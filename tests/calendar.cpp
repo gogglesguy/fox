@@ -3,7 +3,7 @@
 *                    Calendar Example and Test Program                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2011 Sander Jansen. All Rights Reserved                    *
+* Copyright (C) 2006,2012 Sander Jansen. All Rights Reserved                    *
 ********************************************************************************/
 #include <fx.h>
 

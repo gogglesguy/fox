@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -103,7 +103,7 @@ FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen){
   }
 
 
-// Recursively visit files and directories
+// Recursively traverse starting from path
 FXuint FXDirVisitor::traverse(const FXString& path){
   return recurse(path,NULL);
   }
@@ -129,51 +129,37 @@ FXuint FXDirVisitor::leave(const FXString& path){
   return 1;
   }
 
-/*
-// Recursively visit files and directories
-FXint FXDirVisitor::traverse(const FXString& path,const FXString& pattern,FXuint flags){
-  FXDir dir(path);
-  if(dir.isOpen()){
-    FXuint   mode=(flags&FXDir::CaseFold)?(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE|FILEMATCH_CASEFOLD):(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE);
-    FXString pathname;
-    FXString name;
-    FXStat   data;
-    while(dir.next(name)){
 
-      // Get full path
-      pathname=path;
-      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
-      pathname+=name;
+/*******************************************************************************/
 
-      // Get file info
-      if(!FXStat::statFile(pathname,data)) continue;
 
-      // Handle directory
-      if(data.isDirectory()){
-#ifdef WIN32
-        if((flags&FXDir::NoDirs) || (data.isHidden() && !(flags&FXDir::HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&FXDir::NoParent)) || (!(flags&FXDir::AllDirs) && !FXPath::match(name,pattern,mode))) continue;
-#else
-        if((flags&FXDir::NoDirs) || (name[0]=='.' && !(flags&FXDir::HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&FXDir::NoParent)) || (!(flags&FXDir::AllDirs) && !FXPath::match(name,pattern,mode))) continue;
-#endif
-        enter(pathname);
-        if(name[0]!='.' || (name[1]!=0 && (name[1]!='.' || name[2]!=0))){ traverse(pathname,pattern,flags); }
-        leave(pathname);
-        }
-
-      // Handle file
-      else{
-#ifdef WIN32
-        if((flags&FXDir::NoFiles) || (data.isHidden() && !(flags&FXDir::HiddenFiles)) || (!(flags&FXDir::AllFiles) && !FXPath::match(name,pattern,mode))) continue;
-#else
-        if((flags&FXDir::NoFiles) || (name[0]=='.' && !(flags&FXDir::HiddenFiles)) || (!(flags&FXDir::AllFiles) && !FXPath::match(name,pattern,mode))) continue;
-#endif
-        visit(pathname);
-        }
-      }
-    }
-  return 1;
+// Recursively traverse starting from path
+FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& pat,FXuint flg){
+  mode=(flg&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
+  pattern=pat;
+  flags=flg;
+  return recurse(path,NULL);
   }
-*/
+
+
+// Handle directory
+FXuint FXGlobVisitor::enter(const FXString& path){
+#ifdef WIN32
+  return !(flags&FXDir::NoDirs) && ((flags&FXDir::HiddenDirs) || !FXStat::isHidden(path)) && ((flags&FXDir::AllDirs) || FXPath::match(path,pattern,mode));
+#else
+  return !(flags&FXDir::NoDirs) && ((flags&FXDir::HiddenDirs) || !FXPath::isHidden(path)) && ((flags&FXDir::AllDirs) || FXPath::match(path,pattern,mode));
+#endif
+  }
+
+
+// Handle file
+FXuint FXGlobVisitor::visit(const FXString& path){
+#ifdef WIN32
+  return !(flags&FXDir::NoFiles) && ((flags&FXDir::HiddenFiles) || !FXStat::isHidden(path)) && ((flags&FXDir::AllFiles) || FXPath::match(path,pattern,mode));
+#else
+  return !(flags&FXDir::NoFiles) && ((flags&FXDir::HiddenFiles) || !FXPath::isHidden(path)) && ((flags&FXDir::AllFiles) || FXPath::match(path,pattern,mode));
+#endif
+  }
 
 
 }

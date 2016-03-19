@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -75,7 +75,7 @@ public:
   FXMat3f& operator=(const FXMat2f& s);
   FXMat3f& operator=(const FXMat3f& s);
   FXMat3f& operator=(const FXMat4f& s);
-  
+
   /// Assignment from quaternion
   FXMat3f& operator=(const FXQuatf& quat);
 
@@ -169,6 +169,9 @@ public:
 
   /// Invert
   FXMat3f invert() const;
+  
+  /// Destructor
+ ~FXMat3f(){}
   };
 
 

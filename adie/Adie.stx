@@ -3,7 +3,7 @@
 #                       A d i e   S y n t a x   F i l e                         #
 #                                                                               #
 #################################################################################
-# Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        #
+# Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        #
 #################################################################################
 # This program is free software; you can redistribute it and/or modify          #
 # it under the terms of the GNU General Public License as published by          #
@@ -1158,7 +1158,7 @@ end
 language "GLSL"
 
   # File patterns for this language mode
-  filesmatch "*.frag,*.vert"
+  filesmatch "*.frag,*.vert,*.glsl"
   contentsmatch "\AGLSL"
 
   # Word delimiters
@@ -1187,7 +1187,7 @@ language "GLSL"
   end
 
   rule "Keyword"
-    pattern     "\<(if|else|for|while|do|discard|return|break|continue|struct)\>"
+    pattern     "\<(if|else|for|while|do|switch|case|default|discard|return|break|continue|struct)\>"
   end
 
   rule "Number"
@@ -1195,11 +1195,23 @@ language "GLSL"
   end
 
   rule "Type"
-    pattern     "\<(void|bool|int|float|vec2|vec3|vec4|bvec2|bvec3|bvec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler1D|sampler2D|sampler3D|samplerCube|sampler1DShadow|sampler2DShadow)\>"
+    pattern     "\<(void|bool|int|uint|atomic_uint|float|double)\>"
+  end
+
+  rule "Vector"
+    pattern     "\<(vec2|vec3|vec4|dvec2|dvec3|dvec4|bvec2|bvec3|bvec4|ivec2|ivec3|ivec4|uvec2|uvec3|uvec4)\>"
+  end
+
+  rule "Matrix"
+    pattern     "\<(mat2|mat3|mat4|mat2x2|mat2x3|mat2x4|mat3x2|mat3x3|mat3x4|mat4x2|mat4x3|mat4x4|dmat2|dmat3|dmat4|dmat2x2|dmat2x3|dmat2x4|dmat3x2|dmat3x3|dmat3x4|dmat4x2|dmat4x3|dmat4x4)\>"
+  end
+
+  rule "Sampler"
+    pattern     "\<(sampler1D|image1D|sampler2D|image2D|sampler3D|image3D|samplerCube|imageCube|sampler2DRect|image2DRect|sampler1DArray|image1DArray|sampler2DArray|image2DArray|samplerBuffer|imageBuffer|sampler2DMS|image2DMS|sampler2DMSArray|image2DMSArray|samplerCubeArray|imageCubeArray|sampler1DShadow|sampler2DShadow|sampler2DRectShadow|sampler2DArrayShadow|sampler1DArrayShadow|sampler2DArrayShadow|samplerCubeShadow|samplerCubeArrayShadow|isampler1D|iimage1D|isampler2D|iimage2D|isampler3D|iimage3D|isamplerCube|iimageCube|isampler2DRect|iimage2DRect|isampler1DArray|iimage1DArray|isampler2DArray|iimage2DArray|isamplerBuffer|iimageBuffer|isampler2DMS|iimage2DMS|isampler2DMSArray|iimage2DMSArray|isamplerCubeArray|iimageCubeArray|usampler1D|uimage1D|usampler2D|uimage2D|usampler3D|uimage3D|usamplerCube|uimageCube|usampler2DRect|uimage2DRect|usampler1DArray|uimage1DArray|usampler2DArray|uimage2DArray|usamplerBuffer|uimageBuffer|usampler2DMS|uimage2DMS|usampler2DMSArray|uimage2DMSArray|usamplerCubeArray|uimageCubeArray)\>"
   end
 
   rule "Qualifier"
-    pattern     "\<(varying|attribute|uniform|in|out|inout|const)\>"
+    pattern     "\<(const|in|out|inout|attribute|uniform|varying|invariant|coherent|volatile|restrict|readonly|writeonly|centroid|sample|flat|noperspective|smooth|patch|layout)\>"
   end
 
   rule "Braces"

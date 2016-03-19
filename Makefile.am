@@ -27,21 +27,7 @@ web: distdir
 drop: dist-all
 	cp $(distdir).tar.gz /net/webby/ftp/pub
 	cp $(distdir).zip /net/webby/ftp/pub
+	sha1sum $(distdir).tar.gz >/net/webby/ftp/pub/$(distdir).tar.gz.sha1sum
+	sha1sum $(distdir).zip >/net/webby/ftp/pub/$(distdir).zip.sha1sum
 	cd /net/webby/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
 	cd /net/webby/ftp/pub && ln -sf $(distdir).zip fox-latest.zip
-
-
-#diff: distdir
-#	-diff -P -c -r fox-1.1.8 $(distdir) > fox-patch-1.1.8-$(distdir)
-
-# Suggestion for the above
-# cvs rdiff -u -kk -r fox-1.0.8 -r fox-1.0.9 FOX > fox-path-1.0.8-1.0.9
-
-
-#dist-hook:
-#	cp fox.spec $(distdir)
-#	cp -dpR windows $(distdir)/windows
-#	-find $(distdir)/windows -name CVS -exec rm -rf {} \;
-
-
-

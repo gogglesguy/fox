@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1225,10 +1225,10 @@ FXVec3f FXGLViewer::spherePoint(FXint px,FXint py){
   v.y=2.0f*(0.5f*wvt.h-py)/screenmin;
   d=v.x*v.x+v.y*v.y;
   if(d<0.75f){
-    v.z=sqrtf(1.0-d);
+    v.z=sqrtf(1.0f-d);
     }
   else if(d<3.0f){
-    d=1.7320508008f-sqrtf(d);
+    d=1.7320508075688772f-sqrtf(d);
     t=1.0f-d*d;
     if(t<0.0f) t=0.0f;
     v.z=1.0f-sqrtf(t);

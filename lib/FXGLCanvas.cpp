@@ -3,7 +3,7 @@
 *                    O p e n G L   C a n v a s   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -133,6 +133,8 @@ void FXGLCanvas::create(){
       HDC hdc=::GetDC((HWND)xid);       // FIXME should this be this->GetDC()
       SetPixelFormat(hdc,(FXint)(FXival)visual->id(),&pfd);
       ::ReleaseDC((HWND)xid,hdc);       // FIXME should this be this->ReleaseDC()
+//#elif defined(GLX_VERSION_1_3)
+//      xid=glXCreateWindow((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),xid,NULL);
 #endif
 #endif
       }
@@ -152,6 +154,12 @@ void FXGLCanvas::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
       if(options&GLCANVAS_OWN_CONTEXT) context->destroy();
+#ifdef HAVE_GL_H
+//#if defined(GLX_VERSION_1_3)
+//      glXDestroyWindow((Display*)getApp()->getDisplay(),xid);
+//      xid=0;
+//#endif
+#endif
       }
     }
   FXCanvas::destroy();

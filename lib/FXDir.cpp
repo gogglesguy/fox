@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -278,7 +278,7 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
       if(count+1>=size){
         size=size?(size<<1):256;
         newlist=new FXString [size];
-        for(int i=0; i<count; i++){
+        for(FXint i=0; i<count; i++){
           newlist[i].adopt(filelist[i]);
           }
         delete [] filelist;

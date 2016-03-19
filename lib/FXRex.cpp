@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1775,7 +1775,7 @@ FXbool FXExecute::match(const FXuchar* prog){
         str++;
         continue;
       case OP_NOT_PUNCT:        // Match a non-punctuation
-        if(str_end<=str || *str=='\n' || isDelim((FXuchar) *str)) goto f;
+        if(str_end<=str || *str=='\n' || isDelim(*str)) goto f;
         str++;
         continue;
       case OP_NOT_PUNCT_NL:     // Match a non-punctuation including newline
@@ -1809,7 +1809,7 @@ FXbool FXExecute::match(const FXuchar* prog){
         prog+=2;
         if(str+no>str_end) goto f;
         do{
-          if(*prog != *str) goto f;
+          if(*prog != (FXuchar)*str) goto f;
           prog++;
           str++;
           }
@@ -2026,11 +2026,11 @@ rep:    if(str_end<str+rep_min) goto f;
             break;
           case OP_CHAR:
             ch=*prog++;
-            while(save<end && (FXuchar)*save==ch){ save++; }
+            while(save<end && ch==(FXuchar)*save){ save++; }
             break;
           case OP_CHAR_CI:
             ch=*prog++;
-            while(save<end && Ascii::toLower(*save)==ch && *save!='\n'){ save++; }
+            while(save<end && ch==Ascii::toLower(*save)){ save++; }
             break;
           default:
             fxerror("FXRex::match: bad opcode (%d) at: %p on line: %d\n",op,prog-1,__LINE__);
@@ -2266,7 +2266,7 @@ FXbool FXExecute::attempt(const FXchar* string){
 
 // Match subject string, returning number of matches found
 FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
-  register FXint ch;
+  register FXuchar ch;
 
   // Simple case
   if(fm==to) return attempt(fm);

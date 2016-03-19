@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -967,6 +967,35 @@ FXMat4d FXMat4d::rigidInvert() const {
   }
 
 
+// Return normal-transformation matrix (inverse transpose of upper 3x3 block)
+FXMat3d FXMat4d::normalMatrix() const {
+  register FXdouble dd;
+  FXMat3d res;
+  res[0][0]=m[1][1]*m[2][2]-m[1][2]*m[2][1];
+  res[0][1]=m[1][2]*m[2][0]-m[1][0]*m[2][2];
+  res[0][2]=m[1][0]*m[2][1]-m[1][1]*m[2][0];
+  res[1][0]=m[0][2]*m[2][1]-m[0][1]*m[2][2];
+  res[1][1]=m[0][0]*m[2][2]-m[0][2]*m[2][0];
+  res[1][2]=m[0][1]*m[2][0]-m[0][0]*m[2][1];
+  res[2][0]=m[0][1]*m[1][2]-m[0][2]*m[1][1];
+  res[2][1]=m[0][2]*m[1][0]-m[0][0]*m[1][2];
+  res[2][2]=m[0][0]*m[1][1]-m[0][1]*m[1][0];
+  dd=m[0][0]*res[0][0]+m[0][1]*res[0][1]+m[0][2]*res[0][2];
+  FXASSERT(dd!=0.0);
+  dd=1.0/dd;
+  res[0][0]*=dd;
+  res[0][1]*=dd;
+  res[0][2]*=dd;
+  res[1][0]*=dd;
+  res[1][1]*=dd;
+  res[1][2]*=dd;
+  res[2][0]*=dd;
+  res[2][1]*=dd;
+  res[2][2]*=dd;
+  return res;
+  }
+
+
 // Matrix times vector
 FXVec3d operator*(const FXMat4d& m,const FXVec3d& v){
 #if defined(FOX_HAS_SSE3)
@@ -1021,7 +1050,7 @@ FXVec4d operator*(const FXMat4d& m,const FXVec4d& v){
 #endif
   }
 
-
+ 
 // Vector times matrix
 FXVec3d operator*(const FXVec3d& v,const FXMat4d& m){
 #if defined(FOX_HAS_SSE3)
@@ -1037,8 +1066,8 @@ FXVec3d operator*(const FXVec3d& v,const FXMat4d& m){
   register __m128d v1=_mm_set1_pd(v[1]);
   register __m128d v2=_mm_set1_pd(v[2]);
   FXVec3d r;
-  _mm_store_pd(&r[0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m00,v0),_mm_mul_pd(m10,v1)),_mm_add_pd(_mm_mul_pd(m20,v2),m30)));
-  _mm_store_sd(&r[2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(m02,v0),_mm_mul_sd(m12,v1)),_mm_add_sd(_mm_mul_sd(m22,v2),m32)));
+  _mm_storeu_pd(&r[0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m00,v0),_mm_mul_pd(m10,v1)),_mm_add_pd(_mm_mul_pd(m20,v2),m30)));
+  _mm_store_sd (&r[2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(m02,v0),_mm_mul_sd(m12,v1)),_mm_add_sd(_mm_mul_sd(m22,v2),m32)));
   return r;
 #else
   return FXVec3d(v[0]*m[0][0]+v[1]*m[1][0]+v[2]*m[2][0]+m[3][0], v[0]*m[0][1]+v[1]*m[1][1]+v[2]*m[2][1]+m[3][1], v[0]*m[0][2]+v[1]*m[1][2]+v[2]*m[2][2]+m[3][2]);
@@ -1062,8 +1091,8 @@ FXVec4d operator*(const FXVec4d& v,const FXMat4d& m){
   register __m128d v2=_mm_set1_pd(v[2]);
   register __m128d v3=_mm_set1_pd(v[3]);
   FXVec4d r;
-  _mm_store_pd(&r[0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m00,v0),_mm_mul_pd(m10,v1)),_mm_add_pd(_mm_mul_pd(m20,v2),_mm_mul_pd(m30,v3))));
-  _mm_store_pd(&r[2],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m02,v0),_mm_mul_pd(m12,v1)),_mm_add_pd(_mm_mul_pd(m22,v2),_mm_mul_pd(m32,v3))));
+  _mm_storeu_pd(&r[0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m00,v0),_mm_mul_pd(m10,v1)),_mm_add_pd(_mm_mul_pd(m20,v2),_mm_mul_pd(m30,v3))));
+  _mm_storeu_pd(&r[2],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m02,v0),_mm_mul_pd(m12,v1)),_mm_add_pd(_mm_mul_pd(m22,v2),_mm_mul_pd(m32,v3))));
   return r;
 #else
   return FXVec4d(v[0]*m[0][0]+v[1]*m[1][0]+v[2]*m[2][0]+v[3]*m[3][0], v[0]*m[0][1]+v[1]*m[1][1]+v[2]*m[2][1]+v[3]*m[3][1], v[0]*m[0][2]+v[1]*m[1][2]+v[2]*m[2][2]+v[3]*m[3][2], v[0]*m[0][3]+v[1]*m[1][3]+v[2]*m[2][3]+v[3]*m[3][3]);

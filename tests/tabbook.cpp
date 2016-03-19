@@ -3,7 +3,7 @@
 *                                 Test Tab Book                                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

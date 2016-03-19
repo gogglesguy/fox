@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -240,6 +240,7 @@
 #include "FXFontDialog.h"
 #include "FXUndoList.h"
 #include "FXRex.h"
+#include "FXExpression.h"
 #include "FXText.h"
 #include "FXDataTarget.h"
 #include "FXProgressBar.h"

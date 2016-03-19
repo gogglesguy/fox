@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -65,7 +65,7 @@ public:
   FXbool empty() const { return (code==initial); }
 
   /// Evaluate expression with given arguments, if any
-  FXdouble evaluate(const FXdouble *args=NULL);
+  FXdouble evaluate(const FXdouble *args=NULL) const;
 
   /// Parse expression, return error code if syntax error is found
   FXExpressionError parse(const FXchar* expression,const FXchar* variables=NULL);
@@ -76,9 +76,18 @@ public:
   /// Returns error code for given error
   static const FXchar* getError(FXExpressionError err){ return errors[err]; }
 
+  /// Saving and loading
+  friend FXAPI FXStream& operator<<(FXStream& store,const FXExpression& s);
+  friend FXAPI FXStream& operator>>(FXStream& store,FXExpression& s);
+
   /// Delete
  ~FXExpression();
   };
+
+
+// Serialization
+extern FXAPI FXStream& operator<<(FXStream& store,const FXExpression& s);
+extern FXAPI FXStream& operator>>(FXStream& store,FXExpression& s);
 
 }
 

@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -286,7 +286,7 @@ FXint FXGLVisual::matchSpecs(const FXGLSpecs& s){
     }
 
   // Composition support would be nice to have
-  if(!s.composition) match+=2;
+  if(!s.composition) match+=100;
 
   // Off-screen drawing would be nice
   if(!s.image) match+=1;
@@ -601,6 +601,7 @@ void FXGLVisual::create(){
             vi=XGetVisualInfo((Display*)getApp()->getDisplay(),VisualScreenMask,&vitemplate,&nvi);
             if(vi){
               int defvisualid=XVisualIDFromVisual(DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())));
+              int samplebuffers=0;
               int bestmatch=1000000000;
               int best=-1;
               int value;
@@ -639,7 +640,10 @@ void FXGLVisual::create(){
                 if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_STEREO,&specs.stereobuffer)!=Success) continue;
 
                 // Get multisample support (if we don't succeed, set it to zero)
-                if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_SAMPLES_ARB,&specs.multisamples)!=Success) specs.multisamples=0;
+                specs.multisamples=0;
+                if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_SAMPLE_BUFFERS_ARB,&samplebuffers)==Success && samplebuffers){
+                  if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_SAMPLES_ARB,&specs.multisamples)!=Success) continue;
+                  }
 
                 // Check if accelerated or not (assume yes)
                 if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_VISUAL_CAVEAT_EXT,&specs.accel)==Success){

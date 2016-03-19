@@ -19,6 +19,48 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 27 - FOX DEVELOPMENT 1.7.33
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Issue with Windows7 OpenGL pixel format supporting composition is weighted heavier, thus picking
+composition mode preferentially.  This makes it less likely that the visual will match non-Aero capable pixel
+formats.</li>
+<li>Fixed TIFF image save/load.</li>
+<li>Fixed quaternion arc() for vectors that are 180 degrees apart.</li>
+<li>Some tweaks in FXAtomic: more optimal code for non-PIC compiles; also, check for PIE (position independent executable).</li>
+<li>Fixed problem in FXRex regarding non-ASCII characters.</li>
+<li>Repaired some broken syntax patterns in Adie.stx syntax file.</li>
+<li>SSE-ified lerp() API added to vector classes.</li>
+<li>Fixed SSE unaligned store problem in FXMat4d; exhibited itself on 32-bit systems.</li>
+<li>Setjmp()/longjmp() issue fixed in fxpngio.cpp.</li>
+<li>Operator FXbool in FXAutoPtr and FXRefPtr interfered with comparison operators; removed it.</li>
+<li>Added API's to FXMat4 classes.</li>
+<li>Added serialization capability to FXExpression class.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 27 - FOX STABLE 1.6.45
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed quaternion arc() routine.  In case of vectors that are (almost) 180 degrees apart, the wrong
+quaternion was returned.</li>
+<li>Issue with Windows7 OpenGL pixel format supporting composition is weighted heavier, thus picking
+composition mode preferentially.  This makes it less likely that the visual will match non-Aero capable pixel
+formats.</li>
+<li>Invalid handle issue fixed in FXWindow.</li>
+<li>Backported FXPath shell escaping routine.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 January 3 - FOX DEVELOPMENT 1.7.32
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -31,7 +73,7 @@ January 3 - FOX DEVELOPMENT 1.7.32
 <li>Removed copy constructor and assignment operator for FXDict; was never correct anyway, and its not used.</li>
 <li>Issue with FXMenuCheck and FXMenuRadio reimplementing ID_SETVALUE with a boolean argument, whereas baseclass
 implements ID_SETVALUE with string (since there is no check)  This caused some breakage in apps.</li>
-<li>Scrolling widgets like FXIconList no longer do makeItemVisible if user clicks on item:- this was disconcerting 
+<li>Scrolling widgets like FXIconList no longer do makeItemVisible if user clicks on item:- this was disconcerting
 and unnecessary; if you can click on it, then you must have been able to see it!</li>
 <li>Fixed few issues with incremental search bar visibility.</li>
 </ul>

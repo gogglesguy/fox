@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -95,6 +95,9 @@ public:
 
   /// Clamp values of vector between limits
   FXVec3d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi),FXCLAMP(lo,z,hi)); }
+
+  /// Destructor
+ ~FXVec3d(){}
   };
 
 
@@ -160,6 +163,9 @@ extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,c
 
 /// Normalize vector
 extern FXAPI FXVec3d normalize(const FXVec3d& v);
+
+/// Linearly interpolate
+extern FXAPI FXVec3d lerp(const FXVec3d& u,const FXVec3d& v,FXdouble f);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3d& v);

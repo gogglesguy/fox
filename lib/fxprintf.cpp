@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -383,15 +383,6 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble value,FXint prec
     p=_fcvt(buf1,value,decimal,negative,prec);
     }
 
-/*
-  // Check for Infinity and NaN
-  if(apr_isalpha(*p)){
-    *len = strlen(p);
-    memcpy(buf, p, *len + 1);
-    *is_negative = false;
-    return buffer;
-    }
-*/
   // Deal with sign
   if(negative){
     *ptr++='-';

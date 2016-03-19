@@ -3,7 +3,7 @@
 *                       S t a t u s L i n e   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,13 +33,13 @@ namespace FX {
 * A semi-permanent message can override this permanent message, for example to
 * indicate the application is busy or in a particular operating mode.
 * The status line obtains the semi-permanent message by sending its target (if any)
-* SEL_UPDATE message. 
+* SEL_UPDATE message.
 * A ID_SETSTRINGVALUE can be used to change the status message.
-* When the user moves the cursor over a widget which has status-line help, the 
+* When the user moves the cursor over a widget which has status-line help, the
 * status line can flash a very temporarily message with help about the widget.
 * For example, the status line may flash the "Quit Application" message when
 * the user moves the cursor over the Quit button.
-* The status line obtains the help message from the control by sending it a 
+* The status line obtains the help message from the control by sending it a
 * ID_QUERY_HELP message with type SEL_UPDATE.
 * Unless the value is overridden, the status line will display the normal text,
 * i.e. the string set via setNormalText().

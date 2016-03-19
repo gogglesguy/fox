@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -88,6 +88,9 @@ public:
 
   /// Clamp values of vector between limits
   FXVec2d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi)); }
+
+  /// Destructor
+ ~FXVec2d(){}
   };
 
 
@@ -138,6 +141,9 @@ inline FXVec2d hi(const FXVec2d& a,const FXVec2d& b){return FXVec2d(FXMAX(a.x,b.
 
 /// Normalize vector
 extern FXAPI FXVec2d normalize(const FXVec2d& v);
+
+/// Linearly interpolate
+extern FXAPI FXVec2d lerp(const FXVec2d& u,const FXVec2d& v,FXdouble f);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec2d& v);

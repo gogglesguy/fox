@@ -3,7 +3,7 @@
 *                      J P E G    I n p u t / O u t p u t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2011 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2012 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,6 +26,7 @@
 #include "FXElement.h"
 #include "FXStream.h"
 #ifdef HAVE_JPEG_H
+#include <setjmp.h>
 #undef FAR
 extern "C" {
 /* Theo Veenker <Theo.Veenker@let.uu.nl> says this is needed for CYGWIN */
@@ -44,7 +45,6 @@ typedef int INT32;
 }
 #endif
 
-#include <setjmp.h>
 
 
 /*

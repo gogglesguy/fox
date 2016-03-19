@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -849,7 +849,7 @@ FXExpressionError FXExpression::parse(const FXString& expression,const FXString&
 
 
 // Evaluate expression
-FXdouble FXExpression::evaluate(const FXdouble *args){
+FXdouble FXExpression::evaluate(const FXdouble *args) const {
   FXdouble stack[MAXSTACKDEPTH];
   register const FXuchar *pc=code+4;
   register FXdouble *sp=stack-1;
@@ -917,6 +917,26 @@ FXdouble FXExpression::evaluate(const FXdouble *args){
       }
     }
   return 0.0;
+  }
+
+
+// Save
+FXStream& operator<<(FXStream& store,const FXExpression& s){
+  FXint size=*((FXint*)s.code);
+  store << size;
+  store.save(s.code+4,size-4);
+  return store;
+  }
+
+
+// Load
+FXStream& operator>>(FXStream& store,FXExpression& s){
+  FXint size;
+  store >> size;
+  allocElms(s.code,size);
+  store.load(s.code+4,size-4);
+  *((FXint*)s.code)=size;
+  return store;
   }
 
 

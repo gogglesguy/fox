@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n    R a n g e    C l a s s            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -150,6 +150,9 @@ public:
 
   /// Transform range by 4x4 matrix
   FXRanged transform(const FXMat4d& mat) const;
+
+  /// Destructor
+ ~FXRanged(){}
   };
 
 

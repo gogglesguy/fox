@@ -3,7 +3,7 @@
 *                         P r o c e s s   S u p p o r t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -408,15 +408,15 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
     if(::GetFileAttributesW(uniexec)!=INVALID_FILE_ATTRIBUTES){
       PROCESS_INFORMATION pi;
       STARTUPINFO si;
-      
+
       // Zero out process info and startup info
       memset(&pi,0,sizeof(pi));
       memset(&si,0,sizeof(si));
-      
+
       // Init startup info
       si.cb=sizeof(si);
       si.dwFlags=STARTF_USESTDHANDLES;
-      
+
       // Stdin was redirected
       si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
       if(input && input->isOpen()){
@@ -434,13 +434,13 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
       if(errors && errors->isOpen()){
         si.hStdError=output->handle();
         }
-        
+
       // Build wide-character command line
       FXnchar *command=commandline(args);
-      
+
       // Build wide-character environment block
       FXnchar *envir=enviroblock(env);
-      
+
       // Create process
       if(CreateProcessW(uniexec,command,NULL,NULL,TRUE,CREATE_UNICODE_ENVIRONMENT,envir,NULL,&si,&pi)){
         CloseHandle(pi.hThread);
@@ -456,15 +456,15 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
     if(::GetFileAttributesA(exec)!=INVALID_FILE_ATTRIBUTES){
       PROCESS_INFORMATION pi;
       STARTUPINFO si;
-      
+
       // Zero out process info and startup info
       memset(&pi,0,sizeof(pi));
       memset(&si,0,sizeof(si));
-      
+
       // Init startup info
       si.cb=sizeof(si);
       si.dwFlags=STARTF_USESTDHANDLES;
-      
+
       // Stdin was redirected
       si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
       if(input && input->isOpen()){
@@ -485,17 +485,17 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
 
       // Build command line
       FXchar *command=commandline(args);
-      
+
       // Build environment block
       FXchar *envir=enviroblock(env);
-      
+
       // Create process
       if(CreateProcessA(exec,command,NULL,NULL,TRUE,0,envir,NULL,&si,&pi)){
         CloseHandle(pi.hThread);
         pid=pi.hProcess;
         result=true;
         }
-      
+
       // Free command line and environment block
       freeElms(envir);
       freeElms(command);
@@ -510,17 +510,17 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
 
           // Stdin was redirected
           if(input && input->isOpen()){
-            dup2(input->handle(),STDIN_FILENO); 
+            dup2(input->handle(),STDIN_FILENO);
             }
-            
+
           // Stdout was redirected
           if(output && output->isOpen()){
-            dup2(output->handle(),STDOUT_FILENO); 
+            dup2(output->handle(),STDOUT_FILENO);
             }
-            
+
           // Stderr was redirected
           if(errors && errors->isOpen()){
-            dup2(errors->handle(),STDERR_FILENO); 
+            dup2(errors->handle(),STDERR_FILENO);
             }
 
           // Close all other handles

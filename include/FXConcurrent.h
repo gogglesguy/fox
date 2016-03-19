@@ -3,7 +3,7 @@
 *            C o n c u r r e n t   T a s k   E x e c u t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2010,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2010,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -100,7 +100,7 @@ typedef FXPtrListOf<FXWorkQueue> FXWorkQueues;
 * FXConcurrent is started by calling its start() API, passing the number of threads
 * to start and the size of the work-queue for each thread (default is 32).
 * To minimize needless context-switching, it is usually best to start no more threads
-* than there are processors in the system (you can use FXThread::processors() to find 
+* than there are processors in the system (you can use FXThread::processors() to find
 * out how many processors are in your system).
 * Parallel tasks are started by calling execute(), passing the task to be performed
 * and the arguments (data) to perform the task on.  A total of argc tasks is started,

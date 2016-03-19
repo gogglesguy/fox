@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    S p h e r e    C l a s s         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -117,6 +117,9 @@ public:
 
   /// Transform sphere by 4x4 matrix
   FXSpheref transform(const FXMat4f& mat) const;
+
+  /// Destructor
+ ~FXSpheref(){}
   };
 
 

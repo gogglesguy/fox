@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -70,7 +70,7 @@ struct FXTextChange {
 
 /**
 * The text widget provides a multi-line text editing control.
-* The widget supports both clipboard for cut-and-paste operations, 
+* The widget supports both clipboard for cut-and-paste operations,
 * as well as drag and drop of text.
 * Text may be edited interactively by the user, or changed through
 * the programmatic interface.
@@ -79,9 +79,9 @@ struct FXTextChange {
 * of changes to the current cursor location by issueing SEL_CHANGED
 * callbacks.  If text is inserted, deleted, or replaced, the widget
 * will send SEL_INSERTED, SEL_DELETED, or SEL_REPLACED messages, and
-* pass along an FXTextChange to indicate what changes were made to the 
+* pass along an FXTextChange to indicate what changes were made to the
 * text buffer, in sufficient detail for recording undo and redo info.
-* 
+*
 * When selections are made, SEL_SELECTED or SEL_DESELECTED messages
 * are issued, passing along the range of text affected by the change
 * in selection.
@@ -89,31 +89,31 @@ struct FXTextChange {
 * As the cursor is being moved, matching parentheses, brackets, and
 * braces may be highlighted for a short time if the brace-matching
 * feature has been enabled.
-* 
-* An auto-indent feature, enabled by TEXT_AUTOINDENT flag, will automatically 
+*
+* An auto-indent feature, enabled by TEXT_AUTOINDENT flag, will automatically
 * enter a number of spaces if a newline is entered, starting new text entry at
 * the same level of indent as the previous line.
-*  
+*
 * When styled mode is turned on, the text widget will maintain a parallel
-* style-buffer along side the text-buffer.  This style buffer is used to 
-* index into a style table (FXHiliteStyle), which describes what colors 
-* and visual attributes are to be used to draw the each character in the 
+* style-buffer along side the text-buffer.  This style buffer is used to
+* index into a style table (FXHiliteStyle), which describes what colors
+* and visual attributes are to be used to draw the each character in the
 * text buffer.
-* 
+*
 * When text is added to the widget programmatically, a style index may
 * be passed in to apply to the newly added text.  It is also possible to
 * change the style of the text without changing the text itself.  This
 * could be used to form the basis of a colorizing text editor, for example.
 *
-* The first entry in the style table corresponds to a style index of 1. 
+* The first entry in the style table corresponds to a style index of 1.
 * Style index 0 is used for the default text style, the style that would
 * be shown if the styled mode is not in effect.
 *
-* In a typical scenario, the contents of the style buffer is either directly 
+* In a typical scenario, the contents of the style buffer is either directly
 * written when the text is added to the widget, or is continually modified
 * by editing the text via syntax-based highlighting engine which
 * colors the text based on syntactical patterns.
-* 
+*
 * The text widget has several controlling flags which affect its behaviour
 * and display.  TEXT_READONLY sets the widget in read-only mode.  In this
 * mode, the contents of the widget may only be changed programmatically,
@@ -1008,7 +1008,7 @@ public:
 
   /**
   * Set highlight styles.
-  * The table of styles is only referenced by the widget; it is not copied.  
+  * The table of styles is only referenced by the widget; it is not copied.
   * Thus, multiple widgets may share a common style table.
   * Some care must be taken to populate the style-buffer only with numbers
   * inside the style table.

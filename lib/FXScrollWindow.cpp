@@ -3,7 +3,7 @@
 *                     S c r o l l W i n d o w   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -203,11 +203,11 @@ void FXScrollWindow::layout(){
   }
 
 
-// When focus moves to scroll window, we actually force the
-// focus to the content window or a child thereof.
-long FXScrollWindow::onFocusSelf(FXObject* sender,FXSelector,void* ptr){
-  FXWindow *child=contentWindow();      ///// FIXME see MDIChild /////
-  return child && child->handle(sender,FXSEL(SEL_FOCUS_SELF,0),ptr);
+// Focus on widget itself and try put focus on the content window as well
+long FXScrollWindow::onFocusSelf(FXObject* sender,FXSelector,void* ptr){        // See FXMDIChild
+  setFocus();                           
+  if(contentWindow()) contentWindow()->handle(sender,FXSEL(SEL_FOCUS_SELF,0),ptr);
+  return 1;
   }
 
 

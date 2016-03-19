@@ -3,7 +3,7 @@
 *                S h u t t e r   B u g   A p p l i c a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -119,6 +119,9 @@ const FXchar patterns[]=
 #ifdef HAVE_TIFF_H
   "\nTIFF Image (*.tif)"
 #endif
+#ifdef HAVE_WEBP_H
+  "\nWebP Image (*.webp)"
+#endif
   "\nRAS Image (*.ras)"
   "\nPS Image (*.ps)"
   ;
@@ -141,6 +144,9 @@ enum {
 #endif
 #ifdef HAVE_TIFF_H
   ,TYPE_TIF
+#endif
+#ifdef HAVE_WEBP_H
+  ,TYPE_WBP
 #endif
   ,TYPE_RAS
   ,TYPE_PS
@@ -609,6 +615,9 @@ FXbool ShutterBug::saveImage(const FXString& file,FXColor* pixels,FXint w,FXint 
 #ifdef HAVE_TIFF_H
       case TYPE_TIF: ok=fxsaveTIF(outfile,pixels,w,h,0); break;
 #endif
+#ifdef HAVE_WEBP_H
+      case TYPE_WBP: ok=fxsaveWEBP(outfile,pixels,w,h,75.0f); break;
+#endif
       case TYPE_RAS: ok=fxsaveRAS(outfile,pixels,w,h); break;
       case TYPE_PS: ok=fxsavePS(outfile,pixels,w,h); break;
       }
@@ -952,7 +961,7 @@ long ShutterBug::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"ShutterBug",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nFOX Screenshot Utility, version %d.%d.%d.\nShutterBug uses the FOX Toolkit version %d.%d.%d.\nCopyright (C) 2003,2011 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nFOX Screenshot Utility, version %d.%d.%d.\nShutterBug uses the FOX Toolkit version %d.%d.%d.\nCopyright (C) 2003,2012 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute();

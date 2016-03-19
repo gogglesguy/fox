@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -71,7 +71,7 @@ public:
   /// Assignment
   FXMat4d& operator=(const FXMat3d& s);
   FXMat4d& operator=(const FXMat4d& s);
-  
+
   /// Assignment from quaternion
   FXMat4d& operator=(const FXQuatd& quat);
 
@@ -200,6 +200,12 @@ public:
 
   /// Invert rigid body transform matrix
   FXMat4d rigidInvert() const;
+
+  /// Return normal-transformation matrix
+  FXMat3d normalMatrix() const;
+  
+  /// Destructor
+ ~FXMat4d(){}
   };
 
 

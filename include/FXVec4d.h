@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -101,6 +101,9 @@ public:
 
   /// Return true if edge a-b crosses plane
   FXbool crosses(const FXVec3d& a,const FXVec3d& b) const;
+
+  /// Destructor
+ ~FXVec4d(){}
   };
 
 
@@ -163,6 +166,9 @@ extern FXAPI FXVec4d colorToVec4d(FXColor clr);
 
 /// Normalize vector
 extern FXAPI FXVec4d normalize(const FXVec4d& v);
+
+/// Linearly interpolate
+extern FXAPI FXVec4d lerp(const FXVec4d& u,const FXVec4d& v,FXdouble f);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec4d& v);
