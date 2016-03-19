@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -86,6 +86,24 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d a=%.16g b=%.16g c=%.16g\n",floatformat[x],floatnumbers[y],res,da,db,dc);
       }
     }
+
+/*
+  FXString st;
+  char buf[1000];
+  FXdouble capacite1,capacite2,capacite3;
+
+  while(gets(buf)){
+    st=buf;
+    capacite2= st.toDouble();
+    fprintf(stderr,"toDouble: %.30lg\n", capacite2);
+    capacite1=strtod(buf,NULL);
+    fprintf(stderr,"strtod:   %.30lg\n", capacite1);
+    st.scan("%lf",&capacite3);
+    fprintf(stderr,"fxscanf:  %.30lg\n", capacite3);
+    fprintf(stderr,"DIFF %.30lg (rel %.10lg)\n",capacite1-capacite2,fabs(capacite1-capacite2)/fabs(capacite1));
+    fprintf(stderr,"DIFF %.30lg (rel %.10lg)\n",capacite1-capacite3,fabs(capacite1-capacite3)/fabs(capacite1));
+    }
+*/
 
   return 1;
   }

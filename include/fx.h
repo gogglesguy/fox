@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -57,6 +57,7 @@
 #include "FXAutoThreadStorageKey.h"
 #include "FXRunnable.h"
 #include "FXThread.h"
+#include "FXScopedThread.h"
 #include "FXStream.h"
 #include "FXPtrList.h"
 #include "FXPtrQueue.h"
@@ -92,8 +93,9 @@
 #include "FXAccelTable.h"
 #include "FXRecentFiles.h"
 #include "FXWorker.h"
-#include "FXConcurrent.h"
+#include "FXLFQueue.h"
 #include "FXThreadPool.h"
+#include "FXParallel.h"
 #include "FXFont.h"
 #include "FXCursor.h"
 #include "FXVisual.h"

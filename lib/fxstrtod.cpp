@@ -3,7 +3,7 @@
 *               S t r i n g   t o   D o u b l e   C o n v e r s i o n           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,7 +30,14 @@
     for conversion success.
   - Checks both overflow and underflow. Note that characters are consumed in case of
     overflow or underflow, but OK flag is still false when the condition is raised.
+  - Accuracy is in the order of 16 digits; this is the best one can do with doubles.
+  - We only work with the first 20 significants digits; processing more will not
+    increase accuracy and may cause trouble.
+  - When compiled with FTZ/DAZ (-ffast-math) or equivalent, results from conversions
+    will be less accurate!
 */
+
+#define MAXDIGS  20     // Maximum number of significant digits
 
 /*******************************************************************************/
 
@@ -47,51 +54,57 @@ extern FXAPI FXfloat __strtof(const FXchar *beg,const FXchar** end=NULL,FXbool* 
 FXdouble __strtod(const FXchar *beg,const FXchar** end,FXbool* ok){
   register const FXchar *s=beg;
   register FXdouble value=0.0;
-  register FXint significands=-1;
-  register FXint exponent=0;
+  register FXdouble mult=1.0;
+  register FXint exponent=-1;
   register FXint digits=0;
   register FXint expo=0;
-  register FXint digs=0;
   register FXint neg;
+  register FXint nex;
+
+  // Assume the worst
+  if(ok) *ok=false;
 
   // No characters consumed
   if(end) *end=s;
 
   // Skip whitespace
   while(Ascii::isSpace(s[0])){
-    s++;
+    ++s;
     }
 
   // Handle sign
   if((neg=(*s=='-')) || (*s=='+')){
-    s++;
+    ++s;
     }
 
-  // Read the mantissa
-  while('0'<=*s && *s<='9'){
-    value=value*10.0+Ascii::digitValue(*s++);
-    if(value) significands++;
-    digits++;
-    }
-  if(*s=='.'){
-    s++;
-    while('0'<=*s && *s<='9'){
-      value=value*10.0+Ascii::digitValue(*s++);
-      if(value) significands++;
-      exponent--;
-      digits++;
+  // We see start of a number
+  if(*s=='.' || ('0'<=*s && *s<='9')){
+
+    // Leading zeros
+    while(*s=='0'){
+      ++s;
       }
-    }
 
-  // Assume the worst
-  if(ok) *ok=false;
-
-  // Got at least a mantissa
-  if(0<digits){
-
-    // Adjust sign
-    if(neg){
-      value=-value;
+    // Read the mantissa
+    while('0'<=*s && *s<='9'){
+      if(digits<MAXDIGS){
+        value+=(*s-'0')*mult;
+        mult*=0.1;
+        }
+      ++exponent;
+      ++digits;
+      ++s;
+      }
+    if(*s=='.'){
+      ++s;
+      while('0'<=*s && *s<='9'){
+        if(digits<MAXDIGS){
+          value+=(*s-'0')*mult;
+          mult*=0.1;
+          }
+        digits++;
+        ++s;
+        }
       }
 
     // Characters consumed so far
@@ -99,18 +112,24 @@ FXdouble __strtod(const FXchar *beg,const FXchar** end,FXbool* ok){
 
     // Try exponent
     if((*s|0x20)=='e'){
-      s++;
-      if((neg=(*s=='-')) || (*s=='+')){
-        s++;
-        }
-      while('0'<=*s && *s<='9'){
-        expo=expo*10+Ascii::digitValue(*s++);
-        digs++;
+      ++s;
+
+      // Handle optional exponent sign
+      if((nex=(*s=='-')) || (*s=='+')){
+        ++s;
         }
 
       // Got an exponent
-      if(0<digs){
-        if(neg){
+      if('0'<=*s && *s<='9'){
+
+        // Eat exponent digits
+        while('0'<=*s && *s<='9'){
+          expo=expo*10+(*s-'0');
+          ++s;
+          }
+
+        // Update exponent
+        if(nex){
           exponent-=expo;
           }
         else{
@@ -122,37 +141,35 @@ FXdouble __strtod(const FXchar *beg,const FXchar** end,FXbool* ok){
         }
       }
 
-    // Mantissa is not zero
+    // Elaborate checks only if non-zero
     if(value!=0.0){
 
-      // Bring mantissa to the form X.XXXXXXX
-      value*=fxtenToThe(-significands);
-      exponent+=significands;
-
       // Check for overflow
-      if((exponent>308) || ((exponent==308) && (value>=1.79769313486231570815))){
-        return 1.79769313486231570815E+308;
+      if(308<=exponent){
+        if((308<exponent) || (1.79769313486231570815<=value)){
+          return neg ? -1.79769313486231570815E+308 : 1.79769313486231570815E+308;      // Sensible value, but not OK
+          }
         }
 
       // Check for denormal or underflow
       if(exponent<-308){
-
-        // Check underflow
         if((exponent<-324) || ((exponent==-324) && (value<=4.94065645841246544177))){
-          return 0.0;
+          if(ok) *ok=true;
+          return 0.0;                                                                   // Flush to zero, and OK
           }
-
-        // Bring exponent into range for denormal
-        value*=1.0E-16;
+        value*=1.0E-16;         // Fix number
         exponent+=16;
         }
 
       // In range
       value*=fxtenToThe(exponent);
-      }
 
-    // OK
-    if(ok) *ok=true;
+      // Adjust sign
+      if(neg){
+        value=-value;
+        }
+      }
+    if(ok) *ok=true;            // OK
     }
   return value;
   }

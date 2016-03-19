@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -417,7 +417,7 @@ PSID GetUserSID(const FXString& name){
     // First call to LookupAccountName to get the buffer sizes
     if(LookupAccountNameA(NULL,user.text(),sid,&sid_size,domain,&domain_size,&use)){
 
-      // Allocate 
+      // Allocate
       sid=(PSID)LocalAlloc(LMEM_FIXED,sid_size);
       domain=new TCHAR [domain_size];
 
@@ -426,8 +426,8 @@ PSID GetUserSID(const FXString& name){
         delete [] domain;
         return sid;
         }
-        
-      // Free 
+
+      // Free
       LocalFree(sid);
       delete [] domain;
       }

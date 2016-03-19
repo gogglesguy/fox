@@ -3,7 +3,7 @@
 *                          S e m a p h o r e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -66,7 +66,47 @@ void FXSemaphore::wait(){
   }
 
 
-// Decrement semaphore; returning false if count is zero
+// Try decrement semaphore; return false if timed out
+FXbool FXSemaphore::wait(FXTime nsec){
+#if defined(WIN32)
+  if(0<nsec){
+    if(nsec<forever){
+      DWORD delay=(DWORD)(nsec/1000000);
+      return WaitForSingleObject((HANDLE)data[0],delay)==WAIT_OBJECT_0;
+      }
+    return WaitForSingleObject((HANDLE)data[0],INFINITE)==WAIT_OBJECT_0;
+    }
+  return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
+  return false;
+#else
+  if(0<nsec){
+    if(nsec<forever){
+#if (_POSIX_C_SOURCE >= 199309L)
+      struct timespec ts;
+      clock_gettime(CLOCK_REALTIME,&ts);
+      ts.tv_sec=ts.tv_sec+(ts.tv_nsec+nsec)/1000000000;
+      ts.tv_nsec=(ts.tv_nsec+nsec)%1000000000;
+      return sem_timedwait((sem_t*)data,&ts)==0;
+#else
+      struct timespec ts;
+      struct timeval tv;
+      gettimeofday(&tv,NULL);
+      tv.tv_usec*=1000;
+      ts.tv_sec=tv.tv_sec+(tv.tv_usec+nsec)/1000000000;
+      ts.tv_nsec=(tv.tv_usec+nsec)%1000000000;
+      return sem_timedwait((sem_t*)data,&ts)==0;
+#endif
+      }
+    return sem_wait((sem_t*)data)==0;
+    }
+  return sem_trywait((sem_t*)data)==0;
+#endif
+  }
+
+
+// Try decrement semaphore; and return false if count is zero
 FXbool FXSemaphore::trywait(){
 #if defined(WIN32)
   return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;

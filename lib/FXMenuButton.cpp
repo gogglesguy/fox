@@ -3,7 +3,7 @@
 *                       M e n u    B u t t o n    O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -292,9 +292,9 @@ long FXMenuButton::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 long FXMenuButton::onKeyPress(FXObject*,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  if(pane && pane->shown() && pane->handle(pane,sel,ptr)) return 1;
   if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
+    if(pane && pane->shown() && pane->handle(pane,sel,ptr)) return 1;
     if(event->code==KEY_space || event->code==KEY_KP_Space){
       if(state)
         handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
@@ -310,9 +310,9 @@ long FXMenuButton::onKeyPress(FXObject*,FXSelector sel,void* ptr){
 // Keyboard release; forward to menu pane, or handle here
 long FXMenuButton::onKeyRelease(FXObject*,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  if(pane && pane->shown() && pane->handle(pane,sel,ptr)) return 1;
   if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
+    if(pane && pane->shown() && pane->handle(pane,sel,ptr)) return 1;
     if(event->code==KEY_space || event->code==KEY_KP_Space){
       return 1;
       }

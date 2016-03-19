@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -951,8 +951,10 @@ void FXDirList::listChildItems(FXDirItem *par){
 
       mode=info.mode();
 
-      // Check if link is a link to a directory
-      if((mode&FXIO::SymLink) && FXStat::isDirectory(pathname)) mode|=FXIO::Directory;
+      // If its a link, get file mode from target
+      if(info.isLink()){
+        mode=FXStat::mode(pathname) | FXIO::SymLink;
+        }
 
 #endif
 

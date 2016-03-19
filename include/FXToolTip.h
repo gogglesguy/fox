@@ -3,7 +3,7 @@
 *                           T o o l   T i p   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,6 +72,7 @@ public:
     ID_LAST
     };
 public:
+
   /// Construct a tool tip
   FXToolTip(FXApp* a,FXuint opts=TOOLTIP_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 

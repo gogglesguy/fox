@@ -3,7 +3,7 @@
 *               D e v i c e   C o n t e x t   B a s e   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,7 +21,9 @@
 #ifndef FXDC_H
 #define FXDC_H
 
+
 namespace FX {
+
 
 /// Drawing (BITBLT) functions
 enum FXFunction {

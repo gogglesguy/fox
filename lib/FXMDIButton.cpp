@@ -3,7 +3,7 @@
 *             M u l t i p l e   D o c u m e n t   B u t t o n                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -91,11 +91,10 @@ FXint FXMDIDeleteButton::getDefaultHeight(){
 
 // Handle repaint
 long FXMDIDeleteButton::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint xx,yy;
   dc.setForeground(backColor);
-  dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
+  dc.fillRectangle(0,0,width,height);
   if(options&(FRAME_RAISED|FRAME_SUNKEN)){
     if(state==STATE_UP){
       if(options&FRAME_THICK) drawDoubleRaisedRectangle(dc,0,0,width,height);
@@ -162,11 +161,10 @@ FXint FXMDIRestoreButton::getDefaultHeight(){
 
 // Handle repaint
 long FXMDIRestoreButton::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint xx,yy;
   dc.setForeground(backColor);
-  dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
+  dc.fillRectangle(0,0,width,height);
   if(options&(FRAME_RAISED|FRAME_SUNKEN)){
     if(state==STATE_UP){
       if(options&FRAME_THICK) drawDoubleRaisedRectangle(dc,0,0,width,height);
@@ -227,11 +225,10 @@ FXint FXMDIMaximizeButton::getDefaultHeight(){
 
 // Handle repaint
 long FXMDIMaximizeButton::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint xx,yy;
   dc.setForeground(backColor);
-  dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
+  dc.fillRectangle(0,0,width,height);
   if(options&(FRAME_RAISED|FRAME_SUNKEN)){
     if(state==STATE_UP){
       if(options&FRAME_THICK) drawDoubleRaisedRectangle(dc,0,0,width,height);
@@ -285,11 +282,10 @@ FXint FXMDIMinimizeButton::getDefaultHeight(){
 
 // Handle repaint
 long FXMDIMinimizeButton::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint xx,yy;
   dc.setForeground(backColor);
-  dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
+  dc.fillRectangle(0,0,width,height);
   if(options&(FRAME_RAISED|FRAME_SUNKEN)){
     if(state==STATE_UP){
       if(options&FRAME_THICK) drawDoubleRaisedRectangle(dc,0,0,width,height);
@@ -348,11 +344,10 @@ FXint FXMDIWindowButton::getDefaultHeight(){
 
 // Handle repaint
 long FXMDIWindowButton::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint ix,iy,iw,ih;
   dc.setForeground(backColor);
-  dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
+  dc.fillRectangle(0,0,width,height);
   drawFrame(dc,0,0,width,height);
   if(icon){
     iw=icon->getWidth();

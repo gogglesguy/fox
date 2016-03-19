@@ -3,7 +3,7 @@
 *                            P o i n t e r   L i s t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -43,7 +43,7 @@
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
 // Empty list
-#define EMPTY       ((void**)(emptylist+1))
+#define EMPTY       ((FXptr*)(emptylist+1))
 
 using namespace FX;
 
@@ -53,20 +53,20 @@ namespace FX {
 
 
 // Empty object list
-static const void* emptylist[2]={0,0};
+static const FXptr emptylist[2]={0,0};
 
 
 // Change number of items in list
 FXbool FXPtrList::no(FXint num){
   register FXint old=no();
-  register void **p;
+  register FXptr* p;
   if(__likely(old!=num)){
     if(0<num){
       if(ptr==EMPTY){
-        if((p=(void**)malloc(ROUNDUP(num)*sizeof(void*)+sizeof(void*)))==NULL) return false;
+        if((p=(FXptr*)malloc(ROUNDUP(num)*sizeof(FXptr)+sizeof(FXptr)))==NULL) return false;
         }
       else{
-        if((p=(void**)realloc(ptr-1,ROUNDUP(num)*sizeof(void*)+sizeof(void*)))==NULL) return false;
+        if((p=(FXptr*)realloc(ptr-1,ROUNDUP(num)*sizeof(FXptr)+sizeof(FXptr)))==NULL) return false;
         }
       ptr=p+1;
       *((FXint*)(ptr-1))=num;
@@ -95,7 +95,7 @@ FXPtrList::FXPtrList(const FXPtrList& src):ptr(EMPTY){
 
 
 // Construct and init with single object
-FXPtrList::FXPtrList(void* object):ptr(EMPTY){
+FXPtrList::FXPtrList(FXptr object):ptr(EMPTY){
   if(__likely(no(1))){
     ptr[0]=object;
     }
@@ -103,7 +103,7 @@ FXPtrList::FXPtrList(void* object):ptr(EMPTY){
 
 
 // Construct and init with n copies of object
-FXPtrList::FXPtrList(void* object,FXint n):ptr(EMPTY){
+FXPtrList::FXPtrList(FXptr object,FXint n):ptr(EMPTY){
   if(__likely(0<n && no(n))){
     fillElms(ptr,object,n);
     }
@@ -111,7 +111,7 @@ FXPtrList::FXPtrList(void* object,FXint n):ptr(EMPTY){
 
 
 // Construct and init with list of objects
-FXPtrList::FXPtrList(void** objects,FXint n):ptr(EMPTY){
+FXPtrList::FXPtrList(FXptr* objects,FXint n):ptr(EMPTY){
   if(__likely(0<n && no(n))){
     copyElms(ptr,objects,n);
     }
@@ -121,7 +121,7 @@ FXPtrList::FXPtrList(void** objects,FXint n):ptr(EMPTY){
 // Assignment operator
 FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
   if(__likely(ptr!=orig.ptr && no(orig.no()))){
-    copyElms(ptr,(void**)orig.ptr,orig.no());
+    copyElms(ptr,(FXptr*)orig.ptr,orig.no());
     }
   return *this;
   }
@@ -138,7 +138,7 @@ void FXPtrList::adopt(FXPtrList& orig){
 
 
 // Assign object p to list
-FXbool FXPtrList::assign(void* object){
+FXbool FXPtrList::assign(FXptr object){
   if(__likely(no(1))){
     ptr[0]=object;
     return true;
@@ -148,7 +148,7 @@ FXbool FXPtrList::assign(void* object){
 
 
 // Assign n copies of object to list
-FXbool FXPtrList::assign(void* object,FXint n){
+FXbool FXPtrList::assign(FXptr object,FXint n){
   if(__likely(no(n))){
     fillElms(ptr,object,n);
     return true;
@@ -158,7 +158,7 @@ FXbool FXPtrList::assign(void* object,FXint n){
 
 
 // Assign n objects to list
-FXbool FXPtrList::assign(void** objects,FXint n){
+FXbool FXPtrList::assign(FXptr* objects,FXint n){
   if(__likely(no(n))){
     moveElms(ptr,objects,n);
     return true;
@@ -169,12 +169,12 @@ FXbool FXPtrList::assign(void** objects,FXint n){
 
 // Assign input string to this string
 FXbool FXPtrList::assign(const FXPtrList& objects){
-  return assign((void**)objects.ptr,objects.no());
+  return assign((FXptr*)objects.ptr,objects.no());
   }
 
 
 // Insert an object
-FXbool FXPtrList::insert(FXint pos,void* object){
+FXbool FXPtrList::insert(FXint pos,FXptr object){
   register FXint num=no();
   if(__likely(no(num+1))){
     moveElms(ptr+pos+1,ptr+pos,num-pos);
@@ -186,7 +186,7 @@ FXbool FXPtrList::insert(FXint pos,void* object){
 
 
 // Insert n copies of object at specified position
-FXbool FXPtrList::insert(FXint pos,void* object,FXint n){
+FXbool FXPtrList::insert(FXint pos,FXptr object,FXint n){
   register FXint num=no();
   if(__likely(no(num+n))){
     moveElms(ptr+pos+n,ptr+pos,num-pos);
@@ -198,7 +198,7 @@ FXbool FXPtrList::insert(FXint pos,void* object,FXint n){
 
 
 // Insert n objects at specified position
-FXbool FXPtrList::insert(FXint pos,void** objects,FXint n){
+FXbool FXPtrList::insert(FXint pos,FXptr* objects,FXint n){
   register FXint num=no();
   if(__likely(no(num+n))){
     moveElms(ptr+pos+n,ptr+pos,num-pos);
@@ -211,12 +211,12 @@ FXbool FXPtrList::insert(FXint pos,void** objects,FXint n){
 
 // Insert objects at specified position
 FXbool FXPtrList::insert(FXint pos,const FXPtrList& objects){
-  return insert(pos,(void**)objects.ptr,objects.no());
+  return insert(pos,(FXptr*)objects.ptr,objects.no());
   }
 
 
 // Prepend an object
-FXbool FXPtrList::prepend(void* object){
+FXbool FXPtrList::prepend(FXptr object){
   register FXint num=no();
   if(__likely(no(num+1))){
     moveElms(ptr+1,ptr,num);
@@ -228,7 +228,7 @@ FXbool FXPtrList::prepend(void* object){
 
 
 // Prepend n copies of object
-FXbool FXPtrList::prepend(void* object,FXint n){
+FXbool FXPtrList::prepend(FXptr object,FXint n){
   register FXint num=no();
   if(__likely(no(num+n))){
     moveElms(ptr+n,ptr,num);
@@ -240,7 +240,7 @@ FXbool FXPtrList::prepend(void* object,FXint n){
 
 
 // Prepend n objects
-FXbool FXPtrList::prepend(void** objects,FXint n){
+FXbool FXPtrList::prepend(FXptr* objects,FXint n){
   register FXint num=no();
   if(__likely(no(num+n))){
     moveElms(ptr+n,ptr,num);
@@ -253,12 +253,12 @@ FXbool FXPtrList::prepend(void** objects,FXint n){
 
 // Prepend objects
 FXbool FXPtrList::prepend(const FXPtrList& objects){
-  return prepend((void**)objects.ptr,objects.no());
+  return prepend((FXptr*)objects.ptr,objects.no());
   }
 
 
 // Append an object
-FXbool FXPtrList::append(void* object){
+FXbool FXPtrList::append(FXptr object){
   register FXint num=no();
   if(__likely(no(num+1))){
     ptr[num]=object;
@@ -269,7 +269,7 @@ FXbool FXPtrList::append(void* object){
 
 
 // Append n copies of object
-FXbool FXPtrList::append(void* object,FXint n){
+FXbool FXPtrList::append(FXptr object,FXint n){
   register FXint num=no();
   if(__likely(no(num+n))){
     fillElms(ptr+num,object,n);
@@ -280,7 +280,7 @@ FXbool FXPtrList::append(void* object,FXint n){
 
 
 // Add string to the end
-FXbool FXPtrList::append(void** objects,FXint n){
+FXbool FXPtrList::append(FXptr* objects,FXint n){
   register FXint num=no();
   if(__likely(no(num+n))){
     copyElms(ptr+num,objects,n);
@@ -292,19 +292,19 @@ FXbool FXPtrList::append(void** objects,FXint n){
 
 // Add string to the end
 FXbool FXPtrList::append(const FXPtrList& objects){
-  return append((void**)objects.ptr,objects.no());
+  return append((FXptr*)objects.ptr,objects.no());
   }
 
 
 // Replace element
-FXbool FXPtrList::replace(FXint pos,void* object){
+FXbool FXPtrList::replace(FXint pos,FXptr object){
   ptr[pos]=object;
   return true;
   }
 
 
 // Replaces the m objects at pos with n copies of object
-FXbool FXPtrList::replace(FXint pos,FXint m,void* object,FXint n){
+FXbool FXPtrList::replace(FXint pos,FXint m,FXptr object,FXint n){
   register FXint num=no();
   if(__unlikely(m<n)){
     if(__unlikely(!no(num-m+n))) return false;
@@ -320,7 +320,7 @@ FXbool FXPtrList::replace(FXint pos,FXint m,void* object,FXint n){
 
 
 // Replaces the m objects at pos with n objects
-FXbool FXPtrList::replace(FXint pos,FXint m,void** objects,FXint n){
+FXbool FXPtrList::replace(FXint pos,FXint m,FXptr* objects,FXint n){
   register FXint num=no();
   if(__unlikely(m<n)){
     if(__unlikely(!no(num-m+n))) return false;
@@ -337,7 +337,7 @@ FXbool FXPtrList::replace(FXint pos,FXint m,void** objects,FXint n){
 
 // Replace the m objects at pos with objects
 FXbool FXPtrList::replace(FXint pos,FXint m,const FXPtrList& objects){
-  return replace(pos,m,(void**)objects.ptr,objects.no());
+  return replace(pos,m,(FXptr*)objects.ptr,objects.no());
   }
 
 
@@ -358,7 +358,7 @@ FXbool FXPtrList::erase(FXint pos,FXint n){
 
 
 // Push object to end
-FXbool FXPtrList::push(void* object){
+FXbool FXPtrList::push(FXptr object){
   register FXint num=no();
   if(__likely(no(num+1))){
     ptr[num]=object;
@@ -375,7 +375,7 @@ FXbool FXPtrList::pop(){
 
 
 // Remove object
-FXbool FXPtrList::remove(const void* object){
+FXbool FXPtrList::remove(FXptr object){
   register FXint pos;
   if(0<=(pos=find(object))){
     return erase(pos);
@@ -385,7 +385,7 @@ FXbool FXPtrList::remove(const void* object){
 
 
 // Find object in list, searching forward; return position or -1
-FXint FXPtrList::find(const void* object,FXint pos) const {
+FXint FXPtrList::find(FXptr object,FXint pos) const {
   register FXint p=FXMAX(0,pos);
   while(p<no()){
     if(ptr[p]==object){ return p; }
@@ -396,7 +396,7 @@ FXint FXPtrList::find(const void* object,FXint pos) const {
 
 
 // Find object in list, searching backward; return position or -1
-FXint FXPtrList::rfind(const void* object,FXint pos) const {
+FXint FXPtrList::rfind(FXptr object,FXint pos) const {
   register FXint p=FXMIN(pos,no()-1);
   while(0<=p){
     if(ptr[p]==object){ return p; }

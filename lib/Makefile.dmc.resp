@@ -30,7 +30,6 @@
 +FXComplexd.obj &
 +FXComposeContext.obj &
 +FXComposite.obj &
-+FXConcurrent.obj &
 +FXConsole.obj &
 +FXCursor.obj &
 +FXDate.obj &
@@ -152,6 +151,7 @@
 +FXPPMIcon.obj &
 +FXPPMImage.obj &
 +FXPacker.obj &
++FXParallel.obj &
 +FXPath.obj &
 +FXPicker.obj &
 +FXPipe.obj &
@@ -185,6 +185,7 @@
 +FXRootWindow.obj &
 +FXRuler.obj &
 +FXRulerView.obj &
++FXScopedThread.obj &
 +FXScrollArea.obj &
 +FXScrollBar.obj &
 +FXScrollPane.obj &

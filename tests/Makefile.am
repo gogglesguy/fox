@@ -46,6 +46,7 @@ ratio \
 half \
 match \
 gaugetest \
+parallel \
 gltest \
 glviewer
 
@@ -90,6 +91,7 @@ dctest_SOURCES		= dctest.cpp dippy.h
 half_SOURCES		= half.cpp
 match_SOURCES		= match.cpp
 unicode_SOURCES		= unicode.cpp
+parallel_SOURCES	= parallel.cpp
 
 
 

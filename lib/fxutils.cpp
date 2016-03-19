@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -625,16 +625,16 @@ static FXdouble negPowOfTen1[32]={
   };
 
 
-// Table of 1E-0,...1E-288, in steps of 32
-static FXdouble negPowOfTen32[10]={
-  1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288
+// Table of 1E-0,...1E-320, in steps of 32
+static FXdouble negPowOfTen32[11]={
+  1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288,1E-320
   };
 
 
 // Fast integer power of 10; this is based on the mathematical
 // identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
-// table of 308 entries, but that would take a lot of space...
-// The exponent should be in the range -308 to 308, these being the limits
+// table of 308+ entries, but that would take a lot of space...
+// The exponent should be in the range -324 to +308, these being the limits
 // of double precision IEEE754 standard floating point.
 FXdouble fxtenToThe(FXint e){
   return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];

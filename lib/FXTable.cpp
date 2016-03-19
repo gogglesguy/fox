@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -963,14 +963,14 @@ void FXTable::getSpanningRange(FXint row,FXint col,FXint& fr,FXint& lr,FXint& fc
   fr=lr=row;
   fc=lc=col;
   if((item=cells[row*ncols+col])!=NULL){
-    while(0<fr && cells[(fr-1)*ncols+col]==item) fr--; 
-    while(lr<nrows-1 && cells[(lr+1)*ncols+col]==item) lr++; 
-    while(0<fc && cells[row*ncols+fc-1]==item) fc--; 
-    while(lc<ncols-1 && cells[row*ncols+lc+1]==item) lc++; 
+    while(0<fr && cells[(fr-1)*ncols+col]==item) fr--;
+    while(lr<nrows-1 && cells[(lr+1)*ncols+col]==item) lr++;
+    while(0<fc && cells[row*ncols+fc-1]==item) fc--;
+    while(lc<ncols-1 && cells[row*ncols+lc+1]==item) lc++;
     }
   }
-  
-    
+
+
 // Return true if its a spanning cell
 FXbool FXTable::isItemSpanning(FXint row,FXint col) const {
   return isItemHorizontalSpanning(row,col) || isItemVerticalSpanning(row,col);
@@ -1838,7 +1838,7 @@ FXbool FXTable::selectRange(FXint nrlo,FXint nrhi,FXint nclo,FXint nchi,FXbool n
             updateItem(r,c);
             if(notify && target){
               FXTablePos tablepos={r,c};
-              target->tryHandle(this,FXSEL(SEL_DESELECTED,message),(void*)&tablepos); 
+              target->tryHandle(this,FXSEL(SEL_DESELECTED,message),(void*)&tablepos);
               }
             }
           else{

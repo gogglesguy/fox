@@ -3,7 +3,7 @@
 *                            D a t e   C l a s s                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,8 +21,8 @@
 #ifndef FXDATE_H
 #define FXDATE_H
 
-namespace FX {
 
+namespace FX {
 
 
 /**
@@ -189,7 +189,7 @@ public:
 
   /// load from stream
   friend FXAPI FXStream& operator>>(FXStream& store,FXDate& d);
-  
+
   /// Destructor
  ~FXDate(){}
   };

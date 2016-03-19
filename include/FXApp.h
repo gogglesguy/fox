@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -365,7 +365,7 @@ private:
   void openInputDevices();
   void closeInputDevices();
 #ifdef WIN32
-  static FXival CALLBACK wndproc(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam); 
+  static FXival CALLBACK wndproc(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam);
 protected:
   virtual FXival dispatchEvent(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam);
 #else

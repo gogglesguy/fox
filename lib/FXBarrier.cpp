@@ -3,7 +3,7 @@
 *                             B a r r i e r   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,8 +29,21 @@
   Notes:
 
   - Barrier synchronization primitive.
-  - For now, Barrier is implemented in terms of mutex and condition
-    variables; a future version may use native facilities.
+  - Not using POSIX barriers, since they lack a few important features:
+
+      o Ability to adjust threshold on the fly.
+      o Obtain current threshold value.
+      o Unconditionally release all threads.
+
+  - Ability to change threshold is necessary to adjust number of threads based on
+    working conditions. For example, on busy machine one could reduce number of
+    threads working on a parallel problem until system load drops below some level.
+
+  - To release all blocked threads in case a program can't wait for all threads
+    to clock.
+
+  - Many scenarios are possible, and often necessary.
+
 */
 
 using namespace FX;
@@ -42,24 +55,50 @@ namespace FX {
 /*******************************************************************************/
 
 
-// Initialize the barrier
-FXBarrier::FXBarrier(FXuint count):generation(0),threshold(count),counter(count){
-  if(count<1){ fxerror("FXBarrier::FXBarrier: bad count argument.\n"); }
+// Initialize the barrier with initial threshold thr
+FXBarrier::FXBarrier(FXuint thr):generation(0),thresh(FXMAX(thr,1)),count(0){
   }
 
 
 // Wait for all threads to hit the barrier
 FXbool FXBarrier::wait(){
-  FXMutexLock locker(mutex);
+  FXScopedMutex locker(mutex);
   FXuint gen=generation;
-  if(--counter==0){
-    counter=threshold;
+  if(++count>=thresh){
+    count=0;
     generation++;
     condition.broadcast();
     return true;
     }
   while(gen==generation){
     condition.wait(mutex);
+    }
+  return false;
+  }
+
+
+// Change threshold, possibly releasing all waiting threads
+FXbool FXBarrier::threshold(FXuint thr){
+  FXScopedMutex locker(mutex);
+  thresh=FXMAX(thr,1);
+  if(count>=thresh){
+    count=0;
+    generation++;
+    condition.broadcast();
+    return true;
+    }
+  return false;
+  }
+
+
+// Release all waiting threads unconditionally
+FXbool FXBarrier::release(){
+  FXScopedMutex locker(mutex);
+  if(count){
+    count=0;
+    generation++;
+    condition.broadcast();
+    return true;
     }
   return false;
   }

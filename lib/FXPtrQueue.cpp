@@ -3,7 +3,7 @@
 *                         Q u e u e   O f   P o i n t e r s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,12 +21,18 @@
 #include "xincs.h"
 #include "fxdefs.h"
 #include "FXElement.h"
+#include "FXPtrList.h"
 #include "FXPtrQueue.h"
 
 
 /*
   Notes:
-  - Its safe to write with only one thread, and read with only one thread.
+  - Fixed-sized, circular buffer of pointers to stuff.
+  - A building block for all sorts of useful things.
+  - The head and tail pointer can assume arbitrary values,
+    with constraint that 0 <= head-tail <= N.
+  - Access slots by taking modulo of head or tail pointers.
+  - Thus all N (not N-1) slots can be filled.
 */
 
 using namespace FX;
@@ -37,16 +43,19 @@ namespace FX {
 /*******************************************************************************/
 
 
+// Create initially empty queue
+FXPtrQueue::FXPtrQueue():head(0),tail(0){
+  }
+
+
 // Create queue with initial size
-FXPtrQueue::FXPtrQueue(FXuint sz):list(NULL),size(0),head(0),tail(0){
-  if(callocElms(list,sz)){ size=sz; }
+FXPtrQueue::FXPtrQueue(FXuint sz):list((FXptr)NULL,sz),head(0),tail(0){
   }
 
 
 // Change size of queue; return true if success
 FXbool FXPtrQueue::setSize(FXuint sz){
-  if(resizeElms(list,sz)){
-    size=sz;
+  if(list.no(sz)){
     head=0;
     tail=0;
     return true;
@@ -55,52 +64,34 @@ FXbool FXPtrQueue::setSize(FXuint sz){
   }
 
 
-// Return size
-FXuint FXPtrQueue::getSize() const {
-  return size;
-  }
-
-
-// Return head
-FXuint FXPtrQueue::getHead() const {
-  return head;
-  }
-
-
-// Return tail
-FXuint FXPtrQueue::getTail() const {
-  return tail;
-  }
-
-
 // Return used slots
 FXuint FXPtrQueue::getUsed() const {
-  return (head-tail+size)%size;
+  return head-tail;
   }
 
 
 // Return free slots
 FXuint FXPtrQueue::getFree() const {
-  return (size-1+tail-head)%size;
+  return getSize()+tail-head;
   }
 
 
 // Check if queue is full
 FXbool FXPtrQueue::isFull() const {
-  return ((size+head-tail+1)%size)==0;
+  return (head-tail)>=getSize();
   }
 
 
 // Check if queue is empty
 FXbool FXPtrQueue::isEmpty() const {
-  return (head-tail)==0;
+  return (head-tail)<=0;
   }
 
 
 // Peek for item
-FXbool FXPtrQueue::peek(void*& ptr){
-  if(__likely(head!=tail)){
-    ptr=list[tail];
+FXbool FXPtrQueue::peek(FXptr& ptr){
+  if(__likely((head-tail)>0)){
+    ptr=list[tail%getSize()];
     return true;
     }
   return false;
@@ -108,11 +99,10 @@ FXbool FXPtrQueue::peek(void*& ptr){
 
 
 // Add item to queue, return true if success
-FXbool FXPtrQueue::push(void* ptr){
-  FXuint next=(head+1)%size;
-  if(__likely(next!=tail)){
-    list[head]=ptr;
-    head=next;
+FXbool FXPtrQueue::push(FXptr ptr){
+  if(__likely((head-tail)<getSize())){
+    list[head%getSize()]=ptr;
+    head++;
     return true;
     }
   return false;
@@ -120,11 +110,10 @@ FXbool FXPtrQueue::push(void* ptr){
 
 
 // Remove item from queue, return true if success
-FXbool FXPtrQueue::pop(void*& ptr){
-  if(__likely(head!=tail)){
-    FXuint next=(tail+1)%size;
-    ptr=list[tail];
-    tail=next;
+FXbool FXPtrQueue::pop(FXptr& ptr){
+  if(__likely((head-tail)>0)){
+    ptr=list[tail%getSize()];
+    tail++;
     return true;
     }
   return false;
@@ -133,8 +122,8 @@ FXbool FXPtrQueue::pop(void*& ptr){
 
 // Pop onject from queue
 FXbool FXPtrQueue::pop(){
-  if(__likely(head!=tail)){
-    tail=(tail+1)%size;
+  if(__likely((head-tail)>0)){
+    tail++;
     return true;
     }
   return false;
@@ -143,7 +132,6 @@ FXbool FXPtrQueue::pop(){
 
 // Destroy job queue
 FXPtrQueue::~FXPtrQueue(){
-  freeElms(list);
   }
 
 }

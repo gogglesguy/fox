@@ -3,7 +3,7 @@
 *                           Device Context Tester                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>

@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -45,7 +45,7 @@ public:
   /// Initialize from array of doubles
   FXVec3d(const FXdouble v[]):x(v[0]),y(v[1]),z(v[2]){}
 
-  /// Initialize with components
+  /// Initialize from components
   FXVec3d(FXdouble xx,FXdouble yy,FXdouble zz):x(xx),y(yy),z(zz){}
 
   /// Return a non-const reference to the ith element
@@ -63,7 +63,7 @@ public:
   /// Set value from another vector
   FXVec3d& set(const FXVec3d& v){x=v.x;y=v.y;z=v.z;return *this;}
 
-  /// Set value from array of floats
+  /// Set from array of doubles
   FXVec3d& set(const FXdouble v[]){x=v[0];y=v[1];z=v[2];return *this;}
 
   /// Set value from components

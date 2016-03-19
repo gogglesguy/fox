@@ -3,7 +3,7 @@
 *                        M e n u   P a n e   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,6 +26,7 @@
 #endif
 
 namespace FX {
+
 
 /// Popup menu pane
 class FXAPI FXMenuPane : public FXPopup {

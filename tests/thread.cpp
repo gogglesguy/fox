@@ -3,7 +3,7 @@
 *                                Thread Pool Test                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -89,7 +89,7 @@ int main(int,char**){
   fxTraceLevel=151;
 
   // Make thread pool
-  FXThreadPool pool(10);
+  FXThreadPool pool(256);
 
   // Make producer thread
   Producer producer(&pool,100,10);
@@ -97,7 +97,7 @@ int main(int,char**){
   fxmessage("Found %d processors\n",cpus);
 
   fxmessage("starting pool\n");
-  started=pool.start(cpus,8,cpus);
+  started=pool.start(cpus);
   fxmessage("running: %d (%d)\n",pool.getRunningThreads(),started);
   getchar();
   fxmessage("started pool %d\n",started);

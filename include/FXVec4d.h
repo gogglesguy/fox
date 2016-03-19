@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -64,7 +64,7 @@ public:
   /// Set value from another vector
   FXVec4d& set(const FXVec4d& v){x=v.x;y=v.y;z=v.z;w=v.w;return *this;}
 
-  /// Set value from array of floats
+  /// Set value from array of doubles
   FXVec4d& set(const FXdouble v[]){x=v[0];y=v[1];z=v[2];w=v[3];return *this;}
 
   /// Set value from components

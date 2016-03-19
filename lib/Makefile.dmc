@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 2006,2012 by Andre Fornacon.   All Rights Reserved.          #
+# Copyright (C) 2006,2013 by Andre Fornacon.   All Rights Reserved.          #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -152,7 +152,6 @@ FXComplexd.cpp \
 FXComboBox.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
-FXConcurrent.cpp \
 FXConsole.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
@@ -299,6 +298,7 @@ FXPNGImage.cpp \
 FXPPMIcon.cpp \
 FXPPMImage.cpp \
 FXPacker.cpp \
+FXParallel.cpp \
 FXPath.cpp \
 FXPicker.cpp \
 FXPipe.cpp \
@@ -332,6 +332,7 @@ FXRGBImage.cpp \
 FXRootWindow.cpp \
 FXRuler.cpp \
 FXRulerView.cpp \
+FXScopedThread.cpp \
 FXScrollArea.cpp \
 FXScrollWindow.cpp \
 FXScrollBar.cpp \

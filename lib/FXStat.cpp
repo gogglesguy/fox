@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -214,12 +214,11 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
-        info.modeFlags=0777;
+        info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
+        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -239,12 +238,11 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
-        info.modeFlags=0777;
+        info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
+        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -263,7 +261,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
     const FXTime seconds=1000000000;
     struct stat data;
     if(::stat(file.text(),&data)==0){
-      info.modeFlags=(data.st_mode&0777);
+      info.modeFlags=(data.st_mode&FXIO::AllFull);
       if(S_ISDIR(data.st_mode)) info.modeFlags|=FXIO::Directory;
       if(S_ISREG(data.st_mode)) info.modeFlags|=FXIO::File;
       if(S_ISLNK(data.st_mode)) info.modeFlags|=FXIO::SymLink;
@@ -314,12 +312,11 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
-        info.modeFlags=0777;
+        info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
+        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -339,12 +336,11 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
-        info.modeFlags=0777;
+        info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
+        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -363,7 +359,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
     const FXTime seconds=1000000000;
     struct stat data;
     if(::lstat(file.text(),&data)==0){
-      info.modeFlags=(data.st_mode&0777);
+      info.modeFlags=(data.st_mode&FXIO::AllFull);
       if(S_ISDIR(data.st_mode)) info.modeFlags|=FXIO::Directory;
       if(S_ISREG(data.st_mode)) info.modeFlags|=FXIO::File;
       if(S_ISLNK(data.st_mode)) info.modeFlags|=FXIO::SymLink;
@@ -406,11 +402,10 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
 #ifdef WIN32
   BY_HANDLE_FILE_INFORMATION data;
   if(::GetFileInformationByHandle(file.handle(),&data)){
-    info.modeFlags=0777;
+    info.modeFlags=FXIO::AllFull;
     if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-    if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-    else info.modeFlags|=FXIO::File;
-    if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
+    if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
+    if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File; // Directories (folders) always writable on Windows
     info.userNumber=0;
     info.groupNumber=0;
     info.linkCount=data.nNumberOfLinks;
@@ -426,7 +421,7 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
   const FXTime seconds=1000000000;
   struct stat data;
   if(::fstat(file.handle(),&data)==0){
-    info.modeFlags=(data.st_mode&0777);
+    info.modeFlags=(data.st_mode&FXIO::AllFull);
     if(S_ISDIR(data.st_mode)) info.modeFlags|=FXIO::Directory;
     if(S_ISREG(data.st_mode)) info.modeFlags|=FXIO::File;
     if(S_ISLNK(data.st_mode)) info.modeFlags|=FXIO::SymLink;
@@ -461,17 +456,53 @@ FXuint FXStat::mode(const FXString& file){
   }
 
 
+
 // Change the mode flags for this file
 FXbool FXStat::mode(const FXString& file,FXuint perm){
+  if(!file.empty()){
 #ifdef WIN32
-  return false; // FIXME Unimplemented yet
+/*
+#ifdef UNICODE
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    FXuint flags=::GetFileAttributesW(unifile);
+    if(flags!=INVALID_FILE_ATTRIBUTES){
+      if(flags&FILE_ATTRIBUTE_DIRECTORY){
+        }
+      else{
+        }
+
+      if((flags&FILE_ATTRIBUTE_DIRECTORY) || (perm&FXIO::AllWrite)){
+        flags&=~FILE_ATTRIBUTE_READONLY;
+        }
+      else{
+        flags|=FILE_ATTRIBUTE_READONLY;
+        }
+      if(perm&FXIO::Hidden) flags|=FILE_ATTRIBUTE_HIDDEN; else flags&=~FILE_ATTRIBUTE_HIDDEN;
+      flags&=FILE_ATTRIBUTE_ARCHIVE|FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_NORMAL|FILE_ATTRIBUTE_NOT_CONTENT_INDEXED|FILE_ATTRIBUTE_OFFLINE|FILE_ATTRIBUTE_READONLY|FILE_ATTRIBUTE_SYSTEM|FILE_ATTRIBUTE_TEMPORARY;
+      return ::SetFileAttributesW(unifile,flags)!=0;
+      }
+    return false;
 #else
-  FXuint bits=perm&0777;
-  if(perm&FXIO::SetUser) bits|=S_ISUID;
-  if(perm&FXIO::SetGroup) bits|=S_ISGID;
-  if(perm&FXIO::Sticky) bits|=S_ISVTX;
-  return !file.empty() && ::chmod(file.text(),bits)==0;
+    FXuint flags=::GetFileAttributesA(unifile);
+    if(flags!=INVALID_FILE_ATTRIBUTES){
+      if((flags&FILE_ATTRIBUTE_DIRECTORY) || (perm&FXIO::AllWrite)) flags&=~FILE_ATTRIBUTE_READONLY; else flags|=FILE_ATTRIBUTE_READONLY;
+      if(perm&FXIO::Hidden) flags|=FILE_ATTRIBUTE_HIDDEN; else flags&=~FILE_ATTRIBUTE_HIDDEN;
+      flags&=FILE_ATTRIBUTE_ARCHIVE|FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_NORMAL|FILE_ATTRIBUTE_NOT_CONTENT_INDEXED|FILE_ATTRIBUTE_OFFLINE|FILE_ATTRIBUTE_READONLY|FILE_ATTRIBUTE_SYSTEM|FILE_ATTRIBUTE_TEMPORARY;
+      return ::SetFileAttributesA(file.text(),flags)!=0;
+      }
+    return false;
 #endif
+*/
+#else
+    FXuint bits=perm&0777;
+    if(perm&FXIO::SetUser) bits|=S_ISUID;
+    if(perm&FXIO::SetGroup) bits|=S_ISGID;
+    if(perm&FXIO::Sticky) bits|=S_ISVTX;
+    return ::chmod(file.text(),bits)==0;
+#endif
+    }
+  return false;
   }
 
 
@@ -842,9 +873,9 @@ FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){
     }
 #endif
 #else
-#ifdef HAVE_STATFS
-  struct statfs info;
-  if(statfs(path.text(),&info)==0){
+#if defined(HAVE_STATVFS) && defined(HAVE_SYS_STATVFS_H)
+  struct statvfs info;
+  if(statvfs(path.text(),&info)==0){
     space=info.f_bsize*info.f_blocks;
     return true;
     }
@@ -869,9 +900,9 @@ FXbool FXStat::getAvailableDiskSpace(const FXString& path,FXulong& space){
     }
 #endif
 #else
-#ifdef HAVE_STATFS
-  struct statfs info;
-  if(statfs(path.text(),&info)==0){
+#if defined(HAVE_STATVFS) && defined(HAVE_SYS_STATVFS_H)
+  struct statvfs info;
+  if(statvfs(path.text(),&info)==0){
     space=info.f_bsize*info.f_bfree;
     return true;
     }

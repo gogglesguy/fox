@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -38,7 +38,7 @@ public:
   /// Initialize from another vector
   FXVec2d(const FXVec2d& v):x(v.x),y(v.y){}
 
-  /// Initialize from array of floats
+  /// Initialize from array of doubles
   FXVec2d(const FXdouble v[]):x(v[0]),y(v[1]){}
 
   /// Initialize from components
@@ -53,13 +53,13 @@ public:
   /// Assignment
   FXVec2d& operator=(const FXVec2d& v){x=v.x;y=v.y;return *this;}
 
-  /// Assignment from array of floats
+  /// Assignment from array of doubles
   FXVec2d& operator=(const FXdouble v[]){x=v[0];y=v[1];return *this;}
 
   /// Set value from another vector
   FXVec2d& set(const FXVec2d& v){x=v.x;y=v.y;return *this;}
 
-  /// Set value from array of floats
+  /// Set value from array of doubles
   FXVec2d& set(const FXdouble v[]){x=v[0];y=v[1];return *this;}
 
   /// Set value from components

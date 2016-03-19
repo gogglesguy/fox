@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -490,6 +490,73 @@ namespace FX {
 
 namespace {
 
+
+// Flags
+enum {
+  FLG_WORST  = 0,           // Worst case
+  FLG_WIDTH  = 1,           // Matches >=1 character
+  FLG_SIMPLE = 2            // Simple
+  };
+
+
+// Tokens
+enum {
+  TK_END,               // End of string
+
+  TK_BAD,               // Bad token
+
+  TK_CHAR,              // 8-bit character
+  TK_WCHAR,             // Wide character
+
+  TK_LPAREN,            // Parentheses
+  TK_RPAREN,
+
+  TK_ALTER,             // Alternatives
+  TK_DASH,              // Dash
+
+  TK_STAR,              // Zero or more repeat
+  TK_PLUS,              // One or more repeat
+  TK_QUEST,             // Zero or one repeat
+
+  TK_LBRACE,            // Counted repeat
+  TK_RBRACE,
+  TK_COMMA,
+
+  TK_CARET,             // Zero-width Assertions
+  TK_DOLLAR,
+  TK_BEGWORD,
+  TK_ENDWORD,
+  TK_BEGTEXT,
+  TK_ENDTEXT,
+  TK_BNDWORD,
+  TK_INTWORD,
+
+  TK_LBRACK,            // General character classes
+  TK_RBRACK,
+
+  TK_ANY,               // Special character classes
+  TK_DIGIT,
+  TK_NONDIGIT,
+  TK_SPACE,
+  TK_NONSPACE,
+  TK_WORD,
+  TK_NONWORD,
+  TK_LETTER,
+  TK_NONLETTER,
+  TK_HEXDIGIT,
+  TK_NONHEXDIGIT,
+  TK_UPPERCASE,
+  TK_LOWERCASE,
+  TK_PUNCT,
+  TK_NONPUNCT,
+
+  TK_BACKREF,           // Back references
+
+  TK_UNICLASS,          // Unicode character class
+  TK_UNISCRIPT          // Unicode script
+  };
+
+
 // Opcodes of the engine
 enum {
   OP_FAIL,              // Always fail
@@ -621,7 +688,7 @@ enum {
   OP_JUMPLT_7,
   OP_JUMPLT_8,
   OP_JUMPLT_9,
-  OP_JUMPGT_0,          // JUmp if counter 0, 1, ... greater than value
+  OP_JUMPGT_0,          // Jump if counter 0, 1, ... greater than value
   OP_JUMPGT_1,
   OP_JUMPGT_2,
   OP_JUMPGT_3,
@@ -635,11 +702,39 @@ enum {
   };
 
 
-// Flags
-enum {
-  FLG_WORST  = 0,           // Worst case
-  FLG_WIDTH  = 1,           // Matches >=1 character
-  FLG_SIMPLE = 2            // Simple
+// Structure used during compiling
+struct FXCompile {
+  const FXchar  *pat;               // Pattern string pointer
+  FXuchar       *code;              // Program code
+  FXuchar       *pc;                // Program counter
+  FXint          mode;              // Compile mode
+  FXint          nbra;              // Number of counting braces
+  FXint          npar;              // Number of capturing parentheses
+
+  // Parsing
+  FXRex::Error compile();
+  FXRex::Error verbatim();
+  FXRex::Error expression(FXshort& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error branch(FXshort& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error piece(FXshort& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error atom(FXshort& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error charset();
+
+  // Code generation
+  FXuchar* append(FXuchar op);
+  FXuchar* append(FXuchar op,FXshort arg);
+  FXuchar* appendset(FXuchar op,const FXuchar set[]);
+  FXuchar* append(FXuchar op,FXshort arg1,FXshort arg2);
+
+  FXuchar* insert(FXuchar *ptr,FXuchar op);
+  FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg);
+  FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg1,FXshort arg2);
+
+  // Patch branches
+  void patch(FXuchar *fm,FXuchar *to);
+
+  // Fix value
+  void fix(FXuchar *ptr,FXshort val);
   };
 
 
@@ -669,42 +764,6 @@ struct FXExecute {
   };
 
 
-// Structure used during compiling
-struct FXCompile {
-  const FXchar  *pat;               // Pattern string pointer
-  FXuchar       *code;              // Program code
-  FXuchar       *pc;                // Program counter
-  FXint          mode;              // Compile mode
-  FXint          nbra;              // Number of counting braces
-  FXint          npar;              // Number of capturing parentheses
-
-  // Code generation
-  FXuchar* append(FXuchar op);
-  FXuchar* append(FXuchar op,FXshort arg);
-  FXuchar* appendset(FXuchar op,const FXuchar set[]);
-  FXuchar* append(FXuchar op,FXshort arg1,FXshort arg2);
-
-  FXuchar* insert(FXuchar *ptr,FXuchar op);
-  FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg);
-  FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg1,FXshort arg2);
-
-  // Patch branches
-  void patch(FXuchar *fm,FXuchar *to);
-
-  // Fix value
-  void fix(FXuchar *ptr,FXshort val);
-
-  // Parsing
-  FXRex::Error compile(FXshort& flags);
-  FXRex::Error verbatim(FXshort& flags);
-  FXRex::Error expression(FXshort& flags,FXshort& smin,FXshort& smax);
-  FXRex::Error alternative(FXshort& flags,FXshort& smin,FXshort& smax);
-  FXRex::Error piece(FXshort& flags,FXshort& smin,FXshort& smax);
-  FXRex::Error atom(FXshort& flags,FXshort& smin,FXshort& smax);
-  FXRex::Error charset();
-  };
-
-
 /*******************************************************************************/
 
 // FXCompile members
@@ -718,12 +777,12 @@ static const FXuchar specials[32]={
 
 
 // Compiler main
-FXRex::Error FXCompile::compile(FXshort& flags){
+FXRex::Error FXCompile::compile(){
   FXRex::Error err;
-  FXshort smin,smax;
+  FXshort flags,smin,smax;
   if(*pat=='\0') return FXRex::ErrEmpty;
   if(mode&FXRex::Verbatim){
-    if((err=verbatim(flags))) return err;
+    if((err=verbatim())) return err;
     }
   else{
     if((err=expression(flags,smin,smax))) return err;
@@ -735,13 +794,12 @@ FXRex::Error FXCompile::compile(FXshort& flags){
 
 
 // Parse without interpretation of magic characters
-FXRex::Error FXCompile::verbatim(FXshort& flags){
+FXRex::Error FXCompile::verbatim(){
   append((mode&FXRex::IgnoreCase)?OP_CHARS_CI:OP_CHARS,strlen(pat));
   while(*pat){
     append((mode&FXRex::IgnoreCase)?Ascii::toLower(*pat):*pat);
     pat++;
     }
-  flags=FLG_WIDTH;
   return FXRex::ErrOK;
   }
 
@@ -752,17 +810,17 @@ FXRex::Error FXCompile::expression(FXshort& flags,FXshort& smin,FXshort& smax){
   FXshort flg,smn,smx;
   FXuchar* at=pc;
   FXuchar* jp=NULL;
-  if((err=alternative(flags,smin,smax))) return err;
+  if((err=branch(flags,smin,smax))) return err;
   while(*pat=='|'){
     pat++;
     insert(at,OP_BRANCH,pc-at+5);
     append(OP_JUMP,jp?jp-pc-1:0);
     jp=pc-2;
     at=pc;
-    if((err=alternative(flg,smn,smx))) return err;
-    if(!(flg&FLG_WIDTH)) flags&=~FLG_WIDTH;
+    if((err=branch(flg,smn,smx))) return err;
     if(smx>smax) smax=smx;
     if(smn<smin) smin=smn;
+    if(!(flg&FLG_WIDTH)) flags&=~FLG_WIDTH;
     }
   patch(jp,pc);
   return FXRex::ErrOK;
@@ -770,12 +828,12 @@ FXRex::Error FXCompile::expression(FXshort& flags,FXshort& smin,FXshort& smax){
 
 
 // Parse branch
-FXRex::Error FXCompile::alternative(FXshort& flags,FXshort& smin,FXshort& smax){
+FXRex::Error FXCompile::branch(FXshort& flags,FXshort& smin,FXshort& smax){
   FXRex::Error err;
   FXshort flg,smn,smx;
-  flags=FLG_WORST;
   smin=0;
   smax=0;
+  flags=FLG_WORST;
   while(*pat!='\0' && *pat!='|' && *pat!=')'){
     if((err=piece(flg,smn,smx))) return err;
     if(flg&FLG_WIDTH) flags|=FLG_WIDTH;
@@ -961,7 +1019,7 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
           insert(ptr,OP_ZERO_0+nbra);
           append(OP_INCR_0+nbra);
           append(OP_JUMPLT_0+nbra,rep_min,ptr-pc-2);
-          append(OP_JUMPGT_0+nbra,rep_max,5);
+          append(OP_JUMPGT_0+nbra,rep_max-1,5);
           append(lazy?OP_BRANCH:OP_BRANCHREV,ptr-pc);
           nbra++;
           }
@@ -979,8 +1037,9 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
   const FXchar* savepat;
   FXuchar *ptr;
   FXint save;
+  smin=0;
+  smax=0;
   flags=FLG_WORST;                                      // Assume the worst
-  smin=smax=0;
   switch(*pat){
     case '(':                                           // Subexpression grouping
       if(*++pat=='?'){
@@ -1494,6 +1553,115 @@ in: last=(FXuchar)*pat++;
   }
 
 
+/*
+
+
+// Read control code
+FXshort FXCompile::getctl(){
+  register FXshort ch=TK_BAD;
+  if('@'<=*pat && *pat<='_'){
+    ch=*pat++ - '@';
+    }
+  return TK_BAD;
+  }
+
+
+// Read octal digits
+FXshort FXCompile::getoct(){
+  register FXshort ch=TK_BAD;
+  if('0'<=*pat && *pat<'7'){
+    ch=*pat++ - '0';
+    if('0'<=*pat && *pat<'7'){
+      ch=(ch<<3) + *pat++ - '0';
+      if('0'<=*pat && *pat<'7'){
+        ch=(ch<<3) + *pat++ - '0';
+        }
+      }
+    }
+  return ch;
+  }
+
+
+// Read hex digits
+FXshort FXCompile::gethex(){
+  register FXshort ch=TK_BAD;
+  if(Ascii::isHexDigit(*pat)){
+    ch=Ascii::digitValue(*pat++);
+    if(Ascii::isHexDigit(*pat)){
+      ch=(ch<<4)+Ascii::digitValue(*pat++);
+      }
+    }
+  return ch;
+  }
+
+// Lexing
+FXshort FXCompile::token(){
+  register FXshort ch;
+  switch(ch=(FXuchar)*pat++){
+    case   0: return TK_END;                       // End of pattern
+    case '(': return TK_LPAREN;
+    case ')': return TK_RPAREN;
+    case '[': return TK_LBRACK;
+    case ']': return TK_RBRACK;
+    case '{': return TK_LBRACE;
+    case '}': return TK_RBRACE;
+    case '|': return TK_ALTER;
+    case '-': return TK_DASH;
+    case '*': return TK_STAR;
+    case '+': return TK_PLUS;
+    case '?': return TK_QUEST;
+    case ',': return TK_COMMA;
+    case '^': return TK_CARET;
+    case '$': return TK_DOLLAR;
+    case '.': return TK_ANY;
+    case '\\':
+      switch(ch=(FXuchar)*pat++){
+        case  0 : return TK_BAD;                        // End of pattern
+        case 'a': return '\a';                          // Bell
+        case 'e': return '\033';                        // Escape
+        case 'f': return '\f';                          // Form feed
+        case 'n': return '\n';                          // Newline
+        case 'r': return '\r';                          // Return
+        case 't': return '\t';                          // Tab
+        case 'v': return '\v';                          // Vertical tab
+        case 'w': return TK_WORD;
+        case 'W': return TK_NONWORD;
+        case 's': return TK_SPACE;
+        case 'S': return TK_NONSPACE;
+        case 'd': return TK_DIGIT;
+        case 'D': return TK_NONDIGIT;
+        case 'h': return TK_HEXDIGIT;
+        case 'H': return TK_NONHEXDIGIT;
+        case 'p': return TK_PUNCT;
+        case 'P': return TK_NONPUNCT;
+        case 'l': return TK_LETTER;
+        case 'L': return TK_NONLETTER;
+        case 'u': return TK_UPPER;
+        case 'U': return TK_LOWER;
+        case 'b': return TK_WORDBOUND;
+        case 'B': return TK_INTRAWORD;
+        case 'A': return TK_BEGTEXT;
+        case 'Z': return TK_ENDTEXT;
+        case '<': return TK_BEGWORD;
+        case '>': return TK_ENDWORD;
+        case '1': return TK_BACKREF1;
+        case '2': return TK_BACKREF2;
+        case '3': return TK_BACKREF3;
+        case '4': return TK_BACKREF4;
+        case '5': return TK_BACKREF5;
+        case '6': return TK_BACKREF6;
+        case '7': return TK_BACKREF7;
+        case '8': return TK_BACKREF8;
+        case '9': return TK_BACKREF9;
+        case 'c': return getctl();                      // Control character
+        case '0': return getoct();                      // Octal digit
+        case 'x': return gethex();                      // Hex digit
+        }
+    }
+  return ch;
+  }
+*/
+
 // Append opcode
 FXuchar* FXCompile::append(FXuchar op){
   register FXuchar *ret=pc;
@@ -1644,13 +1812,13 @@ FXbool FXExecute::match(const FXuchar* prog){
       case OP_JUMP:
         prog+=GETARG(prog);
         continue;
-      case OP_BRANCH:           // Jump after trying following code
+      case OP_BRANCH:           // Jump AFTER trying following code
         save=str;
         if(match(prog+2)) goto t;
         str=save;
         prog+=GETARG(prog);
         continue;
-      case OP_BRANCHREV:        // Jump before trying following code
+      case OP_BRANCHREV:        // Jump BEFORE trying following code
         save=str;
         if(match(prog+GETARG(prog))) goto t;
         str=save;
@@ -1698,11 +1866,11 @@ FXbool FXExecute::match(const FXuchar* prog){
       case OP_WORD_INT:         // Must be inside a word
         if(!((str_beg<str && isWord(*(str-1))) && (str<str_end && isWord(*str)))) goto f;
         continue;
-      case OP_ANY:              // Match any character
+      case OP_ANY:              // Match any character, except newline
         if(str_end<=str || *str=='\n') goto f;
         str++;
         continue;
-      case OP_ANY_NL:           // Matches any character including newline
+      case OP_ANY_NL:           // Matches any character, including newline
         if(str_end<=str) goto f;
         str++;
         continue;
@@ -1724,11 +1892,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         if(str_end<=str || !Ascii::isLower(*str)) goto f;
         str++;
         continue;
-      case OP_SPACE:            // Match space
+      case OP_SPACE:            // Match space, except newline
         if(str_end<=str || *str=='\n' || !Ascii::isSpace(*str)) goto f;
         str++;
         continue;
-      case OP_SPACE_NL:         // Match space including newline
+      case OP_SPACE_NL:         // Match space, including newline
         if(str_end<=str || !Ascii::isSpace(*str)) goto f;
         str++;
         continue;
@@ -1740,11 +1908,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         if(str_end<=str || !Ascii::isDigit(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_DIGIT:        // Match a non-digit
+      case OP_NOT_DIGIT:        // Match a non-digit, except newline
         if(str_end<=str || *str=='\n' || Ascii::isDigit(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_DIGIT_NL:     // Match a non-digit including newline
+      case OP_NOT_DIGIT_NL:     // Match a non-digit, including newline
         if(str_end<=str || Ascii::isDigit(*str)) goto f;
         str++;
         continue;
@@ -1752,11 +1920,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         if(str_end<=str || !Ascii::isHexDigit(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_HEX:          // Match a non-hex digit
+      case OP_NOT_HEX:          // Match a non-hex digit, except newline
         if(str_end<=str || *str=='\n' || Ascii::isHexDigit(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_HEX_NL:       // Match a non-hex digit including newline
+      case OP_NOT_HEX_NL:       // Match a non-hex digit, including newline
         if(str_end<=str || Ascii::isHexDigit(*str)) goto f;
         str++;
         continue;
@@ -1764,11 +1932,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         if(str_end<=str || !Ascii::isLetter(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_LETTER:       // Match a non-letter
+      case OP_NOT_LETTER:       // Match a non-letter, except newline
         if(str_end<=str || *str=='\n' || Ascii::isLetter(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_LETTER_NL:    // Match a non-letter including newline
+      case OP_NOT_LETTER_NL:    // Match a non-letter, including newline
         if(str_end<=str || Ascii::isLetter(*str)) goto f;
         str++;
         continue;
@@ -1776,11 +1944,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         if(str_end<=str || !isDelim(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_PUNCT:        // Match a non-punctuation
+      case OP_NOT_PUNCT:        // Match a non-punctuation, except newline
         if(str_end<=str || *str=='\n' || isDelim(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_PUNCT_NL:     // Match a non-punctuation including newline
+      case OP_NOT_PUNCT_NL:     // Match a non-punctuation, including newline
         if(str_end<=str || isDelim(*str)) goto f;
         str++;
         continue;
@@ -1788,11 +1956,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         if(str_end<=str || !isWord(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_WORD:         // Match a non-word character
+      case OP_NOT_WORD:         // Match a non-word character, except newline
         if(str_end<=str || *str=='\n' || isWord(*str)) goto f;
         str++;
         continue;
-      case OP_NOT_WORD_NL:      // Match a non-word character including newline
+      case OP_NOT_WORD_NL:      // Match a non-word character, including newline
         if(str_end<=str || isWord(*str)) goto f;
         str++;
         continue;
@@ -1829,22 +1997,106 @@ FXbool FXExecute::match(const FXuchar* prog){
         while(--no);
         continue;
 /*
-      case OP_UANY:             // Match any unicode character
+      case OP_UANY:             // Match any unicode character, except newline
         if(str_end<=str || *str=='\n') goto f;
         str=wcinc(str);
         continue;
-      case OP_UANY_NL:          // Matches any unicode character including newline
+      case OP_UANY_NL:          // Matches any unicode characterm, including newline
         if(str_end<=str) goto f;
         str=wcinc(str);
         continue;
-      case OP_UUPPER:            // Match if unicode uppercase
+      case OP_UUPPER:           // Match if unicode uppercase
         if(str_end<=str || !Unicode::isUpper(wc(str))) goto f;
         str=wcinc(str);
         continue;
-      case OP_ULOWER:            // Match if unicode lowercase
+      case OP_ULOWER:           // Match if unicode lowercase
         if(str_end<=str || !Unicode::isLower(wc(str))) goto f;
         str=wcinc(str);
         continue;
+      case OP_UTITLE:           // Match if unicode title case
+        if(str_end<=str || !Unicode::isTitle(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_USPACE:           // Match space, except newline
+        if(str_end<=str || *str=='\n' || !Unicode::isSpace(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_USPACE_NL:        // Match space, including newline
+        if(str_end<=str || !Unicode::isSpace(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UNOT_SPACE:       // Match non-space
+        if(str_end<=str || Unicode::isSpace(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UDIGIT:           // Match a digit 0..9
+        if(str_end<=str || !Unicode::isDigit(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UNOT_DIGIT:       // Match a non-digit, except newline
+        if(str_end<=str || *str=='\n' || Unicode::isDigit(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UNOT_DIGIT_NL:    // Match a non-digit, including newline
+        if(str_end<=str || Unicode::isDigit(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_ULETTER:          // Match a letter a..z, A..Z
+        if(str_end<=str || !Unicode::isLetter(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UNOT_LETTER:      // Match a non-letter, except newline
+        if(str_end<=str || *str=='\n' || Unicode::isLetter(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UNOT_LETTER_NL:   // Match a non-letter, including newline
+        if(str_end<=str || Unicode::isLetter(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UPUNCT:           // Match a punctuation
+        if(str_end<=str || !Unicode::isPunct(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UNOT_PUNCT:       // Match a non-punctuation, except newline
+        if(str_end<=str || *str=='\n' || Unicode::isPunct(wc(str))) goto f;
+        str++;
+        continue;
+      case OP_UNOT_PUNCT_NL:    // Match a non-punctuation, including newline
+        if(str_end<=str || Unicode::isPunct(wc(str))) goto f;
+        str=wcinc(str);
+        continue;
+      case OP_UCAT:             // Unicode character from category
+        if(str_end<=str || Unicode::charCategory(wc(str))!=(FXuchar)*prog) goto f;
+        str=wcinc(str);
+        prog++;
+        continue;
+      case OP_UNOT_CAT:         // Unicode character NOT from category, except newline
+        if(str_end<=str || *str=='\n' || Unicode::charCategory(wc(str))==(FXuchar)*prog) goto f;
+        str=wcinc(str);
+        prog++;
+        continue;
+      case OP_UNOT_CAT_NL:      // Unicode character NOT from category, including newline
+        if(str_end<=str || Unicode::charCategory(wc(str))==(FXuchar)*prog) goto f;
+        str=wcinc(str);
+        prog++;
+        continue;
+      case OP_USCRIPT:          // Unicode character from script
+        if(str_end<=str || Unicode::scriptType(wc(str))!=(FXuchar)*prog) goto f;
+        str=wcinc(str);
+        prog++;
+        continue;
+      case OP_UNOT_SCRIPT:      // Unicode character NOT from script, except newline
+        if(str_end<=str || *str=='\n' || Unicode::scriptType(wc(str))==(FXuchar)*prog) goto f;
+        str=wcinc(str);
+        prog++;
+        continue;
+      case OP_UNOT_SCRIPT_NL:   // Unicode character NOT from script, including newline
+        if(str_end<=str || Unicode::scriptType(wc(str))==(FXuchar)*prog) goto f;
+        str=wcinc(str);
+        prog++;
+        continue;
+
+
       ////////
       case OP_UCHAR:             // Match single unicode character
         if(str_end<=str || wc(prog) != wc(str)) goto f;
@@ -2080,13 +2332,18 @@ rep:    if(str_end<str+rep_min) goto f;
       case OP_SUB_BEG_8:
       case OP_SUB_BEG_9:
         no=op-OP_SUB_BEG_0;
-        bak_beg[no]=save=str;                   // Back reference start set
-        bak_end[no]=NULL;                       // Back reference end
-        if(!match(prog)) goto f;                // Match the rest
-        if(sub_beg[no]==-1 && no<npar){
-          sub_beg[no]=save-str_beg;
+        beg=bak_beg[no]; bak_beg[no]=str;       // Back reference start set
+        end=bak_end[no]; bak_end[no]=NULL;      // Back reference end
+        save=str;
+        if(match(prog)){
+          if(sub_beg[no]==-1 && no<npar){
+            sub_beg[no]=save-str_beg;
+            }
+          goto t;
           }
-        goto t;
+        bak_beg[no]=beg;                        // Reinstate old value
+        bak_end[no]=end;
+        goto f;
       case OP_SUB_END_0:                        // Capturing close parentheses
       case OP_SUB_END_1:
       case OP_SUB_END_2:
@@ -2098,12 +2355,16 @@ rep:    if(str_end<str+rep_min) goto f;
       case OP_SUB_END_8:
       case OP_SUB_END_9:
         no=op-OP_SUB_END_0;
+        end=bak_end[no];
         bak_end[no]=save=str;                   // Back reference end
-        if(!match(prog)) goto f;                // Match the rest
-        if(sub_end[no]==-1 && no<npar){
-          sub_end[no]=save-str_beg;
+        if(match(prog)){
+          if(sub_end[no]==-1 && no<npar){
+            sub_end[no]=save-str_beg;
+            }
+          goto t;
           }
-        goto t;
+        bak_end[no]=end;                        // Reinstate old value
+        goto f;
       case OP_REF_0:                            // Back reference to capturing parentheses
       case OP_REF_1:
       case OP_REF_2:
@@ -2119,14 +2380,12 @@ rep:    if(str_end<str+rep_min) goto f;
         end=bak_end[no];                        // Get back reference end
         if(!beg) goto f;
         if(!end) goto f;
-        if(beg<end){                            // Empty capture matches!
-          if(str+(end-beg)>str_end) goto f;     // Not enough characters left
-          do{
-            if(*beg != *str) goto f;            // No match
-            beg++;
-            str++;
-            }
-          while(beg<end);
+        FXASSERT(beg<=end);
+        if(str+(end-beg)>str_end) goto f;       // Not enough characters left
+        while(beg<end){                         // Match zero or more characters from back reference
+          if(*beg!=*str) goto f;
+          beg++;
+          str++;
           }
         continue;
       case OP_REF_CI_0:                         // Back reference to capturing parentheses
@@ -2144,14 +2403,12 @@ rep:    if(str_end<str+rep_min) goto f;
         end=bak_end[no];                        // Get back reference end
         if(!beg) goto f;
         if(!end) goto f;
-        if(beg<end){                            // Empty capture matches!
-          if(str+(end-beg)>str_end) goto f;     // Not enough characters left
-          do{
-            if(Ascii::toLower(*beg) != Ascii::toLower(*str)) goto f;      // No match
-            beg++;
-            str++;
-            }
-          while(beg<end);
+        FXASSERT(beg<=end);
+        if(str+(end-beg)>str_end) goto f;       // Not enough characters left
+        while(beg<end){                         // Match zero or more characters from back reference
+          if(Ascii::toLower(*beg)!=Ascii::toLower(*str)) goto f;
+          beg++;
+          str++;
           }
         continue;
       case OP_AHEAD_NEG:                        // Positive or negative look ahead
@@ -2435,7 +2692,6 @@ FXRex& FXRex::operator=(const FXRex& orig){
 FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
   FXRex::Error err=FXRex::ErrEmpty;
   FXCompile cs;
-  FXshort flags;
   FXshort size;
 
   // Free old code, if any
@@ -2457,7 +2713,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
     cs.pc+=2;
 
     // Check syntax and amount of memory needed
-    err=cs.compile(flags);
+    err=cs.compile();
     if(!err){
 
       // Compile code unless only syntax checking
@@ -2483,7 +2739,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
         cs.pc+=2;
 
         // Generate program
-        err=cs.compile(flags);
+        err=cs.compile();
 
         // Dump for debugging
 #ifdef REXDEBUG
@@ -2518,6 +2774,8 @@ FXbool FXRex::match(const FXchar* string,FXint len,FXint* beg,FXint* end,FXint m
     if(!end) end=aend;
     ms.str_beg=string;
     ms.str_end=string+len;
+    ms.bak_beg[0]=ms.bak_beg[1]=ms.bak_beg[2]=ms.bak_beg[3]=ms.bak_beg[4]=ms.bak_beg[5]=ms.bak_beg[6]=ms.bak_beg[7]=ms.bak_beg[8]=ms.bak_beg[9]=NULL;
+    ms.bak_end[0]=ms.bak_end[1]=ms.bak_end[2]=ms.bak_end[3]=ms.bak_end[4]=ms.bak_end[5]=ms.bak_end[6]=ms.bak_end[7]=ms.bak_end[8]=ms.bak_end[9]=NULL;
     ms.sub_beg=beg;
     ms.sub_end=end;
     ms.code=code;

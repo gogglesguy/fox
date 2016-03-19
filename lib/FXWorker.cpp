@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,10 +21,6 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
-#include "FXElement.h"
-#include "FXPtrQueue.h"
-#include "FXMutex.h"
-#include "FXCondition.h"
 #include "FXAutoThreadStorageKey.h"
 #include "FXRunnable.h"
 #include "FXThread.h"
@@ -33,9 +29,13 @@
 
 /*
   Notes:
-  - A Worker runs a runnable, and then terminates when the runnable
-    is done.
-  - This is used in FXThreadPool and FXConcurrent.
+  - A Worker is a thread that performs a Runnable.
+  - When the worker thread completes the execution of the runnable, the worker thread
+    and its memory are automatically reclaimed.
+  - The runnable itself is not deleted by the worker; it will thus outlive the worker
+    that runs it.
+  - Exceptions thrown by the runnable cause early termination of the runnable,
+    and are caught by the worker
 */
 
 using namespace FX;
@@ -45,24 +45,13 @@ namespace FX {
 
 /*******************************************************************************/
 
-
 // Create worker for runnable
-FXWorker::FXWorker(FXRunnable *r):runnable(r){
+FXWorker::FXWorker(FXRunnable* rn):runnable(rn){
   FXTRACE((100,"FXWorker::FXWorker %p\n",this));
   }
 
 
-// Change runnable if not started yet
-FXbool FXWorker::setRunnable(FXRunnable* r){
-  if(!running()){
-    runnable=r;
-    return true;
-    }
-  return false;
-  }
-  
-  
-// Worker runs jobs, then dies
+// Worker runs a job, then exits normally
 FXint FXWorker::run(){
   if(runnable){
     try{ runnable->run(); } catch(...){ }
@@ -72,9 +61,23 @@ FXint FXWorker::run(){
   }
 
 
-// Destroy worker
+// Create and start a worker executing a given runnable
+FXWorker* FXWorker::execute(FXRunnable* rn,FXuval stacksize){
+  register FXWorker* worker;
+  if(rn){
+    if((worker=new FXWorker(rn))!=NULL){
+      if(worker->start(stacksize)){ return worker; }
+      delete worker;
+      }
+    }
+  return NULL;
+  }
+
+
+// Destroy
 FXWorker::~FXWorker(){
   FXTRACE((100,"FXWorker::~FXWorker %p\n",this));
+  runnable=(FXRunnable*)-1L;
   }
 
 }

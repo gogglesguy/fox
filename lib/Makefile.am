@@ -218,7 +218,6 @@ FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
-FXConcurrent.cpp \
 FXCondition.cpp \
 FXConsole.cpp \
 FXCursor.cpp \
@@ -307,6 +306,7 @@ FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXKnob.cpp \
 FXLabel.cpp \
+FXLFQueue.cpp \
 FXList.cpp \
 FXListBox.cpp \
 FXLocale.cpp \
@@ -347,6 +347,7 @@ FXPNGImage.cpp \
 FXPPMIcon.cpp \
 FXPPMImage.cpp \
 FXPacker.cpp \
+FXParallel.cpp \
 FXPath.cpp \
 FXPicker.cpp \
 FXPipe.cpp  \
@@ -381,12 +382,14 @@ FXRex.cpp \
 FXRootWindow.cpp \
 FXRuler.cpp \
 FXRulerView.cpp \
+FXScopedThread.cpp \
 FXScrollArea.cpp \
 FXScrollBar.cpp \
 FXScrollPane.cpp \
 FXScrollWindow.cpp \
 FXSearchDialog.cpp \
 FXSemaphore.cpp \
+FXSemaQueue.cpp \
 FXSeparator.cpp \
 FXSettings.cpp \
 FXShell.cpp \

@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -154,7 +154,7 @@ namespace FX {
 #endif
 
 // Construct for expose event painting
-FXDCWindow::FXDCWindow(FXDrawable* draw,FXEvent* event):FXDC(draw->getApp()){
+FXDCWindow::FXDCWindow(FXDrawable* draw,FXEvent* event):FXDC(draw->getApp()),surface(NULL),rect(0,0,0,0),devfg(0),devbg(0){
   oldpalette=NULL;
   oldbrush=NULL;
   oldpen=NULL;
@@ -174,7 +174,7 @@ FXDCWindow::FXDCWindow(FXDrawable* draw,FXEvent* event):FXDC(draw->getApp()){
 
 
 // Construct for normal painting
-FXDCWindow::FXDCWindow(FXDrawable* draw):FXDC(draw->getApp()){
+FXDCWindow::FXDCWindow(FXDrawable* draw):FXDC(draw->getApp()),surface(NULL),rect(0,0,0,0),devfg(0),devbg(0){
   oldpalette=NULL;
   oldbrush=NULL;
   oldpen=NULL;
@@ -1426,6 +1426,7 @@ void FXDCWindow::setBackground(FXColor clr){
 void FXDCWindow::setDashes(FXuint dashoffset,const FXchar *dashpattern,FXuint dashlength){
   register FXuint len,i;
   if(!surface){ fxerror("FXDCWindow::setDashes: DC not connected to drawable.\n"); }
+  if(dashlength>32){ fxerror("FXDCWindow::setDashes: bad dashlength parameter.\n"); }
   for(i=len=0; i<dashlength; i++){
     dashpat[i]=dashpattern[i];
     len+=(FXuint)dashpattern[i];
@@ -1744,7 +1745,7 @@ void FXDCWindow::clipChildren(FXbool yes){
 
 
 // Construct for expose event painting
-FXDCWindow::FXDCWindow(FXDrawable* draw,FXEvent* event):FXDC(draw->getApp()){
+FXDCWindow::FXDCWindow(FXDrawable* draw,FXEvent* event):FXDC(draw->getApp()),surface(NULL),rect(0,0,0,0),devfg(0),devbg(0){
 #ifdef HAVE_XFT_H
   xftDraw=NULL;
 #endif
@@ -1762,7 +1763,7 @@ FXDCWindow::FXDCWindow(FXDrawable* draw,FXEvent* event):FXDC(draw->getApp()){
 
 
 // Construct for normal painting
-FXDCWindow::FXDCWindow(FXDrawable* draw):FXDC(draw->getApp()){
+FXDCWindow::FXDCWindow(FXDrawable* draw):FXDC(draw->getApp()),surface(NULL),rect(0,0,0,0),devfg(0),devbg(0){
 #ifdef HAVE_XFT_H
   xftDraw=NULL;
 #endif
@@ -2635,6 +2636,7 @@ void FXDCWindow::setBackground(FXColor clr){
 void FXDCWindow::setDashes(FXuint dashoffset,const FXchar *dashpattern,FXuint dashlength){
   register FXuint len,i;
   if(!surface){ fxerror("FXDCWindow::setDashes: DC not connected to drawable.\n"); }
+  if(dashlength>32){ fxerror("FXDCWindow::setDashes: bad dashlength parameter.\n"); }
   for(i=len=0; i<dashlength; i++){
     dashpat[i]=dashpattern[i];
     len+=(FXuint)dashpattern[i];

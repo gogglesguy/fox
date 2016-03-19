@@ -128,6 +128,7 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %files devel
 %defattr(-,root,root)
 %{_bindir}/reswrap
+%{_bindir}/fox-config
 %{_mandir}/man1/reswrap.1*
 %{_includedir}/fox-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@
 %{_libdir}/libFOX-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.la

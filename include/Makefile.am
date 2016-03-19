@@ -86,7 +86,6 @@ FXComplexf.h \
 FXComplexd.h \
 FXComposeContext.h \
 FXComposite.h \
-FXConcurrent.h \
 FXCondition.h \
 FXConsole.h \
 FXCursor.h \
@@ -177,6 +176,7 @@ FXJPGIcon.h \
 FXJPGImage.h \
 FXKnob.h \
 FXLabel.h \
+FXLFQueue.h \
 FXList.h \
 FXListBox.h \
 FXLocale.h \
@@ -216,6 +216,7 @@ FXPNGImage.h \
 FXPPMIcon.h \
 FXPPMImage.h \
 FXPacker.h \
+FXParallel.h \
 FXPath.h \
 FXPicker.h \
 FXPipe.h \
@@ -253,12 +254,14 @@ FXRootWindow.h \
 FXRuler.h \
 FXRulerView.h \
 FXRunnable.h \
+FXScopedThread.h \
 FXScrollArea.h \
 FXScrollBar.h \
 FXScrollPane.h \
 FXScrollWindow.h \
 FXSearchDialog.h \
 FXSemaphore.h \
+FXSemaQueue.h \
 FXSeparator.h \
 FXSettings.h \
 FXShell.h \

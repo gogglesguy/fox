@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                 M u l i t h r e a d i n g   S u p p o r t                     *
+*                          T h r e a d   S u p p o r t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -123,7 +123,7 @@ void* FXThread::function(void* ptr){
 
 
 // Start thread
-FXbool FXThread::start(unsigned long stacksize){
+FXbool FXThread::start(FXuval stacksize){
 #if defined(WIN32)
   DWORD thd;
   if(busy){ fxerror("FXThread::start: thread already running.\n"); }
@@ -351,7 +351,7 @@ FXThreadID FXThread::current(){
 // Return number of processors
 FXint FXThread::processors(){
 #if defined(WIN32)
-  SYSTEM_INFO info;
+  SYSTEM_INFO info={{0}};
   GetSystemInfo(&info);
   return info.dwNumberOfProcessors;
 #else
@@ -365,10 +365,10 @@ FXint FXThread::processors(){
   if((result=sysconf(_SC_NPROC_ONLN))>0){
     return result;
     }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__FreeBSD__)
   int result=1;
   size_t len=sizeof(result);
-  if(sysctlbyname("hw.activecpu",&result,&len,NULL,0)!=-1){
+  if(sysctlbyname("hw.ncpu",&result,&len,NULL,0)!=-1){
     return result;
     }
 #elif defined(HW_NCPU)
