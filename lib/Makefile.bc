@@ -111,6 +111,7 @@ FXCP865Codec.cpp \
 FXCP866Codec.cpp \
 FXCP869Codec.cpp \
 FXCP874Codec.cpp \
+fxcpuid.cpp \
 FXCursor.cpp \
 FXDataTarget.cpp \
 FXDate.cpp \
@@ -189,6 +190,8 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXJP2Icon.cpp \
+FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXKOI8RCodec.cpp \
@@ -238,6 +241,8 @@ FXPoint.cpp \
 FXPrintDialog.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
+FXPtrList.cpp \
+FXPtrQueue.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
 FXRASIcon.cpp \
@@ -337,6 +342,7 @@ fxgetticks.cpp \
 fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
+fxjp2io.cpp \
 fxjpegio.cpp \
 fxkeyboard.cpp \
 fxkeysym.cpp \

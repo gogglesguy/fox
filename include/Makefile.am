@@ -178,6 +178,8 @@ FXMDIButton.h \
 FXMDIChild.h \
 FXMDIClient.h \
 FXMainWindow.h \
+FXMat2d.h \
+FXMat2f.h \
 FXMat3d.h \
 FXMat4d.h \
 FXMat3f.h \
@@ -214,6 +216,7 @@ FXPopup.h \
 FXPrintDialog.h \
 FXProgressBar.h \
 FXProgressDialog.h \
+FXPtrList.h \
 FXPtrQueue.h \
 FXQuatd.h \
 FXQuatf.h \

@@ -152,7 +152,7 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
 // Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 #if defined(WIN32)
-  return InterlockedCompareExchange((LONG*)ptr,v,expect);
+  return InterlockedCompareExchange((volatile LONG*)ptr,v,expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
   __asm__ __volatile__("lock\n\t"
@@ -196,7 +196,7 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 // Atomically set pointer variable at ptr to v, and return its old contents
 void* atomicSet(void* volatile* ptr,void* v){
 #if defined(WIN32)
-   return InterlockedExchangePointer(ptr,p);
+   return InterlockedExchangePointer(ptr,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   void* ret=v;
   __asm__ __volatile__("xchgl %0,%1\n\t" : "=r"(ret),"=m" (*ptr) : "0" (ret), "m"(*ptr) : "memory", "cc");

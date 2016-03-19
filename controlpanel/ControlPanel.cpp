@@ -106,7 +106,10 @@ FXIMPLEMENT(FXDesktopSetup,FXMainWindow,FXDesktopSetupMap,ARRAYNUMBER(FXDesktopS
 /*******************************************************************************/
 
 // Construct window
-FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,tr("FOX Desktop Setup"),NULL,NULL,DECOR_ALL,0,0,0,0){
+FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NULL,DECOR_ALL,0,0,0,0){
+
+  // Set title
+  setTitle(tr("FOX Desktop Setup"));
 
   // Grab stock font's description
   FXFontDesc fontdescription=getApp()->getNormalFont()->getFontDesc();
@@ -1117,7 +1120,7 @@ FXbool FXDesktopSetup::writeSettingsFile(const FXString& file){
 
   // Normal font
   desktopsettings.writeStringEntry("SETTINGS","normalfont",fontspec.text());
-  
+
   // Save Colors
   desktopsettings.writeColorEntry("SETTINGS","basecolor",theme_current.base);
   desktopsettings.writeColorEntry("SETTINGS","bordercolor",theme_current.border);

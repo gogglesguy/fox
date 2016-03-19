@@ -26,6 +26,7 @@ namespace FX {
 
 
 class FXQuatd;
+class FXMat2d;
 class FXMat4d;
 
 
@@ -40,6 +41,9 @@ public:
 
   /// Initialize matrix from scalar
   FXMat3d(FXdouble s);
+
+  /// Initialize with 2x2 rotation and scale matrix
+  FXMat3d(const FXMat2d& s);
 
   /// Initialize matrix from another matrix
   FXMat3d(const FXMat3d& s);
@@ -68,6 +72,7 @@ public:
   FXMat3d& operator=(FXdouble s);
 
   /// Assignment
+  FXMat3d& operator=(const FXMat2d& s);
   FXMat3d& operator=(const FXMat3d& s);
   FXMat3d& operator=(const FXMat4d& s);
 
@@ -76,6 +81,9 @@ public:
 
   /// Set value from scalar
   FXMat3d& set(FXdouble s);
+  
+  /// Set value from 2x2 rotation and scale matrix
+  FXMat3d& set(const FXMat2d& s);
 
   /// Set value from another matrix
   FXMat3d& set(const FXMat3d& s);

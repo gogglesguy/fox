@@ -47,6 +47,7 @@
 #include "FXAtomic.h"
 #include "FXThread.h"
 #include "FXStream.h"
+#include "FXPtrList.h"
 #include "FXPtrQueue.h"
 #include "FXIO.h"
 #include "FXFile.h"

@@ -157,6 +157,8 @@
 +FXPrintDialog.obj &
 +FXProgressBar.obj &
 +FXProgressDialog.obj &
++FXPtrList.obj &
++FXPtrQueue.obj &
 +FXQuatd.obj &
 +FXQuatf.obj &
 +FXRASIcon.obj &

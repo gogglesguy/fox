@@ -865,6 +865,7 @@ FXbool FXThread::start(unsigned long stacksize){
   if(tid){ fxerror("FXThread::start: thread still attached.\n"); }
   busy=true;
   if((tid=(FXThreadID)CreateThread(NULL,stacksize,(LPTHREAD_START_ROUTINE)FXThread::function,this,0,&thd))==NULL) busy=false;
+//  if((tid=(FXThreadID)_beginthreadex(NULL,stacksize,(LPTHREAD_START_ROUTINE)FXThread::function,this,0,&thd))==NULL) busy=false;
 #else
   pthread_attr_t attr;
   if(busy){ fxerror("FXThread::start: thread already running.\n"); }
@@ -964,6 +965,7 @@ void FXThread::exit(FXint code){
 #if defined(WIN32)
   if(self()){ self()->busy=false; }
   ExitThread(code);
+//  _endthreadex(code);
 #else
   if(self()){ self()->busy=false; }
   pthread_exit((void*)(FXival)code);

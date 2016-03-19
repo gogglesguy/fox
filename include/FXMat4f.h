@@ -97,11 +97,11 @@ public:
   FXMat4f& set(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4f& d);
 
   /// Assignment operators
-  FXMat4f& operator+=(const FXMat4f& w);
-  FXMat4f& operator-=(const FXMat4f& w);
-  FXMat4f& operator*=(const FXMat4f& w);
-  FXMat4f& operator*=(FXfloat w);
-  FXMat4f& operator/=(FXfloat w);
+  FXMat4f& operator+=(const FXMat4f& s);
+  FXMat4f& operator-=(const FXMat4f& s);
+  FXMat4f& operator*=(const FXMat4f& s);
+  FXMat4f& operator*=(FXfloat s);
+  FXMat4f& operator/=(FXfloat s);
 
   /// Indexing
   FXVec4f& operator[](FXint i){return m[i];}

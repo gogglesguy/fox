@@ -69,7 +69,7 @@ static inline FXfloat rsqrtf(FXfloat r){
 FXVec3f fastnormalize(const FXVec3f& v){
   register FXfloat m=v.length2();
   FXVec3f result(v);
-  if(FLT_MIN<m){ result*=rsqrtf(m); }
+  if(__likely(FLT_MIN<m)){ result*=rsqrtf(m); }
   return result;
   }
 
@@ -78,7 +78,7 @@ FXVec3f fastnormalize(const FXVec3f& v){
 FXVec3f normalize(const FXVec3f& v){
   register FXfloat m=v.length2();
   FXVec3f result(v);
-  if(0.0f<m){ result/=sqrtf(m); }
+  if(__likely(0.0f<m)){ result/=sqrtf(m); }
   return result;
   }
 

@@ -1429,18 +1429,18 @@ FXint FXText::getYOfPos(FXint pos) const {
     FXTRACE((150,"getYOfPos(%d < visrows[0]=%d) = %d\n",pos,visrows[0],margintop+y));
     }
 
-  // Below visible part of buffer
-  else if(pos>=visrows[nvisrows]){
-    n=countRows(visrows[nvisrows-1],pos);
-    y=(toprow+nvisrows-1+n)*h;
-    FXTRACE((150,"getYOfPos(%d > visrows[%d]=%d) = %d\n",pos,nvisrows,visrows[nvisrows],margintop+y));
-    }
-
   // In visible part of buffer
-  else{
+  else if(pos<visrows[nvisrows]){
     n=posToLine(pos,0);
     y=(toprow+n)*h;
     FXTRACE((150,"getYOfPos(visrows[0]=%d <= %d <= visrows[%d]=%d) = %d\n",visrows[0],pos,nvisrows,visrows[nvisrows],margintop+y));
+    }
+
+  // Below visible part of buffer
+  else{
+    n=countRows(visrows[0],pos);
+    y=(toprow+n)*h;
+    FXTRACE((150,"getYOfPos(%d > visrows[%d]=%d) = %d\n",pos,nvisrows,visrows[nvisrows],margintop+y));
     }
   return getVisibleY()+margintop+y;
   }
@@ -1535,13 +1535,17 @@ FXint FXText::getBottomLine() const {
 
 // Move content
 void FXText::moveContents(FXint x,FXint y){
-  register FXint delta,i,dx,dy,vx,vy,vw,vh;
+  register FXint delta=-y/font->getFontHeight()-toprow;
+  register FXint vx=getVisibleX();
+  register FXint vy=getVisibleY();
+  register FXint vw=getVisibleWidth();
+  register FXint vh=getVisibleHeight();  
+  register FXint dx=x-pos_x;
+  register FXint dy=y-pos_y;
+  register FXint i;
 
   // Erase fragments of cursor overhanging margins
   eraseCursorOverhang();
-
-  // Number of lines scrolled
-  delta=-y/font->getFontHeight() - toprow;
 
   // Scrolled up one or more lines
   if(delta<0){
@@ -1588,22 +1592,14 @@ void FXText::moveContents(FXint x,FXint y){
   FXASSERT(0<=toprow && toprow<=nrows-1);
   FXASSERT(0<=toppos && toppos<=length);
 
-  // Scroll the contents
-  dx=x-pos_x;
-  dy=y-pos_y;
-  pos_x=x;
-  pos_y=y;
-
-  vx=getVisibleX();
-  vy=getVisibleY();
-  vw=getVisibleWidth();
-  vh=getVisibleHeight();
-
   // Scroll stuff in the bar only vertically
   scroll(vx-barwidth,vy,barwidth,vh,0,dy);
 
   // Scroll the text
   scroll(vx+marginleft,vy+margintop,vw-marginleft-marginright,vh-margintop-marginbottom,dx,dy);
+
+  pos_x=x;
+  pos_y=y;
   }
 
 /*******************************************************************************/

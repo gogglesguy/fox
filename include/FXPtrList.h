@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                            O b j e c t   L i s t                              *
+*                            P o i n t e r   L i s t                            *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -18,38 +18,34 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifndef FXOBJECTLIST_H
-#define FXOBJECTLIST_H
-
-#ifndef FXOBJECT_H
-#include "FXObject.h"
-#endif
+#ifndef FXPTRLIST_H
+#define FXPTRLIST_H
 
 namespace FX {
 
-/// List of pointers to objects
-class FXAPI FXObjectList {
+/// List of pointers
+class FXAPI FXPtrList {
 protected:
-  FXObject **ptr;
+  void **ptr;
 public:
 
   /// Default constructor
-  FXObjectList();
+  FXPtrList();
 
   /// Copy constructor
-  FXObjectList(const FXObjectList& src);
+  FXPtrList(const FXPtrList& src);
 
   /// Construct and init with single object
-  FXObjectList(FXObject* object);
+  FXPtrList(void* object);
 
   /// Construct and init with n copies of object
-  FXObjectList(FXObject* object,FXint n);
+  FXPtrList(void* object,FXint n);
 
   /// Construct and init with list of objects
-  FXObjectList(FXObject** objects,FXint n);
+  FXPtrList(void** objects,FXint n);
 
   /// Assignment operator
-  FXObjectList& operator=(const FXObjectList& orig);
+  FXPtrList& operator=(const FXPtrList& orig);
 
   /// Return number of objects
   FXint no() const { return *((FXint*)(ptr-1)); }
@@ -58,87 +54,87 @@ public:
   FXbool no(FXint num);
 
   /// Indexing operator
-  FXObject*& operator[](FXint i){ return ptr[i]; }
-  FXObject* const& operator[](FXint i) const { return ptr[i]; }
+  void*& operator[](FXint i){ return ptr[i]; }
+  void* const& operator[](FXint i) const { return ptr[i]; }
 
   /// Indexing operator
-  FXObject*& at(FXint i){ return ptr[i]; }
-  FXObject* const& at(FXint i) const { return ptr[i]; }
+  void*& at(FXint i){ return ptr[i]; }
+  void* const& at(FXint i) const { return ptr[i]; }
 
   /// First element in list
-  FXObject*& head(){ return ptr[0]; }
-  FXObject* const& head() const { return ptr[0]; }
+  void*& head(){ return ptr[0]; }
+  void* const& head() const { return ptr[0]; }
 
   /// Last element in list
-  FXObject*& tail(){ return ptr[no()-1]; }
-  FXObject* const& tail() const { return ptr[no()-1]; }
+  void*& tail(){ return ptr[no()-1]; }
+  void* const& tail() const { return ptr[no()-1]; }
 
   /// Access to content array
-  FXObject** data(){ return ptr; }
-  FXObject *const * data() const { return ptr; }
+  void** data(){ return ptr; }
+  void *const * data() const { return ptr; }
 
   /// Adopt objects from orig, leaving orig empty
-  void adopt(FXObjectList& orig);
+  void adopt(FXPtrList& orig);
 
   /// Assign object to list
-  FXbool assign(FXObject* object);
+  FXbool assign(void* object);
 
   /// Assign n copies of object to list
-  FXbool assign(FXObject* object,FXint n);
+  FXbool assign(void* object,FXint n);
 
   /// Assign n objects to list
-  FXbool assign(FXObject** objects,FXint n);
+  FXbool assign(void** objects,FXint n);
 
   /// Assign objects to list
-  FXbool assign(const FXObjectList& objects);
+  FXbool assign(const FXPtrList& objects);
 
   /// Insert object at certain position
-  FXbool insert(FXint pos,FXObject* object);
+  FXbool insert(FXint pos,void* object);
 
   /// Insert n copies of object at specified position
-  FXbool insert(FXint pos,FXObject* object,FXint n);
+  FXbool insert(FXint pos,void* object,FXint n);
 
   /// Insert n objects at specified position
-  FXbool insert(FXint pos,FXObject** objects,FXint n);
+  FXbool insert(FXint pos,void** objects,FXint n);
 
   /// Insert objects at specified position
-  FXbool insert(FXint pos,const FXObjectList& objects);
+  FXbool insert(FXint pos,const FXPtrList& objects);
 
   /// Prepend object
-  FXbool prepend(FXObject* object);
+  FXbool prepend(void* object);
 
   /// Prepend n copies of object
-  FXbool prepend(FXObject* object,FXint n);
+  FXbool prepend(void* object,FXint n);
 
   /// Prepend n objects
-  FXbool prepend(FXObject** objects,FXint n);
+  FXbool prepend(void** objects,FXint n);
 
   /// Prepend objects
-  FXbool prepend(const FXObjectList& objects);
+  FXbool prepend(const FXPtrList& objects);
 
   /// Append object
-  FXbool append(FXObject* object);
+  FXbool append(void* object);
 
   /// Append n copies of object
-  FXbool append(FXObject* object,FXint n);
+  FXbool append(void* object,FXint n);
 
   /// Append n objects
-  FXbool append(FXObject** objects,FXint n);
+  FXbool append(void** objects,FXint n);
 
   /// Append objects
-  FXbool append(const FXObjectList& objects);
+  FXbool append(const FXPtrList& objects);
 
   /// Replace object at position by given object
-  FXbool replace(FXint pos,FXObject* object);
+  FXbool replace(FXint pos,void* object);
 
   /// Replaces the m objects at pos with n copies of object
-  FXbool replace(FXint pos,FXint m,FXObject* object,FXint n);
+  FXbool replace(FXint pos,FXint m,void* object,FXint n);
 
   /// Replaces the m objects at pos with n objects
-  FXbool replace(FXint pos,FXint m,FXObject** objects,FXint n);
+  FXbool replace(FXint pos,FXint m,void** objects,FXint n);
 
   /// Replace the m objects at pos with objects
-  FXbool replace(FXint pos,FXint m,const FXObjectList& objects);
+  FXbool replace(FXint pos,FXint m,const FXPtrList& objects);
 
   /// Remove object at pos
   FXbool erase(FXint pos);
@@ -147,52 +143,47 @@ public:
   FXbool erase(FXint pos,FXint n);
 
   /// Push object to end
-  FXbool push(FXObject* object);
+  FXbool push(void* object);
 
   /// Pop object from end
   FXbool pop();
 
   /// Remove object
-  FXbool remove(const FXObject* object);
+  FXbool remove(const void* object);
 
   /// Find object in list, searching forward; return position or -1
-  FXint find(const FXObject *object,FXint pos=0) const;
+  FXint find(const void *object,FXint pos=0) const;
 
   /// Find object in list, searching backward; return position or -1
-  FXint rfind(const FXObject *object,FXint pos=2147483647) const;
+  FXint rfind(const void *object,FXint pos=2147483647) const;
 
   /// Remove all objects
   void clear();
 
-  /// Save to a stream
-  void save(FXStream& store) const;
-
-  /// Load from a stream
-  void load(FXStream& store);
-
   /// Destructor
-  virtual ~FXObjectList();
+  virtual ~FXPtrList();
   };
+
 
 
 /// Specialize list to pointers to TYPE
 template<class TYPE>
-class FXObjectListOf : public FXObjectList {
+class FXPtrListOf : public FXPtrList {
 public:
   /// Default constructor
-  FXObjectListOf(){}
+  FXPtrListOf(){}
 
   /// Copy constructor
-  FXObjectListOf(const FXObjectListOf<TYPE>& src):FXObjectList(src){ }
+  FXPtrListOf(const FXPtrListOf<TYPE>& src):FXPtrList(src){ }
 
   /// Construct and init with single object
-  FXObjectListOf(TYPE* object):FXObjectList(reinterpret_cast<FXObject*>(object)){ }
+  FXPtrListOf(TYPE* object):FXPtrList(reinterpret_cast<void*>(object)){ }
 
   /// Construct and init with n copies of object
-  FXObjectListOf(TYPE* object,FXint n):FXObjectList(reinterpret_cast<FXObject*>(object),n){ }
+  FXPtrListOf(TYPE* object,FXint n):FXPtrList(reinterpret_cast<void*>(object),n){ }
 
   /// Construct and init with list of objects
-  FXObjectListOf(TYPE** objects,FXint n):FXObjectList(reinterpret_cast<FXObject**>(objects),n){ }
+  FXPtrListOf(TYPE** objects,FXint n):FXPtrList(reinterpret_cast<void**>(objects),n){ }
 
   /// Indexing operator
   TYPE*& operator[](FXint i){ return reinterpret_cast<TYPE*&>(ptr[i]); }

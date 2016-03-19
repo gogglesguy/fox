@@ -117,19 +117,19 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo FXJPGImage.lo \
 	FXKnob.lo FXLabel.lo FXList.lo FXListBox.lo FXLocale.lo \
 	FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo \
-	FXMat3d.lo FXMat4d.lo FXMat3f.lo FXMat4f.lo FXMatrix.lo \
-	FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo FXMenuButton.lo \
-	FXMenuCaption.lo FXMenuCascade.lo FXMenuCheck.lo \
-	FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
+	FXMat2d.lo FXMat2f.lo FXMat3d.lo FXMat3f.lo FXMat4d.lo \
+	FXMat4f.lo FXMatrix.lo FXMemMap.lo FXMemoryStream.lo \
+	FXMenuBar.lo FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
+	FXMenuCheck.lo FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
 	FXMessageChannel.lo FXObject.lo FXObjectList.lo \
 	FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo FXPNGIcon.lo \
 	FXPNGImage.lo FXPPMIcon.lo FXPPMImage.lo FXPacker.lo FXPath.lo \
 	FXPicker.lo FXPipe.lo FXPopup.lo FXPoint.lo FXPrintDialog.lo \
-	FXProgressBar.lo FXProgressDialog.lo FXPtrQueue.lo FXQuatd.lo \
-	FXQuatf.lo FXRASIcon.lo FXRASImage.lo FXRGBIcon.lo \
-	FXRGBImage.lo FXRadioButton.lo FXRangef.lo FXRanged.lo \
-	FXRangeSlider.lo FXRealSlider.lo FXRealSpinner.lo \
+	FXProgressBar.lo FXProgressDialog.lo FXPtrList.lo \
+	FXPtrQueue.lo FXQuatd.lo FXQuatf.lo FXRASIcon.lo FXRASImage.lo \
+	FXRGBIcon.lo FXRGBImage.lo FXRadioButton.lo FXRangef.lo \
+	FXRanged.lo FXRangeSlider.lo FXRealSlider.lo FXRealSpinner.lo \
 	FXRecentFiles.lo FXRectangle.lo FXRegion.lo FXRegistry.lo \
 	FXReplaceDialog.lo FXRex.lo FXRootWindow.lo FXRuler.lo \
 	FXRulerView.lo FXScrollArea.lo FXScrollBar.lo FXScrollPane.lo \
@@ -617,9 +617,11 @@ FXMDIButton.cpp \
 FXMDIChild.cpp \
 FXMDIClient.cpp \
 FXMainWindow.cpp \
+FXMat2d.cpp \
+FXMat2f.cpp \
 FXMat3d.cpp \
-FXMat4d.cpp \
 FXMat3f.cpp \
+FXMat4d.cpp \
 FXMat4f.cpp \
 FXMatrix.cpp \
 FXMemMap.cpp \
@@ -654,6 +656,7 @@ FXPoint.cpp \
 FXPrintDialog.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
+FXPtrList.cpp \
 FXPtrQueue.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
@@ -1029,6 +1032,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMDIChild.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMDIClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMainWindow.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMat2d.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMat2f.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMat3d.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMat3f.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMat4d.Plo@am__quote@
@@ -1066,6 +1071,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPrintDialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProgressBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProgressDialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPtrList.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPtrQueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXQuatd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXQuatf.Plo@am__quote@

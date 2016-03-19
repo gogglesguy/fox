@@ -1,5 +1,5 @@
 %define name fox
-%define version @FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.@FOX_PATCH_LEVEL@
+%define version 1.7.24
 %define release 1
 
 Summary: The FOX toolkit.
@@ -106,7 +106,7 @@ rm -r doc/art/Makefile.am doc/art/Makefile.in doc/art/Makefile
 rm -f doc/screenshots/Makefile.am doc/screenshots/Makefile.in doc/screenshots/Makefile
 
 # remove docs as they are supplied by rpm
-rm -rf ${RPM_BUILD_ROOT}/%{_datadir}/doc/fox-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@
+rm -rf ${RPM_BUILD_ROOT}/%{_datadir}/doc/fox-1.7
 rm -rf ${RPM_BUILD_ROOT}/usr/fox
 
 %clean
@@ -114,12 +114,12 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 
 %files
 %defattr(-,root,root)
-%{_libdir}/libFOX-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.so
-%{_libdir}/libFOX-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.so.@LT_CURRENT@
-%{_libdir}/libFOX-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.so.@LT_CURRENT@.@LT_AGE@.@LT_REVISION@
-%{_libdir}/libCHART-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.so
-%{_libdir}/libCHART-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.so.@LT_CURRENT@
-%{_libdir}/libCHART-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.so.@LT_CURRENT@.@LT_AGE@.@LT_REVISION@
+%{_libdir}/libFOX-1.7.so
+%{_libdir}/libFOX-1.7.so.0
+%{_libdir}/libFOX-1.7.so.0.0.24
+%{_libdir}/libCHART-1.7.so
+%{_libdir}/libCHART-1.7.so.0
+%{_libdir}/libCHART-1.7.so.0.0.24
 %{_libdir}/pkgconfig/fox.pc
 
 %doc doc
@@ -130,14 +130,14 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %{_bindir}/reswrap
 %{_bindir}/fox-config
 %{_mandir}/man1/reswrap.1*
-%{_includedir}/fox-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@
-%{_libdir}/libFOX-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.la
-%{_libdir}/libCHART-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.la
+%{_includedir}/fox-1.7
+%{_libdir}/libFOX-1.7.la
+%{_libdir}/libCHART-1.7.la
 
 %files static
 %defattr(-,root,root)
-%{_libdir}/libFOX-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.a
-%{_libdir}/libCHART-@FOX_MAJOR_VERSION@.@FOX_MINOR_VERSION@.a
+%{_libdir}/libFOX-1.7.a
+%{_libdir}/libCHART-1.7.a
 
 %files -n adie
 %defattr(-,root,root)

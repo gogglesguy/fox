@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [23])
+m4_define([fox_level], [24])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -181,7 +181,7 @@ fi
 # Check for J2K Image support
 AC_ARG_ENABLE(jp2,[  --disable-jp2          compile without JPEG 2000 image support])
 AC_MSG_RESULT([$enable_j2k])
-if test "x$enable_jp2" != "xno"; then
+if test "x$enable_jp2" = "xyes"; then
 AC_CHECK_HEADER(openjpeg.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JP2_H=1"; LIBS="${LIBS} ${LIBJP2:=-lopenjpeg}")
 fi
 

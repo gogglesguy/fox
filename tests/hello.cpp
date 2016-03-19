@@ -1,6 +1,5 @@
 #include "fx.h"
 
-
 /*
 
   This is a classical programming example.  Doing it graphically

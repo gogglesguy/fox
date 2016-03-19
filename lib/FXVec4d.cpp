@@ -53,7 +53,7 @@ FXVec4d colorToVec4d(FXColor clr){
 FXVec4d normalize(const FXVec4d& v){
   register FXdouble m=v.length2();
   FXVec4d result(v);
-  if(0.0<m){ result/=sqrt(m); }
+  if(__likely(0.0<m)){ result/=sqrt(m); }
   return result;
   }
 
