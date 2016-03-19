@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -120,10 +120,10 @@ struct FXFontDesc {
   FXushort        setwidth;                 /// Set width [normal, condensed, expanded, ...]
   FXushort        encoding;                 /// Encoding of character set
   FXushort        flags;                    /// Flags
-  
+
   /// Set font description from a string
   void setFont(const FXString& string);
-  
+
   /// Get string of font description
   FXString getFont() const;
   };

@@ -3,7 +3,7 @@
 *                          T I F F   I n p u t / O u t p u t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2010 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2011 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -218,6 +218,12 @@ FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXush
       }
     }
 
+ /// RGBA => BGRA    
+  for(i=0;i<size;i++) {
+    data[i] = ((data[i]&0xff)<<16) | ((data[i]&0xff0000)>>16) | (data[i]&0xff00) | (data[i]&0xff000000);
+    }    
+
+
   TIFFRGBAImageEnd(&img);
   TIFFClose(image);
   return true;
@@ -232,6 +238,8 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
   long rows_per_strip,line;
   const TIFFCodec* coder;
   TIFF *image;
+  FXColor * ld=NULL;
+  FXint i;
 
   // Must make sense
   if(!data || width<=0 || height<=0) return false;
@@ -282,6 +290,27 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
       }
     data+=width;
     }
+    
+    
+  /// pixels for one line
+  if (!allocElms(ld,width)) {
+    TIFFClose(image);
+    return false;
+    }
+
+  // Dump each line
+  for(line=0; line<height; line++){    
+    for(i=0;i<width;i++) {
+      ld[i] = FXREDVAL(data[i]) | FXGREENVAL(data[i])<<8 | FXBLUEVAL(data[i])<<16 | FXALPHAVAL(data[i])<<24;
+      }    
+    if(TIFFWriteScanline(image,(void*)ld,line,1)!=1){
+      freeElms(ld);
+      TIFFClose(image);
+      return false;
+      }
+    data+=width;
+    }
+  freeElms(ld);        
   TIFFClose(image);
   return true;
   }

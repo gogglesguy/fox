@@ -42,9 +42,11 @@ switcher \
 tabbook \
 ratio \
 half \
+gaugetest \
 gltest \
 glviewer
 
+gaugetest_SOURCES           = gaugetest.cpp
 format_SOURCES          = format.cpp
 scan_SOURCES            = scan.cpp
 console_SOURCES         = console.cpp

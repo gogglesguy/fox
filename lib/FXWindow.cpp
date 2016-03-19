@@ -3,7 +3,7 @@
 *                            W i n d o w   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -53,6 +53,7 @@
 #include "FXComposeContext.h"
 #include "FXTextField.h"
 #include "fxpriv.h"
+
 
 /*
  Notes:
@@ -1290,7 +1291,6 @@ void FXWindow::create(){
 #else                   // X11
 
       XSetWindowAttributes wattr;
-      XClassHint hint;
       unsigned long mask;
 
       // Fill in the attributes
@@ -1363,15 +1363,6 @@ void FXWindow::create(){
       // Store for xid to C++ object mapping
       getApp()->hash.insert((void*)xid,this);
 
-      // Set resource and class name for toplevel windows.
-      // In a perfect world this would be set in FXTopWindow, but for some strange reasons
-      // some window-managers (e.g. fvwm) this will be too late and they will not recognize them.
-      if(isShell()){
-        hint.res_name=(char*)getApp()->getAppName().text();             // "FoxApp";
-        hint.res_class=(char*)getApp()->getVendorName().text();         // "FoxWindow";
-        XSetClassHint((Display*)getApp()->getDisplay(),xid,&hint);
-        }
-
       // We put the XdndAware property on all toplevel windows, so that
       // when dragging, we need to search no further than the toplevel window.
       if(isShell()){
@@ -1388,19 +1379,6 @@ void FXWindow::create(){
       if(visual->colormap!=DefaultColormap((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()))){
         addColormapWindows();
         }
-
-      // Enable extra events when input extension supported
-#ifdef HAVE_XINPUT_H
-      if(isEnabled()){
-        if(getApp()->xsbDevice){
-          XEventClass xevents[3];
-          xevents[0]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbBallMotion;
-          xevents[1]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonPress;
-          xevents[2]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonRelease;
-          XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,3);
-          }
-        }
-#endif
 
       // Show if it was supposed to be
       if(shown() && 0<width && 0<height) XMapWindow((Display*)getApp()->getDisplay(),xid);
@@ -1580,7 +1558,7 @@ void FXWindow::setShape(const FXRegion& region){
     CombineRgn(rgn,(HRGN)region.region,rgn,RGN_COPY);
     SetWindowRgn((HWND)xid,rgn,false);
 #else
-#ifdef HAVE_XSHAPE_H
+#if defined(HAVE_XSHAPE_H)
     XShapeCombineRegion((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,(Region)region.region,ShapeSet);
 #endif
 #endif
@@ -1623,7 +1601,7 @@ void FXWindow::setShape(FXBitmap* bitmap){
     SetWindowRgn((HWND)xid,rgn,false);
     DeleteDC(hdc);
 #else
-#ifdef HAVE_XSHAPE_H
+#if defined(HAVE_XSHAPE_H)
     XShapeCombineMask((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,bitmap->id(),ShapeSet);
 #endif
 #endif
@@ -1642,7 +1620,7 @@ void FXWindow::setShape(FXIcon* icon){
     SetWindowRgn((HWND)xid,rgn,false);
     DeleteDC(hdc);
 #else
-#ifdef HAVE_XSHAPE_H
+#if defined(HAVE_XSHAPE_H)
     XShapeCombineMask((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,icon->shape,ShapeSet);
 #endif
 #endif
@@ -1656,7 +1634,7 @@ void FXWindow::clearShape(){
 #ifdef WIN32
     SetWindowRgn((HWND)xid,NULL,false);
 #else
-#ifdef HAVE_XSHAPE_H
+#if defined(HAVE_XSHAPE_H)
     XShapeCombineMask((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,None,ShapeSet);
 #endif
 #endif
@@ -1899,13 +1877,6 @@ long FXWindow::onSelectionRequest(FXObject*,FXSelector,void* ptr){
 FXbool FXWindow::hasSelection() const {
   return (getApp()->selectionWindow==this);
   }
-
-/*
-==== separate app->event.time into special (global) variable in FXApp.
-==== Add ctor to FXEvent.
-==== Create FXEvent on stack to pass.
-==== Recursive event loops create new FXEvent.
-*/
 
 
 // Acquire the selection.
@@ -2515,15 +2486,6 @@ void FXWindow::enable(){
       FXuint events=BASIC_EVENT_MASK|ENABLED_EVENT_MASK;
       if(isShell()) events|=SHELL_EVENT_MASK;
       XSelectInput((Display*)getApp()->getDisplay(),xid,events);
-#ifdef HAVE_XINPUT_H
-      if(getApp()->xsbDevice){
-        XEventClass xevents[3];
-        xevents[0]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbBallMotion;
-        xevents[1]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonPress;
-        xevents[2]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonRelease;
-        XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,3);
-        }
-#endif
 #endif
       }
     }
@@ -2551,13 +2513,6 @@ void FXWindow::disable(){
       FXuint events=BASIC_EVENT_MASK;
       if(isShell()) events|=SHELL_EVENT_MASK;
       XSelectInput((Display*)getApp()->getDisplay(),xid,events);
-#ifdef HAVE_XINPUT_H
-      if(getApp()->xsbDevice){
-        XEventClass xevents[1];
-        xevents[0]=((XDevice*)getApp()->xsbDevice)->device_id<<8;
-        XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,1);
-        }
-#endif
       if(getApp()->mouseGrabWindow==this){
         XUngrabPointer((Display*)getApp()->getDisplay(),CurrentTime);
         XFlush((Display*)getApp()->getDisplay());

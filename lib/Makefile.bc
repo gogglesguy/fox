@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -27,17 +27,26 @@ LD        = bcc32
 TOPDIR    = ..
 # Uncomment the following two lines for debug builds...
 #CXXFLAGS  = -5 -Od -w-aus -w-ccc -w-csu -w-par -w-pia -w-rch -w-inl -w-ngu
-#DEFINES   = -DFOX_BIGENDIAN=0 -D_WINDOWS -DWIN32 -DHAVE_GL_H -DHAVE_GLU_H -DHAVE_VSSCANF
+#DEFINES   = -DFOX_BIGENDIAN=0 -DDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H -DHAVE_GLU_H -DHAVE_VSSCANF
 # Uncomment the following two lines for release builds...
 CXXFLAGS  = -5 -O2 -w-aus -w-ccc -w-csu -w-par -w-pia -w-rch -w-inl -w-ngu
-DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H -DHAVE_GLU_H -DHAVE_VSSCANF #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_TIFF_H -DXMD_H
+DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H -DHAVE_GLU_H #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_TIFF_H -DXMD_H
 INCDIRS   = -I$(TOPDIR)/include
-FOXLIB    = $(TOPDIR)\lib\FOX-1.7.lib
 RESWRAP   = $(TOPDIR)\utils\reswrap.exe
+
+# Uncomment for DLL build
+#FOXDLL    = -DFOXDLL -DFOXDLL_EXPORTS
+!ifdef FOXDLL
+  DEFINES = $(DEFINES) $(FOXDLL)
+  FOXLIB  = $(TOPDIR)\lib\FOXDLL-1.7.lib
+!else
+  FOXLIB  = $(TOPDIR)\lib\FOX-1.7.lib
+!endif
 
 
 .SUFFIXES: .cpp .c
 
+# Project sources
 SOURCES = \
 FX4Splitter.cpp \
 FX7Segment.cpp \
@@ -223,6 +232,7 @@ FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
+FXMetaClass.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -356,6 +366,9 @@ fxpsio.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
 fxscanf.cpp \
+fxstrtoll.cpp \
+fxstrtoull.cpp \
+fxstrtod.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
@@ -363,10 +376,13 @@ fxutils.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
-icons.cpp \
-strtoll.cpp
+icons.cpp
 
+# Objects
 OBJECTS = $(SOURCES:.cpp=.obj)
+
+# Other resources
+RESOURCES = version.rc
 
 .cpp.obj:
         $(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $<
@@ -381,7 +397,15 @@ clean:
 
 
 # Make the library
+!ifdef FOXDLL
+$(FOXLIB): $(OBJECTS)
+	ilink32 /Tpd /Gn /x @&&|
+	c0d32.obj $(OBJECTS),FOX,, import32.lib cw32.lib
+|
+	IMPLIB $(FOXLIB) FOX.dll
+!else
 $(FOXLIB): $(OBJECTS) Makefile.bc.resp
-        touch $(FOXLIB)
-        del $(FOXLIB)
-        $(LIB) "$(FOXLIB)" /P256 @Makefile.bc.resp
+	touch $(FOXLIB)
+	del $(FOXLIB)
+	$(LIB) "$(FOXLIB)" /P256 @Makefile.bc.resp
+!endif

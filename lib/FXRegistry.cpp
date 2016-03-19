@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -85,14 +85,14 @@
       6)    An application reads files in the order:
 
                 System-Wide:
-                        foxrc,
-                        Vendor/Vendorrc,
-                        Vendor/Applicationrc
+                        fox.rc,
+                        Vendor/Vendor.rc,
+                        Vendor/Application.rc
 
                 Per-User:
-                        foxrc,
-                        Vendor/Vendorrc,
-                        Vendor/Applicationrc
+                        fox.rc,
+                        Vendor/Vendor.rc,
+                        Vendor/Application.rc
 
       7)    When System-Wide settings files are loaded, entries are not marked as
             changed, and thus not written into the Per-User settings file.  Only

@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -137,6 +137,7 @@
 #include "FX7Segment.h"
 #include "FXDial.h"
 #include "FXKnob.h"
+#include "FXGauge.h"
 #include "FXColorBar.h"
 #include "FXColorRing.h"
 #include "FXColorWell.h"

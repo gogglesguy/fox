@@ -3,7 +3,7 @@
 *                      S c r o l l A r e a   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -76,6 +76,9 @@
   - Note that the horizontal scrollbar width NO LONGER influences the default width,
     and the vertical scrollbar NO LONGER influences default height.  This was done
     to get accurate minimum sizes for subclasses which add headers or rulers.
+  - Should honor LAYOUT_XXX options passed to FXScrollBars.  This will be handy
+    to allow alternate scrollbar placement strategies (for this to work the subclasses
+    will need to be fixed to use getVisibleX() and getVisibleY() everywhere).
 */
 
 
@@ -120,8 +123,8 @@ FXScrollArea::FXScrollArea(){
 // Construct and init
 FXScrollArea::FXScrollArea(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXComposite(p,opts,x,y,w,h){
   flags|=FLAG_SHOWN;
-  horizontal=new FXScrollBar(this,this,ID_HSCROLLED,(opts&SCROLLERS_DONT_TRACK)?(SCROLLBAR_HORIZONTAL|SCROLLBAR_WHEELJUMP):SCROLLBAR_HORIZONTAL);
-  vertical=new FXScrollBar(this,this,ID_VSCROLLED,(opts&SCROLLERS_DONT_TRACK)?(SCROLLBAR_VERTICAL|SCROLLBAR_WHEELJUMP):SCROLLBAR_VERTICAL);
+  horizontal=new FXScrollBar(this,this,ID_HSCROLLED,(opts&SCROLLERS_DONT_TRACK)?(SCROLLBAR_HORIZONTAL|SCROLLBAR_WHEELJUMP|LAYOUT_SIDE_BOTTOM):(SCROLLBAR_HORIZONTAL|LAYOUT_SIDE_BOTTOM));
+  vertical=new FXScrollBar(this,this,ID_VSCROLLED,(opts&SCROLLERS_DONT_TRACK)?(SCROLLBAR_VERTICAL|SCROLLBAR_WHEELJUMP|LAYOUT_SIDE_RIGHT):(SCROLLBAR_VERTICAL|LAYOUT_SIDE_RIGHT));
   corner=new FXScrollCorner(this);
   backColor=getApp()->getBackColor();
   pos_x=0;

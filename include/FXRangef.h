@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    R a n g e    C l a s s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -143,7 +143,7 @@ public:
   FXint intersect(const FXVec4f& plane) const;
 
   /// Intersect box with ray u-v
-  FXbool intersect(const FXVec3f& u,const FXVec3f& v);
+  FXbool intersect(const FXVec3f& u,const FXVec3f& v) const;
 
   /// Get corner number 0..7
   FXVec3f corner(FXint c) const { return FXVec3f((&lower)[c&1].x,(&lower)[(c>>1)&1].y,(&lower)[c>>2].z); }

@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -389,25 +389,25 @@ const FXTime forever=9223372036854775807L;
 #if FOX_BIGENDIAN == 1
 
 /// Make RGBA color
-#define FXRGBA(r,g,b,a)    (((FX::FXuint)(FX::FXuchar)(r)<<24) | ((FX::FXuint)(FX::FXuchar)(g)<<16) | ((FX::FXuint)(FX::FXuchar)(b)<<8) | ((FX::FXuint)(FX::FXuchar)(a)))
+#define FXRGBA(r,g,b,a)    (((FX::FXuint)(FX::FXuchar)(a)) | ((FX::FXuint)(FX::FXuchar)(r)<<8) | ((FX::FXuint)(FX::FXuchar)(g)<<16) | ((FX::FXuint)(FX::FXuchar)(b)<<24))
 
 /// Make RGB color
-#define FXRGB(r,g,b)       (((FX::FXuint)(FX::FXuchar)(r)<<24) | ((FX::FXuint)(FX::FXuchar)(g)<<16) | ((FX::FXuint)(FX::FXuchar)(b)<<8) | 0x000000ff)
+#define FXRGB(r,g,b)       (((FX::FXuint)(FX::FXuchar)(r)<<8) | ((FX::FXuint)(FX::FXuchar)(g)<<16) | ((FX::FXuint)(FX::FXuchar)(b)<<24) | 0x000000ff)
 
 /// Get red value from RGBA color
-#define FXREDVAL(rgba)     ((FX::FXuchar)(((rgba)>>24)&0xff))
+#define FXREDVAL(rgba)     ((FX::FXuchar)(((rgba)>>8)&0xff))
 
 /// Get green value from RGBA color
 #define FXGREENVAL(rgba)   ((FX::FXuchar)(((rgba)>>16)&0xff))
 
 /// Get blue value from RGBA color
-#define FXBLUEVAL(rgba)    ((FX::FXuchar)(((rgba)>>8)&0xff))
+#define FXBLUEVAL(rgba)    ((FX::FXuchar)(((rgba)>>24)&0xff))
 
 /// Get alpha value from RGBA color
 #define FXALPHAVAL(rgba)   ((FX::FXuchar)((rgba)&0xff))
 
 /// Get component value of RGBA color
-#define FXRGBACOMPVAL(rgba,comp) ((FX::FXuchar)(((rgba)>>((3-(comp))<<3))&0xff))
+#define FXRGBACOMPVAL(rgba,comp) ((FX::FXuchar)(((rgba)>>((comp)<<3))&0xff))
 
 #endif
 
@@ -416,25 +416,25 @@ const FXTime forever=9223372036854775807L;
 #if FOX_BIGENDIAN == 0
 
 /// Make RGBA color
-#define FXRGBA(r,g,b,a)    (((FX::FXuint)(FX::FXuchar)(r)) | ((FX::FXuint)(FX::FXuchar)(g)<<8) | ((FX::FXuint)(FX::FXuchar)(b)<<16) | ((FX::FXuint)(FX::FXuchar)(a)<<24))
+#define FXRGBA(r,g,b,a)    (((FX::FXuint)(FX::FXuchar)(a)<<24) | ((FX::FXuint)(FX::FXuchar)(r)<<16) | ((FX::FXuint)(FX::FXuchar)(g)<<8) | ((FX::FXuint)(FX::FXuchar)(b)))
 
 /// Make RGB color
-#define FXRGB(r,g,b)       (((FX::FXuint)(FX::FXuchar)(r)) | ((FX::FXuint)(FX::FXuchar)(g)<<8) | ((FX::FXuint)(FX::FXuchar)(b)<<16) | 0xff000000)
+#define FXRGB(r,g,b)       (((FX::FXuint)(FX::FXuchar)(r)<<16) | ((FX::FXuint)(FX::FXuchar)(g)<<8) | ((FX::FXuint)(FX::FXuchar)(b)) | 0xff000000)
 
 /// Get red value from RGBA color
-#define FXREDVAL(rgba)     ((FX::FXuchar)((rgba)&0xff))
+#define FXREDVAL(rgba)     ((FX::FXuchar)(((rgba)>>16)&0xff))
 
 /// Get green value from RGBA color
 #define FXGREENVAL(rgba)   ((FX::FXuchar)(((rgba)>>8)&0xff))
 
 /// Get blue value from RGBA color
-#define FXBLUEVAL(rgba)    ((FX::FXuchar)(((rgba)>>16)&0xff))
+#define FXBLUEVAL(rgba)    ((FX::FXuchar)((rgba)&0xff))
 
 /// Get alpha value from RGBA color
 #define FXALPHAVAL(rgba)   ((FX::FXuchar)(((rgba)>>24)&0xff))
 
 /// Get component value of RGBA color
-#define FXRGBACOMPVAL(rgba,comp) ((FX::FXuchar)(((rgba)>>((comp)<<3))&0xff))
+#define FXRGBACOMPVAL(rgba,comp) ((FX::FXuchar)(((rgba)>>((3-(comp))<<3))&0xff))
 
 #endif
 
@@ -656,6 +656,9 @@ extern FXAPI FXbool fxIsNan(FXfloat number);
 
 /// Text for not-a-number double
 extern FXAPI FXbool fxIsNan(FXdouble number);
+
+/// Raise 10 to an integer power e in the range [-308..308]
+extern FXAPI FXdouble fxtenToThe(FXint e);
 
 /// Convert keysym to unicode character
 extern FXAPI FXwchar fxkeysym2ucs(FXwchar sym);

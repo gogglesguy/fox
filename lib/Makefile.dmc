@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 2006,2010 by Andre Fornacon.   All Rights Reserved.          #
+# Copyright (C) 2006,2011 by Andre Fornacon.   All Rights Reserved.          #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -27,7 +27,7 @@ LIB	  = lib
 RCC	  = rcc
 TOPDIR	  = ..
 CXXFLAGS  = -mn -WD -5 -a8 -Ae -Ar -Nc -NS -NV
-DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_VSSCANF -DHAVE_OPENGL #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_ZLIB_H -DHAVE_TIFF_H -DHAVE_BZ2LIB_H -DXMD_H
+DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_OPENGL #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_ZLIB_H -DHAVE_TIFF_H -DHAVE_BZ2LIB_H -DXMD_H
 INCDIRS   = -I$(TOPDIR)/include
 FOXLIB	  = $(TOPDIR)\lib\FOX-1.7.lib
 RESWRAP	  = $(TOPDIR)\utils\reswrap.exe
@@ -285,6 +285,7 @@ FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
+FXMetaClass.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -417,6 +418,9 @@ fxpsio.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
 fxscanf.cpp \
+fxstrtoll.cpp \
+fxstrtoull.cpp \
+fxstrtod.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
@@ -424,8 +428,7 @@ fxutils.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
-icons.cpp \
-strtoll.cpp
+icons.cpp
 
 OBJECTS = $(SOURCES:.cpp=.obj)
 

@@ -3,7 +3,7 @@
 *                       R e a l S l i d e r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -98,7 +98,7 @@ FXDEFMAP(FXRealSlider) FXRealSliderMap[]={
 FXIMPLEMENT(FXRealSlider,FXFrame,FXRealSliderMap,ARRAYNUMBER(FXRealSliderMap))
 
 
-#if defined(WIN32) || defined(__sgi) || defined(__sun) || defined(__alpha)
+#if defined(WIN32) || defined(__sgi) || defined(__sun) || defined(__alpha) || defined(__minix)
 static double round(double x){ return (x >= 0) ? floor(x+0.5) : ceil(x-0.5); }
 #endif
 
@@ -791,10 +791,9 @@ void FXRealSlider::drawSliderHead(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h
 
 // Handle repaint
 long FXRealSlider::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *event=(FXEvent*)ptr;
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint tx,ty,hhs=headSize/2;
   FXint xx,yy,ww,hh;
-  FXDCWindow dc(this,event);
 
   // Repaint background
   dc.setForeground(backColor);

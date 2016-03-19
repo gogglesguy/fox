@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -298,10 +298,13 @@ static inline double fxabs(double a){ return a<0 ? -a : a; }
 // Setup for true color
 void FXVisual::setuptruecolor(){
   register FXuint  redshift,greenshift,blueshift;
-  register FXPixel redmask,greenmask,bluemask;
+  register FXPixel redmask,greenmask,bluemask,alphamask;
   register FXPixel redmax,greenmax,bluemax;
   register FXuint i,c,d,r,g,b;
   register FXdouble gamma;
+
+// FIXME alpha mask: set as ~(redmask|greenmask|bluemask)
+// FIXME set to all 1-s (0xFFFFF....FF).
 
   // Get gamma
   gamma=getApp()->reg().readRealEntry("SETTINGS","displaygamma",1.0);
@@ -310,6 +313,7 @@ void FXVisual::setuptruecolor(){
   redmask=((Visual*)visual)->red_mask;
   greenmask=((Visual*)visual)->green_mask;
   bluemask=((Visual*)visual)->blue_mask;
+  alphamask=~(redmask|greenmask|bluemask);              // Collect bits unused by r,g,b for alpha
   redshift=findshift(redmask);
   greenshift=findshift(greenmask);
   blueshift=findshift(bluemask);
@@ -328,9 +332,12 @@ void FXVisual::setuptruecolor(){
       r=(redmax*c+dither[d])/255;
       g=(greenmax*c+dither[d])/255;
       b=(bluemax*c+dither[d])/255;
-      rpix[d][i]=r << redshift;
-      gpix[d][i]=g << greenshift;
-      bpix[d][i]=b << blueshift;
+      rpix[d][i]=alphamask | (r << redshift);           // Unused (alpha) bits are set to 1
+      gpix[d][i]=alphamask | (g << greenshift);
+      bpix[d][i]=alphamask | (b << blueshift);
+//      rpix[d][i]=r << redshift;     
+//      gpix[d][i]=g << greenshift;
+//      bpix[d][i]=b << blueshift;
       }
     }
 

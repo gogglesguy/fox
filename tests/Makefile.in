@@ -45,7 +45,8 @@ noinst_PROGRAMS = scan$(EXEEXT) format$(EXEEXT) console$(EXEEXT) \
 	hello$(EXEEXT) hello2$(EXEEXT) iconlist$(EXEEXT) \
 	image$(EXEEXT) mditest$(EXEEXT) shutter$(EXEEXT) \
 	splitter$(EXEEXT) switcher$(EXEEXT) tabbook$(EXEEXT) \
-	ratio$(EXEEXT) half$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
+	ratio$(EXEEXT) half$(EXEEXT) gaugetest$(EXEEXT) \
+	gltest$(EXEEXT) glviewer$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -104,6 +105,10 @@ am_foursplit_OBJECTS = foursplit.$(OBJEXT)
 foursplit_OBJECTS = $(am_foursplit_OBJECTS)
 foursplit_LDADD = $(LDADD)
 foursplit_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
+am_gaugetest_OBJECTS = gaugetest.$(OBJEXT)
+gaugetest_OBJECTS = $(am_gaugetest_OBJECTS)
+gaugetest_LDADD = $(LDADD)
+gaugetest_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_gltest_OBJECTS = gltest.$(OBJEXT)
 gltest_OBJECTS = $(am_gltest_OBJECTS)
 gltest_LDADD = $(LDADD)
@@ -230,28 +235,28 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
 	$(dirlist_SOURCES) $(expression_SOURCES) $(format_SOURCES) \
-	$(foursplit_SOURCES) $(gltest_SOURCES) $(glviewer_SOURCES) \
-	$(groupbox_SOURCES) $(half_SOURCES) $(header_SOURCES) \
-	$(hello_SOURCES) $(hello2_SOURCES) $(iconlist_SOURCES) \
-	$(image_SOURCES) $(imageviewer_SOURCES) $(layout_SOURCES) \
-	$(mditest_SOURCES) $(memmap_SOURCES) $(minheritance_SOURCES) \
-	$(ratio_SOURCES) $(rex_SOURCES) $(scan_SOURCES) \
-	$(scribble_SOURCES) $(shutter_SOURCES) $(splitter_SOURCES) \
-	$(switcher_SOURCES) $(tabbook_SOURCES) $(table_SOURCES) \
-	$(thread_SOURCES) $(wizard_SOURCES)
+	$(foursplit_SOURCES) $(gaugetest_SOURCES) $(gltest_SOURCES) \
+	$(glviewer_SOURCES) $(groupbox_SOURCES) $(half_SOURCES) \
+	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
+	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
+	$(layout_SOURCES) $(mditest_SOURCES) $(memmap_SOURCES) \
+	$(minheritance_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
+	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
+	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
+	$(table_SOURCES) $(thread_SOURCES) $(wizard_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
 	$(dirlist_SOURCES) $(expression_SOURCES) $(format_SOURCES) \
-	$(foursplit_SOURCES) $(gltest_SOURCES) $(glviewer_SOURCES) \
-	$(groupbox_SOURCES) $(half_SOURCES) $(header_SOURCES) \
-	$(hello_SOURCES) $(hello2_SOURCES) $(iconlist_SOURCES) \
-	$(image_SOURCES) $(imageviewer_SOURCES) $(layout_SOURCES) \
-	$(mditest_SOURCES) $(memmap_SOURCES) $(minheritance_SOURCES) \
-	$(ratio_SOURCES) $(rex_SOURCES) $(scan_SOURCES) \
-	$(scribble_SOURCES) $(shutter_SOURCES) $(splitter_SOURCES) \
-	$(switcher_SOURCES) $(tabbook_SOURCES) $(table_SOURCES) \
-	$(thread_SOURCES) $(wizard_SOURCES)
+	$(foursplit_SOURCES) $(gaugetest_SOURCES) $(gltest_SOURCES) \
+	$(glviewer_SOURCES) $(groupbox_SOURCES) $(half_SOURCES) \
+	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
+	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
+	$(layout_SOURCES) $(mditest_SOURCES) $(memmap_SOURCES) \
+	$(minheritance_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
+	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
+	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
+	$(table_SOURCES) $(thread_SOURCES) $(wizard_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -274,6 +279,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -306,6 +312,7 @@ LT_CURRENT = @LT_CURRENT@
 LT_RELEASE = @LT_RELEASE@
 LT_REVISION = @LT_REVISION@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -337,6 +344,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
@@ -390,6 +398,7 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
+gaugetest_SOURCES = gaugetest.cpp
 format_SOURCES = format.cpp
 scan_SOURCES = scan.cpp
 console_SOURCES = console.cpp
@@ -510,6 +519,9 @@ format$(EXEEXT): $(format_OBJECTS) $(format_DEPENDENCIES)
 foursplit$(EXEEXT): $(foursplit_OBJECTS) $(foursplit_DEPENDENCIES) 
 	@rm -f foursplit$(EXEEXT)
 	$(CXXLINK) $(foursplit_OBJECTS) $(foursplit_LDADD) $(LIBS)
+gaugetest$(EXEEXT): $(gaugetest_OBJECTS) $(gaugetest_DEPENDENCIES) 
+	@rm -f gaugetest$(EXEEXT)
+	$(CXXLINK) $(gaugetest_OBJECTS) $(gaugetest_LDADD) $(LIBS)
 gltest$(EXEEXT): $(gltest_OBJECTS) $(gltest_DEPENDENCIES) 
 	@rm -f gltest$(EXEEXT)
 	$(CXXLINK) $(gltest_OBJECTS) $(gltest_LDADD) $(LIBS)
@@ -604,6 +616,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/expression.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/format.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/foursplit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gaugetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gltest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glviewer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/groupbox.Po@am__quote@

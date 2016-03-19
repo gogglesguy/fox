@@ -3,7 +3,7 @@
 *                            O b j e c t   L i s t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -139,8 +139,8 @@ void FXObjectList::adopt(FXObjectList& orig){
 
 // Assign object p to list
 FXbool FXObjectList::assign(FXObject* object){
-  if(__likely(no(1))){ 
-    ptr[0]=object; 
+  if(__likely(no(1))){
+    ptr[0]=object;
     return true;
     }
   return false;
@@ -149,8 +149,8 @@ FXbool FXObjectList::assign(FXObject* object){
 
 // Assign n copies of object to list
 FXbool FXObjectList::assign(FXObject* object,FXint n){
-  if(__likely(no(n))){ 
-    fillElms(ptr,object,n); 
+  if(__likely(no(n))){
+    fillElms(ptr,object,n);
     return true;
     }
   return false;
@@ -159,7 +159,7 @@ FXbool FXObjectList::assign(FXObject* object,FXint n){
 
 // Assign n objects to list
 FXbool FXObjectList::assign(FXObject** objects,FXint n){
-  if(__likely(no(n))){ 
+  if(__likely(no(n))){
     moveElms(ptr,objects,n);
     return true;
     }

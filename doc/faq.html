@@ -110,16 +110,14 @@ looks very differently internally.
 </p>
 <!--- TOPIC TITLE -->
 <ul>
-Please refer to <a href="http://www.fox-toolkit.net/cgi-bin/wiki.pl?Mac_OS_X">The fifthplanet Macintosh Wiki</a>.
-Basically, if you have installed XFree or Apple's own X Server, FOX can be compiled and
+Basically, if you have installed Apple's own X Server, FOX can be compiled and
 run on OS-X. Only a few environment variables need to be modified (the usual bunch,
 see INSTALL for more detailed information).
 <p>
-A native port running on top of OS-X w/o the need of an X Server is possible.
-However, the author currently does not own a Macintosh, nor has access too one.
-Therefore, unless some hardware is donated to the FOX Project for this purpose,
-chances are small that a software port will happen any time soon, esp. since
-Apple's own X-Server already solves the problem.
+A native port running on top of OS-X w/o the need of an X Server may be a project
+that will be undertaken at some time in the future; however, please be aware that
+since the loop and feel is completely determined by FOX's own implementation, a
+natively ported FOX application will look identical to the one using the X Server.
 </ul>
 
 
@@ -330,7 +328,7 @@ Basically, an Icon [Widget, Image, Font, etc] comprises a part which lives in yo
 program [the <b>client-side</b>], and a part which lives in the X-Server or GDI subsystem
 [the <b>server-side</b>].
 <p>
-The C++ CTOR only builds the part in the client side.  The server side part of the
+The C++ constructor of an object only builds the part in the client side.  The server side part of the
 Icon [Widget, Image, etc] is realized when you call create() on it.
 For convenience, all <em>reachable</em> resources may be created with a single call to <b>FXApp::create()</b>.
 The call to <b>FXApp::create()</b> traverses the entire Widget tree and creates all Windows, Icons,
@@ -605,8 +603,7 @@ Note that the LZW patent will expire soon, and so compressed GIF support will th
 be reinstated.
 <p>
 Nevertheless, software patents are very bad for software developers, particularly since
-so many completely trivial ideas seem to slip through the patent system, see
-<a href="http://lpf.ai.mit.edu/Patents/chaining-oss.html">The Case Against Software Patents</a>.
+so many completely trivial ideas seem to slip through the patent system.
 </ul>
 
 

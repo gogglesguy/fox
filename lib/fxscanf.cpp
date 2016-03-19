@@ -3,7 +3,7 @@
 *                   V a r a r g s   S c a n f   R o u t i n e s                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -104,42 +104,11 @@ enum {
   };
 
 
-// Table of 1E+0,...1E+31, in steps of 1
-static FXdouble posPowOfTen1[32]={
-  1E+0,1E+1,1E+2,1E+3,1E+4,1E+5,1E+6,1E+7,1E+8,1E+9,1E+10,1E+11,1E+12,1E+13,1E+14,1E+15,1E+16,1E+17,1E+18,1E+19,1E+20,1E+21,1E+22,1E+23,1E+24,1E+25,1E+26,1E+27,1E+28,1E+29,1E+30,1E+31
-  };
-
-// Table of 1E+0,...1E+288, in steps of 32
-static FXdouble posPowOfTen32[10]={
-  1E+0,1E+32,1E+64,1E+96,1E+128,1E+160,1E+192,1E+224,1E+256,1E+288
-  };
-
-// Table of 1E-0,...1E-31, in steps of 1
-static FXdouble negPowOfTen1[32]={
-  1E-0,1E-1,1E-2,1E-3,1E-4,1E-5,1E-6,1E-7,1E-8,1E-9,1E-10,1E-11,1E-12,1E-13,1E-14,1E-15,1E-16,1E-17,1E-18,1E-19,1E-20,1E-21,1E-22,1E-23,1E-24,1E-25,1E-26,1E-27,1E-28,1E-29,1E-30,1E-31
-  };
-
-// Table of 1E-0,...1E-288, in steps of 32
-static FXdouble negPowOfTen32[10]={
-  1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288
-  };
-
-
 /*******************************************************************************/
-
-// Fast integer power of 10; this is based on the mathematical
-// identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
-// table of 308 entries, but that would take a lot of space...
-// The exponent should be in the range -308 to 308, these being the limits
-// of double precision IEEE754 standard floating point.
-static FXdouble tenToThe(FXint e){
-  return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];
-  }
-
 
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  register FXint ch,nn,v,neg,pos,width,base,digits,modifier,convert,count,exponent;
+  register FXint ch,nn,v,neg,pos,width,base,digits,signifs,modifier,convert,count,exponent;
   register const FXchar *start=string;
   register FXchar *ptr;
   FXdouble number;
@@ -164,7 +133,7 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
 
       // Default settings
       modifier=ARG_DEFAULT;
-      width=2147483647;
+      width=0;
       convert=1;
       base=0;
       pos=-1;
@@ -198,7 +167,7 @@ flg:  switch(ch){
             for(pos=1; pos<width; ++pos){               // Advance to position prior to arg
               (void)va_arg(ag,void*);
               }
-            width=2147483647;                           // Reset width
+            width=0;                                    // Reset width
             }
           goto flg;
         case 'l':                                       // Long
@@ -246,70 +215,69 @@ decimal:  base+=2;
         case 'b':                                       // Binary
           base+=2;
         case 'i':                                       // Either
-          while(Ascii::isSpace(*string)) string++;              // Skip white space
+          if(width<1) width=2147483647;                                 // Width at least 1
+          while(Ascii::isSpace(*string)) string++;                      // Skip white space
+          value=0;
+          digits=0;
+          if((neg=(*string=='-')) || (*string=='+')){                   // Handle sign
+            string++;
+            width--;
+            }
           if(0<width){
-            value=0;
-            digits=0;
-            if((neg=(*string=='-')) || (*string=='+')){         // Handle sign
+            if(*string=='0'){                                           // Got a '0'
+              digits++;
+              string++;
+              width--;
+              if(0<width && (*string=='x' || *string=='X')){            // Got a '0x'
+                if(base==0) base=16;                                    // If not set yet, '0x' means set base to 16
+                if(base==16){                                           // But don't eat the 'x' if base wasn't 16!
+                  string++;
+                  width--;
+                  }
+                }
+              else if(0<width && (*string=='b' || *string=='B')){       // Got a '0b'
+                if(base==0) base=2;                                     // If not set yet, '0b' means set base to 2
+                if(base==2){                                            // But don't eat the 'b' if base wasn't 2!
+                  string++;
+                  width--;
+                  }
+                }
+              else{
+                if(base==0) base=8;                                     // If not set yet, '0' means set base to 8
+                }
+              }
+            if(base==0) base=10;                                        // Not starting with '0' or '0x', so its decimal
+            while(0<width && 0<=(v=Ascii::digitValue(*string)) && v<base){      // Convert to integer
+              value=value*base+v;
+              digits++;
               string++;
               width--;
               }
-            if(0<width){
-              if(*string=='0'){                                 // Got a '0'
-                digits++;
-                string++;
-                width--;
-                if(0<width && (*string=='x' || *string=='X')){  // Got a '0x'
-		  if(base==0) base=16;                          // If not set yet, '0x' means set base to 16
-		  if(base==16){                                 // But don't eat the 'x' if base wasn't 16!
-                    string++;
-                    width--;
-		    }
-                  }
-                else if(0<width && (*string=='b' || *string=='B')){     // Got a '0b'
-		  if(base==0) base=2;                           // If not set yet, '0b' means set base to 2
-		  if(base==2){                                  // But don't eat the 'b' if base wasn't 2!
-                    string++;
-                    width--;
-		    }
-                  }
-                else{
-                  if(base==0) base=8;                           // If not set yet, '0' means set base to 8
-                  }
-                }
-              if(base==0) base=10;                              // Not starting with '0' or '0x', so its decimal
-              while(0<width && 0<=(v=Ascii::digitValue(*string)) && v<base){   // Convert to integer
-                value=value*base+v;
-                digits++;
-                string++;
-                width--;
-                }
-              if(!digits) goto x;                               // No digits seen!
-              if(neg){                                          // Apply sign
-                value=0-value;
-                }
-assign:       if(convert){
-                if(modifier==ARG_DEFAULT){                      // 32-bit always
-                  *va_arg(ag,FXint*)=(FXint)value;
-                  }
-                else if(modifier==ARG_LONG){                    // Whatever size a long is
-                  *va_arg(ag,long*)=(long)value;
-                  }
-                else if(modifier==ARG_LONGLONG){                // 64-bit always
-                  *va_arg(ag,FXlong*)=value;
-                  }
-                else if(modifier==ARG_HALF){                    // 16-bit always
-                  *va_arg(ag,FXshort*)=(FXshort)value;
-                  }
-                else if(modifier==ARG_HALFHALF){                // 8-bit always
-                  *va_arg(ag,FXchar*)=(FXchar)value;
-                  }
-                else{                                           // Whatever size a pointer is
-                  *va_arg(ag,FXival*)=(FXival)value;
-                  }
-                count++;
-                }
+            }
+          if(!digits) goto x;                                   // No digits seen!
+          if(neg){                                              // Apply sign
+            value=0-value;
+            }
+assign:   if(convert){
+            if(modifier==ARG_DEFAULT){                          // 32-bit always
+              *va_arg(ag,FXint*)=(FXint)value;
               }
+            else if(modifier==ARG_LONG){                        // Whatever size a long is
+              *va_arg(ag,long*)=(long)value;
+              }
+            else if(modifier==ARG_LONGLONG){                    // 64-bit always
+              *va_arg(ag,FXlong*)=value;
+              }
+            else if(modifier==ARG_HALF){                        // 16-bit always
+              *va_arg(ag,FXshort*)=(FXshort)value;
+              }
+            else if(modifier==ARG_HALFHALF){                    // 8-bit always
+              *va_arg(ag,FXchar*)=(FXchar)value;
+              }
+            else{                                               // Whatever size a pointer is
+              *va_arg(ag,FXival*)=(FXival)value;
+              }
+            count++;
             }
           break;
         case 'e':                                       // Floating point
@@ -318,83 +286,95 @@ assign:       if(convert){
         case 'F':
         case 'g':
         case 'G':
+          if(width<1) width=2147483647;                         // Width at least 1
           while(Ascii::isSpace(*string)) string++;              // Skip white space
+          number=0.0;
+          exponent=0;
+          signifs=-1;
+          digits=0;
+          if((neg=(*string=='-')) || (*string=='+')){           // Handle sign
+            string++;
+            width--;
+            }
           if(0<width){
-            number=0.0;
-            exponent=0;
-            digits=0;
-            if((neg=(*string=='-')) || (*string=='+')){         // Handle sign
+            while(0<width && '0'<=*string && *string<='9'){     // Mantissa digits
+              number=number*10.0+(*string-'0');
+              if(number) signifs++;
+              digits++;
               string++;
               width--;
               }
-            if(0<width){
-              while(0<width && Ascii::isDigit(*string)){        // Mantissa digits
+            if(0<width && *string=='.'){                        // Mantissa decimals following '.'
+              string++;
+              width--;
+              while(0<width && '0'<=*string && *string<='9'){
                 number=number*10.0+(*string-'0');
+                if(number) signifs++;
                 digits++;
                 string++;
+                exponent--;
                 width--;
-                }
-              if(0<width && *string=='.'){                      // Mantissa decimals following '.'
-                string++;
-                width--;
-                while(0<width && Ascii::isDigit(*string)){
-                  number=number*10.0+(*string-'0');
-                  digits++;
-                  string++;
-                  exponent--;
-                  width--;
-                  }
-                }
-              if(!digits) goto x;                               // No digits in mantissa at all!
-              if(neg){                                          // Apply sign
-                number=-number;
-                }
-              if(0<width && (*string=='e' || *string=='E')){    // Handle exponent
-                string++;
-                width--;
-                nn=0;
-                digits=0;
-                if(0<width){
-                  if((neg=(*string=='-')) || (*string=='+')){   // Handle exponent sign
-                    string++;
-                    width--;
-                    }
-                  while(0<width && Ascii::isDigit(*string)){
-                    nn=nn*10+(*string-'0');
-                    string++;
-                    digits++;
-                    width--;
-                    }
-                  if(!digits) goto x;                           // No digits in exponent!
-                  if(neg){
-                    exponent-=nn;
-                    }
-                  else{
-                    exponent+=nn;
-                    }
-                  }
-                }
-              if(number!=0.0 && exponent){
-                if(exponent<-308){                              // Tweak for denormalized numbers
-                  number*=1E-16;
-                  exponent+=16;
-                  }
-                number*=tenToThe(FXCLAMP(-308,exponent,308));   // Shift floating point
-                }
-              if(convert){
-                if(modifier==ARG_DEFAULT){
-                  *va_arg(ag,FXfloat*)=(FXfloat)number;         // 32-bit float
-                  }
-                else{
-                  *va_arg(ag,FXdouble*)=number;                 // 64-bit double
-                  }
-                count++;
                 }
               }
             }
+          if(!digits) goto x;                                   // No digits in mantissa at all!
+          if(neg){                                              // Apply sign
+            number=-number;
+            }
+          if(0<width && (*string=='e' || *string=='E')){        // Handle exponent
+            string++;
+            width--;
+            nn=0;
+            digits=0;
+            if(0<width){
+              if((neg=(*string=='-')) || (*string=='+')){       // Handle exponent sign
+                string++;
+                width--;
+                }
+              while(0<width && '0'<=*string && *string<='9'){
+                nn=nn*10+(*string-'0');
+                string++;
+                digits++;
+                width--;
+                }
+              if(!digits) goto x;                               // No digits in exponent!
+              if(neg){
+                exponent-=nn;
+                }
+              else{
+                exponent+=nn;
+                }
+              }
+            }
+          if(number!=0.0){
+            number*=fxtenToThe(-signifs);                       // Mantissa to form X.XXXXXX
+            exponent+=signifs;
+            if((exponent>308) || ((exponent==308) && (value>=1.79769313486231570815))){         // Check overflow
+              number=1.79769313486231570815E+308;
+              }
+            else if((exponent<-324) || ((exponent==-324) && (value<=4.94065645841246544177))){  // Check underflow
+              number=0.0;
+              }
+            else{
+              if(exponent<-308){                                // Tweak for denormals
+                number*=1.0E-16;
+                exponent+=16;
+                }
+              number*=fxtenToThe(exponent);                     // Shift floating point
+              }
+            }
+          if(convert){
+            if(modifier==ARG_DEFAULT){
+              *va_arg(ag,FXfloat*)=(FXfloat)number;             // 32-bit float
+              }
+            else{
+              *va_arg(ag,FXdouble*)=number;                     // 64-bit double
+              }
+            count++;
+            }
           break;
         case 'c':                                       // Character(s)
-          if(width==2147483647) width=1;
+          if(width<1) width=1;                          // Width at least 1
           if(convert){
             ptr=va_arg(ag,FXchar*);
             while(0<width && *string){
@@ -411,7 +391,8 @@ assign:       if(convert){
             }
           break;
         case 's':                                       // String
-          while(Ascii::isSpace(*string)) string++;              // Skip white space
+          if(width<1) width=2147483647;                 // Width at least 1
+          while(Ascii::isSpace(*string)) string++;      // Skip white space
           if(convert){
             ptr=va_arg(ag,FXchar*);
             while(0<width && *string && !Ascii::isSpace(*string)){
@@ -429,6 +410,7 @@ assign:       if(convert){
             }
           break;
         case '[':                                       // Character set
+          if(width<1) width=2147483647;                 // Width at least 1
           ch=(FXuchar)*format++;
           v=1;
           if(ch=='^'){                                  // Negated character set

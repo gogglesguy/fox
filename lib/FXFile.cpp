@@ -3,7 +3,7 @@
 *                             F i l e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -583,7 +583,7 @@ FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
 
         // Open source directory
         if(!dir.open(srcfile)) return false;
-        
+
         // Make destination directory if needed
         if(!dststat.isDirectory()){
           //FXTRACE((100,"FXDir::create(%s)\n",dstfile.text()));

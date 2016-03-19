@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,28 +32,28 @@ namespace FX {
 * The Registry maintains a persistent settings database for an application.
 * The settings database is organized in two groups of three layers each.
 * Configuration data shared by all users on a system is stored in the system-
-* wide settings database. Configuration data for a single user is stored in 
+* wide settings database. Configuration data for a single user is stored in
 * the per-user database (typically somewhere in the user's home directory).
-* Each group is further subdivided into three layers.  
-* The Common layer contains configuration data shared by all FOX programs.  
+* Each group is further subdivided into three layers.
+* The Common layer contains configuration data shared by all FOX programs.
 * The Vendor layer in turn contains configuration data shared by all programs
 * from a particular vendor (like a suite of interoperating applications).
 * The Application layer contains configuration data for a particular application
 * only.
-* When an FXApp object is constructed, the application name and optional vendor 
+* When an FXApp object is constructed, the application name and optional vendor
 * name parameters determine the names of the Application layer and Vendor layer
 * settings files (the name of Common layer settings file is pre-determined).
 * Upon startup, the application's configuration data are assembled by merging
 * layers from the system-wide group first, and then the layers from the per-
-* user group.  
-* During this merge, per-user settings override system-wide settings, and 
+* user group.
+* During this merge, per-user settings override system-wide settings, and
 * application settings take precedence over vendor settings, which in turn
 * override common settings.
 * Only per-user, application-layer settings are ever written:- the other settings
 * are rarely modified.  Typically, system-wide settings are set when an
 * application is installed, while common per-user settings tend to be changed
 * by specialized applications (e.g. ControlPanel) or through installation scripts.
-* The Rregistry is automatically read when FXApp::init() is called, and written 
+* The Rregistry is automatically read when FXApp::init() is called, and written
 * back to the system when FXApp::exit() is called.
 */
 class FXAPI FXRegistry : public FXSettings {
@@ -122,10 +122,10 @@ public:
   virtual FXbool write();
 
   /// File extension for settings files
-  static const FXchar ext[]; 
+  static const FXchar ext[];
 
   /// File name of common settings file
-  static const FXchar foxrc[];          
+  static const FXchar foxrc[];
 
   /// Destructor
   virtual ~FXRegistry();

@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    R a n g e    C l a s s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -222,47 +222,62 @@ FXint FXRangef::intersect(const FXVec4f& plane) const {
 
 
 // Intersect box with ray u-v
-FXbool FXRangef::intersect(const FXVec3f& u,const FXVec3f& v){
-  register FXfloat d,ni,fi,t;
+FXbool FXRangef::intersect(const FXVec3f& u,const FXVec3f& v) const {
   register FXfloat f= FLT_MAX;
   register FXfloat n=-FLT_MAX;
+  register FXfloat d,ni,fi;
   d = v.x-u.x;
-  if(d==0.0f){
+  if(__likely(d!=0.0f)){
+    if(0.0f<d){
+      ni = (lower.x-u.x)/d;
+      fi = (upper.x-u.x)/d;
+      }
+    else{
+      ni = (upper.x-u.x)/d;
+      fi = (lower.x-u.x)/d;
+      }
+    if(ni>n) n=ni;
+    if(fi<f) f=fi;
+    if(n>f) return false;
+    }
+  else{
     if((upper.x<u.x) || (u.x<lower.x)) return false;
     }
-  else{
-    ni = (lower.x-u.x)/d;
-    fi = (upper.x-u.x)/d;
-    if(ni>fi) FXSWAP(ni,fi,t);
+  d = v.y-u.y;
+  if(__likely(d!=0.0f)){
+    if(0.0f<d){
+      ni = (lower.y-u.y)/d;
+      fi = (upper.y-u.y)/d;
+      }
+    else{
+      ni = (upper.y-u.y)/d;
+      fi = (lower.y-u.y)/d;
+      }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
     }
-  d = v.y-u.y;
-  if(d==0.0f){
+  else{
     if((upper.y<u.y) || (u.y<lower.y)) return false;
     }
-  else{
-    ni = (lower.y-u.y)/d;
-    fi = (upper.y-u.y)/d;
-    if(ni>fi) FXSWAP(ni,fi,t);
+  d = v.z-u.z;
+  if(__likely(d!=0.0f)){
+    if(0.0f<d){
+      ni = (lower.z-u.z)/d;
+      fi = (upper.z-u.z)/d;
+      }
+    else{
+      ni = (upper.z-u.z)/d;
+      fi = (lower.z-u.z)/d;
+      }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
     }
-  d = v.z-u.z;
-  if(d==0.0f){
+  else{
     if((upper.z<u.z) || (u.z<lower.z)) return false;
     }
-  else{
-    ni = (lower.z-u.z)/d;
-    fi = (upper.z-u.z)/d;
-    if(ni>fi) FXSWAP(ni,fi,t);
-    if(ni>n) n=ni;
-    if(fi<f) f=fi;
-    if(n>f) return false;
-    }
-  return true;
+  return 0.0f<=f && n<=1.0f;
   }
 
 

@@ -3,7 +3,7 @@
 *                       R o o t   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -40,6 +40,8 @@
 
   - Size of FXRootWindow is now size of the entire virtual display, which
     is a tiled virtual area of primary and secondary display adapters.
+  - Maybe getDefaultWidth() and getDefaultHeight() should return the size
+    of the currently active screen.
 */
 
 
@@ -76,6 +78,36 @@ int FXRootWindow::ReleaseDC(FXID hdc) const {
   return status;
   }
 
+
+/*
+
+// EnumDisplayMonitors callback routine to determine biggest screen size
+static BOOL maxScreenSizeCallback(HMONITOR hmon,HDC hdc,LPRECT rect,LPARAM args){
+  MONITORINFO moninfo; FXint w,h;
+  moninfo.cbSize=sizeof(moninfo);
+  GetMonitorInfo(hmon,&moninfo);
+  w=moninfo.rcWork.right-moninfo.rcWork.left;
+  h=moninfo.rcWork.bottom-moninfo.rcWork.top;
+  if(((FXint*)args)[0]<w) ((FXint*)args)[0]=w;
+  if(((FXint*)args)[1]<h) ((FXint*)args)[1]=h;
+  return true;
+  }
+
+
+// Obtain largest dimensions of all screens (bounding box)
+static FXbool getMaxScreenSize(FXint& width,FXint& height){
+  FXint args[2]={0,0};
+  if(EnumDisplayMonitors(NULL,NULL,(MONITORENUMPROC)maxScreenSizeCallback,(LPARAM)args)){
+    width=args[0];
+    height=args[1];
+    return true;
+    }
+  return false;
+  }
+
+*/
+
+
 #endif
 
 
@@ -93,21 +125,35 @@ void FXRootWindow::create(){
 
 #ifdef WIN32
 
-      // Get HWND of desktop window
+      // Get handle of desktop window
       xid=GetDesktopWindow();
 
-      // Obtain size
+      // Obtain desktop window size
       HDC hdc=::GetDC((HWND)xid);
       width=GetDeviceCaps(hdc,HORZRES);
       height=GetDeviceCaps(hdc,VERTRES);
       ::ReleaseDC((HWND)xid,hdc);
+
+      // Size bigger than all display screens
+      //getMaxScreenSize(width,height);
+
+      // Size bigger than all display screens
+      //width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
+      //height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+      // Size of primary display screen
+      //width=GetSystemMetrics(SM_CXSCREEN);
+      //height=GetSystemMetrics(SM_CYSCREEN);
 
       // Store for xid to C++ object mapping
       getApp()->hash.insert((void*)xid,this);
 
 #else
 
+      // Get handle of desktop window
       xid=RootWindow(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+
+      // Obtain desktop window size
       width=DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
       height=DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
 
@@ -148,53 +194,6 @@ void FXRootWindow::destroy(){
     xid=0;
     }
   }
-
-
-/*
-//
-//      max_monitor_cb
-//
-//  EnumDisplayMonitors callback routine
-//
-static BOOL max_monitor_cb(HMONITOR hmon,HDC hdc,LPRECT rect,LPARAM args){
-  int w,h;
-  MONITORINFO moninfo;
-  moninfo.cbSize=sizeof(moninfo);
-  GetMonitorInfo(hmon,&moninfo);
-  w=moninfo.rcWork.right-moninfo.rcWork.left;
-  h=moninfo.rcWork.bottom-moninfo.rcWork.top;
-  if(((FXint*)args)[0]<w) ((FXint*)args)[0]=w;
-  if(((FXint*)args)[1]<h) ((FXint*)args)[1]=h;
-  return true;
-  }
-
-
-//
-//      GetMaxScreenSize
-//
-//  Returns the biggest width and biggest height of all the
-//  monitors on the system. Does not necessarily have to
-//  refer to the same monitor device.
-//
-FXbool GetMaxScreenSize(FXint &width, FXint &height){
-  FXint args[2]={0,0};
-  if(EnumDisplayMonitors(NULL,NULL,(MONITORENUMPROC)max_monitor_cb,(LPARAM)args)){
-    width=args[0];
-    height=args[1];
-    return true;
-    }
-  return false;
-  }
-
-
-One could also use:
-
-GetSystemMetrics(SM_CXVIRTUALSCREEN)
-GetSystemMetrics(SM_CYVIRTUALSCREEN)
-
-//return GetSystemMetrics(SM_CXSCREEN);
-//return GetSystemMetrics(SM_CYSCREEN);
-*/
 
 
 // Get default width

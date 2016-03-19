@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,19 +21,18 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
-#include "FXThread.h"
 
 /*
   Notes:
 
-  - THIS LIBRARY REQUIRES LOCKING PRIMITIVES NOT PRESENT ON OLDER MACHINES.  In
-    the x86 world, you're good on PentiumPro or newer.
-    Code intended to run on ancient hardware can not use features only present
+  - THIS LIBRARY REQUIRES LOCKING PRIMITIVES NOT PRESENT ON OLDER MACHINES.
+    In the x86 world, you're good on PentiumPro or newer.
+
+  - Code intended to run on ancient hardware CAN NOT use features only present
     on modern processors; you should write your software to use operating-system
     provided locking features such as mutexes and semaphores instead!
 
-  - Workaround: compile this with -DOLDPENTIUM when compiling this library; this
-    causes fallback to general-purpose O.S. supported primitives.
+  - You can test using atomicsAvailable() to see if these primitives are atomic.
 
   - The API's are function calls rather than inlines in the header files because
     naive programmers don't specify "submodel" options and may not get the inten-
@@ -50,9 +49,6 @@
     threads monitoring atomic variables (e.g. spinlocks) will cause bus traffic
     whenever shared cachelines are updated, even if its not the variable itself
     but something close to it in the same cacheline.
-
-  - We fall back on a global mutex if no atomic primitives don't exist.  This is
-    of course orders of magnitude slower than the preferred method.
 */
 
 
@@ -81,12 +77,6 @@
 #define HAVE_INLINE_ASSEMBLY 1
 #endif
 
-// Code for old Pentium, i486, or i386
-#if defined(OLDPENTIUM)
-#undef HAVE_INLINE_ASSEMBLY
-#undef HAVE_BUILTIN_SYNC
-#endif
-
 using namespace FX;
 
 
@@ -95,15 +85,20 @@ namespace FX {
 
 /*******************************************************************************/
 
-// FIXME
-// Either works with real atomic primitives,
-// or doesn't work at all.
-// Have API to find out which.
-
-// If neither windows, nor inline assembly, then fallback to global mutex
-#if !(defined(WIN32) || (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__))))
-static pthread_mutex_t global_mutex=PTHREAD_MUTEX_INITIALIZER;
+// Atomics are available
+FXbool atomicsAvailable(){
+#if defined(WIN32)
+  return true;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  return true;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  return true;
+#elif defined(HAVE_BUILTIN_SYNC)
+  return true;
+#else
+  return false;
 #endif
+  }
 
 
 // Atomically set variable at ptr to v, and return its old contents
@@ -112,16 +107,13 @@ FXint atomicSet(volatile FXint* ptr,FXint v){
   return InterlockedExchange((LONG*)ptr,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret=v;
-  __asm__ __volatile__("xchgl %0,%1\n\t" : "=r"(ret),"=m" (*ptr) : "0" (ret), "m"(*ptr) : "memory", "cc");
+  __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_lock_test_and_set(ptr,v);
 #else
-  register FXint ret;
-  pthread_mutex_lock(&global_mutex);
-  ret=*ptr;
+  FXint ret=*ptr;
   *ptr=v;
-  pthread_mutex_unlock(&global_mutex);
   return ret;
 #endif
   }
@@ -134,16 +126,13 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret=v;
   __asm__ __volatile__ ("lock\n\t"
-                        "xaddl %0,%1\n\t" : "=r"(ret), "=m"(*ptr) : "0" (ret), "m" (*ptr) : "memory", "cc");
+                        "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_fetch_and_add(ptr,v);
 #else
-  register FXint ret;
-  pthread_mutex_lock(&global_mutex);
-  ret=*ptr;
+  FXint ret=*ptr;
   *ptr+=v;
-  pthread_mutex_unlock(&global_mutex);
   return ret;
 #endif
   }
@@ -156,16 +145,15 @@ FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
   __asm__ __volatile__("lock\n\t"
-                       "cmpxchgl %1,%2\n\t" : "=a"(ret), "=r"(v), "=m"(*ptr) : "0"(expect), "1"(v), "m"(*ptr) : "memory", "cc");
+                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #else
-  register FXint ret;
-  pthread_mutex_lock(&global_mutex);
-  ret=*ptr;
-  if(*ptr==expect) *ptr=v;
-  pthread_mutex_unlock(&global_mutex);
+  FXint ret=*ptr;
+  if(*ptr==expect){
+    *ptr=v;
+    }
   return ret;
 #endif
   }
@@ -178,17 +166,18 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
-                        "cmpxchgl %1,%2\n\t"
-                        "setz %0 \n\t" : "=a"(ret), "=r"(v), "=m"(*ptr) : "a"(expect), "r"(v), "m"(*ptr) : "memory", "cc");
+                        "cmpxchgl %2, (%1)\n\t"
+                        "sete   %%al\n\t"
+                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
 #else
-  register FXbool ret=false;
-  pthread_mutex_lock(&global_mutex);
-  if(*ptr==expect){ *ptr=v; ret=true; }
-  pthread_mutex_unlock(&global_mutex);
-  return ret;
+  if(*ptr==expect){
+    *ptr=v;
+    return true;
+    }
+  return false;
 #endif
   }
 
@@ -199,20 +188,17 @@ void* atomicSet(void* volatile* ptr,void* v){
    return InterlockedExchangePointer(ptr,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   void* ret=v;
-  __asm__ __volatile__("xchgl %0,%1\n\t" : "=r"(ret),"=m" (*ptr) : "0" (ret), "m"(*ptr) : "memory", "cc");
+  __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   void* ret=v;
-  __asm__ __volatile__("xchgq %0,%1\n\t" : "=r"(ret),"=m" (*ptr) : "0" (ret), "m"(*ptr) : "memory", "cc");
+  __asm__ __volatile__("xchgq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_lock_test_and_set(ptr,v);
 #else
-  register void* ret;
-  pthread_mutex_lock(&global_mutex);
-  ret=*ptr;
+  void* ret=*ptr;
   *ptr=v;
-  pthread_mutex_unlock(&global_mutex);
   return ret;
 #endif
   }
@@ -227,21 +213,18 @@ void* atomicAdd(void* volatile* ptr,FXival v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register void* ret=(void*)v;
   __asm__ __volatile__ ("lock\n\t"
-                        "xaddl %0,%1\n\t" : "=r"(ret), "=m"(*ptr) : "0" (ret), "m" (*ptr) : "memory", "cc");
+                        "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   register void* ret=(void*)v;
   __asm__ __volatile__ ("lock\n\t"
-                        "xaddq %0,%1\n\t" : "=r"(ret), "=m"(*ptr) : "0" (ret), "m" (*ptr) : "memory", "cc");
+                        "xaddq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0" (ret) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_fetch_and_add(ptr,v);
 #else
-  register void* ret;
-  pthread_mutex_lock(&global_mutex);
-  ret=*ptr;
+  void* ret=*ptr;
   *((unsigned char**)ptr)+=v;
-  pthread_mutex_unlock(&global_mutex);
   return ret;
 #endif
   }
@@ -252,27 +235,25 @@ void* atomicCas(void* volatile* ptr,void* expect,void* v){
 #if defined(WIN32)
   return InterlockedCompareExchangePointer(ptr,v,expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
-  register void* ret;
+  register void* ret=(void*)v;
   __asm__ __volatile__("lock\n\t"
-                       "cmpxchgl %1,%2\n\t" : "=a"(ret), "=r"(v), "=m"(*ptr) : "0"(expect), "1"(v), "m"(*ptr) : "memory", "cc");
+                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   register void* ret;
   __asm__ __volatile__("lock\n\t"
-                       "cmpxchgq %1,%2\n\t" : "=a"(ret), "=r"(v), "=m"(*ptr) : "0"(expect), "1"(v), "m"(*ptr) : "memory", "cc");
+                       "cmpxchgq %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #else
-  register void* ret;
-  pthread_mutex_lock(&global_mutex);
-  ret=*ptr;
-  if(*ptr==expect) *ptr=v;
-  pthread_mutex_unlock(&global_mutex);
+  void* ret=*ptr;
+  if(*ptr==expect){
+    *ptr=v;
+    }
   return ret;
 #endif
   }
-
 
 
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
@@ -282,85 +263,75 @@ FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
-                        "cmpxchgl %1,%2\n\t"
-                        "setz %0\n\t" : "=a"(ret), "=r"(v), "=m"(*ptr) : "a"(expect), "r"(v), "m"(*ptr) : "memory", "cc");
+                        "cmpxchgl %2, (%1)\n\t"
+                        "sete   %%al\n\t"
+                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
-                        "cmpxchgq %1,%2\n\t"
-                        "setz %0 \n\t" : "=a"(ret), "=r"(v), "=m"(*ptr) : "a"(expect), "r"(v), "m"(*ptr) : "memory", "cc");
+                        "cmpxchgq %2, (%1)\n\t"
+                        "sete   %%al\n\t"
+                        "andq   $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
 #else
-  register FXbool ret=false;
-  pthread_mutex_lock(&global_mutex);
-  if(*ptr==expect){ *ptr=v; ret=true; }
-  pthread_mutex_unlock(&global_mutex);
-  return ret;
+  if(*ptr==expect){
+    *ptr=v;
+    return true;
+    }
+  return false;
 #endif
   }
 
-
-// 1. If the class is MEMORY, pass the argument on the stack.
-// 2. If the class is INTEGER, the next available register of the sequence %rdi, %rsi, %rdx, %rcx, %r8 and %r9 is used13 .
-// 3. If the class is SSE, the next available vector register is used, the registers are taken in the order from %xmm0 to %xmm7.
-// 4. If the class is SSEUP, the eightbyte is passed in the next available eightbyte chunk of the last used vector register.
-// 5. If the class is X87, X87UP or COMPLEX_X87, it is passed in memory.
 
 // Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
 FXbool atomicBoolDCas(void* volatile* ptr,void* cmpa,void* cmpb,void* a,void* b){
-#if defined(WIN32)
-  // FIXME //
-  return false;
+#if (defined(WIN32) && (_WIN32_WINNT >= 0x0600) && !defined(_WIN64))
+  LONGLONG ab=(((LONGLONG)(FXuval)a)|((LONGLONG)(FXuval)b)<<32);
+  LONGLONG compab=(((LONGLONG)(FXuval)cmpa)|((LONGLONG)(FXuval)cmpb)<<32);
+  return (InterlockedCompareExchange64((LONGLONG volatile *)ptr,ab,compab)==compab);
+#elif (defined(WIN32) && defined(_MSC_VER) && defined(_WIN64))
+  LONGLONG duet[2]={(LONGLONG)a,(LONGLONG)b};
+  return (_InterlockedCompareExchange128((LONGLONG volatile*)ptr,(LONGLONG)cmpb,(LONGLONG)cmpa,duet));
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register FXbool ret;
   // CMPXCHG8B: if(EDX:EAX == MEM64){ MEM64 = ECX:EBX } else { EDX:EAX = MEM64; }
-  __asm__ __volatile__ ("xchgl %%ebx,%%esi\n\t"                 // Swap EBX to ESI to get a into EBX and save EBX
+  __asm__ __volatile__ ("xchgl   %%esi, %%ebx\n\t"              // Swap EBX to ESI to get a into EBX and save EBX
                         "lock\n\t"
-                        "cmpxchg8b (%%edi)\n\t"                 // The pointer was forced into EDI
-                        "movl %%esi,%%ebx\n\t"                  // Swap ESI back to restore EBX
-                        "setz %0\n\t" : "=a"(ret), "=D"(ptr) : "D"(ptr), "a"(cmpa), "d"(cmpb), "S"(a), "c"(b) : "memory", "cc");
+                        "cmpxchg8b (%1)\n\t"
+                        "setz   %%al\n\t"
+                        "andl   $1, %%eax\n\t"
+                        "xchgl  %%esi, %%ebx\n\t" : "=a"(ret) : "D"(ptr), "a"(cmpa), "d"(cmpb), "S"(a), "c"(b) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
-  register FXbool ret;
   // CMPXCHG16B: if(RDX:RAX == MEM128){ MEM128 = RCX:RBX } else { RDX:RAX = MEM128; }
-  __asm__ __volatile__ ("lock\n\t"
-                        "cmpxchg16b %1\n\t"
-                        "setz %0\n\t" : "=a"(ret), "=m"(*ptr) : "a"(cmpa), "m"(*ptr), "d"(cmpb), "b"(a), "c"(b) : "memory", "cc");
+  register FXbool ret;
+  __asm__ __volatile__ ("xchgq   %%rsi, %%rbx\n\t"              // Swap RSI and RBX to get a into RBX and save RBX
+                        "lock\n\t"
+                        "cmpxchg16b (%1)\n\t"
+                        "setz    %%al\n\t"
+                        "andq    $1, %%rax\n\t"
+                        "xchgq   %%rsi, %%rbx\n\t" : "=a"(ret) : "r"(ptr), "a"(cmpa), "d"(cmpb), "S"(a), "c"(b) : "memory", "cc");
   return ret;
-//#elif (defined(HAVE_BUILTIN_SYNC) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
-//  struct Pair { unsigned long a; unsigned long b; };
-//  union Duet { Pair p; unsigned long long w; };
-//  Duet cmp;
-//  Duet val;
-//  cmp.p.a=(unsigned long)cmpa;
-//  cmp.p.b=(unsigned long)cmpb;
-//  val.p.a=(unsigned long)a;
-//  val.p.b=(unsigned long)b;
-//  return __sync_bool_compare_and_swap((unsigned long long*)ptr,cmp.w,val.w);
-//#elif (defined(HAVE_BUILTIN_SYNC) && defined(__LP64__) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16))
-//  struct Pair { unsigned long a; unsigned long b; };
-//  union Duet { Pair p; __int128_t w; };
-//  Duet cmp;
-//  Duet val;
-//  cmp.p.a=(unsigned long)cmpa;
-//  cmp.p.b=(unsigned long)cmpb;
-//  val.p.a=(unsigned long)a;
-//  val.p.b=(unsigned long)b;
-//  return __sync_bool_compare_and_swap_16((__int128_t*)ptr,cmp.w,val.w);
+#elif (defined(HAVE_BUILTIN_SYNC) && defined(__LP64__) && defined(__GNUC__))
+  __uint128_t expectab=((__uint128_t)(FXuval)cmpa) | (((__uint128_t)(FXuval)cmpb)<<64);
+  __uint128_t ab=((__uint128_t)(FXuval)a) | (((__uint128_t)(FXuval)b)<<64);
+  return __sync_bool_compare_and_swap((__uint128_t*)ptr,expectab,ab);
+#elif (defined(HAVE_BUILTIN_SYNC) && !defined(__LP64__))
+  FXulong expectab=((FXulong)(FXuval)cmpa) | (((FXulong)(FXuval)cmpb)<<32);
+  FXulong ab=((FXulong)(FXuval)a) | (((FXulong)(FXuval)b)<<32);
+  return __sync_bool_compare_and_swap((FXulong*)ptr,expectab,ab);
 #else
-  register FXbool ret=false;
-  pthread_mutex_lock(&global_mutex);
   if(ptr[0]==cmpa && ptr[1]==cmpb){
     ptr[0]=a;
     ptr[1]=b;
-    ret=true;
+    return true;
     }
-  pthread_mutex_unlock(&global_mutex);
-  return ret;
+  return false;
 #endif
   }
+
 
 }

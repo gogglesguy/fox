@@ -3,7 +3,7 @@
 *                    T o o l   B a r   S h e l l   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -264,7 +264,7 @@ long FXToolBarShell::onLayout(FXObject*,FXSelector,void*){
     }
   else{
     hide();
-    }  
+    }
   return 0;
   }
 

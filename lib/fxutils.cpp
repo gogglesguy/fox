@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,9 +51,10 @@ extern "C" FXAPI void fxfindfox(void){ }
 namespace FX {
 
 
-// Furnish our own version
+// Furnish our own versions
 extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
+extern FXAPI FXuint __strtoul(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
 
 
 // Global flag which controls tracing level.
@@ -200,12 +201,12 @@ void fxassert(const FXchar* expression,const FXchar* filename,unsigned int linen
 #ifdef WIN32
   fxmessage("%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
 #else
-//  if(isatty(fileno(stderr))){
-//    fxmessage("\033[1;31m%s:%d:\033[0m FXASSERT(%s) failed.\n",filename,lineno,expression);
-//    }
-//  else{
+  if(isatty(fileno(stderr))){
+    fxmessage("%s:%d: \033[1;33mFXASSERT(%s)\033[0m failed.\n",filename,lineno,expression);
+    }
+  else{
     fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
-//    }
+    }    
 #endif
   }
 
@@ -215,12 +216,12 @@ void fxverify(const FXchar* expression,const FXchar* filename,unsigned int linen
 #ifdef WIN32
   fxmessage("%s(%d): FXVERIFY(%s) failed.\n",filename,lineno,expression);
 #else
-//  if(isatty(fileno(stderr))){
-//    fxmessage("\033[1;31m%s:%d:\033[0m FXVERIFY(%s) failed.\n",filename,lineno,expression);
-//    }
-//  else{
+  if(isatty(fileno(stderr))){
+    fxmessage("%s:%d: \033[1;33mFXVERIFY(%s)\033[0m failed.\n",filename,lineno,expression);
+    }
+  else{
     fxmessage("%s:%d: FXVERIFY(%s) failed.\n",filename,lineno,expression);
-//    }
+    }
 #endif
   }
 
@@ -231,7 +232,7 @@ void fxtrace(FXint level,const FXchar* format,...){
     const FXchar* str;
     fxTraceLevel=0;
     if((str=getenv("FOX_TRACE_LEVEL"))!=NULL){
-      fxTraceLevel=strtoul(str,NULL,10);
+      fxTraceLevel=__strtoul(str);
       }
     }
   if(fxTraceLevel>level){
@@ -605,6 +606,42 @@ FXbool fxIsNan(FXfloat number){
 FXbool fxIsNan(FXdouble number){
   return (((DoubleStruct*)&number)->n.e==2047) && !((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
   }
+
+
+// Table of 1E+0,...1E+31, in steps of 1
+static FXdouble posPowOfTen1[32]={
+  1E+0,1E+1,1E+2,1E+3,1E+4,1E+5,1E+6,1E+7,1E+8,1E+9,1E+10,1E+11,1E+12,1E+13,1E+14,1E+15,1E+16,1E+17,1E+18,1E+19,1E+20,1E+21,1E+22,1E+23,1E+24,1E+25,1E+26,1E+27,1E+28,1E+29,1E+30,1E+31
+  };
+
+
+// Table of 1E+0,...1E+288, in steps of 32
+static FXdouble posPowOfTen32[10]={
+  1E+0,1E+32,1E+64,1E+96,1E+128,1E+160,1E+192,1E+224,1E+256,1E+288
+  };
+
+
+// Table of 1E-0,...1E-31, in steps of 1
+static FXdouble negPowOfTen1[32]={
+  1E-0,1E-1,1E-2,1E-3,1E-4,1E-5,1E-6,1E-7,1E-8,1E-9,1E-10,1E-11,1E-12,1E-13,1E-14,1E-15,1E-16,1E-17,1E-18,1E-19,1E-20,1E-21,1E-22,1E-23,1E-24,1E-25,1E-26,1E-27,1E-28,1E-29,1E-30,1E-31
+  };
+
+
+// Table of 1E-0,...1E-288, in steps of 32
+static FXdouble negPowOfTen32[10]={
+  1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288
+  };
+
+
+// Fast integer power of 10; this is based on the mathematical
+// identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
+// table of 308 entries, but that would take a lot of space...
+// The exponent should be in the range -308 to 308, these being the limits
+// of double precision IEEE754 standard floating point.
+FXdouble fxtenToThe(FXint e){
+  return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];
+  }
+
+/*******************************************************************************/
 
 #if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
 

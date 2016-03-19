@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -23,6 +23,12 @@
 
 
 namespace FX {
+
+/**
+* Atomics are available .
+* Only single-threaded code works properly if this returns false.
+*/
+extern FXAPI FXbool atomicsAvailable();
 
 
 ///// Atomic integers
@@ -70,28 +76,28 @@ inline EType* atomicSet(EType* volatile* ptr,EType* v){
 /// Atomically add v to pointer variable at ptr, and return its old contents
 template <class EType>
 inline EType* atomicAdd(EType* volatile* ptr,FXival v){
-  return (EType*)atomicAdd((void* volatile*)ptr,v*((FXival)sizeof(EType)));
+  return (EType*)atomicAdd((void*volatile*)ptr,v*((FXival)sizeof(EType)));
   }
 
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 template <class EType>
 inline EType* atomicCas(EType* volatile* ptr,EType* expect,EType* v){
-  return (EType*)atomicCas((void* volatile*)ptr,(void*)expect,(void*)v);
+  return (EType*)atomicCas((void*volatile*)ptr,(void*)expect,(void*)v);
   }
 
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 template <class EType>
 inline FXbool atomicBoolCas(EType* volatile* ptr,EType* expect,EType* v){
-  return atomicBoolCas((void* volatile*)ptr,(void*)expect,(void*)v);
+  return atomicBoolCas((void*volatile*)ptr,(void*)expect,(void*)v);
   }
 
 
 /// Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
 template <class EType>
 inline FXbool atomicBoolDCas(EType* volatile* ptr,EType* cmpa,EType* cmpb,EType* a,EType* b){
-  return atomicBoolDCas((void* volatile*)ptr,(void*)cmpa,(void*)cmpb,(void*)a,(void*)b);
+  return atomicBoolDCas((void*volatile*)ptr,(void*)cmpa,(void*)cmpb,(void*)a,(void*)b);
   }
 
 

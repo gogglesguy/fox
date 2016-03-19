@@ -3,7 +3,7 @@
 *                        P o s t S c r i p t   O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -126,9 +126,9 @@ FXbool fxsavePS(FXStream& store,const FXColor* data,FXint width,FXint height,FXi
     p=(FXuchar*)data;
     for(y=0; y<height; y++){
       for(x=0; x<width; x++,p+=4){
-        output(store,"%02x",p[0]);
-        output(store,"%02x",p[1]);
         output(store,"%02x",p[2]);
+        output(store,"%02x",p[1]);
+        output(store,"%02x",p[0]);
         }
       output(store, "\n");
       }
@@ -151,7 +151,7 @@ FXbool fxsavePS(FXStream& store,const FXColor* data,FXint width,FXint height,FXi
     p=(FXuchar*)data;
     for(y=0; y<height; y++){
       for(x=0; x<width; x++,p+=4){
-        output(store,"%02x",(77*(FXuint)p[0]+151*(FXuint)p[1]+28*(FXuint)p[2])/256);
+        output(store,"%02x",(77*(FXuint)p[2]+151*(FXuint)p[1]+28*(FXuint)p[0])/256);
         }
       output(store,"\n");
       }

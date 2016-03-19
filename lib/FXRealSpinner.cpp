@@ -3,7 +3,7 @@
 *             R e a l - V a l u e d   S p i n n e r  W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2010 by Bill Baxter.   All Rights Reserved.                *
+* Copyright (C) 2003,2011 by Bill Baxter.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -91,7 +91,7 @@ FXDEFMAP(FXRealSpinner) FXRealSpinnerMap[]={
 FXIMPLEMENT(FXRealSpinner,FXPacker,FXRealSpinnerMap,ARRAYNUMBER(FXRealSpinnerMap))
 
 
-#if defined(WIN32) || defined(__sgi) || defined(__sun) || defined(__alpha)
+#if defined(WIN32) || defined(__sgi) || defined(__sun) || defined(__alpha) || defined(__minix)
 static double round(double x){ return (x >= 0) ? floor(x+0.5) : ceil(x-0.5); }
 #endif
 

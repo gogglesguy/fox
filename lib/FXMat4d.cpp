@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,6 +36,7 @@
   Notes:
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
+  - Some operations assume last column is (0,0,0,1).
 */
 
 
@@ -158,6 +159,12 @@ FXMat4d::FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4
   }
 
 
+// Initialize matrix from quaternion
+FXMat4d::FXMat4d(const FXQuatd& quat){
+  set(FXMat3d(quat));
+  }
+
+
 // Assign from scalar
 FXMat4d& FXMat4d::operator=(FXdouble s){
 #if defined(FOX_HAS_SSE2)
@@ -208,6 +215,12 @@ FXMat4d& FXMat4d::operator=(const FXMat4d& s){
   return *this;
   }
 
+
+// Assignment from quaternion
+FXMat4d& FXMat4d::operator=(const FXQuatd& quat){
+  return set(FXMat3d(quat));
+  }
+  
 
 // Assignment from array
 FXMat4d& FXMat4d::operator=(const FXdouble s[]){
@@ -344,6 +357,12 @@ FXMat4d& FXMat4d::set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const F
   return *this;
   }
 
+
+// Assignment from quaternion
+FXMat4d& FXMat4d::set(const FXQuatd& quat){
+  return set(FXMat3d(quat));
+  }
+  
 
 // Add matrices
 FXMat4d& FXMat4d::operator+=(const FXMat4d& s){
@@ -621,62 +640,23 @@ FXMat4d& FXMat4d::rot(const FXQuatd& q){
   }
 
 
-// Rotate by angle (cos,sin) about arbitrary vector
+// Multiply by rotation c,s about unit axis
 FXMat4d& FXMat4d::rot(const FXVec3d& v,FXdouble c,FXdouble s){
-  register FXdouble xx,yy,zz,xy,yz,zx,xs,ys,zs,t;
-  register FXdouble r00,r01,r02,r10,r11,r12,r20,r21,r22;
-  register FXdouble x=v.x;
-  register FXdouble y=v.y;
-  register FXdouble z=v.z;
-  register FXdouble mag=x*x+y*y+z*z;
-  FXASSERT(-1.00001<c && c<1.00001 && -1.00001<s && s<1.00001);
-  if(mag<=1.0E-30) return *this;         // Rotation about 0-length axis
-  mag=sqrt(mag);
-  x/=mag;
-  y/=mag;
-  z/=mag;
-  xx=x*x;
-  yy=y*y;
-  zz=z*z;
-  xy=x*y;
-  yz=y*z;
-  zx=z*x;
-  xs=x*s;
-  ys=y*s;
-  zs=z*s;
-  t=1.0-c;
-  r00=t*xx+c;  r10=t*xy-zs; r20=t*zx+ys;
-  r01=t*xy+zs; r11=t*yy+c;  r21=t*yz-xs;
-  r02=t*zx-ys; r12=t*yz+xs; r22=t*zz+c;
-  x=m[0][0];
-  y=m[1][0];
-  z=m[2][0];
-  m[0][0]=x*r00+y*r01+z*r02;
-  m[1][0]=x*r10+y*r11+z*r12;
-  m[2][0]=x*r20+y*r21+z*r22;
-  x=m[0][1];
-  y=m[1][1];
-  z=m[2][1];
-  m[0][1]=x*r00+y*r01+z*r02;
-  m[1][1]=x*r10+y*r11+z*r12;
-  m[2][1]=x*r20+y*r21+z*r22;
-  x=m[0][2];
-  y=m[1][2];
-  z=m[2][2];
-  m[0][2]=x*r00+y*r01+z*r02;
-  m[1][2]=x*r10+y*r11+z*r12;
-  m[2][2]=x*r20+y*r21+z*r22;
-  x=m[0][3];
-  y=m[1][3];
-  z=m[2][3];
-  m[0][3]=x*r00+y*r01+z*r02;
-  m[1][3]=x*r10+y*r11+z*r12;
-  m[2][3]=x*r20+y*r21+z*r22;
-  return *this;
+  register FXdouble xx=v.x*v.x;
+  register FXdouble yy=v.y*v.y;
+  register FXdouble zz=v.z*v.z;
+  register FXdouble xy=v.x*v.y;
+  register FXdouble yz=v.y*v.z;
+  register FXdouble zx=v.z*v.x;
+  register FXdouble xs=v.x*s;
+  register FXdouble ys=v.y*s;
+  register FXdouble zs=v.z*s;
+  register FXdouble t=1.0-c;
+  return rot(FXMat3d(t*xx+c,t*xy+zs,t*zx-ys,t*xy-zs,t*yy+c,t*yz+xs,t*zx+ys,t*yz-xs,t*zz+c));
   }
 
 
-// Rotate by angle (in radians) about arbitrary vector
+// Multiply by rotation of phi about unit axis
 FXMat4d& FXMat4d::rot(const FXVec3d& v,FXdouble phi){
   return rot(v,cos(phi),sin(phi));
   }
@@ -855,15 +835,15 @@ FXMat4d& FXMat4d::scale(FXdouble sx,FXdouble sy,FXdouble sz){
   }
 
 
-// Scale uniform
-FXMat4d& FXMat4d::scale(FXdouble s){
-  return scale(s,s,s);
+// Scale unqual
+FXMat4d& FXMat4d::scale(const FXVec3d& v){
+  return scale(v[0],v[1],v[2]);
   }
 
 
-// Scale matrix
-FXMat4d& FXMat4d::scale(const FXVec3d& v){
-  return scale(v[0],v[1],v[2]);
+// Scale uniform
+FXMat4d& FXMat4d::scale(FXdouble s){
+  return scale(s,s,s);
   }
 
 

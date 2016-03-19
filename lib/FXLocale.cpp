@@ -3,7 +3,7 @@
 *                           L o c a l e   C l a s s                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,6 +42,13 @@
       2 normalized codeset
       3 territory
       4 modifier
+      
+  - Info from "Unicode Common Locale Data Repository," http://cldr.unicode.org,
+    and http://www.unicode.org/reports/tr35/.
+  - Formatting of dates, times, and time zones.
+  - Formatting numbers and currency values.
+  - Sorting text
+  - Choosing languages or countries by name.
 */
 
 

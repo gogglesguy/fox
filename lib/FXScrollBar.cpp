@@ -3,7 +3,7 @@
 *                         S c r o l l b a r   O b j e c t s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,6 +26,7 @@
 #include "FXThread.h"
 #include "FXStream.h"
 #include "FXString.h"
+#include "FXColors.h"
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
@@ -678,23 +679,7 @@ long FXScrollBar::onAutoScroll(FXObject*,FXSelector,void* ptr){
 
 // Draw button in scrollbar; this is slightly different from a raised rectangle
 void FXScrollBar::drawButton(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down){
-  dc.setForeground(backColor);
-  dc.fillRectangle(x+2,y+2,w-4,h-4);
-  if(!down){
-    dc.setForeground(backColor);
-    dc.fillRectangle(x,y,w-1,1);
-    dc.fillRectangle(x,y,1,h-1);
-    dc.setForeground(hiliteColor);
-    dc.fillRectangle(x+1,y+1,w-2,1);
-    dc.fillRectangle(x+1,y+1,1,h-2);
-    dc.setForeground(shadowColor);
-    dc.fillRectangle(x+1,y+h-2,w-2,1);
-    dc.fillRectangle(x+w-2,y+1,1,h-2);
-    dc.setForeground(borderColor);
-    dc.fillRectangle(x,y+h-1,w,1);
-    dc.fillRectangle(x+w-1,y,1,h);
-    }
-  else{
+  if(down){
     dc.setForeground(borderColor);
     dc.fillRectangle(x,y,w-2,1);
     dc.fillRectangle(x,y,1,h-2);
@@ -708,6 +693,41 @@ void FXScrollBar::drawButton(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbo
     dc.fillRectangle(x+1,y+h-2,w-1,1);
     dc.fillRectangle(x+w-2,y+2,1,h-2);
     }
+  else{
+    dc.setForeground(backColor);
+    dc.fillRectangle(x,y,w-1,1);
+    dc.fillRectangle(x,y,1,h-1);
+    dc.setForeground(hiliteColor);
+    dc.fillRectangle(x+1,y+1,w-2,1);
+    dc.fillRectangle(x+1,y+1,1,h-2);
+    dc.setForeground(shadowColor);
+    dc.fillRectangle(x+1,y+h-2,w-2,1);
+    dc.fillRectangle(x+w-2,y+1,1,h-2);
+    dc.setForeground(borderColor);
+    dc.fillRectangle(x,y+h-1,w,1);
+    dc.fillRectangle(x+w-1,y,1,h);
+    }
+  dc.setForeground(backColor);
+  dc.fillRectangle(x+2,y+2,w-4,h-4);
+  }
+
+
+// Draw thumb in the scrollbar
+void FXScrollBar::drawThumb(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h){
+  dc.setForeground(backColor);
+  dc.fillRectangle(x,y,w-1,1);
+  dc.fillRectangle(x,y,1,h-1);
+  dc.setForeground(hiliteColor);
+  dc.fillRectangle(x+1,y+1,w-2,1);
+  dc.fillRectangle(x+1,y+1,1,h-2);
+  dc.setForeground(shadowColor);
+  dc.fillRectangle(x+1,y+h-2,w-2,1);
+  dc.fillRectangle(x+w-2,y+1,1,h-2);
+  dc.setForeground(borderColor);
+  dc.fillRectangle(x,y+h-1,w,1);
+  dc.fillRectangle(x+w-1,y,1,h);
+  dc.setForeground(backColor);
+  dc.fillRectangle(x+2,y+2,w-4,h-4);
   }
 
 
@@ -799,7 +819,6 @@ long FXScrollBar::onPaint(FXObject*,FXSelector,void* ptr){
   if(options&SCROLLBAR_HORIZONTAL){
     total=width-height-height;
     if(thumbsize<total){                                    // Scrollable
-      drawButton(dc,thumbpos,0,thumbsize,height,0);
       dc.setStipple(STIPPLE_GRAY);
       dc.setFillStyle(FILL_OPAQUESTIPPLED);
       if(mode==MODE_PAGE_DEC){
@@ -822,13 +841,12 @@ long FXScrollBar::onPaint(FXObject*,FXSelector,void* ptr){
       dc.fillRectangle(thumbpos+thumbsize,0,width-height-thumbpos-thumbsize,height);
       }
     else{                                                   // Non-scrollable
-      dc.setStipple(STIPPLE_GRAY);
-      dc.setFillStyle(FILL_OPAQUESTIPPLED);
       dc.setForeground(hiliteColor);
       dc.setBackground(backColor);
       dc.fillRectangle(height,0,total,height);
       }
     dc.setFillStyle(FILL_SOLID);
+    drawThumb(dc,thumbpos,0,thumbsize,height);
     drawButton(dc,width-height,0,height,height,(mode==MODE_INC));
     drawRightArrow(dc,width-height,0,height,height,(mode==MODE_INC));
     drawButton(dc,0,0,height,height,(mode==MODE_DEC));
@@ -837,7 +855,6 @@ long FXScrollBar::onPaint(FXObject*,FXSelector,void* ptr){
   else{
     total=height-width-width;
     if(thumbsize<total){                                    // Scrollable
-      drawButton(dc,0,thumbpos,width,thumbsize,0);
       dc.setStipple(STIPPLE_GRAY);
       dc.setFillStyle(FILL_OPAQUESTIPPLED);
       if(mode==MODE_PAGE_DEC){
@@ -860,13 +877,12 @@ long FXScrollBar::onPaint(FXObject*,FXSelector,void* ptr){
       dc.fillRectangle(0,thumbpos+thumbsize,width,height-width-thumbpos-thumbsize);
       }
     else{                                                   // Non-scrollable
-      dc.setStipple(STIPPLE_GRAY);
-      dc.setFillStyle(FILL_OPAQUESTIPPLED);
       dc.setForeground(hiliteColor);
       dc.setBackground(backColor);
       dc.fillRectangle(0,width,width,total);
       }
     dc.setFillStyle(FILL_SOLID);
+    drawThumb(dc,0,thumbpos,width,thumbsize);
     drawButton(dc,0,height-width,width,width,(mode==MODE_INC));
     drawDownArrow(dc,0,height-width,width,width,(mode==MODE_INC));
     drawButton(dc,0,0,width,width,(mode==MODE_DEC));
@@ -1077,9 +1093,13 @@ long FXScrollCorner::onPaint(FXObject*,FXSelector,void* ptr){
   }
 
 
-void FXScrollCorner::enable(){ }
+// Enable the window
+void FXScrollCorner::enable(){
+  }
 
 
-void FXScrollCorner::disable(){ }
+// Disable the window
+void FXScrollCorner::disable(){
+  }
 
 }

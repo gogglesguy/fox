@@ -22,8 +22,6 @@ clview_icon.gif \
 colordialog.png \
 cometassay.jpg \
 contact.gif \
-dlgedit1.png \
-dlgedit2.png \
 dirdialog.png \
 emso_screen.png \
 emso_screen_small.jpg \

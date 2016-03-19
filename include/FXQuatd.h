@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -23,9 +23,6 @@
 
 
 namespace FX {
-
-
-class FXMat3d;
 
 
 /// Double-precision quaternion
@@ -48,9 +45,6 @@ public:
 
   /// Construct from components
   FXQuatd(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww):x(xx),y(yy),z(zz),w(ww){}
-
-  /// Construct quaternion from 3x3 matrix
-  FXQuatd(const FXMat3d& mat);
 
   /// Construct quaternion from two unit vectors
   FXQuatd(const FXVec3d& fr,const FXVec3d& to);
@@ -162,6 +156,9 @@ public:
   /// Take logarithm of quaternion
   FXQuatd log() const;
 
+  /// Power of quaternion
+  FXQuatd pow(FXdouble t) const;
+
   /// Invert quaternion
   FXQuatd invert() const;
 
@@ -170,12 +167,6 @@ public:
 
   /// Conjugate quaternion
   FXQuatd conj() const;
-
-  /// Construct quaternion from arc a->b on unit sphere
-  FXQuatd& arc(const FXVec3d& a,const FXVec3d& b);
-
-  /// Spherical lerp
-  FXQuatd& lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f);
 
   /// Rotation of a vector by a quaternion
   FXVec3d operator*(const FXVec3d& v) const;
@@ -204,6 +195,16 @@ inline FXbool operator!=(FXdouble n,const FXQuatd& a){return n!=a.x || n!=a.y ||
 /// Equality tests
 inline FXbool operator==(const FXQuatd& a,const FXQuatd& b){ return a.x==b.x && a.y==b.y && a.z==b.z && a.w==b.w; }
 inline FXbool operator!=(const FXQuatd& a,const FXQuatd& b){ return a.x!=b.x || a.y!=b.y || a.z!=b.z || a.w!=b.w; }
+
+
+/// Construct quaternion from arc a->b on unit sphere
+extern FXAPI FXQuatd arc(const FXVec3d& a,const FXVec3d& b);
+
+/// Spherical lerp of unit quaternions u,v
+extern FXAPI FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f);
+
+/// Derivative of spherical lerp of unit quaternions u,v 
+extern FXAPI FXQuatd lerpdot(const FXQuatd& u,const FXQuatd& v,FXdouble f);
 
 /// Save quaternion to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXQuatd& v);

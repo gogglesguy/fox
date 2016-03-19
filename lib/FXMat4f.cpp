@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,11 +36,11 @@
   Notes:
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
+  - Some operations assume last column is (0,0,0,1).
 */
 
 
 using namespace FX;
-
 
 /*******************************************************************************/
 
@@ -158,6 +158,12 @@ FXMat4f::FXMat4f(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4
   }
 
 
+// Initialize matrix from quaternion
+FXMat4f::FXMat4f(const FXQuatf& quat){
+  set(FXMat3f(quat));
+  }
+
+
 // Assign from scalar
 FXMat4f& FXMat4f::operator=(FXfloat s){
 #if defined(FOX_HAS_SSE)
@@ -208,6 +214,12 @@ FXMat4f& FXMat4f::operator=(const FXMat4f& s){
   return *this;
   }
 
+
+// Assignment from quaternion
+FXMat4f& FXMat4f::operator=(const FXQuatf& quat){
+  return set(FXMat3f(quat));
+  }
+  
 
 // Assignment from array
 FXMat4f& FXMat4f::operator=(const FXfloat s[]){
@@ -344,6 +356,12 @@ FXMat4f& FXMat4f::set(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const F
   return *this;
   }
 
+
+// Set value from quaternion
+FXMat4f& FXMat4f::set(const FXQuatf& quat){
+  return set(FXMat3f(quat));
+  }
+  
 
 // Add matrices
 FXMat4f& FXMat4f::operator+=(const FXMat4f& s){
@@ -609,62 +627,23 @@ FXMat4f& FXMat4f::rot(const FXQuatf& q){
   }
 
 
-// Rotate by angle (cos,sin) about arbitrary vector
+// Multiply by rotation c,s about unit axis
 FXMat4f& FXMat4f::rot(const FXVec3f& v,FXfloat c,FXfloat s){
-  register FXfloat xx,yy,zz,xy,yz,zx,xs,ys,zs,t;
-  register FXfloat r00,r01,r02,r10,r11,r12,r20,r21,r22;
-  register FXfloat x=v.x;
-  register FXfloat y=v.y;
-  register FXfloat z=v.z;
-  register FXfloat mag=x*x+y*y+z*z;
-  FXASSERT(-1.00001f<c && c<1.00001f && -1.00001f<s && s<1.00001f);
-  if(mag<=1.0E-30f) return *this;         // Rotation about 0-length axis
-  mag=sqrtf(mag);
-  x/=mag;
-  y/=mag;
-  z/=mag;
-  xx=x*x;
-  yy=y*y;
-  zz=z*z;
-  xy=x*y;
-  yz=y*z;
-  zx=z*x;
-  xs=x*s;
-  ys=y*s;
-  zs=z*s;
-  t=1.0f-c;
-  r00=t*xx+c;  r10=t*xy-zs; r20=t*zx+ys;
-  r01=t*xy+zs; r11=t*yy+c;  r21=t*yz-xs;
-  r02=t*zx-ys; r12=t*yz+xs; r22=t*zz+c;
-  x=m[0][0];
-  y=m[1][0];
-  z=m[2][0];
-  m[0][0]=x*r00+y*r01+z*r02;
-  m[1][0]=x*r10+y*r11+z*r12;
-  m[2][0]=x*r20+y*r21+z*r22;
-  x=m[0][1];
-  y=m[1][1];
-  z=m[2][1];
-  m[0][1]=x*r00+y*r01+z*r02;
-  m[1][1]=x*r10+y*r11+z*r12;
-  m[2][1]=x*r20+y*r21+z*r22;
-  x=m[0][2];
-  y=m[1][2];
-  z=m[2][2];
-  m[0][2]=x*r00+y*r01+z*r02;
-  m[1][2]=x*r10+y*r11+z*r12;
-  m[2][2]=x*r20+y*r21+z*r22;
-  x=m[0][3];
-  y=m[1][3];
-  z=m[2][3];
-  m[0][3]=x*r00+y*r01+z*r02;
-  m[1][3]=x*r10+y*r11+z*r12;
-  m[2][3]=x*r20+y*r21+z*r22;
-  return *this;
+  register FXfloat xx=v.x*v.x;
+  register FXfloat yy=v.y*v.y;
+  register FXfloat zz=v.z*v.z;
+  register FXfloat xy=v.x*v.y;
+  register FXfloat yz=v.y*v.z;
+  register FXfloat zx=v.z*v.x;
+  register FXfloat xs=v.x*s;
+  register FXfloat ys=v.y*s;
+  register FXfloat zs=v.z*s;
+  register FXfloat t=1.0f-c;
+  return rot(FXMat3f(t*xx+c,t*xy+zs,t*zx-ys,t*xy-zs,t*yy+c,t*yz+xs,t*zx+ys,t*yz-xs,t*zz+c));
   }
 
 
-// Rotate by angle (in radians) about arbitrary vector
+// Multiply by rotation of phi about unit axis
 FXMat4f& FXMat4f::rot(const FXVec3f& v,FXfloat phi){
   return rot(v,cosf(phi),sinf(phi));
   }
@@ -823,15 +802,15 @@ FXMat4f& FXMat4f::scale(FXfloat sx,FXfloat sy,FXfloat sz){
   }
 
 
-// Scale uniform
-FXMat4f& FXMat4f::scale(FXfloat s){
-  return scale(s,s,s);
+// Scale unqual
+FXMat4f& FXMat4f::scale(const FXVec3f& v){
+  return scale(v[0],v[1],v[2]);
   }
 
 
-// Scale matrix
-FXMat4f& FXMat4f::scale(const FXVec3f& v){
-  return scale(v[0],v[1],v[2]);
+// Scale uniform
+FXMat4f& FXMat4f::scale(FXfloat s){
+  return scale(s,s,s);
   }
 
 

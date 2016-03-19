@@ -3,7 +3,7 @@
 *                     F S   C o l o r   Q u a n t i z a t i o n                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -60,9 +60,9 @@ FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
   for(r1=i=0; r1<8; r1++){
     for(g1=0; g1<8; g1++){
       for(b1=0; b1<4; b1++){
-        ((FXuchar*)(colormap+i))[0]=(r1*255+3)/7;
+        ((FXuchar*)(colormap+i))[0]=(b1*255+1)/3;
         ((FXuchar*)(colormap+i))[1]=(g1*255+3)/7;
-        ((FXuchar*)(colormap+i))[2]=(b1*255+1)/3;
+        ((FXuchar*)(colormap+i))[2]=(r1*255+3)/7;
         ((FXuchar*)(colormap+i))[3]=255;
         i++;
         }
@@ -82,9 +82,9 @@ FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
 
   // Get first line of picture
   for(j=0; j<w; j++){
-    nr[j]=((const FXuchar*)(src+j))[0];
+    nr[j]=((const FXuchar*)(src+j))[2];
     ng[j]=((const FXuchar*)(src+j))[1];
-    nb[j]=((const FXuchar*)(src+j))[2];
+    nb[j]=((const FXuchar*)(src+j))[0];
     }
   src+=w;
 
@@ -99,9 +99,9 @@ FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
     // Get next line
     if(i!=h-1){
       for(j=0; j<w; j++){
-        nr[j]=((const FXuchar*)(src+j))[0];
+        nr[j]=((const FXuchar*)(src+j))[2];
         ng[j]=((const FXuchar*)(src+j))[1];
-        nb[j]=((const FXuchar*)(src+j))[2];
+        nb[j]=((const FXuchar*)(src+j))[0];
         }
       src+=w;
       }
@@ -117,9 +117,9 @@ FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
       *dst++=val;
 
       // compute color errors
-      r1-=((FXuchar*)(colormap+val))[0];
+      r1-=((FXuchar*)(colormap+val))[2];
       g1-=((FXuchar*)(colormap+val))[1];
-      b1-=((FXuchar*)(colormap+val))[2];
+      b1-=((FXuchar*)(colormap+val))[0];
 
       // Add fractions of errors to adjacent pixels
       if(j!=w-1){                       // Adjust RIGHT pixel

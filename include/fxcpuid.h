@@ -3,7 +3,7 @@
 *                              C P U I D   S u p p o r t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -39,12 +39,12 @@ enum {
   CPU_HAS_SSE42     = 0x00200,
   CPU_HAS_POPCNT    = 0x00400,
   CPU_HAS_MOVBE     = 0x00800,
-  CPU_HAS_CMPXCGH8  = 0x01000,
-  CPU_HAS_CMPXCGH16 = 0x02000,
+  CPU_HAS_CMPXCHG8  = 0x01000,
+  CPU_HAS_CMPXCHG16 = 0x02000,
   CPU_HAS_3DNOWEXT  = 0x04000,
   CPU_HAS_3DNOW     = 0x08000
   };
- 
+
 
 /**
 * Check if cpuid is available.
@@ -91,8 +91,6 @@ extern FXAPI FXuint fxCPUFeatures();
 * Return CPU Identification.  For example, on AMD processors this returns
 * "AuthenticAMD".
 * Name should be at least 16 bytes, plus 1 for end-of-string.
-* This function will also try to return a sensible value on non-
-* x86 or x86-64 processors.
 */
 extern FXAPI FXbool fxCPUName(FXchar name[]);
 

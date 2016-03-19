@@ -3,7 +3,7 @@
 *                     W U   C o l o r   Q u a n t i z a t i o n                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -95,9 +95,9 @@ static void histogram(WU& wu,const FXColor *data,FXint size){
 
   // Build histogram
   for(i=0; i<size; ++i){
-    r=((const FXuchar*)(data+i))[0];
+    r=((const FXuchar*)(data+i))[2];
     g=((const FXuchar*)(data+i))[1];
-    b=((const FXuchar*)(data+i))[2];
+    b=((const FXuchar*)(data+i))[0];
     inr=(r>>3)+1;
     ing=(g>>3)+1;
     inb=(b>>3)+1;
@@ -414,10 +414,10 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
     mark(cube[k],k,map);
     weight=volume(cube[k],wu.wt);
     if(weight){
-      ((FXuchar*)(colormap+k))[0]=volume(cube[k],wu.mr)/weight;
-      ((FXuchar*)(colormap+k))[1]=volume(cube[k],wu.mg)/weight;
-      ((FXuchar*)(colormap+k))[2]=volume(cube[k],wu.mb)/weight;
       ((FXuchar*)(colormap+k))[3]=255;
+      ((FXuchar*)(colormap+k))[2]=volume(cube[k],wu.mr)/weight;
+      ((FXuchar*)(colormap+k))[1]=volume(cube[k],wu.mg)/weight;
+      ((FXuchar*)(colormap+k))[0]=volume(cube[k],wu.mb)/weight;
       }
     else{
       ((FXuchar*)(colormap+k))[0]=0;
@@ -429,9 +429,9 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
 
   // Build histogram
   for(i=0; i<size; ++i){
-    r=((const FXuchar*)(src+i))[0];
+    r=((const FXuchar*)(src+i))[2];
     g=((const FXuchar*)(src+i))[1];
-    b=((const FXuchar*)(src+i))[2];
+    b=((const FXuchar*)(src+i))[0];
     dst[i]=map[(r>>3)+1][(g>>3)+1][(b>>3)+1];
     }
 

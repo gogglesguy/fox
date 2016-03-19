@@ -3,7 +3,7 @@
 *                         P N G    I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -74,7 +74,11 @@ static void user_flush_fn(png_structp ){ }
 static void user_error_fn(png_structp png_ptr,png_const_charp){
   FXStream* store=(FXStream*)png_get_error_ptr(png_ptr);
   store->setError(FXStreamFormat);                      // Flag this as a format error in FXStream
+#if (PNG_LIBPNG_VER < 10500)
   longjmp(png_ptr->jmpbuf,1);                           // Bail out
+#else
+  png_longjmp(png_ptr,1);                               // Bail out
+#endif
   }
 
 
@@ -117,7 +121,7 @@ FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     }
 
   // Set error handling
-  if(setjmp(png_ptr->jmpbuf)){
+  if(setjmp(png_jmpbuf(png_ptr))){
 
     // Free all of the memory associated with the png_ptr and info_ptr
     png_destroy_read_struct(&png_ptr,&info_ptr,(png_infopp)NULL);
@@ -140,6 +144,9 @@ FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
   // tell libpng to strip 16 bit/color files down to 8 bits/color
   png_set_strip_16(png_ptr);
+
+  // rgb(a)->bgr(a)
+  png_set_bgr(png_ptr);
 
   // Expand paletted colors into true RGB triplets
   if(color_type==PNG_COLOR_TYPE_PALETTE) png_set_expand(png_ptr);
@@ -228,7 +235,7 @@ FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
     }
 
   // Set error handling.
-  if(setjmp(png_ptr->jmpbuf)){
+  if(setjmp(png_jmpbuf(png_ptr))){
     png_destroy_write_struct(&png_ptr,&info_ptr);
     return false;
     }
@@ -238,6 +245,10 @@ FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
 
   // Set the header
   png_set_IHDR(png_ptr,info_ptr,width,height,8,PNG_COLOR_TYPE_RGB_ALPHA,PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_BASE,PNG_FILTER_TYPE_BASE);
+
+  // Use bgr instead of rgb
+  png_set_bgr(png_ptr);
+
   png_write_info(png_ptr,info_ptr);
 
   // Row pointers

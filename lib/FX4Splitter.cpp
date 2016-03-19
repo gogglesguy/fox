@@ -3,7 +3,7 @@
 *                       F o u r - W a y   S p l i t t e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -167,7 +167,7 @@ FXint FX4Splitter::getDefaultWidth(){
   if(pbl && pbl->shown()){ blw=pbl->getDefaultWidth(); set|=ExpandBottomLeft; }
   if(pbr && pbr->shown()){ brw=pbr->getDefaultWidth(); set|=ExpandBottomRight; }
   switch(set){
-  
+
     // None expanded
     case ExpandNone: return 0;
 
@@ -193,7 +193,7 @@ FXint FX4Splitter::getDefaultWidth(){
     case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlw,blw)+brw+barsize:FXMAX(tlw,blw+brw+barsize);
     case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?blw+FXMAX(trw,brw)+barsize:FXMAX(trw,blw+brw+barsize);
     }
-    
+
   // Default is all expanded
   return FXMAX(tlw,blw)+FXMAX(trw,brw)+barsize;
   }
@@ -211,7 +211,7 @@ FXint FX4Splitter::getDefaultHeight(){
   if(pbl && pbl->shown()){ blh=pbl->getDefaultHeight(); set|=ExpandBottomLeft; }
   if(pbr && pbr->shown()){ brh=pbr->getDefaultHeight(); set|=ExpandBottomRight; }
   switch(set){
-  
+
     // None expanded
     case ExpandNone: return 0;
 
@@ -264,7 +264,7 @@ void FX4Splitter::layout(){
   lsy=rsy=splity;
 
   switch(set){
-  
+
     // None expanded
     case ExpandNone: tsx=bsx=width; lsy=rsy=height; break;
 

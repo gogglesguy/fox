@@ -3,7 +3,7 @@
 *                         T o p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -40,6 +40,7 @@
 #include "FXMainWindow.h"
 #include "FXToolBar.h"
 #include "FXToolBarGrip.h"
+#include "FXSystem.h"
 #include "FX88591Codec.h"
 #include "fxpriv.h"
 
@@ -223,11 +224,29 @@ void FXTopWindow::create(){
       AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);        // Calculate based on *client* rectangle
       SetWindowPos((HWND)xid,NULL,rect.left,rect.top,FXMAX(rect.right-rect.left,1),FXMAX(rect.bottom-rect.top,1),SWP_NOZORDER|SWP_NOOWNERZORDER);
 #else
-      Atom protocols[3];
+
+      // Set WM protocols
+      Atom protocols[4];
       protocols[0]=getApp()->wmDeleteWindow;
       protocols[1]=getApp()->wmTakeFocus;
       protocols[2]=getApp()->wmNetPing;
-      XSetWMProtocols(DISPLAY(getApp()),xid,protocols,3);       // Catch delete window
+      protocols[3]=getApp()->wmSaveYourself;
+      XSetWMProtocols(DISPLAY(getApp()),xid,protocols,4);       // Catch delete window
+
+      // Set resource and class name for toplevel windows.
+      // In a perfect world this would be set in FXTopWindow, but for some strange reasons
+      // some window-managers (e.g. fvwm) this will be too late and they will not recognize them.
+      XClassHint hint;
+      hint.res_name=(char*)getApp()->getAppName().text();             // "FoxApp"
+      hint.res_class=(char*)getApp()->getVendorName().text();         // "FoxWindow"
+      XSetClassHint((Display*)getApp()->getDisplay(),xid,&hint);
+
+      // Set client machine name and application pid
+      FXString hostname=FXSystem::getHostName();
+      XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->wmClientMachine,XA_STRING,8,PropModeReplace,(unsigned char*)hostname.text(),hostname.length());
+      FXint proccessid=FXSystem::getProcessId();
+      XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->wmNetProcessId,XA_CARDINAL,32,PropModeReplace,(unsigned char*)&proccessid,1);
+
 //#ifdef HAVE_XFIXES_H
 //      int evb,erb;
 //      if(XFixesQueryExtension(DISPLAY(getApp()),&evb,&erb)){
@@ -945,7 +964,7 @@ FXbool FXTopWindow::minimize(FXbool notify){
     SetWindowLong((HWND)xid,GWL_STYLE,dwStyle|WS_OVERLAPPEDWINDOW);
     SetWindowPlacement((HWND)xid,&windowplacement);
     SetWindowPos((HWND)xid,NULL,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_NOOWNERZORDER|SWP_FRAMECHANGED);
-  
+
 
 #endif
 

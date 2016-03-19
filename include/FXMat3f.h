@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -75,13 +75,16 @@ public:
   FXMat3f& operator=(const FXMat2f& s);
   FXMat3f& operator=(const FXMat3f& s);
   FXMat3f& operator=(const FXMat4f& s);
+  
+  /// Assignment from quaternion
+  FXMat3f& operator=(const FXQuatf& quat);
 
   /// Assignment from array
   FXMat3f& operator=(const FXfloat s[]);
 
   /// Set value from scalar
   FXMat3f& set(FXfloat s);
-  
+
   /// Set value from 2x2 rotation and scale matrix
   FXMat3f& set(const FXMat2f& s);
 
@@ -132,15 +135,30 @@ public:
   /// Return true if identity matrix
   FXbool isIdentity() const;
 
-  /// Multiply by rotation of phi
-  FXMat3f& rot(FXfloat c,FXfloat s);
-  FXMat3f& rot(FXfloat phi);
+  /// Multiply by rotation about unit-quaternion
+  FXMat3f& rot(const FXQuatf& q);
 
-  /// Multiply by translation
-  FXMat3f& trans(FXfloat tx,FXfloat ty);
+  /// Multiply by rotation c,s about unit axis
+  FXMat3f& rot(const FXVec3f& v,FXfloat c,FXfloat s);
+
+  /// Multiply by rotation of phi about unit axis
+  FXMat3f& rot(const FXVec3f& v,FXfloat phi);
+
+  /// Multiply by x-rotation
+  FXMat3f& xrot(FXfloat c,FXfloat s);
+  FXMat3f& xrot(FXfloat phi);
+
+  /// Multiply by y-rotation
+  FXMat3f& yrot(FXfloat c,FXfloat s);
+  FXMat3f& yrot(FXfloat phi);
+
+  /// Multiply by z-rotation
+  FXMat3f& zrot(FXfloat c,FXfloat s);
+  FXMat3f& zrot(FXfloat phi);
 
   /// Multiply by scaling
-  FXMat3f& scale(FXfloat sx,FXfloat sy);
+  FXMat3f& scale(FXfloat sx,FXfloat sy,FXfloat sz);
+  FXMat3f& scale(const FXVec3f& v);
   FXMat3f& scale(FXfloat s);
 
   /// Determinant

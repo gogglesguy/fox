@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -31,7 +31,7 @@ TOPDIR    = ..
 
 # Uncomment the following two lines for release builds...
 CXXFLAGS  = /w3 /e1 /zq /5r /ei /xs /xr /fp5 /otexan /zp=4
-DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H -DHAVE_GLU_H -DHAVE_VSSCANF -DHAVE_STRTOLL -DHAVE_STRTOULL #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_TIFF_H -DXMD_H
+DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H -DHAVE_GLU_H #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_TIFF_H -DXMD_H
 
 INCDIRS   = -I$(TOPDIR)\include
 
@@ -219,6 +219,7 @@ OBJECTS += FXMenuSeparator.obj
 OBJECTS += FXMenuTitle.obj
 OBJECTS += FXMessageBox.obj
 OBJECTS += FXMessageChannel.obj
+OBJECTS += FXMetaClass.obj
 OBJECTS += FXObject.obj
 OBJECTS += FXObjectList.obj
 OBJECTS += FXOptionMenu.obj
@@ -351,6 +352,9 @@ OBJECTS += fxpsio.obj
 OBJECTS += fxrasio.obj
 OBJECTS += fxrgbio.obj
 OBJECTS += fxscanf.obj
+OBJECTS += fxstrtoll.obj
+OBJECTS += fxstrtoull.obj
+OBJECTS += fxstrtod.obj
 OBJECTS += fxtargaio.obj
 OBJECTS += fxtifio.obj
 OBJECTS += fxunicode.obj
@@ -359,7 +363,6 @@ OBJECTS += fxwuquantize.obj
 OBJECTS += fxxbmio.obj
 OBJECTS += fxxpmio.obj
 OBJECTS += icons.obj
-OBJECTS += strtoll.obj
 
 
 .cpp.obj: .AUTODEPEND

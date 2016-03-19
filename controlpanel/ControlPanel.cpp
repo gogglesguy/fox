@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2011 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -498,10 +498,10 @@ FXIcon *FXDesktopSetup::createIconFromName(const FXString& name) const {
   FXIconSource iconsource(getApp());
   FXString iconfilename=FXPath::search(iconpath,name);
   if(!iconfilename.empty()){
-    FXIcon *icon=iconsource.loadIconFile(iconfilename);
-    if(icon){
-      icon->blend(getApp()->getBaseColor());
-      icon->create();
+    FXIcon *ico=iconsource.loadIconFile(iconfilename);
+    if(ico){
+      ico->blend(getApp()->getBaseColor());
+      ico->create();
       return icon;
       }
     }
@@ -511,15 +511,15 @@ FXIcon *FXDesktopSetup::createIconFromName(const FXString& name) const {
 
 // Reflect icon on button
 void FXDesktopSetup::setupIconButton(const FXString& name,FXint index){
-  FXIcon *icon=iconbutton[index]->getIcon();
-  if(icon){
+  FXIcon *ico=iconbutton[index]->getIcon();
+  if(ico){
     iconbutton[index]->setIcon(NULL);
-    delete icon;
+    delete ico;
     }
-  icon=createIconFromName(name);
-  if(icon){
-    icon->create();
-    iconbutton[index]->setIcon(icon);
+  ico=createIconFromName(name);
+  if(ico){
+    ico->create();
+    iconbutton[index]->setIcon(ico);
     }
   }
 
@@ -570,7 +570,6 @@ long FXDesktopSetup::onCmdFileBinding(FXObject*,FXSelector,void* ptr){
   FXint index=(FXint)(FXival)ptr,no;
   FXString association;
   FXString iconname;
-  FXIcon *icn;
 
   // Save old one
   saveFileBinding();
@@ -1158,8 +1157,10 @@ FXbool FXDesktopSetup::writeSettingsFile(const FXString& file){
   desktopsettings.writeRealEntry("SETTINGS","displaygamma",gamma);
 
   // Write file
-  if(desktopsettings.unparseFile(file)){
-    return true;
+  if(FXDir::createDirectories(FXPath::upLevel(file))){
+    if(desktopsettings.unparseFile(file)){
+      return true;
+      }
     }
   return false;
   }
@@ -1197,10 +1198,7 @@ int main(int argc,char **argv){
   application.create();
 
   // Set application and vendor names
-  if(!main->setApplicationAndVendor(appnm,vndnm)){
-    fxmessage("Unable to read settings for: %s\n",appnm.text());
-    return 1;
-    }
+  main->setApplicationAndVendor(appnm,vndnm);
 
   // Start
   return application.run();

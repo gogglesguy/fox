@@ -3,7 +3,7 @@
 *           D o u b l e - P r e c i s i o n    R a n g e    C l a s s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -222,50 +222,65 @@ FXint FXRanged::intersect(const FXVec4d& plane) const {
 
 
 // Intersect box with ray u-v
-FXbool FXRanged::intersect(const FXVec3d& u,const FXVec3d& v){
-  register FXdouble d,ni,fi,t;
+FXbool FXRanged::intersect(const FXVec3d& u,const FXVec3d& v) const {
   register FXdouble f= DBL_MAX;
   register FXdouble n=-DBL_MAX;
+  register FXdouble d,ni,fi;
   d = v.x-u.x;
-  if(d==0.0){
+  if(__likely(d!=0.0)){
+    if(0.0<d){
+      ni = (lower.x-u.x)/d;
+      fi = (upper.x-u.x)/d;
+      }
+    else{
+      ni = (upper.x-u.x)/d;
+      fi = (lower.x-u.x)/d;
+      }
+    if(ni>n) n=ni;
+    if(fi<f) f=fi;
+    if(n>f) return false;
+    }
+  else{
     if((upper.x<u.x) || (u.x<lower.x)) return false;
     }
-  else{
-    ni = (lower.x-u.x)/d;
-    fi = (upper.x-u.x)/d;
-    if(ni>fi) FXSWAP(ni,fi,t);
+  d = v.y-u.y;
+  if(__likely(d!=0.0)){
+    if(0.0<d){
+      ni = (lower.y-u.y)/d;
+      fi = (upper.y-u.y)/d;
+      }
+    else{
+      ni = (upper.y-u.y)/d;
+      fi = (lower.y-u.y)/d;
+      }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
     }
-  d = v.y-u.y;
-  if(d==0.0){
+  else{
     if((upper.y<u.y) || (u.y<lower.y)) return false;
     }
-  else{
-    ni = (lower.y-u.y)/d;
-    fi = (upper.y-u.y)/d;
-    if(ni>fi) FXSWAP(ni,fi,t);
+  d = v.z-u.z;
+  if(__likely(d!=0.0)){
+    if(0.0<d){
+      ni = (lower.z-u.z)/d;
+      fi = (upper.z-u.z)/d;
+      }
+    else{
+      ni = (upper.z-u.z)/d;
+      fi = (lower.z-u.z)/d;
+      }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
     }
-  d = v.z-u.z;
-  if(d==0.0){
+  else{
     if((upper.z<u.z) || (u.z<lower.z)) return false;
     }
-  else{
-    ni = (lower.z-u.z)/d;
-    fi = (upper.z-u.z)/d;
-    if(ni>fi) FXSWAP(ni,fi,t);
-    if(ni>n) n=ni;
-    if(fi<f) f=fi;
-    if(n>f) return false;
-    }
-  return true;
+  return 0.0<=f && n<=1.0;
   }
-
-
+    
+    
 // Transform range by 4x4 matrix
 FXRanged FXRanged::transform(const FXMat4d& mat) const {
   FXRanged result(corner(0)*mat);

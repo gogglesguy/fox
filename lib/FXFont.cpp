@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -121,6 +121,7 @@
 
   - Get encoding from locale (see X11).
 
+  - ix|xi
 */
 
 
@@ -2771,10 +2772,10 @@ FXFontDesc FXFont::getActualFontDesc() const {
 
 /*******************************************************************************/
 
-#if 0  
+#if 0
   /// Construct font description
   FXFontDesc(const FXString& fc,FXuint sz,FXuint wt,FXuint sl,FXuint enc,FXuint sw,FXuint h);
-  
+
 // Construct font description
 FXFontDesc::FXFontDesc(const FXString& fc,FXuint sz,FXuint wt,FXuint sl,FXuint enc,FXuint sw,FXuint h){
   memcpy(face,fc.text(),sizeof(face)-1);    // FIXME yes, not liking this...
@@ -2784,7 +2785,7 @@ FXFontDesc::FXFontDesc(const FXString& fc,FXuint sz,FXuint wt,FXuint sl,FXuint e
   setwidth=sw;
   encoding=enc;
   flags=(h&~FXFont::X11);          // System-independent method
-  }  
+  }
 #endif
 
 
@@ -2843,10 +2844,10 @@ FXString FXFontDesc::getFont() const {
     }
   return string;
   }
-  
-  
+
+
 /*******************************************************************************/
-  
+
 
 // Change font description from a string
 void FXFont::setFont(const FXString& string){

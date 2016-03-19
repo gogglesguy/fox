@@ -3,7 +3,7 @@
 *                      P r o g r e s s   D i a l o g   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -230,14 +230,14 @@ void FXProgressDialog::increment(FXuint value){
 
 
 // Has operation been cancelled?
-FXbool FXProgressDialog::isCancelled() const { 
-  return cancelled; 
+FXbool FXProgressDialog::isCancelled() const {
+  return cancelled;
   }
 
 
 // Change cancelled flag
-void FXProgressDialog::setCancelled(FXbool flg){ 
-  cancelled=flg; 
+void FXProgressDialog::setCancelled(FXbool flg){
+  cancelled=flg;
   }
 
 

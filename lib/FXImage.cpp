@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -417,9 +417,9 @@ void FXImage::restore(){
       // Stuff it into our own data structure
       for(y=0,img=(FXuchar*)data,pix=pixels; y<height; y++){
         for(x=0; x<width; x++){
-          img[0]=pix[2];
+          img[0]=pix[0];
           img[1]=pix[1];
-          img[2]=pix[0];
+          img[2]=pix[2];
           img[3]=255;
           img+=4;
           pix+=3;
@@ -590,9 +590,9 @@ void FXImage::restore(){
           for(y=0,img=(FXuchar*)data; y<height; y++){
             for(x=0; x<width; x++){
               pixel=XGetPixel(xim,x,y);
-              img[0]=rtab[pixel];
+              img[0]=btab[pixel];
               img[1]=gtab[pixel];
-              img[2]=btab[pixel];
+              img[2]=rtab[pixel];
               img[3]=255;
               img+=4;
               }
@@ -613,9 +613,9 @@ void FXImage::restore(){
               r=(pixel&redmask)>>redshift;
               g=(pixel&greenmask)>>greenshift;
               b=(pixel&bluemask)>>blueshift;
-              img[0]=rtab[r];
+              img[0]=btab[b];
               img[1]=gtab[g];
-              img[2]=btab[b];
+              img[2]=rtab[r];
               img[3]=255;
               img+=4;
               }
@@ -688,9 +688,9 @@ void FXImage::render(){
         dst+=skip;
         w=width;
         do{
-          dst[0]=src[2];
+          dst[0]=src[0];
           dst[1]=src[1];
-          dst[2]=src[0];
+          dst[2]=src[2];
           src+=4;
           dst+=3;
           }
@@ -727,7 +727,7 @@ void FXImage::render_true_N_fast(void *xim,FXuchar *img){
   do{
     x=0;
     do{
-      XPutPixel(((XImage*)xim),x,y,visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]]);
+      XPutPixel(((XImage*)xim),x,y,visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]]);
       img+=4;
       }
     while(++x<width);
@@ -745,7 +745,7 @@ void FXImage::render_true_N_dither(void *xim,FXuchar *img){
     x=0;
     do{
       d=((y&3)<<2)|(x&3);
-      XPutPixel(((XImage*)xim),x,y,visual->rpix[d][img[0]] | visual->gpix[d][img[1]] | visual->bpix[d][img[2]]);
+      XPutPixel(((XImage*)xim),x,y,visual->rpix[d][img[2]] | visual->gpix[d][img[1]] | visual->bpix[d][img[0]]);
       img+=4;
       }
     while(++x<width);
@@ -766,7 +766,7 @@ void FXImage::render_true_24(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        val=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        val=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         pix[0]=(FXuchar)(val>>16);
         pix[1]=(FXuchar)(val>>8);
         pix[2]=(FXuchar)val;
@@ -784,7 +784,7 @@ void FXImage::render_true_24(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        val=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        val=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         pix[0]=(FXuchar)val;
         pix[1]=(FXuchar)(val>>8);
         pix[2]=(FXuchar)(val>>16);
@@ -813,7 +813,7 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        *((FXuint*)pix)=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        *((FXuint*)pix)=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         img+=4;
         pix+=4;
         }
@@ -830,7 +830,7 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        val=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        val=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         pix[0]=(FXuchar)(val>>24);
         pix[1]=(FXuchar)(val>>16);
         pix[2]=(FXuchar)(val>>8);
@@ -851,7 +851,7 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        val=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        val=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         pix[0]=(FXuchar)val;
         pix[1]=(FXuchar)(val>>8);
         pix[2]=(FXuchar)(val>>16);
@@ -881,7 +881,7 @@ void FXImage::render_true_16_fast(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        *((FXushort*)pix)=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        *((FXushort*)pix)=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         img+=4;
         pix+=2;
         }
@@ -898,7 +898,7 @@ void FXImage::render_true_16_fast(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        val=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        val=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         pix[0]=(FXuchar)(val>>8);
         pix[1]=(FXuchar)val;
         img+=4;
@@ -917,7 +917,7 @@ void FXImage::render_true_16_fast(void *xim,FXuchar *img){
     do{
       w=width-1;
       do{
-        val=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+        val=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
         pix[0]=(FXuchar)val;
         pix[1]=(FXuchar)(val>>8);
         img+=4;
@@ -946,7 +946,7 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
       w=width-1;
       do{
         d=((h&3)<<2)|(w&3);
-        *((FXushort*)pix)=visual->rpix[d][img[0]] | visual->gpix[d][img[1]] | visual->bpix[d][img[2]];
+        *((FXushort*)pix)=visual->rpix[d][img[2]] | visual->gpix[d][img[1]] | visual->bpix[d][img[0]];
         img+=4;
         pix+=2;
         }
@@ -964,7 +964,7 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
       w=width-1;
       do{
         d=((h&3)<<2)|(w&3);
-        val=visual->rpix[d][img[0]] | visual->gpix[d][img[1]] | visual->bpix[d][img[2]];
+        val=visual->rpix[d][img[2]] | visual->gpix[d][img[1]] | visual->bpix[d][img[0]];
         pix[0]=(FXuchar)(val>>8);
         pix[1]=(FXuchar)val;
         img+=4;
@@ -984,7 +984,7 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
       w=width-1;
       do{
         d=((h&3)<<2)|(w&3);
-        val=visual->rpix[d][img[0]] | visual->gpix[d][img[1]] | visual->bpix[d][img[2]];
+        val=visual->rpix[d][img[2]] | visual->gpix[d][img[1]] | visual->bpix[d][img[0]];
         pix[0]=(FXuchar)val;
         pix[1]=(FXuchar)(val>>8);
         img+=4;
@@ -1008,7 +1008,7 @@ void FXImage::render_true_8_fast(void *xim,FXuchar *img){
   do{
     w=width-1;
     do{
-      *pix=visual->rpix[1][img[0]] | visual->gpix[1][img[1]] | visual->bpix[1][img[2]];
+      *pix=visual->rpix[1][img[2]] | visual->gpix[1][img[1]] | visual->bpix[1][img[0]];
       img+=4;
       pix++;
       }
@@ -1030,7 +1030,7 @@ void FXImage::render_true_8_dither(void *xim,FXuchar *img){
     w=width-1;
     do{
       d=((h&3)<<2)|(w&3);
-      *pix=visual->rpix[d][img[0]] | visual->gpix[d][img[1]] | visual->bpix[d][img[2]];
+      *pix=visual->rpix[d][img[2]] | visual->gpix[d][img[1]] | visual->bpix[d][img[0]];
       img+=4;
       pix++;
       }
@@ -1054,7 +1054,7 @@ void FXImage::render_index_4_fast(void *xim,FXuchar *img){
       w=width-1;
       half=0;
       do{
-        val=visual->lut[visual->rpix[1][img[0]]+visual->gpix[1][img[1]]+visual->bpix[1][img[2]]];
+        val=visual->lut[visual->rpix[1][img[2]]+visual->gpix[1][img[1]]+visual->bpix[1][img[0]]];
         if(half) *pix++|=val;
         else *pix=val<<4;
         half^=1;
@@ -1072,7 +1072,7 @@ void FXImage::render_index_4_fast(void *xim,FXuchar *img){
       w=width-1;
       half=0;
       do{
-        val=visual->lut[visual->rpix[1][img[0]]+visual->gpix[1][img[1]]+visual->bpix[1][img[2]]];
+        val=visual->lut[visual->rpix[1][img[2]]+visual->gpix[1][img[1]]+visual->bpix[1][img[0]]];
         if(half) *pix++|=val<<4;
         else *pix=val;
         half^=1;
@@ -1100,7 +1100,7 @@ void FXImage::render_index_4_dither(void *xim,FXuchar *img){
       half=0;
       do{
         d=((h&3)<<2)|(w&3);
-        val=visual->lut[visual->rpix[d][img[0]]+visual->gpix[d][img[1]]+visual->bpix[d][img[2]]];
+        val=visual->lut[visual->rpix[d][img[2]]+visual->gpix[d][img[1]]+visual->bpix[d][img[0]]];
         if(half) *pix++|=val;
         else *pix=val<<4;
         half^=1;
@@ -1119,7 +1119,7 @@ void FXImage::render_index_4_dither(void *xim,FXuchar *img){
       half=0;
       do{
         d=((h&3)<<2)|(w&3);
-        val=visual->lut[visual->rpix[d][img[0]]+visual->gpix[d][img[1]]+visual->bpix[d][img[2]]];
+        val=visual->lut[visual->rpix[d][img[2]]+visual->gpix[d][img[1]]+visual->bpix[d][img[0]]];
         if(half) *pix++|=val<<4;
         else *pix=val;
         half^=1;
@@ -1143,7 +1143,7 @@ void FXImage::render_index_8_fast(void *xim,FXuchar *img){
   do{
     w=width-1;
     do{
-      *pix=visual->lut[visual->rpix[1][img[0]]+visual->gpix[1][img[1]]+visual->bpix[1][img[2]]];
+      *pix=visual->lut[visual->rpix[1][img[2]]+visual->gpix[1][img[1]]+visual->bpix[1][img[0]]];
       img+=4;
       pix++;
       }
@@ -1165,7 +1165,7 @@ void FXImage::render_index_8_dither(void *xim,FXuchar *img){
     w=width-1;
     do{
       d=((h&3)<<2)|(w&3);
-      *pix=visual->lut[visual->rpix[d][img[0]]+visual->gpix[d][img[1]]+visual->bpix[d][img[2]]];
+      *pix=visual->lut[visual->rpix[d][img[2]]+visual->gpix[d][img[1]]+visual->bpix[d][img[0]]];
       img+=4;
       pix++;
       }
@@ -1184,7 +1184,7 @@ void FXImage::render_index_N_fast(void *xim,FXuchar *img){
   do{
     x=0;
     do{
-      XPutPixel(((XImage*)xim),x,y,visual->lut[visual->rpix[1][img[0]]+visual->gpix[1][img[1]]+visual->bpix[1][img[2]]]);
+      XPutPixel(((XImage*)xim),x,y,visual->lut[visual->rpix[1][img[2]]+visual->gpix[1][img[1]]+visual->bpix[1][img[0]]]);
       img+=4;
       }
     while(++x<width);
@@ -1202,7 +1202,7 @@ void FXImage::render_index_N_dither(void *xim,FXuchar *img){
     x=0;
     do{
       d=((y&3)<<2)|(x&3);
-      XPutPixel(((XImage*)xim),x,y,visual->lut[visual->rpix[d][img[0]]+visual->gpix[d][img[1]]+visual->bpix[d][img[2]]]);
+      XPutPixel(((XImage*)xim),x,y,visual->lut[visual->rpix[d][img[2]]+visual->gpix[d][img[1]]+visual->bpix[d][img[0]]]);
       img+=4;
       }
     while(++x<width);
@@ -1221,7 +1221,7 @@ void FXImage::render_gray_8_fast(void *xim,FXuchar *img){
   do{
     w=width-1;
     do{
-      *pix=visual->gpix[1][(77*img[0]+151*img[1]+29*img[2])>>8];
+      *pix=visual->gpix[1][(77*img[2]+151*img[1]+29*img[0])>>8];
       img+=4;
       pix++;
       }
@@ -1242,7 +1242,7 @@ void FXImage::render_gray_8_dither(void *xim,FXuchar *img){
   do{
     w=width-1;
     do{
-      *pix=visual->gpix[((h&3)<<2)|(w&3)][(77*img[0]+151*img[1]+29*img[2])>>8];
+      *pix=visual->gpix[((h&3)<<2)|(w&3)][(77*img[2]+151*img[1]+29*img[0])>>8];
       img+=4;
       pix++;
       }
@@ -1261,7 +1261,7 @@ void FXImage::render_gray_N_fast(void *xim,FXuchar *img){
   do{
     x=0;
     do{
-      XPutPixel(((XImage*)xim),x,y,visual->gpix[1][(77*img[0]+151*img[1]+29*img[2])>>8]);
+      XPutPixel(((XImage*)xim),x,y,visual->gpix[1][(77*img[2]+151*img[1]+29*img[0])>>8]);
       img+=4;
       }
     while(++x<width);
@@ -1278,7 +1278,7 @@ void FXImage::render_gray_N_dither(void *xim,FXuchar *img){
   do{
     x=0;
     do{
-      XPutPixel(((XImage*)xim),x,y,visual->gpix[((y&3)<<2)|(x&3)][(77*img[0]+151*img[1]+29*img[2])>>8]);
+      XPutPixel(((XImage*)xim),x,y,visual->gpix[((y&3)<<2)|(x&3)][(77*img[2]+151*img[1]+29*img[0])>>8]);
       img+=4;
       }
     while(++x<width);
@@ -1295,7 +1295,7 @@ void FXImage::render_mono_1_fast(void *xim,FXuchar *img){
   do{
     x=0;
     do{
-      XPutPixel(((XImage*)xim),x,y,visual->gpix[1][(77*img[0]+151*img[1]+29*img[2])>>8]);
+      XPutPixel(((XImage*)xim),x,y,visual->gpix[1][(77*img[2]+151*img[1]+29*img[0])>>8]);
       img+=4;
       }
     while(++x<width);
@@ -1312,7 +1312,7 @@ void FXImage::render_mono_1_dither(void *xim,FXuchar *img){
   do{
     x=0;
     do{
-      XPutPixel(((XImage*)xim),x,y,visual->gpix[((y&3)<<2)|(x&3)][(77*img[0]+151*img[1]+29*img[2])>>8]);
+      XPutPixel(((XImage*)xim),x,y,visual->gpix[((y&3)<<2)|(x&3)][(77*img[2]+151*img[1]+29*img[0])>>8]);
       img+=4;
       }
     while(++x<width);
@@ -1566,19 +1566,19 @@ static void hscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint s
     ar=ag=ab=aa=0;
     while(1){
       if(fin<fout){
-        ar+=fin*s[0];
-        ag+=fin*s[1];
-        ab+=fin*s[2];
         aa+=fin*s[3];
+        ar+=fin*s[2];
+        ag+=fin*s[1];
+        ab+=fin*s[0];
         fout-=fin;
         fin=dw;
         s+=4;
         }
       else{
-        ar+=fout*s[0]; d[0]=ar/sw; ar=0;
-        ag+=fout*s[1]; d[1]=ag/sw; ag=0;
-        ab+=fout*s[2]; d[2]=ab/sw; ab=0;
         aa+=fout*s[3]; d[3]=aa/sw; aa=0;
+        ar+=fout*s[2]; d[2]=ar/sw; ar=0;
+        ag+=fout*s[1]; d[1]=ag/sw; ag=0;
+        ab+=fout*s[0]; d[0]=ab/sw; ab=0;
         fin-=fout;
         fout=sw;
         d+=4;
@@ -1607,19 +1607,19 @@ static void vscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint s
     ar=ag=ab=aa=0;
     while(1){
       if(fin<fout){
-        ar+=fin*s[0];
-        ag+=fin*s[1];
-        ab+=fin*s[2];
         aa+=fin*s[3];
+        ar+=fin*s[2];
+        ag+=fin*s[1];
+        ab+=fin*s[0];
         fout-=fin;
         fin=dh;
         s+=ss;
         }
       else{
-        ar+=fout*s[0]; d[0]=ar/sh; ar=0;
-        ag+=fout*s[1]; d[1]=ag/sh; ag=0;
-        ab+=fout*s[2]; d[2]=ab/sh; ab=0;
         aa+=fout*s[3]; d[3]=aa/sh; aa=0;
+        ar+=fout*s[2]; d[2]=ar/sh; ar=0;
+        ag+=fout*s[1]; d[1]=ag/sh; ag=0;
+        ab+=fout*s[0]; d[0]=ab/sh; ab=0;
         fin-=fout;
         fout=sh;
         d+=ds;
@@ -2047,10 +2047,10 @@ void FXImage::fade(FXColor color,FXint factor){
     register FXuchar *pix=(FXuchar*)data;
     register FXuchar *end=pix+height*width*4;
     do{
-      w=pix[0]*s+r; pix[0]=(w+(w>>8))>>8;
-      w=pix[1]*s+g; pix[1]=(w+(w>>8))>>8;
-      w=pix[2]*s+b; pix[2]=(w+(w>>8))>>8;
       w=pix[3]*s+a; pix[3]=(w+(w>>8))>>8;
+      w=pix[2]*s+r; pix[2]=(w+(w>>8))>>8;
+      w=pix[1]*s+g; pix[1]=(w+(w>>8))>>8;
+      w=pix[0]*s+b; pix[0]=(w+(w>>8))>>8;
       pix+=4;
       }
     while(pix<end);
@@ -2080,36 +2080,36 @@ static void shearx(FXuchar *out,FXuchar* in,FXint nwidth,FXint owidth,FXint heig
       s=z&255;
       k=q+(z>>8)*4;
       while(q<k){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
         q[3]=a;
+        q[2]=r;
+        q[1]=g;
+        q[0]=b;
         q+=4;
         }
-      q[0]=((r-p[0])*s+(p[0]<<8)+127)>>8;
-      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
-      q[2]=((b-p[2])*s+(p[2]<<8)+127)>>8;
       q[3]=((a-p[3])*s+(p[3]<<8)+127)>>8;
+      q[2]=((r-p[2])*s+(p[2]<<8)+127)>>8;
+      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
+      q[0]=((b-p[0])*s+(p[0]<<8)+127)>>8;
       q+=4;
       p+=4;
       while(p<pp){
-        q[0]=((p[0-4]-p[0])*s+(p[0]<<8)+127)>>8;
-        q[1]=((p[1-4]-p[1])*s+(p[1]<<8)+127)>>8;
-        q[2]=((p[2-4]-p[2])*s+(p[2]<<8)+127)>>8;
         q[3]=((p[3-4]-p[3])*s+(p[3]<<8)+127)>>8;
+        q[2]=((p[2-4]-p[2])*s+(p[2]<<8)+127)>>8;
+        q[1]=((p[1-4]-p[1])*s+(p[1]<<8)+127)>>8;
+        q[0]=((p[0-4]-p[0])*s+(p[0]<<8)+127)>>8;
         q+=4;
         p+=4;
         }
-      q[0]=((p[0-4]-r)*s+(r<<8)+127)>>8;
-      q[1]=((p[1-4]-g)*s+(g<<8)+127)>>8;
-      q[2]=((p[2-4]-b)*s+(b<<8)+127)>>8;
       q[3]=((p[3-4]-a)*s+(a<<8)+127)>>8;
+      q[2]=((p[2-4]-r)*s+(r<<8)+127)>>8;
+      q[1]=((p[1-4]-g)*s+(g<<8)+127)>>8;
+      q[0]=((p[0-4]-b)*s+(b<<8)+127)>>8;
       q+=4;
       while(q<qq){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
         q[3]=a;
+        q[2]=r;
+        q[1]=g;
+        q[0]=b;
         q+=4;
         }
       }
@@ -2142,36 +2142,36 @@ static void sheary(FXuchar *out,FXuchar* in,FXint width,FXint nheight,FXint ohei
       s=z&255;
       k=q+(z>>8)*dp;
       while(q<k){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
-        q[3]=a;
+        q[3]=r;
+        q[2]=g;
+        q[1]=b;
+        q[0]=a;
         q+=dp;
         }
-      q[0]=((r-p[0])*s+(p[0]<<8)+127)>>8;
-      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
-      q[2]=((b-p[2])*s+(p[2]<<8)+127)>>8;
       q[3]=((a-p[3])*s+(p[3]<<8)+127)>>8;
+      q[2]=((r-p[2])*s+(p[2]<<8)+127)>>8;
+      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
+      q[0]=((b-p[0])*s+(p[0]<<8)+127)>>8;
       q+=dp;
       p+=dp;
       while(p<pp){
-        q[0]=((p[0-dp]-p[0])*s+(p[0]<<8)+127)>>8;
-        q[1]=((p[1-dp]-p[1])*s+(p[1]<<8)+127)>>8;
-        q[2]=((p[2-dp]-p[2])*s+(p[2]<<8)+127)>>8;
         q[3]=((p[3-dp]-p[3])*s+(p[3]<<8)+127)>>8;
+        q[2]=((p[2-dp]-p[2])*s+(p[2]<<8)+127)>>8;
+        q[1]=((p[1-dp]-p[1])*s+(p[1]<<8)+127)>>8;
+        q[0]=((p[0-dp]-p[0])*s+(p[0]<<8)+127)>>8;
         q+=dp;
         p+=dp;
         }
-      q[0]=((p[0-dp]-r)*s+(r<<8)+127)>>8;
-      q[1]=((p[1-dp]-g)*s+(g<<8)+127)>>8;
-      q[2]=((p[2-dp]-b)*s+(b<<8)+127)>>8;
       q[3]=((p[3-dp]-a)*s+(a<<8)+127)>>8;
+      q[2]=((p[2-dp]-r)*s+(r<<8)+127)>>8;
+      q[1]=((p[1-dp]-g)*s+(g<<8)+127)>>8;
+      q[0]=((p[0-dp]-b)*s+(b<<8)+127)>>8;
       q+=dp;
       while(q<qq){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
         q[3]=a;
+        q[2]=r;
+        q[1]=g;
+        q[0]=b;
         q+=dp;
         }
       pp+=4;
@@ -2247,10 +2247,10 @@ void FXImage::hgradient(FXColor left,FXColor right){
     da=((a2-a1)<<16)/(width-1);
     x=width;
     do{
-      ptr[0]=rr>>16; rr+=dr;
-      ptr[1]=gg>>16; gg+=dg;
-      ptr[2]=bb>>16; bb+=db;
       ptr[3]=aa>>16; aa+=da;
+      ptr[2]=rr>>16; rr+=dr;
+      ptr[1]=gg>>16; gg+=dg;
+      ptr[0]=bb>>16; bb+=db;
       ptr+=4;
       }
     while(--x);
@@ -2291,16 +2291,16 @@ void FXImage::vgradient(FXColor top,FXColor bottom){
     da=((a2-a1)<<16)/(height-1);
     y=height;
     do{
+      a1=aa>>16; aa+=da;
       r1=rr>>16; rr+=dr;
       g1=gg>>16; gg+=dg;
       b1=bb>>16; bb+=db;
-      a1=aa>>16; aa+=da;
       x=width;
       do{
-        ptr[0]=r1;
-        ptr[1]=g1;
-        ptr[2]=b1;
         ptr[3]=a1;
+        ptr[2]=r1;
+        ptr[1]=g1;
+        ptr[0]=b1;
         ptr+=4;
         }
       while(--x);
@@ -2351,16 +2351,16 @@ void FXImage::gradient(FXColor topleft,FXColor topright,FXColor bottomleft,FXCol
 
     y=height;
     do{
+      a=al; da=(ar-al)/(width-1);
       r=rl; dr=(rr-rl)/(width-1);
       g=gl; dg=(gr-gl)/(width-1);
       b=bl; db=(br-bl)/(width-1);
-      a=al; da=(ar-al)/(width-1);
       x=width;
       do{
-        ptr[0]=r>>16; r+=dr;
-        ptr[1]=g>>16; g+=dg;
-        ptr[2]=b>>16; b+=db;
         ptr[3]=a>>16; a+=da;
+        ptr[2]=r>>16; r+=dr;
+        ptr[1]=g>>16; g+=dg;
+        ptr[0]=b>>16; b+=db;
         ptr+=4;
         }
       while(--x);
@@ -2389,9 +2389,9 @@ void FXImage::blend(FXColor color){
     register FXint s,w;
     do{
       s=pix[3];
-      w=(pix[0]-r)*s; pix[0]=r+((w+(w>>8)+128)>>8);
+      w=(pix[2]-r)*s; pix[2]=r+((w+(w>>8)+128)>>8);
       w=(pix[1]-g)*s; pix[1]=g+((w+(w>>8)+128)>>8);
-      w=(pix[2]-b)*s; pix[2]=b+((w+(w>>8)+128)>>8);             /* FIXME need to write new alpha also */
+      w=(pix[0]-b)*s; pix[0]=b+((w+(w>>8)+128)>>8);             /* FIXME need to write new alpha also */
       pix+=4;
       }
     while(pix<end);
@@ -2405,9 +2405,9 @@ void FXImage::invert(){
     register FXuchar *pix=(FXuchar*)data;
     register FXuchar *end=pix+height*width*4;
     do{
-      pix[0]=255-pix[0];
       pix[1]=255-pix[1];
       pix[2]=255-pix[2];
+      pix[3]=255-pix[3];
       pix+=4;
       }
     while(pix<end);
@@ -2427,10 +2427,10 @@ void FXImage::colorize(FXColor color){
     do{
       if(pix[3]){
 //        lum=(65535-77*pix[0]-151*pix[1]-29*pix[2])>>8;
-        lum=(77*pix[0]+151*pix[1]+29*pix[2])>>8;
-        w=r*lum; pix[0]=(w+(w>>8))>>8;
+        lum=(77*pix[2]+151*pix[1]+29*pix[0])>>8;
+        w=r*lum; pix[2]=(w+(w>>8))>>8;
         w=g*lum; pix[1]=(w+(w>>8))>>8;
-        w=b*lum; pix[2]=(w+(w>>8))>>8;
+        w=b*lum; pix[0]=(w+(w>>8))>>8;
         }
       pix+=4;
       }
