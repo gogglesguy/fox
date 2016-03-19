@@ -58,7 +58,7 @@ FXTime fxgetticks(){
   return value;
   }
 
-#elif defined(__GNUC__) && defined(__x86_64__)
+#elif (defined(__GNUC__) || defined(__ICC)) && defined(__x86_64__)
 
 // Return clock ticks from AMD64 TSC register [GCC AMD64 version].
 FXTime fxgetticks(){

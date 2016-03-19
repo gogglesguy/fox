@@ -50,6 +50,8 @@ protected:
   FXuint             searchmode;
   FXuint             current;
 protected:
+  static const FXchar sectionName[];
+protected:
   FXReplaceDialog(){}
   void appendHistory(const FXString& search,const FXString& replace,FXuint mode);
 private:

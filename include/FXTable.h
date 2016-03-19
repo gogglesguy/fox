@@ -70,8 +70,9 @@ class FXAPI FXTableItem : public FXObject {
   friend class FXTable;
 protected:
   FXString    label;
+  FXString    tip; 
   FXIcon     *icon;
-  void       *data;
+  FXptr       data;
   FXuint      state;
 private:
   FXTableItem(const FXTableItem&);
@@ -112,7 +113,7 @@ public:
 public:
 
   /// Construct new table item
-  FXTableItem(const FXString& text,FXIcon* ic=NULL,void* ptr=NULL):label(text),icon(ic),data(ptr),state(RIGHT|CENTER_Y){}
+  FXTableItem(const FXString& text,FXIcon* ic=NULL,FXptr ptr=NULL):label(text),icon(ic),data(ptr),state(RIGHT|CENTER_Y){}
 
   /// Change item's text label
   virtual void setText(const FXString& txt);
@@ -126,11 +127,17 @@ public:
   /// Return item's icon
   virtual FXIcon* getIcon() const { return icon; }
 
+  /// Set the tool tip message for this item
+  void setTipText(const FXString& text){ tip=text; }
+
+  /// Get the tool tip message for this item
+  const FXString& getTipText() const { return tip; }
+
   /// Change item's user data
-  void setData(void* ptr){ data=ptr; }
+  void setData(FXptr ptr){ data=ptr; }
 
   /// Get item's user data
-  void* getData() const { return data; }
+  FXptr getData() const { return data; }
 
   /// Make item draw as focused
   virtual void setFocus(FXbool focus);
@@ -843,15 +850,23 @@ public:
   /// Return cell text
   FXString getItemText(FXint row,FXint col) const;
 
+  /// Change tool tip message for item at index
+  void setItemTipText(FXint row,FXint col,const FXString& text);
+
+  /// Get tool tip message of item at index
+  FXString getItemTipText(FXint row,FXint col) const;
+
   /// Modify cell icon, deleting the old icon if it was owned
   void setItemIcon(FXint row,FXint col,FXIcon* icon,FXbool owned=false,FXbool notify=false);
 
   /// Return cell icon
   FXIcon* getItemIcon(FXint row,FXint col) const;
 
-  /// Modify cell user-data
-  void setItemData(FXint row,FXint col,void* ptr);
-  void* getItemData(FXint row,FXint col) const;
+  /// Change cell user-data
+  void setItemData(FXint row,FXint col,FXptr ptr);
+
+  /// Return cell user-data
+  FXptr getItemData(FXint row,FXint col) const;
 
   /**
   * Extract cells from given range as text, each column separated by a string cs,

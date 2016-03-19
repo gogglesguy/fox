@@ -134,22 +134,22 @@ public:
   FXString getItem(FXint index) const;
 
   /// Replace the item at index
-  FXint setItem(FXint index,const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint setItem(FXint index,const FXString& text,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list box by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXchar** strings,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list box by appending items from newline separated strings
-  FXint fillItems(const FXString& strings,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXString& strings,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Insert a new item at index
-  FXint insertItem(FXint index,const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint insertItem(FXint index,const FXString& text,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Add an item to the end of the list
-  FXint appendItem(const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint appendItem(const FXString& text,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Prepend an item to the list
-  FXint prependItem(const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint prependItem(const FXString& text,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
   FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
@@ -182,7 +182,7 @@ public:
   * search direction; this can be combined with SEARCH_NOWRAP or SEARCH_WRAP
   * to control whether the search wraps at the start or end of the list.
   */
-  FXint findItemByData(const void *ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
+  FXint findItemByData(FXptr ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
   /// Set text for specified item
   void setItemText(FXint index,const FXString& text);
@@ -197,10 +197,10 @@ public:
   FXIcon* getItemIcon(FXint index) const;
 
   /// Set data pointer for specified item
-  void setItemData(FXint index,void* ptr) const;
+  void setItemData(FXint index,FXptr ptr) const;
 
   /// Get data pointer for specified item
-  void* getItemData(FXint index) const;
+  FXptr getItemData(FXint index) const;
 
   /// Return true if item is enabled
   FXbool isItemEnabled(FXint index) const;

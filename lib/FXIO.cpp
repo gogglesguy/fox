@@ -121,15 +121,15 @@ FXbool FXIO::flush(){
   }
 
 
-// Test if we're at the end
-FXbool FXIO::eof(){
-  return true;
+// Test if we're at the end; -1 if error
+FXint FXIO::eof(){
+  return -1;
   }
 
 
 // Return file size
 FXlong FXIO::size(){
-  return 0;
+  return -1;
   }
 
 

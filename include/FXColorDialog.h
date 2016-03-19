@@ -45,6 +45,8 @@ class FXAPI FXColorDialog : public FXDialogBox {
 protected:
   FXColorSelector *colorbox;
 protected:
+  static const FXchar sectionName[];
+protected:
   FXColorDialog(){}
 private:
   FXColorDialog(const FXColorDialog&);

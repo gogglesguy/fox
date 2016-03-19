@@ -301,13 +301,13 @@ FXbool FXFile::flush(){
   }
 
 
-// Test if we're at the end
-FXbool FXFile::eof(){
+// Test if we're at the end; -1 if error
+FXint FXFile::eof(){
   if(isOpen()){
     register FXlong pos=position();
     return 0<=pos && size()<=pos;
     }
-  return true;
+  return -1;
   }
 
 

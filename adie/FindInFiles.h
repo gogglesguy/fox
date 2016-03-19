@@ -34,7 +34,10 @@ protected:
   FXTextField *filefolder;
   FXComboBox  *filefilter;
   FXString     history[20];
+  FXuint       searchflags;
   FXint        index;
+protected:
+  static const FXchar sectionName[];
 private:
   FindInFiles(){}
   FindInFiles(const FindInFiles&);
@@ -48,6 +51,17 @@ public:
   long onCmdFolder(FXObject*,FXSelector,void*);
   long onArrowKey(FXObject*,FXSelector,void*);
   long onMouseWheel(FXObject*,FXSelector,void*);
+  long onUpdFlags(FXObject*,FXSelector,void*);
+  long onCmdFlags(FXObject*,FXSelector,void*);
+  long onCmdFileDblClicked(FXObject*,FXSelector,void*);
+public:
+  enum {
+    SearchExact    = 0,         /// Search exact matches
+    SearchCaseFold = 1,         /// Search with case folding
+    SearchRegex    = 2,         /// Search regular expression
+    SearchRecurse  = 4,         /// Search files recursively
+    SeachHidden    = 8          /// Search hidden files also
+    };
 public:
   enum{
     ID_SEARCH=FXDialogBox::ID_LAST,
@@ -57,10 +71,24 @@ public:
     ID_FOLDER,
     ID_HIST_UP,
     ID_HIST_DN,
+    ID_EXACT,
+    ID_ICASE,
+    ID_REGEX,
+    ID_RECURSIVE,
+    ID_HIDDEN,
+    ID_FILELIST,
     ID_LAST
     };
 public:
+
+  /// Create find-in-files widget
   FindInFiles(Adie *a);
+
+  /// Create server-side resources
+  virtual void create();
+
+  /// Destroy server-side resources
+  virtual void destroy();
 
   /// Change directory
   void setDirectory(const FXString& path);

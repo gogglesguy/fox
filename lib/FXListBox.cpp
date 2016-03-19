@@ -348,7 +348,7 @@ FXString FXListBox::getItem(FXint index) const {
 
 
 // Replace text of item at index
-FXint FXListBox::setItem(FXint index,const FXString& text,FXIcon* icon,void* ptr,FXbool notify){
+FXint FXListBox::setItem(FXint index,const FXString& text,FXIcon* icon,FXptr ptr,FXbool notify){
   if(index<0 || list->getNumItems()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
   list->setItem(index,text,icon,ptr,notify);
   if(isItemCurrent(index)){
@@ -361,7 +361,7 @@ FXint FXListBox::setItem(FXint index,const FXString& text,FXIcon* icon,void* ptr
 
 
 // Fill list by appending items from array of strings
-FXint FXListBox::fillItems(const FXchar** strings,FXIcon* icon,void* ptr,FXbool notify){
+FXint FXListBox::fillItems(const FXchar** strings,FXIcon* icon,FXptr ptr,FXbool notify){
   register FXint numberofitems=list->getNumItems();
   register FXint n=list->fillItems(strings,icon,ptr,notify);
   if(numberofitems<=list->getCurrentItem()){
@@ -374,7 +374,7 @@ FXint FXListBox::fillItems(const FXchar** strings,FXIcon* icon,void* ptr,FXbool 
 
 
 // Fill list by appending items from newline separated strings
-FXint FXListBox::fillItems(const FXString& strings,FXIcon* icon,void* ptr,FXbool notify){
+FXint FXListBox::fillItems(const FXString& strings,FXIcon* icon,FXptr ptr,FXbool notify){
   register FXint numberofitems=list->getNumItems();
   register FXint n=list->fillItems(strings,icon,ptr,notify);
   if(numberofitems<=list->getCurrentItem()){
@@ -387,7 +387,7 @@ FXint FXListBox::fillItems(const FXString& strings,FXIcon* icon,void* ptr,FXbool
 
 
 // Insert item at index
-FXint FXListBox::insertItem(FXint index,const FXString& text,FXIcon* icon,void* ptr,FXbool notify){
+FXint FXListBox::insertItem(FXint index,const FXString& text,FXIcon* icon,FXptr ptr,FXbool notify){
   if(index<0 || list->getNumItems()<index){ fxerror("%s::insertItem: index out of range.\n",getClassName()); }
   list->insertItem(index,text,icon,ptr,notify);
   if(isItemCurrent(index)){
@@ -400,7 +400,7 @@ FXint FXListBox::insertItem(FXint index,const FXString& text,FXIcon* icon,void* 
 
 
 // Append item
-FXint FXListBox::appendItem(const FXString& text,FXIcon* icon,void* ptr,FXbool notify){
+FXint FXListBox::appendItem(const FXString& text,FXIcon* icon,FXptr ptr,FXbool notify){
   FXint index=list->appendItem(text,icon,ptr,notify);
   if(isItemCurrent(index)){
     field->setIcon(icon);
@@ -412,7 +412,7 @@ FXint FXListBox::appendItem(const FXString& text,FXIcon* icon,void* ptr,FXbool n
 
 
 // Prepend item
-FXint FXListBox::prependItem(const FXString& text,FXIcon* icon,void* ptr,FXbool notify){
+FXint FXListBox::prependItem(const FXString& text,FXIcon* icon,FXptr ptr,FXbool notify){
   FXint index=list->prependItem(text,icon,ptr,notify);
   if(isItemCurrent(index)){
     field->setIcon(icon);
@@ -498,7 +498,7 @@ FXint FXListBox::findItem(const FXString& text,FXint start,FXuint flgs) const {
 
 
 // Get item by data
-FXint FXListBox::findItemByData(const void *ptr,FXint start,FXuint flgs) const {
+FXint FXListBox::findItemByData(FXptr ptr,FXint start,FXuint flgs) const {
   return list->findItemByData(ptr,start,flgs);
   }
 
@@ -532,13 +532,13 @@ FXIcon* FXListBox::getItemIcon(FXint index) const {
 
 
 // Set item data
-void FXListBox::setItemData(FXint index,void* ptr) const {
+void FXListBox::setItemData(FXint index,FXptr ptr) const {
   list->setItemData(index,ptr);
   }
 
 
 // Get item data
-void* FXListBox::getItemData(FXint index) const {
+FXptr FXListBox::getItemData(FXint index) const {
   return list->getItemData(index);
   }
 

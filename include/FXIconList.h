@@ -60,7 +60,7 @@ protected:
   FXString  label;      // Text of item
   FXIcon   *bigIcon;    // Big icon shown in big icon mode
   FXIcon   *miniIcon;   // Mini icon shown in mini icon mode
-  void     *data;       // User data pointer
+  FXptr     data;       // User data pointer
   FXuint    state;      // State flags
 private:
   FXIconItem(const FXIconItem&);
@@ -85,7 +85,7 @@ public:
 public:
 
   /// Construct new item with given text, icons, and user-data
-  FXIconItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,void* ptr=NULL):label(text),bigIcon(bi),miniIcon(mi),data(ptr),state(0){}
+  FXIconItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,FXptr ptr=NULL):label(text),bigIcon(bi),miniIcon(mi),data(ptr),state(0){}
 
   /// Change item's text label
   virtual void setText(const FXString& txt);
@@ -106,10 +106,10 @@ public:
   FXIcon* getMiniIcon() const { return miniIcon; }
 
   /// Change item's user data
-  void setData(void* ptr){ data=ptr; }
+  void setData(FXptr ptr){ data=ptr; }
 
   /// Get item's user data
-  void* getData() const { return data; }
+  FXptr getData() const { return data; }
 
   /// Make item draw as focused
   virtual void setFocus(FXbool focus);
@@ -234,7 +234,7 @@ protected:
   void getrowscols(FXint& nr,FXint& nc,FXint w,FXint h) const;
   void lassoChanged(FXint ox,FXint oy,FXint ow,FXint oh,FXint nx,FXint ny,FXint nw,FXint nh,FXbool notify);
   virtual void moveContents(FXint x,FXint y);
-  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
+  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,FXptr ptr);
   static FXint compareSection(const FXchar *p,const FXchar* q,FXint s);
   static FXint compareSectionCase(const FXchar *p,const FXchar* q,FXint s);
 private:
@@ -396,31 +396,31 @@ public:
   FXint setItem(FXint index,FXIconItem* item,FXbool notify=false);
 
   /// Replace items text, icons, and user-data pointer
-  FXint setItem(FXint index,const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint setItem(FXint index,const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon *big=NULL,FXIcon* mini=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXchar** strings,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from newline separated strings
-  FXint fillItems(const FXString& strings,FXIcon *big=NULL,FXIcon* mini=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXString& strings,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Insert a new [possibly subclassed] item at the give index
   FXint insertItem(FXint index,FXIconItem* item,FXbool notify=false);
 
   /// Insert item at index with given text, icons, and user-data pointer
-  FXint insertItem(FXint index,const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint insertItem(FXint index,const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Append a [possibly subclassed] item to the end of the list
   FXint appendItem(FXIconItem* item,FXbool notify=false);
 
   /// Append new item with given text and optional icons, and user-data pointer
-  FXint appendItem(const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint appendItem(const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Prepend a [possibly subclassed] item to the end of the list
   FXint prependItem(FXIconItem* item,FXbool notify=false);
 
   /// Prepend new item with given text and optional icons, and user-data pointer
-  FXint prependItem(const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint prependItem(const FXString& text,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
   FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
@@ -462,7 +462,7 @@ public:
   * search direction; this can be combined with SEARCH_NOWRAP or SEARCH_WRAP
   * to control whether the search wraps at the start or end of the list.
   */
-  FXint findItemByData(const void *ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
+  FXint findItemByData(FXptr ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
   /// Scroll to make item at index visible
   virtual void makeItemVisible(FXint index);
@@ -486,10 +486,10 @@ public:
   FXIcon* getItemMiniIcon(FXint index) const;
 
   /// Change item user-data pointer
-  void setItemData(FXint index,void* ptr);
+  void setItemData(FXint index,FXptr ptr);
 
   /// Return item user-data pointer
-  void* getItemData(FXint index) const;
+  FXptr getItemData(FXint index) const;
 
   /// Return true if item at index is selected
   FXbool isItemSelected(FXint index) const;

@@ -198,7 +198,7 @@ void FXTabBook::layout(){
       }
     }
 
-  // This will change only if current now invisible
+  // Changes current only if old current no longer visible
   current=newcurrent;
 
   // Left or right tabs
@@ -405,8 +405,18 @@ void FXTabBook::layout(){
 
 // The sender of the message is the item to open up
 long FXTabBook::onCmdOpenItem(FXObject* sender,FXSelector,void*){
-  setCurrent(indexOfChild((FXWindow*)sender)/2,true);
+  setCurrent(indexOfChild((FXWindow*)sender)>>1,true);
   return 1;
+  }
+
+
+// Set current subwindow
+void FXTabBook::setCurrent(FXint index,FXbool notify){
+  if(index!=current && 0<=index && index<(numChildren()>>1)){
+    current=index;
+    recalc();
+    if(notify && target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)current); }
+    }
   }
 
 

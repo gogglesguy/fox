@@ -36,6 +36,7 @@
     scan files that exceed certain size, don't scan files whose first chunk
     of data matches certain pattern (e.g. "PNG" or "GIF89a", etc).
   - Probably need to make this standard re-usable widget.
+  - Keep registry entry for size & position of dialog.
 */
 
 #define HORZ_PAD      12
@@ -51,11 +52,24 @@ FXDEFMAP(FindInFiles) FindInFilesMap[]={
   FXMAPFUNC(SEL_MOUSEWHEEL,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onMouseWheel),
   FXMAPFUNCS(SEL_UPDATE,FindInFiles::ID_HIST_UP,FindInFiles::ID_HIST_DN,FindInFiles::onUpdHistory),
   FXMAPFUNCS(SEL_COMMAND,FindInFiles::ID_HIST_UP,FindInFiles::ID_HIST_DN,FindInFiles::onCmdHistory),
+  FXMAPFUNCS(SEL_UPDATE,FindInFiles::ID_EXACT,FindInFiles::ID_HIDDEN,FindInFiles::onUpdFlags),
+  FXMAPFUNCS(SEL_COMMAND,FindInFiles::ID_EXACT,FindInFiles::ID_HIDDEN,FindInFiles::onCmdFlags),
+  FXMAPFUNC(SEL_DOUBLECLICKED,FindInFiles::ID_FILELIST,FindInFiles::onCmdFileDblClicked),
   };
 
 
 // Object implementation
 FXIMPLEMENT(FindInFiles,FXDialogBox,FindInFilesMap,ARRAYNUMBER(FindInFilesMap))
+
+
+// Search and replace dialog registry section name
+const FXchar FindInFiles::sectionName[]="Find In Files";
+
+
+// Registry keys
+static const FXchar skey[20][3]={
+  "SA","SB","SC","SD","SE","SF","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SP","SQ","SR","SS","ST"
+  };
 
 
 // Construct file in files dialog
@@ -71,11 +85,11 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
   // Options block
   FXHorizontalFrame* frame=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
-  new FXRadioButton(frame,tr("Ex&act"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXRadioButton(frame,tr("I&gnore Case"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXRadioButton(frame,tr("E&xpression"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXCheckButton(frame,tr("&Recursive"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXCheckButton(frame,tr("&Hidden Files"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXRadioButton(frame,tr("Ex&act"),this,ID_EXACT,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXRadioButton(frame,tr("I&gnore Case"),this,ID_ICASE,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXRadioButton(frame,tr("E&xpression"),this,ID_REGEX,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("&Recursive"),this,ID_RECURSIVE,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("&Hidden Files"),this,ID_HIDDEN,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
 
   // Entry block
   FXMatrix *matrix=new FXMatrix(this,3,MATRIX_BY_COLUMNS|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X,0,0,0,0,0,0,0,0);
@@ -83,7 +97,7 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   // Text field with history
   new FXLabel(matrix,tr("S&earch for:"),NULL,JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
   FXHorizontalFrame* searchbox=new FXHorizontalFrame(matrix,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0, 0,0);
-  findstring=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 3,3,3,3);
+  findstring=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXVerticalFrame* searcharrows=new FXVerticalFrame(searchbox,LAYOUT_RIGHT|LAYOUT_FILL_Y|PACK_UNIFORM_HEIGHT,0,0,0,0, 0,0,0,0, 0,0);
   FXArrowButton* ar1=new FXArrowButton(searcharrows,this,ID_HIST_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
   FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_HIST_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
@@ -93,28 +107,87 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
   // Folder to search
   new FXLabel(matrix,tr("In &Folder:"),NULL,JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
-  filefolder=new FXTextField(matrix,40,this,ID_FOLDER_TEXT,JUSTIFY_LEFT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X,0,0,0,0, 3,3,3,3);
+  filefolder=new FXTextField(matrix,40,this,ID_FOLDER_TEXT,JUSTIFY_LEFT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
   new FXButton(matrix,"...",NULL,this,ID_FOLDER,LAYOUT_CENTER_Y|FRAME_RAISED|FRAME_THICK|LAYOUT_FIX_WIDTH,0,0,20,0);
 
   // Filter for files
   new FXLabel(matrix,tr("F&ilter:"),NULL,JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
-  filefilter=new FXComboBox(matrix,10,this,ID_FILTER_TEXT,COMBOBOX_STATIC|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_COLUMN,0,0,0,0, 3,3,3,3);
+  filefilter=new FXComboBox(matrix,10,this,ID_FILTER_TEXT,COMBOBOX_STATIC|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_COLUMN);
   filefilter->setNumVisible(4);
   new FXFrame(matrix,0);
 
   // Matching files
   FXHorizontalFrame* resultbox=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
-  locations=new FXIconList(resultbox,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_DETAILED|ICONLIST_SINGLESELECT);
-  locations->appendHeader("File",NULL,100);
-  locations->appendHeader("Line",NULL,50);
-  locations->appendHeader("Text",NULL,200);
+  locations=new FXIconList(resultbox,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_DETAILED|ICONLIST_SINGLESELECT);
+  locations->appendHeader(tr("File"),NULL,300);
+  locations->appendHeader(tr("Line"),NULL,50);
+  locations->appendHeader(tr("Text"),NULL,200);
 
   // Set title
   setTitle(tr("Find In Files"));
 
   // Initial pattern
   setPatternList(tr("All Files (*)"));
+  
+  // Search flags
+  searchflags=SearchExact;
   index=-1;
+  }
+
+
+// Create server-side resources
+void FindInFiles::create(){
+  setWidth(getApp()->reg().readIntEntry(sectionName,"width",600));
+  setHeight(getApp()->reg().readIntEntry(sectionName,"height",400));
+  history[ 0]=getApp()->reg().readStringEntry(sectionName,skey[ 0],FXString::null);
+  history[ 1]=getApp()->reg().readStringEntry(sectionName,skey[ 1],FXString::null);
+  history[ 2]=getApp()->reg().readStringEntry(sectionName,skey[ 2],FXString::null);
+  history[ 3]=getApp()->reg().readStringEntry(sectionName,skey[ 3],FXString::null);
+  history[ 4]=getApp()->reg().readStringEntry(sectionName,skey[ 4],FXString::null);
+  history[ 5]=getApp()->reg().readStringEntry(sectionName,skey[ 5],FXString::null);
+  history[ 6]=getApp()->reg().readStringEntry(sectionName,skey[ 6],FXString::null);
+  history[ 7]=getApp()->reg().readStringEntry(sectionName,skey[ 7],FXString::null);
+  history[ 8]=getApp()->reg().readStringEntry(sectionName,skey[ 8],FXString::null);
+  history[ 9]=getApp()->reg().readStringEntry(sectionName,skey[ 9],FXString::null);
+  history[10]=getApp()->reg().readStringEntry(sectionName,skey[10],FXString::null);
+  history[11]=getApp()->reg().readStringEntry(sectionName,skey[11],FXString::null);
+  history[12]=getApp()->reg().readStringEntry(sectionName,skey[12],FXString::null);
+  history[13]=getApp()->reg().readStringEntry(sectionName,skey[13],FXString::null);
+  history[14]=getApp()->reg().readStringEntry(sectionName,skey[14],FXString::null);
+  history[15]=getApp()->reg().readStringEntry(sectionName,skey[15],FXString::null);
+  history[16]=getApp()->reg().readStringEntry(sectionName,skey[16],FXString::null);
+  history[17]=getApp()->reg().readStringEntry(sectionName,skey[17],FXString::null);
+  history[18]=getApp()->reg().readStringEntry(sectionName,skey[18],FXString::null);
+  history[19]=getApp()->reg().readStringEntry(sectionName,skey[19],FXString::null);
+  FXDialogBox::create();
+  }
+
+
+// Destroy server-side resources
+void FindInFiles::destroy(){
+  getApp()->reg().writeIntEntry("SETTINGS","width",getWidth());
+  getApp()->reg().writeIntEntry("SETTINGS","height",getHeight());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 0],history[ 0].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 1],history[ 1].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 2],history[ 2].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 3],history[ 3].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 4],history[ 4].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 5],history[ 5].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 6],history[ 6].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 7],history[ 7].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 8],history[ 8].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[ 9],history[ 9].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[10],history[10].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[11],history[11].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[12],history[12].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[13],history[13].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[14],history[14].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[15],history[15].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[16],history[16].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[17],history[17].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[18],history[18].text());
+  getApp()->reg().writeStringEntry(sectionName,skey[19],history[19].text());
+  FXDialogBox::destroy();
   }
 
 
@@ -217,7 +290,7 @@ long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
 
 // Set directory to search in
 long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
-  FXString path=FXFileDialog::getOpenDirectory(this,"Search In Folder",getDirectory());
+  FXString path=FXFileDialog::getOpenDirectory(this,tr("Search In Folder"),getDirectory());
   if(!path.empty()){
     setDirectory(path);
     }
@@ -277,13 +350,6 @@ void FindInFiles::scrollforw(){
     }
   }
 
-// FIXME this should be a widget (FXListSpinner) !!
-
-// Registry keys for history
-static const FXchar regkey[20][3]={
-  "SA","SB","SC","SD","SE","SF","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SP","SQ","SR","SS","ST"
-  };
-
 
 // Update arrows
 long FindInFiles::onUpdHistory(FXObject* sender,FXSelector sel,void*){
@@ -336,6 +402,42 @@ long FindInFiles::onMouseWheel(FXObject*,FXSelector,void* ptr){
   return 1;
   }
 
+
+// Update flags
+long FindInFiles::onUpdFlags(FXObject* sender,FXSelector sel,void*){
+  FXuint value=0;
+  switch(FXSELID(sel)){
+    case ID_EXACT: value=!(searchflags&(SearchCaseFold|SearchRegex)); break;
+    case ID_ICASE: value=(searchflags&SearchCaseFold); break;
+    case ID_REGEX: value=(searchflags&SearchRegex); break;
+    case ID_RECURSIVE: value=(searchflags&SearchRecurse); break;
+    case ID_HIDDEN: value=(searchflags&SeachHidden); break;
+    }
+  sender->handle(this,value?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+
+// Handle flags
+long FindInFiles::onCmdFlags(FXObject*,FXSelector sel,void*){
+  switch(FXSELID(sel)){
+    case ID_EXACT: searchflags=(searchflags&~(SearchCaseFold|SearchRegex)); break;
+    case ID_ICASE: searchflags=(searchflags&~SearchRegex)|SearchCaseFold; break;
+    case ID_REGEX: searchflags=(searchflags&~SearchCaseFold)|SearchRegex; break;
+    case ID_RECURSIVE: searchflags^=SearchRecurse; break;
+    case ID_HIDDEN: searchflags^=SeachHidden; break;
+    }
+  return 1;
+  }
+
+
+// File list double clicked
+long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
+  FXint index=(FXint)(FXival)ptr;
+  return 1;
+  }
+  
 
 // Clean up
 FindInFiles::~FindInFiles(){

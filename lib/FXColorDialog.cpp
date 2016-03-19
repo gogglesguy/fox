@@ -59,6 +59,10 @@ using namespace FX;
 
 namespace FX {
 
+// Color dialog registry section name
+const FXchar FXColorDialog::sectionName[]="Color Dialog";
+
+
 // Map
 FXDEFMAP(FXColorDialog) FXColorDialogMap[]={
   FXMAPFUNC(SEL_CHANGED,FXColorDialog::ID_COLORSELECTOR,FXColorDialog::onChgColor),
@@ -94,62 +98,62 @@ FXColorDialog::FXColorDialog(FXApp* a,const FXString& name,FXuint opts,FXint x,F
 
 // Create server-side resources
 void FXColorDialog::create(){
-  setActivePanel(getApp()->reg().readIntEntry("Color Dialog","activecolorpane",COLORTAB_COLOR_RING));
-  setWellColor( 0,getApp()->reg().readColorEntry("Color Dialog","WA",FXRGBA(255,255,255,255)));
-  setWellColor( 1,getApp()->reg().readColorEntry("Color Dialog","WB",FXRGBA(204,204,204,255)));
-  setWellColor( 2,getApp()->reg().readColorEntry("Color Dialog","WC",FXRGBA(153,153,153,255)));
-  setWellColor( 3,getApp()->reg().readColorEntry("Color Dialog","WD",FXRGBA(102,102,102,255)));
-  setWellColor( 4,getApp()->reg().readColorEntry("Color Dialog","WE",FXRGBA( 51, 51, 51,255)));
-  setWellColor( 5,getApp()->reg().readColorEntry("Color Dialog","WF",FXRGBA(  0,  0,  0,255)));
-  setWellColor( 6,getApp()->reg().readColorEntry("Color Dialog","WG",FXRGBA(255,  0,  0,255)));
-  setWellColor( 7,getApp()->reg().readColorEntry("Color Dialog","WH",FXRGBA(  0,255,  0,255)));
-  setWellColor( 8,getApp()->reg().readColorEntry("Color Dialog","WI",FXRGBA(  0,  0,255,255)));
-  setWellColor( 9,getApp()->reg().readColorEntry("Color Dialog","WJ",FXRGBA(  0,255,255,255)));
-  setWellColor(10,getApp()->reg().readColorEntry("Color Dialog","WK",FXRGBA(255,255,  0,255)));
-  setWellColor(11,getApp()->reg().readColorEntry("Color Dialog","WL",FXRGBA(255,  0,255,255)));
-  setWellColor(12,getApp()->reg().readColorEntry("Color Dialog","WM",FXRGBA(255,165,  0,255)));
-  setWellColor(13,getApp()->reg().readColorEntry("Color Dialog","WN",FXRGBA(153,  0,  0,255)));
-  setWellColor(14,getApp()->reg().readColorEntry("Color Dialog","WO",FXRGBA(  0,153,  0,255)));
-  setWellColor(15,getApp()->reg().readColorEntry("Color Dialog","WP",FXRGBA(  0,  0,153,255)));
-  setWellColor(16,getApp()->reg().readColorEntry("Color Dialog","WQ",FXRGBA(  0,153,153,255)));
-  setWellColor(17,getApp()->reg().readColorEntry("Color Dialog","WR",FXRGBA(153,153,  0,255)));
-  setWellColor(18,getApp()->reg().readColorEntry("Color Dialog","WS",FXRGBA(153,  0,153,255)));
-  setWellColor(19,getApp()->reg().readColorEntry("Color Dialog","WT",FXRGBA(255,175,175,255)));
-  setWellColor(20,getApp()->reg().readColorEntry("Color Dialog","WU",FXRGBA(175,255,175,255)));
-  setWellColor(21,getApp()->reg().readColorEntry("Color Dialog","WV",FXRGBA(175,175,255,255)));
-  setWellColor(22,getApp()->reg().readColorEntry("Color Dialog","WW",FXRGBA(175,255,255,255)));
-  setWellColor(23,getApp()->reg().readColorEntry("Color Dialog","WX",FXRGBA(255,255,175,255)));
+  setActivePanel(getApp()->reg().readIntEntry(sectionName,"activecolorpane",COLORTAB_COLOR_RING));
+  setWellColor( 0,getApp()->reg().readColorEntry(sectionName,"WA",FXRGBA(255,255,255,255)));
+  setWellColor( 1,getApp()->reg().readColorEntry(sectionName,"WB",FXRGBA(204,204,204,255)));
+  setWellColor( 2,getApp()->reg().readColorEntry(sectionName,"WC",FXRGBA(153,153,153,255)));
+  setWellColor( 3,getApp()->reg().readColorEntry(sectionName,"WD",FXRGBA(102,102,102,255)));
+  setWellColor( 4,getApp()->reg().readColorEntry(sectionName,"WE",FXRGBA( 51, 51, 51,255)));
+  setWellColor( 5,getApp()->reg().readColorEntry(sectionName,"WF",FXRGBA(  0,  0,  0,255)));
+  setWellColor( 6,getApp()->reg().readColorEntry(sectionName,"WG",FXRGBA(255,  0,  0,255)));
+  setWellColor( 7,getApp()->reg().readColorEntry(sectionName,"WH",FXRGBA(  0,255,  0,255)));
+  setWellColor( 8,getApp()->reg().readColorEntry(sectionName,"WI",FXRGBA(  0,  0,255,255)));
+  setWellColor( 9,getApp()->reg().readColorEntry(sectionName,"WJ",FXRGBA(  0,255,255,255)));
+  setWellColor(10,getApp()->reg().readColorEntry(sectionName,"WK",FXRGBA(255,255,  0,255)));
+  setWellColor(11,getApp()->reg().readColorEntry(sectionName,"WL",FXRGBA(255,  0,255,255)));
+  setWellColor(12,getApp()->reg().readColorEntry(sectionName,"WM",FXRGBA(255,165,  0,255)));
+  setWellColor(13,getApp()->reg().readColorEntry(sectionName,"WN",FXRGBA(153,  0,  0,255)));
+  setWellColor(14,getApp()->reg().readColorEntry(sectionName,"WO",FXRGBA(  0,153,  0,255)));
+  setWellColor(15,getApp()->reg().readColorEntry(sectionName,"WP",FXRGBA(  0,  0,153,255)));
+  setWellColor(16,getApp()->reg().readColorEntry(sectionName,"WQ",FXRGBA(  0,153,153,255)));
+  setWellColor(17,getApp()->reg().readColorEntry(sectionName,"WR",FXRGBA(153,153,  0,255)));
+  setWellColor(18,getApp()->reg().readColorEntry(sectionName,"WS",FXRGBA(153,  0,153,255)));
+  setWellColor(19,getApp()->reg().readColorEntry(sectionName,"WT",FXRGBA(255,175,175,255)));
+  setWellColor(20,getApp()->reg().readColorEntry(sectionName,"WU",FXRGBA(175,255,175,255)));
+  setWellColor(21,getApp()->reg().readColorEntry(sectionName,"WV",FXRGBA(175,175,255,255)));
+  setWellColor(22,getApp()->reg().readColorEntry(sectionName,"WW",FXRGBA(175,255,255,255)));
+  setWellColor(23,getApp()->reg().readColorEntry(sectionName,"WX",FXRGBA(255,255,175,255)));
   FXDialogBox::create();
   }
 
 
 // Destroy server-side resources
 void FXColorDialog::destroy(){
-  getApp()->reg().writeIntEntry("Color Dialog","activecolorpane",getActivePanel());
-  getApp()->reg().writeColorEntry("Color Dialog","WA",getWellColor( 0));
-  getApp()->reg().writeColorEntry("Color Dialog","WB",getWellColor( 1));
-  getApp()->reg().writeColorEntry("Color Dialog","WC",getWellColor( 2));
-  getApp()->reg().writeColorEntry("Color Dialog","WD",getWellColor( 3));
-  getApp()->reg().writeColorEntry("Color Dialog","WE",getWellColor( 4));
-  getApp()->reg().writeColorEntry("Color Dialog","WF",getWellColor( 5));
-  getApp()->reg().writeColorEntry("Color Dialog","WG",getWellColor( 6));
-  getApp()->reg().writeColorEntry("Color Dialog","WH",getWellColor( 7));
-  getApp()->reg().writeColorEntry("Color Dialog","WI",getWellColor( 8));
-  getApp()->reg().writeColorEntry("Color Dialog","WJ",getWellColor( 9));
-  getApp()->reg().writeColorEntry("Color Dialog","WK",getWellColor(10));
-  getApp()->reg().writeColorEntry("Color Dialog","WL",getWellColor(11));
-  getApp()->reg().writeColorEntry("Color Dialog","WM",getWellColor(12));
-  getApp()->reg().writeColorEntry("Color Dialog","WN",getWellColor(13));
-  getApp()->reg().writeColorEntry("Color Dialog","WO",getWellColor(14));
-  getApp()->reg().writeColorEntry("Color Dialog","WP",getWellColor(15));
-  getApp()->reg().writeColorEntry("Color Dialog","WQ",getWellColor(16));
-  getApp()->reg().writeColorEntry("Color Dialog","WR",getWellColor(17));
-  getApp()->reg().writeColorEntry("Color Dialog","WS",getWellColor(18));
-  getApp()->reg().writeColorEntry("Color Dialog","WT",getWellColor(19));
-  getApp()->reg().writeColorEntry("Color Dialog","WU",getWellColor(20));
-  getApp()->reg().writeColorEntry("Color Dialog","WV",getWellColor(21));
-  getApp()->reg().writeColorEntry("Color Dialog","WW",getWellColor(22));
-  getApp()->reg().writeColorEntry("Color Dialog","WX",getWellColor(23));
+  getApp()->reg().writeIntEntry(sectionName,"activecolorpane",getActivePanel());
+  getApp()->reg().writeColorEntry(sectionName,"WA",getWellColor( 0));
+  getApp()->reg().writeColorEntry(sectionName,"WB",getWellColor( 1));
+  getApp()->reg().writeColorEntry(sectionName,"WC",getWellColor( 2));
+  getApp()->reg().writeColorEntry(sectionName,"WD",getWellColor( 3));
+  getApp()->reg().writeColorEntry(sectionName,"WE",getWellColor( 4));
+  getApp()->reg().writeColorEntry(sectionName,"WF",getWellColor( 5));
+  getApp()->reg().writeColorEntry(sectionName,"WG",getWellColor( 6));
+  getApp()->reg().writeColorEntry(sectionName,"WH",getWellColor( 7));
+  getApp()->reg().writeColorEntry(sectionName,"WI",getWellColor( 8));
+  getApp()->reg().writeColorEntry(sectionName,"WJ",getWellColor( 9));
+  getApp()->reg().writeColorEntry(sectionName,"WK",getWellColor(10));
+  getApp()->reg().writeColorEntry(sectionName,"WL",getWellColor(11));
+  getApp()->reg().writeColorEntry(sectionName,"WM",getWellColor(12));
+  getApp()->reg().writeColorEntry(sectionName,"WN",getWellColor(13));
+  getApp()->reg().writeColorEntry(sectionName,"WO",getWellColor(14));
+  getApp()->reg().writeColorEntry(sectionName,"WP",getWellColor(15));
+  getApp()->reg().writeColorEntry(sectionName,"WQ",getWellColor(16));
+  getApp()->reg().writeColorEntry(sectionName,"WR",getWellColor(17));
+  getApp()->reg().writeColorEntry(sectionName,"WS",getWellColor(18));
+  getApp()->reg().writeColorEntry(sectionName,"WT",getWellColor(19));
+  getApp()->reg().writeColorEntry(sectionName,"WU",getWellColor(20));
+  getApp()->reg().writeColorEntry(sectionName,"WV",getWellColor(21));
+  getApp()->reg().writeColorEntry(sectionName,"WW",getWellColor(22));
+  getApp()->reg().writeColorEntry(sectionName,"WX",getWellColor(23));
   FXDialogBox::destroy();
   }
 

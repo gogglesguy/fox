@@ -198,7 +198,6 @@
 +FXPPMIcon.obj &
 +FXPPMImage.obj &
 +FXPacker.obj &
-+FXParallel.obj &
 +FXPath.obj &
 +FXPicker.obj &
 +FXPipe.obj &
@@ -271,6 +270,7 @@
 +FXTabBook.obj &
 +FXTabItem.obj &
 +FXTable.obj &
++FXTaskGroup.obj &
 +FXText.obj &
 +FXTextCodec.obj &
 +FXTextField.obj &

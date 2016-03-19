@@ -95,6 +95,7 @@
 #include "FXWorker.h"
 #include "FXLFQueue.h"
 #include "FXThreadPool.h"
+#include "FXTaskGroup.h"
 #include "FXParallel.h"
 #include "FXFont.h"
 #include "FXCursor.h"

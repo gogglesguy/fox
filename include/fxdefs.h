@@ -687,6 +687,12 @@ extern FXAPI void fxrgb_to_hsl(FXfloat& h,FXfloat& s,FXfloat& l,FXfloat r,FXfloa
 /// Convert HSL to RGB
 extern FXAPI void fxhsl_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat l);
 
+/// Encode src to dst in base64
+extern FXint fxencode64(FXchar* dst,const FXchar* src,FXint len);
+
+/// Decode src to dst from base64
+extern FXint fxdecode64(FXchar* dst,const FXchar* src,FXint len);
+
 /// Float number classification: 0=OK, +/-1=Inf, +/-2=NaN
 extern FXAPI FXint fxieeefloatclass(FXfloat number);
 

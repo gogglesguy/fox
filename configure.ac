@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [38])
+m4_define([fox_level], [39])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -109,6 +109,9 @@ AC_CHECK_LIB(dld, shl_load)
 # Check thread functions
 AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r pthread_setaffinity_np)
 
+# Check for common functions
+AC_CHECK_FUNCS(statvfs)
+
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
   CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow"
@@ -171,9 +174,6 @@ AC_CHECK_HEADERS([sys/mount.h])
 AC_CHECK_HEADERS([semaphore.h])
 AC_CHECK_HEADERS([dlfcn.h])
 AC_CHECK_HEADERS([sys/statvfs.h])
-
-# Check for common functions
-AC_CHECK_FUNCS([statvfs])
 
 # SSE/SSE2/SSE3
 SAVE_CPPFLAGS=$CPPFLAGS

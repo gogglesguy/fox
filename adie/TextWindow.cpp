@@ -853,10 +853,12 @@ FXbool TextWindow::isModified() const {
   return !undolist.marked();
   }
 
+
 // Set editable flag
 void TextWindow::setEditable(FXbool edit){
   editor->setEditable(edit);
   }
+
 
 // Is it editable
 FXbool TextWindow::isEditable() const {

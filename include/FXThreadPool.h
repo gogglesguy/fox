@@ -136,9 +136,11 @@ public:
   static void instance(FXThreadPool *pool);
 
   /**
-  * Start the thread pool with an initial number of threads
-  * equal to count.
+  * Start the thread pool with an initial number of threads equal to count.
   * Returns the number of threads actually started.
+  * An association will be established between the calling thread and the thread pool.  
+  * This association lasts until stop() is called.  If another threadpool was already started 
+  * before by the calling thread, no new association will be established.
   */
   FXuint start(FXuint count=0);
 
@@ -190,8 +192,10 @@ public:
 
   /**
   * Stop context.
-  * Enter the task-processing loop and help the worker-threads until the
-  * task queue is empty.  Then stop all worker threads and return true.
+  * Enter the task-processing loop and help the worker-threads until the task queue is 
+  * empty, and all tasks have finished executing.
+  * The association between the calling thread, established when start() was called,
+  * will hereby be dissolved, if the calling thread was associated with this thread pool.
   * Return false if the thread pool wasn't running.
   */
   FXbool stop();

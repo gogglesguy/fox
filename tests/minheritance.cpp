@@ -161,7 +161,7 @@ public:
 /*******************************************************************************/
 
 Base1::Base1(){
-  FXTRACE((100,"Base1::Base1 at %08lx\n",(unsigned long)this));
+  FXTRACE((100,"Base1::Base1 at %08p\n",this));
   a=1;
   }
 
@@ -180,12 +180,12 @@ FXDEFMAP(Base2) Base2Map[]={
 FXIMPLEMENT(Base2,FXObject,Base2Map,ARRAYNUMBER(Base2Map))
 
 Base2::Base2(){
-  FXTRACE((100,"Base2::Base2 at %08lx\n",(unsigned long)this));
+  FXTRACE((100,"Base2::Base2 at %08p\n",this));
   b=2;
   }
 
 long Base2::onCmdBase2(FXObject*,FXSelector,void*){
-  FXTRACE((100,"Base2::onCmdBase2 at %08lx b=%d\n",(unsigned long)this,b));
+  FXTRACE((100,"Base2::onCmdBase2 at %08p b=%d\n",this,b));
   return 1;
   }
 
@@ -198,7 +198,7 @@ Base2::~Base2(){
 
 
 Base3::Base3(){
-  FXTRACE((100,"Base3::Base3 at %08lx\n",(unsigned long)this));
+  FXTRACE((100,"Base3::Base3 at %08p\n",this));
   c=3;
   }
 
@@ -219,12 +219,12 @@ FXDEFMAP(TwoBaseOne) TwoBaseOneMap[]={
 FXIMPLEMENT(TwoBaseOne,Base2,TwoBaseOneMap,ARRAYNUMBER(TwoBaseOneMap))
 
 TwoBaseOne::TwoBaseOne(){
-  FXTRACE((100,"TwoBaseOne::TwoBaseOne at %08lx\n",(unsigned long)this));
+  FXTRACE((100,"TwoBaseOne::TwoBaseOne at %08p\n",this));
   d=4;
   }
 
 long TwoBaseOne::onCmdTwoBaseOne(FXObject*,FXSelector,void*){
-  FXTRACE((100,"TwoBaseOne::onCmdTwoBaseOne at %08lx d=%d\n",(unsigned long)this,d));
+  FXTRACE((100,"TwoBaseOne::onCmdTwoBaseOne at %08p d=%d\n",this,d));
   return 1;
   }
 
@@ -242,12 +242,12 @@ FXDEFMAP(TwoBaseTwo) TwoBaseTwoMap[]={
 FXIMPLEMENT(TwoBaseTwo,Base2,TwoBaseTwoMap,ARRAYNUMBER(TwoBaseTwoMap))
 
 TwoBaseTwo::TwoBaseTwo(){
-  FXTRACE((100,"TwoBaseTwo::TwoBaseTwo at %08lx\n",(unsigned long)this));
+  FXTRACE((100,"TwoBaseTwo::TwoBaseTwo at %08p\n",this));
   e=4;
   }
 
 long TwoBaseTwo::onCmdTwoBaseTwo(FXObject*,FXSelector,void*){
-  FXTRACE((100,"TwoBaseTwo::onCmdTwoBaseTwo at %08lx e=%d\n",(unsigned long)this,e));
+  FXTRACE((100,"TwoBaseTwo::onCmdTwoBaseTwo at %08p e=%d\n",this,e));
   return 1;
   }
 
@@ -268,12 +268,12 @@ FXDEFMAP(ThreeBase) ThreeBaseMap[]={
 FXIMPLEMENT(ThreeBase,TwoBaseOne,ThreeBaseMap,ARRAYNUMBER(ThreeBaseMap))
 
 ThreeBase::ThreeBase(){
-  FXTRACE((100,"ThreeBase::ThreeBase at %08lx\n",(unsigned long)this));
+  FXTRACE((100,"ThreeBase::ThreeBase at %08p\n",this));
   f=5;
   }
 
 long ThreeBase::onCmdThreeBase(FXObject*,FXSelector,void*){
-  FXTRACE((100,"ThreeBase::onCmdThreeBase at %08lx f=%d\n",(unsigned long)this,f));
+  FXTRACE((100,"ThreeBase::onCmdThreeBase at %08p f=%d\n",this,f));
   return 1;
   }
 

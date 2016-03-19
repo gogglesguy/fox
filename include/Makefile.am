@@ -292,6 +292,7 @@ FXTabBar.h \
 FXTabBook.h \
 FXTabItem.h \
 FXTable.h \
+FXTaskGroup.h \
 FXText.h \
 FXTextCodec.h \
 FXTextField.h \

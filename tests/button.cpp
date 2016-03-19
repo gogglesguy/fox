@@ -423,25 +423,11 @@ int main(int argc,char *argv[]){
   // Open display
   application.init(argc,argv);
 
-//FXWindow *buttons=NULL;
-
-//  if(argc>1){
-//    FXFileStream stream;
-//    stream.open(argv[1],FXStreamLoad);
-//    application.readWindow(stream,buttons,application.getRootWindow(),application.getRootWindow());
-//    stream.close();
-//    application.dumpWidgets();
-//    }
-
-//  else{
-    // Main window
-    new ButtonWindow(&application);
-//   }
-
+  // Main window
+  new ButtonWindow(&application);
 
   // Create app
   application.create();
-//if(buttons) buttons->show();
 
   // Run
   return application.run();

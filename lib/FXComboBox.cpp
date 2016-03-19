@@ -411,7 +411,7 @@ FXString FXComboBox::getItem(FXint index) const {
 
 
 // Replace text of item at index
-FXint FXComboBox::setItem(FXint index,const FXString& text,void* ptr,FXbool notify){
+FXint FXComboBox::setItem(FXint index,const FXString& text,FXptr ptr,FXbool notify){
   if(index<0 || list->getNumItems()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
   list->setItem(index,text,NULL,ptr);
   recalc();
@@ -447,7 +447,7 @@ FXint FXComboBox::fillItems(const FXString& strings,FXbool notify){
 
 
 // Insert item at index
-FXint FXComboBox::insertItem(FXint index,const FXString& text,void* ptr,FXbool notify){
+FXint FXComboBox::insertItem(FXint index,const FXString& text,FXptr ptr,FXbool notify){
   if(index<0 || list->getNumItems()<index){ fxerror("%s::insertItem: index out of range.\n",getClassName()); }
   list->insertItem(index,text,NULL,ptr);
   recalc();
@@ -459,7 +459,7 @@ FXint FXComboBox::insertItem(FXint index,const FXString& text,void* ptr,FXbool n
 
 
 // Append item
-FXint FXComboBox::appendItem(const FXString& text,void* ptr,FXbool notify){
+FXint FXComboBox::appendItem(const FXString& text,FXptr ptr,FXbool notify){
   FXint index=list->appendItem(text,NULL,ptr);
   recalc();
   if(isItemCurrent(index)){
@@ -531,7 +531,7 @@ FXint FXComboBox::findItem(const FXString& text,FXint start,FXuint flgs) const {
 
 
 // Get item by data
-FXint FXComboBox::findItemByData(const void *ptr,FXint start,FXuint flgs) const {
+FXint FXComboBox::findItemByData(FXptr ptr,FXint start,FXuint flgs) const {
   return list->findItemByData(ptr,start,flgs);
   }
 
@@ -553,13 +553,13 @@ FXString FXComboBox::getItemText(FXint index) const {
 
 
 // Set item data
-void FXComboBox::setItemData(FXint index,void* ptr) const {
+void FXComboBox::setItemData(FXint index,FXptr ptr) const {
   list->setItemData(index,ptr);
   }
 
 
 // Get item data
-void* FXComboBox::getItemData(FXint index) const {
+FXptr FXComboBox::getItemData(FXint index) const {
   return list->getItemData(index);
   }
 

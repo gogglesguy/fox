@@ -1744,6 +1744,80 @@ language "TDL"
 end
 
 
+# Ada Programming Language
+language "Ada"
+
+  # File patterns for this language mode
+  filesmatch "*.ada,*.ad,*.ads,*.adb,*.a,*.ADA,*.AD,*.ADS,*.ADB,*.A"
+  
+  contextlines 1
+
+  # Word delimiters
+  delimiters "~.,/\`'!@$%^&*()-=+{}|[]\":;<>?"
+
+  # Comment
+  rule "Comment"
+    openpattern   "--"
+    closepattern  "$"
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+  end
+
+  # Char constant
+  rule "Char"
+    pattern     "'([^\\]|\\.)'"
+  end
+
+  # Pragma
+  rule "Pragma"
+    pattern     "(?n(?ipragma)\s+\l[\l\d]*(?:_\l[\l\d]*)*\s*\([^)]*\)\s*;)"
+  end
+
+  rule "Attribute"
+    pattern     "(?i'size\s+(use)>)|'\l[\l\d]*(?:_[\l\d]+)*"
+  end
+
+  # Statement label
+  rule "Label"
+    pattern     "<<\l[\l\d]*(_[\l\d]+)*>>"
+  end
+
+  # Based number
+  rule "BasedNumber"
+    pattern     "(\d+(_\d+)*#\h+(_\h+)*(\.\h+(_\h+)*)?#([eE][-+]?\d+(_\d+)*)?)"
+  end
+
+  # Decimal number
+  rule "Number"
+    pattern     "(\d+(_\d+)*(\.\d+(_\d+)*)?([eE][-+]?\d+(_\d+)*)?)"
+  end
+
+  # Reserved keywords
+  rule "Keyword"
+    pattern     "\<(?iabort|abstract|abs|accept|access|aliased|all|and|array|at|begin|body|case|constant|declare|delay|delta|digits|do|else|elsif|end|entry|exception|exit|for|function|generic|goto|if|interface|in|is|limited|loop|mod|new|nor|not|null|of|or|others|out|overriding|package|pragma|private|procedure|protected|raise|range|record|rem|renames|requeue|return|reverse|select|separate|some|subtype|synchronized|tagged|task|terminate|then|type|until|use|when|while|with|xor)\>"
+  end
+
+  # Operators
+  rule "Operator"
+    pattern     "(=|/=|<=|<|>=|>|\+|-|&|\*\*|\*|/|:=|:)"
+  end
+
+  # Types
+  rule "Types"
+    pattern     "\<(boolean|character|count|duration|float|integer|long_float|long_integer|priority|short_float|short_integer|string)\>"
+  end
+
+  # Identifiers
+  rule "Identifier"
+    pattern     "\<(\l[\l\d]*(_[\l\d]+)*)\>"
+  end
+end
+
 
 # C++ programming language
 language "Go"

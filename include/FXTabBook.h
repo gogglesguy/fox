@@ -66,6 +66,14 @@ public:
   /// Construct tab book
   FXTabBook(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=TABBOOK_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_SPACING,FXint pr=DEFAULT_SPACING,FXint pt=DEFAULT_SPACING,FXint pb=DEFAULT_SPACING);
 
+  /**
+  * Change currently active tab item; this raises the active tab item
+  * slightly above the neighboring tab items.  If notify=true then the
+  * tab bar will also send a SEL_COMMAND message to its target, containing
+  * the currently active tab index in the void pointer.
+  */
+  virtual void setCurrent(FXint index,FXbool notify=false);
+
   /// Perform layout
   virtual void layout();
 

@@ -117,7 +117,7 @@ void printusage(const char* prog){
   fxmessage("  -W, --wait                  Calling thread waits.\n");
   fxmessage("  -h, --help                  Print help.\n");
   fxmessage("  -Q, --queue                 Test job queue.\n");
-  fxmessage("  -C, --context               Test task context.\n");
+  fxmessage("  -P, --pool                  Test thread pool.\n");
   fxmessage("  -G, --group                 Test task group.\n");
   }
 
@@ -183,7 +183,7 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"-Q")==0 || strcmp(argv[arg],"--queue")==0){
       test=0;
       }
-    else if(strcmp(argv[arg],"-C")==0 || strcmp(argv[arg],"--context")==0){
+    else if(strcmp(argv[arg],"-P")==0 || strcmp(argv[arg],"--pool")==0){
       test=1;
       }
     else if(strcmp(argv[arg],"-G")==0 || strcmp(argv[arg],"--group")==0){
@@ -283,10 +283,6 @@ int main(int argc,char* argv[]){
     fxmessage("8-way parallel call...\n");
     FXParallelInvoke(churn,churn,churn,churn,churn,churn,churn,churn);
     fxmessage("...done\n");
-
-//    FXParallelInvoke(churnSplit,churnSplit,churnSplit);
-
-//    fxmessage("next...\n");
 
     fxmessage("8-way parallel for-loop...\n");
     FXParallelFor(0,100,1,8,looping);

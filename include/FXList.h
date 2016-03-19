@@ -51,7 +51,7 @@ class FXAPI FXListItem : public FXObject {
 protected:
   FXString  label;
   FXIcon   *icon;
-  void     *data;
+  FXptr     data;
   FXuint    state;
   FXint     x,y;
 private:
@@ -72,7 +72,7 @@ public:
 public:
 
   /// Construct new item with given text, icon, and user-data
-  FXListItem(const FXString& text,FXIcon* ic=NULL,void* ptr=NULL):label(text),icon(ic),data(ptr),state(0),x(0),y(0){}
+  FXListItem(const FXString& text,FXIcon* ic=NULL,FXptr ptr=NULL):label(text),icon(ic),data(ptr),state(0),x(0),y(0){}
 
   /// Change item's text label
   virtual void setText(const FXString& txt);
@@ -87,10 +87,10 @@ public:
   FXIcon* getIcon() const { return icon; }
 
   /// Change item's user data
-  void setData(void* ptr){ data=ptr; }
+  void setData(FXptr ptr){ data=ptr; }
 
   /// Get item's user data
-  void* getData() const { return data; }
+  FXptr getData() const { return data; }
 
   /// Make item draw as focused
   virtual void setFocus(FXbool focus);
@@ -193,7 +193,7 @@ protected:
 protected:
   FXList();
   void recompute();
-  virtual FXListItem *createItem(const FXString& text,FXIcon* icon,void* ptr);
+  virtual FXListItem *createItem(const FXString& text,FXIcon* icon,FXptr ptr);
 private:
   FXList(const FXList&);
   FXList &operator=(const FXList&);
@@ -287,31 +287,31 @@ public:
   FXint setItem(FXint index,FXListItem* item,FXbool notify=false);
 
   /// Replace items text, icon, and user-data pointer
-  FXint setItem(FXint index,const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint setItem(FXint index,const FXString& text,FXIcon *icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from newline separated strings
-  FXint fillItems(const FXString& strings,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXString& strings,FXIcon *icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Insert a new [possibly subclassed] item at the give index
   FXint insertItem(FXint index,FXListItem* item,FXbool notify=false);
 
   /// Insert item at index with given text, icon, and user-data pointer
-  FXint insertItem(FXint index,const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint insertItem(FXint index,const FXString& text,FXIcon *icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Append a [possibly subclassed] item to the list
   FXint appendItem(FXListItem* item,FXbool notify=false);
 
   /// Append new item with given text and optional icon, and user-data pointer
-  FXint appendItem(const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint appendItem(const FXString& text,FXIcon *icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Prepend a [possibly subclassed] item to the list
   FXint prependItem(FXListItem* item,FXbool notify=false);
 
   /// Prepend new item with given text and optional icon, and user-data pointer
-  FXint prependItem(const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint prependItem(const FXString& text,FXIcon *icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
   FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
@@ -356,7 +356,7 @@ public:
   * search direction; this can be combined with SEARCH_NOWRAP or SEARCH_WRAP
   * to control whether the search wraps at the start or end of the list.
   */
-  FXint findItemByData(const void *ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
+  FXint findItemByData(FXptr ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
   /// Scroll to bring item into view
   virtual void makeItemVisible(FXint index);
@@ -374,10 +374,10 @@ public:
   FXIcon* getItemIcon(FXint index) const;
 
   /// Change item user-data pointer
-  void setItemData(FXint index,void* ptr);
+  void setItemData(FXint index,FXptr ptr);
 
   /// Return item user-data pointer
-  void* getItemData(FXint index) const;
+  FXptr getItemData(FXint index) const;
 
   /// Return true if item is selected
   FXbool isItemSelected(FXint index) const;

@@ -587,7 +587,7 @@ FXbool FXStat::modified(const FXString& file,FXTime ns){
       CloseHandle(hnd);
       }
 #else
-#if defined(_ATFILE_SOURCE) || (_XOPEN_SOURCE > 700 || _POSIX_C_SOURCE >= 200809)
+#if defined(_ATFILE_SOURCE)
     const FXTime seconds=1000000000;
     struct timespec values[2];
     values[0].tv_sec=UTIME_OMIT;
@@ -642,7 +642,7 @@ FXbool FXStat::accessed(const FXString& file,FXTime ns){
       CloseHandle(hnd);
       }
 #else
-#if defined(_ATFILE_SOURCE) || (_XOPEN_SOURCE > 700 || _POSIX_C_SOURCE >= 200809)
+#if defined(_ATFILE_SOURCE)
     const FXTime seconds=1000000000;
     struct timespec values[2];
     values[0].tv_sec=ns/seconds;

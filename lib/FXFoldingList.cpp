@@ -2174,7 +2174,7 @@ void FXFoldingList::setAnchorItem(FXFoldingItem* item){
 
 
 // Create item
-FXFoldingItem* FXFoldingList::createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr){
+FXFoldingItem* FXFoldingList::createItem(const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr){
   return new FXFoldingItem(text,oi,ci,ptr);
   }
 
@@ -2248,7 +2248,7 @@ FXFoldingItem* FXFoldingList::insertItem(FXFoldingItem* other,FXFoldingItem* fat
 
 
 // Insert item under father before other item
-FXFoldingItem* FXFoldingList::insertItem(FXFoldingItem* other,FXFoldingItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXFoldingItem* FXFoldingList::insertItem(FXFoldingItem* other,FXFoldingItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   return insertItem(other,father,createItem(text,oi,ci,ptr),notify);
   }
 
@@ -2260,7 +2260,7 @@ FXFoldingItem* FXFoldingList::appendItem(FXFoldingItem* father,FXFoldingItem* it
 
 
 // Append item under father
-FXFoldingItem* FXFoldingList::appendItem(FXFoldingItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXFoldingItem* FXFoldingList::appendItem(FXFoldingItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   return insertItem(NULL,father,createItem(text,oi,ci,ptr),notify);
   }
 
@@ -2271,13 +2271,13 @@ FXFoldingItem* FXFoldingList::prependItem(FXFoldingItem* father,FXFoldingItem* i
   }
 
 // Prepend item under father
-FXFoldingItem* FXFoldingList::prependItem(FXFoldingItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXFoldingItem* FXFoldingList::prependItem(FXFoldingItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   return insertItem(father?father->first:firstitem,father,createItem(text,oi,ci,ptr),notify);
   }
 
 
 // Fill list by appending items from array of strings
-FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){
@@ -2289,7 +2289,7 @@ FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXchar** strings,FXIc
 
 
 // Fill list by appending items from newline separated strings
-FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXString& strings,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXString& strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   register FXint beg=0,end=0,n=0;
   while(end<strings.length()){
     beg=end;
@@ -2540,7 +2540,7 @@ FXFoldingItem* FXFoldingList::findItem(const FXString& text,FXFoldingItem* start
 
 
 // Get item by data
-FXFoldingItem* FXFoldingList::findItemByData(const void *ptr,FXFoldingItem* start,FXuint flgs) const {
+FXFoldingItem* FXFoldingList::findItemByData(FXptr ptr,FXFoldingItem* start,FXuint flgs) const {
   register FXFoldingItem *item;
   if(firstitem){
     if(flgs&SEARCH_BACKWARD){

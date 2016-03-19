@@ -74,7 +74,6 @@ public:
     Unicode    = 32     /// Unicode mode
     };
 
-
   /// Regular expression match flags
   enum {
     Forward    = 0,     /// Match scanning forward from offset

@@ -17,6 +17,47 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+May 12 - FOX DEVELOPMENT 1.7.39
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Small changes to return types in FXIO (and subclasses) for flush(), eof().</li>
+<li>FXSemaphore implemented in terms of mutex and condition on MacOSX and Minix.</li>
+<li>FXMat4d and FXMat2d AVX accelerated when compiled for AVX.</li>
+<li>ADA programming language patterns added to Adie's syntax file.</li>
+<li>Fix in PathFinder escapement of filenames prior to spawning process to open document.</li>
+<li>Compile-time check improved before implementing call to utimensat() in FXStat.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 7 - FOX STABLE 1.6.49
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Check index out of bounds in FXTabBook::setCurrent().</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 7 - FOX STABLE 1.6.48
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Patches 64-bit Windows MING-W64.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 March 23 - FOX DEVELOPMENT 1.7.38
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -27,7 +68,7 @@ lock-free queue, with semaphores managing synchronization between producer- and 
 Thus, threads never block unless two edge conditions are reached: either the task-queue is empty,
 in which case worker threads will block (nothing to do), or task queue is filled up, and producer
 thread will block (no room in queue).<br>
-An important new capability is for an additional thread to enter into the task-processing loop 
+An important new capability is for an additional thread to enter into the task-processing loop
 temporarily.
 Finally, the thread starting FXThreadPool, as well as the worker threads belonging to the FXThreadPool
 now have a thread-local variable referencing the FXThreadPool.  This allows the threads involved to
@@ -35,7 +76,7 @@ locate the address of the FXThreadPool, for instance to create an FXTaskGroup.</
 <li>New FXTaskGroup class manages groups of task to be executed in parallel on a FXThreadPool.
 Tasks started through the FXTaskGroup interface are guaranteed to be completed within the lifetime
 of the FXTaskGroup instance.</li>
-<li>New FXParallelInvoke and FXParallelFor template functions to implement parallel function call, and 
+<li>New FXParallelInvoke and FXParallelFor template functions to implement parallel function call, and
 parallel for loop.  This uses the new FXTaskGroup, and indirectly, FXThreadPool.</li>
 <li>Pass optional stacksize when constructing FXWorker.  Added stacksize option to FXThreadPool with which new
 workers will be started.</li>

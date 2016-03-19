@@ -40,7 +40,7 @@ static const FXchar encode[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
 
 
 // Encode src to dst in base64
-FXint encode64(FXchar* dst,const FXchar* src,FXint len){
+FXint fxencode64(FXchar* dst,const FXchar* src,FXint len){
   register FXchar* ptr=dst;
   while(3<=len){
     *ptr++=encode[(src[0]>>2)&0x3f];
@@ -88,7 +88,7 @@ static const FXschar decode[256]={
 
 
 // Decode src to dst from base64
-FXint decode64(FXchar* dst,const FXchar* src,FXint len){
+FXint fxdecode64(FXchar* dst,const FXchar* src,FXint len){
   register FXuchar c0,c1,c2,c3;
   register FXchar* ptr=dst;
   while(4<=len){
