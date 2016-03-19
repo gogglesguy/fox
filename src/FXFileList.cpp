@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.263 2008/01/04 15:42:13 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.270 2008/03/19 17:37:02 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -284,7 +284,6 @@ void FXFileList::destroy(){
   }
 
 
-
 /*******************************************************************************/
 
 // Return list of selected files
@@ -402,6 +401,26 @@ The actual request is handled like this:
 // FIXME share code with file clipboard...
 
 // Deal with the drop that has just occurred
+long FXFileList::onDropAction(FXObject*,FXSelector,void* ptr){
+  FXMenuPane dropmenu(this);
+  new FXMenuCommand(&dropmenu,tr("Move Here"),NULL,NULL,0);
+  new FXMenuCommand(&dropmenu,tr("Copy Here"),NULL,NULL,0);
+  new FXMenuCommand(&dropmenu,tr("Link Here"),NULL,NULL,0);
+  new FXMenuSeparator(&dropmenu);
+  new FXMenuCommand(&dropmenu,tr("Cancel"),NULL,NULL,0);
+  dropmenu.create();
+  dropmenu.popup(NULL,((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y);
+  getApp()->runModalWhileShown(&dropmenu);
+
+  // Forget drop data
+  dropdirectory=FXString::null;
+  dropfiles=FXString::null;
+  dropaction=DRAG_REJECT;
+  return 1;
+  }
+
+/*
+// Deal with the drop that has just occurred
 long FXFileList::onDropAction(FXObject*,FXSelector,void*){
   FXint beg,end;
   if(dropaction==DRAG_MOVE){
@@ -487,6 +506,7 @@ long FXFileList::onDropAction(FXObject*,FXSelector,void*){
   dropaction=DRAG_REJECT;
   return 1;
   }
+*/
 
 
 // Delete selection
@@ -587,8 +607,8 @@ long FXFileList::onDNDLeave(FXObject* sender,FXSelector sel,void* ptr){
   stopAutoScroll();
   getApp()->removeTimeout(this,ID_OPENTIMER);
   setDirectory(startdirectory);
-  startdirectory=FXString::null;
-  dropdirectory=FXString::null;
+  startdirectory.clear();
+  dropdirectory.clear();
   dropaction=DRAG_REJECT;
   return 1;
   }
@@ -652,7 +672,7 @@ long FXFileList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   setDirectory(startdirectory);
 
   // Clear stuff
-  startdirectory=FXString::null;
+  startdirectory.clear();
 
   // Perhaps target wants to deal with it
   if(FXIconList::onDNDDrop(sender,sel,ptr)) return 1;
@@ -661,10 +681,9 @@ long FXFileList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   if(getDNDData(FROM_DRAGNDROP,urilistType,string)){
     dropFinished(DRAG_ACCEPT);
     decodeURIList(dropfiles,string);
-    getApp()->addChore(this,ID_DROPACTION);
+    getApp()->addChore(this,ID_DROPACTION,ptr);
     return 1;
     }
-
   return 0;
   }
 
@@ -743,7 +762,7 @@ long FXFileList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
   if(!FXIconList::onEndDrag(sender,sel,ptr)){
     endDrag((didAccept()!=DRAG_REJECT));
     setDragCursor(getDefaultCursor());
-    dragfiles=FXString::null;
+    dragfiles.clear();
     }
   return 1;
   }
@@ -873,10 +892,17 @@ long FXFileList::onUpdSetDirectory(FXObject* sender,FXSelector,void*){
 
 // Sort by name
 long FXFileList::onCmdSortByName(FXObject*,FXSelector,void*){
+#ifdef WIN32
   if(sortfunc==ascending) sortfunc=descending;
   else if(sortfunc==ascendingCase) sortfunc=descendingCase;
   else if(sortfunc==descending) sortfunc=ascending;
   else sortfunc=ascendingCase;
+#else
+  if(sortfunc==ascending) sortfunc=descending;
+  else if(sortfunc==ascendingCase) sortfunc=descendingCase;
+  else if(sortfunc==descending) sortfunc=ascending;
+  else sortfunc=ascending;
+#endif
   scan(true);
   return 1;
   }
@@ -1190,7 +1216,6 @@ FXIcon* FXFileList::getItemPreviewIcon(FXint index) const {
   }
 
 
-
 // Change directory when hovering over a folder
 long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
   register FXint index=(FXint)(FXival)ptr;
@@ -1235,7 +1260,6 @@ void FXFileList::scan(FXbool force){
     setDirectory(FXPath::upLevel(directory));
     }
   }
-
 
 
 // Set current filename

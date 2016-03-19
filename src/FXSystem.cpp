@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSystem.cpp,v 1.38 2008/01/04 15:42:34 fox Exp $                        *
+* $Id: FXSystem.cpp,v 1.39 2008/03/29 03:08:29 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -169,7 +169,7 @@ FXString FXSystem::userName(FXuint uid){
 #endif
 #endif
   __snprintf(result,sizeof(result),"%u",uid);
-  return result;
+  return FXString(result);
   }
 
 
@@ -188,7 +188,7 @@ FXString FXSystem::groupName(FXuint gid){
 #endif
 #endif
   __snprintf(result,sizeof(result),"%u",gid);
-  return result;
+  return FXString(result);
   }
 
 
@@ -197,15 +197,21 @@ FXString FXSystem::currentUserName(){
 #ifdef WIN32
   TCHAR buffer[MAXPATHLEN];
   DWORD size=MAXPATHLEN;
-  if(GetUserName(buffer,&size)) return buffer;
+  if(GetUserName(buffer,&size)){
+    return FXString(buffer);
+    }
 #else
 #if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct passwd pwdresult,*pwd;
   char buffer[1024];
-  if(getpwuid_r(geteuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd) return pwd->pw_name;
+  if(getpwuid_r(geteuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
+    return FXString(pwd->pw_name);
+    }
 #else
   struct passwd *pwd=getpwuid(geteuid());
-  if(pwd) return pwd->pw_name;
+  if(pwd){
+    return FXString(pwd->pw_name);
+    }
 #endif
 #endif
   return FXString::null;
@@ -219,10 +225,14 @@ FXString FXSystem::currentGroupName(){
   ::group grpresult;
   ::group *grp;
   char buffer[1024];
-  if(getgrgid_r(getegid(),&grpresult,buffer,sizeof(buffer),&grp)==0 && grp) return grp->gr_name;
+  if(getgrgid_r(getegid(),&grpresult,buffer,sizeof(buffer),&grp)==0 && grp){
+    return FXString(grp->gr_name);
+    }
 #else
   ::group *grp=getgrgid(getegid());
-  if(grp) return grp->gr_name;
+  if(grp){
+    return FXString(grp->gr_name);
+    }
 #endif
 #endif
   return FXString::null;
@@ -243,7 +253,7 @@ FXString FXSystem::modeString(FXuint mode){
   result[8]=(mode&FXIO::OtherWrite) ? 'w' : '-';
   result[9]=(mode&FXIO::Sticky) ? 't' : (mode&FXIO::OtherExec) ? 'x' : '-';
   result[10]=0;
-  return result;
+  return FXString(result);
   }
 
 
@@ -286,10 +296,14 @@ FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
 FXString FXSystem::getCurrentDirectory(){
 #ifdef WIN32
   TCHAR buffer[MAXPATHLEN];
-  if(GetCurrentDirectory(MAXPATHLEN,buffer)) return buffer;
+  if(GetCurrentDirectory(MAXPATHLEN,buffer)){
+    return FXString(buffer);
+    }
 #else
   FXchar buffer[MAXPATHLEN];
-  if(getcwd(buffer,MAXPATHLEN)) return buffer;
+  if(getcwd(buffer,MAXPATHLEN)){
+    return FXString(buffer);
+    }
 #endif
   return FXString::null;
   }
@@ -366,53 +380,75 @@ FXString FXSystem::getHomeDirectory(){
 FXString FXSystem::getUserDirectory(const FXString& user){
 #ifdef WIN32
   if(user.empty()){
-    register const FXchar *str1,*str2;
+    const FXchar *str1,*str2;
     FXchar home[MAXPATHLEN];
     DWORD size=MAXPATHLEN;
     HKEY hKey;
     LONG result;
-    if((str1=getenv("USERPROFILE"))!=NULL) return str1;
-    if((str1=getenv("HOME"))!=NULL) return str1;
+    if((str1=getenv("USERPROFILE"))!=NULL){
+      return FXString(str1);
+      }
+    if((str1=getenv("HOME"))!=NULL){
+      return FXString(str1);
+      }
     if((str2=getenv("HOMEPATH"))!=NULL){      // This should be good for WinNT, Win2K according to MSDN
       if((str1=getenv("HOMEDRIVE"))==NULL) str1="c:";
       strncpy(home,str1,MAXPATHLEN);
       strncat(home,str2,MAXPATHLEN);
-      return home;
+      return FXString(home);
       }
     if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
       result=RegQueryValueExA(hKey,"Personal",NULL,NULL,(LPBYTE)home,&size);  // Change "Personal" to "Desktop" if you want...
       RegCloseKey(hKey);
-      if(result==ERROR_SUCCESS) return home;
+      if(result==ERROR_SUCCESS){
+        return FXString(home);
+        }
       }
     return "c:" PATHSEPSTRING;
     }
   return "c:" PATHSEPSTRING;
 #elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct passwd pwdresult,*pwd;
+  const FXchar* str;
   char buffer[1024];
   if(user.empty()){
-    register const FXchar* str;
-    if((str=getenv("HOME"))!=NULL) return str;
-    if((str=getenv("USER"))!=NULL || (str=getenv("LOGNAME"))!=NULL){
-      if(getpwnam_r(str,&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd) return pwd->pw_dir;
+    if((str=getenv("HOME"))!=NULL){
+      return FXString(str);
       }
-    if(getpwuid_r(getuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd) return pwd->pw_dir;
+    if((str=getenv("USER"))!=NULL || (str=getenv("LOGNAME"))!=NULL){
+      if(getpwnam_r(str,&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
+        return FXString(pwd->pw_dir);
+        }
+      }
+    if(getpwuid_r(getuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
+      return FXString(pwd->pw_dir);
+      }
     return PATHSEPSTRING;
     }
-  if(getpwnam_r(user.text(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd) return pwd->pw_dir;
+  if(getpwnam_r(user.text(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
+    return FXString(pwd->pw_dir);
+    }
   return PATHSEPSTRING;
 #else
-  register struct passwd *pwd;
+  struct passwd *pwd;
+  const FXchar* str;
   if(user.empty()){
-    register const FXchar* str;
-    if((str=getenv("HOME"))!=NULL) return str;
-    if((str=getenv("USER"))!=NULL || (str=getenv("LOGNAME"))!=NULL){
-      if((pwd=getpwnam(str))!=NULL) return pwd->pw_dir;
+    if((str=getenv("HOME"))!=NULL){
+      return FXString(str);
       }
-    if((pwd=getpwuid(getuid()))!=NULL) return pwd->pw_dir;
+    if((str=getenv("USER"))!=NULL || (str=getenv("LOGNAME"))!=NULL){
+      if((pwd=getpwnam(str))!=NULL){
+        return FXString(pwd->pw_dir);
+        }
+      }
+    if((pwd=getpwuid(getuid()))!=NULL){
+      return FXString(pwd->pw_dir);
+      }
     return PATHSEPSTRING;
     }
-  if((pwd=getpwnam(user.text()))!=NULL) return pwd->pw_dir;
+  if((pwd=getpwnam(user.text()))!=NULL){
+    return FXString(pwd->pw_dir);
+    }
   return PATHSEPSTRING;
 #endif
   }
@@ -447,7 +483,7 @@ FXint FXSystem::getProcessId(){
 FXString FXSystem::getHostName(){
   FXchar name[1024];
   if(gethostname(name,sizeof(name))==0){
-    return name;
+    return FXString(name);
     }
   return "localhost";
   }

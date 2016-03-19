@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFile.cpp,v 1.262 2008/01/04 15:42:11 fox Exp $                         *
+* $Id: FXFile.cpp,v 1.266 2008/04/22 20:08:09 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -134,7 +134,6 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
       case WriteOnly: flags=O_WRONLY; break;
       case ReadWrite: flags=O_RDWR; break;
       }
-// O_LARGEFILE
 
     // Appending and truncation
     if(m&Append) flags|=O_APPEND;
@@ -142,6 +141,11 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
 
     // Non-blocking mode
     if(m&NonBlocking) flags|=O_NONBLOCK;
+
+    // Change access time
+#ifdef O_NOATIME
+    if(m&NoAccessTime) flags|=O_NOATIME;
+#endif
 
     // Creation mode
     if(m&Create){

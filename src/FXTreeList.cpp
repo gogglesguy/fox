@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeList.cpp,v 1.191 2008/01/04 15:42:41 fox Exp $                     *
+* $Id: FXTreeList.cpp,v 1.192 2008/03/25 20:00:59 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -2364,7 +2364,7 @@ FXTreeItem* FXTreeList::findItem(const FXString& text,FXTreeItem* start,FXuint f
         item=item->getAbove();
         }
       if(start && !(flgs&SEARCH_WRAP)) return NULL;
-      for(item=lastitem; item->getLast(); item=item->getLast());
+      for(item=lastitem; item->getLast(); item=item->getLast()){}
       while(item!=start){
         if((*comparefunc)(item->getText(),text,len)==0) return item;
         item=item->getAbove();
@@ -2399,7 +2399,7 @@ FXTreeItem* FXTreeList::findItemByData(const void *ptr,FXTreeItem* start,FXuint 
         item=item->getAbove();
         }
       if(start && !(flgs&SEARCH_WRAP)) return NULL;
-      for(item=lastitem; item->getLast(); item=item->getLast());
+      for(item=lastitem; item->getLast(); item=item->getLast()){}
       while(item!=start){
         if(item->getData()==ptr) return item;
         item=item->getAbove();

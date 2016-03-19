@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxscanf.cpp,v 1.17 2008/01/04 15:42:47 fox Exp $                         *
+* $Id: fxscanf.cpp,v 1.25 2008/03/31 10:49:13 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -31,13 +31,19 @@
   - It may be not perfect, but at least its the same on all platforms.
   - Handles conversions of the form:
 
-        % [*] [N$] [width] [l|ll|h|hh|L|q|t|z] [n|p|d|u|i|x|X|o|D|c|s|[set]|e|E|f|G|g|b]
+        % [*] [digits$] [width] [l|ll|h|hh|L|q|t|z] [n|p|d|u|i|x|X|o|D|c|s|[SET]|e|E|f|G|g|b]
 
-  - The optional parameter '*' suppresses assignment of the matching quantity.
-  - The optional N$ specifies parameter number.  Normally, order of parameters
-    is same as order of %-directives.
-  - Width specifies field width to read, not counting spaces [except for %[] and %c
-    and %n directives where spaces do count].
+  - Assignment suppression:
+     '*'        When '*' is passed assignment of the matching quantity is suppressed.
+
+  - Positional argument:
+     'digits$'  A sequence of decimal digits indication the position in the parameter
+                list, followed by '$'.  The first parameter starts at 1.
+
+  - Width:
+     digits     Specifies field width to read, not counting spaces [except for %[] and
+                %c and %n directives where spaces do count].
+
   - Interpretation of size parameters:
 
      'hh'       convert to FXchar
@@ -69,8 +75,13 @@
 
 
   - We can print comma's like 1,000,000.00 but we can't read them...
-  - FIXME positional arguments [N$] will be implemented as well some time.
 */
+
+#ifdef WIN32
+#ifndef va_copy
+#define va_copy(arg,list) ((arg)=(list))
+#endif
+#endif
 
 using namespace FX;
 
@@ -83,8 +94,6 @@ namespace FX {
 extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
 extern FXAPI FXint __vsscanf(const FXchar* string,const FXchar* format,va_list arg_ptr);
 
-// Fast integer power of 10
-extern FXAPI FXdouble tenToThe(FXint e);
 
 // Type modifiers
 enum {
@@ -97,18 +106,53 @@ enum {
   };
 
 
+// Table of 1E+0,...1E+31, in steps of 1
+static FXdouble posPowOfTen1[32]={
+  1E+0,1E+1,1E+2,1E+3,1E+4,1E+5,1E+6,1E+7,1E+8,1E+9,1E+10,1E+11,1E+12,1E+13,1E+14,1E+15,1E+16,1E+17,1E+18,1E+19,1E+20,1E+21,1E+22,1E+23,1E+24,1E+25,1E+26,1E+27,1E+28,1E+29,1E+30,1E+31
+  };
+
+// Table of 1E+0,...1E+288, in steps of 32
+static FXdouble posPowOfTen32[10]={
+  1E+0,1E+32,1E+64,1E+96,1E+128,1E+160,1E+192,1E+224,1E+256,1E+288
+  };
+
+// Table of 1E-0,...1E-31, in steps of 1
+static FXdouble negPowOfTen1[32]={
+  1E-0,1E-1,1E-2,1E-3,1E-4,1E-5,1E-6,1E-7,1E-8,1E-9,1E-10,1E-11,1E-12,1E-13,1E-14,1E-15,1E-16,1E-17,1E-18,1E-19,1E-20,1E-21,1E-22,1E-23,1E-24,1E-25,1E-26,1E-27,1E-28,1E-29,1E-30,1E-31
+  };
+
+// Table of 1E-0,...1E-288, in steps of 32
+static FXdouble negPowOfTen32[10]={
+  1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288
+  };
+
+
+/*******************************************************************************/
+
+// Fast integer power of 10; this is based on the mathematical
+// identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
+// table of 308 entries, but that would take a lot of space...
+// The exponent should be in the range -308 to 308, these being the limits
+// of double precision IEEE754 standard floating point.
+static FXdouble tenToThe(FXint e){
+  return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];
+  }
+
+
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
   register FXint ch,nn,v,neg,pos,width,base,digits,modifier,convert,count,exponent;
   register const FXchar *start=string;
-  register FXdouble number;
-  register FXulong value;
   register FXchar *ptr;
+  FXdouble number;
+  FXulong  value;
   FXchar   set[256];
+  va_list ag;
 
   count=0;
 
   // Process format string
+  va_copy(ag,args);
   while((ch=*format++)!='\0'){
 
     // Check for format-characters
@@ -120,74 +164,71 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
       // Check for '%%'
       if(ch=='%') goto nml;
 
-      // Suppress conversion
-      convert=1;
-      if(ch=='*'){                                      // Suppress conversion
-        ch=*format++;
-        convert=0;
-        }
-
-      // Field width
+      // Default settings
+      modifier=ARG_DEFAULT;
       width=2147483647;
-      if(Ascii::isDigit(ch)){
-        width=ch-'0';
-        ch=*format++;
-        while(Ascii::isDigit(ch)){
-          width=width*10+ch-'0';
-          ch=*format++;
-          }
-        }
+      convert=1;
+      base=0;
+      pos=-1;
 
-      // Positional parameter?
-      pos=-1;                                           // FIXME syntax is parsed but not yet handled
-      if(ch=='$'){
-        pos=width;
-        width=2147483647;
-        if(Ascii::isDigit(ch)){
+      // Parse format specifier
+flg:  switch(ch){
+        case '*':                                       // Suppress conversion
+          convert=0;
+          ch=*format++;
+          goto flg;
+        case '0':                                       // Width or positional parameter
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
           width=ch-'0';
           ch=*format++;
           while(Ascii::isDigit(ch)){
             width=width*10+ch-'0';
             ch=*format++;
             }
-          }
-        }
-
-      // Type modifier
-      modifier=ARG_DEFAULT;
-      if(ch=='l'){                                      // Long
-        modifier=ARG_LONG;
-        ch=*format++;
-        if(ch=='l'){                                    // Long Long
+          if(ch=='$'){                                  // Positional parameter
+            ch=*format++;
+            if(width<=0) goto x;                        // Not a legal parameter position
+            va_copy(ag,args);
+            for(pos=1; pos<width; ++pos){               // Advance to position prior to arg
+              (void)va_arg(ag,void*);
+              }
+            width=2147483647;                           // Reset width
+            }
+          goto flg;
+        case 'l':                                       // Long
+          modifier=ARG_LONG;
+          ch=*format++;
+          if(ch=='l'){                                  // Long Long
+            modifier=ARG_LONGLONG;
+            ch=*format++;
+            }
+          goto flg;
+        case 'h':                                       // Short
+          modifier=ARG_HALF;
+          ch=*format++;
+          if(ch=='h'){                                  // Char
+            modifier=ARG_HALFHALF;
+            ch=*format++;
+            }
+          goto flg;
+        case 'L':                                       // Long Long
+        case 'q':
           modifier=ARG_LONGLONG;
           ch=*format++;
-          }
-        }
-      else if(ch=='h'){                                 // Short
-        modifier=ARG_HALF;
-        ch=*format++;
-        if(ch=='h'){                                    // Char
-          modifier=ARG_HALFHALF;
+          goto flg;
+        case 't':                                       // Size depends on pointer
+        case 'z':
+          modifier=ARG_VARIABLE;
           ch=*format++;
-          }
-        }
-      else if(ch=='L' || ch=='q'){                      // Long Long
-        modifier=ARG_LONGLONG;
-        ch=*format++;
-        }
-      else if(ch=='t' || ch=='z'){                      // Size depends on pointer
-        modifier=ARG_VARIABLE;
-        ch=*format++;
-        }
-
-      // Skip spaces except for conversions %n %c %[]
-      if(ch!='[' && ch!='c' && ch!='n'){
-        while(Ascii::isSpace(*string)) string++;
-        }
-
-      // Conversion specifier
-      base=0;
-      switch(ch){
+          goto flg;
         case 'n':                                       // Consumed characters till here
           value=string-start;
           goto assign;
@@ -207,6 +248,7 @@ decimal:  base+=2;
         case 'b':                                       // Binary
           base+=2;
         case 'i':                                       // Either
+          while(Ascii::isSpace(*string)) string++;              // Skip white space
           if(0<width){
             value=0;
             digits=0;
@@ -250,22 +292,22 @@ decimal:  base+=2;
                 }
 assign:       if(convert){
                 if(modifier==ARG_DEFAULT){                      // 32-bit always
-                  *va_arg(args,FXint*)=(FXint)value;
+                  *va_arg(ag,FXint*)=(FXint)value;
                   }
                 else if(modifier==ARG_LONG){                    // Whatever size a long is
-                  *va_arg(args,long*)=(long)value;
+                  *va_arg(ag,long*)=(long)value;
                   }
                 else if(modifier==ARG_LONGLONG){                // 64-bit always
-                  *va_arg(args,FXlong*)=value;
+                  *va_arg(ag,FXlong*)=value;
                   }
                 else if(modifier==ARG_HALF){                    // 16-bit always
-                  *va_arg(args,FXshort*)=(FXshort)value;
+                  *va_arg(ag,FXshort*)=(FXshort)value;
                   }
                 else if(modifier==ARG_HALFHALF){                // 8-bit always
-                  *va_arg(args,FXchar*)=(FXchar)value;
+                  *va_arg(ag,FXchar*)=(FXchar)value;
                   }
                 else{                                           // Whatever size a pointer is
-                  *va_arg(args,FXival*)=(FXival)value;
+                  *va_arg(ag,FXival*)=(FXival)value;
                   }
                 count++;
                 }
@@ -278,6 +320,7 @@ assign:       if(convert){
         case 'F':
         case 'g':
         case 'G':
+          while(Ascii::isSpace(*string)) string++;              // Skip white space
           if(0<width){
             number=0.0;
             exponent=0;
@@ -334,14 +377,18 @@ assign:       if(convert){
                   }
                 }
               if(number!=0.0 && exponent){
+                if(exponent<-308){                              // Tweak for denormalized numbers
+                  number*=1E-16;
+                  exponent+=16;
+                  }
                 number*=tenToThe(FXCLAMP(-308,exponent,308));   // Shift floating point
                 }
               if(convert){
                 if(modifier==ARG_DEFAULT){
-                  *va_arg(args,FXfloat*)=(FXfloat)number;       // 32-bit float
+                  *va_arg(ag,FXfloat*)=(FXfloat)number;         // 32-bit float
                   }
                 else{
-                  *va_arg(args,FXdouble*)=number;               // 64-bit double
+                  *va_arg(ag,FXdouble*)=number;                 // 64-bit double
                   }
                 count++;
                 }
@@ -351,7 +398,7 @@ assign:       if(convert){
         case 'c':                                       // Character(s)
           if(width==2147483647) width=1;
           if(convert){
-            ptr=va_arg(args,FXchar*);
+            ptr=va_arg(ag,FXchar*);
             while(0<width && *string){
               *ptr++=*string++;
               width--;
@@ -366,8 +413,9 @@ assign:       if(convert){
             }
           break;
         case 's':                                       // String
+          while(Ascii::isSpace(*string)) string++;              // Skip white space
           if(convert){
-            ptr=va_arg(args,FXchar*);
+            ptr=va_arg(ag,FXchar*);
             while(0<width && *string && !Ascii::isSpace(*string)){
               *ptr++=*string++;
               width--;
@@ -406,7 +454,7 @@ assign:       if(convert){
             ch=nn;
             }
           if(convert){
-            ptr=va_arg(args,FXchar*);
+            ptr=va_arg(ag,FXchar*);
             while(0<width && *string && set[(FXuchar)*string]){
               *ptr++=*string++;
               width--;

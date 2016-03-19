@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.381 2008/01/10 21:42:43 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.384 2008/03/18 21:32:08 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1374,12 +1374,14 @@ void FXWindow::create(){
 
       // Enable extra events when input extension supported
 #ifdef HAVE_XINPUT_H
-      if(getApp()->xsbDevice){
-        XEventClass xevents[3];
-        xevents[0]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbBallMotion;
-        xevents[1]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonPress;
-        xevents[2]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonRelease;
-        XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,3);
+      if(flags&FLAG_ENABLED){
+        if(getApp()->xsbDevice){
+          XEventClass xevents[3];
+          xevents[0]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbBallMotion;
+          xevents[1]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonPress;
+          xevents[2]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonRelease;
+          XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,3);
+          }
         }
 #endif
 
@@ -2483,6 +2485,15 @@ void FXWindow::enable(){
       FXuint events=BASIC_EVENT_MASK|ENABLED_EVENT_MASK;
       if(flags&FLAG_SHELL) events|=SHELL_EVENT_MASK;
       XSelectInput((Display*)getApp()->getDisplay(),xid,events);
+#ifdef HAVE_XINPUT_H
+      if(getApp()->xsbDevice){
+        XEventClass xevents[3];
+        xevents[0]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbBallMotion;
+        xevents[1]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonPress;
+        xevents[2]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonRelease;
+        XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,3);
+        }
+#endif
 #endif
       }
     }
@@ -2510,6 +2521,13 @@ void FXWindow::disable(){
       FXuint events=BASIC_EVENT_MASK;
       if(flags&FLAG_SHELL) events|=SHELL_EVENT_MASK;
       XSelectInput((Display*)getApp()->getDisplay(),xid,events);
+#ifdef HAVE_XINPUT_H
+      if(getApp()->xsbDevice){
+        XEventClass xevents[1];
+        xevents[0]=((XDevice*)getApp()->xsbDevice)->device_id<<8;
+        XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,1);
+        }
+#endif
       if(getApp()->mouseGrabWindow==this){
         XUngrabPointer((Display*)getApp()->getDisplay(),CurrentTime);
         XFlush((Display*)getApp()->getDisplay());
@@ -2697,10 +2715,10 @@ long FXWindow::onUngrabbed(FXObject*,FXSelector,void* ptr){
 
 
 // Translate message
-const FXchar* FXWindow::tr(const FXchar* text,const FXchar* hint) const {
+const FXchar* FXWindow::tr(const FXchar* text,const FXchar* hint,FXint count) const {
   FXTranslator *translator=getApp()->getTranslator();
   if(translator){
-    return translator->tr(getClassName(),text,hint);
+    return translator->tr(getClassName(),text,hint,count);
     }
   return text;
   }

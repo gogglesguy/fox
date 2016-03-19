@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTranslator.cpp,v 1.17 2008/01/04 15:42:41 fox Exp $                    *
+* $Id: FXTranslator.cpp,v 1.19 2008/03/24 21:32:29 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -40,14 +40,12 @@
 
 /*
   Notes:
-  - The input message string may be not UTF-8 but some other code
-    page, the "developer's code page".  If we allow for explicit
-    setting of the "developer's code page" we can perform another
-    translation from code-page -> utf-8 here as well.  This will
-    be convenient since this allows e.g. a russion programmer to
-    just use his editor in koi8 setting.
-  - The above does mean we need to return FXString instead of a
-    pointer, perhaps...
+  - Since the original input string is potentially used as output string if no
+    translation is available, the original input string needs to be UTF8 also.
+  - The tr() function has an extra parameter count to allow translations which 
+    require special plural forms dependent on some number.  If set to -1 (default),
+    the first available translation is used.
+  - 
 */
 
 using namespace FX;
@@ -62,7 +60,7 @@ FXIMPLEMENT(FXTranslator,FXObject,NULL,0)
 
 
 // Construct translator
-FXTranslator::FXTranslator(FXApp* a):app(a),codec(NULL){
+FXTranslator::FXTranslator(){
   FXTRACE((100,"%p->FXTranslator::FXTranslator\n",this));
   }
 
@@ -107,8 +105,8 @@ FXTranslator::FXTranslator(FXApp* a):app(a),codec(NULL){
 
 
 // Translate a string
-const FXchar* FXTranslator::tr(const FXchar* context,const FXchar* message,const FXchar* hint) const {
-  FXTRACE((200,"tr context: '%s' message: '%s' hint: '%s'.\n",context,message,hint?hint:""));
+const FXchar* FXTranslator::tr(const FXchar* context,const FXchar* message,const FXchar* hint,FXint count) const {
+  FXTRACE((200,"tr context: '%s' message: '%s' hint: '%s' count: %d.\n",context,message,hint?hint:"",count));
   return message;
   }
 
@@ -128,8 +126,6 @@ void FXTranslator::load(FXStream& store){
 // Destroy translator
 FXTranslator::~FXTranslator(){
   FXTRACE((100,"%p->FXTranslator::~FXTranslator\n",this));
-  app=(FXApp*)-1L;
-  codec=(FXTextCodec*)-1L;
   }
 
 }

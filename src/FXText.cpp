@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.cpp,v 1.492 2008/01/04 15:42:35 fox Exp $                         *
+* $Id: FXText.cpp,v 1.494 2008/03/27 15:51:57 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -194,6 +194,7 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_KEYRELEASE,0,FXText::onKeyRelease),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXText::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXText::onQueryHelp),
+  FXMAPFUNC(SEL_IME_START,0,FXText::onIMEStart),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_TOGGLE_EDITABLE,FXText::onUpdToggleEditable),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_TOGGLE_OVERSTRIKE,FXText::onUpdToggleOverstrike),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_CURSOR_ROW,FXText::onUpdCursorRow),
@@ -441,8 +442,10 @@ void FXText::create(){
   tabwidth=tabcolumns*font->getTextWidth(" ",1);
   barwidth=barcolumns*font->getTextWidth("8",1);
   recalc();
+  if(getApp()->hasInputMethod()){
+    createComposeContext();
+    }
   }
-
 
 // Detach window
 void FXText::detach(){
@@ -452,6 +455,9 @@ void FXText::detach(){
   textType=0;
   utf8Type=0;
   utf16Type=0;
+  if(getApp()->hasInputMethod()){
+    destroyComposeContext();
+    }
   }
 
 
@@ -478,9 +484,9 @@ void FXText::setFocus(){
   FXScrollArea::setFocus();
   setDefault(TRUE);
   flags&=~FLAG_UPDATE;
-  if(getApp()->hasInputMethod()){
-    createComposeContext();
-    }
+//  if(getApp()->hasInputMethod()){
+//    createComposeContext();
+//    }
   }
 
 
@@ -489,9 +495,9 @@ void FXText::killFocus(){
   FXScrollArea::killFocus();
   setDefault(MAYBE);
   flags|=FLAG_UPDATE;
-  if(getApp()->hasInputMethod()){
-    destroyComposeContext();
-    }
+//  if(getApp()->hasInputMethod()){
+//    destroyComposeContext();
+//    }
   }
 
 
@@ -1276,13 +1282,13 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
   FXRex rex;
 
   // Compile flags
-  rexmode=REX_VERBATIM;
-  if(1<npar) rexmode|=REX_CAPTURE;
-  if(flgs&SEARCH_REGEX) rexmode&=~REX_VERBATIM;
-  if(flgs&SEARCH_IGNORECASE) rexmode|=REX_ICASE;
+  rexmode=FXRex::Verbatim;
+  if(1<npar) rexmode|=FXRex::Capture;
+  if(flgs&SEARCH_REGEX) rexmode&=~FXRex::Verbatim;
+  if(flgs&SEARCH_IGNORECASE) rexmode|=FXRex::IgnoreCase;
 
   // Try parse the regex
-  if(rex.parse(string,rexmode)==REGERR_OK){
+  if(!rex.parse(string,rexmode)){
 
     // Make all characters contiguous in the buffer
     squeezegap();
@@ -1291,24 +1297,24 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
     if(flgs&SEARCH_BACKWARD){
 
       // Search from start to begin of buffer
-      if(rex.match(buffer,length,beg,end,REX_BACKWARD,npar,0,start)) return true;
+      if(rex.match(buffer,length,beg,end,FXRex::Backward,npar,0,start)) return true;
 
       if(!(flgs&SEARCH_WRAP)) return false;
 
       // Search from end of buffer backwards
-      if(rex.match(buffer,length,beg,end,REX_BACKWARD,npar,start,length)) return true;
+      if(rex.match(buffer,length,beg,end,FXRex::Backward,npar,start,length)) return true;
       }
 
     // Search forward
     else{
 
       // Search from start to end of buffer
-      if(rex.match(buffer,length,beg,end,REX_FORWARD,npar,start,length)) return true;
+      if(rex.match(buffer,length,beg,end,FXRex::Forward,npar,start,length)) return true;
 
       if(!(flgs&SEARCH_WRAP)) return false;
 
       // Search from begin of buffer forwards
-      if(rex.match(buffer,length,beg,end,REX_FORWARD,npar,0,start)) return true;
+      if(rex.match(buffer,length,beg,end,FXRex::Forward,npar,0,start)) return true;
       }
     }
   return false;
@@ -3393,6 +3399,22 @@ long FXText::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 long FXText::onUpdHaveSelection(FXObject* sender,FXSelector,void*){
   sender->handle(this,(selstartpos<selendpos)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
+  }
+
+long FXText::onIMEStart(FXObject* sender,FXSelector,void* ptr){
+  if(isEditable()){
+    if(getComposeContext()){
+      FXint th=font->getFontHeight();
+      FXint cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
+      if(getVisibleY()<=cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
+        FXint cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
+        getComposeContext()->setSpot(cursorx,cursory);
+        getComposeContext()->setFont(font);
+        }
+      }
+    return 1;
+    }
+  return 0;
   }
 
 /*******************************************************************************/

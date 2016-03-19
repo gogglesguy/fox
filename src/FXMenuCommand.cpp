@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuCommand.cpp,v 1.78 2008/01/04 15:42:25 fox Exp $                   *
+* $Id: FXMenuCommand.cpp,v 1.79 2008/01/15 05:37:08 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -46,7 +46,7 @@
   - When menu label changes, hotkey might have to be adjusted.
   - Fix it so menu stays up when after Alt-F, you press Alt-E.
   - MenuItems should be derived from FXLabel.
-  - FXMenuCascade should send ID_POST/IDUNPOST to self.
+  - FXMenuCascade should send ID_POST/ID_UNPOST to self.
   - Look into SEL_FOCUS_SELF some more...
   - We handle left, middle, right mouse buttons exactly the same;
     this permits popup menus posted by any mouse button.

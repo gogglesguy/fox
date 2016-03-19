@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.cpp,v 1.119 2008/01/10 20:08:06 fox Exp $                    *
+* $Id: FXGLContext.cpp,v 1.121 2008/04/22 20:14:25 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -211,12 +211,12 @@ FXbool FXGLContext::begin(FXDrawable *draw){
       return true;
       }
 #elif defined(GLX_VERSION_1_3)
-    if(glXMakeContextCurrent((Display*)getApp()->getDisplay(),draw->id(),draw->id(),(GLXContext)xid)){
+    if(glXMakeContextCurrent((Display*)getApp()->getDisplay(),draw->res(),draw->res(),(GLXContext)xid)){
       surface=draw;
       return true;
       }
 #else
-    if(glXMakeCurrent((Display*)getApp()->getDisplay(),draw->id(),(GLXContext)xid)){
+    if(glXMakeCurrent((Display*)getApp()->getDisplay(),draw->res(),(GLXContext)xid)){
       surface=draw;
       return true;
       }

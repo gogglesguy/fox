@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPrintDialog.cpp,v 1.65 2008/01/04 15:42:26 fox Exp $                   *
+* $Id: FXPrintDialog.cpp,v 1.66 2008/03/25 20:00:59 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -450,7 +450,7 @@ void FXPrintDialog::create(){
       }
 
     // Snarf printer name (we read until the ':' or the '|' which separates aliases)
-    for(i=0; i<1000 && buf[i]!=0 && buf[i]!=':' && buf[i]!='|'; i++);
+    for(i=0; i<1000 && buf[i]!=0 && buf[i]!=':' && buf[i]!='|'; i++){}
     buf[i]=0;
 
     // Append human-readable info, if any

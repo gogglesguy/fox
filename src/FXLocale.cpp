@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXLocale.cpp,v 1.4 2008/01/04 15:42:24 fox Exp $                         *
+* $Id: FXLocale.cpp,v 1.5 2008/04/04 21:17:14 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -33,6 +33,17 @@
 
 /*
   Notes:
+  
+  - Format of locale:
+  
+      language[_territory][.codeset][@modifier]
+
+  - When looking, some parts may be dropped in the following order:
+    
+      1 codeset
+      2 normalized codeset
+      3 territory
+      4 modifier
 */
 
 

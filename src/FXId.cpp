@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXId.cpp,v 1.27 2008/01/04 15:42:21 fox Exp $                            *
+* $Id: FXId.cpp,v 1.28 2008/04/22 20:08:09 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -69,4 +69,11 @@ void FXId::load(FXStream& store){
   store >> app;
   }
 
+
+// Destructor
+FXId::~FXId(){
+  app=(FXApp*)-1L;
+  data=(void*)-1L;
+  }
+  
 }

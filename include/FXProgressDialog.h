@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressDialog.h,v 1.22 2008/01/04 15:18:23 fox Exp $                  *
+* $Id: FXProgressDialog.h,v 1.23 2008/02/04 21:56:59 fox Exp $                  *
 ********************************************************************************/
 #ifndef FXPROGRESSDIALOG_H
 #define FXPROGRESSDIALOG_H
@@ -46,6 +46,8 @@ class FXLabel;
 * A Progress Dialog is a simple dialog which is used to
 * keep a user informed of the progress of a lengthy operation
 * in a program and that the program is in fact still working.
+* The PROGRESSDIALOG_CANCEL option enables the display of the
+* cancel button in the Progress Dialog.
 */
 class FXAPI FXProgressDialog : public FXDialogBox {
   FXDECLARE(FXProgressDialog)

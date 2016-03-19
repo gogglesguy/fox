@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.198 2008/01/04 15:18:28 fox Exp $                           *
+* $Id: fxdefs.h,v 1.201 2008/04/18 16:57:06 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -230,6 +230,8 @@ enum FXSelType {
   SEL_SPACEBALLBUTTONRELEASE,           /// Released space ball button
   SEL_SESSION_NOTIFY,                   /// Session is about to close
   SEL_SESSION_CLOSED,                   /// Session is closed
+  SEL_IME_START,                        /// IME mode
+  SEL_IME_END,                          /// IME mode
   SEL_LAST
   };
 
@@ -436,7 +438,7 @@ const FXdouble DTOR=0.0174532925199432957692369077;
 /// Multiplier for radians to degrees
 const FXdouble RTOD=57.295779513082320876798154814;
 
-#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__)
+#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__)
 /// A time in the far, far future
 const FXTime forever=9223372036854775807LL;
 #else
@@ -578,6 +580,20 @@ const FXTime forever=9223372036854775807L;
 
 
 /**
+* FXVERIFY prints out a message when the expression fails,
+* and nothing otherwise.
+* When compiling your application for release, these messages
+* are compiled out, but unlike FXASSERT, FXVERIFY will still execute
+* the expression.
+*/
+#ifndef NDEBUG
+#define FXVERIFY(exp) ((exp)?((void)0):(void)FX::fxverify(#exp,__FILE__,__LINE__))
+#else
+#define FXVERIFY(exp) ((void)(exp))
+#endif
+
+
+/**
 * FXTRACE() allows you to trace the execution of your application
 * with increasing levels of detail the higher the trace level.
 * The trace level is determined by variable fxTraceLevel, which
@@ -594,7 +610,6 @@ const FXTime forever=9223372036854775807L;
 #else
 #define FXTRACE(arguments) ((void)0)
 #endif
-
 
 /**
 * Allocate a memory block of no elements of type and store a pointer
@@ -707,6 +722,9 @@ extern FXAPI void fxmessage(const char* format,...) FX_PRINTF(1,2) ;
 
 /// Assert failed routine:- usually not called directly but called through FXASSERT
 extern FXAPI void fxassert(const char* expression,const char* filename,unsigned int lineno);
+
+/// Verify failed routine:- usually not called directly but called through FXVERIFY
+extern FXAPI void fxverify(const char* expression,const char* filename,unsigned int lineno);
 
 /// Trace printout routine:- usually not called directly but called through FXTRACE
 extern FXAPI void fxtrace(unsigned int level,const char* format,...) FX_PRINTF(2,3) ;

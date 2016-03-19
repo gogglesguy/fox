@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.h,v 1.177 2008/01/04 15:18:25 fox Exp $                          *
+* $Id: FXTable.h,v 1.179 2008/03/05 06:01:54 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -617,15 +617,17 @@ public:
   * it is filled by the original item's contents if the cell contained
   * an item.  You can enter input mode also by sending the table an
   * ID_START_INPUT message.
+  * Return true if editing of the cell has been started.
   */
-  virtual void startInput(FXint row,FXint col);
+  virtual FXbool startInput(FXint row,FXint col);
 
   /**
   * Cancel input mode.  The input control is immediately deleted
   * and the cell will retain its old value.  You can also cancel
   * input mode by sending the table an ID_CANCEL_INPUT message.
+  * Return true if editing of the cell has been cancelled.
   */
-  virtual void cancelInput();
+  virtual FXbool cancelInput();
 
   /**
   * End input mode and accept the new value from the control.
@@ -634,8 +636,9 @@ public:
   * callback will be generated to signify to the target that this call
   * has a new value.  You can also accept the input by sending the table
   * an ID_ACCEPT_INPUT message.
+  * Return true if the new value of the cell has been accepted.
   */
-  virtual void acceptInput(FXbool notify=false);
+  virtual FXbool acceptInput(FXbool notify=false);
 
   /**
   * Determine column containing x.

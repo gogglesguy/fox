@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.cpp,v 1.211 2008/01/04 15:42:39 fox Exp $                    *
+* $Id: FXTextField.cpp,v 1.212 2008/03/27 15:51:57 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -111,6 +111,7 @@ FXDEFMAP(FXTextField) FXTextFieldMap[]={
   FXMAPFUNC(SEL_FOCUS_SELF,0,FXTextField::onFocusSelf),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXTextField::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXTextField::onQueryHelp),
+  FXMAPFUNC(SEL_IME_START,0,FXTextField::onIMEStart),
   FXMAPFUNC(SEL_UPDATE,FXTextField::ID_TOGGLE_EDITABLE,FXTextField::onUpdToggleEditable),
   FXMAPFUNC(SEL_UPDATE,FXTextField::ID_TOGGLE_OVERSTRIKE,FXTextField::onUpdToggleOverstrike),
   FXMAPFUNC(SEL_UPDATE,FXTextField::ID_CUT_SEL,FXTextField::onUpdHaveSelection),
@@ -1279,6 +1280,19 @@ long FXTextField::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
   if(FXFrame::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
+    return 1;
+    }
+  return 0;
+  }
+
+
+long FXTextField::onIMEStart(FXObject* sender,FXSelector sel,void* ptr){
+  if(isEditable()){
+    if(getComposeContext()){
+      register FXint cursorx=coord(cursor)-1;
+      getComposeContext()->setSpot(cursorx,padtop+border);
+      getComposeContext()->setFont(font);
+      }
     return 1;
     }
   return 0;

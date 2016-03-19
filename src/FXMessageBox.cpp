@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageBox.cpp,v 1.47 2008/01/04 15:42:25 fox Exp $                    *
+* $Id: FXMessageBox.cpp,v 1.49 2008/01/22 21:37:10 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -132,7 +132,7 @@ void FXMessageBox::initialize(const FXString& text,FXIcon* icn,FXuint whichbutto
     new FXButton(buttons,tr("&Cancel"),NULL,this,ID_CLICKED_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
     initial->setFocus();
     }
-  else if (whichbuttons==MBOX_SAVE_CANCEL_DONTSAVE){
+  else if(whichbuttons==MBOX_SAVE_CANCEL_DONTSAVE){
     buttons->setPackingHints(PACK_NORMAL);
     new FXButton(buttons,tr("&Don't Save"),NULL,this,ID_CLICKED_NO,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
     FXHorizontalFrame *buttons3=new FXHorizontalFrame(buttons,LAYOUT_RIGHT|PACK_UNIFORM_WIDTH,0,0,0,0,0,0,0,0);
@@ -164,7 +164,7 @@ FXuint FXMessageBox::error(FXWindow* owner,FXuint opts,const char* caption,const
   FXGIFIcon icon(owner->getApp(),erroricon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(owner,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(owner,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_OWNER);
   }
@@ -175,7 +175,7 @@ FXuint FXMessageBox::error(FXApp* app,FXuint opts,const char* caption,const char
   FXGIFIcon icon(app,erroricon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(app,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(app,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_SCREEN);
   }
@@ -187,7 +187,7 @@ FXuint FXMessageBox::warning(FXWindow* owner,FXuint opts,const char* caption,con
   FXGIFIcon icon(owner->getApp(),warningicon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(owner,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(owner,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_OWNER);
   }
@@ -198,7 +198,7 @@ FXuint FXMessageBox::warning(FXApp* app,FXuint opts,const char* caption,const ch
   FXGIFIcon icon(app,warningicon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(app,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(app,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_SCREEN);
   }
@@ -209,7 +209,7 @@ FXuint FXMessageBox::question(FXWindow* owner,FXuint opts,const char* caption,co
   FXGIFIcon icon(owner->getApp(),questionicon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(owner,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(owner,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_OWNER);
   }
@@ -220,7 +220,7 @@ FXuint FXMessageBox::question(FXApp* app,FXuint opts,const char* caption,const c
   FXGIFIcon icon(app,questionicon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(app,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(app,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_SCREEN);
   }
@@ -231,7 +231,7 @@ FXuint FXMessageBox::information(FXWindow* owner,FXuint opts,const char* caption
   FXGIFIcon icon(owner->getApp(),infoicon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(owner,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(owner,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_OWNER);
   }
@@ -242,7 +242,7 @@ FXuint FXMessageBox::information(FXApp* app,FXuint opts,const char* caption,cons
   FXGIFIcon icon(app,infoicon);
   va_list arguments;
   va_start(arguments,message);
-  FXMessageBox box(app,caption,FXString::value(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox box(app,caption,FXString::vvalue(message,arguments),&icon,opts|DECOR_TITLE|DECOR_BORDER);
   va_end(arguments);
   return box.execute(PLACEMENT_SCREEN);
   }

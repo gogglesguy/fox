@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXListBox.h,v 1.51 2008/01/04 15:18:20 fox Exp $                         *
+* $Id: FXListBox.h,v 1.53 2008/01/15 05:31:34 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXLISTBOX_H
 #define FXLISTBOX_H
@@ -204,8 +204,11 @@ public:
   /// Get data pointer for specified item
   void* getItemData(FXint index) const;
 
-  /// Is the pane shown
-  FXbool isPaneShown() const;
+  /// Show or hide menu
+  void showMenu(FXbool shw);
+
+  /// Is the menu pane shown
+  FXbool isMenuShown() const;
 
   /// Sort items using current sort function
   void sortItems();

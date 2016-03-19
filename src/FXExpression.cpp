@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXExpression.cpp,v 1.37 2008/01/04 15:42:11 fox Exp $                    *
+* $Id: FXExpression.cpp,v 1.38 2008/03/25 20:00:58 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -493,7 +493,7 @@ FXint FXCompile::lookup(const FXchar *list){
     FXint which=0;
     while(*list){
       const FXchar *q;
-      for(q=head; q<tail && *q==*list; q++,list++);
+      for(q=head; q<tail && *q==*list; q++,list++){}
       if(q==tail && (*list=='\0' || *list==',')) return which;
       while(*list && *list!=',') list++;
       if(*list==','){ which++; list++; }

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: thread.cpp,v 1.26 2008/01/04 15:18:34 fox Exp $                          *
+* $Id: thread.cpp,v 1.27 2008/03/26 15:04:04 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include "FXThreadPool.h"
@@ -72,7 +72,7 @@ FXint Producer::run(){
 
 
 // Start
-int main(int argc,char *argv[]){
+int main(int,char**){
 
   // Trace
   fxTraceLevel=151;

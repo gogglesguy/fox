@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconList.cpp,v 1.243 2008/01/04 15:42:20 fox Exp $                     *
+* $Id: FXIconList.cpp,v 1.245 2008/03/26 02:44:30 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -118,7 +118,7 @@ void FXIconItem::drawBigIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXi
   dc.fillRectangle(x,y,w,h);
   space=w-SIDE_SPACING;
   if(!label.empty()){
-    for(len=0; len<label.length() && label[len]!='\t'; len++);
+    for(len=0; len<label.length() && label[len]!='\t'; len++){}
     tw=4+font->getTextWidth(label.text(),len);
     th=4+font->getFontHeight();
     yt=y+h-th-BIG_LINE_SPACING/2;
@@ -184,7 +184,7 @@ void FXIconItem::drawMiniIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FX
     space-=iw+MINI_TEXT_SPACING;
     }
   if(!label.empty()){
-    for(len=0; len<label.length() && label[len]!='\t'; len++);
+    for(len=0; len<label.length() && label[len]!='\t'; len++){}
     tw=4+font->getTextWidth(label.text(),len);
     th=4+font->getFontHeight();
     dw=font->getTextWidth("...",3);
@@ -255,7 +255,7 @@ void FXIconItem::drawDetails(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXi
     used=iw+DETAIL_TEXT_SPACING+SIDE_SPACING/2;
     for(hi=beg=0; beg<label.length() && hi<header->getNumItems(); hi++,beg=end+1){
       space=header->getItemSize(hi)-used;
-      for(end=beg; end<label.length() && label[end]!='\t'; end++);
+      for(end=beg; end<label.length() && label[end]!='\t'; end++){}
       if(end>beg){
         drw=end-beg;
         tw=font->getTextWidth(&label[beg],drw);
@@ -282,7 +282,7 @@ FXint FXIconItem::hitItem(const FXIconList* list,FXint rx,FXint ry,FXint rw,FXin
   register FXFont *font=list->getFont();
   register FXuint options=list->getListStyle();
   register FXint iw=0,tw=0,ih=0,th=0,ss=0,ix,iy,tx,ty,w,h,sp,tlen;
-  for(tlen=0; tlen<label.length() && label[tlen]!='\t'; tlen++);
+  for(tlen=0; tlen<label.length() && label[tlen]!='\t'; tlen++){}
   if(options&ICONLIST_BIG_ICONS){
     w=list->getItemWidth();
     h=list->getItemHeight();
@@ -428,7 +428,7 @@ FXint FXIconItem::getWidth(const FXIconList* list) const {
   register FXFont *font=list->getFont();
   register FXuint options=list->getListStyle();
   register FXint iw=0,tw=0,w=0,tlen;
-  for(tlen=0; tlen<label.length() && label[tlen]!='\t'; tlen++);
+  for(tlen=0; tlen<label.length() && label[tlen]!='\t'; tlen++){}
   if(options&ICONLIST_BIG_ICONS){
     if(bigIcon) iw=bigIcon->getWidth();
     if(!label.empty()) tw=4+font->getTextWidth(label.text(),tlen);
@@ -1872,8 +1872,8 @@ long FXIconList::onCmdSelectInverse(FXObject*,FXSelector,void*){
 // Compare sectioned strings
 FXint FXIconList::compareSection(const FXchar *p,const FXchar* q,FXint s){
   register FXint c1,c2,x;
-  for(x=s; x && *p; x-=(*p++=='\t'));
-  for(x=s; x && *q; x-=(*q++=='\t'));
+  for(x=s; x && *p; x-=(*p++=='\t')){}
+  for(x=s; x && *q; x-=(*q++=='\t')){}
   do{
     c1=FXuchar(*p++);
     c2=FXuchar(*q++);
@@ -1886,8 +1886,8 @@ FXint FXIconList::compareSection(const FXchar *p,const FXchar* q,FXint s){
 // Compare sectioned strings, case-insensitive
 FXint FXIconList::compareSectionCase(const FXchar *p,const FXchar* q,FXint s){
   register FXint c1,c2,x;
-  for(x=s; x && *p; x-=(*p++=='\t'));
-  for(x=s; x && *q; x-=(*q++=='\t'));
+  for(x=s; x && *p; x-=(*p++=='\t')){}
+  for(x=s; x && *q; x-=(*q++=='\t')){}
   do{
     if((*p & 0x80) && (*q & 0x80)){
       c1=Unicode::toLower(wc(p)); p+=wclen(p);
@@ -1936,7 +1936,7 @@ void FXIconList::sortItems(){
     if(0<=current){
       c=items[current];
       }
-    for(h=1; h<=items.no()/9; h=3*h+1);
+    for(h=1; h<=items.no()/9; h=3*h+1){}
     for(; h>0; h/=3){
       for(i=h+1;i<=items.no();i++){
         v=items[i-1];

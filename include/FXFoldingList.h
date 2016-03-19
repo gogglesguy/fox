@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.h,v 1.44 2008/01/04 15:18:18 fox Exp $                     *
+* $Id: FXFoldingList.h,v 1.45 2008/01/30 17:27:39 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXFOLDINGLIST_H
 #define FXFOLDINGLIST_H
@@ -239,6 +239,11 @@ typedef FXint (*FXFoldingListSortFunc)(const FXFoldingItem*,const FXFoldingItem*
 * type SEL_INSERTED or SEL_DELETED.
 * In each of these cases, a pointer to the item, if any, is passed in the
 * 3rd argument of the message.
+* The text in each item is a string separated by tabs for each column;
+* in mini- or big-icon mode, only the text before the first tab is shown.  
+* In detail-mode, the text before the first tab is shown in the first column,
+* the text between the first and second tab is shown in the second column, 
+* and so on.
 */
 class FXAPI FXFoldingList : public FXScrollArea {
   FXDECLARE(FXFoldingList)

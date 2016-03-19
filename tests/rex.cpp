@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: rex.cpp,v 1.22 2008/01/04 15:18:34 fox Exp $                             *
+* $Id: rex.cpp,v 1.23 2008/03/26 19:08:46 fox Exp $                             *
 ********************************************************************************/
 #include "fx.h"
 
@@ -23,7 +23,7 @@
 
 // Start the whole thing
 int main(int argc,char** argv){
-  FXRexError err;
+  FXRex::Error err;
   FXRex rex;
   FXbool ok;
   FXint i;
@@ -35,11 +35,11 @@ int main(int argc,char** argv){
     exit(1);
     }
   if(2<=argc){
-    err=rex.parse(argv[1],REX_NORMAL|REX_CAPTURE);
+    err=rex.parse(argv[1],FXRex::Normal|FXRex::Capture);
     fprintf(stderr,"parse(\"%s\") = %s\n",argv[1],FXRex::getError(err));
     }
   if(3<=argc){
-    ok=rex.match(argv[2],strlen(argv[2]),beg,end,REX_FORWARD,NCAP);
+    ok=rex.match(argv[2],strlen(argv[2]),beg,end,FXRex::Forward,NCAP);
     if(ok){
       fprintf(stderr,"match at %d:%d\n",beg[0],end[0]);
       for(i=1; i<NCAP; i++){

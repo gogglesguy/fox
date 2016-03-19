@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxprintf.cpp,v 1.60 2008/01/04 15:42:46 fox Exp $                        *
+* $Id: fxprintf.cpp,v 1.72 2008/03/25 20:01:00 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -31,7 +31,11 @@
   Notes:
   - Handles conversions of the form:
 
-        % [#0-+ ] [width] [.precision] [l|ll|h|hh|L|q|t|z] [d|i|o|u|x|X|e|E|f|F|g|G|c|s|n|p]
+        % [digits$] [#0-+ ] [width] [.precision] [l|ll|h|hh|L|q|t|z] [d|i|o|u|x|X|e|E|f|F|g|G|c|s|n|p]
+
+  - Positional argument:
+     'digits$'  A sequence of decimal digits indication the position in the parameter list,
+                followed by '$'.  The first parameter starts at 1.
 
   - Interpretation of the flags:
      '#'        Alternate form (prefix '0' for octal, '0x' for hex, decimal point if float.
@@ -40,6 +44,22 @@
      '+'        Show sign always.
      ' '        Leave blank for positive numbers.
      '''        Insert comma's for thousands, like 1,000,000.
+
+  - Width:
+    digits      Explicit format width.
+    *           Format width passed as a parameter.
+    *digits$    Format width in positional parameter.  The first parameter starts at 1.
+
+    If the format width is negative, it is interpreted as left-justified, same if the '-'
+    flag was used.
+
+  - Precision:
+    digits      Explicit precision.
+    *           Precision passed as a parameter.
+    *digits$    Precision in positional parameter.  The first parameter starts at 1.
+
+    The maximum precision supported is 100, and the minimum value is 0.  If not specified,
+    a value of 6 will be used for floating point conversions.
 
   - Interpretation of size parameters:
      'hh'       convert from FXchar.
@@ -68,15 +88,21 @@
      'f', 'F'   Simple point conversion.
      'g', 'G'   Shortest representation point conversion.
 
-  - Width may be digits, or '*'.
-  - Precision is a sequence of digits, or '*'.
-  - Exponent base 10: x = log10(2^y) = y*log10(2) = y*0.301029995663981
-    so, roughly x = y*0.301025390625 = (y*1233)>>12.
-  - FIXME positional arguments [N$] will be implemented as well some time.
+  - If the range of positional parameters in a format string is not contiguous,
+    i.e. if a positional parameter is skipped (e.g. "%3$d%1$d"), then the missing
+    one is assumed to be of type "int".
+    Its therefore best if no parameters are skipped; referencing a single parameter
+    multiple times however, is no problem!!
 */
 
 #define CONVERTSIZE     512     // Convertsion buffer
 #define NDIG            512     // Maximum space used for numbers
+
+#ifdef WIN32
+#ifndef va_copy
+#define va_copy(arg,list) ((arg)=(list))
+#endif
+#endif
 
 using namespace FX;
 
@@ -111,7 +137,8 @@ enum {
   FLG_UPPER    = 32,    // Use upper case
   FLG_UNSIGNED = 64,    // Unsigned
   FLG_THOUSAND = 128,   // Print comma's for thousands
-  FLG_EXPONENT = 256    // Exponential notation
+  FLG_EXPONENT = 256,   // Exponential notation
+  FLG_DOTSEEN  = 512    // Dot was seen
   };
 
 
@@ -525,23 +552,196 @@ static FXchar* convertLong(FXchar* buffer,FXint& len,FXlong value,FXuint base,FX
 /*******************************************************************************/
 
 
+// Advance ag from args to position before pos
+void vadvance(va_list& ag,va_list args,const FXchar* format,FXint pos){
+  register FXint ch,modifier,val,v;
+  register const FXchar* fmt;
+  register FXint cur=1;
+  va_copy(ag,args);
+  while(cur<pos){
+    fmt=format;
+    while((ch=*fmt++)!='\0'){
+      if(ch=='%'){
+        ch=*fmt++;
+        if(ch=='%') continue;
+        modifier=ARG_DEFAULT;
+        val=0;
+flg:    switch(ch){
+          case ' ':
+          case '-':
+          case '+':
+          case '#':
+          case '\'':
+          case '.':                                     // Precision follows
+            ch=*fmt++;
+            goto flg;
+          case '*':                                     // Width or precision parameter
+            ch=*fmt++;
+            if(Ascii::isDigit(ch)){
+              v=ch-'0';
+              ch=*fmt++;
+              while(Ascii::isDigit(ch)){
+                v=v*10+ch-'0';
+                ch=*fmt++;
+                }
+              if(ch!='$') return;                       // Bail on format-error
+              ch=*fmt++;
+              if(v==cur){
+                (void)va_arg(ag,FXint);
+                goto nxt;
+                }
+              }
+            goto flg;
+          case '0':                                     // Print leading zeroes
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+          case '8':
+          case '9':
+            v=ch-'0';
+            ch=*fmt++;
+            while(Ascii::isDigit(ch)){
+              v=v*10+ch-'0';
+              ch=*fmt++;
+              }
+            if(ch=='$'){                                // Positional parameter
+              ch=*fmt++;
+              val=v;
+              goto flg;
+              }
+            goto flg;
+          case 'l':                                     // Long
+            modifier=ARG_LONG;
+            ch=*fmt++;
+            if(ch=='l'){                                // Long Long
+              modifier=ARG_LONGLONG;
+              ch=*fmt++;
+              }
+            goto flg;
+          case 'h':                                     // Short
+            modifier=ARG_HALF;
+            ch=*fmt++;
+            if(ch=='h'){                                // Char
+              modifier=ARG_HALFHALF;
+              ch=*fmt++;
+              }
+            goto flg;
+          case 'L':
+          case 'q':                                     // Long Long
+            modifier=ARG_LONGLONG;
+            ch=*fmt++;
+            goto flg;
+          case 't':
+          case 'z':                                     // Size depends on pointer
+            modifier=ARG_VARIABLE;
+            ch=*fmt++;
+            goto flg;
+          case 'u':
+          case 'd':
+          case 'i':
+          case 'b':
+          case 'o':
+          case 'X':
+          case 'x':
+            if(val==cur){
+              if(modifier==ARG_DEFAULT){                // 32-bit always
+                (void)va_arg(ag,FXuint);
+                }
+              else if(modifier==ARG_LONG){              // Whatever size a long is
+                (void)va_arg(ag,unsigned long);
+                }
+              else if(modifier==ARG_LONGLONG){          // 64-bit always
+                (void)va_arg(ag,FXulong);
+                }
+              else if(modifier==ARG_HALF){              // 16-bit always
+                (void)va_arg(ag,FXuint);
+                }
+              else if(modifier==ARG_HALFHALF){          // 8-bit always
+                (void)va_arg(ag,FXuint);
+                }
+              else{                                     // Whatever size a pointer is
+                (void)va_arg(ag,FXuval);
+                }
+              goto nxt;
+              }
+            break;
+          case 'F':
+          case 'f':
+          case 'E':
+          case 'e':
+          case 'G':
+          case 'g':
+            if(val==cur){
+              (void)va_arg(ag,FXdouble);
+              goto nxt;
+              }
+            break;
+          case 'c':
+            if(val==cur){
+              (void)va_arg(ag,FXint);
+              goto nxt;
+              }
+            break;
+          case 's':
+            if(val==cur){
+              (void)va_arg(ag,FXchar*);
+              goto nxt;
+              }
+            break;
+          case 'n':
+            if(val==cur){
+              (void)va_arg(ag,FXint*);
+              goto nxt;
+              }
+            break;
+          case 'p':
+            if(val==cur){
+              (void)va_arg(ag,FXuval);
+              goto nxt;
+              }
+            break;
+          default:                                      // Bail on format-error
+            return;
+          }
+        }
+      }
+
+    // Position cur$ not found; assume it was an int
+    (void)va_arg(ag,FXint);
+
+    // Advance to next parameter
+nxt:cur++;
+    }
+  }
+
+
+/*******************************************************************************/
+
 // Print using format
 FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args){
-  FXint ch,count,flags,width,precision,modifier,len,i;
-  FXchar buffer[CONVERTSIZE+2],*str;
+  FXint ch,modifier,count,flags,width,precision,pos,val,len,i;
+  const FXchar *fmt=format;
+  const FXchar *str;
   FXdouble number;
   FXlong value;
+  FXchar buffer[CONVERTSIZE+2];
+  va_list ag;
 
   count=0;
 
   // Process format string
-  while((ch=*format++)!='\0'){
+  va_copy(ag,args);
+  while((ch=*fmt++)!='\0'){
 
     // Check for format-characters
     if(ch=='%'){
 
       // Get next format character
-      ch=*format++;
+      ch=*fmt++;
 
       // Check for '%%'
       if(ch=='%') goto nml;
@@ -551,167 +751,208 @@ FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args)
       flags=FLG_DEFAULT;
       precision=-1;
       width=-1;
+      pos=-1;
+      val=0;
 
-      // Check flag characters
-flg:  if(ch==' '){ flags|=FLG_BLANK; ch=*format++; goto flg; }
-      if(ch=='-'){ flags|=FLG_LEFT; ch=*format++; goto flg; }
-      if(ch=='+'){ flags|=FLG_SIGN; ch=*format++; goto flg; }
-      if(ch=='0'){ flags|=FLG_ZERO; ch=*format++; goto flg; }
-      if(ch=='#'){ flags|=FLG_ALTER; ch=*format++; goto flg; }
-      if(ch=='\''){ flags|=FLG_THOUSAND; ch=*format++; goto flg; }
-
-      // Field width
-      if(Ascii::isDigit(ch)){                   // In format
-        width=ch-'0';
-        ch=*format++;
-        while(Ascii::isDigit(ch)){
-          width=width*10+ch-'0';
-          ch=*format++;
-          }
-        }
-      else if(ch=='*'){                         // In argument
-        width=va_arg(args,FXint);
-        ch=*format++;
-        if(width<0){
-          width=-width;
+      // Parse format specifier
+flg:  switch(ch){
+        case ' ':                                       // Print blank if not negative
+          flags|=FLG_BLANK;
+          ch=*fmt++;
+          goto flg;
+        case '-':                                       // Left adjust
           flags|=FLG_LEFT;
-          }
-        }
-
-      // Precision
-      if(ch=='.'){
-        ch=*format++;
-        precision=0;                            // Default is zero
-        if(Ascii::isDigit(ch)){                 // In format
-          precision=ch-'0';
-          ch=*format++;
-          while(Ascii::isDigit(ch)){
-            precision=precision*10+ch-'0';
-            ch=*format++;
+          ch=*fmt++;
+          goto flg;
+        case '+':                                       // Always print sign even if positive
+          flags|=FLG_SIGN;
+          ch=*fmt++;
+          goto flg;
+        case '#':                                       // Alternate form
+          flags|=FLG_ALTER;
+          ch=*fmt++;
+          goto flg;
+        case '\'':                                      // Print thousandths
+          flags|=FLG_THOUSAND;
+          ch=*fmt++;
+          goto flg;
+        case '.':                                       // Precision follows
+          flags|=FLG_DOTSEEN;
+          ch=*fmt++;
+          precision=0;                                  // Default is zero
+          goto flg;
+        case '*':                                       // Width or precision parameter
+          ch=*fmt++;
+          val=0;                                        // Assume non-positional parameter
+          if(Ascii::isDigit(ch)){
+            val=ch-'0';
+            ch=*fmt++;
+            while(Ascii::isDigit(ch)){
+              val=val*10+ch-'0';
+              ch=*fmt++;
+              }
+            if(ch!='$') goto x;                         // Expected positional parameter suffix '$'
+            ch=*fmt++;
+            if(0<val){                                  // Positional argument follows; scan to proper place in args
+              vadvance(ag,args,format,val);
+              }
             }
-          if(precision>100) precision=100;
-          }
-        else if(ch=='*'){                       // In argument
-          precision=va_arg(args,FXint);
-          ch=*format++;
-          if(precision<0) precision=0;
-          if(precision>100) precision=100;
-          }
-        }
-
-      // Type modifier
-      if(ch=='l'){                                      // Long
-        modifier=ARG_LONG;
-        ch=*format++;
-        if(ch=='l'){                                    // Long Long
+          if(flags&FLG_DOTSEEN){                        // After period: its precision
+            precision=va_arg(ag,FXint);
+            if(precision<0){ precision=0; }
+            if(precision>100){ precision=100; }
+            }
+          else{                                         // Before period: its width
+            width=va_arg(ag,FXint);
+            if(width<0){ width=-width; flags|=FLG_LEFT; }
+            }
+          goto flg;
+        case '0':                                       // Print leading zeroes
+          if(!(flags&FLG_DOTSEEN)) flags|=FLG_ZERO;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          val=ch-'0';
+          ch=*fmt++;
+          while(Ascii::isDigit(ch)){
+            val=val*10+ch-'0';
+            ch=*fmt++;
+            }
+          if(ch=='$'){                                  // Positional parameter
+            ch=*fmt++;
+            if(val<=0) goto x;                          // Not a legal parameter position
+            pos=val;                                    // Remember position
+            goto flg;
+            }
+          if(flags&FLG_DOTSEEN){                        // After period: its precision
+            precision=val;
+            if(precision>100){ precision=100; }
+            }
+          else{                                         // Before period: its width
+            width=val;
+            }
+          goto flg;
+        case 'l':                                       // Long
+          modifier=ARG_LONG;
+          ch=*fmt++;
+          if(ch=='l'){                                  // Long Long
+            modifier=ARG_LONGLONG;
+            ch=*fmt++;
+            }
+          goto flg;
+        case 'h':                                       // Short
+          modifier=ARG_HALF;
+          ch=*fmt++;
+          if(ch=='h'){                                  // Char
+            modifier=ARG_HALFHALF;
+            ch=*fmt++;
+            }
+          goto flg;
+        case 'L':
+        case 'q':                                       // Long Long
           modifier=ARG_LONGLONG;
-          ch=*format++;
-          }
-        }
-      else if(ch=='h'){                                 // Short
-        modifier=ARG_HALF;
-        ch=*format++;
-        if(ch=='h'){                                    // Char
-          modifier=ARG_HALFHALF;
-          ch=*format++;
-          }
-        }
-      else if(ch=='L' || ch=='q'){                      // Long Long
-        modifier=ARG_LONGLONG;
-        ch=*format++;
-        }
-      else if(ch=='t' || ch=='z'){                      // Size depends on pointer
-        modifier=ARG_VARIABLE;
-        ch=*format++;
-        }
-
-      // Conversion specifier
-      switch(ch){
+          ch=*fmt++;
+          goto flg;
+        case 't':
+        case 'z':                                       // Size depends on pointer
+          modifier=ARG_VARIABLE;
+          ch=*fmt++;
+          goto flg;
         case 'u':
           flags|=FLG_UNSIGNED;
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
-            value=(FXulong)va_arg(args,FXuint);
+            value=(FXulong)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_LONG){                  // Whatever size a long is
-            value=(FXulong)va_arg(args,unsigned long);
+            value=(FXulong)va_arg(ag,unsigned long);
             }
           else if(modifier==ARG_LONGLONG){              // 64-bit always
-            value=(FXulong)va_arg(args,FXulong);
+            value=(FXulong)va_arg(ag,FXulong);
             }
           else if(modifier==ARG_HALF){                  // 16-bit always
-            value=(FXulong)(FXushort)va_arg(args,FXuint);
+            value=(FXulong)(FXushort)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            value=(FXulong)(FXuchar)va_arg(args,FXuint);
+            value=(FXulong)(FXuchar)va_arg(ag,FXuint);
             }
           else{                                         // Whatever size a pointer is
-            value=(FXulong)va_arg(args,FXuval);
+            value=(FXulong)va_arg(ag,FXuval);
             }
           str=convertLong(buffer,len,value,10,precision,flags);
           break;
         case 'd':
         case 'i':
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
-            value=(FXlong)va_arg(args,FXint);
+            value=(FXlong)va_arg(ag,FXint);
             }
           else if(modifier==ARG_LONG){                  // Whatever size a long is
-            value=(FXlong)va_arg(args,long);
+            value=(FXlong)va_arg(ag,long);
             }
           else if(modifier==ARG_LONGLONG){              // 64-bit always
-            value=(FXlong)va_arg(args,FXlong);
+            value=(FXlong)va_arg(ag,FXlong);
             }
           else if(modifier==ARG_HALF){                  // 16-bit always
-            value=(FXlong)(FXshort)va_arg(args,FXint);
+            value=(FXlong)(FXshort)va_arg(ag,FXint);
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            value=(FXlong)(signed char)va_arg(args,FXint);
+            value=(FXlong)(signed char)va_arg(ag,FXint);
             }
           else{                                         // Whatever size a pointer is
-            value=(FXlong)va_arg(args,FXival);
+            value=(FXlong)va_arg(ag,FXival);
             }
           str=convertLong(buffer,len,value,10,precision,flags);
           break;
         case 'b':
           flags|=FLG_UNSIGNED;
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
-            value=(FXulong)va_arg(args,FXuint);
+            value=(FXulong)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_LONG){                  // Whatever size a long is
-            value=(FXulong)va_arg(args,unsigned long);
+            value=(FXulong)va_arg(ag,unsigned long);
             }
           else if(modifier==ARG_LONGLONG){              // 64-bit always
-            value=(FXulong)va_arg(args,FXulong);
+            value=(FXulong)va_arg(ag,FXulong);
             }
           else if(modifier==ARG_HALF){                  // 16-bit always
-            value=(FXulong)(FXushort)va_arg(args,FXuint);
+            value=(FXulong)(FXushort)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            value=(FXulong)(FXuchar)va_arg(args,FXuint);
+            value=(FXulong)(FXuchar)va_arg(ag,FXuint);
             }
           else{                                         // Whatever size a pointer is
-            value=(FXulong)va_arg(args,FXuval);
+            value=(FXulong)va_arg(ag,FXuval);
             }
           str=convertLong(buffer,len,value,2,precision,flags);
           break;
         case 'o':
           flags|=FLG_UNSIGNED;
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
-            value=(FXulong)va_arg(args,FXuint);
+            value=(FXulong)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_LONG){                  // Whatever size a long is
-            value=(FXulong)va_arg(args,unsigned long);
+            value=(FXulong)va_arg(ag,unsigned long);
             }
           else if(modifier==ARG_LONGLONG){              // 64-bit always
-            value=(FXulong)va_arg(args,FXulong);
+            value=(FXulong)va_arg(ag,FXulong);
             }
           else if(modifier==ARG_HALF){                  // 16-bit always
-            value=(FXulong)(FXushort)va_arg(args,FXuint);
+            value=(FXulong)(FXushort)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            value=(FXulong)(FXuchar)va_arg(args,FXuint);
+            value=(FXulong)(FXuchar)va_arg(ag,FXuint);
             }
           else{                                         // Whatever size a pointer is
-            value=(FXulong)va_arg(args,FXuval);
+            value=(FXulong)va_arg(ag,FXuval);
             }
           str=convertLong(buffer,len,value,8,precision,flags);
           break;
@@ -719,30 +960,32 @@ flg:  if(ch==' '){ flags|=FLG_BLANK; ch=*format++; goto flg; }
           flags|=FLG_UPPER;
         case 'x':
           flags|=FLG_UNSIGNED;
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
-            value=(FXulong)va_arg(args,FXuint);
+            value=(FXulong)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_LONG){                  // Whatever size a long is
-            value=(FXulong)va_arg(args,unsigned long);
+            value=(FXulong)va_arg(ag,unsigned long);
             }
           else if(modifier==ARG_LONGLONG){              // 64-bit always
-            value=(FXulong)va_arg(args,FXulong);
+            value=(FXulong)va_arg(ag,FXulong);
             }
           else if(modifier==ARG_HALF){                  // 16-bit always
-            value=(FXulong)(FXushort)va_arg(args,FXuint);
+            value=(FXulong)(FXushort)va_arg(ag,FXuint);
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            value=(FXulong)(FXuchar)va_arg(args,FXuint);
+            value=(FXulong)(FXuchar)va_arg(ag,FXuint);
             }
           else{                                         // Whatever size a pointer is
-            value=(FXulong)va_arg(args,FXuval);
+            value=(FXulong)va_arg(ag,FXuval);
             }
           str=convertLong(buffer,len,value,16,precision,flags);
           break;
         case 'F':
           flags|=FLG_UPPER;
         case 'f':
-          number=va_arg(args,FXdouble);
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
+          number=va_arg(ag,FXdouble);
           if(precision<0) precision=6;
           str=convertDouble(buffer,len,number,precision,flags);
           break;
@@ -750,27 +993,31 @@ flg:  if(ch==' '){ flags|=FLG_BLANK; ch=*format++; goto flg; }
           flags|=FLG_UPPER;
         case 'e':
           flags|=FLG_EXPONENT;
-          number=va_arg(args,FXdouble);
+          if(0<pos) vadvance(ag,args,format,pos);
+          number=va_arg(ag,FXdouble);
           if(precision<0) precision=6;
           str=convertDouble(buffer,len,number,precision,flags);
           break;
         case 'G':
           flags|=FLG_UPPER;
         case 'g':
-          number=va_arg(args,FXdouble);
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
+          number=va_arg(ag,FXdouble);
           if(precision<0) precision=6;
           if(precision<1) precision=1;
           str=convertGeneral(buffer,len,number,precision,flags);
           break;
         case 'c':                                       // Single character
           flags&=~FLG_ZERO;
-          buffer[0]=va_arg(args,FXint);
+          if(0<pos) vadvance(ag,args,format,pos);
+          buffer[0]=va_arg(ag,FXint);
           str=buffer;
           len=1;
           break;
         case 's':
           flags&=~FLG_ZERO;
-          str=va_arg(args,FXchar*);                     // String value
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
+          str=va_arg(ag,FXchar*);                       // String value
           if(str){
             len=strlen(str);
             if(0<=precision && precision<len) len=precision;
@@ -781,28 +1028,30 @@ flg:  if(ch==' '){ flags|=FLG_BLANK; ch=*format++; goto flg; }
             }
           break;
         case 'n':
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
-            *va_arg(args,FXint*)=(FXint)count;
+            *va_arg(ag,FXint*)=(FXint)count;
             }
           else if(modifier==ARG_LONG){                  // Whatever size a long is
-            *va_arg(args,long*)=(long)count;
+            *va_arg(ag,long*)=(long)count;
             }
           else if(modifier==ARG_LONGLONG){              // 64-bit always
-            *va_arg(args,FXlong*)=count;
+            *va_arg(ag,FXlong*)=count;
             }
           else if(modifier==ARG_HALF){                  // 16-bit always
-            *va_arg(args,FXshort*)=(FXshort)count;
+            *va_arg(ag,FXshort*)=(FXshort)count;
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            *va_arg(args,FXchar*)=(FXchar)count;
+            *va_arg(ag,FXchar*)=(FXchar)count;
             }
           else{                                         // Whatever size a pointer is
-            *va_arg(args,FXival*)=(FXival)count;
+            *va_arg(ag,FXival*)=(FXival)count;
             }
           continue;                                     // No printout
         case 'p':
           flags&=~FLG_ZERO;
-          value=(FXulong)va_arg(args,FXuval);
+          if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
+          value=(FXulong)va_arg(ag,FXuval);
           str=convertLong(buffer,len,value,16,precision,flags);
           break;
         default:                                        // Format error

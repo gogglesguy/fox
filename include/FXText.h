@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.h,v 1.225 2008/01/04 15:18:25 fox Exp $                           *
+* $Id: FXText.h,v 1.226 2008/03/27 15:51:56 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXTEXT_H
 #define FXTEXT_H
@@ -249,6 +249,7 @@ public:
   long onQueryTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
   long onUpdHaveSelection(FXObject*,FXSelector,void*);
+  long onIMEStart(FXObject*,FXSelector,void*);
 
   // Value access
   long onCmdSetStringValue(FXObject*,FXSelector,void*);

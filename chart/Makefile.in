@@ -99,7 +99,7 @@ CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap
 SUFFIXES = .gif .bmp
-LDADD = libCHART-1.7.la ../src/libFOX-1.7.la -lm
+LDADD = libCHART-1.7.la $(top_builddir)/src/libFOX-1.7.la -lm
 
 lib_LTLIBRARIES = libCHART-1.7.la
 
@@ -159,7 +159,8 @@ PROGRAMS =  $(noinst_PROGRAMS)
 
 charttest_OBJECTS =  charttest.$(OBJEXT) icons.$(OBJEXT)
 charttest_LDADD = $(LDADD)
-charttest_DEPENDENCIES =  libCHART-1.7.la ../src/libFOX-1.7.la
+charttest_DEPENDENCIES =  libCHART-1.7.la \
+$(top_builddir)/src/libFOX-1.7.la
 charttest_LDFLAGS = 
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

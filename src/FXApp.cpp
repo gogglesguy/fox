@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.710 2008/01/11 18:27:34 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.729 2008/03/28 20:54:20 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -496,7 +496,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   callocElms(signals,MAXSIGNALS);         // Signals array
   signalreceived=0;                       // Latest received signal
   inputmethod="";                         // Input method name
-  inputstyle="root";                      // Input method style
+  inputstyle="overthespot";               // Input method style
   maxcolors=MAXCOLORS;                    // Maximum number of colors to allocate
   ddeData=NULL;                           // Data exchange array
   ddeSize=0;                              // Data exchange array size
@@ -752,14 +752,13 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   normalFont=new FXFont(this,"Sans,90");
 #else
   normalFont=new FXFont(this,"helvetica,90");
-//  normalFont=new FXFont(this,"helvetica,90,,,,iso10646-1");
 #endif
 
   // We delete the stock font
   stockFont=normalFont;
 
   // Default translator
-  translator=new FXTranslator(this);
+  translator=new FXTranslator;
 
   // Init colors
   borderColor=FXRGB(0,0,0);
@@ -837,6 +836,180 @@ static HINSTANCE GetOwnModuleHandle(){
   return (HINSTANCE)mbi.AllocationBase;
   }
 
+
+// Open Input devices
+void FXApp::openInputDevices(){
+#if (_WIN32_WINNT >= 0x0501)
+  RAWINPUTDEVICELIST *devlist;
+  RID_DEVICE_INFO devinfo;
+  RAWINPUTDEVICE dev;
+  FXuint num_devices;
+  FXchar devname[256];
+  FXuint i;
+  FXuint bc;
+
+  // Get the number of attached raw input devices
+  GetRawInputDeviceList(NULL,&num_devices,sizeof(RAWINPUTDEVICELIST));
+  if(0<num_devices){
+
+    // Allocate the list
+    if(callocElms(devlist,num_devices)){
+
+      // Get the attached input device list
+      GetRawInputDeviceList(devlist,&num_devices,sizeof(RAWINPUTDEVICELIST));   // man page is wrong about arg2
+
+      // Get more info about each device
+      for(i=0; i<num_devices; i++){
+        bc=sizeof(devname);
+        GetRawInputDeviceInfo(devlist[i].hDevice,RIDI_DEVICENAME,devname,&bc);
+        FXTRACE((1,"device[%d] handle=%p type=%d name=%s\n",i,devlist[i].hDevice,devlist[i].dwType,devname));
+        bc=devinfo.cbSize=sizeof(devinfo);
+        GetRawInputDeviceInfo(devlist[i].hDevice,RIDI_DEVICEINFO,&devinfo,&bc);
+        switch(devinfo.dwType){
+          case RIM_TYPEMOUSE:
+#if 0
+            tlog("dwId:\t%d\n", devinfo.mouse.dwId);
+            tlog("dwNumberOfButtons:\t%d\n", devinfo.mouse.dwNumberOfButtons);
+            tlog("dwSampleRate:\t%d\n", devinfo.mouse.dwSampleRate);
+#endif
+            break;
+          case RIM_TYPEKEYBOARD:
+#if 0
+            tlog("dwType:\t%d\n", devinfo.keyboard.dwType);
+            tlog("dwSubType:\t%d\n", devinfo.keyboard.dwSubType);
+            tlog("dwKeyboardMode:\t%d\n", devinfo.keyboard.dwKeyboardMode);
+            tlog("dwNumberOfFunctionKeys:\t%d\n", devinfo.keyboard.dwNumberOfFunctionKeys);
+            tlog("dwNumberOfIndicators:\t%d\n", devinfo.keyboard.dwNumberOfIndicators);
+            tlog("dwNumberOfKeysTotal:\t%d\n", devinfo.keyboard.dwNumberOfKeysTotal);
+#endif
+            break;
+          case RIM_TYPEHID:
+         //   tlog("dwVendorId:\t0x%x (%s)\n", devinfo.hid.dwVendorId, fmt_vendor(devinfo.hid.dwVendorId));
+         //   tlog("dwProductId:\t0x%x (%s)\n", devinfo.hid.dwProductId, fmt_product(devinfo.hid.dwProductId));
+         //   tlog("dwVersionNumber:\t%d\n", devinfo.hid.dwVersionNumber);
+         //   tlog("usUsagePage:\t%d\n", devinfo.hid.usUsagePage);
+         //   tlog("usUsage:\t%d\n", devinfo.hid.usUsage);
+            //
+            // register to receive input from the SpaceNavigator
+            //
+            //	See:
+            //	    www.3dconnexion.com/forum/viewtopic.php?t=1031#5666
+            //	    www.usb.org/developers/hidpage/
+            //
+            if((devinfo.hid.dwVendorId==0x046d) &&	    // Logitech
+                (devinfo.hid.dwProductId==0xc626) &&	    // SpaceNavigator
+                (devinfo.hid.usUsagePage==1) &&	    // Generic Desktop Controls
+                (devinfo.hid.usUsage==8)){		    // Multi-axis Controller
+                dev.usUsagePage=1;
+                dev.usUsage=8;
+                dev.dwFlags=0;
+                dev.hwndTarget=NULL;		    // follow keyboard focus
+                if(RegisterRawInputDevices(&dev,1,sizeof(dev))){
+                  spaceNavHandle=devlist[i].hDevice;  // assume only one device is connected
+ //                 tlog("\nRegistered for WM_INPUT!\n");
+                }
+              }
+            break;
+          }
+        }
+      }
+    freeElms(devlist);
+    }
+#endif
+  }
+
+
+// Close Input devices
+void FXApp::closeInputDevices(){
+  }
+
+#if 0
+//
+//	onMotion
+//
+long SpaceNav::onMotion(FXObject *, FXSelector, void *vp)
+{
+#if 1
+    //
+    // this is the "unbuffered read" method
+    //
+#pragma pack(1)
+    struct SpaceNavStruct {
+	RAWINPUTHEADER hdr;
+	unsigned long bc;	// sizeof(u + id)
+	unsigned long count;	// number of inputs
+	unsigned char id;	// 1=translation, 2=rotation, 3=buttons
+	union DataUnion {
+	    struct AxesStruct {
+		signed short x,y,z;
+	    } axes;
+	    unsigned char buttons;
+	} u;
+    } snav;
+    FXuint bc = sizeof(snav);
+    FXint status;
+#pragma pack()
+    status = GetRawInputData(
+	    (HRAWINPUT)vp,		// hRawInput
+	    RID_INPUT,			// uiCommand
+	    &snav,			// pData
+	    &bc,			// pcbSize
+	    sizeof(RAWINPUTHEADER));	// cbSizeHeader
+    if (status == bc) {
+	switch (snav.id) {
+	    case 1:
+		dofValue[0] = snav.u.axes.x;
+		dofValue[1] = snav.u.axes.y;
+		dofValue[2] = snav.u.axes.z;
+//		tlog("X{%6d %6d %6d}\n", snav.u.axes.x, snav.u.axes.y, snav.u.axes.z);
+		break;
+	    case 2:
+		dofValue[3] = snav.u.axes.x;
+		dofValue[4] = snav.u.axes.y;
+		dofValue[5] = snav.u.axes.z;
+//		tlog("R{%6d %6d %6d}\n", snav.u.axes.x, snav.u.axes.y, snav.u.axes.z);
+		break;
+	    case 3:
+		tlog("B(%d)\n", snav.u.buttons);
+		break;
+	    default:
+		tlog("id=%d (?)\n", snav.id);
+		break;
+	}
+    }
+    else tlog("Error %d != %d\n", bc, status);
+#else
+    //
+    // and the "buffered read" method..
+    //
+    //	I cannot get this to work.
+    //	I posted a question on the MSDN forum to see if I'm doing something
+    //	wrong.  I'll post more info as I get it.  In the meantime, the
+    //	unbuffered read seems to work ok.
+    //
+    FXint status;
+    FXuint num_inputs;
+    FXuint sizeof_buffer;
+    // can a function's semantics get any more ridiculous???
+    sizeof_buffer = sizeof(RAWINPUT);
+#if 1
+    num_inputs = GetRawInputBuffer(NULL, &sizeof_buffer, sizeof(RAWINPUTHEADER));
+    num_inputs = sizeof_buffer/sizeof(RAWINPUT);
+    if (bufAlloc < num_inputs) {
+	bufAlloc = num_inputs;
+	FXRESIZE(&inpBuffer, RAWINPUT, bufAlloc);
+    }
+#endif
+    num_inputs = GetRawInputBuffer(inpBuffer, &sizeof_buffer, sizeof(RAWINPUTHEADER));
+    tlog("onMotion(%d)\n", num_inputs);
+    status = DefRawInputProc(&inpBuffer, 1/*num_inputs*/, sizeof(RAWINPUTHEADER));
+#endif
+    onPaint(NULL,0,NULL);
+    return 1;
+}
+#endif
+
+
 #else                   // X11
 
 // Perhaps should do something else...
@@ -894,55 +1067,50 @@ void FXApp::imdestroycallback(void*,FXApp* a,void*){
 // Open Input devices
 void FXApp::openInputDevices(){
 #ifdef HAVE_XINPUT_H
-  XExtensionVersion *xie;
-  XDeviceInfo *list;
-  XAnyClassInfo *ci;
-  XInputClassInfo *ici;
-  int ndevices,d,c,i;
-  xie=XGetExtensionVersion((Display*)display,INAME);
-  if(xie && (xie!=(XExtensionVersion*)NoSuchExtension)){
-    if(xie->present){
-      list=XListInputDevices((Display*)display,&ndevices);
-      if(list){
-        for(d=0; d<ndevices; ++d){
-          if(list[d].use==IsXKeyboard || list[d].use==IsXPointer) continue;
-          ci=list[d].inputclassinfo;
-          for(c=0; c<list[d].num_classes; ++c){
-            if(ci->c_class==ValuatorClass && ((XValuatorInfo*)ci)->num_axes==6){        // 6DOF controller!
-              xsbDevice=XOpenDevice((Display*)display,list[d].id);
-              //XSetDeviceMode((Display*)display,(XDevice*)xsbDevice,Absolute);
-              for(i=0,ici=((XDevice*)xsbDevice)->classes; i<((XDevice*)xsbDevice)->num_classes; ++i,++ici){
-                if(ici->input_class==ValuatorClass){
-                  xsbBallMotion=ici->event_type_base+_deviceMotionNotify;
+  int XInputMajorOpcode,XInputFirstEvent,XInputFirstError;
+  if(XQueryExtension((Display*)display,INAME,&XInputMajorOpcode,&XInputFirstEvent,&XInputFirstError)){
+    XExtensionVersion *xie=XGetExtensionVersion((Display*)display,INAME);
+    if(xie && (xie!=(XExtensionVersion*)NoSuchExtension)){
+      if(xie->present){
+        XDeviceInfo *list; int ndevices;
+        list=XListInputDevices((Display*)display,&ndevices);
+        if(list){
+          for(int d=0; d<ndevices; ++d){
+            if(list[d].use==IsXExtensionDevice){
+              XAnyClassInfo *ci=list[d].inputclassinfo;
+              for(int c=0; c<list[d].num_classes; ++c){
+                if(ci->c_class==ValuatorClass && ((XValuatorInfo*)ci)->num_axes==6){        // 6DOF controller!
+                  xsbDevice=XOpenDevice((Display*)display,list[d].id);
+                  if(xsbDevice){
+                    XInputClassInfo *ici=((XDevice*)xsbDevice)->classes;
+                    //XSetDeviceMode((Display*)display,(XDevice*)xsbDevice,Absolute);
+                    for(int i=0; i<((XDevice*)xsbDevice)->num_classes; ++i,++ici){
+                      if(ici->input_class==ValuatorClass){
+                        xsbBallMotion=ici->event_type_base+_deviceMotionNotify;
+                        }
+                      else if(ici->input_class==ButtonClass){
+                        xsbButtonPress=ici->event_type_base+_deviceButtonPress;
+                        xsbButtonRelease=ici->event_type_base+_deviceButtonRelease;
+                        }
+                      }
+                    FXTRACE((100,"xsbBallMotion: %d\n",xsbBallMotion));
+                    FXTRACE((100,"xsbButtonPress: %d\n",xsbButtonPress));
+                    FXTRACE((100,"xsbButtonRelease: %d\n",xsbButtonRelease));
+                    break;
+                    }
                   }
-                else if(ici->input_class==ButtonClass){
-                  xsbButtonPress=ici->event_type_base+_deviceButtonPress;
-                  xsbButtonRelease=ici->event_type_base+_deviceButtonRelease;
-                  }
+                ci=(XAnyClassPtr)(((FXuchar*)ci)+ci->length);
                 }
-              break;
               }
-            ci=(XAnyClassPtr)(((FXuchar*)ci)+ci->length);
             }
+          XFreeDeviceList(list);
           }
-        XFreeDeviceList(list);
         }
+      XFree(xie);
       }
-    XFree(xie);
     }
 #endif
   }
-
-
-#if 0
-XLedFeedbackControl ledctl;
-ledctl.c_class=LedFeedbackClass;
-ledctl.length=sizeof(ledctl);
-ledctl.id=184;
-ledctl.led_mask=0xffff;
-ledctl.led_values=0xffff;
-XChangeFeedbackControl((Display*)display,spaceball,DvLed,(XFeedbackControl*)&ledctl);
-#endif
 
 
 // Close Input devices
@@ -1099,25 +1267,7 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     wndclass.lpszMenuName=NULL;
     wndclass.lpszClassName=TEXT("FXPopup");
     RegisterClassEx(&wndclass);
-/*
-    // Message window
-    wndclass.cbSize=sizeof(WNDCLASSEX);
-    wndclass.style=0;
-    wndclass.lpfnWndProc=(WNDPROC)FXApp::wndproc;
-    wndclass.cbClsExtra=0;
-    wndclass.cbWndExtra=0;
-    wndclass.hInstance=(HINSTANCE)display;
-    wndclass.hIcon=NULL;
-    wndclass.hIconSm=NULL;
-    wndclass.hCursor=NULL;
-    wndclass.hbrBackground=NULL;
-    wndclass.lpszMenuName=NULL;
-    wndclass.lpszClassName=TEXT("MSGWIN");
-    RegisterClassEx(&wndclass);
 
-    // Make message window
-    messageWindow=CreateWindow("MSGWIN","msgwin",0,0,0,0,0,0,0,(HINSTANCE)display,0);
-*/
     // This should prevent the Abort/Retry/Ignore message
     // when switching to drive w/no media mounted in it...
     SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -1219,7 +1369,7 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     if(XRRQueryExtension((Display*)display,&rreventbase,&rrerrorbase)){
       XRRSelectInput((Display*)display,XDefaultRootWindow((Display*)display),True);
       xrrScreenChange=rreventbase+RRScreenChangeNotify;
-      FXTRACE((100,"Xrandr available: %d\n",rreventbase));
+      FXTRACE((100,"xrrScreenChange: %d\n",xrrScreenChange));
       }
 #endif
 
@@ -1228,7 +1378,7 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     int fxeventbase,fxerrorbase;
     if(XFixesQueryExtension((Display*)display,&fxeventbase,&fxerrorbase)){
       xfxFixesSelection=fxeventbase+XFixesSelectionNotify;
-      FXTRACE((100,"Xfixes available: %d\n",fxeventbase));
+      FXTRACE((100,"xfxFixesSelection: %d\n",xfxFixesSelection));
       //int major_version=XFIXES_MAJOR;
       //int minor_version=XFIXES_MINOR;
       //XFixesQueryVersion((Display*)display,&major_version,&minor_version);
@@ -1336,14 +1486,10 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     stipples[STIPPLE_REVDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)revdiag_bits,16,16);
     stipples[STIPPLE_CROSSDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)crossdiag_bits,16,16);
 
+#endif
+
     // Open input devices
     openInputDevices();
-
-    // Only want client messages for this window
-    //XSetWindowAttributes swa;
-    //swa.event_mask=NoEventMask;
-    //messageWindow=XCreateWindow((Display*)display,XDefaultRootWindow((Display*)display),0,0,1,1,0,0,InputOnly,DefaultVisual((Display*)display,DefaultScreen((Display*)display)),CWEventMask,&swa);
-#endif
 
     // Clear sticky mod state
     stickyMods=0;
@@ -1364,6 +1510,9 @@ FXbool FXApp::closeDisplay(){
 
     // What's going on
     FXTRACE((100,"%s::closeDisplay: closing display.\n",getClassName()));
+
+    // Close input devices
+    closeInputDevices();
 
 #ifdef WIN32            // MS-Windows
 
@@ -1392,12 +1541,7 @@ FXbool FXApp::closeDisplay(){
     DeleteObject(stipples[STIPPLE_15]);
     DeleteObject(stipples[STIPPLE_16]);
 
-    //DestroyWindow(messageWindow);
-
 #else                   // X11
-    FXASSERT(display);
-
-    closeInputDevices();
 
     // Free standard stipples
     XFreePixmap((Display*)display,stipples[STIPPLE_0]);
@@ -1425,8 +1569,6 @@ FXbool FXApp::closeDisplay(){
     XFreePixmap((Display*)display,stipples[STIPPLE_DIAG]);
     XFreePixmap((Display*)display,stipples[STIPPLE_REVDIAG]);
     XFreePixmap((Display*)display,stipples[STIPPLE_CROSSDIAG]);
-
-    //XDestroyWindow((Display*)display,messageWindow);
 
     // Close input method
 #ifndef NO_XIM
@@ -1461,37 +1603,6 @@ FXbool FXApp::hasInputMethod() const {
   }
 
 
-/*
-FXbool FXApp::postMessage(void* ptr){
-  XEvent se;
-  se.xclient.type=ClientMessage;
-  se.xclient.display=(Display*)display;
-  se.xclient.message_type=messageType;
-  se.xclient.format=32;
-  se.xclient.window=messageWindow;
-  if(sizeof(void*)==sizeof(long)){
-    se.xclient.data.l[0]=(long)ptr;
-    se.xclient.data.l[1]=0;
-    }
-  else{
-    se.xclient.data.l[0]=(long)((FXuval)ptr);
-    se.xclient.data.l[1]=(long)(((FXuval)ptr)>>32);
-    }
-  se.xclient.data.l[2]=0;
-  se.xclient.data.l[3]=0;
-  se.xclient.data.l[4]=0;
-  XSendEvent((Display*)display,messageWindow,false,NoEventMask,&se);
-  XFlush((Display*)display);
-  return true;
-  }
-
-
-FXbool FXApp::postMessage(void* ptr){
-  return PostMessage(messageWindow,messageType,0,(LPARAM)message)!=0;
-  }
-*/
-
-
 /*******************************************************************************/
 
 // Add deadline in nanoseconds
@@ -1511,7 +1622,7 @@ a:t->data=ptr;
   t->target=tgt;
   t->message=sel;
   t->due=due;
-  for(tt=&timers; *tt && ((*tt)->due < t->due); tt=&(*tt)->next);
+  for(tt=&timers; *tt && ((*tt)->due < t->due); tt=&(*tt)->next){}
   t->next=*tt;
   *tt=t;
   }
@@ -1659,7 +1770,7 @@ void FXApp::addChore(FXObject* tgt,FXSelector sel,void *ptr){
 a:c->data=ptr;
   c->target=tgt;
   c->message=sel;
-  for(cc=&chores; *cc; cc=&(*cc)->next);
+  for(cc=&chores; *cc; cc=&(*cc)->next){}
   c->next=NULL;
   *cc=c;
   }
@@ -2002,7 +2113,7 @@ FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
     FXint sig=signalreceived;
     FXint nxt=MAXSIGNALS;
     signals[sig].notified=false;
-    while(--nxt && !signals[nxt].notified);
+    while(--nxt && !signals[nxt].notified){}
     signalreceived=nxt;
     if(signals[sig].target && signals[sig].target->tryHandle(this,FXSEL(SEL_SIGNAL,signals[sig].message),(void*)(FXival)sig)){
       refresh();
@@ -2365,7 +2476,6 @@ FXString translateKeyEvent(XEvent& event,XIC xic){
 // Dispatch event to widget
 FXbool FXApp::dispatchEvent(FXRawEvent& ev){
   FXWindow *window,*ancestor;
-  FXint     tmp_x,tmp_y;
   Atom      answer;
   FXuint    state;
   XEvent    se;
@@ -3056,7 +3166,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
 #endif
 #ifdef HAVE_XFIXES_H
         if(ev.type==xfxFixesSelection){
-          FXTRACE((100,"XFixesSelectionNotifyEvent window=%d owner=%d selection=%d\n",((XFixesSelectionNotifyEvent*)&ev)->window,((XFixesSelectionNotifyEvent*)&ev)->owner,((XFixesSelectionNotifyEvent*)&ev)->selection));
+          FXTRACE((100,"XFixesSelectionNotifyEvent window=%lu owner=%lu selection=%lu\n",((XFixesSelectionNotifyEvent*)&ev)->window,((XFixesSelectionNotifyEvent*)&ev)->owner,((XFixesSelectionNotifyEvent*)&ev)->selection));
           }
 #endif
 #ifdef HAVE_XINPUT_H
@@ -3077,8 +3187,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           event.values[3]=sbe.axis_data[3]-axis_data[3];
           event.values[4]=sbe.axis_data[4]-axis_data[4];
           event.values[5]=sbe.axis_data[5]-axis_data[5];
-//          FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",event.values[0],event.values[1],event.values[2],event.values[3],event.values[4],event.values[5]));
-          FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
+//          FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
           axis_data[0]=sbe.axis_data[0];
           axis_data[1]=sbe.axis_data[1];
           axis_data[2]=sbe.axis_data[2];
@@ -4061,7 +4170,7 @@ FXString translateKeyEvent(unsigned int,unsigned int wParam,long lParam){
 
 // Message dispatching
 long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam){
-  FXWindow *window,*ancestor,*win;
+  FXWindow *window,*ancestor,*win,*focuswin;
   static HWND lastmovehwnd=0;
   static LPARAM lastmovelParam=0;
   POINT ptRoot, pt;
@@ -4096,50 +4205,47 @@ long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long l
       EndPaint((HWND)hwnd,&ps);
       return 0;
 
-/*
-    case WM_IME_STARTCOMPOSITION:
-      if(activeWindow){
-        //return activeWindow->handle(this, MKUINT(0,SEL_IME_START), NULL);
-        return activeWindow->handle(this, FXSEL(SEL_IME_START,0), NULL);
+	case WM_IME_STARTCOMPOSITION:
+      focuswin=getFocusWindow();
+      if(inputstyle[1]!='o'){ // not root mode
+        if(focuswin && focuswin->getComposeContext())
+          focuswin->handle(this,FXSEL(SEL_IME_START,0),NULL);
+        else
+          return 0;
         }
+      // on-the-spot mode
+      if(inputstyle[1]=='n') return 0;
+      // other mode
       return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
 
-    case WM_IME_ENDCOMPOSITION:
-      if(activeWindow){
-        //return activeWindow->handle(this, MKUINT(0,SEL_IME_END), NULL);
-        return activeWindow->handle(this, FXSEL(SEL_IME_END,0), NULL);
+	case WM_IME_ENDCOMPOSITION:
+      focuswin=getFocusWindow();
+      if(inputstyle[1]!='o'){ // not root mode
+        if(focuswin && focuswin->getComposeContext())
+          focuswin->handle(this,FXSEL(SEL_IME_END,0),NULL);
+        else
+          return 0;
         }
+      // on-the-spot mode
+      if(inputstyle[1]=='n') return 0;
+      // other mode
       return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
 
-    case WM_IME_COMPOSITION:
-      if((lParam & GCS_RESULTSTR) && activeWindow){
-        HIMC himc = ImmGetContext((HWND)window->id());
-        int len = ImmGetCompositionStringW(himc, GCS_RESULTSTR, NULL, 0);
-        wchar_t* wstr = new wchar_t [len+1];
+    case WM_IME_CHAR:
+      // ignore this message, coming after WM_IME_COMPOSITION
+      // because IME string is handled in WM_IME_COMPOSITION message
+      return 0;
 
-        ImmGetCompositionStringW(himc, GCS_RESULTSTR, wstr, len);
-        ImmReleaseContext((HWND)window->id(), himc);
-
-        // The length is given in bytes for some reason.
-        wstr[len/sizeof(wstr[0])] = 0;
-
-        if(getFocusWindow() && getFocusWindow()->getComposeContext()){
-          //int wclen=MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED,str,-1,NULL,0);
-          //wchar_t* wstr = new wchar_t [wclen];
-          //MultiByteToWideChar(CP_ACP,0,str,-1,wstr,wclen);
-          int utf8len=WideCharToMultiByte(CP_UTF8,0,wstr,-1,NULL,0,NULL,NULL);
-          wchar_t* utf8str = new wchar_t [utf8len];
-          WideCharToMultiByte(CP_UTF8,0,wstr,-1,(char*)utf8str,utf8len,NULL,NULL);
-          long ret=getFocusWindow()->handle(this,FXSEL(SEL_IME_TEXT,0),utf8str);
-          delete [] wstr;
-          delete [] utf8str;
-          return ret;
-          }
-        delete [] wstr;
-        }
-      return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
-*/
     // Keyboard
+    case WM_IME_COMPOSITION:
+      if((inputstyle[1]!='n') && !(lParam&GCS_RESULTSTR)){
+        focuswin=getFocusWindow();
+        if(focuswin && focuswin->getComposeContext())
+          return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
+        else
+          return 0;
+        }
+      // else keep going
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
     case WM_KEYUP:
@@ -4161,7 +4267,18 @@ long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long l
 
       // Translate to string on KeyPress
       if(event.type==SEL_KEYPRESS){
-        event.text=translateKeyEvent(iMsg,wParam,lParam);
+        focuswin=getFocusWindow();
+        if( (iMsg==WM_IME_COMPOSITION) && (lParam&GCS_RESULTSTR) && focuswin && focuswin->getComposeContext()){
+          FXRawEvent ev;
+          ev.hwnd=(HWND)hwnd;
+          ev.message=iMsg;
+          ev.wParam=wParam;
+          ev.lParam=lParam;
+          event.text=focuswin->getComposeContext()->translateEvent(ev);
+          }
+        else{
+          event.text=translateKeyEvent(iMsg,wParam,lParam);
+          }
         }
 
       // Clear string on KeyRelease
@@ -4223,6 +4340,16 @@ Alt key seems to repeat.
         // Dispatch if not in a modal loop or in a modal loop for a window containing the focus window
         if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(keyWindow)) || keyWindow->getShell()->doesSaveUnder()){
           if(keyWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
+          if((iMsg==WM_IME_COMPOSITION) && (inputstyle[1]!='n')){
+            // it is possible that undetermined IME characters remain
+            if(inputstyle[1]!='o'){
+              focuswin=getFocusWindow();
+              if(focuswin){
+                focuswin->handle(this,FXSEL(SEL_IME_START,0),NULL);
+                }
+              }
+            return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
+            }
           return 0;
           }
 
@@ -4468,6 +4595,7 @@ Alt key seems to repeat.
 
     // Configure (size)
     case WM_SIZE:
+      if(wParam==SIZE_MINIMIZED) return 0;
       event.type=SEL_CONFIGURE;
       event.rect.x=window->getX();
       event.rect.y=window->getY();
@@ -4583,6 +4711,7 @@ Alt key seems to repeat.
         if(!(((FXTopWindow*)window)->getDecorations()&DECOR_SHRINKABLE)){
           if(!(((FXTopWindow*)window)->getDecorations()&DECOR_STRETCHABLE)){    // Cannot change at all
             SetRect(&rect,0,0,window->getWidth(),window->getHeight());
+            //SetRect(&rect,0,0,window->getDefaultWidth(),window->getDefaultHeight());
             AdjustWindowRectEx(&rect,GetWindowLong((HWND)hwnd,GWL_STYLE),false,GetWindowLong((HWND)hwnd,GWL_EXSTYLE));
             ((MINMAXINFO*)lParam)->ptMinTrackSize.x=((MINMAXINFO*)lParam)->ptMaxTrackSize.x=rect.right-rect.left;
             ((MINMAXINFO*)lParam)->ptMinTrackSize.y=((MINMAXINFO*)lParam)->ptMaxTrackSize.y=rect.bottom-rect.top;
@@ -4632,6 +4761,11 @@ Alt key seems to repeat.
         }
       return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
 #endif
+    case WM_INPUT:
+      //event.type=SEL_SPACEBALLMOTION;
+      //if(window->handle(this,FXSEL(event.type,0),(void *)lParam)) refresh();
+      return 0;
+
     case WM_TIMER:              // added by msh 2/DEC/99
     case WM_ENTERSIZEMOVE:
     case WM_EXITSIZEMOVE:
@@ -4838,19 +4972,22 @@ FXDragType FXApp::registerDragType(const FXString& name) const {
 // Get name of registered drag type
 FXString FXApp::getDragTypeName(FXDragType type) const {
   if(initialized){
+    FXString result;
 #ifdef WIN32
     if(0xC000<=type && type<=0xFFFF){
       FXchar buffer[256];
       GetClipboardFormatNameA(type,buffer,sizeof(buffer));
-      return buffer;
+      result.assign(buffer);
       }
-    return "WIN32_DEFAULT_TYPE";
+    else{
+      result.assign("WIN32_DEFAULT_TYPE");
+      }
 #else
     FXchar *name=XGetAtomName((Display*)display,type);
-    FXString dragtypename(name);
+    result.assign(name);
     XFree(name);
-    return dragtypename;
 #endif
+    return result;
     }
   return FXString::null;
   }

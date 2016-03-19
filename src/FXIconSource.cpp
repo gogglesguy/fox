@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconSource.cpp,v 1.24 2008/01/04 15:42:21 fox Exp $                    *
+* $Id: FXIconSource.cpp,v 1.25 2008/01/25 13:59:26 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -291,7 +291,7 @@ FXImage *FXIconSource::loadImageStream(FXStream& store,const FXString& type) con
     }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H
-  else if(comparecase(FXJPGImage::fileExt,type)==0){
+  else if(comparecase(FXJPGImage::fileExt,type)==0 || comparecase("jpeg",type)==0){
     image=new FXJPGImage(app);
     }
 #endif

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: PathFinder.cpp,v 1.143 2008/01/04 15:59:38 fox Exp $                     *
+* $Id: PathFinder.cpp,v 1.144 2008/03/26 20:04:22 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -752,10 +752,10 @@ long PathFinderMain::onFileListPopup(FXObject*,FXSelector,void* ptr){
     new FXMenuCommand(&pane,"Open with...",NULL,this,ID_OPEN_WITH);
     new FXMenuCommand(&pane,"Open with editor",NULL,this,ID_OPEN_WITH_EDITOR);
     new FXMenuSeparator(&pane);
+    new FXMenuCommand(&pane,"Rename",renameicon,this,ID_RENAME);
     new FXMenuCommand(&pane,"Copy",copyicon,this,ID_COPY);
     new FXMenuCommand(&pane,"Move",moveicon,this,ID_MOVE);
     new FXMenuCommand(&pane,"Link",linkicon,this,ID_LINK);
-    new FXMenuCommand(&pane,"Rename",renameicon,this,ID_RENAME);
     new FXMenuCommand(&pane,"Delete",deleteicon,this,ID_DELETE);
     new FXMenuSeparator(&pane);
     new FXMenuCommand(&pane,"Properties...",propicon,this,ID_PROPERTIES);
@@ -1045,7 +1045,7 @@ long PathFinderMain::onCmdCopy(FXObject*,FXSelector,void*){
       copydialog.setNewName(FXPath::absolute(FXPath::directory(filenamelist[i]),"CopyOf"+FXPath::name(filenamelist[i])));
       if(!copydialog.execute()) break;
       newname=copydialog.getNewName();
-      if(!FXFile::copyFiles(filenamelist[i],newname,FALSE)){
+      if(!FXFile::copyFiles(filenamelist[i],newname,false)){
         if(FXMessageBox::error(this,MBOX_YES_NO,"Error Copying File","Unable to copy file:\n\n%s  to:  %s\n\nContinue with operation?",filenamelist[i].text(),newname.text())==MBOX_CLICKED_NO) break;
         }
       }
@@ -1066,7 +1066,7 @@ long PathFinderMain::onCmdMove(FXObject*,FXSelector,void*){
       copydialog.setNewName(filenamelist[i]);
       if(!copydialog.execute()) break;
       newname=copydialog.getNewName();
-      if(!FXFile::moveFiles(filenamelist[i],newname,FALSE)){
+      if(!FXFile::moveFiles(filenamelist[i],newname,false)){
 	if(FXMessageBox::error(this,MBOX_YES_NO,"Error Moving File","Unable to move file:\n\n%s  to:  %s\n\nContinue with operation?",filenamelist[i].text(),newname.text())==MBOX_CLICKED_NO) break;
 	}
       }
@@ -1108,7 +1108,7 @@ long PathFinderMain::onCmdRename(FXObject*,FXSelector,void*){
       copydialog.setNewName(FXPath::name(filenamelist[i]));
       if(!copydialog.execute()) break;
       newname=copydialog.getNewName();
-      if(!FXFile::moveFiles(filenamelist[i],FXPath::absolute(FXPath::directory(filenamelist[i]),newname),FALSE)){
+      if(!FXFile::moveFiles(filenamelist[i],FXPath::absolute(FXPath::directory(filenamelist[i]),newname),false)){
 	if(FXMessageBox::error(this,MBOX_YES_NO,"Error Renaming File","Unable to rename file:\n\n%s  to:  %s\n\nContinue with operation?",filenamelist[i].text(),newname.text())==MBOX_CLICKED_NO) break;
 	}
       }

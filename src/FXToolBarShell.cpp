@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToolBarShell.cpp,v 1.29 2008/01/04 15:42:40 fox Exp $                  *
+* $Id: FXToolBarShell.cpp,v 1.30 2008/03/25 20:00:59 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -272,7 +272,7 @@ long FXToolBarShell::onLayout(FXObject*,FXSelector,void*){
 // Find out where window was grabbed
 FXuchar FXToolBarShell::where(FXint x,FXint y) const {
   register FXuchar code=DRAG_NONE;
-  if(getFirst() && (0<=x && x<border+padleft) || (0<=y && y<border+padtop) || (width-padright-border<=x && x<width) || (height-padbottom-border<=y && y<height)){
+  if(getFirst() && ((0<=x && x<border+padleft) || (0<=y && y<border+padtop) || (width-padright-border<=x && x<width) || (height-padbottom-border<=y && y<height))){
     FXuint hints=getFirst()->getLayoutHints();
     if(hints&LAYOUT_FIX_WIDTH){
       if(x<HANDLE_SIZE) code|=DRAG_LEFT;

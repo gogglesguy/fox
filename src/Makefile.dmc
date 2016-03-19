@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.67 2008/01/04 16:14:04 fox Exp $                     #
+# $Id: Makefile.dmc,v 1.70 2008/03/31 15:05:55 fox Exp $                     #
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later
@@ -106,6 +106,21 @@ winrestore.gif
 SOURCES = \
 FX4Splitter.cpp \
 FX7Segment.cpp \
+FX885910Codec.cpp \
+FX885911Codec.cpp \
+FX885913Codec.cpp \
+FX885914Codec.cpp \
+FX885915Codec.cpp \
+FX885916Codec.cpp \
+FX88591Codec.cpp \
+FX88592Codec.cpp \
+FX88593Codec.cpp \
+FX88594Codec.cpp \
+FX88595Codec.cpp \
+FX88596Codec.cpp \
+FX88597Codec.cpp \
+FX88598Codec.cpp \
+FX88599Codec.cpp \
 FXAccelTable.cpp \
 FXApp.cpp \
 FXArrowButton.cpp \
@@ -126,6 +141,7 @@ FXColorBar.cpp \
 FXColorDialog.cpp \
 FXColorList.cpp \
 FXColorNames.cpp \
+FXColorRing.cpp \
 FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
@@ -134,6 +150,32 @@ FXComplexd.cpp \
 FXComboBox.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConsole.cpp \
+FXCopyDialog.cpp \
+FXCP1250Codec.cpp \
+FXCP1251Codec.cpp \
+FXCP1252Codec.cpp \
+FXCP1253Codec.cpp \
+FXCP1254Codec.cpp \
+FXCP1255Codec.cpp \
+FXCP1256Codec.cpp \
+FXCP1257Codec.cpp \
+FXCP1258Codec.cpp \
+FXCP437Codec.cpp \
+FXCP850Codec.cpp \
+FXCP852Codec.cpp \
+FXCP855Codec.cpp \
+FXCP856Codec.cpp \
+FXCP857Codec.cpp \
+FXCP860Codec.cpp \
+FXCP861Codec.cpp \
+FXCP862Codec.cpp \
+FXCP863Codec.cpp \
+FXCP864Codec.cpp \
+FXCP865Codec.cpp \
+FXCP866Codec.cpp \
+FXCP869Codec.cpp \
+FXCP874Codec.cpp \
 FXCursor.cpp \
 FXDataTarget.cpp \
 FXDate.cpp \
@@ -207,12 +249,15 @@ FXImage.cpp \
 FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
+FXIO.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
+FXKOI8RCodec.cpp \
 FXKnob.cpp \
 FXLabel.cpp \
 FXList.cpp \
 FXListBox.cpp \
+FXLocale.cpp \
 FXMDIButton.cpp \
 FXMDIChild.cpp \
 FXMDIClient.cpp \
@@ -246,7 +291,9 @@ FXPNGImage.cpp \
 FXPPMIcon.cpp \
 FXPPMImage.cpp \
 FXPacker.cpp \
+FXPath.cpp \
 FXPicker.cpp \
+FXPipe.cpp \
 FXPopup.cpp \
 FXPoint.cpp \
 FXPrintDialog.cpp \
@@ -254,15 +301,12 @@ FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
-FXMessenger.cpp \
-FXRGBIcon.cpp \
-FXRGBImage.cpp \
+FXRASIcon.cpp \
+FXRASImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
 FXRangeSlider.cpp \
-FXRASIcon.cpp \
-FXRASImage.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -271,6 +315,8 @@ FXRegion.cpp \
 FXRegistry.cpp \
 FXReplaceDialog.cpp \
 FXRex.cpp \
+FXRGBIcon.cpp \
+FXRGBImage.cpp \
 FXRootWindow.cpp \
 FXRuler.cpp \
 FXRulerView.cpp \
@@ -285,18 +331,21 @@ FXShell.cpp \
 FXShutter.cpp \
 FXSize.cpp \
 FXSlider.cpp \
-FXSpinner.cpp \
-FXSplitter.cpp \
+FXSocket.cpp \
 FXSpheref.cpp \
 FXSphered.cpp \
+FXSpinner.cpp \
 FXSplashWindow.cpp \
+FXSplitter.cpp \
 FXSpring.cpp \
+FXStat.cpp \
 FXStatusBar.cpp \
 FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
 FXStringDict.cpp \
 FXSwitcher.cpp \
+FXSystem.cpp \
 FXTGAIcon.cpp \
 FXTGAImage.cpp \
 FXTIFIcon.cpp \
@@ -317,6 +366,7 @@ FXToolBarShell.cpp \
 FXToolBarTab.cpp \
 FXToolTip.cpp \
 FXTopWindow.cpp \
+FXTranslator.cpp \
 FXTreeList.cpp \
 FXTreeListBox.cpp \
 FXTriStateButton.cpp \
@@ -369,275 +419,21 @@ fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
-strtoll.cpp \
-vsscanf.cpp
+strtoll.cpp
 
-OBJECTS = \
-FX4Splitter.obj \
-FX7Segment.obj \
-FXAccelTable.obj \
-FXApp.obj \
-FXArrowButton.obj \
-FXBMPIcon.obj \
-FXBMPImage.obj \
-FXBitmap.obj \
-FXBitmapFrame.obj \
-FXBitmapView.obj \
-FXButton.obj \
-FXBZStream.obj \
-FXCURCursor.obj \
-FXCanvas.obj \
-FXCheckButton.obj \
-FXChoiceBox.obj \
-FXColorBar.obj \
-FXColorDialog.obj \
-FXColorNames.obj \
-FXColorRing.obj \
-FXColorSelector.obj \
-FXColorWell.obj \
-FXColorWheel.obj \
-FXComboBox.obj \
-FXComposite.obj \
-FXCursor.obj \
-FXDC.obj \
-FXDCPrint.obj \
-FXDCWindow.obj \
-FXDLL.obj \
-FXDataTarget.obj \
-FXDebugTarget.obj \
-FXDelegator.obj \
-FXDial.obj \
-FXDialogBox.obj \
-FXDict.obj \
-FXDir.obj \
-FXDirBox.obj \
-FXDirDialog.obj \
-FXDirList.obj \
-FXDirSelector.obj \
-FXDockBar.obj \
-FXDockHandler.obj \
-FXDockSite.obj \
-FXDockTitle.obj \
-FXDocument.obj \
-FXDragCorner.obj \
-FXDrawable.obj \
-FXDriveBox.obj \
-FXException.obj \
-FXFile.obj \
-FXFileDialog.obj \
-FXFileDict.obj \
-FXFileList.obj \
-FXFileSelector.obj \
-FXFileStream.obj \
-FXFoldingList.obj \
-FXFont.obj \
-FXFontDialog.obj \
-FXFontSelector.obj \
-FXFrame.obj \
-FXGIFCursor.obj \
-FXGIFIcon.obj \
-FXGIFImage.obj \
-FXGLCanvas.obj \
-FXGLCone.obj \
-FXGLContext.obj \
-FXGLCube.obj \
-FXGLCylinder.obj \
-FXGLObject.obj \
-FXGLShape.obj \
-FXGLSphere.obj \
-FXGLTriangleMesh.obj \
-FXGLViewer.obj \
-FXGLVisual.obj \
-FXGradientBar.obj \
-FXGroupBox.obj \
-FXGZStream.obj \
-FXHash.obj \
-FXHeader.obj \
-FXHorizontalFrame.obj \
-FXICOIcon.obj \
-FXICOImage.obj \
-FXIFFIcon.obj \
-FXIFFImage.obj \
-FXIcon.obj \
-FXIconDict.obj \
-FXIconList.obj \
-FXIconSource.obj \
-FXId.obj \
-FXImage.obj \
-FXImageFrame.obj \
-FXImageView.obj \
-FXInputDialog.obj \
-FXJPGIcon.obj \
-FXJPGImage.obj \
-FXKnob.obj \
-FXLabel.obj \
-FXList.obj \
-FXListBox.obj \
-FXLocale.obj \
-FXMDIButton.obj \
-FXMDIChild.obj \
-FXMDIClient.obj \
-FXMainWindow.obj \
-FXMat3d.obj \
-FXMat4d.obj \
-FXMat3f.obj \
-FXMat4f.obj \
-FXMatrix.obj \
-FXMemMap.obj \
-FXMemoryStream.obj \
-FXMenuBar.obj \
-FXMenuButton.obj \
-FXMenuCaption.obj \
-FXMenuCascade.obj \
-FXMenuCheck.obj \
-FXMenuRadio.obj \
-FXMenuCommand.obj \
-FXMenuPane.obj \
-FXMenuSeparator.obj \
-FXMenuTitle.obj \
-FXMessageBox.obj \
-FXMessageChannel.obj \
-FXObject.obj \
-FXObjectList.obj \
-FXOptionMenu.obj \
-FXPCXIcon.obj \
-FXPCXImage.obj \
-FXPNGIcon.obj \
-FXPNGImage.obj \
-FXPPMIcon.obj \
-FXPPMImage.obj \
-FXPacker.obj \
-FXPicker.obj \
-FXPopup.obj \
-FXPoint.obj \
-FXPrintDialog.obj \
-FXProgressBar.obj \
-FXProgressDialog.obj \
-FXQuatd.obj \
-FXQuatf.obj \
-FXMessenger.obj \
-FXRGBIcon.obj \
-FXRGBImage.obj \
-FXRadioButton.obj \
-FXRangef.obj \
-FXRanged.obj \
-FXRASIcon.obj \
-FXRASImage.obj \
-FXRealSlider.obj \
-FXRealSpinner.obj \
-FXRecentFiles.obj \
-FXRectangle.obj \
-FXRegion.obj \
-FXRegistry.obj \
-FXReplaceDialog.obj \
-FXRex.obj \
-FXRootWindow.obj \
-FXRuler.obj \
-FXScrollArea.obj \
-FXScrollWindow.obj \
-FXScrollBar.obj \
-FXScrollPane.obj \
-FXSearchDialog.obj \
-FXSeparator.obj \
-FXSettings.obj \
-FXShell.obj \
-FXShutter.obj \
-FXSize.obj \
-FXSlider.obj \
-FXSpinner.obj \
-FXSplitter.obj \
-FXSpheref.obj \
-FXSphered.obj \
-FXSplashWindow.obj \
-FXSpring.obj \
-FXStatusBar.obj \
-FXStatusLine.obj \
-FXStream.obj \
-FXString.obj \
-FXStringDict.obj \
-FXSwitcher.obj \
-FXTGAIcon.obj \
-FXTGAImage.obj \
-FXTIFIcon.obj \
-FXTIFImage.obj \
-FXTabBar.obj \
-FXTabBook.obj \
-FXTabItem.obj \
-FXTable.obj \
-FXText.obj \
-FXTextCodec.obj \
-FXTextField.obj \
-FXThread.obj \
-FXToggleButton.obj \
-FXToolBar.obj \
-FXToolBarGrip.obj \
-FXToolBarShell.obj \
-FXToolBarTab.obj \
-FXToolTip.obj \
-FXTopWindow.obj \
-FXTreeList.obj \
-FXTreeListBox.obj \
-FXTriStateButton.obj \
-FXUndoList.obj \
-FXURL.obj \
-FXUTF16Codec.obj \
-FXUTF32Codec.obj \
-FXUTF8Codec.obj \
-FXVec2d.obj \
-FXVec2f.obj \
-FXVec3d.obj \
-FXVec3f.obj \
-FXVec4d.obj \
-FXVec4f.obj \
-FXVerticalFrame.obj \
-FXVisual.obj \
-FXWindow.obj \
-FXWizard.obj \
-FXXBMIcon.obj \
-FXXBMImage.obj \
-FXXPMIcon.obj \
-FXXPMImage.obj \
-fxascii.obj \
-fxbmpio.obj \
-fxezquantize.obj \
-fxfilematch.obj \
-fxfsquantize.obj \
-fxgetticks.obj \
-fxgifio.obj \
-fxicoio.obj \
-fxiffio.obj \
-fxjpegio.obj \
-fxkeyboard.obj \
-fxkeysym.obj \
-fxparsegeometry.obj \
-fxpcxio.obj \
-fxpngio.obj \
-fxppmio.obj \
-fxpsio.obj \
-fxpriv.obj \
-fxrasio.obj \
-fxrgbio.obj \
-fxtargaio.obj \
-fxtifio.obj \
-fxunicode.obj \
-fxutils.obj \
-fxwuquantize.obj \
-fxxbmio.obj \
-fxxpmio.obj \
-icons.obj \
-strtoll.obj
+OBJECTS = $(SOURCES:.cpp=.obj)
 
-.cpp.obj:
+.cpp.obj :
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $<
 
-all: $(FOXLIB)
+all : $(FOXLIB)
 
 FXApp.cpp: icons.cpp
 
-icons.h: $(ICONS)
+icons.h : $(ICONS)
 	$(RESWRAP) -h -n FX -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS) icons.h
+icons.cpp : $(ICONS) icons.h
 	$(RESWRAP) -i icons.h -n FX -oa icons.cpp $(ICONS)
 
 clean:
@@ -645,7 +441,7 @@ clean:
 	del *.obj
 
 # Make the library
-$(FOXLIB): $(OBJECTS)
+$(FOXLIB) : $(OBJECTS)
 	touch $(FOXLIB)
 	del $(FOXLIB)
 	$(RCC) -32 -oversion.res version.rc

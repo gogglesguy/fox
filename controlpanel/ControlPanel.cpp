@@ -18,11 +18,11 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: ControlPanel.cpp,v 1.38 2008/01/04 15:42:51 fox Exp $                    *
+* $Id: ControlPanel.cpp,v 1.2 2008/03/06 05:28:34 fox Exp $                     *
 ********************************************************************************/
 #include <xincs.h>
 #include <fx.h>
-#include "controlpanelicon.h"
+#include "icons.h"
 
 #define DEFAULT_SPACING 6
 

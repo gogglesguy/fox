@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuButton.h,v 1.28 2008/01/04 15:18:22 fox Exp $                      *
+* $Id: FXMenuButton.h,v 1.32 2008/01/30 16:44:09 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXMENUBUTTON_H
 #define FXMENUBUTTON_H
@@ -89,8 +89,8 @@ public:
   long onFocusOut(FXObject*,FXSelector,void*);
   long onUngrabbed(FXObject*,FXSelector,void*);
   long onMotion(FXObject*,FXSelector,void*);
-  long onLeftBtnPress(FXObject*,FXSelector,void*);
-  long onLeftBtnRelease(FXObject*,FXSelector,void*);
+  long onButtonPress(FXObject*,FXSelector,void*);
+  long onButtonRelease(FXObject*,FXSelector,void*);
   long onKeyPress(FXObject*,FXSelector,void*);
   long onKeyRelease(FXObject*,FXSelector,void*);
   long onHotKeyPress(FXObject*,FXSelector,void*);
@@ -128,6 +128,12 @@ public:
 
   /// Return current popup menu
   FXPopup* getMenu() const { return pane; }
+
+  /// Show or hide menu
+  void showMenu(FXbool shw);
+
+  /// Is the pane shown
+  FXbool isMenuShown() const;
 
   /// Set X offset where menu pops up relative to button
   void setXOffset(FXint offx){ offsetx=offx; }

@@ -4,7 +4,7 @@
 AUTOMAKE_OPTIONS = foreign dist-zip
 #AUTOMAKE_OPTIONS = foreign dist-zip no-dependencies
 
-SUBDIRS    = utils include src chart doc tests shutterbug adie pathfinder calculator windows
+SUBDIRS    = utils include src chart doc tests shutterbug adie pathfinder calculator controlpanel windows
 EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README fox.lsm index.html aclocal.m4
 
 bin_SCRIPTS = fox-config

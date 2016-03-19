@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileSelector.cpp,v 1.213 2008/01/04 15:42:14 fox Exp $                 *
+* $Id: FXFileSelector.cpp,v 1.214 2008/03/26 20:04:22 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -164,10 +164,12 @@ FXDEFMAP(FXFileSelector) FXFileSelectorMap[]={
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_BOOKMARK,FXFileSelector::onCmdBookmark),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_NEW,FXFileSelector::onCmdNew),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_NEW,FXFileSelector::onUpdNew),
-  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_REMOVE,FXFileSelector::onCmdRemove),
-  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_MOVE,FXFileSelector::onCmdMove),
+  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_RENAME,FXFileSelector::onCmdRename),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_COPY,FXFileSelector::onCmdCopy),
+  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_MOVE,FXFileSelector::onCmdMove),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_LINK,FXFileSelector::onCmdLink),
+  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_REMOVE,FXFileSelector::onCmdRemove),
+  FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_RENAME,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_COPY,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_MOVE,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_LINK,FXFileSelector::onUpdSelected),
@@ -219,10 +221,11 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   markicon=new FXGIFIcon(getApp(),bookset);
   clearicon=new FXGIFIcon(getApp(),bookclr);
   newicon=new FXGIFIcon(getApp(),foldernew);
-  deleteicon=new FXGIFIcon(getApp(),filedelete);
-  moveicon=new FXGIFIcon(getApp(),filemove);
+  renameicon=new FXGIFIcon(getApp(),filerename);
   copyicon=new FXGIFIcon(getApp(),filecopy);
+  moveicon=new FXGIFIcon(getApp(),filemove);
   linkicon=new FXGIFIcon(getApp(),filelink);
+  deleteicon=new FXGIFIcon(getApp(),filedelete);
   dirbox=new FXDirBox(navbuttons,this,ID_DIRTREE,DIRBOX_NO_OWN_ASSOC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0,1,1,1,1);
   dirbox->setNumVisible(5);
   dirbox->setAssociations(filebox->getAssociations(),false);    // Shared file associations
@@ -588,6 +591,32 @@ FXString *FXFileSelector::getSelectedFilesOnly() const {
   }
 
 
+// Rename file or directory
+long FXFileSelector::onCmdRename(FXObject*,FXSelector,void*){
+  FXString *filenamelist=getSelectedFiles();
+  FXString renamemessage;
+  FXString oldname;
+  FXString newname;
+  if(filenamelist){
+    for(FXint i=0; !filenamelist[i].empty(); i++){
+      oldname=FXPath::name(filenamelist[i]);
+      renamemessage.format(tr("Rename file from:\n\n%s\n\nto: "),oldname.text());
+      FXInputDialog inputdialog(this,tr("Rename File"),renamemessage,NULL,INPUTDIALOG_STRING,0,0,0,0);
+      inputdialog.setText(oldname);
+      inputdialog.setNumColumns(60);
+      if(inputdialog.execute()){
+        newname=inputdialog.getText();
+        if(!FXFile::moveFiles(filenamelist[i],FXPath::absolute(FXPath::directory(filenamelist[i]),newname),false)){
+          if(FXMessageBox::error(this,MBOX_YES_NO,tr("Error Renaming File"),tr("Unable to rename file:\n\n%s  to:  %s\n\nContinue with operation?"),oldname.text(),newname.text())==MBOX_CLICKED_NO) break;
+          }
+        }
+      }
+    delete [] filenamelist;
+    }
+  return 1;
+  }
+
+
 // Copy file or directory
 long FXFileSelector::onCmdCopy(FXObject*,FXSelector,void*){
   FXString *filenamelist=getSelectedFiles();
@@ -775,6 +804,7 @@ long FXFileSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
 
   new FXMenuSeparator(&filemenu);
   new FXMenuCommand(&filemenu,tr("New directory..."),newicon,this,ID_NEW);
+  new FXMenuCommand(&filemenu,tr("Rename..."),renameicon,this,ID_RENAME);
   new FXMenuCommand(&filemenu,tr("Copy..."),copyicon,this,ID_COPY);
   new FXMenuCommand(&filemenu,tr("Move..."),moveicon,this,ID_MOVE);
   new FXMenuCommand(&filemenu,tr("Link..."),linkicon,this,ID_LINK);
@@ -1220,10 +1250,11 @@ FXFileSelector::~FXFileSelector(){
   delete markicon;
   delete clearicon;
   delete newicon;
-  delete deleteicon;
-  delete moveicon;
+  delete renameicon;
   delete copyicon;
+  delete moveicon;
   delete linkicon;
+  delete deleteicon;
   filebox=(FXFileList*)-1L;
   filename=(FXTextField*)-1L;
   filefilter=(FXComboBox*)-1L;

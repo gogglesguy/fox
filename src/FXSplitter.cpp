@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSplitter.cpp,v 1.60 2008/01/04 15:42:31 fox Exp $                      *
+* $Id: FXSplitter.cpp,v 1.61 2008/03/25 20:00:59 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -292,7 +292,7 @@ void FXSplitter::adjustHLayout(){
     pos=window->getX()+window->getWidth();
     window->position(split,0,pos-split,height);
     pos=split-barsize;
-    for(stretcher=getFirst(); stretcher && !stretcher->shown(); stretcher=stretcher->getNext());
+    for(stretcher=getFirst(); stretcher && !stretcher->shown(); stretcher=stretcher->getNext()){}
     for(child=window->getPrev(); child; child=child->getPrev()){
       if(child->shown()){
         w=child->getWidth();
@@ -308,7 +308,7 @@ void FXSplitter::adjustHLayout(){
     pos=window->getX();
     window->position(pos,0,split-pos,height);
     pos=split+barsize;
-    for(stretcher=getLast(); stretcher && !stretcher->shown(); stretcher=stretcher->getPrev());
+    for(stretcher=getLast(); stretcher && !stretcher->shown(); stretcher=stretcher->getPrev()){}
     for(child=window->getNext(); child; child=child->getNext()){
       if(child->shown()){
         w=child->getWidth();
@@ -332,7 +332,7 @@ void FXSplitter::adjustVLayout(){
     pos=window->getY()+window->getHeight();
     window->position(0,split,width,pos-split);
     pos=split-barsize;
-    for(stretcher=getFirst(); stretcher && !stretcher->shown(); stretcher=stretcher->getNext());
+    for(stretcher=getFirst(); stretcher && !stretcher->shown(); stretcher=stretcher->getNext()){}
     for(child=window->getPrev(); child; child=child->getPrev()){
       if(child->shown()){
         w=child->getWidth();
@@ -348,7 +348,7 @@ void FXSplitter::adjustVLayout(){
     pos=window->getY();
     window->position(0,pos,width,split-pos);
     pos=split+barsize;
-    for(stretcher=getLast(); stretcher && !stretcher->shown(); stretcher=stretcher->getPrev());
+    for(stretcher=getLast(); stretcher && !stretcher->shown(); stretcher=stretcher->getPrev()){}
     for(child=window->getNext(); child; child=child->getNext()){
       if(child->shown()){
         w=child->getWidth();

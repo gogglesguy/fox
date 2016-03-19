@@ -10,13 +10,62 @@
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+February 11 - FOX DEVELOPMENT 1.7.16
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed issue with unplugged XDevice (when xorg.conf contains device but device
+was unplugged).</li>
+<li>FXMenuButton pops and collapses with any mouse button, not just left one.  This fixes a minor
+problem if one tries to right-click after having left-clicked FXMenuButton.</li>
+<li>FXIconSource now handles "jpeg" and "tiff" extensions instead of only "jpg" and "tif".</li>
+<li>Forgotten tr() added to FXMessageBox.</li>
+<li>Added NoAccessTime option for FXFile open() call.</li>
+<li>Added Rename option to FXFileSelector widget.<\li>
+<li>FXString::vformat() and FXString::format() and other printf-like printing routines now support 
+positional arguments.</li>
+<li>FXString::vscan() and FXString::scan() and other scanf-like reading routines now also support
+positional arguments.</li>
+<li>FXTopWindow not only UTF8 title but also sets 8859-1 title string for legacy window managers.</li>
+<li>Fixed numerous warnings due to GCC 4.3 new integer overflow rules (-fstrict-overflow and -Wstrict-overflow).  
+Whenever the optimizer makes the assumption is made that expressions doesn't overflow, a warning is issued.
+Rewriting code in a way that makes the assumption go away will kill the warning; sometime, unsigned
+may be used as well.  So I rewrote a lot of code in FOX to be more overflow-resistent.</li>
+<li>Fixed many warnings reported by Borland C++ compiler.</li>
+<li>Moved REGEX_ enums into FXRex class namespace.</li>
+<li>Applied FXComposeContext and FXApp patches for input methods on Windows; new message types
+have been introduced because of this, SEL_IME_START and SEL_IME_END.</li>
+<li>Corrected problem causing NVIDIA driver video-memory leak in FXGLContext when new GLX1.3
+code is used on new Xorg X Server.  The problem caused video memory to remain allocated past
+the termination of the program.  Of course this should never happen, not even in incorrect
+programs.  NVIDIA is looking at the problem from their end.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 10 - FOX STABLE 1.6.32
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed FXPath::simplify().  Backport from FOX 1.7.</li>
+<li>Fixed Adie CPU load issue caused by clock updating.</li>
+<li>Fixed FXURL::fileFromURL().</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 January 11 - FOX DEVELOPMENT 1.7.15
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
 <ul>
-<li>Updated MS-Windows OpenGL implementation.  Now uses wglGetPixelFormatAttribivARB() 
-from ICD driver (where available) to determine extended PIXELFORMAT attributes.  
+<li>Updated MS-Windows OpenGL implementation.  Now uses wglGetPixelFormatAttribivARB()
+from ICD driver (where available) to determine extended PIXELFORMAT attributes.
 Of particular interest is the ability to match multi-sampling PIXELFORMATs which
 support hardware anti-aliasing.</li>
 <li>Fixed bug in FXSettings not dealing properly with CRLF on MS-Windows (when in

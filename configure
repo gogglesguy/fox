@@ -1942,7 +1942,7 @@ FOX_MAJOR_VERSION=1
 
 FOX_MINOR_VERSION=7
 
-FOX_PATCH_LEVEL=15
+FOX_PATCH_LEVEL=16
 
 FOX_INTERFACE_VERSION=0
 
@@ -21958,7 +21958,7 @@ cat >>confdefs.h <<\_ACEOF
 #define WIN32 1
 _ACEOF
 
-LIBS="${LIBS} -lcomctl32 -lwsock32 -lwinspool -lmpr"
+LIBS="${LIBS} -lcomctl32 -lwsock32 -lwinspool -lmpr -lgdi32"
 LDFLAGS="${LDFLAGS} -mwindows -e _mainCRTStartup"
 if test "x$with_mingw32" != "x" ; then
 CPPFLAGS="${CPPFLAGS} -I$with_mingw32/include"
@@ -25311,7 +25311,7 @@ CPPFLAGS="$saved_cppflags"
 
 
 
-ac_config_files="$ac_config_files Makefile utils/Makefile include/Makefile include/fxver.h src/Makefile src/version.rc chart/Makefile doc/Makefile doc/art/Makefile doc/screenshots/Makefile tests/Makefile adie/Makefile shutterbug/Makefile pathfinder/Makefile calculator/Makefile windows/Makefile fox.spec fox-config fox.pc"
+ac_config_files="$ac_config_files Makefile utils/Makefile include/Makefile include/fxver.h src/Makefile src/version.rc chart/Makefile doc/Makefile doc/art/Makefile doc/screenshots/Makefile tests/Makefile adie/Makefile shutterbug/Makefile pathfinder/Makefile calculator/Makefile controlpanel/Makefile windows/Makefile fox.spec fox-config fox.pc"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -25896,6 +25896,7 @@ do
     "shutterbug/Makefile") CONFIG_FILES="$CONFIG_FILES shutterbug/Makefile" ;;
     "pathfinder/Makefile") CONFIG_FILES="$CONFIG_FILES pathfinder/Makefile" ;;
     "calculator/Makefile") CONFIG_FILES="$CONFIG_FILES calculator/Makefile" ;;
+    "controlpanel/Makefile") CONFIG_FILES="$CONFIG_FILES controlpanel/Makefile" ;;
     "windows/Makefile") CONFIG_FILES="$CONFIG_FILES windows/Makefile" ;;
     "fox.spec") CONFIG_FILES="$CONFIG_FILES fox.spec" ;;
     "fox-config") CONFIG_FILES="$CONFIG_FILES fox-config" ;;

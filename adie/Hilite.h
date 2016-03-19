@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Hilite.h,v 1.38 2008/01/04 15:18:11 fox Exp $                            *
+* $Id: Hilite.h,v 1.39 2008/03/26 19:08:45 fox Exp $                            *
 ********************************************************************************/
 #ifndef HILITE_H
 #define HILITE_H
@@ -93,7 +93,7 @@ private:
 public:
 
   // Construct node
-  FXSimpleRule(const FXString& nm,const FXString& rex,FXint p,FXint s):FXRule(nm,p,s),pat(rex,REX_NEWLINE){ }
+  FXSimpleRule(const FXString& nm,const FXString& rex,FXint p,FXint s):FXRule(nm,p,s),pat(rex,FXRex::Newline){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -114,7 +114,7 @@ private:
 public:
 
   // Construct node
-  FXBracketRule(const FXString& nm,const FXString& brex,const FXString& erex,FXint p,FXint s):FXRule(nm,p,s),beg(brex,REX_NEWLINE),end(erex,REX_NEWLINE){ }
+  FXBracketRule(const FXString& nm,const FXString& brex,const FXString& erex,FXint p,FXint s):FXRule(nm,p,s),beg(brex,FXRex::Newline),end(erex,FXRex::Newline){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -138,7 +138,7 @@ private:
 public:
 
   // Construct node
-  FXSafeBracketRule(const FXString& nm,const FXString& brex,const FXString& erex,const FXString& srex,FXint p,FXint s):FXBracketRule(nm,brex,erex,p,s),esc(srex,REX_NEWLINE){ }
+  FXSafeBracketRule(const FXString& nm,const FXString& brex,const FXString& erex,const FXString& srex,FXint p,FXint s):FXBracketRule(nm,brex,erex,p,s),esc(srex,FXRex::Newline){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;

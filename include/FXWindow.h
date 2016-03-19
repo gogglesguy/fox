@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.h,v 1.168 2008/01/04 15:18:28 fox Exp $                         *
+* $Id: FXWindow.h,v 1.169 2008/03/18 21:32:08 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXWINDOW_H
 #define FXWINDOW_H
@@ -792,9 +792,9 @@ public:
   * language.  An optional hint may be passed to break any ties in case
   * more than one tranlation is possible for the given message text.
   * In addition, the name of the widget is passed as context name so
-  * that controls in a single dialog may be grouped together.
+  * that translations for a single dialog may be grouped together.
   */
-  virtual const FXchar* tr(const FXchar* text,const FXchar* hint=NULL) const;
+  virtual const FXchar* tr(const FXchar* text,const FXchar* hint=NULL,FXint count=-1) const;
 
   /// Save window to stream
   virtual void save(FXStream& store) const;

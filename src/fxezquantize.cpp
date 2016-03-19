@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxezquantize.cpp,v 1.10 2008/01/04 15:42:45 fox Exp $                     *
+* $Id: fxezquantize.cpp,v 1.11 2008/03/14 04:11:27 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

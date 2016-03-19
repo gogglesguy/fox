@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComposeContext.cpp,v 1.17 2008/01/04 15:42:06 fox Exp $                *
+* $Id: FXComposeContext.cpp,v 1.19 2008/03/27 15:51:57 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -35,6 +35,7 @@
 #include "FXApp.h"
 #include "FXId.h"
 #include "FXWindow.h"
+#include "FXFont.h"
 #include "FXComposeContext.h"
 #include "FXException.h"
 
@@ -86,7 +87,7 @@ void FXComposeContext::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-      ///////
+      xid=window->id();
       }
     }
   }
@@ -119,10 +120,30 @@ void FXComposeContext::focusOut(){
   }
 
 
+// Set the font
+void FXComposeContext::setFont(FXFont* font){
+  if(xid && font && font->id()){
+    HIMC himc=ImmGetContext((HWND)xid);
+    LOGFONT lf;
+    GetObject((HFONT)font->id(),sizeof(LOGFONT),&lf);
+    ImmSetCompositionFont(himc,&lf);
+    ImmReleaseContext((HWND)xid,himc);
+    }
+  }
+
+
 // Set the spot
 void FXComposeContext::setSpot(FXint x,FXint y){
   if(xid){
-    ///////
+    HIMC himc=ImmGetContext((HWND)xid);
+    COMPOSITIONFORM cf;
+    cf.dwStyle=CFS_POINT;
+    FXint tox,toy;
+    window->translateCoordinatesTo(tox,toy,window->getShell(),x,y);
+    cf.ptCurrentPos.x=tox;
+    cf.ptCurrentPos.y=toy;
+    ImmSetCompositionWindow(himc,&cf);
+    ImmReleaseContext((HWND)xid,himc);
     }
   }
 
@@ -139,7 +160,28 @@ void FXComposeContext::setArea(FXint x,FXint y,FXint w,FXint h){
 FXString FXComposeContext::translateEvent(FXRawEvent& event){
   FXString result;
   if(xid){
-    ///////
+    HIMC himc=ImmGetContext(event.hwnd);
+    LONG mlen=0;
+    FXnchar* mstr;
+    if(event.lParam&GCS_RESULTSTR){
+      mlen=ImmGetCompositionString(himc,GCS_RESULTSTR,NULL,0);
+      mstr=new FXnchar [mlen];
+      ImmGetCompositionString(himc,GCS_RESULTSTR,mstr,mlen);
+      }
+    else{
+      mlen=ImmGetCompositionString(himc,GCS_COMPSTR,NULL,0);
+      mstr=new FXnchar [mlen+1];
+      ImmGetCompositionString(himc,GCS_COMPSTR,mstr,mlen);
+      }
+	mstr[mlen/sizeof(FXnchar)]=0;
+    ImmReleaseContext(event.hwnd,himc);
+    int utf8len=WideCharToMultiByte(CP_UTF8,0,mstr,-1,NULL,0,NULL,NULL);
+    FXchar* utf8str=new FXchar [utf8len];
+    WideCharToMultiByte(CP_UTF8,0,mstr,-1,utf8str,utf8len,NULL,NULL);
+    result.assign(utf8str,utf8len);
+
+    delete [] mstr;
+    delete [] utf8str;
     }
   return result;
   }
@@ -390,6 +432,16 @@ void FXComposeContext::focusOut(){
     XUnsetICFocus((XIC)xid);
     }
 #endif
+  }
+
+
+// Set the font
+void FXComposeContext::setFont(FXFont* font){
+  if(xid && font && font->id()){
+#ifndef NO_XIM
+      ///
+#endif
+    }
   }
 
 

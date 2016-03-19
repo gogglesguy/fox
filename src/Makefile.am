@@ -274,7 +274,6 @@ FXICOIcon.cpp \
 FXICOImage.cpp \
 FXIFFIcon.cpp \
 FXIFFImage.cpp \
-FXIO.cpp \
 FXIcon.cpp \
 FXIconDict.cpp \
 FXIconList.cpp \
@@ -284,6 +283,7 @@ FXImage.cpp \
 FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
+FXIO.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXKnob.cpp \
@@ -313,6 +313,7 @@ FXMenuPane.cpp \
 FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
+FXMessageChannel.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -333,7 +334,6 @@ FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
-FXMessageChannel.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
 FXRGBIcon.cpp \

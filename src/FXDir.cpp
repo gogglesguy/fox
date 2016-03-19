@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDir.cpp,v 1.48 2008/01/04 15:42:10 fox Exp $                           *
+* $Id: FXDir.cpp,v 1.49 2008/02/28 16:14:29 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -309,8 +309,6 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
   return 0;
   }
 
-
-// FIXME maybe an FXDrive class for iteration over drives is better?
 
 // List drives, i.e. roots of directory trees.
 FXint FXDir::listDrives(FXString*& drivelist){

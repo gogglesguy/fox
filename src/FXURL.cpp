@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXURL.cpp,v 1.38 2008/01/04 15:42:41 fox Exp $                           *
+* $Id: FXURL.cpp,v 1.39 2008/02/19 18:59:04 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -95,12 +95,12 @@ FXString FXURL::fileFromURL(const FXString& url){
     FXString result;
     FXint path=localurl.find(PATHSEP,7);
     if(path<0 || path==7){
-      result=localurl.mid(7,2000);
+      result=localurl.mid(7,2147483647);
       }
     else{
       FXString host=localurl.mid(7,path-7);
       if(host=="localhost" || host==FXSystem::getHostName()){
-        result=localurl.mid(path,2000);
+        result=localurl.mid(path,2147483647);
         }
       }
     if(result[0]==PATHSEP && Ascii::isLetter(result[1]) && (result[2]==':' || result[2]=='|')){
@@ -109,18 +109,18 @@ FXString FXURL::fileFromURL(const FXString& url){
       }
     return result;
     }
-  return "";
+  return FXString::null;
 #else
   FXint t;
   if(comparecase("file:",url,5)==0){
-    if(url[5]==PATHSEP && url[6]==PATHSEP){
+    if(ISPATHSEP(url[5]) && ISPATHSEP(url[6])){
       t=url.find(PATHSEP,7);
-      if(7<t) return url.mid(t,2000);       // We ignore host designation
-      return url.mid(7,2000);               // Empty hostname part
+      if(7<t) return url.mid(t,2147483647);       // We ignore host designation
+      return url.mid(7,2147483647);               // Empty hostname part
       }
-    return url.mid(5,2000);                 // No hostname
+    return url.mid(5,2147483647);                 // No hostname
     }
-  return url;                               // Return unchanged
+  return FXString::null;
 #endif
   }
 

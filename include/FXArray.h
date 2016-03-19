@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXArray.h,v 1.33 2008/01/04 15:18:14 fox Exp $                           *
+* $Id: FXArray.h,v 1.34 2008/03/25 20:13:22 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXARRAY_H
 #define FXARRAY_H
@@ -68,7 +68,7 @@ public:
   /// Change number of elements to n
   FXbool no(FXint n){
     if(n!=num){
-      if(n<num){
+      if(0<num-n){
         destructElms(ptr+n,num-n);
         if(!resizeElms(ptr,n)) return false;
         }

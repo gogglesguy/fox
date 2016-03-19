@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileDict.cpp,v 1.73 2008/01/04 15:42:13 fox Exp $                      *
+* $Id: FXFileDict.cpp,v 1.74 2008/03/25 20:00:58 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -200,49 +200,49 @@ void *FXFileDict::createData(void* ptr){
   fileassoc=new FXFileAssoc;
 
   // Parse command
-  for(q=command; *p && *p!=';' && q<command+COMMANDLEN-1; *q++=*p++); *q='\0';
+  for(q=command; *p && *p!=';' && q<command+COMMANDLEN-1; *q++=*p++){} *q='\0';
 
   // Skip section separator
   if(*p==';') p++;
 
   // Parse extension type
-  for(q=extension; *p && *p!=';' && q<extension+EXTENSIONLEN-1; *q++=*p++); *q='\0';
+  for(q=extension; *p && *p!=';' && q<extension+EXTENSIONLEN-1; *q++=*p++){} *q='\0';
 
   // Skip section separator
   if(*p==';') p++;
 
   // Parse big icon name
-  for(q=bigname; *p && *p!=';' && *p!=':' && q<bigname+ICONNAMELEN-1; *q++=*p++); *q='\0';
+  for(q=bigname; *p && *p!=';' && *p!=':' && q<bigname+ICONNAMELEN-1; *q++=*p++){} *q='\0';
 
   // Skip icon separator
   if(*p==':') p++;
 
   // Parse big open icon name
-  for(q=bignameopen; *p && *p!=';' && q<bignameopen+ICONNAMELEN-1; *q++=*p++); *q='\0';
+  for(q=bignameopen; *p && *p!=';' && q<bignameopen+ICONNAMELEN-1; *q++=*p++){} *q='\0';
 
   // Skip section separator
   if(*p==';') p++;
 
   // Parse mini icon name
-  for(q=mininame; *p && *p!=';' && *p!=':' && q<mininame+ICONNAMELEN-1; *q++=*p++); *q='\0';
+  for(q=mininame; *p && *p!=';' && *p!=':' && q<mininame+ICONNAMELEN-1; *q++=*p++){} *q='\0';
 
   // Skip icon separator
   if(*p==':') p++;
 
   // Parse mini open icon name
-  for(q=mininameopen; *p && *p!=';' && q<mininameopen+ICONNAMELEN-1; *q++=*p++); *q='\0';
+  for(q=mininameopen; *p && *p!=';' && q<mininameopen+ICONNAMELEN-1; *q++=*p++){} *q='\0';
 
   // Skip section separator
   if(*p==';') p++;
 
   // Parse mime type
-  for(q=mimetype; *p && *p!=';' && q<mimetype+MIMETYPELEN-1; *q++=*p++); *q='\0';
+  for(q=mimetype; *p && *p!=';' && q<mimetype+MIMETYPELEN-1; *q++=*p++){} *q='\0';
 
   // Skip section separator
   if(*p==';') p++;
 
   // Parse flags
-  for(extra=p; *p && *p!=';'; p++);
+  for(extra=p; *p && *p!=';'; p++){}
 
   // Test flags
   if(strstr(extra,"cd")) flags|=1;

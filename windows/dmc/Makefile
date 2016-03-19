@@ -3,9 +3,9 @@
 #
 
 all:
-	cd ..\utils
+	cd ..\..\utils
 	smake -fMakefile.dmc
-	cd ..\..\src
+	cd ..\src
 	smake -fMakefile.dmc
 	cd ..\tests
 	smake -fMakefile.dmc
@@ -15,11 +15,13 @@ all:
 	smake -fMakefile.dmc
 	cd ..\calculator
 	smake -fMakefile.dmc
+	cd ..\shutterbug
+	make -fMakefile.dmc
 
 clean:
-	cd ..\..\src
+	cd ..\..\utils
 	smake -fMakefile.dmc clean
-	cd ..\utils
+	cd ..\src
 	smake -fMakefile.dmc clean
 	cd ..\tests
 	smake -fMakefile.dmc clean
@@ -28,4 +30,6 @@ clean:
 	cd ..\pathfinder
 	smake -fMakefile.dmc clean
 	cd ..\calculator
+	smake -fMakefile.dmc clean
+	cd ..\shutterbug
 	smake -fMakefile.dmc clean

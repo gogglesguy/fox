@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.h,v 1.51 2008/01/04 15:18:12 fox Exp $                        *
+* $Id: TextWindow.h,v 1.52 2008/02/29 21:19:21 fox Exp $                        *
 ********************************************************************************/
 #ifndef TEXTWINDOW_H
 #define TEXTWINDOW_H
@@ -203,6 +203,7 @@ public:
   long onCmdFilter(FXObject*,FXSelector,void*);
   long onUpdOverstrike(FXObject*,FXSelector,void*);
   long onUpdReadOnly(FXObject*,FXSelector,void*);
+  long onUpdTabMode(FXObject*,FXSelector,void*);
   long onUpdNumRows(FXObject*,FXSelector,void*);
   long onClock(FXObject*,FXSelector,void*);
   long onCmdPreferences(FXObject*,FXSelector,void*);
@@ -290,6 +291,7 @@ public:
     ID_INCLUDE_PATH,
     ID_OVERSTRIKE,
     ID_READONLY,
+    ID_TABMODE,
     ID_CLOCKTIME,
     ID_PREFERENCES,
     ID_TABCOLUMNS,

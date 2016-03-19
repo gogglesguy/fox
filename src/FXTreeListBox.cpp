@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeListBox.cpp,v 1.70 2008/01/04 15:42:41 fox Exp $                   *
+* $Id: FXTreeListBox.cpp,v 1.75 2008/03/25 20:00:59 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -209,13 +209,13 @@ long FXTreeListBox::onTreeForward(FXObject*,FXSelector sel,void* ptr){
 
 // Forward GUI update of tree to target; but only if pane is not popped
 long FXTreeListBox::onTreeUpdate(FXObject*,FXSelector,void*){
-  return target && !isPaneShown() && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
+  return target && !isMenuShown() && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
   }
 
 
 // Pressed left button in text field
 long FXTreeListBox::onFieldButton(FXObject*,FXSelector,void*){
-  button->handle(this,FXSEL(SEL_COMMAND,ID_POST),NULL);      // Post the list
+  button->showMenu(true);
   return 1;
   }
 
@@ -230,7 +230,7 @@ long FXTreeListBox::onFocusSelf(FXObject* sender,FXSelector,void* ptr){
 long FXTreeListBox::onFocusUp(FXObject*,FXSelector,void*){
   if(isEnabled()){
     FXTreeItem *item=getCurrentItem();
-    if(!item){ for(item=getLastItem(); item->getLast(); item=item->getLast()); }
+    if(!item){ for(item=getLastItem(); item->getLast(); item=item->getLast()){} }
     else if(item->getAbove()){ item=item->getAbove(); }
     if(item){
       setCurrentItem(item,true);
@@ -267,7 +267,7 @@ long FXTreeListBox::onMouseWheel(FXObject*,FXSelector,void* ptr){
       else if(item->getBelow()){ item=item->getBelow(); }
       }
     else if(event->code>0){
-      if(!item){ for(item=getLastItem(); item->getLast(); item=item->getLast()); }
+      if(!item){ for(item=getLastItem(); item->getLast(); item=item->getLast()){} }
       else if(item->getAbove()){ item=item->getAbove(); }
       }
     if(item){
@@ -279,9 +279,15 @@ long FXTreeListBox::onMouseWheel(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Show menu
+void FXTreeListBox::showMenu(FXbool shw){
+  button->showMenu(shw);
+  }
+
+
 // Is the pane shown
-FXbool FXTreeListBox::isPaneShown() const {
-  return pane->shown();
+FXbool FXTreeListBox::isMenuShown() const {
+  return button->isMenuShown();
   }
 
 

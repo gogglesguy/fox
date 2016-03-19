@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCanvas.cpp,v 1.83 2008/01/10 19:00:51 fox Exp $                      *
+* $Id: FXGLCanvas.cpp,v 1.86 2008/04/22 20:14:25 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -65,7 +65,6 @@ FXIMPLEMENT(FXGLCanvas,FXCanvas,NULL,0)
 FXGLCanvas::FXGLCanvas(){
   flags|=FLAG_ENABLED|FLAG_SHOWN;
   context=NULL;
-  xxx=0;
   }
 
 
@@ -74,7 +73,6 @@ FXGLCanvas::FXGLCanvas(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector s
   flags|=FLAG_ENABLED|FLAG_SHOWN;
   context=new FXGLContext(getApp(),vis);
   visual=vis;
-  xxx=0;
   }
 
 
@@ -83,7 +81,6 @@ FXGLCanvas::FXGLCanvas(FXComposite* p,FXGLVisual *vis,FXGLCanvas* share,FXObject
   flags|=FLAG_ENABLED|FLAG_SHOWN;
   context=new FXGLContext(getApp(),vis,share->getContext());
   visual=vis;
-  xxx=0;
   }
 
 
@@ -92,7 +89,6 @@ FXGLCanvas::FXGLCanvas(FXComposite* p,FXGLContext* ctx,FXObject* tgt,FXSelector 
   flags|=FLAG_ENABLED|FLAG_SHOWN;
   context=ctx;
   visual=ctx->getVisual();
-  xxx=0;
   }
 
 
@@ -122,7 +118,7 @@ FXbool FXGLCanvas::isShared() const {
 
 // Create X window (GL CANVAS)
 void FXGLCanvas::create(){
-  FXWindow::create();
+  FXCanvas::create();
   if(xid){
     if(getApp()->isInitialized()){
       context->create();
@@ -132,10 +128,11 @@ void FXGLCanvas::create(){
       HDC hdc=::GetDC((HWND)xid);       // FIXME should this be this->GetDC()
       SetPixelFormat(hdc,(FXint)(FXival)visual->id(),&pfd);
       ::ReleaseDC((HWND)xid,hdc);       // FIXME should this be this->ReleaseDC()
+      rsc=xid;
 #elif defined(GLX_VERSION_1_3)
-      xxx=glXCreateWindow((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),xid,NULL);
+      rsc=glXCreateWindow((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),xid,NULL);
 #else
-      /////
+      rsc=xid;
 #endif
 #endif
       }
@@ -146,7 +143,8 @@ void FXGLCanvas::create(){
 // Detach the GL Canvas
 void FXGLCanvas::detach(){
   context->detach();
-  FXWindow::detach();
+  FXCanvas::detach();
+  rsc=0;
   }
 
 
@@ -154,15 +152,15 @@ void FXGLCanvas::detach(){
 void FXGLCanvas::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
+      if(options&GLCANVAS_OWN_CONTEXT) context->destroy();
 #ifdef HAVE_GL_H
 #if defined(WIN32)
-      /////
 #elif defined(GLX_VERSION_1_3)
-      glXDestroyWindow((Display*)getApp()->getDisplay(),xxx);
+      glXDestroyWindow((Display*)getApp()->getDisplay(),rsc);
 #else
-      /////
 #endif
 #endif
+      rsc=0;
       }
     }
   FXCanvas::destroy();
@@ -195,23 +193,23 @@ void FXGLCanvas::swapBuffers(){
 
 // Save object to stream
 void FXGLCanvas::save(FXStream& store) const {
-  FXWindow::save(store);
+  FXCanvas::save(store);
   store << context;
   }
 
 
 // Load object from stream
 void FXGLCanvas::load(FXStream& store){
-  FXWindow::load(store);
+  FXCanvas::load(store);
   store >> context;
   }
 
 
 // Close and release any resources
 FXGLCanvas::~FXGLCanvas(){
+  destroy();
   if(options&GLCANVAS_OWN_CONTEXT) delete context;
   context=(FXGLContext*)-1L;
-  destroy();
   }
 
 }

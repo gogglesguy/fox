@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Adie.cpp,v 1.126 2008/01/04 15:18:11 fox Exp $                           *
+* $Id: Adie.cpp,v 1.127 2008/03/25 20:00:57 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -180,7 +180,7 @@ void Adie::exit(FXint code){
 
 // Close all windows
 long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){
-  while(0<windowlist.no() && windowlist[0]->close(true));
+  while(0<windowlist.no() && windowlist[0]->close(true)){}
   return 1;
   }
 

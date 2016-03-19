@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRootWindow.cpp,v 1.42 2008/01/04 15:42:30 fox Exp $                    *
+* $Id: FXRootWindow.cpp,v 1.44 2008/01/22 20:07:21 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -123,6 +123,52 @@ void FXRootWindow::create(){
       }
     }
   }
+
+/*
+//
+//      max_monitor_cb
+//
+//  EnumDisplayMonitors callback routine
+//
+static BOOL max_monitor_cb(HMONITOR hmon,HDC hdc,LPRECT rect,LPARAM args){
+  int w,h;
+  MONITORINFO moninfo;
+  moninfo.cbSize=sizeof(moninfo);
+  GetMonitorInfo(hmon,&moninfo);
+  w=moninfo.rcWork.right-moninfo.rcWork.left;
+  h=moninfo.rcWork.bottom-moninfo.rcWork.top;
+  if(((FXint*)args)[0]<w) ((FXint*)args)[0]=w;
+  if(((FXint*)args)[1]<h) ((FXint*)args)[1]=h;
+  return true;
+  }
+
+
+//
+//      GetMaxScreenSize
+//
+//  Returns the biggest width and biggest height of all the
+//  monitors on the system. Does not necessarily have to
+//  refer to the same monitor device.
+//
+FXbool GetMaxScreenSize(FXint &width, FXint &height){
+  FXint args[2]={0,0};
+  if(EnumDisplayMonitors(NULL,NULL,(MONITORENUMPROC)max_monitor_cb,(LPARAM)args)){
+    width=args[0];
+    height=args[1];
+    return true;
+    }
+  return false;
+  }
+
+
+One could also use:
+
+GetSystemMetrics(SM_CXVIRTUALSCREEN)
+GetSystemMetrics(SM_CYVIRTUALSCREEN)
+
+//return GetSystemMetrics(SM_CXSCREEN);
+//return GetSystemMetrics(SM_CYSCREEN);
+*/
 
 
 // Get default width

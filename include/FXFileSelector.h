@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileSelector.h,v 1.73 2008/01/04 15:18:18 fox Exp $                    *
+* $Id: FXFileSelector.h,v 1.74 2008/03/26 20:04:22 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXFILESELECTOR_H
 #define FXFILESELECTOR_H
@@ -79,10 +79,11 @@ protected:
   FXIcon            *markicon;          // Book mark icon
   FXIcon            *clearicon;         // Book clear icon
   FXIcon            *newicon;           // New directory icon
-  FXIcon            *deleteicon;        // Delete file icon
-  FXIcon            *moveicon;          // Rename file icon
+  FXIcon            *renameicon;        // Rename file icon
   FXIcon            *copyicon;          // Copy file icon
+  FXIcon            *moveicon;          // Rename file icon
   FXIcon            *linkicon;          // Link file icon
+  FXIcon            *deleteicon;        // Delete file icon
   FXRecentFiles      bookmarks;         // Bookmarked places
   FXuint             selectmode;        // Select mode
   FXbool             navigable;         // May navigate
@@ -108,8 +109,9 @@ public:
   long onCmdVisit(FXObject*,FXSelector,void*);
   long onCmdNew(FXObject*,FXSelector,void*);
   long onUpdNew(FXObject*,FXSelector,void*);
-  long onCmdMove(FXObject*,FXSelector,void*);
+  long onCmdRename(FXObject*,FXSelector,void*);
   long onCmdCopy(FXObject*,FXSelector,void*);
+  long onCmdMove(FXObject*,FXSelector,void*);
   long onCmdLink(FXObject*,FXSelector,void*);
   long onCmdRemove(FXObject*,FXSelector,void*);
   long onUpdSelected(FXObject*,FXSelector,void*);
@@ -133,10 +135,11 @@ public:
     ID_BOOKMENU,
     ID_VISIT,
     ID_NEW,
-    ID_REMOVE,
-    ID_MOVE,
+    ID_RENAME,
     ID_COPY,
+    ID_MOVE,
     ID_LINK,
+    ID_REMOVE,
     ID_LAST
     };
 public:

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.263 2008/01/04 15:42:34 fox Exp $                       *
+* $Id: FXString.cpp,v 1.266 2008/03/19 17:43:44 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1709,9 +1709,9 @@ FXString FXString::right(FXint n) const {
 FXString FXString::mid(FXint pos,FXint n) const {
   if(0<n){
     register FXint len=length();
-    if(pos<len && pos+n>0){
+    if(pos<len && n>-pos){
       if(pos<0){n+=pos;pos=0;}
-      if(pos+n>len){n=len-pos;}
+      if(n>len-pos){n=len-pos;}
       return FXString(str+pos,n);
       }
     }
@@ -2092,128 +2092,6 @@ FXString& FXString::vformat(const FXchar* fmt,va_list args){
   return *this;
   }
 
-
-#if 0
-// FIXME need safe version of this, that grows buffer automatically
-// NOTES
-//  - Can not reset va_arg pointer in vformat().
-//  - Repeated va_start() is not portable.
-
-// FIXME use va_copy to retry printf if don't.
-
-// Print formatted string a-la vprintf
-FXString& FXString::vformat(const FXchar* fmt,va_list args){
-  register FXint len=0;
-  if(fmt && *fmt){
-    register FXint n=strlen(fmt);       // Result is longer than format string
-//    va_list a;
-//    n+=128;                             // Add a bit of slop
-//x:  length(n);
-//    va_copy(a,args);
-//    len=vsnprintf(str,n+1,fmt,a);
-//    if(len<0){ n<<=1; goto x; }         // Some implementations return -1 if not enough room
-//    if(n<len){ n=len; goto x; }         // Others return how much space would be needed
-    n+=1024;                            // Add a lot of slop
-    length(n);                          // Some implementations return -1 if not enough room
-    len=__vsnprintf(str,n+1,fmt,args);  // Others return how much space would be needed
-    FXASSERT(0<=len && len<=n);
-    }
-  length(len);
-  return *this;
-  }
-#endif
-
-#if 0
-
-// Below is from Tim Dollar; need to check this out
-
-// Print formatted string a-la printf
-FXString& FXString::format(const char* fmt,...){
-  int len;
-  va_list args;
-
-#if defined(_LINUX_) || defined(_SUN_)
-
-  // Start with a str capable of holding one char and try a
-  // vsnprintf to get the required length.
-  length(1);
-  va_start(args,fmt);
-  len = vsnprintf(str,1,fmt,args);
-  va_end(args);
-  if(len<0) return *this;
-
-  // Resize and do it for real
-  length(len);
-  va_start(args,fmt);
-  vsnprintf(str,len+1,fmt,args);
-  va_end(args);
-
-#elif defined(WIN32)     // including 64-bit
-
-  // Windows provides a nice little function for determining the
-  // result string size a priori.
-  va_start(args,fmt);
-  len = _vscprintf(fmt,args);
-  va_end(args);
-  if(len<0) return *this;
-
-  // Resize and do the write.
-  length(len);
-  va_start(args,fmt);
-  _vsnprintf(str,len+1,fmt,args);
-  va_end(args);
-
-#elif defined(_HP_)   // tested only on pa-risc
-
-  int status;
-
-  // Start with a str capable of holding a 128 characters
-  len = 128;
-  length(len);
-  while(1) {
-    va_start(args,fmt);
-
-    // The documentation for this function is awful. Through
-    // experimentation, I've determined that if the result string
-    // would be longer than the specified size, this function returns
-    // -1. Otherwise, it returns the number of characters written.
-    // For real errors, the return value is supposed to be negative,
-    // but I don't know if this includes -1.
-    status = vsnprintf(str,len+1,fmt,args);
-
-    va_end(args);
-    if(status < -1) { length(0); return *this; }
-    if(status>=0 && status < len) { length(status); return *this; }
-    len*=2;
-    length(len);
-    }
-
-#elif defined(_SGI_)  // tested only on IRIX 6.5
-
-  int status;
-
-  // Start with a str capable of holding a 128 characters
-  len = 128;
-  length(len);
-  while(1) {
-    va_start(args,fmt);
-
-    // This guy reports the number of characters transmitted or -1
-    // on error. It DOES NOT report the number of characters that
-    // would have been transmitted in the event that the string is
-    // too short.
-    status = vsnprintf(str,len+1,fmt,args);
-
-    va_end(args);
-    if(status < 0) { length(0); return *this; }
-    if(status < len) { length(status); return *this; }
-    len*=2;
-    length(len);
-    }
-#endif
-  return *this;
-  }
-#endif
 
 // Print formatted string a-la printf
 FXString& FXString::format(const FXchar* fmt,...){

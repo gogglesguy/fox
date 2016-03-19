@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIO.h,v 1.24 2008/01/04 15:18:19 fox Exp $                              *
+* $Id: FXIO.h,v 1.29 2008/04/22 20:08:08 fox Exp $                              *
 ********************************************************************************/
 #ifndef FXIO_H
 #define FXIO_H
@@ -92,21 +92,22 @@ public:
   enum {
 
     /// Basic access options
-    NoAccess    = 0,                    /// No access
-    ReadOnly    = 1,                    /// Open for reading
-    WriteOnly   = 2,                    /// Open for writing
-    ReadWrite   = ReadOnly|WriteOnly,   /// Open for read and write
-    Append      = 4,                    /// Open for append
-    Truncate    = 8,                    /// Truncate to zero when writing
-    Create      = 16,                   /// Create if it doesn't exist
-    Exclusive   = 32,                   /// Fail if trying to create a file which already exists
-    NonBlocking = 64,                   /// Non-blocking i/o
-    Executable  = 128,                  /// Executable (memory map)
-    OwnHandle   = 256,                  /// File handle is ours
+    NoAccess     = 0,                    /// No access
+    ReadOnly     = 1,                    /// Open for reading
+    WriteOnly    = 2,                    /// Open for writing
+    ReadWrite    = ReadOnly|WriteOnly,   /// Open for both read and write
+    Append       = 4,                    /// Open for append
+    Truncate     = 8,                    /// Truncate to zero when writing
+    Create       = 16,                   /// Create if it doesn't exist
+    Exclusive    = 32,                   /// Fail if trying to create a file which already exists
+    NonBlocking  = 64,                   /// Non-blocking i/o
+    Executable   = 128,                  /// Executable (memory map)
+    OwnHandle    = 256,                  /// File handle is ours
+    NoAccessTime = 512,                  /// Don't change access time of file
 
     /// Convenience access options
-    Reading     = ReadOnly,                     /// Normal options for reading
-    Writing     = ReadWrite|Create|Truncate     /// Normal options for writing
+    Reading      = ReadOnly,                    /// Normal options for reading
+    Writing      = ReadWrite|Create|Truncate    /// Normal options for writing
     };
 
   /// Positioning modes

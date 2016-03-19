@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFile.h,v 1.108 2008/01/04 15:18:18 fox Exp $                           *
+* $Id: FXFile.h,v 1.109 2008/02/28 16:14:28 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXFILE_H
 #define FXFILE_H
@@ -123,6 +123,7 @@ public:
 
   /// Recursively remove file or directory, recurse if allowed
   static FXbool removeFiles(const FXString& path,FXbool recursive=false);
+
 
   /// Destroy
   virtual ~FXFile();

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuCaption.cpp,v 1.59 2008/01/04 15:42:25 fox Exp $                   *
+* $Id: FXMenuCaption.cpp,v 1.60 2008/01/15 05:37:08 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -46,7 +46,6 @@
     accelerator key combination.
   - When menu label changes, hotkey might have to be adjusted.
   - Fix it so menu stays up when after Alt-F, you press Alt-E.
-  - FXMenuCascade should send ID_POST/ID_UNPOST to self.
   - Look into SEL_FOCUS_SELF some more:- menus should not
     get focus, or at least, return the focus to the original
     widget.

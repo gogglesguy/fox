@@ -4,7 +4,7 @@ CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP  = $(top_builddir)/utils/reswrap
 SUFFIXES = .gif .bmp
-LDADD = ../src/libFOX-1.7.la -lm
+LDADD = $(top_builddir)/src/libFOX-1.7.la -lm
 
 EXTRA_PROGRAMS	= \
 gltest \
@@ -12,15 +12,15 @@ glviewer
 
 
 noinst_PROGRAMS	= \
-console \
+scan \
 format \
+console \
 thread \
 calendar \
 expression \
 dctest \
 codecs \
 dialog \
-ControlPanel \
 groupbox \
 scribble \
 wizard \
@@ -49,6 +49,7 @@ ratio \
 $(GL_TESTS)
 
 format_SOURCES          = format.cpp
+scan_SOURCES            = scan.cpp
 console_SOURCES         = console.cpp
 thread_SOURCES          = thread.cpp
 calendar_SOURCES        = calendar.cpp
@@ -83,7 +84,6 @@ dirlist_SOURCES		= dirlist.cpp
 button_SOURCES		= button.cpp
 codecs_SOURCES		= codecs.cpp
 dctest_SOURCES		= dctest.cpp dippy.h
-ControlPanel_SOURCES    = ControlPanel.cpp controlpanelicon.h
 
 
 

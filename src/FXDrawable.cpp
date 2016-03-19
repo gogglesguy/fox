@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDrawable.cpp,v 1.30 2008/01/04 15:42:11 fox Exp $                      *
+* $Id: FXDrawable.cpp,v 1.31 2008/04/22 20:08:09 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -104,7 +104,6 @@ void FXDrawable::load(FXStream& store){
 // Clean up
 FXDrawable::~FXDrawable(){
   visual=(FXVisual*)-1L;
-  xid=0;
   }
 
 }

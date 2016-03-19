@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComboBox.cpp,v 1.83 2008/01/04 15:42:06 fox Exp $                      *
+* $Id: FXComboBox.cpp,v 1.87 2008/01/15 05:31:34 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -198,7 +198,7 @@ void FXComboBox::layout(){
 
 // Forward GUI update of text field to target; but only if pane is not popped
 long FXComboBox::onUpdFmText(FXObject*,FXSelector,void*){
-  return target && !isPaneShown() && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
+  return target && !isMenuShown() && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
   }
 
 
@@ -225,7 +225,7 @@ long FXComboBox::onListCommand(FXObject*,FXSelector,void* ptr){
 // Pressed left button in text field
 long FXComboBox::onTextButton(FXObject*,FXSelector,void*){
   if(options&COMBOBOX_STATIC){
-    button->handle(this,FXSEL(SEL_COMMAND,ID_POST),NULL);
+    button->showMenu(true);
     return 1;
     }
   return 0;
@@ -567,9 +567,15 @@ void* FXComboBox::getItemData(FXint index) const {
   }
 
 
+// Show menu
+void FXComboBox::showMenu(FXbool shw){
+  button->showMenu(shw);
+  }
+
+
 // Is the pane shown
-FXbool FXComboBox::isPaneShown() const {
-  return pane->shown();
+FXbool FXComboBox::isMenuShown() const {
+  return button->isMenuShown();
   }
 
 

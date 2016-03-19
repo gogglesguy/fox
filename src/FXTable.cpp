@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.cpp,v 1.273 2008/01/04 15:42:35 fox Exp $                        *
+* $Id: FXTable.cpp,v 1.274 2008/03/05 05:58:41 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1872,7 +1872,7 @@ void FXTable::setItemFromControl(FXint r,FXint c,FXWindow *control){
 
 
 // Start to edit a cell
-void FXTable::startInput(FXint r,FXint c){
+FXbool FXTable::startInput(FXint r,FXint c){
   if(0<=r && 0<=c && !editor){
     editor=getControlForItem(r,c);
     if(editor){
@@ -1884,13 +1884,15 @@ void FXTable::startInput(FXint r,FXint c){
       editor->setSelector(ID_ACCEPT_INPUT);     // FIXME ending input upon SEL_COMMAND not ideal...
       editor->setFocus();
       recalc();
+      return true;
       }
     }
+  return false;
   }
 
 
 // Cancel editing cell
-void FXTable::cancelInput(){
+FXbool FXTable::cancelInput(){
   if(editor){
     delete editor;
     input.fm.row=-1;
@@ -1898,12 +1900,14 @@ void FXTable::cancelInput(){
     input.fm.col=-1;
     input.to.col=-1;
     editor=NULL;
+    return true;
     }
+  return false;
   }
 
 
 // Done with editing cell
-void FXTable::acceptInput(FXbool notify){
+FXbool FXTable::acceptInput(FXbool notify){
   if(editor){
     FXTableRange tablerange=input;
     setItemFromControl(input.fm.row,input.fm.col,editor);
@@ -1911,18 +1915,18 @@ void FXTable::acceptInput(FXbool notify){
     if(notify && target){
       target->tryHandle(this,FXSEL(SEL_REPLACED,message),(void*)&tablerange);
       }
+    return true;
     }
+  return false;
   }
 
 
 // Start edit of current cell
 long FXTable::onCmdStartInput(FXObject*,FXSelector,void*){
-  if(isEditable()){
-    startInput(current.row,current.col);
+  if(isEditable() && startInput(current.row,current.col)){
+    return 1;
     }
-  else{
-    getApp()->beep();
-    }
+  getApp()->beep();
   return 1;
   }
 
@@ -1936,15 +1940,19 @@ long FXTable::onUpdStartInput(FXObject* sender,FXSelector,void*){
 
 // Cancel edit
 long FXTable::onCmdCancelInput(FXObject*,FXSelector,void*){
-  cancelInput();
-  return 1;
+  if(cancelInput()){
+    return 1;
+    }
+  return 0;
   }
 
 
 // End edit
 long FXTable::onCmdAcceptInput(FXObject*,FXSelector,void*){
-  acceptInput(true);
-  return 1;
+  if(acceptInput(true)){
+    return 1;
+    }
+  return 0;
   }
 
 

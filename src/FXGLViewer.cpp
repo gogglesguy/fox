@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.183 2008/01/04 15:42:17 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.184 2008/03/25 20:00:58 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1777,10 +1777,10 @@ long FXGLViewer::onRightBtnRelease(FXObject*,FXSelector,void* ptr){
       if(mode==POSTING){
         setOp(HOVERING);
         hit=pick(event->click_x,event->click_y);
-        if(hit && hit->handle(this,FXSEL(SEL_COMMAND,ID_QUERY_MENU),ptr))
-          ;
-        else if(target && target->tryHandle(this,FXSEL(SEL_COMMAND,ID_QUERY_MENU),ptr))
-          ;
+        if(hit && hit->handle(this,FXSEL(SEL_COMMAND,ID_QUERY_MENU),ptr)){
+          }
+        else if(target && target->tryHandle(this,FXSEL(SEL_COMMAND,ID_QUERY_MENU),ptr)){
+          }
         }
       setOp(HOVERING);
       }

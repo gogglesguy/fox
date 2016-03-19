@@ -29,6 +29,8 @@
 +FXComplexd.obj &
 +FXComposeContext.obj &
 +FXComposite.obj &
++FXConsole.obj &
++FXCopyDialog.obj &
 +FXCursor.obj &
 +FXDate.obj &
 +FXDataTarget.obj &
@@ -41,6 +43,7 @@
 +FXDial.obj &
 +FXDialogBox.obj &
 +FXDict.obj &
++FXDir.obj &
 +FXDirBox.obj &
 +FXDirDialog.obj &
 +FXDirList.obj &
@@ -101,6 +104,7 @@
 +FXImageFrame.obj &
 +FXImageView.obj &
 +FXInputDialog.obj &
++FXIO.obj &
 +FXJPGIcon.obj &
 +FXJPGImage.obj &
 +FXKnob.obj &
@@ -141,7 +145,9 @@
 +FXPPMIcon.obj &
 +FXPPMImage.obj &
 +FXPacker.obj &
++FXPath.obj &
 +FXPicker.obj &
++FXPipe.obj &
 +FXPopup.obj &
 +FXPoint.obj &
 +FXPrintDialog.obj &
@@ -149,7 +155,6 @@
 +FXProgressDialog.obj &
 +FXQuatd.obj &
 +FXQuatf.obj &
-+FXMessenger.obj &
 +FXRASIcon.obj &
 +FXRASImage.obj &
 +FXRGBIcon.obj &
@@ -186,12 +191,14 @@
 +FXSplashWindow.obj &
 +FXSplitter.obj &
 +FXSpring.obj &
++FXStat.obj &
 +FXStatusBar.obj &
 +FXStatusLine.obj &
 +FXStream.obj &
 +FXString.obj &
 +FXStringDict.obj &
 +FXSwitcher.obj &
++FXSystem.obj &
 +FXTGAIcon.obj &
 +FXTGAImage.obj &
 +FXTIFIcon.obj &
@@ -212,6 +219,7 @@
 +FXToolBarTab.obj &
 +FXToolTip.obj &
 +FXTopWindow.obj &
++FXTranslator.obj &
 +FXTreeList.obj &
 +FXTreeListBox.obj &
 +FXTriStateButton.obj &
@@ -237,8 +245,8 @@
 +fxascii.obj &
 +fxbmpio.obj &
 +fxezquantize.obj &
-+fxfsquantize.obj &
 +fxfilematch.obj &
++fxfsquantize.obj &
 +fxgetticks.obj &
 +fxgifio.obj &
 +fxicoio.obj &
