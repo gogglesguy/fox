@@ -45,6 +45,7 @@
 #include "FXElement.h"
 #include "FXArray.h"
 #include "FXHash.h"
+#include "FXRandom.h"
 #include "FXAtomic.h"
 #include "FXMutex.h"
 #include "FXCondition.h"

@@ -1513,6 +1513,7 @@ void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
       }
     }
   }
+  
 #if 0
 
 // Set current filename

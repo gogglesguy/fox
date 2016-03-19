@@ -215,6 +215,7 @@
 +FXRASIcon.obj &
 +FXRASImage.obj &
 +FXRadioButton.obj &
++FXRandom.obj &
 +FXRangef.obj &
 +FXRanged.obj &
 +FXRangeSlider.obj &

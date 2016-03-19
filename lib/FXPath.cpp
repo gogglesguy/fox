@@ -593,48 +593,70 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
   }
 
 
-// Return relative path of file to given base directory
+// Return relative path of file to given absolute base directory
 //
 // Examples:
 //
 //  Base       File         Result      Comment
-//  /          /a/b         /a/b        Branch point is /
-//  /p/q/r     /a/b/c       /a/b/c      Branch point is /
+//  a          /b           /b          Base is relative but file is not
+//  /a         b            b           Base is absolute but file is not
+//
 //  /a/b/c     /a/b/c/d     d           Branch point is /a/b/c
 //  /a/b/c/    /a/b/c/d     d           Branch point is /a/b/c
-//  /a/b/c/d   /a/b/c       ../         Branch point is /a/b/c
-//  /a/b/c/d   /a/b/q       ../../q     Branch point is /a/b
+//
+//  a          b            ../b        Branch point is assumed ..
+//  ./a        ./b          ../b        Branch point is assumed ..
+//
 //  /a/b/c     /a/b/c       .           Equal
 //  /a/b/c/    /a/b/c/      .           Equal
+//  /a/b/c     /a/b/c/      .           Equal
+//  /a/b/c/    /a/b/c       .           Equal
+//
 //  ../a/b/c   ../a/b/c/d   d           Branch point is ../a/b/c
-//  ./a        ./b          ../b        Branch point assumed to be ..
-//  a          b            ../b        Branch point assumed to be ..
+//
+//  /a/b/c/d   /a/b/c       ../         Branch point is /a/b/c
+//
+//  /a/b/c/d   /a/b/q       ../../q     Branch point is /a/b
+//
+//  /          /a           a           Branch point is /
+//  /a         /b           ../b        Branch point is /
+//  /a/b       /c           ../../c     Branch point is /
+//  /          /a/b         a/b         Branch point is /
+//  /p/q       /a/b         ../../a/b   Branch point is /
+//
 FXString FXPath::relative(const FXString& base,const FXString& file){
-  if(!base.empty() && !FXPath::isTopDirectory(base)){
+  FXTRACE((1,"FXPath::relative(%s,%s)\n",base.text(),file.text()));
+  if(!base.empty() && (FXPath::isAbsolute(base) == FXPath::isAbsolute(file))){  // Both absolute or both relative
     register FXint p=0,q=0,bp=0,bq=0;
 
     // Find branch point
 #if defined(WIN32)
-    while(base[p] && ((Ascii::toLower(base[p])==Ascii::toLower(file[q])) || (ISPATHSEP(base[p]) && ISPATHSEP(file[q])))){
-      if(ISPATHSEP(base[p])){
-        bp=p;
-        bq=q;
-        while(0<p && ISPATHSEP(base[p+1])) p++;           // Eat multiple slashes, but not the UNC "\\" at the start
-        while(0<q && ISPATHSEP(file[q+1])) q++;
+    while(base[p] && file[q]){
+      if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
+        bp=p; while(ISPATHSEP(base[p])) p++;    // Eat multiple slashes
+        bq=q; while(ISPATHSEP(file[q])) q++;
+        continue;
         }
-      p++;
-      q++;
+      if(Ascii::toLower(base[p])==Ascii::toLower(file[q])){
+        p++;
+        q++;
+        continue;
+        }
+      break;
       }
 #else
-    while(base[p] && (base[p]==file[q])){
-      if(ISPATHSEP(base[p])){
-        bp=p;
-        bq=q;
-        while(ISPATHSEP(base[p+1])) p++;                  // Eat multiple slashes
-        while(ISPATHSEP(file[q+1])) q++;
+    while(base[p] && file[q]){
+      if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
+        bp=p; while(ISPATHSEP(base[p])) p++;    // Eat multiple slashes
+        bq=q; while(ISPATHSEP(file[q])) q++;
+        continue;
         }
-      p++;
-      q++;
+      if(base[p]==file[q]){
+        p++;
+        q++;
+        continue;
+        }
+      break;
       }
 #endif
 
@@ -644,35 +666,27 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
       bq=q;
       }
 
-    // If branch point is not root
-#if defined(WIN32)
-    if(!((ISPATHSEP(base[0]) && (bp==0 || (ISPATHSEP(base[1]) && bp==1))) || (Ascii::isLetter(base[0]) && base[1]==':' && (bp==1 || (ISPATHSEP(base[2]) && bp==2))))){
-#else
-    if(!(ISPATHSEP(base[0]) && bp==0)){
-#endif
+    // Strip leading path character off, if any
+    while(ISPATHSEP(file[bq])) bq++;
 
-      // Strip leading path character off, if any
-      while(ISPATHSEP(file[bq])) bq++;
+    // Non trivial
+    if(file[bq]){
+      FXString result;
 
-      // Non trivial
-      if(file[bq]){
-        FXString result;
-
-        // Up to branch point
-        while(base[bp]){
-          while(ISPATHSEP(base[bp])) bp++;
-          if(base[bp]){
-            result.append(".." PATHSEPSTRING);
-            while(base[bp] && !ISPATHSEP(base[bp])) bp++;
-            }
+      // Up to branch point
+      while(base[bp]){
+        while(ISPATHSEP(base[bp])) bp++;
+        if(base[bp]){
+          result.append(".." PATHSEPSTRING);
+          while(base[bp] && !ISPATHSEP(base[bp])) bp++;
           }
-
-        // Append tail end
-        result.append(&file[bq]);
-        return result;
         }
-      return ".";
+
+      // Append tail end
+      result.append(&file[bq]);
+      return result;
       }
+    return ".";
     }
   return file;
   }
@@ -916,7 +930,7 @@ FXbool FXPath::isShare(const FXString& file){
   }
 
 
-/// Return true if input path is a hidden file or directory
+// Return true if input path is a hidden file or directory
 FXbool FXPath::isHidden(const FXString&){
   return false;
   }
@@ -930,17 +944,13 @@ FXbool FXPath::isShare(const FXString&){
   }
 
 
-/// Return true if input path is a hidden file or directory
+// Return true if input path is a hidden file or directory
 FXbool FXPath::isHidden(const FXString& file){
-  register FXint f=0,n=0;
-  if(!file.empty()){
-    while(file[n]){
-      if(ISPATHSEP(file[n])) f=n+1;
-      n++;
-      }
-    return file[f]=='.';
+  register FXint i=file.length();
+  while(0<i && !ISPATHSEP(file[i-1])){
+    --i;
     }
-  return false;
+  return file[i]=='.';
   }
 
 

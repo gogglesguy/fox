@@ -129,10 +129,10 @@ public:
   FXbool empty() const { return (code==fallback); }
 
   /// Parse pattern, return error code if syntax error is found
-  FXRex::Error parse(const FXchar* pattern,FXint mode=Normal);
+  Error parse(const FXchar* pattern,FXint mode=Normal);
 
   /// Parse pattern, return error code if syntax error is found
-  FXRex::Error parse(const FXString& pattern,FXint mode=Normal);
+  Error parse(const FXString& pattern,FXint mode=Normal);
 
   /**
   * Match a subject string of length len, returning true if a match is found
@@ -159,7 +159,7 @@ public:
   static FXString substitute(const FXString& string,FXint* beg,FXint* end,const FXString& replace,FXint npar=1);
 
   /// Returns error code for given error
-  static const FXchar* getError(FXRex::Error err){ return errors[err]; }
+  static const FXchar* getError(Error err){ return errors[err]; }
 
   /// Comparison operators
   FXbool operator==(const FXRex& rex) const;

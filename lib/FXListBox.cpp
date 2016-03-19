@@ -543,6 +543,24 @@ void* FXListBox::getItemData(FXint index) const {
   }
 
 
+// Return true if item is enabled
+FXbool FXListBox::isItemEnabled(FXint index) const {
+  return list->isItemEnabled(index);
+  }
+  
+
+// Enable item
+FXbool FXListBox::enableItem(FXint index){
+  return list->enableItem(index);
+  }
+  
+
+// Disable item
+FXbool FXListBox::disableItem(FXint index){
+  return list->disableItem(index);
+  }
+
+
 // Show menu
 void FXListBox::showMenu(FXbool shw){
   button->showMenu(shw);

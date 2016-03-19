@@ -613,7 +613,7 @@ long FXScrollBar::onMouseWheel(FXObject*,FXSelector,void* ptr){
         else{
           dragjump=(dragpoint-pos);
           if(FXABS(dragjump)>16) dragjump/=16;
-          getApp()->addTimeout(this,ID_TIMEWHEEL,5,(void*)(FXival)dragjump);
+          getApp()->addTimeout(this,ID_TIMEWHEEL,WHEELJUMPTIME,(void*)(FXival)dragjump);
           }
         }
       else{

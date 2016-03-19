@@ -365,6 +365,7 @@ FXRASImage.cpp \
 FXRGBIcon.cpp \
 FXRGBImage.cpp \
 FXRadioButton.cpp \
+FXRandom.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
 FXRangeSlider.cpp \

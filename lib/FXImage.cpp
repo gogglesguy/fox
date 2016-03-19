@@ -1552,6 +1552,167 @@ void FXImage::resize(FXint w,FXint h){
   }
 
 
+// Gamma-corrected image scaling.
+// In a nutshell: convert pixel value to intensities, scale, then convert 
+// them back to pixel value:
+// 
+//      I = pow(P,2.2) 
+//      P = pow(I,1/2.2)
+//
+// Reference: http://www.4p8.com/eric.brasseur/gamma.html
+// At some future time this should be based around the gamma used in
+// FXVisual; this means generating the table at run time.
+
+// Table lookup: y=pow(x,2.2)
+static FXuint gammatable[256]={
+       0,     1,     4,    11,    21,    34,    51,    72,
+      97,   125,   158,   195,   236,   282,   332,   386, 
+     445,   509,   577,   650,   728,   810,   898,   990,  
+    1087,  1189,  1297,  1409,  1526,  1649,  1776,  1909, 
+    2048,  2191,  2340,  2494,  2653,  2818,  2988,  3164,  
+    3346,  3532,  3725,  3923,  4126,  4335,  4550,  4771, 
+    4997,  5229,  5466,  5710,  5959,  6214,  6475,  6742,  
+    7014,  7293,  7577,  7868,  8164,  8466,  8775,  9089, 
+    9410,  9736, 10069, 10407, 10752, 11103, 11460, 11824, 
+   12193, 12569, 12951, 13339, 13733, 14134, 14541, 14954, 
+   15374, 15800, 16232, 16671, 17116, 17567, 18025, 18490, 
+   18961, 19438, 19922, 20412, 20908, 21412, 21922, 22438, 
+   22961, 23490, 24026, 24569, 25118, 25674, 26237, 26806, 
+   27382, 27965, 28554, 29150, 29753, 30362, 30978, 31601, 
+   32231, 32867, 33511, 34161, 34818, 35482, 36152, 36830, 
+   37514, 38205, 38903, 39608, 40320, 41039, 41765, 42497, 
+   43237, 43984, 44737, 45498, 46266, 47040, 47822, 48610, 
+   49406, 50209, 51019, 51836, 52660, 53491, 54329, 55174, 
+   56027, 56886, 57753, 58627, 59508, 60396, 61291, 62194, 
+   63103, 64020, 64944, 65876, 66815, 67760, 68714, 69674, 
+   70642, 71617, 72599, 73588, 74585, 75590, 76601, 77620, 
+   78646, 79680, 80721, 81769, 82825, 83888, 84958, 86036, 
+   87122, 88214, 89314, 90422, 91537, 92660, 93790, 94927, 
+   96072, 97224, 98384, 99552,100727,101909,103099,104297, 
+  105502,106715,107935,109163,110398,111641,112892,114150,
+  115415,116689,117970,119259,120555,121859,123170,124490,
+  125817,127151,128493,129843,131201,132566,133940,135320,
+  136709,138105,139509,140921,142340,143768,145203,146646,
+  148096,149555,151021,152495,153977,155466,156964,158469,
+  159982,161503,163032,164569,166114,167666,169226,170795,
+  172371,173955,175547,177147,178754,180370,181994,183625,
+  185265,186912,188568,190231,191902,193582,195269,196964
+  };
+
+
+static FXuint gammaLookup(FXuint i){
+  return gammatable[i];
+  }
+
+
+static FXuint gammaInvertLookup(FXuint val){
+  register FXint mid,low=0,high=255;
+  while((high-low)>1){
+    mid=low+(high-low)/2;
+    if(val<gammatable[mid]) 
+      high=mid;
+    else 
+      low=mid;
+    }
+  return (gammatable[high]==val) ? high : low;
+  }
+
+
+/*
+static FXuint gammaInvertLookup(FXuint val){
+  register FXint l=0,h=255,m;
+  while(l<=h-2){
+    if(gammatable[m=(h+l)>>1]<=val) l=m; else h=m;
+    }
+  return gammatable[l];
+  }
+*/
+
+
+// Horizontal box-filtered, gamma-corrected
+static void hscalergbagamma(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint sw,FXint ){
+  register FXint fin,fout,ar,ag,ab,aa;
+  register FXint ss=4*sw;
+  register FXint ds=4*dw;
+  register FXuchar *end=dst+ds*dh;
+  register FXuchar *d;
+  register const FXuchar *s;
+  do{
+    s=src; src+=ss;
+    d=dst; dst+=ds;
+    fin=dw;
+    fout=sw;
+    ar=ag=ab=aa=0;
+    while(1){
+      if(fin<fout){
+        aa+=fin*s[3];
+        ar+=fin*gammaLookup(s[2]);
+        ag+=fin*gammaLookup(s[1]);
+        ab+=fin*gammaLookup(s[0]);
+        fout-=fin;
+        fin=dw;
+        s+=4;
+        }
+      else{
+        aa+=fout*s[3];              d[3]=aa/sw;
+        ar+=fout*gammaLookup(s[2]); d[2]=gammaInvertLookup(ar/sw);
+        ag+=fout*gammaLookup(s[1]); d[1]=gammaInvertLookup(ag/sw);
+        ab+=fout*gammaLookup(s[0]); d[0]=gammaInvertLookup(ab/sw);
+        ar=ag=ab=aa=0;
+        fin-=fout;
+        fout=sw;
+        d+=4;
+        if(d>=dst) break;  
+        }
+      }
+    }
+  while(dst<end);
+  }
+         
+// Vertical box-filtered, gamma-corrected
+static void vscalergbagamma(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint sw,FXint sh){
+  register FXint fin,fout,ar,ag,ab,aa;
+  register FXint ss=4*sw;
+  register FXint ds=4*dw;
+  register FXint dss=ds*dh;
+  register FXuchar *end=dst+ds;
+  register FXuchar *d,*dd;
+  register const FXuchar *s;
+  do{
+    s=src; src+=4;
+    d=dst; dst+=4;
+    dd=d+dss;
+    fin=dh;
+    fout=sh;
+    ar=ag=ab=aa=0;
+    while(1){
+      if(fin<fout){
+        aa+=fin*s[3];
+        ar+=fin*gammaLookup(s[2]);
+        ag+=fin*gammaLookup(s[1]);
+        ab+=fin*gammaLookup(s[0]);
+        fout-=fin;
+        fin=dh;
+        s+=ss;
+        }
+      else{
+        aa+=fout*s[3];              d[3]=aa/sh;
+        ar+=fout*gammaLookup(s[2]); d[2]=gammaInvertLookup(ar/sh);
+        ag+=fout*gammaLookup(s[1]); d[1]=gammaInvertLookup(ag/sh);
+        ab+=fout*gammaLookup(s[0]); d[0]=gammaInvertLookup(ab/sh);
+        ar=ag=ab=aa=0;
+        fin-=fout;
+        fout=sh;
+        d+=ds;
+        if(d>=dd) break;
+        }
+      }
+    }
+  while(dst<end);
+  }
+
+
+// Horizontal box-filtered
 static void hscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint sw,FXint ){
   register FXint fin,fout,ar,ag,ab,aa;
   register FXint ss=4*sw;
@@ -1591,6 +1752,7 @@ static void hscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint s
   }
 
 
+// Vertical box-filtered
 static void vscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint sw,FXint sh){
   register FXint fin,fout,ar,ag,ab,aa;
   register FXint ss=4*sw;
@@ -1631,50 +1793,6 @@ static void vscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint s
   while(dst<end);
   }
 
-#if 0
-From: http://www.4p8.com/eric.brasseur/gamma.html
--- Image scaling with correct gamma
-
-tile_x       = 2
-tile_y       = 2
-gamma        = 2.2
-
-tile_surface = tile_x * tile_y
-gamma_invert = 1 / gamma
-
-for y = 0, math.floor (height / tile_y) - 1 do
-	for x = 0, math.floor (width / tile_x) - 1 do
-
-		sum_r, sum_g, sum_b = 0, 0, 0
-
-		for ly = 0, tile_y - 1 do
-			for lx = 0, tile_x - 1 do
-
-				r, g, b = get_rgb (x * tile_x + lx, y * tile_y + ly)
-
-				real_r = r ^ gamma
-				real_g = g ^ gamma
-				real_b = b ^ gamma
-
-				sum_r = sum_r + real_r
-				sum_g = sum_g + real_g
-				sum_b = sum_b + real_b
-			end
-		end
-
-		real_r = sum_r / tile_surface
-		real_g = sum_g / tile_surface
-		real_b = sum_b / tile_surface
-
-		r = real_r ^ gamma_invert
-		g = real_g ^ gamma_invert
-		b = real_b ^ gamma_invert
-
-		set_rgb (x, y, r, g, b)
-	end
-	progress (y * tile_y / height)
-end
-#endif
 
 // Simple nearest neighbor scaling; fast but ugly
 static void scalenearest(FXColor *dst,const FXColor* src,FXint dw,FXint dh,FXint sw,FXint sh){
@@ -1714,7 +1832,7 @@ void FXImage::scale(FXint w,FXint h,FXint quality){
       FXColor *interim;
 
       switch(quality){
-        case 0:
+        case 0:         // Fast but ugly scale
 
           // Copy to old buffer
           if(!dupElms(interim,data,ow*oh)){ throw FXMemoryException("unable to scale image"); }
@@ -1728,7 +1846,7 @@ void FXImage::scale(FXint w,FXint h,FXint quality){
           // Free old buffer
           freeElms(interim);
           break;
-        default:
+        case 1:         // Slower box filtered scale
 
           // Allocate interim buffer
           if(!allocElms(interim,w*oh)){ throw FXMemoryException("unable to scale image"); }
@@ -1750,6 +1868,34 @@ void FXImage::scale(FXint w,FXint h,FXint quality){
             }
           else{
             vscalergba((FXuchar*)data,(FXuchar*)interim,w,h,w,oh);
+            }
+
+          // Free interim buffer
+          freeElms(interim);
+          break;
+        case 2:         // Slow gamma corrected scale
+        default:        
+
+          // Allocate interim buffer
+          if(!allocElms(interim,w*oh)){ throw FXMemoryException("unable to scale image"); }
+
+          // Scale horizontally first, placing result into interim buffer
+          if(w==ow){
+            memcpy((FXuchar*)interim,(FXuchar*)data,w*oh*4);
+            }
+          else{
+            hscalergbagamma((FXuchar*)interim,(FXuchar*)data,w,oh,ow,oh);
+            }
+
+          // Resize the pixmap and target buffer
+          resize(w,h);
+
+          // Scale vertically from the interim buffer into target buffer
+          if(h==oh){
+            memcpy((FXuchar*)data,(FXuchar*)interim,w*h*4);
+            }
+          else{
+            vscalergbagamma((FXuchar*)data,(FXuchar*)interim,w,h,w,oh);
             }
 
           // Free interim buffer

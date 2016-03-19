@@ -227,6 +227,15 @@ public:
   /// Return item's user data
   void* getItemData(const FXTreeItem* item) const;
 
+  /// Return true if item is enabled
+  FXbool isItemEnabled(const FXTreeItem* item) const;
+
+  /// Enable item
+  FXbool enableItem(FXTreeItem* item);
+
+  /// Disable item
+  FXbool disableItem(FXTreeItem* item);
+
   /// Return item sort function
   FXTreeListSortFunc getSortFunc() const;
 

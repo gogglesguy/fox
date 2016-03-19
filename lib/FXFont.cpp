@@ -2802,8 +2802,7 @@ void FXFontDesc::setFont(const FXString& string){
     flags=FXFont::styleFromString(string.section(',',6));
     }
   else{
-    memcpy(face,string.text(),sizeof(face)-1);
-    face[len]=0;
+    strncpy(face,string.text(),sizeof(face));
     size=0;
     weight=0;
     slant=0;

@@ -2117,6 +2117,14 @@ SOURCE=..\..\..\include\FXRadioButton.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXRandom.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXRandom.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXRanged.cpp
 # End Source File
 # Begin Source File

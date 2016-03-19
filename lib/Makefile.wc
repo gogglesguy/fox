@@ -245,6 +245,7 @@ OBJECTS += FXPtrQueue.obj
 OBJECTS += FXQuatd.obj
 OBJECTS += FXQuatf.obj
 OBJECTS += FXRadioButton.obj
+OBJECTS += FXRandom.obj
 OBJECTS += FXRanged.obj
 OBJECTS += FXRangef.obj
 OBJECTS += FXRangeSlider.obj

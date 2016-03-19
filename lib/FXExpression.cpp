@@ -39,7 +39,22 @@
   - Potential issue is that ran uses global state.
 */
 
+// Debugging expression code
+//#define EXPRDEBUG 1
+
 #define MAXSTACKDEPTH 128
+
+// Access to argument
+#if defined(__i386__) || defined(__x86_64__)            // No alignment limits on shorts
+#define SETARG(p,val) (*((FXshort*)(p))=(val))
+#define GETARG(p)     (*((FXshort*)(p)))
+#elif defined(FOX_BIGENDIAN)                            // Big-endian machines
+#define SETARG(p,val) (*((p)+0)=(val)>>8,*((p)+1)=(val))
+#define GETARG(p)     ((FXshort)((*((p)+0)<<8)+(*((p)+1))))
+#else                                                   // Little-endian machines
+#define SETARG(p,val) (*((p)+0)=(val),*((p)+1)=(val)>>8)
+#define GETARG(p)     ((FXshort)((*((p)+0))+(*((p)+1)<<8)))
+#endif
 
 using namespace FX;
 
@@ -52,6 +67,8 @@ namespace FX {
 extern FXAPI FXlong __strtoll(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
 extern FXAPI FXdouble __strtod(const FXchar *beg,const FXchar** end=NULL,FXbool* ok=NULL);
 
+
+namespace {
 
 // Tokens
 enum {
@@ -82,7 +99,9 @@ enum {
   TK_SHIFTLEFT  = 24,
   TK_SHIFTRIGHT = 25,
   TK_COMMA      = 26,
-  TK_ERROR      = 27,
+  TK_QUEST      = 27,
+  TK_COLON      = 28,
+  TK_ERROR      = 29,
   TK_PI         = 2585,
   TK_EULER      = 69,
   TK_RTOD       = 3005613,
@@ -117,6 +136,11 @@ enum {
 // Opcodes
 enum {
   OP_END,
+
+  OP_BRA,
+  OP_BRT,
+  OP_BRF,
+
   OP_NUM,
   OP_VAR,
   OP_RAND,
@@ -176,46 +200,91 @@ struct FXCompile {
   FXuchar      *code;
   FXuchar      *pc;
   FXuint        token;
-  FXExpressionError compile();
-  FXExpressionError expression();
-  FXExpressionError shiftexp();
-  FXExpressionError bitexp();
-  FXExpressionError addexp();
-  FXExpressionError mulexp();
-  FXExpressionError powexp();
-  FXExpressionError primary();
-  FXExpressionError element();
-  FXint lookup(const FXchar *list);
-  void opcode(FXuchar op);
-  void operand(FXint n);
-  void operand(FXdouble num);
+
+  // Get token
   void gettok();
+
+  // Parsing
+  FXExpression::Error compile();
+  FXExpression::Error expression();
+  FXExpression::Error altex();
+  FXExpression::Error compex();
+  FXExpression::Error shiftexp();
+  FXExpression::Error bitexp();
+  FXExpression::Error addexp();
+  FXExpression::Error mulexp();
+  FXExpression::Error powexp();
+  FXExpression::Error primary();
+  FXExpression::Error element();
+
+  // Variable lookup
+  FXint lookup(const FXchar *list);
+
+  // Code generation
+  FXuchar* opcode(FXuchar op);
+  FXuchar* offset(FXshort n);
+  FXuchar* number(FXdouble num);
+
+  // Backpatch
+  void fix(FXuchar *ptr,FXshort val);
   };
 
 
 /*******************************************************************************/
 
 // Compile expression
-FXExpressionError FXCompile::compile(){
-  FXExpressionError err;
-  if(token==TK_EOF) return EXPRERR_EMPTY;
+FXExpression::Error FXCompile::compile(){
+  FXExpression::Error err;
+  if(token==TK_EOF) return FXExpression::ErrEmpty;
   err=expression();
-  if(err!=EXPRERR_OK) return err;
-  if(token!=TK_EOF) return EXPRERR_TOKEN;
+  if(err!=FXExpression::ErrOK) return err;
+  if(token!=TK_EOF) return FXExpression::ErrToken;
   opcode(OP_END);
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Expression
-FXExpressionError FXCompile::expression(){
-  FXExpressionError err=shiftexp();
-  if(err!=EXPRERR_OK) return err;
+FXExpression::Error FXCompile::expression(){
+  FXExpression::Error err=altex();
+  if(err!=FXExpression::ErrOK) return err;
+  return FXExpression::ErrOK;
+  }
+
+
+// Parse x?y:z
+FXExpression::Error FXCompile::altex(){
+  FXExpression::Error err=compex();
+  FXuchar *piff,*pels;
+  if(err!=FXExpression::ErrOK) return err;
+  if(token==TK_QUEST){
+    gettok();
+    opcode(OP_BRF);
+    piff=offset(0);
+    err=altex();
+    if(err!=FXExpression::ErrOK) return err;
+    if(token!=TK_COLON) return FXExpression::ErrColon;
+    opcode(OP_BRA);
+    pels=offset(0);
+    gettok();
+    fix(piff,pc-piff);
+    err=altex();
+    if(err!=FXExpression::ErrOK) return err;
+    fix(pels,pc-pels);
+    }
+  return FXExpression::ErrOK;
+  }
+
+
+// Compare expression
+FXExpression::Error FXCompile::compex(){
+  FXExpression::Error err=shiftexp();
+  if(err!=FXExpression::ErrOK) return err;
   if(TK_LESS<=token && token<=TK_NOTEQUAL){
     FXuint t=token;
     gettok();
     err=shiftexp();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     if(t==TK_LESS) opcode(OP_LT);
     else if(t==TK_LESSEQ) opcode(OP_LE);
     else if(t==TK_GREATER) opcode(OP_GT);
@@ -223,112 +292,112 @@ FXExpressionError FXCompile::expression(){
     else if(t==TK_EQUAL) opcode(OP_EQ);
     else opcode(OP_NE);
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Shift expression
-FXExpressionError FXCompile::shiftexp(){
-  FXExpressionError err=bitexp();
-  if(err!=EXPRERR_OK) return err;
+FXExpression::Error FXCompile::shiftexp(){
+  FXExpression::Error err=bitexp();
+  if(err!=FXExpression::ErrOK) return err;
   while(TK_SHIFTLEFT<=token && token<=TK_SHIFTRIGHT){
     FXuint t=token;
     gettok();
     err=bitexp();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     if(t==TK_SHIFTLEFT) opcode(OP_SHL);
     else opcode(OP_SHR);
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Bit expression
-FXExpressionError FXCompile::bitexp(){
-  FXExpressionError err=addexp();
-  if(err!=EXPRERR_OK) return err;
+FXExpression::Error FXCompile::bitexp(){
+  FXExpression::Error err=addexp();
+  if(err!=FXExpression::ErrOK) return err;
   while(TK_AND<=token && token<=TK_XOR){
     FXuint t=token;
     gettok();
     err=addexp();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     if(t==TK_AND) opcode(OP_AND);
     else if(t==TK_OR) opcode(OP_OR);
     else opcode(OP_XOR);
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Add expression
-FXExpressionError FXCompile::addexp(){
-  FXExpressionError err=mulexp();
-  if(err!=EXPRERR_OK) return err;
+FXExpression::Error FXCompile::addexp(){
+  FXExpression::Error err=mulexp();
+  if(err!=FXExpression::ErrOK) return err;
   while(TK_PLUS<=token && token<=TK_MINUS){
     FXuint t=token;
     gettok();
     err=mulexp();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     if(t==TK_MINUS) opcode(OP_SUB);
     else opcode(OP_ADD);
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Mul expression
-FXExpressionError FXCompile::mulexp(){
-  FXExpressionError err=powexp();
-  if(err!=EXPRERR_OK) return err;
+FXExpression::Error FXCompile::mulexp(){
+  FXExpression::Error err=powexp();
+  if(err!=FXExpression::ErrOK) return err;
   while(TK_TIMES<=token && token<=TK_MODULO){
     FXuint t=token;
     gettok();
     err=powexp();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     if(t==TK_TIMES) opcode(OP_MUL);
     else if(t==TK_DIVIDE) opcode(OP_DIV);
     else opcode(OP_MOD);
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Power expression
-FXExpressionError FXCompile::powexp(){
-  FXExpressionError err=primary();
-  if(err!=EXPRERR_OK) return err;
+FXExpression::Error FXCompile::powexp(){
+  FXExpression::Error err=primary();
+  if(err!=FXExpression::ErrOK) return err;
   if(token==TK_POWER){
     gettok();
     err=powexp();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     opcode(OP_POW);
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Primary
-FXExpressionError FXCompile::primary(){
-  FXExpressionError err;
+FXExpression::Error FXCompile::primary(){
+  FXExpression::Error err;
   if(token==TK_PLUS || token==TK_MINUS || token==TK_NOT){
     FXuint t=token;
     gettok();
     err=primary();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     if(t==TK_MINUS) opcode(OP_NEG);
     else if(t==TK_NOT) opcode(OP_NOT);
     }
   else{
     err=element();
-    if(err!=EXPRERR_OK) return err;
+    if(err!=FXExpression::ErrOK) return err;
     }
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
 // Element
-FXExpressionError FXCompile::element(){
-  FXExpressionError err;
+FXExpression::Error FXCompile::element(){
+  FXExpression::Error err;
   FXdouble num;
   FXuchar op;
   FXbool ok;
@@ -337,54 +406,54 @@ FXExpressionError FXCompile::element(){
     case TK_LPAR:
       gettok();
       err=expression();
-      if(err!=EXPRERR_OK) return err;
-      if(token!=TK_RPAR) return EXPRERR_PAREN;
+      if(err!=FXExpression::ErrOK) return err;
+      if(token!=TK_RPAR) return FXExpression::ErrParent;
       break;
     case TK_INT_HEX:
       num=(FXdouble)__strtoll(head+2,NULL,16,&ok);
-      if(!ok) return EXPRERR_TOKEN;
+      if(!ok) return FXExpression::ErrToken;
       opcode(OP_NUM);
-      operand(num);
+      number(num);
       break;
     case TK_INT_BIN:
       num=(FXdouble)__strtoll(head+2,NULL,2,&ok);
-      if(!ok) return EXPRERR_TOKEN;
+      if(!ok) return FXExpression::ErrToken;
       opcode(OP_NUM);
-      operand(num);
+      number(num);
       break;
     case TK_INT_OCT:
       num=(FXdouble)__strtoll(head+1,NULL,8,&ok);
-      if(!ok) return EXPRERR_TOKEN;
+      if(!ok) return FXExpression::ErrToken;
       opcode(OP_NUM);
-      operand(num);
+      number(num);
       break;
     case TK_INT:
       num=(FXdouble)__strtoll(head,NULL,10,&ok);
       opcode(OP_NUM);
-      if(!ok) return EXPRERR_TOKEN;
-      operand(num);
+      if(!ok) return FXExpression::ErrToken;
+      number(num);
       break;
     case TK_REAL:
       num=__strtod(head,NULL,&ok);
-      if(!ok) return EXPRERR_TOKEN;
+      if(!ok) return FXExpression::ErrToken;
       opcode(OP_NUM);
-      operand(num);
+      number(num);
       break;
     case TK_PI:
       opcode(OP_NUM);
-      operand(3.1415926535897932384626433832795029);
+      number(3.1415926535897932384626433832795029);
       break;
     case TK_EULER:
       opcode(OP_NUM);
-      operand(2.7182818284590452353602874713526625);
+      number(2.7182818284590452353602874713526625);
       break;
     case TK_RTOD:
       opcode(OP_NUM);
-      operand(57.295779513082320876798154814);
+      number(57.295779513082320876798154814);
       break;
     case TK_DTOR:
       opcode(OP_NUM);
-      operand(0.0174532925199432957692369077);
+      number(0.0174532925199432957692369077);
       break;
     case TK_RAN:
       opcode(OP_RAND);
@@ -401,15 +470,15 @@ FXExpressionError FXCompile::element(){
     case TK_ATAN2:
       op=OP_ATAN2;
 dyad: gettok();
-      if(token!=TK_LPAR) return EXPRERR_PAREN;
+      if(token!=TK_LPAR) return FXExpression::ErrParent;
       gettok();
       err=expression();
-      if(err!=EXPRERR_OK) return err;
-      if(token!=TK_COMMA) return EXPRERR_COMMA;
+      if(err!=FXExpression::ErrOK) return err;
+      if(token!=TK_COMMA) return FXExpression::ErrComma;
       gettok();
       err=expression();
-      if(err!=EXPRERR_OK) return err;
-      if(token!=TK_RPAR) return EXPRERR_PAREN;
+      if(err!=FXExpression::ErrOK) return err;
+      if(token!=TK_RPAR) return FXExpression::ErrParent;
       opcode(op);
       break;
     case TK_ABS:
@@ -469,16 +538,16 @@ dyad: gettok();
     case TK_TANH:
       op=OP_TANH;
 mono: gettok();
-      if(token!=TK_LPAR) return EXPRERR_PAREN;
+      if(token!=TK_LPAR) return FXExpression::ErrParent;
       gettok();
       err=expression();
-      if(err!=EXPRERR_OK) return err;
-      if(token!=TK_RPAR) return EXPRERR_PAREN;
+      if(err!=FXExpression::ErrOK) return err;
+      if(token!=TK_RPAR) return FXExpression::ErrParent;
       opcode(op);
       break;
     default:
       v=lookup(vars);
-      if(v<0) return EXPRERR_IDENT;
+      if(v<0) return FXExpression::ErrIdent;
       opcode(OP_VAR);
       opcode(v);
       break;
@@ -501,10 +570,12 @@ mono: gettok();
     case TK_SHIFTRIGHT:
     case TK_COMMA:
     case TK_ERROR:
-      return EXPRERR_TOKEN;
+    case TK_QUEST:
+    case TK_COLON:
+      return FXExpression::ErrToken;
     }
   gettok();
-  return EXPRERR_OK;
+  return FXExpression::ErrOK;
   }
 
 
@@ -595,6 +666,12 @@ void FXCompile::gettok(){
       case ',':
         token=TK_COMMA; tail++;
         return;
+      case '?':
+        token=TK_QUEST; tail++;
+        return;
+      case ':':
+        token=TK_COLON; tail++;
+        return;
       case '.':
       case '0':
       case '1':
@@ -667,32 +744,30 @@ void FXCompile::gettok(){
 
 
 // Emit opcode
-void FXCompile::opcode(FXuchar op){
+FXuchar* FXCompile::opcode(FXuchar op){
+  register FXuchar* result=pc;
   if(code){
     pc[0]=op;
     }
   pc++;
+  return result;
   }
 
 
-// Emit integer operand
-void FXCompile::operand(FXint n){
+// Emit offset
+FXuchar* FXCompile::offset(FXshort n){
+  register FXuchar* result=pc;
   if(code){
-#if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
-    ((FXint*)pc)[0]=n;
-#else
-    pc[0]=((const FXuchar*)&n)[0];
-    pc[1]=((const FXuchar*)&n)[1];
-    pc[2]=((const FXuchar*)&n)[2];
-    pc[3]=((const FXuchar*)&n)[3];
-#endif
+    SETARG(pc,n);
     }
-  pc+=4;
+  pc+=2;
+  return result;
   }
 
 
-// Emit double operand
-void FXCompile::operand(FXdouble n){
+// Emit double
+FXuchar* FXCompile::number(FXdouble n){
+  register FXuchar* result=pc;
   if(code){
 #if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
     ((FXdouble*)pc)[0]=n;
@@ -708,15 +783,26 @@ void FXCompile::operand(FXdouble n){
 #endif
     }
   pc+=8;
+  return result;
   }
+
+
+// Fix value
+void FXCompile::fix(FXuchar *ptr,FXshort val){
+  if(code && ptr){
+    SETARG(ptr,val);
+    }
+  }
+
+}
 
 /*******************************************************************************/
 
 #if FOX_BIGENDIAN == 1
-const FXuchar FXExpression::initial[]={0,0,0,14,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
+const FXuchar FXExpression::initial[]={0,14,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
 #endif
 #if FOX_BIGENDIAN == 0
-const FXuchar FXExpression::initial[]={14,0,0,0,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
+const FXuchar FXExpression::initial[]={14,0,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
 #endif
 
 
@@ -728,7 +814,8 @@ const FXchar *const FXExpression::errors[]={
   "Unmatched parenthesis",
   "Illegal token",
   "Expected comma",
-  "Unknown identifier"
+  "Unknown identifier",
+  "Expected colon"
   };
 
 
@@ -740,21 +827,21 @@ FXExpression::FXExpression():code((FXuchar*)(void*)initial){
 // Copy regex object
 FXExpression::FXExpression(const FXExpression& orig):code((FXuchar*)(void*)initial){
   if(orig.code!=initial){
-    dupElms(code,orig.code,*((FXint*)orig.code));
+    dupElms(code,orig.code,GETARG(orig.code));
     }
   }
 
 
 // Compile expression from pattern; fail if error
-FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpressionError* error):code((FXuchar*)(void*)initial){
-  FXExpressionError err=parse(expression,variables);
+FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpression::Error* error):code((FXuchar*)(void*)initial){
+  FXExpression::Error err=parse(expression,variables);
   if(error){ *error=err; }
   }
 
 
 // Compile expression from pattern; fail if error
-FXExpression::FXExpression(const FXString& expression,const FXString& variables,FXExpressionError* error):code((FXuchar*)(void*)initial){
-  FXExpressionError err=parse(expression.text(),variables.text());
+FXExpression::FXExpression(const FXString& expression,const FXString& variables,FXExpression::Error* error):code((FXuchar*)(void*)initial){
+  FXExpression::Error err=parse(expression.text(),variables.text());
   if(error){ *error=err; }
   }
 
@@ -765,7 +852,7 @@ FXExpression& FXExpression::operator=(const FXExpression& orig){
     if(code!=initial) freeElms(code);
     code=(FXuchar*)(void*)initial;
     if(orig.code!=initial){
-      dupElms(code,orig.code,*((FXint*)orig.code));
+      dupElms(code,orig.code,GETARG(orig.code));
       }
     }
   return *this;
@@ -774,13 +861,13 @@ FXExpression& FXExpression::operator=(const FXExpression& orig){
 /*******************************************************************************/
 
 #ifdef EXPRDEBUG
-#include "fxexpdbg.h"
+#include "fxexprdbg.h"
 #endif
 
 
 // Parse expression, return error code if syntax error is found
-FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* variables){
-  FXExpressionError err=EXPRERR_EMPTY;
+FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* variables){
+  FXExpression::Error err=FXExpression::ErrEmpty;
   FXint size=0;
   FXCompile cs;
 
@@ -802,19 +889,19 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
     cs.gettok();
 
     // Emit unknown size
-    cs.operand(0);
+    cs.offset(0);
 
     // Parse to check syntax and determine size
     err=cs.compile();
 
     // Was OK?
-    if(err==EXPRERR_OK){
+    if(err==FXExpression::ErrOK){
 
       // Allocate new code
       size=cs.pc-cs.code;
       if(!allocElms(code,size)){
         code=(FXuchar*)(void*)initial;
-        return EXPRERR_MEMORY;
+        return FXExpression::ErrMemory;
         }
 
       // Fill in compile data
@@ -827,7 +914,7 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
       cs.gettok();
 
       // Emit code size
-      cs.operand(size);
+      cs.offset(size);
 
       // Generate program
       err=cs.compile();
@@ -843,7 +930,7 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
 
 
 // Parse expression, return error code if syntax error is found
-FXExpressionError FXExpression::parse(const FXString& expression,const FXString& variables){
+FXExpression::Error FXExpression::parse(const FXString& expression,const FXString& variables){
   return parse(expression.text(),variables.text());
   }
 
@@ -851,11 +938,14 @@ FXExpressionError FXExpression::parse(const FXString& expression,const FXString&
 // Evaluate expression
 FXdouble FXExpression::evaluate(const FXdouble *args) const {
   FXdouble stack[MAXSTACKDEPTH];
-  register const FXuchar *pc=code+4;
+  register const FXuchar *pc=code+2;
   register FXdouble *sp=stack-1;
   while(1){
     switch(*pc++){
       case OP_END:   return *sp;
+      case OP_BRA:   pc+=GETARG(pc); break;
+      case OP_BRF:   pc+=*sp-- ? 2 : GETARG(pc); break;
+      case OP_BRT:   pc+=*sp-- ? GETARG(pc) : 2; break;
 #if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
       case OP_NUM:   *++sp=*((FXdouble*)pc); pc+=8; break;
 #else
@@ -922,20 +1012,20 @@ FXdouble FXExpression::evaluate(const FXdouble *args) const {
 
 // Save
 FXStream& operator<<(FXStream& store,const FXExpression& s){
-  FXint size=*((FXint*)s.code);
+  FXshort size=GETARG(s.code);
   store << size;
-  store.save(s.code+4,size-4);
+  store.save(s.code+2,size-2);
   return store;
   }
 
 
 // Load
 FXStream& operator>>(FXStream& store,FXExpression& s){
-  FXint size;
+  FXshort size;
   store >> size;
   allocElms(s.code,size);
-  store.load(s.code+4,size-4);
-  *((FXint*)s.code)=size;
+  store.load(s.code+2,size-2);
+  SETARG(s.code,size);
   return store;
   }
 
