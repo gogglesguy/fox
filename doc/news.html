@@ -17,6 +17,58 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 10 - FOX DEVELOPMENT 1.7.50
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Major changes in the regular expression engine. New API amatch() for anchored match, and new API search which replaces match().
+More sensible parameter order and moved some flags from run-time to compile time.</li>
+<li>Internals of FXRex are now ready for UTF8 matching; however parsing part will need to follow before these
+new capabilities can be put to use.</li>
+<li>FXRex::substitute() now interprets the usual escape sequences when creating replacement pattern 
+from regular expression match captures.</li>
+<li>Speedup in FXText getByte(), getChar(), etc. by introduction of branch-free handling of gapped-buffer
+accesses.</li>
+<li>Moved hard-wired search and replace dialogs out of FXText and into Adie text editor; this is part of 
+the FXText widget slim-down program.</li>
+<li>Adie text editor search and replace improvements.  Basically, stream-lines mouse-free usability.</li>
+<li>Adie incremental search bar now pops up at bottom of window.  This is much less disruptive as text does
+not get "pushed down" when this toolbar pops up.</li>
+<li>The FXHash find() routine now returns the slot index, or -1 if not found.  If you use FXHash you should
+be aware that simply replacing find() by at() will fix your code to the new system.  This was done based on
+request from a user who noted the find() API in FXHash behaved differently from the find() in FXDictionary.</li>
+<li>Strip leading and trailing space from display in Adie's bookmark menu.</li>
+<li>Added ParallelMax constant declaration for FXParallelFor.</li>
+<li>Change to FXText findText() API. The new version can perform not only forward and backward search, but also
+anchored match.  The anchored match is performed if neither SEARCH_FORWARD or SEARCH_BACKWARD flags are passed.</li>
+<li>Goto Line dialog moved from FXText to Adie text editor proper (also part of FXText widget slimdown program).</li>
+<li>Adie Replace Dialog now has Search button.</li>
+<li>Adie Replace Dialog Replace function now first checks if current highlighted text is the one being searched for,
+and only searches further if it isn't. This logic will therefore replace already highlighted selection, and make it
+less likely you accidentally "skip" the first item in a search-and-replace session.</li>
+<li>Also, Search and Replace dialogs stay up until explicitly closed.  It was often the case that the first search
+is not always the desired one, and one had to bring up the dialog a second time.  Note that Escape hides the dialog,
+so no mouse interaction is required for "Power Users".</li>
+<li>Search and Replace dialog can now replace within selected text only.</li>
+<li>Some language pattern updates in Adie syntax coloring file.</li>
+<li>CMake coloring patterns added to syntax file.</li>
+<li>New match modes added to FXRex: Exact, and NotEmpty. The Exact mode succeeds only if a successful match
+eats the entire string. The NotEmpty mode succeeds only if the match eats at least one character.  
+Note these are compile time flags, and implemented through special asserts in the matching engine.  
+Thus, the engine will potentially backtrack earlier matches to try other possibilities!</li>
+<li>Regular expression match engine speeded up by streamlining matcher-setup internally; this particularly
+affects search().</li>
+<li>Fixed bug in FXHash::at().</li>
+<li>Eliminated recursion in simple possessive match in FXRex.</li>
+<li>Added handy isNull(), isBool(), etc. APIs to FXVariant.</li>
+<li>Made selection-changing APIs virtual in FXText, for subclassing.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 July 29 - FOX DEVELOPMENT 1.7.49
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -33,7 +85,7 @@ worker threads.</li>
 is very similar to asChars(), except that toChars() is safe (always returns a non-NULL pointer).</li>
 <li>Renamed toPointer() to toPtr() in FXVariant for consistency.</li>
 <li>FXParallel implementation changes: don't kick off tasks via FXThreadPool in ParallelFor if there's
-only one task.  Also, split ParallelFor into a number of pieces corresponding to the number of threads 
+only one task.  Also, split ParallelFor into a number of pieces corresponding to the number of threads
 available in the FXThreadPool, unless this number is passed explicitly.</li>
 <li>Ensured FXParallelForFunctor's are aligned in ParallelFor.</li>
 <li>Updated VC++ 2008 Visual Studio project files.</li>

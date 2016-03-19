@@ -788,10 +788,10 @@ FXStream& FXStream::load(FXdouble* p,FXuval n){
 FXStream& FXStream::addObject(const FXObject* v){
   if(v){
     if(dir==FXStreamSave){
-      hash.insert((void*)v,(void*)(FXuval)seq++);
+      hash.insert((FXptr)v,(FXptr)(FXuval)seq++);
       }
     else if(dir==FXStreamLoad){
-      hash.insert((void*)(FXuval)seq++,(void*)v);
+      hash.insert((FXptr)(FXuval)seq++,(FXptr)v);
       }
     }
   return *this;
@@ -812,12 +812,12 @@ FXStream& FXStream::saveObject(const FXObject* v){
       *this << zero;
       return *this;
       }
-    tag=(FXuint)(FXuval)hash.find((void*)v);    // Already in table
+    tag=(FXuint)(FXuval)hash.at((FXptr)v);      // Already in table
     if(tag){
       *this << tag;
       return *this;
       }
-    hash.insert((void*)v,(void*)(FXuval)seq++); // Add to table
+    hash.insert((FXptr)v,(FXptr)(FXuval)seq++); // Add to table
     cls=v->getMetaClass();
     name=cls->getClassName();
     tag=strlen(name)+1;
@@ -850,7 +850,7 @@ FXStream& FXStream::loadObject(FXObject*& v){
       return *this;
       }
     if(tag>=0x80000000){
-      v=(FXObject*)hash.find((void*)(FXuval)tag);
+      v=(FXObject*)hash.at((FXptr)(FXuval)tag);
       if(!v){
         code=FXStreamFormat;                    // Bad format in stream
         }
@@ -872,7 +872,7 @@ FXStream& FXStream::loadObject(FXObject*& v){
       return *this;
       }
     v=cls->makeInstance();                      // Build some object!!
-    hash.insert((void*)(FXuval)seq++,(void*)v); // Add to table
+    hash.insert((FXptr)(FXuval)seq++,(FXptr)v); // Add to table
     FXTRACE((100,"%08ld: loadObject(%s)\n",(FXuval)pos,v->getClassName()));
     v->load(*this);
     }

@@ -56,6 +56,14 @@ public:
   /// Test if zero
   FXbool operator!() const { return (re==0.0) && (im==0.0); }
 
+  /// Access real part
+  FXdouble& real() { return re; }
+  const FXdouble& real() const { return re; }
+  
+  /// Access imaginary part
+  FXdouble& imag() { return im; }
+  const FXdouble& imag() const { return im; }
+
   /// Squared modulus
   FXdouble modulus2() const { return re*re+im*im; }
 
@@ -153,7 +161,7 @@ extern FXAPI FXComplexd ccos(const FXComplexd& c);
 /// Complex square root
 extern FXAPI FXComplexd ctan(const FXComplexd& c);
 
-/// Complex hyperbolic sine 
+/// Complex hyperbolic sine
 extern FXAPI FXComplexd csinh(const FXComplexd& c);
 
 /// Complex hyperbolic cosine

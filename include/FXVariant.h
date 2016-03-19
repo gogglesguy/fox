@@ -124,6 +124,45 @@ public:
   /// Change number of elements in array
   FXbool no(FXint n);
 
+  /// Is it a null?
+  FXbool isNull() const { return type==VNull; }
+  
+  /// Is it a bool?
+  FXbool isBool() const { return type==VBool; }
+  
+  /// Is it a character?
+  FXbool isChar() const { return type==VChar; }
+  
+  /// Is it a int?
+  FXbool isInt() const { return type==VInt; }
+  
+  /// Is it a unsigned int?
+  FXbool isUInt() const { return type==VUInt; }
+  
+  /// Is it a long?
+  FXbool isLong() const { return type==VLong; }
+  
+  /// Is it a unsigned long?
+  FXbool isULong() const { return type==VULong; }
+  
+  /// Is it a float?
+  FXbool isFloat() const { return type==VFloat; }
+  
+  /// Is it a double?
+  FXbool isDouble() const { return type==VDouble; }
+  
+  /// Is it a pointer?
+  FXbool isPtr() const { return type==VPointer; }
+  
+  /// Is it a string?
+  FXbool isString() const { return type==VString; }
+  
+  /// Is it a array?
+  FXbool isArray() const { return type==VArray; }
+  
+  /// Is it a map?
+  FXbool isMap() const { return type==VMap; }
+
   /// Convert to bool; always OK
   FXbool toBool() const;
 

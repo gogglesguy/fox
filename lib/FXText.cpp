@@ -48,9 +48,6 @@
 #include "FXGIFIcon.h"
 #include "FXScrollBar.h"
 #include "FXText.h"
-#include "FXInputDialog.h"
-#include "FXReplaceDialog.h"
-#include "FXSearchDialog.h"
 #include "FX88591Codec.h"
 #include "FXCP1252Codec.h"
 #include "FXUTF16Codec.h"
@@ -62,27 +59,22 @@
 /*
   Notes:
   - Line start array is one longer than number of visible lines.
-  - We want both tab translated to spaces as well as tab-stops array.
   - Control characters in the buffer are OK (e.g. ^L)
   - Drag cursor should be same as normal one until drag starts!
   - Change of cursor only implies makePositionVisible() if done by user.
-  - Breaking:
-    Soft-hyphen     173  \xAD
-    No break space  240  \xF0
   - Buffer layout:
 
     Content  :  A  B  C  .  .  .  .  .  .  .  .  D  E  F  G
-    Position :  0  1  2 			 3  4  5  6    length=7
+    Position :  0  1  2 			                   3  4  5  6    length=7
     Addresss :  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14    buffersize=7+11-3=15
-             		 ^			 ^
-	     		 |			 |
-	     	      gapstart=3	       gapend=11       gaplen=11-3=8
+                         ^		               	 ^
+	           	       	 |			                |
+	     	                gapstart=3	           gapend=11      gaplen=11-3=8
 
-    The gap is moved around the buffer so newly added text
-    can be entered into the gap; when the gap becomes too small,
-    the buffer is resized.  This gapped-buffer technique minimizes
-    the number of resizes of the buffer, and minimizes the number
-    of block moves.
+    The gap is moved around the buffer so newly added text can be entered into the gap;
+    when the gap becomes too small, the buffer is resized.
+    This gapped-buffer technique minimizes the number of resizes of the buffer, and
+    minimizes the number of block moves.
 
     The tail end of the visrows array will look like:
 
@@ -93,8 +85,8 @@
 
     The last legal position is length = 11.
 
-  - While resizing window, keep track of a position which should remain visible,
-    i.e. toppos=rowStart(position).  The position is changed same as toppos, except during
+  - While resizing window, keep track of a position which should remain visible, i.e.
+    toppos=rowStart(position).  The position is changed same as toppos, except during
     resize.
   - When changing text, if we're looking at the tail end of the buffer, avoid jumping
     the top lines when the content hight shrinks.
@@ -102,30 +94,14 @@
   - Add incremental search, search/replace, selection search.
   - Style table stuff.
   - Need to allow for one single routine to update style buffer same as text buffer
-  - Suggested additional bindings:
-    Ctl-F   Find
-    Ctl-R   Replace
-    Ctl-G   Find again (Shift-Ctl-G Find again backward)
-    Ctl-T   Replace again (Shift-Ctl-G Replace again backward)
-    Ctl-L   Goto line number
-    Ctl-E   Goto selected
-    Ctl-I   Indent (shift 1 character right)
-    Ctl-U   Unindent (shift 1 character left)
-    Ctl-Z   undo
-    Ctl-Y   redo
-    Ctl-M   Goto matching (Shift-Ctl-M backward)
-    Insert  toggle overstrike mode
-    Brace matching
   - Maybe put all keyboard bindings into accelerator table.
   - Variable cursorcol should take tabcolumns into account.
   - Italic fonts are bit problematic on border between selected/unselected text
     due to kerning.
   - Tab should work as tabcolumns columns when computing a column.
   - Need rectangular selection capability.
-  - Perhaps split off buffer management into separate text buffer class (allows for multiple views).
-  - Need to implement regex search/replace.
-  - Add better support for subclassing (syntax coloring e.g.).
-  - Add support for line numbers.
+  - Perhaps split off buffer management into separate text buffer class (allows for
+    multiple views).
   - Improve book keeping based on line/column numbers, not rows/characters.
   - If there is a style table, the style buffer is used as index into the style table,
     allowing for up to 255 styles (style index==0 is the default style).
@@ -142,16 +118,16 @@
     question:- how to know we're pasting whole lines?
   - Need block cursor when in overstrike mode.
   - Inserting lots of stuff should show cursor.
-  - Perhaps change text and style buffer to FXString for further complexity
-    reduction.
+  - Perhaps change text and style buffer to FXString for further complexity reduction.
   - FIXME use getVisibleX() and getVisibleY() everywhere!
 */
 
 
-#define MINSIZE   80                  // Minimum gap size
-#define NVISROWS  20                  // Initial visible rows
+#define MINSIZE         80              // Minimum gap size
+#define NVISROWS        20              // Initial visible rows
+#define MAXTABCOLUMNS   32              // Maximum tab column setting
 
-#define TEXT_MASK   (TEXT_FIXEDWRAP|TEXT_WORDWRAP|TEXT_OVERSTRIKE|TEXT_READONLY|TEXT_NO_TABS|TEXT_AUTOINDENT|TEXT_SHOWACTIVE)
+#define TEXT_MASK       (TEXT_FIXEDWRAP|TEXT_WORDWRAP|TEXT_OVERSTRIKE|TEXT_READONLY|TEXT_NO_TABS|TEXT_AUTOINDENT|TEXT_SHOWACTIVE)
 
 using namespace FX;
 
@@ -244,7 +220,7 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SCROLL_CENTER,FXText::onCmdScrollCenter),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_STRING,FXText::onCmdInsertString),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_NEWLINE,FXText::onCmdInsertNewline),
-  FXMAPFUNC(SEL_COMMAND,FXText::IN_INSERT_NEWLINE_ONLY,FXText::onCmdInsertNewlineOnly),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_NEWLINE_ONLY,FXText::onCmdInsertNewlineOnly),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_NEWLINE_INDENT,FXText::onCmdInsertNewlineIndent),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_TAB,FXText::onCmdInsertTab),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_HARDTAB,FXText::onCmdInsertHardTab),
@@ -277,15 +253,7 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_COMMAND,FXText::ID_UPPER_CASE,FXText::onCmdChangeCase),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_LOWER_CASE,FXText::onCmdChangeCase),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_GOTO_MATCHING,FXText::onCmdGotoMatching),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_GOTO_SELECTED,FXText::onCmdGotoSelected),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_GOTO_LINE,FXText::onCmdGotoLine),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SELECT_MATCHING,FXText::onCmdSelectMatching),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_SEARCH,FXText::onCmdSearch),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_REPLACE,FXText::onCmdReplace),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_SEARCH_FORW,FXText::onCmdSearchNext),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_SEARCH_BACK,FXText::onCmdSearchNext),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_SEARCH_FORW_SEL,FXText::onCmdSearchSel),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_SEARCH_BACK_SEL,FXText::onCmdSearchSel),
   FXMAPFUNCS(SEL_COMMAND,FXText::ID_SELECT_BRACE,FXText::ID_SELECT_ANG,FXText::onCmdSelectBlock),
   FXMAPFUNCS(SEL_COMMAND,FXText::ID_LEFT_BRACE,FXText::ID_LEFT_ANG,FXText::onCmdBlockBeg),
   FXMAPFUNCS(SEL_COMMAND,FXText::ID_RIGHT_BRACE,FXText::ID_RIGHT_ANG,FXText::onCmdBlockEnd),
@@ -308,6 +276,9 @@ const FXchar FXText::textDelimiters[]="~.,/\\`'!@#$%^&*()-=+{}|[]\":;<>?";
 // Matching things
 static const FXchar lefthand[]="{[(<";
 static const FXchar righthand[]="}])>";
+
+// Spaces, lots of spaces
+static const FXchar spaces[MAXTABCOLUMNS+1]="                                ";
 
 /*******************************************************************************/
 
@@ -363,7 +334,6 @@ FXText::FXText(){
   barColor=0;
   textWidth=0;
   textHeight=0;
-  searchflags=SEARCH_EXACT;
   delimiters=textDelimiters;
   vrows=0;
   vcols=0;
@@ -428,7 +398,6 @@ FXText::FXText(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
   barColor=backColor;
   textWidth=0;
   textHeight=0;
-  searchflags=SEARCH_EXACT;
   delimiters=textDelimiters;
   vrows=0;
   vcols=0;
@@ -547,10 +516,9 @@ static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
   return w<128 && strchr(delimiters,w); // FIXME for w>=128
   }
 
-
 // Make a valid position, at the start of a wide character
 FXint FXText::validPos(FXint pos) const {
-  register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
+  const FXchar* ptr=&buffer[(gapend-gapstart)&((~pos+gapstart)>>31)];
   if(pos<=0) return 0;
   if(pos>=length) return length;
   return (FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
@@ -560,7 +528,7 @@ FXint FXText::validPos(FXint pos) const {
 // Decrement; a wide character does not cross the gap, so if pos is at
 // or below below the gap, we read from the segment below the gap
 FXint FXText::dec(FXint pos) const {
-  register const FXchar *ptr=pos<=gapstart ? buffer : buffer-gapstart+gapend;
+  const FXchar* ptr=&buffer[(gapend-gapstart)&((gapstart-pos)>>31)];
   return (--pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
   }
 
@@ -568,21 +536,21 @@ FXint FXText::dec(FXint pos) const {
 // Increment; since a wide character does not cross the gap, if we
 // start under the gap the last character accessed is below the gap
 FXint FXText::inc(FXint pos) const {
-  register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
+  const FXchar* ptr=&buffer[(gapend-gapstart)&((~pos+gapstart)>>31)];
   return (++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos), pos;
   }
 
 
 // Get byte
 FXint FXText::getByte(FXint pos) const {
-  return (FXuchar)buffer[pos<gapstart ? pos : pos-gapstart+gapend];
+  return (FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
   }
 
 
 // Get character, assuming that gap never inside utf8 encoding
 FXwchar FXText::getChar(FXint pos) const {
-  register const FXuchar* ptr=(pos<gapstart)?(FXuchar*)(buffer+pos):(FXuchar*)(buffer+pos-gapstart+gapend);
-  register FXwchar w=ptr[0];
+  const FXuchar* ptr=(FXuchar*)&buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
+  FXwchar w=ptr[0];
   if(__unlikely(0xC0<=w)){ w=(w<<6)^ptr[1]^0x3080;
   if(__unlikely(0x800<=w)){ w=(w<<6)^ptr[2]^0x20080;
   if(__unlikely(0x10000<=w)){ w=(w<<6)^ptr[3]^0x400080; }}}
@@ -592,13 +560,13 @@ FXwchar FXText::getChar(FXint pos) const {
 
 // Get length of wide character at position pos
 FXint FXText::getCharLen(FXint pos) const {
-  return FXString::utfBytes[(FXuchar)buffer[pos<gapstart ? pos : pos-gapstart+gapend]];
+  return FXString::utfBytes[(FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))]];
   }
 
 
 // Get style
 FXint FXText::getStyle(FXint pos) const {
-  return (FXuchar)sbuffer[pos<gapstart ? pos : pos-gapstart+gapend];
+  return (FXuchar)sbuffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
   }
 
 
@@ -668,11 +636,11 @@ void FXText::squeezegap(){
 
 // Character width
 FXint FXText::charWidth(FXwchar ch,FXint indent) const {
-  if(ch<' '){
-    if(ch!='\t'){
-      return font->getCharWidth('^')+font->getCharWidth(ch|0x40);
+  if(__unlikely(ch<' ')){
+    if(__likely(ch=='\t')){
+      return (tabwidth-indent%tabwidth);
       }
-    return (tabwidth-indent%tabwidth);
+    return font->getCharWidth('^')+font->getCharWidth(ch|0x40);
     }
   return font->getCharWidth(ch);
   }
@@ -1234,7 +1202,7 @@ FXint FXText::shiftText(FXint start,FXint end,FXint amount,FXbool notify){
   FXchar *text;
   if(start<0) start=0;
   if(end>length) end=length;
-  FXASSERT(0<tabcolumns);
+  FXASSERT(0<tabcolumns && tabcolumns<MAXTABCOLUMNS);
   if(start<end){
     p=start;
     white=0;
@@ -1303,14 +1271,16 @@ FXint FXText::shiftText(FXint start,FXint end,FXint amount,FXbool notify){
 
 // Search for text
 FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start,FXuint flgs,FXint npar){
-  register FXint rexmode;
+  FXint rexmode=FXRex::Normal;
   FXRex rex;
 
-  // Compile flags
-  rexmode=FXRex::Verbatim;
-  if(1<npar) rexmode|=FXRex::Capture;
-  if(flgs&SEARCH_REGEX) rexmode&=~FXRex::Verbatim;
-  if(flgs&SEARCH_IGNORECASE) rexmode|=FXRex::IgnoreCase;
+  // Check arguments
+  if(npar<1 || !beg || !end){ fxerror("%s::findText: bad argument.\n",getClassName()); }
+
+  // Tweak parse flags a bit
+  if(1<npar) rexmode|=FXRex::Capture;                           // Capturing parentheses
+  if(flgs&SEARCH_IGNORECASE) rexmode|=FXRex::IgnoreCase;        // Case insensitivity
+  if(!(flgs&SEARCH_REGEX)) rexmode|=FXRex::Verbatim;            // Verbatim match
 
   // Try parse the regex
   if(rex.parse(string,rexmode)==FXRex::ErrOK){
@@ -1318,29 +1288,29 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
     // Make all characters contiguous in the buffer
     squeezegap();
 
-    // Search backward
-    if(flgs&SEARCH_BACKWARD){
-
-      // Search from start to begin of buffer
-      if(rex.match(buffer,length,beg,end,FXRex::Backward,npar,0,start)) return true;
-
-      if(!(flgs&SEARCH_WRAP)) return false;
-
-      // Search from end of buffer backwards
-      if(rex.match(buffer,length,beg,end,FXRex::Backward,npar,start,length)) return true;
-      }
+    // Use a validated position
+    start=validPos(start);
 
     // Search forward
-    else{
-
-      // Search from start to end of buffer
-      if(rex.match(buffer,length,beg,end,FXRex::Forward,npar,start,length)) return true;
-
-      if(!(flgs&SEARCH_WRAP)) return false;
-
-      // Search from begin of buffer forwards
-      if(rex.match(buffer,length,beg,end,FXRex::Forward,npar,0,start)) return true;
+    if(flgs&SEARCH_FORWARD){
+      if(rex.search(buffer,length,start,length,FXRex::Normal,beg,end,npar)>=0) return true;
+      if((flgs&SEARCH_WRAP) && (start!=0)){
+        if(rex.search(buffer,length,0,start,FXRex::Normal,beg,end,npar)>=0) return true;
+        }
+      return false;
       }
+
+    // Search backward
+    if(flgs&SEARCH_BACKWARD){
+      if(rex.search(buffer,length,start,0,FXRex::Normal,beg,end,npar)>=0) return true;
+      if((flgs&SEARCH_WRAP) && (start!=length)){
+        if(rex.search(buffer,length,length,start,FXRex::Normal,beg,end,npar)>=0) return true;
+        }
+      return false;
+      }
+
+    // Anchored match
+    return rex.amatch(buffer,length,start,FXRex::Normal,beg,end,npar);
     }
   return false;
   }
@@ -1866,9 +1836,9 @@ void FXText::setCursorColumn(FXint col,FXbool notify){
 
 // Move cursor
 void FXText::moveCursor(FXint pos,FXbool notify){
-  makePositionVisible(pos);
   setCursorPos(pos,notify);
-  setAnchorPos(pos);
+  makePositionVisible(cursorpos);
+  setAnchorPos(cursorpos);
   killSelection(notify);
   flashMatching();
   }
@@ -1876,8 +1846,8 @@ void FXText::moveCursor(FXint pos,FXbool notify){
 
 // Move cursor and select
 void FXText::moveCursorAndSelect(FXint pos,FXuint select,FXbool notify){
-  makePositionVisible(pos);
   setCursorPos(pos,notify);
+  makePositionVisible(cursorpos);
   extendSelection(cursorpos,select,notify);
   }
 
@@ -2519,6 +2489,12 @@ FXint FXText::overstruck(FXint start,FXint end,const FXchar *text,FXint n){
 /*******************************************************************************/
 
 
+// Select all text
+FXbool FXText::selectAll(FXbool notify){
+  return setSelection(0,length,notify);
+  }
+
+
 // Set selection
 FXbool FXText::setSelection(FXint pos,FXint len,FXbool notify){
   FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
@@ -2563,12 +2539,6 @@ FXbool FXText::setSelection(FXint pos,FXint len,FXbool notify){
     return true;
     }
   return false;
-  }
-
-
-// Select all text
-FXbool FXText::selectAll(FXbool notify){
-  return setSelection(0,length,notify);
   }
 
 
@@ -2618,6 +2588,25 @@ FXbool FXText::extendSelection(FXint pos,FXuint select,FXbool notify){
       break;
     }
   return setSelection(ss,se-ss,notify);
+  }
+
+
+// Kill the selection
+FXbool FXText::killSelection(FXbool notify){
+  if(selstartpos<selendpos){
+    FXint what[2];
+    if(notify && target){
+      what[0]=selstartpos;
+      what[1]=selendpos-selstartpos;
+      target->tryHandle(this,FXSEL(SEL_DESELECTED,message),(void*)what);
+      }
+    if(hasSelection()) releaseSelection();
+    updateRange(selstartpos,selendpos);
+    selstartpos=0;
+    selendpos=0;
+    return true;
+    }
+  return false;
   }
 
 
@@ -2771,25 +2760,6 @@ FXbool FXText::pasteClipboard(FXbool notify){
   }
 
 
-// Kill the selection
-FXbool FXText::killSelection(FXbool notify){
-  if(selstartpos<selendpos){
-    FXint what[2];
-    if(notify && target){
-      what[0]=selstartpos;
-      what[1]=selendpos-selstartpos;
-      target->tryHandle(this,FXSEL(SEL_DESELECTED,message),(void*)what);
-      }
-    if(hasSelection()) releaseSelection();
-    updateRange(selstartpos,selendpos);
-    selstartpos=0;
-    selendpos=0;
-    return true;
-    }
-  return false;
-  }
-
-
 // Set highlight
 FXbool FXText::setHighlight(FXint pos,FXint len){
   register FXint hs=validPos(pos);
@@ -2823,10 +2793,6 @@ FXbool FXText::killHighlight(){
   }
 
 /*******************************************************************************/
-
-// FIXME
-// Runs should preferably be whole combining sequence
-// Deal with non-rectangular selections.
 
 // Draw fragment of text in given style
 void FXText::drawBufferText(FXDCWindow& dc,FXint x,FXint y,FXint,FXint,FXint pos,FXint n,FXuint style) const {
@@ -3069,6 +3035,10 @@ void FXText::eraseCursorOverhang(){
       }
     }
   }
+
+// FIXME
+// Runs should preferably be whole combining sequence
+// Deal with non-rectangular selections.
 
 
 // Draw partial text line [positions fm...to] with correct style
@@ -4101,7 +4071,7 @@ long FXText::onKeyPress(FXObject*,FXSelector,void* ptr){
       case KEY_Return:
       case KEY_KP_Enter:
         if(event->state&CONTROLMASK){
-          handle(this,FXSEL(SEL_COMMAND,IN_INSERT_NEWLINE_ONLY),NULL);
+          handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE_ONLY),NULL);
           }
         else if(event->state&SHIFTMASK){
           handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE_INDENT),NULL);
@@ -4442,7 +4412,7 @@ long FXText::onCmdInsertString(FXObject*,FXSelector,void* ptr){
 // Insert newline with optional autoindent
 long FXText::onCmdInsertNewline(FXObject*,FXSelector,void*){
   if(options&TEXT_AUTOINDENT) return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE_INDENT),NULL);
-  return handle(this,FXSEL(SEL_COMMAND,IN_INSERT_NEWLINE_ONLY),NULL);
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE_ONLY),NULL);
   }
 
 
@@ -4482,10 +4452,10 @@ long FXText::onCmdInsertHardTab(FXObject*,FXSelector,void*){
 // Insert soft-tab
 long FXText::onCmdInsertSoftTab(FXObject*,FXSelector,void*){
   FXint pos=isPosSelected(cursorpos) ? selstartpos : cursorpos;
-  FXString string(' ',tabcolumns-indentFromPos(lineStart(pos),pos)%tabcolumns);
-  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)string.text());
+  FXint indent=indentFromPos(lineStart(pos),pos);
+  FXASSERT(0<tabcolumns && tabcolumns<MAXTABCOLUMNS);
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)(spaces+MAXTABCOLUMNS+indent%tabcolumns-tabcolumns));
   }
-
 
 /*******************************************************************************/
 
@@ -4858,38 +4828,6 @@ long FXText::onCmdGotoMatching(FXObject*,FXSelector,void*){
   }
 
 
-// Goto selected line number
-long FXText::onCmdGotoSelected(FXObject*,FXSelector,void*){
-  FXString string; FXint row=0,s;
-  if(getDNDData(FROM_SELECTION,stringType,string)){
-    if((s=string.find_first_of("0123456789"))>=0){
-      while(Ascii::isDigit(string[s])){
-        row=row*10+Ascii::digitValue(string[s]);
-        s++;
-        }
-      if(1<=row){
-        setCursorRow(row-1,true);
-        return 1;
-        }
-      }
-    }
-  getApp()->beep();
-  return 1;
-  }
-
-
-// Goto line number
-long FXText::onCmdGotoLine(FXObject*,FXSelector,void*){
-  FXGIFIcon icon(getApp(),gotoicon);
-  FXint row=cursorrow+1;
-  if(FXInputDialog::getInteger(row,this,tr("Goto Line"),tr("&Goto line number:"),&icon,1,2147483647)){
-    update();
-    setCursorRow(row-1,true);
-    }
-  return 1;
-  }
-
-
 // Move cursor to indicated row
 long FXText::onCmdCursorRow(FXObject* sender,FXSelector,void*){
   FXint row=cursorrow+1;
@@ -4919,173 +4857,6 @@ long FXText::onCmdCursorColumn(FXObject* sender,FXSelector,void*){
 // Being asked about current column
 long FXText::onUpdCursorColumn(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&cursorcol);
-  return 1;
-  }
-
-
-// Search for selected text
-long FXText::onCmdSearchSel(FXObject*,FXSelector sel,void*){
-  FXString string;
-
-  // First, try UTF-8
-  if(getDNDData(FROM_SELECTION,utf8Type,string)){
-    searchstring=string;
-    searchflags=SEARCH_EXACT;
-    }
-
-  // Next, try UTF-16
-  else if(getDNDData(FROM_SELECTION,utf16Type,string)){
-    FXUTF16LECodec unicode;
-    searchstring=unicode.mb2utf(string);
-    searchflags=SEARCH_EXACT;
-    }
-
-  // Finally, try good old 8859-1
-  else if(getDNDData(FROM_SELECTION,stringType,string)){
-    FX88591Codec ascii;
-    searchstring=ascii.mb2utf(string);
-    searchflags=SEARCH_EXACT;
-    }
-
-  // Have search string?
-  if(!searchstring.empty()){
-    FXint beg[10],end[10],pos;
-
-    // Search direction
-    pos=cursorpos;
-    if(FXSELID(sel)==ID_SEARCH_FORW_SEL){
-      if(isPosSelected(pos)) pos=selendpos;
-      searchflags&=~SEARCH_BACKWARD;
-      }
-    else{
-      if(isPosSelected(pos)) pos=selstartpos-1;
-      searchflags|=SEARCH_BACKWARD;
-      }
-
-    // Perform search
-    if(findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
-      if(beg[0]!=selstartpos || end[0]!=selendpos){
-        setAnchorPos(beg[0]);
-        moveCursorAndSelect(end[0],SelectChars,true);
-        return 1;
-        }
-      }
-    }
-
-  // Beep
-  getApp()->beep();
-  return 1;
-  }
-
-
-// Search for next occurence
-long FXText::onCmdSearchNext(FXObject*,FXSelector sel,void*){
-  if(!searchstring.empty()){
-    FXint beg[10],end[10],pos;
-
-    // Search direction
-    pos=cursorpos;
-    if(FXSELID(sel)==ID_SEARCH_FORW){
-      if(isPosSelected(pos)) pos=selendpos;
-      searchflags&=~SEARCH_BACKWARD;
-      }
-    else{
-      if(isPosSelected(pos)) pos=selstartpos-1;
-      searchflags|=SEARCH_BACKWARD;
-      }
-
-    // Perform search
-    if(findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
-      if(beg[0]!=selstartpos || end[0]!=selendpos){
-        setAnchorPos(beg[0]);
-        moveCursorAndSelect(end[0],SelectChars,true);
-        return 1;
-        }
-      }
-    }
-  getApp()->beep();
-  return 1;
-  }
-
-
-// Search text
-long FXText::onCmdSearch(FXObject*,FXSelector,void*){
-  FXGIFIcon icon(getApp(),searchicon);
-  FXSearchDialog searchdialog(this,tr("Search"),&icon);
-  FXint beg[10],end[10],prevpos,nextpos,pos,code;
-  while(true){
-    prevpos=nextpos=getCursorPos();
-    if(isPosSelected(getCursorPos())){
-      prevpos=getSelStartPos()-1;
-      nextpos=getSelEndPos();
-      }
-    code=searchdialog.execute();
-    if(code==FXSearchDialog::DONE) break;
-    searchstring=searchdialog.getSearchText();
-    searchflags=searchdialog.getSearchMode();
-    pos=(searchflags&SEARCH_BACKWARD) ? prevpos : nextpos;
-    if(findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
-      setAnchorPos(beg[0]);
-      moveCursorAndSelect(end[0],SelectChars,true);
-      if(code!=FXSearchDialog::SEARCH_NEXT) break;
-      }
-    else{
-      getApp()->beep();
-      }
-    }
-  return 1;
-  }
-
-
-// Replace text; we assume that findText has called squeezegap()!
-long FXText::onCmdReplace(FXObject*,FXSelector,void*){
-  FXGIFIcon icon(getApp(),searchicon);
-  FXReplaceDialog replacedialog(this,tr("Replace"),&icon);
-  FXint beg[10],end[10],prevpos,nextpos,fm,to,pos,code;
-  FXString replacestring;
-  FXString replacevalue;
-  while(true){
-    prevpos=nextpos=getCursorPos();
-    if(isPosSelected(getCursorPos())){
-      prevpos=getSelStartPos()-1;
-      nextpos=getSelEndPos();
-      }
-    code=replacedialog.execute();
-    if(code==FXReplaceDialog::DONE) break;
-    searchstring=replacedialog.getSearchText();
-    replacestring=replacedialog.getReplaceText();
-    searchflags=replacedialog.getSearchMode();
-    replacevalue=FXString::null;
-    fm=-1;
-    to=-1;
-    if(code==FXReplaceDialog::REPLACE_ALL){
-      pos=0;
-      while(findText(searchstring,beg,end,pos,searchflags&~SEARCH_BACKWARD,10)){
-        if(0<=fm) replacevalue.append(&buffer[pos],beg[0]-pos);
-        replacevalue.append(FXRex::substitute(buffer,length,beg,end,replacestring,10));
-        if(fm<0) fm=beg[0];
-        to=end[0];
-        pos=end[0];
-        if(beg[0]==end[0]) pos++;
-        }
-      }
-    else{
-      pos=(searchflags&SEARCH_BACKWARD) ? prevpos : nextpos;
-      if(findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
-        replacevalue=FXRex::substitute(buffer,length,beg,end,replacestring,10);
-        fm=beg[0];
-        to=end[0];
-        }
-      }
-    if(0<=fm){
-      replaceText(fm,to-fm,replacevalue,true);
-      moveCursor(fm+replacevalue.length(),true);
-      if(code!=FXReplaceDialog::REPLACE_NEXT) break;
-      }
-    else{
-      getApp()->beep();
-      }
-    }
   return 1;
   }
 
@@ -5190,7 +4961,7 @@ void FXText::setWrapColumns(FXint cols){
 
 // Set tab columns
 void FXText::setTabColumns(FXint cols){
-  if(cols<=0) cols=1;
+  cols=FXCLAMP(1,cols,MAXTABCOLUMNS);
   if(cols!=tabcolumns){
     tabcolumns=cols;
     tabwidth=tabcolumns*font->getTextWidth(" ",1);

@@ -76,6 +76,7 @@ Adie::Adie(const FXString& name):FXApp(name){
   helpicon=new FXGIFIcon(this,help_gif);
   quiticon=new FXGIFIcon(this,quit_gif);
   searchicon=new FXGIFIcon(this,search_gif,0,IMAGE_ALPHAGUESS);
+  replaceicon=new FXGIFIcon(this,replace_gif,0,IMAGE_ALPHAGUESS);
   searchnexticon=new FXGIFIcon(this,searchnext_gif,0,IMAGE_ALPHAGUESS);
   searchprevicon=new FXGIFIcon(this,searchprev_gif,0,IMAGE_ALPHAGUESS);
   bookseticon=new FXGIFIcon(this,bookset_gif);
@@ -385,6 +386,7 @@ Adie::~Adie(){
   delete helpicon;
   delete quiticon;
   delete searchicon;
+  delete replaceicon;
   delete searchnexticon;
   delete searchprevicon;
   delete bookseticon;

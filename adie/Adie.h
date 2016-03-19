@@ -61,6 +61,7 @@ protected:
   FXIcon             *helpicon;
   FXIcon             *quiticon;
   FXIcon             *searchicon;
+  FXIcon             *replaceicon;
   FXIcon             *searchnexticon;
   FXIcon             *searchprevicon;
   FXIcon             *bookseticon;
@@ -112,7 +113,7 @@ public:
 
   // Get syntax paths
   const FXString& getSyntaxPaths() const { return syntaxpaths; }
-  
+
   // Delete application object
   virtual ~Adie();
   };

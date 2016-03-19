@@ -1,4 +1,4 @@
-/*********** Generated on 2014/07/29 19:51:16 by reswrap version 5.2.0 *********/
+/*********** Generated on 2014/11/10 19:02:15 by reswrap version 5.2.0 *********/
 
 /* Created by reswrap from file ../adie/adie_gif.gif */
 extern const unsigned char adie_gif[];
@@ -54,6 +54,9 @@ extern const unsigned char fonts_gif[];
 /* Created by reswrap from file ../adie/forward_gif.gif */
 extern const unsigned char forward_gif[];
 
+/* Created by reswrap from file ../adie/goto_gif.gif */
+extern const unsigned char goto_gif[];
+
 /* Created by reswrap from file ../adie/help_gif.gif */
 extern const unsigned char help_gif[];
 
@@ -102,6 +105,9 @@ extern const unsigned char redo_gif[];
 /* Created by reswrap from file ../adie/reload_gif.gif */
 extern const unsigned char reload_gif[];
 
+/* Created by reswrap from file ../adie/replace_gif.gif */
+extern const unsigned char replace_gif[];
+
 /* Created by reswrap from file ../adie/saveall_gif.gif */
 extern const unsigned char saveall_gif[];
 
@@ -113,6 +119,9 @@ extern const unsigned char save_gif[];
 
 /* Created by reswrap from file ../adie/search_gif.gif */
 extern const unsigned char search_gif[];
+
+/* Created by reswrap from file ../adie/searchicon_gif.gif */
+extern const unsigned char searchicon_gif[];
 
 /* Created by reswrap from file ../adie/searchnext_gif.gif */
 extern const unsigned char searchnext_gif[];

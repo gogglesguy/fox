@@ -91,8 +91,6 @@ protected:
   void drawTextRange(FXDCWindow& dc,FXint fm,FXint to) const;
   void drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint fm,FXint to) const;
   void drawPWDTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint fm,FXint to) const;
-  void moveCursor(FXint pos);
-  void moveCursorAndSelect(FXint pos);
   void enterText(const FXString& text,FXbool notify);
   FXbool deletePendingSelection(FXbool notify);
 private:
@@ -331,6 +329,12 @@ public:
 
   /// Return cursor position
   FXint getCursorPos() const { return cursor; }
+  
+  /// Move cursor to position, and scroll into view
+  void moveCursor(FXint pos);
+
+  /// Move cursor to position, and extent the selection to this point
+  void moveCursorAndSelect(FXint pos);
 
   /// Change anchor position
   void setAnchorPos(FXint pos);

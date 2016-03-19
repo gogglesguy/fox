@@ -29,6 +29,9 @@
 #include <unistd.h>
 #endif
 #include <ctype.h>
+#include "FX88591Codec.h"
+#include "FXCP1252Codec.h"
+#include "FXUTF16Codec.h"
 #include "HelpWindow.h"
 #include "Preferences.h"
 #include "Commands.h"
@@ -112,10 +115,11 @@
     replace selection with result.
   - When making new window (i.e. no file), initialize directory part
     of the untitled file to that of the current text window.
+  - FIXME search and replace, as well as findText() etc. does NOT belong
+    in FXText widget but here.
 */
 
 #define CLOCKTIMER      1000000000
-#define FILETIMER       1000
 #define RESTYLEJUMP     80
 
 /*******************************************************************************/
@@ -125,7 +129,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,0,TextWindow::onUpdate),
   FXMAPFUNC(SEL_FOCUSIN,0,TextWindow::onFocusIn),
   FXMAPFUNC(SEL_TIMEOUT,TextWindow::ID_CLOCKTIME,TextWindow::onClock),
-  
+
   FXMAPFUNC(SEL_FOCUSIN,TextWindow::ID_TEXT,TextWindow::onTextFocus),
   FXMAPFUNC(SEL_INSERTED,TextWindow::ID_TEXT,TextWindow::onTextInserted),
   FXMAPFUNC(SEL_REPLACED,TextWindow::ID_TEXT,TextWindow::onTextReplaced),
@@ -229,7 +233,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERTTABS,TextWindow::onUpdInsertTabs),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_BRACEMATCH,TextWindow::onCmdBraceMatch),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_BRACEMATCH,TextWindow::onUpdBraceMatch),
-  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERT_FILE,TextWindow::onUpdInsertFile),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERT_FILE,TextWindow::onUpdIsEditable),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERT_FILE,TextWindow::onCmdInsertFile),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXTRACT_FILE,TextWindow::onUpdExtractFile),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXTRACT_FILE,TextWindow::onCmdExtractFile),
@@ -261,6 +265,17 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
 
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXPRESSION,TextWindow::onCmdExpression),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXPRESSION,TextWindow::onUpdExpression),
+
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_GOTO_LINE,TextWindow::onCmdGotoLine),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_GOTO_SELECTED,TextWindow::onCmdGotoSelected),
+
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCH,TextWindow::onCmdSearch),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_REPLACE,TextWindow::onCmdReplace),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_REPLACE,TextWindow::onUpdIsEditable),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCH_SEL_FORW,TextWindow::onCmdSearchSel),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCH_SEL_BACK,TextWindow::onCmdSearchSel),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCH_NXT_FORW,TextWindow::onCmdSearchNext),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCH_NXT_BACK,TextWindow::onCmdSearchNext),
 
   FXMAPFUNC(SEL_CHANGED,TextWindow::ID_ISEARCH_TEXT,TextWindow::onChgISearchText),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_TEXT,TextWindow::onCmdISearchText),
@@ -360,7 +375,7 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
 
   // Search bar
   dragshell3=new FXToolBarShell(this,FRAME_RAISED);
-  searchbar=new FXToolBar(topdock,dragshell3,LAYOUT_DOCK_NEXT|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED);
+  searchbar=new FXToolBar(bottomdock,dragshell3,LAYOUT_DOCK_NEXT|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED);
   searchbar->allowedSides(FXDockBar::ALLOW_HORIZONTAL);
   new FXToolBarGrip(searchbar,searchbar,FXToolBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
@@ -411,6 +426,9 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
 
   // Initialize bookmarks
   clearBookmarks();
+
+  // Set status
+  setStatusMessage(tr("Ready."));
 
   // Initial setting
   syntax=NULL;
@@ -516,8 +534,8 @@ void TextWindow::createMenubar(){
   new FXMenuTitle(menubar,tr("&Goto"),NULL,gotomenu);
 
   // Goto Menu entries
-  new FXMenuCommand(gotomenu,tr("&Goto...\tCtl-L\tGoto line number."),NULL,editor,FXText::ID_GOTO_LINE);
-  new FXMenuCommand(gotomenu,tr("Goto selected...\tCtl-E\tGoto selected line number."),NULL,editor,FXText::ID_GOTO_SELECTED);
+  new FXMenuCommand(gotomenu,tr("&Goto...\tCtl-L\tGoto line number."),NULL,this,ID_GOTO_LINE);
+  new FXMenuCommand(gotomenu,tr("Goto selected...\tCtl-E\tGoto selected line number."),NULL,this,ID_GOTO_SELECTED);
   new FXMenuSeparator(gotomenu);
   new FXMenuCommand(gotomenu,tr("Goto {..\tShift-Ctl-{\tGoto start of enclosing block."),NULL,editor,FXText::ID_LEFT_BRACE);
   new FXMenuCommand(gotomenu,tr("Goto ..}\tShift-Ctl-}\tGoto end of enclosing block."),NULL,editor,FXText::ID_RIGHT_BRACE);
@@ -544,12 +562,12 @@ void TextWindow::createMenubar(){
   new FXMenuSeparator(searchmenu);
   new FXMenuCommand(searchmenu,tr("Incremental search\tCtl-I\tSearch for a string."),NULL,this,ID_ISEARCH_START);
   new FXMenuCommand(searchmenu,tr("Search in &Files\t\tSearch files for a string."),NULL,this,ID_FINDFILES);
-  new FXMenuCommand(searchmenu,tr("Search sel. fwd\tCtl-H\tSearch for selection."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW_SEL);
-  new FXMenuCommand(searchmenu,tr("Search sel. bck\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK_SEL);
-  new FXMenuCommand(searchmenu,tr("Search next fwd\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW);
-  new FXMenuCommand(searchmenu,tr("Search next bck\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK);
-  new FXMenuCommand(searchmenu,tr("Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,editor,FXText::ID_SEARCH);
-  new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),NULL,editor,FXText::ID_REPLACE);
+  new FXMenuCommand(searchmenu,tr("Search sel. fwd\tCtl-H\tSearch for selection."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
+  new FXMenuCommand(searchmenu,tr("Search sel. bck\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+  new FXMenuCommand(searchmenu,tr("Search next fwd\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+  new FXMenuCommand(searchmenu,tr("Search next bck\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+  new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,this,ID_SEARCH);
+  new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),getApp()->replaceicon,this,ID_REPLACE);
 
   // Syntax menu
   syntaxmenu=new FXMenuPane(this);
@@ -664,9 +682,9 @@ void TextWindow::createToolbar(){
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
 
   // Search
-  new FXButton(toolbar,tr("\tSearch\tSearch text."),getApp()->searchicon,editor,FXText::ID_SEARCH,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tSearch Previous Selected\tSearch previous occurrence of selected text."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK_SEL,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tSearch Next Selected\tSearch next occurrence of selected text."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW_SEL,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSearch\tSearch text."),getApp()->searchicon,this,ID_SEARCH,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSearch Previous Selected\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSearch Next Selected\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
@@ -701,6 +719,17 @@ void TextWindow::createToolbar(){
 // Create search bar
 void TextWindow::createSearchbar(){
   new FXLabel(searchbar,tr("Search:"),NULL,LAYOUT_CENTER_Y);
+/*
+  FXHorizontalFrame* searchbox=new FXHorizontalFrame(searchbar,FRAME_LINE|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
+  searchtext=new FXTextField(searchbox,50,this,ID_ISEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,1,1);
+  searchtext->setTipText(tr("Incremental Search (Ctl-I)"));
+  searchtext->setHelpText(tr("Incremental search for a string."));
+  FXVerticalFrame* searcharrows=new FXVerticalFrame(searchbox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
+  FXArrowButton* ar1=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_UP,ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
+  FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_DN,ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
+  ar1->setArrowSize(3);
+  ar2->setArrowSize(3);
+*/
   searchtext=new FXTextField(searchbar,50,this,ID_ISEARCH_TEXT,TEXTFIELD_ENTER_ONLY|FRAME_LINE|JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0,4,4,1,1);
   searchtext->setTipText(tr("Incremental Search (Ctl-I)"));
   searchtext->setHelpText(tr("Incremental search for a string."));
@@ -1198,6 +1227,11 @@ FXint TextWindow::getCurrentPattern() const {
   return filter->getCurrentItem();
   }
 
+
+// Set status message
+void TextWindow::setStatusMessage(const FXString& msg){
+  statusbar->getStatusLine()->setNormalText(msg);
+  }
 
 /*******************************************************************************/
 
@@ -1878,8 +1912,8 @@ long TextWindow::onCmdInsertFile(FXObject*,FXSelector,void*){
   }
 
 
-// Update insert file
-long TextWindow::onUpdInsertFile(FXObject* sender,FXSelector,void*){
+// Sensitize if editable
+long TextWindow::onUpdIsEditable(FXObject* sender,FXSelector,void*){
   sender->handle(this,editor->isEditable()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
@@ -2711,6 +2745,393 @@ long TextWindow::onUpdExpression(FXObject* sender,FXSelector,void*){
 
 /*******************************************************************************/
 
+// Goto line number
+long TextWindow::onCmdGotoLine(FXObject*,FXSelector,void*){
+  FXGIFIcon dialogicon(getApp(),goto_gif);
+  FXint row=editor->getCursorRow()+1;
+  if(FXInputDialog::getInteger(row,this,tr("Goto Line"),tr("&Goto line number:"),&dialogicon,1,2147483647)){
+    editor->setCursorRow(row-1,true);
+    }
+  return 1;
+  }
+
+
+// Goto selected line number
+long TextWindow::onCmdGotoSelected(FXObject*,FXSelector,void*){
+  FXString string;
+  if(getDNDData(FROM_SELECTION,stringType,string)){
+    FXint row=0,s;
+    if((s=string.find_first_of("0123456789"))>=0){
+      while(Ascii::isDigit(string[s])){
+        row=row*10+Ascii::digitValue(string[s]);
+        s++;
+        }
+      if(1<=row){
+        editor->setCursorRow(row-1,true);
+        return 1;
+        }
+      }
+    }
+  getApp()->beep();
+  return 1;
+  }
+
+
+/*******************************************************************************/
+
+
+// Check if the selection (if any) matches the pattern
+FXbool TextWindow::matchesSelection(const FXString& string,FXint* beg,FXint* end,FXuint flgs,FXint npar) const {
+  FXint selstart=editor->getSelStartPos();
+  FXint selend=editor->getSelEndPos();
+  if((selstart<selend) && (0<npar)){
+    if(editor->findText(string,beg,end,selstart,flgs&~(SEARCH_FORWARD|SEARCH_BACKWARD),npar)){
+      return (beg[0]==selstart) && (end[0]==selend);
+      }
+    }
+  return false;
+  }
+
+
+// Search text
+long TextWindow::onCmdSearch(FXObject*,FXSelector,void*){
+  FXTRACE((1,"TextWindow::onCmdSearch()\n"));
+  FXGIFIcon dialogicon(getApp(),searchicon_gif);
+  FXSearchDialog searchdialog(this,tr("Search"),&dialogicon);
+  FXint beg[10],end[10],pos,code;
+  FXuint placement=PLACEMENT_OWNER;
+
+  // Start the search
+  setStatusMessage(tr("Search for a string in the file."));
+
+  // First time, throw dialog over window
+  while((code=searchdialog.execute(placement))!=FXSearchDialog::DONE){
+
+    // User may have moved the panel
+    placement=PLACEMENT_DEFAULT;
+
+    // Grab the search parameters
+    searchstring=searchdialog.getSearchText();
+    searchflags=searchdialog.getSearchMode();
+
+    // If search string matches the selection, start from the end (or begin
+    // when seaching backwards) of the selection.  Otherwise proceed from the
+    // cursor position.
+    pos=editor->getCursorPos();
+    if(matchesSelection(searchstring,beg,end,searchflags,10)){
+      pos=(searchflags&SEARCH_BACKWARD) ? beg[0]-1 : end[0];
+      }
+
+    // Search the text
+    if(editor->findText(searchstring,beg,end,pos,searchflags,10)){
+
+      // Feed back success, search box turns green
+      setStatusMessage(tr("String found!"));
+      searchdialog.setSearchTextColor(FXRGB(128,255,128));
+
+      // Flag a wraparound the text
+      if(searchflags&SEARCH_BACKWARD){
+        if(pos<=beg[0]){ setStatusMessage(tr("Search wrapped around.")); }
+        }
+      else{
+        if(beg[0]<pos){ setStatusMessage(tr("Search wrapped around.")); }
+        }
+
+      // Beep if same location in buffer
+      if((beg[0]==editor->getSelStartPos()) && (end[0]==editor->getSelEndPos())){
+        getApp()->beep();
+        }
+
+      // Select new text
+      editor->setAnchorPos(beg[0]);
+      editor->moveCursorAndSelect(end[0],FXText::SelectChars,true);
+      }
+    else{
+
+      // Feedback failure, search box turns red
+      setStatusMessage(tr("String not found!"));
+      searchdialog.setSearchTextColor(FXRGB(255,128,128));
+      getApp()->beep();
+      }
+    }
+
+  // Restore normal message
+  setStatusMessage(tr("Ready."));
+  return 1;
+  }
+
+
+// Substitute algorithm
+static FXString substitute(const FXString& original,const FXString& replace,FXint* beg,FXint* end,FXint npar){
+  FXint adjbeg[10],adjend[10],i;
+  for(i=0; i<npar; ++i){
+    adjbeg[i]=beg[i]-beg[0];
+    adjend[i]=end[i]-beg[0];
+    }
+  return FXRex::substitute(original,adjbeg,adjend,replace,npar);
+  }
+
+
+// Replace text
+long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
+  FXTRACE((1,"TextWindow::onCmdReplace()\n"));
+  FXGIFIcon dialogicon(getApp(),searchicon_gif);
+  FXReplaceDialog replacedialog(this,tr("Replace"),&dialogicon);
+  FXint beg[10],end[10],pos,finish,fm,to,code;
+  FXuint placement=PLACEMENT_OWNER;
+  FXString originalvalue;
+  FXString replacevalue;
+  FXString replacestring;
+  FXbool found;
+
+  // Start the search/replace
+  setStatusMessage(tr("Search and replace strings in the file."));
+
+  // First time, throw dialog over window
+  while((code=replacedialog.execute(placement))!=FXReplaceDialog::DONE){
+
+    // User may have moved the panel
+    placement=PLACEMENT_DEFAULT;
+
+    // Grab the search parameters
+    searchstring=replacedialog.getSearchText();
+    replacestring=replacedialog.getReplaceText();
+    searchflags=replacedialog.getSearchMode();
+    replacevalue=FXString::null;
+
+    // Search or replace one instance
+    if((code==FXReplaceDialog::SEARCH) || (code==FXReplaceDialog::REPLACE)){
+
+      // If search string matches the selection, start from the end (or begin
+      // when seaching backwards) of the selection.  Otherwise proceed from the
+      // cursor position.
+      pos=editor->getCursorPos();
+      found=matchesSelection(searchstring,beg,end,searchflags,10);
+      if(found){
+        pos=(searchflags&SEARCH_BACKWARD) ? beg[0]-1 : end[0];
+        }
+
+      // Perform a search if no match yet, or we're just searching
+      if(!found || (code==FXReplaceDialog::SEARCH)){
+        found=editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10);
+        }
+
+      // Found a match; if just searching, select the match, otherwise, select
+      // the replaced text to what the match was replaced with.
+      if(found){
+        setStatusMessage(tr("String found!"));
+        replacedialog.setSearchTextColor(FXRGB(128,255,128));
+        replacedialog.setReplaceTextColor(FXRGB(128,255,128));
+
+        // Flag a wraparound the text
+        if(searchflags&SEARCH_BACKWARD){
+          if(pos<=beg[0]){ setStatusMessage(tr("Search wrapped around.")); }
+          }
+        else{
+          if(beg[0]<pos){ setStatusMessage(tr("Search wrapped around.")); }
+          }
+
+        // Replace the string
+        if(code==FXReplaceDialog::REPLACE){
+          if(searchflags&SEARCH_REGEX){
+            editor->extractText(originalvalue,beg[0],end[0]-beg[0]);
+            replacevalue=substitute(originalvalue,replacestring,beg,end,10);
+            }
+          else{
+            replacevalue=replacestring;
+            }
+          editor->replaceText(beg[0],end[0]-beg[0],replacevalue,true);
+
+          // Highlight last changed
+          editor->setAnchorPos(beg[0]);
+          editor->moveCursorAndSelect(beg[0]+replacevalue.length(),FXText::SelectChars,true);
+          }
+
+        // Just highlight it
+        else{
+          editor->setAnchorPos(beg[0]);
+          editor->moveCursorAndSelect(end[0],FXText::SelectChars,true);
+          }
+        }
+
+      // Not found
+      else{
+        setStatusMessage(tr("String not found!"));
+        replacedialog.setSearchTextColor(FXRGB(255,128,128));
+        replacedialog.setReplaceTextColor(FXRGB(255,128,128));
+        getApp()->beep();
+        }
+      }
+
+    // Replace multiple instances
+    else{
+      fm=-1;
+      to=-1;
+
+      // Replace range
+      if(code==FXReplaceDialog::REPLACE_ALL){
+        pos=0;
+        finish=editor->getLength();
+        }
+      else{
+        pos=editor->getSelStartPos();
+        finish=editor->getSelEndPos();
+        }
+
+      // Scan through text buffer
+      while(editor->findText(searchstring,beg,end,pos,((searchflags&~(SEARCH_WRAP|SEARCH_BACKWARD|SEARCH_FORWARD))|SEARCH_FORWARD),10) && end[0]<=finish){
+
+        // Start buffer mutation at first occurrence
+        if(fm<0){ fm=to=beg[0]; }
+
+        // Unchanged piece is just copied over
+        if(to<beg[0]){
+          editor->extractText(originalvalue,to,beg[0]-to);
+          replacevalue.append(originalvalue);
+          }
+
+        // For changed piece, use substitution pattern
+        if(searchflags&SEARCH_REGEX){
+          editor->extractText(originalvalue,beg[0],end[0]-beg[0]);
+          replacevalue.append(substitute(originalvalue,replacestring,beg,end,10));
+          }
+        else{
+          replacevalue.append(replacestring);
+          }
+
+        // End of buffer mutation at end of last occurrence
+        to=end[0];
+
+        // Advance at least one character
+        pos=to;
+        if(beg[0]==end[0]) pos++;
+        }
+
+      // Got anything at all?
+      if(0<=fm && 0<=to){
+        setStatusMessage(tr("Strings replaced!"));
+        replacedialog.setSearchTextColor(FXRGB(128,255,128));
+        replacedialog.setReplaceTextColor(FXRGB(128,255,128));
+
+        // Replace the text
+        editor->replaceText(fm,to-fm,replacevalue,true);
+        editor->moveCursor(fm+replacevalue.length(),true);
+        }
+      else{
+        setStatusMessage(tr("String not found!"));
+        replacedialog.setSearchTextColor(FXRGB(255,128,128));
+        replacedialog.setReplaceTextColor(FXRGB(255,128,128));
+        getApp()->beep();
+        }
+      }
+    }
+
+  // Restore normal message
+  setStatusMessage(tr("Ready."));
+  return 1;
+  }
+
+
+// Search seleced
+long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
+  FXTRACE((1,"TextWindow::onCmdSearchSel()\n"));
+  FXString string;
+
+  // First, try UTF-8
+  if(getDNDData(FROM_SELECTION,utf8Type,string)){
+    searchstring=string;
+    searchflags=SEARCH_EXACT;
+    }
+
+  // Next, try UTF-16
+  else if(getDNDData(FROM_SELECTION,utf16Type,string)){
+    FXUTF16LECodec unicode;
+    searchstring=unicode.mb2utf(string);
+    searchflags=SEARCH_EXACT;
+    }
+
+  // Finally, try good old 8859-1
+  else if(getDNDData(FROM_SELECTION,stringType,string)){
+    FX88591Codec ascii;
+    searchstring=ascii.mb2utf(string);
+    searchflags=SEARCH_EXACT;
+    }
+
+  // Have search string?
+  if(!searchstring.empty()){
+    FXint selstart=editor->getSelStartPos();
+    FXint selend=editor->getSelEndPos();
+    FXint pos=editor->getCursorPos();
+    FXint beg[10],end[10];
+
+    // Search direction
+    pos=editor->getCursorPos();
+    if(FXSELID(sel)==ID_SEARCH_SEL_FORW){
+      if(editor->isPosSelected(pos)) pos=selend;
+      searchflags&=~SEARCH_BACKWARD;
+      searchflags|=SEARCH_FORWARD;
+      }
+    else{
+      if(editor->isPosSelected(pos)) pos=FXMAX(selstart-1,0);
+      searchflags&=~SEARCH_FORWARD;
+      searchflags|=SEARCH_BACKWARD;
+      }
+
+    // Perform search
+    if(editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
+      if(beg[0]!=selstart || end[0]!=selend){
+        editor->setAnchorPos(beg[0]);
+        editor->moveCursorAndSelect(end[0],FXText::SelectChars,true);
+        return 1;
+        }
+      }
+    }
+
+  // Beep
+  getApp()->beep();
+  return 1;
+  }
+
+
+// Search for next occurence
+long TextWindow::onCmdSearchNext(FXObject*,FXSelector sel,void*){
+  FXTRACE((1,"TextWindow::onCmdSearchNext()\n"));
+  if(!searchstring.empty()){
+    FXint selstart=editor->getSelStartPos();
+    FXint selend=editor->getSelEndPos();
+    FXint pos=editor->getCursorPos();
+    FXint beg[10];
+    FXint end[10];
+
+    // Search direction
+    if(FXSELID(sel)==ID_SEARCH_NXT_FORW){
+      if(editor->isPosSelected(pos)) pos=selend;
+      searchflags&=~SEARCH_BACKWARD;
+      searchflags|=SEARCH_FORWARD;
+      }
+    else{
+      if(editor->isPosSelected(pos)) pos=FXMAX(selstart-1,0);
+      searchflags&=~SEARCH_FORWARD;
+      searchflags|=SEARCH_BACKWARD;
+      }
+
+    // Perform search
+    if(editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
+      if(beg[0]!=selstart || end[0]!=selend){
+        editor->setAnchorPos(beg[0]);
+        editor->moveCursorAndSelect(end[0],FXText::SelectChars,true);
+        return 1;
+        }
+      }
+    }
+
+  // Beep
+  getApp()->beep();
+  return 1;
+  }
+
+/*******************************************************************************/
+
 // Start incremental search; show search bar if not permanently visible
 void TextWindow::startISearch(){
   if(!searching){
@@ -2841,10 +3262,12 @@ long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
     }
   if(((FXEvent*)ptr)->code==KEY_Down){
     searchflags&=~SEARCH_BACKWARD;
+    searchflags|=SEARCH_FORWARD;
     performISearch(searchtext->getText(),true,true);
     return 1;
     }
   if(((FXEvent*)ptr)->code==KEY_Up){
+    searchflags&=~SEARCH_FORWARD;
     searchflags|=SEARCH_BACKWARD;
     performISearch(searchtext->getText(),true,true);
     return 1;
@@ -2859,7 +3282,14 @@ long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
       return 1;
       }
     if(((FXEvent*)ptr)->code==KEY_d){
-      searchflags^=SEARCH_BACKWARD;
+      searchflags^=(SEARCH_FORWARD|SEARCH_BACKWARD);
+      }
+    if(((FXEvent*)ptr)->code==KEY_p){
+      // FIXME search history backward
+      return 1;
+      }
+    if(((FXEvent*)ptr)->code==KEY_n){
+      // FIXME search history forward
       return 1;
       }
     }
@@ -2869,6 +3299,7 @@ long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
 
 // Search incremental backward for next occurrence
 long TextWindow::onCmdISearchPrev(FXObject*,FXSelector,void*){
+  searchflags&=~SEARCH_FORWARD;
   searchflags|=SEARCH_BACKWARD;
   performISearch(searchtext->getText(),true,true);
   return 1;
@@ -2878,6 +3309,7 @@ long TextWindow::onCmdISearchPrev(FXObject*,FXSelector,void*){
 // Search incremental forward for next occurrence
 long TextWindow::onCmdISearchNext(FXObject*,FXSelector,void*){
   searchflags&=~SEARCH_BACKWARD;
+  searchflags|=SEARCH_FORWARD;
   performISearch(searchtext->getText(),true,true);
   return 1;
   }
@@ -2913,7 +3345,7 @@ long TextWindow::onUpdISearchModifiers(FXObject* sender,FXSelector sel,void*){
 // Change incremental search modifiers
 long TextWindow::onCmdISearchModifiers(FXObject*,FXSelector sel,void*){
   switch(FXSELID(sel)){
-    case ID_ISEARCH_REVERSE: searchflags^=SEARCH_BACKWARD; break;
+    case ID_ISEARCH_REVERSE: searchflags^=(SEARCH_FORWARD|SEARCH_BACKWARD); break;
     case ID_ISEARCH_IGNCASE: searchflags^=SEARCH_IGNORECASE; break;
     case ID_ISEARCH_REGEX: searchflags^=SEARCH_REGEX; break;
     }
@@ -3173,6 +3605,7 @@ long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
     else{
       editor->extractText(string,b,e-b);
       }
+    string.trim();
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)c);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
@@ -3194,7 +3627,7 @@ long TextWindow::onCmdClearMarks(FXObject*,FXSelector,void*){
 // position to be somewhere in the currently visible text.
 void TextWindow::setBookmark(FXint pos){
   if(!bookmark[9] && pos){
-    register FXint i;
+    FXint i;
     for(i=0; i<=9; i++){
       if(bookmark[i]==pos) return;
       }
@@ -3209,7 +3642,7 @@ void TextWindow::setBookmark(FXint pos){
 // Remove bookmark at given position pos
 void TextWindow::clearBookmark(FXint pos){
   if(bookmark[0] && pos){
-    register FXint i,j,p;
+    FXint i,j,p;
     for(i=j=0; j<=9; j++){
       p=bookmark[j];
       if(p!=pos){
@@ -3226,7 +3659,7 @@ void TextWindow::clearBookmark(FXint pos){
 // if it was inside the deleted text and moving its position otherwise
 void TextWindow::updateBookmarks(FXint pos,FXint nd,FXint ni){
   if(bookmark[0]){
-    register FXint i,j,p;
+    FXint i,j,p;
     for(i=j=0; j<=9; j++){
       p=bookmark[j];
       if(p<=pos){
@@ -3548,7 +3981,7 @@ long TextWindow::onUpdStyleBold(FXObject* sender,FXSelector sel,void*){
 
 // Set language
 void TextWindow::setSyntax(Syntax* syn){
-  register FXint rule;
+  FXint rule;
   syntax=syn;
   if(syntax){
     editor->setDelimiters(syntax->getDelimiters().text());
@@ -3620,10 +4053,10 @@ void TextWindow::restyleText(){
 
 // Scan backward by context amount
 FXint TextWindow::backwardByContext(FXint pos) const {
-  register FXint nlines=syntax->getContextLines();
-  register FXint nchars=syntax->getContextChars();
-  register FXint r1=pos;
-  register FXint r2=pos;
+  FXint nlines=syntax->getContextLines();
+  FXint nchars=syntax->getContextChars();
+  FXint r1=pos;
+  FXint r2=pos;
   if(nlines==0){
     r1=pos-nchars;
     }
@@ -3640,10 +4073,10 @@ FXint TextWindow::backwardByContext(FXint pos) const {
 
 // Scan forward by context amount
 FXint TextWindow::forwardByContext(FXint pos) const {
-  register FXint nlines=syntax->getContextLines();
-  register FXint nchars=syntax->getContextChars();
-  register FXint r1=pos;
-  register FXint r2=pos;
+  FXint nlines=syntax->getContextLines();
+  FXint nchars=syntax->getContextChars();
+  FXint r1=pos;
+  FXint r2=pos;
   if(nlines==0){
     r1=pos+nchars;
     }
@@ -3660,7 +4093,7 @@ FXint TextWindow::forwardByContext(FXint pos) const {
 
 // Find restyle point
 FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
-  register FXint probepos,safepos,beforesafepos,runstyle,s;
+  FXint probepos,safepos,beforesafepos,runstyle,s;
 
   // Return 0 for style unless we found something else
   style=0;
@@ -3677,47 +4110,46 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
   // Outside of colorized part, so restyle from here
   if(runstyle==0) return probepos;
 
-  // Scan back one more context and one before that
+  // Scan back one more context
   safepos=backwardByContext(probepos);
+
+  // And one before that
   beforesafepos=backwardByContext(safepos);
 
-  // Scan back
-  for(--probepos; 0<probepos; --probepos){
+  // Scan back for style change
+  while(0<probepos){
 
-    // Same style; continue scanning backwards
-    s=editor->getStyle(probepos);
-    if(s==runstyle){
+    // Style prior to probe position
+    s=editor->getStyle(probepos-1);
 
-      // Went back pretty far, return running style
-      if(probepos<=beforesafepos){
-        style=runstyle;
-        return safepos;
+    // Style change?
+    if(runstyle!=s){
+
+      // At beginning of child-pattern, return parent style
+      if(syntax->isAncestor(s,runstyle)){
+        style=s;
+        return probepos;
         }
 
-      // Continue scanning backwards till we see a style change
-      continue;
+      // Before end of child-pattern, return running style
+      if(syntax->isAncestor(runstyle,s)){
+        style=runstyle;
+        return probepos;
+        }
+
+      // Set common ancestor style
+      style=syntax->commonAncestor(runstyle,s);
+      return probepos;
       }
 
-    // At beginning of child-pattern, return parent style
-    if(syntax->isAncestor(s,runstyle)){
-      style=s;
-      return probepos+1;
-      }
+    // Scan back
+    --probepos;
 
-    // Before end of child-pattern, return running style
-    if(syntax->isAncestor(runstyle,s)){
+    // Further back
+    if(probepos<beforesafepos){
       style=runstyle;
-      return probepos+1;
+      return safepos;
       }
-
-    // Sibling styles with common ancestor, return ancestor style
-    if(syntax->getRule(s)->getParent()==syntax->getRule(runstyle)->getParent()){
-      style=syntax->getRule(s)->getParent();
-      return probepos+1;
-      }
-
-    // Unrelated styles, return with root style
-    return probepos+1;
     }
   return 0;
   }
@@ -3731,7 +4163,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint
   FXint delta=0;
   head=0;
   tail=0;
-  FXASSERT(0<=rule);
+  FXASSERT(0<=rule && rule<syntax->getNumRules());
   FXASSERT(0<=beg && beg<=end && end<=editor->getLength());
   if(allocElms(text,len+len+len)){
     newstyle=text+len;
@@ -3739,14 +4171,14 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint
     editor->extractText(text,beg,len);
     editor->extractStyle(oldstyle,beg,len);
     syntax->getRule(rule)->stylizeBody(text,newstyle,0,len,head,tail);
-    editor->changeStyle(beg,newstyle,len);
+    FXASSERT(0<=head && head<=tail && tail<=len);
+    editor->changeStyle(beg,newstyle,tail);
     for(delta=tail; 0<delta && oldstyle[delta-1]==newstyle[delta-1]; --delta){ }
     freeElms(text);
     }
   head+=beg;
   tail+=beg;
   delta+=beg;
-  FXTRACE((1,"changed head=%d tail=%d same till delta=%d\n",head,tail,delta));
   return delta;
   }
 
@@ -3754,6 +4186,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint
 // Restyle text after change in buffer [fm,to]
 void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
   FXint head,tail,changed,affected,beg,end,len,rule,restylejump;
+  FXTRACE((1,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));
   if(colorize && syntax){
 
     // Length of text
@@ -3769,9 +4202,9 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
     // Scan forward by one context
     end=forwardByContext(changed);
 
-    FXTRACE((1,"restyleText: pos=%d del=%d ins=%d beg=%d end=%d rule=%d\n",pos,del,ins,beg,end,rule));
+    FXTRACE((1,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text()));
 
-    FXASSERT(0<=rule);
+    FXASSERT(0<=rule && rule<syntax->getNumRules());
 
     // Restyle until we fully enclose the style change
     restylejump=RESTYLEJUMP;
@@ -3779,6 +4212,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
 
       // Restyle [beg,end> using rule, return matched range in [head,tail>
       affected=restyleRange(beg,end,head,tail,rule);
+      FXTRACE((1,"affected=%d beg=%d end=%d head=%d tail=%d, ule=%d (%s) \n",affected,beg,end,head,tail,rule,syntax->getRule(rule)->getName().text()));
 
       // Not all colored yet, continue coloring with parent rule from
       if(tail<end){

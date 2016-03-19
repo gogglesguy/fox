@@ -108,15 +108,14 @@ unsigned int CALLBACK FXThread::function(void* ptr){
   try{
     code=thread->run();
     }
-  catch(const FXThreadException& te){   // Graceful thread exit
-    code=te.code();
+  catch(const FXThreadException& e){    // Graceful thread exit
+    code=e.code();
     }
-  catch(const FXException&){            // Quietly handle FXExceptions
-    code=-1;
+  catch(const FXException& e){          // Our kind of exceptions
+    fxerror("FXThread: caught exception: %s.\n",e.what());
     }
   catch(...){                           // Other exceptions
-    if(self()){ self()->busy=false; }
-    throw;
+    fxerror("FXThread: caught unknown exception.\n");
     }
   if(self()){ self()->busy=false; }
   return code;
@@ -131,15 +130,14 @@ void* FXThread::function(void* ptr){
   try{
     code=thread->run();
     }
-  catch(const FXThreadException& te){   // Graceful thread exit
-    code=te.code();
+  catch(const FXThreadException& e){    // Graceful thread exit
+    code=e.code();
     }
-  catch(const FXException&){            // Quietly handle FXExceptions
-    code=-1;
+  catch(const FXException& e){          // Our kind of exceptions
+    fxerror("FXThread: caught exception: %s.\n",e.what());
     }
   catch(...){                           // Other exceptions
-    if(self()){ self()->busy=false; }
-    throw;
+    fxerror("FXThread: caught unknown exception.\n");
     }
   if(self()){ self()->busy=false; }
   return (void*)(FXival)code;
@@ -715,7 +713,6 @@ FXbool FXThread::affinity(FXulong mask){
       return SetThreadAffinityMask((HANDLE)tid,(FXuval)mask)!=0;
       }
     }
-  return false;
 #elif defined(HAVE_PTHREAD_SETAFFINITY_NP)
   const FXulong bit=1;
   if(tid){
@@ -730,8 +727,8 @@ FXbool FXThread::affinity(FXulong mask){
       return pthread_setaffinity_np((pthread_t)tid,sizeof(cpuset),&cpuset)==0;
       }
     }
-  return false;
 #endif
+  return false;
   }
 
 
@@ -747,7 +744,6 @@ FXulong FXThread::affinity() const {
       return (FXulong)cpuset;
       }
     }
-  return 0;
 #elif defined(HAVE_PTHREAD_SETAFFINITY_NP)
   const FXulong bit=1;
   if(tid){
@@ -761,8 +757,8 @@ FXulong FXThread::affinity() const {
       return mask;
       }
     }
-  return 0;
 #endif
+  return 0;
   }
 
 

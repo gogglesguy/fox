@@ -69,7 +69,7 @@
     the task queue becomes empty.  In either case, it may have to block for a little
     while on the completion semaphore.
 
-  - No new jobs posted when about to shut down; so when queue becomes empty, it
+  - No new tasks can be posted when about to shut down; so when queue becomes empty, it
     will stay empty.
 
 */
@@ -93,7 +93,7 @@ FXThreadPool::FXThreadPool(FXuint sz):queue(sz),freeslots(sz),usedslots(0),stack
 
 // Change task queue size, return true if success
 FXbool FXThreadPool::setSize(FXuint sz){
-  if(sz&(sz-1)){ fxerror("FXThreadPool::setSize: bad argument: %d.\n",sz); }
+  if((sz<8) || (sz&(sz-1))){ fxerror("FXThreadPool::setSize: bad argument: %u.\n",sz); }
   if(atomicBoolCas(&running,0,2)){
     FXuint osz=queue.getSize();
     if(setSize(sz)){
@@ -203,8 +203,6 @@ void FXThreadPool::runWhile(FXCompletion& comp,FXTime timeout){
     freeslots.post();
     try{
       task->run();
-      }
-    catch(const FXException&){
       }
     catch(...){
       tasks.decrement();

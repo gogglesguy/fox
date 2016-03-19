@@ -426,7 +426,7 @@ static FXbool fxloadICOBits(FXStream& store,FXColor*& data,FXint width,FXint hei
 // Save icon bits
 static FXbool fxsaveICOBits(FXStream& store,const FXColor* data,FXint width,FXint height,FXint bpp){
   const FXuchar padding[3]={0,0,0};
-  register FXint x,y,pad; FXuchar c,bit;
+  FXint x,y,pad; FXuchar c,bit;
 
   // Save pixels (XOR bytes)
   if(fxsaveBMPBits(store,data,width,height,bpp)){
@@ -458,7 +458,7 @@ static FXushort checkBPP(const FXColor *data,FXint width,FXint height){
     }
   return 24;
   }
-  
+
 /*******************************************************************************/
 
 // Load BMP image from stream
@@ -613,7 +613,7 @@ FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
     store.setBigEndian(false);
 
     // BitmapFileHeader
-    BitmapFileHeader bfh={0x4d42,14+WIN_NEW+height*(((width*bpp+31)>>5)<<2),0,0,14+WIN_NEW};
+    BitmapFileHeader bfh={0x4d42,FXuint(14+WIN_NEW+height*(((width*bpp+31)>>5)<<2)),0,0,14+WIN_NEW};
 
     // Initialize bitmap info header
     BitmapInfoHeader bmi={WIN_NEW,width,height,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};

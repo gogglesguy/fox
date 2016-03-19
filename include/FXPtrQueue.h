@@ -78,7 +78,7 @@ public:
 
 
 /// Queue of pointers to TYPE
-template <class TYPE>
+template <typename TYPE>
 class FXPtrQueueOf : public FXPtrQueue {
 public:
   FXPtrQueueOf(){}

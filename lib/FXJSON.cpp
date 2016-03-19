@@ -159,7 +159,7 @@ FXJSON::FXJSON(FXchar* data,FXuval size,Direction d):begptr(NULL),endptr(NULL),r
 // Open FXJSON stream for given direction and set its buffer
 FXbool FXJSON::open(FXchar* data,FXuval sz,Direction d){
   FXTRACE((2,"FXJSON::open(%p,%lu,%d)\n",data,sz,d));
-  if(!dir && d){
+  if((dir==Stop) && (d!=Stop)){
     if(data){                   // External buffer
       begptr=data;
       endptr=begptr+sz;

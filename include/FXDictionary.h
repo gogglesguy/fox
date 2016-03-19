@@ -153,7 +153,7 @@ public:
 
 
 /// Dictionary of pointers to TYPE
-template<class TYPE>
+template<typename TYPE>
 class FXDictionaryOf : public FXDictionary {
 public:
 

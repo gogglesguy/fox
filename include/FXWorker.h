@@ -29,11 +29,11 @@ namespace FX {
 
 
 /**
-* An FXWorker is a transient thread that performs an FXRunnable.
-* After the worker thread finishes the execution of the runnable, the worker thread's
+* An FXWorker is a transient thread that performs an FXRunnable task.
+* After the worker thread finishes the execution of the task, the worker thread's
 * memory is automatically reclaimed.
 * The FXRunnable itself is not deleted; it will thus outlive the worker that runs it.
-* Any exceptions raised by the runnable are caught by the worker thread, and will
+* Any exceptions raised by the task are caught by the worker thread, and will
 * be rethrown after the worker thread's memory has been reclaimed.
 */
 class FXAPI FXWorker : public FXThread {
@@ -45,10 +45,10 @@ private:
 public:
 
   /// Create worker for runnable
-  FXWorker(FXRunnable* rn=NULL);
+  FXWorker(FXRunnable* task=NULL);
 
   /// Change runnable if not started yet
-  void setRunnable(FXRunnable* rn){ runnable=rn; }
+  void setRunnable(FXRunnable* task){ runnable=task; }
 
   /// Return runnable
   FXRunnable* getRunnable() const { return runnable; }
@@ -57,7 +57,7 @@ public:
   virtual FXint run();
 
   /// Create and start a worker on a given runnable.
-  static FXWorker* execute(FXRunnable* rn,FXuval stacksize=0);
+  static FXWorker* execute(FXRunnable* task,FXuval stacksize=0);
 
   /// Destroy
   virtual ~FXWorker();

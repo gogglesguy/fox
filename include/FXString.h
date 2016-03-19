@@ -581,9 +581,10 @@ public:
   */
   static FXString vvalue(const FXchar* fmt,va_list args);
 
-  /// Get hash value
+  /// Compute hash value of string
   FXuint hash() const;
 
+  /// Compute hash value of string
   static FXuint hash(const FXchar* s);
 
   /// Swap two strings

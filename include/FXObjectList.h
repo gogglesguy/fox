@@ -177,7 +177,7 @@ public:
 
 
 /// List to pointers to objects of TYPE
-template<class TYPE>
+template<typename TYPE>
 class FXObjectListOf : public FXObjectList {
 public:
 

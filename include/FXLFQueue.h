@@ -73,7 +73,7 @@ public:
 
 
 /// Lock-free queue of pointers to TYPE
-template <class TYPE>
+template <typename TYPE>
 class FXLFQueueOf : public FXLFQueue {
 public:
   FXLFQueueOf(){}

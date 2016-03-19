@@ -23,7 +23,7 @@
 #include "fxdefs.h"
 #include "FXArray.h"
 #include "FXHash.h"
-#include "FXStream.h"
+#include "FXException.h"
 #include "FXElement.h"
 
 
@@ -191,59 +191,70 @@ FXHash& FXHash::adopt(FXHash& other){
   }
 
 
-// Return true if association in table
-FXptr FXHash::find(FXptr name) const {
+// Find position of given key
+FXival FXHash::find(FXptr name) const {
   if(__likely(LEGAL(name))){
     register FXuval p,b,x;
     p=b=HASH(name);
     while(__likely(table[x=p&(no()-1)].name)){
-      if(__likely(table[x].name==name)) return table[x].data;
+      if(__likely(table[x].name==name)) return x;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
     }
-  return NULL;
+  return -1;
   }
 
 
-// Replace entry in the table, returning old one
-FXptr FXHash::insert(FXptr name,FXptr data){
+// Return reference to slot assocated with given key
+FXptr& FXHash::at(FXptr name){
   if(__likely(LEGAL(name))){
     register FXuval p,b,h,x;
-    register FXptr old;
     p=b=h=HASH(name);
     while(table[x=p&(no()-1)].name){
-      if(table[x].name==name) goto x;            // Replace existing
+      if(table[x].name==name) goto x;           // Replace existing slot
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-    if(__likely(free()>1+(no()>>2)) || __likely(resize(no()<<1))){
-      p=b=h;
-      while(table[x=p&(no()-1)].name){
-        if(table[x].name==VOID) goto y;         // Put into voided slot
-        p=(p<<2)+p+b+1;
-        b>>=BSHIFT;
-        }
-      free(free()-1);                           // Put into empty slot
-y:    used(used()+1);
-      table[x].name=name;
-x:    old=table[x].data;
-      table[x].data=data;
-      return old;
+    if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXHash::at: out of memory\n"); }
+    p=b=h;
+    while(table[x=p&(no()-1)].name){
+      if(table[x].name==VOID) goto y;           // Put into voided slot
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
+    free(free()-1);                             // Put into empty slot
+y:  used(used()+1);
+    table[x].name=name;
+x:  return table[x].data;
+    }
+  return *((FXptr*)NULL);               // Can NOT be referenced; will generate segfault!
+  }
+
+
+// Return constant reference to slot assocated with given key
+const FXptr& FXHash::at(FXptr name) const {
+  if(__likely(LEGAL(name))){
+    register FXuval p,b,x;
+    p=b=HASH(name);
+    while(table[x=p&(no()-1)].name){
+      if(table[x].name==name) return table[x].data;     // Return existing slot
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
       }
     }
-  return NULL;
+  return EMPTY[0].data;                 // Can be safely referenced, will read as NULL
   }
 
 
 // Remove association from the table
 FXptr FXHash::remove(FXptr name){
+  register FXptr old=NULL;
   if(__likely(LEGAL(name))){
     register FXuval p,b,x;
-    register FXptr old;
     p=b=HASH(name);
     while(table[x=p&(no()-1)].name!=name){
-      if(table[x].name==NULL) goto x;
+      if(table[x].name==NULL) return NULL;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
@@ -252,23 +263,23 @@ FXptr FXHash::remove(FXptr name){
     table[x].data=NULL;
     used(used()-1);
     if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
-    return old;
     }
-x:return NULL;
+  return old;
   }
 
 
 // Erase data at pos in the table, returning old pointer
 FXptr FXHash::erase(FXival pos){
-  if(0<=pos && pos<no() && LEGAL(table[pos].name)){
-    register FXptr old=table[pos].data;
+  register FXptr old=NULL;
+  if(__unlikely(pos<0 || no()<=pos)){ throw FXRangeException("FXHash::erase: argument out of range\n"); }
+  if(__likely(LEGAL(table[pos].name))){
+    old=table[pos].data;
     table[pos].name=VOID;                       // Void the slot (not empty!)
     table[pos].data=NULL;
     used(used()-1);
     if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
-    return old;
     }
-  return NULL;
+  return old;
   }
 
 

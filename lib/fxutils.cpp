@@ -314,10 +314,10 @@ void fxwarning(const FXchar* format,...){
 
 // Safe string copy
 FXival fxstrlcpy(FXchar* dst,const FXchar* src,FXival len){
-  register const FXchar* s=src;
-  register FXchar* d=dst;
-  register FXival n=len;
-  register FXchar c;
+  const FXchar* s=src;
+  FXchar* d=dst;
+  FXival n=len;
+  FXchar c;
   while((c=*s)!='\0'){
     if(1<n){ *d++=c; n--; }
     s++;
@@ -331,11 +331,11 @@ FXival fxstrlcpy(FXchar* dst,const FXchar* src,FXival len){
 
 // Safe string concat
 FXival fxstrlcat(FXchar* dst,const FXchar* src,FXival len){
-  register const FXchar* s=src;
-  register FXchar* d=dst;
-  register FXival n=len;
-  register FXival m;
-  register FXchar c;
+  const FXchar* s=src;
+  FXchar* d=dst;
+  FXival n=len;
+  FXival m;
+  FXchar c;
   while(0<n && *d!='\0'){
     d++;
     n--;
@@ -375,7 +375,7 @@ FXchar* fxstrcasestr(const FXchar* s,const FXchar* find){
 
 // Convert string of length len to MSDOS; return new string and new length
 FXbool fxtoDOS(FXchar*& string,FXint& len){
-  register FXint f=0,t=0;
+  FXint f=0,t=0;
   while(f<len){
     if(string[f++]=='\n') t++; t++;
     }
@@ -393,7 +393,7 @@ FXbool fxtoDOS(FXchar*& string,FXint& len){
 
 // Convert string of length len from MSDOS; return new string and new length
 FXbool fxfromDOS(FXchar*& string,FXint& len){
-  register FXint f=0,t=0,c;
+  FXint f=0,t=0,c;
   while(f<len){
     if((c=string[f++])!='\r') string[t++]=c;
     }
@@ -440,9 +440,9 @@ FILE *fxreopen(const char *filename,const char *mode,FILE * stream){
 
 // Convert RGB to HSV
 void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloat g,FXfloat b){
-  register FXfloat mx=FXMAX3(r,g,b);
-  register FXfloat mn=FXMIN3(r,g,b);
-  register FXfloat d=mx-mn;
+  FXfloat mx=FXMAX3(r,g,b);
+  FXfloat mn=FXMIN3(r,g,b);
+  FXfloat d=mx-mn;
   h=0.0f;
   s=0.0f;
   v=mx;
@@ -461,8 +461,8 @@ void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloat g,FXfloat b
 
 // Convert HSV to RGB
 void fxhsv_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat v){
-  register FXfloat f,w,q,t;
-  register FXint i;
+  FXfloat f,w,q,t;
+  FXint i;
   r=g=b=v;
   if(__likely(s>0.0f)){
     if(h==360.0f) h=0.0f;
@@ -486,9 +486,9 @@ void fxhsv_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat v
 
 // Convert RGB to HSL
 void fxrgb_to_hsl(FXfloat& h,FXfloat& s,FXfloat& l,FXfloat r,FXfloat g,FXfloat b){
-  register FXfloat mx=FXMAX3(r,g,b);
-  register FXfloat mn=FXMIN3(r,g,b);
-  register FXfloat d=mx-mn;
+  FXfloat mx=FXMAX3(r,g,b);
+  FXfloat mn=FXMIN3(r,g,b);
+  FXfloat d=mx-mn;
   h=0.0f;
   s=0.0f;
   l=(mx+mn)*0.5f;
@@ -508,8 +508,8 @@ void fxrgb_to_hsl(FXfloat& h,FXfloat& s,FXfloat& l,FXfloat r,FXfloat g,FXfloat b
 
 // Convert HSL to RGB
 void fxhsl_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat l){
-  register FXfloat f,v,min,mid1,mid2,sv,vsf;
-  register FXint i;
+  FXfloat f,v,min,mid1,mid2,sv,vsf;
+  FXint i;
   r=g=b=l;
   if(l<0.5f)
     v=l+l*s;
@@ -542,8 +542,8 @@ void fxhsl_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat l
 
 // Calculate a hash value from a string; algorithm same as in perl
 FXuint fxstrhash(const FXchar* str){
-  register FXuint h=0;
-  register FXuchar c;
+  FXuint h=0;
+  FXuchar c;
   while((c=*str++)!='\0'){
     h = ((h << 5) + h) ^ c;
     }
@@ -553,10 +553,10 @@ FXuint fxstrhash(const FXchar* str){
 
 // Swap non-overlapping arrays
 void memswap(void *dst,void *src,FXuval n){
-  register FXuchar* p=(FXuchar*)dst;
-  register FXuchar* q=(FXuchar*)src;
-  register FXuchar* e=p+n;
-  register FXuchar t;
+  FXuchar* p=(FXuchar*)dst;
+  FXuchar* q=(FXuchar*)src;
+  FXuchar* e=p+n;
+  FXuchar t;
   while(p<e){
     t=*p; *p=*q; *q=t;
     p++;

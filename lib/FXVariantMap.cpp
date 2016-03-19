@@ -78,9 +78,9 @@ const FXival __variantmap__empty__[8]={1,0,1,(FXival)(__string__empty__+1),0,0,0
 
 // Adjust the size of the table
 FXbool FXVariantMap::no(FXival n){
-  register FXival m=no();
+  FXival m=no();
   if(__likely(m!=n)){
-    register Entry *elbat;
+    Entry *elbat;
 
     // Release old table
     if(1<m){
@@ -110,8 +110,8 @@ FXbool FXVariantMap::resize(FXival n){
   FXASSERT((n-used())>0);       // At least one free slot
   if(elbat.no(n)){
     if(1<elbat.no() && 1<no()){
-      register FXuval p,b,h,x;
-      register FXival i;
+      FXuval p,b,h,x;
+      FXival i;
       for(i=0; i<no(); ++i){                  // Hash existing entries into new table
         p=b=h=table[i].hash;
         if(!table[i].key.empty()){
@@ -183,7 +183,7 @@ FXVariantMap& FXVariantMap::adopt(FXVariantMap& other){
 
 // Find slot index for key; return -1 if not found
 FXival FXVariantMap::find(const FXchar* ky) const {
-  register FXuval p,b,x,h;
+  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::find: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -198,7 +198,7 @@ FXival FXVariantMap::find(const FXchar* ky) const {
 
 // Return reference to variant assocated with key
 FXVariant& FXVariantMap::at(const FXchar* ky){
-  register FXuval p,b,h,x;
+  FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -224,7 +224,7 @@ x:return table[x].data;
 
 // Return constant reference to variant assocated with key
 const FXVariant& FXVariantMap::at(const FXchar* ky) const {
-  register FXuval p,b,x,h;
+  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -239,7 +239,7 @@ x:return table[x].data;                                 // If not found we stopp
 
 // Remove entry from table
 void FXVariantMap::remove(const FXchar* ky){
-  register FXuval p,b,h,x;
+  FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::remove: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -269,7 +269,7 @@ void FXVariantMap::erase(FXival pos){
 
 // Compare all non-empty entries
 FXbool FXVariantMap::operator==(const FXVariantMap& other) const {
-  register FXival i,j;
+  FXival i,j;
   if(table!=other.table){
     for(i=0; i<no(); ++i){
       if(key(i).empty()) continue;
