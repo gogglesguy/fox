@@ -3,9 +3,9 @@
 *                    B i t m a p   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: bitmapviewer.cpp,v 1.26 2008/01/04 15:18:32 fox Exp $                    *
+* $Id: bitmapviewer.cpp,v 1.28 2009/01/19 20:44:57 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -235,7 +235,7 @@ FXIMPLEMENT(BitmapWindow,FXMainWindow,BitmapWindowMap,ARRAYNUMBER(BitmapWindowMa
 
 
 // Make some windows
-BitmapWindow::BitmapWindow(FXApp* a):FXMainWindow(a,"FOX Image Viewer: - untitled",NULL,NULL,DECOR_ALL,0,0,850,600,0,0){
+BitmapWindow::BitmapWindow(FXApp* a):FXMainWindow(a,"FOX Image Viewer: - untitled",NULL,NULL,DECOR_ALL,0,0,850,600,0,0),mrufiles(a){
   setTarget(this);
   setSelector(ID_TITLE);
 

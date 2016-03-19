@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxgetticks.cpp,v 1.7 2008/01/04 15:42:45 fox Exp $                       *
+* $Id: fxgetticks.cpp,v 1.9 2009/01/07 21:46:33 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,17 +43,6 @@ namespace FX {
 
 
 #if defined(WIN32)
-
-/*
-// Processor: x86, x64
-#include <intrin.h>
-#pragma intrinsic(__rdtsc)
-
-FXTime fxgetticks(){
-  FXTime value=__rdtsc();
-  return value;
-  }
-*/
 
 // Return clock ticks from performance counter [WIN32 version].
 FXTime fxgetticks(){

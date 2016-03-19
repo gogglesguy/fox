@@ -3,7 +3,7 @@
 *                     H i g h l i g h t   E n g i n e                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Hilite.cpp,v 1.48 2008/03/26 19:08:45 fox Exp $                          *
+* $Id: Hilite.cpp,v 1.50 2009/01/06 13:07:20 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <new>
@@ -210,7 +210,7 @@ FXSyntax::FXSyntax(const FXString& lang):language(lang){
 
 // Match filename against wildcards
 FXbool FXSyntax::matchFilename(const FXString& name) const {
-  return FXPath::match(extensions,name);
+  return FXPath::match(name,extensions);
   }
 
 

@@ -95,7 +95,7 @@ STRIP = @STRIP@
 VERSION = @VERSION@
 X_BASE_LIBS = @X_BASE_LIBS@
 
-CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
+AM_CXXFLAGS = @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap
 SUFFIXES = .gif .bmp
@@ -157,6 +157,7 @@ Snapper.$(OBJEXT)
 shutterbug_LDADD = $(LDADD)
 shutterbug_DEPENDENCIES =  $(top_builddir)/src/libFOX-1.7.la
 shutterbug_LDFLAGS = 
+CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -366,7 +367,8 @@ ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -469,7 +471,8 @@ Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \

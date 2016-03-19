@@ -3,9 +3,9 @@
 *                                 Button Test                                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: button.cpp,v 1.25 2008/03/07 02:44:37 fox Exp $                          *
+* $Id: button.cpp,v 1.26 2009/01/06 13:31:21 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

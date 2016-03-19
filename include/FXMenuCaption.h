@@ -3,7 +3,7 @@
 *                         M e n u C a p t i o n   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuCaption.h,v 1.36 2008/01/04 15:18:22 fox Exp $                     *
+* $Id: FXMenuCaption.h,v 1.38 2009/01/19 22:51:50 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXMENUCAPTION_H
 #define FXMENUCAPTION_H
@@ -42,8 +42,14 @@ class FXFont;
 
 
 /**
-* The menu caption is a widget which can be used as a caption
-* above a number of menu commands in a menu.
+* The menu caption is a widget which can be used as a caption above a number 
+* of menu commands in a menu.
+* When passing a tab-separated list of fields in the text parameter, the caption 
+* text is set to the first field, and the help string to the third field.
+* If the caption text contains an ampersand, the letter following it will be
+* underlined, and a suitable hotkey will be installed.  The actual ampersand
+* will be removed.
+* To display an ampersand in the caption, use two consecutive ampersands.
 */
 class FXAPI FXMenuCaption : public FXWindow {
   FXDECLARE(FXMenuCaption)

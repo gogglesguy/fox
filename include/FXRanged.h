@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n    R a n g e    C l a s s            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRanged.h,v 1.23 2008/06/04 18:34:16 fox Exp $                          *
+* $Id: FXRanged.h,v 1.25 2009/01/26 09:40:23 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXRANGED_H
 #define FXRANGED_H
@@ -38,7 +38,7 @@ public:
   FXVec3d upper;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXRanged(){}
 
   /// Initialize with another range

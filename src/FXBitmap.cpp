@@ -3,7 +3,7 @@
 *                             B i t m a p    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmap.cpp,v 1.103 2008/07/30 23:55:13 fox Exp $                       *
+* $Id: FXBitmap.cpp,v 1.104 2009/01/06 13:24:26 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -840,14 +840,14 @@ void FXBitmap::setOptions(FXuint opts){
 
 
 // Set pixel data ownership flag
-void FXBitmap::setOwned(FXbool owned){ 
+void FXBitmap::setOwned(FXbool owned){
   options^=((0-owned)^options)&BITMAP_OWNED;
   }
 
 
 // Get pixel ownership flag
-FXbool FXBitmap::isOwned() const { 
-  return (options&BITMAP_OWNED)!=0; 
+FXbool FXBitmap::isOwned() const {
+  return (options&BITMAP_OWNED)!=0;
   }
 
 

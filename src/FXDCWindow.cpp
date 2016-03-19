@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.cpp,v 1.186 2008/05/20 14:21:30 fox Exp $                     *
+* $Id: FXDCWindow.cpp,v 1.188 2009/01/06 13:24:28 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -508,7 +508,7 @@ void FXDCWindow::fillComplexPolygonRel(const FXPoint* points,FXuint npoints){
 
 // Fill vertical gradient rectangle
 void FXDCWindow::fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor top,FXColor bottom){
-  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,yl,yh,xx,yy,dy,dx,n,t;
+  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,yl,yh,yy,dy,n,t;
   if(!surface){ fxerror("FXDCWindow::fillVerticalGradient: DC not connected to drawable.\n"); }
   if(0<w && 0<h){
     r1=FXREDVAL(top);
@@ -578,7 +578,7 @@ void FXDCWindow::fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor to
 
 // Fill horizontal gradient rectangle
 void FXDCWindow::fillHorizontalGradient(FXint x,FXint y,FXint w,FXint h,FXColor left,FXColor right){
-  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,yl,yh,xx,yy,dy,dx,n,t;
+  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,xx,dx,n,t;
   if(!surface){ fxerror("FXDCWindow::fillHorizontalGradient: DC not connected to drawable.\n"); }
   if(0<w && 0<h){
     r1=FXREDVAL(left);
@@ -1875,7 +1875,7 @@ void FXDCWindow::fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor to
   v[1].Blue=FXBLUEVAL(bottom)<<8;
   v[1].Alpha=0xFF00;
   ::GradientFill((HDC)ctx,v,2,&r,1,GRADIENT_FILL_RECT_V);
-#endif  
+#endif
   }
 
 
@@ -1899,7 +1899,7 @@ void FXDCWindow::fillHorizontalGradient(FXint x,FXint y,FXint w,FXint h,FXColor 
   v[1].Blue=FXBLUEVAL(right)<<8;
   v[1].Alpha=0xFF00;
   ::GradientFill((HDC)ctx,v,2,&r,1,GRADIENT_FILL_RECT_H);
-#endif  
+#endif
   }
 
 

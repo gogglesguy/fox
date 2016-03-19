@@ -3,7 +3,7 @@
 *                        C U R   C u r s o r    O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2008 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2001,2009 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCURCursor.cpp,v 1.31 2008/07/02 19:36:27 fox Exp $                     *
+* $Id: FXCURCursor.cpp,v 1.32 2009/01/06 13:24:26 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

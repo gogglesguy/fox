@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.166 2008/07/30 23:55:13 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.169 2009/01/21 12:35:00 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -209,6 +209,96 @@ FXImage::FXImage(FXApp* a,const FXColor *pix,FXuint opts,FXint w,FXint h):FXDraw
   }
 
 
+// Change options
+void FXImage::setOptions(FXuint opts){
+  options=(options&~IMAGE_MASK) | (opts&IMAGE_MASK);
+  }
+
+
+// Set pixel data ownership flag
+void FXImage::setOwned(FXbool owned){
+  options^=((0-owned)^options)&IMAGE_OWNED;
+  }
+
+
+// Get pixel ownership flag
+FXbool FXImage::isOwned() const {
+  return (options&IMAGE_OWNED)!=0;
+  }
+
+
+// Attach pixel buffer to image, and assume ownership of it if IMAGE_OWNED is passed
+void FXImage::setData(FXColor *pix,FXuint opts){
+
+  // Free old data
+  if(options&IMAGE_OWNED){ freeElms(data); }
+
+  // Only own pixel buffer if one was passed
+  if(pix && (opts&IMAGE_OWNED)){
+    options|=IMAGE_OWNED;
+    }
+  else{
+    options&=~IMAGE_OWNED;
+    }
+
+  // Set the pointer
+  data=pix;
+  }
+
+
+// Populate the image with new pixel data
+void FXImage::setData(FXColor *pix,FXuint opts,FXint w,FXint h){
+
+  // Free old data
+  if(options&IMAGE_OWNED){ freeElms(data); }
+
+  // Resize pixmap
+  resize(w,h);
+
+  // Only own pixel buffer if one was passed
+  if(pix && (opts&IMAGE_OWNED)){
+    options|=IMAGE_OWNED;
+    }
+  else{
+    options&=~IMAGE_OWNED;
+    }
+
+  // Set the pointer
+  data=pix;
+  }
+
+
+// Scan the image and return false if fully opaque
+FXbool FXImage::hasAlpha() const {
+  if(data){
+    register FXint i=width*height-1;
+    do{
+      if(((const FXuchar*)(data+i))[3]<255) return true;
+      }
+    while(--i>=0);
+    }
+  return false;
+  }
+
+
+#ifdef WIN32
+
+// Return the device context; the image already selected into it
+FXID FXImage::GetDC() const {
+  HDC hdc=::CreateCompatibleDC(NULL);
+  SelectObject(hdc,(HBITMAP)xid);
+  return hdc;
+  }
+
+
+// Release it (no-op)
+int FXImage::ReleaseDC(FXID hdc) const {
+  return ::DeleteDC((HDC)hdc);
+  }
+
+#endif
+
+
 // Create image
 void FXImage::create(){
   if(!xid){
@@ -245,16 +335,6 @@ void FXImage::create(){
   }
 
 
-// Release the client-side buffer, free it if it was owned.
-void FXImage::release(){
-  if(options&IMAGE_OWNED){
-    options&=~IMAGE_OWNED;
-    freeElms(data);
-    }
-  data=NULL;
-  }
-
-
 // Detach image
 void FXImage::detach(){
   visual->detach();
@@ -278,19 +358,6 @@ void FXImage::destroy(){
       }
     xid=0;
     }
-  }
-
-
-// Scan the image and return false if fully opaque
-FXbool FXImage::hasAlpha() const {
-  if(data){
-    register FXint i=width*height-1;
-    do{
-      if(((const FXuchar*)(data+i))[3]<255) return true;
-      }
-    while(--i>=0);
-    }
-  return false;
   }
 
 
@@ -595,25 +662,6 @@ void FXImage::render(){
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
-
-/*
-      // Set up the bitmap info
-      bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-      bmi.bmiHeader.biWidth=width;
-      bmi.bmiHeader.biHeight=height;
-      bmi.bmiHeader.biPlanes=1;
-      bmi.bmiHeader.biBitCount=32;
-      bmi.bmiHeader.biCompression=BI_RGB;
-      bmi.bmiHeader.biSizeImage=0;
-      bmi.bmiHeader.biXPelsPerMeter=0;
-      bmi.bmiHeader.biYPelsPerMeter=0;
-      bmi.bmiHeader.biClrUsed=0;
-      bmi.bmiHeader.biClrImportant=0;
-          FXuchar * dst=NULL;
-
-     xid=CreateDIBSection(NULL,&bmi,DIB_RGB_COLORS,(void**)&dst,NULL,0);
-*/
-
 
       // Set up the bitmap info
       bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
@@ -1451,115 +1499,13 @@ void FXImage::render(){
 #endif
 
 
-/*
-    register FXuint r=FXREDVAL(color);
-    register FXuint g=FXGREENVAL(color);
-    register FXuint b=FXBLUEVAL(color);
-    register FXuint a=FXALPHAVAL(color);
-    register FXuchar *pix=data;
-    register FXuchar *end=pix+height*width*channels;
-    FXuchar  tbl[512];
-
-    // Fill table
-    for(int i=0; i<256; i++){
-      tbl[255+i]=-(i*factor+127)/255;
-      tbl[255-i]= (i*factor+127)/255;
-      }
-
-    // Fade
-    if(channels==4){
-      do{
-        pix[0]=pix[0]+tbl[255+pix[0]-r];
-        pix[1]=pix[1]+tbl[255+pix[1]-g];
-        pix[2]=pix[2]+tbl[255+pix[2]-b];
-        pix[3]=pix[3]+tbl[255+pix[3]-a];
-        pix+=4;
-        }
-      while(pix<end);
-      }
-    else{
-      do{
-        pix[0]=pix[0]+tbl[255+pix[0]-r];
-        pix[1]=pix[1]+tbl[255+pix[1]-g];
-        pix[2]=pix[2]+tbl[255+pix[2]-b];
-        pix+=3;
-        }
-      while(pix<end);
-      }
+// Release the client-side buffer, free it if it was owned.
+void FXImage::release(){
+  if(options&IMAGE_OWNED){
+    options&=~IMAGE_OWNED;
+    freeElms(data);
     }
-*/
-
-  // FXColor ____blend(FXColor fg,FXColor bg){
-//   register FXuint r,g,b,s,t,tmp;
-//   s=FXALPHAVAL(fg);
-//   t=~s;
-//   tmp=FXREDVAL(fg)*s+FXREDVAL(bg)*t+127;     r=(tmp+(tmp>>8))>>8;
-//   tmp=FXGREENVAL(fg)*s+FXGREENVAL(bg)*t+127; g=(tmp+(tmp>>8))>>8;
-//   tmp=FXBLUEVAL(fg)*s+FXBLUEVAL(bg)*t+127;   b=(tmp+(tmp>>8))>>8;
-//   return FXRGB(r,g,b);
-//   }
-/*
-        s=pix[3];
-        t=s^0xff;
-        w=pix[0]*s+r*t; pix[0]=(w+(w>>8))>>8;
-        w=pix[1]*s+g*t; pix[1]=(w+(w>>8))>>8;
-        w=pix[2]*s+b*t; pix[2]=(w+(w>>8))>>8;
-        s=pix[3];
-*/
-
-
-// Fill image with color
-void FXImage::fill(FXColor color){
-  if(data){
-    register FXColor *pix=data;
-    register FXColor *end=pix+height*width;
-    do{ *pix++=color; }while(pix<end);
-    }
-  }
-
-
-// Fade image to uniform color
-void FXImage::fade(FXColor color,FXint factor){
-  if(data){
-    register FXuint s=factor;
-    register FXuint t=~factor;
-    register FXuint r=FXREDVAL(color)*t;
-    register FXuint g=FXGREENVAL(color)*t;
-    register FXuint b=FXBLUEVAL(color)*t;
-    register FXuint a=FXALPHAVAL(color)*t;
-    register FXuint w;
-    register FXuchar *pix=(FXuchar*)data;
-    register FXuchar *end=pix+height*width*4;
-    do{
-      w=pix[0]*s+r; pix[0]=(w+(w>>8))>>8;
-      w=pix[1]*s+g; pix[1]=(w+(w>>8))>>8;
-      w=pix[2]*s+b; pix[2]=(w+(w>>8))>>8;
-      w=pix[3]*s+a; pix[3]=(w+(w>>8))>>8;
-      pix+=4;
-      }
-    while(pix<end);
-    }
-  }
-
-
-// Blend image over uniform color
-void FXImage::blend(FXColor color){
-  if(data){
-    register FXuchar *pix=(FXuchar*)data;
-    register FXuchar *end=pix+height*width*4;
-    register FXint r=FXREDVAL(color);
-    register FXint g=FXGREENVAL(color);
-    register FXint b=FXBLUEVAL(color);
-    register FXint s,w;
-    do{
-      s=pix[3];
-      w=(pix[0]-r)*s; pix[0]=r+((w+(w>>8)+128)>>8);
-      w=(pix[1]-g)*s; pix[1]=g+((w+(w>>8)+128)>>8);
-      w=(pix[2]-b)*s; pix[2]=b+((w+(w>>8)+128)>>8);
-      pix+=4;
-      }
-    while(pix<end);
-    }
+  data=NULL;
   }
 
 
@@ -1812,133 +1758,6 @@ void FXImage::mirror(FXbool horizontal,FXbool vertical){
   }
 
 
-// Shear in X
-static void shearx(FXuchar *out,FXuchar* in,FXint nwidth,FXint owidth,FXint height,FXint shear,FXColor clr){
-  register FXuchar *ppp,*pp,*qq,*p,*q,*k;
-  register FXuint r=FXREDVAL(clr);
-  register FXuint g=FXGREENVAL(clr);
-  register FXuint b=FXBLUEVAL(clr);
-  register FXuint a=FXALPHAVAL(clr);
-  register FXint dp=owidth<<2;
-  register FXint dq=nwidth<<2;
-  register FXint s,z,y,d;
-  if(shear){
-    if(shear>0){ y=height-1; d=-1; } else { shear=-shear; y=0; d=1; }
-    pp=in;
-    ppp=pp+height*dp;
-    qq=out;
-    do{
-      p=pp; pp+=dp;
-      q=qq; qq+=dq;
-      z=(y*shear-1)/(height-1); y+=d;
-      s=z&255;
-      k=q+(z>>8)*4;
-      while(q<k){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
-        q[3]=a;
-        q+=4;
-        }
-      q[0]=((r-p[0])*s+(p[0]<<8)+127)>>8;
-      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
-      q[2]=((b-p[2])*s+(p[2]<<8)+127)>>8;
-      q[3]=((a-p[3])*s+(p[3]<<8)+127)>>8;
-      q+=4;
-      p+=4;
-      while(p<pp){
-        q[0]=((p[0-4]-p[0])*s+(p[0]<<8)+127)>>8;
-        q[1]=((p[1-4]-p[1])*s+(p[1]<<8)+127)>>8;
-        q[2]=((p[2-4]-p[2])*s+(p[2]<<8)+127)>>8;
-        q[3]=((p[3-4]-p[3])*s+(p[3]<<8)+127)>>8;
-        q+=4;
-        p+=4;
-        }
-      q[0]=((p[0-4]-r)*s+(r<<8)+127)>>8;
-      q[1]=((p[1-4]-g)*s+(g<<8)+127)>>8;
-      q[2]=((p[2-4]-b)*s+(b<<8)+127)>>8;
-      q[3]=((p[3-4]-a)*s+(a<<8)+127)>>8;
-      q+=4;
-      while(q<qq){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
-        q[3]=a;
-        q+=4;
-        }
-      }
-    while(pp!=ppp);
-    }
-  else{
-    memcpy(out,in,owidth*height*4);
-    }
-  }
-
-
-// Shear in Y
-static void sheary(FXuchar *out,FXuchar* in,FXint width,FXint nheight,FXint oheight,FXint shear,FXColor clr){
-  register FXuchar *ppp,*pp,*qq,*p,*q,*k;
-  register FXuint r=FXREDVAL(clr);
-  register FXuint g=FXGREENVAL(clr);
-  register FXuint b=FXBLUEVAL(clr);
-  register FXuint a=FXALPHAVAL(clr);
-  register FXint dp=width<<2;
-  register FXint s,z,x,d;
-  if(shear){
-    if(shear>0){ x=width-1; d=-1; } else { shear=-shear; x=0; d=1; }
-    pp=in+dp*oheight;
-    ppp=pp+dp;
-    qq=out+dp*nheight;
-    do{
-      p=pp-dp*oheight;
-      q=qq-dp*nheight;
-      z=(x*shear-1)/(width-1); x+=d;
-      s=z&255;
-      k=q+(z>>8)*dp;
-      while(q<k){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
-        q[3]=a;
-        q+=dp;
-        }
-      q[0]=((r-p[0])*s+(p[0]<<8)+127)>>8;
-      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
-      q[2]=((b-p[2])*s+(p[2]<<8)+127)>>8;
-      q[3]=((a-p[3])*s+(p[3]<<8)+127)>>8;
-      q+=dp;
-      p+=dp;
-      while(p<pp){
-        q[0]=((p[0-dp]-p[0])*s+(p[0]<<8)+127)>>8;
-        q[1]=((p[1-dp]-p[1])*s+(p[1]<<8)+127)>>8;
-        q[2]=((p[2-dp]-p[2])*s+(p[2]<<8)+127)>>8;
-        q[3]=((p[3-dp]-p[3])*s+(p[3]<<8)+127)>>8;
-        q+=dp;
-        p+=dp;
-        }
-      q[0]=((p[0-dp]-r)*s+(r<<8)+127)>>8;
-      q[1]=((p[1-dp]-g)*s+(g<<8)+127)>>8;
-      q[2]=((p[2-dp]-b)*s+(b<<8)+127)>>8;
-      q[3]=((p[3-dp]-a)*s+(a<<8)+127)>>8;
-      q+=dp;
-      while(q<qq){
-        q[0]=r;
-        q[1]=g;
-        q[2]=b;
-        q[3]=a;
-        q+=dp;
-        }
-      pp+=4;
-      qq+=4;
-      }
-    while(pp!=ppp);
-    }
-  else{
-    memcpy(out,in,width*oheight*4);
-    }
-  }
-
-
 // Rotate image by degrees ccw
 void FXImage::rotate(FXint degrees){
   FXTRACE((100,"%s::rotate(%d)\n",getClassName(),degrees));
@@ -2102,6 +1921,226 @@ void FXImage::crop(FXint x,FXint y,FXint w,FXint h,FXColor color){
   }
 
 
+/*
+    register FXuint r=FXREDVAL(color);
+    register FXuint g=FXGREENVAL(color);
+    register FXuint b=FXBLUEVAL(color);
+    register FXuint a=FXALPHAVAL(color);
+    register FXuchar *pix=data;
+    register FXuchar *end=pix+height*width*channels;
+    FXuchar  tbl[512];
+
+    // Fill table
+    for(int i=0; i<256; i++){
+      tbl[255+i]=-(i*factor+127)/255;
+      tbl[255-i]= (i*factor+127)/255;
+      }
+
+    // Fade
+    if(channels==4){
+      do{
+        pix[0]=pix[0]+tbl[255+pix[0]-r];
+        pix[1]=pix[1]+tbl[255+pix[1]-g];
+        pix[2]=pix[2]+tbl[255+pix[2]-b];
+        pix[3]=pix[3]+tbl[255+pix[3]-a];
+        pix+=4;
+        }
+      while(pix<end);
+      }
+    else{
+      do{
+        pix[0]=pix[0]+tbl[255+pix[0]-r];
+        pix[1]=pix[1]+tbl[255+pix[1]-g];
+        pix[2]=pix[2]+tbl[255+pix[2]-b];
+        pix+=3;
+        }
+      while(pix<end);
+      }
+    }
+*/
+
+  // FXColor ____blend(FXColor fg,FXColor bg){
+//   register FXuint r,g,b,s,t,tmp;
+//   s=FXALPHAVAL(fg);
+//   t=~s;
+//   tmp=FXREDVAL(fg)*s+FXREDVAL(bg)*t+127;     r=(tmp+(tmp>>8))>>8;
+//   tmp=FXGREENVAL(fg)*s+FXGREENVAL(bg)*t+127; g=(tmp+(tmp>>8))>>8;
+//   tmp=FXBLUEVAL(fg)*s+FXBLUEVAL(bg)*t+127;   b=(tmp+(tmp>>8))>>8;
+//   return FXRGB(r,g,b);
+//   }
+/*
+        s=pix[3];
+        t=s^0xff;
+        w=pix[0]*s+r*t; pix[0]=(w+(w>>8))>>8;
+        w=pix[1]*s+g*t; pix[1]=(w+(w>>8))>>8;
+        w=pix[2]*s+b*t; pix[2]=(w+(w>>8))>>8;
+        s=pix[3];
+
+*/
+
+
+// Fill image with color
+void FXImage::fill(FXColor color){
+  if(data){
+    register FXColor *pix=data;
+    register FXColor *end=pix+height*width;
+    do{ *pix++=color; }while(pix<end);
+    }
+  }
+
+
+
+// Fade image to uniform color
+void FXImage::fade(FXColor color,FXint factor){
+  if(data){
+    register FXuint s=factor;
+    register FXuint t=~factor;
+    register FXuint r=FXREDVAL(color)*t;
+    register FXuint g=FXGREENVAL(color)*t;
+    register FXuint b=FXBLUEVAL(color)*t;
+    register FXuint a=FXALPHAVAL(color)*t;
+    register FXuint w;
+    register FXuchar *pix=(FXuchar*)data;
+    register FXuchar *end=pix+height*width*4;
+    do{
+      w=pix[0]*s+r; pix[0]=(w+(w>>8))>>8;
+      w=pix[1]*s+g; pix[1]=(w+(w>>8))>>8;
+      w=pix[2]*s+b; pix[2]=(w+(w>>8))>>8;
+      w=pix[3]*s+a; pix[3]=(w+(w>>8))>>8;
+      pix+=4;
+      }
+    while(pix<end);
+    }
+  }
+
+
+// Shear in X
+static void shearx(FXuchar *out,FXuchar* in,FXint nwidth,FXint owidth,FXint height,FXint shear,FXColor clr){
+  register FXuchar *ppp,*pp,*qq,*p,*q,*k;
+  register FXuint r=FXREDVAL(clr);
+  register FXuint g=FXGREENVAL(clr);
+  register FXuint b=FXBLUEVAL(clr);
+  register FXuint a=FXALPHAVAL(clr);
+  register FXint dp=owidth<<2;
+  register FXint dq=nwidth<<2;
+  register FXint s,z,y,d;
+  if(shear){
+    if(shear>0){ y=height-1; d=-1; } else { shear=-shear; y=0; d=1; }
+    pp=in;
+    ppp=pp+height*dp;
+    qq=out;
+    do{
+      p=pp; pp+=dp;
+      q=qq; qq+=dq;
+      z=(y*shear-1)/(height-1); y+=d;
+      s=z&255;
+      k=q+(z>>8)*4;
+      while(q<k){
+        q[0]=r;
+        q[1]=g;
+        q[2]=b;
+        q[3]=a;
+        q+=4;
+        }
+      q[0]=((r-p[0])*s+(p[0]<<8)+127)>>8;
+      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
+      q[2]=((b-p[2])*s+(p[2]<<8)+127)>>8;
+      q[3]=((a-p[3])*s+(p[3]<<8)+127)>>8;
+      q+=4;
+      p+=4;
+      while(p<pp){
+        q[0]=((p[0-4]-p[0])*s+(p[0]<<8)+127)>>8;
+        q[1]=((p[1-4]-p[1])*s+(p[1]<<8)+127)>>8;
+        q[2]=((p[2-4]-p[2])*s+(p[2]<<8)+127)>>8;
+        q[3]=((p[3-4]-p[3])*s+(p[3]<<8)+127)>>8;
+        q+=4;
+        p+=4;
+        }
+      q[0]=((p[0-4]-r)*s+(r<<8)+127)>>8;
+      q[1]=((p[1-4]-g)*s+(g<<8)+127)>>8;
+      q[2]=((p[2-4]-b)*s+(b<<8)+127)>>8;
+      q[3]=((p[3-4]-a)*s+(a<<8)+127)>>8;
+      q+=4;
+      while(q<qq){
+        q[0]=r;
+        q[1]=g;
+        q[2]=b;
+        q[3]=a;
+        q+=4;
+        }
+      }
+    while(pp!=ppp);
+    }
+  else{
+    memcpy(out,in,owidth*height*4);
+    }
+  }
+
+
+// Shear in Y
+static void sheary(FXuchar *out,FXuchar* in,FXint width,FXint nheight,FXint oheight,FXint shear,FXColor clr){
+  register FXuchar *ppp,*pp,*qq,*p,*q,*k;
+  register FXuint r=FXREDVAL(clr);
+  register FXuint g=FXGREENVAL(clr);
+  register FXuint b=FXBLUEVAL(clr);
+  register FXuint a=FXALPHAVAL(clr);
+  register FXint dp=width<<2;
+  register FXint s,z,x,d;
+  if(shear){
+    if(shear>0){ x=width-1; d=-1; } else { shear=-shear; x=0; d=1; }
+    pp=in+dp*oheight;
+    ppp=pp+dp;
+    qq=out+dp*nheight;
+    do{
+      p=pp-dp*oheight;
+      q=qq-dp*nheight;
+      z=(x*shear-1)/(width-1); x+=d;
+      s=z&255;
+      k=q+(z>>8)*dp;
+      while(q<k){
+        q[0]=r;
+        q[1]=g;
+        q[2]=b;
+        q[3]=a;
+        q+=dp;
+        }
+      q[0]=((r-p[0])*s+(p[0]<<8)+127)>>8;
+      q[1]=((g-p[1])*s+(p[1]<<8)+127)>>8;
+      q[2]=((b-p[2])*s+(p[2]<<8)+127)>>8;
+      q[3]=((a-p[3])*s+(p[3]<<8)+127)>>8;
+      q+=dp;
+      p+=dp;
+      while(p<pp){
+        q[0]=((p[0-dp]-p[0])*s+(p[0]<<8)+127)>>8;
+        q[1]=((p[1-dp]-p[1])*s+(p[1]<<8)+127)>>8;
+        q[2]=((p[2-dp]-p[2])*s+(p[2]<<8)+127)>>8;
+        q[3]=((p[3-dp]-p[3])*s+(p[3]<<8)+127)>>8;
+        q+=dp;
+        p+=dp;
+        }
+      q[0]=((p[0-dp]-r)*s+(r<<8)+127)>>8;
+      q[1]=((p[1-dp]-g)*s+(g<<8)+127)>>8;
+      q[2]=((p[2-dp]-b)*s+(b<<8)+127)>>8;
+      q[3]=((p[3-dp]-a)*s+(a<<8)+127)>>8;
+      q+=dp;
+      while(q<qq){
+        q[0]=r;
+        q[1]=g;
+        q[2]=b;
+        q[3]=a;
+        q+=dp;
+        }
+      pp+=4;
+      qq+=4;
+      }
+    while(pp!=ppp);
+    }
+  else{
+    memcpy(out,in,width*oheight*4);
+    }
+  }
+
+
 // Shear image horizontally
 void FXImage::xshear(FXint shear,FXColor clr){
   FXint neww=width+((FXABS(shear)+255)>>8);
@@ -2138,74 +2177,6 @@ void FXImage::yshear(FXint shear,FXColor clr){
     resize(width,newh);
     }
   }
-
-
-/*
-
-
-// Fill with diagonal gradient RGB
-static void dgradientrgba(FXuchar *dst,FXint w,FXint h,FXint r1,FXint g1,FXint b1,FXint a1,FXint r2,FXint g2,FXint b2,FXint a2){
-  register FXint rr,gg,bb,aa,drx,dgx,dbx,dax,dry,dgy,dby,day,x,y;
-  register FXuchar *ptr=dst;
-  FXuchar xtable[4][2048];
-  FXuchar ytable[4][2048];
-  FXASSERT(w>0 && h>0);
-  FXASSERT(w<2048 && h<2048);
-  drx=dry=((r2-r1)<<16);
-  dgx=dgy=((g2-g1)<<16);
-  dbx=dby=((b2-b1)<<16);
-  dax=day=((a2-a1)<<16);
-  rr=(r1<<16)+32768;
-  gg=(g1<<16)+32768;
-  bb=(b1<<16)+32768;
-  aa=(a1<<16)+32768;
-  drx/=(w-1)*2;
-  dgx/=(w-1)*2;
-  dbx/=(w-1)*2;
-  dax/=(w-1)*2;
-  x=w;
-  do{
-    --x;
-    xtable[0][x]=rr>>16; rr+=drx;
-    xtable[1][x]=gg>>16; gg+=dgx;
-    xtable[2][x]=bb>>16; bb+=dbx;
-    xtable[3][x]=aa>>16; aa+=dax;
-    }
-  while(x);
-  rr=32768;
-  gg=32768;
-  bb=32768;
-  aa=32768;
-  dry/=(h-1)*2;
-  dgy/=(h-1)*2;
-  dby/=(h-1)*2;
-  day/=(h-1)*2;
-  y=h;
-  do{
-    --y;
-    ytable[0][y]=rr>>16; rr+=dry;
-    ytable[1][y]=gg>>16; gg+=dgy;
-    ytable[2][y]=bb>>16; bb+=dby;
-    ytable[3][y]=aa>>16; aa+=day;
-    }
-  while(y);
-  y=h;
-  do{
-    --y;
-    x=w;
-    do{
-      --x;
-      ptr[0]=xtable[0][x]+ytable[0][y];
-      ptr[1]=xtable[1][x]+ytable[1][y];
-      ptr[2]=xtable[2][x]+ytable[2][y];
-      ptr[3]=xtable[3][x]+ytable[3][y];
-      ptr+=4;
-      }
-    while(x);
-    }
-  while(y);
-  }
-*/
 
 
 // Fill horizontal gradient
@@ -2363,81 +2334,134 @@ void FXImage::gradient(FXColor topleft,FXColor topright,FXColor bottomleft,FXCol
   }
 
 
-#ifdef WIN32
-
-// Return the device context; the image already selected into it
-FXID FXImage::GetDC() const {
-  HDC hdc=::CreateCompatibleDC(NULL);
-  SelectObject(hdc,(HBITMAP)xid);
-  return hdc;
-  }
-
-
-// Release it (no-op)
-int FXImage::ReleaseDC(FXID hdc) const {
-  return ::DeleteDC((HDC)hdc);
-  }
-
-#endif
-
-
-// Change options
-void FXImage::setOptions(FXuint opts){
-  options=(options&~IMAGE_MASK) | (opts&IMAGE_MASK);
-  }
-
-
-// Set pixel data ownership flag
-void FXImage::setOwned(FXbool owned){ 
-  options^=((0-owned)^options)&IMAGE_OWNED;
-  }
-
-
-// Get pixel ownership flag
-FXbool FXImage::isOwned() const { 
-  return (options&IMAGE_OWNED)!=0; 
-  }
-
-
-// Attach pixel buffer to image, and assume ownership of it if IMAGE_OWNED is passed
-void FXImage::setData(FXColor *pix,FXuint opts){
-
-  // Free old data
-  if(options&IMAGE_OWNED){ freeElms(data); }
-
-  // Only own pixel buffer if one was passed
-  if(pix && (opts&IMAGE_OWNED)){
-    options|=IMAGE_OWNED;
+// Blend image over uniform color
+void FXImage::blend(FXColor color){
+  if(data){
+    register FXuchar *pix=(FXuchar*)data;
+    register FXuchar *end=pix+height*width*4;
+    register FXint r=FXREDVAL(color);
+    register FXint g=FXGREENVAL(color);
+    register FXint b=FXBLUEVAL(color);
+    register FXint s,w;
+    do{
+      s=pix[3];
+      w=(pix[0]-r)*s; pix[0]=r+((w+(w>>8)+128)>>8);
+      w=(pix[1]-g)*s; pix[1]=g+((w+(w>>8)+128)>>8);
+      w=(pix[2]-b)*s; pix[2]=b+((w+(w>>8)+128)>>8);
+      pix+=4;
+      }
+    while(pix<end);
     }
-  else{
-    options&=~IMAGE_OWNED;
-    }
-
-  // Set the pointer
-  data=pix;
   }
 
 
-// Populate the image with new pixel data
-void FXImage::setData(FXColor *pix,FXuint opts,FXint w,FXint h){
-
-  // Free old data
-  if(options&IMAGE_OWNED){ freeElms(data); }
-
-  // Resize pixmap
-  resize(w,h);
-
-  // Only own pixel buffer if one was passed
-  if(pix && (opts&IMAGE_OWNED)){
-    options|=IMAGE_OWNED;
+// Invert colors of an image
+void FXImage::invert(){
+  if(data){
+    register FXuchar *pix=(FXuchar*)data;
+    register FXuchar *end=pix+height*width*4;
+    do{
+      pix[0]=255-pix[0];
+      pix[1]=255-pix[1];
+      pix[2]=255-pix[2];
+      pix+=4;
+      }
+    while(pix<end);
     }
-  else{
-    options&=~IMAGE_OWNED;
-    }
-
-  // Set the pointer
-  data=pix;
   }
+
+
+// Colorize image based on luminance
+void FXImage::colorize(FXColor color){
+  if(data){
+    register FXuchar *pix=(FXuchar*)data;
+    register FXuchar *end=pix+height*width*4;
+    register FXint r=FXREDVAL(color);
+    register FXint g=FXGREENVAL(color);
+    register FXint b=FXBLUEVAL(color);
+    register FXint lum,w;
+    do{
+      if(pix[3]){
+//        lum=(65535-77*pix[0]-151*pix[1]-29*pix[2])>>8;
+        lum=(77*pix[0]+151*pix[1]+29*pix[2])>>8;
+        w=r*lum; pix[0]=(w+(w>>8))>>8;
+        w=g*lum; pix[1]=(w+(w>>8))>>8;
+        w=b*lum; pix[2]=(w+(w>>8))>>8;
+        }
+      pix+=4;
+      }
+    while(pix<end);
+    }
+  }
+
+/*
+
+
+// Fill with diagonal gradient RGB
+static void dgradientrgba(FXuchar *dst,FXint w,FXint h,FXint r1,FXint g1,FXint b1,FXint a1,FXint r2,FXint g2,FXint b2,FXint a2){
+  register FXint rr,gg,bb,aa,drx,dgx,dbx,dax,dry,dgy,dby,day,x,y;
+  register FXuchar *ptr=dst;
+  FXuchar xtable[4][2048];
+  FXuchar ytable[4][2048];
+  FXASSERT(w>0 && h>0);
+  FXASSERT(w<2048 && h<2048);
+  drx=dry=((r2-r1)<<16);
+  dgx=dgy=((g2-g1)<<16);
+  dbx=dby=((b2-b1)<<16);
+  dax=day=((a2-a1)<<16);
+  rr=(r1<<16)+32768;
+  gg=(g1<<16)+32768;
+  bb=(b1<<16)+32768;
+  aa=(a1<<16)+32768;
+  drx/=(w-1)*2;
+  dgx/=(w-1)*2;
+  dbx/=(w-1)*2;
+  dax/=(w-1)*2;
+  x=w;
+  do{
+    --x;
+    xtable[0][x]=rr>>16; rr+=drx;
+    xtable[1][x]=gg>>16; gg+=dgx;
+    xtable[2][x]=bb>>16; bb+=dbx;
+    xtable[3][x]=aa>>16; aa+=dax;
+    }
+  while(x);
+  rr=32768;
+  gg=32768;
+  bb=32768;
+  aa=32768;
+  dry/=(h-1)*2;
+  dgy/=(h-1)*2;
+  dby/=(h-1)*2;
+  day/=(h-1)*2;
+  y=h;
+  do{
+    --y;
+    ytable[0][y]=rr>>16; rr+=dry;
+    ytable[1][y]=gg>>16; gg+=dgy;
+    ytable[2][y]=bb>>16; bb+=dby;
+    ytable[3][y]=aa>>16; aa+=day;
+    }
+  while(y);
+  y=h;
+  do{
+    --y;
+    x=w;
+    do{
+      --x;
+      ptr[0]=xtable[0][x]+ytable[0][y];
+      ptr[1]=xtable[1][x]+ytable[1][y];
+      ptr[2]=xtable[2][x]+ytable[2][y];
+      ptr[3]=xtable[3][x]+ytable[3][y];
+      ptr+=4;
+      }
+    while(x);
+    }
+  while(y);
+  }
+*/
+
+
 
 
 // Save pixel data only

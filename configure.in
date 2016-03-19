@@ -8,7 +8,7 @@ dnl Minor Library release number
 FOX_MINOR_VERSION=7
 
 dnl Increment after every source code change
-FOX_PATCH_LEVEL=18
+FOX_PATCH_LEVEL=19
 
 dnl Binaries compiled with this patchlevel of FOX will need at least
 dnl version MAJOR.MINOR.INTERFACE_VERSION to run. The assertion
@@ -209,7 +209,7 @@ fi
 
 dnl Using reentrant library calls
 AC_MSG_CHECKING(for thread-safe library calls)
-AC_ARG_ENABLE(enable_threadsafe,[  --enable-threadsafe     Thread-safe library calls])
+AC_ARG_ENABLE(threadsafe,[  --enable-threadsafe     Thread-safe library calls])
 AC_MSG_RESULT([$enable_threadsafe])
 if test "x$enable_threadsafe" != "xno" ; then
 CXXFLAGS="${CXXFLAGS} -DFOX_THREAD_SAFE=1 -D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT"

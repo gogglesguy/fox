@@ -3,7 +3,7 @@
 *                    O p e n G L   C a n v a s   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCanvas.cpp,v 1.91 2008/08/06 03:59:14 fox Exp $                      *
+* $Id: FXGLCanvas.cpp,v 1.97 2009/01/16 14:43:42 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -135,11 +135,11 @@ void FXGLCanvas::create(){
       rsc=xid;
 #elif defined(GLX_VERSION_1_3)
       rsc=glXCreateWindow((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),xid,NULL);
+      if(rsc==0){ rsc=xid; }            // For broken glXCreateWindow implementation
 #else
       rsc=xid;
 #endif
 #endif
-
       // Uh-oh, we failed
       if(!rsc){ throw FXWindowException("unable to create GL window."); }
       }

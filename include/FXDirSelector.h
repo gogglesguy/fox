@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirSelector.h,v 1.30 2008/01/04 15:18:15 fox Exp $                     *
+* $Id: FXDirSelector.h,v 1.31 2009/01/06 13:07:23 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXDIRSELECTOR_H
 #define FXDIRSELECTOR_H

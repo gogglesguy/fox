@@ -95,7 +95,7 @@ STRIP = @STRIP@
 VERSION = @VERSION@
 X_BASE_LIBS = @X_BASE_LIBS@
 
-CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
+AM_CXXFLAGS = @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap
 SUFFIXES = .gif .bmp
@@ -358,6 +358,7 @@ half_OBJECTS =  half.$(OBJEXT)
 half_LDADD = $(LDADD)
 half_DEPENDENCIES =  $(top_builddir)/src/libFOX-1.7.la
 half_LDFLAGS = 
+CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -651,7 +652,8 @@ bitmapviewer.o: bitmapviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -750,7 +752,8 @@ button.o: button.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -849,7 +852,8 @@ calendar.o: calendar.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -948,7 +952,8 @@ codecs.o: codecs.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1050,7 +1055,8 @@ console.o: console.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1149,7 +1155,8 @@ datatarget.o: datatarget.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1248,7 +1255,8 @@ dctest.o: dctest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1347,7 +1355,8 @@ dialog.o: dialog.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1446,7 +1455,8 @@ dirlist.o: dirlist.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1545,7 +1555,8 @@ expression.o: expression.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1645,7 +1656,8 @@ format.o: format.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1744,7 +1756,8 @@ foursplit.o: foursplit.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1843,7 +1856,8 @@ gltest.o: gltest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -1956,7 +1970,8 @@ glviewer.o: glviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2069,7 +2084,8 @@ groupbox.o: groupbox.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2169,7 +2185,8 @@ half.o: half.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2268,7 +2285,8 @@ header.o: header.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2367,7 +2385,8 @@ hello.o: hello.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2453,8 +2472,7 @@ hello.o: hello.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
 	../include/FXDebugTarget.h ../include/FXCalendarView.h \
 	../include/FXCalendar.h ../include/FXGradientBar.h \
-	../include/FXConsole.h ../include/FXSplashWindow.h \
-	../include/FXExpression.h
+	../include/FXConsole.h ../include/FXSplashWindow.h
 hello2.o: hello2.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXhalf.h ../include/FXHash.h \
@@ -2467,7 +2485,8 @@ hello2.o: hello2.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2566,7 +2585,8 @@ iconlist.o: iconlist.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2665,7 +2685,8 @@ image.o: image.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2764,7 +2785,8 @@ imageviewer.o: imageviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2863,7 +2885,8 @@ layout.o: layout.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -2962,7 +2985,8 @@ mditest.o: mditest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3062,7 +3086,8 @@ memmap.o: memmap.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3162,7 +3187,8 @@ minheritance.o: minheritance.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3261,7 +3287,8 @@ ratio.o: ratio.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3360,7 +3387,8 @@ rex.o: rex.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3459,7 +3487,8 @@ scan.o: scan.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3558,7 +3587,8 @@ scribble.o: scribble.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3657,7 +3687,8 @@ shutter.o: shutter.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3756,7 +3787,8 @@ splitter.o: splitter.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3856,7 +3888,8 @@ switcher.o: switcher.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -3955,7 +3988,8 @@ tabbook.o: tabbook.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -4054,7 +4088,8 @@ table.o: table.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -4153,7 +4188,8 @@ thread.o: thread.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -4253,7 +4289,8 @@ wizard.o: wizard.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \

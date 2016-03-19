@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDir.cpp,v 1.71 2008/09/24 04:58:20 fox Exp $                           *
+* $Id: FXDir.cpp,v 1.82 2009/01/06 13:24:29 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -36,15 +36,6 @@
   - This class implements a way to list the files in a directory.
   - We just want to wrap directory iteration, nothing fancy.
   - Maybe add positioning for seek and tell type functions.
-  - Maybe add API like:
-
-        FXString name;
-        while(dir.next(name)){
-          ...
-          }
-
-    This would be mode efficient, due to elimination of string copies being returned
-    by dir.name().
 */
 
 
@@ -269,18 +260,18 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 #ifdef WIN32
 
       // Filter out files; a bit tricky...
-      if(!data.isDirectory() && ((flags&NoFiles) || (data.isHidden() && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(pattern,name,mode)))) continue;
+      if(!data.isDirectory() && ((flags&NoFiles) || (data.isHidden() && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,mode)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(pattern,name,mode)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,mode)))) continue;
 
 #else
 
       // Filter out files; a bit tricky...
-      if(!data.isDirectory() && ((flags&NoFiles) || (name[0]=='.' && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(pattern,name,mode)))) continue;
+      if(!data.isDirectory() && ((flags&NoFiles) || (name[0]=='.' && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,mode)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(pattern,name,mode)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,mode)))) continue;
 
 #endif
 
@@ -356,102 +347,7 @@ FXDir::~FXDir(){
   }
 
 
-// Recursively visit files and directories
-FXbool FXDirVisitor::traverse(const FXString& path){
-  FXStat data;
-  if(FXStat::statLink(path,data)){
-    if(data.isDirectory()){
-      if(enter(path)){
-        FXDir directory(path);
-        FXString name;
-        while(directory.next(name)){
-          if(name[0]!='.' || (name[1]!=0 && (name[1]!='.' || name[2]!=0))){ 
-            if(!traverse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name)) break;
-            }
-          }
-        return leave(path);
-        }
-      }
-    else{
-      return visit(path);                // Its a file
-      }
-    }
-  return false;
-  }
-
-
-/*
-// Recursively visit files and directories
-FXint FXDirVisitor::traverse(const FXString& path,const FXString& pattern,FXuint flags){
-  FXDir dir(path);
-  if(dir.isOpen()){
-    FXuint   mode=(flags&FXDir::CaseFold)?(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE|FILEMATCH_CASEFOLD):(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE);
-    FXString pathname;
-    FXString name;
-    FXStat   data;
-    while(dir.next(name)){
-
-      // Get full path
-      pathname=path;
-      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
-      pathname+=name;
-
-      // Get file info
-      if(!FXStat::statFile(pathname,data)) continue;
-
-      // Handle directory
-      if(data.isDirectory()){
-#ifdef WIN32
-        if((flags&FXDir::NoDirs) || (data.isHidden() && !(flags&FXDir::HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&FXDir::NoParent)) || (!(flags&FXDir::AllDirs) && !FXPath::match(pattern,name,mode))) continue;
-#else
-        if((flags&FXDir::NoDirs) || (name[0]=='.' && !(flags&FXDir::HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&FXDir::NoParent)) || (!(flags&FXDir::AllDirs) && !FXPath::match(pattern,name,mode))) continue;
-#endif
-        enter(pathname);
-        if(name[0]!='.' || (name[1]!=0 && (name[1]!='.' || name[2]!=0))){ traverse(pathname,pattern,flags); }
-        leave(pathname);
-        }
-
-      // Handle file
-      else{
-#ifdef WIN32
-        if((flags&FXDir::NoFiles) || (data.isHidden() && !(flags&FXDir::HiddenFiles)) || (!(flags&FXDir::AllFiles) && !FXPath::match(pattern,name,mode))) continue;
-#else
-        if((flags&FXDir::NoFiles) || (name[0]=='.' && !(flags&FXDir::HiddenFiles)) || (!(flags&FXDir::AllFiles) && !FXPath::match(pattern,name,mode))) continue;
-#endif
-        visit(pathname);
-        }
-      }
-    }
-  return 1;
-  }
-*/
-
-
-// Handle directory
-FXbool FXDirVisitor::enter(const FXString& path){
-  FXTRACE((1,"enter(%s)\n",path.text()));
-  return true;
-  }
-
-
-// Handle file
-FXbool FXDirVisitor::visit(const FXString& path){
-  FXTRACE((1,"visit(%s)\n",path.text()));
-  return true;
-  }
-
-
-// Handle directory
-FXbool FXDirVisitor::leave(const FXString& path){
-  FXTRACE((1,"leave(%s)\n",path.text()));
-  return true;
-  }
-
 }
-
-
-
-
 
 
 

@@ -3,9 +3,9 @@
 *                                Thread Pool Test                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: thread.cpp,v 1.28 2008/04/24 14:02:25 fox Exp $                          *
+* $Id: thread.cpp,v 1.29 2009/01/06 13:31:22 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include "FXThreadPool.h"
@@ -56,7 +56,7 @@ FXint Runner::run(){
   return 1;
   }
 
- 
+
 // Generate jobs
 FXint Producer::run(){
   fprintf(stderr,"producer start\n");

@@ -3,9 +3,9 @@
 *                         OpenGL Application coding sample                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: glviewer.cpp,v 1.117 2008/04/18 03:36:28 fox Exp $                       *
+* $Id: glviewer.cpp,v 1.120 2009/01/27 22:34:49 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "fx3d.h"

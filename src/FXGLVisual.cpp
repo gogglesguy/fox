@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLVisual.cpp,v 1.135 2008/09/22 20:50:12 fox Exp $                     *
+* $Id: FXGLVisual.cpp,v 1.138 2009/01/20 17:27:25 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -355,7 +355,7 @@ void FXGLVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-      
+
 #ifdef HAVE_GL_H
 
       PIXELFORMATDESCRIPTOR pfd={sizeof(PIXELFORMATDESCRIPTOR),1,PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|PFD_DOUBLEBUFFER,PFD_TYPE_RGBA,24,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,PFD_MAIN_PLANE,0,0,0,0};
@@ -367,7 +367,7 @@ void FXGLVisual::create(){
       // Get device handle
       HDC hdc=::GetDC(hwnd);
 
-      // Choose pdf & set it
+      // Choose pfd & set it
       v=ChoosePixelFormat(hdc,&pfd);
       if(SetPixelFormat(hdc,v,&pfd)){
 
@@ -830,11 +830,11 @@ void FXGLVisual::create(){
 
       // Destroy dummy window
       DestroyWindow(hwnd);
-      
+
 #endif
 
       }
-      
+
     // Test if successful
     if(!xid){
       throw FXWindowException("unable to create GL context.");
@@ -863,7 +863,7 @@ void FXGLVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-      
+
 #ifdef HAVE_GL_H
 
       // Assume the default
@@ -872,249 +872,256 @@ void FXGLVisual::create(){
 
       // OpenGL is available if we're talking to an OpenGL-capable X-Server
       if(glXQueryExtension((Display*)getApp()->getDisplay(),NULL,NULL)){
-        GLXFBConfig *fb;
-        int nfb;
+        int major,minor;
 
-        // Get frame buffer configurations
-        fb=glXGetFBConfigs((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()),&nfb);
-        if(fb){
-          int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glsamples,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,gldrawables,glrender,gllevel,glaccel;
-          int dred,dgreen,dblue,dalpha,ddepth,dstencil,dsamples,daccred,daccgreen,daccblue,daccalpha,match,visualid,configid;
-          int defvisualid=XVisualIDFromVisual(DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())));
-          int bestmatch=1000000000;
-          int bestvisualid=0;
-          int best=-1;
-          int v;
+        // Try get OpenGL version info
+        if(glXQueryVersion((Display*)getApp()->getDisplay(),&major,&minor)){
+          GLXFBConfig *fb; int nfb;
 
-          FXTRACE((150,"Found %d configs\n",nfb));
-          FXTRACE((150,"Default visualid=0x%02x\n",defvisualid));
+          // Report version found
+          FXTRACE((150,"Found OpenGL version %d.%d\n",major,minor));
 
-          // Find the best one
-          for(v=0; v<nfb; v++){
+          // Get frame buffer configurations
+          fb=glXGetFBConfigs((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()),&nfb);
+          if(fb){
+            int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glsamples,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,gldrawables,glrender,gllevel,glaccel;
+            int dred,dgreen,dblue,dalpha,ddepth,dstencil,dsamples,daccred,daccgreen,daccblue,daccalpha,match,visualid,configid;
+            int defvisualid=XVisualIDFromVisual(DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())));
+            int bestmatch=1000000000;
+            int bestvisualid=0;
+            int best=-1;
+            int v;
 
-            // Get supported drawable targets
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DRAWABLE_TYPE,&gldrawables)!=Success) continue;
-            if((flags&VISUAL_WINDOW) && !(gldrawables&GLX_WINDOW_BIT)) continue;
-            if((flags&VISUAL_IMAGE) && !(gldrawables&GLX_PIXMAP_BIT)) continue;
-            if((flags&VISUAL_BUFFER) && !(gldrawables&GLX_PBUFFER_BIT)) continue;
+            FXTRACE((150,"Found %d configs\n",nfb));
+            FXTRACE((150,"Default visualid=0x%02x\n",defvisualid));
 
-            // Get supported render type; we don't want index mode
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RENDER_TYPE,&glrender)!=Success) continue;
-            if(!(glrender&(GLX_RGBA_BIT|GLX_RGBA_FLOAT_BIT_ARB))) continue;
+            // Find the best one
+            for(v=0; v<nfb; v++){
 
-            // Get overlay level; we don't want overlays
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_LEVEL,&gllevel)!=Success) continue;
-            if(gllevel!=0) continue;
+              // Get supported drawable targets
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DRAWABLE_TYPE,&gldrawables)!=Success) continue;
+              if((flags&VISUAL_WINDOW) && !(gldrawables&GLX_WINDOW_BIT)) continue;
+              if((flags&VISUAL_IMAGE) && !(gldrawables&GLX_PIXMAP_BIT)) continue;
+              if((flags&VISUAL_BUFFER) && !(gldrawables&GLX_PBUFFER_BIT)) continue;
 
-            // Get stereo and double buffer support
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DOUBLEBUFFER,&gldouble)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_STEREO,&glstereo)!=Success) continue;
+              // Get supported render type; we don't want index mode
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RENDER_TYPE,&glrender)!=Success) continue;
+              if(!(glrender&(GLX_RGBA_BIT|GLX_RGBA_FLOAT_BIT_ARB))) continue;
 
-            // Get plane depths
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RED_SIZE,&glredsize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_GREEN_SIZE,&glgreensize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_BLUE_SIZE,&glbluesize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ALPHA_SIZE,&glalphasize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DEPTH_SIZE,&gldepthsize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_STENCIL_SIZE,&glstencilsize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_RED_SIZE,&glaccumredsize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_GREEN_SIZE,&glaccumgreensize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_BLUE_SIZE,&glaccumbluesize)!=Success) continue;
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_ALPHA_SIZE,&glaccumalphasize)!=Success) continue;
+              // Get overlay level; we don't want overlays
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_LEVEL,&gllevel)!=Success) continue;
+              if(gllevel!=0) continue;
 
-            // Get multisample support (if we don't succeed, set it to zero)
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_SAMPLES,&glsamples)!=Success) glsamples=0;
+              // Get stereo and double buffer support
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DOUBLEBUFFER,&gldouble)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_STEREO,&glstereo)!=Success) continue;
 
-            // Frame buffer config id
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_FBCONFIG_ID,&configid)!=Success) continue;
+              // Get plane depths
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RED_SIZE,&glredsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_GREEN_SIZE,&glgreensize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_BLUE_SIZE,&glbluesize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ALPHA_SIZE,&glalphasize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DEPTH_SIZE,&gldepthsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_STENCIL_SIZE,&glstencilsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_RED_SIZE,&glaccumredsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_GREEN_SIZE,&glaccumgreensize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_BLUE_SIZE,&glaccumbluesize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_ALPHA_SIZE,&glaccumalphasize)!=Success) continue;
 
-            // Visual ID if it matters
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_VISUAL_ID,&visualid)!=Success) continue;
+              // Get multisample support (if we don't succeed, set it to zero)
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_SAMPLES,&glsamples)!=Success) glsamples=0;
 
-            // Check if accelerated or not
-            if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_CONFIG_CAVEAT,&glaccel)!=Success) continue;
-            glaccel=(glaccel!=GLX_SLOW_CONFIG);
+              // Frame buffer config id
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_FBCONFIG_ID,&configid)!=Success) continue;
 
-            // We prefer to get a few MORE bits in RGBA than we asked for
-            dred   = glredsize-redSize;     if(dred<0)   dred   *= -100;
-            dgreen = glgreensize-greenSize; if(dgreen<0) dgreen *= -100;
-            dblue  = glbluesize-blueSize;   if(dblue<0)  dblue  *= -100;
-            dalpha = glalphasize-alphaSize; if(dalpha<0) dalpha *= -100;
+              // Visual ID if it matters
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_VISUAL_ID,&visualid)!=Success) continue;
 
-            // Prefer better Z than asked, but colors more important
-            ddepth = gldepthsize-depthSize; if(ddepth<0) ddepth *= -10;
+              // Check if accelerated or not
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_CONFIG_CAVEAT,&glaccel)!=Success) continue;
+              glaccel=(glaccel!=GLX_SLOW_CONFIG);
 
-            // We care about colors and Z depth more than stencil depth
-            dstencil = glstencilsize-stencilSize; if(dstencil<0) dstencil *= -1;
+              // We prefer to get a few MORE bits in RGBA than we asked for
+              dred   = glredsize-redSize;     if(dred<0)   dred   *= -100;
+              dgreen = glgreensize-greenSize; if(dgreen<0) dgreen *= -100;
+              dblue  = glbluesize-blueSize;   if(dblue<0)  dblue  *= -100;
+              dalpha = glalphasize-alphaSize; if(dalpha<0) dalpha *= -100;
 
-            // Accumulation buffers
-            daccred=glaccumredsize-accumRedSize;       if(daccred<0)   daccred   *= -1;
-            daccgreen=glaccumgreensize-accumGreenSize; if(daccgreen<0) daccgreen *= -1;
-            daccblue=glaccumbluesize-accumBlueSize;    if(daccblue<0)  daccblue  *= -1;
-            daccalpha=glaccumalphasize-accumAlphaSize; if(daccalpha<0) daccalpha *= -1;
+              // Prefer better Z than asked, but colors more important
+              ddepth = gldepthsize-depthSize; if(ddepth<0) ddepth *= -10;
 
-            // Want the best colors, of course
-            match=dred+dgreen+dblue+dalpha;
+              // We care about colors and Z depth more than stencil depth
+              dstencil = glstencilsize-stencilSize; if(dstencil<0) dstencil *= -1;
 
-            // Accumulation buffers
-            match+=daccred+daccgreen+daccblue+daccalpha;
+              // Accumulation buffers
+              daccred=glaccumredsize-accumRedSize;       if(daccred<0)   daccred   *= -1;
+              daccgreen=glaccumgreensize-accumGreenSize; if(daccgreen<0) daccgreen *= -1;
+              daccblue=glaccumbluesize-accumBlueSize;    if(daccblue<0)  daccblue  *= -1;
+              daccalpha=glaccumalphasize-accumAlphaSize; if(daccalpha<0) daccalpha *= -1;
 
-            // Hardware accelerated is normally a plus
-            if(!glaccel && !(flags&VISUAL_NO_ACCEL)){
-              match+=10000;
-              }
+              // Want the best colors, of course
+              match=dred+dgreen+dblue+dalpha;
 
-            // Extra penalty for no alpha if we asked for alpha, but no
-            // penalty at all if there is alpha and we didn't ask for it.
-            if(alphaSize>0){
-              if(glalphasize<1) match+=100000;
-              }
+              // Accumulation buffers
+              match+=daccred+daccgreen+daccblue+daccalpha;
 
-            // Wanted Z-buffer
-            if(depthSize>0){
-              if(gldepthsize<1) match+=10000000;
-              else match+=ddepth;
-              }
-            else{
-              if(gldepthsize>0) match+=10000000;
-              }
-
-            // Stencil buffers desired
-            if(stencilSize>0){
-              if(glstencilsize<1) match+=10000;
-              else match+=dstencil;
-              }
-            else{
-              if(glstencilsize>0) match+=1;
-              }
-
-            // Multisamples
-            if(multiSamples>0){
-              dsamples=glsamples-multiSamples;
-              if(dsamples<0) dsamples*=-10;
-              match+=dsamples;
-              }
-            else{
-              if(glsamples>0) match+=100;
-              }
-
-            // Double buffering also quite strongly preferred
-            if(flags&VISUAL_DOUBLE_BUFFER){
-              if(!gldouble) match+=1000000;
-              }
-            else{
-              if(gldouble) match+=1000000;
-              }
-
-            // Stereo not so important
-            if(flags&VISUAL_STEREO){
-              if(!glstereo) match+=10000;
-              }
-            else{
-              if(glstereo) match+=10000;
-              }
-
-            // Want float buffer
-            if(flags&VISUAL_FLOAT){
-              if(!(glrender&GLX_RGBA_FLOAT_BIT_ARB)) match+=1000;
-              }
-            else{
-              if(!(glrender&GLX_RGBA_BIT)) match+=1000;
-              }
-
-            // Trace
-            FXTRACE((150,"Config: #%d: match=%d\n",v,match));
-            FXTRACE((150,"  drawables  = %s%s%s\n",(gldrawables&GLX_WINDOW_BIT)?"GLX_WINDOW_BIT ":"",(gldrawables&GLX_PIXMAP_BIT)?"GLX_PIXMAP_BIT ":"",(gldrawables&GLX_PBUFFER_BIT)?"GLX_PBUFFER_BIT":""));
-            FXTRACE((150,"  render     = %s%s%s\n",(glrender&GLX_RGBA_BIT)?"GLX_RGBA_BIT ":"",(glrender&GLX_COLOR_INDEX_BIT)?"GLX_COLOR_INDEX_BIT ":"",(glrender&GLX_RGBA_FLOAT_BIT_ARB)?"GLX_RGBA_FLOAT_BIT_ARB":""));
-            FXTRACE((150,"  format     = %p\n",fb[v]));
-            FXTRACE((150,"  configid   = 0x%02x\n",configid));
-            FXTRACE((150,"  visualid   = 0x%02x\n",visualid));
-            FXTRACE((150,"  red size   = %d\n",glredsize));
-            FXTRACE((150,"  green size = %d\n",glgreensize));
-            FXTRACE((150,"  blue size  = %d\n",glbluesize));
-            FXTRACE((150,"  alpha size = %d\n",glalphasize));
-            FXTRACE((150,"  depth size = %d\n",gldepthsize));
-            FXTRACE((150,"  double buf = %d\n",gldouble));
-            FXTRACE((150,"  stencil    = %d\n",glstencilsize));
-            FXTRACE((150,"  acc red    = %d\n",glaccumredsize));
-            FXTRACE((150,"  acc green  = %d\n",glaccumgreensize));
-            FXTRACE((150,"  acc blue   = %d\n",glaccumbluesize));
-            FXTRACE((150,"  acc alpha  = %d\n",glaccumalphasize));
-            FXTRACE((150,"  stereo     = %d\n",glstereo));
-            FXTRACE((150,"  samples    = %d\n",glsamples));
-            FXTRACE((150,"  accel      = %d\n",glaccel));
-
-            // May the best config win
-            if(match<=bestmatch){
-
-              // All other things being equal, we prefer default visual!
-              if((match<bestmatch) || (visualid==defvisualid)){
-                actualRedSize=glredsize;
-                actualGreenSize=glgreensize;
-                actualBlueSize=glbluesize;
-                actualAlphaSize=glalphasize;
-                actualDepthSize=gldepthsize;
-                actualStencilSize=glstencilsize;
-                actualMultiSamples=glsamples;
-                actualAccumRedSize=glaccumredsize;
-                actualAccumGreenSize=glaccumgreensize;
-                actualAccumBlueSize=glaccumbluesize;
-                actualAccumAlphaSize=glaccumalphasize;
-                doubleBuffer=gldouble;
-                stereoBuffer=glstereo;
-                accelerated=glaccel;
-                copying=false;
-                bestmatch=match;
-                bestvisualid=visualid;
-                best=v;
+              // Hardware accelerated is normally a plus
+              if(!glaccel && !(flags&VISUAL_NO_ACCEL)){
+                match+=10000;
                 }
-              }
-            }
 
-          // We should have one now
-          if(0<=best){
-            FXTRACE((140,"Best Config: #%d: match=%d\n",best,bestmatch));
+              // Extra penalty for no alpha if we asked for alpha, but no
+              // penalty at all if there is alpha and we didn't ask for it.
+              if(alphaSize>0){
+                if(glalphasize<1) match+=100000;
+                }
 
-            // For window/pixmap drawable, get visual and depth
-            if(bestvisualid){
-              XVisualInfo vitemplate,*vi;
-              int nvi;
+              // Wanted Z-buffer
+              if(depthSize>0){
+                if(gldepthsize<1) match+=10000000;
+                else match+=ddepth;
+                }
+              else{
+                if(gldepthsize>0) match+=10000000;
+                }
 
-              // Get visual, depth
-              vitemplate.screen=DefaultScreen((Display*)getApp()->getDisplay());
-              vitemplate.visualid=bestvisualid;
-              vi=XGetVisualInfo((Display*)getApp()->getDisplay(),VisualScreenMask|VisualIDMask,&vitemplate,&nvi);
-              if(vi){
-                visual=vi[0].visual;
-                depth=vi[0].depth;
+              // Stencil buffers desired
+              if(stencilSize>0){
+                if(glstencilsize<1) match+=10000;
+                else match+=dstencil;
+                }
+              else{
+                if(glstencilsize>0) match+=1;
+                }
 
-                // Initialize colormap
-                setupcolormap();
+              // Multisamples
+              if(multiSamples>0){
+                dsamples=glsamples-multiSamples;
+                if(dsamples<0) dsamples*=-10;
+                match+=dsamples;
+                }
+              else{
+                if(glsamples>0) match+=100;
+                }
 
-                // Make GC's for this visual
-                gc=setupgc(false);
-                scrollgc=setupgc(true);
+              // Double buffering also quite strongly preferred
+              if(flags&VISUAL_DOUBLE_BUFFER){
+                if(!gldouble) match+=1000000;
+                }
+              else{
+                if(gldouble) match+=1000000;
+                }
 
-                XFree((char*)vi);
+              // Stereo not so important
+              if(flags&VISUAL_STEREO){
+                if(!glstereo) match+=10000;
+                }
+              else{
+                if(glstereo) match+=10000;
+                }
+
+              // Want float buffer
+              if(flags&VISUAL_FLOAT){
+                if(!(glrender&GLX_RGBA_FLOAT_BIT_ARB)) match+=1000;
+                }
+              else{
+                if(!(glrender&GLX_RGBA_BIT)) match+=1000;
+                }
+
+              // Trace
+              FXTRACE((150,"Config: #%d: match=%d\n",v,match));
+              FXTRACE((150,"  drawables  = %s%s%s\n",(gldrawables&GLX_WINDOW_BIT)?"GLX_WINDOW_BIT ":"",(gldrawables&GLX_PIXMAP_BIT)?"GLX_PIXMAP_BIT ":"",(gldrawables&GLX_PBUFFER_BIT)?"GLX_PBUFFER_BIT":""));
+              FXTRACE((150,"  render     = %s%s%s\n",(glrender&GLX_RGBA_BIT)?"GLX_RGBA_BIT ":"",(glrender&GLX_COLOR_INDEX_BIT)?"GLX_COLOR_INDEX_BIT ":"",(glrender&GLX_RGBA_FLOAT_BIT_ARB)?"GLX_RGBA_FLOAT_BIT_ARB":""));
+              FXTRACE((150,"  format     = %p\n",fb[v]));
+              FXTRACE((150,"  configid   = 0x%02x\n",configid));
+              FXTRACE((150,"  visualid   = 0x%02x\n",visualid));
+              FXTRACE((150,"  red size   = %d\n",glredsize));
+              FXTRACE((150,"  green size = %d\n",glgreensize));
+              FXTRACE((150,"  blue size  = %d\n",glbluesize));
+              FXTRACE((150,"  alpha size = %d\n",glalphasize));
+              FXTRACE((150,"  depth size = %d\n",gldepthsize));
+              FXTRACE((150,"  double buf = %d\n",gldouble));
+              FXTRACE((150,"  stencil    = %d\n",glstencilsize));
+              FXTRACE((150,"  acc red    = %d\n",glaccumredsize));
+              FXTRACE((150,"  acc green  = %d\n",glaccumgreensize));
+              FXTRACE((150,"  acc blue   = %d\n",glaccumbluesize));
+              FXTRACE((150,"  acc alpha  = %d\n",glaccumalphasize));
+              FXTRACE((150,"  stereo     = %d\n",glstereo));
+              FXTRACE((150,"  samples    = %d\n",glsamples));
+              FXTRACE((150,"  accel      = %d\n",glaccel));
+
+              // May the best config win
+              if(match<=bestmatch){
+
+                // All other things being equal, we prefer default visual!
+                if((match<bestmatch) || (visualid==defvisualid)){
+                  actualRedSize=glredsize;
+                  actualGreenSize=glgreensize;
+                  actualBlueSize=glbluesize;
+                  actualAlphaSize=glalphasize;
+                  actualDepthSize=gldepthsize;
+                  actualStencilSize=glstencilsize;
+                  actualMultiSamples=glsamples;
+                  actualAccumRedSize=glaccumredsize;
+                  actualAccumGreenSize=glaccumgreensize;
+                  actualAccumBlueSize=glaccumbluesize;
+                  actualAccumAlphaSize=glaccumalphasize;
+                  doubleBuffer=gldouble;
+                  stereoBuffer=glstereo;
+                  accelerated=glaccel;
+                  copying=false;
+                  bestmatch=match;
+                  bestvisualid=visualid;
+                  best=v;
+                  }
                 }
               }
 
-            // Remember best config
-            xid=(FXID)fb[best];
-            }
+            // We should have one now
+            if(0<=best){
+              FXTRACE((140,"Best Config: #%d: match=%d\n",best,bestmatch));
 
-          // Free configs
-          XFree(fb);
+              // For window/pixmap drawable, get visual and depth
+              if(bestvisualid){
+                XVisualInfo vitemplate,*vi;
+                int nvi;
+
+                // Get visual, depth
+                vitemplate.screen=DefaultScreen((Display*)getApp()->getDisplay());
+                vitemplate.visualid=bestvisualid;
+                vi=XGetVisualInfo((Display*)getApp()->getDisplay(),VisualScreenMask|VisualIDMask,&vitemplate,&nvi);
+                if(vi){
+                  visual=vi[0].visual;
+                  depth=vi[0].depth;
+
+                  // Initialize colormap
+                  setupcolormap();
+
+                  // Make GC's for this visual
+                  gc=setupgc(false);
+                  scrollgc=setupgc(true);
+
+                  XFree((char*)vi);
+                  }
+                }
+
+              // Remember best config
+              xid=(FXID)fb[best];
+              }
+
+            // Free configs
+            XFree(fb);
+            }
           }
         }
-        
+
 #endif
 
       }
-      
+
     // Test if successful
-    if(!xid){ 
-      throw FXWindowException("no matching GL configuration."); 
+    if(!xid){
+      throw FXWindowException("no matching GL configuration.");
       }
     }
   }
@@ -1137,194 +1144,201 @@ void FXGLVisual::create(){
 
       // OpenGL is available if we're talking to an OpenGL-capable X-Server
       if(glXQueryExtension((Display*)getApp()->getDisplay(),NULL,NULL)){
-        XVisualInfo vitemplate,*vi;
-        int nvi;
+        int major,minor;
 
-        // Scan for all visuals of given screen
-        vitemplate.screen=DefaultScreen((Display*)getApp()->getDisplay());
-        vi=XGetVisualInfo((Display*)getApp()->getDisplay(),VisualScreenMask,&vitemplate,&nvi);
-        if(vi){
-          int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,glusable,glrender,gllevel;
-          int dred,dgreen,dblue,dalpha,ddepth,dstencil,daccred,daccgreen,daccblue,daccalpha,match,visualid;
-          int defvisualid=XVisualIDFromVisual(DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())));
-          int bestmatch=1000000000;
-          int best=-1;
-          int v;
+        // Try get OpenGL version info
+        if(glXQueryVersion((Display*)getApp()->getDisplay(),&major,&minor)){
+          XVisualInfo vitemplate,*vi; int nvi;
 
-          FXTRACE((150,"Found %d configs\n",nvi));
-          FXTRACE((150,"Default visualid=0x%02x\n",defvisualid));
+          // Report version found
+          FXTRACE((150,"Found OpenGL version %d.%d\n",major,minor));
 
-          // Find the best one
-          for(v=0; v<nvi; v++){
+          // Scan for all visuals of given screen
+          vitemplate.screen=DefaultScreen((Display*)getApp()->getDisplay());
+          vi=XGetVisualInfo((Display*)getApp()->getDisplay(),VisualScreenMask,&vitemplate,&nvi);
+          if(vi){
+            int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,glusable,glrender,gllevel;
+            int dred,dgreen,dblue,dalpha,ddepth,dstencil,daccred,daccgreen,daccblue,daccalpha,match,visualid;
+            int defvisualid=XVisualIDFromVisual(DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())));
+            int bestmatch=1000000000;
+            int best=-1;
+            int v;
 
-            // GL support is requested
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_USE_GL,&glusable)!=Success) continue;
-            if(!glusable) continue;
+            FXTRACE((150,"Found %d configs\n",nvi));
+            FXTRACE((150,"Default visualid=0x%02x\n",defvisualid));
 
-            // Get supported drawable targets
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_RGBA,&glrender)!=Success) continue;
-            if(!glrender) continue;
+            // Find the best one
+            for(v=0; v<nvi; v++){
 
-            // Get overlay level
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_LEVEL,&gllevel)!=Success) continue;
-            if(gllevel) continue;
+              // GL support is requested
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_USE_GL,&glusable)!=Success) continue;
+              if(!glusable) continue;
 
-            // Get stereo and double buffer support
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_DOUBLEBUFFER,&gldouble)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_STEREO,&glstereo)!=Success) continue;
+              // Get supported drawable targets
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_RGBA,&glrender)!=Success) continue;
+              if(!glrender) continue;
 
-            // Get plane depths
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_RED_SIZE,&glredsize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_GREEN_SIZE,&glgreensize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_BLUE_SIZE,&glbluesize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ALPHA_SIZE,&glalphasize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_DEPTH_SIZE,&gldepthsize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_STENCIL_SIZE,&glstencilsize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_RED_SIZE,&glaccumredsize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_GREEN_SIZE,&glaccumgreensize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_BLUE_SIZE,&glaccumbluesize)!=Success) continue;
-            if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_ALPHA_SIZE,&glaccumalphasize)!=Success) continue;
+              // Get overlay level
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_LEVEL,&gllevel)!=Success) continue;
+              if(gllevel) continue;
 
-            // Visual ID if it matters
-            visualid=vi[v].visualid;
+              // Get stereo and double buffer support
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_DOUBLEBUFFER,&gldouble)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_STEREO,&glstereo)!=Success) continue;
 
-            // We prefer to get a few MORE bits in RGBA than we asked for
-            dred   = glredsize-redSize;     if(dred<0)   dred   *= -100;
-            dgreen = glgreensize-greenSize; if(dgreen<0) dgreen *= -100;
-            dblue  = glbluesize-blueSize;   if(dblue<0)  dblue  *= -100;
-            dalpha = glalphasize-alphaSize; if(dalpha<0) dalpha *= -100;
+              // Get plane depths
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_RED_SIZE,&glredsize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_GREEN_SIZE,&glgreensize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_BLUE_SIZE,&glbluesize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ALPHA_SIZE,&glalphasize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_DEPTH_SIZE,&gldepthsize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_STENCIL_SIZE,&glstencilsize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_RED_SIZE,&glaccumredsize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_GREEN_SIZE,&glaccumgreensize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_BLUE_SIZE,&glaccumbluesize)!=Success) continue;
+              if(glXGetConfig((Display*)getApp()->getDisplay(),&vi[v],GLX_ACCUM_ALPHA_SIZE,&glaccumalphasize)!=Success) continue;
 
-            // Prefer better Z than asked, but colors more important
-            ddepth = gldepthsize-depthSize; if(ddepth<0) ddepth *= -10;
+              // Visual ID if it matters
+              visualid=vi[v].visualid;
 
-            // We care about colors and Z depth more than stencil depth
-            dstencil = glstencilsize-stencilSize; if(dstencil<0) dstencil *= -1;
+              // We prefer to get a few MORE bits in RGBA than we asked for
+              dred   = glredsize-redSize;     if(dred<0)   dred   *= -100;
+              dgreen = glgreensize-greenSize; if(dgreen<0) dgreen *= -100;
+              dblue  = glbluesize-blueSize;   if(dblue<0)  dblue  *= -100;
+              dalpha = glalphasize-alphaSize; if(dalpha<0) dalpha *= -100;
 
-            // Accumulation buffers
-            daccred=glaccumredsize-accumRedSize;       if(daccred<0)   daccred   *= -1;
-            daccgreen=glaccumgreensize-accumGreenSize; if(daccgreen<0) daccgreen *= -1;
-            daccblue=glaccumbluesize-accumBlueSize;    if(daccblue<0)  daccblue  *= -1;
-            daccalpha=glaccumalphasize-accumAlphaSize; if(daccalpha<0) daccalpha *= -1;
+              // Prefer better Z than asked, but colors more important
+              ddepth = gldepthsize-depthSize; if(ddepth<0) ddepth *= -10;
 
-            // Want the best colors, of course
-            match=dred+dgreen+dblue+dalpha;
+              // We care about colors and Z depth more than stencil depth
+              dstencil = glstencilsize-stencilSize; if(dstencil<0) dstencil *= -1;
 
-            // Accumulation buffers
-            match+=daccred+daccgreen+daccblue+daccalpha;
+              // Accumulation buffers
+              daccred=glaccumredsize-accumRedSize;       if(daccred<0)   daccred   *= -1;
+              daccgreen=glaccumgreensize-accumGreenSize; if(daccgreen<0) daccgreen *= -1;
+              daccblue=glaccumbluesize-accumBlueSize;    if(daccblue<0)  daccblue  *= -1;
+              daccalpha=glaccumalphasize-accumAlphaSize; if(daccalpha<0) daccalpha *= -1;
 
-            // Extra penalty for no alpha if we asked for alpha, but no
-            // penalty at all if there is alpha and we didn't ask for it.
-            if(alphaSize>0){
-              if(glalphasize<1) match+=100000;
-              }
+              // Want the best colors, of course
+              match=dred+dgreen+dblue+dalpha;
 
-            // Wanted Z-buffer
-            if(depthSize>0){
-              if(gldepthsize<1) match+=10000000;
-              else match+=ddepth;
-              }
-            else{
-              if(gldepthsize>0) match+=10000000;
-              }
+              // Accumulation buffers
+              match+=daccred+daccgreen+daccblue+daccalpha;
 
-            // Stencil buffers desired
-            if(stencilSize>0){
-              if(glstencilsize<1) match+=10000;
-              else match+=dstencil;
-              }
-            else{
-              if(glstencilsize>0) match+=1;
-              }
+              // Extra penalty for no alpha if we asked for alpha, but no
+              // penalty at all if there is alpha and we didn't ask for it.
+              if(alphaSize>0){
+                if(glalphasize<1) match+=100000;
+                }
 
-            // Double buffering also quite strongly preferred
-            if(flags&VISUAL_DOUBLE_BUFFER){
-              if(!gldouble) match+=1000000;
-              }
-            else{
-              if(gldouble) match+=1000000;
-              }
+              // Wanted Z-buffer
+              if(depthSize>0){
+                if(gldepthsize<1) match+=10000000;
+                else match+=ddepth;
+                }
+              else{
+                if(gldepthsize>0) match+=10000000;
+                }
 
-            // Stereo not so important
-            if(flags&VISUAL_STEREO){
-              if(!glstereo) match+=10000;
-              }
-            else{
-              if(glstereo) match+=10000;
-              }
+              // Stencil buffers desired
+              if(stencilSize>0){
+                if(glstencilsize<1) match+=10000;
+                else match+=dstencil;
+                }
+              else{
+                if(glstencilsize>0) match+=1;
+                }
 
-            // Trace
-            FXTRACE((150,"Config: #%d: match=%d\n",v,match));
-            FXTRACE((150,"  visualid   = 0x%02x\n",visualid));
-            FXTRACE((150,"  red size   = %d\n",glredsize));
-            FXTRACE((150,"  green size = %d\n",glgreensize));
-            FXTRACE((150,"  blue size  = %d\n",glbluesize));
-            FXTRACE((150,"  alpha size = %d\n",glalphasize));
-            FXTRACE((150,"  depth size = %d\n",gldepthsize));
-            FXTRACE((150,"  double buf = %d\n",gldouble));
-            FXTRACE((150,"  stencil    = %d\n",glstencilsize));
-            FXTRACE((150,"  acc red    = %d\n",glaccumredsize));
-            FXTRACE((150,"  acc green  = %d\n",glaccumgreensize));
-            FXTRACE((150,"  acc blue   = %d\n",glaccumbluesize));
-            FXTRACE((150,"  acc alpha  = %d\n",glaccumalphasize));
-            FXTRACE((150,"  stereo     = %d\n",glstereo));
+              // Double buffering also quite strongly preferred
+              if(flags&VISUAL_DOUBLE_BUFFER){
+                if(!gldouble) match+=1000000;
+                }
+              else{
+                if(gldouble) match+=1000000;
+                }
 
-            // May the best config win
-            if(match<=bestmatch){
+              // Stereo not so important
+              if(flags&VISUAL_STEREO){
+                if(!glstereo) match+=10000;
+                }
+              else{
+                if(glstereo) match+=10000;
+                }
 
-              // All other things being equal, we prefer default visual!
-              if((match<bestmatch) || (visualid==defvisualid)){
-                actualRedSize=glredsize;
-                actualGreenSize=glgreensize;
-                actualBlueSize=glbluesize;
-                actualAlphaSize=glalphasize;
-                actualDepthSize=gldepthsize;
-                actualStencilSize=glstencilsize;
-                actualMultiSamples=0;
-                actualAccumRedSize=glaccumredsize;
-                actualAccumGreenSize=glaccumgreensize;
-                actualAccumBlueSize=glaccumbluesize;
-                actualAccumAlphaSize=glaccumalphasize;
-                doubleBuffer=gldouble;
-                stereoBuffer=glstereo;
-                accelerated=true;
-                copying=false;
-                bestmatch=match;
-                best=v;
+              // Trace
+              FXTRACE((150,"Config: #%d: match=%d\n",v,match));
+              FXTRACE((150,"  visualid   = 0x%02x\n",visualid));
+              FXTRACE((150,"  red size   = %d\n",glredsize));
+              FXTRACE((150,"  green size = %d\n",glgreensize));
+              FXTRACE((150,"  blue size  = %d\n",glbluesize));
+              FXTRACE((150,"  alpha size = %d\n",glalphasize));
+              FXTRACE((150,"  depth size = %d\n",gldepthsize));
+              FXTRACE((150,"  double buf = %d\n",gldouble));
+              FXTRACE((150,"  stencil    = %d\n",glstencilsize));
+              FXTRACE((150,"  acc red    = %d\n",glaccumredsize));
+              FXTRACE((150,"  acc green  = %d\n",glaccumgreensize));
+              FXTRACE((150,"  acc blue   = %d\n",glaccumbluesize));
+              FXTRACE((150,"  acc alpha  = %d\n",glaccumalphasize));
+              FXTRACE((150,"  stereo     = %d\n",glstereo));
+
+              // May the best config win
+              if(match<=bestmatch){
+
+                // All other things being equal, we prefer default visual!
+                if((match<bestmatch) || (visualid==defvisualid)){
+                  actualRedSize=glredsize;
+                  actualGreenSize=glgreensize;
+                  actualBlueSize=glbluesize;
+                  actualAlphaSize=glalphasize;
+                  actualDepthSize=gldepthsize;
+                  actualStencilSize=glstencilsize;
+                  actualMultiSamples=0;
+                  actualAccumRedSize=glaccumredsize;
+                  actualAccumGreenSize=glaccumgreensize;
+                  actualAccumBlueSize=glaccumbluesize;
+                  actualAccumAlphaSize=glaccumalphasize;
+                  doubleBuffer=gldouble;
+                  stereoBuffer=glstereo;
+                  accelerated=true;
+                  copying=false;
+                  bestmatch=match;
+                  best=v;
+                  }
                 }
               }
+
+            // We should have one now
+            if(0<=best){
+              FXTRACE((140,"Best Config: #%d: match=%d\n",best,bestmatch));
+
+              // Remember visual, depth, visualid
+              visual=vi[best].visual;
+              depth=vi[best].depth;
+
+              // Initialize colormap
+              setupcolormap();
+
+              // Make GC's for this visual
+              scrollgc=setupgc(true);
+              gc=setupgc(false);
+
+              // Remember best config
+              xid=((Visual*)visual)->visualid;
+              }
+
+            // Free visual info
+            XFree((char*)vi);
             }
-
-          // We should have one now
-          if(0<=best){
-            FXTRACE((140,"Best Config: #%d: match=%d\n",best,bestmatch));
-
-            // Remember visual, depth, visualid
-            visual=vi[best].visual;
-            depth=vi[best].depth;
-
-            // Initialize colormap
-            setupcolormap();
-
-            // Make GC's for this visual
-            scrollgc=setupgc(true);
-            gc=setupgc(false);
-
-            // Remember best config
-            xid=((Visual*)visual)->visualid;
-            }
-
-          // Free visual info
-          XFree((char*)vi);
           }
         }
-        
+
 #endif
 
       }
-      
+
     // Test if successful
-    if(!xid){ 
-      throw FXWindowException("no matching GL configuration."); 
+    if(!xid){
+      throw FXWindowException("no matching GL configuration.");
       }
     }
   }

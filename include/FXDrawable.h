@@ -3,7 +3,7 @@
 *                           D r a w a b l e   A r e a                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDrawable.h,v 1.30 2008/04/23 17:30:40 fox Exp $                        *
+* $Id: FXDrawable.h,v 1.31 2009/01/06 13:07:23 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDRAWABLE_H
 #define FXDRAWABLE_H

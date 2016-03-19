@@ -3,7 +3,7 @@
 *                        T o o l   B a r   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToolBar.h,v 1.32 2008/01/04 15:18:27 fox Exp $                         *
+* $Id: FXToolBar.h,v 1.33 2009/01/06 13:07:28 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXTOOLBAR_H
 #define FXTOOLBAR_H

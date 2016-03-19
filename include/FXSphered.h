@@ -3,7 +3,7 @@
 *           D o u b l e - P r e c i s i o n    S p h e r e    C l a s s         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSphered.h,v 1.23 2008/06/04 17:48:47 fox Exp $                         *
+* $Id: FXSphered.h,v 1.25 2009/01/26 09:40:23 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSPHERED_H
 #define FXSPHERED_H
@@ -38,7 +38,7 @@ public:
   FXdouble radius;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXSphered(){}
 
   /// Copy constructor
@@ -119,7 +119,7 @@ public:
 
   /// Transform sphere by 4x4 matrix
   FXSphered transform(const FXMat4d& mat) const;
-  
+
   /// Test if box overlaps with sphere
   friend FXAPI FXbool overlap(const FXRanged& a,const FXSphered& b);
 

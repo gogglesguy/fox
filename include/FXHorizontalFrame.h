@@ -3,7 +3,7 @@
 *              H o r i z o n t a l   C o n t a i n e r   W i d g e t            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXHorizontalFrame.h,v 1.20 2008/01/04 15:18:19 fox Exp $                 *
+* $Id: FXHorizontalFrame.h,v 1.21 2009/01/06 13:07:24 fox Exp $                 *
 ********************************************************************************/
 #ifndef FXHORIZONTALFRAME_H
 #define FXHORIZONTALFRAME_H

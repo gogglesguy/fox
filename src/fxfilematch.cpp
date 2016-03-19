@@ -3,7 +3,7 @@
 *                   W i l d c a r d   M a t c h   F u n c t i o n               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxfilematch.cpp,v 1.21 2008/01/04 15:42:45 fox Exp $                     *
+* $Id: fxfilematch.cpp,v 1.26 2009/01/06 13:24:46 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -80,37 +80,37 @@ namespace FX {
 
 
 // Perform match
-static FXbool domatch(const char *pattern,const char *string,FXuint flags){
-  register const char *p=pattern;
-  register const char *q=string;
-  register const char *s;
-  register char c,cs,ce,cc,neg;
-  register int level;
+static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
+  register const FXchar *s=string;
+  register const FXchar *p=pattern;
+  register const FXchar *r;
+  register FXchar c,cs,ce,cc,neg;
+  register FXint level;
   while((c=*p++)!='\0'){
     switch(c){
       case '?':
-        if(*q=='\0') return false;
-        if((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*q)) return false;
-        if((flags&FILEMATCH_PERIOD) && (*q=='.') && ((q==string) || ((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*(q-1))))) return false;
-        q++;
+        if(*s=='\0') return false;
+        if((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*s)) return false;
+        if((flags&FILEMATCH_PERIOD) && (*s=='.') && ((s==string) || ((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*(s-1))))) return false;
+        s++;
         break;
       case '*':
         c=*p;
         while(c=='*') c=*++p;
-        if((flags&FILEMATCH_PERIOD) && (*q=='.') && ((q==string) || ((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*(q-1))))) return false;
+        if((flags&FILEMATCH_PERIOD) && (*s=='.') && ((s==string) || ((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*(s-1))))) return false;
         if(c=='\0'){    // Optimize for case of trailing '*'
-          if(flags&FILEMATCH_FILE_NAME){ for(s=q; *s; s++){ if(ISPATHSEP(*s)) return false; } }
+          if(flags&FILEMATCH_FILE_NAME){ for(r=s; *r; r++){ if(ISPATHSEP(*r)) return false; } }
           return 1;
           }
-        while(!domatch(p,q,flags&~FILEMATCH_PERIOD)){
-          if((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*q)) return false;
-          if(*q++=='\0') return false;
+        while(!domatch(s,p,flags&~FILEMATCH_PERIOD)){
+          if((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*s)) return false;
+          if(*s++=='\0') return false;
           }
         return 1;
       case '[':
-        if(*q=='\0') return false;
-        if((flags&FILEMATCH_PERIOD) && (*q=='.') && ((q==string) || ((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*(q-1))))) return false;
-        cc=FOLD(*q);
+        if(*s=='\0') return false;
+        if((flags&FILEMATCH_PERIOD) && (*s=='.') && ((s==string) || ((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(*(s-1))))) return false;
+        cc=FOLD(*s);
         neg=((*p=='!') || (*p=='^'));
         if(neg) p++;
         c=*p++;
@@ -132,7 +132,7 @@ static FXbool domatch(const char *pattern,const char *string,FXuint flags){
           }
         while(c!=']');
         if(!neg) return false;
-        q++;
+        s++;
         break;
 match:  while(c!=']'){
           if(c=='\0') return false;
@@ -140,10 +140,10 @@ match:  while(c!=']'){
           if(c=='\\' && !(flags&FILEMATCH_NOESCAPE)) p++;
           }
         if(neg) return false;
-        q++;
+        s++;
         break;
       case '(':
-nxt:    if(domatch(p,q,flags)) return true;
+nxt:    if(domatch(s,p,flags)) return true;
         for(level=0; *p && 0<=level; ){
           switch(*p++){
             case '\\': if(*p) p++; break;
@@ -169,22 +169,22 @@ nxt:    if(domatch(p,q,flags)) return true;
       case '\\':
         if(*p && !(flags&FILEMATCH_NOESCAPE)) c=*p++;   // Trailing escape represents itself
       default:
-        if(FOLD(c)!=FOLD(*q)) return false;
-        q++;
+        if(FOLD(c)!=FOLD(*s)) return false;
+        s++;
         break;
       }
     }
-  return (*q=='\0') || (ISPATHSEP(*q) && (flags&FILEMATCH_LEADING_DIR));
+  return (*s=='\0') || (ISPATHSEP(*s) && (flags&FILEMATCH_LEADING_DIR));
   }
 
 
 // Public API to matcher
-FXbool fxfilematch(const char *pattern,const char *string,FXuint flags){
-  register const char *p=pattern;
-  register const char *q=string;
-  register int level;
-  if(p && q){
-nxt:if(domatch(p,q,flags)) return true;
+FXbool fxfilematch(const FXchar *string,const FXchar *pattern,FXuint flags){
+  register const FXchar *s=string;
+  register const FXchar *p=pattern;
+  register FXint level;
+  if(s && p){
+nxt:if(domatch(s,p,flags)) return true;
     for(level=0; *p && 0<=level; ){
       switch(*p++){
         case '\\': if(*p) p++; break;
@@ -197,5 +197,6 @@ nxt:if(domatch(p,q,flags)) return true;
     }
   return false;
   }
+
 
 }

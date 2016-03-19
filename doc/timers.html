@@ -121,11 +121,11 @@ MyObject::~MyObject(){
 
 <p>Timers are <b>fired</b> when the application returns to the event loop.
 This may cause timers to be invoked a bit later than specified by the timer interval.
-For a single "one-shot" timeout, this <em>jitter</em> is typically small.  
+For a single "one-shot" timeout, this <em>jitter</em> is typically small.
 But for periodic timeouts, the amount of jitter may build up, causing the errors between
 desired fire-time and actual fire-time to get larger and larger.<br>
 Furtunately, there is an alternate timeout method:</p>
-  
+
 <pre>
 // Register Timer callback message at one second from now
 MyObject* object;
@@ -133,15 +133,15 @@ void *userdata;
 FXTime later=FXThread::time()+1000000000L;
 app-><b>addDeadline</b>(object,ID_ANIMATIONSTEP,later,userdata);
 </pre>
-  
-<p>This sets a timer to fire at time <em>later</em>, where <em>later</em> is 
+
+<p>This sets a timer to fire at time <em>later</em>, where <em>later</em> is
 specified as absolute time in nanoseconds since Jan. 1st, 1970.  Each time
 the timer fires, we can add 1000000000 to get to the next timeout.  This
 way, the errors do not build up but stay within bounds.<br>
 
 Note, however, that this approach might be a slightly dangerous: we're assuming
-that processing the timeout-handler takes less time than the amount of time 
-added to get to the next due-time.  If processing the timeout-handler takes 
+that processing the timeout-handler takes less time than the amount of time
+added to get to the next due-time.  If processing the timeout-handler takes
 more time, then the system might choke on handling nothing but timeouts!<br>
 
 Therefore, the <b>addDeadline()</b> method is recommended for long duraration
@@ -219,7 +219,7 @@ app->removeChore(object,ID_ANIMATIONSTEP);
 
   <p>Like timers, it is OK to remove a chore that has already fired.
   Thus, classes which are receiving a chore message can remove it
-  in the destructor, regardless of whether it has already fired or not.  
+  in the destructor, regardless of whether it has already fired or not.
   This can substantially simplify book keeping.</p>
 
 <p>To check if a chore has been set, use the <b>FXApp::hasChore()</b> API:</p>
@@ -392,7 +392,7 @@ same callback message handler <b>ID</b> for all three types of I/O activities.
 The optional user-data pointer is passed along to the message handler, to
 help it determine what to do.  For example, you may want to pass along the
 socket file descriptor, cast to a void-pointer.</p>
-  
+
 <p>To remove a callback message handler, you can call <b>FXApp::removeInput()</b>
 as follows:</p>
 
@@ -414,10 +414,14 @@ say].</p>
 
 <!--- COPYRIGHT -->
 <p>
-<table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>
-<img src='art/line.gif' width=100% height=1><font size=-1>
-Copyright &copy; 1997-2008 Jeroen van der Zijp</font>
-</td></tr></table>
+<table width=100% cellpadding=0 cellspacing=0>
+<tr>
+<td width=100% valign=top id=HEADLINE align=right>
+<img src='art/line.gif' width=100% height=1>
+<font size=-1>Copyright &copy; 1997-2009 Jeroen van der Zijp</font>
+</td>
+</tr>
+</table>
 </p>
 <!--- COPYRIGHT -->
 

@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorSelector.h,v 1.36 2008/07/22 19:28:02 fox Exp $                   *
+* $Id: FXColorSelector.h,v 1.38 2009/01/06 13:07:22 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXCOLORSELECTOR_H
 #define FXCOLORSELECTOR_H
@@ -70,7 +70,7 @@ protected:
   FXfloat       rgba[4];              // Accurate RGBA color
   FXfloat       hsva[4];              // Accurate HSVA color
 protected:
-  static const FXchar* wellname[24];  // Well names
+  static const FXchar *const wellname[24];
 protected:
   FXColorSelector(){}
   void updateWell();

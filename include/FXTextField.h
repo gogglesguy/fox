@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.h,v 1.86 2008/04/24 16:22:59 fox Exp $                       *
+* $Id: FXTextField.h,v 1.87 2009/01/06 13:07:28 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTEXTFIELD_H
 #define FXTEXTFIELD_H

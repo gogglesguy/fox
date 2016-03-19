@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXVec3d.h,v 1.26 2008/01/04 15:18:28 fox Exp $                           *
+* $Id: FXVec3d.h,v 1.29 2009/02/04 18:11:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXVEC3D_H
 #define FXVEC3D_H
@@ -39,7 +39,7 @@ public:
   FXdouble z;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXVec3d(){}
 
   /// Initialize from another vector
@@ -51,17 +51,11 @@ public:
   /// Initialize with components
   FXVec3d(FXdouble xx,FXdouble yy,FXdouble zz=1.0){x=xx;y=yy;z=zz;}
 
-  /// Initialize with color
-  FXVec3d(FXColor color);
-
   /// Return a non-const reference to the ith element
   FXdouble& operator[](FXint i){return (&x)[i];}
 
   /// Return a const reference to the ith element
   const FXdouble& operator[](FXint i) const {return (&x)[i];}
-
-  /// Assign color
-  FXVec3d& operator=(FXColor color);
 
   /// Assignment
   FXVec3d& operator=(const FXVec3d& v){x=v.x;y=v.y;z=v.z;return *this;}
@@ -89,9 +83,6 @@ public:
   operator const FXdouble*() const {return &x;}
   operator FXVec2d&(){return *reinterpret_cast<FXVec2d*>(this);}
   operator const FXVec2d&() const {return *reinterpret_cast<const FXVec2d*>(this);}
-
-  /// Convert to color
-  operator FXColor() const;
 
   /// Unary
   FXVec3d operator+() const { return *this; }
@@ -156,6 +147,10 @@ public:
   friend inline FXVec3d lo(const FXVec3d& a,const FXVec3d& b);
   friend inline FXVec3d hi(const FXVec3d& a,const FXVec3d& b);
 
+  /// Convert vector to color and back
+  friend FXAPI FXColor colorFromVec3d(const FXVec3d& vec);
+  friend FXAPI FXVec3d colorToVec3d(FXColor clr);
+
   /// Compute normal from three points a,b,c
   friend FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
 
@@ -195,6 +190,9 @@ inline FXbool operator>=(FXdouble n,const FXVec3d& a){return n>=a.x && n>=a.y &&
 
 inline FXVec3d lo(const FXVec3d& a,const FXVec3d& b){return FXVec3d(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z));}
 inline FXVec3d hi(const FXVec3d& a,const FXVec3d& b){return FXVec3d(FXMAX(a.x,b.x),FXMAX(a.y,b.y),FXMAX(a.z,b.z));}
+
+extern FXAPI FXColor colorFromVec3d(const FXVec3d& vec);
+extern FXAPI FXVec3d colorToVec3d(FXColor clr);
 
 extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
 extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,const FXVec3d& d);

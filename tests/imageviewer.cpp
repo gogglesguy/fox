@@ -3,9 +3,9 @@
 *                      I m a g e   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.125 2008/11/25 10:13:02 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.127 2009/01/19 20:44:57 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -228,7 +228,7 @@ FXIMPLEMENT(ImageWindow,FXMainWindow,ImageWindowMap,ARRAYNUMBER(ImageWindowMap))
 
 
 // Make some windows
-ImageWindow::ImageWindow(FXApp* a):FXMainWindow(a,"FOX Image Viewer: - untitled",NULL,NULL,DECOR_ALL,0,0,850,600,0,0){
+ImageWindow::ImageWindow(FXApp* a):FXMainWindow(a,"FOX Image Viewer: - untitled",NULL,NULL,DECOR_ALL,0,0,850,600,0,0),mrufiles(a){
   setTarget(this);
   setSelector(ID_TITLE);
 

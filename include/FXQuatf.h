@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXQuatf.h,v 1.20 2008/01/04 15:18:23 fox Exp $                           *
+* $Id: FXQuatf.h,v 1.22 2009/01/26 09:40:23 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXQUATF_H
 #define FXQUATF_H
@@ -34,7 +34,7 @@ class FXMat3f;
 class FXAPI FXQuatf : public FXVec4f {
 public:
 
-  /// Construct
+  /// Default constructor; value is not initialized
   FXQuatf(){}
 
   /// Copy constructor

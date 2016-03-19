@@ -3,9 +3,9 @@
 *                             Half Float Support Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2008,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: half.cpp,v 1.5 2008/11/19 13:08:32 fox Exp $                             *
+* $Id: half.cpp,v 1.9 2009/01/06 13:31:22 fox Exp $                             *
 ********************************************************************************/
 #include "fx.h"
 
@@ -42,7 +42,7 @@ FXhalf  convertedback[65536];
 
 
 // Start
-int main(int,char*[]){
+int main(int argc,char* argv[]){
   FXint i;
   CNV c;
 

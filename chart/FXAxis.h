@@ -3,7 +3,7 @@
 *                          A x i s - D e f i n i t i o n                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAxis.h,v 1.26 2008/09/26 00:42:12 fox Exp $                            *
+* $Id: FXAxis.h,v 1.27 2009/01/06 13:07:21 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAXIS_H
 #define FXAXIS_H

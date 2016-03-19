@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStat.h,v 1.31 2008/09/17 22:13:02 fox Exp $                            *
+* $Id: FXStat.h,v 1.33 2009/01/06 13:07:27 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXSTAT_H
 #define FXSTAT_H
@@ -41,6 +41,7 @@ private:
   FXTime  createTime;           /// Create time (ns)
   FXTime  accessTime;           /// Access time (ns)
   FXTime  modifyTime;           /// Modify time (ns)
+  FXlong  fileVolume;           /// File volume (device)
   FXlong  fileIndex;            /// File index (inode)
   FXlong  fileSize;             /// File size
 public:
@@ -56,7 +57,7 @@ public:
 
   /// Return the mode flags for this file
   FXuint mode() const { return modeFlags; }
-  
+
   /// Return file size in bytes
   FXlong size() const { return fileSize; }
 
@@ -68,7 +69,10 @@ public:
 
   /// Return number of links to file
   FXuint links() const { return linkCount; }
-  
+
+  /// Return file volume number
+  FXlong volume() const { return fileVolume; }
+
   /// Return file index number
   FXlong index() const { return fileIndex; }
 
@@ -170,6 +174,9 @@ public:
 
   /// Return file size in bytes
   static FXlong size(const FXString& file);
+
+  /// Return file volume number
+  static FXlong volume(const FXString& file);
 
   /// Return file index number
   static FXlong index(const FXString& file);

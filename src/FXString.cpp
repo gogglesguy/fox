@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.270 2008/07/19 21:44:31 fox Exp $                       *
+* $Id: FXString.cpp,v 1.272 2009/01/06 13:24:41 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -2057,31 +2057,31 @@ FXint FXString::find_last_not_of(FXchar c,FXint pos) const {
 #endif
 
 // Print formatted string a-la vprintf
-FXString& FXString::vformat(const FXchar* fmt,va_list args){
-  register FXint len=0;
+FXint FXString::vformat(const FXchar* fmt,va_list args){
+  FXint result=0;
   if(fmt && *fmt){
     va_list ag;
     va_copy(ag,args);
-    len=__vsnprintf(str,length(),fmt,ag);       // Try to see if existing buffer fits
+    result=__vsnprintf(str,length(),fmt,ag);       // Try to see if existing buffer fits
     va_end(ag);
-    if(length()<len){
-      length(len);
-      __vsnprintf(str,length(),fmt,args);       // Now try again with exactly the right size
-      return *this;
+    if(length()<result){
+      length(result);
+      result=__vsnprintf(str,length(),fmt,args);   // Now try again with exactly the right size
+      return result;
       }
     }
-  length(len);
-  return *this;
+  length(result);
+  return result;
   }
 
 
 // Print formatted string a-la printf
-FXString& FXString::format(const FXchar* fmt,...){
+FXint FXString::format(const FXchar* fmt,...){
   va_list args;
   va_start(args,fmt);
-  vformat(fmt,args);
+  FXint result=vformat(fmt,args);
   va_end(args);
-  return *this;
+  return result;
   }
 
 
@@ -2208,14 +2208,16 @@ static const char *const conversionformat[]={"%.*f","%.*E","%.*G"};
 // Convert from double
 FXString& FXString::fromDouble(FXdouble number,FXint prec,FXint fmt){
   if(fmt<0 || fmt>2){ fxerror("FXString::fromDouble: fmt out of range.\n"); }
-  return format(conversionformat[fmt],prec,number);
+  format(conversionformat[fmt],prec,number);
+  return *this;
   }
 
 
 // Convert from float
 FXString& FXString::fromFloat(FXfloat number,FXint prec,FXint fmt){
   if(fmt<0 || fmt>2){ fxerror("FXString::fromFloat: fmt out of range.\n"); }
-  return format(conversionformat[fmt],prec,number);
+  format(conversionformat[fmt],prec,number);
+  return *this;
   }
 
 

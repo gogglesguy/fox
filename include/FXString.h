@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.h,v 1.148 2008/07/19 21:44:31 fox Exp $                         *
+* $Id: FXString.h,v 1.151 2009/01/06 13:07:27 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -161,16 +161,16 @@ public:
   /// Convert to upper case
   FXString& upper();
 
-  /// Return num partition(s) beginning at start from a string separated by delimiters delim.
+  /// Return num partition(s) from a given start partition in a string separated by delimiters delim.
   FXString section(FXchar delim,FXint start,FXint num=1) const;
 
-  /// Return num partition(s) beginning at start from a string separated by set of delimiters from delim of size n
+  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim of size n
   FXString section(const FXchar* delim,FXint n,FXint start,FXint num) const;
 
-  /// Return num partition(s) beginning at start from a string separated by set of delimiters from delim.
+  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim.
   FXString section(const FXchar* delim,FXint start,FXint num=1) const;
 
-  /// Return num partition(s) beginning at start from a string separated by set of delimiters from delim.
+  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim.
   FXString section(const FXString& delim,FXint start,FXint num=1) const;
 
   /// Adopt string s, leaving s empty
@@ -486,8 +486,8 @@ public:
   FXint vscan(const FXchar* fmt,va_list args) const;
 
   /// Format a string a-la printf
-  FXString& format(const FXchar* fmt,...) FX_PRINTF(2,3) ;
-  FXString& vformat(const FXchar* fmt,va_list args);
+  FXint format(const FXchar* fmt,...) FX_PRINTF(2,3) ;
+  FXint vformat(const FXchar* fmt,va_list args);
 
   /// Convert to long integer
   FXlong toLong(FXint base=10) const;

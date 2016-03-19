@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXQuatd.cpp,v 1.32 2008/01/04 15:42:27 fox Exp $                         *
+* $Id: FXQuatd.cpp,v 1.36 2009/01/06 13:24:38 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -536,16 +536,27 @@ FXQuatd FXQuatd::conj() const {
 FXQuatd& FXQuatd::arc(const FXVec3d& f,const FXVec3d& t){
   register FXdouble dot=f.x*t.x+f.y*t.y+f.z*t.z,div;
   if(dot> 0.999999){            // Unit quaternion
-    x= 0.0;
-    y= 0.0;
-    z= 0.0;
-    w= 1.0;
+    x=0.0;
+    y=0.0;
+    z=0.0;
+    w=1.0;
     }
-  else if(dot<-0.999999){       // 180 quaternion
-    x= 0.0;
-    y= 0.0;
-    z=-1.0;
-    w= 0.0;
+  else if(dot<-0.999999){       // 180 quaternion (Stephen Hardy)
+    x=f.y-f.z;
+    y=f.z-f.x;
+    z=f.x-f.y;
+    dot=x*x+y*y+z*z;
+    if(dot<0.1){                // Ensure non-zero orthogonal vector
+      x=-f.y-f.z;
+      y=f.x-f.z;
+      z=f.x+f.y;
+      dot=x*x+y*y+z*z;
+      }
+    div=sqrt(dot);              // Renormalize axis
+    x/=div;
+    y/=div;
+    z/=div;
+    w=0.0;
     }
   else{
     div=sqrt((dot+1.0)*2.0);

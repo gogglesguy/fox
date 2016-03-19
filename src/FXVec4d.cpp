@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXVec4d.cpp,v 1.19 2008/01/04 15:42:42 fox Exp $                         *
+* $Id: FXVec4d.cpp,v 1.23 2009/02/05 14:57:14 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -39,32 +39,25 @@ using namespace FX;
 
 namespace FX {
 
-FXVec4d::FXVec4d(FXColor color){
-  x=0.003921568627*FXREDVAL(color);
-  y=0.003921568627*FXGREENVAL(color);
-  z=0.003921568627*FXBLUEVAL(color);
-  w=0.003921568627*FXALPHAVAL(color);
+
+// Convert from vector to color
+FXColor colorFromVec4d(const FXVec4d& vec){
+  return FXRGBA((vec.x*255.0+0.5),(vec.y*255.0+0.5),(vec.z*255.0+0.5),(vec.w*255.0+0.5));
   }
 
 
-FXVec4d& FXVec4d::operator=(FXColor color){
-  x=0.003921568627*FXREDVAL(color);
-  y=0.003921568627*FXGREENVAL(color);
-  z=0.003921568627*FXBLUEVAL(color);
-  w=0.003921568627*FXALPHAVAL(color);
-  return *this;
+// Convert from color to vector
+FXVec4d colorToVec4d(FXColor clr){
+  return FXVec4d(0.003921568627*FXREDVAL(clr),0.003921568627*FXGREENVAL(clr),0.003921568627*FXBLUEVAL(clr),0.003921568627*FXALPHAVAL(clr));
   }
 
 
-FXVec4d::operator FXColor() const {
-  return FXRGBA((x*255.0),(y*255.0),(z*255.0),(w*255.0));
-  }
-
-
+// Normalize vector
 FXVec4d normalize(const FXVec4d& v){
-  register FXdouble t=v.length();
-  if(t>0.0){ return FXVec4d(v.x/t,v.y/t,v.z/t,v.w/t); }
-  return FXVec4d(0.0,0.0,0.0,0.0);
+  register FXdouble m=v.length2();
+  FXVec4d result(v);
+  if(m>0.0){ result/=sqrt(m); }
+  return result;
   }
 
 

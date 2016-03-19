@@ -3,7 +3,7 @@
 *                       I m a g e   V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImageView.h,v 1.20 2008/01/04 15:18:20 fox Exp $                       *
+* $Id: FXImageView.h,v 1.21 2009/01/06 13:07:25 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXIMAGEVIEW_H
 #define FXIMAGEVIEW_H

@@ -3,7 +3,7 @@
 *                          T I F F   I n p u t / O u t p u t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2008 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2009 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxtifio.cpp,v 1.44 2008/01/04 15:42:47 fox Exp $                         *
+* $Id: fxtifio.cpp,v 1.45 2009/01/06 13:24:47 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

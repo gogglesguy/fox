@@ -3,9 +3,9 @@
 *                                 Test Dialog Box                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: dialog.cpp,v 1.48 2008/01/04 15:18:33 fox Exp $                          *
+* $Id: dialog.cpp,v 1.49 2009/01/06 13:31:21 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStat.cpp,v 1.43 2008/09/18 18:12:57 fox Exp $                          *
+* $Id: FXStat.cpp,v 1.47 2009/01/06 13:24:40 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -34,7 +34,7 @@
 
 /*
   Notes:
-
+  - Find out stuff about files and directories.
 */
 
 
@@ -200,6 +200,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
   info.createTime=0;
   info.accessTime=0;
   info.modifyTime=0;
+  info.fileVolume=0;
   info.fileIndex=0;
   info.fileSize=0;
   if(!file.empty()){
@@ -224,34 +225,13 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
         info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
         info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
         result=true;
         }
       ::CloseHandle(hfile);
       }
-/*      
-    if(!result){
-      WIN32_FILE_ATTRIBUTE_DATA data2;
-      if(::GetFileAttributesExW(buffer,GetFileExInfoStandard,&data2)){
-        SHFILEINFO sfi2;
-        info.modeFlags=0777;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(buffer,0,&sfi2,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
-        info.userNumber=0;
-        info.groupNumber=0;
-        info.linkCount=1;
-        info.accessTime=fxfiletime(*((FXTime*)&data2.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data2.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data2.ftCreationTime));
-        info.fileSize=(((FXlong)data2.nFileSizeHigh)<<32)|((FXlong)data2.nFileSizeLow);
-        result=true;
-        }
-      }
-*/      
 #else
     HANDLE hfile;
     if((hfile=::CreateFile(file.text(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
@@ -263,41 +243,20 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
         else info.modeFlags|=FXIO::File;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
         info.userNumber=0;
         info.groupNumber=0;
-        info.linkCount=data1.nNumberOfLinks;
+        info.linkCount=data.nNumberOfLinks;
         info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
         info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
         info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
         result=true;
         }
       ::CloseHandle(hfile);
       }
-/*      
-    if(!result){
-      WIN32_FILE_ATTRIBUTE_DATA data2;
-      if(::GetFileAttributesExW(file.text(),GetFileExInfoStandard,&data2)){
-        SHFILEINFO sfi2;
-        info.modeFlags=0777;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(file.text(),0,&sfi2,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
-        info.userNumber=0;
-        info.groupNumber=0;
-        info.linkCount=1;
-        info.accessTime=fxfiletime(*((FXTime*)&data2.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data2.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data2.ftCreationTime));
-        info.fileSize=(((FXlong)data2.nFileSizeHigh)<<32)|((FXlong)data2.nFileSizeLow);
-        result=true;
-        }
-      }
-*/      
 #endif
 #else
     const FXTime seconds=1000000000;
@@ -320,6 +279,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
       info.accessTime=data.st_atime*seconds;
       info.modifyTime=data.st_mtime*seconds;
       info.createTime=data.st_ctime*seconds;
+      info.fileVolume=(FXlong)data.st_dev;
       info.fileIndex=(FXlong)data.st_ino;
       info.fileSize=(FXlong)data.st_size;
       result=true;
@@ -340,6 +300,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
   info.createTime=0;
   info.accessTime=0;
   info.modifyTime=0;
+  info.fileVolume=0;
   info.fileIndex=0;
   info.fileSize=0;
   if(!file.empty()){
@@ -364,80 +325,38 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
         info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
         info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
         info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
         result=true;
         }
       ::CloseHandle(hfile);
       }
-/*      
-    if(!result){
-      WIN32_FILE_ATTRIBUTE_DATA data2;
-      if(::GetFileAttributesExW(buffer,GetFileExInfoStandard,&data2)){
-        SHFILEINFO sfi2;
-        info.modeFlags=0777;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(buffer,0,&sfi2,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
-        info.userNumber=0;
-        info.groupNumber=0;
-        info.linkCount=1;
-        info.accessTime=fxfiletime(*((FXTime*)&data2.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data2.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data2.ftCreationTime));
-        info.fileSize=(((FXlong)data2.nFileSizeHigh)<<32)|((FXlong)data2.nFileSizeLow);
-        result=true;
-        }
-      }
-*/      
 #else
     HANDLE hfile;
     if((hfile=::CreateFile(file.text(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
-      BY_HANDLE_FILE_INFORMATION data1;
-      if(::GetFileInformationByHandle(hfile,&data1)){
+      BY_HANDLE_FILE_INFORMATION data;
+      if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
         info.modeFlags=0777;
-        if(data1.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data1.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
         else info.modeFlags|=FXIO::File;
-        if(data1.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
+        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
         info.userNumber=0;
         info.groupNumber=0;
-        info.linkCount=data1.nNumberOfLinks;
-        info.accessTime=fxfiletime(*((FXTime*)&data1.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data1.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data1.ftCreationTime));
-        info.fileIndex=(((FXulong)data1.nFileIndexHigh)<<32)|((FXulong)data1.nFileIndexLow);
-        info.fileSize=(((FXlong)data1.nFileSizeHigh)<<32)|((FXlong)data1.nFileSizeLow);
+        info.linkCount=data.nNumberOfLinks;
+        info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
+        info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
+        info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.fileVolume=data.dwVolumeSerialNumber;
+        info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
+        info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
         result=true;
         }
       ::CloseHandle(hfile);
       }
-/*      
-    if(!result){
-      WIN32_FILE_ATTRIBUTE_DATA data2;
-      if(::GetFileAttributesExW(file.text(),GetFileExInfoStandard,&data2)){
-        SHFILEINFO sfi2;
-        info.modeFlags=0777;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
-        else info.modeFlags|=FXIO::File;
-        if(data2.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(file.text(),0,&sfi2,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
-        info.userNumber=0;
-        info.groupNumber=0;
-        info.linkCount=1;
-        info.accessTime=fxfiletime(*((FXTime*)&data2.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data2.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data2.ftCreationTime));
-        info.fileSize=(((FXlong)data2.nFileSizeHigh)<<32)|((FXlong)data2.nFileSizeLow);
-        result=true;
-        }
-      }
-*/      
 #endif
 #else
     const FXTime seconds=1000000000;
@@ -460,6 +379,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
       info.accessTime=data.st_atime*seconds;
       info.modifyTime=data.st_mtime*seconds;
       info.createTime=data.st_ctime*seconds;
+      info.fileVolume=(FXlong)data.st_dev;
       info.fileIndex=(FXlong)data.st_ino;
       info.fileSize=(FXlong)data.st_size;
       result=true;
@@ -479,6 +399,7 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
   info.createTime=0;
   info.accessTime=0;
   info.modifyTime=0;
+  info.fileVolume=0;
   info.fileIndex=0;
   info.fileSize=0;
 #ifdef WIN32
@@ -495,6 +416,7 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
     info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
     info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
     info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+    info.fileVolume=data.dwVolumeSerialNumber;
     info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
     info.fileSize=(((FXulong)data.nFileSizeHigh)<<32)|((FXulong)data.nFileSizeLow);
     return true;
@@ -520,6 +442,7 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
     info.accessTime=data.st_atime*seconds;
     info.modifyTime=data.st_mtime*seconds;
     info.createTime=data.st_ctime*seconds;
+    info.fileVolume=(FXlong)data.st_dev;
     info.fileIndex=(FXlong)data.st_ino;
     info.fileSize=(FXlong)data.st_size;
     return true;
@@ -576,6 +499,14 @@ FXlong FXStat::size(const FXString& file){
   FXStat data;
   statFile(file,data);
   return data.size();
+  }
+
+
+// Return file volume number
+FXlong FXStat::volume(const FXString& file){
+  FXStat data;
+  statFile(file,data);
+  return data.volume();
   }
 
 

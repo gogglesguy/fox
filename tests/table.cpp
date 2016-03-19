@@ -3,9 +3,9 @@
 *                                 Test Table Widget                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: table.cpp,v 1.78 2008/01/04 15:18:34 fox Exp $                           *
+* $Id: table.cpp,v 1.80 2009/01/06 13:31:22 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -139,6 +139,9 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   table->setCellColor(1,0,FXRGB(240,255,240));
   table->setCellColor(1,1,FXRGB(240,240,255));
   table->setHelpText("Editable table.");
+
+  table->setRowRenumbering(true);
+  table->setColumnRenumbering(true);
 
   // Initialize scrollable part of table
   for(r=0; r<50; r++){

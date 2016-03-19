@@ -3,9 +3,9 @@
 *                    Calendar Example and Test Program                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2008 Sander Jansen. All Rights Reserved                    *
+* Copyright (C) 2006,2009 Sander Jansen. All Rights Reserved                    *
 *********************************************************************************
-* $Id: calendar.cpp,v 1.12 2008/03/06 05:42:24 fox Exp $                        *
+* $Id: calendar.cpp,v 1.13 2009/01/06 13:31:21 fox Exp $                        *
 ********************************************************************************/
 #include <fx.h>
 

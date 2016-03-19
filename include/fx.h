@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx.h,v 1.118 2008/07/18 20:31:20 fox Exp $                               *
+* $Id: fx.h,v 1.120 2009/01/06 13:07:29 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H
@@ -64,6 +64,7 @@
 #include "FXSystem.h"
 #include "FXStat.h"
 #include "FXDir.h"
+#include "FXDirVisitor.h"
 #include "FXDate.h"
 #include "FXURL.h"
 #include "FXStringDict.h"

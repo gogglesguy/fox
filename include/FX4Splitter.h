@@ -3,7 +3,7 @@
 *                       F o u r - W a y   S p l i t t e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX4Splitter.h,v 1.33 2008/01/04 15:18:14 fox Exp $                       *
+* $Id: FX4Splitter.h,v 1.34 2009/01/06 13:07:21 fox Exp $                       *
 ********************************************************************************/
 #ifndef FX4SPLITTER_H
 #define FX4SPLITTER_H

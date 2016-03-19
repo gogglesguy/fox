@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.307 2008/09/15 23:51:48 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.311 2009/01/06 13:24:31 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -634,7 +634,7 @@ long FXFileList::onCmdDropCopy(FXObject*,FXSelector,void*){
         }
       }
     }
-*/    
+*/
   dropdirectory=FXString::null;
   delete [] dropfiles;
   dropfiles=NULL;
@@ -1548,7 +1548,7 @@ void FXFileList::listItems(FXbool force){
 #endif
 
       // If it is a file and we want only directories or doesn't match, skip it
-      if(!info.isDirectory() && ((options&FILELIST_SHOWDIRS) || !FXPath::match(pattern,name,matchmode))) continue;
+      if(!info.isDirectory() && ((options&FILELIST_SHOWDIRS) || !FXPath::match(name,pattern,matchmode))) continue;
 
       // If it is a directory and we want only files, skip it
       if(info.isDirectory() && (options&FILELIST_SHOWFILES)) continue;

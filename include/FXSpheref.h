@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    S p h e r e    C l a s s         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSpheref.h,v 1.24 2008/06/04 17:48:47 fox Exp $                         *
+* $Id: FXSpheref.h,v 1.26 2009/01/26 09:40:23 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSPHEREF_H
 #define FXSPHEREF_H
@@ -30,6 +30,7 @@ namespace FX {
 class FXRangef;
 class FXMat4f;
 
+
 /// Spherical bounds
 class FXAPI FXSpheref {
 public:
@@ -37,7 +38,7 @@ public:
   FXfloat radius;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXSpheref(){}
 
   /// Copy constructor
@@ -115,10 +116,10 @@ public:
 
   /// Intersect sphere with ray u-v
   FXbool intersect(const FXVec3f& u,const FXVec3f& v) const;
-  
+
   /// Transform sphere by 4x4 matrix
   FXSpheref transform(const FXMat4f& mat) const;
-  
+
   /// Test if box overlaps with sphere
   friend FXAPI FXbool overlap(const FXRangef& a,const FXSpheref& b);
 

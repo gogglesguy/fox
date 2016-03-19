@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.cpp,v 1.274 2008/03/05 05:58:41 fox Exp $                        *
+* $Id: FXTable.cpp,v 1.279 2009/01/17 10:14:21 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -370,8 +370,7 @@ void FXTableItem::draw(const FXTable* table,FXDC& dc,FXint x,FXint y,FXint w,FXi
 
 
 // Create input control for editing this item
-FXWindow *FXTableItem::getControlFor(FXTable* table){
-  register FXFont *font=table->getFont();
+FXWindow* FXTableItem::getControlFor(FXTable* table){
   register FXTextField *field;
   register FXuint justify=0;
   field=new FXTextField(table,1,NULL,0,TEXTFIELD_ENTER_ONLY,0,0,0,0,table->getMarginLeft(),table->getMarginRight(),table->getMarginTop(),table->getMarginBottom());
@@ -381,7 +380,7 @@ FXWindow *FXTableItem::getControlFor(FXTable* table){
   if(state&BOTTOM) justify|=JUSTIFY_BOTTOM;
   field->create();
   field->setJustify(justify);
-  field->setFont(font);
+  field->setFont(table->getFont());
   field->setBackColor(table->getBackColor());
   field->setTextColor(table->getTextColor());
   field->setSelBackColor(table->getSelBackColor());
@@ -393,7 +392,7 @@ FXWindow *FXTableItem::getControlFor(FXTable* table){
 
 
 // Set value from input control
-void FXTableItem::setFromControl(FXWindow *control){
+void FXTableItem::setFromControl(FXWindow* control){
   register FXTextField *field=static_cast<FXTextField*>(control);
   setText(field->getText());
   }
@@ -586,8 +585,7 @@ void FXComboTableItem::setSelections(const FXString& strings){
 
 
 // Create input control for editing this item
-FXWindow *FXComboTableItem::getControlFor(FXTable* table){
-  register FXFont *font=table->getFont();
+FXWindow* FXComboTableItem::getControlFor(FXTable* table){
   register FXComboBox *combo;
   register FXuint justify=0;
   combo=new FXComboBox(table,1,NULL,0,COMBOBOX_STATIC,0,0,0,0,table->getMarginLeft(),table->getMarginRight(),table->getMarginTop(),table->getMarginBottom());
@@ -597,7 +595,7 @@ FXWindow *FXComboTableItem::getControlFor(FXTable* table){
   if(state&BOTTOM) justify|=JUSTIFY_BOTTOM;
   combo->create();
   combo->setJustify(justify);
-  combo->setFont(font);
+  combo->setFont(table->getFont());
   combo->setBackColor(table->getBackColor());
   combo->setTextColor(table->getTextColor());
   combo->setSelBackColor(table->getSelBackColor());
@@ -610,7 +608,7 @@ FXWindow *FXComboTableItem::getControlFor(FXTable* table){
 
 
 // Set value from input control
-void FXComboTableItem::setFromControl(FXWindow *control){
+void FXComboTableItem::setFromControl(FXWindow* control){
   register FXComboBox *combo=static_cast<FXComboBox*>(control);
   setText(combo->getText());
   }
@@ -1178,7 +1176,7 @@ void FXTable::updateItem(FXint r,FXint c) const {
 void FXTable::updateColumnNumbers(FXint lo,FXint hi){
   FXString label;
   for(FXint c=lo; c<hi; c++){
-    setColumnText(c,label.format("%u",c+1));
+    setColumnText(c,label.fromUInt(c+1));
     }
   }
 
@@ -1187,7 +1185,7 @@ void FXTable::updateColumnNumbers(FXint lo,FXint hi){
 void FXTable::updateRowNumbers(FXint lo,FXint hi){
   FXString label;
   for(FXint r=lo; r<hi; r++){
-    setRowText(r,label.format("%u",r+1));
+    setRowText(r,label.fromUInt(r+1));
     }
   }
 
@@ -1281,24 +1279,23 @@ FXbool FXTable::isItemCurrent(FXint r,FXint c) const {
 
 // True if item is enabled
 FXbool FXTable::isItemEnabled(FXint r,FXint c) const {
-  if(r<0 || nrows<=r || c<0 || ncols<=c){ fxerror("%s::isItemEnabled: index out of range.\n",getClassName()); }
-  FXTableItem *item=cells[r*ncols+c];
-  return !item || item->isEnabled();
+  return (0<=r && 0<=c && r<nrows && c<ncols && (!cells[r*ncols+c] || cells[r*ncols+c]->isEnabled()));
   }
 
 
 // Enable one item
 FXbool FXTable::enableItem(FXint r,FXint c){
-  if(r<0 || nrows<=r || c<0 || ncols<=c){ fxerror("%s::enableItem: index out of range.\n",getClassName()); }
-  register FXTableItem* item=cells[r*ncols+c];
-  if(item==NULL){
-    cells[r*ncols+c]=item=createItem(FXString::null,NULL,NULL);
-    if(isItemSelected(r,c)) item->setSelected(false);
-    }
-  if(!item->isEnabled()){
-    item->setEnabled(true);
-    updateItem(r,c);
-    return true;
+  if(0<=r && 0<=c && r<nrows && c<ncols){
+    register FXTableItem* item=cells[r*ncols+c];
+    if(item==NULL){
+      cells[r*ncols+c]=item=createItem(FXString::null,NULL,NULL);
+      if(isItemSelected(r,c)) item->setSelected(false);
+      }
+    if(!item->isEnabled()){
+      item->setEnabled(true);
+      updateItem(r,c);
+      return true;
+      }
     }
   return false;
   }
@@ -1306,16 +1303,17 @@ FXbool FXTable::enableItem(FXint r,FXint c){
 
 // Disable one item
 FXbool FXTable::disableItem(FXint r,FXint c){
-  if(r<0 || nrows<=r || c<0 || ncols<=c){ fxerror("%s::disableItem: index out of range.\n",getClassName()); }
-  register FXTableItem* item=cells[r*ncols+c];
-  if(item==NULL){
-    cells[r*ncols+c]=item=createItem(FXString::null,NULL,NULL);
-    if(isItemSelected(r,c)) item->setSelected(false);
-    }
-  if(item->isEnabled()){
-    item->setEnabled(false);
-    updateItem(r,c);
-    return true;
+  if(0<=r && 0<=c && r<nrows && c<ncols){
+    register FXTableItem* item=cells[r*ncols+c];
+    if(item==NULL){
+      cells[r*ncols+c]=item=createItem(FXString::null,NULL,NULL);
+      if(isItemSelected(r,c)) item->setSelected(false);
+      }
+    if(item->isEnabled()){
+      item->setEnabled(false);
+      updateItem(r,c);
+      return true;
+      }
     }
   return false;
   }
@@ -1850,7 +1848,7 @@ FXbool FXTable::killSelection(FXbool notify){
 
 
 // Get input control to edit the item
-FXWindow *FXTable::getControlForItem(FXint r,FXint c){
+FXWindow* FXTable::getControlForItem(FXint r,FXint c){
   register FXTableItem* item=cells[r*ncols+c];
   if(item==NULL){
     cells[r*ncols+c]=item=createItem(FXString::null,NULL,NULL);
@@ -1861,7 +1859,7 @@ FXWindow *FXTable::getControlForItem(FXint r,FXint c){
 
 
 // Set the item from the input control
-void FXTable::setItemFromControl(FXint r,FXint c,FXWindow *control){
+void FXTable::setItemFromControl(FXint r,FXint c,FXWindow* control){
   register FXTableItem* item=cells[r*ncols+c];
   if(item==NULL){
     cells[r*ncols+c]=item=createItem(FXString::null,NULL,NULL);
@@ -1873,7 +1871,7 @@ void FXTable::setItemFromControl(FXint r,FXint c,FXWindow *control){
 
 // Start to edit a cell
 FXbool FXTable::startInput(FXint r,FXint c){
-  if(0<=r && 0<=c && !editor){
+  if(isEditable() && isItemEnabled(r,c) && !editor){
     editor=getControlForItem(r,c);
     if(editor){
       input.fm.row=startRow(r,c);
@@ -1923,36 +1921,31 @@ FXbool FXTable::acceptInput(FXbool notify){
 
 // Start edit of current cell
 long FXTable::onCmdStartInput(FXObject*,FXSelector,void*){
-  if(isEditable() && startInput(current.row,current.col)){
-    return 1;
+  if(!startInput(current.row,current.col)){
+    getApp()->beep();
     }
-  getApp()->beep();
   return 1;
   }
 
 
 // Update start edit
 long FXTable::onUpdStartInput(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(isEditable() && !editor)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  sender->handle(this,(isEditable() && isItemEnabled(current.row,current.col) && !editor)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
 
 // Cancel edit
 long FXTable::onCmdCancelInput(FXObject*,FXSelector,void*){
-  if(cancelInput()){
-    return 1;
-    }
-  return 0;
+  cancelInput();
+  return 1;
   }
 
 
 // End edit
 long FXTable::onCmdAcceptInput(FXObject*,FXSelector,void*){
-  if(acceptInput(true)){
-    return 1;
-    }
-  return 0;
+  acceptInput(true);
+  return 1;
   }
 
 

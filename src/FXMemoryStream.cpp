@@ -3,7 +3,7 @@
 *                   M e m o r y   S t r e a m   C l a s s e s                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMemoryStream.cpp,v 1.26 2008/07/03 21:17:19 fox Exp $                  *
+* $Id: FXMemoryStream.cpp,v 1.27 2009/01/06 13:24:36 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

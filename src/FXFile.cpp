@@ -3,7 +3,7 @@
 *                             F i l e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFile.cpp,v 1.269 2008/09/10 23:44:46 fox Exp $                         *
+* $Id: FXFile.cpp,v 1.271 2009/01/06 13:24:30 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -489,44 +489,12 @@ FXbool FXFile::symlink(const FXString& oldfile,const FXString& newfile){
 // Return true if files are identical
 FXbool FXFile::identical(const FXString& file1,const FXString& file2){
   if(file1!=file2){
-#ifdef WIN32
-    BY_HANDLE_FILE_INFORMATION info1,info2;
-    HANDLE hFile1,hFile2;
-    FXbool same=false;
-#ifdef UNICODE
-    FXnchar name1[MAXPATHLEN],name2[MAXPATHLEN];
-    utf2ncs(name1,MAXPATHLEN,file1.text(),file1.length()+1);
-    utf2ncs(name2,MAXPATHLEN,file2.text(),file2.length()+1);
-    hFile1=::CreateFile(name1,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-    if(hFile1!=INVALID_HANDLE_VALUE){
-      hFile2=::CreateFile(name2,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-      if(hFile2!=INVALID_HANDLE_VALUE){
-        if(::GetFileInformationByHandle(hFile1,&info1) && ::GetFileInformationByHandle(hFile2,&info2)){
-          same=(info1.nFileIndexLow==info2.nFileIndexLow && info1.nFileIndexHigh==info2.nFileIndexHigh && info1.dwVolumeSerialNumber==info2.dwVolumeSerialNumber);
-          }
-        ::CloseHandle(hFile2);
-        }
-      ::CloseHandle(hFile1);
+    FXStat info1;
+    FXStat info2;
+    if(FXStat::statFile(file1,info1) && FXStat::statFile(file2,info2)){
+      return info1.index()==info2.index() && info1.volume()==info2.volume();
       }
-    return same;
-#else
-    hFile1=::CreateFile(file1.text(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-    if(hFile1!=INVALID_HANDLE_VALUE){
-      hFile2=::CreateFile(file2.text(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-      if(hFile2!=INVALID_HANDLE_VALUE){
-        if(::GetFileInformationByHandle(hFile1,&info1) && ::GetFileInformationByHandle(hFile2,&info2)){
-          same=(info1.nFileIndexLow==info2.nFileIndexLow && info1.nFileIndexHigh==info2.nFileIndexHigh && info1.dwVolumeSerialNumber==info2.dwVolumeSerialNumber);
-          }
-        ::CloseHandle(hFile2);
-        }
-      ::CloseHandle(hFile1);
-      }
-    return same;
-#endif
-#else
-    struct stat stat1,stat2;
-    return !::lstat(file1.text(),&stat1) && !::lstat(file2.text(),&stat2) && stat1.st_ino==stat2.st_ino && stat1.st_dev==stat2.st_dev;
-#endif
+    return false;
     }
   return true;
   }

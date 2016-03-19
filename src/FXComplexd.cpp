@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n   C o m p l e x   N u m b e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComplexd.cpp,v 1.6 2008/01/04 15:42:06 fox Exp $                       *
+* $Id: FXComplexd.cpp,v 1.7 2009/01/06 13:24:27 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

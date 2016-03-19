@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.h,v 1.21 2008/09/12 19:56:44 fox Exp $                            *
+* $Id: FXPath.h,v 1.24 2009/01/06 13:07:26 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPATH_H
 #define FXPATH_H
@@ -31,13 +31,13 @@ namespace FXPath {
 
   /**
   * Return root of absolute path; on Unix, this is just "/". On
-  * Windows, this is "\\" or "C:\".  Returns the empty string
-  * if the given path is not absolute.
+  * Windows, this is "\", "\\Janes PC\" or "C:\".
+  * Returns the empty string if the given path is not absolute.
   */
   extern FXAPI FXString root(const FXString& file);
 
   /**
-  * Return share name from Windows UNC filename.
+  * Return share name from Windows UNC filename, if any.
   * For example, share("\\Janes PC\Janes Documents\Document.doc")
   * returns "Janes PC".
   */
@@ -146,7 +146,7 @@ namespace FXPath {
   *  FILEMATCH_LEADING_DIR       Ignore /... after a match
   *  FILEMATCH_CASEFOLD          Compare without regard to case
   */
-  extern FXAPI FXbool match(const FXString& pattern,const FXString& file,FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
+  extern FXAPI FXbool match(const FXString& file,const FXString& pattern="*",FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
 
   /**
   * Generate unique filename of the form pathnameXXX.ext, where

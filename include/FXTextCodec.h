@@ -3,7 +3,7 @@
 *                   U n i c o d e   T e x t   C o d e c                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2008 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2009 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextCodec.h,v 1.33 2008/01/04 15:18:27 fox Exp $                       *
+* $Id: FXTextCodec.h,v 1.34 2009/01/06 13:07:28 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTEXTCODEC_H
 #define FXTEXTCODEC_H

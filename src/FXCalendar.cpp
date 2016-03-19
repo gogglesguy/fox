@@ -3,7 +3,7 @@
 *                   B a s e   C a l e n d a r   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2008 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2006,2009 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.cpp,v 1.20 2008/09/30 02:50:43 fox Exp $                      *
+* $Id: FXCalendar.cpp,v 1.21 2009/01/06 13:24:27 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -349,20 +349,20 @@ FXColor FXCalendar::getOtherWeekendColor() const {
 // Set font used by the header
 void FXCalendar::setHeaderFont(FXFont *fnt){
   year->setFont(fnt);
-  months[0]->setFont(fnt); 
-  months[1]->setFont(fnt); 
-  months[2]->setFont(fnt); 
-  months[3]->setFont(fnt); 
-  months[4]->setFont(fnt); 
-  months[5]->setFont(fnt); 
-  months[6]->setFont(fnt); 
-  months[7]->setFont(fnt); 
-  months[8]->setFont(fnt); 
-  months[9]->setFont(fnt); 
-  months[10]->setFont(fnt); 
-  months[11]->setFont(fnt); 
+  months[0]->setFont(fnt);
+  months[1]->setFont(fnt);
+  months[2]->setFont(fnt);
+  months[3]->setFont(fnt);
+  months[4]->setFont(fnt);
+  months[5]->setFont(fnt);
+  months[6]->setFont(fnt);
+  months[7]->setFont(fnt);
+  months[8]->setFont(fnt);
+  months[9]->setFont(fnt);
+  months[10]->setFont(fnt);
+  months[11]->setFont(fnt);
   }
-  
+
 
 // Get font used by the header
 FXFont* FXCalendar::getHeaderFont() const {

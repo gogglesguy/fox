@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.138 2008/11/14 01:13:02 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.142 2009/01/28 12:44:50 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -39,6 +39,9 @@
 #else
 #include <pthread.h>
 #include <semaphore.h>
+#if defined(hpux) || defined(__hpux) || defined(_hpux)
+#include <sys/pstat.h>
+#endif
 #endif
 #endif
 
@@ -88,6 +91,11 @@
     however, an exceptionally inelegant solution in Boehm's GC code (file
     linux_threads.c).  But its so ugly we'd rather live without until a real
     suspend/resume facility is implemented in the linux kernel.
+
+  - To find all preprocessor defines in GCC:
+
+      echo | gcc -E -dM -
+
 */
 
 using namespace FX;
@@ -898,7 +906,7 @@ FXSpinLock::~FXSpinLock(){
   }
 
 
-#elif defined(__APPLE__)          
+#elif defined(__APPLE__)
 
 
 // Initialize spinlock
@@ -1368,18 +1376,25 @@ FXThreadID FXThread::current(){
 
 // Return number of processors
 FXint FXThread::processors(){
-#if defined(__FreeBSD__)
-  int result=1;
-  int resultsize=sizeof(int);
-  sysctlbyname("hw.ncpu",&result,&resultsize,0,0);
-  return result;
-#elif defined(__APPLE__)
-  return  MPProcessors();
-#else
-  FXint result=sysconf(_SC_NPROCESSORS_ONLN);
-  if(result<0) result=1;
-  return result;
+#if defined(__APPLE__) || defined(__FreeBSD__)
+  int result;
+  int mib[2]={CTL_HW,HW_NCPU};
+  size_t len=sizeof(result);
+  if(sysctl(mib,2,&result,&len,NULL,NULL)!=-1){
+    return result;
+    }
+#elif defined(hpux) || defined(__hpux) || defined(_hpux)
+  struct pst_dynamic psd;
+  if(!pstat_getdynamic(&psd,sizeof(psd),(size_t)1,0)){
+    return (int)psd.psd_proc_cnt;
+    }
+#elif defined(_SC_NPROCESSORS_ONLN)
+  FXint result;
+  if((result=sysconf(_SC_NPROCESSORS_ONLN))>0){
+    return result;
+    }
 #endif
+  return 1;
   }
 
 

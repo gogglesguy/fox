@@ -3,7 +3,7 @@
 *                       C a l e n d a r   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2008 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2006,2009 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.h,v 1.14 2008/09/30 02:50:43 fox Exp $                        *
+* $Id: FXCalendar.h,v 1.15 2009/01/06 13:07:22 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCALENDAR_H
 #define FXCALENDAR_H

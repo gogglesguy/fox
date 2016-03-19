@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3d.h,v 1.24 2008/01/04 15:18:21 fox Exp $                           *
+* $Id: FXMat3d.h,v 1.26 2009/01/26 09:40:22 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT3D_H
 #define FXMAT3D_H
@@ -37,7 +37,7 @@ protected:
   FXVec3d m[3];
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXMat3d(){}
 
   /// Initialize matrix from another matrix

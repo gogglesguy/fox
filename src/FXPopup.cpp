@@ -3,7 +3,7 @@
 *                     P o p u p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPopup.cpp,v 1.105 2008/01/04 15:42:26 fox Exp $                        *
+* $Id: FXPopup.cpp,v 1.107 2009/01/09 02:10:25 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -600,7 +600,6 @@ long FXPopup::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 // Key press; escape cancels popup
 long FXPopup::onKeyPress(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-//  if(event->code==KEY_Escape || event->code==KEY_Cancel || event->code==KEY_Alt_L || event->code==KEY_Alt_R){
   if(event->code==KEY_Escape || event->code==KEY_Cancel){
     handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
     return 1;

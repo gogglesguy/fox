@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.174 2008/07/17 20:39:00 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.176 2009/01/06 13:24:48 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -288,7 +288,7 @@ void fxwarning(const char* format,...){
 
 
 // Sleep n microseconds
-void fxsleep(unsigned int n){
+void fxsleep(FXuint n){
 #ifdef WIN32
   unsigned int zzz=n/1000;
   if(zzz==0) zzz=1;
@@ -719,7 +719,7 @@ FXuint fxgetmxcsr(){
 void fxsetmxcsr(FXuint mxcsr){
   asm ( "ldmxcsr %0" : : "m" (mxcsr) );
   }
-  
+
 #endif
 
 

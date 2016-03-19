@@ -3,7 +3,7 @@
 *                     T A R G A   I c o n   O b j e c t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2008 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2009 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTGAIcon.h,v 1.23 2008/01/04 15:18:25 fox Exp $                         *
+* $Id: FXTGAIcon.h,v 1.24 2009/01/06 13:07:27 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXTGAICON_H
 #define FXTGAICON_H
