@@ -17,6 +17,32 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 29 - FOX DEVELOPMENT 1.7.49
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Major API changes to FXThreadPool: mostly, much more sane implementation, and optional
+FXCompletion parameter passed to perform wait on subset of tasks; see FXCompletion notes below.</li>
+<li>Added FXCompletion synchronization object.  FXCompletion is now used in FXTaskGroup, FXThreadPool,
+but can also be used in your own programs whenever one thread needs to await the completion of multiple
+worker threads.</li>
+<li>Fixed bug in FXJSON parser: properly stop parsing at offending character.</li>
+<li>Byte order mark handling fix in FXJSON parser.</li>
+<li>Added toChars() API to FXVariant; it returns empty string unless variant is of type string. This
+is very similar to asChars(), except that toChars() is safe (always returns a non-NULL pointer).</li>
+<li>Renamed toPointer() to toPtr() in FXVariant for consistency.</li>
+<li>FXParallel implementation changes: don't kick off tasks via FXThreadPool in ParallelFor if there's
+only one task.  Also, split ParallelFor into a number of pieces corresponding to the number of threads 
+available in the FXThreadPool, unless this number is passed explicitly.</li>
+<li>Ensured FXParallelForFunctor's are aligned in ParallelFor.</li>
+<li>Updated VC++ 2008 Visual Studio project files.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 July 6 - FOX DEVELOPMENT 1.7.48
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -24,8 +50,8 @@ July 6 - FOX DEVELOPMENT 1.7.48
 <ul>
 <li>Added verbose option to reswrap.</li>
 <li>Updated BMP loader routines, some bullet-proofing against malicious bitmap files.</li>
-<li>Changes in FXVariant: operator bool returns true for non-zero numerical values, non-empty arrays or non-empty dictionaries.  
-It only returns false if the variant is FXVariant::null.  This new interpretation strokes much better with common usage 
+<li>Changes in FXVariant: operator bool returns true for non-zero numerical values, non-empty arrays or non-empty dictionaries.
+It only returns false if the variant is FXVariant::null.  This new interpretation strokes much better with common usage
 patterns.</li>
 <li>Added asChars() API to FXVariant.</li>
 <li>FXPtrList now index with FXival.</li>

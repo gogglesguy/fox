@@ -125,6 +125,15 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,0,TextWindow::onUpdate),
   FXMAPFUNC(SEL_FOCUSIN,0,TextWindow::onFocusIn),
   FXMAPFUNC(SEL_TIMEOUT,TextWindow::ID_CLOCKTIME,TextWindow::onClock),
+  
+  FXMAPFUNC(SEL_FOCUSIN,TextWindow::ID_TEXT,TextWindow::onTextFocus),
+  FXMAPFUNC(SEL_INSERTED,TextWindow::ID_TEXT,TextWindow::onTextInserted),
+  FXMAPFUNC(SEL_REPLACED,TextWindow::ID_TEXT,TextWindow::onTextReplaced),
+  FXMAPFUNC(SEL_DELETED,TextWindow::ID_TEXT,TextWindow::onTextDeleted),
+  FXMAPFUNC(SEL_DND_DROP,TextWindow::ID_TEXT,TextWindow::onTextDNDDrop),
+  FXMAPFUNC(SEL_DND_MOTION,TextWindow::ID_TEXT,TextWindow::onTextDNDMotion),
+  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,TextWindow::onTextRightMouse),
+
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ABOUT,TextWindow::onCmdAbout),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_HELP,TextWindow::onCmdHelp),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEW,TextWindow::onCmdNew),
@@ -191,14 +200,6 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_WRAP,TextWindow::onUpdWrap),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TOGGLE_WRAP,TextWindow::onCmdWrap),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE_SETTINGS,TextWindow::onCmdSaveSettings),
-
-  FXMAPFUNC(SEL_FOCUSIN,TextWindow::ID_TEXT,TextWindow::onTextFocus),
-  FXMAPFUNC(SEL_INSERTED,TextWindow::ID_TEXT,TextWindow::onTextInserted),
-  FXMAPFUNC(SEL_REPLACED,TextWindow::ID_TEXT,TextWindow::onTextReplaced),
-  FXMAPFUNC(SEL_DELETED,TextWindow::ID_TEXT,TextWindow::onTextDeleted),
-  FXMAPFUNC(SEL_DND_DROP,TextWindow::ID_TEXT,TextWindow::onTextDNDDrop),
-  FXMAPFUNC(SEL_DND_MOTION,TextWindow::ID_TEXT,TextWindow::onTextDNDMotion),
-  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,TextWindow::onTextRightMouse),
 
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_FIXED_WRAP,TextWindow::onUpdWrapFixed),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FIXED_WRAP,TextWindow::onCmdWrapFixed),
@@ -322,10 +323,6 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
 
 // Object implementation
 FXIMPLEMENT(TextWindow,FXMainWindow,TextWindowMap,ARRAYNUMBER(TextWindowMap))
-
-
-const FXTime milliseconds=1000000;
-
 
 /*******************************************************************************/
 
@@ -1683,7 +1680,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
           }
         }
 
-      // Compiler output in the form <filename>:<number>:<number> Error message
+      // Compiler output in the form <filename>:<number>:<number>: Error message
       else if(string.scan("%[^:]:%d:%d",name,&lineno,&column)==3){
         column-=1;
         file=FXPath::absolute(dir,name);
@@ -1693,7 +1690,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
         }
 
       // Compiler output in the form <filename>:<number>: Error message
-      else if(string.scan("%[^:]:%d:",name,&lineno)==2){
+      else if(string.scan("%[^:]:%d",name,&lineno)==2){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
           file=FXPath::search(searchpaths,name);

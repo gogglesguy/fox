@@ -43,6 +43,7 @@
 +FXColorWell.obj &
 +FXColorWheel.obj &
 +FXComboBox.obj &
++FXCompletion.obj &
 +FXComplexf.obj &
 +FXComplexd.obj &
 +FXComposeContext.obj &
@@ -294,6 +295,9 @@
 +FXUTF16Codec.obj &
 +FXUTF32Codec.obj &
 +FXUTF8Codec.obj &
++FXVariant.obj &
++FXVariantArray.obj &
++FXVariantMap.obj &
 +FXVec2d.obj &
 +FXVec2f.obj &
 +FXVec3d.obj &

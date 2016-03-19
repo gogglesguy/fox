@@ -82,6 +82,7 @@ FXColorSelector.h \
 FXColorWell.h \
 FXColorWheel.h \
 FXComboBox.h \
+FXCompletion.h \
 FXComplexf.h \
 FXComplexd.h \
 FXComposeContext.h \

@@ -140,6 +140,7 @@ FXbool Rule::stylizeBody(const FXchar*,FXchar*,FXint,FXint,FXint&,FXint&) const 
   return false;
   }
 
+/*******************************************************************************/
 
 FXIMPLEMENT(SimpleRule,Rule,NULL,0)
 
@@ -153,6 +154,7 @@ FXbool SimpleRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint t
   return false;
   }
 
+/*******************************************************************************/
 
 FXIMPLEMENT(BracketRule,Rule,NULL,0)
 
@@ -191,6 +193,7 @@ FXbool BracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint 
   return false;
   }
 
+/*******************************************************************************/
 
 FXIMPLEMENT(SafeBracketRule,BracketRule,NULL,0)
 
@@ -233,6 +236,7 @@ FXbool SafeBracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FX
   return false;
   }
 
+/*******************************************************************************/
 
 FXIMPLEMENT(DefaultRule,Rule,NULL,0)
 
@@ -261,6 +265,7 @@ FXbool DefaultRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint 
   return DefaultRule::stylizeBody(text,textstyle,fm,to,start,stop);
   }
 
+/*******************************************************************************/
 
 FXIMPLEMENT(Syntax,FXObject,NULL,0)
 

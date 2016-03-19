@@ -175,41 +175,42 @@ long Adie::onUpdSyntaxPaths(FXObject* sender,FXSelector,void*){
   return 1;
   }
 
+
 /*******************************************************************************/
 
 // Print command line help
 static void printusage(){
-  printf("Usage: adie [options] files...\n");
-  printf("  options:\n");
-  printf("  -?, -h, --help                      Print help.\n");
-  printf("  -V, --version                       Print version number.\n");
-  printf("  -v, --view                          Start in view-only mode.\n");
-  printf("  -e, --edit                          Start in edit-mode.\n");
-  printf("  -l NUM, --line NUM                  Jump cursor position to line number.\n");
-  printf("  -c NUM, --col NUM                   Jump cursor position to column.\n");
-  printf("  -S SYNTAXFILE, --syntax SYNTAXFILE  Load given syntax file.\n");
-  printf("  -L LANGUAGE, --lang LANGUAGE        Force language mode.\n");
+  fxmessage("Usage: adie [options] files...\n");
+  fxmessage("  options:\n");
+  fxmessage("  -?, -h, --help                      Print help.\n");
+  fxmessage("  -V, --version                       Print version number.\n");
+  fxmessage("  -v, --view                          Start in view-only mode.\n");
+  fxmessage("  -e, --edit                          Start in edit-mode.\n");
+  fxmessage("  -l NUM, --line NUM                  Jump cursor position to line number.\n");
+  fxmessage("  -c NUM, --col NUM                   Jump cursor position to column.\n");
+  fxmessage("  -S SYNTAXFILE, --syntax SYNTAXFILE  Load given syntax file.\n");
+  fxmessage("  -L LANGUAGE, --lang LANGUAGE        Force language mode.\n");
   }
 
 
 // Print verson info
 static void printversion(){
-  printf("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  printf("Copyright (C) 2000,2014 Jeroen van der Zijp.  All Rights Reserved.\n\n");
-  printf("Please visit: http://www.fox-toolkit.org for further information.\n");
-  printf("\n");
-  printf("This program is free software: you can redistribute it and/or modify\n");
-  printf("it under the terms of the GNU General Public License as published by\n");
-  printf("the Free Software Foundation, either version 3 of the License, or\n");
-  printf("(at your option) any later version.\n");
-  printf("\n");
-  printf("This program is distributed in the hope that it will be useful,\n");
-  printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-  printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
-  printf("GNU General Public License for more details.\n");
-  printf("\n");
-  printf("You should have received a copy of the GNU General Public License\n");
-  printf("along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
+  fxmessage("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
+  fxmessage("Copyright (C) 2000,2014 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
+  fxmessage("\n");
+  fxmessage("This program is free software: you can redistribute it and/or modify\n");
+  fxmessage("it under the terms of the GNU General Public License as published by\n");
+  fxmessage("the Free Software Foundation, either version 3 of the License, or\n");
+  fxmessage("(at your option) any later version.\n");
+  fxmessage("\n");
+  fxmessage("This program is distributed in the hope that it will be useful,\n");
+  fxmessage("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+  fxmessage("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
+  fxmessage("GNU General Public License for more details.\n");
+  fxmessage("\n");
+  fxmessage("You should have received a copy of the GNU General Public License\n");
+  fxmessage("along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
   }
 
 
@@ -264,23 +265,23 @@ FXint Adie::start(int argc,char** argv){
       return 0;
       }
     else if(compare(argv[arg],"-l")==0 || compare(argv[arg],"--line")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing line number.\n"); return 1; }
+      if(++arg>=argc){ fxwarning("Adie: missing line number.\n"); return 1; }
       sscanf(argv[arg],"%d",&line);
       }
     else if(compare(argv[arg],"-c")==0 || compare(argv[arg],"--col")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing column number.\n"); return 1; }
+      if(++arg>=argc){ fxwarning("Adie: missing column number.\n"); return 1; }
       sscanf(argv[arg],"%d",&col);
       }
     else if(compare(argv[arg],"-S")==0 || compare(argv[arg],"--syntax")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing syntax file.\n"); return 1; }
+      if(++arg>=argc){ fxwarning("Adie: missing syntax file.\n"); return 1; }
       syntaxfile=argv[arg];
       }
-    else if(compare(argv[arg],"-S")==0 || compare(argv[arg],"--lang")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing language mode.\n"); return 1; }
+    else if(compare(argv[arg],"-L")==0 || compare(argv[arg],"--lang")==0){
+      if(++arg>=argc){ fxwarning("Adie: missing language mode.\n"); return 1; }
       lang=argv[arg];
       }
     else{
-      fprintf(stderr,"Adie: unknown command line argument.\n");
+      fxwarning("Adie: unknown command line argument.\n");
       return 1;
       }
     arg++;
@@ -289,7 +290,7 @@ FXint Adie::start(int argc,char** argv){
   // Load syntax file
   if(!syntaxfile.empty()){
     if(!SyntaxParser::parseFile(syntaxes,syntaxfile)){
-      fprintf(stderr,"Adie: unable to parse syntax file: %s.\n",syntaxfile.text());
+      fxwarning("Adie: unable to parse syntax file: %s.\n",syntaxfile.text());
       }
     }
 

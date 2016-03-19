@@ -116,8 +116,8 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXCURCursor.lo FXCalendar.lo FXCalendarView.lo FXCanvas.lo \
 	FXCheckButton.lo FXChoiceBox.lo FXColorBar.lo FXColorDialog.lo \
 	FXColorList.lo FXColorRing.lo FXColors.lo FXColorSelector.lo \
-	FXColorWell.lo FXColorWheel.lo FXComboBox.lo FXComplexf.lo \
-	FXComplexd.lo FXComposeContext.lo FXComposite.lo \
+	FXColorWell.lo FXColorWheel.lo FXComboBox.lo FXCompletion.lo \
+	FXComplexf.lo FXComplexd.lo FXComposeContext.lo FXComposite.lo \
 	FXCondition.lo FXConsole.lo FXCursor.lo FXDataTarget.lo \
 	FXDate.lo FXDC.lo FXDCPrint.lo FXDCWindow.lo FXDDSIcon.lo \
 	FXDDSImage.lo FXDLL.lo FXDebugTarget.lo FXDelegator.lo \
@@ -573,6 +573,7 @@ FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
 FXComboBox.cpp \
+FXCompletion.cpp \
 FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
@@ -1023,6 +1024,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXColorWheel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXColors.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComboBox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXCompletion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComplexd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComplexf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComposeContext.Plo@am__quote@

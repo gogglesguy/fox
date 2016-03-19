@@ -71,7 +71,7 @@ public:
   /**
   * Close JSON file and delete buffers.
   */
-  FXbool close();
+  virtual FXbool close();
 
   /**
   * Close JSON file.

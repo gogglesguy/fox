@@ -225,6 +225,7 @@ FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
 FXComboBox.cpp \
+FXCompletion.cpp \
 FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \

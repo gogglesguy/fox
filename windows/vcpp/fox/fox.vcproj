@@ -1580,6 +1580,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXCompletion.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXCompletion.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXComplexd.cpp"
 			>
 			<FileConfiguration
@@ -5963,6 +5971,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXParallel.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\fxparsegeometry.cpp"
 			>
 			<FileConfiguration
@@ -8241,6 +8253,14 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXTaskGroup.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXTaskGroup.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXText.cpp"
 			>
 			<FileConfiguration
@@ -9576,7 +9596,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="cd ..\..\..\lib&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -v -nc -i icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookset.gif bookclr.gif bookadd.bmp bookdel.bmp clearentry.gif cmymode.gif dialmode.gif dirupicon.gif deleteicon.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotoicon.gif gotowork.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap  -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookset.gif bookclr.gif bookadd.bmp bookdel.bmp clearentry.gif cmymode.gif dialmode.gif dirupicon.gif deleteicon.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotoicon.gif gotowork.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif&#x0D;&#x0A;"
+					CommandLine="cd ..\..\..\lib&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -nc -i icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookset.gif bookclr.gif bookadd.bmp bookdel.bmp clearentry.gif cmymode.gif dialmode.gif dirupicon.gif deleteicon.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotoicon.gif gotowork.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookset.gif bookclr.gif bookadd.bmp bookdel.bmp clearentry.gif cmymode.gif dialmode.gif dirupicon.gif deleteicon.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotoicon.gif gotowork.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif"
 					Outputs="icons.cpp;icons.h"
 				/>
 			</FileConfiguration>
