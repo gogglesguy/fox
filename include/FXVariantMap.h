@@ -82,6 +82,12 @@ public:
   /// Find slot index for key; return -1 if not found
   FXival find(const FXString& ky) const { return find(ky.text()); }
 
+  /// Check if key is mapped
+  FXbool has(const FXchar* ky) const { return 0<=find(ky); }
+
+  /// Check if key is mapped
+  FXbool has(const FXString& ky) const { return has(ky.text()); }
+
   /// Return reference to variant assocated with key
   FXVariant& at(const FXchar* ky);
 
@@ -111,6 +117,9 @@ public:
 
   /// Remove entry from the table
   void remove(const FXString& ky){ remove(ky.text()); }
+
+  /// Erase entry at pos in the table
+  void erase(FXival pos);
 
   /// Equality operator
   FXbool operator==(const FXVariantMap& other) const;

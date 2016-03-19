@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                        I / O   D e v i c e   C l a s s                        *
+*                        I / O   B u f f e r   C l a s s                        *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -18,8 +18,8 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifndef FXIODEVICE_H
-#define FXIODEVICE_H
+#ifndef FXIOBUFFER_H
+#define FXIOBUFFER_H
 
 #ifndef FXIO_H
 #include "FXIO.h"
@@ -30,40 +30,33 @@ namespace FX {
 
 
 /**
-* FXIODevice manipulates a handle to operating system i/o device,
-* such as pipes, sockets, or files.
+* IOBuffer is a file-interface to a chunk of memory, permitting
+* file-operations to be performed on memory-resident data.
 */
-class FXAPI FXIODevice : public FXIO {
+class FXAPI FXIOBuffer : public FXIO {
 protected:
-  FXInputHandle device;
+  FXuchar *begptr;      // Begin of buffer
+  FXuchar *endptr;      // End of buffer
+  FXuchar *ptr;         // Pointer
 private:
-  FXIODevice(const FXIODevice&);
-  FXIODevice &operator=(const FXIODevice&);
+  FXIOBuffer(const FXIOBuffer&);
+  FXIOBuffer &operator=(const FXIOBuffer&);
 public:
 
   /// Construct
-  FXIODevice();
+  FXIOBuffer();
 
-  /// Construct with given handle and mode
-  FXIODevice(FXInputHandle h,FXuint m);
+  /// Construct and open
+  FXIOBuffer(FXuchar* data=NULL,FXuval size=0L,FXuint m=FXIO::Reading);
 
-  /// Open device with access mode m and handle h
-  virtual FXbool open(FXInputHandle h,FXuint m);
-
-  /// Return handle
-  FXInputHandle handle() const { return device; }
+  /// Open buffer 
+  virtual FXbool open(FXuchar* data=NULL,FXuval size=0L,FXuint m=FXIO::Reading);
 
   /// Return true if open
   virtual FXbool isOpen() const;
 
   /// Return true if serial access only
   virtual FXbool isSerial() const;
-
-  /// Attach existing device handle, taking ownership of the handle
-  virtual void attach(FXInputHandle h,FXuint m);
-
-  /// Detach device handle
-  virtual void detach();
 
   /// Get current file position
   virtual FXlong position() const;
@@ -93,7 +86,7 @@ public:
   virtual FXbool close();
 
   /// Destroy and close
-  virtual ~FXIODevice();
+  virtual ~FXIOBuffer();
   };
 
 }

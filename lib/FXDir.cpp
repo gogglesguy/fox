@@ -96,7 +96,7 @@ FXbool FXDir::open(const FXString& path){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,path.text(),MAXPATHLEN);
+    utf2ncs(buffer,path.text(),MAXPATHLEN-2);
     wcsncat(buffer,TEXT("\\*"),MAXPATHLEN);
 #else
     FXchar buffer[MAXPATHLEN];

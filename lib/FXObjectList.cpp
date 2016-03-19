@@ -65,16 +65,16 @@ FXbool FXObjectList::no(FXint num){
   if(__likely(old!=num)){
     if(0<num){
       if(ptr==EMPTY){
-        if((p=(FXObject**)malloc(ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)))==NULL) return false;
+        if((p=(FXObject**)::malloc(ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)))==NULL) return false;
         }
       else{
-        if((p=(FXObject**)realloc(ptr-1,ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)))==NULL) return false;
+        if((p=(FXObject**)::realloc(ptr-1,ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)))==NULL) return false;
         }
       ptr=p+1;
       *((FXint*)(ptr-1))=num;
       }
     else if(ptr!=EMPTY){
-      free(ptr-1);
+      ::free(ptr-1);
       ptr=EMPTY;
       }
     }
@@ -131,10 +131,9 @@ FXObjectList& FXObjectList::operator=(const FXObjectList& orig){
 
 // Adopt objects from orig, leaving orig empty
 FXObjectList& FXObjectList::adopt(FXObjectList& orig){
-  if(__likely(ptr!=orig.ptr)){
-    if(ptr!=EMPTY){ free(ptr-1); }
-    ptr=orig.ptr;
-    orig.ptr=EMPTY;
+  if(__likely(ptr!=orig.ptr)){ 
+    swap(ptr,orig.ptr); 
+    orig.clear(); 
     }
   return *this;
   }
@@ -412,7 +411,7 @@ FXint FXObjectList::rfind(const FXObject* object,FXint pos) const {
 // Clear the list
 void FXObjectList::clear(){
   if(__likely(ptr!=EMPTY)){
-    free(ptr-1);
+    ::free(ptr-1);
     ptr=EMPTY;
     }
   }
@@ -442,9 +441,7 @@ void FXObjectList::load(FXStream& store){
 
 // Free up nicely
 FXObjectList::~FXObjectList(){
-  if(__likely(ptr!=EMPTY)){
-    free(ptr-1);
-    }
+  clear();
   }
 
 }

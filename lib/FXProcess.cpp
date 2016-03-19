@@ -401,7 +401,7 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
   FXbool result=false;
   if(pid==0 && exec && args){
 #if defined(WIN32)
-#ifdef UNICODE
+#if defined(UNICODE)
     FXnchar uniexec[MAXPATHLEN];
     utf2ncs(uniexec,exec,MAXPATHLEN);
     if(::GetFileAttributesW(uniexec)!=INVALID_FILE_ATTRIBUTES){

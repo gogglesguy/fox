@@ -62,12 +62,6 @@ public:
   /// Change file position, returning new position from start
   virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
 
-  /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* data,FXival count);
-
-  /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* data,FXival count);
-
   /// Truncate file to size s
   virtual FXlong truncate(FXlong s);
 
@@ -79,9 +73,6 @@ public:
 
   /// Return file size
   virtual FXlong size();
-
-  /// Close file
-  virtual FXbool close();
 
 
   /// Create new (empty) file
@@ -121,10 +112,6 @@ public:
 
   /// Recursively remove file or directory, recurse if allowed
   static FXbool removeFiles(const FXString& path,FXbool recursive=false);
-
-
-  /// Destroy
-  virtual ~FXFile();
   };
 
 }

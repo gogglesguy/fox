@@ -98,21 +98,20 @@ public:
   FXptr find(FXptr name) const;
 
   /**
-  * Insert key into table, unless the key already exists.
-  * Returns the current value of the key.
-  */
-  FXptr insert(FXptr name,FXptr data=NULL);
-
-  /**
   * Replace key in table, overwriting the old value if the
   * given key already exists.  Returns the old value of the key.
   */
-  FXptr replace(FXptr name,FXptr data=NULL);
+  FXptr insert(FXptr name,FXptr data=NULL);
 
   /**
   * Remove key from the table. Returns the old value of the key.
   */
   FXptr remove(FXptr name);
+
+  /**
+  * Erase entry from table at pos, returning old value.
+  */
+  FXptr erase(FXival pos);
 
   /**
   * Return true if slot is not occupied by a key.
@@ -125,9 +124,14 @@ public:
   FXptr key(FXival pos) const { return table[pos].name; }
 
   /**
-  * Return data pointer at position pos.
+  * Return reference to data pointer at position pos.
   */
-  FXptr value(FXival pos) const { return table[pos].data; }
+  FXptr& value(FXival pos){ return table[pos].data; }
+
+  /**
+  * Return constant reference data pointer at position pos.
+  */
+  const FXptr& value(FXival pos) const { return table[pos].data; }
 
   /**
   * Clear hash table.

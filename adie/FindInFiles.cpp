@@ -128,7 +128,7 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
   // Initial pattern
   setPatternList(tr("All Files (*)"));
-  
+
   // Search flags
   searchflags=SearchExact;
   index=-1;
@@ -434,10 +434,10 @@ long FindInFiles::onCmdFlags(FXObject*,FXSelector sel,void*){
 
 // File list double clicked
 long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
-  FXint index=(FXint)(FXival)ptr;
+  index=(FXint)(FXival)ptr;
   return 1;
   }
-  
+
 
 // Clean up
 FindInFiles::~FindInFiles(){

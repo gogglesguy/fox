@@ -252,13 +252,7 @@ FXbool FXVariant::no(FXint n){
 
 // Check if key is mapped
 FXbool FXVariant::has(const FXchar* key) const {
-  return (type==VMap) && (reinterpret_cast<const FXVariantMap*>(&value.p)->find(key)>=0);
-  }
-
-
-// Check if key is mapped
-FXbool FXVariant::has(const FXString& key) const {
-  return (type==VMap) && (reinterpret_cast<const FXVariantMap*>(&value.p)->find(key)>=0);
+  return (type==VMap) && (reinterpret_cast<const FXVariantMap*>(&value.p)->has(key));
   }
 
 
@@ -287,12 +281,6 @@ FXbool FXVariant::toBool(FXbool* ok) const {
   }
 
 
-// Convert to char
-FXchar FXVariant::toChar(FXbool* ok) const {
-  return (FXchar)toULong(ok);
-  }
-
-
 // Convert to int
 FXint FXVariant::toInt(FXbool* ok) const {
   return (FXint)toLong(ok);
@@ -300,7 +288,7 @@ FXint FXVariant::toInt(FXbool* ok) const {
 
 
 // Convert to unsigned int
-FXint FXVariant::toUInt(FXbool* ok) const {
+FXuint FXVariant::toUInt(FXbool* ok) const {
   return (FXuint)toULong(ok);
   }
 

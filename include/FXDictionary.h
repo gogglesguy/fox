@@ -25,8 +25,14 @@ namespace FX {
 
 
 /**
-* The dictionary class maintains a fast-access hash table of entities
-* indexed by a character string.
+* The dictionary class maintains a fast-access hash table, mapping character
+* strings to pointers.
+* Subclasses of dictionary can easily specialize the pointers to pointers to
+* particular types; to this end subclasses must overload certain API's and 
+* perform the necessary type-casts for the proper interpretation of the stored
+* pointer values.
+* Note that many complex containers in FOX now fit inside a pointer, and so 
+* these types can be used in dictionaries as well! 
 */
 class FXAPI FXDictionary {
 protected:
@@ -76,83 +82,70 @@ public:
   /// Adopt dictionary from another
   FXDictionary& adopt(FXDictionary& other);
 
-  /// Find data pointer given key
-  FXptr find(const FXchar* ky) const;
+  /// Find position of given key
+  FXival find(const FXchar* ky) const;
 
-  /// Find data pointer given key
-  FXptr find(const FXString& ky) const { return find(ky.text()); }
+  /// Find position of given key
+  FXival find(const FXString& ky) const { return find(ky.text()); }
 
-  /// Return reference to slot assocated with key
+  /// Check if key is mapped
+  FXbool has(const FXchar* ky) const { return 0<=find(ky); }
+
+  /// Check if key is mapped
+  FXbool has(const FXString& ky) const { return has(ky.text()); }
+
+  /// Return reference to slot assocated with given key
   FXptr& at(const FXchar* ky);
 
-  /// Return constant reference to slot assocated with key
+  /// Return constant reference to slot assocated with given key
   const FXptr& at(const FXchar* ky) const;
 
-  /// Return reference to slot assocated with key
+  /// Return reference to slot assocated with given key
   FXptr& at(const FXString& ky){ return at(ky.text()); }
 
-  /// Return constant reference to slot assocated with key
+  /// Return constant reference to slot assocated with given key
   const FXptr& at(const FXString& ky) const { return at(ky.text()); }
 
-  /// Return reference to slot assocated with key
+  /// Return reference to slot assocated with given key
   FXptr& operator[](const FXchar* ky){ return at(ky); }
 
-  /// Return constant reference to slot assocated with key
+  /// Return constant reference to slot assocated with given key
   const FXptr& operator[](const FXchar* ky) const { return at(ky); }
 
-  /// Return reference to slot assocated with key
+  /// Return reference to slot assocated with given key
   FXptr& operator[](const FXString& ky){ return at(ky); }
 
-  /// Return constant reference to slot assocated with key
+  /// Return constant reference to slot assocated with given key
   const FXptr& operator[](const FXString& ky) const { return at(ky); }
 
-  /**
-  * Insert data into the table with given key.
-  * If there is an existing entry with the key, leave it unchanged,
-  */
+  /// Insert association with given key; return old value, if any
   FXptr insert(const FXchar* ky,FXptr ptr=NULL);
-  
-  /**
-  * Insert data into the table with given key.
-  * If there is an existing entry with the key, leave it unchanged,
-  */
+
+  /// Insert association with given key; return old value, if any
   FXptr insert(const FXString& ky,FXptr ptr=NULL){ return insert(ky.text(),ptr); }
 
-  /**
-  * Replace data in table with given key.
-  * If there is no existing entry with the key, a new entry is inserted.
-  */
-  FXptr replace(const FXchar* ky,FXptr ptr=NULL);
-
-  /**
-  * Replace data in table with given key.
-  * If there is no existing entry with the key, a new entry is inserted.
-  */
-  FXptr replace(const FXString& ky,FXptr ptr=NULL){ return replace(ky.text(),ptr); }
-
-  /**
-  * Remove data given key from table, returning old pointer.
-  */
+  /// Remove association with given key; return old value, if any
   FXptr remove(const FXchar* ky);
 
-  /**
-  * Remove data given key from table, returning old pointer.
-  */
+  /// Remove association with given key; return old value, if any
   FXptr remove(const FXString& ky){ return remove(ky.text()); }
+
+  /// Erase data at pos in the table; return old value, if any
+  FXptr erase(FXival pos);
 
   /// Return key at position pos
   const FXString& key(FXival pos) const { return table[pos].key; }
 
-  /// Return data pointer at position pos
+  /// Return reference to slot at position pos
   FXptr& data(FXival pos){ return table[pos].data; }
 
-  /// Return data pointer at position pos
+  /// Return constant reference to slot at position pos
   const FXptr& data(FXival pos) const { return table[pos].data; }
 
-  /// Clear all entries
+  /// Clear entire table
   void clear();
 
-  /// Destructor
+  /// Destroy table
  ~FXDictionary();
   };
 

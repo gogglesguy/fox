@@ -534,10 +534,10 @@ FXuint fxstrhash(const FXchar* str){
 
 // Swap non-overlapping arrays
 void memswap(void *dst,void *src,FXuval n){
-  register unsigned char* p=(unsigned char*)dst;
-  register unsigned char* q=(unsigned char*)src;
-  register unsigned char* e=p+n;
-  register unsigned char t;
+  register FXuchar* p=(FXuchar*)dst;
+  register FXuchar* q=(FXuchar*)src;
+  register FXuchar* e=p+n;
+  register FXuchar t;
   while(p<e){
     t=*p; *p=*q; *q=t;
     p++;

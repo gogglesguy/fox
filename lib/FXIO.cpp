@@ -109,6 +109,18 @@ FXival FXIO::writeBlock(const void*,FXival count){
   }
 
 
+// Read character 
+FXbool FXIO::readChar(FXchar& ch){
+  return readBlock(&ch,1)==1;
+  }
+  
+
+// Write character
+FXbool FXIO::writeChar(FXchar ch){
+  return writeBlock(&ch,1)==1;
+  }
+  
+
 // Truncate file
 FXlong FXIO::truncate(FXlong){
   return -1;

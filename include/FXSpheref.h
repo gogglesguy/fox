@@ -121,6 +121,9 @@ public:
   /// Intersect sphere with ray u-v
   FXbool intersect(const FXVec3f& u,const FXVec3f& v) const;
 
+  /// Intersect box with ray pos+lambda*dir, returning true if hit
+  FXbool intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[]) const;
+
   /// Transform sphere by 4x4 matrix
   FXSpheref transform(const FXMat4f& mat) const;
 

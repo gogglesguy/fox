@@ -245,26 +245,30 @@ FXint FXSpheref::intersect(const FXVec4f& plane) const {
 
 // Intersect sphere with ray u-v
 FXbool FXSpheref::intersect(const FXVec3f& u,const FXVec3f& v) const {
+  FXfloat hits[2];
+  return intersect(u,v-u,hits) && 0.0f<=hits[1] && hits[0]<=1.0f;
+  }
+
+
+// Intersect box with ray pos+lambda*dir, returning true if hit
+FXbool FXSpheref::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[]) const {
   if(0.0f<=radius){
-    FXfloat rr=radius*radius;
-    FXVec3f uc=center-u;        // Vector from u to center
-    FXfloat dd=uc.length2();
-    if(dd>rr){                  // Ray start point outside sphere
-      FXVec3f uv=v-u;           // Vector from u to v
-      FXfloat hh=uc*uv;         // If hh<0, uv points away from center
-      if(0.0f<=hh){             // Not away from sphere
-        FXfloat kk=uv.length2();
-        FXfloat disc=hh*hh-kk*(dd-rr);  // FIXME this needs to be checked again!
-        if(disc<=0.0f) return false;
-        return true;
-        }
-      return false;
+    FXVec3f m=center-pos;
+    FXfloat m2=m.length2();
+    FXfloat d2=dir.length2();
+    FXfloat r2=radius*radius;
+    FXfloat b=dir*m;
+    FXfloat disc=b*b-d2*(m2-r2);
+    if(0.0f<=disc){
+      disc=sqrt(disc);
+      hit[0]=(-b-disc)/d2;
+      hit[1]=(-b+disc)/d2;
+      return true;
       }
-    return true;
     }
   return false;
   }
-
+  
 
 // Test if box overlaps with sphere; algorithm due to Arvo (GEMS I)
 FXbool overlap(const FXSpheref& a,const FXRangef& b){

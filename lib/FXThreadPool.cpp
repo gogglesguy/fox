@@ -311,8 +311,8 @@ FXuint FXThreadPool::start(FXuint count){
 
 
 // Process tasks from the queue using multiple worker threads.
-// When queue becomes empty, extra workers will exit if no work
-// arrives within a set amount of time.
+// When queue becomes empty, extra workers will exit if no work arrives
+// within a set amount of time. 
 // The last worker to terminate will signal the semaphore.
 FXint FXThreadPool::run(){
   instance(this);

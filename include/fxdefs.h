@@ -131,7 +131,7 @@
 
 
 // Restrict aliasing on pointers
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__restrict)
 #define __restrict __restrict__
 #else
 #define __restrict
