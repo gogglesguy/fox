@@ -45,10 +45,12 @@ namespace FX {
 
 
 // Declarations
+#ifndef FXLOADXBM
 extern FXAPI FXbool fxcheckXBM(FXStream& store);
 extern FXAPI FXbool fxloadXBM(FXColor*& data,const FXuchar *pix,const FXuchar *msk,FXint width,FXint height);
 extern FXAPI FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& hotx,FXint& hoty);
 extern FXAPI FXbool fxsaveXBM(FXStream& store,const FXColor *data,FXint width,FXint height,FXint hotx=-1,FXint hoty=-1);
+#endif
 
 // Furnish our own version
 extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);

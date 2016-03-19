@@ -57,7 +57,6 @@ public:
   };
 
 
-
 #ifndef FXLOADIFF
 #define FXLOADIFF
 
@@ -73,7 +72,6 @@ extern FXAPI FXbool fxcheckIFF(FXStream& store);
 * If an error occurred, the pixel array is set to NULL.
 */
 extern FXAPI FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-
 
 #endif
 

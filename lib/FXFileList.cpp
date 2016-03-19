@@ -75,7 +75,7 @@
   - Clipboard, DND, etc. support.
   - When being dragged over, if hovering over a directory item for some
     time we need to open it.
-  - We should generate SEL_INSERTED, SEL_DELETED, SEL_REPLACED, SEL_CHANGED
+  - We should generate SEL_INSERTED, SEL_DELETED, SEL_CHANGED
     messages as the FXFileList updates itself from the file system.
   - The solution currently used to determine whether or not to blend the
     icon isn't so great; this class shouldn't have to know about FXPNGIcon.
@@ -177,19 +177,19 @@ FXIMPLEMENT(FXFileList,FXIconList,FXFileListMap,ARRAYNUMBER(FXFileListMap))
 FXFileList::FXFileList(){
   dropEnable();
   associations=NULL;
+  list=NULL;
   big_folder=NULL;
   mini_folder=NULL;
   big_doc=NULL;
   mini_doc=NULL;
   big_app=NULL;
   mini_app=NULL;
-  list=NULL;
 #ifdef WIN32
   matchmode=FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold;
-  sortfunc=ascendingCase;
+  setSortFunc(ascendingCase);
 #else
   matchmode=FXPath::PathName|FXPath::NoEscape;
-  sortfunc=ascending;
+  setSortFunc(ascending);
 #endif
   imagesize=32;
   clipfiles=NULL;
@@ -218,19 +218,19 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
 #endif
   associations=NULL;
   if(!(options&FILELIST_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
+  list=NULL;
   big_folder=new FXGIFIcon(getApp(),bigfolder);
   mini_folder=new FXGIFIcon(getApp(),minifolder);
   big_doc=new FXGIFIcon(getApp(),bigdoc);
   mini_doc=new FXGIFIcon(getApp(),minidoc);
   big_app=new FXGIFIcon(getApp(),bigapp);
   mini_app=new FXGIFIcon(getApp(),miniapp);
-  list=NULL;
 #ifdef WIN32
   matchmode=FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold;
-  sortfunc=ascendingCase;
+  setSortFunc(ascendingCase);
 #else
   matchmode=FXPath::PathName|FXPath::NoEscape;
-  sortfunc=ascending;
+  setSortFunc(ascending);
 #endif
   imagesize=32;
   clipfiles=NULL;
@@ -1071,120 +1071,120 @@ long FXFileList::onUpdSetDirectory(FXObject* sender,FXSelector,void*){
 // Sort by name
 long FXFileList::onCmdSortByName(FXObject*,FXSelector,void*){
 #ifdef WIN32
-  if(sortfunc==ascending) sortfunc=descending;
-  else if(sortfunc==ascendingCase) sortfunc=descendingCase;
-  else if(sortfunc==descending) sortfunc=ascending;
-  else sortfunc=ascendingCase;
+  if(getSortFunc()==ascending) setSortFunc(descending);
+  else if(getSortFunc()==ascendingCase) setSortFunc(descendingCase);
+  else if(getSortFunc()==descending) setSortFunc(ascending);
+  else setSortFunc(ascendingCase);
 #else
-  if(sortfunc==ascending) sortfunc=descending;
-  else if(sortfunc==ascendingCase) sortfunc=descendingCase;
-  else if(sortfunc==descending) sortfunc=ascending;
-  else sortfunc=ascending;
+  if(getSortFunc()==ascending) setSortFunc(descending);
+  else if(getSortFunc()==ascendingCase) setSortFunc(descendingCase);
+  else if(getSortFunc()==descending) setSortFunc(ascending);
+  else setSortFunc(ascendingCase);
 #endif
-  scan(true);
+  sortItems();
   return 1;
   }
 
 
 // Update sender
 long FXFileList::onUpdSortByName(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascending || sortfunc==descending || sortfunc==ascendingCase || sortfunc==descendingCase) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascending || getSortFunc()==descending || getSortFunc()==ascendingCase || getSortFunc()==descendingCase) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Sort by type
 long FXFileList::onCmdSortByType(FXObject*,FXSelector,void*){
-  sortfunc=(sortfunc==ascendingType) ? descendingType : ascendingType;
-  scan(true);
+  setSortFunc((getSortFunc()==ascendingType) ? descendingType : ascendingType);
+  sortItems();
   return 1;
   }
 
 
 // Update sender
 long FXFileList::onUpdSortByType(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascendingType || sortfunc==descendingType) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascendingType || getSortFunc()==descendingType) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Sort by size
 long FXFileList::onCmdSortBySize(FXObject*,FXSelector,void*){
-  sortfunc=(sortfunc==ascendingSize) ? descendingSize : ascendingSize;
-  scan(true);
+  setSortFunc((getSortFunc()==ascendingSize) ? descendingSize : ascendingSize);
+  sortItems();
   return 1;
   }
 
 
 // Update sender
 long FXFileList::onUpdSortBySize(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascendingSize || sortfunc==descendingSize) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascendingSize || getSortFunc()==descendingSize) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Sort by time
 long FXFileList::onCmdSortByTime(FXObject*,FXSelector,void*){
-  sortfunc=(sortfunc==ascendingTime) ? descendingTime : ascendingTime;
-  scan(true);
+  setSortFunc((getSortFunc()==ascendingTime) ? descendingTime : ascendingTime);
+  sortItems();
   return 1;
   }
 
 
 // Update sender
 long FXFileList::onUpdSortByTime(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascendingTime || sortfunc==descendingTime) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascendingTime || getSortFunc()==descendingTime) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Sort by user
 long FXFileList::onCmdSortByUser(FXObject*,FXSelector,void*){
-  sortfunc=(sortfunc==ascendingUser) ? descendingUser : ascendingUser;
-  scan(true);
+  setSortFunc((getSortFunc()==ascendingUser) ? descendingUser : ascendingUser);
+  sortItems();
   return 1;
   }
 
 
 // Update sender
 long FXFileList::onUpdSortByUser(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascendingUser || sortfunc==descendingUser) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascendingUser || getSortFunc()==descendingUser) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Sort by group
 long FXFileList::onCmdSortByGroup(FXObject*,FXSelector,void*){
-  sortfunc=(sortfunc==ascendingGroup) ? descendingGroup : ascendingGroup;
-  scan(true);
+  setSortFunc((getSortFunc()==ascendingGroup) ? descendingGroup : ascendingGroup);
+  sortItems();
   return 1;
   }
 
 
 // Update sender
 long FXFileList::onUpdSortByGroup(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascendingGroup || sortfunc==descendingGroup) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascendingGroup || getSortFunc()==descendingGroup) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Reverse sort order
 long FXFileList::onCmdSortReverse(FXObject*,FXSelector,void*){
-  if(sortfunc==ascending) sortfunc=descending;
-  else if(sortfunc==descending) sortfunc=ascending;
-  else if(sortfunc==ascendingCase) sortfunc=descendingCase;
-  else if(sortfunc==descendingCase) sortfunc=ascendingCase;
-  else if(sortfunc==ascendingType) sortfunc=descendingType;
-  else if(sortfunc==descendingType) sortfunc=ascendingType;
-  else if(sortfunc==ascendingSize) sortfunc=descendingSize;
-  else if(sortfunc==descendingSize) sortfunc=ascendingSize;
-  else if(sortfunc==ascendingTime) sortfunc=descendingTime;
-  else if(sortfunc==descendingTime) sortfunc=ascendingTime;
-  else if(sortfunc==ascendingUser) sortfunc=descendingUser;
-  else if(sortfunc==descendingUser) sortfunc=ascendingUser;
-  else if(sortfunc==ascendingGroup) sortfunc=descendingGroup;
-  else if(sortfunc==descendingGroup) sortfunc=ascendingGroup;
-  scan(true);
+  if(getSortFunc()==ascending) setSortFunc(descending);
+  else if(getSortFunc()==descending) setSortFunc(ascending);
+  else if(getSortFunc()==ascendingCase) setSortFunc(descendingCase);
+  else if(getSortFunc()==descendingCase) setSortFunc(ascendingCase);
+  else if(getSortFunc()==ascendingType) setSortFunc(descendingType);
+  else if(getSortFunc()==descendingType) setSortFunc(ascendingType);
+  else if(getSortFunc()==ascendingSize) setSortFunc(descendingSize);
+  else if(getSortFunc()==descendingSize) setSortFunc(ascendingSize);
+  else if(getSortFunc()==ascendingTime) setSortFunc(descendingTime);
+  else if(getSortFunc()==descendingTime) setSortFunc(ascendingTime);
+  else if(getSortFunc()==ascendingUser) setSortFunc(descendingUser);
+  else if(getSortFunc()==descendingUser) setSortFunc(ascendingUser);
+  else if(getSortFunc()==ascendingGroup) setSortFunc(descendingGroup);
+  else if(getSortFunc()==descendingGroup) setSortFunc(ascendingGroup);
+  sortItems();
   return 1;
   }
 
@@ -1192,13 +1192,13 @@ long FXFileList::onCmdSortReverse(FXObject*,FXSelector,void*){
 // Update sender
 long FXFileList::onUpdSortReverse(FXObject* sender,FXSelector,void*){
   FXSelector selector=FXSEL(SEL_COMMAND,ID_UNCHECK);
-  if(sortfunc==descending) selector=FXSEL(SEL_COMMAND,ID_CHECK);
-  else if(sortfunc==descendingCase) selector=FXSEL(SEL_COMMAND,ID_CHECK);
-  else if(sortfunc==descendingType) selector=FXSEL(SEL_COMMAND,ID_CHECK);
-  else if(sortfunc==descendingSize) selector=FXSEL(SEL_COMMAND,ID_CHECK);
-  else if(sortfunc==descendingTime) selector=FXSEL(SEL_COMMAND,ID_CHECK);
-  else if(sortfunc==descendingUser) selector=FXSEL(SEL_COMMAND,ID_CHECK);
-  else if(sortfunc==descendingGroup) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  if(getSortFunc()==descending) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  else if(getSortFunc()==descendingCase) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  else if(getSortFunc()==descendingType) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  else if(getSortFunc()==descendingSize) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  else if(getSortFunc()==descendingTime) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  else if(getSortFunc()==descendingUser) selector=FXSEL(SEL_COMMAND,ID_CHECK);
+  else if(getSortFunc()==descendingGroup) selector=FXSEL(SEL_COMMAND,ID_CHECK);
   sender->handle(this,selector,NULL);
   return 1;
   }
@@ -1206,19 +1206,19 @@ long FXFileList::onUpdSortReverse(FXObject* sender,FXSelector,void*){
 
 // Toggle case sensitivity
 long FXFileList::onCmdSortCase(FXObject*,FXSelector,void*){
-  if(sortfunc==ascending) sortfunc=ascendingCase;
-  else if(sortfunc==ascendingCase) sortfunc=ascending;
-  else if(sortfunc==descending) sortfunc=descendingCase;
-  else if(sortfunc==descendingCase) sortfunc=descending;
-  scan(true);
+  if(getSortFunc()==ascending) setSortFunc(ascendingCase);
+  else if(getSortFunc()==ascendingCase) setSortFunc(ascending);
+  else if(getSortFunc()==descending) setSortFunc(descendingCase);
+  else if(getSortFunc()==descendingCase) setSortFunc(descending);
+  sortItems();
   return 1;
   }
 
 
 // Check if case sensitive
 long FXFileList::onUpdSortCase(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(sortfunc==ascendingCase || sortfunc==descendingCase) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
-  sender->handle(this,(sortfunc==ascendingCase || sortfunc==ascending || sortfunc==descendingCase || sortfunc==descending) ? FXSEL(SEL_COMMAND,ID_ENABLE) : FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  sender->handle(this,(getSortFunc()==ascendingCase || getSortFunc()==descendingCase) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(getSortFunc()==ascendingCase || getSortFunc()==ascending || getSortFunc()==descendingCase || getSortFunc()==descending) ? FXSEL(SEL_COMMAND,ID_ENABLE) : FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
@@ -1232,12 +1232,12 @@ long FXFileList::onCmdHeader(FXObject*,FXSelector,void* ptr){
 
 // Clicked header button
 long FXFileList::onUpdHeader(FXObject*,FXSelector,void*){
-  header->setArrowDir(0,(sortfunc==ascending || sortfunc==ascendingCase)  ? FXHeaderItem::ARROW_DOWN : (sortfunc==descending || sortfunc==descendingCase) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Name
-  header->setArrowDir(1,(sortfunc==ascendingType)  ? FXHeaderItem::ARROW_DOWN : (sortfunc==descendingType) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Type
-  header->setArrowDir(2,(sortfunc==ascendingSize)  ? FXHeaderItem::ARROW_DOWN : (sortfunc==descendingSize) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Size
-  header->setArrowDir(3,(sortfunc==ascendingTime)  ? FXHeaderItem::ARROW_DOWN : (sortfunc==descendingTime) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Date
-  header->setArrowDir(4,(sortfunc==ascendingUser)  ? FXHeaderItem::ARROW_DOWN : (sortfunc==descendingUser) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // User
-  header->setArrowDir(5,(sortfunc==ascendingGroup) ? FXHeaderItem::ARROW_DOWN : (sortfunc==descendingGroup)? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Group
+  header->setArrowDir(0,(getSortFunc()==ascending || getSortFunc()==ascendingCase)  ? FXHeaderItem::ARROW_DOWN : (getSortFunc()==descending || getSortFunc()==descendingCase) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Name
+  header->setArrowDir(1,(getSortFunc()==ascendingType)  ? FXHeaderItem::ARROW_DOWN : (getSortFunc()==descendingType) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Type
+  header->setArrowDir(2,(getSortFunc()==ascendingSize)  ? FXHeaderItem::ARROW_DOWN : (getSortFunc()==descendingSize) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Size
+  header->setArrowDir(3,(getSortFunc()==ascendingTime)  ? FXHeaderItem::ARROW_DOWN : (getSortFunc()==descendingTime) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Date
+  header->setArrowDir(4,(getSortFunc()==ascendingUser)  ? FXHeaderItem::ARROW_DOWN : (getSortFunc()==descendingUser) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // User
+  header->setArrowDir(5,(getSortFunc()==ascendingGroup) ? FXHeaderItem::ARROW_DOWN : (getSortFunc()==descendingGroup)? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);   // Group
   return 1;
   }
 
@@ -1258,6 +1258,18 @@ long FXFileList::onRefreshTimer(FXObject*,FXSelector,void*){
 long FXFileList::onCmdRefresh(FXObject*,FXSelector,void*){
   scan(true);
   return 1;
+  }
+
+
+// Compare till '\t' or '\0'
+static FXbool fileequal(const FXchar* p1,const FXchar* p2){
+  register FXint c1,c2;
+  do{
+    c1=*p1++;
+    c2=*p2++;
+    }
+  while(c1==c2 && c1!='\0' && c1!='\t');
+  return (c1=='\0' || c1=='\t') && (c2=='\0' || c2=='\t');
   }
 
 
@@ -1290,16 +1302,213 @@ void FXFileList::scan(FXbool force){
   }
 
 
+// List directory
+void FXFileList::listItems(FXbool force){
+  FXFileItem  *oldlist=list;    // Old insert-order list
+  FXFileItem  *newlist=NULL;    // New insert-order list
+  FXFileItem **po=&oldlist;     // Head of old list
+  FXFileItem **pn=&newlist;     // Head of new list
+  FXFileItem  *olditem;
+  FXFileItem  *newitem;
+  FXFileItem  *link;
+  FXString     pathname;
+  FXString     extension;
+  FXString     label;
+  FXString     name;
+  FXString     grpid;
+  FXString     usrid;
+  FXString     attrs;
+  FXString     modtm;
+  FXString     lnknm;
+  FXuint       mode;
+  FXbool       istop;
+  FXStat       info;
+  FXDir        dir;
+
+  // Get directory stream pointer
+  if(dir.open(directory)){
+
+    // Are we at the top directory?
+    istop=FXPath::isTopDirectory(directory);
+
+    // Loop over directory entries
+    while(dir.next(name)){
+
+      // Hidden files of the form ".xxx" are normally not shown, but ".." is so we can
+      // navigate up as well as down.  However, at the root level we can't go up any
+      // further so we show "." but not ".."; this allows us to explicitly select "/."
+      // as a directory when we're in directory selection mode.
+      if(name[0]=='.'){
+        if(name[1]=='\0'){
+          if((options&FILELIST_NO_PARENT) || !istop) continue;
+          }
+        else if(name[1]=='.' && name[2]=='\0'){
+          if((options&FILELIST_NO_PARENT) || istop) continue;
+          }
+        else{
+          if(!(options&FILELIST_SHOWHIDDEN)) continue;
+          }
+        }
+
+      // Build full pathname
+      pathname=directory;
+      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
+      pathname+=name;
+
+#ifdef WIN32
+
+      // Get file/link info
+      if(!FXStat::statFile(pathname,info)) continue;
+
+      mode=info.mode();
+
+      // Hidden file or directory normally not shown
+      if((mode&FXIO::Hidden) && !(options&FILELIST_SHOWHIDDEN)) continue;
+#else
+
+      // Get file/link info
+      if(!FXStat::statLink(pathname,info)) continue;
+
+      mode=info.mode();
+
+      // Check if link is a link to a directory
+      if((mode&FXIO::SymLink) && FXStat::isDirectory(pathname)) mode|=FXIO::Directory;
+
+#endif
+
+      // If it is a directory and we want only files, skip it
+      if((mode&FXIO::Directory) && (options&FILELIST_SHOWFILES)) continue;
+
+      // If it is a file and we want only directories or doesn't match, skip it
+      if(!(mode&FXIO::Directory) && ((options&FILELIST_SHOWDIRS) || !FXPath::match(name,pattern,matchmode))) continue;
+
+      // Search for item in old list, unlink from old if found
+      for(FXFileItem** pp=po; (olditem=*pp)!=NULL; pp=&olditem->link){
+        if(fileequal(olditem->label.text(),name.text())){
+          *pp=olditem->link; olditem->link=NULL;
+          break;
+          }
+        }
+
+      // New item if stuff changed
+      if(force || !olditem || olditem->date!=info.modified() || olditem->size!=info.size() || olditem->mode!=mode){
+
+        // Make new item if we have to
+        newitem=(FXFileItem*)createItem(FXString::null,NULL,NULL,NULL);
+
+        // Obtain user name
+        usrid=FXSystem::userName(info.user());
+
+        // Obtain group name
+        grpid=FXSystem::groupName(info.group());
+
+        // Permissions
+        attrs=FXSystem::modeString(mode);
+
+        // Mod time
+        modtm=FXSystem::localTime(info.modified());
+
+        // Link name, if any
+        lnknm=FXString::null;
+        if(info.isLink()) lnknm=FXFile::symlink(pathname);
+
+        // Update item information
+        newitem->setDraggable(draggable);
+        newitem->setSize(info.size());
+        newitem->setDate(info.modified());
+        newitem->setMode(mode);
+        newitem->setAssoc(NULL);
+
+        // Determine icons and type
+        if(newitem->isDirectory()){
+          extension=tr("Folder");
+          newitem->setBigIcon(big_folder);
+          newitem->setMiniIcon(mini_folder);
+          if(associations) newitem->setAssoc(associations->findDirBinding(pathname.text()));
+          }
+        else if(newitem->isExecutable()){
+          extension=tr("Application");
+          newitem->setBigIcon(big_app);
+          newitem->setMiniIcon(mini_app);
+          if(associations) newitem->setAssoc(associations->findExecBinding(pathname.text()));
+          }
+        else{
+          extension=tr("Document");
+          newitem->setBigIcon(big_doc);
+          newitem->setMiniIcon(mini_doc);
+          if(associations) newitem->setAssoc(associations->findFileBinding(pathname.text()));
+          }
+
+        // If association is found, use it
+        if(newitem->getAssoc()){
+          extension=newitem->getAssoc()->extension;
+          if(newitem->getAssoc()->bigicon) newitem->setBigIcon(newitem->getAssoc()->bigicon);
+          if(newitem->getAssoc()->miniicon) newitem->setMiniIcon(newitem->getAssoc()->miniicon);
+          }
+
+        // Update item information
+        label.format("%s\t%s\t%lld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),newitem->size,modtm.text(),usrid.text(),grpid.text(),attrs.text(),lnknm.text());
+
+        // New label
+        newitem->setText(label);
+
+        // Create item
+        if(id()) newitem->create();
+
+        // Replace old item
+        if(olditem){
+
+          // Old item was selected, so new one will be, too!
+          newitem->setSelected(olditem->isSelected());
+
+          // Replace old with new
+          setItem(items.find(olditem),newitem,true);
+          }
+
+        // Add new item
+        else{
+          appendItem(newitem,true);
+          }
+        *pn=newitem; pn=&newitem->link;
+        }
+
+      // Keep old item if nothing changed
+      else{
+        *pn=olditem; pn=&olditem->link;
+        }
+      }
+    dir.close();
+    }
+
+  // Wipe items remaining in list:- they have disappeared!!
+  for(olditem=oldlist; olditem; olditem=link){
+    link=olditem->link;
+    removeItem(items.find(olditem),true);
+    }
+
+  // Remember new list
+  list=newlist;
+
+  // Show thumbnails
+  if(showImages()){
+    getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)0);
+    }
+  }
+
+
+/*******************************************************************************/
+
+
 // Set current filename
 void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
     setDirectory(FXPath::directory(pathname));
     FXint index=findItem(FXPath::name(pathname));
-    makeItemVisible(index);
-    setAnchorItem(index);
-    setCurrentItem(index,notify);
     if(0<=index){
+      makeItemVisible(index);
+      setAnchorItem(index);
+      setCurrentItem(index,notify);
       selectItem(index);
       }
     }
@@ -1308,8 +1517,10 @@ void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
 
 // Get pathname to current file, if any
 FXString FXFileList::getCurrentFile() const {
-  if(current<0) return FXString::null;
-  return getItemPathname(current);
+  if(0<=getCurrentItem()){
+    return getItemPathname(getCurrentItem());
+    }
+  return FXString::null;
   }
 
 
@@ -1333,19 +1544,20 @@ FXString *FXFileList::getSelectedFiles() const {
 
 // Set directory being displayed
 void FXFileList::setDirectory(const FXString& pathname){
+  FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
-    FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
     FXString path=FXPath::absolute(directory,pathname);
-    while(!FXPath::isTopDirectory(path) && !(FXPath::isShare(path) || FXStat::isDirectory(path))){
+    while(!FXPath::isTopDirectory(path) && !FXPath::isShare(path) && !FXStat::isDirectory(path)){
       path=FXPath::upLevel(path);
       }
     if(directory!=path){
-      setPosition(0,0);
       directory=path;
-      clearItems();
+      clearItems(true);
       counter=0;
       list=NULL;
       scan(true);
+      setCurrentItem(0);
+      makeItemVisible(0);
       }
     }
   }
@@ -1356,16 +1568,105 @@ void FXFileList::setPattern(const FXString& ptrn){
   if(ptrn.empty()) return;
   if(pattern!=ptrn){
     pattern=ptrn;
-    scan(true);
+    if(getNumItems()) scan(true);
     }
   }
 
+/*******************************************************************************/
+
+// Get file name from item
+FXString FXFileList::getItemFilename(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::getItemFilename: index out of range.\n",getClassName()); }
+  return items[index]->label.section('\t',0);
+  }
+
+
+// Get full pathname to item
+FXString FXFileList::getItemPathname(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::getItemPathname: index out of range.\n",getClassName()); }
+  return FXPath::absolute(directory,items[index]->label.section('\t',0));
+  }
+
+
+// Is file
+FXbool FXFileList::isItemFile(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::isItemFile: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isFile();
+  }
+
+
+// Is directory
+FXbool FXFileList::isItemDirectory(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::isItemDirectory: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isDirectory();
+  }
+
+
+// Is executable
+FXbool FXFileList::isItemExecutable(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::isItemExecutable: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isExecutable();
+  }
+
+
+// Return true if this is a symbolic link item
+FXbool FXFileList::isItemSymlink(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::isItemSymlink: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isSymlink();
+  }
+
+
+// Return true if item is navigational item like '.' or '..'
+FXbool FXFileList::isItemNavigational(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::isItemNavigational: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isNavigational();
+  }
+
+
+// Get associations (if any) from the file
+FXFileAssoc* FXFileList::getItemAssoc(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::getItemAssoc: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->getAssoc();
+  }
+
+
+// Return the file size for this item
+FXlong FXFileList::getItemSize(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::getItemSize: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->getSize();
+  }
+
+
+// Return the date for this item, in nanoseconds
+FXTime FXFileList::getItemDate(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::getItemDate: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->getDate();
+  }
+
+
+// Return the mode bits for this item
+FXuint FXFileList::getItemMode(FXint index) const {
+  if(index<0 || getNumItems()<=index){ fxerror("%s::getItemMode: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->getMode();
+  }
+
+/*******************************************************************************/
 
 // Change file match mode
 void FXFileList::setMatchMode(FXuint mode){
   if(matchmode!=mode){
     matchmode=mode;
-    scan(true);
+    if(getNumItems()) scan(true);
+    }
+  }
+
+
+// Change show hidden files mode
+void FXFileList::showHiddenFiles(FXbool flag){
+  FXuint opts=((-(FXint)flag^options)&FILELIST_SHOWHIDDEN)^options;
+  if(opts!=options){
+    options=opts;
+    if(getNumItems()) scan(true);
     }
   }
 
@@ -1376,37 +1677,12 @@ FXbool FXFileList::showHiddenFiles() const {
   }
 
 
-// Change show hidden files mode
-void FXFileList::showHiddenFiles(FXbool flag){
-  FXuint opts=((-(FXint)flag^options)&FILELIST_SHOWHIDDEN)^options;
+// Change show directories only mode
+void FXFileList::showOnlyDirectories(FXbool flag){
+  FXuint opts=(((0-flag)^options)&FILELIST_SHOWDIRS)^options;
   if(opts!=options){
     options=opts;
-    scan(true);
-    }
-  }
-
-
-// Return true if displaying image
-FXbool FXFileList::showImages() const {
-  return (options&FILELIST_SHOWIMAGES)!=0;
-  }
-
-
-// Change show image display mode
-void FXFileList::showImages(FXbool flag){
-  FXuint opts=((-(FXint)flag^options)&FILELIST_SHOWIMAGES)^options;
-  if(opts!=options){
-    options=opts;
-    scan(true);
-    }
-  }
-
-
-// Change images preview size
-void FXFileList::setImageSize(FXint size){
-  if(size!=imagesize){
-    imagesize=size;
-    scan(true);
+    if(getNumItems()) scan(true);
     }
   }
 
@@ -1417,12 +1693,12 @@ FXbool FXFileList::showOnlyDirectories() const {
   }
 
 
-// Change show directories only mode
-void FXFileList::showOnlyDirectories(FXbool flag){
-  FXuint opts=(((0-flag)^options)&FILELIST_SHOWDIRS)^options;
+// Show files only
+void FXFileList::showOnlyFiles(FXbool flag){
+  FXuint opts=(((0-flag)^options)&FILELIST_SHOWFILES)^options;
   if(opts!=options){
     options=opts;
-    scan(true);
+    if(getNumItems()) scan(true);
     }
   }
 
@@ -1433,12 +1709,12 @@ FXbool FXFileList::showOnlyFiles() const {
   }
 
 
-// Show files only
-void FXFileList::showOnlyFiles(FXbool flag){
-  FXuint opts=(((0-flag)^options)&FILELIST_SHOWFILES)^options;
+// Show parent directories
+void FXFileList::showParents(FXbool flag) {
+  FXuint opts=(((flag-1)^options)&FILELIST_NO_PARENT)^options;
   if(opts!=options){
     options=opts;
-    scan(true);
+    if(getNumItems()) scan(true);
     }
   }
 
@@ -1449,318 +1725,40 @@ FXbool FXFileList::showParents() const {
   }
 
 
-// Show parent directories
-void FXFileList::showParents(FXbool flag) {
-  FXuint opts=(((flag-1)^options)&FILELIST_NO_PARENT)^options;
+// Change show image display mode
+void FXFileList::showImages(FXbool flag){
+  FXuint opts=(((0-flag)^options)&FILELIST_SHOWIMAGES)^options;
   if(opts!=options){
     options=opts;
-    scan(true);
+    if(getNumItems()) scan(true);
     }
   }
 
 
-// Compare till '\t' or '\0'
-static FXbool fileequal(const FXchar* p1,const FXchar* p2){
-  register FXint c1,c2;
-  do{
-    c1=*p1++;
-    c2=*p2++;
+// Return true if displaying image
+FXbool FXFileList::showImages() const {
+  return (options&FILELIST_SHOWIMAGES)!=0;
+  }
+
+
+// Change images preview size
+void FXFileList::setImageSize(FXint size){
+  if(size!=imagesize){
+    imagesize=size;
+    if(getNumItems()) scan(true);
     }
-  while(c1==c2 && c1!='\0' && c1!='\t');
-  return (c1=='\0' || c1=='\t') && (c2=='\0' || c2=='\t');
-  }
-
-
-// List directory
-void FXFileList::listItems(FXbool force){
-  FXFileItem  *curitem=NULL;
-  FXFileItem  *oldlist=list;     // Old insert-order list
-  FXFileItem  *newlist=NULL;     // New insert-order list
-  FXFileItem **po=&oldlist;     // Head of old list
-  FXFileItem **pn=&newlist;     // Head of new list
-  FXFileItem **pp;
-  FXFileItem  *item;
-  FXFileItem  *link;
-  FXString    pathname;
-  FXString    extension;
-  FXString    name;
-  FXString    grpid;
-  FXString    usrid;
-  FXString    atts;
-  FXString    mod;
-  FXString    linkname;
-  FXbool      isdir;
-  FXbool      istop;
-  FXStat      info;
-  FXDir       dir;
-
-  // Remember current item
-  if(0<=current){ curitem=(FXFileItem*)items[current]; }
-
-  // Start inserting
-  items.clear();
-
-  // Are we at the top directory?
-  istop=FXPath::isTopDirectory(directory);
-
-  // Get directory stream pointer
-  if(dir.open(directory)){
-
-    // Loop over directory entries
-    while(dir.next(name)){
-
-      // Hidden files of the form ".xxx" are normally not shown, but ".." is so we can
-      // navigate up as well as down.  However, at the root level we can't go up any
-      // further so we show "." but not ".."; this allows us to explicitly select "/."
-      // as a directory when we're in directory selection mode.
-      if(name[0]=='.'){
-        if(name[1]==0){
-          if((options&FILELIST_NO_PARENT) || !istop) continue;
-          }
-        else if(name[1]=='.' && name[2]==0){
-          if((options&FILELIST_NO_PARENT) || istop) continue;
-          }
-        else{
-          if(!(options&FILELIST_SHOWHIDDEN)) continue;
-          }
-        }
-
-      // Build full pathname
-      pathname=directory;
-      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
-      pathname+=name;
-
-#ifdef WIN32
-
-      // Get file/link info
-      if(!FXStat::statFile(pathname,info)) continue;
-
-      // Is directory
-      isdir=info.isDirectory();
-
-      // Hidden file or directory normally not shown
-      if(info.isHidden() && !(options&FILELIST_SHOWHIDDEN)) continue;
-#else
-
-      // Get file/link info
-      if(!FXStat::statLink(pathname,info)) continue;
-
-      // Is directory
-      isdir=info.isDirectory();
-
-      // Check if link is a link to a directory
-      if(info.isLink()){
-        isdir=FXStat::isDirectory(pathname);
-        }
-#endif
-
-      // If it is a file and we want only directories or doesn't match, skip it
-      if(!isdir && ((options&FILELIST_SHOWDIRS) || !FXPath::match(name,pattern,matchmode))) continue;
-
-      // If it is a directory and we want only files, skip it
-      if(isdir && (options&FILELIST_SHOWFILES)) continue;
-
-      // Search for item in old list, unlink from old if found
-      for(pp=po; (item=*pp)!=NULL; pp=&item->link){
-        if(fileequal(item->label.text(),name.text())){
-          *pp=item->link; item->link=NULL;
-          goto fnd;
-          }
-        }
-
-      // Make new item if we have to
-      item=(FXFileItem*)createItem(FXString::null,NULL,NULL,NULL);
-
-      // Link items into new list
-fnd:  *pn=item; pn=&item->link;
-
-      // Append
-      if(item==curitem) current=items.no();
-      items.append(item);
-
-      // Update only if something changed
-      if(force || item->label.empty() || item->date!=info.modified() || item->size!=info.size()){
-
-        // Obtain user name
-        usrid=FXSystem::userName(info.user());
-
-        // Obtain group name
-        grpid=FXSystem::groupName(info.group());
-
-        // Permissions
-        atts=FXSystem::modeString(info.mode());
-
-        // Mod time
-        mod=FXSystem::localTime(info.modified());
-
-        // Link name, if any
-        linkname=FXString::null;
-        if(info.isLink()) linkname=FXFile::symlink(pathname);
-
-        // Update flags
-        if(info.isExecutable()){item->state|=FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::EXECUTABLE;}
-        if(info.isCharacter()){item->state|=FXFileItem::CHARDEV;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::CHARDEV;}
-        if(info.isBlock()){item->state|=FXFileItem::BLOCKDEV;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::BLOCKDEV;}
-        if(info.isFifo()){item->state|=FXFileItem::FIFO;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::FIFO;}
-        if(info.isSocket()){item->state|=FXFileItem::SOCK;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::SOCK;}
-        if(info.isLink()){item->state|=FXFileItem::SYMLINK;}else{item->state&=~FXFileItem::SYMLINK;}
-        if(isdir){item->state|=FXFileItem::FOLDER;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::FOLDER;}
-
-        // We can drag items only if allowed
-        item->setDraggable(draggable);
-
-        // File size
-        item->size=info.size();
-
-        // File access time
-        item->date=info.modified();
-
-        // No associations
-        item->assoc=NULL;
-
-        // Determine icons and type
-        if(item->isDirectory()){
-          extension="File Folder";
-          item->setBigIcon(big_folder);
-          item->setMiniIcon(mini_folder);
-          if(associations) item->assoc=associations->findDirBinding(pathname.text());
-          }
-        else if(item->isExecutable()){
-          extension="Application";
-          item->setBigIcon(big_app);
-          item->setMiniIcon(mini_app);
-          if(associations) item->assoc=associations->findExecBinding(pathname.text());
-          }
-        else{
-          extension=FXPath::extension(pathname).upper();
-          if(!extension.empty()) extension+=" File";
-          item->setBigIcon(big_doc);
-          item->setMiniIcon(mini_doc);
-          if(associations) item->assoc=associations->findFileBinding(pathname.text());
-          }
-
-        // If association is found, use it
-        if(item->assoc){
-          extension=item->assoc->extension;
-          if(item->assoc->bigicon) item->setBigIcon(item->assoc->bigicon);
-          if(item->assoc->miniicon) item->setMiniIcon(item->assoc->miniicon);
-          }
-
-        // Update item information
-        item->label.format("%s\t%s\t%lld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text(),linkname.text());
-
-        // Create item
-        if(id()) item->create();
-        }
-      }
-    dir.close();
-    }
-
-  // Wipe items remaining in list:- they have disappeared!!
-  for(item=oldlist; item; item=link){
-    link=item->link;
-    delete item;
-    }
-
-  // Validate
-  if(current>=items.no()) current=-1;
-  if(anchor>=items.no()) anchor=-1;
-  if(extent>=items.no()) extent=-1;
-
-  // Remember new list
-  list=newlist;
-
-  // Show thumbnails
-  if(showImages()){
-    getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)0);
-    }
-
-  // Gotta recalc size of content
-  recalc();
-  }
-
-
-/*******************************************************************************/
-
-
-// Get file name from item
-FXString FXFileList::getItemFilename(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::getItemFilename: index out of range.\n",getClassName()); }
-  return items[index]->label.section('\t',0);
-  }
-
-
-// Get full pathname to item
-FXString FXFileList::getItemPathname(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::getItemPathname: index out of range.\n",getClassName()); }
-  return FXPath::absolute(directory,items[index]->label.section('\t',0));
-  }
-
-
-// Is file
-FXbool FXFileList::isItemFile(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemFile: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isFile();
-  }
-
-
-// Is directory
-FXbool FXFileList::isItemDirectory(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemDirectory: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isDirectory();
-  }
-
-
-// Is executable
-FXbool FXFileList::isItemExecutable(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemExecutable: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isExecutable();
-  }
-
-
-// Return true if this is a symbolic link item
-FXbool FXFileList::isItemSymlink(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemSymlink: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isSymlink();
-  }
-
-
-// Return true if item is navigational item like '.' or '..'
-FXbool FXFileList::isItemNavigational(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemNavigational: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isNavigational();
-  }
-
-
-// Get associations (if any) from the file
-FXFileAssoc* FXFileList::getItemAssoc(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::getItemAssoc: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->getAssoc();
-  }
-
-
-// Return the file size for this item
-FXlong FXFileList::getItemSize(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::getItemSize: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->getSize();
-  }
-
-
-// Return the date for this item, in nanoseconds
-FXTime FXFileList::getItemDate(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::getItemDate: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->getDate();
   }
 
 
 // Change file associations; delete the old one unless it was shared
 void FXFileList::setAssociations(FXFileDict* assocs,FXbool owned){
-  if(associations!=assocs){
-    if(!(options&FILELIST_NO_OWN_ASSOC)) delete associations;
-    associations=assocs;
-    scan(true);
-    }
+  FXuint opts=options;
   options^=((owned-1)^options)&FILELIST_NO_OWN_ASSOC;
+  if(associations!=assocs){
+    if(!(opts&FILELIST_NO_OWN_ASSOC)) delete associations;
+    associations=assocs;
+    if(getNumItems()) scan(true);
+    }
   }
 
 
@@ -1768,10 +1766,11 @@ void FXFileList::setAssociations(FXFileDict* assocs,FXbool owned){
 void FXFileList::setDraggableFiles(FXbool flg){
   if(draggable!=flg){
     draggable=flg;
-    scan(true);
+    if(getNumItems()) scan(true);
     }
   }
 
+/*******************************************************************************/
 
 // Save data
 void FXFileList::save(FXStream& store) const {
@@ -1838,4 +1837,3 @@ FXFileList::~FXFileList(){
   }
 
 }
-

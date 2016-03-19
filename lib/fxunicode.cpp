@@ -24,7 +24,7 @@
 
 
 
-/******* Generated on 2011/09/02 15:57:58 by unicode tool version 6.0.0 ********/
+/******* Generated on 2011/09/16 10:16:35 by unicode tool version 6.0.0 ********/
 
 
 using namespace FX;
@@ -6651,7 +6651,7 @@ const unsigned short upper_block[478]={
   };
 
 // Data upper
-const short upper_data[3011]={
+const int upper_data[3011]={
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
@@ -6927,7 +6927,7 @@ const unsigned short lower_block[477]={
   };
 
 // Data lower
-const short lower_data[2949]={
+const int lower_data[2949]={
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
@@ -7199,7 +7199,7 @@ const unsigned short title_block[478]={
   };
 
 // Data title
-const short title_data[3011]={
+const int title_data[3011]={
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    
    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,    

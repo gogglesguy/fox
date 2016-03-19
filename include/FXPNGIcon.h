@@ -58,6 +58,9 @@ public:
   };
 
 
+#ifndef FXLOADPNG
+#define FXLOADPNG
+
 /**
 * Check if stream contains a PNG, return true if so.
 */
@@ -76,6 +79,8 @@ extern FXAPI FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an PNG (Portable Network Graphics) file to a stream.
 */
 extern FXAPI FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height);
+
+#endif
 
 }
 

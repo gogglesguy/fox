@@ -63,13 +63,17 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   FXVerticalFrame *buttons=new FXVerticalFrame(horizontal,LAYOUT_LEFT|LAYOUT_FILL_Y|FRAME_SUNKEN|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0, 0,0,0,0, 0,0);
   FXSwitcher *switcher=new FXSwitcher(horizontal,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
 
+  buttons->setBackColor(getApp()->getShadowColor());
+
   // Icons
   pat=new FXGIFIcon(getApp(),pattern_gif);
   brw=new FXGIFIcon(getApp(),file_gif);
   mim=new FXGIFIcon(getApp(),miscellaneous_gif);
   dir=new FXGIFIcon(getApp(),setdir);
+  run=new FXBMPIcon(getApp(),run_bmp,0,IMAGE_ALPHAGUESS);
 
-  ///////////////////////////  Browser settings pane  ////////////////////////////
+
+  ///////////////////////////  Browser settings pane  ///////////////////////////
   FXVerticalFrame* browserpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   new FXLabel(browserpane,tr("PathFinder settings"),NULL,LAYOUT_LEFT);
   new FXHorizontalSeparator(browserpane,SEPARATOR_LINE|LAYOUT_FILL_X);
@@ -95,11 +99,15 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   blending=new FXCheckButton(matrix2,FXString::null,NULL,0,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
   new FXFrame(matrix2,0);
 
+  new FXLabel(matrix2,tr("Image scaling:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
+  scaling=new FXCheckButton(matrix2,FXString::null,NULL,0,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
+  new FXFrame(matrix2,0);
+
   //// Browser settings button
   new FXButton(buttons,tr("Browser\tFile browser settings\tChange browser settings and other things."),brw,switcher,FXSwitcher::ID_OPEN_FIRST,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
 
-  ///////////////////////  Mime type settings pane  //////////////////////////
+  /////////////////////////  Mime type settings pane  ///////////////////////////
   FXPacker* mimetypepane=new FXPacker(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
   new FXLabel(mimetypepane,tr("Extensions Setup"),NULL,LAYOUT_LEFT|LAYOUT_SIDE_TOP);
   new FXHorizontalSeparator(mimetypepane,SEPARATOR_LINE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
@@ -169,6 +177,27 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   //// File pattern settings button
   new FXButton(buttons,tr("Patterns\tFilename patterns\tChange wildcard patterns for filenames."),pat,switcher,FXSwitcher::ID_OPEN_THIRD,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
+
+
+  ///////////////////////////  Other settings pane  /////////////////////////////
+  FXVerticalFrame* otherpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
+  new FXLabel(otherpane,tr("Other Settings"),NULL,LAYOUT_LEFT);
+  new FXHorizontalSeparator(otherpane,SEPARATOR_LINE|LAYOUT_FILL_X);
+  FXMatrix *matrix3=new FXMatrix(otherpane,3,MATRIX_BY_COLUMNS|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,10,0, 6, 6);
+
+  new FXLabel(matrix3,tr("Auto size lists:"),NULL,LAYOUT_LEFT|LAYOUT_CENTER_Y);
+  autosize=new FXCheckButton(matrix3,FXString::null,NULL,0,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
+  new FXFrame(matrix3,0);
+
+  new FXLabel(matrix3,tr("Item space:"),NULL,LAYOUT_LEFT|LAYOUT_CENTER_Y);
+  itemspace=new FXTextField(matrix3,6,NULL,0,TEXTFIELD_INTEGER|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y,0,0,0,0, 2,2,2,2);
+  new FXFrame(matrix3,0);
+
+  //// File pattern settings button
+  new FXButton(buttons,tr("Other\tOther settings\tChange other settings."),run,switcher,FXSwitcher::ID_OPEN_FOURTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
+
+
+
   // Bottom part
   new FXHorizontalSeparator(vertical,SEPARATOR_RIDGE|LAYOUT_FILL_X);
   FXHorizontalFrame *closebox=new FXHorizontalFrame(vertical,LAYOUT_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH);
@@ -177,6 +206,18 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
 
   // Populate bindings
   setupFileBindings();
+  }
+
+
+// Set item space
+void Preferences::setItemSpace(FXint s){ 
+  itemspace->setText(FXString::value(s)); 
+  }
+  
+  
+// Get item space
+FXint Preferences::getItemSpace() const { 
+  return itemspace->getText().toInt(); 
   }
 
 
@@ -429,6 +470,8 @@ long Preferences::onCmdBrowseIcon(FXObject*,FXSelector sel,void*){
   opendialog.setSelectMode(SELECTFILE_EXISTING);
   opendialog.showImages(true);
   opendialog.setFilename(iconfilename);
+  opendialog.setItemSpace(100);
+  opendialog.setFileBoxStyle(ICONLIST_BIG_ICONS|ICONLIST_BROWSESELECT);
   if(opendialog.execute()){
     iconfilename=opendialog.getFilename();
     fileicons[index]=FXPath::relativize(getIconPath(),iconfilename);
@@ -481,5 +524,6 @@ Preferences::~Preferences(){
   delete pat;
   delete brw;
   delete mim;
+  delete run;
   delete dir;
   }

@@ -333,9 +333,11 @@ using namespace FX;
 
 namespace FX {
 
+#ifndef FXLOADDDS
 extern FXAPI FXbool fxcheckDDS(FXStream& store);
 extern FXAPI FXbool fxloadDDS(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& depth);
 extern FXAPI FXbool fxsaveDDS(FXStream& store,FXColor* data,FXint width,FXint height,FXint depth);
+#endif
 
 
 // Pixel format

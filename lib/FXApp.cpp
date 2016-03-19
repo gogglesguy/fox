@@ -714,7 +714,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   scrollSpeed=80000000;
   scrollDelay=600000000;
   blinkSpeed=500000000;
-  animSpeed=10000000;
+  animSpeed=20000000;
   menuPause=400000000;
   toolTipPause=800000000;
   toolTipTime=2000000000;
@@ -2496,6 +2496,9 @@ a:ev.xany.type=0;
 #if 0
   // Event was filtered by input method; get next one
   if(xim && XFilterEvent(&ev,None)){
+    goto a;
+    }
+  if(xim && getFocusWindow() && XFilterEvent(&ev,(Window)getFocusWindow()->id())){    // FIXME
     goto a;
     }
 #endif

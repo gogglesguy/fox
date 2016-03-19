@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [29])
+m4_define([fox_level], [30])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -166,8 +166,13 @@ AC_CHECK_HEADERS([sys/shm.h])
 AC_CHECK_HEADERS([sys/mman.h])
 AC_CHECK_HEADERS([sys/sysctl.h])
 AC_CHECK_HEADERS([sys/pstat.h])
+AC_CHECK_HEADERS([sys/statfs.h])
+AC_CHECK_HEADERS([sys/mount.h])
 AC_CHECK_HEADERS([semaphore.h])
 AC_CHECK_HEADERS([dlfcn.h])
+
+# Check for common functions
+AC_CHECK_FUNCS([statfs])
 
 # SSE/SSE2/SSE3
 SAVE_CPPFLAGS=$CPPFLAGS

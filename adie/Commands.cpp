@@ -20,9 +20,7 @@
 ********************************************************************************/
 #include "fx.h"
 #include "Commands.h"
-#include "FXRex.h"
-#include "FXArray.h"
-#include "Hilite.h"
+#include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
 

@@ -1055,15 +1055,12 @@ FXbool FXDesktopSetup::setApplicationAndVendor(const FXString& an,const FXString
   setFilename(path);
   setupVendorAndAppLabel();
 
-  // Now try to read
-  if(readSettingsFile(path)){
-    setupFileBindings();
-    setupColors();
-    initColors();
-    setupFont();
-    return true;
-    }
-  return false;
+  readSettingsFile(path);
+  setupFileBindings();
+  setupColors();
+  initColors();
+  setupFont();
+  return true;
   }
 
 

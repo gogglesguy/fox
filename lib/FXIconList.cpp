@@ -1991,7 +1991,9 @@ void FXIconList::setCurrentItem(FXint index,FXbool notify){
       }
 
     // Notify item change
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
+      }
     }
 
   // In browse selection mode, select item
@@ -2515,27 +2517,34 @@ FXIconItem *FXIconList::getItem(FXint index) const {
 
 // Replace item with another
 FXint FXIconList::setItem(FXint index,FXIconItem* item,FXbool notify){
-
-  // Must have item
-  if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
-
-  // Must be in range
   if(index<0 || items.no()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
+  if(items[index]!=item){
 
-  // Notify item will be replaced
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_REPLACED,message),(void*)(FXival)index);}
+    // Must have item
+    if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
 
-  // Copy the state over
-  item->state=items[index]->state;
+    // Notify old item will be deleted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);
+      }
 
-  // Delete old
-  delete items[index];
+    // Delete old
+    delete items[index];
 
-  // Add new
-  items[index]=item;
+    // Add new
+    items[index]=item;
 
-  // Redo layout
-  recalc();
+    // Notify new item has been inserted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);
+      if(current==index){
+        target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
+        }
+      }
+
+    // Redo layout
+    recalc();
+    }
   return index;
   }
 
@@ -2567,18 +2576,16 @@ FXint FXIconList::insertItem(FXint index,FXIconItem* item,FXbool notify){
   if(current<0 && items.no()==1) current=0;
 
   // Notify item has been inserted
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
-
-  // Current item may have changed
-  if(old!=current){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+  if(notify && target){
+    target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);
+    if(old!=current){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
+      }
     }
 
   // Was new item
-  if(0<=current && current==index){
-    if(hasFocus()){
-      items[current]->setFocus(true);
-      }
+  if(index==current){
+    items[current]->setFocus(hasFocus());
     if((options&SELECT_MASK)==ICONLIST_BROWSESELECT && items[current]->isEnabled()){
       selectItem(current,notify);
       }
@@ -2685,8 +2692,8 @@ FXint FXIconList::moveItem(FXint newindex,FXint oldindex,FXbool notify){
     if(viewable==oldindex) viewable=newindex;
 
     // Current item may have changed
-    if(old!=current){
-      if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+    if(notify && target && old!=current){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
       }
 
     // Redo layout
@@ -2720,15 +2727,13 @@ FXIconItem* FXIconList::extractItem(FXint index,FXbool notify){
   if(viewable>index || viewable>=items.no())  viewable--;
 
   // Current item has changed
-  if(index<=old){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+  if(notify && target && index<=old){
+    target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
     }
 
   // Deleted current item
   if(0<=current && index==old){
-    if(hasFocus()){
-      items[current]->setFocus(true);
-      }
+    items[current]->setFocus(hasFocus());
     if((options&SELECT_MASK)==ICONLIST_BROWSESELECT && items[current]->isEnabled()){
       selectItem(current,notify);
       }
@@ -2750,7 +2755,9 @@ void FXIconList::removeItem(FXint index,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::removeItem: index out of range.\n",getClassName()); }
 
   // Notify item will be deleted
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);}
+  if(notify && target){
+    target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);
+    }
 
   // Delete item
   delete items[index];
@@ -2765,15 +2772,13 @@ void FXIconList::removeItem(FXint index,FXbool notify){
   if(viewable>index || viewable>=items.no())  viewable--;
 
   // Current item has changed
-  if(index<=old){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+  if(notify && target && index<=old){
+    target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
     }
 
   // Deleted current item
   if(0<=current && index==old){
-    if(hasFocus()){
-      items[current]->setFocus(true);
-      }
+    items[current]->setFocus(hasFocus());
     if((options&SELECT_MASK)==ICONLIST_BROWSESELECT && items[current]->isEnabled()){
       selectItem(current,notify);
       }
@@ -2790,7 +2795,9 @@ void FXIconList::clearItems(FXbool notify){
 
   // Delete items
   for(FXint index=items.no()-1; 0<=index; index--){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);}
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);
+      }
     delete items[index];
     }
 
@@ -2804,8 +2811,8 @@ void FXIconList::clearItems(FXbool notify){
   viewable=-1;
 
   // Current item has changed
-  if(old!=-1){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)-1);}
+  if(notify && target && old!=-1){
+    target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)-1);
     }
 
   // Redo layout

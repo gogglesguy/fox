@@ -82,7 +82,7 @@
     not all items are same size.
   - Item justification and icon/text relationships would be nice, too.
   - FIXME if no text, you're unable to see if an item is selected.
-  - Should sortItems() have optional notify parameter to generate callback 
+  - Should sortItems() have optional notify parameter to generate callback
     when current item index has changed?
 */
 
@@ -868,18 +868,6 @@ long FXList::onLeave(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
-// Gained focus
-long FXList::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
-  FXScrollArea::onFocusIn(sender,sel,ptr);
-  if(0<=current){
-    FXASSERT(current<items.no());
-    items[current]->setFocus(true);
-    updateItem(current);
-    }
-  return 1;
-  }
-
-
 // We timed out, i.e. the user didn't move for a while
 long FXList::onTipTimer(FXObject*,FXSelector,void*){
   flags|=FLAG_TIP;
@@ -910,6 +898,18 @@ long FXList::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
     return 1;
     }
   return 0;
+  }
+
+
+// Gained focus
+long FXList::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
+  FXScrollArea::onFocusIn(sender,sel,ptr);
+  if(0<=current){
+    FXASSERT(current<items.no());
+    items[current]->setFocus(true);
+    updateItem(current);
+    }
+  return 1;
   }
 
 
@@ -1523,7 +1523,9 @@ void FXList::setCurrentItem(FXint index,FXbool notify){
       }
 
     // Notify item change
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
+      }
     }
 
   // In browse select mode, select this item
@@ -1556,27 +1558,34 @@ FXListItem *FXList::getItem(FXint index) const {
 
 // Replace item with another
 FXint FXList::setItem(FXint index,FXListItem* item,FXbool notify){
-
-  // Must have item
-  if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
-
-  // Must be in range
   if(index<0 || items.no()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
+  if(items[index]!=item){
 
-  // Notify item will be replaced
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_REPLACED,message),(void*)(FXival)index);}
+    // Must have item
+    if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
 
-  // Copy the state over
-  item->state=items[index]->state;
+    // Notify old item will be deleted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);
+      }
 
-  // Delete old
-  delete items[index];
+    // Delete old
+    delete items[index];
 
-  // Add new
-  items[index]=item;
+    // Add new
+    items[index]=item;
 
-  // Redo layout
-  recalc();
+    // Notify new item has been inserted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);
+      if(current==index){
+        target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
+        }
+      }
+
+    // Redo layout
+    recalc();
+    }
   return index;
   }
 
@@ -1608,18 +1617,16 @@ FXint FXList::insertItem(FXint index,FXListItem* item,FXbool notify){
   if(current<0 && items.no()==1) current=0;
 
   // Notify item has been inserted
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
-
-  // Current item may have changed
-  if(old!=current){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+  if(notify && target){
+    target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);
+    if(old!=current){
+      if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+      }
     }
 
   // Was new item
-  if(0<=current && current==index){
-    if(hasFocus()){
-      items[current]->setFocus(true);
-      }
+  if(index==current){
+    items[current]->setFocus(hasFocus());
     if((options&SELECT_MASK)==LIST_BROWSESELECT && items[current]->isEnabled()){
       selectItem(current,notify);
       }
@@ -1726,8 +1733,8 @@ FXint FXList::moveItem(FXint newindex,FXint oldindex,FXbool notify){
     if(viewable==oldindex) viewable=newindex;
 
     // Current item may have changed
-    if(old!=current){
-      if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+    if(notify && target && old!=current){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
       }
 
     // Redo layout
@@ -1746,7 +1753,9 @@ FXListItem* FXList::extractItem(FXint index,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::extractItem: index out of range.\n",getClassName()); }
 
   // Notify item will be deleted
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);}
+  if(notify && target){
+    target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);
+    }
 
   // Extract item
   result=items[index];
@@ -1761,15 +1770,13 @@ FXListItem* FXList::extractItem(FXint index,FXbool notify){
   if(viewable>index || viewable>=items.no()) viewable--;
 
   // Current item has changed
-  if(index<=old){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+  if(notify && target && index<=old){
+    target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
     }
 
   // Deleted current item
   if(0<=current && index==old){
-    if(hasFocus()){
-      items[current]->setFocus(true);
-      }
+    items[current]->setFocus(hasFocus());
     if((options&SELECT_MASK)==LIST_BROWSESELECT && items[current]->isEnabled()){
       selectItem(current,notify);
       }
@@ -1806,15 +1813,13 @@ void FXList::removeItem(FXint index,FXbool notify){
   if(viewable>index || viewable>=items.no()) viewable--;
 
   // Current item has changed
-  if(index<=old){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);}
+  if(notify && target && index<=old){
+    target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
     }
 
   // Deleted current item
   if(0<=current && index==old){
-    if(hasFocus()){
-      items[current]->setFocus(true);
-      }
+    items[current]->setFocus(hasFocus());
     if((options&SELECT_MASK)==LIST_BROWSESELECT && items[current]->isEnabled()){
       selectItem(current,notify);
       }
@@ -1845,8 +1850,8 @@ void FXList::clearItems(FXbool notify){
   viewable=-1;
 
   // Current item has changed
-  if(old!=-1){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)-1);}
+  if(notify && target && old!=-1){
+    target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)-1);
     }
 
   // Redo layout

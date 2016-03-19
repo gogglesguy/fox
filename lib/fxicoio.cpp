@@ -47,10 +47,11 @@ using namespace FX;
 
 namespace FX {
 
+#ifndef FXLOADICO
 extern FXAPI FXbool fxcheckICO(FXStream& store);
 extern FXAPI FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot);
 extern FXAPI FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot=-1,FXint yspot=-1);
-
+#endif
 
 
 // Check if stream contains ICO

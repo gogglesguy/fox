@@ -687,7 +687,7 @@ FXString::FXString():str(EMPTY){
   }
 
 
-// Copy construct
+// Construct copy of another string
 FXString::FXString(const FXString& s):str(EMPTY){
   register FXint n=s.length();
   if(0<n){
@@ -695,6 +695,7 @@ FXString::FXString(const FXString& s):str(EMPTY){
     memcpy(str,s.str,n);
     }
   }
+
 
 
 // Construct and init
@@ -2428,9 +2429,9 @@ FXString FXString::vvalue(const FXchar* fmt,va_list args){
 FXuint FXString::hash() const {
   register FXint len=length();
   register FXuint h=0;
-  for(register FXint i=0; i<len; i++){  // This should be a very good hash function:- just 4 collisions
-    h = ((h << 5) + h) ^ str[i];        // on the webster web2 dictionary of 234936 words, and no
-    }                                   // collisions at all on the standard dict!
+  for(register FXint i=0; i<len; i++){          // This should be a very good hash function:- just 4 collisions
+    h = ((h << 5) + h) ^ (FXuchar)str[i];       // on the webster web2 dictionary of 234936 words, and no
+    }                                           // collisions at all on the standard dict!
   return h;
   }
 

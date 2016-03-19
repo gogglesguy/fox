@@ -42,10 +42,10 @@ public:
   static const FXschar utfBytes[256];
 public:
 
-  /// Create empty string
+  /// Construct empty string
   FXString();
 
-  /// Copy construct
+  /// Construct copy of another string
   FXString(const FXString& s);
 
   /// Construct and init from string

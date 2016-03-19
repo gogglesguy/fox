@@ -62,6 +62,9 @@ public:
   };
 
 
+#ifndef FXLOADBMP
+#define FXLOADBMP
+
 /**
 * Check if stream contains a bitmap, return true if so.
 */
@@ -80,6 +83,8 @@ extern FXAPI FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an BMP (Microsoft Bitmap) file to a stream.
 */
 extern FXAPI FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+#endif
 
 }
 

@@ -516,28 +516,31 @@ FXHeaderItem *FXHeader::getItem(FXint index) const {
 
 // Replace item with another
 FXint FXHeader::setItem(FXint index,FXHeaderItem* item,FXbool notify){
-
-  // Must have item
-  if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
-
-  // Must be in range
   if(index<0 || items.no()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
+  if(items[index]!=item){
+  
+    // Must have item
+    if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
 
-  // Notify item will be replaced
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_REPLACED,message),(void*)(FXival)index);}
+    // Notify old item will be deleted
+    if(notify && target){target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);}
 
-  // Copy the size over
-  item->setSize(items[index]->getSize());
-  item->setPos(items[index]->getPos());
+    // Copy the size over
+    item->setSize(items[index]->getSize());
+    item->setPos(items[index]->getPos());
 
-  // Delete old
-  delete items[index];
+    // Delete old
+    delete items[index];
 
-  // Add new
-  items[index]=item;
+    // Add new
+    items[index]=item;
 
-  // Redo layout
-  recalc();
+    // Notify new item has been inserted
+    if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
+
+    // Redo layout
+    recalc();
+    }
   return index;
   }
 

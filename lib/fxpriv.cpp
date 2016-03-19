@@ -108,7 +108,7 @@ HANDLE fxrecvdata(HANDLE hMap,FXuchar*& data,FXuint& size){
 
 // Send request for data
 HANDLE fxsendrequest(HWND window,HWND requestor,WPARAM type){
-  FXuint loops=1000;
+  FXuint loops=100;
   MSG msg;
   PostMessage((HWND)window,WM_DND_REQUEST,type,(LPARAM)requestor);
   while(!PeekMessage(&msg,NULL,WM_DND_REPLY,WM_DND_REPLY,PM_REMOVE)){
@@ -310,7 +310,7 @@ PFNMONITORFROMWINDOW fxMonitorFromWindow=MyMonitorFromWindow;
 
 // Wait for event of certain type
 static FXbool fxwaitforevent(Display *display,Window window,int type,XEvent& event){
-  FXuint loops=1000;
+  FXuint loops=100;
   while(!XCheckTypedWindowEvent(display,window,type,&event)){
     if(loops==0){ fxwarning("timed out\n"); return false; }
     FXThread::sleep(10000000);  // Don't burn too much CPU here:- the other guy needs it more....
@@ -322,7 +322,7 @@ static FXbool fxwaitforevent(Display *display,Window window,int type,XEvent& eve
 
 // Send request for selection info
 Atom fxsendrequest(Display *display,Window window,Atom selection,Atom prop,Atom type,FXuint time){
-  FXuint loops=1000;
+  FXuint loops=100;
   XEvent ev;
   XConvertSelection(display,selection,type,prop,window,time);
   while(!XCheckTypedWindowEvent(display,window,SelectionNotify,&ev)){

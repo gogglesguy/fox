@@ -85,7 +85,6 @@ FXDEFMAP(FXTreeListBox) FXTreeListBoxMap[]={
   FXMAPFUNC(SEL_CHANGED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
   FXMAPFUNC(SEL_DELETED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
   FXMAPFUNC(SEL_INSERTED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
-  FXMAPFUNC(SEL_REPLACED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
   FXMAPFUNC(SEL_COMMAND,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeCommand),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,FXTreeListBox::ID_FIELD,FXTreeListBox::onFieldButton),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXTreeListBox::ID_FIELD,FXTreeListBox::onMouseWheel),

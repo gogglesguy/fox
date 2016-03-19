@@ -411,7 +411,7 @@ public:
   * as keys into the registry database for this application's settings.
   * Only one single application object can be constructed.
   */
-  FXApp(const FXString& name="Application",const FXString& vendor="FoxDefault");
+  FXApp(const FXString& name="Application",const FXString& vendor=FXString::null);
 
   /// Change application name
   void setAppName(const FXString& name);

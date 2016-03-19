@@ -164,8 +164,8 @@ typedef FXObjectListOf<FXListItem> FXListItemList;
 * The list sends SEL_COMMAND messages when the user clicks on an item,
 * and SEL_CLICKED, SEL_DOUBLECLICKED, and SEL_TRIPLECLICKED when the user
 * clicks once, twice, or thrice, respectively.
-* When items are added, replaced, or removed, the list sends messages of
-* the type SEL_INSERTED, SEL_REPLACED, or SEL_DELETED.
+* When items are inserted or removed, the list sends messages of
+* the type SEL_INSERTED or SEL_DELETED.
 * In each of these cases, the index to the item, if any, is passed in the
 * 3rd argument of the message.
 */

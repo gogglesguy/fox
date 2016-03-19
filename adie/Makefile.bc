@@ -38,13 +38,13 @@ PROGRAMS  = adie.exe
 OBJECTS   = \
 adie.obj \
 Commands.obj  \
-HelpWindow.obj \
-TextWindow.obj \
-Preferences.obj \
 help.obj \
-Hilite.obj \
+HelpWindow.obj \
 icons.obj \
-parsesyntax.obj \
+Preferences.obj \
+Syntax.obj \
+SyntaxParser.obj \
+TextWindow.obj \
 main.obj
 
 ICONS = \

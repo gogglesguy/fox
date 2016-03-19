@@ -517,7 +517,7 @@ void FXTopWindow::place(FXuint placement){
       // Place such that mouse in the middle, placing it as
       // close as possible in the center of the owner window.
       // Don't move the window unless the mouse is not inside.
-      if(!shown() || x<wx || y<wy || wx+ww<=x || wy+wh<=y){
+      if(x<wx || y<wy || wx+ww<=x || wy+wh<=y){
 
         // Get the owner
         over=getOwner()?getOwner():getRoot();

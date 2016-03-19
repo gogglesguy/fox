@@ -40,9 +40,11 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADRGB
 extern FXAPI FXbool fxcheckRGB(FXStream& store);
 extern FXAPI FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height);
+#endif
 
 
 // RLE decompress

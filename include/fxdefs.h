@@ -336,6 +336,9 @@ const FXTime forever=FXLONG(9223372036854775807);
 
 /**********************************  Macros  ***********************************/
 
+/// Get bit b from val
+#define FXBIT(val,b)       (((val)>>(b))&1)
+
 /// Abolute value
 #define FXABS(val)         (((val)>=0)?(val):-(val))
 

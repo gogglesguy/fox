@@ -713,11 +713,13 @@ FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){
     }
 #endif
 #else
+#ifdef HAVE_STATFS
   struct statfs info;
   if(statfs(path.text(),&info)==0){
     space=info.f_bsize*info.f_blocks;
     return true;
     }
+#endif
 #endif
   return false;
   }
@@ -738,11 +740,13 @@ FXbool FXStat::getAvailableDiskSpace(const FXString& path,FXulong& space){
     }
 #endif
 #else
+#ifdef HAVE_STATFS
   struct statfs info;
   if(statfs(path.text(),&info)==0){
     space=info.f_bsize*info.f_bfree;
     return true;
     }
+#endif
 #endif
   return false;
   }

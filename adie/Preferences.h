@@ -25,7 +25,7 @@
 
 class TextWindow;
 class Adie;
-class FXSyntax;
+class Syntax;
 
 
 class Preferences : public FXDialogBox {
@@ -71,7 +71,7 @@ public:
   FXString getSyntaxPaths() const;
 
   // Set language syntax
-  void setSyntax(FXSyntax* syn);
+  void setSyntax(Syntax* syn);
 
     // Clean up
   virtual ~Preferences();

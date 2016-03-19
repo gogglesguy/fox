@@ -249,6 +249,10 @@ void FXTextField::setFocus(){
   FXFrame::setFocus();
   setDefault(TRUE);
   flags&=~FLAG_UPDATE;
+  if(getApp()->hasInputMethod()){
+    createComposeContext();
+    getComposeContext()->setFont(font);
+    }
   }
 
 

@@ -44,9 +44,11 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADPNG
 extern FXAPI FXbool fxcheckPNG(FXStream& store);
 extern FXAPI FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height);
+#endif
 
 
 #ifdef HAVE_PNG_H

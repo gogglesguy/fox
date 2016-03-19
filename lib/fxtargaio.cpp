@@ -43,9 +43,11 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADTGA
 extern FXAPI FXbool fxcheckTGA(FXStream& store);
 extern FXAPI FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height);
+#endif
 
 
 static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){

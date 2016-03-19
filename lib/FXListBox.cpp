@@ -77,7 +77,6 @@ FXDEFMAP(FXListBox) FXListBoxMap[]={
   FXMAPFUNC(SEL_CHANGED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_DELETED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_INSERTED,FXListBox::ID_LIST,FXListBox::onListForward),
-  FXMAPFUNC(SEL_REPLACED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_COMMAND,FXListBox::ID_LIST,FXListBox::onListCommand),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,FXListBox::ID_FIELD,FXListBox::onFieldButton),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXListBox::ID_FIELD,FXListBox::onMouseWheel),

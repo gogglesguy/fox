@@ -1114,19 +1114,20 @@ void FXWindow::setDefault(FXuchar flag){
     }
   }
 
-
 // Find default window
 FXWindow* FXWindow::findDefault() const {
   register FXWindow *win=(FXWindow*)this;
-a:if(win!=getNext()){
-b:  if(win->isDefault()) return win;
-    if(win->getFirst()){ win=win->getFirst(); goto b; }
-c:  if(win->getNext()){ win=win->getNext(); goto a; }
+  while(1){
+    if(win->isDefault()) return win;
+    if(win->getFirst()){ win=win->getFirst(); continue; }
+nxt:if(win==this) break;
+    if(win->getNext()){ win=win->getNext(); continue; }
     win=win->getParent();
-    if(win!=getParent()) goto c;
+    goto nxt;
     }
   return NULL;
   }
+
 
 
 // Return true if this is the initial default window
@@ -1152,12 +1153,13 @@ void FXWindow::setInitial(FXbool flag){
 // Find initial window
 FXWindow* FXWindow::findInitial() const {
   register FXWindow *win=(FXWindow*)this;
-a:if(win!=getNext()){
-b:  if(win->isInitial()) return win;
-    if(win->getFirst()){ win=win->getFirst(); goto b; }
-c:  if(win->getNext()){ win=win->getNext(); goto a; }
+  while(1){
+    if(win->isInitial()) return win;
+    if(win->getFirst()){ win=win->getFirst(); continue; }
+nxt:if(win==this) break;
+    if(win->getNext()){ win=win->getNext(); continue; }
     win=win->getParent();
-    if(win!=getParent()) goto c;
+    goto nxt;
     }
   return NULL;
   }
@@ -2090,19 +2092,13 @@ void FXWindow::recalc(){
 
 // Force GUI refresh of this window and all of its children
 void FXWindow::forceRefresh(){
-  register FXWindow *child=this;
+  register FXWindow *win=this;
   while(1){
-    handle(this,FXSEL(SEL_UPDATE,0),NULL);
-    if(child->getFirst()){
-      child=child->getFirst();
-      continue;
-      }
-nxt:if(child==this) break;
-    if(child->getNext()){
-      child=child->getNext();
-      continue;
-      }
-    child=child->getParent();
+    win->handle(win,FXSEL(SEL_UPDATE,0),NULL);
+    if(win->getFirst()){ win=win->getFirst(); continue; }
+nxt:if(win==this) break;
+    if(win->getNext()){ win=win->getNext(); continue; }
+    win=win->getParent();
     goto nxt;
     }
   }

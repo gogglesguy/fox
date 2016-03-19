@@ -41,12 +41,12 @@
 
 
 using namespace FX;
-
+ 
 /*******************************************************************************/
 
 namespace FX {
 
-
+ 
 // Initialize matrix from scalar
 FXMat3d::FXMat3d(FXdouble s){
 #if defined(FOX_HAS_SSE2)
@@ -54,7 +54,7 @@ FXMat3d::FXMat3d(FXdouble s){
   _mm_storeu_pd(&m[0][2],_mm_set1_pd(s));
   _mm_storeu_pd(&m[1][1],_mm_set1_pd(s));
   _mm_storeu_pd(&m[2][0],_mm_set1_pd(s));
-  _mm_storel_pd(&m[2][2],_mm_set1_pd(s));
+  _mm_store_sd (&m[2][2],_mm_set1_pd(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s;
@@ -62,7 +62,7 @@ FXMat3d::FXMat3d(FXdouble s){
 #endif
   }
 
-
+ 
 // Initialize matrix from another matrix
 FXMat3d::FXMat3d(const FXMat2d& s){
 #if defined(FOX_HAS_SSE2)
@@ -735,21 +735,21 @@ FXVec2d operator*(const FXVec2d& v,const FXMat3d& m){
   return FXVec2d(v[0]*m[0][0]+v[1]*m[1][0]+m[2][0],v[0]*m[0][1]+v[1]*m[1][1]+m[2][1]);
   }
 
-
+ 
 // Vector times matrix
 FXVec3d operator*(const FXVec3d& v,const FXMat3d& m){
 #if defined(FOX_HAS_SSE2)
   register __m128d m00=_mm_loadu_pd(&m[0][0]);
-  register __m128d m02=_mm_loadu_pd(&m[0][2]);
   register __m128d m10=_mm_loadu_pd(&m[1][0]);
-  register __m128d m12=_mm_loadu_pd(&m[1][2]);
   register __m128d m20=_mm_loadu_pd(&m[2][0]);
-  register __m128d m22=_mm_loadu_pd(&m[2][2]);
+  register __m128d m02=_mm_load_sd(&m[0][2]);
+  register __m128d m12=_mm_load_sd(&m[1][2]);
+  register __m128d m22=_mm_load_sd(&m[2][2]);
   register __m128d v0=_mm_set1_pd(v[0]);
   register __m128d v1=_mm_set1_pd(v[1]);
   register __m128d v2=_mm_set1_pd(v[2]);
   FXVec3d r;
-  _mm_store_pd(&r[0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m00,v0),_mm_mul_pd(m10,v1)),_mm_mul_pd(m20,v2)));
+  _mm_storeu_pd(&r[0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(m00,v0),_mm_mul_pd(m10,v1)),_mm_mul_pd(m20,v2)));
   _mm_store_sd(&r[2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(m02,v0),_mm_mul_sd(m12,v1)),_mm_mul_sd(m22,v2)));
   return r;
 #else
@@ -798,10 +798,10 @@ FXMat3d operator-(const FXMat3d& a,const FXMat3d& b){
 FXMat3d operator*(const FXMat3d& a,const FXMat3d& b){
 #if defined(FOX_HAS_SSE2)
   register __m128d b00=_mm_loadu_pd(&b[0][0]);
-  register __m128d b02=_mm_load_sd(&b[0][2]);
   register __m128d b10=_mm_loadu_pd(&b[1][0]);
-  register __m128d b12=_mm_load_sd(&b[1][2]);
   register __m128d b20=_mm_loadu_pd(&b[2][0]);
+  register __m128d b02=_mm_load_sd(&b[0][2]);
+  register __m128d b12=_mm_load_sd(&b[1][2]);
   register __m128d b22=_mm_load_sd(&b[2][2]);
   register __m128d xx,yy,zz;
   FXMat3d r;
@@ -809,17 +809,17 @@ FXMat3d operator*(const FXMat3d& a,const FXMat3d& b){
   yy=_mm_set1_pd(a[0][1]);
   zz=_mm_set1_pd(a[0][2]);
   _mm_storeu_pd(&r[0][0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(b00,xx),_mm_mul_pd(b10,yy)),_mm_mul_pd(b20,zz)));
-  _mm_store_sd(&r[0][2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(b02,xx),_mm_mul_sd(b12,yy)),_mm_mul_sd(b22,zz)));
+  _mm_store_sd (&r[0][2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(b02,xx),_mm_mul_sd(b12,yy)),_mm_mul_sd(b22,zz)));
   xx=_mm_set1_pd(a[1][0]);
   yy=_mm_set1_pd(a[1][1]);
   zz=_mm_set1_pd(a[1][2]);
   _mm_storeu_pd(&r[1][0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(b00,xx),_mm_mul_pd(b10,yy)),_mm_mul_pd(b20,zz)));
-  _mm_store_sd(&r[1][2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(b02,xx),_mm_mul_sd(b12,yy)),_mm_mul_sd(b22,zz)));
+  _mm_store_sd (&r[1][2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(b02,xx),_mm_mul_sd(b12,yy)),_mm_mul_sd(b22,zz)));
   xx=_mm_set1_pd(a[2][0]);
   yy=_mm_set1_pd(a[2][1]);
   zz=_mm_set1_pd(a[2][2]);
   _mm_storeu_pd(&r[2][0],_mm_add_pd(_mm_add_pd(_mm_mul_pd(b00,xx),_mm_mul_pd(b10,yy)),_mm_mul_pd(b20,zz)));
-  _mm_store_sd(&r[2][2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(b02,xx),_mm_mul_sd(b12,yy)),_mm_mul_sd(b22,zz)));
+  _mm_store_sd (&r[2][2],_mm_add_sd(_mm_add_sd(_mm_mul_sd(b02,xx),_mm_mul_sd(b12,yy)),_mm_mul_sd(b22,zz)));
   return r;
 #else
   register FXdouble x,y,z;

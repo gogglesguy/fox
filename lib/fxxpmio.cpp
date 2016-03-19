@@ -57,10 +57,12 @@ extern FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXi
 
 
 // Declarations
+#ifndef FXLOADXPM
 extern FXAPI FXbool fxcheckXPM(FXStream& store);
 extern FXAPI FXbool fxloadXPM(const FXchar **pix,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsaveXPM(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
+#endif
 
 // Furnish our own version
 extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);

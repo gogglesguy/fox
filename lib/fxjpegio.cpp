@@ -70,9 +70,11 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADJPG
 extern FXAPI FXbool fxcheckJPG(FXStream& store);
 extern FXAPI FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality);
 extern FXAPI FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
+#endif
 
 
 #ifdef HAVE_JPEG_H

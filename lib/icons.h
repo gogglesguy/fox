@@ -16,6 +16,10 @@ extern const unsigned char bigdoc[];
 
 extern const unsigned char bigfloppy[];
 
+extern const unsigned char bigfloppy3[];
+
+extern const unsigned char bigfloppy5[];
+
 extern const unsigned char bigfolder[];
 
 extern const unsigned char bigfolderopen[];

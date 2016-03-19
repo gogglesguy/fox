@@ -58,6 +58,9 @@ public:
   };
 
 
+#ifndef FXLOADDDS
+#define FXLOADDDS
+
 /**
 * Check if stream contains a DDS format, return true if so.
 */
@@ -75,6 +78,8 @@ extern FXAPI FXbool fxloadDDS(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save a DDS (Direct Draw Surface) file to a stream.
 */
 extern FXAPI FXbool fxsaveDDS(FXStream& store,FXColor* data,FXint width,FXint height,FXint depth);
+
+#endif
 
 }
 

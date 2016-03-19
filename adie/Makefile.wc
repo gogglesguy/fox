@@ -41,10 +41,10 @@ OBJECTS += Commands.obj
 OBJECTS += HelpWindow.obj
 OBJECTS += TextWindow.obj
 OBJECTS += Preferences.obj
-OBJECTS += ParseSyntax.obj
+OBJECTS += SyntaxParser.obj
 OBJECTS += help.obj
-OBJECTS += Hilite.obj
 OBJECTS += icons.obj
+OBJECTS += Syntax.obj
 OBJECTS += main.obj
 
 ICONS  =

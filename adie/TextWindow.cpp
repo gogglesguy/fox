@@ -29,12 +29,10 @@
 #include <unistd.h>
 #endif
 #include <ctype.h>
-#include "FXRex.h"
-#include "FXArray.h"
 #include "HelpWindow.h"
 #include "Preferences.h"
 #include "Commands.h"
-#include "Hilite.h"
+#include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "icons.h"
@@ -84,6 +82,22 @@
   - Maybe FXText should have its own accelerator table so that key bindings
     may be changed.
   - Would be nice to save as HTML.
+  - Ideas:
+     o Sessions. When reloading session, restore all windows (& positions)
+       that were open last time when in that session.
+       Info of sessions is in registry
+     o Command line option --sesssion <name> to open session instead of single
+       file.
+     o When creating new file, set syntax based on current file.  Switch
+       syntax when performing save-as.
+     o Manual syntax change should associate filename and syntax name in
+       registry (unless extension suggests same name).
+     o Master syntax rule should be explicitly created.  Simplifies parser.
+     o Master syntax rule NOT style index 0.  So you can set normal colors
+       on a per-language basis...
+     o Need option for tabbed interface.
+     o Ability to open multiple files at once in open-panel.
+     o Find In Files dialog (free floating).
 */
 
 #define CLOCKTIMER      1000000000
@@ -259,7 +273,7 @@ const FXTime milliseconds=1000000;
 /*******************************************************************************/
 
 // Make some windows
-TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,850,600,0,0),mrufiles(a){
+TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,850,600,0,0),mrufiles(a){
 
   // Add to list of windows
   getApp()->windowlist.append(this);
@@ -461,6 +475,9 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   new FXToggleButton(toolbar,tr("\tShow Browser\t\tShow file browser."),tr("\tHide Browser\t\tHide file browser."),getApp()->nobrowsericon,getApp()->browsericon,this,ID_TOGGLE_BROWSER,ICON_ABOVE_TEXT|TOGGLEBUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Color
+  new FXButton(toolbar,tr("\tPreferences\tDisplay preferences dialog."),getApp()->configicon,this,ID_PREFERENCES,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+
+  // Color
   new FXButton(toolbar,tr("\tFonts\tDisplay font dialog."),getApp()->fontsicon,this,ID_FONT,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Help
@@ -641,13 +658,13 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   mrufiles.setSelector(ID_OPEN_RECENT);
 
   // Initialize file name
-  filename=file;
+  filename="untitled";
   filenameset=false;
   filetime=0;
 
   // Initialize other stuff
   searchpaths="/usr/include";
-  setPatterns(tr("All Files (*)"));
+  setPatterns("All Files (*)");
   setCurrentPattern(0);
   currentstyle=-1;
   colorize=false;
@@ -1051,13 +1068,11 @@ void TextWindow::visitLine(FXint line,FXint column){
 
 // Change patterns, each pattern separated by newline
 void TextWindow::setPatterns(const FXString& patterns){
-  FXString pat; FXint i;
+  FXint current=getCurrentPattern();
   filter->clearItems();
-  for(i=0; !(pat=patterns.section('\n',i)).empty(); i++){
-    filter->appendItem(pat);
-    }
-  if(!filter->getNumItems()) filter->appendItem(tr("All Files (*)"));
-  setCurrentPattern(0);
+  filter->fillItems(patterns);
+  if(!filter->getNumItems()) filter->appendItem("All Files (*)");
+  setCurrentPattern(FXCLAMP(0,current,filter->getNumItems()-1));
   }
 
 
@@ -1085,9 +1100,7 @@ FXString TextWindow::getSearchPaths() const {
 
 // Set current pattern
 void TextWindow::setCurrentPattern(FXint n){
-  n=FXCLAMP(0,n,filter->getNumItems()-1);
-  filter->setCurrentItem(n);
-  dirlist->setPattern(FXFileSelector::patternFromText(filter->getItemText(n)));
+  filter->setCurrentItem(FXCLAMP(0,n,filter->getNumItems()-1),true);
   }
 
 
@@ -1486,7 +1499,8 @@ long TextWindow::onUpdReopen(FXObject* sender,FXSelector,void* ptr){
 
 // New
 long TextWindow::onCmdNew(FXObject*,FXSelector,void*){
-  TextWindow *window=new TextWindow(getApp(),unique());
+  TextWindow *window=new TextWindow(getApp());
+  window->setFilename(unique());
   window->create();
   window->raise();
   window->setFocus();
@@ -1510,7 +1524,7 @@ long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
     if(!window){
       window=findUnused();
       if(!window){
-        window=new TextWindow(getApp(),unique());
+        window=new TextWindow(getApp());
         window->create();
         }
       if(window->loadFile(file)){
@@ -1637,7 +1651,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
         if(!window){
           window=findUnused();
           if(!window){
-            window=new TextWindow(getApp(),unique());
+            window=new TextWindow(getApp());
             window->create();
             }
           if(window->loadFile(file)){
@@ -1674,7 +1688,7 @@ long TextWindow::onCmdOpenRecent(FXObject*,FXSelector,void* ptr){
   if(!window){
     window=findUnused();
     if(!window){
-      window=new TextWindow(getApp(),unique());
+      window=new TextWindow(getApp());
       window->create();
       }
     if(window->loadFile(file)){
@@ -2843,35 +2857,31 @@ void TextWindow::writeView(const FXString& file){
 
 // Determine language
 void TextWindow::determineSyntax(){
-  FXString contents;
-  FXSyntax* stx;
+  FXString file=FXPath::name(getFilename());
 
-  FXTRACE((1,"Determine Language for window %s\n",getFilename().text()));
-
-  // Determine syntax based on filename patterns
-  stx=getApp()->getSyntaxForFile(getFilename());
+  // See if specific syntax to be used for a file
+  Syntax* stx=getApp()->getSyntaxByName(getApp()->reg().readStringEntry("SYNTAX",file.text()));
   if(!stx){
 
-    // Grab first couple of bytes
-    editor->extractText(contents,0,FXMIN(512,editor->getLength()));
+    // See if file matches a pattern
+    stx=getApp()->getSyntaxByPattern(file);
+    if(!stx){
+      FXString contents;
 
-    // Determine syntax based on contents
-    stx=getApp()->getSyntaxForContents(contents);
+      // Grab contents fragment
+      editor->extractText(contents,0,FXMIN(1024,editor->getLength()));
+
+      // See if contents of file match a pattern
+      stx=getApp()->getSyntaxByContents(contents);
+      }
     }
-
-  // Change it
   setSyntax(stx);
-  }
-
-
-// Set syntax by name
-void TextWindow::forceSyntax(const FXString& language){
-  setSyntax(getApp()->getSyntaxForLanguage(language));
   }
 
 
 // Change style colors
 void TextWindow::setStyleColors(FXint index,const FXHiliteStyle& style){
+  FXASSERT(0<=index && index<styles.no());
   styles[index]=style;
   editor->update();
   }
@@ -2880,8 +2890,15 @@ void TextWindow::setStyleColors(FXint index,const FXHiliteStyle& style){
 // Switch syntax
 long TextWindow::onCmdSyntaxSwitch(FXObject*,FXSelector sel,void*){
   FXint syn=FXSELID(sel)-ID_SYNTAX_FIRST;
-  FXASSERT(0<=syn && syn<=getApp()->syntaxes.no());
-  setSyntax(syn?getApp()->syntaxes[syn-1]:NULL);
+  FXString file=FXPath::name(getFilename());
+  if(0<syn){
+    getApp()->reg().writeStringEntry("SYNTAX",file.text(),getApp()->syntaxes[syn-1]->getName().text());
+    setSyntax(getApp()->syntaxes[syn-1]);
+    }
+  else{
+    getApp()->reg().deleteEntry("SYNTAX",file.text());
+    setSyntax(NULL);
+    }
   return 1;
   }
 
@@ -2890,7 +2907,7 @@ long TextWindow::onCmdSyntaxSwitch(FXObject*,FXSelector sel,void*){
 long TextWindow::onUpdSyntaxSwitch(FXObject* sender,FXSelector sel,void*){
   FXint syn=FXSELID(sel)-ID_SYNTAX_FIRST;
   FXASSERT(0<=syn && syn<=getApp()->syntaxes.no());
-  FXSyntax *sntx=syn?getApp()->syntaxes[syn-1]:NULL;
+  Syntax *sntx=syn?getApp()->syntaxes[syn-1]:NULL;
   sender->handle(this,(sntx==syntax)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
@@ -2918,6 +2935,7 @@ long TextWindow::onCmdStyleFlags(FXObject*,FXSelector sel,void*){
       case ID_STYLE_STRIKEOUT: styles[currentstyle].style^=FXText::STYLE_STRIKEOUT; break;
       case ID_STYLE_BOLD:      styles[currentstyle].style^=FXText::STYLE_BOLD; break;
       }
+    writeStyleForRule(syntax->getRule(currentstyle+1)->getName(),styles[currentstyle]);
     setStyleColors(currentstyle,styles[currentstyle]);
     }
   return 1;
@@ -2987,7 +3005,7 @@ long TextWindow::onUpdStyleColor(FXObject* sender,FXSelector sel,void*){
 
 
 // Set language
-void TextWindow::setSyntax(FXSyntax* syn){
+void TextWindow::setSyntax(Syntax* syn){
   register FXint rule;
   syntax=syn;
   if(syntax){
@@ -3012,16 +3030,18 @@ void TextWindow::setSyntax(FXSyntax* syn){
 
 // Restyle entire text
 void TextWindow::restyleText(){
-  FXchar *text,*style;
-  FXint head,tail,len;
   if(colorize && syntax){
+    FXint head,tail,len;
+    FXchar *text;
+    FXchar *style;
     len=editor->getLength();
-    allocElms(text,len+len);
-    style=text+len;
-    editor->extractText(text,0,len);
-    syntax->getRule(0)->stylize(text,style,0,len,head,tail);
-    editor->changeStyle(0,style,len);
-    freeElms(text);
+    if(allocElms(text,len+len)){
+      style=text+len;
+      editor->extractText(text,0,len);
+      syntax->getRule(0)->stylize(text,style,0,len,head,tail);
+      editor->changeStyle(0,style,len);
+      freeElms(text);
+      }
     }
   }
 
@@ -3146,7 +3166,6 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
     }
   return 0;
   }
-
 
 
 // Restyle range; returns affected style end, i.e. one beyond
