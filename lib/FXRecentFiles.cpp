@@ -3,7 +3,7 @@
 *                     R e c e n t   F i l e s   L i s t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,6 +29,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXEvent.h"
 #include "FXWindow.h"
@@ -214,7 +216,7 @@ long FXRecentFiles::onUpdAnyFiles(FXObject *sender,FXSelector,void*){
 // Save data
 void FXRecentFiles::save(FXStream& store) const {
   FXObject::save(store);
-  store << settings;
+//  store << settings;
   store << target;
   store << message;
   store << group;
@@ -225,7 +227,7 @@ void FXRecentFiles::save(FXStream& store) const {
 // Load data
 void FXRecentFiles::load(FXStream& store){
   FXObject::load(store);
-  store >> settings;
+//  store >> settings;
   store >> target;
   store >> message;
   store >> group;

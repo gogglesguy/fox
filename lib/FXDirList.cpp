@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,6 +36,7 @@
 #include "FXFile.h"
 #include "FXDir.h"
 #include "FXURL.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXFont.h"
@@ -54,7 +55,9 @@
 #include "FXMenuRadio.h"
 #include "FXMenuCheck.h"
 #include "FXMenuSeparator.h"
-#include "FXFileDict.h"
+#include "FXDictionary.h"
+#include "FXIconCache.h"
+#include "FXFileAssociations.h"
 #include "FXMessageBox.h"
 #ifdef WIN32
 #include <shellapi.h>
@@ -171,7 +174,7 @@ FXDirList::FXDirList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXi
   dropEnable();
   associations=NULL;
   list=NULL;
-  if(!(options&DIRLIST_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
+  if(!(options&DIRLIST_NO_OWN_ASSOC)) associations=new FXFileAssociations(getApp());
   opendiricon=new FXGIFIcon(getApp(),minifolderopen);
   closeddiricon=new FXGIFIcon(getApp(),minifolder);
   documenticon=new FXGIFIcon(getApp(),minidoc);
@@ -1332,7 +1335,7 @@ void FXDirList::showHiddenFiles(FXbool flag){
 
 
 // Change file associations; delete the old one unless it was shared
-void FXDirList::setAssociations(FXFileDict* assocs,FXbool owned){
+void FXDirList::setAssociations(FXFileAssociations* assocs,FXbool owned){
   FXuint opts=options;
   options^=((owned-1)^options)&DIRLIST_NO_OWN_ASSOC;
   if(associations!=assocs){
@@ -1405,7 +1408,7 @@ FXDirList::~FXDirList(){
   delete networkicon;
   delete floppyicon;
   delete zipdiskicon;
-  associations=(FXFileDict*)-1L;
+  associations=(FXFileAssociations*)-1L;
   opendiricon=(FXGIFIcon*)-1L;
   closeddiricon=(FXGIFIcon*)-1L;
   documenticon=(FXGIFIcon*)-1L;

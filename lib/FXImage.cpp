@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,6 +31,8 @@
 #include "FXPoint.h"
 #include "FXRectangle.h"
 #include "FXException.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXVisual.h"
 #include "FXEvent.h"
@@ -1564,7 +1566,7 @@ void FXImage::resize(FXint w,FXint h){
 // FXVisual; this means generating the table at run time.
 
 // Table lookup: y=pow(x,2.2)
-static FXuint gammatable[256]={
+static const FXuint gammatable[256]={
        0,     1,     4,    11,    21,    34,    51,    72,
       97,   125,   158,   195,   236,   282,   332,   386,
      445,   509,   577,   650,   728,   810,   898,   990,
@@ -1616,17 +1618,6 @@ static FXuint gammaInvertLookup(FXuint val){
     }
   return (gammatable[high]==val) ? high : low;
   }
-
-
-/*
-static FXuint gammaInvertLookup(FXuint val){
-  register FXint l=0,h=255,m;
-  while(l<=h-2){
-    if(gammatable[m=(h+l)>>1]<=val) l=m; else h=m;
-    }
-  return gammatable[l];
-  }
-*/
 
 
 // Horizontal box-filtered, gamma-corrected

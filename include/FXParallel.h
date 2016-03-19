@@ -3,7 +3,7 @@
 *                     P a r a l l e l   C o m p u t a t i o n                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2012,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2012,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -202,6 +202,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task2);
   group.execute(&task3);
   group.execute(&task4);
+  group.execute(&task5);
   group.execute(&task6);
   group.executeAndRun(&task7);
   }
@@ -238,6 +239,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task2);
   group.execute(&task3);
   group.execute(&task4);
+  group.execute(&task5);
   group.execute(&task6);
   group.execute(&task7);
   group.executeAndRun(&task8);
@@ -294,7 +296,6 @@ void FXParallelFor(FXThreadPool* pool,Index fm,Index to,Index by,Index nc,const 
       new (&space[c*size]) FXParallelLoopFunctor<Functor,Index>(fun,fm,fm+ni*by,by);
       group.execute((FXParallelLoopFunctor<Functor,Index>*)&space[c*size]);
       }
-    group.wait();
     }
   }
 

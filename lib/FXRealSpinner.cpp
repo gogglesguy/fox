@@ -3,7 +3,7 @@
 *             R e a l - V a l u e d   S p i n n e r  W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2013 by Bill Baxter.   All Rights Reserved.                *
+* Copyright (C) 2003,2014 by Bill Baxter.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
 #include "FXEvent.h"

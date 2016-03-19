@@ -240,7 +240,6 @@ FXDebugTarget.cpp \
 FXDelegator.cpp \
 FXDial.cpp \
 FXDialogBox.cpp \
-FXDict.cpp \
 FXDictionary.cpp \
 FXDir.cpp \
 FXDirBox.cpp \
@@ -261,8 +260,8 @@ FXExpression.cpp \
 FXExtentd.cpp \
 FXExtentf.cpp \
 FXFile.cpp \
+FXFileAssociations.cpp \
 FXFileDialog.cpp \
-FXFileDict.cpp \
 FXFileList.cpp \
 FXFileSelector.cpp \
 FXFileStream.cpp \
@@ -298,7 +297,7 @@ FXICOImage.cpp \
 FXIFFIcon.cpp \
 FXIFFImage.cpp \
 FXIcon.cpp \
-FXIconDict.cpp \
+FXIconCache.cpp \
 FXIconList.cpp \
 FXIconSource.cpp \
 FXId.cpp \
@@ -419,7 +418,6 @@ FXStatusBar.cpp \
 FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
-FXStringDict.cpp \
 FXStringDictionary.cpp \
 FXSwitcher.cpp \
 FXSystem.cpp \
@@ -476,6 +474,7 @@ fxcpuid.cpp \
 fxbmpio.cpp \
 fxddsio.cpp \
 fxezquantize.cpp \
+fxexeio.cpp \
 fxfsquantize.cpp \
 fxgetticks.cpp \
 fxgifio.cpp \

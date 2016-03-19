@@ -3,7 +3,7 @@
 *                       A b s t r a c t   I / O   C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,7 +33,7 @@
 /*
   Notes:
   - The class FXIO provides the interface to stream- or block-devices.
-  - The base class implementation provides essentially a file-pointer.  
+  - The base class implementation provides essentially a file-pointer.
   - When reading, an infinite stream of zeroes is returned to the caller; when writing
     all data are dropped but in either case the file-pointer maintains a tally of the
     number of bytes moved up to that point.

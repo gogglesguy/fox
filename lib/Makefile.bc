@@ -138,6 +138,7 @@ FXDelegator.cpp \
 FXDial.cpp \
 FXDialogBox.cpp \
 FXDict.cpp \
+FXDictionary.cpp \
 FXDir.cpp \
 FXDirBox.cpp \
 FXDirDialog.cpp \
@@ -310,7 +311,7 @@ FXStatusBar.cpp \
 FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
-FXStringDict.cpp \
+FXStringDictionary.cpp \
 FXSwitcher.cpp \
 FXSystem.cpp \
 FXTGAIcon.cpp \

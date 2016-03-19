@@ -3,7 +3,7 @@
 *                              V a r i a n t - M a p                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -134,7 +134,7 @@ FXbool FXVariantMap::resize(FXival n){
   }
 
 
-// Construct empty dictionary
+// Construct empty map
 FXVariantMap::FXVariantMap():table(EMPTY){
   FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
   FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
@@ -145,20 +145,27 @@ FXVariantMap::FXVariantMap():table(EMPTY){
 FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
   FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
   FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
-  if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXVariantMap::FXVariantMap: out of memory\n"); }
-  copyElms(table,other.table,no());
-  free(other.free());
-  used(other.used());
+  if(1<other.no()){
+    if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXVariantMap::FXVariantMap: out of memory\n"); }
+    copyElms(table,other.table,no());
+    free(other.free());
+    used(other.used());
+    }
   }
 
 
 // Assignment operator
 FXVariantMap& FXVariantMap::operator=(const FXVariantMap& other){
   if(__likely(table!=other.table)){
-    if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXVariantMap::operator=: out of memory\n"); }
-    copyElms(table,other.table,no());
-    free(other.free());
-    used(other.used());
+    if(1<other.no()){
+      if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXVariantMap::operator=: out of memory\n"); }
+      copyElms(table,other.table,no());
+      free(other.free());
+      used(other.used());
+      }
+    else{
+      no(1);
+      }
     }
   return *this;
   }

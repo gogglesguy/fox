@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,6 +33,7 @@
 #include "FXRectangle.h"
 #include "FXObject.h"
 #include "FXObjectList.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
@@ -231,8 +232,7 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     // Color wheel
     FXHorizontalFrame *dialblock=new FXHorizontalFrame(panels,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,15,15,5,5, 5,8);
 
-    wheel=new FXColorRing(dialblock,this,ID_DIAL_WHEEL,LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,140,140,1,1,1,1);
-//    wheel=new FXColorRing(dialblock,this,ID_DIAL_WHEEL,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0,1,1,1,1);
+    wheel=new FXColorRing(dialblock,this,ID_DIAL_WHEEL,LAYOUT_CENTER_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X|JUSTIFY_LEFT|JUSTIFY_CENTER_Y,0,0,0,0,1,1,1,1);
 
   // RGB Mode
   new FXTabItem(panels,tr("\tRed, Green, Blue"),rgbmodeicon,TAB_TOP_NORMAL,0,0,0,0, 6,6,0,0);
@@ -346,7 +346,7 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     FXHorizontalFrame *outer=new FXHorizontalFrame(panels,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_FILL_X);
     FXHorizontalFrame *frame=new FXHorizontalFrame(outer,LAYOUT_FILL_Y|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
     list=new FXColorList(frame,this,ID_COLOR_LIST,LAYOUT_FILL_Y|LAYOUT_FILL_X|LIST_BROWSESELECT);
-    list->setNumVisible(6);
+    list->setNumVisible(8);
     list->setSortFunc(hueSort);
 
     // Add color names

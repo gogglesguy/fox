@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -37,6 +37,7 @@
 #include "FXRectangle.h"
 #include "FXElement.h"
 #include "FXObject.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
@@ -334,7 +335,7 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright information
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2013 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2014 Jeroen van der Zijp. All Rights Reserved.";
 
 
 // Conversion

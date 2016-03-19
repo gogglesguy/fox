@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -70,7 +70,7 @@ class FXAPI FXTableItem : public FXObject {
   friend class FXTable;
 protected:
   FXString    label;
-  FXString    tip; 
+  FXString    tip;
   FXIcon     *icon;
   FXptr       data;
   FXuint      state;

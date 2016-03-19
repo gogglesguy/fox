@@ -3,7 +3,7 @@
 *                            O b j e c t   L i s t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -131,9 +131,9 @@ FXObjectList& FXObjectList::operator=(const FXObjectList& orig){
 
 // Adopt objects from orig, leaving orig empty
 FXObjectList& FXObjectList::adopt(FXObjectList& orig){
-  if(__likely(ptr!=orig.ptr)){ 
-    swap(ptr,orig.ptr); 
-    orig.clear(); 
+  if(__likely(ptr!=orig.ptr)){
+    swap(ptr,orig.ptr);
+    orig.clear();
     }
   return *this;
   }

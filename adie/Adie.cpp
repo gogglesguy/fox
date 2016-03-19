@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -105,7 +105,7 @@ Adie::Adie(const FXString& name):FXApp(name){
 #endif
 
   // File associations, shared between all windows
-  associations=new FXFileDict(this);
+  associations=new FXFileAssociations(this);
   }
 
 
@@ -195,7 +195,7 @@ static void printusage(){
 // Print verson info
 static void printversion(){
   printf("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  printf("Copyright (C) 2000,2013 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  printf("Copyright (C) 2000,2014 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   printf("Please visit: http://www.fox-toolkit.org for further information.\n");
   printf("\n");
   printf("This program is free software: you can redistribute it and/or modify\n");
@@ -242,7 +242,7 @@ FXint Adie::start(int argc,char** argv){
   syntaxfile=FXPath::search(syntaxpaths,"Adie.stx");
 
   // Get icon search path
-  iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconDict::defaultIconPath);
+  iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath);
 
   // Change icon search path
   associations->setIconPath(iconpath);
@@ -264,24 +264,24 @@ FXint Adie::start(int argc,char** argv){
       return 0;
       }
     else if(compare(argv[arg],"-l")==0 || compare(argv[arg],"--line")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing line number.\n"); exit(1); }
+      if(++arg>=argc){ fprintf(stderr,"Adie: missing line number.\n"); return 1; }
       sscanf(argv[arg],"%d",&line);
       }
     else if(compare(argv[arg],"-c")==0 || compare(argv[arg],"--col")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing column number.\n"); exit(1); }
+      if(++arg>=argc){ fprintf(stderr,"Adie: missing column number.\n"); return 1; }
       sscanf(argv[arg],"%d",&col);
       }
     else if(compare(argv[arg],"-S")==0 || compare(argv[arg],"--syntax")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing syntax file.\n"); exit(1); }
+      if(++arg>=argc){ fprintf(stderr,"Adie: missing syntax file.\n"); return 1; }
       syntaxfile=argv[arg];
       }
     else if(compare(argv[arg],"-S")==0 || compare(argv[arg],"--lang")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing language mode.\n"); exit(1); }
+      if(++arg>=argc){ fprintf(stderr,"Adie: missing language mode.\n"); return 1; }
       lang=argv[arg];
       }
     else{
       fprintf(stderr,"Adie: unknown command line argument.\n");
-      exit(1);
+      return 1;
       }
     arg++;
     }

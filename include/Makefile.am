@@ -101,7 +101,6 @@ FXDebugTarget.h \
 FXDelegator.h \
 FXDial.h \
 FXDialogBox.h \
-FXDict.h \
 FXDictionary.h \
 FXDir.h \
 FXDirBox.h \
@@ -124,8 +123,8 @@ FXExpression.h \
 FXExtentd.h \
 FXExtentf.h \
 FXFile.h \
+FXFileAssociations.h \
 FXFileDialog.h \
-FXFileDict.h \
 FXFileList.h \
 FXFileSelector.h \
 FXFileStream.h \
@@ -164,7 +163,7 @@ FXIO.h \
 FXIOBuffer.h \
 FXIODevice.h \
 FXIcon.h \
-FXIconDict.h \
+FXIconCache.h \
 FXIconList.h \
 FXIconSource.h \
 FXId.h \
@@ -285,7 +284,6 @@ FXStatusBar.h \
 FXStatusLine.h \
 FXStream.h \
 FXString.h \
-FXStringDict.h \
 FXStringDictionary.h \
 FXSwitcher.h \
 FXSystem.h \

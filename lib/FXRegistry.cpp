@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,7 +32,7 @@
 #include "FXStat.h"
 #include "FXFile.h"
 #include "FXDir.h"
-#include "FXStringDict.h"
+#include "FXStringDictionary.h"
 #include "FXRegistry.h"
 
 /*
@@ -186,10 +186,6 @@ const FXchar FXRegistry::ext[]=FILEEXT;
 const FXchar FXRegistry::foxrc[]=FOXRC;
 
 
-// Object implementation
-FXIMPLEMENT(FXRegistry,FXSettings,NULL,0)
-
-
 // Make registry object
 FXRegistry::FXRegistry(const FXString& akey,const FXString& vkey):applicationkey(akey),vendorkey(vkey),systemdirs(SYSTEMDIRS),userdir(USERDIR){
 #if defined(WIN32)
@@ -203,32 +199,33 @@ FXRegistry::FXRegistry(const FXString& akey,const FXString& vkey):applicationkey
 #if defined(WIN32)
 
 // Read from Windows Registry
-FXbool FXRegistry::readFromRegistry(void* hroot,FXbool mrk){
-  HKEY hsoftware,hvendor;
+FXbool FXRegistry::readFromRegistry(FXptr hroot,FXbool mrk){
+  HKEY hsoftware;
   FXbool ok=false;
 
-  FXTRACE((100,"%s::readFromRegistry(%p,%d)\n",getClassName(),hroot,mrk));
+  FXTRACE((100,"FXRegistry::readFromRegistry(%p,%d)\n",hroot,mrk));
 
   // Open Software registry section
   if(RegOpenKeyExA((HKEY)hroot,"Software",0,KEY_READ,&hsoftware)==ERROR_SUCCESS){
 
     // Read Software\FOX
-    if(readFromRegistryGroup(hsoftware,"FOX")) ok=true;
+    if(readFromRegistryGroup("FOX",hsoftware,false)) ok=true;
 
     // Have vendor key
     if(!vendorkey.empty()){
+      HKEY hvendor;
 
-      // Open Vendor registry sub-section
+      // Open vendor registry sub-section
       if(RegOpenKeyExA(hsoftware,vendorkey.text(),0,KEY_READ,&hvendor)==ERROR_SUCCESS){
 
-        // Read Software\Vendor\Vendor
-        if(readFromRegistryGroup(hvendor,vendorkey.text())) ok=true;
+        // Read under "Software\Vendor\Vendor"
+        if(readFromRegistryGroup(vendorkey,hvendor,false)) ok=true;
 
         // Have application key
         if(!applicationkey.empty()){
 
-          // Read Software\Vendor\Application
-          if(readFromRegistryGroup(hvendor,applicationkey.text(),mrk)) ok=true;
+          // Read under "Software\Vendor\Application"
+          if(readFromRegistryGroup(applicationkey,hvendor,mrk)) ok=true;
           }
         RegCloseKey(hvendor);
         }
@@ -240,8 +237,8 @@ FXbool FXRegistry::readFromRegistry(void* hroot,FXbool mrk){
       // Have application key
       if(!applicationkey.empty()){
 
-        // Read Software\Application
-        if(readFromRegistryGroup(hsoftware,applicationkey.text(),mrk)) ok=true;
+        // Read under "Software\Application"
+        if(readFromRegistryGroup(applicationkey,hsoftware,mrk)) ok=true;
         }
       }
     RegCloseKey(hsoftware);
@@ -251,33 +248,44 @@ FXbool FXRegistry::readFromRegistry(void* hroot,FXbool mrk){
 
 
 // Read from given group
-FXbool FXRegistry::readFromRegistryGroup(void* hbase,const char* groupname,FXbool mrk){
+FXbool FXRegistry::readFromRegistryGroup(const FXString& group,FXptr hbase,FXbool mrk){
   FXchar section[MAXNAME],name[MAXNAME],value[MAXVALUE];
-  DWORD sectionsize,sectionindex,namesize,valuesize,index,type;
-  HKEY hgroup,hsection;
-  FILETIME writetime;
-  FXStringDict *group;
-  if(RegOpenKeyExA((HKEY)hbase,groupname,0,KEY_READ,&hgroup)==ERROR_SUCCESS){
-    sectionindex=0;
-    sectionsize=MAXNAME;
+  HKEY hgroup;
+
+  // Open registry group
+  if(RegOpenKeyExA((HKEY)hbase,group.text(),0,KEY_READ,&hgroup)==ERROR_SUCCESS){
+    DWORD sectionsize=MAXNAME;
+    DWORD sectionindex=0;
+    FILETIME writetime;
+
+    // Read sections
     while(RegEnumKeyExA(hgroup,sectionindex,section,&sectionsize,NULL,NULL,NULL,&writetime)==ERROR_SUCCESS){
-      group=insert(section);
+
+      // Open section
+      HKEY hsection;
       if(RegOpenKeyExA(hgroup,section,0,KEY_READ,&hsection)==ERROR_SUCCESS){
-        index=0;
-        namesize=MAXNAME;
-        valuesize=MAXVALUE;
+        DWORD namesize=MAXNAME;
+        DWORD valuesize=MAXVALUE;
+        DWORD index=0;
+        DWORD type;
+
+        // Read key-value pairs
         while(RegEnumValueA(hsection,index,name,&namesize,NULL,&type,(BYTE*)value,&valuesize)!=ERROR_NO_MORE_ITEMS){
           FXASSERT(type==REG_SZ);
-          group->replace(name,value,mrk);
+          at(section).at(name,mrk)=value;
           namesize=MAXNAME;
           valuesize=MAXVALUE;
           index++;
           }
+
+        // Close section
         RegCloseKey(hsection);
         }
       sectionsize=MAXNAME;
       sectionindex++;
       }
+
+    // Close group
     RegCloseKey(hgroup);
     return true;
     }
@@ -286,30 +294,34 @@ FXbool FXRegistry::readFromRegistryGroup(void* hbase,const char* groupname,FXboo
 
 
 // Update current user's settings
-FXbool FXRegistry::writeToRegistry(void* hroot){
-  HKEY hsoftware,hvendor;
+FXbool FXRegistry::writeToRegistry(FXptr hroot){
   FXbool ok=false;
 
-  FXTRACE((100,"%s::writeToRegistry(%p)\n",getClassName(),hroot));
+  FXTRACE((100,"FXRegistry::writeToRegistry(%p)\n",hroot));
 
+  // Have application key
   if(!applicationkey.empty()){
+    HKEY hsoftware;
 
-    // Open Software registry section
+    // Open software registry section
     if(RegOpenKeyExA((HKEY)hroot,"Software",0,KEY_WRITE,&hsoftware)==ERROR_SUCCESS){
 
       // Have vendor key
       if(!vendorkey.empty()){
+        HKEY hvendor;
         DWORD disp;
 
-        // Open Vendor registry sub-section
+        // Open vendor registry sub-section
         if(RegCreateKeyExA(hsoftware,vendorkey.text(),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,NULL,&hvendor,&disp)==ERROR_SUCCESS){
 
           // Have application key
           if(!applicationkey.empty()){
 
-            // Write Software\Vendor\Application
-            if(writeToRegistryGroup(hvendor,applicationkey.text())) ok=true;
+            // Write under "Software\Vendor\Application"
+            if(writeToRegistryGroup(applicationkey,hvendor)) ok=true;
             }
+
+          // Done with vendor key
           RegCloseKey(hvendor);
           }
         }
@@ -320,12 +332,12 @@ FXbool FXRegistry::writeToRegistry(void* hroot){
         // Have application key
         if(!applicationkey.empty()){
 
-          // Write Software\Application
-          if(writeToRegistryGroup(hsoftware,applicationkey.text())) ok=true;
+          // Write under "Software\Application"
+          if(writeToRegistryGroup(applicationkey,hsoftware)) ok=true;
           }
         }
 
-      // Done with Software key
+      // Done with software key
       RegCloseKey(hsoftware);
       }
     }
@@ -334,14 +346,15 @@ FXbool FXRegistry::writeToRegistry(void* hroot){
 
 
 // Write to registry group
-FXbool FXRegistry::writeToRegistryGroup(void* hbase,const char* groupname){
+FXbool FXRegistry::writeToRegistryGroup(const FXString& group,FXptr hbase){
   FXchar section[MAXNAME];
   DWORD sectionsize,sectionindex,disp;
   HKEY hgroup,hsection;
   FXint s,e;
   FILETIME writetime;
-  FXStringDict *group;
-  if(RegCreateKeyExA((HKEY)hbase,groupname,0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,NULL,&hgroup,&disp)==ERROR_SUCCESS){
+
+  // Open registry group
+  if(RegCreateKeyExA((HKEY)hbase,group.text(),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,NULL,&hgroup,&disp)==ERROR_SUCCESS){
 
     // First, purge all existing sections
     while(1){
@@ -351,30 +364,38 @@ FXbool FXRegistry::writeToRegistryGroup(void* hbase,const char* groupname){
       if(RegDeleteKeyA(hgroup,section)!=ERROR_SUCCESS) break;
       }
 
-    // Dump the registry, writing only marked entries
-    s=first();
-    while(s<size()){
-      hsection=NULL;
-      group=data(s);
-      FXASSERT(group);
-      for(e=group->first(); e<group->size(); e=group->next(e)){
-        if(group->mark(e)){
-          if(hsection==NULL){
-            FXASSERT(key(s));
-            if(RegCreateKeyExA(hgroup,key(s),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,NULL,&hsection,&disp)!=ERROR_SUCCESS) goto x;
+    // Write sections
+    for(s=0; s<no(); ++s){
+
+      // Section is non-empty
+      if(!empty(s)){
+        hsection=NULL;
+
+        // Write keys in this section
+        for(e=0; e<data(s).no(); ++e){
+
+          // Key is non-empty and marked
+          if(!data(s).empty(e) && data(s).mark(e)){
+
+            // Create section in registry upon finding first key in it
+            if(hsection==NULL){
+              if(RegCreateKeyExA(hgroup,key(s).text(),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,NULL,&hsection,&disp)!=ERROR_SUCCESS) goto x;
+              }
+
+            // Write key-value pair
+            if(RegSetValueExA(hsection,data(s).key(e).text(),0,REG_SZ,(BYTE*)data(s).data(e).text(),data(s).data(e).length()+1)!=ERROR_SUCCESS) break;
             }
-          FXASSERT(group->key(e));
-          FXASSERT(group->data(e));
-          if(RegSetValueExA(hsection,group->key(e),0,REG_SZ,(BYTE*)group->data(e),strlen(group->data(e))+1)!=ERROR_SUCCESS) break;
           }
+
+        // Close section
+        if(hsection) RegCloseKey(hsection);
         }
 
-      // Close this section's key (if it exists)
-      if(hsection) RegCloseKey(hsection);
-
       // Process next registry section
-x:    s=next(s);
+x:    continue;
       }
+
+    // Close group
     RegCloseKey(hgroup);
     return true;
     }

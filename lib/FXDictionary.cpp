@@ -3,7 +3,7 @@
 *                          D i c t i o n a r y    C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -116,9 +116,9 @@ FXbool FXDictionary::resize(FXival n){
             p=(p<<2)+p+b+1;
             b>>=BSHIFT;
             }
-          swap(elbat.table[x].key,table[i].key);    // Steal the string buffer
+          elbat.table[x].key.adopt(table[i].key);       // Steal the string buffers
           elbat.table[x].data=table[i].data;
-          elbat.table[x].hash=h;                    // And copy the hash value
+          elbat.table[x].hash=h;                        // And copy the hash value
           }
         }
       elbat.free(n-used());     // All non-empty slots now free
@@ -138,24 +138,31 @@ FXDictionary::FXDictionary():table(EMPTY){
   }
 
 
-// Construct empty dictionary
+// Construct from another dictionary
 FXDictionary::FXDictionary(const FXDictionary& other):table(EMPTY){
   FXASSERT(sizeof(FXDictionary)==sizeof(FXptr));
   FXASSERT(sizeof(Entry)<=sizeof(FXival)*3);
-  if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXDictionary::FXDictionary: out of memory\n"); }
-  copyElms(table,other.table,no());
-  free(other.free());
-  used(other.used());
+  if(1<other.no()){
+    if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXDictionary::FXDictionary: out of memory\n"); }
+    copyElms(table,other.table,no());
+    free(other.free());
+    used(other.used());
+    }
   }
 
 
 // Assignment operator
 FXDictionary& FXDictionary::operator=(const FXDictionary& other){
   if(__likely(table!=other.table)){
-    if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXDictionary::operator=: out of memory\n"); }
-    copyElms(table,other.table,no());
-    free(other.free());
-    used(other.used());
+    if(1<other.no()){
+      if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXDictionary::operator=: out of memory\n"); }
+      copyElms(table,other.table,no());
+      free(other.free());
+      used(other.used());
+      }
+    else{
+      no(1);
+      }
     }
   return *this;
   }
@@ -187,7 +194,7 @@ FXival FXDictionary::find(const FXchar* ky) const {
 
 
 // Return reference to slot assocated with given key
-FXptr& FXDictionary::at(const FXchar* ky){
+void*& FXDictionary::at(const FXchar* ky){
   register FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
@@ -213,30 +220,24 @@ x:return table[x].data;
 
 
 // Return constant reference to slot assocated with given key
-const FXptr& FXDictionary::at(const FXchar* ky) const {
+void *const& FXDictionary::at(const FXchar* ky) const {
   register FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
   while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) goto x;   // Return existing slot
+    if(table[x].hash==h && table[x].key==ky) goto x;    // Return existing slot
     p=(p<<2)+p+b+1;
     b>>=BSHIFT;
     }
-x:return table[x].data;
-  }
-
-
-// Insert association with given key; return old value, if any
-FXptr FXDictionary::insert(const FXchar* ky,FXptr ptr){
-  return swap(ptr,at(ky));
+x:return table[x].data;                                 // Stopped at empty slot
   }
 
 
 // Remove association with given key; return old value, if any
-FXptr FXDictionary::remove(const FXchar* ky){
+void* FXDictionary::remove(const FXchar* ky){
   register FXuval p,b,h,x;
-  register FXptr old;
+  register void* old;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::remove: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -255,10 +256,10 @@ FXptr FXDictionary::remove(const FXchar* ky){
 
 
 // Erase data at pos in the table; return old value, if any
-FXptr FXDictionary::erase(FXival pos){
+void* FXDictionary::erase(FXival pos){
   if(__unlikely(pos<0 || no()<=pos)){ throw FXRangeException("FXDictionary::erase: argument out of range\n"); }
   if(!table[pos].key.empty()){
-    register FXptr old=table[pos].data;
+    register void* old=table[pos].data;
     table[pos].key.clear();                             // Void the slot (not empty!)
     table[pos].data=NULL;
     used(used()-1);

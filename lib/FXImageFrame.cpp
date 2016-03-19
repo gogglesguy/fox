@@ -3,7 +3,7 @@
 *                       I m a g e   F r a m e   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2013 by H. J. Daniel III. All Rights Reserved.             *
+* Copyright (C) 2001,2014 by H. J. Daniel III. All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,6 +29,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
 #include "FXEvent.h"
@@ -153,7 +155,6 @@ void FXImageFrame::setJustify(FXuint style){
 FXuint FXImageFrame::getJustify() const {
   return (options&JUSTIFY_MASK);
   }
-
 
 
 // Save data

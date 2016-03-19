@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,6 +36,7 @@
 #include "FXFile.h"
 #include "FXDir.h"
 #include "FXObjectList.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
@@ -443,13 +444,13 @@ long FXDirSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
 
 
 // Change file associations
-void FXDirSelector::setAssociations(FXFileDict* assoc,FXbool owned){
+void FXDirSelector::setAssociations(FXFileAssociations* assoc,FXbool owned){
   dirbox->setAssociations(assoc,owned);
   }
 
 
 // Return file associations
-FXFileDict* FXDirSelector::getAssociations() const {
+FXFileAssociations* FXDirSelector::getAssociations() const {
   return dirbox->getAssociations();
   }
 

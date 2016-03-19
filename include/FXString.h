@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -602,7 +602,7 @@ public:
 
 /// Swap two strings
 inline FXString& swap(FXString& dst,FXString& src){
-  FXchar* t=dst.str; dst.str=src.str; src.str=t; 
+  FXchar* t=dst.str; dst.str=src.str; src.str=t;
   return dst;
   }
 

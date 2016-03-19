@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -290,7 +290,7 @@ public:
 
   /// Return true if the file has the sticky bit set
   static FXbool isSetSticky(const FXString& file);
-  
+
   /// Return true if file is accessible for access mode m (FXIO::ReadOnly, FXIO::WriteOnly, FXIO::Executable)
   static FXbool isAccessible(const FXString& file,FXuint m=0);
 

@@ -3,7 +3,7 @@
 *                       S t a t u s   L i n e   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,6 +29,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
 #include "FXFont.h"
@@ -145,7 +147,7 @@ long FXStatusLine::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
 
   // Set background text
   setText(normal);
-  
+
   // GUI update callback may set application mode text
   FXFrame::onUpdate(sender,sel,ptr);
 
@@ -156,8 +158,8 @@ long FXStatusLine::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
     }
   return 1;
   }
-  
-  
+
+
 // Update value from a message
 long FXStatusLine::onCmdSetStringValue(FXObject*,FXSelector,void* ptr){
   setText(*((FXString*)ptr));

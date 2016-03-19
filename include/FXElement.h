@@ -3,7 +3,7 @@
 *                           Generic Element Handling                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -95,7 +95,7 @@ inline void moveElms(EType* dst,const EType* src,FXuval n){
 /// Swap element dst and src
 template<class EType>
 inline EType& swap(EType& dst,EType& src){
-  EType t=dst; dst=src; src=t; 
+  EType t=dst; dst=src; src=t;
   return dst;
   }
 

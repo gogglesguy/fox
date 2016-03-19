@@ -3,7 +3,7 @@
 *                            P o i n t e r   L i s t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -130,9 +130,9 @@ FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
 
 // Adopt objects from orig, leaving orig empty
 FXPtrList& FXPtrList::adopt(FXPtrList& orig){
-  if(__likely(ptr!=orig.ptr)){ 
-    swap(ptr,orig.ptr); 
-    orig.clear(); 
+  if(__likely(ptr!=orig.ptr)){
+    swap(ptr,orig.ptr);
+    orig.clear();
     }
   return *this;
   }

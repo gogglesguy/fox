@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -28,10 +28,9 @@
 namespace FX {
 
 
+class FXDirList;
+class FXFileAssociations;
 struct FXFileAssoc;
-class  FXFileDict;
-class  FXIcon;
-class  FXDirList;
 
 
 /// Directory List options
@@ -125,25 +124,25 @@ public:
 class FXAPI FXDirList : public FXTreeList {
   FXDECLARE(FXDirList)
 protected:
-  FXFileDict   *associations;           // Association table
-  FXDirItem    *list;                   // Root item list
-  FXIcon       *opendiricon;            // Open folder icon
-  FXIcon       *closeddiricon;          // Closed folder icon
-  FXIcon       *documenticon;           // Document icon
-  FXIcon       *applicationicon;        // Application icon
-  FXIcon       *cdromicon;              // CDROM icon
-  FXIcon       *harddiskicon;           // Hard drive icon
-  FXIcon       *networkicon;            // Network icon
-  FXIcon       *floppyicon;             // Floppy icon
-  FXIcon       *zipdiskicon;            // Zip disk icon
-  FXString      pattern;                // Pattern of file names
-  FXString      dropdirectory;          // Drop directory
-  FXString      dragfiles;              // Dragged file names
-  FXString      dropfiles;              // Dropped file names
-  FXDragAction  dropaction;             // Drop action
-  FXuint        matchmode;              // File wildcard match mode
-  FXuint        counter;                // Refresh counter
-  FXbool        draggable;              // Dragable files
+  FXFileAssociations *associations;     // Association table
+  FXDirItem          *list;             // Root item list
+  FXIcon             *opendiricon;      // Open folder icon
+  FXIcon             *closeddiricon;    // Closed folder icon
+  FXIcon             *documenticon;     // Document icon
+  FXIcon             *applicationicon;  // Application icon
+  FXIcon             *cdromicon;        // CDROM icon
+  FXIcon             *harddiskicon;     // Hard drive icon
+  FXIcon             *networkicon;      // Network icon
+  FXIcon             *floppyicon;       // Floppy icon
+  FXIcon             *zipdiskicon;      // Zip disk icon
+  FXString            pattern;          // Pattern of file names
+  FXString            dropdirectory;    // Drop directory
+  FXString            dragfiles;        // Dragged file names
+  FXString            dropfiles;        // Dropped file names
+  FXDragAction        dropaction;       // Drop action
+  FXuint              matchmode;        // File wildcard match mode
+  FXuint              counter;          // Refresh counter
+  FXbool              draggable;        // Dragable files
 protected:
   FXDirList();
   void listRootItems();
@@ -303,10 +302,10 @@ public:
   FXbool showHiddenFiles() const;
 
   /// Change file associations; delete the old one unless it was shared
-  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
 
   /// Return file associations
-  FXFileDict* getAssociations() const { return associations; }
+  FXFileAssociations* getAssociations() const { return associations; }
 
   /// Set draggable files
   void setDraggableFiles(FXbool flag);

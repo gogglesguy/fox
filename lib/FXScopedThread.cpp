@@ -3,7 +3,7 @@
 *                    S c o p e d   T h r e a d   S u p p o r t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2013,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,7 +33,7 @@
   - A ScopedThread should probably not be detached!
   - The ScopedThread destructor does not cause the thread to exit;
     some other mechanism should be provided for this purpose.
-  
+
 */
 
 using namespace FX;

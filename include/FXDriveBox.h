@@ -3,7 +3,7 @@
 *                        D r i v e   B o x   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -28,8 +28,7 @@
 namespace FX {
 
 
-class FXIcon;
-class FXFileDict;
+class FXFileAssociations;
 
 /// Drive Box options
 enum {
@@ -41,14 +40,14 @@ enum {
 class FXAPI FXDriveBox : public FXListBox {
   FXDECLARE(FXDriveBox)
 protected:
-  FXFileDict *associations;     // Association table
-  FXIcon     *foldericon;       // Folder icons
-  FXIcon     *cdromicon;        // CDROM icon
-  FXIcon     *harddiskicon;     // Hard disk icon
-  FXIcon     *netdriveicon;     // Networked drive icon
-  FXIcon     *floppyicon;       // Floppy icon
-  FXIcon     *nethoodicon;      // Network neighborhood icon
-  FXIcon     *zipdiskicon;      // Zip drive icon
+  FXFileAssociations *associations;     // Association table
+  FXIcon             *foldericon;       // Folder icons
+  FXIcon             *cdromicon;        // CDROM icon
+  FXIcon             *harddiskicon;     // Hard disk icon
+  FXIcon             *netdriveicon;     // Networked drive icon
+  FXIcon             *floppyicon;       // Floppy icon
+  FXIcon             *nethoodicon;      // Network neighborhood icon
+  FXIcon             *zipdiskicon;      // Zip drive icon
 protected:
   FXDriveBox(){}
   void listDrives();
@@ -88,10 +87,10 @@ public:
   FXString getDrive() const;
 
   /// Change file associations
-  void setAssociations(FXFileDict* assoc);
+  void setAssociations(FXFileAssociations* assoc);
 
   /// Return file associations
-  FXFileDict* getAssociations() const { return associations; }
+  FXFileAssociations* getAssociations() const { return associations; }
 
   /// Destructor
   virtual ~FXDriveBox();

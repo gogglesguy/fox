@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -803,7 +803,7 @@ void Calculator::setDisplayValue(FXdouble val){
     setDisplayText(string.fromDouble(val,precision,exponent));
     }
   else{
-    setDisplayText(string.fromLong((FXlong)floor(val),base));
+    setDisplayText(string.fromLong((FXlong)round(val),base));
     }
   }
 

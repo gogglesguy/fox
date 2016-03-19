@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -36,82 +36,82 @@ class Preferences;
 class PathFinderMain : public FXMainWindow {
   FXDECLARE(PathFinderMain)
 protected:
-  FXToolBarShell    *dragshell1;        // For floating menu bar
-  FXToolBarShell    *dragshell2;        // For floating tool bar
-  FXToolBarShell    *dragshell3;        // For floating location bar
-  FXToolBar         *toolbar;           // Toolbar
-  FXToolBar         *locationbar;       // Location bar
-  FXStatusBar       *statusbar;         // Status bar
-  FXMenuPane        *filemenu;
-  FXMenuPane        *editmenu;
-  FXMenuPane        *viewmenu;
-  FXMenuPane        *gomenu;
-  FXMenuPane        *arrangemenu;
-  FXMenuPane        *sortmenu;
-  FXMenuPane        *prefmenu;
-  FXMenuPane        *helpmenu;
-  FXMenuPane        *bookmarkmenu;
-  FXDirBox          *dirbox;		// Directory box
-  FXSwitcher        *switcher;		// Switcher for preview
-  FXSplitter        *splitter;
-  FXVerticalFrame   *group1;
-  FXVerticalFrame   *group2;
-  FXDirList         *dirlist;		// Directory tree
-  FXFileList        *filelist;		// File list
-  FXComboBox        *pattern;		// Filter pattern
-  FXLabel           *diskspace;         // Show free space
-  FXTextField       *address;		// Address field
-  FXImageView       *imagepreview;	// Image preview panel
-  FXRecentFiles      bookmarkeddirs;	// Bookmarked directories
-  FXFileDict        *associations;	// File associations
-  FXIcon            *foxbigicon;	// Icons
-  FXIcon            *foxminiicon;
-  FXIcon            *cuticon;
-  FXIcon            *copyicon;
-  FXIcon            *moveicon;
-  FXIcon            *linkicon;
-  FXIcon            *renameicon;
-  FXIcon            *pasteicon;
-  FXIcon            *upicon;
-  FXIcon            *homeicon;
-  FXIcon            *backicon;
-  FXIcon            *forwicon;
-  FXIcon            *bigiconsicon;
-  FXIcon            *miniiconsicon;
-  FXIcon            *detailsicon;
-  FXIcon            *mapicon;
-  FXIcon            *unmapicon;
-  FXIcon            *propicon;
-  FXIcon            *deleteicon;
-  FXIcon            *setbookicon;
-  FXIcon            *addbookicon;
-  FXIcon            *delbookicon;
-  FXIcon            *clrbookicon;
-  FXIcon            *sortingicon;
-  FXIcon            *execicon;
-  FXIcon            *newdiricon;
-  FXIcon            *workicon;
-  FXIcon            *closeicon;
-  FXIcon            *locationicon;
-  FXIcon            *entericon;
-  FXIcon            *rotatelefticon;
-  FXIcon            *rotaterighticon;
-  FXIcon            *quiticon;
-  FXIcon            *configicon;
-  FXString           editor;		// Editor command
-  FXString           terminal;		// Terminal command
-  FXString           program;		// Last program
-  FXString           visiteddir[10];	// Visited directories
-  FXint              visiting;		// Currently visited directory
-  FXint              totalCount;
-  FXlong             totalSpace;
-  FXint              selectedCount;
-  FXlong             selectedSpace;
-  FXuint             selectedModeBits[16];
-  FXString           statusInfo;
-  FXbool             preview;		// Preview mode
-  FXbool             blending;		// Icon blending
-  FXbool             scaling;           // Image scaled
+  FXToolBarShell     *dragshell1;               // For floating menu bar
+  FXToolBarShell     *dragshell2;               // For floating tool bar
+  FXToolBarShell     *dragshell3;               // For floating location bar
+  FXToolBar          *toolbar;                  // Toolbar
+  FXToolBar          *locationbar;              // Location bar
+  FXStatusBar        *statusbar;                // Status bar
+  FXMenuPane         *filemenu;
+  FXMenuPane         *editmenu;
+  FXMenuPane         *viewmenu;
+  FXMenuPane         *gomenu;
+  FXMenuPane         *arrangemenu;
+  FXMenuPane         *sortmenu;
+  FXMenuPane         *prefmenu;
+  FXMenuPane         *helpmenu;
+  FXMenuPane         *bookmarkmenu;
+  FXDirBox           *dirbox;		        // Directory box
+  FXSwitcher         *switcher;		        // Switcher for preview
+  FXSplitter         *splitter;
+  FXVerticalFrame    *group1;
+  FXVerticalFrame    *group2;
+  FXDirList          *dirlist;		        // Directory tree
+  FXFileList         *filelist;		        // File list
+  FXComboBox         *pattern;		        // Filter pattern
+  FXLabel            *diskspace;                // Show free space
+  FXTextField        *address;		        // Address field
+  FXImageView        *imagepreview;	        // Image preview panel
+  FXRecentFiles       bookmarkeddirs;	        // Bookmarked directories
+  FXFileAssociations *associations;	        // File associations
+  FXIcon             *foxbigicon;	        // Icons
+  FXIcon             *foxminiicon;
+  FXIcon             *cuticon;
+  FXIcon             *copyicon;
+  FXIcon             *moveicon;
+  FXIcon             *linkicon;
+  FXIcon             *renameicon;
+  FXIcon             *pasteicon;
+  FXIcon             *upicon;
+  FXIcon             *homeicon;
+  FXIcon             *backicon;
+  FXIcon             *forwicon;
+  FXIcon             *bigiconsicon;
+  FXIcon             *miniiconsicon;
+  FXIcon             *detailsicon;
+  FXIcon             *mapicon;
+  FXIcon             *unmapicon;
+  FXIcon             *propicon;
+  FXIcon             *deleteicon;
+  FXIcon             *setbookicon;
+  FXIcon             *addbookicon;
+  FXIcon             *delbookicon;
+  FXIcon             *clrbookicon;
+  FXIcon             *sortingicon;
+  FXIcon             *execicon;
+  FXIcon             *newdiricon;
+  FXIcon             *workicon;
+  FXIcon             *closeicon;
+  FXIcon             *locationicon;
+  FXIcon             *entericon;
+  FXIcon             *rotatelefticon;
+  FXIcon             *rotaterighticon;
+  FXIcon             *quiticon;
+  FXIcon             *configicon;
+  FXString            editor;		        // Editor command
+  FXString            terminal;		        // Terminal command
+  FXString            program;		        // Last program
+  FXString            visiteddir[10];	        // Visited directories
+  FXint               visiting;		        // Currently visited directory
+  FXint               totalCount;
+  FXlong              totalSpace;
+  FXint               selectedCount;
+  FXlong              selectedSpace;
+  FXuint              selectedModeBits[16];
+  FXString            statusInfo;
+  FXbool              preview;		        // Preview mode
+  FXbool              blending;		        // Icon blending
+  FXbool              scaling;                  // Image scaled
 protected:
   PathFinderMain(){}
   FXbool haveSelectedFiles() const;
@@ -195,6 +195,10 @@ public:
   long onClickedImagePreview(FXObject*,FXSelector,void*);
   long onCmdRotateImage(FXObject*,FXSelector,void*);
   long onUpdRotateImage(FXObject*,FXSelector,void*);
+  long onCmdImageSize(FXObject*,FXSelector,void*);
+  long onUpdImageSize(FXObject*,FXSelector,void*);
+  long onCmdToggleHidden(FXObject*,FXSelector,void*);
+  long onUpdToggleHidden(FXObject*,FXSelector,void*);
   long onCmdPreferences(FXObject*,FXSelector,void*);
 public:
   enum{
@@ -259,6 +263,11 @@ public:
     ID_IMAGE_PREVIEW,
     ID_IMAGE_ROTATE_LEFT,
     ID_IMAGE_ROTATE_RIGHT,
+    ID_MINI_SIZE,
+    ID_NORMAL_SIZE,
+    ID_MEDIUM_SIZE,
+    ID_GIANT_SIZE,
+    ID_TOGGLE_HIDDEN,
     ID_HARVEST,
     ID_PREFERENCES,
     ID_LAST
@@ -283,7 +292,7 @@ public:
   FXString getDirectory() const;
 
   // Return file associations
-  FXFileDict *getAssociations() const { return associations; }
+  FXFileAssociations *getAssociations() const { return associations; }
 
   // Save settings
   void saveSettings();

@@ -3,7 +3,7 @@
 *                P a r a l l e l   P r o g r a m m i n g   T e s t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2012,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2012,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 
 #include "xincs.h"
@@ -69,16 +69,16 @@ FXint QTest::run(){
 
 // Churn cpu for a random while, then return
 void churn(){
-  FXRandom random(FXThread::time());
+  FXRandom random(FXThread::time()+128628761545);
   fxmessage("Churn start th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
-  while(random.randDouble()<0.99999999){ }
+  while(random.randDouble()<0.999999999){ }
   fxmessage("Churn done  th %p code %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   }
 
 
 // Loop through index range
 void looping(FXint i){
-  FXRandom random(FXThread::time());
+  FXRandom random(FXThread::time()+128628761545);
   fxmessage("Looping %05d begin th %p core %d/%d\n",i,FXThread::current(),FXThread::processor(),FXThread::processors());
   while(random.randDouble()<0.9999999){ }
   fxmessage("Looping %05d finis th %p core %d/%d\n",i,FXThread::current(),FXThread::processor(),FXThread::processors());
@@ -121,7 +121,8 @@ void printusage(const char* prog){
   fxmessage("  -h, --help                  Print help.\n");
   fxmessage("  -Q, --queue                 Test job queue.\n");
   fxmessage("  -P, --pool                  Test thread pool.\n");
-  fxmessage("  -G, --group                 Test task group.\n");
+  fxmessage("  -L, --loop                  Test parallel loop.\n");
+  fxmessage("  -I, --invoke                Test parallel invoke.\n");
   }
 
 
@@ -195,8 +196,11 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"-P")==0 || strcmp(argv[arg],"--pool")==0){
       test=1;
       }
-    else if(strcmp(argv[arg],"-G")==0 || strcmp(argv[arg],"--group")==0){
+    else if(strcmp(argv[arg],"-L")==0 || strcmp(argv[arg],"--loop")==0){
       test=2;
+      }
+    else if(strcmp(argv[arg],"-I")==0 || strcmp(argv[arg],"--invoke")==0){
+      test=3;
       }
     else{
       fxmessage("Bad argument.\n");
@@ -297,6 +301,29 @@ int main(int argc,char* argv[]){
     fxmessage("stopping...\n");
     pool.stop();
     fxmessage("...done!\n");
+    }
+
+  // Test parallel invoke
+  if(3==test){
+    FXThreadPool pool(size);
+
+    pool.setMinimumThreads(minimum);
+    pool.setMaximumThreads(maximum);
+    pool.setExpiration(1000000);
+
+    fxmessage("starting %d of maximum of %d threads, keeping at most %d\n",nthreads,maximum,minimum);
+
+    pool.start(nthreads);
+
+    fxmessage("running: %d!\n",pool.getRunningThreads());
+
+    fxmessage("main thread %p\n",FXThread::current());
+
+
+    // 8-way parallelism if you got the cores
+    fxmessage("%d-way parallel call...\n",nthreads);
+    FXParallelInvoke(churn,churn,churn,churn,churn,churn,churn,churn);
+    fxmessage("...done\n");
     }
   return 0;
   }

@@ -3,7 +3,7 @@
 *                      A u t o m a t i c   P o i n t e r                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -78,7 +78,7 @@ public:
 
   /// Follow pointer operator
   EType* operator->() const { return ptr; }
-  
+
   /// Array indexing
   EType& operator[](FXint i) const { return ptr[i]; }
 

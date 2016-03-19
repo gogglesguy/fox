@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -28,10 +28,10 @@
 namespace FX {
 
 
-class FXFileDict;
+class FXButton;
 class FXDirList;
 class FXTextField;
-class FXButton;
+class FXFileAssociations;
 
 
 /**
@@ -143,10 +143,10 @@ public:
   FXuint getDirBoxStyle() const;
 
   /// Change file associations; delete old ones if owned
-  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
 
   /// Return file associations
-  FXFileDict* getAssociations() const;
+  FXFileAssociations* getAssociations() const;
 
   /// Save to stream
   virtual void save(FXStream& store) const;

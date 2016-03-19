@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -159,7 +159,11 @@ FXDEFMAP(PathFinderMain) PathFinderMainMap[]={
   FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_CLOSE_PREVIEW,PathFinderMain::onUpdClosePreview),
   FXMAPFUNCS(SEL_COMMAND,PathFinderMain::ID_IMAGE_ROTATE_LEFT,PathFinderMain::ID_IMAGE_ROTATE_RIGHT,PathFinderMain::onCmdRotateImage),
   FXMAPFUNCS(SEL_UPDATE,PathFinderMain::ID_IMAGE_ROTATE_LEFT,PathFinderMain::ID_IMAGE_ROTATE_RIGHT,PathFinderMain::onUpdRotateImage),
+  FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_TOGGLE_HIDDEN,PathFinderMain::onCmdToggleHidden),
+  FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_TOGGLE_HIDDEN,PathFinderMain::onUpdToggleHidden),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_PREFERENCES,PathFinderMain::onCmdPreferences),
+  FXMAPFUNCS(SEL_COMMAND,PathFinderMain::ID_MINI_SIZE,PathFinderMain::ID_GIANT_SIZE,PathFinderMain::onCmdImageSize),
+  FXMAPFUNCS(SEL_UPDATE,PathFinderMain::ID_MINI_SIZE,PathFinderMain::ID_GIANT_SIZE,PathFinderMain::onUpdImageSize),
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,PathFinderMain::ID_IMAGE_PREVIEW,PathFinderMain::onClickedImagePreview)
   };
 
@@ -279,7 +283,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   diskspace->setSelector(ID_DISKSPACE);
 
   // Make file associations object; shared between FXFileList and FXDirList
-  associations=new FXFileDict(getApp());
+  associations=new FXFileAssociations(getApp());
 
   // Main window interior
   FXHorizontalFrame * splitterbox=new FXHorizontalFrame(this,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_RAISED,0,0,0,0, 2,2,2,2, 0,0);
@@ -294,6 +298,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // Folder List
   dirlist=new FXDirList(group1,this,ID_DIRECTORYLIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_RIGHT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_BROWSESELECT|DIRLIST_NO_OWN_ASSOC);
+  dirlist->setAssociations(associations);
   dirlist->dropEnable();
 
   // Header above files
@@ -310,6 +315,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // File List
   filelist=new FXFileList(switcher,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_MINI_ICONS|ICONLIST_AUTOSIZE|FILELIST_NO_OWN_ASSOC);
+  filelist->setAssociations(associations);
   filelist->dropEnable();
 
   // Image view
@@ -387,6 +393,14 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuSeparator(arrangemenu);
   new FXMenuRadio(arrangemenu,tr("&Rows\t\tView row-wise."),filelist,FXFileList::ID_ARRANGE_BY_ROWS);
   new FXMenuRadio(arrangemenu,tr("&Columns\t\tView column-wise."),filelist,FXFileList::ID_ARRANGE_BY_COLUMNS);
+  new FXMenuSeparator(arrangemenu);
+  new FXMenuCheck(arrangemenu,tr("Hidden files"),this,ID_TOGGLE_HIDDEN);
+  new FXMenuCheck(arrangemenu,tr("Preview images"),filelist,FXFileList::ID_TOGGLE_IMAGES);
+  new FXMenuSeparator(arrangemenu);
+  new FXMenuRadio(arrangemenu,tr("Mini images"),this,ID_MINI_SIZE);
+  new FXMenuRadio(arrangemenu,tr("Normal images"),this,ID_NORMAL_SIZE);
+  new FXMenuRadio(arrangemenu,tr("Medium images"),this,ID_MEDIUM_SIZE);
+  new FXMenuRadio(arrangemenu,tr("Giant images"),this,ID_GIANT_SIZE);
 
   // Sort menu
   sortmenu=new FXMenuPane(this);
@@ -410,10 +424,6 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   // View Menu Pane
   viewmenu=new FXMenuPane(this);
   new FXMenuTitle(menubar,tr("&View"),NULL,viewmenu);
-  new FXMenuCheck(viewmenu,tr("Hidden &Directories\t\tShow hidden directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
-  new FXMenuCheck(viewmenu,tr("Hidden &Files\t\tShow hidden files and directories."),filelist,FXFileList::ID_TOGGLE_HIDDEN);
-  new FXMenuCheck(viewmenu,tr("&Preview Images\t\tShow thumbnail images."),filelist,FXFileList::ID_TOGGLE_IMAGES);
-  new FXMenuSeparator(viewmenu);
   new FXMenuCheck(viewmenu,tr("Tree list\t\tShow or hide the tree list."),group1,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Toolbar\t\tShow or hide tool bar."),toolbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Location bar\t\tShow or hide location bar."),locationbar,FXWindow::ID_TOGGLESHOWN);
@@ -458,8 +468,9 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // Directory box
   dirbox=new FXDirBox(toolbar,this,ID_DIRBOX,DIRBOX_NO_OWN_ASSOC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FIX_WIDTH|LAYOUT_CENTER_Y,0,0,180,0, 0,0, 1,1);
-  dirbox->setNumVisible(5);
   dirbox->setHelpText(tr("Switch to parent folder."));
+  dirbox->setAssociations(associations);
+  dirbox->setNumVisible(5);
 
   // Spacer
   new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,2,0);
@@ -558,11 +569,6 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   bookmarkeddirs.setMaxFiles(20);
   bookmarkeddirs.setTarget(this);
   bookmarkeddirs.setSelector(ID_GO_RECENT);
-
-  // Set associations
-  dirbox->setAssociations(associations);
-  dirlist->setAssociations(associations);
-  filelist->setAssociations(associations);
 
   // Set patterns
   setPatternList(fallbackPatterns);
@@ -717,16 +723,17 @@ void PathFinderMain::saveSettings(){
   FXIconListSortFunc sortfunc;
   FXString filter;
   FXString path;
+  FXString imagepath;
   FXbool   hiddenfiles;
   FXbool   thumbnails;
-  FXbool   hiddendirs;
   FXuint   iconview;
   FXint    itemspace;
+  FXint    thumbnailsize;
   FXuint   index;
 
-  // Save pathfinder directory
-  path=filelist->getDirectory();
-  getApp()->reg().writeStringEntry("SETTINGS","directory",path.text());
+  // Save icon search path
+  imagepath=associations->getIconPath();
+  getApp()->reg().writeStringEntry("SETTINGS","iconpath",imagepath.text());
 
   // Save file list mode
   iconview=filelist->getListStyle();
@@ -740,13 +747,13 @@ void PathFinderMain::saveSettings(){
   hiddenfiles=filelist->showHiddenFiles();
   getApp()->reg().writeBoolEntry("SETTINGS","hiddenfiles",hiddenfiles);
 
-  // Showing hidden directories...
-  hiddendirs=dirlist->showHiddenFiles();
-  getApp()->reg().writeBoolEntry("SETTINGS","hiddendirs",hiddendirs);
-
   // Showing thumbnails...
   thumbnails=filelist->showImages();
   getApp()->reg().writeBoolEntry("SETTINGS","thumbnails",thumbnails);
+
+  // Save file list item space
+  thumbnailsize=filelist->getImageSize();
+  getApp()->reg().writeIntEntry("SETTINGS","thumbnailsize",thumbnailsize);
 
   // Write new window size back to registry
   getApp()->reg().writeIntEntry("SETTINGS","x",getX());
@@ -807,6 +814,10 @@ void PathFinderMain::saveSettings(){
   sortfunc=filelist->getSortFunc();
   for(index=ARRAYNUMBER(sortfuncs)-1; index; index--){ if(sortfuncs[index]==sortfunc) break; }
   getApp()->reg().writeIntEntry("SETTINGS","sorting",index);
+
+  // Save pathfinder directory
+  path=filelist->getDirectory();
+  getApp()->reg().writeStringEntry("SETTINGS","directory",path.text());
   }
 
 
@@ -815,19 +826,20 @@ void PathFinderMain::loadSettings(){
   FXint    ww,hh,xx,yy;
   FXString path;
   FXString filter;
+  FXString imagepath;
   FXuint   iconview;
+  FXint    thumbnailsize;
   FXint    itemspace;
   FXbool   hiddenfiles;
   FXbool   thumbnails;
-  FXbool   hiddendirs;
   FXbool   tbshown;
   FXbool   lbshown;
   FXbool   sbshown;
   FXuint   sortfunc;
 
-  // Read last path setting
-  path=getApp()->reg().readStringEntry("SETTINGS","directory","~");
-  setDirectory(FXPath::expand(path));
+  // Get icon search path
+  imagepath=getApp()->reg().readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath);
+  associations->setIconPath(imagepath);
 
   // Read icon view mode
   iconview=getApp()->reg().readUIntEntry("SETTINGS","iconview",ICONLIST_MINI_ICONS|ICONLIST_AUTOSIZE);
@@ -840,14 +852,15 @@ void PathFinderMain::loadSettings(){
   // Showing hidden files...
   hiddenfiles=getApp()->reg().readBoolEntry("SETTINGS","hiddenfiles",false);
   filelist->showHiddenFiles(hiddenfiles);
+  dirlist->showHiddenFiles(hiddenfiles);
 
   // Showing thumbnails...
   thumbnails=getApp()->reg().readBoolEntry("SETTINGS","thumbnails",false);
   filelist->showImages(thumbnails);
 
-  // Showing hidden directories...
-  hiddendirs=getApp()->reg().readBoolEntry("SETTINGS","hiddendirs",false);
-  dirlist->showHiddenFiles(hiddendirs);
+  // Showing thumbnails...
+  thumbnailsize=getApp()->reg().readIntEntry("SETTINGS","thumbnailsize",32);
+  filelist->setImageSize(thumbnailsize);
 
   // Get size
   xx=getApp()->reg().readIntEntry("SETTINGS","x",100);
@@ -916,6 +929,10 @@ void PathFinderMain::loadSettings(){
   sortfunc=getApp()->reg().readIntEntry("SETTINGS","sorting",0);
   if(sortfunc>=ARRAYNUMBER(sortfuncs)) sortfunc=0;
   filelist->setSortFunc(sortfuncs[sortfunc]);
+
+  // Read last path setting
+  path=getApp()->reg().readStringEntry("SETTINGS","directory","~");
+  setDirectory(FXPath::expand(path));
   }
 
 
@@ -1192,7 +1209,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"PathFinder",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s).\nCopyright (C) 2000,2013 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s).\nCopyright (C) 2000,2014 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1663,6 +1680,49 @@ long PathFinderMain::onSigHarvest(FXObject*,FXSelector,void*){
   }
 
 
+// Toggle hidden files display
+long PathFinderMain::onCmdToggleHidden(FXObject*,FXSelector,void*){
+  dirlist->showHiddenFiles(!filelist->showHiddenFiles());
+  filelist->showHiddenFiles(!filelist->showHiddenFiles());
+  return 1;
+  }
+
+
+// Update toggle hidden files widget
+long PathFinderMain::onUpdToggleHidden(FXObject* sender,FXSelector,void*){
+  sender->handle(this,filelist->showHiddenFiles()?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+
+// Change image size
+long PathFinderMain::onCmdImageSize(FXObject*,FXSelector sel,void*){
+  switch(FXSELID(sel)){
+    case ID_MINI_SIZE: filelist->setImageSize(16); break;
+    case ID_NORMAL_SIZE: filelist->setImageSize(32); break;
+    case ID_MEDIUM_SIZE: filelist->setImageSize(64); break;
+    case ID_GIANT_SIZE: filelist->setImageSize(128); break;
+    }
+  return 1;
+  }
+
+
+// Update image size
+long PathFinderMain::onUpdImageSize(FXObject* sender,FXSelector sel,void*){
+  FXbool check=false;
+  switch(FXSELID(sel)){
+    case ID_MINI_SIZE: check=(filelist->getImageSize()==16); break;
+    case ID_NORMAL_SIZE: check=(filelist->getImageSize()==32); break;
+    case ID_MEDIUM_SIZE: check=(filelist->getImageSize()==64); break;
+    case ID_GIANT_SIZE: check=(filelist->getImageSize()==128); break;
+    }
+  sender->handle(this,check?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+
 // Show preferences dialog
 long PathFinderMain::onCmdPreferences(FXObject*,FXSelector,void*){
   Preferences preferences(this);
@@ -1792,7 +1852,6 @@ long PathFinderMain::onUpdFileSize(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&size);
   return 1;
   }
-
 
 
 // Update file type
@@ -2064,6 +2123,11 @@ PathFinderMain::~PathFinderMain(){
 
 // Start the whole thing
 int main(int argc,char *argv[]){
+
+  // Make sure  we're linked against the right library version
+  if(fxversion[0]!=FOX_MAJOR || fxversion[1]!=FOX_MINOR || fxversion[2]!=FOX_LEVEL){
+    fxerror("FOX Library mismatch; expected version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL);
+    }
 
   // Create application
   FXApp application("PathFinder");

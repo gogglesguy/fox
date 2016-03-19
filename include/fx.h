@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -76,7 +76,6 @@
 #include "FXVariantArray.h"
 #include "FXVariantMap.h"
 #include "FXDictionary.h"
-#include "FXStringDictionary.h"
 #include "FXJSON.h"
 #include "FXJSONFile.h"
 #include "FXDLL.h"
@@ -86,7 +85,6 @@
 #include "FXColors.h"
 #include "FXObject.h"
 #include "FXDelegator.h"
-#include "FXDict.h"
 #include "FXPath.h"
 #include "FXSystem.h"
 #include "FXStat.h"
@@ -94,7 +92,7 @@
 #include "FXDirVisitor.h"
 #include "FXDate.h"
 #include "FXURL.h"
-#include "FXStringDict.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXObjectList.h"
@@ -159,8 +157,8 @@
 #include "FXDCWindow.h"
 #include "FXDCPrint.h"
 #include "FXIconSource.h"
-#include "FXIconDict.h"
-#include "FXFileDict.h"
+#include "FXIconCache.h"
+#include "FXFileAssociations.h"
 #include "FXFrame.h"
 #include "FXSeparator.h"
 #include "FXLabel.h"

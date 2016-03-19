@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   B o x   O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -35,6 +35,7 @@
 #include "FXStat.h"
 #include "FXFile.h"
 #include "FXDir.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
@@ -61,7 +62,9 @@
 #include "FXTreeList.h"
 #include "FXTreeListBox.h"
 #include "FXDirBox.h"
-#include "FXFileDict.h"
+#include "FXDictionary.h"
+#include "FXIconCache.h"
+#include "FXFileAssociations.h"
 #include "icons.h"
 
 /*
@@ -69,7 +72,7 @@
   - When setting path, it adds all directories from the top down to
     the lowest directory.
   - Share icons with other widgets; upgrade icons to some nicer ones.
-  - Should some of these icons move to FXFileDict?
+  - Should some of these icons move to FXFileAssociations?
   - Need to support ":" directory list separator so we can path not just
     a single path but a list of paths.
 */
@@ -98,7 +101,7 @@ FXIMPLEMENT(FXDirBox,FXTreeListBox,FXDirBoxMap,ARRAYNUMBER(FXDirBoxMap))
 // Directory box
 FXDirBox::FXDirBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXTreeListBox(p,tgt,sel,opts,x,y,w,h, pl,pr,pt,pb){
   associations=NULL;
-  if(!(options&DIRBOX_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
+  if(!(options&DIRBOX_NO_OWN_ASSOC)) associations=new FXFileAssociations(getApp());
   foldericon=new FXGIFIcon(getApp(),minifolder);
   cdromicon=new FXGIFIcon(getApp(),minicdrom);
   harddiskicon=new FXGIFIcon(getApp(),miniharddisk);
@@ -421,7 +424,7 @@ FXString FXDirBox::getDirectory() const {
 
 
 // Change file associations; delete the old one unless it was shared
-void FXDirBox::setAssociations(FXFileDict* assocs,FXbool owned){
+void FXDirBox::setAssociations(FXFileAssociations* assocs,FXbool owned){
   FXuint opts=options;
   options^=((owned-1)^options)&DIRBOX_NO_OWN_ASSOC;
   if(associations!=assocs){
@@ -471,7 +474,7 @@ FXDirBox::~FXDirBox(){
   delete floppyicon;
   delete nethoodicon;
   delete zipdiskicon;
-  associations=(FXFileDict*)-1L;
+  associations=(FXFileAssociations*)-1L;
   foldericon=(FXIcon*)-1L;
   cdromicon=(FXIcon*)-1L;
   harddiskicon=(FXIcon*)-1L;

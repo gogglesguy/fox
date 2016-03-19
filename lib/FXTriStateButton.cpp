@@ -3,7 +3,7 @@
 *               T r i - S t a t e    B u t t o n    W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2013 by Charles Warren.   All Rights Reserved.             *
+* Copyright (C) 2002,2014 by Charles Warren.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXEvent.h"
 #include "FXWindow.h"

@@ -3,7 +3,7 @@
 *                    F i l e   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,6 +33,7 @@
 #include "FXPath.h"
 #include "FXStat.h"
 #include "FXFile.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXEvent.h"
@@ -325,18 +326,6 @@ FXbool FXFileDialog::allowNavigation() const{
   }
 
 
-// Change file associations
-void FXFileDialog::setAssociations(FXFileDict* assoc,FXbool owned){
-  filebox->setAssociations(assoc,owned);
-  }
-
-
-// Return file associations
-FXFileDict* FXFileDialog::getAssociations() const {
-  return filebox->getAssociations();
-  }
-
-
 // Set draggable files
 void FXFileDialog::setDraggableFiles(FXbool flag){
   filebox->setDraggableFiles(flag);
@@ -353,11 +342,35 @@ FXbool FXFileDialog::getDraggableFiles() const {
 void FXFileDialog::setTimeFormat(const FXString& fmt){
   filebox->setTimeFormat(fmt);
   }
-  
+
 
 // Return file time format
 FXString FXFileDialog::getTimeFormat() const {
   return filebox->getTimeFormat();
+  }
+
+
+// Change file associations
+void FXFileDialog::setAssociations(FXFileAssociations* assoc,FXbool owned){
+  filebox->setAssociations(assoc,owned);
+  }
+
+
+// Return file associations
+FXFileAssociations* FXFileDialog::getAssociations() const {
+  return filebox->getAssociations();
+  }
+
+
+// Change icon loader
+void FXFileDialog::setIconSource(FXIconSource* src){
+  filebox->setIconSource(src);
+  }
+
+
+// Return icon loader
+FXIconSource* FXFileDialog::getIconSource() const {
+  return filebox->getIconSource();
   }
 
 

@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -102,7 +102,7 @@ FXHash::FXHash():table(EMPTY){
 
 // Construct from another table
 FXHash::FXHash(const FXHash& other):table(EMPTY){
-  if(__likely(no(other.no()))){
+  if(__likely(1<other.no() && no(other.no()))){
     copyElms(table,other.table,no());
     free(other.free());
     used(other.used());
@@ -145,7 +145,7 @@ FXbool FXHash::resize(FXival n){
   if(elbat.no(n)){
     if(1<elbat.no() && 1<no()){
       register FXptr name,data;
-      register FXuval p,b,h,x;
+      register FXuval p,b,x;
       register FXival i;
       for(i=0; i<no(); ++i){                  // Hash existing entries into new table
         name=table[i].name;
