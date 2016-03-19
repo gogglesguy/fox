@@ -85,10 +85,14 @@ protected:
   FXint                replaceEnd;              // End of text to be replaced
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
+  FXString             isearchString[20];       // Incremental search strings
+  FXuint               isearchOption[20];       // Incremental search options
+  FXbool               isearchReplace;          // Replace new entry
+  FXint                isearchIndex;            // Incremental search index
+  FXint                isearchpos;              // Incremental search position
+  FXbool               searching;               // Incremental search in effect
   FXString             searchstring;            // String of last search
   FXuint               searchflags;             // Incremental search flags
-  FXint                searchpos;               // Incremental search position
-  FXbool               searching;               // Incremental search in effect
   FXbool               showsearchbar;           // Showing incremental search bar
   FXbool               showlogger;              // Showing error logger
   FXbool               initialsize;             // New window is initialwidth x initialheight
@@ -109,9 +113,6 @@ protected:
   void createStatusbar();
   void readRegistry();
   void writeRegistry();
-  FXString unique() const;
-  TextWindow *findUnused() const;
-  TextWindow *findWindow(const FXString& file) const;
   FXint findRestylePoint(FXint pos,FXint& style) const;
   FXint backwardByContext(FXint pos) const;
   FXint forwardByContext(FXint pos) const;
@@ -121,6 +122,9 @@ protected:
   FXHiliteStyle readStyleForRule(const FXString& group,const FXString& name,const FXString& style);
   void writeStyleForRule(const FXString& group,const FXString& name,const FXHiliteStyle& style);
   FXbool matchesSelection(const FXString& string,FXint* beg,FXint* end,FXuint flgs,FXint npar) const;
+  void addSearchHistory(const FXString& pat,FXuint opt,FXbool rep);
+  void loadSearchHistory();
+  void saveSearchHistory();
 protected:
   enum{
     MAXUNDOSIZE    = 1000000,               // Don't let the undo buffer get out of hand
@@ -150,7 +154,6 @@ public:
   long onCmdSaveAs(FXObject*,FXSelector,void*);
   long onCmdFont(FXObject*,FXSelector,void*);
   long onCmdPrint(FXObject*,FXSelector,void*);
-  long onCmdFindInFiles(FXObject*,FXSelector,void*);
   long onCmdSaveSettings(FXObject*,FXSelector,void*);
 
   // Text display
@@ -269,6 +272,7 @@ public:
   long onUpdToggleBrowser(FXObject*,FXSelector,void*);
   long onCmdSearchPaths(FXObject*,FXSelector,void*);
   long onUpdSearchPaths(FXObject*,FXSelector,void*);
+  long onCmdFindInFiles(FXObject*,FXSelector,void*);
 
   // Shell commands
   long onCmdShellDialog(FXObject*,FXSelector,void*);
@@ -308,12 +312,14 @@ public:
   long onCmdISearchNext(FXObject*,FXSelector,void*);
   long onCmdISearchStart(FXObject*,FXSelector,void*);
   long onCmdISearchFinish(FXObject*,FXSelector,void*);
-  long onUpdISearchModifiers(FXObject*,FXSelector,void*);
-  long onCmdISearchModifiers(FXObject*,FXSelector,void*);
-  long onUpdISearchHistUp(FXObject*,FXSelector,void*);
   long onCmdISearchHistUp(FXObject*,FXSelector,void*);
-  long onUpdISearchHistDn(FXObject*,FXSelector,void*);
   long onCmdISearchHistDn(FXObject*,FXSelector,void*);
+  long onUpdISearchCase(FXObject*,FXSelector,void*);
+  long onCmdISearchCase(FXObject*,FXSelector,void*);
+  long onUpdISearchDir(FXObject*,FXSelector,void*);
+  long onCmdISearchDir(FXObject*,FXSelector,void*);
+  long onUpdISearchRegex(FXObject*,FXSelector,void*);
+  long onCmdISearchRegex(FXObject*,FXSelector,void*);
 
   // Style changes
   long onCmdStyleNormalFG(FXObject*,FXSelector,void*);
@@ -350,7 +356,6 @@ public:
     ID_SAVEAS,
     ID_FONT,
     ID_HELP,
-    ID_FINDFILES,
     ID_WINDOW,
     ID_PRINT,
     ID_TEXT_BACK,
@@ -449,6 +454,7 @@ public:
     ID_USE_INITIAL_SIZE,
     ID_SET_INITIAL_SIZE,
     ID_TOGGLE_BROWSER,
+    ID_FINDFILES,
     ID_SEARCHPATHS,
     ID_EXPRESSION,
     ID_GOTO_LINE,
@@ -510,11 +516,11 @@ public:
   // Get current file of directory browser
   FXString getBrowserCurrentFile() const;
 
-  // Return this window's filename
-  const FXString& getFilename() const { return filename; }
-
   // Change this window's filename
   void setFilename(const FXString& file){ filename=file; }
+
+  // Return this window's filename
+  const FXString& getFilename() const { return filename; }
 
   // Change file time
   void setFiletime(FXTime t){ filetime=t; }
@@ -553,10 +559,10 @@ public:
   FXbool saveChanges();
 
   // Change pattern list
-  void setPatterns(const FXString& patterns);
+  void setPatternList(const FXString& patterns);
 
   // Get pattern list
-  FXString getPatterns() const;
+  FXString getPatternList() const;
 
   // Set search paths
   void setSearchPaths(const FXString& paths);
@@ -603,7 +609,7 @@ public:
   void finishISearch();
 
   // Search next incremental text
-  FXbool performISearch(const FXString& text,FXbool advance=false,FXbool notify=false);
+  FXbool performISearch(const FXString& text,FXuint opts,FXbool advance=false,FXbool notify=false);
 
   // Start shell command
   FXbool startCommand(const FXString& command,const FXString& input=FXString::null);

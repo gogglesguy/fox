@@ -20,7 +20,6 @@
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
-#include <new>
 #include <signal.h>
 #ifndef WIN32
 #include <sys/wait.h>
@@ -31,6 +30,7 @@
 #include "Syntax.h"
 #include "SyntaxParser.h"
 #include "TextWindow.h"
+#include "FindInFiles.h"
 #include "Adie.h"
 #include "icons.h"
 
@@ -117,51 +117,6 @@ Adie::Adie(const FXString& name):FXApp(name){
 
   // File associations, shared between all windows
   associations=new FXFileAssociations(this);
-  }
-
-
-// Get syntax for language name
-Syntax* Adie::getSyntaxByName(const FXString& lang){
-  FXTRACE((10,"Adie::getSyntaxByName(%s)\n",lang.text()));
-  if(!lang.empty()){
-    for(FXint syn=0; syn<syntaxes.no(); syn++){
-      if(syntaxes[syn]->getName()==lang){
-        FXTRACE((10,"syntaxes[%d]: language: %s matched name: %s!\n",syn,syntaxes[syn]->getName().text(),lang.text()));
-        return syntaxes[syn];
-        }
-      }
-    }
-  return NULL;
-  }
-
-
-// Get syntax by matching file patterns
-Syntax* Adie::getSyntaxByPattern(const FXString& file){
-  FXTRACE((10,"Adie::getSyntaxByPattern(%s)\n",file.text()));
-  if(!file.empty()){
-    for(FXint syn=0; syn<syntaxes.no(); syn++){
-      if(syntaxes[syn]->matchFilename(file)){
-        FXTRACE((10,"syntaxes[%d]: language: %s matched file: %s!\n",syn,syntaxes[syn]->getName().text(),file.text()));
-        return syntaxes[syn];
-        }
-      }
-    }
-  return NULL;
-  }
-
-
-// Get syntax by matching file contents
-Syntax* Adie::getSyntaxByContents(const FXString& contents){
-  FXTRACE((10,"Adie::getSyntaxByContents(%s)\n",contents.text()));
-  if(!contents.empty()){
-    for(FXint syn=0; syn<syntaxes.no(); syn++){
-      if(syntaxes[syn]->matchContents(contents)){
-        FXTRACE((10,"syntaxes[%d]: language: %s matched contents: %s!\n",syn,syntaxes[syn]->getName().text(),contents.text()));
-        return syntaxes[syn];
-        }
-      }
-    }
-  return NULL;
   }
 
 
@@ -330,7 +285,7 @@ FXint Adie::start(int argc,char** argv){
 
     // Start in directory with empty untitled file
     if(FXStat::isDirectory(file)){
-      file=FXPath::absolute(file,"untitled");
+      file=unique(file);
       window->setFilename(file);
       window->setBrowserCurrentFile(file);
       }
@@ -379,6 +334,124 @@ FXint Adie::start(int argc,char** argv){
 
   // Now run
   return run();
+  }
+
+
+// Generate unique name from given path
+FXString Adie::unique(const FXString& path) const {
+  FXString name="untitled";
+  FXString file;
+  for(FXint i=1; i<2147483647; i++){
+    file=FXPath::absolute(path,name);
+    if(!findWindow(file)) break;
+    name.format("untitled%d",i);
+    }
+  return file;
+  }
+
+
+// Find an as yet untitled, unedited window
+TextWindow *Adie::findUnused() const {
+  for(FXint w=0; w<windowlist.no(); w++){
+    if(!windowlist[w]->isFilenameSet() && !windowlist[w]->isModified()){
+      return windowlist[w];
+      }
+    }
+  return NULL;
+  }
+
+
+// Find window, if any, currently editing the given file
+TextWindow* Adie::findWindow(const FXString& file) const {
+  for(FXint w=0; w<windowlist.no(); w++){
+    if(windowlist[w]->getFilename()==file){
+      return windowlist[w];
+      }
+    }
+  return NULL;
+  }
+
+
+// Open file and jump to line, or just jump to line if already open
+TextWindow* Adie::openFileWindow(const FXString& file,FXint lineno,FXint column){
+  TextWindow *window=NULL;
+
+  FXTRACE((1,"Adie::openFileWindow(%s,%d,%d)\n",file.text(),lineno,column));
+
+  // See if we already have this file
+  window=findWindow(file);
+  if(!window){
+
+    // Create new one if no unused windows
+    window=findUnused();
+    if(!window){
+      window=new TextWindow(this);
+      window->create();
+      }
+
+    // Load the file
+    if(window->loadFile(file)){
+      window->clearBookmarks();
+      window->readBookmarks(file);
+      window->readView(file);
+      window->determineSyntax();
+      }
+    }
+
+  // Switch line number only
+  if(lineno){
+    window->visitLine(lineno,column);
+    }
+
+  // Bring up the window
+  window->raise();
+  window->setFocus();
+  return window;
+  }
+
+
+// Get syntax for language name
+Syntax* Adie::getSyntaxByName(const FXString& lang){
+  FXTRACE((10,"Adie::getSyntaxByName(%s)\n",lang.text()));
+  if(!lang.empty()){
+    for(FXint syn=0; syn<syntaxes.no(); syn++){
+      if(syntaxes[syn]->getName()==lang){
+        FXTRACE((10,"syntaxes[%d]: language: %s matched name: %s!\n",syn,syntaxes[syn]->getName().text(),lang.text()));
+        return syntaxes[syn];
+        }
+      }
+    }
+  return NULL;
+  }
+
+
+// Get syntax by matching file patterns
+Syntax* Adie::getSyntaxByPattern(const FXString& file){
+  FXTRACE((10,"Adie::getSyntaxByPattern(%s)\n",file.text()));
+  if(!file.empty()){
+    for(FXint syn=0; syn<syntaxes.no(); syn++){
+      if(syntaxes[syn]->matchFilename(file)){
+        FXTRACE((10,"syntaxes[%d]: language: %s matched file: %s!\n",syn,syntaxes[syn]->getName().text(),file.text()));
+        return syntaxes[syn];
+        }
+      }
+    }
+  return NULL;
+  }
+
+
+// Get syntax by matching file contents
+Syntax* Adie::getSyntaxByContents(const FXString& contents){
+  FXTRACE((10,"Adie::getSyntaxByContents(%s)\n",contents.text()));
+  if(!contents.empty()){
+    for(FXint syn=0; syn<syntaxes.no(); syn++){
+      if(syntaxes[syn]->matchContents(contents)){
+        FXTRACE((10,"syntaxes[%d]: language: %s matched contents: %s!\n",syn,syntaxes[syn]->getName().text(),contents.text()));
+        return syntaxes[syn];
+        }
+      }
+    }
+  return NULL;
   }
 
 /*******************************************************************************/

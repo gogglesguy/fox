@@ -21,7 +21,7 @@
 #ifndef CONTROLPANEL_H
 #define CONTROLPANEL_H
 
- 
+
 // Color theme info
 struct ColorTheme {
   const FXchar* name;
@@ -122,6 +122,7 @@ private:
   FXuint             maxcolors;
   FXint              dragDelta;
   FXint              wheelLines;
+  FXint              barSize;
   FXfloat            gamma;
   FXFileBinding      filebinding;       // Current file binding
 private:
@@ -146,6 +147,7 @@ private:
   FXDataTarget       target_tooltiptime;
   FXDataTarget       target_dragdelta;          // Move mouse delta
   FXDataTarget       target_wheellines;         // Mouse wheel lines
+  FXDataTarget       target_barsize;            // Scroll bar size
   FXDataTarget       target_maxcolors;          // Maximum colors
   FXDataTarget       target_gamma;              // Display gamma value
   FXDataTarget       target_filebinding_description;

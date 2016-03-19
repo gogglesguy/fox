@@ -272,7 +272,7 @@ public:
   virtual void killFocus();
 
   /// Return the number of items in the list
-  FXint getNumItems() const { return items.no(); }
+  FXint getNumItems() const { return (FXint)items.no(); }
 
   /// Return number of visible items
   FXint getNumVisible() const { return visible; }

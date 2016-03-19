@@ -47,7 +47,7 @@ public:
   FXbool setSize(FXuint sz);
 
   /// Return size
-  FXuint getSize() const { return items.no(); }
+  FXuint getSize() const { return (FXuint)items.no(); }
 
   /// Return number of used slots
   FXuint getUsed() const;

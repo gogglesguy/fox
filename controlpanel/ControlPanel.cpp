@@ -22,7 +22,7 @@
 #include <fx.h>
 #include "ControlPanel.h"
 #include "icons.h"
- 
+
 #define DEFAULT_SPACING 6
 
 
@@ -418,6 +418,11 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   spinner13->setRange(0.0,5.0);
   spinner13->setIncrement(0.1);
 
+  // Scrollbar size spinner
+  new FXLabel(matrix3,tr("Scrollbar Size"));
+  FXSpinner* spinner14=new FXSpinner(matrix3,3,&target_barsize,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
+  spinner14->setRange(5,100);
+
   // Close button etc.
   new FXSeparator(main,SEPARATOR_GROOVE|LAYOUT_FILL_X);
   FXHorizontalFrame *closebox=new FXHorizontalFrame(main,LAYOUT_BOTTOM|LAYOUT_FILL_X,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
@@ -456,6 +461,7 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   iconpath=FXIconCache::defaultIconPath;
   dragDelta=getApp()->getDragDelta();
   wheelLines=getApp()->getWheelLines();
+  barSize=getApp()->getScrollBarSize();
   maxcolors=125;
   gamma=1.0;
 
@@ -483,6 +489,7 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   target_tooltiptime.connect(tooltipTime);
   target_dragdelta.connect(dragDelta);
   target_wheellines.connect(wheelLines);
+  target_barsize.connect(barSize);
   target_maxcolors.connect(maxcolors);
   target_gamma.connect(gamma);
 
@@ -1104,6 +1111,7 @@ FXbool FXDesktopSetup::readSettingsFile(const FXString& file){
     // Mouse tweaks
     dragDelta=desktopsettings.readIntEntry("SETTINGS","dragdelta",getApp()->getDragDelta());
     wheelLines=desktopsettings.readIntEntry("SETTINGS","wheellines",getApp()->getWheelLines());
+    barSize=desktopsettings.readIntEntry("SETTINGS","scrollbarsize",getApp()->getScrollBarSize());
 
     // Display tweaks
     maxcolors=desktopsettings.readUIntEntry("SETTINGS","maxcolors",125);
@@ -1152,6 +1160,7 @@ FXbool FXDesktopSetup::writeSettingsFile(const FXString& file){
   // Mouse tweaks
   desktopsettings.writeIntEntry("SETTINGS","dragdelta",dragDelta);
   desktopsettings.writeIntEntry("SETTINGS","wheellines",wheelLines);
+  desktopsettings.writeIntEntry("SETTINGS","scrollbarsize",barSize);
 
   // Display tweaks
   desktopsettings.writeUIntEntry("SETTINGS","maxcolors",maxcolors);

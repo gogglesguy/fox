@@ -31,6 +31,8 @@
     Journal of Modern Applied Statistical Methods 2, No. 2, 2003.
   - Different shift-counts are certainly possible, and produce different
     sequences (of the same period), see G. Marsaglia, "Xorshift RNGs".
+  - New shift counts based on the paper "An experimental exploration of 
+    Marsaglia's xorshift generators, scrambled", Sebastiano Vigna, 2014.
 */
 
 #define SHIFTA    12
@@ -59,7 +61,7 @@ void FXRandom::seed(FXulong s){
   state=s^FXULONG(4101842887655102017);
   }
 
-	
+
 // Generate next state
 FXulong FXRandom::next(){
   state^=state>>SHIFTA;

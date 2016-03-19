@@ -387,7 +387,7 @@ void FXIcon::render(){
         if(!xim){ fxerror("%s::render: unable to render icon.\n",getClassName()); }
 
         // Try create temp pixel store
-        if(!allocElms(xim->data,xim->bytes_per_line*height)){ fxerror("%s::render: unable to allocate memory.\n",getClassName()); }
+        if(!callocElms(xim->data,xim->bytes_per_line*height)){ fxerror("%s::render: unable to allocate memory.\n",getClassName()); }
         }
 
       // Make GC

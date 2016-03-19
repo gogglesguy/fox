@@ -136,8 +136,8 @@ FXbool FXDispatcher::init(){
   if(!isInitialized()){
     if(allocElms(handles,1)){
 #if defined(WIN32)
-      clearElms(handles,ARRAYNUMBER(handles));
-      clearElms(watched,ARRAYNUMBER(handles));
+      clearElms(handles->handles,ARRAYNUMBER(handles->handles));
+      clearElms(handles->watched,ARRAYNUMBER(handles->watched));
 #elif defined(HAVE_EPOLL_CREATE1)
       sigemptyset(&handles->signals);
       clearElms(handles->events,ARRAYNUMBER(handles->events));
@@ -367,7 +367,7 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd,FXuint mode){
 #if defined(WIN32) //////////////////////////////////////////////////////////////
 
 // Dispatch driver
-FXint FXDispatcher::dispatch(FXTime timeout,FXuint flags){
+FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
   if(isInitialized()){
     FXTime now,due,delay,interval;
     FXint sig,nxt;
@@ -400,7 +400,7 @@ FXint FXDispatcher::dispatch(FXTime timeout,FXuint flags){
       // Check active handles
       while(0<numraised){
         current=current%numhandles;
-        if((WaitForSingleObject(handles->handles[current],0)==WAIT_OBJECT_0){
+        if(WaitForSingleObject(handles->handles[current],0)==WAIT_OBJECT_0){
           numraised--;
           if(dispatchHandle(current,InputRead)) return true; // Which of InputRead or InputWrite ??
           }

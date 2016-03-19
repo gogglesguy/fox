@@ -654,7 +654,7 @@ FXIMPLEMENT(DCTestWindow,FXMainWindow,DCTestWindowMap,ARRAYNUMBER(DCTestWindowMa
 
 
 // Make some windows
-DCTestWindow::DCTestWindow(FXApp *ap):FXMainWindow(ap,"Device Context Test",NULL,NULL,DECOR_ALL,0,0,900,820){
+DCTestWindow::DCTestWindow(FXApp *ap):FXMainWindow(ap,"Device Context Test",NULL,NULL,DECOR_ALL,0,0,1400,1080){
 
   // Preferred line attributes
   lineStyle=LINE_SOLID;

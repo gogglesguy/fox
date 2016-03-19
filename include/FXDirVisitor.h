@@ -48,26 +48,30 @@ namespace FX {
 * or files.
 * The visitor automatically skips entries already visited or directories with
 * unsufficient permissions.
+* Recursion may be optionally limited with the limit parameter; setting limit
+* equal to 1 traverses the given path only; a setting of 2 traverses the path
+* and its immediate children, but stops there. A limit of 0 does nothing at
+* all.
 */
 class FXAPI FXDirVisitor {
 private:
   struct Seen;
 protected:
-  virtual FXuint recurse(const FXString& path,Seen *seen);
+  virtual FXuint recurse(const FXString& path,Seen *seen,FXint depth);
 public:
 
   /// Start traversal at given path
-  FXuint traverse(const FXString& path);
-  
+  FXuint traverse(const FXString& path,FXint limit=1000);
+
   /// Enter directory
   virtual FXuint enter(const FXString& path);
-  
+
   /// Visit file
   virtual FXuint visit(const FXString& path);
-  
+
   /// Leave directory
   virtual FXuint leave(const FXString& path);
-  
+
   /// Destructor
   virtual ~FXDirVisitor();
   };
@@ -83,14 +87,14 @@ private:
   FXuint   options;             // Matching options
 public:
 
-  /// Construct directory visitor 
+  /// Construct directory visitor
   FXGlobVisitor():options(0){}
 
   /// Construct directory visitor from original
   FXGlobVisitor(const FXGlobVisitor& org):wildcard(org.wildcard),options(org.options){}
 
   /// Start traversal at given path
-  FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll);
+  FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll,FXint depth=1000);
 
   /// Enter directory; returns 1 if path matches criteria
   virtual FXuint enter(const FXString& path);
@@ -100,7 +104,7 @@ public:
 
   /// Leave directory; always returns 1
   virtual FXuint leave(const FXString& path);
-  
+
   /// Destructor
   virtual ~FXGlobVisitor();
   };
@@ -123,34 +127,34 @@ public:
 
   /// Create new glob counting visitor
   FXGlobCountVisitor();
-  
+
   /// Copy glob counting visitor
   FXGlobCountVisitor(const FXGlobCountVisitor& org);
 
-  /// Start traversal of path  
-  FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll);
+  /// Start traversal of path
+  FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll,FXint limit=1000);
 
   /// Return total number of folders found
   FXlong getTotalFolders() const { return countFolders; }
-  
+
   /// Return total number of files matched
   FXlong getTotalFiles() const { return countFiles; }
-  
+
   /// Return total number of bytes in matching files
   FXlong getTotalBytes() const { return countBytes; }
-  
+
   /// Return maximum depth of directory tree
   FXlong getMaximumDepth() const { return maxDepth; }
-  
+
   /// Count directories
   virtual FXuint enter(const FXString& path);
-  
+
   /// Count files
   virtual FXuint visit(const FXString& path);
-  
+
   /// Count depth
   virtual FXuint leave(const FXString& path);
-  
+
   /// Destructor
   virtual ~FXGlobCountVisitor();
   };

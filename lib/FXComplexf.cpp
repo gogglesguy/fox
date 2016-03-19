@@ -38,7 +38,7 @@ namespace FX {
 
 // Complex square root
 FXComplexf csqrt(const FXComplexf& c){
-  register FXfloat mag=c.modulus();
+  register FXfloat mag=abs(c);
   register FXfloat rr=sqrt((mag+c.re)*0.5f);
   register FXfloat ii=sqrt((mag-c.re)*0.5f);
 #if defined(WIN32)

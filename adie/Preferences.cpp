@@ -230,13 +230,13 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
 /*******************************************************************************/
 
 // Change patterns, each pattern separated by newline
-void Preferences::setPatterns(const FXString& patterns){
+void Preferences::setPatternList(const FXString& patterns){
   filepattext->setText(patterns);
   }
 
 
 // Return list of patterns
-FXString Preferences::getPatterns() const {
+FXString Preferences::getPatternList() const {
   return filepattext->getText();
   }
 
@@ -249,7 +249,7 @@ void Preferences::setSyntax(Syntax* syn){
     FXColorWell   *well;
     FXLabel       *label;
     FXint          i;
-    
+
     // Captions
     new FXLabel(stylemat,tr("Rule\tSyntax rule name"),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Nfg\tNormal foreground color"),NULL,JUSTIFY_RIGHT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
@@ -262,14 +262,14 @@ void Preferences::setSyntax(Syntax* syn){
     new FXLabel(stylemat,tr("Und\tUnderline"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Str\tStrikeout"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Bld\tBold face"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
-    
+
     // Add controls for each rule
     for(i=0; i<syn->getNumRules()-1; i++){
-    
+
       // Rule name
       label=new FXLabel(stylemat,syn->getRule(i+1)->getName(),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
       label->setBackColor(getApp()->getBackColor());
-      
+
       // Color wells
       well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_NORMAL_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
       well->setBackColor(getApp()->getBackColor());

@@ -72,10 +72,10 @@ public:
   /// Return default height
   virtual FXint getDefaultHeight();
 
-  /// Set check state (TRUE, FALSE or MAYBE)
+  /// Set check state (true, false or maybe)
   void setCheck(FXuchar s=true);
 
-  /// Get check state (TRUE, FALSE or MAYBE)
+  /// Get check state (true, false or maybe)
   FXuchar getCheck() const { return check; }
 
   /// Get the box background color

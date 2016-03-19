@@ -345,7 +345,7 @@ public:
   virtual void position(FXint x,FXint y,FXint w,FXint h);
 
   /// Return number of items
-  FXint getNumItems() const { return items.no(); }
+  FXint getNumItems() const { return (FXint)items.no(); }
 
   /// Return number of rows
   FXint getNumRows() const { return nrows; }

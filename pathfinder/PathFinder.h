@@ -280,7 +280,7 @@ public:
   virtual FXbool close(FXbool notify=false);
 
   // Switch current directory
-  void setDirectory(const FXString& dir);
+  void setDirectory(const FXString& path);
 
   // Return current directory
   FXString getDirectory() const;

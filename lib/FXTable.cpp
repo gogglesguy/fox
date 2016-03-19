@@ -2918,15 +2918,6 @@ long FXTable::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
         }
       mode=MOUSE_SELECT;
       }
-/*
-    else if(event->state&CONTROLMASK){
-      if(isItemEnabled(current.row,current.col)){
-//        toggleItem(current.row,current.col,true);
-        }
-      setAnchorItem(current.row,current.col);
-      mode=MOUSE_SELECT;
-      }
-*/
     else{
       if(isItemEnabled(current.row,current.col)){
         killSelection(true);
@@ -2960,9 +2951,6 @@ long FXTable::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
 
     // Scroll to make item visibke
     makePositionVisible(current.row,current.col);
-
-    // Update anchor
-    //setAnchorItem(current.row,current.col); // FIXME look into the selection stuff
 
     // Generate clicked callbacks
     if(event->click_count==1){
