@@ -35,6 +35,7 @@ protected:
   FXTextField     *terminal;
   FXCheckButton   *preview;
   FXCheckButton   *blending;
+  FXCheckButton   *scaling;
   FXTextField     *icondirs;
   FXList          *extensions;
   FXComboBox      *mimetypes;
@@ -47,9 +48,12 @@ protected:
   FXString         filemime;
   FXString         filecommand;
   FXString         fileicons[4];
+  FXCheckButton   *autosize;
+  FXTextField     *itemspace;
   FXIcon          *brw;
   FXIcon          *pat;
   FXIcon          *mim;
+  FXIcon          *run;
   FXIcon          *dir;
 private:
   Preferences(){}
@@ -129,12 +133,24 @@ public:
   FXbool getPreview() const { return preview->getCheck(); }
 
   // Set image preview
-  void setBlend(FXbool blend){ blending->setCheck(blend); }
-  FXbool getBlend() const { return blending->getCheck(); }
+  void setPreviewBlend(FXbool blend){ blending->setCheck(blend); }
+  FXbool getPreviewBlend() const { return blending->getCheck(); }
+
+  // Set image scale
+  void setPreviewScale(FXbool scale){ scaling->setCheck(scale); }
+  FXbool getPreviewScale() const { return scaling->getCheck(); }
 
   // Get/set icon path
   void setIconPath(const FXString& text){ icondirs->setText(text); }
   FXString getIconPath() const { return icondirs->getText(); }
+
+  // Set autosize
+  void setAutoSize(FXbool flag){ autosize->setCheck(flag); }
+  FXbool getAutoSize() const { return autosize->getCheck(); }
+
+  // Set item space
+  void setItemSpace(FXint s);
+  FXint getItemSpace() const;
 
   // Clean up
   virtual ~Preferences();

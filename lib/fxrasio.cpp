@@ -179,9 +179,11 @@ struct HEADER {                         // File header
   };
 
 
+#ifndef FXLOADRAS
 extern FXAPI FXbool fxcheckRAS(FXStream& store);
 extern FXAPI FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsaveRAS(FXStream& store,const FXColor *data,FXint width,FXint height);
+#endif
 
 
 // Check if stream contains a RAS

@@ -42,9 +42,11 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADPCX
 extern FXAPI FXbool fxcheckPCX(FXStream& store);
 extern FXAPI FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height);
+#endif
 
 
 // Check if stream contains a PCX
@@ -258,7 +260,7 @@ FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
           freeElms(line);
           }
         }
-    
+
       // Reset byte order
       store.swapBytes(swap);
       }
@@ -288,8 +290,7 @@ FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height){
   FXshort  Ymin=0;
   FXshort  Xmax=width-1;
   FXshort  Ymax=height-1;
-  FXshort  Width=width;
-  FXshort  Height=height;
+  FXshort  BytesPerLine=width;          // FIXME see PCX.txt docs
   FXuchar  Current,Last,RLECount,rc,*pp;
   FXint    i,x,y,rgb;
   FXbool   swap;
@@ -334,8 +335,8 @@ FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height){
   // NPlanes
   store << NPlanes;
 
-  // BytesPerLine = width
-  store << Width;
+  // BytesPerLine
+  store << BytesPerLine;
 
   // PaletteInfo=1
   store << PaletteInfo;

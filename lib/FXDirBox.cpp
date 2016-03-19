@@ -425,12 +425,13 @@ FXString FXDirBox::getDirectory() const {
 
 // Change file associations; delete the old one unless it was shared
 void FXDirBox::setAssociations(FXFileDict* assocs,FXbool owned){
+  FXuint opts=options;
+  options^=((owned-1)^options)&DIRBOX_NO_OWN_ASSOC;
   if(associations!=assocs){
-    if(!(options&DIRBOX_NO_OWN_ASSOC)) delete associations;
+    if(!(opts&DIRBOX_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
     setDirectory(getDirectory());
     }
-  options^=((owned-1)^options)&DIRBOX_NO_OWN_ASSOC;
   }
 
 

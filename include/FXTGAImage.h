@@ -55,6 +55,9 @@ public:
   };
 
 
+#ifndef FXLOADTGA
+#define FXLOADTGA
+
 /**
 * Check if stream contains a TARGA, return true if so.
 */
@@ -73,6 +76,8 @@ extern FXAPI FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an TARGA file to a stream.
 */
 extern FXAPI FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+#endif
 
 }
 

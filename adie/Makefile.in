@@ -50,8 +50,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" \
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 =
 am_adie_OBJECTS = Adie.$(OBJEXT) Commands.$(OBJEXT) help.$(OBJEXT) \
-	HelpWindow.$(OBJEXT) Hilite.$(OBJEXT) icons.$(OBJEXT) \
-	main.$(OBJEXT) parsesyntax.$(OBJEXT) Preferences.$(OBJEXT) \
+	HelpWindow.$(OBJEXT) icons.$(OBJEXT) main.$(OBJEXT) \
+	Preferences.$(OBJEXT) Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) \
 	TextWindow.$(OBJEXT) $(am__objects_1)
 adie_OBJECTS = $(am_adie_OBJECTS)
 adie_LDADD = $(LDADD)
@@ -304,14 +304,15 @@ help.h \
 help.cpp \
 HelpWindow.h \
 HelpWindow.cpp \
-Hilite.h \
-Hilite.cpp \
 icons.h \
 icons.cpp \
 main.cpp \
-parsesyntax.cpp \
 Preferences.h \
 Preferences.cpp \
+Syntax.h \
+Syntax.cpp \
+SyntaxParser.h \
+SyntaxParser.cpp \
 TextWindow.h \
 TextWindow.cpp \
 LICENSE \
@@ -448,13 +449,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Adie.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpWindow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hilite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preferences.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Syntax.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SyntaxParser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TextWindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/help.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/icons.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parsesyntax.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

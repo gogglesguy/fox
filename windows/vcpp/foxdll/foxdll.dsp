@@ -141,10 +141,6 @@ SOURCE=..\..\..\lib\bigfolderopen.gif
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\lib\bigharddisk.gif
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\lib\bignetdrive.gif
 # End Source File
 # Begin Source File
@@ -433,11 +429,31 @@ SOURCE=..\..\..\include\fxascii.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXAtomic.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\include\FXAtomic.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\include\FXAutoPtr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXAutoThreadStorageKey.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXAutoThreadStorageKey.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXBarrier.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXBarrier.h
 # End Source File
 # Begin Source File
 
@@ -645,6 +661,22 @@ SOURCE=..\..\..\include\FXComposite.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXConcurrent.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXConcurrent.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXCondition.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXCondition.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXConsole.cpp
 # End Source File
 # Begin Source File
@@ -842,6 +874,14 @@ SOURCE=..\..\..\lib\FXCP874Codec.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXCP874Codec.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\fxcpuid.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\fxcpuid.h
 # End Source File
 # Begin Source File
 
@@ -1089,6 +1129,10 @@ SOURCE=..\..\..\include\FXElement.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\fxendian.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\include\FXEvent.h
 # End Source File
 # Begin Source File
@@ -1218,6 +1262,14 @@ SOURCE=..\..\..\include\FXFrame.h
 # Begin Source File
 
 SOURCE=..\..\..\lib\fxfsquantize.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXGauge.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXGauge.h
 # End Source File
 # Begin Source File
 
@@ -1633,6 +1685,22 @@ SOURCE=..\..\..\include\FXMainWindow.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXMat2d.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXMat2d.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXMat2f.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXMat2f.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXMat3d.cpp
 # End Source File
 # Begin Source File
@@ -1806,6 +1874,14 @@ SOURCE=..\..\..\lib\FXMessageChannel.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXMessageChannel.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXMetaClass.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXMetaClass.h
 # End Source File
 # Begin Source File
 
@@ -2089,6 +2165,10 @@ SOURCE=..\..\..\lib\FXReadWriteLock.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\FXReadWriteLock.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXRealSlider.cpp
 # End Source File
 # Begin Source File
@@ -2118,6 +2198,10 @@ SOURCE=..\..\..\lib\FXRectangle.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXRectangle.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXRefPtr.h
 # End Source File
 # Begin Source File
 
@@ -2194,6 +2278,10 @@ SOURCE=..\..\..\lib\FXRulerView.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXRulerView.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXRunnable.h
 # End Source File
 # Begin Source File
 
@@ -2773,6 +2861,14 @@ SOURCE=..\..\..\include\FXWizard.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXWorker.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXWorker.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\fxwuquantize.cpp
 # End Source File
 # Begin Source File
@@ -2906,14 +3002,6 @@ SOURCE=..\..\..\lib\minidoc.gif
 # Begin Source File
 
 SOURCE=..\..\..\lib\minifloppy.gif
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lib\minifloppy3.gif
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lib\minifloppy5.gif
 # End Source File
 # Begin Source File
 

@@ -40,7 +40,7 @@ private:
   PropertyDialog(){}
   PropertyDialog(const PropertyDialog&);
 public:
-  PropertyDialog(FXWindow *owner);
+  PropertyDialog(FXWindow *own);
   virtual ~PropertyDialog();
   };
 

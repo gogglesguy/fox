@@ -42,9 +42,11 @@ namespace FX {
 
 
 // Declarations
+#ifndef FXLOADPPM
 extern FXAPI FXbool fxcheckPPM(FXStream& store);
 extern FXAPI FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height);
+#endif
 
 // Furnish our own version
 extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
@@ -98,11 +100,11 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   if(magic=='P'){
 
     // Check format
-    // "P1" = Ascii bitmap, 
-    // "P2" = Ascii greymap, 
+    // "P1" = Ascii bitmap,
+    // "P2" = Ascii greymap,
     // "P3" = Ascii pixmap,
-    // "P4" = Raw bitmap, 
-    // "P5" = Raw greymap, 
+    // "P4" = Raw bitmap,
+    // "P5" = Raw greymap,
     // "P6" = Raw pixmap
     store >> format;
     if('1'<=format && format<='6'){
@@ -110,7 +112,7 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       // Get size
       width=getint(store);
       height=getint(store);
-      
+
       // Sanity check
       if(0<width && 0<height){
         npixels=width*height;

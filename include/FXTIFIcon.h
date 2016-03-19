@@ -66,6 +66,9 @@ public:
   };
 
 
+#ifndef FXLOADTIF
+#define FXLOADTIF
+
 /**
 * Check if stream contains a TIFF, return true if so.
 */
@@ -84,6 +87,8 @@ extern FXAPI FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an TIFF (Tagged Image File Format) file to a stream.
 */
 extern FXAPI FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec);
+
+#endif
 
 }
 

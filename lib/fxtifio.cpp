@@ -57,9 +57,11 @@ namespace FX {
 
 
 // Declarations
+#ifndef FXLOADTIF
 extern FXAPI FXbool fxcheckTIF(FXStream& store);
 extern FXAPI FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec);
 extern FXAPI FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec);
+#endif
 
 // Furnish our own version
 extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
@@ -218,10 +220,10 @@ FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXush
       }
     }
 
- /// RGBA => BGRA    
+ /// RGBA => BGRA
   for(i=0;i<size;i++) {
     data[i] = ((data[i]&0xff)<<16) | ((data[i]&0xff0000)>>16) | (data[i]&0xff00) | (data[i]&0xff000000);
-    }    
+    }
 
 
   TIFFRGBAImageEnd(&img);
@@ -290,8 +292,8 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
       }
     data+=width;
     }
-    
-    
+
+
   /// pixels for one line
   if (!allocElms(ld,width)) {
     TIFFClose(image);
@@ -299,10 +301,10 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
     }
 
   // Dump each line
-  for(line=0; line<height; line++){    
+  for(line=0; line<height; line++){
     for(i=0;i<width;i++) {
       ld[i] = FXREDVAL(data[i]) | FXGREENVAL(data[i])<<8 | FXBLUEVAL(data[i])<<16 | FXALPHAVAL(data[i])<<24;
-      }    
+      }
     if(TIFFWriteScanline(image,(void*)ld,line,1)!=1){
       freeElms(ld);
       TIFFClose(image);
@@ -310,7 +312,7 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
       }
     data+=width;
     }
-  freeElms(ld);        
+  freeElms(ld);
   TIFFClose(image);
   return true;
   }

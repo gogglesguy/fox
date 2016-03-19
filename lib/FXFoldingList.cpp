@@ -2234,19 +2234,17 @@ FXFoldingItem* FXFoldingList::insertItem(FXFoldingItem* other,FXFoldingItem* fat
   if(!currentitem && item==lastitem) currentitem=item;
 
   // Notify item has been inserted
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)item);}
-
-  // Current item may have changed
-  if(olditem!=currentitem){
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);}
+  if(notify && target){
+    target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)item);
+    if(olditem!=currentitem){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);
+      }
     }
 
   // Was new item
   if(currentitem==item){
-    if(hasFocus()){
-      currentitem->setFocus(true);
-      }
-    if((options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT && currentitem->isEnabled()){
+    currentitem->setFocus(hasFocus());
+    if(currentitem->isEnabled() && (options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT){
       selectItem(currentitem,notify);
       }
     }
@@ -2412,16 +2410,14 @@ FXFoldingItem* FXFoldingList::extractItem(FXFoldingItem* item,FXbool notify){
       }
 
     // Current item has changed
-    if(olditem!=currentitem){
-      if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);}
+    if(notify && target && olditem!=currentitem){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);
       }
 
     // Extracted current item
     if(currentitem && currentitem!=olditem){
-      if(hasFocus()){
-        currentitem->setFocus(true);
-        }
-      if((options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT && currentitem->isEnabled()){
+      currentitem->setFocus(hasFocus());
+      if(currentitem->isEnabled() && (options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT){
         selectItem(currentitem,notify);
         }
       }
@@ -2480,16 +2476,14 @@ void FXFoldingList::removeItems(FXFoldingItem* fm,FXFoldingItem* to,FXbool notif
       }
 
     // Current item has changed
-x:  if(olditem!=currentitem){
-      if(notify && target){target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);}
+x:  if(notify && target && olditem!=currentitem){
+      target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);
       }
 
     // Deleted current item
     if(currentitem && currentitem!=olditem){
-      if(hasFocus()){
-        currentitem->setFocus(true);
-        }
-      if((options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT && currentitem->isEnabled()){
+      currentitem->setFocus(hasFocus());
+      if(currentitem->isEnabled() && (options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT){
         selectItem(currentitem,notify);
         }
       }

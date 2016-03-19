@@ -82,9 +82,11 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADJP2
 extern FXAPI FXbool fxcheckJP2(FXStream& store);
 extern FXAPI FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality);
 extern FXAPI FXbool fxsaveJP2(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
+#endif
 
 
 #undef HAVE_JP2_H

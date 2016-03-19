@@ -41,7 +41,9 @@ namespace FX {
 
 
 // Declarations
+#ifndef FXLOADXBM
 extern FXAPI FXbool fxsavePS(FXStream& store,const FXColor *data,FXint width,FXint height,FXint paperw=612,FXint paperh=792,FXint margin=35,FXbool color=true);
+#endif
 
 // Furnish our own version
 extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);

@@ -21,13 +21,9 @@
 #include "fx.h"
 #include "icons.h"
 #include "help.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "Preferences.h"
 #include "Commands.h"
-#include "FXRex.h"
-#include "FXArray.h"
-#include "Hilite.h"
+#include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "HelpWindow.h"

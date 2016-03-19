@@ -394,6 +394,14 @@ SOURCE=..\..\..\adie\syntax_gif.gif
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\SyntaxParser.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\SyntaxParser.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\TextWindow.cpp
 # End Source File
 # Begin Source File

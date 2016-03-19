@@ -44,8 +44,10 @@ using namespace FX;
 namespace FX {
 
 
+#ifndef FXLOADIFF
 extern FXAPI FXbool fxcheckIFF(FXStream& store);
 extern FXAPI FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+#endif
 
 
 // Tags

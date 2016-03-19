@@ -41,10 +41,10 @@ Adie.cpp \
 Commands.cpp \
 help.cpp \
 HelpWindow.cpp \
-Hilite.cpp \
 icons.cpp \
 main.cpp \
-parsesyntax.cpp \
+Syntax.cpp \
+SyntaxParser.cpp \
 Preferences.cpp \
 TextWindow.cpp
 
@@ -56,9 +56,9 @@ HelpWindow.obj \
 TextWindow.obj \
 Preferences.obj \
 help.obj \
-Hilite.obj \
 icons.obj \
-parsesyntax.obj \
+Syntax.obj \
+SyntaxParser.obj \
 main.obj
 
 # splitted to avoid 'cmdline too long' errors

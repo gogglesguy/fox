@@ -187,7 +187,7 @@ long FXProgressBar::onCmdGetIntRange(FXObject*,FXSelector,void* ptr){
 // Draw only the interior, i.e. the part that changes
 void FXProgressBar::drawInterior(FXDCWindow& dc){
   register FXdouble fraction=(total>0)?((FXdouble)progress/(FXdouble)total):1.0;
-  register FXint percent,barlength,barwidth,barfilled,ang,tx,ty,tw,th,dx,dy,ds,n;
+  register FXint percent,barlength,barwidth,barfilled,tx,ty,tw,th,dx,dy,ds,n;
   FXchar numtext[10];
 
   // Calculate percentage complete
@@ -215,25 +215,11 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
     // Draw filled piece
     if(barfilled!=0){
 
-      // Original code
-      //dc.setForeground(barColor);
-      //dc.fillArc(dx,dy,ds,ds,5760,-barfilled);
-
       // New gradient method
       for(int i=ds; i>0; i-=8){
         dc.setForeground(makeBlendColor(barBGColor,barColor,(100*i+ds/2)/ds));
         dc.fillArc(dx+(ds-i)/2,dy+(ds-i)/2,i,i,5760,-barfilled);
         }
-/*
-      ang=0;
-      n=640;
-      while(ang<barfilled){
-        if(ang+n>barfilled) n=barfilled-ang;
-        dc.setForeground(makeBlendColor(barBGColor,barColor,(460800+80*(ang+n))/23040));
-        dc.fillArc(dx,dy,ds,ds,5760-ang,-n);
-        ang+=n;
-        }
-*/
       }
 
     // Draw outside circle

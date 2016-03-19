@@ -35,7 +35,7 @@
 int main(int argc,char *argv[]){
 
   // Make application
-  FXApp application("Calculator",FXString::null);
+  FXApp application("Calculator");
 
   // Open display
   application.init(argc,argv);

@@ -23,10 +23,11 @@
 
 
 
+class Adie;
+class Syntax;
 class HelpWindow;
 class Preferences;
-class Adie;
-class FXSyntax;
+
 
 // Array of styles
 typedef FXArray<FXHiliteStyle> FXHiliteArray;
@@ -64,7 +65,7 @@ protected:
   FXStatusBar         *statusbar;               // Status bar
   FXFont              *font;                    // Text window font
   FXint                bookmark[10];            // Book marks
-  FXSyntax            *syntax;                  // Syntax highlighter
+  Syntax              *syntax;                  // Syntax highlighter
   FXUndoList           undolist;                // Undo list
   FXRecentFiles        mrufiles;                // Recent files list
   FXString             filename;                // File being edited
@@ -350,7 +351,7 @@ public:
 public:
 
   // Create new text window
-  TextWindow(Adie* a,const FXString& file);
+  TextWindow(Adie* a);
 
   // Create window
   virtual void create();
@@ -448,16 +449,13 @@ public:
   void writeView(const FXString& file);
 
   // Set syntax
-  void setSyntax(FXSyntax* syn);
+  void setSyntax(Syntax* syn);
 
   // Get syntax
-  FXSyntax* getSyntax() const { return syntax; }
+  Syntax* getSyntax() const { return syntax; }
 
   // Determine syntax
   void determineSyntax();
-
-  // Set syntax by name
-  void forceSyntax(const FXString& language);
 
   // Change style colors
   void setStyleColors(FXint index,const FXHiliteStyle& style);

@@ -55,6 +55,9 @@ public:
   };
 
 
+#ifndef FXLOADRGB
+#define FXLOADRGB
+
 /**
 * Check if stream contains a RGB, return true if so.
 */
@@ -73,6 +76,8 @@ extern FXAPI FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an RGB (SGI IRIS RGB) file to a stream.
 */
 extern FXAPI FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+#endif
 
 }
 

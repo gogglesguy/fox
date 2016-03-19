@@ -66,6 +66,8 @@ public:
   };
 
 
+#ifndef FXLOADJPG
+#define FXLOADJPG
 
 /**
 * Check if stream contains a JPG, return true if so.
@@ -85,6 +87,8 @@ extern FXAPI FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an JPEG (Joint Photographics Experts Group) file to a stream.
 */
 extern FXAPI FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
+
+#endif
 
 }
 

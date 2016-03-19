@@ -54,6 +54,9 @@ public:
   };
 
 
+#ifndef FXLOADPCX
+#define FXLOADPCX
+
 /**
 * Check if stream contains a PCX, return true if so.
 */
@@ -72,6 +75,8 @@ extern FXAPI FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an PCX (PC Paintbrush) file to a stream.
 */
 extern FXAPI FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+#endif
 
 }
 

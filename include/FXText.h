@@ -69,14 +69,71 @@ struct FXTextChange {
 
 
 /**
-* The text widget supports editing of multiple lines of text.
-* An optional style table can provide text coloring based on
-* the contents of an optional parallel style buffer, which is
-* maintained as text is edited.  In a typical scenario, the
-* contents of the style buffer is either directly written when
-* the text is added to the widget, or is continually modified
+* The text widget provides a multi-line text editing control.
+* The widget supports both clipboard for cut-and-paste operations, 
+* as well as drag and drop of text.
+* Text may be edited interactively by the user, or changed through
+* the programmatic interface.
+*
+* During interactive editing, the text widget notifies its target
+* of changes to the current cursor location by issueing SEL_CHANGED
+* callbacks.  If text is inserted, deleted, or replaced, the widget
+* will send SEL_INSERTED, SEL_DELETED, or SEL_REPLACED messages, and
+* pass along an FXTextChange to indicate what changes were made to the 
+* text buffer, in sufficient detail for recording undo and redo info.
+* 
+* When selections are made, SEL_SELECTED or SEL_DESELECTED messages
+* are issued, passing along the range of text affected by the change
+* in selection.
+*
+* As the cursor is being moved, matching parentheses, brackets, and
+* braces may be highlighted for a short time if the brace-matching
+* feature has been enabled.
+* 
+* An auto-indent feature, enabled by TEXT_AUTOINDENT flag, will automatically 
+* enter a number of spaces if a newline is entered, starting new text entry at
+* the same level of indent as the previous line.
+*  
+* When styled mode is turned on, the text widget will maintain a parallel
+* style-buffer along side the text-buffer.  This style buffer is used to 
+* index into a style table (FXHiliteStyle), which describes what colors 
+* and visual attributes are to be used to draw the each character in the 
+* text buffer.
+* 
+* When text is added to the widget programmatically, a style index may
+* be passed in to apply to the newly added text.  It is also possible to
+* change the style of the text without changing the text itself.  This
+* could be used to form the basis of a colorizing text editor, for example.
+*
+* The first entry in the style table corresponds to a style index of 1. 
+* Style index 0 is used for the default text style, the style that would
+* be shown if the styled mode is not in effect.
+*
+* In a typical scenario, the contents of the style buffer is either directly 
+* written when the text is added to the widget, or is continually modified
 * by editing the text via syntax-based highlighting engine which
 * colors the text based on syntactical patterns.
+* 
+* The text widget has several controlling flags which affect its behaviour
+* and display.  TEXT_READONLY sets the widget in read-only mode.  In this
+* mode, the contents of the widget may only be changed programmatically,
+* although it is possible for the user to select and paste out of the text
+* buffer.
+* The TEXT_WORDWRAP flag turns on line-wrapping.  Normally, long lines extend
+* past the right-hand side of the visible buffer.  In wrap mode, text is folded
+* at natural break points (breakable spaces, tabs, etc).  The default wrap mode
+* is a fluid wrap, that is, the text is reflowed as the widget is resized.
+* The flag TEXT_FIXEDWRAP disables the fluid wrap mode and makes the widget
+* wrap at a fixed column, regardless of the width of the widget.
+* The TEXT_OVERSTRIKE mode causes text entered by the user to overstrike
+* already existing text, instead of inserting new next. This mode can be
+* toggled interactively by hitting the INS key on the keyboard.
+* The flag TEXT_NO_TABS causes a TAB key to be replaced by the appropriate
+* number of spaces when entered interactively; however, the user can still
+* enter a TAB by entering Ctrl+TAB.
+* Finally, the TEXT_SHOWACTIVE mode will cause the line containing the current
+* cursor location to be highlighted.  This makes it easier to find the insertion
+* point when scrolling back and forth a large document.
 */
 class FXAPI FXText : public FXScrollArea {
   FXDECLARE(FXText)
@@ -315,7 +372,7 @@ public:
   long onCmdDeselectAll(FXObject*,FXSelector,void*);
 
   // Deletion
-  long onCmdBackspace(FXObject*,FXSelector,void*);
+  long onCmdBackspaceChar(FXObject*,FXSelector,void*);
   long onCmdBackspaceWord(FXObject*,FXSelector,void*);
   long onCmdBackspaceBol(FXObject*,FXSelector,void*);
   long onCmdDeleteChar(FXObject*,FXSelector,void*);
@@ -415,7 +472,7 @@ public:
     ID_SELECT_PAREN,
     ID_SELECT_ANG,
     ID_DESELECT_ALL,
-    ID_BACKSPACE,
+    ID_BACKSPACE_CHAR,
     ID_BACKSPACE_WORD,
     ID_BACKSPACE_BOL,
     ID_DELETE_CHAR,
@@ -918,13 +975,21 @@ public:
   /// Return text widget style
   FXuint getTextStyle() const;
 
-  /// Change number of visible rows
+  /**
+  * Change number of visible rows.
+  * The number of visible rows is used to calculate the default height
+  * the text widget reports to its parent layout manager.
+  */
   void setVisibleRows(FXint rows);
 
   /// Return number of visible rows
   FXint getVisibleRows() const { return vrows; }
 
-  /// Change number of visible columns
+  /**
+  * Change number of visible columns.
+  * The number of visible columns is used to calculate the default height
+  * the text widget reports to its parent layout manager.
+  */
   void setVisibleColumns(FXint cols);
 
   /// Return number of visible columns
@@ -941,10 +1006,18 @@ public:
   */
   FXTime getHiliteMatchTime() const { return matchtime; }
 
-  /// Set highlight styles
+  /**
+  * Set highlight styles.
+  * The table of styles is only referenced by the widget; it is not copied.  
+  * Thus, multiple widgets may share a common style table.
+  * Some care must be taken to populate the style-buffer only with numbers
+  * inside the style table.
+  */
   void setHiliteStyles(FXHiliteStyle* styles);
 
-  /// Get highlight styles
+  /**
+  * Return current value of the style table.
+  */
   FXHiliteStyle* getHiliteStyles() const { return hilitestyles; }
 
   /// Save to a stream

@@ -61,9 +61,12 @@ extern FXbool fxezquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXi
 extern FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
 
 
+#ifndef FXLOADGIF
 extern FXAPI FXbool fxcheckGIF(FXStream& store);
 extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXbool alpha=true);
 extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
+#endif
+
 
 // Codes found in the GIF specification
 const FXuchar TAG_EXTENSION   = 0x21;   // Extension block

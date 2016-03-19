@@ -121,8 +121,9 @@ void FXSettings::deleteData(void* ptr){
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
   FXTRACE((100,"%s::parseFile(%s,%d)\n",getClassName(),filename.text(),mrk));
   FXFile file(filename,FXIO::Reading);
+  FXString string;
   if(file.isOpen()){
-    FXString string('\0',file.size());
+    string.length(file.size());
     if(file.readBlock(string.text(),string.length())==string.length()){
       return parse(string,mrk);
       }
@@ -135,8 +136,8 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
 FXbool FXSettings::unparseFile(const FXString& filename){
   FXTRACE((100,"%s::unparseFile(%s)\n",getClassName(),filename.text()));
   FXFile file(filename,FXIO::Writing);
+  FXString string;
   if(file.isOpen()){
-    FXString string;
     if(unparse(string)){
       return file.writeBlock(string.text(),string.length())==string.length();
       }
@@ -265,7 +266,7 @@ FXbool FXSettings::unparse(FXString& string) const {
           // Write section name if not written yet
           if(!ss){
             string.append("[");
-            string.append(key(s));      // FIXME should escape group 
+            string.append(key(s));      // FIXME should escape group
             string.append("]" ENDLINE);
             ss=1;
             }

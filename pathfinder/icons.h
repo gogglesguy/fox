@@ -1,4 +1,4 @@
-/*********** Generated on 2011/09/14 17:44:54 by reswrap version 5.1.1 *********/
+/*********** Generated on 2011/10/18 00:17:09 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file bigicons.bmp */
 extern const unsigned char bigicons[];
@@ -98,6 +98,9 @@ extern const unsigned char rotateleft[];
 
 /* Created by reswrap from file rotateright.gif */
 extern const unsigned char rotateright[];
+
+/* Created by reswrap from file run_bmp.bmp */
+extern const unsigned char run_bmp[];
 
 /* Created by reswrap from file setbook.gif */
 extern const unsigned char setbook[];

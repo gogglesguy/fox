@@ -38,9 +38,47 @@
 #   just a backslash.
 #
 # - Put this file in some directory in $PATH and Adie will find it.
+#
+# - If default rule (rule with no patterns at all) is used as parent
+#   of all the other rules, then Adie will show colors different from
+#   the default editor settings. Colors of a child rule are inherited
+#   from its parent rule.
 
 
 #################################################################################
+
+# Adie editor syntax-file syntax coloring (yup!)
+language "Adie Syntax"
+  filesmatch "*.stx"
+  rule "Comment"
+    openpattern   "#"
+    closepattern  "$"
+  end
+  rule "Keyword"
+    pattern     "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|foreground|background|selforeground|selbackground|hiliteforeground|hilitebackground|activebackground|style|end)\>"
+  end
+  rule "Expression"
+    openpattern    "pattern|openpattern|closepattern|stoppattern"
+    closepattern   "$"
+    rule "Pattern"
+      openpattern   "\""
+      closepattern  "\""
+      stoppattern   "$"
+      rule "Escape"
+        pattern     "\\\""
+      end
+    end
+  end
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+    rule "Escape"
+      pattern     "\\\""
+    end
+  end
+end
+
 
 # LaTeX text formatting language
 language "LaTeX"
@@ -84,7 +122,7 @@ language "LaTeX"
     rule "Sectioning"
       pattern "\<(section|subsection|subsubsection|paragraph|chapter)\>"
     end
-    rule "Referance"
+    rule "Reference"
       pattern "\<(cite|ref|label)\>"
     end
     rule "Includes"
@@ -119,40 +157,6 @@ language "LaTeX"
     pattern "\\{2}"
   end
 end
-
-
-# Adie editor syntax-file syntax coloring (yup!)
-language "Adie Syntax"
-  filesmatch "*.stx"
-  rule "Comment"
-    openpattern   "#"
-    closepattern  "$"
-  end
-  rule "Keyword"
-    pattern     "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|foreground|end)\>"
-  end
-  rule "Expression"
-    openpattern    "pattern|openpattern|closepattern|stoppattern"
-    closepattern   "$"
-    rule "Pattern"
-      openpattern   "\""
-      closepattern  "\""
-      stoppattern   "$"
-      rule "Escape"
-        pattern     "\\\""
-      end
-    end
-  end
-  rule "String"
-    openpattern   "\""
-    closepattern  "\""
-    stoppattern   "$"
-    rule "Escape"
-      pattern     "\\\""
-    end
-  end
-end
-
 
 # FOX Registry syntax coloring
 language "Registry"
@@ -207,6 +211,19 @@ language "C++"
 
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
 
   # C++ style comment
   rule "CPPDocComment"
@@ -326,7 +343,7 @@ language "C++"
   end
 
   rule "FOXType"
-    pattern     "\<(FXuchar|FXschar,FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXColor|FXPixel|FXTime|FXID)\>"
+    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXColor|FXPixel|FXTime|FXID)\>"
   end
 
   rule "Keyword"
@@ -365,6 +382,19 @@ language "C"
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
 
   contextlines 100
+
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
 
   # C style comment
   rule "CDocComment"
@@ -638,7 +668,7 @@ end
 # Python
 language "Python"
   filesmatch "*.py"
-  
+
   # Numbers
   rule "Number"
     pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|l|UL|ul|u|U|F|f)?\>"
@@ -679,7 +709,7 @@ language "Python"
       pattern     "(\\u\h{4}|\\U\h{8})"
     end
   end
-  
+
   # Triple quoted string (')
   rule "String"
     openpattern    "'''"
@@ -715,27 +745,27 @@ language "Python"
       pattern     "(\\u\h{4}|\\U\h{8})"
     end
   end
-  
+
   rule "Comment"
     pattern    "#.*?$"
   end
-  
+
   rule "Operator"
     pattern     "\+\+|\+=|\+|--|-=|-|==|=|&&|&=|&|=|^=|^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!=|!|~=|~|\*=|\*|/=|/|%=|%|:"
   end
-  
+
   rule "Braces"
     pattern     "(\{|\})"
   end
-  
+
   rule "Parentheses"
     pattern     "(\(|\))"
   end
-  
+
   rule "Brackets"
     pattern     "(\[|\])"
   end
-  
+
   rule "Keyword"
     pattern     "\<(and|del|from|not|while|as|elif|global|or|with|assert|else|if|pass|yield|break|except|import|print|class|exec|in|raise|continue|finally|is|return|def|for|lambda|try)\>"
   end
@@ -982,7 +1012,7 @@ language "Markup"
         # there's a bit of a kludge here, for the "?" operator, a "?" matches against the "?>" at the end of a block of PHP
         # so I've had to make it \?[^>] which means the character following the "?" is treated as part of the operator
         # If you write this: "$x = $y ? 1 : 2" it looks fine, but if you write "$x=$y?1:2" the "1" is shown as part of the operator
-        pattern "(,|=|\+=|-=|\*=|/=|\.=|%=|&=|\|=|\^=|~=|<<=|>>=|:|\?[^>]|\|\||&&|\||\^|&|==|!=|===|!==|<|<=|>|>=|<<|>>|\+|-|\.|\*|/|%|!|~|\+\+|--|\(int\)|\(double\)|\(string\)|\(array\)|\(object\)|@|\[|\])
+        pattern "(,|=|\+=|-=|\*=|/=|\.=|%=|&=|\|=|\^=|~=|<<=|>>=|:|\?[^>]|\|\||&&|\||\^|&|==|!=|===|!==|<|<=|>|>=|<<|>>|\+|-|\.|\*|/|%|!|~|\+\+|--|\(int\)|\(double\)|\(string\)|\(array\)|\(object\)|@|\[|\])"
      end
   end
   rule "Comment"
@@ -1190,6 +1220,19 @@ language "Java"
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
 
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
+
   # Line comment
   rule "LineComment"
     openpattern   "//"
@@ -1277,6 +1320,19 @@ language "C#"
 
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
 
   # Line comment
   rule "LineComment"
@@ -1417,6 +1473,19 @@ language "JavaScript"
 
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
 
   # C style comment
   rule "MultiLineComment"

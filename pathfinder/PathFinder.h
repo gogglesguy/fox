@@ -36,7 +36,6 @@ class Preferences;
 class PathFinderMain : public FXMainWindow {
   FXDECLARE(PathFinderMain)
 protected:
-  PropertyDialog    *property;
   FXToolBarShell    *dragshell1;        // For floating menu bar
   FXToolBarShell    *dragshell2;        // For floating tool bar
   FXToolBarShell    *dragshell3;        // For floating location bar
@@ -99,27 +98,33 @@ protected:
   FXString           program;		// Last program
   FXString           visiteddir[10];	// Visited directories
   FXint              visiting;		// Currently visited directory
+  FXint              totalCount;
+  FXlong             totalSpace;
+  FXint              selectedCount;
+  FXlong             selectedSpace;
+  FXuint             selectedModeBits[16];
+  FXString           statusInfo;
   FXbool             preview;		// Preview mode
   FXbool             blending;		// Icon blending
+  FXbool             scaling;           // Image scaled
 protected:
   PathFinderMain(){}
   FXint getNumFilenames() const;
   FXString* getFilenames() const;
   void visitDirectory(const FXString& dir);
-  void setPatterns(const FXString& patterns);
-  FXString getPatterns() const;
+  void setPatternList(const FXString& patterns);
+  FXString getPatternList() const;
   void setCurrentPattern(FXint n);
   FXint getCurrentPattern() const;
   FXbool previewImage(const FXString& filename);
   void closePreview();
 public:
+  long onUpdate(FXObject*,FXSelector,void*);
   long onCmdAbout(FXObject*,FXSelector,void*);
   long onCmdClosePreview(FXObject*,FXSelector,void*);
   long onUpdClosePreview(FXObject*,FXSelector,void*);
   long onCmdDirTree(FXObject*,FXSelector,void*);
   long onCmdDirectory(FXObject*,FXSelector,void*);
-  long onCmdFileClicked(FXObject*,FXSelector,void*);
-  long onCmdFileDblClicked(FXObject*,FXSelector,void*);
   long onCmdGotoLocation(FXObject*,FXSelector,void*);
   long onCmdClearLocation(FXObject*,FXSelector,void*);
   long onCmdUpDirectory(FXObject*,FXSelector,void*);
@@ -130,10 +135,17 @@ public:
   long onCmdRecentDirectory(FXObject*,FXSelector,void*);
   long onCmdSaveSettings(FXObject*,FXSelector,void*);
   long onCmdNewPathFinder(FXObject*,FXSelector,void*);
-  long onFileListPopup(FXObject*,FXSelector,void*);
+  long onFilePopup(FXObject*,FXSelector,void*);
+  long onFileDblClicked(FXObject*,FXSelector,void*);
+
+  long onFileSelected(FXObject*,FXSelector,void*);
+  long onFileDeselected(FXObject*,FXSelector,void*);
+  long onFileInserted(FXObject*,FXSelector,void*);
+  long onFileDeleted(FXObject*,FXSelector,void*);
+
+
   long onUpdStatusline(FXObject*,FXSelector,void*);
   long onCmdProperties(FXObject*,FXSelector,void*);
-  long onUpdProperties(FXObject*,FXSelector,void*);
   long onCmdBookmark(FXObject*,FXSelector,void*);
   long onCmdBackDirectory(FXObject*,FXSelector,void*);
   long onUpdBackDirectory(FXObject*,FXSelector,void*);
@@ -188,7 +200,6 @@ public:
     ID_UPDATE_FILES,
     ID_DISKSPACE,
     ID_UPDIRECTORY,
-    ID_MAINWINDOW,
     ID_GOTO_LOCATION,
     ID_CLEAR_LOCATION,
     ID_GO_WORK,
@@ -216,27 +227,27 @@ public:
     ID_OPEN_WITH_EDITOR,
     ID_RUN,
     ID_TERMINAL,
-    ID_RUSR,          // File modes
-    ID_WUSR,
-    ID_XUSR,
-    ID_RGRP,
-    ID_WGRP,
-    ID_XGRP,
-    ID_ROTH,
-    ID_WOTH,
-    ID_XOTH,
-    ID_SUID,
-    ID_SGID,
-    ID_SVTX,
-    ID_OWNER,         // File ownership
-    ID_GROUP,
-    ID_FILE_CREATED,
-    ID_FILE_ACCESSED,
-    ID_FILE_MODIFIED,
-    ID_FILE_TYPE,
-    ID_FILE_LOCATION,
-    ID_FILE_SIZE,
-    ID_FILE_DESC,
+    ID_PROP_XOTH,          // File modes (order important)
+    ID_PROP_WOTH=ID_PROP_XOTH+1,
+    ID_PROP_ROTH=ID_PROP_XOTH+2,
+    ID_PROP_XGRP=ID_PROP_XOTH+3,
+    ID_PROP_WGRP=ID_PROP_XOTH+4,
+    ID_PROP_RGRP=ID_PROP_XOTH+5,
+    ID_PROP_XUSR=ID_PROP_XOTH+6,
+    ID_PROP_WUSR=ID_PROP_XOTH+7,
+    ID_PROP_RUSR=ID_PROP_XOTH+8,
+    ID_PROP_SUID=ID_PROP_XOTH+13,
+    ID_PROP_SGID=ID_PROP_XOTH+14,
+    ID_PROP_SVTX=ID_PROP_XOTH+15,
+    ID_PROP_OWNER,         // File ownership
+    ID_PROP_GROUP,
+    ID_PROP_CREATED,
+    ID_PROP_MODIFIED,
+    ID_PROP_ACCESSED,
+    ID_PROP_TYPE,
+    ID_PROP_LOCATION,
+    ID_PROP_SIZE,
+    ID_PROP_DESC,
     ID_CLOSE_PREVIEW,
     ID_IMAGE_PREVIEW,
     ID_IMAGE_ROTATE_LEFT,

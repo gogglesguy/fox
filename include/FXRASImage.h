@@ -55,6 +55,9 @@ public:
   };
 
 
+#ifndef FXLOADRAS
+#define FXLOADRAS
+
 /**
 * Check if stream contains a RAS, return true if so.
 */
@@ -73,6 +76,8 @@ extern FXAPI FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an SUN Raster Image format file to a stream.
 */
 extern FXAPI FXbool fxsaveRAS(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+#endif
 
 }
 

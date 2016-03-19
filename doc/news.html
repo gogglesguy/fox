@@ -15,6 +15,56 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE WITH LOGO --->
 
 
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+October 18 - FOX DEVELOPMENT 1.7.30
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Vastly expanded code docs for FXText widget.</li>
+<li>Improved Syntax parser for Adie text editor.</li>
+<li>FXFileList now issues proper callbacks when files or directories are
+changed on the disk while FXFileList is displaying them.</li>
+<li>FXFileSelector puts FXFileList into ICONLIST_SINGLESELECT mode when
+SELECTFILE_ANY mode is in effect.  This is as it should be since the user
+may type a filename that doesn't yet exist.</li>
+<li>Several unnecessary directory scans have been eliminated when FXFileDialog
+first appears.  This makes the FXFileDialog <b>much</b> faster than it was before.</li>
+<li>Python syntax rules updated in Adie.stx.</li>
+<li>Added coloring rules for merge-conflicts for C, C++, and a few other languages to Adie.stx.</li>
+<li>Fixed bugs in Adie.stx now flagged by stricter syntax parser.</li>
+<li>Non-recursive forceRefresh() in FXWindow.</li>
+<li>FXIconList generates SEL_DELETED, SEL_INSERTED instead of SEL_REPLACED.  These callbacks
+are more useful.</li>
+<li>PathFinder shows useful information in its status line.</li>
+<li>Can now change permissions of multiple files from PathFinder properties panel.</li>
+<li>PathFinder can now change file-associations and icon-assignments, just like ControlPanel.
+For now, these have effect only in PathFinder itself, but this should change in the future.</li>
+<li>Typo in FXComplexd fixed.</li>
+<li>Workarounds for disk stat for MacOSX and other non-Linux Unices.</li>
+<li>Fixed bug in FXMat3d SSE2 code.  Was using aligned access.</li>
+<li>FXFileList and FXDirList items keep track of mode-bits.  This actually simplifies
+stuff quite a bit.</li>
+<li>Useless directory rescan eliminated when sort-function changed in FXFilelist and FXDirList.</li>
+<li>Issue SEL_CHANGED if current item is replaced in FXIconList, FXList, etc.</li>
+<li>Adie remembers if extension-less file syntax was changed by hand; next time same file
+is loaded, syntax will be restored properly.</li>
+<li>First-time bug in ControlPanel fixed; rare, issue only occurs ControlPanel is ran first
+time and no registry exists yet on disk.</li>
+<li>Option added to PathFinder to scale image to available space when using internal image viewer.</li>
+<li>Vendor-key in FXApp's constructor now defaults to FXString::null.  This is the more common usage
+pattern.</li>
+<li>Option added to PathFinder to control file-item space and whether or not to auto-size columns
+display.</li>
+<li>Bold, strikethrough, underline style flags now saved in Adie.</li>
+<li>New syntax rule option in Adie.stx: all-matching "background" rule.  When used, you can
+colorize all text not matched with the regular rules, as override to the default colors used
+by the Adie editor.</li>
+</ul>
+
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>

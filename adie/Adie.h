@@ -24,7 +24,7 @@
 
 // Version
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 3
+#define VERSION_MINOR 4
 #define VERSION_PATCH 0
 
 
@@ -41,7 +41,7 @@ class Adie : public FXApp {
 protected:
   TextWindowList  windowlist;                   // Window list
   FXFileDict     *associations;                 // File association table
-  FXSyntaxList    syntaxes;                     // List of syntax patterns
+  SyntaxList      syntaxes;                     // List of syntax patterns
   FXString        syntaxpath;                   // Where to look for syntax file
   FXIcon         *bigicon;                      // Big application icon
   FXIcon         *smallicon;                    // Small application icon
@@ -78,7 +78,6 @@ private:
   Adie(){}
   Adie(const Adie&);
   Adie& operator=(const Adie&);
-  FXbool loadSyntaxFile(const FXString& file);
 public:
   enum{
     ID_CLOSEALL=FXApp::ID_LAST,
@@ -101,13 +100,13 @@ public:
   const FXString& getSyntaxPaths() const { return syntaxpath; }
 
   // Get syntax for language name
-  FXSyntax* getSyntaxForLanguage(const FXString& name) const;
+  Syntax* getSyntaxByName(const FXString& lang);
 
-  // Get syntax from file name
-  FXSyntax* getSyntaxForFile(const FXString& file) const;
+  // Get syntax by matching pattern
+  Syntax* getSyntaxByPattern(const FXString& file);
 
-  // Get syntax based on contents
-  FXSyntax* getSyntaxForContents(const FXString& contents) const;
+  // Get syntax by contents
+  Syntax* getSyntaxByContents(const FXString& contents);
 
   // Exit application
   virtual void exit(FXint code=0);

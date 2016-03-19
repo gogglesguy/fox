@@ -19,17 +19,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 ********************************************************************************/
 #include "fx.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <signal.h>
-#ifndef WIN32
-#include <unistd.h>
-#endif
-#include <ctype.h>
-#include "FXRex.h"
-#include "FXArray.h"
-#include "Hilite.h"
+#include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "icons.h"
@@ -59,7 +49,7 @@ void printusage(){
 // Start the whole thing
 int main(int argc,char *argv[]){
   TextWindow *window=NULL;
-  FXchar     *language=NULL;
+  Syntax     *syntax=NULL;
   FXchar     *tags=NULL;
   FXbool      edit=true;
   FXint       line=0;
@@ -103,7 +93,7 @@ int main(int argc,char *argv[]){
       }
     else if(compare(argv[arg],"-m")==0 || compare(argv[arg],"--mode")==0){
       if(++arg>=argc){ fprintf(stderr,"Adie: missing language mode argument.\n"); exit(1); }
-      language=argv[arg];
+      syntax=application.getSyntaxByName(argv[arg]);
       }
     else if(compare(argv[arg],"-g")==0 || compare(argv[arg],"--geometry")==0){
       if(++arg>=argc){ fprintf(stderr,"Adie: missing geometry argument.\n"); exit(1); }
@@ -117,7 +107,7 @@ int main(int argc,char *argv[]){
     // Load the file
     else{
       file=FXPath::absolute(argv[arg]);
-      window=new TextWindow(&application,"untitled");
+      window=new TextWindow(&application);
       window->create();
       if(window->loadFile(file)){
         window->readBookmarks(file);
@@ -128,17 +118,17 @@ int main(int argc,char *argv[]){
       else{
         window->setFilename(file);
         window->setFilenameSet(true);
-        window->setSyntax(application.getSyntaxForFile(file));
+        window->determineSyntax();
         }
-      if(language) window->forceSyntax(language);
+      if(syntax) window->setSyntax(syntax);
       }
     }
 
   // Make window, if none opened yet
   if(!window){
-    window=new TextWindow(&application,"untitled");
+    window=new TextWindow(&application);
     window->create();
-    if(language) window->forceSyntax(language);
+    if(syntax) window->setSyntax(syntax);
     }
 
   // Run

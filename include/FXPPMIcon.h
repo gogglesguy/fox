@@ -55,6 +55,9 @@ public:
   };
 
 
+#ifndef FXLOADPPM
+#define FXLOADPPM
+
 /**
 * Check if stream contains a PPM, return true if so.
 */
@@ -73,6 +76,8 @@ extern FXAPI FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an PPM (Portable Pixmap Format) file to a stream.
 */
 extern FXAPI FXbool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+#endif
 
 }
 

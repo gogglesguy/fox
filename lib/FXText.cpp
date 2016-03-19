@@ -256,7 +256,7 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SELECT_LINE,FXText::onCmdSelectLine),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SELECT_ALL,FXText::onCmdSelectAll),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DESELECT_ALL,FXText::onCmdDeselectAll),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_BACKSPACE,FXText::onCmdBackspace),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_BACKSPACE_CHAR,FXText::onCmdBackspaceChar),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_BACKSPACE_WORD,FXText::onCmdBackspaceWord),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_BACKSPACE_BOL,FXText::onCmdBackspaceBol),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_CHAR,FXText::onCmdDeleteChar),
@@ -453,6 +453,7 @@ void FXText::create(){
     }
   }
 
+
 // Detach window
 void FXText::detach(){
   FXScrollArea::detach();
@@ -461,9 +462,6 @@ void FXText::detach(){
   textType=0;
   utf8Type=0;
   utf16Type=0;
-  if(getApp()->hasInputMethod()){
-    destroyComposeContext();
-    }
   }
 
 
@@ -490,9 +488,10 @@ void FXText::setFocus(){
   FXScrollArea::setFocus();
   setDefault(TRUE);
   flags&=~FLAG_UPDATE;
-//  if(getApp()->hasInputMethod()){
-//    createComposeContext();
-//    }
+  if(getApp()->hasInputMethod()){
+    createComposeContext();
+    getComposeContext()->setFont(font);
+    }
   }
 
 
@@ -501,9 +500,9 @@ void FXText::killFocus(){
   FXScrollArea::killFocus();
   setDefault(MAYBE);
   flags|=FLAG_UPDATE;
-//  if(getApp()->hasInputMethod()){
-//    destroyComposeContext();
-//    }
+  if(getApp()->hasInputMethod()){
+    destroyComposeContext();
+    }
   }
 
 
@@ -4130,7 +4129,7 @@ long FXText::onKeyPress(FXObject*,FXSelector,void* ptr){
           handle(this,FXSEL(SEL_COMMAND,ID_BACKSPACE_BOL),NULL);
           }
         else{
-          handle(this,FXSEL(SEL_COMMAND,ID_BACKSPACE),NULL);
+          handle(this,FXSEL(SEL_COMMAND,ID_BACKSPACE_CHAR),NULL);
           }
         break;
       case KEY_Return:
@@ -4654,7 +4653,7 @@ long FXText::onCmdDeselectAll(FXObject*,FXSelector,void*){
 /*******************************************************************************/
 
 // Backspace character
-long FXText::onCmdBackspace(FXObject*,FXSelector,void*){
+long FXText::onCmdBackspaceChar(FXObject*,FXSelector,void*){
   if(isEditable()){
     if(deletePendingSelection(true)) return 1;
     if(0<cursorpos){

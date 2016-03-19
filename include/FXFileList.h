@@ -56,61 +56,67 @@ protected:
   FXFileItem  *link;            // Link to next item
   FXlong       size;            // File size
   FXTime       date;            // File time
+  FXuint       mode;            // Mode flags
 private:
   FXFileItem(const FXFileItem&);
   FXFileItem& operator=(const FXFileItem&);
 protected:
   FXFileItem():assoc(NULL),link(NULL),size(0),date(0){}
-protected:
-  enum{
-    FOLDER     = 64,            /// Directory item
-    EXECUTABLE = 128,           /// Executable item
-    SYMLINK    = 256,           /// Symbolic linked item
-    CHARDEV    = 512,           /// Character special item
-    BLOCKDEV   = 1024,          /// Block special item
-    FIFO       = 2048,          /// FIFO item
-    SOCK       = 4096           /// Socket item
-    };
 public:
 
   /// Constructor
-  FXFileItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,void* ptr=NULL):FXIconItem(text,bi,mi,ptr),assoc(NULL),link(NULL),size(0L),date(0L){}
+  FXFileItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,void* ptr=NULL):FXIconItem(text,bi,mi,ptr),assoc(NULL),link(NULL),size(0L),date(0L),mode(0){}
 
   /// Return true if this is a file item
-  FXbool isFile() const { return (state&(FOLDER|BLOCKDEV|CHARDEV|FIFO|SOCK))==0; }
+  FXbool isFile() const { return (mode&(FXIO::File))!=0; }
 
   /// Return true if this is a directory item
-  FXbool isDirectory() const { return (state&FOLDER)!=0; }
+  FXbool isDirectory() const { return (mode&FXIO::Directory)!=0; }
 
   /// Return true if this is an executable item
-  FXbool isExecutable() const { return (state&EXECUTABLE)!=0; }
+  FXbool isExecutable() const { return (mode&FXIO::File)!=0 && (mode&FXIO::AllExec)!=0; }
 
   /// Return true if this is a symbolic link item
-  FXbool isSymlink() const { return (state&SYMLINK)!=0; }
+  FXbool isSymlink() const { return (mode&FXIO::SymLink)!=0; }
 
   /// Return true if this is a character device item
-  FXbool isChardev() const { return (state&CHARDEV)!=0; }
+  FXbool isChardev() const { return (mode&FXIO::Character)!=0; }
 
   /// Return true if this is a block device item
-  FXbool isBlockdev() const { return (state&BLOCKDEV)!=0; }
+  FXbool isBlockdev() const { return (mode&FXIO::Block)!=0; }
 
   /// Return true if this is an FIFO item
-  FXbool isFifo() const { return (state&FIFO)!=0; }
+  FXbool isFifo() const { return (mode&FXIO::Fifo)!=0; }
 
   /// Return true if this is a socket
-  FXbool isSocket() const { return (state&SOCK)!=0; }
+  FXbool isSocket() const { return (mode&FXIO::Socket)!=0; }
 
   /// Return true if item is a special navigational item like '.' or '..'
   FXbool isNavigational() const { return (label[0]=='.' && (label[1]=='\t' || (label[1]=='.' && label[2]=='\t'))); }
 
+  /// Set the file-association object for this item
+  void setAssoc(FXFileAssoc* a){ assoc=a; }
+
   /// Return the file-association object for this item
   FXFileAssoc* getAssoc() const { return assoc; }
+
+  /// Set the file size for this item
+  void setSize(FXlong s){ size=s; }
 
   /// Return the file size for this item
   FXlong getSize() const { return size; }
 
+  /// Set the date for this item, in nanoseconds
+  void setDate(FXTime d){ date=d; }
+
   /// Return the date for this item, in nanoseconds
   FXTime getDate() const { return date; }
+
+  /// Set file mode bits
+  void setMode(FXuint m){ mode=m; }
+
+  /// Return file mode bits
+  FXuint getMode() const { return mode; }
   };
 
 
@@ -152,8 +158,8 @@ protected:
 protected:
   FXFileList();
   void listItems(FXbool force);
-  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
   FXIcon* getItemPreviewIcon(FXint index) const;
+  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
 private:
   FXFileList(const FXFileList&);
   FXFileList &operator=(const FXFileList&);
@@ -329,47 +335,50 @@ public:
   /// Return the date for this item, in nanoseconds
   FXTime getItemDate(FXint index) const;
 
-  /// Return wildcard matching mode
-  FXuint getMatchMode() const { return matchmode; }
+  /// Return the mode bits for this item
+  FXuint getItemMode(FXint index) const;
 
   /// Change wildcard matching mode (see FXPath)
   void setMatchMode(FXuint mode);
 
-  /// Return true if showing hidden files
-  FXbool showHiddenFiles() const;
+  /// Return wildcard matching mode
+  FXuint getMatchMode() const { return matchmode; }
 
   /// Show or hide hidden files
   void showHiddenFiles(FXbool flag);
 
-  /// Return true if showing directories only
-  FXbool showOnlyDirectories() const;
+  /// Return true if showing hidden files
+  FXbool showHiddenFiles() const;
 
   /// Show directories only
   void showOnlyDirectories(FXbool flag);
 
-  /// Return true if showing files only
-  FXbool showOnlyFiles() const;
+  /// Return true if showing directories only
+  FXbool showOnlyDirectories() const;
 
   /// Show files only
   void showOnlyFiles(FXbool flag);
 
-  /// Return true if image preview on
-  FXbool showImages() const;
+  /// Return true if showing files only
+  FXbool showOnlyFiles() const;
 
-  /// Show or hide preview images
-  void showImages(FXbool flag);
-
-  /// Return images preview size
-  FXint getImageSize() const { return imagesize; }
-
-  /// Change images preview size
-  void setImageSize(FXint size);
+  /// Show parent directories
+  void showParents(FXbool flag);
 
   /// Return true if showing parent directories
   FXbool showParents() const;
 
-  /// Show parent directories
-  void showParents(FXbool flag);
+  /// Show or hide preview images
+  void showImages(FXbool flag);
+
+  /// Return true if image preview on
+  FXbool showImages() const;
+
+  /// Change images preview size
+  void setImageSize(FXint size);
+
+  /// Return images preview size
+  FXint getImageSize() const { return imagesize; }
 
   /// Change file associations; delete the old one unless it was shared
   void setAssociations(FXFileDict* assoc,FXbool owned=false);

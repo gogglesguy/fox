@@ -66,6 +66,9 @@ public:
   };
 
 
+#ifndef FXLOADJP2
+#define FXLOADJP2
+
 /**
 * Check if stream contains a JP2, return true if so.
 */
@@ -84,6 +87,8 @@ extern FXAPI FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint&
 * Save an JPEG-2000 file to a stream.
 */
 extern FXAPI FXbool fxsaveJP2(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
+
+#endif
 
 }
 

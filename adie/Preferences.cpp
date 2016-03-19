@@ -21,12 +21,8 @@
 #include "fx.h"
 #include "icons.h"
 #include "help.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "FXRex.h"
-#include "FXArray.h"
 #include "Preferences.h"
-#include "Hilite.h"
+#include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "icons.h"
@@ -216,9 +212,6 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXLabel(colormatrix,tr("Bold:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN);
   new FXCheckButton(colormatrix,FXString::null,own,TextWindow::ID_STYLE_BOLD,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXFrame(colormatrix,LAYOUT_FILL_ROW);
-//   new FXLabel(colormatrix,"Italic:",NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN);
-//   new FXCheckButton(colormatrix,NULL,NULL,0,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
-//   new FXFrame(colormatrix,LAYOUT_FILL_ROW);
 
   FXGroupBox* stylegroup=new FXGroupBox(sub5,tr("Item name"),FRAME_GROOVE|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4,4);
   FXVerticalFrame* listframe=new FXVerticalFrame(stylegroup,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
@@ -292,10 +285,10 @@ void Preferences::setSyntaxPaths(const FXString& paths){
 FXString Preferences::getSyntaxPaths() const {
   return syntaxtext->getText();
   }
-  
-  
+
+
 // Set language syntax
-void Preferences::setSyntax(FXSyntax* syn){
+void Preferences::setSyntax(Syntax* syn){
   stylelist->clearItems(TRUE);
   if(syn){
     for(FXint i=1; i<syn->getNumRules(); i++){

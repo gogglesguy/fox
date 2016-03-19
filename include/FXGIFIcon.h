@@ -54,7 +54,6 @@ public:
   };
 
 
-
 #ifndef FXLOADGIF
 #define FXLOADGIF
 
