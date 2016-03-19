@@ -657,6 +657,33 @@ FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen){
 
 /*******************************************************************************/
 
+
+#if 0
+// Change the length of the string to len
+FXbool FXString::length(FXint len){
+  if(__likely(len!=length())){
+    if(0<len){
+      register FXchar *ptr;
+      if(str==EMPTY){
+        ptr=(FXchar*)malloc(ROUNDUP(1+len)+sizeof(FXint));
+        }
+      else{
+        ptr=(FXchar*)realloc(str-sizeof(FXint),ROUNDUP(1+len)+sizeof(FXint));
+        }
+      if(__unlikely(!ptr)) return false;
+      str=ptr+sizeof(FXint);
+      str[len]=0;
+      *(((FXint*)str)-1)=len;
+      }
+    else if(str!=EMPTY){
+      free(str-sizeof(FXint));
+      str=EMPTY;
+      }
+    }
+  return true;
+  }
+#endif
+
 // Change the length of the string to len
 void FXString::length(FXint len){
   if(__likely(len!=length())){

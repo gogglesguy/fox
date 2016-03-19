@@ -7,6 +7,26 @@
 <body bgcolor=#ffffff link=#990033 vlink=#990033 alink=#990033 text=#000000>
 
 
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 24 - FOX DEVELOPMENT 1.7.35
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>New feature in FXHeader control: auto-renumbering captions based on renumbering function; if a renumbering
+function (which computes the caption from the caption index) is set, then captions are automatically recomputed
+when the number of items in the FXHeader is changed.</li>
+<li>Updated FXTable to use this new feature in FXHeader. The old options for renumbering have been removed.</li>
+<li>Porting problem in FXMat4d, FXMat4f fixed, for CYGWIN32.</li>
+<li>Added API's to FXTable to return first and last row (or column) of a spanning cell.</li>
+<li>Added API to check if a cell is horizontally spanning or vertically spanning.</li>
+<li>Cutoff angles in FXQuatd are smaller than in FXQuatf, due to much greater precision of doubles versus floats.</li>
+<li>FOX on <a href='http://www.raspberrypi.org'>Raspberry Pi</a> coming soon (I got one on order!).</li>
+</ul>
+
+
 <!---- TOPIC TITLE WITH LOGO--->
 <table border=0 cellpadding= cellspacing=2 width=100% ><tr><td><a href='http://www.fox-toolkit.org' target=_top><img src='art/foxlogo_small.jpg' border=0></a></td><td width=100% valign=bottom id="HEADLINE"><b>
 News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]</font></a>

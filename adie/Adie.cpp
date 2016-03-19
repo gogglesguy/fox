@@ -318,6 +318,7 @@ FXint Adie::start(int argc,char** argv){
       window->readBookmarks(file);
       window->readView(file);
       window->setEditable(edit);
+      window->determineSyntax();
       if(line) window->visitLine(line,col);
       }
 
@@ -326,6 +327,7 @@ FXint Adie::start(int argc,char** argv){
       window->setFilename(file);
       window->determineSyntax();
       window->setBrowserCurrentFile(file);
+      window->determineSyntax();
       }
 
     // Override language mode?

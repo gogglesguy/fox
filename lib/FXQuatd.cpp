@@ -448,7 +448,7 @@ FXQuatd FXQuatd::exp() const {
   register FXdouble theta=sqrt(x*x+y*y+z*z);
   register FXdouble scale;
   FXQuatd result(x,y,z,cos(theta));
-  if(__likely(0.000001<theta)){
+  if(__likely(0.000000001<theta)){
     scale=sin(theta)/theta;
     result.x*=scale;
     result.y*=scale;
@@ -540,13 +540,13 @@ FXVec3d FXQuatd::operator*(const FXVec3d& v) const {
 FXQuatd arc(const FXVec3d& f,const FXVec3d& t){
   register FXdouble dot=f.x*t.x+f.y*t.y+f.z*t.z,div;
   FXQuatd result;
-  if(__unlikely(dot> 0.999999)){        // Unit quaternion
+  if(__unlikely(dot>0.999999999999999)){        // Unit quaternion
     result.x=0.0;
     result.y=0.0;
     result.z=0.0;
     result.w=1.0;
     }
-  else if(__unlikely(dot<-0.999999)){   // 180 quaternion (Stephen Hardy)
+  else if(__unlikely(dot<-0.999999999999999)){  // 180 quaternion (Stephen Hardy)
     if(fabs(f.z)<fabs(f.x) && fabs(f.z)<fabs(f.y)){     // x, y largest magnitude
       result.x= f.x*f.z-f.z*f.y;
       result.y= f.z*f.x+f.y*f.z;
@@ -590,7 +590,7 @@ FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   register FXdouble to=f;
   register FXdouble theta;
   FXQuatd result;
-  if(__likely(cost<0.999999)){
+  if(__likely(cost<0.999999999999999)){
     sint=sqrt(1.0-cost*cost);
     theta=atan2(sint,cost);
     fr=sin(fr*theta)/sint;
@@ -616,7 +616,7 @@ FXQuatd lerpdot(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   register FXdouble to=f;
   register FXdouble theta;
   FXQuatd result;
-  if(__likely(cost<0.999999)){
+  if(__likely(cost<0.999999999999999)){
     sint=sqrt(1.0-cost*cost);
     theta=atan2(sint,cost);
     fr=-theta*cos(fr*theta)/sint;

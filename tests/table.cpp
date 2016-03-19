@@ -138,8 +138,8 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   table->setCellColor(1,1,FXRGB(240,240,255));
   table->setHelpText("Editable table.");
 
-  table->setRowRenumbering(true);
-  table->setColumnRenumbering(true);
+  table->setRowRenumbering(FXHeader::decimalNumbering);
+  table->setColumnRenumbering(FXHeader::decimalNumbering);
 
   // Initialize scrollable part of table
   for(r=0; r<50; r++){
@@ -157,6 +157,7 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   for(r=0; r<50; r++){
     table->setRowText(r,"Row"+FXString::value(r));
     }
+    
 /*
   table->setLeadingRows(1);
   table->setLeadingColumns(1);

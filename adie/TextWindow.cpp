@@ -920,9 +920,6 @@ FXbool TextWindow::loadFile(const FXString& file){
         setFilename(file);
         setFilenameSet(true);
 
-        // Determine language
-        determineSyntax();
-
         // Clear undo records
         undolist.clear();
 
@@ -1628,6 +1625,7 @@ long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
         window->clearBookmarks();
         window->readBookmarks(file);
         window->readView(file);
+        window->determineSyntax();
         }
       else{
         FXMessageBox::error(window,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
@@ -1751,13 +1749,15 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
             window=new TextWindow(getApp());
             window->create();
             }
-          if(window->loadFile(file)){
+          if(!window->loadFile(file)){
+            getApp()->beep();
+            FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+            }
+          else{
             window->clearBookmarks();
             window->readBookmarks(file);
             window->readView(file);
-            }
-          else{
-            FXMessageBox::error(window,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+            window->determineSyntax();
             }
           }
 
@@ -1788,13 +1788,15 @@ long TextWindow::onCmdOpenRecent(FXObject*,FXSelector,void* ptr){
       window=new TextWindow(getApp());
       window->create();
       }
-    if(window->loadFile(file)){
+    if(!window->loadFile(file)){
+      getApp()->beep();
+      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+      }
+    else{
       window->clearBookmarks();
       window->readBookmarks(file);
       window->readView(file);
-      }
-    else{
-      FXMessageBox::error(window,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+      window->determineSyntax();
       }
     }
   window->raise();
@@ -1810,13 +1812,15 @@ long TextWindow::onCmdOpenTree(FXObject*,FXSelector,void* ptr){
   if(!item || !dirlist->isItemFile(item)) return 1;
   if(!saveChanges()) return 1;
   file=dirlist->getItemPathname(item);
-  if(loadFile(file)){
+  if(!loadFile(file)){
+    getApp()->beep();
+    FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+    }
+  else{
     clearBookmarks();
     readBookmarks(file);
     readView(file);
-    }
-  else{
-    FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+    determineSyntax();
     }
   return 1;
   }
@@ -1829,13 +1833,15 @@ long TextWindow::onTextDNDDrop(FXObject*,FXSelector,void*){
     file=FXURL::fileFromURL(string.before('\r'));
     if(file.empty()) return 1;
     if(!saveChanges()) return 1;
-    if(loadFile(file)){
+    if(!loadFile(file)){
+      getApp()->beep();
+      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+      }
+    else{
       clearBookmarks();
       readBookmarks(file);
       readView(file);
-      }
-    else{
-      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+      determineSyntax();
       }
     return 1;
     }
@@ -1933,6 +1939,7 @@ FXbool TextWindow::saveChanges(){
           }
         }
       if(!saveFile(file)){
+        getApp()->beep();
         FXMessageBox::error(this,MBOX_OK,tr("Error Saving File"),tr("Unable to save file: %s"),file.text());
         }
       }
@@ -1947,6 +1954,7 @@ FXbool TextWindow::saveChanges(){
 long TextWindow::onCmdSave(FXObject* sender,FXSelector sel,void* ptr){
   if(!isFilenameSet()) return onCmdSaveAs(sender,sel,ptr);
   if(!saveFile(getFilename())){
+    getApp()->beep();
     FXMessageBox::error(this,MBOX_OK,tr("Error Saving File"),tr("Unable to save file: %s"),getFilename().text());
     }
   return 1;
@@ -1976,8 +1984,10 @@ long TextWindow::onCmdSaveAs(FXObject*,FXSelector,void*){
       if(MBOX_CLICKED_NO==FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite Document"),tr("Overwrite existing document: %s?"),file.text())) return 1;
       }
     if(!saveFile(file)){
+      getApp()->beep();
       FXMessageBox::error(this,MBOX_OK,tr("Error Saving File"),tr("Unable to save file: %s"),file.text());
       }
+    determineSyntax();
     }
   return 1;
   }
@@ -3038,6 +3048,7 @@ long TextWindow::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
         if(loadFile(getFilename())){
           editor->setTopLine(top);
           editor->setCursorPos(pos);
+          determineSyntax();
           }
         }
       warnchanged=true;

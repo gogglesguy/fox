@@ -168,6 +168,10 @@ public:
   };
 
 
+/// Header item numbering function
+typedef FXString (*FXNumberingFunc)(FXint);
+
+
 /// List of FXHeaderItem's
 typedef FXObjectListOf<FXHeaderItem> FXHeaderItemList;
 
@@ -195,9 +199,10 @@ class FXAPI FXHeader : public FXFrame {
   FXDECLARE(FXHeader)
 protected:
   FXHeaderItemList items;	// Item list
-  FXColor          textColor;	// Text color
   FXFont          *font;	// Text font
+  FXNumberingFunc  numbering;   // Automatic caption renumbering method
   FXString         help;	// Help text
+  FXColor          textColor;	// Text color
   FXint            pos;		// Scroll position
   FXint            active;	// Active button
   FXint            activepos;	// Position of active item
@@ -219,6 +224,8 @@ public:
   long onTipTimer(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
+public:
+  static FXString decimalNumbering(FXint index);
 public:
 
   /// Construct new header control
@@ -381,11 +388,20 @@ public:
   /// return text font
   FXFont* getFont() const { return font; }
 
-  /// Return text color
-  FXColor getTextColor() const { return textColor; }
+  /// Manually renumber captions between fm and to inclusively
+  void renumberCaptions(FXNumberingFunc func,FXint fm=0,FXint to=2147483647);
+
+  /// Enable auto-renumbering using the given function, or disable it if NULL
+  void setAutoNumbering(FXNumberingFunc func);
+  
+  /// Return auto-renumbering function
+  FXNumberingFunc getAutoNumbering() const { return numbering; }
 
   /// Change text color
   void setTextColor(FXColor clr);
+
+  /// Return text color
+  FXColor getTextColor() const { return textColor; }
 
   /// Set header style options
   void setHeaderStyle(FXuint style);
