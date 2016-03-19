@@ -835,9 +835,9 @@ void FXTopWindow::flash(FXbool yes){
     se.xclient.window=xid;
     se.xclient.data.l[0]=yes;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
     se.xclient.data.l[1]=getApp()->wmNetNeedAttention;
-    se.xclient.data.l[2]=0l;
-    se.xclient.data.l[3]=0l;
-    se.xclient.data.l[4]=0l;
+    se.xclient.data.l[2]=0;
+    se.xclient.data.l[3]=0;
+    se.xclient.data.l[4]=0;
     XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),False,SubstructureRedirectMask|SubstructureNotifyMask,&se);
 #endif
     }

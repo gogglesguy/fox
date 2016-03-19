@@ -78,26 +78,19 @@ public:
   /// Addition operators
   FXSize operator+(const FXSize& s) const { return FXSize(w+s.w,h+s.h); }
   FXSize operator-(const FXSize& s) const { return FXSize(w-s.w,h-s.h); }
-
-  /// Scale operators
-  friend inline FXSize operator*(const FXSize& s,FXshort c);
-  friend inline FXSize operator*(FXshort c,const FXSize& s);
-  friend inline FXSize operator/(const FXSize& s,FXshort c);
-  friend inline FXSize operator/(FXshort c,const FXSize& s);
-
-  /// Save object to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXSize& s);
-
-  /// Load object from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXSize& s);
   };
 
+
+/// Scale operators
 inline FXSize operator*(const FXSize& s,FXshort c){ return FXSize(s.w*c,s.h*c); }
 inline FXSize operator*(FXshort c,const FXSize& s){ return FXSize(c*s.w,c*s.h); }
 inline FXSize operator/(const FXSize& s,FXshort c){ return FXSize(s.w/c,s.h/c); }
 inline FXSize operator/(FXshort c,const FXSize& s){ return FXSize(c/s.w,c/s.h); }
 
+/// Save object to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXSize& s);
+
+/// Load object from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXSize& s);
 
 }

@@ -361,12 +361,12 @@ Input Messages
 <pre>
 // Message map entry of "object"
 FXDEFMAP(MyObject) MyObjectMap[]={
-  FXMAPFUNC(SEL_IO_READ,MyObject::ID_ACCEPT,MyObject::onAcceptConnectionFromTheNet),
-  FXMAPFUNC(SEL_IO_READ,MyObject::ID_SOCKET,MyObject::onReceivedInputFromTheNet),
-  FXMAPFUNC(SEL_IO_WRITE,MyObject::ID_SOCKET,MyObject::onSendOutputToTheNet),
-  FXMAPFUNC(SEL_IO_EXCEPT,MyObject::ID_SOCKET,MyObject::onDealWithExcept),
-  ...
-  };
+  FXMAPFUNC(SEL_IO_READ,MyObject::ID_ACCEPT,MyObject::onAcceptConnectionFromTheNet),
+  FXMAPFUNC(SEL_IO_READ,MyObject::ID_SOCKET,MyObject::onReceivedInputFromTheNet),
+  FXMAPFUNC(SEL_IO_WRITE,MyObject::ID_SOCKET,MyObject::onSendOutputToTheNet), 
+  FXMAPFUNC(SEL_IO_EXCEPT,MyObject::ID_SOCKET,MyObject::onDealWithExcept),
+  ...
+  };
 </pre>
 
   <p>In this example, a server type application may

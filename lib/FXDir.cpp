@@ -62,7 +62,7 @@ struct SPACE {
 // Construct directory enumerator
 FXDir::FXDir(){
   // If this fails on your machine, determine what sizeof(SPACE) is
-  // on your machine and mail it to: jeroen@fox-toolkit.org!
+  // on your machine and mail it to: jeroen@fox-toolkit.com!
   //FXTRACE((150,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
   FXASSERT(sizeof(SPACE)<=sizeof(space));
 #ifdef WIN32
@@ -76,7 +76,7 @@ FXDir::FXDir(){
 // Construct directory enumerator
 FXDir::FXDir(const FXString& path){
   // If this fails on your machine, determine what sizeof(SPACE) is
-  // on your machine and mail it to: jeroen@fox-toolkit.org!
+  // on your machine and mail it to: jeroen@fox-toolkit.com!
   //FXTRACE((150,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
   FXASSERT(sizeof(SPACE)<=sizeof(space));
 #ifdef WIN32

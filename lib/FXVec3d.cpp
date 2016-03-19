@@ -54,7 +54,7 @@ FXVec3d colorToVec3d(FXColor clr){
 FXVec3d normalize(const FXVec3d& v){
   register FXdouble m=v.length2();
   FXVec3d result(v);
-  if(m>0.0){ result/=sqrt(m); }
+  if(0.0<m){ result/=sqrt(m); }
   return result;
   }
 

@@ -42,9 +42,6 @@ enum {
 typedef FXuint FXSelector;
 
 
-class FXObject;
-
-
 /// Describes a FOX object
 class FXAPI FXMetaClass {
 private:
@@ -93,8 +90,8 @@ public:
    static FX::FXObject* manufacture(); \
    virtual long handle(FX::FXObject* sender,FX::FXSelector sel,void* ptr); \
    virtual const FX::FXMetaClass* getMetaClass() const { return &metaClass; } \
-   friend FX::FXStream& operator<<(FX::FXStream& store,const classname* obj){return store.saveObject((FX::FXObjectPtr)(obj));} \
-   friend FX::FXStream& operator>>(FX::FXStream& store,classname*& obj){return store.loadObject((FX::FXObjectPtr&)(obj));} \
+   friend FX::FXStream& operator<<(FX::FXStream& store,const classname* obj){return store.saveObject((const FX::FXObject*)(obj));} \
+   friend FX::FXStream& operator>>(FX::FXStream& store,classname*& obj){return store.loadObject((FX::FXObject*&)(obj));} \
   private:
 
 
@@ -115,8 +112,8 @@ public:
    static const FX::FXMetaClass metaClass; \
    virtual long handle(FX::FXObject* sender,FX::FXSelector sel,void* ptr); \
    virtual const FX::FXMetaClass* getMetaClass() const { return &metaClass; } \
-   friend FX::FXStream& operator<<(FX::FXStream& store,const classname* obj){return store.saveObject((FX::FXObjectPtr)(obj));} \
-   friend FX::FXStream& operator>>(FX::FXStream& store,classname*& obj){return store.loadObject((FX::FXObjectPtr&)(obj));} \
+   friend FX::FXStream& operator<<(FX::FXStream& store,const classname* obj){return store.saveObject((const FX::FXObject*)(obj));} \
+   friend FX::FXStream& operator>>(FX::FXStream& store,classname*& obj){return store.loadObject((FX::FXObject*&)(obj));} \
   private:
 
 

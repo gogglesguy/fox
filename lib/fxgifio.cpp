@@ -24,7 +24,6 @@
 #include "FXHash.h"
 #include "FXElement.h"
 #include "FXStream.h"
-//#include "fxpriv.h"
 
 
 /*
@@ -66,10 +65,10 @@ extern FXAPI FXbool fxcheckGIF(FXStream& store);
 extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXbool alpha=true);
 extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
 
-
 // Codes found in the GIF specification
 const FXuchar TAG_EXTENSION   = 0x21;   // Extension block
 const FXuchar TAG_GRAPHIC     = 0xF9;   // Graphic control block
+const FXuchar TAG_COMMENT     = 0xFE;   // Comment extension
 const FXuchar TAG_IMAGE       = 0x2c;   // Image separator
 const FXuchar TAG_TERMINATOR  = 0x00;   // Block terminator
 const FXuchar TAG_GRAPHICSIZE = 0x04;   // Graphic block size

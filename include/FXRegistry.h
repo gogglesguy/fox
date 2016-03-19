@@ -59,8 +59,8 @@ protected:
   FXbool readFromDir(const FXString& dirname,FXbool mark);
 #ifdef WIN32
   FXbool readFromRegistry(void* hRootKey,FXbool mark);
-  FXbool writeToRegistry(void* hRootKey);
   FXbool readFromRegistryGroup(void* org,const char* groupname,FXbool mark=false);
+  FXbool writeToRegistry(void* hRootKey);
   FXbool writeToRegistryGroup(void* org,const char* groupname);
 #endif
 private:

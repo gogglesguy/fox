@@ -84,6 +84,10 @@
 #include "FXTIFImage.h"
 #endif
 #endif
+#ifdef HAVE_JP2_H
+#include "FXJP2Icon.h"
+#include "FXJP2Image.h"
+#endif
 
 
 /*
@@ -216,6 +220,11 @@ FXIcon *FXIconSource::loadIconStream(FXStream& store,const FXString& type) const
     icon=new FXTIFIcon(app);
     }
 #endif
+#ifdef HAVE_JP2_H
+  else if(comparecase(FXJP2Icon::fileExt,type)==0){
+    icon=new FXJP2Icon(app);
+    }
+#endif
 #endif
   if(icon){
     if(icon->loadPixels(store)) return icon;
@@ -311,6 +320,11 @@ FXImage *FXIconSource::loadImageStream(FXStream& store,const FXString& type) con
 #ifdef HAVE_TIFF_H
   else if(comparecase(FXTIFImage::fileExt,type)==0 || comparecase("tiff",type)==0){
     image=new FXTIFImage(app);
+    }
+#endif
+#ifdef HAVE_JP2_H
+  else if(comparecase(FXJP2Image::fileExt,type)==0){
+    image=new FXJP2Image(app);
     }
 #endif
 #endif

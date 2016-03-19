@@ -1304,12 +1304,12 @@ FXRex::Error FXCompile::atom(FXint& flags,FXint& smin,FXint& smax){
               case '0':                                 // Octal digit
                 pat+=2;
                 ch=oct(pat);
-                if(ch>256) return FXRex::ErrToken;         // Characters should be 0..255
+                if(ch>=256) return FXRex::ErrToken;        // Characters should be 0..255
                 break;
               case 'x':                                 // Hex digit
                 pat+=2;
                 ch=hex(pat);
-                if(ch>256) return FXRex::ErrToken;         // Characters should be 0..255
+                if(ch>=256) return FXRex::ErrToken;        // Characters should be 0..255
                 break;
               case '\0':                                // Unexpected pattern end
                 return FXRex::ErrNoAtom;
@@ -1371,13 +1371,13 @@ x:    if(1<len && (*pat=='*' || *pat=='+' || *pat=='?' || *pat=='{')){
 
 
 // True if character is a word character
-inline int isword(int ch){
+inline FXbool isWord(FXchar ch){
   return Ascii::isAlphaNumeric(ch) || ch=='_';
   }
 
 
 // True if character is punctuation (delimiter) character
-inline int isdelim(int ch){
+inline FXbool isDelim(FXchar ch){
   return Ascii::isPunct(ch) && ch!='_';
   }
 
@@ -1405,16 +1405,16 @@ FXRex::Error FXCompile::charset(){
     }
   if(*pat=='-' || *pat==']') goto in;             // '-' and ']' are literal at begin
   while(*pat!='\0' && *pat!=']'){
-in: last=*pat++;
+in: last=(FXuchar)*pat++;
     if(last=='\\'){
       last=*pat++;
       switch(last){
         case 'w':
-          for(i=0; i<256; i++) {if(isword(i)) INCL(set,i); }
+          for(i=0; i<256; i++) {if(isWord(i)) INCL(set,i); }
           first=-1;
           continue;
         case 'W':
-          for(i=0; i<256; i++){ if(!isword(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(!isWord(i)) INCL(set,i); }
           first=-1;
           continue;
         case 's':
@@ -1442,11 +1442,11 @@ in: last=*pat++;
           first=-1;
           continue;
         case 'p':
-          for(i=0; i<256; i++){ if(isdelim(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(isDelim(i)) INCL(set,i); }
           first=-1;
           continue;
         case 'P':
-          for(i=0; i<256; i++){ if(!isdelim(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(!isDelim(i)) INCL(set,i); }
           first=-1;
           continue;
         case 'l':
@@ -1730,20 +1730,20 @@ FXbool FXExecute::match(const FXint* prog){
         if(str>=str_end && (mode&FXRex::NotEol)) return false;
         break;
       case OP_WORD_BEG:       // Must be at begin of word
-        if(str_beg<str && isword((FXuchar) *(str-1))) return false;
-        if(str_end<=str || !isword((FXuchar) *str)) return false;
+        if(str_beg<str && isWord(*(str-1))) return false;
+        if(str_end<=str || !isWord(*str)) return false;
         break;
       case OP_WORD_END:       // Must be at end of word
-        if(str<str_end && isword((FXuchar) *str)) return false;
-        if(str<=str_beg || !isword((FXuchar) *(str-1))) return false;
+        if(str<str_end && isWord(*str)) return false;
+        if(str<=str_beg || !isWord(*(str-1))) return false;
         break;
       case OP_WORD_BND:       // Must be at word boundary
-        if(!(((str==str_beg || !isword((FXuchar) *(str-1))) && (str<str_end && isword((FXuchar) *str))) ||
-             ((str==str_end || !isword((FXuchar) *str)) && (str_beg<str && isword((FXuchar) *(str-1)))))) return false;
+        if(!(((str==str_beg || !isWord(*(str-1))) && (str<str_end && isWord(*str))) ||
+             ((str==str_end || !isWord(*str)) && (str_beg<str && isWord(*(str-1)))))) return false;
         break;
       case OP_WORD_INT:       // Must be inside a word
-        if(str==str_beg || !isword((FXuchar) *(str-1))) return false;
-        if(str==str_end || !isword((FXuchar) *str)) return false;
+        if(str==str_beg || !isWord(*(str-1))) return false;
+        if(str==str_end || !isWord(*str)) return false;
         break;
       case OP_STR_BEG:        // Must be at begin of entire string
         if(str!=str_beg) return false;
@@ -1762,7 +1762,7 @@ FXbool FXExecute::match(const FXint* prog){
         str++;
         break;
       case OP_CHAR:           // Match single character
-        if(str==str_end || *prog != *str) return false;
+        if(str==str_end || *prog != (FXuchar)*str) return false;
         prog++;
         str++;
         break;
@@ -1833,15 +1833,15 @@ FXbool FXExecute::match(const FXint* prog){
         str++;
         break;
       case OP_PUNCT:          // Match a punctuation
-        if(str==str_end || !isdelim((FXuchar) *str)) return false;
+        if(str==str_end || !isDelim(*str)) return false;
         str++;
         break;
       case OP_NOT_PUNCT:      // Match a non-punctuation
-        if(str==str_end || *str=='\n' || isdelim((FXuchar) *str)) return false;
+        if(str==str_end || *str=='\n' || isDelim((FXuchar) *str)) return false;
         str++;
         break;
       case OP_NOT_PUNCT_NL:   // Match a non-punctuation including newline
-        if(str==str_end || isdelim((FXuchar) *str)) return false;
+        if(str==str_end || isDelim(*str)) return false;
         str++;
         break;
       case OP_LETTER:         // Match a letter a..z, A..Z
@@ -1857,15 +1857,15 @@ FXbool FXExecute::match(const FXint* prog){
         str++;
         break;
       case OP_WORD:           // Match a word character a..z,A..Z,0..9,_
-        if(str==str_end || !isword((FXuchar) *str)) return false;
+        if(str==str_end || !isWord(*str)) return false;
         str++;
         break;
       case OP_NOT_WORD:       // Match a non-word character
-        if(str==str_end || *str=='\n' || isword((FXuchar) *str)) return false;
+        if(str==str_end || *str=='\n' || isWord(*str)) return false;
         str++;
         break;
       case OP_NOT_WORD_NL:    // Match a non-word character including newline
-        if(str==str_end || isword((FXuchar) *str)) return false;
+        if(str==str_end || isWord(*str)) return false;
         str++;
         break;
       case OP_UPPER:          // Match if uppercase
@@ -1956,7 +1956,7 @@ rep:    if(str+rep_min>str_end) return false;
         switch(op){
           case OP_CHAR:         // For UTF8 we should have OP_CHAR2, OP_CHAR3, ... OP_CHAR6, for  possible UTF8 lengths
             ch=*prog++;
-            while(save<end && *save==ch) save++;
+            while(save<end && (FXuchar)*save==ch) save++;
             break;
           case OP_CHAR_CI:
             ch=*prog++;
@@ -1964,7 +1964,7 @@ rep:    if(str+rep_min>str_end) return false;
             break;
           case OP_CHARS:
             ch=*++prog;
-            while(save<end && *save==ch) save++;
+            while(save<end && (FXuchar)*save==ch) save++;
             prog+=3;
             break;
           case OP_CHARS_CI:
@@ -2008,13 +2008,13 @@ rep:    if(str+rep_min>str_end) return false;
             while(save<end && !Ascii::isHexDigit(*save)) save++;
             break;
           case OP_PUNCT:
-            while(save<end && isdelim((FXuchar) *save)) save++;
+            while(save<end && isDelim(*save)) save++;
             break;
           case OP_NOT_PUNCT:
-            while(save<end && *save!='\n' && !isdelim((FXuchar) *save)) save++;
+            while(save<end && *save!='\n' && !isDelim(*save)) save++;
             break;
           case OP_NOT_PUNCT_NL:
-            while(save<end && !isdelim((FXuchar) *save)) save++;
+            while(save<end && !isDelim(*save)) save++;
             break;
           case OP_LETTER:
             while(save<end && Ascii::isLetter(*save)) save++;
@@ -2026,13 +2026,13 @@ rep:    if(str+rep_min>str_end) return false;
             while(save<end && !Ascii::isLetter(*save)) save++;
             break;
           case OP_WORD:
-            while(save<end && isword((FXuchar) *save)) save++;
+            while(save<end && isWord(*save)) save++;
             break;
           case OP_NOT_WORD:
-            while(save<end && *save!='\n' && !isword((FXuchar) *save)) save++;
+            while(save<end && *save!='\n' && !isWord(*save)) save++;
             break;
           case OP_NOT_WORD_NL:
-            while(save<end && !isword((FXuchar) *save)) save++;
+            while(save<end && !isWord(*save)) save++;
             break;
           case OP_UPPER:
             while(save<end && Ascii::isUpper(*save)) save++;
@@ -2264,7 +2264,7 @@ FXbool FXExecute::attempt(const FXchar* string){
 
 // Match subject string, returning number of matches found
 FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
-  register FXchar ch;
+  register FXint ch;
 
   // Simple case
   if(fm==to) return attempt(fm);
@@ -2285,7 +2285,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
       ch=(code[1]==OP_CHAR)?code[2]:code[3];
       if(to==str_end) to--;
       while(fm<=to){
-        if(*to==ch && attempt(to)) return true;
+        if((FXuchar)*to==ch && attempt(to)) return true;
         to--;
         }
       return false;
@@ -2294,7 +2294,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
       ch=(code[1]==OP_CHAR_CI)?code[2]:code[3];
       if(to==str_end) to--;
       while(fm<=to){
-        if(Ascii::toLower(*to)==ch && attempt(to)) return true;
+        if(Ascii::toLower((FXuchar)*to)==ch && attempt(to)) return true;
         to--;
         }
       return false;
@@ -2321,7 +2321,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
       ch=(code[1]==OP_CHAR)?code[2]:code[3];
       if(to==str_end) to--;
       while(fm<=to){
-        if(*fm==ch && attempt(fm)) return true;
+        if((FXuchar)*fm==ch && attempt(fm)) return true;
         fm++;
         }
       return false;
@@ -2330,7 +2330,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
       ch=(code[1]==OP_CHAR_CI)?code[2]:code[3];
       if(to==str_end) to--;
       while(fm<=to){
-        if(Ascii::toLower(*fm)==ch && attempt(fm)) return true;
+        if(Ascii::toLower((FXuchar)*fm)==ch && attempt(fm)) return true;
         fm++;
         }
       return false;
@@ -2374,9 +2374,14 @@ const FXchar *const FXRex::errors[]={
 const FXint FXRex::fallback[]={2,OP_FAIL};
 
 
+
+// Construct empty regular expression object
+FXRex::FXRex():code((FXint*)(void*)fallback){
+  }
+
+
 // Copy regex object
-FXRex::FXRex(const FXRex& orig){
-  code=(FXint*)fallback;
+FXRex::FXRex(const FXRex& orig):code((FXint*)(void*)fallback){
   if(orig.code!=fallback){
     dupElms(code,orig.code,orig.code[0]);
     }
@@ -2384,14 +2389,14 @@ FXRex::FXRex(const FXRex& orig){
 
 
 // Compile expression from pattern; fail if error
-FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error):code((FXint*)fallback){
+FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error):code((FXint*)(void*)fallback){
   FXRex::Error err=parse(pattern,mode);
   if(error){ *error=err; }
   }
 
 
 // Compile expression from pattern; fail if error
-FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXint*)fallback){
+FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXint*)(void*)fallback){
   FXRex::Error err=parse(pattern.text(),mode);
   if(error){ *error=err; }
   }
@@ -2401,7 +2406,7 @@ FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXint
 FXRex& FXRex::operator=(const FXRex& orig){
   if(code!=orig.code){
     if(code!=fallback) freeElms(code);
-    code=(FXint*)fallback;
+    code=(FXint*)(void*)fallback;
     if(orig.code!=fallback){
       dupElms(code,orig.code,orig.code[0]);
       }
@@ -2425,7 +2430,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
 
   // Free old code, if any
   if(code!=fallback) freeElms(code);
-  code=(FXint*)fallback;
+  code=(FXint*)(void*)fallback;
 
   // Check
   if(pattern){
@@ -2451,7 +2456,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
         // Allocate new code
         size=cs.pc-((FXint*)NULL);
         if(!allocElms(code,size)){
-          code=(FXint*)fallback;
+          code=(FXint*)(void*)fallback;
           return FXRex::ErrMemory;
           }
 

@@ -289,6 +289,22 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 // Access to display
 #define DISPLAY(app)      ((Display*)((app)->display))
 
+// For Fontconfig 1.0.2
+#ifndef FC_WEIGHT_THIN
+#define FC_WEIGHT_THIN              0
+#undef FC_WEIGHT_LIGHT
+#define FC_WEIGHT_LIGHT             50
+#endif
+#ifndef FC_WEIGHT_EXTRALIGHT
+#define FC_WEIGHT_EXTRALIGHT        40
+#endif
+#ifndef FC_WEIGHT_NORMAL
+#define FC_WEIGHT_NORMAL            80
+#endif
+#ifndef FC_WEIGHT_EXTRABOLD
+#define FC_WEIGHT_EXTRABOLD         205
+#endif
+
 
 // From FOX weight to fontconfig weight
 static FXint weight2FcWeight(FXint weight){
@@ -326,6 +342,7 @@ static FXint fcWeight2Weight(FXint fcWeight){
 
 // From FOX setwidth to fontconfig setwidth
 static FXint setWidth2FcSetWidth(FXint setwidth){
+#ifdef FC_WIDTH
   switch(setwidth){
     case FXFont::UltraCondensed:return FC_WIDTH_ULTRACONDENSED;
     case FXFont::ExtraCondensed:return FC_WIDTH_EXTRACONDENSED;
@@ -338,11 +355,15 @@ static FXint setWidth2FcSetWidth(FXint setwidth){
     case FXFont::UltraExpanded: return FC_WIDTH_ULTRAEXPANDED;
     }
   return FC_WIDTH_NORMAL;
+#else
+  return 0;
+#endif
   }
 
 
 // From fontconfig setwidth to FOX setwidth
 static FXint fcSetWidth2SetWidth(FXint fcSetWidth){
+#ifdef FC_WIDTH
   switch(fcSetWidth){
     case FC_WIDTH_ULTRACONDENSED:return FXFont::UltraCondensed;
     case FC_WIDTH_EXTRACONDENSED:return FXFont::ExtraCondensed;
@@ -354,6 +375,7 @@ static FXint fcSetWidth2SetWidth(FXint fcSetWidth){
     case FC_WIDTH_EXTRAEXPANDED: return FXFont::ExtraExpanded;
     case FC_WIDTH_ULTRAEXPANDED: return FXFont::UltraExpanded;
     }
+#endif
   return FXFont::NonExpanded;
   }
 
@@ -390,7 +412,9 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FXbool     fc_autohint=getApp()->reg().readBoolEntry("Xft","autohint",false);
   FXbool     fc_antialias=getApp()->reg().readBoolEntry("Xft","antialias",true);
   FXint      fc_rgba=FC_RGBA_UNKNOWN;
+#ifdef FC_HINT_STYLE
   FXint      fc_hintstyle=FC_HINT_FULL;
+#endif
   int        pp,sw,wt,sl;
   double     a,s,c,sz;
   FcPattern *pattern,*p;
@@ -453,10 +477,12 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
     FcPatternAddInteger(pattern,FC_SLANT,slant2FcSlant(wantslant));
     }
 
+#ifdef FC_WIDTH
   // Set setwidth
   if(wantsetwidth!=0){
     FcPatternAddInteger(pattern,FC_WIDTH,setWidth2FcSetWidth(wantsetwidth));
     }
+#endif
 
   // Set encoding
   if(wantencoding!=FONTENCODING_DEFAULT){                                       // FIXME
@@ -507,10 +533,12 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       }
     }
 
+#ifdef FC_WIDTH
   // Get setwidth
   if(FcPatternGetInteger(p,FC_WIDTH,0,&sw)==FcResultMatch){
     actualSetwidth=fcSetWidth2SetWidth(sw);
     }
+#endif
 
   // Get weight
   if(FcPatternGetInteger(p,FC_WEIGHT,0,&wt)==FcResultMatch){
@@ -953,6 +981,8 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         // Create scaled font
         __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
 
+        FXTRACE((140,"XLoadQueryFont(\"%s\")\n",xlfd));
+
         // Load normal scaled font
         fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
 
@@ -979,6 +1009,10 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
       // Simple case for horizontally drawn fonts
       else{
+
+        FXTRACE((140,"XLoadQueryFont(\"%s\")\n",xlfd));
+
+        // Load normal scaled font
         fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
         }
 
@@ -2168,7 +2202,11 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
   res=FXApp::instance()->reg().readUIntEntry("SETTINGS","screenres",100);
 
   // Build object set
+#ifdef FC_WIDTH
   objset=FcObjectSetBuild(FC_FAMILY,FC_FOUNDRY,FC_SPACING,FC_SCALABLE,FC_WIDTH,FC_WEIGHT,FC_SLANT,FC_PIXEL_SIZE,NULL);
+#else
+  objset=FcObjectSetBuild(FC_FAMILY,FC_FOUNDRY,FC_SPACING,FC_SCALABLE,FC_WEIGHT,FC_SLANT,FC_PIXEL_SIZE,NULL);
+#endif
   if(objset){
 
     // Create pattern object
@@ -2213,11 +2251,13 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
                 }
               }
 
+#ifdef FC_WIDTH
             // Get setwidth
             setwidth=0;
             if(FcPatternGetInteger(p,FC_WIDTH,0,&setwidth)==FcResultMatch){
               setwidth=fcSetWidth2SetWidth(setwidth);
               }
+#endif
 
             // Get weight
             weight=0;

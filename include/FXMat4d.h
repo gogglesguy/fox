@@ -44,6 +44,9 @@ public:
   /// Initialize with 3x3 rotation and scaling matrix
   FXMat4d(const FXMat3d& other);
 
+  /// Initialize matrix from array
+  FXMat4d(const FXdouble s[]);
+
   /// Initialize matrix from scalar
   FXMat4d(FXdouble w);
 
@@ -62,6 +65,11 @@ public:
   /// Assignment
   FXMat4d& operator=(const FXMat4d& other);
   FXMat4d& operator=(const FXMat3d& other);
+
+  /// Assignment from array
+  FXMat4d& operator=(const FXdouble s[]);
+
+  /// Assignment from scalar
   FXMat4d& operator=(FXdouble w);
 
   /// Set value from another matrix
@@ -69,6 +77,9 @@ public:
 
   /// Set value from 3x3 rotation and scaling matrix
   FXMat4d& set(const FXMat3d& other);
+
+  /// Set value from array
+  FXMat4d& set(const FXdouble s[]);
 
   /// Set value from scalar
   FXMat4d& set(FXdouble w);
@@ -115,18 +126,6 @@ public:
   /// Equality tests
   FXbool operator==(const FXMat4d& a) const;
   FXbool operator!=(const FXMat4d& a) const;
-
-  friend FXAPI FXbool operator==(const FXMat4d& a,FXdouble n);
-  friend FXAPI FXbool operator==(FXdouble n,const FXMat4d& a);
-
-  friend FXAPI FXbool operator!=(const FXMat4d& a,FXdouble n);
-  friend FXAPI FXbool operator!=(FXdouble n,const FXMat4d& a);
-
-  /// Matrix and scalar
-  friend FXAPI FXMat4d operator*(FXdouble x,const FXMat4d& a);
-  friend FXAPI FXMat4d operator*(const FXMat4d& a,FXdouble x);
-  friend FXAPI FXMat4d operator/(const FXMat4d& a,FXdouble x);
-  friend FXAPI FXMat4d operator/(FXdouble x,const FXMat4d& a);
 
   /// Set to identity matrix
   FXMat4d& identity();
@@ -199,27 +198,27 @@ public:
 
   /// Invert
   FXMat4d invert() const;
-
-  /// Save to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXMat4d& m);
-
-  /// Load from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXMat4d& m);
   };
 
+
+/// Scaling
 extern FXAPI FXMat4d operator*(FXdouble x,const FXMat4d& a);
 extern FXAPI FXMat4d operator*(const FXMat4d& a,FXdouble x);
-
 extern FXAPI FXMat4d operator/(const FXMat4d& a,FXdouble x);
 extern FXAPI FXMat4d operator/(FXdouble x,const FXMat4d& a);
 
+/// Equality tests
 extern FXAPI FXbool operator==(const FXMat4d& a,FXdouble n);
 extern FXAPI FXbool operator==(FXdouble n,const FXMat4d& a);
 
+/// Inequality tests
 extern FXAPI FXbool operator!=(const FXMat4d& a,FXdouble n);
 extern FXAPI FXbool operator!=(FXdouble n,const FXMat4d& a);
 
+/// Save matrix to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXMat4d& m);
+
+/// Load matrix from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXMat4d& m);
 
 }

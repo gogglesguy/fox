@@ -117,29 +117,22 @@ public:
 
   /// Transform sphere by 4x4 matrix
   FXSpheref transform(const FXMat4f& mat) const;
-
-  /// Test if box overlaps with sphere
-  friend FXAPI FXbool overlap(const FXRangef& a,const FXSpheref& b);
-
-  /// Test if sphere overlaps with box
-  friend FXAPI FXbool overlap(const FXSpheref& a,const FXRangef& b);
-
-  /// Test if spheres overlap
-  friend FXAPI FXbool overlap(const FXSpheref& a,const FXSpheref& b);
-
-  /// Save object to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXSpheref& sphere);
-
-  /// Load object from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXSpheref& sphere);
   };
 
 
+/// Test if box overlaps with sphere
 extern FXAPI FXbool overlap(const FXRangef& a,const FXSpheref& b);
+
+/// Test if sphere overlaps with box
 extern FXAPI FXbool overlap(const FXSpheref& a,const FXRangef& b);
+
+/// Test if spheres overlap
 extern FXAPI FXbool overlap(const FXSpheref& a,const FXSpheref& b);
 
+/// Save object to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXSpheref& sphere);
+
+/// Load object from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXSpheref& sphere);
 
 }

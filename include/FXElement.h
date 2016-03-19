@@ -43,8 +43,8 @@ inline void destructElms(EType* ptr,unsigned long n){
 
 
 /// Copy some elements from one place to another
-template<class EType>
-inline void copyElms(EType* dst,const EType* src,unsigned long n){
+template<class EType, class OType>
+inline void copyElms(EType* dst,const OType* src,unsigned long n){
   while(n--){ *dst++ = *src++; }
   }
 
@@ -64,8 +64,8 @@ inline void moveElms(EType* dst,const EType* src,unsigned long n){
 
 
 /// Fill array of elements with given element
-template<class EType>
-inline void fillElms(EType* dst,const EType& src,unsigned long n){
+template<class EType, class OType>
+inline void fillElms(EType* dst,const OType& src,unsigned long n){
   while(n--){ *dst++ = src; }
   }
 

@@ -291,6 +291,8 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXJP2Icon.cpp \
+FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXKnob.cpp \
@@ -436,6 +438,7 @@ fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
 fxjpegio.cpp \
+fxjp2io.cpp \
 fxkeyboard.cpp \
 fxkeysym.cpp \
 fxparsegeometry.cpp \

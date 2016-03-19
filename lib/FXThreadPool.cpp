@@ -323,13 +323,13 @@ void FXThreadPool::stop(){
 
 
 // Perform a job
-FXbool FXThreadPool::execute(FXRunnable *job,FXbool block){
+FXbool FXThreadPool::execute(FXRunnable *job,FXTime blocking){
   FXbool result=false;
   mutex.lock();
   if(runs && job){
     if(0<waiting || running>=maximum || startWorker()){
-      while(runs && !(result=queue.push(job)) && block){
-        pcond.wait(mutex);
+      while(runs && !(result=queue.push(job)) && 0<blocking){
+        if(!pcond.wait(mutex,blocking)) break;
         }
       if(result){
         ccond.signal();
@@ -360,7 +360,7 @@ FXint FXThreadPool::run(){
       mutex.lock();
       }
     ++waiting;
-    wcond.signal();
+    wcond.broadcast();  // Wake all threads
     }
   while(waiting<=minimum && ccond.wait(mutex,expire) && runs);
   --waiting;

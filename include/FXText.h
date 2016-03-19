@@ -176,8 +176,6 @@ protected:
   void moveCursor(FXint pos,FXbool notify=false);
   void moveCursorAndSelect(FXint pos,FXuint select,FXbool notify=false);
   FXint overstruck(FXint start,const FXchar *text,FXint n);
-  void enterTab(FXbool notify);
-  void enterNewline(FXbool notify);
   void enterText(const FXchar *text,FXint n,FXbool notify);
   void enterText(const FXString& text,FXbool notify);
   FXbool deletePendingSelection(FXbool notify);
@@ -291,8 +289,11 @@ public:
   // Inserting
   long onCmdInsertString(FXObject*,FXSelector,void*);
   long onCmdInsertNewline(FXObject*,FXSelector,void*);
+  long onCmdInsertNewlineOnly(FXObject*,FXSelector,void*);
+  long onCmdInsertNewlineIndent(FXObject*,FXSelector,void*);
   long onCmdInsertTab(FXObject*,FXSelector,void*);
   long onCmdInsertHardTab(FXObject*,FXSelector,void*);
+  long onCmdInsertSoftTab(FXObject*,FXSelector,void*);
 
   // Manipulation Selection
   long onCmdCutSel(FXObject*,FXSelector,void*);
@@ -387,8 +388,11 @@ public:
     ID_SCROLL_CENTER,
     ID_INSERT_STRING,
     ID_INSERT_NEWLINE,
+    IN_INSERT_NEWLINE_ONLY,
+    ID_INSERT_NEWLINE_INDENT,
     ID_INSERT_TAB,
     ID_INSERT_HARDTAB,
+    ID_INSERT_SOFTTAB,
     ID_CUT_SEL,
     ID_COPY_SEL,
     ID_DELETE_SEL,

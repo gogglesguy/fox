@@ -74,6 +74,7 @@ public:
 
   /// Find string dictionary for the given section; may be NULL
   FXStringDict* find(const FXchar *section) const { return (FXStringDict*)FXDict::find(section); }
+  FXStringDict* find(const FXString& section) const { return (FXStringDict*)FXDict::find(section.text()); }
 
   /// Obtain the string dictionary for the given section
   FXStringDict* data(FXint pos) const { return (FXStringDict*)FXDict::data(pos); }

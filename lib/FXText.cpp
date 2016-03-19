@@ -238,8 +238,11 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SCROLL_CENTER,FXText::onCmdScrollCenter),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_STRING,FXText::onCmdInsertString),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_NEWLINE,FXText::onCmdInsertNewline),
+  FXMAPFUNC(SEL_COMMAND,FXText::IN_INSERT_NEWLINE_ONLY,FXText::onCmdInsertNewlineOnly),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_NEWLINE_INDENT,FXText::onCmdInsertNewlineIndent),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_TAB,FXText::onCmdInsertTab),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_HARDTAB,FXText::onCmdInsertHardTab),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_INSERT_SOFTTAB,FXText::onCmdInsertSoftTab),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CUT_SEL,FXText::onCmdCutSel),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_COPY_SEL,FXText::onCmdCopySel),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_SEL,FXText::onCmdDeleteSel),
@@ -2474,36 +2477,6 @@ FXString FXText::getSelectedText() const {
 
 /*******************************************************************************/
 
-// Enter a tab at cursor
-void FXText::enterTab(FXbool notify){
-  FXString string("\t");
-  if(options&TEXT_NO_TABS){
-    FXint pos=isPosSelected(cursorpos) ? selstartpos : cursorpos;
-    FXint start=lineStart(pos);
-    FXint indent=indentFromPos(start,pos);
-    FXint len=tabcolumns-indent%tabcolumns;
-    string.assign(' ',len);
-    }
-  enterText(string,notify);
-  }
-
-
-// Enter newline and indent
-void FXText::enterNewline(FXbool notify){
-  FXString string("\n");
-  if(options&TEXT_AUTOINDENT){
-    FXint pos=isPosSelected(cursorpos) ? selstartpos : cursorpos;
-    FXint p=lineStart(pos);
-    FXchar c;
-    while(p<pos && Ascii::isSpace((c=getByte(p)))){
-      string.append(c);
-      p++;
-      }
-    }
-  enterText(string,notify);
-  }
-
-
 // Insert text at cursor
 void FXText::enterText(const FXString& text,FXbool notify){
   enterText(text.text(),text.length(),notify);
@@ -3102,11 +3075,11 @@ void FXText::eraseCursorOverhang(){
         }
       if(cursory<=getVisibleY()+margintop && getVisibleY()<=cursory+th){
         dc.setForeground(backColor);
-        dc.fillRectangle(cursorx-2,getVisibleY(),5,margintop);
+        dc.fillRectangle(cursorx-2,getVisibleY(),6,margintop);
         }
       if(getVisibleY()+getVisibleHeight()-marginbottom<=cursory+th && cursory<getVisibleY()+getVisibleHeight()){
         dc.setForeground(backColor);
-        dc.fillRectangle(cursorx-2,getVisibleY()+getVisibleHeight()-marginbottom,5,marginbottom);
+        dc.fillRectangle(cursorx-2,getVisibleY()+getVisibleHeight()-marginbottom,6,marginbottom);
         }
       }
     }
@@ -4141,7 +4114,15 @@ long FXText::onKeyPress(FXObject*,FXSelector,void* ptr){
         break;
       case KEY_Return:
       case KEY_KP_Enter:
-        handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE),NULL);
+        if(event->state&CONTROLMASK){
+          handle(this,FXSEL(SEL_COMMAND,IN_INSERT_NEWLINE_ONLY),NULL);
+          }
+        else if(event->state&SHIFTMASK){
+          handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE_INDENT),NULL);
+          }
+        else{
+          handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE),NULL);
+          }
         break;
       case KEY_Tab:
       case KEY_KP_Tab:
@@ -4440,38 +4421,54 @@ long FXText::onCmdInsertString(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Insert a character
+// Insert newline with optional autoindent
 long FXText::onCmdInsertNewline(FXObject*,FXSelector,void*){
-  if(isEditable()){
-    enterNewline(true);
-    return 1;
-    }
-  getApp()->beep();
-  return 1;
+  if(options&TEXT_AUTOINDENT) return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_NEWLINE_INDENT),NULL);
+  return handle(this,FXSEL(SEL_COMMAND,IN_INSERT_NEWLINE_ONLY),NULL);
+  }
+
+
+// Insert newline only
+long FXText::onCmdInsertNewlineOnly(FXObject*,FXSelector,void*){
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)"\n");
   }
 
 
 // Insert a character
+long FXText::onCmdInsertNewlineIndent(FXObject*,FXSelector,void*){
+  FXint pos=isPosSelected(cursorpos) ? selstartpos : cursorpos;
+  FXint start=lineStart(pos);
+  FXint n;
+  FXString string;
+  extractText(string,start,pos-start);
+  n=string.find_first_not_of(" \t\v");
+  if(0<=n) string.trunc(n);
+  string.prepend('\n');
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)string.text());
+  }
+
+
+// Insert optional soft-tab 
 long FXText::onCmdInsertTab(FXObject*,FXSelector,void*){
-  if(isEditable()){
-    enterTab(true);
-    return 1;
-    }
-  getApp()->beep();
-  return 1;
+  if(options&TEXT_NO_TABS) return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_SOFTTAB),NULL);
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_HARDTAB),NULL);
   }
-
-
-// Insert a hard-tab character
+  
+  
+// Insert hard-tab
 long FXText::onCmdInsertHardTab(FXObject*,FXSelector,void*){
-  if(isEditable()){
-    enterText("\t",1,true);
-    return 1;
-    }
-  getApp()->beep();
-  return 1;
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)"\t");
   }
 
+
+// Insert soft-tab
+long FXText::onCmdInsertSoftTab(FXObject*,FXSelector,void*){
+  FXint pos=isPosSelected(cursorpos) ? selstartpos : cursorpos;
+  FXString string(' ',tabcolumns-indentFromPos(lineStart(pos),pos)%tabcolumns);
+  return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)string.text());
+  }
+  
+  
 /*******************************************************************************/
 
 // Cut

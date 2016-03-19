@@ -160,10 +160,10 @@ static void term_source(j_decompress_ptr){
 
 // Check if stream contains a JPG
 FXbool fxcheckJPG(FXStream& store){
-  FXuchar signature[2];
-  store.load(signature,2);
-  store.position(-2,FXFromCurrent);
-  return signature[0]==0xFF && signature[1]==0xD8;
+  FXuchar signature[3];
+  store.load(signature,3);
+  store.position(-3,FXFromCurrent);
+  return signature[0]==0xFF && signature[1]==0xD8 && signature[2]==0xFF;
   }
 
 
@@ -371,7 +371,7 @@ FXbool fxcheckJPG(FXStream&){
 
 // Stub routine
 FXbool fxloadJPG(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& quality){
-  static const FXuchar jpeg_bits[] = {
+  static const FXuchar jpeg_bits[]={
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,

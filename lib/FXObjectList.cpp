@@ -164,7 +164,7 @@ FXObjectList& FXObjectList::assign(FXObject** objects,FXint n){
 
 
 // Assign input string to this string
-FXObjectList& FXObjectList::assign(FXObjectList& objects){
+FXObjectList& FXObjectList::assign(const FXObjectList& objects){
   return assign(objects.ptr,objects.no());
   }
 
@@ -203,7 +203,7 @@ FXObjectList& FXObjectList::insert(FXint pos,FXObject** objects,FXint n){
 
 
 // Insert objects at specified position
-FXObjectList& FXObjectList::insert(FXint pos,FXObjectList& objects){
+FXObjectList& FXObjectList::insert(FXint pos,const FXObjectList& objects){
   return insert(pos,objects.ptr,objects.no());
   }
 
@@ -242,7 +242,7 @@ FXObjectList& FXObjectList::prepend(FXObject** objects,FXint n){
 
 
 // Prepend objects
-FXObjectList& FXObjectList::prepend(FXObjectList& objects){
+FXObjectList& FXObjectList::prepend(const FXObjectList& objects){
   return prepend(objects.ptr,objects.no());
   }
 
@@ -278,7 +278,7 @@ FXObjectList& FXObjectList::append(FXObject** objects,FXint n){
 
 
 // Add string to the end
-FXObjectList& FXObjectList::append(FXObjectList& objects){
+FXObjectList& FXObjectList::append(const FXObjectList& objects){
   return append(objects.ptr,objects.no());
   }
 
@@ -288,7 +288,6 @@ FXObjectList& FXObjectList::replace(FXint pos,FXObject* object){
   ptr[pos]=object;
   return *this;
   }
-
 
 
 // Replaces the m objects at pos with n copies of object
@@ -324,7 +323,7 @@ FXObjectList& FXObjectList::replace(FXint pos,FXint m,FXObject** objects,FXint n
 
 
 // Replace the m objects at pos with objects
-FXObjectList& FXObjectList::replace(FXint pos,FXint m,FXObjectList& objects){
+FXObjectList& FXObjectList::replace(FXint pos,FXint m,const FXObjectList& objects){
   return replace(pos,m,objects.ptr,objects.no());
   }
 

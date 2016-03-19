@@ -165,6 +165,8 @@ FXImage.h \
 FXImageFrame.h \
 FXImageView.h \
 FXInputDialog.h \
+FXJP2Icon.h \
+FXJP2Image.h \
 FXJPGIcon.h \
 FXJPGImage.h \
 FXKnob.h \

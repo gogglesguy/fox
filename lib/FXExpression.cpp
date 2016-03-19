@@ -732,12 +732,12 @@ const FXchar *const FXExpression::errors[]={
 
 
 // Construct empty expression object
-FXExpression::FXExpression():code((FXuchar*)initial){
+FXExpression::FXExpression():code((FXuchar*)(void*)initial){
   }
 
 
 // Copy regex object
-FXExpression::FXExpression(const FXExpression& orig):code((FXuchar*)initial){
+FXExpression::FXExpression(const FXExpression& orig):code((FXuchar*)(void*)initial){
   if(orig.code!=initial){
     dupElms(code,orig.code,*((FXint*)orig.code));
     }
@@ -745,14 +745,14 @@ FXExpression::FXExpression(const FXExpression& orig):code((FXuchar*)initial){
 
 
 // Compile expression from pattern; fail if error
-FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpressionError* error):code((FXuchar*)initial){
+FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpressionError* error):code((FXuchar*)(void*)initial){
   FXExpressionError err=parse(expression,variables);
   if(error){ *error=err; }
   }
 
 
 // Compile expression from pattern; fail if error
-FXExpression::FXExpression(const FXString& expression,const FXString& variables,FXExpressionError* error):code((FXuchar*)initial){
+FXExpression::FXExpression(const FXString& expression,const FXString& variables,FXExpressionError* error):code((FXuchar*)(void*)initial){
   FXExpressionError err=parse(expression.text(),variables.text());
   if(error){ *error=err; }
   }
@@ -762,7 +762,7 @@ FXExpression::FXExpression(const FXString& expression,const FXString& variables,
 FXExpression& FXExpression::operator=(const FXExpression& orig){
   if(code!=orig.code){
     if(code!=initial) freeElms(code);
-    code=(FXuchar*)initial;
+    code=(FXuchar*)(void*)initial;
     if(orig.code!=initial){
       dupElms(code,orig.code,*((FXint*)orig.code));
       }
@@ -785,7 +785,7 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
 
   // Free old code, if any
   if(code!=initial) freeElms(code);
-  code=(FXuchar*)initial;
+  code=(FXuchar*)(void*)initial;
 
   // If not empty, parse expression
   if(expression){
@@ -812,7 +812,7 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
       // Allocate new code
       size=cs.pc-cs.code;
       if(!allocElms(code,size)){
-        code=(FXuchar*)initial;
+        code=(FXuchar*)(void*)initial;
         return EXPRERR_MEMORY;
         }
 

@@ -18,11 +18,54 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-April 1 - FOX DEVELOPMENT 1.7.20
+December 12 - FOX DEVELOPMENT 1.7.21
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
 <ul>
+<li>Added fastnormalize() API's in FXVec{2,3,4}f, which use SSE rsqrtss and one Newton-Raphson
+step for fast and quite accurate vector normalization.</li>
+<li>Added JPEG 2000 support (FXJP2Icon, FXJP2Image).</li>
+<li>Added soft-tab insert, force auto-indent and no-auto-indent character entry.</li>
+<li>Fixed cursor-overhang issue (off-by-one redraw).</li>
+<li>Fixed FXCondition::wait().</li>
+<li>Added a few convenience-API's in FXMat{3,4}{d,f}.</li>
+<li>Obtain number of processors improved.</li>
+<li>Some small fixes in FXRex.</li>
+<li>Faster fxrandom() implementation using Marsaglia's algorithm; its better as well!</li>
+<li>Fix issue in FXThreadPool waking threads.</li>
+<li>Variable amount of wait adding job to FXThreadPool.</li>
+<li>Fixed a few warnings.</li>
+<li>Fixes in FXFont rolled in.</li>
+<li>Outer product added in FXMat3{d,f} and FXMat4{d,f}.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 11 - FOX STABLE 1.6.37
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed remainingTimeout() returning ns, not ms remaining time.</li>
+<li>Fixed bug in parsing of accelerators.</li>
+<li>Fixed wrong enum value in FXComboBox.</li>
+<li>Backported FXTable fix from 1.7 (delete of selected lines).</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 18 - FOX DEVELOPMENT 1.7.20
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Use relative value for FXCondition::wait() instead.</li>
+<li>Totally rewritten FXTheadPool class.</li>
+<li>Default argument for FXHash::insert() and FXHash::replace() is NULL.</li>
+<li>Added get()/set() to FXAutoThreadStorageKey class.</li>
 <li>Small reorganization of source files; allows in-situ usage of library.</li>
 <li>Removed getCursorItem() API from list widgets.  Was not working reliably anyway.</li>
 <li>Changed the way tooltips are obtained in list widgets.  New onQueryTip() implementation
@@ -35,6 +78,42 @@ more easy customization.</li>
 <li>Sort colors in FXColorSelector.  First cut of algorithm is reasonable, but needs improving.</li>
 <li>Converted to new automake tools.</li>
 <li>Converted FOX from CVS to GIT repository.</li>
+<li>Fixed ID_DELETE being used for different things.  This meant ID_DELETE_CHAR is now used in
+FXText and FXTextField to delete a character.</li>
+<li>Moved ID_AUTOSCROLL from FXWindow to FXScrollArea, FXScrollBar, and FXTextField; these are
+the only places this is used.</li>
+<li>Added missing FXAPI declaration to FXRulerView.</li>
+<li>Added icon-owned option to FXHeader control.</li>
+<li>Fixed enum value in FXComboBox.</li>
+<li>FXFile need not be friend of FXStat.</li>
+<li>Dramatic speedups in FXHash and FXDict.</li>
+<li>Fixed FXTable delete of selected lines.  Selection wasn't properly adjusted.</li>
+<li>Added some API's to FXObjectList.</li>
+<li>Added non-const accessor API's to FXArray and FXString.</li>
+<li>Documentation comments added to FXTabBar and FXTabBook.</li>
+<li>Fix in FXSettings; don't create section just because we want to delete a key.</li>
+<li>Safer behavior in FXDict.</li>
+<li>New look for FXProgressBar.</li>
+<li>Cleaner tear-down logic in FXApp.</li>
+<li>FXRootWindow wasn't being deleted from XID -> FXWindow hash table.</li>
+<li>Added FXRefPtr class for reference counted objects.</li>
+<li>Speeded up FXStat::statFile() on Windows.</li>
+<li>Fixed bug in FXAccelTable.</li>
+<li>Added __likely() and __unlikely() macros; these help with branch-probabilities.</li>
+<li>Added FX_FORMAT macro. Useful for argument checking.</li>
+<li>Added FXColors, a handy list of pre-defined colors. Also some handy color API's.</li>
+<li>Added getWindowClass() API to FXWindow.  This returns the window-type, which is role
+a window plays on a desktop.  This hint is intended for Window Managers.</li>
+<li>Change FXPath::match() API parameters and enums; old fxfilematch() API now eliminated.</li>
+<li>Added FXALIGNED macro variable alignment attribute hint.</li>
+<li>Fix fxgetticks() implementation.</li>
+<li>New fxgetmxcsr() and fxsetmxcsr() API's (x86-64/Linux only).</li>
+<li>Added fxhsl_to_rgb() and fxrgb_to_hsl() API's.</li>
+<li>Allow setting fxTraceLevel from environment variable FOX_TRACE_LEVEL.</li>
+<li>Old getCursorItem() API's removed from List Widgets. Didn't work that well anyway.</li>
+<li>Better default colors in FXColorDialog.</li>
+<li>Transitioned from configure.in to configure.ac for new automake system.</li>
+<li>Directory layout change to allow in-situ usage.</li>
 </ul>
 
 <!--- TOPIC TITLE -->

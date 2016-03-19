@@ -35,7 +35,7 @@
 
   - Format for settings database file:
 
-    [Section Key]
+    [SectionKey]
     EntryKey=string-with-no-spaces
     EntryKey="string\nwith a\nnewline in it\n"
     EntryKey=" string with leading and trailing spaces and \"embedded\" in it  "
@@ -45,14 +45,13 @@
 
   - Leading/trailing spaces are NOT part of the EntryKey.
 
-  - FXSectionDict should go; FXSettings should simply derive from FXDict.
-
   - Escape sequences now allow octal (\377) as well as hex (\xff) codes.
 
   - EntryKey format should be like values.
 
   - Extensive error checking in unparseFile() to ensure no settings data is
     lost when disk is full.
+    
   - FIXME only writeFormatEntry() still has arbitrary limits.
 */
 

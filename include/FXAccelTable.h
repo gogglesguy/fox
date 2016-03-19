@@ -71,41 +71,6 @@ public:
   /// Return target object of the given accelerator
   FXObject* targetOfAccel(FXHotKey hotkey) const;
 
-  /**
-  * Parse accelerator from string, yielding modifier and
-  * key code.  For example, parseAccel("Ctl+Shift+X")
-  * yields MKUINT(KEY_X,CONTROLMASK|SHIFTMASK).
-  */
-  friend FXAPI FXHotKey parseAccel(const FXString& string);
-
-  /**
-  * Unparse hot key comprising modifier and key code back
-  * into a string suitable for parsing with fxparseHotKey.
-  */
-  friend FXAPI FXString unparseAccel(FXHotKey key);
-
-  /**
-  * Parse hot key from string, yielding modifier and
-  * key code.  For example, parseHotKey(""Salt && &Pepper!"")
-  * yields MKUINT(KEY_p,ALTMASK).
-  */
-  friend FXAPI FXHotKey parseHotKey(const FXString& string);
-
-  /**
-  * Obtain hot key offset in string, or -1 if not found.
-  * For example, findHotKey("Salt && &Pepper!") yields 7.
-  * Note that this is the byte-offset, not the character
-  * index!
-  */
-  friend FXAPI FXint findHotKey(const FXString& string);
-
-  /**
-  * Strip hot key combination from the string.
-  * For example, stripHotKey("Salt && &Pepper") should
-  * yield "Salt & Pepper".
-  */
-  friend FXAPI FXString stripHotKey(const FXString& string);
-
   /// Save table to a stream
   virtual void save(FXStream& store) const;
 
@@ -117,10 +82,39 @@ public:
   };
 
 
+/**
+* Parse accelerator from string, yielding modifier and
+* key code.  For example, parseAccel("Ctl+Shift+X")
+* yields MKUINT(KEY_X,CONTROLMASK|SHIFTMASK).
+*/
 extern FXAPI FXHotKey parseAccel(const FXString& string);
+
+/**
+* Unparse hot key comprising modifier and key code back
+* into a string suitable for parsing with fxparseHotKey.
+*/
 extern FXAPI FXString unparseAccel(FXHotKey key);
+
+/**
+* Parse hot key from string, yielding modifier and
+* key code.  For example, parseHotKey(""Salt && &Pepper!"")
+* yields MKUINT(KEY_p,ALTMASK).
+*/
 extern FXAPI FXHotKey parseHotKey(const FXString& string);
+
+/**
+* Obtain hot key offset in string, or -1 if not found.
+* For example, findHotKey("Salt && &Pepper!") yields 7.
+* Note that this is the byte-offset, not the character
+* index!
+*/
 extern FXAPI FXint findHotKey(const FXString& string);
+
+/**
+* Strip hot key combination from the string.
+* For example, stripHotKey("Salt && &Pepper") should
+* yield "Salt & Pepper".
+*/
 extern FXAPI FXString stripHotKey(const FXString& string);
 
 }

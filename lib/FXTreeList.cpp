@@ -52,6 +52,7 @@
   - As with FXIconList, it probably shouldn't autoscroll when draggin icons.
   - Maybe moving (dragging) items around in the treelist is something that should
     be supported?
+  - FIXME if no text, you're unable to see if an item is selected.
 */
 
 
@@ -88,7 +89,10 @@ void FXTreeItem::draw(const FXTreeList* list,FXDC& dc,FXint xx,FXint yy,FXint,FX
   if(icon){
     iw=icon->getWidth();
     ih=icon->getHeight();
-    dc.drawIcon(icon,xx,yy+(hh-ih)/2);
+    if(isEnabled())
+      dc.drawIcon(icon,xx,yy+(hh-ih)/2);
+    else
+      dc.drawIconSunken(icon,xx,yy+(hh-ih)/2);
     xx+=ICON_SPACING+iw;
     }
   if(!label.empty()){

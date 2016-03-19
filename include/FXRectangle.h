@@ -62,9 +62,6 @@ public:
   /// Rectangle properly contained in rectangle
   FXbool contains(const FXRectangle& r) const { return x<=r.x && y<=r.y && r.x+r.w<=x+w && r.y+r.h<=y+h; }
 
-  /// Rectangles overlap
-  friend inline FXbool overlap(const FXRectangle& a,const FXRectangle& b);
-
   /// Return moved rectangle
   FXRectangle& move(const FXPoint& p){ x+=p.x; y+=p.y; return *this; }
   FXRectangle& move(FXshort dx,FXshort dy){ x+=dx; y+=dy; return *this; }
@@ -110,18 +107,16 @@ public:
   /// Union and intersection between rectangles
   FXRectangle operator+(const FXRectangle& r) const;
   FXRectangle operator*(const FXRectangle& r) const;
-
-  /// Save object to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXRectangle& r);
-
-  /// Load object from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXRectangle& r);
   };
 
 
+/// Rectangles overlap
 inline FXbool overlap(const FXRectangle& a,const FXRectangle& b){ return b.x<a.x+a.w && b.y<a.y+a.h && a.x<b.x+b.w && a.y<b.y+b.h; }
 
+/// Save object to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXRectangle& r);
+
+/// Load object from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXRectangle& r);
 
 }
