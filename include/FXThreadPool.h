@@ -58,9 +58,11 @@ typedef FXLFQueueOf<FXRunnable> FXTaskQueue;
 * premature exit of either the worker thread of the thread pool itself.
 * When the thread pool is stopped, it will wait until all tasks are finished, and then
 * cause all worker-threads to terminate.
-* The thread pool becomes associated with the calling thread when start() is called;
-* this association lasts until stop() is called. In addition, each worker will also
-* be associated with the thread pool as well.
+* The thread pool becomes associated (through a thread-local variable) with the calling 
+* thread when start() is called; this association lasts until stop() is called. 
+* In addition, each worker will similarly be associated with the thread pool.
+* The thread pool associated this way can be obtained using the static member-function
+* instance().
 */
 class FXAPI FXThreadPool : public FXRunnable {
   friend class FXWorker;
@@ -138,8 +140,8 @@ public:
   /**
   * Start the thread pool with an initial number of threads equal to count.
   * Returns the number of threads actually started.
-  * An association will be established between the calling thread and the thread pool.  
-  * This association lasts until stop() is called.  If another threadpool was already started 
+  * An association will be established between the calling thread and the thread pool.
+  * This association lasts until stop() is called.  If another threadpool was already started
   * before by the calling thread, no new association will be established.
   */
   FXuint start(FXuint count=0);
@@ -149,24 +151,30 @@ public:
   * If a spot becomes available in the task queue within the timeout interval,
   * add the task to the queue and return true.
   * Return false if the task could not be added within the given time interval.
+  * Possibly starts additional worker threads if the maximum number of worker
+  * threads has not yet been exceeded.
   */
   FXbool execute(FXRunnable* task,FXTime blocking=forever);
 
   /**
   * Execute a task on the thread pool by entering it into the queue.
-  * If the task was successfully added, the calling thread will enter
+  * If the task was successfully added, the calling thread will temporarily enter
   * the task-processing loop, and help out the worker-threads until the queue
   * is empty.
   * Return false if the task could not be added within the given time interval.
+  * Possibly starts additional worker threads if the maximum number of worker
+  * threads has not yet been exceeded.
   */
   FXbool executeAndRun(FXRunnable* task,FXTime blocking=forever);
 
   /**
   * Execute task on the thread pool by entering int into the queue.
-  * If the task was successfully added, the calling thread will enter
+  * If the task was successfully added, the calling thread will temporarily enter
   * the task-processing loop, and help out the worker-threads until either
-  * the queue is empty, or the counter becomes zero.
+  * the queue is empty, or the atomic counter becomes zero.
   * Return false if the task could not be added within the given time interval.
+  * Possibly starts additional worker threads if the maximum number of worker
+  * threads has not yet been exceeded.
   */
   FXbool executeAndRunWhile(FXRunnable* task,volatile FXuint& count,FXTime blocking=forever);
 
@@ -178,8 +186,8 @@ public:
   FXbool wait();
 
   /**
-  * Enter the task-processing loop, helping out the worker-threads until either
-  * the task queue is empty, or the counter becomes zero.
+  * Temporarily enter the task-processing loop, helping out the worker-threads until 
+  * either the task queue is empty, or the counter becomes zero.
   * Return false if the thread pool wasn't running.
   */
   FXbool waitWhile(volatile FXuint& count);
@@ -192,7 +200,7 @@ public:
 
   /**
   * Stop context.
-  * Enter the task-processing loop and help the worker-threads until the task queue is 
+  * Enter the task-processing loop and help the worker-threads until the task queue is
   * empty, and all tasks have finished executing.
   * The association between the calling thread, established when start() was called,
   * will hereby be dissolved, if the calling thread was associated with this thread pool.

@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                        I / O   D e v i c e   C l a s s                        *
+*                        I / O   B u f f e r   C l a s s                        *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -27,22 +27,15 @@
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXIO.h"
-#include "FXIODevice.h"
-
+#include "FXIOBuffer.h"
 
 
 /*
   Notes:
-
-  - An abstract class for low-level IO.
+  - FIXME need option "owned" vs non-owned buffer.
+  - Etc.
 */
 
-// Bad handle value
-#ifdef WIN32
-#define BadHandle INVALID_HANDLE_VALUE
-#else
-#define BadHandle -1
-#endif
 
 using namespace FX;
 
@@ -53,153 +46,113 @@ namespace FX {
 
 
 // Construct
-FXIODevice::FXIODevice():device(BadHandle){
+FXIOBuffer::FXIOBuffer():begptr(NULL),endptr(NULL),ptr(NULL){
   }
 
 
-// Construct with given handle and mode
-FXIODevice::FXIODevice(FXInputHandle h,FXuint m):FXIO(m),device(h){
+// Construct and open
+FXIOBuffer::FXIOBuffer(FXuchar* data,FXuval size,FXuint m):begptr(NULL),endptr(NULL),ptr(NULL){
+  open(data,size,m);
   }
 
 
-// Open file
-FXbool FXIODevice::open(FXInputHandle h,FXuint m){
-  device=h;
+
+// Open buffer 
+FXbool FXIOBuffer::open(FXuchar* data,FXuval size,FXuint m){
+  begptr=data;
+  endptr=begptr+size;
   access=m;
   return true;
   }
-
+  
 
 // Return true if open
-FXbool FXIODevice::isOpen() const {
-  return device!=BadHandle;
+FXbool FXIOBuffer::isOpen() const {
+  return endptr!=begptr;
   }
 
 
 // Return true if serial access only
-FXbool FXIODevice::isSerial() const {
-  return true;
-  }
-
-
-// Attach existing file handle
-void FXIODevice::attach(FXInputHandle h,FXuint m){
-  close();
-  device=h;
-  access=(m|OwnHandle);
-  }
-
-
-// Detach existing file handle
-void FXIODevice::detach(){
-  device=BadHandle;
-  access=NoAccess;
+FXbool FXIOBuffer::isSerial() const {
+  return false;
   }
 
 
 // Get position
-FXlong FXIODevice::position() const {
-  return -1;
+FXlong FXIOBuffer::position() const {
+  return ptr-begptr;
   }
 
 
 // Move to position
-FXlong FXIODevice::position(FXlong,FXuint){
+FXlong FXIOBuffer::position(FXlong off,FXuint from){
+  if(access&ReadWrite){
+    if(from==Current) off+=(ptr-begptr);
+    else if(from==End) off+=(endptr-begptr);
+    ptr=begptr+off;
+    return ptr-begptr;
+    }
   return -1;
   }
 
 
 // Read block
-FXival FXIODevice::readBlock(void* data,FXival count){
-  FXival nread=-1;
-  if((device!=BadHandle) && (access&ReadOnly)){
-#if defined(WIN32)
-    DWORD nr;
-    if(::ReadFile(device,data,(DWORD)count,&nr,NULL)!=0){
-      nread=(FXival)nr;
-      }
-#else
-    do{
-      nread=::read(device,data,count);
-      }
-    while(nread<0 && errno==EINTR);
-#endif
+FXival FXIOBuffer::readBlock(void* data,FXival count){
+  if(access&ReadOnly){
+    if(count>(endptr-ptr)) count=(endptr-ptr);
+    memmove(data,ptr,count);
+    ptr+=count;
+    return count;
     }
-  return nread;
+  return 0;
   }
 
 
 // Write block
-FXival FXIODevice::writeBlock(const void* data,FXival count){
-  FXival nwritten=-1;
-  if((device!=BadHandle) && (access&WriteOnly)){
-#if defined(WIN32)
-    DWORD nw;
-    if(::WriteFile(device,data,(DWORD)count,&nw,NULL)!=0){
-      nwritten=(FXival)nw;
-      }
-#else
-    do{
-      nwritten=::write(device,data,count);
-      }
-    while(nwritten<0 && errno==EINTR);
-#endif
+FXival FXIOBuffer::writeBlock(const void* data,FXival count){
+  if(access&WriteOnly){
+    if(count>(endptr-ptr)) count=(endptr-ptr);
+    memmove(ptr,data,count);
+    ptr+=count;
+    return count;
     }
-  return nwritten;
+  return 0;
   }
 
 
 // Truncate file
-FXlong FXIODevice::truncate(FXlong){
+FXlong FXIOBuffer::truncate(FXlong){
   return -1;
   }
 
 
 // Synchronize disk with cached data
-FXbool FXIODevice::flush(){
+FXbool FXIOBuffer::flush(){
   return false;
   }
 
 
 // Test if we're at the end; -1 if error
-FXint FXIODevice::eof(){
-  return -1;
+FXint FXIOBuffer::eof(){
+  return ptr>=endptr;
   }
 
 
 // Return file size
-FXlong FXIODevice::size(){
-  return -1;
+FXlong FXIOBuffer::size(){
+  return endptr-begptr;
   }
 
 
 // Close file
-FXbool FXIODevice::close(){
-  if(device!=BadHandle){
-    if(access&OwnHandle){
-#if defined(WIN32)
-      if(::CloseHandle(device)!=0){
-        device=BadHandle;
-        access=NoAccess;
-        return true;
-        }
-#else
-      if(::close(device)==0){
-        device=BadHandle;
-        access=NoAccess;
-        return true;
-        }
-#endif
-      }
-    device=BadHandle;
-    access=NoAccess;
-    }
-  return false;
+FXbool FXIOBuffer::close(){
+  begptr=endptr=ptr=NULL;
+  return true;
   }
 
 
 // Destroy
-FXIODevice::~FXIODevice(){
+FXIOBuffer::~FXIOBuffer(){
   close();
   }
 

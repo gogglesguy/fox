@@ -50,20 +50,9 @@ public:
   /// Open device with access mode and handle
   virtual FXbool open(FXInputHandle h,FXuint m);
 
-  /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* data,FXival count);
-
-  /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* data,FXival count);
-
-  /// Close socket
-  virtual FXbool close();
 
   /// Create a named pipe
   static FXbool create(const FXString& file,FXuint perm=FXIO::AllReadWrite);
-
-  /// Destroy
-  virtual ~FXPipe();
   };
 
 }

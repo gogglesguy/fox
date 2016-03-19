@@ -32,14 +32,14 @@
 /*
   Notes:
   - We store the hash key, so that 99.999% of the time we can compare hash numbers;
-    only when hash numbers match do we need to compare keys. With a pretty decent hash 
-    function, the number of calls to strcmp() should be roughly the same as the number 
+    only when hash numbers match do we need to compare keys. With a pretty decent hash
+    function, the number of calls to strcmp() should be roughly the same as the number
     of successful lookups.
-    
+
   - When entry is removed, its key and data are cleared, but its hash value remains the
     same; in other words, voided slots have empty key but non-zero hash value, and free slots
     have empty key AND zero hash value.
-    
+
   - Invariants:
 
       1 Always at least one table entry marked as "free" i.e. key==empty and hash==0.
@@ -50,12 +50,12 @@
 
   - Minimum table size is 1 (one free slot). Thus, for a table to have one element its
     size must be at least  2.
-    
+
   - Empty table is represented by magic EMPTY table value.  This is compile-time constant
     data and will never change.
-    
+
   - NULL keys or empty-string keys are not allowed.
-  
+
   - Similar to FXDictionary; reimplemented to support FXVariant as payload.
 */
 
@@ -74,25 +74,6 @@ namespace FX {
 extern const FXint __string__empty__[];
 extern const FXival __variantmap__empty__[];
 const FXival __variantmap__empty__[8]={1,0,1,(FXival)(__string__empty__+1),0,0,0,0};
-
-
-// Construct empty dictionary
-FXVariantMap::FXVariantMap():table(EMPTY){
-  FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
-  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
-  }
-
-
-// Construct from another map
-FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
-  FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
-  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
-  if(no(other.no())){
-    copyElms(table,other.table,no());
-    free(other.free());
-    used(other.used());
-    }
-  }
 
 
 // Adjust the size of the table
@@ -153,9 +134,28 @@ FXbool FXVariantMap::resize(FXival n){
   }
 
 
+// Construct empty dictionary
+FXVariantMap::FXVariantMap():table(EMPTY){
+  FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
+  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
+  }
+
+
+// Construct from another map
+FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
+  FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
+  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
+  if(__unlikely(no(other.no()))){ throw FXMemoryException("FXVariantMap::FXVariantMap: out of memory\n"); }
+  copyElms(table,other.table,no());
+  free(other.free());
+  used(other.used());
+  }
+
+
 // Assignment operator
 FXVariantMap& FXVariantMap::operator=(const FXVariantMap& other){
-  if(table!=other.table && no(other.no())){
+  if(table!=other.table){
+    if(__unlikely(no(other.no()))){ throw FXMemoryException("FXVariantMap::operator=: out of memory\n"); }
     copyElms(table,other.table,no());
     free(other.free());
     used(other.used());
@@ -245,6 +245,18 @@ void FXVariantMap::remove(const FXchar* ky){
   table[x].data.clear();        // Clear the variant
   used(used()-1);
   if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
+  }
+
+
+// Erase entry at pos in the table
+void FXVariantMap::erase(FXival pos){
+  if(__unlikely(pos<0 || no()<=pos)){ throw FXRangeException("FXVariantMap::erase: argument out of range\n"); }
+  if(!table[pos].key.empty()){
+    table[pos].key.clear();     // Void the slot (not empty!)
+    table[pos].data.clear();    // Clear the variant
+    used(used()-1);
+    if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
+    }
   }
 
 

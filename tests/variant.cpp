@@ -26,7 +26,7 @@ int main(int argc,char *argv[]){
   FXint wrap;
 
   // JSON I/O
-  FXJSON json(163840);
+  FXJSON json(1024);
 
   // Variant to save
   FXVariant var;

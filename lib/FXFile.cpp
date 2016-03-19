@@ -41,15 +41,9 @@
 
   - Implemented many functions in terms of FXFile and FXDir
     so we won't have to worry about unicode stuff.
-  - Perhaps we should assume FXString contains string encoded in the locale
-    of the system [which in case of Windows would mean it contains UTF-16]?
-    Because it isn't between 8-bit or 16-bit, but also about utf-8 v.s. other
-    encodings..
-  - This should be in FXSystem; FXSystem needs to determine the locale, then
-    determine the codec needed for that locale, and then use this codec for
-    encoding our strings to that locale.
 */
 
+// Bad handle value
 #ifdef WIN32
 #define BadHandle INVALID_HANDLE_VALUE
 #else
@@ -69,7 +63,6 @@ using namespace FX;
 namespace FX {
 
 
-
 // Construct file and attach existing handle h
 FXFile::FXFile(FXInputHandle h,FXuint m){
   open(h,m);
@@ -84,8 +77,8 @@ FXFile::FXFile(const FXString& file,FXuint m,FXuint perm){
 
 // Open file
 FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
-  if(!file.empty() && !isOpen()){
-#ifdef WIN32
+  if((device==BadHandle) && !file.empty()){
+#if defined(WIN32)
     SECURITY_ATTRIBUTES sat;
     DWORD flags=GENERIC_READ;
     DWORD creation=OPEN_EXISTING;
@@ -116,7 +109,7 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
       }
 
     // Do it
-#ifdef UNICODE
+#if defined(UNICODE)
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
     device=::CreateFileW(unifile,flags,FILE_SHARE_READ|FILE_SHARE_WRITE,&sat,creation,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -149,12 +142,12 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
     if(m&NonBlocking) flags|=O_NONBLOCK;
 
     // Change access time
-#ifdef O_NOATIME
+#if defined(O_NOATIME)
     if(m&NoAccessTime) flags|=O_NOATIME;
 #endif
 
     // Inheritable only if specified
-#ifdef O_CLOEXEC
+#if defined(O_CLOEXEC)
     if(!(m&Inheritable)) flags|=O_CLOEXEC;
 #endif
 
@@ -195,8 +188,8 @@ FXbool FXFile::isSerial() const {
 
 // Get position
 FXlong FXFile::position() const {
-  if(isOpen()){
-#ifdef WIN32
+  if(device!=BadHandle){
+#if defined(WIN32)
     LARGE_INTEGER pos;
     pos.QuadPart=0;
     pos.LowPart=::SetFilePointer(device,0,&pos.HighPart,FILE_CURRENT);
@@ -212,8 +205,8 @@ FXlong FXFile::position() const {
 
 // Move to position
 FXlong FXFile::position(FXlong offset,FXuint from){
-  if(isOpen()){
-#ifdef WIN32
+  if(device!=BadHandle){
+#if defined(WIN32)
     LARGE_INTEGER pos;
     pos.QuadPart=offset;
     pos.LowPart=::SetFilePointer(device,pos.LowPart,&pos.HighPart,from);
@@ -227,50 +220,10 @@ FXlong FXFile::position(FXlong offset,FXuint from){
   }
 
 
-// Read block
-FXival FXFile::readBlock(void* data,FXival count){
-  FXival nread=-1;
-  if(isOpen()){
-#ifdef WIN32
-    DWORD nr;
-    if(::ReadFile(device,data,(DWORD)count,&nr,NULL)!=0){
-      nread=(FXival)nr;
-      }
-#else
-    do{
-      nread=::read(device,data,count);
-      }
-    while(nread<0 && errno==EINTR);
-#endif
-    }
-  return nread;
-  }
-
-
-// Write block
-FXival FXFile::writeBlock(const void* data,FXival count){
-  FXival nwritten=-1;
-  if(isOpen()){
-#ifdef WIN32
-    DWORD nw;
-    if(::WriteFile(device,data,(DWORD)count,&nw,NULL)!=0){
-      nwritten=(FXival)nw;
-      }
-#else
-    do{
-      nwritten=::write(device,data,count);
-      }
-    while(nwritten<0 && errno==EINTR);
-#endif
-    }
-  return nwritten;
-  }
-
-
 // Truncate file
 FXlong FXFile::truncate(FXlong s){
-  if(isOpen()){
-#ifdef WIN32
+  if(device!=BadHandle){
+#if defined(WIN32)
     LARGE_INTEGER oldpos;
     LARGE_INTEGER newpos;
     oldpos.QuadPart=0;
@@ -290,8 +243,8 @@ FXlong FXFile::truncate(FXlong s){
 
 // Flush to disk
 FXbool FXFile::flush(){
-  if(isOpen()){
-#ifdef WIN32
+  if(device!=BadHandle){
+#if defined(WIN32)
     return ::FlushFileBuffers(device)!=0;
 #else
     return ::fsync(device)==0;
@@ -303,7 +256,7 @@ FXbool FXFile::flush(){
 
 // Test if we're at the end; -1 if error
 FXint FXFile::eof(){
-  if(isOpen()){
+  if(device!=BadHandle){
     register FXlong pos=position();
     return 0<=pos && size()<=pos;
     }
@@ -313,8 +266,8 @@ FXint FXFile::eof(){
 
 // Return file size
 FXlong FXFile::size(){
-  if(isOpen()){
-#ifdef WIN32
+  if(device!=BadHandle){
+#if defined(WIN32)
     ULARGE_INTEGER result;
     result.LowPart=::GetFileSize(device,&result.HighPart);
     return result.QuadPart;
@@ -326,44 +279,13 @@ FXlong FXFile::size(){
   return -1;
   }
 
-
-// Close file
-FXbool FXFile::close(){
-  if(isOpen()){
-    if(access&OwnHandle){
-#ifdef WIN32
-      if(::CloseHandle(device)!=0){
-        device=BadHandle;
-        access=NoAccess;
-        return true;
-        }
-#else
-      if(::close(device)==0){
-        device=BadHandle;
-        access=NoAccess;
-        return true;
-        }
-#endif
-      }
-    device=BadHandle;
-    access=NoAccess;
-    }
-  return false;
-  }
-
-
-// Destroy
-FXFile::~FXFile(){
-  close();
-  }
-
-
+/*******************************************************************************/
 
 // Create new (empty) file
 FXbool FXFile::create(const FXString& file,FXuint perm){
   if(!file.empty()){
-#ifdef WIN32
-#ifdef UNICODE
+#if defined(WIN32)
+#if defined(UNICODE)
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
     FXInputHandle h=::CreateFileW(unifile,GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -383,8 +305,8 @@ FXbool FXFile::create(const FXString& file,FXuint perm){
 // Remove a file
 FXbool FXFile::remove(const FXString& file){
   if(!file.empty()){
-#ifdef WIN32
-#ifdef UNICODE
+#if defined(WIN32)
+#if defined(UNICODE)
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
     return ::DeleteFileW(unifile)!=0;
@@ -402,8 +324,8 @@ FXbool FXFile::remove(const FXString& file){
 // Rename file
 FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
   if(srcfile!=dstfile){
-#ifdef WIN32
-#ifdef UNICODE
+#if defined(WIN32)
+#if defined(UNICODE)
     FXnchar srcname[MAXPATHLEN];
     FXnchar dstname[MAXPATHLEN];
     utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
@@ -420,7 +342,7 @@ FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
   }
 
 
-#ifdef WIN32
+#if defined(WIN32)
 
 typedef BOOL (WINAPI *FunctionCreateHardLink)(const TCHAR*,const TCHAR*,LPSECURITY_ATTRIBUTES);
 
@@ -432,7 +354,7 @@ static FunctionCreateHardLink MyCreateHardLink=HelpCreateHardLink;
 // The first time its called, we're setting the function pointer, so
 // subsequent calls will experience no additional overhead whatsoever!
 static BOOL WINAPI HelpCreateHardLink(const TCHAR* newname,const TCHAR* oldname,LPSECURITY_ATTRIBUTES sa){
-#ifdef UNICODE
+#if defined(UNICODE)
   HMODULE hkernel=LoadLibraryW(L"Kernel32");
   if(hkernel){
     MyCreateHardLink=(FunctionCreateHardLink)::GetProcAddress(hkernel,"CreateHardLinkW");
@@ -456,8 +378,8 @@ static BOOL WINAPI HelpCreateHardLink(const TCHAR* newname,const TCHAR* oldname,
 // Link file
 FXbool FXFile::link(const FXString& srcfile,const FXString& dstfile){
   if(srcfile!=dstfile){
-#ifdef WIN32
-#ifdef UNICODE
+#if defined(WIN32)
+#if defined(UNICODE)
     FXnchar srcname[MAXPATHLEN];
     FXnchar dstname[MAXPATHLEN];
     utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
@@ -477,7 +399,7 @@ FXbool FXFile::link(const FXString& srcfile,const FXString& dstfile){
 // Read symbolic link
 FXString FXFile::symlink(const FXString& file){
   if(!file.empty()){
-#ifndef WIN32
+#if !defined(WIN32)
     FXchar lnk[MAXPATHLEN+1];
     FXint len=::readlink(file.text(),lnk,MAXPATHLEN);
     if(0<=len){
@@ -492,7 +414,7 @@ FXString FXFile::symlink(const FXString& file){
 // Symbolic Link file
 FXbool FXFile::symlink(const FXString& srcfile,const FXString& dstfile){
   if(dstfile!=srcfile){
-#ifndef WIN32
+#if !defined(WIN32)
     return ::symlink(srcfile.text(),dstfile.text())==0;
 #endif
     }
@@ -571,8 +493,9 @@ FXbool FXFile::concat(const FXString& srcfile1,const FXString& srcfile2,const FX
   return false;
   }
 
-// FIXME use FXFile::identical to keep struct on stack for cycle-test
+/*******************************************************************************/
 
+// FIXME use FXFile::identical to keep struct on stack for cycle-test
 
 // Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
 FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
@@ -711,4 +634,3 @@ FXbool FXFile::removeFiles(const FXString& path,FXbool recursive){
 
 
 }
-

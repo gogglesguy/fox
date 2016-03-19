@@ -41,6 +41,7 @@ public:
     ErrComma,           /// Expected comma ','
     ErrBracket,         /// Expected closing bracket
     ErrBrace,           /// Expected closing brace
+    ErrQuotes,          /// Expected closing quotes
     ErrNumber,          /// Numeric conversion
     ErrEnd              /// Unexpected end of file
     };
@@ -50,7 +51,7 @@ public:
     Pretty              /// Pretty printed, indented output
     };
 private:
-  FXFile      file;             // File IO device
+  FXIO       *dev;              // File IO device
   FXchar     *begptr;           // Text buffer begin ptr
   FXchar     *endptr;           // Text buffer end ptr
   FXchar     *rptr;             // Text buffer read ptr
@@ -68,15 +69,15 @@ private:
   FXuchar     dent;             // Indentation amount
 private:
   FXint next();
-  FXint space();
-  FXint writeindent(FXint d);
-  FXint vformat(const FXchar* fmt,va_list args);
-  FXint format(const FXchar* fmt,...);
+  Error loadString(FXString& str);
   Error loadMap(FXVariant& var);
   Error loadArray(FXVariant& var);
+  Error loadVariant(FXVariant& var);
+  Error saveText(const FXchar* ptr,FXint count);
+  Error saveIndent(FXint count);
+  Error saveString(const FXString& str);
   Error saveMap(const FXVariant& var);
   Error saveArray(const FXVariant& var);
-  Error loadVariant(FXVariant& var);
   Error saveVariant(const FXVariant& var);
 private:
   static const FXchar *const errors[];
@@ -105,9 +106,9 @@ public:
   FXbool open(const FXString& filename,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
 
   /**
-  * Return current io access mode.
+  * Return current io device.
   */
-  FXuint mode() const { return file.mode(); }
+  FXIO* device() const { return dev; }
 
   /**
   * Load a variant from stream.
@@ -192,4 +193,3 @@ public:
 }
 
 #endif
-

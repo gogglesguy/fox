@@ -321,16 +321,14 @@ FXint wc2utf(FXwchar w){
   if(__likely(w<0x80)) return 1;
   if(__likely(w<0x800)) return 2;
   if(__likely(w<0x10000)) return 3;
-  if(__likely(w<0x110000)) return 4;
-  return 0;
+  return 4;
   }
 
 
 // Return number of narrow characters for utf16 representation of wide character w
 FXint wc2nc(FXwchar w){
-  if(__likely(w<0xFFFF)) return 1;
-  if(__likely(w<0x110000)) return 2;
-  return 0;
+  if(__likely(w<0x10000)) return 1;
+  return 2;
   }
 
 
@@ -472,29 +470,23 @@ FXint wc2utf(FXchar *dst,FXwchar w){
     dst[2]=(w&0x3F)|0x80;
     return 3;
     }
-  if(__likely(w<0x110000)){
-    dst[0]=(w>>18)|0xF0;
-    dst[1]=((w>>12)&0x3F)|0x80;
-    dst[2]=((w>>6)&0x3F)|0x80;
-    dst[3]=(w&0x3F)|0x80;
-    return 4;
-    }
-  return 0;
+  dst[0]=(w>>18)|0xF0;
+  dst[1]=((w>>12)&0x3F)|0x80;
+  dst[2]=((w>>6)&0x3F)|0x80;
+  dst[3]=(w&0x3F)|0x80;
+  return 4;
   }
 
 
 // Convert wide character to narrow character string
 FXint wc2nc(FXnchar *dst,FXwchar w){
-  if(__likely(w<=0xFFFF)){
+  if(__likely(w<0x10000)){
     dst[0]=w;
     return 1;
     }
-  if(__likely(w<0x110000)){
-    dst[0]=LEAD_OFFSET+(w>>10);
-    dst[1]=TAIL_OFFSET+(w&0x3FF);
-    return 2;
-    }
-  return 0;
+  dst[0]=LEAD_OFFSET+(w>>10);
+  dst[1]=TAIL_OFFSET+(w&0x3FF);
+  return 2;
   }
 
 
@@ -677,10 +669,10 @@ FXbool FXString::length(FXint len){
     if(0<len){
       register FXchar *ptr;
       if(str==EMPTY){
-        ptr=(FXchar*)malloc(ROUNDUP(1+len)+sizeof(FXint));
+        ptr=(FXchar*)::malloc(ROUNDUP(1+len)+sizeof(FXint));
         }
       else{
-        ptr=(FXchar*)realloc(str-sizeof(FXint),ROUNDUP(1+len)+sizeof(FXint));
+        ptr=(FXchar*)::realloc(str-sizeof(FXint),ROUNDUP(1+len)+sizeof(FXint));
         }
       if(__unlikely(!ptr)) return false;
       str=ptr+sizeof(FXint);
@@ -688,7 +680,7 @@ FXbool FXString::length(FXint len){
       *(((FXint*)str)-1)=len;
       }
     else if(str!=EMPTY){
-      free(str-sizeof(FXint));
+      ::free(str-sizeof(FXint));
       str=EMPTY;
       }
     }
@@ -702,20 +694,20 @@ void FXString::length(FXint len){
     register FXchar *ptr;
     if(0<len){
       if(str==EMPTY){
-        ptr=(FXchar*)malloc(ROUNDUP(1+len)+sizeof(FXint));
+        ptr=(FXchar*)::malloc(ROUNDUP(1+len)+sizeof(FXint));
         }
       else{
-        ptr=(FXchar*)realloc(str-sizeof(FXint),ROUNDUP(1+len)+sizeof(FXint));
+        ptr=(FXchar*)::realloc(str-sizeof(FXint),ROUNDUP(1+len)+sizeof(FXint));
         }
       if(__unlikely(!ptr)){
-        throw FXMemoryException();
+        throw FXMemoryException("FXString::length: out of memory\n");
         }
       str=ptr+sizeof(FXint);
       str[len]=0;
       *(((FXint*)str)-1)=len;
       }
     else if(str!=EMPTY){
-      free(str-sizeof(FXint));
+      ::free(str-sizeof(FXint));
       str=EMPTY;
       }
     }
@@ -808,7 +800,7 @@ FXString::FXString(FXchar c,FXint n):str(EMPTY){
 
 // Destructor
 FXString::~FXString(){
-  if(str!=EMPTY){free(str-sizeof(FXint));}
+  if(str!=EMPTY){::free(str-sizeof(FXint));}
   }
 
 
@@ -917,7 +909,7 @@ FXString& FXString::operator=(const FXwchar* s){
 
 // Assign another string to this string
 FXString& FXString::operator=(const FXString& s){
-  if(str!=s.str) assign(s.str,s.length());
+  if(__likely(str!=s.str)){ assign(s.str,s.length()); }
   return *this;
   }
 
@@ -954,10 +946,9 @@ FXString& FXString::operator+=(const FXString& s){
 
 // Adopt string s, leaving s empty
 FXString& FXString::adopt(FXString& s){
-  if(this!=&s){
-    if(str!=EMPTY){free(str-sizeof(FXint));}
-    str=s.str;
-    s.str=EMPTY;
+  if(__likely(str!=s.str)){ 
+    swap(str,s.str); 
+    s.clear(); 
     }
   return *this;
   }
@@ -1064,7 +1055,7 @@ FXString& FXString::assign(const FXwchar* s){
 
 // Assign input string to this string
 FXString& FXString::assign(const FXString& s){
-  if(str!=s.str) assign(s.str,s.length());
+  if(__likely(str!=s.str)){ assign(s.str,s.length()); }
   return *this;
   }
 
@@ -3455,13 +3446,13 @@ static FXint compose(FXwchar* result,FXint len){
 
 // Return normalized string
 FXString normalize(const FXString& s){
-  FXwchar* wcs=(FXwchar*)malloc(s.length()*sizeof(FXwchar));
+  FXwchar* wcs=(FXwchar*)::malloc(s.length()*sizeof(FXwchar));
   FXString result;
   if(wcs){
     FXint n=utf2wcs(wcs,s.text(),s.length(),s.length());
     normalize(wcs,n);
     result.assign(wcs,n);
-    free(wcs);
+    ::free(wcs);
     }
   return result;
   }
@@ -3472,7 +3463,7 @@ FXString normalize(const FXString& s){
 // tables change, make sure this code is updated.   We have an assert
 // just in case.
 FXString decompose(const FXString& s,FXbool canonical){
-  FXwchar* wcs=(FXwchar*)malloc(s.length()*sizeof(FXwchar)*18);
+  FXwchar* wcs=(FXwchar*)::malloc(s.length()*sizeof(FXwchar)*18);
   FXString result;
   if(wcs){
     FXwchar* ptr=wcs+s.length()*17;
@@ -3485,7 +3476,7 @@ FXString decompose(const FXString& s,FXbool canonical){
     FXASSERT(n<=s.length()*18);
     normalize(wcs,n);
     result.assign(wcs,n);
-    free(wcs);
+    ::free(wcs);
     }
   return result;
   }
@@ -3493,7 +3484,7 @@ FXString decompose(const FXString& s,FXbool canonical){
 
 // Return normalized composition of string, as utf8
 FXString compose(const FXString& s,FXbool canonical){
-  FXwchar* wcs=(FXwchar*)malloc(s.length()*sizeof(FXwchar)*18);
+  FXwchar* wcs=(FXwchar*)::malloc(s.length()*sizeof(FXwchar)*18);
   FXString result;
   if(wcs){
     FXwchar* ptr=wcs+s.length()*17;
@@ -3507,7 +3498,7 @@ FXString compose(const FXString& s,FXbool canonical){
     normalize(wcs,n);
     n=compose(wcs,n);
     result.assign(wcs,n);
-    free(wcs);
+    ::free(wcs);
     }
   return result;
   }

@@ -39,13 +39,12 @@
   - Obviously this will get fleshed out some more...
 */
 
-
-#if defined(WIN32)
+// Bad handle value
+#ifdef WIN32
 #define BadHandle INVALID_HANDLE_VALUE
 #else
 #define BadHandle -1
 #endif
-
 
 using namespace FX;
 
@@ -83,73 +82,9 @@ FXbool FXPipe::open(FXInputHandle h,FXuint m){
   return FXIODevice::open(h,m);
   }
 
+/*******************************************************************************/
 
-// Read block
-FXival FXPipe::readBlock(void* data,FXival count){
-  FXival nread=-1;
-  if(isOpen()){
-#if defined(WIN32)
-    DWORD nr;
-    if(::ReadFile(device,data,(DWORD)count,&nr,NULL)!=0){
-      nread=(FXival)nr;
-      }
-#else
-    do{
-      nread=::read(device,data,count);
-      }
-    while(nread<0 && errno==EINTR);
-#endif
-    }
-  return nread;
-  }
-
-
-// Write block
-FXival FXPipe::writeBlock(const void* data,FXival count){
-  FXival nwritten=-1;
-  if(isOpen()){
-#if defined(WIN32)
-    DWORD nw;
-    if(::WriteFile(device,data,(DWORD)count,&nw,NULL)!=0){
-      nwritten=(FXival)nw;
-      }
-#else
-    do{
-      nwritten=::write(device,data,count);
-      }
-    while(nwritten<0 && errno==EINTR);
-#endif
-    }
-  return nwritten;
-  }
-
-
-// Close pipe
-FXbool FXPipe::close(){
-  if(isOpen()){
-    if(access&OwnHandle){
-#if defined(WIN32)
-      if(::CloseHandle(device)!=0){
-        device=BadHandle;
-        access=NoAccess;
-        return true;
-        }
-#else
-      if(::close(device)==0){
-        device=BadHandle;
-        access=NoAccess;
-        return true;
-        }
-#endif
-      }
-    device=BadHandle;
-    access=NoAccess;
-    }
-  return false;
-  }
-
-
-// Create new (empty) file
+// Create a named pipe
 FXbool FXPipe::create(const FXString& file,FXuint perm){
   if(!file.empty()){
 #if defined(WIN32)
@@ -170,12 +105,6 @@ HANDLE WINAPI CreateNamedPipe(
 #endif
     }
   return false;
-  }
-
-
-// Destroy
-FXPipe::~FXPipe(){
-  close();
   }
 
 

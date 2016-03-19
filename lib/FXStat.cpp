@@ -218,6 +218,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
+// FIXME some other way to determine if its an executable??        
         if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
@@ -867,7 +868,7 @@ FXbool FXStat::isAccessible(const FXString& file,FXuint m){
     FXuint mode=0;
     if(m&FXIO::ReadOnly) mode|=4;
     if(m&FXIO::WriteOnly) mode|=2;
-    utf2ncs(unifile,path.text(),MAXPATHLEN);
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
     return _waccess(unifile,mode)==0;
 #else
     FXuint mode=0;
@@ -885,7 +886,7 @@ FXbool FXStat::isAccessible(const FXString& file,FXuint m){
     }
   return false;
   }
- 
+
 
 // Obtain total amount of space on disk
 FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){

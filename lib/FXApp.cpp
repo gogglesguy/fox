@@ -1035,7 +1035,7 @@ static HINSTANCE GetOwnModuleHandle(){
 
 // Open Input devices
 void FXApp::openInputDevices(){
-#if (_WIN32_WINNT >= 0x0501)
+#if 0 //(_WIN32_WINNT >= 0x0501)
   RAWINPUTDEVICELIST *devlist;
   RID_DEVICE_INFO devinfo;
   RAWINPUTDEVICE dev;
@@ -1122,8 +1122,7 @@ void FXApp::closeInputDevices(){
 //
 //	onMotion
 //
-long SpaceNav::onMotion(FXObject *, FXSelector, void *vp)
-{
+long SpaceNav::onMotion(FXObject *, FXSelector, void *vp){
 #if 1
     //
     // this is the "unbuffered read" method

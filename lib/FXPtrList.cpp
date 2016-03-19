@@ -64,16 +64,16 @@ FXbool FXPtrList::no(FXint num){
   if(__likely(old!=num)){
     if(0<num){
       if(ptr==EMPTY){
-        if((p=(FXptr*)malloc(ROUNDUP(num)*sizeof(FXptr)+sizeof(FXptr)))==NULL) return false;
+        if((p=(FXptr*)::malloc(ROUNDUP(num)*sizeof(FXptr)+sizeof(FXptr)))==NULL) return false;
         }
       else{
-        if((p=(FXptr*)realloc(ptr-1,ROUNDUP(num)*sizeof(FXptr)+sizeof(FXptr)))==NULL) return false;
+        if((p=(FXptr*)::realloc(ptr-1,ROUNDUP(num)*sizeof(FXptr)+sizeof(FXptr)))==NULL) return false;
         }
       ptr=p+1;
       *((FXint*)(ptr-1))=num;
       }
     else if(ptr!=EMPTY){
-      free(ptr-1);
+      ::free(ptr-1);
       ptr=EMPTY;
       }
     }
@@ -130,10 +130,9 @@ FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
 
 // Adopt objects from orig, leaving orig empty
 FXPtrList& FXPtrList::adopt(FXPtrList& orig){
-  if(__likely(ptr!=orig.ptr)){
-    if(ptr!=EMPTY){ free(ptr-1); }
-    ptr=orig.ptr;
-    orig.ptr=EMPTY;
+  if(__likely(ptr!=orig.ptr)){ 
+    swap(ptr,orig.ptr); 
+    orig.clear(); 
     }
   return *this;
   }
@@ -411,7 +410,7 @@ FXint FXPtrList::rfind(FXptr object,FXint pos) const {
 // Clear the list
 void FXPtrList::clear(){
   if(__likely(ptr!=EMPTY)){
-    free(ptr-1);
+    ::free(ptr-1);
     ptr=EMPTY;
     }
   }
@@ -419,9 +418,7 @@ void FXPtrList::clear(){
 
 // Free up nicely
 FXPtrList::~FXPtrList(){
-  if(__likely(ptr!=EMPTY)){
-    free(ptr-1);
-    }
+  clear();
   }
 
 }

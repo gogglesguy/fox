@@ -206,36 +206,8 @@ FXptr FXHash::find(FXptr name) const {
   }
 
 
-// Insert entry into the table, unless it already exists
-FXptr FXHash::insert(FXptr name,FXptr data){
-  if(__likely(LEGAL(name))){
-    register FXuval p,b,h,x;
-    p=b=h=HASH(name);
-    while(table[x=p&(no()-1)].name){
-      if(table[x].name==name) goto x;            // Return existing
-      p=(p<<2)+p+b+1;
-      b>>=BSHIFT;
-      }
-    if(__likely(free()>1+(no()>>2)) || __likely(resize(no()<<1))){
-      p=b=h;
-      while(table[x=p&(no()-1)].name){
-        if(table[x].name==VOID) goto y;         // Put into voided slot
-        p=(p<<2)+p+b+1;
-        b>>=BSHIFT;
-        }
-      free(free()-1);                           // Put into empty slot
-y:    used(used()+1);
-      table[x].name=name;
-      table[x].data=data;
-x:    return table[x].data;
-      }
-    }
-  return NULL;
-  }
-
-
 // Replace entry in the table, returning old one
-FXptr FXHash::replace(FXptr name,FXptr data){
+FXptr FXHash::insert(FXptr name,FXptr data){
   if(__likely(LEGAL(name))){
     register FXuval p,b,h,x;
     register FXptr old;
@@ -283,6 +255,20 @@ FXptr FXHash::remove(FXptr name){
     return old;
     }
 x:return NULL;
+  }
+
+
+// Erase data at pos in the table, returning old pointer
+FXptr FXHash::erase(FXival pos){
+  if(0<=pos && pos<no() && LEGAL(table[pos].name)){
+    register FXptr old=table[pos].data;
+    table[pos].name=VOID;                       // Void the slot (not empty!)
+    table[pos].data=NULL;
+    used(used()-1);
+    if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
+    return old;
+    }
+  return NULL;
   }
 
 

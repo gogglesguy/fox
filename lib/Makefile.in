@@ -138,9 +138,9 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo FXIcon.lo \
 	FXIconDict.lo FXIconList.lo FXIconSource.lo FXId.lo FXImage.lo \
 	FXImageFrame.lo FXImageView.lo FXInputDialog.lo FXIO.lo \
-	FXIODevice.lo FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo \
-	FXJPGImage.lo FXJSON.lo FXKnob.lo FXLabel.lo FXLFQueue.lo \
-	FXList.lo FXListBox.lo FXLocale.lo FXMDIButton.lo \
+	FXIOBuffer.lo FXIODevice.lo FXJP2Icon.lo FXJP2Image.lo \
+	FXJPGIcon.lo FXJPGImage.lo FXJSON.lo FXKnob.lo FXLabel.lo \
+	FXLFQueue.lo FXList.lo FXListBox.lo FXLocale.lo FXMDIButton.lo \
 	FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo FXMat2d.lo \
 	FXMat2f.lo FXMat3d.lo FXMat3f.lo FXMat4d.lo FXMat4f.lo \
 	FXMatrix.lo FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo \
@@ -166,18 +166,18 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXSpinner.lo FXSpinLock.lo FXSpheref.lo FXSphered.lo \
 	FXSplashWindow.lo FXSplitter.lo FXSpring.lo FXStat.lo \
 	FXStatusBar.lo FXStatusLine.lo FXStream.lo FXString.lo \
-	FXStringDict.lo FXSwitcher.lo FXSystem.lo FXTGAIcon.lo \
-	FXTGAImage.lo FXTIFIcon.lo FXTIFImage.lo FXTabBar.lo \
-	FXTabBook.lo FXTabItem.lo FXTable.lo FXTaskGroup.lo FXText.lo \
-	FXTextCodec.lo FXTextField.lo FXThread.lo FXThreadPool.lo \
-	FXToggleButton.lo FXToolBar.lo FXToolBarGrip.lo \
-	FXToolBarShell.lo FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo \
-	FXTranslator.lo FXTreeList.lo FXTreeListBox.lo \
-	FXTriStateButton.lo FXUndoList.lo FXURL.lo FXVariant.lo \
-	FXVariantArray.lo FXVariantMap.lo FXVec2d.lo FXVec2f.lo \
-	FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
-	FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo FXWindow.lo \
-	FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
+	FXStringDict.lo FXStringMap.lo FXSwitcher.lo FXSystem.lo \
+	FXTGAIcon.lo FXTGAImage.lo FXTIFIcon.lo FXTIFImage.lo \
+	FXTabBar.lo FXTabBook.lo FXTabItem.lo FXTable.lo \
+	FXTaskGroup.lo FXText.lo FXTextCodec.lo FXTextField.lo \
+	FXThread.lo FXThreadPool.lo FXToggleButton.lo FXToolBar.lo \
+	FXToolBarGrip.lo FXToolBarShell.lo FXToolBarTab.lo \
+	FXToolTip.lo FXTopWindow.lo FXTranslator.lo FXTreeList.lo \
+	FXTreeListBox.lo FXTriStateButton.lo FXUndoList.lo FXURL.lo \
+	FXVariant.lo FXVariantArray.lo FXVariantMap.lo FXVec2d.lo \
+	FXVec2f.lo FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo \
+	FXVerticalFrame.lo FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo \
+	FXWindow.lo FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxcpuid.lo \
 	fxbmpio.lo fxddsio.lo fxezquantize.lo fxfsquantize.lo \
 	fxgetticks.lo fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo \
@@ -655,6 +655,7 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXIOBuffer.cpp \
 FXIODevice.cpp \
 FXJP2Icon.cpp \
 FXJP2Image.cpp \
@@ -766,6 +767,7 @@ FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
 FXStringDict.cpp \
+FXStringMap.cpp \
 FXSwitcher.cpp \
 FXSystem.cpp \
 FXTGAIcon.cpp \
@@ -1092,6 +1094,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIFFIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIFFImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIO.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIOBuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIODevice.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIconDict.Plo@am__quote@
@@ -1213,6 +1216,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXString.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStringDict.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStringMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSwitcher.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSystem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTGAIcon.Plo@am__quote@

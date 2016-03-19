@@ -161,6 +161,7 @@ FXICOImage.h \
 FXIFFImage.h \
 FXIFFIcon.h \
 FXIO.h \
+FXIOBuffer.h \
 FXIODevice.h \
 FXIcon.h \
 FXIconDict.h \
@@ -284,6 +285,7 @@ FXStatusLine.h \
 FXStream.h \
 FXString.h \
 FXStringDict.h \
+FXStringMap.h \
 FXSwitcher.h \
 FXSystem.h \
 FXTGAIcon.h \

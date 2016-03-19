@@ -145,6 +145,12 @@ public:
   /// Write block of bytes, returning number of bytes written
   virtual FXival writeBlock(const void* data,FXival count);
 
+  /// Read character 
+  FXbool readChar(FXchar& ch);
+  
+  /// Write character
+  FXbool writeChar(FXchar ch);
+
   /// Truncate file
   virtual FXlong truncate(FXlong size);
 
@@ -154,7 +160,7 @@ public:
   /// Test if we're at the end; -1 if error
   virtual FXint eof();
 
-  /// Return size 
+  /// Return size
   virtual FXlong size();
 
   /// Close handle

@@ -117,7 +117,7 @@ public:
 
   /// Return type
   VType getType() const { return type; }
-  
+
   /// Return size of array
   FXint no() const;
 
@@ -127,14 +127,11 @@ public:
   /// Convert to bool
   FXbool toBool(FXbool* ok=NULL) const;
 
-  /// Convert to char
-  FXchar toChar(FXbool* ok=NULL) const;
-
   /// Convert to int
   FXint toInt(FXbool* ok=NULL) const;
 
   /// Convert to unsigned int
-  FXint toUInt(FXbool* ok=NULL) const;
+  FXuint toUInt(FXbool* ok=NULL) const;
 
   /// Convert to long
   FXlong toLong(FXbool* ok=NULL) const;
@@ -158,7 +155,16 @@ public:
   operator FXbool() const { return toBool(); }
 
   /// Convert to char
-  operator FXchar() const { return toChar(); }
+  operator FXchar() const { return toInt(); }
+
+  /// Convert to char
+  operator FXuchar() const { return toUInt(); }
+
+  /// Convert to short
+  operator FXshort() const { return toInt(); }
+
+  /// Convert to unsigned short
+  operator FXushort() const { return toUInt(); }
 
   /// Convert to int
   operator FXint() const { return toInt(); }
@@ -257,7 +263,7 @@ public:
   FXbool has(const FXchar* key) const;
 
   /// Check if key is mapped
-  FXbool has(const FXString& key) const;
+  FXbool has(const FXString& key) const { return has(key.text()); }
 
   /// Return the value of the variant as a long
   const FXlong& asLong() const { return value.i; }

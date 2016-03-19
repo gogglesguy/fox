@@ -307,6 +307,7 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXIOBuffer.cpp \
 FXIODevice.cpp \
 FXJP2Icon.cpp \
 FXJP2Image.cpp \
@@ -418,6 +419,7 @@ FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
 FXStringDict.cpp \
+FXStringMap.cpp \
 FXSwitcher.cpp \
 FXSystem.cpp \
 FXTGAIcon.cpp \

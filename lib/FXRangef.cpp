@@ -225,7 +225,7 @@ FXint FXRangef::intersect(const FXVec4f& plane) const {
 // Intersect box with ray u-v
 FXbool FXRangef::intersect(const FXVec3f& u,const FXVec3f& v) const {
   FXfloat hits[2];
-  return intersect(u,v-u,hits) && hits[1]<=1.0f;
+  return intersect(u,v-u,hits) && 0.0f<=hits[1] && hits[0]<=1.0f;
   }
 
 
@@ -245,7 +245,6 @@ FXbool FXRangef::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[]) 
       }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
-    if(f<0.0f) return false;
     }
   else{
     if((pos.x<lower.x) || (pos.x>upper.x)) return false;
@@ -262,7 +261,6 @@ FXbool FXRangef::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[]) 
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
-    if(f<0.0f) return false;
     }
   else{
     if((pos.y<lower.y) || (pos.y>upper.y)) return false;
@@ -279,12 +277,11 @@ FXbool FXRangef::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[]) 
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
-    if(f<0.0f) return false;
     }
   else{
     if((pos.z<lower.z) || (pos.z>upper.z)) return false;
     }
-  hit[0]=n;     // May be < 0
+  hit[0]=n;
   hit[1]=f;
   return true;
   }
