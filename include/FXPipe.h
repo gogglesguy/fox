@@ -18,10 +18,10 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPipe.h,v 1.13 2007/07/09 16:02:46 fox Exp $                            *
+* $Id: FXPipe.h,v 1.14 2007/08/02 13:30:10 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPIPE_H
-#define FXFILE_H
+#define FXPIPE_H
 
 #ifndef FXIO_H
 #include "FXIO.h"

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: bitmapviewer.cpp,v 1.23 2007/06/14 16:09:54 fox Exp $                    *
+* $Id: bitmapviewer.cpp,v 1.25 2007/08/10 16:49:32 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -577,9 +577,11 @@ long BitmapWindow::onCmdQuit(FXObject*,FXSelector,void*){
 
 // Update title
 long BitmapWindow::onUpdTitle(FXObject* sender,FXSelector,void*){
-  FXString caption="FOX Bitmap Viewer:- " + filename;
-  FXBitmap* image=bitmapview->getBitmap();
-  if(image){ caption+=" (" + FXStringVal(image->getWidth()) + " x " + FXStringVal(image->getHeight()) + ")"; }
+  FXString caption("FOX Image Viewer:- " + filename);
+  FXBitmap* bitmap=bitmapview->getBitmap();
+  if(bitmap){
+    caption.format("FOX Image Viewer:- %s (%d x %d)",filename.text(),bitmap->getWidth(),bitmap->getHeight());
+    }
   sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&caption);
   return 1;
   }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStream.cpp,v 1.75 2007/07/09 16:27:10 fox Exp $                        *
+* $Id: FXStream.cpp,v 1.79 2007/10/05 14:09:04 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -214,6 +214,7 @@ FXbool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
 
 // Flush buffer
 FXbool FXStream::flush(){
+  if(dir!=FXStreamSave){fxerror("FXStream::flush: illegal stream direction.\n");}
   writeBuffer(0);
   return code==FXStreamOK;
   }
@@ -619,7 +620,6 @@ FXStream& FXStream::operator>>(FXdouble& v){
     }
   return *this;
   }
-
 
 
 /************************  Load Blocks of Basic Types  *************************/

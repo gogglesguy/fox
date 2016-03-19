@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuButton.cpp,v 1.55 2007/07/09 16:27:02 fox Exp $                    *
+* $Id: FXMenuButton.cpp,v 1.56 2007/09/04 22:09:10 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -175,7 +175,7 @@ FXint FXMenuButton::getDefaultHeight(){
   if(icon) ih=icon->getHeight();
   if(!(options&(ICON_ABOVE_TEXT|ICON_BELOW_TEXT))) h=FXMAX(th,ih); else h=th+ih;
   h=padtop+padbottom+(border<<1)+h;
-  if((options&MENUBUTTON_LEFT) && (options&MENUBUTTON_ATTACH_BOTTOM)&&(options&MENUBUTTON_ATTACH_CENTER)){
+  if((options&MENUBUTTON_LEFT) && (options&MENUBUTTON_ATTACH_BOTTOM) && (options&MENUBUTTON_ATTACH_CENTER)){
     if(pane){ ph=pane->getDefaultHeight(); if(ph>h) h=ph; }
     }
   return h;
@@ -334,7 +334,7 @@ long FXMenuButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 long FXMenuButton::onHotKeyRelease(FXObject*,FXSelector,void*){
   return 1;
   }
-
+ 
 
 // Post the menu
 long FXMenuButton::onCmdPost(FXObject*,FXSelector,void*){

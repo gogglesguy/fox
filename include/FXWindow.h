@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.h,v 1.162 2007/07/09 16:02:51 fox Exp $                         *
+* $Id: FXWindow.h,v 1.163 2007/09/04 22:12:34 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXWINDOW_H
 #define FXWINDOW_H
@@ -780,6 +780,7 @@ public:
   /// Get background color
   FXColor getBackColor() const { return backColor; }
 
+  /// Does save-unders
   virtual FXbool doesSaveUnder() const;
 
   /**

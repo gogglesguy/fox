@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSwitcher.cpp,v 1.41 2007/07/09 16:27:11 fox Exp $                      *
+* $Id: FXSwitcher.cpp,v 1.44 2007/08/24 22:08:52 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,6 +43,7 @@
     the size to grow instead of shrinkwrap to the biggest child.
   - Thanks to Charles Warren for the suggestion for the collapse
     modes.
+  - The current panel number is adjusted if the number of panels changes.
 */
 
 
@@ -70,10 +71,13 @@ FXDEFMAP(FXSwitcher) FXSwitcherMap[]={
 FXIMPLEMENT(FXSwitcher,FXPacker,FXSwitcherMap,ARRAYNUMBER(FXSwitcherMap))
 
 
+// Serialization
+FXSwitcher::FXSwitcher():current(-1){
+  }
+
 
 // Make a switcher window
-FXSwitcher::FXSwitcher(FXComposite *p,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,0,0){
-  current=0;
+FXSwitcher::FXSwitcher(FXComposite *p,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,0,0),current(-1){
   }
 
 
@@ -157,7 +161,9 @@ void FXSwitcher::layout(){
   y=border+padtop;
   w=width-padright-padleft-(border<<1);
   h=height-padtop-padbottom-(border<<1);
-  for(i=0,child=getFirst(); child; child=child->getNext(),i++){
+  if(current<0) current=0;
+  if(current>=numChildren()) current=numChildren()-1;
+  for(child=getFirst(),i=0; child; child=child->getNext(),i++){
     child->position(x,y,w,h);
     if(i==current){
       child->show();
@@ -172,7 +178,7 @@ void FXSwitcher::layout(){
 
 // Set current subwindow
 void FXSwitcher::setCurrent(FXint panel,FXbool notify){
-  if(0<=panel && panel<numChildren() && current!=panel){
+  if(current!=panel && 0<=panel && panel<numChildren()){
     current=panel;
     recalc();
     if(notify && target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)current); }

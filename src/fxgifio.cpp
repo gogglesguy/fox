@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxgifio.cpp,v 1.83 2007/07/09 16:27:19 fox Exp $                         *
+* $Id: fxgifio.cpp,v 1.84 2007/08/07 01:19:06 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -60,7 +60,7 @@ namespace FX {
 
 
 extern FXAPI FXbool fxcheckGIF(FXStream& store);
-extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXbool alpha=true);
 extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
 
 
@@ -93,11 +93,11 @@ FXbool fxcheckGIF(FXStream& store){
 
 
 // Load image from stream
-FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXbool flag){
   const   FXint Yinit[4]={0,4,2,1};
   const   FXint Yinc[4]={8,8,4,2};
   FXint   imwidth,imheight,interlace,ncolors,npixels,maxpixels,i;
-  FXuchar c1,c2,c3,sbsize,flags,alpha,*ptr,*buf,*pix;
+  FXuchar c1,c2,c3,sbsize,flagbits,background,index,*ptr,*buf,*pix;
   FXColor colormap[256];
   FXint   BitOffset;                  // Bit Offset of next code
   FXint   ByteOffset;                 // Byte offset of next code
@@ -144,12 +144,12 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // Get screen descriptor
   store >> c1 >> c2;    // Skip screen width
   store >> c1 >> c2;    // Skip screen height
-  store >> flags;       // Get flags
-  store >> alpha;       // Background
+  store >> flagbits;    // Get flag bits
+  store >> background;  // Background
   store >> c2;          // Skip aspect ratio
 
   // Determine number of colors
-  ncolors=2<<(flags&7);
+  ncolors=2<<(flagbits&7);
   BitMask=ncolors-1;
 
   // If no colormap, spec says first 2 colors are black and white
@@ -157,7 +157,7 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   colormap[1]=FXRGB(255,255,255);
 
   // Read global map if there is one
-  if(flags&0x80){
+  if(flagbits&0x80){
     for(i=0; i<ncolors; i++){
       store >> ((FXuchar*)(colormap+i))[0];     // Blue
       store >> ((FXuchar*)(colormap+i))[1];     // Green
@@ -178,12 +178,13 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       if(c2==TAG_GRAPHIC){
         store >> sbsize;
         if(sbsize!=TAG_GRAPHICSIZE) return false;
-        store >> flags;         // Flags
+        store >> flagbits;      // Flag bits
         store >> c3 >> c3;      // Delay time
-        store >> alpha;         // Alpha color index; we suspect alpha<ncolors not always true...
+        store >> index;         // Alpha color index; we suspect alpha<ncolors not always true...
         store >> c3;
-        if(flags&1){            // Clear alpha channel of alpha color
-          colormap[alpha]&=FXRGBA(255,255,255,0);       // Clear the alpha channel but keep the RGB
+        if(flagbits&1){            // Clear alpha channel of alpha color
+          background=index;
+          flag=true;
           }
         continue;
         }
@@ -211,11 +212,11 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       imheight=(c2<<8)+c1;
 
       // Get image flags
-      store >> flags;
+      store >> flagbits;
 
       // Read local map if there is one
-      if(flags&0x80){
-        ncolors=2<<(flags&7);
+      if(flagbits&0x80){
+        ncolors=2<<(flagbits&7);
         for(i=0; i<ncolors; i++){
           store >> ((FXuchar*)(colormap+i))[0]; // Red
           store >> ((FXuchar*)(colormap+i))[1]; // Green
@@ -225,7 +226,7 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         }
 
       // Interlaced image
-      interlace=(flags&0x40);
+      interlace=(flagbits&0x40);
 
       // Total pixels expected
       maxpixels=imwidth*imheight;
@@ -427,7 +428,7 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
       // Technically, this is incorrect; but we have so
       // many GIF87a's that we have to keep doing this!
-      colormap[alpha]&=FXRGBA(255,255,255,0);
+      if(flag){ colormap[background]&=FXRGBA(255,255,255,0); }
 
       // Apply colormap
       for(i=0; i<maxpixels; i++){
@@ -453,7 +454,7 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 
 // Save a gif file to a stream
-FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast){
+FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool flag){
   FXuint   clearcode,endcode,freecode,findcode,prefix,current,outaccu,initcodesize,codesize,hash,step;
   FXint    maxpixels,ncolors,bitsperpixel,colormapsize,outbits,src,dst,i;
   FXuchar  c1,c2,alpha,*pixels,*output;
@@ -474,7 +475,7 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   // First, try EZ quantization, because it is exact; a previously
   // loaded GIF will be re-saved with exactly the same colors.
   if(!fxezquantize(pixels,data,colormap,ncolors,width,height,256)){
-    if(fast){
+    if(flag){
       fxfsquantize(pixels,data,colormap,ncolors,width,height,256);
       }
     else{

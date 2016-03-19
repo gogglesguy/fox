@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconList.h,v 1.116 2007/07/09 16:02:45 fox Exp $                       *
+* $Id: FXIconList.h,v 1.117 2007/08/11 17:39:21 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXICONLIST_H
 #define FXICONLIST_H
@@ -209,8 +209,6 @@ protected:
   FXColor            selbackColor;      // Selected back color
   FXColor            seltextColor;      // Selected text color
   FXint              itemSpace;         // Space for item label
-  FXint              listWidth;         // List width
-  FXint              listHeight;        // List height
   FXint              itemWidth;         // Item width
   FXint              itemHeight;        // Item height
   FXint              anchorx;           // Rectangular selection

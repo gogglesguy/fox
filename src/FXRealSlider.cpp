@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRealSlider.cpp,v 1.31 2007/07/09 16:27:06 fox Exp $                    *
+* $Id: FXRealSlider.cpp,v 1.34 2007/09/20 18:00:51 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -123,11 +123,11 @@ FXRealSlider::FXRealSlider(){
 // Make a slider
 FXRealSlider::FXRealSlider(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb){
   flags|=FLAG_ENABLED;
-  slotColor=getApp()->getBackColor();
   baseColor=getApp()->getBaseColor();
   hiliteColor=getApp()->getHiliteColor();
   shadowColor=getApp()->getShadowColor();
   borderColor=getApp()->getBorderColor();
+  slotColor=getApp()->getBackColor();
   target=tgt;
   message=sel;
   range[0]=0.0;
@@ -137,9 +137,9 @@ FXRealSlider::FXRealSlider(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint op
   gran=0.0;
   delta=0.0;
   headpos=0;
-  dragpoint=0;
   headsize=(options&REALSLIDER_INSIDE_BAR)?HEADINSIDEBAR:HEADOVERHANGING;
   slotsize=5;
+  dragpoint=0;
   }
 
 
@@ -237,7 +237,7 @@ long FXRealSlider::onCmdGetTip(FXObject*,FXSelector,void* ptr){
 
 // We were asked about tip text
 long FXRealSlider::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !tip.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
     return 1;
@@ -248,7 +248,7 @@ long FXRealSlider::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXRealSlider::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;
@@ -884,6 +884,7 @@ long FXRealSlider::onPaint(FXObject*,FXSelector,void* ptr){
 void FXRealSlider::setRange(FXdouble lo,FXdouble hi,FXbool notify){
   if(lo>hi){ fxerror("%s::setRange: trying to set negative range.\n",getClassName()); }
   if(range[0]!=lo || range[1]!=hi){
+    if(options&(REALSLIDER_TICKS_TOP|REALSLIDER_TICKS_BOTTOM)) update();
     range[0]=lo;
     range[1]=hi;
     setValue(pos,notify);
@@ -993,10 +994,8 @@ void FXRealSlider::setSlotColor(FXColor clr){
 void FXRealSlider::setTickDelta(FXdouble dist){
   if(dist<0.0) dist=0.0;
   if(delta!=dist){
+    if(options&(REALSLIDER_TICKS_TOP|REALSLIDER_TICKS_BOTTOM)) update();
     delta=dist;
-    if(options&(REALSLIDER_TICKS_TOP|REALSLIDER_TICKS_BOTTOM)){
-      recalc();
-      }
     }
   }
 

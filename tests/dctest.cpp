@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: dctest.cpp,v 1.53 2007/02/07 20:22:23 fox Exp $                          *
+* $Id: dctest.cpp,v 1.54 2007/08/10 16:35:33 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>
@@ -1300,6 +1300,7 @@ long DCTestWindow::onPaintImages(FXObject *sender,FXSelector,void *ptr){
 // This is the WYSIWYG routine, it takes a DC and renders
 // into it; it does not know if the DC is a printer or screen.
 void DCTestWindow::drawPage(FXDC& dc,FXint w,FXint h){
+  FXString string;
 
   dc.setForeground(erasecolor);
   dc.fillRectangle(0,0,w,h);
@@ -1330,7 +1331,8 @@ void DCTestWindow::drawPage(FXDC& dc,FXint w,FXint h){
   points[5].x=points[4].x+w/6; points[5].y=points[1].y;
   dc.drawLines(points,6);
 
-  FXString string="Font: "+testFont->getName()+"  Size: "+FXStringVal(testFont->getSize()/10);
+  string.format("Font: %s Size: %d",testFont->getName().text(),testFont->getSize()/10);
+  
   dc.setFont(testFont);
   dc.setForeground(forecolor);
   dc.setBackground(backcolor);

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGZFileStream.cpp,v 1.10 2007/07/09 16:26:56 fox Exp $                  *
+* $Id: FXGZFileStream.cpp,v 1.12 2007/10/05 14:09:04 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -57,7 +57,7 @@ struct ZBlock {
 
 
 // Initialize file stream
-FXGZFileStream::FXGZFileStream(const FXObject* cont):FXFileStream(cont),z(NULL),f(0){
+FXGZFileStream::FXGZFileStream(const FXObject* cont):FXFileStream(cont),gz(NULL),ac(0){
   }
 
 
@@ -68,18 +68,18 @@ FXuval FXGZFileStream::writeBuffer(FXuval){
   FXASSERT(begptr<=rdptr);
   FXASSERT(rdptr<=wrptr);
   FXASSERT(wrptr<=endptr);
-  while(rdptr<wrptr){
-    z->stream.next_in=(Bytef*)rdptr;
-    z->stream.avail_in=wrptr-rdptr;
-    z->stream.next_out=z->buffer;
-    z->stream.avail_out=BUFFERSIZE;
-    zerror=deflate(&z->stream,f);
-//    if(zerror!=Z_OK) break;
-    if(!(zerror==Z_OK || zerror==Z_STREAM_END)) break;
-    m=z->stream.next_out-z->buffer;
-    n=file.writeBlock(z->buffer,m);
-    if(n<m) break;
-    rdptr=(FXuchar*)z->stream.next_in;
+  while(rdptr<wrptr || ac==Z_FINISH || ac==Z_SYNC_FLUSH){
+    gz->stream.next_in=(Bytef*)rdptr;
+    gz->stream.avail_in=wrptr-rdptr;
+    gz->stream.next_out=gz->buffer;
+    gz->stream.avail_out=BUFFERSIZE;
+    zerror=deflate(&gz->stream,ac);
+    if(zerror<Z_OK) break;                              // Error occurred
+    m=gz->stream.next_out-gz->buffer;
+    n=file.writeBlock(gz->buffer,m);
+    if(n<m) break;                                      // Failed to write data
+    rdptr=(FXuchar*)gz->stream.next_in;
+    if(zerror==Z_STREAM_END) break;                     // Flushed or finished all data
     }
   if(rdptr<wrptr){memmove(begptr,rdptr,wrptr-rdptr);}
   wrptr=begptr+(wrptr-rdptr);
@@ -99,22 +99,17 @@ FXuval FXGZFileStream::readBuffer(FXuval){
   wrptr=begptr+(wrptr-rdptr);
   rdptr=begptr;
   while(wrptr<endptr){
-//    n=file.readBlock(z->buffer,BUFFERSIZE);
-//    if(n<=0) break;
-//    z->stream.next_in=z->buffer;
-//    z->stream.avail_in=n;
-    if(z->stream.avail_in<=0){  // Get more input if buffer is empty
-      n=file.readBlock(z->buffer,BUFFERSIZE);
+    if(gz->stream.avail_in<=0){                         // Read more input 
+      n=file.readBlock(gz->buffer,BUFFERSIZE);
       if(n<=0) break;
-      z->stream.next_in=z->buffer;
-      z->stream.avail_in=n;
+      gz->stream.next_in=gz->buffer;
+      gz->stream.avail_in=n;
       }
-    z->stream.next_out=(Bytef*)wrptr;
-    z->stream.avail_out=endptr-wrptr;
-    zerror=inflate(&z->stream,Z_NO_FLUSH);
-//    if(zerror!=Z_OK) break;
-    if(!(zerror==Z_OK || zerror==Z_STREAM_END)) break;
-    wrptr=(FXuchar*)z->stream.next_out;
+    gz->stream.next_out=(Bytef*)wrptr;
+    gz->stream.avail_out=endptr-wrptr;
+    zerror=inflate(&gz->stream,Z_NO_FLUSH);
+    if(zerror<Z_OK) break;                              // Error occurred
+    wrptr=(FXuchar*)gz->stream.next_out;
     if(zerror==Z_STREAM_END) break;
     }
   return wrptr-rdptr;
@@ -124,24 +119,24 @@ FXuval FXGZFileStream::readBuffer(FXuval){
 // Try open file stream
 FXbool FXGZFileStream::open(const FXString& filename,FXStreamDirection save_or_load,FXuval size){
   if(FXFileStream::open(filename,save_or_load,size)){
-    if(callocElms(z,1)){
+    if(callocElms(gz,1)){
       int zerror;
-      z->stream.next_in=NULL;
-      z->stream.avail_in=0;
-      z->stream.next_out=NULL;
-      z->stream.avail_out=0;
-      f=Z_NO_FLUSH;
+      gz->stream.next_in=NULL;
+      gz->stream.avail_in=0;
+      gz->stream.next_out=NULL;
+      gz->stream.avail_out=0;
+      ac=Z_NO_FLUSH;
       if(save_or_load==FXStreamLoad){
-        zerror=inflateInit(&z->stream);
+        zerror=inflateInit(&gz->stream);
         if(zerror==Z_OK) return true;
         code=FXStreamNoRead;
         }
       else{
-        zerror=deflateInit(&z->stream,Z_DEFAULT_COMPRESSION);
+        zerror=deflateInit(&gz->stream,Z_DEFAULT_COMPRESSION);
         if(zerror==Z_OK) return true;
         code=FXStreamNoWrite;
         }
-      freeElms(z);
+      freeElms(gz);
       }
     FXFileStream::close();
     }
@@ -149,19 +144,31 @@ FXbool FXGZFileStream::open(const FXString& filename,FXStreamDirection save_or_l
   }
 
 
+// Flush buffer
+FXbool FXGZFileStream::flush(){
+  FXbool result;
+  int action=ac;
+  if(ac!=Z_FINISH) ac=Z_SYNC_FLUSH;
+  result=FXStream::flush();
+  ac=action;
+  return result;
+  }
+
+
+
 // Close file stream
 FXbool FXGZFileStream::close(){
   if(dir){
     if(dir==FXStreamLoad){
       FXFileStream::close();
-      inflateEnd(&z->stream);
+      inflateEnd(&gz->stream);
       }
     else{
-      f=Z_FINISH;
+      ac=Z_FINISH;
       FXFileStream::close();
-      deflateEnd(&z->stream);
+      deflateEnd(&gz->stream);
       }
-    freeElms(z);
+    freeElms(gz);
     return true;
     }
   return false;

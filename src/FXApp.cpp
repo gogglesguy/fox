@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.688 2007/07/25 17:38:41 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.689 2007/09/07 21:02:41 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -2940,6 +2940,11 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
       case MappingNotify:
         FXTRACE((100,"MappingNotify\n"));
         if(ev.xmapping.request!=MappingPointer) XRefreshKeyboardMapping(&ev.xmapping);
+        return true;
+
+      // Visibility notification
+      case VisibilityNotify:
+        FXTRACE((100,"VisibilityNotify window=%ld %s\n",ev.xvisibility.window,(ev.xvisibility.state==VisibilityUnobscured)?"VisibilityUnobscured":(ev.xvisibility.state==VisibilityPartiallyObscured)?"VisibilityPartiallyObscured":"VisibilityFullyObscured"));
         return true;
 
       // Other events

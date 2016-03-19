@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXConsole.cpp,v 1.19 2007/07/09 16:26:45 fox Exp $                       *
+* $Id: FXConsole.cpp,v 1.20 2007/09/26 21:53:31 fox Exp $                       *
 ********************************************************************************/
 #include <new>
 #include "xincs.h"
@@ -54,9 +54,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
-// Explicit template specialization
-//template class FXArray<FXString>;
 
 
 FXDEFMAP(FXConsole) FXConsoleMap[]={

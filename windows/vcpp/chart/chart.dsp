@@ -88,11 +88,59 @@ LIB32=link.exe -lib
 # Name "chart - Win32 Debug"
 # Begin Source File
 
+SOURCE=..\..\..\chart\chart.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\chartdefs.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\chartutils.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\chartutils.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FX2DChart.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FX2DChart.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FX2DPlot.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FX2DPlot.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FXAxis.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FXAxis.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\chart\FXChart.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\chart\FXChart.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FXCurve.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\chart\FXCurve.h
 # End Source File
 # End Target
 # End Project

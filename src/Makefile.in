@@ -78,11 +78,8 @@ GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 GL_LIBS = @GL_LIBS@
 GL_TESTS = @GL_TESTS@
-HAVE_LIB = @HAVE_LIB@
-LIB = @LIB@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
-LTLIB = @LTLIB@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_RELEASE = @LT_RELEASE@
@@ -2355,11 +2352,13 @@ FXMainWindow.lo FXMainWindow.o : FXMainWindow.cpp ../include/xincs.h \
 FXMat3d.lo FXMat3d.o : FXMat3d.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/FXHash.h ../include/FXStream.h \
 	../include/FXObject.h ../include/FXVec2d.h ../include/FXVec3d.h \
-	../include/FXVec4d.h ../include/FXQuatd.h ../include/FXMat3d.h
+	../include/FXVec4d.h ../include/FXQuatd.h ../include/FXMat3d.h \
+	../include/FXMat4d.h
 FXMat3f.lo FXMat3f.o : FXMat3f.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/FXHash.h ../include/FXStream.h \
 	../include/FXObject.h ../include/FXVec2f.h ../include/FXVec3f.h \
-	../include/FXVec4f.h ../include/FXQuatf.h ../include/FXMat3f.h
+	../include/FXVec4f.h ../include/FXQuatf.h ../include/FXMat3f.h \
+	../include/FXMat4f.h
 FXMat4d.lo FXMat4d.o : FXMat4d.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/FXHash.h ../include/FXStream.h \
 	../include/FXObject.h ../include/FXVec2d.h ../include/FXVec3d.h \

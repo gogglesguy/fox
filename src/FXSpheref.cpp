@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSpheref.cpp,v 1.26 2007/07/09 16:27:10 fox Exp $                       *
+* $Id: FXSpheref.cpp,v 1.28 2007/09/10 15:47:41 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -147,13 +147,13 @@ FXSpheref& FXSpheref::include(const FXRangef& box){
   if(box.lower.x<=box.upper.x && box.lower.y<=box.upper.y && box.lower.z<=box.upper.z){
     if(0.0f<=radius){
       include(box.corner(0));
+      include(box.corner(7));
       include(box.corner(1));
+      include(box.corner(6));
       include(box.corner(2));
+      include(box.corner(5));
       include(box.corner(3));
       include(box.corner(4));
-      include(box.corner(5));
-      include(box.corner(6));
-      include(box.corner(7));
       return *this;
       }
     center=box.center();
@@ -168,13 +168,13 @@ FXSpheref& FXSpheref::includeInRadius(const FXRangef& box){
   if(box.lower.x<=box.upper.x && box.lower.y<=box.upper.y && box.lower.z<=box.upper.z){
     if(0.0f<=radius){
       includeInRadius(box.corner(0));
+      includeInRadius(box.corner(7));
       includeInRadius(box.corner(1));
+      includeInRadius(box.corner(6));
       includeInRadius(box.corner(2));
+      includeInRadius(box.corner(5));
       includeInRadius(box.corner(3));
       includeInRadius(box.corner(4));
-      includeInRadius(box.corner(5));
-      includeInRadius(box.corner(6));
-      includeInRadius(box.corner(7));
       return *this;
       }
     center=box.center();
@@ -235,11 +235,11 @@ FXSpheref& FXSpheref::includeInRadius(const FXSpheref& sphere){
 FXint FXSpheref::intersect(const FXVec4f& plane) const {
   register FXfloat dist=plane.distance(center);
 
-  // Lower point on positive side of plane
-  if(dist>=radius) return 1;
-
   // Upper point on negative side of plane
   if(dist<=-radius) return -1;
+
+  // Lower point on positive side of plane
+  if(dist>=radius) return 1;
 
   // Overlap
   return 0;

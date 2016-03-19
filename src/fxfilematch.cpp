@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxfilematch.cpp,v 1.19 2007/07/09 16:27:19 fox Exp $                     *
+* $Id: fxfilematch.cpp,v 1.20 2007/09/16 04:31:29 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -122,8 +122,8 @@ static FXbool domatch(const char *pattern,const char *string,FXuint flags){
           c=FOLD(c);
           if((flags&FILEMATCH_FILE_NAME) && ISPATHSEP(c)) return false;
           if(c=='-' && *p!=']'){
-            ce = *p++;
-            if(ce=='\\' && !(flags&FILEMATCH_NOESCAPE)) c=*p++;
+            c = *p++;
+            if(c=='\\' && !(flags&FILEMATCH_NOESCAPE)) c=*p++;
             if(c=='\0') return false;
             ce=FOLD(c);
             c=*p++;

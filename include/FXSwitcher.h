@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSwitcher.h,v 1.21 2007/07/09 16:02:50 fox Exp $                        *
+* $Id: FXSwitcher.h,v 1.22 2007/08/24 22:08:52 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXSWITCHER_H
 #define FXSWITCHER_H
@@ -56,7 +56,7 @@ class FXAPI FXSwitcher : public FXPacker {
 protected:
   FXint  current;
 protected:
-  FXSwitcher(){}
+  FXSwitcher();
 private:
   FXSwitcher(const FXSwitcher&);
   FXSwitcher& operator=(const FXSwitcher&);

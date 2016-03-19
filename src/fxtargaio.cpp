@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxtargaio.cpp,v 1.36 2007/07/09 16:27:23 fox Exp $                       *
+* $Id: fxtargaio.cpp,v 1.37 2007/08/09 15:09:44 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -808,7 +808,7 @@ FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // but other pixel depths could be used.
   store >> PixelDepth;
 
-//  FXTRACE((100,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d width=%d height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,width,height));
+  //FXTRACE((100,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d width=%d height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,width,height));
 
   // Don't load too many colors
   if(ColorMapLength>256) return false;

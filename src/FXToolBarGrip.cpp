@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToolBarGrip.cpp,v 1.36 2007/07/09 16:27:16 fox Exp $                   *
+* $Id: FXToolBarGrip.cpp,v 1.37 2007/08/27 18:51:00 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,8 +71,6 @@ FXDEFMAP(FXToolBarGrip) FXToolBarGripMap[]={
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXToolBarGrip::onLeftBtnRelease),
   FXMAPFUNC(SEL_KEYPRESS,0,FXToolBarGrip::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXToolBarGrip::onKeyRelease),
-  FXMAPFUNC(SEL_QUERY_TIP,0,FXToolBarGrip::onQueryTip),
-  FXMAPFUNC(SEL_QUERY_HELP,0,FXToolBarGrip::onQueryHelp),
   FXMAPFUNC(SEL_COMMAND,FXToolBarGrip::ID_SETHELPSTRING,FXToolBarGrip::onCmdSetHelp),
   FXMAPFUNC(SEL_COMMAND,FXToolBarGrip::ID_GETHELPSTRING,FXToolBarGrip::onCmdGetHelp),
   FXMAPFUNC(SEL_COMMAND,FXToolBarGrip::ID_SETTIPSTRING,FXToolBarGrip::onCmdSetTip),

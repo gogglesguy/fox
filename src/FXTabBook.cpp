@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTabBook.cpp,v 1.29 2007/07/09 16:27:11 fox Exp $                       *
+* $Id: FXTabBook.cpp,v 1.30 2007/08/23 21:44:12 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -52,7 +52,6 @@
     the position of each pane when the FXTabBook itself changes.
     Only the active pane needs to be resized, leading to much faster
     layouts.
-  - Fix setCurrent() to be like FXSwitcher.
 */
 
 #define TABBOOK_MASK       (TABBOOK_SIDEWAYS|TABBOOK_BOTTOMTABS)

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: parsesyntax.cpp,v 1.17 2007/07/06 04:22:29 fox Exp $                     *
+* $Id: parsesyntax.cpp,v 1.19 2007/08/10 22:06:38 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -35,6 +35,8 @@
 /*
   Notes:
   - Parses Adie syntax and style file.
+  - Needs to be redone some day!  Current "string" syntax is strange; replace this
+    with the one from FXString escape/unescape.
 */
 
 #define MAXLINE         2048
@@ -53,8 +55,8 @@ private:
   FXchar    buffer[MAXLINE];
 private:
   FXchar* getline();
+  FXint integer();
   const FXchar* token();
-  const FXchar* word();
   const FXchar* string();
 public:
   Parser(const FXString& fn):file(fn),line(NULL),tok(NULL),fp(NULL),number(0){}
@@ -87,13 +89,13 @@ const FXchar* Parser::token(){
 
 
 // Parse word from line
-const FXchar* Parser::word(){
+FXint Parser::integer(){
   register FXchar *value;
   while(*line && isspace((FXuchar)*line)) line++;
   value=line;
   while(*line && !isspace((FXuchar)*line)) line++;
   *line++='\0';
-  return value;
+  return strtol(value,NULL,10);
   }
 
 
@@ -261,11 +263,11 @@ FXbool Parser::parse(FXSyntaxList& syntaxes){
         continue;
         }
       if(strcmp(tok,"contextlines")==0){        // Context lines
-        syntax->setContextLines(FXIntVal(word()));
+        syntax->setContextLines(integer());
         continue;
         }
       if(strcmp(tok,"contextchars")==0){        // Context chars
-        syntax->setContextChars(FXIntVal(word()));
+        syntax->setContextChars(integer());
         continue;
         }
       break;

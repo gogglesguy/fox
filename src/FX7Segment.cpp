@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX7Segment.cpp,v 1.23 2007/07/09 16:26:42 fox Exp $                      *
+* $Id: FX7Segment.cpp,v 1.27 2007/08/27 18:50:59 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -240,49 +240,49 @@ long FX7Segment::onCmdSetValue(FXObject*,FXSelector,void *ptr){
 
 // Get value as int
 long FX7Segment::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr)=FXIntVal(label);
+  *((FXint*)ptr)=label.toInt();
   return 1;
   }
 
 
 // Set value from int
 long FX7Segment::onCmdSetIntValue(FXObject*,FXSelector,void *ptr){
-  setText(FXStringVal(*((FXint*)ptr)));
+  setText(FXString::value(*((FXint*)ptr)));
   return 1;
   }
 
 
 // Update value from a message
 long FX7Segment::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
-  setText(FXStringVal(*((FXlong*)ptr)));
+  setText(FXString::value(*((FXlong*)ptr)));
   return 1;
   }
 
 
 // Obtain value with a message
 long FX7Segment::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
-  *((FXlong*)ptr)=FXLongVal(label);
+  *((FXlong*)ptr)=label.toLong();
   return 1;
   }
 
 
 // Get value as double
 long FX7Segment::onCmdGetRealValue(FXObject*,FXSelector,void* ptr){
-  *((FXdouble*)ptr)=FXDoubleVal(label);
+  *((FXdouble*)ptr)=label.toDouble();
   return 1;
   }
 
 
 // Set value from double
 long FX7Segment::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
-  setText(FXStringVal(*((FXdouble*)ptr)));
+  setText(FXString::value(*((FXdouble*)ptr)));
   return 1;
   }
 
 
 // Get value as string
 long FX7Segment::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr)=FXIntVal(label);
+  *((FXString*)ptr)=getText();
   return 1;
   }
 
@@ -324,7 +324,7 @@ long FX7Segment::onCmdGetTip(FXObject*,FXSelector,void* ptr){
 
 // We were asked about tip text
 long FX7Segment::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !tip.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
     return 1;
@@ -335,7 +335,7 @@ long FX7Segment::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FX7Segment::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;

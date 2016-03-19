@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.h,v 1.12 2007/07/09 16:02:41 fox Exp $                    *
+* $Id: FXBZFileStream.h,v 1.13 2007/10/01 20:54:39 fox Exp $                    *
 ********************************************************************************/
 #ifdef HAVE_BZ2LIB_H
 #ifndef FXBZFILESTREAM_H
@@ -50,6 +50,9 @@ public:
 
   /// Open file stream
   FXbool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
+
+  /// Flush buffer
+  virtual FXbool flush();
 
   /// Close file stream
   virtual FXbool close();

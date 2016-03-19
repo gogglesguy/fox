@@ -1129,7 +1129,8 @@ static FXString slantToString(FXuint slant){
 
 // Update dialog according to new font
 void FXDesktopSetup::setupFont(){
-  FXString fontname=font->getActualName()+", "+FXStringVal(font->getSize()/10);
+  FXString fontname;
+  fontname=font->getActualName()+", "+FXString::value(font->getSize()/10);
   if(font->getWeight()!=0 && font->getWeight()!=FXFont::Normal){
     fontname+=", "+weightToString(font->getWeight());
     }

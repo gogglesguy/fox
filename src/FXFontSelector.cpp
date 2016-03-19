@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFontSelector.cpp,v 1.61 2007/07/09 16:26:54 fox Exp $                  *
+* $Id: FXFontSelector.cpp,v 1.62 2007/08/10 04:40:19 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -460,7 +460,7 @@ long FXFontSelector::onCmdSize(FXObject*,FXSelector,void* ptr){
 
 // User clicked up directory button
 long FXFontSelector::onCmdSizeText(FXObject*,FXSelector,void*){
-  selected.size=(FXuint)(10.0*FXFloatVal(size->getText()));
+  selected.size=(FXuint)(10.0*size->getText().toFloat());
   if(selected.size<60) selected.size=60;
   if(selected.size>2400) selected.size=2400;
   previewFont();

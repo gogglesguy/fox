@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4f.h,v 1.19 2007/07/09 16:02:46 fox Exp $                           *
+* $Id: FXMat4f.h,v 1.27 2007/09/24 21:00:49 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT4F_H
 #define FXMAT4F_H
@@ -27,30 +27,55 @@
 namespace FX {
 
 
+class FXMat3f;
+
+
 /// Single-precision 4x4 matrix
 class FXAPI FXMat4f {
 protected:
   FXVec4f m[4];
 public:
-  /// Constructors
+
+  /// Default constructor
   FXMat4f(){}
+
+  /// Initialize matrix from another matrix
+  FXMat4f(const FXMat4f& other);
+
+  /// Initialize with 3x3 rotation and scaling matrix
+  FXMat4f(const FXMat3f& other);
+
+  /// Initialize matrix from scalar
   FXMat4f(FXfloat w);
+  
+  /// Initialize diagonal matrix 
+  FXMat4f(FXfloat a,FXfloat b,FXfloat c,FXfloat d);
+
+  /// Initialize matrix from components
   FXMat4f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,
           FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,
           FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,
           FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33);
+
+  /// Initialize matrix from four vectors
   FXMat4f(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4f& d);
-  FXMat4f(const FXMat4f& other);
 
   /// Assignment
   FXMat4f& operator=(const FXMat4f& other);
+  FXMat4f& operator=(const FXMat3f& other);
   FXMat4f& operator=(FXfloat w);
 
   /// Set value from another matrix
   FXMat4f& set(const FXMat4f& other);
 
+  /// Set value from 3x3 rotation and scaling matrix
+  FXMat4f& set(const FXMat3f& other);
+
   /// Set value from scalar
   FXMat4f& set(FXfloat w);
+
+  /// Set diagonal matrix 
+  FXMat4f& set(FXfloat a,FXfloat b,FXfloat c,FXfloat d);
 
   /// Set value from components
   FXMat4f& set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,
@@ -64,8 +89,8 @@ public:
   /// Assignment operators
   FXMat4f& operator+=(const FXMat4f& w);
   FXMat4f& operator-=(const FXMat4f& w);
-  FXMat4f& operator*=(FXfloat w);
   FXMat4f& operator*=(const FXMat4f& w);
+  FXMat4f& operator*=(FXfloat w);
   FXMat4f& operator/=(FXfloat w);
 
   /// Indexing
@@ -84,12 +109,6 @@ public:
   FXMat4f operator-(const FXMat4f& w) const;
   FXMat4f operator*(const FXMat4f& w) const;
 
-  /// Other operators
-  friend FXAPI FXMat4f operator*(FXfloat x,const FXMat4f& a);
-  friend FXAPI FXMat4f operator*(const FXMat4f& a,FXfloat x);
-  friend FXAPI FXMat4f operator/(const FXMat4f& a,FXfloat x);
-  friend FXAPI FXMat4f operator/(FXfloat x,const FXMat4f& a);
-
   /// Multiply matrix and vector
   FXVec4f operator*(const FXVec4f& v) const;
   FXVec3f operator*(const FXVec3f& v) const;
@@ -98,11 +117,17 @@ public:
   FXbool operator==(const FXMat4f& a) const;
   FXbool operator!=(const FXMat4f& a) const;
 
-  friend inline FXbool operator==(const FXMat4f& a,FXfloat n);
-  friend inline FXbool operator==(FXfloat n,const FXMat4f& a);
+  friend FXAPI FXbool operator==(const FXMat4f& a,FXfloat n);
+  friend FXAPI FXbool operator==(FXfloat n,const FXMat4f& a);
 
-  friend inline FXbool operator!=(const FXMat4f& a,FXfloat n);
-  friend inline FXbool operator!=(FXfloat n,const FXMat4f& a);
+  friend FXAPI FXbool operator!=(const FXMat4f& a,FXfloat n);
+  friend FXAPI FXbool operator!=(FXfloat n,const FXMat4f& a);
+
+  /// Matrix and scalar
+  friend FXAPI FXMat4f operator*(FXfloat x,const FXMat4f& a);
+  friend FXAPI FXMat4f operator*(const FXMat4f& a,FXfloat x);
+  friend FXAPI FXMat4f operator/(const FXMat4f& a,FXfloat x);
+  friend FXAPI FXMat4f operator/(FXfloat x,const FXMat4f& a);
 
   /// Set to identity matrix
   FXMat4f& identity();
@@ -130,6 +155,9 @@ public:
 
   /// Multiply by left-hand matrix
   FXMat4f& left();
+
+  /// Multiply by rotation matrix
+  FXMat4f& rot(const FXMat3f& r);
 
   /// Multiply by rotation about unit-quaternion
   FXMat4f& rot(const FXQuatf& q);

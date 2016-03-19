@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX4Splitter.cpp,v 1.57 2007/07/09 16:26:42 fox Exp $                     *
+* $Id: FX4Splitter.cpp,v 1.58 2007/08/24 16:16:11 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -139,22 +139,19 @@ FXWindow *FX4Splitter::getTopLeft() const {
 
 // Get top right child
 FXWindow *FX4Splitter::getTopRight() const {
-  if(!getTopLeft()) return NULL;
-  return getTopLeft()->getNext();
+  return getTopLeft() ? getTopLeft()->getNext() : NULL;
   }
 
 
 // Get bottom left child
 FXWindow *FX4Splitter::getBottomLeft() const {
-  if(!getTopRight()) return NULL;
-  return getTopRight()->getNext();
+  return getTopRight() ? getTopRight()->getNext() : NULL;
   }
 
 
 // Get bottom right child
 FXWindow *FX4Splitter::getBottomRight() const {
-  if(!getBottomLeft()) return NULL;
-  return getBottomLeft()->getNext();
+  return getBottomLeft() ? getBottomLeft()->getNext() : NULL;
   }
 
 

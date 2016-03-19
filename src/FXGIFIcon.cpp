@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGIFIcon.cpp,v 1.35 2007/07/09 16:26:54 fox Exp $                       *
+* $Id: FXGIFIcon.cpp,v 1.36 2007/08/07 01:19:06 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,7 +77,7 @@ FXGIFIcon::FXGIFIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FX
 
 // Save object to stream
 FXbool FXGIFIcon::savePixels(FXStream& store) const {
-  if(fxsaveGIF(store,data,width,height)){
+  if(fxsaveGIF(store,data,width,height,true)){
     return true;
     }
   return false;
@@ -87,7 +87,7 @@ FXbool FXGIFIcon::savePixels(FXStream& store) const {
 // Load object from stream
 FXbool FXGIFIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
-  if(fxloadGIF(store,pixels,w,h)){
+  if(fxloadGIF(store,pixels,w,h,true)){
     setData(pixels,IMAGE_OWNED,w,h);
     if(options&IMAGE_ALPHAGUESS) transp=guesstransp();
     return true;

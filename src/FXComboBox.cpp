@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComboBox.cpp,v 1.80 2007/07/09 16:26:45 fox Exp $                      *
+* $Id: FXComboBox.cpp,v 1.82 2007/09/04 22:13:22 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -606,6 +606,18 @@ void FXComboBox::setComboStyle(FXuint mode){
   }
 
 
+// Change popup pane shrinkwrap mode
+void FXComboBox::setShrinkWrap(FXbool flag){
+  pane->setShrinkWrap(flag);
+  }
+  
+
+// Return popup pane shrinkwrap mode
+FXbool FXComboBox::getShrinkWrap() const {
+  return pane->getShrinkWrap();
+  }
+  
+  
 // Get combobox style
 FXuint FXComboBox::getComboStyle() const {
   return (options&COMBOBOX_MASK);

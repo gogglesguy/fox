@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: glviewer.cpp,v 1.98 2007/06/27 18:04:42 fox Exp $                        *
+* $Id: glviewer.cpp,v 1.102 2007/08/21 15:16:54 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include "fx3d.h"
@@ -886,7 +886,7 @@ long GLViewWindow::onCmdNewViewer(FXObject*,FXSelector,void*){
   static int no=1;
 
   // Make new MDI child widget
-  FXMDIChild* mdichild=new FXMDIChild(mdiclient,FXStringFormat("GL Viewer #%d",no),winappicon,mdimenu,MDI_TRACKING,30,30,300,200);
+  FXMDIChild* mdichild=new FXMDIChild(mdiclient,FXString::value("GL Viewer #%d",no),winappicon,mdimenu,MDI_TRACKING,30,30,300,200);
 
   FXGLViewer *view=new FXGLViewer(mdichild,glvisual,this,ID_GLVIEWER);
 

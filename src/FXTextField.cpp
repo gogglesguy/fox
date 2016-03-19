@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.cpp,v 1.206 2007/07/09 16:27:15 fox Exp $                    *
+* $Id: FXTextField.cpp,v 1.210 2007/08/27 18:51:00 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -191,8 +191,7 @@ FXTextField::FXTextField(){
 
 
 // Construct and init
-FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb){
+FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb){
   if(ncols<0) ncols=0;
   flags|=FLAG_ENABLED;
   target=tgt;
@@ -1181,21 +1180,21 @@ long FXTextField::onCmdSetValue(FXObject*,FXSelector,void* ptr){
 
 // Update value from a message
 long FXTextField::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
-  setText(FXStringVal(*((FXint*)ptr)));
+  setText(FXString::value(*((FXint*)ptr)));
   return 1;
   }
 
 
 // Update value from a message
 long FXTextField::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
-  setText(FXStringVal(*((FXlong*)ptr)));
+  setText(FXString::value(*((FXlong*)ptr)));
   return 1;
   }
 
 
 // Update value from a message
 long FXTextField::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
-  setText(FXStringVal(*((FXdouble*)ptr)));
+  setText(FXString::value(*((FXdouble*)ptr)));
   return 1;
   }
 
@@ -1209,28 +1208,28 @@ long FXTextField::onCmdSetStringValue(FXObject*,FXSelector,void* ptr){
 
 // Obtain value from text field
 long FXTextField::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr)=FXIntVal(contents);
+  *((FXint*)ptr)=contents.toInt();
   return 1;
   }
 
 
 // Obtain value from text field
 long FXTextField::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
-  *((FXlong*)ptr)=FXLongVal(contents);
+  *((FXlong*)ptr)=contents.toLong();
   return 1;
   }
 
 
 // Obtain value from text field
 long FXTextField::onCmdGetRealValue(FXObject*,FXSelector,void* ptr){
-  *((FXdouble*)ptr)=FXDoubleVal(contents);
+  *((FXdouble*)ptr)=contents.toDouble();
   return 1;
   }
 
 
 // Obtain value from text field
 long FXTextField::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){
-  *((FXString*)ptr)=getText();
+  *((FXString*)ptr)=contents;
   return 1;
   }
 
@@ -1266,7 +1265,7 @@ long FXTextField::onCmdGetHelp(FXObject*,FXSelector,void* ptr){
 
 // We were asked about tip text
 long FXTextField::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !tip.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
     return 1;
@@ -1277,7 +1276,7 @@ long FXTextField::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXTextField::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: reswrap.cpp,v 1.34 2007/07/06 04:56:22 fox Exp $                         *
+* $Id: reswrap.cpp,v 1.38 2007/08/23 01:46:20 fox Exp $                         *
 ********************************************************************************/
 #include "stdio.h"
 #include "stdlib.h"
@@ -74,7 +74,7 @@
 /*******************************************************************************/
 
 
-const char version[]="5.0.0";
+const char version[]="5.1.1";
 
 
 typedef struct {
@@ -91,6 +91,7 @@ typedef struct {
   int         filetype;
   int         declaresize;
   int         forceunsigned;
+  int         constant;
   int         comments;
   int         keepext;
   int         binary;
@@ -131,7 +132,9 @@ void printusage(){
   printf("  -m, --msdos               Read files with MS-DOS mode\n");
   printf("  -b, --binary              Read files using binary mode (default)\n");
   printf("  -u, --unsigned            Force unsigned char even for text mode\n");
-  printf("  -c, --comments            Add comments to the output files (default)\n");
+  printf("  -N  --no-const            Don't output const specifier in declaration\n");
+  printf("  -C  --const               Force const specifier in declaration\n");
+  printf("  -cc, --comments           Add comments to the output files (default)\n");
   printf("  -nc, --no-comments        Remove comments from the output files\n");
   printf("  -p name, --prefix name    Prepend name in front of names of declarations and definitions\n");
   printf("  -f name, --suffix name    Append name in after names of declarations and definitions\n");
@@ -278,31 +281,35 @@ void processresourcefile(const char* filename,const char* name,OPTIONS* opts){
     fprintf(opts->outfile,"static ");
     }
 
-  /* No resource override given? */
-  if(!name){
-
-    /* Compute resource name from filename */
-    name=resourcename(resource,filename,opts->keepext);
+  /* Generate const declaration */
+  if(opts->constant){
+    fprintf(opts->outfile,"const ");
     }
 
   /* In text mode, output a 'char' declaration */
   if((opts->mode>=MODE_TEXT) && !opts->forceunsigned){
-    if(opts->declaresize){
-      fprintf(opts->outfile,"const char %s%s%s[%d]",opts->prefix,name,opts->suffix,ressize);
-      }
-    else{
-      fprintf(opts->outfile,"const char %s%s%s[]",opts->prefix,name,opts->suffix);
-      }
+    fprintf(opts->outfile,"char ");
     }
 
   /* In binary mode, output a 'unsigned char' declaration */
   else{
-    if(opts->declaresize){
-      fprintf(opts->outfile,"const unsigned char %s%s%s[%d]",opts->prefix,name,opts->suffix,ressize);
-      }
-    else{
-      fprintf(opts->outfile,"const unsigned char %s%s%s[]",opts->prefix,name,opts->suffix);
-      }
+    fprintf(opts->outfile,"unsigned char ");
+    }
+
+  /* Compute resource name from filename if no override */
+  if(!name){
+    name=resourcename(resource,filename,opts->keepext);
+    }
+
+  /* Generate resource name */
+  fprintf(opts->outfile,"%s%s%s",opts->prefix,name,opts->suffix);
+
+  /* Size specifier */
+  if(opts->declaresize){
+    fprintf(opts->outfile,"[%d]",ressize);
+    }
+  else{
+    fprintf(opts->outfile,"[]");
     }
 
   /* Generating source file */
@@ -353,10 +360,12 @@ void processresourcefile(const char* filename,const char* name,OPTIONS* opts){
           fprintf(opts->outfile,"\n  ");
           col=0;
           }
-        if(opts->mode==MODE_HEX)
+        if(opts->mode==MODE_HEX){
           fprintf(opts->outfile,"0x%02x",b);
-        else
+          }
+        else{
           fprintf(opts->outfile,"%3d",b);
+          }
         first=0;
         col++;
         }
@@ -387,6 +396,7 @@ int main(int argc,char **argv){
   opts.scope=0;
   opts.append=0;
   opts.header=0;
+  opts.constant=1;
   opts.outfile=stdout;
   opts.maxcols=16;
   opts.colsset=0;
@@ -530,6 +540,16 @@ int main(int argc,char **argv){
         opts.forceunsigned=1;
         }
 
+      /* No constant declaration */
+      else if(strcmp(argv[arg],"-N")==0 || strcmp(argv[arg],"--no-const")==0){
+        opts.constant=0;
+        }
+
+      /* Force constant declaration */
+      else if(strcmp(argv[arg],"-C")==0 || strcmp(argv[arg],"--const")==0){
+        opts.constant=1;
+        }
+
       /* Declare size */
       else if(strcmp(argv[arg],"-z")==0 || strcmp(argv[arg],"--size")==0){
         opts.declaresize=1;
@@ -555,16 +575,6 @@ int main(int argc,char **argv){
         opts.keepext=0;
         }
 
-      /* Add comments */
-      else if(strcmp(argv[arg],"-c")==0 || strcmp(argv[arg],"--comments")==0){
-        opts.comments=1;
-        }
-
-      /* No comments */
-      else if(strcmp(argv[arg],"-nc")==0 || strcmp(argv[arg],"--no-comments")==0){
-        opts.comments=0;
-        }
-
       /* Change number of columns */
       else if(strcmp(argv[arg],"-c")==0 || strcmp(argv[arg],"--columns")==0){
         if(++arg>=argc){
@@ -576,6 +586,16 @@ int main(int argc,char **argv){
           exit(1);
           }
         opts.colsset=1;
+        }
+
+      /* Add comments */
+      else if(strcmp(argv[arg],"-cc")==0 || strcmp(argv[arg],"--comments")==0){
+        opts.comments=1;
+        }
+
+      /* No comments */
+      else if(strcmp(argv[arg],"-nc")==0 || strcmp(argv[arg],"--no-comments")==0){
+        opts.comments=0;
         }
 
       /* Embed in namespace */

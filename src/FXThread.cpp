@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.110 2007/07/09 16:27:16 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.112 2007/10/05 16:27:44 fox Exp $                       *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -563,7 +563,7 @@ FXbool FXThread::priority(FXThread::Priority prio){
     int pri;
     switch(prio){
       case PriorityMinimum:
-        pri=THREAD_PRIORITY_IDLE;
+        pri=THREAD_PRIORITY_LOWEST;
         break;
       case PriorityLower:
         pri=THREAD_PRIORITY_BELOW_NORMAL;
@@ -1316,7 +1316,7 @@ FXbool FXThread::suspend(){
 #elif defined(SUNOS)
   return busy && tid && (thr_suspend((pthread_t)tid)==0);
 #else
-  return busy && tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);
+  return busy && tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);      // FIXME does not work
 #endif
   }
 
@@ -1328,7 +1328,7 @@ FXbool FXThread::resume(){
 #elif defined(SUNOS)
   return busy && tid && (thr_continue((pthread_t)tid)==0);
 #else
-  return busy && tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);
+  return busy && tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);      // FIXME does not work
 #endif
   }
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXShutter.h,v 1.32 2007/07/09 16:02:49 fox Exp $                         *
+* $Id: FXShutter.h,v 1.35 2007/08/27 17:31:49 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSHUTTER_H
 #define FXSHUTTER_H
@@ -44,13 +44,12 @@ class FXShutterItem;
 */
 class FXAPI FXShutterItem : public FXVerticalFrame {
   FXDECLARE(FXShutterItem)
-  friend class FXShutter;
 protected:
   FXButton         *button;
   FXScrollWindow   *scrollWindow;
   FXVerticalFrame  *content;
 protected:
-  FXShutterItem(){}
+  FXShutterItem();
 private:
   FXShutterItem(const FXShutterItem&);
   FXShutterItem &operator=(const FXShutterItem&);
@@ -64,8 +63,12 @@ public:
     ID_LAST
     };
 public:
+
   /// Constructor
   FXShutterItem(FXShutter *p,const FXString& text=FXString::null,FXIcon* icon=NULL,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_SPACING,FXint pr=DEFAULT_SPACING,FXint pt=DEFAULT_SPACING,FXint pb=DEFAULT_SPACING,FXint hs=DEFAULT_SPACING,FXint vs=DEFAULT_SPACING);
+
+  /// Return a pointer to the scroll window
+  FXScrollWindow* getScrollWindow() const { return scrollWindow; }
 
   /// Return a pointer to the button for this item
   FXButton* getButton() const { return button; }
@@ -85,6 +88,12 @@ public:
   /// Get the tool tip message for this item
   FXString getTipText() const;
 
+  /// Save to stream
+  virtual void save(FXStream& store) const;
+
+  /// Load from stream
+  virtual void load(FXStream& store);
+
   /// Destructor
   virtual ~FXShutterItem();
   };
@@ -97,15 +106,13 @@ public:
 */
 class FXAPI FXShutter : public FXVerticalFrame {
   FXDECLARE(FXShutter)
-  friend class FXShutterItem;
 protected:
-  FXint          current;               // Item currently open
-  FXint          closing;               // Item closing down
-  FXint          heightIncrement;       // Height delta
-  FXint          closingHeight;         // Closing items current height
-  FXbool         closingHadScrollbar;   // Closing item had a scroll bar
+  FXint   current;              // Item currently open
+  FXint   closing;              // Item closing down
+  FXint   closingHeight;        // Height of closing item
+  FXint   heightIncrement;      // Height delta
 protected:
-  FXShutter(){}
+  FXShutter();
 private:
   FXShutter(const FXShutter&);
   FXShutter &operator=(const FXShutter&);
@@ -149,6 +156,12 @@ public:
 
   /// Return the index of the currently displayed item
   FXint getCurrent() const { return current; }
+
+  /// Save to stream
+  virtual void save(FXStream& store) const;
+
+  /// Load from stream
+  virtual void load(FXStream& store);
 
   /// Destructor
   virtual ~FXShutter();

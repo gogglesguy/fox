@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRanged.cpp,v 1.18 2007/07/09 16:27:05 fox Exp $                        *
+* $Id: FXRanged.cpp,v 1.20 2007/08/08 13:09:36 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.h,v 1.174 2007/07/09 16:02:50 fox Exp $                          *
+* $Id: FXTable.h,v 1.176 2007/08/27 18:50:58 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -357,6 +357,8 @@ private:
   FXTable& operator=(const FXTable&);
 public:
   long onPaint(FXObject*,FXSelector,void*);
+  long onEnter(FXObject*,FXSelector,void*);
+  long onLeave(FXObject*,FXSelector,void*);
   long onFocusIn(FXObject*,FXSelector,void*);
   long onFocusOut(FXObject*,FXSelector,void*);
   long onMotion(FXObject*,FXSelector,void*);
@@ -378,6 +380,9 @@ public:
   long onClicked(FXObject*,FXSelector,void*);
   long onDoubleClicked(FXObject*,FXSelector,void*);
   long onTripleClicked(FXObject*,FXSelector,void*);
+  long onQueryTip(FXObject*,FXSelector,void*);
+  long onQueryHelp(FXObject*,FXSelector,void*);
+  long onTipTimer(FXObject*,FXSelector,void*);
 
   long onCmdToggleEditable(FXObject*,FXSelector,void*);
   long onUpdToggleEditable(FXObject*,FXSelector,void*);
@@ -800,6 +805,23 @@ public:
 
   /// Return icon of row header at index
   FXIcon* getRowIcon(FXint index) const;
+
+
+
+
+  /// Change column header tip text
+  void setColumnTipText(FXint index,const FXString& text);
+
+  /// Return tip text of column header at index
+  FXString getColumnTipText(FXint index) const;
+
+  /// Change row header tip text
+  void setRowTipText(FXint index,const FXString& text);
+
+  /// Return tip text of row header at index
+  FXString getRowTipText(FXint index) const;
+
+
 
   /// Change column header icon position, e.g. FXHeaderItem::BEFORE, etc.
   void setColumnIconPosition(FXint index,FXuint m);
