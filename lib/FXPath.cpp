@@ -711,6 +711,113 @@ FXString FXPath::relative(const FXString& file){
 
 
 // Return true if file is inside base directory
+//
+// Examples:
+//
+//  Base       File         Result      Comment
+//  /a/b/c     /a/b/c/d      yes        /a/b/c/d is under directory /a/b/c
+//  a/b        a/b/c         yes        ./a/b/c is under directory ./a/b
+//  a          b             no         ./b is NOT under ./a
+//  a/b        a/c           no         ./a/c is NOT under ./a/b
+//  /a/b/c     c             no         ./c is NOT (necessarily) under /a/b/c
+//  a          /a/b          no         /a/b is NOT under ./a
+//  .          b             yes        ./b is under .
+//  ..         b             yes        ./b is under ./..
+//  ../a       b             no         ./b is NOT under ../a
+//  ./a/b      a/b           yes        ./a/b is under ./a/b
+//  a/b        ./a/b/c       yes        ./a/b/c is under ./a/b
+//  ./a/b      a/b           yes        ./a/b is under ./a/b
+//  .          .             yes        . is under .
+//  ..         .             yes        . is under ./..
+//  ..         ..            yes        .. is under ..
+//  .          ..            no         ./.. is NOT under .
+//  ../a/b     ../a/b/c      yes        ../a/b/c is under ../a/b
+//  ../a/b     ../d          no         ../d is NOT under ../a/b
+//  (empty)    (something)   no         ./something is NOT under empty
+FXbool FXPath::isInside(const FXString& base,const FXString& file){
+  if(!base.empty() && !file.empty()){
+    register FXint p=0,q=0,f;
+#ifdef WIN32
+    while(base[p] && ((Ascii::toLower(base[p])==Ascii::toLower(file[q])) || (ISPATHSEP(base[p]) && ISPATHSEP(file[q])))){
+      if(ISPATHSEP(base[p])){
+        while(0<p && ISPATHSEP(base[p+1])) p++;           // Eat multiple slashes, but not the UNC "\\" at the start
+        while(0<q && ISPATHSEP(file[q+1])) q++;
+        }
+      p++;
+      q++;
+      }
+#else
+    while(base[p] && file[q]){
+      if(base[p]=='.' && ISPATHSEP(base[p+1])){ p+=2; continue; }
+      if(file[q]=='.' && ISPATHSEP(file[q+1])){ q+=2; continue; }
+      if(base[p]=='.' && base[p+1]=='.' && file[q]=='.' && file[q+1]=='.'){ p+=2; q+=2; continue; }
+      if(ISPATHSEP(base[p])){
+        while(ISPATHSEP(base[p+1])) p++;
+        }
+      if(ISPATHSEP(file[q])){
+        while(ISPATHSEP(file[q+1])) q++;
+        }
+      if(base[0]=='\0') break;
+      if(base[p]!=file[q]){
+        return false;
+        }
+      p++;
+      q++;
+      }
+#endif
+    return (0<p) && base[p]=='\0'; // && (ISPATHSEP(file[q]) || file[q]=='\0');
+    }
+  return false;
+  }
+
+/*
+
+*/
+
+#if 0
+FXbool FXPath::isInside(const FXString& base,const FXString& file){
+  if(!base.empty()){
+    register FXint p=0,q=0,f;
+#ifdef WIN32
+    while(base[p] && ((Ascii::toLower(base[p])==Ascii::toLower(file[q])) || (ISPATHSEP(base[p]) && ISPATHSEP(file[q])))){
+      if(ISPATHSEP(base[p])){
+        while(0<p && ISPATHSEP(base[p+1])) p++;           // Eat multiple slashes, but not the UNC "\\" at the start
+        while(0<q && ISPATHSEP(file[q+1])) q++;
+        }
+      p++;
+      q++;
+      }
+#else
+    while(base[p] && file[q]){
+      if(ISPATHSEP(base[p])){
+        while(ISPATHSEP(base[p+1])) p++;
+        }
+      if(ISPATHSEP(file[q])){
+        while(ISPATHSEP(file[q+1])) q++;
+        }
+//      if(base[p]=='.' && base[p+1]=='\0'){ p+=1; continue; }
+      if(base[p]=='.' && ISPATHSEP(base[p+1])){ p+=2; continue; }
+      if(file[q]=='.' && ISPATHSEP(file[q+1])){ q+=2; continue; }
+      f=0;
+      if(file[q]=='.' && file[q+1]=='.') f|=1;
+      if(base[p]=='.' && base[p+1]=='.') f|=2;
+      if(f==1) return false;
+      if(f==3){ p+=2; q+=2; continue; }
+      if(f==2){ p+=2; continue; }
+      if(base[p]=='.' && base[p+1]=='.'){ p+=2; continue; }
+      if(base[p]!=file[q]){
+        return false;
+        }
+      p++;
+      q++;
+      }
+#endif
+    return (0<p) && base[p]=='\0'; // && (ISPATHSEP(file[q]) || file[q]=='\0');
+    }
+  return false;
+  }
+
+
 FXbool FXPath::isInside(const FXString& base,const FXString& file){
   register FXint p=0,q=0;
 #ifdef WIN32
@@ -734,7 +841,7 @@ FXbool FXPath::isInside(const FXString& base,const FXString& file){
 #endif
   return base[p]=='\0' && (ISPATHSEP(file[q]) || file[q]=='\0');
   }
-
+#endif
 
 // Convert path from using 'sepfm' to use 'septo' path-separators
 FXString FXPath::convert(const FXString& file,FXchar septo,FXchar sepfm){
@@ -1191,6 +1298,31 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
   return FXString::null;
   }
 
+
+// Relativize to path list
+FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
+  FXString result(file);
+  if(!file.empty()){
+    FXString base,rr,r;
+    FXint beg,end,b,e;
+    for(beg=0; pathlist[beg]; beg=end){
+      while(pathlist[beg]==PATHLISTSEP) beg++;
+      for(end=beg; pathlist[end] && pathlist[end]!=PATHLISTSEP; end++){}
+      if(beg==end) break;
+      base=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)));
+      if(isInside(base,file)){
+        r=FXPath::relative(base,file);
+        if(r.length()<result.length()){
+          if(FXPath::search(pathlist,r)==file){
+            result=r;
+            }
+          }
+        }
+      }
+    }
+  return result;
+  }
+  
 
 }
 

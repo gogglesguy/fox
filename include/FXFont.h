@@ -111,7 +111,7 @@ enum FXFontEncoding {
   };
 
 
-/// Font style
+/// Font description
 struct FXFontDesc {
   FXchar          face[116];                /// Face name
   FXushort        size;                     /// Size in deci-points (one point is 1/72 inch)
@@ -120,6 +120,12 @@ struct FXFontDesc {
   FXushort        setwidth;                 /// Set width [normal, condensed, expanded, ...]
   FXushort        encoding;                 /// Encoding of character set
   FXushort        flags;                    /// Flags
+  
+  /// Set font description from a string
+  void setFont(const FXString& string);
+  
+  /// Get string of font description
+  FXString getFont() const;
   };
 
 
@@ -380,6 +386,26 @@ public:
 
   /// Calculate height of given text in this font
   virtual FXint getTextHeight(const FXchar *string,FXuint length) const;
+
+  /// Convert style hints to string and vice versa
+  static FXuint styleFromString(const FXString& str);
+  static FXString stringFromStyle(FXuint style);
+
+  /// Convert slant to string and vice versa
+  static FXuint slantFromString(const FXString& str);
+  static FXString stringFromSlant(FXuint slant);
+
+  /// Convert weight to string and vice versa
+  static FXuint weightFromString(const FXString& str);
+  static FXString stringFromWeight(FXuint weight);
+
+  /// Convert setwidth to string and vice versa
+  static FXuint setWidthFromString(const FXString& str);
+  static FXString stringFromSetWidth(FXuint setwidth);
+
+  /// Convert encoding to string and vice versa
+  static FXuint encodingFromString(const FXString& str);
+  static FXString stringFromEncoding(FXuint encoding);
 
   /**
   * List all fonts matching hints. If listFonts() returns true then

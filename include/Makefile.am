@@ -214,6 +214,7 @@ FXPopup.h \
 FXPrintDialog.h \
 FXProgressBar.h \
 FXProgressDialog.h \
+FXPtrQueue.h \
 FXQuatd.h \
 FXQuatf.h \
 FXMessageChannel.h \

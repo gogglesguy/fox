@@ -13,8 +13,30 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE WITH LOGO --->
-
-
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+October 5 - FOX DEVELOPMENT 1.7.23
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>New API FXPath::relativize() returns shortest (unique) relative filename of file given a list
+of search directories and absolute filename.</li>
+<li>Added intrinsics includes to xincs.h (enabled on Linux/GCC only for now).</li>
+<li>Small layout changes to FXFontDialog.</li>
+<li>Added API's to FXFontDialog to allow user to work with font spec string instead of just FXFontDesc.</li>
+<li>Added API's to FXFont for picking apart font spec string components.</li>
+<li>Added some API's to FXFontDesc.</li>
+<li>Added FXPtrQueue class.</li>
+<li>SSE intrinsics now used (with appropriate compiler options) in FXMat4f (on x86-64 by default
+and optional on x86).  Windows compilers may follow.</li>
+<li>Updated ControlPanel for new registry location; cleaned it up a bit as well.</li>
+<li>Due to crash bug in openjpeg library, JPEG2000 support temporarily turned off.</li>
+<li>Default value for mark in FXSettings parse() and parseFile() was changed to true.  This
+is more user-friendly because this causes entries to be written back in unparse() and
+unparseFile() even if not changed.</li>
+</ul>
 
 <!--- TOPIC TITLE -->
 <p>
@@ -24,9 +46,9 @@ September 25 - FOX DEVELOPMENT 1.7.22
 <p>
 <!--- TOPIC TITLE -->
 <ul>
-<li>FXRegistry now uses the 
-<a href="http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html">FreeDesktop.Org specification</a>.  
-Registry files are located in locations determined according to the specification, $XDG_CONFIG_DIRS and $XDG_CONFIG_DIR.  
+<li>FXRegistry now uses the
+<a href="http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html">FreeDesktop.Org specification</a>.
+Registry files are located in locations determined according to the specification, $XDG_CONFIG_DIRS and $XDG_CONFIG_DIR.
 Also, registry files have a file extension ".rc" or in ascii mode on Windows, ".ini".
 The common FOX applications settings file is now called "fox.rc" ("fox.ini" on Windows if ascii mode) to avoid
 possible clashes with other systems.</li>
@@ -41,9 +63,9 @@ first event; after first event, don't block if no further events but just fall o
 <li>FXString throws FXMemoryException if out of RAM.</li>
 <li>Improved FXString::escape() and FXString::unescape().</li>
 <li>Updates to Adie syntax file.</li>
-<li>Atomic primitives for integer and pointer variables added; not inlined due to possible differences 
+<li>Atomic primitives for integer and pointer variables added; not inlined due to possible differences
 in compiler settings between user's own code and FOX library.</li>
-<li>Adie "Open Selected" parses out filename,line number, and also (new) column (accomodate change of GCC 
+<li>Adie "Open Selected" parses out filename,line number, and also (new) column (accomodate change of GCC
 error/warning outputs).</li>
 <li>Compiled regexes in FXRex now use HALF the amount of memory.</li>
 <li>New subdivision modes for FX4Splitter: preferred FOURSPLITTER_VERTICAL or FOURSPLITTER_HORIZONTAL flags
@@ -58,7 +80,7 @@ GCC, LLVM, and Intel-C++ only).</li>
 <li>New API's for quaternion implementation FXQuatf and FXQuatd.</li>
 <li>Added IMAGE_THRESGUESS flag for FXIcon.  When passed, it auto-detects the etched-in looking
 icon threshold value using new protected member function guessthresh().  This works very similarly
-to IMAGE_ALPHAGUESS and guesstransp(). New API's setThresholdValue() and getThresholdValue() allow 
+to IMAGE_ALPHAGUESS and guesstransp(). New API's setThresholdValue() and getThresholdValue() allow
 direct setting of this value.</li>
 <li>API to get temporary directory improved in FXSystem::getTempDirectory().</li>
 <li>Use thread-safe versions for time and dates in FXDate and FXSystem, whenever possible.</li>
@@ -72,7 +94,7 @@ CONDITION_VARIABLE.</li>
 <li>Fixed small bug in FXDict.</li>
 <li>Fixed FXToolBarShell issue with FXToolBarShell not hiding when its child does.</li>
 <li>Fixed bunch of warnings found under LLVM clang++ compiler.</li>
-<li>FOX time settings variables no longer with "ns" suffix; no longer needed since registry now in 
+<li>FOX time settings variables no longer with "ns" suffix; no longer needed since registry now in
 new location there's no conflict with old FOX registry files.</li>
 </ul>
 

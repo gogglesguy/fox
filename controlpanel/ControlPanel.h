@@ -38,16 +38,22 @@ struct ColorTheme {
   };
 
 
+// Up to 4 icons associated with file
+enum {
+  BIG_ICON,
+  BIG_ICON_OPEN,
+  MINI_ICON,
+  MINI_ICON_OPEN
+  };
+
+
 // File binding
 struct FXFileBinding {
-  FXString key;
-  FXString description;
-  FXString command;
-  FXString bigname;
-  FXString bignameopen;
-  FXString name;
-  FXString nameopen;
-  FXString mime;
+  FXString key;                 // Registry key
+  FXString description;         // Description
+  FXString command;             // Command to invoke
+  FXString iconfile[4];         // Icon file names
+  FXString mime;                // Mime type
   };
 
 
@@ -65,10 +71,8 @@ private:
   FXListBox         *list;
   FXList            *filebindinglist;
   FXComboBox        *mimetypelist;
-  FXButton          *button_bigname;
-  FXButton          *button_bignameopen;
-  FXButton          *button_name;
-  FXButton          *button_nameopen;
+  FXButton          *iconbutton[4];
+  FXLabel           *vendorandapplication;
 private:
   FXToolTip         *tooltip;
   FXTabBook         *tabbook;
@@ -98,11 +102,11 @@ private:
 private:
   ColorTheme         theme_current;     // Current Settings
   ColorTheme         theme_user;        // Theme User may have set, which is different from the other themes
-  FXColor            hilite;
-  FXColor            shadow;
 private:
   FXFont            *font;
   FXbool             hascurrent;
+  FXString           fontspec;          // Selected font
+  FXString           filename;          // Filename of settings file
   FXString           applicationname;   // If editing specific application settings
   FXString           vendorname;        // If editing specific vendor settings
   FXString           iconpath;          // Path where icons are found
@@ -121,19 +125,17 @@ private:
   FXfloat            gamma;
   FXFileBinding      filebinding;       // Current file binding
 private:
-  FXDataTarget       target_base;
+  FXDataTarget       target_base;                // Color targets
   FXDataTarget       target_back;
   FXDataTarget       target_border;
   FXDataTarget       target_fore;
-  FXDataTarget       target_hilite;
-  FXDataTarget       target_shadow;
   FXDataTarget       target_selfore;
   FXDataTarget       target_selback;
   FXDataTarget       target_tipfore;
   FXDataTarget       target_tipback;
   FXDataTarget       target_menufore;
   FXDataTarget       target_menuback;
-  FXDataTarget       target_typingspeed;
+  FXDataTarget       target_typingspeed;        // Time targets
   FXDataTarget       target_clickspeed;
   FXDataTarget       target_scrollspeed;
   FXDataTarget       target_scrolldelay;
@@ -142,21 +144,22 @@ private:
   FXDataTarget       target_menupause;
   FXDataTarget       target_tooltippause;
   FXDataTarget       target_tooltiptime;
-  FXDataTarget       target_dragdelta;
-  FXDataTarget       target_wheellines;
-  FXDataTarget       target_maxcolors;
-  FXDataTarget       target_gamma;
+  FXDataTarget       target_dragdelta;          // Move mouse delta
+  FXDataTarget       target_wheellines;         // Mouse wheel lines
+  FXDataTarget       target_maxcolors;          // Maximum colors
+  FXDataTarget       target_gamma;              // Display gamma value
   FXDataTarget       target_filebinding_description;
   FXDataTarget       target_filebinding_command;
   FXDataTarget       target_iconpath;
 private:
-  void setup();
   void setupFont();
-  void setupColors();
-  FXbool writeDesktop();
   void initColors();
+  void setupColors();
   void saveFileBinding();
-  FXString getOutputFile();
+  void setupFileBindings();
+  void setupVendorAndAppLabel();
+  void setupIconButton(const FXString& name,FXint index);
+  FXIcon *createIconFromName(const FXString& name) const;
 private:
   FXDesktopSetup(){}
   FXDesktopSetup(const FXDesktopSetup&);
@@ -171,10 +174,10 @@ public:
     ID_REMOVE_FILEBINDING,
     ID_RENAME_FILEBINDING,
     ID_SELECT_FILEBINDING,
-    ID_SELECT_ICON_NAME,
-    ID_SELECT_ICON_BIGNAME,
-    ID_SELECT_ICON_NAMEOPEN,
-    ID_SELECT_ICON_BIGNAMEOPEN,
+    ID_SELECT_ICON_BIG,
+    ID_SELECT_ICON_BIGOPEN,
+    ID_SELECT_ICON_MINI,
+    ID_SELECT_ICON_MINIOPEN,
     ID_SELECT_MIMETYPE
     };
 public:
@@ -193,23 +196,38 @@ public:
   // Constructor
   FXDesktopSetup(FXApp *app);
 
-  // Create widgets
-  virtual void create();
-
-  // Close the application, return TRUE if actually closed
-  virtual FXbool close(FXbool notify=false);
-
   // Change application name
   void setApplicationName(const FXString& name){ applicationname=name; }
-  
+
   // Return application name
   const FXString& getApplicationName() const { return applicationname; }
 
   // Change vendor name
   void setVendorName(const FXString& name){ vendorname=name; }
-  
+
   // Return vendor name
   const FXString& getVendorName() const { return vendorname; }
+
+  // Set filename from vendor and application name
+  FXbool setApplicationAndVendor(const FXString& an,const FXString& vn=FXString::null);
+
+  // Set filename
+  void setFilename(const FXString& file){ filename=file; }
+
+  // Return filename
+  FXString getFilename() const { return filename; }
+
+  // Read settings file
+  FXbool readSettingsFile(const FXString& file);
+
+  // Write settings file
+  FXbool writeSettingsFile(const FXString& file);
+
+  // Create widgets
+  virtual void create();
+
+  // Close the application, return TRUE if actually closed
+  virtual FXbool close(FXbool notify=false);
 
   // Destructor
   virtual ~FXDesktopSetup();

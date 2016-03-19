@@ -120,7 +120,7 @@ void FXSettings::deleteData(void* ptr){
 // Parse filename
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
   FXFile file(filename,FXIO::Reading);
-  FXTRACE((1,"%s::parseFile(%s,%d)\n",getClassName(),filename.text(),mrk));
+  FXTRACE((100,"%s::parseFile(%s,%d)\n",getClassName(),filename.text(),mrk));
   if(file.isOpen()){
 
     // Prepare buffer string
@@ -228,7 +228,7 @@ next:   while(string[p] && string[p]!='\n') p++;
 // Unparse registry file
 FXbool FXSettings::unparseFile(const FXString& filename){
   FXFile file(filename,FXIO::Writing);
-  FXTRACE((1,"%s::unparseFile(%s)\n",getClassName(),filename.text()));
+  FXTRACE((100,"%s::unparseFile(%s)\n",getClassName(),filename.text()));
   if(file.isOpen()){
     FXString string;
 

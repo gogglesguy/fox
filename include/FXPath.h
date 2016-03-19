@@ -177,6 +177,11 @@ namespace FXPath {
   */
   extern FXAPI FXString search(const FXString& pathlist,const FXString& file);
 
+  /**
+  * Given search path list, return shortest relative path name that still
+  * uniquely resolves to the given file name.
+  */
+  FXString relativize(const FXString& pathlist,const FXString& file);
   }
 
 }

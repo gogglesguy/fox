@@ -38,24 +38,38 @@ protected:
   FXFontSelector *fontbox;
 protected:
   FXFontDialog(){}
+  void initdialog();
 private:
   FXFontDialog(const FXFontDialog&);
   FXFontDialog &operator=(const FXFontDialog&);
 public:
-  /// Constructor
+
+  /// Constructor font dialog box
   FXFontDialog(FXWindow* owner,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=600,FXint h=380);
 
-  /// Save dialog to a stream
-  virtual void save(FXStream& store) const;
+  /// Constructor free-floating font dialog box
+  FXFontDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=600,FXint h=380);
 
-  /// Load dialog from a stream
-  virtual void load(FXStream& store);
+  /// Hide this window
+  virtual void hide();
+
+  /// Set font selection as a string
+  void setFont(const FXString& string);
+
+  /// Get font selection as a string
+  FXString getFont() const;
 
   /// Set the current font selection
   void setFontDesc(const FXFontDesc& fontdesc);
 
   /// Get the current font selection
   const FXFontDesc& getFontDesc() const;
+
+  /// Save dialog to a stream
+  virtual void save(FXStream& store) const;
+
+  /// Load dialog from a stream
+  virtual void load(FXStream& store);
 
   /// Destructor
   virtual ~FXFontDialog();
