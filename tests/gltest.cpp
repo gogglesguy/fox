@@ -60,16 +60,16 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
   v_matrix=new FXMatrix(driverbox, 2, MATRIX_BY_COLUMNS);
 
   new FXLabel(v_matrix,"Vendor: ",NULL,LABEL_NORMAL);
-  new FXLabel(v_matrix,FXStringFormat("%s",glGetString(GL_VENDOR)),NULL,LABEL_NORMAL);
+  new FXLabel(v_matrix,FXString::value("%s",glGetString(GL_VENDOR)),NULL,LABEL_NORMAL);
 
   new FXLabel(v_matrix,"Renderer: ",NULL,LABEL_NORMAL);
-  new FXLabel(v_matrix,FXStringFormat("%s",glGetString(GL_RENDERER)),NULL,LABEL_NORMAL);
+  new FXLabel(v_matrix,FXString::value("%s",glGetString(GL_RENDERER)),NULL,LABEL_NORMAL);
 
   new FXLabel(v_matrix,"GL Version: ",NULL,LABEL_NORMAL);
-  new FXLabel(v_matrix,FXStringFormat("%s",glGetString(GL_VERSION)),NULL,LABEL_NORMAL);
+  new FXLabel(v_matrix,FXString::value("%s",glGetString(GL_VERSION)),NULL,LABEL_NORMAL);
 
   new FXLabel(v_matrix,"GLU Version: ",NULL,LABEL_NORMAL);
-  new FXLabel(v_matrix,FXStringFormat("%s",gluGetString(GLU_VERSION)),NULL,LABEL_NORMAL);
+  new FXLabel(v_matrix,FXString::value("%s",gluGetString(GLU_VERSION)),NULL,LABEL_NORMAL);
 
   // Opengl implementation-dependent stuff
   limitsbox=new FXGroupBox(frame1, "Implementation limits", GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_X);
@@ -77,54 +77,56 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
 
   glGetIntegerv(GL_MAX_VIEWPORT_DIMS, intvals);
   new FXLabel(v_matrix2, "Maximum viewport size: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d x %d", intvals[0], intvals[1]));
+  new FXLabel(v_matrix2, FXString::value("%d x %d", intvals[0], intvals[1]));
 
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &intval);
   new FXLabel(v_matrix2, "Maximum texture size (w or h): ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
   glGetIntegerv(GL_MAX_LIGHTS, &intval);
   new FXLabel(v_matrix2, "Maximum number of lights: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
+#if defined(GL_MAX_TEXTURE_UNITS)
   glGetIntegerv(GL_MAX_TEXTURE_UNITS, &intval);
   new FXLabel(v_matrix2, "Number of texture units: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
+#endif
 
   glGetIntegerv(GL_MAX_CLIP_PLANES, &intval);
   new FXLabel(v_matrix2, "Maximum number of clipping planes: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
   glGetIntegerv(GL_MAX_MODELVIEW_STACK_DEPTH, &intval);
   new FXLabel(v_matrix2, "Maximum modelview-matrix stack depth: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
   glGetIntegerv(GL_MAX_PROJECTION_STACK_DEPTH, &intval);
   new FXLabel(v_matrix2, "Maximum projection-matrix stack depth: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
   glGetIntegerv(GL_MAX_ATTRIB_STACK_DEPTH, &intval);
   new FXLabel(v_matrix2, "Maximum attribute stack depth: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
 #if defined(GL_MAX_VERTEX_ATTRIBS)
   intval=0;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &intval);
-#endif  
+#endif
   new FXLabel(v_matrix2, "Maximum vertex attributes: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 #if defined(GL_MAX_VERTEX_UNIFORM_COMPONENTS)
   intval=0;
   glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &intval);
-#endif  
+#endif
   new FXLabel(v_matrix2, "Maximum vertex uniform components: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 #if defined(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS)
   intval=0;
   glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &intval);
-#endif  
+#endif
   new FXLabel(v_matrix2, "Maximum fragment uniform components: ");
-  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+  new FXLabel(v_matrix2, FXString::value("%d", intval));
 
   optionframe=new FXHorizontalFrame(frame1,LAYOUT_SIDE_TOP|FRAME_NONE|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0);
 
@@ -157,20 +159,19 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
     new FXLabel(mat,"no",NULL,LABEL_NORMAL);
 
   new FXLabel(mat,"Color Depth",NULL,LABEL_NORMAL);
-  new FXLabel(mat,FXStringFormat("%d",
-    vis->getActualRedSize()+vis->getActualGreenSize()+vis->getActualBlueSize()+vis->getActualAlphaSize()));
+  new FXLabel(mat,FXString::value("%d",vis->getActualRedSize()+vis->getActualGreenSize()+vis->getActualBlueSize()+vis->getActualAlphaSize()));
 
   new FXLabel(mat,"Depth Buffer Size",NULL,LABEL_NORMAL);
-  new FXLabel(mat,FXStringFormat("%d",vis->getActualDepthSize()),NULL,LABEL_NORMAL);
+  new FXLabel(mat,FXString::value("%d",vis->getActualDepthSize()),NULL,LABEL_NORMAL);
 
   new FXLabel(mat,"Stencil Buffer Size",NULL,LABEL_NORMAL);
-  new FXLabel(mat,FXStringFormat("%d",vis->getActualStencilSize()),NULL,LABEL_NORMAL);
+  new FXLabel(mat,FXString::value("%d",vis->getActualStencilSize()),NULL,LABEL_NORMAL);
 
   new FXLabel(mat,"RGBA",NULL,LABEL_NORMAL);
-  new FXLabel(mat,FXStringFormat("%d-%d-%d-%d",vis->getActualRedSize(),vis->getActualGreenSize(),vis->getActualBlueSize(),vis->getActualAlphaSize()),NULL,LABEL_NORMAL);
+  new FXLabel(mat,FXString::value("%d-%d-%d-%d",vis->getActualRedSize(),vis->getActualGreenSize(),vis->getActualBlueSize(),vis->getActualAlphaSize()),NULL,LABEL_NORMAL);
 
   new FXLabel(mat,"Accum RGBA",NULL,LABEL_NORMAL);
-  new FXLabel(mat,FXStringFormat("%d-%d-%d-%d",vis->getActualAccumRedSize(),vis->getActualAccumGreenSize(),vis->getActualAccumBlueSize(),vis->getActualAccumAlphaSize()),NULL,LABEL_NORMAL);
+  new FXLabel(mat,FXString::value("%d-%d-%d-%d",vis->getActualAccumRedSize(),vis->getActualAccumGreenSize(),vis->getActualAccumBlueSize(),vis->getActualAccumAlphaSize()),NULL,LABEL_NORMAL);
 
   // List of extensions
   glextbox= new FXGroupBox(optionframe,"Available Extensions",GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_Y|LAYOUT_FILL_X);
@@ -184,7 +185,7 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
     text=strdup(tmp);
     token=strtok(text," ");
     while(token){
-      extensionList->appendItem(FXStringFormat("[GL] %s",token));
+      extensionList->appendItem(FXString::value("[GL] %s",token));
       token=strtok(NULL," ");
       }
     free(text);
@@ -197,7 +198,7 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
     text=strdup(tmp);
     token=strtok(text," ");
     while(token!=NULL){
-      extensionList->appendItem(FXStringFormat("[GLU] %s",token));
+      extensionList->appendItem(FXString::value("[GLU] %s",token));
       token=strtok(NULL," ");
       }
     free(text);
@@ -634,7 +635,7 @@ int main(int argc,char *argv[]){
   // Open the display
   application.init(argc,argv);
 
-/*  
+/*
   FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DoubleBuffer|FXGLConfig::DrawWindow);
 //  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
   FXGLContext context(&application,config);

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImageView.cpp,v 1.44 2007/07/09 16:27:00 fox Exp $                     *
+* $Id: FXImageView.cpp,v 1.45 2007/08/14 00:46:38 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -123,10 +123,13 @@ FXint FXImageView::getContentHeight(){
 // Recalculate layout
 void FXImageView::layout(){
 
-  // Layout scroll bars and viewport
-  FXScrollArea::layout();
+  // Place scroll bars
+  placeScrollBars(width,height);
 
+  // Repaint
   update();
+
+  // Not dirty
   flags&=~FLAG_DIRTY;
   }
 

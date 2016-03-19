@@ -17,7 +17,57 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-June 12 - FOX DEVELOPMENT 1.7.11
+October 6 - FOX DEVELOPMENT 1.7.12
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added additional API's to FXMat3d, FXMat3f, FXMat4d, FXMat4f.</li>
+<li>FXSlider, FXRealSlider didn't update tickmarks (if shown) when slider range was changed.</li>
+<li>Small typo found in fxfilematch() was found which affected character-range matching.</li>
+<li>Change in the order FXSphered, FXSpheref is expanded when bounding box is added, resulting,
+in most cases, in a smaller bounding sphere.</li>
+<li>API added to FXTreeListBox, FXListBox, to set shrink-wrap mode for popup pane; this allows
+minimum size depending on actual number of items in list.</li>
+<li>Logic of sizing items in FXIconList changed slightly.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+October 6 - FOX STABLE 1.6.30
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed some issues with flush() in FXBZFileStream and FXGZFileStream.</li>
+<li>FXDial didn't issue SEL_COMMAND when driven from keyboard.</li>
+<li>Small typo found in fxfilematch() was found which affected character-range matching.</li>
+<li>Problem in FX7Segment fixed.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 9 - FOX STABLE 1.6.29
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added ".jpeg" as additional extension for JPEG images in FXIconSource.</li>
+<li>Fix in FXSplashWindow not killing timer if it gets destroyed before timer goes off.</li>
+<li>FX7Segment had bug in onCmdGetStringValue() implementation (it was not returning the
+string).</li>
+<li>Cruft removed from FXMat3f.</li>
+<li>Bold style fixed in FXText.</li>
+<li>Read outside buffer problem (flagged in valgrind occasionally) fixed in FXText.</li>
+<li>Bugs in FXListBox and FXTreeListBox fixed.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 31 - FOX DEVELOPMENT 1.7.11
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->

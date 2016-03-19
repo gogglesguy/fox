@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3f.h,v 1.18 2007/07/09 16:02:46 fox Exp $                           *
+* $Id: FXMat3f.h,v 1.24 2007/09/24 21:00:48 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT3F_H
 #define FXMAT3F_H
@@ -28,6 +28,7 @@ namespace FX {
 
 
 class FXQuatf;
+class FXMat4f;
 
 
 /// Single-precision 3x3 matrix
@@ -41,9 +42,15 @@ public:
 
   /// Initialize matrix from another matrix
   FXMat3f(const FXMat3f& other);
+  
+  /// Initialize from rotation and scaling part of 4x4 matrix
+  FXMat3f(const FXMat4f& other);
 
   /// Initialize matrix from scalar
   FXMat3f(FXfloat w);
+
+  /// Initialize diagonal matrix 
+  FXMat3f(FXfloat a,FXfloat b,FXfloat c);
 
   /// Initialize matrix from components
   FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,
@@ -58,13 +65,20 @@ public:
 
   /// Assignment
   FXMat3f& operator=(const FXMat3f& other);
+  FXMat3f& operator=(const FXMat4f& other);
   FXMat3f& operator=(FXfloat w);
 
   /// Set value from another matrix
   FXMat3f& set(const FXMat3f& other);
 
+  /// Set from rotation and scaling part of 4x4 matrix
+  FXMat3f& set(const FXMat4f& q);
+
   /// Set value from scalar
   FXMat3f& set(FXfloat w);
+
+  /// Set diagonal matrix 
+  FXMat3f& set(FXfloat a,FXfloat b,FXfloat c);
 
   /// Set value from components
   FXMat3f& set(FXfloat a00,FXfloat a01,FXfloat a02,
@@ -80,8 +94,8 @@ public:
   /// Assignment operators
   FXMat3f& operator+=(const FXMat3f& w);
   FXMat3f& operator-=(const FXMat3f& w);
-  FXMat3f& operator*=(FXfloat w);
   FXMat3f& operator*=(const FXMat3f& w);
+  FXMat3f& operator*=(FXfloat w);
   FXMat3f& operator/=(FXfloat w);
 
   /// Indexing
@@ -108,11 +122,11 @@ public:
   FXbool operator==(const FXMat3f& a) const;
   FXbool operator!=(const FXMat3f& a) const;
 
-  friend inline FXbool operator==(const FXMat3f& a,FXfloat n);
-  friend inline FXbool operator==(FXfloat n,const FXMat3f& a);
-  
-  friend inline FXbool operator!=(const FXMat3f& a,FXfloat n);
-  friend inline FXbool operator!=(FXfloat n,const FXMat3f& a);
+  friend FXAPI FXbool operator==(const FXMat3f& a,FXfloat n);
+  friend FXAPI FXbool operator==(FXfloat n,const FXMat3f& a);
+
+  friend FXAPI FXbool operator!=(const FXMat3f& a,FXfloat n);
+  friend FXAPI FXbool operator!=(FXfloat n,const FXMat3f& a);
 
   /// Matrix and scalar
   friend FXAPI FXMat3f operator*(FXfloat x,const FXMat3f& a);

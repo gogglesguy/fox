@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToolBarTab.cpp,v 1.27 2007/07/09 16:27:16 fox Exp $                    *
+* $Id: FXToolBarTab.cpp,v 1.28 2007/08/27 18:51:00 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -353,7 +353,7 @@ long FXToolBarTab::onUpdUncollapse(FXObject* sender,FXSelector,void*){
 
 // We were asked about tip text
 long FXToolBarTab::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !tip.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
     return 1;

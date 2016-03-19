@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGZFileStream.h,v 1.11 2007/07/09 16:02:45 fox Exp $                    *
+* $Id: FXGZFileStream.h,v 1.12 2007/10/04 13:18:50 fox Exp $                    *
 ********************************************************************************/
 #ifdef HAVE_ZLIB_H
 #ifndef FXGZFILESTREAM_H
@@ -38,8 +38,8 @@ struct ZBlock;
 /// GZIP compressed stream
 class FXAPI FXGZFileStream : public FXFileStream {
 private:
-  ZBlock *z;
-  int     f;
+  ZBlock *gz;
+  int     ac;
 protected:
   virtual FXuval writeBuffer(FXuval count);
   virtual FXuval readBuffer(FXuval count);
@@ -50,6 +50,9 @@ public:
 
   /// Open file stream
   FXbool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
+
+  /// Flush buffer
+  virtual FXbool flush();
 
   /// Close file stream
   virtual FXbool close();

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: PathFinder.cpp,v 1.137 2007/07/06 04:22:31 fox Exp $                     *
+* $Id: PathFinder.cpp,v 1.141 2007/08/21 15:16:53 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -591,7 +591,7 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
         if(association->command.text()){
-          FXString command=FXStringFormat(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
+          FXString command=FXString::value(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
           FXTRACE((100,"system(%s)\n",command.text()));
           system(command.text());
           }
@@ -649,7 +649,7 @@ long PathFinderMain::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
         if(association->command.text()){
-          FXString command=FXStringFormat(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
+          FXString command=FXString::value(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
           FXTRACE((100,"system(%s)\n",command.text()));
           system(command.text());
           }
@@ -775,7 +775,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"PathFinder",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXStringFormat(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp (jeroen@fox-toolkit.org).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp (jeroen@fox-toolkit.org).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -907,12 +907,12 @@ long PathFinderMain::onUpdFiles(FXObject* sender,FXSelector,void*){
 
 // Update status line to show some info about the icon the cursor is over
 long PathFinderMain::onUpdStatusline(FXObject* sender,FXSelector,void*){
-  FXint index;
-  index=filelist->getCursorItem();
+  FXint index=filelist->getCursorItem();
   if(0<=index){
-    FXString info;
     FXFileItem *item=(FXFileItem*)filelist->getItem(index);
     FXFileAssoc *assoc=item->getAssoc();
+    FXString size;
+    FXString info;
 
     // What is this thing?
     if(item->isDirectory())       info="Directory: ";
@@ -924,11 +924,14 @@ long PathFinderMain::onUpdStatusline(FXObject* sender,FXSelector,void*){
     else if(item->isExecutable()) info="Application: ";
     else                          info="File: ";
 
+    // Get size
+    size.fromLong(item->getSize());
+    
     // Add the name
     info+=filelist->getItemFilename(index);
 
     // Add size if its a file
-    if(item->isFile()) info+=" ("+FXStringVal(item->getSize())+" bytes) ";
+    if(item->isFile()) info+=" ("+size+" bytes) ";
 
     // Add the extension
     if(assoc) info+=assoc->extension;
@@ -954,7 +957,7 @@ long PathFinderMain::onCmdNewPathFinder(FXObject*,FXSelector,void*){
   FXString path=filelist->getDirectory();
   saveSettings();
   getApp()->reg().write();
-  FXString command=FXStringFormat("%s %s &",pathfindercommand,path.text());
+  FXString command=FXString::value("%s %s &",pathfindercommand,path.text());
   system(command.text());
   return 1;
   }
@@ -1709,7 +1712,8 @@ long PathFinderMain::onUpdFileLocation(FXObject* sender,FXSelector,void*){
 
 // Update file type
 long PathFinderMain::onUpdFileSize(FXObject* sender,FXSelector,void*){
-  FXString size=FXStringVal(FXStat::size(filelist->getCurrentFile()));
+  FXString size;
+  size.fromInt(FXStat::size(filelist->getCurrentFile()));
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&size);
   return 1;
   }

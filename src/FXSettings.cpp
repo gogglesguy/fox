@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSettings.cpp,v 1.81 2007/07/25 14:34:37 fox Exp $                      *
+* $Id: FXSettings.cpp,v 1.82 2007/08/31 05:36:32 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -124,19 +124,18 @@ void FXSettings::deleteData(void* ptr){
 // Parse filename
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
   FXFile file(filename,FXIO::Reading);
-  FXTRACE((1,"parseFile(%s)\n",filename.text()));
   if(file.isOpen()){
-  
+
     // Prepare buffer string
     FXString string('\0',file.size());
-    
+
     // Load file
     if(file.readBlock(&string[0],string.length())==string.length()){
       FXStringDict *group=NULL;
       FXint lineno=1,p=0,b,e;
       FXString name;
       FXString value;
-      
+
       // Skip BOM, if any
       if(string[p]=='\xef' && string[p+1]=='\xbb' && string[p+2]=='\xbf') p+=3;
 
@@ -146,9 +145,9 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
         // Skip leading blanks
         while(Ascii::isBlank(string[p])) p++;
 
-        // Non-comment 
+        // Non-comment
         if(string[p] && string[p]!='\n' && string[p]!='#' && string[p]!=';'){
-          
+
           // Parse section name
           if(string[p]=='['){
 
@@ -159,12 +158,12 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
 
             // Check errors
             if(string[p]!=']'){ fxwarning("%s:%d: illegal section name.\n",filename.text(),lineno); goto next; }
-            
+
             e=p++;
-                        
+
             // Grab name
             name=string.mid(b,e-b);
-            
+
             // Add new section dict
             group=insert(name.text());
             }
@@ -184,13 +183,13 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
             if(string[p]!='='){ fxwarning("%s:%d: expected '=' to follow key.\n",filename.text(),lineno); goto next; }
 
             e=p++;
-            
+
             // Remove trailing spaces after name
             while(b<e && Ascii::isBlank(string[e-1])) e--;
 
             // Grab name
             name=string.mid(b,e-b);
-            
+
             // Skip leading spaces
             while(Ascii::isBlank(string[p])) p++;
 
@@ -201,13 +200,13 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
             while(string[p] && string[p]!='\n' && !Ascii::isControl(string[p])) p++;
 
             e=p;
-            
+
             // Remove trailing spaces after value
             while(b<e && Ascii::isBlank(string[e-1])) e--;
 
             // Grab the unescaped value
             value=string.mid(b,e-b).unescape('"','"');
-            
+
             // Add entry to current section
             group->replace(name.text(),value.text(),mrk);
             }
@@ -220,14 +219,14 @@ next:   while(string[p] && string[p]!='\n') p++;
         if(string[p]=='\n'){
           lineno++;
           p++;
-          }  
+          }
         }
       return true;
       }
     }
   return false;
   }
-      
+
 
 // Unparse registry file
 FXbool FXSettings::unparseFile(const FXString& filename){
@@ -270,7 +269,7 @@ FXbool FXSettings::unparseFile(const FXString& filename){
         string.append(ENDLINE);
         }
       }
-      
+
     // Save file
     if(file.writeBlock(&string[0],string.length())==string.length()){
       return true;

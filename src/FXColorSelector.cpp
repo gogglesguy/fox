@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorSelector.cpp,v 1.82 2007/07/09 16:26:44 fox Exp $                 *
+* $Id: FXColorSelector.cpp,v 1.85 2007/08/10 17:41:57 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -435,11 +435,12 @@ long FXColorSelector::onCmdAlphaText(FXObject* sender,FXSelector,void*){
 
 // Update Alpha text fields
 long FXColorSelector::onUpdAlphaText(FXObject* sender,FXSelector,void*){
+  FXString value;
   if(isOpaqueOnly()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_HIDE),NULL);
     }
   else{
-    FXString value=FXStringVal(255.0*rgba[3],1,FALSE);
+    value.fromDouble(255.0*rgba[3],1,0);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&value);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
     }
@@ -513,7 +514,7 @@ long FXColorSelector::onCmdRGBSlider(FXObject*,FXSelector sel,void*){
 // Update well from RGB text fields
 long FXColorSelector::onCmdRGBText(FXObject*,FXSelector sel,void*){
   FXint which=FXSELID(sel)-ID_RGB_RED_TEXT;
-  rgba[which]=0.003921568627f*FXFloatVal(rgbatext[which]->getText());
+  rgba[which]=0.003921568627f*rgbatext[which]->getText().toFloat();
   fxrgb_to_hsv(hsva[0],hsva[1],hsva[2],rgba[0],rgba[1],rgba[2]);
   updateWell();
   if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)well->getRGBA());
@@ -524,7 +525,7 @@ long FXColorSelector::onCmdRGBText(FXObject*,FXSelector sel,void*){
 // Update RGB text fields
 long FXColorSelector::onUpdRGBText(FXObject*,FXSelector sel,void*){
   FXint which=FXSELID(sel)-ID_RGB_RED_TEXT;
-  rgbatext[which]->setText(FXStringVal(255.0f*rgba[which],1,FALSE));
+  rgbatext[which]->setText(FXString::value(255.0f*rgba[which],1,0));
   return 1;
   }
 
@@ -558,7 +559,7 @@ long FXColorSelector::onCmdHSVSlider(FXObject*,FXSelector sel,void*){
 long FXColorSelector::onCmdHSVText(FXObject*,FXSelector sel,void*){
   const FXfloat factor[3]={1.0f,0.01f,0.01f};
   FXint which=FXSELID(sel)-ID_HSV_HUE_TEXT;
-  hsva[which]=factor[which]*FXFloatVal(hsvatext[which]->getText());
+  hsva[which]=factor[which]*hsvatext[which]->getText().toFloat();
   fxhsv_to_rgb(rgba[0],rgba[1],rgba[2],hsva[0],hsva[1],hsva[2]);
   updateWell();
   if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)well->getRGBA());
@@ -570,7 +571,7 @@ long FXColorSelector::onCmdHSVText(FXObject*,FXSelector sel,void*){
 long FXColorSelector::onUpdHSVText(FXObject*,FXSelector sel,void*){
   const FXfloat factor[3]={1.0f,100.0f,100.0f};
   FXint which=FXSELID(sel)-ID_HSV_HUE_TEXT;
-  hsvatext[which]->setText(FXStringVal(hsva[which]*factor[which],1,FALSE));
+  hsvatext[which]->setText(FXString::value(hsva[which]*factor[which],1,0));
   return 1;
   }
 
@@ -602,7 +603,7 @@ long FXColorSelector::onCmdCMYSlider(FXObject*,FXSelector sel,void*){
 
 long FXColorSelector::onCmdCMYText(FXObject*,FXSelector sel,void*){
   FXint which=FXSELID(sel)-ID_CMY_CYAN_TEXT;
-  FXfloat val=0.003921568627f*FXFloatVal(cmytext[which]->getText());
+  FXfloat val=0.003921568627f*cmytext[which]->getText().toFloat();
   rgba[which]=1.0f-val;
   fxrgb_to_hsv(hsva[0],hsva[1],hsva[2],rgba[0],rgba[1],rgba[2]);
   hsva[3]=rgba[3];
@@ -615,7 +616,7 @@ long FXColorSelector::onCmdCMYText(FXObject*,FXSelector sel,void*){
 long FXColorSelector::onUpdCMYText(FXObject*,FXSelector sel,void*){
   FXint which=FXSELID(sel)-ID_CMY_CYAN_TEXT;
   FXfloat val=255.0f-255.0f*rgba[which];
-  cmytext[which]->setText(FXStringVal(val,1,FALSE));
+  cmytext[which]->setText(FXString::value(val,1,0));
   return 1;
   }
 

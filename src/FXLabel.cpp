@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXLabel.cpp,v 1.63 2007/07/09 16:27:01 fox Exp $                         *
+* $Id: FXLabel.cpp,v 1.65 2007/08/27 18:50:59 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -296,7 +296,7 @@ long FXLabel::onCmdSetStringValue(FXObject*,FXSelector,void* ptr){
 
 // Obtain value from text field
 long FXLabel::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){
-  *((FXString*)ptr)=getText();
+  *((FXString*)ptr)=label;
   return 1;
   }
 
@@ -408,7 +408,7 @@ long FXLabel::onCmdGetTip(FXObject*,FXSelector,void* ptr){
 
 // We were asked about tip text
 long FXLabel::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !tip.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
     return 1;
@@ -419,7 +419,7 @@ long FXLabel::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXLabel::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;

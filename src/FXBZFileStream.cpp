@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.cpp,v 1.11 2007/07/09 16:31:34 fox Exp $                  *
+* $Id: FXBZFileStream.cpp,v 1.15 2007/10/05 14:09:04 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -74,18 +74,19 @@ FXuval FXBZFileStream::writeBuffer(FXuval){
   FXASSERT(begptr<=rdptr);
   FXASSERT(rdptr<=wrptr);
   FXASSERT(wrptr<=endptr);
-  while(rdptr<wrptr){
+  while(rdptr<wrptr || ac==BZ_FINISH || ac==BZ_FLUSH){
     bz->stream.next_in=(char*)rdptr;
     bz->stream.avail_in=wrptr-rdptr;
     bz->stream.next_out=bz->buffer;
     bz->stream.avail_out=BUFFERSIZE;
     bzerror=BZ2_bzCompress(&bz->stream,ac);
-//    if(bzerror!=BZ_OK) break;
-    if(!(bzerror==BZ_RUN_OK || bzerror==BZ_STREAM_END)) break;
+    if(bzerror<BZ_OK) break;                            // Error occurred
     m=bz->stream.next_out-bz->buffer;
     n=file.writeBlock(bz->buffer,m);
-    if(n<m) break;
+    if(n<m) break;                                      // Failed to write data
     rdptr=(FXuchar*)bz->stream.next_in;
+    if(bzerror==BZ_STREAM_END) break;                   // Finished all data
+    if(bzerror==BZ_RUN_OK && ac==BZ_FLUSH) break;       // Flushed all data
     }
   if(rdptr<wrptr){memmove(begptr,rdptr,wrptr-rdptr);}
   wrptr=begptr+(wrptr-rdptr);
@@ -105,11 +106,7 @@ FXuval FXBZFileStream::readBuffer(FXuval){
   wrptr=begptr+(wrptr-rdptr);
   rdptr=begptr;
   while(wrptr<endptr){
-//    n=file.readBlock(bz->buffer,BUFFERSIZE);
-//    if(n<=0) break;
-//    bz->stream.next_in=bz->buffer;
-//    bz->stream.avail_in=n;
-    if(bz->stream.avail_in<=0){ // get more input if buffer is empty
+    if(bz->stream.avail_in<=0){                         // Read more input 
       n=file.readBlock(bz->buffer,BUFFERSIZE);
       if(n<=0) break;
       bz->stream.next_in=bz->buffer;
@@ -118,10 +115,9 @@ FXuval FXBZFileStream::readBuffer(FXuval){
     bz->stream.next_out=(char*)wrptr;
     bz->stream.avail_out=endptr-wrptr;
     bzerror=BZ2_bzDecompress(&bz->stream);
-//    if(bzerror!=BZ_OK) break;
-    if(!(bzerror==BZ_OK || bzerror==BZ_STREAM_END)) break;
+    if(bzerror<BZ_OK) break;                            // Error occurred
     wrptr=(FXuchar*)bz->stream.next_out;
-    if(bzerror==BZ_STREAM_END) break;
+    if(bzerror==BZ_STREAM_END) break;                   // Hit end of file
     }
   return wrptr-rdptr;
   }
@@ -152,6 +148,17 @@ FXbool FXBZFileStream::open(const FXString& filename,FXStreamDirection save_or_l
     FXFileStream::close();
     }
   return false;
+  }
+
+
+// Flush buffer
+FXbool FXBZFileStream::flush(){
+  FXbool result;
+  int action=ac;
+  if(ac!=BZ_FINISH) ac=BZ_FLUSH;
+  result=FXStream::flush();
+  ac=action;
+  return result;
   }
 
 

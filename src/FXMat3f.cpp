@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3f.cpp,v 1.19 2007/07/09 16:27:02 fox Exp $                         *
+* $Id: FXMat3f.cpp,v 1.23 2007/09/24 21:00:49 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -31,6 +31,7 @@
 #include "FXVec4f.h"
 #include "FXQuatf.h"
 #include "FXMat3f.h"
+#include "FXMat4f.h"
 
 
 /*
@@ -65,11 +66,27 @@ FXMat3f::FXMat3f(const FXMat3f& other){
   }
 
 
+// Initialize from rotation and scaling part of 4x4 matrix
+FXMat3f::FXMat3f(const FXMat4f& other){
+  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
+  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
+  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+  }
+
+
 // Initialize matrix from scalar
 FXMat3f::FXMat3f(FXfloat w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w;
   m[1][0]=w; m[1][1]=w; m[1][2]=w;
   m[2][0]=w; m[2][1]=w; m[2][2]=w;
+  }
+
+
+// Initialize diagonal matrix 
+FXMat3f::FXMat3f(FXfloat a,FXfloat b,FXfloat c){
+  m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
+  m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
   }
 
 
@@ -104,7 +121,16 @@ FXMat3f& FXMat3f::operator=(const FXMat3f& other){
   }
 
 
-// Set matrix to constant
+// Assign from rotation and scaling part of 4x4 matrix
+FXMat3f& FXMat3f::operator=(const FXMat4f& other){
+  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
+  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
+  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+  return *this;
+  }
+
+
+// Assign from scalar
 FXMat3f& FXMat3f::operator=(FXfloat w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w;
   m[1][0]=w; m[1][1]=w; m[1][2]=w;
@@ -122,7 +148,16 @@ FXMat3f& FXMat3f::set(const FXMat3f& other){
   }
 
 
-// Construct from scalar number
+// Set from rotation and scaling part of 4x4 matrix
+FXMat3f& FXMat3f::set(const FXMat4f& other){
+  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
+  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
+  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+  return *this;
+  }
+
+
+// Set value from scalar
 FXMat3f& FXMat3f::set(FXfloat w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w;
   m[1][0]=w; m[1][1]=w; m[1][2]=w;
@@ -131,7 +166,16 @@ FXMat3f& FXMat3f::set(FXfloat w){
   }
 
 
-// Construct from components
+// Set diagonal matrix 
+FXMat3f& FXMat3f::set(FXfloat a,FXfloat b,FXfloat c){
+  m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
+  m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
+  return *this;
+  }
+
+
+// Set value from components
 FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
@@ -140,7 +184,7 @@ FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a1
   }
 
 
-// Construct matrix from three vectors
+// Set value from three vectors
 FXMat3f& FXMat3f::set(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
   m[0]=a;
   m[1]=b;
@@ -149,7 +193,7 @@ FXMat3f& FXMat3f::set(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
   }
 
 
-// Construct rotation matrix from quaternion
+// Set value from quaternion
 FXMat3f& FXMat3f::set(const FXQuatf& quat){
   quat.getAxes(m[0],m[1],m[2]);
   return *this;
@@ -202,7 +246,7 @@ FXMat3f& FXMat3f::operator*=(const FXMat3f& w){
   }
 
 
-// Divide matric by scalar
+// Divide matrix by scalar
 FXMat3f& FXMat3f::operator/=(FXfloat w){
   m[0][0]/=w; m[0][1]/=w; m[0][2]/=w;
   m[1][0]/=w; m[1][1]/=w; m[1][2]/=w;

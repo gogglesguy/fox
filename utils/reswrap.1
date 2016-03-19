@@ -1,4 +1,4 @@
-.TH reswrap 1 "August 2006" "The FOX C++ GUI Toolkit" "FOX Programmers Manual"
+.TH reswrap 1 "August 2007" "The FOX C++ GUI Toolkit" "FOX Programmers Manual"
 
 .SH NAME
 reswrap \- wrap icon resources into C or C++ code
@@ -11,8 +11,8 @@ reswrap \- wrap icon resources into C or C++ code
 .SH DESCRIPTION
 .B Reswrap
 is a tool to turn images, text, and other resource files into C or C++ data arrays.
-This allows various binary resources to be embedded in the source code, and
-compiled into an application.
+This allows various binary resources to be embedded in source code and compiled into 
+an application.
 
 In development of graphical applications with FOX, it is used to embed
 icons and images for the user interface into the executable and eliminate the need
@@ -61,7 +61,7 @@ instead of writing to stdout.
 Append the output of the conversion to
 .I file
 instead of writing to stdout.  If \fI file\fR does not exist yet, it is created, and the optional
-comment line will be written, followed by the optional \fB#include "\fR\fIfile\fR\fB"\fR directive.  
+comment line will be written, followed by the optional \fB#include "\fR\fIfile\fR\fB"\fR directive.
 If the file already exists then it will be opened for appending.
 
 .TP
@@ -104,8 +104,11 @@ resource file.
 
 .TP
 \fB\-ta\fR, \fB\--ascii\fR
-Write data as a text string, with each byte represented as a hexadecimal
-excape sequence, as in "\\x33".
+Write data as a text string, with each byte printed normally unless it must be
+escaped, as in "\\x33".  Use this option if you need to embed large chunks of
+text (for example, on-line help) into the application.  This lets you keep
+the original text in a plain text file, and obviates the need to manually escape
+special characters to embed them into source code.
 The C++ compiler appends a nul-character at the end of
 the text string, thus making the data array one character longer than the
 resource file.
@@ -129,24 +132,34 @@ the resource file.  For example, \fIimage.gif\fR generates \fIconst unsigned cha
 .TP
 \fB\-m\fR, \fB\--msdos\fR
 Read files with MS-DOS mode.  This replaces "\\r\\n" with "\\n" when reading the resource file.
+Only use this if the resource is actually text!
 
 .TP
 \fB\-b\fR, \fB\--binary\fR
-Read files in BINARY mode. This option is the default.
+Read files in BINARY mode. Data other than text should always be read in using binary mode.  
+This option is the default. 
 
 .TP
 \fB\-u\fR, \fB\--unsigned\fR
-Generate \fI\unsigned char\fR declaration, even when  \fI\--text\fR or \fI\--ascii\fR
+Generate \fIunsigned char\fR declaration, even when  \fI--text\fR or \fI--ascii\fR
 was specified.
 
 .TP
-\fB\-c\fR, \fB\--comments\fR
+\fB\-N\fR, \fB\--no-const\fR
+Do not generate \fIconst\fR declarations.
+
+.TP
+\fB\-C\fR, \fB\--const\fR
+Force generation of \fIconst\fR declarations.
+
+.TP
+\fB\-cc\fR, \fB\--comments\fR
 Add comments to the output files.  This option is the default.  At the top of
 each output file, write the current date, and the reswrap version number.
 
 .TP
 \fB\-nc\fR, \fB\--no-comments\fR
-Suppress generations of comments in the output files. 
+Suppress generations of comments in the output files.
 
 .TP
 \fB\-p\fI name\fR, \fB\--prefix\fI name\fR
@@ -198,7 +211,7 @@ This manpage was originally written by Torsten Landschoff (torsten@debian.org)
 for the Debian distribution of the FOX Toolkit, and is currently maintained
 by Jeroen van der Zijp (jeroen@fox-toolkit.org).
 .SH COPYRIGHT
-Copyright \(co 1997,2006 Jeroen van der Zijp.
+Copyright \(co 1997,2007 Jeroen van der Zijp.
 .br
 This is free software; see the source for copying conditions.  There is
 NO warranty; not even for MERCHANTABILITY or FITNESS FOR  A  PARTICULAR

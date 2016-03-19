@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.175 2007/07/09 16:26:55 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.176 2007/08/27 18:27:27 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1885,7 +1885,7 @@ long FXGLViewer::onMotion(FXObject*,FXSelector,void* ptr){
         break;
       }
     }
-  return 1; //changed;
+  return 1;
   }
 
 
@@ -1994,7 +1994,7 @@ long FXGLViewer::onTipTimer(FXObject*,FXSelector,void*){
 
 // We were asked about status text
 long FXGLViewer::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXGLCanvas::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;
@@ -2005,7 +2005,7 @@ long FXGLViewer::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about tip text
 long FXGLViewer::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXGLCanvas::onQueryTip(sender,sel,ptr)) return 1;
   if(flags&FLAG_TIP){
     FXint x,y; FXuint state;
     getCursorPosition(x,y,state);

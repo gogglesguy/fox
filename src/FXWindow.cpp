@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.372 2007/07/20 18:31:01 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.373 2007/09/07 21:02:44 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -86,7 +86,7 @@
 #ifndef WIN32
 
 // Basic events
-#define BASIC_EVENT_MASK   (StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask|KeyPressMask|KeyReleaseMask|KeymapStateMask)
+#define BASIC_EVENT_MASK   (StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask|KeyPressMask|KeyReleaseMask|KeymapStateMask|VisibilityChangeMask)
 
 // Additional events for shell widget events
 #define SHELL_EVENT_MASK   (FocusChangeMask|StructureNotifyMask)

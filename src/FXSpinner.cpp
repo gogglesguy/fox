@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSpinner.cpp,v 1.76 2007/07/09 16:27:10 fox Exp $                       *
+* $Id: FXSpinner.cpp,v 1.79 2007/08/10 17:41:58 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -248,7 +248,7 @@ long FXSpinner::onUpdEntry(FXObject*,FXSelector,void*){
 
 // Text field changed
 long FXSpinner::onChgEntry(FXObject*,FXSelector,void*){
-  register FXint value=FXIntVal(textField->getText());
+  register FXint value=textField->getText().toInt();
   if(value<range[0]) value=range[0];
   if(value>range[1]) value=range[1];
   if(value!=pos){
@@ -261,7 +261,7 @@ long FXSpinner::onChgEntry(FXObject*,FXSelector,void*){
 
 // Text field command
 long FXSpinner::onCmdEntry(FXObject*,FXSelector,void*){
-  textField->setText(FXStringVal(pos));       // Put back adjusted value
+  textField->setText(FXString::value(pos));       // Put back adjusted value
   if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
   return 1;
   }
@@ -439,8 +439,8 @@ void FXSpinner::setValue(FXint value,FXbool notify){
   if(value<range[0]) value=range[0];
   if(value>range[1]) value=range[1];
   if(pos!=value){
-    textField->setText(FXStringVal(value));
     pos=value;
+    textField->setText(FXString::value(value));
     if(notify && target){target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);}
     }
   }

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: table.cpp,v 1.72 2007/02/07 20:22:24 fox Exp $                           *
+* $Id: table.cpp,v 1.77 2007/08/27 18:27:30 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -117,6 +117,8 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   // Menubar
   menubar=new FXMenuBar(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
 
+  new FXStatusBar(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
+
   // Separator
   new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
 
@@ -136,11 +138,12 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   table->setCellColor(0,1,FXRGB(255,240,240));
   table->setCellColor(1,0,FXRGB(240,255,240));
   table->setCellColor(1,1,FXRGB(240,240,255));
+  table->setHelpText("Editable table.");
 
   // Initialize scrollable part of table
   for(r=0; r<50; r++){
     for(c=0; c<14; c++){
-      table->setItemText(r,c,"r:"+FXStringVal(r)+" c:"+FXStringVal(c));
+      table->setItemText(r,c,"r:"+FXString::value(r)+" c:"+FXString::value(c));
       }
     }
 
@@ -151,7 +154,7 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
 
   // Initialize row headers
   for(r=0; r<50; r++){
-    table->setRowText(r,"Row"+FXStringVal(r));
+    table->setRowText(r,"Row"+FXString::value(r));
     }
 /*
   table->setLeadingRows(1);
@@ -265,6 +268,7 @@ long TableWindow::onCmdTest(FXObject*,FXSelector,void*){
 // Resize table
 long TableWindow::onCmdResizeTable(FXObject*,FXSelector,void*){
   FXDialogBox dlg(this,"Resize Table");
+  FXint nr,nc,r,c;
   FXHorizontalFrame *hframe=new FXHorizontalFrame(&dlg,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXLabel(hframe,"Rows:",NULL,LAYOUT_SIDE_LEFT|LAYOUT_CENTER_Y);
   FXTextField* rows=new FXTextField(hframe,5,NULL,0,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_LEFT|LAYOUT_CENTER_Y);
@@ -275,18 +279,17 @@ long TableWindow::onCmdResizeTable(FXObject*,FXSelector,void*){
   FXint oldnr,oldnc;
   oldnr=table->getNumRows();
   oldnc=table->getNumColumns();
-  rows->setText(FXStringVal(oldnr));
-  cols->setText(FXStringVal(oldnc));
+  rows->setText(FXString::value(oldnr));
+  cols->setText(FXString::value(oldnc));
   if(dlg.execute()){
-    FXint nr,nc,r,c;
-    nr=FXIntVal(rows->getText());
-    nc=FXIntVal(cols->getText());
+    nr=rows->getText().toInt();
+    nc=cols->getText().toInt();
     if(nr<0) nr=0;
     if(nc<0) nc=0;
     table->setTableSize(nr,nc);
     for(r=0; r<nr; r++){
       for(c=0; c<nc; c++){
-        //table->setItemText(r,c,"r:"+FXStringVal(r+1)+" c:"+FXStringVal(c+1));
+        table->setItemText(r,c,"r:"+FXString::value(r+1)+" c:"+FXString::value(c+1));
         }
       }
     }

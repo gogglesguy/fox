@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.117 2007/06/14 16:09:54 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.119 2007/08/10 16:49:33 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -560,9 +560,11 @@ long ImageWindow::onCmdQuit(FXObject*,FXSelector,void*){
 
 // Update title
 long ImageWindow::onUpdTitle(FXObject* sender,FXSelector,void*){
-  FXString caption="FOX Image Viewer:- " + filename;
+  FXString caption("FOX Image Viewer:- " + filename);
   FXImage* image=imageview->getImage();
-  if(image){ caption+=" (" + FXStringVal(image->getWidth()) + " x " + FXStringVal(image->getHeight()) + ")"; }
+  if(image){
+    caption.format("FOX Image Viewer:- %s (%d x %d)",filename.text(),image->getWidth(),image->getHeight());
+    }
   sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&caption);
   return 1;
   }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXInputDialog.cpp,v 1.44 2007/07/09 16:27:00 fox Exp $                   *
+* $Id: FXInputDialog.cpp,v 1.47 2007/08/10 17:41:58 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -132,8 +132,8 @@ FXuint FXInputDialog::execute(FXuint placement){
   show(placement);
   return getApp()->runModalFor(this);
   }
-  
-  
+
+
 extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
 
 
@@ -193,9 +193,9 @@ FXbool FXInputDialog::getString(FXString& result,FXApp* app,const FXString& capt
 FXbool FXInputDialog::getInteger(FXint& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon,FXint lo,FXint hi){
   FXInputDialog inputdialog(owner,caption,label,icon,INPUTDIALOG_INTEGER,0,0,0,0);
   inputdialog.setLimits(lo,hi);
-  inputdialog.setText(FXStringVal(FXCLAMP(lo,result,hi)));
+  inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi)));
   if(inputdialog.execute()){
-    result=FXIntVal(inputdialog.getText());
+    result=inputdialog.getText().toInt();
     return true;
     }
   return false;
@@ -206,9 +206,9 @@ FXbool FXInputDialog::getInteger(FXint& result,FXWindow* owner,const FXString& c
 FXbool FXInputDialog::getInteger(FXint& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon,FXint lo,FXint hi){
   FXInputDialog inputdialog(app,caption,label,icon,INPUTDIALOG_INTEGER,0,0,0,0);
   inputdialog.setLimits(lo,hi);
-  inputdialog.setText(FXStringVal(FXCLAMP(lo,result,hi)));
+  inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi)));
   if(inputdialog.execute()){
-    result=FXIntVal(inputdialog.getText());
+    result=inputdialog.getText().toInt();
     return true;
     }
   return false;
@@ -219,9 +219,9 @@ FXbool FXInputDialog::getInteger(FXint& result,FXApp* app,const FXString& captio
 FXbool FXInputDialog::getReal(FXdouble& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon,FXdouble lo,FXdouble hi){
   FXInputDialog inputdialog(owner,caption,label,icon,INPUTDIALOG_REAL,0,0,0,0);
   inputdialog.setLimits(lo,hi);
-  inputdialog.setText(FXStringVal(FXCLAMP(lo,result,hi),10));
+  inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi),10));
   if(inputdialog.execute()){
-    result=FXDoubleVal(inputdialog.getText());
+    result=inputdialog.getText().toDouble();
     return true;
     }
   return false;
@@ -232,9 +232,9 @@ FXbool FXInputDialog::getReal(FXdouble& result,FXWindow* owner,const FXString& c
 FXbool FXInputDialog::getReal(FXdouble& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon,FXdouble lo,FXdouble hi){
   FXInputDialog inputdialog(app,caption,label,icon,INPUTDIALOG_REAL,0,0,0,0);
   inputdialog.setLimits(lo,hi);
-  inputdialog.setText(FXStringVal(FXCLAMP(lo,result,hi),10));
+  inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi),10));
   if(inputdialog.execute()){
-    result=FXDoubleVal(inputdialog.getText());
+    result=inputdialog.getText().toDouble();
     return true;
     }
   return false;

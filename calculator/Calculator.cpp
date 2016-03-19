@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Calculator.cpp,v 1.66 2007/07/06 04:22:29 fox Exp $                      *
+* $Id: Calculator.cpp,v 1.68 2007/08/10 16:35:32 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -777,9 +777,9 @@ void Calculator::setDisplayText(const FXString& txt){
 FXdouble Calculator::getDisplayValue() const {
   FXdouble val;
   if(base==10)
-    val=FXDoubleVal(getDisplayText());
+    val=getDisplayText().toDouble();
   else
-    val=(FXdouble)FXUIntVal(getDisplayText(),base);
+    val=(FXdouble)getDisplayText().toInt(base);
   return val;
   }
 
@@ -787,6 +787,7 @@ FXdouble Calculator::getDisplayValue() const {
 // Redisplay new value
 void Calculator::setDisplayValue(FXdouble val){
   FXint fp=fxieeedoubleclass(val);
+  FXString string;
   if(fp==-2 || fp==+2){
     setDisplayText("ERROR");
     if(beep) getApp()->beep();
@@ -801,10 +802,10 @@ void Calculator::setDisplayValue(FXdouble val){
     }
   else if(base==10){
     if(val==0.0) val=0.0;       // Don't ever print out -0 instead of 0
-    setDisplayText(FXStringVal(val,precision,exponent));
+    setDisplayText(string.fromDouble(val,precision,exponent));
     }
   else{
-    setDisplayText(FXStringVal((FXuint)floor(val),base));
+    setDisplayText(string.fromUInt((FXuint)floor(val),base));
     }
   }
 

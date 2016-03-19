@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGIFCursor.cpp,v 1.37 2007/07/09 16:26:54 fox Exp $                     *
+* $Id: FXGIFCursor.cpp,v 1.38 2007/08/07 01:19:06 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -68,7 +68,7 @@ FXGIFCursor::FXGIFCursor(FXApp* a,const void *pix,FXint hx,FXint hy):FXCursor(a,
   if(pix){
     FXMemoryStream ms;
     ms.open(FXStreamLoad,(FXuchar*)pix);
-    fxloadGIF(ms,data,width,height);
+    fxloadGIF(ms,data,width,height,true);
     hotx=FXCLAMP(0,hx,width-1);
     hoty=FXCLAMP(0,hy,height-1);
     options|=CURSOR_OWNED;
@@ -79,7 +79,7 @@ FXGIFCursor::FXGIFCursor(FXApp* a,const void *pix,FXint hx,FXint hy):FXCursor(a,
 
 // Save object to stream
 FXbool FXGIFCursor::savePixels(FXStream& store) const {
-  if(fxsaveGIF(store,data,width,height)){
+  if(fxsaveGIF(store,data,width,height,true)){
     return true;
     }
   return false;
@@ -89,7 +89,7 @@ FXbool FXGIFCursor::savePixels(FXStream& store) const {
 // Load object from stream
 FXbool FXGIFCursor::loadPixels(FXStream& store){
   if(options&CURSOR_OWNED){freeElms(data);}
-  if(fxloadGIF(store,data,width,height)){
+  if(fxloadGIF(store,data,width,height,true)){
     options|=CURSOR_OWNED;
     return true;
     }

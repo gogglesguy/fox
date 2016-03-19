@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.cpp,v 1.270 2007/07/09 16:27:11 fox Exp $                        *
+* $Id: FXTable.cpp,v 1.272 2007/08/27 18:51:00 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -621,7 +621,10 @@ void FXComboTableItem::setFromControl(FXWindow *control){
 // Map
 FXDEFMAP(FXTable) FXTableMap[]={
   FXMAPFUNC(SEL_PAINT,0,FXTable::onPaint),
+  FXMAPFUNC(SEL_ENTER,0,FXTable::onEnter),
+  FXMAPFUNC(SEL_LEAVE,0,FXTable::onLeave),
   FXMAPFUNC(SEL_MOTION,0,FXTable::onMotion),
+  FXMAPFUNC(SEL_TIMEOUT,FXList::ID_TIPTIMER,FXTable::onTipTimer),
   FXMAPFUNC(SEL_TIMEOUT,FXWindow::ID_AUTOSCROLL,FXTable::onAutoScroll),
   FXMAPFUNC(SEL_UNGRABBED,0,FXTable::onUngrabbed),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,0,FXTable::onLeftBtnPress),
@@ -642,6 +645,8 @@ FXDEFMAP(FXTable) FXTableMap[]={
   FXMAPFUNC(SEL_DOUBLECLICKED,0,FXTable::onDoubleClicked),
   FXMAPFUNC(SEL_TRIPLECLICKED,0,FXTable::onTripleClicked),
   FXMAPFUNC(SEL_COMMAND,0,FXTable::onCommand),
+  FXMAPFUNC(SEL_QUERY_TIP,0,FXTable::onQueryTip),
+  FXMAPFUNC(SEL_QUERY_HELP,0,FXTable::onQueryHelp),
   FXMAPFUNC(SEL_UPDATE,FXTable::ID_HORZ_GRID,FXTable::onUpdHorzGrid),
   FXMAPFUNC(SEL_UPDATE,FXTable::ID_VERT_GRID,FXTable::onUpdVertGrid),
   FXMAPFUNC(SEL_COMMAND,FXTable::ID_HORZ_GRID,FXTable::onCmdHorzGrid),
@@ -1950,6 +1955,59 @@ long FXTable::onUpdAcceptInput(FXObject* sender,FXSelector,void*){
   }
 
 
+
+// We timed out, i.e. the user didn't move for a while
+long FXTable::onTipTimer(FXObject*,FXSelector,void*){
+  flags|=FLAG_TIP;
+  return 1;
+  }
+
+
+// We were asked about tip text
+long FXTable::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
+  if(FXScrollArea::onQueryTip(sender,sel,ptr)) return 1;
+  if((flags&FLAG_TIP)){ 
+    FXint cx,cy,r,c; FXuint state;
+    getCursorPosition(cx,cy,state);
+    c=colAtX(cx);
+    r=rowAtY(cy);
+    if(0<=r && 0<=c && r<nrows && c<ncols && cells[r*ncols+c]){
+      FXString text=cells[r*ncols+c]->getText();
+      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&text);
+      return 1;
+      }
+    }
+  return 0;
+  }
+
+
+// We were asked about status text
+long FXTable::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
+  if(FXScrollArea::onQueryHelp(sender,sel,ptr)) return 1;
+  if((flags&FLAG_HELP) && !help.empty()){
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
+    return 1;
+    }
+  return 0;
+  }
+
+
+// Enter window
+long FXTable::onEnter(FXObject* sender,FXSelector sel,void* ptr){
+  FXScrollArea::onEnter(sender,sel,ptr);
+  getApp()->addTimeout(this,ID_TIPTIMER,getApp()->getMenuPause());
+  return 1;
+  }
+
+
+// Leave window
+long FXTable::onLeave(FXObject* sender,FXSelector sel,void* ptr){
+  FXScrollArea::onLeave(sender,sel,ptr);
+  getApp()->removeTimeout(this,ID_TIPTIMER);
+  return 1;
+  }
+
+
 // Gained focus
 long FXTable::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
   register FXTableItem *item;
@@ -2752,23 +2810,28 @@ long FXTable::onAutoScroll(FXObject* sender,FXSelector sel,void* ptr){
 long FXTable::onMotion(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXint r,c;
-  switch(mode){
-    case MOUSE_NONE:
-      return 0;
-    case MOUSE_SCROLL:
-      setPosition(event->win_x-grabx,event->win_y-graby);
-      return 1;
-    case MOUSE_DRAG:
-      return 1;
-    case MOUSE_SELECT:
-      if(startAutoScroll(event,false)) return 1;  // FIXME scroll when near edge of scrollable area
-      c=colAtX(event->win_x);
-      r=rowAtY(event->win_y);
-      if(0<=r && 0<=c && r<nrows && c<ncols && (current.row!=r || current.col!=c)){
-        extendSelection(r,c,true);
-        setCurrentItem(r,c,true);
-        }
-      return 1;
+  flags&=~FLAG_TIP;
+  if(isEnabled()){
+    getApp()->removeTimeout(this,ID_TIPTIMER);
+    switch(mode){
+      case MOUSE_NONE:
+        getApp()->addTimeout(this,ID_TIPTIMER,getApp()->getMenuPause());
+        return 0;
+      case MOUSE_SCROLL:
+        setPosition(event->win_x-grabx,event->win_y-graby);
+        return 1;
+      case MOUSE_DRAG:
+        return 1;
+      case MOUSE_SELECT:
+        if(startAutoScroll(event,false)) return 1;  // FIXME scroll when near edge of scrollable area
+        c=colAtX(event->win_x);
+        r=rowAtY(event->win_y);
+        if(0<=r && 0<=c && r<nrows && c<ncols && (current.row!=r || current.col!=c)){
+          extendSelection(r,c,true);
+          setCurrentItem(r,c,true);
+          }
+        return 1;
+      }
     }
   return 0;
   }
@@ -4449,6 +4512,7 @@ FXIcon* FXTable::getColumnIcon(FXint index) const {
   return colHeader->getItemIcon(index);
   }
 
+
 // Change row header icon
 void FXTable::setRowIcon(FXint index,FXIcon* icon){
   rowHeader->setItemIcon(index,icon);
@@ -4458,6 +4522,30 @@ void FXTable::setRowIcon(FXint index,FXIcon* icon){
 // Return icon of row header at index
 FXIcon* FXTable::getRowIcon(FXint index) const {
   return rowHeader->getItemIcon(index);
+  }
+
+
+// Change column header tip text
+void FXTable::setColumnTipText(FXint index,const FXString& text){
+  colHeader->setItemTipText(index,text);
+  }
+
+
+// Return tip text of column header at index
+FXString FXTable::getColumnTipText(FXint index) const {
+  return colHeader->getItemTipText(index);
+  }
+
+
+// Change row header tip text
+void FXTable::setRowTipText(FXint index,const FXString& text){
+  rowHeader->setItemTipText(index,text);
+  }
+
+
+// Return tip text of row header at index
+FXString FXTable::getRowTipText(FXint index) const {
+  return rowHeader->getItemTipText(index);
   }
 
 
@@ -4638,6 +4726,7 @@ void FXTable::load(FXStream& store){
 
 // Clean up
 FXTable::~FXTable(){
+  getApp()->removeTimeout(this,ID_TIPTIMER);
   for(FXint r=0; r<nrows; r++){
     for(FXint c=0; c<ncols; c++){
       FXTableItem* item=cells[r*ncols+c];

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeListBox.h,v 1.49 2007/07/09 16:02:51 fox Exp $                     *
+* $Id: FXTreeListBox.h,v 1.50 2007/09/04 22:09:10 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXTREELISTBOX_H
 #define FXTREELISTBOX_H
@@ -244,11 +244,17 @@ public:
   /// Return font
   FXFont* getFont() const;
 
+  /// Change list style
+  void setListStyle(FXuint style);
+
   /// Return list style
   FXuint getListStyle() const;
 
-  /// Change list style
-  void setListStyle(FXuint style);
+  /// Change popup pane shrinkwrap mode
+  void setShrinkWrap(FXbool flag);
+
+  /// Return popup pane shrinkwrap mode
+  FXbool getShrinkWrap() const;
 
   /// Change help text
   void setHelpText(const FXString& txt);

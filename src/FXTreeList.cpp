@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeList.cpp,v 1.187 2007/07/09 16:27:17 fox Exp $                     *
+* $Id: FXTreeList.cpp,v 1.190 2007/08/27 18:27:30 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -557,8 +557,8 @@ FXint FXTreeList::getContentHeight(){
 // Recalculate layout
 void FXTreeList::layout(){
 
-  // Calculate contents
-  FXScrollArea::layout();
+  // Place scroll bars
+  placeScrollBars(width,height);
 
   // Set line size based on item size
   if(firstitem){
@@ -566,15 +566,15 @@ void FXTreeList::layout(){
     horizontal->setLine(firstitem->getWidth(this)/10);
     }
 
-  // Force repaint
-  update();
-
   // We were supposed to make this item viewable
   if(viewableitem){
     makeItemVisible(viewableitem);
     }
 
-  // No more dirty
+  // Repaint
+  update();
+
+  // Not dirty
   flags&=~FLAG_DIRTY;
   }
 
@@ -723,8 +723,8 @@ void FXTreeList::makeItemVisible(FXTreeItem* item){
       if(flags&FLAG_RECALC) layout();
 
       px=pos_x;
-      py=pos_y; 
-      x=item->x;     
+      py=pos_y;
+      x=item->x;
       y=item->y;
       w=item->getWidth(this);
       h=item->getHeight(this);
@@ -1105,7 +1105,7 @@ long FXTreeList::onTipTimer(FXObject*,FXSelector,void*){
 
 // We were asked about tip text
 long FXTreeList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !(options&TREELIST_AUTOSELECT) && cursoritem){   // No tip when autoselect!
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&cursoritem->getText());
     return 1;
@@ -1116,7 +1116,7 @@ long FXTreeList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXTreeList::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryHelp(sender,sel,ptr)) return 1;
   if(!help.empty() && (flags&FLAG_HELP)){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;

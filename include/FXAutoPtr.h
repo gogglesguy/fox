@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAutoPtr.h,v 1.11 2007/07/09 16:02:41 fox Exp $                         *
+* $Id: FXAutoPtr.h,v 1.12 2007/08/03 19:20:26 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXAUTOPTR_H
 #define FXAUTOPTR_H
@@ -45,7 +45,7 @@ public:
   template<class T> FXAutoPtr& operator=(FXAutoPtr<T>& orig){ reset(orig.release()); return *this; }
 
   /// Conversion operators
-  operator TYPE*(){ return ptr; }
+  operator TYPE*() const { return ptr; }
 
   /// Dereference operator
   TYPE& operator*() const { return *ptr; }

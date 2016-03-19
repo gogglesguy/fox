@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeListBox.cpp,v 1.68 2007/07/09 16:27:17 fox Exp $                   *
+* $Id: FXTreeListBox.cpp,v 1.69 2007/09/04 22:09:10 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -639,6 +639,18 @@ FXuint FXTreeListBox::getListStyle() const {
   }
 
 
+// Change popup pane shrinkwrap mode
+void FXTreeListBox::setShrinkWrap(FXbool flag){
+  pane->setShrinkWrap(flag);
+  }
+  
+
+// Return popup pane shrinkwrap mode
+FXbool FXTreeListBox::getShrinkWrap() const {
+  return pane->getShrinkWrap();
+  }
+  
+  
 // Set help text
 void FXTreeListBox::setHelpText(const FXString& txt){
   field->setHelpText(txt);

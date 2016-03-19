@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.cpp,v 1.14 2007/07/09 16:26:44 fox Exp $                      *
+* $Id: FXCalendar.cpp,v 1.16 2007/08/10 17:41:57 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -143,9 +143,9 @@ FXCalendar::FXCalendar(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
 
 // Create X window
 void FXCalendar::create(){
+  FXDate date(view->getCurrentDate());
   FXPacker::create();
-  FXDate date=view->getCurrentDate();
-  year->setText(FXStringVal(date.year()));
+  year->setText(FXString::value(date.year()));
   month->setCurrentNo(date.month()-1);
   }
 
@@ -339,9 +339,8 @@ FXColor FXCalendar::getOtherWeekendColor() const {
 
 // Switch date
 long FXCalendar::onCmdDate(FXObject*,FXSelector,void* ptr){
-  FXDate date;
-  date.setJulian((FXuint)(FXival)(ptr));
-  year->setText(FXStringVal(date.year()));
+  FXDate date((FXuint)(FXival)(ptr));
+  year->setText(FXString::value(date.year()));
   month->setCurrentNo(view->getCurrentMonth()-1);
   if(target) target->tryHandle(this,FXSEL(SEL_CHANGED,message),ptr);
   return 1;

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconList.cpp,v 1.238 2007/07/09 16:26:57 fox Exp $                     *
+* $Id: FXIconList.cpp,v 1.242 2007/08/28 04:02:05 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -284,7 +284,7 @@ FXint FXIconItem::hitItem(const FXIconList* list,FXint rx,FXint ry,FXint rw,FXin
   register FXint iw=0,tw=0,ih=0,th=0,ss=0,ix,iy,tx,ty,w,h,sp,tlen;
   for(tlen=0; tlen<label.length() && label[tlen]!='\t'; tlen++);
   if(options&ICONLIST_BIG_ICONS){
-    w=list->getItemSpace();
+    w=list->getItemWidth();
     h=list->getItemHeight();
     sp=w-SIDE_SPACING;
     if(!label.empty()){
@@ -303,7 +303,7 @@ FXint FXIconItem::hitItem(const FXIconList* list,FXint rx,FXint ry,FXint rw,FXin
     tx=(w-tw)/2;
     }
   else if(options&ICONLIST_MINI_ICONS){
-    sp=list->getItemSpace()-SIDE_SPACING;
+    sp=list->getItemWidth()-SIDE_SPACING;
     ix=SIDE_SPACING/2;
     tx=SIDE_SPACING/2;
     if(miniIcon){
@@ -571,8 +571,6 @@ FXIconList::FXIconList(){
   selbackColor=0;
   seltextColor=0;
   itemSpace=ITEM_SPACE;
-  listWidth=0;
-  listHeight=0;
   itemWidth=1;
   itemHeight=1;
   anchorx=0;
@@ -604,8 +602,6 @@ FXIconList::FXIconList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   selbackColor=getApp()->getSelbackColor();
   seltextColor=getApp()->getSelforeColor();
   itemSpace=ITEM_SPACE;
-  listWidth=0;
-  listHeight=0;
   itemWidth=1;
   itemHeight=1;
   anchorx=0;
@@ -687,11 +683,11 @@ void FXIconList::moveContents(FXint x,FXint y){
 void FXIconList::getrowscols(FXint& nr,FXint& nc,FXint w,FXint h) const {
   if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
     if(options&ICONLIST_COLUMNS){
-      nc=w/itemSpace;
+      nc=w/itemWidth;
       if(nc<1) nc=1;
       nr=(items.no()+nc-1)/nc;
       if(nr*itemHeight > h){
-        nc=(w-vertical->getDefaultWidth())/itemSpace;
+        nc=(w-vertical->getDefaultWidth())/itemWidth;
         if(nc<1) nc=1;
         nr=(items.no()+nc-1)/nc;
         }
@@ -701,7 +697,7 @@ void FXIconList::getrowscols(FXint& nr,FXint& nc,FXint w,FXint h) const {
       nr=h/itemHeight;
       if(nr<1) nr=1;
       nc=(items.no()+nr-1)/nr;
-      if(nc*itemSpace > w){
+      if(nc*itemWidth > w){
         nr=(h-horizontal->getDefaultHeight())/itemHeight;
         if(nr<1) nr=1;
         nc=(items.no()+nr-1)/nr;
@@ -720,9 +716,6 @@ void FXIconList::getrowscols(FXint& nr,FXint& nc,FXint w,FXint h) const {
 void FXIconList::recompute(){
   register FXint w,h,i;
 
-  listWidth=0;
-  listHeight=0;
-
   itemWidth=1;
   itemHeight=1;
 
@@ -734,28 +727,18 @@ void FXIconList::recompute(){
     if(h>itemHeight) itemHeight=h;
     }
 
-  // Automatically size item spacing
-  if(options&ICONLIST_AUTOSIZE) itemSpace=FXMAX(itemWidth,1);
-
-  // Adjust for detail mode
-  if(!(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS))) itemWidth=header->getTotalSize();
+  // Normally, apply fixed item size unless autosize is on
+  if(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)){
+    if(!(options&ICONLIST_AUTOSIZE)) itemWidth=itemSpace;
+    }
+    
+  // In detail mode, item width depends only on header
+  else{
+    itemWidth=header->getTotalSize();
+    }
 
   // Get number of rows or columns
   getrowscols(nrows,ncols,width,height);
-
-  //FXTRACE((100,"%s::recompute: itemWidth=%d itemHeight=%d nrows=%d ncols=%d\n",getClassName(),itemWidth,itemHeight,nrows,ncols));
-
-  // List modes
-  if(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)){
-    listWidth=ncols*itemSpace;
-    listHeight=nrows*itemHeight;
-    }
-
-  // Detail modes
-  else{
-    listWidth=header->getTotalSize();
-    listHeight=header->getDefaultHeight()+nrows*itemHeight;
-    }
 
   // Done
   flags&=~FLAG_RECALC;
@@ -765,14 +748,14 @@ void FXIconList::recompute(){
 // Determine content width of icon list
 FXint FXIconList::getContentWidth(){
   if(flags&FLAG_RECALC) recompute();
-  return listWidth;
+  return ncols*itemWidth;
   }
 
 
 // Determine content height of icon list
 FXint FXIconList::getContentHeight(){
   if(flags&FLAG_RECALC) recompute();
-  return listHeight;
+  return nrows*itemHeight;
   }
 
 
@@ -788,7 +771,7 @@ void FXIconList::layout(){
 
   // Set line size
   vertical->setLine(itemHeight);
-  horizontal->setLine(itemSpace);
+  horizontal->setLine(itemWidth);
 
   // We were supposed to make this item viewable
   if(0<=viewable){
@@ -1044,15 +1027,15 @@ FXbool FXIconList::isItemVisible(FXint index) const {
   if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
     if(options&ICONLIST_COLUMNS){
       FXASSERT(ncols>0);
-      x=pos_x+itemSpace*(index%ncols);
+      x=pos_x+itemWidth*(index%ncols);
       y=pos_y+itemHeight*(index/ncols);
       }
     else{
       FXASSERT(nrows>0);
-      x=pos_x+itemSpace*(index/nrows);
+      x=pos_x+itemWidth*(index/nrows);
       y=pos_y+itemHeight*(index%nrows);
       }
-    if(0<x+itemSpace && x<getVisibleWidth() && 0<y+itemHeight && y<getVisibleHeight()) vis=true;
+    if(0<x+itemWidth && x<getVisibleWidth() && 0<y+itemHeight && y<getVisibleHeight()) vis=true;
     }
   else{
     hh=header->getDefaultHeight();
@@ -1087,15 +1070,15 @@ void FXIconList::makeItemVisible(FXint index){
       if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
         if(options&ICONLIST_COLUMNS){
           FXASSERT(ncols>0);
-          x=itemSpace*(index%ncols);
+          x=itemWidth*(index%ncols);
           y=itemHeight*(index/ncols);
           }
         else{
           FXASSERT(nrows>0);
-          x=itemSpace*(index/nrows);
+          x=itemWidth*(index/nrows);
           y=itemHeight*(index%nrows);
           }
-        if(px+x+itemSpace >= vw) px=vw-x-itemSpace;
+        if(px+x+itemWidth >= vw) px=vw-x-itemWidth;
         if(px+x <= 0) px=-x;
         if(py+y+itemHeight >= vh) py=vh-y-itemHeight;
         if(py+y <= 0) py=-y;
@@ -1126,12 +1109,12 @@ FXint FXIconList::getItemAt(FXint x,FXint y) const {
   y-=pos_y;
   x-=pos_x;
   if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
-    c=x/itemSpace;
+    c=x/itemWidth;
     r=y/itemHeight;
     if(c<0 || c>=ncols || r<0 || r>=nrows) return -1;
     index=(options&ICONLIST_COLUMNS) ? ncols*r+c : nrows*c+r;
     if(index<0 || index>=items.no()) return -1;
-    ix=itemSpace*c;
+    ix=itemWidth*c;
     iy=itemHeight*r;
     if(items[index]->hitItem(this,x-ix,y-iy)==0) return -1;
     }
@@ -1264,7 +1247,7 @@ FXint FXIconList::hitItem(FXint index,FXint x,FXint y,FXint ww,FXint hh) const {
       r=index;
       c=0;
       }
-    ix=itemSpace*c;
+    ix=itemWidth*c;
     iy=itemHeight*r;
     hit=items[index]->hitItem(this,x-ix,y-iy,ww,hh);
     }
@@ -1278,11 +1261,11 @@ void FXIconList::updateItem(FXint index) const {
     if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
       if(options&ICONLIST_COLUMNS){
         FXASSERT(ncols>0);
-        update(pos_x+itemSpace*(index%ncols),pos_y+itemHeight*(index/ncols),itemSpace,itemHeight);
+        update(pos_x+itemWidth*(index%ncols),pos_y+itemHeight*(index/ncols),itemWidth,itemHeight);
         }
       else{
         FXASSERT(nrows>0);
-        update(pos_x+itemSpace*(index/nrows),pos_y+itemHeight*(index%nrows),itemSpace,itemHeight);
+        update(pos_x+itemWidth*(index/nrows),pos_y+itemHeight*(index%nrows),itemWidth,itemHeight);
         }
       }
     else{
@@ -1598,7 +1581,7 @@ long FXIconList::onTipTimer(FXObject*,FXSelector,void*){
 
 // We were asked about tip text
 long FXIconList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && (0<=cursor)){
     FXString string=items[cursor]->getText().section('\t',0);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
@@ -1610,7 +1593,7 @@ long FXIconList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXIconList::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;
@@ -1662,22 +1645,22 @@ long FXIconList::onPaint(FXObject*,FXSelector,void* ptr){
     if(rhi>=nrows) rhi=nrows-1;
 
     // Exposed columns
-    clo=(event->rect.x-pos_x)/itemSpace;
-    chi=(event->rect.x+event->rect.w-pos_x)/itemSpace;
+    clo=(event->rect.x-pos_x)/itemWidth;
+    chi=(event->rect.x+event->rect.w-pos_x)/itemWidth;
     if(clo<0) clo=0;
     if(chi>=ncols) chi=ncols-1;
 
     for(r=rlo; r<=rhi; r++){
       y=pos_y+r*itemHeight;
       for(c=clo; c<=chi; c++){
-        x=pos_x+c*itemSpace;
+        x=pos_x+c*itemWidth;
         index=(options&ICONLIST_COLUMNS) ? ncols*r+c : nrows*c+r;
         dc.setForeground(backColor);
         if(index<items.no()){
-          items[index]->draw(this,dc,x,y,itemSpace,itemHeight);
+          items[index]->draw(this,dc,x,y,itemWidth,itemHeight);
           }
         else{
-          dc.fillRectangle(x,y,itemSpace,itemHeight);
+          dc.fillRectangle(x,y,itemWidth,itemHeight);
           }
         }
       }
@@ -1690,7 +1673,7 @@ long FXIconList::onPaint(FXObject*,FXSelector,void* ptr){
       }
 
     // Background to the right
-    x=pos_x+(chi+1)*itemSpace;
+    x=pos_x+(chi+1)*itemWidth;
     if(x<event->rect.x+event->rect.w){
       dc.setForeground(backColor);
       dc.fillRectangle(x,event->rect.y,event->rect.x+event->rect.w-x,event->rect.h);
@@ -2915,10 +2898,8 @@ void FXIconList::save(FXStream& store) const {
   store << selbackColor;
   store << seltextColor;
   store << itemSpace;
-  store << listWidth;
-  store << listHeight;
- store << itemWidth;
- store << itemHeight;
+  store << itemWidth;
+  store << itemHeight;
   store << help;
   }
 
@@ -2938,10 +2919,8 @@ void FXIconList::load(FXStream& store){
   store >> selbackColor;
   store >> seltextColor;
   store >> itemSpace;
-  store >> listWidth;
-  store >> listHeight;
- store >> itemWidth;
- store >> itemHeight;
+  store >> itemWidth;
+  store >> itemHeight;
   store >> help;
   }
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFont.cpp,v 1.200 2007/07/24 15:30:47 fox Exp $                         *
+* $Id: FXFont.cpp,v 1.204 2007/08/24 16:16:12 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -765,7 +765,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
       // Encoding
       if(wantencoding==FONTENCODING_DEFAULT){
-        dencoding=(encoding!=FONTENCODING_ISO_8859_1);
+        dencoding=(encoding!=FONTENCODING_UNICODE);     // Want unicode if nothing else given
         }
       else{
         dencoding=(encoding!=wantencoding);
@@ -2593,14 +2593,14 @@ static const ENTRY weighttable[]={
 // Search for value and return name
 static FXString findbyvalue(const ENTRY* table,FXint n,FXuint value){
   for(int i=0; i<n; i++){ if(table[i].value==value) return table[i].name; }
-  return FXStringVal(value);
+  return FXString::value(value);
   }
 
 
 // Search for name and return value
 static FXuint findbyname(const ENTRY* table,FXint n,const FXString& name){
   for(int i=0; i<n; i++){ if(comparecase(table[i].name,name)==0) return table[i].value; }
-  return FXUIntVal(name);
+  return name.toUInt();
   }
 
 
@@ -2649,7 +2649,7 @@ void FXFont::setFont(const FXString& string){
     wantedName=string.left(len);
 
     // Point size
-    wantedSize=FXUIntVal(string.section(',',1));
+    wantedSize=string.section(',',1).toUInt();
 
     // Weight
     wantedWeight=findbyname(weighttable,ARRAYNUMBER(weighttable),string.section(',',2));
@@ -2664,7 +2664,7 @@ void FXFont::setFont(const FXString& string){
     wantedEncoding=findbyname(encodingtable,ARRAYNUMBER(encodingtable),string.section(',',5));
 
     // Flags
-    hints=FXUIntVal(string.section(',',6));
+    hints=string.section(',',6).toUInt();
     }
   }
 
@@ -2680,7 +2680,7 @@ FXString FXFont::getFont() const {
 
     // Append size
     string.append(',');
-    string.append(FXStringVal(wantedSize));
+    string.append(FXString::value(wantedSize));
 
     // Weight and other stuff
     if(wantedWeight || wantedSlant || wantedSetwidth || wantedEncoding || hints){
@@ -2715,7 +2715,7 @@ FXString FXFont::getFont() const {
 
               // Append hint flags
               string.append(',');
-              string.append(FXStringVal(hints));
+              string.append(FXString::value(hints));
               }
             }
           }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGIFCursor.h,v 1.26 2007/07/09 16:02:44 fox Exp $                       *
+* $Id: FXGIFCursor.h,v 1.27 2007/08/07 01:19:06 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGIFCURSOR_H
 #define FXGIFCURSOR_H
@@ -71,17 +71,19 @@ extern FXAPI FXbool fxcheckGIF(FXStream& store);
 
 
 /**
-* Load an GIF (Graphics Interchange Format) file from a stream.
-* Upon successful return, the pixel array and size are returned.
-* If an error occurred, the pixel array is set to NULL.
+* Load an GIF (Graphics Interchange Format) file from a stream; if the flag 
+* flag is true, the background color is considered transparent.  Upon successful return, 
+* the pixel array and size are returned.  If an error occurred, the pixel array is set to NULL.
 */
-extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXbool flag=true);
 
 
 /**
-* Save an GIF (Graphics Interchange Format) file to a stream.
+* Save an GIF (Graphics Interchange Format) file to a stream.  If flag
+* is true, the faster Floyd-Steinberg dither method instead of the slower Wu 
+* quantization algorithm.
 */
-extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
+extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool flag=true);
 
 #endif
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4d.cpp,v 1.30 2007/07/09 16:27:02 fox Exp $                         *
+* $Id: FXMat4d.cpp,v 1.37 2007/09/24 21:00:49 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -64,7 +64,26 @@ using namespace FX;
 
 namespace FX {
 
-// Build matrix from constant
+
+// Initialize matrix from another matrix
+FXMat4d::FXMat4d(const FXMat4d& other){
+  m[0]=other[0];
+  m[1]=other[1];
+  m[2]=other[2];
+  m[3]=other[3];
+  }
+
+
+// Initialize with 3x3 rotation and scaling matrix
+FXMat4d::FXMat4d(const FXMat3d& other){
+  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2]; m[0][3]=0.0;
+  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2]; m[1][3]=0.0;
+  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2]; m[2][3]=0.0;
+  m[3][0]=0.0;         m[3][1]=0.0;         m[3][2]=0.0;         m[3][3]=1.0;
+  }
+
+
+// Initialize matrix from scalar
 FXMat4d::FXMat4d(FXdouble w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w; m[0][3]=w;
   m[1][0]=w; m[1][1]=w; m[1][2]=w; m[1][3]=w;
@@ -73,7 +92,16 @@ FXMat4d::FXMat4d(FXdouble w){
   }
 
 
-// Build matrix from scalars
+// Initialize diagonal matrix 
+FXMat4d::FXMat4d(FXdouble a,FXdouble b,FXdouble c,FXdouble d){
+  m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0; m[0][3]=0.0;
+  m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0; m[1][3]=0.0;
+  m[2][0]=0.0; m[2][1]=0.0; m[2][2]=c;   m[2][3]=0.0;
+  m[3][0]=0.0; m[3][1]=0.0; m[3][2]=0.0; m[3][3]=d;
+  }
+
+
+// Initialize matrix from components
 FXMat4d::FXMat4d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
@@ -82,21 +110,12 @@ FXMat4d::FXMat4d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a1
   }
 
 
-// Build matrix from four vectors
+// Initialize matrix from four vectors
 FXMat4d::FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d){
   m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
   m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
   m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
   m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
-  }
-
-
-// Copy constructor
-FXMat4d::FXMat4d(const FXMat4d& other){
-  m[0]=other[0];
-  m[1]=other[1];
-  m[2]=other[2];
-  m[3]=other[3];
   }
 
 
@@ -110,7 +129,17 @@ FXMat4d& FXMat4d::operator=(const FXMat4d& other){
   }
 
 
-// Set matrix to constant
+// Assign from 3x3 rotation and scaling matrix
+FXMat4d& FXMat4d::operator=(const FXMat3d& other){
+  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2]; m[0][3]=0.0;
+  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2]; m[1][3]=0.0;
+  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2]; m[2][3]=0.0;
+  m[3][0]=0.0;         m[3][1]=0.0;         m[3][2]=0.0;         m[3][3]=1.0;
+  return *this;
+  }
+
+
+// Assign from scalar
 FXMat4d& FXMat4d::operator=(FXdouble w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w; m[0][3]=w;
   m[1][0]=w; m[1][1]=w; m[1][2]=w; m[1][3]=w;
@@ -130,7 +159,17 @@ FXMat4d& FXMat4d::set(const FXMat4d& other){
   }
 
 
-// Construct from scalar number
+// Set from 3x3 rotation and scaling matrix
+FXMat4d& FXMat4d::set(const FXMat3d& other){
+  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2]; m[0][3]=0.0;
+  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2]; m[1][3]=0.0;
+  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2]; m[2][3]=0.0;
+  m[3][0]=0.0;         m[3][1]=0.0;         m[3][2]=0.0;         m[3][3]=1.0;
+  return *this;
+  }
+
+
+// Set value from scalar
 FXMat4d& FXMat4d::set(FXdouble w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w; m[0][3]=w;
   m[1][0]=w; m[1][1]=w; m[1][2]=w; m[1][3]=w;
@@ -140,7 +179,17 @@ FXMat4d& FXMat4d::set(FXdouble w){
   }
 
 
-// Construct from components
+// Set diagonal matrix 
+FXMat4d& FXMat4d::set(FXdouble a,FXdouble b,FXdouble c,FXdouble d){
+  m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0; m[0][3]=0.0;
+  m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0; m[1][3]=0.0;
+  m[2][0]=0.0; m[2][1]=0.0; m[2][2]=c;   m[2][3]=0.0;
+  m[3][0]=0.0; m[3][1]=0.0; m[3][2]=0.0; m[3][3]=d;
+  return *this;
+  }
+
+
+// Set value from components
 FXMat4d& FXMat4d::set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
@@ -150,7 +199,7 @@ FXMat4d& FXMat4d::set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdoub
   }
 
 
-// Construct matrix from three vectors
+// Set value from four vectors
 FXMat4d& FXMat4d::set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d){
   m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
   m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
@@ -234,7 +283,6 @@ FXMat4d FXMat4d::operator-() const {
                  -m[2][0],-m[2][1],-m[2][2],-m[2][3],
                  -m[3][0],-m[3][1],-m[3][2],-m[3][3]);
   }
-
 
 
 // Add matrices
@@ -439,14 +487,9 @@ FXMat4d& FXMat4d::left(){
   }
 
 
-// Rotate using quaternion
-FXMat4d& FXMat4d::rot(const FXQuatd& q){
+// Multiply by rotation matrix
+FXMat4d& FXMat4d::rot(const FXMat3d& r){
   register FXdouble x,y,z;
-
-  // Get rotation matrix
-  FXMat3d r(q);
-
-  // Pre-multiply
   x=m[0][0]; y=m[1][0]; z=m[2][0];
   m[0][0]=x*r[0][0]+y*r[0][1]+z*r[0][2];
   m[1][0]=x*r[1][0]+y*r[1][1]+z*r[1][2];
@@ -464,6 +507,12 @@ FXMat4d& FXMat4d::rot(const FXQuatd& q){
   m[1][3]=x*r[1][0]+y*r[1][1]+z*r[1][2];
   m[2][3]=x*r[2][0]+y*r[2][1]+z*r[2][2];
   return *this;
+  }
+
+
+// Rotate using quaternion
+FXMat4d& FXMat4d::rot(const FXQuatd& q){
+  return rot(FXMat3d(q));
   }
 
 

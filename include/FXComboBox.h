@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComboBox.h,v 1.53 2007/07/09 16:02:42 fox Exp $                        *
+* $Id: FXComboBox.h,v 1.54 2007/09/04 22:09:09 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCOMBOBOX_H
 #define FXCOMBOBOX_H
@@ -245,6 +245,12 @@ public:
 
   /// Get the combobox style.
   FXuint getComboStyle() const;
+
+  /// Change popup pane shrinkwrap mode
+  void setShrinkWrap(FXbool flag);
+
+  /// Return popup pane shrinkwrap mode
+  FXbool getShrinkWrap() const;
 
   /// Set window background color
   virtual void setBackColor(FXColor clr);

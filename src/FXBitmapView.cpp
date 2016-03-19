@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmapView.cpp,v 1.21 2007/07/09 16:26:44 fox Exp $                    *
+* $Id: FXBitmapView.cpp,v 1.22 2007/08/14 00:46:38 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -129,10 +129,13 @@ FXint FXBitmapView::getContentHeight(){
 // Recalculate layout
 void FXBitmapView::layout(){
 
-  // Layout scroll bars and viewport
-  FXScrollArea::layout();
+  // Place scroll bars
+  placeScrollBars(width,height);
 
+  // Repaint
   update();
+
+  // Not dirty
   flags&=~FLAG_DIRTY;
   }
 

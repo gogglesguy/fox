@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.cpp,v 1.90 2007/07/09 16:26:53 fox Exp $                   *
+* $Id: FXFoldingList.cpp,v 1.92 2007/08/27 18:27:27 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -532,7 +532,7 @@ FXint FXFoldingList::getDefaultWidth(){
 
 
 // Get default height
-FXint FXFoldingList::getDefaultHeight(){ 
+FXint FXFoldingList::getDefaultHeight(){
   return 0<visible ? visible*(4+font->getFontHeight())+header->getDefaultHeight() : FXScrollArea::getDefaultHeight()+header->getDefaultHeight();
   }
 
@@ -622,7 +622,7 @@ void FXFoldingList::layout(){
     makeItemVisible(viewableitem);
     }
 
-  // Force repaint
+  // Repaint
   update();
 
   // No more dirty
@@ -1224,7 +1224,7 @@ long FXFoldingList::onTipTimer(FXObject*,FXSelector,void*){
 
 // We were asked about tip text
 long FXFoldingList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !(options&FOLDINGLIST_AUTOSELECT) && cursoritem){   // No tip when autoselect!
     FXString string=cursoritem->getText().section('\t',0);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
@@ -1236,7 +1236,7 @@ long FXFoldingList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXFoldingList::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;

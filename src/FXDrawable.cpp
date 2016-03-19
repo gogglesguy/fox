@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDrawable.cpp,v 1.28 2007/07/09 16:26:50 fox Exp $                      *
+* $Id: FXDrawable.cpp,v 1.29 2007/08/27 12:08:15 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -63,8 +63,8 @@ FXDrawable::FXDrawable(){
 // Initialize nicely
 FXDrawable::FXDrawable(FXApp* a,FXint w,FXint h):FXId(a){
   visual=NULL;
-  width=FXMAX(w,1);
-  height=FXMAX(h,1);
+  width=FXMAX(w,0);
+  height=FXMAX(h,0);
   }
 
 
@@ -78,8 +78,8 @@ void FXDrawable::setVisual(FXVisual* vis){
 
 // Resize drawable to the specified width and height
 void FXDrawable::resize(FXint w,FXint h){
-  width=FXMAX(w,1);
-  height=FXMAX(h,1);
+  width=FXMAX(w,0);
+  height=FXMAX(h,0);
   }
 
 

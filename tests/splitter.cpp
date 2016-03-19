@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: splitter.cpp,v 1.36 2007/02/07 20:22:24 fox Exp $                        *
+* $Id: splitter.cpp,v 1.38 2007/08/10 17:47:01 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -209,7 +209,7 @@ SplitterWindow::SplitterWindow(FXApp* a):FXMainWindow(a,"Splitter Test",NULL,NUL
         tree->appendItem(twig,"Fourth-Fourth-Second",doc,doc);
         tree->appendItem(twig,"Fourth-Fourth-Third",doc,doc);
         for(i=0; i<10; i++){
-          tree->prependItem(twig,FXStringVal(i),doc,doc);
+          tree->prependItem(twig,FXString::value(i),doc,doc);
           }
       twig=tree->appendItem(branch,"Fourth-Fifth",folder_open,folder_closed);
       tree->expandTree(twig);
@@ -217,7 +217,7 @@ SplitterWindow::SplitterWindow(FXApp* a):FXMainWindow(a,"Splitter Test",NULL,NUL
         tree->appendItem(twig,"Fourth-Fifth-Second",doc,doc);
         tree->appendItem(twig,"Fourth-Fifth-Third",doc,doc);
         for(i=0; i<10; i++){
-          tree->appendItem(twig,FXStringVal(i),doc,doc);
+          tree->appendItem(twig,FXString::value(i),doc,doc);
           }
     tree->appendItem(topmost,"Fifth",doc,doc);
     tree->appendItem(topmost,"Sixth",doc,doc);

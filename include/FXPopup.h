@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPopup.h,v 1.41 2007/07/09 16:02:46 fox Exp $                           *
+* $Id: FXPopup.h,v 1.43 2007/09/04 22:12:34 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXPOPUP_H
 #define FXPOPUP_H
@@ -173,18 +173,19 @@ public:
 //   /// Pop down the menu
 //   virtual void popdown(FXint value);
 
-  /// Return popup orientation
-  FXuint getOrientation() const;
-
   /// Change popup orientation
   void setOrientation(FXuint orient);
 
-  /// Return shrinkwrap mode
-  FXbool getShrinkWrap() const;
+  /// Return popup orientation
+  FXuint getOrientation() const;
 
   /// Change shrinkwrap mode
   void setShrinkWrap(FXbool flag);
 
+  /// Return shrinkwrap mode
+  FXbool getShrinkWrap() const;
+
+  /// Does save-unders
   virtual FXbool doesSaveUnder() const;
 
   /// Destructor

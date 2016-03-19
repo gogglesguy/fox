@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXList.cpp,v 1.185 2007/07/09 16:27:01 fox Exp $                         *
+* $Id: FXList.cpp,v 1.187 2007/08/27 18:27:28 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -453,21 +453,22 @@ FXint FXList::getContentHeight(){
 // Recalculate layout determines item locations and sizes
 void FXList::layout(){
 
-  // Calculate contents
-  FXScrollArea::layout();
+  // Place scroll bars
+  placeScrollBars(width,height);
 
-  // Determine line size for scroll bars
+  // Set line size based on item size
   if(0<items.no()){
     vertical->setLine(items[0]->getHeight(this));
     horizontal->setLine(items[0]->getWidth(this)/10);
     }
 
-  update();
-
   // We were supposed to make this item viewable
   if(0<=viewable){
     makeItemVisible(viewable);
     }
+
+  // Repaint
+  update();
 
   // No more dirty
   flags&=~FLAG_DIRTY;
@@ -880,7 +881,7 @@ long FXList::onTipTimer(FXObject*,FXSelector,void*){
 
 // We were asked about tip text
 long FXList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !(options&LIST_AUTOSELECT) && (0<=cursor)){    // No tip when autoselect!
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&items[cursor]->getText());
     return 1;
@@ -891,7 +892,7 @@ long FXList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXList::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXScrollArea::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;

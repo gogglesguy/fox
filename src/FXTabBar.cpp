@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTabBar.cpp,v 1.34 2007/07/09 16:27:11 fox Exp $                        *
+* $Id: FXTabBar.cpp,v 1.35 2007/08/23 21:44:12 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -45,7 +45,6 @@
   - Should focus go to tab items?
   - Tab items should observe various border styles.
   - TAB/TABTAB should go into content, arrow keys navigate between tabs.
-  - Fix setCurrent() to be like FXSwitcher.
 */
 
 
@@ -367,7 +366,7 @@ void FXTabBar::layout(){
 
 // Set current subwindow
 void FXTabBar::setCurrent(FXint panel,FXbool notify){
-  if(0<=panel && panel!=current){
+  if(panel!=current && 0<=panel && panel<numChildren()){
     current=panel;
     recalc();
     if(notify && target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)current); }

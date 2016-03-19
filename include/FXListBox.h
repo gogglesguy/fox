@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXListBox.h,v 1.49 2007/07/09 16:02:46 fox Exp $                         *
+* $Id: FXListBox.h,v 1.50 2007/09/04 22:09:10 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXLISTBOX_H
 #define FXLISTBOX_H
@@ -215,6 +215,12 @@ public:
 
   /// Get text font
   FXFont* getFont() const;
+
+  /// Change popup pane shrinkwrap mode
+  void setShrinkWrap(FXbool flag);
+
+  /// Return popup pane shrinkwrap mode
+  FXbool getShrinkWrap() const;
 
   /// Set window background color
   virtual void setBackColor(FXColor clr);

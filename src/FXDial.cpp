@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDial.cpp,v 1.58 2007/07/09 16:26:46 fox Exp $                          *
+* $Id: FXDial.cpp,v 1.60 2007/09/22 04:29:00 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -176,7 +176,7 @@ long FXDial::onCmdGetTip(FXObject*,FXSelector,void* ptr){
 
 // We were asked about tip text
 long FXDial::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !tip.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
     return 1;
@@ -187,7 +187,7 @@ long FXDial::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
 
 // We were asked about status text
 long FXDial::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
+  if(FXFrame::onQueryHelp(sender,sel,ptr)) return 1;
   if((flags&FLAG_HELP) && !help.empty()){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&help);
     return 1;
@@ -419,13 +419,11 @@ long FXDial::onKeyPress(FXObject*,FXSelector,void* ptr){
         break;
       case KEY_plus:
       case KEY_KP_Add:
-inc:    //setValue(pos+((incr+359)/360),true);
-        setValue(pos+1);
+inc:    setValue(pos+1,true);
         return 1;
       case KEY_minus:
       case KEY_KP_Subtract:
-dec:    //setValue(pos-((incr+359)/360),true);
-        setValue(pos-1);
+dec:    setValue(pos-1,true);
         return 1;
       }
     }
