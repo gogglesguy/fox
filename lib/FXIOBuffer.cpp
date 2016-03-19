@@ -32,8 +32,7 @@
 
 /*
   Notes:
-  - FIXME need option "owned" vs non-owned buffer.
-  - Etc.
+  - A fixed size memory buffer that can be accessed through file API.
 */
 
 
@@ -44,31 +43,33 @@ using namespace FX;
 namespace FX {
 
 
-
 // Construct
-FXIOBuffer::FXIOBuffer():begptr(NULL),endptr(NULL),ptr(NULL){
+FXIOBuffer::FXIOBuffer():buffer(NULL),space(0L){
   }
 
 
 // Construct and open
-FXIOBuffer::FXIOBuffer(FXuchar* data,FXuval size,FXuint m):begptr(NULL),endptr(NULL),ptr(NULL){
-  open(data,size,m);
+FXIOBuffer::FXIOBuffer(FXuchar* ptr,FXuval sz,FXuint m):buffer(NULL),space(0L){
+  open(ptr,sz,m);
   }
 
 
-
-// Open buffer 
-FXbool FXIOBuffer::open(FXuchar* data,FXuval size,FXuint m){
-  begptr=data;
-  endptr=begptr+size;
-  access=m;
-  return true;
+// Open buffer
+FXbool FXIOBuffer::open(FXuchar* ptr,FXuval sz,FXuint m){
+  if(ptr && sz && (m&ReadWrite)){
+    buffer=ptr;
+    space=sz;
+    access=m;
+    pointer=0L;
+    return true;
+    }
+  return false;
   }
-  
+
 
 // Return true if open
 FXbool FXIOBuffer::isOpen() const {
-  return endptr!=begptr;
+  return buffer!=NULL;
   }
 
 
@@ -80,28 +81,31 @@ FXbool FXIOBuffer::isSerial() const {
 
 // Get position
 FXlong FXIOBuffer::position() const {
-  return ptr-begptr;
+  return pointer;
   }
 
 
 // Move to position
-FXlong FXIOBuffer::position(FXlong off,FXuint from){
+FXlong FXIOBuffer::position(FXlong offset,FXuint from){
   if(access&ReadWrite){
-    if(from==Current) off+=(ptr-begptr);
-    else if(from==End) off+=(endptr-begptr);
-    ptr=begptr+off;
-    return ptr-begptr;
+    if(from==Current) offset=pointer+offset;
+    else if(from==End) offset=space+offset;
+    if(0<=offset && offset<=(FXlong)space){
+      pointer=offset;
+      return pointer;
+      }
     }
   return -1;
   }
 
 
 // Read block
-FXival FXIOBuffer::readBlock(void* data,FXival count){
+FXival FXIOBuffer::readBlock(void* ptr,FXival count){
   if(access&ReadOnly){
-    if(count>(endptr-ptr)) count=(endptr-ptr);
-    memmove(data,ptr,count);
-    ptr+=count;
+    FXival remaining=space-pointer;
+    if(count>remaining) count=remaining;
+    memcpy(ptr,&buffer[pointer],count);
+    pointer+=count;
     return count;
     }
   return 0;
@@ -109,11 +113,12 @@ FXival FXIOBuffer::readBlock(void* data,FXival count){
 
 
 // Write block
-FXival FXIOBuffer::writeBlock(const void* data,FXival count){
+FXival FXIOBuffer::writeBlock(const void* ptr,FXival count){
   if(access&WriteOnly){
-    if(count>(endptr-ptr)) count=(endptr-ptr);
-    memmove(ptr,data,count);
-    ptr+=count;
+    FXival remaining=space-pointer;
+    if(count>remaining) count=remaining;
+    memcpy(&buffer[pointer],ptr,count);
+    pointer+=count;
     return count;
     }
   return 0;
@@ -121,32 +126,40 @@ FXival FXIOBuffer::writeBlock(const void* data,FXival count){
 
 
 // Truncate file
-FXlong FXIOBuffer::truncate(FXlong){
+FXlong FXIOBuffer::truncate(FXlong sz){
+  if(buffer && 0<=sz && sz<=(FXlong)space){
+    if(pointer>sz) pointer=sz;
+    space=sz;
+    return sz;
+    }
   return -1;
   }
 
-
+ 
 // Synchronize disk with cached data
 FXbool FXIOBuffer::flush(){
-  return false;
+  return true;
   }
 
 
 // Test if we're at the end; -1 if error
 FXint FXIOBuffer::eof(){
-  return ptr>=endptr;
+  return pointer>=(FXlong)space;
   }
 
 
 // Return file size
 FXlong FXIOBuffer::size(){
-  return endptr-begptr;
+  return space;
   }
 
 
 // Close file
 FXbool FXIOBuffer::close(){
-  begptr=endptr=ptr=NULL;
+  buffer=NULL;
+  space=0L;
+  pointer=0L;
+  access=NoAccess;
   return true;
   }
 

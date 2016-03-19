@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                            W o r k e r   T h r e a d                          *
+*                            J S O N   F i l e   I / O                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,49 +18,65 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifndef FXWORKER_H
-#define FXWORKER_H
+#ifndef FXJSONFILE_H
+#define FXJSONFILE_H
 
-#ifndef FXTHREAD_H
-#include "FXThread.h"
+#ifndef FXJSON_H
+#include "FXJSON.h"
 #endif
 
 namespace FX {
 
 
 /**
-* An FXWorker is a transient thread that performs an FXRunnable.
-* After the worker thread finishes the execution of the runnable, the worker thread's 
-* memory is automatically reclaimed.
-* The FXRunnable itself is not deleted; it will thus outlive the worker that runs it.
-* Any exceptions raised by the runnable are caught by the worker thread, and will 
-* be rethrown after the worker thread's memory has been reclaimed.
+* Serialize a variant to or from JSON formatted file.
 */
-class FXAPI FXWorker : public FXThread {
+class FXAPI FXJSONFile : public FXJSON {
 private:
-  FXRunnable *runnable;
-private:
-  FXWorker(const FXWorker&);
-  FXWorker &operator=(const FXWorker&);
+  FXFile file;
 public:
 
-  /// Create worker for runnable
-  FXWorker(FXRunnable* rn=NULL);
+  /**
+  * Create JSON file i/o object.
+  */
+  FXJSONFile();
 
-  /// Change runnable if not started yet
-  void setRunnable(FXRunnable* rn){ runnable=rn; }
+  /**
+  * Create JSON file i/o object and open it.
+  */
+  FXJSONFile(const FXString& filename,Direction d=Load,FXuval sz=4096);
 
-  /// Return runnable
-  FXRunnable* getRunnable() const { return runnable; }
+  /**
+  * Open JSON file from given handle for direction d.
+  */
+  FXbool open(FXInputHandle h,Direction d=Load,FXuval sz=4096);
 
-  /// Run worker
-  virtual FXint run();
+  /**
+  * Open JSON file for direction d.
+  */
+  FXbool open(const FXString& filename,Direction d=Load,FXuval sz=4096);
 
-  /// Create and start a worker on a given runnable.
-  static FXWorker* execute(FXRunnable* rn,FXuval stacksize=0);
+  /**
+  * Fill buffer from file.
+  * Return false if not open for reading, or fail to read from disk.
+  */
+  virtual FXbool fill();
 
-  /// Destroy
-  virtual ~FXWorker();
+  /**
+  * Flush buffer to file.
+  * Return false if not open for writing, or if fail to write to disk.
+  */
+  virtual FXbool flush();
+
+  /**
+  * Close JSON file and delete buffers.
+  */
+  FXbool close();
+
+  /**
+  * Close JSON file.
+  */
+  virtual ~FXJSONFile();
   };
 
 }

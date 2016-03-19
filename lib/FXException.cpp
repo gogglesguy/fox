@@ -66,4 +66,8 @@ const FXchar FXImageException::exceptionName[]="image exception";
 const FXchar FXFontException::exceptionName[]="font exception";
 
 
+// Thread exception
+const FXchar FXThreadException::exceptionName[]="thread exception";
+
+
 }

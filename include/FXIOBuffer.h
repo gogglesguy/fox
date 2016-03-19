@@ -30,14 +30,12 @@ namespace FX {
 
 
 /**
-* IOBuffer is a file-interface to a chunk of memory, permitting
-* file-operations to be performed on memory-resident data.
+* IOBuffer provides a file-interface to a memory-buffer of a given size.
 */
 class FXAPI FXIOBuffer : public FXIO {
 protected:
-  FXuchar *begptr;      // Begin of buffer
-  FXuchar *endptr;      // End of buffer
-  FXuchar *ptr;         // Pointer
+  FXuchar *buffer;      // Memory buffer
+  FXuval   space;       // Space in buffer
 private:
   FXIOBuffer(const FXIOBuffer&);
   FXIOBuffer &operator=(const FXIOBuffer&);
@@ -47,31 +45,34 @@ public:
   FXIOBuffer();
 
   /// Construct and open
-  FXIOBuffer(FXuchar* data=NULL,FXuval size=0L,FXuint m=FXIO::Reading);
+  FXIOBuffer(FXuchar* ptr,FXuval sz,FXuint m=FXIO::Reading);
 
-  /// Open buffer 
-  virtual FXbool open(FXuchar* data=NULL,FXuval size=0L,FXuint m=FXIO::Reading);
+  /// Open buffer
+  virtual FXbool open(FXuchar* ptr,FXuval sz,FXuint m=FXIO::Reading);
 
+  /// Obtain pointer to buffer
+  FXuchar* data() const { return buffer; }
+  
   /// Return true if open
   virtual FXbool isOpen() const;
 
   /// Return true if serial access only
   virtual FXbool isSerial() const;
 
-  /// Get current file position
+  /// Get current buffer position
   virtual FXlong position() const;
 
-  /// Change file position, returning new position from start
+  /// Change buffer position, returning new position from start
   virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
 
   /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* data,FXival count);
+  virtual FXival readBlock(void* ptr,FXival count);
 
   /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* data,FXival count);
+  virtual FXival writeBlock(const void* ptr,FXival count);
 
-  /// Truncate file
-  virtual FXlong truncate(FXlong size);
+  /// Truncate size of the buffer
+  virtual FXlong truncate(FXlong sz);
 
   /// Flush to disk
   virtual FXbool flush();
@@ -79,7 +80,7 @@ public:
   /// Test if we're at the end; -1 if error
   virtual FXint eof();
 
-  /// Return size
+  /// Return size of the buffer
   virtual FXlong size();
 
   /// Close handle

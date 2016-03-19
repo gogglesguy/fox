@@ -54,18 +54,18 @@ typedef FXLFQueueOf<FXRunnable> FXTaskQueue;
 * The jobs which are passed to the thread pool are derived from FXRunnable.  In order
 * to perform some useful function, subclasses of FXRunnable should overload the run()
 * function.
-* Exceptions thrown by a task are caught in the thread pool and thus won't cause a
-* premature exit of either the worker thread of the thread pool itself.
+* FXEceptions thrown by a task are caught in the thread pool and thus won't cause a
+* premature exit of either the worker thread of the thread pool itself; other exceptions
+* however will possibly cause program termination.
 * When the thread pool is stopped, it will wait until all tasks are finished, and then
 * cause all worker-threads to terminate.
-* The thread pool becomes associated (through a thread-local variable) with the calling 
-* thread when start() is called; this association lasts until stop() is called. 
+* The thread pool becomes associated (through a thread-local variable) with the calling
+* thread when start() is called; this association lasts until stop() is called.
 * In addition, each worker will similarly be associated with the thread pool.
 * The thread pool associated this way can be obtained using the static member-function
 * instance().
 */
 class FXAPI FXThreadPool : public FXRunnable {
-  friend class FXWorker;
 private:
   FXTaskQueue     queue;        // Task queue
   FXSemaphore     freeslots;    // Free slots in queue
@@ -85,7 +85,6 @@ private:
   FXThreadPool &operator=(const FXThreadPool&);
 private:
   FXbool startWorker();
-  void processTask(FXRunnable* task);
   void processTasksWhile(volatile FXuint& count,FXTime nsec=forever);
   virtual FXint run();
 public:
@@ -186,7 +185,7 @@ public:
   FXbool wait();
 
   /**
-  * Temporarily enter the task-processing loop, helping out the worker-threads until 
+  * Temporarily enter the task-processing loop, helping out the worker-threads until
   * either the task queue is empty, or the counter becomes zero.
   * Return false if the thread pool wasn't running.
   */

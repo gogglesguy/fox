@@ -142,7 +142,7 @@ FXDictionary::FXDictionary():table(EMPTY){
 FXDictionary::FXDictionary(const FXDictionary& other):table(EMPTY){
   FXASSERT(sizeof(FXDictionary)==sizeof(FXptr));
   FXASSERT(sizeof(Entry)<=sizeof(FXival)*3);
-  if(__unlikely(no(other.no()))){ throw FXMemoryException("FXDictionary::FXDictionary: out of memory\n"); }
+  if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXDictionary::FXDictionary: out of memory\n"); }
   copyElms(table,other.table,no());
   free(other.free());
   used(other.used());
@@ -152,7 +152,7 @@ FXDictionary::FXDictionary(const FXDictionary& other):table(EMPTY){
 // Assignment operator
 FXDictionary& FXDictionary::operator=(const FXDictionary& other){
   if(__likely(table!=other.table)){
-    if(__unlikely(no(other.no()))){ throw FXMemoryException("FXDictionary::operator=: out of memory\n"); }
+    if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXDictionary::operator=: out of memory\n"); }
     copyElms(table,other.table,no());
     free(other.free());
     used(other.used());
@@ -163,9 +163,9 @@ FXDictionary& FXDictionary::operator=(const FXDictionary& other){
 
 // Adopt dictionary from another
 FXDictionary& FXDictionary::adopt(FXDictionary& other){
-  if(__likely(table!=other.table)){ 
-    swap(table,other.table); 
-    other.clear(); 
+  if(__likely(table!=other.table)){
+    swap(table,other.table);
+    other.clear();
     }
   return *this;
   }
@@ -223,36 +223,13 @@ const FXptr& FXDictionary::at(const FXchar* ky) const {
     p=(p<<2)+p+b+1;
     b>>=BSHIFT;
     }
-x:return table[x].data;                                 // If not found we stopped at a free slot
+x:return table[x].data;
   }
 
 
 // Insert association with given key; return old value, if any
 FXptr FXDictionary::insert(const FXchar* ky,FXptr ptr){
-  register FXuval p,b,h,x;
-  register FXptr old;
-  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::insert: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) goto x;    // Replace existing
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
-    }
-  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXDictionary::insert: out of memory\n"); }
-  p=b=h;
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].key.empty()) goto y;                    // Put into voided slot
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
-    }
-  free(free()-1);                                       // Put into empty slot
-y:used(used()+1);
-  table[x].key=ky;
-  table[x].hash=h;
-x:old=table[x].data;
-  table[x].data=ptr;
-  return old;
+  return swap(ptr,at(ky));
   }
 
 

@@ -52,37 +52,94 @@ using namespace FX;
 
 namespace FX {
 
-/*
-// create the security descriptor
-SECURITY_ATTRIBUTES saAttr;
-saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-saAttr.bInheritHandle = TRUE;
-saAttr.lpSecurityDescriptor = NULL;
-CreatePipe(  &hStdInRead,  &hStdInWrite, &saAttr, 0);
-CreatePipe( &hStdOutRead, &hStdOutWrite, &saAttr, 0);
-CreatePipe( &hStdErrRead, &hStdErrWrite, &saAttr, 0);
 
-// Create pipes for stdin and stdout
-CreatePipe(&hReadStdin, &hWriteStdin, NULL, 0);
-CreatePipe(&hReadStdout, &hWriteStdout, NULL, 0);
-
-// hook them up to the process we're about to create
-startup_info.hStdOutput = hWriteStdout;
-startup_info.hStdInput = hReadStdin;
-*/
-
-// Construct file and attach existing handle h
-FXPipe::FXPipe(FXInputHandle h,FXuint m){
-  open(h,m);
+// Construct and open pipes with access mode m for this one and the reverse for the other
+FXPipe::FXPipe(FXPipe& other,FXuint m){
+  open(other,m);
   }
 
 
-// Open device with access mode and handle
+// Construct file and attach existing handle h
+FXPipe::FXPipe(FXInputHandle h,FXuint m){
+  attach(h,m);
+  }
+
+
+// Open pipes with access mode m for this one and the reverse for the other
+FXbool FXPipe::open(FXPipe& other,FXuint m){
+  if(device==BadHandle && other.device==BadHandle){
+    access=NoAccess;
+    other.access=NoAccess;
+    pointer=0L;
+    other.pointer=0L;
+#if defined(WIN32)
+    SECURITY_ATTRIBUTES sat;
+    HANDLE hrd,hwr;
+    sat.nLength=sizeof(SECURITY_ATTRIBUTES);
+    sat.bInheritHandle=(m&Inheritable)?true:false;
+    sat.lpSecurityDescriptor=NULL;
+    
+    // Create connected pipe
+    if(CreatePipe(&hrd,(HANDLE*)&hwr,&sat,0)!=0){
+      if(m&ReadOnly){
+        device=hrd;
+        other.device=hwr;
+        access=(m&~WriteOnly)|ReadOnly|OwnHandle;
+        other.access=(m&~ReadOnly)|WriteOnly|OwnHandle;
+        }
+      else{
+        device=hwr;
+        other.device=hrd;
+        access=(m&~ReadOnly)|WriteOnly|OwnHandle;
+        other.access=(m&~WriteOnly)|ReadOnly|OwnHandle;
+        }
+      return true;
+      }
+#else
+    FXint flags=0;
+    FXint fd[2];
+
+    // Non-blocking mode
+    if(m&NonBlocking) flags|=O_NONBLOCK;
+
+    // Inheritable only if specified
+#if defined(O_CLOEXEC)
+    if(!(m&Inheritable)) flags|=O_CLOEXEC;
+#endif
+
+    // Create connected pipe
+#if defined(HAVE_PIPE2)
+    if(pipe2(fd,flags)==0){
+#else    
+    if(pipe(fd)==0){
+#endif    
+      if(m&ReadOnly){
+        device=fd[0];
+        other.device=fd[1];
+        access=(m&~WriteOnly)|ReadOnly|OwnHandle;
+        other.access=(m&~ReadOnly)|WriteOnly|OwnHandle;
+        }
+      else{
+        device=fd[1];
+        other.device=fd[0];
+        access=(m&~ReadOnly)|WriteOnly|OwnHandle;
+        other.access=(m&~WriteOnly)|ReadOnly|OwnHandle;
+        }
+      return true;
+      }
+#endif
+    }
+  return false;
+  }
+  
+
+// Open pipe with access mode m and handle h
 FXbool FXPipe::open(FXInputHandle h,FXuint m){
   return FXIODevice::open(h,m);
   }
 
 /*******************************************************************************/
+
 
 // Create a named pipe
 FXbool FXPipe::create(const FXString& file,FXuint perm){
@@ -106,7 +163,6 @@ HANDLE WINAPI CreateNamedPipe(
     }
   return false;
   }
-
 
 }
 

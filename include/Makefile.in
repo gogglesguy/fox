@@ -408,6 +408,7 @@ FXJP2Image.h \
 FXJPGIcon.h \
 FXJPGImage.h \
 FXJSON.h \
+FXJSONFile.h \
 FXKnob.h \
 FXLabel.h \
 FXLFQueue.h \
@@ -516,7 +517,7 @@ FXStatusLine.h \
 FXStream.h \
 FXString.h \
 FXStringDict.h \
-FXStringMap.h \
+FXStringDictionary.h \
 FXSwitcher.h \
 FXSystem.h \
 FXTGAIcon.h \

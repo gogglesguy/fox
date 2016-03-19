@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXException.h"
 #include "FXRunnable.h"
 #include "FXAutoThreadStorageKey.h"
 #include "FXThread.h"
@@ -58,7 +59,6 @@ namespace FX {
 
 /*******************************************************************************/
 
-
 // Generate one for the thread itself
 FXAutoThreadStorageKey FXThread::selfKey;
 
@@ -95,16 +95,29 @@ FXThread* FXThread::self(){
   }
 
 
-// Start the thread; we associate the FXThread instance with
-// this thread using thread-local storage accessed with self_key.
-// Also, we catch any errors thrown by the thread code here.
-// If FXThread is still around after run() returns, reset busy to false.
+// Start the thread; we associate the FXThread instance with this thread using thread-local 
+// storage accessed with self_key.
+// A special FXThreadException may be used to unroll to this point and return a specific
+// error code from the thread; any other FXException is silently caught here, and causes 
+// FXThread to return error-code of -1.
 #if defined(WIN32)
 unsigned int CALLBACK FXThread::function(void* ptr){
   register FXThread *thread=(FXThread*)ptr;
   register FXint code=-1;
   self(thread);
-  try{ code=thread->run(); } catch(...){ }
+  try{
+    code=thread->run();
+    }
+  catch(const FXThreadException& te){   // Graceful thread exit
+    code=te.code();
+    }
+  catch(const FXException&){            // Quietly handle FXExceptions
+    code=-1;
+    }
+  catch(...){                           // Other exceptions
+    if(self()){ self()->busy=false; }
+    throw;
+    }
   if(self()){ self()->busy=false; }
   return code;
   }
@@ -115,7 +128,19 @@ void* FXThread::function(void* ptr){
   self(thread);
   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,NULL);
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
-  try{ code=thread->run(); } catch(...){ }
+  try{
+    code=thread->run();
+    }
+  catch(const FXThreadException& te){   // Graceful thread exit
+    code=te.code();
+    }
+  catch(const FXException&){            // Quietly handle FXExceptions
+    code=-1;
+    }
+  catch(...){                           // Other exceptions
+    if(self()){ self()->busy=false; }
+    throw;
+    }
   if(self()){ self()->busy=false; }
   return (void*)(FXival)code;
   }
@@ -409,8 +434,8 @@ FXint FXThread::processor(){
 #if defined(WIN32)
 #if (WINVER >= 0x0600)                  // Vista and up
     return GetCurrentProcessorNumber();
-#endif    
-#endif    
+#endif
+#endif
 #if defined(HAVE_SCHED_GETCPU)
     return sched_getcpu();
 #endif

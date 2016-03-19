@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                         S t r i n g   T a b l e   C l a s s                   *
+*                  S t r i n g   D i c t i o n a r y    C l a s s               *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -25,11 +25,11 @@
 #include "FXException.h"
 #include "FXString.h"
 #include "FXDictionary.h"
-#include "FXStringMap.h"
+#include "FXStringDictionary.h"
 
 /*
   Notes:
-  - FXStringMap is a hash table from FXString to FXString. 
+  - FXStringDictionary is a hash table from FXString to FXString.
 */
 
 using namespace FX;
@@ -39,31 +39,26 @@ using namespace FX;
 namespace FX {
 
 
-// Empty string object
-const FXString FXStringMap::null;
-
-
-
 // Construct empty dictionary
-FXStringMap::FXStringMap(){
+FXStringDictionary::FXStringDictionary(){
   }
 
 
 // Construct empty dictionary
-FXStringMap::FXStringMap(const FXStringMap& other):FXDictionary(other){
-  for(FXint i=0; i<no(); ++i){ 
-    if(!key(i).empty()) construct(&data(i),other.data(i)); 
+FXStringDictionary::FXStringDictionary(const FXStringDictionary& other):FXDictionary(other){
+  for(FXint i=0; i<no(); ++i){
+    if(!key(i).empty()) construct(&data(i),other.data(i));
     }
   }
 
 
 // Assignment operator
-FXStringMap& FXStringMap::operator=(const FXStringMap& other){
-  if(__likely(table!=other.table)){ 
+FXStringDictionary& FXStringDictionary::operator=(const FXStringDictionary& other){
+  if(__likely(table!=other.table)){
     clear();
     FXDictionary::operator=(other);
-    for(FXint i=0; i<no(); ++i){ 
-      if(!key(i).empty()) construct(&data(i),other.data(i)); 
+    for(FXint i=0; i<no(); ++i){
+      if(!key(i).empty()) construct(&data(i),other.data(i));
       }
     }
   return *this;
@@ -71,42 +66,47 @@ FXStringMap& FXStringMap::operator=(const FXStringMap& other){
 
 
 // Adopt dictionary from another
-FXStringMap& FXStringMap::adopt(FXStringMap& other){
-  if(__likely(table!=other.table)){ 
-    swap(table,other.table); 
+FXStringDictionary& FXStringDictionary::adopt(FXStringDictionary& other){
+  if(__likely(table!=other.table)){
+    swap(table,other.table);
     other.clear();
     }
   return *this;
   }
 
 
+// Dirty tricks
+extern const FXint __string__empty__[];
+
+
 // Return reference to string assocated with key
-FXString& FXStringMap::at(const FXchar* ky){
-  FXptr& contents=FXDictionary::at(ky);
-  if(!contents){ construct((FXString*)&contents); }
+FXString& FXStringDictionary::at(const FXchar* ky){
+  FXptr& contents(FXDictionary::at(ky));
+  if(!contents){ contents=(FXptr)(__string__empty__+1); }
   return reinterpret_cast<FXString&>(contents);
   }
 
 
 
 // Return constant reference to string assocated with key
-const FXString& FXStringMap::at(const FXchar* ky) const {
-  const FXptr& contents=FXDictionary::at(ky);
-  return contents ? reinterpret_cast<const FXString&>(contents) : FXStringMap::null;
+const FXString& FXStringDictionary::at(const FXchar* ky) const {
+  const FXptr& contents(FXDictionary::at(ky));
+  if(!contents){ return *((const FXString*)(const FXptr)(__string__empty__+1)); }
+  return reinterpret_cast<const FXString&>(contents);
   }
 
 
 // Insert string associated with given key
-void FXStringMap::insert(const FXchar* ky,const FXchar* value){
+void FXStringDictionary::insert(const FXchar* ky,const FXchar* value){
   FXptr contents;
-  if((contents=FXDictionary::insert(ky,construct((FXString*)&contents,value)))!=NULL){
+  if((contents=FXDictionary::insert(ky,construct(reinterpret_cast<FXString*>(&contents),value)))!=NULL){
     destruct(reinterpret_cast<FXString*>(&contents));
     }
   }
 
 
 // Remove string associated with given key
-void FXStringMap::remove(const FXchar* ky){
+void FXStringDictionary::remove(const FXchar* ky){
   FXptr contents;
   if((contents=FXDictionary::remove(ky))!=NULL){
     destruct(reinterpret_cast<FXString*>(&contents));
@@ -115,7 +115,7 @@ void FXStringMap::remove(const FXchar* ky){
 
 
 // Erase string at pos in the table
-void FXStringMap::erase(FXival pos){
+void FXStringDictionary::erase(FXival pos){
   FXptr contents;
   if((contents=FXDictionary::erase(pos))!=NULL){
     destruct(reinterpret_cast<FXString*>(&contents));
@@ -124,7 +124,7 @@ void FXStringMap::erase(FXival pos){
 
 
 /// Clear entire table
-void FXStringMap::clear(){
+void FXStringDictionary::clear(){
   for(FXint i=0; i<no(); ++i){
     if(!key(i).empty()){ destruct(&data(i)); }
     }
@@ -133,7 +133,7 @@ void FXStringMap::clear(){
 
 
 // Destroy table
-FXStringMap::~FXStringMap(){
+FXStringDictionary::~FXStringDictionary(){
   clear();
   }
 

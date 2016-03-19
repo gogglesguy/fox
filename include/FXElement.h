@@ -57,6 +57,13 @@ inline void constructElms(EType* ptr,FXuval n){
   }
 
 
+/// Construct some elements at a location, with argument
+template<class EType,class Arg>
+inline void constructElms(EType* ptr,Arg arg,FXuval n){
+  while(n--){ construct(ptr,arg); ptr++; }
+  }
+
+
 /// Destruct some elements at a location
 template<class EType>
 inline void destructElms(EType* ptr,FXuval n){
@@ -87,8 +94,9 @@ inline void moveElms(EType* dst,const EType* src,FXuval n){
 
 /// Swap element dst and src
 template<class EType>
-inline void swap(EType& dst,EType& src){
-  EType t=dst; dst=src; src=t;
+inline EType& swap(EType& dst,EType& src){
+  EType t=dst; dst=src; src=t; 
+  return dst;
   }
 
 

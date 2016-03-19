@@ -660,7 +660,8 @@ FXbool PathFinderMain::haveSelectedFiles() const {
     }
   return false;
   }
-  
+
+
 // Get number of selected filenames, not including "." and ".."
 FXint PathFinderMain::getNumSelectedFiles() const {
   register FXint result=0;

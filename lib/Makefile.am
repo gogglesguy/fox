@@ -314,6 +314,7 @@ FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXJSON.cpp \
+FXJSONFile.cpp \
 FXKnob.cpp \
 FXLabel.cpp \
 FXLFQueue.cpp \
@@ -419,7 +420,7 @@ FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
 FXStringDict.cpp \
-FXStringMap.cpp \
+FXStringDictionary.cpp \
 FXSwitcher.cpp \
 FXSystem.cpp \
 FXTGAIcon.cpp \

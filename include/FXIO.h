@@ -22,16 +22,19 @@
 #define FXIO_H
 
 
-
 namespace FX {
 
 
 /**
 * FXIO is a base class for a generic i/o device.
+* The FXIO implementation provides an endless source or sink of data.
+* You can use FXIO to tally the number of bytes required to save
+* something to storage before actually doing so.
 */
 class FXAPI FXIO {
 protected:
-  FXuint access;
+  FXlong pointer;       // Stream pointer
+  FXuint access;        // Access mode flags
 private:
   FXIO(const FXIO&);
   FXIO &operator=(const FXIO&);
@@ -140,19 +143,19 @@ public:
   virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
 
   /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* data,FXival count);
+  virtual FXival readBlock(void* ptr,FXival count);
 
   /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* data,FXival count);
+  virtual FXival writeBlock(const void* ptr,FXival count);
 
-  /// Read character 
+  /// Read character
   FXbool readChar(FXchar& ch);
-  
+
   /// Write character
   FXbool writeChar(FXchar ch);
 
   /// Truncate file
-  virtual FXlong truncate(FXlong size);
+  virtual FXlong truncate(FXlong sz);
 
   /// Flush to disk
   virtual FXbool flush();

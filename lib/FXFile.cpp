@@ -65,7 +65,7 @@ namespace FX {
 
 // Construct file and attach existing handle h
 FXFile::FXFile(FXInputHandle h,FXuint m){
-  open(h,m);
+  attach(h,m);
   }
 
 
@@ -77,7 +77,7 @@ FXFile::FXFile(const FXString& file,FXuint m,FXuint perm){
 
 // Open file
 FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
-  if((device==BadHandle) && !file.empty()){
+  if(__likely(device==BadHandle) && __likely(!file.empty())){
 #if defined(WIN32)
     SECURITY_ATTRIBUTES sat;
     DWORD flags=GENERIC_READ;
@@ -109,6 +109,8 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
       }
 
     // Do it
+    access=NoAccess;
+    pointer=0L;
 #if defined(UNICODE)
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
@@ -117,15 +119,13 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
     device=::CreateFileA(file.text(),flags,FILE_SHARE_READ|FILE_SHARE_WRITE,&sat,creation,FILE_ATTRIBUTE_NORMAL,NULL);
 #endif
     if(device!=BadHandle){
-      if(m&Append){                             // Appending
-        ::SetFilePointer(device,0,NULL,FILE_END);
-        }
+      if(m&Append){ position(0,FXIO::End); }    // Appending
       access=(m|OwnHandle);                     // Own handle
       return true;
       }
 #else
-    FXuint bits=perm&0777;
-    FXuint flags=0;
+    FXint bits=perm&0777;
+    FXint flags=0;
 
     // Basic access mode
     switch(m&(ReadOnly|WriteOnly)){
@@ -163,8 +163,11 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
     if(perm&FXIO::Sticky) bits|=S_ISVTX;
 
     // Do it
+    access=NoAccess;
+    pointer=0L;
     device=::open(file.text(),flags,bits);
     if(device!=BadHandle){
+      if(m&Append){ position(0,FXIO::End); }    // Appending
       access=(m|OwnHandle);                     // Own handle
       return true;
       }
@@ -188,32 +191,27 @@ FXbool FXFile::isSerial() const {
 
 // Get position
 FXlong FXFile::position() const {
-  if(device!=BadHandle){
-#if defined(WIN32)
-    LARGE_INTEGER pos;
-    pos.QuadPart=0;
-    pos.LowPart=::SetFilePointer(device,0,&pos.HighPart,FILE_CURRENT);
-    if(pos.LowPart==INVALID_SET_FILE_POINTER && GetLastError()!=NO_ERROR) pos.QuadPart=-1;
-    return pos.QuadPart;
-#else
-    return ::lseek(device,0,SEEK_CUR);
-#endif
-    }
-  return -1;
+  return pointer;
   }
 
 
 // Move to position
 FXlong FXFile::position(FXlong offset,FXuint from){
-  if(device!=BadHandle){
+  if(__likely(device!=BadHandle)){
 #if defined(WIN32)
     LARGE_INTEGER pos;
     pos.QuadPart=offset;
     pos.LowPart=::SetFilePointer(device,pos.LowPart,&pos.HighPart,from);
-    if(pos.LowPart==INVALID_SET_FILE_POINTER && GetLastError()!=NO_ERROR) pos.QuadPart=-1;
-    return pos.QuadPart;
+    if(pos.LowPart!=INVALID_SET_FILE_POINTER || GetLastError()==NO_ERROR){
+      pointer=pos.QuadPart;
+      return pointer;
+      }
 #else
-    return ::lseek(device,offset,from);
+    FXlong pos;
+    if(0<=(pos=::lseek(device,offset,from))){
+      pointer=pos;
+      return pointer;
+      }
 #endif
     }
   return -1;
@@ -221,20 +219,23 @@ FXlong FXFile::position(FXlong offset,FXuint from){
 
 
 // Truncate file
-FXlong FXFile::truncate(FXlong s){
-  if(device!=BadHandle){
+FXlong FXFile::truncate(FXlong sz){
+  if(__likely(device!=BadHandle)){
 #if defined(WIN32)
-    LARGE_INTEGER oldpos;
-    LARGE_INTEGER newpos;
-    oldpos.QuadPart=0;
-    newpos.QuadPart=s;
-    oldpos.LowPart=::SetFilePointer(device,0,&oldpos.HighPart,FILE_CURRENT);
-    newpos.LowPart=::SetFilePointer(device,newpos.LowPart,&newpos.HighPart,FILE_BEGIN);
-    if((newpos.LowPart==INVALID_SET_FILE_POINTER && GetLastError()!=NO_ERROR) || ::SetEndOfFile(device)==0) newpos.QuadPart=-1;
-    ::SetFilePointer(device,oldpos.LowPart,&oldpos.HighPart,FILE_BEGIN);
-    return newpos.QuadPart;
+    LARGE_INTEGER pos;
+    pos.QuadPart=sz;
+    pos.LowPart=::SetFilePointer(device,pos.LowPart,&pos.HighPart,FILE_BEGIN);
+    if(pos.LowPart!=INVALID_SET_FILE_POINTER || GetLastError()==NO_ERROR){
+      if(::SetEndOfFile(device)!=0){
+        position(pointer);
+        return sz;
+        }
+      }
 #else
-    if(::ftruncate(device,s)==0) return s;
+    if(::ftruncate(device,sz)==0){
+      position(pointer);
+      return sz;
+      }
 #endif
     }
   return -1;
@@ -243,7 +244,7 @@ FXlong FXFile::truncate(FXlong s){
 
 // Flush to disk
 FXbool FXFile::flush(){
-  if(device!=BadHandle){
+  if(__likely(device!=BadHandle)){
 #if defined(WIN32)
     return ::FlushFileBuffers(device)!=0;
 #else
@@ -256,9 +257,8 @@ FXbool FXFile::flush(){
 
 // Test if we're at the end; -1 if error
 FXint FXFile::eof(){
-  if(device!=BadHandle){
-    register FXlong pos=position();
-    return 0<=pos && size()<=pos;
+  if(__likely(device!=BadHandle)){
+    return !(pointer<size());
     }
   return -1;
   }
@@ -266,7 +266,7 @@ FXint FXFile::eof(){
 
 // Return file size
 FXlong FXFile::size(){
-  if(device!=BadHandle){
+  if(__likely(device!=BadHandle)){
 #if defined(WIN32)
     ULARGE_INTEGER result;
     result.LowPart=::GetFileSize(device,&result.HighPart);

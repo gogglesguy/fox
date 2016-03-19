@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXException.h"
 #include "FXAutoThreadStorageKey.h"
 #include "FXRunnable.h"
 #include "FXThread.h"
@@ -34,8 +35,8 @@
     and its memory are automatically reclaimed.
   - The runnable itself is not deleted by the worker; it will thus outlive the worker
     that runs it.
-  - Exceptions thrown by the runnable cause early termination of the runnable,
-    and are caught by the worker
+  - Resource exceptions thrown by the runnable cause early termination of the runnable,
+    and are caught by the worker; other exceptions cause program termination, normally.
 */
 
 using namespace FX;
@@ -51,10 +52,17 @@ FXWorker::FXWorker(FXRunnable* rn):runnable(rn){
   }
 
 
-// Worker runs a job, then exits normally
+// Worker runs a job, then cleans itself up
+// Exceptions are passed through after cleanup of worker
 FXint FXWorker::run(){
   if(runnable){
-    try{ runnable->run(); } catch(...){ }
+    try{
+      runnable->run();
+      }
+    catch(...){
+      delete this;
+      throw;
+      }
     }
   delete this;
   return 0;
@@ -63,9 +71,9 @@ FXint FXWorker::run(){
 
 // Create and start a worker executing a given runnable
 FXWorker* FXWorker::execute(FXRunnable* rn,FXuval stacksize){
-  register FXWorker* worker;
   if(rn){
-    if((worker=new FXWorker(rn))!=NULL){
+    FXWorker* worker=new FXWorker(rn);
+    if(worker){
       if(worker->start(stacksize)){ return worker; }
       delete worker;
       }

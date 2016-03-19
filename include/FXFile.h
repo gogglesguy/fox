@@ -42,7 +42,7 @@ public:
   FXFile(){ }
 
   /// Construct file and attach existing handle h
-  FXFile(FXInputHandle h,FXuint m);
+  FXFile(FXInputHandle h,FXuint m=FXIO::Reading);
 
   /// Construct and open a file
   FXFile(const FXString& file,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
@@ -51,7 +51,7 @@ public:
   virtual FXbool open(const FXString& file,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
 
   /// Open device with access mode and handle
-  virtual FXbool open(FXInputHandle h,FXuint m);
+  virtual FXbool open(FXInputHandle h,FXuint m=FXIO::Reading);
 
   /// Return true if serial access only
   virtual FXbool isSerial() const;
@@ -63,7 +63,7 @@ public:
   virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
 
   /// Truncate file to size s
-  virtual FXlong truncate(FXlong s);
+  virtual FXlong truncate(FXlong sz);
 
   /// Flush to disk
   virtual FXbool flush();

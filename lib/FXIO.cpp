@@ -32,8 +32,13 @@
 
 /*
   Notes:
-
-  - An abstract class for IO.
+  - The class FXIO provides the interface to stream- or block-devices.
+  - The base class implementation provides essentially a file-pointer.  
+  - When reading, an infinite stream of zeroes is returned to the caller; when writing
+    all data are dropped but in either case the file-pointer maintains a tally of the
+    number of bytes moved up to that point.
+  - FXIO can thus be used to determine the length of a file without actually performing
+    any i/o to the actual device; this is often convenient.
 */
 
 // Bad handle value
@@ -52,12 +57,12 @@ namespace FX {
 
 
 // Construct
-FXIO::FXIO():access(NoAccess){
+FXIO::FXIO():pointer(0L),access(NoAccess){
   }
 
 
 // Construct with given mode
-FXIO::FXIO(FXuint m):access(m){
+FXIO::FXIO(FXuint m):pointer(0L),access(m){
   }
 
 
@@ -81,72 +86,86 @@ FXbool FXIO::isOpen() const {
 
 // Return true if serial access only
 FXbool FXIO::isSerial() const {
-  return true;
+  return false;
   }
 
 
 // Get position
 FXlong FXIO::position() const {
-  return -1;
+  return pointer;
   }
 
 
 // Move to position
-FXlong FXIO::position(FXlong,FXuint){
+FXlong FXIO::position(FXlong offset,FXuint from){
+  if(from==Current) offset=pointer+offset;
+  if(0<=offset){
+    pointer=offset;
+    return pointer;
+    }
   return -1;
   }
 
 
 // Read block
-FXival FXIO::readBlock(void*,FXival){
-  return 0;
+FXival FXIO::readBlock(void* ptr,FXival count){
+  memset(ptr,0,count);
+  pointer+=count;
+  return count;
   }
 
 
 // Write block
 FXival FXIO::writeBlock(const void*,FXival count){
+  pointer+=count;
   return count;
   }
 
 
-// Read character 
+// Read character
 FXbool FXIO::readChar(FXchar& ch){
   return readBlock(&ch,1)==1;
   }
-  
+
 
 // Write character
 FXbool FXIO::writeChar(FXchar ch){
   return writeBlock(&ch,1)==1;
   }
-  
+
 
 // Truncate file
-FXlong FXIO::truncate(FXlong){
+FXlong FXIO::truncate(FXlong sz){
+  if(0<=sz){
+    if(pointer>=sz) pointer=sz;
+    return sz;
+    }
   return -1;
   }
 
 
 // Synchronize disk with cached data
 FXbool FXIO::flush(){
-  return false;
+  return true;
   }
 
 
 // Test if we're at the end; -1 if error
 FXint FXIO::eof(){
-  return -1;
+  return 0;
   }
 
 
 // Return file size
 FXlong FXIO::size(){
-  return -1;
+  return pointer;
   }
 
 
 // Close file
 FXbool FXIO::close(){
+  access=NoAccess;
+  pointer=0L;
   return true;
   }
 

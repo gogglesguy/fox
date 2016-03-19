@@ -102,7 +102,7 @@ FXHash::FXHash():table(EMPTY){
 
 // Construct from another table
 FXHash::FXHash(const FXHash& other):table(EMPTY){
-  if(no(other.no())){
+  if(__likely(no(other.no()))){
     copyElms(table,other.table,no());
     free(other.free());
     used(other.used());
@@ -172,7 +172,7 @@ FXbool FXHash::resize(FXival n){
 
 // Assign from another table
 FXHash& FXHash::operator=(const FXHash& other){
-  if(table!=other.table && no(other.no())){
+  if(__likely(table!=other.table && no(other.no()))){
     copyElms(table,other.table,no());
     free(other.free());
     used(other.used());
@@ -183,9 +183,9 @@ FXHash& FXHash::operator=(const FXHash& other){
 
 // Adopt table from another
 FXHash& FXHash::adopt(FXHash& other){
-  if(table!=other.table && no(1)){
-    table=other.table;
-    other.table=EMPTY;
+  if(__likely(table!=other.table)){
+    swap(table,other.table);
+    other.clear();
     }
   return *this;
   }

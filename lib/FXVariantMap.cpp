@@ -145,7 +145,7 @@ FXVariantMap::FXVariantMap():table(EMPTY){
 FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
   FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
   FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
-  if(__unlikely(no(other.no()))){ throw FXMemoryException("FXVariantMap::FXVariantMap: out of memory\n"); }
+  if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXVariantMap::FXVariantMap: out of memory\n"); }
   copyElms(table,other.table,no());
   free(other.free());
   used(other.used());
@@ -154,8 +154,8 @@ FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
 
 // Assignment operator
 FXVariantMap& FXVariantMap::operator=(const FXVariantMap& other){
-  if(table!=other.table){
-    if(__unlikely(no(other.no()))){ throw FXMemoryException("FXVariantMap::operator=: out of memory\n"); }
+  if(__likely(table!=other.table)){
+    if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXVariantMap::operator=: out of memory\n"); }
     copyElms(table,other.table,no());
     free(other.free());
     used(other.used());
@@ -166,9 +166,9 @@ FXVariantMap& FXVariantMap::operator=(const FXVariantMap& other){
 
 // Adopt array from another
 FXVariantMap& FXVariantMap::adopt(FXVariantMap& other){
-  if(table!=other.table && no(1)){
-    table=other.table;
-    other.table=EMPTY;
+  if(__likely(table!=other.table)){
+    swap(table,other.table);
+    other.clear();
     }
   return *this;
   }

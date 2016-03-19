@@ -168,7 +168,7 @@ public:
 
 
 
-/// Specialize list to pointers to TYPE
+/// List to pointers to TYPE
 template<class TYPE>
 class FXPtrListOf : public FXPtrList {
 public:

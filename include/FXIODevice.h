@@ -44,11 +44,11 @@ public:
   /// Construct
   FXIODevice();
 
-  /// Construct with given handle and mode
-  FXIODevice(FXInputHandle h,FXuint m);
+  /// Construct device and attach existing handle h
+  FXIODevice(FXInputHandle h,FXuint m=FXIO::Reading);
 
   /// Open device with access mode m and handle h
-  virtual FXbool open(FXInputHandle h,FXuint m);
+  virtual FXbool open(FXInputHandle h,FXuint m=FXIO::Reading);
 
   /// Return handle
   FXInputHandle handle() const { return device; }
@@ -72,13 +72,13 @@ public:
   virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
 
   /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* data,FXival count);
+  virtual FXival readBlock(void* ptr,FXival count);
 
   /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* data,FXival count);
+  virtual FXival writeBlock(const void* ptr,FXival count);
 
   /// Truncate file
-  virtual FXlong truncate(FXlong size);
+  virtual FXlong truncate(FXlong sz);
 
   /// Flush to disk
   virtual FXbool flush();
