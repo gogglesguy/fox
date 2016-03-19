@@ -37,6 +37,10 @@
   - Note sizeof(FXival) == sizeof(FXptr).
 */
 
+
+// Special empty array value
+#define EMPTY   ((FXptr)(__array__empty__+1))
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -44,12 +48,9 @@ using namespace FX;
 namespace FX {
 
 
-// Empty object list
-static const FXival emptyarray[2]={0,0};
-
-
-// Empty buffer designator
-#define EMPTY   (const_cast<FXival*>(emptyarray+1))
+// Empty array value
+extern const FXival __array__empty__[];
+const FXival __array__empty__[2]={0,0};
 
 
 // Default constructor

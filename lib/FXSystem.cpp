@@ -162,10 +162,14 @@ FXString FXSystem::userName(FXuint uid){
 #ifdef HAVE_GETPWUID_R
   struct passwd pwdresult,*pwd;
   char buffer[1024];
-  if(getpwuid_r(uid,&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd) return pwd->pw_name;
+  if(getpwuid_r(uid,&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
+    return FXString(pwd->pw_name);
+    }
 #else
   struct passwd *pwd=getpwuid(uid);
-  if(pwd) return pwd->pw_name;
+  if(pwd){
+    return FXString(pwd->pw_name);
+    }
 #endif
 #endif
   __snprintf(result,sizeof(result),"%u",uid);
@@ -181,10 +185,14 @@ FXString FXSystem::groupName(FXuint gid){
   ::group grpresult;
   ::group *grp;
   char buffer[1024];
-  if(getgrgid_r(gid,&grpresult,buffer,sizeof(buffer),&grp)==0 && grp) return grp->gr_name;
+  if(getgrgid_r(gid,&grpresult,buffer,sizeof(buffer),&grp)==0 && grp){
+    return FXString(grp->gr_name);
+    }
 #else
   ::group *grp=getgrgid(gid);
-  if(grp) return grp->gr_name;
+  if(grp){
+    return FXString(grp->gr_name);
+    }
 #endif
 #endif
   __snprintf(result,sizeof(result),"%u",gid);
@@ -463,7 +471,6 @@ FXString FXSystem::getUserDirectory(const FXString& user){
         return FXString(home);
         }
       }
-    return FXString::null;
     }
   return FXString::null;
 #elif defined(HAVE_GETPWNAM_R)
@@ -534,24 +541,11 @@ FXString FXSystem::getTempDirectory(){
 FXString FXSystem::getHostName(){
   FXchar name[MAXHOSTNAMELEN];
   if(gethostname(name,sizeof(name))==0){
+    name[MAXHOSTNAMELEN-1]='\0';
     return FXString(name);
     }
   return "localhost";
   }
-
-/*
-//#include <sys/utsname.h>
-
-// Return host name
-FXString FXSystem::getHostName(){
-  struct utsname name;
-  if(0<=uname(&name)){
-    return FXString(name.nodename);
-    }
-  return "localhost";
-  }
-*/
-
 
 
 // Determine if UTF8 locale in effect
@@ -599,4 +593,3 @@ FXString FXSystem::dllName(const FXString& name){
 
 
 }
-

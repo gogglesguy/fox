@@ -12,36 +12,31 @@ bin_PROGRAMS = ControlPanel
 man_MANS = ControlPanel.1
 
 ICONS  = \
-controlpanel_gif.gif \
-colors_gif.gif \
-filebinding_gif.gif \
-settings_gif.gif
+$(top_srcdir)/controlpanel/controlpanel_gif.gif \
+$(top_srcdir)/controlpanel/colors_gif.gif \
+$(top_srcdir)/controlpanel/filebinding_gif.gif \
+$(top_srcdir)/controlpanel/settings_gif.gif
 
 ControlPanel_SOURCES = \
 icons.h \
 icons.cpp \
 ControlPanel.h \
-ControlPanel.cpp \
-LICENSE \
-$(ICONS)
+ControlPanel.cpp
 
-
-ControlPanel.cpp: icons.h icons.cpp
-
+BUILT_SOURCES = icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
-
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
-
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 CLEANFILES = icons.h icons.cpp
 
-
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc
-
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc \
+LICENSE \
+$(ICONS)

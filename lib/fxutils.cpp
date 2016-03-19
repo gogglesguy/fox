@@ -311,36 +311,46 @@ void fxwarning(const FXchar* format,...){
 #endif
   }
 
+/*******************************************************************************/
 
-// Sleep n microseconds
-void fxsleep(FXuint n){
-#ifdef WIN32
-  unsigned int zzz=n/1000;
-  if(zzz==0) zzz=1;
-  Sleep(zzz);
-#else
-#if  (_POSIX_C_SOURCE >= 199309L)
-  struct timespec value;
-  value.tv_nsec = 1000 * (n%1000000);
-  value.tv_sec = n/1000000;
-  nanosleep(&value,NULL);
-#else
-#ifndef BROKEN_SELECT
-  struct timeval value;
-  value.tv_usec = n % 1000000;
-  value.tv_sec = n / 1000000;
-  select(1,0,0,0,&value);
-#else
-  unsigned int zzz=n/1000000;
-  if(zzz==0) zzz=1;
-  if(zzz){
-    while((zzz=sleep(zzz))>0) ;
+// Safe string copy
+FXival fxstrlcpy(FXchar* dst,const FXchar* src,FXival len){
+  register const FXchar* s=src;
+  register FXchar* d=dst;
+  register FXival n=len;
+  register FXchar c;
+  while((c=*s)!='\0'){
+    if(1<n){ *d++=c; n--; }
+    s++;
     }
-#endif
-#endif
-#endif
+  if(0<n){
+    *d='\0';
+    }
+  return s-src;
   }
 
+
+// Safe string concat
+FXival fxstrlcat(FXchar* dst,const FXchar* src,FXival len){
+  register const FXchar* s=src;
+  register FXchar* d=dst;
+  register FXival n=len;
+  register FXival m;
+  register FXchar c;
+  while(0<n && *d!='\0'){
+    d++;
+    n--;
+    }
+  m=d-dst;
+  while((c=*s)!='\0'){
+    if(1<n){ *d++=c; n--; }
+    s++;
+    }
+  if(0<n){
+    *d='\0';
+    }
+  return (s-src)+m;
+  }
 
 /*******************************************************************************/
 
@@ -513,13 +523,26 @@ void fxhsl_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat l
 
 // Calculate a hash value from a string; algorithm same as in perl
 FXuint fxstrhash(const FXchar* str){
-  register const FXuchar *s=(const FXuchar*)str;
   register FXuint h=0;
-  register FXuint c;
-  while((c=*s++)!='\0'){
+  register FXuchar c;
+  while((c=*str++)!='\0'){
     h = ((h << 5) + h) ^ c;
     }
   return h;
+  }
+
+
+// Swap non-overlapping arrays
+void memswap(void *dst,void *src,FXuval n){
+  register unsigned char* p=(unsigned char*)dst;
+  register unsigned char* q=(unsigned char*)src;
+  register unsigned char* e=p+n;
+  register unsigned char t;
+  while(p<e){
+    t=*p; *p=*q; *q=t;
+    p++;
+    q++;
+    }
   }
 
 

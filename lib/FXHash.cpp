@@ -42,6 +42,8 @@
     hash table requires very little space, and no table is allocated until at least one
     element is added.
 
+  - Probe position p, probe increment b, and index x MUST be unsigned.
+
   - The table resize algorithm:
 
       - Table maintains count of used slots, and count of free slots; when an entry
@@ -74,11 +76,12 @@
 
 */
 
-#define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
-#define BSHIFT    5
-#define VOID      ((void*)-1L)
-#define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
+#define EMPTY     ((Entry*)(__hash__empty__+3))
 #define NOMEMORY  ((Entry*)(((FXival*)NULL)+3))
+#define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
+#define VOID      ((FXptr)-1L)
+#define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
+#define BSHIFT    5
 #define SIZE      -1
 #define USED      -2
 #define FREE      -3
@@ -92,11 +95,8 @@ namespace FX {
 
 
 // Empty object list
-static const FXival emptytable[7]={1,0,1,0,0,0,0};
-
-
-// Empty buffer designator
-#define EMPTY   (const_cast<Entry*>((Entry*)(emptytable+3)))
+extern const FXival __hash__empty__[];
+const FXival __hash__empty__[7]={1,0,1,0,0};
 
 
 // Make empty table
@@ -116,11 +116,12 @@ void FXHash::clear(){
 // Resize the table to the given size; the size must be a power of two
 FXbool FXHash::size(FXival num){
   FXASSERT((num&(num-1))==0);
+  FXASSERT((num-no())>0);
   if(size()!=num){
     register Entry* elbat=EMPTY;
-    register FXival p,b,x,i;
-    register void* name;
-    register void* data;
+    register FXptr name,data;
+    register FXuval p,b,x;
+    register FXival i;
     if(1<num){
       if(__unlikely((elbat=(Entry*)(((FXival*)calloc(sizeof(FXival)*3+sizeof(Entry)*num,1))+3))==NOMEMORY)) return false;
       for(i=0; i<size(); ++i){                  // Hash existing entries into new table
@@ -148,10 +149,10 @@ FXbool FXHash::size(FXival num){
   }
 
 
-// Insert key into the table
-void* FXHash::insert(void* name,void* data){
+// Insert entry into the table, unless it already exists
+FXptr FXHash::insert(FXptr name,FXptr data){
   if(__likely(LEGAL(name))){
-    register FXival p,b,h,x;
+    register FXuval p,b,h,x;
     p=b=h=HASH(name);
     while(table[x=p&(size()-1)].name){
       if(table[x].name==name) goto y;            // Return existing
@@ -176,11 +177,11 @@ y:    return table[x].data;
   }
 
 
-// Replace key in the table, returning old one
-void* FXHash::replace(void* name,void* data){
+// Replace entry in the table, returning old one
+FXptr FXHash::replace(FXptr name,FXptr data){
   if(__likely(LEGAL(name))){
-    register FXival p,b,h,x;
-    register void* old;
+    register FXuval p,b,h,x;
+    register FXptr old;
     p=b=h=HASH(name);
     while(table[x=p&(size()-1)].name){
       if(table[x].name==name) goto y;            // Replace existing
@@ -207,10 +208,10 @@ y:    old=table[x].data;
 
 
 // Remove association from the table
-void* FXHash::remove(void* name){
+FXptr FXHash::remove(FXptr name){
   if(__likely(LEGAL(name))){
-    register FXival p,b,x;
-    register void* old;
+    register FXuval p,b,x;
+    register FXptr old;
     p=b=HASH(name);
     while(table[x=p&(size()-1)].name!=name){
       if(table[x].name==NULL) goto x;
@@ -229,9 +230,9 @@ x:return NULL;
 
 
 // Return true if association in table
-void* FXHash::find(void* name) const {
+FXptr FXHash::find(FXptr name) const {
   if(__likely(LEGAL(name))){
-    register FXival p,b,x;
+    register FXuval p,b,x;
     p=b=HASH(name);
     while(__likely(table[x=p&(size()-1)].name)){
       if(__likely(table[x].name==name)) return table[x].data;

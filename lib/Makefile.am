@@ -12,132 +12,132 @@ libFOX_1_7_la_LIBADD  = $(X_LIBS) $(X_PRE_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS) $
 libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
 
 CURSORS = \
-blank.xbm \
-blank_mask.xbm \
-crosshair.xbm \
-crosshair_mask.xbm \
-dndask.xbm \
-dndask_mask.xbm \
-dndcopy.xbm \
-dndcopy_mask.xbm \
-dndlink.xbm \
-dndlink_mask.xbm \
-dndmove.xbm \
-dndmove_mask.xbm \
-dontdrop.xbm \
-dontdrop_mask.xbm \
-drag.xbm \
-drag_mask.xbm \
-gray.xbm \
-hand.xbm \
-hand_mask.xbm \
-helparrow.xbm \
-helparrow_mask.xbm \
-hsplit.xbm \
-hsplit_mask.xbm \
-move.xbm \
-move_mask.xbm \
-ne.xbm \
-ne_mask.xbm \
-se.xbm \
-se_mask.xbm \
-sw.xbm \
-sw_mask.xbm \
-nw.xbm \
-nw_mask.xbm \
-resizeleft.xbm \
-resizeleft_mask.xbm \
-resizetop.xbm \
-resizetop_mask.xbm \
-resizetopleft.xbm \
-resizetopleft_mask.xbm \
-resizetopright.xbm \
-resizetopright_mask.xbm \
-rotate.xbm \
-rotate_mask.xbm \
-swatch.xbm \
-swatch_mask.xbm \
-vsplit.xbm \
-vsplit_mask.xbm \
-xsplit.xbm \
-xsplit_mask.xbm
+$(top_srcdir)/lib/blank.xbm \
+$(top_srcdir)/lib/blank_mask.xbm \
+$(top_srcdir)/lib/crosshair.xbm \
+$(top_srcdir)/lib/crosshair_mask.xbm \
+$(top_srcdir)/lib/dndask.xbm \
+$(top_srcdir)/lib/dndask_mask.xbm \
+$(top_srcdir)/lib/dndcopy.xbm \
+$(top_srcdir)/lib/dndcopy_mask.xbm \
+$(top_srcdir)/lib/dndlink.xbm \
+$(top_srcdir)/lib/dndlink_mask.xbm \
+$(top_srcdir)/lib/dndmove.xbm \
+$(top_srcdir)/lib/dndmove_mask.xbm \
+$(top_srcdir)/lib/dontdrop.xbm \
+$(top_srcdir)/lib/dontdrop_mask.xbm \
+$(top_srcdir)/lib/drag.xbm \
+$(top_srcdir)/lib/drag_mask.xbm \
+$(top_srcdir)/lib/gray.xbm \
+$(top_srcdir)/lib/hand.xbm \
+$(top_srcdir)/lib/hand_mask.xbm \
+$(top_srcdir)/lib/helparrow.xbm \
+$(top_srcdir)/lib/helparrow_mask.xbm \
+$(top_srcdir)/lib/hsplit.xbm \
+$(top_srcdir)/lib/hsplit_mask.xbm \
+$(top_srcdir)/lib/move.xbm \
+$(top_srcdir)/lib/move_mask.xbm \
+$(top_srcdir)/lib/ne.xbm \
+$(top_srcdir)/lib/ne_mask.xbm \
+$(top_srcdir)/lib/se.xbm \
+$(top_srcdir)/lib/se_mask.xbm \
+$(top_srcdir)/lib/sw.xbm \
+$(top_srcdir)/lib/sw_mask.xbm \
+$(top_srcdir)/lib/nw.xbm \
+$(top_srcdir)/lib/nw_mask.xbm \
+$(top_srcdir)/lib/resizeleft.xbm \
+$(top_srcdir)/lib/resizeleft_mask.xbm \
+$(top_srcdir)/lib/resizetop.xbm \
+$(top_srcdir)/lib/resizetop_mask.xbm \
+$(top_srcdir)/lib/resizetopleft.xbm \
+$(top_srcdir)/lib/resizetopleft_mask.xbm \
+$(top_srcdir)/lib/resizetopright.xbm \
+$(top_srcdir)/lib/resizetopright_mask.xbm \
+$(top_srcdir)/lib/rotate.xbm \
+$(top_srcdir)/lib/rotate_mask.xbm \
+$(top_srcdir)/lib/swatch.xbm \
+$(top_srcdir)/lib/swatch_mask.xbm \
+$(top_srcdir)/lib/vsplit.xbm \
+$(top_srcdir)/lib/vsplit_mask.xbm \
+$(top_srcdir)/lib/xsplit.xbm \
+$(top_srcdir)/lib/xsplit_mask.xbm
 
 ICONS = \
-arrownext.gif \
-arrowprev.gif \
-bigapp.gif \
-bigcdrom.gif \
-bigcomputer.gif \
-bigdesktop.gif \
-bigdoc.gif \
-bigfloppy.gif \
-bigfloppy3.gif \
-bigfloppy5.gif \
-bigfolder.gif \
-bigfolderopen.gif \
-bignetdrive.gif \
-bignethood.gif \
-bookset.gif \
-bookclr.gif \
-bookadd.bmp \
-bookdel.bmp \
-clearentry.gif \
-cmymode.gif \
-dialmode.gif \
-dirupicon.gif \
-deleteicon.gif \
-docktop.gif \
-dockbottom.gif \
-dockleft.gif \
-dockright.gif \
-dockfree.gif \
-dockflip.gif \
-entericon.gif \
-erroricon.gif \
-eyedrop.gif \
-filecancel.gif \
-fileaccept.gif \
-filecopy.gif \
-filemove.gif \
-filehidden.gif \
-filelink.gif \
-filerename.gif \
-filedelete.gif \
-fileshown.gif \
-foldernew.gif \
-gotohome.gif \
-gotoicon.gif \
-gotowork.gif \
-hsvmode.gif \
-infoicon.gif \
-landscape.gif \
-listmode.gif \
-miniapp.gif \
-minicdrom.gif \
-minicomputer.gif \
-minidesktop.gif \
-minidoc.gif \
-minifloppy.gif \
-minifolder.gif \
-minifolderopen.gif \
-miniharddisk.gif \
-mininetdrive.gif \
-mininethood.gif \
-minizipdrive.gif \
-newfolder.bmp \
-portrait.gif \
-questionicon.gif \
-rgbmode.gif \
-searchicon.gif \
-showbigicons.gif \
-showdetails.gif \
-showsmallicons.gif \
-sorting.bmp \
-warningicon.gif \
-winclose.gif \
-winmaximize.gif \
-winminimize.gif \
-winrestore.gif
+$(top_srcdir)/lib/arrownext.gif \
+$(top_srcdir)/lib/arrowprev.gif \
+$(top_srcdir)/lib/bigapp.gif \
+$(top_srcdir)/lib/bigcdrom.gif \
+$(top_srcdir)/lib/bigcomputer.gif \
+$(top_srcdir)/lib/bigdesktop.gif \
+$(top_srcdir)/lib/bigdoc.gif \
+$(top_srcdir)/lib/bigfloppy.gif \
+$(top_srcdir)/lib/bigfloppy3.gif \
+$(top_srcdir)/lib/bigfloppy5.gif \
+$(top_srcdir)/lib/bigfolder.gif \
+$(top_srcdir)/lib/bigfolderopen.gif \
+$(top_srcdir)/lib/bignetdrive.gif \
+$(top_srcdir)/lib/bignethood.gif \
+$(top_srcdir)/lib/bookset.gif \
+$(top_srcdir)/lib/bookclr.gif \
+$(top_srcdir)/lib/bookadd.bmp \
+$(top_srcdir)/lib/bookdel.bmp \
+$(top_srcdir)/lib/clearentry.gif \
+$(top_srcdir)/lib/cmymode.gif \
+$(top_srcdir)/lib/dialmode.gif \
+$(top_srcdir)/lib/dirupicon.gif \
+$(top_srcdir)/lib/deleteicon.gif \
+$(top_srcdir)/lib/docktop.gif \
+$(top_srcdir)/lib/dockbottom.gif \
+$(top_srcdir)/lib/dockleft.gif \
+$(top_srcdir)/lib/dockright.gif \
+$(top_srcdir)/lib/dockfree.gif \
+$(top_srcdir)/lib/dockflip.gif \
+$(top_srcdir)/lib/entericon.gif \
+$(top_srcdir)/lib/erroricon.gif \
+$(top_srcdir)/lib/eyedrop.gif \
+$(top_srcdir)/lib/filecancel.gif \
+$(top_srcdir)/lib/fileaccept.gif \
+$(top_srcdir)/lib/filecopy.gif \
+$(top_srcdir)/lib/filemove.gif \
+$(top_srcdir)/lib/filehidden.gif \
+$(top_srcdir)/lib/filelink.gif \
+$(top_srcdir)/lib/filerename.gif \
+$(top_srcdir)/lib/filedelete.gif \
+$(top_srcdir)/lib/fileshown.gif \
+$(top_srcdir)/lib/foldernew.gif \
+$(top_srcdir)/lib/gotohome.gif \
+$(top_srcdir)/lib/gotoicon.gif \
+$(top_srcdir)/lib/gotowork.gif \
+$(top_srcdir)/lib/hsvmode.gif \
+$(top_srcdir)/lib/infoicon.gif \
+$(top_srcdir)/lib/landscape.gif \
+$(top_srcdir)/lib/listmode.gif \
+$(top_srcdir)/lib/miniapp.gif \
+$(top_srcdir)/lib/minicdrom.gif \
+$(top_srcdir)/lib/minicomputer.gif \
+$(top_srcdir)/lib/minidesktop.gif \
+$(top_srcdir)/lib/minidoc.gif \
+$(top_srcdir)/lib/minifloppy.gif \
+$(top_srcdir)/lib/minifolder.gif \
+$(top_srcdir)/lib/minifolderopen.gif \
+$(top_srcdir)/lib/miniharddisk.gif \
+$(top_srcdir)/lib/mininetdrive.gif \
+$(top_srcdir)/lib/mininethood.gif \
+$(top_srcdir)/lib/minizipdrive.gif \
+$(top_srcdir)/lib/newfolder.bmp \
+$(top_srcdir)/lib/portrait.gif \
+$(top_srcdir)/lib/questionicon.gif \
+$(top_srcdir)/lib/rgbmode.gif \
+$(top_srcdir)/lib/searchicon.gif \
+$(top_srcdir)/lib/showbigicons.gif \
+$(top_srcdir)/lib/showdetails.gif \
+$(top_srcdir)/lib/showsmallicons.gif \
+$(top_srcdir)/lib/sorting.bmp \
+$(top_srcdir)/lib/warningicon.gif \
+$(top_srcdir)/lib/winclose.gif \
+$(top_srcdir)/lib/winmaximize.gif \
+$(top_srcdir)/lib/winminimize.gif \
+$(top_srcdir)/lib/winrestore.gif
 
 
 CODECS = \
@@ -443,6 +443,9 @@ FXTreeListBox.cpp \
 FXTriStateButton.cpp \
 FXUndoList.cpp \
 FXURL.cpp \
+FXVariant.cpp \
+FXVariantArray.cpp \
+FXVariantMap.cpp \
 FXVec2d.cpp \
 FXVec2f.cpp \
 FXVec3d.cpp \
@@ -499,25 +502,23 @@ fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
 icons.h \
-jitter.h \
+jitter.h
+
+BUILT_SOURCES = icons.h icons.cpp
+
+icons.h: $(ICONS)
+	$(RESWRAP) -nc -h -n FX -o $@ $^
+
+icons.cpp: $(ICONS)
+	$(RESWRAP) -nc -i icons.h -n FX -o $@ $^
+
+EXTRA_DIST = \
+Makefile.bc \
+Makefile.bc.resp \
+Makefile.dmc \
+Makefile.wc \
+Makefile.dmc.resp \
 version.rc \
 version.rc.in \
 $(CURSORS) \
 $(ICONS)
-
-FXApp.cpp: icons.h
-
-icons.h: $(ICONS)
-	$(RESWRAP) -nc -h -n FX -o icons.h $(ICONS)
-
-
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -nc -i icons.h -n FX -o icons.cpp $(ICONS)
-
-
-EXTRA_DIST = Makefile.bc \
-             Makefile.bc.resp \
-             Makefile.dmc \
-             Makefile.wc \
-             Makefile.dmc.resp
-

@@ -10,52 +10,51 @@ bin_PROGRAMS	= PathFinder
 
 man_MANS = PathFinder.1
 
-ICONS = \
-addbook.bmp \
-bigicons.bmp \
-closepanel.gif \
-clrbook.gif \
-copy.bmp \
-config_gif.gif \
-copyit.gif \
-cut.bmp \
-delbook.bmp \
-deleteit.bmp \
-desktop.bmp \
-details.bmp \
-dirup.bmp \
-enter.gif \
-execute.bmp \
-file_gif.gif \
-foldernew.gif \
-foxbig.gif \
-foxmini.gif \
-goback.bmp \
-goforw.bmp \
-gotodir.bmp \
-home.gif \
-hosts.bmp \
-iconpath.gif \
-linkit.bmp \
-location.gif \
-maphost.bmp \
-miscellaneous_gif.gif \
-moveit.gif \
-paste.bmp \
-pattern_gif.gif \
-properties.bmp \
-quit_gif.gif \
-newfolder.bmp \
-renameit.gif \
-rotateleft.gif \
-rotateright.gif \
-run_bmp.bmp \
-setbook.gif \
-setdir.gif \
-smallicons.bmp \
-sorting.bmp \
-unmaphost.bmp \
-work.gif
+ICONS = $(top_srcdir)/pathfinder/addbook.bmp \
+$(top_srcdir)/pathfinder/bigicons.bmp \
+$(top_srcdir)/pathfinder/closepanel.gif \
+$(top_srcdir)/pathfinder/clrbook.gif \
+$(top_srcdir)/pathfinder/copy.bmp \
+$(top_srcdir)/pathfinder/config_gif.gif \
+$(top_srcdir)/pathfinder/copyit.gif \
+$(top_srcdir)/pathfinder/cut.bmp \
+$(top_srcdir)/pathfinder/delbook.bmp \
+$(top_srcdir)/pathfinder/deleteit.bmp \
+$(top_srcdir)/pathfinder/desktop.bmp \
+$(top_srcdir)/pathfinder/details.bmp \
+$(top_srcdir)/pathfinder/dirup.bmp \
+$(top_srcdir)/pathfinder/enter.gif \
+$(top_srcdir)/pathfinder/execute.bmp \
+$(top_srcdir)/pathfinder/file_gif.gif \
+$(top_srcdir)/pathfinder/foldernew.gif \
+$(top_srcdir)/pathfinder/foxbig.gif \
+$(top_srcdir)/pathfinder/foxmini.gif \
+$(top_srcdir)/pathfinder/goback.bmp \
+$(top_srcdir)/pathfinder/goforw.bmp \
+$(top_srcdir)/pathfinder/gotodir.bmp \
+$(top_srcdir)/pathfinder/home.gif \
+$(top_srcdir)/pathfinder/hosts.bmp \
+$(top_srcdir)/pathfinder/iconpath.gif \
+$(top_srcdir)/pathfinder/linkit.bmp \
+$(top_srcdir)/pathfinder/location.gif \
+$(top_srcdir)/pathfinder/maphost.bmp \
+$(top_srcdir)/pathfinder/miscellaneous_gif.gif \
+$(top_srcdir)/pathfinder/moveit.gif \
+$(top_srcdir)/pathfinder/paste.bmp \
+$(top_srcdir)/pathfinder/pattern_gif.gif \
+$(top_srcdir)/pathfinder/properties.bmp \
+$(top_srcdir)/pathfinder/quit_gif.gif \
+$(top_srcdir)/pathfinder/newfolder.bmp \
+$(top_srcdir)/pathfinder/renameit.gif \
+$(top_srcdir)/pathfinder/rotateleft.gif \
+$(top_srcdir)/pathfinder/rotateright.gif \
+$(top_srcdir)/pathfinder/run_bmp.bmp \
+$(top_srcdir)/pathfinder/setbook.gif \
+$(top_srcdir)/pathfinder/setdir.gif \
+$(top_srcdir)/pathfinder/sorting.bmp \
+$(top_srcdir)/pathfinder/smallicons.bmp \
+$(top_srcdir)/pathfinder/unmaphost.bmp \
+$(top_srcdir)/pathfinder/work.gif
 
 PathFinder_SOURCES =  \
 icons.h \
@@ -67,22 +66,23 @@ PathFinder.h \
 Preferences.cpp \
 Preferences.h \
 PropertyDialog.cpp \
-PropertyDialog.h \
-LICENSE \
-$(ICONS)
+PropertyDialog.h
 
-PathFinder.cpp: icons.h icons.cpp
+BUILT_SOURCES =	icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 CLEANFILES	= icons.h icons.cpp
 
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc \
+LICENSE \
+$(ICONS)
 

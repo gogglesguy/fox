@@ -1,35 +1,35 @@
-/*********** Generated on 2013/08/27 18:16:37 by reswrap version 5.1.1 *********/
+/*********** Generated on 2013/09/15 20:07:43 by reswrap version 5.1.1 *********/
 
-/* Created by reswrap from file line_0.gif */
+/* Created by reswrap from file ../shutterbug/line_0.gif */
 extern const unsigned char line_0[];
 
-/* Created by reswrap from file line_1.gif */
+/* Created by reswrap from file ../shutterbug/line_1.gif */
 extern const unsigned char line_1[];
 
-/* Created by reswrap from file line_2.gif */
+/* Created by reswrap from file ../shutterbug/line_2.gif */
 extern const unsigned char line_2[];
 
-/* Created by reswrap from file line_3.gif */
+/* Created by reswrap from file ../shutterbug/line_3.gif */
 extern const unsigned char line_3[];
 
-/* Created by reswrap from file line_4.gif */
+/* Created by reswrap from file ../shutterbug/line_4.gif */
 extern const unsigned char line_4[];
 
-/* Created by reswrap from file line_5.gif */
+/* Created by reswrap from file ../shutterbug/line_5.gif */
 extern const unsigned char line_5[];
 
-/* Created by reswrap from file line_6.gif */
+/* Created by reswrap from file ../shutterbug/line_6.gif */
 extern const unsigned char line_6[];
 
-/* Created by reswrap from file line_7.gif */
+/* Created by reswrap from file ../shutterbug/line_7.gif */
 extern const unsigned char line_7[];
 
-/* Created by reswrap from file line_8.gif */
+/* Created by reswrap from file ../shutterbug/line_8.gif */
 extern const unsigned char line_8[];
 
-/* Created by reswrap from file shutterbug.gif */
+/* Created by reswrap from file ../shutterbug/shutterbug.gif */
 extern const unsigned char shutterbug[];
 
-/* Created by reswrap from file tinyshutterbug.gif */
+/* Created by reswrap from file ../shutterbug/tinyshutterbug.gif */
 extern const unsigned char tinyshutterbug[];
 

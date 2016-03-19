@@ -14,53 +14,53 @@ bin_SCRIPTS = Adie.stx
 man_MANS = adie.1
 
 ICONS  = \
-adie_gif.gif \
-backward_gif.gif \
-big_gif.gif \
-bookdel_gif.gif \
-booknext_gif.gif \
-bookprev_gif.gif \
-bookset_gif.gif \
-browser.gif \
-capitalize.gif \
-close_gif.gif \
-colors_gif.gif \
-config_gif.gif \
-copy_gif.gif \
-cut_gif.gif \
-delete_gif.gif \
-delimit_gif.gif \
-fonts_gif.gif \
-forward_gif.gif \
-help_gif.gif \
-indent_gif.gif \
-info_gif.gif \
-lang_gif.gif \
-lowercase.gif \
-miscellaneous_gif.gif \
-new_gif.gif \
-nobrowser.gif \
-open_gif.gif \
-palette_gif.gif \
-pattern_gif.gif \
-paste_gif.gif \
-print_gif.gif \
-quit_gif.gif \
-redo_gif.gif \
-reload_gif.gif \
-saveall_gif.gif \
-saveas_gif.gif \
-save_gif.gif \
-search_gif.gif \
-searchnext_gif.gif \
-searchprev_gif.gif \
-shiftleft_gif.gif \
-shiftright_gif.gif \
-small_gif.gif \
-styles_gif.gif \
-syntax_gif.gif \
-undo_gif.gif \
-uppercase.gif
+$(top_srcdir)/adie/adie_gif.gif \
+$(top_srcdir)/adie/backward_gif.gif \
+$(top_srcdir)/adie/big_gif.gif \
+$(top_srcdir)/adie/bookdel_gif.gif \
+$(top_srcdir)/adie/booknext_gif.gif \
+$(top_srcdir)/adie/bookprev_gif.gif \
+$(top_srcdir)/adie/bookset_gif.gif \
+$(top_srcdir)/adie/browser.gif \
+$(top_srcdir)/adie/capitalize.gif \
+$(top_srcdir)/adie/close_gif.gif \
+$(top_srcdir)/adie/colors_gif.gif \
+$(top_srcdir)/adie/config_gif.gif \
+$(top_srcdir)/adie/copy_gif.gif \
+$(top_srcdir)/adie/cut_gif.gif \
+$(top_srcdir)/adie/delete_gif.gif \
+$(top_srcdir)/adie/delimit_gif.gif \
+$(top_srcdir)/adie/fonts_gif.gif \
+$(top_srcdir)/adie/forward_gif.gif \
+$(top_srcdir)/adie/help_gif.gif \
+$(top_srcdir)/adie/indent_gif.gif \
+$(top_srcdir)/adie/info_gif.gif \
+$(top_srcdir)/adie/lang_gif.gif \
+$(top_srcdir)/adie/lowercase.gif \
+$(top_srcdir)/adie/miscellaneous_gif.gif \
+$(top_srcdir)/adie/new_gif.gif \
+$(top_srcdir)/adie/nobrowser.gif \
+$(top_srcdir)/adie/open_gif.gif \
+$(top_srcdir)/adie/palette_gif.gif \
+$(top_srcdir)/adie/pattern_gif.gif \
+$(top_srcdir)/adie/paste_gif.gif \
+$(top_srcdir)/adie/print_gif.gif \
+$(top_srcdir)/adie/quit_gif.gif \
+$(top_srcdir)/adie/redo_gif.gif \
+$(top_srcdir)/adie/reload_gif.gif \
+$(top_srcdir)/adie/saveall_gif.gif \
+$(top_srcdir)/adie/saveas_gif.gif \
+$(top_srcdir)/adie/save_gif.gif \
+$(top_srcdir)/adie/search_gif.gif \
+$(top_srcdir)/adie/searchnext_gif.gif \
+$(top_srcdir)/adie/searchprev_gif.gif \
+$(top_srcdir)/adie/shiftleft_gif.gif \
+$(top_srcdir)/adie/shiftright_gif.gif \
+$(top_srcdir)/adie/small_gif.gif \
+$(top_srcdir)/adie/styles_gif.gif \
+$(top_srcdir)/adie/syntax_gif.gif \
+$(top_srcdir)/adie/undo_gif.gif \
+$(top_srcdir)/adie/uppercase.gif
 
 
 adie_SOURCES = \
@@ -84,20 +84,16 @@ Syntax.cpp \
 SyntaxParser.h \
 SyntaxParser.cpp \
 TextWindow.h \
-TextWindow.cpp \
-LICENSE \
-$(ICONS)
+TextWindow.cpp
 
-
-Adie.cpp: icons.h icons.cpp
-
+BUILT_SOURCES = icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 
 CLEANFILES = icons.h icons.cpp
@@ -107,5 +103,6 @@ EXTRA_DIST = $(man_MANS) \
 Adie.stx \
 Makefile.bc \
 Makefile.wc \
-Makefile.dmc
-
+Makefile.dmc \
+LICENSE \
+$(ICONS)

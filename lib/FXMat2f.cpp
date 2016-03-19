@@ -414,7 +414,7 @@ FXMat2f FXMat2f::invert() const {
 FXVec2f operator*(const FXMat2f& m,const FXVec2f& v){
 #if defined(FOX_HAS_SSE3)
   register __m128 mm=_mm_loadu_ps(&m[0][0]);
-  register __m128 vv=(__m128)_mm_set1_epi64(*((const __m64*)&v[0]));
+  register __m128 vv=_mm_castsi128_ps(_mm_set1_epi64(*((const __m64*)&v[0])));
   register __m128 rr=_mm_mul_ps(mm,vv);
   FXVec2f r;
   _mm_storel_pi((__m64*)&r[0],_mm_hadd_ps(rr,rr));
@@ -429,7 +429,7 @@ FXVec2f operator*(const FXMat2f& m,const FXVec2f& v){
 FXVec2f operator*(const FXVec2f& v,const FXMat2f& m){
 #if defined(FOX_HAS_SSE3)
   register __m128 mm=_mm_loadu_ps(&m[0][0]);
-  register __m128 vv=(__m128)_mm_set1_epi64(*((const __m64*)&v[0]));
+  register __m128 vv=_mm_castsi128_ps(_mm_set1_epi64(*((const __m64*)&v[0])));
   register __m128 rr=_mm_mul_ps(_mm_shufd_ps(mm,_MM_SHUFFLE(3,1,2,0)),vv);
   FXVec2f r;
   _mm_storel_pi((__m64*)&r[0],_mm_hadd_ps(rr,rr));

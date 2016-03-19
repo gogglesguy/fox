@@ -311,6 +311,9 @@ FXTreeListBox.h \
 FXTriStateButton.h \
 FXUndoList.h \
 FXURL.h \
+FXVariant.h \
+FXVariantArray.h \
+FXVariantMap.h \
 FXVec2d.h \
 FXVec2f.h \
 FXVec3d.h \

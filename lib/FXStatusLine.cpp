@@ -114,16 +114,14 @@ FXint FXStatusLine::getDefaultHeight(){
 
 // Slightly different from Frame border
 long FXStatusLine::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
-  FXint ty=padtop+(height-padtop-padbottom-font->getFontHeight())/2;
-  FXint pos,len;
+  FXDCWindow dc(this,(FXEvent*)ptr);
   dc.setForeground(backColor);
-  dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
+  dc.setFont(font);
+  dc.fillRectangle(border,border,width-(border<<1),height-(border<<1));
   if(!status.empty()){
-    dc.setFont(font);
-    pos=status.find('\n');
-    len=status.length();
+    FXint ty=padtop+(height-padtop-padbottom-font->getFontHeight())/2;
+    FXint len=status.length();
+    FXint pos=status.find('\n');
     if(pos>=0){
       dc.setForeground(textHighlightColor);
       dc.drawText(padleft,ty+font->getFontAscent(),status.text(),pos);
@@ -145,20 +143,21 @@ long FXStatusLine::onPaint(FXObject*,FXSelector,void* ptr){
 long FXStatusLine::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
   FXWindow *helpsource=getApp()->getCursorWindow();
 
-  // GUI update callback may set application mode-indicating text
+  // Set background text
+  setText(normal);
+  
+  // GUI update callback may set application mode text
   FXFrame::onUpdate(sender,sel,ptr);
 
-  // Control under the cursor may supply a temporary help message string
-  if(helpsource && getShell()->isOwnerOf(helpsource) && helpsource->handle(this,FXSEL(SEL_QUERY_HELP,0),NULL)){
-    return 1;
+  // Ask the help source for a new status text first, but only if the
+  // statusline's shell is a direct or indirect owner of the help source
+  if(helpsource && getShell()->isOwnerOf(helpsource)){
+    helpsource->handle(this,FXSEL(SEL_QUERY_HELP,0),NULL);
     }
-
-  // Otherwise, display normal message
-  setText(normal);
   return 1;
   }
-
-
+  
+  
 // Update value from a message
 long FXStatusLine::onCmdSetStringValue(FXObject*,FXSelector,void* ptr){
   setText(*((FXString*)ptr));
@@ -178,8 +177,6 @@ void FXStatusLine::setText(const FXString& text){
   if(status!=text){
     status=text;
     update(border,border,width-(border<<1),height-(border<<1));
-    repaint(border,border,width-(border<<1),height-(border<<1));
-    getApp()->flush();
     }
   }
 
@@ -189,8 +186,6 @@ void FXStatusLine::setNormalText(const FXString& text){
   if(normal!=text){
     normal=text;
     update(border,border,width-(border<<1),height-(border<<1));
-    repaint(border,border,width-(border<<1),height-(border<<1));
-    getApp()->flush();
     }
   }
 

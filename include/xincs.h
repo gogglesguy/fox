@@ -72,6 +72,7 @@
 #endif
 #include <windows.h>            // Core Windows stuff
 #include <winspool.h>           // Printer stuff
+#include <io.h>                 // For _access()
 #ifndef __CYGWIN__
 #include <winsock2.h>
 #endif
@@ -237,7 +238,7 @@ typedef cpuset_t   cpu_set_t;
 #endif
 
 // SSE Intrinsics only if available and turned on
-#if (defined(__GNUC__) || defined(__INTEL_COMPILER))
+#if ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
 #if defined(HAVE_IMMINTRIN_H)
 #include <immintrin.h>
 #if defined(__SSE__)
@@ -249,6 +250,9 @@ typedef cpuset_t   cpu_set_t;
 #if defined(__SSE3__)
 #define FOX_HAS_SSE3
 #endif
+#if defined(__SSSE3__)
+#define FOX_HAS_SSSE3
+#endif
 #if defined(__SSE4_2__)
 #define FOX_HAS_SSE4
 #endif
@@ -258,8 +262,12 @@ typedef cpuset_t   cpu_set_t;
 #if defined(__AVX2__)
 #define FOX_HAS_AVX2
 #endif
+#if defined(__FMA__)
+#define FOX_HAS_FMA
 #endif
 #endif
+#endif
+
 
 // X11 includes
 #include <X11/X.h>

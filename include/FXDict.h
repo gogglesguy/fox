@@ -41,7 +41,7 @@ protected:
   struct Entry {
     FXchar *key;                // Key string
     void   *data;               // Data
-    FXint   hash;               // Hash value of key
+    FXuint  hash;               // Hash value of key
     FXbool  mark;               // Entry is marked
     };
 protected:
@@ -51,7 +51,7 @@ protected:
 protected:
   static const Entry init;      // Initialization value
 protected:
-  static FXint hash(const FXchar* str);
+  static FXuint hash(const FXchar* str);
 private:
   FXDict(const FXDict&);
   FXDict &operator=(const FXDict&);

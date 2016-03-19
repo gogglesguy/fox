@@ -17,6 +17,35 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 15 - FOX DEVELOPMENT 1.7.42
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added class FXVariant, and supporting classes FXVariantMap and FXVariantArray.
+The FXVariant class can store basic types like bool, int, or float, but also arrays of variants,
+or maps of variants.  Thus, FXVariant can be used to store an arbitrarily complex tree-like
+data structure.</li>
+<li>Problems in Windows version of fxcpuid.cpp fixed.</li>
+<li>Fix cased from (__m128) to _mm_castsi128_ps() intrinsic for portability.</li>
+<li>Fix compare operation in FXSize.h.</li>
+<li>Added fxstrlcpy() and fxstrlcat() for safe string copy and string concatenation.</li>
+<li>Added __noreturn macro for flagging non-returning functions like fxerror().  This may 
+help compilers generate better code for places where these functions are called.</li>
+<li>Removed fxsleep(), obsoleted by FXThread::sleep() and FXThread::wkaeat().</li>
+<li>Allow out-of-source builds of FOX on configure-based systems.</li>
+<li>Force end-of-string in value returned by gethostname().</li>
+<li>Fix introduced bugs in FXHash and FXDict.</li>
+<li>Added swapElms() to FXElement.h. Also added templated swap().</li>
+<li>Added internal function memswap().</li>
+<li>Don't include intrinsics header files unless target architecture is x86 or x86-64.</li>
+<li>Updated build on Fedora 18 for Raspberry Pi.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 August 27 - FOX DEVELOPMENT 1.7.41
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

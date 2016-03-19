@@ -113,10 +113,10 @@ inline FXbool operator>(FXshort n,const FXSize& a){ return n>a.w && n>a.h; }
 inline FXbool operator>=(FXshort n,const FXSize& a){ return n>=a.w && n>=a.h; }
 
 /// Inequality tests
-inline FXbool operator<(const FXSize& a,const FXSize& b){ return a.w<b.h && a.w<b.h; }
-inline FXbool operator<=(const FXSize& a,const FXSize& b){ return a.w<=b.h && a.w<=b.h; }
-inline FXbool operator>(const FXSize& a,const FXSize& b){ return a.w>b.h && a.w>b.h; }
-inline FXbool operator>=(const FXSize& a,const FXSize& b){ return a.w>=b.h && a.w>=b.h; }
+inline FXbool operator<(const FXSize& a,const FXSize& b){ return a.w<b.w && a.h<b.h; }
+inline FXbool operator<=(const FXSize& a,const FXSize& b){ return a.w<=b.w && a.h<=b.h; }
+inline FXbool operator>(const FXSize& a,const FXSize& b){ return a.w>b.w && a.h>b.h; }
+inline FXbool operator>=(const FXSize& a,const FXSize& b){ return a.w>=b.w && a.h>=b.h; }
 
 /// Lowest or highest components
 inline FXSize lo(const FXSize& a,const FXSize& b){ return FXSize(FXMIN(a.w,b.w),FXMIN(a.h,b.h)); }

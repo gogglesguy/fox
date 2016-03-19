@@ -50,7 +50,7 @@ public:
   FXPtrList& operator=(const FXPtrList& orig);
 
   /// Return number of objects
-  FXint no() const { return *((FXint*)(ptr-1)); }
+  FXint no() const { return *((const FXint*)(ptr-1)); }
 
   /// Set number of objects
   FXbool no(FXint num);
@@ -76,7 +76,7 @@ public:
   const FXptr* data() const { return ptr; }
 
   /// Adopt objects from orig, leaving orig empty
-  FXPtrList& adopt(FXPtrList& orig);
+  void adopt(FXPtrList& orig);
 
   /// Assign object to list
   FXbool assign(FXptr object);

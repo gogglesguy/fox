@@ -68,7 +68,7 @@ public:
     }
 
   /// Return number of items
-  FXival no() const { return *(((FXival*)ptr)-1); }
+  FXival no() const { return *(((const FXival*)ptr)-1); }
 
   /// Change number of elements in array to n
   FXbool no(FXival n){
@@ -112,7 +112,7 @@ public:
 
   /// Adopt array from another
   FXArray<EType>& adopt(FXArray<EType>& src){
-    if(ptr!=src.ptr && no(0)){FXptr tmp=src.ptr;src.ptr=ptr;ptr=tmp;}
+    if(ptr!=src.ptr && no(0)){ swap(ptr,src.ptr); }
     return *this;
     }
 
