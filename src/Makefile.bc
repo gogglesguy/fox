@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2005 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
-# $Id: Makefile.bc,v 1.146 2007/05/30 17:43:21 fox Exp $                     #
+# $Id: Makefile.bc,v 1.147 2007/07/02 12:30:36 fox Exp $                     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -355,8 +355,7 @@ fxxpmio.cpp \
 icons.cpp \
 version.rc \
 version.rc.in \
-strtoll.cpp \
-vsscanf.cpp
+strtoll.cpp
 
 OBJECTS = $(SOURCES:.cpp=.obj)
 

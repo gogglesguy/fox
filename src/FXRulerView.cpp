@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRulerView.cpp,v 1.26 2007/02/07 22:58:06 fox Exp $                     *
+* $Id: FXRulerView.cpp,v 1.28 2007/07/09 16:27:07 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -105,6 +104,18 @@ FXRulerView::FXRulerView(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts
   }
 
 
+// Get default width
+FXint FXRulerView::getDefaultWidth(){
+  return FXScrollArea::getDefaultWidth()+vruler->getDefaultWidth();
+  }
+
+
+// Get default height
+FXint FXRulerView::getDefaultHeight(){ 
+  return FXScrollArea::getDefaultHeight()+hruler->getDefaultHeight();
+  }
+
+
 // Get document position X
 FXint FXRulerView::getDocumentX() const {
   return vruler->getWidth()+hruler->getDocumentLower();
@@ -179,11 +190,9 @@ FXint FXRulerView::getContentHeight(){
 
 // Move content
 void FXRulerView::moveContents(FXint x,FXint y){
+  FXScrollArea::moveContents(x,y);
   hruler->setPosition(x);
   vruler->setPosition(y);
-  scroll(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight(),x-pos_x,y-pos_y);
-  pos_x=x;
-  pos_y=y;
   }
 
 

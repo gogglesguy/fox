@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.107 2007/05/17 19:27:57 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.110 2007/07/09 16:27:16 fox Exp $                       *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -427,7 +426,8 @@ unsigned int CALLBACK FXThread::function(void* thread){
 // Start thread
 FXbool FXThread::start(unsigned long stacksize){
   DWORD thd;
-  if(busy){ fxerror("FXThread::start: already running.\n"); }
+  if(busy){ fxerror("FXThread::start: thread already running.\n"); }
+  if(tid){ fxerror("FXThread::start: thread still attached.\n"); }
   busy=true;
   if((tid=(FXThreadID)CreateThread(NULL,stacksize,(LPTHREAD_START_ROUTINE)FXThread::function,this,0,&thd))==NULL) busy=false;
   return busy;
@@ -459,11 +459,12 @@ FXbool FXThread::join(){
 
 // Cancel the thread
 FXbool FXThread::cancel(){
-  if(busy && TerminateThread((HANDLE)tid,0)){
-    CloseHandle((HANDLE)tid);
-    tid=0;
-    busy=false;
-    return true;
+  if(tid){
+    if(busy && TerminateThread((HANDLE)tid,0)) busy=false;
+    if(CloseHandle((HANDLE)tid)){
+      tid=0;
+      return true;
+      }
     }
   return false;
   }
@@ -471,7 +472,11 @@ FXbool FXThread::cancel(){
 
 // Detach thread
 FXbool FXThread::detach(){
-  return busy && CloseHandle((HANDLE)tid);
+  if(tid && CloseHandle((HANDLE)tid)){
+    tid=0;
+    return true;
+    }
+  return false;
   }
 
 
@@ -554,7 +559,7 @@ void FXThread::setStorage(FXThreadStorageKey key,void* ptr){
 
 // Set thread priority
 FXbool FXThread::priority(FXThread::Priority prio){
-  if(busy){
+  if(tid){
     int pri;
     switch(prio){
       case PriorityMinimum:
@@ -585,7 +590,7 @@ FXbool FXThread::priority(FXThread::Priority prio){
 // Return thread priority
 FXThread::Priority FXThread::priority() const {
   Priority result=PriorityError;
-  if(busy){
+  if(tid){
     int pri=GetThreadPriority((HANDLE)tid);
     if(pri!=THREAD_PRIORITY_ERROR_RETURN){
       switch(pri){
@@ -628,13 +633,13 @@ FXThread::Policy FXThread::policy() const {
 
 // Suspend thread
 FXbool FXThread::suspend(){
-  return busy && (SuspendThread((HANDLE)tid)!=(DWORD)-1L);
+  return busy && tid && (SuspendThread((HANDLE)tid)!=(DWORD)-1L);
   }
 
 
 // Resume thread
 FXbool FXThread::resume(){
-  return busy && (ResumeThread((HANDLE)tid)!=(DWORD)-1L);
+  return busy && tid && (ResumeThread((HANDLE)tid)!=(DWORD)-1L);
   }
 
 
@@ -971,7 +976,8 @@ void* FXThread::function(void* thread){
 // PTHREAD_STACK_MIN definition.
 FXbool FXThread::start(unsigned long stacksize){
   pthread_attr_t attr;
-  if(busy){ fxerror("FXThread::start: already running.\n"); }
+  if(busy){ fxerror("FXThread::start: thread already running.\n"); }
+  if(tid){ fxerror("FXThread::start: thread still attached.\n"); }
   pthread_attr_init(&attr);
   pthread_attr_setinheritsched(&attr,PTHREAD_INHERIT_SCHED);
   //pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
@@ -1010,11 +1016,12 @@ FXbool FXThread::join(){
 
 // Cancel the thread
 FXbool FXThread::cancel(){
-  if(busy && pthread_cancel((pthread_t)tid)==0){
-    pthread_join((pthread_t)tid,NULL);
-    tid=0;
-    busy=false;
-    return true;
+  if(tid){
+    if(busy && pthread_cancel((pthread_t)tid)==0) busy=false;
+    if(pthread_join((pthread_t)tid,NULL)==0){
+      tid=0;
+      return true;
+      }
     }
   return false;
   }
@@ -1022,7 +1029,11 @@ FXbool FXThread::cancel(){
 
 // Detach thread
 FXbool FXThread::detach(){
-  return busy && pthread_detach((pthread_t)tid)==0;
+  if(tid && pthread_detach((pthread_t)tid)==0){
+    tid=0;
+    return true;
+    }
+  return false;
   }
 
 
@@ -1156,7 +1167,7 @@ void FXThread::setStorage(FXThreadStorageKey key,void* ptr){
 // Set thread priority
 FXbool FXThread::priority(FXThread::Priority prio){
 #ifndef __APPLE__
-  if(busy){
+  if(tid){
     sched_param sched={0};
     int plcy=0;
     if(pthread_getschedparam((pthread_t)tid,&plcy,&sched)==0){
@@ -1203,7 +1214,7 @@ FXbool FXThread::priority(FXThread::Priority prio){
 FXThread::Priority FXThread::priority() const {
   Priority result=PriorityError;
 #ifndef __APPLE__
-  if(busy){
+  if(tid){
     sched_param sched={0};
     int plcy=0;
     if(pthread_getschedparam((pthread_t)tid,&plcy,&sched)==0){
@@ -1248,7 +1259,7 @@ FXThread::Priority FXThread::priority() const {
 // Set thread scheduling policy
 FXbool FXThread::policy(FXThread::Policy plcy){
 #ifndef __APPLE__
-  if(busy){
+  if(tid){
     sched_param sched={0};
     int oldplcy=0;
     int newplcy=0;
@@ -1276,7 +1287,7 @@ FXbool FXThread::policy(FXThread::Policy plcy){
 FXThread::Policy FXThread::policy() const {
   Policy result=PolicyError;
 #ifndef __APPLE__
-  if(busy){
+  if(tid){
     sched_param sched={0};
     int plcy=0;
     if(pthread_getschedparam((pthread_t)tid,&plcy,&sched)==0){
@@ -1301,11 +1312,11 @@ FXThread::Policy FXThread::policy() const {
 // Suspend thread
 FXbool FXThread::suspend(){
 #if defined(_HPUX_SOURCE)
-  return busy && (pthread_suspend((pthread_t)tid)==0);
+  return busy && tid && (pthread_suspend((pthread_t)tid)==0);
 #elif defined(SUNOS)
-  return busy && (thr_suspend((pthread_t)tid)==0);
+  return busy && tid && (thr_suspend((pthread_t)tid)==0);
 #else
-  return busy && (pthread_kill((pthread_t)tid,SIGSTOP)==0);
+  return busy && tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);
 #endif
   }
 
@@ -1313,11 +1324,11 @@ FXbool FXThread::suspend(){
 // Resume thread
 FXbool FXThread::resume(){
 #if defined(_HPUX_SOURCE)
-  return busy && (pthread_resume_np((pthread_t)tid,PTHREAD_COUNT_RESUME_NP)==0);
+  return busy && tid && (pthread_resume_np((pthread_t)tid,PTHREAD_COUNT_RESUME_NP)==0);
 #elif defined(SUNOS)
-  return busy && (thr_continue((pthread_t)tid)==0);
+  return busy && tid && (thr_continue((pthread_t)tid)==0);
 #else
-  return busy && (pthread_kill((pthread_t)tid,SIGCONT)==0);
+  return busy && tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);
 #endif
   }
 

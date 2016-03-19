@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.170 2007/02/07 20:22:09 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.175 2007/07/09 16:26:55 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -58,6 +57,7 @@
 #include "FXGLObject.h"
 #include "FXPrintDialog.h"
 #include "jitter.h"
+
 
 /*
   To Do:
@@ -301,15 +301,13 @@ FXGLViewer::FXGLViewer(){
 
 
 // Construct GL viewer widget with private display list
-FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXGLCanvas(p,vis,NULL,tgt,sel,opts,x,y,w,h){
+FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,NULL,tgt,sel,opts,x,y,w,h){
   initialize();
   }
 
 
 // Construct GL viewer widget with shared display list
-FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* sharegroup,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXGLCanvas(p,vis,sharegroup,tgt,sel,opts,x,y,w,h){
+FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* sharegroup,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,sharegroup,tgt,sel,opts,x,y,w,h){
   initialize();
   }
 
@@ -988,7 +986,7 @@ void FXGLViewer::updateProjection(){
 
 // Change transformation matrix
 void FXGLViewer::updateTransform(){
-  transform.eye();
+  transform.identity();
   transform.trans(0.0f,0.0f,(FXfloat)-distance);
   transform.rot(rotation);
   transform.scale(scale);
@@ -1042,7 +1040,7 @@ FXbool FXGLViewer::fitToBounds(const FXRangef& box){
   FXMat4f m;
 
   // Get rotation of model
-  m.eye();
+  m.identity();
   m.rot(rotation);
   m.trans(-box.center());
 
@@ -1852,7 +1850,7 @@ long FXGLViewer::onMotion(FXObject*,FXSelector,void* ptr){
           FXMat4f mm;
           FXQuatf qq;
           qq=turn(event->win_x,event->win_y,event->last_x,event->last_y);
-          mm.eye();
+          mm.identity();
           mm.trans(0.0f,0.0f,(FXfloat)-distance); // FIXME This aint it yet...
           mm.rot(qq);
           mm.trans(0.0f,0.0f,(FXfloat)distance);

@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDockSite.cpp,v 1.110 2007/06/04 21:37:14 fox Exp $                     *
+* $Id: FXDockSite.cpp,v 1.112 2007/07/09 16:26:49 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -427,14 +426,8 @@ void FXDockSite::layout(){
       if(expand) require=bottom-top;
 
       // Start next galley
-      if(options&LAYOUT_SIDE_BOTTOM){   // Docked on right
-        galx=right-galw;
-        right=right-galw-hspacing;
-        }
-      else{                             // Docked on left
-        galx=left;
-        left=left+galw+hspacing;
-        }
+      galx=left;
+      left=left+galw+hspacing;
 
       // Placement of widgets on galley
       for(child=begin,e=0; child; child=child->getNext()){
@@ -501,14 +494,8 @@ void FXDockSite::layout(){
       if(expand) require=right-left;
 
       // Start next galley
-      if(options&LAYOUT_SIDE_BOTTOM){   // Docked on bottom
-        galy=bottom-galh;
-        bottom=bottom-galh-vspacing;
-        }
-      else{                             // Docked on top
-        galy=top;
-        top=top+galh+vspacing;
-        }
+      galy=top;
+      top=top+galh+vspacing;
 
       // Placement of widgets on galley
       for(child=begin,e=0; child; child=child->getNext()){
@@ -919,18 +906,10 @@ void FXDockSite::moveToolBar(FXDockBar* bar,FXint barx,FXint bary){
       galw=0;
       for(begin=getFirst(),cur=prv=nxt=curend=prvend=nxtend=NULL; begin; begin=end->getNext()){
         w=galleyWidth(begin,end,bottom-top,require,expand);
-        if(options&LAYOUT_SIDE_BOTTOM){   // Docked on right
-          if(!after(end,bar)){ if(right-w<=barx+barw && barx+barw<right){ prv=begin; prvend=end; } }
-          else if(!after(bar,begin)){ if(right-w<=barx && barx<right){ nxt=begin; nxtend=end; } }
-          else{ cur=begin; curend=end; galx=right-w; galw=w; }
-          right-=w+hspacing;
-          }
-        else{                             // Docked on left
-          if(!after(end,bar)){ if(left<=barx && barx<left+w){ prv=begin; prvend=end; } }
-          else if(!after(bar,begin)){ if(left<=barx+barw && barx+barw<left+w){ nxt=begin; nxtend=end; } }
-          else{ cur=begin; curend=end; galx=left; galw=w; }
-          left+=w+hspacing;
-          }
+        if(!after(end,bar)){ if(left<=barx && barx<left+w){ prv=begin; prvend=end; } }
+        else if(!after(bar,begin)){ if(left<=barx+barw && barx+barw<left+w){ nxt=begin; nxtend=end; } }
+        else{ cur=begin; curend=end; galx=left; galw=w; }
+        left+=w+hspacing;
         }
 
       // Same bar, move vertically

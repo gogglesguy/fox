@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2006,2007 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendarView.h,v 1.8 2007/02/07 20:21:52 fox Exp $                     *
+* $Id: FXCalendarView.h,v 1.14 2007/07/09 16:02:42 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXCALENDARVIEW_H
 #define FXCALENDARVIEW_H
@@ -52,19 +51,19 @@ class FXAPI FXCalendarView : public FXWindow {
 FXDECLARE(FXCalendarView)
 protected:
   FXFont  *font;                // Font
-  FXColor  titlecolor;          // Title Color
-  FXColor  titlebackcolor;      // Title Back Color
-  FXColor  daycolor;            // Normal Day Color
-  FXColor  daycolord;           // Normal Day Color Disabled
-  FXColor  weekendcolor;        // Weekend Color
-  FXColor  weekendcolord;       // Weekend Color Disabled
-  FXColor  todaycolor;          // Today Color
+  FXDate   current;             // Current Date
+  FXDate   selected;            // Selected Date
+  FXDate   ds;                  // First Day in Calendar
   FXint    month;               // Which month is being viewed.
   FXint    firstday;            // Which day of the week we display in the first column
   FXint    ws;                  // First week number in Calendar
-  FXDate   ds;                  // First Day in Calendar
-  FXDate   current;             // Current Date
-  FXDate   selected;            // Selected Date
+  FXColor  todayColor;          // Today Color
+  FXColor  titleColor;          // Title Color
+  FXColor  titleBackColor;      // Title Back Color
+  FXColor  dayColor;            // Normal Day Color
+  FXColor  otherDayColor;       // Normal Day Color Disabled
+  FXColor  weekendColor;        // Weekend Color
+  FXColor  otherWeekendColor;   // Weekend Color Disabled
   FXbool   has_selection;       // If any date is selected
   FXbool   state;               // State
 protected:
@@ -72,7 +71,6 @@ protected:
   void moveFocus(FXDate);
   void markdirty(FXDate);
   void updateview(FXbool notify=true);
-  FXint weeknumber(FXDate) const;
 private:
   FXCalendarView(const FXCalendarView&);
   FXCalendarView &operator=(const FXCalendarView&);
@@ -96,7 +94,7 @@ public:
   /// Construct a Calendar View
   FXCalendarView(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=CALENDAR_BROWSESELECT,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Create Calendar View
+  /// Create X window
   virtual void create();
 
   /// Yes we can
@@ -161,43 +159,43 @@ public:
   void setTitleColor(FXColor c);
 
   /// Get the display color of titles
-  FXColor getTitleColor() const { return titlecolor; }
+  FXColor getTitleColor() const { return titleColor; }
 
   /// Set the display background color of titles
   void setTitleBackColor(FXColor c);
 
   /// Get the display background color of titles
-  FXColor getTitleBackColor() const { return titlebackcolor; }
+  FXColor getTitleBackColor() const { return titleBackColor; }
 
   /// Set the display color of non-weekend days
   void setDayColor(FXColor c);
 
   /// Get the display color of non-weekend days
-  FXColor getDayColor() const { return daycolor; }
+  FXColor getDayColor() const { return dayColor; }
 
   /// Set the display color of non-weekend days not in the current month
   void setOtherDayColor(FXColor c);
 
   /// Get the display color of non-weekend days not in the current month
-  FXColor getOtherDayColor() const { return daycolord; }
+  FXColor getOtherDayColor() const { return otherDayColor; }
 
   /// Set the display color of today
   void setTodayColor(FXColor c);
 
   /// Get the display color of today
-  FXColor getTodayColor() const { return todaycolor; }
+  FXColor getTodayColor() const { return todayColor; }
 
   /// Set the display color of days in the weekend
   void setWeekendColor(FXColor c);
 
   /// Get the display color of days in the weekend
-  FXColor getWeekendColor() const { return weekendcolor; }
+  FXColor getWeekendColor() const { return weekendColor; }
 
   /// Set the display color of days in the weekend not in the current month
   void setOtherWeekendColor(FXColor c);
 
   /// Get the display color of days in the weekend not in the current month
-  FXColor getOtherWeekendColor() const { return weekendcolord; }
+  FXColor getOtherWeekendColor() const { return otherWeekendColor; }
 
   /// Destructor
   virtual ~FXCalendarView();

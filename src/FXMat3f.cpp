@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3f.cpp,v 1.15 2007/02/07 20:22:12 fox Exp $                         *
+* $Id: FXMat3f.cpp,v 1.19 2007/07/09 16:27:02 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,9 +74,7 @@ FXMat3f::FXMat3f(FXfloat w){
 
 
 // Initialize matrix from components
-FXMat3f::FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,
-                 FXfloat a10,FXfloat a11,FXfloat a12,
-                 FXfloat a20,FXfloat a21,FXfloat a22){
+FXMat3f::FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
@@ -135,9 +132,7 @@ FXMat3f& FXMat3f::set(FXfloat w){
 
 
 // Construct from components
-FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,
-                      FXfloat a10,FXfloat a11,FXfloat a12,
-                      FXfloat a20,FXfloat a21,FXfloat a22){
+FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
@@ -224,7 +219,6 @@ FXMat3f FXMat3f::operator-() const {
   }
 
 
-
 // Add matrices
 FXMat3f FXMat3f::operator+(const FXMat3f& w) const {
   return FXMat3f(m[0][0]+w[0][0],m[0][1]+w[0][1],m[0][2]+w[0][2],
@@ -308,27 +302,38 @@ FXVec2f FXMat3f::operator*(const FXVec2f& v) const {
   }
 
 
-// Vector times matrix
-FXVec3f operator*(const FXVec3f& v,const FXMat3f& m){
-  register FXfloat x=v.x,y=v.y,z=v.z;
-  return FXVec3f(x*m[0][0]+y*m[1][0]+z*m[2][0], x*m[0][1]+y*m[1][1]+z*m[2][1], x*m[0][2]+y*m[1][2]+z*m[2][2]);
-  }
+// Equality 
+FXbool FXMat3f::operator==(const FXMat3f& a) const { return m[0]==a.m[0] && m[1]==a.m[1] && m[2]==a.m[2]; }
+  
+  
+// Inequality 
+FXbool FXMat3f::operator!=(const FXMat3f& a) const { return m[0]!=a.m[0] || m[1]!=a.m[1] || m[2]!=a.m[2]; }
 
 
-// Vector times matrix
-FXVec2f operator*(const FXVec2f& v,const FXMat3f& m){
-  register FXfloat x=v.x,y=v.y;
-  FXASSERT(m[0][2]==0.0f && m[1][2]==0.0f && m[2][2]==1.0f);
-  return FXVec2f(x*m[0][0]+y*m[1][0]+m[2][0], x*m[0][1]+y*m[1][1]+m[2][1]);
-  }
+// Equality
+FXbool operator==(const FXMat3f& a,FXfloat n){ return a[0]==n && a[1]==n && a[2]==n; }
+FXbool operator==(FXfloat n,const FXMat3f& a){ return n==a[0] && n==a[1] && n==a[2]; }
 
 
-// Make unit matrix
-FXMat3f& FXMat3f::eye(){
+// Inequality 
+FXbool operator!=(const FXMat3f& a,FXfloat n){ return a[0]!=n || a[1]!=n || a[2]!=n; }
+FXbool operator!=(FXfloat n,const FXMat3f& a){ return n!=a[0] || n!=a[1] || n!=a[2]; }
+
+
+// Set to identity matrix
+FXMat3f& FXMat3f::identity(){
   m[0][0]=1.0f; m[0][1]=0.0f; m[0][2]=0.0f;
   m[1][0]=0.0f; m[1][1]=1.0f; m[1][2]=0.0f;
   m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=1.0f;
   return *this;
+  }
+
+
+// Return true if identity matrix
+FXbool FXMat3f::isIdentity() const {
+  return m[0][0]==1.0f && m[0][1]==0.0f && m[0][2]==0.0f &&
+         m[1][0]==0.0f && m[1][1]==1.0f && m[1][2]==0.0f &&
+         m[2][0]==0.0f && m[2][1]==0.0f && m[2][2]==1.0f;
   }
 
 

@@ -17,12 +17,58 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+June 12 - FOX DEVELOPMENT 1.7.11
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>The FOX Library License <b>has been changed</b> to the new <b><a href='http://www.fsf.org/licensing'>Lesser GPL Version 3</a></b>!
+In addition, the <b><a href='license.html'>FOX Library License Addendum</a></b> has also been <b>changed</b>; a
+new clause has been added to the License Addendum. <br>
+The new clause in the License Addendum stipulates that the License Addendum does not propagate to derivate
+works:-  when you make a derivate work based on the FOX Library, this work may no longer carry over the FOX
+License Addendum.  In practice, this means that <b><em>derivate works will no longer support the relinking exception</em></b>,
+<b><em>but must fall back to the standard Lesser GPL license</em></b>.
+Note that this does not fundamentally change use of the FOX Library in commercial applications; rather, it
+expands a little bit on the intent of the original License Addendum, which was to ensure that modified
+source code is released under the Lesser GPL.<br>
+As you all are probably aware, several not-so-ethical companies [which, for now, shall remain nameless!] have been
+trying to perform an end-run around the old GNU GPL License.  This necessitated an extensive revision of GNU GPL
+License.  After a long period of extensive review, this revision was recently completed.  <br>
+I felt that the FOX Library also deserved the additional protections that this new license offers and therefore decided to
+exercise the <em>"..or later version"</em> provision of the GPL license to move all the source code over to
+this.</li>
+<li>Major improvements to FXChart widget, and introduced FX2DChart and FX2DPlot widgets.</li>
+<li>Extra constructors and set() API's added to FXRangef, FXRanged.  Made radius have
+default parameter value in FXSphere to match the idea in FXRange.</li>
+<li>Fixed FXDockSite moveToolBar() problem when FXDockSite is docked at bottom side.</li>
+<li>Fixed FXComboBox, FXListBox, FXTreeListBox potentially reading freed memory.  This
+happens at least with FXComboBox when used inside FXComboTableItem.</li>
+<li>FXIconSource now recognizes ".jpeg" extension.</li>
+<li>Added "special stacking orders" capability for FXTopWindow. STACK_TOP makes the window always
+stay on top of all other windows.  STACK_BOTTOM makes it stay below others.  STACK_NORMAL is the
+default behaviour.  The STACK_TOP is the most interesting mode; it can be used for attention-dialogs
+like error boxes, or splash-windows.</li>
+<li>FXSettings has had a major overhaul.  Arbitrary size limits for the strings have been removed.</li>
+<li>FXMat3d, FXMat3f, FXMat4d, FXMat4f have equality operators now.</li>
+<li>Added setOrtho(), setFrustum() to FXMat4d and FXMat4f.  The new API's replace ortho() and frustum().
+The new way is much faster because no matrix multiply is done anymore.  Also new API's setInverseOrtho()
+and setInverseFrustum() have bee added.  In addition, getOrtho(), getFrustum() extract the view-volume
+dimensions from the projection matrix, which may come in handy.</li>
+<li>FXMat3f, FXMat3d, FXMat4d, FXMat4f function eye() has been replaced with identity(). New API isIdentity()
+has been added also.</li>
+<li>New API getItem() added to FXOptionMenu.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 June 4 - FOX DEVELOPMENT 1.7.10
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
 <ul>
-<li>fxIsFinite(), fxIsInf(), fxIsNan() API's added.
+<li>fxIsFinite(), fxIsInf(), fxIsNan() API's added.</li>
 <li>FXGradientBar visual aspects have more control now.</li>
 <li>FXShutter didn't issue message when shutter-item was pressed.</li>
 <li>The fxgetticks() API is now official.  It returns the CPU's clocktick-
@@ -43,18 +89,19 @@ so the associations may be shared between multiple widgets.</li>
 <li>Fixed issue with bold-face text not drawing correctly in FXText if
 gap happens to be in the text-fragment being drawn.</li>
 <li>Implemented __vsscanf() and __sscanf().  Since this native FOX implementation,
+and its now used on all platforms, there will be no more issues with 32-bit v.s.
+64-bit architectures, or Windows v.s. Solaris v.s. GLIBC based systems.
+The new routine will always behave the same and support the same conversions.</li>
 <li>Decoration options interpreted under Windows-XP and UNIX as follows: DECOR_SHRINKABLE
 means window may be smaller, but not larger, than default size; DECOR_STRETCHABLE means
 window may be larger, but not smaller, than default size; and finally, DECOR_RESIZE
 means window may be both smaller or larger than default size.</li>
-and its now used on all platforms, there will be no more issues with 32-bit v.s.
-64-bit architectures, or Windows v.s. Solaris v.s. GLIBC based systems.
-The new routine will always behave the same and support the same conversions.</li>
 <li>Implemented __snprintf() and __vsnprintf().  This takes care of all variability
 in these API's across platforms, and also 64- v.s. 32-bit issues.</li>
 <li>Fixed issue in multi-head API access under older Windows operating systems
 than Windows-XP.</li>
 <li>FXMDIChild resize animation speed changed a little bit.</li>
+<li>Added some exciting new applications to the list of projects.</li>
 </ul>
 
 <!--- TOPIC TITLE -->
@@ -884,7 +931,7 @@ google_ad_format = "728x90_as";
 <p>
 <table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1><font size=-1>
-Copyright &copy; 1997-2005 Jeroen van der Zijp</font>
+Copyright &copy; 1997-2007 Jeroen van der Zijp</font>
 <!-- Begin Nedstat Basic code --><!-- Title: FOX --><!-- URL: http://www.fox-toolkit.org --><script language="JavaScript" src="http://m1.nedstatbasic.net/basic.js"></script>
 <A target=_blank href="http://v1.nedstatbasic.net/stats?ABDZOQqjU2gPjOQDQH/c7z1OusNg"><IMG src="http://m1.nedstatbasic.net/n?id=ABDZOQqjU2gPjOQDQH/c7z1OusNg&p=1&w=1280" border=0 width=18 height=18 align=right></A>
 </td></tr></table>

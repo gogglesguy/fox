@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.h,v 1.126 2007/04/11 13:33:57 fox Exp $                         *
+* $Id: FXString.h,v 1.132 2007/07/09 16:02:49 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -470,6 +469,15 @@ public:
   /// Find last character NOT equal to c, starting from pos; return position or -1
   FXint find_last_not_of(FXchar c,FXint pos=0) const;
 
+  /// Check if the string contains special characters or leading or trailing whitespace
+  FXbool shouldEscape(FXchar lquote=0,FXchar rquote=0);
+  
+  /// Escape special characters, and optionally enclose with left and right quotes
+  FXString& escape(FXchar lquote=0,FXchar rquote=0);
+  
+  /// Unescape special characters, and optionally remove left and right quotes
+  FXString& unescape(FXchar lquote=0,FXchar rquote=0);
+
   /// Format a string a-la printf
   FXString& format(const FXchar* fmt,...) FX_PRINTF(2,3) ;
   FXString& vformat(const FXchar* fmt,va_list args);
@@ -610,12 +618,6 @@ public:
   /// Return ascii containing unicode escapes from utf8
   friend FXAPI FXString toAscii(const FXString& s);
 
-  /// Escape special characters in a string
-  friend FXAPI FXString escape(const FXString& s);
-
-  /// Unescape special characters in a string
-  friend FXAPI FXString unescape(const FXString& s);
-
   /// Return normalized string, i.e. reordering of diacritical marks
   friend FXAPI FXString normalize(const FXString& s);
 
@@ -723,9 +725,6 @@ extern FXAPI FXdouble FXDoubleVal(const FXString& s);
 
 extern FXAPI FXString fromAscii(const FXString& s);
 extern FXAPI FXString toAscii(const FXString& s);
-
-extern FXAPI FXString escape(const FXString& s);
-extern FXAPI FXString unescape(const FXString& s);
 
 extern FXAPI FXString normalize(const FXString& s);
 extern FXAPI FXString decompose(const FXString& s,FXuint kind);

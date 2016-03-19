@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRangef.h,v 1.18 2007/02/07 20:21:57 fox Exp $                          *
+* $Id: FXRangef.h,v 1.20 2007/07/09 16:02:47 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXRANGEF_H
 #define FXRANGEF_H
@@ -41,14 +40,20 @@ public:
   /// Default constructor
   FXRangef(){}
 
-  /// Copy constructor
+  /// Initialize with another range
   FXRangef(const FXRangef& bounds):lower(bounds.lower),upper(bounds.upper){}
 
-  /// Initialize from two vectors
-  FXRangef(const FXVec3f& lo,const FXVec3f& hi):lower(lo),upper(hi){}
+  /// Initialize with a single point
+  FXRangef(const FXVec3f& p):lower(p),upper(p){}
 
-  /// Initialize from six numbers
-  FXRangef(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi):lower(xlo,ylo,zlo),upper(xhi,yhi,zhi){}
+  /// Initialize with corner points
+  FXRangef(const FXVec3f& l,const FXVec3f& h):lower(l),upper(h){}
+
+  /// Initialize with a single point
+  FXRangef(FXfloat x,FXfloat y,FXfloat z):lower(x,y,z),upper(x,y,z){}
+
+  /// Initialize with explicit values
+  FXRangef(FXfloat xl,FXfloat xh,FXfloat yl,FXfloat yh,FXfloat zl,FXfloat zh):lower(xl,yl,zl),upper(xh,yh,zh){}
 
   /// Initialize box to fully contain the given bounding sphere
   FXRangef(const FXSpheref& sphere);
@@ -59,11 +64,17 @@ public:
   /// Set value from another range
   FXRangef& set(const FXRangef& bounds){ lower=bounds.lower; upper=bounds.upper; return *this; }
 
-  /// Set value from two vectors
-  FXRangef& set(const FXVec3f& lo,const FXVec3f& hi){ lower=lo; upper=hi; return *this; }
+  /// Set value from single point
+  FXRangef& set(const FXVec3f& p){ lower=upper=p; return *this; }
 
-  /// Set value from six numbers
-  FXRangef& set(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){ lower.set(xlo,ylo,zlo); upper.set(xhi,yhi,zhi); return *this; }
+  /// Set value from corner points
+  FXRangef& set(const FXVec3f& l,const FXVec3f& h){ lower=l; upper=h; return *this; }
+
+  /// Set value from single point
+  FXRangef& set(FXfloat x,FXfloat y,FXfloat z){ lower.x=upper.x=x; lower.y=upper.y=y; lower.z=upper.z=z; return *this; }
+
+  /// Set value from explicit values
+  FXRangef& set(FXfloat xl,FXfloat xh,FXfloat yl,FXfloat yh,FXfloat zl,FXfloat zh){ lower.set(xl,yl,zl); upper.set(xh,yh,zh); return *this; }
 
   /// Indexing with 0..1
   FXVec3f& operator[](FXint i){ return (&lower)[i]; }

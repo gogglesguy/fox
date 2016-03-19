@@ -15,19 +15,31 @@ libCHART_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -
 chartincludedir=$(includedir)/fox-1.7/chart
 
 chartinclude_HEADERS = \
-FXChart.h
+FX2DChart.h \
+FX2DPlot.h \
+FXAxis.h \
+FXChart.h \
+FXCurve.h \
+chartdefs.h \
+chart.h
 
 libCHART_1_7_la_SOURCES = \
-FXChart.cpp
+FX2DChart.cpp \
+FX2DPlot.cpp \
+FXAxis.cpp \
+FXChart.cpp \
+FXCurve.cpp \
+chartutils.h \
+chartutils.cpp
 
 
-noinst_PROGRAMS = chart
+noinst_PROGRAMS = charttest
 
 ICONS = marble.bmp
 
-chart_SOURCES = chart.cpp icons.h icons.cpp $(ICONS)
+charttest_SOURCES = charttest.cpp icons.h icons.cpp $(ICONS)
 
-chart.cpp: icons.h icons.cpp
+charttest.cpp: icons.h icons.cpp
 
 icons.h: $(ICONS)
 	$(RESWRAP) -h -o icons.h $(ICONS)

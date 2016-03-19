@@ -262,5 +262,4 @@
 +fxxbmio.obj &
 +fxxpmio.obj &
 +icons.obj &
-+strtoll.obj &
-+vsscanf.obj
++strtoll.obj

@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeListBox.cpp,v 1.65 2007/02/07 20:22:19 fox Exp $                   *
+* $Id: FXTreeListBox.cpp,v 1.68 2007/07/09 16:27:17 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -88,6 +87,7 @@ FXDEFMAP(FXTreeListBox) FXTreeListBoxMap[]={
   FXMAPFUNC(SEL_DELETED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
   FXMAPFUNC(SEL_INSERTED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
   FXMAPFUNC(SEL_REPLACED,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeForward),
+  FXMAPFUNC(SEL_COMMAND,FXTreeListBox::ID_TREE,FXTreeListBox::onTreeCommand),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,FXTreeListBox::ID_FIELD,FXTreeListBox::onFieldButton),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXTreeListBox::ID_FIELD,FXTreeListBox::onMouseWheel),
   };
@@ -98,8 +98,7 @@ FXIMPLEMENT(FXTreeListBox,FXPacker,FXTreeListBoxMap,ARRAYNUMBER(FXTreeListBoxMap
 
 
 // List box
-FXTreeListBox::FXTreeListBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXPacker(p,opts,x,y,w,h, 0,0,0,0, 0,0){
+FXTreeListBox::FXTreeListBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h, 0,0,0,0, 0,0){
   flags|=FLAG_ENABLED;
   target=tgt;
   message=sel;
@@ -188,15 +187,17 @@ void FXTreeListBox::layout(){
   }
 
 
-// Forward clicked message from list to target
-long FXTreeListBox::onTreeClicked(FXObject*,FXSelector,void* ptr){
-  button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);    // Unpost the list
-  if(ptr){
-    field->setText(tree->getItemText((FXTreeItem*)ptr));
-    field->setIcon(tree->getItemClosedIcon((FXTreeItem*)ptr));
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),ptr);
-    }
-  return 1;
+// Clicked inside or outside an item in the list; unpost the pane
+long FXTreeListBox::onTreeClicked(FXObject*,FXSelector,void* ){
+  return button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
+  }
+
+
+// Clicked on an item in the list; issue a callback
+long FXTreeListBox::onTreeCommand(FXObject*,FXSelector,void* ptr){
+  field->setText(tree->getItemText((FXTreeItem*)ptr));
+  field->setIcon(tree->getItemClosedIcon((FXTreeItem*)ptr));
+  return target && target->tryHandle(this,FXSEL(SEL_COMMAND,message),ptr);
   }
 
 

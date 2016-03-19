@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.h,v 1.75 2007/05/17 14:47:05 fox Exp $                        *
+* $Id: FXFileList.h,v 1.79 2007/07/09 16:02:44 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXFILELIST_H
 #define FXFILELIST_H
@@ -160,13 +159,16 @@ protected:
   virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
   void listItems(FXbool force);
   FXint getSelectedFiles(FXString& result) const;
+  FXString* getSelectedFiles() const;
+  FXIcon* getItemPreviewIcon(FXint index) const;
 private:
   FXFileList(const FXFileList&);
   FXFileList &operator=(const FXFileList&);
 public:
   long onOpenTimer(FXObject*,FXSelector,void*);
-  long onDropAction(FXObject*,FXSelector,void*);
   long onRefreshTimer(FXObject*,FXSelector,void*);
+  long onDropAction(FXObject*,FXSelector,void*);
+  long onPreviewChore(FXObject*,FXSelector,void*);
   long onDNDEnter(FXObject*,FXSelector,void*);
   long onDNDLeave(FXObject*,FXSelector,void*);
   long onDNDMotion(FXObject*,FXSelector,void*);
@@ -234,9 +236,10 @@ public:
   static FXint descendingGroup(const FXIconItem* a,const FXIconItem* b);
 public:
   enum {
-    ID_REFRESHTIMER=FXIconList::ID_LAST,
-    ID_OPENTIMER,
+    ID_OPENTIMER=FXIconList::ID_LAST,
+    ID_REFRESHTIMER,
     ID_DROPACTION,
+    ID_PREVIEWCHORE,
     ID_SORT_BY_NAME,    /// Sort by name
     ID_SORT_BY_TYPE,    /// Sort by type
     ID_SORT_BY_SIZE,    /// Sort by size

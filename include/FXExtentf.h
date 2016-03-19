@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXExtentf.h,v 1.13 2007/02/07 20:21:54 fox Exp $                         *
+* $Id: FXExtentf.h,v 1.15 2007/07/09 16:02:44 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXEXTENTF_H
 #define FXEXTENTF_H
@@ -41,11 +40,17 @@ public:
   /// Copy constructor
   FXExtentf(const FXExtentf& ext):lower(ext.lower),upper(ext.upper){}
 
-  /// Initialize from two vectors
+  /// Initialize with a single point
+  FXExtentf(const FXVec2f& p):lower(p),upper(p){}
+
+  /// Initialize from corner points
   FXExtentf(const FXVec2f& lo,const FXVec2f& hi):lower(lo),upper(hi){}
 
-  /// Initialize from six numbers
-  FXExtentf(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi):lower(xlo,ylo),upper(xhi,yhi){}
+  /// Initialize with a single point
+  FXExtentf(FXfloat x,FXfloat y):lower(x,y),upper(x,y){}
+
+  /// Initialize with explicit values
+  FXExtentf(FXfloat xl,FXfloat xh,FXfloat yl,FXfloat yh):lower(xl,yl),upper(xh,yh){}
 
   /// Assignment
   FXExtentf& operator=(const FXExtentf& ext){ lower=ext.lower; upper=ext.upper; return *this; }
@@ -53,11 +58,17 @@ public:
   /// Set value from another range
   FXExtentf& set(const FXExtentf& ext){ lower=ext.lower; upper=ext.upper; return *this; }
 
-  /// Set value from two vectors
+  /// Set value from single point
+  FXExtentf& set(const FXVec2f& p){ lower=upper=p; return *this; }
+
+  /// Set value from corner points
   FXExtentf& set(const FXVec2f& lo,const FXVec2f& hi){ lower=lo; upper=hi; return *this; }
 
-  /// Set value from four numbers
-  FXExtentf& set(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi){ lower.set(xlo,ylo); upper.set(xhi,yhi); return *this; }
+  /// Set value from single point
+  FXExtentf& set(FXfloat x,FXfloat y){ lower.x=upper.x=x; lower.y=upper.y=y; return *this; }
+
+  /// Set value from explicit values
+  FXExtentf& set(FXfloat xl,FXfloat xh,FXfloat yl,FXfloat yh){ lower.set(xl,yl); upper.set(xh,yh); return *this; }
 
   /// Indexing with 0..1
   FXVec2f& operator[](FXint i){ return (&lower)[i]; }

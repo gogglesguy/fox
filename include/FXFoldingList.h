@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.h,v 1.38 2007/02/07 20:21:54 fox Exp $                     *
+* $Id: FXFoldingList.h,v 1.43 2007/07/09 16:02:44 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXFOLDINGLIST_H
 #define FXFOLDINGLIST_H
@@ -266,7 +265,7 @@ protected:
   FXint              graby;             // Grab point y
   FXString           lookup;            // Lookup string
   FXString           help;              // Help string
-  FXbool               state;             // State of item
+  FXbool             state;             // State of item
 protected:
   FXFoldingList();
   void recompute();
@@ -291,7 +290,7 @@ public:
   long onLeftBtnRelease(FXObject*,FXSelector,void*);
   long onRightBtnPress(FXObject*,FXSelector,void*);
   long onRightBtnRelease(FXObject*,FXSelector,void*);
-  long onHeaderChanged(FXObject*,FXSelector,void*);
+  long onChgHeader(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
   long onTipTimer(FXObject*,FXSelector,void*);
@@ -311,7 +310,7 @@ public:
 public:
   enum {
     ID_LOOKUPTIMER=FXScrollArea::ID_LAST,
-    ID_HEADER_CHANGE,
+    ID_HEADER,
     ID_LAST
     };
 public:
@@ -333,6 +332,12 @@ public:
 
   /// Return default height
   virtual FXint getDefaultHeight();
+  
+  /// Return visible scroll-area y position
+  virtual FXint getVisibleY() const;
+
+  /// Return visible scroll-area height
+  virtual FXint getVisibleHeight() const;
 
   /// Compute and return content width
   virtual FXint getContentWidth();

@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXHeader.cpp,v 1.119 2007/02/07 20:22:10 fox Exp $                       *
+* $Id: FXHeader.cpp,v 1.125 2007/07/09 16:26:56 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -69,12 +68,15 @@ using namespace FX;
 namespace FX {
 
 
-// Explicit template specialization
-//template class FXObjectListOf<FXHeaderItem>;
-
-
 // Object implementation
 FXIMPLEMENT(FXHeaderItem,FXObject,NULL,0)
+
+
+// Construct new item with given text, icon, size, and user-data
+FXHeaderItem::FXHeaderItem(const FXString& text,FXIcon* ic,FXint s,void* ptr):icon(ic),data(ptr),size(s),pos(0),state(LEFT|BEFORE){
+  label=text.section('\t', 0);
+  tip=text.section('\t', 1);
+  }
 
 
 // Draw item
@@ -327,6 +329,7 @@ void FXHeaderItem::setIcon(FXIcon* icn){
 void FXHeaderItem::save(FXStream& store) const {
   FXObject::save(store);
   store << label;
+  store << tip;
   store << icon;
   store << size;
   store << pos;
@@ -338,6 +341,7 @@ void FXHeaderItem::save(FXStream& store) const {
 void FXHeaderItem::load(FXStream& store){
   FXObject::load(store);
   store >> label;
+  store >> tip;
   store >> icon;
   store >> size;
   store >> pos;
@@ -378,8 +382,7 @@ FXHeader::FXHeader(){
 
 
 // Make a Header
-FXHeader::FXHeader(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb){
+FXHeader::FXHeader(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb){
   flags|=FLAG_ENABLED|FLAG_SHOWN;
   target=tgt;
   message=sel;
@@ -667,6 +670,23 @@ FXString FXHeader::getItemText(FXint index) const {
   }
 
 
+// Change item's tooltip text
+void FXHeader::setItemTipText(FXint index,const FXString& text){
+  if(index<0 || items.no()<=index){ fxerror("%s::setItemTipText: index out of range.\n",getClassName()); }
+  if(items[index]->getTipText()!=text){
+    items[index]->setTipText(text);
+    recalc();
+    }
+  }
+
+
+// Get item's tooltip text
+FXString FXHeader::getItemTipText(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::getItemTipText: index out of range.\n",getClassName()); }
+  return items[index]->getTipText();
+  }
+
+
 // Change item's icon
 void FXHeader::setItemIcon(FXint index,FXIcon* icon){
   if(index<0 || items.no()<=index){ fxerror("%s::setItemIcon: index out of range.\n",getClassName()); }
@@ -714,21 +734,20 @@ FXint FXHeader::getItemOffset(FXint index) const {
 
 // Get index of item at offset
 FXint FXHeader::getItemAt(FXint coord) const {
-  register FXint h=items.no()-1,l=0,m;
-  coord=coord-pos;
+  register FXint h=items.no()-1,l=0,p=coord-pos,m;
   if(l<=h){
-    if(coord<items[l]->getPos()) return -1;
-    if(coord>=items[h]->getPos()+items[h]->getSize()) return items.no();
+    if(p<items[l]->getPos()) return -1;
+    if(p>=items[h]->getPos()+items[h]->getSize()) return items.no();
     do{
       m=(h+l)>>1;
-      if(coord<items[m]->getPos()) h=m-1;
-      else if(coord>=items[m]->getPos()+items[m]->getSize()) l=m+1;
+      if(p<items[m]->getPos()) h=m-1;
+      else if(p>=items[m]->getPos()+items[m]->getSize()) l=m+1;
       else break;
       }
-    while(h>=l);
+    while(l<=h);
     return m;
     }
-  return coord<0 ? -1 : 0;
+  return p<0 ? -1 : 0;
   }
 
 
@@ -991,8 +1010,7 @@ long FXHeader::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
     getCursorPosition(cx,cy,btns);
     index=getItemAt((options&HEADER_VERTICAL)?cy:cx);
     if(0<=index && index<items.no()){
-      FXString string=items[index]->getText();
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
+      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&items[index]->getTipText());
       return 1;
       }
     }

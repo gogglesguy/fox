@@ -5,9 +5,9 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This program is free software; you can redistribute it and/or modify          *
+* This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
-* the Free Software Foundation; either version 2 of the License, or             *
+* the Free Software Foundation, either version 3 of the License, or             *
 * (at your option) any later version.                                           *
 *                                                                               *
 * This program is distributed in the hope that it will be useful,               *
@@ -16,10 +16,9 @@
 * GNU General Public License for more details.                                  *
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
-* along with this program; if not, write to the Free Software                   *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.h,v 1.49 2007/03/13 21:51:15 fox Exp $                        *
+* $Id: TextWindow.h,v 1.50 2007/07/06 04:22:29 fox Exp $                        *
 ********************************************************************************/
 #ifndef TEXTWINDOW_H
 #define TEXTWINDOW_H
@@ -375,13 +374,13 @@ public:
 
   // Change file time
   void setFiletime(FXTime t){ filetime=t; }
-  
+
   // Get file time
   FXTime getFiletime() const { return filetime; }
-  
+
   // Set filename is set flag
   void setFilenameSet(FXbool set){ filenameset=set; }
-  
+
   // Has a filename been set
   FXbool isFilenameSet() const { return filenameset; }
 

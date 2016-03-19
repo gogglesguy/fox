@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2006,2007 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.cpp,v 1.7 2007/02/07 20:22:03 fox Exp $                       *
+* $Id: FXCalendar.cpp,v 1.14 2007/07/09 16:26:44 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,6 +70,8 @@ using namespace FX;
 
 namespace FX {
 
+
+// Map
 FXDEFMAP(FXCalendar) FXCalendarMap[]={
   FXMAPFUNC(SEL_REPLACED,FXCalendar::ID_CALENDAR,FXCalendar::onCmdDate),
   FXMAPFUNCS(SEL_COMMAND,FXCalendar::ID_MONTH_START,FXCalendar::ID_MONTH_END,FXCalendar::onCmdMonth),
@@ -87,6 +88,8 @@ FXDEFMAP(FXCalendar) FXCalendarMap[]={
   FXMAPFUNC(SEL_UPDATE,FXCalendar::ID_CALENDAR,FXCalendar::onFwdToTarget),
   };
 
+
+// Implementation
 FXIMPLEMENT(FXCalendar,FXPacker,FXCalendarMap,ARRAYNUMBER(FXCalendarMap));
 
 
@@ -103,7 +106,7 @@ FXCalendar::FXCalendar(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
 
   // Popup for months
   months=new FXPopup(this);
-  for(int i=1; i<=12; i++){
+  for(FXint i=1; i<=12; i++){
     new FXOption(months,tr(FXDate::monthName(i)),NULL,this,ID_MONTH_START+(i-1),OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
     }
 
@@ -138,6 +141,7 @@ FXCalendar::FXCalendar(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   }
 
 
+// Create X window
 void FXCalendar::create(){
   FXPacker::create();
   FXDate date=view->getCurrentDate();
@@ -146,6 +150,7 @@ void FXCalendar::create(){
   }
 
 
+// Enable the window
 void FXCalendar::enable(){
   FXPacker::enable();
   view->enable();
@@ -157,6 +162,8 @@ void FXCalendar::enable(){
   arrows[3]->enable();
   }
 
+
+// Disable the window
 void FXCalendar::disable(){
   FXPacker::disable();
   view->disable();
@@ -169,28 +176,56 @@ void FXCalendar::disable(){
   }
 
 
+// Set date
+void FXCalendar::setCurrentDate(FXDate date,FXbool notify){
+  view->setCurrentDate(date,notify);
+  }
 
+
+// Get the current date
+FXDate FXCalendar::getCurrentDate() const {
+  return view->getCurrentDate();
+  }
+
+
+// Set the current month
+void FXCalendar::setCurrentMonth(FXint mo,FXbool notify){
+  view->setCurrentMonth(mo,notify);
+  }
+
+
+// Return the current month shown
+FXint FXCalendar::getCurrentMonth() const {
+  return view->getCurrentMonth();
+  }
+
+
+// Set the Calendar Style
 void FXCalendar::setCalendarStyle(FXuint style){
   view->setCalendarStyle(style);
   }
 
 
+// Get the Calendar Style
 FXuint FXCalendar::getCalendarStyle() const {
   return view->getCalendarStyle();
   }
 
 
+// Set the first day of the week [0 -> 6]
 void FXCalendar::setFirstDay(FXint d){
   view->setFirstDay(d);
   view->update();
   }
 
 
-FXint FXCalendar::getFirstDay() const{
+// Get the first day of the week [0 -> 6]
+FXint FXCalendar::getFirstDay() const {
   return view->getFirstDay();
   }
 
 
+// Change the Frame Style
 void FXCalendar::setFrameStyle(FXuint s){
   FXPacker::setFrameStyle(s);
   if(options&FRAME_SUNKEN && !(options&FRAME_RAISED)){
@@ -205,87 +240,104 @@ void FXCalendar::setFrameStyle(FXuint s){
   }
 
 
+// Set the back color
 void FXCalendar::setBackColor(FXColor c){
   FXPacker::setBackColor(c);
   view->setBackColor(c);
   }
 
 
-FXColor FXCalendar::getBackColor() const{
+// Get the back color
+FXColor FXCalendar::getBackColor() const {
   return view->getBackColor();
   }
 
 
+// Set the display color of titles
 void FXCalendar::setTitleColor(FXColor c){
   view->setTitleColor(c);
   }
 
 
-FXColor FXCalendar::getTitleColor() const{
+// Get the display color of titles
+FXColor FXCalendar::getTitleColor() const {
   return view->getTitleColor();
   }
 
 
+// Set the display color of titles
 void FXCalendar::setTitleBackColor(FXColor c){
   view->setTitleBackColor(c);
   }
 
 
-FXColor FXCalendar::getTitleBackColor() const{
+// Get the display color of titles
+FXColor FXCalendar::getTitleBackColor() const {
   return view->getTitleBackColor();
   }
 
 
+// Set the display color of non-weekend days
 void FXCalendar::setDayColor(FXColor c){
   view->setDayColor(c);
   }
 
 
-FXColor FXCalendar::getDayColor() const{
+// Get the display color of non-weekend days
+FXColor FXCalendar::getDayColor() const {
   return view->getDayColor();
   }
 
 
+// Set the display color of non-weekend days not in the current month
 void FXCalendar::setOtherDayColor(FXColor c){
   view->setOtherDayColor(c);
   }
 
 
-FXColor FXCalendar::getOtherDayColor() const{
+// Get the display color of non-weekend days not in the current month
+FXColor FXCalendar::getOtherDayColor() const {
   return view->getOtherDayColor();
   }
 
 
+// Set the display color of today
 void FXCalendar::setTodayColor(FXColor c){
   view->setTodayColor(c);
   }
 
 
+// Get the display color of today
 FXColor FXCalendar::getTodayColor() const {
   return view->getTodayColor();
   }
 
 
+// Set the display color of days in the weekend
 void FXCalendar::setWeekendColor(FXColor c){
   view->setWeekendColor(c);
   }
 
 
-FXColor FXCalendar::getWeekendColor() const{
+// Get the display color of days in the weekend
+FXColor FXCalendar::getWeekendColor() const {
   return view->getWeekendColor();
   }
 
 
+// Set the display color of days in the weekend not in the current month
 void FXCalendar::setOtherWeekendColor(FXColor c){
   view->setOtherWeekendColor(c);
   }
 
 
-FXColor FXCalendar::getOtherWeekendColor() const{
+// Get the display color of days in the weekend not in the current month
+FXColor FXCalendar::getOtherWeekendColor() const {
   return view->getOtherWeekendColor();
   }
 
 
+// Switch date
 long FXCalendar::onCmdDate(FXObject*,FXSelector,void* ptr){
   FXDate date;
   date.setJulian((FXuint)(FXival)(ptr));
@@ -296,93 +348,63 @@ long FXCalendar::onCmdDate(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Switch month
 long FXCalendar::onCmdMonth(FXObject*,FXSelector sel,void*){
   view->setCurrentMonth((FXSELID(sel)-ID_MONTH_START)+1,true);
   return 1;
   }
 
 
+// Select month
 long FXCalendar::onCmdSelectMonth(FXObject*,FXSelector,void*ptr){
   view->setCurrentMonth(1+(FXint)(FXival)(ptr),true);
   return 1;
   }
 
 
+// Go to next year
 long FXCalendar::onCmdNextYear(FXObject*,FXSelector,void*){
   FXDate date=view->getCurrentDate();
-  date.setDate(date.year()+1,date.month(),date.day());
+  date.addYears(1);
   view->setCurrentDate(date,true);
   return 1;
   }
 
 
+// Go to previous year
 long FXCalendar::onCmdPrevYear(FXObject*,FXSelector,void*){
   FXDate date=view->getCurrentDate();
-  date.setDate(date.year()-1,date.month(),date.day());
+  date.addYears(-1);
   view->setCurrentDate(date,true);
   return 1;
   }
 
 
-static FXDate incMonth(FXDate d){
-  FXint day=d.day();
-  FXint month=d.month();
-  FXint year=d.year();
-  FXDate temp;
-  if(d.month()==12){
-    month=1;
-    year++;
-    }
-  else{
-    month++;
-    }
-  temp.setDate(year,month,1);
-  if(temp.daysInMonth()>day)
-    return FXDate(year,month,day);
-  else
-    return FXDate(year,month,temp.daysInMonth());
-  }
-
-
-static FXDate decMonth(FXDate d){
-  FXint day=d.day();
-  FXint month=d.month();
-  FXint year=d.year();
-  FXDate temp;
-  if(d.month()==1){
-    month=12;
-    year--;
-    }
-  else{
-    month--;
-    }
-  temp.setDate(year,month,1);
-  if(temp.daysInMonth()>day)
-    return FXDate(year,month,day);
-  else
-    return FXDate(year,month,temp.daysInMonth());
-  }
-
-
+// Go to next month
 long FXCalendar::onCmdNextMonth(FXObject*,FXSelector,void*){
   FXDate date=view->getCurrentDate();
-  view->setCurrentDate(incMonth(date),true);
+  date.addMonths(1);
+  view->setCurrentDate(date,true);
   return 1;
   }
 
 
+// Go to previous month
 long FXCalendar::onCmdPrevMonth(FXObject*,FXSelector,void*){
   FXDate date=view->getCurrentDate();
-  view->setCurrentDate(decMonth(date),true);
+  date.addMonths(-1);
+  view->setCurrentDate(date,true);
   return 1;
   }
 
 
+// Forward to calendar view
 long FXCalendar::onFwdToView(FXObject*sender,FXSelector sel,void*ptr){
   return view->handle(sender,sel,ptr);
   }
 
 
+// Forward from calendar view
 long FXCalendar::onFwdToTarget(FXObject*,FXSelector sel,void* ptr){
   return target && target->tryHandle(this,FXSEL(FXSELTYPE(sel),message),ptr);
   }
@@ -391,6 +413,15 @@ long FXCalendar::onFwdToTarget(FXObject*,FXSelector sel,void* ptr){
 // Destroy
 FXCalendar::~FXCalendar(){
   delete months;
+  view=(FXCalendarView*)-1L;
+  year=(FXLabel*)-1L;
+  months=(FXPopup*)-1L;
+  month=(FXOptionMenu*)-1L;
+  frame=(FXHorizontalFrame*)-1L;
+  arrows[0]=(FXArrowButton*)-1L;
+  arrows[1]=(FXArrowButton*)-1L;
+  arrows[2]=(FXArrowButton*)-1L;
+  arrows[3]=(FXArrowButton*)-1L;
   }
 
 

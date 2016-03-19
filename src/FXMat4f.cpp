@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4f.cpp,v 1.18 2007/02/07 20:22:12 fox Exp $                         *
+* $Id: FXMat4f.cpp,v 1.25 2007/07/09 16:27:02 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,10 +74,7 @@ FXMat4f::FXMat4f(FXfloat w){
 
 
 // Build matrix from scalars
-FXMat4f::FXMat4f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,
-                 FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,
-                 FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,
-                 FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
+FXMat4f::FXMat4f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
@@ -145,10 +141,7 @@ FXMat4f& FXMat4f::set(FXfloat w){
 
 
 // Construct from components
-FXMat4f& FXMat4f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,
-                      FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,
-                      FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,
-                      FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
+FXMat4f& FXMat4f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
@@ -340,8 +333,26 @@ FXVec3f FXMat4f::operator*(const FXVec3f& v) const {
   }
 
 
-// Make unit matrix
-FXMat4f& FXMat4f::eye(){
+// Equality
+FXbool FXMat4f::operator==(const FXMat4f& a) const { return m[0]==a.m[0] && m[1]==a.m[1] && m[2]==a.m[2] && m[3]==a.m[3]; }
+
+
+// Inequality
+FXbool FXMat4f::operator!=(const FXMat4f& a) const { return m[0]!=a.m[0] || m[1]!=a.m[1] || m[2]!=a.m[2] || m[3]!=a.m[3]; }
+
+
+// Equality
+FXbool operator==(const FXMat4f& a,FXfloat n){ return a[0]==n && a[1]==n && a[2]==n && a[3]==n; }
+FXbool operator==(FXfloat n,const FXMat4f& a){ return n==a[0] && n==a[1] && n==a[2] && n==a[3]; }
+
+
+// Inequality
+FXbool operator!=(const FXMat4f& a,FXfloat n){ return a[0]!=n || a[1]!=n || a[2]!=n || a[3]!=n; }
+FXbool operator!=(FXfloat n,const FXMat4f& a){ return n!=a[0] || n!=a[1] || n!=a[2] || n!=a[3]; }
+
+
+// Set to identity matrix
+FXMat4f& FXMat4f::identity(){
   m[0][0]=1.0f; m[0][1]=0.0f; m[0][2]=0.0f; m[0][3]=0.0f;
   m[1][0]=0.0f; m[1][1]=1.0f; m[1][2]=0.0f; m[1][3]=0.0f;
   m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=1.0f; m[2][3]=0.0f;
@@ -350,102 +361,70 @@ FXMat4f& FXMat4f::eye(){
   }
 
 
-// Orthographic projection
-FXMat4f& FXMat4f::ortho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
-  register FXfloat x,y,z,tx,ty,tz,rl,tb,yh,r0,r1,r2,r3;
-  rl=xhi-xlo;
-  tb=yhi-ylo;
-  yh=zhi-zlo;
-  FXASSERT(rl && tb && yh);         // Throw exception in future
-  x= 2.0f/rl;
-  y= 2.0f/tb;
-  z=-2.0f/yh;
-  tx=-(xhi+xlo)/rl;
-  ty=-(yhi+ylo)/tb;
-  tz=-(zhi+zlo)/yh;
-  r0=m[0][0];
-  r1=m[1][0];
-  r2=m[2][0];
-  r3=m[3][0];
-  m[0][0]=x*r0;
-  m[1][0]=y*r1;
-  m[2][0]=z*r2;
-  m[3][0]=tx*r0+ty*r1+tz*r2+r3;
-  r0=m[0][1];
-  r1=m[1][1];
-  r2=m[2][1];
-  r3=m[3][1];
-  m[0][1]=x*r0;
-  m[1][1]=y*r1;
-  m[2][1]=z*r2;
-  m[3][1]=tx*r0+ty*r1+tz*r2+r3;
-  r0=m[0][2];
-  r1=m[1][2];
-  r2=m[2][2];
-  r3=m[3][2];
-  m[0][2]=x*r0;
-  m[1][2]=y*r1;
-  m[2][2]=z*r2;
-  m[3][2]=tx*r0+ty*r1+tz*r2+r3;
-  r0=m[0][3];
-  r1=m[1][3];
-  r2=m[2][3];
-  r3=m[3][3];
-  m[0][3]=x*r0;
-  m[1][3]=y*r1;
-  m[2][3]=z*r2;
-  m[3][3]=tx*r0+ty*r1+tz*r2+r3;
-  return *this;
+// Return true if identity matrix
+FXbool FXMat4f::isIdentity() const {
+  return m[0][0]==1.0f && m[0][1]==0.0f && m[0][2]==0.0f && m[0][3]==0.0f &&
+         m[1][0]==0.0f && m[1][1]==1.0f && m[1][2]==0.0f && m[1][3]==0.0f &&
+         m[2][0]==0.0f && m[2][1]==0.0f && m[2][2]==1.0f && m[2][3]==0.0f &&
+         m[3][0]==0.0f && m[3][1]==0.0f && m[3][2]==0.0f && m[3][3]==1.0f;
   }
 
 
-// Perspective projection
-FXMat4f& FXMat4f::frustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
-  register FXfloat x,y,a,b,c,d,rl,tb,yh,r0,r1,r2,r3;
-  FXASSERT(0.0f<zlo && zlo<zhi);  // Throw exception in future
-  rl=xhi-xlo;
-  tb=yhi-ylo;
-  yh=zhi-zlo;
-  FXASSERT(rl && tb);                   // Throw exception in future
-  x= 2.0f*zlo/rl;
-  y= 2.0f*zlo/tb;
-  a= (xhi+xlo)/rl;
-  b= (yhi+ylo)/tb;
-  c=-(zhi+zlo)/yh;
-  d=-(2.0f*zhi*zlo)/yh;
-  r0=m[0][0];
-  r1=m[1][0];
-  r2=m[2][0];
-  r3=m[3][0];
-  m[0][0]=x*r0;
-  m[1][0]=y*r1;
-  m[2][0]=a*r0+b*r1+c*r2-r3;
-  m[3][0]=d*r2;
-  r0=m[0][1];
-  r1=m[1][1];
-  r2=m[2][1];
-  r3=m[3][1];
-  m[0][1]=x*r0;
-  m[1][1]=y*r1;
-  m[2][1]=a*r0+b*r1+c*r2-r3;
-  m[3][1]=d*r2;
-  r0=m[0][2];
-  r1=m[1][2];
-  r2=m[2][2];
-  r3=m[3][2];
-  m[0][2]=x*r0;
-  m[1][2]=y*r1;
-  m[2][2]=a*r0+b*r1+c*r2-r3;
-  m[3][2]=d*r2;
-  r0=m[0][3];
-  r1=m[1][3];
-  r2=m[2][3];
-  r3=m[3][3];
-  m[0][3]=x*r0;
-  m[1][3]=y*r1;
-  m[2][3]=a*r0+b*r1+c*r2-r3;
-  m[3][3]=d*r2;
-  return *this;
+// Set orthographic projection from view volume
+FXMat4f& FXMat4f::setOrtho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
+  register FXfloat rl=xhi-xlo;
+  register FXfloat tb=yhi-ylo;
+  register FXfloat yh=zhi-zlo;
+  return set(2.0f/rl,0.0f,0.0f,0.0f,0.0f,2.0f/tb,0.0f,0.0f,0.0f,0.0f,-2.0f/yh,0.0f,-(xhi+xlo)/rl,-(yhi+ylo)/tb,-(zhi+zlo)/yh,1.0f);
+  }
+
+
+// Get view volume from orthographic projection
+void FXMat4f::getOrtho(FXfloat& xlo,FXfloat& xhi,FXfloat& ylo,FXfloat& yhi,FXfloat& zlo,FXfloat& zhi) const {
+  zlo= (m[3][2]+1.0f)/m[2][2];
+  zhi= (m[3][2]-1.0f)/m[2][2];
+  xlo=-(1.0f+m[3][0])/m[0][0];
+  xhi= (1.0f-m[3][0])/m[0][0];
+  ylo=-(1.0f+m[3][1])/m[1][1];
+  yhi= (1.0f-m[3][1])/m[1][1];
+  }
+
+
+// Set to inverse orthographic projection
+FXMat4f& FXMat4f::setInverseOrtho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
+  register FXfloat rl=xhi-xlo;
+  register FXfloat tb=yhi-ylo;
+  register FXfloat yh=zhi-zlo;
+  return set(0.5f*rl,0.0f,0.0f,0.0f,0.0f,0.5f*tb,0.0f,0.0f,0.0f,0.0f,-0.5f*yh,0.0f,0.5f*(xhi+xlo),0.5f*(yhi+ylo),0.5f*(zhi+zlo),1.0f);
+  }
+
+
+// Set to perspective projection from view volume
+FXMat4f& FXMat4f::setFrustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
+  register FXfloat rl=xhi-xlo;
+  register FXfloat tb=yhi-ylo;
+  register FXfloat yh=zhi-zlo;
+  return set(2.0f*zlo/rl,0.0f,0.0f,0.0f,0.0f,2.0f*zlo/tb,0.0f,0.0f,(xhi+xlo)/rl,(yhi+ylo)/tb,-(zhi+zlo)/yh,-1.0f,0.0f,0.0f,-2.0f*zhi*zlo/yh,0.0f);
+  }
+
+
+// Get view volume from perspective projection
+void FXMat4f::getFrustum(FXfloat& xlo,FXfloat& xhi,FXfloat& ylo,FXfloat& yhi,FXfloat& zlo,FXfloat& zhi) const {
+  zlo=m[3][2]/(m[2][2]-1.0f);
+  zhi=m[3][2]/(m[2][2]+1.0f);
+  xlo=zlo*(m[2][0]-1.0f)/m[0][0];
+  xhi=zlo*(m[2][0]+1.0f)/m[0][0];
+  yhi=zlo*(m[2][1]+1.0f)/m[1][1];
+  ylo=zlo*(m[2][1]-1.0f)/m[1][1];
+  }
+
+
+// Set to inverse perspective projection from view volume
+FXMat4f& FXMat4f::setInverseFrustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
+  register FXfloat rl=xhi-xlo;
+  register FXfloat tb=yhi-ylo;
+  register FXfloat yh=zhi-zlo;
+  return set(0.5f*rl/zlo,0.0f,0.0f,0.0f,0.0f,0.5f*tb/zlo,0.0f,0.0f,0.0f,0.0f,0.0f,-0.5f*yh/(zhi*zlo),0.5f*(xhi+xlo)/zlo,0.5f*(yhi+ylo)/zlo,-1.0f,0.5f*(zhi+zlo)/(zhi*zlo));
   }
 
 

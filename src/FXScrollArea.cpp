@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXScrollArea.cpp,v 1.68 2007/02/08 14:16:42 fox Exp $                    *
+* $Id: FXScrollArea.cpp,v 1.73 2007/07/09 16:27:07 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -41,28 +40,42 @@
 
 /*
   To do:
-  - In new HSCROLLING_OFF mode, default width should be computed
-    from contents (new virtual for that), and presence of scrollbars
-    (determined by flags, as well as need).
-  - The original content size should be returned from getContentWidth(),
-    and getContentHeight().
   - When tabbing, we will never put focus on scrollbar.
   - Perhaps scroll windows should observe FRAME_SUNKEN etc.
   - Here's a new idea:- perhaps the scrollbars should be GUI-updated from the
     FXScrollArea.  Then layout() will do nothing but place the bars.
   - What if we want to keep two scrolled windows in sync, i.e. scroll them
     both the same amount.
-  - Do we need to be able to map mouse wheel to horizontal scrollbar instead?
-    or perhaps even both ways (depending on whether scrolling is possible
-    in one or another direction).
-  - New getVisibleX(), getVisibleY(), getVisibleWidth() and getVisibleHeight()
-    introduced to divorce viewport location from scrollbar placement.
+  - The original content size is computed by getContentWidth() and getContentHeight().
+    In the typical subclass, content size is computed only when there's reason to believe
+    it has changed; a cached value is returned otherwise.
+  - Note that the content size does NOT include the sizes of fixed elements like headers or
+    rulers; it should return ONLY the size of the scrolled document.
+  - The placement of the viewport is returned by getVisibleX(), getVisibleY(), getVisibleWidth(),
+    and getVisibleHeight().  Subclass these when header controls need to be substracted from
+    the visible area.
+    If the document is not scrolled, (getVisibleX(), getVisibleY()) corresponds to 
+    the document coordinate (0,0).  Drawing should be relative to getVisibleX() and
+    getVisibleY() so that subclasses may place header controls around the visible area.
   - The getVisibleX(), getVisibleY(), getVisibleWidth() and getVisibleHeight()
     identify the scrollable part in a FXScrollArea subclass; only pixels inside
     this area are normally scrolled.  Also, this area determines the auto-scroll
     processing; when cursor position is near the edge of the visible part, auto-
     scrolling commences.  Thus, autoscrolling can start while the cursor is still
     fully inside the window but near the visible scroll-area.
+  - When computing default width, the content width is assumed to be 0, unless the
+    HSCROLLING_OFF mode is in effect.  Then the width of the vertical scrollbar is
+    added unless the vertical scrollbar is suppressed (using VSCROLLER_NEVER).
+    A subclass may subsequently add any additional space needed for headers or rulers.
+  - Likewise, when computing default height, the content height is assumed to be 0, unless 
+    the VSCROLLING_OFF mode is in effect.  Then the height of the horizontal scrollbar is
+    added unless the horizontal scrollbar is suppressed (using HSCROLLER_NEVER).
+    A subclass may subsequently add any additional space needed for headers or rulers.
+  - Thus, the minimum size will be such that at scrollbars (and possible other fixed-
+    elements such as headers or rules) will be fully visible.
+  - Note that the horizontal scrollbar width NO LONGER influences the default width,
+    and the vertical scrollbar NO LONGER influences default height.  This was done
+    to get accurate minimum sizes for subclasses which add headers or rulers. 
 */
 
 
@@ -105,8 +118,7 @@ FXScrollArea::FXScrollArea(){
 
 
 // Construct and init
-FXScrollArea::FXScrollArea(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXComposite(p,opts,x,y,w,h){
+FXScrollArea::FXScrollArea(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXComposite(p,opts,x,y,w,h){
   flags|=FLAG_SHOWN;
   horizontal=new FXScrollBar(this,this,FXWindow::ID_HSCROLLED,(opts&SCROLLERS_DONT_TRACK)?(SCROLLBAR_HORIZONTAL|SCROLLBAR_WHEELJUMP):SCROLLBAR_HORIZONTAL);
   vertical=new FXScrollBar(this,this,FXWindow::ID_VSCROLLED,(opts&SCROLLERS_DONT_TRACK)?(SCROLLBAR_VERTICAL|SCROLLBAR_WHEELJUMP):SCROLLBAR_VERTICAL);
@@ -120,9 +132,7 @@ FXScrollArea::FXScrollArea(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FX
 // Get default width
 FXint FXScrollArea::getDefaultWidth(){
   register FXint w=0;
-  register FXint t;
   if((options&HSCROLLER_NEVER)&&(options&HSCROLLER_ALWAYS)) w=getContentWidth();
-  if(!(options&HSCROLLER_NEVER) && (t=horizontal->getDefaultWidth())>w) w=t;
   if(!(options&VSCROLLER_NEVER)) w+=vertical->getDefaultWidth();
   return FXMAX(w,1);
   }
@@ -131,9 +141,7 @@ FXint FXScrollArea::getDefaultWidth(){
 // Get default height
 FXint FXScrollArea::getDefaultHeight(){
   register FXint h=0;
-  register FXint t;
   if((options&VSCROLLER_NEVER)&&(options&VSCROLLER_ALWAYS)) h=getContentHeight();
-  if(!(options&VSCROLLER_NEVER) && (t=vertical->getDefaultHeight())>h) h=t;
   if(!(options&HSCROLLER_NEVER)) h+=horizontal->getDefaultHeight();
   return FXMAX(h,1);
   }

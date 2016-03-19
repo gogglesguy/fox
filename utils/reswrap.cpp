@@ -5,9 +5,9 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This program is free software; you can redistribute it and/or modify          *
+* This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
-* the Free Software Foundation; either version 2 of the License, or             *
+* the Free Software Foundation, either version 3 of the License, or             *
 * (at your option) any later version.                                           *
 *                                                                               *
 * This program is distributed in the hope that it will be useful,               *
@@ -16,10 +16,9 @@
 * GNU General Public License for more details.                                  *
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
-* along with this program; if not, write to the Free Software                   *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: reswrap.cpp,v 1.33 2007/02/07 20:22:25 fox Exp $                         *
+* $Id: reswrap.cpp,v 1.34 2007/07/06 04:56:22 fox Exp $                         *
 ********************************************************************************/
 #include "stdio.h"
 #include "stdlib.h"
@@ -32,8 +31,6 @@
 /*
 
   Notes:
-  - License changed to GPL from LGPL because this is a standalone program
-    that does not need to be linked to anything.
   - Can now also generate output as a (possibly escaped) text string.
   - Options to suffixes and prefixes; for example:
 
@@ -151,9 +148,9 @@ void printversion(){
   printf("Copyright (C) 1997,2007 Jeroen van der Zijp. All Rights Reserved.\n");
   printf("Please visit: http://www.fox-toolkit.org for further information.\n");
   printf("\n");
-  printf("This program is free software; you can redistribute it and/or modify\n");
+  printf("This program is free software: you can redistribute it and/or modify\n");
   printf("it under the terms of the GNU General Public License as published by\n");
-  printf("the Free Software Foundation; either version 2 of the License, or\n");
+  printf("the Free Software Foundation, either version 3 of the License, or\n");
   printf("(at your option) any later version.\n");
   printf("\n");
   printf("This program is distributed in the hope that it will be useful,\n");
@@ -162,8 +159,7 @@ void printversion(){
   printf("GNU General Public License for more details.\n");
   printf("\n");
   printf("You should have received a copy of the GNU General Public License\n");
-  printf("along with this program; if not, write to the Free Software\n");
-  printf("Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.\n");
+  printf("along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
   }
 
 

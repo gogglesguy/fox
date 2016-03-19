@@ -36,6 +36,7 @@ foxcalc_prefdialog_03_small.jpg \
 glview.png \
 goggles.png \
 imagedebugger.gif \
+inload.jpg \
 openspace.gif \
 pathfinder.png \
 pdiary.jpg \

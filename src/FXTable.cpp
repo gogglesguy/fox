@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.cpp,v 1.264 2007/02/27 23:01:43 fox Exp $                        *
+* $Id: FXTable.cpp,v 1.270 2007/07/09 16:27:11 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -770,8 +769,7 @@ FXTable::FXTable(){
 
 
 // Build table
-FXTable::FXTable(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXScrollArea(p,opts,x,y,w,h){
+FXTable::FXTable(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXScrollArea(p,opts,x,y,w,h){
   FXuint colhs=HEADER_HORIZONTAL|HEADER_TRACKING|HEADER_BUTTON|FRAME_RAISED|FRAME_THICK|LAYOUT_FIX_HEIGHT;
   FXuint rowhs=HEADER_VERTICAL|HEADER_TRACKING|HEADER_BUTTON|FRAME_RAISED|FRAME_THICK|LAYOUT_FIX_WIDTH;
   if(options&TABLE_COL_SIZABLE) colhs|=HEADER_RESIZE;
@@ -867,39 +865,39 @@ void FXTable::detach(){
   }
 
 
-// Get default width; logic is as follows:
-// If we don't honor the visible columns, calculate as FXScrollArea.
-// If we honor visible columns, calculate the size based on that;
-// if there MAY be a horizontal scroller AND its minimum size exceeds
-// this, then that will determine its size.
-// Finally, if there MAY be a vertical scroller we assume it will be
-// included in the calculation.
-FXint FXTable::getDefaultWidth(){
-  register FXint w,t;
-  if(0<visiblecols){
-    w=visiblecols*defColWidth+vgrid;
-    if(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) w+=rowHeader->getWidth();
-    else w+=rowHeader->getDefaultWidth();
-    if(!(options&HSCROLLER_NEVER) && (t=horizontal->getDefaultWidth())>w) w=t;
-    if(!(options&VSCROLLER_NEVER)) w+=vertical->getDefaultWidth();
-    return w;
-    }
-  return FXScrollArea::getDefaultWidth();
+// Starting row of multi-column cell
+FXint FXTable::startRow(FXint row,FXint col) const {
+  register FXTableItem *item=cells[row*ncols+col];
+  if(item){ while(0<row && cells[(row-1)*ncols+col]==item) row--; }
+  FXASSERT(0<=row && row<nrows);
+  return row;
   }
 
 
-// Get default height; similar logic as above
-FXint FXTable::getDefaultHeight(){
-  register FXint h,t;
-  if(0<visiblerows){
-    h=visiblerows*defRowHeight+hgrid;
-    if(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) h+=colHeader->getHeight();
-    else h+=colHeader->getDefaultHeight();
-    if(!(options&VSCROLLER_NEVER) && (t=vertical->getDefaultHeight())>h) h=t;
-    if(!(options&HSCROLLER_NEVER)) h+=horizontal->getDefaultHeight();
-    return h;
-    }
-  return FXScrollArea::getDefaultHeight();
+// Starting column of multi-column cell
+FXint FXTable::startCol(FXint row,FXint col) const {
+  register FXTableItem *item=cells[row*ncols+col];
+  if(item){ while(0<col && cells[row*ncols+col-1]==item) col--; }
+  FXASSERT(0<=col && col<ncols);
+  return col;
+  }
+
+
+// Ending row of multi-column cell
+FXint FXTable::endRow(FXint row,FXint col) const {
+  register FXTableItem *item=cells[row*ncols+col];
+  if(item){ while(row<nrows-1 && cells[(row+1)*ncols+col]==item) row++; }
+  FXASSERT(0<=row && row<nrows);
+  return row;
+  }
+
+
+// Ending column of multi-column cell
+FXint FXTable::endCol(FXint row,FXint col) const {
+  register FXTableItem *item=cells[row*ncols+col];
+  if(item){ while(col<ncols-1 && cells[row*ncols+col+1]==item) col++; }
+  FXASSERT(0<=col && col<ncols);
+  return col;
   }
 
 
@@ -983,60 +981,6 @@ FXTRACE((100,"changeFocus: xx=%d\n",colHeader->getX()+colHeader->getItemOffset(c
   }
 
 
-// Determine scrollable content width
-FXint FXTable::getContentWidth(){
-  register FXint w=colHeader->getTotalSize()+vgrid;
-  if(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) w+=rowHeader->getWidth();
-  else w+=rowHeader->getDefaultWidth();
-  return w;
-  }
-
-
-// Determine scrollable content height
-FXint FXTable::getContentHeight(){
-  register FXint h=rowHeader->getTotalSize()+hgrid;
-  if(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) h+=colHeader->getHeight();
-  else h+=colHeader->getDefaultHeight();
-  return h;
-  }
-
-
-// Starting row of multi-column cell
-FXint FXTable::startRow(FXint row,FXint col) const {
-  register FXTableItem *item=cells[row*ncols+col];
-  if(item){ while(0<row && cells[(row-1)*ncols+col]==item) row--; }
-  FXASSERT(0<=row && row<nrows);
-  return row;
-  }
-
-
-// Starting column of multi-column cell
-FXint FXTable::startCol(FXint row,FXint col) const {
-  register FXTableItem *item=cells[row*ncols+col];
-  if(item){ while(0<col && cells[row*ncols+col-1]==item) col--; }
-  FXASSERT(0<=col && col<ncols);
-  return col;
-  }
-
-
-// Ending row of multi-column cell
-FXint FXTable::endRow(FXint row,FXint col) const {
-  register FXTableItem *item=cells[row*ncols+col];
-  if(item){ while(row<nrows-1 && cells[(row+1)*ncols+col]==item) row++; }
-  FXASSERT(0<=row && row<nrows);
-  return row;
-  }
-
-
-// Ending column of multi-column cell
-FXint FXTable::endCol(FXint row,FXint col) const {
-  register FXTableItem *item=cells[row*ncols+col];
-  if(item){ while(col<ncols-1 && cells[row*ncols+col+1]==item) col++; }
-  FXASSERT(0<=col && col<ncols);
-  return col;
-  }
-
-
 // Propagate size change
 void FXTable::recalc(){
   FXScrollArea::recalc();
@@ -1044,23 +988,61 @@ void FXTable::recalc(){
   }
 
 
+// Get default width
+FXint FXTable::getDefaultWidth(){  
+  register FXint rw=(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) ? rowHeader->getWidth() : rowHeader->getDefaultWidth();
+  return 0<visiblecols ? visiblecols*defColWidth+vgrid+rw : FXScrollArea::getDefaultWidth()+rw;
+  }
+
+
+// Get default height
+FXint FXTable::getDefaultHeight(){
+  register FXint ch=(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) ? colHeader->getHeight() : colHeader->getDefaultHeight();
+  return 0<visiblerows ? visiblerows*defRowHeight+hgrid+ch : FXScrollArea::getDefaultHeight()+ch;
+  }
+
+
+// Return visible scroll-area x position
+FXint FXTable::getVisibleX() const {
+  return colHeader->getX();
+  }
+
+
+// Return visible scroll-area y position
+FXint FXTable::getVisibleY() const {
+  return rowHeader->getY();
+  }
+
+
+// Return visible scroll-area width
+FXint FXTable::getVisibleWidth() const {
+  return width-vertical->getWidth()-colHeader->getX();
+  }
+
+
+// Return visible scroll-area height
+FXint FXTable::getVisibleHeight() const {
+  return height-horizontal->getHeight()-rowHeader->getY();
+  }
+
+
+// Determine scrollable content width
+FXint FXTable::getContentWidth(){
+  return colHeader->getTotalSize()+vgrid;
+  }
+
+
+// Determine scrollable content height
+FXint FXTable::getContentHeight(){
+  return rowHeader->getTotalSize()+hgrid;
+  }
+
+
 // Move content
 void FXTable::moveContents(FXint x,FXint y){
-  register FXint dx=x-pos_x;
-  register FXint dy=y-pos_y;
-
-  // Update position
-  pos_x=x;
-  pos_y=y;
-
-  // Scroll headers
+  FXScrollArea::moveContents(x,y);
   colHeader->setPosition(x);
   rowHeader->setPosition(y);
-
-  // Scroll table
-  scroll(colHeader->getX(),rowHeader->getY(),FXMIN(colHeader->getTotalSize()+vgrid,width),FXMIN(rowHeader->getTotalSize()+hgrid,height),dx,dy);
-
-  // Place editor control
   if(editor){
     editor->move(getColumnX(input.fm.col)+vgrid,getRowY(input.fm.row)+hgrid);
     }
@@ -1071,24 +1053,22 @@ void FXTable::moveContents(FXint x,FXint y){
 void FXTable::layout(){
   register FXint roww,colh,x,y,w,h;
 
-  // Calculate contents
-  FXScrollArea::layout();
-
   // Size up column header height
-  if(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) colh=colHeader->getHeight();
-  else colh=colHeader->getDefaultHeight();
+  colh=(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) ? colHeader->getHeight() : colHeader->getDefaultHeight();
 
   // Size up row header width
-  if(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) roww=rowHeader->getWidth();
-  else roww=rowHeader->getDefaultWidth();
+  roww=(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) ? rowHeader->getWidth() : rowHeader->getDefaultWidth();
 
   // Place headers
-  colHeader->position(roww,0,getVisibleWidth()-roww,colh);
-  rowHeader->position(0,colh,roww,getVisibleHeight()-colh);
+  colHeader->position(roww,0,width-roww,colh);
+  rowHeader->position(0,colh,roww,height-colh);
   cornerButton->position(0,0,roww,colh);
   cornerButton->raise();
   colHeader->raise();
   rowHeader->raise();
+
+  // Place scroll bars
+  placeScrollBars(width-roww,height-colh);
 
   // Determine line size for scroll bars
   vertical->setLine(defRowHeight);
@@ -1136,18 +1116,18 @@ void FXTable::makePositionVisible(FXint r,FXint c){
   if(xid){
     px=pos_x;
     py=pos_y;
-    vw=getVisibleWidth();
-    vh=getVisibleHeight();
     if(0<=c && c<ncols){
+      vw=getVisibleWidth();
       xlo=colHeader->getItem(c)->getPos();
-      xhi=colHeader->getItem(c)->getSize()+xlo;
-      if(px+xhi >= vw-colHeader->getX()) px=vw-colHeader->getX()-xhi;
+      xhi=colHeader->getItem(c)->getSize()+xlo+vgrid;
+      if(px+xhi >= vw) px=vw-xhi;
       if(px+xlo <= 0) px=-xlo;
       }
     if(0<=r && r<nrows){
+      vh=getVisibleHeight();
       ylo=rowHeader->getItem(r)->getPos();
-      yhi=rowHeader->getItem(r)->getSize()+ylo;
-      if(py+yhi >= vh-rowHeader->getY()) py=vh-rowHeader->getY()-yhi;
+      yhi=rowHeader->getItem(r)->getSize()+ylo+hgrid;
+      if(py+yhi >= vh) py=vh-yhi;
       if(py+ylo <= 0) py=-ylo;
       }
     setPosition(px,py);
@@ -1163,7 +1143,7 @@ FXbool FXTable::isItemVisible(FXint r,FXint c) const {
   xr=colHeader->getItem(c)->getSize()+xl;
   yt=rowHeader->getItem(r)->getPos();
   yb=rowHeader->getItem(r)->getSize()+yt;
-  return 0<pos_x+xr && 0<pos_y+yb && pos_x+xl<getVisibleWidth()-colHeader->getX() && pos_y+yt<getVisibleHeight()-rowHeader->getY();
+  return 0<pos_x+xr && 0<pos_y+yb && pos_x+xl<getVisibleWidth() && pos_y+yt<getVisibleHeight();
   }
 
 

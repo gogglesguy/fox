@@ -85,9 +85,9 @@ Anatomy of Regular Expressions
   The special form "a{n}"
   is equivalent to "a{n,n}".
   <p>
-  Repetitions may be <em>greedy</em>, <em>lazy</em>, or <em>possessive</em>.  
-  Greedy repetitions are the default; greedy repetitions will try to match as 
-  many characters as possible, whereas lazy repetitions will try to match as 
+  Repetitions may be <em>greedy</em>, <em>lazy</em>, or <em>possessive</em>.
+  Greedy repetitions are the default; greedy repetitions will try to match as
+  many characters as possible, whereas lazy repetitions will try to match as
   few as possible.  Finally, possessive repetitions behave like greedy ones
   except that there is no attempt to match fewer occurrences: if the pattern
   doesn't match after the maximum number of occurrences, no further attempts
@@ -455,7 +455,7 @@ This is usually what people expect to happen.
 </ul>
 
 <p>
-The parameter <B><I>npar</I></B> controls the length of the <B><I>beg</I></B> and <B><I>end</I></B> arrays.  
+The parameter <B><I>npar</I></B> controls the length of the <B><I>beg</I></B> and <B><I>end</I></B> arrays.
 It should be set to at least 1.
 If the pattern has been compiled with REX_CAPTURE, any capturing sub-expressions at a level
 less than <B><I>npar</I></B> will be returned into the arrays <B><I>beg</I></B> and <B><I>end</I></B>.
@@ -463,7 +463,7 @@ Backreferences only work if capturing parentheses are enabled with REX_CAPTURE, 
 it is OK to pass npar=1 if you're not actually interested in the values of the captured
 parentheses: the backreferences and capturing parentheses use independent arrays.<br>
 
-To capture sub-expressions, is important to pass a value for <B><I>npar</I></B> which is at 
+To capture sub-expressions, is important to pass a value for <B><I>npar</I></B> which is at
 least as large as the expected number of capturing subexpressions, but the value of npar
 does not affect the matching process itself due to the use of independent arrays.
 <p>
@@ -626,8 +626,8 @@ that this also means we can make do with one less entry in the beg and end array
 as we're getting one fewer return value.
 <p>
 If the npar parameter is too small, then any capturing parentheses level greater
-than npar will behave as before, but will simply not be returned. 
-If back references are used, a back reference to a capturing parenthesis  
+than npar will behave as before, but will simply not be returned.
+If back references are used, a back reference to a capturing parenthesis
 will work simply referencing the internal capturing arrays which are enabled
 by passing REX_CAPTURE when parsing the pattern.
 <p>
@@ -664,7 +664,7 @@ the whole subject string.
 <p>
 <table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1><font size=-1>
-Copyright &copy; 1997-2006 Jeroen van der Zijp</font>
+Copyright &copy; 1997-2007 Jeroen van der Zijp</font>
 </td></tr></table>
 </p>
 <!--- COPYRIGHT -->

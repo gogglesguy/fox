@@ -101,7 +101,7 @@ Icons and Images into an Application
 </p>
 <!--- TOPIC TITLE -->
 <ul>
-  
+
 <p>One crucial problem with icon-rich applications is where to keep
 all those icons; obviously, keeping icons in separate files allows
 end-users to substitute icons and perhaps change them with an Icon
@@ -115,7 +115,7 @@ the need for end-users to set paths and environment variables.</p>
 all icons and images right into the application's executable.&nbsp;
 This is done by simply by compiling the icons into the code in the form
 of C++ data statements, and then linking them in.</p>
-  
+
 <p>XPM and XBM icons or images can be directly included into the
 source code, as these formats are basically just C++ data arrays
 already and therefore no additional tools are required to embed them
@@ -126,10 +126,10 @@ without a graphical icon editor. Other image formats need to be
 transformed into a C++ data array with a small build-time utility
 called <a name="RESWRAP"></a><b><i>reswrap</i></b>, which is provided
 in the FOX distribution.</p>
-  
-<p><b><i>Reswrap</i></b> allows you to generate the C or C++ data arrays 
-automatically from the icons during the build process of your application; 
-simply add a few rules into your Makefile, or, under VC++, use the reswrap 
+
+<p><b><i>Reswrap</i></b> allows you to generate the C or C++ data arrays
+automatically from the icons during the build process of your application;
+simply add a few rules into your Makefile, or, under VC++, use the reswrap
 program in a so-called <em>Utility Project</em>.<br>
 
 For example, given as input a GIF file image such as below:</p>
@@ -232,10 +232,10 @@ have a so-called hot-spot, the point inside the cursor-glyph which is
 "pointer to" by the mouse. <br>
 FOX currently also supports color cursors with an alpha component, i.e.
 partially transparent cursors.
-This is limited to certain platforms; on platforms where color cursors are not 
+This is limited to certain platforms; on platforms where color cursors are not
 supported, the color image is thresholded to a simple black/white image with the alpha
 channel mapping to fully transparent.
-Designing your color cursors with contrasting colors ensures that they will look 
+Designing your color cursors with contrasting colors ensures that they will look
 reasonable on such platforms.<br></p>
 
 <p>Besides defining your own "custom" cursors, FOX also allows you to
@@ -252,7 +252,7 @@ static unsigned char resize_bits[] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc, 0x00, 0x00, 0x00,
   ....
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  
+
 // Shape bits, in XBM Format
 #define resize_mask_width 32
 #define resize_mask_height 32
@@ -262,7 +262,7 @@ static unsigned char resize_mask_bits[] = {
    0x00, 0x00, 0x00, 0x00, 0xfe, 0x01, 0x00, 0x00, 0xfe, 0x01, 0x00, 0x00,
    ....
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-   
+
 // Resize corner
 resizeCursor=new FXCursor(application,resize_bits,resize_mask_bits,resize_width,resize_height,resize_x_hot,resize_y_hot);
 </pre>
@@ -290,10 +290,10 @@ and the picture will have to be the same size.</p>
 </p>
 <!--- TOPIC TITLE -->
 <ul>
-<p>Sometimes, your icons may look funny. This is usually because FOX Icon 
+<p>Sometimes, your icons may look funny. This is usually because FOX Icon
 routines determine the wrong value for the transparency color.
-FOX can handle images with a true alpha-channel, or images with a special 
-transparency color. 
+FOX can handle images with a true alpha-channel, or images with a special
+transparency color.
 
 The latter is the more common approach, as many file formats do not support
 true alpha channels. <br>
@@ -311,11 +311,11 @@ For <b><i>GIF</i></b> Images, FOX uses the following algorithm:</p>
 For <b><i>BMP</i></b> images, there is no background or transparency
 color in the image file format; the algorithm is simpler:</p>
 <ul>
-<li>The assumed transparency color is the same as the default GUI background color, 
+<li>The assumed transparency color is the same as the default GUI background color,
 which is FXRGB(192,192,192).</li>
-<li>If the option IMAGE_ALPHACOLOR is used when constructing the icon, 
+<li>If the option IMAGE_ALPHACOLOR is used when constructing the icon,
 the specified color is used.</li>
-<li>Finally, if the option IMAGE_OPAQUE is used, the icon is forced to be 
+<li>Finally, if the option IMAGE_OPAQUE is used, the icon is forced to be
 non-transparent.</li>
 </ul>
 
@@ -331,11 +331,11 @@ new FXGIFIcon(app,picture_data,FXRGB(192,192,192),IMAGE_ALPHACOLOR);
 </pre>
 
 <p>The IMAGE_ALPHAGUESS option works very much like IMAGE_ALPHACOLOR, except that
-instead of explicitly passing a color, you can let the system pick it for you.  
+instead of explicitly passing a color, you can let the system pick it for you.
 The IMAGE_ALPHAGUESS looks at the corners of the image, picks the color which
 is used the most often.  Since the edges around the icon picture are usually filled
 with background color, this usually works very well (just remember to use a
-background color which doesn't also appear inside the icon picture!).  
+background color which doesn't also appear inside the icon picture!).
 This is used as follows:</p>
 <pre>
 new FXGIFIcon(app,picture_data,0,IMAGE_ALPHAGUESS);
@@ -347,7 +347,7 @@ the IMAGE_OPAQUE option:</p>
 new FXGIFIcon(app,picture_data,0,IMAGE_OPQUE);
 </pre>
 
-<p>For more information on graphics file formats and their idiosyncracies, 
+<p>For more information on graphics file formats and their idiosyncracies,
 see the <a href="http://www.dcs.ed.ac.uk/%7Emxr/gfx/index-hi.html">Graphics File Format Web Site</a>.</p>
 </ul>
 
@@ -546,24 +546,24 @@ ICONS = bigpenguin.gif logo.gif fileopen.gif
 # Generate header file containing declarations
 icons.h: $(ICONS)
         reswrap -h -o icons.h $(ICONS)
-        
+
 # Generate source file containing data arrays
 # The "-i icons.h " parameter writes an #include directive
 # into the output file.
 icons.cpp: $(ICONS) icons.h
         reswrap -i icons.h -o icons.cpp $(ICONS)
-   
-# Link it all together        
+
+# Link it all together
 myapp: $(OBJECTS)
         gcc -o myapp $(OBJECTS) -lFOX -lm -lSM -lICE -lXext -lX11
-        
+
 myapp.o: myapp.cpp icons.h
 
 </pre>
 <p>This will cause make to generate two files, <tt>icons.h</tt> and <tt>icons.cpp</tt>
 which contain the declarations and definitions respectively for all the
 reswrapped icons listed in the $(ICONS) variable.  <br>
-The <tt>icons.cpp</tt> will include the icon.h header file so as to inform the 
+The <tt>icons.cpp</tt> will include the icon.h header file so as to inform the
 compiler of the declarations.
 </p>
 With the latest version of reswrap, you can even do both in one single step:
@@ -579,7 +579,7 @@ We also used the new long options here.
     <tr>
       <td id="HEADLINE" align="right" valign="top" width="100%"><img
  src="art/line.gif" height="1" width="100%"><font size="-1">
-Copyright &copy; 1997-2005 Jeroen van der Zijp</font>
+Copyright &copy; 1997-2007 Jeroen van der Zijp</font>
       </td>
     </tr>
   </tbody>

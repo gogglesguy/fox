@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXOptionMenu.cpp,v 1.73 2007/02/07 20:22:13 fox Exp $                    *
+* $Id: FXOptionMenu.cpp,v 1.76 2007/07/09 16:27:03 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -98,8 +97,7 @@ FXOption::FXOption(){
   }
 
 // Make option menu entry
-FXOption::FXOption(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXLabel(p,text,ic,opts,x,y,w,h,pl,pr,pt,pb){
+FXOption::FXOption(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXLabel(p,text,ic,opts,x,y,w,h,pl,pr,pt,pb){
   target=tgt;
   message=sel;
   seltextColor=getApp()->getSelMenuTextColor();
@@ -355,8 +353,7 @@ FXIMPLEMENT(FXOptionMenu,FXLabel,FXOptionMenuMap,ARRAYNUMBER(FXOptionMenuMap))
 
 
 // Make a option menu button
-FXOptionMenu::FXOptionMenu(FXComposite* p,FXPopup* pup,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXLabel(p,FXString::null,NULL,opts,x,y,w,h,pl,pr,pt,pb){
+FXOptionMenu::FXOptionMenu(FXComposite* p,FXPopup* pup,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXLabel(p,FXString::null,NULL,opts,x,y,w,h,pl,pr,pt,pb){
   dragCursor=getApp()->getDefaultCursor(DEF_RARROW_CURSOR);
   pane=pup;
   current=NULL;
@@ -716,6 +713,12 @@ void FXOptionMenu::killFocus(){
 
 // If window can have focus
 FXbool FXOptionMenu::canFocus() const { return true; }
+
+
+// Return the option item at the given index
+FXOption *FXOptionMenu::getItem(FXint index) const {
+  return pane ? dynamic_cast<FXOption*>(pane->childAtIndex(index)) : NULL;
+  }
 
 
 // Set current selection

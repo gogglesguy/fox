@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxprintf.cpp,v 1.56 2007/06/03 15:48:37 fox Exp $                        *
+* $Id: fxprintf.cpp,v 1.58 2007/07/09 16:27:22 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -265,7 +264,7 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
     while(0<prec && p[prec-1]=='0') prec--;
     }
 
-  // Exponential notation +d.ddddE+dd
+  // Exponential notation +d.dddddE+dd
   if(mode){
     *ptr++=*p++;                                // One before the decimal point
     if((1<prec) || (flags&FLG_ALTER)){          // Decimal point needed
@@ -294,10 +293,10 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
       }
     }
 
-  // Fractional notation +0.0000ddddd
+  // Fraction-only notation +0.0000dddddd
   else if(decimal<=0){
     *ptr++='0';
-    *ptr++='.';
+    if(decimal<0 || 1<=prec) *ptr++='.';        // Decimal point only if followed by at least one digit
     while(decimal++<0){                         // Generate leading zeroes after decimal point
       *ptr++='0';
       }
@@ -306,25 +305,25 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
       }
     }
 
+  // Integral notation +ddddddd00.
+  else if(prec<=decimal){
+    for(i=1; i<=prec; i++){                     // Generate prec digits
+      *ptr++=*p++;
+      }
+    while(prec++<decimal){                      // Append zeroes until we get to decimal point
+      *ptr++='0';
+      }
+    if(flags&FLG_ALTER) *ptr++='.';             // End with decimal point if alternate mode
+    }
+
   // Normal notation +dddd.dd
   else{
-    if(prec<=decimal){
-      for(i=1; i<=prec; i++){                   // Generate prec digits
-        *ptr++=*p++;
-        }
-      while(prec++<decimal){                    // Append zeroes until we get to decimal point
-        *ptr++='0';
-        }
-      if(flags&FLG_ALTER) *ptr++='.';           // End with decimal point if alternate mode
+    for(i=1; i<=decimal; i++){                  // Generate decimal digits
+      *ptr++=*p++;
       }
-    else{
-      for(i=1; i<=decimal; i++){                // Generate decimal digits
-        *ptr++=*p++;
-        }
-      *ptr++='.';                               // Output decimal point
-      while(decimal++<prec){                    // Append more digits until we get prec
-        *ptr++=*p++;
-        }
+    *ptr++='.';                                 // Output decimal point
+    while(decimal++<prec){                      // Append more digits until we get prec
+      *ptr++=*p++;
       }
     }
 

@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComboBox.cpp,v 1.76 2007/03/08 21:50:50 fox Exp $                      *
+* $Id: FXComboBox.cpp,v 1.80 2007/07/09 16:26:45 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -91,6 +90,7 @@ FXDEFMAP(FXComboBox) FXComboBoxMap[]={
   FXMAPFUNC(SEL_FOCUS_SELF,0,FXComboBox::onFocusSelf),
   FXMAPFUNC(SEL_UPDATE,FXComboBox::ID_TEXT,FXComboBox::onUpdFmText),
   FXMAPFUNC(SEL_CLICKED,FXComboBox::ID_LIST,FXComboBox::onListClicked),
+  FXMAPFUNC(SEL_COMMAND,FXComboBox::ID_LIST,FXComboBox::onListCommand),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,FXComboBox::ID_TEXT,FXComboBox::onTextButton),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXComboBox::ID_TEXT,FXComboBox::onMouseWheel),
   FXMAPFUNC(SEL_CHANGED,FXComboBox::ID_TEXT,FXComboBox::onTextChanged),
@@ -110,8 +110,7 @@ FXIMPLEMENT(FXComboBox,FXPacker,FXComboBoxMap,ARRAYNUMBER(FXComboBoxMap))
 
 
 // Combo box
-FXComboBox::FXComboBox(FXComposite *p,FXint cols,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXPacker(p,opts,x,y,w,h, 0,0,0,0, 0,0){
+FXComboBox::FXComboBox(FXComposite *p,FXint cols,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h, 0,0,0,0, 0,0){
   flags|=FLAG_ENABLED;
   target=tgt;
   message=sel;
@@ -209,14 +208,17 @@ long FXComboBox::onFwdToText(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
-// Forward clicked message from list to target
-long FXComboBox::onListClicked(FXObject*,FXSelector,void* ptr){
-  button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
-  if(0<=((FXint)(FXival)ptr)){
-    setText(list->getItemText((FXint)(FXival)ptr),true);
-    if(!(options&COMBOBOX_STATIC)) field->selectAll();          // Select if editable
-    }
-  return 1;
+// Clicked inside or outside an item in the list; unpost the pane
+long FXComboBox::onListClicked(FXObject*,FXSelector,void*){
+  return button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
+  }
+
+
+// Clicked on an item in the list; issue a callback
+long FXComboBox::onListCommand(FXObject*,FXSelector,void* ptr){
+  field->setText(list->getItemText((FXint)(FXival)ptr));
+  if(!(options&COMBOBOX_STATIC)) field->selectAll(); 
+  return target && target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)getText().text());
   }
 
 

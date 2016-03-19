@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIButton.cpp,v 1.31 2007/05/17 19:27:56 fox Exp $                     *
+* $Id: FXMDIButton.cpp,v 1.33 2007/07/09 16:27:01 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,8 +76,7 @@ FXIMPLEMENT(FXMDIDeleteButton,FXButton,FXMDIDeleteButtonMap,ARRAYNUMBER(FXMDIDel
 
 
 // Make delete button
-FXMDIDeleteButton::FXMDIDeleteButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXButton(p,"\tClose\tClose Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
+FXMDIDeleteButton::FXMDIDeleteButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXButton(p,"\tClose\tClose Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
   }
 
 
@@ -149,8 +147,7 @@ FXIMPLEMENT(FXMDIRestoreButton,FXButton,FXMDIRestoreButtonMap,ARRAYNUMBER(FXMDIR
 
 
 // Make restore button
-FXMDIRestoreButton::FXMDIRestoreButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXButton(p,"\tRestore\tRestore Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
+FXMDIRestoreButton::FXMDIRestoreButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXButton(p,"\tRestore\tRestore Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
   }
 
 
@@ -216,8 +213,7 @@ FXIMPLEMENT(FXMDIMaximizeButton,FXButton,FXMDIMaximizeButtonMap,ARRAYNUMBER(FXMD
 
 
 // Make maximize button
-FXMDIMaximizeButton::FXMDIMaximizeButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXButton(p,"\tMaximize\tMaximize Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
+FXMDIMaximizeButton::FXMDIMaximizeButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXButton(p,"\tMaximize\tMaximize Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
   }
 
 FXint FXMDIMaximizeButton::getDefaultWidth(){
@@ -274,8 +270,7 @@ FXIMPLEMENT(FXMDIMinimizeButton,FXButton,FXMDIMinimizeButtonMap,ARRAYNUMBER(FXMD
 
 
 // Make minimize button
-FXMDIMinimizeButton::FXMDIMinimizeButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXButton(p,"\tMinimize\tMinimize Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
+FXMDIMinimizeButton::FXMDIMinimizeButton(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXButton(p,"\tMinimize\tMinimize Window.",NULL,tgt,sel,opts,x,y,w,h,3,3,2,2){
   }
 
 
@@ -333,8 +328,7 @@ FXIMPLEMENT(FXMDIWindowButton,FXMenuButton,FXMDIWindowButtonMap,ARRAYNUMBER(FXMD
 
 
 // Make window button
-FXMDIWindowButton::FXMDIWindowButton(FXComposite* p,FXPopup* pup,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXMenuButton(p,FXString::null,NULL,pup,opts,x,y,w,h,0,0,0,0){
+FXMDIWindowButton::FXMDIWindowButton(FXComposite* p,FXPopup* pup,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXMenuButton(p,FXString::null,NULL,pup,opts,x,y,w,h,0,0,0,0){
   tip="Menu";
   target=tgt;
   message=sel;

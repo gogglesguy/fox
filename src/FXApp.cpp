@@ -7,21 +7,20 @@
 *********************************************************************************
 * Major Contributions for Windows NT by Lyle Johnson                            *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.684 2007/05/22 13:31:53 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.688 2007/07/25 17:38:41 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -600,7 +599,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   // Root window
   root=new FXRootWindow(this,defaultVisual);
 
-  
+
 #ifdef WIN32            // MS-Windows specific inits
 
   // DDE
@@ -646,6 +645,8 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   wmNetHMaximized=0;
   wmNetVMaximized=0;
   wmNetFullScreen=0;
+  wmNetBelowOthers=0;
+  wmNetAboveOthers=0;
   wmNetNeedAttention=0;
   wmNetMoveResize=0;
   wmNetRestack=0;
@@ -706,14 +707,15 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   xdndRect.y=0;
   xdndRect.w=0;
   xdndRect.h=0;
-  xrreventbase=0;                         // XRR support
+  xrreventbase=0;                         // Xrandr support
+  xfxeventbase=0;                         // Xfixes support
   xim=NULL;                               // Input method stuff
 
   // Miscellaneous stuff
   shmi=true;
   shmp=true;
   synchronize=false;
-  
+
 #endif
 
   // Timing constants
@@ -1132,15 +1134,6 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
       }
 #endif
 
-    // Check for X Rotation and Reflection support
-#ifdef HAVE_XRANDR_H
-    int errorbase;
-    if(XRRQueryExtension((Display*)display,&xrreventbase,&errorbase)){
-      XRRSelectInput((Display*)display,XDefaultRootWindow((Display*)display),True);
-      FXTRACE((100,"X RandR available\n"));
-      }
-#endif
-
     // Window Manager communication
     wmDeleteWindow=XInternAtom((Display*)display,"WM_DELETE_WINDOW",0);
     wmQuitApp=XInternAtom((Display*)display,"_WM_QUIT_APP",0);
@@ -1157,6 +1150,8 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     wmNetHMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_HORZ",0);
     wmNetVMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_VERT",0);
     wmNetFullScreen=XInternAtom((Display*)display,"_NET_WM_STATE_FULLSCREEN",0);
+    wmNetBelowOthers=XInternAtom((Display*)display,"_NET_WM_STATE_BELOW",0);
+    wmNetAboveOthers=XInternAtom((Display*)display,"_NET_WM_STATE_ABOVE",0);
     wmNetNeedAttention=XInternAtom((Display*)display,"_NET_WM_STATE_DEMANDS_ATTENTION",0);
 
     wmNetMoveResize=XInternAtom((Display*)display,"_NET_WM_MOVERESIZE",0);
@@ -1210,6 +1205,27 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     // XDND Types list
     xdndTypes=(FXID)XInternAtom((Display*)display,"XdndTypeList",0);
 
+    // Check for X Rotation and Reflection support
+#ifdef HAVE_XRANDR_H
+    int rrerrorbase;
+    if(XRRQueryExtension((Display*)display,&xrreventbase,&rrerrorbase)){
+      FXTRACE((100,"Xrandr available: %d\n",xrreventbase));
+      XRRSelectInput((Display*)display,XDefaultRootWindow((Display*)display),True);
+      }
+#endif
+
+    // Check for X Fixes support
+#ifdef HAVE_XFIXES_H
+    int fxerrorbase;
+    if(XFixesQueryExtension((Display*)display,&xfxeventbase,&fxerrorbase)){
+      FXTRACE((100,"Xfixes available: %d\n",xfxeventbase));
+      //int major_version=XFIXES_MAJOR;
+      //int minor_version=XFIXES_MINOR;
+      //XFixesQueryVersion((Display*)display,&major_version,&minor_version);
+      //XFixesSelectSelectionInput((Display*)display,XDefaultRootWindow((Display*)display),xcbSelection,XFixesSetSelectionOwnerNotifyMask|XFixesSelectionWindowDestroyNotifyMask|XFixesSelectionClientCloseNotifyMask);
+      }
+#endif
+
     // Standard stipples
     stipples[STIPPLE_0]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_0],8,8);
     stipples[STIPPLE_1]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_1],8,8);
@@ -1262,7 +1278,7 @@ FXbool FXApp::closeDisplay(){
 
     // What's going on
     FXTRACE((100,"%s::closeDisplay: closing display.\n",getClassName()));
-    
+
 #ifdef WIN32            // MS-Windows
 
     // Atoms created using GlobalCreateAtom() are reference-counted by
@@ -1331,7 +1347,7 @@ FXbool FXApp::closeDisplay(){
 
     // Close display
     XCloseDisplay((Display*)display);
-  
+
 #endif
 
     // Clear it
@@ -2938,6 +2954,11 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           // FIXME This should be a SEL_CONFIGURE for the root window, eventually
           }
 #endif
+#ifdef HAVE_XFIXES_H
+        if(ev.type==xfxeventbase+XFixesSelectionNotify){
+          FXTRACE((100,"XFixesSelectionNotifyEvent window=%d owner=%d selection=%d\n",((XFixesSelectionNotifyEvent*)&ev)->window,((XFixesSelectionNotifyEvent*)&ev)->owner,((XFixesSelectionNotifyEvent*)&ev)->selection));
+          }
+#endif
         return true;
       }
     }
@@ -3409,6 +3430,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
   FXASSERT(sizeof(FXdouble)==8);
   FXASSERT(sizeof(FXival)==sizeof(void*));
   FXASSERT(sizeof(FXuval)==sizeof(void*));
+  FXASSERT(sizeof(FXString)==sizeof(void*));
 #ifdef WIN32
   FXASSERT(sizeof(HWND)==sizeof(FXID));
 #else

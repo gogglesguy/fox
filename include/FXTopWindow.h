@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTopWindow.h,v 1.71 2007/05/21 19:56:56 fox Exp $                       *
+* $Id: FXTopWindow.h,v 1.74 2007/07/09 16:02:50 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTOPWINDOW_H
 #define FXTOPWINDOW_H
@@ -50,18 +49,25 @@ enum {
 
 /// Initial window placement
 enum {
-  PLACEMENT_DEFAULT,                  /// Place it at the default size and location
-  PLACEMENT_VISIBLE,                  /// Place window to be fully visible
-  PLACEMENT_CURSOR,                   /// Place it under the cursor position
-  PLACEMENT_OWNER,                    /// Place it centered on its owner
-  PLACEMENT_SCREEN,                   /// Place it centered on the screen
-  PLACEMENT_MAXIMIZED                 /// Place it maximized to the screen size
+  PLACEMENT_DEFAULT,            /// Place it at the default size and location
+  PLACEMENT_VISIBLE,            /// Place window to be fully visible
+  PLACEMENT_CURSOR,             /// Place it under the cursor position
+  PLACEMENT_OWNER,              /// Place it centered on its owner
+  PLACEMENT_SCREEN,             /// Place it centered on the screen
+  PLACEMENT_MAXIMIZED           /// Place it maximized to the screen size
+  };
+
+
+/// Special stacking orders
+enum {
+  STACK_NORMAL,                 /// Stack normally (default) 
+  STACK_BOTTOM,                 /// Stack below other windows
+  STACK_TOP                     /// Stack above other windows
   };
 
 
 class FXToolBar;
 class FXIcon;
-
 
 
 /**
@@ -212,6 +218,9 @@ public:
 
   /// Make window full screen, return true if success
   virtual FXbool fullScreen(FXbool notify=false);
+
+  /// Special stacking order level
+  virtual FXbool stackingOrder(FXuint order);
 
   /**
   * Close the window, return true if actually closed.  If notify=true, the target
