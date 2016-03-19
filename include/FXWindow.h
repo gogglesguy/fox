@@ -3,7 +3,7 @@
 *                            W i n d o w   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.h,v 1.170 2008/09/05 22:50:07 fox Exp $                         *
+* $Id: FXWindow.h,v 1.171 2009/01/06 13:07:29 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXWINDOW_H
 #define FXWINDOW_H
@@ -126,7 +126,7 @@ public:
   static FXDragType urilistType;        // URI list request
   static FXDragType utf8Type;           // UTF-8 text request
   static FXDragType utf16Type;          // UTF-16 text request
-  static FXDragType actionType;         // Clipboard action 
+  static FXDragType actionType;         // Clipboard action
   static const FXDragType stringType;   // Clipboard text type (pre-registered)
   static const FXDragType imageType;    // Clipboard image type (pre-registered)
 protected:

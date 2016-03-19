@@ -31,15 +31,9 @@
 
 */
 
-#include "FXExpression.h"
-
 
 // The entry point where the program starts running
 int main(int argc,char **argv){
-fxTraceLevel=2;
-  FXDirVisitor vis;
-  vis.traverse(argv[1]);
-  exit(1);
 
   // Each FOX GUI program needs one, and only one, application object.
   // The application objects coordinates some common stuff shared between

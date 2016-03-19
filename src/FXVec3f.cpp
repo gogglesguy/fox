@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXVec3f.cpp,v 1.18 2008/01/04 15:42:42 fox Exp $                         *
+* $Id: FXVec3f.cpp,v 1.23 2009/02/05 14:57:14 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -39,30 +39,24 @@ using namespace FX;
 
 namespace FX {
 
-FXVec3f::FXVec3f(FXColor color){
-  x=0.003921568627f*FXREDVAL(color);
-  y=0.003921568627f*FXGREENVAL(color);
-  z=0.003921568627f*FXBLUEVAL(color);
+// Convert from vector to color
+FXColor colorFromVec3f(const FXVec3f& vec){
+  return FXRGB((vec.x*255.0f+0.5f),(vec.y*255.0f+0.5f),(vec.z*255.0f+0.5f));
   }
 
 
-FXVec3f& FXVec3f::operator=(FXColor color){
-  x=0.003921568627f*FXREDVAL(color);
-  y=0.003921568627f*FXGREENVAL(color);
-  z=0.003921568627f*FXBLUEVAL(color);
-  return *this;
+// Convert from color to vector
+FXVec3f colorToVec3f(FXColor clr){
+  return FXVec3f(0.003921568627f*FXREDVAL(clr),0.003921568627f*FXGREENVAL(clr),0.003921568627f*FXBLUEVAL(clr));
   }
 
 
-FXVec3f::operator FXColor() const {
-  return FXRGB((x*255.0f),(y*255.0f),(z*255.0f));
-  }
-
-
+// Normalize vector
 FXVec3f normalize(const FXVec3f& v){
-  register FXfloat t=v.length();
-  if(t>0.0f){ return FXVec3f(v.x/t,v.y/t,v.z/t); }
-  return FXVec3f(0.0f,0.0f,0.0f);
+  register FXfloat m=v.length2();
+  FXVec3f result(v);
+  if(m>0.0f){ result/=sqrtf(m); }
+  return result;
   }
 
 

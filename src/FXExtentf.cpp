@@ -3,7 +3,7 @@
 *          S i n g l e - P r e c i s i o n    E x t e n t    C l a s s          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXExtentf.cpp,v 1.7 2008/01/04 15:42:11 fox Exp $                        *
+* $Id: FXExtentf.cpp,v 1.8 2009/01/06 13:24:30 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

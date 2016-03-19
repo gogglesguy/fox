@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.191 2008/09/15 17:54:44 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.193 2009/01/06 13:24:29 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1028,7 +1028,7 @@ void FXDirList::listChildItems(FXDirItem *par){
 #endif
 
       // If it is not a directory, and not showing files and matching pattern skip it
-      if(!info.isDirectory() && !((options&DIRLIST_SHOWFILES) && FXPath::match(pattern,name,matchmode))) continue;
+      if(!info.isDirectory() && !((options&DIRLIST_SHOWFILES) && FXPath::match(name,pattern,matchmode))) continue;
 
       // Find it, and take it out from the old list if found
       for(pp=po; (item=*pp)!=NULL; pp=&item->link){

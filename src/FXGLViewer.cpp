@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.187 2008/07/28 20:59:45 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.196 2009/02/04 18:14:05 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -998,22 +998,22 @@ void FXGLViewer::updateTransform(){
   transform.scale(scale);
   transform.trans(-center);
   itransform=transform.invert();
-//   FXTRACE((150,"itrans=%11.8f %11.8f %11.8f %11.8f\n",itransform[0][0],itransform[0][1],itransform[0][2],itransform[0][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[1][0],itransform[1][1],itransform[1][2],itransform[1][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[2][0],itransform[2][1],itransform[2][2],itransform[2][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[3][0],itransform[3][1],itransform[3][2],itransform[3][3]));
-//   FXTRACE((150,"\n"));
-//   FXTRACE((150," trans=%11.8f %11.8f %11.8f %11.8f\n",transform[0][0],transform[0][1],transform[0][2],transform[0][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",transform[1][0],transform[1][1],transform[1][2],transform[1][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",transform[2][0],transform[2][1],transform[2][2],transform[2][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",transform[3][0],transform[3][1],transform[3][2],transform[3][3]));
-//   FXTRACE((150,"\n"));
-//   FXHMat check=itransform*transform;
-//   FXTRACE((150," check=%11.8f %11.8f %11.8f %11.8f\n",check[0][0],check[0][1],check[0][2],check[0][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",check[1][0],check[1][1],check[1][2],check[1][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",check[2][0],check[2][1],check[2][2],check[2][3]));
-//   FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",check[3][0],check[3][1],check[3][2],check[3][3]));
-//   FXTRACE((150,"\n"));
+  //FXTRACE((150,"itrans=%11.8f %11.8f %11.8f %11.8f\n",itransform[0][0],itransform[0][1],itransform[0][2],itransform[0][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[1][0],itransform[1][1],itransform[1][2],itransform[1][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[2][0],itransform[2][1],itransform[2][2],itransform[2][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[3][0],itransform[3][1],itransform[3][2],itransform[3][3]));
+  //FXTRACE((150,"\n"));
+  //FXTRACE((150," trans=%11.8f %11.8f %11.8f %11.8f\n",transform[0][0],transform[0][1],transform[0][2],transform[0][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",transform[1][0],transform[1][1],transform[1][2],transform[1][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",transform[2][0],transform[2][1],transform[2][2],transform[2][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",transform[3][0],transform[3][1],transform[3][2],transform[3][3]));
+  //FXTRACE((150,"\n"));
+  //FXMat4f check=itransform*transform;
+  //FXTRACE((150," check=%11.8f %11.8f %11.8f %11.8f\n",check[0][0],check[0][1],check[0][2],check[0][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",check[1][0],check[1][1],check[1][2],check[1][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",check[2][0],check[2][1],check[2][2],check[2][3]));
+  //FXTRACE((150,"       %11.8f %11.8f %11.8f %11.8f\n",check[3][0],check[3][1],check[3][2],check[3][3]));
+  //FXTRACE((150,"\n"));
   }
 
 
@@ -2793,8 +2793,7 @@ long FXGLViewer::onUpdCurrent(FXObject* sender,FXSelector,void*){
 
 // Set background color
 long FXGLViewer::onCmdBackColor(FXObject*,FXSelector sel,void* ptr){
-  FXColor color=(FXColor)(FXuval)ptr;
-  background[0]=background[1]=color;
+  background[0]=background[1]=colorToVec4f((FXColor)(FXuval)ptr);
   if(FXSELTYPE(sel)==SEL_COMMAND || !turbomode){
     update();
     }
@@ -2804,7 +2803,7 @@ long FXGLViewer::onCmdBackColor(FXObject*,FXSelector sel,void* ptr){
 
 // Update background color
 long FXGLViewer::onUpdBackColor(FXObject* sender,FXSelector,void*){
-  FXColor clr=background[0];
+  FXColor clr=colorFromVec4f(background[0]);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)clr);
   return 1;
   }
@@ -2812,8 +2811,7 @@ long FXGLViewer::onUpdBackColor(FXObject* sender,FXSelector,void*){
 
 // Set gradient background color
 long FXGLViewer::onCmdGradientBackColor(FXObject*,FXSelector sel,void* ptr){
-  FXColor color=(FXColor)(FXuval)ptr;
-  background[FXSELID(sel)-ID_TOP_COLOR]=color;
+  background[FXSELID(sel)-ID_TOP_COLOR]=colorToVec4f((FXColor)(FXuval)ptr);
   if(FXSELTYPE(sel)==SEL_COMMAND || !turbomode){
     update();
     }
@@ -2823,7 +2821,7 @@ long FXGLViewer::onCmdGradientBackColor(FXObject*,FXSelector sel,void* ptr){
 
 // Update gradient background color
 long FXGLViewer::onUpdGradientBackColor(FXObject* sender,FXSelector sel,void*){
-  FXColor clr=background[FXSELID(sel)-ID_TOP_COLOR];
+  FXColor clr=colorFromVec4f(background[FXSELID(sel)-ID_TOP_COLOR]);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)clr);
   return 1;
   }
@@ -2831,8 +2829,7 @@ long FXGLViewer::onUpdGradientBackColor(FXObject* sender,FXSelector sel,void*){
 
 // Set ambient light color
 long FXGLViewer::onCmdAmbientColor(FXObject*,FXSelector sel,void* ptr){
-  FXColor color=(FXColor)(FXuval)ptr;
-  ambient=color;
+  ambient=colorToVec4f((FXColor)(FXuval)ptr);
   if(FXSELTYPE(sel)==SEL_COMMAND || !turbomode){
     update();
     }
@@ -2842,7 +2839,7 @@ long FXGLViewer::onCmdAmbientColor(FXObject*,FXSelector sel,void* ptr){
 
 // Update ambient light color
 long FXGLViewer::onUpdAmbientColor(FXObject* sender,FXSelector,void*){
-  FXColor clr=ambient;
+  FXColor clr=colorFromVec4f(ambient);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)clr);
   return 1;
   }
@@ -2850,8 +2847,7 @@ long FXGLViewer::onUpdAmbientColor(FXObject* sender,FXSelector,void*){
 
 // Set ambient light color
 long FXGLViewer::onCmdLightAmbient(FXObject*,FXSelector sel,void* ptr){
-  FXColor color=(FXColor)(FXuval)ptr;
-  light.ambient=color;
+  light.ambient=colorToVec4f((FXColor)(FXuval)ptr);
   if(FXSELTYPE(sel)==SEL_COMMAND || !turbomode){
     update();
     }
@@ -2861,7 +2857,7 @@ long FXGLViewer::onCmdLightAmbient(FXObject*,FXSelector sel,void* ptr){
 
 // Update ambient light color
 long FXGLViewer::onUpdLightAmbient(FXObject* sender,FXSelector,void*){
-  FXColor clr=light.ambient;
+  FXColor clr=colorFromVec4f(light.ambient);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)clr);
   return 1;
   }
@@ -2869,8 +2865,7 @@ long FXGLViewer::onUpdLightAmbient(FXObject* sender,FXSelector,void*){
 
 // Set diffuse light color
 long FXGLViewer::onCmdLightDiffuse(FXObject*,FXSelector sel,void* ptr){
-  FXColor color=(FXColor)(FXuval)ptr;
-  light.diffuse=color;
+  light.diffuse=colorToVec4f((FXColor)(FXuval)ptr);
   if(FXSELTYPE(sel)==SEL_COMMAND || !turbomode){
     update();
     }
@@ -2880,7 +2875,7 @@ long FXGLViewer::onCmdLightDiffuse(FXObject*,FXSelector sel,void* ptr){
 
 // Update diffuse light color
 long FXGLViewer::onUpdLightDiffuse(FXObject* sender,FXSelector,void*){
-  FXColor clr=light.diffuse;
+  FXColor clr=colorFromVec4f(light.diffuse);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)clr);
   return 1;
   }
@@ -2888,8 +2883,7 @@ long FXGLViewer::onUpdLightDiffuse(FXObject* sender,FXSelector,void*){
 
 // Set specular light color
 long FXGLViewer::onCmdLightSpecular(FXObject*,FXSelector sel,void* ptr){
-  FXColor color=(FXColor)(FXuval)ptr;
-  light.specular=color;
+  light.specular=colorToVec4f((FXColor)(FXuval)ptr);
   if(FXSELTYPE(sel)==SEL_COMMAND || !turbomode){
     update();
     }
@@ -2899,7 +2893,7 @@ long FXGLViewer::onCmdLightSpecular(FXObject*,FXSelector sel,void* ptr){
 
 // Update specular light color
 long FXGLViewer::onUpdLightSpecular(FXObject* sender,FXSelector,void*){
-  FXColor clr=light.specular;
+  FXColor clr=colorFromVec4f(light.specular);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)clr);
   return 1;
   }

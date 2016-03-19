@@ -3,7 +3,7 @@
 *                       I m a g e   F r a m e   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2008 by H. J. Daniel III. All Rights Reserved.             *
+* Copyright (C) 2001,2009 by H. J. Daniel III. All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmapFrame.cpp,v 1.12 2008/01/04 15:42:05 fox Exp $                   *
+* $Id: FXBitmapFrame.cpp,v 1.13 2009/01/06 13:24:26 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

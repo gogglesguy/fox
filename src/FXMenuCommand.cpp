@@ -3,7 +3,7 @@
 *                         M e n u   C o m m a n d    W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuCommand.cpp,v 1.79 2008/01/15 05:37:08 fox Exp $                   *
+* $Id: FXMenuCommand.cpp,v 1.81 2009/01/19 22:51:50 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -96,18 +96,16 @@ FXMenuCommand::FXMenuCommand(){
 
 // Command menu item
 FXMenuCommand::FXMenuCommand(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel,FXuint opts):FXMenuCaption(p,text,ic,opts){
-  FXAccelTable *table;
-  FXWindow *own;
-  flags|=FLAG_ENABLED;
   defaultCursor=getApp()->getDefaultCursor(DEF_RARROW_CURSOR);
+  flags|=FLAG_ENABLED;
   target=tgt;
   message=sel;
   accel=text.section('\t',1);
   acckey=parseAccel(accel);
   if(acckey){
-    own=getShell()->getOwner();
+    FXWindow *own=getShell()->getOwner();
     if(own){
-      table=own->getAccelTable();
+      FXAccelTable *table=own->getAccelTable();
       if(table){
         table->addAccel(acckey,this,FXSEL(SEL_COMMAND,ID_ACCEL));
         }
@@ -328,8 +326,22 @@ long FXMenuCommand::onPaint(FXObject*,FXSelector,void* ptr){
 // Change accelerator text; note this just changes the text!
 // This is because the accelerator's target may be different from
 // the MenuCommands and we don't want to blow it away.
-void FXMenuCommand::setAccelText(const FXString& text){
+void FXMenuCommand::setAccelText(const FXString& text,FXbool acc){
   if(accel!=text){
+    if(acc){
+      FXHotKey yekcca=parseAccel(text);
+      if(acckey || yekcca){
+        FXWindow *own=getShell()->getOwner();
+        if(own){
+          FXAccelTable *table=own->getAccelTable();
+          if(table){
+            table->removeAccel(acckey);
+            table->addAccel(yekcca,this,FXSEL(SEL_COMMAND,ID_ACCEL));
+            }
+          }
+        }
+      acckey=yekcca;
+      }
     accel=text;
     recalc();
     update();
@@ -355,12 +367,10 @@ void FXMenuCommand::load(FXStream& store){
 
 // Need to uninstall accelerator
 FXMenuCommand::~FXMenuCommand(){
-  FXAccelTable *table;
-  FXWindow *own;
   if(acckey){
-    own=getShell()->getOwner();
+    FXWindow *own=getShell()->getOwner();
     if(own){
-      table=own->getAccelTable();
+      FXAccelTable *table=own->getAccelTable();
       if(table){
         table->removeAccel(acckey);
         }

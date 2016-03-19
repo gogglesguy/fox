@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.h,v 1.179 2008/03/05 06:01:54 fox Exp $                          *
+* $Id: FXTable.h,v 1.182 2009/01/16 11:14:51 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -185,10 +185,10 @@ public:
   FXStipplePattern getStipple() const;
 
   /// Create input control for editing this item
-  virtual FXWindow *getControlFor(FXTable* table);
+  virtual FXWindow* getControlFor(FXTable* table);
 
   /// Set value from input control
-  virtual void setFromControl(FXWindow *control);
+  virtual void setFromControl(FXWindow* control);
 
   /// Return width of item
   virtual FXint getWidth(const FXTable* table) const;
@@ -341,8 +341,8 @@ protected:
   virtual void drawVGrid(FXDC& dc,FXint rlo,FXint rhi,FXint clo,FXint chi);
   virtual void drawContents(FXDC& dc,FXint x,FXint y,FXint w,FXint h);
   virtual FXTableItem* createItem(const FXString& text,FXIcon* icon,void* ptr);
-  virtual FXWindow *getControlForItem(FXint r,FXint c);
-  virtual void setItemFromControl(FXint r,FXint c,FXWindow *control);
+  virtual FXWindow* getControlForItem(FXint r,FXint c);
+  virtual void setItemFromControl(FXint r,FXint c,FXWindow* control);
   virtual void updateColumnNumbers(FXint lo,FXint hi);
   virtual void updateRowNumbers(FXint lo,FXint hi);
 protected:
@@ -809,9 +809,6 @@ public:
   /// Return icon of row header at index
   FXIcon* getRowIcon(FXint index) const;
 
-
-
-
   /// Change column header tip text
   void setColumnTipText(FXint index,const FXString& text);
 
@@ -823,8 +820,6 @@ public:
 
   /// Return tip text of row header at index
   FXString getRowTipText(FXint index) const;
-
-
 
   /// Change column header icon position, e.g. FXHeaderItem::BEFORE, etc.
   void setColumnIconPosition(FXint index,FXuint m);
@@ -905,7 +900,7 @@ public:
   /// Disable item
   virtual FXbool disableItem(FXint r,FXint c);
 
-  /// Is item enabled
+  /// Is item enabled and editable
   FXbool isItemEnabled(FXint r,FXint c) const;
 
   /**

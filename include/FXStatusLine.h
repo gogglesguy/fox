@@ -3,7 +3,7 @@
 *                       S t a t u s L i n e   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStatusLine.h,v 1.11 2008/01/04 15:18:24 fox Exp $                      *
+* $Id: FXStatusLine.h,v 1.12 2009/01/06 13:07:27 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXSTATUSLINE_H
 #define FXSTATUSLINE_H

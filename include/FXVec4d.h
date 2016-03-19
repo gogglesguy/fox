@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXVec4d.h,v 1.31 2008/01/04 15:18:28 fox Exp $                           *
+* $Id: FXVec4d.h,v 1.34 2009/02/04 18:11:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXVEC4D_H
 #define FXVEC4D_H
@@ -39,7 +39,7 @@ public:
   FXdouble w;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXVec4d(){}
 
   /// Initialize from another vector
@@ -54,17 +54,11 @@ public:
   /// Initialize with components
   FXVec4d(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww=1.0){x=xx;y=yy;z=zz;w=ww;}
 
-  /// Initialize with color
-  FXVec4d(FXColor color);
-
   /// Return a non-const reference to the ith element
   FXdouble& operator[](FXint i){return (&x)[i];}
 
   /// Return a const reference to the ith element
   const FXdouble& operator[](FXint i) const {return (&x)[i];}
-
-  /// Assign color
-  FXVec4d& operator=(FXColor color);
 
   /// Assignment
   FXVec4d& operator=(const FXVec3d& v){x=v.x;y=v.y;z=v.z;w=1.0;return *this;}
@@ -93,9 +87,6 @@ public:
   operator const FXdouble*() const {return &x;}
   operator FXVec3d&(){return *reinterpret_cast<FXVec3d*>(this);}
   operator const FXVec3d&() const {return *reinterpret_cast<const FXVec3d*>(this);}
-
-  /// Convert to color
-  operator FXColor() const;
 
   /// Unary
   FXVec4d operator+() const { return *this; }
@@ -162,6 +153,10 @@ public:
   friend FXAPI FXVec4d plane(const FXVec3d& vec,const FXVec3d& p);
   friend FXAPI FXVec4d plane(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
 
+  /// Convert vector to color and back
+  friend FXAPI FXColor colorFromVec4d(const FXVec4d& vec);
+  friend FXAPI FXVec4d colorToVec4d(FXColor clr);
+
   /// Signed distance normalized plane and point
   FXdouble distance(const FXVec3d& p) const;
 
@@ -206,6 +201,9 @@ extern FXAPI FXVec4d plane(const FXVec4d& vec);
 extern FXAPI FXVec4d plane(const FXVec3d& vec,FXdouble dist);
 extern FXAPI FXVec4d plane(const FXVec3d& vec,const FXVec3d& p);
 extern FXAPI FXVec4d plane(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
+
+extern FXAPI FXColor colorFromVec4d(const FXVec4d& vec);
+extern FXAPI FXVec4d colorToVec4d(FXColor clr);
 
 extern FXAPI FXVec4d normalize(const FXVec4d& v);
 

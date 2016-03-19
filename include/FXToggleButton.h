@@ -3,7 +3,7 @@
 *                   T o g g l e    B u t t o n    W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToggleButton.h,v 1.37 2008/01/04 15:18:27 fox Exp $                    *
+* $Id: FXToggleButton.h,v 1.38 2009/01/06 13:07:28 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXTOGGLEBUTTON_H
 #define FXTOGGLEBUTTON_H

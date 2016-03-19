@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorSelector.cpp,v 1.88 2008/07/22 19:28:31 fox Exp $                 *
+* $Id: FXColorSelector.cpp,v 1.92 2009/02/04 18:11:55 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -145,7 +145,7 @@ FXIMPLEMENT(FXColorSelector,FXPacker,FXColorSelectorMap,ARRAYNUMBER(FXColorSelec
 
 
 // Well names
-const FXchar* FXColorSelector::wellname[24]={
+const FXchar *const FXColorSelector::wellname[24]={
   "wella","wellb","wellc","welld",
   "welle","wellf","wellg","wellh",
   "welli","wellj","wellk","welll",
@@ -299,7 +299,7 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     label->setTarget(this);
     label->setSelector(ID_ALPHA_LABEL);
 
-    // Set ranges and increment
+    // Set ranges 
     hsvaslider[0]->setRange(0,360);
     hsvaslider[1]->setRange(0,1000);
     hsvaslider[2]->setRange(0,1000);
@@ -334,7 +334,7 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     label->setTarget(this);
     label->setSelector(ID_ALPHA_LABEL);
 
-    // Set ranges and increment
+    // Set ranges
     cmyslider[0]->setRange(0,255);
     cmyslider[1]->setRange(0,255);
     cmyslider[2]->setRange(0,255);
@@ -351,20 +351,20 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
 
     // Add color names
     for(FXuint i=0; i<fxnumcolornames; i++){
-      list->appendItem(fxcolornames[i].name,fxcolornames[i].color);
+      list->appendItem(tr(fxcolornames[i].name),fxcolornames[i].color);
       }
 
   // Init RGBA
-  rgba[0]=0.0;
-  rgba[1]=0.0;
-  rgba[2]=0.0;
-  rgba[3]=1.0;
+  rgba[0]=0.0f;
+  rgba[1]=0.0f;
+  rgba[2]=0.0f;
+  rgba[3]=1.0f;
 
   // Init HSVA
-  hsva[0]=360.0;
-  hsva[1]=0.0;
-  hsva[2]=0.0;
-  hsva[3]=1.0;
+  hsva[0]=360.0f;
+  hsva[1]=0.0f;
+  hsva[2]=0.0f;
+  hsva[3]=1.0f;
 
   // Reflect color in well
   updateWell();
@@ -459,7 +459,7 @@ long FXColorSelector::onUpdAlphaText(FXObject* sender,FXSelector,void*){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_HIDE),NULL);
     }
   else{
-    value.fromDouble(255.0*rgba[3],1,0);
+    value.fromDouble(255.0f*rgba[3],1,0);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&value);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
     }
@@ -473,7 +473,7 @@ long FXColorSelector::onUpdAlphaSlider(FXObject* sender,FXSelector,void*){
     sender->handle(this,FXSEL(SEL_COMMAND,ID_HIDE),NULL);
     }
   else{
-    FXint value=(FXint)(255.0*rgba[3]);
+    FXint value=(FXint)(255.0f*rgba[3]);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&value);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
     }
@@ -686,7 +686,7 @@ long FXColorSelector::onCmdWell(FXObject*,FXSelector,void*){
 
 // Update main well
 void FXColorSelector::updateWell(){
-  well->setRGBA(FXRGBA((int)(rgba[0]*255.0),(int)(rgba[1]*255.0),(int)(rgba[2]*255.0),(int)(rgba[3]*255.0)));
+  well->setRGBA(FXRGBA((int)(rgba[0]*255.0f),(int)(rgba[1]*255.0f),(int)(rgba[2]*255.0f),(int)(rgba[3]*255.0f)));
   }
 
 

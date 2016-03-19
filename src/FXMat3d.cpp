@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3d.cpp,v 1.23 2008/01/04 15:42:24 fox Exp $                         *
+* $Id: FXMat3d.cpp,v 1.25 2009/01/27 22:58:18 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -39,16 +39,6 @@
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
 */
-
-
-#define DET2(a00,a01, \
-             a10,a11) ((a00)*(a11)-(a10)*(a01))
-
-#define DET3(a00,a01,a02, \
-             a10,a11,a12, \
-             a20,a21,a22) ((a00)*DET2(a11,a12,a21,a22) - \
-                           (a10)*DET2(a01,a02,a21,a22) + \
-                           (a20)*DET2(a01,a02,a11,a12))
 
 
 using namespace FX;
@@ -423,9 +413,9 @@ FXMat3d& FXMat3d::scale(FXdouble s){
 
 // Calculate determinant
 FXdouble FXMat3d::det() const {
-  return DET3(m[0][0],m[0][1],m[0][2],
-              m[1][0],m[1][1],m[1][2],
-              m[2][0],m[2][1],m[2][2]);
+  return m[0][0]*(m[1][1]*m[2][2]-m[2][1]*m[1][2])+
+         m[0][1]*(m[2][0]*m[1][2]-m[1][0]*m[2][2])+
+         m[0][2]*(m[1][0]*m[2][1]-m[2][0]*m[1][1]);
   }
 
 
@@ -454,7 +444,6 @@ FXMat3d FXMat3d::invert() const {
   res[2][2]=m[0][0]*m[1][1]-m[0][1]*m[1][0];
 
   dt=m[0][0]*res[0][0]+m[0][1]*res[1][0]+m[0][2]*res[2][0];
-  //if(det==0.0) throw FXException("FXMat3d is singular.");
   FXASSERT(dt!=0.0);
 
   res[0][0]/=dt;

@@ -3,7 +3,7 @@
 *              P r i v a t e   I n t e r n a l   F u n c t i o n s              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxpriv.h,v 1.47 2008/09/22 20:50:13 fox Exp $                            *
+* $Id: fxpriv.h,v 1.48 2009/01/06 13:24:47 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPRIV_H
 #define FXPRIV_H

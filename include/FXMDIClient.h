@@ -3,7 +3,7 @@
 *         M u l t i p l e   D o c u m e n t   C l i e n t   W i n d o w         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIClient.h,v 1.40 2008/07/14 17:06:19 fox Exp $                       *
+* $Id: FXMDIClient.h,v 1.41 2009/01/06 13:07:25 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXMDICLIENT_H
 #define FXMDICLIENT_H
@@ -159,7 +159,7 @@ public:
 
   /// Get active document; this is the target of the active MDI Child, if any
   FXObject* getActiveDocument() const;
-  
+
   /// Change background image
   void setBackImage(FXImage* img);
 

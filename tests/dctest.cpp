@@ -3,9 +3,9 @@
 *                           Device Context Tester                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: dctest.cpp,v 1.56 2008/04/29 12:51:38 fox Exp $                          *
+* $Id: dctest.cpp,v 1.57 2009/01/06 13:31:21 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>

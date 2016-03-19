@@ -3,7 +3,7 @@
 *                           C o l o r   D i a l o g                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorDialog.h,v 1.26 2008/07/22 19:21:32 fox Exp $                     *
+* $Id: FXColorDialog.h,v 1.27 2009/01/06 13:07:22 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXCOLORDIALOG_H
 #define FXCOLORDIALOG_H

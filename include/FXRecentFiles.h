@@ -3,7 +3,7 @@
 *                     R e c e n t   F i l e s   L i s t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRecentFiles.h,v 1.28 2008/01/04 15:18:23 fox Exp $                     *
+* $Id: FXRecentFiles.h,v 1.32 2009/01/07 13:24:50 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXRECENTFILES_H
 #define FXRECENTFILES_H
@@ -34,7 +34,7 @@ class FXApp;
 
 
 /**
-* The recent files object manages a most recently used (MRU) file list by
+* The Recent Files group manages a most recently used (MRU) file list by
 * means of the standard system registry.
 * When connected to a widget, like a menu command, the recent files object
 * updates the menu commands label to the associated recent file name; when
@@ -45,15 +45,19 @@ class FXApp;
 * updates the system registry to record these changes.
 * The ID_ANYFILES may be connected to a menu separator to cause automatic
 * hiding of the menu separator when there are no recent files.
+* The number of file names is typically no more than 10.
+* File names should not be empty.
 */
 class FXAPI FXRecentFiles : public FXObject {
   FXDECLARE(FXRecentFiles)
 private:
-  FXApp      *app;            // Backlink to application
+  FXSettings *settings;       // Settings database where list is kept
   FXObject   *target;         // Target object to send message
   FXSelector  message;        // Message to send
   FXString    group;          // MRU File group
-  FXint       maxfiles;       // Maximum number of files to track
+  FXuint      maxfiles;       // Maximum number of files to track
+private:
+  static const FXchar key[32][7];
 private:
   FXRecentFiles(const FXRecentFiles&);
   FXRecentFiles &operator=(const FXRecentFiles&);
@@ -80,23 +84,37 @@ public:
     };
 public:
 
-  /// Make new recent files group, using global application instance
+  /**
+  * Make new recent files group. 
+  * A Settings object and group name must be assigned prior to usage.
+  */
   FXRecentFiles();
 
-  /// Make new recent files group with default groupname
-  FXRecentFiles(FXApp* a);
+  /**
+  * Make new recent files group, using settings database from application.
+  * An optional target and message may be passed to invoke when one of the 
+  * list of files is invoked.
+  */
+  FXRecentFiles(FXApp* a,const FXString& gp="Recent Files",FXObject *tgt=NULL,FXSelector sel=0);
 
-  /// Make new recent files group with groupname gp
-  FXRecentFiles(FXApp* a,const FXString& gp,FXObject *tgt=NULL,FXSelector sel=0);
+  /**
+  * Make new recent files group, using given settings database.
+  * An optional target and message may be passed to invoke when one of the 
+  * list of files is invoked.
+  */  
+  FXRecentFiles(FXSettings* st,const FXString& gp="Recent Files",FXObject *tgt=NULL,FXSelector sel=0);
 
-  /// Get application
-  FXApp* getApp() const { return app; }
+  /// Change settings database
+  void setSettings(FXSettings* s){ settings=s; }
+
+  /// Return settings database
+  FXSettings* getSettings() const { return settings; }
 
   /// Change number of files we're tracking
-  void setMaxFiles(FXint mx){ maxfiles=mx; }
+  void setMaxFiles(FXuint mx);
 
   /// Return the maximum number of files being tracked
-  FXint getMaxFiles() const { return maxfiles; }
+  FXuint getMaxFiles() const { return maxfiles; }
 
   /// Set group name
   void setGroupName(const FXString& name){ group=name; }
@@ -117,10 +135,10 @@ public:
   FXSelector getSelector() const { return message; }
 
   /// Obtain the filename at index
-  FXString getFile(FXint index) const;
+  FXString getFile(FXuint index) const;
 
   /// Change the filename at index
-  void setFile(FXint index,const FXString& filename);
+  void setFile(FXuint index,const FXString& filename);
 
   /// Append a file
   void appendFile(const FXString& filename);

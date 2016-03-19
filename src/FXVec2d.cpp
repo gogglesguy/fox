@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXVec2d.cpp,v 1.13 2008/01/04 15:42:41 fox Exp $                         *
+* $Id: FXVec2d.cpp,v 1.15 2009/02/06 00:17:14 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -38,10 +38,12 @@ using namespace FX;
 namespace FX {
 
 
+// Normalize vector
 FXVec2d normalize(const FXVec2d& v){
-  register FXdouble t=v.length();
-  if(t>0.0){ return FXVec2d(v.x/t,v.y/t); }
-  return FXVec2d(0.0,0.0);
+  register FXdouble m=v.length2();
+  FXVec2d result(v);
+  if(m>0.0f){ result/=sqrtf(m); }
+  return result;
   }
 
 

@@ -95,7 +95,7 @@ STRIP = @STRIP@
 VERSION = @VERSION@
 X_BASE_LIBS = @X_BASE_LIBS@
 
-CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
+AM_CXXFLAGS = @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap
 SUFFIXES = .gif .bmp
@@ -187,6 +187,7 @@ PathFinder.$(OBJEXT) Preferences.$(OBJEXT) PropertyDialog.$(OBJEXT)
 PathFinder_LDADD = $(LDADD)
 PathFinder_DEPENDENCIES =  $(top_builddir)/src/libFOX-1.7.la
 PathFinder_LDFLAGS = 
+CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -395,7 +396,8 @@ CopyDialog.o: CopyDialog.cpp ../include/xincs.h ../include/fx.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -495,7 +497,8 @@ PathFinder.o: PathFinder.cpp ../include/xincs.h ../include/fx.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -599,7 +602,8 @@ Preferences.o: Preferences.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \
@@ -699,7 +703,8 @@ PropertyDialog.o: PropertyDialog.cpp ../include/xincs.h ../include/fx.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
 	../include/FXObject.h ../include/FXDelegator.h \
 	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
-	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXStat.h ../include/FXDir.h \
+	../include/FXDirVisitor.h ../include/FXDate.h \
 	../include/FXURL.h ../include/FXStringDict.h \
 	../include/FXSettings.h ../include/FXRegistry.h \
 	../include/FXObjectList.h ../include/FXAccelTable.h \

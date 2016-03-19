@@ -3,7 +3,7 @@
 *                  R a d i o   B u t t o n    W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRadioButton.h,v 1.35 2008/01/04 15:18:23 fox Exp $                     *
+* $Id: FXRadioButton.h,v 1.36 2009/01/06 13:07:26 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXRADIOBUTTON_H
 #define FXRADIOBUTTON_H

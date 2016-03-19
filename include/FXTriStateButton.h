@@ -3,7 +3,7 @@
 *               T r i - S t a t e    B u t t o n    W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2008 by Charles Warren.   All Rights Reserved.             *
+* Copyright (C) 2002,2009 by Charles Warren.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTriStateButton.h,v 1.9 2008/01/04 15:18:27 fox Exp $                   *
+* $Id: FXTriStateButton.h,v 1.10 2009/01/06 13:07:29 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXTRISTATEBUTTON_H
 #define FXTRISTATEBUTTON_H

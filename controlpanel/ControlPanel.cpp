@@ -3,7 +3,7 @@
 *                    FOX Desktop Setup - FOX Desktop Enviroment                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2009 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: ControlPanel.cpp,v 1.3 2008/04/29 12:51:38 fox Exp $                     *
+* $Id: ControlPanel.cpp,v 1.4 2009/01/06 13:07:21 fox Exp $                     *
 ********************************************************************************/
 #include <xincs.h>
 #include <fx.h>

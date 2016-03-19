@@ -3,7 +3,7 @@
 *          M u l t i p l e   D o c u m e n t   C h i l d   W i n d o w          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIChild.cpp,v 1.113 2008/07/15 19:01:42 fox Exp $                     *
+* $Id: FXMDIChild.cpp,v 1.114 2009/01/06 13:24:36 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

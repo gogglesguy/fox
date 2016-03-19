@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * Major Contributions for Windows NT by Lyle Johnson                            *
 *********************************************************************************
@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.745 2008/09/17 22:13:03 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.749 2009/01/19 20:54:20 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -338,7 +338,7 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright notice
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2008 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2009 Jeroen van der Zijp. All Rights Reserved.";
 
 
 #ifdef WIN32            // Windows
@@ -1161,10 +1161,10 @@ const FXchar* windowTypeAtoms[14]={
 FXbool FXApp::openDisplay(const FXchar* dpyname){
   if(!initialized){
 
-    // What's going on
-    FXTRACE((100,"%s::openDisplay: opening display.\n",getClassName()));
-
 #ifdef WIN32            // MS-Windows
+
+    // What's going on
+    FXTRACE((100,"%s::openDisplay(%s)\n",getClassName(),dpyname));
 
     // Set to HINSTANCE on Windows
     display=GetOwnModuleHandle();
@@ -1296,6 +1296,9 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
 
     // Revert to default
     if(!dpyname) dpyname=dpy;
+
+    // What's going on
+    FXTRACE((100,"%s::openDisplay(%s)\n",getClassName(),dpyname));
 
     // Open display
     display=XOpenDisplay(dpyname);
@@ -1951,11 +1954,10 @@ r:if(mode&INPUT_READ){
     inputs[fd].excpt.data=NULL;
     FD_CLR(fd,&handles->hnd[2]);
     }
-  if(fd==maxhandle){
-    while(fd>=0 && !FD_ISSET(fd,&handles->hnd[0]) && !FD_ISSET(fd,&handles->hnd[1]) && !FD_ISSET(fd,&handles->hnd[2])){
-      --fd;
+  if(maxhandle==fd){
+    while(maxhandle>=0 && !FD_ISSET(maxhandle,&handles->hnd[0]) && !FD_ISSET(maxhandle,&handles->hnd[1]) && !FD_ISSET(maxhandle,&handles->hnd[2])){
+      --maxhandle;
       }
-    maxhandle=fd;
     }
 #endif
   return true;

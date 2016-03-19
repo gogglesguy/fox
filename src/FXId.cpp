@@ -3,7 +3,7 @@
 *                                  X - O b j e c t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXId.cpp,v 1.29 2008/04/23 17:37:00 fox Exp $                            *
+* $Id: FXId.cpp,v 1.30 2009/01/06 13:24:35 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

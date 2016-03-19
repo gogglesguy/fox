@@ -3,7 +3,7 @@
 *         I n t e r - T h r e a d    M e s s a g i n g    C h a n n e l         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageChannel.cpp,v 1.15 2008/08/29 16:43:52 fox Exp $                *
+* $Id: FXMessageChannel.cpp,v 1.16 2009/01/06 13:24:37 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -44,8 +44,8 @@
     use an Event-object to actually signal the GUI thread when we've
     written something to the pipe.
   - Based on suggestion from Axel Schmidt <axel.schmidt@analytica-karlsruhe.de>,
-    the Event object was replaced by counting Semaphore.  
-    This way, the number of calls to message() has to be equal to the number of calls 
+    the Event object was replaced by counting Semaphore.
+    This way, the number of calls to message() has to be equal to the number of calls
     to MsgWaitForMultipleObjects.  Thus, each call to message() results in exactly
     one callback in the GUI thread.
 */

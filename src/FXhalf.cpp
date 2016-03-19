@@ -3,7 +3,7 @@
 *                     H a l f - F l o a t   S u p p o r t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2008,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXhalf.cpp,v 1.21 2008/11/20 09:36:33 fox Exp $                          *
+* $Id: FXhalf.cpp,v 1.24 2009/01/06 13:24:45 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -46,7 +46,7 @@
                         |  |   |  |        |
         Meaning:        s  eeeee  ffffffffff
 
-    s = 1-bit sign, 0=positive (+), 1=negayive (-).
+    s = 1-bit sign, 0=positive (+), 1=negative (-).
     e = 5-bit base-2 exponent, with bias of 15
     f = 10-bit fraction.
 
@@ -67,7 +67,7 @@
 
        value = 0.0
 
-    If the exponent is eeeee is 30, and ffffffffff is zero:
+    If the exponent is eeeee is 31, and ffffffffff is zero:
 
        value = Infinity (or -Infinity if s=1)
 

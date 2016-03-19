@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.h,v 1.70 2008/07/30 23:55:13 fox Exp $                           *
+* $Id: FXImage.h,v 1.72 2009/01/06 13:07:25 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXIMAGE_H
 #define FXIMAGE_H
@@ -263,17 +263,23 @@ public:
   /// Blend image over uniform color
   virtual void blend(FXColor color);
 
-  /// Save object to stream
-  virtual void save(FXStream& store) const;
+  /// Invert colors of an image
+  virtual void invert();
 
-  /// Load object from stream
-  virtual void load(FXStream& store);
+  /// Colorize image based on luminance
+  virtual void colorize(FXColor color);
 
   /// Save pixel data only
   virtual FXbool savePixels(FXStream& store) const;
 
   /// Load pixel data only
   virtual FXbool loadPixels(FXStream& store);
+
+  /// Save object to stream
+  virtual void save(FXStream& store) const;
+
+  /// Load object from stream
+  virtual void load(FXStream& store);
 
   /// Destructor
   virtual ~FXImage();

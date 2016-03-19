@@ -18,6 +18,73 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+February 05 - FOX DEVELOPMENT 1.7.19
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Reversed arguments in fxfilematch() and FXPath::match(); this allows default parameter to be passed for
+pattern (which is also self-documenting).</li>
+<li>FXString::format() and FXString::vformat() now return size of the string; this is more useful than
+self-reference.</li>
+<li>FXSettings APIs now sport versions which take FXString reference.  This eliminates many ".text()" calls
+to pass char* pointers.</li>
+<li>FXRecentFiles now works on FXSettings, not FXApp. Now specifically disallows empty filenames.</li>
+<li>Added volume to FXStat.  Volume and index uniquely identify a file in the system, even when
+symlinks are used. Interpretation of these values other than simple comparisons depends on the
+operating system, however!</li>
+<li>FXDirVisitor split off into its own file.</li>
+<li>Major speed improvement in FXMat4d, FXMat4f matrix inversion: speeded up by over factor two;
+this is based on a specific Laplace Expansion of the 4x4 Matrix which is based on 2x2 subblocks
+instead of the usual development by a row and 3x3 minors.</li>
+<li>Based on the above techique, we also have a faster 4x4 determinant calculation [about 25%
+fewer floating point operations].</li>
+<li>Block editing of FXTable cells which are disabled.</li>
+<li>Wrote a little piece on the new half-float support and the theory behind its implementation
+in FOX: see <a href='http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf'>fasthalffloatconversion.pdf</a>.
+This paper explains the new half-float representation [similar to IEEE754 float and double], and how extremely
+fast conversions can be obtained.</li>
+<li>Eliminated automatic conversion of FXColor to- and from FXVec4 and FXVec3.  These API's have
+caused much hidden bugs and indeed after removing them even more bugs surfaces which were
+masked by these API's. <br>
+The New API's are colorToVec4f(), colorFromVec4f(), colorToVec3f(), colorFromVec3f(), and their
+equivalent double-precison flavors.<br>
+Also fixed at the same time is more correct rounding when convering from floating point to
+integral representations.</li>
+<li>Added FXAtomicPtr template class for lock-free programming support on SMP type systems.
+The new lock-free primitives require processor bus-locking support.  Due to at least
+some GCC versions having problems, the new FXAtomicInt and FXAtomicPtr implementation in
+FOX prefers to use the inline assembly version over the GCC __sync_xyz() style built-ins.
+Some of the API's have been renamed to more commonly (and succinct) names, such as cas() (compare-and-swap),
+set() (exchange).</li>
+<li>New code in FXThread for determining #processors.</li>
+<li>New API's added to FXImage. The colorize() API colorizes an image by multiplying its luminance
+by a given color argument. The fade() API fades the image to a uniform given color, based on a
+fading-factor.</li>
+<li>Some more stringent checking and tracing in FXGLVisual matching added.</li>
+<li>Workaround added for non-conforming handling or GLX 1.3 or newer by allowing
+0 for glXCreateWindow() in older glX implementations.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+February 05 - FOX STABLE 1.6.35
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Backported FXFont Freetype pitch size.</li>
+<li>Fixed compose context create issue.</li>
+<li>Bug fix in fxloadPPM() when ascii black and white bitmap is loaded.</li>
+<li>Call tr() when populating color names.</li>
+<li>Small bug in FXTextField when I-beam cursor surrounded by non-ascii UTF8 characters
+and it near the beginning or end of the string.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 November 24 - FOX DEVELOPMENT 1.7.18
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -51,12 +118,12 @@ are iconified/minimized, maximized, or restored through Window Manager.</li>
 pixel buffer is managed.</li>
 <li>Added getActualFontDesc() API to FXFont so we can get the info about which font was actually
 matched in a more convenient form than using the individual API's.</li>
-<li>DDS support now includes half float and float (R16F, G16R16F, A16B16G16R16F, R32F, G32R32F, A32B32G32R32F 
+<li>DDS support now includes half float and float (R16F, G16R16F, A16B16G16R16F, R32F, G32R32F, A32B32G32R32F
 formats.</li>
 <li>Fixed problem in FXMessageChannel: using Semaphore instead of Event on Windows fixes
 sporadic lock-ups.</li>
 <li>Added extra option to FXMessageBox.</li>
-<li>FXProgressDialog and FXProgressBar now support ID_SETINTRANGE and ID_GETINTRANGE, 
+<li>FXProgressDialog and FXProgressBar now support ID_SETINTRANGE and ID_GETINTRANGE,
 permitting connection through messages.</li>
 <li>Updated XDND system with DRAG_ASK. DRAG_ASK causes menu popup; this eliminates
 accidental drag-and-drops when you really wanted to click.</li>
@@ -1298,12 +1365,14 @@ google_ad_format = "728x90_as";
 
 <!--- COPYRIGHT -->
 <p>
-<table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>
-<img src='art/line.gif' width=100% height=1><font size=-1>
-Copyright &copy; 1997-2007 Jeroen van der Zijp</font>
-<!-- Begin Nedstat Basic code --><!-- Title: FOX --><!-- URL: http://www.fox-toolkit.org --><script language="JavaScript" src="http://m1.nedstatbasic.net/basic.js"></script>
-<A target=_blank href="http://v1.nedstatbasic.net/stats?ABDZOQqjU2gPjOQDQH/c7z1OusNg"><IMG src="http://m1.nedstatbasic.net/n?id=ABDZOQqjU2gPjOQDQH/c7z1OusNg&p=1&w=1280" border=0 width=18 height=18 align=right></A>
-</td></tr></table>
+<table width=100% cellpadding=0 cellspacing=0>
+<tr>
+<td width=100% valign=top id=HEADLINE align=right>
+<img src='art/line.gif' width=100% height=1>
+<font size=-1>Copyright &copy; 1997-2009 Jeroen van der Zijp</font>
+</td>
+</tr>
+</table>
 </p>
 <!--- COPYRIGHT -->
 

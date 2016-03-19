@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.h,v 1.56 2008/04/23 16:20:35 fox Exp $                        *
+* $Id: FXDCWindow.h,v 1.57 2009/01/06 13:07:22 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDCWINDOW_H
 #define FXDCWINDOW_H
@@ -152,7 +152,7 @@ public:
 
   /// Fill vertical gradient rectangle
   virtual void fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor top,FXColor bottom);
-  
+
   /// Fill horizontal gradient rectangle
   virtual void fillHorizontalGradient(FXint x,FXint y,FXint w,FXint h,FXColor left,FXColor right);
 

@@ -3,7 +3,7 @@
 *                            C h o i c e   B o x                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXChoiceBox.cpp,v 1.19 2008/01/04 15:42:05 fox Exp $                     *
+* $Id: FXChoiceBox.cpp,v 1.20 2009/01/06 13:24:27 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

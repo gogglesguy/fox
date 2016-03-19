@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.h,v 1.45 2008/01/30 17:27:39 fox Exp $                     *
+* $Id: FXFoldingList.h,v 1.46 2009/01/06 13:07:24 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXFOLDINGLIST_H
 #define FXFOLDINGLIST_H
@@ -240,9 +240,9 @@ typedef FXint (*FXFoldingListSortFunc)(const FXFoldingItem*,const FXFoldingItem*
 * In each of these cases, a pointer to the item, if any, is passed in the
 * 3rd argument of the message.
 * The text in each item is a string separated by tabs for each column;
-* in mini- or big-icon mode, only the text before the first tab is shown.  
+* in mini- or big-icon mode, only the text before the first tab is shown.
 * In detail-mode, the text before the first tab is shown in the first column,
-* the text between the first and second tab is shown in the second column, 
+* the text between the first and second tab is shown in the second column,
 * and so on.
 */
 class FXAPI FXFoldingList : public FXScrollArea {

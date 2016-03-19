@@ -3,7 +3,7 @@
 *                      B Z F i l e S t r e a m   C l a s s e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Lyle Johnson. All Rights Reserved.                 *
+* Copyright (C) 1999,2009 by Lyle Johnson. All Rights Reserved.                 *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.cpp,v 1.17 2008/07/02 19:05:39 fox Exp $                  *
+* $Id: FXBZFileStream.cpp,v 1.18 2009/01/06 13:24:26 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -65,8 +65,8 @@ struct BZBlock {
 // Create BZIP2 file stream
 FXBZFileStream::FXBZFileStream(const FXObject* cont):FXFileStream(cont),bz(NULL),ac(0){
   }
-  
-  
+
+
 // Create and open BZIP2 file stream
 FXBZFileStream::FXBZFileStream(const FXString& filename,FXStreamDirection save_or_load,FXuval size):bz(NULL),ac(0){
   open(filename,save_or_load,size);

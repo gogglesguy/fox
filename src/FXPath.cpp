@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.cpp,v 1.56 2008/09/12 20:09:28 fox Exp $                          *
+* $Id: FXPath.cpp,v 1.59 2009/01/06 13:24:37 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -72,23 +72,39 @@ using namespace FX;
 namespace FX {
 
 
-// Return root of given path; this is just "/" or "" if not absolute
+// Return root of given path, including share name or drive letter
 FXString FXPath::root(const FXString& file){
+  if(!file.empty()){
 #ifdef WIN32
-  if(ISPATHSEP(file[0])){
-    if(ISPATHSEP(file[1])) return PATHSEPSTRING PATHSEPSTRING;  // UNC
-    return FXSystem::getCurrentDrive()+PATHSEPSTRING;
-    }
-  if(Ascii::isLetter(file[0]) && file[1]==':'){                 // C:
-    return file.left(2)+PATHSEPSTRING;
-    }
-  return FXString::null;
+    FXString result=file;
+    FXint p=0;
+    FXint q=0;
+    if(ISPATHSEP(result[q])){                                   // UNC
+      result[p++]=PATHSEP; q++;
+      if(ISPATHSEP(result[q])){
+        result[p++]=PATHSEP; q++;
+        while(ISPATHSEP(result[q])) q++;
+        while(result[q]){
+          if(ISPATHSEP(result[q])){ result[p++]=PATHSEP; break; }
+          result[p++]=result[q++];
+          }
+        }
+      return result.trunc(p);
+      }
+    if(Ascii::isLetter(result[q]) && result[q+1]==':'){         // C:
+      result[p++]=result[q++]; result[p++]=':'; q++;
+      if(ISPATHSEP(result[q])){
+        result[p++]=PATHSEP;
+        }
+      return result.trunc(p);
+      }
 #else
-  if(ISPATHSEP(file[0])){
-    return PATHSEPSTRING;
+    if(ISPATHSEP(file[0])){
+      return PATHSEPSTRING;
+      }
+#endif
     }
   return FXString::null;
-#endif
   }
 
 
@@ -914,8 +930,8 @@ FXString FXPath::dequote(const FXString& file){
 
 
 // Match filenames using *, ?, [^a-z], and so on
-FXbool FXPath::match(const FXString& pattern,const FXString& file,FXuint flags){
-  return fxfilematch(pattern.text(),file.text(),flags);
+FXbool FXPath::match(const FXString& file,const FXString& pattern,FXuint flags){
+  return fxfilematch(file.text(),pattern.text(),flags);
   }
 
 

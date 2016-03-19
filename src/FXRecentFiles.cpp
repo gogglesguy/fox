@@ -3,7 +3,7 @@
 *                     R e c e n t   F i l e s   L i s t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRecentFiles.cpp,v 1.41 2008/01/04 15:42:29 fox Exp $                   *
+* $Id: FXRecentFiles.cpp,v 1.47 2009/01/07 13:25:39 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -41,14 +41,25 @@
   Notes:
   - Use the auto-hide or auto-gray feature to hide menus which are connected
     to the FXRecentFiles class.
-  - Default constructor should probably be deprecated in applications.
+  - Default constructor is deprecated in applications; used only for serialization.
 */
+
 
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Up to 32 files kepts
+const FXchar FXRecentFiles::key[32][7]={
+  {"FILE0"}, {"FILE1"}, {"FILE2"}, {"FILE3"}, {"FILE4"}, {"FILE5"}, {"FILE6"}, {"FILE7"},
+  {"FILE8"}, {"FILE9"}, {"FILE10"},{"FILE11"},{"FILE12"},{"FILE13"},{"FILE14"},{"FILE15"},
+  {"FILE16"},{"FILE17"},{"FILE18"},{"FILE19"},{"FILE20"},{"FILE21"},{"FILE22"},{"FILE23"},
+  {"FILE24"},{"FILE25"},{"FILE26"},{"FILE27"},{"FILE28"},{"FILE29"},{"FILE30"},{"FILE31"}
+  };
+
 
 
 // Furnish our own version
@@ -70,79 +81,79 @@ FXIMPLEMENT(FXRecentFiles,FXObject,FXRecentFilesMap,ARRAYNUMBER(FXRecentFilesMap
 
 
 // Serialization
-FXRecentFiles::FXRecentFiles():app(FXApp::instance()),target(NULL),message(0),group("Recent Files"),maxfiles(10){
-  }
-
-
-// Make new Recent Files group with default group
-FXRecentFiles::FXRecentFiles(FXApp* a):app(a),target(NULL),message(0),group("Recent Files"),maxfiles(10){
+FXRecentFiles::FXRecentFiles():settings(NULL),target(NULL),message(0),maxfiles(10){
   }
 
 
 // Make new Recent Files group
-FXRecentFiles::FXRecentFiles(FXApp* a,const FXString& gp,FXObject *tgt,FXSelector sel):app(a),target(tgt),message(sel),group(gp),maxfiles(10){
+FXRecentFiles::FXRecentFiles(FXApp* a,const FXString& gp,FXObject *tgt,FXSelector sel):settings(&a->reg()),target(tgt),message(sel),group(gp),maxfiles(10){
+  }
+
+
+// Make new Recent Files group
+FXRecentFiles::FXRecentFiles(FXSettings* st,const FXString& gp,FXObject *tgt,FXSelector sel):settings(st),target(tgt),message(sel),group(gp),maxfiles(10){
+  }
+
+
+
+// Change number of files we're tracking
+void FXRecentFiles::setMaxFiles(FXuint mx){
+  maxfiles=FXCLAMP(1,mx,ARRAYNUMBER(key));
   }
 
 
 // Obtain the filename at index
-FXString FXRecentFiles::getFile(FXint index) const {
-  FXchar key[20];
-  __snprintf(key,sizeof(key),"FILE%d",index);
-  return app->reg().readStringEntry(group.text(),key,FXString::null);
+FXString FXRecentFiles::getFile(FXuint index) const {
+  return settings->readStringEntry(group,key[index],FXString::null);
   }
 
 
 // Change the filename at index
-void FXRecentFiles::setFile(FXint index,const FXString& filename){
-  FXchar key[20];
-  __snprintf(key,sizeof(key),"FILE%d",index);
-  app->reg().writeStringEntry(group.text(),key,filename.text());
+void FXRecentFiles::setFile(FXuint index,const FXString& filename){
+  if(!filename.empty()){
+    settings->writeStringEntry(group,key[index],filename.text());
+    }
   }
 
 
 // Append a file; its added to the top of the list, and everything else
 // is moved down the list one notch; the last one is dropped from the list.
 void FXRecentFiles::appendFile(const FXString& filename){
-  FXString newname=filename;
-  FXString oldname;
-  FXchar key[20];
-  FXint i=1,j=1;
-  do{
+  if(!filename.empty()){
+    FXString newname=filename;
+    FXString oldname;
+    FXuint i=1,j=1;
     do{
-      __snprintf(key,sizeof(key),"FILE%d",j++);
-      oldname=app->reg().readStringEntry(group.text(),key,NULL);
+      do{ oldname=settings->readStringEntry(group,key[j++],NULL); }while(oldname==filename);
+      settings->writeStringEntry(group,key[i],newname.text());
+      newname=oldname;
       }
-    while(oldname==filename);
-    __snprintf(key,sizeof(key),"FILE%d",i++);
-    app->reg().writeStringEntry(group.text(),key,newname.text());
-    newname=oldname;
+    while(!oldname.empty() && ++i<=maxfiles);
     }
-  while(!oldname.empty() && i<=maxfiles);
   }
 
 
 // Remove a file
 void FXRecentFiles::removeFile(const FXString& filename){
-  FXchar key[20];
-  FXString name;
-  FXint i=1,j=1;
-  do{
-    __snprintf(key,sizeof(key),"FILE%d",i++);
-    name=app->reg().readStringEntry(group.text(),key,NULL);
-    app->reg().deleteEntry(group.text(),key);
-    if(name.empty()) break;
-    if(name!=filename){
-      __snprintf(key,sizeof(key),"FILE%d",j++);
-      app->reg().writeStringEntry(group.text(),key,name.text());
+  if(!filename.empty()){
+    FXString name;
+    FXuint i=1,j=1;
+    do{
+      name=settings->readStringEntry(group,key[i],NULL);
+      settings->deleteEntry(group,key[i]);
+      if(name.empty()) break;
+      if(name!=filename){
+        settings->writeStringEntry(group,key[j++],name.text());
+        }
       }
+    while(++i<=maxfiles);
     }
-  while(i<=maxfiles);
   }
 
 
 // Remove all files from the list
 void FXRecentFiles::clear(){
-  app->reg().deleteSection(group.text());
+  settings->deleteSection(group);
   }
 
 
@@ -155,14 +166,9 @@ long FXRecentFiles::onCmdClear(FXObject*,FXSelector,void*){
 
 // User clicks on one of the file names
 long FXRecentFiles::onCmdFile(FXObject*,FXSelector sel,void*){
-  const FXchar *filename;
-  FXchar key[20];
-  if(target){
-    __snprintf(key,sizeof(key),"FILE%d",(FXSELID(sel)-ID_FILE_1+1));
-    filename=app->reg().readStringEntry(group.text(),key,NULL);
-    if(filename){
-      target->handle(this,FXSEL(SEL_COMMAND,message),(void*)filename);
-      }
+  const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1+1],NULL);
+  if(filename){
+    if(target){ target->handle(this,FXSEL(SEL_COMMAND,message),(void*)filename); }
     }
   return 1;
   }
@@ -170,15 +176,11 @@ long FXRecentFiles::onCmdFile(FXObject*,FXSelector sel,void*){
 
 // Update handler for same
 long FXRecentFiles::onUpdFile(FXObject *sender,FXSelector sel,void*){
-  register FXint which=FXSELID(sel)-ID_FILE_1+1;
-  const FXchar *filename;
-  FXchar key[20];
-  __snprintf(key,sizeof(key),"FILE%d",which);
-  filename=app->reg().readStringEntry(group.text(),key,NULL);
+  const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1+1],NULL);
   if(filename){
     FXString string;
-    if(which<10)
-      string.format("&%d %s",which,filename);
+    if(FXSELID(sel)<ID_FILE_10)
+      string.format("&%d %s",FXSELID(sel)-ID_FILE_1+1,filename);
     else
       string.format("1&0 %s",filename);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&string);
@@ -193,7 +195,7 @@ long FXRecentFiles::onUpdFile(FXObject *sender,FXSelector sel,void*){
 
 // Show or hide depending on whether there are any files
 long FXRecentFiles::onUpdAnyFiles(FXObject *sender,FXSelector,void*){
-  if(app->reg().readStringEntry(group.text(),"FILE1",NULL))
+  if(settings->readStringEntry(group,key[1],NULL))
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SHOW),NULL);
   else
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_HIDE),NULL);
@@ -204,7 +206,7 @@ long FXRecentFiles::onUpdAnyFiles(FXObject *sender,FXSelector,void*){
 // Save data
 void FXRecentFiles::save(FXStream& store) const {
   FXObject::save(store);
-  store << app;
+  store << settings;
   store << target;
   store << message;
   store << group;
@@ -215,7 +217,7 @@ void FXRecentFiles::save(FXStream& store) const {
 // Load data
 void FXRecentFiles::load(FXStream& store){
   FXObject::load(store);
-  store >> app;
+  store >> settings;
   store >> target;
   store >> message;
   store >> group;

@@ -3,7 +3,7 @@
 *                         R u l e r V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRulerView.h,v 1.24 2008/01/04 15:18:23 fox Exp $                       *
+* $Id: FXRulerView.h,v 1.25 2009/01/06 13:07:27 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXRULERVIEW_H
 #define FXRULERVIEW_H

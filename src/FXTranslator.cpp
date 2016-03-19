@@ -3,7 +3,7 @@
 *                       M e s s a g e   T r a n s l a t o r                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTranslator.cpp,v 1.19 2008/03/24 21:32:29 fox Exp $                    *
+* $Id: FXTranslator.cpp,v 1.20 2009/01/06 13:24:43 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -42,10 +42,10 @@
   Notes:
   - Since the original input string is potentially used as output string if no
     translation is available, the original input string needs to be UTF8 also.
-  - The tr() function has an extra parameter count to allow translations which 
+  - The tr() function has an extra parameter count to allow translations which
     require special plural forms dependent on some number.  If set to -1 (default),
     the first available translation is used.
-  - 
+  -
 */
 
 using namespace FX;

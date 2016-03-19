@@ -3,7 +3,7 @@
 *                        O p e n G L   C o n e    O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCone.h,v 1.21 2008/01/04 15:18:19 fox Exp $                          *
+* $Id: FXGLCone.h,v 1.22 2009/01/06 13:07:24 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXGLCONE_H
 #define FXGLCONE_H

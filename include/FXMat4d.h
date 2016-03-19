@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4d.h,v 1.28 2008/01/04 15:18:21 fox Exp $                           *
+* $Id: FXMat4d.h,v 1.30 2009/01/26 09:40:22 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT4D_H
 #define FXMAT4D_H
@@ -27,6 +27,7 @@
 namespace FX {
 
 
+class FXQuatd;
 class FXMat3d;
 
 
@@ -36,7 +37,7 @@ protected:
   FXVec4d m[4];
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXMat4d(){}
 
   /// Initialize matrix from another matrix

@@ -49,6 +49,7 @@
 +FXDirDialog.obj &
 +FXDirList.obj &
 +FXDirSelector.obj &
++FXDirVisitor.obj &
 +FXDockBar.obj &
 +FXDockHandler.obj &
 +FXDockSite.obj &

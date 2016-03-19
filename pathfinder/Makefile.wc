@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.wc,v 1.15 2008/07/23 19:09:09 fox Exp $                      #
+# $Id: Makefile.wc,v 1.16 2009/01/19 20:54:19 fox Exp $                      #
 ##############################################################################
 
 # For use with OpenWatcom C++ v1.0 or later

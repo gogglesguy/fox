@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4d.cpp,v 1.38 2008/01/04 15:42:24 fox Exp $                         *
+* $Id: FXMat4d.cpp,v 1.43 2009/01/27 22:34:48 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -40,23 +40,6 @@
   - Goal is same effect as OpenGL.
 */
 
-
-#define DET2(a00,a01, \
-             a10,a11) ((a00)*(a11)-(a10)*(a01))
-
-#define DET3(a00,a01,a02, \
-             a10,a11,a12, \
-             a20,a21,a22) ((a00)*DET2(a11,a12,a21,a22) - \
-                           (a10)*DET2(a01,a02,a21,a22) + \
-                           (a20)*DET2(a01,a02,a11,a12))
-
-#define DET4(a00,a01,a02,a03, \
-             a10,a11,a12,a13, \
-             a20,a21,a22,a23, \
-             a30,a31,a32,a33) ((a00)*DET3(a11,a12,a13,a21,a22,a23,a31,a32,a33) - \
-                               (a10)*DET3(a01,a02,a03,a21,a22,a23,a31,a32,a33) + \
-                               (a20)*DET3(a01,a02,a03,a11,a12,a13,a31,a32,a33) - \
-                               (a30)*DET3(a01,a02,a03,a11,a12,a13,a21,a22,a23))
 
 using namespace FX;
 
@@ -670,10 +653,12 @@ FXMat4d& FXMat4d::scale(const FXVec3d& v){
 
 // Calculate determinant
 FXdouble FXMat4d::det() const {
-  return DET4(m[0][0],m[0][1],m[0][2],m[0][3],
-              m[1][0],m[1][1],m[1][2],m[1][3],
-              m[2][0],m[2][1],m[2][2],m[2][3],
-              m[3][0],m[3][1],m[3][2],m[3][3]);
+  return (m[0][0]*m[1][1]-m[0][1]*m[1][0]) * (m[2][2]*m[3][3]-m[2][3]*m[3][2]) -
+         (m[0][0]*m[1][2]-m[0][2]*m[1][0]) * (m[2][1]*m[3][3]-m[2][3]*m[3][1]) +
+         (m[0][0]*m[1][3]-m[0][3]*m[1][0]) * (m[2][1]*m[3][2]-m[2][2]*m[3][1]) +
+         (m[0][1]*m[1][2]-m[0][2]*m[1][1]) * (m[2][0]*m[3][3]-m[2][3]*m[3][0]) -
+         (m[0][1]*m[1][3]-m[0][3]*m[1][1]) * (m[2][0]*m[3][2]-m[2][2]*m[3][0]) +
+         (m[0][2]*m[1][3]-m[0][3]*m[1][2]) * (m[2][0]*m[3][1]-m[2][1]*m[3][0]);
   }
 
 
@@ -688,34 +673,38 @@ FXMat4d FXMat4d::transpose() const {
 
 // Invert matrix
 FXMat4d FXMat4d::invert() const {
-  FXMat4d r(1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0);
-  FXMat4d x(*this);
-  register FXdouble pvv,t;
-  register int i,j,pvi;
-  for(i=0; i<4; i++){
-    pvv=x[i][i];
-    pvi=i;
-    for(j=i+1; j<4; j++){   // Find pivot (largest in column i)
-      if(fabs(x[j][i])>fabs(pvv)){
-        pvi=j;
-        pvv=x[j][i];
-        }
-      }
-    FXASSERT(pvv != 0.0);  // Should not be singular
-    if(pvi!=i){             // Swap rows i and pvi
-      FXSWAP(r[i][0],r[pvi][0],t); FXSWAP(r[i][1],r[pvi][1],t); FXSWAP(r[i][2],r[pvi][2],t); FXSWAP(r[i][3],r[pvi][3],t);
-      FXSWAP(x[i][0],x[pvi][0],t); FXSWAP(x[i][1],x[pvi][1],t); FXSWAP(x[i][2],x[pvi][2],t); FXSWAP(x[i][3],x[pvi][3],t);
-      }
-    x[i][0]/=pvv; x[i][1]/=pvv; x[i][2]/=pvv; x[i][3]/=pvv;
-    r[i][0]/=pvv; r[i][1]/=pvv; r[i][2]/=pvv; r[i][3]/=pvv;
-    for(j=0; j<4; j++){     // Eliminate column i
-      if(j!=i){
-        t=x[j][i];
-        x[j][0]-=x[i][0]*t; x[j][1]-=x[i][1]*t; x[j][2]-=x[i][2]*t; x[j][3]-=x[i][3]*t;
-        r[j][0]-=r[i][0]*t; r[j][1]-=r[i][1]*t; r[j][2]-=r[i][2]*t; r[j][3]-=r[i][3]*t;
-        }
-      }
-    }
+  FXMat4d r;
+  register FXdouble A0=m[0][0]*m[1][1]-m[0][1]*m[1][0];
+  register FXdouble A1=m[0][0]*m[1][2]-m[0][2]*m[1][0];
+  register FXdouble A2=m[0][0]*m[1][3]-m[0][3]*m[1][0];
+  register FXdouble A3=m[0][1]*m[1][2]-m[0][2]*m[1][1];
+  register FXdouble A4=m[0][1]*m[1][3]-m[0][3]*m[1][1];
+  register FXdouble A5=m[0][2]*m[1][3]-m[0][3]*m[1][2];
+  register FXdouble B0=m[2][0]*m[3][1]-m[2][1]*m[3][0];
+  register FXdouble B1=m[2][0]*m[3][2]-m[2][2]*m[3][0];
+  register FXdouble B2=m[2][0]*m[3][3]-m[2][3]*m[3][0];
+  register FXdouble B3=m[2][1]*m[3][2]-m[2][2]*m[3][1];
+  register FXdouble B4=m[2][1]*m[3][3]-m[2][3]*m[3][1];
+  register FXdouble B5=m[2][2]*m[3][3]-m[2][3]*m[3][2];
+  register FXdouble dd=A0*B5-A1*B4+A2*B3+A3*B2-A4*B1+A5*B0;
+  FXASSERT(dd!=0.0);                                    // Should not be singular
+  dd=1.0/dd;
+  r[0][0]=(m[1][1]*B5-m[1][2]*B4+m[1][3]*B3)*dd;
+  r[1][0]=(m[1][2]*B2-m[1][0]*B5-m[1][3]*B1)*dd;
+  r[2][0]=(m[1][0]*B4-m[1][1]*B2+m[1][3]*B0)*dd;
+  r[3][0]=(m[1][1]*B1-m[1][0]*B3-m[1][2]*B0)*dd;
+  r[0][1]=(m[0][2]*B4-m[0][1]*B5-m[0][3]*B3)*dd;
+  r[1][1]=(m[0][0]*B5-m[0][2]*B2+m[0][3]*B1)*dd;
+  r[2][1]=(m[0][1]*B2-m[0][0]*B4-m[0][3]*B0)*dd;
+  r[3][1]=(m[0][0]*B3-m[0][1]*B1+m[0][2]*B0)*dd;
+  r[0][2]=(m[3][1]*A5-m[3][2]*A4+m[3][3]*A3)*dd;
+  r[1][2]=(m[3][2]*A2-m[3][0]*A5-m[3][3]*A1)*dd;
+  r[2][2]=(m[3][0]*A4-m[3][1]*A2+m[3][3]*A0)*dd;
+  r[3][2]=(m[3][1]*A1-m[3][0]*A3-m[3][2]*A0)*dd;
+  r[0][3]=(m[2][2]*A4-m[2][1]*A5-m[2][3]*A3)*dd;
+  r[1][3]=(m[2][0]*A5-m[2][2]*A2+m[2][3]*A1)*dd;
+  r[2][3]=(m[2][1]*A2-m[2][0]*A4-m[2][3]*A0)*dd;
+  r[3][3]=(m[2][0]*A3-m[2][1]*A1+m[2][2]*A0)*dd;
   return r;
   }
 

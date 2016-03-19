@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXVec3f.h,v 1.30 2008/01/04 15:18:28 fox Exp $                           *
+* $Id: FXVec3f.h,v 1.33 2009/02/04 18:11:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXVEC3F_H
 #define FXVEC3F_H
@@ -39,7 +39,7 @@ public:
   FXfloat z;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXVec3f(){}
 
   /// Initialize from another vector
@@ -51,17 +51,11 @@ public:
   /// Initialize from components
   FXVec3f(FXfloat xx,FXfloat yy,FXfloat zz=1.0f){x=xx;y=yy;z=zz;}
 
-  /// Initialize with color
-  FXVec3f(FXColor color);
-
   /// Return a non-const reference to the ith element
   FXfloat& operator[](FXint i){return (&x)[i];}
 
   /// Return a const reference to the ith element
   const FXfloat& operator[](FXint i) const {return (&x)[i];}
-
-  /// Assign color
-  FXVec3f& operator=(FXColor color);
 
   /// Assignment
   FXVec3f& operator=(const FXVec3f& v){x=v.x;y=v.y;z=v.z;return *this;}
@@ -89,9 +83,6 @@ public:
   operator const FXfloat*() const {return &x;}
   operator FXVec2f&(){return *reinterpret_cast<FXVec2f*>(this);}
   operator const FXVec2f&() const {return *reinterpret_cast<const FXVec2f*>(this);}
-
-  /// Convert to color
-  operator FXColor() const;
 
   /// Unary
   FXVec3f operator+() const { return *this; }
@@ -156,6 +147,10 @@ public:
   friend inline FXVec3f lo(const FXVec3f& a,const FXVec3f& b);
   friend inline FXVec3f hi(const FXVec3f& a,const FXVec3f& b);
 
+  /// Convert vector to color and back
+  friend FXAPI FXColor colorFromVec3f(const FXVec3f& vec);
+  friend FXAPI FXVec3f colorToVec3f(FXColor clr);
+
   /// Compute normal from three points a,b,c
   friend FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c);
 
@@ -195,6 +190,9 @@ inline FXbool operator>=(FXfloat n,const FXVec3f& a){return n>=a.x && n>=a.y && 
 
 inline FXVec3f lo(const FXVec3f& a,const FXVec3f& b){return FXVec3f(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z));}
 inline FXVec3f hi(const FXVec3f& a,const FXVec3f& b){return FXVec3f(FXMAX(a.x,b.x),FXMAX(a.y,b.y),FXMAX(a.z,b.z));}
+
+extern FXAPI FXColor colorFromVec3f(const FXVec3f& vec);
+extern FXAPI FXVec3f colorToVec3f(FXColor clr);
 
 extern FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c);
 extern FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f& d);

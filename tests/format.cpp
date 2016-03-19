@@ -3,9 +3,9 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: format.cpp,v 1.41 2008/07/18 20:32:31 fox Exp $                          *
+* $Id: format.cpp,v 1.42 2009/01/06 13:31:21 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 

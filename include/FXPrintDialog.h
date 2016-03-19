@@ -3,7 +3,7 @@
 *                        P r i n t   J o b   D i a l o g                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPrintDialog.h,v 1.20 2008/01/04 15:18:23 fox Exp $                     *
+* $Id: FXPrintDialog.h,v 1.21 2009/01/06 13:07:26 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXPRINTDIALOG_H
 #define FXPRINTDIALOG_H

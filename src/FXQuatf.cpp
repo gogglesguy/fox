@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXQuatf.cpp,v 1.35 2008/01/04 15:42:28 fox Exp $                         *
+* $Id: FXQuatf.cpp,v 1.41 2009/01/28 08:32:54 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -220,7 +220,6 @@ void FXQuatf::setYawRollPitch(FXfloat yaw,FXfloat roll,FXfloat pitch){
   z=cp*cr*sy-sp*sr*cy;
   w=cp*cr*cy+sp*sr*sy;
   }
-
 
 
 // Obtain roll, pitch, yaw
@@ -537,16 +536,27 @@ FXQuatf FXQuatf::conj() const {
 FXQuatf& FXQuatf::arc(const FXVec3f& f,const FXVec3f& t){
   register FXfloat dot=f.x*t.x+f.y*t.y+f.z*t.z,div;
   if(dot> 0.999999f){           // Unit quaternion
-    x= 0.0f;
-    y= 0.0f;
-    z= 0.0f;
-    w= 1.0f;
+    x=0.0f;
+    y=0.0f;
+    z=0.0f;
+    w=1.0f;
     }
-  else if(dot<-0.999999f){      // 180 quaternion
-    x= 0.0f;
-    y= 0.0f;
-    z=-1.0f;
-    w= 0.0f;
+  else if(dot<-0.999999f){      // 180 quaternion (Stephen Hardy)
+    x=f.y-f.z;
+    y=f.z-f.x;
+    z=f.x-f.y;
+    dot=x*x+y*y+z*z;
+    if(dot<0.1f){               // Ensure non-zero orthogonal vector
+      x=-f.y-f.z;
+      y=f.x-f.z;
+      z=f.x+f.y;
+      dot=x*x+y*y+z*z;
+      }
+    div=sqrtf(dot);             // Renormalize axis
+    x/=div;
+    y/=div;
+    z/=div;
+    w=0.0f;
     }
   else{
     div=sqrtf((dot+1.0f)*2.0f);
@@ -594,7 +604,7 @@ FXQuatf FXQuatf::operator*(const FXQuatf& q) const {
 
 According to someone on gdalgorithms list, this is faster:
 
-V' = V - 2 * cross( cross( q.xyz, V ) - q.w * V ), q.xyz )
+V' = V - 2 * cross( (cross( q.xyz, V ) - q.w * V ), q.xyz )
 
 ==
 v' = q.v.q*

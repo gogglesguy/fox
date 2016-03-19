@@ -3,7 +3,7 @@
 *                       F i l e   S t r e a m   C l a s s                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileStream.h,v 1.22 2008/07/02 19:05:39 fox Exp $                      *
+* $Id: FXFileStream.h,v 1.23 2009/01/06 13:07:24 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFILESTREAM_H
 #define FXFILESTREAM_H

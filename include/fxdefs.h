@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.206 2008/09/05 22:50:07 fox Exp $                           *
+* $Id: fxdefs.h,v 1.211 2009/01/21 12:35:21 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -307,8 +307,8 @@ enum FXClipAction {
   CLIP_COPY    = 0,                 /// Copy to clipboard
   CLIP_CUT     = 1                  /// Clip to clipboard
   };
-  
-  
+
+
 /// Origin of data
 enum FXDNDOrigin {
   FROM_SELECTION  = 0,              /// Primary selection
@@ -523,6 +523,9 @@ const FXTime forever=9223372036854775807L;
 
 /// Test if character c is at the start of a utf8 sequence
 #define FXISUTF(c) (((c)&0xC0)!=0x80)
+
+/// Average of two FXColor ca and FXColor cb
+#define FXAVGCOLOR(ca,cb) (((ca)&(cb))+((((ca)^(cb))&0xFEFEFEFE)>>1))
 
 
 // Definitions for big-endian machines
@@ -744,10 +747,10 @@ extern FXAPI void fxverify(const char* expression,const char* filename,unsigned 
 extern FXAPI void fxtrace(unsigned int level,const char* format,...) FX_PRINTF(2,3) ;
 
 /// Sleep n microseconds
-extern FXAPI void fxsleep(unsigned int n);
+extern FXAPI void fxsleep(FXuint n);
 
 /// Match a file name with a pattern
-extern FXAPI FXbool fxfilematch(const char *pattern,const char *string,FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
+extern FXAPI FXbool fxfilematch(const FXchar *string,const FXchar *pattern="*",FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
 
 /// Get highlight color
 extern FXAPI FXColor makeHiliteColor(FXColor clr);

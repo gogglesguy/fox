@@ -3,7 +3,7 @@
 *                          I C O   I m a g e   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2008 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2009 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXICOImage.h,v 1.25 2008/01/04 15:18:19 fox Exp $                        *
+* $Id: FXICOImage.h,v 1.26 2009/01/06 13:07:24 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXICOIMAGE_H
 #define FXICOIMAGE_H

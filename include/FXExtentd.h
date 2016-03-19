@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n    E x t e n t    C l a s s          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXExtentd.h,v 1.16 2008/01/04 15:18:18 fox Exp $                         *
+* $Id: FXExtentd.h,v 1.18 2009/01/26 09:40:22 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXEXTENTD_H
 #define FXEXTENTD_H
@@ -34,7 +34,7 @@ public:
   FXVec2d upper;
 public:
 
-  /// Default constructor
+  /// Default constructor; value is not initialized
   FXExtentd(){}
 
   /// Copy constructor

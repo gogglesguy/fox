@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.274 2008/07/08 18:50:51 fox Exp $                            *
+* $Id: FXApp.h,v 1.275 2009/01/06 13:07:21 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -523,10 +523,10 @@ public:
   virtual void detach();
 
   /**
-  * Add timeout message sel to be sent to target object tgt after an interval of ns 
-  * nanoseconds; the timer fires only once after the interval expires.  
+  * Add timeout message sel to be sent to target object tgt after an interval of ns
+  * nanoseconds; the timer fires only once after the interval expires.
   * The void* ptr is user data which will be passed into the void* ptr of the message
-  * handler.  
+  * handler.
   * If a timer with the same target and message already exists, it will be rescheduled.
   * Note: the smallest interval that one can wait is actually much larger
   * than a nanosecond; on Unix systems, the smallest interval is about 1000 ns,
@@ -535,11 +535,11 @@ public:
   void addTimeout(FXObject* tgt,FXSelector sel,FXTime ns=1000000000,void* ptr=NULL);
 
   /**
-  * Add deadline timeout message sel to be sent to target object tgt when the due time, 
-  * expressed in nanoseconds since Epoch (Jan 1, 1970), is reached.  
-  * This is the preferred way to schedule regularly occuring events, as the exact time of issue will 
-  * not suffer accumulating errors as with the addTimeout() method.  However, it is important to ensure 
-  * that the due time is sufficiently far into the future, as otherwise the system may be swamped 
+  * Add deadline timeout message sel to be sent to target object tgt when the due time,
+  * expressed in nanoseconds since Epoch (Jan 1, 1970), is reached.
+  * This is the preferred way to schedule regularly occuring events, as the exact time of issue will
+  * not suffer accumulating errors as with the addTimeout() method.  However, it is important to ensure
+  * that the due time is sufficiently far into the future, as otherwise the system may be swamped
   * executing nothing but timeout messages.
   */
   void addDeadline(FXObject* tgt,FXSelector sel,FXTime due=forever,void* ptr=NULL);
@@ -551,7 +551,7 @@ public:
   void removeTimeout(FXObject* tgt,FXSelector sel=0);
 
   /**
-  * Return true if a timeout with target object tgt and message sel has been set; 
+  * Return true if a timeout with target object tgt and message sel has been set;
   * if sel=0, return true if any timeout has been set with target object tgt.
   */
   FXbool hasTimeout(FXObject *tgt,FXSelector sel=0) const;
@@ -575,7 +575,7 @@ public:
   void addChore(FXObject* tgt,FXSelector sel,void *ptr=NULL);
 
   /**
-  * Remove chore identified by target object tgt and message sel; if sel=0, 
+  * Remove chore identified by target object tgt and message sel; if sel=0,
   * remove all idle processing messages which refernce object tgt.
   */
   void removeChore(FXObject* tgt,FXSelector sel=0);

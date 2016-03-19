@@ -3,7 +3,7 @@
 *                    T o o l   B a r   S h e l l   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToolBarShell.cpp,v 1.30 2008/03/25 20:00:59 fox Exp $                  *
+* $Id: FXToolBarShell.cpp,v 1.31 2009/01/06 13:24:43 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

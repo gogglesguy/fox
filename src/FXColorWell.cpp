@@ -3,7 +3,7 @@
 *                         C o l o r W e l l   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorWell.cpp,v 1.82 2008/07/22 20:46:37 fox Exp $                     *
+* $Id: FXColorWell.cpp,v 1.84 2009/01/06 13:24:27 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -621,7 +621,7 @@ long FXColorWell::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 
 
 // Update another Color Well
-long FXColorWell::onUpdColor(FXObject* sender,FXSelector,void* ptr){
+long FXColorWell::onUpdColor(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&rgba);
   return 1;
   }
