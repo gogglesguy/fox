@@ -366,9 +366,9 @@ void FXTabBar::layout(){
 
 
 // Set current subwindow
-void FXTabBar::setCurrent(FXint panel,FXbool notify){
-  if(panel!=current && 0<=panel && panel<numChildren()){
-    current=panel;
+void FXTabBar::setCurrent(FXint index,FXbool notify){
+  if(index!=current && 0<=index && index<numChildren()){
+    current=index;
     recalc();
     if(notify && target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)current); }
     }

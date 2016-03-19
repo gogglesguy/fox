@@ -54,7 +54,7 @@ private:
   FXuint   flags;
   FXuint   mode;
 public:
-  FXGlobVisitor():flags(FXDir::MatchAll),mode(FXPath::PathName|FXPath::NoEscape){}
+  FXGlobVisitor():flags(0),mode(0){}
   FXGlobVisitor(const FXGlobVisitor& org):pattern(org.pattern),flags(org.flags),mode(org.mode){}
   FXuint traverse(const FXString& path,const FXString& pat="*",FXuint flg=FXDir::MatchAll);
   virtual FXuint enter(const FXString& path);

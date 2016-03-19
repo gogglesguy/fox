@@ -137,6 +137,7 @@ FXDirVisitor::~FXDirVisitor(){
 /*******************************************************************************/
 
 
+
 // Recursively traverse starting from path
 FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& pat,FXuint flg){
   mode=(flg&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);

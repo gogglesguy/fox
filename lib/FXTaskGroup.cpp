@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                     P a r a l l e l   C o m p u t a t i o n                   *
+*                        T a s k   G r o u p   C l a s s                        *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 2012,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -36,24 +36,24 @@
 #include "FXWorker.h"
 #include "FXLFQueue.h"
 #include "FXThreadPool.h"
-#include "FXParallel.h"
+#include "FXTaskGroup.h"
 
 
 /*
   Notes:
-  
-  - FXTaskGroup executes a special runnable (FXTaskGroup::Task) executing the passed runnable. 
-    This special runnable has backlink to group, and group gets signaled by this special 
+
+  - FXTaskGroup executes a special runnable (FXTaskGroup::Task) executing the passed runnable.
+    This special runnable has backlink to group, and group gets signaled by this special
     runnable when its passed runnable is done.
-    
-  - The interface can be passed ANY FXRunnable. Why? because this is the most general, 
+
+  - The interface can be passed ANY FXRunnable. Why? because this is the most general,
     and runnables that were used for FXThreadPool could now be used for FXTaskGroup instead.
-    
-  - Of course, passing special runnable DIRECTLY may be a bit more efficient; but one problem 
+
+  - Of course, passing special runnable DIRECTLY may be a bit more efficient; but one problem
     is you'd have to re-implement the run() to explicitly update the completion counter, and
     thus this becomes something the user has to do rather than it being something done in the
     FOX library itself.  Someone will mess up.
-  
+
   - Early termination:
 
       o It should be possible to terminate a parallel group early.
@@ -65,7 +65,7 @@
       o A special case of early termination is abort. An abort should probably
         terminate not only the group, but also all the parent groups.
         Normal termination just causes early exit of the group.
-        
+
       o Should we also use FXRunnable's return code?
 
 */

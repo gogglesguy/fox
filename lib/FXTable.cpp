@@ -544,6 +544,7 @@ FXint FXTableItem::getHeight(const FXTable* table) const {
 void FXTableItem::save(FXStream& store) const {
   FXObject::save(store);
   store << label;
+  store << tip;
   store << icon;
   store << state;
   }
@@ -553,6 +554,7 @@ void FXTableItem::save(FXStream& store) const {
 void FXTableItem::load(FXStream& store){
   FXObject::load(store);
   store >> label;
+  store >> tip;
   store >> icon;
   store >> state;
   }
@@ -1274,8 +1276,28 @@ void FXTable::setItemText(FXint row,FXint col,const FXString& text,FXbool notify
 // Get item text
 FXString FXTable::getItemText(FXint row,FXint col) const {
   if(row<0 || col<0 || nrows<=row || ncols<=col){ fxerror("%s::getItemText: index out of range.\n",getClassName()); }
-  if(cells[row*ncols+col]) return cells[row*ncols+col]->getText();
-  return FXString::null;
+  register FXTableItem* item=cells[row*ncols+col];
+  return item ? item->getText() : FXString::null;
+  }
+
+
+// Change item's tooltip text
+void FXTable::setItemTipText(FXint row,FXint col,const FXString& text){
+  if(row<0 || nrows<=row || col<0 || ncols<=col){ fxerror("%s::setItemTipText: index out of range.\n",getClassName()); }
+  register FXTableItem* item=cells[row*ncols+col];
+  if(item==NULL){
+    cells[row*ncols+col]=item=createItem(FXString::null,NULL,NULL);
+    if(isItemSelected(row,col)) item->setSelected(true);
+    }
+  item->setTipText(text);
+  }
+
+
+// Get item's tooltip text
+FXString FXTable::getItemTipText(FXint row,FXint col) const {
+  if(row<0 || nrows<=row || col<0 || ncols<=col){ fxerror("%s::getItemTipText: index out of range.\n",getClassName()); }
+  register FXTableItem* item=cells[row*ncols+col];
+  return item ? item->getTipText() : FXString::null;
   }
 
 
@@ -1302,12 +1324,13 @@ void FXTable::setItemIcon(FXint row,FXint col,FXIcon* icon,FXbool owned,FXbool n
 // Get item icon
 FXIcon* FXTable::getItemIcon(FXint row,FXint col) const {
   if(row<0 || col<0 || nrows<=row || ncols<=col){ fxerror("%s::getItemIcon: index out of range.\n",getClassName()); }
-  return cells[row*ncols+col] ? cells[row*ncols+col]->getIcon() : NULL;
+  register FXTableItem* item=cells[row*ncols+col];
+  return item ? item->getIcon() : NULL;
   }
 
 
 // Set item data
-void FXTable::setItemData(FXint row,FXint col,void* ptr){
+void FXTable::setItemData(FXint row,FXint col,FXptr ptr){
   if(row<0 || col<0 || nrows<=row || ncols<=col){ fxerror("%s::setItemData: index out of range.\n",getClassName()); }
   register FXTableItem* item=cells[row*ncols+col];
   if(item==NULL){
@@ -1319,9 +1342,10 @@ void FXTable::setItemData(FXint row,FXint col,void* ptr){
 
 
 // Get item data
-void* FXTable::getItemData(FXint row,FXint col) const {
+FXptr FXTable::getItemData(FXint row,FXint col) const {
   if(row<0 || col<0 || nrows<=row || ncols<=col){ fxerror("%s::getItemData: index out of range.\n",getClassName()); }
-  return cells[row*ncols+col] ? cells[row*ncols+col]->getData() : NULL;
+  register FXTableItem* item=cells[row*ncols+col];
+  return item ? item->getData() : NULL;
   }
 
 
@@ -2008,7 +2032,7 @@ long FXTable::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
     c=colAtX(cx);
     r=rowAtY(cy);
     if(0<=r && 0<=c && r<nrows && c<ncols && cells[r*ncols+c]){
-      FXString text=cells[r*ncols+c]->getText();
+      FXString text=cells[r*ncols+c]->getTipText();
       sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&text);
       return 1;
       }

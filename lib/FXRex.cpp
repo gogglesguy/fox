@@ -2640,7 +2640,6 @@ const FXuchar FXRex::fallback[]={
   };
 
 
-
 // Construct empty regular expression object
 FXRex::FXRex():code((FXuchar*)(void*)fallback){
   }

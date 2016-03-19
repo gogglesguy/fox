@@ -74,8 +74,15 @@ using namespace FX;
 
 namespace FX {
 
+
+// Search and replace dialog registry section name
+const FXchar FXReplaceDialog::sectionName[]="SearchReplace";
+
+
 // Search and replace registry group
 static const FXchar searchgroup[]="SearchReplace";
+
+// Value key names
 static const FXchar skey[20][3]={"SA","SB","SC","SD","SE","SF","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SP","SQ","SR","SS","ST"};
 static const FXchar rkey[20][3]={"RA","RB","RC","RD","RE","RF","RG","RH","RI","RJ","RK","RL","RM","RN","RO","RP","RQ","RR","RS","RT"};
 static const FXchar mkey[20][3]={"MA","MB","MC","MD","ME","MF","MG","MH","MI","MJ","MK","ML","MM","MN","MO","MP","MQ","MR","MS","MT"};
@@ -121,7 +128,7 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* i
   FXVerticalFrame* entry=new FXVerticalFrame(toppart,LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
   searchlabel=new FXLabel(entry,tr("S&earch for:"),NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
   searchbox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
-  searchtext=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 3,3,3,3);
+  searchtext=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXVerticalFrame* searcharrows=new FXVerticalFrame(searchbox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   FXArrowButton* ar1=new FXArrowButton(searcharrows,this,ID_SEARCH_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
   FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_SEARCH_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
@@ -129,7 +136,7 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* i
   ar2->setArrowSize(3);
   replacelabel=new FXLabel(entry,tr("Replace &with:"),NULL,LAYOUT_LEFT);
   replacebox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
-  replacetext=new FXTextField(replacebox,26,this,ID_REPLACE_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 3,3,3,3);
+  replacetext=new FXTextField(replacebox,26,this,ID_REPLACE_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXVerticalFrame* replacearrows=new FXVerticalFrame(replacebox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   FXArrowButton* ar3=new FXArrowButton(replacearrows,this,ID_REPLACE_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
   FXArrowButton* ar4=new FXArrowButton(replacearrows,this,ID_REPLACE_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
@@ -233,16 +240,16 @@ void FXReplaceDialog::appendHistory(const FXString& search,const FXString& repla
   register const char* val;
   register int i;
   if(!search.empty()){
-    if(search!=getApp()->reg().readStringEntry(searchgroup,skey[0],FXString::null)){
+    if(search!=getApp()->reg().readStringEntry(sectionName,skey[0],FXString::null)){
       for(i=19; i>0; i--){
-        if((val=getApp()->reg().readStringEntry(searchgroup,skey[i-1],NULL))!=NULL) getApp()->reg().writeStringEntry(searchgroup,skey[i],val);
-        if((val=getApp()->reg().readStringEntry(searchgroup,rkey[i-1],NULL))!=NULL) getApp()->reg().writeStringEntry(searchgroup,rkey[i],val);
-        if((val=getApp()->reg().readStringEntry(searchgroup,mkey[i-1],NULL))!=NULL) getApp()->reg().writeStringEntry(searchgroup,mkey[i],val);
+        if((val=getApp()->reg().readStringEntry(sectionName,skey[i-1],NULL))!=NULL) getApp()->reg().writeStringEntry(sectionName,skey[i],val);
+        if((val=getApp()->reg().readStringEntry(sectionName,rkey[i-1],NULL))!=NULL) getApp()->reg().writeStringEntry(sectionName,rkey[i],val);
+        if((val=getApp()->reg().readStringEntry(sectionName,mkey[i-1],NULL))!=NULL) getApp()->reg().writeStringEntry(sectionName,mkey[i],val);
         }
       }
-    getApp()->reg().writeStringEntry(searchgroup,skey[0],search.text());
-    getApp()->reg().writeStringEntry(searchgroup,rkey[0],replace.text());
-    getApp()->reg().writeUIntEntry(searchgroup,mkey[0],mode);
+    getApp()->reg().writeStringEntry(sectionName,skey[0],search.text());
+    getApp()->reg().writeStringEntry(sectionName,rkey[0],replace.text());
+    getApp()->reg().writeUIntEntry(sectionName,mkey[0],mode);
     }
   }
 
@@ -250,15 +257,15 @@ void FXReplaceDialog::appendHistory(const FXString& search,const FXString& repla
 // Scroll back in search history
 long FXReplaceDialog::onCmdSearchHist(FXObject*,FXSelector sel,void*){
   if(FXSELID(sel)==ID_SEARCH_UP){
-    if(current<20 && getApp()->reg().readStringEntry(searchgroup,skey[current],NULL)) current++;
+    if(current<20 && getApp()->reg().readStringEntry(sectionName,skey[current],NULL)) current++;
     }
   else{
     if(current>0) current--;
     }
   if(current){
-    setSearchText(getApp()->reg().readStringEntry(searchgroup,skey[current-1],FXString::null));
-    setReplaceText(getApp()->reg().readStringEntry(searchgroup,rkey[current-1],FXString::null));
-    setSearchMode(getApp()->reg().readUIntEntry(searchgroup,mkey[current-1],SEARCH_EXACT|SEARCH_FORWARD));
+    setSearchText(getApp()->reg().readStringEntry(sectionName,skey[current-1],FXString::null));
+    setReplaceText(getApp()->reg().readStringEntry(sectionName,rkey[current-1],FXString::null));
+    setSearchMode(getApp()->reg().readUIntEntry(sectionName,mkey[current-1],SEARCH_EXACT|SEARCH_FORWARD));
     }
   else{
     setSearchText(FXString::null);
@@ -272,13 +279,13 @@ long FXReplaceDialog::onCmdSearchHist(FXObject*,FXSelector sel,void*){
 // Scroll back in replace history
 long FXReplaceDialog::onCmdReplaceHist(FXObject*,FXSelector sel,void*){
   if(FXSELID(sel)==ID_REPLACE_UP){
-    if(current<20 && getApp()->reg().readStringEntry(searchgroup,skey[current],NULL)) current++;
+    if(current<20 && getApp()->reg().readStringEntry(sectionName,skey[current],NULL)) current++;
     }
   else{
     if(current>0) current--;
     }
   if(current){
-    setReplaceText(getApp()->reg().readStringEntry(searchgroup,rkey[current-1],FXString::null));
+    setReplaceText(getApp()->reg().readStringEntry(sectionName,rkey[current-1],FXString::null));
     }
   else{
     setReplaceText(FXString::null);

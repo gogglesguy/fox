@@ -64,6 +64,11 @@ using namespace FX;
 namespace FX {
 
 
+// File dialog registry section name
+const FXchar FXFileDialog::sectionName[]="File Dialog";
+
+
+
 // Object implementation
 FXIMPLEMENT(FXFileDialog,FXDialogBox,NULL,0)
 
@@ -87,20 +92,20 @@ void FXFileDialog::initdialog(){
   filebox->acceptButton()->setSelector(FXDialogBox::ID_ACCEPT);
   filebox->cancelButton()->setTarget(this);
   filebox->cancelButton()->setSelector(FXDialogBox::ID_CANCEL);
-  setWidth(getApp()->reg().readIntEntry("File Dialog","width",getWidth()));
-  setHeight(getApp()->reg().readIntEntry("File Dialog","height",getHeight()));
-  setFileBoxStyle(getApp()->reg().readUIntEntry("File Dialog","style",getFileBoxStyle()));
-  showHiddenFiles(getApp()->reg().readBoolEntry("File Dialog","showhidden",showHiddenFiles()));
+  setWidth(getApp()->reg().readIntEntry(sectionName,"width",getWidth()));
+  setHeight(getApp()->reg().readIntEntry(sectionName,"height",getHeight()));
+  setFileBoxStyle(getApp()->reg().readUIntEntry(sectionName,"style",getFileBoxStyle()));
+  showHiddenFiles(getApp()->reg().readBoolEntry(sectionName,"showhidden",showHiddenFiles()));
   }
 
 
 // Hide window and save settings
 void FXFileDialog::hide(){
   FXDialogBox::hide();
-  getApp()->reg().writeIntEntry("File Dialog","width",getWidth());
-  getApp()->reg().writeIntEntry("File Dialog","height",getHeight());
-  getApp()->reg().writeUIntEntry("File Dialog","style",getFileBoxStyle());
-  getApp()->reg().writeBoolEntry("File Dialog","showhidden",showHiddenFiles());
+  getApp()->reg().writeIntEntry(sectionName,"width",getWidth());
+  getApp()->reg().writeIntEntry(sectionName,"height",getHeight());
+  getApp()->reg().writeUIntEntry(sectionName,"style",getFileBoxStyle());
+  getApp()->reg().writeBoolEntry(sectionName,"showhidden",showHiddenFiles());
   }
 
 

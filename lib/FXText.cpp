@@ -1311,7 +1311,7 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
   if(flgs&SEARCH_IGNORECASE) rexmode|=FXRex::IgnoreCase;
 
   // Try parse the regex
-  if(!rex.parse(string,rexmode)){
+  if(rex.parse(string,rexmode)==FXRex::ErrOK){
 
 FXTRACE((1,"string \"%s\" \n",string.text()));
 FXTRACE((1,"string :"));
@@ -3008,7 +3008,7 @@ void FXText::drawCursor(FXuint state){
 void FXText::paintCursor(FXDCWindow& dc) const {
   register FXint th=font->getFontHeight(),cursorx,cursory;
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()<=cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
+  if(getVisibleY()<cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
     cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
     if(getVisibleX()<=cursorx+3 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
@@ -3032,7 +3032,7 @@ void FXText::paintCursor(FXDCWindow& dc) const {
 void FXText::eraseCursor(FXDCWindow& dc) const {
   register FXint th=font->getFontHeight(),cursorx,cursory,cx,cy,ch,cw;
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()<=cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
+  if(getVisibleY()<cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
     cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
     if(getVisibleX()<=cursorx+3 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
@@ -3045,6 +3045,7 @@ void FXText::eraseCursor(FXDCWindow& dc) const {
         cw=FXMIN(cursorx+4,getVisibleX()+getVisibleWidth()-marginright)-cx;
         ch=getVisibleHeight()-margintop-marginbottom;
         dc.setClipRectangle(cx,cy,cw,ch);
+        FXASSERT(toprow<=cursorrow && cursorrow<toprow+nvisrows);
         drawTextRow(dc,cursorrow);
         }
       }
@@ -3095,6 +3096,8 @@ void FXText::drawTextRow(FXDCWindow& dc,FXint row) const {
   register FXuint newstyle;
   register FXint cw,sp,sc,ep,ec;
   register FXwchar cc;
+
+  FXASSERT(0<=linebeg && lineend<=length);
 
   // Back off past break-character, i.e. space or newline (if any)
   if(linebeg<linebreak && Ascii::isSpace(getByte(linebreak-1))) linebreak--;
@@ -5341,17 +5344,16 @@ void FXText::setOverstrike(FXbool over){
 
 
 // Set styled text mode
-void FXText::setStyled(FXbool styled){
+FXbool FXText::setStyled(FXbool styled){
   if(styled && !sbuffer){
-    if(!callocElms(sbuffer,length+gapend-gapstart)){
-      fxerror("%s::setStyled: out of memory.\n",getClassName());
-      }
+    if(!callocElms(sbuffer,length+gapend-gapstart)) return false;
     update();
     }
   if(!styled && sbuffer){
     freeElms(sbuffer);
     update();
     }
+  return true;
   }
 
 

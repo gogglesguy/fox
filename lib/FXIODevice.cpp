@@ -156,15 +156,15 @@ FXbool FXIODevice::flush(){
   }
 
 
-// Test if we're at the end
-FXbool FXIODevice::eof(){
-  return true;
+// Test if we're at the end; -1 if error
+FXint FXIODevice::eof(){
+  return -1;
   }
 
 
 // Return file size
 FXlong FXIODevice::size(){
-  return 0;
+  return -1;
   }
 
 

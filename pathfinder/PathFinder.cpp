@@ -953,21 +953,23 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
 long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
   FXint index=(FXint)(FXival)ptr;
   if(0<=index){
+  
+    // Get file name
+    FXString name=filelist->getItemPathname(index);
 
     // If directory, open the directory
     if(filelist->isItemDirectory(index)){
-      FXString directory=filelist->getItemPathname(index);
-      FXTRACE((10,"directory=%s\n",directory.text()));
-      filelist->setDirectory(directory,true);
-      dirlist->setDirectory(directory);
-      dirbox->setDirectory(directory);
-      address->setText(directory);
-      visitDirectory(directory);
+      FXTRACE((10,"directory=%s\n",name.text()));
+      filelist->setDirectory(name,true);
+      dirlist->setDirectory(name);
+      dirbox->setDirectory(name);
+      address->setText(name);
+      visitDirectory(name);
       }
 
     // If executable, execute it!
     else if(filelist->isItemExecutable(index)){
-      FXString executable=FXPath::enquote(filelist->getItemPathname(index)) + " &";
+      FXString executable=FXPath::enquote(name)+" &";
       FXTRACE((10,"system(%s)\n",executable.text()));
       system(executable.text());
       }
@@ -977,22 +979,22 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
 
       // Load image if preview mode on
       if(preview){
-        if(previewImage(filelist->getItemPathname(index))) return 1;
+        if(previewImage(name)) return 1;
         }
 
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
         if(association->command.text()){
-          FXString command=FXString::value(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
+          FXString command=FXString::value(association->command.text(),FXPath::enquote(name).text());
           FXTRACE((10,"system(%s)\n",command.text()));
           system(command.text());
           }
         else{
-          FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),filelist->getItemFilename(index).text());
+          FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),name.text());
           }
         }
       else{
-        FXMessageBox::information(this,MBOX_OK,tr("Unknown File Type"),tr("No association has been set for file: %s."),filelist->getItemFilename(index).text());
+        FXMessageBox::information(this,MBOX_OK,tr("Unknown File Type"),tr("No association has been set for file: %s."),name.text());
         }
       }
     }
@@ -1582,7 +1584,7 @@ long PathFinderMain::onCmdOpenWith(FXObject*,FXSelector,void*){
   FXString filename=filelist->getCurrentFile();
   if(FXInputDialog::getString(cmd,this,tr("Open File With"),tr("Open ") + FXPath::name(filename) + tr(" with:"))){
     getApp()->reg().writeStringEntry("SETTINGS","command",cmd.text());
-    FXString command=cmd+" "+filename+" &";
+    FXString command=cmd+" "+FXPath::enquote(filename)+" &";
     system(command.text());
 /*
     // Spawn child
@@ -1603,9 +1605,9 @@ long PathFinderMain::onCmdOpenWith(FXObject*,FXSelector,void*){
 
 // Open this file with the editor
 long PathFinderMain::onCmdOpenWithEditor(FXObject*,FXSelector,void*){
-  FXString currentfile=filelist->getCurrentFile();
-  if(!currentfile.empty()){
-    FXString executable=editor+" "+FXPath::enquote(currentfile)+" &";
+  FXString filename=filelist->getCurrentFile();
+  if(!filename.empty()){
+    FXString executable=editor+" "+FXPath::enquote(filename)+" &";
     FXTRACE((10,"system(%s)\n",executable.text()));
     system(executable.text());
     }

@@ -74,11 +74,11 @@ public:
   /// Flush to disk
   virtual FXbool flush();
 
+  /// Test if we're at the end; -1 if error
+  virtual FXint eof();
+
   /// Return file size
   virtual FXlong size();
-
-  /// Test if we're at the end
-  virtual FXbool eof();
 
   /// Close file
   virtual FXbool close();

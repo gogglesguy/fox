@@ -49,7 +49,10 @@ namespace FX {
 
 // Initialize matrix from scalar
 FXMat4f::FXMat4f(FXfloat s){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(m[0],_mm256_set1_ps(s));
+  _mm256_storeu_ps(m[2],_mm256_set1_ps(s));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(m[0],_mm_set1_ps(s));
   _mm_storeu_ps(m[1],_mm_set1_ps(s));
   _mm_storeu_ps(m[2],_mm_set1_ps(s));
@@ -507,7 +510,10 @@ FXMat4f FXMat4f::operator-() const {
 
 // Set to identity matrix
 FXMat4f& FXMat4f::identity(){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(m[0],_mm256_set_ps(0.0f,0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f,1.0f));
+  _mm256_storeu_ps(m[2],_mm256_set_ps(1.0f,0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f,0.0f));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(m[0],_mm_set_ps(0.0f,0.0f,0.0f,1.0f));
   _mm_storeu_ps(m[1],_mm_set_ps(0.0f,0.0f,1.0f,0.0f));
   _mm_storeu_ps(m[2],_mm_set_ps(0.0f,1.0f,0.0f,0.0f));
@@ -1019,7 +1025,8 @@ FXVec4f operator*(const FXMat4f& m,const FXVec4f& v){
   FXVec4f r;
   r0=_mm_hadd_ps(r0,r1);
   r2=_mm_hadd_ps(r2,r3);
-  _mm_storeu_ps(&r[0],_mm_hadd_ps(r0,r2));
+  r0=_mm_hadd_ps(r0,r2);
+  _mm_storeu_ps(&r[0],r0);
   return r;
 #else
   return FXVec4f(m[0][0]*v[0]+m[0][1]*v[1]+m[0][2]*v[2]+m[0][3]*v[3], m[1][0]*v[0]+m[1][1]*v[1]+m[1][2]*v[2]+m[1][3]*v[3], m[2][0]*v[0]+m[2][1]*v[1]+m[2][2]*v[2]+m[2][3]*v[3], m[3][0]*v[0]+m[3][1]*v[1]+m[3][2]*v[2]+m[3][3]*v[3]);

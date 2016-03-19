@@ -132,28 +132,28 @@ public:
   FXTreeItem* getCurrentItem() const;
 
   /// Fill tree list box by appending items from array of strings
-  FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill tree list box by appending items from newline separated strings
-  FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Insert [possibly subclassed] item under father before other item
   FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Insert item with given text and optional icons, and user-data pointer under father before other item
-  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
+  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Append [possibly subclassed] item as last child of father
   FXTreeItem* appendItem(FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Append item with given text and optional icons, and user-data pointer as last child of father
-  FXTreeItem* appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
+  FXTreeItem* appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Prepend [possibly subclassed] item as first child of father
   FXTreeItem* prependItem(FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Prepend item with given text and optional icons, and user-data pointer as first child of father
-  FXTreeItem* prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
+  FXTreeItem* prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Move item under father before other item
   FXTreeItem *moveItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item);
@@ -189,7 +189,7 @@ public:
   * the search direction; this can be combined with SEARCH_NOWRAP or SEARCH_WRAP
   * to control whether the search wraps at the start or end of the list.
   */
-  FXTreeItem* findItemByData(const void *ptr,FXTreeItem* start=NULL,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
+  FXTreeItem* findItemByData(FXptr ptr,FXTreeItem* start=NULL,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
   /// Return true if item is leaf-item, i.e. has no children
   FXbool isItemLeaf(const FXTreeItem* item) const;
@@ -222,10 +222,10 @@ public:
   FXIcon* getItemClosedIcon(const FXTreeItem* item) const;
 
   /// Change item's user data
-  void setItemData(FXTreeItem* item,void* ptr) const;
+  void setItemData(FXTreeItem* item,FXptr ptr) const;
 
   /// Return item's user data
-  void* getItemData(const FXTreeItem* item) const;
+  FXptr getItemData(const FXTreeItem* item) const;
 
   /// Return true if item is enabled
   FXbool isItemEnabled(const FXTreeItem* item) const;

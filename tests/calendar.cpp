@@ -96,8 +96,7 @@ TestWindow::TestWindow(FXApp *a):FXMainWindow(a,"Calendar Test Program",NULL,NUL
   FXVerticalFrame *vframe3=new FXVerticalFrame(hframe,LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH);
 
   FXGroupBox *box=new FXGroupBox(vframe2,"Calendar View",FRAME_RIDGE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-  view=new FXCalendar(box,/*&dt_date,FXDataTarget::ID_VALUE,*/NULL,0,/*LAYOUT_FILL_X|LAYOUT_FILL_Y|*/FRAME_SUNKEN|FRAME_THICK);
-  //view->disable();
+  view=new FXCalendar(box,&dt_date,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
 
   hframe=new FXHorizontalFrame(box);
   new FXLabel(hframe,"Julian Day Number");

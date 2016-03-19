@@ -629,8 +629,8 @@ public:
   /// Return true if overstrike mode in effect
   FXbool isOverstrike() const;
 
-  /// Set styled text mode
-  void setStyled(FXbool styled=true);
+  /// Set styled text mode; return true if success
+  FXbool setStyled(FXbool styled=true);
 
   /// Return true if style buffer
   FXbool isStyled() const { return (sbuffer!=NULL); }

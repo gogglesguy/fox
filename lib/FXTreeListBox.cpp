@@ -527,7 +527,7 @@ FXTreeItem* FXTreeListBox::findItem(const FXString& text,FXTreeItem* start,FXuin
 
 
 // Get item by data
-FXTreeItem* FXTreeListBox::findItemByData(const void *ptr,FXTreeItem* start,FXuint flgs) const {
+FXTreeItem* FXTreeListBox::findItemByData(FXptr ptr,FXTreeItem* start,FXuint flgs) const {
   return tree->findItemByData(ptr,start,flgs);
   }
 
@@ -603,13 +603,13 @@ FXIcon* FXTreeListBox::getItemClosedIcon(const FXTreeItem* item) const{
 
 
 // Set item data
-void FXTreeListBox::setItemData(FXTreeItem* item,void* ptr) const {
+void FXTreeListBox::setItemData(FXTreeItem* item,FXptr ptr) const {
   tree->setItemData(item,ptr);
   }
 
 
 // Get item data
-void* FXTreeListBox::getItemData(const FXTreeItem* item) const {
+FXptr FXTreeListBox::getItemData(const FXTreeItem* item) const {
   return tree->getItemData(item);
   }
 

@@ -35,7 +35,7 @@ class FXAPI FXId : public FXObject {
   FXDECLARE_ABSTRACT(FXId)
 private:
   FXApp *app;             // Back link to application object
-  void  *data;            // User data
+  FXptr  data;            // User data
 protected:
   FXID   xid;
 private:
@@ -62,10 +62,10 @@ public:
   virtual void destroy();
 
   /// Set user data pointer
-  void setUserData(void *ptr){ data=ptr; }
+  void setUserData(FXptr ptr){ data=ptr; }
 
   /// Get user data pointer
-  void* getUserData() const { return data; }
+  FXptr getUserData() const { return data; }
 
   /// Save object to stream
   virtual void save(FXStream& store) const;

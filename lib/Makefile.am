@@ -347,7 +347,6 @@ FXPNGImage.cpp \
 FXPPMIcon.cpp \
 FXPPMImage.cpp \
 FXPacker.cpp \
-FXParallel.cpp \
 FXPath.cpp \
 FXPicker.cpp \
 FXPipe.cpp  \
@@ -420,6 +419,7 @@ FXTabBar.cpp \
 FXTabBook.cpp \
 FXTabItem.cpp \
 FXTable.cpp \
+FXTaskGroup.cpp \
 FXText.cpp \
 FXTextCodec.cpp \
 FXTextField.cpp \

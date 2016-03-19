@@ -184,7 +184,7 @@ long HeaderWindow::onCmdAbout(FXObject*,FXSelector,void*){
 
 // Changed the header control
 long HeaderWindow::onCmdHeader(FXObject*,FXSelector,void* ptr){
-  FXint which=(FXint)(long)ptr;
+  FXint which=(FXint)(FXival)ptr;
   FXASSERT(0<=which && which<4);
   FXTRACE((1,"Width of item %d = %d\n",which,header1->getItemSize(which)));
   list[which]->setWidth(header1->getItemSize(which));
@@ -194,7 +194,7 @@ long HeaderWindow::onCmdHeader(FXObject*,FXSelector,void* ptr){
 
 // Clicked a header button:- we highlight all in the list
 long HeaderWindow::onCmdHeaderButton(FXObject*,FXSelector,void* ptr){
-  FXint which=(FXint)(long)ptr;
+  FXint which=(FXint)(FXival)ptr;
   FXint i;
   FXASSERT(0<=which && which<4);
   for(i=0; i<list[which]->getNumItems(); i++){

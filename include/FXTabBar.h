@@ -111,7 +111,7 @@ public:
   * tab bar will also send a SEL_COMMAND message to its target, containing
   * the currently active tab index in the void pointer.
   */
-  virtual void setCurrent(FXint panel,FXbool notify=false);
+  virtual void setCurrent(FXint index,FXbool notify=false);
 
   /// Return the currently active tab item
   FXint getCurrent() const { return current; }

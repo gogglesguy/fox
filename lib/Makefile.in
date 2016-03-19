@@ -150,12 +150,12 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXMessageChannel.lo FXMetaClass.lo FXMutex.lo FXObject.lo \
 	FXObjectList.lo FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo \
 	FXPNGIcon.lo FXPNGImage.lo FXPPMIcon.lo FXPPMImage.lo \
-	FXPacker.lo FXParallel.lo FXPath.lo FXPicker.lo FXPipe.lo \
-	FXPopup.lo FXPoint.lo FXPrintDialog.lo FXProcess.lo \
-	FXProgressBar.lo FXProgressDialog.lo FXPtrList.lo \
-	FXPtrQueue.lo FXQuatd.lo FXQuatf.lo FXRASIcon.lo FXRASImage.lo \
-	FXRGBIcon.lo FXRGBImage.lo FXRadioButton.lo FXRandom.lo \
-	FXRangef.lo FXRanged.lo FXRangeSlider.lo FXReadWriteLock.lo \
+	FXPacker.lo FXPath.lo FXPicker.lo FXPipe.lo FXPopup.lo \
+	FXPoint.lo FXPrintDialog.lo FXProcess.lo FXProgressBar.lo \
+	FXProgressDialog.lo FXPtrList.lo FXPtrQueue.lo FXQuatd.lo \
+	FXQuatf.lo FXRASIcon.lo FXRASImage.lo FXRGBIcon.lo \
+	FXRGBImage.lo FXRadioButton.lo FXRandom.lo FXRangef.lo \
+	FXRanged.lo FXRangeSlider.lo FXReadWriteLock.lo \
 	FXRealSlider.lo FXRealSpinner.lo FXRecentFiles.lo \
 	FXRectangle.lo FXRegion.lo FXRegistry.lo FXReplaceDialog.lo \
 	FXRex.lo FXRootWindow.lo FXRuler.lo FXRulerView.lo \
@@ -168,15 +168,15 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXStatusBar.lo FXStatusLine.lo FXStream.lo FXString.lo \
 	FXStringDict.lo FXSwitcher.lo FXSystem.lo FXTGAIcon.lo \
 	FXTGAImage.lo FXTIFIcon.lo FXTIFImage.lo FXTabBar.lo \
-	FXTabBook.lo FXTabItem.lo FXTable.lo FXText.lo FXTextCodec.lo \
-	FXTextField.lo FXThread.lo FXThreadPool.lo FXToggleButton.lo \
-	FXToolBar.lo FXToolBarGrip.lo FXToolBarShell.lo \
-	FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo FXTranslator.lo \
-	FXTreeList.lo FXTreeListBox.lo FXTriStateButton.lo \
-	FXUndoList.lo FXURL.lo FXVec2d.lo FXVec2f.lo FXVec3d.lo \
-	FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
-	FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo FXWindow.lo \
-	FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
+	FXTabBook.lo FXTabItem.lo FXTable.lo FXTaskGroup.lo FXText.lo \
+	FXTextCodec.lo FXTextField.lo FXThread.lo FXThreadPool.lo \
+	FXToggleButton.lo FXToolBar.lo FXToolBarGrip.lo \
+	FXToolBarShell.lo FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo \
+	FXTranslator.lo FXTreeList.lo FXTreeListBox.lo \
+	FXTriStateButton.lo FXUndoList.lo FXURL.lo FXVec2d.lo \
+	FXVec2f.lo FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo \
+	FXVerticalFrame.lo FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo \
+	FXWindow.lo FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxcpuid.lo \
 	fxbmpio.lo fxddsio.lo fxezquantize.lo fxfsquantize.lo \
 	fxgetticks.lo fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo \
@@ -696,7 +696,6 @@ FXPNGImage.cpp \
 FXPPMIcon.cpp \
 FXPPMImage.cpp \
 FXPacker.cpp \
-FXParallel.cpp \
 FXPath.cpp \
 FXPicker.cpp \
 FXPipe.cpp  \
@@ -769,6 +768,7 @@ FXTabBar.cpp \
 FXTabBook.cpp \
 FXTabItem.cpp \
 FXTable.cpp \
+FXTaskGroup.cpp \
 FXText.cpp \
 FXTextCodec.cpp \
 FXTextField.cpp \
@@ -1134,7 +1134,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPPMIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPPMImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPacker.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXParallel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPath.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPicker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPipe.Plo@am__quote@
@@ -1207,6 +1206,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTabBook.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTabItem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTaskGroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXText.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTextCodec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTextField.Plo@am__quote@

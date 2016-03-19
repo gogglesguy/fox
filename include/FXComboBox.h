@@ -167,7 +167,7 @@ public:
   FXString getItem(FXint index) const;
 
   /// Replace the item at index
-  FXint setItem(FXint index,const FXString& text,void* ptr=NULL,FXbool notify=false);
+  FXint setItem(FXint index,const FXString& text,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill combo box by appending items from array of strings
   FXint fillItems(const FXchar** strings,FXbool notify=false);
@@ -176,13 +176,13 @@ public:
   FXint fillItems(const FXString& strings,FXbool notify=false);
 
   /// Insert a new item at index
-  FXint insertItem(FXint index,const FXString& text,void* ptr=NULL,FXbool notify=false);
+  FXint insertItem(FXint index,const FXString& text,FXptr ptr=NULL,FXbool notify=false);
 
   /// Append an item to the list
-  FXint appendItem(const FXString& text,void* ptr=NULL,FXbool notify=false);
+  FXint appendItem(const FXString& text,FXptr ptr=NULL,FXbool notify=false);
 
   /// Prepend an item to the list
-  FXint prependItem(const FXString& text,void* ptr=NULL,FXbool notify=false);
+  FXint prependItem(const FXString& text,FXptr ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
   FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
@@ -212,7 +212,7 @@ public:
   * search direction; this can be combined with SEARCH_NOWRAP or SEARCH_WRAP
   * to control whether the search wraps at the start or end of the list.
   */
-  FXint findItemByData(const void *ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
+  FXint findItemByData(FXptr ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
   /// Set text for specified item
   void setItemText(FXint index,const FXString& text);
@@ -221,10 +221,10 @@ public:
   FXString getItemText(FXint index) const;
 
   /// Set data pointer for specified item
-  void setItemData(FXint index,void* ptr) const;
+  void setItemData(FXint index,FXptr ptr) const;
 
   /// Get data pointer for specified item
-  void* getItemData(FXint index) const;
+  FXptr getItemData(FXint index) const;
 
   /// Return true if item is enabled
   FXbool isItemEnabled(FXint index) const;

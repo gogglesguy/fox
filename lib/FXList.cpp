@@ -519,14 +519,14 @@ FXIcon* FXList::getItemIcon(FXint index) const {
 
 
 // Set item data
-void FXList::setItemData(FXint index,void* ptr){
+void FXList::setItemData(FXint index,FXptr ptr){
   if(index<0 || items.no()<=index){ fxerror("%s::setItemData: index out of range.\n",getClassName()); }
   items[index]->setData(ptr);
   }
 
 
 // Get item data
-void* FXList::getItemData(FXint index) const {
+FXptr FXList::getItemData(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::getItemData: index out of range.\n",getClassName()); }
   return items[index]->getData();
   }
@@ -1542,7 +1542,7 @@ void FXList::setAnchorItem(FXint index){
 
 
 // Create custom item
-FXListItem *FXList::createItem(const FXString& text,FXIcon* icon,void* ptr){
+FXListItem *FXList::createItem(const FXString& text,FXIcon* icon,FXptr ptr){
   return new FXListItem(text,icon,ptr);
   }
 
@@ -1589,7 +1589,7 @@ FXint FXList::setItem(FXint index,FXListItem* item,FXbool notify){
 
 
 // Replace item with another
-FXint FXList::setItem(FXint index,const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
+FXint FXList::setItem(FXint index,const FXString& text,FXIcon *icon,FXptr ptr,FXbool notify){
   return setItem(index,createItem(text,icon,ptr),notify);
   }
 
@@ -1637,7 +1637,7 @@ FXint FXList::insertItem(FXint index,FXListItem* item,FXbool notify){
 
 
 // Insert item
-FXint FXList::insertItem(FXint index,const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
+FXint FXList::insertItem(FXint index,const FXString& text,FXIcon *icon,FXptr ptr,FXbool notify){
   return insertItem(index,createItem(text,icon,ptr),notify);
   }
 
@@ -1649,7 +1649,7 @@ FXint FXList::appendItem(FXListItem* item,FXbool notify){
 
 
 // Append item
-FXint FXList::appendItem(const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
+FXint FXList::appendItem(const FXString& text,FXIcon *icon,FXptr ptr,FXbool notify){
   return insertItem(items.no(),createItem(text,icon,ptr),notify);
   }
 
@@ -1661,13 +1661,13 @@ FXint FXList::prependItem(FXListItem* item,FXbool notify){
 
 
 // Prepend item
-FXint FXList::prependItem(const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
+FXint FXList::prependItem(const FXString& text,FXIcon *icon,FXptr ptr,FXbool notify){
   return insertItem(0,createItem(text,icon,ptr),notify);
   }
 
 
 // Fill list by appending items from array of strings
-FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,void* ptr,FXbool notify){
+FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,FXptr ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){
@@ -1679,7 +1679,7 @@ FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,void* ptr,FXbool not
 
 
 // Fill list by appending items from newline separated strings
-FXint FXList::fillItems(const FXString& strings,FXIcon *icon,void* ptr,FXbool notify){
+FXint FXList::fillItems(const FXString& strings,FXIcon *icon,FXptr ptr,FXbool notify){
   register FXint beg=0,end=0,n=0;
   while(end<strings.length()){
     beg=end;
@@ -1892,7 +1892,7 @@ FXint FXList::findItem(const FXString& string,FXint start,FXuint flgs) const {
 
 
 // Get item by data
-FXint FXList::findItemByData(const void *ptr,FXint start,FXuint flgs) const {
+FXint FXList::findItemByData(FXptr ptr,FXint start,FXuint flgs) const {
   register FXint index;
   if(0<items.no()){
     if(flgs&SEARCH_BACKWARD){

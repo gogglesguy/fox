@@ -2025,7 +2025,7 @@ void FXTreeList::setAnchorItem(FXTreeItem* item){
 
 
 // Create item
-FXTreeItem* FXTreeList::createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr){
+FXTreeItem* FXTreeList::createItem(const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr){
   return new FXTreeItem(text,oi,ci,ptr);
   }
 
@@ -2099,7 +2099,7 @@ FXTreeItem* FXTreeList::insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeIt
 
 
 // Insert item under father before other item
-FXTreeItem* FXTreeList::insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXTreeItem* FXTreeList::insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   return insertItem(other,father,createItem(text,oi,ci,ptr),notify);
   }
 
@@ -2111,7 +2111,7 @@ FXTreeItem* FXTreeList::appendItem(FXTreeItem* father,FXTreeItem* item,FXbool no
 
 
 // Append item under father
-FXTreeItem* FXTreeList::appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXTreeItem* FXTreeList::appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   return insertItem(NULL,father,createItem(text,oi,ci,ptr),notify);
   }
 
@@ -2122,13 +2122,13 @@ FXTreeItem* FXTreeList::prependItem(FXTreeItem* father,FXTreeItem* item,FXbool n
   }
 
 // Prepend item under father
-FXTreeItem* FXTreeList::prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXTreeItem* FXTreeList::prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   return insertItem(father?father->first:firstitem,father,createItem(text,oi,ci,ptr),notify);
   }
 
 
 // Fill list by appending items from array of strings
-FXint FXTreeList::fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXint FXTreeList::fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){
@@ -2140,7 +2140,7 @@ FXint FXTreeList::fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi
 
 
 // Fill list by appending items from newline separated strings
-FXint FXTreeList::fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+FXint FXTreeList::fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   register FXint beg=0,end=0,n=0;
   while(end<strings.length()){
     beg=end;
@@ -2391,7 +2391,7 @@ FXTreeItem* FXTreeList::findItem(const FXString& text,FXTreeItem* start,FXuint f
 
 
 // Get item by data
-FXTreeItem* FXTreeList::findItemByData(const void *ptr,FXTreeItem* start,FXuint flgs) const {
+FXTreeItem* FXTreeList::findItemByData(FXptr ptr,FXTreeItem* start,FXuint flgs) const {
   register FXTreeItem *item;
   if(firstitem){
     if(flgs&SEARCH_BACKWARD){

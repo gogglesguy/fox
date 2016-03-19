@@ -84,10 +84,10 @@ public:
   /// Flush to disk
   virtual FXbool flush();
 
-  /// Test if we're at the end
-  virtual FXbool eof();
+  /// Test if we're at the end; -1 if error
+  virtual FXint eof();
 
-  /// Return size of i/o device
+  /// Return size 
   virtual FXlong size();
 
   /// Close handle

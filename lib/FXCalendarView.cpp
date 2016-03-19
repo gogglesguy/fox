@@ -95,7 +95,7 @@ FXCalendarView::FXCalendarView(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   message=sel;
   has_selection=false;
   selected=current=FXDate::localDate();
-  firstday=0; // Sunday
+  firstday=FXDate::Sun; // Sunday
 
   // Setup Default Colors
   todayColor=FXRGB(0,180,0);

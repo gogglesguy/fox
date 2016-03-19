@@ -38,6 +38,8 @@ class FXAPI FXFileDialog : public FXDialogBox {
 protected:
   FXFileSelector *filebox;
 protected:
+  static const FXchar sectionName[];
+protected:
   FXFileDialog(){}
   void initdialog();
 private:
