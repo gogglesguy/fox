@@ -107,25 +107,25 @@ PropertyDialog::PropertyDialog(FXWindow *own):FXDialogBox(own,"Properties",DECOR
   new FXLabel(accessmatrix,tr("Special"),NULL,LAYOUT_CENTER_X);
 
   new FXLabel(accessmatrix,tr("&User"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_RUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[8]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_RUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[7]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[6]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
   new FXLabel(accessmatrix,tr("Set UID"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SUID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[9]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SUID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 
   new FXLabel(accessmatrix,tr("&Group"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_RGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[5]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_RGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[4]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[3]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
   new FXLabel(accessmatrix,tr("Set GID"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SGID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[10]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SGID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 
   new FXLabel(accessmatrix,tr("&Other"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_ROTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[2]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_ROTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[1]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[0]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
   new FXLabel(accessmatrix,tr("Sticky"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SVTX,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  filemode[11]=new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SVTX,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 
   FXGroupBox *ownergroup=new FXGroupBox(permFrame,tr("Ownership"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
   FXMatrix *ownermatrix=new FXMatrix(ownergroup,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y);

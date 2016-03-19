@@ -246,7 +246,7 @@ FXuint FXConsole::styleOf(FXint line,FXint index,FXint p,FXint c) const {
 
 
 // Draw fragment of text in given style
-void FXConsole::drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint,FXint,const FXchar *text,FXint n,FXuint style) const {
+void FXConsole::drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint,FXint,const FXchar *text,FXint n,FXuint sty) const {
   register FXColor color=FXRGB(255,255,255);
   dc.setForeground(color);
   y+=font->getFontAscent();

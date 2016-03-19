@@ -219,7 +219,7 @@ FXMat4f& FXMat4f::operator=(const FXMat4f& s){
 FXMat4f& FXMat4f::operator=(const FXQuatf& quat){
   return set(FXMat3f(quat));
   }
-  
+
 
 // Assignment from array
 FXMat4f& FXMat4f::operator=(const FXfloat s[]){
@@ -361,7 +361,7 @@ FXMat4f& FXMat4f::set(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const F
 FXMat4f& FXMat4f::set(const FXQuatf& quat){
   return set(FXMat3f(quat));
   }
-  
+
 
 // Add matrices
 FXMat4f& FXMat4f::operator+=(const FXMat4f& s){
@@ -949,8 +949,8 @@ FXMat4f FXMat4f::rigidInvert() const {
   r[3][3]=1.0f;
   return r;
   }
-
-
+ 
+ 
 // Matrix times vector
 FXVec3f operator*(const FXMat4f& m,const FXVec3f& v){
 #if defined(FOX_HAS_SSE3)
@@ -1004,10 +1004,9 @@ FXVec3f operator*(const FXVec3f& v,const FXMat4f& m){
   register __m128 m1=_mm_loadu_ps(m[1]);
   register __m128 m2=_mm_loadu_ps(m[2]);
   register __m128 m3=_mm_loadu_ps(m[3]);
-  register __m128 vv=_mm_loadu_ps(v);
-  register __m128 v0=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(0,0,0,0));
-  register __m128 v1=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(1,1,1,1));
-  register __m128 v2=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(2,2,2,2));
+  register __m128 v0=_mm_set1_ps(v[0]);
+  register __m128 v1=_mm_set1_ps(v[1]);
+  register __m128 v2=_mm_set1_ps(v[2]);
   register __m128 rr=_mm_add_ps(_mm_add_ps(_mm_mul_ps(v0,m0),_mm_mul_ps(v1,m1)),_mm_add_ps(_mm_mul_ps(v2,m2),m3));
   FXVec3f r;
   _mm_storel_pi((__m64*)&r[0],rr);
@@ -1026,11 +1025,10 @@ FXVec4f operator*(const FXVec4f& v,const FXMat4f& m){
   register __m128 m1=_mm_loadu_ps(m[1]);
   register __m128 m2=_mm_loadu_ps(m[2]);
   register __m128 m3=_mm_loadu_ps(m[3]);
-  register __m128 vv=_mm_loadu_ps(v);
-  register __m128 v0=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(0,0,0,0));
-  register __m128 v1=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(1,1,1,1));
-  register __m128 v2=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(2,2,2,2));
-  register __m128 v3=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(3,3,3,3));
+  register __m128 v0=_mm_set1_ps(v[0]);
+  register __m128 v1=_mm_set1_ps(v[1]);
+  register __m128 v2=_mm_set1_ps(v[2]);
+  register __m128 v3=_mm_set1_ps(v[3]);
   FXVec4f r;
   _mm_storeu_ps(&r[0],_mm_add_ps(_mm_add_ps(_mm_mul_ps(v0,m0),_mm_mul_ps(v1,m1)),_mm_add_ps(_mm_mul_ps(v2,m2),_mm_mul_ps(v3,m3))));
   return r;

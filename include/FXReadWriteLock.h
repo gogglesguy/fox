@@ -26,8 +26,14 @@ namespace FX {
 
 
 /**
-* A read / write lock allows multiple readers but only a single
-* writer.
+* FXReadWriteLock allows multiple readers but only a single writer.
+*
+* FXReadWriteLock provides access to a shared region just like FXMutex,
+* except that threads that just read from the shared variables are not
+* excluding each other.  When a thread tries to write, however, it can
+* only proceed when no other writers or readers are present.
+* Thus, data structures which are frequently inspected but rarely updated
+* can be more effectively accessed with a read/write lock than with a mutex.  
 */
 class FXAPI FXReadWriteLock {
 private:

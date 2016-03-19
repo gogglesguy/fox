@@ -40,7 +40,6 @@
 #include "FXStatusLine.h"
 
 
-
 /*
   Notes:
   - Fallback text is displayed when neither cursor window or
@@ -145,17 +144,17 @@ long FXStatusLine::onPaint(FXObject*,FXSelector,void* ptr){
 long FXStatusLine::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
   FXWindow *helpsource=getApp()->getCursorWindow();
 
-  // Regular GUI update
+  // Set background text
+  setText(normal);
+  
+  // GUI update callback may set application mode text
   FXFrame::onUpdate(sender,sel,ptr);
 
   // Ask the help source for a new status text first, but only if the
   // statusline's shell is a direct or indirect owner of the help source
-  if(helpsource && getShell()->isOwnerOf(helpsource) && helpsource->handle(this,FXSEL(SEL_QUERY_HELP,0),NULL)){
-    return 1;
+  if(helpsource && getShell()->isOwnerOf(helpsource)){
+    helpsource->handle(this,FXSEL(SEL_QUERY_HELP,0),NULL);
     }
-
-  // Otherwise, supply normal message
-  setText(normal);
   return 1;
   }
 

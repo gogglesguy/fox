@@ -174,18 +174,6 @@ FXbool FXGLVisual::hasOpenGL(FXApp* application){
 
 /*******************************************************************************/
 
-
-/*
-FIXME
-
-New strategy:
-per-platform code to loop over depths;
-populate FXGLDepth
-evaluate FXGLDepth metrics w.r.t. desired FXGLDepth (platform independent)
-Keep the best
-Select FXGLDepth to keep
-*/
-
 // Describes particular FB configuration
 struct FXGLVisual::FXGLSpecs {
   int redsize;

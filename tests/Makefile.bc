@@ -63,7 +63,8 @@ glviewer.exe \
 gltest.exe \
 wizard.exe \
 imageviewer.exe \
-half.exe
+half.exe \
+unicode.exe
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp
@@ -159,6 +160,9 @@ dctest.exe: $(FOXLIB) dctest.obj
 
 half.exe: $(FOXLIB) half.obj
 	$(LD) $(LDFLAGS) half.obj $(FOXLIB)
+
+unicode.exe: $(FOXLIB) unicode.obj
+	$(LD) $(LDFLAGS) unicode.obj $(FOXLIB)
 
 process.exe: $(FOXLIB) process.obj
 	$(LD) $(LDFLAGS) process.obj $(FOXLIB)

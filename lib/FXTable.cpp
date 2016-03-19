@@ -2263,6 +2263,10 @@ long FXTable::onCmdDeleteSel(FXObject*,FXSelector,void*){
        more to the right, and stuff below block more to the bottom by
        inserting as many columns/rows as needed [but do not remove
        rows if new data from clipboard is smaller.
+       
+       
+  probably need pasteClipboard() and pasteSelection() etc.
+  like FXText has.  v
 */
 
 

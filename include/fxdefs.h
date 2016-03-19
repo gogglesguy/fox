@@ -81,11 +81,9 @@
 #define FXIMPORT __declspec(dllimport)
 #else
 #if defined(__GNUC__) && (__GNUC__ >= 4)
-#define FXLOCAL  __attribute__((visibility("hidden")))
 #define FXEXPORT __attribute__((visibility("default")))
 #define FXIMPORT
 #else
-#define FXLOCAL
 #define FXEXPORT
 #define FXIMPORT
 #endif
@@ -136,9 +134,11 @@
 
 // Prefetch address
 #if (__GNUC__ >= 4) && (defined(__i386__) || defined(__x86_64__))
-#define __prefetch(addr,hint)  __builtin_prefetch((addr),0,hint)
+#define __prefetch(addr)   __builtin_prefetch((addr),0)
+#define __prefetchw(addr)  __builtin_prefetch((addr),1)
 #else
-#define __prefetch(addr,hint) 
+#define __prefetch(addr)
+#define __prefetchw(addr)
 #endif
 
 // Callback
@@ -210,6 +210,7 @@ class                          FXString;
 
 // Streamable types; these are fixed size!
 typedef char                   FXchar;
+typedef signed char            FXschar;
 typedef unsigned char          FXuchar;
 typedef bool                   FXbool;
 typedef unsigned short         FXushort;

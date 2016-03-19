@@ -218,7 +218,7 @@ void FXQuatd::setYawRollPitch(FXdouble yaw,FXdouble roll,FXdouble pitch){
 // test Sy against -1 and 1; this is numerically more stable, as
 // asin doesn't like arguments outside [-1,1].
 void FXQuatd::getRollPitchYaw(FXdouble& roll,FXdouble& pitch,FXdouble& yaw) const {
-  register FXdouble s=-2.0f*(x*z-w*y);
+  register FXdouble s=-2.0*(x*z-w*y);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
       roll=atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
@@ -598,7 +598,7 @@ FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   }
 
 
-// Derivative of spherical lerp of unit quaternions u,v 
+// Derivative of spherical lerp of unit quaternions u,v
 // This is equivalent to: u * (u.unitinvert()*v).pow(f) * (u.unitinvert()*v).log(),
 // which is itself equivalent to: lerp(u,v,f) * (u.unitinvert()*v).log()
 FXQuatd lerpdot(const FXQuatd& u,const FXQuatd& v,FXdouble f){

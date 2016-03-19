@@ -82,6 +82,8 @@
     not all items are same size.
   - Item justification and icon/text relationships would be nice, too.
   - FIXME if no text, you're unable to see if an item is selected.
+  - Should sortItems() have optional notify parameter to generate callback 
+    when current item index has changed?
 */
 
 

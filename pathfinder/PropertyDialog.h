@@ -33,6 +33,7 @@ protected:
   FXLabel       *createtime;
   FXLabel       *modifytime;
   FXLabel       *accesstime;
+  FXCheckButton *filemode[12];
   FXTextField   *fileowner;
   FXTextField   *filegroup;
 private:

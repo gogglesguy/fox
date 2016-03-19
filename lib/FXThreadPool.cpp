@@ -357,7 +357,7 @@ FXint FXThreadPool::run(){
   mutex.unlock();
   // FIXME unlink ticket-lump from linked list of ticket lumps
   // since its now gone.
-  return runs;
+  return 0;
   }
 
 

@@ -1220,7 +1220,7 @@ void FXApp::imcreatecallback(void*,FXApp* a,void*){
 #ifndef NO_XIM
   XIMCallback ximcallback;
   fxwarning("Warning: input method server restarted.\n");
-  XUnregisterIMInstantiateCallback((Display*)app->getDisplay(),NULL,NULL,NULL,(XIMProc)imcreatecallback,(XPointer)a);
+  XUnregisterIMInstantiateCallback((Display*)app->getDisplay(),NULL,NULL,NULL,(XIDProc)imcreatecallback,(XPointer)a);
   a->xim=XOpenIM((Display*)app->display,NULL,NULL,NULL);
   if(a->xim){
     ximcallback.callback=(XIMProc)imdestroycallback;
@@ -1235,7 +1235,7 @@ void FXApp::imcreatecallback(void*,FXApp* a,void*){
 void FXApp::imdestroycallback(void*,FXApp* a,void*){
 #ifndef NO_XIM
   fxwarning("Warning: input method server terminated.\n");
-  XRegisterIMInstantiateCallback((Display*)a->getDisplay(),NULL,NULL,NULL,(XIMProc)imcreatecallback,(XPointer)a);
+  XRegisterIMInstantiateCallback((Display*)a->getDisplay(),NULL,NULL,NULL,(XIDProc)imcreatecallback,(XPointer)a);
   a->xim=NULL;
 #endif
   }
@@ -1551,7 +1551,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
       FXTRACE((100,"Got Input Method\n"));
       }
     else{
-      XRegisterIMInstantiateCallback((Display*)display,NULL,NULL,NULL,(XIMProc)imcreatecallback,(XPointer)this);
+      XRegisterIMInstantiateCallback((Display*)display,NULL,NULL,NULL,(XIDProc)imcreatecallback,(XPointer)this);
       }
 #endif
 

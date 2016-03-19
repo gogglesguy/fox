@@ -59,8 +59,8 @@ window.html \
 xml.html
 
 
-#docs:
-#	doxygen doxygen.cfg
+docs:
+	doxygen doxygen.cfg
 
 
 # Complete documentation package

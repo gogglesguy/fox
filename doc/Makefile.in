@@ -298,9 +298,6 @@ window.html \
 xml.html
 
 
-#docs:
-#	doxygen doxygen.cfg
-
 # Complete documentation package
 html_DATA = $(HTML_FILES)
 EXTRA_DIST = $(html_DATA)
@@ -673,6 +670,9 @@ uninstall-am: uninstall-htmlDATA
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am uninstall-htmlDATA
 
+
+docs:
+	doxygen doxygen.cfg
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

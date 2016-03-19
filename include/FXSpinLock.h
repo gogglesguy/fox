@@ -26,11 +26,13 @@ namespace FX {
 
 
 /**
-* FXSpinLock can be used to provide safe access to very small
-* critical sections.  It is cheaper than FXMutex, but unlike
-* FXMutex, threads which are unable to obtain the lock will
-* not block, but spin in a tight loop until the lock can be
-* obtained.
+* FXSpinLock can be used to provide safe access to very small critical sections.
+* 
+* Similar to FXMutex, a FXSpinLock provides safe access to a critical section 
+* shared by multiple threads.  Unlike FXMutex, however, a thread which is unable 
+* to obtain the lock will not block, but spin in a tight loop until the lock can 
+* be obtained.  The advantage of FXSpinLock over FXMutex is that no operating
+* system calls are performed suspending and resuming the calling thread.
 */
 class FXAPI FXSpinLock {
 private:

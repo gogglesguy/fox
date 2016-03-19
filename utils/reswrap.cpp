@@ -98,7 +98,7 @@ typedef struct {
 
 
 /* Print short help */
-void printhelp(const char *option){
+static void printhelp(const char *option){
   printf("reswrap: invalid option: -- %s\n",option);
   printf("Usage: reswrap [options] [-o[a] outfile] files...\n");
   printf("Try \"reswrap --help\" for more information.\n");
@@ -106,7 +106,7 @@ void printhelp(const char *option){
 
 
 /* Print some help */
-void printusage(){
+static void printusage(){
   printf("Usage: reswrap [options] [-o[a] outfile] files...\n");
   printf("Convert files containing images, text, or binary data into C/C++ data arrays.\n");
   printf("\n");
@@ -144,7 +144,7 @@ void printusage(){
 
 
 /* Print version information */
-void printversion(){
+static void printversion(){
   printf("reswrap %s\n\n",version);
   printf("Copyright (C) 1997,2011 Jeroen van der Zijp. All Rights Reserved.\n");
   printf("Please visit: http://www.fox-toolkit.org for further information.\n");
@@ -165,7 +165,7 @@ void printversion(){
 
 
 /* Build resource name */
-const char* resourcename(char *name,const char* filename,int keepdot){
+static const char* resourcename(char *name,const char* filename,int keepdot){
   const char* begin=name;
   const char* ptr;
 
@@ -195,7 +195,7 @@ const char* resourcename(char *name,const char* filename,int keepdot){
 
 
 /* Process prologue */
-void prologue(OPTIONS* opts){
+static void prologue(OPTIONS* opts){
   char date[100];
   time_t clock;
   if(opts->outfilename){
@@ -230,7 +230,7 @@ void prologue(OPTIONS* opts){
 
 
 /* Process epilogue */
-void epilogue(OPTIONS* opts){
+static void epilogue(OPTIONS* opts){
   if(opts->scope){
     fprintf(opts->outfile,"}\n");
     }
@@ -242,7 +242,7 @@ void epilogue(OPTIONS* opts){
 
 
 /* Process resource file */
-void processresourcefile(const char* filename,const char* name,OPTIONS* opts){
+static void processresourcefile(const char* filename,const char* name,OPTIONS* opts){
   char resource[MAX_RESOURCE];
   int ressize,first,col,hex,b;
   FILE *file;

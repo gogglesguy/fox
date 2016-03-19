@@ -1,4 +1,4 @@
-/*********** Generated on 2011/08/03 20:11:59 by reswrap version 5.1.1 *********/
+/*********** Generated on 2011/09/14 17:44:54 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file bigicons.bmp */
 extern const unsigned char bigicons[];
@@ -72,8 +72,8 @@ extern const unsigned char location[];
 /* Created by reswrap from file maphost.bmp */
 extern const unsigned char maphost[];
 
-/* Created by reswrap from file mimetype.gif */
-extern const unsigned char mimetype[];
+/* Created by reswrap from file miscellaneous_gif.gif */
+extern const unsigned char miscellaneous_gif[];
 
 /* Created by reswrap from file moveit.gif */
 extern const unsigned char moveit[];

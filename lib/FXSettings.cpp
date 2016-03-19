@@ -170,7 +170,7 @@ FXbool FXSettings::parse(const FXString& string,FXbool mrk){
         b=++p;
 
         // Scan section name
-        while(string[p] && string[p]!=']' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
+        while(string[p] && string[p]!=']' && !Ascii::isControl(string[p])) p++;
 
         // Check errors
         if(string[p]!=']'){ fxwarning("%d: illegal section name.\n",lineno); goto nxt; }
@@ -178,7 +178,7 @@ FXbool FXSettings::parse(const FXString& string,FXbool mrk){
         e=p++;
 
         // Grab name
-        name=string.mid(b,e-b);
+        name=string.mid(b,e-b); // FIXME should unescape group
 
         // Add new section dict
         group=insert(name.text());
@@ -193,7 +193,7 @@ FXbool FXSettings::parse(const FXString& string,FXbool mrk){
         b=p;
 
         // Scan key name
-        while(string[p] && string[p]!='=' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
+        while(string[p] && string[p]!='=' && !Ascii::isControl(string[p])) p++;
 
         // Check errors
         if(string[p]!='='){ fxwarning("%d: expected '=' to follow key.\n",lineno); goto nxt; }
@@ -213,7 +213,7 @@ FXbool FXSettings::parse(const FXString& string,FXbool mrk){
         b=p;
 
         // Scan value
-        while(string[p] && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
+        while(string[p] && !Ascii::isControl(string[p])) p++;
 
         e=p;
 
@@ -265,7 +265,7 @@ FXbool FXSettings::unparse(FXString& string) const {
           // Write section name if not written yet
           if(!ss){
             string.append("[");
-            string.append(key(s));
+            string.append(key(s));      // FIXME should escape group 
             string.append("]" ENDLINE);
             ss=1;
             }

@@ -29,14 +29,19 @@ namespace FX {
 
 
 /**
-* The status line normally shows its permanent message; when
-* moving the mouse over a Widget which has status-line help, the status line
-* temporarily replaces its normal message with the help information; the status
-* line obtains the help message by sending the Widget a ID_QUERY_HELP message
-* with type SEL_UPDATE.
-* If this query does not result in a new status string, the target of
-* the status line is tried via an ordinary SEL_UPDATE message.
-* If none of the above work then the status line will display the normal text,
+* The status line normally shows its permanent message.
+* A semi-permanent message can override this permanent message, for example to
+* indicate the application is busy or in a particular operating mode.
+* The status line obtains the semi-permanent message by sending its target (if any)
+* SEL_UPDATE message. 
+* A ID_SETSTRINGVALUE can be used to change the status message.
+* When the user moves the cursor over a widget which has status-line help, the 
+* status line can flash a very temporarily message with help about the widget.
+* For example, the status line may flash the "Quit Application" message when
+* the user moves the cursor over the Quit button.
+* The status line obtains the help message from the control by sending it a 
+* ID_QUERY_HELP message with type SEL_UPDATE.
+* Unless the value is overridden, the status line will display the normal text,
 * i.e. the string set via setNormalText().
 * If the message contains a newline (\n), then the part before the newline
 * will be displayed in the highlight color, while the part after the newline

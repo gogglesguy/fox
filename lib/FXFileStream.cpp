@@ -177,5 +177,4 @@ FXFileStream::~FXFileStream(){
   close();
   }
 
-
 }

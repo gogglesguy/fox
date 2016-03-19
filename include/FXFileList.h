@@ -69,8 +69,7 @@ protected:
     CHARDEV    = 512,           /// Character special item
     BLOCKDEV   = 1024,          /// Block special item
     FIFO       = 2048,          /// FIFO item
-    SOCK       = 4096,          /// Socket item
-    SHARE      = 8192           /// Share
+    SOCK       = 4096           /// Socket item
     };
 public:
 
@@ -78,13 +77,10 @@ public:
   FXFileItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,void* ptr=NULL):FXIconItem(text,bi,mi,ptr),assoc(NULL),link(NULL),size(0L),date(0L){}
 
   /// Return true if this is a file item
-  FXbool isFile() const { return (state&(FOLDER|BLOCKDEV|CHARDEV|FIFO|SOCK|SHARE))==0; }
+  FXbool isFile() const { return (state&(FOLDER|BLOCKDEV|CHARDEV|FIFO|SOCK))==0; }
 
   /// Return true if this is a directory item
   FXbool isDirectory() const { return (state&FOLDER)!=0; }
-
-  /// Return true if this is a share item
-  FXbool isShare() const { return (state&SHARE)!=0; }
 
   /// Return true if this is an executable item
   FXbool isExecutable() const { return (state&EXECUTABLE)!=0; }
@@ -303,29 +299,35 @@ public:
   /// Return wildcard pattern
   FXString getPattern() const { return pattern; }
 
-  /// Return true if item is a directory
-  FXbool isItemDirectory(FXint index) const;
-
-  /// Return true if item is a directory
-  FXbool isItemShare(FXint index) const;
-
-  /// Return true if item is a file
-  FXbool isItemFile(FXint index) const;
-
-  /// Return true if item is executable
-  FXbool isItemExecutable(FXint index) const;
-
-  /// Return true if item is navigational item like '.' or '..'
-  FXbool isItemNavigational(FXint index) const;
-
   /// Return name of item at index
   FXString getItemFilename(FXint index) const;
 
   /// Return full pathname of item at index
   FXString getItemPathname(FXint index) const;
 
+  /// Return true if item is a file
+  FXbool isItemFile(FXint index) const;
+
+  /// Return true if item is a directory
+  FXbool isItemDirectory(FXint index) const;
+
+  /// Return true if item is executable
+  FXbool isItemExecutable(FXint index) const;
+
+  /// Return true if this is a symbolic link item
+  FXbool isItemSymlink(FXint index) const;
+
+  /// Return true if item is navigational item like '.' or '..'
+  FXbool isItemNavigational(FXint index) const;
+
   /// Return file association of item
   FXFileAssoc* getItemAssoc(FXint index) const;
+
+  /// Return the file size for this item
+  FXlong getItemSize(FXint index) const;
+
+  /// Return the date for this item, in nanoseconds
+  FXTime getItemDate(FXint index) const;
 
   /// Return wildcard matching mode
   FXuint getMatchMode() const { return matchmode; }
