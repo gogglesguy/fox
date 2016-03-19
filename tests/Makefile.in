@@ -2017,12 +2017,11 @@ gltest.o: gltest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXSphered.h ../include/FXExtentf.h \
 	../include/FXExtentd.h ../include/FXComplexf.h \
 	../include/FXComplexd.h ../include/FXGLVisual.h \
-	../include/FXGLConfig.h ../include/FXGLContext.h \
-	../include/FXGLCanvas.h ../include/FXGLViewer.h \
-	../include/FXGLObject.h ../include/FXGLShape.h \
-	../include/FXGLCone.h ../include/FXGLCube.h \
-	../include/FXGLCylinder.h ../include/FXGLSphere.h \
-	../include/FXGLTriangleMesh.h
+	../include/FXGLContext.h ../include/FXGLCanvas.h \
+	../include/FXGLViewer.h ../include/FXGLObject.h \
+	../include/FXGLShape.h ../include/FXGLCone.h \
+	../include/FXGLCube.h ../include/FXGLCylinder.h \
+	../include/FXGLSphere.h ../include/FXGLTriangleMesh.h
 glviewer.o: glviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -2130,12 +2129,11 @@ glviewer.o: glviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXSphered.h ../include/FXExtentf.h \
 	../include/FXExtentd.h ../include/FXComplexf.h \
 	../include/FXComplexd.h ../include/FXGLVisual.h \
-	../include/FXGLConfig.h ../include/FXGLContext.h \
-	../include/FXGLCanvas.h ../include/FXGLViewer.h \
-	../include/FXGLObject.h ../include/FXGLShape.h \
-	../include/FXGLCone.h ../include/FXGLCube.h \
-	../include/FXGLCylinder.h ../include/FXGLSphere.h \
-	../include/FXGLTriangleMesh.h
+	../include/FXGLContext.h ../include/FXGLCanvas.h \
+	../include/FXGLViewer.h ../include/FXGLObject.h \
+	../include/FXGLShape.h ../include/FXGLCone.h \
+	../include/FXGLCube.h ../include/FXGLCylinder.h \
+	../include/FXGLSphere.h ../include/FXGLTriangleMesh.h
 groupbox.o: groupbox.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \

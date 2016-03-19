@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.195 2007/07/09 16:02:51 fox Exp $                           *
+* $Id: fxdefs.h,v 1.197 2007/11/30 19:30:11 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -225,6 +225,9 @@ enum FXSelType {
   SEL_QUERY_HELP,                       /// Message inquiring about statusline help
   SEL_DOCKED,                           /// Toolbar docked
   SEL_FLOATED,                          /// Toolbar floated
+  SEL_SPACEBALLMOTION,                  /// Moved space ball puck
+  SEL_SPACEBALLBUTTONPRESS,             /// Pressed space ball button
+  SEL_SPACEBALLBUTTONRELEASE,           /// Released space ball button
   SEL_SESSION_NOTIFY,                   /// Session is about to close
   SEL_SESSION_CLOSED,                   /// Session is closed
   SEL_LAST

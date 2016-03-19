@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDebugTarget.cpp,v 1.35 2007/07/09 16:26:46 fox Exp $                   *
+* $Id: FXDebugTarget.cpp,v 1.37 2007/11/30 19:30:12 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -123,6 +123,9 @@ const char *const FXDebugTarget::messageTypeName[]={
   "SEL_QUERY_HELP",
   "SEL_DOCKED",
   "SEL_FLOATED",
+  "SEL_SPACEBALLMOTION", 
+  "SEL_SPACEBALLBUTTONPRESS",  
+  "SEL_SPACEBALLBUTTONRELEASE",
   "SEL_SESSION_NOTIFY",
   "SEL_SESSION_CLOSED"
   };

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.176 2007/08/27 18:27:27 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.182 2007/12/31 15:34:31 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -51,7 +51,6 @@
 #include "FXMessageBox.h"
 #include "FXToolTip.h"
 #include "FXCursor.h"
-#include "FXGLConfig.h"
 #include "FXGLContext.h"
 #include "FXGLViewer.h"
 #include "FXGLObject.h"
@@ -169,6 +168,7 @@ FXDEFMAP(FXGLViewer) FXGLViewerMap[]={
   FXMAPFUNC(SEL_MIDDLEBUTTONRELEASE,0,FXGLViewer::onMiddleBtnRelease),
   FXMAPFUNC(SEL_RIGHTBUTTONPRESS,0,FXGLViewer::onRightBtnPress),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,FXGLViewer::onRightBtnRelease),
+  FXMAPFUNC(SEL_SPACEBALLMOTION,0,FXGLViewer::onSpaceBallMotion),
   FXMAPFUNC(SEL_UNGRABBED,0,FXGLViewer::onUngrabbed),
   FXMAPFUNC(SEL_KEYPRESS,0,FXGLViewer::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXGLViewer::onKeyRelease),
@@ -301,13 +301,19 @@ FXGLViewer::FXGLViewer(){
 
 
 // Construct GL viewer widget with private display list
-FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,NULL,tgt,sel,opts,x,y,w,h){
+FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,tgt,sel,opts,x,y,w,h){
   initialize();
   }
 
 
 // Construct GL viewer widget with shared display list
-FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* sharegroup,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,sharegroup,tgt,sel,opts,x,y,w,h){
+FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* share,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,share,tgt,sel,opts,x,y,w,h){
+  initialize();
+  }
+
+
+// Construct GL viewer widget sharing context
+FXGLViewer::FXGLViewer(FXComposite* p,FXGLContext* ctx,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,ctx,tgt,sel,opts,x,y,w,h){
   initialize();
   }
 
@@ -624,7 +630,7 @@ void FXGLViewer::drawWorld(FXViewport& wv){
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambient);
 
   // Enable fog
-  if(options&VIEWER_FOG){
+  if(options&GLVIEWER_FOG){
     glEnable(GL_FOG);
     glFogfv(GL_FOG_COLOR,background[0]);                // Disappear into the background
     //glFogf(GL_FOG_DENSITY,1.0f);
@@ -634,12 +640,12 @@ void FXGLViewer::drawWorld(FXViewport& wv){
     }
 
   // Dithering
-  if(options&VIEWER_DITHER){
+  if(options&GLVIEWER_DITHER){
     glEnable(GL_DITHER);
     }
 
   // Enable lighting
-  if(options&VIEWER_LIGHTING){
+  if(options&GLVIEWER_LIGHTING){
     glEnable(GL_LIGHTING);
     }
 
@@ -1901,6 +1907,57 @@ long FXGLViewer::onMouseWheel(FXObject*,FXSelector,void* ptr){
   }
 
 
+
+FXdouble curve(FXdouble x,FXdouble theta){
+  FXdouble result;
+  if(x<-theta){
+    result=x+2.0*theta/3.0;
+    }
+  else if(x>theta){
+    result=x-2.0*theta/3.0;
+    }
+  else{
+    result=x*x*x/(3.0*theta*theta);
+    }
+  return result;
+  }
+
+
+// Space ball motion
+long FXGLViewer::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
+  FXEvent* event=(FXEvent*)ptr;
+  const FXVec3f xaxis(1.0f,0.0f,0.0f);
+  const FXVec3f yaxis(0.0f,1.0f,0.0f);
+  const FXVec3f zaxis(0.0f,0.0f,1.0f);
+  FXTRACE((100,"onSpaceBallMotion Mask=%08x\n",event->state));
+  if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_SPACEBALLMOTION,message),ptr)) return 1;
+    //FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",event->values[0],event->values[1],event->values[2],event->values[3],event->values[4],event->values[5]));
+    FXQuatf q;
+    if(FXABS(event->values[3])>FXABS(event->values[4])){
+      if(FXABS(event->values[3])>FXABS(event->values[5])){
+        q.setAxisAngle(xaxis,0.0004*curve(event->values[3],50.0));
+        }
+      else{
+        q.setAxisAngle(zaxis,-0.0004*curve(event->values[5],50.0));
+        }
+      }
+    else{
+      if(FXABS(event->values[4])>FXABS(event->values[5])){
+        q.setAxisAngle(yaxis,-0.0004*curve(event->values[4],50.0));
+        }
+      else{
+        q.setAxisAngle(zaxis,-0.0004*curve(event->values[5],50.0));
+        }
+      }
+    translate(-worldVector(0,0,0.01*curve(event->values[0],40.0),0.01*curve(event->values[1],40.0)));
+    setOrientation(q*getOrientation());
+    setZoom(getZoom()*pow(2.0,-0.0001*curve(event->values[2],50.0)));
+    }
+  return 1;
+  }
+
+
 // Handle keyboard press/release
 long FXGLViewer::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
@@ -2866,7 +2923,7 @@ long FXGLViewer::onUpdTurbo(FXObject* sender,FXSelector,void*){
 
 // Toggle lighting
 long FXGLViewer::onCmdLighting(FXObject*,FXSelector,void*){
-  options^=VIEWER_LIGHTING;
+  options^=GLVIEWER_LIGHTING;
   update();
   return 1;
   }
@@ -2876,14 +2933,14 @@ long FXGLViewer::onCmdLighting(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdLighting(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(options&VIEWER_LIGHTING) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(options&GLVIEWER_LIGHTING) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Toggle fog
 long FXGLViewer::onCmdFog(FXObject*,FXSelector,void*){
-  options^=VIEWER_FOG;
+  options^=GLVIEWER_FOG;
   update();
   return 1;
   }
@@ -2893,14 +2950,14 @@ long FXGLViewer::onCmdFog(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdFog(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(options&VIEWER_FOG) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(options&GLVIEWER_FOG) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Toggle dithering
 long FXGLViewer::onCmdDither(FXObject*,FXSelector,void*){
-  options^=VIEWER_DITHER;
+  options^=GLVIEWER_DITHER;
   update();
   return 1;
   }
@@ -2910,7 +2967,7 @@ long FXGLViewer::onCmdDither(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdDither(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(options&VIEWER_DITHER) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(options&GLVIEWER_DITHER) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 

@@ -353,7 +353,6 @@ FXGIFIcon.cpp \
 FXGIFImage.cpp \
 FXGLCanvas.cpp \
 FXGLCone.cpp \
-FXGLConfig.cpp \
 FXGLContext.cpp \
 FXGLCube.cpp \
 FXGLCylinder.cpp \
@@ -605,10 +604,10 @@ FXDrawable.lo FXDriveBox.lo FXException.lo FXExpression.lo FXExtentd.lo \
 FXExtentf.lo FXFile.lo FXFileDialog.lo FXFileDict.lo FXFileList.lo \
 FXFileSelector.lo FXFileStream.lo FXFoldingList.lo FXFont.lo \
 FXFontDialog.lo FXFontSelector.lo FXFrame.lo FXGIFCursor.lo \
-FXGIFIcon.lo FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo FXGLConfig.lo \
-FXGLContext.lo FXGLCube.lo FXGLCylinder.lo FXGLObject.lo FXGLShape.lo \
-FXGLSphere.lo FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo \
-FXGradientBar.lo FXGroupBox.lo FXGZFileStream.lo FXHash.lo FXHeader.lo \
+FXGIFIcon.lo FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo FXGLContext.lo \
+FXGLCube.lo FXGLCylinder.lo FXGLObject.lo FXGLShape.lo FXGLSphere.lo \
+FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo FXGradientBar.lo \
+FXGroupBox.lo FXGZFileStream.lo FXHash.lo FXHeader.lo \
 FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo \
 FXIFFImage.lo FXIO.lo FXIcon.lo FXIconDict.lo FXIconList.lo \
 FXIconSource.lo FXId.lo FXImage.lo FXImageFrame.lo FXImageView.lo \
@@ -1871,10 +1870,9 @@ FXGLCanvas.lo FXGLCanvas.o : FXGLCanvas.cpp ../include/xincs.h \
 	../include/FXRegistry.h ../include/FXAccelTable.h \
 	../include/FXApp.h ../include/FXException.h \
 	../include/FXVisual.h ../include/FXId.h ../include/FXGLVisual.h \
-	../include/FXCursor.h ../include/FXGLConfig.h \
-	../include/FXGLContext.h ../include/FXGLCanvas.h \
+	../include/FXCursor.h ../include/FXGLCanvas.h \
 	../include/FXCanvas.h ../include/FXWindow.h \
-	../include/FXDrawable.h
+	../include/FXDrawable.h ../include/FXGLContext.h
 FXGLCone.lo FXGLCone.o : FXGLCone.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXThread.h ../include/FXStream.h \
@@ -1896,13 +1894,14 @@ FXGLConfig.lo FXGLConfig.o : FXGLConfig.cpp ../include/xincs.h \
 FXGLContext.lo FXGLContext.o : FXGLContext.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXThread.h ../include/FXStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
+	../include/FXElement.h ../include/FXString.h \
+	../include/FXSize.h ../include/FXPoint.h \
 	../include/FXRectangle.h ../include/FXSettings.h \
 	../include/FXDict.h ../include/FXObject.h \
 	../include/FXRegistry.h ../include/FXAccelTable.h \
-	../include/FXApp.h ../include/FXException.h \
-	../include/FXVisual.h ../include/FXId.h ../include/FXGLVisual.h \
-	../include/FXDrawable.h ../include/FXGLConfig.h \
+	../include/FXApp.h ../include/FXFont.h ../include/FXId.h \
+	../include/FXException.h ../include/FXVisual.h \
+	../include/FXGLVisual.h ../include/FXDrawable.h \
 	../include/FXGLContext.h
 FXGLCube.lo FXGLCube.o : FXGLCube.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
@@ -2011,10 +2010,9 @@ FXGLViewer.lo FXGLViewer.o : FXGLViewer.cpp ../include/xincs.h \
 	../include/FXShell.h ../include/FXComposite.h \
 	../include/FXWindow.h ../include/FXDrawable.h \
 	../include/FXToolTip.h ../include/FXCursor.h \
-	../include/FXGLConfig.h ../include/FXGLContext.h \
-	../include/FXGLViewer.h ../include/FXGLCanvas.h \
-	../include/FXCanvas.h ../include/FXGLObject.h \
-	../include/FXPrintDialog.h jitter.h
+	../include/FXGLContext.h ../include/FXGLViewer.h \
+	../include/FXGLCanvas.h ../include/FXCanvas.h \
+	../include/FXGLObject.h ../include/FXPrintDialog.h jitter.h
 FXGLVisual.lo FXGLVisual.o : FXGLVisual.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXThread.h ../include/FXElement.h \
@@ -2023,8 +2021,8 @@ FXGLVisual.lo FXGLVisual.o : FXGLVisual.cpp ../include/xincs.h \
 	../include/FXSettings.h ../include/FXDict.h \
 	../include/FXObject.h ../include/FXRegistry.h \
 	../include/FXAccelTable.h ../include/FXApp.h \
-	../include/FXFont.h ../include/FXId.h ../include/FXGLVisual.h \
-	../include/FXVisual.h
+	../include/FXFont.h ../include/FXId.h ../include/FXException.h \
+	../include/FXGLVisual.h ../include/FXVisual.h
 FXGradientBar.lo FXGradientBar.o : FXGradientBar.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/fxkeys.h \
 	../include/FXHash.h ../include/FXThread.h \

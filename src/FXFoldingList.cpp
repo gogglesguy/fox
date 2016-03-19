@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.cpp,v 1.92 2007/08/27 18:27:27 fox Exp $                   *
+* $Id: FXFoldingList.cpp,v 1.93 2007/12/31 18:22:59 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -834,7 +834,7 @@ FXbool FXFoldingList::isItemVisible(const FXFoldingItem* item) const {
 
 // Make item fully visible
 void FXFoldingList::makeItemVisible(FXFoldingItem* item){
-  register FXint vh,hh,py,y,h;
+  register FXint vh,py,y,h;
   if(item){
 
     // Remember for later

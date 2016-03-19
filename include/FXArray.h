@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXArray.h,v 1.30 2007/07/09 16:02:41 fox Exp $                           *
+* $Id: FXArray.h,v 1.32 2008/01/03 03:52:33 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXARRAY_H
 #define FXARRAY_H
@@ -31,11 +31,11 @@ namespace FX {
 
 
 /// Array of some generic type
-template<class TYPE>
+template<class EType>
 class FXArray {
 protected:
-  TYPE  *ptr;   // Data array
-  FXint  num;   // Number in array
+  EType  *ptr;   // Data array
+  FXint   num;   // Number in array
 public:
 
   /// Create as empty
@@ -48,17 +48,17 @@ public:
     }
 
   /// Create initialized from another array
-  FXArray(const FXArray<TYPE>& src):ptr(NULL),num(0){
+  FXArray(const FXArray<EType>& src):ptr(NULL),num(0){
     if(allocElms(ptr,src.num)){ constructElms(ptr,src.num); copyElms(ptr,src.ptr,src.num); num=src.num; }
     }
 
   /// Create initialized with n copies of object
-  FXArray(const TYPE& src,FXint n):ptr(NULL),num(0){
+  FXArray(const EType& src,FXint n):ptr(NULL),num(0){
     if(allocElms(ptr,n)){ constructElms(ptr,n); fillElms(ptr,src,n); num=n; }
     }
 
   /// Create initialized with array of n objects
-  FXArray(const TYPE* src,FXint n):ptr(NULL),num(0){
+  FXArray(const EType* src,FXint n):ptr(NULL),num(0){
     if(allocElms(ptr,n)){ constructElms(ptr,n); copyElms(ptr,src,n); num=n; }
     }
 
@@ -82,24 +82,24 @@ public:
     }
 
   /// Assign from another list
-  FXArray<TYPE>& operator=(const FXArray<TYPE>& src){
+  FXArray<EType>& operator=(const FXArray<EType>& src){
     if(ptr!=src.ptr){ no(src.num); copyElms(ptr,src.ptr,src.num); }
     return *this;
     }
 
   /// Index into array
-  TYPE& operator[](FXint i){ return ptr[i]; }
-  const TYPE& operator[](FXint i) const { return ptr[i]; }
+  EType& operator[](FXint i){ return ptr[i]; }
+  const EType& operator[](FXint i) const { return ptr[i]; }
 
   /// Index into list
-  TYPE& at(FXint i){ return ptr[i]; }
-  const TYPE& at(FXint i) const { return ptr[i]; }
+  EType& at(FXint i){ return ptr[i]; }
+  const EType& at(FXint i) const { return ptr[i]; }
 
   /// Return pointer to list
-  TYPE* data() const { return ptr; }
+  EType* data() const { return ptr; }
 
   /// Adopt array from source
-  FXArray<TYPE>& adopt(FXArray<TYPE>& src){
+  FXArray<EType>& adopt(FXArray<EType>& src){
     no(0);
     ptr=src.ptr; src.ptr=NULL;
     num=src.num; src.num=0;
@@ -107,105 +107,105 @@ public:
     }
 
   /// Assign object p to list
-  FXArray<TYPE>& assign(const TYPE& src){
+  FXArray<EType>& assign(const EType& src){
     if(no(1)){ ptr[0]=src; }
     return *this;
     }
 
   /// Assign n copies of object to list
-  FXArray<TYPE>& assign(const TYPE& src,FXint n){
+  FXArray<EType>& assign(const EType& src,FXint n){
     if(no(n)){ fillElms(ptr,src,n); }
     return *this;
     }
 
   /// Assign n objects to list
-  FXArray<TYPE>& assign(const TYPE* src,FXint n){
+  FXArray<EType>& assign(const EType* src,FXint n){
     if(no(n)){ copyElms(ptr,src,n); }
     return *this;
     }
 
   /// Assign n objects to list
-  FXArray<TYPE>& assign(const FXArray<TYPE>& src){
+  FXArray<EType>& assign(const FXArray<EType>& src){
     return assign(src.ptr,src.num);
     }
 
   /// Insert an object
-  FXArray<TYPE>& insert(FXint pos,const TYPE& src){
+  FXArray<EType>& insert(FXint pos,const EType& src){
     if(no(num+1)){ moveElms(ptr+pos+1,ptr+pos,num-pos-1); ptr[pos]=src; }
     return *this;
     }
 
   /// Insert n copies of object at specified position
-  FXArray<TYPE>& insert(FXint pos,const TYPE& src,FXint n){
+  FXArray<EType>& insert(FXint pos,const EType& src,FXint n){
     if(no(num+n)){ moveElms(ptr+pos+n,ptr+pos,num-pos-n); fillElms(ptr+pos,src,n); }
     return *this;
     }
 
   /// Insert n objects at specified position
-  FXArray<TYPE>& insert(FXint pos,const TYPE* src,FXint n){
+  FXArray<EType>& insert(FXint pos,const EType* src,FXint n){
     if(no(num+n)){ moveElms(ptr+pos+n,ptr+pos,num-pos-n); copyElms(ptr+pos,src,n); }
     return *this;
     }
 
   /// Insert n objects at specified position
-  FXArray<TYPE>& insert(FXint pos,const FXArray<TYPE>& src){
+  FXArray<EType>& insert(FXint pos,const FXArray<EType>& src){
     return insert(pos,src.ptr,src.num);
     }
 
   /// Prepend object
-  FXArray<TYPE>& prepend(const TYPE& src){
+  FXArray<EType>& prepend(const EType& src){
     if(no(num+1)){ moveElms(ptr+1,ptr,num-1); ptr[0]=src; }
     return *this;
     }
 
   /// Prepend n copies of object
-  FXArray<TYPE>& prepend(const TYPE& src,FXint n){
+  FXArray<EType>& prepend(const EType& src,FXint n){
     if(no(num+n)){ moveElms(ptr+n,ptr,num-n); fillElms(ptr,src,n); }
     return *this;
     }
 
   /// Prepend n objects
-  FXArray<TYPE>& prepend(const TYPE* src,FXint n){
+  FXArray<EType>& prepend(const EType* src,FXint n){
     if(no(num+n)){ moveElms(ptr+n,ptr,num-n); copyElms(ptr,src,n); }
     return *this;
     }
 
   /// Prepend n objects
-  FXArray<TYPE>& prepend(const FXArray<TYPE>& src){
+  FXArray<EType>& prepend(const FXArray<EType>& src){
     return prepend(src.ptr,src.num);
     }
 
   /// Append object
-  FXArray<TYPE>& append(const TYPE& src){
+  FXArray<EType>& append(const EType& src){
     if(no(num+1)){ ptr[num-1]=src; }
     return *this;
     }
 
   /// Append n copies of object
-  FXArray<TYPE>& append(const TYPE& src,FXint n){
+  FXArray<EType>& append(const EType& src,FXint n){
     if(no(num+n)){ fillElms(ptr+num-n,src,n); }
     return *this;
     }
 
   /// Append n objects
-  FXArray<TYPE>& append(const TYPE* src,FXint n){
+  FXArray<EType>& append(const EType* src,FXint n){
     if(no(num+n)){ copyElms(ptr+num-n,src,n); }
     return *this;
     }
 
   /// Append n objects
-  FXArray<TYPE>& append(const FXArray<TYPE>& src){
+  FXArray<EType>& append(const FXArray<EType>& src){
     return append(src.ptr,src.num);
     }
 
   /// Replace an object
-  FXArray<TYPE>& replace(FXint pos,const TYPE& src){
+  FXArray<EType>& replace(FXint pos,const EType& src){
     ptr[pos]=src;
     return *this;
     }
 
   /// Replace the m objects at pos with n copies of src
-  FXArray<TYPE>& replace(FXint pos,FXint m,const TYPE& src,FXint n){
+  FXArray<EType>& replace(FXint pos,FXint m,const EType& src,FXint n){
     if(m<n){
       if(!no(num-m+n)) return *this;
       moveElms(ptr+pos+n,ptr+pos+m,num-pos-n);
@@ -219,7 +219,7 @@ public:
     }
 
   /// Replace m objects at pos by n objects from src
-  FXArray<TYPE>& replace(FXint pos,FXint m,const TYPE* src,FXint n){
+  FXArray<EType>& replace(FXint pos,FXint m,const EType* src,FXint n){
     if(m<n){
       if(!no(num-m+n)) return *this;
       moveElms(ptr+pos+n,ptr+pos+m,num-pos-n);
@@ -233,24 +233,24 @@ public:
     }
 
   /// Replace m objects at pos by objects from src
-  FXArray<TYPE>& replace(FXint pos,FXint m,const FXArray<TYPE>& src){
+  FXArray<EType>& replace(FXint pos,FXint m,const FXArray<EType>& src){
     return replace(pos,m,src.ptr,src.num);
     }
 
   /// Remove object at pos
-  FXArray<TYPE>& erase(FXint pos){
+  FXArray<EType>& erase(FXint pos){
     moveElms(ptr+pos,ptr+pos+1,num-pos-1); no(num-1);
     return *this;
     }
 
   /// Remove n objects starting at pos
-  FXArray<TYPE>& erase(FXint pos,FXint n){
+  FXArray<EType>& erase(FXint pos,FXint n){
     moveElms(ptr+pos,ptr+pos+n,num-n-pos); no(num-n);
     return *this;
     }
 
   /// Remove all objects
-  FXArray<TYPE>& clear(){
+  FXArray<EType>& clear(){
     destructElms(ptr,num); freeElms(ptr); num=0;
     return *this;
     }

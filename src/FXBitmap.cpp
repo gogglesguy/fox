@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmap.cpp,v 1.99 2007/07/09 16:26:44 fox Exp $                        *
+* $Id: FXBitmap.cpp,v 1.101 2007/12/13 21:44:49 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -65,7 +65,6 @@
     be reversed.
 */
 
-#define DISPLAY(app) ((Display*)((app)->display))
 
 // Changable bitmap options
 #define BITMAP_MASK   (BITMAP_KEEP|BITMAP_SHMI|BITMAP_SHMP)
@@ -116,7 +115,7 @@ void FXBitmap::create(){
 #ifdef WIN32
       xid=CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
 #else
-      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),1);
+      xid=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),FXMAX(width,1),FXMAX(height,1),1);
 #endif
 
       // Were we successful?
@@ -160,7 +159,7 @@ void FXBitmap::destroy(){
 #ifdef WIN32
       DeleteObject(xid);
 #else
-      XFreePixmap(DISPLAY(getApp()),xid);
+      XFreePixmap((Display*)getApp()->getDisplay(),xid);
 #endif
       }
     xid=0;
@@ -352,7 +351,7 @@ void FXBitmap::restore(){
 
     // Got local buffer to receive into
     if(data){
-      xim=XGetImage(DISPLAY(getApp()),xid,0,0,width,height,1,XYPixmap);
+      xim=XGetImage((Display*)getApp()->getDisplay(),xid,0,0,width,height,1,XYPixmap);
       if(!xim){ throw FXImageException("unable to restore image"); }
 
       // Should have succeeded
@@ -388,7 +387,6 @@ void FXBitmap::restore(){
 void FXBitmap::render(){
   if(xid){
     register XImage *xim=NULL;
-    register Visual *vis;
     register int size;
     register FXuchar *pix;
     register int i;
@@ -403,12 +401,10 @@ void FXBitmap::render(){
       // Make GC
       values.foreground=0xffffffff;
       values.background=0;
-      gc=XCreateGC(DISPLAY(getApp()),xid,GCForeground|GCBackground,&values);
+      gc=XCreateGC((Display*)getApp()->getDisplay(),xid,GCForeground|GCBackground,&values);
 
-      // Get Visual
-      vis=(Visual*)visual->visual;
-
-      xim=XCreateImage(DISPLAY(getApp()),vis,1,XYBitmap,0,NULL,width,height,8,(width+7)>>3);
+      // Create image to transfer pixels
+      xim=XCreateImage((Display*)getApp()->getDisplay(),(Visual*)visual->visual,1,XYBitmap,0,NULL,width,height,8,(width+7)>>3);
       if(!xim){ throw FXImageException("unable to render bitmap"); }
 
       // Try create temp pixel store
@@ -441,10 +437,10 @@ void FXBitmap::render(){
         }
 
       // Blast the image
-      XPutImage(DISPLAY(getApp()),xid,gc,xim,0,0,0,0,width,height);
+      XPutImage((Display*)getApp()->getDisplay(),xid,gc,xim,0,0,0,0,width,height);
       freeElms(xim->data);
       XDestroyImage(xim);
-      XFreeGC(DISPLAY(getApp()),gc);
+      XFreeGC((Display*)getApp()->getDisplay(),gc);
       }
     }
   }
@@ -473,10 +469,10 @@ void FXBitmap::resize(FXint w,FXint h){
 #else
 
     // Free old pixmap
-    XFreePixmap(DISPLAY(getApp()),xid);
+    XFreePixmap((Display*)getApp()->getDisplay(),xid);
 
     // Make new pixmap
-    xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,1);
+    xid=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),w,h,1);
     if(!xid){ throw FXImageException("unable to resize bitmap"); }
     
 #endif

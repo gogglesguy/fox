@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRangeSlider.cpp,v 1.11 2007/11/06 22:07:23 fox Exp $                    *
+* $Id: FXRangeSlider.cpp,v 1.12 2007/11/16 16:25:45 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -35,8 +35,6 @@
 #include "FXApp.h"
 #include "FXDCWindow.h"
 #include "FXRangeSlider.h"
-
-
 
 
 /*

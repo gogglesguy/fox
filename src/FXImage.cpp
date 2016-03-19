@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.160 2007/11/02 04:12:57 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.163 2007/12/28 16:33:18 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -227,11 +227,8 @@ void FXImage::create(){
 
 #else
 
-      // Get depth (should use visual!!)
-      int dd=visual->getDepth();
-
       // Make pixmap
-      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),dd);
+      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),visual->depth);
 
 #endif
 
@@ -394,7 +391,7 @@ void FXImage::restore(){
     register FXPixel pixel;
     register FXuint  redshift,greenshift,blueshift;
     register FXPixel redmask,greenmask,bluemask;
-    register int size,dd,i;
+    register int size,i;
     register FXbool shmi=false;
     register XImage *xim=NULL;
     register Visual *vis;
@@ -415,7 +412,6 @@ void FXImage::restore(){
 
     // Get Visual
     vis=(Visual*)visual->visual;
-    dd=visual->getDepth();
 
     // Just in case you're on a high-end system
     FXASSERT(vis->map_entries<=MAX_MAPSIZE);
@@ -438,7 +434,7 @@ void FXImage::restore(){
       // First try XShm
 #ifdef HAVE_XSHM_H
       if(shmi){
-        xim=XShmCreateImage(DISPLAY(getApp()),vis,dd,(dd==1)?XYPixmap:ZPixmap,NULL,&shminfo,width,height);
+        xim=XShmCreateImage(DISPLAY(getApp()),vis,visual->depth,(visual->depth==1)?XYPixmap:ZPixmap,NULL,&shminfo,width,height);
         if(!xim){ shmi=0; }
         if(shmi){
           shminfo.shmid=shmget(IPC_PRIVATE,xim->bytes_per_line*xim->height,IPC_CREAT|0777);
@@ -1263,8 +1259,6 @@ void FXImage::render(){
   if(xid){
     register FXbool shmi=false;
     register XImage *xim=NULL;
-    register Visual *vis;
-    register int dd;
     XGCValues values;
     GC gc;
 #ifdef HAVE_XSHM_H
@@ -1281,11 +1275,6 @@ void FXImage::render(){
       values.background=WhitePixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
       gc=XCreateGC(DISPLAY(getApp()),xid,GCForeground|GCBackground,&values);
 
-      // Get Visual
-      vis=(Visual*)visual->visual;
-
-      dd=visual->getDepth();
-
       // Turn it on iff both supported and desired
 #ifdef HAVE_XSHM_H
       if(options&IMAGE_SHMI) shmi=getApp()->shmi;
@@ -1294,7 +1283,7 @@ void FXImage::render(){
       // First try XShm
 #ifdef HAVE_XSHM_H
       if(shmi){
-        xim=XShmCreateImage(DISPLAY(getApp()),vis,dd,(dd==1)?XYPixmap:ZPixmap,NULL,&shminfo,width,height);
+        xim=XShmCreateImage(DISPLAY(getApp()),(Visual*)visual->visual,visual->depth,(visual->depth==1)?XYPixmap:ZPixmap,NULL,&shminfo,width,height);
         if(!xim){ shmi=0; }
         if(shmi){
           shminfo.shmid=shmget(IPC_PRIVATE,xim->bytes_per_line*xim->height,IPC_CREAT|0777);
@@ -1311,7 +1300,7 @@ void FXImage::render(){
 
       // Try the old fashioned way
       if(!shmi){
-        xim=XCreateImage(DISPLAY(getApp()),vis,dd,(dd==1)?XYPixmap:ZPixmap,0,NULL,width,height,32,0);
+        xim=XCreateImage(DISPLAY(getApp()),(Visual*)visual->visual,visual->depth,(visual->depth==1)?XYPixmap:ZPixmap,0,NULL,width,height,32,0);
         if(!xim){ throw FXImageException("unable to render image"); }
 
         // Try create temp pixel store
@@ -1335,7 +1324,7 @@ void FXImage::render(){
 
       // Determine what to do
       switch(visual->getType()){
-        case VISUALTYPE_TRUE:
+        case FXVisual::Color:
           switch(xim->bits_per_pixel){
             case 32:
               render_true_32(xim,(FXuchar*)data);
@@ -1364,7 +1353,7 @@ void FXImage::render(){
               break;
             }
           break;
-        case VISUALTYPE_GRAY:
+        case FXVisual::Gray:
           switch(xim->bits_per_pixel){
             case 1:
               if(options&IMAGE_NEAREST)
@@ -1386,7 +1375,7 @@ void FXImage::render(){
               break;
             }
           break;
-        case VISUALTYPE_INDEX:
+        case FXVisual::Index:
           switch(xim->bits_per_pixel){
             case 4:
               if(options&IMAGE_NEAREST)
@@ -1408,13 +1397,11 @@ void FXImage::render(){
               break;
             }
           break;
-        case VISUALTYPE_MONO:
+        case FXVisual::Mono:
           if(options&IMAGE_NEAREST)
             render_mono_1_fast(xim,(FXuchar*)data);
           else
             render_mono_1_dither(xim,(FXuchar*)data);
-        case VISUALTYPE_UNKNOWN:
-          break;
         }
 
       // Transfer image with shared memory

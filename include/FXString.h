@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.h,v 1.142 2007/08/21 15:16:53 fox Exp $                         *
+* $Id: FXString.h,v 1.143 2007/11/25 15:34:32 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -543,7 +543,7 @@ public:
   /**
   * Return a string value from vprintf-like format arguments.
   */
-  static FXString value(const FXchar* fmt,va_list args);
+  static FXString vvalue(const FXchar* fmt,va_list args);
 
   /// Check if the string contains special characters or leading or trailing whitespace
   FXbool shouldEscape(FXchar lquote=0,FXchar rquote=0) const;

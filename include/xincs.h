@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: xincs.h,v 1.79 2007/07/12 04:43:19 fox Exp $                             *
+* $Id: xincs.h,v 1.81 2007/12/28 21:27:45 fox Exp $                             *
 ********************************************************************************/
 #ifndef XINCS_H
 #define XINCS_H
@@ -221,6 +221,10 @@ struct fxdirent : public dirent {
 #ifdef HAVE_XRENDER_H
 #include <X11/extensions/Xrender.h>
 #endif
+#ifdef HAVE_XINPUT_H
+#include <X11/extensions/XI.h>
+#include <X11/extensions/XInput.h>
+#endif
 
 #ifndef NO_XIM
 #ifndef XlibSpecificationRelease        // Not defined until X11R5
@@ -237,8 +241,6 @@ extern "C" char *XSetIMValues(XIM,...);
 #endif
 
 #endif
-
-
 
 
 // OpenGL includes
@@ -263,6 +265,8 @@ extern "C" char *XSetIMValues(XIM,...);
 #ifdef HAVE_GLU_H
 #include <GL/glu.h>
 #endif
+
+//#undef GLX_VERSION_1_3
 
 // Maximum path length
 #ifndef MAXPATHLEN

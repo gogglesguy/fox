@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLVisual.h,v 1.31 2007/07/09 16:02:45 fox Exp $                        *
+* $Id: FXGLVisual.h,v 1.36 2007/12/28 18:46:17 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVISUAL_H
 #define FXGLVISUAL_H
@@ -49,16 +49,32 @@ class FXAPI FXGLVisual : public FXVisual {
   friend class FXDCWindow;
   friend class FXGLCanvas;
 protected:
-  FXint        redSize;             // Desired #bits for red
-  FXint        greenSize;           // Desired #bits for green
-  FXint        blueSize;            // Desired #bits for blue
-  FXint        alphaSize;           // Desired #bits for alpha
-  FXint        depthSize;           // Desired #bits for Z
-  FXint        stencilSize;         // Desired #bits for stencil
-  FXint        accumRedSize;        // Desired #bits for accum red
-  FXint        accumGreenSize;      // Desired #bits for accum green
-  FXint        accumBlueSize;       // Desired #bits for accum blue
-  FXint        accumAlphaSize;      // Desired #bits for accum alpha
+  FXuchar redSize;              // Red bits
+  FXuchar greenSize;            // Green depth
+  FXuchar blueSize;             // Blue bits
+  FXuchar alphaSize;            // Alpha bits
+  FXuchar depthSize;            // Depth bits
+  FXuchar stencilSize;          // Stencil bits
+  FXuchar multiSamples;         // Multi-sampling
+  FXuchar accumRedSize;         // Red accu buffer bits
+  FXuchar accumGreenSize;       // Green accu buffer bits
+  FXuchar accumBlueSize;        // Blue accu buffer bits
+  FXuchar accumAlphaSize;       // Alpha accu buffer bits
+  FXuchar actualRedSize;        // Actual Red bits
+  FXuchar actualGreenSize;      // Actual Green depth
+  FXuchar actualBlueSize;       // Actual Blue bits
+  FXuchar actualAlphaSize;      // Actual Alpha bits
+  FXuchar actualDepthSize;      // Actual Depth bits
+  FXuchar actualStencilSize;    // Actual Stencil bits
+  FXuchar actualMultiSamples;   // Actual multi-sampling
+  FXuchar actualAccumRedSize;   // Actual Red accu buffer bits
+  FXuchar actualAccumGreenSize; // Actual Green accu buffer bits
+  FXuchar actualAccumBlueSize;  // Actual Blue accu buffer bits
+  FXuchar actualAccumAlphaSize; // Actual Alpha accu buffer bits
+  FXbool  doubleBuffer;
+  FXbool  stereoBuffer;
+  FXbool  accelerated;
+  FXbool  copying;
 protected:
   FXGLVisual();
 private:
@@ -67,12 +83,7 @@ private:
 public:
 
   /// Construct default visual
-  FXGLVisual(FXApp* a,FXuint flags);
-
-  /**
-  * Test if if OpenGL is supported.
-  */
-  static FXbool hasOpenGL(FXApp* application);
+  FXGLVisual(FXApp* a,FXuint flgs=VISUAL_DOUBLE_BUFFER|VISUAL_WINDOW);
 
   /// Create visual
   virtual void create();
@@ -90,6 +101,7 @@ public:
   FXint getAlphaSize() const { return alphaSize; }
   FXint getDepthSize() const { return depthSize; }
   FXint getStencilSize() const { return stencilSize; }
+  FXint getMultiSamples() const { return multiSamples; }
   FXint getAccumRedSize() const { return accumRedSize; }
   FXint getAccumGreenSize() const { return accumGreenSize; }
   FXint getAccumBlueSize() const { return accumBlueSize; }
@@ -102,34 +114,39 @@ public:
   void setAlphaSize(FXint as){ alphaSize=as; }
   void setDepthSize(FXint ds){ depthSize=ds; }
   void setStencilSize(FXint ss){ stencilSize=ss; }
+  void setMultiSamples(FXint ms){ multiSamples=ms; }
   void setAccumRedSize(FXint rs){ accumRedSize=rs; }
   void setAccumGreenSize(FXint gs){ accumGreenSize=gs; }
   void setAccumBlueSize(FXint bs){ accumBlueSize=bs; }
   void setAccumAlphaSize(FXint as){ accumAlphaSize=as; }
 
   /// Get ACTUAL sizes for bit-planes
-  FXint getActualRedSize() const;
-  FXint getActualGreenSize() const;
-  FXint getActualBlueSize() const;
-  FXint getActualAlphaSize() const;
-  FXint getActualDepthSize() const;
-  FXint getActualStencilSize() const;
-  FXint getActualAccumRedSize() const;
-  FXint getActualAccumGreenSize() const;
-  FXint getActualAccumBlueSize() const;
-  FXint getActualAccumAlphaSize() const;
+  FXint getActualRedSize() const { return actualRedSize; }
+  FXint getActualGreenSize() const { return actualGreenSize; }
+  FXint getActualBlueSize() const { return actualBlueSize; }
+  FXint getActualAlphaSize() const { return actualAlphaSize; }
+  FXint getActualDepthSize() const { return actualDepthSize; }
+  FXint getActualStencilSize() const { return actualStencilSize; }
+  FXint getActualMultiSamples() const { return actualMultiSamples; }
+  FXint getActualAccumRedSize() const { return actualAccumRedSize; }
+  FXint getActualAccumGreenSize() const { return actualAccumGreenSize; }
+  FXint getActualAccumBlueSize() const { return actualAccumBlueSize; }
+  FXint getActualAccumAlphaSize() const { return actualAccumAlphaSize; }
 
   /// Is it double buffered?
-  FXbool isDoubleBuffer() const;
+  FXbool isDoubleBuffer() const { return doubleBuffer; }
 
   /// Is it stereo?
-  FXbool isStereo() const;
+  FXbool isStereo() const { return stereoBuffer; }
 
   /// Is it hardware-accelerated?
-  FXbool isAccelerated() const;
+  FXbool isAccelerated() const { return accelerated; }
 
   /// Does it swap by copying instead of flipping buffers
-  FXbool isBufferSwapCopy() const;
+  FXbool isBufferSwapCopy() const { return copying; }
+
+  /// Test if if OpenGL is supported.
+  static FXbool hasOpenGL(FXApp* application);
 
   /// Save visual info to a stream
   virtual void save(FXStream& store) const;
@@ -140,10 +157,6 @@ public:
   /// Destructor
   virtual ~FXGLVisual();
   };
-
-
-/// Create a display list of bitmaps from font glyphs in a font
-extern FXAPI FXbool glUseFXFont(FXFont* font,int first,int count,int list);
 
 }
 

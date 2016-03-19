@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.263 2007/07/12 04:43:18 fox Exp $                            *
+* $Id: FXApp.h,v 1.265 2007/11/30 18:16:54 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -130,6 +130,7 @@ struct FXAPI FXEvent {
   FXuint      click_time;     /// Time of mouse button press
   FXint       click_button;   /// Mouse button pressed
   FXint       click_count;    /// Click-count
+  FXint       values[6];      /// Valuators from space ball
   FXbool      moved;          /// Moved cursor since press
   FXRectangle rect;           /// Rectangle
   FXbool      synthetic;      /// True if synthetic expose event
@@ -358,9 +359,13 @@ private:
   FXbool           xdndWantUpdates;     // XDND target wants new positions while in rect
   FXbool           xdndFinishSent;      // XDND finish sent
   FXRectangle      xdndRect;            // XDND rectangle bounding target
-  FXint            xrreventbase;        // Xrandr event base
-  FXint            xfxeventbase;        // Xfixes event base
+  FXID             xrrScreenChange;     // Xrandr ScreenChange event 
+  FXID             xfxFixesSelection;   // Xfixes selection event 
+  FXID             xsbBallMotion;       // Space ball motion event
+  FXID             xsbButtonPress;      // Space ball button press event
+  FXID             xsbButtonRelease;    // Space ball button release event
   FXID             stipples[23];        // Standard stipple patterns
+  void            *xsbDevice;           // Space ball input device
   void            *xim;                 // Input method
   FXbool           shmi;                // Use XSHM Image possible
   FXbool           shmp;                // Use XSHM Pixmap possible
@@ -396,6 +401,8 @@ protected:
   void scrollRepaints(FXID win,FXint dx,FXint dy);
   static void imcreatecallback(void*,FXApp*,void*);
   static void imdestroycallback(void*,FXApp*,void*);
+  void openInputDevices();
+  void closeInputDevices();
 #endif
 
 protected:
