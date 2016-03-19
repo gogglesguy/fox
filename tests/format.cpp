@@ -78,8 +78,8 @@ const double floatnumbers[]={
   0.0,
   -0.0
   };
-  
-  
+
+
 // Use a trick to get a nan
 #if FOX_BIGENDIAN
 const FXuint doublenan[2]={0x7fffffff,0xffffffff};
@@ -113,10 +113,11 @@ const FXchar *intformat[]={
 const FXint intnumbers[]={
   0,
   1,
+  -1,
   0x90,
   -34,
   2147483647,
-  4294967295u
+  -2147483648
   };
 
 
@@ -167,15 +168,15 @@ int main(int,char*[]){
     __snprintf(buffer,sizeof(buffer),floatformat[x],*((const FXdouble*)&doubleinf));
     fprintf(stdout,"format=\"%s\" output=\"%s\"\n",floatformat[x],buffer);
     }
-    
+
   fprintf(stdout,"\n");
-  
+
   // Testing NaN's
   for(x=0; x<ARRAYNUMBER(floatformat); x++){
     __snprintf(buffer,sizeof(buffer),floatformat[x],*((const FXdouble*)&doublenan));
     fprintf(stdout,"format=\"%s\" output=\"%s\"\n",floatformat[x],buffer);
     }
-    
+
   fprintf(stdout,"\n");
 
   // Testing positional formats

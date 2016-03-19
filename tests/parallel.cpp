@@ -131,6 +131,7 @@ int main(int argc,char* argv[]){
       if(++arg>=argc){ fxmessage("Missing pieces number argument.\n"); exit(1); }
       pieces=strtoul(argv[arg],NULL,0);
       if(pieces<1){ fxmessage("Value for pieces number of pieces (%d) too small.\n",pieces); exit(1); }
+      if(pieces>FXParallelMax){ fxmessage("Value for pieces number of pieces (%d) too large (%d).\n",pieces,FXParallelMax); exit(1); }
       }
     else if(strcmp(argv[arg],"--minimum")==0){
       if(++arg>=argc){ fxmessage("Missing threads number argument.\n"); exit(1); }

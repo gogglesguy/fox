@@ -92,11 +92,17 @@ FXuint SyntaxParser::gettok(){
   }
 
 
+// Check syntax
+static FXRex::Error checkRexSyntax(const FXString& text){
+  FXRex rex; 
+  return rex.parse(text,FXRex::Syntax);
+  }
+  
+
 // Parse rule and sub rules
 FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
   FXString name,openpat,clospat,stoppat;
   FXRex::Error error;
-  FXRex regex;
   FXint index;
   if(token==TK_RULE){
     token=gettok();
@@ -120,7 +126,7 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
             }
           openpat.assign(head+1,tail-head-2);
           openpat.substitute("\\\"","\"",true);
-          if((error=regex.parse(openpat,FXRex::Syntax))!=FXRex::ErrOK){
+          if((error=checkRexSyntax(openpat))!=FXRex::ErrOK){
             fxwarning("%s:%d: bad pattern: %s.\n",from,line,FXRex::getError(error));
             return false;
             }
@@ -134,7 +140,7 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
             }
           openpat.assign(head+1,tail-head-2);
           openpat.substitute("\\\"","\"",true);
-          if((error=regex.parse(openpat,FXRex::Syntax))!=FXRex::ErrOK){
+          if((error=checkRexSyntax(openpat))!=FXRex::ErrOK){
             fxwarning("%s:%d: bad openpattern: %s.\n",from,line,FXRex::getError(error));
             return false;
             }
@@ -148,7 +154,7 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
             }
           clospat.assign(head+1,tail-head-2);
           clospat.substitute("\\\"","\"",true);
-          if((error=regex.parse(clospat,FXRex::Syntax))!=FXRex::ErrOK){
+          if((error=checkRexSyntax(clospat))!=FXRex::ErrOK){
             fxwarning("%s:%d: bad closepattern: %s.\n",from,line,FXRex::getError(error));
             return false;
             }
@@ -162,7 +168,7 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
             }
           stoppat.assign(head+1,tail-head-2);
           stoppat.substitute("\\\"","\"",true);
-          if((error=regex.parse(stoppat,FXRex::Syntax))!=FXRex::ErrOK){
+          if((error=checkRexSyntax(stoppat))!=FXRex::ErrOK){
             fxwarning("%s:%d: bad stoppattern: %s.\n",from,line,FXRex::getError(error));
             return false;
             }
@@ -205,13 +211,14 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
 
 // Parse language
 FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
-  FXString  delimiters=FXText::textDelimiters;
-  FXString  contentsmatch;
-  FXString  filesmatch;
-  FXString  name;
-  FXint     contextlines=0;
-  FXint     contextchars=0;
-  Syntax   *syntax;
+  FXString delimiters=FXText::textDelimiters;
+  FXString contentsmatch;
+  FXString filesmatch;
+  FXString name;
+  FXint contextlines=0;
+  FXint contextchars=0;
+  FXRex::Error error;
+  Syntax *syntax;
 
   // Expect language
   if(token==TK_LANGUAGE){
@@ -246,6 +253,10 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
             }
           contentsmatch.assign(head+1,tail-head-2);
           contentsmatch.substitute("\\\"","\"",true);
+          if((error=checkRexSyntax(contentsmatch))!=FXRex::ErrOK){
+            fxwarning("%s:%d: bad pattern in contentsmatch: %s.\n",from,line,FXRex::getError(error));
+            return false;
+            }
           token=gettok();
           continue;
         case TK_DELIMITERS:             // Word delimiters

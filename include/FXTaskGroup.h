@@ -52,6 +52,9 @@ private:
   private:
     FXTaskGroup *taskgroup;     // Backlink to taskgroup
     FXRunnable  *runnable;      // Wrapped runnable
+  private:
+    Task(const Task&);
+    Task &operator=(const Task&);
   public:
     Task(FXTaskGroup* g,FXRunnable *r);
     virtual FXint run();
@@ -81,7 +84,7 @@ public:
   */
   FXThreadPool* getThreadPool() const { return threadpool; }
 
-  /** 
+  /**
   * Return number of tasks.
   */
   FXuint getRunningTasks() const { return completion.count(); }

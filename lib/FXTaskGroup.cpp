@@ -41,28 +41,28 @@
   Notes:
 
   - FXTaskGroup manages the execution  of a task-set (a set of FXRunnables) on the FXThreadPool.
-  
+
   - Each FXRunnable is 'wrapped' by FXTaskGroup::Task which updates the completion object
     inside FXTaskGroup.  This way, the FXTaskGroup can monitor the completion of the task-set
     it is monitoring.
-    
+
   - When waiting for the task-set to finish, the calling thread may join the worker-threads in
     the FXThreadPool temporarily to add additional processing power; only when the FXThreadPoll
     queue is empty will the calling thread drop out of the FXThreadPoll's processing loop to
     actually block for the completion semaphore.
-    
+
   - Possible improvements:
-      
+
       o For FXParallel, we could have a special flavor of FXTaskGroup::Task that does not wrap
         a FXRunnable but has a more streamlined implementation, thus avoiding allocs and frees.
-        
+
       o We would like some kind of early termination capability.  For instance, in a parallel
         search algorithm we would like to stop (or never even start) tasks when one of them is
-        successfull.
-        
+        successful.
+
       o Another case of early termination would be the throwing of exceptions from one of the
         tasks.
-        
+
       o For now, we don't have a good mechanism for this; we do want to keep this light-weight
         since FXTaskGroup is created on the stack in FXParallel.
 */
@@ -102,8 +102,6 @@ FXTaskGroup::Task::~Task(){
 FXint FXTaskGroup::Task::run(){
   try{
     runnable->run();
-    }
-  catch(const FXException&){
     }
   catch(...){
     delete this;

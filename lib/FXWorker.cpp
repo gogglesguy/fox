@@ -35,8 +35,7 @@
     and its memory are automatically reclaimed.
   - The runnable itself is not deleted by the worker; it will thus outlive the worker
     that runs it.
-  - Resource exceptions thrown by the runnable cause early termination of the runnable,
-    and are caught by the worker; other exceptions cause program termination, normally.
+  - Exceptions thrown by the runnable cause early termination of the runnable.
 */
 
 using namespace FX;
@@ -47,7 +46,7 @@ namespace FX {
 /*******************************************************************************/
 
 // Create worker for runnable
-FXWorker::FXWorker(FXRunnable* rn):runnable(rn){
+FXWorker::FXWorker(FXRunnable* task):runnable(task){
   FXTRACE((100,"FXWorker::FXWorker %p\n",this));
   }
 
@@ -56,9 +55,7 @@ FXWorker::FXWorker(FXRunnable* rn):runnable(rn){
 FXint FXWorker::run(){
   if(runnable){
     try{
-      runnable->run();
-      }
-    catch(const FXException&){
+      runnable->run();                  
       }
     catch(...){
       delete this;
@@ -71,9 +68,9 @@ FXint FXWorker::run(){
 
 
 // Create and start a worker executing a given runnable
-FXWorker* FXWorker::execute(FXRunnable* rn,FXuval stacksize){
-  if(rn){
-    FXWorker* worker=new FXWorker(rn);
+FXWorker* FXWorker::execute(FXRunnable* task,FXuval stacksize){
+  if(task){
+    FXWorker* worker=new FXWorker(task);
     if(worker){
       if(worker->start(stacksize)){ return worker; }
       delete worker;

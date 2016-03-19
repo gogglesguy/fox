@@ -42,7 +42,7 @@ public:
 
 
 /// Array of some generic type
-template<class EType>
+template<typename EType>
 class FXArray : public FXArrayBase {
 public:
 

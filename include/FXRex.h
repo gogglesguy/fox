@@ -27,33 +27,35 @@ namespace FX {
 
 /**
 * FXRex is a regular expression class implementing a NFA matcher.
-* It supports capturing parentheses, non-capturing parentheses,
-* positive or negative lookahead, backreferences, case-insensitive
-* matching, counted repetitions, lazy or greedy matches, and
-* PERL-like matching operators.
-* The subject string may be scanned forwards or backwards, and may
-* contain any of 256 possible character values.
+* It supports capturing parentheses, non-capturing parentheses, positive or negative
+* lookahead, backreferences, case-insensitive matching, counted repetitions, lazy or
+* greedy matches, and PERL-like matching operators.
+* The subject string may be searched forwards or backwards, and may contain any of
+* 256 possible byte values.
 *
-* When parsing a regular expression pattern, the mode parameter is
-* the bitwise OR of a set of flags and affects the match algorithm.
-* Passing the flag Capture enables capturing parentheses
-* and back references. The flag IgnoreCase enables case-insensitive
-* matching. When the flag Newline is passed, newlines are treated
-* like normal characters; otherwise, newline is NOT matched
-* except when explicitly part of a character class. The flag
-* Verbatim disables all special character interpretation.
+* When parsing a regular expression pattern, the mode parameter is the bitwise OR of
+* a set of flags and affects the match algorithm.  Passing the flag Capture enables
+* capturing parentheses and back references, and allows the matcher engine to return
+* the locations of the string matching these sub-patterns. The flag IgnoreCase enables
+* case-insensitive matching.
+* When the flag Newline is passed, newlines are treated like normal characters, and
+* not line-separators.  If Newline flag is not passed, character classes such as '.',
+* '\D', '\s', [^a-z] etc. will NOT match newlines.  The flag Verbatim disables all
+* special character interpretation, making the entire pattern a literal string to be
+* matched against a string one-to-one.
+* When the Exact flag is passed, a match succeeds only if the entire string is matched.
+* If the NotEmpty flag is passed, the pattern must match at least one character in order
+* to succeed.
+* If the flag Syntax will check the pattern for correct syntax only, and not generate a
+* matching engine; it will just reset the engine to the empty pattern.
 *
-* When matching a compiled pattern, the mode parameter is the
-* bitwise OR of a set of flags that affects how the match is
-* performed.  Passing the flag Backward causes the match
-* to proceed backwards through the subject string.  Passing the
-* flags NotBol and/or NotEol causes the begin and
-* end of the subject string NOT to be considered a line start
-* or line end. The flag NotEmpty causes a match to fail if
-* the empty string was matched.
+* When matching a compiled pattern, the mode parameter is the bitwise OR of a set of
+* flags that affects how the match is performed.  Passing the flags NotBol and/or NotEol
+* causes the begin and end of the subject string NOT to be considered a line start or
+* line end.
 *
-* Patterns which cause inordinate amounts of recursion may cause
-* FXRex to throw an FXResourceException.
+* Patterns which cause inordinate amounts of recursion may cause FXRex to fail where
+* otherwise it would succeed to match.
 */
 class FXAPI FXRex {
 private:
@@ -63,24 +65,25 @@ private:
   static const FXuchar fallback[];
 public:
 
-  /// Regular expression parse flags
+  /// Regular expression flags
   enum {
-    Normal     = 0,     /// Normal mode
-    Capture    = 1,     /// Perform capturing parentheses
-    IgnoreCase = 2,     /// Ignore case differences
-    Newline    = 4,     /// Match-any operators match newline too
-    Verbatim   = 8,     /// Disable interpretation of magic characters
-    Syntax     = 16,    /// Perform syntax check only
-    Unicode    = 32     /// Unicode mode
-    };
 
-  /// Regular expression match flags
-  enum {
-    Forward    = 0,     /// Match scanning forward from offset
-    Backward   = 64,    /// Match scanning backward from offset
-    NotBol     = 128,   /// Start of string is NOT begin of line
-    NotEol     = 256,   /// End of string is NOT end of line
-    NotEmpty   = 512    /// Do not match empty
+    /// Flags for both parse and match mode
+    Normal     = 0,     /// Normal mode (default)
+    Unicode    = 1,     /// Unicode mode
+
+    /// Regular expression parse flags
+    Syntax     = 2,     /// Perform syntax check only
+    Verbatim   = 4,     /// Literal pattern mode with no magic characters
+    Capture    = 8,     /// Perform capturing parentheses
+    IgnoreCase = 16,    /// Ignore case differences
+    Newline    = 32,    /// Match-any operators match newline too
+    Exact      = 64,    /// Exact match to entire string (\A..\Z)
+    NotEmpty   = 128,   /// A successful match must not be empty
+
+    /// Regular expression match flags
+    NotBol     = 256,   /// Start of string is NOT begin of line
+    NotEol     = 512    /// End of string is NOT end of line
     };
 
   /// Regular expression error codes
@@ -100,15 +103,21 @@ public:
     ErrComplex = 12,    /// Expression too complex
     ErrMemory  = 13,    /// Out of memory
     ErrToken   = 14,    /// Illegal token
-    ErrBehind  = 15     /// Bad look-behind pattern
+    ErrBehind  = 15,    /// Bad look-behind pattern
+    ErrSupport = 16     /// Unsupported
     };
 
 public:
 
-  /// Construct empty regular expression object
+  /**
+  * Construct empty regular expression object, with the
+  * fallback program installed.
+  */
   FXRex();
 
-  /// Copy regular expression object
+  /**
+  * Copy regular expression object  from another.
+  */
   FXRex(const FXRex& orig);
 
   /// Compile expression from pattern; if error is not NULL, error code is returned
@@ -117,9 +126,6 @@ public:
   /// Compile expression from pattern; if error is not NULL, error code is returned
   FXRex(const FXString& pattern,FXint mode=Normal,Error* error=NULL);
 
-  /// Assign another regular expression to this one
-  FXRex& operator=(const FXRex& orig);
-
   /**
   * See if regular expression is empty; the regular expression
   * will be empty when it is unable to parse a pattern due to
@@ -127,23 +133,35 @@ public:
   */
   FXbool empty() const { return (code==fallback); }
 
-  /// Parse pattern, return error code if syntax error is found
+  /**
+  * Parse pattern, return error code if syntax error is found.
+  * The parse-mode flags control the compile options, and affect how
+  * the generated matcher behaves.
+  * If a parse fails, an error code is returned; in this case, the
+  * expression matcher will be set up to a fallback program.
+  */
   Error parse(const FXchar* pattern,FXint mode=Normal);
-
-  /// Parse pattern, return error code if syntax error is found
   Error parse(const FXString& pattern,FXint mode=Normal);
 
   /**
-  * Match a subject string of length len, returning true if a match is found
-  * and false otherwise.  The entire pattern is captured in beg[0] and end[0],
-  * where beg[0] refers to the position of the first matched character and end[0]
-  * refers to the position after the last matched character.
-  * Sub expressions from capturing parenthesis i are returned in beg[i] and end[i].
+  * Perform anchored match of subject string of length len at position pos, returning true
+  * if the pattern matches at this point.
+  * If there is a match, the pattern and subpatterns are captured in the arrays beg[] and end[]
+  * which must both be at least npar entries long.
   */
-  FXbool match(const FXchar* string,FXint len,FXint* beg=NULL,FXint* end=NULL,FXint mode=Forward,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
+  FXbool amatch(const FXchar* string,FXint len,FXint pos=0,FXint mode=Normal,FXint* beg=NULL,FXint* end=NULL,FXint npar=0) const;
+  FXbool amatch(const FXString& string,FXint pos=0,FXint mode=Normal,FXint* beg=NULL,FXint* end=NULL,FXint npar=0) const;
 
-  /// Search for match in a string
-  FXbool match(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint mode=Forward,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
+  /**
+  * Search subject string of length len for a pattern, returning the location where the pattern
+  * is found relative from the start of the string, or -1 if there is no match.
+  * In case of a successful match, the pattern and subpatterns are captured in the arrays beg[] and end[]
+  * which must be at least npar entries long.
+  * The string is searched forwards (or backwards) starting from position fm toward to, both of which
+  * must lie inside the string.
+  */
+  FXint search(const FXchar* string,FXint len,FXint fm,FXint to,FXint mode=Normal,FXint* beg=NULL,FXint* end=NULL,FXint npar=0) const;
+  FXint search(const FXString& string,FXint fm,FXint to,FXint mode=Normal,FXint* beg=NULL,FXint* end=NULL,FXint npar=0) const;
 
   /**
   * After performing a regular expression match with capturing parentheses,
@@ -151,14 +169,19 @@ public:
   * is replaced by the entire matched pattern, and "\1" through "\9" are
   * replaced by captured expressions.  The original source string and its
   * length, and the match arrays beg and end must be passed.
+  * The replace string may also contain regular escape sequences to embed special
+  * characters.
   */
+  static FXString substitute(const FXchar* string,FXint len,FXint* beg,FXint* end,const FXchar* replace,FXint npar=1);
   static FXString substitute(const FXchar* string,FXint len,FXint* beg,FXint* end,const FXString& replace,FXint npar=1);
-
-  /// Return substitution string
+  static FXString substitute(const FXString& string,FXint* beg,FXint* end,const FXchar* replace,FXint npar=1);
   static FXString substitute(const FXString& string,FXint* beg,FXint* end,const FXString& replace,FXint npar=1);
 
-  /// Returns error code for given error
+  /// Returns error message text for a given error code
   static const FXchar* getError(Error err){ return errors[err]; }
+
+  /// Assign another regular expression to this one
+  FXRex& operator=(const FXRex& orig);
 
   /// Comparison operators
   FXbool operator==(const FXRex& rex) const;
@@ -167,6 +190,11 @@ public:
   /// Saving and loading
   friend FXAPI FXStream& operator<<(FXStream& store,const FXRex& s);
   friend FXAPI FXStream& operator>>(FXStream& store,FXRex& s);
+
+  /**
+  * Clear the expression object and reinstate the fallback program.
+  */
+  void clear();
 
   /// Delete
  ~FXRex();

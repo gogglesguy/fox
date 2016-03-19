@@ -53,6 +53,7 @@
 
   - Search dialog is essentially a FXReplaceDialog with some of the buttons
     hidden.
+  - Search dialog is now kept open until explicitly closed.
 */
 
 using namespace FX;
@@ -66,11 +67,11 @@ namespace FX {
 FXIMPLEMENT(FXSearchDialog,FXReplaceDialog,NULL,0)
 
 
-
-// File Open Dialog
+// Search Dialog
 FXSearchDialog::FXSearchDialog(FXWindow* own,const FXString& caption,FXIcon* icn,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXReplaceDialog(own,caption,icn,opts,x,y,w,h){
-  accept->setText(tr("&Search"));
-  every->hide();
+  replace->hide();
+  replacesel->hide();
+  replaceall->hide();
   replacelabel->hide();
   replacebox->hide();
   }

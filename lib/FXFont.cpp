@@ -136,7 +136,8 @@ using namespace FX;
 namespace FX {
 
 
-const FXint LEAD_OFFSET=0xD800-(0x10000>>10);
+static const FXint LEAD_OFFSET=0xD800-(0x10000>>10);
+static const FXint TAIL_OFFSET=0xDC00;
 
 
 // Absolute value
@@ -1648,7 +1649,7 @@ FXint FXFont::getCharWidth(const FXwchar ch) const {
     sbuffer[0]=ch;
     if(0xFFFF<ch){                      // Deal with surrogate pair
       sbuffer[0]=(ch>>10)+LEAD_OFFSET;
-      sbuffer[1]=(ch&0x3FF)+0xDC00;
+      sbuffer[1]=(ch&0x3FF)+TAIL_OFFSET;
       GetTextExtentPoint32W((HDC)dc,sbuffer,2,&size);
       return size.cx;
       }

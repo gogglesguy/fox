@@ -60,7 +60,7 @@ extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,.
 
 // Little helper
 static void readline(FXStream& store,FXchar* buffer,FXuint size){
-  register FXuint i=0;
+  FXuint i=0;
   while(!store.eof() && i<size){
     store >> buffer[i];
     if(buffer[i]=='\r') continue;
@@ -82,7 +82,7 @@ FXbool fxcheckXBM(FXStream& store){
 
 // Load alpha XBM image from pixels and mask
 FXbool fxloadXBM(FXColor*& data,const FXuchar *pixels,const FXuchar *mask,FXint width,FXint height){
-  register FXint x,y,byt,bit,row;
+  FXint x,y,byt,bit,row;
   data=NULL;
   if(pixels && mask && 0<width && 0<height){
     if(callocElms(data,width*height)){
@@ -192,8 +192,8 @@ FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
 // Save image to a stream
 FXbool fxsaveXBM(FXStream& store,const FXColor *data,FXint width,FXint height,FXint hotx,FXint hoty){
   static const FXint dither[4][4]={{0,32768, 8192,40960},{49152,16384,57344,24576},{12288,45056,4096,36864},{61440,28672,53248,20480}};
-  register const FXuchar *ptr=(const FXuchar*)data;
-  register FXint bit,code,count,x,y,n;
+  const FXuchar *ptr=(const FXuchar*)data;
+  FXint bit,code,count,x,y,n;
   const char name[]="image";
   FXchar buffer[128];
 

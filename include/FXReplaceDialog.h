@@ -34,7 +34,22 @@ class FXTextField;
 class FXHorizontalFrame;
 
 
-/// Text replace dialog
+/**
+* Search and Replace Dialog.
+* This dialog allows the user to enter a string or pattern to
+* search for, and a replace string to replace the matched contents with.
+* Some options can control the search process: case-sensitivity, regular
+* expression searches, and search direction (forward or backward).
+* For convenience, the most recent search and replace strings are remembered,
+* and can be quickly recalled by scrolling back in the respective entry-boxes.
+* The flags controlling case-sensitivity, pattern search, and search direction
+* are also remembered and will automatically be reinstated when the corresponding
+* search string is selected.
+* Note, the dialog does not itself perform a search, it just provided a convenient
+* entry box for the search and replace parameters.
+* A history is kept of past strings and flags that we searched; this can be quickly
+* recalled by using the arrow-buttons.
+*/
 class FXAPI FXReplaceDialog : public FXDialogBox {
   FXDECLARE(FXReplaceDialog)
 protected:
@@ -44,56 +59,66 @@ protected:
   FXLabel           *replacelabel;
   FXTextField       *replacetext;
   FXHorizontalFrame *replacebox;
-  FXButton          *accept;
+  FXButton          *search;
+  FXButton          *replace;
+  FXButton          *replacesel;
+  FXButton          *replaceall;
   FXButton          *cancel;
-  FXButton          *every;
   FXuint             searchmode;
   FXuint             current;
 protected:
   static const FXchar sectionName[];
 protected:
   FXReplaceDialog(){}
-  void appendHistory(const FXString& search,const FXString& replace,FXuint mode);
+  void appendHistory(const FXString& searchstr,const FXString& replacestr,FXuint mode);
 private:
   FXReplaceDialog(const FXReplaceDialog&);
   FXReplaceDialog &operator=(const FXReplaceDialog&);
 public:
-  long onCmdAll(FXObject*,FXSelector,void*);
-  long onCmdNext(FXObject*,FXSelector,void*);
   long onUpdDir(FXObject*,FXSelector,void*);
   long onCmdDir(FXObject*,FXSelector,void*);
   long onUpdMode(FXObject*,FXSelector,void*);
   long onCmdMode(FXObject*,FXSelector,void*);
+  long onUpdWrap(FXObject*,FXSelector,void*);
+  long onCmdWrap(FXObject*,FXSelector,void*);
   long onSearchKey(FXObject*,FXSelector,void*);
   long onReplaceKey(FXObject*,FXSelector,void*);
   long onCmdSearchHist(FXObject*,FXSelector,void*);
   long onCmdReplaceHist(FXObject*,FXSelector,void*);
-  long onCmdAccept(FXObject*,FXSelector,void*);
   long onWheelSearch(FXObject*,FXSelector,void*);
   long onWheelReplace(FXObject*,FXSelector,void*);
+  long onCmdSearch(FXObject*,FXSelector,void*);
+  long onUpdSearch(FXObject*,FXSelector,void*);
+  long onCmdReplace(FXObject*,FXSelector,void*);
+  long onCmdReplaceSel(FXObject*,FXSelector,void*);
+  long onCmdReplaceAll(FXObject*,FXSelector,void*);
 public:
   enum{
-    ID_NEXT=FXDialogBox::ID_LAST,
-    ID_PREV,
-    ID_SEARCH_UP,
+    ID_SEARCH_UP=FXDialogBox::ID_LAST,
     ID_SEARCH_DN,
     ID_REPLACE_UP,
     ID_REPLACE_DN,
-    ID_ALL,
+    ID_SEARCH,
+    ID_SEARCH_NEXT,
+    ID_SEARCH_PREV,
+    ID_REPLACE,
+    ID_REPLACE_SEL,
+    ID_REPLACE_ALL,
     ID_DIR,
     ID_SEARCH_TEXT,
     ID_REPLACE_TEXT,
-    ID_MODE,
-    ID_LAST=ID_MODE+32
+    ID_MODE_FIRST,
+    ID_MODE_LAST=ID_MODE_FIRST+SEARCH_SUFFIX,
+    ID_WRAP,
+    ID_LAST
     };
 public:
   enum {
     DONE          = 0,    /// Cancel search
-    SEARCH        = 1,    /// Search first occurrence
-    REPLACE       = 1,    /// Replace first occurrence
-    SEARCH_NEXT   = 2,    /// Search next occurrence
-    REPLACE_NEXT  = 2,    /// Replace next occurrence
-    REPLACE_ALL   = 3     /// Replace all occurrences
+    SEARCH        = 1,    /// Search for pattern
+    REPLACE       = 2,    /// Replace first occurrence
+    REPLACE_SEL   = 3,    /// Replace occurrences in selection
+    REPLACE_ALL   = 4     /// Replace all occurrences
     };
 public:
 
@@ -118,6 +143,18 @@ public:
   /// Return search mode the user has selected
   FXuint getSearchMode() const { return searchmode; }
 
+  /// Change search text color
+  void setSearchTextColor(FXColor clr);
+  
+  /// Return search text color
+  FXColor getSearchTextColor() const;
+  
+  /// Change replace text color
+  void setReplaceTextColor(FXColor clr);
+  
+  /// Return replace text color
+  FXColor getReplaceTextColor() const;
+  
   /// Run modal invocation of the dialog
   virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
 

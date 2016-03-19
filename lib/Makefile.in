@@ -459,7 +459,6 @@ $(top_srcdir)/lib/filedelete.gif \
 $(top_srcdir)/lib/fileshown.gif \
 $(top_srcdir)/lib/foldernew.gif \
 $(top_srcdir)/lib/gotohome.gif \
-$(top_srcdir)/lib/gotoicon.gif \
 $(top_srcdir)/lib/gotowork.gif \
 $(top_srcdir)/lib/hsvmode.gif \
 $(top_srcdir)/lib/infoicon.gif \

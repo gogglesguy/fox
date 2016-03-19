@@ -28,7 +28,16 @@
 namespace FX {
 
 
-/// Text search dialog
+/**
+* Search Dialog.
+* This dialog allows the user to enter a search string or pattern to
+* search for; also, some common options such as case-sentitivity, search
+* direction, and whether or not to perform a regular expression match may
+* be entered.  The most recent couple of search paraneters are remembered
+* for quick recall for convenience.
+* Note that this dialog does not actually perform a search, it just provides
+* an entry box for the search parameters.
+*/
 class FXAPI FXSearchDialog : public FXReplaceDialog {
   FXDECLARE(FXSearchDialog)
 protected:

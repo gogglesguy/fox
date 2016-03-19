@@ -2407,7 +2407,7 @@ FXString FXString::vvalue(const FXchar* fmt,va_list args){
   }
 
 
-// Compute hash value from string
+// Compute hash value of string
 FXuint FXString::hash(const FXchar* s){
   register FXuint result=0;
   register FXuchar c;
@@ -2418,7 +2418,7 @@ FXuint FXString::hash(const FXchar* s){
   }
 
 
-// Get hash value of the string
+// Compute hash value of string
 FXuint FXString::hash() const {
   return FXString::hash(str);
   }
@@ -2927,7 +2927,7 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
     case '\x18':
     case '\x19':
     case '\x1A':
-    case '\x1B':
+    case '\x1B':                        // Or represent as \e ?
     case '\x1C':
     case '\x1D':
     case '\x1E':
@@ -3007,7 +3007,7 @@ hex1: q+=4;                             // Escape as \xHH
     case '\x18':
     case '\x19':
     case '\x1A':
-    case '\x1B':
+    case '\x1B':                        // Or represent as \e ?
     case '\x1C':
     case '\x1D':
     case '\x1E':
@@ -3165,6 +3165,7 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
       case 'b':
       case 'v':
       case 'a':
+      case 'e':                         // Escape
       case 'f':
       case 't':
       case '\\':
@@ -3243,6 +3244,9 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
         continue;
       case 'a':
         result[q++]='\a';
+        continue;
+      case 'e':                         // Escape
+        result[q++]='\033';
         continue;
       case 'f':
         result[q++]='\f';

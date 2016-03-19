@@ -842,7 +842,7 @@ FXWindow* FXApp::getForegroundWindow() const {
 
 // Find window from id
 FXWindow* FXApp::findWindowWithId(FXID xid) const {
-  return (FXWindow*)hash.find((void*)xid);
+  return (FXWindow*)hash.at((FXptr)xid); 
   }
 
 
@@ -5071,7 +5071,7 @@ Alt key seems to repeat.
     case WM_CREATE:
       event.type=SEL_CREATE;
       window=(FXWindow*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
-      hash.insert((void*)hwnd,window);
+      hash.insert((FXptr)hwnd,window);
       if(window->handle(this,FXSEL(SEL_CREATE,0),&event)) refresh();
       return 0;
 

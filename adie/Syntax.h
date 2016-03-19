@@ -89,10 +89,13 @@ private:
 public:
 
   // Construct node
-  SimpleRule(const FXString& nm,const FXString& rex,FXint p,FXint s):Rule(nm,p,s),pat(rex,FXRex::Newline){ }
+  SimpleRule(const FXString& nm,const FXString& rex,FXint p,FXint s):Rule(nm,p,s),pat(rex,FXRex::Newline|FXRex::NotEmpty){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
+
+  // Stylize body, i.e. after begin pattern has been seen
+  virtual FXbool stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
   };
 
 
@@ -197,6 +200,9 @@ public:
   // Return true if p is ancestor of c
   FXbool isAncestor(FXint p,FXint c) const;
 
+  // Return common ancestor of a and b
+  FXint commonAncestor(FXint a,FXint b) const;
+
   // Language name
   const FXString& getName() const { return language; }
   void setName(const FXString& lang){ language=lang; }
@@ -245,4 +251,3 @@ public:
 
 
 #endif
-

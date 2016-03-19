@@ -78,6 +78,7 @@ protected:
   FXHiliteArray        styles;                  // Highlight styles
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
+  FXString             searchstring;            // String of last search
   FXuint               searchflags;             // Incremental search flags
   FXint                searchpos;               // Incremental search position
   FXbool               searching;               // Incremental search in effect
@@ -111,6 +112,7 @@ protected:
   FXint restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint rule);
   FXHiliteStyle readStyleForRule(const FXString& name);
   void writeStyleForRule(const FXString& name,const FXHiliteStyle& style);
+  FXbool matchesSelection(const FXString& string,FXint* beg,FXint* end,FXuint flgs,FXint npar) const;
 protected:
   enum{
     MAXUNDOSIZE    = 1000000,               // Don't let the undo buffer get out of hand
@@ -125,6 +127,7 @@ public:
   long onFocusIn(FXObject*,FXSelector,void*);
   long onCmdAbout(FXObject*,FXSelector,void*);
   long onCmdHelp(FXObject*,FXSelector,void*);
+  long onUpdIsEditable(FXObject*,FXSelector,void*);
 
   // File management
   long onCmdNew(FXObject*,FXSelector,void*);
@@ -222,7 +225,6 @@ public:
   long onCmdDelimiters(FXObject*,FXSelector,void*);
   long onUpdDelimiters(FXObject*,FXSelector,void*);
   long onCmdInsertFile(FXObject*,FXSelector,void*);
-  long onUpdInsertFile(FXObject*,FXSelector,void*);
   long onCmdExtractFile(FXObject*,FXSelector,void*);
   long onUpdExtractFile(FXObject*,FXSelector,void*);
   long onCmdWheelAdjust(FXObject*,FXSelector,void*);
@@ -263,6 +265,16 @@ public:
   // Evaluate expression
   long onCmdExpression(FXObject*,FXSelector,void*);
   long onUpdExpression(FXObject*,FXSelector,void*);
+
+  // Jumping around
+  long onCmdGotoLine(FXObject*,FXSelector,void*);
+  long onCmdGotoSelected(FXObject*,FXSelector,void*);
+
+  // Search
+  long onCmdSearch(FXObject*,FXSelector,void*);
+  long onCmdReplace(FXObject*,FXSelector,void*);
+  long onCmdSearchSel(FXObject*,FXSelector,void*);
+  long onCmdSearchNext(FXObject*,FXSelector,void*);
 
   // Incremental search
   long onChgISearchText(FXObject*,FXSelector,void*);
@@ -410,6 +422,14 @@ public:
     ID_TOGGLE_BROWSER,
     ID_SEARCHPATHS,
     ID_EXPRESSION,
+    ID_GOTO_LINE,
+    ID_GOTO_SELECTED,
+    ID_SEARCH,
+    ID_REPLACE,
+    ID_SEARCH_SEL_FORW,
+    ID_SEARCH_SEL_BACK,
+    ID_SEARCH_NXT_FORW,
+    ID_SEARCH_NXT_BACK,
     ID_ISEARCH_TEXT,
     ID_ISEARCH_REVERSE,
     ID_ISEARCH_IGNCASE,
@@ -554,6 +574,9 @@ public:
 
   // Determine syntax
   void determineSyntax();
+
+  // Set status message
+  void setStatusMessage(const FXString& msg);
 
   // Delete text window
   virtual ~TextWindow();

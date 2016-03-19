@@ -77,9 +77,9 @@ const FXival __settings__empty__[6]={1,0,1,(FXival)(__string__empty__+1),(FXival
 
 // Adjust the size of the table
 FXbool FXSettings::no(FXival n){
-  register FXival m=no();
+  FXival m=no();
   if(__likely(m!=n)){
-    register Entry *elbat;
+    Entry *elbat;
 
     // Release old table
     if(1<m){
@@ -109,8 +109,8 @@ FXbool FXSettings::resize(FXival n){
   FXASSERT((n-used())>0);       // At least one free slot
   if(elbat.no(n)){
     if(1<elbat.no() && 1<no()){
-      register FXuval p,b,h,x;
-      register FXival i;
+      FXuval p,b,h,x;
+      FXival i;
       for(i=0; i<no(); ++i){                  // Hash existing entries into new table
         p=b=h=table[i].hash;
         if(!table[i].key.empty()){
@@ -183,7 +183,7 @@ FXSettings& FXSettings::adopt(FXSettings& other){
 
 // Find position of given key
 FXival FXSettings::find(const FXchar* ky) const {
-  register FXuval p,b,x,h;
+  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXSettings::find: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -198,7 +198,7 @@ FXival FXSettings::find(const FXchar* ky) const {
 
 // Return reference to string assocated with key
 FXStringDictionary& FXSettings::at(const FXchar* ky){
-  register FXuval p,b,h,x;
+  FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXSettings::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -225,7 +225,7 @@ x:modified=true;                                        // Assume its to be writ
 
 // Return constant reference to string assocated with key
 const FXStringDictionary& FXSettings::at(const FXchar* ky) const {
-  register FXuval p,b,x,h;
+  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXSettings::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -269,7 +269,7 @@ FXbool FXSettings::unparseFile(const FXString& filename){
 
 // Parse single string to populate settings
 FXbool FXSettings::parse(const FXString& str,FXbool mrk){
-  register FXint lineno=1,p=0,b,e;
+  FXint lineno=1,p=0,b,e;
   FXString section,name,value;
 
   // Skip over byte-order mark
@@ -361,7 +361,7 @@ nxt:while(str[p]){
 
 // Unparse settings to a single string
 FXbool FXSettings::unparse(FXString& str) const {
-  register FXival sec,ent,flg;
+  FXival sec,ent,flg;
 
   // Clear output
   str.clear();
@@ -885,7 +885,7 @@ void FXSettings::deleteEntry(const FXString& section,const FXString& name){
 
 // Delete section
 void FXSettings::deleteSection(const FXchar* section){
-  register FXuval p,b,h,x;
+  FXuval p,b,h,x;
   if(__unlikely(!section || !*section)){ throw FXRangeException("FXSettings::deleteSection: null or empty key\n"); }
   p=b=h=FXString::hash(section);
   FXASSERT(h);

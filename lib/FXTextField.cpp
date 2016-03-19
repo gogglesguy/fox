@@ -574,17 +574,17 @@ void FXTextField::setCursorPos(FXint pos){
 
 // Move cursor
 void FXTextField::moveCursor(FXint pos){
-  makePositionVisible(pos);
   setCursorPos(pos);
-  setAnchorPos(pos);
+  makePositionVisible(cursor);
+  setAnchorPos(cursor);
   killSelection();
   }
 
 
 // Move cursor and select
 void FXTextField::moveCursorAndSelect(FXint pos){
-  makePositionVisible(pos);
   setCursorPos(pos);
+  makePositionVisible(cursor);
   extendSelection(cursor);
   }
 

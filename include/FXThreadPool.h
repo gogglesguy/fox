@@ -55,9 +55,8 @@ typedef FXLFQueueOf<FXRunnable> FXTaskQueue;
 * The tasks which are passed to the thread pool are derived from FXRunnable.  In order
 * to perform some useful function, subclasses of FXRunnable should overload the run()
 * function.
-* FXExceptions thrown by a task are caught in the thread pool and thus won't cause a
-* premature exit of either the worker thread of the thread pool itself; other exceptions
-* however will possibly cause program termination.
+* Uncaught exceptions thrown by a task are intercepted by the thread pool and rethrown
+* after the necessary cleanup, and cause the worker thread to end prematurely.
 * When the thread pool is stopped, it will wait until all tasks are finished, and then
 * cause all worker-threads to terminate.
 * The thread pool becomes associated (through a thread-local variable) with the calling

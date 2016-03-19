@@ -76,7 +76,7 @@ FXString FXPath::root(const FXString& file){
   if(!file.empty()){
 #if defined(WIN32)
     FXString result(file);
-    register FXint p=0,q=0;
+    FXint p=0,q=0;
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
       if(ISPATHSEP(result[q])){
@@ -110,7 +110,7 @@ FXString FXPath::root(const FXString& file){
 FXString FXPath::share(const FXString& file){
 #if defined(WIN32)
   if(!file.empty()){
-    register FXint f,n;
+    FXint f,n;
     if(ISPATHSEP(file[0])){                                   // UNC
       if(ISPATHSEP(file[1])){
         n=2;
@@ -135,7 +135,7 @@ FXString FXPath::share(const FXString& file){
 FXString FXPath::directory(const FXString& file){
   if(!file.empty()){
     FXString result(file);
-    register FXint p=0,q=0,s;
+    FXint p=0,q=0,s;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -177,8 +177,7 @@ FXString FXPath::directory(const FXString& file){
 // However, name("/bla/bla") is "bla" as we expect!
 FXString FXPath::name(const FXString& file){
   if(!file.empty()){
-    register FXint n=0,f;
-    n=0;
+    FXint n=0,f;
 #if defined(WIN32)
     if(Ascii::isLetter(file[0]) && file[1]==':') n=2;
 #endif
@@ -201,7 +200,7 @@ FXString FXPath::name(const FXString& file){
 //  /path/.aa       -> .aa
 FXString FXPath::title(const FXString& file){
   if(!file.empty()){
-    register FXint i=0,f,e,b;
+    FXint i=0,f,e,b;
 #if defined(WIN32)
     if(Ascii::isLetter(file[0]) && file[1]==':') i=2;
 #endif
@@ -230,7 +229,7 @@ FXString FXPath::title(const FXString& file){
 //  /path/.aa       -> ""
 FXString FXPath::extension(const FXString& file){
   if(!file.empty()){
-    register FXint n=0,f,e,i;
+    FXint n=0,f,e,i;
 #if defined(WIN32)
     if(Ascii::isLetter(file[0]) && file[1]==':') n=2;
 #endif
@@ -259,7 +258,7 @@ FXString FXPath::extension(const FXString& file){
 FXString FXPath::stripExtension(const FXString& file){
   if(!file.empty()){
     FXString result(file);
-    register FXint p=0,q=0,s,e;
+    FXint p=0,q=0,s,e;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -329,7 +328,7 @@ FXString FXPath::expand(const FXString& file){
     FXString result;
 #if defined(WIN32)
     FXString var,val;
-    register FXint b=0,e;
+    FXint b=0,e;
     while(file[b]){
       if(file[b]=='%'){
         e=file.find('%',b+1);
@@ -362,7 +361,7 @@ FXString FXPath::expand(const FXString& file){
         }
       }
 #else
-    register FXint b,e,n;
+    FXint b,e,n;
 
     // Expand leading tilde of the form ~/filename or ~user/filename
     n=0;
@@ -466,7 +465,7 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 FXString FXPath::simplify(const FXString& file){
   if(!file.empty()){
     FXString result(file);
-    register FXint p=0,q=0,s;
+    FXint p=0,q=0,s;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -633,7 +632,7 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
 
   // Base and file non-empty and either both absolute, or both relative
   if(!base.empty() && !file.empty() && (FXPath::isAbsolute(base) == FXPath::isAbsolute(file))){
-    register FXint p=0,q=0,bp=0,bq=0;
+    FXint p=0,q=0,bp=0,bq=0;
 
     // Find branch point
 #if defined(WIN32)
@@ -731,7 +730,7 @@ FXString FXPath::relative(const FXString& file){
 //  (empty)    (something)   no         ./something is NOT under empty
 FXbool FXPath::isInside(const FXString& base,const FXString& file){
   if(!base.empty() && !file.empty()){
-    register FXint p=0,q=0,v=0;
+    FXint p=0,q=0,v=0;
 #if defined(WIN32)
     if(ISPATHSEP(base[p])){
       if(!ISPATHSEP(file[q])) return false;
@@ -828,7 +827,7 @@ b:    if(file[q]=='.'){
 FXString FXPath::convert(const FXString& file,FXchar septo,FXchar sepfm){
   if(!file.empty()){
     FXString result(file);
-    register FXint p=0,q=0;
+    FXint p=0,q=0;
 #if defined(WIN32)
     if(result[q]==sepfm || result[q]==septo){                   // UNC
       result[p++]=septo; q++;
@@ -869,7 +868,7 @@ FXString FXPath::convert(const FXString& file,FXchar septo,FXchar sepfm){
 FXString FXPath::upLevel(const FXString& file){
   if(!file.empty()){
     FXString result(file);
-    register FXint p=0,q=0,s;
+    FXint p=0,q=0,s;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -952,7 +951,7 @@ FXbool FXPath::isShare(const FXString&){
 
 // Return true if input path is a hidden file or directory
 FXbool FXPath::isHidden(const FXString& file){
-  register FXint i=file.length();
+  FXint i=file.length();
   while(0<i && !ISPATHSEP(file[i-1])){
     --i;
     }
@@ -987,7 +986,7 @@ FXString FXPath::validPath(const FXString& file){
 FXString FXPath::enquote(const FXString& file,FXbool force){
   FXString result(file);
   if(0<file.length()){
-    register FXint p,q,c,n;
+    FXint p,q,c,n;
 
     // Check if quotes needed, if not already forced
     if(!force && 0<=file.find_first_of(" \t\n\v\"")) force=true;
@@ -1114,7 +1113,7 @@ FXString FXPath::enquote(const FXString& file,FXbool force){
 FXString FXPath::dequote(const FXString& file){
   FXString result(file);
   if(0<result.length()){
-    register FXint e=result.length(),b=0,r=0,q=0,n=0;
+    FXint e=result.length(),b=0,r=0,q=0,n=0;
 
     // Trim tail
     while(0<e && Ascii::isSpace(file[e-1])) --e;
@@ -1167,7 +1166,7 @@ FXString FXPath::dequote(const FXString& file){
 FXString FXPath::enquote(const FXString& file,FXbool force){
   FXString result(file);
   if(0<file.length()){
-    register FXint p=0,q=0,e=0,c;
+    FXint p=0,q=0,e=0,c;
     while(p<file.length()){
       switch(file[p++]){
         case '\'':              // Quote needs to be escaped to ...'\''....
@@ -1234,7 +1233,7 @@ FXString FXPath::enquote(const FXString& file,FXbool force){
 FXString FXPath::dequote(const FXString& file){
   FXString result(file);
   if(0<result.length()){
-    register FXint e=result.length(),b=0,r=0,q=0;
+    FXint e=result.length(),b=0,r=0,q=0;
 
     // Trim tail
     while(0<e && Ascii::isSpace(file[e-1])) --e;
@@ -1261,11 +1260,11 @@ FXString FXPath::dequote(const FXString& file){
 
 // Perform match
 static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
-  register const FXchar *s=string;
-  register const FXchar *p=pattern;
-  register FXint level;
-  register FXwchar c,c2,cc;
-  register FXbool neg,ok;
+  const FXchar *s=string;
+  const FXchar *p=pattern;
+  FXint level;
+  FXwchar c,c2,cc;
+  FXbool neg,ok;
   while((c=wc(p))!='\0'){
     p=wcinc(p);
     switch(c){
@@ -1402,10 +1401,10 @@ nxt:    if(domatch(s,p,flags)) return true;
 
 // Match filename against a pattern, subject to flags
 FXbool FXPath::match(const FXchar *string,const FXchar *pattern,FXuint flags){
-  register const FXchar *s=string;
-  register const FXchar *p=pattern;
-  register FXint level;
-  register FXwchar c;
+  const FXchar *s=string;
+  const FXchar *p=pattern;
+  FXint level;
+  FXwchar c;
   if(s && p){
 nxt:if(domatch(s,p,flags)) return true;
     for(level=0; *p && 0<=level; ){
@@ -1443,7 +1442,7 @@ FXString FXPath::unique(const FXString& file){
   FXString ext=FXPath::extension(file);
   FXString path=FXPath::stripExtension(file);           // Use the new API (Jeroen)
   FXString filename;
-  register FXint count=0;
+  FXint count=0;
   if(!ext.empty()) ext.prepend('.');            // Only add period when non-empty extension
   while(count<1000){
     filename.format("%s%i%s",path.text(),count,ext.text());
@@ -1458,9 +1457,8 @@ FXString FXPath::unique(const FXString& file){
 FXString FXPath::search(const FXString& pathlist,const FXString& file){
   FXTRACE((100,"FXPath::search(\"%s\",\"%s\")\n",pathlist.text(),file.text()));
   if(!file.empty()){
-    register FXint beg;
-    register FXint end;
     FXString path;
+    FXint beg,end;
     if(FXPath::isAbsolute(file)){
       if(FXStat::exists(file)) return file;
       return FXString::null;
@@ -1482,7 +1480,7 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
 FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
   FXString result(file);
   if(!file.empty()){
-    register FXint beg,end;
+    FXint beg,end;
     FXString base,rr,r;
     for(beg=0; pathlist[beg]; beg=end){
       while(pathlist[beg]==PATHLISTSEP) beg++;
@@ -1508,7 +1506,7 @@ FXbool FXPath::hasExecExtension(const FXString& file){
 #if defined(WIN32)
   if(!file.empty()){
     FXString pathext(FXSystem::getExecExtensions());
-    register FXint beg=0,end;
+    FXint beg=0,end;
     do{
       end=beg;
       while(end<pathext.length() && pathext[end]!=PATHLISTSEP) end++;

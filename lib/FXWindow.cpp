@@ -673,7 +673,7 @@ long FXWindow::onConfigure(FXObject*,FXSelector,void* ptr){
 // The window was destroyed; the grab is lost
 long FXWindow::onDestroy(FXObject*,FXSelector,void*){
   FXTRACE((250,"%s::onDestroy %p\n",getClassName(),this));
-  getApp()->hash.remove((void*)xid);
+  getApp()->hash.remove((FXptr)xid);
   if(getApp()->mouseGrabWindow==this) getApp()->mouseGrabWindow=NULL;
   if(getApp()->keyboardGrabWindow==this) getApp()->keyboardGrabWindow=NULL;
   if(getApp()->cursorWindow==this) getApp()->cursorWindow=parent;
@@ -1276,7 +1276,7 @@ void FXWindow::create(){
       if(!xid){ throw FXWindowException("unable to create window."); }
 
       // Store for xid to C++ object mapping
-      getApp()->hash.insert((void*)xid,this);
+      getApp()->hash.insert((FXptr)xid,this);
 
       // We put the XdndAware property on all toplevel windows, so that
       // when dragging, we need to search no further than the toplevel window.
@@ -1369,7 +1369,7 @@ void FXWindow::create(){
       if(!xid){ throw FXWindowException("unable to create window."); }
 
       // Store for xid to C++ object mapping
-      getApp()->hash.insert((void*)xid,this);
+      getApp()->hash.insert((FXptr)xid,this);
 
       // We put the XdndAware property on all toplevel windows, so that
       // when dragging, we need to search no further than the toplevel window.
@@ -1429,7 +1429,7 @@ void FXWindow::attach(FXID w){
       xid=w;
 
       // Store for xid to C++ object mapping
-      getApp()->hash.insert((void*)xid,this);
+      getApp()->hash.insert((FXptr)xid,this);
 
 #ifdef WIN32
 
@@ -1463,7 +1463,7 @@ void FXWindow::detach(){
       FXTRACE((100,"%s::detach %p\n",getClassName(),this));
 
       // Remove from xid to C++ object mapping
-      getApp()->hash.remove((void*)xid);
+      getApp()->hash.remove((FXptr)xid);
 
       // Detach visual
       visual->detach();
@@ -1494,7 +1494,7 @@ void FXWindow::destroy(){
       FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
 
       // Remove from xid to C++ object mapping
-      getApp()->hash.remove((void*)xid);
+      getApp()->hash.remove((FXptr)xid);
 
       // Its our own window, so destroy it
       if(flags&FLAG_OWNED){

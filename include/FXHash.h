@@ -93,15 +93,35 @@ public:
   FXHash& adopt(FXHash& other);
 
   /**
-  * Return value of key, or return NULL.
+  * Find position of given key, returning -1 if not found.
   */
-  FXptr find(FXptr name) const;
+  FXival find(FXptr name) const;
+
+  /**
+  * Return reference to slot assocated with given key.
+  */
+  FXptr& at(FXptr name);
+
+  /**
+  * Return constant reference to slot assocated with given key.
+  */
+  const FXptr& at(FXptr name) const;
+
+  /**
+  * Return reference to slot assocated with given key.
+  */
+  FXptr& operator[](FXptr name){ return at(name); }
+
+  /**
+  * Return constant reference to slot assocated with given key.
+  */
+  const FXptr& operator[](FXptr name) const { return at(name); }
 
   /**
   * Replace key in table, overwriting the old value if the
   * given key already exists.  Returns the old value of the key.
   */
-  FXptr insert(FXptr name,FXptr data=NULL);
+  FXptr insert(FXptr name,FXptr data=NULL){ return swap(data,at(name)); }
 
   /**
   * Remove key from the table. Returns the old value of the key.

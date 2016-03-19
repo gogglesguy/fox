@@ -228,7 +228,7 @@ language "C++"
 
   # C++ style comment
   rule "CPPDocComment"
-    openpattern   "/// "
+    openpattern   "///(?!/)"
     closepattern  "$"
   end
 
@@ -243,7 +243,7 @@ language "C++"
 
   # C style comment
   rule "CDocComment"
-    openpattern   "/\*\*[ \n]"
+    openpattern   "/\*\*(?=\s)"
     closepattern  "\*/"
   end
 
@@ -399,7 +399,7 @@ language "C"
 
   # C style comment
   rule "CDocComment"
-    openpattern   "/\*\*[ \n]"
+    openpattern   "/\*\*(?=\s)"
     closepattern  "\*/"
   end
 
@@ -1104,6 +1104,36 @@ language "Make"
     end
     rule "ControlEscape"
       pattern     "\\."
+    end
+  end
+end
+
+
+# Makefiles
+language "CMake"
+  filesmatch "*.cmake,*.cmake.in,*.ctest,*.ctest.in,CMakeLists.txt"
+  contextlines 1
+  rule "BracketComment"
+    openpattern  "#\[\["
+    closepattern "\]\]"
+  end
+  rule "Comment"
+    openpattern  "#"
+    closepattern "$"
+  end
+  rule "Command"
+    openpattern "\s*?[A-Za-z_][A-Za-z0-9_]*?\s*?\("
+    closepattern "\)"
+    rule "QuotedArgument"
+      openpattern   "\""
+      closepattern  "\""
+      stoppattern   "$"
+      rule "Escape"
+        pattern     "\\[()#\" \\$@^;trn]"
+      end
+    end
+    rule "Argument"
+      pattern "[^\s()#\"\']+?"
     end
   end
 end

@@ -25,6 +25,11 @@
 namespace FX {
 
 
+enum{ 
+  FXParallelMax=128     // Maximum number of parallel jobs
+  };
+
+
 /**
 * FXParallelCallFunctor is a helper for FXParallelInvoke.  It executes a functor on
 * a thread provided by the FXThreadPool.
@@ -288,9 +293,9 @@ void FXParallelFor(FXThreadPool* pool,Index fm,Index to,Index by,Index nc,const 
   if(fm<to){
     if(by<(to-fm)){
       FXTaskGroup group(pool);
-      FXulong space[128*((sizeof(FXParallelForFunctor<Functor,Index>)+sizeof(FXulong)-1)/sizeof(FXulong))];
+      FXulong space[FXParallelMax*((sizeof(FXParallelForFunctor<Functor,Index>)+sizeof(FXulong)-1)/sizeof(FXulong))];
       Index nits=1+(to-fm-1)/by,ni,c;
-      if(nc>128) nc=128;
+      if(nc>FXParallelMax) nc=FXParallelMax;
       if(nc>nits) nc=nits;
       for(c=0; c<nc; fm+=ni*by,++c){
         ni=(nits+nc-1-c)/nc;

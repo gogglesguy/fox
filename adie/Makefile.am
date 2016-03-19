@@ -32,6 +32,7 @@ $(top_srcdir)/adie/delete_gif.gif \
 $(top_srcdir)/adie/delimit_gif.gif \
 $(top_srcdir)/adie/fonts_gif.gif \
 $(top_srcdir)/adie/forward_gif.gif \
+$(top_srcdir)/adie/goto_gif.gif \
 $(top_srcdir)/adie/help_gif.gif \
 $(top_srcdir)/adie/indent_gif.gif \
 $(top_srcdir)/adie/info_gif.gif \
@@ -48,10 +49,12 @@ $(top_srcdir)/adie/print_gif.gif \
 $(top_srcdir)/adie/quit_gif.gif \
 $(top_srcdir)/adie/redo_gif.gif \
 $(top_srcdir)/adie/reload_gif.gif \
+$(top_srcdir)/adie/replace_gif.gif \
 $(top_srcdir)/adie/saveall_gif.gif \
 $(top_srcdir)/adie/saveas_gif.gif \
 $(top_srcdir)/adie/save_gif.gif \
 $(top_srcdir)/adie/search_gif.gif \
+$(top_srcdir)/adie/searchicon_gif.gif \
 $(top_srcdir)/adie/searchnext_gif.gif \
 $(top_srcdir)/adie/searchprev_gif.gif \
 $(top_srcdir)/adie/shiftleft_gif.gif \

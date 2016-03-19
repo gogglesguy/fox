@@ -26,7 +26,8 @@ namespace FX {
 
 
 /// Pointer to shared object
-template <class EType> class FXRefPtr {
+template<typename EType> 
+class FXRefPtr {
 private:
   EType* ptr;
 public:
@@ -46,7 +47,7 @@ public:
     }
 
   /// Copy constructor from shared pointer of compatible type
-  template <class T> FXRefPtr(FXRefPtr<T>& org):ptr(org.ptr){
+  template<typename T> FXRefPtr(FXRefPtr<T>& org):ptr(org.ptr){
     if(ptr) ptr->ref();
     }
 
@@ -71,7 +72,7 @@ public:
     }
 
   /// Assignment from shared pointer of compatible type
-  template <class T> FXRefPtr<EType>& operator=(FXRefPtr<T>& src){
+  template<typename T> FXRefPtr<EType>& operator=(FXRefPtr<T>& src){
     FXRefPtr<EType> tmp(src);
     swap(tmp);
     return *this;
@@ -103,13 +104,13 @@ public:
 
 
 /// Serialize of reference counted pointer
-template <class EType> FXStream& operator<<(FXStream& store,const FXRefPtr<EType>& obj){
+template<typename EType> FXStream& operator<<(FXStream& store,const FXRefPtr<EType>& obj){
   EType *temp=obj; store << temp; return store;
   }
 
 
 /// Deserialize of reference counted pointer
-template <class EType> FXStream& operator>>(FXStream& store,FXRefPtr<EType>& obj){
+template<typename EType> FXStream& operator>>(FXStream& store,FXRefPtr<EType>& obj){
   EType *temp; store >> temp; obj=temp; return store;
   }
 

@@ -60,7 +60,7 @@ public:
 
 
 // Specialize to pointers to TYPE
-template <class TYPE>
+template<typename TYPE>
 class FXSemaQueueOf : public FXSemaQueue {
 public:
   FXSemaQueueOf(){}

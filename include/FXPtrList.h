@@ -169,7 +169,7 @@ public:
 
 
 /// List to pointers to TYPE
-template<class TYPE>
+template<typename TYPE>
 class FXPtrListOf : public FXPtrList {
 public:
 

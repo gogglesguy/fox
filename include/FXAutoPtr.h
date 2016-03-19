@@ -27,7 +27,8 @@ namespace FX {
 
 /// Implicitly used FXAutoPtrRef to hand FXAutoPtr through implicitly called
 /// constructors and conversion operators.  Probably not used directly.
-template<typename EType> struct FXAutoPtrRef {
+template<typename EType> 
+struct FXAutoPtrRef {
   EType* ptr;
   explicit FXAutoPtrRef(EType* src):ptr(src){ }
   };
@@ -35,7 +36,8 @@ template<typename EType> struct FXAutoPtrRef {
 
 
 /// Automatic pointer
-template <class EType> class FXAutoPtr {
+template<typename EType> 
+class FXAutoPtr {
 private:
   EType* ptr;
 public:
@@ -50,7 +52,7 @@ public:
   FXAutoPtr(FXAutoPtrRef<EType> src):ptr(src.ptr){ }
 
   /// Construct from another automatic pointer of compatible type
-  template <class T> explicit FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
+  template <typename T> explicit FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
 
   /// Assign from pointer
   FXAutoPtr& operator=(EType *src){ return reset(src); }
@@ -62,7 +64,7 @@ public:
   FXAutoPtr& operator=(FXAutoPtrRef<EType> src){ if(src.ptr!=ptr){ delete ptr; ptr=src.ptr; } return *this; }
 
   /// Assign from an automatic pointer with compatible type
-  template <class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
+  template <typename T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
 
   /// Conversion operators
   operator EType*() const { return ptr; }
@@ -94,13 +96,13 @@ public:
 
 
 /// Serialize of automatic pointer
-template <class EType> FXStream& operator<<(FXStream& store,const FXAutoPtr<EType>& obj){
+template <typename EType> FXStream& operator<<(FXStream& store,const FXAutoPtr<EType>& obj){
   EType *temp=obj; store << temp; return store;
   }
 
 
 /// Deserialize of automatic pointer
-template <class EType> FXStream& operator>>(FXStream& store,FXAutoPtr<EType>& obj){
+template <typename EType> FXStream& operator>>(FXStream& store,FXAutoPtr<EType>& obj){
   EType *temp; store >> temp; obj=temp; return store;
   }
 

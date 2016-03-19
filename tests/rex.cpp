@@ -21,36 +21,54 @@
 
 // Start the whole thing
 int main(int argc,char** argv){
-  FXRex::Error err;
+  FXint beg[NCAP]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+  FXint end[NCAP]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+  FXint where;
+  FXint ncap=1;
+  FXint mode;
   FXRex rex;
-  FXbool ok;
-  FXint i;
-  FXint beg[NCAP];
-  FXint end[NCAP];
+  FXRex::Error err;
+  
   fxTraceLevel=101;
 
+  // Got nothing
   if(argc==1){
-    fprintf(stderr,"no arguments\n");
+    fxwarning("no arguments\n");
     exit(1);
     }
+
+  // Just compile pattern arg#1
   if(2<=argc){
-    err=rex.parse(argv[1],FXRex::Normal|FXRex::Capture);
-    fprintf(stderr,"parse(\"%s\") = %s\n",argv[1],FXRex::getError(err));
+    mode=FXRex::Normal;
+    mode|=FXRex::Capture;
+    mode|=FXRex::NotEmpty;
+    mode|=FXRex::Exact;
+    err=rex.parse(argv[1],mode);
+    fxmessage("parse(\"%s\") = %s\n",argv[1],FXRex::getError(err));
     }
+
+  // Match pattern against arg#2
   if(3<=argc){
-    ok=rex.match(argv[2],strlen(argv[2]),beg,end,FXRex::Forward,NCAP);
-    if(ok){
-      fprintf(stderr,"match at %d:%d\n",beg[0],end[0]);
-      for(i=1; i<NCAP; i++){
-        fprintf(stderr,"capture at %d:%d\n",beg[i],end[i]);
+    if(4<=argc){
+      ncap=strtoul(argv[3],NULL,10);
+      if(ncap>NCAP) ncap=NCAP;
+      }
+    mode=FXRex::Normal;
+    //mode|=FXRex::NotBol;
+    //mode|=FXRex::NotEol;
+    where=rex.search(argv[2],strlen(argv[2]),0,strlen(argv[2]),mode,beg,end,ncap);
+    if(0<=where){
+      fxmessage("found at %d\n",where);
+      for(FXint i=0; i<ncap; i++){
+        fxmessage("capture at %d:%d\n",beg[i],end[i]);
         }
-      for(i=beg[0]; i<end[0]; i++){
-        fprintf(stderr,"%c",argv[2][i]);
+      for(FXint i=beg[0]; i<end[0]; i++){
+        fxmessage("%c",argv[2][i]);
         }
-      fprintf(stderr,"\n");
+      fxmessage("\n");
       }
     else{
-      fprintf(stderr,"no match\n");
+      fxmessage("no match\n");
       }
     }
   return 1;

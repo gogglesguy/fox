@@ -182,8 +182,6 @@ protected:
   FXColor        barColor;            // Bar background color
   FXint          textWidth;           // Total width of all text
   FXint          textHeight;          // Total height of all text
-  FXString       searchstring;        // String of last search
-  FXuint         searchflags;         // Flags of last search
   const FXchar  *delimiters;          // Delimiters
   FXString       clipped;             // Clipped text
   FXint          vrows;               // Default visible rows
@@ -230,8 +228,6 @@ protected:
   FXint findMatching(FXint pos,FXint beg,FXint end,FXwchar ch,FXint level) const;
   void flashMatching();
   void moveContents(FXint x,FXint y);
-  void moveCursor(FXint pos,FXbool notify=false);
-  void moveCursorAndSelect(FXint pos,FXuint select,FXbool notify=false);
   FXint overstruck(FXint start,FXint end,const FXchar *text,FXint n);
   void enterText(const FXchar *text,FXint n,FXbool notify);
   void enterText(const FXString& text,FXbool notify);
@@ -387,16 +383,10 @@ public:
   long onCmdBlockBeg(FXObject*,FXSelector,void*);
   long onCmdBlockEnd(FXObject*,FXSelector,void*);
   long onCmdGotoMatching(FXObject*,FXSelector,void*);
-  long onCmdGotoSelected(FXObject*,FXSelector,void*);
   long onCmdCursorRow(FXObject*,FXSelector,void*);
   long onUpdCursorRow(FXObject*,FXSelector,void*);
   long onCmdCursorColumn(FXObject*,FXSelector,void*);
   long onUpdCursorColumn(FXObject*,FXSelector,void*);
-  long onCmdGotoLine(FXObject*,FXSelector,void*);
-  long onCmdSearch(FXObject*,FXSelector,void*);
-  long onCmdReplace(FXObject*,FXSelector,void*);
-  long onCmdSearchNext(FXObject*,FXSelector,void*);
-  long onCmdSearchSel(FXObject*,FXSelector,void*);
   long onCmdToggleEditable(FXObject*,FXSelector,void*);
   long onUpdToggleEditable(FXObject*,FXSelector,void*);
   long onCmdToggleOverstrike(FXObject*,FXSelector,void*);
@@ -451,7 +441,7 @@ public:
     ID_SCROLL_CENTER,
     ID_INSERT_STRING,
     ID_INSERT_NEWLINE,
-    IN_INSERT_NEWLINE_ONLY,
+    ID_INSERT_NEWLINE_ONLY,
     ID_INSERT_NEWLINE_INDENT,
     ID_INSERT_TAB,
     ID_INSERT_HARDTAB,
@@ -492,14 +482,6 @@ public:
     ID_UPPER_CASE,
     ID_LOWER_CASE,
     ID_GOTO_MATCHING,
-    ID_GOTO_SELECTED,
-    ID_GOTO_LINE,
-    ID_SEARCH_FORW_SEL,
-    ID_SEARCH_BACK_SEL,
-    ID_SEARCH_FORW,
-    ID_SEARCH_BACK,
-    ID_SEARCH,
-    ID_REPLACE,
     ID_LEFT_BRACE,
     ID_LEFT_BRACK,
     ID_LEFT_PAREN,
@@ -795,18 +777,16 @@ public:
   FXint shiftText(FXint start,FXint end,FXint amount,FXbool notify=false);
 
   /**
-  * Search for string in text buffer, returning the extent of
-  * the string in beg and end.  The search starts from the given
-  * starting position, scans forward (SEARCH_FORWARD) or backward
-  * (SEARCH_BACKWARD), and wraps around if SEARCH_WRAP has been
-  * specified.  The search type is either a plain search (SEARCH_EXACT),
-  * case insensitive search (SEARCH_IGNORECASE), or regular expression
-  * search (SEARCH_REGEX).
-  * For regular expression searches, capturing parentheses are used if
-  * npar is greater than 1; in this case, the number of entries in the
-  * beg[], end[] arrays must be npar also.  If either beg or end or
-  * both are NULL, internal arrays are used.
-  * [This API is still subject to change!!]
+  * Search for string in text buffer, returning the extent of the string in beg and end.
+  * The search starts from the given starting position, scans forward (SEARCH_FORWARD) or
+  * backward (SEARCH_BACKWARD), and wraps around if SEARCH_WRAP has been specified.
+  * If neither SEARCH_FORWARD or SEARCH_BACKWARD flags are set, an anchored match is performed
+  * at the given starting position.
+  * The search type is either a plain search (SEARCH_EXACT), case insensitive search
+  * (SEARCH_IGNORECASE), or regular expression search (SEARCH_REGEX).
+  * For regular expression searches, capturing parentheses are used if npar is greater than 1;
+  * in this case, the number of entries in the beg[], end[] arrays must be npar also.
+  * If either beg or end or both are NULL, internal arrays are used.
   */
   FXbool findText(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint start=0,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP|SEARCH_EXACT,FXint npar=1);
 
@@ -892,13 +872,16 @@ public:
   void setCenterLine(FXint pos);
 
   /// Select all text
-  FXbool selectAll(FXbool notify=false);
+  virtual FXbool selectAll(FXbool notify=false);
 
   /// Select len characters starting at given position pos
-  FXbool setSelection(FXint pos,FXint len,FXbool notify=false);
+  virtual FXbool setSelection(FXint pos,FXint len,FXbool notify=false);
 
   /// Extend the primary selection from the anchor to the given position
-  FXbool extendSelection(FXint pos,FXuint select=SelectChars,FXbool notify=false);
+  virtual FXbool extendSelection(FXint pos,FXuint select=SelectChars,FXbool notify=false);
+
+  /// Kill or deselect primary selection
+  virtual FXbool killSelection(FXbool notify=false);
 
   /// Copy primary selection to clipboard
   FXbool copySelection();
@@ -920,9 +903,6 @@ public:
 
   /// Replace primary selection by other text
   FXbool replaceSelection(const FXString& text,FXbool notify=false);
-
-  /// Kill or deselect primary selection
-  FXbool killSelection(FXbool notify=false);
 
   /// Return true if position pos is selected
   FXbool isPosSelected(FXint pos) const;
@@ -956,6 +936,12 @@ public:
 
   /// Return the cursor position
   FXint getCursorPos() const { return cursorpos; }
+
+  /// Move cursor to position, and scroll into view
+  void moveCursor(FXint pos,FXbool notify=false);
+
+  /// Move cursor to position, and extent the selection to this point
+  void moveCursorAndSelect(FXint pos,FXuint select,FXbool notify=false);
 
   /// Set the anchor position
   void setAnchorPos(FXint pos);

@@ -166,7 +166,7 @@ public:
   FXThreadException(const FXchar *msg,FXint xc=-1):FXException(msg),exitcode(xc){}
   FXint code() const { return exitcode; }
   };
-
+  
 }
 
 #endif
