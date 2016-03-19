@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,7 +54,8 @@ struct SPACE {
 struct SPACE {
   DIR*            handle;
   struct dirent*  dp;
-  struct fxdirent result;
+  struct dirent   result;
+  char            buffer[256];  // Extra space must follow dirent!
   };
 #endif
 
@@ -130,14 +131,13 @@ FXbool FXDir::isOpen() const {
 // Go to next directory entry and return its name
 FXbool FXDir::next(FXString& name){
   if(isOpen()){
-#ifdef WIN32
+#if defined(WIN32)
     if(((SPACE*)space)->first || FindNextFile(((SPACE*)space)->handle,&((SPACE*)space)->result)){
       ((SPACE*)space)->first=false;
       name.assign(((SPACE*)space)->result.cFileName);
       return true;
       }
-#else
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_READDIR_R)
     if(!readdir_r(((SPACE*)space)->handle,&((SPACE*)space)->result,&((SPACE*)space)->dp) && ((SPACE*)space)->dp){
       name.assign(((SPACE*)space)->dp->d_name);
       return true;
@@ -147,7 +147,6 @@ FXbool FXDir::next(FXString& name){
       name.assign(((SPACE*)space)->dp->d_name);
       return true;
       }
-#endif
 #endif
     }
   name.clear();
@@ -328,7 +327,6 @@ FXint FXDir::listShares(FXString*& sharelist){
 
 // Create a directories recursively
 FXbool FXDir::createDirectories(const FXString& path,FXuint perm){
-  FXTRACE((1,"path=%s\n",path.text()));
   if(!path.empty()){
     if(FXStat::isDirectory(path)) return true;
     if(createDirectories(FXPath::upLevel(path),perm)){

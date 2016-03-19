@@ -186,6 +186,7 @@ FX7Segment.cpp \
 FXAccelTable.cpp \
 FXApp.cpp \
 FXArrowButton.cpp \
+FXAtomic.cpp \
 FXBMPIcon.cpp \
 FXBMPImage.cpp \
 FXBitmap.cpp \
@@ -429,6 +430,7 @@ FXXBMImage.cpp \
 FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
+fxcpuid.cpp \
 fxbmpio.cpp \
 fxddsio.cpp \
 fxezquantize.cpp \

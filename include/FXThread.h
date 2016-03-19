@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -201,6 +201,16 @@ public:
   FXCondition();
 
   /**
+  * Wake or unblock a single blocked thread
+  */
+  void signal();
+
+  /**
+  * Wake or unblock all blocked threads
+  */
+  void broadcast();
+
+  /**
   * Wait until condition becomes signalled, using given mutex,
   * which must already have been locked prior to this call.
   * Return true if the wait ended due to the condition being
@@ -219,16 +229,6 @@ public:
   * special value 'forever' is passed, wait indefinitely.
   */
   FXbool wait(FXMutex& mtx,FXTime nsec);
-
-  /**
-  * Wake or unblock a single blocked thread
-  */
-  void signal();
-
-  /**
-  * Wake or unblock all blocked threads
-  */
-  void broadcast();
 
   /// Delete the condition
   ~FXCondition();
@@ -270,6 +270,32 @@ public:
 
   /// Delete the read/write lock
  ~FXReadWriteLock();
+  };
+
+
+/**
+* A thread barrier.
+*/
+class FXAPI FXBarrier {
+private:
+  FXCondition condition;
+  FXMutex     mutex;
+  FXuint      generation;
+  FXuint      threshold;
+  FXuint      counter;
+private:
+  FXBarrier(const FXBarrier&);
+  FXBarrier &operator=(const FXBarrier&);
+public:
+
+  /// Initialize the barrier
+  FXBarrier(FXuint count=1);
+
+  /// Wait for all threads to hit the barrier
+  FXbool wait();
+
+  /// Delete the barrier
+ ~FXBarrier();
   };
 
 

@@ -3,7 +3,7 @@
 *                             Half Float Support Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

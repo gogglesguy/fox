@@ -20,8 +20,11 @@ snapshot: dist-all
 
 
 
+#web: distdir
+#	cd $(distdir)/doc && doxygen doxygen.cfg
+#	cp -r $(distdir)/doc/* /net/linky/mnt/html
+
 web: distdir
-	cd $(distdir)/doc && doxygen doxygen.cfg
 	cp -r $(distdir)/doc/* /net/linky/mnt/html
 
 drop: dist-all

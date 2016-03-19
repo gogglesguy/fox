@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -69,7 +69,7 @@ FXQuatf::FXQuatf(const FXMat3f& mat){
 
 // Adjust quaternion length
 FXQuatf& FXQuatf::adjust(){
-  register FXfloat t=x*x+y*y+z*z+w*w;
+  register FXfloat t=length2();
   register FXfloat f;
   if(t>0.0f){
     f=1.0f/sqrtf(t);
@@ -592,12 +592,6 @@ FXQuatf& FXQuatf::lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f){
   }
 
 
-// Multiply quaternions
-FXQuatf FXQuatf::operator*(const FXQuatf& q) const {
-  return FXQuatf(w*q.x+x*q.w+y*q.z-z*q.y, w*q.y+y*q.w+z*q.x-x*q.z, w*q.z+z*q.w+x*q.y-y*q.x, w*q.w-x*q.x-y*q.y-z*q.z);
-  }
-
-
 /*
 
 According to someone on gdalgorithms list, this is faster:
@@ -644,6 +638,17 @@ FXVec3f FXQuatf::operator*(const FXVec3f& v) const {
   return v*FXMat3f(*this);
   }
 
+// Save vector to stream
+FXStream& operator<<(FXStream& store,const FXQuatf& v){
+  store << v.x << v.y << v.z << v.w;
+  return store;
+  }
+
+// Load vector from stream
+FXStream& operator>>(FXStream& store,FXQuatf& v){
+  store >> v.x >> v.y >> v.z >> v.w;
+  return store;
+  }
 
 }
 

@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -560,10 +560,10 @@ public:
   FXbool shouldEscape(FXchar lquote=0,FXchar rquote=0) const;
 
   /// Escape special characters, and optionally enclose with left and right quotes
-  FXString& escape(FXchar lquote=0,FXchar rquote=0);
+  FXString escape(FXchar lquote=0,FXchar rquote=0);
 
   /// Unescape special characters, and optionally remove left and right quotes
-  FXString& unescape(FXchar lquote=0,FXchar rquote=0);
+  FXString unescape(FXchar lquote=0,FXchar rquote=0);
 
   /// Get hash value
   FXuint hash() const;
@@ -682,6 +682,12 @@ extern FXAPI FXString fromAscii(const FXString& s);
 /// Return ascii containing unicode escapes from utf8
 extern FXAPI FXString toAscii(const FXString& s);
 
+/// Convert unix string to dos string
+extern FXAPI FXString& unixToDos(FXString& str);
+
+/// Convert dos string to unix string
+extern FXAPI FXString& dosToUnix(FXString& str);
+
 /// Return normalized string, i.e. reordering of diacritical marks
 extern FXAPI FXString normalize(const FXString& s);
 
@@ -690,12 +696,6 @@ extern FXAPI FXString decompose(const FXString& s,FXuint kind);
 
 /// Return normalized composition of string; this first performs normalized decomposition
 extern FXAPI FXString compose(const FXString& s,FXuint kind);
-
-/// Convert unix string to dos string
-extern FXAPI FXString& unixToDos(FXString& str);
-
-/// Convert dos string to unix string
-extern FXAPI FXString& dosToUnix(FXString& str);
 
 }
 

@@ -3,7 +3,7 @@
 *                        X B M   I c o n   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -65,7 +65,8 @@ FXIMPLEMENT(FXXBMIcon,FXIcon,NULL,0)
 FXXBMIcon::FXXBMIcon(FXApp* a,const FXuchar *pixels,const FXuchar *mask,FXColor clr,FXuint opts,FXint w,FXint h):FXIcon(a,NULL,clr,opts,w,h){
   if(pixels && mask){
     fxloadXBM(data,pixels,mask,w,h);
-    if(options&IMAGE_ALPHAGUESS) transp=guesstransp();
+    if(options&IMAGE_ALPHAGUESS) setTransparentColor(guesstransp());
+    if(options&IMAGE_THRESGUESS) setThresholdValue(guessthresh());
     options|=IMAGE_OWNED;
     }
   }
@@ -85,7 +86,8 @@ FXbool FXXBMIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h,hotx,hoty;
   if(fxloadXBM(store,pixels,w,h,hotx,hoty)){
     setData(pixels,IMAGE_OWNED,w,h);
-    if(options&IMAGE_ALPHAGUESS) transp=guesstransp();
+    if(options&IMAGE_ALPHAGUESS) setTransparentColor(guesstransp());
+    if(options&IMAGE_THRESGUESS) setThresholdValue(guessthresh());
     return true;
     }
   return false;

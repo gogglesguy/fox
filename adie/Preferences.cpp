@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -57,6 +57,7 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   ind=new FXGIFIcon(getApp(),indent_gif);
   pat=new FXGIFIcon(getApp(),pattern_gif);
   sty=new FXGIFIcon(getApp(),styles_gif);
+  mis=new FXGIFIcon(getApp(),miscellaneous_gif);
 
   ///////////////////////////  Editor settings pane  ////////////////////////////
   FXVerticalFrame* editorpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
@@ -226,6 +227,19 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   //// Highlight style settings button
   new FXButton(buttons,tr("Styles\tHighlight styles\tChange highlight styles for syntax coloring."),sty,switcher,FXSwitcher::ID_OPEN_FOURTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
+  ///////////////////////  File paths settings pane  //////////////////////////
+  FXVerticalFrame* miscellaneouspane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
+  new FXLabel(miscellaneouspane,tr("Miscellaneous settings"),NULL,LAYOUT_LEFT);
+  new FXHorizontalSeparator(miscellaneouspane,SEPARATOR_LINE|LAYOUT_FILL_X);
+  FXMatrix *matrix3=new FXMatrix(miscellaneouspane,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 4);
+
+  new FXLabel(matrix3,tr("Search path:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  searchtext=new FXTextField(matrix3,10,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
+  searchtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where files are to be found."));
+  searchtext->setHelpText(tr("Change file search path."));
+
+  //// File pattern settings button
+  new FXButton(buttons,tr("Misc\tMiscellaneous\tMiscellaneous settings."),mis,switcher,FXSwitcher::ID_OPEN_FIFTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
   // Bottom part
   new FXHorizontalSeparator(vertical,SEPARATOR_RIDGE|LAYOUT_FILL_X);
@@ -251,6 +265,18 @@ FXString Preferences::getPatterns() const {
   }
 
 
+// Set search paths
+void Preferences::setSearchPaths(const FXString& paths){
+  searchtext->setText(paths);
+  }
+
+
+// Get search paths
+FXString Preferences::getSearchPaths() const {
+  return searchtext->getText();
+  }
+
+
 // Set language syntax
 void Preferences::setSyntax(FXSyntax* syn){
   stylelist->clearItems(TRUE);
@@ -268,4 +294,5 @@ Preferences::~Preferences(){
   delete ind;
   delete pat;
   delete sty;
+  delete mis;
   }

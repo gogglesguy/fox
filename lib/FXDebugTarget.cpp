@@ -3,7 +3,7 @@
 *                      D e b u g - T a r g e t   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -137,7 +137,8 @@ const char *const FXDebugTarget::messageTypeName[]={
   "SEL_SPACEBALLBUTTONPRESS",
   "SEL_SPACEBALLBUTTONRELEASE",
   "SEL_SESSION_NOTIFY",
-  "SEL_SESSION_CLOSED",
+  "SEL_SESSION_CLOSED",  
+  "SEL_COPYDATA",                 
   "SEL_IME_START",
   "SEL_IME_END"
   };

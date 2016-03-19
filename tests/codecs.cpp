@@ -3,7 +3,7 @@
 *                                 Codecs Tests                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -79,13 +79,88 @@ void utf8roundtriptest(FXTextCodec *codec){
   }
 
 
+// Test buffer
+static FXchar buffer[1024];
+
+
 // Start the whole thing
 int main(int,char**){
+  FXTime beg,end;
+  FXwchar w1,w2;
+
+  // Round-trip tests
+  printf("Testing utf2wc(wc2utf(wc)) == wc\n");
+
+
+  // Test utf for codes of 1 byte
+  beg=fxgetticks();
+  for(w1=0; w1<0x80; w1++){
+    wc2utf(buffer,w1);
+    utf2wc(w2,buffer);
+    if(w1!=w2) printf("%06X: Problem: %06X\n",w1,w2);
+    }
+  end=fxgetticks();
+  printf("1-Byte case: %lld ticks/character\n",(end-beg)/0x80);
+
+  // Test utf for codes of 2 bytes
+  beg=fxgetticks();
+  for(w1=0x80; w1<0x800; w1++){
+    wc2utf(buffer,w1);
+    utf2wc(w2,buffer);
+    if(w1!=w2) printf("%06X: Problem: %06X\n",w1,w2);
+    }
+  end=fxgetticks();
+  printf("2-Byte case: %lld ticks/character\n",(end-beg)/(0x800-0x80));
+
+  // Test utf for codes of 3 bytes
+  beg=fxgetticks();
+  for(w1=0x800; w1<0x10000; w1++){
+    wc2utf(buffer,w1);
+    utf2wc(w2,buffer);
+    if(w1!=w2) printf("%06X: Problem: %06X\n",w1,w2);
+    }
+  end=fxgetticks();
+  printf("3-Byte case: %lld ticks/character\n",(end-beg)/(0x10000-0x800));
+
+  // Test utf for codes of 4 bytes
+  beg=fxgetticks();
+  for(w1=0x10000; w1<0x200000; w1++){
+    wc2utf(buffer,w1);
+    utf2wc(w2,buffer);
+    if(w1!=w2) printf("%06X: Problem: %06X\n",w1,w2);
+    }
+  end=fxgetticks();
+  printf("4-Byte case: %lld ticks/character\n",(end-beg)/(0x200000-0x10000));
+
+  // Test utf for codes of 5 bytes
+  beg=fxgetticks();
+  for(w1=0x200000; w1<0x4000000; w1++){
+    wc2utf(buffer,w1);
+    utf2wc(w2,buffer);
+    if(w1!=w2) printf("%06X: Problem: %06X\n",w1,w2);
+    }
+  end=fxgetticks();
+  printf("5-Byte case: %lld ticks/character\n",(end-beg)/(0x4000000-0x200000));
+
+  // Test utf for codes of 6 bytes
+  for(w1=0x4000000; w1<0x7fffffff; w1++){
+    wc2utf(buffer,w1);
+    utf2wc(w2,buffer);
+    if(w1!=w2) printf("%06X: Problem: %06X\n",w1,w2);
+    }
+  end=fxgetticks();
+  printf("6-Byte case: %lld ticks/character\n",(end-beg)/(0x7fffffff-0x4000000));
+
+
+/*
+
+//    n=wc2utfs((FXchar*)buf,128,&wc,1);
+//    utf2wcs(&ww,1,(const FXchar*)buf,n);
   const FXwchar *wcdec;
-  FXwchar wc,ww;
-  FXint i,n,dec,cc,num1,num2,numt;
+  FXwchar wc,ww,vv;
+  FXint i,n,dec,num1,num2,num3,numt;
   FXString value,norm;
-  FXuchar buf[128];
+  FXchar buf[128];
   FXchar input[256];
 //utf8codingtest();
 //utf16codingtest();
@@ -96,7 +171,6 @@ int main(int,char**){
 //  utf8roundtriptest(&koi8_r);
 //  utf8roundtriptest(&iso8859_2);
 
-/*
   wc=0x7fffffff;
   wc=0x3ffffff;
   wc=0x1fffff;
@@ -139,12 +213,20 @@ int main(int,char**){
 
 //  exit(0);
 
-  // Test utf
-  for(wc=0; wc<0x7fffffff; wc++){
-    n=wc2utfs((FXchar*)buf,128,&wc,1);
-    utf2wcs(&ww,1,(const FXchar*)buf,n);
-    if(wc!=ww) printf("%06X: Problem: %06X\n",wc,ww);
+/*
+  // Test lengths
+  for(wc=0; wc<0x110000; wc++){
+    num1=utfslen(&wc,1);
+    ww=Unicode::toUpper(wc);
+    vv=Unicode::toLower(wc);
+    num2=utfslen(&ww,1);
+    num3=utfslen(&vv,1);
+    printf("%06x: %2d %2d %2d %s\n",wc,num1,num2,num3,((num1==num2) && (num1==num3))?"":"differ!");
     }
+
+  exit(0);
+*/
+
 
 /*
   // Test decompose table

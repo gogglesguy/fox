@@ -3,7 +3,7 @@
 *                   S U N   R A S T E R   I m a g e   O b j e c t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -84,7 +84,8 @@ FXbool FXRASIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadRAS(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);
-    if(options&IMAGE_ALPHAGUESS) transp=guesstransp();
+    if(options&IMAGE_ALPHAGUESS) setTransparentColor(guesstransp());
+    if(options&IMAGE_THRESGUESS) setThresholdValue(guessthresh());
     return true;
     }
   return false;

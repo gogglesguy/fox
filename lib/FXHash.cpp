@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,7 +31,7 @@
   - The table hashes pointers to pointers, or things which fit into a pointer to
     things which fit into a pointer.  This covers a large number of hashing cases.
   - We distinguish between used slots, free slots, and formerly used empty slots.
-    The members "used" and "free" keep track of the number of slots in the table which 
+    The members "used" and "free" keep track of the number of slots in the table which
     are occupied, and the number of slots which are free.  These numbers do not always
     sum to the total number of slots!
   - An occupied slot which is removed will be marked as empty; it can not be counted
@@ -40,7 +40,7 @@
   - Only when the table is resized will the empty slots be reclaimed.
   - The probe sequence will eventually visit each table location, thus guaranteeing that
     items will be found if they're in the table.
-  - When items are added, the load factor is kept below half full; any additional items 
+  - When items are added, the load factor is kept below half full; any additional items
     will cause the table to be resized to double the previous size.
   - When items are removed, the load factor is kept above one quarter full, and the
     table will be resized to half the original size.

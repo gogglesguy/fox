@@ -15,6 +15,110 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE WITH LOGO --->
 
 
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 25 - FOX DEVELOPMENT 1.7.22
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXRegistry now uses the 
+<a href="http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html">FreeDesktop.Org specification</a>.  
+Registry files are located in locations determined according to the specification, $XDG_CONFIG_DIRS and $XDG_CONFIG_DIR.  
+Also, registry files have a file extension ".rc" or in ascii mode on Windows, ".ini".
+The common FOX applications settings file is now called "fox.rc" ("fox.ini" on Windows if ascii mode) to avoid
+possible clashes with other systems.</li>
+<li>FXApp::runWhileEvents() and FXApp::runModalWhileEvents() only use blocking time when waiting for
+first event; after first event, don't block if no further events but just fall out.</li>
+<li>Better FXString::upper() and FXString::lower() implementation.</li>
+<li>Major cleanup of xincs.h.</li>
+<li>Major performance improvements in FXThreadPool.</li>
+<li>Dispatch WM_COPYDATA from FXApp (Windows).</li>
+<li>Dump FOX version number in very first trace command.</li>
+<li>FXThreadPool::start() should not return until all started worker threads are ready.</li>
+<li>FXString throws FXMemoryException if out of RAM.</li>
+<li>Improved FXString::escape() and FXString::unescape().</li>
+<li>Updates to Adie syntax file.</li>
+<li>Atomic primitives for integer and pointer variables added; not inlined due to possible differences 
+in compiler settings between user's own code and FOX library.</li>
+<li>Adie "Open Selected" parses out filename,line number, and also (new) column (accomodate change of GCC 
+error/warning outputs).</li>
+<li>Compiled regexes in FXRex now use HALF the amount of memory.</li>
+<li>New subdivision modes for FX4Splitter: preferred FOURSPLITTER_VERTICAL or FOURSPLITTER_HORIZONTAL flags
+control which way sub-panes expand if not all four sub-panes are visible.</li>
+<li>Fixed issue with FXThread priorities.</li>
+<li>Atomic (possessive) sub-group matching implemented in FXRex.</li>
+<li>New fxcpuid.h header added to allow checking processor types (currently supported on x86 and x86-64 on
+GCC, LLVM, and Intel-C++ only).</li>
+<li>New FXISUTF8(), FXISUTF16() macros added; FXISUTF() removed.</li>
+<li>API wcvalid() checks for valid utf8, utf16 (wide character) character sequence.</li>
+<li>Updated and corrected FXURL implementation; code to handle legacy URLs for Windows.</li>
+<li>New API's for quaternion implementation FXQuatf and FXQuatd.</li>
+<li>Added IMAGE_THRESGUESS flag for FXIcon.  When passed, it auto-detects the etched-in looking
+icon threshold value using new protected member function guessthresh().  This works very similarly
+to IMAGE_ALPHAGUESS and guesstransp(). New API's setThresholdValue() and getThresholdValue() allow 
+direct setting of this value.</li>
+<li>API to get temporary directory improved in FXSystem::getTempDirectory().</li>
+<li>Use thread-safe versions for time and dates in FXDate and FXSystem, whenever possible.</li>
+<li>FXBarrier class added to FXThread.h.</li>
+<li>Added very fast affineInvert() and even faster rigidInvert() to FXMat4f and FXMat4d.</li>
+<li>NEW FOX compile option "--enable-native" will generate native code support for machine you're on.
+This is faster if FOX is compiled use on your own machine only.</li>
+<li>Added __threadlocal attribute macro to declare thread-local variables.</li>
+<li>Compiling FXThread on newer Windows versions allows usage of newer kernel facilities such as RWLOCK,
+CONDITION_VARIABLE.</li>
+<li>Fixed small bug in FXDict.</li>
+<li>Fixed FXToolBarShell issue with FXToolBarShell not hiding when its child does.</li>
+<li>Fixed bunch of warnings found under LLVM clang++ compiler.</li>
+<li>FOX time settings variables no longer with "ns" suffix; no longer needed since registry now in 
+new location there's no conflict with old FOX registry files.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 2 - Half Floats
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>A reader kindly pointed out a porting issue in the generation of the half-float
+table generation. I have revised the function to generate the tables, and an updated
+version of my <b>fast half float to float conversion</b> paper may be found here:
+<a href='http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf'>fasthalffloatconversion.pdf</a>.
+<br>Note that the tables in FOX 1.7 are still correct:- they were generated on a machine where the
+problem didn't manifest itself.
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 31 - FOX STABLE 1.6.40
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fix FOX package-config file.</li>
+<li>FXSystem::getTempDirectory() now uses TMPDIR environment variable if set.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 24 - FOX STABLE 1.6.38
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Auto-guess icon etch mask threshold added.</li>
+<li>Updated compilation scripts to new autoconfig.</li>
+<li>Removed XGetDefault from code in ControlPanel.cpp.</li>
+<li>Compile Adie with static lib on Windows.</li>
+</ul>
+
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
@@ -1481,7 +1585,7 @@ google_ad_format = "728x90_as";
 <tr>
 <td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1>
-<font size=-1>Copyright &copy; 1997-2009 Jeroen van der Zijp</font>
+<font size=-1>Copyright &copy; 1997-2010 Jeroen van der Zijp</font>
 </td>
 </tr>
 </table>

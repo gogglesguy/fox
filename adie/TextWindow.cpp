@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -176,7 +176,6 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_STRIP_SP,        TextWindow::onCmdStripSpaces),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_APPEND_NL,       TextWindow::onUpdAppendNewline),
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_APPEND_NL,       TextWindow::onCmdAppendNewline),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SEARCH_PATHS,    TextWindow::onCmdSearchPaths),
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_FILEFILTER,      TextWindow::onCmdFilter),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_OVERSTRIKE,      TextWindow::onUpdOverstrike),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_READONLY,        TextWindow::onUpdReadOnly),
@@ -591,7 +590,6 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   new FXMenuCheck(optionmenu,tr("Use initial size\t\tToggle initial window size mode."),this,ID_USE_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("Set initial size\t\tSet current window size as the initial window size."),NULL,this,ID_SET_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("&Restyle\t\tToggle syntax coloring."),NULL,this,ID_RESTYLE);
-  new FXMenuCommand(optionmenu,tr("Search paths...\t\tDirectories to search for files."),NULL,this,ID_SEARCH_PATHS);
   new FXMenuCascade(optionmenu,tr("Tab stops"),NULL,tabsmenu);
   new FXMenuCascade(optionmenu,tr("Syntax patterns"),NULL,syntaxmenu);
   new FXMenuSeparator(optionmenu);
@@ -1043,10 +1041,11 @@ TextWindow *TextWindow::findWindow(const FXString& file) const {
 
 
 // Visit given line
-void TextWindow::visitLine(FXint line){
-  FXint pos=editor->nextLine(0,line-1);
-  editor->setCursorPos(pos);
-  editor->setCenterLine(pos);
+void TextWindow::visitLine(FXint line,FXint column){
+  FXint start=editor->nextLine(0,line-1);
+  editor->setCursorPos(start);
+  editor->setCenterLine(start);
+  editor->setCursorColumn(column);
   }
 
 
@@ -1072,6 +1071,17 @@ FXString TextWindow::getPatterns() const {
   return pat;
   }
 
+
+// Change search paths
+void TextWindow::setSearchPaths(const FXString& paths){
+  searchpaths=paths;
+  }
+  
+  
+FXString TextWindow::getSearchPaths() const {
+  return searchpaths;
+  }
+  
 
 // Set current pattern
 void TextWindow::setCurrentPattern(FXint n){
@@ -1359,7 +1369,6 @@ void TextWindow::writeRegistry(){
   // Active background
   getApp()->reg().writeBoolEntry("SETTINGS","showactive",(editor->getTextStyle()&TEXT_SHOWACTIVE)!=0);
 
-
   // Bar columns
   getApp()->reg().writeIntEntry("SETTINGS","barcols",editor->getBarColumns());
 
@@ -1402,7 +1411,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2009 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2010 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1424,9 +1433,11 @@ long TextWindow::onCmdHelp(FXObject*,FXSelector,void*){
 long TextWindow::onCmdPreferences(FXObject*,FXSelector,void*){
   Preferences preferences(this);
   preferences.setPatterns(getPatterns());
+  preferences.setSearchPaths(getSearchPaths());
   preferences.setSyntax(getSyntax());
   if(preferences.execute()){
     setPatterns(preferences.getPatterns());
+    setSearchPaths(preferences.getSearchPaths());
     }
   return 1;
   }
@@ -1521,6 +1532,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
   FXchar name[1024];
   FXString string;
   FXint lineno=0;
+  FXint column=0;
 
   // Get selection
   if(getDNDData(FROM_SELECTION,stringType,string)){
@@ -1552,6 +1564,15 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
 
       // Extract name from #include <file.h> syntax
       else if(string.scan("#include <%[^>]>",name)==1){
+        file=FXPath::absolute(dir,name);
+        if(!FXStat::exists(file)){
+          file=FXPath::search(searchpaths,name);
+          }
+        }
+
+      // Compiler output in the form <filename>:<number>:<number> Error message
+      else if(string.scan("%[^:]:%d:%d",name,&lineno,&column)==3){
+        column-=1;
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
           file=FXPath::search(searchpaths,name);
@@ -1629,7 +1650,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
 
         // Switch line number only
         if(lineno){
-          window->visitLine(lineno);
+          window->visitLine(lineno,column);
           }
 
         // Bring up the window
@@ -2243,13 +2264,6 @@ long TextWindow::onUpdTabMode(FXObject* sender,FXSelector,void*){
 long TextWindow::onUpdNumRows(FXObject* sender,FXSelector,void*){
   FXuint size=editor->getNumRows();
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&size);
-  return 1;
-  }
-
-
-// Set search paths
-long TextWindow::onCmdSearchPaths(FXObject*,FXSelector,void*){
-  FXInputDialog::getString(searchpaths,this,tr("Change file search path"),tr("Specify a list of directories separated by a `" PATHLISTSEPSTRING "' where files are to be found.\nFor example:\n\n  /usr/include" PATHLISTSEPSTRING "/usr/local/include\n\nThis list will be used to locate the selected file name."));
   return 1;
   }
 
@@ -3014,7 +3028,7 @@ void TextWindow::restyleText(){
 FXHiliteStyle TextWindow::readStyleForRule(const FXString& name){
   FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100]; FXint sty;
   FXHiliteStyle style={0,0,0,0,0,0,0,0};
-  if(getApp()->reg().readFormatEntry("STYLE",name.text(),"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)==8){
+  if(getApp()->reg().readFormatEntry("STYLE",name,"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)==8){
     style.normalForeColor=colorFromName(nfg);
     style.normalBackColor=colorFromName(nbg);
     style.selectForeColor=colorFromName(sfg);
@@ -3038,61 +3052,9 @@ void TextWindow::writeStyleForRule(const FXString& name,const FXHiliteStyle& sty
   nameFromColor(hfg,style.hiliteForeColor);
   nameFromColor(hbg,style.hiliteBackColor);
   nameFromColor(abg,style.activeBackColor);
-  getApp()->reg().writeFormatEntry("STYLE",name.text(),"%s,%s,%s,%s,%s,%s,%s,%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,style.style);
+  getApp()->reg().writeFormatEntry("STYLE",name,"%s,%s,%s,%s,%s,%s,%s,%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,style.style);
   }
 
-/*
-
-// Read styles
-void Adie::readStyles(){
-  FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100],index[10],name[200];
-  FXint  sty,i;
-  nstyles=0;
-  for(i=0; i<MAXSTYLES; i++){
-    sprintf(index,"%d",i+1);
-    if(reg().readFormatEntry("STYLES",index,"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%d",name,nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)!=9) break;
-    FXTRACE((1,"name=\"%s\" nfg=%s nbg=%s sfg=%s sbg=%s hfg=%s hbg=%s abg=%s sty=%d\n",name,nfg,nbg,sfg,sbg,hfg,hbg,abg,sty));
-    stylename[i]=name;
-    stylecolor[i].normalForeColor=colorFromName(nfg);
-    stylecolor[i].normalBackColor=colorFromName(nbg);
-    stylecolor[i].selectForeColor=colorFromName(sfg);
-    stylecolor[i].selectBackColor=colorFromName(sbg);
-    stylecolor[i].hiliteForeColor=colorFromName(hfg);
-    stylecolor[i].hiliteBackColor=colorFromName(hbg);
-    stylecolor[i].activeBackColor=colorFromName(abg);
-    stylecolor[i].style=sty;
-    nstyles++;
-    }
-  }
-
-
-// Write styles
-void Adie::writeStyles(){
-  FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100],name[10];
-  FXint  i;
-  reg().deleteSection("STYLES");
-  for(i=0; i<nstyles; i++){
-    nameFromColor(nfg,stylecolor[i].normalForeColor);
-    nameFromColor(nbg,stylecolor[i].normalBackColor);
-    nameFromColor(sfg,stylecolor[i].selectForeColor);
-    nameFromColor(sbg,stylecolor[i].selectBackColor);
-    nameFromColor(hfg,stylecolor[i].hiliteForeColor);
-    nameFromColor(hbg,stylecolor[i].hiliteBackColor);
-    nameFromColor(abg,stylecolor[i].activeBackColor);
-    sprintf(name,"%d",i+1);
-    reg().writeFormatEntry("STYLES",name,"%s,%s,%s,%s,%s,%s,%s,%s,%d",stylename[i].text(),nfg,nbg,sfg,sbg,hfg,hbg,abg,stylecolor[i].style);
-    }
-  }
-  // Get style pointer
-  FXHiliteStyle* getStyles() const { return styles.data(); }
-
-  // Get particular style
-  const FXHiliteStyle& getStyle(FXint index) const { return styles[index]; }
-
-  // Change particular style
-  void setStyle(FXint index,const FXHiliteStyle& s){ styles[index]=s; }
-
-*/
 
 // Scan backward by context amount
 FXint TextWindow::backwardByContext(FXint pos) const {

@@ -3,7 +3,7 @@
 *                            O b j e c t   L i s t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -43,7 +43,7 @@ public:
   FXObjectList(FXObject* object);
 
   /// Construct and init with n copies of object
-  FXObjectList(FXObject* objects,FXint n);
+  FXObjectList(FXObject* object,FXint n);
 
   /// Construct and init with list of objects
   FXObjectList(FXObject** objects,FXint n);
@@ -179,27 +179,40 @@ public:
 template<class TYPE>
 class FXObjectListOf : public FXObjectList {
 public:
+  /// Default constructor
   FXObjectListOf(){}
 
+  /// Copy constructor
+  FXObjectListOf(const FXObjectListOf<TYPE>& src):FXObjectList(src){ }
+
+  /// Construct and init with single object
+  FXObjectListOf(TYPE* object):FXObjectList(reinterpret_cast<FXObject*>(object)){ }
+
+  /// Construct and init with n copies of object
+  FXObjectListOf(TYPE* object,FXint n):FXObjectList(reinterpret_cast<FXObject*>(object),n){ }
+
+  /// Construct and init with list of objects
+  FXObjectListOf(TYPE** objects,FXint n):FXObjectList(reinterpret_cast<FXObject**>(objects),n){ }
+
   /// Indexing operator
-  TYPE*& operator[](FXint i){ return (TYPE*&)ptr[i]; }
-  TYPE *const& operator[](FXint i) const { return (TYPE*const&)ptr[i]; }
+  TYPE*& operator[](FXint i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
+  TYPE *const& operator[](FXint i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
 
   /// Access to list
-  TYPE*& at(FXint i){ return (TYPE*&)ptr[i]; }
-  TYPE *const& at(FXint i) const { return (TYPE*const&)ptr[i]; }
+  TYPE*& at(FXint i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
+  TYPE *const& at(FXint i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
 
   /// First element in list
-  TYPE*& head(){ return (TYPE*&)ptr[0]; }
-  TYPE* const& head() const { return (TYPE*const&)ptr[0]; }
+  TYPE*& head(){ return reinterpret_cast<TYPE*&>(ptr[0]); }
+  TYPE* const& head() const { return reinterpret_cast<TYPE*const&>(ptr[0]); }
 
   /// Last element in list
-  TYPE*& tail(){ return (TYPE*&)ptr[no()-1]; }
-  TYPE* const& tail() const { return (TYPE*const&)ptr[no()-1]; }
+  TYPE*& tail(){ return reinterpret_cast<TYPE*&>(ptr[no()-1]); }
+  TYPE* const& tail() const { return reinterpret_cast<TYPE* const&>(ptr[no()-1]); }
 
   /// Access to content array
-  TYPE** data(){ return (TYPE**)ptr; }
-  TYPE *const * data() const { return (TYPE*const *)ptr; }
+  TYPE** data(){ return reinterpret_cast<TYPE**>(ptr); }
+  TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
   };
 
 }

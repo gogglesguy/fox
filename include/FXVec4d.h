@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -25,9 +25,6 @@
 namespace FX {
 
 
-class FXMat4d;
-
-
 /// Double-precision 4-element vector
 class FXAPI FXVec4d {
 public:
@@ -40,7 +37,7 @@ public:
   /// Default constructor; value is not initialized
   FXVec4d(){}
 
-  /// Construct with 3-vector 
+  /// Construct with 3-vector
   FXVec4d(const FXVec3d& v,FXdouble s=0.0):x(v.x),y(v.y),z(v.z),w(s){}
 
   /// Initialize from another vector
@@ -85,32 +82,12 @@ public:
   operator FXVec3d&(){return *reinterpret_cast<FXVec3d*>(this);}
   operator const FXVec3d&() const {return *reinterpret_cast<const FXVec3d*>(this);}
 
-  /// Unary
-  FXVec4d operator+() const { return *this; }
-  FXVec4d operator-() const { return FXVec4d(-x,-y,-z,-w); }
-
-  /// Vector and vector
-  FXVec4d operator+(const FXVec4d& v) const { return FXVec4d(x+v.x,y+v.y,z+v.z,w+v.w); }
-  FXVec4d operator-(const FXVec4d& v) const { return FXVec4d(x-v.x,y-v.y,z-v.z,w-v.w); }
-
-  /// Vector and matrix
-  FXVec4d operator*(const FXMat4d& m) const;
-
-  /// Dot product
-  FXdouble operator*(const FXVec4d& v) const { return x*v.x+y*v.y+z*v.z+w*v.w; }
-
   /// Test if zero
   FXbool operator!() const {return x==0.0 && y==0.0 && z==0.0 && w==0.0; }
 
-  /// Equality tests
-  FXbool operator==(const FXVec4d& v) const { return x==v.x && y==v.y && z==v.z && w==v.w; }
-  FXbool operator!=(const FXVec4d& v) const { return x!=v.x || y!=v.y || z!=v.z || w!=v.w; }
-
-  /// Inequality tests
-  FXbool operator<(const FXVec4d& v) const { return x<v.x && y<v.y && z<v.z && w<v.w; }
-  FXbool operator<=(const FXVec4d& v) const { return x<=v.x && y<=v.y && z<=v.z && w<=v.w; }
-  FXbool operator>(const FXVec4d& v) const { return x>v.x && y>v.y && z>v.z && w>v.w; }
-  FXbool operator>=(const FXVec4d& v) const { return x>=v.x && y>=v.y && z>=v.z && w>=v.w; }
+  /// Unary
+  FXVec4d operator+() const { return *this; }
+  FXVec4d operator-() const { return FXVec4d(-x,-y,-z,-w); }
 
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z+w*w; }
@@ -127,17 +104,28 @@ public:
   };
 
 
+/// Dot product
+inline FXdouble operator*(const FXVec4d& a,const FXVec4d& b){ return a.x*b.x+a.y*b.y+a.z*b.z+a.w*b.w; }
+
 /// Scaling
 inline FXVec4d operator*(const FXVec4d& a,FXdouble n){return FXVec4d(a.x*n,a.y*n,a.z*n,a.w*n);}
 inline FXVec4d operator*(FXdouble n,const FXVec4d& a){return FXVec4d(n*a.x,n*a.y,n*a.z,n*a.w);}
 inline FXVec4d operator/(const FXVec4d& a,FXdouble n){return FXVec4d(a.x/n,a.y/n,a.z/n,a.w/n);}
 inline FXVec4d operator/(FXdouble n,const FXVec4d& a){return FXVec4d(n/a.x,n/a.y,n/a.z,n/a.w);}
 
+/// Vector and vector addition
+inline FXVec4d operator+(const FXVec4d& a,const FXVec4d& b){ return FXVec4d(a.x+b.x,a.y+b.y,a.z+b.z,a.w+b.w); }
+inline FXVec4d operator-(const FXVec4d& a,const FXVec4d& b){ return FXVec4d(a.x-b.x,a.y-b.y,a.z-b.z,a.w-b.w); }
+
 /// Equality tests
 inline FXbool operator==(const FXVec4d& a,FXdouble n){return a.x==n && a.y==n && a.z==n && a.w==n;}
 inline FXbool operator!=(const FXVec4d& a,FXdouble n){return a.x!=n || a.y!=n || a.z!=n || a.w!=n;}
 inline FXbool operator==(FXdouble n,const FXVec4d& a){return n==a.x && n==a.y && n==a.z && n==a.w;}
 inline FXbool operator!=(FXdouble n,const FXVec4d& a){return n!=a.x || n!=a.y || n!=a.z || n!=a.w;}
+
+/// Equality tests
+inline FXbool operator==(const FXVec4d& a,const FXVec4d& b){ return a.x==b.x && a.y==b.y && a.z==b.z && a.w==b.w; }
+inline FXbool operator!=(const FXVec4d& a,const FXVec4d& b){ return a.x!=b.x || a.y!=b.y || a.z!=b.z || a.w!=b.w; }
 
 /// Inequality tests
 inline FXbool operator<(const FXVec4d& a,FXdouble n){return a.x<n && a.y<n && a.z<n && a.w<n;}
@@ -150,6 +138,12 @@ inline FXbool operator<(FXdouble n,const FXVec4d& a){return n<a.x && n<a.y && n<
 inline FXbool operator<=(FXdouble n,const FXVec4d& a){return n<=a.x && n<=a.y && n<=a.z && n<=a.w;}
 inline FXbool operator>(FXdouble n,const FXVec4d& a){return n>a.x && n>a.y && n>a.z && n>a.w;}
 inline FXbool operator>=(FXdouble n,const FXVec4d& a){return n>=a.x && n>=a.y && n>=a.z && n>=a.w;}
+
+/// Inequality tests
+inline FXbool operator<(const FXVec4d& a,const FXVec4d& b){ return a.x<b.x && a.y<b.y && a.z<b.z && a.w<b.w; }
+inline FXbool operator<=(const FXVec4d& a,const FXVec4d& b){ return a.x<=b.x && a.y<=b.y && a.z<=b.z && a.w<=b.w; }
+inline FXbool operator>(const FXVec4d& a,const FXVec4d& b){ return a.x>b.x && a.y>b.y && a.z>b.z && a.w>b.w; }
+inline FXbool operator>=(const FXVec4d& a,const FXVec4d& b){ return a.x>=b.x && a.y>=b.y && a.z>=b.z && a.w>=b.w; }
 
 /// Lowest or highest components
 inline FXVec4d lo(const FXVec4d& a,const FXVec4d& b){return FXVec4d(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z),FXMIN(a.w,b.w));}

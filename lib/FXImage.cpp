@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -160,7 +160,7 @@
 #define DISPLAY(app) ((Display*)((app)->display))
 
 // Changable image options
-#define IMAGE_MASK   (IMAGE_KEEP|IMAGE_NEAREST|IMAGE_OPAQUE|IMAGE_ALPHACOLOR|IMAGE_SHMI|IMAGE_SHMP|IMAGE_ALPHAGUESS)
+#define IMAGE_MASK   (IMAGE_KEEP|IMAGE_NEAREST|IMAGE_OPAQUE|IMAGE_ALPHACOLOR|IMAGE_SHMI|IMAGE_SHMP|IMAGE_ALPHAGUESS|IMAGE_THRESGUESS)
 
 // Maximum size of the colormap; for high-end graphics systems
 // you may want to define HIGHENDGRAPHICS to allow for large colormaps
@@ -1630,6 +1630,50 @@ static void vscalergba(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint s
   while(dst<end);
   }
 
+#if 0
+From: http://www.4p8.com/eric.brasseur/gamma.html
+-- Image scaling with correct gamma
+
+tile_x       = 2
+tile_y       = 2
+gamma        = 2.2
+
+tile_surface = tile_x * tile_y
+gamma_invert = 1 / gamma
+
+for y = 0, math.floor (height / tile_y) - 1 do
+	for x = 0, math.floor (width / tile_x) - 1 do
+
+		sum_r, sum_g, sum_b = 0, 0, 0
+
+		for ly = 0, tile_y - 1 do
+			for lx = 0, tile_x - 1 do
+
+				r, g, b = get_rgb (x * tile_x + lx, y * tile_y + ly)
+
+				real_r = r ^ gamma
+				real_g = g ^ gamma
+				real_b = b ^ gamma
+
+				sum_r = sum_r + real_r
+				sum_g = sum_g + real_g
+				sum_b = sum_b + real_b
+			end
+		end
+
+		real_r = sum_r / tile_surface
+		real_g = sum_g / tile_surface
+		real_b = sum_b / tile_surface
+
+		r = real_r ^ gamma_invert
+		g = real_g ^ gamma_invert
+		b = real_b ^ gamma_invert
+
+		set_rgb (x, y, r, g, b)
+	end
+	progress (y * tile_y / height)
+end
+#endif
 
 // Simple nearest neighbor scaling; fast but ugly
 static void scalenearest(FXColor *dst,const FXColor* src,FXint dw,FXint dh,FXint sw,FXint sh){

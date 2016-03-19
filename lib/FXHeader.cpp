@@ -3,7 +3,7 @@
 *                               H e a d e r   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -117,8 +117,9 @@ void FXHeaderItem::draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,
 
   // Icon-text spacing
   if(iw && tw) s=ICON_SPACING;
-
+  
   // Draw arrows
+#if 1
   if(state&(ARROW_UP|ARROW_DOWN)){
     aa=(font->getFontHeight()-5)|1;
     ay=y+(h-aa)/2;
@@ -140,6 +141,31 @@ void FXHeaderItem::draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,
     w-=aa+4;
     dc.setClipRectangle(x,y,w,h);
     }
+#endif
+#if 0
+  if(state&(ARROW_UP|ARROW_DOWN)){
+    FXPoint points[3];
+    aa=(font->getFontHeight()-5)|1;
+    ay=y+(h-aa)/2; 
+    ax=x+w-aa-2;
+    if(state&ARROW_UP){
+      points[0].set(ax+(aa>>1),ay-1);  
+      points[1].set(ax,ay+aa);      
+      points[2].set(ax+aa-1,ay+aa);       
+      dc.setForeground(header->getShadowColor());
+      dc.fillPolygon(points,3);
+      }
+    else{
+      points[0].set(ax+aa,ay);
+      points[1].set(ax+(aa>>1),ay+aa);
+      points[2].set(ax+1,ay);    
+      dc.setForeground(header->getShadowColor());
+      dc.fillPolygon(points,3);
+      }
+    w-=aa+4;
+    dc.setClipRectangle(x,y,w,h);
+    }
+#endif
 
   // Fix x coordinate
   if(state&LEFT){
@@ -207,20 +233,20 @@ void FXHeaderItem::draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,
 
 
 // Create icon
-void FXHeaderItem::create(){ 
-  if(icon) icon->create(); 
+void FXHeaderItem::create(){
+  if(icon) icon->create();
   }
 
 
 // No op, we don't own icon
-void FXHeaderItem::destroy(){ 
-  if((state&ICONOWNED) && icon) icon->destroy(); 
+void FXHeaderItem::destroy(){
+  if((state&ICONOWNED) && icon) icon->destroy();
   }
 
 
 // Detach from icon resource
-void FXHeaderItem::detach(){ 
-  if(icon) icon->detach(); 
+void FXHeaderItem::detach(){
+  if(icon) icon->detach();
   }
 
 

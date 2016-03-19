@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [21])
+m4_define([fox_level], [22])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -84,7 +84,6 @@ AC_PATH_XTRA
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
-AC_FUNC_MMAP
 
 if test "$no_x" = yes; then
 X_BASE_LIBS="-lcomctl32 -lwsock32 -lwinspool -lmpr -lgdi32 -limm32"
@@ -104,8 +103,11 @@ AC_CHECK_LIB(pthread, pthread_exit)
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(dld, shl_load)
 
-# Check vsscanf
+# Check vsscanf, vsnprintf, strtoll, strtoull
 AC_CHECK_FUNCS(vsscanf vsnprintf strtoll strtoull)
+
+# Check thread-safe alternatives
+AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r)
 
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
@@ -133,6 +135,18 @@ if test "x$enable_release" = "xyes" ; then
   fi
 fi
 
+# Native code
+AC_MSG_CHECKING(for native code generation)
+AC_ARG_ENABLE(native,[  --enable-native        compile for native code])
+AC_MSG_RESULT([$enable_native])
+if test "x$enable_native" = "xyes" ; then
+  if test "${GCC}" = "yes" ; then
+    if test "x${build_cpu}" = "xi686" -o "x${build_cpu}" = "xx86_64"; then
+      CXXFLAGS="${CXXFLAGS} -march=native"
+    fi
+  fi
+fi
+
 # Enable profiling
 AC_MSG_CHECKING(for profiling)
 AC_ARG_WITH(profiling,[  --with-profiling        choices are yes, no, or gprof])
@@ -143,6 +157,13 @@ elif test "x$with_profiling" = "xgprof" ; then
 CXXFLAGS="${CXXFLAGS} -pg"
 fi
 
+# Check for common headers
+AC_CHECK_HEADERS([sys/select.h])
+AC_CHECK_HEADERS([sys/ipc.h])
+AC_CHECK_HEADERS([sys/shm.h])
+AC_CHECK_HEADERS([sys/mman.h])
+AC_CHECK_HEADERS([sys/sysctl.h])
+AC_CHECK_HEADERS([sys/pstat.h])
 
 # Check for JPEG Image support
 AC_ARG_ENABLE(jpeg,[  --disable-jpeg          compile without JPEG image support])
@@ -196,9 +217,9 @@ dnl Check for Xft2 support
 AC_MSG_CHECKING(for Xft support)
 AC_ARG_WITH(xft,[  --with-xft              enable Xft support])
 AC_MSG_RESULT([$with_xft])
-if test "x$with_xft" = "xyes"; then
-XFTCFLAGS=`pkg-config --cflags xft`
-XFTLIBS=`pkg-config --libs xft`
+if test "x$with_xft" != "xno"; then
+XFTCFLAGS="-I/usr/include/freetype2"
+XFTLIBS="-lfreetype -lXft"
 saved_cppflags="${CXXFLAGS}"
 CXXFLAGS="${CXXFLAGS} -DHAVE_XFT_H=1 $XFTCFLAGS"
 X_BASE_LIBS="${X_BASE_LIBS} $XFTLIBS"
@@ -282,6 +303,7 @@ AC_MSG_RESULT([$with_opengl])
 if test "x$with_opengl" != "xno" ; then
 AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU}")
 AC_CHECK_HEADER(GL/gl.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GL_H=1"; LIBS="${LIBS} ${LIBGL}")
+AC_CHECK_HEADER(GL/glx.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLX_H=1")
 fi
 GL_LIBS="${LIBGL} ${LIBGLU}"
 

@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -22,28 +22,6 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXThread.h"
-#ifndef WIN32
-#if defined(__APPLE__)
-#ifdef Status
-#undef Status
-#endif
-#ifdef KeyClass
-#undef KeyClass
-#endif
-#include <CoreServices/CoreServices.h>
-#include <libkern/OSAtomic.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <sys/types.h>
-#include <sys/sysctl.h>
-#else
-#include <pthread.h>
-#include <semaphore.h>
-#if defined(hpux) || defined(__hpux) || defined(_hpux)
-#include <sys/pstat.h>
-#endif
-#endif
-#endif
 
 /*
   Notes:
@@ -103,61 +81,83 @@ using namespace FX;
 
 namespace FX {
 
+
 /*******************************************************************************/
 
 
-#if defined(WIN32)                      // Windows implementation
-
-
 // Initialize mutex
-FXMutex::FXMutex(FXbool){
+FXMutex::FXMutex(FXbool recursive){
+#if defined(WIN32)
   // If this fails on your machine, determine what value
   // of sizeof(CRITICAL_SECTION) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(CRITICAL_SECTION)=%d\n",sizeof(CRITICAL_SECTION)));
   FXASSERT(sizeof(data)>=sizeof(CRITICAL_SECTION));
   InitializeCriticalSection((CRITICAL_SECTION*)data);
+#else
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_mutex_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_mutex_t));
+  pthread_mutexattr_t mutexatt;
+  pthread_mutexattr_init(&mutexatt);
+  pthread_mutexattr_settype(&mutexatt,recursive?PTHREAD_MUTEX_RECURSIVE:PTHREAD_MUTEX_DEFAULT);
+  pthread_mutex_init((pthread_mutex_t*)data,&mutexatt);
+  pthread_mutexattr_destroy(&mutexatt);
+#endif
   }
 
 
 // Lock the mutex
 void FXMutex::lock(){
+#if defined(WIN32)
   EnterCriticalSection((CRITICAL_SECTION*)data);
+#else
+  pthread_mutex_lock((pthread_mutex_t*)data);
+#endif
   }
-
 
 
 // Try lock the mutex
 FXbool FXMutex::trylock(){
-#if(_WIN32_WINNT >= 0x0400)
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0400)
   return TryEnterCriticalSection((CRITICAL_SECTION*)data)!=0;
-#else
+#elif defined(WIN32)
   return false;
+#else
+  return pthread_mutex_trylock((pthread_mutex_t*)data)==0;
 #endif
   }
 
 
 // Unlock mutex
 void FXMutex::unlock(){
+#if defined(WIN32)
   LeaveCriticalSection((CRITICAL_SECTION*)data);
+#else
+  pthread_mutex_unlock((pthread_mutex_t*)data);
+#endif
   }
 
 
 // Test if locked
 FXbool FXMutex::locked(){
-#if(_WIN32_WINNT >= 0x0400)
-  if(TryEnterCriticalSection((CRITICAL_SECTION*)data)!=0){
-    LeaveCriticalSection((CRITICAL_SECTION*)data);
+  if(trylock()){
+    unlock();
     return false;
     }
-#endif
   return true;
   }
 
 
 // Delete mutex
 FXMutex::~FXMutex(){
+#if defined(WIN32)
   DeleteCriticalSection((CRITICAL_SECTION*)data);
+#else
+  pthread_mutex_destroy((pthread_mutex_t*)data);
+#endif
   }
 
 
@@ -166,55 +166,137 @@ FXMutex::~FXMutex(){
 
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){
-  data[0]=0;
+#if defined(WIN32)
+  data[0]=data[1]=data[2]=data[3]=0;
+#elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
+  data[0]=data[1]=data[2]=data[3]=0;
+#elif defined(__APPLE__)
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_mutex_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
+  FXASSERT(sizeof(data)>=sizeof(OSSpinLock));
+  *((OSSpinLock*)data)=OS_SPINLOCK_INIT;
+#else
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_spinlock_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
+  pthread_spin_init((pthread_spinlock_t*)(void*)data,PTHREAD_PROCESS_PRIVATE);
+#endif
   }
 
 
 // Lock the spinlock
 void FXSpinLock::lock(){
+#if defined(WIN32)
   while(InterlockedExchange((LONG*)data,1L)){
     while(data[0]){ }
     }
+#elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
+  __asm__ __volatile__ ("movw $0x0100, %%ax \n\t"
+                        "lock xaddw %%ax, %0 \n\t"
+                        "1: \n\t"
+                        "cmpb %%ah, %%al\n\t"
+                        "je 2f\n\t"
+                        "rep; nop\n\t"
+                        "movb %0, %%al\n\t"
+                        "jmp 1b\n\t"
+                        "2:"  : "+m" (data) : : "memory", "ax", "cc");
+#elif defined(__APPLE__)
+  OSSpinLockLock((OSSpinLock*)data);
+#else
+  pthread_spin_lock((pthread_spinlock_t*)(void*)data);
+#endif
   }
 
 
 // Try lock the spinlock
 FXbool FXSpinLock::trylock(){
+#if defined(WIN32)
   return !InterlockedExchange((LONG*)data,1L);
+#elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
+  FXbool ret;
+  __asm__ __volatile__ ("movw %1,%%ax\n\t"
+                        "cmpb %%ah, %%al\n\t"
+                        "jne 1f\n\t"
+                        "movw %%ax,%%cx\n\t"
+                        "addw $0x0100,%%cx\n\t"
+                        "lock cmpxchgw %%cx,%1\n\t"
+                        "1:\n\t"
+                        "sete %b0\n\t" :"=a" (ret), "+m" (data) : : "ecx", "memory", "cc");
+  return ret;
+#elif defined(__APPLE__)
+  return OSSpinLockTry((OSSpinLock*)data);
+#else
+  return pthread_spin_trylock((pthread_spinlock_t*)(void*)data)==0;
+#endif
   }
 
 
 // Unlock spinlock
 void FXSpinLock::unlock(){
+#if defined(WIN32)
   InterlockedExchange((LONG*)data,0L);
+#elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
+  __asm__ __volatile__ ("lock incb %0\n\t" : "+m" (data) : : "memory", "cc");
+#elif defined(__APPLE__)
+  OSSpinLockUnlock((OSSpinLock*)data);
+#else
+  pthread_spin_unlock((pthread_spinlock_t*)(void*)data);
+#endif
   }
 
 
 // Test if locked
 FXbool FXSpinLock::locked(){
-  if(!InterlockedExchange((LONG*)data,1L)){
-    InterlockedExchange((LONG*)data,0L);
+#if defined(WIN32)
+  return (data[0]!=0);
+#elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
+  FXbool ret;
+  __asm__ __volatile__ ("movw %1,%%ax\n\t"
+                        "cmpb %%ah, %%al\n\t"
+                        "setne %%al\n\t" :"=a" (ret), "+m" (data) : : "memory", "cc");
+  return ret;
+#elif defined(__APPLE__)
+  if(OSSpinLockTry((OSSpinLock*)data)){
+    OSSpinLockUnlock((OSSpinLock*)data);
     return false;
     }
   return true;
+#else
+  if(pthread_spin_trylock((pthread_spinlock_t*)(void*)data)==0){
+    pthread_spin_unlock((pthread_spinlock_t*)(void*)data);
+    return false;
+    }
+  return true;
+#endif
   }
 
 
 // Delete spinlock
 FXSpinLock::~FXSpinLock(){
+#if defined(WIN32)
+  // NOP //
+#elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
+  // NOP //
+#elif defined(__APPLE__)
+  // NOP //
+#else
+  pthread_spin_destroy((pthread_spinlock_t*)(void*)data);
+#endif
   }
 
 
 /*******************************************************************************/
 
 
-// Initialize semaphore
-FXSemaphore::FXSemaphore(FXint initial){
-  data[0]=(FXuval)CreateSemaphore(NULL,initial,0x7fffffff,NULL);
-  }
+#if defined(WIN32)
 
-
+#ifndef SEMAQUERYINFOCLASS
 #define SEMAQUERYINFOCLASS 0
+#endif
 
 typedef long NTSTATUS;
 
@@ -223,18 +305,14 @@ typedef struct _SEMAINFO {
   UINT Limit;		// max semaphore count
   } SEMAINFO;
 
-
 // Stub function
 static NTSTATUS WINAPI myQuerySemaphore(HANDLE Handle,UINT InfoClass,SEMAINFO* SemaInfo,UINT InfoSize,UINT* RetLen);
-
 
 // Function variable decl
 typedef NTSTATUS (WINAPI *PFNQUERYSEMAPHORE)(HANDLE Handle,UINT InfoClass,SEMAINFO* SemaInfo,UINT InfoSize,UINT* RetLen);
 
-
 // Function pointer into ntdll.dll
 static PFNQUERYSEMAPHORE fxQuerySemaphore=myQuerySemaphore;
-
 
 // When called, grab the true API from the DLL if we can
 static NTSTATUS WINAPI myQuerySemaphore(HANDLE Handle,UINT InfoClass,SEMAINFO* SemaInfo,UINT InfoSize,UINT* RetLen){
@@ -247,85 +325,148 @@ static NTSTATUS WINAPI myQuerySemaphore(HANDLE Handle,UINT InfoClass,SEMAINFO* S
   return -1;
   }
 
+#endif
+
+
+// Initialize semaphore
+FXSemaphore::FXSemaphore(FXint initial){
+#if defined(WIN32)
+  data[0]=(FXuval)CreateSemaphore(NULL,initial,0x7fffffff,NULL);
+#else
+  // If this fails on your machine, determine what value
+  // of sizeof(sem_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
+  FXASSERT(sizeof(data)>=sizeof(sem_t));
+  sem_init((sem_t*)data,0,(unsigned int)initial);
+#endif
+  }
+
 
 // Get semaphore value
 FXint FXSemaphore::value() const {
+#if defined(WIN32)
   SEMAINFO SemInfo;
   UINT RetLen;
   if(fxQuerySemaphore((HANDLE)data[0],SEMAQUERYINFOCLASS,&SemInfo,sizeof(SemInfo),&RetLen)>=0){
     return SemInfo.Count;
     }
   return -1;
+#else
+  int result=-1;
+  sem_getvalue((sem_t*)data,&result);
+  return result;
+#endif
   }
 
 
 // Decrement semaphore, waiting if count is zero
 void FXSemaphore::wait(){
+#if defined(WIN32)
   WaitForSingleObject((HANDLE)data[0],INFINITE);
+#else
+  sem_wait((sem_t*)data);
+#endif
   }
 
 
 // Decrement semaphore; returning false if count is zero
 FXbool FXSemaphore::trywait(){
+#if defined(WIN32)
   return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;
+#else
+  return sem_trywait((sem_t*)data)==0;
+#endif
   }
 
 
 // Increment semaphore
 void FXSemaphore::post(){
+#if defined(WIN32)
   ReleaseSemaphore((HANDLE)data[0],1,NULL);
+#else
+  sem_post((sem_t*)data);
+#endif
   }
 
 
 // Delete semaphore
 FXSemaphore::~FXSemaphore(){
+#if defined(WIN32)
   CloseHandle((HANDLE)data[0]);
+#else
+  sem_destroy((sem_t*)data);
+#endif
   }
 
 
 /*******************************************************************************/
 
 
-// This is the solution according to Schmidt, the win32-threads
-// implementation thereof which is found inside GCC somewhere.
-// See: (http://www.cs.wustl.edu/~schmidt/win32-cv-1.html).
-//
-// Our implementation however initializes the Event objects in
-// the constructor, under the assumption that you wouldn't be creating
-// a condition object if you weren't planning to use them somewhere.
-
-
 // Initialize condition
 FXCondition::FXCondition(){
-  // If this fails on your machine, notify jeroen@fox-toolkit.com!
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_cond_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  FXASSERT(sizeof(data)>=sizeof(CONDITION_VARIABLE));
+  InitializeConditionVariable((CONDITION_VARIABLE*)data);
+#elif defined(WIN32)
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_cond_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)=%d\n",sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)));
   FXASSERT(sizeof(data)>=sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval));
   data[0]=(FXuval)CreateEvent(NULL,0,0,NULL);                   // Wakes one, autoreset
   data[1]=(FXuval)CreateEvent(NULL,1,0,NULL);                   // Wakes all, manual reset
   data[2]=0;                                                    // Blocked count
   InitializeCriticalSection((CRITICAL_SECTION*)&data[3]);       // Critical section
+#else
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_cond_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_cond_t));
+  pthread_cond_init((pthread_cond_t*)data,NULL);
+#endif
   }
 
 
 // Wake up one single waiting thread
 void FXCondition::signal(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  WakeConditionVariable((CONDITION_VARIABLE*)data);
+#elif defined(WIN32)
   EnterCriticalSection((CRITICAL_SECTION*)&data[3]);
   int blocked=(data[2]>0);
   LeaveCriticalSection((CRITICAL_SECTION*)&data[3]);
   if(blocked) SetEvent((HANDLE)data[0]);
+#else
+  pthread_cond_signal((pthread_cond_t*)data);
+#endif
   }
 
 
 // Wake up all waiting threads
 void FXCondition::broadcast(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  WakeAllConditionVariable((CONDITION_VARIABLE*)data);
+#elif defined(WIN32)
   EnterCriticalSection((CRITICAL_SECTION*)&data[3]);
   int blocked=(data[2]>0);
   LeaveCriticalSection((CRITICAL_SECTION*)&data[3]);
   if(blocked) SetEvent((HANDLE)data[1]);
+#else
+  pthread_cond_broadcast((pthread_cond_t*)data);
+#endif
   }
 
 
 // Wait
 FXbool FXCondition::wait(FXMutex& mtx){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  return SleepConditionVariableCS((CONDITION_VARIABLE*)data,(CRITICAL_SECTION*)mtx.data,INFINITE)!=0;
+#elif defined(WIN32)
   EnterCriticalSection((CRITICAL_SECTION*)&data[3]);
   data[2]++;
   LeaveCriticalSection((CRITICAL_SECTION*)&data[3]);
@@ -338,11 +479,22 @@ FXbool FXCondition::wait(FXMutex& mtx){
   if(last_waiter) ResetEvent((HANDLE)data[1]);                  // Reset signal
   mtx.lock();
   return (WAIT_OBJECT_0+0==result)||(result==WAIT_OBJECT_0+1);
+#else
+  return pthread_cond_wait((pthread_cond_t*)data,(pthread_mutex_t*)mtx.data)==0;
+#endif
   }
 
 
 // Wait using single global mutex
 FXbool FXCondition::wait(FXMutex& mtx,FXTime nsec){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  if(0<nsec){
+    DWORD delay=INFINITE;
+    if(nsec<forever) delay=nsec/1000000;
+    return SleepConditionVariableCS((CONDITION_VARIABLE*)data,(CRITICAL_SECTION*)mtx.data,delay)!=0;
+    }
+  return false;
+#elif defined(WIN32)
   if(0<nsec){
     DWORD delay=INFINITE;
     if(nsec<forever) delay=nsec/1000000;
@@ -360,788 +512,7 @@ FXbool FXCondition::wait(FXMutex& mtx,FXTime nsec){
     return (WAIT_OBJECT_0+0==result)||(result==WAIT_OBJECT_0+1);
     }
   return false;
-  }
-
-
-// Delete condition
-FXCondition::~FXCondition(){
-  CloseHandle((HANDLE)data[0]);
-  CloseHandle((HANDLE)data[1]);
-  DeleteCriticalSection((CRITICAL_SECTION*)&data[3]);
-  }
-
-
-/*******************************************************************************/
-
-struct RWLOCK {
-  CRITICAL_SECTION mutex[1];
-  CRITICAL_SECTION access[1];
-  DWORD            readers;
-  };
-
-
-// Initialize read/write lock
-FXReadWriteLock::FXReadWriteLock(){
-  // If this fails on your machine, determine what value
-  // of sizeof(RWLOCK) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.com!!
-  //FXTRACE((150,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
-  FXASSERT(sizeof(data)>=sizeof(RWLOCK));
-  InitializeCriticalSection(((RWLOCK*)data)->mutex);
-  InitializeCriticalSection(((RWLOCK*)data)->access);
-  ((RWLOCK*)data)->readers=0;
-  }
-
-
-// Acquire read lock for read/write lock
-void FXReadWriteLock::readLock(){
-  EnterCriticalSection(((RWLOCK*)data)->mutex);
-  if(++((RWLOCK*)data)->readers==1){
-    EnterCriticalSection(((RWLOCK*)data)->access);
-    }
-  LeaveCriticalSection(((RWLOCK*)data)->mutex);
-  }
-
-
-// Try to acquire read lock for read/write lock
-FXbool FXReadWriteLock::tryReadLock(){
-#if(_WIN32_WINNT >= 0x0400)
-  if(TryEnterCriticalSection(((RWLOCK*)data)->mutex)){
-    if(++((RWLOCK*)data)->readers==1 && !TryEnterCriticalSection(((RWLOCK*)data)->access)){
-      --((RWLOCK*)data)->readers;
-      LeaveCriticalSection(((RWLOCK*)data)->mutex);
-      return false;
-      }
-    LeaveCriticalSection(((RWLOCK*)data)->mutex);
-    return true;
-    }
-#endif
-  return false;
-  }
-
-
-// Unlock read lock
-void FXReadWriteLock::readUnlock(){
-  EnterCriticalSection(((RWLOCK*)data)->mutex);
-  if(--((RWLOCK*)data)->readers==0){
-    LeaveCriticalSection(((RWLOCK*)data)->access);
-    }
-  LeaveCriticalSection(((RWLOCK*)data)->mutex);
-  }
-
-
-// Acquire write lock for read/write lock
-void FXReadWriteLock::writeLock(){
-  EnterCriticalSection(((RWLOCK*)data)->access);
-  }
-
-
-// Try to acquire write lock for read/write lock
-FXbool FXReadWriteLock::tryWriteLock(){
-#if(_WIN32_WINNT >= 0x0400)
-  return TryEnterCriticalSection(((RWLOCK*)data)->access)!=0;
 #else
-  return false;
-#endif
-  }
-
-
-// Unlock write lock
-void FXReadWriteLock::writeUnlock(){
-  LeaveCriticalSection(((RWLOCK*)data)->access);
-  }
-
-
-// Delete read/write lock
-FXReadWriteLock::~FXReadWriteLock(){
-  DeleteCriticalSection(((RWLOCK*)data)->mutex);
-  DeleteCriticalSection(((RWLOCK*)data)->access);
-  }
-
-#if 0
-  FXMutex     access;
-  FXCondition reader;
-  FXCondition writer;
-  FXint       numreaders;
-  FXint       numwriters;
-  FXint       inside;
-
-// Initialize read/write lock
-FXReadWriteLock::FXReadWriteLock():numreaders(0),numwriters(0),inside(0){
-  }
-
-
-// Acquire read lock for read/write lock
-void FXReadWriteLock::readLock(){
-  FXMutexLock lock(access);
-  while(inside<0 || numwriters){
-    ++numreaders;
-    reader.wait(access);
-    --numreaders;
-    }
-  ++inside;
-  }
-
-
-// Try to acquire read lock for read/write lock
-FXbool FXReadWriteLock::tryReadLock(){
-//  return pthread_rwlock_tryrdlock((pthread_rwlock_t*)data)==0;
-  }
-
-
-// Unlock read lock
-void FXReadWriteLock::readUnlock(){
-  FXMutexLock lock(access);
-  if(--inside==0){
-    if(numwriters){
-      writer.signal();
-      }
-    else if(numreaders){
-      reader.broadcast();
-      }
-    }
-  }
-
-
-// Acquire write lock for read/write lock
-void FXReadWriteLock::writeLock(){
-  FXMutexLock lock(access);
-  while(inside){
-    ++numwriters;
-    writer.wait(access);
-    --numwriters;
-    }
-  --inside;
-  }
-
-
-// Try to acquire write lock for read/write lock
-FXbool FXReadWriteLock::tryWriteLock(){
-//  return pthread_rwlock_trywrlock((pthread_rwlock_t*)data)==0;
-  }
-
-
-// Unlock write lock
-void FXReadWriteLock::writeUnlock(){
-  FXMutexLock lock(access);
-  if(++inside==0){
-    if(numwriters){
-      writer.signal();
-      }
-    else if(numreaders){
-      reader.broadcast();
-      }
-    }
-  }
-
-
-// Delete read/write lock
-FXReadWriteLock::~FXReadWriteLock(){
-  }
-#endif
-
-
-/*******************************************************************************/
-
-
-// Automatically acquire a thread-local storage key
-FXAutoThreadStorageKey::FXAutoThreadStorageKey(){
-  FXASSERT(sizeof(FXThreadStorageKey)==sizeof(DWORD));
-  value=(FXThreadStorageKey)TlsAlloc();
-  }
-
-
-// Set thread local storage associated with this key
-void FXAutoThreadStorageKey::set(void* ptr) const {
-  TlsSetValue((DWORD)value,ptr);
-  }
-
-
-// Get thread local storage associated with this key
-void* FXAutoThreadStorageKey::get() const {
-  return TlsGetValue((DWORD)value);
-  }
-
-
-// Automatically release a thread-local storage key
-FXAutoThreadStorageKey::~FXAutoThreadStorageKey(){
-  TlsFree((DWORD)value);
-  }
-
-
-// Generate one for the thread itself
-FXAutoThreadStorageKey FXThread::selfKey;
-
-
-// Initialize thread
-FXThread::FXThread():tid(0),busy(false){
-  }
-
-
-// Return thread id of this thread object.
-// Purposefully NOT inlined, the tid may be changed by another
-// thread and therefore we must force the compiler to fetch
-// this value fresh each time it is needed!
-FXThreadID FXThread::id() const {
-  return tid;
-  }
-
-
-// Return true if this thread is running
-FXbool FXThread::running() const {
-  return busy;
-  }
-
-
-// Change pointer to thread
-void FXThread::self(FXThread* t){
-  FXThread::selfKey.set(t);
-  }
-
-
-// Return pointer to calling thread
-FXThread* FXThread::self(){
-  return (FXThread*)FXThread::selfKey.get();
-  }
-
-
-// Start the thread; we associate the FXThread instance with
-// this thread using thread-local storage accessed with self_key.
-// Also, we catch any errors thrown by the thread code here.
-// If FXThread is still around after run() returns, reset busy to false.
-unsigned int CALLBACK FXThread::function(void* ptr){
-  register FXThread *thread=(FXThread*)ptr;
-  register FXint code=-1;
-  self(thread);
-  try{ code=thread->run(); } catch(...){ }
-  if(self()){ self()->busy=false; }
-  return code;
-  }
-
-
-// Start thread
-FXbool FXThread::start(unsigned long stacksize){
-  DWORD thd;
-  if(busy){ fxerror("FXThread::start: thread already running.\n"); }
-  if(tid){ fxerror("FXThread::start: thread still attached.\n"); }
-  busy=true;
-  if((tid=(FXThreadID)CreateThread(NULL,stacksize,(LPTHREAD_START_ROUTINE)FXThread::function,this,0,&thd))==NULL) busy=false;
-  return busy;
-  }
-
-
-// Suspend calling thread until thread is done
-FXbool FXThread::join(FXint& code){
-  if(tid && WaitForSingleObject((HANDLE)tid,INFINITE)==WAIT_OBJECT_0){
-    GetExitCodeThread((HANDLE)tid,(DWORD*)&code);
-    CloseHandle((HANDLE)tid);
-    tid=0;
-    return true;
-    }
-  return false;
-  }
-
-
-// Suspend calling thread until thread is done
-FXbool FXThread::join(){
-  if(tid && WaitForSingleObject((HANDLE)tid,INFINITE)==WAIT_OBJECT_0){
-    CloseHandle((HANDLE)tid);
-    tid=0;
-    return true;
-    }
-  return false;
-  }
-
-
-// Cancel the thread
-FXbool FXThread::cancel(){
-  if(tid){
-    if(busy && TerminateThread((HANDLE)tid,0)) busy=false;
-    if(CloseHandle((HANDLE)tid)){
-      tid=0;
-      return true;
-      }
-    }
-  return false;
-  }
-
-
-// Detach thread
-FXbool FXThread::detach(){
-  if(tid && CloseHandle((HANDLE)tid)){
-    tid=0;
-    return true;
-    }
-  return false;
-  }
-
-
-// Exit calling thread
-void FXThread::exit(FXint code){
-  if(self()){ self()->busy=false; }
-  ExitThread(code);
-  }
-
-
-// Yield the thread
-void FXThread::yield(){
-  Sleep(0);
-  }
-
-
-// Get time in nanoseconds since Epoch
-FXTime FXThread::time(){
-  FXTime now;
-  GetSystemTimeAsFileTime((FILETIME*)&now);
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__)
-  return (now-116444736000000000LL)*100LL;
-#else
-  return (now-116444736000000000L)*100L;
-#endif
-  }
-
-
-// Make the calling thread sleep for a number of nanoseconds
-void FXThread::sleep(FXTime nsec){
-  Sleep((DWORD)(nsec/1000000));
-  }
-
-
-// Wake at appointed time
-void FXThread::wakeat(FXTime nsec){
-  nsec-=FXThread::time();
-  if(nsec<0) nsec=0;
-  Sleep((DWORD)(nsec/1000000));
-  }
-
-
-// Return thread id of caller
-FXThreadID FXThread::current(){
-  return (FXThreadID)GetCurrentThreadId();
-  }
-
-
-// Return number of processors
-FXint FXThread::processors(){
-  SYSTEM_INFO info;
-  GetSystemInfo(&info);
-  return info.dwNumberOfProcessors;
-  }
-
-
-// Generate new thread local storage key
-FXThreadStorageKey FXThread::createStorageKey(){
-  return (FXThreadStorageKey)TlsAlloc();
-  }
-
-
-// Dispose of thread local storage key
-void FXThread::deleteStorageKey(FXThreadStorageKey key){
-  TlsFree((DWORD)key);
-  }
-
-
-// Get thread local storage pointer using key
-void* FXThread::getStorage(FXThreadStorageKey key){
-  return TlsGetValue((DWORD)key);
-  }
-
-
-// Set thread local storage pointer using key
-void FXThread::setStorage(FXThreadStorageKey key,void* ptr){
-  TlsSetValue((DWORD)key,ptr);
-  }
-
-
-// Set thread priority
-FXbool FXThread::priority(FXThread::Priority prio){
-  if(tid){
-    int pri;
-    switch(prio){
-      case PriorityMinimum:
-        pri=THREAD_PRIORITY_LOWEST;
-        break;
-      case PriorityLower:
-        pri=THREAD_PRIORITY_BELOW_NORMAL;
-        break;
-      case PriorityMedium:
-        pri=THREAD_PRIORITY_NORMAL;
-        break;
-      case PriorityHigher:
-        pri=THREAD_PRIORITY_ABOVE_NORMAL;
-        break;
-      case PriorityMaximum:
-        pri=THREAD_PRIORITY_HIGHEST;
-        break;
-      default:
-        pri=THREAD_PRIORITY_NORMAL;
-        break;
-      }
-    return SetThreadPriority((HANDLE)tid,pri)!=0;
-    }
-  return false;
-  }
-
-
-// Return thread priority
-FXThread::Priority FXThread::priority() const {
-  Priority result=PriorityError;
-  if(tid){
-    int pri=GetThreadPriority((HANDLE)tid);
-    if(pri!=THREAD_PRIORITY_ERROR_RETURN){
-      switch(pri){
-        case THREAD_PRIORITY_IDLE:
-          result=PriorityMinimum;
-          break;
-        case THREAD_PRIORITY_BELOW_NORMAL:
-          result=PriorityLower;
-          break;
-        case THREAD_PRIORITY_NORMAL:
-          result=PriorityMedium;
-          break;
-        case THREAD_PRIORITY_ABOVE_NORMAL:
-          result=PriorityHigher;
-          break;
-        case THREAD_PRIORITY_HIGHEST:
-          result=PriorityMaximum;
-          break;
-        default:
-          result=PriorityDefault;
-          break;
-        }
-      }
-    }
-  return result;
-  }
-
-
-// Set thread scheduling policy
-FXbool FXThread::policy(FXThread::Policy){
-  return true;
-  }
-
-
-// Get thread scheduling policy
-FXThread::Policy FXThread::policy() const {
-  return PolicyDefault;
-  }
-
-
-// Suspend thread
-FXbool FXThread::suspend(){
-  return busy && tid && (SuspendThread((HANDLE)tid)!=(DWORD)-1L);
-  }
-
-
-// Resume thread
-FXbool FXThread::resume(){
-  return busy && tid && (ResumeThread((HANDLE)tid)!=(DWORD)-1L);
-  }
-
-
-// Destroy
-FXThread::~FXThread(){
-  if(self()==this){
-    self(NULL);
-    detach();
-    }
-  else{
-    cancel();
-    }
-  }
-
-
-/*******************************************************************************/
-
-
-#else                                   // Unix implementation
-
-
-// Initialize mutex
-FXMutex::FXMutex(FXbool recursive){
-  pthread_mutexattr_t mutexatt;
-  // If this fails on your machine, determine what value
-  // of sizeof(pthread_mutex_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.com!!
-  //FXTRACE((150,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
-  FXASSERT(sizeof(data)>=sizeof(pthread_mutex_t));
-  pthread_mutexattr_init(&mutexatt);
-  pthread_mutexattr_settype(&mutexatt,recursive?PTHREAD_MUTEX_RECURSIVE:PTHREAD_MUTEX_DEFAULT);
-  pthread_mutex_init((pthread_mutex_t*)data,&mutexatt);
-  pthread_mutexattr_destroy(&mutexatt);
-  }
-
-
-// Lock the mutex
-void FXMutex::lock(){
-  pthread_mutex_lock((pthread_mutex_t*)data);
-  }
-
-
-// Try lock the mutex
-FXbool FXMutex::trylock(){
-  return pthread_mutex_trylock((pthread_mutex_t*)data)==0;
-  }
-
-
-// Unlock mutex
-void FXMutex::unlock(){
-  pthread_mutex_unlock((pthread_mutex_t*)data);
-  }
-
-
-// Test if locked
-FXbool FXMutex::locked(){
-  if(pthread_mutex_trylock((pthread_mutex_t*)data)==0){
-    pthread_mutex_unlock((pthread_mutex_t*)data);
-    return false;
-    }
-  return true;
-  }
-
-
-// Delete mutex
-FXMutex::~FXMutex(){
-  pthread_mutex_destroy((pthread_mutex_t*)data);
-  }
-
-/*******************************************************************************/
-
-#if (defined(__GNUC__) || defined(__ICC)) && (defined(__i386__) || defined(__x86_64__))
-
-// Initialize spinlock
-FXSpinLock::FXSpinLock(){
-  data[0]=data[1]=data[2]=data[3]=0;
-  }
-
-
-// Lock the spinlock
-void FXSpinLock::lock(){
-  __asm__ __volatile__ (
-        "movw $0x100, %%ax \n\t"
-        "lock \n\t"
-        "xaddw %%ax, %0 \n\t"
-        "1: \n\t"
-        "cmpb %%ah, %%al\n\t"
-        "je 2f\n\t"
-        "rep; nop\n\t"
-        "movb %0, %%al\n\t"
-        "jmp 1b\n\t"
-        "2:"  : "+m" (data) : : "memory", "ax", "cc");
-  }
-
-
-// Try lock the spinlock
-FXbool FXSpinLock::trylock(){
-  FXushort tmp,old;
-  __asm__ __volatile__ (
-        "movw %2,%w0\n\t"
-        "cmpb %h0, %b0\n\t"
-        "jne 1f\n\t"
-        "movw %w0,%w1\n\t"
-        "incb %h1\n\t"
-        "lock \n\t"
-        "cmpxchgw %w1,%2\n\t"
-        "1:" :"=a" (old), "=Q" (tmp), "+m" (data) : : "memory", "cc");
-  return ((old&0xff)==((old>>8)&0xff));
-  }
-
-
-// Unlock spinlock
-void FXSpinLock::unlock(){
-  __asm__ __volatile__ (
-        "lock\n\t"
-        "incb %0" : "+m" (data) : : "memory", "cc");
-  }
-
-
-// Test if locked
-FXbool FXSpinLock::locked(){
-  FXushort tmp=*((volatile FXushort*)(void*)data);
-  return (((tmp>>8)&0xff)!=(tmp&0xff));
-  }
-
-
-// Delete spinlock
-FXSpinLock::~FXSpinLock(){
-  }
-
-
-#elif defined(__APPLE__)
-
-
-// Initialize spinlock
-FXSpinLock::FXSpinLock(){
-  // If this fails on your machine, determine what value
-  // of sizeof(pthread_mutex_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.com!!
-  //FXTRACE((150,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
-  FXASSERT(sizeof(data)>=sizeof(OSSpinLock));
-  data[0]=data[1]=data[2]=data[3]=0;
-  }
-
-
-// Lock the spinlock
-void FXSpinLock::lock(){
-  OSSpinLockLock((OSSpinLock*)data);
-  }
-
-
-// Try lock the spinlock
-FXbool FXSpinLock::trylock(){
-  return OSSpinLockTry((OSSpinLock*)data);
-  }
-
-
-// Unlock spinlock
-void FXSpinLock::unlock(){
-  OSSpinLockUnlock((OSSpinLock*)data);
-  }
-
-
-// Test if locked
-FXbool FXSpinLock::locked(){
-  if(OSSpinLockTry((OSSpinLock*)data)){
-    OSSpinLockUnlock((OSSpinLock*)data);
-    return false;
-    }
-  return true;
-  }
-
-
-// Delete spinlock
-FXSpinLock::~FXSpinLock(){
-  }
-
-
-#else
-
-
-// Initialize spinlock
-FXSpinLock::FXSpinLock(){
-  // If this fails on your machine, determine what value
-  // of sizeof(pthread_spinlock_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.com!!
-  //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
-  FXASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
-  pthread_spin_init((pthread_spinlock_t*)(void*)data,PTHREAD_PROCESS_PRIVATE);
-  }
-
-
-// Lock the spinlock
-void FXSpinLock::lock(){
-  pthread_spin_lock((pthread_spinlock_t*)(void*)data);
-  }
-
-
-// Try lock the spinlock
-FXbool FXSpinLock::trylock(){
-  return pthread_spin_trylock((pthread_spinlock_t*)(void*)data)==0;
-  }
-
-
-// Unlock spinlock
-void FXSpinLock::unlock(){
-  pthread_spin_unlock((pthread_spinlock_t*)(void*)data);
-  }
-
-
-// Test if locked
-FXbool FXSpinLock::locked(){
-  if(pthread_spin_trylock((pthread_spinlock_t*)(void*)data)==0){
-    pthread_spin_unlock((pthread_spinlock_t*)(void*)data);
-    return false;
-    }
-  return true;
-  }
-
-
-// Delete spinlock
-FXSpinLock::~FXSpinLock(){
-  pthread_spin_destroy((pthread_spinlock_t*)(void*)data);
-  }
-
-#endif
-
-/*******************************************************************************/
-
-
-// Initialize semaphore
-FXSemaphore::FXSemaphore(FXint initial){
-  // If this fails on your machine, determine what value
-  // of sizeof(sem_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.com!!
-  //FXTRACE((150,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
-  FXASSERT(sizeof(data)>=sizeof(sem_t));
-  sem_init((sem_t*)data,0,(unsigned int)initial);
-  }
-
-
-// Get semaphore value
-FXint FXSemaphore::value() const {
-  int result=-1;
-  sem_getvalue((sem_t*)data,&result);
-  return result;
-  }
-
-
-// Decrement semaphore, waiting if count is zero
-void FXSemaphore::wait(){
-  sem_wait((sem_t*)data);
-  }
-
-
-// Decrement semaphore; returning false if count is zero
-FXbool FXSemaphore::trywait(){
-  return sem_trywait((sem_t*)data)==0;
-  }
-
-
-// Increment semaphore
-void FXSemaphore::post(){
-  sem_post((sem_t*)data);
-  }
-
-
-// Delete semaphore
-FXSemaphore::~FXSemaphore(){
-  sem_destroy((sem_t*)data);
-  }
-
-/*******************************************************************************/
-
-
-// Initialize condition
-FXCondition::FXCondition(){
-  // If this fails on your machine, determine what value
-  // of sizeof(pthread_cond_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.com!!
-  //FXTRACE((150,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
-  FXASSERT(sizeof(data)>=sizeof(pthread_cond_t));
-  pthread_cond_init((pthread_cond_t*)data,NULL);
-  }
-
-
-// Wake up one single waiting thread
-void FXCondition::signal(){
-  pthread_cond_signal((pthread_cond_t*)data);
-  }
-
-
-// Wake up all waiting threads
-void FXCondition::broadcast(){
-  pthread_cond_broadcast((pthread_cond_t*)data);
-  }
-
-
-// Wait for condition indefinitely
-FXbool FXCondition::wait(FXMutex& mtx){
-  return pthread_cond_wait((pthread_cond_t*)data,(pthread_mutex_t*)mtx.data)==0;
-  }
-
-
-// Wait for condition but fall through after timeout
-FXbool FXCondition::wait(FXMutex& mtx,FXTime nsec){
   if(0<nsec){
     if(nsec<forever){
 #if (_POSIX_C_SOURCE >= 199309L)
@@ -1163,28 +534,67 @@ FXbool FXCondition::wait(FXMutex& mtx,FXTime nsec){
     return pthread_cond_wait((pthread_cond_t*)data,(pthread_mutex_t*)mtx.data)==0;
     }
   return false;
+#endif
   }
 
 
 // Delete condition
 FXCondition::~FXCondition(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  // NOP //
+#elif defined(WIN32)
+  CloseHandle((HANDLE)data[0]);
+  CloseHandle((HANDLE)data[1]);
+  DeleteCriticalSection((CRITICAL_SECTION*)&data[3]);
+#else
   pthread_cond_destroy((pthread_cond_t*)data);
+#endif
   }
 
 
 /*******************************************************************************/
 
 
+#if defined(WIN32)
+struct RWLOCK {
+  CRITICAL_SECTION mutex[1];
+  CRITICAL_SECTION access[1];
+  DWORD            readers;
+  };
+#endif
+
+
 // Initialize read/write lock
 FXReadWriteLock::FXReadWriteLock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  // If this fails on your machine, determine what value
+  // of sizeof(RWLOCK) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(SRWLOCK)=%d\n",sizeof(SRWLOCK)));
+  FXASSERT(sizeof(data)>=sizeof(SRWLOCK));
+  InitializeSRWLock((SRWLOCK*)data);
+#elif defined(WIN32)
+  // If this fails on your machine, determine what value
+  // of sizeof(RWLOCK) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
+  FXASSERT(sizeof(data)>=sizeof(RWLOCK));
+  InitializeCriticalSection(((RWLOCK*)data)->mutex);
+  InitializeCriticalSection(((RWLOCK*)data)->access);
+  ((RWLOCK*)data)->readers=0;
+#elif defined(__APPLE__)
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
   FXASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
-#ifdef __APPLE__
   pthread_rwlock_init((pthread_rwlock_t*)data,NULL);
 #else
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_rwlock_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.com!!
+  //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
   pthread_rwlockattr_t rwlockatt;
   pthread_rwlockattr_init(&rwlockatt);
   pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_WRITER_NP);
@@ -1196,43 +606,138 @@ FXReadWriteLock::FXReadWriteLock(){
 
 // Acquire read lock for read/write lock
 void FXReadWriteLock::readLock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  AcquireSRWLockShared((SRWLOCK*)data);
+#elif defined(WIN32)
+  EnterCriticalSection(((RWLOCK*)data)->mutex);
+  if(++((RWLOCK*)data)->readers==1){
+    EnterCriticalSection(((RWLOCK*)data)->access);
+    }
+  LeaveCriticalSection(((RWLOCK*)data)->mutex);
+#else
   pthread_rwlock_rdlock((pthread_rwlock_t*)data);
+#endif
   }
 
 
 // Try to acquire read lock for read/write lock
 FXbool FXReadWriteLock::tryReadLock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  return TryAcquireSRWLockShared((SRWLOCK*)data)!=0;
+#elif defined(WIN32) && (_WIN32_WINNT >= 0x0400)
+  if(TryEnterCriticalSection(((RWLOCK*)data)->mutex)){
+    if(++((RWLOCK*)data)->readers==1 && !TryEnterCriticalSection(((RWLOCK*)data)->access)){
+      --((RWLOCK*)data)->readers;
+      LeaveCriticalSection(((RWLOCK*)data)->mutex);
+      return false;
+      }
+    LeaveCriticalSection(((RWLOCK*)data)->mutex);
+    return true;
+    }
+  return false;
+#elif defined(WIN32)
+  return false;
+#else
   return pthread_rwlock_tryrdlock((pthread_rwlock_t*)data)==0;
+#endif
   }
 
 
 // Unlock read lock
 void FXReadWriteLock::readUnlock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  ReleaseSRWLockShared((SRWLOCK*)data);
+#elif defined(WIN32)
+  EnterCriticalSection(((RWLOCK*)data)->mutex);
+  if(--((RWLOCK*)data)->readers==0){
+    LeaveCriticalSection(((RWLOCK*)data)->access);
+    }
+  LeaveCriticalSection(((RWLOCK*)data)->mutex);
+#else
   pthread_rwlock_unlock((pthread_rwlock_t*)data);
+#endif
   }
 
 
 // Acquire write lock for read/write lock
 void FXReadWriteLock::writeLock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  AcquireSRWLockExclusive((SRWLOCK*)data);
+#elif defined(WIN32)
+  EnterCriticalSection(((RWLOCK*)data)->access);
+#else
   pthread_rwlock_wrlock((pthread_rwlock_t*)data);
+#endif
   }
 
 
 // Try to acquire write lock for read/write lock
 FXbool FXReadWriteLock::tryWriteLock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  return TryAcquireSRWLockExclusive((SRWLOCK*)data)!=0;
+#elif defined(WIN32) && (_WIN32_WINNT >= 0x0400)
+  return TryEnterCriticalSection(((RWLOCK*)data)->access)!=0;
+#elif defined(WIN32)
+  return false;
+#else
   return pthread_rwlock_trywrlock((pthread_rwlock_t*)data)==0;
+#endif
   }
 
 
 // Unlock write lock
 void FXReadWriteLock::writeUnlock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  ReleaseSRWLockExclusive((SRWLOCK*)data);
+#elif defined(WIN32)
+  LeaveCriticalSection(((RWLOCK*)data)->access);
+#else
   pthread_rwlock_unlock((pthread_rwlock_t*)data);
+#endif
   }
 
 
 // Delete read/write lock
 FXReadWriteLock::~FXReadWriteLock(){
+#if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
+  // NOP //
+#elif defined(WIN32)
+  DeleteCriticalSection(((RWLOCK*)data)->mutex);
+  DeleteCriticalSection(((RWLOCK*)data)->access);
+#else
   pthread_rwlock_destroy((pthread_rwlock_t*)data);
+#endif
+  }
+
+
+/*******************************************************************************/
+
+
+// Initialize the barrier
+FXBarrier::FXBarrier(FXuint count):generation(0),threshold(count),counter(count){
+  if(count<1){ fxerror("FXBarrier::FXBarrier: bad count argument.\n"); }
+  }
+
+
+// Wait for all threads to hit the barrier
+FXbool FXBarrier::wait(){
+  FXMutexLock locker(mutex);
+  FXuint gen=generation;
+  if(--counter==0){
+    counter=threshold;
+    generation++;
+    condition.broadcast();
+    return true;
+    }
+  while(gen==generation){
+    condition.wait(mutex);
+    }
+  return false;
+  }
+
+
+// Delete the barrier
+FXBarrier::~FXBarrier(){
   }
 
 
@@ -1241,27 +746,47 @@ FXReadWriteLock::~FXReadWriteLock(){
 
 // Automatically acquire a thread-local storage key
 FXAutoThreadStorageKey::FXAutoThreadStorageKey(){
+#if defined(WIN32)
+  FXASSERT(sizeof(FXThreadStorageKey)==sizeof(DWORD));
+  value=(FXThreadStorageKey)TlsAlloc();
+#else
   FXASSERT(sizeof(FXThreadStorageKey)==sizeof(pthread_key_t));
   pthread_key_create((pthread_key_t*)&value,NULL);
+#endif
   }
 
 
 // Set thread local storage associated with this key
 void FXAutoThreadStorageKey::set(void* ptr) const {
+#if defined(WIN32)
+  TlsSetValue((DWORD)value,ptr);
+#else
   pthread_setspecific((pthread_key_t)value,ptr);
+#endif
   }
 
 
 // Get thread local storage associated with this key
 void* FXAutoThreadStorageKey::get() const {
+#if defined(WIN32)
+  return TlsGetValue((DWORD)value);
+#else
   return pthread_getspecific((pthread_key_t)value);
+#endif
   }
 
 
 // Automatically release a thread-local storage key
 FXAutoThreadStorageKey::~FXAutoThreadStorageKey(){
+#if defined(WIN32)
+  TlsFree((DWORD)value);
+#else
   pthread_key_delete((pthread_key_t)value);
+#endif
   }
+
+
+/*******************************************************************************/
 
 
 // Generate one for the thread itself
@@ -1304,6 +829,16 @@ FXThread* FXThread::self(){
 // this thread using thread-local storage accessed with self_key.
 // Also, we catch any errors thrown by the thread code here.
 // If FXThread is still around after run() returns, reset busy to false.
+#if defined(WIN32)
+unsigned int CALLBACK FXThread::function(void* ptr){
+  register FXThread *thread=(FXThread*)ptr;
+  register FXint code=-1;
+  self(thread);
+  try{ code=thread->run(); } catch(...){ }
+  if(self()){ self()->busy=false; }
+  return code;
+  }
+#else
 void* FXThread::function(void* ptr){
   register FXThread *thread=(FXThread*)ptr;
   register FXint code=-1;
@@ -1319,12 +854,18 @@ void* FXThread::function(void* ptr){
   if(self()){ self()->busy=false; }
   return (void*)(FXival)code;
   }
+#endif
 
 
-// Start thread; make sure that stacksize >= PTHREAD_STACK_MIN.
-// We can't check for it because not all machines have this the
-// PTHREAD_STACK_MIN definition.
+// Start thread
 FXbool FXThread::start(unsigned long stacksize){
+#if defined(WIN32)
+  DWORD thd;
+  if(busy){ fxerror("FXThread::start: thread already running.\n"); }
+  if(tid){ fxerror("FXThread::start: thread still attached.\n"); }
+  busy=true;
+  if((tid=(FXThreadID)CreateThread(NULL,stacksize,(LPTHREAD_START_ROUTINE)FXThread::function,this,0,&thd))==NULL) busy=false;
+#else
   pthread_attr_t attr;
   if(busy){ fxerror("FXThread::start: thread already running.\n"); }
   if(tid){ fxerror("FXThread::start: thread still attached.\n"); }
@@ -1334,34 +875,61 @@ FXbool FXThread::start(unsigned long stacksize){
   busy=true;
   if(pthread_create((pthread_t*)&tid,&attr,FXThread::function,(void*)this)!=0) busy=false;
   pthread_attr_destroy(&attr);
+#endif
   return busy;
   }
 
 
 // Suspend calling thread until thread is done
 FXbool FXThread::join(FXint& code){
+#if defined(WIN32)
+  if(tid && WaitForSingleObject((HANDLE)tid,INFINITE)==WAIT_OBJECT_0){
+    GetExitCodeThread((HANDLE)tid,(DWORD*)&code);
+    CloseHandle((HANDLE)tid);
+    tid=0;
+    return true;
+    }
+#else
   void *trc=NULL;
   if(tid && pthread_join((pthread_t)tid,&trc)==0){
     code=(FXint)(FXival)trc;
     tid=0;
     return true;
     }
+#endif
   return false;
   }
 
 
 // Suspend calling thread until thread is done
 FXbool FXThread::join(){
+#if defined(WIN32)
+  if(tid && WaitForSingleObject((HANDLE)tid,INFINITE)==WAIT_OBJECT_0){
+    CloseHandle((HANDLE)tid);
+    tid=0;
+    return true;
+    }
+#else
   if(tid && pthread_join((pthread_t)tid,NULL)==0){
     tid=0;
     return true;
     }
+#endif
   return false;
   }
 
 
 // Cancel the thread
 FXbool FXThread::cancel(){
+#if defined(WIN32)
+  if(tid){
+    if(busy && TerminateThread((HANDLE)tid,0)) busy=false;
+    if(CloseHandle((HANDLE)tid)){
+      tid=0;
+      return true;
+      }
+    }
+#else
   if(tid){
     if(busy && pthread_cancel((pthread_t)tid)==0) busy=false;
     if(pthread_join((pthread_t)tid,NULL)==0){
@@ -1369,35 +937,61 @@ FXbool FXThread::cancel(){
       return true;
       }
     }
+#endif
   return false;
   }
 
 
 // Detach thread
 FXbool FXThread::detach(){
+#if defined(WIN32)
+  if(tid && CloseHandle((HANDLE)tid)){
+    tid=0;
+    return true;
+    }
+#else
   if(tid && pthread_detach((pthread_t)tid)==0){
     tid=0;
     return true;
     }
+#endif
   return false;
   }
 
 
 // Exit calling thread
 void FXThread::exit(FXint code){
+#if defined(WIN32)
+  if(self()){ self()->busy=false; }
+  ExitThread(code);
+#else
   if(self()){ self()->busy=false; }
   pthread_exit((void*)(FXival)code);
+#endif
   }
 
 
 // Yield the thread
 void FXThread::yield(){
+#if defined(WIN32)
+  Sleep(0);
+#else
   sched_yield();                // More portable than pthread_yield()
+#endif
   }
 
 
 // Get time in nanoseconds since Epoch
 FXTime FXThread::time(){
+#if defined(WIN32)
+  FXTime now;
+  GetSystemTimeAsFileTime((FILETIME*)&now);
+#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__)
+  return (now-116444736000000000LL)*100LL;
+#else
+  return (now-116444736000000000L)*100L;
+#endif
+#else
 #if (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec ts;
@@ -1410,11 +1004,15 @@ FXTime FXThread::time(){
   gettimeofday(&tv,NULL);
   return tv.tv_sec*seconds+tv.tv_usec*microseconds;
 #endif
+#endif
   }
 
 
 // Make the calling thread sleep for a number of nanoseconds
 void FXThread::sleep(FXTime nsec){
+#if defined(WIN32)
+  Sleep((DWORD)(nsec/1000000));
+#else
 #if (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec value;
@@ -1430,11 +1028,17 @@ void FXThread::sleep(FXTime nsec){
   value.tv_sec=nsec/seconds;
   select(1,0,0,0,&value);
 #endif
+#endif
   }
 
 
 // Wake at appointed time
 void FXThread::wakeat(FXTime nsec){
+#if defined(WIN32)
+  nsec-=FXThread::time();
+  if(nsec<0) nsec=0;
+  Sleep((DWORD)(nsec/1000000));
+#else
 #if (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec value;
@@ -1459,18 +1063,27 @@ void FXThread::wakeat(FXTime nsec){
   value.tv_sec=nsec/seconds;
   select(1,0,0,0,&value);
 #endif
+#endif
   }
 
 
 // Return thread id of caller
 FXThreadID FXThread::current(){
+#if defined(WIN32)
+  return (FXThreadID)GetCurrentThreadId();
+#else
   return (FXThreadID)pthread_self();
+#endif
   }
-
 
 
 // Return number of processors
 FXint FXThread::processors(){
+#if defined(WIN32)
+  SYSTEM_INFO info;
+  GetSystemInfo(&info);
+  return info.dwNumberOfProcessors;
+#else
 #if defined(_SC_NPROCESSORS_ONLN)
   int result;
   if((result=sysconf(_SC_NPROCESSORS_ONLN))>0){
@@ -1501,37 +1114,143 @@ FXint FXThread::processors(){
     }
 #endif
   return 1;
+#endif
   }
 
 
 // Generate new thread local storage key
 FXThreadStorageKey FXThread::createStorageKey(){
+#if defined(WIN32)
+  return (FXThreadStorageKey)TlsAlloc();
+#else
   pthread_key_t key;
   return pthread_key_create(&key,NULL)==0 ? (FXThreadStorageKey)key : ~0;
+#endif
   }
 
 
 // Dispose of thread local storage key
 void FXThread::deleteStorageKey(FXThreadStorageKey key){
+#if defined(WIN32)
+  TlsFree((DWORD)key);
+#else
   pthread_key_delete((pthread_key_t)key);
+#endif
   }
 
 
 // Get thread local storage pointer using key
 void* FXThread::getStorage(FXThreadStorageKey key){
+#if defined(WIN32)
+  return TlsGetValue((DWORD)key);
+#else
   return pthread_getspecific((pthread_key_t)key);
+#endif
   }
 
 
 // Set thread local storage pointer using key
 void FXThread::setStorage(FXThreadStorageKey key,void* ptr){
+#if defined(WIN32)
+  TlsSetValue((DWORD)key,ptr);
+#else
   pthread_setspecific((pthread_key_t)key,ptr);
+#endif
   }
+
+
+#if 0
+
+#if defined(WIN32)
+#define MS_VC_EXCEPTION 0x406D1388
+
+#pragma pack(push,8)
+typedef struct tagTHREADNAME_INFO {
+  DWORD dwType;         // Must be 0x1000.
+  LPCSTR szName;        // Pointer to name (in user addr space).
+  DWORD dwThreadID;     // Thread ID (-1=caller thread).
+  DWORD dwFlags;        // Reserved for future use, must be zero.
+  } THREADNAME_INFO;
+#pragma pack(pop)
+#endif
+
+
+// Change thread name
+FXbool FXThread::setName(const FXString& nm){
+#if defined(WIN32)
+  if(tid){
+    THREADNAME_INFO info;
+    FXASSERT(nm.length()<32);
+    info.dwType=0x1000;
+    info.szName=nm.text();
+    info.dwThreadID=tid;
+    info.dwFlags=0;
+    __try {
+       RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
+      }
+    __except(EXCEPTION_EXECUTE_HANDLER){
+      }
+    return true;
+    }
+  return false;
+#else
+  if(tid && nm.length()<32){
+    return pthread_setname_np(tid,nm.text())==0;
+    }
+  return false;
+#endif
+  }
+
+
+// Return thread name
+FXString FXThread::getName() const {
+#if defined(WIN32)
+  return FXString::null;
+#else
+  if(tid){
+    FXchar name[32];
+    if(pthread_getname_np(tid,name,sizeof(name)==0)){
+      return name;
+      }
+    }
+  return FXString::null;
+#endif
+  }
+
+#endif
 
 
 // Set thread priority
 FXbool FXThread::priority(FXThread::Priority prio){
-#ifndef __APPLE__
+#if defined(WIN32)
+  if(tid){
+    int pri;
+    switch(prio){
+      case PriorityMinimum:
+        pri=THREAD_PRIORITY_LOWEST;
+        break;
+      case PriorityLower:
+        pri=THREAD_PRIORITY_BELOW_NORMAL;
+        break;
+      case PriorityMedium:
+        pri=THREAD_PRIORITY_NORMAL;
+        break;
+      case PriorityHigher:
+        pri=THREAD_PRIORITY_ABOVE_NORMAL;
+        break;
+      case PriorityMaximum:
+        pri=THREAD_PRIORITY_HIGHEST;
+        break;
+      default:
+        pri=THREAD_PRIORITY_NORMAL;
+        break;
+      }
+    return SetThreadPriority((HANDLE)tid,pri)!=0;
+    }
+  return false;
+#elif defined(__APPLE__)
+  return false;
+#else
   if(tid){
     sched_param sched={0};
     int plcy=0;
@@ -1546,39 +1265,71 @@ FXbool FXThread::priority(FXThread::Priority prio){
       int priomin=0;
       int priomax=20;
 #endif
-      int priomed=(priomax+priomin)/2;
-      switch(prio){
-        case PriorityMinimum:
-          sched.sched_priority=priomin;
-          break;
-        case PriorityLower:
-          sched.sched_priority=(priomin+priomed)/2;
-          break;
-        case PriorityMedium:
-          sched.sched_priority=priomed;
-          break;
-        case PriorityHigher:
-          sched.sched_priority=(priomax+priomed)/2;
-          break;
-        case PriorityMaximum:
-          sched.sched_priority=priomax;
-          break;
-        default:
-          sched.sched_priority=priomed;
-          break;
+      if(priomax!=-1 && priomin!=-1){
+        int priomed=(priomax+priomin)/2;
+        switch(prio){
+          case PriorityMinimum:
+            sched.sched_priority=priomin;
+            break;
+          case PriorityLower:
+            sched.sched_priority=(priomin+priomed)/2;
+            break;
+          case PriorityMedium:
+            sched.sched_priority=priomed;
+            break;
+          case PriorityHigher:
+            sched.sched_priority=(priomax+priomed)/2;
+            break;
+          case PriorityMaximum:
+            sched.sched_priority=priomax;
+            break;
+          default:
+            sched.sched_priority=priomed;
+            break;
+          }
+        return pthread_setschedparam((pthread_t)tid,plcy,&sched)==0;
         }
-      return pthread_setschedparam((pthread_t)tid,plcy,&sched)==0;
       }
     }
-#endif
   return false;
+#endif
   }
 
 
 // Return thread priority
 FXThread::Priority FXThread::priority() const {
+#if defined(WIN32)
   Priority result=PriorityError;
-#ifndef __APPLE__
+  if(tid){
+    int pri=GetThreadPriority((HANDLE)tid);
+    if(pri!=THREAD_PRIORITY_ERROR_RETURN){
+      switch(pri){
+        case THREAD_PRIORITY_IDLE:
+          result=PriorityMinimum;
+          break;
+        case THREAD_PRIORITY_BELOW_NORMAL:
+          result=PriorityLower;
+          break;
+        case THREAD_PRIORITY_NORMAL:
+          result=PriorityMedium;
+          break;
+        case THREAD_PRIORITY_ABOVE_NORMAL:
+          result=PriorityHigher;
+          break;
+        case THREAD_PRIORITY_HIGHEST:
+          result=PriorityMaximum;
+          break;
+        default:
+          result=PriorityDefault;
+          break;
+        }
+      }
+    }
+  return result;
+#elif defined(__APPLE__)
+  return PriorityError;
+#else
+  Priority result=PriorityError;
   if(tid){
     sched_param sched={0};
     int plcy=0;
@@ -1593,37 +1344,43 @@ FXThread::Priority FXThread::priority() const {
       int priomin=0;
       int priomax=32;
 #endif
-      int priomed=(priomax+priomin)/2;
-      if(sched.sched_priority<priomed){
-        if(sched.sched_priority<=priomin){
-          result=PriorityMinimum;
+      if(priomax!=-1 && priomin!=-1){
+        int priomed=(priomax+priomin)/2;
+        if(sched.sched_priority<priomed){
+          if(sched.sched_priority<=priomin){
+            result=PriorityMinimum;
+            }
+          else{
+            result=PriorityLower;
+            }
+          }
+        else if(sched.sched_priority<priomed){
+          if(sched.sched_priority>=priomax){
+            result=PriorityMaximum;
+            }
+          else{
+            result=PriorityHigher;
+            }
           }
         else{
-          result=PriorityLower;
+          result=PriorityMedium;
           }
-        }
-      else if(sched.sched_priority<priomed){
-        if(sched.sched_priority>=priomax){
-          result=PriorityMaximum;
-          }
-        else{
-          result=PriorityHigher;
-          }
-        }
-      else{
-        result=PriorityMedium;
         }
       return result;
       }
     }
-#endif
   return result;
+#endif
   }
 
 
 // Set thread scheduling policy
 FXbool FXThread::policy(FXThread::Policy plcy){
-#ifndef __APPLE__
+#if defined(WIN32)
+  return false;
+#elif defined(__APPLE__)
+  return false;
+#else
   if(tid){
     sched_param sched={0};
     int oldplcy=0;
@@ -1640,18 +1397,25 @@ FXbool FXThread::policy(FXThread::Policy plcy){
           newplcy=SCHED_OTHER;
           break;
         }
+#if defined(_POSIX_PRIORITY_SCHEDULING)
+      sched.sched_priority=sched_get_priority_min(newplcy);
+#endif
       return pthread_setschedparam((pthread_t)tid,newplcy,&sched)==0;
       }
     }
-#endif
   return false;
+#endif
   }
 
 
 // Get thread scheduling policy
 FXThread::Policy FXThread::policy() const {
+#if defined(WIN32)
+  return PolicyError;
+#elif defined(__APPLE__)
+  return PolicyError;
+#else
   Policy result=PolicyError;
-#ifndef __APPLE__
   if(tid){
     sched_param sched={0};
     int plcy=0;
@@ -1669,38 +1433,42 @@ FXThread::Policy FXThread::policy() const {
         }
       }
     }
-#endif
   return result;
+#endif
   }
 
 
-// Suspend thread; return true if success.
+// Suspend thread
 FXbool FXThread::suspend(){
-#if defined(_HPUX_SOURCE)
-  return busy && tid && (pthread_suspend((pthread_t)tid)==0);
+#if defined(WIN32)
+  return tid && (SuspendThread((HANDLE)tid)!=(DWORD)-1L);
+#elif defined(_HPUX_SOURCE)
+  return tid && (pthread_suspend((pthread_t)tid)==0);
 #elif defined(SUNOS)
-  return busy && tid && (thr_suspend((pthread_t)tid)==0);
+  return tid && (thr_suspend((pthread_t)tid)==0);
 #else
-  // return busy && tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);   // FIXME this does not work.
+  // return tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);   // FIXME this does not work.
   return false;
 #endif
   }
 
 
-// Resume thread; return true if success.
+// Resume thread
 FXbool FXThread::resume(){
-#if defined(_HPUX_SOURCE)
-  return busy && tid && (pthread_resume_np((pthread_t)tid,PTHREAD_COUNT_RESUME_NP)==0);
+#if defined(WIN32)
+  return tid && (ResumeThread((HANDLE)tid)!=(DWORD)-1L);
+#elif defined(_HPUX_SOURCE)
+  return tid && (pthread_resume_np((pthread_t)tid,PTHREAD_COUNT_RESUME_NP)==0);
 #elif defined(SUNOS)
-  return busy && tid && (thr_continue((pthread_t)tid)==0);
+  return tid && (thr_continue((pthread_t)tid)==0);
 #else
-  // return busy && tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);   // FIXME this does not work.
+  // return tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);   // FIXME this does not work.
   return false;
 #endif
   }
 
 
-// Destroy; if it was running, stop it
+// Destroy
 FXThread::~FXThread(){
   if(self()==this){
     self(NULL);
@@ -1710,7 +1478,5 @@ FXThread::~FXThread(){
     cancel();
     }
   }
-
-#endif
 
 }

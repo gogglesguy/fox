@@ -3,11 +3,12 @@
 *                                Thread Pool Test                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include "FXThreadPool.h"
 
+#include <errno.h>
 
 /*
   Notes:
@@ -57,6 +58,7 @@ FXint Runner::run(){
   }
 
 
+
 // Generate jobs
 FXint Producer::run(){
   FXint job=0;
@@ -81,7 +83,7 @@ x:fprintf(stderr,"producer done\n");
 
 // Start
 int main(int,char**){
-  int cpus=FXThread::processors();
+  FXuint cpus=FXThread::processors();
   int started;
 
   // Trace
@@ -92,22 +94,26 @@ int main(int,char**){
 
   // Make producer thread
   Producer producer(&pool,100,10);
-  
+
   fprintf(stderr,"Found %d processors\n",cpus);
 
   fprintf(stderr,"starting pool\n");
-  started=pool.start(1,8,1);
+  started=pool.start(cpus,8,cpus);
+  fprintf(stderr,"running: %d (%d)\n",pool.getRunningThreads(),started);
   getchar();
   fprintf(stderr,"started pool %d\n",started);
   getchar();
 
+  fprintf(stderr,"running: %d\n",pool.getRunningThreads());
   fprintf(stderr,"starting jobs\n");
   producer.start();
   fprintf(stderr,"running jobs\n");
+  fprintf(stderr,"running: %d\n",pool.getRunningThreads());
 
   getchar();
   fprintf(stderr,"stopping\n");
   pool.stop();
+  fprintf(stderr,"running: %d\n",pool.getRunningThreads());
   fprintf(stderr,"stopped\n");
 
   getchar();

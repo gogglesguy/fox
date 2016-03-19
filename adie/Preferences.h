@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -33,11 +33,12 @@ class Preferences : public FXDialogBox {
 protected:
   FXText          *filepattext;
   FXList          *stylelist;
-  FXTextField     *stylename;
+  FXTextField     *searchtext;
   FXIcon          *pal;
   FXIcon          *ind;
   FXIcon          *pat;
   FXIcon          *sty;
+  FXIcon          *mis;
 private:
   Preferences(){}
   Preferences(const Preferences&);
@@ -56,6 +57,12 @@ public:
   // Get filename patterns
   FXString getPatterns() const;
 
+  // Set search paths
+  void setSearchPaths(const FXString& paths);
+  
+  // Get search paths
+  FXString getSearchPaths() const;
+  
   // Set language syntax
   void setSyntax(FXSyntax* syn);
 

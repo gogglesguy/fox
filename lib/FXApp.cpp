@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * Major Contributions for Windows NT by Lyle Johnson                            *
 *********************************************************************************
@@ -20,11 +20,6 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifdef WIN32
-#if _WIN32_WINNT < 0x0400
-#define _WIN32_WINNT 0x0400
-#endif
-#endif
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
@@ -335,7 +330,7 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright notice
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2009 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2010 Jeroen van der Zijp. All Rights Reserved.";
 
 
 #ifdef WIN32            // Windows
@@ -470,7 +465,6 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
 
   // Initialize private platform independent data
   display=NULL;                           // Display connection
-  dpy=":0.0";                             // Initial display guess
   activeWindow=NULL;                      // Active toplevel window
   cursorWindow=NULL;                      // Window under the cursor
   mouseGrabWindow=NULL;                   // Window which grabbed mouse
@@ -757,6 +751,67 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
 
 /*******************************************************************************/
 
+// Change application name
+void FXApp::setAppName(const FXString& name){
+  registry.setAppKey(name);
+  }
+
+
+// Get application name
+const FXString& FXApp::getAppName() const {
+  return registry.getAppKey();
+  }
+
+
+// Change vendor name
+void FXApp::setVendorName(const FXString& name){
+  registry.setVendorKey(name);
+  }
+
+
+// Get vendor name
+const FXString& FXApp::getVendorName() const {
+  return registry.getVendorKey();
+  }
+
+
+// Return true if input method support
+FXbool FXApp::hasInputMethod() const {
+#ifdef WIN32
+  return true;
+#else
+  return xim!=NULL;
+#endif
+  }
+
+
+// Change default visual
+void FXApp::setDefaultVisual(FXVisual* vis){
+  if(!vis){ fxerror("%s::setDefaultVisual: NULL visual.\n",getClassName()); }
+  defaultVisual=vis;
+  }
+
+
+// Set root Window
+void FXApp::setRootWindow(FXRootWindow* rt){
+  if(!rt){ fxerror("%s::setRootWindow: NULL root window.\n",getClassName()); }
+  if(root->getFirst()){ fxerror("%s::setRootWindow: already have windows.\n",getClassName()); }
+  if(rt->getVisual()!=root->getVisual()){ fxerror("%s::setRootWindow: has different visual.\n",getClassName()); }
+  root=rt;
+  }
+
+
+// Return window at the end of the focus chain
+FXWindow *FXApp::getFocusWindow() const {
+  FXWindow *result=getActiveWindow();
+  if(result){
+    while(result->getFocus()){
+      result=result->getFocus();
+      }
+    }
+  return result;
+  }
+
 
 // Find window from id
 FXWindow* FXApp::findWindowWithId(FXID xid) const {
@@ -789,19 +844,152 @@ FXWindow* FXApp::findWindowAt(FXint rx,FXint ry,FXID window) const {
   }
 
 
-// Return window at the end of the focus chain
-FXWindow *FXApp::getFocusWindow() const {
-  FXWindow *result=getActiveWindow();
-  if(result){
-    while(result->getFocus()){
-      result=result->getFocus();
+// Change normal font
+void FXApp::setNormalFont(FXFont* font){
+  if(!font){ fxerror("%s::setNormalFont: NULL font.\n",getClassName()); }
+  normalFont=font;
+  }
+
+/*******************************************************************************/
+
+// Begin of wait-cursor block; wait-cursor blocks may be nested.
+void FXApp::beginWaitCursor(){
+  if(initialized){
+    if(waitCount==0){
+      if(!waitCursor->id()){ fxerror("%s::beginWaitCursor: wait cursor not created yet.\n",getClassName()); }
+#ifdef WIN32
+      SetCursor((HCURSOR)waitCursor->id());
+#else
+      register FXWindow* child;
+      FXASSERT(display);
+      child=getRootWindow()->getFirst();
+      while(child){
+        if(child->id()){
+          XDefineCursor((Display*)display,child->id(),waitCursor->id());
+          if(child->getFirst()){child=child->getFirst();continue;}
+          }
+        while(!child->getNext()&&child->getParent()){child=child->getParent();}
+        child=child->getNext();
+        }
+      XFlush((Display*)display);
+#endif
+      }
+    waitCount++;
+    }
+  }
+
+
+// End of wait-cursor block
+void FXApp::endWaitCursor(){
+  if(initialized){
+    if(waitCount==0) return;
+    waitCount--;
+    if(waitCount==0){
+      if(!waitCursor->id()){ fxerror("%s::endWaitCursor: wait cursor not created yet.\n",getClassName()); }
+#ifdef WIN32
+      if(cursorWindow){
+        SetCursor((HCURSOR)cursorWindow->getDefaultCursor()->id());
+        }
+#else
+      register FXWindow* child;
+      child=getRootWindow()->getFirst();
+      while(child){
+        if(child->id()){
+          XDefineCursor((Display*)display,child->id(),child->getDefaultCursor()->id());
+          if(child->getFirst()){child=child->getFirst();continue;}
+          }
+        while(!child->getNext()&&child->getParent()){child=child->getParent();}
+        child=child->getNext();
+        }
+      XFlush((Display*)display);
+#endif
       }
     }
-  return result;
+  }
+
+
+// Change to a new wait cursor
+void FXApp::setWaitCursor(FXCursor *cur){
+  if(initialized){
+    if(cur==NULL){ fxerror("%s::setWaitCursor: NULL wait cursor.\n",getClassName()); }
+    if(waitCursor!=cur){
+      waitCursor=cur;
+      if(waitCount){
+        if(!waitCursor->id()){ fxerror("%s::setWaitCursor: wait cursor not created yet.\n",getClassName()); }
+#ifdef WIN32
+        SetCursor((HCURSOR)waitCursor->id());
+#else
+        register FXWindow* child;
+        child=getRootWindow()->getFirst();
+        while(child){
+          if(child->id()){
+            XDefineCursor((Display*)display,child->id(),waitCursor->id());
+            if(child->getFirst()){child=child->getFirst();continue;}
+            }
+          while(!child->getNext()&&child->getParent()){child=child->getParent();}
+          child=child->getNext();
+          }
+        XFlush((Display*)display);
+#endif
+        }
+      }
+    }
+  }
+
+
+// Change default cursor
+void FXApp::setDefaultCursor(FXDefaultCursor which,FXCursor* cur){
+  if(!cur){ fxerror("%s::setDefaultCursor: NULL default cursor.\n",getClassName()); }
+  cursor[which]=cur;
+  }
+
+/*******************************************************************************/
+
+// Register DND type
+FXDragType FXApp::registerDragType(const FXString& name) const {
+  if(initialized){
+#ifdef WIN32
+    return RegisterClipboardFormatA(name.text());
+#else
+    return (FXDragType)XInternAtom((Display*)display,name.text(),0);
+#endif
+    }
+  return 0;
+  }
+
+
+// Get name of registered drag type
+FXString FXApp::getDragTypeName(FXDragType type) const {
+  if(initialized){
+    FXString result;
+#ifdef WIN32
+    if(0xC000<=type && type<=0xFFFF){
+      FXchar buffer[256];
+      GetClipboardFormatNameA(type,buffer,sizeof(buffer));
+      result.assign(buffer);
+      }
+    else{
+      result.assign("WIN32_DEFAULT_TYPE");
+      }
+#else
+    FXchar *name=XGetAtomName((Display*)display,type);
+    result.assign(name);
+    XFree(name);
+#endif
+    return result;
+    }
+  return FXString::null;
   }
 
 
 /*******************************************************************************/
+
+
+// Change message translator
+void FXApp::setTranslator(FXTranslator* trans){
+  translator=trans;
+  }
+
 
 #ifdef WIN32            // WIN32
 
@@ -1053,10 +1241,11 @@ void FXApp::openInputDevices(){
         list=XListInputDevices((Display*)display,&ndevices);
         if(list){
           for(int d=0; d<ndevices; ++d){
-            FXTRACE((100,"device: %d: name: %s id: %d \n",d,list[d].name,list[d].id));
-            if(list[d].use==IsXExtensionDevice){
+            FXTRACE((100,"device: %d: name: %s id: %d classes: %d use: %d\n",d,list[d].name,list[d].id,list[d].num_classes,list[d].use));
+            if(list[d].use!=IsXPointer && list[d].use!=IsXKeyboard){
               XAnyClassInfo *ci=list[d].inputclassinfo;
               for(int c=0; c<list[d].num_classes; ++c){
+                FXTRACE((100,"class[%d]: %d\n",c,ci->c_class));
                 if(ci->c_class==ValuatorClass && ((XValuatorInfo*)ci)->num_axes==6){        // 6DOF controller!
                   xsbDevice=XOpenDevice((Display*)display,list[d].id);
                   if(xsbDevice){
@@ -1125,13 +1314,13 @@ const FXchar* windowTypeAtoms[14]={
 /*******************************************************************************/
 
 // Open the display
-FXbool FXApp::openDisplay(const FXchar* dpyname){
+FXbool FXApp::openDisplay(const FXchar* dpy){
   if(!initialized){
 
 #ifdef WIN32            // MS-Windows
 
     // What's going on
-    FXTRACE((100,"%s::openDisplay(%s)\n",getClassName(),dpyname));
+    FXTRACE((100,"%s::openDisplay(%s)\n",getClassName(),dpy));
 
     // Set to HINSTANCE on Windows
     display=GetOwnModuleHandle();
@@ -1261,14 +1450,11 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     // Set fatal handler
     XSetIOErrorHandler(xfatalerrorhandler);
 
-    // Revert to default
-    if(!dpyname) dpyname=dpy;
-
     // What's going on
-    FXTRACE((100,"%s::openDisplay(%s)\n",getClassName(),dpyname));
+    FXTRACE((100,"%s::openDisplay(%s)\n",getClassName(),dpy));
 
     // Open display
-    display=XOpenDisplay(dpyname);
+    display=XOpenDisplay(dpy);
     if(!display) return false;
 
     // For debugging
@@ -1291,7 +1477,7 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
 #ifdef HAVE_XSHM_H
 
     // Displaying remotely turns it off for sure
-    if(!(dpyname[0]==':' && Ascii::isDigit(dpyname[1]))){
+    if(!(dpy[0]==':' && Ascii::isDigit(dpy[1]))){
       shmi=false;
       shmp=false;
       }
@@ -1591,16 +1777,6 @@ FXbool FXApp::closeDisplay(){
     initialized=false;
     }
   return true;
-  }
-
-
-// Return true if input method support
-FXbool FXApp::hasInputMethod() const {
-#ifdef WIN32
-  return true;
-#else
-  return xim!=NULL;
-#endif
   }
 
 
@@ -3221,6 +3397,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           event.values[3]=sbe.axis_data[3]-axis_data[3];
           event.values[4]=sbe.axis_data[4]-axis_data[4];
           event.values[5]=sbe.axis_data[5]-axis_data[5];
+
 //          FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
           axis_data[0]=sbe.axis_data[0];
           axis_data[1]=sbe.axis_data[1];
@@ -3739,6 +3916,7 @@ static void getSystemFont(FXFontDesc& fontdesc){
 void FXApp::init(int& argc,char** argv,FXbool connect){
   const FXchar *fontspec=NULL;
   const FXchar *style=NULL;
+  const FXchar *dpy=":0.0";
   const FXchar *str=NULL;
   FXuint maxcols=0;
   FXint i,j;
@@ -3780,6 +3958,21 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 #ifndef WIN32
   if((str=getenv("DISPLAY"))!=NULL) dpy=str;
 #endif
+
+  // System-wide configuration search paths
+  if((str=getenv("XDG_CONFIG_DIRS"))!=NULL){
+    registry.setSystemDirectories("$XDG_CONFIG_DIRS");
+    }
+
+  // Per-user configuration path
+  if((str=getenv("XDG_CONFIG_HOME"))!=NULL){
+    registry.setUserDirectory("$XDG_CONFIG_HOME");
+    }
+
+  // If set, force FOXDIR for system-wide path
+  if((str=getenv("FOXDIR"))!=NULL){
+    registry.setSystemDirectories("$FOXDIR");
+    }
 
   //fxisconsole(argv[0]);
 
@@ -3854,6 +4047,16 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       continue;
       }
 
+    // Set per-user configuration directory
+    if(strcmp(argv[j],"-config")==0){
+      if(++j>=argc){
+        fxwarning("%s:init: missing argument for -config.\n",getClassName());
+        ::exit(1);
+        }
+      registry.setUserDirectory(argv[j++]);
+      continue;
+      }
+
     // Set maximum number of colors
     if(strcmp(argv[j],"-maxcolors")==0){
       if(++j>=argc){
@@ -3881,7 +4084,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
   appArgc=argc;
 
   // Log message
-  FXTRACE((100,"%s::init\n",getClassName()));
+  FXTRACE((100,"%s::init %d.%d.%d\n",getClassName(),FOX_MAJOR,FOX_MINOR,FOX_LEVEL));
 
   // Read the registry
   registry.read();
@@ -3934,16 +4137,16 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
     }
 
   // Load timing constants
-  typingSpeed=registry.readLongEntry("SETTINGS","typingspeedns",typingSpeed);
-  clickSpeed=registry.readLongEntry("SETTINGS","clickspeedns",clickSpeed);
-  scrollSpeed=registry.readLongEntry("SETTINGS","scrollspeedns",scrollSpeed);
-  scrollDelay=registry.readLongEntry("SETTINGS","scrolldelayns",scrollDelay);
-  blinkSpeed=registry.readLongEntry("SETTINGS","blinkspeedns",blinkSpeed);
-  animSpeed=registry.readLongEntry("SETTINGS","animspeedns",animSpeed);
-  menuPause=registry.readLongEntry("SETTINGS","menupausens",menuPause);
-  toolTipPause=registry.readLongEntry("SETTINGS","tippausens",toolTipPause);
-  toolTipTime=registry.readLongEntry("SETTINGS","tiptimens",toolTipTime);
-  autoHideDelay=registry.readLongEntry("SETTINGS","autohidens",autoHideDelay);
+  typingSpeed=registry.readLongEntry("SETTINGS","typingspeed",typingSpeed);
+  clickSpeed=registry.readLongEntry("SETTINGS","clickspeed",clickSpeed);
+  scrollSpeed=registry.readLongEntry("SETTINGS","scrollspeed",scrollSpeed);
+  scrollDelay=registry.readLongEntry("SETTINGS","scrolldelay",scrollDelay);
+  blinkSpeed=registry.readLongEntry("SETTINGS","blinkspeed",blinkSpeed);
+  animSpeed=registry.readLongEntry("SETTINGS","animspeed",animSpeed);
+  menuPause=registry.readLongEntry("SETTINGS","menupause",menuPause);
+  toolTipPause=registry.readLongEntry("SETTINGS","tippause",toolTipPause);
+  toolTipTime=registry.readLongEntry("SETTINGS","tiptime",toolTipTime);
+  autoHideDelay=registry.readLongEntry("SETTINGS","autohide",autoHideDelay);
 
   // Load miscellaneous settings
   dragDelta=registry.readIntEntry("SETTINGS","dragdelta",dragDelta);
@@ -5008,6 +5211,8 @@ Alt key seems to repeat.
       FXTRACE((100,"sending handle %d from window %d to %d\n",answer,hwnd,lParam));
       PostMessage((HWND)lParam,WM_DND_REPLY,(WPARAM)answer,(LPARAM)hwnd);
       return 0;
+    case WM_COPYDATA:
+      return window->handle(this,FXSEL(SEL_COPYDATA,0),(void*)lParam);
     }
   return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
   }
@@ -5019,43 +5224,6 @@ Alt key seems to repeat.
 long FXApp::onCmdQuit(FXObject*,FXSelector,void*){
   exit(0);
   return 1;
-  }
-
-
-// Register DND type
-FXDragType FXApp::registerDragType(const FXString& name) const {
-  if(initialized){
-#ifdef WIN32
-    return RegisterClipboardFormatA(name.text());
-#else
-    return (FXDragType)XInternAtom((Display*)display,name.text(),0);
-#endif
-    }
-  return 0;
-  }
-
-
-// Get name of registered drag type
-FXString FXApp::getDragTypeName(FXDragType type) const {
-  if(initialized){
-    FXString result;
-#ifdef WIN32
-    if(0xC000<=type && type<=0xFFFF){
-      FXchar buffer[256];
-      GetClipboardFormatNameA(type,buffer,sizeof(buffer));
-      result.assign(buffer);
-      }
-    else{
-      result.assign("WIN32_DEFAULT_TYPE");
-      }
-#else
-    FXchar *name=XGetAtomName((Display*)display,type);
-    result.assign(name);
-    XFree(name);
-#endif
-    return result;
-    }
-  return FXString::null;
   }
 
 
@@ -5125,127 +5293,6 @@ void FXApp::dumpWidgets() const {
   }
 
 
-// Change default visual
-void FXApp::setDefaultVisual(FXVisual* vis){
-  if(!vis){ fxerror("%s::setDefaultVisual: NULL visual.\n",getClassName()); }
-  defaultVisual=vis;
-  }
-
-
-// Change normal font
-void FXApp::setNormalFont(FXFont* font){
-  if(!font){ fxerror("%s::setNormalFont: NULL font.\n",getClassName()); }
-  normalFont=font;
-  }
-
-
-// Set root Window
-void FXApp::setRootWindow(FXRootWindow* rt){
-  if(!rt){ fxerror("%s::setRootWindow: NULL root window.\n",getClassName()); }
-  if(root->getFirst()){ fxerror("%s::setRootWindow: already have windows.\n",getClassName()); }
-  if(rt->getVisual()!=root->getVisual()){ fxerror("%s::setRootWindow: has different visual.\n",getClassName()); }
-  root=rt;
-  }
-
-
-// Begin of wait-cursor block; wait-cursor blocks may be nested.
-void FXApp::beginWaitCursor(){
-  if(initialized){
-    if(waitCount==0){
-      if(!waitCursor->id()){ fxerror("%s::beginWaitCursor: wait cursor not created yet.\n",getClassName()); }
-#ifdef WIN32
-      SetCursor((HCURSOR)waitCursor->id());
-#else
-      register FXWindow* child;
-      FXASSERT(display);
-      child=getRootWindow()->getFirst();
-      while(child){
-        if(child->id()){
-          XDefineCursor((Display*)display,child->id(),waitCursor->id());
-          if(child->getFirst()){child=child->getFirst();continue;}
-          }
-        while(!child->getNext()&&child->getParent()){child=child->getParent();}
-        child=child->getNext();
-        }
-      XFlush((Display*)display);
-#endif
-      }
-    waitCount++;
-    }
-  }
-
-
-// End of wait-cursor block
-void FXApp::endWaitCursor(){
-  if(initialized){
-    if(waitCount==0) return;
-    waitCount--;
-    if(waitCount==0){
-      if(!waitCursor->id()){ fxerror("%s::endWaitCursor: wait cursor not created yet.\n",getClassName()); }
-#ifdef WIN32
-      if(cursorWindow){
-        SetCursor((HCURSOR)cursorWindow->getDefaultCursor()->id());
-        }
-#else
-      register FXWindow* child;
-      child=getRootWindow()->getFirst();
-      while(child){
-        if(child->id()){
-          XDefineCursor((Display*)display,child->id(),child->getDefaultCursor()->id());
-          if(child->getFirst()){child=child->getFirst();continue;}
-          }
-        while(!child->getNext()&&child->getParent()){child=child->getParent();}
-        child=child->getNext();
-        }
-      XFlush((Display*)display);
-#endif
-      }
-    }
-  }
-
-
-// Change to a new wait cursor
-void FXApp::setWaitCursor(FXCursor *cur){
-  if(initialized){
-    if(cur==NULL){ fxerror("%s::setWaitCursor: NULL wait cursor.\n",getClassName()); }
-    if(waitCursor!=cur){
-      waitCursor=cur;
-      if(waitCount){
-        if(!waitCursor->id()){ fxerror("%s::setWaitCursor: wait cursor not created yet.\n",getClassName()); }
-#ifdef WIN32
-        SetCursor((HCURSOR)waitCursor->id());
-#else
-        register FXWindow* child;
-        child=getRootWindow()->getFirst();
-        while(child){
-          if(child->id()){
-            XDefineCursor((Display*)display,child->id(),waitCursor->id());
-            if(child->getFirst()){child=child->getFirst();continue;}
-            }
-          while(!child->getNext()&&child->getParent()){child=child->getParent();}
-          child=child->getNext();
-          }
-        XFlush((Display*)display);
-#endif
-        }
-      }
-    }
-  }
-
-
-// Change default cursor
-void FXApp::setDefaultCursor(FXDefaultCursor which,FXCursor* cur){
-  if(!cur){ fxerror("%s::setDefaultCursor: NULL default cursor.\n",getClassName()); }
-  cursor[which]=cur;
-  }
-
-
-// Change message translator
-void FXApp::setTranslator(FXTranslator* trans){
-  translator=trans;
-  }
-
-
 // Save to stream
 void FXApp::save(FXStream& store) const {
   FXObject::save(store);
@@ -5303,62 +5350,62 @@ void FXApp::load(FXStream& store){
 // Change typing speed
 void FXApp::setTypingSpeed(FXTime speed){
   typingSpeed=speed;
-  registry.writeLongEntry("SETTINGS","typingspeedns",typingSpeed);
+  registry.writeLongEntry("SETTINGS","typingspeed",typingSpeed);
   }
 
 // Change double-click speed
 void FXApp::setClickSpeed(FXTime speed){
   clickSpeed=speed;
-  registry.writeLongEntry("SETTINGS","clickspeedns",clickSpeed);
+  registry.writeLongEntry("SETTINGS","clickspeed",clickSpeed);
   }
 
 // Change scroll speed
 void FXApp::setScrollSpeed(FXTime speed){
   scrollSpeed=speed;
-  registry.writeLongEntry("SETTINGS","scrollspeedns",scrollSpeed);
+  registry.writeLongEntry("SETTINGS","scrollspeed",scrollSpeed);
   }
 
 // Change scroll delay
 void FXApp::setScrollDelay(FXTime delay){
   scrollDelay=delay;
-  registry.writeLongEntry("SETTINGS","scrolldelayns",scrollDelay);
+  registry.writeLongEntry("SETTINGS","scrolldelay",scrollDelay);
   }
 
 // Change cursor blink speed
 void FXApp::setBlinkSpeed(FXTime speed){
   blinkSpeed=speed;
-  registry.writeLongEntry("SETTINGS","blinkspeedns",blinkSpeed);
+  registry.writeLongEntry("SETTINGS","blinkspeed",blinkSpeed);
   }
 
 // Change animation speed
 void FXApp::setAnimSpeed(FXTime speed){
   animSpeed=speed;
-  registry.writeLongEntry("SETTINGS","animspeedns",animSpeed);
+  registry.writeLongEntry("SETTINGS","animspeed",animSpeed);
   }
 
 // Change menu popup delay
 void FXApp::setMenuPause(FXTime pause){
   menuPause=pause;
-  registry.writeLongEntry("SETTINGS","menupausens",menuPause);
+  registry.writeLongEntry("SETTINGS","menupause",menuPause);
   }
 
 // Change tooltip popup pause
 void FXApp::setToolTipPause(FXTime pause){
   toolTipPause=pause;
-  registry.writeLongEntry("SETTINGS","tippausens",toolTipPause);
+  registry.writeLongEntry("SETTINGS","tippause",toolTipPause);
   }
 
 // Change tooltip visibility time
 void FXApp::setToolTipTime(FXTime time){
   toolTipTime=time;
-  registry.writeLongEntry("SETTINGS","tiptimens",toolTipTime);
+  registry.writeLongEntry("SETTINGS","tiptime",toolTipTime);
   }
 
 
 // Change autohide delay time
 void FXApp::setAutoHideDelay(FXTime time){
   autoHideDelay=time;
-  registry.writeLongEntry("SETTINGS","autohidens",autoHideDelay);
+  registry.writeLongEntry("SETTINGS","autohide",autoHideDelay);
   }
 
 

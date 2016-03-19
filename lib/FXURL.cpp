@@ -3,7 +3,7 @@
 *                       U R L   M a n i p u l a t i o n                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -217,22 +217,21 @@ URL::URL(const FXString& string){
   if(string[s]=='/' && string[s+1]=='/'){
     s+=2;
 
-    // Parse user name
+    // Parse username
     user[0]=s;
     while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
       s++;
       }
-    user[1]=s;
 
-    // Check for password
-    pass[0]=pass[1]=s;
+    // Parse password
+    user[1]=pass[0]=s;
     if(string[s]==':'){
       pass[0]=++s;
       while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
         s++;
         }
-      pass[1]=s;
       }
+    pass[1]=s;
 
     // Check for @ after user:pass
     if(string[s]=='@'){
@@ -247,65 +246,75 @@ URL::URL(const FXString& string){
     while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
       s++;
       }
-    host[1]=s;
 
-    // Check for port number
-    port[0]=port[1]=s;
+    // Parse port number
+    host[1]=port[0]=s;
     if(string[s]==':'){
       port[0]=++s;
       while(Ascii::isDigit(string[s])) s++;
-      port[1]=s;
       }
+    port[1]=s;
     }
 
-  // Eat slash preceding the drive letter (e.g. file:///c:/path)
-  if(string[s]=='/' && Ascii::isLetter(string[s+1]) && (string[s+2]==':' || string[s+2]=='|')){
+#ifdef WIN32
+  // Parse path, allowing for \ path delimiters (legacy urls)
+  path[0]=s;
+  while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/\\ ",string[s])){
     s++;
     }
-
+#else
   // Parse path
   path[0]=s;
   while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/ ",string[s])){
     s++;
     }
-  path[1]=s;
+#endif
 
   // Parse query
-  quer[0]=quer[1]=s;
+  path[1]=quer[0]=s;
   if(string[s]=='?'){
     quer[0]=++s;
     while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/?",string[s])){
       s++;
       }
-    quer[1]=s;
     }
 
   // Parse fragment
-  frag[0]=frag[1]=s;
+  quer[1]=frag[0]=s;
   if(string[s]=='#'){
     frag[0]=++s;
     while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/?",string[s])){
       s++;
       }
-    frag[1]=s;
     }
+  frag[1]=s;
   }
 
 
 // Encode control characters and characters from set using %-encoding
 FXString FXURL::encode(const FXString& url,const FXchar* set){
-  register FXint p=0;
-  register FXint c;
   FXString result;
-  while(p<url.length()){
-    c=url[p++];
-    if(c<0x20 || c>0x7F || c=='%' || (set && strchr(set,c))){
-      result.append('%');
-      result.append(FXString::value2Digit[(c>>4)&15]);
-      result.append(FXString::value2Digit[c&15]);
-      continue;
+  if(!url.empty()){
+    register FXint p,q,c;
+    for(p=q=0; p<url.length(); ++p){
+      c=(FXuchar)url[p];
+      if(c<0x20 || c=='%' || (set && strchr(set,c))){
+        q+=3;
+        continue;
+        }
+      q++;
       }
-    result.append(c);
+    result.length(q);
+    for(p=q=0; p<url.length(); ++p){
+      c=(FXuchar)url[p];
+      if(c<0x20 || c=='%' || (set && strchr(set,c))){
+        result[q++]='%';
+        result[q++]=FXString::value2Digit[c>>4];
+        result[q++]=FXString::value2Digit[c&15];
+        continue;
+        }
+      result[q++]=c;
+      }
     }
   return result;
   }
@@ -313,16 +322,25 @@ FXString FXURL::encode(const FXString& url,const FXchar* set){
 
 // Decode string containing %-encoded characters
 FXString FXURL::decode(const FXString& url){
-  register FXint p=0;
-  register FXint c;
   FXString result;
-  while(p<url.length()){
-    c=url[p++];
-    if(c=='%' && Ascii::isHexDigit(url[p]) && Ascii::isHexDigit(url[p+1])){
-      c=Ascii::digitValue(url[p])*16+Ascii::digitValue(url[p+1]);
-      p+=2;
+  if(!url.empty()){
+    register FXint p,q,c;
+    for(p=q=0; p<url.length(); ++p){
+      c=(FXuchar)url[p];
+      if(c=='%' && Ascii::isHexDigit(url[p+1]) && Ascii::isHexDigit(url[p+2])){
+        p+=2;
+        }
+      q++;
       }
-    result.append(c);
+    result.length(q);
+    for(p=q=0; p<url.length(); ++p){
+      c=(FXuchar)url[p];
+      if(c=='%' && Ascii::isHexDigit(url[p+1]) && Ascii::isHexDigit(url[p+2])){
+        c=(Ascii::digitValue(url[p+1])<<4)+Ascii::digitValue(url[p+2]);
+        p+=2;
+        }
+      result[q++]=c;
+      }
     }
   return result;
   }
@@ -337,16 +355,16 @@ FXString FXURL::fileToURL(const FXString& file){
   if(Ascii::isLetter(file[0]) && file[1]==':'){
     return "file:///"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);      // file:///c:/path-with-slashes
     }
-  return "file:"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);           // file:path-with-slashes
+  return "file://"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);         // file://path-with-slashes
 #else
-  return "file:"+encode(file,ENCODE_THESE);                                     // file:path
+  return "file://"+encode(file,ENCODE_THESE);                                   // file://path
 #endif
   }
 
 
 // Return filename from URL, empty if url is not a local file
 FXString FXURL::fileFromURL(const FXString& string){
-  if(!string.empty()){
+  if(comparecase(string,"file:",5)==0){
 #ifdef WIN32
     URL url(string);
     if(url.host[0]<url.host[1]){

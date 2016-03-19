@@ -3,7 +3,7 @@
 *                          Test 4-Way  Splitter  Widget                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -50,7 +50,8 @@ FourSplitWindow::FourSplitWindow(FXApp *a):FXMainWindow(a,"4-Way Splitter Test",
 
   FXHorizontalFrame* hf=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
-  splitter=new FX4Splitter(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FOURSPLITTER_TRACKING);
+  // Splitter with vertical preference
+  splitter=new FX4Splitter(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FOURSPLITTER_TRACKING|FOURSPLITTER_VERTICAL);
 
   // File menu
   filemenu=new FXMenuPane(this);

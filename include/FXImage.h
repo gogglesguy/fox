@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -38,7 +38,8 @@ enum {
   IMAGE_ALPHACOLOR = 0x00000010,      /// Override transparancy color
   IMAGE_SHMI       = 0x00000020,      /// Using shared memory image
   IMAGE_SHMP       = 0x00000040,      /// Using shared memory pixmap
-  IMAGE_ALPHAGUESS = 0x00000080       /// Guess transparency color from corners
+  IMAGE_ALPHAGUESS = 0x00000080,      /// Guess transparency color from corners
+  IMAGE_THRESGUESS = 0x00000100       /// Guess threshold for etch mask
   };
 
 

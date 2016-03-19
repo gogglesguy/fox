@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1310,16 +1310,12 @@ FXString *FXFileList::getSelectedFiles() const {
   register FXString *files=NULL;
   register FXint i,n;
   for(i=n=0; i<getNumItems(); i++){
-    if(isItemSelected(i) && !isItemNavigational(i)){
-      n++;
-      }
+    if(isItemSelected(i) && !isItemNavigational(i)){ n++; }
     }
   if(n){
     files=new FXString [n+1];
     for(i=n=0; i<getNumItems(); i++){
-      if(isItemSelected(i) && !isItemNavigational(i)){
-        files[n++]=getItemPathname(i);
-        }
+      if(isItemSelected(i) && !isItemNavigational(i)){ files[n++]=getItemPathname(i); }
       }
     files[n]=FXString::null;
     }

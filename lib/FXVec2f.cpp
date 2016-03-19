@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,7 +26,6 @@
 #include "FXObject.h"
 #include "FXVec2f.h"
 #include "FXVec3f.h"
-#include "FXMat3f.h"
 
 
 using namespace FX;
@@ -71,18 +70,14 @@ FXVec2f normalize(const FXVec2f& v){
   }
 
 
-// Vector times matrix
-FXVec2f FXVec2f::operator*(const FXMat3f& m) const {
-  return FXVec2f(x*m[0][0]+y*m[1][0]+m[2][0], x*m[0][1]+y*m[1][1]+m[2][1]);
-  }
-
-
+// Save vector to a stream
 FXStream& operator<<(FXStream& store,const FXVec2f& v){
   store << v.x << v.y;
   return store;
   }
 
 
+// Load vector from a stream
 FXStream& operator>>(FXStream& store,FXVec2f& v){
   store >> v.x >> v.y;
   return store;

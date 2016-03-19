@@ -3,7 +3,7 @@
 *         R e f e r e n c e   C o u n t e d   O b j e c t  P o i n t e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -77,11 +77,11 @@ public:
     return *this;
     }
 
-  /// Convert to true/false
-  operator FXbool() const { return !!ptr; }
-  
   /// Conversion operators
   operator EType*() const { return ptr; }
+
+  /// Return pointer value
+  EType* get() const { return ptr; }
 
   /// Dereference operator
   EType& operator*() const { return *ptr; }

@@ -3,7 +3,7 @@
 *                          D i c t i o n a r y    C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -219,8 +219,8 @@ void* FXDict::replace(const FXchar* ky,void* ptr,FXbool mrk){
 x:    used++;
       dict[x].key=strdup(ky);
       dict[x].hash=h;
-      dict[x].mark=mrk;
-y:    dict[x].data=createData(ptr);
+y:    dict[x].mark=mrk;
+      dict[x].data=createData(ptr);
       return dict[x].data;
       }
     }

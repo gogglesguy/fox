@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -19,8 +19,6 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.bc,v 1.161 2009/01/06 13:31:21 fox Exp $                     #
-##############################################################################
 
 CXX       = bcc32
 RM        = del
@@ -34,7 +32,7 @@ TOPDIR    = ..
 CXXFLAGS  = -5 -O2 -w-aus -w-ccc -w-csu -w-par -w-pia -w-rch -w-inl -w-ngu
 DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H -DHAVE_GLU_H -DHAVE_VSSCANF #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_TIFF_H -DXMD_H
 INCDIRS   = -I$(TOPDIR)/include
-FOXLIB    = $(TOPDIR)\src\FOX-1.7.lib
+FOXLIB    = $(TOPDIR)\lib\FOX-1.7.lib
 RESWRAP   = $(TOPDIR)\utils\reswrap.exe
 
 
@@ -61,6 +59,7 @@ FX88599Codec.cpp \
 FXAccelTable.cpp \
 FXApp.cpp \
 FXArrowButton.cpp \
+FXAtomic.cpp \
 FXBMPIcon.cpp \
 FXBMPImage.cpp \
 FXBitmap.cpp \

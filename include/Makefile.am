@@ -306,6 +306,7 @@ FXXPMImage.h \
 fx.h \
 fx3d.h \
 fxascii.h \
+fxcpuid.h \
 fxdefs.h \
 fxkeys.h \
 fxunicode.h \

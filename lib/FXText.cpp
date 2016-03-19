@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -548,7 +548,7 @@ FXint FXText::validPos(FXint pos) const {
   register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
   if(pos<=0) return 0;
   if(pos>=length) return length;
-  return (FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos), pos;
+  return (FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
   }
 
 
@@ -556,7 +556,7 @@ FXint FXText::validPos(FXint pos) const {
 // or below below the gap, we read from the segment below the gap
 FXint FXText::dec(FXint pos) const {
   register const FXchar *ptr=pos<=gapstart ? buffer : buffer-gapstart+gapend;
-  return (--pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos), pos;
+  return (--pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
   }
 
 
@@ -564,7 +564,7 @@ FXint FXText::dec(FXint pos) const {
 // start under the gap the last character accessed is below the gap
 FXint FXText::inc(FXint pos) const {
   register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
-  return (++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos), pos;
+  return (++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos), pos;
   }
 
 
@@ -578,11 +578,11 @@ FXint FXText::getByte(FXint pos) const {
 FXwchar FXText::getChar(FXint pos) const {
   register const FXuchar* ptr=(pos<gapstart)?(FXuchar*)(buffer+pos):(FXuchar*)(buffer+pos-gapstart+gapend);
   register FXwchar w=ptr[0];
-  if(0xC0<=w){ w=(w<<6)^ptr[1]^0x3080;
-  if(0x800<=w){ w=(w<<6)^ptr[2]^0x20080;
-  if(0x10000<=w){ w=(w<<6)^ptr[3]^0x400080;
-  if(0x200000<=w){ w=(w<<6)^ptr[4]^0x8000080;
-  if(0x4000000<=w){ w=(w<<6)^ptr[5]^0x80; }}}}}
+  if(__unlikely(0xC0<=w)){ w=(w<<6)^ptr[1]^0x3080;
+  if(__unlikely(0x800<=w)){ w=(w<<6)^ptr[2]^0x20080;
+  if(__unlikely(0x10000<=w)){ w=(w<<6)^ptr[3]^0x400080;
+  if(__unlikely(0x200000<=w)){ w=(w<<6)^ptr[4]^0x8000080;
+  if(__unlikely(0x4000000<=w)){ w=(w<<6)^ptr[5]^0x80; }}}}}
   return w;
   }
 
@@ -674,6 +674,10 @@ FXint FXText::charWidth(FXwchar ch,FXint indent) const {
   return font->getCharWidth(ch);
   }
 
+
+// FIXME
+// Special codes for non-breaking space U+00A0, zero-width space (U+200B), non-breaking
+// hyphen (U+2011), and other line break types.
 
 // Start of next wrapped line
 FXint FXText::wrap(FXint start) const {
@@ -4448,13 +4452,13 @@ long FXText::onCmdInsertNewlineIndent(FXObject*,FXSelector,void*){
   }
 
 
-// Insert optional soft-tab 
+// Insert optional soft-tab
 long FXText::onCmdInsertTab(FXObject*,FXSelector,void*){
   if(options&TEXT_NO_TABS) return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_SOFTTAB),NULL);
   return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_HARDTAB),NULL);
   }
-  
-  
+
+
 // Insert hard-tab
 long FXText::onCmdInsertHardTab(FXObject*,FXSelector,void*){
   return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)"\t");
@@ -4467,8 +4471,8 @@ long FXText::onCmdInsertSoftTab(FXObject*,FXSelector,void*){
   FXString string(' ',tabcolumns-indentFromPos(lineStart(pos),pos)%tabcolumns);
   return handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)string.text());
   }
-  
-  
+
+
 /*******************************************************************************/
 
 // Cut

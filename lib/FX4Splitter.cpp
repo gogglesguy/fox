@@ -3,7 +3,7 @@
 *                       F o u r - W a y   S p l i t t e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -49,7 +49,7 @@
 
 
 // Splitter styles
-#define FOURSPLITTER_MASK     FOURSPLITTER_TRACKING
+#define FOURSPLITTER_MASK     (FOURSPLITTER_TRACKING|FOURSPLITTER_HORIZONTAL|FOURSPLITTER_VERTICAL)
 
 // Modes
 #define NOWHERE      0
@@ -167,27 +167,35 @@ FXint FX4Splitter::getDefaultWidth(){
   if(pbl && pbl->shown()){ blw=pbl->getDefaultWidth(); set|=ExpandBottomLeft; }
   if(pbr && pbr->shown()){ brw=pbr->getDefaultWidth(); set|=ExpandBottomRight; }
   switch(set){
+  
+    // None expanded
+    case ExpandNone: return 0;
+
+    // Single panel expanded
     case ExpandTopLeft: return tlw;
     case ExpandTopRight: return trw;
-    case ExpandBottomRight: return brw;
     case ExpandBottomLeft: return blw;
+    case ExpandBottomRight: return brw;
 
-    case ExpandTopLeft|ExpandTopRight: return trw+tlw+barsize;
-    case ExpandBottomLeft|ExpandBottomRight: return brw+blw+barsize;
+    // Two panels expanded on same row/column
+    case ExpandTopLeft|ExpandTopRight: return tlw+trw+barsize;
+    case ExpandBottomLeft|ExpandBottomRight: return blw+brw+barsize;
+    case ExpandTopLeft|ExpandBottomLeft: return FXMAX(tlw,blw);
+    case ExpandTopRight|ExpandBottomRight: return FXMAX(trw,brw);
 
-    case ExpandBottomLeft|ExpandTopLeft: return FXMAX(tlw,blw);
-    case ExpandBottomLeft|ExpandTopRight: return FXMAX(blw,trw);
-    case ExpandBottomRight|ExpandTopLeft: return FXMAX(brw,tlw);
-    case ExpandBottomRight|ExpandTopRight: return FXMAX(brw,trw);
+    // Diagonally opposite panels expanded
+    case ExpandTopLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?tlw+brw+barsize:FXMAX(brw,tlw);
+    case ExpandTopRight|ExpandBottomLeft: return (options&FOURSPLITTER_VERTICAL)?trw+blw+barsize:FXMAX(blw,trw);
 
-    case ExpandBottomLeft|ExpandTopLeft|ExpandTopRight: return FXMAX(trw+tlw+barsize,blw);
-    case ExpandBottomRight|ExpandTopLeft|ExpandTopRight: return FXMAX(trw+tlw+barsize,brw);
-    case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: return FXMAX(brw+blw+barsize,tlw);
-    case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: return FXMAX(brw+blw+barsize,trw);
-
-    case ExpandTopLeft|ExpandBottomLeft|ExpandTopRight|ExpandBottomRight: return barsize+FXMAX(tlw,blw)+FXMAX(trw,brw);
+    // Three panels expanded
+    case ExpandTopLeft|ExpandTopRight|ExpandBottomLeft: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlw,blw)+trw+barsize:FXMAX(tlw+trw+barsize,blw);
+    case ExpandTopLeft|ExpandTopRight|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?tlw+FXMAX(trw,brw)+barsize:FXMAX(tlw+trw+barsize,brw);
+    case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlw,blw)+brw+barsize:FXMAX(tlw,blw+brw+barsize);
+    case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?blw+FXMAX(trw,brw)+barsize:FXMAX(trw,blw+brw+barsize);
     }
-  return 0;
+    
+  // Default is all expanded
+  return FXMAX(tlw,blw)+FXMAX(trw,brw)+barsize;
   }
 
 
@@ -203,27 +211,35 @@ FXint FX4Splitter::getDefaultHeight(){
   if(pbl && pbl->shown()){ blh=pbl->getDefaultHeight(); set|=ExpandBottomLeft; }
   if(pbr && pbr->shown()){ brh=pbr->getDefaultHeight(); set|=ExpandBottomRight; }
   switch(set){
+  
+    // None expanded
+    case ExpandNone: return 0;
+
+    // Single panel expanded
     case ExpandTopLeft: return tlh;
     case ExpandTopRight: return trh;
-    case ExpandBottomRight: return brh;
     case ExpandBottomLeft: return blh;
+    case ExpandBottomRight: return brh;
 
+    // Two panels expanded on same row/column
     case ExpandTopLeft|ExpandTopRight: return FXMAX(tlh,trh);
     case ExpandBottomLeft|ExpandBottomRight: return FXMAX(blh,brh);
+    case ExpandTopLeft|ExpandBottomLeft: return tlh+blh+barsize;
+    case ExpandTopRight|ExpandBottomRight: return trh+brh+barsize;
 
-    case ExpandBottomLeft|ExpandTopLeft: return blh+tlh+barsize;
-    case ExpandBottomLeft|ExpandTopRight: return blh+trh+barsize;
-    case ExpandBottomRight|ExpandTopLeft: return brh+tlh+barsize;
-    case ExpandBottomRight|ExpandTopRight: return brh+trh+barsize;
+    // Diagonally opposite panels expanded
+    case ExpandTopLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlh,brh):tlh+brh+barsize;
+    case ExpandTopRight|ExpandBottomLeft: return (options&FOURSPLITTER_VERTICAL)?FXMAX(trh,brh):trh+blh+barsize;
 
-    case ExpandBottomLeft|ExpandTopLeft|ExpandTopRight: return FXMAX(tlh,trh)+blh+barsize;
-    case ExpandBottomRight|ExpandTopLeft|ExpandTopRight: return FXMAX(tlh,trh)+brh+barsize;
-    case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: return FXMAX(blh,brh)+tlh+barsize;
-    case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: return FXMAX(blh,brh)+trh+barsize;
-
-    case ExpandTopLeft|ExpandBottomLeft|ExpandTopRight|ExpandBottomRight: return barsize+FXMAX(tlh,trh)+FXMAX(blh,brh);
+    // Three panels expanded
+    case ExpandTopLeft|ExpandTopRight|ExpandBottomLeft: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlh+blh+barsize,trh):FXMAX(tlh,trh)+blh+barsize;
+    case ExpandTopLeft|ExpandTopRight|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlh,trh+brh+barsize):FXMAX(tlh,trh)+brh+barsize;
+    case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?FXMAX(tlh+blh+barsize,brh):tlh+FXMAX(blh,brh)+barsize;
+    case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: return (options&FOURSPLITTER_VERTICAL)?FXMAX(blh,trh+brh+barsize):trh+FXMAX(blh,brh)+barsize;
     }
-  return 0;
+
+  // Default is all expanded
+  return FXMAX(tlh,trh)+FXMAX(blh,brh)+barsize;
   }
 
 
@@ -234,7 +250,7 @@ void FX4Splitter::layout(){
   FXWindow *pbl=getBottomLeft();
   FXWindow *pbr=getBottomRight();
   FXuint set=getExpanded();
-  FXint tsx,bsx,osy;
+  FXint tsx,bsx,lsy,rsy;
 
   FXASSERT(0<=fhor && fhor<=10000);
   FXASSERT(0<=fver && fver<=10000);
@@ -243,36 +259,43 @@ void FX4Splitter::layout(){
   splitx=(fhor*(width-barsize))/10000;
   splity=(fver*(height-barsize))/10000;
 
+  // Default is all four expanded
   tsx=bsx=splitx;
-  osy=splity;
+  lsy=rsy=splity;
 
   switch(set){
-    case ExpandTopLeft: tsx=bsx=width; osy=height; break;
-    case ExpandTopRight: tsx=bsx=-barsize; osy=height; break;
-    case ExpandBottomRight: tsx=bsx=-barsize; osy=-barsize; break;
-    case ExpandBottomLeft: tsx=bsx=width; osy=-barsize; break;
+  
+    // None expanded
+    case ExpandNone: tsx=bsx=width; lsy=rsy=height; break;
 
-    case ExpandTopLeft|ExpandTopRight: tsx=bsx=splitx; osy=height; break;
-    case ExpandBottomLeft|ExpandBottomRight: tsx=bsx=splitx; osy=-barsize; break;
+    // Single panel expanded
+    case ExpandTopLeft: tsx=bsx=width; lsy=rsy=height; break;
+    case ExpandTopRight: tsx=bsx=-barsize; lsy=rsy=height; break;
+    case ExpandBottomLeft: tsx=bsx=width; lsy=rsy=-barsize; break;
+    case ExpandBottomRight: tsx=bsx=-barsize; lsy=rsy=-barsize; break;
 
-    case ExpandBottomLeft|ExpandTopLeft: tsx=bsx=width; osy=splity; break;
-    case ExpandBottomLeft|ExpandTopRight: tsx=-barsize; bsx=width; osy=splity; break;
-    case ExpandBottomRight|ExpandTopLeft: tsx=width; bsx=-barsize; osy=splity; break;
-    case ExpandBottomRight|ExpandTopRight: tsx=bsx=-barsize; osy=splity; break;
+    // Two panels expanded on same row/column
+    case ExpandTopLeft|ExpandTopRight: lsy=rsy=height; break;
+    case ExpandBottomLeft|ExpandBottomRight: lsy=rsy=-barsize; break;
+    case ExpandTopLeft|ExpandBottomLeft: tsx=bsx=width; break;
+    case ExpandTopRight|ExpandBottomRight: tsx=bsx=-barsize; break;
 
-    case ExpandBottomLeft|ExpandTopLeft|ExpandTopRight: tsx=splitx; bsx=width; osy=splity; break;
-    case ExpandBottomRight|ExpandTopLeft|ExpandTopRight: tsx=splitx; bsx=-barsize; osy=splity; break;
-    case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: tsx=width; bsx=splitx; osy=splity; break;
-    case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: tsx=-barsize; bsx=splitx; osy=splity; break;
+    // Diagonally opposite panels expanded
+    case ExpandTopLeft|ExpandBottomRight: if(options&FOURSPLITTER_VERTICAL){ lsy=height; rsy=-barsize; } else { tsx=width; bsx=-barsize; } break;
+    case ExpandTopRight|ExpandBottomLeft: if(options&FOURSPLITTER_VERTICAL){ lsy=-barsize; rsy=height; } else { tsx=-barsize; bsx=width; } break;
 
-    case ExpandTopLeft|ExpandBottomLeft|ExpandTopRight|ExpandBottomRight: tsx=bsx=splitx; osy=splity; break;
+    // Three panels expanded
+    case ExpandTopLeft|ExpandTopRight|ExpandBottomLeft: if(options&FOURSPLITTER_VERTICAL){ rsy=height; } else { bsx=width; } break;
+    case ExpandTopLeft|ExpandTopRight|ExpandBottomRight: if(options&FOURSPLITTER_VERTICAL){ lsy=height; } else { bsx=-barsize; } break;
+    case ExpandTopLeft|ExpandBottomLeft|ExpandBottomRight: if(options&FOURSPLITTER_VERTICAL){ rsy=-barsize; } else { tsx=width; } break;
+    case ExpandTopRight|ExpandBottomLeft|ExpandBottomRight: if(options&FOURSPLITTER_VERTICAL){ lsy=-barsize; } else { tsx=-barsize; } break;
     }
 
   // Arrange the kids
-  if(ptl) ptl->position(0,0,tsx,osy);
-  if(ptr) ptr->position(tsx+barsize,0,width-tsx-barsize,osy);
-  if(pbl) pbl->position(0,osy+barsize,bsx,height-osy-barsize);
-  if(pbr) pbr->position(bsx+barsize,osy+barsize,width-bsx-barsize,height-osy-barsize);
+  if(ptl) ptl->position(0,0,tsx,lsy);
+  if(ptr) ptr->position(tsx+barsize,0,width-tsx-barsize,rsy);
+  if(pbl) pbl->position(0,lsy+barsize,bsx,height-lsy-barsize);
+  if(pbr) pbr->position(bsx+barsize,rsy+barsize,width-bsx-barsize,height-rsy-barsize);
 
   // Layout ok now
   flags&=~FLAG_DIRTY;
