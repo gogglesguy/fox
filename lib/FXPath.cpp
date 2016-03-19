@@ -716,6 +716,7 @@ FXString FXPath::relative(const FXString& file){
 //
 //  Base       File         Result      Comment
 //  /a/b/c     /a/b/c/d      yes        /a/b/c/d is under directory /a/b/c
+//  /a/b/c     /a/b          no         /a/b is NOT under directory /a/b/c
 //  a/b        a/b/c         yes        ./a/b/c is under directory ./a/b
 //  a          b             no         ./b is NOT under ./a
 //  a/b        a/c           no         ./a/c is NOT under ./a/b
@@ -736,112 +737,98 @@ FXString FXPath::relative(const FXString& file){
 //  (empty)    (something)   no         ./something is NOT under empty
 FXbool FXPath::isInside(const FXString& base,const FXString& file){
   if(!base.empty() && !file.empty()){
-    register FXint p=0,q=0,f;
+    register FXint p=0,q=0,v=0;
 #ifdef WIN32
-    while(base[p] && ((Ascii::toLower(base[p])==Ascii::toLower(file[q])) || (ISPATHSEP(base[p]) && ISPATHSEP(file[q])))){
-      if(ISPATHSEP(base[p])){
-        while(0<p && ISPATHSEP(base[p+1])) p++;           // Eat multiple slashes, but not the UNC "\\" at the start
-        while(0<q && ISPATHSEP(file[q+1])) q++;
-        }
+    if(ISPATHSEP(base[p])){
+      if(!ISPATHSEP(file[q])) return false;
       p++;
       q++;
+      if(ISPATHSEP(base[p])){
+        if(!ISPATHSEP(file[q])) return false;
+        p++;
+        q++;
+        }
       }
+    else if(Ascii::isLetter(base[p]) && base[p+1]==':'){
+      if((Ascii::toLower(base[p])!=Ascii::toLower(file[q])) || (file[q+1]!=':')) return false;
+      p+=2;
+      q+=2;
+      }
+    while(base[p]){
+      if(ISPATHSEP(base[p])){
+        if(!ISPATHSEP(file[q])) return false;
+        p++;
+        q++;
+        while(ISPATHSEP(base[p])) p++;
+        while(ISPATHSEP(file[q])) q++;
+        }
+a:    if(base[p]=='.'){
+        if(base[p+1]=='\0'){ p+=1; goto a; }
+        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }
+        if(base[p+1]=='.'){
+          if(base[p+2]=='\0'){ p+=2; v++; goto a; }
+          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }
+          }
+        }
+b:    if(file[q]=='.'){
+        if(file[q+1]=='\0'){ q+=1; goto b; }
+        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }
+        if(file[q+1]=='.'){
+          if(file[q+2]=='\0'){ q+=2; v--; goto b; }
+          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }
+          }
+        }
+      if(v<0) return false;
+      while(base[p] && !ISPATHSEP(base[p])){
+        if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) return false;
+        p++;
+        q++;
+        }
+      }
+    return true;
 #else
-    while(base[p] && file[q]){
-      if(base[p]=='.' && ISPATHSEP(base[p+1])){ p+=2; continue; }
-      if(file[q]=='.' && ISPATHSEP(file[q+1])){ q+=2; continue; }
-      if(base[p]=='.' && base[p+1]=='.' && file[q]=='.' && file[q+1]=='.'){ p+=2; q+=2; continue; }
-      if(ISPATHSEP(base[p])){
-        while(ISPATHSEP(base[p+1])) p++;
-        }
-      if(ISPATHSEP(file[q])){
-        while(ISPATHSEP(file[q+1])) q++;
-        }
-      if(base[0]=='\0') break;
-      if(base[p]!=file[q]){
-        return false;
-        }
+    if(ISPATHSEP(base[p])){
+      if(!ISPATHSEP(file[q])) return false;
       p++;
       q++;
       }
+    while(base[p]){
+      if(ISPATHSEP(base[p])){
+        if(!ISPATHSEP(file[q])) return false;
+        p++;
+        q++;
+        while(ISPATHSEP(base[p])) p++;
+        while(ISPATHSEP(file[q])) q++;
+        }
+a:    if(base[p]=='.'){
+        if(base[p+1]=='\0'){ p+=1; goto a; }
+        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }
+        if(base[p+1]=='.'){
+          if(base[p+2]=='\0'){ p+=2; v++; goto a; }
+          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }
+          }
+        }
+b:    if(file[q]=='.'){
+        if(file[q+1]=='\0'){ q+=1; goto b; }
+        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }
+        if(file[q+1]=='.'){
+          if(file[q+2]=='\0'){ q+=2; v--; goto b; }
+          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }
+          }
+        }
+      if(v<0) return false;
+      while(base[p] && !ISPATHSEP(base[p])){
+        if(base[p]!=file[q]) return false;
+        p++;
+        q++;
+        }
+      }
+    return true;
 #endif
-    return (0<p) && base[p]=='\0'; // && (ISPATHSEP(file[q]) || file[q]=='\0');
     }
   return false;
   }
 
-/*
-
-*/
-
-#if 0
-FXbool FXPath::isInside(const FXString& base,const FXString& file){
-  if(!base.empty()){
-    register FXint p=0,q=0,f;
-#ifdef WIN32
-    while(base[p] && ((Ascii::toLower(base[p])==Ascii::toLower(file[q])) || (ISPATHSEP(base[p]) && ISPATHSEP(file[q])))){
-      if(ISPATHSEP(base[p])){
-        while(0<p && ISPATHSEP(base[p+1])) p++;           // Eat multiple slashes, but not the UNC "\\" at the start
-        while(0<q && ISPATHSEP(file[q+1])) q++;
-        }
-      p++;
-      q++;
-      }
-#else
-    while(base[p] && file[q]){
-      if(ISPATHSEP(base[p])){
-        while(ISPATHSEP(base[p+1])) p++;
-        }
-      if(ISPATHSEP(file[q])){
-        while(ISPATHSEP(file[q+1])) q++;
-        }
-//      if(base[p]=='.' && base[p+1]=='\0'){ p+=1; continue; }
-      if(base[p]=='.' && ISPATHSEP(base[p+1])){ p+=2; continue; }
-      if(file[q]=='.' && ISPATHSEP(file[q+1])){ q+=2; continue; }
-      f=0;
-      if(file[q]=='.' && file[q+1]=='.') f|=1;
-      if(base[p]=='.' && base[p+1]=='.') f|=2;
-      if(f==1) return false;
-      if(f==3){ p+=2; q+=2; continue; }
-      if(f==2){ p+=2; continue; }
-      if(base[p]=='.' && base[p+1]=='.'){ p+=2; continue; }
-      if(base[p]!=file[q]){
-        return false;
-        }
-      p++;
-      q++;
-      }
-#endif
-    return (0<p) && base[p]=='\0'; // && (ISPATHSEP(file[q]) || file[q]=='\0');
-    }
-  return false;
-  }
-
-
-FXbool FXPath::isInside(const FXString& base,const FXString& file){
-  register FXint p=0,q=0;
-#ifdef WIN32
-  while(base[p] && ((Ascii::toLower(base[p])==Ascii::toLower(file[q])) || (ISPATHSEP(base[p]) && ISPATHSEP(file[q])))){
-    if(ISPATHSEP(base[p])){
-      while(0<p && ISPATHSEP(base[p+1])) p++;           // Eat multiple slashes, but not the UNC "\\" at the start
-      while(0<q && ISPATHSEP(file[q+1])) q++;
-      }
-    p++;
-    q++;
-    }
-#else
-  while(base[p] && (base[p]==file[q])){
-    if(ISPATHSEP(base[p])){
-      while(ISPATHSEP(base[p+1])) p++;                  // Eat multiple slashes
-      while(ISPATHSEP(file[q+1])) q++;
-      }
-    p++;
-    q++;
-    }
-#endif
-  return base[p]=='\0' && (ISPATHSEP(file[q]) || file[q]=='\0');
-  }
-#endif
 
 // Convert path from using 'sepfm' to use 'septo' path-separators
 FXString FXPath::convert(const FXString& file,FXchar septo,FXchar sepfm){
@@ -930,7 +917,7 @@ FXString FXPath::upLevel(const FXString& file){
 // Check if file represents absolute pathname
 FXbool FXPath::isAbsolute(const FXString& file){
 #ifdef WIN32
-  return ISPATHSEP(file[0]) || (Ascii::isLetter(file[0]) && file[1]==':');
+  return ISPATHSEP(file[0]) || (Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2]));
 #else
   return ISPATHSEP(file[0]);
 #endif
@@ -1322,7 +1309,7 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
     }
   return result;
   }
-  
+
 
 }
 

@@ -854,7 +854,6 @@ void GLViewWindow::create(){
   dragshell1->create();
   dragshell2->create();
   dragshell3->create();
-  //toolbar1->undock();
   show(PLACEMENT_SCREEN);
   }
 

@@ -68,8 +68,8 @@ FXString FXSystem::universalTime(FXTime value){
   return FXSystem::universalTime(TIMEFORMAT,value);
   }
 
-
 // FIXME === strptime
+
 // Convert file time to string as per strftime format
 FXString FXSystem::localTime(const FXchar *format,FXTime value){
   time_t tmp=(time_t)(value/seconds);

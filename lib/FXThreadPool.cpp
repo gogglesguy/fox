@@ -108,7 +108,6 @@ FXbool FXThreadPool::setSize(FXuint sz){
   }
 
 
-
 // Return queue size
 FXuint FXThreadPool::getSize() const {
   return queue.getSize();

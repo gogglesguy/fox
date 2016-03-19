@@ -561,9 +561,11 @@ FXbool FXFile::concat(const FXString& srcfile1,const FXString& srcfile2,const FX
 // Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
 FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
   if(srcfile!=dstfile){
-    FXString name,linkname;
+    FXString lnkfile;
+    FXString name;
     FXStat srcstat;
     FXStat dststat;
+    FXDir  dir;
     //FXTRACE((100,"FXFile::copyFiles(%s,%s)\n",srcfile.text(),dstfile.text()));
     if(FXStat::statLink(srcfile,srcstat)){
 
@@ -579,6 +581,9 @@ FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
       // Source is a directory
       if(srcstat.isDirectory()){
 
+        // Open source directory
+        if(!dir.open(srcfile)) return false;
+        
         // Make destination directory if needed
         if(!dststat.isDirectory()){
           //FXTRACE((100,"FXDir::create(%s)\n",dstfile.text()));
@@ -587,10 +592,7 @@ FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
           if(!FXDir::create(dstfile,srcstat.mode()|FXIO::OwnerWrite)) return false;
           }
 
-        // Open source directory
-        FXDir dir(srcfile);
-
-        // Copy source directory
+        // Copy contents of source directory
         while(dir.next(name)){
 
           // Skip '.' and '..'
@@ -617,11 +619,11 @@ FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
 
       // Source is symbolic link: make a new one
       if(srcstat.isLink()){
-        linkname=FXFile::symlink(srcfile);
-        //FXTRACE((100,"symlink(%s,%s)\n",srcfile.text(),dstfile.text()));
+        lnkfile=FXFile::symlink(srcfile);
+        //FXTRACE((100,"symlink(%s,%s)\n",lnkfile.text(),dstfile.text()));
 
         // New symlink to whatever old one referred to
-        if(!FXFile::symlink(srcfile,dstfile)) return false;
+        if(!FXFile::symlink(lnkfile,dstfile)) return false;
 
         // OK
         return true;

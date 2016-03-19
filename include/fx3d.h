@@ -53,6 +53,8 @@
 #include "FXVec4d.h"
 #include "FXQuatf.h"
 #include "FXQuatd.h"
+#include "FXMat2f.h"
+#include "FXMat2d.h"
 #include "FXMat3f.h"
 #include "FXMat3d.h"
 #include "FXMat4f.h"

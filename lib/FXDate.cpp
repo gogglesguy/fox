@@ -45,6 +45,11 @@ namespace FX {
 // Many nanoseconds in a second
 const FXTime seconds=1000000000L;
 
+// Julian day number of GPS week zero
+const FXuint GPS_EPOCH_JDAY=2444245;
+
+// Julian day number of UNIX epoch
+const FXuint UNIX_EPOCH_JDAY=2440588;
 
 // Short month names
 const FXchar FXDate::shortMonthName[12][4]={
@@ -137,13 +142,13 @@ void FXDate::getDate(FXint& yr,FXint& mo,FXint& dy) const {
 
 // Set date from nanoseconds since 1/1/1970
 void FXDate::setTime(FXTime ns){
-  julian=2440588L+ns/(86400L*seconds);
+  julian=UNIX_EPOCH_JDAY+ns/(86400L*seconds);
   }
 
 
 // Get nanoseconds since 1/1/1970 from date
 FXTime FXDate::getTime() const {
-  return (julian-2440588L)*(86400L*seconds);
+  return (julian-UNIX_EPOCH_JDAY)*(86400L*seconds);
   }
 
 

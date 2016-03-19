@@ -39,7 +39,7 @@ public:
   FXMat4d(){}
 
   /// Initialize matrix from scalar
-  FXMat4d(FXdouble w);
+  FXMat4d(FXdouble s);
 
   /// Initialize with 3x3 rotation and scaling matrix
   FXMat4d(const FXMat3d& s);

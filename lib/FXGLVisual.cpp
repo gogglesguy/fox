@@ -842,8 +842,285 @@ void FXGLVisual::create(){
     }
   }
 
+/*
+#elif defined(GLX_VERSION_1_3) //////// X11 NEW /////////////////////////////////
 
-#else ///////////////////////////////// X11 /////////////////////////////////////
+
+#ifndef GLX_ARB_fbconfig_float
+#define GLX_RGBA_FLOAT_TYPE_ARB            0x20B9
+#define GLX_RGBA_FLOAT_BIT_ARB             0x00000004
+#endif
+#ifndef GLX_SAMPLE_BUFFERS
+#define GLX_SAMPLE_BUFFERS                 100000
+#endif
+#ifndef GLX_SAMPLES
+#define GLX_SAMPLES                        100001
+#endif
+
+
+// Initialize
+void FXGLVisual::create(){
+  if(!xid){
+    if(getApp()->isInitialized()){
+      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+
+#ifdef HAVE_GL_H
+
+      // Assume the default
+      visual=DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()));
+      depth=DefaultDepth((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()));
+
+      // OpenGL is available if we're talking to an OpenGL-capable X-Server
+      if(glXQueryExtension((Display*)getApp()->getDisplay(),NULL,NULL)){
+        int major,minor;
+
+        // Try get OpenGL version info
+        if(glXQueryVersion((Display*)getApp()->getDisplay(),&major,&minor)){
+          GLXFBConfig *fb; int nfb;
+
+          // Report version found
+          FXTRACE((150,"Found OpenGL version %d.%d\n",major,minor));
+
+          // Get frame buffer configurations
+          fb=glXGetFBConfigs((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()),&nfb);
+          if(fb){
+            int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glsamples,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,gldrawables,glrender,gllevel,glaccel;
+            int dred,dgreen,dblue,dalpha,ddepth,dstencil,dsamples,daccred,daccgreen,daccblue,daccalpha,match,visualid,configid;
+            int defvisualid=XVisualIDFromVisual(DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())));
+            int bestmatch=1000000000;
+            int bestvisualid=0;
+            int best=-1;
+            int v;
+
+            FXTRACE((150,"Found %d configs\n",nfb));
+            FXTRACE((150,"Default visualid=0x%02x\n",defvisualid));
+
+            // Find the best one
+            for(v=0; v<nfb; v++){
+
+              // Get supported drawable targets
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DRAWABLE_TYPE,&gldrawables)!=Success) continue;
+              if((flags&VISUAL_WINDOW) && !(gldrawables&GLX_WINDOW_BIT)) continue;
+              if((flags&VISUAL_IMAGE) && !(gldrawables&GLX_PIXMAP_BIT)) continue;
+              if((flags&VISUAL_BUFFER) && !(gldrawables&GLX_PBUFFER_BIT)) continue;
+
+              // Get supported render type; we don't want index mode
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RENDER_TYPE,&glrender)!=Success) continue;
+              if(!(glrender&(GLX_RGBA_BIT|GLX_RGBA_FLOAT_BIT_ARB))) continue;
+
+              // Get overlay level; we don't want overlays
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_LEVEL,&gllevel)!=Success) continue;
+              if(gllevel!=0) continue;
+
+              // Get stereo and double buffer support
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DOUBLEBUFFER,&gldouble)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_STEREO,&glstereo)!=Success) continue;
+
+              // Get plane depths
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RED_SIZE,&glredsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_GREEN_SIZE,&glgreensize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_BLUE_SIZE,&glbluesize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ALPHA_SIZE,&glalphasize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_DEPTH_SIZE,&gldepthsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_STENCIL_SIZE,&glstencilsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_RED_SIZE,&glaccumredsize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_GREEN_SIZE,&glaccumgreensize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_BLUE_SIZE,&glaccumbluesize)!=Success) continue;
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_ACCUM_ALPHA_SIZE,&glaccumalphasize)!=Success) continue;
+
+              // Get multisample support (if we don't succeed, set it to zero)
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_SAMPLES,&glsamples)!=Success) glsamples=0;
+
+              // Frame buffer config id
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_FBCONFIG_ID,&configid)!=Success) continue;
+
+              // Visual ID if it matters
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_VISUAL_ID,&visualid)!=Success) continue;
+
+              // Check if accelerated or not
+              if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_CONFIG_CAVEAT,&glaccel)!=Success) continue;
+              glaccel=(glaccel!=GLX_SLOW_CONFIG);
+
+              // We prefer to get a few MORE bits in RGBA than we asked for
+              dred   = glredsize-redSize;     if(dred<0)   dred   *= -100;
+              dgreen = glgreensize-greenSize; if(dgreen<0) dgreen *= -100;
+              dblue  = glbluesize-blueSize;   if(dblue<0)  dblue  *= -100;
+              dalpha = glalphasize-alphaSize; if(dalpha<0) dalpha *= -100;
+
+              // Prefer better Z than asked, but colors more important
+              ddepth = gldepthsize-depthSize; if(ddepth<0) ddepth *= -10;
+
+              // We care about colors and Z depth more than stencil depth
+              dstencil = glstencilsize-stencilSize; if(dstencil<0) dstencil *= -1;
+
+              // Accumulation buffers
+              daccred=glaccumredsize-accumRedSize;       if(daccred<0)   daccred   *= -1;
+              daccgreen=glaccumgreensize-accumGreenSize; if(daccgreen<0) daccgreen *= -1;
+              daccblue=glaccumbluesize-accumBlueSize;    if(daccblue<0)  daccblue  *= -1;
+              daccalpha=glaccumalphasize-accumAlphaSize; if(daccalpha<0) daccalpha *= -1;
+
+              // Want the best colors, of course
+              match=dred+dgreen+dblue+dalpha;
+
+              // Accumulation buffers
+              match+=daccred+daccgreen+daccblue+daccalpha;
+
+              // Hardware accelerated is normally a plus
+              if(!glaccel && !(flags&VISUAL_NO_ACCEL)){
+                match+=10000;
+                }
+
+              // Extra penalty for no alpha if we asked for alpha, but no
+              // penalty at all if there is alpha and we didn't ask for it.
+              if(alphaSize>0){
+                if(glalphasize<1) match+=100000;
+                }
+
+              // Wanted Z-buffer
+              if(depthSize>0){
+                if(gldepthsize<1) match+=10000000;
+                else match+=ddepth;
+                }
+              else{
+                if(gldepthsize>0) match+=10000000;
+                }
+
+              // Stencil buffers desired
+              if(stencilSize>0){
+                if(glstencilsize<1) match+=10000;
+                else match+=dstencil;
+                }
+              else{
+                if(glstencilsize>0) match+=1;
+                }
+
+              // Multisamples
+              if(multiSamples>0){
+                dsamples=glsamples-multiSamples;
+                if(dsamples<0) dsamples*=-10;
+                match+=dsamples;
+                }
+              else{
+                if(glsamples>0) match+=100;
+                }
+
+              // Double buffering also quite strongly preferred
+              if(flags&VISUAL_DOUBLE_BUFFER){
+                if(!gldouble) match+=1000000;
+                }
+              else{
+                if(gldouble) match+=1000000;
+                }
+
+              // Stereo not so important
+              if(flags&VISUAL_STEREO){
+                if(!glstereo) match+=10000;
+                }
+              else{
+                if(glstereo) match+=10000;
+                }
+
+              // Want float buffer
+              if(flags&VISUAL_FLOAT){
+                if(!(glrender&GLX_RGBA_FLOAT_BIT_ARB)) match+=1000;
+                }
+              else{
+                if(!(glrender&GLX_RGBA_BIT)) match+=1000;
+                }
+
+              // Trace
+              FXTRACE((150,"Config: #%d: match=%d\n",v,match));
+              FXTRACE((150,"  drawables  = %s%s%s\n",(gldrawables&GLX_WINDOW_BIT)?"GLX_WINDOW_BIT ":"",(gldrawables&GLX_PIXMAP_BIT)?"GLX_PIXMAP_BIT ":"",(gldrawables&GLX_PBUFFER_BIT)?"GLX_PBUFFER_BIT":""));
+              FXTRACE((150,"  render     = %s%s%s\n",(glrender&GLX_RGBA_BIT)?"GLX_RGBA_BIT ":"",(glrender&GLX_COLOR_INDEX_BIT)?"GLX_COLOR_INDEX_BIT ":"",(glrender&GLX_RGBA_FLOAT_BIT_ARB)?"GLX_RGBA_FLOAT_BIT_ARB":""));
+              FXTRACE((150,"  format     = %p\n",fb[v]));
+              FXTRACE((150,"  configid   = 0x%02x\n",configid));
+              FXTRACE((150,"  visualid   = 0x%02x\n",visualid));
+              FXTRACE((150,"  red size   = %d\n",glredsize));
+              FXTRACE((150,"  green size = %d\n",glgreensize));
+              FXTRACE((150,"  blue size  = %d\n",glbluesize));
+              FXTRACE((150,"  alpha size = %d\n",glalphasize));
+              FXTRACE((150,"  depth size = %d\n",gldepthsize));
+              FXTRACE((150,"  double buf = %d\n",gldouble));
+              FXTRACE((150,"  stencil    = %d\n",glstencilsize));
+              FXTRACE((150,"  acc red    = %d\n",glaccumredsize));
+              FXTRACE((150,"  acc green  = %d\n",glaccumgreensize));
+              FXTRACE((150,"  acc blue   = %d\n",glaccumbluesize));
+              FXTRACE((150,"  acc alpha  = %d\n",glaccumalphasize));
+              FXTRACE((150,"  stereo     = %d\n",glstereo));
+              FXTRACE((150,"  samples    = %d\n",glsamples));
+              FXTRACE((150,"  accel      = %d\n",glaccel));
+
+              // May the best config win
+              if(match<=bestmatch){
+
+                // All other things being equal, we prefer default visual!
+                if((match<bestmatch) || (visualid==defvisualid)){
+                  actualRedSize=glredsize;
+                  actualGreenSize=glgreensize;
+                  actualBlueSize=glbluesize;
+                  actualAlphaSize=glalphasize;
+                  actualDepthSize=gldepthsize;
+                  actualStencilSize=glstencilsize;
+                  actualMultiSamples=glsamples;
+                  actualAccumRedSize=glaccumredsize;
+                  actualAccumGreenSize=glaccumgreensize;
+                  actualAccumBlueSize=glaccumbluesize;
+                  actualAccumAlphaSize=glaccumalphasize;
+                  doubleBuffer=gldouble;
+                  stereoBuffer=glstereo;
+                  accelerated=glaccel;
+                  copying=false;
+                  bestmatch=match;
+                  bestvisualid=visualid;
+                  best=v;
+                  }
+                }
+              }
+
+            // We should have one now
+            if(0<=best){
+              FXTRACE((140,"Best Config: #%d: match=%d\n",best,bestmatch));
+
+              // New way to get visual
+              XVisualInfo *vi;
+              vi=glXGetVisualFromFBConfig((Display*)getApp()->getDisplay(),fb[best]);
+              if(vi){
+                visual=vi[0].visual;
+                depth=vi[0].depth;
+
+                // Initialize colormap
+                setupcolormap();
+
+                // Make GC's for this visual
+                gc=setupgc(false);
+                scrollgc=setupgc(true);
+
+                XFree((char*)vi);
+                }
+
+              // Remember best config
+              xid=(FXID)fb[best];
+              }
+
+            // Free configs
+            XFree(fb);
+            }
+          }
+        }
+
+#endif
+
+      }
+
+    // Test if successful
+    if(!xid){
+      throw FXWindowException("no matching GL configuration.");
+      }
+    }
+  }
+*/
+
+#else //////////////////////////////// X11 OLD //////////////////////////////////
 
 
 #ifndef GLX_ARB_multisample
@@ -1101,49 +1378,6 @@ void FXGLVisual::create(){
     }
   }
 
-
-#if 0
-struct Overlay {
-  FXuint visualid;      // Visual ID
-  FXuint transparency;	// 0: none; 1: pixel; 2: mask (?)
-  FXuint value;		// the transparent pixel
-  FXuint layer;		// -1: underlay; 0: normal; 1: popup; 2: overlay
-  };
-
-
-// Get overlay visuals
-static int getOverlays(Display *display,Overlay*& overlays){
-  unsigned long nitems,bytes_after;
-  int result,actual_format;
-  Atom actual_type;
-  Overlay *data=NULL;
-  Atom XA_SERVER_OVERLAY_VISUALS=XInternAtom(display,"SERVER_OVERLAY_VISUALS",False);
-  result=XGetWindowProperty(display,RootWindow(display,DefaultScreen(display)),XA_SERVER_OVERLAY_VISUALS,0,(65536/sizeof(long)),False,XA_SERVER_OVERLAY_VISUALS,&actual_type,&actual_format,&nitems,&bytes_after,(unsigned char **)&data);
-  if(result==Success && actual_type==XA_SERVER_OVERLAY_VISUALS && actual_format==32 && 1<=nitems){
-    overlays=data;
-    return nitems/(sizeof(Overlay)/sizeof(FXuint));
-    }
-  if(data) XFree(data);
-  overlays=NULL;
-  return 0;
-  }
-
-Overlay *overlays=NULL;
-int noverlays=getOverlays(DISPLAY(getApp()),overlays);
-FXTRACE((100,"noverlays=%d\n",noverlays));
-if(noverlays){
-  for(i=0; i<noverlays; i++){
-    FXTRACE((100,"visual       = %d\n",overlays[i].visualid));
-    FXTRACE((100,"transparency = %d\n",overlays[i].transparency));
-    FXTRACE((100,"value        = %08x\n",overlays[i].value));
-    FXTRACE((100,"layer        = %d\n",overlays[i].layer));
-    }
-  XFree(overlays);
-  }
-
-extern Visual *_XVIDtoVisual(Display* dpy,VisualID id);
-
-#endif
 
 #endif //////////////////////////////////////////////////////////////////////////
 

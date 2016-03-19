@@ -32,7 +32,6 @@
 #include "FXRegion.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
-#include "FXObjectList.h"
 #include "FXVisual.h"
 #include "FXEvent.h"
 #include "FXWindow.h"

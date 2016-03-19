@@ -39,7 +39,7 @@ namespace FX {
 FXVec2d normalize(const FXVec2d& v){
   register FXdouble m=v.length2();
   FXVec2d result(v);
-  if(0.0<m){ result/=sqrt(m); }
+  if(__likely(0.0<m)){ result/=sqrt(m); }
   return result;
   }
 

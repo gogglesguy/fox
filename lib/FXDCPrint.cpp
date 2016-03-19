@@ -929,6 +929,7 @@ void FXDCPrint::drawImage(const FXImage *img,FXint dx,FXint dy){
     FXint    hh = img->getHeight();
     FXuchar *buffer = (FXuchar*)img->getData();
 
+    outf("gsave\n");
     outf("/picstr %d string def\n",ww*3);
     outf("%d %d translate\n",dx,hh-dy);
     outf("%d %d scale\n",ww,-hh);
@@ -938,13 +939,14 @@ void FXDCPrint::drawImage(const FXImage *img,FXint dx,FXint dy){
     outf("false %d\n",3);
     outf("colorimage\n");
 
-    int end=ww*hh;
+    int end=ww*hh*4;
     for(int i=0; i<end ; i+=4){
       outhex(buffer[i]);
       outhex(buffer[i+1]);
       outhex(buffer[i+2]);
       }
     outf("\n");
+    outf("grestore\n"); 
     }
   }
 

@@ -305,9 +305,11 @@ FXMDIButton.cpp \
 FXMDIChild.cpp \
 FXMDIClient.cpp \
 FXMainWindow.cpp \
+FXMat2d.cpp \
+FXMat2f.cpp \
 FXMat3d.cpp \
-FXMat4d.cpp \
 FXMat3f.cpp \
+FXMat4d.cpp \
 FXMat4f.cpp \
 FXMatrix.cpp \
 FXMemMap.cpp \
@@ -342,6 +344,7 @@ FXPoint.cpp \
 FXPrintDialog.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
+FXPtrList.cpp \
 FXPtrQueue.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
