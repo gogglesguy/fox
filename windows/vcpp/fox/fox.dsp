@@ -2836,6 +2836,26 @@ SOURCE=..\..\..\include\FXVisual.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXWEBPIcon.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXWEBPIcon.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXWEBPImage.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXWEBPImage.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\fxwebpio.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXWindow.cpp
 # End Source File
 # Begin Source File

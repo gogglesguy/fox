@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -466,6 +467,30 @@ FXbool FXStat::mode(const FXString& file,FXuint perm){
   return !file.empty() && ::chmod(file.text(),bits)==0;
 #endif
   }
+
+
+/*
+An API to change the file access/modification time would be helpful.
+Handy if you want to archive/copy files and want to keep the same
+timestamp:
+
+On Windows there's:
+SetFileTime
+http://msdn.microsoft.com/en-us/library/windows/desktop/ms724933(v=vs.85).aspx
+
+or with more work SetFileInformationByHandle:
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa365539(v=VS.85).aspx
+
+On Linux there's:
+(seconds)
+utime
+
+POSIX.1-2008 (nanoseconds):
+utimensat
+
+
+Sander
+*/
 
 
 // Return true if file exists

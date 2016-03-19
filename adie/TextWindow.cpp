@@ -428,8 +428,9 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   searchpaths="/usr/include";
   setPatterns("All Files (*)");
   setCurrentPattern(0);
-  searchpos=-1;
   searchflags=SEARCH_FORWARD|SEARCH_EXACT;
+  searchpos=-1;
+  searching=false;
   showsearchbar=false;
   colorize=false;
   stripcr=true;
@@ -2672,34 +2673,40 @@ long TextWindow::onUpdSearchPaths(FXObject* sender,FXSelector,void*){
 
 // Start incremental search; show search bar if not permanently visible
 void TextWindow::startISearch(){
-  showsearchbar=searchbar->shown();
-  if(!showsearchbar){
-    searchbar->show();
-    searchbar->recalc();
+  if(!searching){
+    showsearchbar=searchbar->shown();
+    if(!showsearchbar){
+      searchbar->show();
+      searchbar->recalc();
+      }
+    searchtext->setBackColor(getApp()->getBackColor());
+    searchtext->setText(FXString::null);
+    searchtext->setFocus();
+    searchpos=-1;
+    searching=true;
     }
-  searchtext->setBackColor(getApp()->getBackColor());
-  searchtext->setText(FXString::null);
-  searchtext->setFocus();
-  searchpos=-1;
   }
 
 
 // Finish incremental search; hide search bar if not permanently visible
 void TextWindow::finishISearch(){
-  if(!showsearchbar){
-    searchbar->hide();
-    searchbar->recalc();
+  if(searching){
+    if(!showsearchbar){
+      searchbar->hide();
+      searchbar->recalc();
+      }
+    searchtext->setBackColor(getApp()->getBackColor());
+    searchtext->setText(FXString::null);
+    editor->setFocus();
+    searchpos=-1;
+    searching=false;
     }
-  searchtext->setBackColor(getApp()->getBackColor());
-  searchtext->setText(FXString::null);
-  editor->setFocus();
-  searchpos=-1;
   }
 
 
 // Search next incremental text
 FXbool TextWindow::performISearch(const FXString& text,FXbool advance,FXbool notify){
-  FXint beg[10],end[10],start;
+  FXint beg[10],end[10],start,mode;
   FXRex rex;
 
   // Figure start of search
@@ -2733,7 +2740,10 @@ FXbool TextWindow::performISearch(const FXString& text,FXbool advance,FXbool not
     }
 
   // Check syntax of regex; ignore if input not yet complete
-  if(rex.parse(text,FXRex::Syntax)==FXRex::ErrOK){
+  mode=FXRex::Syntax;
+  if(!(searchflags&SEARCH_REGEX)) mode|=FXRex::Verbatim;
+  if(searchflags&SEARCH_IGNORECASE) mode|=FXRex::IgnoreCase;
+  if(rex.parse(text,mode)==FXRex::ErrOK){
 
     // Search text, beep if not found
     if(!editor->findText(text,beg,end,start,searchflags,10)){

@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -42,7 +43,7 @@
       2 normalized codeset
       3 territory
       4 modifier
-      
+
   - Info from "Unicode Common Locale Data Repository," http://cldr.unicode.org,
     and http://www.unicode.org/reports/tr35/.
   - Formatting of dates, times, and time zones.

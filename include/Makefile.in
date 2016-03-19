@@ -517,6 +517,8 @@ FXVec4d.h \
 FXVec4f.h \
 FXVerticalFrame.h \
 FXVisual.h \
+FXWEBPIcon.h \
+FXWEBPImage.h \
 FXWindow.h \
 FXWizard.h \
 FXWorker.h \

@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxkeys.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -1529,8 +1530,8 @@ FXColor blendOverBackground(FXColor back,FXColor clr){
   bb+=((gs+(bs>>8)+128)>>8);
   return FXRGB(rb,gb,bb);
   }
-  
-  
+
+
 // Blend source color over black background color
 FXColor blendOverBlack(FXColor clr){
   register FXint as=FXALPHAVAL(clr);

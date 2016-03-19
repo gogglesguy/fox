@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -518,7 +519,7 @@ FXHeaderItem *FXHeader::getItem(FXint index) const {
 FXint FXHeader::setItem(FXint index,FXHeaderItem* item,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
   if(items[index]!=item){
-  
+
     // Must have item
     if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
 

@@ -22,7 +22,11 @@
 #define FXDEFS_H
 
 
+
 /********************************  Definitions  ********************************/
+
+// Placement new
+#include <new>
 
 // Truth values
 #ifndef TRUE

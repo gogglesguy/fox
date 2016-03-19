@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXObject.h"
@@ -220,7 +221,7 @@ FXMat4d& FXMat4d::operator=(const FXMat4d& s){
 FXMat4d& FXMat4d::operator=(const FXQuatd& quat){
   return set(FXMat3d(quat));
   }
-  
+
 
 // Assignment from array
 FXMat4d& FXMat4d::operator=(const FXdouble s[]){
@@ -362,7 +363,7 @@ FXMat4d& FXMat4d::set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const F
 FXMat4d& FXMat4d::set(const FXQuatd& quat){
   return set(FXMat3d(quat));
   }
-  
+
 
 // Add matrices
 FXMat4d& FXMat4d::operator+=(const FXMat4d& s){

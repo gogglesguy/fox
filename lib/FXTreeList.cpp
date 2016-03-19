@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxkeys.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -1730,9 +1731,6 @@ long FXTreeList::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
           }
         break;
       }
-
-    // Scroll to make item visibke
-    makeItemVisible(currentitem);
 
     // Update anchor
     setAnchorItem(currentitem);

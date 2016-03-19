@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxkeys.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXAutoThreadStorageKey.h"
@@ -836,7 +837,7 @@ FXWindow* FXApp::getForegroundWindow() const {
   return win;
   }
 #endif
-  
+
 
 // Find window from id
 FXWindow* FXApp::findWindowWithId(FXID xid) const {
@@ -854,7 +855,6 @@ FXWindow* FXApp::findWindowAt(FXint rx,FXint ry,FXID window) const {
     while(1){
       point.x=rx; point.y=ry;
       ScreenToClient((HWND)window,&point);
-//      child=ChildWindowFromPoint((HWND)window,point);
       child=ChildWindowFromPointEx((HWND)window,point,CWP_SKIPINVISIBLE|CWP_SKIPTRANSPARENT);   // Suggested by "PelleBert"
       if(!child || child==window) break;
       window=child;
@@ -5336,8 +5336,8 @@ Alt key seems to repeat.
 #if 0
     case WM_DDE_INITIATE:
     case WM_DDE_EXECUTE:
-    case WM_DDE_ACK: 
-#endif    
+    case WM_DDE_ACK:
+#endif
     case WM_DND_ENTER:
       FXTRACE((100,"DNDEnter from remote window %d\n",lParam));
       xdndSource=(FXID)lParam;

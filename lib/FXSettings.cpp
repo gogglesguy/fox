@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -77,31 +78,6 @@ FXIMPLEMENT(FXSettings,FXDict,NULL,0)
 // Construct settings database
 FXSettings::FXSettings(){
   modified=false;
-  }
-
-
-// Construct copy of existing database
-FXSettings::FXSettings(const FXSettings& orig):FXDict(orig){
-  modified=orig.modified;
-  for(FXint i=0; i<orig.total; i++){
-    if(0<=dict[i].hash){
-      dict[i].data=new FXStringDict(*((FXStringDict*)orig.dict[i].data));
-      }
-    }
-  }
-
-
-// Assignment operator
-FXSettings& FXSettings::operator=(const FXSettings& orig){
-  if(&orig!=this){
-    FXDict::operator=(orig);
-    for(FXint i=0; i<orig.total; i++){
-      if(0<=orig.dict[i].hash){
-        dict[i].data=new FXStringDict(*((FXStringDict*)orig.dict[i].data));
-        }
-      }
-    }
-  return *this;
   }
 
 

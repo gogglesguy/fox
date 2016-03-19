@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXElement.h"
@@ -49,7 +50,10 @@
     compilers; it makes a noticeable difference.
 */
 
-#define BSHIFT 5
+#define HASH(x)   ((FXuval)(x))
+#define BSHIFT    5
+#define VOID      ((void*)-1L)
+#define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
 
 using namespace FX;
 
@@ -57,41 +61,36 @@ using namespace FX;
 
 namespace FX {
 
+// Initial value for slot
+const FXHash::Entry FXHash::init={NULL,NULL};
+
+
 // Make empty table
-FXHash::FXHash(){
-  allocElms(table,2);
-  table[0].name=NULL;
-  table[0].data=NULL;
-  table[1].name=NULL;
-  table[1].data=NULL;
-  total=2;
-  used=0;
-  free=2;
+FXHash::FXHash():table(init,2),used(0),free(2){
   }
 
 
 // Resize hash table, and rehash old stuff into it
 FXbool FXHash::size(FXuint m){
-  FXEntry *newtable;
-  if(__likely(callocElms(newtable,m))){
-    register FXuval p,b,x,i;
+  FXArray<Entry> elbat;
+  if(__likely(elbat.assign(init,m))){
+    register FXuval p,b,x;
     register void *name;
     register void *data;
-    for(i=0; i<total; ++i){
+    register FXint i;
+    for(i=0; i<table.no(); ++i){
       name=table[i].name;
       data=table[i].data;
-      if(name==NULL || name==(void*)-1L) continue;
-      p=b=(FXuval)name;
-      while(newtable[x=p&(m-1)].name){
+      if(!LEGAL(name)) continue;
+      p=b=HASH(name);
+      while(elbat[x=p&(m-1)].name){
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
-      newtable[x].name=name;
-      newtable[x].data=data;
+      elbat[x].name=name;
+      elbat[x].data=data;
       }
-    freeElms(table);
-    table=newtable;
-    total=m;
+    table.adopt(elbat);
     free=m-used;
     return true;
     }
@@ -101,26 +100,27 @@ FXbool FXHash::size(FXuint m){
 
 // Insert key into the table
 void* FXHash::insert(void* name,void* data){
-  register FXuval p,b,x;
-  if(__likely(name)){
-    p=b=(FXuval)name;
-    while(table[x=p&(total-1)].name){
+  if(__likely(LEGAL(name))){
+    register FXuval p,b,h,x;
+    p=b=h=HASH(name);
+    while(table[x=p&(table.no()-1)].name){
       if(table[x].name==name) goto y;            // Return existing
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-    if(__unlikely((free<<1)<=total)) size(total<<1);
-    p=b=(FXuval)name;
-    while(table[x=p&(total-1)].name){
-      if(table[x].name==(void*)-1L) goto x;      // Put it in empty slot
-      p=(p<<2)+p+b+1;
-      b>>=BSHIFT;
+    if(__likely((free<<1)>table.no()) || __likely(size(table.no()<<1))){
+      p=b=h;
+      while(table[x=p&(table.no()-1)].name){
+        if(table[x].name==VOID) goto x;         // Put it in empty slot
+        p=(p<<2)+p+b+1;
+        b>>=BSHIFT;
+        }
+      free--;
+x:    used++;
+      table[x].name=name;
+      table[x].data=data;
+y:    return table[x].data;
       }
-    free--;
-x:  used++;
-    table[x].name=name;
-    table[x].data=data;
-y:  return table[x].data;
     }
   return NULL;
   }
@@ -128,28 +128,29 @@ y:  return table[x].data;
 
 // Replace key in the table, returning old one
 void* FXHash::replace(void* name,void* data){
-  register FXuval p,b,x;
-  register void* old;
-  if(__likely(name)){
-    p=b=(FXuval)name;
-    while(table[x=p&(total-1)].name){
+  if(__likely(LEGAL(name))){
+    register FXuval p,b,h,x;
+    register void* old;
+    p=b=h=HASH(name);
+    while(table[x=p&(table.no()-1)].name){
       if(table[x].name==name) goto y;            // Replace existing
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-    if(__unlikely((free<<1)<=total)) size(total<<1);
-    p=b=(FXuval)name;
-    while(table[x=p&(total-1)].name){
-      if(table[x].name==(void*)-1L) goto x;      // Put it in empty slot
-      p=(p<<2)+p+b+1;
-      b>>=BSHIFT;
+    if(__likely((free<<1)>table.no()) || __likely(size(table.no()<<1))){
+      p=b=h;
+      while(table[x=p&(table.no()-1)].name){
+        if(table[x].name==VOID) goto x;         // Put it in empty slot
+        p=(p<<2)+p+b+1;
+        b>>=BSHIFT;
+        }
+      free--;
+x:    used++;
+      table[x].name=name;
+y:    old=table[x].data;
+      table[x].data=data;
+      return old;
       }
-    free--;
-x:  used++;
-    table[x].name=name;
-y:  old=table[x].data;
-    table[x].data=data;
-    return old;
     }
   return NULL;
   }
@@ -157,20 +158,20 @@ y:  old=table[x].data;
 
 // Remove association from the table
 void* FXHash::remove(void* name){
-  register FXuval p,b,x;
-  register void* old;
-  if(__likely(name)){
-    p=b=(FXuval)name;
-    while(table[x=p&(total-1)].name!=name){
+  if(__likely(LEGAL(name))){
+    register FXuval p,b,x;
+    register void* old;
+    p=b=HASH(name);
+    while(table[x=p&(table.no()-1)].name!=name){
       if(table[x].name==NULL) goto x;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
     old=table[x].data;
-    table[x].name=(void*)-1L;                    // Empty but not free
+    table[x].name=VOID;                         // Empty but not free
     table[x].data=NULL;
     used--;
-    if(__unlikely(used<(total>>2))) size(total>>1);
+    if(__unlikely(used<(table.no()>>2))) size(table.no()>>1);
     return old;
     }
 x:return NULL;
@@ -179,27 +180,22 @@ x:return NULL;
 
 // Return true if association in table
 void* FXHash::find(void* name) const {
-  register FXuval p,b,x;
-  if(__likely(name)){
-    p=b=(FXuval)name;
-    while(__likely(table[x=p&(total-1)].name)){
+  if(__likely(LEGAL(name))){
+    register FXuval p,b,x;
+    p=b=HASH(name);
+    while(__likely(table[x=p&(table.no()-1)].name)){
       if(__likely(table[x].name==name)) return table[x].data;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-   }
+    }
   return NULL;
   }
 
 
 // Clear hash table
 void FXHash::clear(){
-  resizeElms(table,2);
-  table[0].name=NULL;
-  table[0].data=NULL;
-  table[1].name=NULL;
-  table[1].data=NULL;
-  total=2;
+  table.assign(init,2);
   used=0;
   free=2;
   }
@@ -207,8 +203,6 @@ void FXHash::clear(){
 
 // Destroy table
 FXHash::~FXHash(){
-  freeElms(table);
   }
 
 }
-

@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxascii.h"
 #include "fxunicode.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -159,11 +160,11 @@
 
   Possessive matches and Atomic matching groups are closely related in terms of controlling the
   recursion depth of the matcher.
-  
+
   Atomic subgroups: when a subgroup successfully matches, doesn't backtrack into the subgroup
   again: '(a?rd)appel'  against 'aardvark'.  This would fail, first trying 'aardappel' and
-  then 'ardappel'.  Its obvious that failure is more expensive than it should have been.  
-  With the atomic subgroup, '(?>a?rd)appel' would not backtrack after the subgroup was 
+  then 'ardappel'.  Its obvious that failure is more expensive than it should have been.
+  With the atomic subgroup, '(?>a?rd)appel' would not backtrack after the subgroup was
   successfully matched, but fail immediately.
 
 
@@ -788,7 +789,7 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
   FXRex::Error err;
   FXshort rep_min=1;
   FXshort rep_max=1;
-  FXshort lazy=0;       
+  FXshort lazy=0;
   FXshort ch;
 
   // Remember point before atom
@@ -997,7 +998,7 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
           }
         else if(ch=='>'){                               // Atomic sub group (possessive match)
           pat++;
-          ptr=append(OP_ATOMIC,0); 
+          ptr=append(OP_ATOMIC,0);
           if((err=expression(flags,smin,smax))) return err;
           append(OP_PASS);
           patch(ptr+1,pc);                              // If subgroup matches, go here!
@@ -1653,14 +1654,14 @@ FXbool FXExecute::match(const FXuchar* prog){
         str=save;
         prog+=2;
         continue;
-/*        
+/*
       case OP_WHILE:            // Loop with no backtrack
         save=str;
         while(match(prog+2)){ save=str; }       // Advance each time successfully matched sub-chunk
         str=save;                               // Reset to last subchunk matched
         prog+=GETARG(prog);                     // Now match the rest
         continue;
-*/        
+*/
       case OP_STR_BEG:          // Must be at begin of entire string
         if(str!=str_beg) goto f;
         continue;
@@ -2080,8 +2081,8 @@ rep:    if(str_end<str+rep_min) goto f;
         bak_beg[no]=save=str;                   // Back reference start set
         bak_end[no]=NULL;                       // Back reference end
         if(!match(prog)) goto f;                // Match the rest
-        if(sub_beg[no]==-1 && no<npar){ 
-          sub_beg[no]=save-str_beg; 
+        if(sub_beg[no]==-1 && no<npar){
+          sub_beg[no]=save-str_beg;
           }
         goto t;
       case OP_SUB_END_0:                        // Capturing close parentheses
@@ -2097,8 +2098,8 @@ rep:    if(str_end<str+rep_min) goto f;
         no=op-OP_SUB_END_0;
         bak_end[no]=save=str;                   // Back reference end
         if(!match(prog)) goto f;                // Match the rest
-        if(sub_end[no]==-1 && no<npar){ 
-          sub_end[no]=save-str_beg; 
+        if(sub_end[no]==-1 && no<npar){
+          sub_end[no]=save-str_beg;
           }
         goto t;
       case OP_REF_0:                            // Back reference to capturing parentheses

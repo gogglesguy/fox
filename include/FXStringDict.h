@@ -36,16 +36,13 @@ class FXAPI FXStringDict : public FXDict {
 protected:
   virtual void *createData(void*);
   virtual void deleteData(void*);
+private:
+  FXStringDict(const FXStringDict&);
+  FXStringDict &operator=(const FXStringDict&);
 public:
 
   /// Construct a string dictionary
   FXStringDict();
-
-  /// Copy constructor
-  FXStringDict(const FXStringDict& orig);
-
-  /// Assignment operator
-  FXStringDict &operator=(const FXStringDict& orig);
 
   /// Insert a new string indexed by key, with given mark flag
   const FXchar* insert(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return (const FXchar*)FXDict::insert(ky,(void*)str,mrk); }

@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxascii.h"
 #include "fxunicode.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -2501,8 +2502,8 @@ FXint compare(const FXString& s1,const FXString& s2,FXint n){
 FXint comparecase(const FXchar* s1,const FXchar* s2){
   register FXint c1,c2;
   do{
-    c1=Unicode::toLower(wc(s1)); 
-    c2=Unicode::toLower(wc(s2)); 
+    c1=Unicode::toLower(wc(s1));
+    c2=Unicode::toLower(wc(s2));
     if(!c1 || (c1!=c2)) break;
     s1=wcinc(s1);
     s2=wcinc(s2);
@@ -2537,8 +2538,8 @@ FXint comparecase(const FXchar* s1,const FXchar* s2,FXint n){
     register const FXchar* e2=s2+n;
     register FXint c1,c2;
     do{
-      c1=Unicode::toLower(wc(s1)); 
-      c2=Unicode::toLower(wc(s2)); 
+      c1=Unicode::toLower(wc(s1));
+      c2=Unicode::toLower(wc(s2));
       if(!c1 || (c1!=c2)) break;
       s1=wcinc(s1);
       s2=wcinc(s2);
