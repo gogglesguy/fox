@@ -34,7 +34,7 @@ public:
   FXAutoPtr(EType* src=NULL):ptr(src){ }
 
   /// Construct from another automatic pointer
-  FXAutoPtr(FXAutoPtr& src):ptr(src.release()){ }
+  FXAutoPtr(FXAutoPtr<EType>& src):ptr(src.release()){ }
 
   /// Construct from another automatic pointer of compatible type
   template <class T> FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
@@ -43,7 +43,7 @@ public:
   FXAutoPtr& operator=(EType *src){ ptr=src; return *this; }
 
   /// Assign from an another automatic pointer
-  FXAutoPtr& operator=(FXAutoPtr& src){ return reset(src.release()); }
+  FXAutoPtr& operator=(FXAutoPtr<EType>& src){ return reset(src.release()); }
 
   /// Assign from an automatic pointer with compatible type
   template <class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }

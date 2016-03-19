@@ -33,23 +33,17 @@ INCDIRS   = -I$(TOPDIR)\include
 FOXLIB    = $(TOPDIR)\lib\FOX-1.7.lib
 RESWRAP   = $(TOPDIR)\utils\reswrap.exe
 
-PROGRAMS  = calculator.exe
+PROGRAMS  = ControlPanel.exe
 
 OBJECTS   = \
-        Calculator.obj \
-        main.obj \
-        icons.obj \
-        HelpWindow.obj \
-        Preferences.obj \
-        help.obj
+ControlPanel.obj \
+icons.obj
 
 ICONS = \
-        bigcalc.gif \
-        colors.gif \
-        constmem.bmp \
-        information.gif \
-        question.gif \
-        tinycalc.gif
+controlpanel_gif.gif \
+colors_gif.gif \
+filebinding_gif.gif \
+settings_gif.gif
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp
@@ -57,10 +51,10 @@ ICONS = \
 all: $(PROGRAMS)
 
 
-Calculator.exe: $(OBJECTS) $(FOXLIB)
+ControlPanel.exe: $(OBJECTS) $(FOXLIB)
 	$(LD) $(LDFLAGS) $(OBJECTS) $(FOXLIB)
 
-Calculator.obj: icons.h icons.cpp
+ControlPanel.obj: icons.h icons.cpp
 
 icons.h: $(ICONS)
 	$(RESWRAP) -h -o icons.h $**

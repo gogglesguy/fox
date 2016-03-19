@@ -1972,6 +1972,22 @@ SOURCE=..\..\..\lib\fxpsio.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXPtrList.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXPtrList.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXPtrQueue.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXPtrQueue.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXQuatd.cpp
 # End Source File
 # Begin Source File

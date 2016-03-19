@@ -229,6 +229,18 @@ void FXProgressDialog::increment(FXuint value){
   }
 
 
+// Has operation been cancelled?
+FXbool FXProgressDialog::isCancelled() const { 
+  return cancelled; 
+  }
+
+
+// Change cancelled flag
+void FXProgressDialog::setCancelled(FXbool flg){ 
+  cancelled=flg; 
+  }
+
+
 // Destroy it
 FXProgressDialog::~FXProgressDialog(){
   progress=(FXProgressBar*)-1L;
