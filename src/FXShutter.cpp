@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Charles W. Warren.   All Rights Reserved.          *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXShutter.cpp,v 1.48 2007/04/12 17:42:41 fox Exp $                       *
+* $Id: FXShutter.cpp,v 1.50 2007/07/09 16:27:08 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -69,8 +68,8 @@ FXDEFMAP(FXShutterItem) FXShutterItemMap[]={
 FXIMPLEMENT(FXShutterItem,FXVerticalFrame,FXShutterItemMap,ARRAYNUMBER(FXShutterItemMap))
 
 
-FXShutterItem::FXShutterItem(FXShutter* p,const FXString& text,FXIcon* icon,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXVerticalFrame(p,(opts&~(PACK_UNIFORM_HEIGHT|PACK_UNIFORM_WIDTH)),x,y,w,h,0,0,0,0,0,0){
+// Construct shutter item
+FXShutterItem::FXShutterItem(FXShutter* p,const FXString& text,FXIcon* icon,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):FXVerticalFrame(p,(opts&~(PACK_UNIFORM_HEIGHT|PACK_UNIFORM_WIDTH)),x,y,w,h,0,0,0,0,0,0){
   button=new FXButton(this,text,icon,this,FXShutterItem::ID_SHUTTERITEM_BUTTON,FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,0,0,0,0);
   scrollWindow=new FXScrollWindow(this,VSCROLLER_NEVER|HSCROLLER_NEVER|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_LEFT|LAYOUT_TOP,0,0,0,0);
   content=new FXVerticalFrame(scrollWindow,LAYOUT_FILL_X|LAYOUT_FILL_Y|(opts&(PACK_UNIFORM_HEIGHT|PACK_UNIFORM_WIDTH)),0,0,0,0,pl,pr,pt,pb,hs,vs);
@@ -151,8 +150,7 @@ FXIMPLEMENT(FXShutter,FXVerticalFrame,FXShutterMap,ARRAYNUMBER(FXShutterMap))
 
 
 // Make shutter
-FXShutter::FXShutter(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXVerticalFrame(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
+FXShutter::FXShutter(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):FXVerticalFrame(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
   target=tgt;
   message=sel;
   heightIncrement=1;

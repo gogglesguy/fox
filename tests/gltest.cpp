@@ -87,6 +87,10 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
   new FXLabel(v_matrix2, "Maximum number of lights: ");
   new FXLabel(v_matrix2, FXStringFormat("%d", intval));
 
+  glGetIntegerv(GL_MAX_TEXTURE_UNITS, &intval);
+  new FXLabel(v_matrix2, "Number of texture units: ");
+  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+
   glGetIntegerv(GL_MAX_CLIP_PLANES, &intval);
   new FXLabel(v_matrix2, "Maximum number of clipping planes: ");
   new FXLabel(v_matrix2, FXStringFormat("%d", intval));
@@ -101,6 +105,25 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(ow
 
   glGetIntegerv(GL_MAX_ATTRIB_STACK_DEPTH, &intval);
   new FXLabel(v_matrix2, "Maximum attribute stack depth: ");
+  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+
+#if defined(GL_MAX_VERTEX_ATTRIBS)
+  intval=0;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &intval);
+#endif  
+  new FXLabel(v_matrix2, "Maximum vertex attributes: ");
+  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+#if defined(GL_MAX_VERTEX_UNIFORM_COMPONENTS)
+  intval=0;
+  glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &intval);
+#endif  
+  new FXLabel(v_matrix2, "Maximum vertex uniform components: ");
+  new FXLabel(v_matrix2, FXStringFormat("%d", intval));
+#if defined(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS)
+  intval=0;
+  glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &intval);
+#endif  
+  new FXLabel(v_matrix2, "Maximum fragment uniform components: ");
   new FXLabel(v_matrix2, FXStringFormat("%d", intval));
 
   optionframe=new FXHorizontalFrame(frame1,LAYOUT_SIDE_TOP|FRAME_NONE|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0);
@@ -611,13 +634,13 @@ int main(int argc,char *argv[]){
   // Open the display
   application.init(argc,argv);
 
-  application.create();
+/*  
   FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DoubleBuffer|FXGLConfig::DrawWindow);
 //  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
   FXGLContext context(&application,config);
   context.create();
   exit(0);
-
+*/
   // Make window
   new GLTestWindow(&application);
 

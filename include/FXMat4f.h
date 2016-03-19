@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4f.h,v 1.12 2007/02/07 20:21:56 fox Exp $                           *
+* $Id: FXMat4f.h,v 1.19 2007/07/09 16:02:46 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT4F_H
 #define FXMAT4F_H
@@ -95,14 +94,39 @@ public:
   FXVec4f operator*(const FXVec4f& v) const;
   FXVec3f operator*(const FXVec3f& v) const;
 
-  /// Set identity matrix
-  FXMat4f& eye();
+  /// Equality tests
+  FXbool operator==(const FXMat4f& a) const;
+  FXbool operator!=(const FXMat4f& a) const;
 
-  /// Orthographic projection
-  FXMat4f& ortho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
+  friend inline FXbool operator==(const FXMat4f& a,FXfloat n);
+  friend inline FXbool operator==(FXfloat n,const FXMat4f& a);
 
-  /// Perspective projection
-  FXMat4f& frustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
+  friend inline FXbool operator!=(const FXMat4f& a,FXfloat n);
+  friend inline FXbool operator!=(FXfloat n,const FXMat4f& a);
+
+  /// Set to identity matrix
+  FXMat4f& identity();
+
+  /// Return true if identity matrix
+  FXbool isIdentity() const;
+
+  /// Set orthographic projection from view volume
+  FXMat4f& setOrtho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
+
+  /// Get view volume from orthographic projection
+  void getOrtho(FXfloat& xlo,FXfloat& xhi,FXfloat& ylo,FXfloat& yhi,FXfloat& zlo,FXfloat& zhi) const;
+
+  /// Set to inverse orthographic projection
+  FXMat4f& setInverseOrtho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
+
+  /// Set to perspective projection from view volume
+  FXMat4f& setFrustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
+
+  /// Get view volume from perspective projection
+  void getFrustum(FXfloat& xlo,FXfloat& xhi,FXfloat& ylo,FXfloat& yhi,FXfloat& zlo,FXfloat& zhi) const;
+
+  /// Set to inverse perspective projection from view volume
+  FXMat4f& setInverseFrustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
 
   /// Multiply by left-hand matrix
   FXMat4f& left();
@@ -158,8 +182,15 @@ public:
 
 extern FXAPI FXMat4f operator*(FXfloat x,const FXMat4f& a);
 extern FXAPI FXMat4f operator*(const FXMat4f& a,FXfloat x);
+
 extern FXAPI FXMat4f operator/(const FXMat4f& a,FXfloat x);
 extern FXAPI FXMat4f operator/(FXfloat x,const FXMat4f& a);
+
+extern FXAPI FXbool operator==(const FXMat4f& a,FXfloat n);
+extern FXAPI FXbool operator==(FXfloat n,const FXMat4f& a);
+
+extern FXAPI FXbool operator!=(const FXMat4f& a,FXfloat n);
+extern FXAPI FXbool operator!=(FXfloat n,const FXMat4f& a);
 
 extern FXAPI FXStream& operator<<(FXStream& store,const FXMat4f& m);
 extern FXAPI FXStream& operator>>(FXStream& store,FXMat4f& m);

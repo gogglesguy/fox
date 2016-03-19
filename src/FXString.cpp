@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.237 2007/06/03 05:30:38 fox Exp $                       *
+* $Id: FXString.cpp,v 1.247 2007/07/09 16:27:10 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -111,18 +110,27 @@ const signed char FXString::digit2Value[256]={
 
 // Length of a utf8 character representation
 const signed char FXString::utfBytes[256]={
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+  4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
   };
 
 
 /*******************************************************************************/
+
 
 // Length of wide character string
 static inline FXint strlen(const FXchar *src){
@@ -1717,9 +1725,7 @@ FXString& FXString::trimEnd(){
 
 // Truncate string
 FXString& FXString::trunc(FXint pos){
-  register FXint len=length();
-  if(pos>len) pos=len;
-  length(pos);
+  length(FXMIN(pos,length()));
   return *this;
   }
 
@@ -2883,160 +2889,116 @@ FXString toAscii(const FXString& s){
 
 /*******************************************************************************/
 
-// Escape special characters in a string
-FXString escape(const FXString& s){
-  register FXint p,q,c;
-  FXString result;
-  for(p=q=0; q<s.length(); ){
-    c=s[q++];
-    if(c<0x20 || 0x7F<c){
-      switch(c){
-        case '\n':
-        case '\r':
-        case '\b':
-        case '\v':
-        case '\a':
-        case '\f':
-        case '\t':
-        case '\\':
-        case '"':
-        case '\'':
-          p+=2;
-          continue;
-        default:
-          p+=4;
-          continue;
-        }
+
+// Check if the string contains special characters or leading or trailing whitespace
+FXbool FXString::shouldEscape(FXchar lquote,FXchar rquote){
+  register FXint len=length();
+  if(0<len){
+    register FXint p=0;
+    register FXchar c;
+
+    // Starts or ends with white space
+    if(Ascii::isSpace(str[0]) || Ascii::isSpace(str[len-1])) return true;
+
+    // Or contains magic characters
+    while(p<len){
+      c=str[p++];
+      if('\x7E'<c || c<'\x20' || c=='\\' || c==lquote || c==rquote) return true;
       }
-    p++;
     }
-  result.length(p);                     // Resize result
-  for(p=q=0; q<s.length(); ){
-    c=s[q++];
-    if(c<0x20 || 0x7F<c){
-      switch(c){
-        case '\n':
-          result[p++]='\\';
-          result[p++]='n';
-          continue;
-        case '\r':
-          result[p++]='\\';
-          result[p++]='r';
-          continue;
-        case '\b':
-          result[p++]='\\';
-          result[p++]='b';
-          continue;
-        case '\v':
-          result[p++]='\\';
-          result[p++]='v';
-          continue;
-        case '\a':
-          result[p++]='\\';
-          result[p++]='a';
-          continue;
-        case '\f':
-          result[p++]='\\';
-          result[p++]='f';
-          continue;
-        case '\t':
-          result[p++]='\\';
-          result[p++]='t';
-          continue;
-        case '\\':
-          result[p++]='\\';
-          result[p++]='\\';
-          continue;
-        case '"':
-          result[p++]='\\';
-          result[p++]='"';
-          continue;
-        case '\'':
-          result[p++]='\\';
-          result[p++]='\'';
-          continue;
-        default:
-          result[p++]='\\';
-          result[p++]='x';
-          result[p++]=FXString::value2Digit[(c>>4)&15];
-          result[p++]=FXString::value2Digit[c&15];
-          continue;
-        }
-      }
-    result[p++]=c;
-    }
-  FXASSERT(result.length()==p);
-  return result;
+  return false;
   }
 
 
-// Unescape special characters in a string
-FXString unescape(const FXString& s){
-  register FXint p,q,c;
-  FXString result;
-  for(p=q=0; q<s.length(); ){
-    c=s[q++];
-    if(c=='\\' && q<s.length()){
-      c=s[q++];
-      switch(c){
-        case 'x':               // Hex escape
-          if(Ascii::isHexDigit(s[q])){
-            q++;
-            if(Ascii::isHexDigit(s[q])){
-              q++;
-              }
-            }
-          p++;
-          continue;
-        case '0':               // Octal escape
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-          if('0'<=s[q] && s[q]<='7'){
-            q++;
-            if('0'<=s[q] && s[q]<='7'){
-              q++;
-              }
-            }
-          p++;
-          continue;
-        case 'n':
-        case 'r':
-        case 'b':
-        case 'v':
-        case 'a':
-        case 'f':
-        case 't':
-        case '\\':
-        case '"':
-        case '\'':
-        default:
-          p++;
-          continue;
-        }
-      }
-    p++;
+// Escape special characters in a string; optionally surround with quote characters
+FXString& FXString::escape(FXchar lquote,FXchar rquote){
+  register FXint p=0,q=3*length()+2,c;
+  insert(0,'\0',q);
+  if(lquote){
+    str[p++]=lquote;
     }
-  result.length(p);                     // Resize result
-  for(p=q=0; q<s.length(); ){
-    c=s[q++];
-    if(c=='\\' && q<s.length()){
-      c=s[q++];
-      switch(c){
-        case 'x':                       // Hex escape
-          if(Ascii::isHexDigit(s[q])){
-            c=Ascii::digitValue(s[q++]);
-            if(Ascii::isHexDigit(s[q])){
-              c=(c<<4)+Ascii::digitValue(s[q++]);
-              }
-            }
-          result[p++]=c;
+  while(q<length()){
+    c=str[q++];
+    switch(c){
+      case '\n':
+        str[p++]='\\';
+        str[p++]='n';
+        continue;
+      case '\r':
+        str[p++]='\\';
+        str[p++]='r';
+        continue;
+      case '\b':
+        str[p++]='\\';
+        str[p++]='b';
+        continue;
+      case '\v':
+        str[p++]='\\';
+        str[p++]='v';
+        continue;
+      case '\a':
+        str[p++]='\\';
+        str[p++]='a';
+        continue;
+      case '\f':
+        str[p++]='\\';
+        str[p++]='f';
+        continue;
+      case '\t':
+        str[p++]='\\';
+        str[p++]='t';
+        continue;
+      case '\\':
+        str[p++]='\\';
+        str[p++]='\\';
+        continue;
+      default:
+        if(c<'\x20' || '\x7E'<c){   // Not printable ascii
+          str[p++]='\\';
+          str[p++]='x';
+          str[p++]=FXString::value2Digit[(c>>4)&15];
+          str[p++]=FXString::value2Digit[c&15];
           continue;
-        case '0':                       // Octal escape
+          }
+        if(c==lquote){          // We know c!=0
+          str[p++]='\\';
+          str[p++]=lquote;
+          continue;
+          }
+        if(c==rquote){          // We know c!=0
+          str[p++]='\\';
+          str[p++]=rquote;
+          continue;
+          }
+        str[p++]=c;
+        continue;
+      }
+    }
+  if(rquote){
+    str[p++]=rquote;
+    }
+  length(p);
+  return *this;
+  }
+
+
+// Unescape special characters in a string; optionally strip quote characters
+FXString& FXString::unescape(FXchar lquote,FXchar rquote){
+  register FXint b=0,e=length(),p,q,c;
+  if(lquote){
+    while(b<e && Ascii::isSpace(str[b])) b++;        // Trim start
+    if(b<e && str[b]==lquote) b++;
+    }
+  if(rquote){
+    while(b<e && Ascii::isSpace(str[e-1])) e--;      // Trim end
+    if(b<e && str[e-1]==rquote) e--;
+    }
+  for(p=0,q=b; q<e; ){
+    c=str[q++];
+    if(c=='\\' && q<e){
+      c=str[q++];
+      switch(c){
+        case '0':
         case '1':
         case '2':
         case '3':
@@ -3045,53 +3007,53 @@ FXString unescape(const FXString& s){
         case '6':
         case '7':
           c=c-'0';
-          if('0'<=s[q] && s[q]<='7'){
-            c=(c<<3)+s[q++]-'0';
-            if('0'<=s[q] && s[q]<='7'){
-              c=(c<<3)+s[q++]-'0';
+          if('0'<=str[q] && str[q]<='7'){
+            c=(c<<3)+str[q++]-'0';
+            if('0'<=str[q] && str[q]<='7'){
+              c=(c<<3)+str[q++]-'0';
               }
             }
-          result[p++]=c;
+          str[p++]=c;
           continue;
         case 'n':
-          result[p++]='\n';
+          str[p++]='\n';
           continue;
         case 'r':
-          result[p++]='\r';
+          str[p++]='\r';
           continue;
         case 'b':
-          result[p++]='\b';
+          str[p++]='\b';
           continue;
         case 'v':
-          result[p++]='\v';
+          str[p++]='\v';
           continue;
         case 'a':
-          result[p++]='\a';
+          str[p++]='\a';
           continue;
         case 'f':
-          result[p++]='\f';
+          str[p++]='\f';
           continue;
         case 't':
-          result[p++]='\t';
+          str[p++]='\t';
           continue;
         case '\\':
-          result[p++]='\\';
+          str[p++]='\\';
           continue;
-        case '"':
-          result[p++]='"';
-          continue;
-        case '\'':
-          result[p++]='\'';
-          continue;
-        default:
-          result[p++]=c;
+        case 'x':
+          if(Ascii::isHexDigit(str[q])){
+            c=Ascii::digitValue(str[q++]);
+            if(Ascii::isHexDigit(str[q])){
+              c=(c<<4)+Ascii::digitValue(str[q++]);
+              }
+            }
+          str[p++]=c;
           continue;
         }
       }
-    result[p++]=c;
+    str[p++]=c;
     }
-  FXASSERT(result.length()==p);
-  return result;
+  length(p);
+  return *this;
   }
 
 /*******************************************************************************/
@@ -3099,7 +3061,7 @@ FXString unescape(const FXString& s){
 // Convert to dos
 FXString& unixToDos(FXString& str){
   register FXint f=0,t=0;
-  while(f<str.length()){
+  while(f<str.length() && str[f]){
     if(str[f++]=='\n') t++; t++;
     }
   str.length(t);
@@ -3113,7 +3075,7 @@ FXString& unixToDos(FXString& str){
 // Convert from dos
 FXString& dosToUnix(FXString& str){
   register FXint f=0,t=0,c;
-  while(f<str.length()){
+  while(f<str.length() && str[f]){
     if((c=str[f++])!='\r') str[t++]=c;
     }
   str.length(t);
@@ -3341,5 +3303,4 @@ FXString compose(const FXString& s,FXuint kind){
 
 
 }
-
 

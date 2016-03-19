@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3d.h,v 1.13 2007/02/07 20:21:56 fox Exp $                           *
+* $Id: FXMat3d.h,v 1.17 2007/07/09 16:02:46 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT3D_H
 #define FXMAT3D_H
@@ -105,14 +104,27 @@ public:
   FXVec3d operator*(const FXVec3d& v) const;
   FXVec2d operator*(const FXVec2d& v) const;
 
+  /// Equality tests
+  FXbool operator==(const FXMat3d& a) const;
+  FXbool operator!=(const FXMat3d& a) const;
+
+  friend inline FXbool operator==(const FXMat3d& a,FXdouble n);
+  friend inline FXbool operator==(FXdouble n,const FXMat3d& a);
+  
+  friend inline FXbool operator!=(const FXMat3d& a,FXdouble n);
+  friend inline FXbool operator!=(FXdouble n,const FXMat3d& a);
+
   /// Matrix and scalar
   friend FXAPI FXMat3d operator*(FXdouble x,const FXMat3d& a);
   friend FXAPI FXMat3d operator*(const FXMat3d& a,FXdouble x);
   friend FXAPI FXMat3d operator/(const FXMat3d& a,FXdouble x);
   friend FXAPI FXMat3d operator/(FXdouble x,const FXMat3d& a);
 
-  /// Set identity matrix
-  FXMat3d& eye();
+  /// Set to identity matrix
+  FXMat3d& identity();
+
+  /// Return true if identity matrix
+  FXbool isIdentity() const;
 
   /// Multiply by rotation of phi
   FXMat3d& rot(FXdouble c,FXdouble s);
@@ -143,8 +155,15 @@ public:
 
 extern FXAPI FXMat3d operator*(FXdouble x,const FXMat3d& a);
 extern FXAPI FXMat3d operator*(const FXMat3d& a,FXdouble x);
+
 extern FXAPI FXMat3d operator/(const FXMat3d& a,FXdouble x);
 extern FXAPI FXMat3d operator/(FXdouble x,const FXMat3d& a);
+
+extern FXAPI FXbool operator==(const FXMat3d& a,FXdouble n);
+extern FXAPI FXbool operator==(FXdouble n,const FXMat3d& a);
+
+extern FXAPI FXbool operator!=(const FXMat3d& a,FXdouble n);
+extern FXAPI FXbool operator!=(FXdouble n,const FXMat3d& a);
 
 extern FXAPI FXStream& operator<<(FXStream& store,const FXMat3d& m);
 extern FXAPI FXStream& operator>>(FXStream& store,FXMat3d& m);

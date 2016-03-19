@@ -5,9 +5,9 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This program is free software; you can redistribute it and/or modify          *
+* This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
-* the Free Software Foundation; either version 2 of the License, or             *
+* the Free Software Foundation, either version 3 of the License, or             *
 * (at your option) any later version.                                           *
 *                                                                               *
 * This program is distributed in the hope that it will be useful,               *
@@ -16,10 +16,9 @@
 * GNU General Public License for more details.                                  *
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
-* along with this program; if not, write to the Free Software                   *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Preferences.cpp,v 1.19 2007/02/07 20:21:51 fox Exp $                     *
+* $Id: Preferences.cpp,v 1.21 2007/07/06 04:27:07 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "icons.h"
@@ -130,7 +129,7 @@ Preferences::Preferences(Calculator *own):FXDialogBox(own,"Calculator Preference
   new FXHorizontalSeparator(pane3,SEPARATOR_LINE|LAYOUT_FILL_X);
   FXHorizontalFrame *sub3=new FXHorizontalFrame(pane3,LAYOUT_FILL_Y|LAYOUT_FILL_X);
   new FXLabel(sub3,FXString::null,calculator,LAYOUT_CENTER_Y,0,0,0,0,20,20,20,20);
-  new FXLabel(sub3,FXStringFormat(tr("The FOX Calculator\n\nA Programmer's Desktop Calculator version 2.1.0.\nFOX library version %d.%d.%d.\nHome Page: http://www.fox-toolkit.org\nFTP Site: ftp://ftp.fox-toolkit.org\n\nCopyright (C) 2001,2005 Jeroen van der Zijp."),FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  new FXLabel(sub3,FXStringFormat(tr("The FOX Calculator\n\nA Programmer's Desktop Calculator version 2.2.0.\nFOX library version %d.%d.%d.\nHome Page: http://www.fox-toolkit.org\nFTP Site: ftp://ftp.fox-toolkit.org\n\nCopyright (C) 2001,2007 Jeroen van der Zijp."),FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
 
   // Button 3
   new FXButton(buttons,tr("About\tAbout FOX Calculator\tAbout the FOX Calculator."),info,switcher,FXSwitcher::ID_OPEN_THIRD,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: codecs.cpp,v 1.24 2007/02/07 20:22:23 fox Exp $                          *
+* $Id: codecs.cpp,v 1.25 2007/06/22 18:50:59 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -124,7 +124,6 @@ int main(int,char**){
   printf("inc(%d)=",i); printf("%d\n",value.inc(i));
   printf("inc(%d)=",i); printf("%d\n",value.inc(i));
   exit(0);
-*/
 
   while(fgets(input,sizeof(input),stdin)){
     input[strlen(input)-1]=0;
@@ -138,6 +137,7 @@ int main(int,char**){
     value=toAscii(value);
     printf("out: \"%s\"\n",value.text());
     }
+*/
 
   exit(0);
 

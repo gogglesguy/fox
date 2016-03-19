@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDate.cpp,v 1.16 2007/05/17 19:27:56 fox Exp $                          *
+* $Id: FXDate.cpp,v 1.31 2007/07/09 16:26:46 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -33,6 +32,8 @@
   Notes:
   - Henry F. Fliegel and Thomas C. Van Flandern, "A Machine Algorithm for
     Processing Calendar Dates". CACM, Vol. 11, No. 10, October 1968, pp 657.
+  - Major clean up and simplification was done!
+  - Added week number calculations!
 */
 
 
@@ -41,6 +42,11 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Many nanoseconds in a second
+const FXTime seconds=1000000000L;
+
 
 // Short month names
 const FXchar FXDate::shortMonthName[12][4]={
@@ -72,199 +78,241 @@ static const FXuchar monthDays[13]={
   };
 
 
-// Convert gregorian date to julian day number
-void FXDate::greg2jul(FXuint& jd,FXint y,FXint m,FXint d){
-  if(m<1 || m>12 || d<1 || d>31){ fxerror("FXDate:: bad argument\n"); }
-  jd=(1461*(y+4800+(m-14)/12))/4+(367*(m-2-12*((m-14)/12)))/12-(3*((y+4900+(m-14)/12)/100))/4+d-32075;
+/*******************************************************************************/
+
+// Initialize with year and day of year
+FXDate::FXDate(FXint yr,FXint dy){
+  setDate(yr,dy);
   }
 
 
-#if 0
-void FXDate::greg2jul(FXuint& jd,FXint y,FXint m,FXint d){
-  if(m<1 || m>12 || d<1 || d>31){ fxerror("FXDate:: bad argument\n"); }
-  FXuint c,ya;
-  if(y<=99) y+=1900;
-  if(m>2){
-    m-=3;
-    }
-  else{
-    m+=9;
-    y--;
-    }
-  c=y;
-  c/=100;
-  ya=y-100*c;
-  jb=1721119+d+(146097*c)/4+(1461*ya)/4+(153*m+2)/5;
+// Initialize with year, month, and day of month
+FXDate::FXDate(FXint yr,FXint mo,FXint dy){
+  setDate(yr,mo,dy);
   }
 
-void FXDate::jul2greg(FXuint jd,FXint& y,FXint& m,FXint& d){
-  FXuint j=jd-1721119;
-  FXuint x;
-  y=(j*4-1)/146097;
-  j=j*4-146097*y-1;
-  x=j/4;
-  j=(x*4+3)/1461;
-  y=100*y+j;
-  x=(x*4)+3-1461*j;
-  x=(x+4)/4;
-  m=(5*x-3)/153;
-  x=5*x-3-153*m;
-  d=(x+5)/5;
-  if(m<10){
-    m+=3;
-    }
-  else{
-    m-=9;
-    y++;
-    }
+
+// Set date to year and day of year
+void FXDate::setDate(FXint yr,FXint dy){
+  if(dy<1 || dy>366){ fxerror("FXDate::setDate: bad argument.\n"); }
+  julian=(1461*(yr+4799))/4-(3*((yr+4899)/100))/4+dy-31739;
   }
-#endif
 
 
-// Convert julian day number to gregorian date
-void FXDate::jul2greg(FXuint jd,FXint& y,FXint& m,FXint& d){
+// Get year and day of year from date
+void FXDate::getDate(FXint& yr,FXint& dy) const {
   register FXint l,n,i,j;
-  l=jd+68569;
+  l=julian+68569;
   n=(4*l)/146097;
   l=l-(146097*n+3)/4;
   i=(4000*(l+1))/1461001;
   l=l-(1461*i)/4+31;
   j=(80*l)/2447;
-  d=l-(2447*j)/80;
   l=j/11;
-  m=j+2-(12*l);
-  y=100*(n-49)+i+l;
+  yr=100*(n-49)+i+l;
+  dy=julian-(1461*(yr+4799))/4+(3*((yr+4899)/100))/4+31739;
   }
 
 
-// Initialize with year, month, and day
-FXDate::FXDate(FXint y,FXint m,FXint d){
-  greg2jul(julian,y,m,d);
+// Set date to year, month, and day of month
+void FXDate::setDate(FXint yr,FXint mo,FXint dy){
+  if(mo<1 || mo>12 || dy<1 || dy>31){ fxerror("FXDate::setDate: bad argument.\n"); }
+  julian=(1461*(yr+4800+(mo-14)/12))/4+(367*(mo-2-12*((mo-14)/12)))/12-(3*((yr+4900+(mo-14)/12)/100))/4+dy-32075;
   }
 
 
-// Set to year, month, and day
-void FXDate::setDate(FXint y,FXint m,FXint d){
-  greg2jul(julian,y,m,d);
+// Get year, month, and day of month from date
+void FXDate::getDate(FXint& yr,FXint& mo,FXint& dy) const {
+  register FXint l,n,i,j;
+  l=julian+68569;
+  n=(4*l)/146097;
+  l=l-(146097*n+3)/4;
+  i=(4000*(l+1))/1461001;
+  l=l-(1461*i)/4+31;
+  j=(80*l)/2447;
+  dy=l-(2447*j)/80;
+  l=j/11;
+  mo=j+2-(12*l);
+  yr=100*(n-49)+i+l;
   }
 
 
-// Get year, month, and day
-void FXDate::getDate(FXint& y,FXint& m,FXint& d) const {
-  jul2greg(julian,y,m,d);
+// Set date from nanoseconds since 1/1/1970
+void FXDate::setTime(FXTime ns){
+  julian=2440588L+ns/(86400L*seconds);
+  }
+
+
+// Get nanoseconds since 1/1/1970 from date
+FXTime FXDate::getTime() const {
+  return (julian-2440588L)*(86400L*seconds);
   }
 
 
 // is value a leap year?
-FXbool FXDate::leapYear(FXint y){
-  return ((y%4==0) && (y%100!=0)) || (y%400==0);
+FXbool FXDate::leapYear(FXint yr){
+  return ((yr%4==0) && (yr%100!=0)) || (yr%400==0);
+  }
+
+
+// Return number of days in a given year
+FXint FXDate::daysInYear(FXint yr){
+  return leapYear(yr) ? 366 : 365;
+  }
+
+
+// Return number of days in the month in given year, month
+FXint FXDate::daysInMonth(FXint yr,FXint mo){
+  return (mo==2 && leapYear(yr)) ? 29 : monthDays[mo];
   }
 
 
 // Return day of the month
 FXint FXDate::day() const {
-  FXint d,m,y;
-  jul2greg(julian,y,m,d);
-  return d;
+  FXint yr,mo,dy;
+  getDate(yr,mo,dy);
+  return dy;
   }
 
 
 // Return month
 FXint FXDate::month() const {
-  FXint d,m,y;
-  jul2greg(julian,y,m,d);
-  return m;
+  FXint yr,mo,dy;
+  getDate(yr,mo,dy);
+  return mo;
   }
 
 
 // Return year
 FXint FXDate::year() const {
-  FXint d,m,y;
-  jul2greg(julian,y,m,d);
-  return y;
+  FXint yr,mo,dy;
+  getDate(yr,mo,dy);
+  return yr;
   }
 
 
-// Return day of the week, starting with sunday
+// Return day of the week
 FXint FXDate::dayOfWeek() const {
 //  return (((julian+1)%7)+6)%7;        // Monday is day 0 of week
   return (julian+1)%7;                  // Sunday is day 0 of week
   }
 
 
-// number of days in the months
+// Return true if leap year
+FXbool FXDate::leapYear() const {
+  return leapYear(year());
+  }
+
+
+// Return number of days in this year
+FXint FXDate::daysInYear() const {
+  return daysInYear(year());
+  }
+
+
+// Return days in this month
 FXint FXDate::daysInMonth() const {
-  FXint y,m,d;
-  jul2greg(julian,y,m,d);
-  if(m==2 && leapYear(y)) return 29;
-  return monthDays[m];
+  FXint yr,mo,dy;
+  getDate(yr,mo,dy);
+  return daysInMonth(yr,mo);
   }
 
 
 // Return day of year
 FXint FXDate::dayOfYear() const {
-  FXint y,m,d; FXuint jd;
-  jul2greg(julian,y,m,d);
-  greg2jul(jd,y,1,1);
-  return julian-jd+1;
+  FXDate s(year(),1);
+  return julian-s.julian+1;
   }
 
 
-// Return true if leap year
-FXbool FXDate::leapYear() const {
-  FXint d,m,y;
-  jul2greg(julian,y,m,d);
-  return leapYear(y);
+// Return ISO8601 week number of this date
+FXint FXDate::weekOfYear() const {
+  FXint d4,L,d1;
+  d4=(((julian+31741-julian%7)%146097)%36524)%1461;
+  L=d4/1460;
+  d1=(d4-L)%365+L;
+  return 1+d1/7;
+  }
+
+
+// Add d days to this date
+FXDate& FXDate::addDays(FXint d){
+  julian+=d;
+  return *this;
+  }
+
+
+// Add m months to this date; day of month is adjusted for leap-years
+FXDate& FXDate::addMonths(FXint m){
+  FXint yr,mo,dy,mx;
+  getDate(yr,mo,dy);
+  if(0<=m){
+    yr=yr+(mo-1+m)/12;
+    mo=1+(mo-1+m)%12;
+    }
+  else{
+    yr=yr+(mo-12+m)/12;
+    mo=1+(mo+2147483627+m)%12;
+    }
+  mx=daysInMonth(yr,mo);
+  if(dy>mx) dy=mx;
+  setDate(yr,mo,dy);
+  return *this;
+  }
+
+
+// Add y years to this date; day of month is adjusted for leap-years
+FXDate& FXDate::addYears(FXint y){
+  FXint yr,mo,dy;
+  getDate(yr,mo,dy);
+  yr+=y;
+  if(dy>28 && mo==2 && !leapYear(yr)) dy=28;
+  setDate(yr,mo,dy);
+  return *this;
   }
 
 
 // Return current local date
 FXDate FXDate::localDate(){
-  FXDate date;
 #ifdef WIN32
   SYSTEMTIME t;
   GetLocalTime(&t);
-  greg2jul(date.julian,t.wYear,t.wMonth,t.wDay);
-#else
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+  return FXDate(t.wYear,t.wMonth,t.wDay);
+#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct tm result,*t;
   time_t ltime;
   time(&ltime);
   t=localtime_r(&ltime,&result);
+  return FXDate(t->tm_year+1900,t->tm_mon+1,t->tm_mday);
 #else
   struct tm *t;
   time_t ltime;
   time(&ltime);
   t=localtime(&ltime);
+  return FXDate(t->tm_year+1900,t->tm_mon+1,t->tm_mday);
 #endif
-  greg2jul(date.julian,t->tm_year+1900,t->tm_mon+1,t->tm_mday);
-#endif
-  return date;
   }
 
 
 // Return current universal (UTC) date
 FXDate FXDate::universalDate(){
-  FXDate date;
-#if WIN32
+#ifdef WIN32
   SYSTEMTIME t;
   GetSystemTime(&t);
-  greg2jul(date.julian,t.wYear,t.wMonth,t.wDay);
-#else
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+  return FXDate(t.wYear,t.wMonth,t.wDay);
+#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct tm result,*t;
   time_t ltime;
   time(&ltime);
   t=gmtime_r(&ltime,&result);
+  return FXDate(t->tm_year+1900,t->tm_mon+1,t->tm_mday);
 #else
   struct tm *t;
   time_t ltime;
   time(&ltime);
   t=gmtime(&ltime);
+  return FXDate(t->tm_year+1900,t->tm_mon+1,t->tm_mday);
 #endif
-  greg2jul(date.julian,t->tm_year+1900,t->tm_mon+1,t->tm_mday);
-#endif
-  return date;
   }
 
 

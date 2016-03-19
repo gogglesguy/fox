@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRootWindow.cpp,v 1.37 2007/05/17 19:27:56 fox Exp $                    *
+* $Id: FXRootWindow.cpp,v 1.41 2007/07/12 12:07:33 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -84,71 +83,51 @@ int FXRootWindow::ReleaseDC(FXID hdc) const {
 void FXRootWindow::create(){
   register FXWindow *child;
   if(!xid){
+    if(getApp()->isInitialized()){
+      FXTRACE((100,"%s::create %p\n",getClassName(),this));
 
-    // Got to have a visual
-    if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
+      // Got to have a visual
+      if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
 
-    // Initialize visual
-    visual->create();
-  
-#if WIN32
+      // Initialize visual
+      visual->create();
 
-    // Get HWND of desktop window
-    xid=GetDesktopWindow();
+#ifdef WIN32
 
-    // Obtain size
-    HDC hdc=::GetDC((HWND)xid);
-    width=GetDeviceCaps(hdc,HORZRES);
-    height=GetDeviceCaps(hdc,VERTRES);
-    ::ReleaseDC((HWND)xid,hdc);
+      // Get HWND of desktop window
+      xid=GetDesktopWindow();
 
-    // The code below returns the size of the entire virtual
-    // screen area instead of just that of the primary display;
-    // thanks to "Steve Granja" <Steven.Granja@abaqus.com>.
-    // [Apparently does not work on Win95 and WinNT...]
-    //xpos=GetSystemMetrics(SM_XVIRTUALSCREEN);
-    //ypos=GetSystemMetrics(SM_YVIRTUALSCREEN);
-    //width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    //height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
+      // Obtain size
+      HDC hdc=::GetDC((HWND)xid);
+      width=GetDeviceCaps(hdc,HORZRES);
+      height=GetDeviceCaps(hdc,VERTRES);
+      ::ReleaseDC((HWND)xid,hdc);
+
+      // Store for xid to C++ object mapping
+      getApp()->hash.insert((void*)xid,this);
 
 #else
 
-    xid=RootWindow(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-    width=DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-    height=DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+      xid=RootWindow(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+      width=DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+      height=DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+
+      // Store for xid to C++ object mapping
+      getApp()->hash.insert((void*)xid,this);
 
 #endif
+      flags&=~FLAG_OWNED;
 
-    // Normally create children
-    for(child=getFirst(); child; child=child->getNext()) child->create();
-    }
-  }
-
-
-// Detach window
-void FXRootWindow::detach(){
-  register FXWindow *child;
-  visual->detach();
-  if(xid){
-    for(child=getFirst(); child; child=child->getNext()) child->detach();
-    xid=0;
-    }
-  }
-
-
-// When deleted, delete subwindows ONLY
-void FXRootWindow::destroy(){
-  register FXWindow *child;
-  if(xid){
-    for(child=getFirst(); child; child=child->getNext()) child->destroy();
-    xid=0;
+      // Normally create children
+      for(child=getFirst(); child; child=child->getNext()) child->create();
+      }
     }
   }
 
 
 // Get default width
 FXint FXRootWindow::getDefaultWidth(){
-#if WIN32
+#ifdef WIN32
   HDC hdc=::GetDC(GetDesktopWindow());
   FXint w=GetDeviceCaps(hdc,HORZRES);
   ::ReleaseDC(GetDesktopWindow(),hdc);
@@ -161,7 +140,7 @@ FXint FXRootWindow::getDefaultWidth(){
 
 // Get default height
 FXint FXRootWindow::getDefaultHeight(){
-#if WIN32
+#ifdef WIN32
   HDC hdc=::GetDC(GetDesktopWindow());
   FXint h=GetDeviceCaps(hdc,VERTRES);
   ::ReleaseDC(GetDesktopWindow(),hdc);

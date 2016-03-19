@@ -83,21 +83,21 @@ FXIMPLEMENT(TestWindow,FXMainWindow,TestWindowMap,ARRAYNUMBER(TestWindowMap));
 TestWindow::TestWindow(FXApp *a):FXMainWindow(a,"Calendar Test Program",NULL,NULL,DECOR_ALL,0,0,0,0){
 
   // Switcher
-  FXTabBook * tabbook=new FXTabBook(this,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  FXTabBook *tabbook=new FXTabBook(this,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
   // First item is a list
   new FXTabItem(tabbook,"One Calendar",NULL);
 
-  FXHorizontalFrame * hframe = new FXHorizontalFrame(tabbook,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_RAISED|FRAME_THICK,0,0,0,0,0,0,0,0,0);
-  FXVerticalFrame * vframe1 = new FXVerticalFrame(hframe,LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH);
-  FXVerticalFrame * vframe2 = new FXVerticalFrame(hframe,LAYOUT_FILL_Y|LAYOUT_FILL_X);
-  FXVerticalFrame * vframe3 = new FXVerticalFrame(hframe,LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH);
+  FXHorizontalFrame *hframe=new FXHorizontalFrame(tabbook,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_RAISED|FRAME_THICK,0,0,0,0,0,0,0,0,0);
+  FXVerticalFrame *vframe1=new FXVerticalFrame(hframe,LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH);
+  FXVerticalFrame *vframe2=new FXVerticalFrame(hframe,LAYOUT_FILL_Y|LAYOUT_FILL_X);
+  FXVerticalFrame *vframe3=new FXVerticalFrame(hframe,LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH);
 
-  FXGroupBox * box = new FXGroupBox(vframe2,"Calendar View",FRAME_RIDGE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-  view = new FXCalendar(box,/*&dt_date,FXDataTarget::ID_VALUE,*/NULL,0,/*LAYOUT_FILL_X|LAYOUT_FILL_Y|*/FRAME_SUNKEN|FRAME_THICK);
+  FXGroupBox *box=new FXGroupBox(vframe2,"Calendar View",FRAME_RIDGE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  view=new FXCalendar(box,/*&dt_date,FXDataTarget::ID_VALUE,*/NULL,0,/*LAYOUT_FILL_X|LAYOUT_FILL_Y|*/FRAME_SUNKEN|FRAME_THICK);
   //view->disable();
 
-  hframe = new FXHorizontalFrame(box);
+  hframe=new FXHorizontalFrame(box);
   new FXLabel(hframe,"Julian Day Number");
   new FXTextField(hframe,9,&dt_date,FXDataTarget::ID_VALUE,TEXTFIELD_NORMAL|TEXTFIELD_READONLY);
 
@@ -108,7 +108,7 @@ TestWindow::TestWindow(FXApp *a):FXMainWindow(a,"Calendar Test Program",NULL,NUL
   framestyle = 6;
   dt_framestyle.connect(framestyle,this,ID_FRAME_STYLE);
 
-  box = new FXGroupBox(vframe1,"Frame Style",FRAME_RIDGE);
+  box=new FXGroupBox(vframe1,"Frame Style",FRAME_RIDGE);
   new FXRadioButton(box,"None",&dt_framestyle,FXDataTarget::ID_OPTION+0);
   new FXRadioButton(box,"Line",&dt_framestyle,FXDataTarget::ID_OPTION+1);
   new FXRadioButton(box,"Ridge",&dt_framestyle,FXDataTarget::ID_OPTION+2);
@@ -254,7 +254,7 @@ TestWindow::TestWindow(FXApp *a):FXMainWindow(a,"Calendar Test Program",NULL,NUL
   cal[10] = new FXCalendarView(mat,this,ID_CALENDAR,CALENDAR_STATIC|CALENDAR_HIDEOTHER|CALENDAR_SINGLESELECT);
   cal[11] = new FXCalendarView(mat,this,ID_CALENDAR,CALENDAR_STATIC|CALENDAR_HIDEOTHER|CALENDAR_SINGLESELECT);
 
-  for (int i=0;i<12;i++){
+  for(FXint i=0; i<12; i++){
     cal[i]->setCurrentMonth(i+1);
     cal[i]->killSelection();
     }
@@ -269,9 +269,8 @@ void TestWindow::create(){
 
 
 long TestWindow::onCmdSelected(FXObject*sender,FXSelector,void*){
-  for (int i=0;i<12;i++){
-    if (sender!=cal[i])
-      cal[i]->killSelection();
+  for(int i=0;i<12;i++){
+    if(sender!=cal[i]) cal[i]->killSelection();
     }
   return 1;
   }
@@ -295,8 +294,8 @@ long TestWindow::onCmdFrameStyle(FXObject*,FXSelector,void*){
 
 
 long TestWindow::onCmdSelectMode(FXObject*,FXSelector,void*){
-  FXuint style = view->getCalendarStyle();
-  if (mode)
+  FXuint style=view->getCalendarStyle();
+  if(mode)
     view->setCalendarStyle(style&=~CALENDAR_SINGLESELECT);
   else
     view->setCalendarStyle(style|=CALENDAR_SINGLESELECT);
@@ -305,8 +304,8 @@ long TestWindow::onCmdSelectMode(FXObject*,FXSelector,void*){
 
 
 long TestWindow::onCmdStaticMode(FXObject*,FXSelector,void*){
-  FXuint style = view->getCalendarStyle();
-  if (bstatic)
+  FXuint style=view->getCalendarStyle();
+  if(bstatic)
     view->setCalendarStyle(style|CALENDAR_STATIC);
   else
     view->setCalendarStyle(style&=~CALENDAR_STATIC);
@@ -315,8 +314,8 @@ long TestWindow::onCmdStaticMode(FXObject*,FXSelector,void*){
 
 
 long TestWindow::onCmdSiblingMode(FXObject*,FXSelector,void*){
-  FXuint style = view->getCalendarStyle();
-  if (bsibling)
+  FXuint style=view->getCalendarStyle();
+  if(bsibling)
     view->setCalendarStyle(style|CALENDAR_HIDEOTHER);
   else
     view->setCalendarStyle(style&=~CALENDAR_HIDEOTHER);
@@ -325,8 +324,8 @@ long TestWindow::onCmdSiblingMode(FXObject*,FXSelector,void*){
 
 
 long TestWindow::onCmdWeekMode(FXObject*,FXSelector,void*){
-  FXuint style = view->getCalendarStyle();
-  if (bweek)
+  FXuint style=view->getCalendarStyle();
+  if(bweek)
     view->setCalendarStyle(style|CALENDAR_WEEKNUMBERS);
   else
     view->setCalendarStyle(style&=~CALENDAR_WEEKNUMBERS);
@@ -335,14 +334,14 @@ long TestWindow::onCmdWeekMode(FXObject*,FXSelector,void*){
 
 
 long TestWindow::onCmdDayOfWeek(FXObject*,FXSelector,void*ptr){
-  FXint value = (FXint)(FXival)(ptr);
+  FXint value=(FXint)(FXival)(ptr);
   view->setFirstDay(value);
   return 1;
   }
 
 
 long TestWindow::onChgColor(FXObject*,FXSelector sel,void*ptr){
-  FXColor value = (FXuint)(FXuval)(ptr);
+  FXColor value=(FXuint)(FXuval)(ptr);
   switch(FXSELID(sel)){
     case ID_COLOR_1: view->setBackColor(value); break;
     case ID_COLOR_2: view->setTitleBackColor(value); break;
@@ -361,7 +360,6 @@ TestWindow::~TestWindow(){
   }
 
 
-
 // Start the program
 int main(int argc,char *argv[]){
 
@@ -376,7 +374,7 @@ int main(int argc,char *argv[]){
 
   // Realize the tree
   application.create();
-
+  
   // Run
   return application.run();
   }

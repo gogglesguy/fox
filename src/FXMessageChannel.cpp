@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2006,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageChannel.cpp,v 1.6 2007/04/25 16:13:21 fox Exp $                 *
+* $Id: FXMessageChannel.cpp,v 1.11 2007/07/09 16:31:34 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -41,6 +40,12 @@
   Notes:
   - Inter-thread messaging is handy to have.
   - Redo this in terms of FXPipe when that becomes possible.
+  - Because of unbelievably retarded design of Windows, we need to
+    use an Event-object to actually signal the GUI thread when we've
+    written something to the pipe.
+  - Possible problem: should probably NOT reset Event unless pipe is
+    empty.  But are we actually falling out of MsgWaitForMultipleObject if
+    Event is already signalled when we enter MsgWaitForMultipleObject?
 */
 
 
@@ -98,77 +103,69 @@ FXIMPLEMENT(FXMessageChannel,FXObject,FXMessageChannelMap,ARRAYNUMBER(FXMessageC
 
 // Initialize to empty
 FXMessageChannel::FXMessageChannel():app((FXApp*)-1L){
-  fd[0]=fd[1]=BadHandle;
+  h[0]=h[1]=h[2]=BadHandle;
   }
 
 
 // Add handler to application
 FXMessageChannel::FXMessageChannel(FXApp* a):app(a){
 #ifdef WIN32
-  SECURITY_ATTRIBUTES sa;
-  sa.nLength=sizeof(sa);
-  sa.lpSecurityDescriptor=NULL;         // Default ACL
-  sa.bInheritHandle=false;              // Don't inherit handles
-  if(::CreatePipe(&fd[0],&fd[1],&sa,0)==0){ throw FXResourceException("unable to create pipe."); }
-  app->addInput(this,ID_IO_READ,fd[0],INPUT_READ,NULL);
+  if((h[2]=::CreateEvent(NULL,false,false,NULL))==NULL){ throw FXResourceException("unable to create event."); }
+  if(::CreatePipe(&h[0],&h[1],NULL,0)==0){ throw FXResourceException("unable to create pipe."); }
+  app->addInput(this,ID_IO_READ,h[2],INPUT_READ,NULL);
 #else
-  if(::pipe(fd)!=0){ throw FXResourceException("unable to create pipe."); }
-  ::fcntl(fd[0],F_SETFD,FD_CLOEXEC);
-  ::fcntl(fd[1],F_SETFD,FD_CLOEXEC);
-  app->addInput(this,ID_IO_READ,fd[0],INPUT_READ,NULL);
+  if(::pipe(h)!=0){ throw FXResourceException("unable to create pipe."); }
+  ::fcntl(h[0],F_SETFD,FD_CLOEXEC);
+  ::fcntl(h[1],F_SETFD,FD_CLOEXEC);
+  app->addInput(this,ID_IO_READ,h[0],INPUT_READ,NULL);
 #endif
   }
 
-//  event=CreateEvent(NULL,TRUE,FALSE,NULL);
-//  if(event==NULL){ throw FXResourceException("unable to create event."); }
-//  app->addInput(event,INPUT_READ,this,ID_IO_READ);
-
-//  ResetEvent(event);
 
 // Fire signal message to target
 long FXMessageChannel::onMessage(FXObject*,FXSelector,void*){
-  FXDataMessage m;
+  FXDataMessage pkg;
 #ifdef WIN32
   DWORD nread=-1;
-  if(::ReadFile(fd[0],&m,sizeof(FXMessage),&nread,NULL) && nread==sizeof(FXMessage)){
-    if(0<m.size && (::ReadFile(fd[0],&m.data,m.size,&nread,NULL) && nread==m.size)){
-      return m.target && m.target->tryHandle(this,m.message,m.data);
+  if(::ReadFile(h[0],&pkg,sizeof(FXMessage),&nread,NULL) && nread==sizeof(FXMessage)){
+    if(0<pkg.size && (::ReadFile(h[0],&pkg.data,pkg.size,&nread,NULL) && nread==pkg.size)){
+      return pkg.target && pkg.target->tryHandle(this,pkg.message,pkg.data);
       }
-    return m.target && m.target->tryHandle(this,m.message,NULL);
+    return pkg.target && pkg.target->tryHandle(this,pkg.message,NULL);
     }
 #else
-  if(::read(fd[0],&m,sizeof(FXMessage))==sizeof(FXMessage)){
-    if(0<m.size && (::read(fd[0],m.data,m.size)==m.size)){
-      return m.target && m.target->tryHandle(this,m.message,m.data);
+  if(::read(h[0],&pkg,sizeof(FXMessage))==sizeof(FXMessage)){
+    if(0<pkg.size && (::read(h[0],pkg.data,pkg.size)==pkg.size)){
+      return pkg.target && pkg.target->tryHandle(this,pkg.message,pkg.data);
       }
-    return m.target && m.target->tryHandle(this,m.message,NULL);
+    return pkg.target && pkg.target->tryHandle(this,pkg.message,NULL);
     }
 #endif
   return 0;
   }
 
-//  SetEvent(event);
 
 // Send a message to a target
 FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,FXint size){
-  FXMutexLock locker(mx);
-  FXMessage m;
-  m.target=tgt;
-  m.message=msg;
+  FXMutexLock locker(m);
+  FXMessage pkg;
+  pkg.target=tgt;
+  pkg.message=msg;
 #if !(defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64) || defined(_WIN64))
-  m.pad=0;
+  pkg.pad=0;
 #endif
-  m.size=size;
+  pkg.size=size;
 #ifdef WIN32
   DWORD nwritten=-1;
-  if(::WriteFile(fd[1],&m,sizeof(FXMessage),&nwritten,NULL) && nwritten==sizeof(FXMessage)){
-    if(m.size<=0 || (::WriteFile(fd[1],data,m.size,&nwritten,NULL) && nwritten==m.size)){
+  if(::WriteFile(h[1],&pkg,sizeof(FXMessage),&nwritten,NULL) && nwritten==sizeof(FXMessage)){
+    if(pkg.size<=0 || (::WriteFile(h[1],data,pkg.size,&nwritten,NULL) && nwritten==pkg.size)){
+      ::SetEvent(h[2]);
       return true;
       }
     }
 #else
-  if(::write(fd[1],&m,sizeof(FXMessage))==sizeof(FXMessage)){
-    if(m.size<=0 || (::write(fd[1],data,m.size)==m.size)){
+  if(::write(h[1],&pkg,sizeof(FXMessage))==sizeof(FXMessage)){
+    if(pkg.size<=0 || (::write(h[1],data,pkg.size)==pkg.size)){
       return true;
       }
     }
@@ -180,13 +177,14 @@ FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,F
 // Remove handler from application
 FXMessageChannel::~FXMessageChannel(){
 #ifdef WIN32
-  app->removeInput(fd[0],INPUT_READ);
-  ::CloseHandle(fd[0]);
-  ::CloseHandle(fd[0]);
+  app->removeInput(h[2],INPUT_READ);
+  ::CloseHandle(h[0]);
+  ::CloseHandle(h[1]);
+  ::CloseHandle(h[2]);
 #else
-  app->removeInput(fd[0],INPUT_READ);
-  ::close(fd[0]);
-  ::close(fd[1]);
+  app->removeInput(h[0],INPUT_READ);
+  ::close(h[0]);
+  ::close(h[1]);
 #endif
   app=(FXApp*)-1L;
   }

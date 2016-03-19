@@ -5,7 +5,7 @@
 ##############################################################################
 # Contributed by: Andre Fornacon <afo@zlug.org>                              #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.63 2007/05/30 17:43:21 fox Exp $		     #
+# $Id: Makefile.dmc,v 1.64 2007/07/02 12:30:36 fox Exp $		     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or 	     #
 # modify it under the terms of the GNU Library General Public		     #
@@ -624,8 +624,7 @@ fxwuquantize.obj \
 fxxbmio.obj \
 fxxpmio.obj \
 icons.obj \
-strtoll.obj \
-vsscanf.obj
+strtoll.obj
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $<

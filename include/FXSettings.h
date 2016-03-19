@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSettings.h,v 1.41 2007/02/07 20:21:58 fox Exp $                        *
+* $Id: FXSettings.h,v 1.45 2007/07/09 16:02:49 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXSETTINGS_H
 #define FXSETTINGS_H
@@ -48,8 +47,6 @@ protected:
 protected:
   virtual void *createData(void*);
   virtual void deleteData(void*);
-  FXchar* dequote(FXchar* text) const;
-  FXchar* enquote(FXchar* result,const FXchar* text);
   FXStringDict* insert(const FXchar* ky){ return (FXStringDict*)FXDict::insert(ky,NULL); }
   FXStringDict* replace(const FXchar* ky,FXStringDict* section){ return (FXStringDict*)FXDict::replace(ky,section,true); }
   FXStringDict* remove(const FXchar* ky){ return (FXStringDict*)FXDict::remove(ky); }
@@ -64,6 +61,12 @@ public:
   /// Assignment operator
   FXSettings &operator=(const FXSettings& orig);
 
+  /// Is it modified
+  FXbool isModified() const { return modified; }
+
+  /// Mark as changed
+  void setModified(FXbool mdfy=true){ modified=mdfy; }
+
   /// Parse a file containing a settings database.
   FXbool parseFile(const FXString& filename,FXbool mark);
 
@@ -77,31 +80,31 @@ public:
   FXStringDict* data(FXint pos) const { return (FXStringDict*)FXDict::data(pos); }
 
   /// Read a formatted registry entry, using scanf-style format
-  FXint readFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...) FX_SCANF(4,5) ;
+  FXint readFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...) const FX_SCANF(4,5) ;
 
   /// Read a string registry entry; if no value is found, the default value def is returned
-  const FXchar *readStringEntry(const FXchar *section,const FXchar *name,const FXchar *def=NULL);
+  const FXchar *readStringEntry(const FXchar *section,const FXchar *name,const FXchar *def=NULL) const;
 
   /// Read a integer registry entry; if no value is found, the default value def is returned
-  FXint readIntEntry(const FXchar *section,const FXchar *name,FXint def=0);
+  FXint readIntEntry(const FXchar *section,const FXchar *name,FXint def=0) const;
 
   /// Read a unsigned integer registry entry; if no value is found, the default value def is returned
-  FXuint readUIntEntry(const FXchar *section,const FXchar *name,FXuint def=0);
+  FXuint readUIntEntry(const FXchar *section,const FXchar *name,FXuint def=0) const;
 
   /// Read a 64-bit long integer registry entry; if no value is found, the default value def is returned
-  FXlong readLongEntry(const FXchar *section,const FXchar *name,FXlong def=0);
+  FXlong readLongEntry(const FXchar *section,const FXchar *name,FXlong def=0) const;
 
   /// Read a 64-bit unsigned long integer registry entry; if no value is found, the default value def is returned
-  FXulong readULongEntry(const FXchar *section,const FXchar *name,FXulong def=0);
+  FXulong readULongEntry(const FXchar *section,const FXchar *name,FXulong def=0) const;
 
   /// Read a double-precision floating point registry entry; if no value is found, the default value def is returned
-  FXdouble readRealEntry(const FXchar *section,const FXchar *name,FXdouble def=0.0);
+  FXdouble readRealEntry(const FXchar *section,const FXchar *name,FXdouble def=0.0) const;
 
   /// Read a color value registry entry; if no value is found, the default value def is returned
-  FXColor readColorEntry(const FXchar *section,const FXchar *name,FXColor def=0);
+  FXColor readColorEntry(const FXchar *section,const FXchar *name,FXColor def=0) const;
 
   /// Read a boolean registry entry
-  FXbool readBoolEntry(const FXchar *section,const FXchar *name,FXbool def=false);
+  FXbool readBoolEntry(const FXchar *section,const FXchar *name,FXbool def=false) const;
 
   /// Write a formatted registry entry, using printf-style format
   FXint writeFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...) FX_PRINTF(4,5) ;
@@ -130,26 +133,20 @@ public:
   /// Write a boolean value entry
   FXbool writeBoolEntry(const FXchar *section,const FXchar *name,FXbool val);
 
+  /// See if entry exists
+  FXbool existingEntry(const FXchar *section,const FXchar *name) const;
+
   /// Delete a registry entry
   FXbool deleteEntry(const FXchar *section,const FXchar *name);
 
-  /// See if entry exists
-  FXbool existingEntry(const FXchar *section,const FXchar *name);
+  /// See if section exists
+  FXbool existingSection(const FXchar *section) const;
 
   /// Delete section
   FXbool deleteSection(const FXchar *section);
 
-  /// See if section exists
-  FXbool existingSection(const FXchar *section);
-
   /// Clear all sections
   FXbool clear();
-
-  /// Mark as changed
-  void setModified(FXbool mdfy=true){ modified=mdfy; }
-
-  /// Is it modified
-  FXbool isModified() const { return modified; }
 
   /// Cleanup
   virtual ~FXSettings();

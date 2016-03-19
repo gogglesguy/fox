@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: bitmapviewer.cpp,v 1.22 2007/02/07 20:22:23 fox Exp $                    *
+* $Id: bitmapviewer.cpp,v 1.23 2007/06/14 16:09:54 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -332,9 +332,7 @@ BitmapWindow::BitmapWindow(FXApp* a):FXMainWindow(a,"FOX Image Viewer: - untitle
   new FXMenuCommand(filemenu,"Dump",NULL,getApp(),FXApp::ID_DUMP);
 
   // Recent file menu; this automatically hides if there are no files
-  FXMenuSeparator* sep1=new FXMenuSeparator(filemenu);
-  sep1->setTarget(&mrufiles);
-  sep1->setSelector(FXRecentFiles::ID_ANYFILES);
+  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_1);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_2);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_3);
@@ -346,9 +344,7 @@ BitmapWindow::BitmapWindow(FXApp* a):FXMainWindow(a,"FOX Image Viewer: - untitle
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_9);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_10);
   new FXMenuCommand(filemenu,"&Clear Recent Files",NULL,&mrufiles,FXRecentFiles::ID_CLEAR);
-  FXMenuSeparator* sep2=new FXMenuSeparator(filemenu);
-  sep2->setTarget(&mrufiles);
-  sep2->setSelector(FXRecentFiles::ID_ANYFILES);
+  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
   new FXMenuCommand(filemenu,"&Quit\tCtl-Q",NULL,this,ID_QUIT);
 
   // Edit Menu entries

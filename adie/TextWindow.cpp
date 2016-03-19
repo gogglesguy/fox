@@ -5,9 +5,9 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This program is free software; you can redistribute it and/or modify          *
+* This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
-* the Free Software Foundation; either version 2 of the License, or             *
+* the Free Software Foundation, either version 3 of the License, or             *
 * (at your option) any later version.                                           *
 *                                                                               *
 * This program is distributed in the hope that it will be useful,               *
@@ -16,10 +16,9 @@
 * GNU General Public License for more details.                                  *
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
-* along with this program; if not, write to the Free Software                   *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.cpp,v 1.165 2007/05/24 20:42:14 fox Exp $                     *
+* $Id: TextWindow.cpp,v 1.167 2007/07/06 04:22:28 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -473,9 +472,7 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   new FXMenuCheck(filemenu,tr("&Editable\t\tDocument editable."),editor,FXText::ID_TOGGLE_EDITABLE);
 
   // Recent file menu; this automatically hides if there are no files
-  FXMenuSeparator* sep1=new FXMenuSeparator(filemenu);
-  sep1->setTarget(&mrufiles);
-  sep1->setSelector(FXRecentFiles::ID_ANYFILES);
+  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_1);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_2);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_3);
@@ -487,9 +484,7 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_9);
   new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_10);
   new FXMenuCommand(filemenu,tr("&Clear Recent Files"),NULL,&mrufiles,FXRecentFiles::ID_CLEAR);
-  FXMenuSeparator* sep2=new FXMenuSeparator(filemenu);
-  sep2->setTarget(&mrufiles);
-  sep2->setSelector(FXRecentFiles::ID_ANYFILES);
+  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
   new FXMenuCommand(filemenu,tr("&Quit\tCtl-Q"),getApp()->quiticon,getApp(),Adie::ID_CLOSEALL);
 
   // Edit Menu entries

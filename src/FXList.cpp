@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXList.cpp,v 1.178 2007/05/02 01:01:44 fox Exp $                         *
+* $Id: FXList.cpp,v 1.185 2007/07/09 16:27:01 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -97,10 +96,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
-
-// Explicit template specialization
-//template class FXObjectListOf<FXListItem>;
 
 
 // Object implementation
@@ -342,8 +337,7 @@ FXList::FXList(){
 
 
 // List
-FXList::FXList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXScrollArea(p,opts,x,y,w,h){
+FXList::FXList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXScrollArea(p,opts,x,y,w,h){
   flags|=FLAG_ENABLED;
   target=tgt;
   message=sel;
@@ -402,19 +396,6 @@ void FXList::killFocus(){
   }
 
 
-// Get default width
-FXint FXList::getDefaultWidth(){
-  return FXScrollArea::getDefaultWidth();
-  }
-
-
-// Get default height
-FXint FXList::getDefaultHeight(){
-  if(visible) return visible*(LINE_SPACING+font->getFontHeight());
-  return FXScrollArea::getDefaultHeight();
-  }
-
-
 // Propagate size change
 void FXList::recalc(){
   FXScrollArea::recalc();
@@ -423,13 +404,15 @@ void FXList::recalc(){
   }
 
 
-// List is multiple of nitems
-void FXList::setNumVisible(FXint nvis){
-  if(nvis<0) nvis=0;
-  if(visible!=nvis){
-    visible=nvis;
-    recalc();
-    }
+// Get default width
+FXint FXList::getDefaultWidth(){
+  return FXScrollArea::getDefaultWidth();
+  }
+
+
+// Get default height
+FXint FXList::getDefaultHeight(){
+  return 0<visible ? visible*(LINE_SPACING+font->getFontHeight()) : FXScrollArea::getDefaultHeight();
   }
 
 
@@ -899,8 +882,7 @@ long FXList::onTipTimer(FXObject*,FXSelector,void*){
 long FXList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
   if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
   if((flags&FLAG_TIP) && !(options&LIST_AUTOSELECT) && (0<=cursor)){    // No tip when autoselect!
-    FXString string=items[cursor]->getText();
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&items[cursor]->getText());
     return 1;
     }
   return 0;
@@ -1696,32 +1678,6 @@ FXint FXList::fillItems(const FXString& strings,FXIcon *icon,void* ptr,FXbool no
   }
 
 
-/*
-// Retrieve all items into newline separated strings
-FXString FXList::getAllItems() const {
-  FXString result;
-  for(FXint i=0; i<items.no(); i++){
-    result.append(items[i]->getText());
-    result.append("\n");
-    }
-  return result;
-  }
-
-
-// Retrieve all selected items in newline separated strings
-FXString FXList::getSelectedItems() const {
-  FXString result;
-  for(FXint i=0; i<items.no(); i++){
-    if(item[i]->isSelected()){
-      result.append(items[i]->getText());
-      result.append("\n");
-      }
-    }
-  return result;
-  }
-*/
-
-
 // Move item from oldindex to newindex
 FXint FXList::moveItem(FXint newindex,FXint oldindex,FXbool notify){
   register FXint old=current;
@@ -1950,6 +1906,16 @@ FXint FXList::findItemByData(const void *ptr,FXint start,FXuint flgs) const {
       }
     }
   return -1;
+  }
+
+
+// List is multiple of nitems
+void FXList::setNumVisible(FXint nvis){
+  if(nvis<0) nvis=0;
+  if(visible!=nvis){
+    visible=nvis;
+    recalc();
+    }
   }
 
 

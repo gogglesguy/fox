@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.cpp,v 1.81 2007/05/02 01:01:43 fox Exp $                   *
+* $Id: FXFoldingList.cpp,v 1.90 2007/07/09 16:26:53 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -285,7 +284,6 @@ FXint FXFoldingItem::getNumChildren() const {
   }
 
 
-
 // Get item (logically) below this one
 FXFoldingItem* FXFoldingItem::getBelow() const {
   register FXFoldingItem* item=(FXFoldingItem*)this;
@@ -406,7 +404,7 @@ FXDEFMAP(FXFoldingList) FXFoldingListMap[]={
   FXMAPFUNC(SEL_DOUBLECLICKED,0,FXFoldingList::onDoubleClicked),
   FXMAPFUNC(SEL_TRIPLECLICKED,0,FXFoldingList::onTripleClicked),
   FXMAPFUNC(SEL_COMMAND,0,FXFoldingList::onCommand),
-  FXMAPFUNC(SEL_CHANGED,FXFoldingList::ID_HEADER_CHANGE,FXFoldingList::onHeaderChanged),
+  FXMAPFUNC(SEL_CHANGED,FXFoldingList::ID_HEADER,FXFoldingList::onChgHeader),
   };
 
 
@@ -445,10 +443,9 @@ FXFoldingList::FXFoldingList(){
 
 
 // Tree List
-FXFoldingList::FXFoldingList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXScrollArea(p,opts,x,y,w,h){
+FXFoldingList::FXFoldingList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXScrollArea(p,opts,x,y,w,h){
   flags|=FLAG_ENABLED;
-  header=new FXHeader(this,this,FXFoldingList::ID_HEADER_CHANGE,HEADER_TRACKING|HEADER_BUTTON|HEADER_RESIZE|FRAME_RAISED|FRAME_THICK);
+  header=new FXHeader(this,this,FXFoldingList::ID_HEADER,HEADER_TRACKING|HEADER_BUTTON|HEADER_RESIZE|FRAME_RAISED|FRAME_THICK);
   target=tgt;
   message=sel;
   firstitem=NULL;
@@ -520,19 +517,6 @@ void FXFoldingList::killFocus(){
   }
 
 
-// Get default width
-FXint FXFoldingList::getDefaultWidth(){
-  return FXScrollArea::getDefaultWidth();
-  }
-
-
-// Get default height
-FXint FXFoldingList::getDefaultHeight(){
-  if(visible) return visible*(4+font->getFontHeight())+header->getDefaultHeight();
-  return FXScrollArea::getDefaultHeight();
-  }
-
-
 // Propagate size change
 void FXFoldingList::recalc(){
   FXScrollArea::recalc();
@@ -540,36 +524,35 @@ void FXFoldingList::recalc(){
   cursoritem=NULL;
   }
 
+
+// Get default width
+FXint FXFoldingList::getDefaultWidth(){
+  return FXScrollArea::getDefaultWidth();
+  }
+
+
+// Get default height
+FXint FXFoldingList::getDefaultHeight(){ 
+  return 0<visible ? visible*(4+font->getFontHeight())+header->getDefaultHeight() : FXScrollArea::getDefaultHeight()+header->getDefaultHeight();
+  }
+
+
+// Return visible scroll-area y position
+FXint FXFoldingList::getVisibleY() const {
+  return header->getHeight();
+  }
+
+
+// Return visible scroll-area height
+FXint FXFoldingList::getVisibleHeight() const {
+  return height-horizontal->getHeight()-header->getHeight();
+  }
+
+
 // Move content
 void FXFoldingList::moveContents(FXint x,FXint y){
-  FXint dx=x-pos_x;
-  FXint dy=y-pos_y;
-  pos_x=x;
-  pos_y=y;
+  FXScrollArea::moveContents(x,y);
   header->setPosition(x);
-  scroll(0,header->getHeight(),getVisibleWidth(),getVisibleHeight()-header->getHeight(),dx,dy);
-  }
-
-
-// List is multiple of nitems
-void FXFoldingList::setNumVisible(FXint nvis){
-  if(nvis<0) nvis=0;
-  if(visible!=nvis){
-    visible=nvis;
-    recalc();
-    }
-  }
-
-
-// Get number of toplevel items
-FXint FXFoldingList::getNumItems() const {
-  register FXFoldingItem *item=firstitem;
-  register FXint n=0;
-  while(item){
-    item=item->next;
-    n++;
-    }
-  return n;
   }
 
 
@@ -598,8 +581,8 @@ void FXFoldingList::recompute(){
       }
     item=item->next;
     }
-  treeWidth=header->getDefaultWidth();
-  treeHeight=header->getDefaultHeight()+y;
+  treeWidth=header->getTotalSize();
+  treeHeight=y;
   flags&=~FLAG_RECALC;
   }
 
@@ -612,7 +595,7 @@ FXint FXFoldingList::getContentWidth(){
 
 
 // Determine content height of tree list
-FXint FXFoldingList::getContentHeight(){
+FXint FXFoldingList::getContentHeight(){        // FIXME header should not be included in height
   if(flags&FLAG_RECALC) recompute();
   return treeHeight;
   }
@@ -620,12 +603,13 @@ FXint FXFoldingList::getContentHeight(){
 
 // Recalculate layout
 void FXFoldingList::layout(){
+  FXint hh=header->getDefaultHeight();
 
-  // Calculate contents
-  FXScrollArea::layout();
+  // Place scroll bars
+  placeScrollBars(width,height-hh);
 
   // Place header control
-  header->position(0,0,getVisibleWidth(),header->getDefaultHeight());
+  header->position(0,0,width,hh);
 
   // Set line size based on item size
   if(firstitem){
@@ -646,9 +630,20 @@ void FXFoldingList::layout(){
   }
 
 
+// Get number of toplevel items
+FXint FXFoldingList::getNumItems() const {
+  register FXFoldingItem *item=firstitem;
+  register FXint n=0;
+  while(item){
+    item=item->next;
+    n++;
+    }
+  return n;
+  }
+
+
 // Header changed but content size didn't
-long FXFoldingList::onHeaderChanged(FXObject*,FXSelector,void*){
-//  flags&=~FLAG_RECALC;
+long FXFoldingList::onChgHeader(FXObject*,FXSelector,void*){
   return 1;
   }
 
@@ -833,12 +828,13 @@ FXbool FXFoldingList::isItemOpened(const FXFoldingItem* item) const {
 // True if item (partially) visible
 FXbool FXFoldingList::isItemVisible(const FXFoldingItem* item) const {
   if(!item){ fxerror("%s::isItemVisible: item is NULL.\n",getClassName()); }
-  return 0<pos_y+header->getHeight()+item->y+item->getHeight(this) && pos_y+header->getHeight()+item->y<getVisibleHeight();
+  return 0<pos_y+item->y+item->getHeight(this) && pos_y+item->y<getVisibleHeight();
   }
 
 
 // Make item fully visible
 void FXFoldingList::makeItemVisible(FXFoldingItem* item){
+  register FXint vh,hh,py,y,h;
   if(item){
 
     // Remember for later
@@ -853,21 +849,19 @@ void FXFoldingList::makeItemVisible(FXFoldingItem* item){
 
     // Now we adjust the scrolled position to fit everything
     if(xid){
-      FXint vh,hh,y,h;
 
       // Force layout if dirty
       if(flags&FLAG_RECALC) layout();
 
-      y=pos_y;
+      py=pos_y;
+      y=item->y;
       h=item->getHeight(this);
-      hh=header->getHeight();
       vh=getVisibleHeight();
-
-      if(vh<=y+item->y+h+hh) y=vh-item->y-h-hh;
-      if(y+item->y<=0) y=-item->y;
+      if(py+y+h>=vh) py=vh-y-h;
+      if(py+y<=0) py=-y;
 
       // Scroll into view
-      setPosition(pos_x,y);
+      setPosition(pos_x,py);
 
       // Done it
       viewableitem=NULL;
@@ -1231,15 +1225,10 @@ long FXFoldingList::onTipTimer(FXObject*,FXSelector,void*){
 // We were asked about tip text
 long FXFoldingList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
   if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
-  if((flags&FLAG_TIP) && !(options&FOLDINGLIST_AUTOSELECT)){   // No tip when autoselect!
-    FXint x,y; FXuint buttons;
-    getCursorPosition(x,y,buttons);
-    FXFoldingItem *item=getItemAt(x,y);
-    if(item){
-      FXString string=item->getText().section('\t',0);
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
-      return 1;
-      }
+  if((flags&FLAG_TIP) && !(options&FOLDINGLIST_AUTOSELECT) && cursoritem){   // No tip when autoselect!
+    FXString string=cursoritem->getText().section('\t',0);
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
+    return 1;
     }
   return 0;
   }
@@ -2592,6 +2581,16 @@ FXFoldingItem* FXFoldingList::findItemByData(const void *ptr,FXFoldingItem* star
       }
     }
   return NULL;
+  }
+
+
+// List is multiple of nitems
+void FXFoldingList::setNumVisible(FXint nvis){
+  if(nvis<0) nvis=0;
+  if(visible!=nvis){
+    visible=nvis;
+    recalc();
+    }
   }
 
 

@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconList.cpp,v 1.227 2007/05/17 15:55:30 fox Exp $                     *
+* $Id: FXIconList.cpp,v 1.238 2007/07/09 16:26:57 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,6 +76,7 @@
     the visual stuff changed setListStyle().
   - Since '\0' is no longer special in FXString, perhaps we can replace the function
     of '\t' with '\0'.  This would be significantly more efficient.
+  - FIXME resizing header partitions shouldn't cause full recalc().
 */
 
 
@@ -97,9 +97,6 @@ using namespace FX;
 
 namespace FX {
 
-// Explicit template specialization
-//template class FXObjectListOf<FXIconItem>;
-
 
 // Object implementation
 FXIMPLEMENT(FXIconItem,FXObject,NULL,0)
@@ -116,9 +113,8 @@ void FXIconItem::draw(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXint w,FX
 
 // Draw big icon
 void FXIconItem::drawBigIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const {
+  register FXint iw=0,ih=0,tw=0,th=0,ss=0,len,dw,s,space,xt,yt,xi,yi;
   register FXFont *font=list->getFont();
-  register FXint iw=0,ih=0,tw=0,th=0,ss=0;
-  register FXint len,dw,s,space,xt,yt,xi,yi;
   dc.fillRectangle(x,y,w,h);
   space=w-SIDE_SPACING;
   if(!label.empty()){
@@ -170,9 +166,8 @@ void FXIconItem::drawBigIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXi
 
 // Draw mini icon
 void FXIconItem::drawMiniIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const {
+  register FXint iw=0,ih=0,tw=0,th=0,len,dw,s,space;
   register FXFont *font=list->getFont();
-  register FXint iw=0,ih=0,tw=0,th=0;
-  register FXint len,dw,s,space;
   dc.fillRectangle(x,y,w,h);
   x+=SIDE_SPACING/2;
   space=w-SIDE_SPACING;
@@ -224,9 +219,9 @@ void FXIconItem::drawMiniIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FX
 
 // Draw detail
 void FXIconItem::drawDetails(const FXIconList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const {
-  register FXFont *font=list->getFont();
-  register FXHeader *header=list->getHeader();
   register FXint iw=0,ih=0,tw=0,th=0,yt,beg,end,hi,drw,space,used,dw,xx;
+  register FXHeader *header=list->getHeader();
+  register FXFont *font=list->getFont();
   if(header->getNumItems()==0) return;
   if(isSelected()){
     dc.setForeground(list->getSelBackColor());
@@ -531,8 +526,8 @@ FXDEFMAP(FXIconList) FXIconListMap[]={
   FXMAPFUNC(SEL_COMMAND,0,FXIconList::onCommand),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXIconList::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXIconList::onQueryHelp),
-  FXMAPFUNC(SEL_CHANGED,FXIconList::ID_HEADER_CHANGE,FXIconList::onHeaderChanged),
-  FXMAPFUNC(SEL_CLICKED,FXIconList::ID_HEADER_CHANGE,FXIconList::onHeaderResize),
+  FXMAPFUNC(SEL_CHANGED,FXIconList::ID_HEADER,FXIconList::onChgHeader),
+  FXMAPFUNC(SEL_CLICKED,FXIconList::ID_HEADER,FXIconList::onClkHeader),
   FXMAPFUNC(SEL_UPDATE,FXIconList::ID_SHOW_DETAILS,FXIconList::onUpdShowDetails),
   FXMAPFUNC(SEL_UPDATE,FXIconList::ID_SHOW_MINI_ICONS,FXIconList::onUpdShowMiniIcons),
   FXMAPFUNC(SEL_UPDATE,FXIconList::ID_SHOW_BIG_ICONS,FXIconList::onUpdShowBigIcons),
@@ -576,6 +571,8 @@ FXIconList::FXIconList(){
   selbackColor=0;
   seltextColor=0;
   itemSpace=ITEM_SPACE;
+  listWidth=0;
+  listHeight=0;
   itemWidth=1;
   itemHeight=1;
   anchorx=0;
@@ -589,10 +586,9 @@ FXIconList::FXIconList(){
 
 
 // Icon List
-FXIconList::FXIconList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXScrollArea(p,opts,x,y,w,h){
+FXIconList::FXIconList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXScrollArea(p,opts,x,y,w,h){
   flags|=FLAG_ENABLED;
-  header=new FXHeader(this,this,FXIconList::ID_HEADER_CHANGE,HEADER_TRACKING|HEADER_BUTTON|HEADER_RESIZE|FRAME_RAISED|FRAME_THICK);
+  header=new FXHeader(this,this,FXIconList::ID_HEADER,HEADER_TRACKING|HEADER_BUTTON|HEADER_RESIZE|FRAME_RAISED|FRAME_THICK);
   target=tgt;
   message=sel;
   nrows=1;
@@ -608,6 +604,8 @@ FXIconList::FXIconList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   selbackColor=getApp()->getSelbackColor();
   seltextColor=getApp()->getSelforeColor();
   itemSpace=ITEM_SPACE;
+  listWidth=0;
+  listHeight=0;
   itemWidth=1;
   itemHeight=1;
   anchorx=0;
@@ -656,16 +654,6 @@ void FXIconList::killFocus(){
   }
 
 
-
-// Move content
-void FXIconList::moveContents(FXint x,FXint y){
-  FXScrollArea::moveContents(x,y);
-  if(!(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS))){
-    header->setPosition(x);
-    }
-  }
-
-
 // Propagate size change
 void FXIconList::recalc(){
   FXScrollArea::recalc();
@@ -674,34 +662,24 @@ void FXIconList::recalc(){
   }
 
 
-// Recompute interior
-void FXIconList::recompute(){
-  register FXint w,h,i;
+// Return visible area y position
+FXint FXIconList::getVisibleY() const {
+  return (options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)) ? 0 : header->getHeight();
+  }
 
-  itemWidth=1;
-  itemHeight=1;
 
-  // Measure the items
-  for(i=0; i<items.no(); i++){
-    w=items[i]->getWidth(this);
-    h=items[i]->getHeight(this);
-    if(w>itemWidth) itemWidth=w;
-    if(h>itemHeight) itemHeight=h;
+// Return visible area height
+FXint FXIconList::getVisibleHeight() const {
+  return (options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)) ? height-horizontal->getHeight() : height-header->getHeight()-horizontal->getHeight();
+  }
+
+
+// Move content
+void FXIconList::moveContents(FXint x,FXint y){
+  FXScrollArea::moveContents(x,y);
+  if(!(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS))){
+    header->setPosition(x);
     }
-
-  // Automatically size item spacing
-  if(options&ICONLIST_AUTOSIZE) itemSpace=FXMAX(itemWidth,1);
-
-  // Adjust for detail mode
-  if(!(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS))) itemWidth=header->getDefaultWidth();
-
-  // Get number of rows or columns
-  getrowscols(nrows,ncols,width,height);
-
-  //FXTRACE((100,"%s::recompute: itemWidth=%d itemHeight=%d nrows=%d ncols=%d\n",getClassName(),itemWidth,itemHeight,nrows,ncols));
-
-  // Done
-  flags&=~FLAG_RECALC;
   }
 
 
@@ -738,42 +716,63 @@ void FXIconList::getrowscols(FXint& nr,FXint& nc,FXint w,FXint h) const {
   }
 
 
-// Return visible area x position
-FXint FXIconList::getVisibleX() const {
-  return 0;
-  }
+// Recompute interior
+void FXIconList::recompute(){
+  register FXint w,h,i;
 
+  listWidth=0;
+  listHeight=0;
 
-// Return visible area y position
-FXint FXIconList::getVisibleY() const {
-  return (options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)) ? 0 : header->getHeight();
-  }
+  itemWidth=1;
+  itemHeight=1;
 
+  // Measure the items
+  for(i=0; i<items.no(); i++){
+    w=items[i]->getWidth(this);
+    h=items[i]->getHeight(this);
+    if(w>itemWidth) itemWidth=w;
+    if(h>itemHeight) itemHeight=h;
+    }
 
-// Return visible area width
-FXint FXIconList::getVisibleWidth() const {
-  return width-vertical->getWidth();
-  }
+  // Automatically size item spacing
+  if(options&ICONLIST_AUTOSIZE) itemSpace=FXMAX(itemWidth,1);
 
+  // Adjust for detail mode
+  if(!(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS))) itemWidth=header->getTotalSize();
 
-// Return visible area height
-FXint FXIconList::getVisibleHeight() const {
-  return (options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)) ? height-horizontal->getHeight() : height-header->getHeight()-horizontal->getHeight();
+  // Get number of rows or columns
+  getrowscols(nrows,ncols,width,height);
+
+  //FXTRACE((100,"%s::recompute: itemWidth=%d itemHeight=%d nrows=%d ncols=%d\n",getClassName(),itemWidth,itemHeight,nrows,ncols));
+
+  // List modes
+  if(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)){
+    listWidth=ncols*itemSpace;
+    listHeight=nrows*itemHeight;
+    }
+
+  // Detail modes
+  else{
+    listWidth=header->getTotalSize();
+    listHeight=header->getDefaultHeight()+nrows*itemHeight;
+    }
+
+  // Done
+  flags&=~FLAG_RECALC;
   }
 
 
 // Determine content width of icon list
 FXint FXIconList::getContentWidth(){
   if(flags&FLAG_RECALC) recompute();
-  if(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)) return ncols*itemSpace;
-  return header->getDefaultWidth();
+  return listWidth;
   }
 
 
 // Determine content height of icon list
 FXint FXIconList::getContentHeight(){
   if(flags&FLAG_RECALC) recompute();
-  return nrows*itemHeight;
+  return listHeight;
   }
 
 
@@ -832,10 +831,8 @@ void FXIconList::position(FXint x,FXint y,FXint w,FXint h){
   }
 
 
-// Header subdivision has changed:- this is a bit tricky,
-// we want to update the content size w/o re-measuring the items...
-long FXIconList::onHeaderChanged(FXObject*,FXSelector,void*){
-  flags&=~FLAG_RECALC;
+// Header changed but content size didn't
+long FXIconList::onChgHeader(FXObject*,FXSelector,void*){
   return 1;
   }
 
@@ -843,7 +840,7 @@ long FXIconList::onHeaderChanged(FXObject*,FXSelector,void*){
 // Header subdivision resize has been requested;
 // we want to set the width of the header column
 // to that of the widest item.
-long FXIconList::onHeaderResize(FXObject*,FXSelector,void* ptr){
+long FXIconList::onClkHeader(FXObject*,FXSelector,void* ptr){
   register FXint hi=(FXint)(FXival)ptr;
   register FXint i,iw,tw,w,nw=0;
   FXString text;
@@ -1713,7 +1710,7 @@ long FXIconList::onPaint(FXObject*,FXSelector,void* ptr){
     y=pos_y+rlo*itemHeight+header->getDefaultHeight();
     for(index=rlo; index<=rhi; index++,y+=itemHeight){
       dc.setForeground(backColor);
-      items[index]->draw(this,dc,pos_x,y,header->getDefaultWidth(),itemHeight);
+      items[index]->draw(this,dc,pos_x,y,header->getTotalSize(),itemHeight);
       }
 
     // Background below
@@ -1724,7 +1721,7 @@ long FXIconList::onPaint(FXObject*,FXSelector,void* ptr){
       }
 
     // Background to the right
-    x=pos_x+header->getDefaultWidth();
+    x=pos_x+header->getTotalSize();
     if(x<event->rect.x+event->rect.w){
       dc.setForeground(backColor);
       dc.fillRectangle(x,event->rect.y,event->rect.x+event->rect.w-x,event->rect.h);
@@ -2303,7 +2300,7 @@ long FXIconList::onMotion(FXObject*,FXSelector,void* ptr){
 // Pressed a button
 long FXIconList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXint index,code;
+  FXint index;
   flags&=~FLAG_TIP;
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
@@ -2332,9 +2329,6 @@ long FXIconList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
         }
       return 1;
       }
-
-    // Find out where hit
-    code=hitItem(index,event->win_x,event->win_y);
 
     // Previous selection state
     state=items[index]->isSelected();
@@ -2371,7 +2365,6 @@ long FXIconList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       }
 
     // Are we dragging?
-//    if(code && items[index]->isSelected() && items[index]->isDraggable()){
     if(state && items[index]->isSelected() && items[index]->isDraggable()){
       flags|=FLAG_TRYDRAG;
       }
@@ -2922,8 +2915,10 @@ void FXIconList::save(FXStream& store) const {
   store << selbackColor;
   store << seltextColor;
   store << itemSpace;
-  store << itemWidth;
-  store << itemHeight;
+  store << listWidth;
+  store << listHeight;
+ store << itemWidth;
+ store << itemHeight;
   store << help;
   }
 
@@ -2943,8 +2938,10 @@ void FXIconList::load(FXStream& store){
   store >> selbackColor;
   store >> seltextColor;
   store >> itemSpace;
-  store >> itemWidth;
-  store >> itemHeight;
+  store >> listWidth;
+  store >> listHeight;
+ store >> itemWidth;
+ store >> itemHeight;
   store >> help;
   }
 

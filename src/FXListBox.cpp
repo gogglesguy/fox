@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXListBox.cpp,v 1.70 2007/02/07 20:22:11 fox Exp $                       *
+* $Id: FXListBox.cpp,v 1.74 2007/07/09 16:27:01 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -79,6 +78,7 @@ FXDEFMAP(FXListBox) FXListBoxMap[]={
   FXMAPFUNC(SEL_DELETED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_INSERTED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_REPLACED,FXListBox::ID_LIST,FXListBox::onListForward),
+  FXMAPFUNC(SEL_COMMAND,FXListBox::ID_LIST,FXListBox::onListCommand),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,FXListBox::ID_FIELD,FXListBox::onFieldButton),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXListBox::ID_FIELD,FXListBox::onMouseWheel),
   FXMAPFUNC(SEL_COMMAND,FXListBox::ID_SETVALUE,FXListBox::onCmdSetValue),
@@ -92,8 +92,7 @@ FXIMPLEMENT(FXListBox,FXPacker,FXListBoxMap,ARRAYNUMBER(FXListBoxMap))
 
 
 // List box
-FXListBox::FXListBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
-  FXPacker(p,opts,x,y,w,h, 0,0,0,0, 0,0){
+FXListBox::FXListBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h, 0,0,0,0, 0,0){
   flags|=FLAG_ENABLED;
   target=tgt;
   message=sel;
@@ -215,18 +214,18 @@ long FXListBox::onListForward(FXObject*,FXSelector sel,void* ptr){
   }
 
 
-// Forward clicked message from list to target
-long FXListBox::onListClicked(FXObject*,FXSelector,void* ptr){
-  FXint index=(FXint)(FXival)ptr;
-  button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);    // Unpost the list
-  if(0<=index){
-    field->setText(getItemText(index));
-    field->setIcon(getItemIcon(index));
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)index);
-    }
-  return 1;
+// Clicked inside or outside an item in the list; unpost the pane
+long FXListBox::onListClicked(FXObject*,FXSelector,void*){
+  return button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL); 
   }
 
+
+// Clicked on an item in the list; issue a callback
+long FXListBox::onListCommand(FXObject*,FXSelector,void* ptr){
+  field->setText(list->getItemText((FXint)(FXival)ptr));
+  field->setIcon(list->getItemIcon((FXint)(FXival)ptr));
+  return target && target->tryHandle(this,FXSEL(SEL_COMMAND,message),ptr);
+  }
 
 
 // Pressed left button in text field

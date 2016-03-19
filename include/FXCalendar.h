@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2006,2007 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.h,v 1.6 2007/05/21 12:16:29 fox Exp $                         *
+* $Id: FXCalendar.h,v 1.10 2007/07/09 16:02:42 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXCALENDAR_H
 #define FXCALENDAR_H
@@ -92,9 +91,28 @@ public:
   /// Disable the window from receiving mouse and keyboard events
   virtual void disable();
 
+  /// Set date
+  void setCurrentDate(FXDate date,FXbool notify=false);
+
+  /// Get the current date
+  FXDate getCurrentDate() const;
+
+  /// Set the current month; current day will be properly updated for the choosen month
+  void setCurrentMonth(FXint mo,FXbool notify=false);
+
+  /// Return the current month shown. The month may be different than the current
+  /// date if a day in a sibling month is current.
+  FXint getCurrentMonth() const;
+
   /// Return calendar view control
   FXCalendarView* calendarView() const { return view; }
-  
+
+  /// Set the first day of the week [0 -> 6]
+  void setFirstDay(FXint d);
+
+  /// Get the first day of the week [0 -> 6]
+  FXint getFirstDay() const;
+
   /// Change the Frame Style
   void setFrameStyle(FXuint);
 
@@ -104,16 +122,10 @@ public:
   /// Get the Calendar Style
   FXuint getCalendarStyle() const;
 
-  /// Set the first day of the week [0 -> 6]
-  void setFirstDay(FXint d);
-
-  /// Get the first day of the week [0 -> 6]
-  FXint getFirstDay() const;
-
   /// Set the back color
   void setBackColor(FXColor c);
 
-  /// Get the Back Color
+  /// Get the back color
   FXColor getBackColor() const;
 
   /// Set the display color of titles

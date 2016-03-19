@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTopWindow.cpp,v 1.206 2007/05/21 19:56:56 fox Exp $                    *
+* $Id: FXTopWindow.cpp,v 1.212 2007/07/12 12:07:33 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -141,8 +140,7 @@ FXTopWindow::FXTopWindow(){
 
 
 // Create toplevel window object & add to toplevel window list
-FXTopWindow::FXTopWindow(FXApp* ap,const FXString& name,FXIcon *ic,FXIcon *mi,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXShell(ap,opts,x,y,w,h){
+FXTopWindow::FXTopWindow(FXApp* ap,const FXString& name,FXIcon *ic,FXIcon *mi,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):FXShell(ap,opts,x,y,w,h){
   title=name;
   icon=ic;
   miniIcon=mi;
@@ -276,6 +274,13 @@ void FXTopWindow::create(){
 
       // Set hints
       XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
+
+//#ifdef HAVE_XFIXES_H
+//      int evb,erb;
+//      if(XFixesQueryExtension(DISPLAY(getApp()),&evb,&erb)){
+//        XFixesSelectSelectionInput(DISPLAY(getApp()),xid,getApp()->xcbSelection,XFixesSetSelectionOwnerNotifyMask|XFixesSelectionWindowDestroyNotifyMask|XFixesSelectionClientCloseNotifyMask);
+//        }
+//#endif
 
 #endif
       }
@@ -447,6 +452,15 @@ void FXTopWindow::lower(){
     }
 #endif
   }
+
+// The code below returns the size of the entire virtual
+// screen area instead of just that of the primary display;
+// thanks to "Steve Granja" <Steven.Granja@abaqus.com>.
+// [Apparently does not work on Win95 and WinNT...]
+//xpos=GetSystemMetrics(SM_XVIRTUALSCREEN);
+//ypos=GetSystemMetrics(SM_YVIRTUALSCREEN);
+//width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
+//height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
 
 // Position the window based on placement
@@ -980,6 +994,56 @@ FXbool FXTopWindow::fullScreen(FXbool notify){
   }
 
 
+
+// Special stacking order level
+FXbool FXTopWindow::stackingOrder(FXuint order){
+  if(xid){
+#ifdef WIN32
+    switch(order){
+      case STACK_BOTTOM:
+        SetWindowPos((HWND)xid,HWND_BOTTOM,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+        break;
+      case STACK_TOP:
+        SetWindowPos((HWND)xid,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+        break;
+      default:
+        SetWindowPos((HWND)xid,HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+        break;
+      }
+#else
+    XEvent se;
+    switch(order){
+      case STACK_BOTTOM:
+        se.xclient.data.l[0]=1;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
+        se.xclient.data.l[1]=getApp()->wmNetBelowOthers;
+        se.xclient.data.l[2]=0;
+        break;
+      case STACK_TOP:
+        se.xclient.data.l[0]=1;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
+        se.xclient.data.l[1]=getApp()->wmNetAboveOthers;
+        se.xclient.data.l[2]=0;
+        break;
+      default:
+        se.xclient.data.l[0]=0;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
+        se.xclient.data.l[1]=getApp()->wmNetAboveOthers;
+        se.xclient.data.l[2]=getApp()->wmNetBelowOthers;
+        break;
+      }
+    se.xclient.type=ClientMessage;
+    se.xclient.display=DISPLAY(getApp());
+    se.xclient.message_type=getApp()->wmNetState;
+    se.xclient.format=32;
+    se.xclient.window=xid;
+    se.xclient.data.l[3]=0;
+    se.xclient.data.l[4]=0;
+    XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),false,SubstructureRedirectMask|SubstructureNotifyMask,&se);
+#endif
+    return true;
+    }
+  return false;
+  }
+
+
 // Attempt to close the window, return true if actually closed
 FXbool FXTopWindow::close(FXbool notify){
   register FXWindow *window;
@@ -1013,10 +1077,10 @@ x:  delete this;
 
 // Return true if window has been maximized
 FXbool FXTopWindow::isMaximized() const {
-  FXbool maximized=false;
+  FXbool result=false;
   if(xid){
 #ifdef WIN32
-    maximized=IsZoomed((HWND)xid)!=0;
+    result=IsZoomed((HWND)xid)!=0;
 #else
     // For Window Managers supporting the Extended Window Manager Hints
     // See http://www.freedesktop.org/ for the official documentation of EWMH
@@ -1024,43 +1088,43 @@ FXbool FXTopWindow::isMaximized() const {
     if(Success==XGetWindowProperty(DISPLAY(getApp()),xid,getApp()->wmNetState,0,2,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
       if(type==XA_ATOM && format==32){
         for(i=0; i<n; i++){
-          if(((FXID*)prop)[i]==getApp()->wmNetHMaximized) maximized=true;
-          if(((FXID*)prop)[i]==getApp()->wmNetVMaximized) maximized=true;
+          if(((FXID*)prop)[i]==getApp()->wmNetHMaximized) result=true;
+          if(((FXID*)prop)[i]==getApp()->wmNetVMaximized) result=true;
           }
         }
       XFree(prop);
       }
 #endif
     }
-  return maximized;
+  return result;
   }
 
 
 // Return true if window has been minimized
 FXbool FXTopWindow::isMinimized() const {
-  FXbool minimized=false;
+  FXbool result=false;
   if(xid){
 #ifdef WIN32
-    minimized=IsIconic((HWND)xid)!=0;
+    result=IsIconic((HWND)xid)!=0;
 #else
     // This is ICCCM compliant method to ask about WM_STATE
     unsigned long n,i; unsigned char *prop; Atom type; int format;
     if(Success==XGetWindowProperty(DISPLAY(getApp()),xid,getApp()->wmState,0,2,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
-      if(format==32){ minimized=(IconicState==*((FXuint*)prop)); }
+      if(format==32){ result=(IconicState==*((FXuint*)prop)); }
       XFree(prop);
       }
 #endif
     }
-  return minimized;
+  return result;
   }
 
 
 // Return true if full screen
 FXbool FXTopWindow::isFullScreen() const {
-  FXbool fullscreen=false;
+  FXbool result=false;
   if(xid){
 #ifdef WIN32
-    fullscreen=IsZoomed((HWND)xid)!=0;          // FIXME
+    result=IsZoomed((HWND)xid)!=0;          // FIXME
 #else
     // For Window Managers supporting the Extended Window Manager Hints
     // See http://www.freedesktop.org/ for the official documentation of EWMH
@@ -1068,17 +1132,17 @@ FXbool FXTopWindow::isFullScreen() const {
     if(Success==XGetWindowProperty(DISPLAY(getApp()),xid,getApp()->wmNetState,0,2,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
       if(type==XA_ATOM && format==32){
         for(i=0; i<n; i++){
-          if(((FXID*)prop)[i]==getApp()->wmNetFullScreen) fullscreen=true;
+          if(((FXID*)prop)[i]==getApp()->wmNetFullScreen) result=true;
           }
         }
       XFree(prop);
       }
 #endif
     }
-  return fullscreen;
+  return result;
   }
-  
-  
+
+
 // Request for toplevel window move
 void FXTopWindow::move(FXint x,FXint y){
   if((x!=xpos) || (y!=ypos)){

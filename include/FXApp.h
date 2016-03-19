@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.260 2007/05/21 17:02:24 fox Exp $                            *
+* $Id: FXApp.h,v 1.263 2007/07/12 04:43:18 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -308,6 +307,8 @@ private:
   FXID             wmNetHMaximized;     // Extended Window Manager horizontally maximized
   FXID             wmNetVMaximized;     // Extended Window Manager vertically maximized
   FXID             wmNetFullScreen;     // Extended Window Manager full screen
+  FXID             wmNetBelowOthers;    // Extended Window Manager below others
+  FXID             wmNetAboveOthers;    // Extended Window Manager above others
   FXID             wmNetNeedAttention;  // Extended Window Manager need attention
   FXID             wmNetMoveResize;     // Extended Window Manager drag corner
   FXID             wmNetRestack;        // Extended Window Manager change stacking order
@@ -357,7 +358,8 @@ private:
   FXbool           xdndWantUpdates;     // XDND target wants new positions while in rect
   FXbool           xdndFinishSent;      // XDND finish sent
   FXRectangle      xdndRect;            // XDND rectangle bounding target
-  FXint            xrreventbase;        // XRR event base
+  FXint            xrreventbase;        // Xrandr event base
+  FXint            xfxeventbase;        // Xfixes event base
   FXID             stipples[23];        // Standard stipple patterns
   void            *xim;                 // Input method
   FXbool           shmi;                // Use XSHM Image possible
@@ -486,6 +488,15 @@ public:
 
   /// Get current popup window, if any
   FXPopup* getPopupWindow() const { return popupWindow; }
+
+  /// Return window currently owning primary selection
+  FXWindow* getSelectionWindow() const { return selectionWindow; }
+
+  /// Return window currently owning the clipboard
+  FXWindow* getClipboardWindow() const { return clipboardWindow; }
+
+  /// Return drag window if a drag operation is in progress
+  FXWindow* getDragWindow() const { return dragWindow; }
 
   /// Find window from id
   FXWindow* findWindowWithId(FXID xid) const;
@@ -722,9 +733,6 @@ public:
 
   /// Get drag type name
   FXString getDragTypeName(FXDragType type) const;
-
-  /// Return drag window if a drag operation is in progress
-  FXWindow* getDragWindow() const { return dragWindow; }
 
   /// Beep
   void beep();

@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.253 2007/05/17 21:19:49 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.261 2007/07/09 16:26:51 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -122,6 +121,7 @@ FXDEFMAP(FXFileList) FXFileListMap[]={
   FXMAPFUNC(SEL_CLIPBOARD_LOST,0,FXFileList::onClipboardLost),
   FXMAPFUNC(SEL_CLIPBOARD_REQUEST,0,FXFileList::onClipboardRequest),
   FXMAPFUNC(SEL_CHORE,FXFileList::ID_DROPACTION,FXFileList::onDropAction),
+  FXMAPFUNC(SEL_CHORE,FXFileList::ID_PREVIEWCHORE,FXFileList::onPreviewChore),
   FXMAPFUNC(SEL_TIMEOUT,FXFileList::ID_OPENTIMER,FXFileList::onOpenTimer),
   FXMAPFUNC(SEL_TIMEOUT,FXFileList::ID_REFRESHTIMER,FXFileList::onRefreshTimer),
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_DIRECTORY_UP,FXFileList::onUpdDirectoryUp),
@@ -139,7 +139,8 @@ FXDEFMAP(FXFileList) FXFileListMap[]={
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_HIDE_HIDDEN,FXFileList::onUpdHideHidden),
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_TOGGLE_HIDDEN,FXFileList::onUpdToggleHidden),
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_TOGGLE_IMAGES,FXFileList::onUpdToggleImages),
-  FXMAPFUNC(SEL_UPDATE,FXFileList::ID_HEADER_CHANGE,FXFileList::onUpdHeader),
+  FXMAPFUNC(SEL_UPDATE,FXFileList::ID_HEADER,FXFileList::onUpdHeader),
+  FXMAPFUNC(SEL_COMMAND,FXFileList::ID_HEADER,FXFileList::onCmdHeader),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_DIRECTORY_UP,FXFileList::onCmdDirectoryUp),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_SORT_BY_NAME,FXFileList::onCmdSortByName),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_SORT_BY_TYPE,FXFileList::onCmdSortByType),
@@ -158,7 +159,6 @@ FXDEFMAP(FXFileList) FXFileListMap[]={
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_HIDE_HIDDEN,FXFileList::onCmdHideHidden),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_TOGGLE_HIDDEN,FXFileList::onCmdToggleHidden),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_TOGGLE_IMAGES,FXFileList::onCmdToggleImages),
-  FXMAPFUNC(SEL_COMMAND,FXFileList::ID_HEADER_CHANGE,FXFileList::onCmdHeader),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_REFRESH,FXFileList::onCmdRefresh),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_CUT_SEL,FXFileList::onCmdCutSel),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_COPY_SEL,FXFileList::onCmdCopySel),
@@ -200,15 +200,15 @@ FXFileList::FXFileList(){
 // File List
 FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXIconList(p,tgt,sel,opts,x,y,w,h),directory(PATHSEPSTRING),pattern("*"){
   dropEnable();
-  appendHeader(tr("Name"),NULL,200);
-  appendHeader(tr("Type"),NULL,100);
-  appendHeader(tr("Size"),NULL,60);
-  appendHeader(tr("Modified Date"),NULL,150);
-  appendHeader(tr("User"),NULL,50);
-  appendHeader(tr("Group"),NULL,50);
-  appendHeader(tr("Attributes"),NULL,100);
+  appendHeader(tr("Name\tName"),NULL,200);
+  appendHeader(tr("Type\tFile type"),NULL,100);
+  appendHeader(tr("Size\tFile size"),NULL,60);
+  appendHeader(tr("Modified Date\tDate when last modified"),NULL,150);
+  appendHeader(tr("User\tUser name"),NULL,50);
+  appendHeader(tr("Group\tGroup name"),NULL,50);
+  appendHeader(tr("Attributes\tFile attributes"),NULL,100);
 #ifndef WIN32
-  appendHeader(tr("Link"),NULL,200);
+  appendHeader(tr("Link\tSymbolic link to"),NULL,200);
 #endif
   associations=NULL;
   if(!(options&FILELIST_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
@@ -287,6 +287,39 @@ void FXFileList::destroy(){
 
 /*******************************************************************************/
 
+// Return list of selected files
+FXint FXFileList::getSelectedFiles(FXString& result) const {
+  register FXint count=0;
+  result=FXString::null;
+  for(FXint i=0; i<getNumItems(); i++){
+    if(isItemSelected(i) && !isItemNavigational(i)){
+      result.append(getItemPathname(i));
+      result.append("\n");
+      count++;
+      }
+    }
+  return count;
+  }
+
+
+// Return selected files
+FXString* FXFileList::getSelectedFiles() const {
+  register FXString *files=NULL;
+  register FXint i,n;
+  for(i=n=0; i<getNumItems(); i++){
+    if(isItemSelected(i) && !isItemNavigational(i)) n++;
+    }
+  if(n){
+    files=new FXString [n+1];
+    for(i=n=0; i<getNumItems(); i++){
+      if(isItemSelected(i) && !isItemNavigational(i)) files[n++]=getItemPathname(i);
+      }
+    files[n]=FXString::null;
+    }
+  return files;
+  }
+
+
 // Decode urilist to list of filenames
 static FXint decodeURIList(FXString& result,const FXString& string){
   register FXint beg=0,end=0,n=0;
@@ -318,6 +351,53 @@ static FXint encodeURIList(FXString& result,const FXString& string){
   return n;
   }
 
+#if 0
+ - kde_clipboard=registerDragType("application/x-kde-cutselection");
+ - gnome_clipboard=registerDragType("x-special/gnome-copied-files");
+ - gnome_dragndrop=registerDragType("x-special/gnome-icon-list");
+ - urilistType
+
+
+My internal code to keep track of the selected files put on the clipboard:
+
+   for(int i=0; i<filelist->getNumItems(); i++){
+      if(filelist->isItemSelected(i) && filelist->getItemFilename(i)!=".." && filelist->getItemFilename(i)!="."){
+        clipboard.append(FXURL::fileToURL(filelist->getItemPathname(i)));
+        }
+      }
+
+The actual request is handled like this:
+
+  if (event->target==fileapp->kde_clipboard) {
+    /// 1 == cut, 0 == copy
+    setDNDData(FROM_CLIPBOARD,event->target,clipboard_cut ? "1" : "0");
+    }
+  else if (event->target==urilistType){
+    FXString list;
+    list+=clipboard[0];
+    for (int i=1;i<clipboard.no();i++){
+      list+="\r\n";
+      list+=clipboard[i];
+      }
+    setDNDData(FROM_CLIPBOARD,event->target,list);
+    }
+  else if (event->target==fileapp->gnome_clipboard){
+    FXString list;
+
+    if (clipboard_cut)
+      list+="cut\n";
+    else
+      list+="copy\n";
+
+    list+=clipboard[0];
+    for (int i=1;i<clipboard.no();i++){
+      list+="\n";
+      list+=clipboard[i];
+      }
+    setDNDData(FROM_CLIPBOARD,event->target,list);
+    }
+
+#endif
 
 // FIXME share code with file clipboard...
 
@@ -627,21 +707,6 @@ long FXFileList::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
     getSelectedFiles(dragfiles);
     }
   return 1;
-  }
-
-
-// Return list of selected files
-FXint FXFileList::getSelectedFiles(FXString& result) const {
-  register FXint count=0;
-  result=FXString::null;
-  for(FXint i=0; i<getNumItems(); i++){
-    if(isItemSelected(i) && !isItemNavigational(i)){
-      result.append(getItemPathname(i));
-      result.append("\n");
-      count++;
-      }
-    }
-  return count;
   }
 
 
@@ -1116,6 +1181,33 @@ long FXFileList::onCmdRefresh(FXObject*,FXSelector,void*){
   }
 
 
+// Load preview icon given path
+FXIcon* FXFileList::getItemPreviewIcon(FXint index) const {
+  if(getAssociations() && getAssociations()->getIconDict() && getAssociations()->getIconDict()->getIconSource()){
+    return getAssociations()->getIconDict()->getIconSource()->loadScaledIconFile(getItemPathname(index),imagesize);
+    }
+  return NULL;
+  }
+      
+    
+
+// Change directory when hovering over a folder
+long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
+  register FXint index=(FXint)(FXival)ptr;
+  register FXIcon *icon;
+  if(index<getNumItems()){
+    if((icon=getItemPreviewIcon(index))!=NULL){
+      icon->create();
+      setItemBigIcon(index,icon,true);
+      }
+   if(++index<getNumItems()){
+     getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)index);
+     }
+   }
+  return 1;
+  }
+
+
 // Scan items to see if listing is necessary
 void FXFileList::scan(FXbool force){
   FXStat info;
@@ -1495,23 +1587,16 @@ fnd:  *pn=item;
           if(item->assoc->miniicon) item->setMiniIcon(item->assoc->miniicon);
           }
 
+/*
         // Attempt to load thumbnail
         if(associations && (options&FILELIST_SHOWIMAGES)){
           source=associations->getIconDict()->getIconSource();
           icon=source->loadScaledIconFile(pathname,imagesize);
           if(icon) item->setBigIcon(icon,true);
           }
-
+*/
         // Update item information
-#ifdef WIN32
-        item->label.format("%s\t%s\t%I64u\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text());
-#else
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-        item->label.format("%s\t%s\t%ld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text(),linkname.text());
-#else
         item->label.format("%s\t%s\t%lld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text(),linkname.text());
-#endif
-#endif
 
         // Create item
         if(id()) item->create();
@@ -1519,6 +1604,7 @@ fnd:  *pn=item;
       }
     dir.close();
     }
+  
 
   // Wipe items remaining in list:- they have disappeared!!
   for(item=oldlist; item; item=link){
@@ -1534,6 +1620,10 @@ fnd:  *pn=item;
   // Remember new list
   list=newlist;
 
+  if(options&FILELIST_SHOWIMAGES){
+    getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)0);
+    }
+    
   // Gotta recalc size of content
   recalc();
   }
@@ -1656,9 +1746,10 @@ void FXFileList::load(FXStream& store){
 
 // Cleanup
 FXFileList::~FXFileList(){
-  getApp()->removeTimeout(this,ID_REFRESHTIMER);
-  getApp()->removeTimeout(this,ID_OPENTIMER);
   getApp()->removeChore(this,ID_DROPACTION);
+  getApp()->removeChore(this,ID_PREVIEWCHORE);
+  getApp()->removeTimeout(this,ID_OPENTIMER);
+  getApp()->removeTimeout(this,ID_REFRESHTIMER);
   if(!(options&FILELIST_NO_OWN_ASSOC)) delete associations;
   delete big_folder;
   delete mini_folder;

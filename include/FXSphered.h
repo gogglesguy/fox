@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSphered.h,v 1.19 2007/02/07 20:21:58 fox Exp $                         *
+* $Id: FXSphered.h,v 1.21 2007/07/09 16:02:49 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSPHERED_H
 #define FXSPHERED_H
@@ -60,10 +59,10 @@ public:
   FXSphered& set(const FXSphered& sphere){ center=sphere.center; radius=sphere.radius; return *this; }
 
   /// Set value from center and radius
-  FXSphered& set(const FXVec3d& cen,FXdouble rad){ center=cen; radius=rad; return *this; }
+  FXSphered& set(const FXVec3d& cen,FXdouble rad=0.0){ center=cen; radius=rad; return *this; }
 
   /// Set value from center and radius
-  FXSphered& set(FXdouble x,FXdouble y,FXdouble z,FXdouble rad){ center.set(x,y,z); radius=rad; return *this; }
+  FXSphered& set(FXdouble x,FXdouble y,FXdouble z,FXdouble rad=0.0){ center.set(x,y,z); radius=rad; return *this; }
 
   /// Comparison
   FXbool operator==(const FXSphered& s) const { return center==s.center && radius==s.radius;}

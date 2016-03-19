@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.h,v 1.172 2007/02/07 20:21:59 fox Exp $                          *
+* $Id: FXTable.h,v 1.174 2007/07/09 16:02:50 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -501,6 +500,18 @@ public:
 
   /// Computes content height
   virtual FXint getContentHeight();
+  
+  /// Return visible area x position
+  virtual FXint getVisibleX() const;
+
+  /// Return visible area y position
+  virtual FXint getVisibleY() const;
+
+  /// Return visible area width
+  virtual FXint getVisibleWidth() const;
+
+  /// Return visible area height
+  virtual FXint getVisibleHeight() const;
 
   /// Create the server-side resources
   virtual void create();

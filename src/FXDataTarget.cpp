@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDataTarget.cpp,v 1.40 2007/02/07 20:22:05 fox Exp $                    *
+* $Id: FXDataTarget.cpp,v 1.42 2007/07/17 22:51:01 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -52,6 +51,13 @@
   - DT_VOID, i.e. unconnected FXDataTarget maybe it should grey out corresponding
     widgets.
   - Need to add ID_GETLONGVALUE/ID_SETLONGVALUE message handlers some day.
+  - onCmdValue, onUpdValue, onCmdOption, and onUpdOption now return 0 if the type
+    variable is not one of the known types.  This allows more easy subclassing of
+    FXDataTarget to add custom data types.  
+  - When the type is DT_VOID, a change message does not change any data but simply
+    passes along the message to data target's target; an update message will be a
+    no-op, but return 1 so that the sending message will remain sensitized if auto-
+    gray is on.
 */
 
 using namespace FX;
@@ -79,6 +85,8 @@ long FXDataTarget::onCmdValue(FXObject* sender,FXSelector sel,void*){
   FXdouble d;
   FXint    i;
   switch(type){
+    case DT_VOID:
+      break;
     case DT_BOOL:
       i=*((FXbool*)data);
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),(void*)&i);
@@ -123,6 +131,8 @@ long FXDataTarget::onCmdValue(FXObject* sender,FXSelector sel,void*){
     case DT_STRING:
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETSTRINGVALUE),data);
       break;
+    default:
+      return 0;
     }
   if(target){
     target->handle(this,FXSEL(FXSELTYPE(sel),message),data);
@@ -136,6 +146,8 @@ long FXDataTarget::onUpdValue(FXObject* sender,FXSelector,void*){
   FXdouble d;
   FXint    i;
   switch(type){
+    case DT_VOID:
+      break;
     case DT_BOOL:
       i=*((FXbool*)data);
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&i);
@@ -174,6 +186,8 @@ long FXDataTarget::onUpdValue(FXObject* sender,FXSelector,void*){
     case DT_STRING:
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),data);
       break;
+    default:
+      return 0;
     }
   return 1;
   }
@@ -183,6 +197,8 @@ long FXDataTarget::onUpdValue(FXObject* sender,FXSelector,void*){
 long FXDataTarget::onCmdOption(FXObject*,FXSelector sel,void*){
   FXint num=((FXint)FXSELID(sel))-ID_OPTION;
   switch(type){
+    case DT_VOID:
+      break;
     case DT_BOOL:
       *((FXbool*)data)=(num!=0);
       break;
@@ -216,6 +232,8 @@ long FXDataTarget::onCmdOption(FXObject*,FXSelector sel,void*){
     case DT_DOUBLE:
       *((FXdouble*)data)=num;
       break;
+    default:
+      return 0;
     }
   if(target){
     target->handle(this,FXSEL(FXSELTYPE(sel),message),data);
@@ -229,45 +247,54 @@ long FXDataTarget::onUpdOption(FXObject* sender,FXSelector sel,void*){
   FXint num=((FXint)FXSELID(sel))-ID_OPTION;
   FXint i=0;
   switch(type){
+    case DT_VOID:
+      break;
     case DT_BOOL:
-      i=*((FXbool*)data);
+      i=*((FXbool*)data);    
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_CHAR:
       i=*((FXchar*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_UCHAR:
       i=*((FXuchar*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_SHORT:
       i=*((FXshort*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_USHORT:
       i=*((FXushort*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_INT:
       i=*((FXint*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_UINT:
       i=*((FXuint*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_LONG:
       i=(FXint) *((FXlong*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_ULONG:
       i=(FXint) *((FXulong*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_FLOAT:
       i=(FXint) *((FXfloat*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_DOUBLE:
       i=(FXint) *((FXdouble*)data);
+      sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
-    }
-  if(i==num){
-    sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_CHECK),NULL);
-    }
-  else{
-    sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
+    default:
+      return 0;
     }
   return 1;
   }

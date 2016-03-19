@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2006,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXConsole.cpp,v 1.17 2007/02/07 20:22:04 fox Exp $                       *
+* $Id: FXConsole.cpp,v 1.19 2007/07/09 16:26:45 fox Exp $                       *
 ********************************************************************************/
 #include <new>
 #include "xincs.h"
@@ -140,13 +139,13 @@ FXbool FXConsole::canFocus() const {
 
 // Get default width
 FXint FXConsole::getDefaultWidth(){
-  return (0<vcols) ? marginleft+marginright+vcols*font->getTextWidth("8",1) : FXScrollArea::getDefaultWidth();
+  return 0<vcols ? marginleft+marginright+vcols*font->getTextWidth("8",1) : FXScrollArea::getDefaultWidth();
   }
 
 
 // Get default height
 FXint FXConsole::getDefaultHeight(){
-  return (0<vrows) ? margintop+marginbottom+vrows*font->getFontHeight() : FXScrollArea::getDefaultHeight();
+  return 0<vrows ? margintop+marginbottom+vrows*font->getFontHeight() : FXScrollArea::getDefaultHeight();
   }
 
 

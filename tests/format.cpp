@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
-* $Id: format.cpp,v 1.26 2007/06/03 05:30:42 fox Exp $                          *
+* $Id: format.cpp,v 1.32 2007/06/24 17:07:08 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 
@@ -25,11 +25,11 @@ extern FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 const FXchar *floatformat[]={
   "%.10e",
+  "%10.5f",
   "%-10.5f",
-  "%10.5f",
-  "%123.9f",
-  "%10.5f",
+  "%+10.5f",
   "% 10.5f",
+  "%123.9f",
   "%+22.9f",
   "%+4.9f",
   "%01.3f",
@@ -40,13 +40,17 @@ const FXchar *floatformat[]={
   "%.1f",
   "%+.3g",
   "%#.3g",
-  "%.g"
+  "%.g",
+  "%#.g",
+  "%g",
+  "%#g"
   };
 
 
 const double floatnumbers[]={
   0.000000001,
   -1.5,
+  0.8,
   1.0,
   10.0,
   100.0,
@@ -67,11 +71,14 @@ const double floatnumbers[]={
   1.23456789E+20,
   0.00000123456,
   2.2250738585072014e-308,
-  1.7976931348623157e+308
+  1.7976931348623157e+308,
+  0.0
   };
 
 const FXchar *intformat[]={
   "%d",
+  "%02x",
+  "%0.2x",
   "%-8d",
   "%8d",
   "%08d",
@@ -84,12 +91,13 @@ const FXchar *intformat[]={
   "%#08x",
   "%o",
   "%#o",
-  "%.32b",
+  "%.32b"
   };
 
 const FXint intnumbers[]={
   0,
   1,
+  0x90,
   -34,
   2147483647,
   4294967295u
@@ -127,7 +135,7 @@ int main(int,char*[]){
 //  res=__snprintf(buffer,sizeof(buffer),"%g",12345E12);
 //  fprintf(stdout,"%d \"%s\"\n",res,buffer);
 
-#if 0
+  
   // Testing int formats
   for(x=0; x<ARRAYNUMBER(intformat); x++){
     for(y=0; y<ARRAYNUMBER(intnumbers); y++){
@@ -135,7 +143,6 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",intformat[x],buffer);
       }
     }
-#endif
 
   // Testing double formats
   for(x=0; x<ARRAYNUMBER(floatformat); x++){

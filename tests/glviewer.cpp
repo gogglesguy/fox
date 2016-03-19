@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: glviewer.cpp,v 1.94 2007/02/07 20:22:24 fox Exp $                        *
+* $Id: glviewer.cpp,v 1.98 2007/06/27 18:04:42 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include "fx3d.h"
@@ -702,8 +702,8 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   colorpalicon=new FXGIFIcon(getApp(),colorpal);
   zoomicon=new FXGIFIcon(getApp(),zoom);
-  cameraicon=new FXGIFIcon(getApp(),camera);
   foxiconicon=new FXGIFIcon(getApp(),foxicon);
+  cameraicon=new FXGIFIcon(getApp(),camera);
 
   // Miscellaneous buttons
   new FXSeparator(toolbar2,SEPARATOR_GROOVE);
@@ -756,9 +756,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   new FXMenuCheck(windowmenu,"Main Toolbar",toolbar1,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(windowmenu,"Graphic Toolbar",toolbar2,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(windowmenu,"Control panel",dockbar,FXWindow::ID_TOGGLESHOWN);
-  FXMenuSeparator* sep1=new FXMenuSeparator(windowmenu);
-  sep1->setTarget(mdiclient);
-  sep1->setSelector(FXMDIClient::ID_MDI_ANY);
+  new FXMenuSeparator(windowmenu,mdiclient,FXMDIClient::ID_MDI_ANY);
   new FXMenuRadio(windowmenu,FXString::null,mdiclient,FXMDIClient::ID_MDI_1);
   new FXMenuRadio(windowmenu,FXString::null,mdiclient,FXMDIClient::ID_MDI_2);
   new FXMenuRadio(windowmenu,FXString::null,mdiclient,FXMDIClient::ID_MDI_3);
@@ -946,7 +944,6 @@ int main(int argc,char *argv[]){
 
   // Make application
   FXApp application("GLViewer","FoxTest");
-
 
   // Open the display
   application.init(argc,argv);

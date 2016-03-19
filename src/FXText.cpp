@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.cpp,v 1.483 2007/06/03 05:30:38 fox Exp $                         *
+* $Id: FXText.cpp,v 1.490 2007/07/09 16:27:12 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -141,6 +140,7 @@
   - Inserting lots of stuff should show cursor.
   - Perhaps change text and style buffer to FXString for further complexity
     reduction.
+  - FIXME use getVisibleX() and getVisibleY() everywhere!
 */
 
 
@@ -457,13 +457,13 @@ void FXText::detach(){
 
 // Get default width
 FXint FXText::getDefaultWidth(){
-  return (0<vcols) ? marginleft+barwidth+marginright+vcols*font->getTextWidth("8",1) : FXScrollArea::getDefaultWidth();
+  return 0<vcols ? marginleft+marginright+vcols*font->getTextWidth("8",1)+barwidth : FXScrollArea::getDefaultWidth()+barwidth;
   }
 
 
 // Get default height
 FXint FXText::getDefaultHeight(){
-  return (0<vrows) ? margintop+marginbottom+vrows*font->getFontHeight() : FXScrollArea::getDefaultHeight();
+  return 0<vrows ? margintop+marginbottom+vrows*font->getFontHeight() : FXScrollArea::getDefaultHeight();
   }
 
 
@@ -535,23 +535,26 @@ static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
 
 // Make a valid position, at the start of a wide character
 FXint FXText::validPos(FXint pos) const {
+  register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
   if(pos<=0) return 0;
   if(pos>=length) return length;
-  return wcvalidate(pos<gapstart ? buffer : buffer-gapstart+gapend,pos);
+  return (FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos), pos;
   }
 
 
 // Decrement; a wide character does not cross the gap, so if pos is at
 // or below below the gap, we read from the segment below the gap
 FXint FXText::dec(FXint pos) const {
-  return wcdec(pos<=gapstart ? buffer : buffer-gapstart+gapend,pos);
+  register const FXchar *ptr=pos<=gapstart ? buffer : buffer-gapstart+gapend;
+  return (--pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos<=0 || FXISUTF(ptr[pos]) || --pos), pos;
   }
 
 
 // Increment; since a wide character does not cross the gap, if we
 // start under the gap the last character accessed is below the gap
 FXint FXText::inc(FXint pos) const {
-  return wcinc(pos<gapstart ? buffer : buffer-gapstart+gapend,pos);
+  register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
+  return (++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos>=length || FXISUTF(ptr[pos]) || ++pos), pos;
   }
 
 
@@ -1583,7 +1586,7 @@ void FXText::moveContents(FXint x,FXint y){
   vh=getVisibleHeight();
 
   // Scroll stuff in the bar only vertically
-  scroll(0,vy,vx,vh,0,dy);
+  scroll(vx-barwidth,vy,barwidth,vh,0,dy);
 
   // Scroll the text
   scroll(vx+marginleft,vy+margintop,vw-marginleft-marginright,vh-margintop-marginbottom,dx,dy);
@@ -1702,7 +1705,7 @@ FXint FXText::getVisibleY() const {
 
 // Return visible scroll-area width
 FXint FXText::getVisibleWidth() const {
-  return width-barwidth-vertical->getWidth();
+  return width-vertical->getWidth()-barwidth;
   }
 
 
@@ -1715,7 +1718,7 @@ FXint FXText::getVisibleHeight() const {
 // Determine content width of scroll area
 FXint FXText::getContentWidth(){
   if(flags&FLAG_RECALC) recompute();
-  return marginleft+barwidth+marginright+textWidth;
+  return marginleft+marginright+textWidth;
   }
 
 
@@ -1749,7 +1752,7 @@ void FXText::layout(){
     }
 
   // Scrollbars adjusted
-  placeScrollBars(width,height);
+  placeScrollBars(width-barwidth,height);
 
   // Number of visible lines may have changed
   nvisrows=(height-margintop-marginbottom+fh+fh-1)/fh;
@@ -2100,7 +2103,7 @@ void FXText::replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style){
     }
 
   // Reconcile scrollbars
-  placeScrollBars(width,height);
+  placeScrollBars(width-barwidth,height);
 
   // Forget preferred column
   prefcol=-1;

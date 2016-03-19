@@ -74,6 +74,7 @@ Questions
   <a href="#HANDLES">MS-Windows GDI handle limits.</a><BR>
   <a href="#BUFFERED">How to I make a back-buffered widget?</a><BR>
   <a href="#DRAGANDDROP">Advanced drag and drop topics.</a><BR>
+  <a href="#EXCEPTIONS">FOX Exception handling.</a><BR>
 </ul>
 
 
@@ -2180,21 +2181,21 @@ when dragging and dropping within the same application.
 <li>When the widget is the drag source, it calls beginDrag(), handleDrag()
 and endDrag() in succession.</li>
 <p>
-<li>When you do a drag and drop, two programs are normally involved [although 
-drag and drop also works within the same program].  When the drag source [sender] 
+<li>When you do a drag and drop, two programs are normally involved [although
+drag and drop also works within the same program].  When the drag source [sender]
 performs a drop using endDrag(), a drop-message is sent to the drop-target [receiver].
-After sending this drop-message, the sender goes into a little event loop, waiting 
+After sending this drop-message, the sender goes into a little event loop, waiting
 for confirmation that the drop-target has obtained the data, and coordinating with
 the receiver to transfer the drop-data.</li>
 <p>
 <li>After the data transfer has completed, the receiver sends a finish-message to
 the sender to let the sender know it has obtained the data; this message is normally
-send automatically upon returning from the drop-message handler.  
+send automatically upon returning from the drop-message handler.
 When the sender receives this message, it can then wrap up the drag operation, and
 return from the endDrag() routine.</li>
 <p>
-<li>As the sender is waiting for the finish-message in its event loop, it keeps timers 
-to ward against receivers crashing or just being broken in some way.   After all, we 
+<li>As the sender is waiting for the finish-message in its event loop, it keeps timers
+to ward against receivers crashing or just being broken in some way.   After all, we
 don't want a bad behaviour in another program to cause a problem in the sender itself.
 We assume that if a timeout has occurred, the data transfer has been unsuccessful
 and thus the sender should not delete any data in that case.</li>
@@ -2202,19 +2203,19 @@ and thus the sender should not delete any data in that case.</li>
 <li>Now, in most simple drag and drop cases, the operations performed by the receiver
 after obtaining the data from a drop are pretty quick, and no special handling is needed.
 However, when a receiver needs to do a lot of work upon receiving a drop-message,
-the receiver can explicitly send a finish-message to the sender [dropFinished()] after 
-obtaining the data.  We thus release the sender from its event loop quickly, before the 
+the receiver can explicitly send a finish-message to the sender [dropFinished()] after
+obtaining the data.  We thus release the sender from its event loop quickly, before the
 receiver would normally return from the drop-message handler.  Having thus released the
 sender, the receiver can then proceed to work on the data at its leisure.</li>
 <p>
-<li>However, a problem still exists when sender and receiver are one and the same. 
+<li>However, a problem still exists when sender and receiver are one and the same.
 Because in that case, control cannot return from endDrag() because the drop-message
 is still being processed.  To avoid these problems, we need to ensure that control
 returns to the main event loop before the drop-data is processed.</li>
 <p>
-<li>The solution to this problem is to set a chore to process the actual data, 
-and return from the SEL_DND_DROP handler immediately.  This way, if sender and receiver 
-happen to be the same, we are assured that the chore handler is executed after 
+<li>The solution to this problem is to set a chore to process the actual data,
+and return from the SEL_DND_DROP handler immediately.  This way, if sender and receiver
+happen to be the same, we are assured that the chore handler is executed after
 returning to the top-most event loop.</li>
 <p>
 <li>Now, the sender can return from the endDrag() function, and normal event
@@ -2224,6 +2225,88 @@ can invoke anything we want in the chore handler, which includes popping dialogs
 and invoking popup menus!</li>
 </ul>
 
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+<a NAME="EXCEPTIONS"></a>FOX Exception handling.
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+</p>
+<!--- TOPIC TITLE -->
+<p>
+<ul>
+Some notes about the FOX exception handling philosophy.
+FOX Widgets like buttons, sliders, text fields, and so on, rely on a particular, well-defined
+sequence of events to maintain internal consistent state.  During the processing of events,
+widgets may issue callbacks to message handlers in the application program to inform of certain 
+events.<br>
+A problem exists, however, if the message handler code does not normally return to its caller
+but throws an exception.  In this case, exception processing prevents the normal sequence
+of from taking place, leaving a widget in a potentially inconsistent state.
+<p>
+We want to ensure that when exceptions are thrown, the widget can recover.  To this end we
+notice that BEFORE the message handler was invoked, things were still OK.  Therefore, the 
+point of message handler invocation represents a <b>safe</b> <b><em>roll-back</em></b> point.<br>
+<p>
+To ensure that a widget can be brought back into a known state, message handlers are invoked
+through the <b>tryHandle()</b> function.  Any exceptions that are raised while executing
+the handler can be caught in tryHandle().  
+<p>
+However, not all exceptions should be treated this gently; after all, in correct programs,
+only resource-exceptions are to be expected, whereas other types of exceptions may be
+raised only in the presence of non-recoverable errors or incorrectly functioning software.
+<p>
+These kinds of exceptions should be passed on, to allow developers to debug their software.
+<p>
+In FOX, FXResourceException is the type of exception that is expected to be recoverable.
+It includes typical scenarios such as running out of disk space, RAM memory, or window-handles.
+It is important to distingish these errors from programming errors:- perfectly correct programs
+can, after all, run into resource limits on the user's machine, which has only finite amounts
+of memory, disk space, and other resource.  Conversely, programming errors such as indexing 
+lists out of range, and so on, should not occur in well-written software.<br>
+<p>
+Consider the following code-fragment:
+<pre>
+// About box
+long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
+  FXDialogBox about(this,tr("About Adie"),DECOR_TITLE|DECOR_BORDER,0,0,0,0, 0,0,0,0, 0,0);
+  FXGIFIcon picture(getApp(),adie_gif);
+  ///// build a gui //////
+  about.execute(PLACEMENT_OWNER);
+  return 1;
+  }
+</pre>
+
+In this code, FOX API's are invoked to create a dialog box for an application.  This
+typically entails generating windows, icons, cursors, and font resource in the system.  If we
+fail to allocate any of these resources [for example, the number of window handles is
+exceeded], then the responsible FOX API throws a FXResourceException.<br>
+
+Ssince FXDialogBox and FXGIFIcon are stack-allocated, they will be nicely cleaned up, and the
+whole stack is unrolled until the point inside tryHandle() where a FXResourceException is
+caught and discarded.   Now, the user can fix the situation [say, close a few big applications] 
+and try again.
+<p>
+Note that other exceptions than FXResourceExceptions are <b>not</b> caught in tryHandle().  
+<p>
+Thus, to recap:
+<p>
+<ul>
+<li>FXResourceException's are thrown by FOX, and caught in FOX, but may unroll through the 
+application-programmer's own message handler-code.   You can use them in your own code, but
+keep in mind that they're intented for recoverable types of errors, and not for detecting
+programming errors.</li>
+
+<li>You can throw other kinds of exceptions [exceptions not related to FXException], but 
+FOX will not catch them.  However, since these will unroll through tryHandle() and the widget's
+event processing code, there will be a possibility that the widget will remain in an 
+inconsistent state.  Its therefore probably better to avoid raising these types of exceptions 
+unless they're caught prior to returning from the message handler.</li>
+
+<li>Writing your message-handlers exception-safe allows your program to fully recover from
+resource errors, should they occur.</li>
+
+</ul>
 
 <p>
 <table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>
@@ -2247,7 +2330,7 @@ google_ad_format = "728x90_as";
 <p>
 <table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1><font size=-1>
-Copyright &copy; 1997-2005 Jeroen van der Zijp</font>
+Copyright &copy; 1997-2007 Jeroen van der Zijp</font>
 </td></tr></table>
 </p>
 <!--- COPYRIGHT -->

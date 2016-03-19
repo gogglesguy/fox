@@ -5,21 +5,20 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* This library is free software; you can redistribute it and/or                 *
-* modify it under the terms of the GNU Lesser General Public                    *
-* License as published by the Free Software Foundation; either                  *
-* version 2.1 of the License, or (at your option) any later version.            *
+* This library is free software; you can redistribute it and/or modify          *
+* it under the terms of the GNU Lesser General Public License as published by   *
+* the Free Software Foundation; either version 3 of the License, or             *
+* (at your option) any later version.                                           *
 *                                                                               *
 * This library is distributed in the hope that it will be useful,               *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of                *
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU             *
-* Lesser General Public License for more details.                               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 *
+* GNU Lesser General Public License for more details.                           *
 *                                                                               *
-* You should have received a copy of the GNU Lesser General Public              *
-* License along with this library; if not, write to the Free Software           *
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
+* You should have received a copy of the GNU Lesser General Public License      *
+* along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.368 2007/05/17 21:19:50 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.372 2007/07/20 18:31:01 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -112,7 +111,7 @@
 #define LAYOUT_MASK (LAYOUT_SIDE_MASK|LAYOUT_RIGHT|LAYOUT_CENTER_X|LAYOUT_BOTTOM|LAYOUT_CENTER_Y|LAYOUT_FIX_X|LAYOUT_FIX_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_DOCK_SAME|LAYOUT_DOCK_NEXT)
 
 
-#define DISPLAY(app) ((Display*)((app)->display))
+//#define DISPLAY(app) ((Display*)((app)->display))
 
 using namespace FX;
 
@@ -190,22 +189,22 @@ FXIMPLEMENT(FXWindow,FXDrawable,FXWindowMap,ARRAYNUMBER(FXWindowMap))
 
 
 // Drag type names
+const FXchar FXWindow::octetTypeName[]="application/octet-stream";
 const FXchar FXWindow::deleteTypeName[]="DELETE";
 const FXchar FXWindow::textTypeName[]="text/plain";
 const FXchar FXWindow::colorTypeName[]="application/x-color";
 const FXchar FXWindow::urilistTypeName[]="text/uri-list";
 const FXchar FXWindow::utf8TypeName[]="UTF8_STRING";
 const FXchar FXWindow::utf16TypeName[]="text/utf16";
-const FXchar FXWindow::octetTypeName[]="application/octet-stream";
 
 
 // Drag type atoms; first widget to need it should register the type
+FXDragType FXWindow::octetType=0;
 FXDragType FXWindow::deleteType=0;
 FXDragType FXWindow::textType=0;
 FXDragType FXWindow::colorType=0;
 FXDragType FXWindow::urilistType=0;
 FXDragType FXWindow::utf8Type=0;
-FXDragType FXWindow::octetType=0;
 
 
 // The string type is predefined and hardwired
@@ -1138,13 +1137,13 @@ void FXWindow::addColormapWindows(){
   int countReturn,i;
 
   // Check to see if there is already a property
-  Status status=XGetWMColormapWindows(DISPLAY(getApp()),getShell()->id(),&windowsReturn,&countReturn);
+  Status status=XGetWMColormapWindows((Display*)getApp()->getDisplay(),getShell()->id(),&windowsReturn,&countReturn);
 
   // If no property, just create one
   if(!status){
     windows[0]=id();
     windows[1]=getShell()->id();
-    XSetWMColormapWindows(DISPLAY(getApp()),getShell()->id(),windows,2);
+    XSetWMColormapWindows((Display*)getApp()->getDisplay(),getShell()->id(),windows,2);
     }
 
   // There was a property, add myself to the beginning
@@ -1152,7 +1151,7 @@ void FXWindow::addColormapWindows(){
     windowList=(Window*)malloc((sizeof(Window))*(countReturn+1));
     windowList[0]=id();
     for(i=0; i<countReturn; i++) windowList[i+1]=windowsReturn[i];
-    XSetWMColormapWindows(DISPLAY(getApp()),getShell()->id(),windowList,countReturn+1);
+    XSetWMColormapWindows((Display*)getApp()->getDisplay(),getShell()->id(),windowList,countReturn+1);
     XFree((char*)windowsReturn);
     free(windowList);
     }
@@ -1163,12 +1162,12 @@ void FXWindow::addColormapWindows(){
 void FXWindow::remColormapWindows(){
   Window *windowsReturn;
   int countReturn,i;
-  Status status=XGetWMColormapWindows(DISPLAY(getApp()),getShell()->id(),&windowsReturn,&countReturn);
+  Status status=XGetWMColormapWindows((Display*)getApp()->getDisplay(),getShell()->id(),&windowsReturn,&countReturn);
   if(status){
     for(i=0; i<countReturn; i++){
       if(windowsReturn[i]==id()){
         for(i++; i<countReturn; i++) windowsReturn[i-1]=windowsReturn[i];
-        XSetWMColormapWindows(DISPLAY(getApp()),getShell()->id(),windowsReturn,countReturn-1);
+        XSetWMColormapWindows((Display*)getApp()->getDisplay(),getShell()->id(),windowsReturn,countReturn-1);
         break;
         }
       }
@@ -1187,8 +1186,6 @@ void FXWindow::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-      
-#ifdef WIN32
 
       // Gotta have a parent already created!
       if(!parent->id()){ fxerror("%s::create: trying to create window before creating parent window.\n",getClassName()); }
@@ -1208,6 +1205,7 @@ void FXWindow::create(){
       // Create drag cursor
       if(dragCursor) dragCursor->create();
 
+#ifdef WIN32
       // Most windows use these style bits
       DWORD dwStyle=WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
       DWORD dwExStyle=WS_EX_NOPARENTNOTIFY;
@@ -1264,24 +1262,6 @@ void FXWindow::create(){
       XClassHint hint;
       unsigned long mask;
 
-      // Gotta have a parent already created!
-      if(!parent->id()){ fxerror("%s::create: trying to create window before creating parent window.\n",getClassName()); }
-
-      // If window has owner, owner should have been created already
-      if(owner && !owner->id()){ fxerror("%s::create: trying to create window before creating owner window.\n",getClassName()); }
-
-      // Got to have a visual
-      if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
-
-      // Initialize visual
-      visual->create();
-
-      // Create default cursor
-      if(defaultCursor) defaultCursor->create();
-
-      // Create drag cursor
-      if(dragCursor) dragCursor->create();
-
       // Fill in the attributes
       mask=CWBackPixmap|CWWinGravity|CWBitGravity|CWBorderPixel|CWEventMask|CWDontPropagate|CWCursor|CWOverrideRedirect|CWSaveUnder|CWColormap;
 
@@ -1337,7 +1317,7 @@ void FXWindow::create(){
       wattr.cursor=defaultCursor->id();
 
       // Finally, create the window
-      xid=XCreateWindow(DISPLAY(getApp()),parent->id(),xpos,ypos,FXMAX(width,1),FXMAX(height,1),0,visual->depth,InputOutput,(Visual*)visual->visual,mask,&wattr);
+      xid=XCreateWindow((Display*)getApp()->getDisplay(),parent->id(),xpos,ypos,FXMAX(width,1),FXMAX(height,1),0,visual->depth,InputOutput,(Visual*)visual->visual,mask,&wattr);
 
       // Uh-oh, we failed
       if(!xid){ throw FXWindowException("unable to create window."); }
@@ -1351,35 +1331,34 @@ void FXWindow::create(){
       if(flags&FLAG_SHELL){
         hint.res_name=(char*)getApp()->getAppName().text();             // "FoxApp";
         hint.res_class=(char*)getApp()->getVendorName().text();         // "FoxWindow";
-        XSetClassHint(DISPLAY(getApp()),xid,&hint);
+        XSetClassHint((Display*)getApp()->getDisplay(),xid,&hint);
         }
 
       // We put the XdndAware property on all toplevel windows, so that
       // when dragging, we need to search no further than the toplevel window.
       if(flags&FLAG_SHELL){
         Atom propdata=(Atom)XDND_PROTOCOL_VERSION;
-        XChangeProperty(DISPLAY(getApp()),xid,getApp()->xdndAware,XA_ATOM,32,PropModeReplace,(unsigned char*)&propdata,1);
+        XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndAware,XA_ATOM,32,PropModeReplace,(unsigned char*)&propdata,1);
         }
 
       // If window is a shell and it has an owner, make it stay on top of the owner
       if((flags&FLAG_SHELL) && owner){
-        XSetTransientForHint(DISPLAY(getApp()),xid,owner->getShell()->id());
+        XSetTransientForHint((Display*)getApp()->getDisplay(),xid,owner->getShell()->id());
         }
 
       // If colormap different, set WM_COLORMAP_WINDOWS property properly
-      if(visual->colormap!=DefaultColormap(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())))){
+      if(visual->colormap!=DefaultColormap((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()))){
         addColormapWindows();
         }
 
       // Show if it was supposed to be
-      if((flags&FLAG_SHOWN) && 0<width && 0<height) XMapWindow(DISPLAY(getApp()),xid);
+      if((flags&FLAG_SHOWN) && 0<width && 0<height) XMapWindow((Display*)getApp()->getDisplay(),xid);
 
 #endif
       flags|=FLAG_OWNED;
       }
     }
   }
-
 
 
 // Attach to a window belonging to another application
@@ -1415,12 +1394,26 @@ void FXWindow::attach(FXID w){
       // Store for xid to C++ object mapping
       getApp()->hash.insert((void*)xid,this);
 
-      // Reparent under what WE think the parent is
 #ifdef WIN32
+
+      // Reparent under what WE think the parent is
       SetParent((HWND)xid,(HWND)parent->id());
+
 #else
-      XReparentWindow(DISPLAY(getApp()),xid,parent->id(),0,0);
+
+      XSetWindowAttributes wattr;
+      unsigned long mask;
+      mask=CWEventMask|CWDontPropagate|CWCursor;
+      wattr.event_mask=BASIC_EVENT_MASK;
+      if(flags&FLAG_ENABLED) wattr.event_mask|=ENABLED_EVENT_MASK;
+      wattr.do_not_propagate_mask=NOT_PROPAGATE_MASK;
+      wattr.cursor=defaultCursor->id();
+      XChangeWindowAttributes((Display*)getApp()->getDisplay(),xid,mask,&wattr);
+
+      // Reparent window
+      XReparentWindow((Display*)getApp()->getDisplay(),xid,parent->id(),0,0);
 #endif
+      flags&=~FLAG_OWNED;
       }
     }
   }
@@ -1478,17 +1471,17 @@ void FXWindow::destroy(){
         DestroyWindow((HWND)xid);
 #else
         // If colormap different, set WM_COLORMAP_WINDOWS property properly
-        if(visual->colormap!=DefaultColormap(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())))){
+        if(visual->colormap!=DefaultColormap((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()))){
           remColormapWindows();
           }
 
         // Delete the XdndAware property
         if(flags&FLAG_SHELL){
-          XDeleteProperty(DISPLAY(getApp()),xid,getApp()->xdndAware);
+          XDeleteProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndAware);
           }
 
         // Delete the window
-        XDestroyWindow(DISPLAY(getApp()),xid);
+        XDestroyWindow((Display*)getApp()->getDisplay(),xid);
 #endif
         }
       }
@@ -1537,7 +1530,7 @@ void FXWindow::setShape(const FXRegion& region){
     SetWindowRgn((HWND)xid,rgn,false);
 #else
 #ifdef HAVE_XSHAPE_H
-    XShapeCombineRegion(DISPLAY(getApp()),xid,ShapeBounding,0,0,(Region)region.region,ShapeSet);
+    XShapeCombineRegion((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,(Region)region.region,ShapeSet);
 #endif
 #endif
     }
@@ -1580,7 +1573,7 @@ void FXWindow::setShape(FXBitmap* bitmap){
     DeleteDC(hdc);
 #else
 #ifdef HAVE_XSHAPE_H
-    XShapeCombineMask(DISPLAY(getApp()),xid,ShapeBounding,0,0,bitmap->id(),ShapeSet);
+    XShapeCombineMask((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,bitmap->id(),ShapeSet);
 #endif
 #endif
     }
@@ -1599,7 +1592,7 @@ void FXWindow::setShape(FXIcon* icon){
     DeleteDC(hdc);
 #else
 #ifdef HAVE_XSHAPE_H
-    XShapeCombineMask(DISPLAY(getApp()),xid,ShapeBounding,0,0,icon->shape,ShapeSet);
+    XShapeCombineMask((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,icon->shape,ShapeSet);
 #endif
 #endif
     }
@@ -1613,7 +1606,7 @@ void FXWindow::clearShape(){
     SetWindowRgn((HWND)xid,NULL,false);
 #else
 #ifdef HAVE_XSHAPE_H
-    XShapeCombineMask(DISPLAY(getApp()),xid,ShapeBounding,0,0,None,ShapeSet);
+    XShapeCombineMask((Display*)getApp()->getDisplay(),xid,ShapeBounding,0,0,None,ShapeSet);
 #endif
 #endif
     }
@@ -1754,7 +1747,7 @@ void FXWindow::showCursor(FXbool flag){
 #ifdef WIN32
       ShowCursor(true);
 #else
-      XDefineCursor(DISPLAY(getApp()),xid,defaultCursor->id());
+      XDefineCursor((Display*)getApp()->getDisplay(),xid,defaultCursor->id());
 #endif
       }
     flags|=FLAG_CURSOR;
@@ -1764,7 +1757,7 @@ void FXWindow::showCursor(FXbool flag){
 #ifdef WIN32
       ShowCursor(false);
 #else
-      XDefineCursor(DISPLAY(getApp()),xid,getApp()->getDefaultCursor(DEF_BLANK_CURSOR)->id());
+      XDefineCursor((Display*)getApp()->getDisplay(),xid,getApp()->getDefaultCursor(DEF_BLANK_CURSOR)->id());
 #endif
       }
     flags&=~FLAG_CURSOR;
@@ -1782,7 +1775,7 @@ void FXWindow::setDefaultCursor(FXCursor* cur){
 #ifdef WIN32
         if(underCursor() && !grabbed()) SetCursor((HCURSOR)cur->id());
 #else
-        XDefineCursor(DISPLAY(getApp()),xid,cur->id());
+        XDefineCursor((Display*)getApp()->getDisplay(),xid,cur->id());
 #endif
         }
       }
@@ -1801,7 +1794,7 @@ void FXWindow::setDragCursor(FXCursor* cur){
 #ifdef WIN32
         SetCursor((HCURSOR)cur->id());
 #else
-        XChangeActivePointerGrab(DISPLAY(getApp()),GRAB_EVENT_MASK,cur->id(),CurrentTime);
+        XChangeActivePointerGrab((Display*)getApp()->getDisplay(),GRAB_EVENT_MASK,cur->id(),CurrentTime);
 #endif
         }
       }
@@ -1818,7 +1811,7 @@ void FXWindow::setBackColor(FXColor clr){
 //#ifdef WIN32
 //      // FIXME //
 //#else
-//      XSetWindowBackground(DISPLAY(getApp()),xid,visual->getPixel(backColor));
+//      XSetWindowBackground((Display*)getApp()->getDisplay(),xid,visual->getPixel(backColor));
 //#endif
 //      }
     update();
@@ -1871,8 +1864,8 @@ FXbool FXWindow::acquireSelection(const FXDragType *types,FXuint numtypes){
     }
   if(xid){
 #ifndef WIN32
-    XSetSelectionOwner(DISPLAY(getApp()),XA_PRIMARY,xid,getApp()->event.time);
-    if(XGetSelectionOwner(DISPLAY(getApp()),XA_PRIMARY)!=xid) return false;
+    XSetSelectionOwner((Display*)getApp()->getDisplay(),XA_PRIMARY,xid,getApp()->event.time);
+    if(XGetSelectionOwner((Display*)getApp()->getDisplay(),XA_PRIMARY)!=xid) return false;
 #endif
     }
   if(!getApp()->selectionWindow){
@@ -1895,7 +1888,7 @@ FXbool FXWindow::releaseSelection(){
     getApp()->xselNumTypes=0;
     if(xid){
 #ifndef WIN32
-      XSetSelectionOwner(DISPLAY(getApp()),XA_PRIMARY,None,getApp()->event.time);
+      XSetSelectionOwner((Display*)getApp()->getDisplay(),XA_PRIMARY,None,getApp()->event.time);
 #endif
       }
     return true;
@@ -1950,8 +1943,8 @@ FXbool FXWindow::acquireClipboard(const FXDragType *types,FXuint numtypes){
     }
   if(xid){
 #ifndef WIN32
-    XSetSelectionOwner(DISPLAY(getApp()),getApp()->xcbSelection,xid,getApp()->event.time);
-    if(XGetSelectionOwner(DISPLAY(getApp()),getApp()->xcbSelection)!=xid) return false;
+    XSetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xcbSelection,xid,getApp()->event.time);
+    if(XGetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xcbSelection)!=xid) return false;
 #else
     if(!OpenClipboard((HWND)xid)) return false;
     EmptyClipboard();
@@ -1984,7 +1977,7 @@ FXbool FXWindow::releaseClipboard(){
 #endif
     if(xid){
 #ifndef WIN32
-      XSetSelectionOwner(DISPLAY(getApp()),getApp()->xcbSelection,None,getApp()->event.time);
+      XSetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xcbSelection,None,getApp()->event.time);
 #else
       if(OpenClipboard((HWND)xid)){EmptyClipboard();CloseClipboard();}
 #endif
@@ -2010,7 +2003,7 @@ FXbool FXWindow::getCursorPosition(FXint& x,FXint& y,FXuint& buttons) const {
     return true;
 #else
     Window dum; int rx,ry;
-    return XQueryPointer(DISPLAY(getApp()),xid,&dum,&dum,&rx,&ry,&x,&y,&buttons);
+    return XQueryPointer((Display*)getApp()->getDisplay(),xid,&dum,&dum,&rx,&ry,&x,&y,&buttons);
 #endif
     }
   return false;
@@ -2029,7 +2022,7 @@ FXbool FXWindow::setCursorPosition(FXint x,FXint y){
     SetCursorPos(pt.x,pt.y);
     return true;
 #else
-    XWarpPointer(DISPLAY(getApp()),None,xid,0,0,0,0,x,y);
+    XWarpPointer((Display*)getApp()->getDisplay(),None,xid,0,0,0,0,x,y);
     return true;
 #endif
     }
@@ -2157,7 +2150,7 @@ void FXWindow::move(FXint x,FXint y){
 #ifdef WIN32
       SetWindowPos((HWND)xid,NULL,x,y,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE|SWP_NOOWNERZORDER);
 #else
-      XMoveWindow(DISPLAY(getApp()),xid,x,y);
+      XMoveWindow((Display*)getApp()->getDisplay(),xid,x,y);
 #endif
       if(flags&FLAG_DIRTY) layout();
       }
@@ -2187,12 +2180,12 @@ void FXWindow::position(FXint x,FXint y,FXint w,FXint h){
 #else
       if(0<w && 0<h){
         if((flags&FLAG_SHOWN) && (ow<=0 || oh<=0)){
-          XMapWindow(DISPLAY(getApp()),xid);
+          XMapWindow((Display*)getApp()->getDisplay(),xid);
           }
-        XMoveResizeWindow(DISPLAY(getApp()),xid,x,y,w,h);
+        XMoveResizeWindow((Display*)getApp()->getDisplay(),xid,x,y,w,h);
         }
       else if(0<ow && 0<oh){
-        XUnmapWindow(DISPLAY(getApp()),xid);
+        XUnmapWindow((Display*)getApp()->getDisplay(),xid);
         }
 #endif
 
@@ -2223,12 +2216,12 @@ void FXWindow::resize(FXint w,FXint h){
 #else
       if(0<w && 0<h){
         if((flags&FLAG_SHOWN) && (ow<=0 || oh<=0)){
-          XMapWindow(DISPLAY(getApp()),xid);
+          XMapWindow((Display*)getApp()->getDisplay(),xid);
           }
-        XResizeWindow(DISPLAY(getApp()),xid,w,h);
+        XResizeWindow((Display*)getApp()->getDisplay(),xid,w,h);
         }
       else if(0<ow && 0<oh){
-        XUnmapWindow(DISPLAY(getApp()),xid);
+        XUnmapWindow((Display*)getApp()->getDisplay(),xid);
         }
 #endif
 
@@ -2262,10 +2255,10 @@ void FXWindow::scroll(FXint x,FXint y,FXint w,FXint h,FXint dx,FXint dy) const {
       XEvent event;
 
       // Force server to catch up
-      XSync(DISPLAY(getApp()),False);
+      XSync((Display*)getApp()->getDisplay(),False);
 
       // Pull any outstanding repaint events into our own repaint rectangle list
-      while(XCheckWindowEvent(DISPLAY(getApp()),xid,ExposureMask,&event)){
+      while(XCheckWindowEvent((Display*)getApp()->getDisplay(),xid,ExposureMask,&event)){
         if(event.xany.type==NoExpose) continue;
         getApp()->addRepaint(xid,event.xexpose.x,event.xexpose.y,event.xexpose.width,event.xexpose.height,0);
         if(event.xgraphicsexpose.count==0) break;
@@ -2301,7 +2294,7 @@ void FXWindow::scroll(FXint x,FXint y,FXint w,FXint h,FXint dx,FXint dy) const {
         }
 
       // BLIT the contents
-      XCopyArea(DISPLAY(getApp()),xid,xid,(GC)visual->scrollgc,fx,fy,w-ew,h-eh,tx,ty);
+      XCopyArea((Display*)getApp()->getDisplay(),xid,xid,(GC)visual->scrollgc,fx,fy,w-ew,h-eh,tx,ty);
 
       // Post additional rectangles for the uncovered areas
       if(dy){
@@ -2325,7 +2318,7 @@ void FXWindow::show(){
 #ifdef WIN32
       ShowWindow((HWND)xid,SW_SHOWNOACTIVATE);
 #else
-      if(0<width && 0<height) XMapWindow(DISPLAY(getApp()),xid);
+      if(0<width && 0<height) XMapWindow((Display*)getApp()->getDisplay(),xid);
 #endif
       }
     }
@@ -2352,17 +2345,17 @@ void FXWindow::hide(){
       ShowWindow((HWND)xid,SW_HIDE);
 #else
       if(getApp()->mouseGrabWindow==this){
-        XUngrabPointer(DISPLAY(getApp()),CurrentTime);
-        XFlush(DISPLAY(getApp()));
+        XUngrabPointer((Display*)getApp()->getDisplay(),CurrentTime);
+        XFlush((Display*)getApp()->getDisplay());
         handle(this,FXSEL(SEL_UNGRABBED,0),&getApp()->event);
         getApp()->mouseGrabWindow=NULL;
         }
       if(getApp()->keyboardGrabWindow==this){
-        XUngrabKeyboard(DISPLAY(getApp()),getApp()->event.time);
-        XFlush(DISPLAY(getApp()));
+        XUngrabKeyboard((Display*)getApp()->getDisplay(),getApp()->event.time);
+        XFlush((Display*)getApp()->getDisplay());
         getApp()->keyboardGrabWindow=NULL;
         }
-      XUnmapWindow(DISPLAY(getApp()),xid);
+      XUnmapWindow((Display*)getApp()->getDisplay(),xid);
 #endif
       }
     }
@@ -2432,8 +2425,8 @@ void FXWindow::reparent(FXWindow* father,FXWindow* other){
         SetParent((HWND)xid,(HWND)parent->id());
 #else
         // See remarks in FXToolBarGrip
-        XReparentWindow(DISPLAY(getApp()),xid,parent->id(),0,0);
-        XFlush(DISPLAY(getApp()));
+        XReparentWindow((Display*)getApp()->getDisplay(),xid,parent->id(),0,0);
+        XFlush((Display*)getApp()->getDisplay());
 #endif
         }
       }
@@ -2457,7 +2450,7 @@ void FXWindow::enable(){
 #else
       FXuint events=BASIC_EVENT_MASK|ENABLED_EVENT_MASK;
       if(flags&FLAG_SHELL) events|=SHELL_EVENT_MASK;
-      XSelectInput(DISPLAY(getApp()),xid,events);
+      XSelectInput((Display*)getApp()->getDisplay(),xid,events);
 #endif
       }
     }
@@ -2484,16 +2477,16 @@ void FXWindow::disable(){
 #else
       FXuint events=BASIC_EVENT_MASK;
       if(flags&FLAG_SHELL) events|=SHELL_EVENT_MASK;
-      XSelectInput(DISPLAY(getApp()),xid,events);
+      XSelectInput((Display*)getApp()->getDisplay(),xid,events);
       if(getApp()->mouseGrabWindow==this){
-        XUngrabPointer(DISPLAY(getApp()),CurrentTime);
-        XFlush(DISPLAY(getApp()));
+        XUngrabPointer((Display*)getApp()->getDisplay(),CurrentTime);
+        XFlush((Display*)getApp()->getDisplay());
         handle(this,FXSEL(SEL_UNGRABBED,0),&getApp()->event);
         getApp()->mouseGrabWindow=NULL;
         }
       if(getApp()->keyboardGrabWindow==this){
-        XUngrabKeyboard(DISPLAY(getApp()),getApp()->event.time);
-        XFlush(DISPLAY(getApp()));
+        XUngrabKeyboard((Display*)getApp()->getDisplay(),getApp()->event.time);
+        XFlush((Display*)getApp()->getDisplay());
         getApp()->keyboardGrabWindow=NULL;
         }
 #endif
@@ -2514,7 +2507,7 @@ void FXWindow::raise(){
 #ifdef WIN32
     SetWindowPos((HWND)xid,HWND_TOP,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOOWNERZORDER);
 #else
-    XRaiseWindow(DISPLAY(getApp()),xid);
+    XRaiseWindow((Display*)getApp()->getDisplay(),xid);
 #endif
     }
   }
@@ -2526,7 +2519,7 @@ void FXWindow::lower(){
 #ifdef WIN32
     SetWindowPos((HWND)xid,HWND_BOTTOM,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE|SWP_NOOWNERZORDER);
 #else
-    XLowerWindow(DISPLAY(getApp()),xid);
+    XLowerWindow((Display*)getApp()->getDisplay(),xid);
 #endif
     }
   }
@@ -2546,7 +2539,7 @@ void FXWindow::translateCoordinatesFrom(FXint& tox,FXint& toy,const FXWindow* fr
     toy=pt.y;
 #else
     Window tmp;
-    XTranslateCoordinates(DISPLAY(getApp()),fromwindow->id(),xid,fromx,fromy,&tox,&toy,&tmp);
+    XTranslateCoordinates((Display*)getApp()->getDisplay(),fromwindow->id(),xid,fromx,fromy,&tox,&toy,&tmp);
 #endif
     }
   }
@@ -2566,7 +2559,7 @@ void FXWindow::translateCoordinatesTo(FXint& tox,FXint& toy,const FXWindow* towi
     toy=pt.y;
 #else
     Window tmp;
-    XTranslateCoordinates(DISPLAY(getApp()),xid,towindow->id(),fromx,fromy,&tox,&toy,&tmp);
+    XTranslateCoordinates((Display*)getApp()->getDisplay(),xid,towindow->id(),fromx,fromy,&tox,&toy,&tmp);
 #endif
     }
   }
@@ -2588,8 +2581,8 @@ void FXWindow::grab(){
       }
     SetCursor((HCURSOR)dragCursor->id());
 #else
-    if(GrabSuccess!=XGrabPointer(DISPLAY(getApp()),xid,false,GRAB_EVENT_MASK,GrabModeAsync,GrabModeAsync,None,dragCursor->id(),getApp()->event.time)){
-      XGrabPointer(DISPLAY(getApp()),xid,false,GRAB_EVENT_MASK,GrabModeAsync,GrabModeAsync,None,dragCursor->id(),CurrentTime);
+    if(GrabSuccess!=XGrabPointer((Display*)getApp()->getDisplay(),xid,false,GRAB_EVENT_MASK,GrabModeAsync,GrabModeAsync,None,dragCursor->id(),getApp()->event.time)){
+      XGrabPointer((Display*)getApp()->getDisplay(),xid,false,GRAB_EVENT_MASK,GrabModeAsync,GrabModeAsync,None,dragCursor->id(),CurrentTime);
       }
 #endif
     getApp()->mouseGrabWindow=this;
@@ -2606,8 +2599,8 @@ void FXWindow::ungrab(){
     ReleaseCapture();
     SetCursor((HCURSOR)defaultCursor->id());
 #else
-    XUngrabPointer(DISPLAY(getApp()),getApp()->event.time);
-    XFlush(DISPLAY(getApp()));
+    XUngrabPointer((Display*)getApp()->getDisplay(),getApp()->event.time);
+    XFlush((Display*)getApp()->getDisplay());
 #endif
     }
   }
@@ -2629,7 +2622,7 @@ void FXWindow::grabKeyboard(){
 #ifdef WIN32
     SetActiveWindow((HWND)xid); // FIXME Check this
 #else
-    XGrabKeyboard(DISPLAY(getApp()),xid,false,GrabModeAsync,GrabModeAsync,getApp()->event.time);
+    XGrabKeyboard((Display*)getApp()->getDisplay(),xid,false,GrabModeAsync,GrabModeAsync,getApp()->event.time);
 #endif
     getApp()->keyboardGrabWindow=this;
     }
@@ -2644,7 +2637,7 @@ void FXWindow::ungrabKeyboard(){
     FXTRACE((150,"%s::ungrabKeyboard %p\n",getClassName(),this));
     getApp()->keyboardGrabWindow=NULL;
 #ifndef WIN32
-    XUngrabKeyboard(DISPLAY(getApp()),getApp()->event.time);
+    XUngrabKeyboard((Display*)getApp()->getDisplay(),getApp()->event.time);
 #endif
     }
   }
@@ -2715,7 +2708,7 @@ void FXWindow::setDragRectangle(FXint x,FXint y,FXint w,FXint h,FXbool wantupdat
 #else
   Window tmp;
   int tox,toy;
-  XTranslateCoordinates(DISPLAY(getApp()),xid,XDefaultRootWindow(DISPLAY(getApp())),x,y,&tox,&toy,&tmp);
+  XTranslateCoordinates((Display*)getApp()->getDisplay(),xid,XDefaultRootWindow((Display*)getApp()->getDisplay()),x,y,&tox,&toy,&tmp);
   getApp()->xdndRect.x=tox;
   getApp()->xdndRect.y=toy;
   getApp()->xdndWantUpdates=wantupdates;
@@ -2857,7 +2850,7 @@ void FXWindow::dropFinished(FXDragAction action) const {
 #else
     XEvent se;
     se.xclient.type=ClientMessage;
-    se.xclient.display=DISPLAY(getApp());
+    se.xclient.display=(Display*)getApp()->getDisplay();
     se.xclient.message_type=getApp()->xdndFinished;
     se.xclient.format=32;
     se.xclient.window=getApp()->xdndSource;
@@ -2871,8 +2864,8 @@ void FXWindow::dropFinished(FXDragAction action) const {
     else se.xclient.data.l[2]=None;
     se.xclient.data.l[3]=0;
     se.xclient.data.l[4]=0;
-    XSendEvent(DISPLAY(getApp()),getApp()->xdndSource,True,NoEventMask,&se);
-    XFlush(DISPLAY(getApp()));
+    XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndSource,True,NoEventMask,&se);
+    XFlush((Display*)getApp()->getDisplay());
 #endif
     getApp()->xdndFinishSent=true;
     }
@@ -2927,15 +2920,15 @@ FXbool FXWindow::beginDrag(const FXDragType *types,FXuint numtypes){
     getApp()->xdndRect.w=0;
     getApp()->xdndRect.h=0;
 #else
-    XSetSelectionOwner(DISPLAY(getApp()),getApp()->xdndSelection,xid,getApp()->event.time);
-    if(XGetSelectionOwner(DISPLAY(getApp()),getApp()->xdndSelection)!=xid){
+    XSetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xdndSelection,xid,getApp()->event.time);
+    if(XGetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xdndSelection)!=xid){
       fxwarning("%s::beginDrag: failed to acquire DND selection.\n",getClassName());
       return false;
       }
     resizeElms(getApp()->xdndTypeList,numtypes);
     memcpy(getApp()->xdndTypeList,types,sizeof(FXDragType)*numtypes);
     getApp()->xdndNumTypes=numtypes;
-    XChangeProperty(DISPLAY(getApp()),xid,getApp()->xdndTypes,XA_ATOM,32,PropModeReplace,(unsigned char*)getApp()->xdndTypeList,getApp()->xdndNumTypes);
+    XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndTypes,XA_ATOM,32,PropModeReplace,(unsigned char*)getApp()->xdndTypeList,getApp()->xdndNumTypes);
     getApp()->xdndTarget=0;
     getApp()->xdndProxyTarget=0;
     getApp()->ansAction=DRAG_REJECT;
@@ -2959,7 +2952,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
   if(xid==0){ fxerror("%s::handleDrag: window has not yet been created.\n",getClassName()); }
   if(action<DRAG_COPY || DRAG_PRIVATE<action){ fxerror("%s::handleDrag: illegal drag action.\n",getClassName()); }
   if(isDragging()){
-  
+
 #ifdef WIN32            // WINDOWS
 
     FXuint version=0;
@@ -3032,17 +3025,17 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
     FXbool    forcepos=false;
 
     // Find XDND aware window at the indicated location
-    root=XDefaultRootWindow(DISPLAY(getApp()));
+    root=XDefaultRootWindow((Display*)getApp()->getDisplay());
     window=0;
     proxywindow=0;
     version=0;
     win=root;
     while(1){
-      if(!XTranslateCoordinates(DISPLAY(getApp()),root,win,x,y,&dropx,&dropy,&child)) break;
+      if(!XTranslateCoordinates((Display*)getApp()->getDisplay(),root,win,x,y,&dropx,&dropy,&child)) break;
       proxywin=win;
-      if(XGetWindowProperty(DISPLAY(getApp()),win,getApp()->xdndProxy,0,1,False,AnyPropertyType,&typ,&fmt,&ni,&ba,&ptr1)==Success){
+      if(XGetWindowProperty((Display*)getApp()->getDisplay(),win,getApp()->xdndProxy,0,1,False,AnyPropertyType,&typ,&fmt,&ni,&ba,&ptr1)==Success){
         if(typ==XA_WINDOW && fmt==32 && ni>0){
-          if(XGetWindowProperty(DISPLAY(getApp()),*((Window*)ptr1),getApp()->xdndProxy,0,1,False,AnyPropertyType,&typ,&fmt,&ni,&ba,&ptr2)==Success){
+          if(XGetWindowProperty((Display*)getApp()->getDisplay(),*((Window*)ptr1),getApp()->xdndProxy,0,1,False,AnyPropertyType,&typ,&fmt,&ni,&ba,&ptr2)==Success){
             if(typ==XA_WINDOW && fmt==32 && ni>0 && *((Window*)ptr2) == *((Window*)ptr1)){
               proxywin=*((Window*)ptr1);
               }
@@ -3051,7 +3044,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
           }
         XFree(ptr1);
         }
-      if(XGetWindowProperty(DISPLAY(getApp()),proxywin,getApp()->xdndAware,0,1,False,AnyPropertyType,&typ,&fmt,&ni,&ba,&ptr3)==Success){
+      if(XGetWindowProperty((Display*)getApp()->getDisplay(),proxywin,getApp()->xdndAware,0,1,False,AnyPropertyType,&typ,&fmt,&ni,&ba,&ptr3)==Success){
         if(typ==XA_ATOM && fmt==32 && ni>0 && *((Atom*)ptr3)>=3){
           window=win;
           proxywindow=proxywin;
@@ -3070,7 +3063,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
       // Moving OUT of XDND aware window?
       if(getApp()->xdndTarget!=0){
         se.xclient.type=ClientMessage;
-        se.xclient.display=DISPLAY(getApp());
+        se.xclient.display=(Display*)getApp()->getDisplay();
         se.xclient.message_type=getApp()->xdndLeave;
         se.xclient.format=32;
         se.xclient.window=getApp()->xdndTarget;
@@ -3079,7 +3072,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
         se.xclient.data.l[2]=0;
         se.xclient.data.l[3]=0;
         se.xclient.data.l[4]=0;
-        XSendEvent(DISPLAY(getApp()),getApp()->xdndProxyTarget,True,NoEventMask,&se);
+        XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndProxyTarget,True,NoEventMask,&se);
         }
 
       // Reset XDND variables
@@ -3097,7 +3090,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
       // Moving INTO XDND aware window?
       if(getApp()->xdndTarget!=0){
         se.xclient.type=ClientMessage;
-        se.xclient.display=DISPLAY(getApp());
+        se.xclient.display=(Display*)getApp()->getDisplay();
         se.xclient.message_type=getApp()->xdndEnter;
         se.xclient.format=32;
         se.xclient.window=getApp()->xdndTarget;
@@ -3107,7 +3100,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
         se.xclient.data.l[3]=getApp()->xdndNumTypes>=2 ? getApp()->xdndTypeList[1] : None;
         se.xclient.data.l[4]=getApp()->xdndNumTypes>=3 ? getApp()->xdndTypeList[2] : None;
         if(getApp()->xdndNumTypes>3) se.xclient.data.l[1]|=1;
-        XSendEvent(DISPLAY(getApp()),getApp()->xdndProxyTarget,True,NoEventMask,&se);
+        XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndProxyTarget,True,NoEventMask,&se);
         forcepos=true;
         }
       }
@@ -3121,7 +3114,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
         // No outstanding status message, so send new pos right away
         if(!getApp()->xdndStatusPending){
           se.xclient.type=ClientMessage;
-          se.xclient.display=DISPLAY(getApp());
+          se.xclient.display=(Display*)getApp()->getDisplay();
           se.xclient.message_type=getApp()->xdndPosition;
           se.xclient.format=32;
           se.xclient.window=getApp()->xdndTarget;
@@ -3133,7 +3126,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
           else if(action==DRAG_MOVE) se.xclient.data.l[4]=getApp()->xdndActionMove;
           else if(action==DRAG_LINK) se.xclient.data.l[4]=getApp()->xdndActionLink;
           else if(action==DRAG_PRIVATE) se.xclient.data.l[4]=getApp()->xdndActionPrivate;
-          XSendEvent(DISPLAY(getApp()),getApp()->xdndProxyTarget,True,NoEventMask,&se);
+          XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndProxyTarget,True,NoEventMask,&se);
           getApp()->xdndStatusPending=true;       // Waiting for the other app to respond
           }
         }
@@ -3296,7 +3289,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
         loops=1000;
         do{
           FXTRACE((100,"Waiting for pending XdndStatus\n"));
-          if(XCheckIfEvent(DISPLAY(getApp()),&se,matchxdnd,(char*)&match)){
+          if(XCheckIfEvent((Display*)getApp()->getDisplay(),&se,matchxdnd,(char*)&match)){
             getApp()->dispatchEvent(se);
 
             // We got the status update, finally
@@ -3323,7 +3316,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
 
         FXTRACE((100,"Sending XdndDrop\n"));
         se.xclient.type=ClientMessage;
-        se.xclient.display=DISPLAY(getApp());
+        se.xclient.display=(Display*)getApp()->getDisplay();
         se.xclient.message_type=getApp()->xdndDrop;
         se.xclient.format=32;
         se.xclient.window=getApp()->xdndTarget;
@@ -3332,7 +3325,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
         se.xclient.data.l[2]=getApp()->event.time;
         se.xclient.data.l[3]=0;
         se.xclient.data.l[4]=0;
-        XSendEvent(DISPLAY(getApp()),getApp()->xdndProxyTarget,True,NoEventMask,&se);
+        XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndProxyTarget,True,NoEventMask,&se);
 
         // Wait until the target has processed the drop; since the
         // target may be us, we keep processing all XDND related messages
@@ -3341,7 +3334,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
         loops=1000;
         do{
           FXTRACE((100,"Waiting for XdndFinish\n"));
-          if(XCheckIfEvent(DISPLAY(getApp()),&se,matchxdnd,(char*)&match)){
+          if(XCheckIfEvent((Display*)getApp()->getDisplay(),&se,matchxdnd,(char*)&match)){
             getApp()->dispatchEvent(se);
 
             // Got the finish message; we now know the drop has been completed and processed
@@ -3379,7 +3372,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
     if(nodrop){
       FXTRACE((100,"Sending XdndLeave\n"));
       se.xclient.type=ClientMessage;
-      se.xclient.display=DISPLAY(getApp());
+      se.xclient.display=(Display*)getApp()->getDisplay();
       se.xclient.message_type=getApp()->xdndLeave;
       se.xclient.format=32;
       se.xclient.window=getApp()->xdndTarget;
@@ -3388,12 +3381,12 @@ FXDragAction FXWindow::endDrag(FXbool drop){
       se.xclient.data.l[2]=0;
       se.xclient.data.l[3]=0;
       se.xclient.data.l[4]=0;
-      XSendEvent(DISPLAY(getApp()),getApp()->xdndProxyTarget,True,NoEventMask,&se);
+      XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndProxyTarget,True,NoEventMask,&se);
       }
 
     // Clean up
-    XSetSelectionOwner(DISPLAY(getApp()),getApp()->xdndSelection,None,getApp()->event.time);
-    XDeleteProperty(DISPLAY(getApp()),xid,getApp()->xdndTypes);
+    XSetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xdndSelection,None,getApp()->event.time);
+    XDeleteProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndTypes);
     freeElms(getApp()->xdndTypeList);
     getApp()->xdndNumTypes=0;
     getApp()->xdndTarget=0;
