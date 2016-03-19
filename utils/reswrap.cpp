@@ -3,7 +3,7 @@
 *                R e s o u r c e   W r a p p i n g   U t i l i t y              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -68,11 +68,12 @@
 
 #define MAX_RESOURCE   512
 
+#define NUM_COLUMNS    16
 
 /*******************************************************************************/
 
 
-const char version[]="5.2.0";
+const char version[]="5.3.0";
 
 
 typedef struct {
@@ -127,7 +128,7 @@ static void printusage(){
   printf("  -d, --decimal             Output as decimal\n");
   printf("  -x, --hex                 Output as hex (default)\n");
   printf("  -t, --text                Output as hexadecimal text string\n");
-  printf("  -ta, --ascii              Output as ascii text string\n");
+  printf("  -a, --ascii               Output as ascii text string\n");
   printf("  -k, --keep-ext            Keep file extension, replacing period by underscore\n");
   printf("  -nk, --drop-ext           Drop extension (default)\n");
   printf("  -m, --msdos               Read files with MS-DOS mode\n");
@@ -140,7 +141,7 @@ static void printusage(){
   printf("  -p name, --prefix name    Prepend name in front of names of declarations and definitions\n");
   printf("  -f name, --suffix name    Append name in after names of declarations and definitions\n");
   printf("  -n name, --namespace name Place declarations and definitions inside namespace name\n");
-  printf("  -c cols, --columns cols   Change number of columns in output to cols\n");
+  printf("  -c cols, --columns cols   Change number of columns in output from %d to cols\n",NUM_COLUMNS);
   printf("  -r name, --resource name  Override resource name of following resource file\n");
   printf("\n");
   }
@@ -149,7 +150,7 @@ static void printusage(){
 /* Print version information */
 static void printversion(){
   printf("reswrap %s\n\n",version);
-  printf("Copyright (C) 1997,2015 Jeroen van der Zijp. All Rights Reserved.\n");
+  printf("Copyright (C) 1997,2016 Jeroen van der Zijp. All Rights Reserved.\n");
   printf("Please visit: http://www.fox-toolkit.org for further information.\n");
   printf("\n");
   printf("This program is free software: you can redistribute it and/or modify\n");
@@ -403,7 +404,7 @@ int main(int argc,char **argv){
   opts.header=0;
   opts.constant=1;
   opts.outfile=stdout;
-  opts.maxcols=16;
+  opts.maxcols=NUM_COLUMNS;
   opts.colsset=0;
   opts.linkage=LINKAGE_NONE;
   opts.filetype=TYPE_SOURCE;
@@ -524,7 +525,14 @@ int main(int argc,char **argv){
         }
 
       /* Switch to ascii text */
-      else if(strcmp(argv[arg],"-ta")==0 || strcmp(argv[arg],"--ascii")==0){
+      else if(strcmp(argv[arg],"-a")==0 || strcmp(argv[arg],"--ascii")==0){
+        opts.mode=MODE_ASCII;
+        if(!opts.colsset) opts.maxcols=80;
+        }
+
+      /* Switch to ascii text */
+      else if(strcmp(argv[arg],"-ta")==0){
+        fprintf(stderr,"reswrap: -ta option is deprecated; please use -a or --ascii\n");
         opts.mode=MODE_ASCII;
         if(!opts.colsset) opts.maxcols=80;
         }

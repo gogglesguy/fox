@@ -3,7 +3,7 @@
 *                            W i n d o w   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXElement.h"
@@ -3019,7 +3020,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
 
 #ifdef WIN32            // WINDOWS
 
-    FXuint version=0;
+    HANDLE version=0;
     FXbool forcepos=false;
     POINT point;
     HWND window;
@@ -3029,7 +3030,8 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
     point.y=y;
     window=WindowFromPoint(point);      // FIXME wrong for disabled windows
     while(window){
-      version=(FXuint)GetProp(window,(LPCTSTR)MAKELONG(getApp()->xdndAware,0));
+//      version=(FXuint)GetProp(window,(LPCTSTR)MAKELONG(getApp()->xdndAware,0));
+      version=GetProp(window,(LPCTSTR)MAKELONG(getApp()->xdndAware,0));
       if(version) break;
       window=GetParent(window);
       }

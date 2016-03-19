@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -867,7 +868,7 @@ void FXGLViewer::setScene(FXGLObject* sc){
 void FXGLViewer::setFieldOfView(FXdouble fv){
   FXdouble tn;
   fov=FXCLAMP(2.0,fv,90.0);
-  tn=tan(0.5*DTOR*fov);
+  tn=Math::tan(0.5*DTOR*fov);
   FXASSERT(tn>0.0);
   distance=diameter/tn;
   FXASSERT(distance>0.0);
@@ -1224,13 +1225,13 @@ FXVec3f FXGLViewer::spherePoint(FXint px,FXint py){
   v.y=2.0f*(0.5f*wvt.h-py)/screenmin;
   d=v.x*v.x+v.y*v.y;
   if(d<0.75f){
-    v.z=sqrtf(1.0f-d);
+    v.z=Math::sqrt(1.0f-d);
     }
   else if(d<3.0f){
-    d=1.7320508075688772f-sqrtf(d);
+    d=1.7320508075688772f-Math::sqrt(d);
     t=1.0f-d*d;
     if(t<0.0f) t=0.0f;
-    v.z=1.0f-sqrtf(t);
+    v.z=1.0f-Math::sqrt(t);
     }
   else{
     v.z=0.0f;
@@ -1829,7 +1830,7 @@ long FXGLViewer::onMotion(FXObject*,FXSelector,void* ptr){
         break;
       case ZOOMING:             // Zooming camera
         delta=0.005*(event->win_y-event->last_y);
-        setZoom(getZoom()*pow(2.0,delta));
+        setZoom(getZoom()*Math::pow(2.0,delta));
         changed=1;
         break;
       case FOVING:              // Change FOV
@@ -1898,7 +1899,7 @@ long FXGLViewer::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
-    setZoom(getZoom()*pow(2.0,-0.1*event->code/120.0));
+    setZoom(getZoom()*Math::pow(2.0,-0.1*event->code/120.0));
     return 1;
     }
   return 0;
@@ -1906,16 +1907,16 @@ long FXGLViewer::onMouseWheel(FXObject*,FXSelector,void* ptr){
 
 
 
-FXdouble curve(FXdouble x,FXdouble theta){
-  FXdouble result;
+FXfloat curve(FXfloat x,FXfloat theta){
+  FXfloat result;
   if(x<-theta){
-    result=x+2.0*theta/3.0;
+    result=x+2.0f*theta/3.0f;
     }
   else if(x>theta){
-    result=x-2.0*theta/3.0;
+    result=x-2.0f*theta/3.0f;
     }
   else{
-    result=x*x*x/(3.0*theta*theta);
+    result=x*x*x/(3.0f*theta*theta);
     }
   return result;
   }
@@ -1934,23 +1935,23 @@ long FXGLViewer::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
     FXQuatf q;
     if(FXABS(event->values[3])>FXABS(event->values[4])){
       if(FXABS(event->values[3])>FXABS(event->values[5])){
-        q.setAxisAngle(xaxis,0.0004*curve(event->values[3],50.0));
+        q.setAxisAngle(xaxis,0.0004f*curve(event->values[3],50.0f));
         }
       else{
-        q.setAxisAngle(zaxis,-0.0004*curve(event->values[5],50.0));
+        q.setAxisAngle(zaxis,-0.0004f*curve(event->values[5],50.0f));
         }
       }
     else{
       if(FXABS(event->values[4])>FXABS(event->values[5])){
-        q.setAxisAngle(yaxis,-0.0004*curve(event->values[4],50.0));
+        q.setAxisAngle(yaxis,-0.0004f*curve(event->values[4],50.0f));
         }
       else{
-        q.setAxisAngle(zaxis,-0.0004*curve(event->values[5],50.0));
+        q.setAxisAngle(zaxis,-0.0004f*curve(event->values[5],50.0f));
         }
       }
-    translate(-worldVector(0,0,0.01*curve(event->values[0],40.0),0.01*curve(event->values[1],40.0)));
+    translate(-worldVector(0,0,0.01f*curve(event->values[0],40.0f),0.01f*curve(event->values[1],40.0f)));
     setOrientation(q*getOrientation());
-    setZoom(getZoom()*pow(2.0,-0.0001*curve(event->values[2],50.0)));
+    setZoom(getZoom()*Math::pow(2.0f,-0.0001f*curve(event->values[2],50.0f)));
     }
   return 1;
   }
@@ -2125,7 +2126,7 @@ long FXGLViewer::onCmdFront(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdFront(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(EPS>fabs(rotation[0]) && EPS>fabs(rotation[1]) && EPS>fabs(rotation[2]) && EPS>fabs(rotation[3]-1.0)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(EPS>Math::fabs(rotation[0]) && EPS>Math::fabs(rotation[1]) && EPS>Math::fabs(rotation[2]) && EPS>Math::fabs(rotation[3]-1.0)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2142,7 +2143,7 @@ long FXGLViewer::onCmdBack(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdBack(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(EPS>fabs(rotation[0]) && EPS>fabs(rotation[1]+1.0) && EPS>fabs(rotation[2]) && EPS>fabs(rotation[3])) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(EPS>Math::fabs(rotation[0]) && EPS>Math::fabs(rotation[1]+1.0) && EPS>Math::fabs(rotation[2]) && EPS>Math::fabs(rotation[3])) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2159,7 +2160,7 @@ long FXGLViewer::onCmdLeft(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdLeft(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(EPS>fabs(rotation[0]) && EPS>fabs(rotation[1]-0.7071067811865) && EPS>fabs(rotation[2]) && EPS>fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(EPS>Math::fabs(rotation[0]) && EPS>Math::fabs(rotation[1]-0.7071067811865) && EPS>Math::fabs(rotation[2]) && EPS>Math::fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2176,7 +2177,7 @@ long FXGLViewer::onCmdRight(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdRight(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(EPS>fabs(rotation[0]) && EPS>fabs(rotation[1]+0.7071067811865) && EPS>fabs(rotation[2]) && EPS>fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(EPS>Math::fabs(rotation[0]) && EPS>Math::fabs(rotation[1]+0.7071067811865) && EPS>Math::fabs(rotation[2]) && EPS>Math::fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2193,7 +2194,7 @@ long FXGLViewer::onCmdTop(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdTop(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(EPS>fabs(rotation[0]-0.7071067811865) && EPS>fabs(rotation[1]) && EPS>fabs(rotation[2]) && EPS>fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(EPS>Math::fabs(rotation[0]-0.7071067811865) && EPS>Math::fabs(rotation[1]) && EPS>Math::fabs(rotation[2]) && EPS>Math::fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2210,7 +2211,7 @@ long FXGLViewer::onCmdBottom(FXObject*,FXSelector,void*){
 long FXGLViewer::onUpdBottom(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-  sender->handle(this,(EPS>fabs(rotation[0]+0.7071067811865) && EPS>fabs(rotation[1]) && EPS>fabs(rotation[2]) && EPS>fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(EPS>Math::fabs(rotation[0]+0.7071067811865) && EPS>Math::fabs(rotation[1]) && EPS>Math::fabs(rotation[2]) && EPS>Math::fabs(rotation[3]-0.7071067811865)) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2580,7 +2581,7 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
       // Line primitive
       case GL_LINE_RESET_TOKEN:
       case GL_LINE_TOKEN:
-        if(fabs(buffer[p+3]-buffer[p+7+3])<1E-4 || fabs(buffer[p+4]-buffer[p+7+4])<1E-4 || fabs(buffer[p+5]-buffer[p+7+5])<1E-4){
+        if(Math::fabs(buffer[p+3]-buffer[p+7+3])<1E-4 || Math::fabs(buffer[p+4]-buffer[p+7+4])<1E-4 || Math::fabs(buffer[p+5]-buffer[p+7+5])<1E-4){
           pdc.outf("%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg SL\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5], buffer[p+7+0],buffer[p+7+1],buffer[p+7+3],buffer[p+7+4],buffer[p+7+5]);
           }
         else{
@@ -2595,7 +2596,7 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
         if(nvertices==3){ // We assume polybusting has taken place already!
           smooth=0;
           for(i=1; i<nvertices; i++){
-            if(fabs(buffer[p+3]-buffer[p+i*7+3])<1E-4 || fabs(buffer[p+4]-buffer[p+i*7+4])<1E-4 || fabs(buffer[p+5]-buffer[p+i*7+5])<1E-4){ smooth=1; break; }
+            if(Math::fabs(buffer[p+3]-buffer[p+i*7+3])<1E-4 || Math::fabs(buffer[p+4]-buffer[p+i*7+4])<1E-4 || Math::fabs(buffer[p+5]-buffer[p+i*7+5])<1E-4){ smooth=1; break; }
             }
           if(smooth){
             pdc.outf("%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg ST\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5], buffer[p+7+0],buffer[p+7+1],buffer[p+7+3],buffer[p+7+4],buffer[p+7+5], buffer[p+14+0],buffer[p+14+1],buffer[p+14+3],buffer[p+14+4],buffer[p+14+5]);

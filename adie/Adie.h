@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -102,7 +102,7 @@ public:
 
   // Run the application
   FXint start(int argc,char** argv);
-  
+
   // Generate unique name from given path
   FXString unique(const FXString& path) const;
 
@@ -114,7 +114,7 @@ public:
 
   // Open file and jump to line, or just jump to line/column if already open
   TextWindow* openFileWindow(const FXString& file,FXint lineno=0,FXint column=0);
-  
+
   // Get syntax for language name
   Syntax* getSyntaxByName(const FXString& lang);
 

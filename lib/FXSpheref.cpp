@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    S p h e r e    C l a s s         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -45,9 +46,6 @@ using namespace FX;
 namespace FX {
 
 
-inline FXfloat sqrf(FXfloat x){ return x*x; }
-
-
 // Initialize from bounding box
 FXSpheref::FXSpheref(const FXRangef& bounds):center(bounds.center()),radius(bounds.diameter()*0.5f){
   }
@@ -55,7 +53,7 @@ FXSpheref::FXSpheref(const FXRangef& bounds):center(bounds.center()),radius(boun
 
 // Test if sphere contains point x,y,z
 FXbool FXSpheref::contains(FXfloat x,FXfloat y,FXfloat z) const {
-  return 0.0f<=radius && sqrf(center.x-x)+sqrf(center.y-y)+sqrf(center.z-z)<=sqrf(radius);
+  return 0.0f<=radius && Math::sqr(center.x-x)+Math::sqr(center.y-y)+Math::sqr(center.z-z)<=Math::sqr(radius);
   }
 
 
@@ -80,7 +78,7 @@ FXbool FXSpheref::contains(const FXSpheref& sphere) const {
     FXfloat dx=center.x-sphere.center.x;
     FXfloat dy=center.y-sphere.center.y;
     FXfloat dz=center.z-sphere.center.z;
-    return sphere.radius+sqrtf(dx*dx+dy*dy+dz*dz)<=radius;
+    return sphere.radius+Math::sqrt(dx*dx+dy*dy+dz*dz)<=radius;
     }
   return false;
   }
@@ -92,7 +90,7 @@ FXSpheref& FXSpheref::include(FXfloat x,FXfloat y,FXfloat z){
     FXfloat dx=x-center.x;
     FXfloat dy=y-center.y;
     FXfloat dz=z-center.z;
-    FXfloat dist=sqrtf(dx*dx+dy*dy+dz*dz);
+    FXfloat dist=Math::sqrt(dx*dx+dy*dy+dz*dz);
     if(radius<dist){
       FXfloat newradius=0.5f*(radius+dist);
       FXfloat delta=(newradius-radius);
@@ -123,7 +121,7 @@ FXSpheref& FXSpheref::includeInRadius(FXfloat x,FXfloat y,FXfloat z){
     FXfloat dx=x-center.x;
     FXfloat dy=y-center.y;
     FXfloat dz=z-center.z;
-    FXfloat dist=sqrtf(dx*dx+dy*dy+dz*dz);
+    FXfloat dist=Math::sqrt(dx*dx+dy*dy+dz*dz);
     if(radius<dist) radius=dist;
     return *this;
     }
@@ -190,7 +188,7 @@ FXSpheref& FXSpheref::include(const FXSpheref& sphere){
       FXfloat dx=sphere.center.x-center.x;
       FXfloat dy=sphere.center.y-center.y;
       FXfloat dz=sphere.center.z-center.z;
-      FXfloat dist=sqrtf(dx*dx+dy*dy+dz*dz);
+      FXfloat dist=Math::sqrt(dx*dx+dy*dy+dz*dz);
       if(sphere.radius<dist+radius){
         if(radius<dist+sphere.radius){
           FXfloat newradius=0.5f*(radius+dist+sphere.radius);
@@ -217,7 +215,7 @@ FXSpheref& FXSpheref::includeInRadius(const FXSpheref& sphere){
       FXfloat dx=sphere.center.x-center.x;
       FXfloat dy=sphere.center.y-center.y;
       FXfloat dz=sphere.center.z-center.z;
-      FXfloat dist=sqrtf(dx*dx+dy*dy+dz*dz)+sphere.radius;
+      FXfloat dist=Math::sqrt(dx*dx+dy*dy+dz*dz)+sphere.radius;
       if(radius<dist) radius=dist;
       return *this;
       }
@@ -260,7 +258,7 @@ FXbool FXSpheref::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[])
     FXfloat b=dir*m;
     FXfloat disc=b*b-d2*(m2-r2);
     if(0.0f<=disc){
-      disc=sqrt(disc);
+      disc=Math::sqrt(disc);
       hit[0]=(-b-disc)/d2;
       hit[1]=(-b+disc)/d2;
       return true;
@@ -274,9 +272,9 @@ FXbool FXSpheref::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[])
 FXbool overlap(const FXSpheref& a,const FXRangef& b){
   if(0.0f<=a.radius){
     FXfloat e1,e2,e3;
-    if((e1=fmaxf(b.lower.x-a.center.x,0.0f)+fmaxf(a.center.x-b.upper.x,0.0f))>a.radius) return false;
-    if((e2=fmaxf(b.lower.y-a.center.y,0.0f)+fmaxf(a.center.y-b.upper.y,0.0f))>a.radius) return false;
-    if((e3=fmaxf(b.lower.z-a.center.z,0.0f)+fmaxf(a.center.z-b.upper.z,0.0f))>a.radius) return false;
+    if((e1=Math::fmax(b.lower.x-a.center.x,0.0f)+Math::fmax(a.center.x-b.upper.x,0.0f))>a.radius) return false;
+    if((e2=Math::fmax(b.lower.y-a.center.y,0.0f)+Math::fmax(a.center.y-b.upper.y,0.0f))>a.radius) return false;
+    if((e3=Math::fmax(b.lower.z-a.center.z,0.0f)+Math::fmax(a.center.z-b.upper.z,0.0f))>a.radius) return false;
     return e1*e1+e2*e2+e3*e3<=a.radius*a.radius;
     }
   return false;
@@ -295,7 +293,7 @@ FXbool overlap(const FXSpheref& a,const FXSpheref& b){
     FXfloat dx=a.center.x-b.center.x;
     FXfloat dy=a.center.y-b.center.y;
     FXfloat dz=a.center.z-b.center.z;
-    return (dx*dx+dy*dy+dz*dz)<sqrf(a.radius+b.radius);
+    return (dx*dx+dy*dy+dz*dz)<Math::sqr(a.radius+b.radius);
     }
   return false;
   }
@@ -307,7 +305,7 @@ FXSpheref FXSpheref::transform(const FXMat4f& mat) const {
     FXfloat xd=mat[0][0]*mat[0][0]+mat[0][1]*mat[0][1]+mat[0][2]*mat[0][2];
     FXfloat yd=mat[1][0]*mat[1][0]+mat[1][1]*mat[1][1]+mat[1][2]*mat[1][2];
     FXfloat zd=mat[2][0]*mat[2][0]+mat[2][1]*mat[2][1]+mat[2][2]*mat[2][2];
-    return FXSpheref(center*mat,radius*sqrtf(FXMAX3(xd,yd,zd)));
+    return FXSpheref(center*mat,radius*Math::sqrt(Math::fmax(Math::fmax(xd,yd),zd)));
     }
   return FXSpheref(center*mat,radius);
   }

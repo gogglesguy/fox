@@ -3,7 +3,7 @@
 *                         S y n t a x   P a r s e r                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -111,7 +111,7 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
       fxwarning("%s:%d: error: expected 'rule' <name>.\n",from,line);
       return false;
       }
-      
+
     // Snarf name from parse buffer
     name.assign(head+1,tail-head-2);
     token=gettok();

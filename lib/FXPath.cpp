@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -936,10 +936,22 @@ FXbool FXPath::isShare(const FXString& file){
 
 
 // Return true if input path is a hidden file or directory
-FXbool FXPath::isHidden(const FXString&){
+FXbool FXPath::isHidden(const FXString& file){
+  if(!file.empty()){
+    FXuint attrs;
+#ifdef UNICODE
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    attrs=::GetFileAttributesW(unifile);
+#else
+    attrs=::GetFileAttributesA(file.text());
+#endif
+    if(attrs!=INVALID_FILE_ATTRIBUTES){
+      return (attrs&FILE_ATTRIBUTE_HIDDEN)!=0;
+      }
+    }
   return false;
   }
-
 
 #else
 
@@ -951,13 +963,13 @@ FXbool FXPath::isShare(const FXString&){
 
 // Return true if input path is a hidden file or directory
 FXbool FXPath::isHidden(const FXString& file){
-  FXint i=file.length();
-  while(0<i && !ISPATHSEP(file[i-1])){
-    --i;
+  if(!file.empty()){
+    FXint i=file.length();
+    while(0<i && !ISPATHSEP(file[i-1])){ --i; }
+    return file[i]=='.';
     }
-  return file[i]=='.';
+  return false;
   }
-
 
 #endif
 

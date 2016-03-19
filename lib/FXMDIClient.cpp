@@ -3,7 +3,7 @@
 *          M u l t i p l e   D o c u m e n t   C l i e n t   W i n d o w        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
@@ -376,7 +377,7 @@ void FXMDIClient::horizontal(FXbool notify){
   nr=n;
   nc=1;
   if(n>3){
-    nc=(int)sqrt((double)n);
+    nc=(int)Math::sqrt((double)n);
     nr=(n+nc-1)/nc;
     }
   hroom=0;
@@ -406,7 +407,7 @@ void FXMDIClient::vertical(FXbool notify){
   nc=n;
   nr=1;
   if(n>3){
-    nr=(int)sqrt((double)n);
+    nr=(int)Math::sqrt((double)n);
     nc=(n+nr-1)/nr;
     }
   hroom=0;

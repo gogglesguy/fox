@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -229,8 +229,6 @@ protected:
   void flashMatching();
   void moveContents(FXint x,FXint y);
   FXint overstruck(FXint start,FXint end,const FXchar *text,FXint n);
-  void enterText(const FXchar *text,FXint n,FXbool notify);
-  void enterText(const FXString& text,FXbool notify);
   FXbool deletePendingSelection(FXbool notify);
 protected:
   enum {
@@ -380,6 +378,7 @@ public:
   // Control commands
   long onCmdShiftText(FXObject*,FXSelector,void*);
   long onCmdChangeCase(FXObject*,FXSelector,void*);
+  long onCmdJoinLines(FXObject*,FXSelector,void*);
   long onCmdBlockBeg(FXObject*,FXSelector,void*);
   long onCmdBlockEnd(FXObject*,FXSelector,void*);
   long onCmdGotoMatching(FXObject*,FXSelector,void*);
@@ -475,6 +474,7 @@ public:
     ID_CURSOR_ROW,
     ID_CURSOR_COLUMN,
     ID_CLEAN_INDENT,
+    ID_JOIN_LINES,
     ID_SHIFT_LEFT,
     ID_SHIFT_RIGHT,
     ID_SHIFT_TABLEFT,
@@ -906,6 +906,12 @@ public:
 
   /// Replace primary selection by other text
   FXbool replaceSelection(const FXString& text,FXbool notify=false);
+
+  /// Enter text into editor as if typed
+  void enterText(const FXchar *text,FXint n,FXbool repsel=true,FXbool notify=false);
+
+  /// Enter text into editor as if typed
+  void enterText(const FXString& text,FXbool repsel=true,FXbool notify=false);
 
   /// Return true if position pos is selected
   FXbool isPosSelected(FXint pos) const;

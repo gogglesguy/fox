@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -98,7 +99,7 @@ static inline FXfloat rsqrtf(FXfloat r){
 #else
 
 static inline FXfloat rsqrtf(FXfloat r){
-  return 1.0f/sqrtf(r);
+  return 1.0f/Math::sqrt(r);
   }
 
 #endif
@@ -117,7 +118,7 @@ FXVec3f fastnormalize(const FXVec3f& v){
 FXVec3f normalize(const FXVec3f& v){
   register FXfloat m=dot(v,v);
   FXVec3f result(v);
-  if(__likely(0.0f<m)){ result/=sqrtf(m); }
+  if(__likely(0.0f<m)){ result/=Math::sqrt(m); }
   return result;
   }
 

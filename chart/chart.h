@@ -3,7 +3,7 @@
 *                   M a i n   C h a r t   I n c l u d e   F i l e               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -20,7 +20,7 @@
 ********************************************************************************/
 #ifndef CHART_H
 #define CHART_H
- 
+
 // Chart includes
 #include "chartdefs.h"
 #include "FXAxis.h"

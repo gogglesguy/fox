@@ -3,7 +3,7 @@
 *                   E Z   C o l o r   Q u a n t i z a t i o n                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 
 
 /*

@@ -24,6 +24,8 @@ extern const unsigned char bigfolder[];
 
 extern const unsigned char bigfolderopen[];
 
+extern const unsigned char bigharddisk[];
+
 extern const unsigned char bignetdrive[];
 
 extern const unsigned char bignethood[];
@@ -86,8 +88,6 @@ extern const unsigned char foldernew[];
 
 extern const unsigned char gotohome[];
 
-extern const unsigned char gotoicon[];
-
 extern const unsigned char gotowork[];
 
 extern const unsigned char hsvmode[];
@@ -109,6 +109,10 @@ extern const unsigned char minidesktop[];
 extern const unsigned char minidoc[];
 
 extern const unsigned char minifloppy[];
+
+extern const unsigned char minifloppy3[];
+
+extern const unsigned char minifloppy5[];
 
 extern const unsigned char minifolder[];
 
@@ -139,6 +143,8 @@ extern const unsigned char showdetails[];
 extern const unsigned char showsmallicons[];
 
 extern const unsigned char sorting[];
+
+extern const unsigned char undo_gif[];
 
 extern const unsigned char warningicon[];
 

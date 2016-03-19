@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -65,6 +65,7 @@ wizard.exe \
 imageviewer.exe \
 half.exe \
 unicode.exe \
+math.exe \
 variant.exe
 
 .cpp.obj:
@@ -170,6 +171,9 @@ process.exe: $(FOXLIB) process.obj
 
 variant.exe: $(FOXLIB) variant.obj
 	$(LD) $(LDFLAGS) variant.obj $(FOXLIB)
+
+math.exe: $(FOXLIB) math.obj
+	$(LD) $(LDFLAGS) math.obj $(FOXLIB)
 
 clean:
 	del *.obj

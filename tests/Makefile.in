@@ -51,20 +51,20 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = unicode$(EXEEXT) variant$(EXEEXT) scan$(EXEEXT) \
-	format$(EXEEXT) console$(EXEEXT) thread$(EXEEXT) \
-	calendar$(EXEEXT) expression$(EXEEXT) dctest$(EXEEXT) \
-	codecs$(EXEEXT) dialog$(EXEEXT) groupbox$(EXEEXT) \
-	scribble$(EXEEXT) wizard$(EXEEXT) layout$(EXEEXT) rex$(EXEEXT) \
-	table$(EXEEXT) memmap$(EXEEXT) minheritance$(EXEEXT) \
-	bitmapviewer$(EXEEXT) imageviewer$(EXEEXT) button$(EXEEXT) \
-	datatarget$(EXEEXT) dirlist$(EXEEXT) foursplit$(EXEEXT) \
-	header$(EXEEXT) hello$(EXEEXT) hello2$(EXEEXT) \
-	iconlist$(EXEEXT) image$(EXEEXT) mditest$(EXEEXT) \
-	shutter$(EXEEXT) splitter$(EXEEXT) process$(EXEEXT) \
-	switcher$(EXEEXT) tabbook$(EXEEXT) ratio$(EXEEXT) \
-	half$(EXEEXT) match$(EXEEXT) gaugetest$(EXEEXT) \
-	parallel$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
+noinst_PROGRAMS = bitmapviewer$(EXEEXT) button$(EXEEXT) \
+	calendar$(EXEEXT) codecs$(EXEEXT) console$(EXEEXT) \
+	datatarget$(EXEEXT) dctest$(EXEEXT) dialog$(EXEEXT) \
+	dirlist$(EXEEXT) expression$(EXEEXT) format$(EXEEXT) \
+	foursplit$(EXEEXT) gaugetest$(EXEEXT) groupbox$(EXEEXT) \
+	half$(EXEEXT) header$(EXEEXT) hello$(EXEEXT) hello2$(EXEEXT) \
+	iconlist$(EXEEXT) image$(EXEEXT) imageviewer$(EXEEXT) \
+	layout$(EXEEXT) match$(EXEEXT) math$(EXEEXT) mditest$(EXEEXT) \
+	memmap$(EXEEXT) minheritance$(EXEEXT) parallel$(EXEEXT) \
+	process$(EXEEXT) ratio$(EXEEXT) rex$(EXEEXT) scan$(EXEEXT) \
+	scribble$(EXEEXT) shutter$(EXEEXT) splitter$(EXEEXT) \
+	switcher$(EXEEXT) tabbook$(EXEEXT) table$(EXEEXT) \
+	thread$(EXEEXT) unicode$(EXEEXT) variant$(EXEEXT) \
+	wizard$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -175,6 +175,10 @@ am_match_OBJECTS = match.$(OBJEXT)
 match_OBJECTS = $(am_match_OBJECTS)
 match_LDADD = $(LDADD)
 match_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
+am_math_OBJECTS = math.$(OBJEXT)
+math_OBJECTS = $(am_math_OBJECTS)
+math_LDADD = $(LDADD)
+math_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_mditest_OBJECTS = mditest.$(OBJEXT)
 mditest_OBJECTS = $(am_mditest_OBJECTS)
 mditest_LDADD = $(LDADD)
@@ -277,13 +281,13 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(glviewer_SOURCES) $(groupbox_SOURCES) $(half_SOURCES) \
 	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
 	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
-	$(layout_SOURCES) $(match_SOURCES) $(mditest_SOURCES) \
-	$(memmap_SOURCES) $(minheritance_SOURCES) $(parallel_SOURCES) \
-	$(process_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
-	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
-	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
-	$(table_SOURCES) $(thread_SOURCES) $(unicode_SOURCES) \
-	$(variant_SOURCES) $(wizard_SOURCES)
+	$(layout_SOURCES) $(match_SOURCES) $(math_SOURCES) \
+	$(mditest_SOURCES) $(memmap_SOURCES) $(minheritance_SOURCES) \
+	$(parallel_SOURCES) $(process_SOURCES) $(ratio_SOURCES) \
+	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
+	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
+	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
+	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
@@ -292,13 +296,13 @@ DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(glviewer_SOURCES) $(groupbox_SOURCES) $(half_SOURCES) \
 	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
 	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
-	$(layout_SOURCES) $(match_SOURCES) $(mditest_SOURCES) \
-	$(memmap_SOURCES) $(minheritance_SOURCES) $(parallel_SOURCES) \
-	$(process_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
-	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
-	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
-	$(table_SOURCES) $(thread_SOURCES) $(unicode_SOURCES) \
-	$(variant_SOURCES) $(wizard_SOURCES)
+	$(layout_SOURCES) $(match_SOURCES) $(math_SOURCES) \
+	$(mditest_SOURCES) $(memmap_SOURCES) $(minheritance_SOURCES) \
+	$(parallel_SOURCES) $(process_SOURCES) $(ratio_SOURCES) \
+	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
+	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
+	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
+	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -488,6 +492,7 @@ match_SOURCES = match.cpp
 unicode_SOURCES = unicode.cpp
 parallel_SOURCES = parallel.cpp
 variant_SOURCES = variant.cpp
+math_SOURCES = math.cpp
 EXTRA_DIST = Makefile.bc \
              Makefile.wc \
              Makefile.dmc
@@ -610,6 +615,9 @@ layout$(EXEEXT): $(layout_OBJECTS) $(layout_DEPENDENCIES) $(EXTRA_layout_DEPENDE
 match$(EXEEXT): $(match_OBJECTS) $(match_DEPENDENCIES) $(EXTRA_match_DEPENDENCIES) 
 	@rm -f match$(EXEEXT)
 	$(CXXLINK) $(match_OBJECTS) $(match_LDADD) $(LIBS)
+math$(EXEEXT): $(math_OBJECTS) $(math_DEPENDENCIES) $(EXTRA_math_DEPENDENCIES) 
+	@rm -f math$(EXEEXT)
+	$(CXXLINK) $(math_OBJECTS) $(math_LDADD) $(LIBS)
 mditest$(EXEEXT): $(mditest_OBJECTS) $(mditest_DEPENDENCIES) $(EXTRA_mditest_DEPENDENCIES) 
 	@rm -f mditest$(EXEEXT)
 	$(CXXLINK) $(mditest_OBJECTS) $(mditest_LDADD) $(LIBS)
@@ -696,6 +704,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imageviewer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layout.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/math.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mditest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minheritance.Po@am__quote@

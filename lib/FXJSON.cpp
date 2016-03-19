@@ -3,7 +3,7 @@
 *                      J S O N   R e a d e r  &  W r i t e r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 #include "FXElement.h"
 #include "FXArray.h"
@@ -196,8 +197,8 @@ FXbool FXJSON::open(FXchar* data,FXuval sz,Direction d){
 
 // Get next token
 FXint FXJSON::next(){
-  register FXint comment=0;
-  register FXint tok;
+  FXint comment=0;
+  FXint tok;
 
   while(1){
 
@@ -414,7 +415,7 @@ FXJSON::Error FXJSON::loadMap(FXVariant& var){
 
 // Load array elements into var
 FXJSON::Error FXJSON::loadArray(FXVariant& var){
-  FXint index=0;
+  FXival index=0;
   Error err;
 
   // Make it into an array now
@@ -500,7 +501,7 @@ FXJSON::Error FXJSON::loadVariant(FXVariant& var){
 
 // Save string to buffer; flush buffer if needed
 FXJSON::Error FXJSON::saveText(const FXchar* ptr,FXint count){
-  register FXival num;
+  FXival num;
   while(0<count){
     if(__unlikely(wptr+MAXTOKEN>endptr)){
       if(!flush()){ FXTRACE((1,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
@@ -517,7 +518,7 @@ FXJSON::Error FXJSON::saveText(const FXchar* ptr,FXint count){
 
 // Write indentation
 FXJSON::Error FXJSON::saveIndent(FXint count){
-  register FXival num;
+  FXival num;
   while(0<count){
     if(__unlikely(wptr+MAXTOKEN>endptr)){
       if(!flush()){ FXTRACE((1,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
@@ -544,7 +545,7 @@ FXJSON::Error FXJSON::saveString(const FXString& str){
 
 // Save map elements from var
 FXJSON::Error FXJSON::saveMap(const FXVariant& var){
-  register FXint count=var.asMap().used();
+  FXival count=var.asMap().used();
 
   FXASSERT(var.getType()==FXVariant::VMap);
 
@@ -568,7 +569,7 @@ FXJSON::Error FXJSON::saveMap(const FXVariant& var){
       }
 
     // Loop over the items
-    for(FXint i=0; i<var.asMap().no(); ++i){
+    for(FXival i=0; i<var.asMap().no(); ++i){
 
       // Skip empty slots
       if(var.asMap().key(i).empty()) continue;
@@ -650,7 +651,7 @@ FXJSON::Error FXJSON::saveArray(const FXVariant& var){
       }
 
     // Loop over the items
-    for(FXint i=0; i<var.asArray().no(); ++i){
+    for(FXival i=0; i<var.asArray().no(); ++i){
 
       // Write variant
       if(saveVariant(var.asArray().at(i))!=ErrOK) return ErrSave;
@@ -710,7 +711,7 @@ FXJSON::Error FXJSON::saveVariant(const FXVariant& var){
     column+=strlen(truth[flag]);
     break;
   case FXVariant::VChar:
-    string.fromUInt(var.asULong());
+    string.fromULong(var.asULong());
     if(saveText(string.text(),string.length())!=ErrOK) return ErrSave;
     column+=string.length();
     break;

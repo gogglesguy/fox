@@ -3,7 +3,7 @@
 *           D o u b l e - P r e c i s i o n    E x t e n t    C l a s s         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -42,7 +43,7 @@ namespace FX {
 FXdouble FXExtentd::longest() const {
   register FXdouble x=upper.x-lower.x;
   register FXdouble y=upper.y-lower.y;
-  return FXMAX(x,y);
+  return Math::fmax(x,y);
   }
 
 
@@ -50,7 +51,7 @@ FXdouble FXExtentd::longest() const {
 FXdouble FXExtentd::shortest() const {
   register FXdouble x=upper.x-lower.x;
   register FXdouble y=upper.y-lower.y;
-  return FXMIN(x,y);
+  return Math::fmin(x,y);
   }
 
 
@@ -58,7 +59,7 @@ FXdouble FXExtentd::shortest() const {
 FXdouble FXExtentd::diameter() const {
   register FXdouble x=upper.x-lower.x;
   register FXdouble y=upper.y-lower.y;
-  return sqrt(x*x+y*y);
+  return Math::sqrt(x*x+y*y);
   }
 
 

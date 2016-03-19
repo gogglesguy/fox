@@ -3,7 +3,7 @@
 *                      P l o t - C u r v e   D e s c r i p t i o n              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -25,7 +25,7 @@
 #include "FXCurve.h"
 #include "FX2DChart.h"
 #include "FX2DPlot.h"
- 
+
 /*
   Notes:
 */

@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
@@ -290,7 +291,7 @@ static inline FXuint findshift(FXPixel mask){
 // Apply gamma correction to an intensity value in [0..max].
 static FXuint gamma_adjust(FXdouble gamma,FXuint value,FXuint max){
   register FXdouble x=(FXdouble)value / (FXdouble)max;
-  return (FXuint) (((FXdouble)max * pow(x,1.0/gamma))+0.5);
+  return (FXuint) (((FXdouble)max * Math::pow(x,1.0/gamma))+0.5);
   }
 
 

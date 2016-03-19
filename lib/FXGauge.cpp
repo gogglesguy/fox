@@ -3,7 +3,7 @@
 *                             G a u g e   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2010,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2010,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
@@ -332,7 +333,7 @@ void FXGauge::drawPointer(FXDCWindow& dc,FXdouble ang,FXint xx,FXint yy,FXint ww
   FXdouble angle=startAngle*DTOR+ang;
   FXdouble r=indicator[p].radius;
   dc.setForeground(indicator[p].color);
-  dc.drawLine(cx,cy,(FXint)(0.5+cx+cos(angle)*r*rx),(FXint)(0.5+cy-sin(angle)*r*ry));
+  dc.drawLine(cx,cy,(FXint)(0.5+cx+Math::cos(angle)*r*rx),(FXint)(0.5+cy-Math::sin(angle)*r*ry));
   }
 
 
@@ -343,10 +344,10 @@ void FXGauge::drawGauge(FXDCWindow& dc,FXint xx,FXint yy,FXint ww,FXint hh,FXint
   FXdouble sa=startAngle*DTOR;
   FXdouble ea=(startAngle+sweepAngle)*DTOR;
   FXdouble ma=(sa+ea)*0.5;
-  FXdouble csa=cos(sa);
-  FXdouble ssa=sin(sa);
-  FXdouble cea=cos(ea);
-  FXdouble sea=sin(ea);
+  FXdouble csa=Math::cos(sa);
+  FXdouble ssa=Math::sin(sa);
+  FXdouble cea=Math::cos(ea);
+  FXdouble sea=Math::sin(ea);
 
   // Draw the arc
   if(faceColor!=backColor){
@@ -367,12 +368,12 @@ void FXGauge::drawGauge(FXDCWindow& dc,FXint xx,FXint yy,FXint ww,FXint hh,FXint
 
 //  dc.setForeground(FXRGB(0,0,0));
 
-//  dc.drawLine(cx,cy,(FXint)(0.5+cx+cos(ma)*rx),(FXint)(0.5+cy-sin(ma)*ry));
+//  dc.drawLine(cx,cy,(FXint)(0.5+cx+FX::cos(ma)*rx),(FXint)(0.5+cy-FX::sin(ma)*ry));
 //  dc.fillArc(cx-3,cy-3,7,7,0,23040);
 //  dc.fillArc((FXint)(0.5+cx+csa*rx)-3,(FXint)(0.5+cy-ssa*ry)-3,7,7,0,23040);
 //  dc.fillArc((FXint)(0.5+cx+cea*rx)-3,(FXint)(0.5+cy-sea*ry)-3,7,7,0,23040);
 
-//  dc.fillArc((FXint)(0.5+cx+cos(ma)*rx)-3,(FXint)(0.5+cy-sin(ma)*ry)-3,7,7,0,23040);
+//  dc.fillArc((FXint)(0.5+cx+FX::cos(ma)*rx)-3,(FXint)(0.5+cy-FX::sin(ma)*ry)-3,7,7,0,23040);
 
 //  dc.setForeground(FXRGB(255,0,0));
 //  dc.drawLine(cx,yy,cx,yy+hh);
@@ -451,10 +452,10 @@ long FXGauge::onPaint(FXObject*,FXSelector,void *ptr){
       //FXTRACE((1,"sa=%d ea=%d sw=%d\n",sa,ea,sw));
 
       // Include endpoints of arc
-      csa=cos(DTOR*sa);
-      ssa=sin(DTOR*sa);
-      cea=cos(DTOR*ea);
-      sea=sin(DTOR*ea);
+      csa=Math::cos(DTOR*sa);
+      ssa=Math::sin(DTOR*sa);
+      cea=Math::cos(DTOR*ea);
+      sea=Math::sin(DTOR*ea);
       FXMINMAX(xmin,xmax,csa,cea);
       FXMINMAX(ymin,ymax,ssa,sea);
 

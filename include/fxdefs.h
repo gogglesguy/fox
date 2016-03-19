@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -351,18 +351,6 @@ typedef FXID            FXDragType;
 #endif
 
 
-/// Pi
-const FXdouble PI=3.1415926535897932384626433833;
-
-/// Euler constant
-const FXdouble EULER=2.7182818284590452353602874713;
-
-/// Multiplier for degrees to radians
-const FXdouble DTOR=0.0174532925199432957692369077;
-
-/// Multiplier for radians to degrees
-const FXdouble RTOD=57.295779513082320876798154814;
-
 /// A time in the far, far future
 const FXTime forever=FXLONG(9223372036854775807);
 
@@ -618,53 +606,7 @@ const FXTime forever=FXLONG(9223372036854775807);
 */
 #define FXFREE(ptr)               (FX::fxfree((void **)(ptr)))
 
-
-/**
-* These are some of the ISO C99 standard single-precision transcendental functions.
-* On LINUX, specify _GNU_SOURCE or _ISOC99_SOURCE to enable native implementation;
-* otherwise, these macros will be used.  Apple OS-X implements fabsf(x), ceilf(x),
-* floorf(x), and fmodf(x,y).
-* Define FLOAT_MATH_FUNCTIONS if these functions are available in some other
-* library you're linking to.
-*/
-#ifdef __OpenBSD__
-#define FLOAT_MATH_FUNCTIONS
-#endif
-#ifndef FLOAT_MATH_FUNCTIONS
-#ifndef __USE_ISOC99
-#ifndef __APPLE__
-#define fabsf(x)    ((float)fabs((double)(x)))
-#define ceilf(x)    ((float)ceil((double)(x)))
-#define floorf(x)   ((float)floor((double)(x)))
-#define fmodf(x,y)  ((float)fmod((double)(x),(double)(y)))
-#endif
-#define sqrtf(x)    ((float)sqrt((double)(x)))
-#define sinf(x)     ((float)sin((double)(x)))
-#define cosf(x)     ((float)cos((double)(x)))
-#define tanf(x)     ((float)tan((double)(x)))
-#define asinf(x)    ((float)asin((double)(x)))
-#define acosf(x)    ((float)acos((double)(x)))
-#define atanf(x)    ((float)atan((double)(x)))
-#define atan2f(y,x) ((float)atan2((double)(y),(double)(x)))
-#define powf(x,y)   ((float)pow((double)(x),(double)(y)))
-#define expf(x)     ((float)exp((double)(x)))
-#define logf(x)     ((float)log((double)(x)))
-#define log10f(x)   ((float)log10((double)(x)))
-#define fmax(x,y)   (((x)>(y))?(x):(y))
-#define fmin(x,y)   (((x)<(y))?(x):(y))
-#define fmaxf(x,y)  (((x)>(y))?(x):(y))
-#define fminf(x,y)  (((x)<(y))?(x):(y))
-#endif
-#endif
-
-
 /**********************************  Globals  **********************************/
-
-/// Fast integer power function for positive exponents
-extern FXint powi(FXint base,FXint exp);
-
-/// Simple, thread-safe xor-shifting random number generator (initial seed should be non-zero)
-extern FXAPI FXuint fxrandom(FXuint& seed);
 
 /// Allocate memory
 extern FXAPI FXbool fxmalloc(void** ptr,FXuval size);
@@ -734,39 +676,6 @@ extern FXint fxencode64(FXchar* dst,const FXchar* src,FXint len);
 
 /// Decode src to dst from base64
 extern FXint fxdecode64(FXchar* dst,const FXchar* src,FXint len);
-
-/// Float number classification: 0=OK, +/-1=Inf, +/-2=NaN
-extern FXAPI FXint fxieeefloatclass(FXfloat number);
-
-/// Double number classification: 0=OK, +/-1=Inf, +/-2=NaN
-extern FXAPI FXint fxieeedoubleclass(FXdouble number);
-
-/// Test for finite float
-extern FXAPI FXbool fxIsFinite(FXfloat number);
-
-/// Test for finite double
-extern FXAPI FXbool fxIsFinite(FXdouble number);
-
-/// Test for infinite float
-extern FXAPI FXbool fxIsInf(FXfloat number);
-
-/// Test for infinite double
-extern FXAPI FXbool fxIsInf(FXdouble number);
-
-/// Test for not-a-number float
-extern FXAPI FXbool fxIsNan(FXfloat number);
-
-/// Test for not-a-number double
-extern FXAPI FXbool fxIsNan(FXdouble number);
-
-/// Return sign bit of float
-extern FXAPI FXint fxSignBit(FXfloat number);
-
-/// Return sign bit of double
-extern FXAPI FXint fxSignBit(FXdouble number);
-
-/// Raise 10 to an integer power e in the range [-308..308]
-extern FXAPI FXdouble fxtenToThe(FXint e);
 
 /// Convert keysym to unicode character
 extern FXAPI FXwchar fxkeysym2ucs(FXwchar sym);

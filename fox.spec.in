@@ -93,7 +93,7 @@ various other parameters common between all FOX applications.
 %setup -q
 
 %build
-CPPFLAGS="$RPM_OPT_FLAGS -frtti" CFLAGS="$RPM_OPT_FLAGS -frtti" \
+CPPFLAGS="$RPM_OPT_FLAGS -frtti" CFLAGS="$RPM_OPT_FLAGS -frtti" LDFLAGS="$RPM_OPT_FLAGS -fPIC" 
 %configure --enable-release
 make
 

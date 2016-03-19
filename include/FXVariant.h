@@ -3,7 +3,7 @@
 *                          V a r i a n t   T y p e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -126,10 +126,10 @@ public:
   VType getType() const { return type; }
 
   /// Return size of array
-  FXint no() const;
+  FXival no() const;
 
   /// Change number of elements in array
-  FXbool no(FXint n);
+  FXbool no(FXival n);
 
   /// Is it a null?
   FXbool isNull() const { return type==VNull; }
@@ -291,22 +291,42 @@ public:
   FXVariant& adopt(FXVariantMap& other);
 
   /// Return value of object member
-  FXVariant& operator[](const FXchar* key);
+  FXVariant& at(const FXchar* key);
 
   /// Return value of object member
-  const FXVariant& operator[](const FXchar* key) const;
+  const FXVariant& at(const FXchar* key) const;
 
   /// Return value of object member
-  FXVariant& operator[](const FXString& key);
+  FXVariant& operator[](const FXchar* key){ return at(key); }
 
   /// Return value of object member
-  const FXVariant& operator[](const FXString& key) const;
+  const FXVariant& operator[](const FXchar* key) const { return at(key); }
+
+  /// Return value of object member
+  FXVariant& at(const FXString& key);
+
+  /// Return value of object member
+  const FXVariant& at(const FXString& key) const;
+
+  /// Return value of object member
+  FXVariant& operator[](const FXString& key){ return at(key); }
+
+  /// Return value of object member
+  const FXVariant& operator[](const FXString& key) const { return at(key); }
 
   /// Return value of array member
-  FXVariant& operator[](FXint idx);
+  FXVariant& at(FXival idx);
 
   /// Return value of array member
-  const FXVariant& operator[](FXint idx) const;
+  const FXVariant& at(FXival idx) const;
+
+  /// Return value of array member
+  FXVariant& operator[](FXint idx){ return at(idx); }
+  FXVariant& operator[](FXival idx){ return at(idx); }
+
+  /// Return value of array member
+  const FXVariant& operator[](FXint idx) const { return at(idx); }
+  const FXVariant& operator[](FXival idx) const { return at(idx); }
 
   /// Check if key is mapped
   FXbool has(const FXchar* key) const;

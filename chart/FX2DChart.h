@@ -3,7 +3,7 @@
 *             T w o - D i m e n s i o n a l   C h a r t   W i d g e t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -27,7 +27,7 @@
 
 namespace FXCHART {
 
- 
+
 /// Base class for two-dimensional chart widgets
 class FXCHARTAPI FX2DChart : public FXChart {
   FXDECLARE(FX2DChart)

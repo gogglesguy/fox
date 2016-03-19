@@ -51,7 +51,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="2"
 				AdditionalIncludeDirectories="..\..\..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_USRDLL;FOXDLL;FOXDLL_EXPORTS;HAVE_GL_H;HAVE_GLU_H"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_USRDLL;_CRT_SECURE_NO_WARNINGS;FOXDLL;FOXDLL_EXPORTS;HAVE_GL_H;HAVE_GLU_H"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
@@ -5334,6 +5334,14 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXMat4f.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxmath.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\fxmath.h"
 			>
 		</File>
 		<File

@@ -355,14 +355,20 @@ SyntaxParser.cpp \
 TextWindow.h \
 TextWindow.cpp
 
-BUILT_SOURCES = icons.h icons.cpp
-CLEANFILES = icons.h icons.cpp
+BUILT_SOURCES = \
+icons.h \
+icons.cpp \
+help.h \
+help.cpp
+
+CLEANFILES = icons.h icons.cpp help.h help.cpp
 EXTRA_DIST = $(man_MANS) \
 Adie.stx \
 Makefile.bc \
 Makefile.wc \
 Makefile.dmc \
 LICENSE \
+help.txt \
 $(ICONS)
 
 all: $(BUILT_SOURCES)
@@ -805,6 +811,12 @@ icons.h: $(ICONS)
 
 icons.cpp: $(ICONS)
 	$(RESWRAP) -i icons.h -o $@ $^
+
+help.h: help.txt
+	$(RESWRAP) -h -a -o $@ $^
+
+help.cpp: help.txt
+	$(RESWRAP) -i help.h -a -o $@ $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

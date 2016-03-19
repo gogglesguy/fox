@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -34,7 +34,7 @@
 #include "Preferences.h"
 #include "HelpWindow.h"
 
- 
+
 #define BINARY_LIMIT      32                      // 32 bits
 #define OCTAL_LIMIT       11                      // 11 digits
 #define DECIMAL_LIMIT     16                      // +1.234567890123456E-308
@@ -785,18 +785,18 @@ FXdouble Calculator::getDisplayValue() const {
 
 // Redisplay new value
 void Calculator::setDisplayValue(FXdouble val){
-  FXint fp=fxieeedoubleclass(val);
   FXString string;
-  if(fp==-2 || fp==+2){
+  if(Math::isnan(val)){
     setDisplayText("ERROR");
     if(beep) getApp()->beep();
     }
-  else if(fp==-1){
-    setDisplayText("-INF");
-    if(beep) getApp()->beep();
-    }
-  else if(fp==+1){
-    setDisplayText("+INF");
+  else if(Math::isinf(val)){
+    if(Math::signbit(val)){
+      setDisplayText("-INF");
+      }
+    else{
+      setDisplayText("+INF");
+      }
     if(beep) getApp()->beep();
     }
   else if(base==10){
@@ -901,7 +901,7 @@ static FXdouble factorial(FXdouble n){
   FXdouble result=1.0;
   if(0.0<=num && num==n){
     while(num>0.0){
-      if(fxieeedoubleclass(result)>0) break;
+      if(!Math::isfinite(result)) break;
       result=result*num;
       num=num-1.0;
       }
@@ -923,7 +923,7 @@ static FXdouble permutations(FXdouble n,FXdouble r){
   FXdouble result=1.0;
   if(0.0<=num && 0.0<=den && den<=num && num==n && den==r){
     while(den>0.0){
-      if(fxieeedoubleclass(result)>0) break;
+      if(!Math::isfinite(result)) break;
       result=result*num;
       num=num-1.0;
       den=den-1.0;
@@ -941,13 +941,13 @@ static FXdouble permutations(FXdouble n,FXdouble r){
 //            r! (n-r)!
 //
 static FXdouble combinations(FXdouble n,FXdouble r){
-  FXdouble num=floor(n);
-  FXdouble den=floor(r);
+  FXdouble num=Math::floor(n);
+  FXdouble den=Math::floor(r);
   FXdouble res1=1.0;
   FXdouble res2=1.0;
   if(0.0<=num && 0.0<=den && den<=num && num==n && den==r){
     while(den>0.0){
-      if(fxieeedoubleclass(res1)>0) break;
+      if(!Math::isfinite(res1)) break;
       res1=res1*num;
       res2=res2*den;
       num=num-1.0;
@@ -986,19 +986,19 @@ void Calculator::unary(FXuchar op){
   acc=0.0;
   switch(op){
     case UN_NOT:
-      acc=(FXdouble) (~((FXlong)floor(val)));
+      acc=(FXdouble) (~((FXlong)Math::floor(val)));
       break;
     case UN_NEG:
       acc=-val;
       break;
     case UN_SHL:
-      acc=(FXdouble) (((FXulong)floor(val))<<1);
+      acc=(FXdouble) (((FXulong)Math::floor(val))<<1);
       break;
     case UN_SHR:
-      acc=(FXdouble) (((FXulong)floor(val))>>1);
+      acc=(FXdouble) (((FXulong)Math::floor(val))>>1);
       break;
     case UN_SAR:
-      acc=(FXdouble) (((FXlong)floor(val))>>1);
+      acc=(FXdouble) (((FXlong)Math::floor(val))>>1);
       break;
     case UN_RECIP:
       acc=1.0/val;
@@ -1007,64 +1007,64 @@ void Calculator::unary(FXuchar op){
       acc=factorial(val);
       break;
     case UN_SQRT:
-      acc=sqrt(val);
+      acc=Math::sqrt(val);
       break;
     case UN_QUAD:
       acc=val*val;
       break;
     case UN_2LOG:
-      acc=log(val)/log(2.0);
+      acc=Math::log2(val);
       break;
     case UN_2TOX:
-      acc=pow(2.0,val);
+      acc=Math::exp2(val);
       break;
     case UN_LOG:
-      acc=log10(val);
+      acc=Math::log10(val);
       break;
     case UN_10TOX:
-      acc=pow(10.0,val);
+      acc=Math::exp10(val);
       break;
     case UN_LN:
-      acc=log(val);
+      acc=Math::log(val);
       break;
     case UN_EXP:
-      acc=exp(val);
+      acc=Math::exp(val);
       break;
     case UN_SIN:
-      acc=sin(trigarg(val));
+      acc=Math::sin(trigarg(val));
       break;
     case UN_COS:
-      acc=cos(trigarg(val));
+      acc=Math::cos(trigarg(val));
       break;
     case UN_TAN:
-      acc=tan(trigarg(val));
+      acc=Math::tan(trigarg(val));
       break;
     case UN_ASIN:
-      acc=trigres(asin(val));
+      acc=trigres(Math::asin(val));
       break;
     case UN_ACOS:
-      acc=trigres(acos(val));
+      acc=trigres(Math::acos(val));
       break;
     case UN_ATAN:
-      acc=trigres(atan(val));
+      acc=trigres(Math::atan(val));
       break;
     case UN_SINH:
-      acc=sinh(val);
+      acc=Math::sinh(val);
       break;
     case UN_COSH:
-      acc=cosh(val);
+      acc=Math::cosh(val);
       break;
     case UN_TANH:
-      acc=tanh(val);
+      acc=Math::tanh(val);
       break;
     case UN_ASINH:
-      acc=log(val+sqrt(val*val+1.0));   // Tired of #ifdef's:- just expand definitions (Abramowitz & Stegun, pp. 87)
+      acc=Math::asinh(val);
       break;
     case UN_ACOSH:
-      acc=log(val+sqrt(val*val-1.0));   // Same here
+      acc=Math::acosh(val);
       break;
     case UN_ATANH:
-      acc=0.5*log((1.0+val)/(1.0-val)); // And here
+      acc=Math::atanh(val);
     default:
       break;
     }
@@ -1083,13 +1083,13 @@ void Calculator::dyop(FXuchar op){
   acc=getnum();
   switch(op){
     case DY_OR:
-      acc=(FXdouble) (((FXulong)floor(acc)) | ((FXulong)floor(val)));
+      acc=(FXdouble) (((FXulong)Math::floor(acc)) | ((FXulong)Math::floor(val)));
       break;
     case DY_XOR:
-      acc=(FXdouble) (((FXulong)floor(acc)) ^ ((FXulong)floor(val)));
+      acc=(FXdouble) (((FXulong)Math::floor(acc)) ^ ((FXulong)Math::floor(val)));
       break;
     case DY_AND:
-      acc=(FXdouble) (((FXulong)floor(acc)) & ((FXulong)floor(val)));
+      acc=(FXdouble) (((FXulong)Math::floor(acc)) & ((FXulong)Math::floor(val)));
       break;
     case DY_SUB:
       acc=acc-val;
@@ -1098,8 +1098,8 @@ void Calculator::dyop(FXuchar op){
       acc=acc+val;
       break;
     case DY_MOD:                // Theo Veenker <Theo.Veenker@let.uu.nl> suggested this new definition of "mod":
-      val=fabs(val);            // x = a div |b|        ; with a round toward 0
-      acc=fmod(acc,val);        // y = a mod |b|
+      val=Math::fabs(val);      // x = a div |b|        ; with a round toward 0
+      acc=Math::fmod(acc,val);  // y = a mod |b|
       break;                    // a = x * |b| + y
     case DY_IDIV:
       modf(acc/val,&acc);
@@ -1111,10 +1111,10 @@ void Calculator::dyop(FXuchar op){
       acc=acc*val;
       break;
     case DY_XTOY:
-      acc=pow(acc,val);
+      acc=Math::pow(acc,val);
       break;
     case DY_XTOINVY:
-      acc=pow(acc,1.0/val);
+      acc=Math::pow(acc,1.0/val);
       break;
     case DY_PER:
       acc=permutations(acc,val);

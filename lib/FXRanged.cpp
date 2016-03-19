@@ -3,7 +3,7 @@
 *           D o u b l e - P r e c i s i o n    R a n g e    C l a s s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -55,7 +56,7 @@ FXdouble FXRanged::longest() const {
   register FXdouble x=upper.x-lower.x;
   register FXdouble y=upper.y-lower.y;
   register FXdouble z=upper.z-lower.z;
-  return FXMAX3(x,y,z);
+  return Math::fmax(Math::fmax(x,y),z);
   }
 
 
@@ -64,7 +65,7 @@ FXdouble FXRanged::shortest() const {
   register FXdouble x=upper.x-lower.x;
   register FXdouble y=upper.y-lower.y;
   register FXdouble z=upper.z-lower.z;
-  return FXMIN3(x,y,z);
+  return Math::fmin(Math::fmin(x,y),z);
   }
 
 
@@ -73,7 +74,7 @@ FXdouble FXRanged::diameter() const {
   register FXdouble x=upper.x-lower.x;
   register FXdouble y=upper.y-lower.y;
   register FXdouble z=upper.z-lower.z;
-  return sqrt(x*x+y*y+z*z);
+  return Math::sqrt(x*x+y*y+z*z);
   }
 
 

@@ -3,7 +3,7 @@
 *                          L o c k - F r e e   Q u e u e                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2012,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2012,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXElement.h"
 #include "FXArray.h"
 #include "FXPtrList.h"

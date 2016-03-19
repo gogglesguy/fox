@@ -328,6 +328,7 @@
 +fxjpegio.obj &
 +fxkeyboard.obj &
 +fxkeysym.obj &
++fxmath.obj &
 +fxparsegeometry.obj &
 +fxpcxio.obj &
 +fxpngio.obj &

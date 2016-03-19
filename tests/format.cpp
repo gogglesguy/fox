@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 //#include <locale.h>
@@ -193,6 +193,6 @@ int main(int,char*[]){
   __snprintf(buffer,sizeof(buffer),positionalformat3,10,20,30);
   fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat3,buffer);
 
-  return 1;
+  return 0;
   }
 

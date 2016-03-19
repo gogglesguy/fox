@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -66,8 +66,6 @@
     backspace would back up two spaces...)
   - Would be nice if we could remember not only bookmarks, but also window
     size/position based on file name (see idea about sessions below).
-  - Add option to preferences for text widget non-tracking sliders, i.e. use
-    jump-scrolling for slow machines/network connections.
   - Close last window just saves text, then starts new document in last window;
     in other words, only quit will terminate app.
   - Maybe FXText should have its own accelerator table so that key bindings
@@ -141,7 +139,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_DND_DROP,TextWindow::ID_TEXT,TextWindow::onTextDNDDrop),
   FXMAPFUNC(SEL_DND_MOTION,TextWindow::ID_TEXT,TextWindow::onTextDNDMotion),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,TextWindow::onTextRightMouse),
-
+  
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ABOUT,TextWindow::onCmdAbout),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_HELP,TextWindow::onCmdHelp),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEW,TextWindow::onCmdNew),
@@ -149,6 +147,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN_SELECTED,TextWindow::onCmdOpenSelected),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN_TREE,TextWindow::onCmdOpenTree),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN_RECENT,TextWindow::onCmdOpenRecent),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SWITCH,TextWindow::onCmdSwitch),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_REOPEN,TextWindow::onCmdReopen),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_REOPEN,TextWindow::onUpdReopen),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE,TextWindow::onCmdSave),
@@ -507,6 +506,7 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(filemenu,tr("&New...\tCtl-N\tCreate new document."),getApp()->newicon,this,ID_NEW);
   new FXMenuCommand(filemenu,tr("&Open...\tCtl-O\tOpen document file."),getApp()->openicon,this,ID_OPEN);
   new FXMenuCommand(filemenu,tr("Open Selected...  \tCtl-Y\tOpen highlighted document file."),NULL,this,ID_OPEN_SELECTED);
+  new FXMenuCommand(filemenu,tr("Switch...\t\tSwitch to other file."),NULL,this,ID_SWITCH);
   new FXMenuCommand(filemenu,tr("&Reopen...\t\tReopen file."),getApp()->reloadicon,this,ID_REOPEN);
   new FXMenuCommand(filemenu,tr("&Save\tCtl-S\tSave changes to file."),getApp()->saveicon,this,ID_SAVE);
   new FXMenuCommand(filemenu,tr("Save &As...\t\tSave document to another file."),getApp()->saveasicon,this,ID_SAVEAS);
@@ -596,11 +596,12 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-)\tSelect enclosing parentheses."),NULL,editor,FXText::ID_SELECT_PAREN);
   new FXMenuSeparator(searchmenu);
   new FXMenuCommand(searchmenu,tr("Incremental search\tCtl-I\tSearch for a string."),NULL,this,ID_ISEARCH_START);
-  new FXMenuCommand(searchmenu,tr("Search in &Files\t\tSearch files for a string."),NULL,this,ID_FINDFILES);
-  new FXMenuCommand(searchmenu,tr("Search sel. fwd\tCtl-H\tSearch for selection."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
-  new FXMenuCommand(searchmenu,tr("Search sel. bck\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
-  new FXMenuCommand(searchmenu,tr("Search next fwd\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
-  new FXMenuCommand(searchmenu,tr("Search next bck\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+  new FXMenuCommand(searchmenu,tr("Search &Files\t\tSearch files for a string."),NULL,this,ID_FINDFILES);
+  new FXMenuCommand(searchmenu,tr("Find selected >>\tCtl-H\tSearch for selection."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
+  new FXMenuCommand(searchmenu,tr("Find selected <<\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+  new FXMenuCommand(searchmenu,tr("Find again >>\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+  new FXMenuCommand(searchmenu,tr("Find again <<\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+
   new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,this,ID_SEARCH);
   new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),getApp()->replaceicon,this,ID_REPLACE);
 
@@ -732,8 +733,8 @@ void TextWindow::createToolbar(){
 
   // Search
   new FXButton(toolbar,tr("\tSearch\tSearch text."),getApp()->searchicon,this,ID_SEARCH,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tSearch Previous Selected\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tSearch Next Selected\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tFind selected <<\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tFind selected >>\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
@@ -1073,7 +1074,6 @@ FXbool TextWindow::insertFile(const FXString& file){
       freeElms(text);
       }
     }
-
   return loaded;
   }
 
@@ -1182,7 +1182,6 @@ FXbool TextWindow::extractFile(const FXString& file){
       freeElms(text);
       }
     }
-
   return saved;
   }
 
@@ -1581,7 +1580,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2015 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2016 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1855,6 +1854,7 @@ long TextWindow::onCmdOpenRecent(FXObject*,FXSelector,void* ptr){
       window->create();
       }
     if(!window->loadFile(file)){
+      mrufiles.removeFile(file);
       getApp()->beep();
       FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
       }
@@ -1887,6 +1887,34 @@ long TextWindow::onCmdOpenTree(FXObject*,FXSelector,void* ptr){
     readBookmarks(file);
     readView(file);
     determineSyntax();
+    }
+  return 1;
+  }
+
+
+// Switch files
+long TextWindow::onCmdSwitch(FXObject*,FXSelector,void* ptr){
+  if(saveChanges()){
+    FXFileDialog opendialog(this,tr("Switch Document"));
+    FXString file=getFilename();
+    opendialog.setSelectMode(SELECTFILE_EXISTING);
+    opendialog.setAssociations(getApp()->associations,false);
+    opendialog.setPatternList(getPatternList());
+    opendialog.setCurrentPattern(getCurrentPattern());
+    opendialog.setFilename(file);
+    if(opendialog.execute()){
+      setCurrentPattern(opendialog.getCurrentPattern());
+      file=opendialog.getFilename();
+      if(loadFile(file)){
+        clearBookmarks();
+        readBookmarks(file);
+        readView(file);
+        determineSyntax();
+        }
+      else{
+        FXMessageBox::error(this,MBOX_OK,tr("Error Switching Files"),tr("Unable to switch to file: %s"),file.text());
+        }
+      }
     }
   return 1;
   }
@@ -2067,6 +2095,17 @@ FXbool TextWindow::close(FXbool notify){
 
   // Save settings
   writeRegistry();
+
+/*
+  // Reset as empty text window
+  setFilename(getApp()->unique(FXPath::directory(filename)));
+  setFilenameSet(false);
+  editor->setText(FXString::null);
+  undolist.clear();
+  undolist.mark();
+  clearBookmarks();
+  setSyntax(NULL);
+*/
 
   // Perform normal close stuff
   return FXMainWindow::close(notify);
@@ -3732,6 +3771,13 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCommand(&popupmenu,tr("Undo"),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
     new FXMenuCommand(&popupmenu,tr("Redo"),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
     new FXMenuSeparator(&popupmenu);
+
+    new FXMenuCommand(&popupmenu,tr("Find selected <<"),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+    new FXMenuCommand(&popupmenu,tr("Find selected >>"),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
+    new FXMenuCommand(&popupmenu,tr("Find again <<"),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+    new FXMenuCommand(&popupmenu,tr("Find again >>"),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+
+    new FXMenuSeparator(&popupmenu);
     new FXMenuCommand(&popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
     new FXMenuCommand(&popupmenu,tr("Copy"),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
     new FXMenuCommand(&popupmenu,tr("Paste"),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
@@ -4278,11 +4324,10 @@ long TextWindow::onUpdStyleBold(FXObject* sender,FXSelector sel,void*){
 
 // Set language
 void TextWindow::setSyntax(Syntax* syn){
-  FXint rule;
   syntax=syn;
   if(syntax){
     styles.no(syntax->getNumRules()-1);
-    for(rule=1; rule<syntax->getNumRules(); rule++){
+    for(FXint rule=1; rule<syntax->getNumRules(); rule++){
       styles[rule-1]=readStyleForRule(syntax->getGroup(),syntax->getRule(rule)->getName(),syntax->getRule(rule)->getStyle());
       }
     editor->setDelimiters(syntax->getDelimiters().text());

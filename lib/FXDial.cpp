@@ -3,7 +3,7 @@
 *                                D i a l   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -501,7 +502,7 @@ long FXDial::onPaint(FXObject*,FXSelector,void* ptr){
     mid=0.5*(lt+rt);
     for(i=fm; i<=to; i++){
       ang=i*notchSpacing+off;
-      t=(FXint)(mid-r*cos(0.1*DTOR*ang));
+      t=(FXint)(mid-r*Math::cos(0.1*DTOR*ang));
       if((options&DIAL_HAS_NOTCH) && (ang+3600)%3600==notchAngle){
         dc.setForeground(hiliteColor);
         dc.drawLine(t-1,tp,t-1,bm);
@@ -558,7 +559,7 @@ long FXDial::onPaint(FXObject*,FXSelector,void* ptr){
     lu=lt;
     ld=rt;
     for(i=0; i<NUMSIDECOLORS; i++){
-      tmp=r*cos(fac*i);
+      tmp=r*Math::cos(fac*i);
       u=(FXint)(mid-tmp);
       d=(FXint)(mid+tmp);
       red=(rmax*i)/(NUMSIDECOLORS-1);
@@ -583,7 +584,7 @@ long FXDial::onPaint(FXObject*,FXSelector,void* ptr){
     mid=0.5*(tp+bm);
     for(i=fm; i<=to; i++){
       ang=i*notchSpacing+off;
-      t=(FXint)(mid+r*cos(0.1*DTOR*ang));
+      t=(FXint)(mid+r*Math::cos(0.1*DTOR*ang));
       if((options&DIAL_HAS_NOTCH) && (ang+3600)%3600==notchAngle){
         dc.setForeground(hiliteColor);
         dc.drawLine(lt,t-1,rt,t-1);
@@ -640,7 +641,7 @@ long FXDial::onPaint(FXObject*,FXSelector,void* ptr){
     lu=tp;
     ld=bm;
     for(i=0; i<NUMSIDECOLORS; i++){
-      tmp=r*cos(fac*i);
+      tmp=r*Math::cos(fac*i);
       u=(FXint)(mid-tmp);
       d=(FXint)(mid+tmp);
       red=(rmax*i)/(NUMSIDECOLORS-1);

@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -512,8 +513,8 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   // Always set matrix if rotatable
   if(wanthints&FXFont::Rotatable){
     a=0.00027270769562411399179*angle;
-    c=cos(a);
-    s=sin(a);
+    c=Math::cos(a);
+    s=Math::sin(a);
     matrix.xx=c; matrix.xy=-s;
     matrix.yx=s; matrix.yy=c;
     FcPatternAddMatrix(pattern,FC_MATRIX,&matrix);
@@ -1003,9 +1004,9 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         // allocated in the client by Xlib.
         if(fs && (flags&FXFont::Rotatable)){
           a=0.00027270769562411399179*angle;
-          c=(cos(a)*res*actualSize)/(10.0*byres);
-          s=(sin(a)*res*actualSize)/(10.0*byres);
-          __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),fabs(c),SGN(s),fabs(s),SGN(-s),fabs(s),SGN(c),fabs(c),bxres,byres,field[10],field[12]);
+          c=(Math::cos(a)*res*actualSize)/(10.0*byres);
+          s=(Math::sin(a)*res*actualSize)/(10.0*byres);
+          __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),Math::fabs(c),SGN(s),Math::fabs(s),SGN(-s),Math::fabs(s),SGN(c),Math::fabs(c),bxres,byres,field[10],field[12]);
           XUnloadFont(DISPLAY(getApp()),((XFontStruct*)fs)->fid);
           ((XFontStruct*)fs)->fid=XLoadFont(DISPLAY(getApp()),xlfd);
           }
@@ -1700,7 +1701,7 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
     // is not 0, we calculate the unrotated baseline; note however that the calculation is
     // not 100% pixel exact when the angle is not a multiple of 90 degrees.
     XftTextExtentsUtf8(DISPLAY(getApp()),(XftFont*)font,(const FcChar8*)string,length,&extents);
-    if(angle){ return (FXint)(0.5+sqrt((FXdouble)(extents.xOff*extents.xOff+extents.yOff*extents.yOff))); }
+    if(angle){ return (FXint)(0.5+Math::sqrt((FXdouble)(extents.xOff*extents.xOff+extents.yOff*extents.yOff))); }
     return extents.xOff;
 #else                           ///// XLFD /////
     register const XFontStruct *fs=(XFontStruct*)font;

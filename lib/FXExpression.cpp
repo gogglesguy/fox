@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 #include "fxunicode.h"
 #include "FXArray.h"
@@ -454,19 +455,19 @@ FXExpression::Error FXCompile::element(){
       break;
     case TK_PI:
       opcode(OP_NUM);
-      number(3.1415926535897932384626433832795029);
+      number(PI);
       break;
     case TK_EULER:
       opcode(OP_NUM);
-      number(2.7182818284590452353602874713526625);
+      number(EULER);
       break;
     case TK_RTOD:
       opcode(OP_NUM);
-      number(57.295779513082320876798154814);
+      number(RTOD);
       break;
     case TK_DTOR:
       opcode(OP_NUM);
-      number(0.0174532925199432957692369077);
+      number(DTOR);
       break;
     case TK_MAX:
       op=OP_MAX;
@@ -947,34 +948,28 @@ FXdouble FXExpression::evaluate(const FXdouble *args) const {
       case OP_VAR:   *++sp=args[*pc++]; break;
       case OP_NOT:   *sp=(FXdouble)(~((FXlong)*sp)); break;
       case OP_NEG:   *sp=-*sp; break;
-      case OP_SIN:   *sp=sin(*sp); break;
-      case OP_COS:   *sp=cos(*sp); break;
-      case OP_TAN:   *sp=tan(*sp); break;
-      case OP_ASIN:  *sp=asin(*sp); break;
-      case OP_ACOS:  *sp=acos(*sp); break;
-      case OP_ATAN:  *sp=atan(*sp); break;
-      case OP_SINH:  *sp=sinh(*sp); break;
-      case OP_COSH:  *sp=cosh(*sp); break;
-      case OP_TANH:  *sp=tanh(*sp); break;
-#if defined(WIN32) || defined(__minix)
-      case OP_ASINH: *sp=log(*sp + sqrt(*sp * *sp + 1.0)); break;
-      case OP_ACOSH: *sp=log(*sp + sqrt(*sp * *sp - 1.0)); break;
-      case OP_ATANH: *sp=0.5 * log((1.0 + *sp)/(1.0 - *sp)); break;
-#else
-      case OP_ASINH: *sp=asinh(*sp); break;
-      case OP_ACOSH: *sp=acosh(*sp); break;
-      case OP_ATANH: *sp=atanh(*sp); break;
-#endif
-      case OP_SQRT:  *sp=sqrt(*sp); break;
-      case OP_ABS:   *sp=fabs(*sp); break;
-      case OP_CEIL:  *sp=ceil(*sp); break;
-      case OP_FLOOR: *sp=floor(*sp); break;
-      case OP_EXP:   *sp=exp(*sp); break;
-      case OP_LOG:   *sp=log(*sp); break;
-      case OP_LOG10: *sp=log10(*sp); break;
+      case OP_SIN:   *sp=Math::sin(*sp); break;
+      case OP_COS:   *sp=Math::cos(*sp); break;
+      case OP_TAN:   *sp=Math::tan(*sp); break;
+      case OP_ASIN:  *sp=Math::asin(*sp); break;
+      case OP_ACOS:  *sp=Math::acos(*sp); break;
+      case OP_ATAN:  *sp=Math::atan(*sp); break;
+      case OP_SINH:  *sp=Math::sinh(*sp); break;
+      case OP_COSH:  *sp=Math::cosh(*sp); break;
+      case OP_TANH:  *sp=Math::tanh(*sp); break;
+      case OP_ASINH: *sp=Math::asinh(*sp); break;
+      case OP_ACOSH: *sp=Math::acosh(*sp); break;
+      case OP_ATANH: *sp=Math::atanh(*sp); break;
+      case OP_SQRT:  *sp=Math::sqrt(*sp); break;
+      case OP_ABS:   *sp=Math::fabs(*sp); break;
+      case OP_CEIL:  *sp=Math::ceil(*sp); break;
+      case OP_FLOOR: *sp=Math::floor(*sp); break;
+      case OP_EXP:   *sp=Math::exp(*sp); break;
+      case OP_LOG:   *sp=Math::log(*sp); break;
+      case OP_LOG10: *sp=Math::log10(*sp); break;
       case OP_MUL:   *(sp-1)=*(sp-1) * *sp; --sp; break;
       case OP_DIV:   *(sp-1)=*(sp-1) / *sp; --sp; break;
-      case OP_MOD:   *(sp-1)=fmod(*(sp-1),*sp); --sp; break;
+      case OP_MOD:   *(sp-1)=Math::fmod(*(sp-1),*sp); --sp; break;
       case OP_ADD:   *(sp-1)=*(sp-1) + *sp; --sp; break;
       case OP_SUB:   *(sp-1)=*(sp-1) - *sp; --sp; break;
       case OP_AND:   *(sp-1)=(FXdouble)(((FXlong)*(sp-1)) & ((FXlong)*sp)); --sp; break;
@@ -988,10 +983,10 @@ FXdouble FXExpression::evaluate(const FXdouble *args) const {
       case OP_GE:    *(sp-1)=(FXdouble)(*(sp-1) >= *sp); --sp; break;
       case OP_EQ:    *(sp-1)=(FXdouble)(*(sp-1) == *sp); --sp; break;
       case OP_NE:    *(sp-1)=(FXdouble)(*(sp-1) != *sp); --sp; break;
-      case OP_POW:   *(sp-1)=pow(*(sp-1),*sp); --sp; break;
-      case OP_MAX:   *(sp-1)=FXMAX(*(sp-1),*sp); --sp; break;
-      case OP_MIN:   *(sp-1)=FXMIN(*(sp-1),*sp); --sp; break;
-      case OP_ATAN2: *(sp-1)=atan2(*(sp-1),*sp); --sp; break;
+      case OP_POW:   *(sp-1)=Math::pow(*(sp-1),*sp); --sp; break;
+      case OP_MAX:   *(sp-1)=Math::fmax(*(sp-1),*sp); --sp; break;
+      case OP_MIN:   *(sp-1)=Math::fmin(*(sp-1),*sp); --sp; break;
+      case OP_ATAN2: *(sp-1)=Math::atan2(*(sp-1),*sp); --sp; break;
       }
     }
   return 0.0;

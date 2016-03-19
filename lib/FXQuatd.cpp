@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -67,7 +68,7 @@ FXQuatd& FXQuatd::adjust(){
   register FXdouble t=x*x+y*y+z*z+w*w;
   register FXdouble f;
   if(__likely(t>0.0)){
-    f=1.0/sqrt(t);
+    f=1.0/Math::sqrt(t);
     x*=f;
     y*=f;
     z*=f;
@@ -83,11 +84,11 @@ void FXQuatd::setAxisAngle(const FXVec3d& axis,FXdouble phi){
   register FXdouble a,m;
   if(__likely(0.0<mag)){
     a=0.5*phi;
-    m=sin(a)/mag;
+    m=Math::sin(a)/mag;
     x=axis.x*m;
     y=axis.y*m;
     z=axis.z*m;
-    w=cos(a);
+    w=Math::cos(a);
     return;
     }
   x=0.0;
@@ -103,11 +104,11 @@ void FXQuatd::getAxisAngle(FXVec3d& axis,FXdouble& phi) const {
   register FXdouble mag=x*x+y*y+z*z;
   register FXdouble m;
   if(__likely(0.0<mag)){
-    m=sqrt(mag);
+    m=Math::sqrt(mag);
     axis.x=x/m;
     axis.y=y/m;
     axis.z=z/m;
-    phi=2.0*acos(w/sqrt(mag+w*w));
+    phi=2.0*Math::acos(w/Math::sqrt(mag+w*w));
     return;
     }
   axis.x=1.0;
@@ -123,9 +124,9 @@ void FXQuatd::setRollPitchYaw(FXdouble roll,FXdouble pitch,FXdouble yaw){
   register FXdouble rr=0.5*roll;
   register FXdouble pp=0.5*pitch;
   register FXdouble yy=0.5*yaw;
-  sr=sin(rr); cr=cos(rr);
-  sp=sin(pp); cp=cos(pp);
-  sy=sin(yy); cy=cos(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=sr*cp*cy-cr*sp*sy;
   y=cr*sp*cy+sr*cp*sy;
   z=cr*cp*sy-sr*sp*cy;
@@ -139,9 +140,9 @@ void FXQuatd::setYawPitchRoll(FXdouble yaw,FXdouble pitch,FXdouble roll){
   register FXdouble rr=0.5*roll;
   register FXdouble pp=0.5*pitch;
   register FXdouble yy=0.5*yaw;
-  sr=sin(rr); cr=cos(rr);
-  sp=sin(pp); cp=cos(pp);
-  sy=sin(yy); cy=cos(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=sr*cp*cy+cr*sp*sy;
   y=cr*sp*cy-sr*cp*sy;
   z=cr*cp*sy+sr*sp*cy;
@@ -155,9 +156,9 @@ void FXQuatd::setRollYawPitch(FXdouble roll,FXdouble yaw,FXdouble pitch){
   register FXdouble rr=0.5*roll;
   register FXdouble pp=0.5*pitch;
   register FXdouble yy=0.5*yaw;
-  sr=sin(rr); cr=cos(rr);
-  sp=sin(pp); cp=cos(pp);
-  sy=sin(yy); cy=cos(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=cp*cy*sr+sp*sy*cr;
   y=sp*cy*cr+cp*sy*sr;
   z=cp*sy*cr-sp*cy*sr;
@@ -171,9 +172,9 @@ void FXQuatd::setPitchRollYaw(FXdouble pitch,FXdouble roll,FXdouble yaw){
   register FXdouble rr=0.5*roll;
   register FXdouble pp=0.5*pitch;
   register FXdouble yy=0.5*yaw;
-  sr=sin(rr); cr=cos(rr);
-  sp=sin(pp); cp=cos(pp);
-  sy=sin(yy); cy=cos(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=cy*sr*cp-sy*cr*sp;
   y=cy*cr*sp+sy*sr*cp;
   z=cy*sr*sp+sy*cr*cp;
@@ -187,9 +188,9 @@ void FXQuatd::setPitchYawRoll(FXdouble pitch,FXdouble yaw,FXdouble roll){
   register FXdouble rr=0.5*roll;
   register FXdouble pp=0.5*pitch;
   register FXdouble yy=0.5*yaw;
-  sr=sin(rr); cr=cos(rr);
-  sp=sin(pp); cp=cos(pp);
-  sy=sin(yy); cy=cos(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=sr*cy*cp-cr*sy*sp;
   y=cr*cy*sp-sr*sy*cp;
   z=sr*cy*sp+cr*sy*cp;
@@ -203,9 +204,9 @@ void FXQuatd::setYawRollPitch(FXdouble yaw,FXdouble roll,FXdouble pitch){
   register FXdouble rr=0.5*roll;
   register FXdouble pp=0.5*pitch;
   register FXdouble yy=0.5*yaw;
-  sr=sin(rr); cr=cos(rr);
-  sp=sin(pp); cp=cos(pp);
-  sy=sin(yy); cy=cos(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=cp*sr*cy+sp*cr*sy;
   y=sp*cr*cy-cp*sr*sy;
   z=cp*cr*sy-sp*sr*cy;
@@ -222,20 +223,20 @@ void FXQuatd::getRollPitchYaw(FXdouble& roll,FXdouble& pitch,FXdouble& yaw) cons
   register FXdouble s=-2.0*(x*z-w*y);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
-      roll=atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
-      pitch=asin(s);
-      yaw=atan2(2.0*(x*y+w*z),1.0-2.0*(y*y+z*z));
+      roll=Math::atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
+      pitch=Math::asin(s);
+      yaw=Math::atan2(2.0*(x*y+w*z),1.0-2.0*(y*y+z*z));
       }
     else{
       roll=0.0;
       pitch=-1.57079632679489661923;
-      yaw=-atan2(-2.0*(x*y-w*z),2.0*(x*z+w*y));
+      yaw=-Math::atan2(-2.0*(x*y-w*z),2.0*(x*z+w*y));
       }
     }
   else{
     roll=0.0;
     pitch=1.57079632679489661923;
-    yaw=atan2(-2.0*(x*y-w*z),2.0*(x*z+w*y));
+    yaw=Math::atan2(-2.0*(x*y-w*z),2.0*(x*z+w*y));
     }
   }
 
@@ -245,20 +246,20 @@ void FXQuatd::getYawPitchRoll(FXdouble& yaw,FXdouble& pitch,FXdouble& roll) cons
   register FXdouble s=2.0*(x*z+w*y);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
-      yaw=atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
-      pitch=asin(s);
-      roll=atan2(-2.0*(y*z-w*x),1.0-2.0*(x*x+y*y));
+      yaw=Math::atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
+      pitch=Math::asin(s);
+      roll=Math::atan2(-2.0*(y*z-w*x),1.0-2.0*(x*x+y*y));
       }
     else{
       yaw=0.0;
       pitch=-1.57079632679489661923;
-      roll=-atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
+      roll=-Math::atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
       }
     }
   else{
     yaw=0.0;
     pitch=1.57079632679489661923;
-    roll=atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
+    roll=Math::atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
     }
   }
 
@@ -268,20 +269,20 @@ void FXQuatd::getRollYawPitch(FXdouble& roll,FXdouble& yaw,FXdouble& pitch) cons
   register FXdouble s=2.0*(x*y+w*z);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
-      roll=atan2(-2.0*(y*z-w*x),1.0-2.0*(x*x+z*z));
-      yaw=asin(s);
-      pitch=atan2(-2.0*(x*z-w*y),1.0-2.0*(y*y+z*z));
+      roll=Math::atan2(-2.0*(y*z-w*x),1.0-2.0*(x*x+z*z));
+      yaw=Math::asin(s);
+      pitch=Math::atan2(-2.0*(x*z-w*y),1.0-2.0*(y*y+z*z));
       }
     else{
       roll=0.0;
       yaw=-1.57079632679489661923;
-      pitch=-atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
+      pitch=-Math::atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
       }
     }
   else{
     roll=0.0;
     yaw=1.57079632679489661923;
-    pitch=atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
+    pitch=Math::atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
     }
   }
 
@@ -291,20 +292,20 @@ void FXQuatd::getPitchRollYaw(FXdouble& pitch,FXdouble& roll,FXdouble& yaw) cons
   register FXdouble s=2.0*(y*z+w*x);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
-      pitch=atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
-      roll=asin(s);
-      yaw=atan2(-2.0*(x*y-w*z),1.0-2.0*(x*x+z*z));
+      pitch=Math::atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
+      roll=Math::asin(s);
+      yaw=Math::atan2(-2.0*(x*y-w*z),1.0-2.0*(x*x+z*z));
       }
     else{
       pitch=0.0;
       roll=-1.57079632679489661923;
-      yaw=-atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
+      yaw=-Math::atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
       }
     }
   else{
     pitch=0.0;
     roll=1.57079632679489661923;
-    yaw=atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
+    yaw=Math::atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
     }
   }
 
@@ -314,20 +315,20 @@ void FXQuatd::getPitchYawRoll(FXdouble& pitch,FXdouble& yaw,FXdouble& roll) cons
   register FXdouble s=-2.0*(x*y-w*z);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
-      pitch=atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
-      yaw=asin(s);
-      roll=atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+z*z));
+      pitch=Math::atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
+      yaw=Math::asin(s);
+      roll=Math::atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+z*z));
       }
     else{
       pitch=0.0;
       yaw=-1.57079632679489661923;
-      roll=-atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
+      roll=-Math::atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
       }
     }
   else{
     pitch=0.0;
     yaw=1.57079632679489661923;
-    roll=atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
+    roll=Math::atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
     }
   }
 
@@ -337,20 +338,20 @@ void FXQuatd::getYawRollPitch(FXdouble& yaw,FXdouble& roll,FXdouble& pitch) cons
   register FXdouble s=-2.0*(y*z-w*x);
   if(__likely(s<1.0)){
     if(__likely(-1.0<s)){
-      yaw=atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
-      roll=asin(s);
-      pitch=atan2(2.0*(x*z+w*y),1.0-2.0*(x*x+y*y));
+      yaw=Math::atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
+      roll=Math::asin(s);
+      pitch=Math::atan2(2.0*(x*z+w*y),1.0-2.0*(x*x+y*y));
       }
     else{
       yaw=0.0;
       roll=-1.57079632679489661923;
-      pitch=-atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
+      pitch=-Math::atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
       }
     }
   else{
     yaw=0.0;
     roll=1.57079632679489661923;
-    pitch=atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
+    pitch=Math::atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
     }
   }
 
@@ -360,7 +361,7 @@ void FXQuatd::setAxes(const FXVec3d& ex,const FXVec3d& ey,const FXVec3d& ez){
   register FXdouble trace=ex.x+ey.y+ez.z;
   register FXdouble scale;
   if(trace>0.0){
-    scale=sqrt(1.0+trace);
+    scale=Math::sqrt(1.0+trace);
     w=0.5*scale;
     scale=0.5/scale;
     x=(ey.z-ez.y)*scale;
@@ -368,21 +369,21 @@ void FXQuatd::setAxes(const FXVec3d& ex,const FXVec3d& ey,const FXVec3d& ez){
     z=(ex.y-ey.x)*scale;
     }
   else if(ex.x>ey.y && ex.x>ez.z){
-    scale=2.0*sqrt(1.0+ex.x-ey.y-ez.z);
+    scale=2.0*Math::sqrt(1.0+ex.x-ey.y-ez.z);
     x=0.25*scale;
     y=(ex.y+ey.x)/scale;
     z=(ex.z+ez.x)/scale;
     w=(ey.z-ez.y)/scale;
     }
   else if(ey.y>ez.z){
-    scale=2.0*sqrt(1.0+ey.y-ex.x-ez.z);
+    scale=2.0*Math::sqrt(1.0+ey.y-ex.x-ez.z);
     y=0.25*scale;
     x=(ex.y+ey.x)/scale;
     z=(ey.z+ez.y)/scale;
     w=(ez.x-ex.z)/scale;
     }
   else{
-    scale=2.0*sqrt(1.0+ez.z-ex.x-ey.y);
+    scale=2.0*Math::sqrt(1.0+ez.z-ex.x-ey.y);
     z=0.25*scale;
     x=(ex.z+ez.x)/scale;
     y=(ey.z+ez.y)/scale;
@@ -445,11 +446,11 @@ FXVec3d FXQuatd::getZAxis() const {
 // Given q = theta*(x*i+y*j+z*k), where length of (x,y,z) is 1,
 // then exp(q) = sin(theta)*(x*i+y*j+z*k)+cos(theta).
 FXQuatd FXQuatd::exp() const {
-  register FXdouble theta=sqrt(x*x+y*y+z*z);
+  register FXdouble theta=Math::sqrt(x*x+y*y+z*z);
   register FXdouble scale;
-  FXQuatd result(x,y,z,cos(theta));
+  FXQuatd result(x,y,z,Math::cos(theta));
   if(__likely(0.000000001<theta)){
-    scale=sin(theta)/theta;
+    scale=Math::sin(theta)/theta;
     result.x*=scale;
     result.y*=scale;
     result.z*=scale;
@@ -462,8 +463,8 @@ FXQuatd FXQuatd::exp() const {
 // Given q = sin(theta)*(x*i+y*j+z*k)+cos(theta), length of (x,y,z) is 1,
 // then log(q) = theta*(x*i+y*j+z*k).
 FXQuatd FXQuatd::log() const {
-  register FXdouble scale=sqrt(x*x+y*y+z*z);
-  register FXdouble theta=atan2(scale,w);
+  register FXdouble scale=Math::sqrt(x*x+y*y+z*z);
+  register FXdouble theta=Math::atan2(scale,w);
   FXQuatd result(x,y,z,0.0);
   if(__likely(0.0<scale)){
     scale=theta/scale;
@@ -547,12 +548,12 @@ FXQuatd arc(const FXVec3d& f,const FXVec3d& t){
     result.w=1.0;
     }
   else if(__unlikely(dot<-0.999999999999999)){  // 180 quaternion (Stephen Hardy)
-    if(fabs(f.z)<fabs(f.x) && fabs(f.z)<fabs(f.y)){     // x, y largest magnitude
+    if(Math::fabs(f.z)<Math::fabs(f.x) && Math::fabs(f.z)<Math::fabs(f.y)){     // x, y largest magnitude
       result.x= f.x*f.z-f.z*f.y;
       result.y= f.z*f.x+f.y*f.z;
       result.z=-f.y*f.y-f.x*f.x;
       }
-    else if(fabs(f.y)<fabs(f.x)){                       // y, z largest magnitude
+    else if(Math::fabs(f.y)<Math::fabs(f.x)){               // y, z largest magnitude
       result.x= f.y*f.z-f.x*f.y;
       result.y= f.x*f.x+f.z*f.z;
       result.z=-f.z*f.y-f.y*f.x;
@@ -563,14 +564,14 @@ FXQuatd arc(const FXVec3d& f,const FXVec3d& t){
       result.z= f.x*f.y+f.z*f.x;
       }
     dot=result.x*result.x+result.y*result.y+result.z*result.z;
-    div=sqrt(dot);
+    div=Math::sqrt(dot);
     result.x/=div;
     result.y/=div;
     result.z/=div;
     result.w=0.0;
     }
   else{
-    div=sqrt((dot+1.0)*2.0);
+    div=Math::sqrt((dot+1.0)*2.0);
     result.x=(f.y*t.z-f.z*t.y)/div;
     result.y=(f.z*t.x-f.x*t.z)/div;
     result.z=(f.x*t.y-f.y*t.x)/div;
@@ -584,17 +585,17 @@ FXQuatd arc(const FXVec3d& f,const FXVec3d& t){
 // This is equivalent to: u * (u.unitinvert()*v).pow(f)
 FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   register FXdouble dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
-  register FXdouble cost=fabs(dot);
+  register FXdouble cost=Math::fabs(dot);
   register FXdouble sint;
   register FXdouble fr=1.0-f;
   register FXdouble to=f;
   register FXdouble theta;
   FXQuatd result;
   if(__likely(cost<0.999999999999999)){
-    sint=sqrt(1.0-cost*cost);
-    theta=atan2(sint,cost);
-    fr=sin(fr*theta)/sint;
-    to=sin(to*theta)/sint;
+    sint=Math::sqrt(1.0-cost*cost);
+    theta=Math::atan2(sint,cost);
+    fr=Math::sin(fr*theta)/sint;
+    to=Math::sin(to*theta)/sint;
     }
   if(dot<0.0) to=-to;
   result.x=fr*u.x+to*v.x;
@@ -610,17 +611,17 @@ FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
 // which is itself equivalent to: lerp(u,v,f) * (u.unitinvert()*v).log()
 FXQuatd lerpdot(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   register FXdouble dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
-  register FXdouble cost=fabs(dot);
+  register FXdouble cost=Math::fabs(dot);
   register FXdouble sint;
   register FXdouble fr=1.0-f;
   register FXdouble to=f;
   register FXdouble theta;
   FXQuatd result;
   if(__likely(cost<0.999999999999999)){
-    sint=sqrt(1.0-cost*cost);
-    theta=atan2(sint,cost);
-    fr=-theta*cos(fr*theta)/sint;
-    to=theta*cos(to*theta)/sint;
+    sint=Math::sqrt(1.0-cost*cost);
+    theta=Math::atan2(sint,cost);
+    fr=-theta*Math::cos(fr*theta)/sint;
+    to=theta*Math::cos(to*theta)/sint;
     }
   result.x=fr*u.x+to*v.x;
   result.y=fr*u.y+to*v.y;

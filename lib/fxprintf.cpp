@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 
 
@@ -253,8 +254,8 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
   FXbool mode;
 
   // Handle sign
-  if(fxSignBit(number)){
-    number=fabs(number);
+  if(Math::signbit(number)){
+    number=Math::fabs(number);
     *ptr++='-';
     }
   else if(flags&FLG_SIGN){
@@ -265,14 +266,14 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
     }
 
   // Infinity
-  if(fxIsInf(number)){
+  if(Math::isinf(number)){
     *ptr++='i';
     *ptr++='n';
     *ptr++='f';
     }
 
   // NaN
-  else if(fxIsNan(number)){
+  else if(Math::isnan(number)){
     *ptr++='n';
     *ptr++='a';
     *ptr++='n';
@@ -390,8 +391,8 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
   FXint  decimal;
 
   // Handle sign
-  if(fxSignBit(number)){
-    number=fabs(number);
+  if(Math::signbit(number)){
+    number=Math::fabs(number);
     *ptr++='-';
     }
   else if(flags&FLG_SIGN){
@@ -402,14 +403,14 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
     }
 
   // Infinity
-  if(fxIsInf(number)){
+  if(Math::isinf(number)){
     *ptr++='i';
     *ptr++='n';
     *ptr++='f';
     }
 
   // NaN
-  else if(fxIsNan(number)){
+  else if(Math::isnan(number)){
     *ptr++='n';
     *ptr++='a';
     *ptr++='n';

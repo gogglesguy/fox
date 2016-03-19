@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -121,7 +121,7 @@ Adie::Adie(const FXString& name):FXApp(name){
 
 
 // Close all windows
-long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){
+long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){      
   while(0<windowlist.no() && windowlist[0]->close(true)){}
   return 1;
   }
@@ -172,7 +172,7 @@ static void printusage(){
 // Print verson info
 static void printversion(){
   fxmessage("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  fxmessage("Copyright (C) 2000,2015 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Copyright (C) 2000,2016 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
   fxmessage("\n");
   fxmessage("This program is free software: you can redistribute it and/or modify\n");
@@ -200,7 +200,7 @@ FXint Adie::start(int argc,char** argv){
   FXint       col=0;
   FXint       arg=1;
 
-  // After init, the registry has been loaded
+  // The registry has been loaded after this
   init(argc,argv);
 
   // Make a tool tip
@@ -212,14 +212,22 @@ FXint Adie::start(int argc,char** argv){
   // Exec path is default for syntax path
   execpath=FXSystem::getExecPath();
 
+  FXTRACE((10,"execpath=%s\n",execpath.text()));
+
   // Get syntax path
   syntaxpaths=reg().readStringEntry("SETTINGS","syntaxpaths",execpath.text());
+
+  FXTRACE((10,"syntaxpaths=%s\n",syntaxpaths.text()));
 
   // Hunt for the syntax file
   syntaxfile=FXPath::search(syntaxpaths,"Adie.stx");
 
+  FXTRACE((10,"syntaxfile=%s\n",syntaxfile.text()));
+
   // Get icon search path
   iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath);
+
+  FXTRACE((10,"iconpath=%s\n",iconpath.text()));
 
   // Change icon search path
   associations->setIconPath(iconpath);
@@ -287,6 +295,7 @@ FXint Adie::start(int argc,char** argv){
     if(FXStat::isDirectory(file)){
       file=unique(file);
       window->setFilename(file);
+      window->setFilenameSet(false);
       window->setBrowserCurrentFile(file);
       }
 
@@ -302,6 +311,7 @@ FXint Adie::start(int argc,char** argv){
     // Start in directory with empty or inaccessible file
     else{
       window->setFilename(file);
+      window->setFilenameSet(false);    // Prompt for name when saving
       window->determineSyntax();
       window->setBrowserCurrentFile(file);
       window->determineSyntax();
@@ -324,6 +334,7 @@ FXint Adie::start(int argc,char** argv){
     // Compute absolute path
     file=FXPath::absolute("untitled");
     window->setFilename(file);
+    window->setFilenameSet(false);
     window->setBrowserCurrentFile(file);
 
     // Override language mode?

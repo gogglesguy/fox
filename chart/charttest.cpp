@@ -3,7 +3,7 @@
 *                                  Chart  Test                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include "chart.h"
@@ -15,7 +15,7 @@
 */
 
 /*******************************************************************************/
- 
+
 
 // Mini application object
 class ChartWindow : public FXMainWindow {

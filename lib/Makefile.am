@@ -490,6 +490,7 @@ fxjpegio.cpp \
 fxjp2io.cpp \
 fxkeyboard.cpp \
 fxkeysym.cpp \
+fxmath.cpp \
 fxparsegeometry.cpp \
 fxpcxio.cpp \
 fxpngio.cpp \

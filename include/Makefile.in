@@ -574,6 +574,7 @@ fx3d.h \
 fxascii.h \
 fxcpuid.h \
 fxdefs.h \
+fxmath.h \
 fxendian.h \
 fxkeys.h \
 fxunicode.h \
