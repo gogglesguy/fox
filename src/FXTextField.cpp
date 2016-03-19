@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.cpp,v 1.212 2008/03/27 15:51:57 fox Exp $                    *
+* $Id: FXTextField.cpp,v 1.214 2008/04/30 18:32:21 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -114,11 +114,11 @@ FXDEFMAP(FXTextField) FXTextFieldMap[]={
   FXMAPFUNC(SEL_IME_START,0,FXTextField::onIMEStart),
   FXMAPFUNC(SEL_UPDATE,FXTextField::ID_TOGGLE_EDITABLE,FXTextField::onUpdToggleEditable),
   FXMAPFUNC(SEL_UPDATE,FXTextField::ID_TOGGLE_OVERSTRIKE,FXTextField::onUpdToggleOverstrike),
-  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_CUT_SEL,FXTextField::onUpdHaveSelection),
+  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_CUT_SEL,FXTextField::onUpdHaveEditableSelection),
   FXMAPFUNC(SEL_UPDATE,FXTextField::ID_COPY_SEL,FXTextField::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_PASTE_SEL,FXTextField::onUpdYes),
-  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_DELETE_SEL,FXTextField::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_REPLACE_SEL,FXTextField::onUpdHaveSelection),
+  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_PASTE_SEL,FXTextField::onUpdIsEditable),
+  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_DELETE_SEL,FXTextField::onUpdHaveEditableSelection),
+  FXMAPFUNC(SEL_UPDATE,FXTextField::ID_REPLACE_SEL,FXTextField::onUpdHaveEditableSelection),
   FXMAPFUNC(SEL_COMMAND,FXTextField::ID_SETVALUE,FXTextField::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXTextField::ID_SETINTVALUE,FXTextField::onCmdSetIntValue),
   FXMAPFUNC(SEL_COMMAND,FXTextField::ID_SETLONGVALUE,FXTextField::onCmdSetLongValue),
@@ -221,6 +221,10 @@ void FXTextField::create(){
   if(!utf8Type){ utf8Type=getApp()->registerDragType(utf8TypeName); }
   if(!utf16Type){ utf16Type=getApp()->registerDragType(utf16TypeName); }
   font->create();
+  if(getApp()->hasInputMethod()){
+    createComposeContext();
+    getComposeContext()->setFont(font);
+    }
   }
 
 
@@ -245,9 +249,6 @@ void FXTextField::setFocus(){
   FXFrame::setFocus();
   setDefault(TRUE);
   flags&=~FLAG_UPDATE;
-  if(getApp()->hasInputMethod()){
-    createComposeContext();
-    }
   }
 
 
@@ -1286,12 +1287,12 @@ long FXTextField::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
+// Start input method editor
 long FXTextField::onIMEStart(FXObject* sender,FXSelector sel,void* ptr){
   if(isEditable()){
     if(getComposeContext()){
       register FXint cursorx=coord(cursor)-1;
       getComposeContext()->setSpot(cursorx,padtop+border);
-      getComposeContext()->setFont(font);
       }
     return 1;
     }
@@ -1299,11 +1300,26 @@ long FXTextField::onIMEStart(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
-// Update somebody who works on the selection
-long FXTextField::onUpdHaveSelection(FXObject* sender,FXSelector,void* ptr){
-  sender->handle(this,hasSelection()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),ptr);
+// Update somebody who wants to change the text
+long FXTextField::onUpdIsEditable(FXObject* sender,FXSelector,void* ptr){
+  sender->handle(this,isEditable() ? FXSEL(SEL_COMMAND,ID_ENABLE) : FXSEL(SEL_COMMAND,ID_DISABLE),ptr);
   return 1;
   }
+
+
+// Update somebody who works on the selection
+long FXTextField::onUpdHaveSelection(FXObject* sender,FXSelector,void* ptr){
+  sender->handle(this,hasSelection() ? FXSEL(SEL_COMMAND,ID_ENABLE) : FXSEL(SEL_COMMAND,ID_DISABLE),ptr);
+  return 1;
+  }
+
+
+// Update somebody who works on the selection and change the text
+long FXTextField::onUpdHaveEditableSelection(FXObject* sender,FXSelector,void* ptr){
+  sender->handle(this,isEditable() && hasSelection() ? FXSEL(SEL_COMMAND,ID_ENABLE) : FXSEL(SEL_COMMAND,ID_DISABLE),ptr);
+  return 1;
+  }
+
 
 /*******************************************************************************/
 
@@ -2159,6 +2175,7 @@ void FXTextField::setFont(FXFont* fnt){
   if(!fnt){ fxerror("%s::setFont: NULL font specified.\n",getClassName()); }
   if(font!=fnt){
     font=fnt;
+    if(getComposeContext()) getComposeContext()->setFont(font);
     recalc();
     update();
     }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStat.cpp,v 1.39 2008/03/28 20:54:21 fox Exp $                          *
+* $Id: FXStat.cpp,v 1.40 2008/05/19 20:07:45 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -205,7 +205,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
     TCHAR buffer[MAXPATHLEN];
     WIN32_FILE_ATTRIBUTE_DATA data;
     SHFILEINFO sfi;
-    utf2ncs(buffer,file.text(),file.length()+1);
+    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
     if(::GetFileAttributesExW(buffer,GetFileExInfoStandard,&data)){
       info.modeFlags=0777;
       if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
@@ -284,7 +284,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
     TCHAR buffer[MAXPATHLEN];
     WIN32_FILE_ATTRIBUTE_DATA data;
     SHFILEINFO sfi;
-    utf2ncs(buffer,file.text(),file.length()+1);
+    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
     if(::GetFileAttributesExW(buffer,GetFileExInfoStandard,&data)){
       info.modeFlags=0777;
       if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
@@ -428,8 +428,8 @@ FXbool FXStat::exists(const FXString& file){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar name[1024];
-    utf2ncs(name,file.text(),file.length()+1);
+    FXnchar name[MAXPATHLEN];
+    utf2ncs(name,MAXPATHLEN,file.text(),file.length()+1);
     return ::GetFileAttributesW(name)!=0xffffffff;
 #else
     return ::GetFileAttributesA(file.text())!=0xffffffff;

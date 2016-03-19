@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXObjectList.cpp,v 1.46 2008/01/04 15:42:26 fox Exp $                    *
+* $Id: FXObjectList.cpp,v 1.48 2008/06/24 19:09:55 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -352,6 +352,23 @@ FXObjectList& FXObjectList::erase(FXint pos,FXint n){
   register FXint num=no();
   moveElms(ptr+pos,ptr+pos+n,num-n-pos);
   no(num-n);
+  return *this;
+  }
+
+
+// Push object to end
+FXObjectList& FXObjectList::push(FXObject* object){
+  register FXint num=no();
+  if(no(num+1)){
+    ptr[num]=object;
+    }
+  return *this;
+  }
+
+
+// Pop object from end
+FXObjectList& FXObjectList::pop(){
+  no(no()-1);
   return *this;
   }
 

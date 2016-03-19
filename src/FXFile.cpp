@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFile.cpp,v 1.266 2008/04/22 20:08:09 fox Exp $                         *
+* $Id: FXFile.cpp,v 1.267 2008/05/19 20:07:45 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -111,8 +111,8 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
 
     // Do it
 #ifdef UNICODE
-    FXnchar unifile[1024];
-    utf2ncs(unifile,file.text(),file.length()+1);
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,MAXPATHLEN,file.text(),file.length()+1);
     device=::CreateFileW(unifile,flags,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,creation,FILE_ATTRIBUTE_NORMAL,NULL);
 #else
     device=::CreateFileA(file.text(),flags,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,creation,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -352,8 +352,8 @@ FXbool FXFile::create(const FXString& file,FXuint perm){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[1024];
-    utf2ncs(buffer,file.text(),file.length()+1);
+    FXnchar buffer[MAXPATHLEN];
+    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
     FXInputHandle h=::CreateFileW(buffer,GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
 #else
     FXInputHandle h=::CreateFileA(file.text(),GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -373,8 +373,8 @@ FXbool FXFile::remove(const FXString& file){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[1024];
-    utf2ncs(buffer,file.text(),file.length()+1);
+    FXnchar buffer[MAXPATHLEN];
+    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
     return ::DeleteFileW(buffer)!=0;
 #else
     return ::DeleteFileA(file.text())!=0;
@@ -392,9 +392,9 @@ FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
   if(srcfile!=dstfile){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar oldname[1024],newname[1024];
-    utf2ncs(oldname,srcfile.text(),srcfile.length()+1);
-    utf2ncs(newname,dstfile.text(),dstfile.length()+1);
+    FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
+    utf2ncs(oldname,MAXPATHLEN,srcfile.text(),srcfile.length()+1);
+    utf2ncs(newname,MAXPATHLEN,dstfile.text(),dstfile.length()+1);
     return ::MoveFileExW(oldname,newname,MOVEFILE_REPLACE_EXISTING)!=0;
 #else
     return ::MoveFileExA(srcfile.text(),dstfile.text(),MOVEFILE_REPLACE_EXISTING)!=0;
@@ -445,9 +445,9 @@ FXbool FXFile::link(const FXString& oldfile,const FXString& newfile){
   if(newfile!=oldfile){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar oldname[1024],newname[1024];
-    utf2ncs(oldname,oldfile.text(),oldfile.length()+1);
-    utf2ncs(newname,newfile.text(),newfile.length()+1);
+    FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
+    utf2ncs(oldname,MAXPATHLEN,oldfile.text(),oldfile.length()+1);
+    utf2ncs(newname,MAXPATHLEN,newfile.text(),newfile.length()+1);
     return MyCreateHardLink(newname,oldname,NULL)!=0;
 #else
     return MyCreateHardLink(newfile.text(),oldfile.text(),NULL)!=0;
@@ -494,9 +494,9 @@ FXbool FXFile::identical(const FXString& file1,const FXString& file2){
     HANDLE hFile1,hFile2;
     FXbool same=false;
 #ifdef UNICODE
-    FXnchar name1[1024],name2[1024];
-    utf2ncs(name1,file1.text(),file1.length()+1);
-    utf2ncs(name2,file2.text(),file2.length()+1);
+    FXnchar name1[MAXPATHLEN],name2[MAXPATHLEN];
+    utf2ncs(name1,MAXPATHLEN,file1.text(),file1.length()+1);
+    utf2ncs(name2,MAXPATHLEN,file2.text(),file2.length()+1);
     hFile1=::CreateFile(name1,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
     if(hFile1!=INVALID_HANDLE_VALUE){
       hFile2=::CreateFile(name2,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);

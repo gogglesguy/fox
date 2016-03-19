@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.121 2008/03/26 15:04:04 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.124 2008/06/30 18:08:58 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -188,6 +188,7 @@ const FXchar patterns[]=
   "\nPNG Image  (*.png)"
   "\nJPEG Image (*.jpg)"
   "\nTIFF Image (*.tif)"
+  "\nDDS Image (*.dds)"
   ;
 
 /*******************************************************************************/
@@ -450,6 +451,9 @@ FXbool ImageWindow::loadimage(const FXString& file){
     }
   else if(comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
     img=new FXTIFImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    }
+  else if(comparecase(ext,"dds")==0){
+    img=new FXDDSImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 
   // Perhaps failed

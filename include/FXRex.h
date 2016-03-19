@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRex.h,v 1.61 2008/03/26 19:11:54 fox Exp $                             *
+* $Id: FXRex.h,v 1.62 2008/05/20 14:21:30 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXREX_H
 #define FXREX_H
@@ -111,10 +111,10 @@ public:
   FXRex(const FXRex& orig);
 
   /// Compile expression from pattern; if error is not NULL, error code is returned
-  FXRex(const FXchar* pattern,FXint mode=FXRex::Normal,FXRex::Error* error=NULL);
+  FXRex(const FXchar* pattern,FXint mode=Normal,Error* error=NULL);
 
   /// Compile expression from pattern; if error is not NULL, error code is returned
-  FXRex(const FXString& pattern,FXint mode=FXRex::Normal,FXRex::Error* error=NULL);
+  FXRex(const FXString& pattern,FXint mode=Normal,Error* error=NULL);
 
   /// Assign another regular expression to this one
   FXRex& operator=(const FXRex& orig);
@@ -127,10 +127,10 @@ public:
   FXbool empty() const { return (code==fallback); }
 
   /// Parse pattern, return error code if syntax error is found
-  FXRex::Error parse(const FXchar* pattern,FXint mode=FXRex::Normal);
+  FXRex::Error parse(const FXchar* pattern,FXint mode=Normal);
 
   /// Parse pattern, return error code if syntax error is found
-  FXRex::Error parse(const FXString& pattern,FXint mode=FXRex::Normal);
+  FXRex::Error parse(const FXString& pattern,FXint mode=Normal);
 
   /**
   * Match a subject string of length len, returning true if a match is found
@@ -139,10 +139,10 @@ public:
   * refers to the position after the last matched character.
   * Sub expressions from capturing parenthesis i are returned in beg[i] and end[i].
   */
-  FXbool match(const FXchar* string,FXint len,FXint* beg=NULL,FXint* end=NULL,FXint mode=FXRex::Forward,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
+  FXbool match(const FXchar* string,FXint len,FXint* beg=NULL,FXint* end=NULL,FXint mode=Forward,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
 
   /// Search for match in a string
-  FXbool match(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint mode=FXRex::Forward,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
+  FXbool match(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint mode=Forward,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
 
   /**
   * After performing a regular expression match with capturing parentheses,

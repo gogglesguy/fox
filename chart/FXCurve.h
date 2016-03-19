@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCurve.h,v 1.10 2008/01/04 15:18:13 fox Exp $                            *
+* $Id: FXCurve.h,v 1.11 2008/05/20 20:22:29 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXCURVE_H
 #define FXCURVE_H

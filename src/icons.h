@@ -54,6 +54,10 @@ extern const unsigned char erroricon[];
 
 extern const unsigned char eyedrop[];
 
+extern const unsigned char filecancel[];
+
+extern const unsigned char fileaccept[];
+
 extern const unsigned char filecopy[];
 
 extern const unsigned char filemove[];

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFontDialog.cpp,v 1.28 2008/01/04 15:42:15 fox Exp $                    *
+* $Id: FXFontDialog.cpp,v 1.30 2008/04/29 12:51:38 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -88,14 +88,14 @@ void FXFontDialog::load(FXStream& store){
 
 
 // Change the selected font
-void FXFontDialog::setFontSelection(const FXFontDesc& fontdesc){
-  fontbox->setFontSelection(fontdesc);
+void FXFontDialog::setFontDesc(const FXFontDesc& fontdesc){
+  fontbox->setFontDesc(fontdesc);
   }
 
 
 // Return the selected font
-void FXFontDialog::getFontSelection(FXFontDesc& fontdesc) const {
-  fontbox->getFontSelection(fontdesc);
+const FXFontDesc& FXFontDialog::getFontDesc() const {
+  return fontbox->getFontDesc();
   }
 
 

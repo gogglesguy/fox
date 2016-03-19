@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.h,v 1.226 2008/03/27 15:51:56 fox Exp $                           *
+* $Id: FXText.h,v 1.227 2008/04/24 16:22:59 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXTEXT_H
 #define FXTEXT_H
@@ -248,7 +248,9 @@ public:
   long onCmdGetHelp(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
+  long onUpdIsEditable(FXObject*,FXSelector,void*);
   long onUpdHaveSelection(FXObject*,FXSelector,void*);
+  long onUpdHaveEditableSelection(FXObject*,FXSelector,void*);
   long onIMEStart(FXObject*,FXSelector,void*);
 
   // Value access
@@ -823,7 +825,7 @@ public:
 
   /// Make line containing pos the center line
   void setCenterLine(FXint pos);
-
+  
   /// Select all text
   FXbool selectAll(FXbool notify=false);
 

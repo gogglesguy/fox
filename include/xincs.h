@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: xincs.h,v 1.85 2008/04/01 19:12:04 fox Exp $                             *
+* $Id: xincs.h,v 1.86 2008/06/25 16:27:26 fox Exp $                             *
 ********************************************************************************/
 #ifndef XINCS_H
 #define XINCS_H
@@ -172,6 +172,9 @@ struct fxdirent : public dirent {
 #endif
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+#if _WIN32_WINNT < 0x0400
+#define _WIN32_WINNT 0x0400
 #endif
 #include <windows.h>
 #ifndef __CYGWIN__

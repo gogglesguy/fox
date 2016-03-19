@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.h,v 1.80 2008/01/04 15:18:18 fox Exp $                        *
+* $Id: FXFileList.h,v 1.82 2008/05/29 17:45:19 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXFILELIST_H
 #define FXFILELIST_H
@@ -158,8 +158,7 @@ protected:
   FXFileList();
   virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
   void listItems(FXbool force);
-  FXint getSelectedFiles(FXString& result) const;
-  FXString* getSelectedFiles() const;
+  FXString getSelectedFiles() const;
   FXIcon* getItemPreviewIcon(FXint index) const;
 private:
   FXFileList(const FXFileList&);
@@ -219,6 +218,9 @@ public:
   long onCmdCopySel(FXObject*,FXSelector,void*);
   long onCmdPasteSel(FXObject*,FXSelector,void*);
   long onCmdDeleteSel(FXObject*,FXSelector,void*);
+  long onCmdDropCopy(FXObject*,FXSelector,void*);
+  long onCmdDropMove(FXObject*,FXSelector,void*);
+  long onCmdDropLink(FXObject*,FXSelector,void*);
 public:
   static FXint ascending(const FXIconItem* a,const FXIconItem* b);
   static FXint descending(const FXIconItem* a,const FXIconItem* b);
@@ -239,6 +241,9 @@ public:
     ID_OPENTIMER=FXIconList::ID_LAST,
     ID_REFRESHTIMER,
     ID_DROPACTION,
+    ID_DROPCOPY,
+    ID_DROPMOVE,
+    ID_DROPLINK,
     ID_PREVIEWCHORE,
     ID_SORT_BY_NAME,    /// Sort by name
     ID_SORT_BY_TYPE,    /// Sort by type

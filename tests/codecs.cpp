@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: codecs.cpp,v 1.26 2008/01/04 15:18:32 fox Exp $                          *
+* $Id: codecs.cpp,v 1.27 2008/05/19 20:07:46 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -139,12 +139,12 @@ int main(int,char**){
     }
 */
 
-  exit(0);
+//  exit(0);
 
   // Test utf
   for(wc=0; wc<0x7fffffff; wc++){
-    n=wc2utfs((FXchar*)buf,&wc,1);
-    utf2wcs(&ww,(const FXchar*)buf,n);
+    n=wc2utfs((FXchar*)buf,128,&wc,1);
+    utf2wcs(&ww,1,(const FXchar*)buf,n);
     if(wc!=ww) printf("%06X: Problem: %06X\n",wc,ww);
     }
 

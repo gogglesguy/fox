@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFontSelector.h,v 1.21 2008/01/04 15:18:18 fox Exp $                    *
+* $Id: FXFontSelector.h,v 1.23 2008/04/29 12:51:38 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXFONTSELECTOR_H
 #define FXFONTSELECTOR_H
@@ -118,10 +118,10 @@ public:
   FXButton *cancelButton() const { return cancel; }
 
   /// Set font selection
-  void setFontSelection(const FXFontDesc& fontdesc);
+  void setFontDesc(const FXFontDesc& fontdesc);
 
   /// Get font selection
-  void getFontSelection(FXFontDesc& fontdesc) const;
+  const FXFontDesc& getFontDesc() const;
 
   /// Save to a stream
   virtual void save(FXStream& store) const;

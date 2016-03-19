@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComposeContext.h,v 1.12 2008/03/27 15:51:55 fox Exp $                  *
+* $Id: FXComposeContext.h,v 1.13 2008/04/30 18:32:19 fox Exp $                  *
 ********************************************************************************/
 #ifndef FXCOMPOSECONTEXT_H
 #define FXCOMPOSECONTEXT_H
@@ -45,6 +45,7 @@ protected:
   FXSelector message;           // Message to send it
 private:
 #ifndef WIN32
+  void* fontset;
   static int  editStartCallback(void*,FXComposeContext*,void*);
   static void editDoneCallback(void*,FXComposeContext*,void*);
   static void editDrawCallback(void*,FXComposeContext*,void*);

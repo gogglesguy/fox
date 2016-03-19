@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCursor.cpp,v 1.70 2008/01/04 15:42:06 fox Exp $                        *
+* $Id: FXCursor.cpp,v 1.71 2008/05/12 16:48:45 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -137,7 +137,7 @@ static FXbool supportsColorCursors(){
 
   // Try calling GetVersionEx using the OSVERSIONINFOEX structure.
   // If that fails, try using the OSVERSIONINFO structure.
-#if defined (__WATCOMC__) || (__DMC__)
+#if (defined (__WATCOMC__) && (__WATCOMC__ < 1200)) || (__DMC__)
   OSVERSIONINFO osvi={sizeof(OSVERSIONINFO)};
 #else
   OSVERSIONINFOEX osvi={sizeof(OSVERSIONINFOEX)};

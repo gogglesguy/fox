@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRangeSlider.h,v 1.9 2008/01/04 15:18:23 fox Exp $                      *
+* $Id: FXRangeSlider.h,v 1.11 2008/06/13 18:50:12 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXRANGERANGESLIDER_H
 #define FXRANGERANGESLIDER_H
@@ -51,7 +51,8 @@ enum {
 * arrows on the slider thumb.
 * While being moved, the slider sends a SEL_CHANGED message to its target;
 * at the end of the interaction, a SEL_COMMAND message is sent.
-* The message data represents the current slider value, of type FXint.
+* The message data represents the current slider value, a pointer to an array
+* of two FXint's, representing the values of the lower and upper positions.
 */
 class FXAPI FXRangeSlider : public FXFrame {
   FXDECLARE(FXRangeSlider)

@@ -90,6 +90,8 @@ FXDate.h \
 FXDC.h \
 FXDCPrint.h \
 FXDCWindow.h \
+FXDDSIcon.h \
+FXDDSImage.h \
 FXDLL.h \
 FXDataTarget.h \
 FXDebugTarget.h \

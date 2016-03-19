@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.wc,v 1.13 2008/01/04 16:14:04 fox Exp $                      #
+# $Id: Makefile.wc,v 1.14 2008/05/12 16:48:45 fox Exp $                      #
 ##############################################################################
 
 # For use with OpenWatcom C++ v1.0 or later
@@ -31,7 +31,7 @@ DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DUNICODE -DHAVE_GL_H 
 LD	  = wcl386
 LDFLAGS   = -l=nt_win -x # -x = case sensitive
 INCDIRS   = -I$(TOPDIR)\include
-FOXLIB    = $(TOPDIR)\src\FOX-1.7.lib $(%WATCOM)\lib386\nt\comctl32.lib $(%WATCOM)\lib386\nt\wsock32.lib
+FOXLIB    = $(TOPDIR)\src\FOX-1.7.lib $(%WATCOM)\lib386\nt\comctl32.lib $(%WATCOM)\lib386\nt\wsock32.lib $(%WATCOM)\lib386\nt\imm32.lib
 RESWRAP   = $(TOPDIR)\utils\reswrap.exe
 
 PROGRAMS  = PathFinder.exe

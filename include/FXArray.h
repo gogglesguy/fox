@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXArray.h,v 1.34 2008/03/25 20:13:22 fox Exp $                           *
+* $Id: FXArray.h,v 1.38 2008/06/24 19:09:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXARRAY_H
 #define FXARRAY_H
@@ -95,14 +95,20 @@ public:
   EType& at(FXint i){ return ptr[i]; }
   const EType& at(FXint i) const { return ptr[i]; }
 
+  /// First element in list
+  EType& head(){ return ptr[0]; }
+  const EType& head() const { return ptr[0]; }
+
+  /// Last element in list
+  EType& tail(){ return ptr[num-1]; }
+  const EType& tail() const { return ptr[num-1]; }
+
   /// Return pointer to list
   EType* data() const { return ptr; }
 
   /// Adopt array from source
   FXArray<EType>& adopt(FXArray<EType>& src){
-    no(0);
-    ptr=src.ptr; src.ptr=NULL;
-    num=src.num; src.num=0;
+    if(no(0)){ ptr=src.ptr; src.ptr=NULL; num=src.num; src.num=0; }
     return *this;
     }
 
@@ -246,6 +252,18 @@ public:
   /// Remove n objects starting at pos
   FXArray<EType>& erase(FXint pos,FXint n){
     moveElms(ptr+pos,ptr+pos+n,num-n-pos); no(num-n);
+    return *this;
+    }
+
+  /// Push object to end
+  FXArray<EType>& push(const EType& src){
+    if(no(num+1)){ ptr[num-1]=src; }
+    return *this;
+    }
+
+  /// Pop object from end
+  FXArray<EType>& pop(){
+    no(num-1);
     return *this;
     }
 

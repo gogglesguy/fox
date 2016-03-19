@@ -1468,8 +1468,6 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --with-shape            enable XShape support
-  --with-xshm             compile with XShm support
   --enable-threadsafe     Thread-safe library calls
   --disable-jpeg          compile without JPEG image support
   --disable-png           compile without PNG image support
@@ -1490,6 +1488,8 @@ Optional Packages:
   --with-x                use the X Window System
   --with-mingw32=DIR    MingW32 installation location
   --with-xft              enable Xft support
+  --with-shape            enable XShape support
+  --with-xshm             compile with XShm support
   --with-xcursor          compile with Xcursor support
   --with-xrender           compile with XRender support
   --with-xrandr           compile with XRandR support
@@ -1942,7 +1942,7 @@ FOX_MAJOR_VERSION=1
 
 FOX_MINOR_VERSION=7
 
-FOX_PATCH_LEVEL=16
+FOX_PATCH_LEVEL=17
 
 FOX_INTERFACE_VERSION=0
 
@@ -21958,8 +21958,12 @@ cat >>confdefs.h <<\_ACEOF
 #define WIN32 1
 _ACEOF
 
-LIBS="${LIBS} -lcomctl32 -lwsock32 -lwinspool -lmpr -lgdi32"
+LIBS="${LIBS} -lcomctl32 -lwsock32 -lwinspool -lmpr -lgdi32 -limm32"
 LDFLAGS="${LDFLAGS} -mwindows -e _mainCRTStartup"
+cat >>confdefs.h <<\_ACEOF
+#define UNICODE 1
+_ACEOF
+
 if test "x$with_mingw32" != "x" ; then
 CPPFLAGS="${CPPFLAGS} -I$with_mingw32/include"
 LIBS="${LIBS} -L$with_mingw32/lib"
@@ -22095,9 +22099,10 @@ X_BASE_LIBS="${X_BASE_LIBS} $XFTLIBS"
 fi
 
 
-# Check whether --enable-shape was given.
-if test "${enable_shape+set}" = set; then
-  enableval=$enable_shape;
+
+# Check whether --with-shape was given.
+if test "${with_shape+set}" = set; then
+  withval=$with_shape;
 fi
 
 { echo "$as_me:$LINENO: result: $with_shape" >&5
@@ -22164,9 +22169,10 @@ done
 fi
 
 
-# Check whether --enable-xshm was given.
-if test "${enable_xshm+set}" = set; then
-  enableval=$enable_xshm;
+
+# Check whether --with-xshm was given.
+if test "${with_xshm+set}" = set; then
+  withval=$with_xshm;
 fi
 
 { echo "$as_me:$LINENO: result: $with_xshm" >&5
@@ -22503,9 +22509,9 @@ fi
 
 { echo "$as_me:$LINENO: checking for thread-safe library calls" >&5
 echo $ECHO_N "checking for thread-safe library calls... $ECHO_C" >&6; }
-# Check whether --enable-xthreads was given.
-if test "${enable_xthreads+set}" = set; then
-  enableval=$enable_xthreads;
+# Check whether --enable-enable_threadsafe was given.
+if test "${enable_enable_threadsafe+set}" = set; then
+  enableval=$enable_enable_threadsafe;
 fi
 
 { echo "$as_me:$LINENO: result: $enable_threadsafe" >&5

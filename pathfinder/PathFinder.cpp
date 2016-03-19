@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: PathFinder.cpp,v 1.144 2008/03/26 20:04:22 fox Exp $                     *
+* $Id: PathFinder.cpp,v 1.145 2008/06/30 12:22:58 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -1845,6 +1845,9 @@ FXbool PathFinderMain::previewImage(const FXString& filename){
     }
   else if(comparecase(ext,"ras")==0){
     img=new FXRASImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    }
+  else if(comparecase(ext,"dds")==0){
+    img=new FXDDSImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 #ifdef HAVE_PNG_H
   else if(comparecase(ext,"png")==0){

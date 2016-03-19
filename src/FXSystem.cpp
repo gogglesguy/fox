@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSystem.cpp,v 1.39 2008/03/29 03:08:29 fox Exp $                        *
+* $Id: FXSystem.cpp,v 1.41 2008/05/20 13:23:28 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -261,9 +261,16 @@ FXString FXSystem::modeString(FXuint mode){
 FXString FXSystem::getEnvironment(const FXString& name){
   if(!name.empty()){
 #ifdef WIN32
-    FXchar value[1024];
-    DWORD len=GetEnvironmentVariableA(name.text(),value,sizeof(value));
-    return FXString(value,len);
+#ifdef UNICODE
+    FXnchar variable[256],string[1024];
+    utf2ncs(variable,256,name.text(),name.length()+1);
+    DWORD len=GetEnvironmentVariableW(variable,string,1024);
+    return FXString(string,len);
+#else
+    FXchar string[1024];
+    DWORD len=GetEnvironmentVariableA(name.text(),string,1024);
+    return FXString(string,len);
+#endif
 #else
     return FXString(getenv(name.text()));
 #endif
@@ -276,10 +283,21 @@ FXString FXSystem::getEnvironment(const FXString& name){
 FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
   if(!name.empty()){
 #ifdef WIN32
+#ifdef UNICODE
+    FXnchar variable[256];
+    utf2ncs(variable,256,name.text(),name.length()+1);
+    if(!value.empty()){
+      FXnchar string[1024];
+      utf2ncs(string,1024,value.text(),value.length()+1);
+      return SetEnvironmentVariableW(variable,string)!=0;
+      }
+    return SetEnvironmentVariableW(variable,NULL)!=0;
+#else
     if(!value.empty()){
       return SetEnvironmentVariableA(name.text(),value.text())!=0;
       }
     return SetEnvironmentVariableA(name.text(),NULL)!=0;
+#endif
 #elif defined(__GNU_LIBRARY__)
     if(!value.empty()){
       return setenv(name.text(),value.text(),true)==0;
@@ -315,7 +333,7 @@ FXbool FXSystem::setCurrentDirectory(const FXString& path){
 #ifdef WIN32
 #ifdef UNICODE
     TCHAR buffer[MAXPATHLEN];
-    utf2ncs(buffer,path.text(),path.length()+1);
+    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
     return SetCurrentDirectory(buffer)!=0;
 #else
     return SetCurrentDirectory(path.text())!=0;

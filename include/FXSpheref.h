@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSpheref.h,v 1.23 2008/01/04 15:18:24 fox Exp $                         *
+* $Id: FXSpheref.h,v 1.24 2008/06/04 17:48:47 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSPHEREF_H
 #define FXSPHEREF_H
@@ -28,7 +28,7 @@ namespace FX {
 
 
 class FXRangef;
-
+class FXMat4f;
 
 /// Spherical bounds
 class FXAPI FXSpheref {
@@ -115,7 +115,10 @@ public:
 
   /// Intersect sphere with ray u-v
   FXbool intersect(const FXVec3f& u,const FXVec3f& v) const;
-
+  
+  /// Transform sphere by 4x4 matrix
+  FXSpheref transform(const FXMat4f& mat) const;
+  
   /// Test if box overlaps with sphere
   friend FXAPI FXbool overlap(const FXRangef& a,const FXSpheref& b);
 

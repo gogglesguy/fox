@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.184 2008/03/25 20:00:58 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.186 2008/06/09 18:10:47 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -743,7 +743,7 @@ FXGLObject* FXGLViewer::processHits(FXuint *pickbuffer,FXint nhits){
       n=pickbuffer[i];
       d1=pickbuffer[1+i];
       d2=pickbuffer[2+i];
-      if(d1<zmin || (d1==zmin && d2<=zmax)){
+      if(0<d1 && (d1<zmin || (d1==zmin && 0<d2 && d2<=zmax))){  // Sometimes, d1 and d2 are zero
         zmin=d1;
         zmax=d2;
         sel=i;
@@ -1081,7 +1081,7 @@ void FXGLViewer::getMaterial(FXMaterial &mtl) const {
 
 // Get screen point from eye coordinate
 void FXGLViewer::eyeToScreen(FXint& sx,FXint& sy,FXVec3f e){
-  register double xp,yp;
+  register FXdouble xp,yp;
   if(projection==PERSPECTIVE){
     if(e.z==0.0f){ fxerror("%s::eyeToScreen: cannot transform point.\n",getClassName()); }
     xp=-distance*e.x/e.z;
@@ -1091,17 +1091,17 @@ void FXGLViewer::eyeToScreen(FXint& sx,FXint& sy,FXVec3f e){
     xp=e.x;
     yp=e.y;
     }
-  sx=(int)((xp-ax)/worldpx);
-  sy=(int)((ay-yp)/worldpx);
+  sx=(FXint)((xp-ax)/worldpx);
+  sy=(FXint)((ay-yp)/worldpx);
   }
 
 
 // Convert screen point to eye coords
 FXVec3f FXGLViewer::screenToEye(FXint sx,FXint sy,FXfloat eyez){
-  register float xp,yp;
+  register FXfloat xp,yp;
   FXVec3f e;
-  xp=(float)(worldpx*sx+ax);
-  yp=(float)(ay-worldpx*sy);
+  xp=(FXfloat)(worldpx*sx+ax);
+  yp=(FXfloat)(ay-worldpx*sy);
   if(projection==PERSPECTIVE){
     FXASSERT(distance>0.0);
     e.x=(FXfloat)(-eyez*xp/distance);
@@ -2566,9 +2566,9 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
   pdc.outf("%g %g %g C\n",background[0][0],background[0][1],background[0][2]);
   pdc.outf("newpath\n");
   pdc.outf("%g %g moveto\n",0.0,0.0);
-  pdc.outf("%g %g lineto\n",0.0,(double)height);
-  pdc.outf("%g %g lineto\n",(double)width,(double)height);
-  pdc.outf("%g %g lineto\n",(double)width,0.0);
+  pdc.outf("%g %g lineto\n",0.0,(FXdouble)height);
+  pdc.outf("%g %g lineto\n",(FXdouble)width,(FXdouble)height);
+  pdc.outf("%g %g lineto\n",(FXdouble)width,0.0);
   pdc.outf("closepath fill\n");
 
   pdc.outf("1 setlinewidth\n");

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFont.h,v 1.72 2008/01/04 15:18:18 fox Exp $                            *
+* $Id: FXFont.h,v 1.74 2008/04/29 12:51:38 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXFONT_H
 #define FXFONT_H
@@ -306,11 +306,11 @@ public:
   /// Get flags
   FXuint getFlags() const { return flags; }
 
-  /// Get font description
-  void getFontDesc(FXFontDesc& fontdesc) const;
-
   /// Change font description
   virtual void setFontDesc(const FXFontDesc& fontdesc);
+
+  /// Get font description
+  FXFontDesc getFontDesc() const;
 
   /// Return angle
   FXint getAngle() const { return angle; }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.201 2008/04/18 16:57:06 fox Exp $                           *
+* $Id: fxdefs.h,v 1.204 2008/06/03 15:27:29 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -293,11 +293,12 @@ enum {
 /// Drag and drop actions
 enum FXDragAction {
   DRAG_REJECT  = 0,                 /// Reject all drop actions
-  DRAG_ACCEPT  = 1,                 /// Accept any drop action
+  DRAG_ASK     = 1,                 /// Ask
   DRAG_COPY    = 2,                 /// Copy
   DRAG_MOVE    = 3,                 /// Move
   DRAG_LINK    = 4,                 /// Link
-  DRAG_PRIVATE = 5                  /// Private
+  DRAG_PRIVATE = 5,                 /// Private
+  DRAG_ACCEPT  = 6                  /// Accept any drop action
   };
 
 
@@ -353,7 +354,7 @@ typedef FXObject              *FXObjectPtr;
 typedef unsigned int           FXwchar;
 #if defined(_MSC_VER) && !defined(_NATIVE_WCHAR_T_DEFINED)
 typedef unsigned short         FXnchar;
-#elif defined(__WATCOM_INT64__)
+#elif defined(__WATCOMC__) && !defined(_WCHAR_T_DEFINED)
 typedef long char FXnchar;
 #else
 typedef wchar_t                FXnchar;
@@ -864,29 +865,17 @@ extern FXAPI FXint ncslen(const FXchar *str,FXint n);
 /// Length of narrow character representation of utf8 string str
 extern FXAPI FXint ncslen(const FXchar *str);
 
-/// Copy utf8 string of length n to wide character string dst
-extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar *src,FXint n);
+/// Copy utf8 string of length sn to wide character string dst of size dn
+extern FXAPI FXint utf2wcs(FXwchar *dst,FXint dn,const FXchar *src,FXint sn);
 
-/// Copy utf8 string to wide character string dst
-extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar *src);
+/// Copy utf8 string of length sn to narrow character string dst of size dn
+extern FXAPI FXint utf2ncs(FXnchar *dst,FXint dn,const FXchar *src,FXint sn);
 
-/// Copy utf8 string of length n to narrow character string dst
-extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar *src,FXint n);
+/// Copy wide character substring of length sn to dst of size dn
+extern FXAPI FXint wc2utfs(FXchar* dst,FXint dn,const FXwchar *src,FXint sn);
 
-/// Copy utf8 string to narrow character string dst
-extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar *src);
-
-/// Copy wide character substring of length n to dst
-extern FXAPI FXint wc2utfs(FXchar* dst,const FXwchar *src,FXint n);
-
-/// Copy wide character string to dst
-extern FXAPI FXint wc2utfs(FXchar* dst,const FXwchar *src);
-
-/// Copy narrow character substring of length n to dst
-extern FXAPI FXint nc2utfs(FXchar* dst,const FXnchar *src,FXint n);
-
-/// Copy narrow character string to dst
-extern FXAPI FXint nc2utfs(FXchar* dst,const FXnchar *src);
+/// Copy narrow character substring of length sn to dst of size dn
+extern FXAPI FXint nc2utfs(FXchar* dst,FXint dn,const FXnchar *src,FXint sn);
 
 /// Return clock ticks from cpu tick-counter
 extern FXAPI FXTime fxgetticks();

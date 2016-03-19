@@ -657,13 +657,14 @@ bitmapviewer.o: bitmapviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -755,13 +756,14 @@ button.o: button.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -853,13 +855,14 @@ calendar.o: calendar.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -951,13 +954,14 @@ codecs.o: codecs.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1052,13 +1056,14 @@ console.o: console.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1150,13 +1155,14 @@ datatarget.o: datatarget.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1248,13 +1254,14 @@ dctest.o: dctest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1346,13 +1353,14 @@ dialog.o: dialog.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1444,13 +1452,14 @@ dirlist.o: dirlist.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1542,13 +1551,14 @@ expression.o: expression.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1641,13 +1651,14 @@ format.o: format.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1739,13 +1750,14 @@ foursplit.o: foursplit.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1837,13 +1849,14 @@ gltest.o: gltest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -1949,13 +1962,14 @@ glviewer.o: glviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2061,13 +2075,14 @@ groupbox.o: groupbox.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2160,13 +2175,14 @@ header.o: header.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2258,13 +2274,14 @@ hello.o: hello.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2357,13 +2374,14 @@ hello2.o: hello2.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2455,13 +2473,14 @@ iconlist.o: iconlist.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2553,13 +2572,14 @@ image.o: image.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2651,13 +2671,14 @@ imageviewer.o: imageviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2749,13 +2770,14 @@ layout.o: layout.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2847,13 +2869,14 @@ mditest.o: mditest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -2946,13 +2969,14 @@ memmap.o: memmap.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3045,13 +3069,14 @@ minheritance.o: minheritance.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3143,13 +3168,14 @@ ratio.o: ratio.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3240,13 +3266,14 @@ rex.o: rex.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3337,13 +3364,14 @@ scan.o: scan.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3435,13 +3463,14 @@ scribble.o: scribble.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3533,13 +3562,14 @@ shutter.o: shutter.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3631,13 +3661,14 @@ splitter.o: splitter.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3730,13 +3761,14 @@ switcher.o: switcher.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3828,13 +3860,14 @@ tabbook.o: tabbook.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -3926,13 +3959,14 @@ table.o: table.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -4024,13 +4058,14 @@ thread.o: thread.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -4123,13 +4158,14 @@ wizard.o: wizard.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \

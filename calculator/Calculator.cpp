@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Calculator.cpp,v 1.69 2008/01/04 15:18:13 fox Exp $                      *
+* $Id: Calculator.cpp,v 1.71 2008/04/29 18:31:09 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -872,24 +872,24 @@ void Calculator::setPrecision(FXint prec){
 
 
 // Argument to sine, cosine, etc
-FXdouble Calculator::trigarg(FXdouble ang) const {
+FXdouble Calculator::trigarg(FXdouble a) const {
   switch(angles){
-    case ANG_DEG: return DEG2RAD(ang);
-    case ANG_GRA: return GRA2RAD(ang);
-    case ANG_RAD: return ang;
+    case ANG_DEG: return DEG2RAD(a);
+    case ANG_GRA: return GRA2RAD(a);
+    case ANG_RAD: return a;
     }
-  return ang;
+  return a;
   }
 
 
 // Result from arcsine, arccosine, etc
-FXdouble Calculator::trigres(FXdouble res) const {
+FXdouble Calculator::trigres(FXdouble r) const {
   switch(angles){
-    case ANG_DEG: return RAD2DEG(res);
-    case ANG_GRA: return RAD2GRA(res);
-    case ANG_RAD: return res;
+    case ANG_DEG: return RAD2DEG(r);
+    case ANG_GRA: return RAD2GRA(r);
+    case ANG_RAD: return r;
     }
-  return res;
+  return r;
   }
 
 
@@ -1251,12 +1251,11 @@ long Calculator::onUpdColor(FXObject* sender,FXSelector sel,void*){
 // Change font
 long Calculator::onCmdFont(FXObject*,FXSelector,void*){
   FXFontDialog fontdlg(this,"Change Display Font",DECOR_BORDER|DECOR_TITLE);
-  FXFontDesc fontdesc;
-  getDisplayFont()->getFontDesc(fontdesc);
-  fontdlg.setFontSelection(fontdesc);
+  FXFontDesc fontdesc=getDisplayFont()->getFontDesc();
+  fontdlg.setFontDesc(fontdesc);
   if(fontdlg.execute()){
     FXFont *oldfont=font;
-    fontdlg.getFontSelection(fontdesc);
+    fontdesc=fontdlg.getFontDesc();
     font=new FXFont(getApp(),fontdesc);
     font->create();
     setDisplayFont(font);

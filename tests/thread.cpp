@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: thread.cpp,v 1.27 2008/03/26 15:04:04 fox Exp $                          *
+* $Id: thread.cpp,v 1.28 2008/04/24 14:02:25 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include "FXThreadPool.h"
@@ -56,13 +56,14 @@ FXint Runner::run(){
   return 1;
   }
 
-
+ 
 // Generate jobs
 FXint Producer::run(){
   fprintf(stderr,"producer start\n");
+  FXuint seed=1013904223u;
   for(FXint i=0; i<count; i++){
     fprintf(stderr,"producer job %d\n",i);
-    pool->execute(new Runner(i,(FXint)(100000000*drand48())));
+    pool->execute(new Runner(i,fxrandom(seed)/43));
     }
   fprintf(stderr,"producer done\n");
   delete this;

@@ -18,31 +18,28 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.131 2008/02/05 22:02:10 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.135 2008/06/25 16:27:26 fox Exp $                       *
 ********************************************************************************/
-#ifdef WIN32
-#if _WIN32_WINNT < 0x0400
-#define _WIN32_WINNT 0x0400
-#endif
-#endif
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXThread.h"
 #ifndef WIN32
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #ifdef Status
 #undef Status
+#endif
+#ifdef KeyClass
+#undef KeyClass
 #endif
 #include <CoreServices/CoreServices.h>
 #include <libkern/OSAtomic.h>
 #include <pthread.h>
+#include <semaphore.h>
 #else
 #include <pthread.h>
 #include <semaphore.h>
 #endif
-#else
-#include <process.h>
 #endif
 
 /*
@@ -231,8 +228,8 @@ void FXSemaphore::post(){
 FXSemaphore::~FXSemaphore(){
   CloseHandle((HANDLE)data[0]);
   }
-  
-  
+
+
 /*******************************************************************************/
 
 
@@ -407,7 +404,7 @@ FXReadWriteLock::~FXReadWriteLock(){
 #if 0
   FXMutex     access;
   FXCondition reader;
-  FXCondition writer;  
+  FXCondition writer;
   FXint       numreaders;
   FXint       numwriters;
   FXint       inside;
@@ -421,9 +418,9 @@ FXReadWriteLock::FXReadWriteLock():numreaders(0),numwriters(0),inside(0){
 void FXReadWriteLock::readLock(){
   FXMutexLock lock(access);
   while(inside<0 || numwriters){
-    ++numreaders;  
+    ++numreaders;
     reader.wait(access);
-    --numreaders;  
+    --numreaders;
     }
   ++inside;
   }
@@ -936,43 +933,6 @@ FXSpinLock::~FXSpinLock(){
 
 /*******************************************************************************/
 
-#if defined(__APPLE__)
-
-// Initialize semaphore
-FXSemaphore::FXSemaphore(FXint initial){
-  // If this fails on your machine, determine what value
-  // of sizeof(MPSemaphoreID*) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
-  //FXTRACE((150,"sizeof(MPSemaphoreID*)=%d\n",sizeof(MPSemaphoreID*)));
-  FXASSERT(sizeof(data)>=sizeof(MPSemaphoreID*));
-  MPCreateSemaphore(2147483647,initial,(MPSemaphoreID*)data);
-  }
-
-
-// Decrement semaphore
-void FXSemaphore::wait(){
-  MPWaitOnSemaphore(*((MPSemaphoreID*)data),kDurationForever);
-  }
-
-
-// Decrement semaphore but don't block
-FXbool FXSemaphore::trywait(){
-  return MPWaitOnSemaphore(*((MPSemaphoreID*)data),kDurationImmediate)==noErr;
-  }
-
-
-// Increment semaphore
-void FXSemaphore::post(){
-  MPSignalSemaphore(*((MPSemaphoreID*)data));
-  }
-
-
-// Delete semaphore
-FXSemaphore::~FXSemaphore(){
-  MPDeleteSemaphore(*((MPSemaphoreID*)data));
-  }
-
-#else
 
 // Initialize semaphore
 FXSemaphore::FXSemaphore(FXint initial){
@@ -1007,8 +967,6 @@ void FXSemaphore::post(){
 FXSemaphore::~FXSemaphore(){
   sem_destroy((sem_t*)data);
   }
-
-#endif
 
 /*******************************************************************************/
 

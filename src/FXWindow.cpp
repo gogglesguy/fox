@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.384 2008/03/18 21:32:08 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.391 2008/06/03 20:29:00 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -2894,8 +2894,8 @@ void FXWindow::acceptDrop(FXDragAction action) const {
 // Sent by the drop target
 void FXWindow::dropFinished(FXDragAction action) const {
   if(!getApp()->xdndFinishSent){
-#ifdef WIN32
     if(action==DRAG_ACCEPT) action=getApp()->ansAction;
+#ifdef WIN32
     PostMessage((HWND)getApp()->xdndSource,WM_DND_FINISH_REJECT+action,0,(LPARAM)xid);
 #else
     XEvent se;
@@ -2906,12 +2906,7 @@ void FXWindow::dropFinished(FXDragAction action) const {
     se.xclient.window=getApp()->xdndSource;
     se.xclient.data.l[0]=xid;
     se.xclient.data.l[1]=(action==DRAG_REJECT)?0:1;
-    if(action==DRAG_ACCEPT) action=getApp()->ansAction;
-    if(action==DRAG_COPY) se.xclient.data.l[2]=getApp()->xdndActionCopy;
-    else if(action==DRAG_MOVE) se.xclient.data.l[2]=getApp()->xdndActionMove;
-    else if(action==DRAG_LINK) se.xclient.data.l[2]=getApp()->xdndActionLink;
-    else if(action==DRAG_PRIVATE) se.xclient.data.l[2]=getApp()->xdndActionPrivate;
-    else se.xclient.data.l[2]=None;
+    se.xclient.data.l[2]=getApp()->xdndActionList[action];
     se.xclient.data.l[3]=0;
     se.xclient.data.l[4]=0;
     XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndSource,True,NoEventMask,&se);
@@ -2952,7 +2947,7 @@ FXbool FXWindow::beginDrag(const FXDragType *types,FXuint numtypes){
   if(!isDragging()){
     if(types==NULL || numtypes<1){ fxerror("%s::beginDrag: should have at least one type to drag.\n",getClassName()); }
 #ifdef WIN32
-    getApp()->xdndTypes=CreateFileMappingA((HANDLE)0xFFFFFFFF,NULL,PAGE_READWRITE,0,(numtypes+1)*sizeof(FXDragType),"XdndTypeList");
+    getApp()->xdndTypes=CreateFileMappingA(INVALID_HANDLE_VALUE,NULL,PAGE_READWRITE,0,(numtypes+1)*sizeof(FXDragType),"XdndTypeList");
     if(getApp()->xdndTypes){
       FXDragType *dragtypes=(FXDragType*)MapViewOfFile(getApp()->xdndTypes,FILE_MAP_WRITE,0,0,0);
       if(dragtypes){
@@ -2979,6 +2974,7 @@ FXbool FXWindow::beginDrag(const FXDragType *types,FXuint numtypes){
     memcpy(getApp()->xdndTypeList,types,sizeof(FXDragType)*numtypes);
     getApp()->xdndNumTypes=numtypes;
     XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndTypes,XA_ATOM,32,PropModeReplace,(unsigned char*)getApp()->xdndTypeList,getApp()->xdndNumTypes);
+    XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndActions,XA_ATOM,32,PropModeReplace,(unsigned char*)getApp()->xdndActionList,6);
     getApp()->xdndTarget=0;
     getApp()->xdndProxyTarget=0;
     getApp()->ansAction=DRAG_REJECT;
@@ -3000,7 +2996,7 @@ FXbool FXWindow::beginDrag(const FXDragType *types,FXuint numtypes){
 // Drag to new position
 FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
   if(xid==0){ fxerror("%s::handleDrag: window has not yet been created.\n",getClassName()); }
-  if(action<DRAG_COPY || DRAG_PRIVATE<action){ fxerror("%s::handleDrag: illegal drag action.\n",getClassName()); }
+  if(action<DRAG_ASK || DRAG_PRIVATE<action){ fxerror("%s::handleDrag: illegal drag action.\n",getClassName()); }
   if(isDragging()){
 
 #ifdef WIN32            // WINDOWS
@@ -3172,10 +3168,7 @@ FXbool FXWindow::handleDrag(FXint x,FXint y,FXDragAction action){
           se.xclient.data.l[1]=0;
           se.xclient.data.l[2]=MKUINT(y,x);                               // Coordinates
           se.xclient.data.l[3]=getApp()->event.time;                      // Time stamp
-          if(action==DRAG_COPY) se.xclient.data.l[4]=getApp()->xdndActionCopy;
-          else if(action==DRAG_MOVE) se.xclient.data.l[4]=getApp()->xdndActionMove;
-          else if(action==DRAG_LINK) se.xclient.data.l[4]=getApp()->xdndActionLink;
-          else if(action==DRAG_PRIVATE) se.xclient.data.l[4]=getApp()->xdndActionPrivate;
+          se.xclient.data.l[4]=getApp()->xdndActionList[action];
           XSendEvent((Display*)getApp()->getDisplay(),getApp()->xdndProxyTarget,True,NoEventMask,&se);
           getApp()->xdndStatusPending=true;       // Waiting for the other app to respond
           }
@@ -3389,14 +3382,13 @@ FXDragAction FXWindow::endDrag(FXbool drop){
 
             // Got the finish message; we now know the drop has been completed and processed
             if(se.xclient.type==ClientMessage && se.xclient.message_type==getApp()->xdndFinished){
-              action=DRAG_REJECT;       // Only for XDnD==5
-              action=DRAG_ACCEPT;       // Only for XDnD<=4
               if(se.xclient.data.l[1]&1){
                 action=DRAG_ACCEPT;
-                if((FXID)se.xclient.data.l[2]==getApp()->xdndActionCopy) action=DRAG_COPY;
-                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionMove) action=DRAG_MOVE;
-                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionLink) action=DRAG_LINK;
-                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionPrivate) action=DRAG_PRIVATE;
+                if((FXID)se.xclient.data.l[2]==getApp()->xdndActionList[DRAG_ASK]) action=DRAG_ASK;
+                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionList[DRAG_MOVE]) action=DRAG_MOVE;
+                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionList[DRAG_COPY]) action=DRAG_COPY;
+                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionList[DRAG_LINK]) action=DRAG_LINK;
+                else if((FXID)se.xclient.data.l[2]==getApp()->xdndActionList[DRAG_PRIVATE]) action=DRAG_PRIVATE;
                 }
               FXTRACE((100,"Got XdndFinish action=%u\n",action));
               break;
@@ -3437,6 +3429,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
     // Clean up
     XSetSelectionOwner((Display*)getApp()->getDisplay(),getApp()->xdndSelection,None,getApp()->event.time);
     XDeleteProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndTypes);
+    XDeleteProperty((Display*)getApp()->getDisplay(),xid,getApp()->xdndActions);
     freeElms(getApp()->xdndTypeList);
     getApp()->xdndNumTypes=0;
     getApp()->xdndTarget=0;

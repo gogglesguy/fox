@@ -7,10 +7,71 @@
 <body bgcolor=#ffffff link=#990033 vlink=#990033 alink=#990033 text=#000000>
 
 
+<!---- TOPIC TITLE WITH LOGO--->
+<table border=0 cellpadding= cellspacing=2 width=100% ><tr><td><a href='http://www.fox-toolkit.org' target=_top><img src='art/foxlogo_small.jpg' border=0></a></td><td width=100% valign=bottom id="HEADLINE"><b>
+News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]</font></a>
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE WITH LOGO --->
+
+
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-February 11 - FOX DEVELOPMENT 1.7.16
+July 1 - FOX DEVELOPMENT 1.7.17
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>New Image Type supported: FXDDSImage and FXDDSIcon support ".dds" file type images; images are decoded
+when loaded (saving is not yet supported at this time).  The following formats are implemented:
+DXT1 (BC1), DXT2, DXT3 (BC2), DXT4, DXT5 (BC3), ATI1 (BC4), 3DC (or ATI2/BC5), and RXGB.  Also supported are
+non-compressed formats RGB and LUMINANCE.<br>
+At this time, only the first image is loaded; future versions will probably load 3D images and possibly
+Cube Maps as well.  Note: the image loader is not suitable for directly passing images through to OpenGL;
+this code will however be made available at some time as well.</li>
+<li>Added transform() API to FXSphere; it may be used to transform bounding sphere by affine transformation
+matrix.</li>
+<li>Also added transform to FXRange.  Again, matrix must be an affine transformation matrix.</li>
+<li>Many Input Method Editor improvements.</li> 
+<li>Added head() and tail() API's to FXArray and FXObjectList.  Mostly for convenience sake.<\li>
+<li>Updated documentation for FXRangeSlider.</li>
+<li>Extended drag and drop protocol with DND_ASK.</li>
+<li>FXAutoPtr class added.  This represents owned, non-reference counted pointer variable.  This is
+especially convenient for keeping tabs on all your icons and such.</li>
+<li>FXURL family of API's extended: encoding/decoding, but also picking apart URLS into parts according
+to the rfc3986 syntax.</li>
+<li>Added FXPath::share() API for Windows.</li>
+<li>Updating FXFileList for new DND_ASK type.</li>
+<li>FXIconSource now supports FXDDSImage and FXDDSIcon.</li>
+<li>Reimplemented utf2wcs(), utf2ncs(), wc2utfs() and nc2utfs() to be buffer overrun-safe.</li>
+<li>Updated FXThread for Mac OS-X.</li>
+<li>New API's in FXDCWindow: fillVerticalGradient() and fillHorizontalGradient() for gradient-fills.</li>
+<li>New API stackingOrder() added to FXTopWindow to control window stacking order explicitly.  There
+are three types: STACK_NORMAL (the default) where the order is determined by owner windows; STACK_BOTTOM
+which will cause the window to be below other windows, and STACK_TOP which will constrain it to be above
+other windows.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 29 - FOX STABLE 1.6.33
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Backported FXTopWindow resize() and position() fixes from FOX 1.7.</li>
+<li>Fixed GCC 4.3 warning in FXArray header file.</li>
+<li>Made internal data arrays static to prevent global name clashes on some compilers.</li>
+<li>Fixed uninitialized variable in FXFileDict.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 22 - FOX DEVELOPMENT 1.7.16
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
@@ -23,12 +84,12 @@ problem if one tries to right-click after having left-clicked FXMenuButton.</li>
 <li>Forgotten tr() added to FXMessageBox.</li>
 <li>Added NoAccessTime option for FXFile open() call.</li>
 <li>Added Rename option to FXFileSelector widget.<\li>
-<li>FXString::vformat() and FXString::format() and other printf-like printing routines now support 
+<li>FXString::vformat() and FXString::format() and other printf-like printing routines now support
 positional arguments.</li>
 <li>FXString::vscan() and FXString::scan() and other scanf-like reading routines now also support
 positional arguments.</li>
 <li>FXTopWindow not only UTF8 title but also sets 8859-1 title string for legacy window managers.</li>
-<li>Fixed numerous warnings due to GCC 4.3 new integer overflow rules (-fstrict-overflow and -Wstrict-overflow).  
+<li>Fixed numerous warnings due to GCC 4.3 new integer overflow rules (-fstrict-overflow and -Wstrict-overflow).
 Whenever the optimizer makes the assumption is made that expressions doesn't overflow, a warning is issued.
 Rewriting code in a way that makes the assumption go away will kill the warning; sometime, unsigned
 may be used as well.  So I rewrote a lot of code in FOX to be more overflow-resistent.</li>
@@ -74,13 +135,6 @@ ASCII mode; the regular mode uses the registry and that worked fine).</li>
 changes.  This allows us to send SEL_RESTORE, SEL_MAXIMIZE and SEL_MINIMIZE when
 the user manipulates an application's top-level window.</li>
 </ul>
-
-<!---- TOPIC TITLE WITH LOGO--->
-<table border=0 cellpadding= cellspacing=2 width=100% ><tr><td><a href='http://www.fox-toolkit.org' target=_top><img src='art/foxlogo_small.jpg' border=0></a></td><td width=100% valign=bottom id="HEADLINE"><b>
-News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]</font></a>
-<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
-<p>
-<!--- TOPIC TITLE WITH LOGO --->
 
 <!--- TOPIC TITLE -->
 <p>
