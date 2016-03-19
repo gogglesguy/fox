@@ -73,7 +73,7 @@ int main(int argc,char** argv){
   filename=argv[3];
 
   // Show process id
-  fprintf(stderr,"Process id=%d\n",fxgetpid());
+  fprintf(stderr,"Process id=%d\n",FXSystem::getProcessId());
 
   // Test reading
   if(action==TEST_READ){

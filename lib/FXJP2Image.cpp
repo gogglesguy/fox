@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*       D o u b l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
+*                   J P E G - 2 0 0 0   I m a g e   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2009 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -22,12 +22,24 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXHash.h"
+#include "FXThread.h"
 #include "FXStream.h"
-#include "FXObject.h"
-#include "FXVec2d.h"
-#include "FXVec3d.h"
-#include "FXMat3d.h"
+#include "FXMemoryStream.h"
+#include "FXString.h"
+#include "FXSize.h"
+#include "FXPoint.h"
+#include "FXRectangle.h"
+#include "FXRegistry.h"
+#include "FXEvent.h"
+#include "FXWindow.h"
+#include "FXApp.h"
+#include "FXJP2Image.h"
 
+
+/*
+  Notes:
+  - Support for JPEG 2000 image file compression.
+*/
 
 using namespace FX;
 
@@ -36,30 +48,56 @@ using namespace FX;
 namespace FX {
 
 
-// Normalize vector
-FXVec2d normalize(const FXVec2d& v){
-  register FXdouble m=v.length2();
-  FXVec2d result(v);
-  if(0.0<m){ result/=sqrt(m); }
-  return result;
+// Suggested file extension
+const FXchar FXJP2Image::fileExt[]="jp2";
+
+
+// Suggested mime type
+const FXchar FXJP2Image::mimeType[]="image/jp2";
+
+
+// Object implementation
+FXIMPLEMENT(FXJP2Image,FXImage,NULL,0)
+
+
+#ifdef HAVE_J2K_H
+const FXbool FXJP2Image::supported=true;
+#else
+const FXbool FXJP2Image::supported=false;
+#endif
+
+
+// Initialize
+FXJP2Image::FXJP2Image(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h,FXint q):FXImage(a,NULL,opts,w,h),quality(q){
+  if(pix){
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
+    loadPixels(ms);
+    }
   }
 
 
-// Vector times matrix
-FXVec2d FXVec2d::operator*(const FXMat3d& m) const {
-  return FXVec2d(x*m[0][0]+y*m[1][0]+m[2][0], x*m[0][1]+y*m[1][1]+m[2][1]);
+// Save the pixels only
+FXbool FXJP2Image::savePixels(FXStream& store) const {
+  if(fxsaveJP2(store,data,width,height,quality)){
+    return true;
+    }
+  return false;
   }
 
 
-FXStream& operator<<(FXStream& store,const FXVec2d& v){
-  store << v.x << v.y;
-  return store;
+// Load pixels only
+FXbool FXJP2Image::loadPixels(FXStream& store){
+  FXColor *pixels; FXint w,h;
+  if(fxloadJP2(store,pixels,w,h,quality)){
+    setData(pixels,IMAGE_OWNED,w,h);
+    return true;
+    }
+  return false;
   }
 
 
-FXStream& operator>>(FXStream& store,FXVec2d& v){
-  store >> v.x >> v.y;
-  return store;
+// Clean up
+FXJP2Image::~FXJP2Image(){
   }
 
 }

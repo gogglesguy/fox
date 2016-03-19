@@ -187,6 +187,7 @@ const FXchar patterns[]=
   "\nJPEG Image (*.jpg)"
   "\nTIFF Image (*.tif)"
   "\nDDS Image (*.dds)"
+  "\nJP2 Image (*.jp2)"
   ;
 
 /*******************************************************************************/
@@ -397,7 +398,7 @@ ImageWindow::~ImageWindow(){
 
 // About box
 long ImageWindow::onCmdAbout(FXObject*,FXSelector,void*){
-  FXMessageBox about(this,"About Image Viewer","Image Viewer demonstrates the FOX ImageView widget.\n\nUsing the FOX C++ GUI Library (http://www.fox-toolkit.org)\n\nCopyright (C) 2000,2004 Jeroen van der Zijp (jeroen@fox-toolkit.org)",NULL,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox about(this,"About Image Viewer","Image Viewer demonstrates the FOX ImageView widget.\n\nUsing the FOX C++ GUI Library (http://www.fox-toolkit.org)\n\nCopyright (C) 2000,2009 Jeroen van der Zijp (jeroen@fox-toolkit.com)",NULL,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
   about.execute();
   return 1;
   }
@@ -446,6 +447,9 @@ FXbool ImageWindow::loadimage(const FXString& file){
     }
   else if(comparecase(ext,"jpg")==0 || comparecase(ext,"jpeg")==0){
     img=new FXJPGImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    }
+  else if(comparecase(ext,"jp2")==0){
+    img=new FXJP2Image(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
   else if(comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
     img=new FXTIFImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);

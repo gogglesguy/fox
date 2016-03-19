@@ -61,6 +61,7 @@
   - Since '\0' is no longer special in FXString, perhaps we can replace the function
     of '\t' with '\0'.  This would be significantly more efficient.
   - FIXME resizing header partitions shouldn't cause full recalc().
+  - FIXME if no text, you're unable to see if an item is selected.
 */
 
 
@@ -99,7 +100,10 @@ void FXFoldingItem::draw(const FXFoldingList* list,FXDC& dc,FXint xx,FXint yy,FX
     iw=icon->getWidth();
     ih=icon->getHeight();
     dc.setClipRectangle(header->getItemOffset(0),yy,header->getItemSize(0),hh);
-    dc.drawIcon(icon,xx,yy+(hh-ih)/2);
+    if(isEnabled())
+      dc.drawIcon(icon,xx,yy+(hh-ih)/2);
+    else
+      dc.drawIconSunken(icon,xx,yy+(hh-ih)/2);
     dc.clearClipRectangle();
     xx+=ICON_SPACING+iw;
     }

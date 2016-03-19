@@ -40,17 +40,17 @@ public:
   /// Default constructor; value is not initialized
   FXVec4d(){}
 
-  /// Initialize from another vector
-  FXVec4d(const FXVec4d& v){x=v.x;y=v.y;z=v.z;w=v.w;}
+  /// Construct with 3-vector 
+  FXVec4d(const FXVec3d& v,FXdouble s=0.0):x(v.x),y(v.y),z(v.z),w(s){}
 
-  /// Construct with 3-vector and optional scalar
-  FXVec4d(const FXVec3d& v,FXdouble ww=1.0){x=v.x;y=v.y;z=v.z;w=ww;}
+  /// Initialize from another vector
+  FXVec4d(const FXVec4d& v):x(v.x),y(v.y),z(v.z),w(v.w){}
 
   /// Initialize from array of doubles
-  FXVec4d(const FXdouble v[]){x=v[0];y=v[1];z=v[2];w=v[3];}
+  FXVec4d(const FXdouble v[]):x(v[0]),y(v[1]),z(v[2]),w(v[3]){}
 
   /// Initialize with components
-  FXVec4d(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww=1.0){x=xx;y=yy;z=zz;w=ww;}
+  FXVec4d(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww):x(xx),y(yy),z(zz),w(ww){}
 
   /// Return a non-const reference to the ith element
   FXdouble& operator[](FXint i){return (&x)[i];}
@@ -59,7 +59,6 @@ public:
   const FXdouble& operator[](FXint i) const {return (&x)[i];}
 
   /// Assignment
-  FXVec4d& operator=(const FXVec3d& v){x=v.x;y=v.y;z=v.z;w=1.0;return *this;}
   FXVec4d& operator=(const FXVec4d& v){x=v.x;y=v.y;z=v.z;w=v.w;return *this;}
 
   /// Assignment from array of doubles
@@ -75,10 +74,10 @@ public:
   FXVec4d& set(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww){x=xx;y=yy;z=zz;w=ww;return *this;}
 
   /// Assigning operators
-  FXVec4d& operator*=(FXdouble n){x*=n;y*=n;z*=n;w*=n;return *this;}
-  FXVec4d& operator/=(FXdouble n){x/=n;y/=n;z/=n;w/=n;return *this;}
-  FXVec4d& operator+=(const FXVec4d& v){x+=v.x;y+=v.y;z+=v.z;w+=v.w;return *this;}
-  FXVec4d& operator-=(const FXVec4d& v){x-=v.x;y-=v.y;z-=v.z;w-=v.w;return *this;}
+  FXVec4d& operator*=(FXdouble n){ return set(x*n,y*n,z*n,w*n); }
+  FXVec4d& operator/=(FXdouble n){ return set(x/n,y/n,z/n,w/n); }
+  FXVec4d& operator+=(const FXVec4d& v){ return set(x+v.x,y+v.y,z+v.z,w+v.w); }
+  FXVec4d& operator-=(const FXVec4d& v){ return set(x-v.x,y-v.y,z-v.z,w-v.w); }
 
   /// Conversion
   operator FXdouble*(){return &x;}
@@ -97,12 +96,6 @@ public:
   /// Vector and matrix
   FXVec4d operator*(const FXMat4d& m) const;
 
-  /// Scaling
-  friend inline FXVec4d operator*(const FXVec4d& a,FXdouble n);
-  friend inline FXVec4d operator*(FXdouble n,const FXVec4d& a);
-  friend inline FXVec4d operator/(const FXVec4d& a,FXdouble n);
-  friend inline FXVec4d operator/(FXdouble n,const FXVec4d& a);
-
   /// Dot product
   FXdouble operator*(const FXVec4d& v) const { return x*v.x+y*v.y+z*v.z+w*v.w; }
 
@@ -113,99 +106,74 @@ public:
   FXbool operator==(const FXVec4d& v) const { return x==v.x && y==v.y && z==v.z && w==v.w; }
   FXbool operator!=(const FXVec4d& v) const { return x!=v.x || y!=v.y || z!=v.z || w!=v.w; }
 
-  friend inline FXbool operator==(const FXVec4d& a,FXdouble n);
-  friend inline FXbool operator!=(const FXVec4d& a,FXdouble n);
-  friend inline FXbool operator==(FXdouble n,const FXVec4d& a);
-  friend inline FXbool operator!=(FXdouble n,const FXVec4d& a);
-
   /// Inequality tests
   FXbool operator<(const FXVec4d& v) const { return x<v.x && y<v.y && z<v.z && w<v.w; }
   FXbool operator<=(const FXVec4d& v) const { return x<=v.x && y<=v.y && z<=v.z && w<=v.w; }
   FXbool operator>(const FXVec4d& v) const { return x>v.x && y>v.y && z>v.z && w>v.w; }
   FXbool operator>=(const FXVec4d& v) const { return x>=v.x && y>=v.y && z>=v.z && w>=v.w; }
 
-  friend inline FXbool operator<(const FXVec4d& a,FXdouble n);
-  friend inline FXbool operator<=(const FXVec4d& a,FXdouble n);
-  friend inline FXbool operator>(const FXVec4d& a,FXdouble n);
-  friend inline FXbool operator>=(const FXVec4d& a,FXdouble n);
-
-  friend inline FXbool operator<(FXdouble n,const FXVec4d& a);
-  friend inline FXbool operator<=(FXdouble n,const FXVec4d& a);
-  friend inline FXbool operator>(FXdouble n,const FXVec4d& a);
-  friend inline FXbool operator>=(FXdouble n,const FXVec4d& a);
-
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z+w*w; }
   FXdouble length() const { return sqrt(length2()); }
 
   /// Clamp values of vector between limits
-  FXVec4d& clamp(FXdouble lo,FXdouble hi){x=FXCLAMP(lo,x,hi);y=FXCLAMP(lo,y,hi);z=FXCLAMP(lo,z,hi);w=FXCLAMP(lo,w,hi);return *this;}
-
-  /// Lowest or highest components
-  friend inline FXVec4d lo(const FXVec4d& a,const FXVec4d& b);
-  friend inline FXVec4d hi(const FXVec4d& a,const FXVec4d& b);
-
-  /// Compute normalized plane equation ax+by+cz+d=0
-  friend FXAPI FXVec4d plane(const FXVec4d& vec);
-  friend FXAPI FXVec4d plane(const FXVec3d& vec,FXdouble dist);
-  friend FXAPI FXVec4d plane(const FXVec3d& vec,const FXVec3d& p);
-  friend FXAPI FXVec4d plane(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
-
-  /// Convert vector to color and back
-  friend FXAPI FXColor colorFromVec4d(const FXVec4d& vec);
-  friend FXAPI FXVec4d colorToVec4d(FXColor clr);
+  FXVec4d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi),FXCLAMP(lo,z,hi),FXCLAMP(lo,w,hi)); }
 
   /// Signed distance normalized plane and point
   FXdouble distance(const FXVec3d& p) const;
 
   /// Return true if edge a-b crosses plane
   FXbool crosses(const FXVec3d& a,const FXVec3d& b) const;
-
-  /// Normalize vector
-  friend FXAPI FXVec4d normalize(const FXVec4d& v);
-
-  /// Save to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXVec4d& v);
-
-  /// Load from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXVec4d& v);
   };
 
 
+/// Scaling
 inline FXVec4d operator*(const FXVec4d& a,FXdouble n){return FXVec4d(a.x*n,a.y*n,a.z*n,a.w*n);}
 inline FXVec4d operator*(FXdouble n,const FXVec4d& a){return FXVec4d(n*a.x,n*a.y,n*a.z,n*a.w);}
 inline FXVec4d operator/(const FXVec4d& a,FXdouble n){return FXVec4d(a.x/n,a.y/n,a.z/n,a.w/n);}
 inline FXVec4d operator/(FXdouble n,const FXVec4d& a){return FXVec4d(n/a.x,n/a.y,n/a.z,n/a.w);}
 
+/// Equality tests
 inline FXbool operator==(const FXVec4d& a,FXdouble n){return a.x==n && a.y==n && a.z==n && a.w==n;}
 inline FXbool operator!=(const FXVec4d& a,FXdouble n){return a.x!=n || a.y!=n || a.z!=n || a.w!=n;}
 inline FXbool operator==(FXdouble n,const FXVec4d& a){return n==a.x && n==a.y && n==a.z && n==a.w;}
 inline FXbool operator!=(FXdouble n,const FXVec4d& a){return n!=a.x || n!=a.y || n!=a.z || n!=a.w;}
 
+/// Inequality tests
 inline FXbool operator<(const FXVec4d& a,FXdouble n){return a.x<n && a.y<n && a.z<n && a.w<n;}
 inline FXbool operator<=(const FXVec4d& a,FXdouble n){return a.x<=n && a.y<=n && a.z<=n && a.w<=n;}
 inline FXbool operator>(const FXVec4d& a,FXdouble n){return a.x>n && a.y>n && a.z>n && a.w>n;}
 inline FXbool operator>=(const FXVec4d& a,FXdouble n){return a.x>=n && a.y>=n && a.z>=n && a.w>=n;}
 
+/// Inequality tests
 inline FXbool operator<(FXdouble n,const FXVec4d& a){return n<a.x && n<a.y && n<a.z && n<a.w;}
 inline FXbool operator<=(FXdouble n,const FXVec4d& a){return n<=a.x && n<=a.y && n<=a.z && n<=a.w;}
 inline FXbool operator>(FXdouble n,const FXVec4d& a){return n>a.x && n>a.y && n>a.z && n>a.w;}
 inline FXbool operator>=(FXdouble n,const FXVec4d& a){return n>=a.x && n>=a.y && n>=a.z && n>=a.w;}
 
+/// Lowest or highest components
 inline FXVec4d lo(const FXVec4d& a,const FXVec4d& b){return FXVec4d(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z),FXMIN(a.w,b.w));}
 inline FXVec4d hi(const FXVec4d& a,const FXVec4d& b){return FXVec4d(FXMAX(a.x,b.x),FXMAX(a.y,b.y),FXMAX(a.z,b.z),FXMAX(a.w,b.w));}
 
+/// Compute normalized plane equation ax+by+cz+d=0
 extern FXAPI FXVec4d plane(const FXVec4d& vec);
 extern FXAPI FXVec4d plane(const FXVec3d& vec,FXdouble dist);
 extern FXAPI FXVec4d plane(const FXVec3d& vec,const FXVec3d& p);
 extern FXAPI FXVec4d plane(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
 
+/// Convert vector to color
 extern FXAPI FXColor colorFromVec4d(const FXVec4d& vec);
+
+/// Convert color to vector
 extern FXAPI FXVec4d colorToVec4d(FXColor clr);
 
+/// Normalize vector
 extern FXAPI FXVec4d normalize(const FXVec4d& v);
 
+/// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec4d& v);
+
+/// Load vector from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXVec4d& v);
 
 }

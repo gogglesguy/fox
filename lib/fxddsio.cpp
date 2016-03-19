@@ -1261,7 +1261,7 @@ FXbool fxloadDDS(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
           ok=dds_decompress_RGB(dds,(FXuchar*)data);
           }
 
-        // Lumimannce format
+        // Lumimance format
         else{
           ok=dds_decompress_LUM(dds,(FXuchar*)data);
           }

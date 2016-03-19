@@ -70,27 +70,19 @@ public:
   /// Addition operators
   FXPoint operator+(const FXPoint& p) const { return FXPoint(x+p.x,y+p.y); }
   FXPoint operator-(const FXPoint& p) const { return FXPoint(x-p.x,y-p.y); }
-
-  /// Scale operators
-  friend inline FXPoint operator*(const FXPoint& p,FXshort c);
-  friend inline FXPoint operator*(FXshort c,const FXPoint& p);
-  friend inline FXPoint operator/(const FXPoint& p,FXshort c);
-  friend inline FXPoint operator/(FXshort c,const FXPoint& p);
-
-  /// Save object to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXPoint& p);
-
-  /// Load object from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXPoint& p);
   };
 
 
+/// Scale operators
 inline FXPoint operator*(const FXPoint& p,FXshort c){ return FXPoint(p.x*c,p.y*c); }
 inline FXPoint operator*(FXshort c,const FXPoint& p){ return FXPoint(c*p.x,c*p.y); }
 inline FXPoint operator/(const FXPoint& p,FXshort c){ return FXPoint(p.x/c,p.y/c); }
 inline FXPoint operator/(FXshort c,const FXPoint& p){ return FXPoint(c/p.x,c/p.y); }
 
+/// Save object to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXPoint& p);
+
+/// Load object from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXPoint& p);
 
 }

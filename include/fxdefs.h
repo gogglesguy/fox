@@ -204,7 +204,6 @@ typedef unsigned int           FXuint;
 typedef int                    FXint;
 typedef float                  FXfloat;
 typedef double                 FXdouble;
-typedef FXObject              *FXObjectPtr;
 #ifdef WIN32
 typedef unsigned int           FXwchar;
 #if defined(_MSC_VER) && !defined(_NATIVE_WCHAR_T_DEFINED)
@@ -567,7 +566,7 @@ const FXTime forever=9223372036854775807L;
 
 /**********************************  Globals  **********************************/
 
-/// Simple, thread-safe, random number generator
+/// Simple, thread-safe xor-shifting random number generator (initial seed should be non-zero)
 extern FXAPI FXuint fxrandom(FXuint& seed);
 
 /// Allocate memory

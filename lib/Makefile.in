@@ -97,11 +97,11 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo FXIcon.lo \
 	FXIconDict.lo FXIconList.lo FXIconSource.lo FXId.lo FXImage.lo \
 	FXImageFrame.lo FXImageView.lo FXInputDialog.lo FXIO.lo \
-	FXJPGIcon.lo FXJPGImage.lo FXKnob.lo FXLabel.lo FXList.lo \
-	FXListBox.lo FXLocale.lo FXMDIButton.lo FXMDIChild.lo \
-	FXMDIClient.lo FXMainWindow.lo FXMat3d.lo FXMat4d.lo \
-	FXMat3f.lo FXMat4f.lo FXMatrix.lo FXMemMap.lo \
-	FXMemoryStream.lo FXMenuBar.lo FXMenuButton.lo \
+	FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo FXJPGImage.lo \
+	FXKnob.lo FXLabel.lo FXList.lo FXListBox.lo FXLocale.lo \
+	FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo \
+	FXMat3d.lo FXMat4d.lo FXMat3f.lo FXMat4f.lo FXMatrix.lo \
+	FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo FXMenuButton.lo \
 	FXMenuCaption.lo FXMenuCascade.lo FXMenuCheck.lo \
 	FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
@@ -133,12 +133,12 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXVisual.lo FXWindow.lo FXWizard.lo FXXBMIcon.lo FXXBMImage.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbmpio.lo fxddsio.lo \
 	fxezquantize.lo fxfsquantize.lo fxgetticks.lo fxgifio.lo \
-	fxicoio.lo fxiffio.lo fxjpegio.lo fxkeyboard.lo fxkeysym.lo \
-	fxparsegeometry.lo fxpcxio.lo fxpngio.lo fxppmio.lo \
-	fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo fxrgbio.lo \
-	fxscanf.lo fxtargaio.lo fxtifio.lo fxunicode.lo fxutils.lo \
-	fxwuquantize.lo fxxbmio.lo fxxpmio.lo strtoll.lo icons.lo \
-	strtoll.lo $(am__objects_2) $(am__objects_2)
+	fxicoio.lo fxiffio.lo fxjpegio.lo fxjp2io.lo fxkeyboard.lo \
+	fxkeysym.lo fxparsegeometry.lo fxpcxio.lo fxpngio.lo \
+	fxppmio.lo fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo \
+	fxrgbio.lo fxscanf.lo fxtargaio.lo fxtifio.lo fxunicode.lo \
+	fxutils.lo fxwuquantize.lo fxxbmio.lo fxxpmio.lo strtoll.lo \
+	icons.lo strtoll.lo $(am__objects_2) $(am__objects_2)
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 libFOX_1_7_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -577,6 +577,8 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXJP2Icon.cpp \
+FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXKnob.cpp \
@@ -722,6 +724,7 @@ fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
 fxjpegio.cpp \
+fxjp2io.cpp \
 fxkeyboard.cpp \
 fxkeysym.cpp \
 fxparsegeometry.cpp \
@@ -977,6 +980,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXImageFrame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXImageView.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXInputDialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJP2Icon.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJP2Image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJPGIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJPGImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXKOI8RCodec.Plo@am__quote@
@@ -1126,6 +1131,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxgifio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxicoio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxiffio.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxjp2io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxjpegio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxkeyboard.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxkeysym.Plo@am__quote@

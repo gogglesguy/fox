@@ -266,9 +266,9 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
     table->addAccel(MKUINT(KEY_b,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_BIG_ICONS));
     table->addAccel(MKUINT(KEY_s,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_MINI_ICONS));
     table->addAccel(MKUINT(KEY_l,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_DETAILS));
-table->addAccel(MKUINT(KEY_c,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_COPY_SEL));
-table->addAccel(MKUINT(KEY_x,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_CUT_SEL));
-table->addAccel(MKUINT(KEY_v,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_PASTE_SEL));
+//    table->addAccel(MKUINT(KEY_c,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_COPY_SEL));
+//    table->addAccel(MKUINT(KEY_x,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_CUT_SEL));
+//    table->addAccel(MKUINT(KEY_v,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_PASTE_SEL));
     }
   setSelectMode(SELECTFILE_ANY);    // For backward compatibility, this HAS to be the default!
   setPatternList(tr("All Files (*)"));
@@ -1236,6 +1236,9 @@ FXFileSelector::~FXFileSelector(){
     table->removeAccel(MKUINT(KEY_b,CONTROLMASK));
     table->removeAccel(MKUINT(KEY_s,CONTROLMASK));
     table->removeAccel(MKUINT(KEY_l,CONTROLMASK));
+//    table->removeAccel(MKUINT(KEY_c,CONTROLMASK));
+//    table->removeAccel(MKUINT(KEY_x,CONTROLMASK));
+//    table->removeAccel(MKUINT(KEY_v,CONTROLMASK));
     }
   delete bookmarkmenu;
   delete updiricon;

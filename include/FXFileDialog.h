@@ -124,7 +124,7 @@ public:
   /// Return the inter-item spacing (in pixels)
   FXint getItemSpace() const;
 
-  /// Change file selection mode
+  /// Change file selection mode; the default is SELECTFILE_ANY
   void setSelectMode(FXuint mode);
 
   /// Return file selection mode

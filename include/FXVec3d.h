@@ -40,14 +40,17 @@ public:
   /// Default constructor; value is not initialized
   FXVec3d(){}
 
+  /// Initialize from 2-vector
+  FXVec3d(const FXVec2d& v,FXdouble s=0.0):x(v.x),y(v.y),z(s){}
+
   /// Initialize from another vector
-  FXVec3d(const FXVec3d& v){x=v.x;y=v.y;z=v.z;}
+  FXVec3d(const FXVec3d& v):x(v.x),y(v.y),z(v.z){}
 
   /// Initialize from array of doubles
-  FXVec3d(const FXdouble v[]){x=v[0];y=v[1];z=v[2];}
+  FXVec3d(const FXdouble v[]):x(v[0]),y(v[1]),z(v[2]){}
 
   /// Initialize with components
-  FXVec3d(FXdouble xx,FXdouble yy,FXdouble zz=1.0){x=xx;y=yy;z=zz;}
+  FXVec3d(FXdouble xx,FXdouble yy,FXdouble zz):x(xx),y(yy),z(zz){}
 
   /// Return a non-const reference to the ith element
   FXdouble& operator[](FXint i){return (&x)[i];}
@@ -71,10 +74,11 @@ public:
   FXVec3d& set(FXdouble xx,FXdouble yy,FXdouble zz){x=xx;y=yy;z=zz;return *this;}
 
   /// Assigning operators
-  FXVec3d& operator*=(FXdouble n){x*=n;y*=n;z*=n;return *this;}
-  FXVec3d& operator/=(FXdouble n){x/=n;y/=n;z/=n;return *this;}
-  FXVec3d& operator+=(const FXVec3d& v){x+=v.x;y+=v.y;z+=v.z;return *this;}
-  FXVec3d& operator-=(const FXVec3d& v){x-=v.x;y-=v.y;z-=v.z;return *this;}
+  FXVec3d& operator*=(FXdouble n){ return set(x*n,y*n,z*n); }
+  FXVec3d& operator/=(FXdouble n){ return set(x/n,y/n,z/n); }
+  FXVec3d& operator+=(const FXVec3d& v){ return set(x+v.x,y+v.y,z+v.z); }
+  FXVec3d& operator-=(const FXVec3d& v){ return set(x-v.x,y-v.y,z-v.z); }
+  FXVec3d& operator^=(const FXVec3d& v){ return set(y*v.z-z*v.y,z*v.x-x*v.z,x*v.y-y*v.x); }
 
   /// Conversions
   operator FXdouble*(){return &x;}
@@ -94,12 +98,6 @@ public:
   FXVec3d operator*(const FXMat3d& m) const;
   FXVec3d operator*(const FXMat4d& m) const;
 
-  /// Scaling
-  friend inline FXVec3d operator*(const FXVec3d& a,FXdouble n);
-  friend inline FXVec3d operator*(FXdouble n,const FXVec3d& a);
-  friend inline FXVec3d operator/(const FXVec3d& a,FXdouble n);
-  friend inline FXVec3d operator/(FXdouble n,const FXVec3d& a);
-
   /// Dot product
   FXdouble operator*(const FXVec3d& v) const { return x*v.x+y*v.y+z*v.z; }
 
@@ -113,91 +111,68 @@ public:
   FXbool operator==(const FXVec3d& v) const { return x==v.x && y==v.y && z==v.z; }
   FXbool operator!=(const FXVec3d& v) const { return x!=v.x || y!=v.y || z!=v.z; }
 
-  friend inline FXbool operator==(const FXVec3d& a,FXdouble n);
-  friend inline FXbool operator!=(const FXVec3d& a,FXdouble n);
-  friend inline FXbool operator==(FXdouble n,const FXVec3d& a);
-  friend inline FXbool operator!=(FXdouble n,const FXVec3d& a);
-
   /// Inequality tests
   FXbool operator<(const FXVec3d& v) const { return x<v.x && y<v.y && z<v.z; }
   FXbool operator<=(const FXVec3d& v) const { return x<=v.x && y<=v.y && z<=v.z; }
   FXbool operator>(const FXVec3d& v) const { return x>v.x && y>v.y && z>v.z; }
   FXbool operator>=(const FXVec3d& v) const { return x>=v.x && y>=v.y && z>=v.z; }
 
-  friend inline FXbool operator<(const FXVec3d& a,FXdouble n);
-  friend inline FXbool operator<=(const FXVec3d& a,FXdouble n);
-  friend inline FXbool operator>(const FXVec3d& a,FXdouble n);
-  friend inline FXbool operator>=(const FXVec3d& a,FXdouble n);
-
-  friend inline FXbool operator<(FXdouble n,const FXVec3d& a);
-  friend inline FXbool operator<=(FXdouble n,const FXVec3d& a);
-  friend inline FXbool operator>(FXdouble n,const FXVec3d& a);
-  friend inline FXbool operator>=(FXdouble n,const FXVec3d& a);
-
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z; }
   FXdouble length() const { return sqrt(length2()); }
 
   /// Clamp values of vector between limits
-  FXVec3d& clamp(FXdouble lo,FXdouble hi){x=FXCLAMP(lo,x,hi);y=FXCLAMP(lo,y,hi);z=FXCLAMP(lo,z,hi);return *this;}
-
-  /// Lowest or highest components
-  friend inline FXVec3d lo(const FXVec3d& a,const FXVec3d& b);
-  friend inline FXVec3d hi(const FXVec3d& a,const FXVec3d& b);
-
-  /// Convert vector to color and back
-  friend FXAPI FXColor colorFromVec3d(const FXVec3d& vec);
-  friend FXAPI FXVec3d colorToVec3d(FXColor clr);
-
-  /// Compute normal from three points a,b,c
-  friend FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
-
-  /// Compute approximate normal from four points a,b,c,d
-  friend FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,const FXVec3d& d);
-
-  /// Normalize vector
-  friend FXAPI FXVec3d normalize(const FXVec3d& v);
-
-  /// Save vector to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXVec3d& v);
-
-  /// Load vector from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXVec3d& v);
+  FXVec3d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi),FXCLAMP(lo,z,hi)); }
   };
 
 
+/// Scaling
 inline FXVec3d operator*(const FXVec3d& a,FXdouble n){return FXVec3d(a.x*n,a.y*n,a.z*n);}
 inline FXVec3d operator*(FXdouble n,const FXVec3d& a){return FXVec3d(n*a.x,n*a.y,n*a.z);}
 inline FXVec3d operator/(const FXVec3d& a,FXdouble n){return FXVec3d(a.x/n,a.y/n,a.z/n);}
 inline FXVec3d operator/(FXdouble n,const FXVec3d& a){return FXVec3d(n/a.x,n/a.y,n/a.z);}
 
+/// Equality tests
 inline FXbool operator==(const FXVec3d& a,FXdouble n){return a.x==n && a.y==n && a.z==n;}
 inline FXbool operator!=(const FXVec3d& a,FXdouble n){return a.x!=n || a.y!=n || a.z!=n;}
 inline FXbool operator==(FXdouble n,const FXVec3d& a){return n==a.x && n==a.y && n==a.z;}
 inline FXbool operator!=(FXdouble n,const FXVec3d& a){return n!=a.x || n!=a.y || n!=a.z;}
 
+/// Inequality tests
 inline FXbool operator<(const FXVec3d& a,FXdouble n){return a.x<n && a.y<n && a.z<n;}
 inline FXbool operator<=(const FXVec3d& a,FXdouble n){return a.x<=n && a.y<=n && a.z<=n;}
 inline FXbool operator>(const FXVec3d& a,FXdouble n){return a.x>n && a.y>n && a.z>n;}
 inline FXbool operator>=(const FXVec3d& a,FXdouble n){return a.x>=n && a.y>=n && a.z>=n;}
 
+/// Inequality tests
 inline FXbool operator<(FXdouble n,const FXVec3d& a){return n<a.x && n<a.y && n<a.z;}
 inline FXbool operator<=(FXdouble n,const FXVec3d& a){return n<=a.x && n<=a.y && n<=a.z;}
 inline FXbool operator>(FXdouble n,const FXVec3d& a){return n>a.x && n>a.y && n>a.z;}
 inline FXbool operator>=(FXdouble n,const FXVec3d& a){return n>=a.x && n>=a.y && n>=a.z;}
 
+/// Lowest or highest components
 inline FXVec3d lo(const FXVec3d& a,const FXVec3d& b){return FXVec3d(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z));}
 inline FXVec3d hi(const FXVec3d& a,const FXVec3d& b){return FXVec3d(FXMAX(a.x,b.x),FXMAX(a.y,b.y),FXMAX(a.z,b.z));}
 
+/// Convert vector to color
 extern FXAPI FXColor colorFromVec3d(const FXVec3d& vec);
+
+/// Convert color to vector
 extern FXAPI FXVec3d colorToVec3d(FXColor clr);
 
+/// Compute normal from three points a,b,c
 extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
+
+/// Compute approximate normal from four points a,b,c,d
 extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,const FXVec3d& d);
 
+/// Normalize vector
 extern FXAPI FXVec3d normalize(const FXVec3d& v);
 
+/// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3d& v);
+
+/// Load vector from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXVec3d& v);
 
 }

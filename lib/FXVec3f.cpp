@@ -37,6 +37,7 @@ using namespace FX;
 
 namespace FX {
 
+
 // Convert from vector to color
 FXColor colorFromVec3f(const FXVec3f& vec){
   return FXRGB((vec.x*255.0f+0.5f),(vec.y*255.0f+0.5f),(vec.z*255.0f+0.5f));
@@ -49,11 +50,37 @@ FXVec3f colorToVec3f(FXColor clr){
   }
 
 
+#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
+
+static inline FXfloat rsqrtf(FXfloat r){
+  register FXfloat q=r;
+  asm volatile("rsqrtss %0, %0" : "=x" (q) : "0" (q) );
+  return (r*q*q-3.0f)*q*-0.5f;
+  }
+
+#else
+
+static inline FXfloat rsqrtf(FXfloat r){
+  return 1.0f/sqrtf(r);
+  }
+
+#endif
+
+
+// Fast normalize vector
+FXVec3f fastnormalize(const FXVec3f& v){
+  register FXfloat m=v.length2();
+  FXVec3f result(v);
+  if(FLT_MIN<m){ result*=rsqrtf(m); }
+  return result;
+  }
+
+
 // Normalize vector
 FXVec3f normalize(const FXVec3f& v){
   register FXfloat m=v.length2();
   FXVec3f result(v);
-  if(m>0.0f){ result/=sqrtf(m); }
+  if(0.0f<m){ result/=sqrtf(m); }
   return result;
   }
 

@@ -50,11 +50,37 @@ FXVec4f colorToVec4f(FXColor clr){
   }
 
 
+#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
+
+static inline FXfloat rsqrtf(FXfloat r){
+  register FXfloat q=r;
+  asm volatile("rsqrtss %0, %0" : "=x" (q) : "0" (q) );
+  return (r*q*q-3.0f)*q*-0.5f;
+  }
+
+#else
+
+static inline FXfloat rsqrtf(FXfloat r){
+  return 1.0f/sqrtf(r);
+  }
+
+#endif
+
+
+// Fast normalize vector
+FXVec4f fastnormalize(const FXVec4f& v){
+  register FXfloat m=v.length2();
+  FXVec4f result(v);
+  if(FLT_MIN<m){ result*=rsqrtf(m); }
+  return result;
+  }
+
+
 // Normalize vector
 FXVec4f normalize(const FXVec4f& v){
   register FXfloat m=v.length2();
   FXVec4f result(v);
-  if(m>0.0f){ result/=sqrtf(m); }
+  if(0.0f<m){ result/=sqrtf(m); }
   return result;
   }
 

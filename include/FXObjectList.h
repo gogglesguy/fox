@@ -90,7 +90,7 @@ public:
   FXObjectList& assign(FXObject** objects,FXint n);
 
   /// Assign objects to list
-  FXObjectList& assign(FXObjectList& objects);
+  FXObjectList& assign(const FXObjectList& objects);
 
   /// Insert object at certain position
   FXObjectList& insert(FXint pos,FXObject* object);
@@ -102,7 +102,7 @@ public:
   FXObjectList& insert(FXint pos,FXObject** objects,FXint n);
 
   /// Insert objects at specified position
-  FXObjectList& insert(FXint pos,FXObjectList& objects);
+  FXObjectList& insert(FXint pos,const FXObjectList& objects);
 
   /// Prepend object
   FXObjectList& prepend(FXObject* object);
@@ -114,7 +114,7 @@ public:
   FXObjectList& prepend(FXObject** objects,FXint n);
 
   /// Prepend objects
-  FXObjectList& prepend(FXObjectList& objects);
+  FXObjectList& prepend(const FXObjectList& objects);
 
   /// Append object
   FXObjectList& append(FXObject* object);
@@ -126,19 +126,19 @@ public:
   FXObjectList& append(FXObject** objects,FXint n);
 
   /// Append objects
-  FXObjectList& append(FXObjectList& objects);
+  FXObjectList& append(const FXObjectList& objects);
 
   /// Replace object at position by given object
   FXObjectList& replace(FXint pos,FXObject* object);
 
-  /// Replaces the m objects at pos with n objects
-  FXObjectList& replace(FXint pos,FXint m,FXObject** objects,FXint n);
-
   /// Replaces the m objects at pos with n copies of object
   FXObjectList& replace(FXint pos,FXint m,FXObject* object,FXint n);
 
+  /// Replaces the m objects at pos with n objects
+  FXObjectList& replace(FXint pos,FXint m,FXObject** objects,FXint n);
+
   /// Replace the m objects at pos with objects
-  FXObjectList& replace(FXint pos,FXint m,FXObjectList& objects);
+  FXObjectList& replace(FXint pos,FXint m,const FXObjectList& objects);
 
   /// Remove object at pos
   FXObjectList& erase(FXint pos);

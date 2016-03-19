@@ -1,11 +1,11 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [20])
+m4_define([fox_level], [21])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
-AC_INIT(fox,[fox_version],jeroen@fox-toolkit.org)
+AC_INIT(fox,[fox_version],jeroen@fox-toolkit.com)
 AC_CONFIG_SRCDIR([include/fx.h])
 AM_INIT_AUTOMAKE([foreign])
 
@@ -75,6 +75,8 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
 X_BASE_LIBS="-lX11 -lXext"
+LIBGLU="-lGLU"
+LIBGL="-lGL"
 
 # Checks for header files.
 AC_PATH_X
@@ -84,6 +86,11 @@ AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 AC_FUNC_MMAP
 
+if test "$no_x" = yes; then
+X_BASE_LIBS="-lcomctl32 -lwsock32 -lwinspool -lmpr -lgdi32 -limm32"
+LIBGLU="-lglu32"
+LIBGL="-lopengl32"
+fi
 
 # Byte order
 AC_C_BIGENDIAN([FOX_BYTEORDER=1], [FOX_BYTEORDER=0])
@@ -142,6 +149,14 @@ AC_ARG_ENABLE(jpeg,[  --disable-jpeg          compile without JPEG image support
 AC_MSG_RESULT([$enable_jpeg])
 if test "x$enable_jpeg" != "xno"; then
 AC_CHECK_HEADER(jpeglib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JPEG_H=1"; LIBS="${LIBS} ${LIBJPEG:=-ljpeg}")
+fi
+
+
+# Check for J2K Image support
+AC_ARG_ENABLE(jp2,[  --disable-jp2          compile without JPEG 2000 image support])
+AC_MSG_RESULT([$enable_j2k])
+if test "x$enable_jp2" != "xno"; then
+AC_CHECK_HEADER(openjpeg.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JP2_H=1"; LIBS="${LIBS} ${LIBJP2:=-lopenjpeg}")
 fi
 
 
@@ -265,8 +280,8 @@ AC_MSG_CHECKING(for OpenGL support)
 AC_ARG_WITH(opengl,[  --with-opengl           choices are yes, no])
 AC_MSG_RESULT([$with_opengl])
 if test "x$with_opengl" != "xno" ; then
-AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU:=-lGLU}")
-AC_CHECK_HEADER(GL/gl.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GL_H=1"; LIBS="${LIBS} ${LIBGL:=-lGL}")
+AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU}")
+AC_CHECK_HEADER(GL/gl.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GL_H=1"; LIBS="${LIBS} ${LIBGL}")
 fi
 GL_LIBS="${LIBGL} ${LIBGLU}"
 

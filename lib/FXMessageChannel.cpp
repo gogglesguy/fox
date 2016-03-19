@@ -167,7 +167,7 @@ FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,F
     }
 #else
   if(::write(h[1],&pkg,sizeof(FXMessage))==sizeof(FXMessage)){
-    if(pkg.size<=0 || (::write(h[1],data,pkg.size)==pkg.size)){
+    if(pkg.size<=0 || (::write(h[1],data,pkg.size)==pkg.size)){		// Write with one call...
       return true;
       }
     }

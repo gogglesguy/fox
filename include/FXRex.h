@@ -103,7 +103,7 @@ public:
 public:
 
   /// Construct empty regular expression object
-  FXRex():code((FXint*)fallback){}
+  FXRex();
 
   /// Copy regular expression object
   FXRex(const FXRex& orig);

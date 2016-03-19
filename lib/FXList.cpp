@@ -81,6 +81,7 @@
   - Even/odd background colors would be nice, but may look funny when
     not all items are same size.
   - Item justification and icon/text relationships would be nice, too.
+  - FIXME if no text, you're unable to see if an item is selected.
 */
 
 
@@ -119,7 +120,10 @@ void FXListItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXi
     }
   xx+=SIDE_SPACING/2;
   if(icon){
-    dc.drawIcon(icon,xx,yy+(hh-ih)/2);
+    if(isEnabled())
+      dc.drawIcon(icon,xx,yy+(hh-ih)/2);
+    else
+      dc.drawIconSunken(icon,xx,yy+(hh-ih)/2);
     xx+=ICON_SPACING+icon->getWidth();
     }
   if(!label.empty()){

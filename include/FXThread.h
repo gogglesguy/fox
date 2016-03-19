@@ -53,7 +53,10 @@ private:
   FXMutex &operator=(const FXMutex&);
 public:
 
-  /// Initialize the mutex
+  /**
+  * Initialize the mutex; if the parameter recursive is true,
+  * the mutex is reentrant, i.e. counts the number of locks and unlocks.
+  */
   FXMutex(FXbool recursive=false);
 
   /// Lock the mutex
@@ -311,13 +314,13 @@ public:
 
   /// Acquire a unique thread-local storage key
   FXAutoThreadStorageKey();
-  
+
   /// Return the thread-local storage key
   operator FXThreadStorageKey() const { return value; }
 
   /// Set thread local storage associated with this key
   void set(void* ptr) const;
-  
+
   /// Get thread local storage associated with this key
   void* get() const;
 

@@ -169,7 +169,7 @@ long FXInputDialog::onCmdAccept(FXObject* sender,FXSelector sel,void* ptr){
 FXbool FXInputDialog::getString(FXString& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon){
   FXInputDialog inputdialog(owner,caption,label,icon,INPUTDIALOG_STRING,0,0,0,0);
   inputdialog.setText(result);
-  if(inputdialog.execute()){
+  if(inputdialog.execute(PLACEMENT_OWNER)){
     result=inputdialog.getText();
     return true;
     }
@@ -181,7 +181,7 @@ FXbool FXInputDialog::getString(FXString& result,FXWindow* owner,const FXString&
 FXbool FXInputDialog::getString(FXString& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon){
   FXInputDialog inputdialog(app,caption,label,icon,INPUTDIALOG_STRING,0,0,0,0);
   inputdialog.setText(result);
-  if(inputdialog.execute()){
+  if(inputdialog.execute(PLACEMENT_SCREEN)){
     result=inputdialog.getText();
     return true;
     }
@@ -194,7 +194,7 @@ FXbool FXInputDialog::getInteger(FXint& result,FXWindow* owner,const FXString& c
   FXInputDialog inputdialog(owner,caption,label,icon,INPUTDIALOG_INTEGER,0,0,0,0);
   inputdialog.setLimits(lo,hi);
   inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi)));
-  if(inputdialog.execute()){
+  if(inputdialog.execute(PLACEMENT_OWNER)){
     result=inputdialog.getText().toInt();
     return true;
     }
@@ -207,7 +207,7 @@ FXbool FXInputDialog::getInteger(FXint& result,FXApp* app,const FXString& captio
   FXInputDialog inputdialog(app,caption,label,icon,INPUTDIALOG_INTEGER,0,0,0,0);
   inputdialog.setLimits(lo,hi);
   inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi)));
-  if(inputdialog.execute()){
+  if(inputdialog.execute(PLACEMENT_SCREEN)){
     result=inputdialog.getText().toInt();
     return true;
     }
@@ -220,7 +220,7 @@ FXbool FXInputDialog::getReal(FXdouble& result,FXWindow* owner,const FXString& c
   FXInputDialog inputdialog(owner,caption,label,icon,INPUTDIALOG_REAL,0,0,0,0);
   inputdialog.setLimits(lo,hi);
   inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi),10));
-  if(inputdialog.execute()){
+  if(inputdialog.execute(PLACEMENT_OWNER)){
     result=inputdialog.getText().toDouble();
     return true;
     }
@@ -233,7 +233,7 @@ FXbool FXInputDialog::getReal(FXdouble& result,FXApp* app,const FXString& captio
   FXInputDialog inputdialog(app,caption,label,icon,INPUTDIALOG_REAL,0,0,0,0);
   inputdialog.setLimits(lo,hi);
   inputdialog.setText(FXString::value(FXCLAMP(lo,result,hi),10));
-  if(inputdialog.execute()){
+  if(inputdialog.execute(PLACEMENT_SCREEN)){
     result=inputdialog.getText().toDouble();
     return true;
     }

@@ -123,32 +123,24 @@ public:
   /// Include given range into extent
   FXExtentd& include(const FXExtentd& ext);
 
-  /// Test if bounds overlap
-  friend FXAPI FXbool overlap(const FXExtentd& a,const FXExtentd& b);
-
   /// Get corner number 0..3
   FXVec2d corner(FXint c) const { return FXVec2d((&lower)[c&1].x, (&lower)[(c>>1)&1].y); }
-
-  /// Union of two boxes
-  friend FXAPI FXExtentd unite(const FXExtentd& a,const FXExtentd& b);
-
-  /// Intersection of two boxes
-  friend FXAPI FXExtentd intersect(const FXExtentd& a,const FXExtentd& b);
-
-  /// Save object to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXExtentd& ext);
-
-  /// Load object from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXExtentd& ext);
   };
 
 
+/// Test if bounds overlap
 extern FXAPI FXbool overlap(const FXExtentd& a,const FXExtentd& b);
 
+/// Union of two boxes
 extern FXAPI FXExtentd unite(const FXExtentd& a,const FXExtentd& b);
+
+/// Intersection of two boxes
 extern FXAPI FXExtentd intersect(const FXExtentd& a,const FXExtentd& b);
 
+/// Save object to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXExtentd& ext);
+
+/// Load object from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXExtentd& ext);
 
 }

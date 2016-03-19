@@ -48,7 +48,7 @@
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
 // Special empty string value
-#define EMPTY       ((FXchar*)&emptystring[1])
+#define EMPTY       ((FXchar*)(void*)&emptystring[1])
 
 using namespace FX;
 

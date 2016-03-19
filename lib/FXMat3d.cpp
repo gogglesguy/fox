@@ -62,6 +62,14 @@ FXMat3d::FXMat3d(const FXMat4d& other){
   }
 
 
+// Initialize matrix from array
+FXMat3d::FXMat3d(const FXdouble s[]){
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
+  }
+
+
 // Initialize matrix from scalar
 FXMat3d::FXMat3d(FXdouble w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w;
@@ -118,6 +126,15 @@ FXMat3d& FXMat3d::operator=(const FXMat4d& other){
   }
 
 
+// Assignment from array
+FXMat3d& FXMat3d::operator=(const FXdouble s[]){
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
+  return *this;
+  }
+
+
 // Assign from scalar
 FXMat3d& FXMat3d::operator=(FXdouble w){
   m[0][0]=w; m[0][1]=w; m[0][2]=w;
@@ -141,6 +158,15 @@ FXMat3d& FXMat3d::set(const FXMat4d& other){
   m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
   m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
   m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+  return *this;
+  }
+
+
+// Set value from array
+FXMat3d& FXMat3d::set(const FXdouble s[]){
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
   return *this;
   }
 

@@ -246,7 +246,7 @@ public:
   /// Return file list style
   FXuint getFileBoxStyle() const;
 
-  /// Change file selection mode
+  /// Change file selection mode; the default is SELECTFILE_ANY
   void setSelectMode(FXuint mode);
 
   /// Return file selection mode

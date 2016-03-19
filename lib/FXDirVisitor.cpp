@@ -32,6 +32,11 @@
 
 /*
   Notes:
+  - There should be three return value categories:
+      rv > 0      Proceed scanning.
+      rv = 0      Stop with scanning and return with 0.
+      rv < 0      Skip scanning current directory or file.
+  - Not all traversals are top-down.  Some might be upward.
 */
 
 
@@ -103,6 +108,26 @@ FXuint FXDirVisitor::traverse(const FXString& path){
   }
 
 
+// Handle directory
+FXuint FXDirVisitor::enter(const FXString& path){
+  FXTRACE((1,"enter(%s)\n",path.text()));
+  return 1;
+  }
+
+
+// Handle file
+FXuint FXDirVisitor::visit(const FXString& path){
+  FXTRACE((1,"visit(%s)\n",path.text()));
+  return 1;
+  }
+
+
+// Handle directory
+FXuint FXDirVisitor::leave(const FXString& path){
+  FXTRACE((1,"leave(%s)\n",path.text()));
+  return 1;
+  }
+  
 /*
 // Recursively visit files and directories
 FXint FXDirVisitor::traverse(const FXString& path,const FXString& pattern,FXuint flags){
@@ -149,25 +174,5 @@ FXint FXDirVisitor::traverse(const FXString& path,const FXString& pattern,FXuint
   }
 */
 
-
-// Handle directory
-FXuint FXDirVisitor::enter(const FXString& path){
-  FXTRACE((1,"enter(%s)\n",path.text()));
-  return 1;
-  }
-
-
-// Handle file
-FXuint FXDirVisitor::visit(const FXString& path){
-  FXTRACE((1,"visit(%s)\n",path.text()));
-  return 1;
-  }
-
-
-// Handle directory
-FXuint FXDirVisitor::leave(const FXString& path){
-  FXTRACE((1,"leave(%s)\n",path.text()));
-  return 1;
-  }
 
 }

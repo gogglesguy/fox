@@ -63,7 +63,7 @@ public:
 
   /// Change size of queue; return true if success
   FXbool setSize(FXuint sz);
-  
+
   /// Return size
   FXuint getSize() const;
 
@@ -72,10 +72,10 @@ public:
 
   /// Return head
   FXuint getHead() const;
-  
+
   /// Return tail
   FXuint getTail() const;
-  
+
   /// Check if queue is empty
   FXbool isEmpty() const;
 
@@ -141,10 +141,10 @@ public:
 
   /// Change job queue size, return true if success
   FXbool setSize(FXuint sz);
-  
+
   /// Return job queue size
   FXuint getSize() const;
-  
+
   /// Is pool running
   FXbool active();
 
@@ -171,7 +171,7 @@ public:
 
   /// Get expiration time
   FXTime getExpiration() const;
-  
+
   /**
   * Start the thread pool; the number of workers will
   * vary between min and max, depending on work-load.
@@ -188,7 +188,7 @@ public:
   /**
   * Wait until all jobs currently in the queue are finished.
   * Returns true if all worker threads have become idle, i.e. the
-  * queue is empty.  
+  * queue is empty.
   * If the thread pool has been stopped, it returns false.
   */
   FXbool wait();
@@ -201,16 +201,17 @@ public:
   void stop();
 
   /**
-  * Execute job on the next available worker thread.
-  * If no worker thread is available, check if the maximum number
-  * of worker threads has been reached already.  If less than the maximum
-  * number of workers is active, create a new worker and start it on the job.
-  * Otherwise, if the flag block=true, wait until a worker finishes its job
-  * and start it on the new job; if flag block=false, do not start the job at
-  * this time.
-  * Return false if the job could not be added to the job queue.
+  * Execute a job on the thread pool by entering it into the job queue.
+  * If no worker threads are available to process the job and the maximum number of
+  * threads has not yet been exceeded, a new worker thread will be started.
+  * Otherwise, wait for a timeout interval given by blocking for a spot in the job
+  * queue to become available.
+  * If a spot becomes available in the job queue within the timeout interval,
+  * add the job to the queue and return true.
+  * Return false if the thread pool wasn't running yet, if a new worker thread could not
+  * be created when desired, or the job could not be added within the given time interval.
   */
-  FXbool execute(FXRunnable *job,FXbool block=true);
+  FXbool execute(FXRunnable *job,FXTime blocking=forever);
 
   /**
   * Called by a (worker) thread to process jobs from the job queue.

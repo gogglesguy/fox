@@ -34,6 +34,8 @@
 #include <libkern/OSAtomic.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #else
 #include <pthread.h>
 #include <semaphore.h>
@@ -61,7 +63,7 @@
     to change the source a bit.
 
   - If you run into this, try to figure out sizeof(pthread_mutex_t) and
-    let me know about it (jeroen@fox-toolkit.org).
+    let me know about it (jeroen@fox-toolkit.com).
 
   - I do recommend running this in debug mode first time around on a
     new platform.
@@ -111,7 +113,7 @@ namespace FX {
 FXMutex::FXMutex(FXbool){
   // If this fails on your machine, determine what value
   // of sizeof(CRITICAL_SECTION) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(CRITICAL_SECTION)=%d\n",sizeof(CRITICAL_SECTION)));
   FXASSERT(sizeof(data)>=sizeof(CRITICAL_SECTION));
   InitializeCriticalSection((CRITICAL_SECTION*)data);
@@ -295,7 +297,7 @@ FXSemaphore::~FXSemaphore(){
 
 // Initialize condition
 FXCondition::FXCondition(){
-  // If this fails on your machine, notify jeroen@fox-toolkit.org!
+  // If this fails on your machine, notify jeroen@fox-toolkit.com!
   FXASSERT(sizeof(data)>=sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval));
   data[0]=(FXuval)CreateEvent(NULL,0,0,NULL);                   // Wakes one, autoreset
   data[1]=(FXuval)CreateEvent(NULL,1,0,NULL);                   // Wakes all, manual reset
@@ -382,7 +384,7 @@ struct RWLOCK {
 FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(RWLOCK) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
   FXASSERT(sizeof(data)>=sizeof(RWLOCK));
   InitializeCriticalSection(((RWLOCK*)data)->mutex);
@@ -860,7 +862,7 @@ FXMutex::FXMutex(FXbool recursive){
   pthread_mutexattr_t mutexatt;
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
   FXASSERT(sizeof(data)>=sizeof(pthread_mutex_t));
   pthread_mutexattr_init(&mutexatt);
@@ -972,7 +974,7 @@ FXSpinLock::~FXSpinLock(){
 FXSpinLock::FXSpinLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
   FXASSERT(sizeof(data)>=sizeof(OSSpinLock));
   data[0]=data[1]=data[2]=data[3]=0;
@@ -1019,7 +1021,7 @@ FXSpinLock::~FXSpinLock(){
 FXSpinLock::FXSpinLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_spinlock_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
   FXASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
   pthread_spin_init((pthread_spinlock_t*)(void*)data,PTHREAD_PROCESS_PRIVATE);
@@ -1068,7 +1070,7 @@ FXSpinLock::~FXSpinLock(){
 FXSemaphore::FXSemaphore(FXint initial){
   // If this fails on your machine, determine what value
   // of sizeof(sem_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
   FXASSERT(sizeof(data)>=sizeof(sem_t));
   sem_init((sem_t*)data,0,(unsigned int)initial);
@@ -1113,7 +1115,7 @@ FXSemaphore::~FXSemaphore(){
 FXCondition::FXCondition(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_cond_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
   FXASSERT(sizeof(data)>=sizeof(pthread_cond_t));
   pthread_cond_init((pthread_cond_t*)data,NULL);
@@ -1152,9 +1154,9 @@ FXbool FXCondition::wait(FXMutex& mtx,FXTime nsec){
       struct timespec ts;
       struct timeval tv;
       gettimeofday(&tv,NULL);
-      nsec/=1000;
-      ts.tv_src=tv.tv_sec+(tv.tv_usec+nsec)/1000000;
-      tv.tv_usec=(tv.tv_usec+nsec)%1000000;
+      tv.tv_usec*=1000;
+      ts.tv_sec=tv.tv_sec+(tv.tv_usec+nsec)/1000000000;
+      ts.tv_nsec=(tv.tv_usec+nsec)%1000000000;
       return pthread_cond_timedwait((pthread_cond_t*)data,(pthread_mutex_t*)mtx.data,&ts)==0;
 #endif
       }
@@ -1177,7 +1179,7 @@ FXCondition::~FXCondition(){
 FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
+  // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
   FXASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
 #ifdef __APPLE__
@@ -1293,7 +1295,7 @@ void FXThread::self(FXThread* t){
 
 
 // Return pointer to calling thread
-FXThread* FXThread::self(){  
+FXThread* FXThread::self(){
   return (FXThread*)FXThread::selfKey.get();
   }
 
@@ -1466,24 +1468,36 @@ FXThreadID FXThread::current(){
   }
 
 
+
 // Return number of processors
 FXint FXThread::processors(){
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(_SC_NPROCESSORS_ONLN)
   int result;
+  if((result=sysconf(_SC_NPROCESSORS_ONLN))>0){
+    return result;
+    }
+#elif defined(__IRIX__) && defined(_SC_NPROC_ONLN)
+  int result;
+  if((result=sysconf(_SC_NPROC_ONLN))>0){
+    return result;
+    }
+#elif defined(__APPLE__)
+  int result=1;
+  size_t len=sizeof(result);
+  if(sysctlbyname("hw.activecpu",&result,&len,NULL,0)!=-1){
+    return result;
+    }
+#elif defined(HW_NCPU)
+  int result=1;
   int mib[2]={CTL_HW,HW_NCPU};
   size_t len=sizeof(result);
-  if(sysctl(mib,2,&result,&len,NULL,NULL)!=-1){
+  if(sysctl(mib,2,&result,&len,NULL,0)!=-1){
     return result;
     }
 #elif defined(hpux) || defined(__hpux) || defined(_hpux)
   struct pst_dynamic psd;
   if(!pstat_getdynamic(&psd,sizeof(psd),(size_t)1,0)){
     return (int)psd.psd_proc_cnt;
-    }
-#elif defined(_SC_NPROCESSORS_ONLN)
-  FXint result;
-  if((result=sysconf(_SC_NPROCESSORS_ONLN))>0){
-    return result;
     }
 #endif
   return 1;

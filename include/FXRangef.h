@@ -145,35 +145,27 @@ public:
   /// Intersect box with ray u-v
   FXbool intersect(const FXVec3f& u,const FXVec3f& v);
 
-  /// Test if boxes a and b overlap
-  friend FXAPI FXbool overlap(const FXRangef& a,const FXRangef& b);
-
   /// Get corner number 0..7
   FXVec3f corner(FXint c) const { return FXVec3f((&lower)[c&1].x,(&lower)[(c>>1)&1].y,(&lower)[c>>2].z); }
 
   /// Transform range by 4x4 matrix
   FXRangef transform(const FXMat4f& mat) const;
-
-  /// Union of two boxes
-  friend FXAPI FXRangef unite(const FXRangef& a,const FXRangef& b);
-
-  /// Intersection of two boxes
-  friend FXAPI FXRangef intersect(const FXRangef& a,const FXRangef& b);
-
-  /// Save object to a stream
-  friend FXAPI FXStream& operator<<(FXStream& store,const FXRangef& bounds);
-
-  /// Load object from a stream
-  friend FXAPI FXStream& operator>>(FXStream& store,FXRangef& bounds);
   };
 
 
+/// Test if boxes a and b overlap
 extern FXAPI FXbool overlap(const FXRangef& a,const FXRangef& b);
 
+/// Union of two boxes
 extern FXAPI FXRangef unite(const FXRangef& a,const FXRangef& b);
+
+/// Intersection of two boxes
 extern FXAPI FXRangef intersect(const FXRangef& a,const FXRangef& b);
 
+/// Save object to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXRangef& bounds);
+
+/// Load object from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXRangef& bounds);
 
 }

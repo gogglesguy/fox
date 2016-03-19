@@ -68,9 +68,12 @@ FXint fxTraceLevel=-1;
 const FXuchar fxversion[3]={FOX_MAJOR,FOX_MINOR,FOX_LEVEL};
 
 
-// Thread-safe, linear congruential random number generator from Knuth & Lewis.
+// Thread-safe, xor-shifting random number generator (initial seed value must
+// be non-zero.  A suggested seed value is 2463534242.
 FXuint fxrandom(FXuint& seed){
-  seed=1664525UL*seed+1013904223UL;
+  seed^=(seed<<13);
+  seed^=(seed>>17);
+  seed^=(seed<<5);
   return seed;
   }
 
@@ -592,7 +595,6 @@ FXbool fxIsNan(FXfloat number){
 FXbool fxIsNan(FXdouble number){
   return (((DoubleStruct*)&number)->n.e==2047) && !((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
   }
-
 
 /*******************************************************************************/
 
