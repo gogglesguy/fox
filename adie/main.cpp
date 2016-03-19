@@ -24,115 +24,20 @@
 #include "Adie.h"
 #include "icons.h"
 
-/*
-  Note:
-*/
-
 
 /*******************************************************************************/
 
-// Print command line help
-void printusage(){
-  fprintf(stderr,"Usage: adie [options] files...\n");
-  fprintf(stderr,"  options:\n");
-  fprintf(stderr,"  -h, --help                          Print help.\n");
-  fprintf(stderr,"  -V, --version                       Print version number.\n");
-  fprintf(stderr,"  -v, --view                          View, don't edit file.\n");
-  fprintf(stderr,"  -e, --edit                          Edit file.\n");
-  fprintf(stderr,"  -g GEOMETRY, --geometry GEOMETRY    Specify window size.\n");
-  fprintf(stderr,"  -l NUM, --line NUM                  Jump to line number.\n");
-  fprintf(stderr,"  -m LANGUAGE, --mode LANGUAGE        Force language mode.\n");
-  fprintf(stderr,"  -t TAGS, --tags TAGS                Load tags file.\n");
-  }
-
-
 // Start the whole thing
 int main(int argc,char *argv[]){
-  TextWindow *window=NULL;
-  Syntax     *syntax=NULL;
-  FXchar     *tags=NULL;
-  FXbool      edit=true;
-  FXint       line=0;
-  FXString    file;
-  FXint       arg;
-  FXint       x,y,w,h,g;
+
+  // Make sure  we're linked against the right library version
+  if(fxversion[0]!=FOX_MAJOR || fxversion[1]!=FOX_MINOR || fxversion[2]!=FOX_LEVEL){
+    fxerror("FOX Library mismatch; expected version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL);
+    }
 
   // Make application
   Adie application("Adie");
 
-  // Open display
-  application.init(argc,argv);
-
-  // Make a tool tip
-  new FXToolTip(&application,0);
-
-  // Create it
-  application.create();
-
-  // Loop over args
-  for(arg=1; arg<argc; ++arg){
-
-    // Parse a few options
-    if(compare(argv[arg],"-v")==0 || compare(argv[arg],"--view")==0){
-      edit=false;
-      }
-    else if(compare(argv[arg],"-e")==0 || compare(argv[arg],"--edit")==0){
-      edit=true;
-      }
-    else if(compare(argv[arg],"-h")==0 || compare(argv[arg],"--help")==0){
-      printusage();
-      exit(0);
-      }
-    else if(compare(argv[arg],"-l")==0 || compare(argv[arg],"--line")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing line number argument.\n"); exit(1); }
-      sscanf(argv[arg],"%d",&line);
-      }
-    else if(compare(argv[arg],"-t")==0 || compare(argv[arg],"--tags")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing tags file argument.\n"); exit(1); }
-      tags=argv[arg];
-      }
-    else if(compare(argv[arg],"-m")==0 || compare(argv[arg],"--mode")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing language mode argument.\n"); exit(1); }
-      syntax=application.getSyntaxByName(argv[arg]);
-      }
-    else if(compare(argv[arg],"-g")==0 || compare(argv[arg],"--geometry")==0){
-      if(++arg>=argc){ fprintf(stderr,"Adie: missing geometry argument.\n"); exit(1); }
-      g=fxparsegeometry(argv[arg],x,y,w,h);
-      }
-    else if(compare(argv[arg],"-V")==0 || compare(argv[arg],"--version")==0){
-      fprintf(stdout,"Adie - ADvanced Interactive Editor %d.%d.%d.\nCopyright (C) 2000,2011 Jeroen van der Zijp.\n\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-      exit(0);
-      }
-
-    // Load the file
-    else{
-      file=FXPath::absolute(argv[arg]);
-      window=new TextWindow(&application);
-      window->create();
-      if(window->loadFile(file)){
-        window->readBookmarks(file);
-        window->readView(file);
-        window->setEditable(edit);
-        if(line) window->visitLine(line);
-        }
-      else{
-        window->setFilename(file);
-        window->setFilenameSet(true);
-        window->determineSyntax();
-        }
-      if(syntax) window->setSyntax(syntax);
-      }
-    }
-
-  // Make window, if none opened yet
-  if(!window){
-    window=new TextWindow(&application);
-    window->create();
-    if(syntax) window->setSyntax(syntax);
-    }
-
-  // Run
-  return application.run();
+  // Start application
+  return application.start(argc,argv);
   }
-
-

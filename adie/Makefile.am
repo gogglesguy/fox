@@ -15,6 +15,7 @@ man_MANS = adie.1
 
 ICONS  = \
 adie_gif.gif \
+backward_gif.gif \
 big_gif.gif \
 bookdel_gif.gif \
 booknext_gif.gif \
@@ -30,6 +31,7 @@ cut_gif.gif \
 delete_gif.gif \
 delimit_gif.gif \
 fonts_gif.gif \
+forward_gif.gif \
 help_gif.gif \
 indent_gif.gif \
 info_gif.gif \
@@ -66,6 +68,8 @@ Adie.h \
 Adie.cpp \
 Commands.cpp \
 Commands.h \
+FindInFiles.h \
+FindInFiles.cpp \
 help.h \
 help.cpp \
 HelpWindow.h \

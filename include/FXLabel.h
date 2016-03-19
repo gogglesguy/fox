@@ -57,7 +57,7 @@ class FXFont;
 * A label widget can be used to place a text and/or icon for
 * explanation purposes.  The text label may have an optional tooltip
 * and/or help string.  Icon and label are placed relative to the widget
-* using the justfication options, and relative to each other as determined
+* using the justification options, and relative to each other as determined
 * by the icon relationship options.  A large number of arrangements is
 * possible.
 */

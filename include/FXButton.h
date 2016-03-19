@@ -64,7 +64,7 @@ enum {
 * The option BUTTON_AUTOGRAY (BUTTON_AUTOHIDE) causes the button to be grayed
 * out (hidden) if its handler does not respond to the SEL_UPDATE message.
 * This is useful when messages are delegated, for example when using a
-* multiple document interface, where the ultimaye destination of a message
+* multiple document interface, where the ultimate destination of a message
 * can be changed.
 */
 class FXAPI FXButton : public FXLabel {

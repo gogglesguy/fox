@@ -1510,6 +1510,7 @@ void FXDCWindow::setFunction(FXFunction func){
       ::SetROP2((HDC)ctx,R2_MASKNOTPEN);
       break;
     case BLT_DST:                     // D := D
+      ::SetROP2((HDC)ctx,R2_NOP);
       break;
     case BLT_SRC_XOR_DST:             // D := S ^ D
       ::SetROP2((HDC)ctx,R2_XORPEN);

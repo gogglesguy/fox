@@ -29,6 +29,7 @@
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXElement.h"
+#include "FXException.h"
 #include "FXRex.h"
 #include "FXSize.h"
 #include "FXPoint.h"
@@ -2398,18 +2399,8 @@ void FXText::extractText(FXchar *text,FXint pos,FXint n) const {
 
 // Grab range of text
 void FXText::extractText(FXString& text,FXint pos,FXint n) const {
-  if(n<0 || pos<0 || length<pos+n){ fxerror("%s::extractText: bad argument.\n",getClassName()); }
-  FXASSERT(0<=n && 0<=pos && pos+n<=length);
-  if(pos+n<=gapstart){
-    text.append(buffer+pos,n);
-    }
-  else if(gapstart<=pos){
-    text.append(buffer+gapend-gapstart+pos,n);
-    }
-  else{
-    text.append(buffer+pos,gapstart-pos);
-    text.append(buffer+gapend,pos+n-gapstart);
-    }
+  text.length(n);
+  extractText(text.text(),pos,n);
   }
 
 
@@ -2434,20 +2425,8 @@ void FXText::extractStyle(FXchar *style,FXint pos,FXint n) const {
 
 // Grab range of style
 void FXText::extractStyle(FXString& style,FXint pos,FXint n) const {
-  if(n<0 || pos<0 || length<pos+n){ fxerror("%s::extractStyle: bad argument.\n",getClassName()); }
-  FXASSERT(0<=n && 0<=pos && pos+n<=length);
-  if(sbuffer){
-    if(pos+n<=gapstart){
-      style.append(sbuffer+pos,n);
-      }
-    else if(gapstart<=pos){
-      style.append(sbuffer+gapend-gapstart+pos,n);
-      }
-    else{
-      style.append(sbuffer+pos,gapstart-pos);
-      style.append(sbuffer+gapend,pos+n-gapstart);
-      }
-    }
+  style.length(n);
+  extractStyle(style.text(),pos,n);
   }
 
 
@@ -2466,8 +2445,7 @@ void FXText::getText(FXString& text) const {
 // We return a constant copy of the buffer
 FXString FXText::getText() const {
   FXString value;
-  value.append(buffer,gapstart);
-  value.append(buffer+gapend,length-gapstart);
+  extractText(value,0,getLength());
   return value;
   }
 
@@ -2475,16 +2453,7 @@ FXString FXText::getText() const {
 // Get selected text
 FXString FXText::getSelectedText() const {
   FXString value;
-  if(selendpos<=gapstart){
-    value.append(buffer+selstartpos,selendpos-selstartpos);
-    }
-  else if(gapstart<=selstartpos){
-    value.append(buffer+gapend-gapstart+selstartpos,selendpos-selstartpos);
-    }
-  else{
-    value.append(buffer+selstartpos,gapstart-selstartpos);
-    value.append(buffer+gapend,selendpos-gapstart);
-    }
+  extractText(value,selstartpos,selendpos-selstartpos);
   return value;
   }
 
@@ -4171,6 +4140,10 @@ long FXText::onKeyPress(FXObject*,FXSelector,void* ptr){
         if(!(event->state&CONTROLMASK)) goto ins;
       case KEY_F18:                               // Sun Paste key
         handle(this,FXSEL(SEL_COMMAND,ID_PASTE_SEL),NULL);
+        break;
+      case KEY_k:
+        if(!(event->state&CONTROLMASK)) goto ins;
+        handle(this,FXSEL(SEL_COMMAND,ID_DELETE_LINE),NULL);
         break;
       default:
 ins:    if((event->state&(CONTROLMASK|ALTMASK)) || ((FXuchar)event->text[0]<32)) return 0;

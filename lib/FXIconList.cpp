@@ -1171,10 +1171,9 @@ typedef FXint (*FXCompareFunc)(const FXString&,const FXString&,FXint);
 
 // Get item by name
 FXint FXIconList::findItem(const FXString& text,FXint start,FXuint flgs) const {
-  register FXCompareFunc comparefunc;
+  register FXCompareFunc comparefunc=(flgs&SEARCH_IGNORECASE) ? (FXCompareFunc)compcase : (FXCompareFunc)comp;
   register FXint index,len;
   if(0<items.no()){
-    comparefunc=(flgs&SEARCH_IGNORECASE) ? (FXCompareFunc)compcase : (FXCompareFunc)comp;
     len=(flgs&SEARCH_PREFIX)?text.length():2147483647;
     if(flgs&SEARCH_BACKWARD){
       if(start<0) start=items.no()-1;
@@ -1879,8 +1878,8 @@ FXint FXIconList::compareSection(const FXchar *p,const FXchar* q,FXint s){
   for(x=s; x && *p; x-=(*p++=='\t')){}
   for(x=s; x && *q; x-=(*q++=='\t')){}
   do{
-    c1=FXuchar(*p++);
-    c2=FXuchar(*q++);
+    c1=(FXuchar) *p++;
+    c2=(FXuchar) *q++;
     }
   while('\t'<c1 && (c1==c2));
   return c1-c2;
@@ -1893,14 +1892,8 @@ FXint FXIconList::compareSectionCase(const FXchar *p,const FXchar* q,FXint s){
   for(x=s; x && *p; x-=(*p++=='\t')){}
   for(x=s; x && *q; x-=(*q++=='\t')){}
   do{
-    if((*p & 0x80) && (*q & 0x80)){
-      c1=Unicode::toLower(wc(p)); p+=wclen(p);
-      c2=Unicode::toLower(wc(q)); q+=wclen(q);
-      }
-    else{
-      c1=Ascii::toLower(*p); p+=1;
-      c2=Ascii::toLower(*q); q+=1;
-      }
+    c1=Unicode::toLower(wc(p)); p=wcinc(p);
+    c2=Unicode::toLower(wc(q)); q=wcinc(q);
     }
   while('\t'<c1 && (c1==c2));
   return c1-c2;

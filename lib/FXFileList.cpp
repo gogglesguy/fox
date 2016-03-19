@@ -1498,21 +1498,44 @@ void FXFileList::listItems(FXbool force){
 
 /*******************************************************************************/
 
+// Set current filename
+void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
+  FXint index;
+  FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
+  if(!pathname.empty()){
+    setDirectory(FXPath::directory(pathname),notify);
+    if(0<=(index=findItem(FXPath::name(pathname)))){
+      setAnchorItem(index);
+      setCurrentItem(index,notify);
+      selectItem(index,notify);
+      makeItemVisible(index);
+      }
+    }
+  }
+#if 0
 
 // Set current filename
 void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
-    setDirectory(FXPath::directory(pathname));
-    FXint index=findItem(FXPath::name(pathname));
-    if(0<=index){
-      makeItemVisible(index);
+    FXint index;
+    FXString path=FXPath::absolute(pathname);
+    FXString folder=FXPath::directory(path);
+    FXString name=FXPath::name(path);
+    while(!FXPath::isTopDirectory(folder) && !FXStat::isDirectory(folder)){
+      folder=FXPath::upLevel(folder);
+      name=FXString::null;
+      }
+    setDirectory(folder,notify);
+    if(0<=(index=findItem(name))){      // FIXME should this select -1 if file does not exist?
       setAnchorItem(index);
       setCurrentItem(index,notify);
-      selectItem(index);
+      selectItem(index,notify);
+      makeItemVisible(index);
       }
     }
   }
+#endif
 
 
 // Get pathname to current file, if any
@@ -1543,21 +1566,23 @@ FXString *FXFileList::getSelectedFiles() const {
 
 
 // Set directory being displayed
-void FXFileList::setDirectory(const FXString& pathname){
+void FXFileList::setDirectory(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
-    FXString path=FXPath::absolute(directory,pathname);
-    while(!FXPath::isTopDirectory(path) && !FXPath::isShare(path) && !FXStat::isDirectory(path)){
+    FXString path=FXPath::absolute(pathname);
+    while(!FXPath::isTopDirectory(path) && !FXStat::isDirectory(path)){
       path=FXPath::upLevel(path);
       }
     if(directory!=path){
       directory=path;
-      clearItems(true);
+      clearItems(notify);
       counter=0;
       list=NULL;
       scan(true);
-      setCurrentItem(0);
-      makeItemVisible(0);
+      if(getNumItems()){
+        makeItemVisible(0);
+        setCurrentItem(0,notify);
+        }
       }
     }
   }

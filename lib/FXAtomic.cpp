@@ -78,6 +78,7 @@
 #define HAVE_INLINE_ASSEMBLY 1
 #endif
 
+
 using namespace FX;
 
 
@@ -142,7 +143,7 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
 // Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 #if defined(WIN32)
-  return InterlockedCompareExchange((LONG*)ptr,v,expect);
+  return InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
   __asm__ __volatile__("lock\n\t"
@@ -163,7 +164,7 @@ FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 // Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 #if defined(WIN32)
-  return (InterlockedCompareExchange((LONG*)ptr,v,expect)==expect);
+  return (InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect)==(LONG)expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"

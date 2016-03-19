@@ -1430,7 +1430,7 @@ void FXTable::extractText(FXchar*& text,FXint& size,FXint startrow,FXint endrow,
     nrs=strlen(rs);
 
     // Space for separators
-    sz=(endrow-startrow)*((endcol-startcol)*ncs+nrs);
+    sz=(endrow-startrow+1)*((endcol-startcol)*ncs+nrs);
 
     // Space for  each cell
     for(r=startrow; r<=endrow; r++){
@@ -1485,7 +1485,7 @@ void FXTable::extractText(FXString& text,FXint startrow,FXint endrow,FXint start
     nrs=strlen(rs);
 
     // Space for separators
-    sz=(endrow-startrow)*((endcol-startcol)*ncs+nrs);
+    sz=(endrow-startrow+1)*((endcol-startcol)*ncs+nrs);
 
     // Space for  each cell
     for(r=startrow; r<=endrow; r++){
@@ -2263,8 +2263,8 @@ long FXTable::onCmdDeleteSel(FXObject*,FXSelector,void*){
        more to the right, and stuff below block more to the bottom by
        inserting as many columns/rows as needed [but do not remove
        rows if new data from clipboard is smaller.
-       
-       
+
+
   probably need pasteClipboard() and pasteSelection() etc.
   like FXText has.  v
 */

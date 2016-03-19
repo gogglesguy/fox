@@ -321,7 +321,6 @@ long FXFileSelector::onCmdItemSelected(FXObject*,FXSelector,void* ptr){
     if(!filebox->isItemDirectory(index)){
       text=filebox->getItemFilename(index);
       filename->setText(text);
-      FXTRACE((1,"text=%s\n",text.text()));
       }
     }
   return 1;
@@ -405,8 +404,8 @@ long FXFileSelector::onCmdAccept(FXObject*,FXSelector,void*){
         }
 
       // Hop over to that directory
-      dirbox->setDirectory(path);
       filebox->setDirectory(path);
+      dirbox->setDirectory(path);
       filename->setText(FXString::null);
       return 1;
       }
@@ -444,8 +443,8 @@ long FXFileSelector::onCmdAccept(FXObject*,FXSelector,void*){
       }
 
     // Switch as far as we could go
-    dirbox->setDirectory(dir);
     filebox->setDirectory(dir);
+    dirbox->setDirectory(dir);
 
     // Put the tail end back for further editing
     FXASSERT(dir.length()<=path.length());
@@ -521,7 +520,7 @@ long FXFileSelector::onCmdDirTree(FXObject*,FXSelector,void* ptr){
     if(selectmode==SELECTFILE_DIRECTORY) filename->setText(FXString::null);
     }
   else{
-    dirbox->setDirectory(getDirectory());
+    dirbox->setDirectory(filebox->getDirectory());
     }
   return 1;
   }
@@ -529,7 +528,7 @@ long FXFileSelector::onCmdDirTree(FXObject*,FXSelector,void* ptr){
 
 // Create new directory
 long FXFileSelector::onCmdNew(FXObject*,FXSelector,void*){
-  FXString dir=filebox->getDirectory();
+  FXString dir=getDirectory();
   FXString name=tr("Folder");
   FXGIFIcon newdirectoryicon(getApp(),bigfolder);
   if(FXInputDialog::getString(name,this,tr("Create New Directory"),tr("Create new directory with name: "),&newdirectoryicon)){
@@ -877,7 +876,7 @@ long FXFileSelector::onCmdFilter(FXObject*,FXSelector,void* ptr){
 void FXFileSelector::setDirectory(const FXString& path){
   FXString abspath=FXPath::absolute(path);
   filebox->setDirectory(abspath);
-  dirbox->setDirectory(abspath);
+  dirbox->setDirectory(filebox->getDirectory());
   if(selectmode!=SELECTFILE_ANY){
     filename->setText(FXString::null);
     }
@@ -894,8 +893,8 @@ FXString FXFileSelector::getDirectory() const {
 void FXFileSelector::setFilename(const FXString& path){
   FXString abspath=FXPath::absolute(path);
   filebox->setCurrentFile(abspath);
-  dirbox->setDirectory(FXPath::directory(abspath));
-  filename->setText(FXPath::name(abspath));
+  dirbox->setDirectory(filebox->getDirectory());
+  filename->setText(FXPath::relative(getDirectory(),abspath));
   }
 
 

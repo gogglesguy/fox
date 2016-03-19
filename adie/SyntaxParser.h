@@ -25,16 +25,14 @@
 // Parser for syntax file
 class SyntaxParser {
 private:
+  const FXchar *from;           // Source of text being parsed
   const FXchar *head;           // Start of token
   const FXchar *tail;           // End of token+1
   FXuint        token;          // Token type
   FXint         line;           // Line number
 public:
   FXuint gettok();
-  FXbool parseInteger(FXint& value);
   FXbool parseString(FXString& value);
-  FXbool parseRegex(FXString& value);
-  FXbool parseColor(FXColor& value);
   FXbool parseRule(Syntax *syntax,FXint parent);
   FXbool parseLanguage(SyntaxList& syntaxes);
   FXbool parse(SyntaxList& syntaxes);
@@ -60,16 +58,16 @@ public:
 public:
 
   // Construct parser
-  SyntaxParser(const FXchar* src);
+  SyntaxParser(const FXchar* pat,const FXchar* frm);
 
   // Parse string and return syntaxes found in it; return false if problem.
-  static FXbool parse(const FXchar* string,SyntaxList& syntaxes);
+  static FXbool parse(SyntaxList& syntaxes,const FXchar* patterns);
 
   // Parse string and return syntaxes found in it; return false if problem.
-  static FXbool parse(const FXString& string,SyntaxList& syntaxes);
+  static FXbool parse(SyntaxList& syntaxes,const FXString& patterns);
 
   // Parse file and return syntaxes found in it; return false if problem.
-  static FXbool parseFile(const FXString& filename,SyntaxList& syntaxes);
+  static FXbool parseFile(SyntaxList& syntaxes,const FXString& filename);
 
   // Destroy parser
  ~SyntaxParser();

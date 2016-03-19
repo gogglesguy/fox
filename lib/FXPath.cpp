@@ -1255,23 +1255,7 @@ FXString FXPath::dequote(const FXString& file){
 
 #endif
 
-
-/*
-FIXME
-  NameOnly
-  NoEscape
-  CaseFold
-  DotFile
-  DirName
-
-    PathName   = 1,        /// No wildcard can ever match "/'
-    NoEscape   = 2,        /// Backslashes don't quote special chars
-    DotFile    = 4,        /// Leading "." is matched only explicitly
-    LeadDir    = 8,        /// Ignore "/..." after a match
-    CaseFold   = 16        /// Compare without regard to case
-
-Need to update to match UTF-8
-*/
+// FIXME need utf8 version
 
 // If folding case, make lower case
 #define FOLD(c) ((flags&FXPath::CaseFold)?Ascii::toLower(c):(c))
@@ -1288,14 +1272,14 @@ static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
     switch(c){
       case '?':
         if(*s=='\0') return false;
-        if((flags&FXPath::PathName) && ISPATHSEP(*s)) return false;
-        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
+        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
         s++;
         break;
       case '*':
         c=*p;
         while(c=='*') c=*++p;
-        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
         if(c=='\0'){    // Optimize for case of trailing '*'
           if(flags&FXPath::PathName){ for(r=s; *r; r++){ if(ISPATHSEP(*r)) return false; } }
           return true;
@@ -1307,7 +1291,7 @@ static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
         return true;
       case '[':
         if(*s=='\0') return false;
-        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
         cc=FOLD(*s);
         neg=((*p=='!') || (*p=='^'));
         if(neg) p++;

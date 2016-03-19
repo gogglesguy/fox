@@ -168,13 +168,16 @@ FXint FXFileDialog::getCurrentPattern() const {
   return filebox->getCurrentPattern();
   }
 
-FXString FXFileDialog::getPatternText(FXint patno) const {
-  return filebox->getPatternText(patno);
+
+// Change pattern text for pattern number
+void FXFileDialog::setPatternText(FXint patno,const FXString& text){
+  filebox->setPatternText(patno,text);
   }
 
 
-void FXFileDialog::setPatternText(FXint patno,const FXString& text){
-  filebox->setPatternText(patno,text);
+// Get pattern text for given pattern number
+FXString FXFileDialog::getPatternText(FXint patno) const {
+  return filebox->getPatternText(patno);
   }
 
 

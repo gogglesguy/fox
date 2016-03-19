@@ -303,9 +303,6 @@ void FXVisual::setuptruecolor(){
   register FXuint i,c,d,r,g,b;
   register FXdouble gamma;
 
-// FIXME alpha mask: set as ~(redmask|greenmask|bluemask)
-// FIXME set to all 1-s (0xFFFFF....FF).
-
   // Get gamma
   gamma=getApp()->reg().readRealEntry("SETTINGS","displaygamma",1.0);
 
@@ -335,9 +332,6 @@ void FXVisual::setuptruecolor(){
       rpix[d][i]=alphamask | (r << redshift);           // Unused (alpha) bits are set to 1
       gpix[d][i]=alphamask | (g << greenshift);
       bpix[d][i]=alphamask | (b << blueshift);
-//      rpix[d][i]=r << redshift;
-//      gpix[d][i]=g << greenshift;
-//      bpix[d][i]=b << blueshift;
       }
     }
 

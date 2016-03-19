@@ -159,8 +159,8 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	fxpcxio.lo fxpngio.lo fxppmio.lo fxprintf.lo fxpriv.lo \
 	fxpsio.lo fxrasio.lo fxrgbio.lo fxscanf.lo fxstrtoll.lo \
 	fxstrtoull.lo fxstrtod.lo fxtargaio.lo fxtifio.lo fxunicode.lo \
-	fxutils.lo fxwuquantize.lo fxxbmio.lo fxxpmio.lo icons.lo \
-	$(am__objects_2) $(am__objects_2)
+	fxutils.lo fxwebpio.lo fxwuquantize.lo fxxbmio.lo fxxpmio.lo \
+	icons.lo $(am__objects_2) $(am__objects_2)
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 libFOX_1_7_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -400,6 +400,7 @@ bignetdrive.gif \
 bignethood.gif \
 bookset.gif \
 bookclr.gif \
+clearentry.gif \
 cmymode.gif \
 dialmode.gif \
 dirupicon.gif \
@@ -799,6 +800,7 @@ fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwebpio.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
@@ -1231,6 +1233,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxtifio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxunicode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxutils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxwebpio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxwuquantize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxxbmio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxxpmio.Plo@am__quote@

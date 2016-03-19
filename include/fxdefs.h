@@ -189,14 +189,16 @@ enum FXExponent {
 
 /// Search modes for search/replace dialogs
 enum {
-  SEARCH_FORWARD      = 0,    /// Search forward (default)
-  SEARCH_BACKWARD     = 1,    /// Search backward
-  SEARCH_NOWRAP       = 0,    /// Don't wrap (default)
-  SEARCH_WRAP         = 2,    /// Wrap around to start
-  SEARCH_EXACT        = 0,    /// Exact match (default)
-  SEARCH_IGNORECASE   = 4,    /// Ignore case
-  SEARCH_REGEX        = 8,    /// Regular expression match
-  SEARCH_PREFIX       = 16    /// Prefix of subject string
+  SEARCH_FORWARD    = 0,                            /// Search forward (default)
+  SEARCH_BACKWARD   = 1,                            /// Search backward
+  SEARCH_NOWRAP     = 0,                            /// Don't wrap (default)
+  SEARCH_WRAP       = 2,                            /// Wrap around to start
+  SEARCH_EXACT      = 0,                            /// Exact match (default)
+  SEARCH_IGNORECASE = 4,                            /// Ignore case
+  SEARCH_REGEX      = 8,                            /// Regular expression match
+  SEARCH_PREFIX     = 16,                           /// Prefix of subject string
+  SEARCH_SUFFIX     = 32,                           /// Suffix of subject string
+  SEARCH_CONTAINS   = (SEARCH_PREFIX|SEARCH_SUFFIX) /// Contained in subject string
   };
 
 

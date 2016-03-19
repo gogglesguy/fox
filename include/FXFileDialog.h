@@ -97,11 +97,11 @@ public:
   /// Return current pattern number
   FXint getCurrentPattern() const;
 
-  /// Get pattern text for given pattern number
-  FXString getPatternText(FXint patno) const;
-
   /// Change pattern text for pattern number
   void setPatternText(FXint patno,const FXString& text);
+
+  /// Get pattern text for given pattern number
+  FXString getPatternText(FXint patno) const;
 
   /// Return number of patterns
   FXint getNumPatterns() const;

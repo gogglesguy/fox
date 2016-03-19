@@ -1515,6 +1515,48 @@ FXString nameFromColor(FXColor color){
   }
 
 
+// Blend source color over background color
+FXColor blendOverBackground(FXColor back,FXColor clr){
+  register FXint as=FXALPHAVAL(clr);
+  register FXint rb=FXREDVAL(back);
+  register FXint gb=FXGREENVAL(back);
+  register FXint bb=FXBLUEVAL(back);
+  register FXint rs=(FXREDVAL(clr)-rb)*as;
+  register FXint gs=(FXGREENVAL(clr)-gb)*as;
+  register FXint bs=(FXBLUEVAL(clr)-bb)*as;
+  rb+=((rs+(rs>>8)+128)>>8);
+  gb+=((gs+(gs>>8)+128)>>8);
+  bb+=((gs+(bs>>8)+128)>>8);
+  return FXRGB(rb,gb,bb);
+  }
+  
+  
+// Blend source color over black background color
+FXColor blendOverBlack(FXColor clr){
+  register FXint as=FXALPHAVAL(clr);
+  register FXint rs=FXREDVAL(clr)*as;
+  register FXint gs=FXGREENVAL(clr)*as;
+  register FXint bs=FXBLUEVAL(clr)*as;
+  register FXint rd=((rs+(rs>>8)+128)>>8);
+  register FXint gd=((gs+(gs>>8)+128)>>8);
+  register FXint bd=((bs+(bs>>8)+128)>>8);
+  return FXRGB(rd,gd,bd);
+  }
+
+
+// Blend source color over white background color
+FXColor blendOverWhite(FXColor clr){
+  register FXint as=FXALPHAVAL(clr);
+  register FXint rs=(FXREDVAL(clr)-255)*as;
+  register FXint gs=(FXGREENVAL(clr)-255)*as;
+  register FXint bs=(FXBLUEVAL(clr)-255)*as;
+  register FXint rd=255+((rs+(rs>>8)+128)>>8);
+  register FXint gd=255+((gs+(gs>>8)+128)>>8);
+  register FXint bd=255+((bs+(bs>>8)+128)>>8);
+  return FXRGB(rd,gd,bd);
+  }
+
+
 // Blend color src toward color dst by a given percentage
 FXColor makeBlendColor(FXColor src,FXColor dst,FXint percent){
   register FXuint r,g,b,tnecrep=100-percent;

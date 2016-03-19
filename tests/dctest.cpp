@@ -1065,7 +1065,7 @@ long DCTestWindow::onCmdEraseColor(FXObject*,FXSelector,void* ptr){
 
 // Update Erase Color
 long DCTestWindow::onUpdEraseColor(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuint)erasecolor);
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)erasecolor);
   return 1;
   }
 
@@ -1082,7 +1082,7 @@ long DCTestWindow::onCmdForeColor(FXObject*,FXSelector,void* ptr){
 
 // Update Foreground Color
 long DCTestWindow::onUpdForeColor(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuint)forecolor);
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)forecolor);
   return 1;
   }
 
@@ -1098,7 +1098,7 @@ long DCTestWindow::onCmdBackColor(FXObject*,FXSelector,void* ptr){
 
 // Update Back Color
 long DCTestWindow::onUpdBackColor(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuint)backcolor);
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)backcolor);
   return 1;
   }
 

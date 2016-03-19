@@ -25,16 +25,7 @@
 
 /*
   Notes:
-  - The is the new, more strict parser for the syntax coloring files.
-  - New feature is DefaultRule.  The default rule matches all text, so 
-    is typically used as toplevel rule to contain the other rules.
-  - Anything not colored by the regular subrules is colored by the
-    DefaultRule.
-  - Use of DefaultRule is actually optional; there already is a DefaultRule
-    created automatically, corresponding to the fallback style (default-style).
-  - A DefaultRule is used in a language style to override the editor's default
-    setting with some custom coloring scheme; this will override the editor's
-    normal style settings.  
+  - Simple recursive descent parser for syntac expression language.
   - Inside string, '\' escapes only a '"'.  Otherwise it stands for itself;
     for instance "\"quoted\"" means "quoted" but "line\n" means line\n, not
     line<NL>.  This is to keep patterns moderately sane and avoid multiple
@@ -45,7 +36,7 @@
 
 
 // Initialize parser
-SyntaxParser::SyntaxParser(const FXchar* src):head(src),tail(src),token(TK_END),line(1){
+SyntaxParser::SyntaxParser(const FXchar* pat,const FXchar* frm):from(frm),head(pat),tail(pat),token(TK_END),line(1){
   }
 
 
@@ -91,7 +82,7 @@ FXuint SyntaxParser::gettok(){
       while(Ascii::isAlphaNumeric(*tail)){
         tok=((tok<<5)+tok) ^ (FXuchar)*tail++;
         }
-      FXTRACE((20,"hash(%s) = %u\n",FXString(head,tail-head).text(),tok));
+      //FXTRACE((110,"hash(%s) = %u\n",FXString(head,tail-head).text(),tok));
       return tok;
       }
     return TK_ERROR;                    // Error
@@ -101,74 +92,81 @@ FXuint SyntaxParser::gettok(){
   }
 
 
-// Parse integer value
-FXbool SyntaxParser::parseInteger(FXint& value){
-  if(token!=TK_INTEGER){ fxwarning("%d: error: expected integer.\n",line); return false; }
-  value=strtol(head,NULL,0);
-  token=gettok();
-  return true;
-  }
-
-
-// Parse (escaped) string value
-FXbool SyntaxParser::parseString(FXString& value){
-  if(token!=TK_STRING){ fxwarning("%d: error: expected string.\n",line); return false; }
-  value.assign(head+1,tail-head-2);
-  value.substitute("\\\"","\"",true);
-  token=gettok();
-  return true;
-  }
-
-
-// Parse color
-FXbool SyntaxParser::parseColor(FXColor& value){
-  FXString colorname;
-  if(!parseString(colorname)) return false;
-  value=colorFromName(colorname);
-  if(!value){ fxwarning("%d: error: unkown color name.\n",line); return false; }
-  return true;
-  }
-
-
-// Parse (escaped) string value and check its syntax
-FXbool SyntaxParser::parseRegex(FXString& value){
-  FXRex::Error error;
-  FXRex expression;
-  if(!parseString(value)) return false;
-  error=expression.parse(value,FXRex::Syntax);
-  if(error){ fxwarning("%d: error: %s.\n",line,FXRex::getError(error)); return false; }
-  return true;
-  }
-
-
 // Parse rule and sub rules
 FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
   FXString name,openpat,clospat,stoppat;
+  FXRex::Error error;
+  FXRex regex;
   FXint index;
   if(token==TK_RULE){
     token=gettok();
 
     // Rule name
-    if(!parseString(name)) return false;
+    if(token!=TK_STRING){
+      fxwarning("%s:%d: error: expected 'rule' <name>.\n",from,line);
+      return false;
+      }
+    name.assign(head+1,tail-head-2);
+    token=gettok();
 
     // Parse various features
     while(1){
       switch(token){
         case TK_PATTERN:                // Simple pattern
           token=gettok();
-          if(!parseRegex(openpat)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'pattern' <regex>.\n",from,line);
+            return false;
+            }
+          openpat.assign(head+1,tail-head-2);
+          openpat.substitute("\\\"","\"",true);
+          if((error=regex.parse(openpat,FXRex::Syntax))!=FXRex::ErrOK){
+            fxwarning("%s:%d: bad pattern: %s.\n",from,line,FXRex::getError(error));
+            return false;
+            }
+          token=gettok();
           continue;
         case TK_OPENPATTERN:            // Open pattern
           token=gettok();
-          if(!parseRegex(openpat)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'openpattern' <regex>.\n",from,line);
+            return false;
+            }
+          openpat.assign(head+1,tail-head-2);
+          openpat.substitute("\\\"","\"",true);
+          if((error=regex.parse(openpat,FXRex::Syntax))!=FXRex::ErrOK){
+            fxwarning("%s:%d: bad openpattern: %s.\n",from,line,FXRex::getError(error));
+            return false;
+            }
+          token=gettok();
           continue;
         case TK_CLOSEPATTERN:           // Close pattern
           token=gettok();
-          if(!parseRegex(clospat)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'closepattern' <regex>.\n",from,line);
+            return false;
+            }
+          clospat.assign(head+1,tail-head-2);
+          clospat.substitute("\\\"","\"",true);
+          if((error=regex.parse(clospat,FXRex::Syntax))!=FXRex::ErrOK){
+            fxwarning("%s:%d: bad closepattern: %s.\n",from,line,FXRex::getError(error));
+            return false;
+            }
+          token=gettok();
           continue;
         case TK_STOPPATTERN:            // Stop pattern
           token=gettok();
-          if(!parseRegex(stoppat)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'stoppattern' <regex>.\n",from,line);
+            return false;
+            }
+          stoppat.assign(head+1,tail-head-2);
+          stoppat.substitute("\\\"","\"",true);
+          if((error=regex.parse(stoppat,FXRex::Syntax))!=FXRex::ErrOK){
+            fxwarning("%s:%d: bad stoppattern: %s.\n",from,line,FXRex::getError(error));
+            return false;
+            }
+          token=gettok();
           continue;
         }
       break;
@@ -194,7 +192,10 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
       }
 
     // Check end
-    if(token!=TK_END){ fxwarning("%d: error: expected 'end'.\n",line); return false; }
+    if(token!=TK_END){
+      fxwarning("%s:%d: error: expected 'end'.\n",from,line);
+      return false;
+      }
     token=gettok();
     return true;
     }
@@ -204,40 +205,76 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
 
 // Parse language
 FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
-  FXString name,filesmatch,contentsmatch,delimiters;
-  FXint    contextlines=1;
-  FXint    contextchars=1;
-  Syntax  *syntax;
+  FXString  delimiters=FXText::textDelimiters;
+  FXString  contentsmatch;
+  FXString  filesmatch;
+  FXString  name;
+  FXint     contextlines=0;
+  FXint     contextchars=0;
+  Syntax   *syntax;
 
   // Expect language
   if(token==TK_LANGUAGE){
     token=gettok();
 
     // Language name
-    if(!parseString(name)) return false;
+    if(token!=TK_STRING){
+      fxwarning("%s:%d: error: expected 'language' <name>.\n",from,line);
+      return false;
+      }
+    name.assign(head+1,tail-head-2);
+    token=gettok();
 
     // Parse various features
     while(1){
       switch(token){
         case TK_FILESMATCH:             // File extensions
           token=gettok();
-          if(!parseString(filesmatch)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'filesmatch' <wildcard>.\n",from,line);
+            return false;
+            }
+          filesmatch.assign(head+1,tail-head-2);
+          filesmatch.substitute("\\\"","\"",true);
+          token=gettok();
           continue;
         case TK_CONTENTSMATCH:          // File contents
           token=gettok();
-          if(!parseString(contentsmatch)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'contentsmatch' <regex>.\n",from,line);
+            return false;
+            }
+          contentsmatch.assign(head+1,tail-head-2);
+          contentsmatch.substitute("\\\"","\"",true);
+          token=gettok();
           continue;
         case TK_DELIMITERS:             // Word delimiters
           token=gettok();
-          if(!parseString(delimiters)) return false;
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'delimiters' <characters>.\n",from,line);
+            return false;
+            }
+          delimiters.assign(head+1,tail-head-2);
+          delimiters.substitute("\\\"","\"",true);
+          token=gettok();
           continue;
         case TK_CONTEXTLINES:           // Context lines
           token=gettok();
-          if(!parseInteger(contextlines))  return false;
+          if(token!=TK_INTEGER){
+            fxwarning("%s:%d: error: expected 'contextlines' <number>.\n",from,line);
+            return false;
+            }
+          contextlines=strtol(head,NULL,0);
+          token=gettok();
           continue;
         case TK_CONTEXTCHARS:           // Context chars
           token=gettok();
-          if(!parseInteger(contextchars))  return false;
+          if(token!=TK_INTEGER){
+            fxwarning("%s:%d: error: expected 'contextchars' <number>.\n",from,line);
+            return false;
+            }
+          contextchars=strtol(head,NULL,0);
+          token=gettok();
           continue;
         }
       break;
@@ -260,7 +297,10 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
       }
 
     // Check end
-    if(token!=TK_END){ fxwarning("%d: error: expected 'end'.\n",line); return false; }
+    if(token!=TK_END){
+      fxwarning("%s:%d: error: expected 'end'.\n",from,line);
+      return false;
+      }
     token=gettok();
     return true;
     }
@@ -279,27 +319,28 @@ FXbool SyntaxParser::parse(SyntaxList& syntaxes){
 
 
 // Parse string and return syntaxes found in it; return false if problem.
-FXbool SyntaxParser::parse(const FXchar* string,SyntaxList& syntaxes){
-  SyntaxParser parser(string);
+FXbool SyntaxParser::parse(SyntaxList& syntaxes,const FXchar* patterns){
+  SyntaxParser parser(patterns,"Syntax");
   return parser.parse(syntaxes);
   }
 
 
 // Parse string and return syntaxes found in it; return false if problem.
-FXbool SyntaxParser::parse(const FXString& string,SyntaxList& syntaxes){
-  return parse(string.text(),syntaxes);
+FXbool SyntaxParser::parse(SyntaxList& syntaxes,const FXString& patterns){
+  return parse(syntaxes,patterns.text());
   }
 
 
 // Parse file and return syntaxes found in it; return false if problem.
-FXbool SyntaxParser::parseFile(const FXString& filename,SyntaxList& syntaxes){
+FXbool SyntaxParser::parseFile(SyntaxList& syntaxes,const FXString& filename){
   FXFile file(filename,FXIO::Reading);
   FXTRACE((10,"SyntaxParser::parseFile(%s)\n",filename.text()));
   if(file.isOpen()){
-    FXString string;
-    string.length(file.size());
-    if(file.readBlock(string.text(),string.length())==string.length()){
-      return parse(string,syntaxes);
+    FXString patterns;
+    patterns.length(file.size());
+    if(file.readBlock(patterns.text(),patterns.length())==patterns.length()){
+      SyntaxParser parser(patterns.text(),filename.text());
+      return parser.parse(syntaxes);
       }
     }
   return false;

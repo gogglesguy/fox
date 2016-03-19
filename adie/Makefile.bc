@@ -45,6 +45,7 @@ Preferences.obj \
 Syntax.obj \
 SyntaxParser.obj \
 TextWindow.obj \
+FindInFiles.obj \
 main.obj
 
 ICONS = \
@@ -56,6 +57,7 @@ bookprev_gif.gif \
 bookset_gif.gif \
 browser.gif \
 capitalize.gif \
+cleartext_gif.gif \
 close_gif.gif \
 colors_gif.gif \
 config_gif.gif \

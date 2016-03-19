@@ -745,7 +745,7 @@ void FXScrollBar::drawLeftArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,F
   points[1].x=x+ah;
   points[1].y=y+ab-1;
   points[2].x=x;
-  points[2].y=y+(ab>>1);
+  points[2].y=y+ah;
   dc.setForeground(arrowColor);
   dc.fillPolygon(points,3);
   }
@@ -765,7 +765,7 @@ void FXScrollBar::drawRightArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,
   points[1].x=x;
   points[1].y=y+ab-1;
   points[2].x=x+ah;
-  points[2].y=y+(ab>>1);
+  points[2].y=y+ah;
   dc.setForeground(arrowColor);
   dc.fillPolygon(points,3);
   }
@@ -780,7 +780,7 @@ void FXScrollBar::drawUpArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXb
   x=x+((w-ab)>>1);
   y=y+((h-ah)>>1);
   if(down){ ++x; ++y; }
-  points[0].x=x+(ab>>1);
+  points[0].x=x+ah;
   points[0].y=y-1;
   points[1].x=x;
   points[1].y=y+ah;
@@ -804,7 +804,7 @@ void FXScrollBar::drawDownArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,F
   points[0].y=y;
   points[1].x=x+ab-1;
   points[1].y=y;
-  points[2].x=x+(ab>>1);
+  points[2].x=x+ah;
   points[2].y=y+ah;
   dc.setForeground(arrowColor);
   dc.fillPolygon(points,3);

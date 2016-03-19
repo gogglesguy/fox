@@ -32,7 +32,7 @@ class Preferences : public FXDialogBox {
   FXDECLARE(Preferences)
 protected:
   FXText          *filepattext;
-  FXList          *stylelist;
+  FXMatrix        *stylemat;
   FXTextField     *searchtext;
   FXTextField     *syntaxtext;
   FXIcon          *pal;
@@ -57,18 +57,6 @@ public:
 
   // Get filename patterns
   FXString getPatterns() const;
-
-  // Set search paths
-  void setSearchPaths(const FXString& paths);
-
-  // Get search paths
-  FXString getSearchPaths() const;
-
-  // Set syntax file paths
-  void setSyntaxPaths(const FXString& paths);
-
-  // Get syntax file paths
-  FXString getSyntaxPaths() const;
 
   // Set language syntax
   void setSyntax(Syntax* syn);

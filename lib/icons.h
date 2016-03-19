@@ -32,6 +32,8 @@ extern const unsigned char bookset[];
 
 extern const unsigned char bookclr[];
 
+extern const unsigned char clearentry[];
+
 extern const unsigned char cmymode[];
 
 extern const unsigned char dialmode[];

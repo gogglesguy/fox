@@ -66,7 +66,7 @@ private:
   FXDirBox &operator=(const FXDirBox&);
 public:
   long onTreeChanged(FXObject*,FXSelector,void*);
-  long onTreeClicked(FXObject*,FXSelector,void*);
+  long onTreeCommand(FXObject*,FXSelector,void*);
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetStringValue(FXObject*,FXSelector,void*);
   long onCmdGetStringValue(FXObject*,FXSelector,void*);

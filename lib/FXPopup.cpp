@@ -50,6 +50,10 @@
     a popup menu just to get a single choice value back.
   - Do not assume root window is at (0,0); multi-monitor machines may
     have secondary monitor anywhere relative to primary display.
+  - If any child is resized due to GUI update, and FXPopup is in 
+    POPUP_SHRINKWRAP mode, ID_LAYOUT causes resize() of the popup it
+    self as well as layout() of its interior.  For normal shell windows
+    only layout() is called.
 */
 
 
@@ -85,6 +89,7 @@ FXDEFMAP(FXPopup) FXPopupMap[]={
   FXMAPFUNC(SEL_KEYPRESS,0,FXPopup::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXPopup::onKeyRelease),
   FXMAPFUNC(SEL_UNGRABBED,0,FXPopup::onUngrabbed),
+  FXMAPFUNC(SEL_CHORE,FXPopup::ID_LAYOUT,FXPopup::onLayout),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNPOST,FXPopup::onCmdUnpost),
   FXMAPFUNCS(SEL_COMMAND,FXPopup::ID_CHOICE,FXPopup::ID_CHOICE+999,FXPopup::onCmdChoice),
   };
@@ -567,6 +572,18 @@ long FXPopup::onMap(FXObject* sender,FXSelector sel,void* ptr){
     if(getGrabOwner()->grabbed()) getGrabOwner()->ungrab();
     }
   return 1;
+  }
+
+
+// Perform layout; return 0 because no GUI update is needed
+long FXPopup::onLayout(FXObject*,FXSelector,void*){
+  if(getShrinkWrap()){
+    resize(getDefaultWidth(),getDefaultHeight());
+    }
+  else{
+    layout();
+    }
+  return 0;
   }
 
 

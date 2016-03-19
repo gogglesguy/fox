@@ -193,16 +193,16 @@ public:
   * After setting the list of patterns, this call will
   * initially select pattern n as the active one.
   */
-  void setCurrentPattern(FXint n);
+  void setCurrentPattern(FXint patno);
 
   /// Return current pattern number
   FXint getCurrentPattern() const;
 
-  /// Get pattern text for given pattern number
-  FXString getPatternText(FXint patno) const;
-
   /// Change pattern text for pattern number
   void setPatternText(FXint patno,const FXString& text);
+
+  /// Get pattern text for given pattern number
+  FXString getPatternText(FXint patno) const;
 
   /// Return number of patterns
   FXint getNumPatterns() const;

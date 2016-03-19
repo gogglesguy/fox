@@ -79,6 +79,7 @@ bignetdrive.gif \
 bignethood.gif \
 bookset.gif \
 bookclr.gif \
+clearentry.gif \
 cmymode.gif \
 dialmode.gif \
 dirupicon.gif \
@@ -480,6 +481,7 @@ fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwebpio.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \

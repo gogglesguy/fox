@@ -630,6 +630,24 @@ extern FXAPI FXchar* nameFromColor(FXchar *name,FXColor color);
 
 
 /**
+* Blend source color over background color.
+*/
+extern FXAPI FXColor blendOverBackground(FXColor back,FXColor clr);
+
+
+/**
+* Blend source color over black background color.
+*/
+extern FXAPI FXColor blendOverBlack(FXColor clr);
+
+
+/**
+* Blend source color over white background color.
+*/
+extern FXAPI FXColor blendOverWhite(FXColor clr);
+
+
+/**
 * Blend color src toward color dst by a given percentage.
 */
 extern FXAPI FXColor makeBlendColor(FXColor src,FXColor dst,FXint percent=50);

@@ -35,21 +35,17 @@
 #include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
+#include "FindInFiles.h"
 #include "icons.h"
 
 
 /*
   Note:
-  - Commenting/uncommenting source code (various programming languages, of course).
   - Block select (and block operations).
-  - Better icons.
-  - Syntax highlighting (programmable).
   - Shell commands.
   - C tags support.
   - Each style has optional parent; colors with value FXRGBA(0,0,0,0) are
     inherited from the parent; this way, sub-styles are possible.
-  - Bookmarks should be adjusted when text is added or removed:- bookmarks
-    inside a deleted area should be removed.
   - If there is text selected, ctrl-H goes to the next occurrence.  If there
     is nothing selected, ctrl-H would go to the previous search pattern, similar
     to the way ctrl-G works in nedit.
@@ -74,7 +70,7 @@
     a full indention level.  (e.g. We use two spaces for emulated tabs.  The
     backspace would back up two spaces...)
   - Would be nice if we could remember not only bookmarks, but also window
-    size/position based on file name.
+    size/position based on file name (see idea about sessions below).
   - Add option to preferences for text widget non-tracking sliders, i.e. use
     jump-scrolling for slow machines/network connections.
   - Close last window just saves text, then starts new document in last window;
@@ -82,22 +78,40 @@
   - Maybe FXText should have its own accelerator table so that key bindings
     may be changed.
   - Would be nice to save as HTML.
-  - Ideas:
-     o Sessions. When reloading session, restore all windows (& positions)
-       that were open last time when in that session.
-       Info of sessions is in registry
-     o Command line option --sesssion <name> to open session instead of single
-       file.
-     o When creating new file, set syntax based on current file.  Switch
-       syntax when performing save-as.
-     o Manual syntax change should associate filename and syntax name in
-       registry (unless extension suggests same name).
-     o Master syntax rule should be explicitly created.  Simplifies parser.
-     o Master syntax rule NOT style index 0.  So you can set normal colors
-       on a per-language basis...
-     o Need option for tabbed interface.
-     o Ability to open multiple files at once in open-panel.
-     o Find In Files dialog (free floating).
+  - Incremental search bar (disappears when clicking in text, unless up permanently).
+  - Sessions. When reloading session, restore all windows (& positions)
+    that were open last time when in that session.
+    Info of sessions is in registry
+  - Command line option --sesssion <name> to open session instead of single
+    file.
+  - When creating new file, set syntax based on current file.  Switch
+    syntax when performing save-as.
+  - Manual syntax change should associate filename and syntax name in
+    registry (unless extension suggests same name).
+  - Master syntax rule should be explicitly created.  Simplifies parser.
+  - Master syntax rule NOT style index 0.  So you can set normal colors
+    on a per-language basis...
+  - Need option for tabbed interface.
+  - Ability to open multiple files at once in open-panel.
+  - Find In Files dialog (free floating).
+  - Need default colors for styles.
+  - Need default set of styles built-in to code, we can now parse this
+    due to new SyntaxParser being able to parse everything from a big
+    string!
+  - Some way to inherit style attributes, and a way to edit them.
+  - Perhaps change registry representation of style colors.
+  - We can (temporarily) colorize result of find/replace search pattern,
+    simply by writing the style buffer with some value.  This would
+    require a small tweak: add one extra style entry at the end for
+    this purpose, use only temporarily (save old style buffer temporarily).
+  - For this, we should really remove search stuff from FXText widget
+    proper.
+  - Option to read/write BOM at start when load/save from disk.
+  - Comment/uncomment regex in Syntax object.  This would make this
+    language-independent. (1) snap selection, (2) execute regex, (3)
+    replace selection with result.
+  - When making new window (i.e. no file), initialize directory part
+    of the untitled file to that of the current text window.
 */
 
 #define CLOCKTIMER      1000000000
@@ -108,158 +122,198 @@
 
 // Map
 FXDEFMAP(TextWindow) TextWindowMap[]={
-  FXMAPFUNC(SEL_UPDATE,            0,                              TextWindow::onUpdate),
-  FXMAPFUNC(SEL_FOCUSIN,           0,                              TextWindow::onFocusIn),
-  FXMAPFUNC(SEL_TIMEOUT,           TextWindow::ID_CLOCKTIME,       TextWindow::onClock),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_ABOUT,           TextWindow::onCmdAbout),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_HELP,            TextWindow::onCmdHelp),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_NEW,             TextWindow::onCmdNew),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_OPEN,            TextWindow::onCmdOpen),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_OPEN_SELECTED,   TextWindow::onCmdOpenSelected),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_OPEN_TREE,       TextWindow::onCmdOpenTree),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_OPEN_RECENT,     TextWindow::onCmdOpenRecent),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_REOPEN,          TextWindow::onCmdReopen),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_REOPEN,          TextWindow::onUpdReopen),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SAVE,            TextWindow::onCmdSave),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_SAVE,            TextWindow::onUpdSave),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SAVEAS,          TextWindow::onCmdSaveAs),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_FONT,            TextWindow::onCmdFont),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_PRINT,           TextWindow::onCmdPrint),
+  FXMAPFUNC(SEL_UPDATE,0,TextWindow::onUpdate),
+  FXMAPFUNC(SEL_FOCUSIN,0,TextWindow::onFocusIn),
+  FXMAPFUNC(SEL_TIMEOUT,TextWindow::ID_CLOCKTIME,TextWindow::onClock),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ABOUT,TextWindow::onCmdAbout),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_HELP,TextWindow::onCmdHelp),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEW,TextWindow::onCmdNew),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN,TextWindow::onCmdOpen),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN_SELECTED,TextWindow::onCmdOpenSelected),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN_TREE,TextWindow::onCmdOpenTree),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_OPEN_RECENT,TextWindow::onCmdOpenRecent),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_REOPEN,TextWindow::onCmdReopen),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_REOPEN,TextWindow::onUpdReopen),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE,TextWindow::onCmdSave),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVE,TextWindow::onUpdSave),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEAS,TextWindow::onCmdSaveAs),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FONT,TextWindow::onCmdFont),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_PRINT,TextWindow::onCmdPrint),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FINDFILES,TextWindow::onCmdFindInFiles),
 
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_BACK,       TextWindow::onCmdTextBackColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_BACK,       TextWindow::onCmdTextBackColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_BACK,       TextWindow::onUpdTextBackColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_FORE,       TextWindow::onCmdTextForeColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_FORE,       TextWindow::onCmdTextForeColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_FORE,       TextWindow::onUpdTextForeColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_SELBACK,    TextWindow::onCmdTextSelBackColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_SELBACK,    TextWindow::onCmdTextSelBackColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_SELBACK,    TextWindow::onUpdTextSelBackColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_SELFORE,    TextWindow::onCmdTextSelForeColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_SELFORE,    TextWindow::onCmdTextSelForeColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_SELFORE,    TextWindow::onUpdTextSelForeColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_HILITEBACK, TextWindow::onCmdTextHiliteBackColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_HILITEBACK, TextWindow::onCmdTextHiliteBackColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_HILITEBACK, TextWindow::onUpdTextHiliteBackColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_HILITEFORE, TextWindow::onCmdTextHiliteForeColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_HILITEFORE, TextWindow::onCmdTextHiliteForeColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_HILITEFORE, TextWindow::onUpdTextHiliteForeColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_CURSOR,     TextWindow::onCmdTextCursorColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_CURSOR,     TextWindow::onCmdTextCursorColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_CURSOR,     TextWindow::onUpdTextCursorColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_ACTIVEBACK, TextWindow::onCmdTextActBackColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_ACTIVEBACK, TextWindow::onCmdTextActBackColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_ACTIVEBACK, TextWindow::onUpdTextActBackColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_NUMBACK,    TextWindow::onCmdTextBarColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_NUMBACK,    TextWindow::onCmdTextBarColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_NUMBACK,    TextWindow::onUpdTextBarColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_NUMFORE,    TextWindow::onCmdTextNumberColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_TEXT_NUMFORE,    TextWindow::onCmdTextNumberColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_NUMFORE,    TextWindow::onUpdTextNumberColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_BACK,TextWindow::onCmdTextBackColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_BACK,TextWindow::onCmdTextBackColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_BACK,TextWindow::onUpdTextBackColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_FORE,TextWindow::onCmdTextForeColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_FORE,TextWindow::onCmdTextForeColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_FORE,TextWindow::onUpdTextForeColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_SELBACK,TextWindow::onCmdTextSelBackColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_SELBACK,TextWindow::onCmdTextSelBackColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_SELBACK,TextWindow::onUpdTextSelBackColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_SELFORE,TextWindow::onCmdTextSelForeColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_SELFORE,TextWindow::onCmdTextSelForeColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_SELFORE,TextWindow::onUpdTextSelForeColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_HILITEBACK,TextWindow::onCmdTextHiliteBackColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_HILITEBACK,TextWindow::onCmdTextHiliteBackColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_HILITEBACK,TextWindow::onUpdTextHiliteBackColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_HILITEFORE,TextWindow::onCmdTextHiliteForeColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_HILITEFORE,TextWindow::onCmdTextHiliteForeColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_HILITEFORE,TextWindow::onUpdTextHiliteForeColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_CURSOR,TextWindow::onCmdTextCursorColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_CURSOR,TextWindow::onCmdTextCursorColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_CURSOR,TextWindow::onUpdTextCursorColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_ACTIVEBACK,TextWindow::onCmdTextActBackColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_ACTIVEBACK,TextWindow::onCmdTextActBackColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_ACTIVEBACK,TextWindow::onUpdTextActBackColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_NUMBACK,TextWindow::onCmdTextBarColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_NUMBACK,TextWindow::onCmdTextBarColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_NUMBACK,TextWindow::onUpdTextBarColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_NUMFORE,TextWindow::onCmdTextNumberColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_TEXT_NUMFORE,TextWindow::onCmdTextNumberColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_NUMFORE,TextWindow::onUpdTextNumberColor),
 
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_DIR_BACK,        TextWindow::onCmdDirBackColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_DIR_BACK,        TextWindow::onCmdDirBackColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_DIR_BACK,        TextWindow::onUpdDirBackColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_DIR_FORE,        TextWindow::onCmdDirForeColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_DIR_FORE,        TextWindow::onCmdDirForeColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_DIR_FORE,        TextWindow::onUpdDirForeColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_DIR_SELBACK,     TextWindow::onCmdDirSelBackColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_DIR_SELBACK,     TextWindow::onCmdDirSelBackColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_DIR_SELBACK,     TextWindow::onUpdDirSelBackColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_DIR_SELFORE,     TextWindow::onCmdDirSelForeColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_DIR_SELFORE,     TextWindow::onCmdDirSelForeColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_DIR_SELFORE,     TextWindow::onUpdDirSelForeColor),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_DIR_LINES,       TextWindow::onCmdDirLineColor),
-  FXMAPFUNC(SEL_CHANGED,           TextWindow::ID_DIR_LINES,       TextWindow::onCmdDirLineColor),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_DIR_LINES,       TextWindow::onUpdDirLineColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DIR_BACK,TextWindow::onCmdDirBackColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_DIR_BACK,TextWindow::onCmdDirBackColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DIR_BACK,TextWindow::onUpdDirBackColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DIR_FORE,TextWindow::onCmdDirForeColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_DIR_FORE,TextWindow::onCmdDirForeColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DIR_FORE,TextWindow::onUpdDirForeColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DIR_SELBACK,TextWindow::onCmdDirSelBackColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_DIR_SELBACK,TextWindow::onCmdDirSelBackColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DIR_SELBACK,TextWindow::onUpdDirSelBackColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DIR_SELFORE,TextWindow::onCmdDirSelForeColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_DIR_SELFORE,TextWindow::onCmdDirSelForeColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DIR_SELFORE,TextWindow::onUpdDirSelForeColor),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DIR_LINES,TextWindow::onCmdDirLineColor),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_DIR_LINES,TextWindow::onCmdDirLineColor),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DIR_LINES,TextWindow::onUpdDirLineColor),
 
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TOGGLE_WRAP,     TextWindow::onUpdWrap),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TOGGLE_WRAP,     TextWindow::onCmdWrap),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SAVE_SETTINGS,   TextWindow::onCmdSaveSettings),
-  FXMAPFUNC(SEL_INSERTED,          TextWindow::ID_TEXT,            TextWindow::onTextInserted),
-  FXMAPFUNC(SEL_REPLACED,          TextWindow::ID_TEXT,            TextWindow::onTextReplaced),
-  FXMAPFUNC(SEL_DELETED,           TextWindow::ID_TEXT,            TextWindow::onTextDeleted),
-  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,            TextWindow::onTextRightMouse),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_FIXED_WRAP,      TextWindow::onUpdWrapFixed),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_FIXED_WRAP,      TextWindow::onCmdWrapFixed),
-  FXMAPFUNC(SEL_DND_MOTION,        TextWindow::ID_TEXT,            TextWindow::onEditDNDMotion),
-  FXMAPFUNC(SEL_DND_DROP,          TextWindow::ID_TEXT,            TextWindow::onEditDNDDrop),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_STRIP_CR,        TextWindow::onUpdStripReturns),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_STRIP_CR,        TextWindow::onCmdStripReturns),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_STRIP_SP,        TextWindow::onUpdStripSpaces),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_STRIP_SP,        TextWindow::onCmdStripSpaces),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_APPEND_NL,       TextWindow::onUpdAppendNewline),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_APPEND_NL,       TextWindow::onCmdAppendNewline),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_FILEFILTER,      TextWindow::onCmdFilter),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_OVERSTRIKE,      TextWindow::onUpdOverstrike),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_READONLY,        TextWindow::onUpdReadOnly),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TABMODE,         TextWindow::onUpdTabMode),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_NUM_ROWS,        TextWindow::onUpdNumRows),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_PREFERENCES,     TextWindow::onCmdPreferences),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TABCOLUMNS,      TextWindow::onCmdTabColumns),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TABCOLUMNS,      TextWindow::onUpdTabColumns),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_DELIMITERS,      TextWindow::onCmdDelimiters),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_DELIMITERS,      TextWindow::onUpdDelimiters),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_WRAPCOLUMNS,     TextWindow::onCmdWrapColumns),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_WRAPCOLUMNS,     TextWindow::onUpdWrapColumns),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_AUTOINDENT,      TextWindow::onCmdAutoIndent),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_AUTOINDENT,      TextWindow::onUpdAutoIndent),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_INSERTTABS,      TextWindow::onCmdInsertTabs),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_INSERTTABS,      TextWindow::onUpdInsertTabs),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_BRACEMATCH,      TextWindow::onCmdBraceMatch),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_BRACEMATCH,      TextWindow::onUpdBraceMatch),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_INSERT_FILE,     TextWindow::onUpdInsertFile),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_INSERT_FILE,     TextWindow::onCmdInsertFile),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_EXTRACT_FILE,    TextWindow::onUpdExtractFile),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_EXTRACT_FILE,    TextWindow::onCmdExtractFile),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_WHEELADJUST,     TextWindow::onUpdWheelAdjust),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_WHEELADJUST,     TextWindow::onCmdWheelAdjust),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_NEXT_MARK,       TextWindow::onUpdNextMark),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_NEXT_MARK,       TextWindow::onCmdNextMark),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_PREV_MARK,       TextWindow::onUpdPrevMark),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_PREV_MARK,       TextWindow::onCmdPrevMark),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_SET_MARK,        TextWindow::onUpdSetMark),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SET_MARK,        TextWindow::onCmdSetMark),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_CLEAR_MARKS,     TextWindow::onCmdClearMarks),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_SAVEMARKS,       TextWindow::onUpdSaveMarks),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SAVEMARKS,       TextWindow::onCmdSaveMarks),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_SAVEVIEWS,       TextWindow::onUpdSaveViews),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SAVEVIEWS,       TextWindow::onCmdSaveViews),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_SHOWACTIVE,      TextWindow::onUpdShowActive),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SHOWACTIVE,      TextWindow::onCmdShowActive),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TEXT_LINENUMS,   TextWindow::onUpdLineNumbers),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TEXT_LINENUMS,   TextWindow::onCmdLineNumbers),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_WARNCHANGED,     TextWindow::onUpdWarnChanged),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_WARNCHANGED,     TextWindow::onCmdWarnChanged),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_WRAP,TextWindow::onUpdWrap),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TOGGLE_WRAP,TextWindow::onCmdWrap),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE_SETTINGS,TextWindow::onCmdSaveSettings),
 
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_USE_INITIAL_SIZE,TextWindow::onUpdUseInitialSize),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_USE_INITIAL_SIZE,TextWindow::onCmdUseInitialSize),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SET_INITIAL_SIZE,TextWindow::onCmdSetInitialSize),
+  FXMAPFUNC(SEL_FOCUSIN,TextWindow::ID_TEXT,TextWindow::onTextFocus),
+  FXMAPFUNC(SEL_INSERTED,TextWindow::ID_TEXT,TextWindow::onTextInserted),
+  FXMAPFUNC(SEL_REPLACED,TextWindow::ID_TEXT,TextWindow::onTextReplaced),
+  FXMAPFUNC(SEL_DELETED,TextWindow::ID_TEXT,TextWindow::onTextDeleted),
+  FXMAPFUNC(SEL_DND_DROP,TextWindow::ID_TEXT,TextWindow::onTextDNDDrop),
+  FXMAPFUNC(SEL_DND_MOTION,TextWindow::ID_TEXT,TextWindow::onTextDNDMotion),
+  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,TextWindow::onTextRightMouse),
 
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_SYNTAX,          TextWindow::onUpdSyntax),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SYNTAX,          TextWindow::onCmdSyntax),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_RESTYLE,         TextWindow::onUpdRestyle),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_RESTYLE,         TextWindow::onCmdRestyle),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_JUMPSCROLL,      TextWindow::onUpdJumpScroll),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_JUMPSCROLL,      TextWindow::onCmdJumpScroll),
-  FXMAPFUNCS(SEL_UPDATE,           TextWindow::ID_WINDOW_1,        TextWindow::ID_WINDOW_10,    TextWindow::onUpdWindow),
-  FXMAPFUNCS(SEL_COMMAND,          TextWindow::ID_WINDOW_1,        TextWindow::ID_WINDOW_10,    TextWindow::onCmdWindow),
-  FXMAPFUNCS(SEL_UPDATE,           TextWindow::ID_SYNTAX_FIRST,    TextWindow::ID_SYNTAX_LAST,  TextWindow::onUpdSyntaxSwitch),
-  FXMAPFUNCS(SEL_COMMAND,          TextWindow::ID_SYNTAX_FIRST,    TextWindow::ID_SYNTAX_LAST,  TextWindow::onCmdSyntaxSwitch),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_FIXED_WRAP,TextWindow::onUpdWrapFixed),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FIXED_WRAP,TextWindow::onCmdWrapFixed),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_STRIP_CR,TextWindow::onUpdStripReturns),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_STRIP_CR,TextWindow::onCmdStripReturns),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_STRIP_SP,TextWindow::onUpdStripSpaces),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_STRIP_SP,TextWindow::onCmdStripSpaces),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_APPEND_CR,TextWindow::onUpdAppendCarriageReturn),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_APPEND_CR,TextWindow::onCmdAppendCarriageReturn),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_APPEND_NL,TextWindow::onUpdAppendNewline),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_APPEND_NL,TextWindow::onCmdAppendNewline),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FILEFILTER,TextWindow::onCmdFilter),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_OVERSTRIKE,TextWindow::onUpdOverstrike),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_READONLY,TextWindow::onUpdReadOnly),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TABMODE,TextWindow::onUpdTabMode),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_NUM_ROWS,TextWindow::onUpdNumRows),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_PREFERENCES,TextWindow::onCmdPreferences),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TABCOLUMNS,TextWindow::onCmdTabColumns),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TABCOLUMNS,TextWindow::onUpdTabColumns),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DELIMITERS,TextWindow::onCmdDelimiters),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DELIMITERS,TextWindow::onUpdDelimiters),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_WRAPCOLUMNS,TextWindow::onCmdWrapColumns),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_WRAPCOLUMNS,TextWindow::onUpdWrapColumns),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_AUTOINDENT,TextWindow::onCmdAutoIndent),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_AUTOINDENT,TextWindow::onUpdAutoIndent),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERTTABS,TextWindow::onCmdInsertTabs),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERTTABS,TextWindow::onUpdInsertTabs),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_BRACEMATCH,TextWindow::onCmdBraceMatch),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_BRACEMATCH,TextWindow::onUpdBraceMatch),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERT_FILE,TextWindow::onUpdInsertFile),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERT_FILE,TextWindow::onCmdInsertFile),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXTRACT_FILE,TextWindow::onUpdExtractFile),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXTRACT_FILE,TextWindow::onCmdExtractFile),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_WHEELADJUST,TextWindow::onUpdWheelAdjust),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_WHEELADJUST,TextWindow::onCmdWheelAdjust),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_NEXT_MARK,TextWindow::onUpdNextMark),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEXT_MARK,TextWindow::onCmdNextMark),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_PREV_MARK,TextWindow::onUpdPrevMark),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_PREV_MARK,TextWindow::onCmdPrevMark),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SET_MARK,TextWindow::onUpdSetMark),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SET_MARK,TextWindow::onCmdSetMark),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_MARK_0,TextWindow::ID_MARK_9,TextWindow::onUpdGotoMark),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_MARK_0,TextWindow::ID_MARK_9,TextWindow::onCmdGotoMark),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_CLEAR_MARKS,TextWindow::onCmdClearMarks),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVEMARKS,TextWindow::onUpdSaveMarks),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEMARKS,TextWindow::onCmdSaveMarks),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVEVIEWS,TextWindow::onUpdSaveViews),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEVIEWS,TextWindow::onCmdSaveViews),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SHOWACTIVE,TextWindow::onUpdShowActive),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHOWACTIVE,TextWindow::onCmdShowActive),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TEXT_LINENUMS,TextWindow::onUpdLineNumbers),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TEXT_LINENUMS,TextWindow::onCmdLineNumbers),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_WARNCHANGED,TextWindow::onUpdWarnChanged),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_WARNCHANGED,TextWindow::onCmdWarnChanged),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TOGGLE_BROWSER,TextWindow::onCmdToggleBrowser),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_BROWSER,TextWindow::onUpdToggleBrowser),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCHPATHS,TextWindow::onCmdSearchPaths),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATHS,TextWindow::onUpdSearchPaths),
 
-  FXMAPFUNCS(SEL_UPDATE,           TextWindow::ID_TABSELECT_1,     TextWindow::ID_TABSELECT_8,  TextWindow::onUpdTabSelect),
-  FXMAPFUNCS(SEL_COMMAND,          TextWindow::ID_TABSELECT_1,     TextWindow::ID_TABSELECT_8,  TextWindow::onCmdTabSelect),
+  FXMAPFUNC(SEL_CHANGED,TextWindow::ID_ISEARCH_TEXT,TextWindow::onChgISearchText),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_TEXT,TextWindow::onCmdISearchText),
+  FXMAPFUNC(SEL_KEYPRESS,TextWindow::ID_ISEARCH_TEXT,TextWindow::onKeyISearchText),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_PREV,TextWindow::onCmdISearchPrev),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_NEXT,TextWindow::onCmdISearchNext),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_START,TextWindow::onCmdISearchStart),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_FINISH,TextWindow::onCmdISearchFinish),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_ISEARCH_REVERSE,TextWindow::ID_ISEARCH_REGEX,TextWindow::onUpdISearchModifiers),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_ISEARCH_REVERSE,TextWindow::ID_ISEARCH_REGEX,TextWindow::onCmdISearchModifiers),
 
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_STYLE_INDEX,     TextWindow::onUpdStyleIndex),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_STYLE_INDEX,     TextWindow::onCmdStyleIndex),
-  FXMAPFUNCS(SEL_UPDATE,           TextWindow::ID_STYLE_NORMAL_FG, TextWindow::ID_STYLE_ACTIVE_BG, TextWindow::onUpdStyleColor),
-  FXMAPFUNCS(SEL_CHANGED,          TextWindow::ID_STYLE_NORMAL_FG, TextWindow::ID_STYLE_ACTIVE_BG, TextWindow::onCmdStyleColor),
-  FXMAPFUNCS(SEL_COMMAND,          TextWindow::ID_STYLE_NORMAL_FG, TextWindow::ID_STYLE_ACTIVE_BG, TextWindow::onCmdStyleColor),
-  FXMAPFUNCS(SEL_UPDATE,           TextWindow::ID_STYLE_UNDERLINE, TextWindow::ID_STYLE_BOLD,      TextWindow::onUpdStyleFlags),
-  FXMAPFUNCS(SEL_COMMAND,          TextWindow::ID_STYLE_UNDERLINE, TextWindow::ID_STYLE_BOLD,      TextWindow::onCmdStyleFlags),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_USE_INITIAL_SIZE,TextWindow::onUpdUseInitialSize),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_USE_INITIAL_SIZE,TextWindow::onCmdUseInitialSize),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SET_INITIAL_SIZE,TextWindow::onCmdSetInitialSize),
 
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TOGGLE_BROWSER,  TextWindow::onCmdToggleBrowser),
-  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TOGGLE_BROWSER,  TextWindow::onUpdToggleBrowser),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SYNTAX,TextWindow::onUpdSyntax),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SYNTAX,TextWindow::onCmdSyntax),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_RESTYLE,TextWindow::onUpdRestyle),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_RESTYLE,TextWindow::onCmdRestyle),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_JUMPSCROLL,TextWindow::onUpdJumpScroll),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_JUMPSCROLL,TextWindow::onCmdJumpScroll),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_WINDOW_1,TextWindow::ID_WINDOW_10,TextWindow::onUpdWindow),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_WINDOW_1,TextWindow::ID_WINDOW_10,TextWindow::onCmdWindow),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_SYNTAX_FIRST,TextWindow::ID_SYNTAX_LAST,TextWindow::onUpdSyntaxSwitch),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_SYNTAX_FIRST,TextWindow::ID_SYNTAX_LAST,TextWindow::onCmdSyntaxSwitch),
+
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_TABSELECT_1,TextWindow::ID_TABSELECT_8,TextWindow::onUpdTabSelect),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_TABSELECT_1,TextWindow::ID_TABSELECT_8,TextWindow::onCmdTabSelect),
+
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_NORMAL_FG_FIRST,TextWindow::ID_STYLE_NORMAL_FG_LAST,TextWindow::onCmdStyleNormalFG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_NORMAL_FG_FIRST,TextWindow::ID_STYLE_NORMAL_FG_LAST,TextWindow::onCmdStyleNormalFG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_NORMAL_FG_FIRST,TextWindow::ID_STYLE_NORMAL_FG_LAST,TextWindow::onUpdStyleNormalFG),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_NORMAL_BG_FIRST,TextWindow::ID_STYLE_NORMAL_BG_LAST,TextWindow::onCmdStyleNormalBG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_NORMAL_BG_FIRST,TextWindow::ID_STYLE_NORMAL_BG_LAST,TextWindow::onCmdStyleNormalBG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_NORMAL_BG_FIRST,TextWindow::ID_STYLE_NORMAL_BG_LAST,TextWindow::onUpdStyleNormalBG),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_SELECT_FG_FIRST,TextWindow::ID_STYLE_SELECT_FG_LAST,TextWindow::onCmdStyleSelectFG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_SELECT_FG_FIRST,TextWindow::ID_STYLE_SELECT_FG_LAST,TextWindow::onCmdStyleSelectFG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_SELECT_FG_FIRST,TextWindow::ID_STYLE_SELECT_FG_LAST,TextWindow::onUpdStyleSelectFG),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_SELECT_BG_FIRST,TextWindow::ID_STYLE_SELECT_BG_LAST,TextWindow::onCmdStyleSelectBG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_SELECT_BG_FIRST,TextWindow::ID_STYLE_SELECT_BG_LAST,TextWindow::onCmdStyleSelectBG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_SELECT_BG_FIRST,TextWindow::ID_STYLE_SELECT_BG_LAST,TextWindow::onUpdStyleSelectBG),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_HILITE_FG_FIRST,TextWindow::ID_STYLE_HILITE_FG_LAST,TextWindow::onCmdStyleHiliteFG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_HILITE_FG_FIRST,TextWindow::ID_STYLE_HILITE_FG_LAST,TextWindow::onCmdStyleHiliteFG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_HILITE_FG_FIRST,TextWindow::ID_STYLE_HILITE_FG_LAST,TextWindow::onUpdStyleHiliteFG),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_HILITE_BG_FIRST,TextWindow::ID_STYLE_HILITE_BG_LAST,TextWindow::onCmdStyleHiliteBG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_HILITE_BG_FIRST,TextWindow::ID_STYLE_HILITE_BG_LAST,TextWindow::onCmdStyleHiliteBG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_HILITE_BG_FIRST,TextWindow::ID_STYLE_HILITE_BG_LAST,TextWindow::onUpdStyleHiliteBG),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_ACTIVE_BG_FIRST,TextWindow::ID_STYLE_ACTIVE_BG_LAST,TextWindow::onCmdStyleActiveBG),
+  FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_ACTIVE_BG_FIRST,TextWindow::ID_STYLE_ACTIVE_BG_LAST,TextWindow::onCmdStyleActiveBG),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_ACTIVE_BG_FIRST,TextWindow::ID_STYLE_ACTIVE_BG_LAST,TextWindow::onUpdStyleActiveBG),
+
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_UNDERLINE_FIRST,TextWindow::ID_STYLE_UNDERLINE_LAST,TextWindow::onCmdStyleUnderline),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_UNDERLINE_FIRST,TextWindow::ID_STYLE_UNDERLINE_LAST,TextWindow::onUpdStyleUnderline),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_STRIKEOUT_FIRST,TextWindow::ID_STYLE_STRIKEOUT_LAST,TextWindow::onCmdStyleStrikeout),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_STRIKEOUT_FIRST,TextWindow::ID_STYLE_STRIKEOUT_LAST,TextWindow::onUpdStyleStrikeout),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_BOLD_FIRST,TextWindow::ID_STYLE_BOLD_LAST,TextWindow::onCmdStyleBold),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_STYLE_BOLD_FIRST,TextWindow::ID_STYLE_BOLD_LAST,TextWindow::onUpdStyleBold),
   };
 
 
@@ -304,40 +358,11 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   toolbar=new FXToolBar(topdock,dragshell2,LAYOUT_DOCK_NEXT|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED);
   new FXToolBarGrip(toolbar,toolbar,FXToolBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
-  // Info about the editor
-  new FXButton(statusbar,tr("\tAbout Adie\tAbout the Adie text editor."),getApp()->smallicon,this,ID_ABOUT,LAYOUT_FILL_Y|LAYOUT_RIGHT);
-
-  // File menu
-  filemenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&File"),NULL,filemenu);
-
-  // Edit Menu
-  editmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Edit"),NULL,editmenu);
-
-  // Goto Menu
-  gotomenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Goto"),NULL,gotomenu);
-
-  // Search Menu
-  searchmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Search"),NULL,searchmenu);
-
-  // Options Menu
-  optionmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Options"),NULL,optionmenu);
-
-  // View menu
-  viewmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&View"),NULL,viewmenu);
-
-  // Window menu
-  windowmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Window"),NULL,windowmenu);
-
-  // Help menu
-  helpmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Help"),NULL,helpmenu,LAYOUT_RIGHT);
+  // Search bar
+  dragshell3=new FXToolBarShell(this,FRAME_RAISED);
+  searchbar=new FXToolBar(topdock,dragshell3,LAYOUT_DOCK_NEXT|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED);
+  searchbar->allowedSides(FXDockBar::ALLOW_HORIZONTAL);
+  new FXToolBarGrip(searchbar,searchbar,FXToolBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
   // Splitter
   FXSplitter* splitter=new FXSplitter(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|SPLITTER_TRACKING);
@@ -363,61 +388,247 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   editor->setHiliteMatchTime(2000000000);
   editor->setBarColumns(6);
 
-  // Show clock on status bar
-  clock=new FXTextField(statusbar,8,NULL,0,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
-  clock->setBackColor(statusbar->getBackColor());
+  // Create status bar
+  createStatusbar();
 
-  // Undo/redo block
-  undoredoblock=new FXHorizontalFrame(statusbar,LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
-  new FXLabel(undoredoblock,tr("  Undo:"),NULL,LAYOUT_CENTER_Y);
-  FXTextField* undocount=new FXTextField(undoredoblock,6,&undolist,FXUndoList::ID_UNDO_COUNT,TEXTFIELD_READONLY|FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  undocount->setBackColor(statusbar->getBackColor());
-  new FXLabel(undoredoblock,tr("  Redo:"),NULL,LAYOUT_CENTER_Y);
-  FXTextField* redocount=new FXTextField(undoredoblock,6,&undolist,FXUndoList::ID_REDO_COUNT,TEXTFIELD_READONLY|FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  redocount->setBackColor(statusbar->getBackColor());
+  // Create menu bar
+  createMenubar();
 
-  // Show readonly state in status bar
-  FXLabel* readonly=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  readonly->setTarget(this);
-  readonly->setSelector(ID_READONLY);
-  readonly->setTipText(tr("Editable"));
+  // Create tool bar
+  createToolbar();
 
-  // Show insert mode in status bar
-  FXLabel* overstrike=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  overstrike->setTarget(this);
-  overstrike->setSelector(ID_OVERSTRIKE);
-  overstrike->setTipText(tr("Overstrike mode"));
+  // Create search bar
+  createSearchbar();
 
-  // Show tab mode in status bar
-  FXLabel* tabmode=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  tabmode->setTarget(this);
-  tabmode->setSelector(ID_TABMODE);
-  tabmode->setTipText(tr("Tab mode"));
+  // Add some alternative accelerators
+  if(getAccelTable()){
+
+    // These were the old bindings; keeping them for now...
+    getAccelTable()->addAccel(MKUINT(KEY_9,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_LEFT));
+    getAccelTable()->addAccel(MKUINT(KEY_0,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_RIGHT));
+    getAccelTable()->addAccel(MKUINT(KEY_b,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SELECT_BRACE));
+    }
+
+  // Initialize bookmarks
+  clearBookmarks();
+
+  // Initial setting
+  syntax=NULL;
+
+  // Recent files
+  mrufiles.setTarget(this);
+  mrufiles.setSelector(ID_OPEN_RECENT);
+
+  // Initialize file name
+  filename="untitled";
+  filenameset=false;
+  filetime=0;
+
+  // Initialize other stuff
+  searchpaths="/usr/include";
+  setPatterns("All Files (*)");
+  setCurrentPattern(0);
+  searchpos=-1;
+  searchflags=SEARCH_FORWARD|SEARCH_EXACT;
+  showsearchbar=false;
+  colorize=false;
+  stripcr=true;
+  stripsp=false;
+  appendcr=false;
+  appendnl=true;
+  saveviews=false;
+  savemarks=false;
+  warnchanged=false;
+  initialwidth=640;
+  initialheight=480;
+  initialsize=true;
+  lastfilesize=false;
+  lastfileposition=false;
+  undolist.mark();
+  }
 
 
-  // Show size of text in status bar
-  FXTextField* numchars=new FXTextField(statusbar,2,this,ID_TABCOLUMNS,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  numchars->setBackColor(statusbar->getBackColor());
-  numchars->setTipText(tr("Tab setting"));
+// Create main menu bar
+void TextWindow::createMenubar(){
 
-  // Caption before tab columns
-  new FXLabel(statusbar,tr("  Tab:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  // File menu
+  filemenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&File"),NULL,filemenu);
 
-  // Show column number in status bar
-  FXTextField* columnno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_COLUMN,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  columnno->setBackColor(statusbar->getBackColor());
-  columnno->setTipText(tr("Current column"));
+  // File Menu entries
+  new FXMenuCommand(filemenu,tr("&New...\tCtl-N\tCreate new document."),getApp()->newicon,this,ID_NEW);
+  new FXMenuCommand(filemenu,tr("&Open...\tCtl-O\tOpen document file."),getApp()->openicon,this,ID_OPEN);
+  new FXMenuCommand(filemenu,tr("Open Selected...  \tCtl-Y\tOpen highlighted document file."),NULL,this,ID_OPEN_SELECTED);
+  new FXMenuCommand(filemenu,tr("&Reopen...\t\tReopen file."),getApp()->reloadicon,this,ID_REOPEN);
+  new FXMenuCommand(filemenu,tr("&Save\tCtl-S\tSave changes to file."),getApp()->saveicon,this,ID_SAVE);
+  new FXMenuCommand(filemenu,tr("Save &As...\t\tSave document to another file."),getApp()->saveasicon,this,ID_SAVEAS);
+  new FXMenuCommand(filemenu,tr("&Close\tCtl-W\tClose document."),NULL,this,ID_CLOSE);
+  new FXMenuSeparator(filemenu);
+  new FXMenuCommand(filemenu,tr("Insert from file...\t\tInsert text from file."),NULL,this,ID_INSERT_FILE);
+  new FXMenuCommand(filemenu,tr("Extract to file...\t\tExtract text to file."),NULL,this,ID_EXTRACT_FILE);
+  new FXMenuCommand(filemenu,tr("&Print...\tCtl-P\tPrint document."),getApp()->printicon,this,ID_PRINT);
+  new FXMenuCheck(filemenu,tr("&Editable\t\tDocument editable."),editor,FXText::ID_TOGGLE_EDITABLE);
 
-  // Caption before number
-  new FXLabel(statusbar,tr("  Col:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  // Recent file menu; this automatically hides if there are no files
+  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_1);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_2);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_3);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_4);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_5);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_6);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_7);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_8);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_9);
+  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_10);
+  new FXMenuCommand(filemenu,tr("&Clear Recent Files"),NULL,&mrufiles,FXRecentFiles::ID_CLEAR);
+  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
+  new FXMenuCommand(filemenu,tr("&Quit\tCtl-Q\tQuit program."),getApp()->quiticon,getApp(),Adie::ID_CLOSEALL);
 
-  // Show line number in status bar
-  FXTextField* rowno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_ROW,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
-  rowno->setBackColor(statusbar->getBackColor());
-  rowno->setTipText(tr("Current line"));
+  // Edit Menu
+  editmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Edit"),NULL,editmenu);
 
-  // Caption before number
-  new FXLabel(statusbar,tr("  Line:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  // Edit Menu entries
+  new FXMenuCommand(editmenu,tr("&Undo\tCtl-Z\tUndo last change."),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
+  new FXMenuCommand(editmenu,tr("&Redo\tCtl-Shift-Z\tRedo last undo."),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
+  new FXMenuCommand(editmenu,tr("&Undo all\t\tUndo all."),NULL,&undolist,FXUndoList::ID_UNDO_ALL);
+  new FXMenuCommand(editmenu,tr("&Redo all\t\tRedo all."),NULL,&undolist,FXUndoList::ID_REDO_ALL);
+  new FXMenuCommand(editmenu,tr("&Revert to saved\t\tRevert to saved."),NULL,&undolist,FXUndoList::ID_REVERT);
+  new FXMenuSeparator(editmenu);
+  new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy selection to clipboard."),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
+  new FXMenuCommand(editmenu,tr("Cu&t\tCtl-X\tCut selection to clipboard."),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
+  new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
+  new FXMenuCommand(editmenu,tr("&Delete\t\tDelete selection."),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
+  new FXMenuSeparator(editmenu);
+  new FXMenuCommand(editmenu,tr("Lo&wer-case\tCtl-U\tChange to lower case."),getApp()->lowercaseicon,editor,FXText::ID_LOWER_CASE);
+  new FXMenuCommand(editmenu,tr("Upp&er-case\tCtl-Shift-U\tChange to upper case."),getApp()->uppercaseicon,editor,FXText::ID_UPPER_CASE);
+  new FXMenuCommand(editmenu,tr("Clean indent\t\tClean indentation to either all tabs or all spaces."),NULL,editor,FXText::ID_CLEAN_INDENT);
+  new FXMenuCommand(editmenu,tr("Shift left\tCtl-[\tShift text left."),getApp()->shiftlefticon,editor,FXText::ID_SHIFT_LEFT);
+  new FXMenuCommand(editmenu,tr("Shift right\tCtl-]\tShift text right."),getApp()->shiftrighticon,editor,FXText::ID_SHIFT_RIGHT);
+  new FXMenuCommand(editmenu,tr("Shift tab left\tAlt-[\tShift text left one tab position."),getApp()->shiftlefticon,editor,FXText::ID_SHIFT_TABLEFT);
+  new FXMenuCommand(editmenu,tr("Shift tab right\tAlt-]\tShift text right one tab position."),getApp()->shiftrighticon,editor,FXText::ID_SHIFT_TABRIGHT);
+
+  // Goto Menu
+  gotomenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Goto"),NULL,gotomenu);
+
+  // Goto Menu entries
+  new FXMenuCommand(gotomenu,tr("&Goto...\tCtl-L\tGoto line number."),NULL,editor,FXText::ID_GOTO_LINE);
+  new FXMenuCommand(gotomenu,tr("Goto selected...\tCtl-E\tGoto selected line number."),NULL,editor,FXText::ID_GOTO_SELECTED);
+  new FXMenuSeparator(gotomenu);
+  new FXMenuCommand(gotomenu,tr("Goto {..\tShift-Ctl-{\tGoto start of enclosing block."),NULL,editor,FXText::ID_LEFT_BRACE);
+  new FXMenuCommand(gotomenu,tr("Goto ..}\tShift-Ctl-}\tGoto end of enclosing block."),NULL,editor,FXText::ID_RIGHT_BRACE);
+  new FXMenuCommand(gotomenu,tr("Goto (..\tShift-Ctl-(\tGoto start of enclosing expression."),NULL,editor,FXText::ID_LEFT_PAREN);
+  new FXMenuCommand(gotomenu,tr("Goto ..)\tShift-Ctl-)\tGoto end of enclosing expression."),NULL,editor,FXText::ID_RIGHT_PAREN);
+  new FXMenuSeparator(gotomenu);
+  new FXMenuCommand(gotomenu,tr("Goto matching      (..)\tCtl-M\tGoto matching brace or parenthesis."),NULL,editor,FXText::ID_GOTO_MATCHING);
+  new FXMenuSeparator(gotomenu);
+  new FXMenuCommand(gotomenu,tr("&Set bookmark\tAlt-B"),getApp()->bookseticon,this,ID_SET_MARK);
+  new FXMenuCommand(gotomenu,tr("&Next bookmark\tAlt-N"),getApp()->booknexticon,this,ID_NEXT_MARK);
+  new FXMenuCommand(gotomenu,tr("&Previous bookmark\tAlt-P"),getApp()->bookprevicon,this,ID_PREV_MARK);
+  new FXMenuCommand(gotomenu,tr("&Clear bookmarks\tAlt-C"),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
+
+  // Search Menu
+  searchmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Search"),NULL,searchmenu);
+
+  // Search Menu entries
+  new FXMenuCommand(searchmenu,tr("Select matching (..)\tShift-Ctl-M\tSelect matching brace or parenthesis."),NULL,editor,FXText::ID_SELECT_MATCHING);
+  new FXMenuCommand(searchmenu,tr("Select block {..}\tShift-Alt-{\tSelect enclosing block."),NULL,editor,FXText::ID_SELECT_BRACE);
+  new FXMenuCommand(searchmenu,tr("Select block {..}\tShift-Alt-}\tSelect enclosing block."),NULL,editor,FXText::ID_SELECT_BRACE);
+  new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-(\tSelect enclosing parentheses."),NULL,editor,FXText::ID_SELECT_PAREN);
+  new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-)\tSelect enclosing parentheses."),NULL,editor,FXText::ID_SELECT_PAREN);
+  new FXMenuSeparator(searchmenu);
+  new FXMenuCommand(searchmenu,tr("Incremental search\tCtl-I\tSearch for a string."),NULL,this,ID_ISEARCH_START);
+  new FXMenuCommand(searchmenu,tr("Search in &Files\t\tSearch files for a string."),NULL,this,ID_FINDFILES);
+  new FXMenuCommand(searchmenu,tr("Search sel. fwd\tCtl-H\tSearch for selection."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW_SEL);
+  new FXMenuCommand(searchmenu,tr("Search sel. bck\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK_SEL);
+  new FXMenuCommand(searchmenu,tr("Search next fwd\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW);
+  new FXMenuCommand(searchmenu,tr("Search next bck\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK);
+  new FXMenuCommand(searchmenu,tr("Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,editor,FXText::ID_SEARCH);
+  new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),NULL,editor,FXText::ID_REPLACE);
+
+  // Syntax menu
+  syntaxmenu=new FXMenuPane(this);
+  new FXMenuRadio(syntaxmenu,tr("Plain"),this,ID_SYNTAX_FIRST);
+  for(int syn=0; syn<getApp()->syntaxes.no(); syn++){
+    new FXMenuRadio(syntaxmenu,getApp()->syntaxes[syn]->getName(),this,ID_SYNTAX_FIRST+1+syn);
+    }
+
+  // Tabs menu
+  tabsmenu=new FXMenuPane(this);
+  new FXMenuRadio(tabsmenu,"1",this,ID_TABSELECT_1);
+  new FXMenuRadio(tabsmenu,"2",this,ID_TABSELECT_2);
+  new FXMenuRadio(tabsmenu,"3",this,ID_TABSELECT_3);
+  new FXMenuRadio(tabsmenu,"4",this,ID_TABSELECT_4);
+  new FXMenuRadio(tabsmenu,"5",this,ID_TABSELECT_5);
+  new FXMenuRadio(tabsmenu,"6",this,ID_TABSELECT_6);
+  new FXMenuRadio(tabsmenu,"7",this,ID_TABSELECT_7);
+  new FXMenuRadio(tabsmenu,"8",this,ID_TABSELECT_8);
+
+  // Options Menu
+  optionmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Options"),NULL,optionmenu);
+
+  // Options menu
+  new FXMenuCommand(optionmenu,tr("Preferences...\t\tChange preferences."),getApp()->configicon,this,ID_PREFERENCES);
+  new FXMenuCommand(optionmenu,tr("Font...\t\tChange text font."),getApp()->fontsicon,this,ID_FONT);
+  new FXMenuCheck(optionmenu,tr("Insert &tabs\t\tToggle insert tabs."),this,ID_INSERTTABS);
+  new FXMenuCheck(optionmenu,tr("&Word wrap\t\tToggle word wrap mode."),this,ID_TOGGLE_WRAP);
+  new FXMenuCheck(optionmenu,tr("&Overstrike\t\tToggle overstrike mode."),editor,FXText::ID_TOGGLE_OVERSTRIKE);
+  new FXMenuCheck(optionmenu,tr("&Syntax coloring\t\tToggle syntax coloring."),this,ID_SYNTAX);
+  new FXMenuCheck(optionmenu,tr("Jump scrolling\t\tToggle jump scrolling mode."),this,ID_JUMPSCROLL);
+  new FXMenuCheck(optionmenu,tr("Use initial size\t\tToggle initial window size mode."),this,ID_USE_INITIAL_SIZE);
+  new FXMenuCommand(optionmenu,tr("Set initial size\t\tSet current window size as the initial window size."),NULL,this,ID_SET_INITIAL_SIZE);
+  new FXMenuCommand(optionmenu,tr("&Restyle\t\tToggle syntax coloring."),NULL,this,ID_RESTYLE);
+  new FXMenuCascade(optionmenu,tr("Tab stops"),NULL,tabsmenu);
+  new FXMenuCascade(optionmenu,tr("Syntax patterns"),NULL,syntaxmenu);
+  new FXMenuSeparator(optionmenu);
+  new FXMenuCommand(optionmenu,tr("Save Settings\t\tSave settings now."),NULL,this,ID_SAVE_SETTINGS);
+
+  // View menu
+  viewmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&View"),NULL,viewmenu);
+
+  // View Menu entries
+  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
+  new FXMenuCheck(viewmenu,tr("File Browser\t\tDisplay file list."),this,ID_TOGGLE_BROWSER);
+  new FXMenuCheck(viewmenu,tr("Toolbar\t\tDisplay toolbar."),toolbar,FXWindow::ID_TOGGLESHOWN);
+  new FXMenuCheck(viewmenu,tr("Searchbar\t\tDisplay search bar."),searchbar,FXWindow::ID_TOGGLESHOWN);
+  new FXMenuCheck(viewmenu,tr("Status line\t\tDisplay status line."),statusbar,FXWindow::ID_TOGGLESHOWN);
+  new FXMenuCheck(viewmenu,tr("Undo Counters\t\tShow undo/redo counters on status line."),undoredoblock,FXWindow::ID_TOGGLESHOWN);
+  new FXMenuCheck(viewmenu,tr("Clock\t\tShow clock on status line."),clock,FXWindow::ID_TOGGLESHOWN);
+
+  // Window menu
+  windowmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Window"),NULL,windowmenu);
+
+  // Window menu
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_1);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_2);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_3);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_4);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_5);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_6);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_7);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_8);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_9);
+  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_10);
+
+  // Help menu
+  helpmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Help"),NULL,helpmenu,LAYOUT_RIGHT);
+
+  // Help Menu entries
+  new FXMenuCommand(helpmenu,tr("&Help...\t\tDisplay help information."),getApp()->helpicon,this,ID_HELP,0);
+  new FXMenuSeparator(helpmenu);
+  new FXMenuCommand(helpmenu,tr("&About Adie...\t\tDisplay about panel."),getApp()->smallicon,this,ID_ABOUT,0);
+  }
+
+
+// Create tool bar
+void TextWindow::createToolbar(){
 
   // Toobar buttons: File manipulation
   new FXButton(toolbar,tr("\tNew\tCreate new document."),getApp()->newicon,this,ID_NEW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
@@ -482,204 +693,87 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
 
   // Help
   new FXButton(toolbar,tr("\tDisplay help\tDisplay online help information."),getApp()->helpicon,this,ID_HELP,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_RIGHT);
+  }
 
-  // File Menu entries
-  new FXMenuCommand(filemenu,tr("&New...\tCtl-N\tCreate new document."),getApp()->newicon,this,ID_NEW);
-  new FXMenuCommand(filemenu,tr("&Open...\tCtl-O\tOpen document file."),getApp()->openicon,this,ID_OPEN);
-  new FXMenuCommand(filemenu,tr("Open Selected...  \tCtl-Y\tOpen highlighted document file."),NULL,this,ID_OPEN_SELECTED);
-  new FXMenuCommand(filemenu,tr("&Reopen...\t\tReopen file."),getApp()->reloadicon,this,ID_REOPEN);
-  new FXMenuCommand(filemenu,tr("&Save\tCtl-S\tSave changes to file."),getApp()->saveicon,this,ID_SAVE);
-  new FXMenuCommand(filemenu,tr("Save &As...\t\tSave document to another file."),getApp()->saveasicon,this,ID_SAVEAS);
-  new FXMenuCommand(filemenu,tr("&Close\tCtl-W\tClose document."),NULL,this,ID_CLOSE);
-  new FXMenuSeparator(filemenu);
-  new FXMenuCommand(filemenu,tr("Insert from file...\t\tInsert text from file."),NULL,this,ID_INSERT_FILE);
-  new FXMenuCommand(filemenu,tr("Extract to file...\t\tExtract text to file."),NULL,this,ID_EXTRACT_FILE);
-  new FXMenuCommand(filemenu,tr("&Print...\tCtl-P\tPrint document."),getApp()->printicon,this,ID_PRINT);
-  new FXMenuCheck(filemenu,tr("&Editable\t\tDocument editable."),editor,FXText::ID_TOGGLE_EDITABLE);
 
-  // Recent file menu; this automatically hides if there are no files
-  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_1);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_2);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_3);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_4);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_5);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_6);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_7);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_8);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_9);
-  new FXMenuCommand(filemenu,FXString::null,NULL,&mrufiles,FXRecentFiles::ID_FILE_10);
-  new FXMenuCommand(filemenu,tr("&Clear Recent Files"),NULL,&mrufiles,FXRecentFiles::ID_CLEAR);
-  new FXMenuSeparator(filemenu,&mrufiles,FXRecentFiles::ID_ANYFILES);
-  new FXMenuCommand(filemenu,tr("&Quit\tCtl-Q\tQuit program."),getApp()->quiticon,getApp(),Adie::ID_CLOSEALL);
+// Create search bar
+void TextWindow::createSearchbar(){
+  new FXLabel(searchbar,tr("Search:"),NULL,LAYOUT_CENTER_Y);
+  searchtext=new FXTextField(searchbar,50,this,ID_ISEARCH_TEXT,TEXTFIELD_ENTER_ONLY|FRAME_LINE|JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0,4,4,1,1);
+  searchtext->setTipText(tr("Incremental Search (Ctl-I)"));
+  searchtext->setHelpText(tr("Incremental search for a string."));
+  new FXButton(searchbar,tr("\tSearch Previous\tSearch previous occurrence."),getApp()->backwardicon,this,ID_ISEARCH_PREV,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(searchbar,tr("\tSearch Next\tSearch next occurrence."),getApp()->forwardicon,this,ID_ISEARCH_NEXT,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXFrame(searchbar,FRAME_NONE|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,4,4);
+  new FXCheckButton(searchbar,tr("Rev:\tReverse Direction (Ctl-D)\tBackward search direction."),this,ID_ISEARCH_REVERSE,ICON_AFTER_TEXT|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y,0,0,0,0, 1,1,1,1);
+  new FXFrame(searchbar,FRAME_NONE|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,4,4);
+  new FXCheckButton(searchbar,tr("Case:\tCase Insensitive (Ctl-I)\tCase insensitive search."),this,ID_ISEARCH_IGNCASE,ICON_AFTER_TEXT|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y,0,0,0,0, 1,1,1,1);
+  new FXFrame(searchbar,FRAME_NONE|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,4,4);
+  new FXCheckButton(searchbar,tr("Rex:\tRegular Expression (Ctl-E)\tRegular expression search."),this,ID_ISEARCH_REGEX,ICON_AFTER_TEXT|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y,0,0,0,0, 1,1,1,1);
+  new FXFrame(searchbar,FRAME_NONE|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,4,4);
+  }
 
-  // Edit Menu entries
-  new FXMenuCommand(editmenu,tr("&Undo\tCtl-Z\tUndo last change."),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
-  new FXMenuCommand(editmenu,tr("&Redo\tCtl-Shift-Z\tRedo last undo."),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
-  new FXMenuCommand(editmenu,tr("&Undo all\t\tUndo all."),NULL,&undolist,FXUndoList::ID_UNDO_ALL);
-  new FXMenuCommand(editmenu,tr("&Redo all\t\tRedo all."),NULL,&undolist,FXUndoList::ID_REDO_ALL);
-  new FXMenuCommand(editmenu,tr("&Revert to saved\t\tRevert to saved."),NULL,&undolist,FXUndoList::ID_REVERT);
-  new FXMenuSeparator(editmenu);
-  new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy selection to clipboard."),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
-  new FXMenuCommand(editmenu,tr("Cu&t\tCtl-X\tCut selection to clipboard."),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
-  new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
-  new FXMenuCommand(editmenu,tr("&Delete\t\tDelete selection."),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
-  new FXMenuSeparator(editmenu);
-  new FXMenuCommand(editmenu,tr("Lo&wer-case\tCtl-U\tChange to lower case."),getApp()->lowercaseicon,editor,FXText::ID_LOWER_CASE);
-  new FXMenuCommand(editmenu,tr("Upp&er-case\tCtl-Shift-U\tChange to upper case."),getApp()->uppercaseicon,editor,FXText::ID_UPPER_CASE);
-  new FXMenuCommand(editmenu,tr("Clean indent\t\tClean indentation to either all tabs or all spaces."),NULL,editor,FXText::ID_CLEAN_INDENT);
-  new FXMenuCommand(editmenu,tr("Shift left\tCtl-[\tShift text left."),getApp()->shiftlefticon,editor,FXText::ID_SHIFT_LEFT);
-  new FXMenuCommand(editmenu,tr("Shift right\tCtl-]\tShift text right."),getApp()->shiftrighticon,editor,FXText::ID_SHIFT_RIGHT);
-  new FXMenuCommand(editmenu,tr("Shift tab left\tAlt-[\tShift text left one tab position."),getApp()->shiftlefticon,editor,FXText::ID_SHIFT_TABLEFT);
-  new FXMenuCommand(editmenu,tr("Shift tab right\tAlt-]\tShift text right one tab position."),getApp()->shiftrighticon,editor,FXText::ID_SHIFT_TABRIGHT);
 
-  // Right mouse popup
-  popupmenu=new FXMenuPane(this);
-  new FXMenuCommand(popupmenu,tr("Undo"),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
-  new FXMenuCommand(popupmenu,tr("Redo"),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
-  new FXMenuSeparator(popupmenu);
-  new FXMenuCommand(popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
-  new FXMenuCommand(popupmenu,tr("Copy"),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
-  new FXMenuCommand(popupmenu,tr("Paste"),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
-  new FXMenuCommand(popupmenu,tr("Select All"),NULL,editor,FXText::ID_SELECT_ALL);
-  new FXMenuSeparator(popupmenu);
-  new FXMenuCommand(popupmenu,tr("Set bookmark"),getApp()->bookseticon,this,ID_SET_MARK);
-  new FXMenuCommand(popupmenu,tr("Next bookmark"),getApp()->booknexticon,this,ID_NEXT_MARK);
-  new FXMenuCommand(popupmenu,tr("Previous bookmark"),getApp()->bookprevicon,this,ID_PREV_MARK);
-  new FXMenuCommand(popupmenu,tr("Clear bookmarks"),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
+// Create status bar
+void TextWindow::createStatusbar(){
 
-  // Goto Menu entries
-  new FXMenuCommand(gotomenu,tr("&Goto...\tCtl-L\tGoto line number."),NULL,editor,FXText::ID_GOTO_LINE);
-  new FXMenuCommand(gotomenu,tr("Goto selected...\tCtl-E\tGoto selected line number."),NULL,editor,FXText::ID_GOTO_SELECTED);
-  new FXMenuSeparator(gotomenu);
-  new FXMenuCommand(gotomenu,tr("Goto {..\tShift-Ctl-{\tGoto start of enclosing block."),NULL,editor,FXText::ID_LEFT_BRACE);
-  new FXMenuCommand(gotomenu,tr("Goto ..}\tShift-Ctl-}\tGoto end of enclosing block."),NULL,editor,FXText::ID_RIGHT_BRACE);
-  new FXMenuCommand(gotomenu,tr("Goto (..\tShift-Ctl-(\tGoto start of enclosing expression."),NULL,editor,FXText::ID_LEFT_PAREN);
-  new FXMenuCommand(gotomenu,tr("Goto ..)\tShift-Ctl-)\tGoto end of enclosing expression."),NULL,editor,FXText::ID_RIGHT_PAREN);
-  new FXMenuSeparator(gotomenu);
-  new FXMenuCommand(gotomenu,tr("Goto matching      (..)\tCtl-M\tGoto matching brace or parenthesis."),NULL,editor,FXText::ID_GOTO_MATCHING);
-  new FXMenuSeparator(gotomenu);
-  new FXMenuCommand(gotomenu,tr("&Set bookmark\tAlt-B"),getApp()->bookseticon,this,ID_SET_MARK);
-  new FXMenuCommand(gotomenu,tr("&Next bookmark\tAlt-N"),getApp()->booknexticon,this,ID_NEXT_MARK);
-  new FXMenuCommand(gotomenu,tr("&Previous bookmark\tAlt-P"),getApp()->bookprevicon,this,ID_PREV_MARK);
-  new FXMenuCommand(gotomenu,tr("&Clear bookmarks\tAlt-C"),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
+  // Info about the editor
+  new FXButton(statusbar,tr("\tAbout Adie\tAbout the Adie text editor."),getApp()->smallicon,this,ID_ABOUT,LAYOUT_FILL_Y|LAYOUT_RIGHT);
 
-  // Search Menu entries
-  new FXMenuCommand(searchmenu,tr("Select matching (..)\tShift-Ctl-M\tSelect matching brace or parenthesis."),NULL,editor,FXText::ID_SELECT_MATCHING);
-  new FXMenuCommand(searchmenu,tr("Select block {..}\tShift-Alt-{\tSelect enclosing block."),NULL,editor,FXText::ID_SELECT_BRACE);
-  new FXMenuCommand(searchmenu,tr("Select block {..}\tShift-Alt-}\tSelect enclosing block."),NULL,editor,FXText::ID_SELECT_BRACE);
-  new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-(\tSelect enclosing parentheses."),NULL,editor,FXText::ID_SELECT_PAREN);
-  new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-)\tSelect enclosing parentheses."),NULL,editor,FXText::ID_SELECT_PAREN);
-  new FXMenuSeparator(searchmenu);
-  new FXMenuCommand(searchmenu,tr("&Search sel. fwd\tCtl-H\tSearch for selection."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW_SEL);
-  new FXMenuCommand(searchmenu,tr("&Search sel. bck\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK_SEL);
-  new FXMenuCommand(searchmenu,tr("&Search next fwd\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,editor,FXText::ID_SEARCH_FORW);
-  new FXMenuCommand(searchmenu,tr("&Search next bck\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,editor,FXText::ID_SEARCH_BACK);
-  new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,editor,FXText::ID_SEARCH);
-  new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),NULL,editor,FXText::ID_REPLACE);
+  // Show clock on status bar
+  clock=new FXTextField(statusbar,8,NULL,0,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
+  clock->setBackColor(statusbar->getBackColor());
 
-  // Syntax menu
-  syntaxmenu=new FXMenuPane(this);
-  new FXMenuRadio(syntaxmenu,tr("Plain"),this,ID_SYNTAX_FIRST);
-  for(int syn=0; syn<getApp()->syntaxes.no(); syn++){
-    new FXMenuRadio(syntaxmenu,getApp()->syntaxes[syn]->getName(),this,ID_SYNTAX_FIRST+1+syn);
-    }
+  // Undo/redo block
+  undoredoblock=new FXHorizontalFrame(statusbar,LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
+  new FXLabel(undoredoblock,tr("  Undo:"),NULL,LAYOUT_CENTER_Y);
+  FXTextField* undocount=new FXTextField(undoredoblock,5,&undolist,FXUndoList::ID_UNDO_COUNT,TEXTFIELD_READONLY|FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  undocount->setBackColor(statusbar->getBackColor());
+  new FXLabel(undoredoblock,tr("  Redo:"),NULL,LAYOUT_CENTER_Y);
+  FXTextField* redocount=new FXTextField(undoredoblock,5,&undolist,FXUndoList::ID_REDO_COUNT,TEXTFIELD_READONLY|FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  redocount->setBackColor(statusbar->getBackColor());
 
-  // Tabs menu
-  tabsmenu=new FXMenuPane(this);
-  new FXMenuRadio(tabsmenu,"1",this,ID_TABSELECT_1);
-  new FXMenuRadio(tabsmenu,"2",this,ID_TABSELECT_2);
-  new FXMenuRadio(tabsmenu,"3",this,ID_TABSELECT_3);
-  new FXMenuRadio(tabsmenu,"4",this,ID_TABSELECT_4);
-  new FXMenuRadio(tabsmenu,"5",this,ID_TABSELECT_5);
-  new FXMenuRadio(tabsmenu,"6",this,ID_TABSELECT_6);
-  new FXMenuRadio(tabsmenu,"7",this,ID_TABSELECT_7);
-  new FXMenuRadio(tabsmenu,"8",this,ID_TABSELECT_8);
+  // Show readonly state in status bar
+  FXLabel* readonly=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  readonly->setTarget(this);
+  readonly->setSelector(ID_READONLY);
+  readonly->setTipText(tr("Editable"));
 
-  // Options menu
-  new FXMenuCommand(optionmenu,tr("Preferences...\t\tChange preferences."),getApp()->configicon,this,ID_PREFERENCES);
-  new FXMenuCommand(optionmenu,tr("Font...\t\tChange text font."),getApp()->fontsicon,this,ID_FONT);
-  new FXMenuCheck(optionmenu,tr("Insert &tabs\t\tToggle insert tabs."),this,ID_INSERTTABS);
-  new FXMenuCheck(optionmenu,tr("&Word wrap\t\tToggle word wrap mode."),this,ID_TOGGLE_WRAP);
-  new FXMenuCheck(optionmenu,tr("&Overstrike\t\tToggle overstrike mode."),editor,FXText::ID_TOGGLE_OVERSTRIKE);
-  new FXMenuCheck(optionmenu,tr("&Syntax coloring\t\tToggle syntax coloring."),this,ID_SYNTAX);
-  new FXMenuCheck(optionmenu,tr("Jump scrolling\t\tToggle jump scrolling mode."),this,ID_JUMPSCROLL);
-  new FXMenuCheck(optionmenu,tr("Use initial size\t\tToggle initial window size mode."),this,ID_USE_INITIAL_SIZE);
-  new FXMenuCommand(optionmenu,tr("Set initial size\t\tSet current window size as the initial window size."),NULL,this,ID_SET_INITIAL_SIZE);
-  new FXMenuCommand(optionmenu,tr("&Restyle\t\tToggle syntax coloring."),NULL,this,ID_RESTYLE);
-  new FXMenuCascade(optionmenu,tr("Tab stops"),NULL,tabsmenu);
-  new FXMenuCascade(optionmenu,tr("Syntax patterns"),NULL,syntaxmenu);
-  new FXMenuSeparator(optionmenu);
-  new FXMenuCommand(optionmenu,tr("Save Settings\t\tSave settings now."),NULL,this,ID_SAVE_SETTINGS);
+  // Show insert mode in status bar
+  FXLabel* overstrike=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  overstrike->setTarget(this);
+  overstrike->setSelector(ID_OVERSTRIKE);
+  overstrike->setTipText(tr("Overstrike mode"));
 
-  // View Menu entries
-  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
-  new FXMenuCheck(viewmenu,tr("File Browser\t\tDisplay file list."),this,ID_TOGGLE_BROWSER);
-  new FXMenuCheck(viewmenu,tr("Toolbar\t\tDisplay toolbar."),toolbar,FXWindow::ID_TOGGLESHOWN);
-  new FXMenuCheck(viewmenu,tr("Status line\t\tDisplay status line."),statusbar,FXWindow::ID_TOGGLESHOWN);
-  new FXMenuCheck(viewmenu,tr("Undo Counters\t\tShow undo/redo counters on status line."),undoredoblock,FXWindow::ID_TOGGLESHOWN);
-  new FXMenuCheck(viewmenu,tr("Clock\t\tShow clock on status line."),clock,FXWindow::ID_TOGGLESHOWN);
+  // Show tab mode in status bar
+  FXLabel* tabmode=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  tabmode->setTarget(this);
+  tabmode->setSelector(ID_TABMODE);
+  tabmode->setTipText(tr("Tab mode"));
 
-  // Window menu
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_1);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_2);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_3);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_4);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_5);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_6);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_7);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_8);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_9);
-  new FXMenuRadio(windowmenu,FXString::null,this,ID_WINDOW_10);
+  // Show size of text in status bar
+  FXTextField* numchars=new FXTextField(statusbar,2,this,ID_TABCOLUMNS,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  numchars->setBackColor(statusbar->getBackColor());
+  numchars->setTipText(tr("Tab setting"));
 
-  // Help Menu entries
-  new FXMenuCommand(helpmenu,tr("&Help...\t\tDisplay help information."),getApp()->helpicon,this,ID_HELP,0);
-  new FXMenuSeparator(helpmenu);
-  new FXMenuCommand(helpmenu,tr("&About Adie...\t\tDisplay about panel."),getApp()->smallicon,this,ID_ABOUT,0);
+  // Caption before tab columns
+  new FXLabel(statusbar,tr("  Tab:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
-  // Add some alternative accelerators
-  if(getAccelTable()){
+  // Show column number in status bar
+  FXTextField* columnno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_COLUMN,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  columnno->setBackColor(statusbar->getBackColor());
+  columnno->setTipText(tr("Current column"));
 
-    // These were the old bindings; keeping them for now...
-    getAccelTable()->addAccel(MKUINT(KEY_9,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_LEFT));
-    getAccelTable()->addAccel(MKUINT(KEY_0,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_RIGHT));
-    getAccelTable()->addAccel(MKUINT(KEY_k,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_DELETE_LINE));
-    getAccelTable()->addAccel(MKUINT(KEY_b,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SELECT_BRACE));
-    }
+  // Caption before number
+  new FXLabel(statusbar,tr("  Col:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
-  // Initialize bookmarks
-  clearBookmarks();
+  // Show line number in status bar
+  FXTextField* rowno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_ROW,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  rowno->setBackColor(statusbar->getBackColor());
+  rowno->setTipText(tr("Current line"));
 
-  // Initial setting
-  syntax=NULL;
-
-  // Recent files
-  mrufiles.setTarget(this);
-  mrufiles.setSelector(ID_OPEN_RECENT);
-
-  // Initialize file name
-  filename="untitled";
-  filenameset=false;
-  filetime=0;
-
-  // Initialize other stuff
-  searchpaths="/usr/include";
-  setPatterns("All Files (*)");
-  setCurrentPattern(0);
-  currentstyle=-1;
-  colorize=false;
-  stripcr=true;
-  stripsp=false;
-  appendnl=true;
-  saveviews=false;
-  savemarks=false;
-  warnchanged=false;
-  initialwidth=640;
-  initialheight=480;
-  initialsize=true;
-  lastfilesize=false;
-  lastfileposition=false;
-  undolist.mark();
+  // Caption before number
+  new FXLabel(statusbar,tr("  Line:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
   }
 
 
@@ -689,6 +783,7 @@ void TextWindow::create(){
   FXMainWindow::create();
   dragshell1->create();
   dragshell2->create();
+  dragshell3->create();
   filemenu->create();
   editmenu->create();
   gotomenu->create();
@@ -697,11 +792,9 @@ void TextWindow::create(){
   viewmenu->create();
   windowmenu->create();
   helpmenu->create();
-  popupmenu->create();
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
   getApp()->addTimeout(this,ID_CLOCKTIME,CLOCKTIMER);
   editor->setFocus();
-  dirlist->setCurrentFile(FXSystem::getHomeDirectory());
   show(PLACEMENT_DEFAULT);
   }
 
@@ -715,12 +808,6 @@ void TextWindow::detach(){
   }
 
 
-// Redraw when style changed
-void TextWindow::redraw(){
-  editor->update();
-  }
-
-
 // Clean up the mess
 TextWindow::~TextWindow(){
   getApp()->windowlist.remove(this);
@@ -728,6 +815,7 @@ TextWindow::~TextWindow(){
   delete font;
   delete dragshell1;
   delete dragshell2;
+  delete dragshell3;
   delete filemenu;
   delete editmenu;
   delete gotomenu;
@@ -736,13 +824,23 @@ TextWindow::~TextWindow(){
   delete viewmenu;
   delete windowmenu;
   delete helpmenu;
-  delete popupmenu;
   delete syntaxmenu;
   delete tabsmenu;
   }
 
 
 /*******************************************************************************/
+
+// Set current file of directory browser
+void TextWindow::setBrowserCurrentFile(const FXString& file){
+  dirlist->setCurrentFile(file);
+  }
+
+
+// Get current file of directory browser
+FXString TextWindow::getBrowserCurrentFile() const {
+  return dirlist->getCurrentFile();
+  }
 
 
 // Is it modified
@@ -787,13 +885,7 @@ FXbool TextWindow::loadFile(const FXString& file){
 
         // Strip carriage returns
         if(stripcr){
-          for(i=j=0; j<n; j++){
-            c=text[j];
-            if(c!='\r'){
-              text[i++]=c;
-              }
-            }
-          n=i;
+          fxfromDOS(text,n);
           }
 
         // Strip trailing spaces
@@ -817,7 +909,7 @@ FXbool TextWindow::loadFile(const FXString& file){
 
         // Set stuff
         setEditable(FXStat::isWritable(file));
-        dirlist->setCurrentFile(file);
+        setBrowserCurrentFile(file);
         mrufiles.appendFile(file);
         setFiletime(FXStat::modified(file));
         setFilename(file);
@@ -873,13 +965,7 @@ FXbool TextWindow::insertFile(const FXString& file){
 
         // Strip carriage returns
         if(stripcr){
-          for(i=j=0; j<n; j++){
-            c=text[j];
-            if(c!='\r'){
-              text[i++]=c;
-              }
-            }
-          n=i;
+          fxfromDOS(text,n);
           }
 
         // Strip trailing spaces
@@ -946,9 +1032,9 @@ FXbool TextWindow::saveFile(const FXString& file){
         }
 
       // Translate newlines
-#ifdef WIN32
-      fxtoDOS(text,size);
-#endif
+      if(appendcr){
+        fxtoDOS(text,size);
+        }
 
       // Write the file
       n=textfile.writeBlock(text,size);
@@ -956,7 +1042,7 @@ FXbool TextWindow::saveFile(const FXString& file){
 
         // Set stuff
         setEditable(true);
-        dirlist->setCurrentFile(file);
+        setBrowserCurrentFile(file);
         mrufiles.appendFile(file);
         setFiletime(FXStat::modified(file));
         setFilename(file);
@@ -1002,9 +1088,9 @@ FXbool TextWindow::extractFile(const FXString& file){
       editor->extractText(text,editor->getSelStartPos(),size);
 
       // Translate newlines
-#ifdef WIN32
-      fxtoDOS(text,size);
-#endif
+      if(appendcr){
+        fxtoDOS(text,size);
+        }
 
       // Write the file
       n=textfile.writeBlock(text,size);
@@ -1029,11 +1115,13 @@ FXbool TextWindow::extractFile(const FXString& file){
 // Generate unique name for a new window
 FXString TextWindow::unique() const {
   FXString name="untitled";
+  FXString file;
   for(FXint i=1; i<2147483647; i++){
-    if(!findWindow(name)) break;
+    file=FXPath::absolute(FXPath::directory(filename),name);
+    if(!findWindow(file)) break;
     name.format("untitled%d",i);
     }
-  return name;
+  return file;
   }
 
 
@@ -1185,6 +1273,9 @@ void TextWindow::readRegistry(){
   // Showing the tool bar?
   hidetoolbar=getApp()->reg().readBoolEntry("SETTINGS","hidetoolbar",false);
 
+  // Showing the search bar?
+  showsearchbar=getApp()->reg().readBoolEntry("SETTINGS","showsearchbar",false);
+
   // Highlight match time
   editor->setHiliteMatchTime(getApp()->reg().readLongEntry("SETTINGS","bracematchpause",2000000000));
 
@@ -1210,6 +1301,7 @@ void TextWindow::readRegistry(){
 
   // Various flags
   stripcr=getApp()->reg().readBoolEntry("SETTINGS","stripreturn",true);
+  appendcr=getApp()->reg().readBoolEntry("SETTINGS","appendreturn",false);
   stripsp=getApp()->reg().readBoolEntry("SETTINGS","stripspaces",false);
   appendnl=getApp()->reg().readBoolEntry("SETTINGS","appendnewline",true);
   saveviews=getApp()->reg().readBoolEntry("SETTINGS","saveviews",false);
@@ -1217,6 +1309,7 @@ void TextWindow::readRegistry(){
   warnchanged=getApp()->reg().readBoolEntry("SETTINGS","warnchanged",true);
   colorize=getApp()->reg().readBoolEntry("SETTINGS","colorize",false);
   jumpscroll=getApp()->reg().readBoolEntry("SETTINGS","jumpscroll",false);
+  searchflags=getApp()->reg().readUIntEntry("SETTINGS","searchflags",SEARCH_FORWARD|SEARCH_EXACT);
 
   // File patterns
   setPatterns(getApp()->reg().readStringEntry("SETTINGS","filepatterns","All Files (*)"));
@@ -1257,6 +1350,9 @@ void TextWindow::readRegistry(){
 
   // Hide toolbar
   if(hidetoolbar) toolbar->hide();
+
+  // Hide search bar
+  if(!showsearchbar) searchbar->hide();
 
   // Hide undo counters
   if(hideundo) undoredoblock->hide();
@@ -1309,9 +1405,7 @@ void TextWindow::readRegistry(){
   position(xx,yy,ww,hh);
   }
 
-
 /*******************************************************************************/
-
 
 // Save settings to registry
 void TextWindow::writeRegistry(){
@@ -1365,6 +1459,9 @@ void TextWindow::writeRegistry(){
   // Was toolbar shown
   getApp()->reg().writeBoolEntry("SETTINGS","hidetoolbar",!toolbar->shown());
 
+  // Was search bar shown
+  getApp()->reg().writeBoolEntry("SETTINGS","showsearchbar",searchbar->shown());
+
   // Were undo counters shown
   getApp()->reg().writeBoolEntry("SETTINGS","hideundo",!undoredoblock->shown());
 
@@ -1392,6 +1489,7 @@ void TextWindow::writeRegistry(){
 
   // Strip returns
   getApp()->reg().writeBoolEntry("SETTINGS","stripreturn",stripcr);
+  getApp()->reg().writeBoolEntry("SETTINGS","appendreturn",appendcr);
   getApp()->reg().writeBoolEntry("SETTINGS","stripspaces",stripsp);
   getApp()->reg().writeBoolEntry("SETTINGS","appendnewline",appendnl);
   getApp()->reg().writeBoolEntry("SETTINGS","saveviews",saveviews);
@@ -1399,6 +1497,7 @@ void TextWindow::writeRegistry(){
   getApp()->reg().writeBoolEntry("SETTINGS","warnchanged",warnchanged);
   getApp()->reg().writeBoolEntry("SETTINGS","colorize",colorize);
   getApp()->reg().writeBoolEntry("SETTINGS","jumpscroll",(editor->getScrollStyle()&SCROLLERS_DONT_TRACK)!=0);
+  getApp()->reg().writeUIntEntry("SETTINGS","searchflags",searchflags);
 
   // File patterns
   getApp()->reg().writeIntEntry("SETTINGS","filepatternno",getCurrentPattern());
@@ -1412,9 +1511,7 @@ void TextWindow::writeRegistry(){
   getApp()->reg().writeStringEntry("SETTINGS","textfont",fontspec.text());
   }
 
-
 /*******************************************************************************/
-
 
 // About box
 long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
@@ -1441,18 +1538,13 @@ long TextWindow::onCmdHelp(FXObject*,FXSelector,void*){
   }
 
 
-
 // Show preferences dialog
 long TextWindow::onCmdPreferences(FXObject*,FXSelector,void*){
   Preferences preferences(this);
   preferences.setPatterns(getPatterns());
-  preferences.setSearchPaths(getSearchPaths());
-  preferences.setSyntaxPaths(getApp()->getSyntaxPaths());
   preferences.setSyntax(getSyntax());
   if(preferences.execute()){
     setPatterns(preferences.getPatterns());
-    setSearchPaths(preferences.getSearchPaths());
-    getApp()->setSyntaxPaths(preferences.getSyntaxPaths());
     }
   return 1;
   }
@@ -1474,9 +1566,7 @@ long TextWindow::onCmdFont(FXObject*,FXSelector,void*){
   return 1;
   }
 
-
 /*******************************************************************************/
-
 
 // Reopen file
 long TextWindow::onCmdReopen(FXObject*,FXSelector,void*){
@@ -1500,7 +1590,9 @@ long TextWindow::onUpdReopen(FXObject* sender,FXSelector,void* ptr){
 // New
 long TextWindow::onCmdNew(FXObject*,FXSelector,void*){
   TextWindow *window=new TextWindow(getApp());
-  window->setFilename(unique());
+  FXString file=unique();
+  window->setFilename(file);
+  window->setBrowserCurrentFile(file);
   window->create();
   window->raise();
   window->setFocus();
@@ -1726,7 +1818,7 @@ long TextWindow::onCmdOpenTree(FXObject*,FXSelector,void* ptr){
 
 
 // See if we can get it as a filename
-long TextWindow::onEditDNDDrop(FXObject*,FXSelector,void*){
+long TextWindow::onTextDNDDrop(FXObject*,FXSelector,void*){
   FXString string,file;
   if(getDNDData(FROM_DRAGNDROP,urilistType,string)){
     file=FXURL::fileFromURL(string.before('\r'));
@@ -1747,7 +1839,7 @@ long TextWindow::onEditDNDDrop(FXObject*,FXSelector,void*){
 
 
 // See if a filename is being dragged over the window
-long TextWindow::onEditDNDMotion(FXObject*,FXSelector,void*){
+long TextWindow::onTextDNDMotion(FXObject*,FXSelector,void*){
   if(offeredDNDType(FROM_DRAGNDROP,urilistType)){
     acceptDrop(DRAG_COPY);
     return 1;
@@ -1959,6 +2051,18 @@ long TextWindow::onCmdPrint(FXObject*,FXSelector,void*){
   }
 
 
+// Find in files
+long TextWindow::onCmdFindInFiles(FXObject*,FXSelector,void*){
+  FindInFiles *findwindow=new FindInFiles(getApp());
+  findwindow->setPatternList(getPatterns());
+  findwindow->setCurrentPattern(getCurrentPattern());
+  findwindow->setDirectory(FXPath::directory(getFilename()));
+  findwindow->create();
+  findwindow->show(PLACEMENT_CURSOR);
+  return 1;
+  }
+
+
 // Toggle file browser
 long TextWindow::onCmdToggleBrowser(FXObject*,FXSelector,void*){
   if(treebox->shown()){
@@ -2101,10 +2205,7 @@ long TextWindow::onCmdStripSpaces(FXObject*,FXSelector,void* ptr){
 
 // Update toggle strip spaces mode
 long TextWindow::onUpdStripSpaces(FXObject* sender,FXSelector,void*){
-  if(stripsp)
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,stripsp ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2118,12 +2219,25 @@ long TextWindow::onCmdAppendNewline(FXObject*,FXSelector,void* ptr){
 
 // Update toggle append newline mode
 long TextWindow::onUpdAppendNewline(FXObject* sender,FXSelector,void*){
-  if(appendnl)
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,appendnl ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
+
+
+
+// Toggle append carriage return mode
+long TextWindow::onCmdAppendCarriageReturn(FXObject*,FXSelector,void* ptr){
+  appendcr=(FXbool)(FXuval)ptr;
+  return 1;
+  }
+
+
+// Update toggle append carriage return mode
+long TextWindow::onUpdAppendCarriageReturn(FXObject* sender,FXSelector,void*){
+  sender->handle(this,appendcr ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
 
 // Change tab columns
 long TextWindow::onCmdTabColumns(FXObject* sender,FXSelector,void*){
@@ -2541,7 +2655,229 @@ long TextWindow::onCmdFilter(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Change search paths
+long TextWindow::onCmdSearchPaths(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETSTRINGVALUE),(void*)&searchpaths);
+  return 1;
+  }
+
+
+// Update search paths
+long TextWindow::onUpdSearchPaths(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&searchpaths);
+  return 1;
+  }
+
 /*******************************************************************************/
+
+// Start incremental search; show search bar if not permanently visible
+void TextWindow::startISearch(){
+  showsearchbar=searchbar->shown();
+  if(!showsearchbar){
+    searchbar->show();
+    searchbar->recalc();
+    }
+  searchtext->setBackColor(getApp()->getBackColor());
+  searchtext->setText(FXString::null);
+  searchtext->setFocus();
+  searchpos=-1;
+  }
+
+
+// Finish incremental search; hide search bar if not permanently visible
+void TextWindow::finishISearch(){
+  if(!showsearchbar){
+    searchbar->hide();
+    searchbar->recalc();
+    }
+  searchtext->setBackColor(getApp()->getBackColor());
+  searchtext->setText(FXString::null);
+  editor->setFocus();
+  searchpos=-1;
+  }
+
+
+// Search next incremental text
+FXbool TextWindow::performISearch(const FXString& text,FXbool advance,FXbool notify){
+  FXint beg[10],end[10],start;
+  FXRex rex;
+
+  // Figure start of search
+  start=editor->getCursorPos();
+  if(searchpos==-1) searchpos=start;
+  if(advance){
+    if(editor->isPosSelected(start)){
+      if((searchflags&SEARCH_BACKWARD)){
+        start=editor->getSelStartPos();
+        }
+      else{
+        start=editor->getSelEndPos();
+        }
+      }
+    }
+  else{
+    start=searchpos;
+    }
+
+  if((searchflags&SEARCH_BACKWARD) && start>0) start--;
+
+  searchtext->setBackColor(getApp()->getBackColor());
+
+  // If entry is empty, clear selection and jump back to start
+  if(text.empty()){
+    editor->killSelection(notify);
+    editor->makePositionVisible(searchpos);
+    editor->setCursorPos(searchpos,notify);
+    getApp()->beep();
+    return true;
+    }
+
+  // Check syntax of regex; ignore if input not yet complete
+  if(rex.parse(text,FXRex::Syntax)==FXRex::ErrOK){
+
+    // Search text, beep if not found
+    if(!editor->findText(text,beg,end,start,searchflags,10)){
+      searchtext->setBackColor(FXRGB(255,128,128));
+      getApp()->beep();
+      return false;
+      }
+
+    // Matching zero-length assertion at start position; advance to next one
+    if(!(searchflags&SEARCH_BACKWARD) && start==beg[0] && beg[0]==end[0]){
+      if(!editor->findText(text,beg,end,start+1,searchflags,10)){
+        searchtext->setBackColor(FXRGB(255,128,128));
+        getApp()->beep();
+        return false;
+        }
+      }
+
+    // Select matching text
+    if(searchflags&SEARCH_BACKWARD){
+      editor->setAnchorPos(end[0]);
+      editor->extendSelection(beg[0],FXText::SelectChars,notify);
+      editor->makePositionVisible(beg[0]);
+      editor->setCursorPos(beg[0],notify);
+      }
+    else{
+      editor->setAnchorPos(beg[0]);
+      editor->extendSelection(end[0],FXText::SelectChars,notify);
+      editor->makePositionVisible(end[0]);
+      editor->setCursorPos(end[0],notify);
+      }
+    }
+  return true;
+  }
+
+
+// Incremental search text changed
+long TextWindow::onChgISearchText(FXObject*,FXSelector,void*){
+  performISearch(searchtext->getText(),false,true);
+  return 1;
+  }
+
+
+// Incremental search text command
+long TextWindow::onCmdISearchText(FXObject*,FXSelector,void*){
+  performISearch(searchtext->getText(),true,true);
+  return 1;
+  }
+
+
+// Incremental search text command
+long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
+  if(((FXEvent*)ptr)->code==KEY_Escape){
+    finishISearch();
+    return 1;
+    }
+  if(((FXEvent*)ptr)->code==KEY_Down){
+    searchflags&=~SEARCH_BACKWARD;
+    performISearch(searchtext->getText(),true,true);
+    return 1;
+    }
+  if(((FXEvent*)ptr)->code==KEY_Up){
+    searchflags|=SEARCH_BACKWARD;
+    performISearch(searchtext->getText(),true,true);
+    return 1;
+    }
+  if(((FXEvent*)ptr)->state&CONTROLMASK){
+    if(((FXEvent*)ptr)->code==KEY_i){
+      searchflags^=SEARCH_IGNORECASE;
+      return 1;
+      }
+    if(((FXEvent*)ptr)->code==KEY_e){
+      searchflags^=SEARCH_REGEX;
+      return 1;
+      }
+    if(((FXEvent*)ptr)->code==KEY_d){
+      searchflags^=SEARCH_BACKWARD;
+      return 1;
+      }
+    }
+  return 0;
+  }
+
+
+// Search incremental backward for next occurrence
+long TextWindow::onCmdISearchPrev(FXObject*,FXSelector,void*){
+  searchflags|=SEARCH_BACKWARD;
+  performISearch(searchtext->getText(),true,true);
+  return 1;
+  }
+
+
+// Search incremental forward for next occurrence
+long TextWindow::onCmdISearchNext(FXObject*,FXSelector,void*){
+  searchflags&=~SEARCH_BACKWARD;
+  performISearch(searchtext->getText(),true,true);
+  return 1;
+  }
+
+
+// Start incremental search
+long TextWindow::onCmdISearchStart(FXObject*,FXSelector,void*){
+  startISearch();
+  return 1;
+  }
+
+
+// End incremental search
+long TextWindow::onCmdISearchFinish(FXObject*,FXSelector,void*){
+  finishISearch();
+  return 1;
+  }
+
+
+// Update incremental search modifiers
+long TextWindow::onUpdISearchModifiers(FXObject* sender,FXSelector sel,void*){
+  FXuint check=0;
+  switch(FXSELID(sel)){
+    case ID_ISEARCH_REVERSE: check=(searchflags&SEARCH_BACKWARD); break;
+    case ID_ISEARCH_IGNCASE: check=(searchflags&SEARCH_IGNORECASE); break;
+    case ID_ISEARCH_REGEX: check=(searchflags&SEARCH_REGEX); break;
+    }
+  sender->handle(this,check?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change incremental search modifiers
+long TextWindow::onCmdISearchModifiers(FXObject*,FXSelector sel,void*){
+  switch(FXSELID(sel)){
+    case ID_ISEARCH_REVERSE: searchflags^=SEARCH_BACKWARD; break;
+    case ID_ISEARCH_IGNCASE: searchflags^=SEARCH_IGNORECASE; break;
+    case ID_ISEARCH_REGEX: searchflags^=SEARCH_REGEX; break;
+    }
+  // FIXME should change of flags re-search immediately?
+  return 1;
+  }
+
+/*******************************************************************************/
+
+// Text window got focus; terminate incremental search
+long TextWindow::onTextFocus(FXObject*,FXSelector,void*){
+  finishISearch();
+  return 1;
+  }
 
 
 // Text inserted; callback has [pos nins]
@@ -2553,28 +2889,6 @@ long TextWindow::onTextInserted(FXObject*,FXSelector,void* ptr){
   // Log undo record
   if(!undolist.busy()){
     undolist.add(new FXTextInsert(editor,change->pos,change->nins,change->ins));
-    if(undolist.size()>MAXUNDOSIZE) undolist.trimSize(KEEPUNDOSIZE);
-    }
-
-  // Update bookmark locations
-  updateBookmarks(change->pos,change->ndel,change->nins);
-
-  // Restyle text
-  restyleText(change->pos,change->ndel,change->nins);
-
-  return 1;
-  }
-
-
-// Text deleted; callback has [pos ndel]
-long TextWindow::onTextDeleted(FXObject*,FXSelector,void* ptr){
-  const FXTextChange *change=(const FXTextChange*)ptr;
-
-  FXTRACE((140,"Deleted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
-
-  // Log undo record
-  if(!undolist.busy()){
-    undolist.add(new FXTextDelete(editor,change->pos,change->ndel,change->del));
     if(undolist.size()>MAXUNDOSIZE) undolist.trimSize(KEEPUNDOSIZE);
     }
 
@@ -2610,12 +2924,57 @@ long TextWindow::onTextReplaced(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Text deleted; callback has [pos ndel]
+long TextWindow::onTextDeleted(FXObject*,FXSelector,void* ptr){
+  const FXTextChange *change=(const FXTextChange*)ptr;
+
+  FXTRACE((140,"Deleted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+
+  // Log undo record
+  if(!undolist.busy()){
+    undolist.add(new FXTextDelete(editor,change->pos,change->ndel,change->del));
+    if(undolist.size()>MAXUNDOSIZE) undolist.trimSize(KEEPUNDOSIZE);
+    }
+
+  // Update bookmark locations
+  updateBookmarks(change->pos,change->ndel,change->nins);
+
+  // Restyle text
+  restyleText(change->pos,change->ndel,change->nins);
+
+  return 1;
+  }
+
+
 // Released right button
 long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   if(!event->moved){
-    popupmenu->popup(NULL,event->root_x,event->root_y);
-    getApp()->runModalWhileShown(popupmenu);
+    FXMenuPane popupmenu(this,POPUP_SHRINKWRAP);
+    new FXMenuCommand(&popupmenu,tr("Undo"),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
+    new FXMenuCommand(&popupmenu,tr("Redo"),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
+    new FXMenuSeparator(&popupmenu);
+    new FXMenuCommand(&popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
+    new FXMenuCommand(&popupmenu,tr("Copy"),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
+    new FXMenuCommand(&popupmenu,tr("Paste"),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
+    new FXMenuCommand(&popupmenu,tr("Select All"),NULL,editor,FXText::ID_SELECT_ALL);
+    new FXMenuSeparator(&popupmenu);
+    new FXMenuCommand(&popupmenu,tr("Set bookmark"),getApp()->bookseticon,this,ID_SET_MARK);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_0);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_1);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_2);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_3);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_4);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_5);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_6);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_7);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_8);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_9);
+    new FXMenuCommand(&popupmenu,tr("Clear bookmarks"),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
+    popupmenu.forceRefresh();
+    popupmenu.create();
+    popupmenu.popup(NULL,event->root_x,event->root_y);
+    getApp()->runModalWhileShown(&popupmenu);
     }
   return 1;
   }
@@ -2662,12 +3021,11 @@ long TextWindow::onClock(FXObject*,FXSelector,void*){
 
 // Next bookmarked place
 long TextWindow::onCmdNextMark(FXObject*,FXSelector,void*){
-  register FXint b;
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(b=0; b<=9; b++){
+    for(FXint b=0; b<=9; b++){
       if(bookmark[b]==0) break;
-      if(bookmark[b]>pos){ gotoBookmark(b); break; }
+      if(bookmark[b]>pos){ gotoPosition(bookmark[b]); break; }
       }
     }
   return 1;
@@ -2676,10 +3034,9 @@ long TextWindow::onCmdNextMark(FXObject*,FXSelector,void*){
 
 // Sensitize if bookmark beyond cursor pos
 long TextWindow::onUpdNextMark(FXObject* sender,FXSelector,void*){
-  register FXint b;
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(b=0; b<=9; b++){
+    for(FXint b=0; b<=9; b++){
       if(bookmark[b]==0) break;
       if(bookmark[b]>pos){ sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL); return 1; }
       }
@@ -2691,12 +3048,11 @@ long TextWindow::onUpdNextMark(FXObject* sender,FXSelector,void*){
 
 // Previous bookmarked place
 long TextWindow::onCmdPrevMark(FXObject*,FXSelector,void*){
-  register FXint b;
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(b=9; 0<=b; b--){
+    for(FXint b=9; 0<=b; b--){
       if(bookmark[b]==0) continue;
-      if(bookmark[b]<pos){ gotoBookmark(b); break; }
+      if(bookmark[b]<pos){ gotoPosition(bookmark[b]); break; }
       }
     }
   return 1;
@@ -2705,10 +3061,9 @@ long TextWindow::onCmdPrevMark(FXObject*,FXSelector,void*){
 
 // Sensitize if bookmark before cursor pos
 long TextWindow::onUpdPrevMark(FXObject* sender,FXSelector,void*){
-  register FXint b;
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(b=9; 0<=b; b--){
+    for(FXint b=9; 0<=b; b--){
       if(bookmark[b]==0) continue;
       if(bookmark[b]<pos){ sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL); return 1; }
       }
@@ -2732,6 +3087,51 @@ long TextWindow::onUpdSetMark(FXObject* sender,FXSelector,void*){
   }
 
 
+// Goto bookmark i
+long TextWindow::onCmdGotoMark(FXObject*,FXSelector sel,void*){
+  FXint pos=bookmark[FXSELID(sel)-ID_MARK_0];
+  if(pos){
+    if(editor->getCursorPos()==pos){
+      clearBookmark(pos);
+      }
+    else{
+      gotoPosition(pos);
+      }
+    }
+  return 1;
+  }
+
+
+// Update bookmark i
+long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
+  FXint pos=bookmark[FXSELID(sel)-ID_MARK_0];
+  if(pos){
+    FXString string;
+    FXint b=editor->lineStart(pos);
+    FXint e=editor->lineEnd(pos);
+    FXint p=editor->getCursorPos();
+    FXint c=(b<=p&&p<=e);
+    if(b+50<=e){
+      e=editor->validPos(b+50);
+      editor->extractText(string,b,e-b);
+      string.append("...");
+      }
+    else if(b==e){
+      string.format("<<%d>>",pos);
+      }
+    else{
+      editor->extractText(string,b,e-b);
+      }
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)c);
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);
+    return 1;
+    }
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_HIDE),NULL);
+  return 1;
+  }
+
+
 // Clear bookmarks
 long TextWindow::onCmdClearMarks(FXObject*,FXSelector,void*){
   clearBookmarks();
@@ -2742,12 +3142,31 @@ long TextWindow::onCmdClearMarks(FXObject*,FXSelector,void*){
 // Add bookmark at current cursor position; we force the cursor
 // position to be somewhere in the currently visible text.
 void TextWindow::setBookmark(FXint pos){
-  register FXint b;
-  if(!bookmark[9]){
-    for(b=9; 0<b && (bookmark[b-1]==0 || bookmark[b-1]>pos); b--){
-      bookmark[b]=bookmark[b-1];
+  if(!bookmark[9] && pos){
+    register FXint i;
+    for(i=0; i<=9; i++){
+      if(bookmark[i]==pos) return;
       }
-    bookmark[b]=pos;
+    for(i=8; i>=0 && (bookmark[i]==0 || pos<bookmark[i]); i--){
+      bookmark[i+1]=bookmark[i];
+      }
+    bookmark[i+1]=pos;
+    }
+  }
+
+
+// Remove bookmark at given position pos
+void TextWindow::clearBookmark(FXint pos){
+  if(bookmark[0] && pos){
+    register FXint i,j,p;
+    for(i=j=0; j<=9; j++){
+      p=bookmark[j];
+      if(p!=pos){
+        bookmark[i]=p;
+        i++;
+        }
+      }
+    bookmark[i]=0;
     }
   }
 
@@ -2755,27 +3174,30 @@ void TextWindow::setBookmark(FXint pos){
 // Update bookmarks upon a text mutation, deleting the bookmark
 // if it was inside the deleted text and moving its position otherwise
 void TextWindow::updateBookmarks(FXint pos,FXint nd,FXint ni){
-  register FXint delta=ni-nd,i,j,p;
-  for(i=j=0; j<=9; j++){
-    p=bookmark[j];
-    bookmark[j]=0;
-    if(pos+nd<=p)
-      bookmark[i++]=p+delta;
-    else if(p<=pos)
-      bookmark[i++]=p;
+  if(bookmark[0]){
+    register FXint i,j,p;
+    for(i=j=0; j<=9; j++){
+      p=bookmark[j];
+      if(p<=pos){
+        bookmark[i++]=p;
+        }
+      else if(pos+nd<=p){
+        bookmark[i++]=p+ni-nd;
+        }
+      else{
+        bookmark[j]=0;
+        }
+      }
     }
   }
 
 
-// Goto bookmark
-void TextWindow::gotoBookmark(FXint b){
-  register FXint p=bookmark[b];
-  if(p){
-    if(!editor->isPosVisible(p)){
-      editor->setCenterLine(p);
-      }
-    editor->setCursorPos(p);
+// Goto position
+void TextWindow::gotoPosition(FXint pos){
+  if(!editor->isPosVisible(pos)){
+    editor->setCenterLine(pos);
     }
+  editor->setCursorPos(pos);
   }
 
 
@@ -2793,13 +3215,11 @@ void TextWindow::readBookmarks(const FXString& file){
 
 // Write bookmarks associated with file, if any were set
 void TextWindow::writeBookmarks(const FXString& file){
-  if(savemarks){
-    if(bookmark[0] || bookmark[1] || bookmark[2] || bookmark[3] || bookmark[4] || bookmark[5] || bookmark[6] || bookmark[7] || bookmark[8] || bookmark[9]){
-      getApp()->reg().writeFormatEntry("BOOKMARKS",FXPath::name(file).text(),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",bookmark[0],bookmark[1],bookmark[2],bookmark[3],bookmark[4],bookmark[5],bookmark[6],bookmark[7],bookmark[8],bookmark[9]);
-      }
-    else{
-      getApp()->reg().deleteEntry("BOOKMARKS",FXPath::name(file).text());
-      }
+  if(savemarks && (bookmark[0] || bookmark[1] || bookmark[2] || bookmark[3] || bookmark[4] || bookmark[5] || bookmark[6] || bookmark[7] || bookmark[8] || bookmark[9])){
+    getApp()->reg().writeFormatEntry("BOOKMARKS",FXPath::name(file).text(),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",bookmark[0],bookmark[1],bookmark[2],bookmark[3],bookmark[4],bookmark[5],bookmark[6],bookmark[7],bookmark[8],bookmark[9]);
+    }
+  else{
+    getApp()->reg().deleteEntry("BOOKMARKS",FXPath::name(file).text());
     }
   }
 
@@ -2842,13 +3262,11 @@ void TextWindow::readView(const FXString& file){
 
 // Write current view of the file
 void TextWindow::writeView(const FXString& file){
-  if(saveviews){
-    if(editor->getTopLine()){
-      getApp()->reg().writeIntEntry("VIEW",FXPath::name(file).text(),editor->getTopLine());
-      }
-    else{
-      getApp()->reg().deleteEntry("VIEW",FXPath::name(file).text());
-      }
+  if(saveviews && editor->getTopLine()){
+    getApp()->reg().writeIntEntry("VIEW",FXPath::name(file).text(),editor->getTopLine());
+    }
+  else{
+    getApp()->reg().deleteEntry("VIEW",FXPath::name(file).text());
     }
   }
 
@@ -2879,14 +3297,6 @@ void TextWindow::determineSyntax(){
   }
 
 
-// Change style colors
-void TextWindow::setStyleColors(FXint index,const FXHiliteStyle& style){
-  FXASSERT(0<=index && index<styles.no());
-  styles[index]=style;
-  editor->update();
-  }
-
-
 // Switch syntax
 long TextWindow::onCmdSyntaxSwitch(FXObject*,FXSelector sel,void*){
   FXint syn=FXSELID(sel)-ID_SYNTAX_FIRST;
@@ -2912,97 +3322,178 @@ long TextWindow::onUpdSyntaxSwitch(FXObject* sender,FXSelector sel,void*){
   return 1;
   }
 
+/*******************************************************************************/
 
-// Change style index
-long TextWindow::onCmdStyleIndex(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&currentstyle);
+// Change normal foreground color
+long TextWindow::onCmdStyleNormalFG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_NORMAL_FG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].normalForeColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update normal foreground color
+long TextWindow::onUpdStyleNormalFG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_NORMAL_FG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].normalForeColor);
   return 1;
   }
 
 
-// Update style index
-long TextWindow::onUpdStyleIndex(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&currentstyle);
+// Change normal background color
+long TextWindow::onCmdStyleNormalBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_NORMAL_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].normalBackColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update normal background color
+long TextWindow::onUpdStyleNormalBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_NORMAL_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].normalBackColor);
   return 1;
   }
 
 
-// Change style flags
-long TextWindow::onCmdStyleFlags(FXObject*,FXSelector sel,void*){
-  if(0<=currentstyle && currentstyle<styles.no()){
-    switch(FXSELID(sel)){
-      case ID_STYLE_UNDERLINE: styles[currentstyle].style^=FXText::STYLE_UNDERLINE; break;
-      case ID_STYLE_STRIKEOUT: styles[currentstyle].style^=FXText::STYLE_STRIKEOUT; break;
-      case ID_STYLE_BOLD:      styles[currentstyle].style^=FXText::STYLE_BOLD; break;
-      }
-    writeStyleForRule(syntax->getRule(currentstyle+1)->getName(),styles[currentstyle]);
-    setStyleColors(currentstyle,styles[currentstyle]);
-    }
+// Change selected foreground color
+long TextWindow::onCmdStyleSelectFG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_SELECT_FG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].selectForeColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update selected foreground color
+long TextWindow::onUpdStyleSelectFG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_SELECT_FG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].selectForeColor);
   return 1;
   }
 
 
-// Update style flags
-long TextWindow::onUpdStyleFlags(FXObject* sender,FXSelector sel,void*){
-  FXuint bit=0;
-  if(0<=currentstyle && currentstyle<styles.no()){
-    switch(FXSELID(sel)){
-      case ID_STYLE_UNDERLINE: bit=styles[currentstyle].style&FXText::STYLE_UNDERLINE; break;
-      case ID_STYLE_STRIKEOUT: bit=styles[currentstyle].style&FXText::STYLE_STRIKEOUT; break;
-      case ID_STYLE_BOLD:      bit=styles[currentstyle].style&FXText::STYLE_BOLD; break;
-      }
-    sender->handle(this,bit?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-    }
-  else{
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
-    }
+// Change selected background color
+long TextWindow::onCmdStyleSelectBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_SELECT_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].selectBackColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update selected background color
+long TextWindow::onUpdStyleSelectBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_SELECT_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].selectBackColor);
   return 1;
   }
 
 
-// Change style color
-long TextWindow::onCmdStyleColor(FXObject*,FXSelector sel,void* ptr){
-  if(0<=currentstyle && currentstyle<styles.no()){
-    switch(FXSELID(sel)){
-      case ID_STYLE_NORMAL_FG: styles[currentstyle].normalForeColor=(FXColor)(FXuval)ptr; break;
-      case ID_STYLE_NORMAL_BG: styles[currentstyle].normalBackColor=(FXColor)(FXuval)ptr; break;
-      case ID_STYLE_SELECT_FG: styles[currentstyle].selectForeColor=(FXColor)(FXuval)ptr; break;
-      case ID_STYLE_SELECT_BG: styles[currentstyle].selectBackColor=(FXColor)(FXuval)ptr; break;
-      case ID_STYLE_HILITE_FG: styles[currentstyle].hiliteForeColor=(FXColor)(FXuval)ptr; break;
-      case ID_STYLE_HILITE_BG: styles[currentstyle].hiliteBackColor=(FXColor)(FXuval)ptr; break;
-      case ID_STYLE_ACTIVE_BG: styles[currentstyle].activeBackColor=(FXColor)(FXuval)ptr; break;
-      }
-    writeStyleForRule(syntax->getRule(currentstyle+1)->getName(),styles[currentstyle]);
-    setStyleColors(currentstyle,styles[currentstyle]);
-    }
+// Change highlight foreground color
+long TextWindow::onCmdStyleHiliteFG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_HILITE_FG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].hiliteForeColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update highlight foreground color
+long TextWindow::onUpdStyleHiliteFG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_HILITE_FG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].hiliteForeColor);
   return 1;
   }
 
 
-// Update style color
-long TextWindow::onUpdStyleColor(FXObject* sender,FXSelector sel,void*){
-  FXColor color=0;
-  if(0<=currentstyle && currentstyle<styles.no()){
-    switch(FXSELID(sel)){
-      case ID_STYLE_NORMAL_FG: color=styles[currentstyle].normalForeColor; break;
-      case ID_STYLE_NORMAL_BG: color=styles[currentstyle].normalBackColor; break;
-      case ID_STYLE_SELECT_FG: color=styles[currentstyle].selectForeColor; break;
-      case ID_STYLE_SELECT_BG: color=styles[currentstyle].selectBackColor; break;
-      case ID_STYLE_HILITE_FG: color=styles[currentstyle].hiliteForeColor; break;
-      case ID_STYLE_HILITE_BG: color=styles[currentstyle].hiliteBackColor; break;
-      case ID_STYLE_ACTIVE_BG: color=styles[currentstyle].activeBackColor; break;
-      }
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&color);
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-    }
-  else{
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&color);
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
-    }
+// Change highlight background color
+long TextWindow::onCmdStyleHiliteBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_HILITE_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].hiliteBackColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
   return 1;
   }
 
+// Update highlight background color
+long TextWindow::onUpdStyleHiliteBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_HILITE_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].hiliteBackColor);
+  return 1;
+  }
+
+
+// Change active background color
+long TextWindow::onCmdStyleActiveBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_ACTIVE_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].activeBackColor);
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update active background color
+long TextWindow::onUpdStyleActiveBG(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_ACTIVE_BG_FIRST;
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&styles[index].activeBackColor);
+  return 1;
+  }
+
+
+// Change underline style
+long TextWindow::onCmdStyleUnderline(FXObject*,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_UNDERLINE_FIRST;
+  styles[index].style^=FXText::STYLE_UNDERLINE;
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update underline style
+long TextWindow::onUpdStyleUnderline(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_UNDERLINE_FIRST;
+  sender->handle(this,(styles[index].style&FXText::STYLE_UNDERLINE)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change strikeout style
+long TextWindow::onCmdStyleStrikeout(FXObject*,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_STRIKEOUT_FIRST;
+  styles[index].style^=FXText::STYLE_STRIKEOUT;
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update strikeout style
+long TextWindow::onUpdStyleStrikeout(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_STRIKEOUT_FIRST;
+  sender->handle(this,(styles[index].style&FXText::STYLE_STRIKEOUT)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change bold style
+long TextWindow::onCmdStyleBold(FXObject*,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_BOLD_FIRST;
+  styles[index].style^=FXText::STYLE_BOLD;
+  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  editor->update();
+  return 1;
+  }
+
+// Update bold style
+long TextWindow::onUpdStyleBold(FXObject* sender,FXSelector sel,void*){
+  FXint index=FXSELID(sel)-ID_STYLE_BOLD_FIRST;
+  sender->handle(this,(styles[index].style&FXText::STYLE_BOLD)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+/*******************************************************************************/
 
 // Set language
 void TextWindow::setSyntax(Syntax* syn){
@@ -3017,31 +3508,11 @@ void TextWindow::setSyntax(Syntax* syn){
     editor->setHiliteStyles(styles.data());
     editor->setStyled(colorize);
     restyleText();
-    currentstyle=0;
     }
   else{
     editor->setDelimiters(FXText::textDelimiters);
     editor->setHiliteStyles(NULL);
     editor->setStyled(false);
-    currentstyle=-1;
-    }
-  }
-
-
-// Restyle entire text
-void TextWindow::restyleText(){
-  if(colorize && syntax){
-    FXint head,tail,len;
-    FXchar *text;
-    FXchar *style;
-    len=editor->getLength();
-    if(allocElms(text,len+len)){
-      style=text+len;
-      editor->extractText(text,0,len);
-      syntax->getRule(0)->stylize(text,style,0,len,head,tail);
-      editor->changeStyle(0,style,len);
-      freeElms(text);
-      }
     }
   }
 
@@ -3078,20 +3549,41 @@ void TextWindow::writeStyleForRule(const FXString& name,const FXHiliteStyle& sty
   }
 
 
+// Restyle entire text
+void TextWindow::restyleText(){
+  if(colorize && syntax){
+    FXint head,tail,len;
+    FXchar *text;
+    FXchar *style;
+    len=editor->getLength();
+    if(allocElms(text,len+len)){
+      style=text+len;
+      editor->extractText(text,0,len);
+      syntax->getRule(0)->stylize(text,style,0,len,head,tail);
+      editor->changeStyle(0,style,len);
+      freeElms(text);
+      }
+    }
+  }
+
+
 // Scan backward by context amount
 FXint TextWindow::backwardByContext(FXint pos) const {
   register FXint nlines=syntax->getContextLines();
   register FXint nchars=syntax->getContextChars();
-  register FXint result=pos;
-  if(1<nlines){
-    result=editor->prevLine(pos,nlines-1);
+  register FXint r1=pos;
+  register FXint r2=pos;
+  if(nlines==0){
+    r1=pos-nchars;
     }
-  else if(nlines==1){
-    result=editor->lineStart(pos);
+  else if(nchars==0){
+    r2=editor->prevLine(pos,nlines);
     }
-  if(pos-nchars<result) result=pos-nchars;
-  if(result<0) result=0;
-  return result;
+  else{
+    r1=pos-nchars;
+    r2=editor->prevLine(pos,nlines);
+    }
+  return FXMAX(0,FXMIN(r1,r2));
   }
 
 
@@ -3099,11 +3591,19 @@ FXint TextWindow::backwardByContext(FXint pos) const {
 FXint TextWindow::forwardByContext(FXint pos) const {
   register FXint nlines=syntax->getContextLines();
   register FXint nchars=syntax->getContextChars();
-  register FXint result=pos;
-  result=editor->nextLine(pos,nlines);
-  if(pos+nchars>result) result=pos+nchars;
-  if(result>editor->getLength()) result=editor->getLength();
-  return result;
+  register FXint r1=pos;
+  register FXint r2=pos;
+  if(nlines==0){
+    r1=pos+nchars;
+    }
+  else if(nchars==0){
+    r2=editor->nextLine(pos,nlines);
+    }
+  else{
+    r1=pos-nchars;
+    r2=editor->nextLine(pos,nlines);
+    }
+  return FXMIN(editor->getLength(),FXMAX(r1,r2));
   }
 
 
@@ -3116,6 +3616,7 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
 
   // Scan back by a certain amount of match context
   probepos=backwardByContext(pos);
+
   if(probepos==0) return 0;
 
   // Get style here
@@ -3172,19 +3673,22 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
 // the last position where the style changed from the original style
 FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint rule){
   FXchar *text,*newstyle,*oldstyle;
-  register FXint len=end-beg;
-  register FXint delta=len;
+  FXint len=end-beg;
+  FXint delta=len;
+  head=0;
+  tail=len;
   FXASSERT(0<=rule);
   FXASSERT(0<=beg && beg<=end && end<=editor->getLength());
-  allocElms(text,len+len+len);
-  newstyle=text+len;
-  oldstyle=text+len+len;
-  editor->extractText(text,beg,len);
-  editor->extractStyle(oldstyle,beg,len);
-  syntax->getRule(rule)->stylizeBody(text,newstyle,0,len,head,tail);
-  editor->changeStyle(beg,newstyle,len);
-  while(0<delta && oldstyle[delta-1]==newstyle[delta-1]) --delta;
-  freeElms(text);
+  if(allocElms(text,len+len+len)){
+    newstyle=text+len;
+    oldstyle=text+len+len;
+    editor->extractText(text,beg,len);
+    editor->extractStyle(oldstyle,beg,len);
+    syntax->getRule(rule)->stylizeBody(text,newstyle,0,len,head,tail);
+    editor->changeStyle(beg,newstyle,len);
+    while(0<delta && oldstyle[delta-1]==newstyle[delta-1]) --delta;
+    freeElms(text);
+    }
   head+=beg;
   tail+=beg;
   delta+=beg;
