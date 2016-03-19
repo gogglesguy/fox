@@ -34,8 +34,8 @@ void churn2(){
   FXParallelInvoke(churn,churn,churn,churn);
   fxmessage("Churn2 done  th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   }
-  
-  
+
+
 // Make-work procedure does a nested parallel call to churn, then returns.
 // This is to illustrate arbitrary nesting of parallelism.
 void churn3(){
@@ -210,7 +210,7 @@ int main(int argc,char* argv[]){
 
     // Main thread also runs jobs
     if(wait){
-      pool.executeAndRun(new Job);
+      pool.executeAndWait(new Job);
       }
 
     fxmessage("...done\n");
@@ -232,6 +232,7 @@ int main(int argc,char* argv[]){
 
     // Start parallel churn; some are recursive
     FXParallelInvoke(churn,churn2,churn,churn,churn,churn,churn2,churn2);
+
     fxmessage("halfway\n");
 
     // Start parallel churn; some are recursive

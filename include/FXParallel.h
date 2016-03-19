@@ -51,7 +51,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   FXParallelCallFunctor<Functor1> task1(fun1);
   FXParallelCallFunctor<Functor2> task2(fun2);
   group.execute(&task1);
-  group.executeAndRun(&task2);
+  group.executeAndWait(&task2);
   }
 
 
@@ -78,7 +78,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   FXParallelCallFunctor<Functor3> task3(fun3);
   group.execute(&task1);
   group.execute(&task2);
-  group.executeAndRun(&task3);
+  group.executeAndWait(&task3);
   }
 
 
@@ -107,7 +107,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task1);
   group.execute(&task2);
   group.execute(&task3);
-  group.executeAndRun(&task4);
+  group.executeAndWait(&task4);
   }
 
 /**
@@ -137,7 +137,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task2);
   group.execute(&task3);
   group.execute(&task4);
-  group.executeAndRun(&task5);
+  group.executeAndWait(&task5);
   }
 
 /**
@@ -169,7 +169,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task3);
   group.execute(&task4);
   group.execute(&task5);
-  group.executeAndRun(&task6);
+  group.executeAndWait(&task6);
   }
 
 
@@ -204,7 +204,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task4);
   group.execute(&task5);
   group.execute(&task6);
-  group.executeAndRun(&task7);
+  group.executeAndWait(&task7);
   }
 
 
@@ -242,7 +242,7 @@ void FXParallelInvoke(FXThreadPool* pool,const Functor1& fun1,const Functor2& fu
   group.execute(&task5);
   group.execute(&task6);
   group.execute(&task7);
-  group.executeAndRun(&task8);
+  group.executeAndWait(&task8);
   }
 
 
@@ -263,37 +263,43 @@ void FXParallelInvoke(Functor1& fun1,const Functor2& fun2,const Functor3& fun3,c
 * global indexing range on a thread provided by the FXThreadPool.
 */
 template <typename Functor,typename Index>
-class FXParallelLoopFunctor : public FXRunnable {
+class FXParallelForFunctor : public FXRunnable {
   const Functor& functor;
   const Index    fm;
   const Index    to;
   const Index    by;
 private:
-  FXParallelLoopFunctor(const FXParallelLoopFunctor&);
-  FXParallelLoopFunctor &operator=(const FXParallelLoopFunctor&);
+  FXParallelForFunctor(const FXParallelForFunctor&);
+  FXParallelForFunctor &operator=(const FXParallelForFunctor&);
 public:
-  FXParallelLoopFunctor(const Functor& fun,Index f,Index t,Index b):functor(fun),fm(f),to(t),by(b){ }
+  FXParallelForFunctor(const Functor& fun,Index f,Index t,Index b):functor(fun),fm(f),to(t),by(b){ }
   virtual FXint run(){ for(Index ix=fm;ix<to;ix+=by){ functor(ix); } return 0; }
   };
 
 
 /**
-* Perform parallel for-loop executing functor fun(i) for indexes x=fm+by*i, where x<to.
+* Perform parallel for-loop executing functor fun(x) for indexes x=fm+by*i, where x<to.
 * The index range is split into at most nc pieces.  Each piece is executed in parallel
 * using the given FXThreadPool.
 */
 template <typename Functor,typename Index>
 void FXParallelFor(FXThreadPool* pool,Index fm,Index to,Index by,Index nc,const Functor& fun){
-  const FXuval size((sizeof(FXParallelLoopFunctor<Functor,Index>)+sizeof(FXulong)-1)/sizeof(FXulong));
+  const FXuval size=(sizeof(FXParallelForFunctor<Functor,Index>)+sizeof(FXulong)-1)/sizeof(FXulong);
   if(fm<to){
-    FXTaskGroup group(pool);
-    FXlong space[128*size];
-    Index nits=1+(to-fm-1)/by,ni,c;
-    if(nc>128) nc=128;
-    if(nc>nits) nc=nits;
-    for(c=0; c<nc; fm+=ni*by,++c){
-      ni=(nits+nc-1-c)/nc;
-      group.execute(new (&space[c*size]) FXParallelLoopFunctor<Functor,Index>(fun,fm,fm+ni*by,by));
+    if(by<(to-fm)){
+      FXTaskGroup group(pool);
+      FXulong space[128*((sizeof(FXParallelForFunctor<Functor,Index>)+sizeof(FXulong)-1)/sizeof(FXulong))];
+      Index nits=1+(to-fm-1)/by,ni,c;
+      if(nc>128) nc=128;
+      if(nc>nits) nc=nits;
+      for(c=0; c<nc; fm+=ni*by,++c){
+        ni=(nits+nc-1-c)/nc;
+        group.execute(new (&space[c*size]) FXParallelForFunctor<Functor,Index>(fun,fm,fm+ni*by,by));
+        }
+      group.wait();
+      }
+    else{
+      fun(fm);
       }
     }
   }
@@ -317,7 +323,7 @@ void FXParallelFor(Index fm,Index to,Index by,Index nc,const Functor& fun){
 */
 template <typename Functor,typename Index>
 void FXParallelFor(FXThreadPool* pool,Index fm,Index to,Index by,const Functor& fun){
-  FXParallelFor(pool,fm,to,by,(Index)FXThread::processors(),fun);
+  FXParallelFor(pool,fm,to,by,(Index)pool->getMaximumThreads(),fun);
   }
 
 
@@ -329,7 +335,7 @@ void FXParallelFor(FXThreadPool* pool,Index fm,Index to,Index by,const Functor& 
 */
 template <typename Functor,typename Index>
 void FXParallelFor(Index fm,Index to,Index by,const Functor& fun){
-  FXParallelFor(FXThreadPool::instance(),fm,to,by,(Index)FXThread::processors(),fun);
+  FXParallelFor(FXThreadPool::instance(),fm,to,by,fun);
   }
 
 }

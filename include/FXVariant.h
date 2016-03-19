@@ -127,6 +127,12 @@ public:
   /// Convert to bool; always OK
   FXbool toBool() const;
 
+  /// Convert to pointer
+  FXptr toPtr() const;
+
+  /// Convert to char pointer
+  const FXchar* toChars() const;
+
   /// Convert to int
   FXint toInt(FXbool* ok=NULL) const;
 
@@ -145,14 +151,14 @@ public:
   /// Convert to double
   FXdouble toDouble(FXbool* ok=NULL) const;
 
-  /// Convert to pointer
-  FXptr toPointer(FXbool* ok=NULL) const;
-
   /// Convert to string
   FXString toString(FXbool* ok=NULL) const;
 
   /// Convert to bool
   operator FXbool() const { return toBool(); }
+
+  /// Convert to pointer
+  operator FXptr() const { return toPtr(); }
 
   /// Convert to char
   operator FXchar() const { return toInt(); }
@@ -183,9 +189,6 @@ public:
 
   /// Convert to double
   operator FXdouble() const { return toDouble(); }
-
-  /// Convert to pointer
-  operator FXptr() const { return toPointer(); }
 
   /// Convert to string
   operator FXString() const { return toString(); }
@@ -265,6 +268,12 @@ public:
   /// Check if key is mapped
   FXbool has(const FXString& key) const { return has(key.text()); }
 
+  /// Return the value of the variant as a pointer
+  const FXptr& asPtr() const { return value.p; }
+
+  /// Return the value of the variant as a char pointer; variant MUST be a string
+  const FXchar* asChars() const { return value.s; }
+
   /// Return the value of the variant as a long
   const FXlong& asLong() const { return value.i; }
 
@@ -273,12 +282,6 @@ public:
 
   /// Return the value of the variant as a double
   const FXdouble& asDouble() const { return value.d; }
-
-  /// Return the value of the variant as a pointer
-  const FXptr& asPtr() const { return value.p; }
-
-  /// Return the value of the variant as a char pointer; variant MUST be a string
-  const FXchar* asChars() const { return value.s; }
 
   /// Return the value of the variant as a string-reference; variant MUST be a string
   const FXString& asString() const { return *reinterpret_cast<const FXString*>(&value.p); }

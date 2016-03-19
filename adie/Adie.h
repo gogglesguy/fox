@@ -112,7 +112,7 @@ public:
 
   // Get syntax paths
   const FXString& getSyntaxPaths() const { return syntaxpaths; }
-
+  
   // Delete application object
   virtual ~Adie();
   };

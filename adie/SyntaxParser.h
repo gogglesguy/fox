@@ -56,7 +56,7 @@ public:
     TK_END=3658
     };
 public:
-
+ 
   // Construct parser
   SyntaxParser(const FXchar* pat,const FXchar* frm);
 

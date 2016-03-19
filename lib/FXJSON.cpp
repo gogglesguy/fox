@@ -232,23 +232,17 @@ FXint FXJSON::next(){
         sptr++;
         continue;
       case '\xef':              // BOM (byte order mark) should behave as spaces
-        column++;
-        sptr++;
-        if(sptr+1<wptr && sptr[0]=='\xbb' && sptr[1]=='\xbf'){ sptr+=2; continue; }
-        if(comment) continue;
+        if(sptr+2<wptr && sptr[1]=='\xbb' && sptr[2]=='\xbf'){ sptr+=3; continue; }
+        if(comment){ column++; sptr++; continue; }
         return TK_ERROR;
       case '/':                 // Possible start of comment
-        column++;
-        sptr++;
-        if(sptr<wptr && sptr[0]=='*' && comment>=0){ comment+=1; column++; sptr++; continue; }
-        if(sptr<wptr && sptr[0]=='/' && comment==0){ comment-=1; column++; sptr++; continue; }
-        if(comment) continue;
+        if(sptr<wptr && sptr[1]=='*' && comment>=0){ comment+=1; column+=2; sptr+=2; continue; }
+        if(sptr<wptr && sptr[1]=='/' && comment==0){ comment-=1; column+=2; sptr+=2; continue; }
+        if(comment){ column++; sptr++; continue; }
         return TK_ERROR;
       case '*':                 // Possible end of comment
-        column++;
-        sptr++;
-        if(sptr<wptr && sptr[0]=='/' && comment>=1){ comment-=1; column++; sptr++; continue; }
-        if(comment) continue;
+        if(sptr<wptr && sptr[1]=='/' && comment>=1){ comment-=1; column+=2; sptr+=2; continue; }
+        if(comment){ column++; sptr++; continue; }
         return TK_ERROR;
       case '{':                 // Begin of map
         column++;
@@ -297,6 +291,7 @@ FXint FXJSON::next(){
       case '7':
       case '8':
       case '9':
+        if(comment){ column++; sptr++; continue; }
         tok=TK_INT;
         if(sptr[0]=='-' || sptr[0]=='+'){
           column++;
@@ -328,25 +323,18 @@ FXint FXJSON::next(){
             sptr++;
             }
           }
-        if(comment) continue;
         return tok;
       case 'n':                 // Null value
-        column++;
-        sptr++;
-        if(comment) continue;
-        if(sptr+3<wptr && sptr[0]=='u' && sptr[1]=='l' && sptr[2]=='l'){ column+=3; sptr+=3; return TK_NULL; }
+        if(comment){ column++; sptr++; continue; }
+        if(sptr+4<wptr && sptr[1]=='u' && sptr[2]=='l' && sptr[3]=='l'){ column+=4; sptr+=4; return TK_NULL; }
         return TK_ERROR;
       case 't':                 // True value
-        column++;
-        sptr++;
-        if(comment) continue;
-        if(sptr+3<wptr && sptr[0]=='r' && sptr[1]=='u' && sptr[2]=='e'){ column+=3; sptr+=3; return TK_TRUE; }
+        if(comment){ column++; sptr++; continue; }
+        if(sptr+4<wptr && sptr[1]=='r' && sptr[2]=='u' && sptr[3]=='e'){ column+=4; sptr+=4; return TK_TRUE; }
         return TK_ERROR;
       case 'f':                 // False value
-        column++;
-        sptr++;
-        if(comment) continue;
-        if(sptr+4<wptr && sptr[1]=='a' && sptr[2]=='l' && sptr[3]=='s' && sptr[4]=='e'){ column+=4; sptr+=4; return TK_FALSE; }
+        if(comment){ column++; sptr++; continue; }
+        if(sptr+5<wptr && sptr[1]=='a' && sptr[2]=='l' && sptr[3]=='s' && sptr[4]=='e'){ column+=5; sptr+=5; return TK_FALSE; }
         return TK_ERROR;
       default:                  // Other characters
         column++;
@@ -717,7 +705,7 @@ FXJSON::Error FXJSON::saveVariant(const FXVariant& var){
     column+=4;
     break;
   case FXVariant::VBool:
-    flag=(FXbool)var.asLong();
+    flag=(FXbool)var.asULong();
     saveText(truth[flag],strlen(truth[flag]));
     column+=strlen(truth[flag]);
     break;

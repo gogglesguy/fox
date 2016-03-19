@@ -1618,6 +1618,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXCompletion.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXCompletion.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXComplexd.cpp"
 			>
 			<FileConfiguration
@@ -5977,6 +5985,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXParallel.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\fxparsegeometry.cpp"
 			>
 			<FileConfiguration
@@ -8253,6 +8265,14 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXTaskGroup.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXTaskGroup.h"
+			>
 		</File>
 		<File
 			RelativePath="..\..\..\lib\FXText.cpp"

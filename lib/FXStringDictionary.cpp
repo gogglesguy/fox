@@ -249,7 +249,7 @@ void FXStringDictionary::erase(FXival pos){
   }
 
 
-/// Clear entire table
+// Clear entire table
 void FXStringDictionary::clear(){
   no(1);
   }

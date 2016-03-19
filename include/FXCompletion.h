@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                          S e m a p h o r e   C l a s s                        *
+*                     C o m p l e t i o n   C o u n t e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2014 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,49 +18,58 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifndef FXSEMAPHORE_H
-#define FXSEMAPHORE_H
+#ifndef FXCOMPLETION_H
+#define FXCOMPLETION_H
 
 
 namespace FX {
 
 
+class FXThreadPool;
+
 /**
-* A semaphore allows for protection of a resource that can
-* be accessed by a fixed number of simultaneous threads.
-*
-* A typical example of the use of semaphores is for a buffer containing N items.
-* A producer thread may freely append N items before blocking for space to become
-* available; a consumer thread can remove items and block only when no items are
-* left.  Thus, two counting semaphores could be used to manage such a buffer, one
-* counting empty slots and one counting filled slots.  As long as production and
-* consumption proceed at comparable rates, no thread needs to be suspended.
+* A completion counter allows a single thread to monitor a number of ongoing
+* concurrent activities for completion.  Each activity calls increment() on the
+* completion counter when started, and decrement() when finished.
+* The monitoring thread can call wait(), wait(nsec), or done() to determine
+* the status of the concurrent activity.
+* Only one thread is allowed to call any of the wait() functions; but multiple
+* threads can call increment() or decrement().
+* The completion counter can not be destroyed until the last thread decrements
+* the counter back down to zero.
 */
-class FXAPI FXSemaphore {
+class FXAPI FXCompletion {
 private:
-  FXuval data[16];
+  FXSemaphore     semaphore;    // Signalled when last task done
+  volatile FXuint counter;      // Task counter
 private:
-  FXSemaphore(const FXSemaphore&);
-  FXSemaphore& operator=(const FXSemaphore&);
+  FXCompletion(const FXCompletion&);
+  FXCompletion& operator=(const FXCompletion&);
 public:
 
-  /// Initialize semaphore with given count
-  FXSemaphore(FXint count=1);
+  /// Initialize completion counter
+  FXCompletion();
 
-  /// Decrement semaphore by 1, waiting if count is zero
+  /// Return current counter value
+  FXuint count() const { return counter; }
+
+  /// Increment counter by cnt
+  void increment(FXuint cnt=1);
+
+  /// Decrement counter by cnt
+  void decrement(FXuint cnt=1);
+
+  /// Wait till count becomes zero again
   void wait();
 
-  /// Try decrement semaphore; return false if timed out
+  /// Wait till count becomes zero, or timeout; return false if timed out
   FXbool wait(FXTime nsec);
 
-  /// Try decrement semaphore, and return false if count was zero
-  FXbool trywait();
+  /// Return true if count is zero
+  FXbool done() const { return (counter==0); }
 
-  /// Increment semaphore by 1
-  void post();
-
-  /// Delete semaphore
-  ~FXSemaphore();
+  /// Wait till count becomes zero, then destroy
+ ~FXCompletion();
   };
 
 }

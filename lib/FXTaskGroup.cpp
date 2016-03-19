@@ -26,10 +26,8 @@
 #include "FXArray.h"
 #include "FXPtrList.h"
 #include "FXAtomic.h"
-#include "FXMutex.h"
 #include "FXSemaphore.h"
-#include "FXCondition.h"
-#include "FXBarrier.h"
+#include "FXCompletion.h"
 #include "FXRunnable.h"
 #include "FXAutoThreadStorageKey.h"
 #include "FXThread.h"
@@ -42,32 +40,31 @@
 /*
   Notes:
 
-  - FXTaskGroup executes a special runnable (FXTaskGroup::Task) executing the passed runnable.
-    This special runnable has backlink to group, and group gets signaled by this special
-    runnable when its passed runnable is done.
-
-  - The interface can be passed ANY FXRunnable. Why? because this is the most general,
-    and runnables that were used for FXThreadPool could now be used for FXTaskGroup instead.
-
-  - Of course, passing special runnable DIRECTLY may be a bit more efficient; but one problem
-    is you'd have to re-implement the run() to explicitly update the completion counter, and
-    thus this becomes something the user has to do rather than it being something done in the
-    FOX library itself.  Someone will mess up.
-
-  - Early termination:
-
-      o It should be possible to terminate a parallel group early.
-
-      o This means one thread sets some flag in the group, and this flag
-        is periodically examined by the other threads to determine early
-        termination.
-
-      o A special case of early termination is abort. An abort should probably
-        terminate not only the group, but also all the parent groups.
-        Normal termination just causes early exit of the group.
-
-      o Should we also use FXRunnable's return code?
-
+  - FXTaskGroup manages the execution  of a task-set (a set of FXRunnables) on the FXThreadPool.
+  
+  - Each FXRunnable is 'wrapped' by FXTaskGroup::Task which updates the completion object
+    inside FXTaskGroup.  This way, the FXTaskGroup can monitor the completion of the task-set
+    it is monitoring.
+    
+  - When waiting for the task-set to finish, the calling thread may join the worker-threads in
+    the FXThreadPool temporarily to add additional processing power; only when the FXThreadPoll
+    queue is empty will the calling thread drop out of the FXThreadPoll's processing loop to
+    actually block for the completion semaphore.
+    
+  - Possible improvements:
+      
+      o For FXParallel, we could have a special flavor of FXTaskGroup::Task that does not wrap
+        a FXRunnable but has a more streamlined implementation, thus avoiding allocs and frees.
+        
+      o We would like some kind of early termination capability.  For instance, in a parallel
+        search algorithm we would like to stop (or never even start) tasks when one of them is
+        successfull.
+        
+      o Another case of early termination would be the throwing of exceptions from one of the
+        tasks.
+        
+      o For now, we don't have a good mechanism for this; we do want to keep this light-weight
+        since FXTaskGroup is created on the stack in FXParallel.
 */
 
 using namespace FX;
@@ -78,49 +75,35 @@ namespace FX {
 
 
 // Create new group of tasks
-FXTaskGroup::FXTaskGroup():threadpool(FXThreadPool::instance()),completed(1),counter(0){
+FXTaskGroup::FXTaskGroup():threadpool(FXThreadPool::instance()){
   if(!threadpool){ fxerror("FXTaskGroup::FXTaskGroup: No thread pool was set."); }
   }
 
 
 // Create new group of tasks
-FXTaskGroup::FXTaskGroup(FXThreadPool* p):threadpool(p),completed(1),counter(0){
+FXTaskGroup::FXTaskGroup(FXThreadPool* p):threadpool(p){
   if(!threadpool){ fxerror("FXTaskGroup::FXTaskGroup: No thread pool was set."); }
-  }
-
-
-// Task was started
-void FXTaskGroup::incrementAndReset(){
-  if(atomicAdd(&counter,1)==0){
-    completed.trywait();
-    }
-  }
-
-
-// Task has completed
-void FXTaskGroup::decrementAndNotify(){
-  if(atomicAdd(&counter,-1)==1){
-    completed.post();
-    }
   }
 
 
 // Construct task group task
 FXTaskGroup::Task::Task(FXTaskGroup* g,FXRunnable *r):taskgroup(g),runnable(r){
-  taskgroup->incrementAndReset();
+  taskgroup->completion.increment();
   }
 
 
 // Destruct task group task
 FXTaskGroup::Task::~Task(){
-  taskgroup->decrementAndNotify();
+  taskgroup->completion.decrement();
   }
 
 
-// Process task
+// Process task group task
 FXint FXTaskGroup::Task::run(){
   try{
     runnable->run();
+    }
+  catch(const FXException&){
     }
   catch(...){
     delete this;
@@ -152,23 +135,10 @@ FXbool FXTaskGroup::execute(FXRunnable* task){
   }
 
 
-// Start task and wait until queue is empty or counter is zero
-FXbool FXTaskGroup::executeAndRun(FXRunnable* task){
-  if(__likely(task)){
-    if(threadpool->executeAndRunWhile(new FXTaskGroup::Task(this,task),counter)){
-      return true;
-      }
-    }
-  return false;
-  }
-
-
 // Start task in this task group, then wait till done
 FXbool FXTaskGroup::executeAndWait(FXRunnable* task){
   if(__likely(task)){
-    if(threadpool->executeAndRunWhile(new FXTaskGroup::Task(this,task),counter)){
-      completed.wait();
-      completed.post();
+    if(threadpool->executeAndWaitFor(new FXTaskGroup::Task(this,task),completion)){
       return true;
       }
     }
@@ -178,9 +148,7 @@ FXbool FXTaskGroup::executeAndWait(FXRunnable* task){
 
 // Wait for completion
 FXbool FXTaskGroup::wait(){
-  if(threadpool->waitWhile(counter)){
-    completed.wait();
-    completed.post();
+  if(threadpool->waitFor(completion)){
     return true;
     }
   return false;

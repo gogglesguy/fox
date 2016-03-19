@@ -152,7 +152,7 @@ x:  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
   }
 
 
-// Try decrement semaphore; and return false if count is zero
+// Try decrement semaphore; and return false if count was zero
 FXbool FXSemaphore::trywait(){
 #if defined(WIN32)
   return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;

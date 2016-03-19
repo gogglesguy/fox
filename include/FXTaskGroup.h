@@ -47,29 +47,19 @@ class FXThreadPool;
 * semaphore to ensure all tasks are completed.
 */
 class FXAPI FXTaskGroup {
-  class Task;
-  friend class Task;
 private:
   class Task : public FXRunnable {
   private:
-    FXTaskGroup *taskgroup;
-    FXRunnable  *runnable;
-  private:
-    Task();
-    Task(const Task&);
-    Task &operator=(const Task&);
+    FXTaskGroup *taskgroup;     // Backlink to taskgroup
+    FXRunnable  *runnable;      // Wrapped runnable
   public:
     Task(FXTaskGroup* g,FXRunnable *r);
     virtual FXint run();
     virtual ~Task();
     };
 private:
-  FXThreadPool   *threadpool;   // Thread pool
-  FXSemaphore     completed;    // Signaled when group completed
-  volatile FXuint counter;      // Completion counter
-private:
-  void incrementAndReset();
-  void decrementAndNotify();
+  FXThreadPool *threadpool;     // Thread pool used by task group
+  FXCompletion  completion;     // Completion counter
 private:
   FXTaskGroup(const FXTaskGroup&);
   FXTaskGroup &operator=(const FXTaskGroup&);
@@ -91,18 +81,15 @@ public:
   */
   FXThreadPool* getThreadPool() const { return threadpool; }
 
+  /** 
+  * Return number of tasks.
+  */
+  FXuint getRunningTasks() const { return completion.count(); }
+
   /**
   * Start a task in this task group.
   */
   FXbool execute(FXRunnable* task);
-
-  /**
-  * Start task in this task group, and then enter the task-processing
-  * loop, returning when either the completion count reaches zero, or the
-  * thread pool's task queue becomes empty.
-  * Return false if unable to start the task.
-  */
-  FXbool executeAndRun(FXRunnable* task);
 
   /**
   * Start task in this task group, and then enter the task-processing

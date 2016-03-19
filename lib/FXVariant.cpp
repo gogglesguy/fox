@@ -279,8 +279,22 @@ FXbool FXVariant::toBool() const {
     return !!reinterpret_cast<const FXVariantArray*>(&value.p)->no();   // True for non-empty array
   case VMap:
     return !reinterpret_cast<const FXVariantMap*>(&value.p)->empty();   // True for non-empty map
+  case VNull:
+    return false;
     }
   return false;
+  }
+
+
+// Convert to pointer
+FXptr FXVariant::toPtr() const {
+  return (type==VPointer) ? value.p : NULL;
+  }
+
+
+// Convert to char pointer
+const FXchar* FXVariant::toChars() const {
+  return (type==VString) ? value.s : FXString::null;
   }
 
 
@@ -408,17 +422,6 @@ FXdouble FXVariant::toDouble(FXbool* ok) const {
   }
 
 
-// Convert to pointer
-FXptr FXVariant::toPointer(FXbool* ok) const {
-  if(type==VPointer){
-    if(ok) *ok=true;
-    return value.p;
-    }
-  if(ok) *ok=false;
-  return NULL;
-  }
-
-
 // Convert to string
 FXString FXVariant::toString(FXbool* ok) const {
   const FXchar truth[2][6]={"false","true"};
@@ -450,7 +453,6 @@ FXString FXVariant::toString(FXbool* ok) const {
     }
   return FXString::null;
   }
-
 
 /*******************************************************************************/
 

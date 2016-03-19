@@ -319,20 +319,6 @@ void FXBitmap::render(){
 #else                   // X11
 
 
-// Find shift amount
-static inline FXuint findshift(unsigned long mask){
-  register FXuint sh=0;
-  while(!(mask&(1<<sh))) sh++;
-  return sh;
-  }
-
-
-// Find low bit in mask
-static inline FXPixel lowbit(FXPixel mask){
-  return (~mask+1)&mask;
-  }
-
-
 // Restore client-side pixel buffer from bitmap
 void FXBitmap::restore(){
   if(xid){

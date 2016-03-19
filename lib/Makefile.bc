@@ -93,6 +93,7 @@ FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
 FXComboBox.cpp \
+FXCompletion.cpp \
 FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
@@ -344,6 +345,9 @@ FXURL.cpp \
 FXUTF16Codec.cpp \
 FXUTF32Codec.cpp \
 FXUTF8Codec.cpp \
+FXVariant.cpp \
+FXVariantArray.cpp \
+FXVariantMap.cpp \
 FXVec2d.cpp \
 FXVec2f.cpp \
 FXVec3d.cpp \

@@ -39,14 +39,15 @@ typedef FXLFQueueOf<FXRunnable> FXTaskQueue;
 *
 * A task executed by the thread pool is queued up until a worker-thread becomes available
 * to run it.
-* To accomodate fluctuations in workloads, the number of worker-threads can be allowed to
-* vary between a minimum and a maximum number.
+* To accomodate fluctuations in workloads and minimize resources, the number of worker-
+* threads can be allowed to vary between a minimum and a maximum number.
 * Idle worker-threads which receive no assignments within a specified amount of time will
 * automatically terminate, thereby reduce system-resources used by the program.
 * By default, the minimum number of worker-threads is 1, and the maximum number of worker-
 * threads is equal to the number of processors in the system.
-* During peak workloads, the task queue may start to fill up, causing the calling
-* thread to block until there is room in the queue for more tasks.
+* During peak workloads, when the task queue may start to fill up, and no new worker-
+* threads can be created, the calling thread to block until there is room in the queue
+* for more tasks.
 * However, if a non-default value is passed for the blocking-parameter to execute(), the
 * calling thread will be blocked for only a finite amount of time (non-zero blocking value)
 * or return immediately (zero blocking value).
@@ -62,28 +63,27 @@ typedef FXLFQueueOf<FXRunnable> FXTaskQueue;
 * The thread pool becomes associated (through a thread-local variable) with the calling
 * thread when start() is called; this association lasts until stop() is called.
 * In addition, each worker will similarly be associated with the thread pool.
-* The thread pool associated this way can be obtained using the static member-function
-* instance().
+* Thus both the main thread as well as the worker threads can easily find the thread
+* pool through the member-function instance().
 */
 class FXAPI FXThreadPool : public FXRunnable {
 private:
   FXTaskQueue     queue;        // Task queue
+  FXCompletion    tasks;        // Active tasks
+  FXCompletion    threads;      // Active threads
   FXSemaphore     freeslots;    // Free slots in queue
   FXSemaphore     usedslots;    // Used slots in queue
-  FXSemaphore     completed;    // Signaled when all tasks completed
-  FXSemaphore     sayonara;     // Last worker left
   FXuval          stacksize;    // Stack size
   FXTime          expiration;   // Quit if no task within this time
-  volatile FXuint processing;   // Tasks being processed
   volatile FXuint maximum;      // Maximum threads
   volatile FXuint minimum;      // Minimum threads
-  volatile FXuint started;      // Started threads
   volatile FXuint workers;      // Working threads
   volatile FXuint running;      // Context is running
 private:
   static FXAutoThreadStorageKey reference;
 private:
   FXbool startWorker();
+  void runWhile(FXCompletion& comp,FXTime timeout);
   virtual FXint run();
 private:
   FXThreadPool(const FXThreadPool&);
@@ -96,16 +96,19 @@ public:
   FXThreadPool(FXuint sz=256);
 
   /// Return true if running
-  FXbool active() const;
+  FXbool active() const { return running==1; }
 
   /// Change task queue size, return true if success
   FXbool setSize(FXuint sz);
 
   /// Return task queue size
-  FXuint getSize() const;
+  FXuint getSize() const { return queue.getSize(); }
+
+  /// Return number of tasks
+  FXuint getRunningTasks() const { return tasks.count(); }
 
   /// Return number of threads
-  FXuint getRunningThreads() const;
+  FXuint getRunningThreads() const { return threads.count(); }
 
   /// Change minimum number of worker threads; default is 1
   FXbool setMinimumThreads(FXuint n);
@@ -157,28 +160,6 @@ public:
   FXbool execute(FXRunnable* task,FXTime blocking=forever);
 
   /**
-  * Execute a task on the thread pool by entering it into the queue.
-  * If the task was successfully added, the calling thread will temporarily enter
-  * the task-processing loop, and help out the worker-threads until the queue
-  * is empty.
-  * Return false if the task could not be added within the given time interval.
-  * Possibly starts additional worker threads if the maximum number of worker
-  * threads has not yet been exceeded.
-  */
-  FXbool executeAndRun(FXRunnable* task,FXTime blocking=forever);
-
-  /**
-  * Execute task on the thread pool by entering int into the queue.
-  * If the task was successfully added, the calling thread will temporarily enter
-  * the task-processing loop, and help out the worker-threads until either
-  * the queue is empty, or the atomic counter becomes zero.
-  * Return false if the task could not be added within the given time interval.
-  * Possibly starts additional worker threads if the maximum number of worker
-  * threads has not yet been exceeded.
-  */
-  FXbool executeAndRunWhile(FXRunnable* task,volatile FXuint& count,FXTime blocking=forever);
-
-  /**
   * Execute task on the thread pool by entering int into the queue.
   * If the task was successfully added, the calling thread will temporarily enter
   * the task-processing loop, and help out the worker-threads until all tasks
@@ -190,6 +171,17 @@ public:
   FXbool executeAndWait(FXRunnable* task,FXTime blocking=forever);
 
   /**
+  * Execute task on the thread pool by entering int into the queue.
+  * If the task was successfully added, the calling thread will temporarily enter
+  * the task-processing loop, and help out the worker-threads until the completion
+  * becomes signaled.
+  * Return false if the task could not be added within the given time interval.
+  * Possibly starts additional worker threads if the maximum number of worker
+  * threads has not yet been exceeded.
+  */
+  FXbool executeAndWaitFor(FXRunnable* task,FXCompletion& comp,FXTime blocking=forever);
+
+  /**
   * Wait until task queue becomes empty and all tasks are finished, and process tasks
   * to help the worker threads in the meantime.
   * If the thread pool was not running, return immediately with false; otherwise,
@@ -198,14 +190,13 @@ public:
   FXbool wait();
 
   /**
-  * Wait until counter becomes zero or task queue becomes empty, and process tasks
-  * to help the worker threads in the meantime.
+  * Wait until completion becomes signaled, and process tasks to help the worker
+  * threads in the meantime.
   * If the thread pool was not running, return immediately with false; otherwise,
-  * return when the counter becomes zero, or when no new tasks are posted to the
-  * queue after given timeout in nanoseconds, or when the thread pool is stopped.
+  * return when the completion becomes signaled, or when the thread pool is stopped.
   * Immediately return with false if the thread pool wasn't running.
   */
-  FXbool waitWhile(volatile FXuint& count,FXTime timeout=0);
+  FXbool waitFor(FXCompletion& comp);
 
   /**
   * Stop thread pool, and block posting of any new tasks to the queue.
