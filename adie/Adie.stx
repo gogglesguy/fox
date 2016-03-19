@@ -1642,3 +1642,210 @@ language "Lua"
 end
 
 
+# TENA definition language
+language "TDL"
+
+  # File patterns for this language mode
+  filesmatch "*.tdl"
+
+  # Word delimiters
+  delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+  contextlines 1
+
+  # // style comment
+  rule "CPPComment"
+    openpattern   "//"
+    closepattern  "$"
+    rule "FIXME"
+      pattern     "FIXME"
+    end
+  end
+
+  # /* */ style comment
+  rule "CComment"
+    openpattern   "/\*"
+    closepattern  "\*/"
+    rule "FIXME"
+      pattern     "FIXME"
+    end
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h+"
+    end
+    rule "ControlEscape"
+      pattern     "\\."
+    end
+    rule "Format"
+      pattern "%[\*hlLq#0 +-]?\d*(\.(\*|\d*))?l?[diouxXeEfFgGaAcsp]"
+    end
+  end
+
+
+  # Char constant
+  rule "Char"
+    openpattern  "'"
+    closepattern "'"
+    rule "OctalEscape"
+      pattern "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h+"
+    end
+    rule "ControlEscape"
+      pattern "\\."
+    end
+  end
+
+  # Preprocessor
+  rule "Preprocessor"
+    openpattern  "^\s*#"
+    closepattern "$"
+    rule "PreprocessorContinuation"
+      pattern "\\\n"
+    end
+  end
+
+  rule "Keyword"
+    pattern     "\<(abstract|and_eq|and|any|asm|attribute|auto|bitand|bitor|break|case|catch|compl|component|const_cast|consumes|context|continue|custom|default|delete|do|dynamic_cast|else|emits|eventtype|exception|explicit|export|extends|extern|factory|FALSE|false|finder|fixed|for|friend|getraises|goto|home|if|implements|import|inline|interface|local|message|module|multiple|mutable|namespace|native|new|not_eq|not|oneway|operator|optional|or_eq|or|package|primarykey|private|protected|provides|public|publishes|raises|readonly|reinterpret_cast|return|sequence|setraises|sizeof|static_cast|supports|switch|template|this|throw|TRUE|true|truncatable|try|typedef|typeid|typename|typeprefix|uses|using|ValueBase|valuetype|vector|while|xor_eq|xor)\>"
+  end
+
+  rule "Direction"
+    pattern     "\<(inout|in|out)\>"
+  end
+
+  rule "Number"
+    pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|l|UL|ul|u|U|F|f)?\>"
+  end
+
+  rule "Type"
+    pattern     "\<(boolean|bool|char|class|const|double|enum|float32|float64|float|long|int16|int32|int64|int8|int|object|octet|register|short|signed|static|string|struct|uint16|uint32|uint64|uint8|union|unsigned|void|virtual|volatile|wchar_t|wchar|wstring)\>"
+  end
+
+  rule "Braces"
+    pattern     "(\{|\})"
+  end
+
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
+  rule "Operator"
+    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%)"
+  end
+end
+
+
+
+# C++ programming language
+language "Go"
+
+  # File patterns for this language mode
+  filesmatch "*.go"
+
+  contextlines 1
+
+  # Word delimiters
+  delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+
+  # C++ style comment
+  rule "CPPComment"
+    openpattern   "//"
+    closepattern  "$"
+    rule "FIXME"
+      pattern     "FIXME"
+    end
+  end
+
+  # C style comment
+  rule "CComment"
+    openpattern   "/\*"
+    closepattern  "\*/"
+    rule "FIXME"
+      pattern     "FIXME"
+    end
+  end
+
+  # Char constant
+  rule "Char"
+    openpattern  "'"
+    closepattern "'"
+    stoppattern  "$"
+    rule "OctalEscape"
+      pattern     "\\[0-7]{3}"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "Unicode"
+      pattern     "\\u\h\h\h\h"
+    end
+    rule "Unicode"
+      pattern     "\\U\h\h\h\h\h\h\h\h"
+    end
+    rule "ControlEscape"
+      pattern     "\\[abfnrtv\\']"
+    end
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+    rule "OctalEscape"
+      pattern     "\\[0-7]{3}"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "Unicode"
+      pattern     "\\u\h\h\h\h"
+    end
+    rule "Unicode"
+      pattern     "\\U\h\h\h\h\h\h\h\h"
+    end
+    rule "ControlEscape"
+      pattern     "\\[abfnrtv\\\"]"
+    end
+  end
+
+  # String
+  rule "RawString"
+    openpattern   "\`"
+    closepattern  "\`"
+  end
+
+  rule "Keyword"
+    pattern     "\<(break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\>"
+  end
+
+  rule "Operator"
+    pattern     "(\+\+|\+=|\+|--|-=|-|\*=|\*|/=|/|%=|%|&&|&^=|&=|&^|&|\^=|\^|<<=|<<|<=|<-|<|>>=|>>|>=|>|\|\||\|=|\||==|=|!=|!|:=|:|\.\.\.|\.|\(|\[|\{|,|\)|\]|\}|;)"
+  end
+
+  rule "Number"
+    pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?i?)\>"
+  end
+
+  rule "Type"
+    pattern     "\<(uint8|uint16|uint32|uint64|int8|int16|int32|int64|float32|float64|complex64|complex128|byte|rune|uint|int|uintptr)\>"
+  end
+
+  rule "Braces"
+    pattern     "(\{|\})"
+  end
+
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
+end

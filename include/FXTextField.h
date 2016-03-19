@@ -64,8 +64,8 @@ class FXAPI FXTextField : public FXFrame {
   FXDECLARE(FXTextField)
 protected:
   FXString      contents;       // Edited text
-  const FXchar *delimiters;     // Set of delimiters
   FXFont       *font;           // Text font
+  const FXchar *delimiters;     // Set of delimiters
   FXColor       textColor;      // Text color
   FXColor       selbackColor;   // Selected background color
   FXColor       seltextColor;   // Selected text color

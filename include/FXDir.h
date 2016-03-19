@@ -35,7 +35,7 @@ public:
 
   /// Options for listing files
   enum {
-    MatchAll    = 0,              /// Matching files and directories
+    MatchAll    = 0,              /// Only files and directories matching pattern
     NoFiles     = 1,              /// Don't list any files
     NoDirs      = 2,              /// Don't list any directories
     AllFiles    = 4,              /// List all files

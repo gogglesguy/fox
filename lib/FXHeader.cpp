@@ -445,12 +445,6 @@ FXHeader::FXHeader(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint
   }
 
 
-// Simple decimal numbering
-FXString FXHeader::decimalNumbering(FXint index){
-  return FXString::value(index+1);
-  }
-  
-  
 // Create window
 void FXHeader::create(){
   register FXint i;
@@ -522,6 +516,25 @@ FXHeaderItem *FXHeader::getItem(FXint index) const {
   }
 
 
+// Simple decimal numbering
+FXString FXHeader::decimalNumbering(FXint index){
+  return FXString::value(index+1);
+  }
+
+
+// Renumber captions
+void FXHeader::renumberCaptions(FXNumberingFunc func,FXint fm,FXint to){
+  if(func){
+    if(fm<=0) fm=0;
+    if(to>=items.no()) to=items.no()-1;
+    while(fm<=to){
+      setItemText(fm,func(fm));
+      ++fm;
+      }
+    }
+  }
+
+
 // Replace item with another
 FXint FXHeader::setItem(FXint index,FXHeaderItem* item,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
@@ -544,9 +557,7 @@ FXint FXHeader::setItem(FXint index,FXHeaderItem* item,FXbool notify){
     items[index]=item;
 
     // Autorenumber captions
-    if(numbering){
-      renumberCaptions(numbering,index,index);
-      }
+    renumberCaptions(numbering,index,index);
 
     // Redo layout
     recalc();
@@ -584,10 +595,8 @@ FXint FXHeader::insertItem(FXint index,FXHeaderItem* item,FXbool notify){
   items.insert(index,item);
 
   // Autorenumber captions
-  if(numbering){
-    renumberCaptions(numbering,index,items.no()-1);
-    }
-    
+  renumberCaptions(numbering,index,items.no()-1);
+
   // Redo layout
   recalc();
 
@@ -672,9 +681,7 @@ FXHeaderItem* FXHeader::extractItem(FXint index,FXbool notify){
   items.erase(index);
 
   // Autorenumber captions
-  if(numbering){
-    renumberCaptions(numbering,index,items.no()-1);
-    }
+  renumberCaptions(numbering,index,items.no()-1);
 
   // Redo layout
   recalc();
@@ -704,9 +711,7 @@ void FXHeader::removeItem(FXint index,FXbool notify){
   items.erase(index);
 
   // Autorenumber captions
-  if(numbering){
-    renumberCaptions(numbering,index,items.no()-1);
-    }
+  renumberCaptions(numbering,index,items.no()-1);
 
   // Redo layout
   recalc();
@@ -1343,25 +1348,12 @@ void FXHeader::setFont(FXFont* fnt){
   }
 
 
-// Renumber captions 
-void FXHeader::renumberCaptions(FXNumberingFunc func,FXint fm,FXint to){
-  if(func){
-    if(fm<=0) fm=0;
-    if(to>=items.no()) to=items.no()-1;
-    while(fm<=to){
-      setItemText(fm,func(fm));
-      ++fm;
-      }
-    }
-  }
-
-  
 // Set auto-renumbering function
 void FXHeader::setAutoNumbering(FXNumberingFunc func){
   if(numbering!=func){
     numbering=func;
-    if(numbering){ 
-      renumberCaptions(numbering); 
+    if(numbering){
+      renumberCaptions(numbering);
       }
     }
   }

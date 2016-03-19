@@ -4,7 +4,9 @@
 AUTOMAKE_OPTIONS = foreign dist-zip
 
 SUBDIRS    = utils include lib chart doc tests shutterbug adie pathfinder calculator controlpanel windows
-EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README fox.spec index.html aclocal.m4
+EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README fox.spec fox-config index.html aclocal.m4
+
+bin_SCRIPTS = fox-config
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = fox17.pc

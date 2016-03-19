@@ -50,7 +50,7 @@
     compilers; it makes a noticeable difference.
 */
 
-#define HASH(x)   ((FXuval)(x))
+#define HASH(x)   ((FXuval)(x)^(((FXuval)(x))>>13))
 #define BSHIFT    5
 #define VOID      ((void*)-1L)
 #define LEGAL(p)  ((p)!=NULL && (p)!=VOID)

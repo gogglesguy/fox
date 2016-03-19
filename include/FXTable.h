@@ -250,10 +250,10 @@ public:
 * specified.  An entire row (column) can be selected by clicking on the a button
 * in the row (column) Header control.  Passing TABLE_NO_COLSELECT disables column
 * selection, and passing TABLE_NO_ROWSELECT disables column selection.
-* When setColumnRenumbering() is called, column captions are automatically renumbered 
+* When setColumnRenumbering() is called, column captions are automatically renumbered
 * when columns are added or removed, according to the label computed by the renumbering
-* function.  Likewise, setRowRenumbering() will cause row numbers to be recalculated 
-* automatically when rows are added or removed.  The column and row renumbering 
+* function.  Likewise, setRowRenumbering() will cause row numbers to be recalculated
+* automatically when rows are added or removed.  The column and row renumbering
 * functions to not have to be the same.  Passing a NULL renumbering function will
 * turn automatic renumbering off; this is the default.
 * To disable editing of cells in the table, the TABLE_READONLY can be specified.
@@ -328,7 +328,6 @@ public:
   static const FXchar csvTypeName[];
 protected:
   FXTable();
-  void spanningRange(FXint& sr,FXint& er,FXint& sc,FXint& ec,FXint anchrow,FXint anchcol,FXint currow,FXint curcol);
   virtual void moveContents(FXint x,FXint y);
   virtual void drawCell(FXDC& dc,FXint sr,FXint er,FXint sc,FXint ec);
   virtual void drawRange(FXDC& dc,FXint rlo,FXint rhi,FXint clo,FXint chi);
@@ -647,11 +646,11 @@ public:
   */
   FXint rowAtY(FXint y) const;
 
-  /// Return the item at the given index
-  FXTableItem *getItem(FXint row,FXint col) const;
-
   /// Replace the item with a [possibly subclassed] item
   void setItem(FXint row,FXint col,FXTableItem* item,FXbool notify=false);
+
+  /// Return the item at the given index
+  FXTableItem *getItem(FXint row,FXint col) const;
 
   /// Set the table size to nr rows and nc columns; all existing items will be removed
   virtual void setTableSize(FXint nr,FXint nc,FXbool notify=false);
@@ -680,7 +679,7 @@ public:
   /// Remove all items from table
   virtual void clearItems(FXbool notify=false);
 
-  /// Scroll to make cell at r,c fully visible
+  /// Scroll to make cell at row, col fully visible
   virtual void makePositionVisible(FXint row,FXint col);
 
   /// Return true if item partially visible
@@ -878,6 +877,12 @@ public:
   void countText(FXint& nr,FXint& nc,const FXchar* text,FXint size,const FXchar* cs="\t,",const FXchar* rs="\n") const;
   void countText(FXint& nr,FXint& nc,const FXString& text,const FXchar* cs="\t,",const FXchar* rs="\n") const;
 
+  /// Reshape existing item at row, col to span over rows fr..lr, and over columns fc..lc
+  virtual FXbool setSpanningRange(FXint row,FXint col,FXint fr,FXint lr,FXint fc,FXint lc,FXbool notify=false);
+
+  /// Return spanning range of cell at row, col, rows fr..lr and columns fc..lc
+  void getSpanningRange(FXint row,FXint col,FXint& fr,FXint& lr,FXint& fc,FXint& lc) const;
+
   /// Return true if its a spanning cell
   FXbool isItemSpanning(FXint row,FXint col) const;
 
@@ -887,22 +892,10 @@ public:
   /// Return true if its a vertically spanning cell
   FXbool isItemVerticalSpanning(FXint row,FXint col) const;
 
-  /// First row of vertically spanning cell
-  FXint firstRowOfItem(FXint row,FXint col) const;
-
-  /// Last row of vertically spanning cell
-  FXint lastRowOfItem(FXint row,FXint col) const;
-
-  /// First column of horizontally spanning cell
-  FXint firstColumnOfItem(FXint row,FXint col) const;
-
-  /// Last column of horizontally spanning cell
-  FXint lastColumnOfItem(FXint row,FXint col) const;
-
   /// Repaint cells between grid lines sr,er and grid lines sc,ec
   void updateRange(FXint sr,FXint er,FXint sc,FXint ec) const;
 
-  /// Repaint cell at r,c
+  /// Repaint cell at row, col
   void updateItem(FXint row,FXint col) const;
 
   /// Enable item
@@ -990,14 +983,17 @@ public:
   /// Is cell selected
   FXbool isItemSelected(FXint row,FXint col) const;
 
-  /// Is row of cells selected
+  /// Are all cells in the given row selected
   FXbool isRowSelected(FXint row) const;
 
-  /// Is column selected
+  /// Are all cells int the given column selected
   FXbool isColumnSelected(FXint col) const;
 
   /// Is anything selected
   FXbool isAnythingSelected() const;
+
+  /// Select single cell
+  virtual FXbool selectCell(FXint row,FXint col,FXbool notify=false);
 
   /// Select a row
   virtual FXbool selectRow(FXint row,FXbool notify=false);
@@ -1005,8 +1001,8 @@ public:
   /// Select a column
   virtual FXbool selectColumn(FXint col,FXbool notify=false);
 
-  /// Select range
-  virtual FXbool selectRange(FXint startrow,FXint endrow,FXint startcol,FXint endcol,FXbool notify=false);
+  /// Select range rows nrlo..nrhi and columns nclo..nchi
+  virtual FXbool selectRange(FXint nrlo,FXint nrhi,FXint nclo,FXint nchi,FXbool notify=false);
 
   /// Extend selection
   virtual FXbool extendSelection(FXint row,FXint col,FXbool notify=false);

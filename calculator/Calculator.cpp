@@ -159,7 +159,7 @@ static const FXuint   nanny[2]={0xffffffff,0x7fffffff};
 #endif
 
 // Double precision nan
-static const FXdouble& dblnan=*((FXdouble*)(void*)nanny);
+static const FXdouble& dblnan=*((const FXdouble*)(const void*)nanny);
 
 
 // Operator priorities

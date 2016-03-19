@@ -44,6 +44,7 @@ switcher \
 tabbook \
 ratio \
 half \
+match \
 gaugetest \
 gltest \
 glviewer
@@ -87,6 +88,7 @@ button_SOURCES		= button.cpp
 codecs_SOURCES		= codecs.cpp
 dctest_SOURCES		= dctest.cpp dippy.h
 half_SOURCES		= half.cpp
+match_SOURCES		= match.cpp
 unicode_SOURCES		= unicode.cpp
 
 

@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [35])
+m4_define([fox_level], [36])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -113,7 +113,7 @@ AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r p
 if test "${GXX}" = "yes" ; then
   CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow"
 #  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow -Wdouble-promotion -fvisibility=hidden"
-  LDFLAGS="-rdynamic ${LDFLAGS}"
+#  LDFLAGS="-rdynamic ${LDFLAGS}"
 fi
 
 
@@ -139,15 +139,16 @@ fi
 
 # Native code
 AC_MSG_CHECKING(for native code generation)
-AC_ARG_ENABLE(native,[  --enable-native        compile for native code])
+AC_ARG_ENABLE(native,[  --enable-native         compile for native (or architecture like "corei7" or "amdfam10") code])
 AC_MSG_RESULT([$enable_native])
-if test "x$enable_native" = "xyes" ; then
-  if test "${GCC}" = "yes" ; then
-    if test "x${build_cpu}" = "xi686" -o "x${build_cpu}" = "xx86_64"; then
-      CXXFLAGS="${CXXFLAGS} -march=native"
-    fi
+if test "${GXX}" = "yes" ; then
+  if test "x$enable_native" = "xyes" ; then
+    CXXFLAGS="${CXXFLAGS} -march=native"
+  elif test "x$enable_native" != "x" -a "x$enable_native" != "xno"; then
+    CXXFLAGS="${CXXFLAGS} -march=$enable_native"
   fi
 fi
+
 
 # Enable profiling
 AC_MSG_CHECKING(for profiling)
@@ -360,5 +361,6 @@ pathfinder/Makefile
 calculator/Makefile
 controlpanel/Makefile
 windows/Makefile
+fox-config
 fox.spec
 fox17.pc)

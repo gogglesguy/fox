@@ -39,7 +39,7 @@ public:
   virtual FXuint enter(const FXString& path);
   virtual FXuint visit(const FXString& path);
   virtual FXuint leave(const FXString& path);
-  virtual ~FXDirVisitor(){}
+  virtual ~FXDirVisitor();
   };
 
 
@@ -53,11 +53,14 @@ private:
   FXuint   flags;
   FXuint   mode;
 public:
+  FXGlobVisitor():flags(FXDir::MatchAll),mode(FXPath::PathName|FXPath::NoEscape){}
+  FXGlobVisitor(const FXGlobVisitor& org):pattern(org.pattern),flags(org.flags),mode(org.mode){}
   FXuint traverse(const FXString& path,const FXString& pat="*",FXuint flg=FXDir::MatchAll);
   virtual FXuint enter(const FXString& path);
   virtual FXuint visit(const FXString& path);
+  virtual ~FXGlobVisitor();
   };
-  
+
 }
 
 #endif

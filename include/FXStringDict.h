@@ -45,19 +45,19 @@ public:
   FXStringDict();
 
   /// Insert a new string indexed by key, with given mark flag
-  const FXchar* insert(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return (const FXchar*)FXDict::insert(ky,(void*)str,mrk); }
+  const FXchar* insert(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return static_cast<const FXchar*>(FXDict::insert(ky,const_cast<FXchar*>(str),mrk)); }
 
   /// Replace or insert a new string indexed by key, unless given mark is lower that the existing mark
-  const FXchar* replace(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return (const FXchar*)FXDict::replace(ky,(void*)str,mrk); }
+  const FXchar* replace(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return static_cast<const FXchar*>(FXDict::replace(ky,const_cast<FXchar*>(str),mrk)); }
 
   /// Remove entry indexed by key
-  const FXchar* remove(const FXchar* ky){ return (const FXchar*)FXDict::remove(ky); }
+  const FXchar* remove(const FXchar* ky){ return static_cast<const FXchar*>(FXDict::remove(ky)); }
 
   /// Return the entry indexed by key, or return NULL if the key does not exist
-  const FXchar* find(const FXchar* ky) const { return (const FXchar*)FXDict::find(ky); }
+  const FXchar* find(const FXchar* ky) const { return static_cast<const FXchar*>(FXDict::find(ky)); }
 
   /// Return the string at position pos
-  const FXchar* data(FXint pos) const { return (const FXchar*)FXDict::data(pos); }
+  const FXchar* data(FXint pos) const { return static_cast<const FXchar*>(FXDict::data(pos)); }
 
   /// Destructor
   virtual ~FXStringDict();
