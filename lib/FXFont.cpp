@@ -2670,6 +2670,66 @@ static FXuint findbyname(const ENTRY* table,FXint n,const FXString& name){
   }
 
 
+// Get style from string
+FXuint FXFont::styleFromString(const FXString& str){
+  return str.toUInt();
+  }
+
+
+// Get string from style
+FXString FXFont::stringFromStyle(FXuint style){
+   return FXString::value(style);
+  }
+
+
+// Get slant from string
+FXuint FXFont::slantFromString(const FXString& str){
+  return findbyname(slanttable,ARRAYNUMBER(slanttable),str);
+  }
+
+
+// Get string from slant
+FXString FXFont::stringFromSlant(FXuint slant){
+  return findbyvalue(slanttable,ARRAYNUMBER(slanttable),slant);
+  }
+
+
+// Get weight from string
+FXuint FXFont::weightFromString(const FXString& str){
+  return findbyname(weighttable,ARRAYNUMBER(weighttable),str);
+  }
+
+
+// Get string from weight
+FXString FXFont::stringFromWeight(FXuint weight){
+  return findbyvalue(weighttable,ARRAYNUMBER(weighttable),weight);
+  }
+
+
+// Get setwidth from string
+FXuint FXFont::setWidthFromString(const FXString& str){
+  return findbyname(setwidthtable,ARRAYNUMBER(setwidthtable),str);
+  }
+
+
+// Get string from setwidth
+FXString FXFont::stringFromSetWidth(FXuint setwidth){
+  return findbyvalue(setwidthtable,ARRAYNUMBER(setwidthtable),setwidth);
+  }
+
+
+// Get encoding from string
+FXuint FXFont::encodingFromString(const FXString& str){
+  return findbyname(encodingtable,ARRAYNUMBER(encodingtable),str);
+  }
+
+
+// Get string from encoding
+FXString FXFont::stringFromEncoding(FXuint encoding){
+  return findbyvalue(encodingtable,ARRAYNUMBER(encodingtable),encoding);
+  }
+
+
 // Change font description
 void FXFont::setFontDesc(const FXFontDesc& fontdesc){
   wantedName=fontdesc.face;
@@ -2709,6 +2769,84 @@ FXFontDesc FXFont::getActualFontDesc() const {
   return result;
   }
 
+/*******************************************************************************/
+
+#if 0  
+  /// Construct font description
+  FXFontDesc(const FXString& fc,FXuint sz,FXuint wt,FXuint sl,FXuint enc,FXuint sw,FXuint h);
+  
+// Construct font description
+FXFontDesc::FXFontDesc(const FXString& fc,FXuint sz,FXuint wt,FXuint sl,FXuint enc,FXuint sw,FXuint h){
+  memcpy(face,fc.text(),sizeof(face)-1);    // FIXME yes, not liking this...
+  size=10*sz;
+  weight=wt;
+  slant=sl;
+  setwidth=sw;
+  encoding=enc;
+  flags=(h&~FXFont::X11);          // System-independent method
+  }  
+#endif
+
+
+// Set font description from a string
+void FXFontDesc::setFont(const FXString& string){
+  FXint len=string.find(',');
+  memset(face,0,sizeof(face));
+  if(0<=len){
+    memcpy(face,string.text(),FXMIN(len,sizeof(face)-1));
+    size=string.section(',',1).toUInt();
+    weight=FXFont::weightFromString(string.section(',',2));
+    slant=FXFont::slantFromString(string.section(',',3));
+    setwidth=FXFont::setWidthFromString(string.section(',',4));
+    encoding=FXFont::encodingFromString(string.section(',',5));
+    flags=FXFont::styleFromString(string.section(',',6));
+    }
+  else{
+    memcpy(face,string.text(),sizeof(face)-1);
+    face[len]=0;
+    size=0;
+    weight=0;
+    slant=0;
+    setwidth=0;
+    encoding=0;
+    flags=FXFont::X11;
+    }
+  }
+
+
+// Get string of font description
+FXString FXFontDesc::getFont() const {
+  FXString string=face;
+  if(!(flags&FXFont::X11)){
+    string.append(',');
+    string.append(FXString::value(size));
+    if(weight || slant || setwidth || encoding || flags){
+      string.append(',');
+      string.append(FXFont::stringFromWeight(weight));
+      if(slant || setwidth || encoding || flags){
+        string.append(',');
+        string.append(FXFont::stringFromSlant(slant));
+        if(setwidth || encoding || flags){
+          string.append(',');
+          string.append(FXFont::stringFromSetWidth(setwidth));
+          if(encoding || flags){
+            string.append(',');
+            string.append(FXFont::stringFromEncoding(encoding));
+            if(flags){
+              string.append(',');
+              string.append(FXFont::stringFromStyle(flags));
+              }
+            }
+          }
+        }
+      }
+    }
+  return string;
+  }
+  
+  
+/*******************************************************************************/
+  
 
 // Change font description from a string
 void FXFont::setFont(const FXString& string){
@@ -2734,19 +2872,19 @@ void FXFont::setFont(const FXString& string){
     wantedSize=string.section(',',1).toUInt();
 
     // Weight
-    wantedWeight=findbyname(weighttable,ARRAYNUMBER(weighttable),string.section(',',2));
+    wantedWeight=weightFromString(string.section(',',2));
 
     // Slant
-    wantedSlant=findbyname(slanttable,ARRAYNUMBER(slanttable),string.section(',',3));
+    wantedSlant=slantFromString(string.section(',',3));
 
     // Set width
-    wantedSetwidth=findbyname(setwidthtable,ARRAYNUMBER(setwidthtable),string.section(',',4));
+    wantedSetwidth=setWidthFromString(string.section(',',4));
 
     // Encoding
-    wantedEncoding=findbyname(encodingtable,ARRAYNUMBER(encodingtable),string.section(',',5));
+    wantedEncoding=encodingFromString(string.section(',',5));
 
     // Flags
-    hints=string.section(',',6).toUInt();
+    hints=styleFromString(string.section(',',6));
     }
   }
 
@@ -2769,35 +2907,35 @@ FXString FXFont::getFont() const {
 
       // Append weight
       string.append(',');
-      string.append(findbyvalue(weighttable,ARRAYNUMBER(weighttable),wantedWeight));
+      string.append(stringFromWeight(wantedWeight));
 
       // Slant and other stuff
       if(wantedSlant || wantedSetwidth || wantedEncoding || hints){
 
         // Append slant
         string.append(',');
-        string.append(findbyvalue(slanttable,ARRAYNUMBER(slanttable),wantedSlant));
+        string.append(stringFromSlant(wantedSlant));
 
         // Setwidth and other stuff
         if(wantedSetwidth || wantedEncoding || hints){
 
           // Append set width
           string.append(',');
-          string.append(findbyvalue(setwidthtable,ARRAYNUMBER(setwidthtable),wantedSetwidth));
+          string.append(stringFromSetWidth(wantedSetwidth));
 
           // Encoding and other stuff
           if(wantedEncoding || hints){
 
             // Append encoding
             string.append(',');
-            string.append(findbyvalue(encodingtable,ARRAYNUMBER(encodingtable),wantedEncoding));
+            string.append(stringFromEncoding(wantedEncoding));
 
             // Hints
             if(hints){
 
               // Append hint flags
               string.append(',');
-              string.append(FXString::value(hints));
+              string.append(stringFromStyle(hints));
               }
             }
           }

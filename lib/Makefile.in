@@ -126,13 +126,13 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo FXPNGIcon.lo \
 	FXPNGImage.lo FXPPMIcon.lo FXPPMImage.lo FXPacker.lo FXPath.lo \
 	FXPicker.lo FXPipe.lo FXPopup.lo FXPoint.lo FXPrintDialog.lo \
-	FXProgressBar.lo FXProgressDialog.lo FXQuatd.lo FXQuatf.lo \
-	FXRASIcon.lo FXRASImage.lo FXRGBIcon.lo FXRGBImage.lo \
-	FXRadioButton.lo FXRangef.lo FXRanged.lo FXRangeSlider.lo \
-	FXRealSlider.lo FXRealSpinner.lo FXRecentFiles.lo \
-	FXRectangle.lo FXRegion.lo FXRegistry.lo FXReplaceDialog.lo \
-	FXRex.lo FXRootWindow.lo FXRuler.lo FXRulerView.lo \
-	FXScrollArea.lo FXScrollBar.lo FXScrollPane.lo \
+	FXProgressBar.lo FXProgressDialog.lo FXPtrQueue.lo FXQuatd.lo \
+	FXQuatf.lo FXRASIcon.lo FXRASImage.lo FXRGBIcon.lo \
+	FXRGBImage.lo FXRadioButton.lo FXRangef.lo FXRanged.lo \
+	FXRangeSlider.lo FXRealSlider.lo FXRealSpinner.lo \
+	FXRecentFiles.lo FXRectangle.lo FXRegion.lo FXRegistry.lo \
+	FXReplaceDialog.lo FXRex.lo FXRootWindow.lo FXRuler.lo \
+	FXRulerView.lo FXScrollArea.lo FXScrollBar.lo FXScrollPane.lo \
 	FXScrollWindow.lo FXSearchDialog.lo FXSeparator.lo \
 	FXSettings.lo FXShell.lo FXShutter.lo FXSize.lo FXSlider.lo \
 	FXSocket.lo FXSpinner.lo FXSpheref.lo FXSphered.lo \
@@ -654,6 +654,7 @@ FXPoint.cpp \
 FXPrintDialog.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
+FXPtrQueue.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
 FXRASIcon.cpp \
@@ -1065,6 +1066,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPrintDialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProgressBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProgressDialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPtrQueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXQuatd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXQuatf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRASIcon.Plo@am__quote@

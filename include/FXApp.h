@@ -400,9 +400,9 @@ public:
 
 public:
 
-  /// Information
-  static const FXuchar copyright[];     /// Copyright notice of library
-
+  /// Copyright information
+  static const FXuchar copyright[];
+  
 public:
 
   /**

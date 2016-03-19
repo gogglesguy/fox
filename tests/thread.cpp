@@ -6,7 +6,6 @@
 * Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
-#include "FXThreadPool.h"
 
 #include <errno.h>
 

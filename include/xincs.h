@@ -164,6 +164,22 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+// SSE Intrinsics only if available and turned on
+#if (defined(__GNUC__) || defined(__INTEL_COMPILER))
+#if (defined(__SSE__) && defined(HAVE_XMMINTRIN_H))
+#include <xmmintrin.h>
+#define FOX_HAS_SSE     // FOX_HAS_SSE: SSE code generated AND Intrinsics supported
+#endif
+#if (defined(__SSE2__) && defined(HAVE_EMMINTRIN_H))
+#include <emmintrin.h>
+#define FOX_HAS_SSE2    // FOX_HAS_SSE2: SSE2 code generated AND Intrinsics supported
+#endif
+#if (defined(__SSE3__) && defined(HAVE_PMMINTRIN_H))
+#include <pmmintrin.h>
+#define FOX_HAS_SSE3    // FOX_HAS_SSE3: SSE3 code generated AND Intrinsics supported
+#endif
+#endif
+
 // X11 includes
 #include <X11/X.h>
 #include <X11/Xlib.h>

@@ -29,6 +29,10 @@ class FXRunnable;
 class FXThreadPool;
 
 
+/// Job queue
+typedef FXPtrQueueOf<FXRunnable> FXJobQueue;
+
+
 /// A worker thread runs jobs from a thread pool
 class FXAPI FXWorker : public FXThread {
 private:
@@ -46,50 +50,6 @@ public:
 
   /// Destroy worker
   virtual ~FXWorker();
-  };
-
-
-/// Queue
-class FXQueue {
-private:
-  FXRunnable **jobs;    // List of jobs
-  FXuint       head;    // Write side
-  FXuint       tail;    // Read side
-  FXuint       size;    // Size of list
-public:
-
-  /// Create queue with initial size
-  FXQueue(FXuint sz=256);
-
-  /// Change size of queue; return true if success
-  FXbool setSize(FXuint sz);
-
-  /// Return size
-  FXuint getSize() const;
-
-  /// Return jobs
-  FXuint getCount() const;
-
-  /// Return head
-  FXuint getHead() const;
-
-  /// Return tail
-  FXuint getTail() const;
-
-  /// Check if queue is empty
-  FXbool isEmpty() const;
-
-  /// Check if queue is full
-  FXbool isFull() const;
-
-  /// Add item to queue, return true if success
-  FXbool push(FXRunnable* job);
-
-  /// Remove item from queue, return true if success
-  FXbool pop(FXRunnable*& job);
-
-  /// Destroy queue
- ~FXQueue();
   };
 
 
@@ -116,7 +76,7 @@ public:
 */
 class FXAPI FXThreadPool : public FXRunnable {
 private:
-  FXQueue         queue;        // Job queue
+  FXJobQueue      queue;        // Job queue
   FXMutex         mutex;        // Pool mutex
   FXCondition     pcond;        // Producer condition
   FXCondition     ccond;        // Consumer condition
@@ -126,8 +86,8 @@ private:
   volatile FXuint minimum;      // Minimum number of workers
   volatile FXuint started;      // Number of workers started
   volatile FXuint stopped;      // Number of workers stopped
-  volatile FXuint pwaiting;     // Producers waiting 
-  volatile FXuint cwaiting;     // Consumers waiting 
+  volatile FXuint pwaiting;     // Producers waiting
+  volatile FXuint cwaiting;     // Consumers waiting
   volatile FXuint watching;     // Threads watching completion
   volatile FXbool runs;         // Thread pool is running
 private:
@@ -149,25 +109,25 @@ public:
   FXuint getSize() const;
 
   /// Is pool running
-  FXbool active();
+  FXbool active() const;
 
   /// Return number of waiting threads
-  FXuint getWaitingThreads();
+  FXuint getWaitingThreads() const;
 
   /// Return number of worker threads
-  FXuint getRunningThreads();
+  FXuint getRunningThreads() const;
 
   /// Change minimum number of worker threads
   void setMinimumThreads(FXuint n);
 
   /// Return minimum number of worker threads
-  FXuint getMinimumThreads();
+  FXuint getMinimumThreads() const;
 
   /// Change maximum number of worker threads
   void setMaximumThreads(FXuint n);
 
   /// Return maximum number of worker threads
-  FXuint getMaximumThreads();
+  FXuint getMaximumThreads() const;
 
   /// Change expiration time
   void setExpiration(FXTime ns=forever);

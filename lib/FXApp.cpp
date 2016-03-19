@@ -329,7 +329,7 @@ struct FXInvocation {
 FXApp* FXApp::app=NULL;
 
 
-// Copyright notice
+// Copyright information
 const FXuchar FXApp::copyright[]="Copyright (C) 1997,2010 Jeroen van der Zijp. All Rights Reserved.";
 
 
@@ -4198,7 +4198,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
 
 // Exit application and close display
-void FXApp::exit(FXint code){
+void FXApp::exit(FXint code){  
   FXTRACE((100,"%s::exit\n",getClassName()));
 
   // Close the display

@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXElement.h"
+#include "FXPtrQueue.h"
 #include "FXThread.h"
 #include "FXThreadPool.h"
 #include "FXException.h"
@@ -89,93 +90,6 @@ FXWorker::~FXWorker(){
 /*******************************************************************************/
 
 
-// Create job queue with initial size
-FXQueue::FXQueue(FXuint sz):jobs(NULL),head(0),tail(0),size(0){
-  if(callocElms(jobs,sz)){ size=sz; }
-  }
-
-
-// Change size of queue; return true if success
-FXbool FXQueue::setSize(FXuint sz){
-  if(resizeElms(jobs,sz)){
-    size=sz;
-    head=0;
-    tail=0;
-    return true;
-    }
-  return false;
-  }
-
-
-// Return size
-FXuint FXQueue::getSize() const {
-  return size;
-  }
-
-
-// Return jobs
-FXuint FXQueue::getCount() const {
-  return (head-tail+size)%size;
-  }
-
-
-// Return head
-FXuint FXQueue::getHead() const {
-  return head;
-  }
-
-
-// Return tail
-FXuint FXQueue::getTail() const {
-  return tail;
-  }
-
-
-// Check if queue is empty
-FXbool FXQueue::isEmpty() const {
-  return (head-tail)==0;
-  }
-
-
-// Check if queue is full
-FXbool FXQueue::isFull() const {
-  return ((size+head-tail+1)%size)==0;
-  }
-
-
-// Add job to queue, return true if success
-FXbool FXQueue::push(FXRunnable* job){
-  FXuint next=(head+1)%size;
-  if(next!=tail){
-    jobs[head]=job;
-    head=next;
-    return true;
-    }
-  return false;
-  }
-
-
-// Remove job from queue, return true if success
-FXbool FXQueue::pop(FXRunnable*& job){
-  if(head!=tail){
-    FXuint next=(tail+1)%size;
-    job=jobs[tail];
-    tail=next;
-    return true;
-    }
-  return false;
-  }
-
-
-// Destroy job queue
-FXQueue::~FXQueue(){
-  freeElms(jobs);
-  }
-
-
-/*******************************************************************************/
-
-
 // Construct an empty thread pool
 FXThreadPool::FXThreadPool(FXuint sz):queue(sz),expire(forever),maximum(0),minimum(0),started(0),stopped(0),pwaiting(0),cwaiting(0),watching(0),runs(false){
   FXTRACE((100,"FXThreadPool::FXThreadPool %p\n",this));
@@ -202,19 +116,19 @@ FXuint FXThreadPool::getSize() const {
 
 
 // Is pool running
-FXbool FXThreadPool::active(){
+FXbool FXThreadPool::active() const {
   return runs;
   }
 
 
 // Return number of waiting threads
-FXuint FXThreadPool::getWaitingThreads(){
+FXuint FXThreadPool::getWaitingThreads() const {
   return cwaiting;
   }
 
 
 // Return number of running worker threads
-FXuint FXThreadPool::getRunningThreads(){
+FXuint FXThreadPool::getRunningThreads() const {
   return (started-stopped);
   }
 
@@ -228,7 +142,7 @@ void FXThreadPool::setMinimumThreads(FXuint n){
 
 
 // Return minimum number of worker threads
-FXuint FXThreadPool::getMinimumThreads(){
+FXuint FXThreadPool::getMinimumThreads() const {
   return minimum;
   }
 
@@ -242,7 +156,7 @@ void FXThreadPool::setMaximumThreads(FXuint n){
 
 
 // Return maximum number of worker threads
-FXuint FXThreadPool::getMaximumThreads(){
+FXuint FXThreadPool::getMaximumThreads() const {
   return maximum;
   }
 
@@ -373,7 +287,7 @@ FIXME wait for ticket
 // if ticket number invalid, return false.
 // otherwise, wait.
 FXbool FXThreadPool::wait(FXint ticket){
-  
+
   // Check for invalid ticket
   // Two cases:
   //  1.  Ticket has not yet dispatched (item still in queue)
@@ -381,15 +295,15 @@ FXbool FXThreadPool::wait(FXint ticket){
   //      oldest to newest ticket.
   //  2.  Ticket has already been dispatched.  In this case,
   //      visit linked list of ticket-lumps to see if this
-  //      ticket is in the list.  
-  // 
-  // If neither of these is the case, the ticket has expired already 
+  //      ticket is in the list.
+  //
+  // If neither of these is the case, the ticket has expired already
   // and we can return with false.
-  // 
+  //
   // Otherwise, create wait-lump on the stack, linked from threadpool the
   // in order of increasing ticket number, and wait on completion
   // condition variable.
-  
+
   // NOTE a worker thread can also call wait, but we must make sure
   // it would not be waiting on its own ticket...
   // For this purpose store the thread ID into the ticket-lump.

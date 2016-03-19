@@ -115,6 +115,12 @@ public:
   /// Return a pointer to the "Cancel" button
   FXButton *cancelButton() const { return cancel; }
 
+  /// Set font selection as a string
+  void setFont(const FXString& string);
+
+  /// Get font selection as a string
+  FXString getFont() const;
+
   /// Set font selection
   void setFontDesc(const FXFontDesc& fontdesc);
 

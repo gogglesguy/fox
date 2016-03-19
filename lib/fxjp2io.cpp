@@ -87,6 +87,7 @@ extern FXAPI FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint&
 extern FXAPI FXbool fxsaveJP2(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
 
 
+#undef HAVE_JP2_H
 #ifdef HAVE_JP2_H
 
 /*******************************************************************************/

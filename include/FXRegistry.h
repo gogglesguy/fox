@@ -29,25 +29,32 @@ namespace FX {
 
 
 /**
-* The registry maintains a database of persistent settings for an application.
-* The settings database is organized in two groups of three layers each.  The
-* system-wide settings group contains settings information pertaining to all
-* users on a system.  The per-user settings group contains settings affecting
-* that user only.
-* Each settings group contains a desktop layer, which comprises the settings
-* which affect all FOX programs, a vendor layer which holds settings that
-* affect all applications from that vendor (e.g. a application-suite), and
-* an application layer which holds settings only for a single application.
-* The vendor-key and application-key determine which files these layers come
-* from, while the "Desktop" key is used for all FOX applications.
-* Settings in the system-wide group are overwritten by the per-user group,
-* and settings from the "Desktop" layer are overwritten by the vendor-layer;
-* vendor-layer settings are overwritten by the application-layer settings.
-* Only the per-user, per-application settings ever gets written; the layers
-* in the system-group only get written during installation and configuration
-* of the application.
-* The registry is read when FXApp::init() is called, and written back to the
-* system when FXApp::exit() is called.
+* The Registry maintains a persistent settings database for an application.
+* The settings database is organized in two groups of three layers each.
+* Configuration data shared by all users on a system is stored in the system-
+* wide settings database. Configuration data for a single user is stored in 
+* the per-user database (typically somewhere in the user's home directory).
+* Each group is further subdivided into three layers.  
+* The Common layer contains configuration data shared by all FOX programs.  
+* The Vendor layer in turn contains configuration data shared by all programs
+* from a particular vendor (like a suite of interoperating applications).
+* The Application layer contains configuration data for a particular application
+* only.
+* When an FXApp object is constructed, the application name and optional vendor 
+* name parameters determine the names of the Application layer and Vendor layer
+* settings files (the name of Common layer settings file is pre-determined).
+* Upon startup, the application's configuration data are assembled by merging
+* layers from the system-wide group first, and then the layers from the per-
+* user group.  
+* During this merge, per-user settings override system-wide settings, and 
+* application settings take precedence over vendor settings, which in turn
+* override common settings.
+* Only per-user, application-layer settings are ever written:- the other settings
+* are rarely modified.  Typically, system-wide settings are set when an
+* application is installed, while common per-user settings tend to be changed
+* by specialized applications (e.g. ControlPanel) or through installation scripts.
+* The Rregistry is automatically read when FXApp::init() is called, and written 
+* back to the system when FXApp::exit() is called.
 */
 class FXAPI FXRegistry : public FXSettings {
   FXDECLARE(FXRegistry)
@@ -67,9 +74,6 @@ protected:
 private:
   FXRegistry(const FXRegistry&);
   FXRegistry &operator=(const FXRegistry&);
-public:
-  static const FXchar foxrc[];          // Name of common settings file
-  static const FXchar ext[];            // File extension for settings files
 public:
 
   /**
@@ -116,6 +120,12 @@ public:
 
   /// Write registry
   virtual FXbool write();
+
+  /// File extension for settings files
+  static const FXchar ext[]; 
+
+  /// File name of common settings file
+  static const FXchar foxrc[];          
 
   /// Destructor
   virtual ~FXRegistry();

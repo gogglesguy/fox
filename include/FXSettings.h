@@ -67,10 +67,10 @@ public:
   void setModified(FXbool mdfy=true){ modified=mdfy; }
 
   /// Parse a file containing a settings database.
-  FXbool parseFile(const FXString& filename,FXbool mrk);
+  FXbool parseFile(const FXString& filename,FXbool mrk=true);
 
   /// Parse single string to populate settings
-  FXbool parse(const FXString& string,FXbool mrk);
+  FXbool parse(const FXString& string,FXbool mrk=true);
 
   /// Unparse settings database into given file.
   FXbool unparseFile(const FXString& filename);

@@ -342,6 +342,7 @@ FXPoint.cpp \
 FXPrintDialog.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
+FXPtrQueue.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
 FXRASIcon.cpp \

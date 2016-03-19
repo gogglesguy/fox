@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [22])
+m4_define([fox_level], [23])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -164,6 +164,11 @@ AC_CHECK_HEADERS([sys/shm.h])
 AC_CHECK_HEADERS([sys/mman.h])
 AC_CHECK_HEADERS([sys/sysctl.h])
 AC_CHECK_HEADERS([sys/pstat.h])
+
+# SSE/SSE2/SSE3
+AC_CHECK_HEADERS([xmmintrin.h])
+AC_CHECK_HEADERS([emmintrin.h])
+AC_CHECK_HEADERS([pmmintrin.h])
 
 # Check for JPEG Image support
 AC_ARG_ENABLE(jpeg,[  --disable-jpeg          compile without JPEG image support])
