@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMemMap.cpp,v 1.33 2007/02/07 20:22:12 fox Exp $                        *
+* $Id: FXMemMap.cpp,v 1.34 2007/05/01 15:10:27 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxdefs.h"
@@ -104,9 +104,9 @@ void *FXMemMap::map(FXlong off,FXival len){
       if(access&WriteOnly){ flag=FILE_MAP_WRITE; }
 
       // Now map it
-      FXInputHandle hnd=::CreateFileMapping(handle(),NULL,prot,0,maplength,NULL);
+      FXInputHandle hnd=::CreateFileMapping(handle(),NULL,prot,0,len,NULL);
       if(hnd!=NULL){
-        FXuchar* ptr=(FXuchar*)::MapViewOfFile(maphandle,flag,0,off,len);
+        FXuchar* ptr=(FXuchar*)::MapViewOfFile(hnd,flag,0,off,len);
         if(ptr!=NULL){
           maphandle=hnd;
           mapbase=ptr;

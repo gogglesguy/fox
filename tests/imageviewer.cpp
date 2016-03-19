@@ -5,22 +5,9 @@
 *********************************************************************************
 * Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.115 2007/02/07 20:22:24 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.116 2007/05/24 20:42:16 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
-#ifdef HAVE_PNG_H
-#include "FXPNGImage.h"
-#endif
-#ifdef HAVE_JPEG_H
-#include "FXJPGImage.h"
-#endif
-#ifdef HAVE_TIFF_H
-#include "FXTIFImage.h"
-#endif
-#include "FXICOImage.h"
-#include "FXTGAImage.h"
-#include "FXRGBImage.h"
-#include "FXPPMImage.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -198,15 +185,9 @@ const FXchar patterns[]=
   "\nXBM Image  (*.xbm)"
   "\nTARGA Image  (*.tga)"
   "\nPPM Image  (*.ppm)"
-#ifdef HAVE_PNG_H
   "\nPNG Image  (*.png)"
-#endif
-#ifdef HAVE_JPEG_H
   "\nJPEG Image (*.jpg)"
-#endif
-#ifdef HAVE_TIFF_H
   "\nTIFF Image (*.tif)"
-#endif
   ;
 
 /*******************************************************************************/
@@ -465,21 +446,15 @@ FXbool ImageWindow::loadimage(const FXString& file){
   else if(comparecase(ext,"ras")==0){
     img=new FXRASImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-#ifdef HAVE_PNG_H
-  else if(comparecase(ext,"png")==0){
+  else if(FXPNGImage::supported && comparecase(ext,"png")==0){
     img=new FXPNGImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-#endif
-#ifdef HAVE_JPEG_H
-  else if(comparecase(ext,"jpg")==0){
+  else if(FXJPGImage::supported && comparecase(ext,"jpg")==0){
     img=new FXJPGImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-#endif
-#ifdef HAVE_TIFF_H
-  else if(comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
+  else if(FXTIFImage::supported && comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
     img=new FXTIFImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-#endif
 
   // Perhaps failed
   if(img==NULL){
@@ -504,7 +479,6 @@ FXbool ImageWindow::loadimage(const FXString& file){
 //img->blend(FXRGB(255,128,255));
 //img->xshear(-30*256,FXRGB(0,255,128));
 //img->yshear(-50*256,FXRGB(0,255,128));
-
 
     img->create();
     old=imageview->getImage();

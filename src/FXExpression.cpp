@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXExpression.cpp,v 1.34 2007/02/07 20:22:07 fox Exp $                    *
+* $Id: FXExpression.cpp,v 1.35 2007/05/17 19:27:56 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -866,10 +866,10 @@ FXdouble FXExpression::evaluate(const FXdouble *args){
       case OP_VAR:   *++sp=args[*pc++]; break;
       case OP_PI:    *++sp=3.1415926535897932384626433833; break;
       case OP_EULER: *++sp=2.7182818284590452353602874713; break;
-#ifndef WIN32
-      case OP_RAND:  *++sp=drand48(); break;
-#else
+#ifdef WIN32
       case OP_RAND:  *++sp=(FXdouble)rand()/(FXdouble)RAND_MAX; break;
+#else
+      case OP_RAND:  *++sp=drand48(); break;
 #endif
       case OP_NOT:   *sp=(FXdouble)(~((FXint)*sp)); break;
       case OP_NEG:   *sp=-*sp; break;
@@ -882,14 +882,14 @@ FXdouble FXExpression::evaluate(const FXdouble *args){
       case OP_SINH:  *sp=sinh(*sp); break;
       case OP_COSH:  *sp=cosh(*sp); break;
       case OP_TANH:  *sp=tanh(*sp); break;
-#ifndef WIN32
-      case OP_ASINH: *sp=asinh(*sp); break;
-      case OP_ACOSH: *sp=acosh(*sp); break;
-      case OP_ATANH: *sp=atanh(*sp); break;
-#else
+#ifdef WIN32
       case OP_ASINH: *sp=log(*sp + sqrt(*sp * *sp + 1.0)); break;
       case OP_ACOSH: *sp=log(*sp + sqrt(*sp * *sp - 1.0)); break;
       case OP_ATANH: *sp=0.5 * log((1.0 + *sp)/(1.0 - *sp)); break;
+#else
+      case OP_ASINH: *sp=asinh(*sp); break;
+      case OP_ACOSH: *sp=acosh(*sp); break;
+      case OP_ATANH: *sp=atanh(*sp); break;
 #endif
       case OP_SQRT:  *sp=sqrt(*sp); break;
       case OP_ABS:   *sp=fabs(*sp); break;

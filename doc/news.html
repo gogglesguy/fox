@@ -17,6 +17,73 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+June 4 - FOX DEVELOPMENT 1.7.10
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>fxIsFinite(), fxIsInf(), fxIsNan() API's added.
+<li>FXGradientBar visual aspects have more control now.</li>
+<li>FXShutter didn't issue message when shutter-item was pressed.</li>
+<li>The fxgetticks() API is now official.  It returns the CPU's clocktick-
+counter, where supported.  Otherwise it returns time in nanoseconds.</li>
+<li>Fixed rare corner-case with active-line coloring in FXText.</li>
+<li>When FXRegistry is in ascii mode on Windows, system registry should be
+searched in \WINDOWS\foxrc, and not in \WINDOWS\foxrc\foxrc.</li>
+<li>Fixed regression in glUseFXFont() when using Xft instead of XLFD.</li>
+<li>Small subtlety fixed with list widgets and drag-n-drop initiation.</li>
+<li>Fixed bug in FXMemMap.</li>
+<li>Fixed bug in FXVisual which caused drawing to FXBitmap to fail.</li>
+<li>Fixed bug FXWindow setDNDData() which affected MS-Windows clipboard
+operations.</li>
+<li>FXbool can not be relied upon to be 1-byte size.  Removed the FXASSERT inside
+FXApp to that effect.  Serialization should be OK since its cast to FXuchar.</li>
+<li>Added ability to set file-associations table in FXFileDialog, FXDirDialog
+so the associations may be shared between multiple widgets.</li>
+<li>Fixed issue with bold-face text not drawing correctly in FXText if
+gap happens to be in the text-fragment being drawn.</li>
+<li>Implemented __vsscanf() and __sscanf().  Since this native FOX implementation,
+<li>Decoration options interpreted under Windows-XP and UNIX as follows: DECOR_SHRINKABLE
+means window may be smaller, but not larger, than default size; DECOR_STRETCHABLE means
+window may be larger, but not smaller, than default size; and finally, DECOR_RESIZE
+means window may be both smaller or larger than default size.</li>
+and its now used on all platforms, there will be no more issues with 32-bit v.s.
+64-bit architectures, or Windows v.s. Solaris v.s. GLIBC based systems.
+The new routine will always behave the same and support the same conversions.</li>
+<li>Implemented __snprintf() and __vsnprintf().  This takes care of all variability
+in these API's across platforms, and also 64- v.s. 32-bit issues.</li>
+<li>Fixed issue in multi-head API access under older Windows operating systems
+than Windows-XP.</li>
+<li>FXMDIChild resize animation speed changed a little bit.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+June 4 - FOX STABLE 1.6.27
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Decoration options interpreted under Windows-XP and UNIX as follows: DECOR_SHRINKABLE
+means window may be smaller, but not larger, than default size; DECOR_STRETCHABLE means
+window may be larger, but not smaller, than default size; and finally, DECOR_RESIZE
+means window may be both smaller or larger than default size.</li>
+<li>Fixed regression in glUseFXFont() when using Xft instead of XLFD.</li>
+<li>Fixed bug in FXVisual which caused drawing to FXBitmap to fail.</li>
+<li>Fixed bug FXWindow setDNDData() which affected MS-Windows clipboard
+operations.</li>
+<li>Fixed issue with bold-face text not drawing correctly in FXText if
+gap happens to be in the text-fragment being drawn.</li>
+<li>Fixed issue in multi-head API access under older Windows operating systems
+than Windows-XP.</li>
+<li>FXMDIChild resize animation speed changed a little bit.</li>
+<li>Some MacOS-X porting issues fixed.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 March 28 - FOX DEVELOPMENT 1.7.9
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -59,6 +126,7 @@ is compiled with -DUNICODE.  Thus, window-titles now show properly in unicode.</
 expect, except they encode the filename to wide-characters on Windows.
 Note that these API's are not official and will be removed at some point in
 the future.</li>
+<li>Fixed _NET_WM_PING protocol issue (change in protocol).</li>
 </ul>
 
 
@@ -71,6 +139,7 @@ March 28 - FOX STABLE 1.6.25
 <!--- TOPIC TITLE -->
 <ul>
 <li>Fixed compile problem with FXThread for build on MacOS-X.</li>
+<li>Fixed _NET_WM_PING protocol issue (change in protocol).</li>
 </ul>
 
 <!--- TOPIC TITLE -->

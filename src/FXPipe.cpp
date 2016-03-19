@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPipe.cpp,v 1.14 2007/02/07 20:22:13 fox Exp $                           *
+* $Id: FXPipe.cpp,v 1.15 2007/05/30 17:43:21 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

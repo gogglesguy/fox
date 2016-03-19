@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2002 by Jeroen van der Zijp.   All Rights Reserved      #
 ##############################################################################
-# $Id: Makefile.bc,v 1.20 2006/08/15 22:33:09 fox Exp $		             #
+# $Id: Makefile.bc,v 1.21 2007/05/11 05:33:52 fox Exp $		             #
 ##############################################################################
 # This library is free software; you can redistribute it and/or 	     #
 # modify it under the terms of the GNU Library General Public		     #
@@ -57,6 +57,7 @@ booknext_gif.gif \
 bookprev_gif.gif \
 bookset_gif.gif \
 browser.gif \
+capitalize.gif \
 close_gif.gif \
 colors_gif.gif \
 config_gif.gif \
@@ -69,12 +70,13 @@ help_gif.gif \
 indent_gif.gif \
 info_gif.gif \
 lang_gif.gif \
+lowercase.gif \
 new_gif.gif \
 nobrowser.gif \
 open_gif.gif \
 palette_gif.gif \
-paste_gif.gif \
 pattern_gif.gif \
+paste_gif.gif \
 print_gif.gif \
 quit_gif.gif \
 redo_gif.gif \
@@ -90,7 +92,8 @@ shiftright_gif.gif \
 small_gif.gif \
 styles_gif.gif \
 syntax_gif.gif \
-undo_gif.gif
+undo_gif.gif \
+uppercase.gif
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp

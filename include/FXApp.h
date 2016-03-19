@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXApp.h,v 1.258 2007/02/07 20:21:52 fox Exp $                            *
+* $Id: FXApp.h,v 1.260 2007/05/21 17:02:24 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -270,7 +270,30 @@ private:
   static FXApp    *app;                 // Application pointer
 
   // Platform dependent private stuff
-#ifndef WIN32
+#ifdef WIN32
+
+  FXushort         ddeTargets;          // DDE targets atom
+  FXushort         ddeAtom;             // DDE Exchange Atom
+  FXDragType       ddeDelete;           // DDE Delete Target Atom
+  FXDragType      *ddeTypeList;         // DDE drop type list
+  FXuint           ddeNumTypes;         // DDE number of drop types
+  FXDragAction     ddeAction;           // DDE action
+  FXDragAction     ansAction;           // Reply action
+  FXDragType      *xselTypeList;        // Selection type list
+  FXuint           xselNumTypes;        // Selection number of types on list
+  void*            xdndTypes;           // Handle to file mapping object for types list
+  FXushort         xdndAware;           // XDND awareness atom
+  FXID             xdndSource;          // XDND drag source window
+  FXID             xdndTarget;          // XDND drop target window
+  FXbool           xdndStatusPending;   // XDND waiting for status feedback
+  FXbool           xdndFinishPending;   // XDND waiting for drop-confirmation
+  FXbool           xdndStatusReceived;  // XDND received at least one status
+  FXbool           xdndFinishSent;      // XDND finish sent
+  FXRectangle      xdndRect;            // XDND rectangle bounding target
+  FXID             stipples[17];        // Standard stipple bitmaps
+
+#else
+
 private:
   FXID             wmDeleteWindow;      // Catch delete window
   FXID             wmQuitApp;           // Catch quit application
@@ -284,10 +307,13 @@ private:
   FXID             wmNetSupported;      // Extended Window Manager states list
   FXID             wmNetHMaximized;     // Extended Window Manager horizontally maximized
   FXID             wmNetVMaximized;     // Extended Window Manager vertically maximized
+  FXID             wmNetFullScreen;     // Extended Window Manager full screen
   FXID             wmNetNeedAttention;  // Extended Window Manager need attention
   FXID             wmNetMoveResize;     // Extended Window Manager drag corner
   FXID             wmNetRestack;        // Extended Window Manager change stacking order
   FXID             wmNetPing;           // Extended Window Manager ping
+  FXID             wmNetWindowType;     // Extended Window Manager window type
+  FXID             wmWindowTypes[14];   // Window types
   FXID             wmWindowRole;        // Window Role
   FXID             wmClientLeader;      // Client leader
   FXID             wmClientId;          // Client id
@@ -338,28 +364,6 @@ private:
   FXbool           shmp;                // Use XSHM Pixmap possible
   FXbool           synchronize;         // Synchronized
 
-#else
-
-  FXushort         ddeTargets;          // DDE targets atom
-  FXushort         ddeAtom;             // DDE Exchange Atom
-  FXDragType       ddeDelete;           // DDE Delete Target Atom
-  FXDragType      *ddeTypeList;         // DDE drop type list
-  FXuint           ddeNumTypes;         // DDE number of drop types
-  FXDragAction     ddeAction;           // DDE action
-  FXDragAction     ansAction;           // Reply action
-  FXDragType      *xselTypeList;        // Selection type list
-  FXuint           xselNumTypes;        // Selection number of types on list
-  void*            xdndTypes;           // Handle to file mapping object for types list
-  FXushort         xdndAware;           // XDND awareness atom
-  FXID             xdndSource;          // XDND drag source window
-  FXID             xdndTarget;          // XDND drop target window
-  FXbool           xdndStatusPending;   // XDND waiting for status feedback
-  FXbool           xdndFinishPending;   // XDND waiting for drop-confirmation
-  FXbool           xdndStatusReceived;  // XDND received at least one status
-  FXbool           xdndFinishSent;      // XDND finish sent
-  FXRectangle      xdndRect;            // XDND rectangle bounding target
-  FXID             stipples[17];        // Standard stipple bitmaps
-
 #endif
 
 private:
@@ -380,16 +384,16 @@ private:
   void dragdropSetData(const FXWindow* window,FXDragType type,FXuchar* data,FXuint size);
   void dragdropGetData(const FXWindow* window,FXDragType type,FXuchar*& data,FXuint& size);
   void dragdropGetTypes(const FXWindow* window,FXDragType*& types,FXuint& numtypes);
-#ifndef WIN32
+#ifdef WIN32
+  static long CALLBACK wndproc(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
+protected:
+  virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
+#else
   void addRepaint(FXID win,FXint x,FXint y,FXint w,FXint h,FXbool synth=false);
   void removeRepaints(FXID win,FXint x,FXint y,FXint w,FXint h);
   void scrollRepaints(FXID win,FXint dx,FXint dy);
   static void imcreatecallback(void*,FXApp*,void*);
   static void imdestroycallback(void*,FXApp*,void*);
-#else
-  static long CALLBACK wndproc(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
-protected:
-  virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
 #endif
 
 protected:
@@ -786,7 +790,7 @@ public:
   FXTime getToolTipPause() const { return toolTipPause; }
   FXTime getToolTipTime() const { return toolTipTime; }
   FXTime getAutoHideDelay() const { return autoHideDelay; }
-  
+
   /// Change application-wide timing constants, in nanoseconds
   void setTypingSpeed(FXTime speed);
   void setClickSpeed(FXTime speed);

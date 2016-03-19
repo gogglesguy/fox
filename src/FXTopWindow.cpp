@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTopWindow.cpp,v 1.200 2007/03/19 20:46:44 fox Exp $                    *
+* $Id: FXTopWindow.cpp,v 1.206 2007/05/21 19:56:56 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -112,9 +112,10 @@ FXDEFMAP(FXTopWindow) FXTopWindowMap[]={
   FXMAPFUNC(SEL_SIGNAL,FXTopWindow::ID_CLOSE,FXTopWindow::onCmdClose),
   FXMAPFUNC(SEL_TIMEOUT,FXTopWindow::ID_CLOSE,FXTopWindow::onCmdClose),
   FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_CLOSE,FXTopWindow::onCmdClose),
+  FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_RESTORE,FXTopWindow::onCmdRestore),
   FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_MAXIMIZE,FXTopWindow::onCmdMaximize),
   FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_MINIMIZE,FXTopWindow::onCmdMinimize),
-  FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_RESTORE,FXTopWindow::onCmdRestore),
+  FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_FULLSCREEN,FXTopWindow::onCmdFullScreen),
   FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_SETSTRINGVALUE,FXTopWindow::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_GETSTRINGVALUE,FXTopWindow::onCmdGetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXTopWindow::ID_SETICONVALUE,FXTopWindow::onCmdSetIconValue),
@@ -190,19 +191,39 @@ void FXTopWindow::create(){
   if(xid){
     if(getApp()->isInitialized()){
 
-    // Only shrinkable; size may not be above default size
-    if((options&DECOR_SHRINKABLE) && !(options&DECOR_STRETCHABLE)){
-      if(width>getDefaultWidth()) width=getDefaultWidth();
-      if(height>getDefaultHeight()) height=getDefaultHeight();
-      }
-      
-    // Only stretchable; size may not be below default size 
-    else if((options&DECOR_STRETCHABLE) && !(options&DECOR_SHRINKABLE)){
-      if(width<getDefaultWidth()) width=getDefaultWidth();
-      if(height<getDefaultHeight()) height=getDefaultHeight();
-      }
-      
-#ifndef WIN32
+      // Set title
+      settitle();
+
+      // Set decorations
+      setdecorations();
+
+      // Set icon for X-Windows
+      seticons();
+
+      // Only shrinkable; size may not be above default size
+      if((options&DECOR_SHRINKABLE) && !(options&DECOR_STRETCHABLE)){
+        if(width>getDefaultWidth()) width=getDefaultWidth();
+        if(height>getDefaultHeight()) height=getDefaultHeight();
+        }
+
+      // Only stretchable; size may not be below default size
+      else if((options&DECOR_STRETCHABLE) && !(options&DECOR_SHRINKABLE)){
+        if(width<getDefaultWidth()) width=getDefaultWidth();
+        if(height<getDefaultHeight()) height=getDefaultHeight();
+        }
+
+#ifdef WIN32            // WIN32
+
+      // Tweak needed because the options affect window size
+      RECT rect;
+      SetRect(&rect,xpos,ypos,xpos+width,ypos+height);
+      DWORD dwStyle=GetWindowLong((HWND)xid,GWL_STYLE);
+      DWORD dwExStyle=GetWindowLong((HWND)xid,GWL_EXSTYLE);
+      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);
+      SetWindowPos((HWND)xid,NULL,rect.left,rect.top,FXMAX(rect.right-rect.left,1),FXMAX(rect.bottom-rect.top,1),SWP_NOZORDER|SWP_NOOWNERZORDER);
+
+#else                   // X11
+
       // Catch delete window
       Atom protocols[3];
       protocols[0]=getApp()->wmDeleteWindow;
@@ -256,25 +277,6 @@ void FXTopWindow::create(){
       // Set hints
       XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
 
-#endif
-
-      // Set title
-      settitle();
-
-      // Set decorations
-      setdecorations();
-
-      // Set icon for X-Windows
-      seticons();
-
-      // Tweak needed because the options affect window size
-#ifdef WIN32
-      RECT rect;
-      SetRect(&rect,xpos,ypos,xpos+width,ypos+height);
-      DWORD dwStyle=GetWindowLong((HWND)xid,GWL_STYLE);
-      DWORD dwExStyle=GetWindowLong((HWND)xid,GWL_EXSTYLE);
-      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);
-      SetWindowPos((HWND)xid,NULL,rect.left,rect.top,FXMAX(rect.right-rect.left,1),FXMAX(rect.bottom-rect.top,1),SWP_NOZORDER|SWP_NOOWNERZORDER);
 #endif
       }
     }
@@ -404,13 +406,10 @@ void FXTopWindow::hide(){
 // Raise and make foreground window
 void FXTopWindow::raise(){
   FXShell::raise();
+  if(xid){
 #ifdef WIN32
-  if(xid){
     SetForegroundWindow((HWND)xid);
-    }
-#endif
-#ifndef WIN32
-  if(xid){
+#else
     XEvent se;
     se.xclient.type=ClientMessage;
     se.xclient.display=DISPLAY(getApp());
@@ -423,8 +422,8 @@ void FXTopWindow::raise(){
     se.xclient.data.l[3]=0;
     se.xclient.data.l[4]=0;
     XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),false,SubstructureRedirectMask|SubstructureNotifyMask,&se);
-    }
 #endif
+    }
   }
 
 
@@ -463,12 +462,7 @@ void FXTopWindow::place(FXuint placement){
   wh=getHeight();
 
   // Get root window size
-#ifndef WIN32
-  rx=getRoot()->getX();
-  ry=getRoot()->getY();
-  rw=getRoot()->getWidth();
-  rh=getRoot()->getHeight();
-#else
+#ifdef WIN32
   RECT rect;
   MYMONITORINFO minfo;
   HANDLE monitor;
@@ -514,6 +508,11 @@ void FXTopWindow::place(FXuint placement){
     rw=rect.right-rect.left;
     rh=rect.bottom-rect.top;
     }
+#else
+  rx=getRoot()->getX();
+  ry=getRoot()->getY();
+  rw=getRoot()->getWidth();
+  rh=getRoot()->getHeight();
 #endif
 
   // Placement policy
@@ -872,6 +871,40 @@ void FXTopWindow::flash(FXbool yes){
   }
 
 
+// Restore window
+FXbool FXTopWindow::restore(FXbool notify){
+  if(isMinimized() || isMaximized() || isFullScreen()){
+    if(xid){
+#ifdef WIN32
+      ShowWindow((HWND)xid,SW_RESTORE);
+#else
+      XEvent se;
+      se.xclient.type=ClientMessage;
+      se.xclient.display=DISPLAY(getApp());
+      se.xclient.message_type=getApp()->wmNetState;
+      se.xclient.format=32;
+      se.xclient.window=xid;
+      se.xclient.data.l[0]=0;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
+      se.xclient.data.l[1]=getApp()->wmNetHMaximized;
+      se.xclient.data.l[2]=getApp()->wmNetVMaximized;
+      se.xclient.data.l[3]=0;
+      se.xclient.data.l[4]=0;
+      XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),False,SubstructureRedirectMask|SubstructureNotifyMask,&se);
+      se.xclient.data.l[1]=getApp()->wmNetFullScreen;
+      se.xclient.data.l[2]=0;
+      se.xclient.data.l[3]=0;
+      se.xclient.data.l[4]=0;
+      XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),False,SubstructureRedirectMask|SubstructureNotifyMask,&se);
+      XMapWindow(DISPLAY(getApp()),xid);
+#endif
+      }
+    if(notify && target){target->tryHandle(this,FXSEL(SEL_RESTORE,message),NULL);}
+    return true;
+    }
+  return false;
+  }
+
+
 // Iconify window
 FXbool FXTopWindow::maximize(FXbool notify){
   if(!isMaximized()){
@@ -918,12 +951,12 @@ FXbool FXTopWindow::minimize(FXbool notify){
   }
 
 
-// Restore window
-FXbool FXTopWindow::restore(FXbool notify){
-  if(isMinimized() || isMaximized()){
+// Make window full screen, return true if success
+FXbool FXTopWindow::fullScreen(FXbool notify){
+  if(!isFullScreen()){
     if(xid){
 #ifdef WIN32
-      ShowWindow((HWND)xid,SW_RESTORE);
+      ShowWindow((HWND)xid,SW_MAXIMIZE);        // FIXME
 #else
       XEvent se;
       se.xclient.type=ClientMessage;
@@ -931,16 +964,16 @@ FXbool FXTopWindow::restore(FXbool notify){
       se.xclient.message_type=getApp()->wmNetState;
       se.xclient.format=32;
       se.xclient.window=xid;
-      se.xclient.data.l[0]=0;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
-      se.xclient.data.l[1]=getApp()->wmNetHMaximized;
-      se.xclient.data.l[2]=getApp()->wmNetVMaximized;
+      se.xclient.data.l[0]=2;   // 0=_NET_WM_STATE_REMOVE, 1=_NET_WM_STATE_ADD, 2=_NET_WM_STATE_TOGGLE
+      se.xclient.data.l[1]=getApp()->wmNetFullScreen;
+      se.xclient.data.l[2]=0;
       se.xclient.data.l[3]=0;
       se.xclient.data.l[4]=0;
-      XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),False,SubstructureRedirectMask|SubstructureNotifyMask,&se);
+      XSendEvent(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),false,SubstructureRedirectMask|SubstructureNotifyMask,&se);
       XMapWindow(DISPLAY(getApp()),xid);
 #endif
       }
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_RESTORE,message),NULL);}
+    if(notify && target){target->tryHandle(this,FXSEL(SEL_MAXIMIZE,message),NULL);}
     return true;
     }
   return false;
@@ -990,12 +1023,10 @@ FXbool FXTopWindow::isMaximized() const {
     unsigned long n,i; Atom type; unsigned char *prop; int format;
     if(Success==XGetWindowProperty(DISPLAY(getApp()),xid,getApp()->wmNetState,0,2,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
       if(type==XA_ATOM && format==32){
-        FXTRACE((100,"got _NET_WM_STATE property\n"));
         for(i=0; i<n; i++){
           if(((FXID*)prop)[i]==getApp()->wmNetHMaximized) maximized=true;
           if(((FXID*)prop)[i]==getApp()->wmNetVMaximized) maximized=true;
           }
-        FXTRACE((100,"maximized=%d\n",maximized));
         }
       XFree(prop);
       }
@@ -1015,9 +1046,7 @@ FXbool FXTopWindow::isMinimized() const {
     // This is ICCCM compliant method to ask about WM_STATE
     unsigned long n,i; unsigned char *prop; Atom type; int format;
     if(Success==XGetWindowProperty(DISPLAY(getApp()),xid,getApp()->wmState,0,2,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
-      if(format==32){
-        minimized=(IconicState==*((FXuint*)prop));
-        }
+      if(format==32){ minimized=(IconicState==*((FXuint*)prop)); }
       XFree(prop);
       }
 #endif
@@ -1026,6 +1055,30 @@ FXbool FXTopWindow::isMinimized() const {
   }
 
 
+// Return true if full screen
+FXbool FXTopWindow::isFullScreen() const {
+  FXbool fullscreen=false;
+  if(xid){
+#ifdef WIN32
+    fullscreen=IsZoomed((HWND)xid)!=0;          // FIXME
+#else
+    // For Window Managers supporting the Extended Window Manager Hints
+    // See http://www.freedesktop.org/ for the official documentation of EWMH
+    unsigned long n,i; Atom type; unsigned char *prop; int format;
+    if(Success==XGetWindowProperty(DISPLAY(getApp()),xid,getApp()->wmNetState,0,2,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
+      if(type==XA_ATOM && format==32){
+        for(i=0; i<n; i++){
+          if(((FXID*)prop)[i]==getApp()->wmNetFullScreen) fullscreen=true;
+          }
+        }
+      XFree(prop);
+      }
+#endif
+    }
+  return fullscreen;
+  }
+  
+  
 // Request for toplevel window move
 void FXTopWindow::move(FXint x,FXint y){
   if((x!=xpos) || (y!=ypos)){
@@ -1302,6 +1355,13 @@ long FXTopWindow::onCmdGetIconValue(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Restore the window
+long FXTopWindow::onCmdRestore(FXObject*,FXSelector,void*){
+  restore(true);
+  return 1;
+  }
+
+
 // Maximize the window
 long FXTopWindow::onCmdMaximize(FXObject*,FXSelector,void*){
   maximize(true);
@@ -1316,9 +1376,9 @@ long FXTopWindow::onCmdMinimize(FXObject*,FXSelector,void*){
   }
 
 
-// Restore the window
-long FXTopWindow::onCmdRestore(FXObject*,FXSelector,void*){
-  restore(true);
+// Full screen the window
+long FXTopWindow::onCmdFullScreen(FXObject*,FXSelector,void*){
+  fullScreen(true);
   return 1;
   }
 

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxxpmio.cpp,v 1.58 2007/02/07 20:22:23 fox Exp $                         *
+* $Id: fxxpmio.cpp,v 1.61 2007/06/03 05:30:42 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -54,11 +54,15 @@ using namespace FX;
 namespace FX {
 
 
+// Declarations
 extern FXAPI FXbool fxcheckXPM(FXStream& store);
 extern FXAPI FXbool fxloadXPM(const FXchar **pix,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsaveXPM(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
 
+// Furnish our own version
+extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 
 // Read till end of line
@@ -137,7 +141,7 @@ FXbool fxloadXPM(const FXchar **pixels,FXColor*& data,FXint& width,FXint& height
   if(!line) return false;
 
   // Parse size description
-  sscanf(line,"%d %d %u %u",&width,&height,&ncolors,&cpp);
+  __sscanf(line,"%d %d %u %u",&width,&height,&ncolors,&cpp);
 
   // Check size
   if(width<1 || height<1 || width>16384 || height>16384) return false;
@@ -234,7 +238,7 @@ FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   readtext(store,line,sizeof(line));
 
   // Parse size description
-  if(sscanf(line,"%d %d %u %u",&width,&height,&ncolors,&cpp)!=4) return false;
+  if(__sscanf(line,"%d %d %u %u",&width,&height,&ncolors,&cpp)!=4) return false;
 
   // Check size
   if(width<1 || height<1 || width>16384 || height>16384) return false;
@@ -358,7 +362,7 @@ FXbool fxsaveXPM(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   store.save("/* XPM */\nstatic char * image[] = {\n",36);
 
   // Save values
-  len=sprintf(buffer,"\"%d %d %d %d\",\n",width,height,ncolors,cpp);
+  len=__snprintf(buffer,sizeof(buffer),"\"%d %d %d %d\",\n",width,height,ncolors,cpp);
   store.save(buffer,len);
 
   // Save the colors
@@ -367,11 +371,11 @@ FXbool fxsaveXPM(FXStream& store,const FXColor *data,FXint width,FXint height,FX
     c1=printable[i%MAXPRINTABLE];
     c2=printable[i/MAXPRINTABLE];
     if(FXALPHAVAL(color)){
-      len=sprintf(buffer,"\"%c%c c #%02x%02x%02x\",\n",c1,c2,FXREDVAL(color),FXGREENVAL(color),FXBLUEVAL(color));
+      len=__snprintf(buffer,sizeof(buffer),"\"%c%c c #%02x%02x%02x\",\n",c1,c2,FXREDVAL(color),FXGREENVAL(color),FXBLUEVAL(color));
       store.save(buffer,len);
       }
     else{
-      len=sprintf(buffer,"\"%c%c c None\",\n",c1,c2);
+      len=__snprintf(buffer,sizeof(buffer),"\"%c%c c None\",\n",c1,c2);
       store.save(buffer,len);
       }
     }

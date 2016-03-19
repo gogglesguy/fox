@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXShutter.cpp,v 1.47 2007/02/07 20:22:15 fox Exp $                       *
+* $Id: FXShutter.cpp,v 1.48 2007/04/12 17:42:41 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -225,7 +225,7 @@ long FXShutter::onOpenItem(FXObject* sender,FXSelector,void*){
       getApp()->addTimeout(this,ID_SHUTTER_TIMEOUT,speed);
       }
     }
-  setCurrent(which);
+  setCurrent(which,true);
   return 1;
   }
 

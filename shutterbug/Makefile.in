@@ -359,9 +359,10 @@ icons.o: icons.cpp icons.h
 ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
-	../include/FXElement.h ../include/FXArray.h \
-	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
-	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXAutoPtr.h ../include/FXElement.h \
+	../include/FXArray.h ../include/FXThread.h \
+	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
+	../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -376,17 +377,20 @@ ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
-	../include/FXGIFImage.h ../include/FXIFFImage.h \
-	../include/FXBMPImage.h ../include/FXICOImage.h \
+	../include/FXBMPImage.h ../include/FXGIFImage.h \
+	../include/FXICOImage.h ../include/FXIFFImage.h \
+	../include/FXJPGImage.h ../include/FXPCXImage.h \
+	../include/FXPNGImage.h ../include/FXPPMImage.h \
+	../include/FXRASImage.h ../include/FXRGBImage.h \
+	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXPCXImage.h ../include/FXTGAImage.h \
-	../include/FXRGBImage.h ../include/FXPPMImage.h \
-	../include/FXRASImage.h ../include/FXGIFIcon.h \
-	../include/FXIFFIcon.h ../include/FXBMPIcon.h \
-	../include/FXICOIcon.h ../include/FXXBMIcon.h \
-	../include/FXXPMIcon.h ../include/FXPCXIcon.h \
-	../include/FXTGAIcon.h ../include/FXRGBIcon.h \
-	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
+	../include/FXICOIcon.h ../include/FXIFFIcon.h \
+	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
+	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
+	../include/FXRASIcon.h ../include/FXRGBIcon.h \
+	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
+	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -448,18 +452,19 @@ ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
 	../include/FXDebugTarget.h ../include/FXCalendarView.h \
-	../include/FXCalendar.h ../include/FXConsole.h \
-	../include/FXSplashWindow.h ../include/fxkeys.h \
-	../include/FXPNGImage.h ../include/FXJPGImage.h \
-	../include/FXTIFImage.h ../include/FXICOImage.h \
-	../include/FXTGAImage.h ../include/FXRGBImage.h icons.h \
-	ShutterBug.h Snapper.h
+	../include/FXCalendar.h ../include/FXGradientBar.h \
+	../include/FXConsole.h ../include/FXSplashWindow.h \
+	../include/fxkeys.h ../include/FXPNGImage.h \
+	../include/FXJPGImage.h ../include/FXTIFImage.h \
+	../include/FXICOImage.h ../include/FXTGAImage.h \
+	../include/FXRGBImage.h icons.h ShutterBug.h Snapper.h
 Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
-	../include/FXElement.h ../include/FXArray.h \
-	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
-	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXAutoPtr.h ../include/FXElement.h \
+	../include/FXArray.h ../include/FXThread.h \
+	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
+	../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -474,17 +479,20 @@ Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
-	../include/FXGIFImage.h ../include/FXIFFImage.h \
-	../include/FXBMPImage.h ../include/FXICOImage.h \
+	../include/FXBMPImage.h ../include/FXGIFImage.h \
+	../include/FXICOImage.h ../include/FXIFFImage.h \
+	../include/FXJPGImage.h ../include/FXPCXImage.h \
+	../include/FXPNGImage.h ../include/FXPPMImage.h \
+	../include/FXRASImage.h ../include/FXRGBImage.h \
+	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXPCXImage.h ../include/FXTGAImage.h \
-	../include/FXRGBImage.h ../include/FXPPMImage.h \
-	../include/FXRASImage.h ../include/FXGIFIcon.h \
-	../include/FXIFFIcon.h ../include/FXBMPIcon.h \
-	../include/FXICOIcon.h ../include/FXXBMIcon.h \
-	../include/FXXPMIcon.h ../include/FXPCXIcon.h \
-	../include/FXTGAIcon.h ../include/FXRGBIcon.h \
-	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
+	../include/FXICOIcon.h ../include/FXIFFIcon.h \
+	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
+	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
+	../include/FXRASIcon.h ../include/FXRGBIcon.h \
+	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
+	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \
@@ -546,8 +554,8 @@ Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
 	../include/FXDebugTarget.h ../include/FXCalendarView.h \
-	../include/FXCalendar.h ../include/FXConsole.h \
-	../include/FXSplashWindow.h Snapper.h
+	../include/FXCalendar.h ../include/FXGradientBar.h \
+	../include/FXConsole.h ../include/FXSplashWindow.h Snapper.h
 
 info-am:
 info: info-am

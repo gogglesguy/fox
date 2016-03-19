@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIO.cpp,v 1.12 2007/02/07 20:22:10 fox Exp $                            *
+* $Id: FXIO.cpp,v 1.19 2007/04/04 14:45:42 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -27,11 +27,8 @@
 #include "fxascii.h"
 #include "FXHash.h"
 #include "FXStream.h"
-//#include "FXString.h"
-//#include "FXPath.h"
+#include "FXString.h"
 #include "FXIO.h"
-//#include "FXStat.h"
-//#include "FXDir.h"
 
 
 
@@ -61,6 +58,18 @@ FXIO::FXIO():device(BadHandle),access(NoAccess){
   }
 
 
+// Is readable
+FXbool FXIO::isReadable() const {
+  return ((access&ReadOnly)!=0);
+  }
+
+
+// Is writable
+FXbool FXIO::isWritable() const {
+  return ((access&WriteOnly)!=0);
+  }
+
+
 // Open file
 FXbool FXIO::open(FXInputHandle h,FXuint m){
   device=h;
@@ -72,6 +81,12 @@ FXbool FXIO::open(FXInputHandle h,FXuint m){
 // Return true if open
 FXbool FXIO::isOpen() const {
   return device!=BadHandle;
+  }
+
+
+// Return true if serial access only
+FXbool FXIO::isSerial() const {
+  return true;
   }
 
 

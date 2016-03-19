@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx.h,v 1.112 2007/02/07 20:22:00 fox Exp $                               *
+* $Id: fx.h,v 1.114 2007/05/24 20:42:16 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H
@@ -40,6 +40,7 @@
 // FOX classes
 #include "FXHash.h"
 #include "FXException.h"
+#include "FXAutoPtr.h"
 #include "FXElement.h"
 #include "FXArray.h"
 #include "FXThread.h"
@@ -82,28 +83,34 @@
 #include "FXBitmap.h"
 #include "FXImage.h"
 #include "FXIcon.h"
-#include "FXGIFImage.h"
-#include "FXIFFImage.h"
 #include "FXBMPImage.h"
+#include "FXGIFImage.h"
 #include "FXICOImage.h"
-#include "FXXBMImage.h"
-#include "FXXPMImage.h"
+#include "FXIFFImage.h"
+#include "FXJPGImage.h"
 #include "FXPCXImage.h"
-#include "FXTGAImage.h"
-#include "FXRGBImage.h"
+#include "FXPNGImage.h"
 #include "FXPPMImage.h"
 #include "FXRASImage.h"
-#include "FXGIFIcon.h"
-#include "FXIFFIcon.h"
+#include "FXRGBImage.h"
+#include "FXTGAImage.h"
+#include "FXTIFImage.h"
+#include "FXXBMImage.h"
+#include "FXXPMImage.h"
 #include "FXBMPIcon.h"
+#include "FXGIFIcon.h"
 #include "FXICOIcon.h"
-#include "FXXBMIcon.h"
-#include "FXXPMIcon.h"
+#include "FXIFFIcon.h"
+#include "FXJPGIcon.h"
 #include "FXPCXIcon.h"
-#include "FXTGAIcon.h"
-#include "FXRGBIcon.h"
+#include "FXPNGIcon.h"
 #include "FXPPMIcon.h"
 #include "FXRASIcon.h"
+#include "FXRGBIcon.h"
+#include "FXTGAIcon.h"
+#include "FXTIFIcon.h"
+#include "FXXBMIcon.h"
+#include "FXXPMIcon.h"
 #include "FXRegion.h"
 #include "FXDC.h"
 #include "FXDCWindow.h"
@@ -229,6 +236,7 @@
 #include "FXDebugTarget.h"
 #include "FXCalendarView.h"
 #include "FXCalendar.h"
+#include "FXGradientBar.h"
 #include "FXConsole.h"
 #include "FXSplashWindow.h"
 

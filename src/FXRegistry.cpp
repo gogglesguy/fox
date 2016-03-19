@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRegistry.cpp,v 1.64 2007/02/07 20:22:14 fox Exp $                      *
+* $Id: FXRegistry.cpp,v 1.66 2007/05/17 21:19:50 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -103,10 +103,10 @@
 #define MAXVALUE  2000
 
 #ifndef REGISTRYPATH
-#ifndef WIN32
-#define REGISTRYPATH   "/etc:/usr/lib:/usr/local/lib"
+#ifdef WIN32
+#define REGISTRYPATH   "\\WINDOWS"
 #else
-#define REGISTRYPATH   "\\WINDOWS\\foxrc"
+#define REGISTRYPATH   "/etc:/usr/lib:/usr/local/lib"
 #endif
 #endif
 
@@ -123,10 +123,10 @@ FXIMPLEMENT(FXRegistry,FXSettings,NULL,0)
 
 // Make registry object
 FXRegistry::FXRegistry(const FXString& akey,const FXString& vkey):applicationkey(akey),vendorkey(vkey){
-#ifndef WIN32
-  ascii=true;
-#else
+#ifdef WIN32
   ascii=false;
+#else
+  ascii=true;
 #endif
   }
 
@@ -234,25 +234,25 @@ FXbool FXRegistry::readFromDir(const FXString& dirname,FXbool mrk){
   if(!dirname.empty()){
 
     // First try to load desktop registry
-#ifndef WIN32
-    if(parseFile(dirname+PATHSEPSTRING DESKTOP,false)) ok=true;
-#else
+#ifdef WIN32
     if(parseFile(dirname+PATHSEPSTRING DESKTOP ".ini",false)) ok=true;
+#else
+    if(parseFile(dirname+PATHSEPSTRING DESKTOP,false)) ok=true;
 #endif
 
     // Have vendor key
     if(!vendorkey.empty()){
-#ifndef WIN32
-      if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+vendorkey,false)) ok=true;
-#else
+#ifdef WIN32
       if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+vendorkey+".ini",false)) ok=true;
+#else
+      if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+vendorkey,false)) ok=true;
 #endif
       // Have application key
       if(!applicationkey.empty()){
-#ifndef WIN32
-        if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey,mrk)) ok=true;
-#else
+#ifdef WIN32
         if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey+".ini",mrk)) ok=true;
+#else
+        if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey,mrk)) ok=true;
 #endif
         }
       }
@@ -262,10 +262,10 @@ FXbool FXRegistry::readFromDir(const FXString& dirname,FXbool mrk){
 
       // Have application key
       if(!applicationkey.empty()){
-#ifndef WIN32
-        if(parseFile(dirname+PATHSEPSTRING+applicationkey,mrk)) ok=true;
-#else
+#ifdef WIN32
         if(parseFile(dirname+PATHSEPSTRING+applicationkey+".ini",mrk)) ok=true;
+#else
+        if(parseFile(dirname+PATHSEPSTRING+applicationkey,mrk)) ok=true;
 #endif
         }
       }

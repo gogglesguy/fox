@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.192 2007/02/07 20:22:00 fox Exp $                           *
+* $Id: fxdefs.h,v 1.194 2007/05/30 15:57:30 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -748,9 +748,29 @@ extern FXAPI void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloa
 /// Convert HSV to RGB
 extern FXAPI void fxhsv_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat v);
 
-/// Floating point number classification: 0=OK, +/-1=Inf, +/-2=NaN
+/// Float number classification: 0=OK, +/-1=Inf, +/-2=NaN
 extern FXAPI FXint fxieeefloatclass(FXfloat number);
+
+/// Double number classification: 0=OK, +/-1=Inf, +/-2=NaN
 extern FXAPI FXint fxieeedoubleclass(FXdouble number);
+
+/// Test for finite float
+extern FXAPI FXbool fxIsFinite(FXfloat number);
+
+/// Test for finite double
+extern FXAPI FXbool fxIsFinite(FXdouble number);
+
+/// Test for infinite float
+extern FXAPI FXbool fxIsInf(FXfloat number);
+
+/// Test for infinite double
+extern FXAPI FXbool fxIsInf(FXdouble number);
+
+/// Text for not-a-number float
+extern FXAPI FXbool fxIsNan(FXfloat number);
+
+/// Text for not-a-number double
+extern FXAPI FXbool fxIsNan(FXdouble number);
 
 /// Convert keysym to unicode character
 extern FXAPI FXwchar fxkeysym2ucs(FXwchar sym);
@@ -848,6 +868,8 @@ extern FXAPI FXint nc2utfs(FXchar* dst,const FXnchar *src,FXint n);
 /// Copy narrow character string to dst
 extern FXAPI FXint nc2utfs(FXchar* dst,const FXnchar *src);
 
+/// Return clock ticks from cpu tick-counter
+extern FXAPI FXTime fxgetticks();
 
 }
 

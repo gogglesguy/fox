@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirDialog.cpp,v 1.32 2007/02/07 20:22:05 fox Exp $                     *
+* $Id: FXDirDialog.cpp,v 1.34 2007/05/17 14:47:05 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -162,6 +162,18 @@ void FXDirDialog::setDirBoxStyle(FXuint style){
 // Return Directory List style
 FXuint FXDirDialog::getDirBoxStyle() const {
   return dirbox->getDirBoxStyle();
+  }
+
+
+// Change file associations
+void FXDirDialog::setAssociations(FXFileDict* assoc,FXbool owned){
+  dirbox->setAssociations(assoc,owned);
+  }
+
+
+// Return file associations
+FXFileDict* FXDirDialog::getAssociations() const {
+  return dirbox->getAssociations();
   }
 
 

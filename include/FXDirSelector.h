@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirSelector.h,v 1.26 2007/02/07 20:21:53 fox Exp $                     *
+* $Id: FXDirSelector.h,v 1.28 2007/05/17 14:47:05 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXDIRSELECTOR_H
 #define FXDIRSELECTOR_H
@@ -31,6 +31,7 @@
 namespace FX {
 
 
+class FXFileDict;
 class FXDirList;
 class FXTextField;
 class FXButton;
@@ -138,6 +139,12 @@ public:
 
   /// Return Directory List style
   FXuint getDirBoxStyle() const;
+
+  /// Change file associations; delete old ones if owned
+  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+
+  /// Return file associations
+  FXFileDict* getAssociations() const;
 
   /// Save to stream
   virtual void save(FXStream& store) const;

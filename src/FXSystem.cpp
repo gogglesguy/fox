@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSystem.cpp,v 1.33 2007/03/19 15:28:19 fox Exp $                        *
+* $Id: FXSystem.cpp,v 1.35 2007/06/03 05:30:38 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -50,6 +50,10 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Furnish our own version
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 
 // Many nanoseconds in a second
@@ -165,7 +169,7 @@ FXString FXSystem::userName(FXuint uid){
   if(pwd) return pwd->pw_name;
 #endif
 #endif
-  sprintf(result,"%u",uid);
+  __snprintf(result,sizeof(result),"%u",uid);
   return result;
   }
 
@@ -184,14 +188,18 @@ FXString FXSystem::groupName(FXuint gid){
   if(grp) return grp->gr_name;
 #endif
 #endif
-  sprintf(result,"%u",gid);
+  __snprintf(result,sizeof(result),"%u",gid);
   return result;
   }
 
 
 // Get current user name
 FXString FXSystem::currentUserName(){
-#ifndef WIN32
+#ifdef WIN32
+  TCHAR buffer[MAXPATHLEN];
+  DWORD size=MAXPATHLEN;
+  if(GetUserName(buffer,&size)) return buffer;
+#else
 #if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct passwd pwdresult,*pwd;
   char buffer[1024];
@@ -200,10 +208,6 @@ FXString FXSystem::currentUserName(){
   struct passwd *pwd=getpwuid(geteuid());
   if(pwd) return pwd->pw_name;
 #endif
-#else
-  TCHAR buffer[MAXPATHLEN];
-  DWORD size=MAXPATHLEN;
-  if(GetUserName(buffer,&size)) return buffer;
 #endif
   return FXString::null;
   }

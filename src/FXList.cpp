@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXList.cpp,v 1.176 2007/02/07 20:22:11 fox Exp $                         *
+* $Id: FXList.cpp,v 1.178 2007/05/02 01:01:44 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1243,7 +1243,7 @@ long FXList::onMotion(FXObject*,FXSelector,void* ptr){
 // Pressed a button
 long FXList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXint index,code;
+  FXint index;
   flags&=~FLAG_TIP;
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
@@ -1269,14 +1269,13 @@ long FXList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       return 1;
       }
 
-    // Find out where hit
-    code=hitItem(index,event->win_x,event->win_y);
+    // Previous selection state
+    state=items[index]->isSelected();
 
     // Change current item
     setCurrentItem(index,true);
 
     // Change item selection
-    state=items[index]->isSelected();
     switch(options&SELECT_MASK){
       case LIST_EXTENDEDSELECT:
         if(event->state&SHIFTMASK){
@@ -1305,7 +1304,7 @@ long FXList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       }
 
     // Start drag if actually pressed text or icon only
-    if(code && items[index]->isSelected() && items[index]->isDraggable()){
+    if(state && items[index]->isSelected() && items[index]->isDraggable()){
       flags|=FLAG_TRYDRAG;
       }
 

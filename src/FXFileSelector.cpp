@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileSelector.cpp,v 1.208 2007/03/08 18:18:49 fox Exp $                 *
+* $Id: FXFileSelector.cpp,v 1.210 2007/05/17 14:47:06 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -223,7 +223,7 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   linkicon=new FXGIFIcon(getApp(),filelink);
   dirbox=new FXDirBox(navbuttons,this,ID_DIRTREE,DIRBOX_NO_OWN_ASSOC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0,1,1,1,1);
   dirbox->setNumVisible(5);
-  dirbox->setAssociations(filebox->getAssociations());
+  dirbox->setAssociations(filebox->getAssociations(),false);    // Shared file associations
   bookmarkmenu=new FXMenuPane(this,POPUP_SHRINKWRAP);
   new FXMenuCommand(bookmarkmenu,tr("&Set bookmark\t\tBookmark current directory."),markicon,this,ID_BOOKMARK);
   new FXMenuCommand(bookmarkmenu,tr("&Clear bookmarks\t\tClear bookmarks."),clearicon,&bookmarks,FXRecentFiles::ID_CLEAR);
@@ -1102,6 +1102,19 @@ void FXFileSelector::setReadOnly(FXbool flag){
 // Get readonly state
 FXbool FXFileSelector::getReadOnly() const {
   return (FXbool)readonly->getCheck();
+  }
+
+
+// Change file associations
+void FXFileSelector::setAssociations(FXFileDict* assoc,FXbool owned){
+  filebox->setAssociations(assoc,owned);
+  dirbox->setAssociations(assoc,false);         // Shared file associations
+  }
+
+
+// Return file associations
+FXFileDict* FXFileSelector::getAssociations() const {
+  return filebox->getAssociations();
   }
 
 

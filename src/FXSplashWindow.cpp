@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSplashWindow.cpp,v 1.13 2007/02/07 20:22:16 fox Exp $                  *
+* $Id: FXSplashWindow.cpp,v 1.14 2007/05/21 16:06:31 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -99,6 +99,10 @@ void FXSplashWindow::create(){
   if(options&SPLASH_SHAPED) setShape(icon);
   }
 
+//#ifndef WIN32
+//  Atom list[2]={getApp()->wmWindowTypes[5],getApp()->wmWindowTypes[13]};
+//  XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->wmNetWindowType,XA_ATOM,32,PropModeReplace,(unsigned char*)list,2);
+//#endif
 
 // Detach window
 void FXSplashWindow::detach(){

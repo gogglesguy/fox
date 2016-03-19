@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorWell.cpp,v 1.76 2007/03/01 18:16:34 fox Exp $                     *
+* $Id: FXColorWell.cpp,v 1.77 2007/05/17 19:27:56 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -399,10 +399,10 @@ long FXColorWell::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
     FXchar *string;
     callocElms(string,50);
     fxnamefromcolor(string,rgba);
-#ifndef WIN32
-    setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string));
-#else
+#ifdef WIN32
     setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string)+1);
+#else
+    setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string));
 #endif
     return 1;
     }

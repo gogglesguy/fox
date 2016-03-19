@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirList.h,v 1.80 2007/02/07 20:21:53 fox Exp $                         *
+* $Id: FXDirList.h,v 1.81 2007/05/17 14:47:05 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXDIRLIST_H
 #define FXDIRLIST_H
@@ -275,8 +275,8 @@ public:
   /// Show or hide hidden files and directories
   void showHiddenFiles(FXbool flag);
 
-  /// Change file associations
-  void setAssociations(FXFileDict* assoc);
+  /// Change file associations; delete the old one unless it was shared
+  void setAssociations(FXFileDict* assoc,FXbool owned=false);
 
   /// Return file associations
   FXFileDict* getAssociations() const { return associations; }

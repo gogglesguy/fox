@@ -5,7 +5,7 @@
 ##############################################################################
 # Contributed by: Andre Fornacon <afo@zlug.org>                              #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.60 2007/01/31 16:20:02 fox Exp $		     #
+# $Id: Makefile.dmc,v 1.63 2007/05/30 17:43:21 fox Exp $		     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or 	     #
 # modify it under the terms of the GNU Library General Public		     #
@@ -340,7 +340,10 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxezquantize.cpp \
 fxfilematch.cpp \
+fxfsquantize.cpp \
+fxgetticks.cpp \
 fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
@@ -351,17 +354,17 @@ fxparsegeometry.cpp \
 fxpcxio.cpp \
 fxpngio.cpp \
 fxppmio.cpp \
-fxpsio.cpp \
+fxprintf.cpp \
 fxpriv.cpp \
-fxezquantize.cpp \
-fxfsquantize.cpp \
-fxwuquantize.cpp \
+fxpsio.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
+fxscanf.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
@@ -469,6 +472,7 @@ FXKnob.obj \
 FXLabel.obj \
 FXList.obj \
 FXListBox.obj \
+FXLocale.obj \
 FXMDIButton.obj \
 FXMDIChild.obj \
 FXMDIClient.obj \
@@ -594,7 +598,10 @@ FXXPMIcon.obj \
 FXXPMImage.obj \
 fxascii.obj \
 fxbmpio.obj \
+fxezquantize.obj \
 fxfilematch.obj \
+fxfsquantize.obj \
+fxgetticks.obj \
 fxgifio.obj \
 fxicoio.obj \
 fxiffio.obj \
@@ -607,15 +614,13 @@ fxpngio.obj \
 fxppmio.obj \
 fxpsio.obj \
 fxpriv.obj \
-fxezquantize.obj \
-fxfsquantize.obj \
-fxwuquantize.obj \
 fxrasio.obj \
 fxrgbio.obj \
 fxtargaio.obj \
 fxtifio.obj \
 fxunicode.obj \
 fxutils.obj \
+fxwuquantize.obj \
 fxxbmio.obj \
 fxxpmio.obj \
 icons.obj \

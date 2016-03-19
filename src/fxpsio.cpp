@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxpsio.cpp,v 1.14 2007/02/07 20:22:21 fox Exp $                          *
+* $Id: fxpsio.cpp,v 1.15 2007/06/03 05:30:42 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,7 +43,11 @@ using namespace FX;
 namespace FX {
 
 
+// Declarations
 extern FXAPI FXbool fxsavePS(FXStream& store,const FXColor *data,FXint width,FXint height,FXint paperw=612,FXint paperh=792,FXint margin=35,FXbool color=true);
+
+// Furnish our own version
+extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 
 
 // Spit output to stream
@@ -51,11 +55,7 @@ static void output(FXStream& store,const char* fmt,...){
   FXchar buffer[1024]; FXint len;
   va_list args;
   va_start(args,fmt);
-#if defined(WIN32) || defined(HAVE_VSNPRINTF)
-  len=vsnprintf(buffer,sizeof(buffer),fmt,args);
-#else
-  len=vsprintf(buffer,fmt,args);
-#endif
+  len=__vsnprintf(buffer,sizeof(buffer),fmt,args);
   va_end(args);
   store.save(buffer,len);
   }

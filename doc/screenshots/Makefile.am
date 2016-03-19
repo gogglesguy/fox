@@ -11,6 +11,7 @@ adie.gif \
 adie_sty.gif \
 analysisview.png \
 aqx_linux_visualizacao_peq.jpg \
+ares_lauch.jpg \
 arithmedrill-screenshot.png \
 arithmedrill-screenshot_small.png \
 big_ctc_osx.gif \

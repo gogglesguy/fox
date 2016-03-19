@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXButton.cpp,v 1.73 2007/02/07 20:22:03 fox Exp $                        *
+* $Id: FXButton.cpp,v 1.74 2007/04/04 02:45:33 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -276,9 +276,9 @@ long FXButton::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 long FXButton::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  if(isEnabled() && !(flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
-    if((event->code==KEY_space || event->code==KEY_KP_Space) || (isDefault() && (event->code==KEY_Return || event->code==KEY_KP_Enter))){
+    if(!(flags&FLAG_PRESSED) && ((event->code==KEY_space || event->code==KEY_KP_Space) || (isDefault() && (event->code==KEY_Return || event->code==KEY_KP_Enter)))){
       if(state!=STATE_ENGAGED) setState(STATE_DOWN);
       flags|=FLAG_PRESSED;
       flags&=~FLAG_UPDATE;
@@ -293,9 +293,9 @@ long FXButton::onKeyPress(FXObject*,FXSelector,void* ptr){
 long FXButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXbool click=(state==STATE_DOWN);
-  if(isEnabled() && (flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
-    if((event->code==KEY_space || event->code==KEY_KP_Space) || (isDefault() && (event->code==KEY_Return || event->code==KEY_KP_Enter))){
+    if((flags&FLAG_PRESSED) && ((event->code==KEY_space || event->code==KEY_KP_Space) || (isDefault() && (event->code==KEY_Return || event->code==KEY_KP_Enter)))){
       if(state!=STATE_ENGAGED) setState(STATE_UP);
       flags|=FLAG_UPDATE;
       flags&=~FLAG_PRESSED;

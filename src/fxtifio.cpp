@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxtifio.cpp,v 1.40 2007/02/07 20:22:22 fox Exp $                         *
+* $Id: fxtifio.cpp,v 1.41 2007/06/03 05:30:42 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -59,10 +59,13 @@ using namespace FX;
 namespace FX {
 
 
+// Declarations
 extern FXAPI FXbool fxcheckTIF(FXStream& store);
 extern FXAPI FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec);
 extern FXAPI FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec);
 
+// Furnish our own version
+extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 
 #ifdef HAVE_TIFF_H
 
@@ -78,7 +81,7 @@ struct tiff_store_handle {
 // Report an error
 static void fxerrorhandler(const char* module,const char* format,va_list args){
   FXchar message[1024];
-  vsprintf(message,format,args);
+  __vsnprintf(message,sizeof(message),format,args);
   FXTRACE((100,"error: in %s: %s\n",module,message));
   }
 
@@ -86,7 +89,7 @@ static void fxerrorhandler(const char* module,const char* format,va_list args){
 // Report a warning
 static void fxwarninghandler(const char* module,const char* format,va_list args){
   FXchar message[1024];
-  vsprintf(message,format,args);
+  __vsnprintf(message,sizeof(message),format,args);
   FXTRACE((100,"warning: in %s: %s\n",module,message));
   }
 

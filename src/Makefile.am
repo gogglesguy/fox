@@ -291,6 +291,7 @@ FXKnob.cpp \
 FXLabel.cpp \
 FXList.cpp \
 FXListBox.cpp \
+FXLocale.cpp \
 FXMDIButton.cpp \
 FXMDIChild.cpp \
 FXMDIClient.cpp \
@@ -341,7 +342,6 @@ FXRGBImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
-FXReactor.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -421,7 +421,10 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxezquantize.cpp \
 fxfilematch.cpp \
+fxfsquantize.cpp \
+fxgetticks.cpp \
 fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
@@ -432,27 +435,26 @@ fxparsegeometry.cpp \
 fxpcxio.cpp \
 fxpngio.cpp \
 fxppmio.cpp \
+fxprintf.cpp \
+fxpriv.h \
 fxpriv.cpp \
 fxpsio.cpp \
-fxfsquantize.cpp \
-fxezquantize.cpp \
-fxwuquantize.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
+fxscanf.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
 strtoll.cpp \
-vsscanf.cpp \
 icons.h \
 jitter.h \
 version.rc \
 version.rc.in \
-fxpriv.h \
 $(CURSORS) \
 $(ICONS)
 

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRecentFiles.cpp,v 1.38 2007/02/07 20:22:14 fox Exp $                   *
+* $Id: FXRecentFiles.cpp,v 1.39 2007/06/03 05:30:38 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -50,6 +50,11 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Furnish our own version
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+
 
 // Message map
 FXDEFMAP(FXRecentFiles) FXRecentFilesMap[] = {
@@ -83,7 +88,7 @@ FXRecentFiles::FXRecentFiles(FXApp* a,const FXString& gp,FXObject *tgt,FXSelecto
 // Obtain the filename at index
 FXString FXRecentFiles::getFile(FXint index) const {
   FXchar key[20];
-  sprintf(key,"FILE%d",index);
+  __snprintf(key,sizeof(key),"FILE%d",index);
   return app->reg().readStringEntry(group.text(),key,FXString::null);
   }
 
@@ -91,7 +96,7 @@ FXString FXRecentFiles::getFile(FXint index) const {
 // Change the filename at index
 void FXRecentFiles::setFile(FXint index,const FXString& filename){
   FXchar key[20];
-  sprintf(key,"FILE%d",index);
+  __snprintf(key,sizeof(key),"FILE%d",index);
   app->reg().writeStringEntry(group.text(),key,filename.text());
   }
 
@@ -105,11 +110,11 @@ void FXRecentFiles::appendFile(const FXString& filename){
   FXint i=1,j=1;
   do{
     do{
-      sprintf(key,"FILE%d",j++);
+      __snprintf(key,sizeof(key),"FILE%d",j++);
       oldname=app->reg().readStringEntry(group.text(),key,NULL);
       }
     while(oldname==filename);
-    sprintf(key,"FILE%d",i++);
+    __snprintf(key,sizeof(key),"FILE%d",i++);
     app->reg().writeStringEntry(group.text(),key,newname.text());
     newname=oldname;
     }
@@ -123,12 +128,12 @@ void FXRecentFiles::removeFile(const FXString& filename){
   FXString name;
   FXint i=1,j=1;
   do{
-    sprintf(key,"FILE%d",i++);
+    __snprintf(key,sizeof(key),"FILE%d",i++);
     name=app->reg().readStringEntry(group.text(),key,NULL);
     app->reg().deleteEntry(group.text(),key);
     if(name.empty()) break;
     if(name!=filename){
-      sprintf(key,"FILE%d",j++);
+      __snprintf(key,sizeof(key),"FILE%d",j++);
       app->reg().writeStringEntry(group.text(),key,name.text());
       }
     }
@@ -154,7 +159,7 @@ long FXRecentFiles::onCmdFile(FXObject*,FXSelector sel,void*){
   const FXchar *filename;
   FXchar key[20];
   if(target){
-    sprintf(key,"FILE%d",(FXSELID(sel)-ID_FILE_1+1));
+    __snprintf(key,sizeof(key),"FILE%d",(FXSELID(sel)-ID_FILE_1+1));
     filename=app->reg().readStringEntry(group.text(),key,NULL);
     if(filename){
       target->handle(this,FXSEL(SEL_COMMAND,message),(void*)filename);
@@ -169,7 +174,7 @@ long FXRecentFiles::onUpdFile(FXObject *sender,FXSelector sel,void*){
   register FXint which=FXSELID(sel)-ID_FILE_1+1;
   const FXchar *filename;
   FXchar key[20];
-  sprintf(key,"FILE%d",which);
+  __snprintf(key,sizeof(key),"FILE%d",which);
   filename=app->reg().readStringEntry(group.text(),key,NULL);
   if(filename){
     FXString string;

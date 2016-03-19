@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software                   #
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    #
 #################################################################################
-# $Id: Adie.stx,v 1.48 2007/03/20 20:04:55 fox Exp $                            #
+# $Id: Adie.stx,v 1.51 2007/06/01 01:05:59 fox Exp $                            #
 #################################################################################
 
 #
@@ -202,7 +202,7 @@ language "C++"
 
   # File patterns for this language mode
   filesmatch "*.C,*.cpp,*.cc,*.cxx,*.c++,*.H,*.hpp,*.hh,*.hxx,*.h++,*.h"
-  #contentsmatch "[Cc]\+\+"
+  contentsmatch "[Cc]\+\+"
 
   contextlines 100
 
@@ -254,7 +254,7 @@ language "C++"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%[\*ahlLq#0 +-]?(\*|\d*)(\.(\*|\d*))?l?([dDiouxXeEfFgGaAcsp]|\[.*?\])"
+      pattern "%['#0 +-]?(\*|\d*)(\.(\*|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
     end
   end
 

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirDialog.h,v 1.21 2007/02/07 20:21:53 fox Exp $                       *
+* $Id: FXDirDialog.h,v 1.23 2007/05/17 14:47:05 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXDIRDIALOG_H
 #define FXDIRDIALOG_H
@@ -31,6 +31,7 @@
 namespace FX {
 
 
+class FXFileDict;
 class FXDirSelector;
 
 
@@ -90,6 +91,12 @@ public:
 
   /// Return directory list style
   FXuint getDirBoxStyle() const;
+
+  /// Change file associations; delete old ones if owned
+  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+
+  /// Return file associations
+  FXFileDict* getAssociations() const;
 
   /// Open directory name
   static FXString getOpenDirectory(FXWindow* owner,const FXString& caption,const FXString& path);

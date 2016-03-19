@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorNames.cpp,v 1.30 2007/02/07 20:22:03 fox Exp $                    *
+* $Id: FXColorNames.cpp,v 1.33 2007/06/03 05:30:37 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -732,6 +732,11 @@ const FXNamedColor fxcolornames[]={
 const FXuint fxnumcolornames=ARRAYNUMBER(fxcolornames);
 
 
+// Furnish our own version
+extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+
+
 // Get RGB value from color name
 FXColor fxcolorfromname(const FXchar* colorname){
   FXchar name[100],c,*tail=name;
@@ -744,25 +749,25 @@ FXColor fxcolorfromname(const FXchar* colorname){
     if(name[0]=='#'){
       switch(tail-name-1){
         case 3:
-          sscanf(name+1,"%01x%01x%01x",&r,&g,&b);
+          __sscanf(name+1,"%01x%01x%01x",&r,&g,&b);
           return FXRGB((r*17),(g*17),(b*17));
         case 4:
-          sscanf(name+1,"%01x%01x%01x%01x",&r,&g,&b,&a);
+          __sscanf(name+1,"%01x%01x%01x%01x",&r,&g,&b,&a);
           return FXRGBA((r*17),(g*17),(b*17),(a*17));
         case 6:
-          sscanf(name+1,"%02x%02x%02x",&r,&g,&b);
+          __sscanf(name+1,"%02x%02x%02x",&r,&g,&b);
           return FXRGB(r,g,b);
         case 8:
-          sscanf(name+1,"%02x%02x%02x%02x",&r,&g,&b,&a);
+          __sscanf(name+1,"%02x%02x%02x%02x",&r,&g,&b,&a);
           return FXRGBA(r,g,b,a);
         case 9:
-          sscanf(name+1,"%03x%03x%03x",&r,&g,&b);
+          __sscanf(name+1,"%03x%03x%03x",&r,&g,&b);
           return FXRGB((r/16),(g/16),(b/16));
         case 12:
-          sscanf(name+1,"%04x%04x%04x",&r,&g,&b);
+          __sscanf(name+1,"%04x%04x%04x",&r,&g,&b);
           return FXRGB((r/257),(g/257),(b/257));
         case 16:
-          sscanf(name+1,"%04x%04x%04x%04x",&r,&g,&b,&a);
+          __sscanf(name+1,"%04x%04x%04x%04x",&r,&g,&b,&a);
           return FXRGBA((r/257),(g/257),(b/257),(a/257));
         }
       }
@@ -796,7 +801,7 @@ FXchar* fxnamefromcolor(FXchar* colorname,FXColor color){
         return colorname;
         }
       }
-    sprintf(colorname,"#%02x%02x%02x",FXREDVAL(color),FXGREENVAL(color),FXBLUEVAL(color));
+    __snprintf(colorname,sizeof(colorname),"#%02x%02x%02x",FXREDVAL(color),FXGREENVAL(color),FXBLUEVAL(color));
     }
   return colorname;
   }

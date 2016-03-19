@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIconList.cpp,v 1.222 2007/02/07 20:22:10 fox Exp $                     *
+* $Id: FXIconList.cpp,v 1.227 2007/05/17 15:55:30 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -2336,11 +2336,13 @@ long FXIconList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     // Find out where hit
     code=hitItem(index,event->win_x,event->win_y);
 
+    // Previous selection state
+    state=items[index]->isSelected();
+
     // Change current item
     setCurrentItem(index,true);
 
     // Change item selection
-    state=items[index]->isSelected();
     switch(options&SELECT_MASK){
       case ICONLIST_EXTENDEDSELECT:
         if(event->state&SHIFTMASK){
@@ -2369,7 +2371,8 @@ long FXIconList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       }
 
     // Are we dragging?
-    if(code && items[index]->isSelected() && items[index]->isDraggable()){
+//    if(code && items[index]->isSelected() && items[index]->isDraggable()){
+    if(state && items[index]->isSelected() && items[index]->isDraggable()){
       flags|=FLAG_TRYDRAG;
       }
 

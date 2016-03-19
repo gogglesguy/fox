@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFontSelector.cpp,v 1.58 2007/02/07 20:22:08 fox Exp $                  *
+* $Id: FXFontSelector.cpp,v 1.59 2007/05/17 19:27:56 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -208,11 +208,11 @@ FXFontSelector::FXFontSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   scalable=new FXCheckButton(attributes,tr("Scalable:"),this,ID_SCALABLE,JUSTIFY_NORMAL|TEXT_BEFORE_ICON|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
 
   // Check for all (X11) fonts
-#ifndef WIN32
+#ifdef WIN32
+  allfonts=NULL;
+#else
   new FXFrame(attributes,FRAME_NONE|LAYOUT_FILL_COLUMN);
   allfonts=new FXCheckButton(attributes,tr("All Fonts:"),this,ID_ALLFONTS,JUSTIFY_NORMAL|TEXT_BEFORE_ICON|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-#else
-  allfonts=NULL;
 #endif
 
   // Preview

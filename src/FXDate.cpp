@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDate.cpp,v 1.14 2007/02/07 20:22:05 fox Exp $                          *
+* $Id: FXDate.cpp,v 1.16 2007/05/17 19:27:56 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,6 +77,48 @@ void FXDate::greg2jul(FXuint& jd,FXint y,FXint m,FXint d){
   if(m<1 || m>12 || d<1 || d>31){ fxerror("FXDate:: bad argument\n"); }
   jd=(1461*(y+4800+(m-14)/12))/4+(367*(m-2-12*((m-14)/12)))/12-(3*((y+4900+(m-14)/12)/100))/4+d-32075;
   }
+
+
+#if 0
+void FXDate::greg2jul(FXuint& jd,FXint y,FXint m,FXint d){
+  if(m<1 || m>12 || d<1 || d>31){ fxerror("FXDate:: bad argument\n"); }
+  FXuint c,ya;
+  if(y<=99) y+=1900;
+  if(m>2){
+    m-=3;
+    }
+  else{
+    m+=9;
+    y--;
+    }
+  c=y;
+  c/=100;
+  ya=y-100*c;
+  jb=1721119+d+(146097*c)/4+(1461*ya)/4+(153*m+2)/5;
+  }
+
+void FXDate::jul2greg(FXuint jd,FXint& y,FXint& m,FXint& d){
+  FXuint j=jd-1721119;
+  FXuint x;
+  y=(j*4-1)/146097;
+  j=j*4-146097*y-1;
+  x=j/4;
+  j=(x*4+3)/1461;
+  y=100*y+j;
+  x=(x*4)+3-1461*j;
+  x=(x+4)/4;
+  m=(5*x-3)/153;
+  x=5*x-3-153*m;
+  d=(x+5)/5;
+  if(m<10){
+    m+=3;
+    }
+  else{
+    m-=9;
+    y++;
+    }
+  }
+#endif
 
 
 // Convert julian day number to gregorian date
@@ -179,7 +221,11 @@ FXbool FXDate::leapYear() const {
 // Return current local date
 FXDate FXDate::localDate(){
   FXDate date;
-#ifndef WIN32
+#ifdef WIN32
+  SYSTEMTIME t;
+  GetLocalTime(&t);
+  greg2jul(date.julian,t.wYear,t.wMonth,t.wDay);
+#else
 #if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct tm result,*t;
   time_t ltime;
@@ -192,10 +238,6 @@ FXDate FXDate::localDate(){
   t=localtime(&ltime);
 #endif
   greg2jul(date.julian,t->tm_year+1900,t->tm_mon+1,t->tm_mday);
-#else
-  SYSTEMTIME t;
-  GetLocalTime(&t);
-  greg2jul(date.julian,t.wYear,t.wMonth,t.wDay);
 #endif
   return date;
   }
@@ -204,7 +246,11 @@ FXDate FXDate::localDate(){
 // Return current universal (UTC) date
 FXDate FXDate::universalDate(){
   FXDate date;
-#ifndef WIN32
+#if WIN32
+  SYSTEMTIME t;
+  GetSystemTime(&t);
+  greg2jul(date.julian,t.wYear,t.wMonth,t.wDay);
+#else
 #if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct tm result,*t;
   time_t ltime;
@@ -217,10 +263,6 @@ FXDate FXDate::universalDate(){
   t=gmtime(&ltime);
 #endif
   greg2jul(date.julian,t->tm_year+1900,t->tm_mon+1,t->tm_mday);
-#else
-  SYSTEMTIME t;
-  GetSystemTime(&t);
-  greg2jul(date.julian,t.wYear,t.wMonth,t.wDay);
 #endif
   return date;
   }

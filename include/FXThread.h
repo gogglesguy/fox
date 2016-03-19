@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXThread.h,v 1.65 2007/02/23 20:02:01 fox Exp $                          *
+* $Id: FXThread.h,v 1.66 2007/05/17 05:58:42 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
@@ -279,14 +279,14 @@ public:
 
   /// Acquire a unique thread-local storage key
   FXAutoThreadStorageKey();
-  
+
   /// Return the thread-local storage key
   operator FXThreadStorageKey() const { return value; }
-  
+
   /// Release thread-local storage key
  ~FXAutoThreadStorageKey();
   };
-  
+
 
 /**
 * FXThread provides system-independent support for threads.
@@ -315,21 +315,21 @@ public:
 
   /// Thread priority levels
   enum Priority {
-    PRIORITY_ERROR=-1,  /// Failed to get priority
-    PRIORITY_DEFAULT,  	/// Default scheduling priority
-    PRIORITY_MINIMUM,   /// Minimum scheduling priority
-    PRIORITY_LOWER,     /// Lower scheduling priority
-    PRIORITY_MEDIUM,    /// Medium priority
-    PRIORITY_HIGHER,    /// Higher scheduling priority
-    PRIORITY_MAXIMUM    /// Maximum scheduling priority
+    PriorityError=-1,   /// Failed to get priority
+    PriorityDefault,  	/// Default scheduling priority
+    PriorityMinimum,    /// Minimum scheduling priority
+    PriorityLower,      /// Lower scheduling priority
+    PriorityMedium,     /// Medium priority
+    PriorityHigher,     /// Higher scheduling priority
+    PriorityMaximum     /// Maximum scheduling priority
     };
 
   /// Thread scheduling policies
   enum Policy {
-    POLICY_ERROR=-1,    /// Failed to get policy
-    POLICY_DEFAULT,     /// Default scheduling
-    POLICY_FIFO,        /// First in, first out scheduling
-    POLICY_ROUND_ROBIN 	/// Round-robin scheduling
+    PolicyError=-1,     /// Failed to get policy
+    PolicyDefault,      /// Default scheduling
+    PolicyFifo,         /// First in, first out scheduling
+    PolicyRoundRobin 	/// Round-robin scheduling
     };
 
 public:

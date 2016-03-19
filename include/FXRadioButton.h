@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRadioButton.h,v 1.32 2007/02/07 20:21:57 fox Exp $                     *
+* $Id: FXRadioButton.h,v 1.33 2007/04/21 02:12:26 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXRADIOBUTTON_H
 #define FXRADIOBUTTON_H
@@ -98,7 +98,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Set radio button state (TRUE, FALSE or MAYBE)
-  void setCheck(FXuchar s=TRUE,FXbool notify=FALSE);
+  void setCheck(FXuchar s=TRUE,FXbool notify=false);
 
   /// Get radio button state (TRUE, FALSE or MAYBE)
   FXuchar getCheck() const { return check; }

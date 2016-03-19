@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolTip.cpp,v 1.34 2007/03/09 03:55:56 fox Exp $                       *
+* $Id: FXToolTip.cpp,v 1.35 2007/05/17 19:27:57 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -197,12 +197,7 @@ void FXToolTip::place(FXint x,FXint y){
   FXint rx,ry,rw,rh,px,py,w,h;
   w=getDefaultWidth();
   h=getDefaultHeight();
-#ifndef WIN32
-  rx=getRoot()->getX();
-  ry=getRoot()->getY();
-  rw=getRoot()->getWidth();
-  rh=getRoot()->getHeight();
-#else
+#ifdef WIN32
   RECT rect;
   MYMONITORINFO minfo;
   HANDLE monitor;
@@ -232,6 +227,11 @@ void FXToolTip::place(FXint x,FXint y){
     rw=rect.right-rect.left;
     rh=rect.bottom-rect.top;
     }
+#else
+  rx=getRoot()->getX();
+  ry=getRoot()->getY();
+  rw=getRoot()->getWidth();
+  rh=getRoot()->getHeight();
 #endif
   px=x+16-w/3;
   py=y+20;

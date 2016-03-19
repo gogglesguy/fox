@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFile.cpp,v 1.258 2007/02/07 20:22:07 fox Exp $                         *
+* $Id: FXFile.cpp,v 1.259 2007/04/03 19:25:22 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -170,6 +170,12 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
 // Open device with access mode and handle
 FXbool FXFile::open(FXInputHandle h,FXuint m){
   return FXIO::open(h,m);
+  }
+
+  
+// Return true if serial access only
+FXbool FXFile::isSerial() const {
+  return false;
   }
 
 

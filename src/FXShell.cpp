@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXShell.cpp,v 1.83 2007/02/07 20:22:15 fox Exp $                         *
+* $Id: FXShell.cpp,v 1.86 2007/05/22 13:33:53 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -95,6 +95,10 @@ void FXShell::create(){
   }
 
 
+//#ifndef WIN32
+//  XChangeProperty(DISPLAY(getApp()),xid,getApp()->wmNetWindowName,XA_ATOM,32,PropModeReplace,(unsigned char*)title.text(),title.length());
+//#endif
+
 // Schedule layout to be peformed during idle time
 void FXShell::recalc(){
   getApp()->addChore(this,ID_LAYOUT);
@@ -141,10 +145,10 @@ long FXShell::onConfigure(FXObject* sender,FXSelector sel,void* ptr){
     // in recalc() would never fire until we're all done with the resizing.
     // We'd love to have a fix for this, but it seems difficult because of
     // the need to pass "non-client" events over to the DefWindowProc...
-#ifndef WIN32
-    recalc();           // On UNIX, we process idle messages during a resize
-#else
+#ifdef WIN32
     layout();           // On Windows, we are in a modal loop and we have to force it
+#else
+    recalc();           // On UNIX, we process idle messages during a resize
 #endif
     }
   return 1;

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXProgressBar.cpp,v 1.49 2007/02/07 20:22:13 fox Exp $                   *
+* $Id: FXProgressBar.cpp,v 1.50 2007/06/03 05:30:38 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -54,6 +54,10 @@ using namespace FX;
 namespace FX {
 
 
+// Furnish our own version
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+
+
 // Map
 FXDEFMAP(FXProgressBar) FXProgressBarMap[]={
   FXMAPFUNC(SEL_PAINT,0,FXProgressBar::onPaint),
@@ -67,7 +71,6 @@ FXDEFMAP(FXProgressBar) FXProgressBarMap[]={
 
 // Object implementation
 FXIMPLEMENT(FXProgressBar,FXFrame,FXProgressBarMap,ARRAYNUMBER(FXProgressBarMap))
-
 
 
 // Make progress bar
@@ -176,7 +179,7 @@ long FXProgressBar::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
 // Draw only the interior, i.e. the part that changes
 void FXProgressBar::drawInterior(FXDCWindow& dc){
   FXint percent,barlength,barfilled,tx,ty,tw,th,n,d;
-  FXchar numtext[5];
+  FXchar numtext[10];
 
   if(options&PROGRESSBAR_DIAL){
 
@@ -224,7 +227,7 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
       if(tw>(10*d)/16) return;
       th=font->getFontHeight();
       if(th>d/2) return;
-      sprintf(numtext,"%d%%",percent);
+      __snprintf(numtext,sizeof(numtext),"%d%%",percent);
       n=strlen(numtext);
       tw=font->getTextWidth(numtext,n);
       th=font->getFontHeight();
@@ -274,7 +277,7 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
     // Draw text
     if(options&PROGRESSBAR_PERCENTAGE){
       dc.setFont(font);
-      sprintf(numtext,"%d%%",percent);
+      __snprintf(numtext,sizeof(numtext),"%d%%",percent);
       n=strlen(numtext);
       tw=font->getTextWidth(numtext,n);
       th=font->getFontHeight();
@@ -329,7 +332,7 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
     // Draw text
     if(options&PROGRESSBAR_PERCENTAGE){
       dc.setFont(font);
-      sprintf(numtext,"%d%%",percent);
+      __snprintf(numtext,sizeof(numtext),"%d%%",percent);
       n=strlen(numtext);
       tw=font->getTextWidth(numtext,n);
       th=font->getFontHeight();

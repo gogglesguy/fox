@@ -57,6 +57,7 @@ FXApp.h \
 FXArray.h \
 FXAtomic.h \
 FXArrowButton.h \
+FXAutoPtr.h \
 FXBMPIcon.h \
 FXBMPImage.h \
 FXBitmap.h \
@@ -101,7 +102,6 @@ FXDirBox.h \
 FXDirDialog.h \
 FXDirList.h \
 FXDirSelector.h \
-FXDirWatch.h \
 FXDockBar.h \
 FXDockHandler.h \
 FXDockSite.h \
@@ -167,6 +167,7 @@ FXKnob.h \
 FXLabel.h \
 FXList.h \
 FXListBox.h \
+FXLocale.h \
 FXMDIButton.h \
 FXMDIChild.h \
 FXMDIClient.h \
@@ -217,7 +218,6 @@ FXRGBImage.h \
 FXRadioButton.h \
 FXRangef.h \
 FXRanged.h \
-FXReactor.h \
 FXRealSlider.h \
 FXRealSpinner.h \
 FXRecentFiles.h \

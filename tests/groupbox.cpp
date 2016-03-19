@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: groupbox.cpp,v 1.120 2007/02/07 20:22:24 fox Exp $                       *
+* $Id: groupbox.cpp,v 1.122 2007/05/21 17:14:31 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -195,6 +195,7 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
     new FXMenuCommand(filemenu,"Delete\tCtl-X",NULL,this,ID_DELETE,0);
     new FXMenuCommand(filemenu,"Downsize\tF5\tResize to minimum",NULL,this,ID_DOWNSIZE,0);
     new FXMenuCommand(filemenu,"&Size",NULL,this,ID_DOWNSIZE,0);
+    new FXMenuCommand(filemenu,"Full Screen",NULL,this,ID_FULLSCREEN,0);     // TEST
     new FXMenuCommand(filemenu,"Maximize",NULL,this,ID_MAXIMIZE,0);     // TEST
     new FXMenuCommand(filemenu,"Minimize",NULL,this,ID_ICONIFY,0);     // TEST
     new FXMenuCommand(filemenu,"Restore",NULL,this,ID_RESTORE,0);       // TEST
@@ -569,22 +570,6 @@ long GroupWindow::onCmdIconify(FXObject*,FXSelector,void*){
   minimize();
   getApp()->addTimeout(this,ID_DEICONIFY,2000000000);
   FXTRACE((1,"iconify\n"));
-/*
-  static int full=FALSE;
-  full=!full;
-  if(full){
-    //hide();
-    setDecorations(DECOR_NONE);
-    show(PLACEMENT_MAXIMIZED);
-    //maximize();
-    }
-  else{
-    hide();
-    setDecorations(DECOR_ALL);
-    show();
-    restore();
-    }
-*/
   return 1;
   }
 

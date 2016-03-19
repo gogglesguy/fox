@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFile.h,v 1.105 2007/02/07 20:21:54 fox Exp $                           *
+* $Id: FXFile.h,v 1.106 2007/04/03 19:25:21 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXFILE_H
 #define FXFILE_H
@@ -55,7 +55,10 @@ public:
 
   /// Open device with access mode and handle
   virtual FXbool open(FXInputHandle h,FXuint m);
-
+  
+  /// Return true if serial access only
+  virtual FXbool isSerial() const;
+  
   /// Get current file position
   virtual FXlong position() const;
 

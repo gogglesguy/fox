@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGradientBar.h,v 1.55 2007/02/07 20:21:55 fox Exp $                     *
+* $Id: FXGradientBar.h,v 1.56 2007/06/03 16:43:29 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXGRADIENTBAR_H
 #define FXGRADIENTBAR_H
@@ -30,7 +30,6 @@
 
 
 namespace FX {
-
 
 
 /// Gradient bar orientation
@@ -53,7 +52,6 @@ enum {
   GRADIENT_BLEND_INCREASING,            /// Quadratic increasing blend
   GRADIENT_BLEND_DECREASING             /// Quadratic decreasing blend
   };
-
 
 
 // Gradient segment
@@ -87,9 +85,11 @@ protected:
   FXint        anchor;                  // Anchor segment
   FXint        grip;                    // Grip being dragged, if any
   FXint        where;                   // Where dropped in segment
+  FXint        barsize;                 // Bar size
+  FXint        controlsize;             // Size of control
+  FXColor      selectColor;             // Select color
   FXString     tip;                     // Tooltip value
   FXString     help;                    // Help value
-  FXColor      selectColor;             // Select color
   FXint        offset;                  // Offset
 protected:
   FXGradientBar();
@@ -291,6 +291,18 @@ public:
   /// Change blend mode of segment
   void blendSegments(FXint sglo,FXint sghi,FXuint blend=GRADIENT_BLEND_LINEAR,FXbool notify=false);
 
+  /// Change control size
+  void setControlSize(FXint cs);
+  
+  /// Get control size
+  FXint getControlSize() const { return controlsize; }
+
+  /// Change bar size
+  void setBarSize(FXint bs);
+  
+  /// Get bar size
+  FXint getBarSize() const { return barsize; }
+  
   /// Get the gradient bar style
   FXuint getBarStyle() const;
 

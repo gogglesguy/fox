@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.250 2007/03/01 18:16:34 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.253 2007/05/17 21:19:49 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1503,14 +1503,14 @@ fnd:  *pn=item;
           }
 
         // Update item information
-#ifndef WIN32
+#ifdef WIN32
+        item->label.format("%s\t%s\t%I64u\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text());
+#else
 #if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
         item->label.format("%s\t%s\t%ld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text(),linkname.text());
 #else
         item->label.format("%s\t%s\t%lld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text(),linkname.text());
 #endif
-#else
-        item->label.format("%s\t%s\t%I64u\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text());
 #endif
 
         // Create item
@@ -1598,13 +1598,14 @@ FXFileAssoc* FXFileList::getItemAssoc(FXint index) const {
   }
 
 
-// Change associations table; force a rescan so as to
-// update the bindings in each item to the new associations
-void FXFileList::setAssociations(FXFileDict* assocs){
+// Change file associations; delete the old one unless it was shared
+void FXFileList::setAssociations(FXFileDict* assocs,FXbool owned){
   if(associations!=assocs){
+    if(!(options&FILELIST_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
     scan(true);
     }
+  options^=((owned-1)^options)&FILELIST_NO_OWN_ASSOC;
   }
 
 

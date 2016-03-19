@@ -4,26 +4,6 @@
 *                                                                               *
 ********************************************************************************/
 #include "fx.h"
-#ifdef HAVE_PNG_H
-#include "FXPNGImage.h"
-#endif
-#ifdef HAVE_JPEG_H
-#include "FXJPGImage.h"
-#endif
-#ifdef HAVE_TIFF_H
-#include "FXTIFImage.h"
-#endif
-#include "FXICOImage.h"
-#include "FXTGAImage.h"
-#include "FXRGBImage.h"
-
-#include "FXGradientBar.h"
-
-
-FXColor grey_ramp[512*50];                 // Created images
-FXColor red_ramp[512*50];
-FXColor green_ramp[512*50];
-FXColor blue_ramp[512*50];
 
 
 // Event Handler Object
@@ -96,6 +76,12 @@ FXDEFMAP(ImageWindow) ImageWindowMap[]={
 
 // Macro for the ScribbleApp class hierarchy implementation
 FXIMPLEMENT(ImageWindow,FXMainWindow,ImageWindowMap,ARRAYNUMBER(ImageWindowMap))
+
+
+FXColor grey_ramp[512*50];                 // Created images
+FXColor red_ramp[512*50];
+FXColor green_ramp[512*50];
+FXColor blue_ramp[512*50];
 
 
 

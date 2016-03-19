@@ -13,6 +13,7 @@ glviewer
 
 noinst_PROGRAMS	= \
 console \
+format \
 thread \
 calendar \
 expression \
@@ -47,6 +48,7 @@ tabbook \
 ratio \
 $(GL_TESTS)
 
+format_SOURCES          = format.cpp
 console_SOURCES         = console.cpp
 thread_SOURCES          = thread.cpp
 calendar_SOURCES        = calendar.cpp
