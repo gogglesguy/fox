@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                 M u l i t h r e a d i n g   S u p p o r t                     *
+*                          T h r e a d   S u p p o r t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -116,7 +116,7 @@ public:
   * This invokes the run() function in the context of the new
   * thread.
   */
-  FXbool start(unsigned long stacksize=0);
+  FXbool start(FXuval stacksize=0);
 
   /**
   * Suspend calling thread until thread is done.  The FXThreadID is

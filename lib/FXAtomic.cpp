@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -102,6 +102,7 @@ FXbool atomicsAvailable(){
 #endif
   }
 
+/*******************************************************************************/
 
 // Atomically set variable at ptr to v, and return its old contents
 FXint atomicSet(volatile FXint* ptr,FXint v){
@@ -119,6 +120,7 @@ FXint atomicSet(volatile FXint* ptr,FXint v){
   return ret;
 #endif
   }
+
 
 
 // Atomically add v to variable at ptr, and return its old contents
@@ -183,6 +185,89 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 #endif
   }
 
+/*******************************************************************************/
+
+// Atomically set variable at ptr to v, and return its old contents
+FXuint atomicSet(volatile FXuint* ptr,FXuint v){
+#if defined(WIN32)
+  return InterlockedExchange((LONG*)ptr,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+  register FXuint ret=v;
+  __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
+  return ret;
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_lock_test_and_set(ptr,v);
+#else
+  FXuint ret=*ptr;
+  *ptr=v;
+  return ret;
+#endif
+  }
+
+
+// Atomically add v to variable at ptr, and return its old contents
+FXuint atomicAdd(volatile FXuint* ptr,FXuint v){
+#if defined(WIN32)
+  return InterlockedExchangeAdd((LONG*)ptr,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+  register FXuint ret=v;
+  __asm__ __volatile__ ("lock\n\t"
+                        "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
+  return ret;
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_fetch_and_add(ptr,v);
+#else
+  FXuint ret=*ptr;
+  *ptr+=v;
+  return ret;
+#endif
+  }
+
+
+// Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
+FXuint atomicCas(volatile FXuint* ptr,FXuint expect,FXuint v){
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
+  return InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+  register FXuint ret;
+  __asm__ __volatile__("lock\n\t"
+                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
+  return ret;
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_val_compare_and_swap(ptr,expect,v);
+#else
+  FXuint ret=*ptr;
+  if(*ptr==expect){
+    *ptr=v;
+    }
+  return ret;
+#endif
+  }
+
+
+// Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
+FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v){
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
+  return (InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect)==(LONG)expect);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+  register FXbool ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchgl %2, (%1)\n\t"
+                        "sete   %%al\n\t"
+                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
+  return ret;
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_bool_compare_and_swap(ptr,expect,v);
+#else
+  if(*ptr==expect){
+    *ptr=v;
+    return true;
+    }
+  return false;
+#endif
+  }
+
+/*******************************************************************************/
 
 // Atomically set pointer variable at ptr to v, and return its old contents
 void* atomicSet(void* volatile* ptr,void* v){
@@ -319,7 +404,7 @@ FXbool atomicBoolDCas(void* volatile* ptr,void* cmpa,void* cmpb,void* a,void* b)
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchg16b (%1)\n\t"
-                        "setz    %%al\n\t"
+                        "setz   %%al\n\t"
                         "andq    $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "a"(cmpa), "d"(cmpb), "b"(a), "c"(b) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_BUILTIN_SYNC) && defined(__LP64__) && defined(__GNUC__))

@@ -14,22 +14,22 @@ pkgconfig_DATA = fox17.pc
 CLEANFILES = $(distdir).tar.gz $(distdir).zip
 
 snapshot: dist-all
-	cp $(distdir).tar.gz /net/webby/ftp/pub/fox-snapshot.tar.gz
-	cp $(distdir).zip /net/webby/ftp/pub/fox-snapshot.zip
+	cp $(distdir).tar.gz /home/site/ftp/pub/fox-snapshot.tar.gz
+	cp $(distdir).zip /home/site/ftp/pub/fox-snapshot.zip
 
 
 
 web: distdir
 	cd $(distdir)/doc && doxygen doxygen.cfg
-	cp -r $(distdir)/doc/* /net/webby/html
+	cp -r $(distdir)/doc/* /home/site/html
 
 #web: distdir
 #	cp -r $(distdir)/doc/* /net/webby/html
 
 drop: dist-all
-	cp $(distdir).tar.gz /net/webby/ftp/pub
-	cp $(distdir).zip /net/webby/ftp/pub
-	sha1sum $(distdir).tar.gz >/net/webby/ftp/pub/$(distdir).tar.gz.sha1sum
-	sha1sum $(distdir).zip >/net/webby/ftp/pub/$(distdir).zip.sha1sum
-	cd /net/webby/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
-	cd /net/webby/ftp/pub && ln -sf $(distdir).zip fox-latest.zip
+	cp $(distdir).tar.gz /home/site/ftp/pub
+	cp $(distdir).zip /home/site/ftp/pub
+	sha1sum $(distdir).tar.gz >/home/site/ftp/pub/$(distdir).tar.gz.sha1sum
+	sha1sum $(distdir).zip >/home/site/ftp/pub/$(distdir).zip.sha1sum
+	cd /home/site/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
+	cd /home/site/ftp/pub && ln -sf $(distdir).zip fox-latest.zip

@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,11 +62,9 @@ FXTime fxgetticks(){
 
 // Return clock ticks from AMD64 TSC register [GCC AMD64 version].
 FXTime fxgetticks(){
-  FXTime value;
-  asm ( "rdtsc\n\t"
-        "shlq $32,%%rdx\n\t"
-        "leaq (%%rax,%%rdx),%0\n\t" : "=r" (value) : /*NONE*/ : "rdx" );
-  return value;
+  FXuint lo,hi;
+  asm ( "rdtsc" : "=a" (lo), "=d" (hi));
+  return ((FXulong)lo) | (((FXulong)hi)<<32);
   }
 
 #elif !defined(__INTEL_COMPILER) && defined(__GNUC__) && defined(__ia64__)

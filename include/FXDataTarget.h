@@ -3,7 +3,7 @@
 *                              D a t a   T a r g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,19 +29,36 @@ namespace FX {
 
 
 /**
-* A Data Target allows a valuator widget such as a Slider or Text Field
-* to be directly connected with a variable in the program.
-* Whenever the valuator control changes, the variable connected through
-* the data target is automatically updated; conversely, whenever the program
-* changes a variable, all the connected valuator widgets will be updated
-* to reflect this new value on the display.
-* Data Targets also allow connecting Radio Buttons, Menu Commands, and so on
-* to a variable.  In this case, the new value of the connected variable is computed
-* by subtracting ID_OPTION from the message ID.
-* A Data Target may be subclassed to handle additional, user-defined data types; to
+* A Data Target allows a widget to be directly connected with a associated variable,
+* without any additional "glue code".  This connection is bi-directional: widgets can
+* not only only change the associated variable, but also query the associated variable,
+* and reflect its value in the widget.
+*
+* The value of the associated variable is changed by the data target when it receives
+* a SEL_COMMAND or SEL_CHANGED message from the widget.  Conversely, the widget's state
+* may be updated from the data target's associated variable when the it receives a
+* SEL_UPDATE query message from the widget.
+*
+* Valuator widgets should send an ID_VALUE message to the data target.  When a data
+* target receives the ID_VALUE message, it will obtain the value of the sending valuator
+* widget by querying it with a ID_GETINTVALUE, ID_GETLONGVALUE, ID_GETREALVALUE, or
+* ID_GETSTRINGVALUE message, depending on the type of the associated variable.
+*
+* Radio Buttons, Menu Commands, and so on can also be connected to a data target.
+* In this case, the widget must send an ID_OPTION+i message; the value of the associated
+* variable will be obtained from the message itself, by simply subtracting ID_OPTION
+* from the message ID, that is to say, the value will be i (-10000 <= i <= 10000).
+*
+* Updating of widgets from the data target is performed when the widget sends the data
+* target a SEL_UPDATE message.  For ID_VALUE update queries, the data target responds
+* with ID_SETINTVALUE, ID_SETLONGVALUE, ID_SETREALVALUE, or ID_SETSTRINGVALUE depending
+* on the type of the associated variable.
+* For ID_OPTION+i update queries, the data target responds with a ID_CHECK or ID_UNCHECK
+* depending on whether the connected variable's value is equal to i or not.
+*
+* A data target may be subclassed to handle additional, user-defined data types; to
 * this end, the message handlers return 1 if the type is one of DT_VOID...DT_STRING
-* and 0 otherwise.  Thus subclasses can handle any data types not dealt with in the
-* default implementation.
+* and 0 otherwise.
 */
 class FXAPI FXDataTarget : public FXObject {
   FXDECLARE(FXDataTarget)

@@ -3,7 +3,7 @@
 *                         P r o c e s s   S u p p o r t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,9 +21,12 @@
 #ifndef FXPROCESS_H
 #define FXPROCESS_H
 
+
 namespace FX {
 
+
 //////////////////////////////  UNDER DEVELOPMENT  //////////////////////////////
+
 
 class FXIODevice;
 

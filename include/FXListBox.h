@@ -3,7 +3,7 @@
 *                        L i s t   B o x   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -201,7 +201,7 @@ public:
 
   /// Get data pointer for specified item
   void* getItemData(FXint index) const;
-  
+
   /// Return true if item is enabled
   FXbool isItemEnabled(FXint index) const;
 

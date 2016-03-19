@@ -3,7 +3,7 @@
 *                          T I F F   I n p u t / O u t p u t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2012 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2013 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -212,9 +212,9 @@ FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXush
 
           // Convert to local format
           for(FXint s=0; s<size; s++){
-            data[s]=((data[s]&0xff)<<16)|((data[s]&0xff0000)>>16)|(data[s]&0xff00)|(data[s]&0xff000000);    
+            data[s]=((data[s]&0xff)<<16)|((data[s]&0xff0000)>>16)|(data[s]&0xff00)|(data[s]&0xff000000);
             }
-          
+
           // Return with success
           TIFFRGBAImageEnd(&img);
           TIFFClose(image);

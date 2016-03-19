@@ -3,7 +3,7 @@
 *                        L i s t   B o x   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -547,13 +547,13 @@ void* FXListBox::getItemData(FXint index) const {
 FXbool FXListBox::isItemEnabled(FXint index) const {
   return list->isItemEnabled(index);
   }
-  
+
 
 // Enable item
 FXbool FXListBox::enableItem(FXint index){
   return list->enableItem(index);
   }
-  
+
 
 // Disable item
 FXbool FXListBox::disableItem(FXint index){

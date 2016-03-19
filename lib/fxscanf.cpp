@@ -3,7 +3,7 @@
 *                   V a r a r g s   S c a n f   R o u t i n e s                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -81,9 +81,11 @@
 #endif
 #endif
 
-using namespace FX;
+#define MAXDIGS  20     // Maximum number of significant digits
 
 /*******************************************************************************/
+
+using namespace FX;
 
 namespace FX {
 
@@ -103,15 +105,16 @@ enum {
   ARG_VARIABLE          // Depending on size of pointer
   };
 
-
 /*******************************************************************************/
 
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  register FXint ch,nn,v,neg,nex,pos,width,base,digits,signifs,modifier,convert,count,exponent;
+  register FXint modifier,width,convert,base,digits,count,exponent,expo,neg,nex,pos,ch,nn,v;
   register const FXchar *start=string;
+  register const FXchar *ss;
   register FXchar *ptr;
   FXdouble number;
+  FXdouble mult;
   FXulong  value;
   FXchar   set[256];
   va_list ag;
@@ -215,44 +218,44 @@ decimal:  base+=2;
         case 'b':                                       // Binary
           base+=2;
         case 'i':                                       // Either
-          if(width<1) width=2147483647;                                 // Width at least 1
-          while(Ascii::isSpace(*string)) string++;                      // Skip white space
           value=0;
           digits=0;
+          if(width<1) width=2147483647;                                 // Width at least 1
+          while(Ascii::isSpace(*string)) string++;                      // Skip white space; not included in field width
           if((neg=(*string=='-')) || (*string=='+')){                   // Handle sign
             string++;
             width--;
             }
-          if(0<width){
-            if(*string=='0'){                                           // Got a '0'
-              digits++;
-              string++;
-              width--;
-              if(0<width && (*string=='x' || *string=='X')){            // Got a '0x'
-                if(base==0) base=16;                                    // If not set yet, '0x' means set base to 16
-                if(base==16){                                           // But don't eat the 'x' if base wasn't 16!
-                  string++;
-                  width--;
-                  }
-                }
-              else if(0<width && (*string=='b' || *string=='B')){       // Got a '0b'
-                if(base==0) base=2;                                     // If not set yet, '0b' means set base to 2
-                if(base==2){                                            // But don't eat the 'b' if base wasn't 2!
-                  string++;
-                  width--;
-                  }
-                }
-              else{
-                if(base==0) base=8;                                     // If not set yet, '0' means set base to 8
+          if(0<width && *string=='0'){                                  // Got a '0'
+            digits++;
+            string++;
+            width--;
+            if(0<width && (*string=='x' || *string=='X')){              // Got a '0x'
+              if(base==0) base=16;                                      // If not set yet, '0x' means set base to 16
+              if(base==16){                                             // But don't eat the 'x' if base wasn't 16!
+                string++;
+                width--;
                 }
               }
+            else if(0<width && (*string=='b' || *string=='B')){         // Got a '0b'
+              if(base==0) base=2;                                       // If not set yet, '0b' means set base to 2
+              if(base==2){                                              // But don't eat the 'b' if base wasn't 2!
+                string++;
+                width--;
+                }
+              }
+            else{
+              if(base==0) base=8;                                       // If not set yet, '0' means set base to 8
+              }
+            }
+          else{
             if(base==0) base=10;                                        // Not starting with '0' or '0x', so its decimal
-            while(0<width && 0<=(v=Ascii::digitValue(*string)) && v<base){      // Convert to integer
-              value=value*base+v;
-              digits++;
-              string++;
-              width--;
-              }
+            }
+          while(0<width && 0<=(v=Ascii::digitValue(*string)) && v<base){        // Convert to integer
+            value=value*base+v;
+            digits++;
+            string++;
+            width--;
             }
           if(!digits) goto x;                                   // No digits seen!
           if(neg){                                              // Apply sign
@@ -286,79 +289,84 @@ assign:   if(convert){
         case 'F':
         case 'g':
         case 'G':
-          if(width<1) width=2147483647;                         // Width at least 1
-          while(Ascii::isSpace(*string)) string++;              // Skip white space
           number=0.0;
-          exponent=0;
-          signifs=-1;
+          mult=1.0;
+          exponent=-1;
           digits=0;
+          if(width<1) width=2147483647;                         // Width at least 1
+          while(Ascii::isSpace(*string)) string++;              // Skip white space; not included in field width
           if((neg=(*string=='-')) || (*string=='+')){           // Handle sign
             string++;
             width--;
             }
-          if(0<width){
-            while(0<width && '0'<=*string && *string<='9'){     // Mantissa digits
-              number=number*10.0+(*string-'0');
-              if(number) signifs++;
+          if(width<=0 || !(*string=='.' || ('0'<=*string && *string<='9'))) goto x;     // Bail if not starting a number now
+          while(0<width && *string=='0'){                       // Leading zeros
+            string++;
+            width--;
+            }
+          while(0<width && '0'<=*string && *string<='9'){       // Mantissa digits
+            if(digits<MAXDIGS){
+              number+=(*string-'0')*mult;
+              mult*=0.1;
+              }
+            exponent++;
+            digits++;
+            string++;
+            width--;
+            }
+          if(0<width && *string=='.'){                          // Mantissa decimals following '.'
+            string++;
+            width--;
+            while(0<width && '0'<=*string && *string<='9'){
+              if(digits<MAXDIGS){
+                number+=(*string-'0')*mult;
+                mult*=0.1;
+                }
               digits++;
               string++;
               width--;
               }
-            if(0<width && *string=='.'){                        // Mantissa decimals following '.'
-              string++;
-              width--;
-              while(0<width && '0'<=*string && *string<='9'){
-                number=number*10.0+(*string-'0');
-                if(number) signifs++;
-                digits++;
-                string++;
-                exponent--;                                     // Decrement exponent for digits after decimal point
-                width--;
-                }
-              }
             }
-          if(!digits) goto x;                                   // No digits in mantissa at all!
-          if(0<width && (*string=='e' || *string=='E')){        // Handle exponent
-            string++;
+          if(1<width && (*string|0x20)=='e'){                   // Handle exponent, tentatively
+            ss=string;
+            ss++;
             width--;
-            nn=0;
-            digits=0;
-            if(0<width){
-              if((nex=(*string=='-')) || (*string=='+')){       // Handle exponent sign
-                string++;
+            expo=0;
+            if((nex=(*ss=='-')) || (*ss=='+')){                 // Handle exponent sign
+              ss++;
+              width--;
+              }
+            if(0<width && '0'<=*ss && *ss<='9'){                // Have exponent?
+              while(0<width && '0'<=*ss && *ss<='9'){
+                expo=expo*10+(*ss-'0');
+                ss++;
                 width--;
                 }
-              while(0<width && '0'<=*string && *string<='9'){
-                nn=nn*10+(*string-'0');
-                string++;
-                digits++;
-                width--;
-                }
-              if(!digits) goto x;                               // No digits in exponent!
               if(nex){
-                exponent-=nn;
+                exponent-=expo;
                 }
               else{
-                exponent+=nn;
+                exponent+=expo;
                 }
+              string=ss;                                        // Eat exponent characters
               }
             }
           if(number!=0.0){
-            number*=fxtenToThe(-signifs);                       // Mantissa to form X.XXXXXX
-            exponent+=signifs;
-            if((exponent>308) || ((exponent==308) && (number>=1.79769313486231570815))){         // Check overflow
-              number=1.79769313486231570815E+308;
-              }
-            else if((exponent<-324) || ((exponent==-324) && (number<=4.94065645841246544177))){  // Check underflow
-              number=0.0;
-              }
-            else{
-              if(exponent<-308){                                // Tweak for denormals
-                number*=1.0E-16;
-                exponent+=16;
+            if(308<=exponent){                                  // Check for overflow
+              if((308<exponent) || (1.79769313486231570815<=number)){
+                number=1.79769313486231570815E+308;
+                exponent=0;
                 }
-              number*=fxtenToThe(exponent);                     // Shift floating point
               }
+            if(exponent<-308){                                  // Check for denormal or underflow
+              if((exponent<-324) || ((exponent==-324) && (number<=4.94065645841246544177))){
+                number=0.0;
+                exponent=0;
+                }
+              number*=1.0E-16;
+              exponent+=16;
+              }
+            number*=fxtenToThe(exponent);                       // In range
             if(neg){                                            // Apply sign
               number=-number;
               }

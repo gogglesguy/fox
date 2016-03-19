@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,6 +42,7 @@
 #define NULL 0
 #endif
 
+
 // Path separator
 #ifdef WIN32
 #define PATHSEP '\\'
@@ -56,6 +57,7 @@
 #define PATHLISTSEPSTRING ":"
 #define ISPATHSEP(c) ((c)=='/')
 #endif
+
 
 // End Of Line
 #ifdef WIN32
@@ -118,6 +120,7 @@
 #define __align(x)
 #endif
 
+
 // Thread-local storage attribute
 #if defined(__GNUC__)
 #define __threadlocal   __thread
@@ -126,6 +129,7 @@
 #else
 #define __threadlocal
 #endif
+
 
 // Branch prediction optimization
 #if (__GNUC__ >= 3)
@@ -136,6 +140,7 @@
 #define __unlikely(cond)  (!!(cond))
 #endif
 
+
 // Prefetch address
 #if (__GNUC__ >= 4) && (defined(__i386__) || defined(__x86_64__))
 #define __prefetch(addr)   __builtin_prefetch((addr),0)
@@ -144,6 +149,7 @@
 #define __prefetch(addr)
 #define __prefetchw(addr)
 #endif
+
 
 // Callback
 #ifdef WIN32
@@ -171,6 +177,7 @@
 #define FX_SCANF(fmt,arg)
 #define FX_FORMAT(arg)
 #endif
+
 
 // Raw event type
 #ifdef WIN32
@@ -261,6 +268,9 @@ typedef long                   FXival;
 typedef unsigned long          FXuval;
 #endif
 
+
+// Generic void pointer
+typedef void*                  FXptr;
 
 // Suffixes for 64-bit long constants
 #if defined(WIN32) && !defined(__GNUC__)

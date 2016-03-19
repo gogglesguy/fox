@@ -3,7 +3,7 @@
 *                             T h r e a d   P o o l                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,350 +21,346 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXException.h"
 #include "FXElement.h"
-#include "FXPtrQueue.h"
+#include "FXArray.h"
+#include "FXPtrList.h"
+#include "FXAtomic.h"
 #include "FXMutex.h"
+#include "FXSemaphore.h"
 #include "FXCondition.h"
-#include "FXAutoThreadStorageKey.h"
+#include "FXBarrier.h"
 #include "FXRunnable.h"
+#include "FXAutoThreadStorageKey.h"
 #include "FXThread.h"
 #include "FXWorker.h"
+#include "FXLFQueue.h"
 #include "FXThreadPool.h"
-#include "FXException.h"
 
 
 /*
   Notes:
-  - When the current number of worker threads is greater than spare number to keep,
-    terminate the supernumerary ones if, after a small delay, no new jobs come in.
-  - Note, only FXWorker threads should be terminated; other threads running the pool
-    should probably stay in.
-  - But we need some mechanism whereby to identify such non-FXWorker threads.
-  - Expiration time is adjustable.
-  - Maybe need API to change queue size; but only if FXThreadPool is not running.
-  - When adding new job, start new worker if maximum is not yet exceeded and no
-    workers are waiting (idle).
-  - Who can change what variable?
-      - running, waiting: Change only when worker thread is outside cmutex CS.
-      - maximum, minimum: Change only when worker thread is outside cmutex CS.
-      - queue head:       Only changed by producer.
-      - queue tail:       Only changed by consumer (worker threads).
-  - How to break a PARTICULAR thread from the FXThreadPool run loop?
-  - How to make sure certain thread(s) are NOT removed from the run loop?
-  - Minor problem: may overshoot maximum number of threads in a few cases
-    due to race between statement in execute() and incrementing running count
-    in run().  Previous solution was no good since we could have non-FXWorker
-    thread run the threadpool as well.
-  - We want a wait() function which returns when the jobs in the queue at the
-    time of the call are finished, irrespective of any jobs preceding or following
-    it.  The current wait() is not satisfactory since we only return if all threads
-    are idle (which is more restrictive than called for).
-  - Avoid signalling producer if no producers are waiting for room in the queue.
-  - Separate variable #started and #stopped needed because of possibility of race
-    between start() and stop() in short succession.
+  - Process tasks from lock-free queue using multiple threads.
+
+  - A semaphore is used to block producing thread in the case the queue is full, for
+    arbitrary amounts of time ranging from 0 to forever.
+
+  - Producer ONLY ever blocks if queue is full, i.e. no free slot in the queue for an
+    additional task.
+
+  - Multiple producers may add tasks to the queue without lock-contention, if queue is
+    not full.
+
+  - Another semaphore is used to block consuming threads.  Permanent worker threads
+    block indefinitely; temporary workers, if present, block only for short amount of
+    time and exit when no tasks appear within that time.
+
+  - Instead of waiting, a thread can become an additional consumer thread, except that
+    it will not block but return if the queue is empty, or count becomes zero.
+
+  - Task groups provide a mechanism to execute tasks which belong together, and allow
+    the producing thread to know when the entire group is complete.
+
+  - To this end, a task group maintains a counter recording the number of tasks started
+    versus completed, and a semaphore which can coordinate the worker threads with the
+    producer thread.
+
+  - For groups of tasks belonging together, a counter is used to record the completions
+    of all the tasks started in the group.  If the producer also participates in the
+    processing of of tasks, it exits as soon as the completion count reaches zero or
+    the task queue becomes empty.  In either case, it may have to block for a little
+    while on the completion semaphore.
+
+  - No new jobs posted when about to shut down; so when queue becomes empty, it
+    will stay empty.
+
 */
 
 using namespace FX;
 
+/*******************************************************************************/
 
 namespace FX {
 
-/*******************************************************************************/
+
+// Locate thread pool to which worker thread belongs
+FXAutoThreadStorageKey FXThreadPool::reference;
 
 
-// Construct an empty thread pool
-FXThreadPool::FXThreadPool(FXuint sz):queue(sz),expire(forever),maximum(0),minimum(0),started(0),stopped(0),pwaiting(0),cwaiting(0),watching(0),runs(false){
-  FXTRACE((100,"FXThreadPool::FXThreadPool %p\n",this));
+// Create thread pool
+FXThreadPool::FXThreadPool(FXuint sz):queue(sz),freeslots(sz),usedslots(0),sayonara(0),stacksize(0),expiration(forever),processing(1),maximum(FXThread::processors()),minimum(1),workers(0),running(0){
+  FXTRACE((100,"FXThreadPool::FXThreadPool(%d)\n",sz));
   }
 
 
-// Change queue size, return true if success
+// Return true if running
+FXbool FXThreadPool::active() const {
+  return running==1;
+  }
+
+
+// Change task queue size, return true if success
 FXbool FXThreadPool::setSize(FXuint sz){
-  FXbool result=false;
-  mutex.lock();
-  if(!runs && queue.setSize(sz)){
-    result=true;
+  if(sz&(sz-1)){ fxerror("FXThreadPool::setSize: bad argument: %d.\n",sz); }
+  if(atomicBoolCas(&running,0,2)){
+    FXuint osz=queue.getSize();
+    if(setSize(sz)){
+      while(osz<sz){ ++osz; freeslots.post(); }
+      while(osz>sz){ --osz; freeslots.wait(); }
+      running=0;
+      return true;
+      }
+    running=0;
     }
-  mutex.unlock();
-  return result;
+  return false;
   }
 
 
-// Return queue size
+// Return task queue size
 FXuint FXThreadPool::getSize() const {
   return queue.getSize();
   }
 
 
-// Is pool running
-FXbool FXThreadPool::active() const {
-  return runs;
-  }
-
-
-// Return number of waiting threads
-FXuint FXThreadPool::getWaitingThreads() const {
-  return cwaiting;
-  }
-
-
-// Return number of running worker threads
+// Return number of threads
 FXuint FXThreadPool::getRunningThreads() const {
-  return (started-stopped);
+  return workers;
   }
 
 
 // Change minimum number of worker threads
-void FXThreadPool::setMinimumThreads(FXuint n){
-  mutex.lock();
-  minimum=n;
-  mutex.unlock();
-  }
-
-
-// Return minimum number of worker threads
-FXuint FXThreadPool::getMinimumThreads() const {
-  return minimum;
+FXbool FXThreadPool::setMinimumThreads(FXuint n){
+  if(atomicBoolCas(&running,0,2)){
+    minimum=n;
+    running=0;
+    return true;
+    }
+  return false;
   }
 
 
 // Change maximum number of worker threads
-void FXThreadPool::setMaximumThreads(FXuint n){
-  mutex.lock();
-  maximum=n;
-  mutex.unlock();
-  }
-
-
-// Return maximum number of worker threads
-FXuint FXThreadPool::getMaximumThreads() const {
-  return maximum;
+FXbool FXThreadPool::setMaximumThreads(FXuint n){
+  if(atomicBoolCas(&running,0,2)){
+    maximum=n;
+    running=0;
+    return true;
+    }
+  return false;
   }
 
 
 // Change expiration time
-void FXThreadPool::setExpiration(FXTime ns){
-  expire=ns;
-  }
-
-
-// Get expiration time
-FXTime FXThreadPool::getExpiration() const {
-  return expire;
-  }
-
-
-// Create and start a worker
-FXWorker* FXThreadPool::startWorker(){
-  FXWorker *worker=new FXWorker(this);
-  if(!worker->start()){
-    delete worker;
-    return NULL;
+FXbool FXThreadPool::setExpiration(FXTime ns){
+  if(atomicBoolCas(&running,0,2)){
+    expiration=ns;
+    running=0;
+    return true;
     }
-  return worker;
+  return false;
   }
 
 
-// Start pool
-FXuint FXThreadPool::start(FXuint min,FXuint max,FXuint cnt){
-  FXuint result=0;
-  FXTRACE((150,"FXThreadPool::start(%d,%d,%d)\n",min,max,cnt));
-  if(min<=max && cnt<=min){
-    mutex.lock();
-    if(!runs){
+// Change stack size
+FXbool FXThreadPool::setStackSize(FXuval sz){
+  if(atomicBoolCas(&running,0,2)){
+    stacksize=sz;
+    running=0;
+    return true;
+    }
+  return false;
+  }
 
-      // Set thread count range
-      minimum=min;
-      maximum=max;
 
-      // Start workers right away
-      if(0<cnt){
+// Return calling thread's thread pool
+FXThreadPool* FXThreadPool::instance(){
+  return (FXThreadPool*)reference.get();
+  }
 
-        // Start number of workers
-        FXuint total=started;
-        while(result<cnt && startWorker()){
-          result++;
-          }
 
-        // Wait till workers are ready
-        total+=result;
-        while(0<(total-started)){
-          wcond.wait(mutex);
-          }
-        }
+// Change calling thread's thread pool
+void FXThreadPool::instance(FXThreadPool *pool){
+  reference.set(pool);
+  }
 
-      // We're running
-      runs=true;
+
+// Start a worker and reset semaphore
+FXbool FXThreadPool::startWorker(){
+  if(FXWorker::execute(this,stacksize)){
+    if(atomicAdd(&workers,1)==0){
+      sayonara.wait();
       }
-    mutex.unlock();
+    return true;
+    }
+  return false;
+  }
+
+
+// Process one task
+void FXThreadPool::processTask(FXRunnable* task){
+  try{
+    task->run();
+    }
+  catch(...){
+    }
+  }
+
+
+// Process tasks from queue, blocking for up to nsec if queue is empty.
+// Return if queue is empty or count was decremented to zero.
+void FXThreadPool::processTasksWhile(volatile FXuint& count,FXTime nsec){
+  FXRunnable* task;
+  while(count && usedslots.wait(nsec) && queue.pop(task)){
+    processTask(task);
+    freeslots.post();                   // Free slot only when thread is done!!
+    }
+  }
+
+
+// Execute task, returning false if queue is still full after blocking timeout
+FXbool FXThreadPool::execute(FXRunnable* task,FXTime blocking){
+  if(__likely(active() && task)){
+    if(maximum<=workers || queue.getUsed()<=workers || startWorker()){
+      if(freeslots.wait(blocking)){
+        queue.push(task);
+        usedslots.post();
+        return true;
+        }
+      }
+    }
+  return false;
+  }
+
+
+// Execute task and run until queue is empty; return false if unsuccessful
+FXbool FXThreadPool::executeAndRun(FXRunnable* task,FXTime blocking){
+  if(execute(task,blocking)){
+    processTasksWhile(processing,0);
+    return true;
+    }
+  return false;
+  }
+
+
+// Execute task and run until count reaches zero or queue is empty; return false if unsuccessful
+FXbool FXThreadPool::executeAndRunWhile(FXRunnable* task,volatile FXuint& count,FXTime blocking){
+  if(execute(task,blocking)){
+    processTasksWhile(count,0);
+    return true;
+    }
+  return false;
+  }
+
+
+// Wait until queue is empty; return false if unsuccessful
+FXbool FXThreadPool::wait(){
+  if(__likely(active())){
+    processTasksWhile(processing,0);
+    return true;
+    }
+  return false;
+  }
+
+
+// Wait while count not zero or queue is empty; return false if unsuccessful
+FXbool FXThreadPool::waitWhile(volatile FXuint& count){
+  if(__likely(active())){
+    processTasksWhile(count,0);
+    return true;
+    }
+  return false;
+  }
+
+
+// Wait until all tasks are done
+FXbool FXThreadPool::waitDone(){
+  register FXint p,w;
+  if(__likely(active())){
+    w=p=queue.getSize();
+    processTasksWhile(processing,0);
+    while(w){ freeslots.wait(); --w; }  // Decrement free slot count to zero; this means all threads are done!
+    while(p){ freeslots.post(); --p; }  // Increment free slot count back to number of slots
+    return true;
+    }
+  return false;
+  }
+
+
+// Start thread pool
+FXuint FXThreadPool::start(FXuint count){
+  register FXuint result=0;
+  FXTRACE((150,"FXThreadPool::start(%u)\n",count));
+  if(atomicBoolCas(&running,0,2)){
+
+    // Reset leaving semaphore
+    sayonara.post();
+
+    // Start number of workers
+    while(result<count && startWorker()){
+      result++;
+      }
+
+    // Set context reference if not set yet
+    if(instance()==NULL) instance(this);
+
+    // Start running
+    running=1;
     }
   return result;
   }
 
 
-// Wait until all jobs currently in the queue are finished
-FXbool FXThreadPool::wait(){
-  mutex.lock();
-
-  // Add watcher
-  ++watching;
-
-  // Wait until queue is empty and all are waiting
-  while(!queue.isEmpty() || cwaiting<getRunningThreads()){
-    wcond.wait(mutex);
-    }
-
-  // Remove watcher
-  --watching;
-
-  mutex.unlock();
-  return runs;
-  }
-
-
-// Stop pool
-void FXThreadPool::stop(){
-  mutex.lock();
-  if(runs){
-
-    // Prevent new jobs
-    runs=false;
-
-    // Wake all producers
-    pcond.broadcast();
-
-    // Add watcher
-    ++watching;
-
-    // Wait until queue is empty and all are waiting
-    while(!queue.isEmpty() || cwaiting<getRunningThreads()){
-      wcond.wait(mutex);
-      }
-
-    // Remove watcher
-    --watching;
-
-    // All workers should terminate
-    minimum=0;
-    maximum=0;
-
-    // Wake all idle workers to quit
-    ccond.broadcast();
-
-    // Wait till they've stopped running
-    while(started!=stopped){
-      wcond.wait(mutex);
-      }
-    }
-  mutex.unlock();
-  }
-
-
-/*
-FIXME wait for ticket
-
-// Wait for job with given ticket to be completed;
-// if job was completed, return true.
-// if ticket number invalid, return false.
-// otherwise, wait.
-FXbool FXThreadPool::wait(FXint ticket){
-
-  // Check for invalid ticket
-  // Two cases:
-  //  1.  Ticket has not yet dispatched (item still in queue)
-  //      In this case ticket number must be inside range of
-  //      oldest to newest ticket.
-  //  2.  Ticket has already been dispatched.  In this case,
-  //      visit linked list of ticket-lumps to see if this
-  //      ticket is in the list.
-  //
-  // If neither of these is the case, the ticket has expired already
-  // and we can return with false.
-  //
-  // Otherwise, create wait-lump on the stack, linked from threadpool the
-  // in order of increasing ticket number, and wait on completion
-  // condition variable.
-
-  // NOTE a worker thread can also call wait, but we must make sure
-  // it would not be waiting on its own ticket...
-  // For this purpose store the thread ID into the ticket-lump.
-  }
-*/
-
-// Perform a job
-FXbool FXThreadPool::execute(FXRunnable *job,FXTime blocking){
-  FXbool result=false;
-  mutex.lock();
-  if(__likely(runs && job)){
-    if(0<cwaiting || maximum<=getRunningThreads() || startWorker()){
-
-      // Check and possibly wait for room in the queue
-      while(runs && !(result=queue.push(job)) && 0<blocking){
-        ++pwaiting;
-        if(!pcond.wait(mutex,blocking)){ --pwaiting; break; }
-        --pwaiting;
-        }
-
-      // Signal only if anyone's waiting
-      if(result && cwaiting){
-        ccond.signal();
-        }
-      }
-    }
-  mutex.unlock();
-  return result;                // FIXME instead of true/false, return ticket number
-  }
-
-
-// Called by thread to process jobs
+// Process tasks from the queue using multiple worker threads.
+// When queue becomes empty, extra workers will exit if no work
+// arrives within a set amount of time.
+// The last worker to terminate will signal the semaphore.
 FXint FXThreadPool::run(){
-  // FIXME ticket-lump on stack here, linked from thread pool
-  // this keeps track of currently worked-on tickets.
-  // Store the thread ID into the ticket-lump in order to allow
-  // checking if a job tries to wait on itself (which is an error).
-  FXRunnable* job;
-  mutex.lock();
-  ++started;
-  ++cwaiting;
-  wcond.signal();
-  do{
-    --cwaiting;
-    while(queue.pop(job)){
-      // FIXME write the new job's ticket value into the ticket-lump of
-      // this worker thread.
-      if(pwaiting) pcond.signal();
-      if(cwaiting && !queue.isEmpty()) ccond.signal();
-      mutex.unlock();
-      try{
-        job->run();
-        }
-      catch(...){
-        }
-      mutex.lock();
-      }
-    ++cwaiting;
-    // FIXME job has just completed.
-    // If the list of wait-lumps linked from threadpool is non-empty,
-    // visit the list to see if there's a matching ticket with the
-    // one we've been working on.  If a match, signal the completion
-    // condition.  If there is no match, then just do next job.
-    if(watching) wcond.broadcast();
+  instance(this);
+  processTasksWhile(processing,(workers<minimum)?forever:expiration);
+  instance(NULL);
+  if(atomicAdd(&workers,-1)==1){
+    sayonara.post();
     }
-  while(cwaiting<=minimum && ccond.wait(mutex,expire));         // FIXME it would be nice if a *particular* thread could exit the loop
-  --cwaiting;
-  ++stopped;
-  wcond.signal();
-  mutex.unlock();
-  // FIXME unlink ticket-lump from linked list of ticket lumps
-  // since its now gone.
   return 0;
   }
 
 
-// Harvest workers and quit
+// Stop thread pool
+FXbool FXThreadPool::stop(){
+  FXTRACE((150,"FXThreadPool::stop()\n"));
+  if(atomicBoolCas(&running,1,2)){
+    register FXint w=workers;
+
+    // Help out processing tasks while waiting
+    processTasksWhile(processing,0);
+
+    // Queue empty now
+    FXASSERT(queue.isEmpty());
+
+    // Force all workers to stop
+    while(w){ usedslots.post(); --w; }
+
+    // Wait till last worker is done
+    sayonara.wait();
+
+    // Reset usedslots semaphore to zero
+    while(usedslots.trywait()){ }
+
+    // Unset context reference if set to this context
+    if(instance()==this) instance(NULL);
+
+    // Stop running
+    running=0;
+    return true;
+    }
+  return false;
+  }
+
+
+// Delete thread pool
 FXThreadPool::~FXThreadPool(){
+  FXTRACE((100,"FXThreadPool::~FXThreadPool()\n"));
   stop();
-  FXTRACE((100,"FXThreadPool::~FXThreadPool %p\n",this));
   }
 
 }

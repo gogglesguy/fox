@@ -3,7 +3,7 @@
 *                          E x c e p t i o n  T y p e s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -24,6 +24,7 @@
 
 namespace FX {
 
+
 /**
 * Generic catch-all exception.
 * An optional message may be passed in the constructor, which must be a string
@@ -39,6 +40,18 @@ public:
   FXException(const FXchar *msg):message(msg){}
   const FXchar *what() const { return message; }
  ~FXException(){}
+  };
+
+
+/**
+* Fatal error exception.
+*/
+class FXAPI FXFatalException : public FXException {
+private:
+  static const FXchar exceptionName[];
+public:
+  FXFatalException():FXException(FXFatalException::exceptionName){}
+  FXFatalException(const FXchar *msg):FXException(msg){}
   };
 
 

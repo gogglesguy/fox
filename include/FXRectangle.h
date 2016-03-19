@@ -3,7 +3,7 @@
 *                          R e c t a n g l e    C l a s s                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,11 +21,9 @@
 #ifndef FXRECTANGLE_H
 #define FXRECTANGLE_H
 
-
 #ifndef FXPOINT_H
 #include "FXPoint.h"
 #endif
-
 
 namespace FX {
 

@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,14 +29,13 @@ namespace FX {
 
 
 /**
-* A Worker is a thread that runs a runnable.
-* When the runnable is done, the worker terminates itself.
-* Thus this facility allows a job to outlive the thread that
-* computes it [the idea being that a thread may be far more
-* resources-expensive than the job itself].
-* Exceptions raised in the runnable are caught in the worker,
-* so that the worker will properly terminate regarless how the
-* runnable ended.
+* A Worker is a thread that performs a Runnable.
+* When the worker thread completes the execution of the runnable, the
+* worker thread and its memory are automatically reclaimed.
+* The runnable itself is not deleted by the worker; it will thus outlive the
+* worker that runs it.
+* Exceptions raised by the runnable cause early termination of the
+* runnable, and are caught by the worker.
 */
 class FXAPI FXWorker : public FXThread {
 private:
@@ -47,18 +46,21 @@ private:
 public:
 
   /// Create worker for runnable
-  FXWorker(FXRunnable* r=NULL);
+  FXWorker(FXRunnable* rn=NULL);
 
   /// Change runnable if not started yet
-  FXbool setRunnable(FXRunnable* r);
-  
+  void setRunnable(FXRunnable* rn){ runnable=rn; }
+
   /// Return runnable
   FXRunnable* getRunnable() const { return runnable; }
 
   /// Run worker
   virtual FXint run();
 
-  /// Destroy worker
+  /// Create and start a worker on a given runnable.
+  static FXWorker* execute(FXRunnable* rn,FXuval stacksize=0);
+
+  /// Destroy
   virtual ~FXWorker();
   };
 

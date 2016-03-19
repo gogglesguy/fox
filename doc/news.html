@@ -6,6 +6,57 @@
 </head>
 <body bgcolor=#ffffff link=#990033 vlink=#990033 alink=#990033 text=#000000>
 
+<!---- TOPIC TITLE WITH LOGO--->
+<table border=0 cellpadding= cellspacing=2 width=100% ><tr><td><a href='http://www.fox-toolkit.org' target=_top><img src='art/foxlogo_small.jpg' border=0></a></td><td width=100% valign=bottom id="HEADLINE"><b>
+News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]</font></a>
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE WITH LOGO --->
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 23 - FOX DEVELOPMENT 1.7.38
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Totally revamped implementation of FXThreadPool. The new FXThreadPool is organized about a
+lock-free queue, with semaphores managing synchronization between producer- and worker-threads.
+Thus, threads never block unless two edge conditions are reached: either the task-queue is empty,
+in which case worker threads will block (nothing to do), or task queue is filled up, and producer
+thread will block (no room in queue).<br>
+An important new capability is for an additional thread to enter into the task-processing loop 
+temporarily.
+Finally, the thread starting FXThreadPool, as well as the worker threads belonging to the FXThreadPool
+now have a thread-local variable referencing the FXThreadPool.  This allows the threads involved to
+locate the address of the FXThreadPool, for instance to create an FXTaskGroup.</li>
+<li>New FXTaskGroup class manages groups of task to be executed in parallel on a FXThreadPool.
+Tasks started through the FXTaskGroup interface are guaranteed to be completed within the lifetime
+of the FXTaskGroup instance.</li>
+<li>New FXParallelInvoke and FXParallelFor template functions to implement parallel function call, and 
+parallel for loop.  This uses the new FXTaskGroup, and indirectly, FXThreadPool.</li>
+<li>Pass optional stacksize when constructing FXWorker.  Added stacksize option to FXThreadPool with which new
+workers will be started.</li>
+<li>FXBarrier wait primitive now sports API's to change break-through threshold, and forced-release option.</li>
+<li>FXSemaphore now has API's for timed wait, and try-wait for non-blocking semaphore decrement.</li>
+<li>Added additional atomic variable types in FXAtomic.h.</li>
+<li>Added check for maximum dash-pattern length in FXDC and FXDCWindow.</li>
+<li>Fixed some issues with FXStat of files.</li>
+<li>Off-by-one error fixed in FXRex counted repeat of complex subpatterns.</li>
+<li>Clear internal text pointers in FXRex prior to a match.</li>
+<li>Added a few missing print-patterns to Adie.stx syntax file.</li>
+<li>Added FXSemaphore-protected queue class FXSemaQueue; this is itself a wrapper around FXPtrQueue.</li>
+<li>Added lock-free queue class FXLFQueue.</li>
+<li>Numeric conversion issues fixed in fxstrtod.cpp; in particular, some corner cases now give more
+accurate results.</li>
+<li>The function fxscanf.cpp does no longer eat the "e" when scanning for a number, unless actually followed by digits.</li>
+<li>Switch to statvfs() from statfs() in FXStat.</li>
+<li>Indexing operator added to FXAutoPtr.</li>
+<li>Added new class FXScopedThread.  FXScopedThread automatically performs a join() upon destruction.</li>
+</ul>
+
 
 <!--- TOPIC TITLE -->
 <p>
@@ -79,15 +130,6 @@ when the number of items in the FXHeader is changed.</li>
 <li>Cutoff angles in FXQuatd are smaller than in FXQuatf, due to much greater precision of doubles versus floats.</li>
 <li>FOX on <a href='http://www.raspberrypi.org'>Raspberry Pi</a> coming soon (I got one on order!).</li>
 </ul>
-
-
-<!---- TOPIC TITLE WITH LOGO--->
-<table border=0 cellpadding= cellspacing=2 width=100% ><tr><td><a href='http://www.fox-toolkit.org' target=_top><img src='art/foxlogo_small.jpg' border=0></a></td><td width=100% valign=bottom id="HEADLINE"><b>
-News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]</font></a>
-<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
-<p>
-<!--- TOPIC TITLE WITH LOGO --->
-
 
 
 <!--- TOPIC TITLE -->
@@ -2038,7 +2080,7 @@ google_ad_format = "728x90_as";
 <tr>
 <td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1>
-<font size=-1>Copyright &copy; 1997-2012 Jeroen van der Zijp</font>
+<font size=-1>Copyright &copy; 1997-2013 Jeroen van der Zijp</font>
 </td>
 </tr>
 </table>

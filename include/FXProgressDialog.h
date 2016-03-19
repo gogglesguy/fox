@@ -3,7 +3,7 @@
 *                      P r o g r e s s   D i a l o g   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -28,6 +28,7 @@
 namespace FX {
 
 
+/// Progress dialog options
 enum {
   PROGRESSDIALOG_NOCANCEL = 0,                        /// Default is no cancel button
   PROGRESSDIALOG_CANCEL   = 0x02000000,               /// Enable the cancel button

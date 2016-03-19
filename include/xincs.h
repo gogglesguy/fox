@@ -3,7 +3,7 @@
 *              F O X   P r i v a t e   I n c l u d e   F i l e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -117,8 +117,8 @@
 #include <grp.h>
 #include <pwd.h>
 #include <sys/ioctl.h>
-#ifdef HAVE_SYS_STATFS_H
-#include <sys/statfs.h>
+#ifdef HAVE_SYS_STATVFS_H
+#include <sys/statvfs.h>
 #endif
 #ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
@@ -238,17 +238,26 @@ typedef cpuset_t   cpu_set_t;
 
 // SSE Intrinsics only if available and turned on
 #if (defined(__GNUC__) || defined(__INTEL_COMPILER))
-#if (defined(__SSE__) && defined(HAVE_XMMINTRIN_H))
-#include <xmmintrin.h>
-#define FOX_HAS_SSE     // FOX_HAS_SSE: SSE code generated AND Intrinsics supported
+#if defined(HAVE_IMMINTRIN_H)
+#include <immintrin.h>
+#if defined(__SSE__)
+#define FOX_HAS_SSE
 #endif
-#if (defined(__SSE2__) && defined(HAVE_EMMINTRIN_H))
-#include <emmintrin.h>
-#define FOX_HAS_SSE2    // FOX_HAS_SSE2: SSE2 code generated AND Intrinsics supported
+#if defined(__SSE2__)
+#define FOX_HAS_SSE2
 #endif
-#if (defined(__SSE3__) && defined(HAVE_PMMINTRIN_H))
-#include <pmmintrin.h>
-#define FOX_HAS_SSE3    // FOX_HAS_SSE3: SSE3 code generated AND Intrinsics supported
+#if defined(__SSE3__)
+#define FOX_HAS_SSE3
+#endif
+#if defined(__SSE4_1__)
+#define FOX_HAS_SSE4
+#endif
+#if defined(__AVX__)
+#define FOX_HAS_AVX
+#endif
+#if defined(__AVX2__)
+#define FOX_HAS_AVX2
+#endif
 #endif
 #endif
 

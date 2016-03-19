@@ -3,7 +3,7 @@
 *                         Q u e u e   O f   P o i n t e r s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,14 +21,14 @@
 #ifndef FXPTRQUEUE_H
 #define FXPTRQUEUE_H
 
+
 namespace FX {
 
 
 /// Queue of void pointers
 class FXAPI FXPtrQueue {
 private:
-  void**          list;         // List of pointers
-  volatile FXuint size;         // Size of list
+  FXPtrList       list;         // List of pointers
   volatile FXuint head;         // Write side
   volatile FXuint tail;         // Read side
 private:
@@ -36,20 +36,17 @@ private:
   FXPtrQueue &operator=(const FXPtrQueue&);
 public:
 
+  /// Create initially empty queue
+  FXPtrQueue();
+
   /// Create queue with initial size
-  FXPtrQueue(FXuint sz=256);
+  FXPtrQueue(FXuint sz);
 
   /// Change size of queue; return true if success
   FXbool setSize(FXuint sz);
 
   /// Return size
-  FXuint getSize() const;
-
-  /// Return head
-  FXuint getHead() const;
-
-  /// Return tail
-  FXuint getTail() const;
+  FXuint getSize() const { return list.no(); }
 
   /// Return number of used slots
   FXuint getUsed() const;
@@ -64,13 +61,13 @@ public:
   FXbool isEmpty() const;
 
   /// Peek for item
-  FXbool peek(void*& ptr);
+  FXbool peek(FXptr& ptr);
 
   /// Add item to queue, return true if success
-  FXbool push(void* ptr);
+  FXbool push(FXptr ptr);
 
   /// Remove item from queue, return true if success
-  FXbool pop(void*& ptr);
+  FXbool pop(FXptr& ptr);
 
   /// Drop item from queue, return true if success
   FXbool pop();
@@ -86,9 +83,9 @@ class FXPtrQueueOf : public FXPtrQueue {
 public:
   FXPtrQueueOf(){}
   FXPtrQueueOf(FXuint sz):FXPtrQueue(sz){}
-  FXbool peek(TYPE*& ptr){ return FXPtrQueue::peek((void*&)ptr); }
-  FXbool push(TYPE* ptr){ return FXPtrQueue::push((void*)ptr); }
-  FXbool pop(TYPE*& ptr){ return FXPtrQueue::pop((void*&)ptr); }
+  FXbool peek(TYPE*& ptr){ return FXPtrQueue::peek((FXptr&)ptr); }
+  FXbool push(TYPE* ptr){ return FXPtrQueue::push((FXptr)ptr); }
+  FXbool pop(TYPE*& ptr){ return FXPtrQueue::pop((FXptr&)ptr); }
   };
 
 }

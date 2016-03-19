@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1415,8 +1415,10 @@ void FXFileList::listItems(FXbool force){
 
       mode=info.mode();
 
-      // Check if link is a link to a directory
-      if((mode&FXIO::SymLink) && FXStat::isDirectory(pathname)) mode|=FXIO::Directory;
+      // If its a link, get file mode from target
+      if(info.isLink()){
+        mode=FXStat::mode(pathname) | FXIO::SymLink;
+        }
 
 #endif
 
@@ -1556,31 +1558,6 @@ void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
       }
     }
   }
-
-#if 0
-
-// Set current filename
-void FXFileList::setCurrentFile(const FXString& pathname,FXbool notify){
-  FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
-  if(!pathname.empty()){
-    FXint index;
-    FXString path=FXPath::absolute(pathname);
-    FXString folder=FXPath::directory(path);
-    FXString name=FXPath::name(path);
-    while(!FXPath::isTopDirectory(folder) && !FXStat::isDirectory(folder)){
-      folder=FXPath::upLevel(folder);
-      name=FXString::null;
-      }
-    setDirectory(folder,notify);
-    if(0<=(index=findItem(name))){      // FIXME should this select -1 if file does not exist?
-      setAnchorItem(index);
-      setCurrentItem(index,notify);
-      selectItem(index,notify);
-      makeItemVisible(index);
-      }
-    }
-  }
-#endif
 
 
 // Get pathname to current file, if any

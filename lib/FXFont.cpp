@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1698,7 +1698,7 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
     // is not 0, we calculate the unrotated baseline; note however that the calculation is
     // not 100% pixel exact when the angle is not a multiple of 90 degrees.
     XftTextExtentsUtf8(DISPLAY(getApp()),(XftFont*)font,(const FcChar8*)string,length,&extents);
-    if(angle){ return (FXint)(0.5+sqrt(extents.xOff*extents.xOff+extents.yOff*extents.yOff)); }
+    if(angle){ return (FXint)(0.5+sqrt((FXdouble)(extents.xOff*extents.xOff+extents.yOff*extents.yOff))); }
     return extents.xOff;
 #else                           ///// XLFD /////
     register const XFontStruct *fs=(XFontStruct*)font;

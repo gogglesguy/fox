@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -189,7 +189,7 @@ public:
   * in the file was last modified, in nanoseconds since Epoch.
   */
   static FXTime modified(const FXString& file);
-  
+
   /**
   * Change modified time for the given file, on filesystems
   * where this is supported.  Time is specified in nanoseconds
@@ -209,7 +209,7 @@ public:
   * since Epoch.
   */
   static FXbool accessed(const FXString& file,FXTime ns);
-  
+
   /**
   * Return created time for this file, on filesystems
   * where this is supported.  This is also the time when
@@ -224,7 +224,7 @@ public:
   * since Epoch.
   */
   static FXbool created(const FXString& file,FXTime ns);
-  
+
   /// Return true if file is hidden
   static FXbool isHidden(const FXString& file);
 
@@ -297,7 +297,6 @@ public:
   /// Obtain available amount of space on disk mounted at given path
   static FXbool getAvailableDiskSpace(const FXString& path,FXulong& space);
   };
-
 
 }
 

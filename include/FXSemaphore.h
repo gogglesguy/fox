@@ -3,7 +3,7 @@
 *                          S e m a p h o r e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -47,13 +47,16 @@ public:
   /// Initialize semaphore with given count
   FXSemaphore(FXint count=1);
 
-  /// Decrement semaphore, waiting if count is zero
+  /// Decrement semaphore by 1, waiting if count is zero
   void wait();
 
-  /// Decrement semaphore; returning false if count is zero
+  /// Try decrement semaphore; return false if timed out
+  FXbool wait(FXTime nsec);
+
+  /// Try decrement semaphore; and return false if count is zero
   FXbool trywait();
 
-  /// Increment semaphore
+  /// Increment semaphore by 1
   void post();
 
   /// Delete semaphore

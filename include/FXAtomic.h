@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -23,6 +23,7 @@
 
 
 namespace FX {
+
 
 /**
 * Atomics are available .
@@ -46,22 +47,37 @@ extern FXAPI FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v);
 extern FXAPI FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v);
 
 
+///// Atomic unsigned integers
+
+/// Atomically set variable at ptr to v, and return its old contents
+extern FXAPI FXuint atomicSet(volatile FXuint* ptr,FXuint v);
+
+/// Atomically add v to variable at ptr, and return its old contents
+extern FXAPI FXuint atomicAdd(volatile FXuint* ptr,FXuint v);
+
+/// Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
+extern FXAPI FXuint atomicCas(volatile FXuint* ptr,FXuint expect,FXuint v);
+
+/// Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
+extern FXAPI FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v);
+
+
 ///// Atomic void pointers
 
 /// Atomically set pointer variable at ptr to v, and return its old contents
-extern FXAPI void* atomicSet(void* volatile* ptr,void* v);
+extern FXAPI void* atomicSet(volatile FXptr* ptr,FXptr v);
 
 /// Atomically add v to pointer variable at ptr, and return its old contents
-extern FXAPI void* atomicAdd(void* volatile* ptr,FXival v);
+extern FXAPI void* atomicAdd(volatile FXptr* ptr,FXival v);
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
-extern FXAPI void* atomicCas(void* volatile* ptr,void* expect,void* v);
+extern FXAPI void* atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v);
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
-extern FXAPI FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v);
+extern FXAPI FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v);
 
 /// Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
-extern FXAPI FXbool atomicBoolDCas(void* volatile* ptr,void* cmpa,void* cmpb,void* a,void* b);
+extern FXAPI FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b);
 
 
 ///// Atomic pointers to something else
@@ -69,35 +85,35 @@ extern FXAPI FXbool atomicBoolDCas(void* volatile* ptr,void* cmpa,void* cmpb,voi
 /// Atomically set pointer variable at ptr to v, and return its old contents
 template <class EType>
 inline EType* atomicSet(EType* volatile* ptr,EType* v){
-  return (EType*)atomicSet((void*volatile*)ptr,(void*)v);
+  return (EType*)atomicSet((FXptr volatile*)ptr,(FXptr)v);
   }
 
 
 /// Atomically add v to pointer variable at ptr, and return its old contents
 template <class EType>
 inline EType* atomicAdd(EType* volatile* ptr,FXival v){
-  return (EType*)atomicAdd((void*volatile*)ptr,v*((FXival)sizeof(EType)));
+  return (EType*)atomicAdd((volatile FXptr*)ptr,v*((FXival)sizeof(EType)));
   }
 
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 template <class EType>
 inline EType* atomicCas(EType* volatile* ptr,EType* expect,EType* v){
-  return (EType*)atomicCas((void*volatile*)ptr,(void*)expect,(void*)v);
+  return (EType*)atomicCas((volatile FXptr*)ptr,(FXptr)expect,(FXptr)v);
   }
 
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 template <class EType>
 inline FXbool atomicBoolCas(EType* volatile* ptr,EType* expect,EType* v){
-  return atomicBoolCas((void*volatile*)ptr,(void*)expect,(void*)v);
+  return atomicBoolCas((volatile FXptr*)ptr,(FXptr)expect,(FXptr)v);
   }
 
 
 /// Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
 template <class EType>
 inline FXbool atomicBoolDCas(EType* volatile* ptr,EType* cmpa,EType* cmpb,EType* a,EType* b){
-  return atomicBoolDCas((void*volatile*)ptr,(void*)cmpa,(void*)cmpb,(void*)a,(void*)b);
+  return atomicBoolDCas((volatile FXptr*)ptr,(FXptr)cmpa,(FXptr)cmpb,(FXptr)a,(FXptr)b);
   }
 
 

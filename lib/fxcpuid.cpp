@@ -3,7 +3,7 @@
 *                              C P U I D   S u p p o r t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -83,6 +83,8 @@ FXbool fxCPUIDPresent(){
   return false;         // FIXME change later
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   return true;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+  return true;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register FXuint eax,edx;
   __asm__ __volatile__("pushfl\n\t"
@@ -105,7 +107,7 @@ FXuint fxCPUCaps(FXuint level){
 #if defined(WIN32)
   return 0;             // FIXME change later
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(__likely(fxCPUIDPresent())){
+  if(fxCPUIDPresent()){
     register FXuint eax,ebx,ecx,edx;
     level&=0x80000000;
     mycpuid(level,eax,ebx,ecx,edx);
@@ -121,7 +123,7 @@ FXbool fxCPUGetCaps(FXuint level,FXuint features[]){
 #if defined(WIN32)
   return false;         // FIXME change later
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(__likely(level<fxCPUCaps(level))){
+  if(level<fxCPUCaps(level)){
     mycpuid(level,features[0],features[1],features[2],features[3]);
     return true;
     }
@@ -137,7 +139,7 @@ FXbool fxCPUGetXCaps(FXuint level,FXuint count,FXuint features[]){
 #if defined(WIN32)
   return false;         // FIXME change later
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(__likely(level<fxCPUCaps(level))){
+  if(level<fxCPUCaps(level)){
     mycpuidcount(level,count,features[0],features[1],features[2],features[3]);
     return true;
     }
@@ -153,7 +155,7 @@ FXuint fxCPUFeatures(){
 #if defined(WIN32)
   // FIXME //
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(__likely(fxCPUIDPresent())){
+  if(fxCPUIDPresent()){
     FXuint feature[4],caps=0;
     mycpuid(1,feature[0],feature[1],feature[2],feature[3]);
     if(feature[2]&0x00000001) caps|=CPU_HAS_SSE3;
@@ -188,7 +190,7 @@ FXbool fxCPUName(FXchar name[]){
 #if defined(WIN32)
   // FIXME //
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(__likely(fxCPUIDPresent())){
+  if(fxCPUIDPresent()){
     FXuint feature[4];
     mycpuid(0,feature[0],feature[1],feature[2],feature[3]);
     name[0]=((char*)feature)[4];

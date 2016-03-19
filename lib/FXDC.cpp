@@ -3,7 +3,7 @@
 *               D e v i c e   C o n t e x t   B a s e   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -126,6 +126,7 @@ FXDC::FXDC(FXApp* a):app(a){
   fill=FILL_SOLID;
   rule=RULE_EVEN_ODD;
   rop=BLT_SRC;
+  fillElms(dashpat,4,32);
   dashpat[0]=4;
   dashpat[1]=4;
   dashlen=2;
@@ -333,6 +334,7 @@ void FXDC::setBackground(FXColor clr){
 // Set dash pattern
 void FXDC::setDashes(FXuint dashoffset,const FXchar *dashpattern,FXuint dashlength){
   register FXuint len,i;
+  if(dashlength>32){ fxerror("FXDCWindow::setDashes: bad dashlength parameter.\n"); }
   for(i=len=0; i<dashlength; i++){
     dashpat[i]=dashpattern[i];
     len+=(FXuint)dashpattern[i];

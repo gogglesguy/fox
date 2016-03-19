@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -432,7 +432,7 @@ void FXGLVisual::create(){
           DescribePixelFormat(hdc,v,sizeof(PIXELFORMATDESCRIPTOR),&pfd);
 
           // Make sure this visual is valid
-          if(ChoosePixelFormat(hdc,&pfd)!=v) continue;
+//          if(ChoosePixelFormat(hdc,&pfd)!=v) continue;
 
           // Get supported render type; we don't want index mode
           if(pfd.iPixelType==PFD_TYPE_COLORINDEX) continue;

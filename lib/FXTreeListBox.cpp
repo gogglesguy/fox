@@ -3,7 +3,7 @@
 *                       T r e e  L i s t  B o x  O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -624,7 +624,7 @@ FXbool FXTreeListBox::isItemEnabled(const FXTreeItem* item) const {
 FXbool FXTreeListBox::enableItem(FXTreeItem* item){
   return tree->enableItem(item);
   }
-  
+
 
 // Disable item
 FXbool FXTreeListBox::disableItem(FXTreeItem* item){

@@ -3,7 +3,7 @@
 *                        F r a m e   W i n d o w   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -227,8 +227,7 @@ void FXFrame::drawFrame(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h){
 
 // Handle repaint
 long FXFrame::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=static_cast<FXEvent*>(ptr);
-  FXDCWindow dc(this,event);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   dc.setForeground(backColor);
   dc.fillRectangle(border,border,width-(border<<1),height-(border<<1));
   drawFrame(dc,0,0,width,height);

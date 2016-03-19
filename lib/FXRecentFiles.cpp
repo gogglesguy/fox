@@ -3,7 +3,7 @@
 *                     R e c e n t   F i l e s   L i s t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,7 +54,7 @@ namespace FX {
 
 // Up to 32 files kepts
 const FXchar FXRecentFiles::key[32][7]={
-  {"FILE1"}, {"FILE2"}, {"FILE3"}, {"FILE4"}, {"FILE5"}, {"FILE6"}, {"FILE7"}, {"FILE8"}, 
+  {"FILE1"}, {"FILE2"}, {"FILE3"}, {"FILE4"}, {"FILE5"}, {"FILE6"}, {"FILE7"}, {"FILE8"},
   {"FILE9"}, {"FILE10"},{"FILE11"},{"FILE12"},{"FILE13"},{"FILE14"},{"FILE15"},{"FILE16"},
   {"FILE17"},{"FILE18"},{"FILE19"},{"FILE20"},{"FILE21"},{"FILE22"},{"FILE23"},{"FILE24"},
   {"FILE25"},{"FILE26"},{"FILE27"},{"FILE28"},{"FILE29"},{"FILE30"},{"FILE31"},{"FILE32"}

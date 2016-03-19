@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -169,6 +169,6 @@ FXuint FXGlobVisitor::visit(const FXString& path){
 // Destructor
 FXGlobVisitor::~FXGlobVisitor(){
   }
-  
+
 
 }
