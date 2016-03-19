@@ -32,6 +32,7 @@
 // FOX defines
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxkeys.h"
 #include "fxendian.h"
 #include "fxascii.h"
 #include "fxunicode.h"
@@ -213,6 +214,7 @@
 #include "FXBitmapFrame.h"
 #include "FXImageView.h"
 #include "FXImageFrame.h"
+#include "FXHeader.h"
 #include "FXTable.h"
 #include "FXDragCorner.h"
 #include "FXStatusBar.h"
@@ -225,7 +227,6 @@
 #include "FXRangeSlider.h"
 #include "FXSplitter.h"
 #include "FX4Splitter.h"
-#include "FXHeader.h"
 #include "FXShutter.h"
 #include "FXIconList.h"
 #include "FXFileList.h"

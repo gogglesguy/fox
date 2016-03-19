@@ -216,10 +216,6 @@ long FXChart::onClipboardRequest(FXObject *sender,FXSelector sel,void *ptr){
       fxsavePNG(ms,chart->getData(),chart->getWidth(),chart->getHeight());
     else if(event->target==tifType)
       fxsaveTIF(ms,chart->getData(),chart->getWidth(),chart->getHeight(),0);
-#ifdef WIN32
-//  else if(event->target==imageType)
-//    fxsaveBMP(ms,chart->getData(),chart->getWidth(),chart->getHeight());
-#endif
 
     // Grab buffered image
     ms.takeBuffer(pointer,length);

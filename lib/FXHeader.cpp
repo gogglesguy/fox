@@ -418,8 +418,9 @@ FXIMPLEMENT(FXHeader,FXFrame,FXHeaderMap,ARRAYNUMBER(FXHeaderMap))
 // Make a Header
 FXHeader::FXHeader(){
   flags|=FLAG_ENABLED|FLAG_SHOWN;
-  textColor=0;
   font=NULL;
+  numbering=NULL;
+  textColor=0;
   pos=0;
   active=-1;
   activepos=0;
@@ -433,8 +434,9 @@ FXHeader::FXHeader(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint
   flags|=FLAG_ENABLED|FLAG_SHOWN;
   target=tgt;
   message=sel;
-  textColor=getApp()->getForeColor();
   font=getApp()->getNormalFont();
+  numbering=NULL;
+  textColor=getApp()->getForeColor();
   pos=0;
   active=-1;
   activepos=0;
@@ -443,6 +445,12 @@ FXHeader::FXHeader(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint
   }
 
 
+// Simple decimal numbering
+FXString FXHeader::decimalNumbering(FXint index){
+  return FXString::value(index+1);
+  }
+  
+  
 // Create window
 void FXHeader::create(){
   register FXint i;
@@ -495,7 +503,6 @@ FXint FXHeader::getDefaultHeight(){
   }
 
 
-
 // Return total size
 FXint FXHeader::getTotalSize() const {
   return items.no() ? items[items.no()-1]->getPos()+items[items.no()-1]->getSize()-items[0]->getPos() : 0;
@@ -536,11 +543,16 @@ FXint FXHeader::setItem(FXint index,FXHeaderItem* item,FXbool notify){
     // Add new
     items[index]=item;
 
-    // Notify new item has been inserted
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
+    // Autorenumber captions
+    if(numbering){
+      renumberCaptions(numbering,index,index);
+      }
 
     // Redo layout
     recalc();
+
+    // Notify new item has been inserted
+    if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
     }
   return index;
   }
@@ -566,16 +578,21 @@ FXint FXHeader::insertItem(FXint index,FXHeaderItem* item,FXbool notify){
   item->setPos((0<index)?items[index-1]->getPos()+items[index-1]->getSize():0);
 
   // Move over remaining items
-  for(i=index,d=item->getSize(); i<items.no(); i++) items[i]->setPos(items[i]->getPos()+d);
+  for(i=index,d=item->getSize(); i<items.no(); ++i) items[i]->setPos(items[i]->getPos()+d);
 
   // Add item to list
   items.insert(index,item);
 
-  // Notify item has been inserted
-  if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
-
+  // Autorenumber captions
+  if(numbering){
+    renumberCaptions(numbering,index,items.no()-1);
+    }
+    
   // Redo layout
   recalc();
+
+  // Notify item has been inserted
+  if(notify && target){target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)(FXival)index);}
 
   return index;
   }
@@ -654,6 +671,11 @@ FXHeaderItem* FXHeader::extractItem(FXint index,FXbool notify){
   // Remove item from list
   items.erase(index);
 
+  // Autorenumber captions
+  if(numbering){
+    renumberCaptions(numbering,index,items.no()-1);
+    }
+
   // Redo layout
   recalc();
 
@@ -680,6 +702,11 @@ void FXHeader::removeItem(FXint index,FXbool notify){
 
   // Remove item from list
   items.erase(index);
+
+  // Autorenumber captions
+  if(numbering){
+    renumberCaptions(numbering,index,items.no()-1);
+    }
 
   // Redo layout
   recalc();
@@ -1316,6 +1343,30 @@ void FXHeader::setFont(FXFont* fnt){
   }
 
 
+// Renumber captions 
+void FXHeader::renumberCaptions(FXNumberingFunc func,FXint fm,FXint to){
+  if(func){
+    if(fm<=0) fm=0;
+    if(to>=items.no()) to=items.no()-1;
+    while(fm<=to){
+      setItemText(fm,func(fm));
+      ++fm;
+      }
+    }
+  }
+
+  
+// Set auto-renumbering function
+void FXHeader::setAutoNumbering(FXNumberingFunc func){
+  if(numbering!=func){
+    numbering=func;
+    if(numbering){ 
+      renumberCaptions(numbering); 
+      }
+    }
+  }
+
+
 // Set text color
 void FXHeader::setTextColor(FXColor clr){
   if(textColor!=clr){
@@ -1327,7 +1378,7 @@ void FXHeader::setTextColor(FXColor clr){
 
 // Header style change
 void FXHeader::setHeaderStyle(FXuint style){
-  FXuint opts=(options&~HEADER_MASK) | (style&HEADER_MASK);
+  FXuint opts=((style^options)&HEADER_MASK)^options;
   if(options!=opts){
     options=opts;
     recalc();

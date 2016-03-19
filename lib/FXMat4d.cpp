@@ -871,37 +871,37 @@ FXMat4d FXMat4d::transpose() const {
 // Invert matrix
 FXMat4d FXMat4d::invert() const {
   FXMat4d r;
-  register FXdouble A0=m[0][0]*m[1][1]-m[0][1]*m[1][0];
-  register FXdouble A1=m[0][0]*m[1][2]-m[0][2]*m[1][0];
-  register FXdouble A2=m[0][0]*m[1][3]-m[0][3]*m[1][0];
-  register FXdouble A3=m[0][1]*m[1][2]-m[0][2]*m[1][1];
-  register FXdouble A4=m[0][1]*m[1][3]-m[0][3]*m[1][1];
-  register FXdouble A5=m[0][2]*m[1][3]-m[0][3]*m[1][2];
-  register FXdouble B0=m[2][0]*m[3][1]-m[2][1]*m[3][0];
-  register FXdouble B1=m[2][0]*m[3][2]-m[2][2]*m[3][0];
-  register FXdouble B2=m[2][0]*m[3][3]-m[2][3]*m[3][0];
-  register FXdouble B3=m[2][1]*m[3][2]-m[2][2]*m[3][1];
-  register FXdouble B4=m[2][1]*m[3][3]-m[2][3]*m[3][1];
-  register FXdouble B5=m[2][2]*m[3][3]-m[2][3]*m[3][2];
-  register FXdouble dd=A0*B5-A1*B4+A2*B3+A3*B2-A4*B1+A5*B0;
+  register FXdouble a0=m[0][0]*m[1][1]-m[0][1]*m[1][0];
+  register FXdouble a1=m[0][0]*m[1][2]-m[0][2]*m[1][0];
+  register FXdouble a2=m[0][0]*m[1][3]-m[0][3]*m[1][0];
+  register FXdouble a3=m[0][1]*m[1][2]-m[0][2]*m[1][1];
+  register FXdouble a4=m[0][1]*m[1][3]-m[0][3]*m[1][1];
+  register FXdouble a5=m[0][2]*m[1][3]-m[0][3]*m[1][2];
+  register FXdouble b0=m[2][0]*m[3][1]-m[2][1]*m[3][0];
+  register FXdouble b1=m[2][0]*m[3][2]-m[2][2]*m[3][0];
+  register FXdouble b2=m[2][0]*m[3][3]-m[2][3]*m[3][0];
+  register FXdouble b3=m[2][1]*m[3][2]-m[2][2]*m[3][1];
+  register FXdouble b4=m[2][1]*m[3][3]-m[2][3]*m[3][1];
+  register FXdouble b5=m[2][2]*m[3][3]-m[2][3]*m[3][2];
+  register FXdouble dd=a0*b5-a1*b4+a2*b3+a3*b2-a4*b1+a5*b0;
   FXASSERT(dd!=0.0);
   dd=1.0/dd;
-  r[0][0]=(m[1][1]*B5-m[1][2]*B4+m[1][3]*B3)*dd;
-  r[1][0]=(m[1][2]*B2-m[1][0]*B5-m[1][3]*B1)*dd;
-  r[2][0]=(m[1][0]*B4-m[1][1]*B2+m[1][3]*B0)*dd;
-  r[3][0]=(m[1][1]*B1-m[1][0]*B3-m[1][2]*B0)*dd;
-  r[0][1]=(m[0][2]*B4-m[0][1]*B5-m[0][3]*B3)*dd;
-  r[1][1]=(m[0][0]*B5-m[0][2]*B2+m[0][3]*B1)*dd;
-  r[2][1]=(m[0][1]*B2-m[0][0]*B4-m[0][3]*B0)*dd;
-  r[3][1]=(m[0][0]*B3-m[0][1]*B1+m[0][2]*B0)*dd;
-  r[0][2]=(m[3][1]*A5-m[3][2]*A4+m[3][3]*A3)*dd;
-  r[1][2]=(m[3][2]*A2-m[3][0]*A5-m[3][3]*A1)*dd;
-  r[2][2]=(m[3][0]*A4-m[3][1]*A2+m[3][3]*A0)*dd;
-  r[3][2]=(m[3][1]*A1-m[3][0]*A3-m[3][2]*A0)*dd;
-  r[0][3]=(m[2][2]*A4-m[2][1]*A5-m[2][3]*A3)*dd;
-  r[1][3]=(m[2][0]*A5-m[2][2]*A2+m[2][3]*A1)*dd;
-  r[2][3]=(m[2][1]*A2-m[2][0]*A4-m[2][3]*A0)*dd;
-  r[3][3]=(m[2][0]*A3-m[2][1]*A1+m[2][2]*A0)*dd;
+  r[0][0]=(m[1][1]*b5-m[1][2]*b4+m[1][3]*b3)*dd;
+  r[1][0]=(m[1][2]*b2-m[1][0]*b5-m[1][3]*b1)*dd;
+  r[2][0]=(m[1][0]*b4-m[1][1]*b2+m[1][3]*b0)*dd;
+  r[3][0]=(m[1][1]*b1-m[1][0]*b3-m[1][2]*b0)*dd;
+  r[0][1]=(m[0][2]*b4-m[0][1]*b5-m[0][3]*b3)*dd;
+  r[1][1]=(m[0][0]*b5-m[0][2]*b2+m[0][3]*b1)*dd;
+  r[2][1]=(m[0][1]*b2-m[0][0]*b4-m[0][3]*b0)*dd;
+  r[3][1]=(m[0][0]*b3-m[0][1]*b1+m[0][2]*b0)*dd;
+  r[0][2]=(m[3][1]*a5-m[3][2]*a4+m[3][3]*a3)*dd;
+  r[1][2]=(m[3][2]*a2-m[3][0]*a5-m[3][3]*a1)*dd;
+  r[2][2]=(m[3][0]*a4-m[3][1]*a2+m[3][3]*a0)*dd;
+  r[3][2]=(m[3][1]*a1-m[3][0]*a3-m[3][2]*a0)*dd;
+  r[0][3]=(m[2][2]*a4-m[2][1]*a5-m[2][3]*a3)*dd;
+  r[1][3]=(m[2][0]*a5-m[2][2]*a2+m[2][3]*a1)*dd;
+  r[2][3]=(m[2][1]*a2-m[2][0]*a4-m[2][3]*a0)*dd;
+  r[3][3]=(m[2][0]*a3-m[2][1]*a1+m[2][2]*a0)*dd;
   return r;
   }
 
@@ -1050,7 +1050,7 @@ FXVec4d operator*(const FXMat4d& m,const FXVec4d& v){
 #endif
   }
 
- 
+
 // Vector times matrix
 FXVec3d operator*(const FXVec3d& v,const FXMat4d& m){
 #if defined(FOX_HAS_SSE3)
