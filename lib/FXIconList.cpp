@@ -2510,6 +2510,7 @@ FXIconItem *FXIconList::getItem(FXint index) const {
 FXint FXIconList::setItem(FXint index,FXIconItem* item,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::setItem: index out of range.\n",getClassName()); }
   if(items[index]!=item){
+    FXIconItem *orig=items[index];
 
     // Must have item
     if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
@@ -2519,8 +2520,9 @@ FXint FXIconList::setItem(FXint index,FXIconItem* item,FXbool notify){
       target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)(FXival)index);
       }
 
-    // Delete old
-    delete items[index];
+    // Keep item state bits
+    item->setFocus(orig->hasFocus());
+    item->setSelected(orig->isSelected());
 
     // Add new
     items[index]=item;
@@ -2532,6 +2534,9 @@ FXint FXIconList::setItem(FXint index,FXIconItem* item,FXbool notify){
         target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)current);
         }
       }
+      
+    // Delete old
+    delete orig;
 
     // Redo layout
     recalc();

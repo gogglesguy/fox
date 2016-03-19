@@ -84,7 +84,12 @@ protected:
   FXIcon            *propicon;
   FXIcon            *deleteicon;
   FXIcon            *setbookicon;
+  FXIcon            *addbookicon;
+  FXIcon            *delbookicon;
   FXIcon            *clrbookicon;
+  FXIcon            *sortingicon;
+  FXIcon            *execicon;
+  FXIcon            *newdiricon;
   FXIcon            *workicon;
   FXIcon            *closeicon;
   FXIcon            *locationicon;
@@ -109,8 +114,9 @@ protected:
   FXbool             scaling;           // Image scaled
 protected:
   PathFinderMain(){}
-  FXint getNumFilenames() const;
-  FXString* getFilenames() const;
+  FXbool haveSelectedFiles() const;
+  FXint getNumSelectedFiles() const;
+  FXString* getSelectedFiles() const;
   void visitDirectory(const FXString& dir);
   void setPatternList(const FXString& patterns);
   FXString getPatternList() const;
@@ -143,10 +149,10 @@ public:
   long onFileInserted(FXObject*,FXSelector,void*);
   long onFileDeleted(FXObject*,FXSelector,void*);
 
-
   long onUpdStatusline(FXObject*,FXSelector,void*);
   long onCmdProperties(FXObject*,FXSelector,void*);
   long onCmdBookmark(FXObject*,FXSelector,void*);
+  long onCmdUnBookmark(FXObject*,FXSelector,void*);
   long onCmdBackDirectory(FXObject*,FXSelector,void*);
   long onUpdBackDirectory(FXObject*,FXSelector,void*);
   long onCmdForwardDirectory(FXObject*,FXSelector,void*);
@@ -165,6 +171,7 @@ public:
   long onCmdRename(FXObject*,FXSelector,void*);
   long onCmdDelete(FXObject*,FXSelector,void*);
   long onUpdSelected(FXObject*,FXSelector,void*);
+  long onUpdSelectedVisible(FXObject*,FXSelector,void*);
 
   long onCmdFilter(FXObject*,FXSelector,void*);
   long onCmdGotoDir(FXObject*,FXSelector,void*);
@@ -182,7 +189,6 @@ public:
   long onCmdOpen(FXObject*,FXSelector,void*);
   long onCmdOpenWith(FXObject*,FXSelector,void*);
   long onCmdOpenWithEditor(FXObject*,FXSelector,void*);
-  long onUpdHaveItem(FXObject*,FXSelector,void*);
   long onCmdRun(FXObject*,FXSelector,void*);
   long onCmdTerminal(FXObject*,FXSelector,void*);
   long onSigHarvest(FXObject*,FXSelector,void*);
@@ -212,14 +218,15 @@ public:
     ID_STATUSLINE,
     ID_PROPERTIES,
     ID_BOOKMARK,
-    ID_DELETE,
+    ID_UNBOOKMARK,
     ID_CLIPBOARD_CUT,
     ID_CLIPBOARD_COPY,
     ID_CLIPBOARD_PASTE,
+    ID_RENAME,
     ID_COPY,
     ID_MOVE,
     ID_LINK,
-    ID_RENAME,
+    ID_DELETE,
     ID_NEW,
     ID_GOTO_DIR,
     ID_OPEN,

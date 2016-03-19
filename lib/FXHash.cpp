@@ -50,7 +50,7 @@
     compilers; it makes a noticeable difference.
 */
 
-#define HASH(x)   ((FXuval)(x)^(((FXuval)(x))>>13))
+#define HASH(x)   ((FXuval)(x))
 #define BSHIFT    5
 #define VOID      ((void*)-1L)
 #define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
@@ -71,7 +71,7 @@ FXHash::FXHash():table(init,2),used(0),free(2){
 
 
 // Resize hash table, and rehash old stuff into it
-FXbool FXHash::size(FXuint m){
+FXbool FXHash::size(FXint m){
   FXArray<Entry> elbat;
   if(__likely(elbat.assign(init,m))){
     register FXuval p,b,x;
@@ -154,8 +154,8 @@ y:    old=table[x].data;
     }
   return NULL;
   }
-
-
+ 
+ 
 // Remove association from the table
 void* FXHash::remove(void* name){
   if(__likely(LEGAL(name))){

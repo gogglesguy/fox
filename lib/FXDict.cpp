@@ -77,7 +77,7 @@ void *FXDict::createData(void* ptr){ return ptr; }
 
 
 // Default implementation
-void FXDict::deleteData(void*){ }
+void FXDict::deleteData(void*){ }               // FIXME maybe should return arg by default
 
 
 // Resize table, must be power of 2
@@ -182,7 +182,7 @@ void* FXDict::remove(const FXchar* ky){
     used--;
     if(__unlikely(used<(table.no()>>2))) size(table.no()>>1);
     }
-  return NULL;
+  return NULL;          // FIXME maybe should return result of deleteData() 
   }
 
 

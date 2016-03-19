@@ -470,7 +470,7 @@ static const FXchar sourcefiles[]="All Files (*)\nC++ Source Files (*.cpp,*.cxx,
 
 // Open any file
 long GroupWindow::onCmdFileDlgAny(FXObject*,FXSelector,void*){
-  FXString file=FXFileDialog::getSaveFilename(this,"Save file","../tests/groupbox.cpp",sourcefiles,1);
+  FXString file=FXFileDialog::getSaveFilename(this,"Save file","/home/1337/newfile.txt",sourcefiles,1);
   fxmessage("File=\"%s\"\n",file.text());
   return 1;
   }
@@ -478,7 +478,7 @@ long GroupWindow::onCmdFileDlgAny(FXObject*,FXSelector,void*){
 
 // Open existing file
 long GroupWindow::onCmdFileDlgExisting(FXObject*,FXSelector,void*){
-  FXString file=FXFileDialog::getOpenFilename(this,"Open file","../tests/dippy.h",sourcefiles,3);
+  FXString file=FXFileDialog::getOpenFilename(this,"Open file","dippy.h",sourcefiles,3);
   fxmessage("File=\"%s\"\n",file.text());
   return 1;
   }
@@ -486,7 +486,7 @@ long GroupWindow::onCmdFileDlgExisting(FXObject*,FXSelector,void*){
 
 // Open multiple
 long GroupWindow::onCmdFileDlgMultiple(FXObject*,FXSelector,void*){
-  FXString* files=FXFileDialog::getOpenFilenames(this,"Open files","../tests/groupbox.cpp",sourcefiles);
+  FXString* files=FXFileDialog::getOpenFilenames(this,"Open files","groupbox.cpp",sourcefiles);
   if(files){
     for(int i=0; !files[i].empty(); i++){
       fxmessage("Files=\"%s\"\n",files[i].text());
@@ -526,6 +526,7 @@ long GroupWindow::onCmdFileDlgDirectory(FXObject*,FXSelector,void*){
 long GroupWindow::onCmdDirDlg(FXObject*,FXSelector,void*){
   FXDirDialog open(this,"Open directory");
   open.showFiles(TRUE);
+  open.setDirectory("/etc/sysconfig/networking");
   if(open.execute()){
     fxmessage("Dir=%s\n",open.getDirectory().text());
     }

@@ -36,8 +36,8 @@ protected:
     };
 protected:
   FXArray<Entry> table;         // Hash table
-  FXuint         used;          // Number of used entries
-  FXuint         free;          // Number of free entries
+  FXint          used;          // Number of used entries
+  FXint          free;          // Number of free entries
 protected:
   static const Entry init;      // Initialization value
 private:
@@ -54,12 +54,12 @@ public:
   * Resize the table to the given size; the size must be
   * a power of two.
   */
-  FXbool size(FXuint m);
+  FXbool size(FXint m);
 
   /**
   * Return the total number of slots in the table.
   */
-  FXuint size() const { return table.no(); }
+  FXint size() const { return table.no(); }
 
   /**
   * Return number of non-empty slots in the table.
@@ -91,17 +91,17 @@ public:
   /**
   * Return true if slot is not occupied by a key.
   */
-  FXbool empty(FXuint pos) const { return (table[pos].name==NULL)||(table[pos].name==(void*)-1L); }
+  FXbool empty(FXint pos) const { return (table[pos].name==NULL)||(table[pos].name==(void*)-1L); }
 
   /**
   * Return key at position pos.
   */
-  void* key(FXuint pos) const { return table[pos].name; }
+  void* key(FXint pos) const { return table[pos].name; }
 
   /**
   * Return data pointer at position pos.
   */
-  void* value(FXuint pos) const { return table[pos].data; }
+  void* value(FXint pos) const { return table[pos].data; }
 
   /**
   * Clear hash table.

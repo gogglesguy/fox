@@ -230,14 +230,14 @@ public:
   /// Scan the directories and update the items if needed, or if force is true
   void scan(FXbool force=true);
 
-  /// Set current file
-  void setCurrentFile(const FXString& file,FXbool notify=false);
+  /// Set current file; return true if success
+  FXbool setCurrentFile(const FXString& file,FXbool notify=false);
 
   /// Return current file
   FXString getCurrentFile() const;
 
-  /// Set current directory
-  void setDirectory(const FXString& path,FXbool notify=false);
+  /// Set current directory; return true if success
+  FXbool setDirectory(const FXString& path,FXbool notify=false);
 
   /// Return current directory
   FXString getDirectory() const;
@@ -251,7 +251,7 @@ public:
   /// Return absolute pathname of item
   FXString getItemPathname(const FXTreeItem* item) const;
 
-  /// Return the item from the absolute pathname
+  /// Return the (closest) item from the absolute pathname
   FXTreeItem* getPathnameItem(const FXString& path);
 
   /// Return true if item is a file

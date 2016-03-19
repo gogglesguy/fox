@@ -65,13 +65,13 @@ extern FXAPI FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v);
 ///// Atomic void pointers
 
 /// Atomically set pointer variable at ptr to v, and return its old contents
-extern FXAPI void* atomicSet(volatile FXptr* ptr,FXptr v);
+extern FXAPI FXptr atomicSet(volatile FXptr* ptr,FXptr v);
 
 /// Atomically add v to pointer variable at ptr, and return its old contents
-extern FXAPI void* atomicAdd(volatile FXptr* ptr,FXival v);
+extern FXAPI FXptr atomicAdd(volatile FXptr* ptr,FXival v);
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
-extern FXAPI void* atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v);
+extern FXAPI FXptr atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v);
 
 /// Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 extern FXAPI FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v);

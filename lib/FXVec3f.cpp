@@ -98,7 +98,14 @@ FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f&
 
 // Linearly interpolate
 FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f){
-#if defined(FOX_HAS_SSE2)
+#if defined(FOX_HAS_AVX)
+  register __m128 u0=_mm_maskload_ps(&u[0],_mm_set_epi32(0,~0,~0,~0));
+  register __m128 v0=_mm_maskload_ps(&v[0],_mm_set_epi32(0,~0,~0,~0));
+  register __m128 ff=_mm_set1_ps(f);
+  FXVec3f r;
+  _mm_maskstore_ps(&r[0],_mm_set_epi32(0,~0,~0,~0),_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff)));
+  return r;
+#elif defined(FOX_HAS_SSE2)
   register __m128 u0=_mm_loadh_pi(_mm_load_ss(&u[2]),(const __m64*)&u[0]);      // u1 u0 0 u2
   register __m128 v0=_mm_loadh_pi(_mm_load_ss(&v[2]),(const __m64*)&v[0]);      // v1 v0 0 v2
   register __m128 ff=_mm_set1_ps(f);

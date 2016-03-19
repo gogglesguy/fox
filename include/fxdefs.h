@@ -120,6 +120,22 @@
 #define __align(x)
 #endif
 
+// Get alignment of pointer p to b=2^n bytes, returning 0..b-1
+#define __alignment(p,b)   (((FXival)(p))&((b)-1))
+
+// Check if pointer p is aligned to b=2^n bytes
+#define __isaligned(p,b)   (__alignment(p,b)==0)
+
+// Align pointer to b=2^n bytes
+#define __alignto(p,b)     ((void*)((((FXival)(p))+((FXival)((b)-1)))&~((FXival)((b)-1))))
+
+
+// Restrict aliasing on pointers
+#if defined(__GNUC__)
+#define __restrict __restrict__
+#else
+#define __restrict
+#endif
 
 // Thread-local storage attribute
 #if defined(__GNUC__)
@@ -179,6 +195,16 @@
 #endif
 
 
+// Suffixes for 64-bit long constants
+#if defined(WIN32) && !defined(__GNUC__)
+#define FXLONG(c)  c ## i64
+#define FXULONG(c) c ## ui64
+#else
+#define FXLONG(c)  c ## LL
+#define FXULONG(c) c ## ULL
+#endif
+
+
 // Raw event type
 #ifdef WIN32
 struct tagMSG;
@@ -216,44 +242,44 @@ enum {
 /*********************************  Typedefs  **********************************/
 
 // Forward declarations
-class                          FXObject;
-class                          FXStream;
-class                          FXString;
+class   FXObject;
+class   FXStream;
+class   FXString;
 
 
 // Streamable types; these are fixed size!
-typedef char                   FXchar;
-typedef signed char            FXschar;
-typedef unsigned char          FXuchar;
-typedef bool                   FXbool;
-typedef unsigned short         FXushort;
-typedef short                  FXshort;
-typedef unsigned int           FXuint;
-typedef int                    FXint;
-typedef float                  FXfloat;
-typedef double                 FXdouble;
+typedef char                    FXchar;
+typedef signed char             FXschar;
+typedef unsigned char           FXuchar;
+typedef bool                    FXbool;
+typedef unsigned short          FXushort;
+typedef short                   FXshort;
+typedef unsigned int            FXuint;
+typedef int                     FXint;
+typedef float                   FXfloat;
+typedef double                  FXdouble;
 #if defined(WIN32)
-typedef unsigned int           FXwchar;
+typedef unsigned int            FXwchar;
 #if defined(_MSC_VER) && !defined(_NATIVE_WCHAR_T_DEFINED)
-typedef unsigned short         FXnchar;
+typedef unsigned short          FXnchar;
 #elif defined(__WATCOMC__) && !defined(_WCHAR_T_DEFINED)
-typedef long char              FXnchar;
+typedef long char               FXnchar;
 #else
-typedef wchar_t                FXnchar;
+typedef wchar_t                 FXnchar;
 #endif
 #else
-typedef wchar_t                FXwchar;
-typedef unsigned short         FXnchar;
+typedef wchar_t                 FXwchar;
+typedef unsigned short          FXnchar;
 #endif
 #if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-typedef unsigned long          FXulong;
-typedef long                   FXlong;
+typedef unsigned long           FXulong;
+typedef long                    FXlong;
 #elif defined(_MSC_VER) || (defined(__BCPLUSPLUS__) && __BORLANDC__ > 0x500) || defined(__WATCOM_INT64__)
-typedef unsigned __int64       FXulong;
-typedef __int64                FXlong;
+typedef unsigned __int64        FXulong;
+typedef __int64                 FXlong;
 #elif defined(__GNUG__) || defined(__GNUC__) || defined(__SUNPRO_CC) || defined(__MWERKS__) || defined(__SC__) || defined(_LONGLONG)
-typedef unsigned long long     FXulong;
-typedef long long              FXlong;
+typedef unsigned long long      FXulong;
+typedef long long               FXlong;
 #else
 #error "FXlong and FXulong not defined for this architecture!"
 #endif
@@ -261,76 +287,67 @@ typedef long long              FXlong;
 
 // Integral types large enough to hold value of a pointer
 #if defined(_MSC_VER) && defined(_WIN64)
-typedef __int64                FXival;
-typedef unsigned __int64       FXuval;
+typedef __int64                 FXival;
+typedef unsigned __int64        FXuval;
 #else
-typedef long                   FXival;
-typedef unsigned long          FXuval;
+typedef long                    FXival;
+typedef unsigned long           FXuval;
 #endif
 
 
 // Generic void pointer
-typedef void*                  FXptr;
-
-// Suffixes for 64-bit long constants
-#if defined(WIN32) && !defined(__GNUC__)
-#define FXLONG(c)  c ## i64
-#define FXULONG(c) c ## ui64
-#else
-#define FXLONG(c)  c ## LL
-#define FXULONG(c) c ## ULL
-#endif
+typedef void*                   FXptr;
 
 
 // Handle to something in server
 #ifdef WIN32
-typedef void*                  FXID;
+typedef void*           FXID;
 #else
-typedef unsigned long          FXID;
+typedef unsigned long   FXID;
 #endif
 
 // Time since January 1, 1970 (UTC)
-typedef FXlong                 FXTime;
+typedef FXlong          FXTime;
 
 // Pixel type (could be color index)
-typedef unsigned long          FXPixel;
+typedef unsigned long   FXPixel;
 
 // RGBA pixel value
-typedef FXuint                 FXColor;
+typedef FXuint          FXColor;
 
 // Hot key
-typedef FXuint                 FXHotKey;
+typedef FXuint          FXHotKey;
 
 // Input source handle type
 #ifdef WIN32
-typedef void*                  FXInputHandle;
+typedef void*           FXInputHandle;
 #else
-typedef FXint                  FXInputHandle;
+typedef FXint           FXInputHandle;
 #endif
 
 // Thread ID type
 #if defined(WIN32)
-typedef void*                  FXThreadID;
+typedef void*           FXThreadID;
 #else
-typedef unsigned long          FXThreadID;
+typedef unsigned long   FXThreadID;
 #endif
 
 // Thread-local storage key
-typedef FXuval                 FXThreadStorageKey;
+typedef FXuval          FXThreadStorageKey;
 
 // Raw event type
 #ifdef WIN32
-typedef tagMSG    FXRawEvent;
+typedef tagMSG          FXRawEvent;
 #else
-typedef _XEvent   FXRawEvent;
+typedef _XEvent         FXRawEvent;
 #endif
 
 
 /// Drag and drop data type
 #ifdef WIN32
-typedef FXushort  FXDragType;
+typedef FXushort        FXDragType;
 #else
-typedef FXID      FXDragType;
+typedef FXID            FXDragType;
 #endif
 
 

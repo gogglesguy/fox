@@ -146,20 +146,21 @@ protected:
   FXString      pattern;        // Pattern of file names
   FXString      startdirectory; // Start directory
   FXString      dropdirectory;  // Drop directory
-  FXString     *clipfiles;      // Clipped files
-  FXString     *dragfiles;      // Dragged files
-  FXString     *dropfiles;      // Dropped files
+  FXString      clipfiles;      // Clipped files
+  FXString      dragfiles;      // Dragged files
+  FXString      dropfiles;      // Dropped files
+  FXDragAction  dropaction;     // Drop action
   FXuint        matchmode;      // File wildcard match mode
   FXint         imagesize;      // Image size
   FXTime        timestamp;      // Time when last refreshed
   FXuint        counter;        // Refresh counter
-  FXDragAction  dropaction;     // Drop action
   FXbool        clipcut;        // Cut or copy
   FXbool        draggable;      // Dragable files
 protected:
   FXFileList();
   void listItems(FXbool force);
   FXIcon* getItemPreviewIcon(FXint index) const;
+  FXString getSelectedFiles() const;
   virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
 private:
   FXFileList(const FXFileList&);
@@ -285,17 +286,14 @@ public:
   /// Scan the current directory and update the items if needed, or if force is true
   void scan(FXbool force=true);
 
-  /// Set current file
-  void setCurrentFile(const FXString& file,FXbool notify=false);
+  /// Set current file; return true if success
+  FXbool setCurrentFile(const FXString& file,FXbool notify=false);
 
   /// Return current file
   FXString getCurrentFile() const;
 
-  /// Get selected files
-  FXString *getSelectedFiles() const;
-
-  /// Set current directory
-  void setDirectory(const FXString& path,FXbool notify=false);
+  /// Set current directory; return true if success
+  FXbool setDirectory(const FXString& path,FXbool notify=false);
 
   /// Return current directory
   FXString getDirectory() const { return directory; }

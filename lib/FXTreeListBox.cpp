@@ -385,6 +385,18 @@ FXint FXTreeListBox::fillItems(FXTreeItem* father,const FXString& strings,FXIcon
   }
 
 
+// Replace the original item orig with new [possibly subclassed] item
+FXTreeItem* FXTreeListBox::setItem(FXTreeItem* orig,FXTreeItem* item,FXbool notify){
+  register FXTreeItem *newitem=tree->setItem(orig,item,notify);
+  if(tree->getCurrentItem()==newitem){
+    field->setIcon(tree->getItemClosedIcon(newitem));
+    field->setText(tree->getItemText(newitem));
+    }
+  recalc();
+  return newitem;
+  }
+
+
 // Insert item under father before other item
 FXTreeItem* FXTreeListBox::insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,FXbool notify){
   register FXTreeItem *newitem=tree->insertItem(other,father,item,notify);

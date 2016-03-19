@@ -11,6 +11,7 @@ bin_PROGRAMS	= PathFinder
 man_MANS = PathFinder.1
 
 ICONS = \
+addbook.bmp \
 bigicons.bmp \
 closepanel.gif \
 clrbook.gif \
@@ -18,12 +19,15 @@ copy.bmp \
 config_gif.gif \
 copyit.gif \
 cut.bmp \
+delbook.bmp \
 deleteit.bmp \
 desktop.bmp \
 details.bmp \
 dirup.bmp \
 enter.gif \
+execute.bmp \
 file_gif.gif \
+foldernew.gif \
 foxbig.gif \
 foxmini.gif \
 goback.bmp \
@@ -32,7 +36,7 @@ gotodir.bmp \
 home.gif \
 hosts.bmp \
 iconpath.gif \
-linkit.gif \
+linkit.bmp \
 location.gif \
 maphost.bmp \
 miscellaneous_gif.gif \
@@ -41,6 +45,7 @@ paste.bmp \
 pattern_gif.gif \
 properties.bmp \
 quit_gif.gif \
+newfolder.bmp \
 renameit.gif \
 rotateleft.gif \
 rotateright.gif \
@@ -48,6 +53,7 @@ run_bmp.bmp \
 setbook.gif \
 setdir.gif \
 smallicons.bmp \
+sorting.bmp \
 unmaphost.bmp \
 work.gif
 

@@ -194,6 +194,12 @@ public:
   static FXint processors();
 
   /**
+  * Return processor index of the calling thread; returns a value 
+  * between [0 ... processors()-1] if successful, and -1 otherwise.
+  */
+  static FXint processor();
+
+  /**
   * Generate new thread local storage key.
   */
   static FXThreadStorageKey createStorageKey();

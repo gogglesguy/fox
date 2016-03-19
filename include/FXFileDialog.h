@@ -183,7 +183,7 @@ public:
   /// Set draggable files
   void setDraggableFiles(FXbool flag);
 
-  /// Are draggable files
+  /// Are files draggable?
   FXbool getDraggableFiles() const;
 
   /// Change file associations; delete old ones if owned

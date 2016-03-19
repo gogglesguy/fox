@@ -251,13 +251,14 @@ int main(int,char**){
   FXchar buffer[2048];
   FXint len;
   FXwchar uc;
+  FXchar ch;
 
 
   // Dump character properties
   for(uc=0; uc<0x110000; ++uc){
     if(uc%32==0){
-      printf("\nCode\tChar\tCat\tDir\tBreak\tValue\tScript\tComb\tJoin\tDecom\tNumdec\n");
-      printf("======================================================================================\n");
+      printf("\nCode\tChar\tCat\tDir\tBreak\tValue\tScript\tComb\tJoin\tDecom\tNumdec\tCase\n");
+      printf("============================================================================================\n");
       }
     printf("%04X\t",uc);
     if(' '<=uc){
@@ -281,6 +282,11 @@ int main(int,char**){
     printf("%3s\t",joiningtype[Unicode::joiningType(uc)]);
     printf("%4s\t",decomposetype[Unicode::decomposeType(uc)]);
     printf("%2d\t",Unicode::charNumDecompose(uc));
+    ch='-';
+    if(Unicode::isUpper(uc)) ch='U';
+    else if(Unicode::isLower(uc)) ch='L';
+    else if(Unicode::isTitle(uc)) ch='T';
+    printf("%c\t",ch);
     printf("\n");
     }
   return 1;

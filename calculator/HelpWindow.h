@@ -22,9 +22,6 @@
 #define HELPWINDOW_H
 
 
-//class FXText;
-
-
 /// Online help dialog box
 class HelpWindow : public FXDialogBox {
   FXDECLARE(HelpWindow)

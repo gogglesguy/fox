@@ -137,6 +137,9 @@ public:
   /// Fill tree list box by appending items from newline separated strings
   FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
+  /// Replace the original item orig with new [possibly subclassed] item
+  FXTreeItem* setItem(FXTreeItem* orig,FXTreeItem* item,FXbool notify=false);
+
   /// Insert [possibly subclassed] item under father before other item
   FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 

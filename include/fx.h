@@ -93,6 +93,7 @@
 #include "FXAccelTable.h"
 #include "FXRecentFiles.h"
 #include "FXWorker.h"
+#include "FXSemaQueue.h"
 #include "FXLFQueue.h"
 #include "FXThreadPool.h"
 #include "FXTaskGroup.h"

@@ -499,64 +499,6 @@ enum {
   };
 
 
-// Tokens
-enum {
-  TK_END,               // End of string
-
-  TK_BAD,               // Bad token
-
-  TK_CHAR,              // 8-bit character
-  TK_WCHAR,             // Wide character
-
-  TK_LPAREN,            // Parentheses
-  TK_RPAREN,
-
-  TK_ALTER,             // Alternatives
-  TK_DASH,              // Dash
-
-  TK_STAR,              // Zero or more repeat
-  TK_PLUS,              // One or more repeat
-  TK_QUEST,             // Zero or one repeat
-
-  TK_LBRACE,            // Counted repeat
-  TK_RBRACE,
-  TK_COMMA,
-
-  TK_CARET,             // Zero-width Assertions
-  TK_DOLLAR,
-  TK_BEGWORD,
-  TK_ENDWORD,
-  TK_BEGTEXT,
-  TK_ENDTEXT,
-  TK_BNDWORD,
-  TK_INTWORD,
-
-  TK_LBRACK,            // General character classes
-  TK_RBRACK,
-
-  TK_ANY,               // Special character classes
-  TK_DIGIT,
-  TK_NONDIGIT,
-  TK_SPACE,
-  TK_NONSPACE,
-  TK_WORD,
-  TK_NONWORD,
-  TK_LETTER,
-  TK_NONLETTER,
-  TK_HEXDIGIT,
-  TK_NONHEXDIGIT,
-  TK_UPPERCASE,
-  TK_LOWERCASE,
-  TK_PUNCT,
-  TK_NONPUNCT,
-
-  TK_BACKREF,           // Back references
-
-  TK_UNICLASS,          // Unicode character class
-  TK_UNISCRIPT          // Unicode script
-  };
-
-
 // Opcodes of the engine
 enum {
   OP_FAIL,              // Always fail
@@ -597,10 +539,10 @@ enum {
   OP_WORD,              // Word character
   OP_NOT_WORD,          // Non-word character
   OP_NOT_WORD_NL,       // Non-word character including newline
-  OP_CHARS,             // Match literal string
-  OP_CHARS_CI,          // Match literal string, case insensitive
   OP_CHAR,              // Single character
   OP_CHAR_CI,           // Single character, case insensitive
+  OP_CHARS,             // Match literal string
+  OP_CHARS_CI,          // Match literal string, case insensitive
   OP_STAR,              // Greedy * (simple)
   OP_MIN_STAR,          // Lazy * (simple)
   OP_POS_STAR,          // Possessive * (simple)
@@ -618,6 +560,39 @@ enum {
   OP_BEHIND_NEG,        // Negative look-behind
   OP_BEHIND_POS,        // Positive look-behind
   OP_ATOMIC,            // Atomic subgroup
+  OP_UWORD_BEG,         // Unicode beginning of word
+  OP_UWORD_END,         // Unicode end of word
+  OP_UWORD_BND,         // Unicode word boundary
+  OP_UWORD_INT,         // Unicode word interior
+  OP_UANY,              // Unicode any character, except newline
+  OP_UANY_NL,           // Unicode any  character, including newline
+  OP_UANY_OF,           // Unicode any character in set
+  OP_UANY_BUT,          // Unicode any character not in set
+  OP_UUPPER,            // Unicode uppercase
+  OP_ULOWER,            // Unicode lowercase
+  OP_UTITLE,            // Unicode title case
+  OP_USPACE,            // Unicode space, except newline
+  OP_USPACE_NL,         // Unicode space, including newline
+  OP_UNOT_SPACE,        // Unicode non-space
+  OP_UDIGIT,            // Unicode digit
+  OP_UNOT_DIGIT,        // Unicode non-digit, except newline
+  OP_UNOT_DIGIT_NL,     // Unicode non-digit, including newline
+  OP_ULETTER,           // Unicode letter
+  OP_UNOT_LETTER,       // Unicode non-letter, except newline
+  OP_UNOT_LETTER_NL,    // Unicode non-letter, including newline
+  OP_UPUNCT,            // Unicode punctuation
+  OP_UNOT_PUNCT,        // Unicode non-punctuation, except newline
+  OP_UNOT_PUNCT_NL,     // Unicode non-punctuation, including newline
+  OP_UCAT,              // Unicode character from categories
+  OP_UNOT_CAT,          // Unicode character NOT from categories, except newline
+  OP_UNOT_CAT_NL,       // Unicode character NOT from categories, including newline
+  OP_USCRIPT,           // Unicode character from script
+  OP_UNOT_SCRIPT,       // Unicode character NOT from script, except newline
+  OP_UNOT_SCRIPT_NL,    // Unicode character NOT from script, including newline
+  OP_UCHAR,             // Unicode single character
+  OP_UCHAR_CI,          // Unicode single character, case-insensitive
+  OP_UCHARS,            // Unicode 1 or more unicode characters
+  OP_UCHARS_CI,         // Unicode 1 or more unicode characters, case-insensitive
   OP_SUB_BEG_0,         // Start of substring 0, 1, ...
   OP_SUB_BEG_1,
   OP_SUB_BEG_2,
@@ -753,6 +728,9 @@ struct FXExecute {
   FXint          recs;              // Recursions
   FXint          mode;              // Match mode
 
+  // Match subject string
+  FXint repeat(const FXuchar* prog);
+
   // Match at current string position
   FXbool match(const FXuchar* prog);
 
@@ -767,6 +745,142 @@ struct FXExecute {
 /*******************************************************************************/
 
 // FXCompile members
+
+
+// Unicode character categories
+static const FXchar unicat[][3]={
+  {"Cn"},
+  {"Cc"},
+  {"Cf"},
+  {"Cs"},
+  {"Co"},
+  {"Mn"},
+  {"Mc"},
+  {"Me"},
+  {"Zs"},
+  {"Zl"},
+  {"Zp"},
+  {"Lu"},
+  {"Ll"},
+  {"Lt"},
+  {"Lm"},
+  {"Lo"},
+  {"Nl"},
+  {"Nd"},
+  {"No"},
+  {"Pc"},
+  {"Pd"},
+  {"Ps"},
+  {"Pe"},
+  {"Pi"},
+  {"Pf"},
+  {"Po"},
+  {"Sm"},
+  {"Sc"},
+  {"Sk"},
+  {"So"},
+  };
+
+
+// Unicode character scripts
+static const FXchar uniscript[][5]={
+  {"Zzzz"},
+  {"Zyyy"},
+  {"Zinh"},
+  {"Latn"},
+  {"Grek"},
+  {"Cyrl"},
+  {"Armn"},
+  {"Hebr"},
+  {"Arab"},
+  {"Syrc"},
+  {"Thaa"},
+  {"Deva"},
+  {"Beng"},
+  {"Guru"},
+  {"Gujr"},
+  {"Orya"},
+  {"Taml"},
+  {"Telu"},
+  {"Knda"},
+  {"Mlym"},
+  {"Sinh"},
+  {"Thai"},
+  {"Laoo"},
+  {"Tibt"},
+  {"Mymr"},
+  {"Geor"},
+  {"Hang"},
+  {"Ethi"},
+  {"Cher"},
+  {"Cans"},
+  {"Ogam"},
+  {"Runr"},
+  {"Khmr"},
+  {"Mong"},
+  {"Hira"},
+  {"Kana"},
+  {"Bopo"},
+  {"Hani"},
+  {"Yiii"},
+  {"Ital"},
+  {"Goth"},
+  {"Dsrt"},
+  {"Tglg"},
+  {"Hano"},
+  {"Buhd"},
+  {"Tagb"},
+  {"Limb"},
+  {"Tale"},
+  {"Linb"},
+  {"Ugar"},
+  {"Shaw"},
+  {"Osma"},
+  {"Cprt"},
+  {"Brai"},
+  {"Bugi"},
+  {"Copt"},
+  {"Talu"},
+  {"Glag"},
+  {"Tfng"},
+  {"Sylo"},
+  {"Xpeo"},
+  {"Khar"},
+  {"Bali"},
+  {"Xsux"},
+  {"Phnx"},
+  {"Phag"},
+  {"Nkoo"},
+  {"Sund"},
+  {"Lepc"},
+  {"Olck"},
+  {"Vaii"},
+  {"Saur"},
+  {"Kali"},
+  {"Rjng"},
+  {"Lyci"},
+  {"Cari"},
+  {"Lydi"},
+  {"Cham"},
+  {"Lana"},
+  {"Tavt"},
+  {"Avst"},
+  {"Egyp"},
+  {"Samr"},
+  {"Lisu"},
+  {"Bamu"},
+  {"Java"},
+  {"Mtei"},
+  {"Armi"},
+  {"Sarb"},
+  {"Prti"},
+  {"Phli"},
+  {"Orkh"},
+  {"Kthi"},
+  {"Batk"},
+  {"Brah"},
+  {"Mand"},
+  };
 
 
 // Special characters "*+?{^$.()[]|\" plus the end-of-string indicator
@@ -1103,15 +1217,17 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
           smin=smax=0;
           }
         }
-      else if(mode&FXRex::Capture){                     // Capturing
-        level=++npar;
-        if(level>=NSUBEXP) return FXRex::ErrComplex;    // Expression too complex
-        append(OP_SUB_BEG_0+level);
-        if((err=expression(flags,smin,smax))) return err;
-        append(OP_SUB_END_0+level);
-        }
-      else{                                             // Normal
-        if((err=expression(flags,smin,smax))) return err;
+      else{
+        if(mode&FXRex::Capture){                        // Capturing
+          level=++npar;
+          if(level>=NSUBEXP) return FXRex::ErrComplex;  // Expression too complex
+          append(OP_SUB_BEG_0+level);
+          if((err=expression(flags,smin,smax))) return err;
+          append(OP_SUB_END_0+level);
+          }
+        else{                                           // Normal
+          if((err=expression(flags,smin,smax))) return err;
+          }
         }
       if(*pat++!=')') return FXRex::ErrParent;          // Unmatched parenthesis
       flags&=~FLG_SIMPLE;
@@ -1372,18 +1488,6 @@ s:        append(OP_CHAR);
   }
 
 
-// True if character is a word character
-inline FXbool isWord(FXchar ch){
-  return Ascii::isAlphaNumeric(ch) || ch=='_';
-  }
-
-
-// True if character is punctuation (delimiter) character
-inline FXbool isDelim(FXchar ch){
-  return Ascii::isPunct(ch) && ch!='_';
-  }
-
-
 // Parse character class
 FXRex::Error FXCompile::charset(){
   register FXint first,last,op,i;
@@ -1404,11 +1508,11 @@ in: last=(FXuchar)*pat++;
       last=*pat++;
       switch(last){
         case 'w':
-          for(i=0; i<256; i++){ if(isWord(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(Ascii::isWord(i)) INCL(set,i); }
           first=-1;
           continue;
         case 'W':
-          for(i=0; i<256; i++){ if(!isWord(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(!Ascii::isWord(i)) INCL(set,i); }
           first=-1;
           continue;
         case 's':
@@ -1436,11 +1540,11 @@ in: last=(FXuchar)*pat++;
           first=-1;
           continue;
         case 'p':
-          for(i=0; i<256; i++){ if(isDelim(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(Ascii::isDelim(i)) INCL(set,i); }
           first=-1;
           continue;
         case 'P':
-          for(i=0; i<256; i++){ if(!isDelim(i)) INCL(set,i); }
+          for(i=0; i<256; i++){ if(!Ascii::isDelim(i)) INCL(set,i); }
           first=-1;
           continue;
         case 'l':
@@ -1552,115 +1656,6 @@ in: last=(FXuchar)*pat++;
   return FXRex::ErrOK;
   }
 
-
-/*
-
-
-// Read control code
-FXshort FXCompile::getctl(){
-  register FXshort ch=TK_BAD;
-  if('@'<=*pat && *pat<='_'){
-    ch=*pat++ - '@';
-    }
-  return TK_BAD;
-  }
-
-
-// Read octal digits
-FXshort FXCompile::getoct(){
-  register FXshort ch=TK_BAD;
-  if('0'<=*pat && *pat<'7'){
-    ch=*pat++ - '0';
-    if('0'<=*pat && *pat<'7'){
-      ch=(ch<<3) + *pat++ - '0';
-      if('0'<=*pat && *pat<'7'){
-        ch=(ch<<3) + *pat++ - '0';
-        }
-      }
-    }
-  return ch;
-  }
-
-
-// Read hex digits
-FXshort FXCompile::gethex(){
-  register FXshort ch=TK_BAD;
-  if(Ascii::isHexDigit(*pat)){
-    ch=Ascii::digitValue(*pat++);
-    if(Ascii::isHexDigit(*pat)){
-      ch=(ch<<4)+Ascii::digitValue(*pat++);
-      }
-    }
-  return ch;
-  }
-
-// Lexing
-FXshort FXCompile::token(){
-  register FXshort ch;
-  switch(ch=(FXuchar)*pat++){
-    case   0: return TK_END;                       // End of pattern
-    case '(': return TK_LPAREN;
-    case ')': return TK_RPAREN;
-    case '[': return TK_LBRACK;
-    case ']': return TK_RBRACK;
-    case '{': return TK_LBRACE;
-    case '}': return TK_RBRACE;
-    case '|': return TK_ALTER;
-    case '-': return TK_DASH;
-    case '*': return TK_STAR;
-    case '+': return TK_PLUS;
-    case '?': return TK_QUEST;
-    case ',': return TK_COMMA;
-    case '^': return TK_CARET;
-    case '$': return TK_DOLLAR;
-    case '.': return TK_ANY;
-    case '\\':
-      switch(ch=(FXuchar)*pat++){
-        case  0 : return TK_BAD;                        // End of pattern
-        case 'a': return '\a';                          // Bell
-        case 'e': return '\033';                        // Escape
-        case 'f': return '\f';                          // Form feed
-        case 'n': return '\n';                          // Newline
-        case 'r': return '\r';                          // Return
-        case 't': return '\t';                          // Tab
-        case 'v': return '\v';                          // Vertical tab
-        case 'w': return TK_WORD;
-        case 'W': return TK_NONWORD;
-        case 's': return TK_SPACE;
-        case 'S': return TK_NONSPACE;
-        case 'd': return TK_DIGIT;
-        case 'D': return TK_NONDIGIT;
-        case 'h': return TK_HEXDIGIT;
-        case 'H': return TK_NONHEXDIGIT;
-        case 'p': return TK_PUNCT;
-        case 'P': return TK_NONPUNCT;
-        case 'l': return TK_LETTER;
-        case 'L': return TK_NONLETTER;
-        case 'u': return TK_UPPER;
-        case 'U': return TK_LOWER;
-        case 'b': return TK_WORDBOUND;
-        case 'B': return TK_INTRAWORD;
-        case 'A': return TK_BEGTEXT;
-        case 'Z': return TK_ENDTEXT;
-        case '<': return TK_BEGWORD;
-        case '>': return TK_ENDWORD;
-        case '1': return TK_BACKREF1;
-        case '2': return TK_BACKREF2;
-        case '3': return TK_BACKREF3;
-        case '4': return TK_BACKREF4;
-        case '5': return TK_BACKREF5;
-        case '6': return TK_BACKREF6;
-        case '7': return TK_BACKREF7;
-        case '8': return TK_BACKREF8;
-        case '9': return TK_BACKREF9;
-        case 'c': return getctl();                      // Control character
-        case '0': return getoct();                      // Octal digit
-        case 'x': return gethex();                      // Hex digit
-        }
-    }
-  return ch;
-  }
-*/
 
 // Append opcode
 FXuchar* FXCompile::append(FXuchar op){
@@ -1790,11 +1785,239 @@ void FXCompile::fix(FXuchar *ptr,FXshort val){
 // FXExecute members
 
 
+// Match one character of subject string
+FXint FXExecute::repeat(const FXuchar* prog){
+  register FXwchar ch;
+  FXASSERT(str<str_end);
+  switch(*prog){
+    case OP_ANY:
+      if(*str=='\n') return 0;
+      str++;
+      return 1;
+    case OP_ANY_NL:
+      str++;
+      return 1;
+    case OP_ANY_OF:
+      if(!ISIN((prog+1),*str)) return 0;
+      str++;
+      return 33;
+    case OP_ANY_BUT:
+      if(ISIN((prog+1),*str)) return 0;
+      str++;
+      return 33;
+    case OP_UPPER:
+      if(!Ascii::isUpper(*str)) return 0;
+      str++;
+      return 1;
+    case OP_LOWER:
+      if(!Ascii::isLower(*str)) return 0;
+      str++;
+      return 1;
+    case OP_SPACE:
+      if(*str=='\n' || !Ascii::isSpace(*str)) return 0;
+      str++;
+      return 1;
+    case OP_SPACE_NL:
+      if(!Ascii::isSpace(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_SPACE:
+      if(Ascii::isSpace(*str)) return 0;
+      str++;
+      return 1;
+    case OP_DIGIT:
+      if(!Ascii::isDigit(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_DIGIT:
+      if(*str=='\n' && Ascii::isDigit(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_DIGIT_NL:
+      if(Ascii::isDigit(*str)) return 0;
+      str++;
+      return 1;
+    case OP_HEX:
+      if(!Ascii::isHexDigit(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_HEX:
+      if(*str=='\n' || Ascii::isHexDigit(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_HEX_NL:
+      if(Ascii::isHexDigit(*str)) return 0;
+      str++;
+      return 1;
+    case OP_LETTER:
+      if(!Ascii::isLetter(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_LETTER:
+      if(*str=='\n' || Ascii::isLetter(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_LETTER_NL:
+      if(Ascii::isLetter(*str)) return 0;
+      str++;
+      return 1;
+    case OP_PUNCT:
+      if(!Ascii::isDelim(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_PUNCT:
+      if(*str=='\n' || Ascii::isDelim(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_PUNCT_NL:
+      if(Ascii::isDelim(*str)) return 0;
+      str++;
+      return 1;
+    case OP_WORD:
+      if(!Ascii::isWord(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_WORD:
+      if(*str=='\n' || Ascii::isWord(*str)) return 0;
+      str++;
+      return 1;
+    case OP_NOT_WORD_NL:
+      if(Ascii::isWord(*str)) return 0;
+      str++;
+      return 1;
+    case OP_CHAR:
+      if(prog[1]!=(FXuchar)*str) return 0;
+      str++;
+      return 2;
+    case OP_CHAR_CI:
+      if(prog[1]!=Ascii::toLower(*str)) return 0;
+      str++;
+      return 2;
+    case OP_UANY:
+      if(*str=='\n') return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UANY_NL:
+      str=wcinc(str);
+      return 1;
+    case OP_UANY_OF:                            // FIXME
+      // FIXME
+      return 0;
+    case OP_UANY_BUT:                           // FIXME
+      // FIXME
+      return 0;
+    case OP_UUPPER:
+      if(!Unicode::isUpper(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_ULOWER:
+      if(!Unicode::isLower(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UTITLE:
+      if(!Unicode::isTitle(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_USPACE:
+      if(*str=='\n' || !Unicode::isSpace(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_USPACE_NL:
+      if(!Unicode::isSpace(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_SPACE:
+      if(Unicode::isSpace(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UDIGIT:
+      if(!Unicode::isDigit(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_DIGIT:
+      if(*str=='\n' || Unicode::isDigit(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_DIGIT_NL:
+      if(Unicode::isDigit(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_ULETTER:
+      if(!Unicode::isLetter(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_LETTER:
+      if(*str=='\n' || Unicode::isLetter(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_LETTER_NL:
+      if(Unicode::isLetter(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UPUNCT:
+      if(!Unicode::isPunct(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_PUNCT:
+      if(*str=='\n' || Unicode::isPunct(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UNOT_PUNCT_NL:
+      if(Unicode::isPunct(wc(str))) return 0;
+      str=wcinc(str);
+      return 1;
+    case OP_UCAT:
+      ch=Unicode::charCategory(wc(str));
+      if(!(prog[1]<=ch && ch<=prog[2])) return 0;
+      str=wcinc(str);
+      return 3;
+    case OP_UNOT_CAT:
+      if(*str=='\n') return 0;
+      ch=Unicode::charCategory(wc(str));
+      if(prog[1]<=ch && ch<=prog[2]) return 0;
+      str=wcinc(str);
+      return 3;
+    case OP_UNOT_CAT_NL:
+      ch=Unicode::charCategory(wc(str));
+      if(prog[1]<=ch && ch<=prog[2]) return 0;
+      str=wcinc(str);
+      return 3;
+    case OP_USCRIPT:
+      if(Unicode::scriptType(wc(str))!=prog[1]) return 0;
+      str=wcinc(str);
+      return 2;
+    case OP_UNOT_SCRIPT:
+      if(*str=='\n') return 0;
+      if(Unicode::scriptType(wc(str))==prog[1]) return 0;
+      str=wcinc(str);
+      return 2;
+    case OP_UNOT_SCRIPT_NL:
+      if(Unicode::scriptType(wc(str))==prog[1]) return 0;
+      str=wcinc(str);
+      return 2;
+    case OP_UCHAR:
+      ch=wc((const FXchar*)prog+1);
+      if(wc(str)!=ch) return 0;
+      str=wcinc(str);
+      return wclen((const FXchar*)prog+1);
+    case OP_UCHAR_CI:
+      ch=wc((const FXchar*)prog+1);
+      if(Unicode::toLower(wc(str))!=ch) return 0;
+      str=wcinc(str);
+      return wclen((const FXchar*)prog+1);
+    default:
+      fxerror("FXRex::match: bad opcode (%d) at: %p\n",*prog,prog);
+      return 0;
+    }
+  return 0;
+  }
+
+
 // The workhorse
 FXbool FXExecute::match(const FXuchar* prog){
   register FXint no,keep,rep_min,rep_max,greed,op;
   register const FXchar *save,*beg,*end;
-  register FXchar ch;
+  register FXwchar ch;
 
   // Check recursion depth limit
   if(++recs>=MAXRECURSION){ throw FXResourceException("exceeded maximum recursion depth"); }
@@ -1824,14 +2047,6 @@ FXbool FXExecute::match(const FXuchar* prog){
         str=save;
         prog+=2;
         continue;
-/*
-      case OP_WHILE:            // Loop with no backtrack
-        save=str;
-        while(match(prog+2)){ save=str; }       // Advance each time successfully matched sub-chunk
-        str=save;                               // Reset to last subchunk matched
-        prog+=GETARG(prog);                     // Now match the rest
-        continue;
-*/
       case OP_STR_BEG:          // Must be at begin of entire string
         if(str!=str_beg) goto f;
         continue;
@@ -1854,20 +2069,21 @@ FXbool FXExecute::match(const FXuchar* prog){
           if(mode&FXRex::NotEol) goto f;
           }
         continue;
-      case OP_WORD_BEG:         // Must be at begin of word
-        if(!((str<=str_beg || !isWord(*(str-1))) && (str<str_end && isWord(*str)))) goto f;
+      case OP_WORD_BEG:         // Must be at begin of word (word at least one letter)
+        if(!(str<str_end && Ascii::isWord(*str)) || (str_beg<str && Ascii::isWord(*(str-1)))) goto f;
         continue;
-      case OP_WORD_END:         // Must be at end of word
-        if(!((str_end<=str || !isWord(*str)) && (str_beg<str && isWord(*(str-1))))) goto f;
+      case OP_WORD_END:         // Must be at end of word (word at least one letter)
+        if((str<str_end && Ascii::isWord(*str)) || !(str_beg<str && Ascii::isWord(*(str-1)))) goto f;
         continue;
       case OP_WORD_BND:         // Must be at word boundary
-        if(!(((str<=str_beg || !isWord(*(str-1))) && (str<str_end && isWord(*str))) || ((str_end<=str || !isWord(*str)) && (str_beg<str && isWord(*(str-1)))))) goto f;
+        if((str<str_end && Ascii::isWord(*str)) == (str_beg<str && Ascii::isWord(*(str-1)))) goto f;
         continue;
       case OP_WORD_INT:         // Must be inside a word
-        if(!((str_beg<str && isWord(*(str-1))) && (str<str_end && isWord(*str)))) goto f;
+        if(str_end<=str || !Ascii::isWord(*str) || str<=str_beg || !Ascii::isWord(*(str-1))) goto f;
         continue;
       case OP_ANY:              // Match any character, except newline
-        if(str_end<=str || *str=='\n') goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
         str++;
         continue;
       case OP_ANY_NL:           // Matches any character, including newline
@@ -1875,102 +2091,132 @@ FXbool FXExecute::match(const FXuchar* prog){
         str++;
         continue;
       case OP_ANY_OF:           // Match a character in a set
-        if(str_end<=str || !ISIN(prog,*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!ISIN(prog,*str)) goto f;
         prog+=32;
         str++;
         continue;
       case OP_ANY_BUT:          // Match a character NOT in a set
-        if(str_end<=str || ISIN(prog,*str)) goto f;
+        if(str_end<=str) goto f;
+        if(ISIN(prog,*str)) goto f;
         prog+=32;
         str++;
         continue;
       case OP_UPPER:            // Match if uppercase
-        if(str_end<=str || !Ascii::isUpper(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isUpper(*str)) goto f;
         str++;
         continue;
       case OP_LOWER:            // Match if lowercase
-        if(str_end<=str || !Ascii::isLower(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isLower(*str)) goto f;
         str++;
         continue;
       case OP_SPACE:            // Match space, except newline
-        if(str_end<=str || *str=='\n' || !Ascii::isSpace(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(!Ascii::isSpace(*str)) goto f;
         str++;
         continue;
       case OP_SPACE_NL:         // Match space, including newline
-        if(str_end<=str || !Ascii::isSpace(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isSpace(*str)) goto f;
         str++;
         continue;
       case OP_NOT_SPACE:        // Match non-space
-        if(str_end<=str || Ascii::isSpace(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(Ascii::isSpace(*str)) goto f;
         str++;
         continue;
       case OP_DIGIT:            // Match a digit 0..9
-        if(str_end<=str || !Ascii::isDigit(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isDigit(*str)) goto f;
         str++;
         continue;
       case OP_NOT_DIGIT:        // Match a non-digit, except newline
-        if(str_end<=str || *str=='\n' || Ascii::isDigit(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Ascii::isDigit(*str)) goto f;
         str++;
         continue;
       case OP_NOT_DIGIT_NL:     // Match a non-digit, including newline
-        if(str_end<=str || Ascii::isDigit(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(Ascii::isDigit(*str)) goto f;
         str++;
         continue;
       case OP_HEX:              // Match a hex digit 0..9A-Fa-f
-        if(str_end<=str || !Ascii::isHexDigit(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isHexDigit(*str)) goto f;
         str++;
         continue;
       case OP_NOT_HEX:          // Match a non-hex digit, except newline
-        if(str_end<=str || *str=='\n' || Ascii::isHexDigit(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Ascii::isHexDigit(*str)) goto f;
         str++;
         continue;
       case OP_NOT_HEX_NL:       // Match a non-hex digit, including newline
-        if(str_end<=str || Ascii::isHexDigit(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(Ascii::isHexDigit(*str)) goto f;
         str++;
         continue;
       case OP_LETTER:           // Match a letter a..z, A..Z
-        if(str_end<=str || !Ascii::isLetter(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isLetter(*str)) goto f;
         str++;
         continue;
       case OP_NOT_LETTER:       // Match a non-letter, except newline
-        if(str_end<=str || *str=='\n' || Ascii::isLetter(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Ascii::isLetter(*str)) goto f;
         str++;
         continue;
       case OP_NOT_LETTER_NL:    // Match a non-letter, including newline
-        if(str_end<=str || Ascii::isLetter(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(Ascii::isLetter(*str)) goto f;
         str++;
         continue;
       case OP_PUNCT:            // Match a punctuation
-        if(str_end<=str || !isDelim(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isDelim(*str)) goto f;
         str++;
         continue;
       case OP_NOT_PUNCT:        // Match a non-punctuation, except newline
-        if(str_end<=str || *str=='\n' || isDelim(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Ascii::isDelim(*str)) goto f;
         str++;
         continue;
       case OP_NOT_PUNCT_NL:     // Match a non-punctuation, including newline
-        if(str_end<=str || isDelim(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(Ascii::isDelim(*str)) goto f;
         str++;
         continue;
       case OP_WORD:             // Match a word character a..z,A..Z,0..9,_
-        if(str_end<=str || !isWord(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(!Ascii::isWord(*str)) goto f;
         str++;
         continue;
       case OP_NOT_WORD:         // Match a non-word character, except newline
-        if(str_end<=str || *str=='\n' || isWord(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Ascii::isWord(*str)) goto f;
         str++;
         continue;
       case OP_NOT_WORD_NL:      // Match a non-word character, including newline
-        if(str_end<=str || isWord(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(Ascii::isWord(*str)) goto f;
         str++;
         continue;
       case OP_CHAR:             // Match single character
-        if(str_end<=str || *prog != (FXuchar)*str) goto f;
+        if(str_end<=str) goto f;
+        if(prog[0]!=(FXuchar)*str) goto f;
         prog++;
         str++;
         continue;
       case OP_CHAR_CI:          // Match single character, case-insensitive
-        if(str_end<=str || *prog != Ascii::toLower(*str)) goto f;
+        if(str_end<=str) goto f;
+        if(prog[0]!=Ascii::toLower(*str)) goto f;
         prog++;
         str++;
         continue;
@@ -1996,110 +2242,160 @@ FXbool FXExecute::match(const FXuchar* prog){
           }
         while(--no);
         continue;
-/*
+      case OP_UWORD_BEG:        // Unicode beginning of word
+        // FIXME
+        continue;
+      case OP_UWORD_END:        // Unicode end of word
+        // FIXME
+        continue;
+      case OP_UWORD_BND:        // Unicode word boundary
+        // FIXME
+        continue;
+      case OP_UWORD_INT:        // Unicode word interior
+        // FIXME
+        continue;
       case OP_UANY:             // Match any unicode character, except newline
-        if(str_end<=str || *str=='\n') goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
         str=wcinc(str);
         continue;
       case OP_UANY_NL:          // Matches any unicode characterm, including newline
         if(str_end<=str) goto f;
         str=wcinc(str);
         continue;
+      case OP_UANY_OF:          // Unicode any character in set
+        // FIXME
+        // List of ranges
+        continue;
+      case OP_UANY_BUT:         // Unicode any character not in set
+        // FIXME
+        // List of ranges
+        continue;
       case OP_UUPPER:           // Match if unicode uppercase
-        if(str_end<=str || !Unicode::isUpper(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isUpper(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_ULOWER:           // Match if unicode lowercase
-        if(str_end<=str || !Unicode::isLower(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isLower(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UTITLE:           // Match if unicode title case
-        if(str_end<=str || !Unicode::isTitle(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isTitle(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_USPACE:           // Match space, except newline
-        if(str_end<=str || *str=='\n' || !Unicode::isSpace(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(!Unicode::isSpace(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_USPACE_NL:        // Match space, including newline
-        if(str_end<=str || !Unicode::isSpace(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isSpace(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UNOT_SPACE:       // Match non-space
-        if(str_end<=str || Unicode::isSpace(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(Unicode::isSpace(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UDIGIT:           // Match a digit 0..9
-        if(str_end<=str || !Unicode::isDigit(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isDigit(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UNOT_DIGIT:       // Match a non-digit, except newline
-        if(str_end<=str || *str=='\n' || Unicode::isDigit(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Unicode::isDigit(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UNOT_DIGIT_NL:    // Match a non-digit, including newline
-        if(str_end<=str || Unicode::isDigit(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(Unicode::isDigit(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_ULETTER:          // Match a letter a..z, A..Z
-        if(str_end<=str || !Unicode::isLetter(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isLetter(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UNOT_LETTER:      // Match a non-letter, except newline
-        if(str_end<=str || *str=='\n' || Unicode::isLetter(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Unicode::isLetter(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UNOT_LETTER_NL:   // Match a non-letter, including newline
-        if(str_end<=str || Unicode::isLetter(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(Unicode::isLetter(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UPUNCT:           // Match a punctuation
-        if(str_end<=str || !Unicode::isPunct(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(!Unicode::isPunct(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UNOT_PUNCT:       // Match a non-punctuation, except newline
-        if(str_end<=str || *str=='\n' || Unicode::isPunct(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Unicode::isPunct(wc(str))) goto f;
         str++;
         continue;
       case OP_UNOT_PUNCT_NL:    // Match a non-punctuation, including newline
-        if(str_end<=str || Unicode::isPunct(wc(str))) goto f;
+        if(str_end<=str) goto f;
+        if(Unicode::isPunct(wc(str))) goto f;
         str=wcinc(str);
         continue;
       case OP_UCAT:             // Unicode character from category
-        if(str_end<=str || Unicode::charCategory(wc(str))!=(FXuchar)*prog) goto f;
+        if(str_end<=str) goto f;
+        ch=Unicode::charCategory(wc(str));
+        if(!(prog[0]<=ch && ch<=prog[1])) goto f;
         str=wcinc(str);
-        prog++;
+        prog+=2;
         continue;
       case OP_UNOT_CAT:         // Unicode character NOT from category, except newline
-        if(str_end<=str || *str=='\n' || Unicode::charCategory(wc(str))==(FXuchar)*prog) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        ch=Unicode::charCategory(wc(str));
+        if(prog[0]<=ch && ch<=prog[1]) goto f;
         str=wcinc(str);
-        prog++;
+        prog+=2;
         continue;
       case OP_UNOT_CAT_NL:      // Unicode character NOT from category, including newline
-        if(str_end<=str || Unicode::charCategory(wc(str))==(FXuchar)*prog) goto f;
+        if(str_end<=str) goto f;
+        ch=Unicode::charCategory(wc(str));
+        if(prog[0]<=ch && ch<=prog[1]) goto f;
         str=wcinc(str);
-        prog++;
+        prog+=2;
         continue;
       case OP_USCRIPT:          // Unicode character from script
-        if(str_end<=str || Unicode::scriptType(wc(str))!=(FXuchar)*prog) goto f;
+        if(str_end<=str) goto f;
+        if(Unicode::scriptType(wc(str))!=*prog) goto f;
         str=wcinc(str);
         prog++;
         continue;
       case OP_UNOT_SCRIPT:      // Unicode character NOT from script, except newline
-        if(str_end<=str || *str=='\n' || Unicode::scriptType(wc(str))==(FXuchar)*prog) goto f;
+        if(str_end<=str) goto f;
+        if(*str=='\n') goto f;
+        if(Unicode::scriptType(wc(str))==*prog) goto f;
         str=wcinc(str);
         prog++;
         continue;
       case OP_UNOT_SCRIPT_NL:   // Unicode character NOT from script, including newline
-        if(str_end<=str || Unicode::scriptType(wc(str))==(FXuchar)*prog) goto f;
+        if(str_end<=str) goto f;
+        if(Unicode::scriptType(wc(str))==*prog) goto f;
         str=wcinc(str);
         prog++;
         continue;
-
-
-      ////////
+/*
       case OP_UCHAR:             // Match single unicode character
-        if(str_end<=str || wc(prog) != wc(str)) goto f;
+        if(str_end<=str) goto f;
+        ch=wc(prog);
+        if(wc(str)!=ch) goto f;
         prog=wcinc(prog);
         str=wcinc(str);
         continue;
@@ -2194,10 +2490,11 @@ FXbool FXExecute::match(const FXuchar* prog){
         rep_max=ONEINDIG;
         greed=1;
 
+#if 1
         // We need to match more characters than are available
 rep:    if(str_end<str+rep_min) goto f;
         beg=str;
-        end=str+rep_max;
+        end=str+rep_max;        // FIXME not for unicode
         if(str_end<end) end=str_end;
         save=beg;
 
@@ -2261,22 +2558,22 @@ rep:    if(str_end<str+rep_min) goto f;
             while(save<end && !Ascii::isLetter(*save)){ save++; }
             break;
           case OP_PUNCT:
-            while(save<end && isDelim(*save)){ save++; }
+            while(save<end && Ascii::isDelim(*save)){ save++; }
             break;
           case OP_NOT_PUNCT:
-            while(save<end && *save!='\n' && !isDelim(*save)){ save++; }
+            while(save<end && *save!='\n' && !Ascii::isDelim(*save)){ save++; }
             break;
           case OP_NOT_PUNCT_NL:
-            while(save<end && !isDelim(*save)){ save++; }
+            while(save<end && !Ascii::isDelim(*save)){ save++; }
             break;
           case OP_WORD:
-            while(save<end && isWord(*save)){ save++; }
+            while(save<end && Ascii::isWord(*save)){ save++; }
             break;
           case OP_NOT_WORD:
-            while(save<end && *save!='\n' && !isWord(*save)){ save++; }
+            while(save<end && *save!='\n' && !Ascii::isWord(*save)){ save++; }
             break;
           case OP_NOT_WORD_NL:
-            while(save<end && !isWord(*save)){ save++; }
+            while(save<end && !Ascii::isWord(*save)){ save++; }
             break;
           case OP_CHAR:
             ch=*prog++;
@@ -2285,6 +2582,88 @@ rep:    if(str_end<str+rep_min) goto f;
           case OP_CHAR_CI:
             ch=*prog++;
             while(save<end && ch==Ascii::toLower(*save)){ save++; }
+            break;
+          case OP_UANY:
+            // FIXME
+            break;
+          case OP_UANY_NL:
+            // FIXME
+            break;
+          case OP_UANY_OF:
+            // FIXME
+            break;
+          case OP_UANY_BUT:
+            // FIXME
+            break;
+          case OP_UUPPER:
+           // while(save<end && Unicode::isUpper(wc(save))){ save=wcinc(save); }
+            // FIXME
+            break;
+          case OP_ULOWER:
+            // FIXME
+            break;
+          case OP_UTITLE:
+            // FIXME
+            break;
+          case OP_USPACE:
+            // FIXME
+            break;
+          case OP_USPACE_NL:
+            // FIXME
+            break;
+          case OP_UNOT_SPACE:
+            // FIXME
+            break;
+          case OP_UDIGIT:
+            // FIXME
+            break;
+          case OP_UNOT_DIGIT:
+            // FIXME
+            break;
+          case OP_UNOT_DIGIT_NL:
+            // FIXME
+            break;
+          case OP_ULETTER:
+            // FIXME
+            break;
+          case OP_UNOT_LETTER:
+            // FIXME
+            break;
+          case OP_UNOT_LETTER_NL:
+            // FIXME
+            break;
+          case OP_UPUNCT:
+            // FIXME
+            break;
+          case OP_UNOT_PUNCT:
+            // FIXME
+            break;
+          case OP_UNOT_PUNCT_NL:
+            // FIXME
+            break;
+          case OP_UCAT:
+            // FIXME
+            break;
+          case OP_UNOT_CAT:
+            // FIXME
+            break;
+          case OP_UNOT_CAT_NL:
+            // FIXME
+            break;
+          case OP_USCRIPT:
+            // FIXME
+            break;
+          case OP_UNOT_SCRIPT:
+            // FIXME
+            break;
+          case OP_UNOT_SCRIPT_NL:
+            // FIXME
+            break;
+          case OP_UCHAR:
+            // FIXME
+            break;
+          case OP_UCHAR_CI:
+            // FIXME
             break;
           default:
             fxerror("FXRex::match: bad opcode (%d) at: %p on line: %d\n",op,prog-1,__LINE__);
@@ -2321,6 +2700,33 @@ rep:    if(str_end<str+rep_min) goto f;
         // Possessive match
         if(match(prog)) goto t;
         goto f;
+#endif
+      case OP_AHEAD_NEG:                        // Positive or negative look ahead
+      case OP_AHEAD_POS:
+        save=str;
+        keep=match(prog+2);                     // Match the assertion
+        str=save;
+        if((op==OP_AHEAD_POS)!=keep) goto f;    // Didn't get what we expected
+        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
+        continue;
+      case OP_BEHIND_NEG:                       // Positive or negative look-behind
+      case OP_BEHIND_POS:
+        no=GETARG(prog);                        // Backward skip amount
+        prog+=2;
+        keep=false;
+        if(str_beg<=str-no){                    // Can we go back far enough?
+          save=str;
+          str-=no;
+          keep=match(prog+2);                   // Match the assertion
+          str=save;
+          }
+        if((op==OP_BEHIND_POS)!=keep) goto f;   // Didn't get what we expected
+        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
+        continue;
+      case OP_ATOMIC:
+        if(!match(prog+2)) goto f;
+        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
+        continue;
       case OP_SUB_BEG_0:        // Capturing open parentheses
       case OP_SUB_BEG_1:
       case OP_SUB_BEG_2:
@@ -2410,32 +2816,6 @@ rep:    if(str_end<str+rep_min) goto f;
           beg++;
           str++;
           }
-        continue;
-      case OP_AHEAD_NEG:                        // Positive or negative look ahead
-      case OP_AHEAD_POS:
-        save=str;
-        keep=match(prog+2);                     // Match the assertion
-        str=save;
-        if((op-OP_AHEAD_NEG)!=keep) goto f;     // Didn't get what we expected
-        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
-        continue;
-      case OP_BEHIND_NEG:                       // Positive or negative look-behind
-      case OP_BEHIND_POS:
-        no=GETARG(prog);                        // Backward skip amount
-        prog+=2;
-        keep=false;
-        if(str_beg<=str-no){                    // Can we go back far enough?
-          save=str;
-          str-=no;
-          keep=match(prog+2);                   // Match the assertion
-          str=save;
-          }
-        if((op-OP_BEHIND_NEG)!=keep) goto f;    // Didn't get what we expected
-        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
-        continue;
-      case OP_ATOMIC:
-        if(!match(prog+2)) goto f;
-        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
         continue;
       case OP_ZERO_0:                           // Initialize counter for counting repeat
       case OP_ZERO_1:
@@ -2690,15 +3070,16 @@ FXRex& FXRex::operator=(const FXRex& orig){
 // Parse pattern
 FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
   FXRex::Error err=FXRex::ErrEmpty;
-  FXCompile cs;
-  FXshort size;
 
   // Free old code, if any
-  if(code!=fallback) freeElms(code);
-  code=(FXuchar*)(void*)fallback;
+  if(code!=fallback){
+    freeElms(code);
+    code=(FXuchar*)(void*)fallback;
+    }
 
   // Check
   if(pattern){
+    FXCompile cs;
 
     // Fill in compile data
     cs.code=NULL;
@@ -2717,6 +3098,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
 
       // Compile code unless only syntax checking
       if(!(mode&FXRex::Syntax)){
+        FXshort size;
 
         // Allocate new code
         size=cs.pc-((FXuchar*)NULL);
@@ -2742,7 +3124,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
 
         // Dump for debugging
 #ifdef REXDEBUG
-        if(fxTraceLevel>50) dump(code);
+        if(fxTraceLevel>50) dump(pattern,code);
 #endif
         }
       }

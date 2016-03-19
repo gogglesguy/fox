@@ -51,8 +51,11 @@ protected:
   FXIcon        *updiricon;     // Up directory icon
   FXIcon        *homeicon;      // Go home icon
   FXIcon        *workicon;      // Go home icon
-  FXIcon        *markicon;      // Book mark icon
-  FXIcon        *clearicon;     // Book clear icon
+  FXIcon        *bookmarkicon;  // Book mark icon
+  FXIcon        *bookaddicon;   // Book add icon
+  FXIcon        *bookdelicon;   // Book delete icon
+  FXIcon        *bookclricon;   // Book clear icon
+  FXIcon        *sortingicon;   // Sorting icon
   FXIcon        *newicon;       // New directory icon
   FXIcon        *deleteicon;    // Delete file icon
   FXIcon        *moveicon;      // Rename file icon
@@ -72,6 +75,7 @@ public:
   long onCmdDirectoryUp(FXObject*,FXSelector,void*);
   long onPopupMenu(FXObject*,FXSelector,void*);
   long onCmdBookmark(FXObject*,FXSelector,void*);
+  long onCmdUnBookmark(FXObject*,FXSelector,void*);
   long onCmdVisit(FXObject*,FXSelector,void*);
   long onCmdNew(FXObject*,FXSelector,void*);
   long onUpdNew(FXObject*,FXSelector,void*);
@@ -88,6 +92,7 @@ public:
     ID_WORK,
     ID_DIRECTORY_UP,
     ID_BOOKMARK,
+    ID_UNBOOKMARK,
     ID_VISIT,
     ID_NEW,
     ID_REMOVE,

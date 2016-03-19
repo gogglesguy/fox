@@ -79,6 +79,8 @@ bignetdrive.gif \
 bignethood.gif \
 bookset.gif \
 bookclr.gif \
+bookadd.bmp \
+bookdel.bmp \
 clearentry.gif \
 cmymode.gif \
 dialmode.gif \
@@ -122,6 +124,7 @@ miniharddisk.gif \
 mininetdrive.gif \
 mininethood.gif \
 minizipdrive.gif \
+newfolder.bmp \
 portrait.gif \
 questionicon.gif \
 rgbmode.gif \
@@ -129,6 +132,7 @@ searchicon.gif \
 showbigicons.gif \
 showdetails.gif \
 showsmallicons.gif \
+sorting.bmp \
 warningicon.gif \
 winclose.gif \
 winmaximize.gif \

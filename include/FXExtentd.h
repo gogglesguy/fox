@@ -87,7 +87,7 @@ public:
   /// Longest side
   FXdouble longest() const;
 
-  /// shortest side
+  /// Shortest side
   FXdouble shortest() const;
 
   /// Length of diagonal
