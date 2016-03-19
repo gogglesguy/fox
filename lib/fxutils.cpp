@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxendian.h"
 #include "fxascii.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"

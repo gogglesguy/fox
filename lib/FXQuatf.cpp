@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXObject.h"
@@ -640,7 +641,7 @@ FXQuatf lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f){
   }
 
 
-// Derivative of spherical lerp of unit quaternions u,v 
+// Derivative of spherical lerp of unit quaternions u,v
 // This is equivalent to: u * (u.unitinvert()*v).pow(f) * (u.unitinvert()*v).log(),
 // which is itself equivalent to: lerp(u,v,f) * (u.unitinvert()*v).log()
 FXQuatf lerpdot(const FXQuatf& u,const FXQuatf& v,FXfloat f){

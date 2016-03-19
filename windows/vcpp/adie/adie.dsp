@@ -105,6 +105,10 @@ SOURCE=..\..\..\adie\adie_gif.gif
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\backward_gif.gif
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\big_gif.gif
 # End Source File
 # Begin Source File
@@ -185,6 +189,10 @@ SOURCE=..\..\..\adie\fonts_gif.gif
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\forward_gif.gif
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\help.cpp
 # End Source File
 # Begin Source File
@@ -215,8 +223,8 @@ InputPath=.\icons
 
 BuildCmds= \
 	cd ..\..\..\adie \
-	$(WkspDir)\reswrap\Release\reswrap -i icons.h -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif \
-	$(WkspDir)\reswrap\Release\reswrap -h -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif \
+	$(WkspDir)\reswrap\Release\reswrap -i icons.h -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif  backward_gif.gif forward_gif.gif \
+	$(WkspDir)\reswrap\Release\reswrap -h -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif   backward_gif.gif forward_gif.gif \
 	
 
 "icons.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -234,8 +242,8 @@ InputPath=.\icons
 
 BuildCmds= \
 	cd ..\..\..\adie \
-	$(WkspDir)\reswrap\Debug\reswrap -i icons.h -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif \
-	$(WkspDir)\reswrap\Debug\reswrap -h -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif \
+	$(WkspDir)\reswrap\Debug\reswrap -i icons.h -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif backward_gif.gif forward_gif.gif \
+	$(WkspDir)\reswrap\Debug\reswrap -h -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif capitalize.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif miscellaneous_gif.gif lowercase.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif uppercase.gif undo_gif.gif  backward_gif.gif forward_gif.gif \
 	
 
 "icons.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"

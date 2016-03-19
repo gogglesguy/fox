@@ -347,6 +347,8 @@ FXVec4d.cpp \
 FXVec4f.cpp \
 FXVerticalFrame.cpp \
 FXVisual.cpp \
+FXWEBPIcon.cpp \
+FXWEBPImage.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
 FXWorker.cpp \
@@ -384,6 +386,7 @@ fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwebpio.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \

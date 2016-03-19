@@ -297,6 +297,8 @@
 +FXVec4f.obj &
 +FXVerticalFrame.obj &
 +FXVisual.obj &
++FXWEBPIcon.obj &
++FXWEBPImage.obj &
 +FXWindow.obj &
 +FXWizard.obj &
 +FXWorker.obj &
@@ -334,6 +336,7 @@
 +fxtifio.obj &
 +fxunicode.obj &
 +fxutils.obj &
++fxwebpio.obj &
 +fxwuquantize.obj &
 +fxxbmio.obj &
 +fxxpmio.obj &

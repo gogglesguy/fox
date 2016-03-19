@@ -24,6 +24,7 @@
 #include "fxkeys.h"
 #include "fxascii.h"
 #include "fxunicode.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -2401,9 +2402,6 @@ long FXIconList::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
             }
           break;
         }
-
-      // Scroll to make item visibke
-      makeItemVisible(current);
 
       // Update anchor
       setAnchorItem(current);

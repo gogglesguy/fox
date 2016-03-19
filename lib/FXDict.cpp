@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXElement.h"
@@ -34,6 +35,8 @@
     Thus, with a good hash function, the number of calls to strcmp() should be
     roughly the same as the number of successful lookups.
   - Maybe dict[].key should be FXString? Think of the possibilities!
+  - FIXME store FXString instead of char* for key.
+  - FIXME hash() like FXString.
 */
 
 #define BSHIFT 5
@@ -45,84 +48,27 @@ using namespace FX;
 namespace FX {
 
 
+// Object implementation
+FXIMPLEMENT(FXDict,FXObject,NULL,0)
+
+
 // Hash function for string
 FXint FXDict::hash(const FXchar* str){
-  register const FXuchar *s=(const FXuchar*)str;
   register FXint h=0;
   register FXint c;
-  while((c=*s++)!='\0'){
+  while((c=*str++)!='\0'){
     h = ((h << 5) + h) ^ c;
     }
   return h&0x7fffffff;
   }
 
 
-// Object implementation
-FXIMPLEMENT(FXDict,FXObject,NULL,0)
+// Initial value for slot
+const FXDict::Entry FXDict::init={NULL,NULL,-1,false};
 
 
 // Construct empty dictionary
-FXDict::FXDict(){
-  allocElms(dict,2);
-  dict[0].key=NULL;
-  dict[0].data=NULL;
-  dict[0].hash=-1;
-  dict[0].mark=false;
-  dict[1].key=NULL;
-  dict[1].data=NULL;
-  dict[1].hash=-1;
-  dict[1].mark=false;
-  used=0;
-  free=2;
-  total=2;
-  }
-
-
-// Copy constructor
-FXDict::FXDict(const FXDict& orig):FXObject(orig){
-  allocElms(dict,orig.total);
-  for(FXint x=0; x<orig.total; ++x){
-    if(0<=orig.dict[x].hash){
-      dict[x].key=::strdup(orig.dict[x].key);
-      dict[x].data=createData(orig.dict[x].data);
-      dict[x].hash=orig.dict[x].hash;
-      dict[x].mark=orig.dict[x].mark;
-      continue;
-      }
-    dict[x].key=NULL;
-    dict[x].data=NULL;
-    dict[x].hash=-1;
-    dict[x].mark=false;
-    }
-  used=orig.used;
-  free=orig.free;
-  total=orig.total;
-  }
-
-
-// Assignment operator
-FXDict& FXDict::operator=(const FXDict& orig){
-  if(dict!=orig.dict){
-    clear();
-    resizeElms(dict,orig.total);
-    for(FXint x=0; x<orig.total; ++x){
-      if(0<=orig.dict[x].hash){
-        dict[x].key=::strdup(orig.dict[x].key);
-        dict[x].data=createData(orig.dict[x].data);
-        dict[x].hash=orig.dict[x].hash;
-        dict[x].mark=orig.dict[x].mark;
-        continue;
-        }
-      dict[x].key=NULL;
-      dict[x].data=NULL;
-      dict[x].hash=-1;
-      dict[x].mark=false;
-      }
-    used=orig.used;
-    free=orig.free;
-    total=orig.total;
-    }
-  return *this;
+FXDict::FXDict():table(init,2),used(0),free(2){
   }
 
 
@@ -136,32 +82,21 @@ void FXDict::deleteData(void*){ }
 
 // Resize table, must be power of 2
 FXbool FXDict::size(FXint m){
-  FXEntry* ndict;
-  if(allocElms(ndict,m)){
+  FXArray<Entry> elbat;
+  if(elbat.assign(init,m)){
     register FXint p,b,x,i;
-    for(i=0; i<m; ++i){
-      ndict[i].key=NULL;
-      ndict[i].data=NULL;
-      ndict[i].hash=-1;
-      ndict[i].mark=false;
-      }
-    for(i=0; i<total; ++i){
-      p=b=dict[i].hash;
-      if(0<=p){
-        while(ndict[x=p&(m-1)].hash!=-1){
+    for(i=0; i<table.no(); ++i){
+      if(table[i].key){
+        p=b=table[i].hash;
+        while(elbat[x=p&(m-1)].hash!=-1){
           p=(p<<2)+p+b+1;
           b>>=BSHIFT;
           }
-        ndict[x].key=dict[i].key;
-        ndict[x].data=dict[i].data;
-        ndict[x].hash=dict[i].hash;
-        ndict[x].mark=dict[i].mark;
+        elbat[x]=table[i];
         }
       }
-    freeElms(dict);
-    dict=ndict;
+    table.adopt(elbat);
     free=m-used;
-    total=m;
     return true;
     }
   return false;
@@ -171,57 +106,57 @@ FXbool FXDict::size(FXint m){
 // Insert a new entry, leave it alone if already existing
 void* FXDict::insert(const FXchar* ky,void* ptr,FXbool mrk){
   if(__likely(ky)){
-    if((free<<1)>total || size(total<<1)){
-      register FXint p,b,h,x;
-      p=b=h=hash(ky);
-      while(dict[x=p&(total-1)].hash!=-1){
-        if(dict[x].hash==h && strcmp(dict[x].key,ky)==0){ goto y; }
-        p=(p<<2)+p+b+1;
-        b>>=BSHIFT;
-        }
+    register FXint p,b,h,x;
+    p=b=h=hash(ky);
+    while(table[x=p&(table.no()-1)].hash!=-1){
+      if(table[x].hash==h && strcmp(table[x].key,ky)==0){ goto y; }
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
+    if(__likely((free<<1)>table.no()) || __likely(size(table.no()<<1))){
       p=b=h;
-      while(dict[x=p&(total-1)].hash!=-1){
-        if(dict[x].hash==-2) goto x;
+      while(table[x=p&(table.no()-1)].hash!=-1){
+        if(table[x].hash==-2) goto x;
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
       free--;
 x:    used++;
-      dict[x].key=strdup(ky);
-      dict[x].hash=h;
-      dict[x].mark=mrk;
-      dict[x].data=createData(ptr);
-y:    return dict[x].data;
+      table[x].key=strdup(ky);
+      table[x].hash=h;
+      table[x].mark=mrk;
+      table[x].data=createData(ptr);
+y:    return table[x].data;
       }
     }
   return NULL;
   }
 
 
-// Add or replace entry
+// Insert entry or replace existing entry
 void* FXDict::replace(const FXchar* ky,void* ptr,FXbool mrk){
   if(__likely(ky)){
-    if((free<<1)>total || size(total<<1)){
-      register FXint p,b,h,x;
-      p=b=h=hash(ky);
-      while(dict[x=p&(total-1)].hash!=-1){
-        if(dict[x].hash==h && strcmp(dict[x].key,ky)==0){ deleteData(dict[x].data); goto y; }
-        p=(p<<2)+p+b+1;
-        b>>=BSHIFT;
-        }
+    register FXint p,b,h,x;
+    p=b=h=hash(ky);
+    while(table[x=p&(table.no()-1)].hash!=-1){
+      if(table[x].hash==h && strcmp(table[x].key,ky)==0){ deleteData(table[x].data); goto y; }
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
+    if(__likely((free<<1)>table.no()) || __likely(size(table.no()<<1))){
       p=b=h;
-      while(dict[x=p&(total-1)].hash!=-1){
-        if(dict[x].hash==-2) goto x;
+      while(table[x=p&(table.no()-1)].hash!=-1){
+        if(table[x].hash==-2) goto x;
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
       free--;
 x:    used++;
-      dict[x].key=strdup(ky);
-      dict[x].hash=h;
-y:    dict[x].mark=mrk;
-      dict[x].data=createData(ptr);
-      return dict[x].data;
+      table[x].key=strdup(ky);
+      table[x].hash=h;
+y:    table[x].mark=mrk;
+      table[x].data=createData(ptr);
+      return table[x].data;
       }
     }
   return NULL;
@@ -233,19 +168,19 @@ void* FXDict::remove(const FXchar* ky){
   if(__likely(ky)){
     register FXint p,b,h,x;
     p=b=h=hash(ky);
-    while(dict[x=p&(total-1)].hash!=h || strcmp(dict[x].key,ky)!=0){
-      if(dict[x].hash==-1) return NULL;
+    while(table[x=p&(table.no()-1)].hash!=h || strcmp(table[x].key,ky)!=0){
+      if(table[x].hash==-1) return NULL;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-    ::free(dict[x].key);
-    deleteData(dict[x].data);
-    dict[x].key=NULL;
-    dict[x].data=NULL;
-    dict[x].hash=-2;
-    dict[x].mark=false;
+    ::free(table[x].key);
+    deleteData(table[x].data);
+    table[x].key=NULL;
+    table[x].data=NULL;
+    table[x].hash=-2;
+    table[x].mark=false;
     used--;
-    if(used<(total>>2)) size(total>>1);
+    if(__unlikely(used<(table.no()>>2))) size(table.no()>>1);
     }
   return NULL;
   }
@@ -256,9 +191,9 @@ void* FXDict::find(const FXchar* ky) const {
   if(__likely(ky)){
     register FXint p,b,x,h;
     p=b=h=hash(ky);
-    while(__likely(dict[x=p&(total-1)].hash!=-1)){
-      if(__likely(dict[x].hash==h && strcmp(dict[x].key,ky)==0)){
-        return dict[x].data;
+    while(__likely(table[x=p&(table.no()-1)].hash!=-1)){
+      if(__likely(table[x].hash==h && strcmp(table[x].key,ky)==0)){
+        return table[x].data;
         }
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
@@ -271,62 +206,59 @@ void* FXDict::find(const FXchar* ky) const {
 // Get first non-empty entry
 FXint FXDict::first() const {
   register FXint pos=0;
-  while(pos<total){ if(0<=dict[pos].hash) break; pos++; }
-  FXASSERT(total<=pos || 0<=dict[pos].hash);
+  while(pos<table.no()){ if(table[pos].key) break; pos++; }
+  FXASSERT(table.no()<=pos || table[pos].key);
   return pos;
   }
 
 
 // Get last non-empty entry
 FXint FXDict::last() const {
-  register FXint pos=total-1;
-  while(0<=pos){ if(0<=dict[pos].hash) break; pos--; }
-  FXASSERT(pos<0 || 0<=dict[pos].hash);
+  register FXint pos=table.no()-1;
+  while(0<=pos){ if(table[pos].key) break; pos--; }
+  FXASSERT(pos<0 || table[pos].key);
   return pos;
   }
 
 
 // Find next entry
 FXint FXDict::next(FXint pos) const {
-  FXASSERT(0<=pos && pos<total);
-  while(++pos <= total-1){ if(0<=dict[pos].hash) break; }
-  FXASSERT(total<=pos || 0<=dict[pos].hash);
+  FXASSERT(0<=pos && pos<table.no());
+  while(++pos <= table.no()-1){ if(table[pos].key) break; }
+  FXASSERT(table.no()<=pos || table[pos].key);
   return pos;
   }
 
 
 // Find previous entry
 FXint FXDict::prev(FXint pos) const {
-  FXASSERT(0<=pos && pos<total);
-  while(--pos >= 0){ if(0<=dict[pos].hash) break; }
-  FXASSERT(pos<0 || 0<=dict[pos].hash);
+  FXASSERT(0<=pos && pos<table.no());
+  while(--pos >= 0){ if(table[pos].key) break; }
+  FXASSERT(pos<0 || table[pos].key);
   return pos;
   }
 
 
 // Remove all
 void FXDict::clear(){
-  for(FXint x=0; x<total; ++x){
-    if(0<=dict[x].hash){
-      ::free(dict[x].key);
-      deleteData(dict[x].data);
+  for(FXint x=0; x<table.no(); ++x){
+    if(table[x].key){
+      ::free(table[x].key);
+      deleteData(table[x].data);
       }
-    dict[x].key=NULL;
-    dict[x].data=NULL;
-    dict[x].hash=-1;
-    dict[x].mark=false;
+    table[x].key=NULL;
+    table[x].data=NULL;
+    table[x].hash=-1;
+    table[x].mark=false;
     }
   used=0;
-  free=total;
+  free=table.no();
   }
 
 
 // Destroy table
 FXDict::~FXDict(){
   clear();
-  freeElms(dict);
-  dict=(FXEntry*)-1L;
   }
 
 }
-

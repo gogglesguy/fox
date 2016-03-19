@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxkeys.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -50,7 +51,7 @@
     a popup menu just to get a single choice value back.
   - Do not assume root window is at (0,0); multi-monitor machines may
     have secondary monitor anywhere relative to primary display.
-  - If any child is resized due to GUI update, and FXPopup is in 
+  - If any child is resized due to GUI update, and FXPopup is in
     POPUP_SHRINKWRAP mode, ID_LAYOUT causes resize() of the popup it
     self as well as layout() of its interior.  For normal shell windows
     only layout() is called.

@@ -47,11 +47,11 @@ public:
   /// True if format is supported
   static const FXbool supported;
 
-  /// Save pixels into stream in PNG format
-  virtual FXbool loadPixels(FXStream& store);
-
   /// Load pixels from stream in PNG format
   virtual FXbool savePixels(FXStream& store) const;
+
+  /// Save pixels into stream in PNG format
+  virtual FXbool loadPixels(FXStream& store);
 
   /// Destroy
   virtual ~FXPNGImage();

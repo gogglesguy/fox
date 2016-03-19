@@ -55,11 +55,11 @@ public:
   /// Get image quality setting
   FXint getQuality() const { return quality; }
 
-  /// Save pixels into stream in JPEG format
-  virtual FXbool loadPixels(FXStream& store);
-
   /// Load pixels from stream in JPEG format
   virtual FXbool savePixels(FXStream& store) const;
+
+  /// Save pixels into stream in JPEG format
+  virtual FXbool loadPixels(FXStream& store);
 
   /// Destroy
   virtual ~FXJP2Image();

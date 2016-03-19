@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [31])
+m4_define([fox_level], [32])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -207,6 +207,14 @@ AC_ARG_ENABLE(png,[  --disable-png           compile without PNG image support])
 AC_MSG_RESULT([$enable_png])
 if test "x$enable_png" != "xno"; then
 AC_CHECK_HEADERS(png.h,CXXFLAGS="${CXXFLAGS} -DHAVE_PNG_H=1"; LIBS="${LIBS} ${LIBPNG:=-lpng}")
+fi
+
+
+# Check for WEBP Image support
+AC_ARG_ENABLE(png,[  --disable-webp           compile without WEBP image support])
+AC_MSG_RESULT([$enable_webp])
+if test "x$enable_webp" != "xno"; then
+AC_CHECK_HEADERS(webp/decode.h,CXXFLAGS="${CXXFLAGS} -DHAVE_WEBP_H=1"; LIBS="${LIBS} ${LIBWEBP:=-lwebp}")
 fi
 
 

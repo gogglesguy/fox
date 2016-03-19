@@ -442,6 +442,8 @@ FXVec4d.cpp \
 FXVec4f.cpp \
 FXVerticalFrame.cpp \
 FXVisual.cpp \
+FXWEBPIcon.cpp \
+FXWEBPImage.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
 FXWorker.cpp \

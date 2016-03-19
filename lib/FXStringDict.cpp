@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXStringDict.h"
@@ -45,32 +46,6 @@ FXIMPLEMENT(FXStringDict,FXDict,NULL,0)
 
 // Construct string dict
 FXStringDict::FXStringDict(){
-  }
-
-
-// Copy constructor
-FXStringDict::FXStringDict(const FXStringDict& orig):FXDict(orig){
-  register FXint i;
-  for(i=0; i<orig.total; i++){
-    if(0<=dict[i].hash){
-      dict[i].data=createData(orig.dict[i].data);
-      }
-    }
-  }
-
-
-// Assignment operator
-FXStringDict& FXStringDict::operator=(const FXStringDict& orig){
-  register FXint i;
-  if(&orig!=this){
-    FXDict::operator=(orig);
-    for(i=0; i<orig.total; i++){
-      if(0<=orig.dict[i].hash){
-        dict[i].data=createData(orig.dict[i].data);
-        }
-      }
-    }
-  return *this;
   }
 
 

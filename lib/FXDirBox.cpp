@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxascii.h"
 #include "fxkeys.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -397,7 +398,7 @@ long FXDirBox::onTreeCommand(FXObject*,FXSelector,void* ptr){
   removeItem(((FXTreeItem*)ptr)->getFirst());
   return target && target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)string.text());
   }
-  
+
 
 // Forward changed message from list to target
 long FXDirBox::onTreeChanged(FXObject*,FXSelector,void* ptr){

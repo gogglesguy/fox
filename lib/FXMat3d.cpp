@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXObject.h"
@@ -41,12 +42,12 @@
 
 
 using namespace FX;
- 
+
 /*******************************************************************************/
 
 namespace FX {
 
- 
+
 // Initialize matrix from scalar
 FXMat3d::FXMat3d(FXdouble s){
 #if defined(FOX_HAS_SSE2)
@@ -62,7 +63,7 @@ FXMat3d::FXMat3d(FXdouble s){
 #endif
   }
 
- 
+
 // Initialize matrix from another matrix
 FXMat3d::FXMat3d(const FXMat2d& s){
 #if defined(FOX_HAS_SSE2)
@@ -735,7 +736,7 @@ FXVec2d operator*(const FXVec2d& v,const FXMat3d& m){
   return FXVec2d(v[0]*m[0][0]+v[1]*m[1][0]+m[2][0],v[0]*m[0][1]+v[1]*m[1][1]+m[2][1]);
   }
 
- 
+
 // Vector times matrix
 FXVec3d operator*(const FXVec3d& v,const FXMat3d& m){
 #if defined(FOX_HAS_SSE2)

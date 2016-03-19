@@ -50,6 +50,7 @@ main.obj
 
 ICONS = \
 adie_gif.gif \
+backward_gif.gif \
 big_gif.gif \
 bookdel_gif.gif \
 booknext_gif.gif \
@@ -57,7 +58,6 @@ bookprev_gif.gif \
 bookset_gif.gif \
 browser.gif \
 capitalize.gif \
-cleartext_gif.gif \
 close_gif.gif \
 colors_gif.gif \
 config_gif.gif \
@@ -66,6 +66,7 @@ cut_gif.gif \
 delete_gif.gif \
 delimit_gif.gif \
 fonts_gif.gif \
+forward_gif.gif \
 help_gif.gif \
 indent_gif.gif \
 info_gif.gif \

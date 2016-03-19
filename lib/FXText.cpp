@@ -24,6 +24,7 @@
 #include "fxkeys.h"
 #include "fxascii.h"
 #include "fxunicode.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -1830,7 +1831,6 @@ void FXText::setCursorPos(FXint pos,FXbool notify){
     cursorcol=indentFromPos(cursorstart,p);
     cursorpos=p;
     prefcol=-1;
-//    if(isEditable() && hasFocus()) drawCursor(FLAG_CARET);      // FIXME
     if(isEditable()) drawCursor(FLAG_CARET);
     if(target && notify){
       target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)cursorpos);
@@ -3214,14 +3214,12 @@ void FXText::updateRange(FXint beg,FXint end) const {
         rx=pos_x+vx+marginleft+lineWidth(visrows[tl],lc);
       else
         rx=vx+vw;
-      //FXTRACE((1,"updateRange(%d,%d) tl=%d bl=%d fc=%d lc=%d\n",b,e,tl,bl,fc,lc));
       }
     else{
       ty=pos_y+vy+margintop+(toprow+tl)*font->getFontHeight();
       by=pos_y+vy+margintop+(toprow+bl+1)*font->getFontHeight();
       lx=vx;
       rx=lx+vw;
-      //FXTRACE((1,"updateRange(%d,%d) tl=%d bl=%d\n",b,e,tl,bl));
       }
     update(lx,ty,rx-lx,by-ty);
     }

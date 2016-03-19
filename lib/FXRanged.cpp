@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXVec2d.h"
@@ -279,8 +280,8 @@ FXbool FXRanged::intersect(const FXVec3d& u,const FXVec3d& v) const {
     }
   return 0.0<=f && n<=1.0;
   }
-    
-    
+
+
 // Transform range by 4x4 matrix
 FXRanged FXRanged::transform(const FXMat4d& mat) const {
   FXRanged result(corner(0)*mat);

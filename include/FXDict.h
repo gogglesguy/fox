@@ -38,19 +38,23 @@ namespace FX {
 class FXAPI FXDict : public FXObject {
   FXDECLARE(FXDict)
 protected:
-  struct FXEntry {
-    FXchar *key;        // Key string
-    void   *data;       // Data
-    FXint   hash;       // Hash value of key
-    FXbool  mark;       // Entry is marked
+  struct Entry {
+    FXchar *key;                // Key string
+    void   *data;               // Data
+    FXint   hash;               // Hash value of key
+    FXbool  mark;               // Entry is marked
     };
 protected:
-  FXEntry  *dict;       // Dictionary
-  FXint     used;       // Used entries
-  FXint     free;       // Free entries
-  FXint     total;      // Total size
+  FXArray<Entry> table;         // Hash table
+  FXint          used;          // Used entries
+  FXint          free;          // Free entries
+protected:
+  static const Entry init;      // Initialization value
 protected:
   static FXint hash(const FXchar* str);
+private:
+  FXDict(const FXDict&);
+  FXDict &operator=(const FXDict&);
 protected:
 
   /**
@@ -73,12 +77,6 @@ public:
   */
   FXDict();
 
-  /// Copy constructor; does bit-copy of void pointer data.
-  FXDict(const FXDict& orig);
-
-  /// Assignment operator
-  FXDict& operator=(const FXDict& orig);
-
   /**
   * Resize the table to the given size.
   */
@@ -87,7 +85,7 @@ public:
   /**
   * Return the size of the table, including the empty slots.
   */
-  FXint size() const { return total; }
+  FXint size() const { return table.no(); }
 
   /**
   * Return the total number of entries in the table.
@@ -121,22 +119,22 @@ public:
   /**
   * Return true if slot is empty.
   */
-  FXbool empty(FXint pos) const { return dict[pos].hash<0; }
+  FXbool empty(FXint pos) const { return !table[pos].key; }
 
   /**
   * Return key at position pos.
   */
-  const FXchar* key(FXint pos) const { return dict[pos].key; }
+  const FXchar* key(FXint pos) const { return table[pos].key; }
 
   /**
   * Return data pointer at position pos.
   */
-  void* data(FXint pos) const { return dict[pos].data; }
+  void* data(FXint pos) const { return table[pos].data; }
 
   /**
   * Return mark flag of entry at position pos.
   */
-  FXbool mark(FXint pos) const { return dict[pos].mark; }
+  FXbool mark(FXint pos) const { return table[pos].mark; }
 
   /**
   * Return position of first filled slot, or >= total

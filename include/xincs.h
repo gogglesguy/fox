@@ -41,6 +41,7 @@
 #endif
 #endif
 
+
 // Basic includes
 #include <stdio.h>
 #include <stdlib.h>
@@ -334,6 +335,11 @@ typedef cpuset_t   cpu_set_t;
 #endif
 #ifndef SEEK_END
 #define SEEK_END 2
+#endif
+
+// Remove crap
+#ifdef VOID
+#undef VOID
 #endif
 
 #endif

@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -88,7 +89,10 @@
 #include "FXJP2Icon.h"
 #include "FXJP2Image.h"
 #endif
-
+#ifdef HAVE_WEBP_H
+#include "FXWEBPIcon.h"
+#include "FXWEBPImage.h"
+#endif
 
 /*
   Notes:
@@ -225,6 +229,11 @@ FXIcon *FXIconSource::loadIconStream(FXStream& store,const FXString& type) const
     icon=new FXJP2Icon(app);
     }
 #endif
+#ifdef HAVE_WEBP_H
+  else if(comparecase(FXWEBPIcon::fileExt,type)==0){
+    icon=new FXWEBPIcon(app);
+    }
+#endif
 #endif
   if(icon){
     if(icon->loadPixels(store)) return icon;
@@ -325,6 +334,11 @@ FXImage *FXIconSource::loadImageStream(FXStream& store,const FXString& type) con
 #ifdef HAVE_JP2_H
   else if(comparecase(FXJP2Image::fileExt,type)==0){
     image=new FXJP2Image(app);
+    }
+#endif
+#ifdef HAVE_WEBP_H
+  else if(comparecase(FXWEBPImage::fileExt,type)==0){
+    image=new FXWEBPImage(app);
     }
 #endif
 #endif

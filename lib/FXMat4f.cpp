@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXObject.h"
@@ -949,8 +950,8 @@ FXMat4f FXMat4f::rigidInvert() const {
   r[3][3]=1.0f;
   return r;
   }
- 
- 
+
+
 // Matrix times vector
 FXVec3f operator*(const FXMat4f& m,const FXVec3f& v){
 #if defined(FOX_HAS_SSE3)

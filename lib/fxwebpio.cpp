@@ -21,9 +21,16 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXElement.h"
 #include "FXStream.h"
+#ifdef HAVE_WEBP_H
+#include "webp/types.h"
+#include "webp/encode.h"
+#include "webp/decode.h"
+#endif
+
 
 
 /*
@@ -54,8 +61,8 @@ namespace FX {
 
 #ifndef FXLOADWEBP
 extern FXAPI FXbool fxcheckWEBP(FXStream& store);
-extern FXAPI FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality);
-extern FXAPI FXbool fxsaveWEBP(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
+extern FXAPI FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsaveWEBP(FXStream& store,const FXColor* data,FXint width,FXint height,FXfloat quality);
 #endif
 
 /*******************************************************************************/
@@ -75,22 +82,20 @@ FXbool fxcheckWEBP(FXStream& store){
 /*******************************************************************************/
 
 // Load a WebP image
-FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&){
-  FXuchar *data=NULL;
+FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+  FXuchar *buffer=NULL;
+  FXlong   start;
   FXuint   size;
-
-  // Reset output
-  height=width=0;
-  colors=NULL;
+  FXbool   swap;
 
   // Everyone remember where we parked.
-  FXlong start=store.position();
+  start=store.position();
 
   // Go directly to size chunk
   store.position(4,FXFromCurrent);
 
   // Read size in little endian
-  FXbool swap=store.swapBytes();
+  swap=store.swapBytes();
   store.setBigEndian(false);
   store >> size;
   size+=8; // add riff and size fields
@@ -100,39 +105,37 @@ FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXin
   store.position(start);
 
   // Allocate Buffer
-  if(!allocElms(data,size)) return false;
+  if(allocElms(buffer,size)){
 
-  // Read the complete data
-  store.load(data,size);
+    // Read the complete data
+    store.load(buffer,size);
 
-  // Get Info
-  if(WebPGetInfo(data,size,&width,&height) && width>0 && height>0){
+    // Get Info
+    if(WebPGetInfo(buffer,size,&width,&height) && width>0 && height>0){
 
-    // Allocate Output Buffer
-    if(!allocElms(colors,width*height)){
-      freeElms(data);
-      return false;
+      // Allocate Output Buffer
+      if(allocElms(data,width*height)){
+
+        // Try Decoding
+        if(WebPDecodeBGRAInto(buffer,size,(FXuchar*)data,width*height*4,width*4)){
+          freeElms(buffer);
+          return true;
+          }
+        freeElms(data);
+        }
       }
-
-    // Try Decoding
-    if(WebPDecodeBGRAInto(data,size,(FXuchar*)colors,(width*height*4),(width*4))){
-      freeElms(data);
-      return true;
-      }
-
-    // Failed
-    freeElms(colors);
-    width=0;
-    height=0;
+    freeElms(buffer);
     }
-  freeElms(data);
+  data=NULL;
+  height=0;
+  width=0;
   return false;
   }
 
 /*******************************************************************************/
 
 // Save a WebP image
-FXbool fxsaveWEBP(FXStream& store,const FXColor* colors,FXint width,FXint height,FXfloat quality/*=100.0f*/){
+FXbool fxsaveWEBP(FXStream& store,const FXColor* colors,FXint width,FXint height,FXfloat quality){
   FXuchar *data=NULL;
   FXuint   size=WebPEncodeBGRA((const FXuchar*)colors,width,height,width*4,quality,&data);
   if(size){
@@ -155,7 +158,7 @@ FXbool fxcheckWEBP(FXStream&){
 
 
 // Stub routine
-FXbool fxloadWEBP(FXStream&,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   static const FXuchar webp_bits[] = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -178,7 +181,7 @@ FXbool fxloadWEBP(FXStream&,FXColor*& data,FXint& width,FXint& height){
 
 
 // Stub routine
-FXbool fxsaveWEBP(FXStream&,const FXColor*,FXint,FXint){
+FXbool fxsaveWEBP(FXStream&,const FXColor*,FXint,FXint,FXfloat){
   return false;
   }
 

@@ -89,7 +89,7 @@ namespace FX {
 
 // Atomics are available
 FXbool atomicsAvailable(){
-#if defined(WIN32)
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return true;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   return true;
@@ -142,7 +142,7 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
 
 // Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
-#if defined(WIN32)
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
@@ -163,7 +163,7 @@ FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 
 // Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
-#if defined(WIN32)
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect)==(LONG)expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXbool ret;
@@ -186,7 +186,7 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 
 // Atomically set pointer variable at ptr to v, and return its old contents
 void* atomicSet(void* volatile* ptr,void* v){
-#if defined(WIN32)
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
    return InterlockedExchangePointer(ptr,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   void* ret=v;
@@ -234,7 +234,7 @@ void* atomicAdd(void* volatile* ptr,FXival v){
 
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 void* atomicCas(void* volatile* ptr,void* expect,void* v){
-#if defined(WIN32)
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return InterlockedCompareExchangePointer((void**)ptr,v,expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register void* ret=(void*)v;
@@ -260,7 +260,7 @@ void* atomicCas(void* volatile* ptr,void* expect,void* v){
 
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v){
-#if defined(WIN32)
+#if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (InterlockedCompareExchangePointer((void**)ptr,v,expect)==expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register FXbool ret;

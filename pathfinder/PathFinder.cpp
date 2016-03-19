@@ -39,6 +39,9 @@
 #ifdef HAVE_TIFF_H
 #include "FXTIFImage.h"
 #endif
+#ifdef HAVE_WEBP_H
+#include "FXWEBPImage.h"
+#endif
 #include "FXICOImage.h"
 #include "FXTGAImage.h"
 #include "FXRGBImage.h"
@@ -1902,6 +1905,11 @@ FXbool PathFinderMain::previewImage(const FXString& filename){
 #ifdef HAVE_TIFF_H
   else if(comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
     img=new FXTIFImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    }
+#endif
+#ifdef HAVE_WEBP_H
+  else if(comparecase(ext,"webp")==0){
+    img=new FXWEBPImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 #endif
 

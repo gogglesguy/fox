@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
 #include "FXStream.h"
@@ -146,7 +147,7 @@ long FXStatusLine::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
 
   // Set background text
   setText(normal);
-  
+
   // GUI update callback may set application mode text
   FXFrame::onUpdate(sender,sel,ptr);
 

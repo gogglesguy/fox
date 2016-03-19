@@ -26,18 +26,20 @@ namespace FX {
 
 /**
 * A hash table for associating pointers to pointers.
+* All values may be used as a key, except 0 and -1.
 */
 class FXAPI FXHash {
 protected:
-  struct FXEntry {
+  struct Entry {
     void* name;
     void* data;
     };
 protected:
-  FXEntry *table;       // Hash table
-  FXuint   total;       // Table size
-  FXuint   used;        // Number of used entries
-  FXuint   free;        // Number of free entries
+  FXArray<Entry> table;         // Hash table
+  FXuint         used;          // Number of used entries
+  FXuint         free;          // Number of free entries
+protected:
+  static const Entry init;      // Initialization value
 private:
   FXHash(const FXHash&);
   FXHash &operator=(const FXHash&);
@@ -57,7 +59,7 @@ public:
   /**
   * Return the total number of slots in the table.
   */
-  FXuint size() const { return total; }
+  FXuint size() const { return table.no(); }
 
   /**
   * Return number of non-empty slots in the table.

@@ -80,6 +80,7 @@ protected:
   FXint                initialheight;           // Initial height
   FXuint               searchflags;             // Incremental search flags
   FXint                searchpos;               // Incremental search position
+  FXbool               searching;               // Incremental search in effect
   FXbool               showsearchbar;           // Showing incremental search bar
   FXbool               initialsize;             // New window is initialwidth x initialheight
   FXbool               colorize;                // Syntax coloring on if possible

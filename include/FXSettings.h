@@ -49,16 +49,13 @@ protected:
   FXStringDict* insert(const FXchar* ky){ return (FXStringDict*)FXDict::insert(ky,NULL); }
   FXStringDict* replace(const FXchar* ky,FXStringDict* section){ return (FXStringDict*)FXDict::replace(ky,section,true); }
   FXStringDict* remove(const FXchar* ky){ return (FXStringDict*)FXDict::remove(ky); }
+private:
+  FXSettings(const FXSettings&);
+  FXSettings &operator=(const FXSettings&);
 public:
 
   /// Construct settings database.
   FXSettings();
-
-  /// Construct copy of existing database.
-  FXSettings(const FXSettings& orig);
-
-  /// Assignment operator
-  FXSettings &operator=(const FXSettings& orig);
 
   /// Is it modified
   FXbool isModified() const { return modified; }
@@ -71,7 +68,7 @@ public:
 
   /// Unparse settings database into given file.
   FXbool unparseFile(const FXString& filename);
-  
+
   /// Parse single string to populate settings
   FXbool parse(const FXString& string,FXbool mrk=true);
 
