@@ -17,6 +17,93 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+January 2 - FOX DEVELOPMENT 1.7.14
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<b>Happy New Year to all the FOX Users!</b>  Despite the holidays, its been a pretty busy over
+here with new FOX developments; since its the new year it was decided not to sit on this
+any longer but to release it and get some early feedback.  So without further ado, here 
+it is:
+<P>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added <a href='http://www.3dconnexion.com'>3DConnexion SpaceNavigator</a> support (currently
+under Unix only).  
+The <b>SpaceNavigator</b> device is a 6DOF motion controller; if your working with 3D software, 
+you'll probably want to get one of these things.  However, even if you're just fond of using 
+<a href='http://earth.google.com'>Google Earth</a>, you'll probably going to find this thing 
+very useful.<br>
+To get this device working on Linux, a recent <b>Xorg</b> X Server (7.3 or later) with USB HID 
+XDevice support is needed. Of course, HID support in the linux kernel also needs to be enabled.<br>
+Other than that, no special device drivers are required.  However, some minor configuration
+files need to be changed to allow X11 to recognize the device.
+Simply include the following line in the <b>"ServerLayout"</b> section of your <b>Xorg.conf</b> file 
+(typically located in the /etc/X11 directory on your system).
+<br>
+<pre>
+	InputDevice    "SpaceBall" "SpaceBall"
+</pre>
+Also, add a new <b>"InputDevice"</b> section in your <b>Xorg.conf</b> file:
+<br>
+<pre>
+Section "InputDevice"
+	Identifier  "SpaceBall"
+	Driver      "evdev"
+	Option	    "Name"   "3Dconnexion*"
+	Option	    "Pass"   "3"
+        Option      "Mode"   "Relative"
+        Option      "XRelativeAxisMap"  "0"
+        Option      "YRelativeAxisMap"  "1"
+        Option      "ZRelativeAxisMap"  "2"
+        Option      "RXRelativeAxisMap" "3"
+        Option      "RYRelativeAxisMap" "4"
+        Option      "RZRelativeAxisMap" "5"
+	Option	    "ZRelativeAxisButtons" "off"
+EndSection
+</pre>
+After these changes, you should of course restart the X Server.  There is no need for
+any additional driver modules; the new <b>evdev</b> device capability in the X Server does
+all the hard work.  <br>
+Your Space Navigator or Space Traveler (the Space Traveler is a portable version of the Space 
+Navigator.  It has a few more buttons.)  should be plugged in prior to starting your FOX 
+application.
+</li>
+<li>Added new message types SEL_SPACEBALLMOTION, SEL_SPACEBALLBUTTONPRESS, and
+SEL_SPACEBALLBUTTONRELEASE for <a href='http://www.3dconnexion.com'>3DConnexion SpaceNavigator</a>
+devices.</li>
+<li>Revamped OpenGL support with GLX 1.3 or higher (frame buffer config supprt).  There are new 
+options for FXGLVisual, and some older options have been renamed, to force updating of existing 
+software.<br>
+The new implementation allows multi-sampling frame buffer configurations, as well as 
+explicit control of rendering surface types (Window, Image, or Buffer).</li>
+<li>Updated FXGLCanvas.  FXGLCanvas now has the capability of using externally
+created FXGLContext or to use a private FXGLContext.  Thus, FXGLContexts may 
+be shared between instances of FXGLCanvas.  <br>
+There are a few news APIs to control
+the context being used, and a new option GLCANVAS_OWN_CONTEXT to specify if the
+FXGLCanvas should manage the FXGLContext or not.</li>
+<li>FXGLContext has been rewritten to use the updated FXGLVisual.  The FXGLContext object's lifetime
+can be managed independently from the FXGLCanvas windows.  This allows for better control of the
+OpenGL resources (textures, display lists, shaders, etc).  FXGLCanvas windows may be created and 
+destroyed without losing OpenGL objects.</li>
+<li>Fixed bug in fxprintf.cpp with "%n" format.</li>
+<li>Fixed core dump in fxtifio.cpp which was due to crappy TIFF library not handling
+errorhandling function-pointers nicely.  We now get no messages, but at least some types of 
+off-spec TIFF images no longer seem to cause core dumps.</li>
+<li>Fixed GCC type-punning warnings in FXThread.cpp.</li>
+<li>Fixed some warnings in FXApp.cpp.</li>
+<li>Simplified some code in FXDCWindow.cpp, and FXVisual.</li>
+<li>Added flag to force visual ID in FXVisual; this allows you to create a 2D drawable
+with a compatible visual to a 3D drawable.</li>
+<li>Added default handler for SEL_SPACEBALLMOTION, SEL_SPACEBALLBUTTONPRESS, and
+SEL_SPACEBALLBUTTONRELEASE in FXWindow.</li>
+<li>Added Space ball support for rotation, panning, and zooming in FXGLViewer.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 November 16 - FOX DEVELOPMENT 1.7.13
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

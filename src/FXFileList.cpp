@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.261 2007/07/09 16:26:51 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.262 2007/12/31 20:31:53 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1416,8 +1416,6 @@ void FXFileList::listItems(FXbool force){
   FXFileItem **pn=&newlist;     // Head of new list
   FXFileItem *curitem=NULL;
   FXFileItem *item,*link,**pp;
-  FXIconSource *source;
-  FXIcon *icon;
   FXString pathname;
   FXString extension;
   FXString name;
@@ -1587,14 +1585,6 @@ fnd:  *pn=item;
           if(item->assoc->miniicon) item->setMiniIcon(item->assoc->miniicon);
           }
 
-/*
-        // Attempt to load thumbnail
-        if(associations && (options&FILELIST_SHOWIMAGES)){
-          source=associations->getIconDict()->getIconSource();
-          icon=source->loadScaledIconFile(pathname,imagesize);
-          if(icon) item->setBigIcon(icon,true);
-          }
-*/
         // Update item information
         item->label.format("%s\t%s\t%lld\t%s\t%s\t%s\t%s\t%s",name.text(),extension.text(),item->size,mod.text(),usrid.text(),grpid.text(),atts.text(),linkname.text());
 

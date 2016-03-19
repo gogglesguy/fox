@@ -18,26 +18,25 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.h,v 1.36 2007/07/09 16:02:44 fox Exp $                       *
+* $Id: FXGLContext.h,v 1.42 2007/12/27 18:54:53 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGLCONTEXT_H
 #define FXGLCONTEXT_H
 
-//////////////////////////////  UNDER DEVELOPMENT  //////////////////////////////
+#ifndef FXID_H
+#include "FXId.h"
+#endif
 
 namespace FX {
 
-class FXApp;
-class FXDrawable;
 
 /// OpenGL context
 class FXAPI FXGLContext : public FXId {
+  FXDECLARE(FXGLContext)
 private:
-  FXDrawable  *drawable;        // To render on, if any
+  FXDrawable  *surface;         // Drawable surface
+  FXGLVisual  *visual;          // Visual for this window
   FXGLContext *shared;          // Shared with other
-  FXGLConfig   desired;         // Desired configuration
-  FXGLConfig   actual;          // Actual onfiguration
-  void*        format;          // Configuration format
 private:
   FXGLContext(const FXGLContext&);
   FXGLContext &operator=(const FXGLContext&);
@@ -46,34 +45,10 @@ protected:
 public:
 
   /**
-  * Construct an OpenGL context with default configuration properties;
-  * it shares a display list with another context shr.
+  * Construct an GL Context with given GL Visual.  Optionally
+  * share a display list with another GL Context shr.
   */
-  FXGLContext(FXApp *a,FXGLContext* shr=NULL);
-
-  /**
-  * Construct an OpenGL context with given configuration properties cfg;
-  * it shares a display list with another context shr.
-  */
-  FXGLContext(FXApp *a,const FXGLConfig& cfg,FXGLContext* shr=NULL);
-
-  /// Change configuration
-  void setConfig(const FXGLConfig& cfg){ desired=cfg; }
-
-  /// Get configuration
-  const FXGLConfig& getConfig() const { return desired; }
-
-  /// Get actual configuration
-  const FXGLConfig& getActualConfig() const { return actual; }
-
-  /// Get matched configuration format
-  void* getFormat() const { return format; }
-
-  /// Change share context prior to calling create()
-  void setShared(FXGLContext *ctx){ shared=ctx; }
-
-  /// Get share context
-  FXGLContext* getShared() const { return shared; }
+  FXGLContext(FXApp *a,FXGLVisual *vis,FXGLContext* shr=NULL);
 
   /// Create context
   virtual void create();
@@ -84,27 +59,53 @@ public:
   /// Destroy context
   virtual void destroy();
 
-  /// Has double buffering
-  FXbool doubleBuffer() const { return actual.doubleBuffer(); }
+  /// Change visual
+  void setVisual(FXGLVisual* vis);
 
-  /// Has stereo buffering
-  FXbool stereoBuffer() const { return actual.stereoBuffer(); }
+  /// Get the visual
+  FXGLVisual* getVisual() const { return visual; }
 
-  /// Is direct rendering context
-  FXbool direct() const { return actual.direct(); }
+  /// Change share context
+  void setShared(FXGLContext *ctx);
 
-  /// Make OpenGL context current prior to performing OpenGL commands
+  /// Get share context
+  FXGLContext* getShared() const { return shared; }
+
+  /// Return active drawable
+  FXDrawable *drawable() const { return surface; }
+
+  /// Make context current on drawable
   FXbool begin(FXDrawable *draw);
 
-  /// Make OpenGL context non current
+  /// Make context non current
   FXbool end();
 
   /// Swap front and back buffer
   void swapBuffers();
 
+  /// Return true if this window's context is current
+  FXbool isCurrent() const;
+
+  /// Has double buffering
+  FXbool isDoubleBuffer() const;
+
+  /// Has stereo buffering
+  FXbool isStereo() const;
+
+  /// Save object to stream
+  virtual void save(FXStream& store) const;
+
+  /// Load object from stream
+  virtual void load(FXStream& store);
+
   /// Destructor
   virtual ~FXGLContext();
   };
+
+
+
+/// Create a display list of bitmaps from font glyphs in a font
+extern FXAPI FXbool glUseFXFont(FXFont* font,int first,int count,int list);
 
 }
 

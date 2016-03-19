@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.h,v 1.73 2007/11/01 04:55:10 fox Exp $                          *
+* $Id: FXThread.h,v 1.76 2007/11/28 07:20:47 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
@@ -154,7 +154,7 @@ public:
 */
 class FXAPI FXReadWriteLock {
 private:
-  volatile FXuval data[24];
+  volatile FXuval data[32];
 private:
   FXReadWriteLock(const FXReadWriteLock&);
   FXReadWriteLock &operator=(const FXReadWriteLock&);

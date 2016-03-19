@@ -820,6 +820,14 @@ SOURCE=..\..\..\include\FXDirSelector.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\FXDirWatch.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXDirWatch.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXDLL.cpp
 # End Source File
 # Begin Source File
@@ -901,6 +909,10 @@ SOURCE=..\..\..\src\FXException.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXException.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\fxexprdbg.h
 # End Source File
 # Begin Source File
 
@@ -1073,14 +1085,6 @@ SOURCE=..\..\..\src\FXGLCone.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXGLCone.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\FXGLConfig.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\include\FXGLConfig.h
 # End Source File
 # Begin Source File
 
@@ -1393,6 +1397,14 @@ SOURCE=..\..\..\src\FXListBox.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXListBox.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXLocale.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXLocale.h
 # End Source File
 # Begin Source File
 
@@ -1796,6 +1808,14 @@ SOURCE=..\..\..\include\FXRangef.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\FXRangeSlider.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXRangeSlider.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXRASIcon.cpp
 # End Source File
 # Begin Source File
@@ -1877,6 +1897,10 @@ SOURCE=..\..\..\src\FXRex.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXRex.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\fxrexdbg.h
 # End Source File
 # Begin Source File
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxprintf.cpp,v 1.58 2007/07/09 16:27:22 fox Exp $                        *
+* $Id: fxprintf.cpp,v 1.59 2008/01/02 15:16:29 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -258,7 +258,7 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
 
   // Figure mode
   mode=(prec<decimal) || (decimal<-3);
-  
+
   // Eliminate trailing zeroes; not done for alternate mode
   if(!(flags&FLG_ALTER)){
     while(0<prec && p[prec-1]=='0') prec--;
@@ -799,7 +799,7 @@ flg:  if(ch==' '){ flags|=FLG_BLANK; ch=*format++; goto flg; }
           else{                                         // Whatever size a pointer is
             *va_arg(args,FXival*)=(FXival)count;
             }
-          break;
+          continue;                                     // No printout 
         case 'p':
           flags&=~FLG_ZERO;
           value=(FXulong)va_arg(args,FXuval);

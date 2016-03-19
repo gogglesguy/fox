@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIcon.cpp,v 1.79 2007/11/02 04:12:57 fox Exp $                          *
+* $Id: FXIcon.cpp,v 1.80 2007/12/13 21:44:49 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -53,9 +53,6 @@
 */
 
 #define DARKCOLOR(r,g,b) (((r)+(g)+(b))<thresh)
-
-
-#define DISPLAY(app) ((Display*)((app)->display))
 
 using namespace FX;
 
@@ -106,6 +103,7 @@ void FXIcon::create(){
 
       // Initialize visual
       visual->create();
+      
 #ifdef WIN32
       // Create a memory DC compatible with current display
       HDC hdc=::GetDC(GetDesktopWindow());
@@ -121,19 +119,17 @@ void FXIcon::create(){
       etch=::CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
       if(!etch){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 #else
-      // Get depth (should use visual!!)
-      int dd=visual->getDepth();
 
       // Make image pixmap
-      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),dd);
+      xid=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),FXMAX(width,1),FXMAX(height,1),visual->depth);
       if(!xid){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 
       // Make shape pixmap
-      shape=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),1);
+      shape=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),FXMAX(width,1),FXMAX(height,1),1);
       if(!shape){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 
       // Make etch pixmap
-      etch=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),1);
+      etch=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),FXMAX(width,1),FXMAX(height,1),1);
       if(!etch){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 #endif
 
@@ -169,9 +165,9 @@ void FXIcon::destroy(){
       ::DeleteObject(etch);
       ::DeleteObject(xid);
 #else
-      XFreePixmap(DISPLAY(getApp()),shape);
-      XFreePixmap(DISPLAY(getApp()),etch);
-      XFreePixmap(DISPLAY(getApp()),xid);
+      XFreePixmap((Display*)getApp()->getDisplay(),shape);
+      XFreePixmap((Display*)getApp()->getDisplay(),etch);
+      XFreePixmap((Display*)getApp()->getDisplay(),xid);
 #endif
       }
     shape=0;
@@ -316,7 +312,6 @@ void FXIcon::render(){
 // Render icon X Windows
 void FXIcon::render(){
   if(xid){
-    register Visual *vis;
     register XImage *xim=NULL;
     register FXbool shmi=false;
     register FXColor *img;
@@ -335,9 +330,6 @@ void FXIcon::render(){
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
 
-      // Get Visual
-      vis=(Visual*)visual->visual;
-
       // Turn it on iff both supported and desired
 #ifdef HAVE_XSHM_H
       if(options&IMAGE_SHMI) shmi=getApp()->shmi;
@@ -346,7 +338,7 @@ void FXIcon::render(){
       // First try XShm
 #ifdef HAVE_XSHM_H
       if(shmi){
-        xim=XShmCreateImage(DISPLAY(getApp()),vis,1,ZPixmap,NULL,&shminfo,width,height);
+        xim=XShmCreateImage((Display*)getApp()->getDisplay(),(Visual*)visual->visual,1,ZPixmap,NULL,&shminfo,width,height);
         if(!xim){ shmi=0; }
         if(shmi){
           shminfo.shmid=shmget(IPC_PRIVATE,xim->bytes_per_line*xim->height,IPC_CREAT|0777);
@@ -354,7 +346,7 @@ void FXIcon::render(){
           if(shmi){
             shminfo.shmaddr=xim->data=(char*)shmat(shminfo.shmid,0,0);
             shminfo.readOnly=false;
-            XShmAttach(DISPLAY(getApp()),&shminfo);
+            XShmAttach((Display*)getApp()->getDisplay(),&shminfo);
             FXTRACE((150,"Bitmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
             }
           }
@@ -365,7 +357,7 @@ void FXIcon::render(){
       if(!shmi){
 
         // Try create image
-        xim=XCreateImage(DISPLAY(getApp()),vis,1,ZPixmap,0,NULL,width,height,32,0);
+        xim=XCreateImage((Display*)getApp()->getDisplay(),(Visual*)visual->visual,1,ZPixmap,0,NULL,width,height,32,0);
         if(!xim){ fxerror("%s::render: unable to render icon.\n",getClassName()); }
 
         // Try create temp pixel store
@@ -375,7 +367,7 @@ void FXIcon::render(){
       // Make GC
       values.foreground=0xffffffff;
       values.background=0xffffffff;
-      gc=XCreateGC(DISPLAY(getApp()),shape,GCForeground|GCBackground,&values);
+      gc=XCreateGC((Display*)getApp()->getDisplay(),shape,GCForeground|GCBackground,&values);
 
       // Should have succeeded
       FXASSERT(xim);
@@ -421,12 +413,12 @@ void FXIcon::render(){
       // Transfer image
 #ifdef HAVE_XSHM_H
       if(shmi){
-        XShmPutImage(DISPLAY(getApp()),shape,gc,xim,0,0,0,0,width,height,False);
-        XSync(DISPLAY(getApp()),False);
+        XShmPutImage((Display*)getApp()->getDisplay(),shape,gc,xim,0,0,0,0,width,height,False);
+        XSync((Display*)getApp()->getDisplay(),False);
         }
 #endif
       if(!shmi){
-        XPutImage(DISPLAY(getApp()),shape,gc,xim,0,0,0,0,width,height);
+        XPutImage((Display*)getApp()->getDisplay(),shape,gc,xim,0,0,0,0,width,height);
         }
 
       // Fill etch image
@@ -461,19 +453,19 @@ void FXIcon::render(){
       // Transfer image
 #ifdef HAVE_XSHM_H
       if(shmi){
-        XShmPutImage(DISPLAY(getApp()),etch,gc,xim,0,0,0,0,width,height,False);
-        XSync(DISPLAY(getApp()),False);
+        XShmPutImage((Display*)getApp()->getDisplay(),etch,gc,xim,0,0,0,0,width,height,False);
+        XSync((Display*)getApp()->getDisplay(),False);
         }
 #endif
       if(!shmi){
-        XPutImage(DISPLAY(getApp()),etch,gc,xim,0,0,0,0,width,height);
+        XPutImage((Display*)getApp()->getDisplay(),etch,gc,xim,0,0,0,0,width,height);
         }
 
       // Clean up
 #ifdef HAVE_XSHM_H
       if(shmi){
         FXTRACE((150,"Bitmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
-        XShmDetach(DISPLAY(getApp()),&shminfo);
+        XShmDetach((Display*)getApp()->getDisplay(),&shminfo);
         xim->data=NULL;
         XDestroyImage(xim);
         shmdt(shminfo.shmaddr);
@@ -484,7 +476,7 @@ void FXIcon::render(){
         freeElms(xim->data);
         XDestroyImage(xim);
         }
-      XFreeGC(DISPLAY(getApp()),gc);
+      XFreeGC((Display*)getApp()->getDisplay(),gc);
       }
     }
   }
@@ -525,20 +517,20 @@ void FXIcon::resize(FXint w,FXint h){
       int dd=visual->getDepth();
 
       // Free old pixmaps
-      XFreePixmap(DISPLAY(getApp()),xid);
-      XFreePixmap(DISPLAY(getApp()),etch);
-      XFreePixmap(DISPLAY(getApp()),shape);
+      XFreePixmap((Display*)getApp()->getDisplay(),xid);
+      XFreePixmap((Display*)getApp()->getDisplay(),etch);
+      XFreePixmap((Display*)getApp()->getDisplay(),shape);
 
       // Make new pixmap
-      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,dd);
+      xid=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),w,h,dd);
       if(!xid){ fxerror("%s::resize: unable to resize image.\n",getClassName()); }
 
       // Make shape pixmap
-      shape=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,1);
+      shape=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),w,h,1);
       if(!shape){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 
       // Make etch pixmap
-      etch=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,1);
+      etch=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),w,h,1);
       if(!etch){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 #endif
       }

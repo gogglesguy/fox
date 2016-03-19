@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.h,v 1.52 2007/07/09 16:02:42 fox Exp $                        *
+* $Id: FXDCWindow.h,v 1.54 2007/12/21 18:02:49 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDCWINDOW_H
 #define FXDCWINDOW_H
@@ -36,7 +36,6 @@ class FXImage;
 class FXBitmap;
 class FXIcon;
 class FXFont;
-class FXVisual;
 
 
 /**
@@ -52,14 +51,10 @@ class FXAPI FXDCWindow : public FXDC {
   friend class FXFont;
 protected:
   FXDrawable *surface;        // Drawable surface
-  FXVisual   *visual;         // Visual of drawable
   FXRectangle rect;           // Paint rectangle inside drawable
   FXPixel     devfg;          // Device foreground pixel value
   FXPixel     devbg;          // Device background pixel value
-#ifndef WIN32
-  FXuint      flags;          // GC Flags
-  void       *xftDraw;        // Hook used only for XFT support
-#else
+#ifdef WIN32
   FXID        oldpalette;
   FXID        oldbrush;
   FXID        oldpen;
@@ -67,6 +62,9 @@ protected:
   FXbool      needsNewPen;
   FXbool      needsPath;
   FXbool      needsClipReset;
+#else
+  void       *xftDraw;
+  FXuint      flags;
 #endif
 private:
 #ifdef WIN32
@@ -81,14 +79,17 @@ public:
 
   /// Construct for painting in response to expose;
   /// This sets the clip rectangle to the exposed rectangle
-  FXDCWindow(FXDrawable* drawable,FXEvent* event);
+  FXDCWindow(FXDrawable* draw,FXEvent* event);
 
   /// Construct for normal drawing;
   /// This sets clip rectangle to the whole drawable
-  FXDCWindow(FXDrawable* drawable);
+  FXDCWindow(FXDrawable* draw);
+  
+  /// Return active drawable
+  FXDrawable *drawable() const { return surface; }
 
   /// Begin locks in a drawable surface
-  void begin(FXDrawable *drawable);
+  void begin(FXDrawable *draw);
 
   /// End unlock the drawable surface
   void end();

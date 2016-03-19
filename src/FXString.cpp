@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.261 2007/08/21 15:16:53 fox Exp $                       *
+* $Id: FXString.cpp,v 1.262 2007/11/25 15:34:32 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -2407,11 +2407,12 @@ FXString FXString::value(const FXchar* fmt,...){
 
 
 // Return string from vprintf-like format arguments
-FXString FXString::value(const FXchar* fmt,va_list args){
+FXString FXString::vvalue(const FXchar* fmt,va_list args){
   FXString result;
   result.vformat(fmt,args);
   return result;
   }
+
 
 /*******************************************************************************/
 

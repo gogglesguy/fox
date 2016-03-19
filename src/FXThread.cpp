@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.119 2007/11/01 04:55:10 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.126 2008/01/02 17:54:44 fox Exp $                       *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -35,6 +35,7 @@
 #undef Status
 #endif
 #include <CoreServices/CoreServices.h>
+#include <libkern/OSAtomic.h>
 #include <pthread.h>
 #else
 #include <pthread.h>
@@ -162,41 +163,43 @@ FXMutex::~FXMutex(){
 
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){
-  FXASSERT(0);
+  data[0]=0;
   }
 
 
 // Lock the spinlock
 void FXSpinLock::lock(){
-  FXASSERT(0);
+  while(InterlockedExchange((LONG*)data,1L)){
+    while(data[0]){ }
+    }
   }
 
 
 // Try lock the spinlock
 FXbool FXSpinLock::trylock(){
-  FXASSERT(0);
-  return false;
+  return !InterlockedExchange((LONG*)data,1L);
   }
 
 
 // Unlock spinlock
 void FXSpinLock::unlock(){
-  FXASSERT(0);
+  InterlockedExchange((LONG*)data,0L);
   }
 
 
 // Test if locked
 FXbool FXSpinLock::locked(){
-  FXASSERT(0);
+  if(!InterlockedExchange((LONG*)data,1L)){
+    InterlockedExchange((LONG*)data,0L);
+    return false;
+    }
   return true;
   }
 
 
 // Delete spinlock
 FXSpinLock::~FXSpinLock(){
-  FXASSERT(0);
   }
-
 
 /*******************************************************************************/
 
@@ -754,42 +757,43 @@ FXMutex::~FXMutex(){
   pthread_mutex_destroy((pthread_mutex_t*)data);
   }
 
-
 /*******************************************************************************/
+
+#ifdef __APPLE__
 
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.org!!
-  //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
-  FXASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
-  pthread_spin_init((pthread_spinlock_t*)data,PTHREAD_PROCESS_PRIVATE);
+  //FXTRACE((150,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
+  FXASSERT(sizeof(data)>=sizeof(OSSpinLock));
+  data[0]=data[1]=data[2]=data[3]=0;
   }
 
 
 // Lock the spinlock
 void FXSpinLock::lock(){
-  pthread_spin_lock((pthread_spinlock_t*)data);
+  OSSpinLockLock((OSSpinLock*)data);
   }
 
 
 // Try lock the spinlock
 FXbool FXSpinLock::trylock(){
-  return pthread_spin_trylock((pthread_spinlock_t*)data)==0;
+  return OSSpinLockTry((OSSpinLock*)data);
   }
 
 
 // Unlock spinlock
 void FXSpinLock::unlock(){
-  pthread_spin_unlock((pthread_spinlock_t*)data);
+  OSSpinLockUnlock((OSSpinLock*)data);
   }
 
 
 // Test if locked
 FXbool FXSpinLock::locked(){
-  if(pthread_spin_trylock((pthread_spinlock_t*)data)==0){
-    pthread_spin_unlock((pthread_spinlock_t*)data);
+  if(OSSpinLockTry((OSSpinLock*)data)){
+    OSSpinLockUnlock((OSSpinLock*)data);
     return false;
     }
   return true;
@@ -798,8 +802,55 @@ FXbool FXSpinLock::locked(){
 
 // Delete spinlock
 FXSpinLock::~FXSpinLock(){
-  pthread_spin_destroy((pthread_spinlock_t*)data);
   }
+
+#else
+
+// Initialize spinlock
+FXSpinLock::FXSpinLock(){
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_spinlock_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.org!!
+  //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
+  pthread_spin_init((pthread_spinlock_t*)(void*)data,PTHREAD_PROCESS_PRIVATE);
+  }
+
+
+// Lock the spinlock
+void FXSpinLock::lock(){
+  pthread_spin_lock((pthread_spinlock_t*)(void*)data);
+  }
+
+
+// Try lock the spinlock
+FXbool FXSpinLock::trylock(){
+  return pthread_spin_trylock((pthread_spinlock_t*)(void*)data)==0;
+  }
+
+
+// Unlock spinlock
+void FXSpinLock::unlock(){
+  pthread_spin_unlock((pthread_spinlock_t*)(void*)data);
+  }
+
+
+// Test if locked
+FXbool FXSpinLock::locked(){
+  if(pthread_spin_trylock((pthread_spinlock_t*)(void*)data)==0){
+    pthread_spin_unlock((pthread_spinlock_t*)(void*)data);
+    return false;
+    }
+  return true;
+  }
+
+
+// Delete spinlock
+FXSpinLock::~FXSpinLock(){
+  pthread_spin_destroy((pthread_spinlock_t*)(void*)data);
+  }
+
+#endif
 
 /*******************************************************************************/
 
@@ -867,9 +918,7 @@ FXReadWriteLock::~FXReadWriteLock(){
 
 /*******************************************************************************/
 
-
 #ifdef __APPLE__
-
 
 // Initialize semaphore
 FXSemaphore::FXSemaphore(FXint initial){

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: glviewer.cpp,v 1.102 2007/08/21 15:16:54 fox Exp $                        *
+* $Id: glviewer.cpp,v 1.112 2007/12/28 18:46:52 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include "fx3d.h"
@@ -513,7 +513,8 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   // Thus, while the first visual may take some time to initialize, each subsequent
   // window can be created very quickly; we need to determine grpaphics hardware
   // characteristics only once.
-  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLEBUFFER);
+  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLE_BUFFER|VISUAL_WINDOW);
+  //glvisual->setMultiSamples(4);
 
   // Make it active
   mdiclient->setActiveChild(mdichild);

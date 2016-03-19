@@ -131,7 +131,6 @@ FXGIFIcon.h \
 FXGIFImage.h \
 FXGLCanvas.h \
 FXGLCone.h \
-FXGLConfig.h \
 FXGLContext.h \
 FXGLCube.h \
 FXGLCylinder.h \

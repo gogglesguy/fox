@@ -222,10 +222,10 @@ class GLTestWindow : public FXMainWindow {
 
 private:
 
-  FXGLCanvas      *glcanvas;                  // GL Canvas to draw into
-  int              spinning;                  // Is box spinning
-  double           angle;                     // Rotation angle of box
-  FXGLVisual      *glvisual;                  // OpenGL visual
+  FXGLCanvas      *glcanvas;    // GL Canvas to draw into
+  int              spinning;    // Is box spinning
+  double           angle;       // Rotation angle of box
+  FXGLVisual      *glvisual;    // OpenGL visual
 
 protected:
   GLTestWindow(){}
@@ -323,7 +323,7 @@ GLTestWindow::GLTestWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   glpanel=new FXVerticalFrame(glcanvasFrame,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0, 0,0,0,0);
 
   // A Visual to drag OpenGL
-  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLEBUFFER);
+  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLE_BUFFER|VISUAL_WINDOW);
 
   // Drawing glcanvas
   glcanvas=new FXGLCanvas(glpanel,glvisual,this,ID_CANVAS,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT);
@@ -338,6 +338,7 @@ GLTestWindow::GLTestWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   new FXHorizontalSeparator(buttonFrame,SEPARATOR_RIDGE|LAYOUT_FILL_X);
 
   new FXButton(buttonFrame,"&OpenGL Info\tDisplay OpenGL Capabilities",NULL,this,ID_OPENGL,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,10,10,5,5);
+
   // Button to print
   new FXButton(buttonFrame,"Spin &Timer\tSpin using interval timers\nNote the app blocks until the interal has elapsed...",NULL,this,ID_SPIN,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,10,10,5,5);
   new FXButton(buttonFrame,"Spin &Chore\tSpin as fast as possible using chores\nNote even though the app is very responsive, it never blocks;\nthere is always something to do...",NULL,this,ID_SPINFAST,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,10,10,5,5);
@@ -636,12 +637,17 @@ int main(int argc,char *argv[]){
   application.init(argc,argv);
 
 /*
-  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DoubleBuffer|FXGLConfig::DrawWindow);
+//  FXGLConfig config(32,32,32,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
+//  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DoubleBuffer|FXGLConfig::DrawWindow);
 //  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
   FXGLContext context(&application,config);
   context.create();
+  FXVisual visual(&application,VISUAL_FORCE,context.getVisual());
+  visual.create();
+  FXTRACE((1,"OK\n"));
   exit(0);
 */
+
   // Make window
   new GLTestWindow(&application);
 

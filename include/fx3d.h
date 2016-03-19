@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fx3d.h,v 1.26 2007/07/09 16:02:51 fox Exp $                              *
+* $Id: fx3d.h,v 1.27 2007/12/28 14:42:14 fox Exp $                              *
 ********************************************************************************/
 #ifndef FX3D_H
 #define FX3D_H
@@ -65,7 +65,6 @@
 #include "FXComplexf.h"
 #include "FXComplexd.h"
 #include "FXGLVisual.h"
-#include "FXGLConfig.h"
 #include "FXGLContext.h"
 #include "FXGLCanvas.h"
 #include "FXGLViewer.h"

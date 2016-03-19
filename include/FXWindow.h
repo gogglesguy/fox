@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.h,v 1.165 2007/10/10 16:28:45 fox Exp $                         *
+* $Id: FXWindow.h,v 1.167 2007/11/30 19:30:11 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXWINDOW_H
 #define FXWINDOW_H
@@ -195,6 +195,9 @@ public:
   long onMiddleBtnRelease(FXObject*,FXSelector,void*);
   long onRightBtnPress(FXObject*,FXSelector,void*);
   long onRightBtnRelease(FXObject*,FXSelector,void*);
+  long onSpaceBallMotion(FXObject*,FXSelector,void*);
+  long onSpaceBallButtonPress(FXObject*,FXSelector,void*);
+  long onSpaceBallButtonRelease(FXObject*,FXSelector,void*);
   long onBeginDrag(FXObject*,FXSelector,void*);
   long onEndDrag(FXObject*,FXSelector,void*);
   long onDragged(FXObject*,FXSelector,void*);

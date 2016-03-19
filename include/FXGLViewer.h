@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.h,v 1.80 2007/07/09 16:02:44 fox Exp $                        *
+* $Id: FXGLViewer.h,v 1.85 2007/12/31 15:34:30 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVIEWER_H
 #define FXGLVIEWER_H
@@ -37,9 +37,9 @@ class FXGLVisual;
 
 // GL Viewer options
 enum {
-  VIEWER_LIGHTING = 0x00008000,    /// Lighting is on
-  VIEWER_FOG      = 0x00010000,    /// Fog mode on
-  VIEWER_DITHER   = 0x00020000     /// Dithering
+  GLVIEWER_LIGHTING = 0x00010000,    /// Lighting is on
+  GLVIEWER_FOG      = 0x00020000,    /// Fog mode on
+  GLVIEWER_DITHER   = 0x00040000     /// Dithering
   };
 
 
@@ -193,6 +193,7 @@ public:
   long onMiddleBtnRelease(FXObject*,FXSelector,void*);
   long onRightBtnPress(FXObject*,FXSelector,void*);
   long onRightBtnRelease(FXObject*,FXSelector,void*);
+  long onSpaceBallMotion(FXObject*,FXSelector,void*);
   long onUngrabbed(FXObject*,FXSelector,void*);
   long onKeyPress(FXObject*,FXSelector,void*);
   long onKeyRelease(FXObject*,FXSelector,void*);
@@ -333,8 +334,11 @@ public:
   /// Construct GL viewer widget
   FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Construct GL viewer widget sharing display list with another GL viewer
-  FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* sharegroup,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+  /// Construct GL viewer widget sharing display lists with another GL viewer
+  FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* share,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+
+  /// Construct GL viewer widget sharing context
+  FXGLViewer(FXComposite* p,FXGLContext* ctx,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create all of the server-side resources for this window
   virtual void create();

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.375 2007/10/10 16:28:45 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.379 2007/11/30 19:33:24 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -146,6 +146,9 @@ FXDEFMAP(FXWindow) FXWindowMap[]={
   FXMAPFUNC(SEL_MIDDLEBUTTONRELEASE,0,FXWindow::onMiddleBtnRelease),
   FXMAPFUNC(SEL_RIGHTBUTTONPRESS,0,FXWindow::onRightBtnPress),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,FXWindow::onRightBtnRelease),
+  FXMAPFUNC(SEL_SPACEBALLMOTION,0,FXWindow::onSpaceBallMotion),
+  FXMAPFUNC(SEL_SPACEBALLBUTTONPRESS,0,FXWindow::onSpaceBallButtonPress),
+  FXMAPFUNC(SEL_SPACEBALLBUTTONRELEASE,0,FXWindow::onSpaceBallButtonRelease),
   FXMAPFUNC(SEL_UNGRABBED,0,FXWindow::onUngrabbed),
   FXMAPFUNC(SEL_KEYPRESS,0,FXWindow::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXWindow::onKeyRelease),
@@ -759,6 +762,24 @@ long FXWindow::onKeyRelease(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Space ball motion
+long FXWindow::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
+  return isEnabled() && target && target->tryHandle(this,FXSEL(SEL_SPACEBALLMOTION,message),ptr);
+  }
+  
+  
+// Space ball button press
+long FXWindow::onSpaceBallButtonPress(FXObject*,FXSelector,void* ptr){
+  return isEnabled() && target && target->tryHandle(this,FXSEL(SEL_SPACEBALLBUTTONPRESS,message),ptr);
+  }
+  
+
+// Space ball button release
+long FXWindow::onSpaceBallButtonRelease(FXObject*,FXSelector,void* ptr){
+  return isEnabled() && target && target->tryHandle(this,FXSEL(SEL_SPACEBALLBUTTONRELEASE,message),ptr);
+  }
+
+
 // Start a drag operation
 long FXWindow::onBeginDrag(FXObject*,FXSelector,void* ptr){
   return target && target->tryHandle(this,FXSEL(SEL_BEGINDRAG,message),ptr);
@@ -1180,7 +1201,6 @@ void FXWindow::remColormapWindows(){
 
 /*******************************************************************************/
 
-
 // Create X window
 void FXWindow::create(){
   if(!xid){
@@ -1350,6 +1370,17 @@ void FXWindow::create(){
       if(visual->colormap!=DefaultColormap((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()))){
         addColormapWindows();
         }
+        
+      // Enable extra events when input extension supported
+#ifdef HAVE_XINPUT_H
+      if(getApp()->xsbDevice){
+        XEventClass xevents[3];
+        xevents[0]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbBallMotion;
+        xevents[1]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonPress;
+        xevents[2]=(((XDevice*)getApp()->xsbDevice)->device_id<<8)|getApp()->xsbButtonRelease;
+        XSelectExtensionEvent((Display*)getApp()->getDisplay(),xid,xevents,3);
+        }
+#endif
 
       // Show if it was supposed to be
       if((flags&FLAG_SHOWN) && 0<width && 0<height) XMapWindow((Display*)getApp()->getDisplay(),xid);

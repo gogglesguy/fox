@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxtifio.cpp,v 1.42 2007/07/09 16:27:23 fox Exp $                         *
+* $Id: fxtifio.cpp,v 1.43 2008/01/02 19:11:47 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,22 +75,6 @@ struct tiff_store_handle {
   FXlong    begin;
   FXlong    end;
   };
-
-
-// Report an error
-static void fxerrorhandler(const char* module,const char* format,va_list args){
-  FXchar message[1024];
-  __vsnprintf(message,sizeof(message),format,args);
-  FXTRACE((100,"error: in %s: %s\n",module,message));
-  }
-
-
-// Report a warning
-static void fxwarninghandler(const char* module,const char* format,va_list args){
-  FXchar message[1024];
-  __vsnprintf(message,sizeof(message),format,args);
-  FXTRACE((100,"warning: in %s: %s\n",module,message));
-  }
 
 
 // Read bytes from stream
@@ -186,8 +170,8 @@ FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXush
   height=0;
 
   // Set error/warning handlers
-  TIFFSetErrorHandler(fxerrorhandler);
-  TIFFSetWarningHandler(fxwarninghandler);
+  TIFFSetErrorHandler(NULL);
+  TIFFSetWarningHandler(NULL);
 
   // Initialize
   s_handle.store=&store;
@@ -265,8 +249,8 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
   FXTRACE((100,"fxsaveTIF: codec=%d\n",codec));
 
   // Set error/warning handlers
-  TIFFSetErrorHandler(fxerrorhandler);
-  TIFFSetWarningHandler(fxwarninghandler);
+  TIFFSetErrorHandler(NULL);
+  TIFFSetWarningHandler(NULL);
 
   // Initialize
   s_handle.store=&store;

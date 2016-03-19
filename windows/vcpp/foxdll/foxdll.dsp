@@ -1085,14 +1085,6 @@ SOURCE=..\..\..\include\FXGLCone.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\FXGLConfig.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\include\FXGLConfig.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\FXGLContext.cpp
 # End Source File
 # Begin Source File
@@ -1810,6 +1802,14 @@ SOURCE=..\..\..\src\FXRangef.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXRangef.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXRangeSlider.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXRangeSlider.h
 # End Source File
 # Begin Source File
 

@@ -255,7 +255,6 @@ FXGIFIcon.cpp \
 FXGIFImage.cpp \
 FXGLCanvas.cpp \
 FXGLCone.cpp \
-FXGLConfig.cpp \
 FXGLContext.cpp \
 FXGLCube.cpp \
 FXGLCylinder.cpp \
