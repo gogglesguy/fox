@@ -90,6 +90,7 @@ public:
   long onLeave(FXObject*,FXSelector,void*);
   long onMotion(FXObject*,FXSelector,void*);
   long onMap(FXObject*,FXSelector,void*);
+  long onLayout(FXObject*,FXSelector,void*);
   long onButtonPress(FXObject*,FXSelector,void*);
   long onButtonRelease(FXObject*,FXSelector,void*);
   long onUngrabbed(FXObject*,FXSelector,void*);

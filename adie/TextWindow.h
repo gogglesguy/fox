@@ -39,6 +39,7 @@ class TextWindow : public FXMainWindow {
 protected:
   FXToolBarShell      *dragshell1;              // Shell for floating menubar
   FXToolBarShell      *dragshell2;              // Shell for floating toolbar
+  FXToolBarShell      *dragshell3;              // Shell for floating search bar
   FXDockSite          *topdock;                 // Topmost dock area
   FXDockSite          *bottomdock;              // Bottom dock area
   FXDockSite          *leftdock;                // Left dock area
@@ -51,7 +52,6 @@ protected:
   FXMenuPane          *viewmenu;                // View menu
   FXMenuPane          *windowmenu;              // Window menu
   FXMenuPane          *helpmenu;                // Help menu
-  FXMenuPane          *popupmenu;               // Popup menu
   FXMenuPane          *syntaxmenu;              // Syntax menu
   FXMenuPane          *tabsmenu;                // Tab selection menu
   FXVerticalFrame     *treebox;                 // Tree box containing directories/files
@@ -62,6 +62,8 @@ protected:
   FXTextField         *clock;                   // Time
   FXMenuBar           *menubar;                 // Menu bar
   FXToolBar           *toolbar;                 // Tool bar
+  FXToolBar           *searchbar;               // Incremental search bar
+  FXTextField         *searchtext;              // Incremental search text field
   FXStatusBar         *statusbar;               // Status bar
   FXFont              *font;                    // Text window font
   FXint                bookmark[10];            // Book marks
@@ -74,13 +76,16 @@ protected:
   FXString             delimiters;              // Text delimiters
   FXString             searchpaths;             // Search paths for files
   FXHiliteArray        styles;                  // Highlight styles
-  FXint                currentstyle;            // Style being changed
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
+  FXuint               searchflags;             // Incremental search flags
+  FXint                searchpos;               // Incremental search position
+  FXbool               showsearchbar;           // Showing incremental search bar
   FXbool               initialsize;             // New window is initialwidth x initialheight
   FXbool               colorize;                // Syntax coloring on if possible
   FXbool               stripcr;                 // Strip carriage returns
   FXbool               stripsp;                 // Strip trailing spaces
+  FXbool               appendcr;                // Append carriage returns
   FXbool               appendnl;                // Append missing newline at end of text
   FXbool               saveviews;               // Save views of files
   FXbool               savemarks;               // Save bookmarks of files
@@ -88,6 +93,10 @@ protected:
   FXbool               lastfilesize;            // Keep window size for each file
   FXbool               lastfileposition;        // Keep window position for each file
 protected:
+  void createMenubar();
+  void createToolbar();
+  void createSearchbar();
+  void createStatusbar();
   void readRegistry();
   void writeRegistry();
   FXString unique() const;
@@ -129,6 +138,7 @@ public:
   long onCmdSaveAs(FXObject*,FXSelector,void*);
   long onCmdFont(FXObject*,FXSelector,void*);
   long onCmdPrint(FXObject*,FXSelector,void*);
+  long onCmdFindInFiles(FXObject*,FXSelector,void*);
   long onCmdSaveSettings(FXObject*,FXSelector,void*);
 
   // Text display
@@ -184,12 +194,13 @@ public:
   long onUpdWrap(FXObject*,FXSelector,void*);
 
   // Text changes
+  long onTextFocus(FXObject*,FXSelector,void*);
   long onTextInserted(FXObject*,FXSelector,void*);
   long onTextReplaced(FXObject*,FXSelector,void*);
   long onTextDeleted(FXObject*,FXSelector,void*);
+  long onTextDNDDrop(FXObject*,FXSelector,void*);
+  long onTextDNDMotion(FXObject*,FXSelector,void*);
   long onTextRightMouse(FXObject*,FXSelector,void*);
-  long onEditDNDMotion(FXObject*,FXSelector,void*);
-  long onEditDNDDrop(FXObject*,FXSelector,void*);
 
   // Miscellaneous
   long onCmdStripReturns(FXObject*,FXSelector,void*);
@@ -198,6 +209,8 @@ public:
   long onUpdStripSpaces(FXObject*,FXSelector,void*);
   long onCmdAppendNewline(FXObject*,FXSelector,void*);
   long onUpdAppendNewline(FXObject*,FXSelector,void*);
+  long onCmdAppendCarriageReturn(FXObject*,FXSelector,void*);
+  long onUpdAppendCarriageReturn(FXObject*,FXSelector,void*);
   long onCmdFilter(FXObject*,FXSelector,void*);
   long onUpdOverstrike(FXObject*,FXSelector,void*);
   long onUpdReadOnly(FXObject*,FXSelector,void*);
@@ -219,6 +232,8 @@ public:
   long onUpdPrevMark(FXObject*,FXSelector,void*);
   long onCmdSetMark(FXObject*,FXSelector,void*);
   long onUpdSetMark(FXObject*,FXSelector,void*);
+  long onCmdGotoMark(FXObject*,FXSelector,void*);
+  long onUpdGotoMark(FXObject*,FXSelector,void*);
   long onCmdClearMarks(FXObject*,FXSelector,void*);
   long onCmdSaveMarks(FXObject*,FXSelector,void*);
   long onUpdSaveMarks(FXObject*,FXSelector,void*);
@@ -236,17 +251,46 @@ public:
   long onUpdWindow(FXObject*,FXSelector,void*);
   long onCmdSyntaxSwitch(FXObject*,FXSelector,void*);
   long onUpdSyntaxSwitch(FXObject*,FXSelector,void*);
-  long onCmdStyleFlags(FXObject*,FXSelector,void*);
-  long onUpdStyleFlags(FXObject*,FXSelector,void*);
-  long onCmdStyleColor(FXObject*,FXSelector,void*);
-  long onUpdStyleColor(FXObject*,FXSelector,void*);
-  long onCmdStyleIndex(FXObject*,FXSelector,void*);
-  long onUpdStyleIndex(FXObject*,FXSelector,void*);
   long onCmdUseInitialSize(FXObject*,FXSelector,void*);
   long onUpdUseInitialSize(FXObject*,FXSelector,void*);
   long onCmdSetInitialSize(FXObject*,FXSelector,void*);
   long onCmdToggleBrowser(FXObject*,FXSelector,void*);
   long onUpdToggleBrowser(FXObject*,FXSelector,void*);
+  long onCmdSearchPaths(FXObject*,FXSelector,void*);
+  long onUpdSearchPaths(FXObject*,FXSelector,void*);
+
+  // Incremental search
+  long onChgISearchText(FXObject*,FXSelector,void*);
+  long onCmdISearchText(FXObject*,FXSelector,void*);
+  long onKeyISearchText(FXObject*,FXSelector,void*);
+  long onCmdISearchPrev(FXObject*,FXSelector,void*);
+  long onCmdISearchNext(FXObject*,FXSelector,void*);
+  long onCmdISearchStart(FXObject*,FXSelector,void*);
+  long onCmdISearchFinish(FXObject*,FXSelector,void*);
+  long onUpdISearchModifiers(FXObject*,FXSelector,void*);
+  long onCmdISearchModifiers(FXObject*,FXSelector,void*);
+
+  // Style changes
+  long onCmdStyleNormalFG(FXObject*,FXSelector,void*);
+  long onUpdStyleNormalFG(FXObject*,FXSelector,void*);
+  long onCmdStyleNormalBG(FXObject*,FXSelector,void*);
+  long onUpdStyleNormalBG(FXObject*,FXSelector,void*);
+  long onCmdStyleSelectFG(FXObject*,FXSelector,void*);
+  long onUpdStyleSelectFG(FXObject*,FXSelector,void*);
+  long onCmdStyleSelectBG(FXObject*,FXSelector,void*);
+  long onUpdStyleSelectBG(FXObject*,FXSelector,void*);
+  long onCmdStyleHiliteFG(FXObject*,FXSelector,void*);
+  long onUpdStyleHiliteFG(FXObject*,FXSelector,void*);
+  long onCmdStyleHiliteBG(FXObject*,FXSelector,void*);
+  long onUpdStyleHiliteBG(FXObject*,FXSelector,void*);
+  long onCmdStyleActiveBG(FXObject*,FXSelector,void*);
+  long onUpdStyleActiveBG(FXObject*,FXSelector,void*);
+  long onCmdStyleUnderline(FXObject*,FXSelector,void*);
+  long onUpdStyleUnderline(FXObject*,FXSelector,void*);
+  long onCmdStyleStrikeout(FXObject*,FXSelector,void*);
+  long onUpdStyleStrikeout(FXObject*,FXSelector,void*);
+  long onCmdStyleBold(FXObject*,FXSelector,void*);
+  long onUpdStyleBold(FXObject*,FXSelector,void*);
 public:
   enum{
     ID_ABOUT=FXMainWindow::ID_LAST,
@@ -261,6 +305,7 @@ public:
     ID_SAVEAS,
     ID_FONT,
     ID_HELP,
+    ID_FINDFILES,
     ID_WINDOW,
     ID_PRINT,
     ID_TEXT_BACK,
@@ -286,6 +331,7 @@ public:
     ID_STRIP_CR,
     ID_STRIP_SP,
     ID_APPEND_NL,
+    ID_APPEND_CR,
     ID_OVERSTRIKE,
     ID_READONLY,
     ID_TABMODE,
@@ -305,6 +351,16 @@ public:
     ID_NEXT_MARK,
     ID_PREV_MARK,
     ID_CLEAR_MARKS,
+    ID_MARK_0,
+    ID_MARK_1,
+    ID_MARK_2,
+    ID_MARK_3,
+    ID_MARK_4,
+    ID_MARK_5,
+    ID_MARK_6,
+    ID_MARK_7,
+    ID_MARK_8,
+    ID_MARK_9,
     ID_SAVEMARKS,
     ID_SAVEVIEWS,
     ID_SHOWACTIVE,
@@ -324,20 +380,38 @@ public:
     ID_WINDOW_10,
     ID_SYNTAX_FIRST,
     ID_SYNTAX_LAST=ID_SYNTAX_FIRST+100,
-    ID_STYLE_INDEX,
-    ID_STYLE_NORMAL_FG,
-    ID_STYLE_NORMAL_BG,
-    ID_STYLE_SELECT_FG,
-    ID_STYLE_SELECT_BG,
-    ID_STYLE_HILITE_FG,
-    ID_STYLE_HILITE_BG,
-    ID_STYLE_ACTIVE_BG,
-    ID_STYLE_UNDERLINE,
-    ID_STYLE_STRIKEOUT,
-    ID_STYLE_BOLD,
+    ID_STYLE_NORMAL_FG_FIRST,
+    ID_STYLE_NORMAL_FG_LAST=ID_STYLE_NORMAL_FG_FIRST+100,
+    ID_STYLE_NORMAL_BG_FIRST,
+    ID_STYLE_NORMAL_BG_LAST=ID_STYLE_NORMAL_BG_FIRST+100,
+    ID_STYLE_SELECT_FG_FIRST,
+    ID_STYLE_SELECT_FG_LAST=ID_STYLE_SELECT_FG_FIRST+100,
+    ID_STYLE_SELECT_BG_FIRST,
+    ID_STYLE_SELECT_BG_LAST=ID_STYLE_SELECT_BG_FIRST+100,
+    ID_STYLE_HILITE_FG_FIRST,
+    ID_STYLE_HILITE_FG_LAST=ID_STYLE_HILITE_FG_FIRST+100,
+    ID_STYLE_HILITE_BG_FIRST,
+    ID_STYLE_HILITE_BG_LAST=ID_STYLE_HILITE_BG_FIRST+100,
+    ID_STYLE_ACTIVE_BG_FIRST,
+    ID_STYLE_ACTIVE_BG_LAST=ID_STYLE_ACTIVE_BG_FIRST+100,
+    ID_STYLE_UNDERLINE_FIRST,
+    ID_STYLE_UNDERLINE_LAST=ID_STYLE_UNDERLINE_FIRST+100,
+    ID_STYLE_STRIKEOUT_FIRST,
+    ID_STYLE_STRIKEOUT_LAST=ID_STYLE_STRIKEOUT_FIRST+100,
+    ID_STYLE_BOLD_FIRST,
+    ID_STYLE_BOLD_LAST=ID_STYLE_BOLD_FIRST+100,
     ID_USE_INITIAL_SIZE,
     ID_SET_INITIAL_SIZE,
     ID_TOGGLE_BROWSER,
+    ID_SEARCHPATHS,
+    ID_ISEARCH_TEXT,
+    ID_ISEARCH_REVERSE,
+    ID_ISEARCH_IGNCASE,
+    ID_ISEARCH_REGEX,
+    ID_ISEARCH_PREV,
+    ID_ISEARCH_NEXT,
+    ID_ISEARCH_START,
+    ID_ISEARCH_FINISH,
     ID_TABSELECT_1,
     ID_TABSELECT_2,
     ID_TABSELECT_3,
@@ -364,6 +438,12 @@ public:
 
   // Return Adie application
   Adie* getApp() const { return (Adie*)FXMainWindow::getApp(); }
+
+  // Set current file of directory browser
+  void setBrowserCurrentFile(const FXString& file);
+
+  // Get current file of directory browser
+  FXString getBrowserCurrentFile() const;
 
   // Return this window's filename
   const FXString& getFilename() const { return filename; }
@@ -425,14 +505,17 @@ public:
   // Return current file pattern
   FXint getCurrentPattern() const;
 
-  // Add bookmark at current cursor position
+  // Goto position
+  void gotoPosition(FXint pos);
+
+  // Add bookmark at given position pos
   void setBookmark(FXint pos);
+
+  // Remove bookmark at given position pos
+  void clearBookmark(FXint pos);
 
   // Update bookmarks upon a text mutation
   void updateBookmarks(FXint pos,FXint nd,FXint ni);
-
-  // Goto bookmark
-  void gotoBookmark(FXint b);
 
   // Clear bookmarks
   void clearBookmarks();
@@ -448,6 +531,15 @@ public:
   void readView(const FXString& file);
   void writeView(const FXString& file);
 
+  // Start incremental search
+  void startISearch();
+
+  // Finish incremental search
+  void finishISearch();
+
+  // Search next incremental text
+  FXbool performISearch(const FXString& text,FXbool advance=false,FXbool notify=false);
+
   // Set syntax
   void setSyntax(Syntax* syn);
 
@@ -457,15 +549,6 @@ public:
   // Determine syntax
   void determineSyntax();
 
-  // Change style colors
-  void setStyleColors(FXint index,const FXHiliteStyle& style);
-
-  // Get style colors
-  const FXHiliteStyle& getStyleColors(FXint index) const { return styles[index]; }
-
-  // Redraw when style changed
-  void redraw();
-
   // Delete text window
   virtual ~TextWindow();
   };
@@ -474,4 +557,3 @@ public:
 typedef FXObjectListOf<TextWindow> TextWindowList;
 
 #endif
-

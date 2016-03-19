@@ -409,11 +409,14 @@ FXString FXURL::host(const FXString& string){
 
 
 // Parse port number from string containing url
-FXint FXURL::port(const FXString& string){
-  register FXint result=0;
+FXint FXURL::port(const FXString& string,FXint def){
+  register FXint result=def;
   URL url(string);
-  while(url.port[0]<url.port[1]){
-    result=result*10+Ascii::digitValue(string[url.port[0]++]);
+  if(url.port[0]<url.port[1]){
+    result=Ascii::digitValue(string[url.port[0]++]);
+    while(url.port[0]<url.port[1]){
+      result=result*10+Ascii::digitValue(string[url.port[0]++]);
+      }
     }
   return result;
   }

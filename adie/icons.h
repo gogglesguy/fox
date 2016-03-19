@@ -1,7 +1,10 @@
-/*********** Generated on 2011/10/18 00:16:50 by reswrap version 5.1.1 *********/
+/*********** Generated on 2011/12/12 20:03:50 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file adie_gif.gif */
 extern const unsigned char adie_gif[];
+
+/* Created by reswrap from file backward_gif.gif */
+extern const unsigned char backward_gif[];
 
 /* Created by reswrap from file big_gif.gif */
 extern const unsigned char big_gif[];
@@ -47,6 +50,9 @@ extern const unsigned char delimit_gif[];
 
 /* Created by reswrap from file fonts_gif.gif */
 extern const unsigned char fonts_gif[];
+
+/* Created by reswrap from file forward_gif.gif */
+extern const unsigned char forward_gif[];
 
 /* Created by reswrap from file help_gif.gif */
 extern const unsigned char help_gif[];

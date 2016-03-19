@@ -1038,16 +1038,18 @@ fnd:  *pn=item; pn=&item->link;
 void FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
-    FXString path=FXPath::absolute(getItemPathname(currentitem),pathname);
+    FXTreeItem* item;
+    FXbool expand=false;
+    FXString path=FXPath::absolute(pathname);
     while(!FXPath::isTopDirectory(path) && !FXStat::exists(path)){
       path=FXPath::upLevel(path);
+      expand=true;
       }
-    FXTreeItem *item=getPathnameItem(path);
-    makeItemVisible(item);
-    setAnchorItem(item);
-    setCurrentItem(item,notify);
-    if(item){
-      selectItem(item);
+    if((item=getPathnameItem(path))!=NULL){
+      if(expand) expandTree(item,notify);
+      setAnchorItem(item);
+      setCurrentItem(item,notify);
+      makeItemVisible(item);
       }
     }
   }
@@ -1084,14 +1086,17 @@ FXString FXDirList::getSelectedFiles() const {
 void FXDirList::setDirectory(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
-    FXString path=FXPath::absolute(getItemPathname(currentitem),pathname);
+    FXTreeItem* item;
+    FXString path=FXPath::absolute(pathname);
     while(!FXPath::isTopDirectory(path) && !FXStat::isDirectory(path)){
       path=FXPath::upLevel(path);
       }
-    FXTreeItem *item=getPathnameItem(path);
-    if(id()) layout();
-    makeItemVisible(item);
-    setCurrentItem(item,notify);
+    if((item=getPathnameItem(path))!=NULL){
+      expandTree(item,notify);
+      setAnchorItem(item);
+      setCurrentItem(item,notify);
+      makeItemVisible(item);
+      }
     }
   }
 

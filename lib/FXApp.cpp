@@ -821,6 +821,23 @@ FXWindow *FXApp::getFocusWindow() const {
   }
 
 
+#if 0
+FXWindow* FXApp::getForegroundWindow() const {
+  FXWindow *win=NULL;
+#ifdef WIN32
+  unsigned long n,i; Atom type; unsigned char *prop; int format;
+  if(Success==XGetWindowProperty((Display*)display,XDefaultRootWindow((Display*)display),wmNetActiveWindow,0,1,false,XA_WINDOW,&type,&format,&n,&i,&prop)){
+    if(type==XA_WINDOW && format==32){ win=findWindowWithId(*((Window*)prop)); }
+    XFree(prop);
+    }
+#else
+  FXWindow *win=findWindowWithId((FXID)GetForegroundWindow());
+#endif
+  return win;
+  }
+#endif
+  
+
 // Find window from id
 FXWindow* FXApp::findWindowWithId(FXID xid) const {
   return (FXWindow*)hash.find((void*)xid);
@@ -837,7 +854,8 @@ FXWindow* FXApp::findWindowAt(FXint rx,FXint ry,FXID window) const {
     while(1){
       point.x=rx; point.y=ry;
       ScreenToClient((HWND)window,&point);
-      child=ChildWindowFromPoint((HWND)window,point);
+//      child=ChildWindowFromPoint((HWND)window,point);
+      child=ChildWindowFromPointEx((HWND)window,point,CWP_SKIPINVISIBLE|CWP_SKIPTRANSPARENT);   // Suggested by "PelleBert"
       if(!child || child==window) break;
       window=child;
       }
@@ -1601,6 +1619,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
     wmNetBelowOthers=XInternAtom((Display*)display,"_NET_WM_STATE_BELOW",0);
     wmNetAboveOthers=XInternAtom((Display*)display,"_NET_WM_STATE_ABOVE",0);
     wmNetNeedAttention=XInternAtom((Display*)display,"_NET_WM_STATE_DEMANDS_ATTENTION",0);
+    //wmNetActiveWindow=XInternAtom((Display*)display,"_NET_ACTIVE_WINDOW",0);
 
     wmNetMoveResize=XInternAtom((Display*)display,"_NET_WM_MOVERESIZE",0);
     wmNetRestack=XInternAtom((Display*)display,"_NET_RESTACK_WINDOW",0);
@@ -4216,14 +4235,14 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 #ifndef WIN32
 
     // Start synchronized mode
-    if(strcmp(argv[j],"-sync")==0){
+    if(compare(argv[j],"-sync")==0){
       synchronize=true;
       j++;
       continue;
       }
 
     // Do not use X shared memory extension, even if available
-    if(strcmp(argv[j],"-noshm")==0){
+    if(compare(argv[j],"-noshm")==0){
       shmi=false;
       shmp=false;
       j++;
@@ -4231,7 +4250,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       }
 
     // Force use X shared memory extension, if available
-    if(strcmp(argv[j],"-shm")==0){
+    if(compare(argv[j],"-shm")==0){
       shmi=true;
       shmp=true;
       j++;
@@ -4239,7 +4258,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       }
 
     // Alternative display
-    if(strcmp(argv[j],"-display")==0){
+    if(compare(argv[j],"-display")==0){
       if(++j>=argc){
         fxwarning("%s:init: missing argument for -display.\n",getClassName());
         ::exit(1);
@@ -4249,7 +4268,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       }
 
     // Set input method
-    if(strcmp(argv[j],"-im")==0){
+    if(compare(argv[j],"-im")==0){
       if(++j>=argc){
         fxwarning("%s:init: missing argument for -im.\n",getClassName());
         ::exit(1);
@@ -4259,7 +4278,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       }
 
     // Input style
-    if(strcmp(argv[j],"-is")==0){
+    if(compare(argv[j],"-is")==0){
       if(++j>=argc){
         fxwarning("%s:init: missing argument for -is.\n",getClassName());
         ::exit(1);
@@ -4271,7 +4290,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 #endif
 
     // Set trace level
-    if(strcmp(argv[j],"-tracelevel")==0){
+    if(compare(argv[j],"-tracelevel")==0){
       if(++j>=argc){
         fxwarning("%s:init: missing argument for -tracelevel.\n",getClassName());
         ::exit(1);
@@ -4281,7 +4300,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       }
 
     // Set per-user configuration directory
-    if(strcmp(argv[j],"-config")==0){
+    if(compare(argv[j],"-config")==0){
       if(++j>=argc){
         fxwarning("%s:init: missing argument for -config.\n",getClassName());
         ::exit(1);
@@ -4291,7 +4310,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
       }
 
     // Set maximum number of colors
-    if(strcmp(argv[j],"-maxcolors")==0){
+    if(compare(argv[j],"-maxcolors")==0){
       if(++j>=argc){
         fxwarning("%s:init: missing argument for -maxcolors.\n",getClassName());
         ::exit(1);
@@ -5314,7 +5333,11 @@ Alt key seems to repeat.
       //  }
       //DragFinish(hDropInfo);
       break;
-
+#if 0
+    case WM_DDE_INITIATE:
+    case WM_DDE_EXECUTE:
+    case WM_DDE_ACK: 
+#endif    
     case WM_DND_ENTER:
       FXTRACE((100,"DNDEnter from remote window %d\n",lParam));
       xdndSource=(FXID)lParam;

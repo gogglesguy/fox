@@ -1659,30 +1659,6 @@ FXString& FXString::substitute(const FXString& org,const FXString& rep,FXbool al
   }
 
 
-#if 0
-
-// Convert to lower case
-FXString& FXString::lower(){
-  register FXint p=0;
-  while(p<length()){
-    p+=wc2utf(&string[p],Unicode::toLower(wc(p)));           // Only if utf8 length of each character does not change (fix unicode tables for this!)
-    }
-  return *this;
-  }
-
-
-// Convert to upper case
-FXString& FXString::upper(){
-  register FXint p=0;
-  while(p<length()){
-    p+=wc2utf(&string[p],Unicode::toUpper(wc(p)));           // Only if utf8 length of each character does not change (fix unicode tables for this!)
-    }
-  return *this;
-  }
-
-#endif
-
-
 // Convert to lower case
 FXString& FXString::lower(){
   register FXint p,ow,nw;
@@ -2459,12 +2435,10 @@ FXStream& operator>>(FXStream& store,FXString& s){
 
 // Compare string and string
 FXint compare(const FXchar* s1,const FXchar* s2){
-  register const FXuchar *p1=(const FXuchar *)s1;
-  register const FXuchar *p2=(const FXuchar *)s2;
   register FXint c1,c2;
   do{
-    c1=*p1++;
-    c2=*p2++;
+    c1=(FXuchar) *s1++;
+    c2=(FXuchar) *s2++;
     }
   while(c1 && (c1==c2));
   return c1-c2;
@@ -2491,15 +2465,14 @@ FXint compare(const FXString& s1,const FXString& s2){
 
 // Compare string and string, up to n
 FXint compare(const FXchar* s1,const FXchar* s2,FXint n){
-  register const FXuchar *p1=(const FXuchar *)s1;
-  register const FXuchar *p2=(const FXuchar *)s2;
-  register FXint c1,c2;
   if(0<n){
+    register const FXchar* e1=s1+n;
+    register FXint c1,c2;
     do{
-      c1=*p1++;
-      c2=*p2++;
+      c1=(FXuchar) *s1++;
+      c2=(FXuchar) *s2++;
       }
-    while(--n && c1 && (c1==c2));
+    while(c1 && (c1==c2) && (s1<e1));
     return c1-c2;
     }
   return 0;
@@ -2528,16 +2501,13 @@ FXint compare(const FXString& s1,const FXString& s2,FXint n){
 FXint comparecase(const FXchar* s1,const FXchar* s2){
   register FXint c1,c2;
   do{
-    if((*s1 & 0x80) && (*s2 & 0x80)){
-      c1=Unicode::toLower(wc(s1)); s1+=wclen(s1);
-      c2=Unicode::toLower(wc(s2)); s2+=wclen(s2);
-      }
-    else{
-      c1=Ascii::toLower(*s1); s1+=1;
-      c2=Ascii::toLower(*s2); s2+=1;
-      }
+    c1=Unicode::toLower(wc(s1)); 
+    c2=Unicode::toLower(wc(s2)); 
+    if(!c1 || (c1!=c2)) break;
+    s1=wcinc(s1);
+    s2=wcinc(s2);
     }
-  while(c1 && (c1==c2));
+  while(1);
   return c1-c2;
   }
 
@@ -2562,19 +2532,18 @@ FXint comparecase(const FXString& s1,const FXString& s2){
 
 // Compare string and string case insensitive, up to n
 FXint comparecase(const FXchar* s1,const FXchar* s2,FXint n){
-  register FXint c1,c2;
   if(0<n){
+    register const FXchar* e1=s1+n;
+    register const FXchar* e2=s2+n;
+    register FXint c1,c2;
     do{
-      if((*s1 & 0x80) && (*s2 & 0x80)){
-        c1=Unicode::toLower(wc(s1)); s1+=wclen(s1);
-        c2=Unicode::toLower(wc(s2)); s2+=wclen(s2);
-        }
-      else{
-        c1=Ascii::toLower(*s1); s1+=1;
-        c2=Ascii::toLower(*s2); s2+=1;
-        }
+      c1=Unicode::toLower(wc(s1)); 
+      c2=Unicode::toLower(wc(s2)); 
+      if(!c1 || (c1!=c2)) break;
+      s1=wcinc(s1);
+      s2=wcinc(s2);
       }
-    while(--n && c1 && (c1==c2));
+    while((s1<e1) && (s2<e2));
     return c1-c2;
     }
   return 0;

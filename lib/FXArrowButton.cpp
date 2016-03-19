@@ -459,11 +459,11 @@ long FXArrowButton::onPaint(FXObject*,FXSelector,void* ptr){
   ww=width-padleft-padright-(border<<1);
   hh=height-padtop-padbottom-(border<<1);
   if(options&(ARROW_UP|ARROW_DOWN)){
-    q=ww|1; if(q>(hh<<1)) q=(hh<<1)-1;
+    q=(ww-1)|1; if((q>>1)>hh) q=(hh<<1)-1;
     ww=q; hh=q>>1;
     }
   else{
-    q=hh|1; if(q>(ww<<1)) q=(ww<<1)-1;
+    q=(hh-1)|1; if((q>>1)>ww) q=(ww<<1)-1;
     ww=q>>1; hh=q;
     }
 

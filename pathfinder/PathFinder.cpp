@@ -560,7 +560,7 @@ FXbool PathFinderMain::close(FXbool notify){
 void PathFinderMain::setDirectory(const FXString& dir){
   FXString oldpath=getDirectory();
   FXString newpath=FXPath::absolute(oldpath,dir);
-  filelist->setDirectory(newpath);
+  filelist->setDirectory(newpath,true);
   dirbox->setDirectory(newpath);
   dirlist->setDirectory(newpath);
   address->setText(newpath);
@@ -691,7 +691,7 @@ void PathFinderMain::saveSettings(){
   // Save file list mode
   iconview=filelist->getListStyle();
   getApp()->reg().writeUIntEntry("SETTINGS","iconview",iconview);
-  
+
   // Save file list item space
   itemspace=filelist->getItemSpace();
   getApp()->reg().writeIntEntry("SETTINGS","itemspace",itemspace);
@@ -897,7 +897,7 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
     if(filelist->isItemDirectory(index)){
       FXString directory=filelist->getItemPathname(index);
       FXTRACE((10,"directory=%s\n",directory.text()));
-      filelist->setDirectory(directory);
+      filelist->setDirectory(directory,true);
       dirlist->setDirectory(directory);
       dirbox->setDirectory(directory);
       address->setText(directory);
@@ -942,7 +942,7 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
     if(filelist->isItemDirectory(index)){
       FXString directory=filelist->getItemPathname(index);
       FXTRACE((10,"directory=%s\n",directory.text()));
-      filelist->setDirectory(directory);
+      filelist->setDirectory(directory,true);
       dirlist->setDirectory(directory);
       dirbox->setDirectory(directory);
       address->setText(directory);
@@ -1070,7 +1070,7 @@ long PathFinderMain::onCmdGotoLocation(FXObject*,FXSelector,void*){
     }
 
   // Move to this existing directory
-  filelist->setDirectory(dir);
+  filelist->setDirectory(dir,true);
   dirlist->setDirectory(dir);
   dirbox->setDirectory(dir);
   address->setText(path);
@@ -1163,7 +1163,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
 long PathFinderMain::onCmdDirectory(FXObject*,FXSelector,void* ptr){
   FXTreeItem *item=(FXTreeItem*)ptr;
   FXString path=dirlist->getItemPathname(item);
-  filelist->setDirectory(path);
+  filelist->setDirectory(path,true);
   dirbox->setDirectory(path);
   address->setText(path);
   visitDirectory(path);
@@ -1176,7 +1176,7 @@ long PathFinderMain::onCmdDirectory(FXObject*,FXSelector,void* ptr){
 long PathFinderMain::onCmdDirTree(FXObject*,FXSelector,void*){
   FXString path=dirbox->getDirectory();
   dirlist->setDirectory(path);
-  filelist->setDirectory(path);
+  filelist->setDirectory(path,true);
   address->setText(path);
   visitDirectory(path);
   closePreview();

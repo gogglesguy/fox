@@ -252,15 +252,20 @@ int main(int,char**){
   FXint len;
   FXwchar uc;
 
+
   // Dump character properties
   for(uc=0; uc<0x110000; ++uc){
+    if(uc%32==0){
+      printf("\nCode\tChar\tCat\tDir\tBreak\tValue\tScript\tComb\tJoin\tDecom\tNumdec\n");
+      printf("======================================================================================\n");
+      }
     printf("%04X\t",uc);
     if(' '<=uc){
       len=wc2utf(buffer,uc); buffer[len]=0;
       printf("%s\t",buffer);
       }
     else{
-      printf(" \t",buffer);
+      printf(" \t");
       }
     printf("%2s\t",category[Unicode::charCategory(uc)]);
     printf("%3s\t",direction[Unicode::charDirection(uc)]);

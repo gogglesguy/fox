@@ -49,10 +49,11 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 =
-am_adie_OBJECTS = Adie.$(OBJEXT) Commands.$(OBJEXT) help.$(OBJEXT) \
-	HelpWindow.$(OBJEXT) icons.$(OBJEXT) main.$(OBJEXT) \
-	Preferences.$(OBJEXT) Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) \
-	TextWindow.$(OBJEXT) $(am__objects_1)
+am_adie_OBJECTS = Adie.$(OBJEXT) Commands.$(OBJEXT) \
+	FindInFiles.$(OBJEXT) help.$(OBJEXT) HelpWindow.$(OBJEXT) \
+	icons.$(OBJEXT) main.$(OBJEXT) Preferences.$(OBJEXT) \
+	Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) TextWindow.$(OBJEXT) \
+	$(am__objects_1)
 adie_OBJECTS = $(am_adie_OBJECTS)
 adie_LDADD = $(LDADD)
 adie_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
@@ -250,6 +251,7 @@ bin_SCRIPTS = Adie.stx
 man_MANS = adie.1
 ICONS = \
 adie_gif.gif \
+backward_gif.gif \
 big_gif.gif \
 bookdel_gif.gif \
 booknext_gif.gif \
@@ -265,6 +267,7 @@ cut_gif.gif \
 delete_gif.gif \
 delimit_gif.gif \
 fonts_gif.gif \
+forward_gif.gif \
 help_gif.gif \
 indent_gif.gif \
 info_gif.gif \
@@ -300,6 +303,8 @@ Adie.h \
 Adie.cpp \
 Commands.cpp \
 Commands.h \
+FindInFiles.h \
+FindInFiles.cpp \
 help.h \
 help.cpp \
 HelpWindow.h \
@@ -448,6 +453,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Adie.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Commands.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FindInFiles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpWindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preferences.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Syntax.Po@am__quote@

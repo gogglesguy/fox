@@ -173,6 +173,14 @@ SOURCE=..\..\..\adie\delimit_gif.gif
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\FindInFiles.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\FindInFiles.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\fonts_gif.gif
 # End Source File
 # Begin Source File
@@ -194,14 +202,6 @@ SOURCE=..\..\..\adie\HelpWindow.cpp
 # Begin Source File
 
 SOURCE=..\..\..\adie\HelpWindow.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\adie\Hilite.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\adie\Hilite.h
 # End Source File
 # Begin Source File
 
@@ -294,10 +294,6 @@ SOURCE=..\..\..\adie\palette_gif.gif
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\adie\parsesyntax.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\adie\paste2_gif.gif
 # End Source File
 # Begin Source File
@@ -387,6 +383,14 @@ SOURCE=..\..\..\adie\small_gif.gif
 # Begin Source File
 
 SOURCE=..\..\..\adie\styles_gif.gif
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\Syntax.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\Syntax.h
 # End Source File
 # Begin Source File
 

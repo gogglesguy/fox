@@ -1819,6 +1819,10 @@ long FXTextField::onKeyPress(FXObject*,FXSelector,void* ptr){
       case KEY_F18:                             // Sun Paste key
         handle(this,FXSEL(SEL_COMMAND,ID_PASTE_SEL),NULL);
         break;
+      case KEY_k:
+        if(!(event->state&CONTROLMASK)) goto ins;
+        handle(this,FXSEL(SEL_COMMAND,ID_DELETE_ALL),NULL);
+        break;
       default:
 ins:    if((event->state&(CONTROLMASK|ALTMASK)) || ((FXuchar)event->text[0]<32)) return 0;
         handle(this,FXSEL(SEL_COMMAND,ID_INSERT_STRING),(void*)event->text.text());

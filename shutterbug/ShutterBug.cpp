@@ -37,6 +37,8 @@
     it stays the same size.
   - Now remembers last selected filename and file type.
   - Add feature to cut shot to clipboard.
+  - FIXME show the image (possibly resized if too big) just captured.
+  - FIXME option to screenshot window under cursor (like FXPicker).
 */
 
 #define FUDGE         10        // Corner fudge for diagonal dragging

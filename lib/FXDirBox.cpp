@@ -83,7 +83,7 @@ namespace FX {
 // Map
 FXDEFMAP(FXDirBox) FXDirBoxMap[]={
   FXMAPFUNC(SEL_CHANGED,FXDirBox::ID_TREE,FXDirBox::onTreeChanged),
-  FXMAPFUNC(SEL_CLICKED,FXDirBox::ID_TREE,FXDirBox::onTreeClicked),
+  FXMAPFUNC(SEL_COMMAND,FXDirBox::ID_TREE,FXDirBox::onTreeCommand),
   FXMAPFUNC(SEL_COMMAND,FXDirBox::ID_SETVALUE,FXDirBox::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXDirBox::ID_SETSTRINGVALUE,FXDirBox::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXDirBox::ID_GETSTRINGVALUE,FXDirBox::onCmdGetStringValue),
@@ -390,18 +390,14 @@ FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
 
 
 // Forward clicked message from list to target
-long FXDirBox::onTreeClicked(FXObject*,FXSelector,void* ptr){
+long FXDirBox::onTreeCommand(FXObject*,FXSelector,void* ptr){
   FXString string=getItemPathname((FXTreeItem*)ptr);
-  button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);    // Unpost the list
-  if(ptr){
-    field->setText(tree->getItemText((FXTreeItem*)ptr));
-    field->setIcon(tree->getItemClosedIcon((FXTreeItem*)ptr));
-    removeItem(((FXTreeItem*)ptr)->getFirst());
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)string.text());
-    }
-  return 1;
+  field->setText(tree->getItemText((FXTreeItem*)ptr));
+  field->setIcon(tree->getItemClosedIcon((FXTreeItem*)ptr));
+  removeItem(((FXTreeItem*)ptr)->getFirst());
+  return target && target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)string.text());
   }
-
+  
 
 // Forward changed message from list to target
 long FXDirBox::onTreeChanged(FXObject*,FXSelector,void* ptr){

@@ -42,7 +42,7 @@ protected:
   TextWindowList  windowlist;                   // Window list
   FXFileDict     *associations;                 // File association table
   SyntaxList      syntaxes;                     // List of syntax patterns
-  FXString        syntaxpath;                   // Where to look for syntax file
+  FXString        syntaxpaths;                  // Where to look for syntax file
   FXIcon         *bigicon;                      // Big application icon
   FXIcon         *smallicon;                    // Small application icon
   FXIcon         *newicon;
@@ -74,6 +74,8 @@ protected:
   FXIcon         *nobrowsericon;
   FXIcon         *uppercaseicon;
   FXIcon         *lowercaseicon;
+  FXIcon         *backwardicon;
+  FXIcon         *forwardicon;
 private:
   Adie(){}
   Adie(const Adie&);
@@ -81,23 +83,20 @@ private:
 public:
   enum{
     ID_CLOSEALL=FXApp::ID_LAST,
+    ID_SYNTAXPATHS,
     ID_LAST
     };
 public:
   long onCmdCloseAll(FXObject*,FXSelector,void*);
+  long onCmdSyntaxPaths(FXObject*,FXSelector,void*);
+  long onUpdSyntaxPaths(FXObject*,FXSelector,void*);
 public:
 
   // Construct application object
   Adie(const FXString& name);
 
-  // Initialize application
-  virtual void init(int& argc,char** argv,FXbool connect=true);
-
-  // Set syntax paths
-  void setSyntaxPaths(const FXString& paths){ syntaxpath=paths; }
-
-  // Get syntax paths
-  const FXString& getSyntaxPaths() const { return syntaxpath; }
+  // Run the application
+  FXint start(int argc,char** argv);
 
   // Get syntax for language name
   Syntax* getSyntaxByName(const FXString& lang);
@@ -108,8 +107,11 @@ public:
   // Get syntax by contents
   Syntax* getSyntaxByContents(const FXString& contents);
 
-  // Exit application
-  virtual void exit(FXint code=0);
+  // Set syntax paths
+  void setSyntaxPaths(const FXString& paths){ syntaxpaths=paths; }
+
+  // Get syntax paths
+  const FXString& getSyntaxPaths() const { return syntaxpaths; }
 
   // Delete application object
   virtual ~Adie();

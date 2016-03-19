@@ -294,7 +294,7 @@ public:
   FXString *getSelectedFiles() const;
 
   /// Set current directory
-  void setDirectory(const FXString& path);
+  void setDirectory(const FXString& path,FXbool notify=false);
 
   /// Return current directory
   FXString getDirectory() const { return directory; }

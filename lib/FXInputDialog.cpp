@@ -94,7 +94,7 @@ void FXInputDialog::initialize(const FXString& label,FXIcon* icn){
   if(options&INPUTDIALOG_PASSWORD) textopts|=TEXTFIELD_PASSWD;
   if(options&INPUTDIALOG_INTEGER) textopts|=TEXTFIELD_INTEGER|JUSTIFY_RIGHT;
   if(options&INPUTDIALOG_REAL) textopts|=TEXTFIELD_REAL|JUSTIFY_RIGHT;
-  input=new FXTextField(entry,20,this,ID_ACCEPT,textopts,0,0,0,0, 8,8,4,4);
+  input=new FXTextField(entry,20,this,ID_ACCEPT,textopts,0,0,0,0, 3,3,3,3);
   limlo=1.0;
   limhi=0.0;
   }

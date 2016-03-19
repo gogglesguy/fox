@@ -796,7 +796,6 @@ FXGLObject* FXGLViewer::pick(FXint x,FXint y){
   return obj;
   }
 
-
 // Repaint the GL window
 long FXGLViewer::onPaint(FXObject*,FXSelector,void*){
 #ifdef HAVE_GL_H

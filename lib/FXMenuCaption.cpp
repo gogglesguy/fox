@@ -69,6 +69,7 @@ FXDEFMAP(FXMenuCaption) FXMenuCaptionMap[]={
   FXMAPFUNC(SEL_UPDATE,0,FXMenuCaption::onUpdate),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXMenuCaption::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXMenuCaption::onQueryHelp),
+  FXMAPFUNC(SEL_COMMAND,FXMenuCaption::ID_SETVALUE,FXMenuCaption::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXMenuCaption::ID_SETSTRINGVALUE,FXMenuCaption::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXMenuCaption::ID_GETSTRINGVALUE,FXMenuCaption::onCmdGetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXMenuCaption::ID_SETICONVALUE,FXMenuCaption::onCmdSetIconValue),
@@ -253,6 +254,13 @@ long FXMenuCaption::onPaint(FXObject*,FXSelector,void* ptr){
       dc.fillRectangle(xx+1+font->getTextWidth(&label[0],hotoff),yy+1,font->getTextWidth(&label[hotoff],wclen(&label[hotoff])),1);
       }
     }
+  return 1;
+  }
+
+
+// Update value from a message
+long FXMenuCaption::onCmdSetValue(FXObject*,FXSelector,void* ptr){
+  setText((const FXchar*)ptr);
   return 1;
   }
 

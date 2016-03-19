@@ -44,7 +44,7 @@ extern FXAPI FXString password(const FXString& string);
 extern FXAPI FXString host(const FXString& string);
 
 /// Parse port number from string containing url
-extern FXAPI FXint port(const FXString& string);
+extern FXAPI FXint port(const FXString& string,FXint def=0);
 
 /// Parse path from string containing url
 extern FXAPI FXString path(const FXString& string);

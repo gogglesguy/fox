@@ -164,36 +164,36 @@ TestWindow::TestWindow(FXApp *a):FXMainWindow(a,"Calendar Test Program",NULL,NUL
   mat = new FXMatrix(box,2,LAYOUT_FILL_X|MATRIX_BY_COLUMNS,0,0,0,0,0,0,0,0,0,0);
   FXColorWell * cw;
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_1,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_1,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getBackColor());
   new FXLabel(mat,"Background",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_2,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_2,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getTitleBackColor());
   new FXLabel(mat,"Title Background",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_3,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_3,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getTitleColor());
   new FXLabel(mat,"Title Foreground",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_4,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_4,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getWeekendColor());
   new FXLabel(mat,"Weekend",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_5,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_5,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getOtherWeekendColor());
   new FXLabel(mat,"Weekend (disabled)",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_6,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_6,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getDayColor());
   new FXLabel(mat,"Day",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_7,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_7,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getOtherDayColor());
   new FXLabel(mat,"Day (disabled)",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 
-  cw = new FXColorWell(mat,0,this,ID_COLOR_8,LAYOUT_CENTER_Y);
+  cw = new FXColorWell(mat,0,this,ID_COLOR_8,LAYOUT_CENTER_Y|FRAME_LINE);
   cw->setRGBA(view->getTodayColor());
   new FXLabel(mat,"Today",NULL,LAYOUT_CENTER_Y|JUSTIFY_LEFT);
 

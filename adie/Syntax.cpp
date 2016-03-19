@@ -25,19 +25,96 @@
 
 /*
   Notes:
-  - Restart position: place in text which is default style, a few
-    lines of context before the change.
-  - Language mode: use wildcard on filename, or forced explicitly.
-  - Either simple pattern, or begin/end pattern. Special stop pattern
-    to prevent scanning indefinitely.  Patterns may have sub-patterns.
-  - Simple pattern must be non-empty; begin/end patterns of a complex
-    pattern may be zero-width assertions.
-  - Capturing parenthesis are disabled, for speed reasons.
-  - Sample text in Syntax is for displaying inside interactive
-    style setup dialog; it is supposed to contain on instance of
-    each pattern matched by the rule base.
-  - FIXME nested style rules should inherit style settings from parent
-    rules; even if it comes from registry!
+  
+  - Syntax (Language):
+  
+    o  Language is recognized any of three ways:
+    
+       1  Direct association of filename to language name in registry; 
+          typically, set explicitly by the user.
+          
+       2  File extension matches against Language's list of file extensions.
+          Note that this is processed in the order that the languages are
+          listed in the syntax file.
+          
+       3  Contents of the file (at least, the first fragment of the contents),
+          matches against regular expression patten from the Language.
+
+    o  Language sets delimiters in text editor.
+
+    o  Language sets syntax rules to be used for colorizing text.
+     
+  - Syntax Rules:
+  
+    o  Four types of rules at this time:
+    
+       1  DefaultRule (new).  This rule colorizes everything.  By default,
+          a top-level DefaultRule is automatically created in the Language,
+          corresponding to style index 0 in text editor (default style).
+          In some cases, you may want to create another DefaultRule under
+          that.  This will color the entire text with another style.
+          
+       2  SimpleRule.  This rule matches a single regex pattern. This rule
+          has no subrules.  Use this rule to match simple keywords, operators,
+          etc.
+          
+       3  BracketRule.  This rule matches a opening pattern at the start, and
+          a closing pattern at the end.  Everything in between (including the 
+          subject text matched against the patterns) will be colorized by the
+          rule's style.  Subrules under the BracketRule may colorize parts 
+          differently.
+          
+       4  SafeBracketRule. This rule behaves like BracketRule.  Except that
+          each time a sub-chunk is matched, a stop-pattern is tested to see
+          if we end the subrule prior to the normal closing-pattern.
+          The extra clause provides a safety back-stop against matching a 
+          potentially huge portion of text in the event that the user is
+          editing the text and no text currently matches the closing pattern.
+
+    o The pattern in a SimpleRule must be non-empty, i.e. it must match a non-zero 
+      number of characters.  The other rules may match zero characters (e.g.
+      assertions like "^", "\<", "(?=fred)" are OK).
+      
+    o Each rule has its own style index.  This is important for the incremental
+      restyling algorithm.  Each rule also has a link to its immediate parent
+      rule, thus.  Thus, during editing, we can identify the ancestor rules
+      so as to minimally recolor the text.  The algorithm backs up in wider and
+      wider ranges about the changed text until a starting pattern of an ancestor
+      rule is matched again.  In most cases, this search doesn't go very deep,
+      and only small chunks of text need recolorizing.
+
+    o Rules MAY have the same NAMES even though they are different rules.  That
+      merely means these rules will have the same style.  It says nothing about
+      what is matched or how the colorizer works.
+      
+  - SyntaxParser is a simple recursive descent parser.  The style language has
+    very few lexical elements: comments, spaces, numbers, strings, and identifiers.
+    
+    o  Comments.  Comments are lines preceeded by a '#'.  All text after the
+       '#' is skipped until the end of the line.
+       
+    o  Spaces.  Spaces are not significant, except inside strings.  Spaces are
+       simply skipped.
+       
+    o  Numbers.  Only decimal integer numbers are supported.
+    
+    o  Strings.  Strings are any text between double quotes ('"').  There are no 
+       escape sequences, except to enter a double quote ('\"').  This is so as
+       to keep regular expressions somewhat legible.  Note that the regular
+       expression engine *does* support escape sequences, so matching special
+       characters is quite simple.
+       
+    o  Identifiers.  As with most programming languages, identifiers start with
+       a letter, followed by letters or digits.  Only the following identifiers
+       are recognized as language elements:
+       
+         language, rule, filesmatch, contentsmatch, contextlines, contextchars,
+         delimiters, pattern, openpattern, closepattern, stoppattern, end.
+         
+       [There may be more in the future].
+       
+  - We currently don't use capturing parentheses capabilities; bracketing rules
+    seem sufficient for most languages.  Perhaps this will change.
 */
 
 /*******************************************************************************/

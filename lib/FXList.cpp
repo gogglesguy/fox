@@ -1863,30 +1863,29 @@ typedef FXint (*FXCompareFunc)(const FXString&,const FXString&,FXint);
 
 
 // Get item by name
-FXint FXList::findItem(const FXString& text,FXint start,FXuint flgs) const {
-  register FXCompareFunc comparefunc;
+FXint FXList::findItem(const FXString& string,FXint start,FXuint flgs) const {
+  register FXCompareFunc comparefunc=(flgs&SEARCH_IGNORECASE) ? (FXCompareFunc)comparecase : (FXCompareFunc)compare;
   register FXint index,len;
   if(0<items.no()){
-    comparefunc=(flgs&SEARCH_IGNORECASE) ? (FXCompareFunc)comparecase : (FXCompareFunc)compare;
-    len=(flgs&SEARCH_PREFIX)?text.length():2147483647;
+    len=(flgs&SEARCH_PREFIX)?string.length():2147483647;
     if(flgs&SEARCH_BACKWARD){
       if(start<0) start=items.no()-1;
       for(index=start; 0<=index; index--){
-        if((*comparefunc)(items[index]->getText(),text,len)==0) return index;
+        if((*comparefunc)(items[index]->getText(),string,len)==0) return index;
         }
       if(!(flgs&SEARCH_WRAP)) return -1;
       for(index=items.no()-1; start<index; index--){
-        if((*comparefunc)(items[index]->getText(),text,len)==0) return index;
+        if((*comparefunc)(items[index]->getText(),string,len)==0) return index;
         }
       }
     else{
       if(start<0) start=0;
       for(index=start; index<items.no(); index++){
-        if((*comparefunc)(items[index]->getText(),text,len)==0) return index;
+        if((*comparefunc)(items[index]->getText(),string,len)==0) return index;
         }
       if(!(flgs&SEARCH_WRAP)) return -1;
       for(index=0; index<start; index++){
-        if((*comparefunc)(items[index]->getText(),text,len)==0) return index;
+        if((*comparefunc)(items[index]->getText(),string,len)==0) return index;
         }
       }
     }

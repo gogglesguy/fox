@@ -58,6 +58,8 @@
 
   - Keep history of strings previously searched, and allow up/down arrows
     to "scroll" back to this history.
+  - FIXME don't like the way FXReplaceDialog and FXSearchDialog currently work
+    inside FXText widget [should not be in widget].
 */
 
 // Padding for buttons
@@ -73,9 +75,9 @@ namespace FX {
 
 // Search and replace registry group
 static const FXchar searchgroup[]="SearchReplace";
-static const FXchar skey[20][3]={{'S','A','\0'},{'S','B','\0'},{'S','C','\0'},{'S','D','\0'},{'S','E','\0'},{'S','F','\0'},{'S','G','\0'},{'S','H','\0'},{'S','I','\0'},{'S','J','\0'},{'S','K','\0'},{'S','L','\0'},{'S','M','\0'},{'S','N','\0'},{'S','O','\0'},{'S','P','\0'},{'S','Q','\0'},{'S','R','\0'},{'S','S','\0'},{'S','T','\0'}};
-static const FXchar rkey[20][3]={{'R','A','\0'},{'R','B','\0'},{'R','C','\0'},{'R','D','\0'},{'R','E','\0'},{'R','F','\0'},{'R','G','\0'},{'R','H','\0'},{'R','I','\0'},{'R','J','\0'},{'R','K','\0'},{'R','L','\0'},{'R','M','\0'},{'R','N','\0'},{'R','O','\0'},{'R','P','\0'},{'R','Q','\0'},{'R','R','\0'},{'R','S','\0'},{'R','T','\0'}};
-static const FXchar mkey[20][3]={{'M','A','\0'},{'M','B','\0'},{'M','C','\0'},{'M','D','\0'},{'M','E','\0'},{'M','F','\0'},{'M','G','\0'},{'M','H','\0'},{'M','I','\0'},{'M','J','\0'},{'M','K','\0'},{'M','L','\0'},{'M','M','\0'},{'M','N','\0'},{'M','O','\0'},{'M','P','\0'},{'M','Q','\0'},{'M','R','\0'},{'M','S','\0'},{'M','T','\0'}};
+static const FXchar skey[20][3]={"SA","SB","SC","SD","SE","SF","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SP","SQ","SR","SS","ST"};
+static const FXchar rkey[20][3]={"RA","RB","RC","RD","RE","RF","RG","RH","RI","RJ","RK","RL","RM","RN","RO","RP","RQ","RR","RS","RT"};
+static const FXchar mkey[20][3]={"MA","MB","MC","MD","ME","MF","MG","MH","MI","MJ","MK","ML","MM","MN","MO","MP","MQ","MR","MS","MT"};
 
 
 
@@ -118,7 +120,7 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* i
   FXVerticalFrame* entry=new FXVerticalFrame(toppart,LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
   searchlabel=new FXLabel(entry,tr("S&earch for:"),NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
   searchbox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
-  searchtext=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4);
+  searchtext=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 3,3,3,3);
   FXVerticalFrame* searcharrows=new FXVerticalFrame(searchbox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   FXArrowButton* ar1=new FXArrowButton(searcharrows,this,ID_SEARCH_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
   FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_SEARCH_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
@@ -126,7 +128,7 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* i
   ar2->setArrowSize(3);
   replacelabel=new FXLabel(entry,tr("Replace &with:"),NULL,LAYOUT_LEFT);
   replacebox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
-  replacetext=new FXTextField(replacebox,26,this,ID_REPLACE_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4);
+  replacetext=new FXTextField(replacebox,26,this,ID_REPLACE_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 3,3,3,3);
   FXVerticalFrame* replacearrows=new FXVerticalFrame(replacebox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   FXArrowButton* ar3=new FXArrowButton(replacearrows,this,ID_REPLACE_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
   FXArrowButton* ar4=new FXArrowButton(replacearrows,this,ID_REPLACE_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);

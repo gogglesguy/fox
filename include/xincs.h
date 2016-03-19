@@ -86,6 +86,9 @@
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #endif
+#if (_MSC_VER >= 1400)          // VC++ 2005 or newer
+#include <intrin.h>
+#endif
 
 // OpenGL includes
 #ifdef HAVE_GL_H
@@ -179,6 +182,16 @@
 #include <pthread.h>
 #ifdef HAVE_SEMAPHORE_H
 #include <semaphore.h>
+#endif
+#if defined(HAVE_PTHREAD_SETAFFINITY_NP)
+#if defined(__FreeBSD__)
+#include <osreldate.h>
+#if __FreeBSD_version >= 702000
+#include <pthread_np.h>
+#include <sys/cpuset.h>
+typedef cpuset_t   cpu_set_t;
+#endif
+#endif
 #endif
 #if defined(__minix)            // MINIX
 #ifdef sleep

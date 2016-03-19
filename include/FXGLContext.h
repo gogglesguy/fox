@@ -43,8 +43,8 @@ protected:
 public:
 
   /**
-  * Construct an GL Context with given GL Visual.  Optionally
-  * share a display list with another GL Context shr.
+  * Construct an GLContext with given GL Visual.  Optionally
+  * share GL objects (textures, etc) with another GLContext shr.
   */
   FXGLContext(FXApp *a,FXGLVisual *vis,FXGLContext* shr=NULL);
 

@@ -53,6 +53,9 @@
   - Maybe moving (dragging) items around in the treelist is something that should
     be supported?
   - FIXME if no text, you're unable to see if an item is selected.
+  - FIXME maybe add API to ask an item for its preferred indent? It should depend
+    on the icon.
+    Alternatively, we could change the look of the treelist completely.
 */
 
 
@@ -2353,11 +2356,10 @@ typedef FXint (*FXCompareFunc)(const FXString&,const FXString&,FXint);
 
 // Get item by name
 FXTreeItem* FXTreeList::findItem(const FXString& text,FXTreeItem* start,FXuint flgs) const {
-  register FXCompareFunc comparefunc;
+  register FXCompareFunc comparefunc=(flgs&SEARCH_IGNORECASE) ? (FXCompareFunc)comparecase : (FXCompareFunc)compare;
   register FXTreeItem *item;
   register FXint len;
   if(firstitem){
-    comparefunc=(flgs&SEARCH_IGNORECASE) ? (FXCompareFunc)comparecase : (FXCompareFunc)compare;
     len=(flgs&SEARCH_PREFIX)?text.length():2147483647;
     if(flgs&SEARCH_BACKWARD){
       item=start;

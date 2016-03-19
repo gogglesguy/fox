@@ -346,29 +346,33 @@ void fxsleep(FXuint n){
 // Convert string of length len to MSDOS; return new string and new length
 FXbool fxtoDOS(FXchar*& string,FXint& len){
   register FXint f=0,t=0;
-  while(f<len && string[f]!='\0'){
+  while(f<len){
     if(string[f++]=='\n') t++; t++;
     }
-  len=t;
-  if(!resizeElms(string,len+1)) return false;
-  while(0<t){
-    if((string[--t]=string[--f])=='\n') string[--t]='\r';
+  if(resizeElms(string,t+1)){
+    len=t;
+    while(0<t){
+      if((string[--t]=string[--f])=='\n') string[--t]='\r';
+      }
+    string[len]='\0';
+    return true;
     }
-  string[len]='\0';
-  return true;
+  return false;
   }
 
 
 // Convert string of length len from MSDOS; return new string and new length
 FXbool fxfromDOS(FXchar*& string,FXint& len){
   register FXint f=0,t=0,c;
-  while(f<len && string[f]!='\0'){
+  while(f<len){
     if((c=string[f++])!='\r') string[t++]=c;
     }
-  len=t;
-  if(!resizeElms(string,len+1)) return false;
-  string[len]='\0';
-  return true;
+  if(resizeElms(string,t+1)){
+    len=t;
+    string[len]='\0';
+    return true;
+    }
+  return false;
   }
 
 

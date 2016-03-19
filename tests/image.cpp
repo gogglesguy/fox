@@ -112,8 +112,8 @@ ImageWindow::ImageWindow(FXApp* a):FXMainWindow(a,"Image Application",NULL,NULL,
   new FXRadioButton(hf,"Sine blend",gb,FXGradientBar::ID_BLEND_SINE,LAYOUT_CENTER_Y|ICON_BEFORE_TEXT);
   new FXRadioButton(hf,"Increasing blend",gb,FXGradientBar::ID_BLEND_INCREASING,LAYOUT_CENTER_Y|ICON_BEFORE_TEXT);
   new FXRadioButton(hf,"Decreasing blend",gb,FXGradientBar::ID_BLEND_DECREASING,LAYOUT_CENTER_Y|ICON_BEFORE_TEXT);
-  new FXColorWell(hf,FXRGB(0,0,0),gb,FXGradientBar::ID_LOWER_COLOR,LAYOUT_CENTER_Y);
-  new FXColorWell(hf,FXRGB(0,0,0),gb,FXGradientBar::ID_UPPER_COLOR,LAYOUT_CENTER_Y);
+  new FXColorWell(hf,FXRGB(0,0,0),gb,FXGradientBar::ID_LOWER_COLOR,LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
+  new FXColorWell(hf,FXRGB(0,0,0),gb,FXGradientBar::ID_UPPER_COLOR,LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
   new FXButton(hf,"Recenter",NULL,gb,FXGradientBar::ID_RECENTER,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|ICON_BEFORE_TEXT);
   new FXButton(hf,"Split",NULL,gb,FXGradientBar::ID_SPLIT,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|ICON_BEFORE_TEXT);
   new FXButton(hf,"Merge",NULL,gb,FXGradientBar::ID_MERGE,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|ICON_BEFORE_TEXT);
@@ -146,13 +146,13 @@ ImageWindow::ImageWindow(FXApp* a):FXMainWindow(a,"Image Application",NULL,NULL,
     new FXHorizontalSeparator(buttonFrame,SEPARATOR_RIDGE|LAYOUT_FILL_X);
 
     new FXLabel(buttonFrame,"&Background\nColor well",NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X);
-    backwell=new FXColorWell(buttonFrame,FXRGB(255,255,255),this,ID_WELL,LAYOUT_CENTER_X|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,100,30);
+    backwell=new FXColorWell(buttonFrame,FXRGB(255,255,255),this,ID_WELL,LAYOUT_CENTER_X|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|FRAME_SUNKEN|FRAME_THICK,0,0,100,30);
 
     new FXLabel(buttonFrame,"B&order\nColor well",NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X);
-    borderwell=new FXColorWell(buttonFrame,FXRGB(0,0,0),this,ID_WELL,LAYOUT_CENTER_X|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,100,30);
+    borderwell=new FXColorWell(buttonFrame,FXRGB(0,0,0),this,ID_WELL,LAYOUT_CENTER_X|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|FRAME_SUNKEN|FRAME_THICK,0,0,100,30);
 
     new FXLabel(buttonFrame,"&Text\nColor well",NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X);
-    textwell=new FXColorWell(buttonFrame,FXRGB(0,0,0),this,ID_WELL,LAYOUT_CENTER_X|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,100,30);
+    textwell=new FXColorWell(buttonFrame,FXRGB(0,0,0),this,ID_WELL,LAYOUT_CENTER_X|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|FRAME_SUNKEN|FRAME_THICK,0,0,100,30);
 
     // Button to draw
     new FXButton(buttonFrame,"&Colors...\tPop the color dialog",NULL,colordlg,FXWindow::ID_SHOW,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,10,10,5,5);

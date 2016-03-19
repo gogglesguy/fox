@@ -51,13 +51,16 @@ namespace FX {
 * end of the subject string NOT to be considered a line start
 * or line end. The flag NotEmpty causes a match to fail if
 * the empty string was matched.
+*
+* Patterns which cause inordinate amounts of recursion may cause
+* FXRex to throw an FXResourceException.
 */
 class FXAPI FXRex {
 private:
-  FXshort *code;
+  FXuchar *code;
 private:
   static const FXchar *const errors[];
-  static const FXshort fallback[];
+  static const FXuchar fallback[];
 public:
 
   /// Regular expression parse flags
@@ -67,17 +70,18 @@ public:
     IgnoreCase = 2,     /// Ignore case differences
     Newline    = 4,     /// Match-any operators match newline too
     Verbatim   = 8,     /// Disable interpretation of magic characters
-    Syntax     = 16     /// Perform syntax check only
+    Syntax     = 16,    /// Perform syntax check only
+    Unicode    = 32     /// Unicode mode
     };
 
 
   /// Regular expression match flags
   enum {
     Forward    = 0,     /// Match scanning forward from offset
-    Backward   = 32,    /// Match scanning backward from offset
-    NotBol     = 64,    /// Start of string is NOT begin of line
-    NotEol     = 128,   /// End of string is NOT end of line
-    NotEmpty   = 256    /// Do not match empty
+    Backward   = 64,    /// Match scanning backward from offset
+    NotBol     = 128,   /// Start of string is NOT begin of line
+    NotEol     = 256,   /// End of string is NOT end of line
+    NotEmpty   = 512    /// Do not match empty
     };
 
   /// Regular expression error codes

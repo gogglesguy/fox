@@ -39,14 +39,21 @@
 #include "FXDCWindow.h"
 #include "FXApp.h"
 #include "FXLabel.h"
+#include "FXColors.h"
 #include "FXColorWell.h"
 #include "FXColorSelector.h"
 #include "FXColorDialog.h"
 
 /*
   Notes:
-  - Is there any reason why one wouldn't ^C ^V on the clipboard colors same
-    as text?  Maybe ^A should claim selection?
+  - FXColorWell now observes border styles, but padding is outside of the well.
+  - Focus rectangle now drawn inside the color swatch part of the well.
+  - Possibly have no border or padding; so you can now tightly pack wells together,
+    for example, inside FXMatrix.
+  - Probably need to use this feature in FXColorSelector (large collection of
+    custom colors in block under panel).
+  - Also, FXColorWell has default size that can be changed; minimum is 3 pixels,
+    1 pixel for color, 2 for focus rectangle.
   - Single-click should send SEL_COMMAND to target.
   - Perhaps change of color should send SEL_CHANGED.
   - Do not start drag operation unless moving a little bit.
@@ -54,12 +61,7 @@
   - Yes, you can now drag a color into a text widget, or drag the name of
     a color into the well, as well as pasting a color into a text widget or
     vice versa!
-  - KDE/Qt has color drag and drop wrong:- should multiply by 257, not 255,
-    so get full range of [0 - 65535].
 */
-
-#define WELLSIZE    12              // Minimum well size
-#define FOCUSBORDER 3               // Focus border
 
 using namespace FX;
 
@@ -81,8 +83,6 @@ FXDEFMAP(FXColorWell) FXColorWellMap[]={
   FXMAPFUNC(SEL_FOCUSOUT,0,FXColorWell::onFocusOut),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,0,FXColorWell::onLeftBtnPress),
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXColorWell::onLeftBtnRelease),
-  FXMAPFUNC(SEL_MIDDLEBUTTONPRESS,0,FXColorWell::onMiddleBtnPress),
-  FXMAPFUNC(SEL_MIDDLEBUTTONRELEASE,0,FXColorWell::onMiddleBtnRelease),
   FXMAPFUNC(SEL_CLICKED,0,FXColorWell::onClicked),
   FXMAPFUNC(SEL_DOUBLECLICKED,0,FXColorWell::onDoubleClicked),
   FXMAPFUNC(SEL_KEYPRESS,0,FXColorWell::onKeyPress),
@@ -90,9 +90,6 @@ FXDEFMAP(FXColorWell) FXColorWellMap[]={
   FXMAPFUNC(SEL_UNGRABBED,0,FXColorWell::onUngrabbed),
   FXMAPFUNC(SEL_BEGINDRAG,0,FXColorWell::onBeginDrag),
   FXMAPFUNC(SEL_ENDDRAG,0,FXColorWell::onEndDrag),
-  FXMAPFUNC(SEL_SELECTION_LOST,0,FXColorWell::onSelectionLost),
-  FXMAPFUNC(SEL_SELECTION_GAINED,0,FXColorWell::onSelectionGained),
-  FXMAPFUNC(SEL_SELECTION_REQUEST,0,FXColorWell::onSelectionRequest),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXColorWell::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXColorWell::onQueryHelp),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_SETVALUE,FXColorWell::onCmdSetValue),
@@ -118,21 +115,23 @@ FXIMPLEMENT(FXColorWell,FXFrame,FXColorWellMap,ARRAYNUMBER(FXColorWellMap))
 
 // Init
 FXColorWell::FXColorWell(){
+  wellColor[0]=FXColors::White;
+  wellColor[1]=FXColors::White;
+  wellSize=12;
+  rgba=FXColors::White;
   flags|=FLAG_ENABLED|FLAG_DROPTARGET;
-  rgba=0;
-  wellColor[0]=0;
-  wellColor[1]=0;
   }
 
 
 // Make a color well
 FXColorWell::FXColorWell(FXComposite* p,FXColor clr,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb){
   flags|=FLAG_ENABLED|FLAG_DROPTARGET;
+  wellColor[0]=blendOverWhite(clr);
+  wellColor[1]=blendOverBlack(clr);
+  wellSize=12;
+  rgba=clr;
   target=tgt;
   message=sel;
-  rgba=clr;
-  wellColor[0]=rgbaoverwhite(rgba);
-  wellColor[1]=rgbaoverblack(rgba);
   }
 
 
@@ -171,66 +170,41 @@ void FXColorWell::killFocus(){
   }
 
 
-// Compute color over black
-FXColor FXColorWell::rgbaoverblack(FXColor clr){
-  FXint r,g,b,mul=FXALPHAVAL(clr);
-  r=(FXREDVAL(clr)*mul+127)/255;
-  g=(FXGREENVAL(clr)*mul+127)/255;
-  b=(FXBLUEVAL(clr)*mul+127)/255;
-  return FXRGB(r,g,b);
-  }
-
-
-// Compute color over white
-FXColor FXColorWell::rgbaoverwhite(FXColor clr){
-  FXint r,g,b,mul=FXALPHAVAL(clr),lum=(255-mul);
-  r=(lum*255+FXREDVAL(clr)*mul+127)/255;
-  g=(lum*255+FXGREENVAL(clr)*mul+127)/255;
-  b=(lum*255+FXBLUEVAL(clr)*mul+127)/255;
-  return FXRGB(r,g,b);
-  }
-
-
 // Get default size
 FXint FXColorWell::getDefaultWidth(){
-  return WELLSIZE+FOCUSBORDER+padleft+padright+4;
+  return wellSize+padleft+padright+(border<<1);
   }
 
 
 FXint FXColorWell::getDefaultHeight(){
-  return WELLSIZE+FOCUSBORDER+padtop+padbottom+4;
+  return wellSize+padtop+padbottom+(border<<1);
   }
 
 
 // Handle repaint
 long FXColorWell::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXPoint points[3];
   dc.setForeground(backColor);
-  dc.fillRectangle(0,0,width,padtop+FOCUSBORDER);
-  dc.fillRectangle(0,padtop+FOCUSBORDER,padleft+FOCUSBORDER,height-padtop-padbottom-(FOCUSBORDER<<1));
-  dc.fillRectangle(width-padright-FOCUSBORDER,padtop+FOCUSBORDER,padright+FOCUSBORDER,height-padtop-padbottom-(FOCUSBORDER<<1));
-  dc.fillRectangle(0,height-padbottom-FOCUSBORDER,width,padbottom+FOCUSBORDER);
-  if(hasSelection()){
-    dc.setForeground(borderColor);
-    dc.drawRectangle(padleft+1,padtop+1,width-padright-padleft-3,height-padbottom-padtop-3);
-    }
+  dc.fillRectangle(0,0,width,padtop);
+  dc.fillRectangle(0,padtop,padleft,height-padtop-padbottom);
+  dc.fillRectangle(width-padright,padtop,padright,height-padtop-padbottom);
+  dc.fillRectangle(0,height-padbottom,width,padbottom);
+  drawFrame(dc,padleft,padtop,width-padright-padleft,height-padtop-padbottom);
   dc.setForeground(wellColor[0]);
-  points[0].x=points[1].x=padleft+FOCUSBORDER+2;
-  points[2].x=width-padright-FOCUSBORDER-2;
-  points[0].y=points[2].y=padtop+FOCUSBORDER+2;
-  points[1].y=height-padbottom-FOCUSBORDER-2;
+  points[0].x=points[1].x=padleft+border;
+  points[2].x=width-padright-border;
+  points[0].y=points[2].y=padtop+border;
+  points[1].y=height-padbottom-border;
   dc.fillPolygon(points,3);
   dc.setForeground(wellColor[1]);
-  points[0].x=padleft+FOCUSBORDER+2;
-  points[1].x=points[2].x=width-padright-FOCUSBORDER-2;
-  points[0].y=points[1].y=height-padbottom-FOCUSBORDER-2;
-  points[2].y=padtop+FOCUSBORDER+2;
+  points[0].x=padleft+border;
+  points[1].x=points[2].x=width-padright-border;
+  points[0].y=points[1].y=height-padbottom-border;
+  points[2].y=padtop+border;
   dc.fillPolygon(points,3);
-  drawDoubleSunkenRectangle(dc,padleft+FOCUSBORDER,padtop+FOCUSBORDER,width-padright-padleft-(FOCUSBORDER<<1),height-padbottom-padtop-(FOCUSBORDER<<1));
   if(hasFocus()){
-    dc.drawFocusRectangle(padleft,padtop,width-padright-padleft,height-padbottom-padtop);
+    dc.drawFocusRectangle(padleft+border+1,padtop+border+1,width-padright-padleft-(border<<1)-2,height-padbottom-padtop-(border<<1)-2);
     }
   return 1;
   }
@@ -360,57 +334,6 @@ long FXColorWell::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
-// We now really do have the selection; repaint the text field
-long FXColorWell::onSelectionGained(FXObject* sender,FXSelector sel,void* ptr){
-  FXFrame::onSelectionGained(sender,sel,ptr);
-  update();
-  return 1;
-  }
-
-
-// We lost the selection somehow; repaint the text field
-long FXColorWell::onSelectionLost(FXObject* sender,FXSelector sel,void* ptr){
-  FXFrame::onSelectionLost(sender,sel,ptr);
-  update();
-  return 1;
-  }
-
-
-// Somebody wants our selection
-long FXColorWell::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent *event=(FXEvent*)ptr;
-
-  // Try handling it in base class first
-  if(FXFrame::onSelectionRequest(sender,sel,ptr)) return 1;
-
-  // Requested as a color
-  if(event->target==colorType){
-    FXushort *color;
-    allocElms(color,4);
-    color[0]=257*FXREDVAL(rgba);
-    color[1]=257*FXGREENVAL(rgba);
-    color[2]=257*FXBLUEVAL(rgba);
-    color[3]=257*FXALPHAVAL(rgba);
-    setDNDData(FROM_SELECTION,colorType,(FXuchar*)color,sizeof(FXushort)*4);
-    return 1;
-    }
-
-  // Requested as a color name
-  if(event->target==stringType || event->target==textType){
-    FXchar *string;
-    callocElms(string,50);
-    nameFromColor(string,rgba);
-#ifdef WIN32
-    setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string)+1);
-#else
-    setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string));
-#endif
-    return 1;
-    }
-  return 0;
-  }
-
-
 // Start a drag operation
 long FXColorWell::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
   FXDragType types[2]={colorType,textType};
@@ -502,45 +425,6 @@ long FXColorWell::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Pressed middle button to paste
-long FXColorWell::onMiddleBtnPress(FXObject*,FXSelector,void* ptr){
-  flags&=~FLAG_TIP;
-  handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
-  if(isEnabled()){
-    grab();
-    if(target && target->tryHandle(this,FXSEL(SEL_MIDDLEBUTTONPRESS,message),ptr)) return 1;
-    return 1;
-    }
-  return 0;
-  }
-
-
-// Released middle button causes paste of selection
-long FXColorWell::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
-  FXuchar *pointer;
-  FXuint   length;
-  FXColor  color;
-  if(isEnabled()){
-    ungrab();
-    if(target && target->tryHandle(this,FXSEL(SEL_MIDDLEBUTTONRELEASE,message),ptr)) return 1;
-    if(getDNDData(FROM_SELECTION,colorType,pointer,length)){
-      color=FXRGBA((((FXushort*)pointer)[0]+128)/257,(((FXushort*)pointer)[1]+128)/257,(((FXushort*)pointer)[2]+128)/257,(((FXushort*)pointer)[3]+128)/257);
-      freeElms(pointer);
-      setRGBA(color,true);
-      return 1;
-      }
-    if(getDNDData(FROM_SELECTION,stringType,pointer,length)){
-      resizeElms(pointer,length+1); pointer[length]='\0';
-      color=colorFromName((const FXchar*)pointer);
-      freeElms(pointer);
-      setRGBA(color,true);
-      return 1;
-      }
-    }
-  return 0;
-  }
-
-
 // Key Press
 long FXColorWell::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
@@ -582,12 +466,7 @@ long FXColorWell::onKeyRelease(FXObject*,FXSelector,void* ptr){
 
 // Clicked in the well
 long FXColorWell::onClicked(FXObject*,FXSelector,void*){
-  FXDragType types[3]={stringType,colorType,textType};
-  if(target && target->tryHandle(this,FXSEL(SEL_CLICKED,message),(void*)(FXuval)rgba)) return 1;
-  if(!hasSelection()){
-    acquireSelection(types,3);
-    }
-  return 1;
+  return target && target->tryHandle(this,FXSEL(SEL_CLICKED,message),(void*)(FXuval)rgba);
   }
 
 
@@ -599,7 +478,7 @@ long FXColorWell::onClicked(FXObject*,FXSelector,void*){
 // is closed by cancelling it it will revert to the old color
 long FXColorWell::onDoubleClicked(FXObject*,FXSelector,void*){
   if(target && target->tryHandle(this,FXSEL(SEL_DOUBLECLICKED,message),(void*)(FXuval)rgba)) return 1;
-  if(options&COLORWELL_SOURCEONLY) return 1;
+  if(isSourceOnly()) return 1;
   FXColorDialog colordialog(this,tr("Color Dialog"));
   FXColor oldcolor=getRGBA();
   colordialog.setTarget(this);
@@ -699,11 +578,11 @@ long FXColorWell::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 
 // Change RGBA color
 void FXColorWell::setRGBA(FXColor clr,FXbool notify){
-  if(options&COLORWELL_OPAQUEONLY) clr|=FXRGBA(0,0,0,255);
+  if(isOpaqueOnly()) clr|=FXRGBA(0,0,0,255);
   if(clr!=rgba){
     rgba=clr;
-    wellColor[0]=rgbaoverwhite(rgba);
-    wellColor[1]=rgbaoverblack(rgba);
+    wellColor[0]=blendOverWhite(rgba);
+    wellColor[1]=blendOverBlack(rgba);
     update();
     if(notify && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)rgba);
     }
@@ -731,6 +610,16 @@ long FXColorWell::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Change minimum well size
+void FXColorWell::setWellSise(FXint ws){
+  if(ws<3) ws=3;
+  if(wellSize!=ws){
+    wellSize=ws;
+    recalc();
+    }
+  }
+
+
 // Return true if only opaque colors allowed
 FXbool FXColorWell::isOpaqueOnly() const {
   return (options&COLORWELL_OPAQUEONLY)!=0;
@@ -746,6 +635,18 @@ void FXColorWell::setOpaqueOnly(FXbool opaque){
   else{
     options&=~COLORWELL_OPAQUEONLY;
     }
+  }
+
+
+// Return true if only a source
+FXbool FXColorWell::isSourceOnly() const {
+  return (options&COLORWELL_SOURCEONLY)!=0;
+  }
+
+
+// Change source only mode
+void FXColorWell::setSourceOnly(FXbool srconly){
+  options^=((0-srconly)^options)&COLORWELL_SOURCEONLY;
   }
 
 
@@ -772,52 +673,5 @@ void FXColorWell::load(FXStream& store){
 // Destroy
 FXColorWell::~FXColorWell(){
   }
-
-
-// {
-//   FXEvent *ev=(FXEvent*)ptr;
-//   XEvent se;
-//   FXint tox,toy;
-//   Window tmp;
-//   Window www=getWindowAt(ev->root_x,ev->root_y);
-//
-//   XTranslateCoordinates(getDisplay(),XDefaultRootWindow(getDisplay()),www,ev->root_x,ev->root_y,&tox,&toy,&tmp);
-//
-//   se.xbutton.type=ButtonPress;
-//   se.xbutton.serial=0;
-//   se.xbutton.send_event=1;
-//   se.xbutton.display=getDisplay();
-//   se.xbutton.window=www;
-//   se.xbutton.root=XDefaultRootWindow(getDisplay());
-//   se.xbutton.subwindow=None;
-//   se.xbutton.time=ev->time;
-//   se.xbutton.x=tox;
-//   se.xbutton.y=toy;
-//   se.xbutton.x_root=ev->root_x;
-//   se.xbutton.y_root=ev->root_y;
-//   se.xbutton.state=0;
-//   se.xbutton.button=2;
-//   se.xbutton.same_screen=true;
-// fprintf(stderr,"SendEvent to window %d\n",se.xbutton.window);
-//   XSendEvent(getDisplay(),se.xbutton.window,True,NoEventMask,&se);
-//
-//   se.xbutton.type=ButtonRelease;
-//   se.xbutton.serial=0;
-//   se.xbutton.send_event=1;
-//   se.xbutton.display=getDisplay();
-//   se.xbutton.window=www;
-//   se.xbutton.root=XDefaultRootWindow(getDisplay());
-//   se.xbutton.subwindow=None;
-//   se.xbutton.time=ev->time+1;
-//   se.xbutton.x=tox;
-//   se.xbutton.y=toy;
-//   se.xbutton.x_root=ev->root_x;
-//   se.xbutton.y_root=ev->root_y;
-//   se.xbutton.state=Button2Mask;
-//   se.xbutton.button=2;
-//   se.xbutton.same_screen=true;
-// fprintf(stderr,"SendEvent to window %d\n",se.xbutton.window);
-//   XSendEvent(getDisplay(),se.xbutton.window,True,NoEventMask,&se);
-// }
 
 }
