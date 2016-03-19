@@ -3,7 +3,7 @@
 *                         D r i v e   B o x   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,7 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
@@ -65,7 +66,9 @@
 #include "FXList.h"
 #include "FXListBox.h"
 #include "FXDriveBox.h"
-#include "FXFileDict.h"
+#include "FXDictionary.h"
+#include "FXIconCache.h"
+#include "FXFileAssociations.h"
 #include "icons.h"
 
 
@@ -103,7 +106,7 @@ FXIMPLEMENT(FXDriveBox,FXListBox,FXDriveBoxMap,ARRAYNUMBER(FXDriveBoxMap))
 // Directory box
 FXDriveBox::FXDriveBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXListBox(p,tgt,sel,opts,x,y,w,h, pl,pr,pt,pb){
   associations=NULL;
-  if(!(options&DRIVEBOX_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
+  if(!(options&DRIVEBOX_NO_OWN_ASSOC)) associations=new FXFileAssociations(getApp());
   foldericon=new FXGIFIcon(getApp(),minifolder);
   cdromicon=new FXGIFIcon(getApp(),minicdrom);
   harddiskicon=new FXGIFIcon(getApp(),miniharddisk);
@@ -285,7 +288,7 @@ FXString FXDriveBox::getDrive() const {
 
 // Change associations table; force regeneration of the items
 // in the tree list so all the new bindings take effect
-void FXDriveBox::setAssociations(FXFileDict* assocs){
+void FXDriveBox::setAssociations(FXFileAssociations* assocs){
   if(associations!=assocs){
     associations=assocs;
     listDrives();
@@ -332,7 +335,7 @@ FXDriveBox::~FXDriveBox(){
   delete floppyicon;
   delete nethoodicon;
   delete zipdiskicon;
-  associations=(FXFileDict*)-1L;
+  associations=(FXFileAssociations*)-1L;
   foldericon=(FXIcon*)-1L;
   cdromicon=(FXIcon*)-1L;
   harddiskicon=(FXIcon*)-1L;

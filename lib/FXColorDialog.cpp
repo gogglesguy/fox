@@ -3,7 +3,7 @@
 *                           C o l o r   D i a l o g                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,7 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXEvent.h"
@@ -157,48 +158,6 @@ void FXColorDialog::destroy(){
   FXDialogBox::destroy();
   }
 
-/*
-
-// Well names
-const FXchar *const FXColorSelector::wellname[24]={
-  "wella","wellb","wellc","welld",
-  "welle","wellf","wellg","wellh",
-  "welli","wellj","wellk","welll",
-  "wellm","welln","wello","wellp",
-  "wellq","wellr","wells","wellt",
-  "wellu","wellv","wellw","wellx"
-  };
-
-
-  // Get custom well colors from defaults database
-  colorwells[0]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[0],FXRGBA(255,255,255,255)));
-  colorwells[1]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[1],FXRGBA(  0,  0,  0,255)));
-  colorwells[2]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[2],FXRGBA(255,  0,  0,255)));
-  colorwells[3]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[3],FXRGBA(  0,255,  0,255)));
-  colorwells[4]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[4],FXRGBA(  0,  0,255,255)));
-  colorwells[5]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[5],FXRGBA(  0,  0,255,255)));
-  colorwells[6]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[6],FXRGBA(255,255,  0,255)));
-  colorwells[7]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[7],FXRGBA(  0,255,255,255)));
-  colorwells[8]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[8],FXRGBA(255,  0,255,255)));
-  colorwells[9]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[9],FXRGBA(128,  0,  0,255)));
-  colorwells[10]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[10],FXRGBA(  0,128,  0,255)));
-  colorwells[11]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[11],FXRGBA(  0,  0,128,255)));
-  colorwells[12]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[12],FXRGBA(128,128,  0,255)));
-  colorwells[13]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[13],FXRGBA(128,  0,128,255)));
-  colorwells[14]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[14],FXRGBA(  0,128,128,255)));
-  colorwells[15]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[15],FXRGBA(  0,128,128,255)));
-  colorwells[16]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[16],FXRGBA(255,  0,255,255)));
-  colorwells[17]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[17],FXRGBA(128,  0,  0,255)));
-  colorwells[18]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[18],FXRGBA(  0,128,  0,255)));
-  colorwells[19]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[19],FXRGBA(  0,  0,128,255)));
-  colorwells[20]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[20],FXRGBA(128,128,  0,255)));
-  colorwells[21]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[21],FXRGBA(128,  0,128,255)));
-  colorwells[22]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[22],FXRGBA(  0,128,128,255)));
-  colorwells[23]->setRGBA(getApp()->reg().readColorEntry("SETTINGS",wellname[23],FXRGBA(  0,128,128,255)));
-
-  // Switch to correct pane
-
-*/
 
 // Change RGBA color
 void FXColorDialog::setRGBA(FXColor clr){

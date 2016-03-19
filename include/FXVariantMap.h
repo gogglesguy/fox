@@ -3,7 +3,7 @@
 *                              V a r i a n t - M a p                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -127,6 +127,9 @@ public:
   /// Inequality operator
   FXbool operator!=(const FXVariantMap& other) const { return !operator==(other); }
 
+  /// Return true if slot is empty.
+  FXbool empty(FXival pos) const { return table[pos].key.empty(); }
+
   /// Return key value at slot s; may be empty!
   const FXString& key(FXival s) const { return table[s].key; }
 
@@ -139,6 +142,7 @@ public:
   /// Destructor
  ~FXVariantMap();
   };
+
 
 }
 

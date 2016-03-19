@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2013 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2014 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -453,7 +453,7 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
 
   // Miscellaneous
   fontspec=getApp()->getNormalFont()->getFont();
-  iconpath=FXIconDict::defaultIconPath;
+  iconpath=FXIconCache::defaultIconPath;
   dragDelta=getApp()->getDragDelta();
   wheelLines=getApp()->getWheelLines();
   maxcolors=125;
@@ -502,10 +502,9 @@ void FXDesktopSetup::create(){
 
 // Search iconpath for given name and load the icon
 FXIcon *FXDesktopSetup::createIconFromName(const FXString& name) const {
-  FXIconSource iconsource(getApp());
   FXString iconfilename=FXPath::search(iconpath,name);
   if(!iconfilename.empty()){
-    FXIcon *ico=iconsource.loadIconFile(iconfilename);
+    FXIcon *ico=FXIconSource::defaultIconSource.loadIconFile(getApp(),iconfilename);
     if(ico){
       ico->blend(getApp()->getBaseColor());
       ico->create();
@@ -590,21 +589,21 @@ long FXDesktopSetup::onCmdFileBinding(FXObject*,FXSelector,void* ptr){
     association=desktopsettings.readStringEntry("FILETYPES",filebinding.key.text());
 
     // Get command and description names
-    filebinding.command=association.section(";",0);
-    filebinding.description=association.section(";",1);
+    filebinding.command=association.section(';',0);
+    filebinding.description=association.section(';',1);
 
     // Big icon closed and open
-    iconname=association.section(";",2);
-    filebinding.iconfile[BIG_ICON]=iconname.section(":",0);
-    filebinding.iconfile[BIG_ICON_OPEN]=iconname.section(":",1);
+    iconname=association.section(';',2);
+    filebinding.iconfile[BIG_ICON]=iconname.section(':',0);
+    filebinding.iconfile[BIG_ICON_OPEN]=iconname.section(':',1);
 
     // Small icon closed and open
-    iconname=association.section(";",3);
-    filebinding.iconfile[MINI_ICON]=iconname.section(":",0);
-    filebinding.iconfile[MINI_ICON_OPEN]=iconname.section(":",1);
+    iconname=association.section(';',3);
+    filebinding.iconfile[MINI_ICON]=iconname.section(':',0);
+    filebinding.iconfile[MINI_ICON_OPEN]=iconname.section(':',1);
 
     // Mime type name
-    filebinding.mime=association.section(";",4);
+    filebinding.mime=association.section(';',4);
     if(!filebinding.mime.empty()){
       no=mimetypelist->findItem(filebinding.mime);
       mimetypelist->setCurrentItem(no);
@@ -786,22 +785,21 @@ void FXDesktopSetup::setupFont(){
 
 // Update controls of file bindings
 void FXDesktopSetup::setupFileBindings(){
-  FXStringDict *prefs=desktopsettings.find("FILETYPES");
+  const FXStringDictionary& section=getApp()->reg().at("FILETYPES");
+  FXString mime;
+  FXint entry;
   filebindinglist->clearItems();
   mimetypelist->clearItems();
-  if(prefs){
-    FXString string,mime;
-    for(FXint e=prefs->first(); e<prefs->size(); e=prefs->next(e)){
-      filebindinglist->appendItem(prefs->key(e),NULL,NULL,true);
-      string=prefs->data(e);
-      mime=string.section(";",4);
-      if(!mime.empty() && (mimetypelist->findItem(mime)==-1)){
-        mimetypelist->appendItem(mime);
-        }
+  for(entry=0; entry<section.no(); ++entry){
+    if(section.empty(entry)) continue;
+    filebindinglist->appendItem(section.key(entry),NULL,NULL,true);
+    mime=section.data(entry).section(';',4);
+    if(!mime.empty() && (mimetypelist->findItem(mime)==-1)){
+      mimetypelist->appendItem(mime);
       }
+    filebindinglist->sortItems();
+    mimetypelist->sortItems();
     }
-  filebindinglist->sortItems();
-  mimetypelist->sortItems();
   }
 
 
@@ -1101,7 +1099,7 @@ FXbool FXDesktopSetup::readSettingsFile(const FXString& file){
     tooltipTime=desktopsettings.readLongEntry("SETTINGS","tiptime",getApp()->getToolTipTime())/milliseconds;
 
     // Icon search path
-    iconpath=desktopsettings.readStringEntry("SETTINGS","iconpath",FXIconDict::defaultIconPath);
+    iconpath=desktopsettings.readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath);
 
     // Mouse tweaks
     dragDelta=desktopsettings.readIntEntry("SETTINGS","dragdelta",getApp()->getDragDelta());
@@ -1199,6 +1197,11 @@ FXDesktopSetup::~FXDesktopSetup(){
 // Start the program
 int main(int argc,char **argv){
   FXString appnm,vndnm;
+
+  // Make sure  we're linked against the right library version
+  if(fxversion[0]!=FOX_MAJOR || fxversion[1]!=FOX_MINOR || fxversion[2]!=FOX_LEVEL){
+    fxerror("FOX Library mismatch; expected version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL);
+    }
 
   // Make application
   FXApp application("ControlPanel","FOX-DESKTOP");

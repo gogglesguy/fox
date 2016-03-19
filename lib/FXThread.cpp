@@ -3,7 +3,7 @@
 *                          T h r e a d   S u p p o r t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -95,10 +95,10 @@ FXThread* FXThread::self(){
   }
 
 
-// Start the thread; we associate the FXThread instance with this thread using thread-local 
+// Start the thread; we associate the FXThread instance with this thread using thread-local
 // storage accessed with self_key.
 // A special FXThreadException may be used to unroll to this point and return a specific
-// error code from the thread; any other FXException is silently caught here, and causes 
+// error code from the thread; any other FXException is silently caught here, and causes
 // FXThread to return error-code of -1.
 #if defined(WIN32)
 unsigned int CALLBACK FXThread::function(void* ptr){

@@ -45,6 +45,7 @@
 +FXDial.obj &
 +FXDialogBox.obj &
 +FXDict.obj &
++FXDictionary.obj &
 +FXDir.obj &
 +FXDirBox.obj &
 +FXDirDialog.obj &
@@ -208,7 +209,7 @@
 +FXStatusLine.obj &
 +FXStream.obj &
 +FXString.obj &
-+FXStringDict.obj &
++FXStringDictionary.obj &
 +FXSwitcher.obj &
 +FXSystem.obj &
 +FXTGAIcon.obj &

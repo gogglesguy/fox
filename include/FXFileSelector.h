@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -28,7 +28,7 @@
 namespace FX {
 
 
-class FXFileDict;
+class FXFileAssociations;
 class FXFileList;
 class FXTextField;
 class FXComboBox;
@@ -39,6 +39,7 @@ class FXIcon;
 class FXMenuPane;
 class FXCheckButton;
 class FXMatrix;
+class FXIconSource;
 class FXHorizontalFrame;
 
 
@@ -129,6 +130,7 @@ public:
     ID_FILELIST,
     ID_DIRECTORY_UP,
     ID_DIRTREE,
+    ID_MINI_SIZE,
     ID_NORMAL_SIZE,
     ID_MEDIUM_SIZE,
     ID_GIANT_SIZE,
@@ -300,12 +302,6 @@ public:
   /// Is navigation allowed?
   FXbool allowNavigation() const { return navigable; }
 
-  /// Change file associations; delete old ones if owned
-  void setAssociations(FXFileDict* assoc,FXbool owned=false);
-
-  /// Return file associations
-  FXFileDict* getAssociations() const;
-
   /// Set draggable files
   void setDraggableFiles(FXbool flag);
 
@@ -317,6 +313,18 @@ public:
 
   /// Return file time format
   FXString getTimeFormat() const;
+
+  /// Change file associations; delete old ones if owned
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
+
+  /// Return file associations
+  FXFileAssociations* getAssociations() const;
+
+  /// Change icon loader
+  void setIconSource(FXIconSource* src);
+
+  /// Return icon loader
+  FXIconSource* getIconSource() const;
 
   /// Save object to a stream
   virtual void save(FXStream& store) const;

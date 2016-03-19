@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,11 +29,9 @@ namespace FX {
 
 
 struct FXFileAssoc;
-class FXFileDict;
 class FXFileList;
-class FXIcon;
 class FXIconSource;
-class FXIconDict;
+class FXFileAssociations;
 
 
 /// File List options
@@ -45,7 +43,6 @@ enum {
   FILELIST_NO_OWN_ASSOC = 0x40000000, /// Do not create associations for files
   FILELIST_NO_PARENT    = 0x80000000  /// Suppress display of '.' and '..'
   };
-
 
 
 /// File item
@@ -134,33 +131,33 @@ public:
 class FXAPI FXFileList : public FXIconList {
   FXDECLARE(FXFileList)
 protected:
-  FXFileDict   *associations;   // Association table
-  FXFileItem   *list;           // File item list
-  FXIcon       *big_folder;     // Big folder icon
-  FXIcon       *mini_folder;    // Mini folder icon
-  FXIcon       *big_doc;        // Big document icon
-  FXIcon       *mini_doc;       // Mini document icon
-  FXIcon       *big_app;        // Big application icon
-  FXIcon       *mini_app;       // Mini application icon
-  FXString      directory;      // Current directory
-  FXString      pattern;        // Pattern of file names
-  FXString      timeformat;     // File time formatting
-  FXString      startdirectory; // Start directory
-  FXString      dropdirectory;  // Drop directory
-  FXString      clipfiles;      // Clipped files
-  FXString      dragfiles;      // Dragged files
-  FXString      dropfiles;      // Dropped files
-  FXDragAction  dropaction;     // Drop action
-  FXuint        matchmode;      // File wildcard match mode
-  FXint         imagesize;      // Image size
-  FXTime        timestamp;      // Time when last refreshed
-  FXuint        counter;        // Refresh counter
-  FXbool        clipcut;        // Cut or copy
-  FXbool        draggable;      // Dragable files
+  FXFileAssociations *associations;     // Association table
+  FXIconSource       *iconloader;       // Icon loader
+  FXFileItem         *list;             // File item list
+  FXIcon             *big_folder;       // Big folder icon
+  FXIcon             *mini_folder;      // Mini folder icon
+  FXIcon             *big_doc;          // Big document icon
+  FXIcon             *mini_doc;         // Mini document icon
+  FXIcon             *big_app;          // Big application icon
+  FXIcon             *mini_app;         // Mini application icon
+  FXString            directory;        // Current directory
+  FXString            pattern;          // Pattern of file names
+  FXString            timeformat;       // File time formatting
+  FXString            startdirectory;   // Start directory
+  FXString            dropdirectory;    // Drop directory
+  FXString            clipfiles;        // Clipped files
+  FXString            dragfiles;        // Dragged files
+  FXString            dropfiles;        // Dropped files
+  FXDragAction        dropaction;       // Drop action
+  FXuint              matchmode;        // File wildcard match mode
+  FXint               imagesize;        // Image size
+  FXTime              timestamp;        // Time when last refreshed
+  FXuint              counter;          // Refresh counter
+  FXbool              clipcut;          // Cut or copy
+  FXbool              draggable;        // Dragable files
 protected:
   FXFileList();
   void listItems(FXbool force);
-  FXIcon* getItemPreviewIcon(FXint index) const;
   FXString getSelectedFiles() const;
   virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
 private:
@@ -380,23 +377,29 @@ public:
   /// Return images preview size
   FXint getImageSize() const { return imagesize; }
 
-  /// Change file associations; delete the old one unless it was shared
-  void setAssociations(FXFileDict* assoc,FXbool owned=false);
-
-  /// Return file associations
-  FXFileDict* getAssociations() const { return associations; }
-
   /// Set draggable files
   void setDraggableFiles(FXbool flag);
 
   /// Are draggable files
   FXbool getDraggableFiles() const { return draggable; }
 
-  /// Set file time format 
+  /// Set file time format
   void setTimeFormat(const FXString& fmt);
 
   /// Return file time format
   const FXString& getTimeFormat() const { return timeformat; }
+
+  /// Change file associations; delete the old one unless it was shared
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
+
+  /// Return file associations
+  FXFileAssociations* getAssociations() const { return associations; }
+
+  /// Change icon loader
+  void setIconSource(FXIconSource* src){ iconloader=src; }
+
+  /// Return icon loader
+  FXIconSource* getIconSource() const { return iconloader; }
 
   /// Save to stream
   virtual void save(FXStream& store) const;

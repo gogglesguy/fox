@@ -3,7 +3,7 @@
 *                      J S O N   R e a d e r  &  W r i t e r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2013,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -112,7 +112,7 @@ public:
   * Return direction in effect.
   */
   Direction direction() const { return dir; }
-  
+
   /**
   * Load a variant from stream.
   * Return false if stream wasn't opened for loading, or syntax error.
@@ -197,7 +197,7 @@ public:
   */
   virtual ~FXJSON();
   };
-  
+
 }
 
 #endif

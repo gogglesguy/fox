@@ -3,7 +3,7 @@
 *                      J S O N   R e a d e r  &  W r i t e r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2013,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -167,7 +167,7 @@ FXbool FXJSON::open(FXchar* data,FXuval sz,Direction d){
       }
     else{                       // Internal buffer
       if(sz<MINBUFFER) sz=MINBUFFER;
-      if(!callocElms(begptr,sz)) return false; 
+      if(!callocElms(begptr,sz)) return false;
       endptr=begptr+sz;
       owns=true;
       }
@@ -190,8 +190,8 @@ FXbool FXJSON::open(FXchar* data,FXuval sz,Direction d){
     }
   return false;
   }
-    
-    
+
+
 /*******************************************************************************/
 
 // Get next token

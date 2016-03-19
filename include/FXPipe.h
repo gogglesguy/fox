@@ -3,7 +3,7 @@
 *                             P i p e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,14 +42,14 @@ public:
   FXPipe(){ }
 
   /// Construct and open pipes with access mode m for this one and the reverse for the other
-  FXPipe(FXPipe& other,FXuint m=FXIO::Reading);
+  FXPipe(FXPipe& other,FXuint m);
 
   /// Construct pipe and attach existing handle h
   FXPipe(FXInputHandle h,FXuint m=FXIO::Reading);
 
   /// Open pipes with access mode m for this one and the reverse for the other
   virtual FXbool open(FXPipe& other,FXuint m=FXIO::Reading);
-  
+
   /// Open device with access mode and handle
   virtual FXbool open(FXInputHandle h,FXuint m=FXIO::Reading);
 

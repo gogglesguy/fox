@@ -3,7 +3,7 @@
 *                        I / O   B u f f e r   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -52,7 +52,7 @@ public:
 
   /// Obtain pointer to buffer
   FXuchar* data() const { return buffer; }
-  
+
   /// Return true if open
   virtual FXbool isOpen() const;
 

@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -946,9 +946,9 @@ FXString& FXString::operator+=(const FXString& s){
 
 // Adopt string s, leaving s empty
 FXString& FXString::adopt(FXString& s){
-  if(__likely(str!=s.str)){ 
-    swap(str,s.str); 
-    s.clear(); 
+  if(__likely(str!=s.str)){
+    swap(str,s.str);
+    s.clear();
     }
   return *this;
   }
@@ -2441,7 +2441,7 @@ FXuint FXString::hash(const FXchar* s){
   }
 
 
-// Get hash value
+// Get hash value of the string
 FXuint FXString::hash() const {
   return FXString::hash(str);
   }

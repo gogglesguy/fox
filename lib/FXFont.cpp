@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,6 +33,7 @@
 #include "FXRectangle.h"
 #include "FXException.h"
 #include "FXRegion.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXFont.h"

@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -53,11 +53,12 @@ FXWorker::FXWorker(FXRunnable* rn):runnable(rn){
 
 
 // Worker runs a job, then cleans itself up
-// Exceptions are passed through after cleanup of worker
 FXint FXWorker::run(){
   if(runnable){
     try{
       runnable->run();
+      }
+    catch(const FXException&){
       }
     catch(...){
       delete this;

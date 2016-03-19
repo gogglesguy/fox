@@ -3,7 +3,7 @@
 *                             P i p e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -78,7 +78,7 @@ FXbool FXPipe::open(FXPipe& other,FXuint m){
     sat.nLength=sizeof(SECURITY_ATTRIBUTES);
     sat.bInheritHandle=(m&Inheritable)?true:false;
     sat.lpSecurityDescriptor=NULL;
-    
+
     // Create connected pipe
     if(CreatePipe(&hrd,(HANDLE*)&hwr,&sat,0)!=0){
       if(m&ReadOnly){
@@ -110,9 +110,9 @@ FXbool FXPipe::open(FXPipe& other,FXuint m){
     // Create connected pipe
 #if defined(HAVE_PIPE2)
     if(pipe2(fd,flags)==0){
-#else    
+#else
     if(pipe(fd)==0){
-#endif    
+#endif
       if(m&ReadOnly){
         device=fd[0];
         other.device=fd[1];
@@ -131,7 +131,7 @@ FXbool FXPipe::open(FXPipe& other,FXuint m){
     }
   return false;
   }
-  
+
 
 // Open pipe with access mode m and handle h
 FXbool FXPipe::open(FXInputHandle h,FXuint m){

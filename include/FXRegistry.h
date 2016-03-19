@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -57,7 +57,6 @@ namespace FX {
 * back to the system when FXApp::exit() is called.
 */
 class FXAPI FXRegistry : public FXSettings {
-  FXDECLARE(FXRegistry)
 protected:
   FXString applicationkey;  // Application key
   FXString vendorkey;       // Vendor key
@@ -66,10 +65,10 @@ protected:
   FXbool   ascii;           // ASCII file-based registry
 protected:
 #if defined(WIN32)
-  FXbool readFromRegistry(void* hRootKey,FXbool mark);
-  FXbool readFromRegistryGroup(void* org,const char* groupname,FXbool mark=false);
-  FXbool writeToRegistry(void* hRootKey);
-  FXbool writeToRegistryGroup(void* org,const char* groupname);
+  FXbool readFromRegistry(FXptr hroot,FXbool mark=false);
+  FXbool writeToRegistry(FXptr hroot);
+  FXbool readFromRegistryGroup(const FXString& group,FXptr hbase,FXbool mark=false);
+  FXbool writeToRegistryGroup(const FXString& group,FXptr hbase);
 #endif
 private:
   FXRegistry(const FXRegistry&);

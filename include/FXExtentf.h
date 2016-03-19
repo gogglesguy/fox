@@ -3,7 +3,7 @@
 *          S i n g l e - P r e c i s i o n    E x t e n t    C l a s s          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -86,7 +86,7 @@ public:
 
   /// Area
   FXfloat area() const { return width()*height(); }
-  
+
   /// Longest side
   FXfloat longest() const;
 

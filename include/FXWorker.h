@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,10 +30,10 @@ namespace FX {
 
 /**
 * An FXWorker is a transient thread that performs an FXRunnable.
-* After the worker thread finishes the execution of the runnable, the worker thread's 
+* After the worker thread finishes the execution of the runnable, the worker thread's
 * memory is automatically reclaimed.
 * The FXRunnable itself is not deleted; it will thus outlive the worker that runs it.
-* Any exceptions raised by the runnable are caught by the worker thread, and will 
+* Any exceptions raised by the runnable are caught by the worker thread, and will
 * be rethrown after the worker thread's memory has been reclaimed.
 */
 class FXAPI FXWorker : public FXThread {

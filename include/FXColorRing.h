@@ -3,7 +3,7 @@
 *                         C o l o r R i n g   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,12 +32,14 @@ class FXImage;
 
 
 /**
-* A Color Ring widget provides an intuitive way to specify a color.
+* A ColorRing widget provides an intuitive way to specify a color.
 * The outer ring of the widget is rotated to control the hue of the color
 * being specified, while the inner triangle varies the color saturation
 * and the brightness of the color.  The color saturation axis of the
 * triangle goes from a fully saturated "pure" color to "pastel" color;
 * the brightness goes from black to a bright color.
+* ColorRing supports justify options to allow control of the placement of
+* the ring inside the rectangular space of the widget.
 */
 class FXAPI FXColorRing : public FXFrame {
   FXDECLARE(FXColorRing)
@@ -139,6 +141,12 @@ public:
 
   /// Return width of hue ring
   FXint getRingWidth() const { return ringwidth; }
+
+  /// Set the current justification mode
+  void setJustify(FXuint style);
+
+  /// Get the current justification mode
+  FXuint getJustify() const;
 
   /// Set status line help text for this color well
   void setHelpText(const FXString& text){ help=text; }

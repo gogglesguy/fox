@@ -3,7 +3,7 @@
 *                D i r e c t o r y   S e l e c t i o n   D i a l o g            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,6 +32,7 @@
 #include "FXRectangle.h"
 #include "FXStat.h"
 #include "FXFile.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXFont.h"
@@ -162,13 +163,13 @@ FXuint FXDirDialog::getDirBoxStyle() const {
 
 
 // Change file associations
-void FXDirDialog::setAssociations(FXFileDict* assoc,FXbool owned){
+void FXDirDialog::setAssociations(FXFileAssociations* assoc,FXbool owned){
   dirbox->setAssociations(assoc,owned);
   }
 
 
 // Return file associations
-FXFileDict* FXDirDialog::getAssociations() const {
+FXFileAssociations* FXDirDialog::getAssociations() const {
   return dirbox->getAssociations();
   }
 

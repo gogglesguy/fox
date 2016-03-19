@@ -3,7 +3,7 @@
 *                         C o l o r R i n g   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,6 +29,7 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXEvent.h"
@@ -98,14 +99,14 @@
   - Also, we calculate the triangle corners during layout; this keeps manipulation
     of saturation and value very cheap [just move the inner ball].
 
-  - Maybe for slow machines a mode to NOT update dial during dragging.
-
-  - Now that it works I need some beer....
+  - Dial can now be justified inside its box.
 */
 
 #define RINGDIAMETER  60        // Default ring outer diameter
 #define RINGWIDTH     14        // Default ring width
 #define MINTRIANGLE   5         // Minimum triangle radius
+
+#define JUSTIFY_MASK  (JUSTIFY_HZ_APART|JUSTIFY_VT_APART)
 
 
 using namespace FX;
@@ -224,8 +225,12 @@ void FXColorRing::layout(){
   ss=ringouter+ringouter+1;
 
   // New dial location in widget
-  dialx=border+padleft+(ww-ss)/2;
-  dialy=border+padtop+(hh-ss)/2;
+  if(options&JUSTIFY_LEFT) dialx=padleft+border;
+  else if(options&JUSTIFY_RIGHT) dialx=width-padright-border-ss;
+  else dialx=border+padleft+(ww-ss)/2;
+  if(options&JUSTIFY_TOP) dialy=padtop+border;
+  else if(options&JUSTIFY_BOTTOM) dialy=height-padbottom-border-ss;
+  else dialy=border+padtop+(hh-ss)/2;
 
   // Do work if size changed or marked dirty
   if((dial->getWidth()!=ss) || (flags&FLAG_DIRTY)){
@@ -621,7 +626,6 @@ void FXColorRing::setVal(FXfloat v){
   }
 
 
-
 // Set hue, saturation, value
 void FXColorRing::setHueSatVal(FXfloat h,FXfloat s,FXfloat v){
 
@@ -658,6 +662,22 @@ void FXColorRing::setRingWidth(FXint rw){
     ringwidth=rw;
     recalc();
     }
+  }
+
+
+// Set text justify style
+void FXColorRing::setJustify(FXuint style){
+  FXuint opts=(options&~JUSTIFY_MASK) | (style&JUSTIFY_MASK);
+  if(options!=opts){
+    options=opts;
+    recalc();
+    }
+  }
+
+
+// Get text justify style
+FXuint FXColorRing::getJustify() const {
+  return (options&JUSTIFY_MASK);
   }
 
 

@@ -3,7 +3,7 @@
 *                                 Test Table Widget                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

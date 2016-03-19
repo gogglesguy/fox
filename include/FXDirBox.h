@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   B o x   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,7 +29,7 @@ namespace FX {
 
 
 class FXIcon;
-class FXFileDict;
+class FXFileAssociations;
 
 /// Directory Box options
 enum {
@@ -49,14 +49,14 @@ enum {
 class FXAPI FXDirBox : public FXTreeListBox {
   FXDECLARE(FXDirBox)
 protected:
-  FXFileDict *associations;     // Association table
-  FXIcon     *foldericon;       // Folder icons
-  FXIcon     *cdromicon;        // CDROM icon
-  FXIcon     *harddiskicon;     // Hard disk icon
-  FXIcon     *netdriveicon;     // Networked drive icon
-  FXIcon     *floppyicon;       // Floppy icon
-  FXIcon     *nethoodicon;      // Network neighborhood icon
-  FXIcon     *zipdiskicon;      // Zip drive icon
+  FXFileAssociations *associations;     // Association table
+  FXIcon             *foldericon;       // Folder icons
+  FXIcon             *cdromicon;        // CDROM icon
+  FXIcon             *harddiskicon;     // Hard disk icon
+  FXIcon             *netdriveicon;     // Networked drive icon
+  FXIcon             *floppyicon;       // Floppy icon
+  FXIcon             *nethoodicon;      // Network neighborhood icon
+  FXIcon             *zipdiskicon;      // Zip drive icon
 protected:
   FXDirBox(){}
   FXString getItemPathname(FXTreeItem *item) const;
@@ -97,10 +97,10 @@ public:
   FXString getDirectory() const;
 
   /// Change file associations; delete the old one unless it was shared
-  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
 
   /// Return file associations
-  FXFileDict* getAssociations() const { return associations; }
+  FXFileAssociations* getAssociations() const { return associations; }
 
   /// Destructor
   virtual ~FXDirBox();

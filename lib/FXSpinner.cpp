@@ -3,7 +3,7 @@
 *                             S p i n   B u t t o n                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Lyle Johnson.   All Rights Reserved.               *
+* Copyright (C) 1998,2014 by Lyle Johnson.   All Rights Reserved.               *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
 #include "FXEvent.h"

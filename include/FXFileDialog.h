@@ -3,7 +3,7 @@
 *                   F i l e   S e l e c t i o n   D i a l o g                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -28,8 +28,9 @@
 namespace FX {
 
 
-class FXFileDict;
 class FXFileSelector;
+class FXIconSource;
+class FXFileAssociations;
 
 
 /// File selection dialog
@@ -193,10 +194,16 @@ public:
   FXString getTimeFormat() const;
 
   /// Change file associations; delete old ones if owned
-  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
 
   /// Return file associations
-  FXFileDict* getAssociations() const;
+  FXFileAssociations* getAssociations() const;
+
+  /// Change icon loader
+  void setIconSource(FXIconSource* src);
+
+  /// Return icon loader
+  FXIconSource* getIconSource() const;
 
   /// Open existing filename
   static FXString getOpenFilename(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns="*",FXint initial=0);

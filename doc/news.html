@@ -17,6 +17,34 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+January 129 - FOX DEVELOPMENT 1.7.46
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXIconSource now can use icon/image contents to detect file format type [the stream must be seekable].</li>
+<li>A default FXIconSource implementation in FOX will be used to load icons if not overloaded by a user-extended one
+explicitly.</li>
+<li>Replaced FXIconDict with FXIconCache.</li>
+<li>Replaced FXFileDict with FXFileAssociations.  The new implementation uses FXDictionary, 
+and the new FXIconCache.</li>
+<li>Fixed problem in FXDictionary: object pointed to by data is itself not const.  This affects const-accessors.</li>
+<li>Fixed bug in Adie: dumping core when started with unknown commandline parameter.</li>
+<li>Expunged FXDict and its subclasses.  Now replaced with new implementations, see above.</li>
+<li>FXFileList now has explicit pointer to FXIconSource, for image preview purposes.</li>
+<li>Changed things around for FXFileAssociations to be more easily subclassable.</li>
+<li>In FXIconCache, don't add to the hash table until loading was successful.</li>
+<li>PathFinder icon previewing improved, more options for sizing.</li>
+<li>PathFinder custom iconpath wasn't being saved.</li>
+<li>In FXFileAssociations, don't add extension-association unless associated extension data from
+registry is fully and properly parsed.</li>
+<li>Fixed compile problem in FXPipe.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 December 17 - FOX DEVELOPMENT 1.7.45
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -32,17 +60,17 @@ December 17 - FOX DEVELOPMENT 1.7.45
 a thread when thrown inside of FXThread.</li>
 <li>FXThread now interceps only FXException (and subclasses), rethrows other exceptions.  This was necessary due
 to the way GNU C++ library performs thread exits.</li>
-<li>Non FOX exceptions thrown inside FXThread are now rethrown; but attempts are made to maintain proper 
+<li>Non FOX exceptions thrown inside FXThread are now rethrown; but attempts are made to maintain proper
 bookkeeping when unrolling the stack.</li>
 <li>FXThreadPool tasks may throw exceptions. FXThreadPool now intercepts all FOX exceptions and updates
-bookkeeping when other exceptions are thrown. Note: tasks in FXThreadPool are executed by threads, but since 
+bookkeeping when other exceptions are thrown. Note: tasks in FXThreadPool are executed by threads, but since
 sometimes the main thread is executing tasks in FXThreadPool also we can not allow tasks to throw FXThreadException.</li>
 <li>Exceptions thrown inside FXWorker now terminate the worker, and reclaim worker's thread and memory.  Before exceptions
 were all caught, making it impossible to pass return codes from worker execution.</li>
 <li>Exceptions thrown in FXTaskGroup::Task correctly reclaim the FXTaskGroup::Task now, and will update
 completion count and notifications appropriately.</li>
-<li>The exception philosophy in FOX is that the library only manages FXExceptions and their subclasses; other exceptions 
-will be either uncaught or caught and rethrown after bookkeeping updates; thus programs should be careful throwing 
+<li>The exception philosophy in FOX is that the library only manages FXExceptions and their subclasses; other exceptions
+will be either uncaught or caught and rethrown after bookkeeping updates; thus programs should be careful throwing
 exceptions other than FXExceptions.</li>
 </ul>
 

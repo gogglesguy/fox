@@ -3,7 +3,7 @@
 *                        C o l o r W h e e l   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,8 +33,10 @@ class FXImage;
 
 /**
 * A ColorWheel is a widget which controls the hue and saturation values of a
-* color.  It is most often used together with a Color Bar which controls the
+* color.  It is most often used together with a ColorBar which controls the
 * brighness.
+* ColorWheel supports justify options to allow control of the placement of
+* the wheel inside the rectangular space of the widget.
 */
 class FXAPI FXColorWheel : public FXFrame {
   FXDECLARE(FXColorWheel)
@@ -108,6 +110,12 @@ public:
 
   /// Set hue, saturation, value
   void setHueSatVal(FXfloat h,FXfloat s,FXfloat v);
+
+  /// Set the current justification mode
+  void setJustify(FXuint style);
+
+  /// Get the current justification mode
+  FXuint getJustify() const;
 
   /// Set status line help text for this color well
   void setHelpText(const FXString& text){ help=text; }

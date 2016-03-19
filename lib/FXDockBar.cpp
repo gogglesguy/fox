@@ -3,7 +3,7 @@
 *                         D o c k S i t e   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,6 +29,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
 #include "FXEvent.h"

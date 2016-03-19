@@ -3,7 +3,7 @@
 *                      U T F - 1 6  T e x t   C o d e c                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2013 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2014 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -24,7 +24,6 @@
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
-#include "FXDict.h"
 #include "FXString.h"
 #include "FXTextCodec.h"
 #include "FXUTF16Codec.h"

@@ -3,7 +3,7 @@
 *                             T h r e a d   P o o l                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -210,7 +210,7 @@ void FXThreadPool::processTasksWhile(volatile FXuint& count,FXTime nsec){
       freeslots.post();
       throw;
       }
-    freeslots.post();           // Adjust semaphore 
+    freeslots.post();           // Adjust semaphore
     }
   }
 

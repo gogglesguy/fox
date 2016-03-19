@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -38,6 +38,7 @@
 #include "FXStat.h"
 #include "FXFile.h"
 #include "FXURL.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXFont.h"
@@ -48,7 +49,6 @@
 #include "FXGIFIcon.h"
 #include "FXScrollBar.h"
 #include "FXIconSource.h"
-#include "FXIconDict.h"
 #include "FXShell.h"
 #include "FXPopup.h"
 #include "FXMenuPane.h"
@@ -58,7 +58,9 @@
 #include "FXMenuRadio.h"
 #include "FXMenuCheck.h"
 #include "FXMenuSeparator.h"
-#include "FXFileDict.h"
+#include "FXDictionary.h"
+#include "FXIconCache.h"
+#include "FXFileAssociations.h"
 #include "FXHeader.h"
 #include "FXIconList.h"
 #include "FXFileList.h"
@@ -71,7 +73,7 @@
 /*
   Notes:
   - Share icons with other widgets; upgrade icons to some nicer ones.
-  - Should some of these icons move to FXFileDict?
+  - Should some of these icons move to FXFileAssociations?
   - Clipboard of filenames.
   - Clipboard, DND, etc. support.
   - When being dragged over, if hovering over a directory item for some
@@ -80,7 +82,6 @@
     messages as the FXFileList updates itself from the file system.
   - The solution currently used to determine whether or not to blend the
     icon isn't so great; this class shouldn't have to know about FXPNGIcon.
-  - Should blending also happen in FXIconDict? Or more general solution.
   - If you land in a large directory with images, things are a tad slow;
     need to speed this up some how.
 */
@@ -178,6 +179,7 @@ FXIMPLEMENT(FXFileList,FXIconList,FXFileListMap,ARRAYNUMBER(FXFileListMap))
 FXFileList::FXFileList(){
   dropEnable();
   associations=NULL;
+  iconloader=NULL;
   list=NULL;
   big_folder=NULL;
   mini_folder=NULL;
@@ -215,7 +217,8 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   appendHeader(tr("Link\tSymbolic link to"),NULL,200);
 #endif
   associations=NULL;
-  if(!(options&FILELIST_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
+  if(!(options&FILELIST_NO_OWN_ASSOC)) associations=new FXFileAssociations(getApp());
+  iconloader=&FXIconSource::defaultIconSource;
   list=NULL;
   big_folder=new FXGIFIcon(getApp(),bigfolder);
   mini_folder=new FXGIFIcon(getApp(),minifolder);
@@ -947,23 +950,15 @@ long FXFileList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
 
 /*******************************************************************************/
 
-// Load preview icon given path
-FXIcon* FXFileList::getItemPreviewIcon(FXint index) const {
-  if(getAssociations() && getAssociations()->getIconDict() && getAssociations()->getIconDict()->getIconSource()){
-    return getAssociations()->getIconDict()->getIconSource()->loadScaledIconFile(getItemPathname(index),imagesize);
-    }
-  return NULL;
-  }
-
-
 // Cycle through items that represent images
 long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
-  register FXint index=(FXint)(FXival)ptr;
-  register FXIcon *icon;
-  if(index<getNumItems()){
-    if((icon=getItemPreviewIcon(index))!=NULL){
+  FXint index=(FXint)(FXival)ptr;
+  if(index<getNumItems() && iconloader){
+    FXIcon *icon=iconloader->loadScaledIconFile(getApp(),getItemPathname(index),imagesize);;
+    if(icon){
       icon->create();
       setItemBigIcon(index,icon,true);
+      setItemMiniIcon(index,icon,false);
       }
    if(++index<getNumItems()){
      getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)index);
@@ -1767,7 +1762,7 @@ void FXFileList::setImageSize(FXint size){
 
 
 // Change file associations; delete the old one unless it was shared
-void FXFileList::setAssociations(FXFileDict* assocs,FXbool owned){
+void FXFileList::setAssociations(FXFileAssociations* assocs,FXbool owned){
   FXuint opts=options;
   options^=((owned-1)^options)&FILELIST_NO_OWN_ASSOC;
   if(associations!=assocs){
@@ -1847,7 +1842,7 @@ FXFileList::~FXFileList(){
   delete mini_doc;
   delete big_app;
   delete mini_app;
-  associations=(FXFileDict*)-1L;
+  associations=(FXFileAssociations*)-1L;
   big_folder=(FXIcon*)-1L;
   mini_folder=(FXIcon*)-1L;
   big_doc=(FXIcon*)-1L;

@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -39,43 +39,43 @@ class Adie : public FXApp {
   FXDECLARE(Adie)
   friend class TextWindow;
 protected:
-  TextWindowList  windowlist;                   // Window list
-  FXFileDict     *associations;                 // File association table
-  SyntaxList      syntaxes;                     // List of syntax patterns
-  FXString        syntaxpaths;                  // Where to look for syntax file
-  FXIcon         *bigicon;                      // Big application icon
-  FXIcon         *smallicon;                    // Small application icon
-  FXIcon         *newicon;
-  FXIcon         *reloadicon;
-  FXIcon         *openicon;
-  FXIcon         *saveicon;
-  FXIcon         *saveasicon;
-  FXIcon         *printicon;
-  FXIcon         *cuticon;
-  FXIcon         *copyicon;
-  FXIcon         *pasteicon;
-  FXIcon         *deleteicon;
-  FXIcon         *undoicon;
-  FXIcon         *redoicon;
-  FXIcon         *fontsicon;
-  FXIcon         *helpicon;
-  FXIcon         *quiticon;
-  FXIcon         *searchicon;
-  FXIcon         *searchnexticon;
-  FXIcon         *searchprevicon;
-  FXIcon         *bookseticon;
-  FXIcon         *booknexticon;
-  FXIcon         *bookprevicon;
-  FXIcon         *bookdelicon;
-  FXIcon         *shiftlefticon;
-  FXIcon         *shiftrighticon;
-  FXIcon         *configicon;
-  FXIcon         *browsericon;
-  FXIcon         *nobrowsericon;
-  FXIcon         *uppercaseicon;
-  FXIcon         *lowercaseicon;
-  FXIcon         *backwardicon;
-  FXIcon         *forwardicon;
+  TextWindowList      windowlist;                   // Window list
+  FXFileAssociations *associations;                 // File association table
+  SyntaxList          syntaxes;                     // List of syntax patterns
+  FXString            syntaxpaths;                  // Where to look for syntax file
+  FXIcon             *bigicon;                      // Big application icon
+  FXIcon             *smallicon;                    // Small application icon
+  FXIcon             *newicon;
+  FXIcon             *reloadicon;
+  FXIcon             *openicon;
+  FXIcon             *saveicon;
+  FXIcon             *saveasicon;
+  FXIcon             *printicon;
+  FXIcon             *cuticon;
+  FXIcon             *copyicon;
+  FXIcon             *pasteicon;
+  FXIcon             *deleteicon;
+  FXIcon             *undoicon;
+  FXIcon             *redoicon;
+  FXIcon             *fontsicon;
+  FXIcon             *helpicon;
+  FXIcon             *quiticon;
+  FXIcon             *searchicon;
+  FXIcon             *searchnexticon;
+  FXIcon             *searchprevicon;
+  FXIcon             *bookseticon;
+  FXIcon             *booknexticon;
+  FXIcon             *bookprevicon;
+  FXIcon             *bookdelicon;
+  FXIcon             *shiftlefticon;
+  FXIcon             *shiftrighticon;
+  FXIcon             *configicon;
+  FXIcon             *browsericon;
+  FXIcon             *nobrowsericon;
+  FXIcon             *uppercaseicon;
+  FXIcon             *lowercaseicon;
+  FXIcon             *backwardicon;
+  FXIcon             *forwardicon;
 private:
   Adie(){}
   Adie(const Adie&);

@@ -3,7 +3,7 @@
 *                         J P E G   I c o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2013 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2014 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,8 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXEvent.h"
 #include "FXWindow.h"

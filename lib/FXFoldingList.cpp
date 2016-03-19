@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -34,6 +34,8 @@
 #include "FXPoint.h"
 #include "FXObjectList.h"
 #include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXFont.h"
 #include "FXEvent.h"

@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,6 +36,7 @@
 #include "FXStat.h"
 #include "FXFile.h"
 #include "FXDir.h"
+#include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
@@ -178,8 +179,8 @@ FXDEFMAP(FXFileSelector) FXFileSelectorMap[]={
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_LINK,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_REMOVE,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_BOOKMENU,FXFileSelector::onUpdNavigable),
-  FXMAPFUNCS(SEL_COMMAND,FXFileSelector::ID_NORMAL_SIZE,FXFileSelector::ID_GIANT_SIZE,FXFileSelector::onCmdImageSize),
-  FXMAPFUNCS(SEL_UPDATE,FXFileSelector::ID_NORMAL_SIZE,FXFileSelector::ID_GIANT_SIZE,FXFileSelector::onUpdImageSize),
+  FXMAPFUNCS(SEL_COMMAND,FXFileSelector::ID_MINI_SIZE,FXFileSelector::ID_GIANT_SIZE,FXFileSelector::onCmdImageSize),
+  FXMAPFUNCS(SEL_UPDATE,FXFileSelector::ID_MINI_SIZE,FXFileSelector::ID_GIANT_SIZE,FXFileSelector::onUpdImageSize),
   };
 
 
@@ -755,9 +756,10 @@ long FXFileSelector::onUpdSelected(FXObject* sender,FXSelector,void*){
 // Change image size
 long FXFileSelector::onCmdImageSize(FXObject*,FXSelector sel,void*){
   switch(FXSELID(sel)){
+    case ID_MINI_SIZE: setImageSize(16); break;
     case ID_NORMAL_SIZE: setImageSize(32); break;
-    case ID_MEDIUM_SIZE: setImageSize(48); break;
-    case ID_GIANT_SIZE: setImageSize(64); break;
+    case ID_MEDIUM_SIZE: setImageSize(64); break;
+    case ID_GIANT_SIZE: setImageSize(128); break;
     }
   return 1;
   }
@@ -767,9 +769,10 @@ long FXFileSelector::onCmdImageSize(FXObject*,FXSelector sel,void*){
 long FXFileSelector::onUpdImageSize(FXObject* sender,FXSelector sel,void*){
   FXbool check=false;
   switch(FXSELID(sel)){
+    case ID_MINI_SIZE: check=(getImageSize()==16); break;
     case ID_NORMAL_SIZE: check=(getImageSize()==32); break;
-    case ID_MEDIUM_SIZE: check=(getImageSize()==48); break;
-    case ID_GIANT_SIZE: check=(getImageSize()==64); break;
+    case ID_MEDIUM_SIZE: check=(getImageSize()==64); break;
+    case ID_GIANT_SIZE: check=(getImageSize()==128); break;
     }
   sender->handle(this,check?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
@@ -836,6 +839,7 @@ long FXFileSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
     new FXMenuCheck(&viewmenu,tr("Hidden files"),filebox,FXFileList::ID_TOGGLE_HIDDEN);
     new FXMenuCheck(&viewmenu,tr("Preview images"),filebox,FXFileList::ID_TOGGLE_IMAGES);
     new FXMenuSeparator(&viewmenu);
+    new FXMenuRadio(&viewmenu,tr("Mini images"),this,ID_MINI_SIZE);
     new FXMenuRadio(&viewmenu,tr("Normal images"),this,ID_NORMAL_SIZE);
     new FXMenuRadio(&viewmenu,tr("Medium images"),this,ID_MEDIUM_SIZE);
     new FXMenuRadio(&viewmenu,tr("Giant images"),this,ID_GIANT_SIZE);
@@ -1174,19 +1178,6 @@ FXbool FXFileSelector::getReadOnly() const {
   }
 
 
-// Change file associations
-void FXFileSelector::setAssociations(FXFileDict* assoc,FXbool owned){
-  filebox->setAssociations(assoc,owned);
-  dirbox->setAssociations(assoc,false);         // Shared file associations
-  }
-
-
-// Return file associations
-FXFileDict* FXFileSelector::getAssociations() const {
-  return filebox->getAssociations();
-  }
-
-
 // Set draggable files
 void FXFileSelector::setDraggableFiles(FXbool flag){
   filebox->setDraggableFiles(flag);
@@ -1208,6 +1199,31 @@ void FXFileSelector::setTimeFormat(const FXString& fmt){
 // Return file time format
 FXString FXFileSelector::getTimeFormat() const {
   return filebox->getTimeFormat();
+  }
+
+
+// Change file associations
+void FXFileSelector::setAssociations(FXFileAssociations* assoc,FXbool owned){
+  filebox->setAssociations(assoc,owned);
+  dirbox->setAssociations(assoc,false);         // Shared file associations
+  }
+
+
+// Return file associations
+FXFileAssociations* FXFileSelector::getAssociations() const {
+  return filebox->getAssociations();
+  }
+
+
+// Change icon loader
+void FXFileSelector::setIconSource(FXIconSource* src){
+  filebox->setIconSource(src);
+  }
+
+
+// Return icon loader
+FXIconSource* FXFileSelector::getIconSource() const {
+  return filebox->getIconSource();
   }
 
 

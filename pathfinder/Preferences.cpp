@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -223,33 +223,30 @@ FXint Preferences::getItemSpace() const {
 
 // Populate file bindings and mime types
 void Preferences::setupFileBindings(){
-  FXStringDict *prefs=getApp()->reg().find("FILETYPES");
-  if(prefs && prefs->no()){
-    FXString string;
+  const FXStringDictionary& section=getApp()->reg().at("FILETYPES");
+  extensions->clearItems();
+  mimetypes->clearItems();
+  if(!section.empty()){
     FXString mime;
-    extensions->clearItems();
-    mimetypes->clearItems();
-    for(FXint e=prefs->first(); e<prefs->size(); e=prefs->next(e)){
-      extensions->appendItem(prefs->key(e),NULL,NULL,true);
-      string=prefs->data(e);
-      mime=string.section(";",4);
+    for(FXint entry=0; entry<section.no(); ++entry){
+      if(section.empty(entry)) continue;
+      extensions->appendItem(section.key(entry),NULL,NULL,true);
+      mime=section.data(entry).section(';',4);
       if(!mime.empty() && (mimetypes->findItem(mime)==-1)){
         mimetypes->appendItem(mime);
         }
+      extensions->sortItems();
+      mimetypes->sortItems();
       }
-    extensions->sortItems();
-    mimetypes->sortItems();
-    extensions->setCurrentItem(0,true);
     }
   }
 
 
 // Search iconpath for given name and load the icon
 FXIcon *Preferences::createIconFromName(const FXString& name) const {
-  FXIconSource iconsource(getApp());
   FXString iconfilename=FXPath::search(getIconPath(),name);
   if(!iconfilename.empty()){
-    FXIcon *ico=iconsource.loadIconFile(iconfilename);
+    FXIcon *ico=FXIconSource::defaultIconSource.loadIconFile(getApp(),iconfilename);
     if(ico){
       ico->blend(getApp()->getBaseColor());
       ico->create();
@@ -282,26 +279,26 @@ void Preferences::readFileExtension(const FXString& ext){
     FXint index;
 
     // Get command and description names
-    filecommand=association.section(";",0);
-    filedesc=association.section(";",1);
+    filecommand=association.section(';',0);
+    filedesc=association.section(';',1);
 
     // Big icon closed and open
-    iconname=association.section(";",2);
-    fileicons[1]=iconname.section(":",0);
-    fileicons[3]=iconname.section(":",1);
+    iconname=association.section(';',2);
+    fileicons[1]=iconname.section(':',0);
+    fileicons[3]=iconname.section(':',1);
 
     // Small icon closed and open
-    iconname=association.section(";",3);
-    fileicons[0]=iconname.section(":",0);
-    fileicons[2]=iconname.section(":",1);
+    iconname=association.section(';',3);
+    fileicons[0]=iconname.section(':',0);
+    fileicons[2]=iconname.section(':',1);
 
     // Mime type name
-    filemime=association.section(";",4);
+    filemime=association.section(';',4);
     if(!filemime.empty()){
       index=mimetypes->findItem(filemime);
       mimetypes->setCurrentItem(index);
       }
-    else {
+    else{
       index=mimetypes->findItem(" ");           // FIXME
       mimetypes->setCurrentItem(index);
       }
