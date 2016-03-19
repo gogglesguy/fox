@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                         S t r i n g   T a b l e   C l a s s                   *
+*                  S t r i n g   D i c t i o n a r y    C l a s s               *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -18,8 +18,8 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifndef FXSTRINGMAP_H
-#define FXSTRINGMAP_H
+#ifndef FXSTRINGDICTIONARY_H
+#define FXSTRINGDICTIONARY_H
 
 namespace FX {
 
@@ -28,20 +28,20 @@ namespace FX {
 * The dictionary class maintains a fast-access hash table of entities
 * indexed by a character string.
 */
-class FXAPI FXStringMap : public FXDictionary {
+class FXAPI FXStringDictionary : public FXDictionary {
 public:
 
   /// Construct empty dictionary
-  FXStringMap();
+  FXStringDictionary();
 
   /// Construct from another dictionary
-  FXStringMap(const FXStringMap& other);
+  FXStringDictionary(const FXStringDictionary& other);
 
   /// Assignment operator
-  FXStringMap& operator=(const FXStringMap& other);
+  FXStringDictionary& operator=(const FXStringDictionary& other);
 
   /// Adopt dictionary from another
-  FXStringMap& adopt(FXStringMap& other);
+  FXStringDictionary& adopt(FXStringDictionary& other);
 
   /// Return reference to string assocated with key
   FXString& at(const FXchar* ky);
@@ -71,13 +71,13 @@ public:
   void insert(const FXchar* ky,const FXchar* value);
 
   /// Insert string associated with given key
-  void insert(const FXchar* ky,const FXString& value){ return insert(ky,value.text()); }
+  void insert(const FXchar* ky,const FXString& value){ insert(ky,value.text()); }
 
   /// Insert string associated with given key
-  void insert(const FXString& ky,const FXchar* value){ return insert(ky.text(),value); }
+  void insert(const FXString& ky,const FXchar* value){ insert(ky.text(),value); }
 
   /// Insert string associated with given key
-  void insert(const FXString& ky,const FXString& value){ return insert(ky.text(),value.text()); }
+  void insert(const FXString& ky,const FXString& value){ insert(ky.text(),value.text()); }
 
   /// Remove association with given key
   void remove(const FXchar* ky);
@@ -97,11 +97,8 @@ public:
   /// Clear entire table
   void clear();
 
-  /// Default constant string value
-  static const FXString null;
-
   /// Destroy table
- ~FXStringMap();
+ ~FXStringDictionary();
   };
 
 }

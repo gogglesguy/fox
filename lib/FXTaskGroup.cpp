@@ -89,13 +89,15 @@ FXint FXTaskGroup::Task::run(){
     runnable->run();
     }
   catch(...){
+    delete this;
+    throw;
     }
 /*
   if(!group->isCancelled()){
     try{
       runnable->run();
       }
-    catch(...){         // FIXME perhaps dedicated FXException type to cancel the group, and another FXException type to cancel everything recursively...
+    catch(const FXResourceException&){         // FIXME perhaps dedicated FXException type to cancel the group, and another FXException type to cancel everything recursively...
       group->setCancelled(true);
       }
     }

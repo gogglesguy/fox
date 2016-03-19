@@ -39,67 +39,33 @@
   Notes:
 
   - Load and save FXVariant object from/to JSON format files.
+
   - We read over C and C++-style comment; yes, this is not in the spec;
     but it was, once.  Plus, its convenient.
+
   - Closing the file does not reset comment and line number (in case of error, this
     point to the problem).
-  - To do:
-
-      o Add better control of output format, range from "stream of consciousness"
-        to compact to pretty printed human friendly output.
-
-      o Error codes returned in API for better problem diagnosis.
-
-      o Facade over FXIO.
-
-      o Floating point formatting options (Sander).
 
   - JSON syntax is very simple:
 
-         value     : object
-                   | array
-                   | string
-                   | number
-                   | 'true'
-                   | 'false'
-                   | 'null'
-                   ;
+         value     : object | array | string | number | 'true' | 'false' | 'null' ;
 
-         object    : '{'   '}'
-                   | '{' members '}'
-                   ;
+         object    : '{'   '}' | '{' members '}' ;
 
-         members   : pair
-                   | pair ',' members
-                   ;
+         members   : pair | pair ',' members ;
 
-         pair      : string ':' value
+         pair      : string ':' value ;
 
-         array     : '[' ']'
-                   | '[' elements ']'
-                   ;
+         array     : '[' ']' | '[' elements ']' ;
 
-         elements  : value
-                   | value ',' elements
-                   :
+         elements  : value | value ',' elements ;
 
-         string    : '"' '"'
-                   | '"' chars '"'
-                   ;
+         string    : '"' '"' | '"' chars '"' ;
 
-         chars     : char
-                   | char chars
-                   ;
+         chars     : char | char chars ;
 
          char      : unicode_except_esc_or_quotes
-                   | '\"'
-                   | '\\'
-                   | '\/'
-                   | '\b'
-                   | '\f'
-                   | '\n'
-                   | '\r'
-                   | '\t'
+                   | '\"' | '\\' | '\/' | '\b' | '\f' | '\n' | '\r' | '\t'
                    | '\' octdigit octdigit octdigit
                    | '\x' hxdigit hxdigit
                    | '\u' hxdigit hxdigit hxdigit hxdigit
@@ -111,37 +77,25 @@
                    | int frac exp
                    ;
 
-         int       : digit
-                   | nzdigit digits
-                   | "-" digit
-                   | "-" nzdigit digits
-                   ;
+         int       : digit | nzdigit digits | "-" digit | "-" nzdigit digits ;
 
-         digits    : digit | digit digits
-                   ;
+         digits    : digit | digit digits ;
 
+         frac      : "." digits ;
 
-         frac      : "." digits
-                   ;
+         exp       : e digits ;
 
-         exp       : e digits
-                   ;
-
-         e         : "e" | "e+" | "e-" | "E" | "E-" | "E+"
-                   ;
+         e         : "e" | "e+" | "e-" | "E" | "E-" | "E+" ;
 
   - Flow controls the looks of the output.  The current values supported are:
 
-      0 No formatting whatsoever.  This is the most compact format but is essentially
-        not human-readable.
+      Stream  No formatting whatsoever.  This is the most compact format but is essentially
+              not human-readable.
 
-      1 Compact.  Try to cram as much as possible on a line, but break lines beyond
-        a certain size.
+      Compact Try to cram as much as possible on a line, but break lines beyond
+              a certain size.
 
-      2 Nicely indented pretty printed output.
-
-    Future values can be considered.
-
+      Pretty  Nicely indented and pretty printed, but fluffy, output.
 */
 
 
@@ -173,7 +127,6 @@ enum {
 
 /*******************************************************************************/
 
-
 // Error messages
 const FXchar *const FXJSON::errors[]={
   "OK",
@@ -191,50 +144,54 @@ const FXchar *const FXJSON::errors[]={
 
 
 // Construct JSON serializer
-FXJSON::FXJSON(FXival sz):dev(NULL),begptr(NULL),endptr(NULL),rptr(NULL),wptr(NULL),sptr(NULL),size(FXMAX(sz,MINBUFFER)),column(0),indent(0),line(1),token(TK_EOF),wrap(80),flow(Compact),prec(15),fmt(2),dent(2){
+FXJSON::FXJSON():begptr(NULL),endptr(NULL),rptr(NULL),wptr(NULL),sptr(NULL),token(TK_EOF),column(0),indent(0),line(1),wrap(80),dir(Stop),flow(Compact),prec(15),fmt(2),dent(2){
   FXTRACE((1,"FXJSON::FXJSON\n"));
   }
 
 
 // Construct and open for loading
-FXJSON::FXJSON(const FXString& filename,FXuint m,FXuint perm,FXival sz):dev(NULL),begptr(NULL),endptr(NULL),rptr(NULL),wptr(NULL),sptr(NULL),size(FXMAX(sz,MINBUFFER)),column(0),indent(0),line(1),token(TK_EOF),wrap(80),flow(Compact),prec(16),fmt(2),dent(2){
+FXJSON::FXJSON(FXchar* data,FXuval size,Direction d):begptr(NULL),endptr(NULL),rptr(NULL),wptr(NULL),sptr(NULL),token(TK_EOF),column(0),indent(0),line(1),wrap(80),dir(Stop),flow(Compact),prec(16),fmt(2),dent(2){
   FXTRACE((1,"FXJSON::FXJSON\n"));
-  open(filename,m,perm);
+  open(data,size,d);
   }
 
 
-// Open archive for operation
-FXbool FXJSON::open(const FXString& filename,FXuint m,FXuint perm){
-  FXTRACE((2,"FXJSON::open(\"%s\",%o,%o)\n",filename.text(),m,perm));
-  if(!dev){
-    FXFile* file=new FXFile(filename,m,perm);
-    if(file->isOpen()){
-      if(callocElms(begptr,size)){
-        endptr=begptr+size;
-        if(m&FXIO::WriteOnly){
-          wptr=begptr;
-          rptr=begptr;
-          sptr=begptr;
-          }
-        else{
-          wptr=endptr;
-          rptr=endptr;
-          sptr=endptr;
-          }
-        column=0;
-        indent=0;
-        line=1;
-        token=TK_ERROR;
-        dev=file;
-        return true;
-        }
-      file->close();
+// Open FXJSON stream for given direction and set its buffer
+FXbool FXJSON::open(FXchar* data,FXuval sz,Direction d){
+  FXTRACE((2,"FXJSON::open(%p,%lu,%d)\n",data,sz,d));
+  if(!dir && d){
+    if(data){                   // External buffer
+      begptr=data;
+      endptr=begptr+sz;
+      owns=false;
       }
-    delete file;
+    else{                       // Internal buffer
+      if(sz<MINBUFFER) sz=MINBUFFER;
+      if(!callocElms(begptr,sz)) return false; 
+      endptr=begptr+sz;
+      owns=true;
+      }
+    if(d==Save){
+      wptr=begptr;
+      rptr=begptr;
+      sptr=begptr;
+      }
+    else{
+      wptr=endptr;
+      rptr=endptr;
+      sptr=endptr;
+      }
+    token=TK_ERROR;
+    column=0;
+    indent=0;
+    line=1;
+    dir=d;
+    return true;
     }
   return false;
   }
-
+    
+    
 /*******************************************************************************/
 
 // Get next token
@@ -812,7 +769,7 @@ FXJSON::Error FXJSON::saveVariant(const FXVariant& var){
 FXJSON::Error FXJSON::load(FXVariant& variant){
   FXTRACE((2,"FXJSON::load(variant)\n"));
   Error err=ErrLoad;
-  if(dev && dev->isReadable()){
+  if(dir==Load){
     token=next();
     err=loadVariant(variant);
     }
@@ -824,7 +781,7 @@ FXJSON::Error FXJSON::load(FXVariant& variant){
 FXJSON::Error FXJSON::save(const FXVariant& variant){
   FXTRACE((2,"FXJSON::save(variant)\n"));
   Error err=ErrSave;
-  if(dev && dev->isWritable()){
+  if(dir==Save){
     err=saveVariant(variant);
     }
   return err;
@@ -833,52 +790,30 @@ FXJSON::Error FXJSON::save(const FXVariant& variant){
 
 // Fill buffer from file
 FXbool FXJSON::fill(){
-  register FXival n;
-  if(dev && dev->isReadable()){
-    if(rptr<wptr){ memmove(begptr,rptr,wptr-rptr); }
-    wptr=begptr+(wptr-rptr);
-    sptr-=rptr-begptr;
-    rptr=begptr;
-    n=dev->readBlock(wptr,endptr-wptr);
-    if(0<=n){
-      wptr+=n;
-      return rptr<wptr;
-      }
-    }
-  return false;
+  return rptr<wptr;
   }
 
 
 // Flush buffer to file
 FXbool FXJSON::flush(){
-  register FXival n;
-  if(dev && dev->isWritable()){
-    n=dev->writeBlock(rptr,wptr-rptr);
-    if(0<=n){
-      rptr+=n;
-      if(rptr<wptr){ memmove(begptr,rptr,wptr-rptr); }
-      wptr=begptr+(wptr-rptr);
-      rptr=begptr;
-      return wptr<endptr;
-      }
-    }
-  return false;
+  wptr=rptr=begptr;
+  return true;
   }
 
 
 // Close stream and delete buffers
 FXbool FXJSON::close(){
   FXTRACE((2,"FXJSON::close()\n"));
-  if(dev && dev->isOpen()){
-    if(dev->isWritable()) flush();
-    freeElms(begptr);
+  if(dir){
+    if(dir==Save){ flush(); }
+    if(owns){ freeElms(begptr); }
+    begptr=NULL;
     endptr=NULL;
     wptr=NULL;
     rptr=NULL;
     sptr=NULL;
     token=TK_ERROR;
-    delete dev;
-    dev=NULL;
+    dir=Stop;
     return true;
     }
   return false;

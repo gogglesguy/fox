@@ -1104,7 +1104,7 @@ long FXFileList::onCmdSortByName(FXObject*,FXSelector,void*){
   if(getSortFunc()==ascending) setSortFunc(descending);
   else if(getSortFunc()==ascendingCase) setSortFunc(descendingCase);
   else if(getSortFunc()==descending) setSortFunc(ascending);
-  else setSortFunc(ascendingCase);
+  else setSortFunc(ascending);
 #endif
   sortItems();
   return 1;

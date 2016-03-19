@@ -41,7 +41,6 @@ private:
   FXInputHandle maphandle;      // Handle for the map
   FXuchar*      mapbase;        // Memory base where it is mapped
   FXlong        mapoffset;      // Offset of the map
-  FXlong        mapposition;    // Position in file
   FXival        maplength;      // Length of the map
 private:
   FXMemMap(const FXMemMap&);
@@ -79,10 +78,10 @@ public:
   void* unmap();
 
   /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* data,FXival count);
+  virtual FXival readBlock(void* ptr,FXival count);
 
   /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* data,FXival count);
+  virtual FXival writeBlock(const void* ptr,FXival count);
 
   /// Flush to disk
   virtual FXbool flush();

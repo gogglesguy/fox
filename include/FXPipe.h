@@ -26,9 +26,6 @@
 #endif
 
 
-////////////////////////////  UNDER DEVELOPMENT  ////////////////////////////////
-
-
 namespace FX {
 
 
@@ -41,15 +38,20 @@ private:
   FXPipe &operator=(const FXPipe&);
 public:
 
-  /// Construct socket
+  /// Construct pipe
   FXPipe(){ }
 
-  /// Construct file and attach existing handle h
-  FXPipe(FXInputHandle h,FXuint m);
+  /// Construct and open pipes with access mode m for this one and the reverse for the other
+  FXPipe(FXPipe& other,FXuint m=FXIO::Reading);
 
+  /// Construct pipe and attach existing handle h
+  FXPipe(FXInputHandle h,FXuint m=FXIO::Reading);
+
+  /// Open pipes with access mode m for this one and the reverse for the other
+  virtual FXbool open(FXPipe& other,FXuint m=FXIO::Reading);
+  
   /// Open device with access mode and handle
-  virtual FXbool open(FXInputHandle h,FXuint m);
-
+  virtual FXbool open(FXInputHandle h,FXuint m=FXIO::Reading);
 
   /// Create a named pipe
   static FXbool create(const FXString& file,FXuint perm=FXIO::AllReadWrite);

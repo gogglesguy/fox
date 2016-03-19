@@ -587,7 +587,7 @@ public:
   static FXuint hash(const FXchar* s);
 
   /// Swap two strings
-  friend inline void swap(FXString& dst,FXString& src);
+  friend inline FXString& swap(FXString& dst,FXString& src);
 
   /// Saving to a stream
   friend FXAPI FXStream& operator<<(FXStream& store,const FXString& s);
@@ -601,8 +601,9 @@ public:
 
 
 /// Swap two strings
-inline void swap(FXString& dst,FXString& src){
-  FXchar* t=dst.str; dst.str=src.str; src.str=t;
+inline FXString& swap(FXString& dst,FXString& src){
+  FXchar* t=dst.str; dst.str=src.str; src.str=t; 
+  return dst;
   }
 
 

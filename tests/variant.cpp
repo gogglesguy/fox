@@ -26,7 +26,7 @@ int main(int argc,char *argv[]){
   FXint wrap;
 
   // JSON I/O
-  FXJSON json(1024);
+  FXJSONFile json;
 
   // Variant to save
   FXVariant var;
@@ -117,7 +117,7 @@ int main(int argc,char *argv[]){
   if(loadfile){
 
     // Load test
-    if(!json.open(loadfile,FXIO::Reading)){
+    if(!json.open(loadfile,FXJSON::Load)){
       fxwarning("Error: unable to open: \"%s\" for reading.\n",loadfile);
       return 0;
       }
@@ -146,7 +146,7 @@ int main(int argc,char *argv[]){
     fxmessage("Precision: %d format: %d flow: %d dent: %d wrap: %d\n",precision,format,flow,dent,wrap);
 
     // Save test
-    if(!json.open(savefile,FXIO::Writing)){
+    if(!json.open(savefile,FXJSON::Save)){
       fxwarning("Error: unable to open: \"%s\" for writing.\n",savefile);
       return 0;
       }

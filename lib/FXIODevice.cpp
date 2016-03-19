@@ -58,14 +58,16 @@ FXIODevice::FXIODevice():device(BadHandle){
 
 
 // Construct with given handle and mode
-FXIODevice::FXIODevice(FXInputHandle h,FXuint m):FXIO(m),device(h){
+FXIODevice::FXIODevice(FXInputHandle h,FXuint m){
+  attach(h,m);
   }
 
 
-// Open file
+// Open device with access mode m and handle h
 FXbool FXIODevice::open(FXInputHandle h,FXuint m){
   device=h;
   access=m;
+  pointer=0L;
   return true;
   }
 
@@ -87,6 +89,7 @@ void FXIODevice::attach(FXInputHandle h,FXuint m){
   close();
   device=h;
   access=(m|OwnHandle);
+  pointer=0L;
   }
 
 
@@ -94,12 +97,13 @@ void FXIODevice::attach(FXInputHandle h,FXuint m){
 void FXIODevice::detach(){
   device=BadHandle;
   access=NoAccess;
+  pointer=0L;
   }
 
 
 // Get position
 FXlong FXIODevice::position() const {
-  return -1;
+  return pointer;
   }
 
 
@@ -110,19 +114,21 @@ FXlong FXIODevice::position(FXlong,FXuint){
 
 
 // Read block
-FXival FXIODevice::readBlock(void* data,FXival count){
+FXival FXIODevice::readBlock(void* ptr,FXival count){
   FXival nread=-1;
-  if((device!=BadHandle) && (access&ReadOnly)){
+  if(__likely(device!=BadHandle) && __likely(access&ReadOnly)){
 #if defined(WIN32)
     DWORD nr;
-    if(::ReadFile(device,data,(DWORD)count,&nr,NULL)!=0){
+    if(::ReadFile(device,ptr,(DWORD)count,&nr,NULL)!=0){
       nread=(FXival)nr;
       }
+    pointer+=nread;
 #else
     do{
-      nread=::read(device,data,count);
+      nread=::read(device,ptr,count);
       }
     while(nread<0 && errno==EINTR);
+    pointer+=nread;
 #endif
     }
   return nread;
@@ -130,19 +136,21 @@ FXival FXIODevice::readBlock(void* data,FXival count){
 
 
 // Write block
-FXival FXIODevice::writeBlock(const void* data,FXival count){
+FXival FXIODevice::writeBlock(const void* ptr,FXival count){
   FXival nwritten=-1;
-  if((device!=BadHandle) && (access&WriteOnly)){
+  if(__likely(device!=BadHandle) && __likely(access&WriteOnly)){
 #if defined(WIN32)
     DWORD nw;
-    if(::WriteFile(device,data,(DWORD)count,&nw,NULL)!=0){
+    if(::WriteFile(device,ptr,(DWORD)count,&nw,NULL)!=0){
       nwritten=(FXival)nw;
       }
+    pointer+=nwritten;
 #else
     do{
-      nwritten=::write(device,data,count);
+      nwritten=::write(device,ptr,count);
       }
     while(nwritten<0 && errno==EINTR);
+    pointer+=nwritten;
 #endif
     }
   return nwritten;
@@ -175,24 +183,27 @@ FXlong FXIODevice::size(){
 
 // Close file
 FXbool FXIODevice::close(){
-  if(device!=BadHandle){
+  if(__likely(device!=BadHandle)){
     if(access&OwnHandle){
 #if defined(WIN32)
       if(::CloseHandle(device)!=0){
         device=BadHandle;
         access=NoAccess;
+        pointer=0L;
         return true;
         }
 #else
       if(::close(device)==0){
         device=BadHandle;
         access=NoAccess;
+        pointer=0L;
         return true;
         }
 #endif
       }
     device=BadHandle;
     access=NoAccess;
+    pointer=0L;
     }
   return false;
   }

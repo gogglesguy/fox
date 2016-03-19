@@ -139,12 +139,12 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXIconDict.lo FXIconList.lo FXIconSource.lo FXId.lo FXImage.lo \
 	FXImageFrame.lo FXImageView.lo FXInputDialog.lo FXIO.lo \
 	FXIOBuffer.lo FXIODevice.lo FXJP2Icon.lo FXJP2Image.lo \
-	FXJPGIcon.lo FXJPGImage.lo FXJSON.lo FXKnob.lo FXLabel.lo \
-	FXLFQueue.lo FXList.lo FXListBox.lo FXLocale.lo FXMDIButton.lo \
-	FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo FXMat2d.lo \
-	FXMat2f.lo FXMat3d.lo FXMat3f.lo FXMat4d.lo FXMat4f.lo \
-	FXMatrix.lo FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo \
-	FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
+	FXJPGIcon.lo FXJPGImage.lo FXJSON.lo FXJSONFile.lo FXKnob.lo \
+	FXLabel.lo FXLFQueue.lo FXList.lo FXListBox.lo FXLocale.lo \
+	FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo \
+	FXMat2d.lo FXMat2f.lo FXMat3d.lo FXMat3f.lo FXMat4d.lo \
+	FXMat4f.lo FXMatrix.lo FXMemMap.lo FXMemoryStream.lo \
+	FXMenuBar.lo FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
 	FXMenuCheck.lo FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
 	FXMessageChannel.lo FXMetaClass.lo FXMutex.lo FXObject.lo \
@@ -166,9 +166,9 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXSpinner.lo FXSpinLock.lo FXSpheref.lo FXSphered.lo \
 	FXSplashWindow.lo FXSplitter.lo FXSpring.lo FXStat.lo \
 	FXStatusBar.lo FXStatusLine.lo FXStream.lo FXString.lo \
-	FXStringDict.lo FXStringMap.lo FXSwitcher.lo FXSystem.lo \
-	FXTGAIcon.lo FXTGAImage.lo FXTIFIcon.lo FXTIFImage.lo \
-	FXTabBar.lo FXTabBook.lo FXTabItem.lo FXTable.lo \
+	FXStringDict.lo FXStringDictionary.lo FXSwitcher.lo \
+	FXSystem.lo FXTGAIcon.lo FXTGAImage.lo FXTIFIcon.lo \
+	FXTIFImage.lo FXTabBar.lo FXTabBook.lo FXTabItem.lo FXTable.lo \
 	FXTaskGroup.lo FXText.lo FXTextCodec.lo FXTextField.lo \
 	FXThread.lo FXThreadPool.lo FXToggleButton.lo FXToolBar.lo \
 	FXToolBarGrip.lo FXToolBarShell.lo FXToolBarTab.lo \
@@ -662,6 +662,7 @@ FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXJSON.cpp \
+FXJSONFile.cpp \
 FXKnob.cpp \
 FXLabel.cpp \
 FXLFQueue.cpp \
@@ -767,7 +768,7 @@ FXStatusLine.cpp \
 FXStream.cpp \
 FXString.cpp \
 FXStringDict.cpp \
-FXStringMap.cpp \
+FXStringDictionary.cpp \
 FXSwitcher.cpp \
 FXSystem.cpp \
 FXTGAIcon.cpp \
@@ -1110,6 +1111,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJPGIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJPGImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJSON.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXJSONFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXKOI8RCodec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXKnob.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXLFQueue.Plo@am__quote@
@@ -1216,7 +1218,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXString.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStringDict.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStringMap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXStringDictionary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSwitcher.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSystem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXTGAIcon.Plo@am__quote@

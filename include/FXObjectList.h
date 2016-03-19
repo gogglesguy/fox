@@ -176,7 +176,7 @@ public:
   };
 
 
-/// Specialize list to pointers to TYPE
+/// List to pointers to objects of TYPE
 template<class TYPE>
 class FXObjectListOf : public FXObjectList {
 public:

@@ -30,7 +30,7 @@ namespace FX {
 * provides applications with a convenient way to load and save state information
 * in a well-defined and human-readable file format.
 */
-class FXJSON {
+class FXAPI FXJSON {
 public:
   enum Error {
     ErrOK,              /// No errors
@@ -45,28 +45,33 @@ public:
     ErrNumber,          /// Numeric conversion
     ErrEnd              /// Unexpected end of file
     };
-  enum {
+  enum Flow {
     Stream,             /// Stream-of-consciousness output
     Compact,            /// Compact, human readable output (default)
     Pretty              /// Pretty printed, indented output
     };
-private:
-  FXIO       *dev;              // File IO device
+  enum Direction {
+    Stop = 0,           /// Not active
+    Save = 1,           /// Save to device
+    Load = 2            /// Load from device
+    };
+protected:
   FXchar     *begptr;           // Text buffer begin ptr
   FXchar     *endptr;           // Text buffer end ptr
   FXchar     *rptr;             // Text buffer read ptr
   FXchar     *wptr;             // Text buffer write ptr
   FXchar     *sptr;             // Text buffer scan ptr
-  FXival      size;             // Buffer size to allocate
+  FXint       token;            // Token
   FXint       column;           // Column number
   FXint       indent;           // Indent level
   FXint       line;             // Line number
-  FXint       token;            // Token
   FXint       wrap;             // Line wrap column
+  Direction   dir;              // Direction
   FXuchar     flow;             // Output flow
   FXuchar     prec;             // Float precision
   FXuchar     fmt;              // Float format
   FXuchar     dent;             // Indentation amount
+  FXbool      owns;             // Owns the buffer
 private:
   FXint next();
   Error loadString(FXString& str);
@@ -88,28 +93,26 @@ public:
 
   /**
   * Construct JSON serializer.
-  * Initialize serializer and set suggested buffer size.
   */
-  FXJSON(FXival sz=4096);
+  FXJSON();
 
   /**
-  * Construct JSON serializer and open stream.
-  * Initialize serializer, set suggested buffer size, and
-  * open the stream for the given direction.
+  * Construct JSON serializer and open for direction d.
+  * Use given buffer data of size sz, or allocate a local buffer.
   */
-  FXJSON(const FXString& filename,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite,FXival sz=4096);
+  FXJSON(FXchar* data,FXuval sz=4096,Direction d=Load);
 
   /**
-  * Open stream for the given direction.
-  * Allocate buffer of suggested size given in constructor.
+  * Open JSON stream for given direction d.
+  * Use given buffer data of size sz, or allocate a local buffer.
   */
-  FXbool open(const FXString& filename,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
+  FXbool open(FXchar* data=NULL,FXuval size=4096,Direction d=Load);
 
   /**
-  * Return current io device.
+  * Return direction in effect.
   */
-  FXIO* device() const { return dev; }
-
+  Direction direction() const { return dir; }
+  
   /**
   * Load a variant from stream.
   * Return false if stream wasn't opened for loading, or syntax error.
@@ -121,25 +124,6 @@ public:
   * Return false if stream wasn't opened for saving, or disk was full.
   */
   Error save(const FXVariant& variant);
-
-  /**
-  * Fill buffer from file.
-  * Return false if not open for reading, or fail to read from disk.
-  */
-  virtual FXbool fill();
-
-  /**
-  * Flush buffer to file.
-  * Return false if not open for writing, or if fail to write to disk.
-  */
-  virtual FXbool flush();
-
-  /**
-  * Close stream and delete buffers.
-  * If writing, flush remaining text from buffer first.
-  * Return false if not open, or disk is full.
-  */
-  FXbool close();
 
   /**
   * Return current line number.
@@ -168,12 +152,19 @@ public:
 
   /**
   * Change output flow format (Stream, Compact, Pretty).
+  * Stream is the most compact, but pretty much unreadable by humans; it
+  * aims to be compact.
+  * Compact is very human-readable while at the same time using minimum number
+  * of lines to represent the output.
+  * Pretty will print one item on each line, with indentation.  It is very easily
+  * readable but produces large numbers of text lines.
   */
   void setOutputFlow(FXint f){ flow=f; }
   FXint getOutputFlow() const { return flow; }
 
   /**
-  * Change indentation level for pretty print flow.
+  * Change indentation level for pretty print flow, the amount of
+  * indentation applied for each level.
   */
   void setIndentation(FXint d){ dent=d; }
   FXint getIndentation() const { return dent; }
@@ -185,11 +176,28 @@ public:
   FXint getLineWrap() const { return wrap; }
 
   /**
-  * Close stream and clean up.
+  * Fill buffer from file.
+  * Return false if not open for reading, or fail to read from disk.
+  */
+  virtual FXbool fill();
+
+  /**
+  * Flush buffer to file.
+  * Return false if not open for writing, or if fail to write to disk.
+  */
+  virtual FXbool flush();
+
+  /**
+  * Close stream and delete buffer, if owned.
+  */
+  virtual FXbool close();
+
+  /**
+  * Close JSON stream and clean up.
   */
   virtual ~FXJSON();
   };
-
+  
 }
 
 #endif

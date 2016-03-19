@@ -150,6 +150,23 @@ public:
   FXFontException(const FXchar *msg):FXResourceException(msg){}
   };
 
+
+/**
+* Throw this exception to terminate the calling thread gracefully, and
+* pass the given return code back to a possible join() operation if one
+* is in effect.
+*/
+class FXAPI FXThreadException : public FXException {
+private:
+  FXint exitcode;
+private:
+  static const FXchar exceptionName[];
+public:
+  FXThreadException(FXint xc=-1):FXException(FXThreadException::exceptionName),exitcode(xc){}
+  FXThreadException(const FXchar *msg,FXint xc=-1):FXException(msg),exitcode(xc){}
+  FXint code() const { return exitcode; }
+  };
+
 }
 
 #endif

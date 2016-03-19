@@ -186,33 +186,31 @@ void FXThreadPool::instance(FXThreadPool *pool){
 
 // Start a worker and reset semaphore
 FXbool FXThreadPool::startWorker(){
+  register FXuint n=atomicAdd(&workers,1);
   if(FXWorker::execute(this,stacksize)){
-    if(atomicAdd(&workers,1)==0){
-      sayonara.wait();
-      }
+    if(n==0) sayonara.wait();           // Drops the semaphore if this is first worker started
     return true;
     }
+  atomicAdd(&workers,-1);
   return false;
   }
 
 
-// Process one task
-void FXThreadPool::processTask(FXRunnable* task){
-  try{
-    task->run();
-    }
-  catch(...){
-    }
-  }
-
-
-// Process tasks from queue, blocking for up to nsec if queue is empty.
-// Return if queue is empty or count was decremented to zero.
+// Process tasks from queue; return if (1) count was decremented to zero, (2) waited longer
+// than nsec nanoseconds for task to appear in the queue, or (3) the queue is now empty.
 void FXThreadPool::processTasksWhile(volatile FXuint& count,FXTime nsec){
   FXRunnable* task;
   while(count && usedslots.wait(nsec) && queue.pop(task)){
-    processTask(task);
-    freeslots.post();                   // Free slot only when thread is done!!
+    try{                        // Run task which may throw exceptions
+      task->run();
+      }
+    catch(const FXException&){  // FXExceptions raised in the task end here
+      }
+    catch(...){                 // Other exceptions rethrown after adjusting semaphore
+      freeslots.post();
+      throw;
+      }
+    freeslots.post();           // Adjust semaphore 
     }
   }
 
@@ -311,12 +309,22 @@ FXuint FXThreadPool::start(FXuint count){
 
 
 // Process tasks from the queue using multiple worker threads.
-// When queue becomes empty, extra workers will exit if no work arrives
-// within a set amount of time. 
-// The last worker to terminate will signal the semaphore.
+// When queue becomes empty, extra workers will exit if no work arrives within
+// a set amount of time; the last worker to terminate will signal the semaphore.
+// Any exceptions raised during task processing will be rethrown after adjusting
+// the current count of workers.
 FXint FXThreadPool::run(){
   instance(this);
-  processTasksWhile(processing,(workers<minimum)?forever:expiration);
+  try{
+    processTasksWhile(processing,(workers<minimum)?forever:expiration);
+    }
+  catch(...){
+    instance(NULL);
+    if(atomicAdd(&workers,-1)==1){
+      sayonara.post();
+      }
+    throw;
+    }
   instance(NULL);
   if(atomicAdd(&workers,-1)==1){
     sayonara.post();

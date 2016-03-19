@@ -51,7 +51,7 @@ namespace FX {
 
 
 // Create new map object
-FXMemMap::FXMemMap():maphandle(BadHandle),mapbase(NULL),mapoffset(0L),mapposition(0L),maplength(0){
+FXMemMap::FXMemMap():maphandle(BadHandle),mapbase(NULL),mapoffset(0L),maplength(0){
   }
 
 
@@ -112,7 +112,7 @@ void *FXMemMap::map(FXlong off,FXival len){
           mapbase=ptr;
           maplength=len;
           mapoffset=off;
-          mapposition=off;
+          pointer=off;
           return mapbase;
           }
         ::CloseHandle(hnd);
@@ -144,7 +144,7 @@ void *FXMemMap::map(FXlong off,FXival len){
         mapbase=ptr;
         maplength=len;
         mapoffset=off;
-        mapposition=off;
+        pointer=off;
         return mapbase;
         }
 #endif
@@ -166,7 +166,7 @@ void* FXMemMap::unmap(){
     maphandle=BadHandle;
     mapbase=NULL;
     mapoffset=0L;
-    mapposition=0L;
+    pointer=0L;
     maplength=0;
     }
   return NULL;
@@ -175,28 +175,30 @@ void* FXMemMap::unmap(){
 
 // Get current file position
 FXlong FXMemMap::position() const {
-  return mapposition;
+  return pointer;
   }
 
 
 // Change file position, returning new position from start
 FXlong FXMemMap::position(FXlong off,FXuint from){
   if(mapbase){
-    if(from==Current) off=off+mapposition;
-    else if(from==End) off=off+mapoffset+maplength;       // FIXME is this what we want?
-    mapposition=off;
-    return mapposition;
+    if(from==Current) off=pointer+off;
+    else if(from==End) off=mapoffset+maplength+off;     // FIXME is this what we want?
+    if(mapoffset<=off && off<=mapoffset+maplength){
+      pointer=off;
+      return pointer;
+      }
     }
   return -1;
   }
 
 
 // Read block of bytes, returning number of bytes read
-FXival FXMemMap::readBlock(void* data,FXival count){
-  if(mapbase && mapoffset<=mapposition && mapposition<=mapoffset+maplength){
-    if(mapposition+count>mapoffset+maplength) count=mapoffset+maplength-mapposition;
-    memmove(data,mapbase+mapposition-mapoffset,count);
-    mapposition+=count;
+FXival FXMemMap::readBlock(void* ptr,FXival count){
+  if(mapbase && mapoffset<=pointer && pointer<=mapoffset+maplength){
+    if(pointer+count>mapoffset+maplength) count=mapoffset+maplength-pointer;
+    memmove(ptr,mapbase+pointer-mapoffset,count);
+    pointer+=count;
     return count;
     }
   return -1;
@@ -204,11 +206,11 @@ FXival FXMemMap::readBlock(void* data,FXival count){
 
 
 // Write block of bytes, returning number of bytes written
-FXival FXMemMap::writeBlock(const void* data,FXival count){
-  if(mapbase && mapoffset<=mapposition && mapposition<=mapoffset+maplength){
-    if(mapposition+count>mapoffset+maplength) count=mapoffset+maplength-mapposition;
-    memmove(mapbase+mapposition-mapoffset,data,count);
-    mapposition+=count;
+FXival FXMemMap::writeBlock(const void* ptr,FXival count){
+  if(mapbase && mapoffset<=pointer && pointer<=mapoffset+maplength){
+    if(pointer+count>mapoffset+maplength) count=mapoffset+maplength-pointer;
+    memmove(mapbase+pointer-mapoffset,ptr,count);
+    pointer+=count;
     return count;
     }
   return -1;
