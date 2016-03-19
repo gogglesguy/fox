@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.232 2007/03/22 15:55:16 fox Exp $                       *
+* $Id: FXString.cpp,v 1.237 2007/06/03 05:30:38 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -58,6 +58,11 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Furnish our own version
+extern FXAPI FXint __vsscanf(const FXchar* string,const FXchar* format,va_list arg_ptr);
+extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 
 
 // For conversion from UTF16 to UTF32
@@ -2447,12 +2452,13 @@ FXStream& operator>>(FXStream& store,FXString& s){              // Note stream f
 //  - Can not reset va_arg pointer in vformat().
 //  - Repeated va_start() is not portable.
 
+// FIXME use va_copy to retry printf if don't.
+
 // Print formatted string a-la vprintf
 FXString& FXString::vformat(const FXchar* fmt,va_list args){
   register FXint len=0;
   if(fmt && *fmt){
     register FXint n=strlen(fmt);       // Result is longer than format string
-#if defined(WIN32) || defined(HAVE_VSNPRINTF)
 //    va_list a;
 //    n+=128;                             // Add a bit of slop
 //x:  length(n);
@@ -2462,12 +2468,7 @@ FXString& FXString::vformat(const FXchar* fmt,va_list args){
 //    if(n<len){ n=len; goto x; }         // Others return how much space would be needed
     n+=1024;                            // Add a lot of slop
     length(n);                          // Some implementations return -1 if not enough room
-    len=vsnprintf(str,n+1,fmt,args);    // Others return how much space would be needed
-#else
-    n+=1024;                            // Add a lot of slop
-    length(n);
-    len=vsprintf(str,fmt,args);
-#endif
+    len=__vsnprintf(str,n+1,fmt,args);  // Others return how much space would be needed
     FXASSERT(0<=len && len<=n);
     }
   length(len);
@@ -2576,15 +2577,9 @@ FXString& FXString::format(const FXchar* fmt,...){
   }
 
 
-// Furnish our own version if we have to
-#ifndef HAVE_VSSCANF
-extern "C" int vsscanf(const char* str, const char* format, va_list arg_ptr);
-#endif
-
-
 // Scan
 FXint FXString::vscan(const FXchar* fmt,va_list args) const {
-  return vsscanf((char*)str,fmt,args);          // Cast needed for HP-UX 11, which has wrong prototype for vsscanf
+  return __vsscanf(str,fmt,args);
   }
 
 
@@ -2744,19 +2739,6 @@ FXdouble FXDoubleVal(const FXString& s){
   return strtod(s.str,NULL);
   }
 
-#if 0
-FXbool FXIsLongVal(const FXString &,const FXint base)
-  FXchar *end=s.str;
-  strtoll(s.str,&end,base);
-  return (s.str!=end);
-  }
-
-FXbool FXIsDouble(const FXString &,const FXint base)
-  FXchar *end=s.str;
-  strtod(s.str,&end,base);
-  return (s.str!=end);
-  }
-#endif
 
 /*******************************************************************************/
 
@@ -3116,8 +3098,7 @@ FXString unescape(const FXString& s){
 
 // Convert to dos
 FXString& unixToDos(FXString& str){
-  register FXint f=0;
-  register FXint t=0;
+  register FXint f=0,t=0;
   while(f<str.length()){
     if(str[f++]=='\n') t++; t++;
     }

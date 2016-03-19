@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXText.cpp,v 1.476 2007/03/28 15:46:22 fox Exp $                         *
+* $Id: FXText.cpp,v 1.483 2007/06/03 05:30:38 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -156,6 +156,10 @@ using namespace FX;
 namespace FX {
 
 
+// Furnish our own version
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+
+
 // Map
 FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_PAINT,0,FXText::onPaint),
@@ -201,6 +205,7 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_UPDATE,FXText::ID_REPLACE_SEL,FXText::onUpdHaveSelection),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_UPPER_CASE,FXText::onUpdHaveSelection),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_LOWER_CASE,FXText::onUpdHaveSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_CLEAN_INDENT,FXText::onUpdHaveSelection),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_TOP,FXText::onCmdCursorTop),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_BOTTOM,FXText::onCmdCursorBottom),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_HOME,FXText::onCmdCursorHome),
@@ -274,7 +279,8 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNCS(SEL_COMMAND,FXText::ID_SELECT_BRACE,FXText::ID_SELECT_ANG,FXText::onCmdSelectBlock),
   FXMAPFUNCS(SEL_COMMAND,FXText::ID_LEFT_BRACE,FXText::ID_LEFT_ANG,FXText::onCmdBlockBeg),
   FXMAPFUNCS(SEL_COMMAND,FXText::ID_RIGHT_BRACE,FXText::ID_RIGHT_ANG,FXText::onCmdBlockEnd),
-  FXMAPFUNCS(SEL_COMMAND,FXText::ID_CLEAN_INDENT,FXText::ID_SHIFT_TABRIGHT,FXText::onCmdShiftText),
+  FXMAPFUNCS(SEL_COMMAND,FXText::ID_SHIFT_LEFT,FXText::ID_SHIFT_TABRIGHT,FXText::onCmdShiftText),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_CLEAN_INDENT,FXText::onCmdShiftText),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SETHELPSTRING,FXText::onCmdSetHelp),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_GETHELPSTRING,FXText::onCmdGetHelp),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_SETTIPSTRING,FXText::onCmdSetTip),
@@ -292,7 +298,6 @@ const FXchar FXText::textDelimiters[]="~.,/\\`'!@#$%^&*()-=+{}|[]\":;<>?";
 // Matching things
 static const FXchar righthand[]="}])>";
 static const FXchar lefthand[]="{[(<";
-
 
 /*******************************************************************************/
 
@@ -2509,12 +2514,12 @@ void FXText::enterText(const FXchar *text,FXint n,FXbool notify){
   replaceText(start,end-start,text,n,notify);
   moveCursor(start+n,notify);
   }
-  
+
 
 // End of overstruck character range
 FXint FXText::overstruck(FXint start,const FXchar *text,FXint n){
   register FXint sindent,eindent,indent,newline=0,end,c;
-  
+
   // Measure indent at pos
   for(end=lineStart(start),sindent=0; end<start; end+=getCharLen(end)){
     sindent+=(getChar(end)=='\t') ? (tabcolumns-sindent%tabcolumns) : 1;
@@ -2531,19 +2536,19 @@ FXint FXText::overstruck(FXint start,const FXchar *text,FXint n){
   for(end=start,indent=sindent; end<length; end+=getCharLen(end)){
     c=getChar(end);
     if(c=='\n'){                      // Stuff past the newline just gets inserted
-      if(newline) end+=getCharLen(end); 
-      break; 
+      if(newline) end+=getCharLen(end);
+      break;
       }
     indent+=(c=='\t') ? (tabcolumns-indent%tabcolumns) : 1;
     if(indent>=eindent){              // Replace string fits inside here
-      if(indent==eindent) end+=getCharLen(end); 
+      if(indent==eindent) end+=getCharLen(end);
       break;
       }
     }
-  return end; 
+  return end;
   }
-  
-  
+
+
 /*******************************************************************************/
 
 // Set selection
@@ -2709,15 +2714,20 @@ FXbool FXText::pasteSelection(FXbool notify){
 
   // Avoid paste inside selection
   if(selstartpos==selendpos || cursorpos<=selstartpos || selendpos<=cursorpos){
+    FXint start=cursorpos;
+    FXint end=cursorpos;
     FXString string;
 
     // First, try UTF-8
     if(getDNDData(FROM_SELECTION,utf8Type,string)){
-//      replaceText(cursorpos,0,string,notify);
-//      makePositionVisible(cursorpos);
-//      setCursorPos(cursorpos,notify);
-//      flashMatching();
-      enterText(string,notify);
+      if(isOverstrike()){
+        end=overstruck(start,string.text(),string.length());
+        }
+      replaceText(start,end-start,string,notify);
+      makePositionVisible(cursorpos);
+      setCursorPos(cursorpos,notify);
+      flashMatching();
+//      enterText(string,notify);
       return true;
       }
 
@@ -2725,11 +2735,14 @@ FXbool FXText::pasteSelection(FXbool notify){
     if(getDNDData(FROM_SELECTION,utf16Type,string)){
       FXUTF16LECodec unicode;
       string=unicode.mb2utf(string);
-//      replaceText(cursorpos,0,string,notify);
-//      makePositionVisible(cursorpos);
-//      setCursorPos(cursorpos,notify);
-//      flashMatching();
-      enterText(string,notify);
+      if(isOverstrike()){
+        end=overstruck(start,string.text(),string.length());
+        }
+      replaceText(start,end-start,string,notify);
+      makePositionVisible(cursorpos);
+      setCursorPos(cursorpos,notify);
+      flashMatching();
+//      enterText(string,notify);
       return true;
       }
 
@@ -2737,11 +2750,14 @@ FXbool FXText::pasteSelection(FXbool notify){
     if(getDNDData(FROM_SELECTION,stringType,string)){
       FX88591Codec ascii;
       string=ascii.mb2utf(string);
-//      replaceText(cursorpos,0,string,notify);
-//      makePositionVisible(cursorpos);
-//      setCursorPos(cursorpos,notify);
-//      flashMatching();
-      enterText(string,notify);
+      if(isOverstrike()){
+        end=overstruck(start,string.text(),string.length());
+        }
+      replaceText(start,end-start,string,notify);
+      makePositionVisible(cursorpos);
+      setCursorPos(cursorpos,notify);
+      flashMatching();
+//      enterText(string,notify);
       return true;
       }
     }
@@ -2895,6 +2911,7 @@ void FXText::drawBufferText(FXDCWindow& dc,FXint x,FXint y,FXint,FXint,FXint pos
       }
     else{
       dc.drawText(x,y,&buffer[pos],gapstart-pos);
+      if(usedstyle&STYLE_BOLD) dc.drawText(x+1,y,&buffer[pos],gapstart-pos);
       x+=font->getTextWidth(&buffer[pos],gapstart-pos);
       dc.drawText(x,y,&buffer[gapend],pos+n-gapstart);
       if(usedstyle&STYLE_BOLD) dc.drawText(x+1,y,&buffer[gapend],pos+n-gapstart);
@@ -3171,7 +3188,7 @@ void FXText::drawContents(FXDCWindow& dc) const {
   brow=(dc.getClipY()+dc.getClipHeight()-pos_y-vy-margintop)/th;
   dc.setClipRectangle(vx+marginleft,vy+margintop,vw-marginright-marginleft,vh-margintop-marginbottom);
   if(trow<=toprow) trow=toprow;
-  if(brow>=toprow+nvisrows) brow=toprow+nvisrows;
+  if(brow>=toprow+nvisrows) brow=toprow+nvisrows-1;
   for(row=trow; row<=brow; row++){
     drawTextRow(dc,row);
     }
@@ -3195,7 +3212,7 @@ void FXText::drawNumbers(FXDCWindow& dc) const {
   if(trow<=toprow) trow=toprow;
   if(brow>=toprow+nvisrows) brow=toprow+nvisrows;
   for(row=trow; row<=brow; row++){
-    n=sprintf(number,"%d",row+1);
+    n=__snprintf(number,sizeof(number),"%d",row+1);
     tw=font->getTextWidth(number,n);
     dc.drawText(vx-tw,pos_y+vy+margintop+row*th+font->getFontAscent(),number,n);
     }
@@ -3206,7 +3223,7 @@ void FXText::drawNumbers(FXDCWindow& dc) const {
 void FXText::updateRange(FXint beg,FXint end) const {
   register FXint vx,vy,vw,b,e,tl,bl,fc,lc,lx,rx,ty,by;
   FXMINMAX(b,e,beg,end);
-  if(b<visrows[nvisrows] && visrows[0]<e && b<e){
+  if(b<=visrows[nvisrows] && visrows[0]<e && b<=e){
     if(b<visrows[0]) b=visrows[0];
     if(e>visrows[nvisrows]) e=visrows[nvisrows];
     vx=getVisibleX();
@@ -3224,12 +3241,14 @@ void FXText::updateRange(FXint beg,FXint end) const {
         rx=pos_x+vx+marginleft+lineWidth(visrows[tl],lc);
       else
         rx=vx+vw;
+      //FXTRACE((1,"updateRange(%d,%d) tl=%d bl=%d fc=%d lc=%d\n",b,e,tl,bl,fc,lc));
       }
     else{
       ty=pos_y+vy+margintop+(toprow+tl)*font->getFontHeight();
       by=pos_y+vy+margintop+(toprow+bl+1)*font->getFontHeight();
       lx=vx;
       rx=lx+vw;
+      //FXTRACE((1,"updateRange(%d,%d) tl=%d bl=%d\n",b,e,tl,bl));
       }
     update(lx,ty,rx-lx,by-ty);
     }

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMDIChild.cpp,v 1.107 2007/02/07 20:22:12 fox Exp $                     *
+* $Id: FXMDIChild.cpp,v 1.108 2007/05/21 19:56:56 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -254,7 +254,7 @@ void FXMDIChild::layout(){
   bx=width-BORDERWIDTH-bw-2;
   by=BORDERWIDTH+(th-bh)/2;
   windowbtn->position(BORDERWIDTH+2,BORDERWIDTH+(th-mh)/2,mw,mh);
-  if(options&MDI_MAXIMIZED){
+  if(isMaximized()){
     deletebtn->hide();
     maximizebtn->hide();
     minimizebtn->hide();
@@ -265,7 +265,7 @@ void FXMDIChild::layout(){
       contents->show();
       }
     }
-  else if(options&MDI_MINIMIZED){
+  else if(isMinimized()){
     deletebtn->position(bx,by,bw,bh); bx-=bw+3;
     maximizebtn->position(bx,by,bw,bh); bx-=bw+3;
     restorebtn->position(bx,by,bw,bh);
@@ -294,10 +294,31 @@ void FXMDIChild::layout(){
   }
 
 
+// Restore window
+FXbool FXMDIChild::restore(FXbool notify){
+  if(isMaximized() || isMinimized()){
+    if(isMinimized()){
+      iconPosX=xpos;
+      iconPosY=ypos;
+      iconWidth=width;
+      iconHeight=height;
+      }
+    xpos=normalPosX;
+    ypos=normalPosY;
+    width=normalWidth;
+    height=normalHeight;
+    options&=~(MDI_MINIMIZED|MDI_MAXIMIZED);
+    recalc();
+    if(notify && target){target->tryHandle(this,FXSEL(SEL_RESTORE,message),NULL);}
+    }
+  return true;
+  }
+
+
 // Maximize window
 FXbool FXMDIChild::maximize(FXbool notify){
-  if(!(options&MDI_MAXIMIZED)){
-    if(options&MDI_MINIMIZED){
+  if(!isMaximized()){
+    if(isMinimized()){
       iconPosX=xpos;
       iconPosY=ypos;
       iconWidth=width;
@@ -324,8 +345,8 @@ FXbool FXMDIChild::maximize(FXbool notify){
 
 // Minimize window
 FXbool FXMDIChild::minimize(FXbool notify){
-  if(!(options&MDI_MINIMIZED)){
-    if(!(options&MDI_MAXIMIZED)){
+  if(!isMinimized()){
+    if(!isMaximized()){
       normalPosX=xpos;
       normalPosY=ypos;
       normalWidth=width;
@@ -339,27 +360,6 @@ FXbool FXMDIChild::minimize(FXbool notify){
     options&=~MDI_MAXIMIZED;
     recalc();
     if(notify && target){target->tryHandle(this,FXSEL(SEL_MINIMIZE,message),NULL);}
-    }
-  return true;
-  }
-
-
-// Restore window
-FXbool FXMDIChild::restore(FXbool notify){
-  if(options&(MDI_MINIMIZED|MDI_MAXIMIZED)){
-    if(options&MDI_MINIMIZED){
-      iconPosX=xpos;
-      iconPosY=ypos;
-      iconWidth=width;
-      iconHeight=height;
-      }
-    xpos=normalPosX;
-    ypos=normalPosY;
-    width=normalWidth;
-    height=normalHeight;
-    options&=~(MDI_MINIMIZED|MDI_MAXIMIZED);
-    recalc();
-    if(notify && target){target->tryHandle(this,FXSEL(SEL_RESTORE,message),NULL);}
     }
   return true;
   }
@@ -410,13 +410,13 @@ FXbool FXMDIChild::isMinimized() const {
 // Move this window to the specified position in the parent's coordinates
 void FXMDIChild::move(FXint x,FXint y){
   FXComposite::move(x,y);
-  if(!(options&(MDI_MAXIMIZED|MDI_MINIMIZED))){
-    normalPosX=x;
-    normalPosY=y;
-    }
-  else if(options&MDI_MINIMIZED){
+  if(isMinimized()){
     iconPosX=x;
     iconPosY=y;
+    }
+  else if(!isMaximized()){
+    normalPosX=x;
+    normalPosY=y;
     }
   }
 
@@ -424,13 +424,13 @@ void FXMDIChild::move(FXint x,FXint y){
 // Resize this window to the specified width and height
 void FXMDIChild::resize(FXint w,FXint h){
   FXComposite::resize(w,h);
-  if(!(options&(MDI_MAXIMIZED|MDI_MINIMIZED))){
-    normalWidth=w;
-    normalHeight=h;
-    }
-  else if(options&MDI_MINIMIZED){
+  if(isMinimized()){
     iconWidth=w;
     iconHeight=h;
+    }
+  else if(!isMaximized()){
+    normalWidth=w;
+    normalHeight=h;
     }
   }
 
@@ -438,17 +438,17 @@ void FXMDIChild::resize(FXint w,FXint h){
 // Move and resize this window in the parent's coordinates
 void FXMDIChild::position(FXint x,FXint y,FXint w,FXint h){
   FXComposite::position(x,y,w,h);
-  if(!(options&(MDI_MAXIMIZED|MDI_MINIMIZED))){
-    normalPosX=x;
-    normalPosY=y;
-    normalWidth=w;
-    normalHeight=h;
-    }
-  else if(options&MDI_MINIMIZED){
+  if(isMinimized()){
     iconPosX=x;
     iconPosY=y;
     iconWidth=w;
     iconHeight=h;
+    }
+  else if(!isMaximized()){
+    normalPosX=x;
+    normalPosY=y;
+    normalWidth=w;
+    normalHeight=h;
     }
   }
 
@@ -553,7 +553,7 @@ long FXMDIChild::onPaint(FXObject*,FXSelector,void* ptr){
   dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
 
   // Only draw stuff when not maximized
-  if(!(options&MDI_MAXIMIZED)){
+  if(!isMaximized()){
 
     // Compute sizes
     fh=font->getFontHeight();
@@ -611,7 +611,7 @@ long FXMDIChild::onPaint(FXObject*,FXSelector,void* ptr){
       }
 
     // Draw inner border
-    if(!(options&MDI_MINIMIZED)){
+    if(!isMinimized()){
       dc.setForeground(shadowColor);
       dc.fillRectangle(BORDERWIDTH,BORDERWIDTH+th,width-BORDERWIDTH*2-1,1);
       dc.fillRectangle(BORDERWIDTH,BORDERWIDTH+th,1,height-th-BORDERWIDTH*2-1);
@@ -761,11 +761,11 @@ long FXMDIChild::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
         }
       }
     else if(event->click_count==2){
-      if(options&MDI_MINIMIZED){
+      if(isMinimized()){
         animateRectangles(xpos,ypos,width,height,normalPosX,normalPosY,normalWidth,normalHeight);
         restore(true);
         }
-      else if(options&MDI_MAXIMIZED){
+      else if(isMaximized()){
         animateRectangles(xpos,ypos,width,height,normalPosX,normalPosY,normalWidth,normalHeight);
         restore(true);
         }

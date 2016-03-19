@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockBar.cpp,v 1.66 2007/02/07 20:22:05 fox Exp $                       *
+* $Id: FXDockBar.cpp,v 1.67 2007/06/04 21:37:14 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -226,8 +226,7 @@ FXDockBar::FXDockBar():drydock(NULL),wetdock(NULL){
 
 
 // Make a dockable and, possibly, floatable toolbar
-FXDockBar::FXDockBar(FXComposite* p,FXComposite* q,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs),drydock(p),wetdock(q){
+FXDockBar::FXDockBar(FXComposite* p,FXComposite* q,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs),drydock(p),wetdock(q){
   flags|=FLAG_ENABLED;
   gripx=0;
   gripy=0;
@@ -237,8 +236,7 @@ FXDockBar::FXDockBar(FXComposite* p,FXComposite* q,FXuint opts,FXint x,FXint y,F
 
 
 // Make a non-floatable toolbar
-FXDockBar::FXDockBar(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs),drydock(NULL),wetdock(NULL){
+FXDockBar::FXDockBar(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs),drydock(NULL),wetdock(NULL){
   flags|=FLAG_ENABLED;
   gripx=0;
   gripy=0;
@@ -276,7 +274,7 @@ void FXDockBar::dock(FXDockSite* docksite,FXWindow* other,FXbool notify){
   if(docksite && getParent()!=docksite){
     setDryDock(docksite);
     reparent(docksite,other);
-    wetdock->hide();
+    if(wetdock) wetdock->hide();
     docksite->dockToolBar(this,other);
     if(notify && target){target->tryHandle(this,FXSEL(SEL_DOCKED,message),docksite);}
     }
@@ -288,7 +286,7 @@ void FXDockBar::dock(FXDockSite* docksite,FXint localx,FXint localy,FXbool notif
   if(docksite && getParent()!=docksite){
     setDryDock(docksite);
     reparent(docksite,NULL);
-    wetdock->hide();
+    if(wetdock) wetdock->hide();
     docksite->dockToolBar(this,localx,localy);
     if(notify && target){target->tryHandle(this,FXSEL(SEL_DOCKED,message),docksite);}
     }

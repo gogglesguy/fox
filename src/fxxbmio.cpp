@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxxbmio.cpp,v 1.20 2007/02/07 20:22:23 fox Exp $                         *
+* $Id: fxxbmio.cpp,v 1.23 2007/06/03 05:30:42 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -48,10 +48,15 @@ using namespace FX;
 namespace FX {
 
 
+// Declarations
 extern FXAPI FXbool fxcheckXBM(FXStream& store);
 extern FXAPI FXbool fxloadXBM(FXColor*& data,const FXuchar *pix,const FXuchar *msk,FXint width,FXint height);
 extern FXAPI FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& hotx,FXint& hoty);
 extern FXAPI FXbool fxsaveXBM(FXStream& store,const FXColor *data,FXint width,FXint height,FXint hotx=-1,FXint hoty=-1);
+
+// Furnish our own version
+extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 
 // Little helper
@@ -124,7 +129,7 @@ FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       }
 
     // Recognize #define
-    if(sscanf(buffer,"#define %s %d",name,&value)==2){
+    if(__sscanf(buffer,"#define %s %d",name,&value)==2){
       if(strstr(name,"width")) width=value;
       else if(strstr(name,"height")) height=value;
       else if(strstr(name,"x_hot")) hotx=value;
@@ -133,8 +138,8 @@ FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       }
 
     // Recognize declaration
-    if(sscanf(buffer,"static unsigned char %s = {",name)==1) break;
-    if(sscanf(buffer,"static char %s = {", name)==1) break;
+    if(__sscanf(buffer,"static unsigned char %s = {",name)==1) break;
+    if(__sscanf(buffer,"static char %s = {", name)==1) break;
     }
 
   // Test sensible width, height
@@ -194,23 +199,23 @@ FXbool fxsaveXBM(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   FXchar buffer[128];
 
   // Write width
-  n=sprintf(buffer,"#define %s_width %d\n",name,width);
+  n=__snprintf(buffer,sizeof(buffer),"#define %s_width %d\n",name,width);
   store.save(buffer,n);
 
   // Write height
-  n=sprintf(buffer,"#define %s_height %d\n",name,height);
+  n=__snprintf(buffer,sizeof(buffer),"#define %s_height %d\n",name,height);
   store.save(buffer,n);
 
   // Write hot spot
   if(0<=hotx && 0<=hoty){
-    n=sprintf(buffer,"#define %s_x_hot %d\n",name,hotx);
+    n=__snprintf(buffer,sizeof(buffer),"#define %s_x_hot %d\n",name,hotx);
     store.save(buffer,n);
-    n=sprintf(buffer,"#define %s_y_hot %d\n",name,hoty);
+    n=__snprintf(buffer,sizeof(buffer),"#define %s_y_hot %d\n",name,hoty);
     store.save(buffer,n);
     }
 
   // Write declaration
-  n=sprintf(buffer,"static char %s_bits[] = {",name);
+  n=__snprintf(buffer,sizeof(buffer),"static char %s_bits[] = {",name);
   store.save(buffer,n);
 
   // Write pixels
@@ -225,7 +230,7 @@ FXbool fxsaveXBM(FXStream& store,const FXColor *data,FXint width,FXint height,FX
         if(count%12==0){
           store.save("\n   ",3);
           }
-        n=sprintf(buffer," 0x%02x",code);
+        n=__snprintf(buffer,sizeof(buffer)," 0x%02x",code);
         store.save(buffer,n);
         bit=1;
         code=0;

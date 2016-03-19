@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileSelector.h,v 1.69 2007/02/07 20:21:54 fox Exp $                    *
+* $Id: FXFileSelector.h,v 1.71 2007/05/17 14:47:05 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXFILESELECTOR_H
 #define FXFILESELECTOR_H
@@ -30,6 +30,7 @@
 
 namespace FX {
 
+class FXFileDict;
 class FXFileList;
 class FXTextField;
 class FXComboBox;
@@ -289,6 +290,12 @@ public:
 
   /// Allow or disallow navigation
   void allowNavigation(FXbool flag){ navigable=flag; }
+
+  /// Change file associations; delete old ones if owned
+  void setAssociations(FXFileDict* assoc,FXbool owned=false);
+
+  /// Return file associations
+  FXFileDict* getAssociations() const;
 
   /// Is navigation allowed?
   FXbool allowNavigation() const { return navigable; }

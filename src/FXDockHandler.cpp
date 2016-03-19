@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockHandler.cpp,v 1.12 2007/02/07 20:22:05 fox Exp $                   *
+* $Id: FXDockHandler.cpp,v 1.13 2007/05/17 19:27:56 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -141,7 +141,9 @@ long FXDockHandler::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
     flags=(flags&~(FLAG_UPDATE|FLAG_DODRAG))|FLAG_TRYDRAG;
-#ifndef WIN32
+#ifdef WIN32
+    grab();
+#else
     Display *display=(Display*)getApp()->getDisplay();
     const unsigned long mask=CWBackPixmap|CWWinGravity|CWBitGravity|CWBorderPixel|CWOverrideRedirect|CWSaveUnder|CWEventMask|CWDontPropagate|CWColormap|CWCursor;
     XSetWindowAttributes wattr;
@@ -167,8 +169,6 @@ long FXDockHandler::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     xid=xxx;
     grab();
     xid=tempxid;
-#else
-    grab();
 #endif
     update();
     }
@@ -181,7 +181,9 @@ long FXDockHandler::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
     if(flags&FLAG_DODRAG){handle(this,FXSEL(SEL_ENDDRAG,0),ptr);}
     flags=(flags&~(FLAG_TRYDRAG|FLAG_DODRAG))|FLAG_UPDATE;
-#ifndef WIN32
+#ifdef WIN32
+    ungrab();
+#else
     Display *display=(Display*)getApp()->getDisplay();
     FXID tempxid=xid;
     xid=xxx;
@@ -190,8 +192,6 @@ long FXDockHandler::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     getApp()->hash.remove((void*)xxx);
     XDestroyWindow(display,xxx);
     xxx=0;
-#else
-    ungrab();
 #endif
     update();
     }

@@ -389,6 +389,7 @@ FXKnob.cpp \
 FXLabel.cpp \
 FXList.cpp \
 FXListBox.cpp \
+FXLocale.cpp \
 FXMDIButton.cpp \
 FXMDIChild.cpp \
 FXMDIClient.cpp \
@@ -439,7 +440,6 @@ FXRGBImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
-FXReactor.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -519,7 +519,10 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxezquantize.cpp \
 fxfilematch.cpp \
+fxfsquantize.cpp \
+fxgetticks.cpp \
 fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
@@ -530,27 +533,26 @@ fxparsegeometry.cpp \
 fxpcxio.cpp \
 fxpngio.cpp \
 fxppmio.cpp \
+fxprintf.cpp \
+fxpriv.h \
 fxpriv.cpp \
 fxpsio.cpp \
-fxfsquantize.cpp \
-fxezquantize.cpp \
-fxwuquantize.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
+fxscanf.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
 strtoll.cpp \
-vsscanf.cpp \
 icons.h \
 jitter.h \
 version.rc \
 version.rc.in \
-fxpriv.h \
 $(CURSORS) \
 $(ICONS)
 
@@ -610,40 +612,40 @@ FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo \
 FXIFFImage.lo FXIO.lo FXIcon.lo FXIconDict.lo FXIconList.lo \
 FXIconSource.lo FXId.lo FXImage.lo FXImageFrame.lo FXImageView.lo \
 FXInputDialog.lo FXJPGIcon.lo FXJPGImage.lo FXKnob.lo FXLabel.lo \
-FXList.lo FXListBox.lo FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo \
-FXMainWindow.lo FXMat3d.lo FXMat4d.lo FXMat3f.lo FXMat4f.lo FXMatrix.lo \
-FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo FXMenuButton.lo \
-FXMenuCaption.lo FXMenuCascade.lo FXMenuCheck.lo FXMenuRadio.lo \
-FXMenuCommand.lo FXMenuPane.lo FXMenuSeparator.lo FXMenuTitle.lo \
-FXMessageBox.lo FXObject.lo FXObjectList.lo FXOptionMenu.lo \
-FXPCXIcon.lo FXPCXImage.lo FXPNGIcon.lo FXPNGImage.lo FXPPMIcon.lo \
-FXPPMImage.lo FXPacker.lo FXPath.lo FXPicker.lo FXPipe.lo FXPopup.lo \
-FXPoint.lo FXPrintDialog.lo FXProgressBar.lo FXProgressDialog.lo \
-FXQuatd.lo FXQuatf.lo FXMessageChannel.lo FXRASIcon.lo FXRASImage.lo \
-FXRGBIcon.lo FXRGBImage.lo FXRadioButton.lo FXRangef.lo FXRanged.lo \
-FXReactor.lo FXRealSlider.lo FXRealSpinner.lo FXRecentFiles.lo \
-FXRectangle.lo FXRegion.lo FXRegistry.lo FXReplaceDialog.lo FXRex.lo \
-FXRootWindow.lo FXRuler.lo FXRulerView.lo FXScrollArea.lo \
-FXScrollBar.lo FXScrollPane.lo FXScrollWindow.lo FXSearchDialog.lo \
-FXSeparator.lo FXSettings.lo FXShell.lo FXShutter.lo FXSize.lo \
-FXSlider.lo FXSocket.lo FXSpinner.lo FXSpheref.lo FXSphered.lo \
-FXSplashWindow.lo FXSplitter.lo FXSpring.lo FXStat.lo FXStatusBar.lo \
-FXStatusLine.lo FXStream.lo FXString.lo FXStringDict.lo FXSwitcher.lo \
-FXSystem.lo FXTGAIcon.lo FXTGAImage.lo FXTIFIcon.lo FXTIFImage.lo \
-FXTabBar.lo FXTabBook.lo FXTabItem.lo FXTable.lo FXText.lo \
-FXTextCodec.lo FXTextField.lo FXThread.lo FXThreadPool.lo \
+FXList.lo FXListBox.lo FXLocale.lo FXMDIButton.lo FXMDIChild.lo \
+FXMDIClient.lo FXMainWindow.lo FXMat3d.lo FXMat4d.lo FXMat3f.lo \
+FXMat4f.lo FXMatrix.lo FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo \
+FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo FXMenuCheck.lo \
+FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo FXMenuSeparator.lo \
+FXMenuTitle.lo FXMessageBox.lo FXObject.lo FXObjectList.lo \
+FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo FXPNGIcon.lo FXPNGImage.lo \
+FXPPMIcon.lo FXPPMImage.lo FXPacker.lo FXPath.lo FXPicker.lo FXPipe.lo \
+FXPopup.lo FXPoint.lo FXPrintDialog.lo FXProgressBar.lo \
+FXProgressDialog.lo FXQuatd.lo FXQuatf.lo FXMessageChannel.lo \
+FXRASIcon.lo FXRASImage.lo FXRGBIcon.lo FXRGBImage.lo FXRadioButton.lo \
+FXRangef.lo FXRanged.lo FXRealSlider.lo FXRealSpinner.lo \
+FXRecentFiles.lo FXRectangle.lo FXRegion.lo FXRegistry.lo \
+FXReplaceDialog.lo FXRex.lo FXRootWindow.lo FXRuler.lo FXRulerView.lo \
+FXScrollArea.lo FXScrollBar.lo FXScrollPane.lo FXScrollWindow.lo \
+FXSearchDialog.lo FXSeparator.lo FXSettings.lo FXShell.lo FXShutter.lo \
+FXSize.lo FXSlider.lo FXSocket.lo FXSpinner.lo FXSpheref.lo \
+FXSphered.lo FXSplashWindow.lo FXSplitter.lo FXSpring.lo FXStat.lo \
+FXStatusBar.lo FXStatusLine.lo FXStream.lo FXString.lo FXStringDict.lo \
+FXSwitcher.lo FXSystem.lo FXTGAIcon.lo FXTGAImage.lo FXTIFIcon.lo \
+FXTIFImage.lo FXTabBar.lo FXTabBook.lo FXTabItem.lo FXTable.lo \
+FXText.lo FXTextCodec.lo FXTextField.lo FXThread.lo FXThreadPool.lo \
 FXToggleButton.lo FXToolBar.lo FXToolBarGrip.lo FXToolBarShell.lo \
 FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo FXTranslator.lo \
 FXTreeList.lo FXTreeListBox.lo FXTriStateButton.lo FXUndoList.lo \
 FXURL.lo FXVec2d.lo FXVec2f.lo FXVec3d.lo FXVec3f.lo FXVec4d.lo \
 FXVec4f.lo FXVerticalFrame.lo FXVisual.lo FXWindow.lo FXWizard.lo \
 FXXBMIcon.lo FXXBMImage.lo FXXPMIcon.lo FXXPMImage.lo fxascii.lo \
-fxbmpio.lo fxfilematch.lo fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo \
-fxkeyboard.lo fxkeysym.lo fxparsegeometry.lo fxpcxio.lo fxpngio.lo \
-fxppmio.lo fxpriv.lo fxpsio.lo fxfsquantize.lo fxezquantize.lo \
-fxwuquantize.lo fxrasio.lo fxrgbio.lo fxtargaio.lo fxtifio.lo \
-fxunicode.lo fxutils.lo fxxbmio.lo fxxpmio.lo icons.lo strtoll.lo \
-vsscanf.lo
+fxbmpio.lo fxezquantize.lo fxfilematch.lo fxfsquantize.lo fxgetticks.lo \
+fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo fxkeyboard.lo fxkeysym.lo \
+fxparsegeometry.lo fxpcxio.lo fxpngio.lo fxppmio.lo fxprintf.lo \
+fxpriv.lo fxpsio.lo fxrasio.lo fxrgbio.lo fxscanf.lo fxtargaio.lo \
+fxtifio.lo fxunicode.lo fxutils.lo fxwuquantize.lo fxxbmio.lo \
+fxxpmio.lo icons.lo strtoll.lo
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -1812,6 +1814,9 @@ FXFontSelector.lo FXFontSelector.o : FXFontSelector.cpp \
 	../include/FXScrollArea.h ../include/FXScrollWindow.h \
 	../include/FXList.h ../include/FXComboBox.h \
 	../include/FXFontSelector.h
+fxformat.lo fxformat.o : fxformat.cpp ../include/xincs.h \
+	../include/fxver.h ../include/fxdefs.h ../include/fxascii.h \
+	../include/FXString.h fxformat.h
 FXFrame.lo FXFrame.o : FXFrame.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/FXHash.h ../include/FXThread.h \
 	../include/FXStream.h ../include/FXString.h ../include/FXSize.h \
@@ -1824,6 +1829,8 @@ FXFrame.lo FXFrame.o : FXFrame.cpp ../include/xincs.h ../include/fxver.h \
 fxfsquantize.lo fxfsquantize.o : fxfsquantize.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h fxpriv.h \
 	../include/FXElement.h
+fxgetticks.lo fxgetticks.o : fxgetticks.cpp ../include/xincs.h \
+	../include/fxver.h ../include/fxdefs.h
 FXGIFCursor.lo FXGIFCursor.o : FXGIFCursor.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXThread.h ../include/FXElement.h \
@@ -2245,7 +2252,7 @@ FXInputDialog.lo FXInputDialog.o : FXInputDialog.cpp ../include/xincs.h \
 	../include/FXTopWindow.h ../include/FXShell.h
 FXIO.lo FXIO.o : FXIO.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/FXHash.h \
-	../include/FXStream.h ../include/FXIO.h
+	../include/FXStream.h ../include/FXString.h ../include/FXIO.h
 fxjpegio.lo fxjpegio.o : fxjpegio.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXElement.h ../include/FXStream.h
@@ -2332,6 +2339,10 @@ FXListBox.lo FXListBox.o : FXListBox.cpp ../include/xincs.h \
 	../include/FXPacker.h ../include/FXShell.h ../include/FXPopup.h \
 	../include/FXScrollBar.h ../include/FXScrollArea.h \
 	../include/FXList.h ../include/FXListBox.h
+FXLocale.lo FXLocale.o : FXLocale.cpp ../include/xincs.h \
+	../include/fxver.h ../include/fxdefs.h ../include/fxascii.h \
+	../include/FXHash.h ../include/FXStream.h ../include/FXString.h \
+	../include/FXLocale.h
 FXMainWindow.lo FXMainWindow.o : FXMainWindow.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXThread.h \
 	../include/FXHash.h ../include/FXStream.h ../include/FXString.h \
@@ -2748,6 +2759,8 @@ FXPrintDialog.lo FXPrintDialog.o : FXPrintDialog.cpp ../include/xincs.h \
 	../include/FXListBox.h ../include/FXComboBox.h \
 	../include/FXMessageBox.h ../include/FXInputDialog.h \
 	../include/FXFileDialog.h ../include/FXPrintDialog.h icons.h
+fxprintf.lo fxprintf.o : fxprintf.cpp ../include/xincs.h \
+	../include/fxver.h ../include/fxdefs.h ../include/fxascii.h
 fxpriv.lo fxpriv.o : fxpriv.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h fxpriv.h ../include/FXHash.h \
 	../include/FXElement.h ../include/FXThread.h \
@@ -2837,11 +2850,6 @@ FXRASImage.lo FXRASImage.o : FXRASImage.cpp ../include/xincs.h \
 fxrasio.lo fxrasio.o : fxrasio.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/FXHash.h ../include/FXElement.h \
 	../include/FXStream.h
-FXReactor.lo FXReactor.o : FXReactor.cpp ../include/xincs.h \
-	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
-	../include/FXStream.h ../include/FXObject.h \
-	../include/FXThread.h ../include/FXElement.h \
-	../include/FXReactor.h ../include/FXException.h
 FXRealSlider.lo FXRealSlider.o : FXRealSlider.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/fxkeys.h \
 	../include/FXHash.h ../include/FXThread.h ../include/FXStream.h \
@@ -2968,6 +2976,8 @@ FXRulerView.lo FXRulerView.o : FXRulerView.cpp ../include/xincs.h \
 	../include/FXScrollArea.h ../include/FXComposite.h \
 	../include/FXRuler.h ../include/FXFrame.h \
 	../include/FXRulerView.h
+fxscanf.lo fxscanf.o : fxscanf.cpp ../include/xincs.h ../include/fxver.h \
+	../include/fxdefs.h ../include/fxascii.h
 FXScrollArea.lo FXScrollArea.o : FXScrollArea.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXThread.h ../include/FXStream.h \
@@ -3528,8 +3538,8 @@ FXUTF8Codec.lo FXUTF8Codec.o : FXUTF8Codec.cpp ../include/xincs.h \
 	../include/FXString.h ../include/FXTextCodec.h \
 	../include/FXUTF8Codec.h
 fxutils.lo fxutils.o : fxutils.cpp ../include/xincs.h ../include/fxver.h \
-	../include/fxdefs.h ../include/fxascii.h ../include/fxkeys.h \
-	../include/FXHash.h ../include/FXStream.h ../include/FXString.h \
+	../include/fxdefs.h ../include/fxascii.h ../include/FXHash.h \
+	../include/FXStream.h ../include/FXString.h \
 	../include/FXElement.h
 FXVec2d.lo FXVec2d.o : FXVec2d.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h ../include/FXHash.h ../include/FXStream.h \

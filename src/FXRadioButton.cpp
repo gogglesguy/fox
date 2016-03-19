@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRadioButton.cpp,v 1.67 2007/02/07 20:22:14 fox Exp $                   *
+* $Id: FXRadioButton.cpp,v 1.68 2007/04/04 02:45:33 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -273,9 +273,9 @@ long FXRadioButton::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 long FXRadioButton::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  if(isEnabled() && !(flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if(!(flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       oldcheck=check;
       setCheck(TRUE);
       flags|=FLAG_PRESSED;
@@ -290,9 +290,9 @@ long FXRadioButton::onKeyPress(FXObject*,FXSelector,void* ptr){
 // Key Release
 long FXRadioButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  if(isEnabled() && (flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if((flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       flags|=FLAG_UPDATE;
       flags&=~FLAG_PRESSED;
       if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)TRUE);

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXAccelTable.cpp,v 1.55 2007/03/01 22:43:18 fox Exp $                    *
+* $Id: FXAccelTable.cpp,v 1.56 2007/06/03 05:30:37 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -62,6 +62,7 @@ using namespace FX;
 
 namespace FX {
 
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 // Map
 FXDEFMAP(FXAccelTable) FXAccelTableMap[]={
@@ -336,7 +337,7 @@ FXString unparseAccel(FXHotKey key){
     case KEY_F33:
     case KEY_F34:
     case KEY_F35:
-      sprintf(buffer,"F%d",code-KEY_F1+1);
+      __snprintf(buffer,sizeof(buffer),"F%d",code-KEY_F1+1);
       s+=buffer;
       break;
     default:
@@ -347,7 +348,7 @@ FXString unparseAccel(FXHotKey key){
           s+=Ascii::toLower(code);
         }
       else{
-        sprintf(buffer,"#%04x",code);
+        __snprintf(buffer,sizeof(buffer),"#%04x",code);
         s+=buffer;
         }
       break;

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.178 2007/03/01 18:16:34 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.180 2007/05/17 21:19:49 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -720,46 +720,7 @@ void FXDirList::scan(FXbool force){
   }
 
 
-#ifndef WIN32           // UNIX flavor
-
-// List root directories
-void FXDirList::listRootItems(){
-  FXDirItem   *item=(FXDirItem*)firstitem;
-  FXIcon      *openicon=harddiskicon;
-  FXIcon      *closedicon=harddiskicon;
-  FXFileAssoc *fileassoc=NULL;
-
-  // First time, make root node
-  if(!item) item=list=(FXDirItem*)appendItem(NULL,PATHSEPSTRING,harddiskicon,harddiskicon,NULL,true);
-
-  // Root is a directory, has items under it, and is searchable
-  item->state|=FXDirItem::FOLDER|FXDirItem::HASITEMS;
-  item->state&=~(FXDirItem::CHARDEV|FXDirItem::BLOCKDEV|FXDirItem::FIFO|FXDirItem::SOCK|FXDirItem::SYMLINK|FXDirItem::EXECUTABLE);
-
-  // If association is found, use it
-  if(associations) fileassoc=associations->findDirBinding(PATHSEPSTRING);
-  if(fileassoc){
-    if(fileassoc->miniicon) closedicon=fileassoc->miniicon;
-    if(fileassoc->miniiconopen) openicon=fileassoc->miniiconopen;
-    }
-
-  // Update item information
-  item->openIcon=openicon;
-  item->closedIcon=closedicon;
-  item->size=0L;
-  item->assoc=fileassoc;
-  item->date=0;
-
-  // Create item
-  if(id()) item->create();
-
-  // Need to layout
-  recalc();
-  }
-
-
-
-#else                   // Windows flavor
+#ifdef WIN32            // Windows flavor
 
 // List root directories
 void FXDirList::listRootItems(){
@@ -871,6 +832,45 @@ fnd:*pn=item;
   list=newlist;
   }
 
+#else                   // UNIX flavor
+
+// List root directories
+void FXDirList::listRootItems(){
+  FXDirItem   *item=(FXDirItem*)firstitem;
+  FXIcon      *openicon=harddiskicon;
+  FXIcon      *closedicon=harddiskicon;
+  FXFileAssoc *fileassoc=NULL;
+
+  // First time, make root node
+  if(!item) item=list=(FXDirItem*)appendItem(NULL,PATHSEPSTRING,harddiskicon,harddiskicon,NULL,true);
+
+  // Root is a directory, has items under it, and is searchable
+  item->state|=FXDirItem::FOLDER|FXDirItem::HASITEMS;
+  item->state&=~(FXDirItem::CHARDEV|FXDirItem::BLOCKDEV|FXDirItem::FIFO|FXDirItem::SOCK|FXDirItem::SYMLINK|FXDirItem::EXECUTABLE);
+
+  // If association is found, use it
+  if(associations) fileassoc=associations->findDirBinding(PATHSEPSTRING);
+  if(fileassoc){
+    if(fileassoc->miniicon) closedicon=fileassoc->miniicon;
+    if(fileassoc->miniiconopen) openicon=fileassoc->miniiconopen;
+    }
+
+  // Update item information
+  item->openIcon=openicon;
+  item->closedIcon=closedicon;
+  item->size=0L;
+  item->assoc=fileassoc;
+  item->date=0;
+
+  // Create item
+  if(id()) item->create();
+
+  // Need to layout
+  recalc();
+  }
+
+
+
 #endif
 
 
@@ -922,8 +922,16 @@ void FXDirList::listChildItems(FXDirItem *par){
       pathname=directory;
       if(!ISPATHSEP(pathname[pathname.length()-1])) pathname+=PATHSEPSTRING;
       pathname+=name;
+      
+#ifdef WIN32
 
-#ifndef WIN32
+      // Get file/link info
+      if(!FXStat::statFile(pathname,info)) continue;
+
+      // Hidden file or directory normally not shown
+      if(info.isHidden() && !(options&DIRLIST_SHOWHIDDEN)) continue;
+      
+#else
 
       // Get file/link info
       if(!FXStat::statLink(pathname,info)) continue;
@@ -931,14 +939,6 @@ void FXDirList::listChildItems(FXDirItem *par){
       // If its a link, get the info on file itself
       islink=info.isLink();
       if(islink && !FXStat::statFile(pathname,info)) continue;
-
-#else
-
-      // Get file/link info
-      if(!FXStat::statFile(pathname,info)) continue;
-
-      // Hidden file or directory normally not shown
-      if(info.isHidden() && !(options&DIRLIST_SHOWHIDDEN)) continue;
 
 #endif
 
@@ -1076,9 +1076,7 @@ FXTreeItem* FXDirList::getPathnameItem(const FXString& path){
   register FXint beg=0,end=0;
   FXString name;
   if(!path.empty()){
-#ifndef WIN32
-    if(ISPATHSEP(path[0])) end++;
-#else
+#ifdef WIN32
     if(ISPATHSEP(path[0])){
       end++;
       if(ISPATHSEP(path[1])) end++;
@@ -1087,23 +1085,25 @@ FXTreeItem* FXDirList::getPathnameItem(const FXString& path){
       end+=2;
       if(ISPATHSEP(path[2])) end++;
       }
+#else
+    if(ISPATHSEP(path[0])) end++;
 #endif
     if(beg<end){
       name=path.mid(beg,end-beg);
       for(it=firstitem; it; it=it->next){
-#ifndef WIN32
-        if(compare(name,it->getText())==0) goto x;
-#else
+#ifdef WIN32
         if(comparecase(name,it->getText())==0) goto x;
+#else
+        if(compare(name,it->getText())==0) goto x;
 #endif
         }
       listRootItems();
       sortRootItems();
       for(it=firstitem; it; it=it->next){
-#ifndef WIN32
-        if(compare(name,it->getText())==0) goto x;
-#else
+#ifdef WIN32
         if(comparecase(name,it->getText())==0) goto x;
+#else
+        if(compare(name,it->getText())==0) goto x;
 #endif
         }
       return NULL;
@@ -1114,19 +1114,19 @@ x:    item=it;
         while(end<path.length() && !ISPATHSEP(path[end])) end++;
         name=path.mid(beg,end-beg);
         for(it=item->first; it; it=it->next){
-#ifndef WIN32
-          if(compare(name,it->getText())==0) goto y;
-#else
+#ifdef WIN32
           if(comparecase(name,it->getText())==0) goto y;
+#else
+          if(compare(name,it->getText())==0) goto y;
 #endif
           }
         listChildItems((FXDirItem*)item);
         sortChildItems(item);
         for(it=item->first; it; it=it->next){
-#ifndef WIN32
-          if(compare(name,it->getText())==0) goto y;
-#else
+#ifdef WIN32
           if(comparecase(name,it->getText())==0) goto y;
+#else
+          if(compare(name,it->getText())==0) goto y;
 #endif
           }
         return item;
@@ -1227,13 +1227,14 @@ void FXDirList::showHiddenFiles(FXbool flag){
   }
 
 
-// Change associations table; force a rescan so as to
-// update the bindings in each item to the new associations
-void FXDirList::setAssociations(FXFileDict* assocs){
+// Change file associations; delete the old one unless it was shared
+void FXDirList::setAssociations(FXFileDict* assocs,FXbool owned){
   if(associations!=assocs){
+    if(!(options&DIRLIST_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
     scan(true);
     }
+  options^=((owned-1)^options)&DIRLIST_NO_OWN_ASSOC;
   }
 
 

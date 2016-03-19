@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRootWindow.cpp,v 1.36 2007/02/07 20:22:15 fox Exp $                    *
+* $Id: FXRootWindow.cpp,v 1.37 2007/05/17 19:27:56 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -85,25 +85,13 @@ void FXRootWindow::create(){
   register FXWindow *child;
   if(!xid){
 
-#ifndef WIN32
-
     // Got to have a visual
     if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
 
     // Initialize visual
     visual->create();
-
-    xid=RootWindow(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-    width=DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-    height=DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-
-#else
-
-    // Got to have a visual
-    if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
-
-    // Initialize visual
-    visual->create();
+  
+#if WIN32
 
     // Get HWND of desktop window
     xid=GetDesktopWindow();
@@ -122,6 +110,13 @@ void FXRootWindow::create(){
     //ypos=GetSystemMetrics(SM_YVIRTUALSCREEN);
     //width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
     //height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+#else
+
+    xid=RootWindow(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+    width=DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+    height=DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+
 #endif
 
     // Normally create children
@@ -153,26 +148,26 @@ void FXRootWindow::destroy(){
 
 // Get default width
 FXint FXRootWindow::getDefaultWidth(){
-#ifndef WIN32
-  return DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-#else
+#if WIN32
   HDC hdc=::GetDC(GetDesktopWindow());
   FXint w=GetDeviceCaps(hdc,HORZRES);
   ::ReleaseDC(GetDesktopWindow(),hdc);
   return w;
+#else
+  return DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
 #endif
   }
 
 
 // Get default height
 FXint FXRootWindow::getDefaultHeight(){
-#ifndef WIN32
-  return DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-#else
+#if WIN32
   HDC hdc=::GetDC(GetDesktopWindow());
   FXint h=GetDeviceCaps(hdc,VERTRES);
   ::ReleaseDC(GetDesktopWindow(),hdc);
   return h;
+#else
+  return DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
 #endif
   }
 

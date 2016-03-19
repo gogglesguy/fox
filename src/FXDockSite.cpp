@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockSite.cpp,v 1.109 2007/02/07 20:22:06 fox Exp $                     *
+* $Id: FXDockSite.cpp,v 1.110 2007/06/04 21:37:14 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -106,8 +106,7 @@ const FXDefaultCursor FXDockSite::cursorType[16]={
 */
 
 // Make a dock site
-FXDockSite::FXDockSite(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
+FXDockSite::FXDockSite(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):FXPacker(p,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
 //  mode=DRAG_NONE;
   }
 

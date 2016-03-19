@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2005 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
-# $Id: Makefile.bc,v 1.142 2007/01/31 16:20:01 fox Exp $                     #
+# $Id: Makefile.bc,v 1.146 2007/05/30 17:43:21 fox Exp $                     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -192,6 +192,7 @@ FXKnob.cpp \
 FXLabel.cpp \
 FXList.cpp \
 FXListBox.cpp \
+FXLocale.cpp \
 FXMDIButton.cpp \
 FXMDIChild.cpp \
 FXMDIClient.cpp \
@@ -235,7 +236,6 @@ FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
-FXMessenger.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
 FXRGBIcon.cpp \
@@ -325,7 +325,10 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxezquantize.cpp \
 fxfilematch.cpp \
+fxfsquantize.cpp \
+fxgetticks.cpp \
 fxgifio.cpp \
 fxicoio.cpp \
 fxiffio.cpp \
@@ -336,17 +339,17 @@ fxparsegeometry.cpp \
 fxpcxio.cpp \
 fxpngio.cpp \
 fxppmio.cpp \
+fxprintf.cpp \
 fxpriv.cpp \
 fxpsio.cpp \
-fxezquantize.cpp \
-fxfsquantize.cpp \
-fxwuquantize.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
+fxscanf.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
 fxutils.cpp \
+fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \

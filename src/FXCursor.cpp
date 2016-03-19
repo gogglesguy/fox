@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXCursor.cpp,v 1.67 2007/02/07 20:22:04 fox Exp $                        *
+* $Id: FXCursor.cpp,v 1.68 2007/05/17 19:27:56 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -160,106 +160,15 @@ static FXbool supportsColorCursors(){
   return false;
   }
 
-
 #endif
+
 
 // Create cursor
 void FXCursor::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-
-#ifndef WIN32   // X11
-
-      // Mapping to standard X11 cursors
-      const FXuint stock[]={XC_left_ptr,XC_left_ptr,XC_right_ptr,XC_xterm,XC_watch,XC_crosshair,XC_sb_h_double_arrow,XC_sb_v_double_arrow,XC_fleur};
-
-      // Building stock cursor
-      if(options&CURSOR_MASK){
-        FXTRACE((100,"%s::create: stock cursor\n",getClassName()));
-        xid=XCreateFontCursor(DISPLAY(getApp()),stock[options&CURSOR_MASK]);
-        }
-
-      // Building custom cursor
-      else{
-
-        // Should have data
-        if(!data){ fxerror("%s::create: cursor needs pixel data.\n",getClassName()); }
-
-        // Let's hope it's the correct size!
-        if(width>32 || height>32){ fxerror("%s::create: cursor exceeds maximum size of 32x32 pixels\n",getClassName()); }
-
-        // We have support for color cursors and its a color cursor
-#ifdef HAVE_XCURSOR_H
-        if(isColor() && XcursorSupportsARGB(DISPLAY(getApp()))){
-          register FXuchar *src,*dst,*end; XcursorImage *image;
-          FXTRACE((100,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
-          image=XcursorImageCreate(width,height);
-          image->xhot=hotx;
-          image->yhot=hoty;
-          dst=(FXuchar*)image->pixels;
-          src=(FXuchar*)data;
-          end=src+width*height*4;
-          do{
-#ifndef __APPLE__
-            dst[0]=src[2];      // B
-            dst[1]=src[1];      // G
-            dst[2]=src[0];      // R
-            dst[3]=src[3];      // A
-#else
-            // A bug in Apple's X11 implementation has alpha on
-            // the wrong end and BGR wrong way round
-            dst[0]=src[3];      // A
-            dst[1]=src[0];      // R
-            dst[2]=src[1];      // G
-            dst[3]=src[2];      // B
-#endif
-            dst+=4;
-            src+=4;
-            }
-          while(src<end);
-          xid=XcursorImageLoadCursor(DISPLAY(getApp()),image);
-          XcursorImageDestroy(image);
-          }
-
-        // No support for color cursor or simple black/white cursor
-        else{
-#endif
-          FXuchar shapebits[128],maskbits[128]; XColor color[2]; Pixmap srcpix,mskpix;
-          register FXint srcoffset,dstoffset,dstbytes,i,j;
-          FXTRACE((100,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
-          color[0].pixel=BlackPixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-          color[1].pixel=WhitePixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-          color[0].flags=DoRed|DoGreen|DoBlue;
-          color[1].flags=DoRed|DoGreen|DoBlue;
-          XQueryColors(DISPLAY(getApp()),DefaultColormap(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp()))),color,2);
-          memset(shapebits,0,sizeof(shapebits));
-          memset(maskbits,0,sizeof(maskbits));
-          dstbytes=(width+7)/8;
-          srcoffset=dstoffset=0;
-          for(j=0; j<height; j++){
-            for(i=0; i<width; i++){
-              if(((FXuchar*)(data+srcoffset+i))[3]>=128){
-                maskbits[dstoffset+(i>>3)]|=(1<<(i&7));
-                if(DARKCOLOR(((FXuchar*)(data+srcoffset+i))[0],((FXuchar*)(data+srcoffset+i))[1],((FXuchar*)(data+srcoffset+i))[2])) shapebits[dstoffset+(i>>3)]|=(1<<(i&7));
-                }
-              }
-            srcoffset+=width;
-            dstoffset+=dstbytes;
-            }
-          srcpix=XCreateBitmapFromData(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),(char*)shapebits,width,height);
-          if(!srcpix){ throw FXImageException("unable to create cursor"); }
-          mskpix=XCreateBitmapFromData(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),(char*)maskbits,width,height);
-          if(!mskpix){ throw FXImageException("unable to create cursor"); }
-          xid=XCreatePixmapCursor(DISPLAY(getApp()),srcpix,mskpix,&color[0],&color[1],hotx,hoty);
-          XFreePixmap(DISPLAY(getApp()),srcpix);
-          XFreePixmap(DISPLAY(getApp()),mskpix);
-#ifdef HAVE_XCURSOR_H
-          }
-#endif
-        }
-
-#else   // WIN32
+#ifdef WIN32            // WIN32
 
       // Mapping to standard WIN32 cursors
       const LPCTSTR stock[]={IDC_ARROW,IDC_ARROW,IDC_ARROW,IDC_IBEAM,IDC_WAIT,IDC_CROSS,IDC_SIZENS,IDC_SIZEWE,IDC_SIZEALL};
@@ -350,6 +259,95 @@ void FXCursor::create(){
           }
         }
 
+#else                   // X11
+
+      // Mapping to standard X11 cursors
+      const FXuint stock[]={XC_left_ptr,XC_left_ptr,XC_right_ptr,XC_xterm,XC_watch,XC_crosshair,XC_sb_h_double_arrow,XC_sb_v_double_arrow,XC_fleur};
+
+      // Building stock cursor
+      if(options&CURSOR_MASK){
+        FXTRACE((100,"%s::create: stock cursor\n",getClassName()));
+        xid=XCreateFontCursor(DISPLAY(getApp()),stock[options&CURSOR_MASK]);
+        }
+
+      // Building custom cursor
+      else{
+
+        // Should have data
+        if(!data){ fxerror("%s::create: cursor needs pixel data.\n",getClassName()); }
+
+        // Let's hope it's the correct size!
+        if(width>32 || height>32){ fxerror("%s::create: cursor exceeds maximum size of 32x32 pixels\n",getClassName()); }
+
+        // We have support for color cursors and its a color cursor
+#ifdef HAVE_XCURSOR_H
+        if(isColor() && XcursorSupportsARGB(DISPLAY(getApp()))){
+          register FXuchar *src,*dst,*end; XcursorImage *image;
+          FXTRACE((100,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
+          image=XcursorImageCreate(width,height);
+          image->xhot=hotx;
+          image->yhot=hoty;
+          dst=(FXuchar*)image->pixels;
+          src=(FXuchar*)data;
+          end=src+width*height*4;
+          do{
+#ifndef __APPLE__
+            dst[0]=src[2];      // B
+            dst[1]=src[1];      // G
+            dst[2]=src[0];      // R
+            dst[3]=src[3];      // A
+#else
+            // A bug in Apple's X11 implementation has alpha on
+            // the wrong end and BGR wrong way round
+            dst[0]=src[3];      // A
+            dst[1]=src[0];      // R
+            dst[2]=src[1];      // G
+            dst[3]=src[2];      // B
+#endif
+            dst+=4;
+            src+=4;
+            }
+          while(src<end);
+          xid=XcursorImageLoadCursor(DISPLAY(getApp()),image);
+          XcursorImageDestroy(image);
+          }
+
+        // No support for color cursor or simple black/white cursor
+        else{
+#endif
+          FXuchar shapebits[128],maskbits[128]; XColor color[2]; Pixmap srcpix,mskpix;
+          register FXint srcoffset,dstoffset,dstbytes,i,j;
+          FXTRACE((100,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
+          color[0].pixel=BlackPixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+          color[1].pixel=WhitePixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+          color[0].flags=DoRed|DoGreen|DoBlue;
+          color[1].flags=DoRed|DoGreen|DoBlue;
+          XQueryColors(DISPLAY(getApp()),DefaultColormap(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp()))),color,2);
+          memset(shapebits,0,sizeof(shapebits));
+          memset(maskbits,0,sizeof(maskbits));
+          dstbytes=(width+7)/8;
+          srcoffset=dstoffset=0;
+          for(j=0; j<height; j++){
+            for(i=0; i<width; i++){
+              if(((FXuchar*)(data+srcoffset+i))[3]>=128){
+                maskbits[dstoffset+(i>>3)]|=(1<<(i&7));
+                if(DARKCOLOR(((FXuchar*)(data+srcoffset+i))[0],((FXuchar*)(data+srcoffset+i))[1],((FXuchar*)(data+srcoffset+i))[2])) shapebits[dstoffset+(i>>3)]|=(1<<(i&7));
+                }
+              }
+            srcoffset+=width;
+            dstoffset+=dstbytes;
+            }
+          srcpix=XCreateBitmapFromData(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),(char*)shapebits,width,height);
+          if(!srcpix){ throw FXImageException("unable to create cursor"); }
+          mskpix=XCreateBitmapFromData(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),(char*)maskbits,width,height);
+          if(!mskpix){ throw FXImageException("unable to create cursor"); }
+          xid=XCreatePixmapCursor(DISPLAY(getApp()),srcpix,mskpix,&color[0],&color[1],hotx,hoty);
+          XFreePixmap(DISPLAY(getApp()),srcpix);
+          XFreePixmap(DISPLAY(getApp()),mskpix);
+#ifdef HAVE_XCURSOR_H
+          }
+#endif
+        }
 #endif
 
       // Were we successful?
@@ -386,15 +384,10 @@ void FXCursor::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
-#ifndef WIN32
-
-      // Delete cursor
-      XFreeCursor(DISPLAY(getApp()),xid);
-#else
-
-      // Delete cursor
+#ifdef WIN32
       DestroyCursor((HCURSOR)xid);
-
+#else
+      XFreeCursor(DISPLAY(getApp()),xid);
 #endif
       }
     xid=0;

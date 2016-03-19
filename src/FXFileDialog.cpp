@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileDialog.cpp,v 1.60 2007/02/07 20:22:07 fox Exp $                    *
+* $Id: FXFileDialog.cpp,v 1.63 2007/06/04 21:37:14 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -72,15 +72,13 @@ FXIMPLEMENT(FXFileDialog,FXDialogBox,NULL,0)
 
 
 // Construct file fialog box
-FXFileDialog::FXFileDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
+FXFileDialog::FXFileDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
   initdialog();
   }
 
 
 // Construct free-floating file dialog box
-FXFileDialog::FXFileDialog(FXApp* a,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(a,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
+FXFileDialog::FXFileDialog(FXApp* a,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDialogBox(a,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
   initdialog();
   }
 
@@ -319,6 +317,18 @@ void FXFileDialog::allowNavigation(FXbool flag){
 // Is navigation allowed?
 FXbool FXFileDialog::allowNavigation() const{
   return filebox->allowNavigation();
+  }
+
+
+// Change file associations
+void FXFileDialog::setAssociations(FXFileDict* assoc,FXbool owned){
+  filebox->setAssociations(assoc,owned);
+  }
+
+
+// Return file associations
+FXFileDict* FXFileDialog::getAssociations() const {
+  return filebox->getAssociations();
   }
 
 

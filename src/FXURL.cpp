@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXURL.cpp,v 1.35 2007/03/20 20:04:57 fox Exp $                           *
+* $Id: FXURL.cpp,v 1.36 2007/05/17 19:27:57 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,30 +77,19 @@ namespace FX {
 
 // Return URL of filename
 FXString FXURL::fileToURL(const FXString& file){
-#ifndef WIN32
-  return "file:"+file;        // UNIX is easy
-#else
+#ifdef WIN32
   FXString absfile=FXPath::absolute(file).substitute(PATHSEP,'/');
   if(Ascii::isLetter(absfile[0]) && absfile[1]==':') return "file://"+FXSystem::getHostName()+"/"+absfile;     // Drive letter
   return "file://"+FXSystem::getHostName()+absfile;
+#else
+  return "file:"+file;        // UNIX is easy
 #endif
   }
 
 
 // Return filename from URL, empty if url is not a local file
 FXString FXURL::fileFromURL(const FXString& url){
-#ifndef WIN32
-  FXint t;
-  if(comparecase("file:",url,5)==0){
-    if(url[5]==PATHSEP && url[6]==PATHSEP){
-      t=url.find(PATHSEP,7);
-      if(7<t) return url.mid(t,2000);       // We ignore host designation
-      return url.mid(7,2000);               // Empty hostname part
-      }
-    return url.mid(5,2000);                 // No hostname
-    }
-  return url;                               // Return unchanged
-#else
+#ifdef WIN32
   FXString localurl=url;
   localurl.substitute('/',PATHSEP);
   if(comparecase("file:" PATHSEPSTRING PATHSEPSTRING,localurl,7)==0){
@@ -122,6 +111,17 @@ FXString FXURL::fileFromURL(const FXString& url){
     return result;
     }
   return "";
+#else
+  FXint t;
+  if(comparecase("file:",url,5)==0){
+    if(url[5]==PATHSEP && url[6]==PATHSEP){
+      t=url.find(PATHSEP,7);
+      if(7<t) return url.mid(t,2000);       // We ignore host designation
+      return url.mid(7,2000);               // Empty hostname part
+      }
+    return url.mid(5,2000);                 // No hostname
+    }
+  return url;                               // Return unchanged
 #endif
   }
 

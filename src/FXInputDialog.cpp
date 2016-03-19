@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXInputDialog.cpp,v 1.40 2007/02/07 20:22:11 fox Exp $                   *
+* $Id: FXInputDialog.cpp,v 1.42 2007/06/02 06:08:04 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -135,13 +135,16 @@ FXuint FXInputDialog::execute(FXuint placement){
   show(placement);
   return getApp()->runModalFor(this);
   }
+  
+  
+extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
 
 
 // Close dialog with an accept, after an validation of the number
 long FXInputDialog::onCmdAccept(FXObject* sender,FXSelector sel,void* ptr){
   if(options&INPUTDIALOG_INTEGER){
     FXint iresult;
-    if((sscanf(input->getText().text(),"%d",&iresult)!=1) || (limlo<=limhi && (iresult<limlo || limhi<iresult))){
+    if((__sscanf(input->getText().text(),"%d",&iresult)!=1) || (limlo<=limhi && (iresult<limlo || limhi<iresult))){
       input->setFocus();
       input->selectAll();
       getApp()->beep();
@@ -150,7 +153,7 @@ long FXInputDialog::onCmdAccept(FXObject* sender,FXSelector sel,void* ptr){
     }
   else if(options&INPUTDIALOG_REAL){
     FXdouble dresult;
-    if((sscanf(input->getText().text(),"%lf",&dresult)!=1) || (limlo<=limhi && (dresult<limlo || limhi<dresult))){
+    if((__sscanf(input->getText().text(),"%lf",&dresult)!=1) || (limlo<=limhi && (dresult<limlo || limhi<dresult))){
       input->setFocus();
       input->selectAll();
       getApp()->beep();

@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.676 2007/03/22 21:09:43 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.684 2007/05/22 13:31:53 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -338,7 +338,32 @@ FXApp* FXApp::app=NULL;
 const FXuchar FXApp::copyright[]="Copyright (C) 1997,2007 Jeroen van der Zijp. All Rights Reserved.";
 
 
-#ifndef WIN32
+#ifdef WIN32            // Windows
+
+// 17 stipple patterns which match up exactly with the 4x4 dither kernel
+// Note that each scan line must be word-aligned so we pad to the right
+// with zeroes.
+static const BYTE stipple_patterns[17][16]={
+  {0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00, 0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00},   // 0 (white)
+  {0xff,0x00,0xff,0x00,0xff,0x00,0x77,0x00, 0xff,0x00,0xff,0x00,0xff,0x00,0x77,0x00},
+  {0xff,0x00,0xdd,0x00,0xff,0x00,0x77,0x00, 0xff,0x00,0xdd,0x00,0xff,0x00,0x77,0x00},
+  {0xff,0x00,0xdd,0x00,0xff,0x00,0x55,0x00, 0xff,0x00,0xdd,0x00,0xff,0x00,0x55,0x00},
+  {0xff,0x00,0x55,0x00,0xff,0x00,0x55,0x00, 0xff,0x00,0x55,0x00,0xff,0x00,0x55,0x00},
+  {0xff,0x00,0x55,0x00,0xbb,0x00,0x55,0x00, 0xff,0x00,0x55,0x00,0xbb,0x00,0x55,0x00},
+  {0xee,0x00,0x55,0x00,0xbb,0x00,0x55,0x00, 0xee,0x00,0x55,0x00,0xbb,0x00,0x55,0x00},
+  {0xee,0x00,0x55,0x00,0xaa,0x00,0x55,0x00, 0xee,0x00,0x55,0x00,0xaa,0x00,0x55,0x00},
+  {0xaa,0x00,0x55,0x00,0xaa,0x00,0x55,0x00, 0xaa,0x00,0x55,0x00,0xaa,0x00,0x55,0x00},   // 8 (50% grey)
+  {0xaa,0x00,0x55,0x00,0xaa,0x00,0x11,0x00, 0xaa,0x00,0x55,0x00,0xaa,0x00,0x11,0x00},
+  {0xaa,0x00,0x44,0x00,0xaa,0x00,0x11,0x00, 0xaa,0x00,0x44,0x00,0xaa,0x00,0x11,0x00},
+  {0xaa,0x00,0x44,0x00,0xaa,0x00,0x00,0x00, 0xaa,0x00,0x44,0x00,0xaa,0x00,0x00,0x00},
+  {0xaa,0x00,0x00,0x00,0xaa,0x00,0x00,0x00, 0xaa,0x00,0x00,0x00,0xaa,0x00,0x00,0x00},
+  {0xaa,0x00,0x00,0x00,0x22,0x00,0x00,0x00, 0xaa,0x00,0x00,0x00,0x22,0x00,0x00,0x00},
+  {0x88,0x00,0x00,0x00,0x22,0x00,0x00,0x00, 0x88,0x00,0x00,0x00,0x22,0x00,0x00,0x00},
+  {0x88,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x88,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+  {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}    // 16 (black)
+  };
+
+#else                   // X11
 
 // 17 stipple patterns which match up exactly with the 4x4 dither kernel
 static const unsigned char stipple_patterns[17][8]={
@@ -411,31 +436,6 @@ static const unsigned char ver_bits[] = {
   0x08, 0x82, 0x20, 0x08, 0x82, 0x20, 0x08, 0x82, 0x20, 0x08, 0x82, 0x20,
   0x08, 0x82, 0x20, 0x08, 0x82, 0x20, 0x08, 0x82, 0x20, 0x08, 0x82, 0x20,
   0x08, 0x82, 0x20, 0x08, 0x82, 0x20, 0x08, 0x82, 0x20, 0x08, 0x82, 0x20
-  };
-
-#else
-
-// 17 stipple patterns which match up exactly with the 4x4 dither kernel
-// Note that each scan line must be word-aligned so we pad to the right
-// with zeroes.
-static const BYTE stipple_patterns[17][16]={
-  {0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00, 0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00},   // 0 (white)
-  {0xff,0x00,0xff,0x00,0xff,0x00,0x77,0x00, 0xff,0x00,0xff,0x00,0xff,0x00,0x77,0x00},
-  {0xff,0x00,0xdd,0x00,0xff,0x00,0x77,0x00, 0xff,0x00,0xdd,0x00,0xff,0x00,0x77,0x00},
-  {0xff,0x00,0xdd,0x00,0xff,0x00,0x55,0x00, 0xff,0x00,0xdd,0x00,0xff,0x00,0x55,0x00},
-  {0xff,0x00,0x55,0x00,0xff,0x00,0x55,0x00, 0xff,0x00,0x55,0x00,0xff,0x00,0x55,0x00},
-  {0xff,0x00,0x55,0x00,0xbb,0x00,0x55,0x00, 0xff,0x00,0x55,0x00,0xbb,0x00,0x55,0x00},
-  {0xee,0x00,0x55,0x00,0xbb,0x00,0x55,0x00, 0xee,0x00,0x55,0x00,0xbb,0x00,0x55,0x00},
-  {0xee,0x00,0x55,0x00,0xaa,0x00,0x55,0x00, 0xee,0x00,0x55,0x00,0xaa,0x00,0x55,0x00},
-  {0xaa,0x00,0x55,0x00,0xaa,0x00,0x55,0x00, 0xaa,0x00,0x55,0x00,0xaa,0x00,0x55,0x00},   // 8 (50% grey)
-  {0xaa,0x00,0x55,0x00,0xaa,0x00,0x11,0x00, 0xaa,0x00,0x55,0x00,0xaa,0x00,0x11,0x00},
-  {0xaa,0x00,0x44,0x00,0xaa,0x00,0x11,0x00, 0xaa,0x00,0x44,0x00,0xaa,0x00,0x11,0x00},
-  {0xaa,0x00,0x44,0x00,0xaa,0x00,0x00,0x00, 0xaa,0x00,0x44,0x00,0xaa,0x00,0x00,0x00},
-  {0xaa,0x00,0x00,0x00,0xaa,0x00,0x00,0x00, 0xaa,0x00,0x00,0x00,0xaa,0x00,0x00,0x00},
-  {0xaa,0x00,0x00,0x00,0x22,0x00,0x00,0x00, 0xaa,0x00,0x00,0x00,0x22,0x00,0x00,0x00},
-  {0x88,0x00,0x00,0x00,0x22,0x00,0x00,0x00, 0x88,0x00,0x00,0x00,0x22,0x00,0x00,0x00},
-  {0x88,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x88,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
-  {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}    // 16 (black)
   };
 
 #endif
@@ -600,8 +600,38 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   // Root window
   root=new FXRootWindow(this,defaultVisual);
 
-  // X Window specific inits
-#ifndef WIN32
+  
+#ifdef WIN32            // MS-Windows specific inits
+
+  // DDE
+  ddeTargets=0;                           // Data exchange to get list of types
+  ddeAtom=0;                              // Data exchange atom
+  ddeDelete=0;                            // Data exchange delete request
+  ddeTypeList=NULL;                       // Data types list available
+  ddeNumTypes=0;                          // Number of data types
+  ddeAction=DRAG_REJECT;                  // Drag and drop action requested
+  ansAction=DRAG_REJECT;                  // Drag and drop action suggested
+
+  // SELECTION
+  xselTypeList=NULL;                      // List of primary selection types
+  xselNumTypes=0;                         // How many types in list
+
+  // XDND
+  xdndFinishPending=false;                // XDND waiting for drop-confirmation
+  xdndAware=0;                            // XDND awareness atom
+  xdndTypes=NULL;
+  xdndSource=0;                           // XDND drag source window
+  xdndTarget=0;                           // XDND drop target window
+  xdndStatusPending=false;                // XDND waiting for status feedback
+  xdndStatusReceived=false;               // XDND received at least one status
+  xdndFinishSent=false;                   // XDND finish sent
+  xdndRect.x=0;                           // XDND motion rectangle
+  xdndRect.y=0;
+  xdndRect.w=0;
+  xdndRect.h=0;
+
+#else                   // X Window specific inits
+
   wmDeleteWindow=0;                       // Window Manager stuff
   wmQuitApp=0;
   wmProtocols=0;
@@ -615,10 +645,12 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   wmNetSupported=0;                       // Extended Window Manager stuff
   wmNetHMaximized=0;
   wmNetVMaximized=0;
+  wmNetFullScreen=0;
   wmNetNeedAttention=0;
   wmNetMoveResize=0;
   wmNetRestack=0;
   wmNetPing=0;
+  wmNetWindowType=0;
 
   wmWindowRole=0;                         // Window Role
   wmClientLeader=0;                       // Client leader
@@ -681,37 +713,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   shmi=true;
   shmp=true;
   synchronize=false;
-
-  // MS-Windows specific inits
-#else
-
-  // DDE
-  ddeTargets=0;                           // Data exchange to get list of types
-  ddeAtom=0;                              // Data exchange atom
-  ddeDelete=0;                            // Data exchange delete request
-  ddeTypeList=NULL;                       // Data types list available
-  ddeNumTypes=0;                          // Number of data types
-  ddeAction=DRAG_REJECT;                  // Drag and drop action requested
-  ansAction=DRAG_REJECT;                  // Drag and drop action suggested
-
-  // SELECTION
-  xselTypeList=NULL;                      // List of primary selection types
-  xselNumTypes=0;                         // How many types in list
-
-  // XDND
-  xdndFinishPending=false;                // XDND waiting for drop-confirmation
-  xdndAware=0;                            // XDND awareness atom
-  xdndTypes=NULL;
-  xdndSource=0;                           // XDND drag source window
-  xdndTarget=0;                           // XDND drop target window
-  xdndStatusPending=false;                // XDND waiting for status feedback
-  xdndStatusReceived=false;               // XDND received at least one status
-  xdndFinishSent=false;                   // XDND finish sent
-  xdndRect.x=0;                           // XDND motion rectangle
-  xdndRect.y=0;
-  xdndRect.w=0;
-  xdndRect.h=0;
-
+  
 #endif
 
   // Timing constants
@@ -776,7 +778,12 @@ FXWindow* FXApp::findWindowWithId(FXID xid) const {
 // Find window from root x,y, starting from given window
 FXWindow* FXApp::findWindowAt(FXint rx,FXint ry,FXID window) const {
   if(initialized){
-#ifndef WIN32
+#ifdef WIN32
+    POINT point;
+    point.x=rx;
+    point.y=ry;
+    window=WindowFromPoint(point);      // FIXME this finds only enabled/visible windows
+#else
     Window rootwin=XDefaultRootWindow((Display*)display);
     Window child;
     int wx,wy;
@@ -786,11 +793,6 @@ FXWindow* FXApp::findWindowAt(FXint rx,FXint ry,FXID window) const {
       if(child==None) break;
       window=child;
       }
-#else
-    POINT point;
-    point.x=rx;
-    point.y=ry;
-    window=WindowFromPoint(point);      // FIXME this finds only enabled/visible windows
 #endif
     return findWindowWithId(window);
     }
@@ -812,7 +814,16 @@ FXWindow *FXApp::getFocusWindow() const {
 
 /*******************************************************************************/
 
-#ifndef WIN32
+#ifdef WIN32            // WIN32
+
+// Trick to find module handle of FOX library
+static HINSTANCE GetOwnModuleHandle(){
+  MEMORY_BASIC_INFORMATION mbi;
+  VirtualQuery((const void*)GetOwnModuleHandle,&mbi,sizeof(mbi));
+  return (HINSTANCE)mbi.AllocationBase;
+  }
+
+#else                   // X11
 
 // Perhaps should do something else...
 static int xerrorhandler(Display* dpy,XErrorEvent* eev){
@@ -866,14 +877,23 @@ void FXApp::imdestroycallback(void*,FXApp* a,void*){
   }
 
 
-#else
-
-// Trick to find module handle of FOX library
-static HINSTANCE GetOwnModuleHandle(){
-  MEMORY_BASIC_INFORMATION mbi;
-  VirtualQuery((const void*)GetOwnModuleHandle,&mbi,sizeof(mbi));
-  return (HINSTANCE)mbi.AllocationBase;
-  }
+// Bunch-o-atoms
+const FXchar* windowTypeAtoms[14]={
+  "_NET_WM_WINDOW_TYPE_DESKTOP",
+  "_NET_WM_WINDOW_TYPE_DOCK",
+  "_NET_WM_WINDOW_TYPE_TOOLBAR",
+  "_NET_WM_WINDOW_TYPE_MENU",
+  "_NET_WM_WINDOW_TYPE_UTILITY",
+  "_NET_WM_WINDOW_TYPE_SPLASH",
+  "_NET_WM_WINDOW_TYPE_DIALOG",
+  "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU",
+  "_NET_WM_WINDOW_TYPE_POPUP_MENU",
+  "_NET_WM_WINDOW_TYPE_TOOLTIP",
+  "_NET_WM_WINDOW_TYPE_NOTIFICATION",
+  "_NET_WM_WINDOW_TYPE_COMBO",
+  "_NET_WM_WINDOW_TYPE_DND",
+  "_NET_WM_WINDOW_TYPE_NORMAL"
+  };
 
 #endif
 
@@ -886,200 +906,7 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     // What's going on
     FXTRACE((100,"%s::openDisplay: opening display.\n",getClassName()));
 
-#ifndef WIN32
-
-    // Using thread-safe X11 if possible
-    //XInitThreads();
-
-    // Set error handler
-    XSetErrorHandler(xerrorhandler);
-
-    // Set fatal handler
-    XSetIOErrorHandler(xfatalerrorhandler);
-
-    // Revert to default
-    if(!dpyname) dpyname=dpy;
-
-    // Open display
-    display=XOpenDisplay(dpyname);
-    if(!display) return false;
-
-    // For debugging
-    if(synchronize) XSynchronize((Display*)display,true);
-
-    // Setup locales and input method if given
-    if(XSupportsLocale()){
-      FXchar mods[100]="";
-      if(inputmethod[0]){
-        strncpy(mods,"@im=",sizeof(mods));
-        strncat(mods,inputmethod,sizeof(mods));
-        }
-      if(!XSetLocaleModifiers(mods)){
-        if(!XSetLocaleModifiers("")){
-          fxwarning("Cannot set locale modifiers.\n");
-          }
-        }
-      }
-
-#ifdef HAVE_XSHM_H
-
-    // Displaying remotely turns it off for sure
-    if(!(dpyname[0]==':' && Ascii::isDigit(dpyname[1]))){
-      shmi=false;
-      shmp=false;
-      }
-
-    // Its potentially on, see if local display groks it
-    if(shmi || shmp){
-      int maj,min,dum; Bool pm;
-      shmi=false;
-      shmp=false;
-      if(XQueryExtension((Display*)display,"MIT-SHM",&dum,&dum,&dum)){
-        if(XShmQueryVersion((Display*)display,&maj,&min,&pm)){
-          shmp=pm && (XShmPixmapFormat((Display*)display)==ZPixmap);
-          shmi=true;
-          }
-        }
-      }
-
-#else
-
-    // Don't have it!
-    shmi=false;
-    shmp=false;
-
-#endif
-
-    // Report the result
-    FXTRACE((100,"X Shared Images  = %d\n",shmi));
-    FXTRACE((100,"X Shared Pixmaps = %d\n",shmp));
-
-    // Initialize Xft and fontconfig
-#ifdef HAVE_XFT_H
-    if(!XftInit(NULL)) return false;
-    if(XftGetVersion()<XftVersion){ fxwarning("Expected Xft library version %d or greater; was %d.\n",XftVersion,XftGetVersion()); }
-#endif
-
-    // Open input method
-#ifndef NO_XIM
-    xim=XOpenIM((Display*)display,NULL,NULL,NULL);
-    if(xim){
-      XIMCallback ximcallback;
-      ximcallback.callback=(XIMProc)imdestroycallback;
-      ximcallback.client_data=(XPointer)this;
-      XSetIMValues((XIM)xim,XNDestroyCallback,&ximcallback,NULL);
-      FXTRACE((100,"Got Input Method\n"));
-      }
-    else{
-      XRegisterIMInstantiateCallback((Display*)display,NULL,NULL,NULL,(XIMProc)imcreatecallback,(XPointer)this);
-      }
-#endif
-
-    // Check for X Rotation and Reflection support
-#ifdef HAVE_XRANDR_H
-    int errorbase;
-    if(XRRQueryExtension((Display*)display,&xrreventbase,&errorbase)){
-      XRRSelectInput((Display*)display,XDefaultRootWindow((Display*)display),True);
-      FXTRACE((100,"X RandR available\n"));
-      }
-#endif
- 
-    // Window Manager communication
-    wmDeleteWindow=XInternAtom((Display*)display,"WM_DELETE_WINDOW",0);
-    wmQuitApp=XInternAtom((Display*)display,"_WM_QUIT_APP",0);
-    wmProtocols=XInternAtom((Display*)display,"WM_PROTOCOLS",0);
-    wmMotifHints=XInternAtom((Display*)display,"_MOTIF_WM_HINTS",0);
-    wmTakeFocus=XInternAtom((Display*)display,"WM_TAKE_FOCUS",0);
-    wmState=XInternAtom((Display*)display,"WM_STATE",0);
-
-    // Extended Window Manager support
-    wmNetState=XInternAtom((Display*)display,"_NET_WM_STATE",0);
-    wmNetIconName=XInternAtom((Display*)display,"_NET_WM_ICON_NAME",0);
-    wmNetWindowName=XInternAtom((Display*)display,"_NET_WM_NAME",0);
-    wmNetSupported=XInternAtom((Display*)display,"_NET_SUPPORTED",0);
-    wmNetHMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_HORZ",0);
-    wmNetVMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_VERT",0);
-    wmNetNeedAttention=XInternAtom((Display*)display,"_NET_WM_STATE_DEMANDS_ATTENTION",0);
-    wmNetMoveResize=XInternAtom((Display*)display,"_NET_WM_MOVERESIZE",0);
-    wmNetRestack=XInternAtom((Display*)display,"_NET_RESTACK_WINDOW",0);
-    wmNetPing=XInternAtom((Display*)display,"_NET_WM_PING",0);
-
-    // Session management
-    wmWindowRole=XInternAtom((Display*)display,"WM_WINDOW_ROLE",0);
-    wmClientLeader=XInternAtom((Display*)display,"WM_CLIENT_LEADER",0);
-    wmClientId=XInternAtom((Display*)display,"SM_CLIENT_ID",0);
-
-    // XEMBED support
-    embedAtom=XInternAtom((Display*)display,"_XEMBED",0);
-    embedInfoAtom=XInternAtom((Display*)display,"_XEMBED_INFO",0);
-    timestampAtom=XInternAtom((Display*)display,"FOX_TIMESTAMP_PROP",0);
-
-    // DDE property
-    ddeAtom=(FXID)XInternAtom((Display*)display,"_FOX_DDE",0);
-    ddeDelete=(FXID)XInternAtom((Display*)display,"DELETE",0);
-    ddeTargets=(FXID)XInternAtom((Display*)display,"TARGETS",0);
-    ddeIncr=(FXID)XInternAtom((Display*)display,"INCR",0);
-
-    // Clipboard
-    xcbSelection=(FXID)XInternAtom((Display*)display,"CLIPBOARD",0);
-
-    // XDND protocol awareness
-    xdndProxy=(FXID)XInternAtom((Display*)display,"XdndProxy",0);
-    xdndAware=(FXID)XInternAtom((Display*)display,"XdndAware",0);
-
-    // XDND Messages
-    xdndEnter=(FXID)XInternAtom((Display*)display,"XdndEnter",0);
-    xdndLeave=(FXID)XInternAtom((Display*)display,"XdndLeave",0);
-    xdndPosition=(FXID)XInternAtom((Display*)display,"XdndPosition",0);
-    xdndStatus=(FXID)XInternAtom((Display*)display,"XdndStatus",0);
-    xdndDrop=(FXID)XInternAtom((Display*)display,"XdndDrop",0);
-    xdndFinished=(FXID)XInternAtom((Display*)display,"XdndFinished",0);
-
-    // XDND Selection atom
-    xdndSelection=(FXID)XInternAtom((Display*)display,"XdndSelection",0);
-
-    // XDND Actions
-    xdndActionCopy=(FXID)XInternAtom((Display*)display,"XdndActionCopy",0);
-    xdndActionMove=(FXID)XInternAtom((Display*)display,"XdndActionMove",0);
-    xdndActionLink=(FXID)XInternAtom((Display*)display,"XdndActionLink",0);
-    xdndActionPrivate=(FXID)XInternAtom((Display*)display,"XdndActionPrivate",0);
-
-    // XDND Types list
-    xdndTypes=(FXID)XInternAtom((Display*)display,"XdndTypeList",0);
-
-    // Standard stipples
-    stipples[STIPPLE_0]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_0],8,8);
-    stipples[STIPPLE_1]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_1],8,8);
-    stipples[STIPPLE_2]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_2],8,8);
-    stipples[STIPPLE_3]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_3],8,8);
-    stipples[STIPPLE_4]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_4],8,8);
-    stipples[STIPPLE_5]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_5],8,8);
-    stipples[STIPPLE_6]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_6],8,8);
-    stipples[STIPPLE_7]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_7],8,8);
-    stipples[STIPPLE_8]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_8],8,8);
-    stipples[STIPPLE_9]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_9],8,8);
-    stipples[STIPPLE_10]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_10],8,8);
-    stipples[STIPPLE_11]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_11],8,8);
-    stipples[STIPPLE_12]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_12],8,8);
-    stipples[STIPPLE_13]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_13],8,8);
-    stipples[STIPPLE_14]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_14],8,8);
-    stipples[STIPPLE_15]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_15],8,8);
-    stipples[STIPPLE_16]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_16],8,8);
-
-    // Hatch patterns
-    stipples[STIPPLE_HORZ]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)hor_bits,24,24);
-    stipples[STIPPLE_VERT]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)ver_bits,24,24);
-    stipples[STIPPLE_CROSS]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)cross_bits,24,24);
-    stipples[STIPPLE_DIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)diag_bits,16,16);
-    stipples[STIPPLE_REVDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)revdiag_bits,16,16);
-    stipples[STIPPLE_CROSSDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)crossdiag_bits,16,16);
-
-    // Only want client messages for this window
-    //XSetWindowAttributes swa;
-    //swa.event_mask=NoEventMask;
-    //messageWindow=XCreateWindow((Display*)display,XDefaultRootWindow((Display*)display),0,0,1,1,0,0,InputOnly,DefaultVisual((Display*)display,DefaultScreen((Display*)display)),CWEventMask,&swa);
-
-#else
+#ifdef WIN32            // MS-Windows
 
     // Set to HINSTANCE on Windows
     display=GetOwnModuleHandle();
@@ -1216,6 +1043,204 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     // when switching to drive w/no media mounted in it...
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
+#else                   // X11
+
+    // Using thread-safe X11 if possible
+    //XInitThreads();
+
+    // Set error handler
+    XSetErrorHandler(xerrorhandler);
+
+    // Set fatal handler
+    XSetIOErrorHandler(xfatalerrorhandler);
+
+    // Revert to default
+    if(!dpyname) dpyname=dpy;
+
+    // Open display
+    display=XOpenDisplay(dpyname);
+    if(!display) return false;
+
+    // For debugging
+    if(synchronize) XSynchronize((Display*)display,true);
+
+    // Setup locales and input method if given
+    if(XSupportsLocale()){
+      FXchar mods[100]="";
+      if(inputmethod[0]){
+        strncpy(mods,"@im=",sizeof(mods));
+        strncat(mods,inputmethod,sizeof(mods));
+        }
+      if(!XSetLocaleModifiers(mods)){
+        if(!XSetLocaleModifiers("")){
+          fxwarning("Cannot set locale modifiers.\n");
+          }
+        }
+      }
+
+#ifdef HAVE_XSHM_H
+
+    // Displaying remotely turns it off for sure
+    if(!(dpyname[0]==':' && Ascii::isDigit(dpyname[1]))){
+      shmi=false;
+      shmp=false;
+      }
+
+    // Its potentially on, see if local display groks it
+    if(shmi || shmp){
+      int maj,min,dum; Bool pm;
+      shmi=false;
+      shmp=false;
+      if(XQueryExtension((Display*)display,"MIT-SHM",&dum,&dum,&dum)){
+        if(XShmQueryVersion((Display*)display,&maj,&min,&pm)){
+          shmp=pm && (XShmPixmapFormat((Display*)display)==ZPixmap);
+          shmi=true;
+          }
+        }
+      }
+
+#else
+
+    // Don't have it!
+    shmi=false;
+    shmp=false;
+
+#endif
+
+    // Report the result
+    FXTRACE((100,"X Shared Images  = %d\n",shmi));
+    FXTRACE((100,"X Shared Pixmaps = %d\n",shmp));
+
+    // Initialize Xft and fontconfig
+#ifdef HAVE_XFT_H
+    if(!XftInit(NULL)) return false;
+    if(XftGetVersion()<XftVersion){ fxwarning("Expected Xft library version %d or greater; was %d.\n",XftVersion,XftGetVersion()); }
+#endif
+
+    // Open input method
+#ifndef NO_XIM
+    xim=XOpenIM((Display*)display,NULL,NULL,NULL);
+    if(xim){
+      XIMCallback ximcallback;
+      ximcallback.callback=(XIMProc)imdestroycallback;
+      ximcallback.client_data=(XPointer)this;
+      XSetIMValues((XIM)xim,XNDestroyCallback,&ximcallback,NULL);
+      FXTRACE((100,"Got Input Method\n"));
+      }
+    else{
+      XRegisterIMInstantiateCallback((Display*)display,NULL,NULL,NULL,(XIMProc)imcreatecallback,(XPointer)this);
+      }
+#endif
+
+    // Check for X Rotation and Reflection support
+#ifdef HAVE_XRANDR_H
+    int errorbase;
+    if(XRRQueryExtension((Display*)display,&xrreventbase,&errorbase)){
+      XRRSelectInput((Display*)display,XDefaultRootWindow((Display*)display),True);
+      FXTRACE((100,"X RandR available\n"));
+      }
+#endif
+
+    // Window Manager communication
+    wmDeleteWindow=XInternAtom((Display*)display,"WM_DELETE_WINDOW",0);
+    wmQuitApp=XInternAtom((Display*)display,"_WM_QUIT_APP",0);
+    wmProtocols=XInternAtom((Display*)display,"WM_PROTOCOLS",0);
+    wmMotifHints=XInternAtom((Display*)display,"_MOTIF_WM_HINTS",0);
+    wmTakeFocus=XInternAtom((Display*)display,"WM_TAKE_FOCUS",0);
+    wmState=XInternAtom((Display*)display,"WM_STATE",0);
+
+    // Extended Window Manager support
+    wmNetState=XInternAtom((Display*)display,"_NET_WM_STATE",0);
+    wmNetIconName=XInternAtom((Display*)display,"_NET_WM_ICON_NAME",0);
+    wmNetWindowName=XInternAtom((Display*)display,"_NET_WM_NAME",0);
+    wmNetSupported=XInternAtom((Display*)display,"_NET_SUPPORTED",0);
+    wmNetHMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_HORZ",0);
+    wmNetVMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_VERT",0);
+    wmNetFullScreen=XInternAtom((Display*)display,"_NET_WM_STATE_FULLSCREEN",0);
+    wmNetNeedAttention=XInternAtom((Display*)display,"_NET_WM_STATE_DEMANDS_ATTENTION",0);
+
+    wmNetMoveResize=XInternAtom((Display*)display,"_NET_WM_MOVERESIZE",0);
+    wmNetRestack=XInternAtom((Display*)display,"_NET_RESTACK_WINDOW",0);
+    wmNetPing=XInternAtom((Display*)display,"_NET_WM_PING",0);
+    wmNetWindowType=XInternAtom((Display*)display,"_NET_WM_WINDOW_TYPE",0);
+
+    // Register window types
+    XInternAtoms((Display*)display,(char**)windowTypeAtoms,14,0,wmWindowTypes);
+
+    // Session management
+    wmWindowRole=XInternAtom((Display*)display,"WM_WINDOW_ROLE",0);
+    wmClientLeader=XInternAtom((Display*)display,"WM_CLIENT_LEADER",0);
+    wmClientId=XInternAtom((Display*)display,"SM_CLIENT_ID",0);
+
+    // XEMBED support
+    embedAtom=XInternAtom((Display*)display,"_XEMBED",0);
+    embedInfoAtom=XInternAtom((Display*)display,"_XEMBED_INFO",0);
+    timestampAtom=XInternAtom((Display*)display,"FOX_TIMESTAMP_PROP",0);
+
+    // DDE property
+    ddeAtom=(FXID)XInternAtom((Display*)display,"_FOX_DDE",0);
+    ddeDelete=(FXID)XInternAtom((Display*)display,"DELETE",0);
+    ddeTargets=(FXID)XInternAtom((Display*)display,"TARGETS",0);
+    ddeIncr=(FXID)XInternAtom((Display*)display,"INCR",0);
+
+    // Clipboard
+    xcbSelection=(FXID)XInternAtom((Display*)display,"CLIPBOARD",0);
+
+    // XDND protocol awareness
+    xdndProxy=(FXID)XInternAtom((Display*)display,"XdndProxy",0);
+    xdndAware=(FXID)XInternAtom((Display*)display,"XdndAware",0);
+
+    // XDND Messages
+    xdndEnter=(FXID)XInternAtom((Display*)display,"XdndEnter",0);
+    xdndLeave=(FXID)XInternAtom((Display*)display,"XdndLeave",0);
+    xdndPosition=(FXID)XInternAtom((Display*)display,"XdndPosition",0);
+    xdndStatus=(FXID)XInternAtom((Display*)display,"XdndStatus",0);
+    xdndDrop=(FXID)XInternAtom((Display*)display,"XdndDrop",0);
+    xdndFinished=(FXID)XInternAtom((Display*)display,"XdndFinished",0);
+
+    // XDND Selection atom
+    xdndSelection=(FXID)XInternAtom((Display*)display,"XdndSelection",0);
+
+    // XDND Actions
+    xdndActionCopy=(FXID)XInternAtom((Display*)display,"XdndActionCopy",0);
+    xdndActionMove=(FXID)XInternAtom((Display*)display,"XdndActionMove",0);
+    xdndActionLink=(FXID)XInternAtom((Display*)display,"XdndActionLink",0);
+    xdndActionPrivate=(FXID)XInternAtom((Display*)display,"XdndActionPrivate",0);
+
+    // XDND Types list
+    xdndTypes=(FXID)XInternAtom((Display*)display,"XdndTypeList",0);
+
+    // Standard stipples
+    stipples[STIPPLE_0]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_0],8,8);
+    stipples[STIPPLE_1]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_1],8,8);
+    stipples[STIPPLE_2]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_2],8,8);
+    stipples[STIPPLE_3]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_3],8,8);
+    stipples[STIPPLE_4]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_4],8,8);
+    stipples[STIPPLE_5]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_5],8,8);
+    stipples[STIPPLE_6]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_6],8,8);
+    stipples[STIPPLE_7]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_7],8,8);
+    stipples[STIPPLE_8]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_8],8,8);
+    stipples[STIPPLE_9]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_9],8,8);
+    stipples[STIPPLE_10]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_10],8,8);
+    stipples[STIPPLE_11]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_11],8,8);
+    stipples[STIPPLE_12]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_12],8,8);
+    stipples[STIPPLE_13]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_13],8,8);
+    stipples[STIPPLE_14]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_14],8,8);
+    stipples[STIPPLE_15]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_15],8,8);
+    stipples[STIPPLE_16]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_16],8,8);
+
+    // Hatch patterns
+    stipples[STIPPLE_HORZ]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)hor_bits,24,24);
+    stipples[STIPPLE_VERT]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)ver_bits,24,24);
+    stipples[STIPPLE_CROSS]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)cross_bits,24,24);
+    stipples[STIPPLE_DIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)diag_bits,16,16);
+    stipples[STIPPLE_REVDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)revdiag_bits,16,16);
+    stipples[STIPPLE_CROSSDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)crossdiag_bits,16,16);
+
+    // Only want client messages for this window
+    //XSetWindowAttributes swa;
+    //swa.event_mask=NoEventMask;
+    //messageWindow=XCreateWindow((Display*)display,XDefaultRootWindow((Display*)display),0,0,1,1,0,0,InputOnly,DefaultVisual((Display*)display,DefaultScreen((Display*)display)),CWEventMask,&swa);
 #endif
 
     // Clear sticky mod state
@@ -1237,9 +1262,37 @@ FXbool FXApp::closeDisplay(){
 
     // What's going on
     FXTRACE((100,"%s::closeDisplay: closing display.\n",getClassName()));
+    
+#ifdef WIN32            // MS-Windows
 
-    // Clear up the rest
-#ifndef WIN32
+    // Atoms created using GlobalCreateAtom() are reference-counted by
+    // the system; calling GlobalDeleteAtom() here just decrements the
+    // reference count but doesn't necessarily free the memory.
+    GlobalDeleteAtom(ddeTargets);
+    GlobalDeleteAtom(xdndAware);
+
+    // Free standard stipples
+    DeleteObject(stipples[STIPPLE_0]);
+    DeleteObject(stipples[STIPPLE_1]);
+    DeleteObject(stipples[STIPPLE_2]);
+    DeleteObject(stipples[STIPPLE_3]);
+    DeleteObject(stipples[STIPPLE_4]);
+    DeleteObject(stipples[STIPPLE_5]);
+    DeleteObject(stipples[STIPPLE_6]);
+    DeleteObject(stipples[STIPPLE_7]);
+    DeleteObject(stipples[STIPPLE_8]);
+    DeleteObject(stipples[STIPPLE_9]);
+    DeleteObject(stipples[STIPPLE_10]);
+    DeleteObject(stipples[STIPPLE_11]);
+    DeleteObject(stipples[STIPPLE_12]);
+    DeleteObject(stipples[STIPPLE_13]);
+    DeleteObject(stipples[STIPPLE_14]);
+    DeleteObject(stipples[STIPPLE_15]);
+    DeleteObject(stipples[STIPPLE_16]);
+
+    //DestroyWindow(messageWindow);
+
+#else                   // X11
     FXASSERT(display);
 
     // Free standard stipples
@@ -1278,34 +1331,7 @@ FXbool FXApp::closeDisplay(){
 
     // Close display
     XCloseDisplay((Display*)display);
-#else
-
-    // Atoms created using GlobalCreateAtom() are reference-counted by
-    // the system; calling GlobalDeleteAtom() here just decrements the
-    // reference count but doesn't necessarily free the memory.
-    GlobalDeleteAtom(ddeTargets);
-    GlobalDeleteAtom(xdndAware);
-
-    // Free standard stipples
-    DeleteObject(stipples[STIPPLE_0]);
-    DeleteObject(stipples[STIPPLE_1]);
-    DeleteObject(stipples[STIPPLE_2]);
-    DeleteObject(stipples[STIPPLE_3]);
-    DeleteObject(stipples[STIPPLE_4]);
-    DeleteObject(stipples[STIPPLE_5]);
-    DeleteObject(stipples[STIPPLE_6]);
-    DeleteObject(stipples[STIPPLE_7]);
-    DeleteObject(stipples[STIPPLE_8]);
-    DeleteObject(stipples[STIPPLE_9]);
-    DeleteObject(stipples[STIPPLE_10]);
-    DeleteObject(stipples[STIPPLE_11]);
-    DeleteObject(stipples[STIPPLE_12]);
-    DeleteObject(stipples[STIPPLE_13]);
-    DeleteObject(stipples[STIPPLE_14]);
-    DeleteObject(stipples[STIPPLE_15]);
-    DeleteObject(stipples[STIPPLE_16]);
-
-    //DestroyWindow(messageWindow);
+  
 #endif
 
     // Clear it
@@ -1565,35 +1591,7 @@ FXbool FXApp::hasChore(FXObject* tgt,FXSelector sel) const {
 // Add input
 FXbool FXApp::addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode,void* ptr){
   if(mode==INPUT_NONE) return false;
-#ifndef WIN32
-  if(fd<0 || fd>=FD_SETSIZE) return false;
-  if(fd>=ninputs){                    // Grow table of callbacks
-    resizeElms(inputs,fd+1);
-    memset(&inputs[ninputs],0,sizeof(FXInput)*(fd+1-ninputs));
-    ninputs=fd+1;
-    }
-  FXASSERT(inputs);
-  FXASSERT(fd<ninputs);
-  if(mode&INPUT_READ){
-    inputs[fd].read.target=tgt;
-    inputs[fd].read.message=sel;
-    inputs[fd].read.data=ptr;
-    FD_SET(fd,&handles->hnd[0]);
-    }
-  if(mode&INPUT_WRITE){
-    inputs[fd].write.target=tgt;
-    inputs[fd].write.message=sel;
-    inputs[fd].write.data=ptr;
-    FD_SET(fd,&handles->hnd[1]);
-    }
-  if(mode&INPUT_EXCEPT){
-    inputs[fd].excpt.target=tgt;
-    inputs[fd].excpt.message=sel;
-    inputs[fd].excpt.data=ptr;
-    FD_SET(fd,&handles->hnd[2]);
-    }
-  if(fd>maxhandle) maxhandle=fd;
-#else
+#ifdef WIN32
   register FXint in;
   if(fd==INVALID_HANDLE_VALUE || fd==NULL) return false;
   for(in=0; in<=maxhandle; in++){      // See if existing handle
@@ -1623,6 +1621,34 @@ r:FXASSERT(in<ninputs);
     inputs[in].excpt.message=sel;
     inputs[in].excpt.data=ptr;
     }
+#else
+  if(fd<0 || fd>=FD_SETSIZE) return false;
+  if(fd>=ninputs){                    // Grow table of callbacks
+    resizeElms(inputs,fd+1);
+    memset(&inputs[ninputs],0,sizeof(FXInput)*(fd+1-ninputs));
+    ninputs=fd+1;
+    }
+  FXASSERT(inputs);
+  FXASSERT(fd<ninputs);
+  if(mode&INPUT_READ){
+    inputs[fd].read.target=tgt;
+    inputs[fd].read.message=sel;
+    inputs[fd].read.data=ptr;
+    FD_SET(fd,&handles->hnd[0]);
+    }
+  if(mode&INPUT_WRITE){
+    inputs[fd].write.target=tgt;
+    inputs[fd].write.message=sel;
+    inputs[fd].write.data=ptr;
+    FD_SET(fd,&handles->hnd[1]);
+    }
+  if(mode&INPUT_EXCEPT){
+    inputs[fd].excpt.target=tgt;
+    inputs[fd].excpt.message=sel;
+    inputs[fd].excpt.data=ptr;
+    FD_SET(fd,&handles->hnd[2]);
+    }
+  if(fd>maxhandle) maxhandle=fd;
 #endif
   return true;
   }
@@ -1631,33 +1657,7 @@ r:FXASSERT(in<ninputs);
 // Remove input
 FXbool FXApp::removeInput(FXInputHandle fd,FXuint mode){
   if(mode==INPUT_NONE) return false;
-#ifndef WIN32
-  if(fd<0 || fd>maxhandle) return false;
-  if(mode&INPUT_READ){
-    inputs[fd].read.target=NULL;
-    inputs[fd].read.message=0;
-    inputs[fd].read.data=NULL;
-    FD_CLR(fd,&handles->hnd[0]);
-    }
-  if(mode&INPUT_WRITE){
-    inputs[fd].write.target=NULL;
-    inputs[fd].write.message=0;
-    inputs[fd].write.data=NULL;
-    FD_CLR(fd,&handles->hnd[1]);
-    }
-  if(mode&INPUT_EXCEPT){
-    inputs[fd].excpt.target=NULL;
-    inputs[fd].excpt.message=0;
-    inputs[fd].excpt.data=NULL;
-    FD_CLR(fd,&handles->hnd[2]);
-    }
-  if(fd==maxhandle){
-    while(fd>=0 && !FD_ISSET(fd,&handles->hnd[0]) && !FD_ISSET(fd,&handles->hnd[1]) && !FD_ISSET(fd,&handles->hnd[2])){
-      --fd;
-      }
-    maxhandle=fd;
-    }
-#else
+#ifdef WIN32
   register FXint in;
   if(fd==INVALID_HANDLE_VALUE || fd==NULL) return false;
   for(in=0; in<=maxhandle; in++){        // See if existing handle
@@ -1683,6 +1683,32 @@ r:if(mode&INPUT_READ){
     handles->hnd[in]=handles->hnd[maxhandle];      // Compact handle table
     inputs[in]=inputs[maxhandle];
     maxhandle--;
+    }
+#else
+  if(fd<0 || fd>maxhandle) return false;
+  if(mode&INPUT_READ){
+    inputs[fd].read.target=NULL;
+    inputs[fd].read.message=0;
+    inputs[fd].read.data=NULL;
+    FD_CLR(fd,&handles->hnd[0]);
+    }
+  if(mode&INPUT_WRITE){
+    inputs[fd].write.target=NULL;
+    inputs[fd].write.message=0;
+    inputs[fd].write.data=NULL;
+    FD_CLR(fd,&handles->hnd[1]);
+    }
+  if(mode&INPUT_EXCEPT){
+    inputs[fd].excpt.target=NULL;
+    inputs[fd].excpt.message=0;
+    inputs[fd].excpt.data=NULL;
+    FD_CLR(fd,&handles->hnd[2]);
+    }
+  if(fd==maxhandle){
+    while(fd>=0 && !FD_ISSET(fd,&handles->hnd[0]) && !FD_ISSET(fd,&handles->hnd[1]) && !FD_ISSET(fd,&handles->hnd[2])){
+      --fd;
+      }
+    maxhandle=fd;
     }
 #endif
   return true;
@@ -3117,13 +3143,13 @@ FXbool FXApp::dispatchEvent(FXRawEvent& msg){
 // Flush pending repaints
 void FXApp::flush(FXbool sync){
   if(initialized){
-#ifndef WIN32
+#ifdef WIN32
+    GdiFlush();
+#else
     if(sync)
       XSync((Display*)display,false);
     else
       XFlush((Display*)display);
-#else
-    GdiFlush();
 #endif
     }
   }
@@ -3147,12 +3173,12 @@ void FXApp::refresh(){
 // Paint all windows marked for repainting
 void FXApp::repaint(){
   if(initialized){
-#ifndef WIN32
-    removeRepaints(0,0,0,0,0);
-#else
+#ifdef WIN32
     for(FXWindow *top=getRootWindow()->getFirst(); top; top=top->getNext()){
       RedrawWindow((HWND)top->id(),NULL,NULL,RDW_ERASENOW|RDW_UPDATENOW|RDW_ALLCHILDREN);
       }
+#else
+    removeRepaints(0,0,0,0,0);
 #endif
     }
   }
@@ -3364,12 +3390,11 @@ static void getSystemFont(FXFontDesc& fontdesc){
 void FXApp::init(int& argc,char** argv,FXbool connect){
   const FXchar *fontspec=NULL;
   const FXchar *style=NULL;
-  const FXchar *d=NULL;
+  const FXchar *str=NULL;
   FXuint maxcols=0;
   FXint i,j;
 
   // Verify implementation invariants
-  FXASSERT(sizeof(FXbool)==1);
   FXASSERT(sizeof(FXuchar)==1);
   FXASSERT(sizeof(FXchar)==1);
   FXASSERT(sizeof(FXushort)==2);
@@ -3403,10 +3428,15 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
   // Try locate display
 #ifndef WIN32
-  if((d=getenv("DISPLAY"))!=NULL) dpy=d;
+  if((str=getenv("DISPLAY"))!=NULL) dpy=str;
 #endif
 
   //fxisconsole(argv[0]);
+
+  // Check tracelevel
+  if((str=getenv("FOX_TRACE_LEVEL"))!=NULL){
+    fxTraceLevel=strtol(str,NULL,10);
+    }
 
   // Parse out FOX args
   i=j=1;
@@ -4341,7 +4371,7 @@ Alt key seems to repeat.
     case WM_GETMINMAXINFO:
       if(window->id() && window->shown() &&window->isMemberOf(FXMETACLASS(FXTopWindow))){
         RECT rect;
-        FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
+        //FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
         if(!(((FXTopWindow*)window)->getDecorations()&DECOR_SHRINKABLE)){
           if(!(((FXTopWindow*)window)->getDecorations()&DECOR_STRETCHABLE)){    // Cannot change at all
             SetRect(&rect,0,0,window->getWidth(),window->getHeight());
@@ -4362,8 +4392,8 @@ Alt key seems to repeat.
           ((MINMAXINFO*)lParam)->ptMaxTrackSize.x=rect.right-rect.left;
           ((MINMAXINFO*)lParam)->ptMaxTrackSize.y=rect.bottom-rect.top;
           }
-        FXTRACE((100,"width=%d height=%d\n",window->getWidth(),window->getHeight()));
-        FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
+        //FXTRACE((100,"width=%d height=%d\n",window->getWidth(),window->getHeight()));
+        //FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
         }
       return 0;
 
@@ -4583,10 +4613,10 @@ long FXApp::onCmdQuit(FXObject*,FXSelector,void*){
 // Register DND type
 FXDragType FXApp::registerDragType(const FXString& name) const {
   if(initialized){
-#ifndef WIN32
-    return (FXDragType)XInternAtom((Display*)display,name.text(),0);
-#else
+#ifdef WIN32
     return RegisterClipboardFormatA(name.text());
+#else
+    return (FXDragType)XInternAtom((Display*)display,name.text(),0);
 #endif
     }
   return 0;
@@ -4596,18 +4626,18 @@ FXDragType FXApp::registerDragType(const FXString& name) const {
 // Get name of registered drag type
 FXString FXApp::getDragTypeName(FXDragType type) const {
   if(initialized){
-#ifndef WIN32
-    FXchar *name=XGetAtomName((Display*)display,type);
-    FXString dragtypename(name);
-    XFree(name);
-    return dragtypename;
-#else
+#ifdef WIN32
     if(0xC000<=type && type<=0xFFFF){
       FXchar buffer[256];
       GetClipboardFormatNameA(type,buffer,sizeof(buffer));
       return buffer;
       }
     return "WIN32_DEFAULT_TYPE";
+#else
+    FXchar *name=XGetAtomName((Display*)display,type);
+    FXString dragtypename(name);
+    XFree(name);
+    return dragtypename;
 #endif
     }
   return FXString::null;
@@ -4634,10 +4664,10 @@ FXbool FXApp::getKeyState(FXuint keysym) const {
 void FXApp::beep(){
   if(initialized){
     FXTRACE((100,"Beep\n"));
-#ifndef WIN32
-    XBell((Display*)display,0);
-#else
+#ifdef WIN32
     MessageBeep(0);
+#else
+    XBell((Display*)display,0);
 #endif
     }
   }
@@ -4708,7 +4738,9 @@ void FXApp::beginWaitCursor(){
   if(initialized){
     if(waitCount==0){
       if(!waitCursor->id()){ fxerror("%s::beginWaitCursor: wait cursor not created yet.\n",getClassName()); }
-#ifndef WIN32
+#ifdef WIN32
+      SetCursor((HCURSOR)waitCursor->id());
+#else
       register FXWindow* child;
       FXASSERT(display);
       child=getRootWindow()->getFirst();
@@ -4721,8 +4753,6 @@ void FXApp::beginWaitCursor(){
         child=child->getNext();
         }
       XFlush((Display*)display);
-#else
-      SetCursor((HCURSOR)waitCursor->id());
 #endif
       }
     waitCount++;
@@ -4737,7 +4767,11 @@ void FXApp::endWaitCursor(){
     waitCount--;
     if(waitCount==0){
       if(!waitCursor->id()){ fxerror("%s::endWaitCursor: wait cursor not created yet.\n",getClassName()); }
-#ifndef WIN32
+#ifdef WIN32
+      if(cursorWindow){
+        SetCursor((HCURSOR)cursorWindow->getDefaultCursor()->id());
+        }
+#else
       register FXWindow* child;
       child=getRootWindow()->getFirst();
       while(child){
@@ -4749,10 +4783,6 @@ void FXApp::endWaitCursor(){
         child=child->getNext();
         }
       XFlush((Display*)display);
-#else
-      if(cursorWindow){
-        SetCursor((HCURSOR)cursorWindow->getDefaultCursor()->id());
-        }
 #endif
       }
     }
@@ -4767,7 +4797,9 @@ void FXApp::setWaitCursor(FXCursor *cur){
       waitCursor=cur;
       if(waitCount){
         if(!waitCursor->id()){ fxerror("%s::setWaitCursor: wait cursor not created yet.\n",getClassName()); }
-#ifndef WIN32
+#ifdef WIN32
+        SetCursor((HCURSOR)waitCursor->id());
+#else
         register FXWindow* child;
         child=getRootWindow()->getFirst();
         while(child){
@@ -4779,8 +4811,6 @@ void FXApp::setWaitCursor(FXCursor *cur){
           child=child->getNext();
           }
         XFlush((Display*)display);
-#else
-        SetCursor((HCURSOR)waitCursor->id());
 #endif
         }
       }
@@ -5070,13 +5100,13 @@ FXApp::~FXApp(){
   ddeSize=0;
 
   // Free left-over selection type data
-#ifndef WIN32
+#ifdef WIN32
   freeElms(xselTypeList);
-  freeElms(xcbTypeList);
-  freeElms(xdndTypeList);
   freeElms(ddeTypeList);
 #else
   freeElms(xselTypeList);
+  freeElms(xcbTypeList);
+  freeElms(xdndTypeList);
   freeElms(ddeTypeList);
 #endif
 

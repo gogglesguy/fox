@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Adie.cpp,v 1.122 2007/03/27 21:57:03 fox Exp $                           *
+* $Id: Adie.cpp,v 1.124 2007/06/01 04:44:27 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -108,7 +108,7 @@ Adie::Adie(const FXString& name):FXApp(name,FXString::null){
 #endif
 #endif
 
-  // File associations
+  // File associations, shared between all windows
   associations=new FXFileDict(this);
   }
 
@@ -181,7 +181,7 @@ void Adie::exit(FXint code){
 
 // Close all windows
 long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){
-  while(0<windowlist.no() && windowlist[0]->close(TRUE));
+  while(0<windowlist.no() && windowlist[0]->close(true));
   return 1;
   }
 

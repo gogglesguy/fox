@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: TextWindow.cpp,v 1.162 2007/03/27 21:57:04 fox Exp $                     *
+* $Id: TextWindow.cpp,v 1.165 2007/05/24 20:42:14 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -337,7 +337,7 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   // Make tree
   FXHorizontalFrame* treeframe=new FXHorizontalFrame(treebox,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
   dirlist=new FXDirList(treeframe,this,ID_OPEN_TREE,DIRLIST_SHOWFILES|DIRLIST_NO_OWN_ASSOC|TREELIST_BROWSESELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-  dirlist->setAssociations(getApp()->associations);
+  dirlist->setAssociations(getApp()->associations,false);
   dirlist->setDraggableFiles(false);
   FXHorizontalFrame* filterframe=new FXHorizontalFrame(treebox,LAYOUT_FILL_X,0,0,0,0, 4,0,0,4);
   new FXLabel(filterframe,tr("Filter:"),NULL,LAYOUT_CENTER_Y);
@@ -1182,7 +1182,7 @@ void TextWindow::readRegistry(){
   barcols=getApp()->reg().readIntEntry("SETTINGS","barcols",0);
 
   // Various flags
-  stripcr=getApp()->reg().readBoolEntry("SETTINGS","stripreturn",false);
+  stripcr=getApp()->reg().readBoolEntry("SETTINGS","stripreturn",true);
   stripsp=getApp()->reg().readBoolEntry("SETTINGS","stripspaces",false);
   appendnl=getApp()->reg().readBoolEntry("SETTINGS","appendnewline",true);
   saveviews=getApp()->reg().readBoolEntry("SETTINGS","saveviews",false);
@@ -1398,7 +1398,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXStringFormat(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d.\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp (jeroen@fox-toolkit.org).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXStringFormat(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp (jeroen@fox-toolkit.org).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1482,6 +1482,7 @@ long TextWindow::onCmdNew(FXObject*,FXSelector,void*){
 long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
   FXFileDialog opendialog(this,tr("Open Document"));
   opendialog.setSelectMode(SELECTFILE_EXISTING);
+  opendialog.setAssociations(getApp()->associations,false);
   opendialog.setPatternList(getPatterns());
   opendialog.setCurrentPattern(getCurrentPattern());
   opendialog.setDirectory(FXPath::directory(getFilename()));
@@ -1708,6 +1709,7 @@ long TextWindow::onCmdInsertFile(FXObject*,FXSelector,void*){
   FXString file;
   FXFileDialog opendialog(this,tr("Open Document"));
   opendialog.setSelectMode(SELECTFILE_EXISTING);
+  opendialog.setAssociations(getApp()->associations,false);
   opendialog.setPatternList(getPatterns());
   opendialog.setCurrentPattern(getCurrentPattern());
   opendialog.setDirectory(FXPath::directory(getFilename()));
@@ -1734,6 +1736,7 @@ long TextWindow::onCmdExtractFile(FXObject*,FXSelector,void*){
   FXFileDialog savedialog(this,tr("Save Document"));
   FXString file="untitled";
   savedialog.setSelectMode(SELECTFILE_ANY);
+  savedialog.setAssociations(getApp()->associations,false);
   savedialog.setPatternList(getPatterns());
   savedialog.setCurrentPattern(getCurrentPattern());
   savedialog.setDirectory(FXPath::directory(getFilename()));
@@ -1769,6 +1772,7 @@ FXbool TextWindow::saveChanges(){
       if(!isFilenameSet()){
         FXFileDialog savedialog(this,tr("Save Document"));
         savedialog.setSelectMode(SELECTFILE_ANY);
+        savedialog.setAssociations(getApp()->associations,false);
         savedialog.setPatternList(getPatterns());
         savedialog.setCurrentPattern(getCurrentPattern());
         savedialog.setFilename(file);
@@ -1812,6 +1816,7 @@ long TextWindow::onCmdSaveAs(FXObject*,FXSelector,void*){
   FXFileDialog savedialog(this,tr("Save Document"));
   FXString file=getFilename();
   savedialog.setSelectMode(SELECTFILE_ANY);
+  savedialog.setAssociations(getApp()->associations,false);
   savedialog.setPatternList(getPatterns());
   savedialog.setCurrentPattern(getCurrentPattern());
   savedialog.setFilename(file);

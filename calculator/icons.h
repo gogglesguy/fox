@@ -1,4 +1,4 @@
-/*********** Generated on 2007/03/28 11:25:21 by reswrap version 5.0.0 *********/
+/*********** Generated on 2007/06/04 18:31:08 by reswrap version 5.0.0 *********/
 
 /* Created by reswrap from file colors.gif */
 extern const unsigned char colors[];

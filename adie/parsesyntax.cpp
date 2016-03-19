@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: parsesyntax.cpp,v 1.15 2007/02/07 20:21:51 fox Exp $                     *
+* $Id: parsesyntax.cpp,v 1.16 2007/06/01 04:44:27 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -142,7 +142,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         brex=string();
         if((error=expression.parse(brex,REX_SYNTAX))!=REGERR_OK){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
-          return FALSE;
+          return false;
           }
         continue;
         }
@@ -150,7 +150,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         brex=string();
         if((error=expression.parse(brex,REX_SYNTAX))!=REGERR_OK){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
-          return FALSE;
+          return false;
           }
         continue;
         }
@@ -158,7 +158,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         erex=string();
         if((error=expression.parse(erex,REX_SYNTAX))!=REGERR_OK){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
-          return FALSE;
+          return false;
           }
         continue;
         }
@@ -166,7 +166,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         srex=string();
         if((error=expression.parse(srex,REX_SYNTAX))!=REGERR_OK){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
-          return FALSE;
+          return false;
           }
         continue;
         }
@@ -176,7 +176,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
     // Premature end
     if(!tok){
       fxwarning("%s:%d: error: unexpected end of file.\n",file.text(),number);
-      return FALSE;
+      return false;
       }
 
     FXTRACE((1,"brex = %s\n",brex.text()));
@@ -184,7 +184,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
     FXTRACE((1,"srex = %s\n",srex.text()));
 
     // Validation
-    if(brex.empty()) return FALSE;
+    if(brex.empty()) return false;
 
     // Create rule
     if(erex.empty() && srex.empty()){
@@ -198,20 +198,20 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
       }
 
     // Parse subrules, if any
-    if(!parserules(syntax,index)) return FALSE;
+    if(!parserules(syntax,index)) return false;
 
     // Check end
     if(strcmp(tok,"end")!=0){
       fxwarning("%s:%d: error: expected 'end'.\n",file.text(),number);
-      return FALSE;
+      return false;
       }
 
     // Next token
     token();
-    if(!tok) return FALSE;
+    if(!tok) return false;
     }
   FXTRACE((1,"parserules end parent = %d\n",parent));
-  return TRUE;
+  return true;
   }
 
 
@@ -226,7 +226,7 @@ FXbool Parser::parse(FXSyntaxList& syntaxes){
   fp=fopen(file.text(),"r");
   if(!fp){
     fxwarning("error: unable to open file: %s.\n",file.text());
-    return FALSE;
+    return false;
     }
 
   // Parse the languages
@@ -235,7 +235,7 @@ FXbool Parser::parse(FXSyntaxList& syntaxes){
     // Parse next language
     if(strcmp(tok,"language")!=0){
       fxwarning("%s:%d: error: expected 'language'.\n",file.text(),number);
-      return FALSE;
+      return false;
       }
 
     // Parse language name
@@ -275,20 +275,20 @@ FXbool Parser::parse(FXSyntaxList& syntaxes){
     // Premature end
     if(!tok){
       fxwarning("%s:%d: error: unexpected end of file.\n",file.text(),number);
-      return FALSE;
+      return false;
       }
 
     // Parse rules
-    if(!parserules(syntax,0)) return FALSE;
+    if(!parserules(syntax,0)) return false;
 
     // Check end
     if(strcmp(tok,"end")!=0){
       fxwarning("%s:%d: error: expected 'end'.\n",file.text(),number);
-      return FALSE;
+      return false;
       }
     }
   FXTRACE((1,"Parser::parse: OK\n"));
-  return TRUE;
+  return true;
   }
 
 

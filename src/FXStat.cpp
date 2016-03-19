@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStat.cpp,v 1.34 2007/02/07 20:22:16 fox Exp $                          *
+* $Id: FXStat.cpp,v 1.35 2007/05/17 19:27:57 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -412,14 +412,14 @@ FXuint FXStat::mode(const FXString& file){
 
 // Change the mode flags for this file
 FXbool FXStat::mode(const FXString& file,FXuint perm){
-#ifndef WIN32
+#ifdef WIN32
+  return false; // FIXME Unimplemented yet
+#else
   FXuint bits=perm&0777;
   if(perm&FXIO::SetUser) bits|=S_ISUID;
   if(perm&FXIO::SetGroup) bits|=S_ISGID;
   if(perm&FXIO::Sticky) bits|=S_ISVTX;
   return !file.empty() && ::chmod(file.text(),bits)==0;
-#else
-  return false; // FIXME Unimplemented yet
 #endif
   }
 

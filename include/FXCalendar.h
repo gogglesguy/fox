@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXCalendar.h,v 1.5 2007/02/07 20:21:52 fox Exp $                         *
+* $Id: FXCalendar.h,v 1.6 2007/05/21 12:16:29 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXCALENDAR_H
 #define FXCALENDAR_H
@@ -51,7 +51,7 @@ protected:
   FXPopup           *months;
   FXOptionMenu      *month;
   FXHorizontalFrame *frame;
-  FXArrowButton     *arrows[4];  
+  FXArrowButton     *arrows[4];
 protected:
   FXCalendar();
 private:
@@ -92,6 +92,9 @@ public:
   /// Disable the window from receiving mouse and keyboard events
   virtual void disable();
 
+  /// Return calendar view control
+  FXCalendarView* calendarView() const { return view; }
+  
   /// Change the Frame Style
   void setFrameStyle(FXuint);
 

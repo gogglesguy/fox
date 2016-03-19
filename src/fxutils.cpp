@@ -19,13 +19,12 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.151 2007/03/15 06:07:43 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.163 2007/06/03 05:30:42 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxascii.h"
-#include "fxkeys.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -53,6 +52,12 @@ extern "C" FXAPI void fxfindfox(void){ }
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Furnish our own version
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
+
 
 // Global flag which controls tracing level
 FXuint fxTraceLevel=0;
@@ -162,114 +167,35 @@ FXbool fxisconsole(const FXchar*){
 #endif
 
 
-// Assert failed routine
-void fxassert(const char* expression,const char* filename,unsigned int lineno){
-#ifndef WIN32
-  fprintf(stderr,"%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
-  fflush(stderr);
-#else
-#ifdef _WINDOWS
-  char msg[MAXMESSAGESIZE];
-  sprintf(msg,"%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
-  OutputDebugStringA(msg);
-  fprintf(stderr,"%s",msg); // if a console is available
-  fflush(stderr);
-#else
-  fprintf(stderr,"%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
-  fflush(stderr);
-#endif
-#endif
-  }
-
-
 // Log message to [typically] stderr
 void fxmessage(const char* format,...){
-#ifndef WIN32
-  va_list arguments;
-  va_start(arguments,format);
-  vfprintf(stderr,format,arguments);
-  fflush(stderr);
-  va_end(arguments);
-#else
-#ifdef _WINDOWS
   char msg[MAXMESSAGESIZE];
   va_list arguments;
   va_start(arguments,format);
-  vsnprintf(msg,sizeof(msg),format,arguments);
+  __vsnprintf(msg,sizeof(msg),format,arguments);
   va_end(arguments);
+#ifdef WIN32
+#ifdef _WINDOWS
   OutputDebugStringA(msg);
-  fprintf(stderr,"%s",msg); // if a console is available
+  fputs(msg,stderr);    // if a console is available
   fflush(stderr);
 #else
-  va_list arguments;
-  va_start(arguments,format);
-  vfprintf(stderr,format,arguments);
+  fputs(msg,stderr);
   fflush(stderr);
-  va_end(arguments);
 #endif
+#else
+  fputs(msg,stderr);
+  fflush(stderr);
 #endif
   }
 
 
-// Error routine
-void fxerror(const char* format,...){
-#ifndef WIN32
-  va_list arguments;
-  va_start(arguments,format);
-  vfprintf(stderr,format,arguments);
-  fflush(stderr);
-  va_end(arguments);
-  abort();
+// Assert failed routine
+void fxassert(const char* expression,const char* filename,unsigned int lineno){
+#ifdef WIN32
+  fxmessage("%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
 #else
-#ifdef _WINDOWS
-  char msg[MAXMESSAGESIZE];
-  va_list arguments;
-  va_start(arguments,format);
-  vsnprintf(msg,sizeof(msg),format,arguments);
-  va_end(arguments);
-  OutputDebugStringA(msg);
-  fprintf(stderr,"%s",msg); // if a console is available
-  fflush(stderr);
-  MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONEXCLAMATION|MB_APPLMODAL);
-  DebugBreak();
-#else
-  va_list arguments;
-  va_start(arguments,format);
-  vfprintf(stderr,format,arguments);
-  fflush(stderr);
-  va_end(arguments);
-  abort();
-#endif
-#endif
-  }
-
-
-// Warning routine
-void fxwarning(const char* format,...){
-#ifndef WIN32
-  va_list arguments;
-  va_start(arguments,format);
-  vfprintf(stderr,format,arguments);
-  fflush(stderr);
-  va_end(arguments);
-#else
-#ifdef _WINDOWS
-  char msg[MAXMESSAGESIZE];
-  va_list arguments;
-  va_start(arguments,format);
-  vsnprintf(msg,sizeof(msg),format,arguments);
-  va_end(arguments);
-  OutputDebugStringA(msg);
-  fprintf(stderr,"%s",msg); // if a console is available
-  fflush(stderr);
-  MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONINFORMATION|MB_APPLMODAL);
-#else
-  va_list arguments;
-  va_start(arguments,format);
-  vfprintf(stderr,format,arguments);
-  fflush(stderr);
-  va_end(arguments);
-#endif
+  fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
 #endif
   }
 
@@ -277,31 +203,77 @@ void fxwarning(const char* format,...){
 // Trace printout routine
 void fxtrace(unsigned int level,const char* format,...){
   if(fxTraceLevel>level){
-#ifndef WIN32
-    va_list arguments;
-    va_start(arguments,format);
-    vfprintf(stderr,format,arguments);
-    fflush(stderr);
-    va_end(arguments);
-#else
-#ifdef _WINDOWS
     char msg[MAXMESSAGESIZE];
     va_list arguments;
     va_start(arguments,format);
-    vsnprintf(msg,sizeof(msg),format,arguments);
+    __vsnprintf(msg,sizeof(msg),format,arguments);
+    va_end(arguments);
+#ifdef WIN32
+#ifdef _WINDOWS
     OutputDebugStringA(msg);
-    fprintf(stderr,"%s",msg); // if a console is available
+    fputs(msg,stderr);    // if a console is available
     fflush(stderr);
     va_end(arguments);
 #else
-    va_list arguments;
-    va_start(arguments,format);
-    vfprintf(stderr,format,arguments);
+    fputs(msg,stderr);
     fflush(stderr);
-    va_end(arguments);
 #endif
+#else
+    fputs(msg,stderr);
+    fflush(stderr);
 #endif
     }
+  }
+
+
+// Error routine
+void fxerror(const char* format,...){
+  char msg[MAXMESSAGESIZE];
+  va_list arguments;
+  va_start(arguments,format);
+  __vsnprintf(msg,sizeof(msg),format,arguments);
+  va_end(arguments);
+#ifdef WIN32
+#ifdef _WINDOWS
+  OutputDebugStringA(msg);
+  fputs(msg,stderr);    // if a console is available
+  fflush(stderr);
+  MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONEXCLAMATION|MB_APPLMODAL);
+  DebugBreak();
+#else
+  fputs(msg,stderr);
+  fflush(stderr);
+  abort();
+#endif
+#else
+  fputs(msg,stderr);
+  fflush(stderr);
+  abort();
+#endif
+  }
+
+
+// Warning routine
+void fxwarning(const char* format,...){
+  char msg[MAXMESSAGESIZE];
+  va_list arguments;
+  va_start(arguments,format);
+  __vsnprintf(msg,sizeof(msg),format,arguments);
+  va_end(arguments);
+#ifdef WIN32
+#ifdef _WINDOWS
+  OutputDebugStringA(msg);
+  fputs(msg,stderr);    // if a console is available
+  fflush(stderr);
+  MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONINFORMATION|MB_APPLMODAL);
+#else
+  fputs(msg,stderr);
+  fflush(stderr);
+#endif
+#else
+  fputs(msg,stderr);
+  fflush(stderr);
+#endif
   }
 
 
@@ -400,17 +372,17 @@ FXbool fxfromDOS(FXchar*& string,FXint& len){
 
 // Get process id
 FXint fxgetpid(){
-#ifndef WIN32
-  return getpid();
-#else
+#ifdef WIN32
   return (int)GetCurrentProcessId();
+#else
+  return getpid();
 #endif
   }
 
 extern FXAPI FILE *fxopen(const char *filename,const char *mode);
 
 FILE *fxopen(const char *filename,const char *mode){
-#ifdef WIN32 && UNICODE
+#if defined(WIN32) && defined(UNICODE)
   FXnchar unifile[1024];
   FXnchar unimode[1024];
   utf2ncs(unifile,filename,strlen(filename)+1);
@@ -424,7 +396,7 @@ FILE *fxopen(const char *filename,const char *mode){
 extern FXAPI FILE *fxreopen(const char *filename,const char *mode,FILE * stream);
 
 FILE *fxreopen(const char *filename,const char *mode,FILE * stream){
-#ifdef WIN32 && UNICODE
+#if defined(WIN32) && defined(UNICODE)
   FXnchar unifile[1024];
   FXnchar unimode[1024];
   utf2ncs(unifile,filename,strlen(filename)+1);
@@ -508,67 +480,115 @@ FXuint fxstrhash(const FXchar* str){
 
 /*******************************************************************************/
 
-
-// Classify IEEE 754 single-precision floating point number
-//
+// Single Precision IEEE 754 number layout
 //            31 30           23 22             0
 // +------------+---------------+---------------+
 // | s[31] 1bit | e[30:23] 8bit | f[22:0] 23bit |
 // +------------+---------------+---------------+
-//
-FXint fxieeefloatclass(FXfloat number){
-#if FOX_BIGENDIAN
-  union { FXfloat f; struct { FXuint s:1; FXuint e:8; FXuint m:23; } n; } num;
-#else
-  union { FXfloat f; struct { FXuint m:23; FXuint e:8; FXuint s:1; } n; } num;
-#endif
-  num.f=number;
-  FXint result=0;
-//  fprintf(stderr,"num=%16.10g: sgn=%d man=%d (%06x) exp=%d\n",number,num.n.s,num.n.m,num.n.m,num.n.e);
-  if(num.n.e==255){
-    if(num.n.m==0)
-      result=1;     // Inf
-    else
-      result=2;     // NaN
-    if(num.n.s)
-      result=-result;
-    }
-  return result;
-  }
 
 
-// Classify IEEE 754 double-precision floating point number
-//
+// Double Precision IEEE 754 number layout
 //            63 62            52 51            32 31             0
 // +------------+----------------+----------------+---------------+
 // | s[63] 1bit | e[62:52] 11bit | f[51:32] 20bit | f[31:0] 32bit |
 // +------------+----------------+----------------+---------------+
-//
-FXint fxieeedoubleclass(FXdouble number){
-#if FOX_BIGENDIAN
-  union { FXdouble d; struct { FXuint s:1; FXuint e:11; FXuint h:20; FXuint l:32; } n; } num;
+
+
+// Split a float or double into pieces
+#if FOX_BIGENDIAN == 1
+union FloatStruct { FXfloat f; struct { FXuint s:1; FXuint e:8; FXuint m:23; } n; };
+union DoubleStruct { FXdouble d; struct { FXuint s:1; FXuint e:11; FXuint h:20; FXuint l:32; } n; };
 #else
-  union { FXdouble d; struct { FXuint l:32; FXuint h:20; FXuint e:11; FXuint s:1; } n; } num;
+union FloatStruct { FXfloat f; struct { FXuint m:23; FXuint e:8; FXuint s:1; } n; };
+union DoubleStruct { FXdouble d; struct { FXuint l:32; FXuint h:20; FXuint e:11; FXuint s:1; } n; };
 #endif
-  num.d=number;
-//  fprintf(stderr,"num=%16.10g: sgn=%d hi=%d (%06x) lo=%d (%08x) exp=%d\n",number,num.n.s,num.n.h,num.n.h,num.n.l,num.n.l,num.n.e);
-  FXint result=0;
-  if(num.n.e==2047){
-    if(num.n.h==0 && num.n.l==0)
-      result=1;     // Inf
-    else
-      result=2;     // NaN
-    if(num.n.s)
-      result=-result;
+
+
+// Float number classification: 0=OK, +/-1=Inf, +/-2=NaN
+FXint fxieeefloatclass(FXfloat number){
+  FloatStruct *fs=(FloatStruct*)&number;
+  if(fs->n.e==255){
+    if(fs->n.m==0) return fs->n.s ? -1 : 1;     // Inf
+    return fs->n.s ? -2 : 2;                    // NaN
     }
-  return result;
+  return 0;
+  }
+
+
+// Double number classification: 0=OK, +/-1=Inf, +/-2=NaN
+FXint fxieeedoubleclass(FXdouble number){
+  DoubleStruct *fs=(DoubleStruct*)&number;
+  if(fs->n.e==2047){
+    if(fs->n.l==0 && fs->n.h==0) return fs->n.s ? -1 : 1;       // Inf
+    return fs->n.s ? -2 : 2;                                    // NaN
+    }
+  return 0;
+  }
+
+
+// Test for finite float
+FXbool fxIsFinite(FXfloat number){
+  return (((FloatStruct*)&number)->n.e!=255);
+  }
+
+
+// Test for finite double
+FXbool fxIsFinite(FXdouble number){
+  return (((DoubleStruct*)&number)->n.e!=2047);
+  }
+
+
+// Test for infinite float
+FXbool fxIsInf(FXfloat number){
+  return (((FloatStruct*)&number)->n.e==255) && (((FloatStruct*)&number)->n.m==0);
+  }
+
+
+// Test for infinite double
+FXbool fxIsInf(FXdouble number){
+  return (((DoubleStruct*)&number)->n.e==2047) && ((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
+  }
+
+
+// Text for not-a-number float
+FXbool fxIsNan(FXfloat number){
+  return (((FloatStruct*)&number)->n.e==255) && (((FloatStruct*)&number)->n.m!=0);
+  }
+
+
+// Text for not-a-number double
+FXbool fxIsNan(FXdouble number){
+  return (((DoubleStruct*)&number)->n.e==2047) && !((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
+  }
+
+
+// Fast integer power of 10
+extern FXAPI FXdouble tenToThe(FXint e);
+
+// Table of 1E+0,...1E+31, in steps of 1
+static FXdouble posPowOfTen1[32]={1E+0,1E+1,1E+2,1E+3,1E+4,1E+5,1E+6,1E+7,1E+8,1E+9,1E+10,1E+11,1E+12,1E+13,1E+14,1E+15,1E+16,1E+17,1E+18,1E+19,1E+20,1E+21,1E+22,1E+23,1E+24,1E+25,1E+26,1E+27,1E+28,1E+29,1E+30,1E+31};
+
+// Table of 1E+0,...1E+288, in steps of 32
+static FXdouble posPowOfTen32[10]={1E+0,1E+32,1E+64,1E+96,1E+128,1E+160,1E+192,1E+224,1E+256,1E+288};
+
+// Table of 1E-0,...1E-31, in steps of 1
+static FXdouble negPowOfTen1[32]={1E-0,1E-1,1E-2,1E-3,1E-4,1E-5,1E-6,1E-7,1E-8,1E-9,1E-10,1E-11,1E-12,1E-13,1E-14,1E-15,1E-16,1E-17,1E-18,1E-19,1E-20,1E-21,1E-22,1E-23,1E-24,1E-25,1E-26,1E-27,1E-28,1E-29,1E-30,1E-31};
+
+// Table of 1E-0,...1E-288, in steps of 32
+static FXdouble negPowOfTen32[10]={1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288};
+
+
+// Fast integer power of 10; this is based on the mathematical
+// identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
+// table of 308 entries, but that would take a lot of space...
+// The exponent should be in the range -308 to 308, these being the limits
+// of double precision IEEE754 standard floating point.
+FXdouble tenToThe(FXint e){
+  return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];
   }
 
 
 /*******************************************************************************/
-
-
-
 
 #if defined(__GNUC__) && defined(__linux__) && defined(__i386__)
 
@@ -668,178 +688,6 @@ FXuint fxcpuid(){
 
   // Return capabilities
   return caps;
-  }
-#endif
-
-
-/*******************************************************************************/
-
-
-/*
-* Return clock ticks from x86 TSC register [GCC/ICC x86 version].
-*/
-#if (defined(__GNUC__) || defined(__ICC)) && defined(__i386__) && !defined(WIN32)
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  asm ("rdtsc" : "=A" (value));
-  return value;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [GCC AMD64 version].
-*/
-#if defined(__GNUC__) && defined(__x86_64__)
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  asm ( "rdtsc\n\t"
-        "shlq $32,%%rdx\n\t"
-        "leaq (%%rax,%%rdx),%0\n\t" : "=r" (value) : /*NONE*/ : "%rdx" );
-  return value;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [GCC IA64 version].
-*/
-#if !defined(__INTEL_COMPILER) && defined(__GNUC__) && defined(__ia64__)
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  asm ("mov %0=ar.itc" : "=r" (value));
-  return value;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [HPUX C++ IA64 version].
-*/
-#if defined(__hpux) && defined(__ia64)
-#include <machine/sys/inline.h>
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong ret;
-  ret = _Asm_mov_from_ar (_AREG_ITC);           // FIXME not tested!
-  return ret;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [GCC PPC version].
-*/
-#if defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__))
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  unsigned int tbl, tbu0, tbu1;
-  do{
-    asm ("mftbu %0" : "=r"(tbu0));
-    asm ("mftb %0" : "=r"(tbl));
-    asm ("mftbu %0" : "=r"(tbu1));
-    }
-  while(tbu0!=tbu1);
-  return (((unsigned long long)tbu0) << 32) | tbl;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [GCC PA-RISC version].
-*/
-#if defined(__GNUC__) && (defined(__hppa__) || defined(__hppa))
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  asm ("mfctl 16, %0": "=r" (value));           // FIXME not tested!
-  return value;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [HP-C++ PA-RISC version].
-*/
-#if !defined(__GNUC__) && (defined(__hppa__) || defined(__hppa))
-#include <machine/inline.h>
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  register FXlong ret;
-  _MFCTL(16, ret);                              // FIXME not tested!
-  return ret;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [GCC ALPHA version];
-* This version only 32-bits accurate ;-(
-*/
-#if defined(__GNUC__) && defined(__alpha__)
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  asm ("rpcc %0" : "=r"(value));                // FIXME not tested!
-  return (value & 0xFFFFFFFF);
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [DEC C++ ALPHA version];
-* This version only 32-bits accurate ;-(
-*/
-#if (defined(__DECC) || defined(__DECCXX)) && defined(__alpha)
-#include <c_asm.h>
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  value = asm("rpcc %v0");                      // FIXME not tested!
-  return (value & 0xFFFFFFFF);
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [SGI/IRIX version];
-*/
-#if (defined(__IRIX__) || defined(_SGI)) && defined(CLOCK_SGI_CYCLE)
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  const FXlong seconds=1000000000;
-  struct timespec tp;
-  clock_gettime(CLOCK_SGI_CYCLE,&tp);           // FIXME not tested!
-  return tp.tv_sec*seconds+tp.tv_nsec;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [GCC SPARC V9 version].
-*/
-#if defined(__GNUC__) && defined(__sparc_v9__)
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  asm ("rd %%tick, %0" : "=r" (value));         // FIXME not tested!
-  return value;
-  }
-#endif
-
-
-/*
-* Return clock ticks from performance counter [WIN32 version].
-*/
-#ifdef WIN32
-extern FXAPI FXlong fxgetticks();
-FXlong fxgetticks(){
-  FXlong value;
-  QueryPerformanceCounter((LARGE_INTEGER*)&value);
-  return value;
   }
 #endif
 

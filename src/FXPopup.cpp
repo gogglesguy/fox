@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPopup.cpp,v 1.102 2007/03/09 03:55:56 fox Exp $                        *
+* $Id: FXPopup.cpp,v 1.103 2007/05/17 19:27:56 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -666,12 +666,7 @@ void FXPopup::hide(){
 // Popup the menu at some location
 void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
   FXint rx,ry,rw,rh;
-#ifndef WIN32
-  rx=getRoot()->getX();
-  ry=getRoot()->getY();
-  rw=getRoot()->getWidth();
-  rh=getRoot()->getHeight();
-#else
+#ifdef WIN32
   RECT rect;
   MYMONITORINFO minfo;
   HANDLE monitor;
@@ -701,6 +696,11 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
     rw=rect.right-rect.left;
     rh=rect.bottom-rect.top;
     }
+#else
+  rx=getRoot()->getX();
+  ry=getRoot()->getY();
+  rw=getRoot()->getWidth();
+  rh=getRoot()->getHeight();
 #endif
   FXTRACE((150,"%s::popup %p\n",getClassName(),this));
   grabowner=grabto;

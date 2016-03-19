@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRealSlider.cpp,v 1.28 2007/02/07 20:22:14 fox Exp $                    *
+* $Id: FXRealSlider.cpp,v 1.29 2007/05/17 19:27:56 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -723,19 +723,19 @@ void FXRealSlider::drawSliderHead(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h
       dc.drawLine(x,y,x+w-m-1,y);
       dc.drawLine(x,y+1,x,y+h-1);
       dc.drawLine(x+w-1,y+m,x+w-m-1,y);
-#ifndef WIN32
-      dc.setForeground(shadowColor);
-      dc.drawLine(x+w-2,y+h-m-1,x+w-m-2,y+h-1);
-      dc.drawLine(x+1,y+h-2,x+w-m-1,y+h-2);
-      dc.setForeground(borderColor);
-      dc.drawLine(x+w-1,y+h-m-1,x+w-m-1,y+h-1);
-      dc.drawLine(x,y+h-1,x+w-m-1,y+h-1);
-#else
+#ifdef WIN32
       dc.setForeground(shadowColor);
       dc.drawLine(x+w-1,y+h-m-2,x+w-m-2,y+h-1);
       dc.drawLine(x+1,y+h-2,x+w-m-1,y+h-2);
       dc.setForeground(borderColor);
       dc.drawLine(x+w,y+h-m-2,x+w-m-1,y+h-1);
+      dc.drawLine(x,y+h-1,x+w-m-1,y+h-1);
+#else
+      dc.setForeground(shadowColor);
+      dc.drawLine(x+w-2,y+h-m-1,x+w-m-2,y+h-1);
+      dc.drawLine(x+1,y+h-2,x+w-m-1,y+h-2);
+      dc.setForeground(borderColor);
+      dc.drawLine(x+w-1,y+h-m-1,x+w-m-1,y+h-1);
       dc.drawLine(x,y+h-1,x+w-m-1,y+h-1);
 #endif
       }

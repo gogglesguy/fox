@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSettings.cpp,v 1.68 2007/03/20 20:04:56 fox Exp $                      *
+* $Id: FXSettings.cpp,v 1.71 2007/06/03 05:30:38 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -67,6 +67,14 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
+
+
+// Furnish our own version
+extern FXAPI FXint __sscanf(const FXchar* string,const FXchar* format,...);
+extern FXAPI FXint __vsscanf(const FXchar* string,const FXchar* format,va_list arg_ptr);
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
+
 
 // Object implementation
 FXIMPLEMENT(FXSettings,FXDict,NULL,0)
@@ -431,12 +439,6 @@ FXchar* FXSettings::enquote(FXchar* result,const FXchar* text){
   }
 
 
-// Furnish our own version if we have to
-#ifndef HAVE_VSSCANF
-extern "C" int vsscanf(const char* str, const char* format, va_list arg_ptr);
-#endif
-
-
 // Read a formatted registry entry
 FXint FXSettings::readFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...){
   if(!section || !section[0]){ fxerror("FXSettings::readFormatEntry: bad section argument.\n"); }
@@ -449,7 +451,7 @@ FXint FXSettings::readFormatEntry(const FXchar *section,const FXchar *name,const
   if(group){
     const char *value=group->find(name);
     if(value){
-      result=vsscanf((char*)value,fmt,args);    // Cast needed for HP-UX 11, which has wrong prototype for vsscanf
+      result=__vsscanf(value,fmt,args);
       }
     }
   va_end(args);
@@ -479,7 +481,7 @@ FXint FXSettings::readIntEntry(const FXchar *section,const FXchar *name,FXint de
     const char *value=group->find(name);
     if(value){
       FXint ivalue;
-      if(sscanf(value,"%d",&ivalue)==1) return ivalue;
+      if(__sscanf(value,"%d",&ivalue)==1) return ivalue;
       }
     }
   return def;
@@ -495,7 +497,7 @@ FXuint FXSettings::readUIntEntry(const FXchar *section,const FXchar *name,FXuint
     const char *value=group->find(name);
     if(value){
       FXuint ivalue;
-      if(sscanf(value,"%u",&ivalue)==1) return ivalue;
+      if(__sscanf(value,"%u",&ivalue)==1) return ivalue;
       }
     }
   return def;
@@ -511,13 +513,7 @@ FXlong FXSettings::readLongEntry(const FXchar *section,const FXchar *name,FXlong
     const char *value=group->find(name);
     if(value){
       FXlong lvalue;
-#if defined(WIN32)
-      if(sscanf(value,"%I64d",&lvalue)==1) return lvalue;
-#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-      if(sscanf(value,"%ld",&lvalue)==1) return lvalue;
-#else
-      if(sscanf(value,"%lld",&lvalue)==1) return lvalue;
-#endif
+      if(__sscanf(value,"%lld",&lvalue)==1) return lvalue;
       }
     }
   return def;
@@ -534,13 +530,7 @@ FXulong FXSettings::readULongEntry(const FXchar *section,const FXchar *name,FXul
     if(value){
       FXulong lvalue;
       if(value[0]=='0' && (value[1]=='x' || value[1]=='X')){
-#if defined(WIN32)
-        if(sscanf(value,"%I64u",&lvalue)==1) return lvalue;
-#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-        if(sscanf(value,"%lu",&lvalue)==1) return lvalue;
-#else
-        if(sscanf(value,"%llu",&lvalue)==1) return lvalue;
-#endif
+        if(__sscanf(value,"%llu",&lvalue)==1) return lvalue;
         }
       }
     }
@@ -557,7 +547,7 @@ FXdouble FXSettings::readRealEntry(const FXchar *section,const FXchar *name,FXdo
     const char *value=group->find(name);
     if(value){
       FXdouble dvalue;
-      if(sscanf(value,"%lf",&dvalue)==1) return dvalue;
+      if(__sscanf(value,"%lf",&dvalue)==1) return dvalue;
       }
     }
   return def;
@@ -612,11 +602,7 @@ FXint FXSettings::writeFormatEntry(const FXchar *section,const FXchar *name,cons
   va_start(args,fmt);
   if(group){
     FXchar buffer[2048];
-#if defined(WIN32) || defined(HAVE_VSNPRINTF)
-    result=vsnprintf(buffer,sizeof(buffer),fmt,args);
-#else
-    result=vsprintf(buffer,fmt,args);
-#endif
+    result=__vsnprintf(buffer,sizeof(buffer),fmt,args);
     group->replace(name,buffer,true);
     modified=true;
     }
@@ -646,7 +632,7 @@ FXbool FXSettings::writeIntEntry(const FXchar *section,const FXchar *name,FXint 
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[32];
-    sprintf(buffer,"%d",val);
+    __snprintf(buffer,sizeof(buffer),"%d",val);
     group->replace(name,buffer,true);
     modified=true;
     return true;
@@ -662,7 +648,7 @@ FXbool FXSettings::writeUIntEntry(const FXchar *section,const FXchar *name,FXuin
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[32];
-    sprintf(buffer,"%u",val);
+    __snprintf(buffer,sizeof(buffer),"%u",val);
     group->replace(name,buffer,true);
     modified=true;
     return true;
@@ -678,13 +664,7 @@ FXbool FXSettings::writeLongEntry(const FXchar *section,const FXchar *name,FXlon
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
-#if defined(WIN32)
-    sprintf(buffer,"%I64d",val);
-#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-    sprintf(buffer,"%ld",val);
-#else
-    sprintf(buffer,"%lld",val);
-#endif
+    __snprintf(buffer,sizeof(buffer),"%lld",val);
     group->replace(name,buffer,true);
     modified=true;
     return true;
@@ -700,13 +680,7 @@ FXbool FXSettings::writeULongEntry(const FXchar *section,const FXchar *name,FXul
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
-#if defined(WIN32)
-    sprintf(buffer,"%I64u",val);
-#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-    sprintf(buffer,"%lu",val);
-#else
-    sprintf(buffer,"%llu",val);
-#endif
+    __snprintf(buffer,sizeof(buffer),"%llu",val);
     group->replace(name,buffer,true);
     modified=true;
     return true;
@@ -722,7 +696,7 @@ FXbool FXSettings::writeRealEntry(const FXchar *section,const FXchar *name,FXdou
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
-    sprintf(buffer,"%.16g",val);
+    __snprintf(buffer,sizeof(buffer),"%.16g",val);
     group->replace(name,buffer,true);
     modified=true;
     return true;

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.155 2007/02/07 20:22:10 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.158 2007/05/17 22:14:15 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -218,25 +218,23 @@ void FXImage::create(){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
 
-#ifndef WIN32
-
       // Initialize visual
       visual->create();
+
+#ifdef WIN32
+
+      // Create a bitmap compatible with current display
+      HDC hdc=::GetDC(GetDesktopWindow());
+      xid=CreateCompatibleBitmap(hdc,FXMAX(width,1),FXMAX(height,1));
+      ::ReleaseDC(GetDesktopWindow(),hdc);
+
+#else
 
       // Get depth (should use visual!!)
       int dd=visual->getDepth();
 
       // Make pixmap
       xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),dd);
-#else
-
-      // Initialize visual
-      visual->create();
-
-      // Create a bitmap compatible with current display
-      HDC hdc=::GetDC(GetDesktopWindow());
-      xid=CreateCompatibleBitmap(hdc,FXMAX(width,1),FXMAX(height,1));
-      ::ReleaseDC(GetDesktopWindow(),hdc);
 
 #endif
 
@@ -278,10 +276,10 @@ void FXImage::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
-#ifndef WIN32
-      XFreePixmap(DISPLAY(getApp()),xid);
-#else
+#ifdef WIN32
       DeleteObject(xid);
+#else
+      XFreePixmap(DISPLAY(getApp()),xid);
 #endif
       }
     xid=0;
@@ -302,7 +300,80 @@ FXbool FXImage::hasAlpha() const {
   }
 
 
-#ifndef WIN32
+#ifdef WIN32
+
+
+// Restore client-side pixel buffer from image
+void FXImage::restore(){
+  if(xid){
+    register FXint size,bytes_per_line,skip,x,y;
+    register FXuchar *pix,*img;
+    FXuchar *pixels;
+    BITMAPINFO bmi;
+    HDC hdcmem;
+
+    FXTRACE((100,"%s::restore image %p\n",getClassName(),this));
+
+    // Check for legal size
+    if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
+
+    // Make array for data if needed
+    if(!data){
+      size=width*height;
+      if(!allocElms(data,size)){ throw FXMemoryException("unable to restore image"); }
+      options|=IMAGE_OWNED;
+      }
+
+    // Got local buffer to receive into
+    if(data){
+
+      // Set up the bitmap info
+      bytes_per_line=(width*3+3)/4*4;
+      skip=bytes_per_line-width*3;
+
+      bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+      bmi.bmiHeader.biWidth=width;
+      bmi.bmiHeader.biHeight=-height; // Negative heights means upside down!
+      bmi.bmiHeader.biPlanes=1;
+      bmi.bmiHeader.biBitCount=24;
+      bmi.bmiHeader.biCompression=BI_RGB;
+      bmi.bmiHeader.biSizeImage=0;
+      bmi.bmiHeader.biXPelsPerMeter=0;
+      bmi.bmiHeader.biYPelsPerMeter=0;
+      bmi.bmiHeader.biClrUsed=0;
+      bmi.bmiHeader.biClrImportant=0;
+
+      // DIB format pads to multiples of 4 bytes...
+      pixels=(FXuchar*)VirtualAlloc(0,bytes_per_line*height,MEM_COMMIT,PAGE_READWRITE);
+      if(!pixels){ throw FXMemoryException("unable to restore image"); }
+
+      // Make device context
+      hdcmem=::CreateCompatibleDC(NULL);
+      if(!GetDIBits(hdcmem,(HBITMAP)xid,0,height,pixels,&bmi,DIB_RGB_COLORS)){
+        throw FXImageException("unable to restore image");
+        }
+
+      // Stuff it into our own data structure
+      for(y=0,img=(FXuchar*)data,pix=pixels; y<height; y++){
+        for(x=0; x<width; x++){
+          img[0]=pix[2];
+          img[1]=pix[1];
+          img[2]=pix[0];
+          img[3]=255;
+          img+=4;
+          pix+=3;
+          }
+        pix+=skip;
+        }
+      VirtualFree(pixels,0,MEM_RELEASE);
+      ::DeleteDC(hdcmem);
+      }
+    }
+  }
+
+
+#else                   // X11
+
 
 // Find shift amount
 static inline FXuint findshift(unsigned long mask){
@@ -511,41 +582,31 @@ void FXImage::restore(){
     }
   }
 
+#endif
 
-#else
 
 
-// Restore client-side pixel buffer from image
-void FXImage::restore(){
+#ifdef WIN32            // WINDOWS
+
+
+// Render into pixmap
+void FXImage::render(){
   if(xid){
-    register FXint size,bytes_per_line,skip,x,y;
-    register FXuchar *pix,*img;
-    FXuchar *pixels;
+    register FXint bytes_per_line,skip,h,w;
+    register FXuchar *src,*dst;
     BITMAPINFO bmi;
+    FXuchar *pixels;
     HDC hdcmem;
 
-    FXTRACE((100,"%s::restore image %p\n",getClassName(),this));
+    FXTRACE((100,"%s::render %p\n",getClassName(),this));
 
-    // Check for legal size
-    if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
-
-    // Make array for data if needed
-    if(!data){
-      size=width*height;
-      if(!allocElms(data,size)){ throw FXMemoryException("unable to restore image"); }
-      options|=IMAGE_OWNED;
-      }
-
-    // Got local buffer to receive into
-    if(data){
+    // Fill with pixels if there is data
+    if(data && 0<width && 0<height){
 
       // Set up the bitmap info
-      bytes_per_line=(width*3+3)/4*4;
-      skip=bytes_per_line-width*3;
-
       bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
       bmi.bmiHeader.biWidth=width;
-      bmi.bmiHeader.biHeight=-height; // Negative heights means upside down!
+      bmi.bmiHeader.biHeight=height;
       bmi.bmiHeader.biPlanes=1;
       bmi.bmiHeader.biBitCount=24;
       bmi.bmiHeader.biCompression=BI_RGB;
@@ -556,29 +617,38 @@ void FXImage::restore(){
       bmi.bmiHeader.biClrImportant=0;
 
       // DIB format pads to multiples of 4 bytes...
-//      if(!allocElms(pixels,bytes_per_line*height)){ throw FXMemoryException("unable to restore image"); }
+      bytes_per_line=(width*3+3)&~3;
       pixels=(FXuchar*)VirtualAlloc(0,bytes_per_line*height,MEM_COMMIT,PAGE_READWRITE);
-      if(!pixels){ throw FXMemoryException("unable to restore image"); }
-
-      // Make device context
-      hdcmem=::CreateCompatibleDC(NULL);
-      if(!GetDIBits(hdcmem,(HBITMAP)xid,0,height,pixels,&bmi,DIB_RGB_COLORS)){
-        throw FXImageException("unable to restore image");
-        }
-
-      // Stuff it into our own data structure
-      for(y=0,img=(FXuchar*)data,pix=pixels; y<height; y++){
-        for(x=0; x<width; x++){
-          img[0]=pix[2];
-          img[1]=pix[1];
-          img[2]=pix[0];
-          img[3]=255;
-          img+=4;
-          pix+=3;
+      if(!pixels){ throw FXMemoryException("unable to render image"); }
+      skip=-bytes_per_line-width*3;
+      src=(FXuchar*)data;
+      dst=pixels+height*bytes_per_line+width*3;
+      h=height;
+      do{
+        dst+=skip;
+        w=width;
+        do{
+          dst[0]=src[2];
+          dst[1]=src[1];
+          dst[2]=src[0];
+          src+=4;
+          dst+=3;
           }
-        pix+=skip;
+        while(--w);
         }
-//      freeElms(pixels);
+      while(--h);
+      // The MSDN documentation for SetDIBits() states that "the device context
+      // identified by the (first) parameter is used only if the DIB_PAL_COLORS
+      // constant is set for the (last) parameter". This may be true, but under
+      // Win95 you must pass in a non-NULL hdc for the first parameter; otherwise
+      // this call to SetDIBits() will fail (in contrast, it works fine under
+      // Windows NT if you pass in a NULL hdc).
+      hdcmem=::CreateCompatibleDC(NULL);
+      if(!SetDIBits(hdcmem,(HBITMAP)xid,0,height,pixels,&bmi,DIB_RGB_COLORS)){
+//    if(!StretchDIBits(hdcmem,0,0,width,height,0,0,width,height,pixels,&bmi,DIB_RGB_COLORS,SRCCOPY)){
+        throw FXImageException("unable to render image");
+        }
+      GdiFlush();
       VirtualFree(pixels,0,MEM_RELEASE);
       ::DeleteDC(hdcmem);
       }
@@ -586,11 +656,7 @@ void FXImage::restore(){
   }
 
 
-#endif
-
-
-#ifndef WIN32
-
+#else                   // X11
 
 
 // True generic mode
@@ -610,7 +676,6 @@ void FXImage::render_true_N_fast(void *xim,FXuchar *img){
   }
 
 
-
 // True generic mode
 void FXImage::render_true_N_dither(void *xim,FXuchar *img){
   register FXint x,y,d;
@@ -627,7 +692,6 @@ void FXImage::render_true_N_dither(void *xim,FXuchar *img){
     }
   while(++y<height);
   }
-
 
 
 // True 24 bit color
@@ -673,7 +737,6 @@ void FXImage::render_true_24(void *xim,FXuchar *img){
     while(--h>=0);
     }
   }
-
 
 
 // True 32 bit color
@@ -742,7 +805,6 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
     while(--h>=0);
     }
   }
-
 
 
 // True 16 bit color
@@ -876,7 +938,6 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
   }
 
 
-
 // True 8 bit color
 void FXImage::render_true_8_fast(void *xim,FXuchar *img){
   register FXuint jmp=((XImage*)xim)->bytes_per_line-width;
@@ -896,7 +957,6 @@ void FXImage::render_true_8_fast(void *xim,FXuchar *img){
     }
   while(--h>=0);
   }
-
 
 
 // True 8 bit color, dithered
@@ -919,7 +979,6 @@ void FXImage::render_true_8_dither(void *xim,FXuchar *img){
     }
   while(--h>=0);
   }
-
 
 
 // Render 4 bit index color mode
@@ -965,7 +1024,6 @@ void FXImage::render_index_4_fast(void *xim,FXuchar *img){
     while(--h>=0);
     }
   }
-
 
 
 // Render 4 bit index color mode
@@ -1015,7 +1073,6 @@ void FXImage::render_index_4_dither(void *xim,FXuchar *img){
   }
 
 
-
 // Render 8 bit index color mode
 void FXImage::render_index_8_fast(void *xim,FXuchar *img){
   register FXuint jmp=((XImage*)xim)->bytes_per_line-width;
@@ -1035,7 +1092,6 @@ void FXImage::render_index_8_fast(void *xim,FXuchar *img){
     }
   while(--h>=0);
   }
-
 
 
 // Render 8 bit index color mode
@@ -1060,7 +1116,6 @@ void FXImage::render_index_8_dither(void *xim,FXuchar *img){
   }
 
 
-
 // Render generic N bit index color mode
 void FXImage::render_index_N_fast(void *xim,FXuchar *img){
   register FXint x,y;
@@ -1076,7 +1131,6 @@ void FXImage::render_index_N_fast(void *xim,FXuchar *img){
     }
   while(++y<height);
   }
-
 
 
 // Render generic N bit index color mode
@@ -1095,7 +1149,6 @@ void FXImage::render_index_N_dither(void *xim,FXuchar *img){
     }
   while(++y<height);
   }
-
 
 
 // Render 8 bit gray mode
@@ -1119,7 +1172,6 @@ void FXImage::render_gray_8_fast(void *xim,FXuchar *img){
   }
 
 
-
 // Render 8 bit gray mode
 void FXImage::render_gray_8_dither(void *xim,FXuchar *img){
   register FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
@@ -1141,7 +1193,6 @@ void FXImage::render_gray_8_dither(void *xim,FXuchar *img){
   }
 
 
-
 // Render generic N bit gray mode
 void FXImage::render_gray_N_fast(void *xim,FXuchar *img){
   register FXint x,y;
@@ -1157,7 +1208,6 @@ void FXImage::render_gray_N_fast(void *xim,FXuchar *img){
     }
   while(++y<height);
   }
-
 
 
 // Render generic N bit gray mode
@@ -1177,8 +1227,6 @@ void FXImage::render_gray_N_dither(void *xim,FXuchar *img){
   }
 
 
-
-
 // Render monochrome mode
 void FXImage::render_mono_1_fast(void *xim,FXuchar *img){
   register FXint x,y;
@@ -1196,7 +1244,6 @@ void FXImage::render_mono_1_fast(void *xim,FXuchar *img){
   }
 
 
-
 // Render monochrome mode
 void FXImage::render_mono_1_dither(void *xim,FXuchar *img){
   register FXint x,y;
@@ -1212,14 +1259,6 @@ void FXImage::render_mono_1_dither(void *xim,FXuchar *img){
     }
   while(++y<height);
   }
-
-
-
-#endif
-
-
-
-#ifndef WIN32
 
 
 // Render into pixmap
@@ -1406,77 +1445,6 @@ void FXImage::render(){
     }
   }
 
-
-#else
-
-
-void FXImage::render(){
-  if(xid){
-    register FXint bytes_per_line,skip,h,w;
-    register FXuchar *src,*dst;
-    BITMAPINFO bmi;
-    FXuchar *pixels;
-    HDC hdcmem;
-
-    FXTRACE((100,"%s::render %p\n",getClassName(),this));
-
-    // Fill with pixels if there is data
-    if(data && 0<width && 0<height){
-
-      // Set up the bitmap info
-      bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-      bmi.bmiHeader.biWidth=width;
-      bmi.bmiHeader.biHeight=height;
-      bmi.bmiHeader.biPlanes=1;
-      bmi.bmiHeader.biBitCount=24;
-      bmi.bmiHeader.biCompression=BI_RGB;
-      bmi.bmiHeader.biSizeImage=0;
-      bmi.bmiHeader.biXPelsPerMeter=0;
-      bmi.bmiHeader.biYPelsPerMeter=0;
-      bmi.bmiHeader.biClrUsed=0;
-      bmi.bmiHeader.biClrImportant=0;
-
-      // DIB format pads to multiples of 4 bytes...
-      bytes_per_line=(width*3+3)&~3;
-//      if(!allocElms(pixels,bytes_per_line*height)){ throw FXMemoryException("unable to render image"); }
-      pixels=(FXuchar*)VirtualAlloc(0,bytes_per_line*height,MEM_COMMIT,PAGE_READWRITE);
-      if(!pixels){ throw FXMemoryException("unable to render image"); }
-      skip=-bytes_per_line-width*3;
-      src=(FXuchar*)data;
-      dst=pixels+height*bytes_per_line+width*3;
-      h=height;
-      do{
-        dst+=skip;
-        w=width;
-        do{
-          dst[0]=src[2];
-          dst[1]=src[1];
-          dst[2]=src[0];
-          src+=4;
-          dst+=3;
-          }
-        while(--w);
-        }
-      while(--h);
-      // The MSDN documentation for SetDIBits() states that "the device context
-      // identified by the (first) parameter is used only if the DIB_PAL_COLORS
-      // constant is set for the (last) parameter". This may be true, but under
-      // Win95 you must pass in a non-NULL hdc for the first parameter; otherwise
-      // this call to SetDIBits() will fail (in contrast, it works fine under
-      // Windows NT if you pass in a NULL hdc).
-      hdcmem=::CreateCompatibleDC(NULL);
-      if(!SetDIBits(hdcmem,(HBITMAP)xid,0,height,pixels,&bmi,DIB_RGB_COLORS)){
-//    if(!StretchDIBits(hdcmem,0,0,width,height,0,0,width,height,pixels,&bmi,DIB_RGB_COLORS,SRCCOPY)){
-        throw FXImageException("unable to render image");
-        }
-      GdiFlush();
-      VirtualFree(pixels,0,MEM_RELEASE);
-//      freeElms(pixels);
-      ::DeleteDC(hdcmem);
-      }
-    }
-  }
-
 #endif
 
 
@@ -1602,16 +1570,16 @@ void FXImage::resize(FXint w,FXint h){
 
     // Resize device dependent pixmap
     if(xid){
-#ifndef WIN32
-      int dd=visual->getDepth();
-      XFreePixmap(DISPLAY(getApp()),xid);
-      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,dd);
-      if(!xid){ throw FXImageException("unable to resize image"); }
-#else
+#ifdef WIN32
       DeleteObject(xid);
       HDC hdc=::GetDC(GetDesktopWindow());
       xid=CreateCompatibleBitmap(hdc,w,h);
       ::ReleaseDC(GetDesktopWindow(),hdc);
+      if(!xid){ throw FXImageException("unable to resize image"); }
+#else
+      int dd=visual->getDepth();
+      XFreePixmap(DISPLAY(getApp()),xid);
+      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,dd);
       if(!xid){ throw FXImageException("unable to resize image"); }
 #endif
       }
@@ -1739,22 +1707,6 @@ static void scalenearest(FXColor *dst,const FXColor* src,FXint dw,FXint dh,FXint
   while(++i<dh);
   }
 
-/*
-  Nice resize:
-    16x16 -> 1024x1024    440025862
-    1024x1024 -> 16x16     25313450
-
-  Nearest neighbor:
-    16x16 -> 1024x1024     15717582
-    1024x1024 -> 16x16        32508
-
-
-extern FXlong fxgetticks();
-static FXlong __starttick__,__endtick__;
-__starttick__=fxgetticks();
-__endtick__ =fxgetticks();
-fprintf(stderr,"ticks=%lld\n",__endtick__-__starttick__);
-*/
 
 // Resize drawable to the specified width and height
 void FXImage::scale(FXint w,FXint h,FXint quality){

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMDIChild.h,v 1.49 2007/02/07 20:21:56 fox Exp $                        *
+* $Id: FXMDIChild.h,v 1.50 2007/05/21 19:56:56 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXMDICHILD_H
 #define FXMDICHILD_H
@@ -252,18 +252,18 @@ public:
   void setTitleColor(FXColor clr);
   void setTitleBackColor(FXColor clr);
 
+  /// Restore MDI window to normal, return true if restored
+  virtual FXbool restore(FXbool notify=false);
+
   /// Maximize MDI window, return true if maximized
   virtual FXbool maximize(FXbool notify=false);
 
   /// Minimize/iconify MDI window, return true if minimized
   virtual FXbool minimize(FXbool notify=false);
 
-  /// Restore MDI window to normal, return true if restored
-  virtual FXbool restore(FXbool notify=false);
-
   /// Close MDI window, return true if actually closed
   virtual FXbool close(FXbool notify=false);
-
+  
   /// Return true if maximized
   FXbool isMaximized() const;
 

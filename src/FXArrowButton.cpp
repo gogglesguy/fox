@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXArrowButton.cpp,v 1.53 2007/02/07 20:22:03 fox Exp $                   *
+* $Id: FXArrowButton.cpp,v 1.54 2007/04/04 02:45:33 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -270,9 +270,9 @@ long FXArrowButton::onRepeat(FXObject*,FXSelector,void*){
 long FXArrowButton::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  if(isEnabled() && !(flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if(!(flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       setState(true);
       getApp()->removeTimeout(this,ID_AUTO);
       if(options&ARROW_REPEAT) getApp()->addTimeout(this,ID_REPEAT,getApp()->getScrollDelay());
@@ -290,9 +290,9 @@ long FXArrowButton::onKeyPress(FXObject*,FXSelector,void* ptr){
 long FXArrowButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXbool click=(!fired && state);
-  if(isEnabled() && (flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if((flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       setState(false);
       flags|=FLAG_UPDATE;
       flags&=~FLAG_PRESSED;

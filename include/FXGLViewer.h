@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLViewer.h,v 1.78 2007/02/07 20:21:54 fox Exp $                        *
+* $Id: FXGLViewer.h,v 1.79 2007/03/28 21:13:36 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVIEWER_H
 #define FXGLVIEWER_H
@@ -49,35 +49,39 @@ enum {
 
 /// OpenGL Viewer Viewport
 struct FXViewport {
-  FXint      w,h;               // Viewport dimensions
-  FXdouble   left,right;        // World box
-  FXdouble   bottom,top;
-  FXdouble   hither,yon;
+  FXint      w;                 /// Viewport width
+  FXint      h;                 /// Viewport height
+  FXdouble   left;              /// World left
+  FXdouble   right;             /// World right
+  FXdouble   bottom;            /// World bottom
+  FXdouble   top;               /// World top
+  FXdouble   hither;            /// World hither (near)
+  FXdouble   yon;               /// World yon (far)
   };
 
 
-// OpenGL Light Source
+/// OpenGL Light Source
 struct FXAPI FXLight {
-  FXVec4f    ambient;           // Ambient light color
-  FXVec4f    diffuse;           // Diffuse light color
-  FXVec4f    specular;          // Specular light color
-  FXVec4f    position;          // Light position
-  FXVec3f    direction;         // Spot direction
-  FXfloat    exponent;          // Spotlight exponent
-  FXfloat    cutoff;            // Spotlight cutoff angle
-  FXfloat    c_attn;            // Constant attenuation factor
-  FXfloat    l_attn;            // Linear attenuation factor
-  FXfloat    q_attn;            // Quadratic attenuation factor
+  FXVec4f    ambient;           /// Ambient light color
+  FXVec4f    diffuse;           /// Diffuse light color
+  FXVec4f    specular;          /// Specular light color
+  FXVec4f    position;          /// Light position
+  FXVec3f    direction;         /// Spot direction
+  FXfloat    exponent;          /// Spotlight exponent
+  FXfloat    cutoff;            /// Spotlight cutoff angle
+  FXfloat    c_attn;            /// Constant attenuation factor
+  FXfloat    l_attn;            /// Linear attenuation factor
+  FXfloat    q_attn;            /// Quadratic attenuation factor
   };
 
 
-// OpenGL Material Description
+/// OpenGL Material Description
 struct FXAPI FXMaterial {
-  FXVec4f    ambient;           // Ambient material color
-  FXVec4f    diffuse;           // Diffuse material color
-  FXVec4f    specular;          // Specular material color
-  FXVec4f    emission;          // Emissive material color
-  FXfloat    shininess;         // Specular shininess
+  FXVec4f    ambient;           /// Ambient material color
+  FXVec4f    diffuse;           /// Diffuse material color
+  FXVec4f    specular;          /// Specular material color
+  FXVec4f    emission;          /// Emissive material color
+  FXfloat    shininess;         /// Specular shininess
   };
 
 

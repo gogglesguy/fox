@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXAtomic.h,v 1.10 2007/02/07 20:21:52 fox Exp $                           *
+* $Id: FXAtomic.h,v 1.12 2007/04/27 03:56:51 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXATOMIC_H
 #define FXATOMIC_H
@@ -40,32 +40,32 @@ class FXAtomic {
 public:
 
   /// Constructs an atomic integer with a given initial value.
-  FXAtomic(int val=0):val(val){}
+  FXAtomic(int v=0):val(v){}
 
   /// Returns the value of the integer
   operator int() const { return val; }
 
   /// Atomically add something to the integer and return its old value
-  inline int exchange_and_add(int a){
+  inline int exchange_and_add(int v){
 #if defined(WIN32)
-    return ::InterlockedExchangeAdd((LONG*)&val,a);
+    return ::InterlockedExchangeAdd((LONG*)&val,v);
 #elif defined(__GNUC__) && defined(__i386__)
     register volatile int* reference=&val;
-    register int result=a;
+    register int result=v;
     __asm__ __volatile__ ("lock; xaddl %0,(%1)"
 			  : "=r" (result), "=r" (reference)
 			  : "0" (result), "1" (reference));
     return result;
 #elif defined(__GNUC__) && defined(__x86_64__)
     register volatile int* reference=&val;
-    register int result=a;
+    register int result=v;
     __asm__ __volatile__ ("lock; xaddl %0,(%1)"
 			  : "=r" (result), "=r" (reference)
 			  : "0" (result), "1" (reference));
     return result;
 #else
 //#elif defined(__GNUC__) && defined(__GLIBCPP__)
-    return __gnu_cxx::__exchange_and_add((LONG*)&val,a);
+    return __gnu_cxx::__exchange_and_add((LONG*)&val,v);
 //#elif defined(__GNUC__) && defined(__i386__)
 //    register int result=a;
 //    __asm__ __volatile__ ("lock; xaddl %1,%0"
@@ -78,9 +78,9 @@ public:
     }
 
   /// Atomically add something to the integer
-  inline FXAtomic& add(int a){
+  inline FXAtomic& add(int v){
 #if defined(WIN32)
-    ::InterlockedExchangeAdd((LONG*)&val,a);
+    ::InterlockedExchangeAdd((LONG*)&val,v);
 //#elif defined(__GNUC__) && defined(__GLIBCPP__)
 //#elif (defined(__GNUC__) || defined(__ICC)) && defined(__linux__) && defined(__i386__)
 #else
@@ -88,7 +88,7 @@ public:
 //#elif defined(__GNUC__) && defined(__i386__)
 //    __asm__ __volatile__ ("lock; addl %1,%0"
 //                          :"=m" (val)
-//                          :"ir" (a), "m" (val));
+//                          :"ir" (v), "m" (val));
 //#else
 //#error "add not implemented on this architecture!"
 #endif
@@ -96,18 +96,18 @@ public:
     }
 
   /// Atomically substract something to the integer
-  inline FXAtomic& sub(int a){
-    return add(-a);
+  inline FXAtomic& sub(int v){
+    return add(-v);
     }
 
   /// Atomically add something to the integer
-  inline FXAtomic& operator+=(int a){
-    return add(a);
+  inline FXAtomic& operator+=(int v){
+    return add(v);
     }
 
   /// Atomically substract something from the integer
-  inline FXAtomic& operator-=(int a){
-    return add(-a);
+  inline FXAtomic& operator-=(int v){
+    return add(-v);
     }
 
   /// Atomically increment the integer, prefix version

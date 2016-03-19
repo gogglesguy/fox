@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTreeList.cpp,v 1.179 2007/02/07 20:22:19 fox Exp $                     *
+* $Id: FXTreeList.cpp,v 1.181 2007/05/02 01:01:44 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1650,12 +1650,14 @@ long FXTreeList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
         expandTree(item,true);
       return 1;
       }
+      
+    // Previous selection state
+    state=item->isSelected();
 
     // Change current item
     setCurrentItem(item,true);
 
     // Change item selection
-    state=item->isSelected();
     switch(options&SELECT_MASK){
       case TREELIST_EXTENDEDSELECT:
         if(event->state&SHIFTMASK){
@@ -1684,7 +1686,8 @@ long FXTreeList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       }
 
     // Start drag if actually pressed text or icon only
-    if(code && item->isSelected() && item->isDraggable()){
+    if(state && item->isSelected() && item->isDraggable()){
+    FXTRACE((1,"start drag\n"));
       flags|=FLAG_TRYDRAG;
       }
 

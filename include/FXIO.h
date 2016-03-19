@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIO.h,v 1.15 2007/02/07 20:21:55 fox Exp $                              *
+* $Id: FXIO.h,v 1.22 2007/04/04 16:08:34 fox Exp $                              *
 ********************************************************************************/
 #ifndef FXIO_H
 #define FXIO_H
@@ -125,14 +125,23 @@ public:
   /// Open device with access mode m and handle h
   virtual FXbool open(FXInputHandle h,FXuint m);
 
-  /// Return true if open
-  virtual FXbool isOpen() const;
+  /// Is readable
+  FXbool isReadable() const;
+
+  /// Is writable
+  FXbool isWritable() const;
 
   /// Return access mode
   FXuint mode() const { return access; }
 
   /// Return handle
   FXInputHandle handle() const { return device; }
+
+  /// Return true if open
+  virtual FXbool isOpen() const;
+
+  /// Return true if serial access only
+  virtual FXbool isSerial() const;
 
   /// Attach existing device handle, taking ownership of the handle
   virtual void attach(FXInputHandle h,FXuint m);

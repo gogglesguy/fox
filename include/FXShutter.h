@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXShutter.h,v 1.30 2007/02/07 20:21:58 fox Exp $                         *
+* $Id: FXShutter.h,v 1.31 2007/04/12 19:31:11 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSHUTTER_H
 #define FXSHUTTER_H
@@ -125,7 +125,16 @@ public:
     ID_SHUTTER_TIMEOUT=FXVerticalFrame::ID_LAST,
     ID_OPEN_SHUTTERITEM,
     ID_OPEN_FIRST,
-    ID_OPEN_LAST=ID_OPEN_FIRST+1000,
+    ID_OPEN_SECOND,
+    ID_OPEN_THIRD,
+    ID_OPEN_FOURTH,
+    ID_OPEN_FIFTH,
+    ID_OPEN_SIXTH,
+    ID_OPEN_SEVENTH,
+    ID_OPEN_EIGHTH,
+    ID_OPEN_NINETH,
+    ID_OPEN_TENTH,
+    ID_OPEN_LAST=ID_OPEN_FIRST+100,
     ID_LAST
     };
 public:

@@ -1,4 +1,4 @@
-/*********** Generated on 2007/03/28 11:25:14 by reswrap version 5.0.0 *********/
+/*********** Generated on 2007/06/04 18:31:03 by reswrap version 5.0.0 *********/
 
 /* Created by reswrap from file bigicons.bmp */
 extern const unsigned char bigicons[];

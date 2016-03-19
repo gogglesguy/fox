@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTopWindow.h,v 1.69 2007/03/09 03:55:56 fox Exp $                       *
+* $Id: FXTopWindow.h,v 1.71 2007/05/21 19:56:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTOPWINDOW_H
 #define FXTOPWINDOW_H
@@ -123,9 +123,10 @@ public:
   long onFocusRight(FXObject*,FXSelector,void*);
   long onSessionNotify(FXObject*,FXSelector,void*);
   long onSessionClosed(FXObject*,FXSelector,void*);
+  long onCmdRestore(FXObject*,FXSelector,void*);
   long onCmdMaximize(FXObject*,FXSelector,void*);
   long onCmdMinimize(FXObject*,FXSelector,void*);
-  long onCmdRestore(FXObject*,FXSelector,void*);
+  long onCmdFullScreen(FXObject*,FXSelector,void*);
   long onCmdClose(FXObject*,FXSelector,void*);
   long onCmdSetStringValue(FXObject*,FXSelector,void*);
   long onCmdGetStringValue(FXObject*,FXSelector,void*);
@@ -133,9 +134,10 @@ public:
   long onCmdGetIconValue(FXObject*,FXSelector,void*);
 public:
   enum {
-    ID_MAXIMIZE=FXShell::ID_LAST,       /// Maximize the window
+    ID_RESTORE=FXShell::ID_LAST,        /// Restore the window
+    ID_MAXIMIZE,                        /// Maximize the window
     ID_MINIMIZE,                        /// Minimize the window
-    ID_RESTORE,                         /// Restore the window
+    ID_FULLSCREEN,                      /// Make the window full screen
     ID_CLOSE,                           /// Close the window
     ID_QUERY_DOCK,                      /// Toolbar asks to dock
     ID_LAST
@@ -199,14 +201,17 @@ public:
   /// Flash the window to get user's attention
   virtual void flash(FXbool yes);
 
+  /// Restore window to normal, return true if restored
+  virtual FXbool restore(FXbool notify=false);
+
   /// Maximize window, return true if maximized
   virtual FXbool maximize(FXbool notify=false);
 
   /// Minimize or iconify window, return true if minimized
   virtual FXbool minimize(FXbool notify=false);
 
-  /// Restore window to normal, return true if restored
-  virtual FXbool restore(FXbool notify=false);
+  /// Make window full screen, return true if success
+  virtual FXbool fullScreen(FXbool notify=false);
 
   /**
   * Close the window, return true if actually closed.  If notify=true, the target
@@ -222,6 +227,9 @@ public:
 
   /// Return true if minimized
   FXbool isMinimized() const;
+
+  /// Return true if full screen
+  FXbool isFullScreen() const;
 
   /// Change window title
   void setTitle(const FXString& name);

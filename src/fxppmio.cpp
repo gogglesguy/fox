@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxppmio.cpp,v 1.17 2007/02/07 20:22:21 fox Exp $                         *
+* $Id: fxppmio.cpp,v 1.18 2007/06/03 05:30:39 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -44,9 +44,13 @@ using namespace FX;
 namespace FX {
 
 
+// Declarations
 extern FXAPI FXbool fxcheckPPM(FXStream& store);
 extern FXAPI FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 extern FXAPI FXbool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+// Furnish our own version
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 
 // Read one integer
@@ -207,14 +211,14 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 FXbool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height){
   register const FXuchar *pp=(const FXuchar*)data;
   register FXint i,j,nsize;
-  FXchar size[20];
+  FXchar size[32];
 
   // Must make sense
   if(!pp || width<=0 || height<=0) return false;
 
   // Save header
   store.save("P6\n",3);
-  nsize=sprintf(size,"%d %d\n",width,height);
+  nsize=__snprintf(size,sizeof(size),"%d %d\n",width,height);
   store.save(size,nsize);
   store.save("255\n",4);
 

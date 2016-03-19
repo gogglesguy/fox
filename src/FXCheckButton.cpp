@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXCheckButton.cpp,v 1.62 2007/02/07 20:22:03 fox Exp $                   *
+* $Id: FXCheckButton.cpp,v 1.64 2007/05/17 19:27:55 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -268,9 +268,9 @@ long FXCheckButton::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 long FXCheckButton::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  if(isEnabled() && !(flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if(!(flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       oldcheck=check;
       setCheck(!oldcheck);
       flags|=FLAG_PRESSED;
@@ -285,9 +285,9 @@ long FXCheckButton::onKeyPress(FXObject*,FXSelector,void* ptr){
 // Key Release
 long FXCheckButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  if(isEnabled() && (flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if((flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       flags|=FLAG_UPDATE;
       flags&=~FLAG_PRESSED;
       if(check!=oldcheck && target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)check); }
@@ -388,20 +388,20 @@ long FXCheckButton::onPaint(FXObject*,FXSelector,void* ptr){
   else{
     if(check!=FALSE){
       FXSegment seg[6];
-#ifndef WIN32
-      seg[0].x1=3+ix; seg[0].y1=5+iy; seg[0].x2=5+ix; seg[0].y2=7+iy;
-      seg[1].x1=3+ix; seg[1].y1=6+iy; seg[1].x2=5+ix; seg[1].y2=8+iy;
-      seg[2].x1=3+ix; seg[2].y1=7+iy; seg[2].x2=5+ix; seg[2].y2=9+iy;
-      seg[3].x1=5+ix; seg[3].y1=7+iy; seg[3].x2=9+ix; seg[3].y2=3+iy;
-      seg[4].x1=5+ix; seg[4].y1=8+iy; seg[4].x2=9+ix; seg[4].y2=4+iy;
-      seg[5].x1=5+ix; seg[5].y1=9+iy; seg[5].x2=9+ix; seg[5].y2=5+iy;
-#else
+#ifdef WIN32
       seg[0].x1=3+ix; seg[0].y1=5+iy; seg[0].x2=5+ix; seg[0].y2=7+iy;
       seg[1].x1=3+ix; seg[1].y1=6+iy; seg[1].x2=5+ix; seg[1].y2=8+iy;
       seg[2].x1=3+ix; seg[2].y1=7+iy; seg[2].x2=5+ix; seg[2].y2=9+iy;
       seg[3].x1=5+ix; seg[3].y1=7+iy; seg[3].x2=10+ix; seg[3].y2=2+iy;
       seg[4].x1=5+ix; seg[4].y1=8+iy; seg[4].x2=10+ix; seg[4].y2=3+iy;
       seg[5].x1=5+ix; seg[5].y1=9+iy; seg[5].x2=10+ix; seg[5].y2=4+iy;
+#else
+      seg[0].x1=3+ix; seg[0].y1=5+iy; seg[0].x2=5+ix; seg[0].y2=7+iy;
+      seg[1].x1=3+ix; seg[1].y1=6+iy; seg[1].x2=5+ix; seg[1].y2=8+iy;
+      seg[2].x1=3+ix; seg[2].y1=7+iy; seg[2].x2=5+ix; seg[2].y2=9+iy;
+      seg[3].x1=5+ix; seg[3].y1=7+iy; seg[3].x2=9+ix; seg[3].y2=3+iy;
+      seg[4].x1=5+ix; seg[4].y1=8+iy; seg[4].x2=9+ix; seg[4].y2=4+iy;
+      seg[5].x1=5+ix; seg[5].y1=9+iy; seg[5].x2=9+ix; seg[5].y2=5+iy;
 #endif
       dc.drawLineSegments(seg,6);
       }

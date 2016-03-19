@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFoldingList.cpp,v 1.79 2007/02/07 20:22:08 fox Exp $                   *
+* $Id: FXFoldingList.cpp,v 1.81 2007/05/02 01:01:43 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1772,11 +1772,13 @@ long FXFoldingList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       return 1;
       }
 
+    // Previous selection state
+    state=item->isSelected();
+
     // Change current item
     setCurrentItem(item,true);
 
     // Change item selection
-    state=item->isSelected();
     switch(options&SELECT_MASK){
       case FOLDINGLIST_EXTENDEDSELECT:
         if(event->state&SHIFTMASK){
@@ -1805,7 +1807,7 @@ long FXFoldingList::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       }
 
     // Start drag if actually pressed text or icon only
-    if(code && item->isSelected() && item->isDraggable()){
+    if(state && item->isSelected() && item->isDraggable()){
       flags|=FLAG_TRYDRAG;
       }
 

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMessageChannel.cpp,v 1.5 2007/02/07 20:22:13 fox Exp $                 *
+* $Id: FXMessageChannel.cpp,v 1.6 2007/04/25 16:13:21 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -119,6 +119,11 @@ FXMessageChannel::FXMessageChannel(FXApp* a):app(a){
 #endif
   }
 
+//  event=CreateEvent(NULL,TRUE,FALSE,NULL);
+//  if(event==NULL){ throw FXResourceException("unable to create event."); }
+//  app->addInput(event,INPUT_READ,this,ID_IO_READ);
+
+//  ResetEvent(event);
 
 // Fire signal message to target
 long FXMessageChannel::onMessage(FXObject*,FXSelector,void*){
@@ -142,6 +147,7 @@ long FXMessageChannel::onMessage(FXObject*,FXSelector,void*){
   return 0;
   }
 
+//  SetEvent(event);
 
 // Send a message to a target
 FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,FXint size){

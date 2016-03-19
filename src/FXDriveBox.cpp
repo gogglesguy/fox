@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDriveBox.cpp,v 1.38 2007/02/07 20:22:06 fox Exp $                      *
+* $Id: FXDriveBox.cpp,v 1.39 2007/05/17 19:27:56 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -177,31 +177,7 @@ long FXDriveBox::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){
   return 1;
   }
 
-#ifndef WIN32           // UNIX flavor
-
-// Fill list with names of available drives
-void FXDriveBox::listDrives(){
-  register FXFileAssoc *fileassoc;
-  register FXIcon *icon;
-
-  // Remove old items first
-  clearItems();
-
-  // Determine associations, icons and type
-  icon=foldericon;
-  if(associations){
-    fileassoc=associations->findDirBinding("/");
-    if(fileassoc && fileassoc->miniicon) icon=fileassoc->miniicon;
-    }
-
-  // Create icon
-  if(id()) icon->create();
-
-  // Add item
-  appendItem("/",icon);
-  }
-
-#else                   // Windows flavor
+#ifdef WIN32                    // Windows flavor
 
 // Fill list with names of available drives
 void FXDriveBox::listDrives(){
@@ -249,6 +225,30 @@ void FXDriveBox::listDrives(){
       }
     drivemask>>=1;
     }
+  }
+
+#else                           // UNIX flavor
+
+// Fill list with names of available drives
+void FXDriveBox::listDrives(){
+  register FXFileAssoc *fileassoc;
+  register FXIcon *icon;
+
+  // Remove old items first
+  clearItems();
+
+  // Determine associations, icons and type
+  icon=foldericon;
+  if(associations){
+    fileassoc=associations->findDirBinding("/");
+    if(fileassoc && fileassoc->miniicon) icon=fileassoc->miniicon;
+    }
+
+  // Create icon
+  if(id()) icon->create();
+
+  // Add item
+  appendItem("/",icon);
   }
 
 #endif

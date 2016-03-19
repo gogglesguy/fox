@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToggleButton.cpp,v 1.68 2007/02/07 20:22:18 fox Exp $                  *
+* $Id: FXToggleButton.cpp,v 1.69 2007/04/04 02:45:33 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -318,9 +318,9 @@ long FXToggleButton::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
 long FXToggleButton::onKeyPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  if(isEnabled() && !(flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if(!(flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       press(TRUE);
       flags|=FLAG_PRESSED;
       flags&=~FLAG_UPDATE;
@@ -334,9 +334,9 @@ long FXToggleButton::onKeyPress(FXObject*,FXSelector,void* ptr){
 // Key Release
 long FXToggleButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  if(isEnabled() && (flags&FLAG_PRESSED)){
+  if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
-    if(event->code==KEY_space || event->code==KEY_KP_Space){
+    if((flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       press(FALSE);
       setState(!state);
       flags|=FLAG_UPDATE;
@@ -353,7 +353,6 @@ long FXToggleButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
 long FXToggleButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   flags&=~FLAG_TIP;
-  FXTRACE((100,"FXToggleButton::onHotKeyPress\n"));
   if(isEnabled() && !(flags&FLAG_PRESSED)){
     press(TRUE);
     flags|=FLAG_PRESSED;
@@ -365,7 +364,6 @@ long FXToggleButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 
 // Hot key combination released
 long FXToggleButton::onHotKeyRelease(FXObject*,FXSelector,void*){
-  FXTRACE((100,"FXToggleButton::onHotKeyRelease\n"));
   if(isEnabled() && (flags&FLAG_PRESSED)){
     flags|=FLAG_UPDATE;
     flags&=~FLAG_PRESSED;

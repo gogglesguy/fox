@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXVisual.cpp,v 1.91 2007/02/07 20:22:19 fox Exp $                        *
+* $Id: FXVisual.cpp,v 1.92 2007/05/15 05:37:50 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1072,7 +1072,7 @@ void* FXVisual::setupgc(FXbool gex){
   gval.graphics_exposures=gex;
 
   // For default visual; this is easy as we already have a matching window
-  if((Visual*)visual==DefaultVisual(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())))){
+  if((Visual*)visual==DefaultVisual(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp()))) && depth==DefaultDepth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())))){
     gg=XCreateGC(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),GCFillStyle|GCGraphicsExposures,&gval);
     }
 
@@ -1190,6 +1190,7 @@ void FXVisual::create(){
 
       // Monochrome visual (for masks and stipples, not for windows)
       else if(flags&VISUAL_MONOCHROME){
+        // FIXME Is "visual" valid for monochrome?
         numcolors=2;
         depth=1;
         }

@@ -268,6 +268,10 @@ SOURCE=..\..\..\include\FXAtomic.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\FXAutoPtr.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXBitmap.cpp
 # End Source File
 # Begin Source File
@@ -1024,6 +1028,10 @@ SOURCE=..\..\..\src\fxfsquantize.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\fxgetticks.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXGIFCursor.cpp
 # End Source File
 # Begin Source File
@@ -1716,6 +1724,10 @@ SOURCE=..\..\..\include\FXPrintDialog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\fxprintf.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\fxpriv.cpp
 # End Source File
 # Begin Source File
@@ -1801,14 +1813,6 @@ SOURCE=..\..\..\include\FXRASImage.h
 # Begin Source File
 
 SOURCE=..\..\..\src\fxrasio.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\FXReactor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\include\FXReactor.h
 # End Source File
 # Begin Source File
 
@@ -1917,6 +1921,10 @@ SOURCE=..\..\..\src\FXRulerView.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXRulerView.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\fxscanf.cpp
 # End Source File
 # Begin Source File
 
@@ -2525,10 +2533,6 @@ SOURCE=..\..\..\src\strtoll.cpp
 # Begin Source File
 
 SOURCE=..\..\..\src\version.rc
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\vsscanf.cpp
 # End Source File
 # Begin Source File
 

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMDIButton.cpp,v 1.30 2007/02/07 20:22:12 fox Exp $                     *
+* $Id: FXMDIButton.cpp,v 1.31 2007/05/17 19:27:56 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -116,20 +116,20 @@ long FXMDIDeleteButton::onPaint(FXObject*,FXSelector,void* ptr){
     dc.setForeground(textColor);
   else
     dc.setForeground(shadowColor);
-#ifndef WIN32
-  dc.drawLine(xx,  yy,  xx+8,yy+8);
-  dc.drawLine(xx+1,yy,  xx+8,yy+7);
-  dc.drawLine(xx,  yy+1,xx+7,yy+8);
-  dc.drawLine(xx+8,yy,  xx,  yy+8);
-  dc.drawLine(xx+8,yy+1,xx+1,yy+8);
-  dc.drawLine(xx+7,yy,  xx,  yy+7);
-#else
+#ifdef WIN32
   dc.drawLine(xx,  yy,  xx+9,yy+9);
   dc.drawLine(xx+1,yy,  xx+9,yy+8);
   dc.drawLine(xx,  yy+1,xx+8,yy+9);
   dc.drawLine(xx,  yy+8,xx+9,yy-1);
   dc.drawLine(xx+1,yy+8,xx+9,  yy);
   dc.drawLine(xx,  yy+7,xx+8,yy-1);
+#else
+  dc.drawLine(xx,  yy,  xx+8,yy+8);
+  dc.drawLine(xx+1,yy,  xx+8,yy+7);
+  dc.drawLine(xx,  yy+1,xx+7,yy+8);
+  dc.drawLine(xx+8,yy,  xx,  yy+8);
+  dc.drawLine(xx+8,yy+1,xx+1,yy+8);
+  dc.drawLine(xx+7,yy,  xx,  yy+7);
 #endif
   return 1;
   }

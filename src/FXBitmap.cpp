@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBitmap.cpp,v 1.96 2007/02/07 20:22:03 fox Exp $                        *
+* $Id: FXBitmap.cpp,v 1.98 2007/05/17 21:24:32 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -111,22 +111,13 @@ void FXBitmap::create(){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
 
-#ifndef WIN32
-
       // Initialize visual
       visual->create();
 
-      // Make pixmap
-      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),1);
-
-#else
-
-      // Initialize visual
-      visual->create();
-
-      // Create uninitialized shape bitmap
+#ifdef WIN32
       xid=CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
-
+#else
+      xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),1);
 #endif
 
       // Were we successful?
@@ -167,14 +158,10 @@ void FXBitmap::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
-#ifndef WIN32
-
-      // Delete pixmap
-      XFreePixmap(DISPLAY(getApp()),xid);
-#else
-
-      // Delete bitmap
+#ifdef WIN32
       DeleteObject(xid);
+#else
+      XFreePixmap(DISPLAY(getApp()),xid);
 #endif
       }
     xid=0;
@@ -182,141 +169,7 @@ void FXBitmap::destroy(){
   }
 
 
-#ifndef WIN32
-
-// Find shift amount
-static inline FXuint findshift(unsigned long mask){
-  register FXuint sh=0;
-  while(!(mask&(1<<sh))) sh++;
-  return sh;
-  }
-
-
-// Find low bit in mask
-static inline FXPixel lowbit(FXPixel mask){
-  return (~mask+1)&mask;
-  }
-
-
-// Restore client-side pixel buffer from bitmap
-void FXBitmap::restore(){
-  if(xid){
-    register XImage *xim=NULL;
-    register FXint size,x,y;
-
-    FXTRACE((100,"%s::restore bitmap %p\n",getClassName(),this));
-
-    // Check for legal size
-    if(width<1 || height<1){ fxerror("%s::restore: illegal bitmap size %dx%d.\n",getClassName(),width,height); }
-
-    // Make array for data if needed
-    if(!data){
-      size=bytewidth*height;
-      if(!callocElms(data,size)){ throw FXMemoryException("unable to restore bitmap"); }
-      options|=BITMAP_OWNED;
-      }
-
-    // Got local buffer to receive into
-    if(data){
-      xim=XGetImage(DISPLAY(getApp()),xid,0,0,width,height,1,XYPixmap);
-      if(!xim){ throw FXImageException("unable to restore image"); }
-
-      // Should have succeeded
-      FXASSERT(xim);
-
-      FXTRACE((150,"bm width = %d\n",xim->width));
-      FXTRACE((150,"bm height = %d\n",xim->height));
-      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm depth = %d\n",xim->depth));
-      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
-
-      // Grab pixels from image
-      for(y=0; y<height; y++){
-        for(x=0; x<width; x++){
-          if(XGetPixel(xim,x,y)) data[y*bytewidth+(x>>3)]|=1<<(x&7);
-          }
-        }
-
-      // Destroy image
-      XDestroyImage(xim);
-      }
-    }
-  }
-
-
-// Render into pixmap
-void FXBitmap::render(){
-  if(xid){
-    register XImage *xim=NULL;
-    register Visual *vis;
-    register int size;
-    register FXuchar *pix;
-    register int i;
-    XGCValues values;
-    GC gc;
-
-    FXTRACE((100,"%s::render bitmap %p\n",getClassName(),this));
-
-    // Fill with pixels if there is data
-    if(data && 0<width && 0<height){
-
-      // Make GC
-      values.foreground=0xffffffff;
-      values.background=0;
-      gc=XCreateGC(DISPLAY(getApp()),xid,GCForeground|GCBackground,&values);
-
-      // Get Visual
-      vis=(Visual*)visual->visual;
-
-      xim=XCreateImage(DISPLAY(getApp()),vis,1,XYBitmap,0,NULL,width,height,8,(width+7)>>3);
-      if(!xim){ throw FXImageException("unable to render bitmap"); }
-
-      // Try create temp pixel store
-      if(!allocElms(xim->data,xim->bytes_per_line*height)){ throw FXMemoryException("unable to render bitmap"); }
-
-      FXTRACE((150,"bm width = %d\n",xim->width));
-      FXTRACE((150,"bm height = %d\n",xim->height));
-      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm depth = %d\n",xim->depth));
-      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
-
-      // Render bits into server-formatted bitmap
-      size=xim->bytes_per_line*height;
-      pix=(FXuchar*)xim->data;
-
-      // Most significant bit first
-      if(xim->bitmap_bit_order==MSBFirst){
-        for(i=0; i<size; i++) pix[i]=FXBITREVERSE(data[i]);
-        }
-
-      // Least significant bit first
-      else{
-        memcpy(pix,data,size);
-        }
-
-      // Blast the image
-      XPutImage(DISPLAY(getApp()),xid,gc,xim,0,0,0,0,width,height);
-      freeElms(xim->data);
-      XDestroyImage(xim);
-      XFreeGC(DISPLAY(getApp()),gc);
-      }
-    }
-  }
-
-
-#else
+#ifdef WIN32            // WINDOWS
 
 
 struct BITMAPINFO256 {
@@ -463,6 +316,140 @@ void FXBitmap::render(){
   }
 
 
+#else                   // X11
+
+
+// Find shift amount
+static inline FXuint findshift(unsigned long mask){
+  register FXuint sh=0;
+  while(!(mask&(1<<sh))) sh++;
+  return sh;
+  }
+
+
+// Find low bit in mask
+static inline FXPixel lowbit(FXPixel mask){
+  return (~mask+1)&mask;
+  }
+
+
+// Restore client-side pixel buffer from bitmap
+void FXBitmap::restore(){
+  if(xid){
+    register XImage *xim=NULL;
+    register FXint size,x,y;
+
+    FXTRACE((100,"%s::restore bitmap %p\n",getClassName(),this));
+
+    // Check for legal size
+    if(width<1 || height<1){ fxerror("%s::restore: illegal bitmap size %dx%d.\n",getClassName(),width,height); }
+
+    // Make array for data if needed
+    if(!data){
+      size=bytewidth*height;
+      if(!callocElms(data,size)){ throw FXMemoryException("unable to restore bitmap"); }
+      options|=BITMAP_OWNED;
+      }
+
+    // Got local buffer to receive into
+    if(data){
+      xim=XGetImage(DISPLAY(getApp()),xid,0,0,width,height,1,XYPixmap);
+      if(!xim){ throw FXImageException("unable to restore image"); }
+
+      // Should have succeeded
+      FXASSERT(xim);
+
+      FXTRACE((150,"bm width = %d\n",xim->width));
+      FXTRACE((150,"bm height = %d\n",xim->height));
+      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
+      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
+      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((150,"bm depth = %d\n",xim->depth));
+      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
+      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
+
+      // Grab pixels from image
+      for(y=0; y<height; y++){
+        for(x=0; x<width; x++){
+          if(XGetPixel(xim,x,y)) data[y*bytewidth+(x>>3)]|=1<<(x&7);
+          }
+        }
+
+      // Destroy image
+      XDestroyImage(xim);
+      }
+    }
+  }
+
+
+// Render into pixmap
+void FXBitmap::render(){
+  if(xid){
+    register XImage *xim=NULL;
+    register Visual *vis;
+    register int size;
+    register FXuchar *pix;
+    register int i;
+    XGCValues values;
+    GC gc;
+
+    FXTRACE((100,"%s::render bitmap %p\n",getClassName(),this));
+
+    // Fill with pixels if there is data
+    if(data && 0<width && 0<height){
+
+      // Make GC
+      values.foreground=0xffffffff;
+      values.background=0;
+      gc=XCreateGC(DISPLAY(getApp()),xid,GCForeground|GCBackground,&values);
+
+      // Get Visual
+      vis=(Visual*)visual->visual;
+
+      xim=XCreateImage(DISPLAY(getApp()),vis,1,XYBitmap,0,NULL,width,height,8,(width+7)>>3);
+      if(!xim){ throw FXImageException("unable to render bitmap"); }
+
+      // Try create temp pixel store
+      if(!allocElms(xim->data,xim->bytes_per_line*height)){ throw FXMemoryException("unable to render bitmap"); }
+
+      FXTRACE((150,"bm width = %d\n",xim->width));
+      FXTRACE((150,"bm height = %d\n",xim->height));
+      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
+      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
+      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((150,"bm depth = %d\n",xim->depth));
+      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
+      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
+
+      // Render bits into server-formatted bitmap
+      size=xim->bytes_per_line*height;
+      pix=(FXuchar*)xim->data;
+
+      // Most significant bit first
+      if(xim->bitmap_bit_order==MSBFirst){
+        for(i=0; i<size; i++) pix[i]=FXBITREVERSE(data[i]);
+        }
+
+      // Least significant bit first
+      else{
+        memcpy(pix,data,size);
+        }
+
+      // Blast the image
+      XPutImage(DISPLAY(getApp()),xid,gc,xim,0,0,0,0,width,height);
+      freeElms(xim->data);
+      XDestroyImage(xim);
+      XFreeGC(DISPLAY(getApp()),gc);
+      }
+    }
+  }
+
 #endif
 
 
@@ -474,17 +461,8 @@ void FXBitmap::resize(FXint w,FXint h){
   FXTRACE((100,"%s::resize(%d,%d)\n",getClassName(),w,h));
   bw=(w+7)>>3;
   if(xid){
-
-#ifndef WIN32
-
-    // Free old pixmap
-    XFreePixmap(DISPLAY(getApp()),xid);
-
-    // Make new pixmap
-    xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,1);
-    if(!xid){ throw FXImageException("unable to resize bitmap"); }
-
-#else
+  
+#ifdef WIN32
 
     // Delete old bitmap
     DeleteObject(xid);
@@ -492,8 +470,18 @@ void FXBitmap::resize(FXint w,FXint h){
     // Create a bitmap compatible with current display
     xid=CreateBitmap(w,h,1,1,NULL);
     if(!xid){ throw FXImageException("unable to resize bitmap"); }
+    
+#else
 
+    // Free old pixmap
+    XFreePixmap(DISPLAY(getApp()),xid);
+
+    // Make new pixmap
+    xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),w,h,1);
+    if(!xid){ throw FXImageException("unable to resize bitmap"); }
+    
 #endif
+
     }
 
   // Resize data array; only do the work if the new

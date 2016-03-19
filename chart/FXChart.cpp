@@ -19,12 +19,9 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXChart.cpp,v 1.27 2007/02/07 20:21:51 fox Exp $                         *
+* $Id: FXChart.cpp,v 1.28 2007/05/24 20:42:16 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
-#include "FXPNGImage.h"
-#include "FXJPGImage.h"
-#include "FXTIFImage.h"
 #include "FXChart.h"
 
 /*

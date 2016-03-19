@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXString.h,v 1.124 2007/03/22 15:55:15 fox Exp $                         *
+* $Id: FXString.h,v 1.126 2007/04/11 13:33:57 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H

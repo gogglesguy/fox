@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFont.cpp,v 1.196 2007/02/21 15:59:52 fox Exp $                         *
+* $Id: FXFont.cpp,v 1.198 2007/06/03 05:30:37 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -144,6 +144,7 @@ const FXint LEAD_OFFSET=0xD800-(0x10000>>10);
 // Absolute value
 static inline FXint fxabs(FXint a){ return a<0?-a:a; }
 
+extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 #if defined(WIN32) /////////////////////////////// WIN32 ////////////////////////
 
@@ -524,7 +525,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
   // Open font
   font=XftFontOpenPattern(DISPLAY(getApp()),p);
-  xid=(unsigned long)p;
+  xid=(FXID)font;
 
   // Destroy pattern
   FcPatternDestroy(pattern);
@@ -718,7 +719,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FXTRACE((150,"wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res));
 
   // Get fonts matching the pattern
-  sprintf(candidate,"-%s-%s-*-*-*-*-*-%s-*-*-*-*-*-*",wantforge.empty()?"*":wantforge.text(),wantfamily.empty()?"*":wantfamily.text(),(hints&FXFont::Rotatable)?"[1 0 0 1]":"*");
+  __snprintf(candidate,sizeof(candidate),"-%s-%s-*-*-*-*-*-%s-*-*-*-*-*-*",wantforge.empty()?"*":wantforge.text(),wantfamily.empty()?"*":wantfamily.text(),(hints&FXFont::Rotatable)?"[1 0 0 1]":"*");
   fontnames=XListFonts(DISPLAY(getApp()),candidate,65535,&nfontnames);
   if(fontnames && 0<nfontnames){
 
@@ -904,12 +905,12 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
           a=0.00027270769562411399179*angle;
           c=(cos(a)*res*actualSize)/(10.0*byres);
           s=(sin(a)*res*actualSize)/(10.0*byres);
-          sprintf(xlfd,"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),fabs(c),SGN(s),fabs(s),SGN(-s),fabs(s),SGN(c),fabs(c),bxres,byres,field[10],field[12]);
+          __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),fabs(c),SGN(s),fabs(s),SGN(-s),fabs(s),SGN(c),fabs(c),bxres,byres,field[10],field[12]);
           }
 
         // Create scaled font
         else{
-          sprintf(xlfd,"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
+          __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
           }
         }
 
@@ -925,7 +926,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         xlfdSplit(field,candidate);
 
         // Create scaled font
-        sprintf(xlfd,"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
+        __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
 
         // Load normal scaled font
         fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
@@ -945,7 +946,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
           a=0.00027270769562411399179*angle;
           c=(cos(a)*res*actualSize)/(10.0*byres);
           s=(sin(a)*res*actualSize)/(10.0*byres);
-          sprintf(xlfd,"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),fabs(c),SGN(s),fabs(s),SGN(-s),fabs(s),SGN(c),fabs(c),bxres,byres,field[10],field[12]);
+          __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),fabs(c),SGN(s),fabs(s),SGN(-s),fabs(s),SGN(c),fabs(c),bxres,byres,field[10],field[12]);
           XUnloadFont(DISPLAY(getApp()),((XFontStruct*)fs)->fid);
           ((XFontStruct*)fs)->fid=XLoadFont(DISPLAY(getApp()),xlfd);
           }
@@ -2321,12 +2322,12 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
 
   // Match RAW X11
   if(h&FXFont::X11){
-    sprintf(candidate,"%s",face.empty()?"*":face.text());
+    __snprintf(candidate,sizeof(candidate),"%s",face.empty()?"*":face.text());
     }
 
   // Match XLFD
   else{
-    sprintf(candidate,"-%s-%s-*-*-*-*-*-%s-*-*-*-*-*-*",foundry.empty() ? "*" : foundry.text(),family.empty() ? "*" : family.text(),(h&FXFont::Rotatable) ? "[1 0 0 1]" : "*");
+    __snprintf(candidate,sizeof(candidate),"-%s-%s-*-*-*-*-*-%s-*-*-*-*-*-*",foundry.empty() ? "*" : foundry.text(),family.empty() ? "*" : family.text(),(h&FXFont::Rotatable) ? "[1 0 0 1]" : "*");
     }
 
   // Get fonts matching the pattern

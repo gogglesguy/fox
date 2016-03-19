@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirSelector.cpp,v 1.59 2007/02/07 20:22:05 fox Exp $                   *
+* $Id: FXDirSelector.cpp,v 1.61 2007/05/17 14:47:05 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -420,6 +420,18 @@ long FXDirSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
   filemenu.popup(NULL,event->root_x,event->root_y);
   getApp()->runModalWhileShown(&filemenu);
   return 1;
+  }
+
+
+// Change file associations
+void FXDirSelector::setAssociations(FXFileDict* assoc,FXbool owned){
+  dirbox->setAssociations(assoc,owned);
+  }
+
+
+// Return file associations
+FXFileDict* FXDirSelector::getAssociations() const {
+  return dirbox->getAssociations();
   }
 
 
