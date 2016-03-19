@@ -162,10 +162,22 @@
 #endif
 
 
-// Callback
+// Standard call calling sequence
 #ifdef WIN32
 #ifndef CALLBACK
 #define CALLBACK __stdcall
+#endif
+#endif
+
+
+// C Language calling sequence
+#ifdef WIN32
+#ifndef CDECL
+#define CDECL __cdecl
+#endif
+#else
+#ifndef CDECL
+#define CDECL
 #endif
 #endif
 
@@ -285,9 +297,14 @@ typedef long long               FXlong;
 
 
 // Integral types large enough to hold value of a pointer
-#if defined(_MSC_VER) && defined(_WIN64)
+#if defined(_WIN64)
+#if defined (_MSC_VER)
 typedef __int64                 FXival;
 typedef unsigned __int64        FXuval;
+#else
+typedef long long               FXival;
+typedef unsigned long long      FXuval;
+#endif
 #else
 typedef long                    FXival;
 typedef unsigned long           FXuval;
@@ -485,6 +502,12 @@ const FXTime forever=FXLONG(9223372036854775807);
 /// Get component value of RGBA color
 #define FXRGBACOMPVAL(rgba,comp) ((FX::FXuchar)(((rgba)>>((comp)<<3))&0xff))
 
+/// Get RGB color from COLORREF
+#define FXCOLORREF2RGB(ref) (FX::FXuint)((((ref)<<8)&0xff000000) | (((ref)<<8)&0xff0000) | (((ref)<<8)&0xff00) | 0x000000ff)
+
+/// Get COLORREF from RGB color
+#define FXRGB2COLORREF(rgb) (FX::FXuint)((((rgb)>>8)&0xff0000) | (((rgb)>>8)&0xff00) | (((rgb)>>8)&0xff))
+
 #endif
 
 
@@ -511,6 +534,12 @@ const FXTime forever=FXLONG(9223372036854775807);
 
 /// Get component value of RGBA color
 #define FXRGBACOMPVAL(rgba,comp) ((FX::FXuchar)(((rgba)>>((3-(comp))<<3))&0xff))
+
+/// Get RGB color from COLORREF
+#define FXCOLORREF2RGB(ref) (FX::FXuint)((((ref)>>16)&0xff) | ((ref)&0xff00) | (((ref)<<16)&0xff0000) | 0xff000000)
+
+/// Get COLORREF from RGB color
+#define FXRGB2COLORREF(rgb) (FX::FXuint)((((rgb)<<16)&0xff0000) | ((rgb)&0xff00) | (((rgb)>>16)&0xff))
 
 #endif
 
@@ -733,11 +762,17 @@ extern FXAPI FXbool fxIsInf(FXfloat number);
 /// Test for infinite double
 extern FXAPI FXbool fxIsInf(FXdouble number);
 
-/// Text for not-a-number float
+/// Test for not-a-number float
 extern FXAPI FXbool fxIsNan(FXfloat number);
 
-/// Text for not-a-number double
+/// Test for not-a-number double
 extern FXAPI FXbool fxIsNan(FXdouble number);
+
+/// Return sign bit of float
+extern FXAPI FXint fxSignBit(FXfloat number);
+
+/// Return sign bit of double
+extern FXAPI FXint fxSignBit(FXdouble number);
 
 /// Raise 10 to an integer power e in the range [-308..308]
 extern FXAPI FXdouble fxtenToThe(FXint e);

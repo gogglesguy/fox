@@ -403,13 +403,17 @@ FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
           array[j*width+i+size+size]=((const FXuchar*)&data[k])[0];
           }
         }
+        
+      // Save it
       store.save(array,size*channels);
+      
+      // Clean up temp memory
       freeElms(array);
-      }
 
-    // Reset swap status
-    store.swapBytes(swap);
-    return true;
+      // Reset swap status
+      store.swapBytes(swap);
+      return true;
+      }
     }
   return false;
   }

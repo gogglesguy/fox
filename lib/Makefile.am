@@ -77,6 +77,7 @@ $(top_srcdir)/lib/bigfloppy3.gif \
 $(top_srcdir)/lib/bigfloppy5.gif \
 $(top_srcdir)/lib/bigfolder.gif \
 $(top_srcdir)/lib/bigfolderopen.gif \
+$(top_srcdir)/lib/bigharddisk.gif \
 $(top_srcdir)/lib/bignetdrive.gif \
 $(top_srcdir)/lib/bignethood.gif \
 $(top_srcdir)/lib/bookset.gif \
@@ -120,6 +121,8 @@ $(top_srcdir)/lib/minicomputer.gif \
 $(top_srcdir)/lib/minidesktop.gif \
 $(top_srcdir)/lib/minidoc.gif \
 $(top_srcdir)/lib/minifloppy.gif \
+$(top_srcdir)/lib/minifloppy3.gif \
+$(top_srcdir)/lib/minifloppy5.gif \
 $(top_srcdir)/lib/minifolder.gif \
 $(top_srcdir)/lib/minifolderopen.gif \
 $(top_srcdir)/lib/miniharddisk.gif \
@@ -135,6 +138,7 @@ $(top_srcdir)/lib/showbigicons.gif \
 $(top_srcdir)/lib/showdetails.gif \
 $(top_srcdir)/lib/showsmallicons.gif \
 $(top_srcdir)/lib/sorting.bmp \
+$(top_srcdir)/lib/undo_gif.gif \
 $(top_srcdir)/lib/warningicon.gif \
 $(top_srcdir)/lib/winclose.gif \
 $(top_srcdir)/lib/winmaximize.gif \
@@ -256,6 +260,8 @@ FXDragCorner.cpp \
 FXDrawable.cpp \
 FXDriveBox.cpp \
 FXException.cpp \
+FXEXEIcon.cpp \
+FXEXEImage.cpp \
 FXExpression.cpp \
 FXExtentd.cpp \
 FXExtentf.cpp \
@@ -478,7 +484,6 @@ fxexeio.cpp \
 fxfsquantize.cpp \
 fxgetticks.cpp \
 fxgifio.cpp \
-fxicoio.cpp \
 fxiffio.cpp \
 fxjpegio.cpp \
 fxjp2io.cpp \

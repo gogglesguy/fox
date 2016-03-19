@@ -349,8 +349,8 @@ private:
   // Internal helper functions
   FXApp(const FXApp&);
   FXApp &operator=(const FXApp&);
-  static void signalhandler(int sig);
-  static void immediatesignalhandler(int sig);
+  static void CDECL signalhandler(int sig);
+  static void CDECL immediatesignalhandler(int sig);
   void leaveWindow(FXWindow *window,FXWindow *ancestor);
   void enterWindow(FXWindow *window,FXWindow *ancestor);
   void selectionSetData(const FXWindow* window,FXDragType type,FXuchar* data,FXuint size);

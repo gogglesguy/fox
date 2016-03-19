@@ -194,7 +194,7 @@ FXival FXDictionary::find(const FXchar* ky) const {
 
 
 // Return reference to slot assocated with given key
-void*& FXDictionary::at(const FXchar* ky){
+FXptr& FXDictionary::at(const FXchar* ky){
   register FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
@@ -220,7 +220,7 @@ x:return table[x].data;
 
 
 // Return constant reference to slot assocated with given key
-void *const& FXDictionary::at(const FXchar* ky) const {
+const FXptr& FXDictionary::at(const FXchar* ky) const {
   register FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
@@ -235,9 +235,9 @@ x:return table[x].data;                                 // Stopped at empty slot
 
 
 // Remove association with given key; return old value, if any
-void* FXDictionary::remove(const FXchar* ky){
+FXptr FXDictionary::remove(const FXchar* ky){
   register FXuval p,b,h,x;
-  register void* old;
+  register FXptr old;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::remove: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -256,10 +256,10 @@ void* FXDictionary::remove(const FXchar* ky){
 
 
 // Erase data at pos in the table; return old value, if any
-void* FXDictionary::erase(FXival pos){
+FXptr FXDictionary::erase(FXival pos){
   if(__unlikely(pos<0 || no()<=pos)){ throw FXRangeException("FXDictionary::erase: argument out of range\n"); }
   if(!table[pos].key.empty()){
-    register void* old=table[pos].data;
+    register FXptr old=table[pos].data;
     table[pos].key.clear();                             // Void the slot (not empty!)
     table[pos].data=NULL;
     used(used()-1);

@@ -172,7 +172,7 @@ FXbool fxloadXPM(const FXchar **pixels,FXColor*& data,FXint& width,FXint& height
       flag=word[0];
       name[0]=0;
       while(nextword(src,word) && !iskey(word)){
-        strncat(name,word,sizeof(name));
+        fxstrlcat(name,word,sizeof(name));
         }
       if(flag<best){                    // c < g < m < s
         color=colorFromName(name);
@@ -187,7 +187,7 @@ FXbool fxloadXPM(const FXchar **pixels,FXColor*& data,FXint& width,FXint& height
       }
     else{
       colortable[c]=color;
-      strncpy(lookuptable[c],line,cpp);
+      fxstrlcpy(lookuptable[c],line,cpp);
       }
     }
 
@@ -269,7 +269,7 @@ FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       flag=word[0];
       name[0]=0;
       while(nextword(src,word) && !iskey(word)){
-        strncat(name,word,sizeof(name));
+        fxstrlcat(name,word,sizeof(name));
         }
       if(flag<best){                    // c < g < m < s
         color=colorFromName(name);
@@ -284,7 +284,7 @@ FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       }
     else{
       colortable[c]=color;
-      strncpy(lookuptable[c],line,cpp);
+      fxstrlcpy(lookuptable[c],line,cpp);
       }
     }
 

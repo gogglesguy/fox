@@ -125,26 +125,26 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXDirDialog.lo FXDirList.lo FXDirSelector.lo FXDirVisitor.lo \
 	FXDockBar.lo FXDockSite.lo FXDockHandler.lo FXDockTitle.lo \
 	FXDocument.lo FXDragCorner.lo FXDrawable.lo FXDriveBox.lo \
-	FXException.lo FXExpression.lo FXExtentd.lo FXExtentf.lo \
-	FXFile.lo FXFileAssociations.lo FXFileDialog.lo FXFileList.lo \
-	FXFileSelector.lo FXFileStream.lo FXFoldingList.lo FXFont.lo \
-	FXFontDialog.lo FXFontSelector.lo FXFrame.lo FXGIFCursor.lo \
-	FXGIFIcon.lo FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo \
-	FXGLContext.lo FXGLCube.lo FXGLCylinder.lo FXGLObject.lo \
-	FXGLShape.lo FXGLSphere.lo FXGLTriangleMesh.lo FXGLViewer.lo \
-	FXGLVisual.lo FXGauge.lo FXGradientBar.lo FXGroupBox.lo \
-	FXGZFileStream.lo FXhalf.lo FXHash.lo FXHeader.lo \
-	FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo \
-	FXIFFImage.lo FXIcon.lo FXIconCache.lo FXIconList.lo \
-	FXIconSource.lo FXId.lo FXImage.lo FXImageFrame.lo \
-	FXImageView.lo FXInputDialog.lo FXIO.lo FXIOBuffer.lo \
-	FXIODevice.lo FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo \
-	FXJPGImage.lo FXJSON.lo FXJSONFile.lo FXKnob.lo FXLabel.lo \
-	FXLFQueue.lo FXList.lo FXListBox.lo FXLocale.lo FXMDIButton.lo \
-	FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo FXMat2d.lo \
-	FXMat2f.lo FXMat3d.lo FXMat3f.lo FXMat4d.lo FXMat4f.lo \
-	FXMatrix.lo FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo \
-	FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
+	FXException.lo FXEXEIcon.lo FXEXEImage.lo FXExpression.lo \
+	FXExtentd.lo FXExtentf.lo FXFile.lo FXFileAssociations.lo \
+	FXFileDialog.lo FXFileList.lo FXFileSelector.lo \
+	FXFileStream.lo FXFoldingList.lo FXFont.lo FXFontDialog.lo \
+	FXFontSelector.lo FXFrame.lo FXGIFCursor.lo FXGIFIcon.lo \
+	FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo FXGLContext.lo \
+	FXGLCube.lo FXGLCylinder.lo FXGLObject.lo FXGLShape.lo \
+	FXGLSphere.lo FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo \
+	FXGauge.lo FXGradientBar.lo FXGroupBox.lo FXGZFileStream.lo \
+	FXhalf.lo FXHash.lo FXHeader.lo FXHorizontalFrame.lo \
+	FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo \
+	FXIcon.lo FXIconCache.lo FXIconList.lo FXIconSource.lo FXId.lo \
+	FXImage.lo FXImageFrame.lo FXImageView.lo FXInputDialog.lo \
+	FXIO.lo FXIOBuffer.lo FXIODevice.lo FXJP2Icon.lo FXJP2Image.lo \
+	FXJPGIcon.lo FXJPGImage.lo FXJSON.lo FXJSONFile.lo FXKnob.lo \
+	FXLabel.lo FXLFQueue.lo FXList.lo FXListBox.lo FXLocale.lo \
+	FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo \
+	FXMat2d.lo FXMat2f.lo FXMat3d.lo FXMat3f.lo FXMat4d.lo \
+	FXMat4f.lo FXMatrix.lo FXMemMap.lo FXMemoryStream.lo \
+	FXMenuBar.lo FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
 	FXMenuCheck.lo FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
 	FXMessageChannel.lo FXMetaClass.lo FXMutex.lo FXObject.lo \
@@ -180,7 +180,7 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxcpuid.lo \
 	fxbmpio.lo fxddsio.lo fxezquantize.lo fxexeio.lo \
-	fxfsquantize.lo fxgetticks.lo fxgifio.lo fxicoio.lo fxiffio.lo \
+	fxfsquantize.lo fxgetticks.lo fxgifio.lo fxiffio.lo \
 	fxjpegio.lo fxjp2io.lo fxkeyboard.lo fxkeysym.lo \
 	fxparsegeometry.lo fxpcxio.lo fxpngio.lo fxppmio.lo \
 	fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo fxrgbio.lo \
@@ -427,6 +427,7 @@ $(top_srcdir)/lib/bigfloppy3.gif \
 $(top_srcdir)/lib/bigfloppy5.gif \
 $(top_srcdir)/lib/bigfolder.gif \
 $(top_srcdir)/lib/bigfolderopen.gif \
+$(top_srcdir)/lib/bigharddisk.gif \
 $(top_srcdir)/lib/bignetdrive.gif \
 $(top_srcdir)/lib/bignethood.gif \
 $(top_srcdir)/lib/bookset.gif \
@@ -470,6 +471,8 @@ $(top_srcdir)/lib/minicomputer.gif \
 $(top_srcdir)/lib/minidesktop.gif \
 $(top_srcdir)/lib/minidoc.gif \
 $(top_srcdir)/lib/minifloppy.gif \
+$(top_srcdir)/lib/minifloppy3.gif \
+$(top_srcdir)/lib/minifloppy5.gif \
 $(top_srcdir)/lib/minifolder.gif \
 $(top_srcdir)/lib/minifolderopen.gif \
 $(top_srcdir)/lib/miniharddisk.gif \
@@ -485,6 +488,7 @@ $(top_srcdir)/lib/showbigicons.gif \
 $(top_srcdir)/lib/showdetails.gif \
 $(top_srcdir)/lib/showsmallicons.gif \
 $(top_srcdir)/lib/sorting.bmp \
+$(top_srcdir)/lib/undo_gif.gif \
 $(top_srcdir)/lib/warningicon.gif \
 $(top_srcdir)/lib/winclose.gif \
 $(top_srcdir)/lib/winmaximize.gif \
@@ -604,6 +608,8 @@ FXDragCorner.cpp \
 FXDrawable.cpp \
 FXDriveBox.cpp \
 FXException.cpp \
+FXEXEIcon.cpp \
+FXEXEImage.cpp \
 FXExpression.cpp \
 FXExtentd.cpp \
 FXExtentf.cpp \
@@ -826,7 +832,6 @@ fxexeio.cpp \
 fxfsquantize.cpp \
 fxgetticks.cpp \
 fxgifio.cpp \
-fxicoio.cpp \
 fxiffio.cpp \
 fxjpegio.cpp \
 fxjp2io.cpp \
@@ -1052,6 +1057,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXDragCorner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXDrawable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXDriveBox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXEXEIcon.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXEXEImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXException.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXExpression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXExtentd.Plo@am__quote@
@@ -1279,7 +1286,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxfsquantize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxgetticks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxgifio.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxicoio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxiffio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxjp2io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxjpegio.Plo@am__quote@

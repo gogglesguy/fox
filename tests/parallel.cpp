@@ -14,68 +14,40 @@
 // Stop QTest threads
 volatile FXbool stopit=false;
 
-/*******************************************************************************/
-
-// QTest thread
-class QTest : public FXScopedThread {
-private:
-  FXLFQueue *queue;
-public:
-  QTest(FXLFQueue* q):queue(q){}
-  virtual FXint run();
-  };
-
-
-// QTest tests lock-free queue by hammering it with pushes/pulls
-FXint QTest::run(){
-  register FXival niter=0;
-  register FXlong npush=0;
-  register FXlong npull=0;
-  register FXlong ncros=0;
-  register FXTime tot=0;
-  register FXTime tmp;
-  FXptr ptr;
-  tot=fxgetticks();
-  do{
-    ptr=(FXptr)niter;
-    if(!queue->push(ptr)){
-      fxmessage("%p: %ld: full\n",self(),niter);
-      }
-    else{
-      npush++;
-      }
-    if(!queue->pop(ptr)){
-      fxmessage("%p: %ld: empty\n",self(),niter);
-      }
-    else{
-      npull++;
-      }
-    ncros+=(niter!=(FXival)ptr);
-    niter++;
-    }
-  while(!stopit);
-  tot=fxgetticks()-tot;
-  fxmessage("%p: npush=%lld\n",self(),npush);
-  fxmessage("%p: npull=%lld\n",self(),npull);
-  fxmessage("%p: ncros=%lld\n",self(),ncros);
-  fxmessage("%p: niter=%ld\n",self(),niter);
-  fxmessage("%p: avg=%lld\n",self(),tot/(npush+npull));
-  fxmessage("%p: ticks=%lld tick/(push+pull)=%.2lf\n",self(),tot,FXdouble(tot)/FXdouble(npush+npull));
-  return 0;
-  }
 
 /*******************************************************************************/
 
-// Churn cpu for a random while, then return
+// Make-work procedure just uses lots of CPU by drawing random numbers till
+// a number close to 1 is drawn.
 void churn(){
   FXRandom random(FXThread::time()+FXLONG(128628761545));
   fxmessage("Churn start th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
-  while(random.randDouble()<0.999999999){ }
-  fxmessage("Churn done  th %p code %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
+  while(random.randDouble()<0.99999999){ }
+  fxmessage("Churn done  th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   }
 
 
-// Loop through index range
+// Make-work procedure does a nested parallel call to churn, then returns.
+// This is to illustrate arbitrary nesting of parallelism.
+void churn2(){
+  fxmessage("Churn2 start th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
+  FXParallelInvoke(churn,churn,churn,churn);
+  fxmessage("Churn2 done  th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
+  }
+  
+  
+// Make-work procedure does a nested parallel call to churn, then returns.
+// This is to illustrate arbitrary nesting of parallelism.
+void churn3(){
+  fxmessage("Churn3 start th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
+  FXParallelInvoke(churn2,churn2,churn2);
+  fxmessage("Churn3 done  th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
+  }
+
+
+
+
+// Make-work procedure like the ones above, this one depending on loop index i.
 void looping(FXint i){
   FXRandom random(FXThread::time()+FXLONG(128628761545));
   fxmessage("Looping %05d begin th %p core %d/%d\n",i,FXThread::current(),FXThread::processor(),FXThread::processors());
@@ -84,13 +56,7 @@ void looping(FXint i){
   }
 
 
-// Churn cpu for a random while, then return
-void churnSplit(){
-  FXParallelInvoke(churn,churn);
-  }
-
-
-// Do something
+// Low-level interface to thread pool
 class Job : public FXRunnable {
 public:
   Job(){}
@@ -98,7 +64,7 @@ public:
   };
 
 
-// Run
+// Self-destructing task-let performing make-work procedure.
 FXint Job::run(){
   churn();
   delete this;
@@ -116,9 +82,10 @@ void printusage(const char* prog){
   fxmessage("  --jobs <number>             Number of jobs to run.\n");
   fxmessage("  --size <number>             Queue size.\n");
   fxmessage("  --pieces <number>           Split in this many pieces.\n");
+  fxmessage("  -tracelevel <number>        Set trace level.\n");
   fxmessage("  -W, --wait                  Calling thread waits.\n");
   fxmessage("  -h, --help                  Print help.\n");
-  fxmessage("  -Q, --queue                 Test job queue.\n");
+  fxmessage("  -N, --null                  Test create/destroy pool.\n");
   fxmessage("  -P, --pool                  Test thread pool.\n");
   fxmessage("  -L, --loop                  Test parallel loop.\n");
   fxmessage("  -I, --invoke                Test parallel invoke.\n");
@@ -145,7 +112,7 @@ int main(int argc,char* argv[]){
   FXuint minimum=1;
   FXuint nthreads=1;
   FXuint size=512;
-  FXuint njobs=0;
+  FXuint njobs=10;
   FXuint test=2;
   FXuint wait=0;
 
@@ -158,22 +125,22 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"--threads")==0){
       if(++arg>=argc){ fxmessage("Missing threads number argument.\n"); exit(1); }
       nthreads=strtoul(argv[arg],NULL,0);
-      if(nthreads<0){ fxmessage("Value for threads (%d) too small.\n",nthreads); exit(1); }
+      if(nthreads<1){ fxmessage("Value for threads (%d) too small.\n",nthreads); exit(1); }
       }
     else if(strcmp(argv[arg],"--pieces")==0){
       if(++arg>=argc){ fxmessage("Missing pieces number argument.\n"); exit(1); }
       pieces=strtoul(argv[arg],NULL,0);
-      if(minimum<1){ fxmessage("Value for pieces number of pieces (%d) too small.\n",pieces); exit(1); }
+      if(pieces<1){ fxmessage("Value for pieces number of pieces (%d) too small.\n",pieces); exit(1); }
       }
     else if(strcmp(argv[arg],"--minimum")==0){
       if(++arg>=argc){ fxmessage("Missing threads number argument.\n"); exit(1); }
       minimum=strtoul(argv[arg],NULL,0);
-      if(minimum<0){ fxmessage("Value for minimum number of threads (%d) too small.\n",minimum); exit(1); }
+      if(minimum<1){ fxmessage("Value for minimum number of threads (%d) too small.\n",minimum); exit(1); }
       }
     else if(strcmp(argv[arg],"--maximum")==0){
       if(++arg>=argc){ fxmessage("Missing threads number argument.\n"); exit(1); }
       maximum=strtoul(argv[arg],NULL,0);
-      if(maximum<0){ fxmessage("Value for maximum number of threads (%d) too small.\n",minimum); exit(1); }
+      if(maximum<2){ fxmessage("Value for maximum number of threads (%d) too small.\n",minimum); exit(1); }
       }
     else if(strcmp(argv[arg],"--size")==0){
       if(++arg>=argc){ fxmessage("Missing size argument.\n"); exit(1); }
@@ -184,13 +151,10 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"--jobs")==0){
       if(++arg>=argc){ fxmessage("Missing jobs count argument.\n"); exit(1); }
       njobs=strtoul(argv[arg],NULL,0);
-      if(njobs<0){ fxmessage("Value for njobs (%d) too small.\n",njobs); exit(1); }
+      if(njobs<1){ fxmessage("Value for njobs (%d) too small.\n",njobs); exit(1); }
       }
     else if(strcmp(argv[arg],"-W")==0 || strcmp(argv[arg],"--wait")==0){
       wait=1;
-      }
-    else if(strcmp(argv[arg],"-Q")==0 || strcmp(argv[arg],"--queue")==0){
-      test=0;
       }
     else if(strcmp(argv[arg],"-P")==0 || strcmp(argv[arg],"--pool")==0){
       test=1;
@@ -201,6 +165,13 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"-I")==0 || strcmp(argv[arg],"--invoke")==0){
       test=3;
       }
+    else if(strcmp(argv[arg],"-N")==0 || strcmp(argv[arg],"--null")==0){
+      test=0;
+      }
+    else if(strcmp(argv[arg],"-tracelevel")==0){
+      if(++arg>=argc){ fxmessage("Missing tracelevel argument.\n"); exit(1); }
+      fxTraceLevel=strtoul(argv[arg],NULL,0);
+      }
     else{
       fxmessage("Bad argument.\n");
       printusage(argv[0]);
@@ -210,120 +181,73 @@ int main(int argc,char* argv[]){
 
   fxmessage("main thread %p\n",FXThread::current());
 
-  // Test queue
-  if(0==test){
-    FXLFQueue queue(size);
+  // Create thread pool with queue size
+  FXThreadPool pool(size);
 
-    QTest thread1(&queue);
-    QTest thread2(&queue);
-    QTest thread3(&queue);
-    QTest thread4(&queue);
+  // Set number of threads
+  pool.setMinimumThreads(minimum);
+  pool.setMaximumThreads(maximum);
+  pool.setExpiration(1000000);
 
-    thread1.start();
-    thread2.start();
-    thread3.start();
-    thread4.start();
+  fxmessage("starting %d of maximum of %d threads, keeping at least %d\n",nthreads,maximum,minimum);
 
-    fxmessage("press return\n");
+  // Start context
+  pool.start(nthreads);
 
-    // Wait for user
-    getchar();
+  fxmessage("running: %d!\n",pool.getRunningThreads());
 
-    stopit=true;
-    }
+  getchar();
 
-  // Test context
+  // Test plain thread pool usage
   if(1==test){
-    FXThreadPool pool(size);
 
-    // Set number of threads
-    pool.setMinimumThreads(minimum);
-    pool.setMaximumThreads(maximum);
-    pool.setExpiration(1000000);
+    fxmessage("starting execute: %d jobs...\n",njobs);
 
-    fxmessage("starting %d of maximum of %d threads, keeping at most %d\n",nthreads,maximum,minimum);
-
-    // Start context
-    pool.start(nthreads);
-
-    fxmessage("running: %d!\n",pool.getRunningThreads());
-
-    if(0<njobs){
-      fxmessage("starting execute: %d jobs\n",njobs);
-
-      // Start njobs-1 jobs
-      for(FXuint j=wait; j<njobs; ++j){
-        pool.execute(new Job);
-        }
-
-      // Main thread also runs jobs
-      if(wait){
-        pool.executeAndRun(new Job);
-        }
-      fxmessage("finished execute: %d jobs\n",njobs);
+    // Start njobs-1 jobs
+    for(FXuint j=wait; j<njobs; ++j){
+      pool.execute(new Job);
       }
 
-    fxmessage("running: %d!\n",pool.getRunningThreads());
+    // Main thread also runs jobs
+    if(wait){
+      pool.executeAndRun(new Job);
+      }
 
-    // Stop context
-    fxmessage("stopping...\n");
-    pool.stop();
-    fxmessage("done!\n");
+    fxmessage("...done\n");
     }
 
   // Test task groups
   if(2==test){
-    FXThreadPool pool(size);
-
-    pool.setMinimumThreads(minimum);
-    pool.setMaximumThreads(maximum);
-    pool.setExpiration(1000000);
-
-    fxmessage("starting %d of maximum of %d threads, keeping at most %d\n",nthreads,maximum,minimum);
-
-    pool.start(nthreads);
-
-    fxmessage("running: %d!\n",pool.getRunningThreads());
-
-    fxmessage("main thread %p\n",FXThread::current());
-
-
-    // 8-way parallelism if you got the cores
-    fxmessage("%d-way parallel call...\n",nthreads);
-    FXParallelInvoke(churn,churn,churn,churn,churn,churn,churn,churn);
-    fxmessage("...done\n");
-
     fxmessage("%d-way parallel for-loop...\n",nthreads);
-    FXParallelFor(0U,njobs,1U,pieces,looping);
-    fxmessage("...done\n");
 
-    fxmessage("stopping...\n");
-    pool.stop();
+    // Do somthing in parallel
+    FXParallelFor(0U,njobs,1U,pieces,looping);
+
     fxmessage("...done!\n");
     }
 
   // Test parallel invoke
   if(3==test){
-    FXThreadPool pool(size);
-
-    pool.setMinimumThreads(minimum);
-    pool.setMaximumThreads(maximum);
-    pool.setExpiration(1000000);
-
-    fxmessage("starting %d of maximum of %d threads, keeping at most %d\n",nthreads,maximum,minimum);
-
-    pool.start(nthreads);
-
-    fxmessage("running: %d!\n",pool.getRunningThreads());
-
-    fxmessage("main thread %p\n",FXThread::current());
-
-
-    // 8-way parallelism if you got the cores
     fxmessage("%d-way parallel call...\n",nthreads);
-    FXParallelInvoke(churn,churn,churn,churn,churn,churn,churn,churn);
+
+    // Start parallel churn; some are recursive
+    FXParallelInvoke(churn,churn2,churn,churn,churn,churn,churn2,churn2);
+    fxmessage("halfway\n");
+
+    // Start parallel churn; some are recursive
+    FXParallelInvoke(churn2,churn,churn,churn3,churn,churn,churn,churn2);
+
     fxmessage("...done\n");
     }
+
+  fxmessage("running: %d!\n",pool.getRunningThreads());
+
+  // Wait for user
+  getchar();
+
+  fxmessage("stopping...\n");
+  pool.stop();
+  fxmessage("...done!\n");
   return 0;
   }
 

@@ -305,7 +305,7 @@ FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
         // Determine associations, icons and type
         icon=foldericon;
         if(associations){
-          fileassoc=associations->findDirBinding(path.left(end).text());
+          fileassoc=associations->findDirBinding(path.left(end));
           if(fileassoc && fileassoc->miniicon) icon=fileassoc->miniicon;
           }
 
@@ -370,7 +370,7 @@ FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
       // Determine associations, icons and type
       icon=foldericon;
       if(associations){
-        fileassoc=associations->findDirBinding(path.left(end).text());
+        fileassoc=associations->findDirBinding(path.left(end));
         if(fileassoc && fileassoc->miniicon) icon=fileassoc->miniicon;
         }
 

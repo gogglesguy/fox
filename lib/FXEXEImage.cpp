@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                          G e n e r i c   A r r a y                            *
+*                          E X E   I m a g e   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2014 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,25 +21,28 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
-#include "FXElement.h"
 #include "FXArray.h"
+#include "FXHash.h"
+#include "FXMutex.h"
+#include "FXStream.h"
+#include "FXMemoryStream.h"
+#include "FXString.h"
+#include "FXSize.h"
+#include "FXPoint.h"
+#include "FXRectangle.h"
+#include "FXStringDictionary.h"
+#include "FXSettings.h"
+#include "FXRegistry.h"
+#include "FXEvent.h"
+#include "FXWindow.h"
+#include "FXApp.h"
+#include "FXEXEImage.h"
+
+
 
 /*
   Notes:
-  - FXArrayBase manages the gory details of the buffer representation: an item count
-    followed by the items themselves.
-  - The chosen representation allows an empty array to take up very minimal space
-    only; basically, just a pointer to the memory buffer.
-  - The buffer pointer is never NULL; thus its always safe to reference the buffer
-    pointer.
-  - Alignment is assumed to be 8 for 64-bit systems and 4 for 32-bit systems, same
-    as malloc() returns.
-  - Note sizeof(FXival) == sizeof(FXptr).
 */
-
-
-// Special empty array value
-#define EMPTY   ((FXptr)(__array__empty__+1))
 
 using namespace FX;
 
@@ -48,50 +51,46 @@ using namespace FX;
 namespace FX {
 
 
-// Empty array value
-extern const FXival __array__empty__[];
-const FXival __array__empty__[2]={0,0};
+// Suggested file extension
+const FXchar FXEXEImage::fileExt[]="exe";
 
 
-// Default constructor
-FXArrayBase::FXArrayBase():ptr(EMPTY){
-  }
+// Suggested mime type
+const FXchar FXEXEImage::mimeType[]="application/octet-stream";
 
 
-// Copy constructor
-FXArrayBase::FXArrayBase(const FXArrayBase&):ptr(EMPTY){
-  }
+// Object implementation
+FXIMPLEMENT(FXEXEImage,FXImage,NULL,0)
 
 
-// Change number of items in list
-FXbool FXArrayBase::resize(FXival num,FXival sz){
-  register FXival old=*(((FXival*)ptr)-1);
-  if(__likely(old!=num)){
-    register FXptr p;
-    if(0<num){
-      if(ptr!=EMPTY){
-        if(__unlikely((p=::realloc(((FXival*)ptr)-1,sizeof(FXival)+num*sz))==NULL)) return false;
-        }
-      else{
-        if(__unlikely((p=::malloc(sizeof(FXival)+num*sz))==NULL)) return false;
-        }
-      ptr=((FXival*)p)+1;
-      *(((FXival*)ptr)-1)=num;
-      }
-    else{
-      if(ptr!=EMPTY){
-        ::free(((FXival*)ptr)-1);
-        ptr=EMPTY;
-        }
-      }
+// Initialize
+FXEXEImage::FXEXEImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h,FXint ri,FXint rt):FXImage(a,NULL,opts,w,h),rtype(rt),rid(ri){
+  if(pix){
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
+    loadPixels(ms);
     }
-  return true;
   }
 
 
-// Destructor
-FXArrayBase::~FXArrayBase(){
-  resize(0,0);
+// Can not save pixels
+FXbool FXEXEImage::savePixels(FXStream&) const {
+  return false;
+  }
+
+
+// Load pixel data only
+FXbool FXEXEImage::loadPixels(FXStream& store){
+  FXColor *pixels; FXint w,h;
+  if(fxloadEXE(store,pixels,w,h,rtype,rid)){
+    setData(pixels,IMAGE_OWNED,w,h);
+    return true;
+    }
+  return false;
+  }
+
+
+// Clean up
+FXEXEImage::~FXEXEImage(){
   }
 
 }

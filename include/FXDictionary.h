@@ -25,21 +25,20 @@ namespace FX {
 
 
 /**
-* The dictionary class maintains a fast-access hash table, mapping character
-* strings to pointers.
+* The dictionary class is a fast-access hash table, mapping strings to pointers.
 * Subclasses of dictionary can easily specialize the pointers to pointers to
 * particular types; to this end subclasses must overload certain API's and
 * perform the necessary type-casts for the proper interpretation of the stored
 * pointer values.
-* Note that many complex containers in FOX now fit inside a pointer, and so
+* Note that many complex containers in FOX now fit inside a pointer, and thus
 * these types can be used in dictionaries as well!
 */
 class FXAPI FXDictionary {
 protected:
   struct Entry {
-    FXString  key;       // Key
-    void     *data;      // Value
-    FXuint    hash;      // Hash of key
+    FXString key;       // Key
+    FXptr    data;      // Value
+    FXuint   hash;      // Hash of key
     };
 protected:
   Entry*     table;     // Hash table
@@ -95,43 +94,43 @@ public:
   FXbool has(const FXString& ky) const { return has(ky.text()); }
 
   /// Return reference to slot assocated with given key
-  void*& at(const FXchar* ky);
+  FXptr& at(const FXchar* ky);
 
   /// Return constant reference to slot assocated with given key
-  void *const& at(const FXchar* ky) const;
+  const FXptr& at(const FXchar* ky) const;
 
   /// Return reference to slot assocated with given key
-  void*& at(const FXString& ky){ return at(ky.text()); }
+  FXptr& at(const FXString& ky){ return at(ky.text()); }
 
   /// Return constant reference to slot assocated with given key
-  void *const& at(const FXString& ky) const { return at(ky.text()); }
+  const FXptr& at(const FXString& ky) const { return at(ky.text()); }
 
   /// Return reference to slot assocated with given key
-  void*& operator[](const FXchar* ky){ return at(ky); }
+  FXptr& operator[](const FXchar* ky){ return at(ky); }
 
   /// Return constant reference to slot assocated with given key
-  void *const& operator[](const FXchar* ky) const { return at(ky); }
+  const FXptr& operator[](const FXchar* ky) const { return at(ky); }
 
   /// Return reference to slot assocated with given key
-  void*& operator[](const FXString& ky){ return at(ky); }
+  FXptr& operator[](const FXString& ky){ return at(ky); }
 
   /// Return constant reference to slot assocated with given key
-  void *const& operator[](const FXString& ky) const { return at(ky); }
+  const FXptr& operator[](const FXString& ky) const { return at(ky); }
 
   /// Insert association with given key; return old value, if any
-  void* insert(const FXchar* ky,void* ptr=NULL){ return swap(ptr,at(ky)); }
+  FXptr insert(const FXchar* ky,FXptr ptr=NULL){ return swap(ptr,at(ky)); }
 
   /// Insert association with given key; return old value, if any
-  void* insert(const FXString& ky,void* ptr=NULL){ return swap(ptr,at(ky)); }
+  FXptr insert(const FXString& ky,FXptr ptr=NULL){ return swap(ptr,at(ky)); }
 
   /// Remove association with given key; return old value, if any
-  void* remove(const FXchar* ky);
+  FXptr remove(const FXchar* ky);
 
   /// Remove association with given key; return old value, if any
-  void* remove(const FXString& ky){ return remove(ky.text()); }
+  FXptr remove(const FXString& ky){ return remove(ky.text()); }
 
   /// Erase data at pos in the table; return old value, if any
-  void* erase(FXival pos);
+  FXptr erase(FXival pos);
 
   /// Return true if slot is empty.
   FXbool empty(FXival pos) const { return table[pos].key.empty(); }
@@ -140,10 +139,10 @@ public:
   const FXString& key(FXival pos) const { return table[pos].key; }
 
   /// Return reference to slot at position pos
-  void*& data(FXival pos){ return table[pos].data; }
+  FXptr& data(FXival pos){ return table[pos].data; }
 
   /// Return constant reference to slot at position pos
-  void *const& data(FXival pos) const { return table[pos].data; }
+  const FXptr& data(FXival pos) const { return table[pos].data; }
 
   /// Clear entire table
   void clear();

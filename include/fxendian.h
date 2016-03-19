@@ -26,7 +26,7 @@ namespace FX {
 
 
 // Bit reverse in a byte
-inline FXuchar reverse8(FXuchar x){
+static inline FXuchar reverse8(FXuchar x){
   x=((x<<1)&0xAA) | ((x>>1)&0x55);
   x=((x<<2)&0xCC) | ((x>>2)&0x33);
   return (x<<4) | (x>>4);
@@ -34,7 +34,7 @@ inline FXuchar reverse8(FXuchar x){
 
 
 // Bit reverse in a unsigned short
-inline FXushort reverse16(FXushort x){
+static inline FXushort reverse16(FXushort x){
   x=((x<<1)&0xAAAA) | ((x>>1)&0x5555);
   x=((x<<2)&0xCCCC) | ((x>>2)&0x3333);
   x=((x<<4)&0xF0F0) | ((x>>4)&0x0F0F);
@@ -43,7 +43,7 @@ inline FXushort reverse16(FXushort x){
 
 
 // Bit reverse in an unsigned integer
-inline FXuint reverse32(FXuint x){
+static inline FXuint reverse32(FXuint x){
   x=((x<<1)&0xAAAAAAAA) | ((x>>1)&0x55555555);
   x=((x<<2)&0xCCCCCCCC) | ((x>>2)&0x33333333);
   x=((x<<4)&0xF0F0F0F0) | ((x>>4)&0x0F0F0F0F);
@@ -53,7 +53,7 @@ inline FXuint reverse32(FXuint x){
 
 
 // Bit reverse in an unsigned long
-inline FXulong reverse64(FXulong x){
+static inline FXulong reverse64(FXulong x){
   x=((x<< 1)&FXULONG(0xAAAAAAAAAAAAAAAA)) | ((x>> 1)&FXULONG(0x5555555555555555));
   x=((x<< 2)&FXULONG(0xCCCCCCCCCCCCCCCC)) | ((x>> 2)&FXULONG(0x3333333333333333));
   x=((x<< 4)&FXULONG(0xF0F0F0F0F0F0F0F0)) | ((x>> 4)&FXULONG(0x0F0F0F0F0F0F0F0F));
@@ -64,7 +64,7 @@ inline FXulong reverse64(FXulong x){
 
 
 // Byte swap unsigned short
-inline FXushort swap16(FXushort x){
+static inline FXushort swap16(FXushort x){
 #if (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   __asm__ __volatile__("rorw $8,%0\n\t" : "=r"(x) : "0"(x) : "cc");
   return x;
@@ -77,7 +77,7 @@ inline FXushort swap16(FXushort x){
 
 
 // Byte swap unsiged int
-inline FXuint swap32(FXuint x){
+static inline FXuint swap32(FXuint x){
 #if (defined(__GNUC__) && ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))))
   return __builtin_bswap32(x);
 #elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
@@ -93,7 +93,7 @@ inline FXuint swap32(FXuint x){
 
 
 // Byte swap unsigned long
-inline FXulong swap64(FXulong x){
+static inline FXulong swap64(FXulong x){
 #if (defined(__GNUC__) && ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))))
   return __builtin_bswap64(x);
 #elif (defined(__GNUC__) && defined(__i386__))
@@ -114,6 +114,71 @@ inline FXulong swap64(FXulong x){
   return (x>>32)|(x<<32);
 #endif
   }
+
+
+// Isolate least significant bit set
+static inline FXuint lsb32(FXuint x){
+  return (x&(-x));
+  }
+
+
+// Isolate most significant bit set
+static inline FXuint msb32(FXuint x){
+  x|=(x>>1);
+  x|=(x>>2);
+  x|=(x>>4);
+  x|=(x>>8);
+  x|=(x>>16);
+  return x-(x>>1);
+  }
+
+
+// Count one-bits in non-zero integer
+static inline FXuint pop32(FXuint x){
+#if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
+  return __builtin_popcount(x);
+#else
+  x=x-((x>>1)&0x55555555); 
+  x=(x&0x33333333)+((x>>2)&0x33333333); 
+  x=(x+(x>>4))&0x0F0F0F0F; 
+  x=x+(x>>8); 
+  x=x+(x>>16); 
+  return (x&0x3F); 
+#endif
+  }
+  
+  
+// Count leading zeros in non-zero integer
+static inline FXuint clz32(FXuint x){
+#if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
+  return __builtin_clz(x);
+#else
+  register unsigned int f,e,d,c,b;
+  f=!(x&0xffff0000)<<4; x<<=f;
+  e=!(x&0xff000000)<<3; x<<=e;
+  d=!(x&0xf0000000)<<2; x<<=d;
+  c=!(x&0xC0000000)<<1; x<<=c;
+  b=!(x&0x80000000);
+  return f+e+d+c+b;
+#endif
+  }  
+
+
+// Count trailing zeros in non-zero integer
+static inline FXuint ctz32(FXuint x){
+#if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
+  return __builtin_ctz(x);
+#else
+  register unsigned int f,e,d,c,b;
+  f=!(x&0x0000ffff)<<4; x>>=f;
+  e=!(x&0x000000ff)<<3; x>>=e;
+  d=!(x&0x0000000f)<<2; x>>=d;
+  c=!(x&0x00000003)<<1; x>>=c;
+  b=!(x&0x00000001);
+  return f+e+d+c+b;
+#endif
+  }  
+
 
 }
 

@@ -70,7 +70,6 @@ public:
 */
 extern FXAPI FXbool fxcheckBMP(FXStream& store);
 
-
 /**
 * Load an BMP (Microsoft Bitmap) file from a stream.
 * Upon successful return, the pixel array and size are returned.
@@ -78,11 +77,22 @@ extern FXAPI FXbool fxcheckBMP(FXStream& store);
 */
 extern FXAPI FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 
-
 /**
 * Save an BMP (Microsoft Bitmap) file to a stream.
 */
 extern FXAPI FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height);
+
+/**
+* Load DIB (Device Independent Bitmap) file from stream.
+* Upon successful return, the pixel array and size are returned.
+* If an error occurred, the pixel array is set to NULL.
+*/
+extern FXAPI FXbool fxloadDIB(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+
+/**
+* Save an DIB (Device Independent Bitmap) file to a stream.
+*/
+extern FXAPI FXbool fxsaveDIB(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 #endif
 

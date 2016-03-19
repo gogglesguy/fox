@@ -366,7 +366,7 @@ public:
   FXHeader* getHeader() const { return header; }
 
   /// Set headers from array of strings
-  void setHeaders(const FXchar** strings,FXint size=1);
+  void setHeaders(const FXchar *const *strings,FXint size=1);
 
   /// Set headers from array of strings
   void setHeaders(const FXString* strings,FXint size=1);
@@ -417,7 +417,7 @@ public:
   FXFoldingItem* getLastItem() const { return lastitem; }
 
   /// Fill list by appending items from array of strings
-  FXint fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
+  FXint fillItems(FXFoldingItem* father,const FXchar *const *strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from array of strings
   FXint fillItems(FXFoldingItem* father,const FXString* strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);

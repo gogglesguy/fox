@@ -207,7 +207,7 @@ FXStringDictionary& FXSettings::at(const FXchar* ky){
     p=(p<<2)+p+b+1;
     b>>=BSHIFT;
     }
-  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXSettings2::at: out of memory\n"); }
+  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXSettings::at: out of memory\n"); }
   p=b=h;
   while(table[x=p&(no()-1)].hash){
     if(table[x].key.empty()) goto y;                    // Return voided slot

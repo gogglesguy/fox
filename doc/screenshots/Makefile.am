@@ -37,6 +37,7 @@ goggles.png \
 igscanner-screenshot-small.png \
 imagedebugger.gif \
 inload.jpg \
+jorobus_small.png \
 openspace.gif \
 pathfinder.png \
 pdiary.jpg \

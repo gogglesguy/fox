@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                        I C O   I c o n   O b j e c t                          *
+*                        E X E   I c o n   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2014 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2014 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,8 +18,8 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 ********************************************************************************/
-#ifndef FXICOICON_H
-#define FXICOICON_H
+#ifndef FXEXEICON_H
+#define FXEXEICON_H
 
 #ifndef FXICON_H
 #include "FXIcon.h"
@@ -28,21 +28,36 @@
 namespace FX {
 
 
-/// ICO (Microsoft icon format) icon
-class FXAPI FXICOIcon : public FXIcon {
-  FXDECLARE(FXICOIcon)
+/// Icon from resource in Microsoft Windows executable
+class FXAPI FXEXEIcon : public FXIcon {
+  FXDECLARE(FXEXEIcon)
 protected:
-  FXICOIcon(){}
+  FXint rtype;          // Resource type
+  FXint rid;            // Resource id
+protected:
+  FXEXEIcon(){}
 private:
-  FXICOIcon(const FXICOIcon&);
-  FXICOIcon &operator=(const FXICOIcon&);
+  FXEXEIcon(const FXEXEIcon&);
+  FXEXEIcon &operator=(const FXEXEIcon&);
 public:
   static const FXchar fileExt[];
   static const FXchar mimeType[];
 public:
 
-  /// Construct icon from memory stream formatted in Microsoft icon format
-  FXICOIcon(FXApp* a,const void *pix=NULL,FXColor clr=FXRGB(192,192,192),FXuint opts=0,FXint w=1,FXint h=1);
+  /// Construct icon from memory stream comprising Microsoft Windows executable
+  FXEXEIcon(FXApp* a,const void *pix=NULL,FXColor clr=FXRGB(192,192,192),FXuint opts=0,FXint w=1,FXint h=1,FXint ri=-1,FXint rt=3);
+
+  /// Set resource group (type) to load from
+  void setResType(FXint rt){ rtype=rt; }
+
+  /// Get resource group (type)
+  FXint getResType() const { return rtype; }
+
+  /// Set resource id to load
+  void setResId(FXint ri){ rid=ri; }
+
+  /// Get resource id
+  FXint getResId() const { return rid; }
 
   /// Save pixels into stream in Microsoft icon format format
   virtual FXbool savePixels(FXStream& store) const;
@@ -51,30 +66,23 @@ public:
   virtual FXbool loadPixels(FXStream& store);
 
   /// Destroy icon
-  virtual ~FXICOIcon();
+  virtual ~FXEXEIcon();
   };
 
 
-#ifndef FXLOADICO
-#define FXLOADICO
+#ifndef FXLOADEXE
+#define FXLOADEXE
 
 /**
-* Check if stream contains a ICO, return true if so.
+* Check if stream represents a Windows executable.
 */
-extern FXAPI FXbool fxcheckICO(FXStream& store);
+extern FXAPI FXbool fxcheckEXE(FXStream& store);
+
 
 /**
-* Load an ICO (Microsoft icon format) file from a stream.
-* Upon successful return, the pixel array and size are returned.
-* If an error occurred, the pixel array is set to NULL.
+* Pull an icon from a Microsoft Windows executable; try and load resource id under resource group type.
 */
-extern FXAPI FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot);
-
-/**
-* Save an ICO (Microsoft icon format) file to a stream.
-* If no hot-spot given, save as an ICO instead of a CUR resource.
-*/
-extern FXAPI FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot=-1,FXint yspot=-1);
+extern FXAPI FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint type,FXint id);
 
 #endif
 

@@ -364,11 +364,11 @@ FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
 fxddsio.cpp \
+fxexeio.cpp \
 fxezquantize.cpp \
 fxfsquantize.cpp \
 fxgetticks.cpp \
 fxgifio.cpp \
-fxicoio.cpp \
 fxiffio.cpp \
 fxjp2io.cpp \
 fxjpegio.cpp \

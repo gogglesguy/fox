@@ -46,6 +46,7 @@
 #include "FXXBMIcon.h"
 #include "FXXPMIcon.h"
 #include "FXDDSIcon.h"
+#include "FXEXEIcon.h"
 
 // Built-in image formats
 #include "FXBMPImage.h"
@@ -60,6 +61,7 @@
 #include "FXXBMImage.h"
 #include "FXXPMImage.h"
 #include "FXDDSImage.h"
+#include "FXEXEImage.h"
 
 // Formats requiring external libraries
 #ifndef CORE_IMAGE_FORMATS
@@ -162,6 +164,9 @@ FXIcon *FXIconSource::iconFromType(FXApp* app,const FXString& type) const {
   if(comparecase(FXDDSIcon::fileExt,type)==0){
     return new FXDDSIcon(app);
     }
+  if(comparecase(FXEXEIcon::fileExt,type)==0){
+    return new FXEXEIcon(app);
+    }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H
   if(comparecase(FXJPGIcon::fileExt,type)==0 || comparecase("jpeg",type)==0){
@@ -231,6 +236,9 @@ FXImage *FXIconSource::imageFromType(FXApp* app,const FXString& type) const {
   if(comparecase(FXDDSImage::fileExt,type)==0){
     return new FXDDSImage(app);
     }
+  if(comparecase(FXEXEImage::fileExt,type)==0){
+    return new FXEXEImage(app);
+    }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H
   if(comparecase(FXJPGImage::fileExt,type)==0 || comparecase("jpeg",type)==0){
@@ -287,6 +295,9 @@ FXIcon *FXIconSource::iconFromStream(FXApp* app,FXStream& store) const {
     }
   if(fxcheckDDS(store)){
     return new FXDDSIcon(app);
+    }
+  if(fxcheckEXE(store)){
+    return new FXEXEIcon(app);
     }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H
@@ -356,6 +367,9 @@ FXImage *FXIconSource::imageFromStream(FXApp* app,FXStream& store) const {
     }
   if(fxcheckDDS(store)){
     return new FXDDSImage(app);
+    }
+  if(fxcheckEXE(store)){
+    return new FXEXEImage(app);
     }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H

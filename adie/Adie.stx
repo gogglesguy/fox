@@ -344,7 +344,7 @@ language "C++"
   end
 
   rule "FOXType"
-    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXptr|FXColor|FXPixel|FXTime|FXID|FXString)\>"
+    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXptr|FXColor|FXPixel|FXTime)\>"
   end
 
   rule "Keyword"

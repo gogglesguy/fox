@@ -31,10 +31,11 @@ namespace FX {
 /**
 * FXScopedThread is a kind of thread which automatically performs a thread
 * join to clean up the thread when going out of scope.
-* Scoped threads should not be detached, as this would prevent a successful
+* Scoped Threads should not be detached, as this would prevent a successful
 * join().
-* Note that Scoped thread does not forcibly terminate the thread, and thus
-* allows the thread function run() to conclude gracefully.
+* Note that Scoped Thread does not forcibly terminate the thread, and thus
+* allows the thread function run() to conclude gracefully; calling thread
+* waits inside join() until thread is done.
 */
 class FXAPI FXScopedThread : public FXThread {
 private:

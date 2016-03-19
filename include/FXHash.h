@@ -85,7 +85,7 @@ public:
   /**
   * Assign from another table.
   */
-  FXHash &operator=(const FXHash&);
+  FXHash &operator=(const FXHash& other);
 
   /**
   * Adopt table from another; the other table becomes empty.

@@ -2209,7 +2209,7 @@ FXTreeItem* FXTreeList::prependItem(FXTreeItem* father,const FXString& text,FXIc
 
 
 // Fill list by appending items from array of strings
-FXint FXTreeList::fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
+FXint FXTreeList::fillItems(FXTreeItem* father,const FXchar *const *strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){

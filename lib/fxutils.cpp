@@ -44,9 +44,6 @@
 
 using namespace FX;
 
-// Allows GNU autoconfigure to find FOX
-extern "C" FXAPI void fxfindfox(void){ }
-
 
 /*******************************************************************************/
 
@@ -54,9 +51,11 @@ namespace FX {
 
 
 // Furnish our own versions
-extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 extern FXAPI FXuint __strtoul(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
+
+// Allows GNU autoconfigure to find FOX
+extern "C" FXAPI void fxfindfox(void){ }
 
 
 // Global flag which controls tracing level.
@@ -638,16 +637,29 @@ FXbool fxIsInf(FXdouble number){
   }
 
 
-// Text for not-a-number float
+// Test for not-a-number float
 FXbool fxIsNan(FXfloat number){
   return (((FloatStruct*)&number)->n.e==255) && (((FloatStruct*)&number)->n.m!=0);
   }
 
 
-// Text for not-a-number double
+// Test for not-a-number double
 FXbool fxIsNan(FXdouble number){
   return (((DoubleStruct*)&number)->n.e==2047) && !((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
   }
+
+
+// Return sign bit of float
+FXint fxSignBit(FXfloat number){
+  return ((FloatStruct*)&number)->n.s;
+  }
+
+
+// Return sign bit of double
+FXint fxSignBit(FXdouble number){
+  return ((DoubleStruct*)&number)->n.s;
+  }
+
 
 
 // Table of 1E+0,...1E+31, in steps of 1

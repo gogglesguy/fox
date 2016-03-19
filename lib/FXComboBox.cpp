@@ -424,7 +424,7 @@ FXint FXComboBox::setItem(FXint index,const FXString& text,FXptr ptr,FXbool noti
 
 
 // Fill list by appending items from array of strings
-FXint FXComboBox::fillItems(const FXchar** strings,FXbool notify){
+FXint FXComboBox::fillItems(const FXchar *const *strings,FXbool notify){
   register FXint numberofitems=list->getNumItems();
   register FXint n=list->fillItems(strings);
   recalc();

@@ -21,18 +21,87 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxascii.h"
+#include "fxunicode.h"
 #include "FXArray.h"
 #include "FXHash.h"
+#include "FXStream.h"
+#include "FXString.h"
 #include "FXElement.h"
 #include "FXStream.h"
 
 
 /*
   Notes:
-  - Load icon from Windows Executable (or EXE or DLL).
-  - Only works on Windows.
+  - Load icon from resource in Microsoft Windows executable.
+
+  - Useful to display correct icon inside file list widgets.
+
+  - Operation:
+
+     o Scan portable execution header for resource segment.
+     o Burrow down resource directories matching resource type and id.
+     o Then, depending on resource type, use fxloadBMP() or fxloadICO() to pluck
+       the resource apart into the desired image pixel data.
+
+  - Not the entire executable image is scanned; thus, potential problem exists
+    because we have no way of determining the end of the stream. Thus there is
+    no way these can be embedded in a stream of other things as the stream-
+    pointer is left somewhere in the resource segment of the executable image.
+
+  - Thankfully this is not a major issue in most cases.
 */
 
+// Maximum recursion level
+#define MAXRECLEVEL 3
+
+// Executable file signatures
+#define IMAGE_DOS_SIGNATURE             0x5A4D          // MZ
+#define IMAGE_OS2_SIGNATURE             0x454E          // NE
+#define IMAGE_OS2_SIGNATURE_LE          0x454C          // LE
+#define IMAGE_VXD_SIGNATURE             0x454C          // LE
+#define IMAGE_NT_SIGNATURE              0x00004550      // PE00
+
+// Optional header magic numbers
+#define IMAGE_NT_OPTIONAL_HDR32_MAGIC   0x10b
+#define IMAGE_NT_OPTIONAL_HDR64_MAGIC   0x20b
+
+// Image data directory entries
+#define IMAGE_DIRECTORY_ENTRY_EXPORT          0   // Export Directory
+#define IMAGE_DIRECTORY_ENTRY_IMPORT          1   // Import Directory
+#define IMAGE_DIRECTORY_ENTRY_RESOURCE        2   // Resource Directory
+#define IMAGE_DIRECTORY_ENTRY_EXCEPTION       3   // Exception Directory
+#define IMAGE_DIRECTORY_ENTRY_SECURITY        4   // Security Directory
+#define IMAGE_DIRECTORY_ENTRY_BASERELOC       5   // Base Relocation Table
+#define IMAGE_DIRECTORY_ENTRY_DEBUG           6   // Debug Directory
+#define IMAGE_DIRECTORY_ENTRY_COPYRIGHT       7   // (X86 usage)
+#define IMAGE_DIRECTORY_ENTRY_ARCHITECTURE    7   // Architecture Specific Data
+#define IMAGE_DIRECTORY_ENTRY_GLOBALPTR       8   // RVA of GP
+#define IMAGE_DIRECTORY_ENTRY_TLS             9   // TLS Directory
+#define IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG    10   // Load Configuration Directory
+#define IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT   11   // Bound Import Directory in headers
+#define IMAGE_DIRECTORY_ENTRY_IAT            12   // Import Address Table
+#define IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT   13   // Delay Load Import Descriptors
+#define IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR 14   // COM Runtime descriptor
+
+// Image resource directory entry flag bits
+#define IMAGE_RESOURCE_NAME_IS_STRING        0x80000000
+#define IMAGE_RESOURCE_DATA_IS_DIRECTORY     0x80000000
+
+// Resource types
+#define RST_CURSOR        1
+#define RST_BITMAP        2
+#define RST_ICON          3
+#define RST_MENU          4
+#define RST_DIALOG        5
+#define RST_STRING        6
+#define RST_FONTDIR       7
+#define RST_FONT          8
+#define RST_ACCELERATOR   9
+#define RST_RCDATA        10
+#define RST_MESSAGELIST   11
+#define RST_GROUP_CURSOR  12
+#define RST_GROUP_ICON    14
 
 using namespace FX;
 
@@ -40,346 +109,465 @@ using namespace FX;
 
 namespace FX {
 
-
-#if defined(WIN32)
+// Declarations
 extern FXAPI FXbool fxcheckEXE(FXStream& store);
-extern FXAPI FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-#endif
+extern FXAPI FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint type,FXint id);
+
+// From BMP loader
+extern FXAPI FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxloadDIB(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+
+// From ICO loader
+extern FXAPI FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot);
+extern FXAPI FXbool fxloadICOStream(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 
 
-#if defined(WIN32)
-
-/*******************************************************************************/
-#if 0
-
-#pragma pack( push )
-#pragma pack( 2 )
-
-typedef struct {
-  BYTE bWidth;
-  BYTE bHeight;
-  BYTE bColorCount;
-  BYTE bReserved;
-  WORD wPlanes;
-  WORD wBitCount;
-  DWORD dwBytesInRes;
-  WORD nID;
-  } MEMICONDIRENTRY, *LPMEMICONDIRENTRY;
-
-typedef struct {
-  WORD idReserved;
-  WORD idType;
-  WORD idCount;
-  MEMICONDIRENTRY idEntries[1];
-  } MEMICONDIR, *LPMEMICONDIR;
-
-#pragma pack( pop )
-
-typedef struct {
-  BYTE bWidth;
-  BYTE bHeight;
-  BYTE bColorCount;
-  BYTE bReserved;
-  WORD wPlanes;
-  WORD wBitCount;
-  DWORD dwBytesInRes;
-  DWORD dwImageOffset;
-  } ICONDIRENTRY, *LPICONDIRENTRY;
+// DOS file header
+struct ImageDosHeader {
+  FXushort   magic;                     // Magic number
+  FXushort   cblp;                      // Bytes on last page of file
+  FXushort   cp;                        // Pages in file
+  FXushort   crlc;                      // Relocations
+  FXushort   cparhdr;                   // Size of header in paragraphs
+  FXushort   minalloc;                  // Minimum extra paragraphs needed
+  FXushort   maxalloc;                  // Maximum extra paragraphs needed
+  FXushort   ss;                        // Initial (relative) SS value
+  FXushort   sp;                        // Initial SP value
+  FXushort   csum;                      // Checksum
+  FXushort   ip;                        // Initial IP value
+  FXushort   cs;                        // Initial (relative) CS value
+  FXushort   lfarlc;                    // File address of relocation table
+  FXushort   ovno;                      // Overlay number
+  FXushort   res[4];                    // Reserved words
+  FXushort   oemid;                     // OEM identifier (for e_oeminfo)
+  FXushort   oeminfo;                   // OEM information; e_oemid specific
+  FXushort   res2[10];                  // Reserved words
+  FXuint     lfanew;                    // File address of new exe header
+  };
 
 
-static char *arg_output;
-static int arg_verbose = false;
-static int count;
+// Image file header
+struct ImageFileHeader {
+  FXushort   machine;                   // CPU architecture
+  FXushort   numberOfSections;          // Number of sections in section table
+  FXuint     timeDateStamp;             // Date and time of program link
+  FXuint     pointerToSymbolTable;      // RVA of symbol table
+  FXuint     numberOfSymbols;           // Number of symbols in table
+  FXushort   sizeOfOptionalHeader;      // Size of IMAGE_OPTIONAL_HEADER in bytes
+  FXushort   characteristics;           // Flag bits
+  };
 
-#define prgname "extrico"
 
-char *
-basename_no_extension(filename)
-  char *filename;
-{
-	char *str, *str2;
-	int len;
+// Portable executable file header
+struct ImageNTHeader {
+  FXuint          signature;
+  ImageFileHeader fileHeader;
+  };
 
-	str = strrchr(filename, '\\');
-	if (str && str[1]) {
-		str = &str[1];
-	} else {
-		str = strrchr(filename, ':');
-		if (str && str[1])
-			str = &str[1];
-		else
-			str = filename;
-	}
 
-	str2 = strrchr(str, '.');
-	if (str2)
-		len = str2 - str + 1;
-	else
-		len = strlen(str) + 1;
+// Data Directory
+struct ImageDataDirectory {
+  FXuint     virtualAddress;            // RVA of table
+  FXuint     size;                      // Size of table
+  };
 
-	str2 = (char *) malloc(len);
-	if (str2) {
-		memcpy(str2, str, len-1);
-		str2[len] = 0;
-		return str2;
-	}
 
-	return str;
-}
+// Optional Header
+struct ImageOptionalHeader32 {
+  FXushort   magic;                     // IMAGE_NT_OPTIONAL_HDR32_MAGIC
+  FXuchar    majorLinkerVersion;        // Linker version
+  FXuchar    minorLinkerVersion;
+  FXuint     sizeOfCode;                // Size of .text in bytes
+  FXuint     sizeOfInitializedData;     // Size of .bss (and others) in bytes
+  FXuint     sizeOfUninitializedData;   // Size of .data,.sdata etc in bytes
+  FXuint     addressOfEntryPoint;       // RVA of entry point
+  FXuint     baseOfCode;                // Base of .text
+  FXuint     baseOfData;                // Base of .data
+  FXuint     imageBase;                 // Image base VA
+  FXuint     sectionAlignment;          // File section alignment
+  FXuint     fileAlignment;             // File alignment
+  FXushort   majorOperatingSystemVersion;
+  FXushort   minorOperatingSystemVersion;
+  FXushort   majorImageVersion;         // Version of program
+  FXushort   minorImageVersion;
+  FXushort   majorSubsystemVersion;     // Windows specific. Version of SubSystem
+  FXushort   minorSubsystemVersion;
+  FXuint     win32VersionValue;
+  FXuint     sizeOfImage;               // Size of image in bytes
+  FXuint     sizeOfHeaders;             // Size of headers (and stub program) in bytes
+  FXuint     checksum;
+  FXushort   subsystem;
+  FXushort   dllCharacteristics;        // DLL properties
+  FXuint     sizeOfStackReserve;        // Size of stack, in bytes
+  FXuint     sizeOfStackCommit;         // Size of stack to commit
+  FXuint     sizeOfHeapReserve;         // Size of heap, in bytes
+  FXuint     sizeOfHeapCommit;          // Size of heap to commit
+  FXuint     loaderFlags;
+  FXuint     numberOfRvaAndSizes;       // Number of entries in dataDirectory
+  ImageDataDirectory dataDirectory[16];
+  };
 
-int
-xwrite(file, data, size)
-  HANDLE file;
-  void *data;
-  DWORD size;
-{
-	DWORD written_count;
 
-	if (!WriteFile(file, data, size, &written_count, NULL)) {
-		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-        return false;
-    }
+// Optional Header
+struct ImageOptionalHeader64 {
+  FXushort   magic;                     // IMAGE_NT_OPTIONAL_HDR64_MAGIC
+  FXuchar    majorLinkerVersion;        // Linker version
+  FXuchar    minorLinkerVersion;
+  FXuint     sizeOfCode;                // Size of .text in bytes
+  FXuint     sizeOfInitializedData;     // Size of .bss (and others) in bytes
+  FXuint     sizeOfUninitializedData;   // Size of .data,.sdata etc in bytes
+  FXuint     addressOfEntryPoint;       // RVA of entry point
+  FXuint     baseOfCode;                // Base of .text
+  FXulong    imageBase;                 // Base of .data
+  FXuint     sectionAlignment;          // File section alignment
+  FXuint     fileAlignment;             // File alignment
+  FXushort   majorOperatingSystemVersion;
+  FXushort   minorOperatingSystemVersion;
+  FXushort   majorImageVersion;         // Version of program
+  FXushort   minorImageVersion;
+  FXushort   majorSubsystemVersion;
+  FXushort   minorSubsystemVersion;
+  FXuint     win32VersionValue;
+  FXuint     sizeOfImage;               // Size of image in bytes
+  FXuint     sizeOfHeaders;             // Size of headers (and stub program) in bytes
+  FXuint     checksum;
+  FXushort   subsystem;
+  FXushort   dllCharacteristics;        // DLL properties
+  FXulong    sizeOfStackReserve;        // Size of stack, in bytes
+  FXulong    sizeOfStackCommit;         // Size of stack to commit
+  FXulong    sizeOfHeapReserve;         // Size of heap, in bytes
+  FXulong    sizeOfHeapCommit;          // Size of heap to commit
+  FXuint     loaderFlags;
+  FXuint     numberOfRvaAndSizes;       // Number of entries in dataDirectory
+  ImageDataDirectory dataDirectory[16];
+  };
 
-    if(written_count != size) {
-		fprintf(stderr, "%s: Could not write all data.\n", prgname);
-        return false;
-	}
 
-	return true;
-}
+// Optional header
+union ImageOptionalHeader {
+  ImageOptionalHeader32 pe32;           // 32 bit version
+  ImageOptionalHeader64 pe64;           // 64 bit version
+  };
 
-int
-write_icon_to_file (library, icon, filename)
-  HANDLE library;
-  LPMEMICONDIR icon;
-  LPCTSTR filename;
-{
-	HANDLE file;
-	WORD output;
-	int c;
 
-	/* open file */
-	file = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-	  FILE_ATTRIBUTE_NORMAL, NULL);
-	if (file == INVALID_HANDLE_VALUE) {
-		fprintf(stderr, "%s: %s: %s\n", prgname, filename, errorstr());
-		return false;
-	}
+// Section header
+struct ImageSectionHeader {
+  FXchar     name[8];                   // Name, e.g. .text
+  FXuint     virtualSize;               // Virtual size (may be bigger than sizeOfRawData)
+  FXuint     virtualAddress;            // Offset of first byte relative to imageBase
+  FXuint     sizeOfRawData;             // Size of raw data
+  FXuint     pointerToRawData;          // Pointer to raw data in COFF
+  FXuint     pointerToRelocations;
+  FXuint     pointerToLinenumbers;
+  FXushort   numberOfRelocations;
+  FXushort   numberOfLinenumbers;
+  FXuint     characteristics;
+  };
 
-	/* write icon file header */
-	output = 0;	/* reserved */
-	if (!xwrite(file, &output, sizeof(WORD))) {
-		CloseHandle(file);
-		return false;
-	}
-    output = 1;	/* type */
-	if (!xwrite(file, &output, sizeof(WORD))) {
-		CloseHandle(file);
-		return false;
-	}
-	output = icon->idCount;	/* number of images */
-	if (!xwrite(file, &output, sizeof(WORD))) {
-		CloseHandle(file);
-		return false;
-	}
 
- 	/* write ICONDIRENTRY for each image */
-	for (c=0; c < icon->idCount; c++) {
-        int d;
-        ICONDIRENTRY icon_dir_entry;
+// Resource Name (8-bit characters)
+struct ImageResourceDirectoryString {
+  FXushort   length;
+  FXchar     nameString[1];
+  };
 
-		/* convert to ICONDIRENTRY */
-		icon_dir_entry.bWidth = icon->idEntries[c].bWidth;
-		icon_dir_entry.bHeight = icon->idEntries[c].bHeight;
-		icon_dir_entry.bColorCount = icon->idEntries[c].bColorCount;
-		icon_dir_entry.bReserved = 0;
-		icon_dir_entry.wPlanes = icon->idEntries[c].wPlanes;
-		icon_dir_entry.wBitCount = icon->idEntries[c].wBitCount;
-		icon_dir_entry.dwBytesInRes = icon->idEntries[c].dwBytesInRes;
 
-		/* calculate image offset */
-		icon_dir_entry.dwImageOffset = 3*sizeof(WORD) + icon->idCount*sizeof(ICONDIRENTRY);
-		for (d=0; d < c; d++)
-			icon_dir_entry.dwImageOffset += icon->idEntries[d].dwBytesInRes;
+// Resource Name (16-bit characters)
+struct ImageResourceDirectoryStringW {
+  FXushort   length;
+  FXnchar    nameString[1];
+  };
 
-		/* output the ICONDIRENTRY */
-		if (!xwrite(file, &icon_dir_entry, sizeof(ICONDIRENTRY))) {
-			CloseHandle(file);
-			return false;
-		}
-	}
 
-	/* write image data bits for each image */
-	for (c=0; c < icon->idCount; c++) {
-		HRSRC resource;
-		HGLOBAL memory;
+// Resource directory entry
+struct ImageResourceDirectoryEntry {
+  FXuint name;
+  FXuint data;
+  };
 
-		/* find the separate icon resource */
-		resource = FindResource (library, MAKEINTRESOURCE(icon->idEntries[c].nID), RT_ICON);
-		if (!resource) {
-			fprintf(stderr, "%s: %s\n", prgname, errorstr());
-			CloseHandle(file);
-			return false;
-		}
-		/* load the resource */
-		memory = LoadResource (library, resource);
-		if (!memory) {
-			fprintf(stderr, "%s: %s\n", prgname, errorstr());
-			CloseHandle(file);
-			return false;
-		}
 
-		/* output the image data */
-		if (!xwrite(file, LockResource(memory), SizeofResource(library, resource))) {
-			CloseHandle(file);
-			return false;
-		}
-	}
+// Resource directory
+struct ImageResourceDirectory {
+  FXuint     characteristics;
+  FXuint     timeDateStamp;
+  FXushort   majorVersion;
+  FXushort   minorVersion;
+  FXushort   numberOfNamedEntries;
+  FXushort   numberOfIdEntries;
+  };
 
-	CloseHandle(file);
 
-	return true;
-}
+// Resource directory entry
+struct ImageResourceDataEntry {
+  FXuint     offsetToData;
+  FXuint     size;
+  FXuint     codePage;
+  FXuint     reserved;
+  };
 
-BOOL CALLBACK resource_enum (module, type, name, param)
-  HANDLE module;
-  LPCTSTR type;
-  LPTSTR name;
-  LONG param;
-{
-	char *filename;
-	HRSRC resource;
-	HGLOBAL memory;
-	LPMEMICONDIR icon;
-	char dest_filename[1000];
 
-	filename = (char *) param;
-
-    /* if high word of name is zero, name is from MAKEINTRESOURCE() */
-	if (!HIWORD(name))
-		sprintf(dest_filename, "%s%s-%d.ico", (arg_output ? arg_output : ""), basename_no_extension(filename), name);
-    else
-		sprintf(dest_filename, "%s%s-%s.ico", (arg_output ? arg_output : ""), basename_no_extension(filename), name);
-
-	/* find this resource */
-	resource = FindResource(module, name, type);
-	if (!resource) {
-		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		return true;
-	}
-	/* load the resource */
-	memory = LoadResource(module, resource);
-	if (!resource) {
-		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		return true;
-	}
-	/* lock the resource */
-	icon = LockResource(memory);
-	if (!icon) {
-		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		return true;
-	}
-
-	if (arg_verbose)
-		printf("%s [%d] => %s\n", filename, count, dest_filename);
-	count++;
-
-	/* write icon to file */
-	if (!write_icon_to_file(module, icon, dest_filename)) {
-		return true;
-	}
-
-	return true;
-}
-
-int
-extract_icons_from_library(filename)
-  char *filename;
-{
-	HINSTANCE library;
-
-	/* load the DLL/EXE file */
-	library = LoadLibraryEx(filename, NULL, LOAD_LIBRARY_AS_DATAFILE);
-	if (!library) {
-		fprintf(stderr, "%s: %s: %s\n", prgname, filename, errorstr());
-		return 1;
-	}
-
-	/* list all icons in file */
-	if (!EnumResourceNames(library, RT_GROUP_ICON, resource_enum, (LONG) filename)) {
-		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		FreeLibrary (library);
-		return 1;
-	}
-
-	/* free library */
-	if (!FreeLibrary (library)) {
-		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-	}
-}
-
-#endif
+// Resource loader context
+struct Context {
+  FXuint pointer;               // Pointer in pe
+  FXuint address;               // Relocated virtual address
+  FXuint size;                  // Size of resource
+  FXint  wanted[MAXRECLEVEL];   // Items to match at each level
+  };
 
 /*******************************************************************************/
 
-
-// Check if stream contains a JPG
+// Check if stream represents windows executable
 FXbool fxcheckEXE(FXStream& store){
-  FXuchar ss[12];
-  store.load(ss,12);
-  store.position(-12,FXFromCurrent);
-  // FIXME
-  return false;
+  FXuchar ss[2];
+  store.load(ss,2);
+  store.position(-2,FXFromCurrent);
+  return ss[0]=='M' && ss[1]=='Z';
+  }
+
+
+// Scan the data
+static FXbool scandata(FXStream& store,FXColor*& data,FXint& width,FXint& height,const Context& ctx,FXlong start){
+  ImageResourceDataEntry res;
+  FXlong pos=store.position();
+  FXbool result=false;
+
+  FXTRACE((100,"scandata: %llu (%#llx)\n",start,start));
+
+  // Read resource data entry, at start
+  store.position(start);
+  store >> res.offsetToData;
+  store >> res.size;
+  store >> res.codePage;
+  store >> res.reserved;
+
+  FXTRACE((100,"res.offsetToData: %u (%#x)\n",res.offsetToData,res.offsetToData));
+  FXTRACE((100,"res.size: %u\n",res.size));
+  FXTRACE((100,"res.codePage: %u\n",res.codePage));
+  FXTRACE((100,"res.reserved: %u\n",res.reserved));
+
+  // Bail if at end
+  if(store.eof()) goto x;
+
+  // Now try read the image, or icon
+  store.position(ctx.pointer+res.offsetToData-ctx.address);
+  if(ctx.wanted[0]==RST_BITMAP){
+    result=fxloadDIB(store,data,width,height);
+    }
+  else if(ctx.wanted[0]==RST_ICON){
+    result=fxloadICOStream(store,data,width,height);
+    }
+  FXTRACE((100,"result: %u\n",result));
+x:store.position(pos);
+  return result;
+  }
+
+
+// Scan resource directory until we hit the jackpot
+static FXbool scanresources(FXStream& store,FXColor*& data,FXint& width,FXint& height,const Context& ctx,FXlong start,FXint lev){
+  FXbool result=false;
+  if(ctx.pointer<=start && start<ctx.pointer+ctx.size && lev<MAXRECLEVEL){
+    ImageResourceDirectory dir;
+    FXlong pos=store.position();
+
+    // Jump to start of directory
+    store.position(start);
+    store >> dir.characteristics;
+    store >> dir.timeDateStamp;
+    store >> dir.majorVersion;
+    store >> dir.minorVersion;
+    store >> dir.numberOfNamedEntries;
+    store >> dir.numberOfIdEntries;
+
+    FXTRACE((100,"%*sdir.characteristics: %#08x\n",lev<<2,"",dir.characteristics));
+    FXTRACE((100,"%*sdir.timeDateStamp: %u\n",lev<<2,"",dir.timeDateStamp));
+    FXTRACE((100,"%*sdir.majorVersion: %u\n",lev<<2,"",dir.majorVersion));
+    FXTRACE((100,"%*sdir.minorVersion: %u\n",lev<<2,"",dir.minorVersion));
+    FXTRACE((100,"%*sdir.numberOfNamedEntries: %u\n",lev<<2,"",dir.numberOfNamedEntries));
+    FXTRACE((100,"%*sdir.numberOfIdEntries: %u\n\n",lev<<2,"",dir.numberOfIdEntries));
+
+    // We're still good?
+    if(!store.eof()){
+      ImageResourceDirectoryEntry entry;
+      FXint want=ctx.wanted[lev];
+
+      // Loop over the entries
+      for(FXint s=0; !result && s<dir.numberOfNamedEntries+dir.numberOfIdEntries; ++s){
+
+        // Read resource directory entry
+        store >> entry.name;
+        store >> entry.data;
+
+        // Still good?
+        if(store.eof()) goto x;
+
+        FXTRACE((100,"%*sentry.name: %u\n",lev<<2,"",entry.name));
+
+        // If don't care match or matching ID then check the rest, otherwise move on to next
+        if(want==-1 || (!(entry.name&IMAGE_RESOURCE_NAME_IS_STRING) && (entry.name&0xFFFF)==want)){
+          if(entry.data&IMAGE_RESOURCE_DATA_IS_DIRECTORY){
+            entry.data&=~IMAGE_RESOURCE_DATA_IS_DIRECTORY;
+            result=scanresources(store,data,width,height,ctx,ctx.pointer+entry.data,lev+1);
+            }
+          else{
+            result=scandata(store,data,width,height,ctx,ctx.pointer+entry.data);
+            }
+          }
+        }
+      }
+
+    // Restore
+x:  store.position(pos);
+    }
+  return result;
   }
 
 
 // Load resource from executable or dll
-FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint type,FXint id){
+  FXbool result=false;
+
+  FXTRACE((100,"fxloadEXE(data,width,height,type:%d,id:%d)\n\n",type,id));
 
   // Null out
   data=NULL;
   width=0;
   height=0;
 
-  return false;
-  }
+  // Loading other than these is not gonna work
+  if(type==RST_BITMAP || type==RST_ICON){
+    FXbool swap=store.swapBytes();
+    ImageDosHeader dos;
 
-/*******************************************************************************/
+    // Bitmaps are little-endian
+    store.setBigEndian(false);
 
-#else
+    // Load DOS header
+    store >> dos.magic;                  // must contain "MZ"
+    store >> dos.cblp;                   // number of bytes on the last page of the file
+    store >> dos.cp;                     // number of pages in file
+    store >> dos.crlc;                   // relocations
+    store >> dos.cparhdr;                // size of the header in paragraphs
+    store >> dos.minalloc;               // minimum and maximum paragraphs to allocate
+    store >> dos.maxalloc;
+    store >> dos.ss;                     // initial SS:SP to set by Loader
+    store >> dos.sp;
+    store >> dos.csum;                   // checksum
+    store >> dos.ip;                     // initial CS:IP
+    store >> dos.cs;
+    store >> dos.lfarlc;                 // address of relocation table
+    store >> dos.ovno;                   // overlay number
+    store.load(dos.res,4);
+    store >> dos.oemid;                  // OEM id
+    store >> dos.oeminfo;                // OEM info
+    store.load(dos.res2,10);
+    store >> dos.lfanew;                 // address of new EXE header
 
-// Check if stream contains EXE or DLL
-FXbool fxcheckEXE(FXStream&){
-  return false;
-  }
+    FXTRACE((100,"dos.magic: %#04x\n",dos.magic));
+    FXTRACE((100,"dos.cblp: %d\n",dos.cblp));
+    FXTRACE((100,"dos.cp: %d\n",dos.cp));
+    FXTRACE((100,"dos.crlc: %d\n",dos.crlc));
+    FXTRACE((100,"dos.cparhdr: %d\n",dos.cparhdr));
+    FXTRACE((100,"dos.minalloc: %d\n",dos.minalloc));
+    FXTRACE((100,"dos.maxalloc: %d\n",dos.maxalloc));
+    FXTRACE((100,"dos.ss: %d\n",dos.ss));
+    FXTRACE((100,"dos.sp: %d\n",dos.sp));
+    FXTRACE((100,"dos.csum: %d\n",dos.csum));
+    FXTRACE((100,"dos.ip: %d\n",dos.ip));
+    FXTRACE((100,"dos.cs: %d\n",dos.cs));
+    FXTRACE((100,"dos.lfarlc: %d\n",dos.lfarlc));
+    FXTRACE((100,"dos.oemid: %d\n",dos.oemid));
+    FXTRACE((100,"dos.oeminfo: %d\n",dos.oeminfo));
+    FXTRACE((100,"dos.lfanew: %d\n\n",dos.lfanew));
 
+    // Expect MZ
+    if((dos.magic==IMAGE_DOS_SIGNATURE) && !store.eof()){
+      ImageNTHeader nt;
 
-// Stub routine returns placeholder bitmap
-FXbool fxloadEXE(FXStream&,FXColor*& data,FXint& width,FXint& height){
-  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
-  static const FXuchar image_bits[]={
-   0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xf5, 0x33, 0xe6, 0xa7,
-   0x25, 0x22, 0x42, 0xa4, 0x25, 0x40, 0x41, 0xa0, 0xa5, 0x40, 0x41, 0xa1,
-   0xe5, 0x80, 0xc0, 0xa1, 0xa5, 0x40, 0x41, 0xa1, 0x25, 0x40, 0x41, 0xa0,
-   0x25, 0x22, 0x42, 0xa4, 0xf5, 0x33, 0xe6, 0xa7, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
-   0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff};
-  register FXint p;
-  allocElms(data,32*32);
-  for(p=0; p<32*32; p++){
-    data[p]=color[(image_bits[p>>3]>>(p&7))&1];
+      // Skip to NT header
+      store.position(dos.lfanew);
+
+      // File header
+      store >> nt.signature;
+      store >> nt.fileHeader.machine;
+      store >> nt.fileHeader.numberOfSections;            // Number of sections in section table
+      store >> nt.fileHeader.timeDateStamp;               // Date and time of program link
+      store >> nt.fileHeader.pointerToSymbolTable;        // RVA of symbol table
+      store >> nt.fileHeader.numberOfSymbols;             // Number of symbols in table
+      store >> nt.fileHeader.sizeOfOptionalHeader;        // Size of IMAGE_OPTIONAL_HEADER in bytes
+      store >> nt.fileHeader.characteristics;
+
+      // Dump NT header
+      FXTRACE((100,"nt.signature: %#04x\n",nt.signature));
+      FXTRACE((100,"nt.fileHeader.machine: %4x\n",nt.fileHeader.machine));
+      FXTRACE((100,"nt.fileHeader.numberOfSections: %u\n",nt.fileHeader.numberOfSections));
+      FXTRACE((100,"nt.fileHeader.timeDateStamp: %u\n",nt.fileHeader.timeDateStamp));
+      FXTRACE((100,"nt.fileHeader.pointerToSymbolTable: %u\n",nt.fileHeader.pointerToSymbolTable));
+      FXTRACE((100,"nt.fileHeader.numberOfSymbols: %u\n",nt.fileHeader.numberOfSymbols));
+      FXTRACE((100,"nt.fileHeader.sizeOfOptionalHeader: %u\n",nt.fileHeader.sizeOfOptionalHeader));
+      FXTRACE((100,"nt.fileHeader.characteristics: %#04x\n\n",nt.fileHeader.characteristics));
+
+      // Check NT signature
+      if((nt.signature==IMAGE_NT_SIGNATURE) && !store.eof()){
+        FXushort optionalheadermagic;
+
+        // Start of optional header here
+        FXlong optbase=store.position();
+
+        // Read magic number
+        store >> optionalheadermagic;
+
+        // Check if its PE or PE+
+        if((optionalheadermagic==IMAGE_NT_OPTIONAL_HDR32_MAGIC || optionalheadermagic==IMAGE_NT_OPTIONAL_HDR64_MAGIC) && !store.eof()){
+          ImageSectionHeader sec;
+
+          // Skip over to section headers
+          store.position(optbase+nt.fileHeader.sizeOfOptionalHeader);
+
+          // Hunt for the .rsrc section now
+          for(FXint s=0; s<nt.fileHeader.numberOfSections; ++s){
+
+            // Load section header info
+            store.load(sec.name,sizeof(sec.name));
+            store >> sec.virtualSize;
+            store >> sec.virtualAddress;
+            store >> sec.sizeOfRawData;
+            store >> sec.pointerToRawData;
+            store >> sec.pointerToRelocations;
+            store >> sec.pointerToLinenumbers;
+            store >> sec.numberOfRelocations;
+            store >> sec.numberOfLinenumbers;
+            store >> sec.characteristics;
+
+            // Bail if at end
+            if(store.eof()) break;
+
+            FXTRACE((100,"sec%ld.name: %.8s\n",s,sec.name));
+            FXTRACE((100,"sec%ld.virtualSize: %u\n",s,sec.virtualSize));
+            FXTRACE((100,"sec%ld.virtualAddress: %u\n",s,sec.virtualAddress));
+            FXTRACE((100,"sec%ld.sizeOfRawData: %u\n",s,sec.sizeOfRawData));
+            FXTRACE((100,"sec%ld.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData));
+            FXTRACE((100,"sec%ld.pointerToRelocations: %u\n",s,sec.pointerToRelocations));
+            FXTRACE((100,"sec%ld.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers));
+            FXTRACE((100,"sec%ld.numberOfRelocations: %u\n",s,sec.numberOfRelocations));
+            FXTRACE((100,"sec%ld.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers));
+            FXTRACE((100,"sec%ld.characteristics: %#08x\n\n",s,sec.characteristics));
+
+            // Found the resource section in the pe file
+            if(compare(sec.name,".rsrc")==0){
+              Context context={sec.pointerToRawData,sec.virtualAddress,sec.sizeOfRawData,{type,id,-1}};
+
+              // Scan resources in resource section
+              result=scanresources(store,data,width,height,context,sec.pointerToRawData,0);
+              break;
+              }
+            }
+          }
+        }
+      }
+    store.swapBytes(swap);
     }
-  width=32;
-  height=32;
-  return true;
+  return result;
   }
 
-
-#endif
 
 }

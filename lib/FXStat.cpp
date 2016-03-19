@@ -214,7 +214,6 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
     if((hfile=::CreateFile(unifile,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
-        SHFILEINFO sfi;
         info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
@@ -238,7 +237,6 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
     if((hfile=::CreateFile(file.text(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
-        SHFILEINFO sfi;
         info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
@@ -312,7 +310,6 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
     if((hfile=::CreateFile(unifile,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
-        SHFILEINFO sfi;
         info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
@@ -336,7 +333,6 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
     if((hfile=::CreateFile(file.text(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
-        SHFILEINFO sfi;
         info.modeFlags=FXIO::AllFull;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;

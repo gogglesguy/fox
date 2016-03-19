@@ -371,7 +371,7 @@ FXint FXListBox::setItem(FXint index,const FXString& text,FXIcon* icon,FXptr ptr
 
 
 // Fill list by appending items from array of strings
-FXint FXListBox::fillItems(const FXchar** strings,FXIcon* icon,FXptr ptr,FXbool notify){
+FXint FXListBox::fillItems(const FXchar *const *strings,FXIcon* icon,FXptr ptr,FXbool notify){
   register FXint numberofitems=list->getNumItems();
   register FXint n=list->fillItems(strings,icon,ptr,notify);
   if(numberofitems<=list->getCurrentItem()){
