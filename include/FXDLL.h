@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDLL.h,v 1.24 2007/07/09 16:02:42 fox Exp $                             *
+* $Id: FXDLL.h,v 1.25 2007/10/10 19:15:21 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXDLL_H
 #define FXDLL_H
@@ -35,14 +35,14 @@ private:
   void *hnd;
 public:
 
-  /// Default constructor
+  /// Construct with no handle
   FXDLL():hnd(NULL){}
 
-  /// Constructor with handle
+  /// Construct with existing handle
   FXDLL(void *h):hnd(h){}
 
-  /// Copy constructor
-  FXDLL(const FXDLL& d):hnd(d.hnd){}
+  /// Construct copy from original
+  FXDLL(const FXDLL& org):hnd(org.hnd){}
 
   /// Return the name of the library module
   FXString name() const;
@@ -53,8 +53,8 @@ public:
   /// True if library was loaded
   FXbool loaded() const { return hnd!=NULL; }
 
-  /// Load the library module from the given path
-  FXbool load(const FXString& path);
+  /// Load the library module from the name 
+  FXbool load(const FXString& nm);
 
   /// Unload the library module
   void unload();
@@ -81,8 +81,8 @@ public:
 
 
 /**
-* Wrap DLL handle but owns the handle; thus, the library module
-* will automatically be unloaded when auto-dll is destroyed.
+* Auto DLL wraps a library module handle but also owns it; thus, the library 
+* module will automatically be unloaded when auto-dll is destroyed.
 */
 class FXAPI FXAUTODLL : public FXDLL {
 private:
@@ -90,8 +90,8 @@ private:
   FXAUTODLL &operator=(const FXAUTODLL&);
 public:
 
-  /// Initialize by loading given library name
-  FXAUTODLL(const FXString& name);
+  /// Initialize by loading given library name 
+  FXAUTODLL(const FXString& nm);
 
   /// Unload library if we have one
   ~FXAUTODLL();

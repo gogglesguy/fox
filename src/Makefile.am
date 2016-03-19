@@ -342,6 +342,7 @@ FXRGBImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
+FXRangeSlider.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \

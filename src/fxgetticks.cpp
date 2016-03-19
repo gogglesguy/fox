@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxgetticks.cpp,v 1.5 2007/07/09 16:27:19 fox Exp $                       *
+* $Id: fxgetticks.cpp,v 1.6 2007/10/30 20:52:44 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -140,7 +140,6 @@ FXTime fxgetticks(){
 FXTime fxgetticks(){
   FXTime value;
   asm ("rpcc %0" : "=r"(value));                        // Only 32-bits accurate!
-
   return (value & 0xFFFFFFFF);
   }
 

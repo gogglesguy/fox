@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDockBar.cpp,v 1.68 2007/07/09 16:26:49 fox Exp $                       *
+* $Id: FXDockBar.cpp,v 1.72 2007/10/11 17:16:25 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -303,6 +303,28 @@ void FXDockBar::undock(FXint rootx,FXint rooty,FXbool notify){
     if(notify && target){target->tryHandle(this,FXSEL(SEL_FLOATED,message),docksite);}
     }
   }
+  
+
+// Return true if layout side is allowable
+FXbool FXDockBar::isAllowable(FXuint hints) const {
+  if(hints&LAYOUT_SIDE_LEFT){
+    if(hints&LAYOUT_SIDE_BOTTOM){       // Right
+      if(allowed&ALLOW_RIGHT) return true;
+      }
+    else{                               // Left
+      if(allowed&ALLOW_LEFT) return true;
+      }
+    }
+  else{
+    if(hints&LAYOUT_SIDE_BOTTOM){       // Bottom
+      if(allowed&ALLOW_BOTTOM) return true;
+      }
+    else{                               // Top
+      if(allowed&ALLOW_TOP) return true;
+      }
+    }
+  return false;
+  }
 
 
 // Search siblings of drydock for first dock opportunity
@@ -313,7 +335,9 @@ FXDockSite* FXDockBar::findDockAtSide(FXuint side){
     child=drydock->getParent()->getFirst();
     while(child){
       docksite=dynamic_cast<FXDockSite*>(child);
-      if(docksite && docksite->shown() && side==(docksite->getLayoutHints()&LAYOUT_SIDE_MASK)) return docksite;
+      if(docksite && docksite->shown() && side==(docksite->getLayoutHints()&LAYOUT_SIDE_MASK)){
+        if(isAllowable(docksite->getLayoutHints())) return docksite;
+        }
       child=child->getNext();
       }
     }
@@ -389,22 +413,7 @@ FXDockSite* FXDockBar::findDockNear(FXint rootx,FXint rooty){
     while(child){
       docksite=dynamic_cast<FXDockSite*>(child);
       if(docksite && docksite->shown() && insideDock(docksite,barx,bary)){
-        if(docksite->getLayoutHints()&LAYOUT_SIDE_LEFT){
-          if(docksite->getLayoutHints()&LAYOUT_SIDE_BOTTOM){    // Right
-            if(allowed&ALLOW_RIGHT) return docksite;
-            }
-          else{                                                 // Left
-            if(allowed&ALLOW_LEFT) return docksite;
-            }
-          }
-        else{
-          if(docksite->getLayoutHints()&LAYOUT_SIDE_BOTTOM){    // Bottom
-            if(allowed&ALLOW_BOTTOM) return docksite;
-            }
-          else{                                                 // Top
-            if(allowed&ALLOW_TOP) return docksite;
-            }
-          }
+        if(isAllowable(docksite->getLayoutHints())) return docksite;
         }
       child=child->getNext();
       }
@@ -517,17 +526,10 @@ long FXDockBar::onPopupMenu(FXObject*,FXSelector,void* ptr){
   new FXMenuCommand(&dockmenu,tr("Flip"),&dockflipicon,this,ID_DOCK_FLIP);
   dockmenu.create();
   dockmenu.popup(NULL,event->root_x,event->root_y);
-  // FIXME funny problem: menu doesn't update until move despite call to refresh here
-//  getApp()->refresh();
-//  dockmenu.forceRefresh();
   getApp()->runModalWhileShown(&dockmenu);
   return 1;
   }
 
-// FIXME
-// Getting:
-// X Error: code 3 major 4 minor 0: BadWindow (invalid Window parameter).
-// Closing menu
 
 // Tool bar grip drag started; the grip widget can be at any level under this dock bar
 long FXDockBar::onBeginDragGrip(FXObject* sender,FXSelector,void* ptr){

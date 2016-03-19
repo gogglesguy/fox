@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.h,v 1.68 2007/07/09 16:02:50 fox Exp $                          *
+* $Id: FXThread.h,v 1.73 2007/11/01 04:55:10 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
@@ -48,7 +48,7 @@ class FXCondition;
 class FXAPI FXMutex {
   friend class FXCondition;
 private:
-  FXuval data[24];
+  volatile FXuval data[24];
 private:
   FXMutex(const FXMutex&);
   FXMutex &operator=(const FXMutex&);
@@ -72,7 +72,6 @@ public:
   /// Delete the mutex
   ~FXMutex();
   };
-
 
 
 /**
@@ -114,6 +113,40 @@ public:
   };
 
 
+/**
+* FXSpinLock can be used to provide safe access to very small
+* critical sections.  It is cheaper than FXMutex, but unlike
+* FXMutex, threads which are unable to obtain the lock will
+* not block, but spin in a tight loop until the lock can be
+* obtained.
+*/
+class FXAPI FXSpinLock {
+private:
+  volatile FXuval data[4];
+private:
+  FXSpinLock(const FXSpinLock&);
+  FXSpinLock &operator=(const FXSpinLock&);
+public:
+
+  /// Initialize the spinlock
+  FXSpinLock();
+
+  /// Lock the mutex
+  void lock();
+
+  /// Return true if succeeded locking the spinlock
+  FXbool trylock();
+
+  /// Return true if spinlock is already locked
+  FXbool locked();
+
+  /// Unlock spinlock
+  void unlock();
+
+  /// Delete the spinlock
+  ~FXSpinLock();
+  };
+
 
 /**
 * A read / write lock allows multiple readers but only a single
@@ -121,7 +154,7 @@ public:
 */
 class FXAPI FXReadWriteLock {
 private:
-  FXuval data[24];
+  volatile FXuval data[24];
 private:
   FXReadWriteLock(const FXReadWriteLock&);
   FXReadWriteLock &operator=(const FXReadWriteLock&);
@@ -139,13 +172,13 @@ public:
   /// Unlock read lock
   void readUnlock();
 
-  /// Acquire write lock for read/write lock
+  /// Acquire write lock for read/write mutex
   void writeLock();
 
   /// Try to acquire write lock for read/write lock
   bool tryWriteLock();
 
-  /// Unlock write lock
+  /// Unlock write mutex
   void writeUnlock();
 
   /// Delete the read/write lock
@@ -163,7 +196,7 @@ public:
 */
 class FXAPI FXCondition {
 private:
-  FXuval data[12];
+  volatile FXuval data[12];
 private:
   FXCondition(const FXCondition&);
   FXCondition& operator=(const FXCondition&);
@@ -214,7 +247,7 @@ public:
 */
 class FXAPI FXSemaphore {
 private:
-  FXuval data[16];
+  volatile FXuval data[16];
 private:
   FXSemaphore(const FXSemaphore&);
   FXSemaphore& operator=(const FXSemaphore&);
@@ -270,6 +303,7 @@ public:
 * this class represents a unique thread-local storage key.
 */
 class FXAPI FXAutoThreadStorageKey {
+private:
   FXThreadStorageKey value;
 private:
   FXAutoThreadStorageKey(const FXAutoThreadStorageKey&);
@@ -384,7 +418,7 @@ public:
   /**
   * Detach thread, so that a no join() is necessary to harvest the
   * resources of this thread.  The thread continues to run until
-  * normal completion.  
+  * normal completion.
   */
   FXbool detach();
 
@@ -473,12 +507,12 @@ public:
   Policy policy() const;
 
   /**
-  * Suspend thread.
+  * Suspend thread; return true if success.
   */
   FXbool suspend();
 
   /**
-  * Resume thread.
+  * Resume thread; return true if success.
   */
   FXbool resume();
 

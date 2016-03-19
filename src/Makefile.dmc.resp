@@ -157,6 +157,7 @@
 +FXRadioButton.obj &
 +FXRangef.obj &
 +FXRanged.obj &
++FXRangeSlider.obj &
 +FXRealSlider.obj &
 +FXRealSpinner.obj &
 +FXRecentFiles.obj &

@@ -218,6 +218,7 @@ FXRGBImage.h \
 FXRadioButton.h \
 FXRangef.h \
 FXRanged.h \
+FXRangeSlider.h \
 FXRealSlider.h \
 FXRealSpinner.h \
 FXRecentFiles.h \

@@ -78,8 +78,11 @@ GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 GL_LIBS = @GL_LIBS@
 GL_TESTS = @GL_TESTS@
+HAVE_LIB = @HAVE_LIB@
+LIB = @LIB@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+LTLIB = @LTLIB@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_RELEASE = @LT_RELEASE@
@@ -703,16 +706,16 @@ bitmapviewer.o: bitmapviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -801,16 +804,16 @@ button.o: button.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -899,16 +902,16 @@ calendar.o: calendar.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -997,16 +1000,16 @@ codecs.o: codecs.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1098,16 +1101,16 @@ console.o: console.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1196,16 +1199,16 @@ ControlPanel.o: ControlPanel.cpp ../include/xincs.h ../include/fx.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1295,16 +1298,16 @@ datatarget.o: datatarget.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1393,16 +1396,16 @@ dctest.o: dctest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1491,16 +1494,16 @@ dialog.o: dialog.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1589,16 +1592,16 @@ dirlist.o: dirlist.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1687,16 +1690,16 @@ expression.o: expression.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1786,16 +1789,16 @@ format.o: format.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1884,16 +1887,16 @@ foursplit.o: foursplit.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -1982,16 +1985,16 @@ gltest.o: gltest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2095,16 +2098,16 @@ glviewer.o: glviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2208,16 +2211,16 @@ groupbox.o: groupbox.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2307,16 +2310,16 @@ header.o: header.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2405,16 +2408,16 @@ hello.o: hello.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2504,16 +2507,16 @@ hello2.o: hello2.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2602,16 +2605,16 @@ iconlist.o: iconlist.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2700,16 +2703,16 @@ image.o: image.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2798,16 +2801,16 @@ imageviewer.o: imageviewer.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2896,16 +2899,16 @@ layout.o: layout.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -2994,16 +2997,16 @@ mditest.o: mditest.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3093,16 +3096,16 @@ memmap.o: memmap.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3192,16 +3195,16 @@ minheritance.o: minheritance.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3290,16 +3293,16 @@ ratio.o: ratio.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3387,16 +3390,16 @@ rex.o: rex.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3485,16 +3488,16 @@ scribble.o: scribble.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3583,16 +3586,16 @@ shutter.o: shutter.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3681,16 +3684,16 @@ splitter.o: splitter.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3780,16 +3783,16 @@ switcher.o: switcher.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3878,16 +3881,16 @@ tabbook.o: tabbook.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -3976,16 +3979,16 @@ table.o: table.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -4074,16 +4077,16 @@ thread.o: thread.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \
@@ -4173,16 +4176,16 @@ wizard.o: wizard.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXStatusBar.h ../include/FXStatusLine.h \
 	../include/FXChoiceBox.h ../include/FXMessageBox.h \
 	../include/FXDirList.h ../include/FXSlider.h \
-	../include/FXRealSlider.h ../include/FXSplitter.h \
-	../include/FX4Splitter.h ../include/FXHeader.h \
-	../include/FXShutter.h ../include/FXIconList.h \
-	../include/FXFileList.h ../include/FXDirBox.h \
-	../include/FXDriveBox.h ../include/FXDirSelector.h \
-	../include/FXDirDialog.h ../include/FXFileSelector.h \
-	../include/FXFileDialog.h ../include/FXColorSelector.h \
-	../include/FXColorDialog.h ../include/FXFontSelector.h \
-	../include/FXFontDialog.h ../include/FXUndoList.h \
-	../include/FXRex.h ../include/FXText.h \
+	../include/FXRealSlider.h ../include/FXRangeSlider.h \
+	../include/FXSplitter.h ../include/FX4Splitter.h \
+	../include/FXHeader.h ../include/FXShutter.h \
+	../include/FXIconList.h ../include/FXFileList.h \
+	../include/FXDirBox.h ../include/FXDriveBox.h \
+	../include/FXDirSelector.h ../include/FXDirDialog.h \
+	../include/FXFileSelector.h ../include/FXFileDialog.h \
+	../include/FXColorSelector.h ../include/FXColorDialog.h \
+	../include/FXFontSelector.h ../include/FXFontDialog.h \
+	../include/FXUndoList.h ../include/FXRex.h ../include/FXText.h \
 	../include/FXDataTarget.h ../include/FXProgressBar.h \
 	../include/FXReplaceDialog.h ../include/FXRuler.h \
 	../include/FXRulerView.h ../include/FXSearchDialog.h \

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
 *********************************************************************************
-* $Id: format.cpp,v 1.32 2007/06/24 17:07:08 fox Exp $                          *
+* $Id: format.cpp,v 1.33 2007/11/01 04:55:10 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 
@@ -135,7 +135,7 @@ int main(int,char*[]){
 //  res=__snprintf(buffer,sizeof(buffer),"%g",12345E12);
 //  fprintf(stdout,"%d \"%s\"\n",res,buffer);
 
-  
+
   // Testing int formats
   for(x=0; x<ARRAYNUMBER(intformat); x++){
     for(y=0; y<ARRAYNUMBER(intnumbers); y++){
@@ -151,6 +151,7 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",floatformat[x],buffer);
       }
     }
+    
   return 1;
   }
 

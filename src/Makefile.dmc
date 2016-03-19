@@ -5,7 +5,7 @@
 ##############################################################################
 # Contributed by: Andre Fornacon <afo@zlug.org>                              #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.64 2007/07/02 12:30:36 fox Exp $		     #
+# $Id: Makefile.dmc,v 1.65 2007/11/02 19:02:29 fox Exp $		     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or 	     #
 # modify it under the terms of the GNU Library General Public		     #
@@ -260,6 +260,7 @@ FXRGBImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
+FXRangeSlider.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
 FXRealSlider.cpp \

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDial.h,v 1.40 2007/07/09 16:02:43 fox Exp $                            *
+* $Id: FXDial.h,v 1.41 2007/11/06 15:31:29 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXDIAL_H
 #define FXDIAL_H
@@ -53,13 +53,13 @@ enum {
 class FXAPI FXDial : public FXFrame {
   FXDECLARE(FXDial)
 protected:
-  FXint         range[2];       // Reported data range
+  FXint         notchAngle;     // Angle of main notch
+  FXint         notchSpacing;   // Angle between notches
+  FXint         notchOffset;    // Notch offset
   FXColor       notchColor;     // Main notch color
-  FXint         notchangle;     // Angle of main notch
-  FXint         notchspacing;   // Angle between notches
-  FXint         notchoffset;    // Notch offset
-  FXint         dragpoint;      // Place where clicked
-  FXint         dragpos;        // Value where clicked
+  FXint         dragPoint;      // Place where clicked
+  FXint         dragPos;        // Value where clicked
+  FXint         range[2];       // Reported data range
   FXint         incr;           // Rate of change/revolution
   FXint         pos;            // Reported data position
   FXString      help;           // Help string
@@ -141,7 +141,7 @@ public:
   void setNotchSpacing(FXint spacing);
 
   /// Get the current notch spacing
-  FXint getNotchSpacing() const { return notchspacing; }
+  FXint getNotchSpacing() const { return notchSpacing; }
 
   /**
   * Change the notch offset, which is the position of the
@@ -151,7 +151,7 @@ public:
   void setNotchOffset(FXint offset);
 
   /// Get the current center notch offset
-  FXint getNotchOffset() const { return notchoffset; }
+  FXint getNotchOffset() const { return notchOffset; }
 
   /// Changes the dial style.
   void setDialStyle(FXuint opts);

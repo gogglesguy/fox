@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: strtoll.cpp,v 1.13 2007/07/09 16:27:27 fox Exp $                         *
+* $Id: strtoll.cpp,v 1.15 2007/11/16 15:33:08 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -165,7 +165,7 @@ FXlong strtoll(const char *nptr,char **endptr,int base){
 
 extern "C" FXulong strtoull(const char *nptr,char **endptr,int base);
 
-
+ 
 FXulong strtoull(const char *nptr,char **endptr,int base){
   register FXulong cutoff,cutlim,value;
   register FXchar *s=(FXchar*)nptr;
@@ -181,7 +181,7 @@ FXulong strtoull(const char *nptr,char **endptr,int base){
   if(endptr) *endptr=s;
 
   // Skip spaces
-  while((c=*s++)!='\0' && Ascii::isSpace(c)) s++;
+  while(*s!='\0' && Ascii::isSpace(*s)) s++;
 
   // Process sign
   if(*s=='-'){

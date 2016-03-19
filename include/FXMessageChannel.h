@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageChannel.h,v 1.6 2007/07/09 16:02:46 fox Exp $                   *
+* $Id: FXMessageChannel.h,v 1.7 2007/10/30 17:30:55 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXMESSAGECHANNEL_H
 #define FXMESSAGECHANNEL_H
@@ -51,7 +51,7 @@ class FXApp;
 * If the size of the optional data is zero, the message handler will be passed a
 * NULL pointer.
 */
-class FXMessageChannel : public FXObject {
+class FXAPI FXMessageChannel : public FXObject {
   FXDECLARE(FXMessageChannel)
 private:
   FXApp *app;

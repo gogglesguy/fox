@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.373 2007/09/07 21:02:44 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.375 2007/10/10 16:28:45 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
