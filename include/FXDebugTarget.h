@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDebugTarget.h,v 1.19 2009/01/06 13:07:22 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXDEBUGTARGET_H
 #define FXDEBUGTARGET_H

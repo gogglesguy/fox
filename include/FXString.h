@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXString.h,v 1.151 2009/01/06 13:07:27 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -108,7 +106,8 @@ public:
   FXint dec(FXint p,FXint n) const;
 
   /// Get text contents
-  const FXchar* text() const { return (const FXchar*)str; }
+  FXchar* text(){ return str; }
+  const FXchar* text() const { return str; }
 
   /// See if string is empty
   FXbool empty() const { return (((FXint*)str)[-1]==0); }

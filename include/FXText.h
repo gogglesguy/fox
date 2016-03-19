@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXText.h,v 1.228 2009/01/06 13:07:28 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXTEXT_H
 #define FXTEXT_H
@@ -315,7 +313,7 @@ public:
   long onCmdBackspace(FXObject*,FXSelector,void*);
   long onCmdBackspaceWord(FXObject*,FXSelector,void*);
   long onCmdBackspaceBol(FXObject*,FXSelector,void*);
-  long onCmdDelete(FXObject*,FXSelector,void*);
+  long onCmdDeleteChar(FXObject*,FXSelector,void*);
   long onCmdDeleteWord(FXObject*,FXSelector,void*);
   long onCmdDeleteEol(FXObject*,FXSelector,void*);
   long onCmdDeleteAll(FXObject*,FXSelector,void*);
@@ -410,7 +408,7 @@ public:
     ID_BACKSPACE,
     ID_BACKSPACE_WORD,
     ID_BACKSPACE_BOL,
-    ID_DELETE,
+    ID_DELETE_CHAR,
     ID_DELETE_WORD,
     ID_DELETE_EOL,
     ID_DELETE_ALL,

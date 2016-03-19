@@ -1,4 +1,4 @@
-/*********** Generated on 2009/02/05 18:13:30 by reswrap version 5.1.1 *********/
+/*********** Generated on 2009/08/18 18:37:40 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file controlpanel_gif.gif */
 extern const unsigned char controlpanel_gif[];

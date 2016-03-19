@@ -2,14 +2,9 @@
 
 AM_CXXFLAGS = @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
-RESWRAP  = $(top_builddir)/utils/reswrap
+RESWRAP  = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
-LDADD = $(top_builddir)/src/libFOX-1.7.la -lm
-
-EXTRA_PROGRAMS	= \
-gltest \
-glviewer
-
+LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 
 noinst_PROGRAMS	= \
 scan \
@@ -47,7 +42,8 @@ switcher \
 tabbook \
 ratio \
 half \
-$(GL_TESTS)
+gltest \
+glviewer
 
 format_SOURCES          = format.cpp
 scan_SOURCES            = scan.cpp

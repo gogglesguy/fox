@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXVisual.h,v 1.62 2009/01/06 13:07:29 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXVISUAL_H
 #define FXVISUAL_H
@@ -49,14 +47,10 @@ enum {
   VISUAL_BEST          = 16,    /// Best (deepest) visual
   VISUAL_FORCE         = 32,    /// Force given visual id (X11)
   VISUAL_OWN_COLORMAP  = 64,    /// Allocate private colormap
-  VISUAL_WINDOW        = 128,   /// Draw to window [GL Visual]
-  VISUAL_IMAGE         = 256,   /// Draw to image [GL Visual]
-  VISUAL_BUFFER        = 512,   /// Draw to buffer [GL Visual]
-  VISUAL_DOUBLE_BUFFER = 1024,  /// Double buffered [GL Visual]
-  VISUAL_STEREO        = 2048,  /// Stereo buffered [GL Visual]
-  VISUAL_NO_ACCEL      = 4096,  /// No hardware acceleration [GL Visual]
-  VISUAL_SWAP_COPY     = 8192,  /// Buffer swap by copying [GL Visual]
-  VISUAL_FLOAT         = 16384  /// Floating point buffers [GL Visual]
+  VISUAL_DOUBLE_BUFFER = 128,   /// Double buffered [GL Visual]
+  VISUAL_STEREO        = 256,   /// Stereo buffered [GL Visual]
+  VISUAL_NO_ACCEL      = 512,   /// No hardware acceleration [GL Visual]
+  VISUAL_SWAP_COPY     = 1024   /// Buffer swap by copying [GL Visual]
   };
 
 

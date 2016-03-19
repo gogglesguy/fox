@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXPCXIcon.h,v 1.24 2009/01/06 13:07:26 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXPCXICON_H
 #define FXPCXICON_H

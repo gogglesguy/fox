@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXIconList.h,v 1.120 2009/01/06 13:07:25 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXICONLIST_H
 #define FXICONLIST_H
@@ -137,6 +135,9 @@ public:
   /// Return true if this item is draggable
   FXbool isDraggable() const { return (state&DRAGGABLE)!=0; }
 
+  /// Return tip text
+  virtual FXString getTipText() const;
+
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXIconList* list) const;
 
@@ -206,7 +207,6 @@ protected:
   FXint              anchor;            // Anchor item
   FXint              current;           // Current item
   FXint              extent;            // Extent item
-  FXint              cursor;            // Cursor item
   FXint              viewable;          // Visible item
   FXFont            *font;              // Font
   FXIconListSortFunc sortfunc;          // Item sort function
@@ -544,9 +544,6 @@ public:
 
   /// Return anchor item index, or -1 if none
   FXint getAnchorItem() const { return anchor; }
-
-  /// Return index of item under cursor, or -1 if none
-  FXint getCursorItem() const { return cursor; }
 
   /// Sort items
   void sortItems();

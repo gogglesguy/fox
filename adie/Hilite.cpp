@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: Hilite.cpp,v 1.50 2009/01/06 13:07:20 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <new>
@@ -69,13 +67,13 @@ static inline void fillstyle(FXchar* textstyle,FXchar style,FXint f,FXint t){
 
 // Stylize text
 FXbool FXRule::stylize(const FXchar*,FXchar*,FXint,FXint,FXint&,FXint&) const {
-  return FALSE;
+  return false;
   }
 
 
 // Stylize body, i.e. after begin pattern has been seen
 FXbool FXRule::stylizeBody(const FXchar*,FXchar*,FXint,FXint,FXint&,FXint&) const {
-  return FALSE;
+  return false;
   }
 
 
@@ -85,9 +83,9 @@ FXIMPLEMENT(FXSimpleRule,FXRule,NULL,0)
 FXbool FXSimpleRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   if(pat.match(text,to,&start,&stop,FXRex::NotEmpty|FXRex::Forward,1,fm,fm)){
     fillstyle(textstyle,style,start,stop);
-    return TRUE;
+    return true;
     }
-  return FALSE;
+  return false;
   }
 
 
@@ -106,13 +104,13 @@ FXbool FXBracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,
       }
     if(end.match(text,to,&head,&stop,FXRex::Forward,1,fm,fm)){
       fillstyle(textstyle,style,head,stop);
-      return TRUE;
+      return true;
       }
     textstyle[fm++]=style;
 nxt:continue;
     }
   stop=fm;
-  return TRUE;
+  return true;
   }
 
 
@@ -122,9 +120,9 @@ FXbool FXBracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXin
   if(beg.match(text,to,&start,&tail,FXRex::Forward,1,fm,fm)){
     fillstyle(textstyle,style,start,tail);
     FXBracketRule::stylizeBody(text,textstyle,tail,to,head,stop);
-    return TRUE;
+    return true;
     }
-  return FALSE;
+  return false;
   }
 
 
@@ -143,17 +141,17 @@ FXbool FXSafeBracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint
       }
     if(end.match(text,to,&head,&stop,FXRex::Forward,1,fm,fm)){
       fillstyle(textstyle,style,head,stop);
-      return TRUE;
+      return true;
       }
     if(esc.match(text,to,&head,&stop,FXRex::Forward,1,fm,fm)){
       fillstyle(textstyle,style,head,stop);
-      return TRUE;
+      return true;
       }
     textstyle[fm++]=style;
 nxt:continue;
     }
   stop=fm;
-  return TRUE;
+  return true;
   }
 
 
@@ -163,9 +161,9 @@ FXbool FXSafeBracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,
   if(beg.match(text,to,&start,&tail,FXRex::Forward,1,fm,fm)){
     fillstyle(textstyle,style,start,tail);
     FXSafeBracketRule::stylizeBody(text,textstyle,tail,to,head,stop);
-    return TRUE;
+    return true;
     }
-  return FALSE;
+  return false;
   }
 
 
@@ -186,7 +184,7 @@ FXbool FXMasterRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,F
 nxt:continue;
     }
   stop=to;
-  return TRUE;
+  return true;
   }
 
 
@@ -265,9 +263,9 @@ FXbool FXSyntax::isAncestor(FXint p,FXint c) const {
   FXASSERT(0<=p && 0<=c);
   while(c>0){
     c=rules[c]->getParent();
-    if(c==p) return TRUE;
+    if(c==p) return true;
     }
-  return FALSE;
+  return false;
   }
 
 

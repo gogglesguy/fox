@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXGradientBar.h,v 1.61 2009/01/06 13:07:24 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXGRADIENTBAR_H
 #define FXGRADIENTBAR_H
@@ -238,7 +236,7 @@ public:
   /// Deselect all segments
   FXbool deselectSegments(FXbool notify=false);
 
-  /// Returns TRUE if the specified segment is selected
+  /// Returns true if the specified segment is selected
   FXbool isSegmentSelected(FXint s) const;
 
   /// Set lower color of a segment

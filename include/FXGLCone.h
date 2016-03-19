@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXGLCone.h,v 1.22 2009/01/06 13:07:24 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXGLCONE_H
 #define FXGLCONE_H

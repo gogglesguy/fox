@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDict.h,v 1.34 2009/01/06 13:07:22 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXDICT_H
 #define FXDICT_H
@@ -40,16 +38,17 @@ namespace FX {
 class FXAPI FXDict : public FXObject {
   FXDECLARE(FXDict)
 protected:
-  struct FXDictEntry {
-    FXchar *key;              // Key string
-    void   *data;             // Data
-    FXint   hash;             // Hash value of key
-    FXbool  mark;             // Entry is marked
+  struct FXEntry {
+    FXchar *key;        // Key string
+    void   *data;       // Data
+    FXint   hash;       // Hash value of key
+    FXbool  mark;       // Entry is marked
     };
 protected:
-  FXDictEntry *dict;          // Dictionary
-  FXint        total;         // Dictionary size
-  FXint        number;        // Number of entries
+  FXEntry  *dict;       // Dictionary
+  FXint     used;       // Used entries
+  FXint     free;       // Free entries
+  FXint     total;      // Total size
 protected:
   static FXint hash(const FXchar* str);
 protected:
@@ -83,7 +82,7 @@ public:
   /**
   * Resize the table to the given size.
   */
-  void size(FXint m);
+  FXbool size(FXint m);
 
   /**
   * Return the size of the table, including the empty slots.
@@ -93,21 +92,21 @@ public:
   /**
   * Return the total number of entries in the table.
   */
-  FXint no() const { return number; }
+  FXint no() const { return used; }
 
   /**
   * Insert a new entry into the table given key and mark.
   * If there is already an entry with that key, leave it unchanged,
   * otherwise insert the new entry.
   */
-  void* insert(const FXchar* ky,void* ptr,FXbool mrk=false);
+  void* insert(const FXchar* ky,void* ptr=NULL,FXbool mrk=false);
 
   /**
   * Replace data at key, if the entry's mark is less than
   * or equal to the given mark.  If there was no existing entry,
   * a new entry is inserted with the given mark.
   */
-  void* replace(const FXchar* ky,void* ptr,FXbool mrk=false);
+  void* replace(const FXchar* ky,void* ptr=NULL,FXbool mrk=false);
 
   /**
   * Remove data given key.

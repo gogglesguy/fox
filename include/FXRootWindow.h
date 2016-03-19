@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXRootWindow.h,v 1.28 2009/01/06 13:07:27 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXROOTWINDOW_H
 #define FXROOTWINDOW_H
@@ -47,8 +45,17 @@ public:
   /// Construct root window
   FXRootWindow(FXApp* a,FXVisual *vis);
 
-  /// Root window need not be created
+  /// Create server-side resources
   virtual void create();
+
+  /// Can not attach the root window
+  virtual void attach(FXID w);
+
+  /// Can not detach the root window
+  virtual void detach();
+
+  /// Destroy server-side resources
+  virtual void destroy();
 
   /// Perform layout
   virtual void layout();

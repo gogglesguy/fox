@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: main.cpp,v 1.29 2009/01/19 20:54:19 fox Exp $                            *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

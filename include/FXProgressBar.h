@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXProgressBar.h,v 1.28 2009/01/06 13:07:26 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXPROGRESSBAR_H
 #define FXPROGRESSBAR_H
@@ -44,14 +42,14 @@ enum {
 class FXAPI FXProgressBar : public FXFrame {
   FXDECLARE(FXProgressBar)
 protected:
-  FXuint   progress;                      // Integer percentage number
-  FXuint   total;                         // Amount for completion
-  FXint    barsize;                       // Bar size
-  FXFont*  font;
-  FXColor  barBGColor;
-  FXColor  barColor;
-  FXColor  textNumColor;
-  FXColor  textAltColor;
+  FXuint   progress;            // Integer percentage number
+  FXuint   total;               // Amount for completion
+  FXint    barsize;             // Bar size
+  FXFont*  font;                // Text font
+  FXColor  barBGColor;          // Bar background color 
+  FXColor  barColor;            // Filled bar color
+  FXColor  textNumColor;        // Text color inside bar background
+  FXColor  textAltColor;        // Text color inside filled bar
 protected:
   FXProgressBar(){}
   void drawInterior(FXDCWindow& dc);

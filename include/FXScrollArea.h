@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXScrollArea.h,v 1.45 2009/01/06 13:07:27 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXSCROLLAREA_H
 #define FXSCROLLAREA_H
@@ -90,6 +88,13 @@ public:
   long onHScrollerDragged(FXObject*,FXSelector,void*);
   long onVScrollerDragged(FXObject*,FXSelector,void*);
   long onAutoScroll(FXObject*,FXSelector,void*);
+public:
+  enum {
+    ID_AUTOSCROLL=FXComposite::ID_LAST,
+    ID_VSCROLLED,
+    ID_HSCROLLED,
+    ID_LAST
+    };
 public:
 
   /// Return default width

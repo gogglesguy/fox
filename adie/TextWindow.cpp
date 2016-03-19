@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: TextWindow.cpp,v 1.177 2009/01/19 20:54:19 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -1487,14 +1485,15 @@ long TextWindow::onCmdNew(FXObject*,FXSelector,void*){
 // Open
 long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
   FXFileDialog opendialog(this,tr("Open Document"));
+  FXString file=getFilename();
   opendialog.setSelectMode(SELECTFILE_EXISTING);
   opendialog.setAssociations(getApp()->associations,false);
   opendialog.setPatternList(getPatterns());
   opendialog.setCurrentPattern(getCurrentPattern());
-  opendialog.setDirectory(FXPath::directory(getFilename()));
+  opendialog.setFilename(file);
   if(opendialog.execute()){
     setCurrentPattern(opendialog.getCurrentPattern());
-    FXString file=opendialog.getFilename();
+    file=opendialog.getFilename();
     TextWindow *window=findWindow(file);
     if(!window){
       window=findUnused();
@@ -3017,13 +3016,13 @@ FXHiliteStyle TextWindow::readStyleForRule(const FXString& name){
   FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100]; FXint sty;
   FXHiliteStyle style={0,0,0,0,0,0,0,0};
   if(getApp()->reg().readFormatEntry("STYLE",name.text(),"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)==8){
-    style.normalForeColor=fxcolorfromname(nfg);
-    style.normalBackColor=fxcolorfromname(nbg);
-    style.selectForeColor=fxcolorfromname(sfg);
-    style.selectBackColor=fxcolorfromname(sbg);
-    style.hiliteForeColor=fxcolorfromname(hfg);
-    style.hiliteBackColor=fxcolorfromname(hbg);
-    style.activeBackColor=fxcolorfromname(abg);
+    style.normalForeColor=colorFromName(nfg);
+    style.normalBackColor=colorFromName(nbg);
+    style.selectForeColor=colorFromName(sfg);
+    style.selectBackColor=colorFromName(sbg);
+    style.hiliteForeColor=colorFromName(hfg);
+    style.hiliteBackColor=colorFromName(hbg);
+    style.activeBackColor=colorFromName(abg);
     style.style=sty;
     }
   return style;
@@ -3033,13 +3032,13 @@ FXHiliteStyle TextWindow::readStyleForRule(const FXString& name){
 // Write style
 void TextWindow::writeStyleForRule(const FXString& name,const FXHiliteStyle& style){
   FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100];
-  fxnamefromcolor(nfg,style.normalForeColor);
-  fxnamefromcolor(nbg,style.normalBackColor);
-  fxnamefromcolor(sfg,style.selectForeColor);
-  fxnamefromcolor(sbg,style.selectBackColor);
-  fxnamefromcolor(hfg,style.hiliteForeColor);
-  fxnamefromcolor(hbg,style.hiliteBackColor);
-  fxnamefromcolor(abg,style.activeBackColor);
+  nameFromColor(nfg,style.normalForeColor);
+  nameFromColor(nbg,style.normalBackColor);
+  nameFromColor(sfg,style.selectForeColor);
+  nameFromColor(sbg,style.selectBackColor);
+  nameFromColor(hfg,style.hiliteForeColor);
+  nameFromColor(hbg,style.hiliteBackColor);
+  nameFromColor(abg,style.activeBackColor);
   getApp()->reg().writeFormatEntry("STYLE",name.text(),"%s,%s,%s,%s,%s,%s,%s,%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,style.style);
   }
 
@@ -3055,13 +3054,13 @@ void Adie::readStyles(){
     if(reg().readFormatEntry("STYLES",index,"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%d",name,nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)!=9) break;
     FXTRACE((1,"name=\"%s\" nfg=%s nbg=%s sfg=%s sbg=%s hfg=%s hbg=%s abg=%s sty=%d\n",name,nfg,nbg,sfg,sbg,hfg,hbg,abg,sty));
     stylename[i]=name;
-    stylecolor[i].normalForeColor=fxcolorfromname(nfg);
-    stylecolor[i].normalBackColor=fxcolorfromname(nbg);
-    stylecolor[i].selectForeColor=fxcolorfromname(sfg);
-    stylecolor[i].selectBackColor=fxcolorfromname(sbg);
-    stylecolor[i].hiliteForeColor=fxcolorfromname(hfg);
-    stylecolor[i].hiliteBackColor=fxcolorfromname(hbg);
-    stylecolor[i].activeBackColor=fxcolorfromname(abg);
+    stylecolor[i].normalForeColor=colorFromName(nfg);
+    stylecolor[i].normalBackColor=colorFromName(nbg);
+    stylecolor[i].selectForeColor=colorFromName(sfg);
+    stylecolor[i].selectBackColor=colorFromName(sbg);
+    stylecolor[i].hiliteForeColor=colorFromName(hfg);
+    stylecolor[i].hiliteBackColor=colorFromName(hbg);
+    stylecolor[i].activeBackColor=colorFromName(abg);
     stylecolor[i].style=sty;
     nstyles++;
     }
@@ -3074,13 +3073,13 @@ void Adie::writeStyles(){
   FXint  i;
   reg().deleteSection("STYLES");
   for(i=0; i<nstyles; i++){
-    fxnamefromcolor(nfg,stylecolor[i].normalForeColor);
-    fxnamefromcolor(nbg,stylecolor[i].normalBackColor);
-    fxnamefromcolor(sfg,stylecolor[i].selectForeColor);
-    fxnamefromcolor(sbg,stylecolor[i].selectBackColor);
-    fxnamefromcolor(hfg,stylecolor[i].hiliteForeColor);
-    fxnamefromcolor(hbg,stylecolor[i].hiliteBackColor);
-    fxnamefromcolor(abg,stylecolor[i].activeBackColor);
+    nameFromColor(nfg,stylecolor[i].normalForeColor);
+    nameFromColor(nbg,stylecolor[i].normalBackColor);
+    nameFromColor(sfg,stylecolor[i].selectForeColor);
+    nameFromColor(sbg,stylecolor[i].selectBackColor);
+    nameFromColor(hfg,stylecolor[i].hiliteForeColor);
+    nameFromColor(hbg,stylecolor[i].hiliteBackColor);
+    nameFromColor(abg,stylecolor[i].activeBackColor);
     sprintf(name,"%d",i+1);
     reg().writeFormatEntry("STYLES",name,"%s,%s,%s,%s,%s,%s,%s,%s,%d",stylename[i].text(),nfg,nbg,sfg,sbg,hfg,hbg,abg,stylecolor[i].style);
     }

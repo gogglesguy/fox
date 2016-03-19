@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXUTF32Codec.h,v 1.15 2009/01/06 13:07:29 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXUTF32CODEC_H
 #define FXUTF32CODEC_H

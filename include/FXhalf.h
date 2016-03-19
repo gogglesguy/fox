@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXhalf.h,v 1.11 2009/01/14 11:37:25 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXHALF_H
 #define FXHALF_H

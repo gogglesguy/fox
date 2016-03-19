@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDirBox.h,v 1.30 2009/01/06 13:07:23 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXDIRBOX_H
 #define FXDIRBOX_H

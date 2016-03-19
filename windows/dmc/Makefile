@@ -5,7 +5,7 @@
 all:
 	cd ..\..\utils
 	smake -fMakefile.dmc
-	cd ..\src
+	cd ..\lib
 	smake -fMakefile.dmc
 	cd ..\tests
 	smake -fMakefile.dmc
@@ -21,7 +21,7 @@ all:
 clean:
 	cd ..\..\utils
 	smake -fMakefile.dmc clean
-	cd ..\src
+	cd ..\lib
 	smake -fMakefile.dmc clean
 	cd ..\tests
 	smake -fMakefile.dmc clean

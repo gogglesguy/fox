@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: PathFinder.cpp,v 1.146 2009/01/06 13:07:30 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -906,9 +904,10 @@ long PathFinderMain::onUpdFiles(FXObject* sender,FXSelector,void*){
 
 
 // Update status line to show some info about the icon the cursor is over
-long PathFinderMain::onUpdStatusline(FXObject* sender,FXSelector,void*){
-  FXint index=filelist->getCursorItem();
-  if(0<=index){
+long PathFinderMain::onUpdStatusline(FXObject* sender,FXSelector,void*){        // FIXME
+  FXint index,cx,cy; FXuint btns;
+  filelist->getCursorPosition(cx,cy,btns);
+  if((index=filelist->getItemAt(cx,cy))>=0){
     FXFileItem *item=(FXFileItem*)filelist->getItem(index);
     FXFileAssoc *assoc=item->getAssoc();
     FXString size;
@@ -931,7 +930,7 @@ long PathFinderMain::onUpdStatusline(FXObject* sender,FXSelector,void*){
     info+=filelist->getItemFilename(index);
 
     // Add size if its a file
-    if(item->isFile()) info+=" ("+size+" bytes) ";
+    if(item->isFile()) info+=" ("+size+" bytes) "; else info+=" ";
 
     // Add the extension
     if(assoc) info+=assoc->extension;
@@ -1909,7 +1908,7 @@ void PathFinderMain::closePreview(){
 // Harvest the zombies :-)
 long PathFinderMain::onSigHarvest(FXObject*,FXSelector,void*){
 #ifndef WIN32
-  while(waitpid(-1,NULL,WNOHANG)>0);
+  while(waitpid(-1,NULL,WNOHANG)>0){ }
 #endif
   return 1;
   }

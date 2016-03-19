@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: reswrap.cpp,v 1.42 2009/01/15 22:52:41 fox Exp $                         *
 ********************************************************************************/
 #include "stdio.h"
 #include "stdlib.h"

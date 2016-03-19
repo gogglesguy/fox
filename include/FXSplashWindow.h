@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXSplashWindow.h,v 1.16 2009/01/06 13:07:27 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXSPLASHWINDOW_H
 #define FXSPLASHWINDOW_H

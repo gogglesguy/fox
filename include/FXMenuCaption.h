@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXMenuCaption.h,v 1.38 2009/01/19 22:51:50 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXMENUCAPTION_H
 #define FXMENUCAPTION_H
@@ -42,9 +40,9 @@ class FXFont;
 
 
 /**
-* The menu caption is a widget which can be used as a caption above a number 
+* The menu caption is a widget which can be used as a caption above a number
 * of menu commands in a menu.
-* When passing a tab-separated list of fields in the text parameter, the caption 
+* When passing a tab-separated list of fields in the text parameter, the caption
 * text is set to the first field, and the help string to the third field.
 * If the caption text contains an ampersand, the letter following it will be
 * underlined, and a suitable hotkey will be installed.  The actual ampersand

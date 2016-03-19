@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXAtomic.h,v 1.32 2009/01/22 13:31:24 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXATOMIC_H
 #define FXATOMIC_H

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: TextWindow.h,v 1.54 2009/01/06 13:07:20 fox Exp $                        *
 ********************************************************************************/
 #ifndef TEXTWINDOW_H
 #define TEXTWINDOW_H
@@ -362,7 +360,7 @@ public:
   // Detach window
   virtual void detach();
 
-  // Close the window, return TRUE if actually closed
+  // Close the window, return true if actually closed
   virtual FXbool close(FXbool notify=false);
 
   // Return Adie application
@@ -407,7 +405,7 @@ public:
   // Extract selection to file
   FXbool extractFile(const FXString& file);
 
-  // Return TRUE if changes have been saved
+  // Return true if changes have been saved
   FXbool saveChanges();
 
   // Change pattern list

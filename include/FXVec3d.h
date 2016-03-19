@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXVec3d.h,v 1.29 2009/02/04 18:11:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXVEC3D_H
 #define FXVEC3D_H

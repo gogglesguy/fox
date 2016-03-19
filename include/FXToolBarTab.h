@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXToolBarTab.h,v 1.17 2009/01/06 13:07:28 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXTOOLBARTAB_H
 #define FXTOOLBARTAB_H

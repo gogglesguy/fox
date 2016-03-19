@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXGLVisual.h,v 1.38 2009/01/06 13:07:24 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVISUAL_H
 #define FXGLVISUAL_H
@@ -36,7 +34,6 @@ class FXImage;
 class FXIcon;
 class FXBitmap;
 class FXDCWindow;
-class FXGLCanvas;
 
 
 /// Visual describes pixel format of a drawable
@@ -47,7 +44,6 @@ class FXAPI FXGLVisual : public FXVisual {
   friend class FXIcon;
   friend class FXBitmap;
   friend class FXDCWindow;
-  friend class FXGLCanvas;
 protected:
   FXuchar redSize;              // Red bits
   FXuchar greenSize;            // Green depth
@@ -83,7 +79,7 @@ private:
 public:
 
   /// Construct default visual
-  FXGLVisual(FXApp* a,FXuint flgs=VISUAL_DOUBLE_BUFFER|VISUAL_WINDOW);
+  FXGLVisual(FXApp* a,FXuint flgs=VISUAL_DOUBLE_BUFFER);
 
   /// Create visual
   virtual void create();

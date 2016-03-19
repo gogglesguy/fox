@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXProgressDialog.h,v 1.25 2009/01/06 13:07:26 fox Exp $                  *
 ********************************************************************************/
 #ifndef FXPROGRESSDIALOG_H
 #define FXPROGRESSDIALOG_H

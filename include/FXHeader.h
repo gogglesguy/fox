@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXHeader.h,v 1.86 2009/01/06 13:07:24 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXHEADER_H
 #define FXHEADER_H
@@ -65,20 +63,21 @@ protected:
   virtual void draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
 public:
   enum{
-    ARROW_NONE = 0,     /// No arrow
-    ARROW_UP   = 1,     /// Arrow pointing up
-    ARROW_DOWN = 2,     /// Arrow pointing down
-    PRESSED    = 4,     /// Pressed down
-    RIGHT      = 8,     /// Align on right
-    LEFT       = 16,    /// Align on left
-    CENTER_X   = 0,     /// Aling centered horizontally (default)
-    TOP        = 32,    /// Align on top
-    BOTTOM     = 64,    /// Align on bottom
-    CENTER_Y   = 0,     /// Aling centered vertically (default)
-    BEFORE     = 128,   /// Icon before the text
-    AFTER      = 256,   /// Icon after the text
-    ABOVE      = 512,   /// Icon above the text
-    BELOW      = 1024   /// Icon below the text
+    ARROW_NONE = 0,             /// No arrow
+    ARROW_UP   = 0x00000001,    /// Arrow pointing up
+    ARROW_DOWN = 0x00000002,    /// Arrow pointing down
+    PRESSED    = 0x00000004,    /// Pressed down
+    ICONOWNED  = 0x00000008,    /// Icon owned by header item
+    RIGHT      = 0x00000010,    /// Align on right
+    LEFT       = 0x00000020,    /// Align on left
+    CENTER_X   = 0,             /// Aling centered horizontally (default)
+    TOP        = 0x00000040,    /// Align on top
+    BOTTOM     = 0x00000080,    /// Align on bottom
+    CENTER_Y   = 0,             /// Aling centered vertically (default)
+    BEFORE     = 0x00000100,    /// Icon before the text
+    AFTER      = 0x00000200,    /// Icon after the text
+    ABOVE      = 0x00000400,    /// Icon above the text
+    BELOW      = 0x00000800     /// Icon below the text
     };
 public:
 
@@ -97,8 +96,8 @@ public:
   /// Get the tool tip message for this item
   const FXString& getTipText() const { return tip; }
 
-  /// Change item's icon
-  virtual void setIcon(FXIcon* icn);
+  /// Change item's icon, deleting the old icon if it was owned
+  virtual void setIcon(FXIcon* icn,FXbool owned=false);
 
   /// Return item's icon
   FXIcon* getIcon() const { return icon; }
@@ -164,8 +163,8 @@ public:
   virtual void save(FXStream& store) const;
   virtual void load(FXStream& store);
 
-  /// Destructor
-  virtual ~FXHeaderItem(){}
+  /// Delete item and free icon if owned
+  virtual ~FXHeaderItem();
   };
 
 
@@ -314,7 +313,7 @@ public:
   FXString getItemTipText(FXint index) const;
 
   /// Change icon of item at index
-  void setItemIcon(FXint index,FXIcon* icon);
+  void setItemIcon(FXint index,FXIcon* icon,FXbool owned=false);
 
   /// Return icon of item at index
   FXIcon* getItemIcon(FXint index) const;
@@ -395,7 +394,7 @@ public:
   FXuint getHeaderStyle() const;
 
   /// Set the status line help text for this header
-  void setHelpText(const FXString& text);
+  void setHelpText(const FXString& text){ help=text; }
 
   /// Get the status line help text for this header
   const FXString& getHelpText() const { return help; }

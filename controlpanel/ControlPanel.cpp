@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: ControlPanel.cpp,v 1.4 2009/01/06 13:07:21 fox Exp $                     *
 ********************************************************************************/
 #include <xincs.h>
 #include <fx.h>
@@ -503,7 +501,7 @@ void FXDesktopSetup::setup(){
   new FXLabel(matrix,"Base Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_border,FXDataTarget::ID_VALUE);
-  new FXLabel(matrix,"Border Color,NULL,LAYOUT_CENTER_Y");
+  new FXLabel(matrix,"Border Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_fore,FXDataTarget::ID_VALUE);
   new FXLabel(matrix,"Text Color",NULL,LAYOUT_CENTER_Y);
@@ -1208,9 +1206,9 @@ void FXDesktopSetup::initColors(){
   theme_xdefault.tipfore  = FXRGB(  0,  0,  0);
   theme_xdefault.menuback = FXRGB( 10, 36,106);
   theme_xdefault.menufore = FXRGB(255,255,255);
-  theme_xdefault.base   = fxcolorfromname(XGetDefault((Display*)getApp()->getDisplay(),"fox","background"));
-  theme_xdefault.fore   = fxcolorfromname(XGetDefault((Display*)getApp()->getDisplay(),"fox","foreground"));
-  theme_xdefault.border = fxcolorfromname(XGetDefault((Display*)getApp()->getDisplay(),"fox","borderColor"));
+  theme_xdefault.base   = colorFromName(XGetDefault((Display*)getApp()->getDisplay(),"fox","background"));
+  theme_xdefault.fore   = colorFromName(XGetDefault((Display*)getApp()->getDisplay(),"fox","foreground"));
+  theme_xdefault.border = colorFromName(XGetDefault((Display*)getApp()->getDisplay(),"fox","borderColor"));
   list->appendItem("X11 Default",NULL,&theme_xdefault);
 #endif
   list->appendItem("User Defined");

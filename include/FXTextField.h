@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXTextField.h,v 1.87 2009/01/06 13:07:28 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTEXTFIELD_H
 #define FXTEXTFIELD_H
@@ -175,7 +173,7 @@ public:
   long onCmdBackspace(FXObject*,FXSelector,void*);
   long onCmdBackspaceWord(FXObject*,FXSelector,void*);
   long onCmdBackspaceBol(FXObject*,FXSelector,void*);
-  long onCmdDelete(FXObject*,FXSelector,void*);
+  long onCmdDeleteChar(FXObject*,FXSelector,void*);
   long onCmdDeleteWord(FXObject*,FXSelector,void*);
   long onCmdDeleteEol(FXObject*,FXSelector,void*);
   long onCmdDeleteAll(FXObject*,FXSelector,void*);
@@ -217,13 +215,14 @@ public:
     ID_BACKSPACE,
     ID_BACKSPACE_WORD,
     ID_BACKSPACE_BOL,
-    ID_DELETE,
+    ID_DELETE_CHAR,
     ID_DELETE_WORD,
     ID_DELETE_EOL,
     ID_DELETE_ALL,
     ID_TOGGLE_EDITABLE,
     ID_TOGGLE_OVERSTRIKE,
     ID_BLINK,
+    ID_AUTOSCROLL,
     ID_LAST
     };
 

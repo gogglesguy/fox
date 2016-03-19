@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: chartdefs.h,v 1.21 2009/01/06 13:07:21 fox Exp $                         *
 ********************************************************************************/
 #ifndef CHARTDEFS_H
 #define CHARTDEFS_H

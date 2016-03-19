@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXThreadPool.h,v 1.56 2009/01/06 13:07:28 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXTHREADPOOL_H
 #define FXTHREADPOOL_H
@@ -31,44 +29,67 @@ class FXRunnable;
 class FXThreadPool;
 
 
-/// Worker in the pool
+/// A worker thread runs jobs from a thread pool
 class FXAPI FXWorker : public FXThread {
-  friend class FXThreadPool;
 private:
-  FXCondition     condition;    // Task available
-  FXMutex         mutex;        // Task mutex
-  FXThreadPool   *pool;         // Backlink to pool
-  FXWorker       *next;         // Next free worker
-  FXRunnable     *task;         // Task to perform
-  volatile FXbool runs;         // Thread runs
+  FXThreadPool *pool;   // Thread pool
 private:
   FXWorker(const FXWorker&);
   FXWorker &operator=(const FXWorker&);
 public:
 
-  /// Create worker belonging to given pool
-  FXWorker(FXThreadPool* ptr,FXRunnable* job=NULL);
-
-  /// Is worker running
-  FXbool active();
-
-  /// Return thread pool
-  FXThreadPool* getPool() const;
-
-  /// Get task
-  FXRunnable* getTask();
-
-  /// Wait for task
-  FXRunnable* waitTask();
-
-  /// Set task
-  void setTask(FXRunnable* job);
+  /// Create worker for given pool
+  FXWorker(FXThreadPool* p);
 
   /// Run worker
   virtual FXint run();
 
-  /// Destructor
+  /// Destroy worker
   virtual ~FXWorker();
+  };
+
+
+/// Queue
+class FXQueue {
+private:
+  FXRunnable **jobs;    // List of jobs
+  FXuint       head;    // Write side
+  FXuint       tail;    // Read side
+  FXuint       size;    // Size of list
+public:
+
+  /// Create queue with initial size
+  FXQueue(FXuint sz=256);
+
+  /// Change size of queue; return true if success
+  FXbool setSize(FXuint sz);
+  
+  /// Return size
+  FXuint getSize() const;
+
+  /// Return jobs
+  FXuint getCount() const;
+
+  /// Return head
+  FXuint getHead() const;
+  
+  /// Return tail
+  FXuint getTail() const;
+  
+  /// Check if queue is empty
+  FXbool isEmpty() const;
+
+  /// Check if queue is full
+  FXbool isFull() const;
+
+  /// Add item to queue, return true if success
+  FXbool push(FXRunnable* job);
+
+  /// Remove item from queue, return true if success
+  FXbool pop(FXRunnable*& job);
+
+  /// Destroy queue
+ ~FXQueue();
   };
 
 
@@ -93,83 +114,91 @@ public:
 * function.  Any exceptions thrown by this function are caught in FXWorker, thus the
 * worker thread will remain running despite exceptions thrown by the job object.
 */
-class FXAPI FXThreadPool {
-  friend class FXWorker;
+class FXAPI FXThreadPool : public FXRunnable {
 private:
-  FXCondition     condition;    // Waiting list condition
-  FXMutex         mutex;        // Waiting list mutex
-  FXWorker       *waiters;      // List of free workers
-  volatile FXint  maximum;      // Maximum number of workers
-  volatile FXint  minimum;      // Minimum number of workers
-  volatile FXint  running;      // Running number of workers
-  volatile FXint  waiting;      // Waiting number of workers
+  FXQueue         queue;        // Job queue
+  FXMutex         mutex;        // Pool mutex
+  FXCondition     pcond;        // Producer condition
+  FXCondition     ccond;        // Consumer condition
+  FXCondition     wcond;        // Wait condition
+  FXTime          expire;       // Quit if no job within this time
+  volatile FXuint maximum;      // Maximum number of workers
+  volatile FXuint minimum;      // Minimum number of workers
+  volatile FXuint running;      // Running number of workers
+  volatile FXuint waiting;      // Waiting number of workers
   volatile FXbool runs;         // Thread pool is running
 protected:
-  FXRunnable* getTask(FXWorker* wrk);
-  void appendWorker(FXWorker* wrk);
-  void removeWorker(FXWorker* wrk);
-  FXWorker* startWorker(FXRunnable* job);
+  FXbool startWorker();
 private:
   FXThreadPool(const FXThreadPool&);
   FXThreadPool &operator=(const FXThreadPool&);
 public:
 
   /**
-  * Construct an empty thread pool.
+  * Construct an empty thread pool, with given job queue size.
   */
-  FXThreadPool();
+  FXThreadPool(FXuint sz=256);
 
-  /**
-  * Construct an thread pool and call start() to initiate
-  * the thread pool run.
-  */
-  FXThreadPool(FXint min,FXint max=32,FXint run=0);
-
+  /// Change job queue size, return true if success
+  FXbool setSize(FXuint sz);
+  
+  /// Return job queue size
+  FXuint getSize() const;
+  
   /// Is pool running
   FXbool active();
 
   /// Return number of waiting threads
-  FXint getWaitingThreads();
+  FXuint getWaitingThreads();
 
   /// Return number of worker threads
-  FXint getRunningThreads();
+  FXuint getRunningThreads();
 
   /// Change minimum number of worker threads
-  void setMinimumThreads(FXint n);
+  void setMinimumThreads(FXuint n);
 
   /// Return minimum number of worker threads
-  FXint getMinimumThreads();
+  FXuint getMinimumThreads();
 
   /// Change maximum number of worker threads
-  void setMaximumThreads(FXint n);
+  void setMaximumThreads(FXuint n);
 
   /// Return maximum number of worker threads
-  FXint getMaximumThreads();
+  FXuint getMaximumThreads();
 
+  /// Change expiration time
+  void setExpiration(FXTime ns=forever);
+
+  /// Get expiration time
+  FXTime getExpiration() const;
+  
   /**
   * Start the thread pool; the number of workers will
   * vary between min and max, depending on work-load.
-  * A total of run workers will be started immediately;
-  * additional workers will be started on as-needed basis.
+  * A total of cnt workers will be started immediately;
+  * additional workers may be started on as-needed basis.
   * When the number of available workers exceeds min, any
   * additional workers which finish their assigned job will
   * terminate gracefully so as to minimize the number of
   * inactive threads.
+  * Returns the number of workers successfully started.
   */
-  FXint start(FXint min=1,FXint max=32,FXint run=0);
+  FXuint start(FXuint min=1,FXuint max=32,FXuint cnt=0);
 
   /**
-  * Wait until all jobs currently in progress have been finished.
-  * One should not execute new jobs while waiting.
+  * Wait until all jobs currently in the queue are finished.
+  * Returns true if all worker threads have become idle, i.e. the
+  * queue is empty.  
+  * If the thread pool has been stopped, it returns false.
   */
-  FXint wait();
+  FXbool wait();
 
   /**
   * Stop pool.
   * Wait until all workers have terminated gracefully, i.e. until
   * the last job has been completed.
   */
-  FXint stop();
+  void stop();
 
   /**
   * Execute job on the next available worker thread.
@@ -179,10 +208,18 @@ public:
   * Otherwise, if the flag block=true, wait until a worker finishes its job
   * and start it on the new job; if flag block=false, do not start the job at
   * this time.
-  * Return the worker to whom the job was assigned, or NULL if the job could
-  * not be started.
+  * Return false if the job could not be added to the job queue.
   */
-  FXWorker* execute(FXRunnable *job,FXbool block=true);
+  FXbool execute(FXRunnable *job,FXbool block=true);
+
+  /**
+  * Called by a (worker) thread to process jobs from the job queue.
+  * Returns when the thread pool is stopped, the number of threads
+  * exceeds the minimum number of threads, or no new jobs arrive within
+  * a set amount of time.
+  * Returns true if the pool is still running.
+  */
+  virtual FXint run();
 
   /**
   * Signal the running workers to terminate, and wait until
@@ -194,4 +231,3 @@ public:
 }
 
 #endif
-

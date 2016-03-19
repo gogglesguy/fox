@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXFileList.h,v 1.89 2009/01/06 13:07:23 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXFILELIST_H
 #define FXFILELIST_H
@@ -153,7 +151,7 @@ protected:
   FXTime        timestamp;      // Time when last refreshed
   FXuint        counter;        // Refresh counter
   FXDragAction  dropaction;     // Drop action
-  FXClipAction  clipaction;     // Clipboard action
+  FXbool        clipcut;        // Cut or copy
   FXbool        draggable;      // Dragable files
 protected:
   FXFileList();
@@ -332,7 +330,7 @@ public:
   /// Return wildcard matching mode
   FXuint getMatchMode() const { return matchmode; }
 
-  /// Change wildcard matching mode
+  /// Change wildcard matching mode (see FXPath)
   void setMatchMode(FXuint mode);
 
   /// Return true if showing hidden files

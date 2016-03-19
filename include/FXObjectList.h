@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXObjectList.h,v 1.42 2009/01/06 13:07:26 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXOBJECTLIST_H
 #define FXOBJECTLIST_H
@@ -76,7 +74,8 @@ public:
   FXObject* const& tail() const { return ptr[no()-1]; }
 
   /// Access to content array
-  FXObject** data() const { return ptr; }
+  FXObject** data(){ return ptr; }
+  FXObject *const * data() const { return ptr; }
 
   /// Adopt objects from orig, leaving orig empty
   FXObjectList& adopt(FXObjectList& orig);
@@ -199,7 +198,8 @@ public:
   TYPE* const& tail() const { return (TYPE*const&)ptr[no()-1]; }
 
   /// Access to content array
-  TYPE** data() const { return (TYPE**)ptr; }
+  TYPE** data(){ return (TYPE**)ptr; }
+  TYPE *const * data() const { return (TYPE*const *)ptr; }
   };
 
 }

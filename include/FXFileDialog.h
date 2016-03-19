@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXFileDialog.h,v 1.45 2009/01/06 13:07:23 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFILEDIALOG_H
 #define FXFILEDIALOG_H
@@ -132,7 +130,7 @@ public:
   /// Return file selection mode
   FXuint getSelectMode() const;
 
-  /// Change wildcard matching mode
+  /// Change wildcard matching mode (see FXPath)
   void setMatchMode(FXuint mode);
 
   /// Return wildcard matching mode

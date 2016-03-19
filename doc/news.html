@@ -18,6 +18,39 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 1 - FOX DEVELOPMENT 1.7.20
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Small reorganization of source files; allows in-situ usage of library.</li>
+<li>Removed getCursorItem() API from list widgets.  Was not working reliably anyway.</li>
+<li>Changed the way tooltips are obtained in list widgets.  New onQueryTip() implementation
+calls getCursorPosition(() and uses getItemAt() to determine which item to get tip from.</li>
+<li>Added getToolTip() API to list items. Default implementation returns label, but its
+a virtual intended to be overloaded in subclassed list items.</li>
+<li>Fixed the FXColorDialog's custom color wells. They were not saved to registry before.
+Code was moved from FXColorSelector to FXColorDialog, which simplifies FXColorSelector for
+more easy customization.</li>
+<li>Sort colors in FXColorSelector.  First cut of algorithm is reasonable, but needs improving.</li>
+<li>Converted to new automake tools.</li>
+<li>Converted FOX from CVS to GIT repository.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 17 - FOX STABLE 1.6.36
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed FXTable startInput() issue.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 February 05 - FOX DEVELOPMENT 1.7.19
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

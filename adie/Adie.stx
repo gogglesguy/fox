@@ -19,8 +19,6 @@
 # along with this program; if not, write to the Free Software                   #
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    #
 #################################################################################
-# $Id: Adie.stx,v 1.63 2009/01/19 20:54:19 fox Exp $                            #
-#################################################################################
 
 #
 # Notes:
@@ -323,7 +321,7 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern     "\<(FXAPI|FXDEFMAP|FXMALLOC|FXFREE|FXCALLOC|FXRESIZE|FXMEMDUP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|allocElms|callocElms|dupElms|resizeElms|freeElms)\>"
+    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely)\>"
   end
 
   rule "FOXType"
@@ -346,8 +344,12 @@ language "C++"
     pattern     "(\{|\})"
   end
 
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
   rule "Operator"
-    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%|\?|:)"
+    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%|\?|:|\.\.\.|\.)"
   end
 
 end
@@ -482,8 +484,12 @@ language "C"
     pattern     "(\{|\})"
   end
 
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
   rule "Operator"
-    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%|\?|:)"
+    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%|\?|:|\.\.\.|\.)"
   end
 
 end
@@ -842,6 +848,10 @@ language "IDL"
     pattern     "(\{|\})"
   end
 
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
   rule "Operator"
     pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%)"
   end
@@ -1076,6 +1086,10 @@ language "GLSL"
     pattern     "(\{|\})"
   end
 
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
   rule "Operator"
     pattern     "(\[|\]|\+\+|\+=|\+|--|-=|-|==|=|&&|\|\||\^=|\^|<=|<|>=|>|!=|!|\*=|\*|/=|/)"
   end
@@ -1168,6 +1182,10 @@ language "Java"
     pattern     "(\{|\})"
   end
 
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
   rule "Operator"
     pattern     "(\[|\]|==|=|>>>=|>>>|>>=|>>|>=|>|<|<<=|<<|<=|!=|!|~|&&|\|\||\|=|\||\+\+|\+=|\+|--|-=|-|\*=|\*|/=|/|&=|&|\^=|\^|%=|%|\?|:)"
   end
@@ -1250,6 +1268,10 @@ language "C#"
 
   rule "Braces"
     pattern     "(\{|\})"
+  end
+
+  rule "Parentheses"
+    pattern     "(\(|\))"
   end
 
   rule "Operator"

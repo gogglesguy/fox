@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDirSelector.h,v 1.31 2009/01/06 13:07:23 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXDIRSELECTOR_H
 #define FXDIRSELECTOR_H
@@ -130,7 +128,7 @@ public:
   /// Return wildcard matching mode
   FXuint getMatchMode() const;
 
-  /// Change wildcard matching mode
+  /// Change wildcard matching mode (see FXPath)
   void setMatchMode(FXuint mode);
 
   /// Change Directory List style

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDockHandler.h,v 1.8 2009/01/06 13:07:23 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXDOCKHANDLER_H
 #define FXDOCKHANDLER_H

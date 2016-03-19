@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXMat4f.h,v 1.34 2009/01/27 22:34:48 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT4F_H
 #define FXMAT4F_H

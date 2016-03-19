@@ -75,6 +75,7 @@ FXColorBar.h \
 FXColorDialog.h \
 FXColorList.h \
 FXColorRing.h \
+FXColors.h \
 FXColorSelector.h \
 FXColorWell.h \
 FXColorWheel.h \
@@ -113,6 +114,7 @@ FXDragCorner.h \
 FXDrawable.h \
 FXDriveBox.h \
 FXElement.h \
+FXEvent.h \
 FXException.h \
 FXExpression.h \
 FXExtentd.h \
@@ -225,6 +227,7 @@ FXRealSlider.h \
 FXRealSpinner.h \
 FXRecentFiles.h \
 FXRectangle.h \
+FXRefPtr.h \
 FXRegion.h \
 FXRegistry.h \
 FXReplaceDialog.h \

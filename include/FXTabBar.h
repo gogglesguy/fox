@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXTabBar.h,v 1.22 2009/01/06 13:07:28 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABBAR_H
 #define FXTABBAR_H
@@ -50,7 +48,8 @@ enum {
 * the tabs can be on the left or on the right.
 * When one of the tab items is pressed, the tab bar's setCurrent()
 * is called with notify=true.  Thus causes the tab bar to send a
-* SEL_COMMAND message to its target.
+* SEL_COMMAND message to its target, with the currently active
+* tab index in the void pointer.
 */
 class FXAPI FXTabBar : public FXPacker {
   FXDECLARE(FXTabBar)
@@ -109,7 +108,8 @@ public:
   /**
   * Change currently active tab item; this raises the active tab item
   * slightly above the neighboring tab items.  If notify=true then the
-  * tab bar will also send a SEL_COMMAND message to its target.
+  * tab bar will also send a SEL_COMMAND message to its target, containing
+  * the currently active tab index in the void pointer.
   */
   virtual void setCurrent(FXint panel,FXbool notify=false);
 

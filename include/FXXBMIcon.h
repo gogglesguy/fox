@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXXBMIcon.h,v 1.16 2009/01/06 13:07:29 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXXBMICON_H
 #define FXXBMICON_H
@@ -61,7 +59,7 @@ public:
 #define FXLOADXBM
 
 /**
-* Check if stream contains a XBM, return TRUE if so.
+* Check if stream contains a XBM, return true if so.
 */
 extern FXAPI FXbool fxcheckXBM(FXStream& store);
 

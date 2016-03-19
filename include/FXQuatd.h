@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXQuatd.h,v 1.20 2009/01/26 09:40:22 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXQUATD_H
 #define FXQUATD_H
