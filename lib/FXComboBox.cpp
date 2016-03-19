@@ -564,6 +564,24 @@ void* FXComboBox::getItemData(FXint index) const {
   }
 
 
+// Return true if item is enabled
+FXbool FXComboBox::isItemEnabled(FXint index) const {
+  return list->isItemEnabled(index);
+  }
+  
+
+// Enable item
+FXbool FXComboBox::enableItem(FXint index){
+  return list->enableItem(index);
+  }
+  
+
+// Disable item
+FXbool FXComboBox::disableItem(FXint index){
+  return list->disableItem(index);
+  }
+
+
 // Show menu
 void FXComboBox::showMenu(FXbool shw){
   button->showMenu(shw);

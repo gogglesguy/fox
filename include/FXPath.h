@@ -99,7 +99,7 @@ namespace FXPath {
   /// Return relative path of file to the current directory
   extern FXAPI FXString relative(const FXString& file);
 
-  /// Return relative path of file to given base directory
+  /// Return relative path of file to given absolute base directory
   extern FXAPI FXString relative(const FXString& base,const FXString& file);
 
   /// Convert path from using 'sepfm' or 'septo' to use only 'septo' path-separators

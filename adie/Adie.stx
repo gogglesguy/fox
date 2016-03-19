@@ -348,7 +348,7 @@ language "C++"
   end
 
   rule "Keyword"
-    pattern     "\<(friend|typename|explicit|typeid|for|while|if|else|try|catch|new|delete|do|namespace|class|struct|enum|union|public|private|protected|template|switch|case|default|this|return|throw|using|break|continue|goto|static|volatile|const|virtual|mutable|operator|auto|register|overload|inline|extern|and|or|xor|not|compl|and_eq|xor_eq|const_cast|dynamic_cast|true|false|not_eq|sizeof|bitor|bitand|reinterpret_cast|static_cast)\>"
+    pattern     "\<(alignas|alignof|and_eq|and|asm|auto|bitand|bitor|break|case|catch|class|compl|constexpr|const_cast|const|continue|decltype|default|delete|do|dynamic_cast|else|enum|explicit|export|extern|final|for|friend|goto|if|inline|mutable|namespace|new|noexcept|not_eq|not|nullptr|operator|or_eq|or|override|private|protected|public|register|reinterpret_cast|return|sizeof|static_cast|static|struct|switch|template|this|thread_local|throw|try|typedef|typeid|typename|union|using|virtual|volatile|while|xor_eq|xor|true|false)\>"
   end
 
   rule "Number"

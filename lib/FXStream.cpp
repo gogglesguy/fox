@@ -21,11 +21,11 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXElement.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
-#include "FXElement.h"
 #include "FXObject.h"
 #include "FXDLL.h"
 

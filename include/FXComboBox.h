@@ -225,6 +225,15 @@ public:
 
   /// Get data pointer for specified item
   void* getItemData(FXint index) const;
+  
+  /// Return true if item is enabled
+  FXbool isItemEnabled(FXint index) const;
+
+  /// Enable item
+  FXbool enableItem(FXint index);
+
+  /// Disable item
+  FXbool disableItem(FXint index);
 
   /// Show or hide menu
   void showMenu(FXbool shw);

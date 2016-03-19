@@ -170,6 +170,7 @@
 +FXRGBIcon.obj &
 +FXRGBImage.obj &
 +FXRadioButton.obj &
++FXRandom.obj &
 +FXRangef.obj &
 +FXRanged.obj &
 +FXRangeSlider.obj &

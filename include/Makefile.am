@@ -235,6 +235,7 @@ FXRASImage.h \
 FXRGBIcon.h \
 FXRGBImage.h \
 FXRadioButton.h \
+FXRandom.h \
 FXRangef.h \
 FXRanged.h \
 FXRangeSlider.h \

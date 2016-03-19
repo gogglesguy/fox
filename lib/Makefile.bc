@@ -265,6 +265,7 @@ FXQuatf.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
 FXRadioButton.cpp \
+FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
 FXRangeSlider.cpp \

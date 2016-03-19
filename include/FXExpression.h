@@ -25,16 +25,6 @@
 namespace FX {
 
 
-/// Expression error codes
-enum FXExpressionError {
-  EXPRERR_OK,
-  EXPRERR_EMPTY,             /// Empty input
-  EXPRERR_MEMORY,            /// Out of memory
-  EXPRERR_PAREN,             /// Unmatched parentheses
-  EXPRERR_TOKEN,             /// Illegal token
-  EXPRERR_COMMA,             /// Expected comma
-  EXPRERR_IDENT              /// Unknown identifier
-  };
 
 
 /// Expression
@@ -46,6 +36,20 @@ private:
   static const FXchar *const errors[];
 public:
 
+  /// Expression error codes
+  enum Error {
+    ErrOK,              /// No errors
+    ErrEmpty,           /// Empty input
+    ErrMemory,          /// Out of memory
+    ErrParent,          /// Unmatched parentheses
+    ErrToken,           /// Illegal token
+    ErrComma,           /// Expected comma
+    ErrIdent,           /// Unknown identifier
+    ErrColon            /// Expected colon
+    };
+    
+public:
+
   /// Construct empty expression object
   FXExpression();
 
@@ -53,10 +57,10 @@ public:
   FXExpression(const FXExpression& orig);
 
   /// Compile expression; if error is not NULL, error code is returned
-  FXExpression(const FXchar* expression,const FXchar* variables=NULL,FXExpressionError* error=NULL);
+  FXExpression(const FXchar* expression,const FXchar* variables=NULL,Error* error=NULL);
 
   /// Compile expression; if error is not NULL, error code is returned
-  FXExpression(const FXString& expression,const FXString& variables=FXString::null,FXExpressionError* error=NULL);
+  FXExpression(const FXString& expression,const FXString& variables=FXString::null,Error* error=NULL);
 
   /// Assign another expression to this one
   FXExpression& operator=(const FXExpression& orig);
@@ -68,13 +72,13 @@ public:
   FXdouble evaluate(const FXdouble *args=NULL) const;
 
   /// Parse expression, return error code if syntax error is found
-  FXExpressionError parse(const FXchar* expression,const FXchar* variables=NULL);
+  Error parse(const FXchar* expression,const FXchar* variables=NULL);
 
   /// Parse expression, return error code if syntax error is found
-  FXExpressionError parse(const FXString& expression,const FXString& variables=FXString::null);
+  Error parse(const FXString& expression,const FXString& variables=FXString::null);
 
   /// Returns error code for given error
-  static const FXchar* getError(FXExpressionError err){ return errors[err]; }
+  static const FXchar* getError(Error err){ return errors[err]; }
 
   /// Saving and loading
   friend FXAPI FXStream& operator<<(FXStream& store,const FXExpression& s);

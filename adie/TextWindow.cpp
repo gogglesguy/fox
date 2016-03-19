@@ -258,6 +258,9 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCHPATHS,TextWindow::onCmdSearchPaths),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATHS,TextWindow::onUpdSearchPaths),
 
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXPRESSION,TextWindow::onCmdExpression),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXPRESSION,TextWindow::onUpdExpression),
+
   FXMAPFUNC(SEL_CHANGED,TextWindow::ID_ISEARCH_TEXT,TextWindow::onChgISearchText),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_TEXT,TextWindow::onCmdISearchText),
   FXMAPFUNC(SEL_KEYPRESS,TextWindow::ID_ISEARCH_TEXT,TextWindow::onKeyISearchText),
@@ -493,15 +496,16 @@ void TextWindow::createMenubar(){
   // Edit Menu entries
   new FXMenuCommand(editmenu,tr("&Undo\tCtl-Z\tUndo last change."),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
   new FXMenuCommand(editmenu,tr("&Redo\tCtl-Shift-Z\tRedo last undo."),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
-  new FXMenuCommand(editmenu,tr("&Undo all\t\tUndo all."),NULL,&undolist,FXUndoList::ID_UNDO_ALL);
-  new FXMenuCommand(editmenu,tr("&Redo all\t\tRedo all."),NULL,&undolist,FXUndoList::ID_REDO_ALL);
-  new FXMenuCommand(editmenu,tr("&Revert to saved\t\tRevert to saved."),NULL,&undolist,FXUndoList::ID_REVERT);
+  new FXMenuCommand(editmenu,tr("Undo all\t\tUndo all."),NULL,&undolist,FXUndoList::ID_UNDO_ALL);
+  new FXMenuCommand(editmenu,tr("Redo all\t\tRedo all."),NULL,&undolist,FXUndoList::ID_REDO_ALL);
+  new FXMenuCommand(editmenu,tr("Revert to saved\t\tRevert to saved."),NULL,&undolist,FXUndoList::ID_REVERT);
   new FXMenuSeparator(editmenu);
   new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy selection to clipboard."),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
   new FXMenuCommand(editmenu,tr("Cu&t\tCtl-X\tCut selection to clipboard."),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
   new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
   new FXMenuCommand(editmenu,tr("&Delete\t\tDelete selection."),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
   new FXMenuSeparator(editmenu);
+  new FXMenuCommand(editmenu,tr("Evaluate\t\tEvaluate selected expression."),NULL,this,ID_EXPRESSION);
   new FXMenuCommand(editmenu,tr("Lo&wer-case\tCtl-U\tChange to lower case."),getApp()->lowercaseicon,editor,FXText::ID_LOWER_CASE);
   new FXMenuCommand(editmenu,tr("Upp&er-case\tCtl-Shift-U\tChange to upper case."),getApp()->uppercaseicon,editor,FXText::ID_UPPER_CASE);
   new FXMenuCommand(editmenu,tr("Clean indent\t\tClean indentation to either all tabs or all spaces."),NULL,editor,FXText::ID_CLEAN_INDENT);
@@ -2669,6 +2673,33 @@ long TextWindow::onUpdSearchPaths(FXObject* sender,FXSelector,void*){
   return 1;
   }
 
+
+// Evaluate expression
+long TextWindow::onCmdExpression(FXObject* sender,FXSelector,void*){
+  FXString string(editor->getSelectedText());
+  FXExpression expression;
+  if(expression.parse(string)==FXExpression::ErrOK){
+    FXString result(FXString::value(expression.evaluate(),15,2));
+    editor->replaceSelection(result,true);
+    return 1;
+    }
+  getApp()->beep();
+  return 1;
+  }
+
+
+// Update evaluate expression
+long TextWindow::onUpdExpression(FXObject* sender,FXSelector,void*){
+  FXString string(editor->getSelectedText());
+  FXExpression expression;
+  if(expression.parse(string)==FXExpression::ErrOK){
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+    return 1;
+    }
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
 /*******************************************************************************/
 
 // Start incremental search; show search bar if not permanently visible
@@ -3627,10 +3658,13 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
   // Scan back by a certain amount of match context
   probepos=backwardByContext(pos);
 
+  // At begin of buffer, so restyle from begin
   if(probepos==0) return 0;
 
   // Get style here
   runstyle=editor->getStyle(probepos);
+
+  // Outside of colorized part, so restyle from here
   if(runstyle==0) return probepos;
 
   // Scan back one more context and one before that
@@ -3684,9 +3718,9 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
 FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint rule){
   FXchar *text,*newstyle,*oldstyle;
   FXint len=end-beg;
-  FXint delta=len;
+  FXint delta=0;
   head=0;
-  tail=len;
+  tail=0;
   FXASSERT(0<=rule);
   FXASSERT(0<=beg && beg<=end && end<=editor->getLength());
   if(allocElms(text,len+len+len)){
@@ -3696,7 +3730,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint
     editor->extractStyle(oldstyle,beg,len);
     syntax->getRule(rule)->stylizeBody(text,newstyle,0,len,head,tail);
     editor->changeStyle(beg,newstyle,len);
-    while(0<delta && oldstyle[delta-1]==newstyle[delta-1]) --delta;
+    for(delta=tail; 0<delta && oldstyle[delta-1]==newstyle[delta-1]; --delta){ }
     freeElms(text);
     }
   head+=beg;
@@ -3736,9 +3770,10 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
       // Restyle [beg,end> using rule, return matched range in [head,tail>
       affected=restyleRange(beg,end,head,tail,rule);
 
-      // Not all colored yet, continue coloring with parent rule
+      // Not all colored yet, continue coloring with parent rule from
       if(tail<end){
         beg=tail;
+        end=forwardByContext(FXMAX(affected,changed));
         if(rule==0){ fxwarning("Top level patterns did not color everything.\n"); return; }
         rule=syntax->getRule(rule)->getParent();
         continue;

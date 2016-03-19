@@ -604,15 +604,31 @@ FXIcon* FXTreeListBox::getItemClosedIcon(const FXTreeItem* item) const{
 
 // Set item data
 void FXTreeListBox::setItemData(FXTreeItem* item,void* ptr) const {
-  if(item==NULL){ fxerror("%s::setItemData: item is NULL\n",getClassName()); }
   tree->setItemData(item,ptr);
   }
 
 
 // Get item data
 void* FXTreeListBox::getItemData(const FXTreeItem* item) const {
-  if(item==NULL){ fxerror("%s::getItemData: item is NULL\n",getClassName()); }
   return tree->getItemData(item);
+  }
+
+
+// Return true if item is enabled
+FXbool FXTreeListBox::isItemEnabled(const FXTreeItem* item) const {
+  return tree->isItemEnabled(item);
+  }
+
+
+// Enable item
+FXbool FXTreeListBox::enableItem(FXTreeItem* item){
+  return tree->enableItem(item);
+  }
+  
+
+// Disable item
+FXbool FXTreeListBox::disableItem(FXTreeItem* item){
+  return tree->disableItem(item);
   }
 
 

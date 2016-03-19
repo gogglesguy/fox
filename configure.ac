@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [33])
+m4_define([fox_level], [34])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -330,8 +330,8 @@ AC_MSG_CHECKING(for OpenGL support)
 AC_ARG_WITH(opengl,[  --with-opengl           choices are yes, no])
 AC_MSG_RESULT([$with_opengl])
 if test "x$with_opengl" != "xno" ; then
-AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU}")
 AC_CHECK_HEADER(GL/gl.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GL_H=1"; LIBS="${LIBS} ${LIBGL}")
+AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU}")
 AC_CHECK_HEADER(GL/glx.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLX_H=1")
 GL_LIBS="${LIBGL} ${LIBGLU}"
 fi

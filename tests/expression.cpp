@@ -5,7 +5,7 @@
 /* Evaluate expression with arguments */
 int main(int argc,char **argv){
   FXdouble parameter[10];
-  FXExpressionError err;
+  FXExpression::Error err;
   FXExpression expr;
   FXdouble result;
   FXint i;
@@ -15,7 +15,7 @@ int main(int argc,char **argv){
   if(1<argc){
     fxmessage("evaluate(%s) ",argv[1]);
     err=expr.parse(argv[1],(2<argc)?argv[2]:NULL);
-    if(err!=EXPRERR_OK){
+    if(err!=FXExpression::ErrOK){
       fxwarning("Error: %s\n",FXExpression::getError(err));
       exit(1);
       }

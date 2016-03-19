@@ -99,10 +99,10 @@ FXColor FXIcon::guesstransp() const {
 // Determine threshold for etch mask
 FXshort FXIcon::guessthresh() const {
   register FXshort guess=382;
-  FXint frequency[766];
   if(data && 0<width && 0<height){
     register FXint med=(width*height)>>1;
     register FXint i,j,cum;
+    FXint frequency[766];
     memset(frequency,0,sizeof(frequency));
     for(i=0; i<width*height; ++i){
       frequency[((const FXuchar*)(data+i))[2]+((const FXuchar*)(data+i))[1]+((const FXuchar*)(data+i))[0]]++;
@@ -113,7 +113,7 @@ FXshort FXIcon::guessthresh() const {
     for(j=765,cum=0; j>0; --j){
       if((cum+=frequency[j])>=med) break;
       }
-    guess=(i+j+1)>>1;
+    guess=((i+j+1)>>1)+1;               // Fanglin Zhu: raise threshold by one in case of single-color image
     }
   return guess;
   }

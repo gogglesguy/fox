@@ -488,6 +488,8 @@ using namespace FX;
 namespace FX {
 
 
+namespace {
+
 // Opcodes of the engine
 enum {
   OP_FAIL,              // Always fail
@@ -2345,6 +2347,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
   return false;
   }
 
+}
 
 /*******************************************************************************/
 

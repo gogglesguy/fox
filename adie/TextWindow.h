@@ -260,6 +260,10 @@ public:
   long onCmdSearchPaths(FXObject*,FXSelector,void*);
   long onUpdSearchPaths(FXObject*,FXSelector,void*);
 
+  // Evaluate expression
+  long onCmdExpression(FXObject*,FXSelector,void*);
+  long onUpdExpression(FXObject*,FXSelector,void*);
+
   // Incremental search
   long onChgISearchText(FXObject*,FXSelector,void*);
   long onCmdISearchText(FXObject*,FXSelector,void*);
@@ -405,6 +409,7 @@ public:
     ID_SET_INITIAL_SIZE,
     ID_TOGGLE_BROWSER,
     ID_SEARCHPATHS,
+    ID_EXPRESSION,
     ID_ISEARCH_TEXT,
     ID_ISEARCH_REVERSE,
     ID_ISEARCH_IGNCASE,
