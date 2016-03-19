@@ -3,7 +3,7 @@
 *                           T o o l   T i p   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolTip.h,v 1.14 2006/03/31 07:33:04 fox Exp $                         *
+* $Id: FXToolTip.h,v 1.18 2007/03/09 03:55:55 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXTOOLTIP_H
 #define FXTOOLTIP_H
@@ -49,17 +49,17 @@ protected:
   FXString  label;                      // Text in the tip
   FXFont   *font;                       // Font of the tip
   FXColor   textColor;                  // Text color
-  bool      popped;                     // Is currently popped up
+  FXbool    popped;                     // Is currently popped up
 protected:
   FXToolTip();
-  virtual bool doesOverrideRedirect() const;
+  virtual FXbool doesOverrideRedirect() const;
   void place(FXint x,FXint y);
   void autoplace();
 private:
   FXToolTip(const FXToolTip&);
   FXToolTip& operator=(const FXToolTip&);
 #ifdef WIN32
-  virtual const char* GetClass() const;
+  virtual const void* GetClass() const;
 #endif
 public:
   long onPaint(FXObject*,FXSelector,void*);
@@ -111,7 +111,7 @@ public:
   /// Set the current tip text color
   void setTextColor(FXColor clr);
 
-  virtual bool doesSaveUnder() const;
+  virtual FXbool doesSaveUnder() const;
 
   /// Save tip to a stream
   virtual void save(FXStream& store) const;

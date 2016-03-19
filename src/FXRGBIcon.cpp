@@ -3,7 +3,7 @@
 *                      I R I S   R G B   I c o n   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRGBIcon.cpp,v 1.24 2006/01/22 17:58:38 fox Exp $                       *
+* $Id: FXRGBIcon.cpp,v 1.26 2007/02/07 20:22:14 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -78,7 +78,7 @@ FXRGBIcon::FXRGBIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FX
 
 
 // Save object to stream
-bool FXRGBIcon::savePixels(FXStream& store) const {
+FXbool FXRGBIcon::savePixels(FXStream& store) const {
   if(fxsaveRGB(store,data,width,height)){
     return true;
     }
@@ -87,7 +87,7 @@ bool FXRGBIcon::savePixels(FXStream& store) const {
 
 
 // Load object from stream
-bool FXRGBIcon::loadPixels(FXStream& store){
+FXbool FXRGBIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadRGB(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

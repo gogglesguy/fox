@@ -3,7 +3,7 @@
 *                       F o u r - W a y   S p l i t t e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FX4Splitter.cpp,v 1.52 2006/02/20 03:32:13 fox Exp $                     *
+* $Id: FX4Splitter.cpp,v 1.56 2007/02/07 20:22:02 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -161,15 +161,15 @@ FXWindow *FX4Splitter::getBottomRight() const {
 
 // Get default width
 FXint FX4Splitter::getDefaultWidth(){
-  FXWindow *tl=getTopLeft();
-  FXWindow *tr=getTopRight();
-  FXWindow *bl=getBottomLeft();
-  FXWindow *br=getBottomRight();
+  FXWindow *ptl=getTopLeft();
+  FXWindow *ptr=getTopRight();
+  FXWindow *pbl=getBottomLeft();
+  FXWindow *pbr=getBottomRight();
   FXint tlw=0,blw=0,trw=0,brw=0,set=0;
-  if(tl && tl->shown()){ tlw=tl->getDefaultWidth(); set|=ExpandTopLeft; }
-  if(tr && tr->shown()){ trw=tr->getDefaultWidth(); set|=ExpandTopRight; }
-  if(bl && bl->shown()){ blw=bl->getDefaultWidth(); set|=ExpandBottomLeft; }
-  if(br && br->shown()){ brw=br->getDefaultWidth(); set|=ExpandBottomRight; }
+  if(ptl && ptl->shown()){ tlw=ptl->getDefaultWidth(); set|=ExpandTopLeft; }
+  if(ptr && ptr->shown()){ trw=ptr->getDefaultWidth(); set|=ExpandTopRight; }
+  if(pbl && pbl->shown()){ blw=pbl->getDefaultWidth(); set|=ExpandBottomLeft; }
+  if(pbr && pbr->shown()){ brw=pbr->getDefaultWidth(); set|=ExpandBottomRight; }
   switch(set){
     case ExpandTopLeft: return tlw;
     case ExpandTopRight: return trw;
@@ -197,15 +197,15 @@ FXint FX4Splitter::getDefaultWidth(){
 
 // Get default height
 FXint FX4Splitter::getDefaultHeight(){
-  FXWindow *tl=getTopLeft();
-  FXWindow *tr=getTopRight();
-  FXWindow *bl=getBottomLeft();
-  FXWindow *br=getBottomRight();
+  FXWindow *ptl=getTopLeft();
+  FXWindow *ptr=getTopRight();
+  FXWindow *pbl=getBottomLeft();
+  FXWindow *pbr=getBottomRight();
   FXint tlh=0,blh=0,trh=0,brh=0,set=0;
-  if(tl && tl->shown()){ tlh=tl->getDefaultHeight(); set|=ExpandTopLeft; }
-  if(tr && tr->shown()){ trh=tr->getDefaultHeight(); set|=ExpandTopRight; }
-  if(bl && bl->shown()){ blh=bl->getDefaultHeight(); set|=ExpandBottomLeft; }
-  if(br && br->shown()){ brh=br->getDefaultHeight(); set|=ExpandBottomRight; }
+  if(ptl && ptl->shown()){ tlh=ptl->getDefaultHeight(); set|=ExpandTopLeft; }
+  if(ptr && ptr->shown()){ trh=ptr->getDefaultHeight(); set|=ExpandTopRight; }
+  if(pbl && pbl->shown()){ blh=pbl->getDefaultHeight(); set|=ExpandBottomLeft; }
+  if(pbr && pbr->shown()){ brh=pbr->getDefaultHeight(); set|=ExpandBottomRight; }
   switch(set){
     case ExpandTopLeft: return tlh;
     case ExpandTopRight: return trh;
@@ -233,10 +233,10 @@ FXint FX4Splitter::getDefaultHeight(){
 
 // Recompute layout
 void FX4Splitter::layout(){
-  FXWindow *tl=getTopLeft();
-  FXWindow *tr=getTopRight();
-  FXWindow *bl=getBottomLeft();
-  FXWindow *br=getBottomRight();
+  FXWindow *ptl=getTopLeft();
+  FXWindow *ptr=getTopRight();
+  FXWindow *pbl=getBottomLeft();
+  FXWindow *pbr=getBottomRight();
   FXuint set=getExpanded();
   FXint tsx,bsx,osy;
 
@@ -273,10 +273,10 @@ void FX4Splitter::layout(){
     }
 
   // Arrange the kids
-  if(tl) tl->position(0,0,tsx,osy);
-  if(tr) tr->position(tsx+barsize,0,width-tsx-barsize,osy);
-  if(bl) bl->position(0,osy+barsize,bsx,height-osy-barsize);
-  if(br) br->position(bsx+barsize,osy+barsize,width-bsx-barsize,height-osy-barsize);
+  if(ptl) ptl->position(0,0,tsx,osy);
+  if(ptr) ptr->position(tsx+barsize,0,width-tsx-barsize,osy);
+  if(pbl) pbl->position(0,osy+barsize,bsx,height-osy-barsize);
+  if(pbr) pbr->position(bsx+barsize,osy+barsize,width-bsx-barsize,height-osy-barsize);
 
   // Layout ok now
   flags&=~FLAG_DIRTY;
@@ -308,7 +308,7 @@ void FX4Splitter::moveSplit(FXint x,FXint y){
 // Draw the horizontal split
 void FX4Splitter::drawSplit(FXint x,FXint y,FXuint m){
   FXDCWindow dc(this);
-  dc.clipChildren(FALSE);
+  dc.clipChildren(false);
   dc.setFunction(BLT_NOT_DST);
   if(m&ONVERTICAL){
     dc.fillRectangle(x,0,barsize,height);
@@ -578,29 +578,29 @@ void FX4Splitter::setSplitterStyle(FXuint style){
 
 // Expand one or all of the four panes
 void FX4Splitter::setExpanded(FXuint set){
-  FXWindow *tl=getTopLeft();
-  FXWindow *tr=getTopRight();
-  FXWindow *bl=getBottomLeft();
-  FXWindow *br=getBottomRight();
-  if(tl){ if(set&ExpandTopLeft) tl->show(); else tl->hide(); }
-  if(tr){ if(set&ExpandTopRight) tr->show(); else tr->hide(); }
-  if(bl){ if(set&ExpandBottomLeft) bl->show(); else bl->hide(); }
-  if(br){ if(set&ExpandBottomRight) br->show(); else br->hide(); }
+  FXWindow *ptl=getTopLeft();
+  FXWindow *ptr=getTopRight();
+  FXWindow *pbl=getBottomLeft();
+  FXWindow *pbr=getBottomRight();
+  if(ptl){ if(set&ExpandTopLeft) ptl->show(); else ptl->hide(); }
+  if(ptr){ if(set&ExpandTopRight) ptr->show(); else ptr->hide(); }
+  if(pbl){ if(set&ExpandBottomLeft) pbl->show(); else pbl->hide(); }
+  if(pbr){ if(set&ExpandBottomRight) pbr->show(); else pbr->hide(); }
   recalc();
   }
 
 
 // Get set of expanded children
 FXuint FX4Splitter::getExpanded() const {
-  FXWindow *tl=getTopLeft();
-  FXWindow *tr=getTopRight();
-  FXWindow *bl=getBottomLeft();
-  FXWindow *br=getBottomRight();
+  FXWindow *ptl=getTopLeft();
+  FXWindow *ptr=getTopRight();
+  FXWindow *pbl=getBottomLeft();
+  FXWindow *pbr=getBottomRight();
   FXuint set=0;
-  if(tl && tl->shown()) set|=ExpandTopLeft;
-  if(tr && tr->shown()) set|=ExpandTopRight;
-  if(bl && bl->shown()) set|=ExpandBottomLeft;
-  if(br && br->shown()) set|=ExpandBottomRight;
+  if(ptl && ptl->shown()) set|=ExpandTopLeft;
+  if(ptr && ptr->shown()) set|=ExpandTopRight;
+  if(pbl && pbl->shown()) set|=ExpandBottomLeft;
+  if(pbr && pbr->shown()) set|=ExpandBottomRight;
   return set;
   }
 

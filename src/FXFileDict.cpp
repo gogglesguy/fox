@@ -3,7 +3,7 @@
 *                 F i l e  - A s s o c i a t i o n   T a b l e                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileDict.cpp,v 1.69 2006/03/31 07:33:06 fox Exp $                      *
+* $Id: FXFileDict.cpp,v 1.71 2007/02/07 20:22:07 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -249,7 +249,7 @@ void *FXFileDict::createData(void* ptr){
   if(strstr(extra,"cd")) flags|=1;
   if(strstr(extra,"term")) flags|=2;
 
-  FXTRACE((10,"FXFileDict: command=\"%s\" extension=\"%s\" mimetype=\"%s\" big=\"%s\" bigopen=\"%s\" mini=\"%s\" miniopen=\"%s\" flags=%d\n",command,extension,mimetype,bigname,bignameopen,mininame,mininameopen,flags));
+  FXTRACE((300,"FXFileDict: command=\"%s\" extension=\"%s\" mimetype=\"%s\" big=\"%s\" bigopen=\"%s\" mini=\"%s\" miniopen=\"%s\" flags=%d\n",command,extension,mimetype,bigname,bignameopen,mininame,mininameopen,flags));
 
   // Initialize association data
   fileassoc->command=command;

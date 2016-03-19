@@ -3,7 +3,7 @@
 *                           O p e n G L   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLObject.cpp,v 1.38 2006/04/02 19:33:22 fox Exp $                      *
+* $Id: FXGLObject.cpp,v 1.45 2007/02/07 20:22:09 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -63,10 +63,13 @@ using namespace FX;
 
 namespace FX {
 
+
+// Explicit template specialization
+//template class FXObjectListOf<FXGLObject>;
+
+
 // Object implementation
 FXIMPLEMENT(FXGLObject,FXObject,NULL,0)
-
-
 
 
 // Get bounding box
@@ -94,15 +97,15 @@ FXGLObject* FXGLObject::identify(FXuint*){ return this; }
 
 
 // Return true if it can be dragged
-bool FXGLObject::canDrag() const { return false; }
+FXbool FXGLObject::canDrag() const { return false; }
 
 
 // Return true if OK to delete object
-bool FXGLObject::canDelete() const { return false; }
+FXbool FXGLObject::canDelete() const { return false; }
 
 
 // Drag the object
-bool FXGLObject::drag(FXGLViewer*,FXint,FXint,FXint,FXint){ return false; }
+FXbool FXGLObject::drag(FXGLViewer*,FXint,FXint,FXint,FXint){ return false; }
 
 
 
@@ -166,11 +169,11 @@ FXGLObject* FXGLGroup::identify(FXuint* path){
 
 
 // Return true if it can be dragged
-bool FXGLGroup::canDrag() const { return true; }
+FXbool FXGLGroup::canDrag() const { return true; }
 
 
 // Drag group object
-bool FXGLGroup::drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty){
+FXbool FXGLGroup::drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty){
   for(FXint i=0; i<list.no(); i++){
     list[i]->drag(viewer,fx,fy,tx,ty);
     }

@@ -3,7 +3,7 @@
 *                         C o l o r   L i s t   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorList.cpp,v 1.5 2006/03/31 07:33:04 fox Exp $                      *
+* $Id: FXColorList.cpp,v 1.8 2007/02/07 20:22:03 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -69,7 +69,7 @@ FXIMPLEMENT(FXColorItem,FXListItem,NULL,0)
 
 
 // Draw item
-void FXColorItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXint hh){
+void FXColorItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXint hh) const {
   register FXFont *font=list->getFont();
   register FXint th=0;
   if(!label.empty()) th=font->getFontHeight();
@@ -162,7 +162,7 @@ FXListItem *FXColorList::createItem(const FXString& text,FXIcon*,void* ptr){
 
 
 // Fill list by appending color items from array of strings and array of colors
-FXint FXColorList::fillItems(const FXchar** strings,FXColor *colors,void* ptr,bool notify){
+FXint FXColorList::fillItems(const FXchar** strings,FXColor *colors,void* ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){
@@ -175,7 +175,7 @@ FXint FXColorList::fillItems(const FXchar** strings,FXColor *colors,void* ptr,bo
 
 
 // Insert item at index with given text, color, and user-data pointer
-FXint FXColorList::insertItem(FXint index,const FXString& text,FXColor color,void* ptr,bool notify){
+FXint FXColorList::insertItem(FXint index,const FXString& text,FXColor color,void* ptr,FXbool notify){
   FXint pos=FXList::insertItem(index,text,NULL,ptr,notify);
   setItemColor(pos,color);
   return pos;
@@ -183,14 +183,14 @@ FXint FXColorList::insertItem(FXint index,const FXString& text,FXColor color,voi
 
 
 // Append new item with given text, color, and user-data pointer
-FXint FXColorList::appendItem(const FXString& text,FXColor color,void* ptr,bool notify){
+FXint FXColorList::appendItem(const FXString& text,FXColor color,void* ptr,FXbool notify){
   FXint pos=FXList::appendItem(text,NULL,ptr,notify);
   setItemColor(pos,color);
   return pos;
   }
 
 // Prepend new item with given text, color, and user-data pointer
-FXint FXColorList::prependItem(const FXString& text,FXColor color,void* ptr,bool notify){
+FXint FXColorList::prependItem(const FXString& text,FXColor color,void* ptr,FXbool notify){
   FXint pos=FXList::prependItem(text,NULL,ptr,notify);
   setItemColor(pos,color);
   return pos;

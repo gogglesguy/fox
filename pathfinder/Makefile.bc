@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2005 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
-# $Id: Makefile.bc,v 1.24 2006/03/22 03:46:48 fox Exp $                      #
+# $Id: Makefile.bc,v 1.26 2006/08/10 14:07:23 fox Exp $                      #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -47,6 +47,7 @@ ICONS = \
         bigicons.bmp \
         closepanel.gif \
         clrbook.gif \
+        config_gif.gif \
         copy.bmp \
         copyit.gif \
         cut.bmp \
@@ -93,10 +94,10 @@ pathfinder.exe: $(OBJECTS) $(FOXLIB)
 PathFinder.obj: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $**
+	$(RESWRAP) -h -o icons.h $**
 
 icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $**
+	$(RESWRAP) -i icons.h -o icons.cpp $**
 
 clean:
 	$(RM) *.obj

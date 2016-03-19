@@ -3,7 +3,7 @@
 *                     P o p u p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,11 +19,12 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPopup.cpp,v 1.93 2006/04/05 18:55:10 fox Exp $                         *
+* $Id: FXPopup.cpp,v 1.102 2007/03/09 03:55:56 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxpriv.h"
 #include "fxkeys.h"
 #include "FXHash.h"
 #include "FXThread.h"
@@ -100,8 +101,7 @@ FXPopup::FXPopup():prevActive(NULL),nextActive(NULL){
 
 
 // Transient window used for popups
-FXPopup::FXPopup(FXWindow* owner,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXShell(owner,opts,x,y,w,h),prevActive(NULL),nextActive(NULL){
+FXPopup::FXPopup(FXWindow* own,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXShell(own,opts,x,y,w,h),prevActive(NULL),nextActive(NULL){
   defaultCursor=getApp()->getDefaultCursor(DEF_RARROW_CURSOR);
   dragCursor=getApp()->getDefaultCursor(DEF_RARROW_CURSOR);
   flags|=FLAG_ENABLED;
@@ -115,20 +115,20 @@ FXPopup::FXPopup(FXWindow* owner,FXuint opts,FXint x,FXint y,FXint w,FXint h):
 
 
 // Popups do override-redirect
-bool FXPopup::doesOverrideRedirect() const {
+FXbool FXPopup::doesOverrideRedirect() const {
   return true;
   }
 
 
 // Popups do save-unders
-bool FXPopup::doesSaveUnder() const {
+FXbool FXPopup::doesSaveUnder() const {
   return true;
   }
 
 
 #ifdef WIN32
 
-const char* FXPopup::GetClass() const { return "FXPopup"; }
+const void* FXPopup::GetClass() const { return TEXT("FXPopup"); }
 
 #endif
 
@@ -523,28 +523,20 @@ long FXPopup::onFocusPrev(FXObject*,FXSelector,void* ptr){
 
 // Moved into the popup:- tell the target
 long FXPopup::onEnter(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
-  FXint px, py;
+  FXint px,py;
   FXShell::onEnter(sender,sel,ptr);
-//  if(event->code==CROSSINGNORMAL){
-  //if(((FXEvent*)ptr)->code!=CROSSINGGRAB){
-    translateCoordinatesTo(px,py,getParent(),event->win_x,event->win_y); // Patch from Michael Nold <mn@sol-3.de>
-    if(contains(px,py) && getGrabOwner()->grabbed()) getGrabOwner()->ungrab();
-//    }
+  translateCoordinatesTo(px,py,getParent(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y);
+  if(contains(px,py) && getGrabOwner()->grabbed()) getGrabOwner()->ungrab();
   return 1;
   }
 
 
 // Moved outside the popup:- tell the target
 long FXPopup::onLeave(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
   FXint px,py;
   FXShell::onLeave(sender,sel,ptr);
-//  if(event->code==CROSSINGNORMAL){
-  //if(((FXEvent*)ptr)->code!=CROSSINGGRAB){
-    translateCoordinatesTo(px,py,getParent(),event->win_x,event->win_y); // Patch from Michael Nold <mn@sol-3.de>
-    if(!contains(px,py) && shown() && !getGrabOwner()->grabbed() && getGrabOwner()->shown()) getGrabOwner()->grab();
-//    }
+  translateCoordinatesTo(px,py,getParent(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y);
+  if(!contains(px,py) && shown() && !getGrabOwner()->grabbed() && getGrabOwner()->shown()) getGrabOwner()->grab();
   return 1;
   }
 
@@ -681,38 +673,28 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
   rh=getRoot()->getHeight();
 #else
   RECT rect;
-#if (WINVER >= 0x500) || ((defined _WIN32_WINDOWS) && (_WIN32_WINDOWS >= 0x410))
-  HINSTANCE user32;
-  typedef BOOL (WINAPI* PFN_GETMONITORINFOA)(HMONITOR, LPMONITORINFO);
-  typedef HMONITOR (WINAPI* PFN_MONITORFROMRECTA)(LPRECT, DWORD);
-  PFN_GETMONITORINFOA GetMonitorInfoA;
-  PFN_MONITORFROMRECTA MonitorFromRectA;
+  MYMONITORINFO minfo;
+  HANDLE monitor;
 
-  // Suggested by "Daniel Gehriger" <gehriger@linkcad.com>
-  // The API does not exist on older Windows NT and 95, so
-  // We can't even link it, let alone call it.
-  // The solution is to ask the DLL if the function exists.
-  // And another patch from Lothar Scholtz; now it works!
-  if((user32=LoadLibraryA("User32")) && (GetMonitorInfoA=reinterpret_cast<PFN_GETMONITORINFOA>(GetProcAddress(user32,"GetMonitorInfoA"))) && (MonitorFromRectA=reinterpret_cast<PFN_MONITORFROMRECTA>(GetProcAddress(user32,"MonitorFromRect")))){
-    MONITORINFOEXA minfo;
-    HMONITOR hMon;
-    rect.left=x;
-    rect.right=x+w;
-    rect.top=y;
-    rect.bottom=y+h;
-    hMon=MonitorFromRectA(&rect,MONITOR_DEFAULTTOPRIMARY);
+  rect.left=x;
+  rect.right=x+w;
+  rect.top=y;
+  rect.bottom=y+h;
+
+  // Get monitor info if we have this API
+  monitor=fxMonitorFromRect(&rect,MONITOR_DEFAULTTOPRIMARY);
+  if(monitor){
     memset(&minfo,0,sizeof(minfo));
     minfo.cbSize=sizeof(minfo);
-    GetMonitorInfoA(hMon,&minfo);
+    fxGetMonitorInfo(monitor,&minfo);
     rx=minfo.rcWork.left;
     ry=minfo.rcWork.top;
     rw=minfo.rcWork.right-minfo.rcWork.left;
     rh=minfo.rcWork.bottom-minfo.rcWork.top;
     }
-  else
-#endif
-    {
-    // On Win95 and WinNT, we have to use the following
+
+  // Otherwise use the work-area
+  else{
     SystemParametersInfo(SPI_GETWORKAREA,sizeof(RECT),&rect,0);
     rx=rect.left;
     ry=rect.top;
@@ -720,7 +702,6 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
     rh=rect.bottom-rect.top;
     }
 #endif
-
   FXTRACE((150,"%s::popup %p\n",getClassName(),this));
   grabowner=grabto;
   if((options&POPUP_SHRINKWRAP) || w<=1) w=getDefaultWidth();
@@ -825,7 +806,7 @@ FXuint FXPopup::getOrientation() const {
 
 // Set popup orientation
 void FXPopup::setOrientation(FXuint orient){
-  FXuint opts=(options&~POPUP_HORIZONTAL) | (orient&POPUP_HORIZONTAL);
+  FXuint opts=((orient^options)&POPUP_HORIZONTAL)^options;
   if(options!=opts){
     options=opts;
     recalc();
@@ -834,20 +815,20 @@ void FXPopup::setOrientation(FXuint orient){
 
 
 // Return shrinkwrap mode
-bool FXPopup::getShrinkWrap() const {
+FXbool FXPopup::getShrinkWrap() const {
   return (options&POPUP_SHRINKWRAP)!=0;
   }
 
 
 // Change shrinkwrap mode
-void FXPopup::setShrinkWrap(bool sw){
-  options=sw ? (options|POPUP_SHRINKWRAP) : (options&~POPUP_SHRINKWRAP);
+void FXPopup::setShrinkWrap(FXbool flag){
+  options^=((0-flag)^options)&POPUP_SHRINKWRAP;
   }
 
 
 // Change frame border style
 void FXPopup::setFrameStyle(FXuint style){
-  FXuint opts=(options&~FRAME_MASK) | (style&FRAME_MASK);
+  FXuint opts=((style^options)&FRAME_MASK)^options;
   if(options!=opts){
     FXint b=(opts&FRAME_THICK) ? 2 : (opts&(FRAME_SUNKEN|FRAME_RAISED)) ? 1 : 0;
     options=opts;

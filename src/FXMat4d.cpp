@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMat4d.cpp,v 1.17 2006/01/22 17:58:35 fox Exp $                         *
+* $Id: FXMat4d.cpp,v 1.19 2007/02/07 20:22:12 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -352,18 +352,18 @@ FXMat4d& FXMat4d::eye(){
 
 
 // Orthographic projection
-FXMat4d& FXMat4d::ortho(FXdouble left,FXdouble right,FXdouble bottom,FXdouble top,FXdouble hither,FXdouble yon){
+FXMat4d& FXMat4d::ortho(FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi,FXdouble zlo,FXdouble zhi){
   register FXdouble x,y,z,tx,ty,tz,rl,tb,yh,r0,r1,r2,r3;
-  rl=right-left;
-  tb=top-bottom;
-  yh=yon-hither;
+  rl=xhi-xlo;
+  tb=yhi-ylo;
+  yh=zhi-zlo;
   FXASSERT(rl && tb && yh);         // Throw exception in future
   x= 2.0/rl;
   y= 2.0/tb;
   z=-2.0/yh;
-  tx=-(right+left)/rl;
-  ty=-(top+bottom)/tb;
-  tz=-(yon+hither)/yh;
+  tx=-(xhi+xlo)/rl;
+  ty=-(yhi+ylo)/tb;
+  tz=-(zhi+zlo)/yh;
   r0=m[0][0];
   r1=m[1][0];
   r2=m[2][0];
@@ -401,19 +401,19 @@ FXMat4d& FXMat4d::ortho(FXdouble left,FXdouble right,FXdouble bottom,FXdouble to
 
 
 // Perspective projection
-FXMat4d& FXMat4d::frustum(FXdouble left,FXdouble right,FXdouble bottom,FXdouble top,FXdouble hither,FXdouble yon){
+FXMat4d& FXMat4d::frustum(FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi,FXdouble zlo,FXdouble zhi){
   register FXdouble x,y,a,b,c,d,rl,tb,yh,r0,r1,r2,r3;
-  FXASSERT(0.0<hither && hither<yon);  // Throw exception in future
-  rl=right-left;
-  tb=top-bottom;
-  yh=yon-hither;
+  FXASSERT(0.0<zlo && zlo<zhi);  // Throw exception in future
+  rl=xhi-xlo;
+  tb=yhi-ylo;
+  yh=zhi-zlo;
   FXASSERT(rl && tb);                   // Throw exception in future
-  x= 2.0*hither/rl;
-  y= 2.0*hither/tb;
-  a= (right+left)/rl;
-  b= (top+bottom)/tb;
-  c=-(yon+hither)/yh;
-  d=-(2.0*yon*hither)/yh;
+  x= 2.0*zlo/rl;
+  y= 2.0*zlo/tb;
+  a= (xhi+xlo)/rl;
+  b= (yhi+ylo)/tb;
+  c=-(zhi+zlo)/yh;
+  d=-(2.0*zhi*zlo)/yh;
   r0=m[0][0];
   r1=m[1][0];
   r2=m[2][0];
@@ -694,15 +694,15 @@ FXMat4d FXMat4d::invert() const {
 
 
 // Look at
-FXMat4d& FXMat4d::look(const FXVec3d& eye,const FXVec3d& cntr,const FXVec3d& vup){
+FXMat4d& FXMat4d::look(const FXVec3d& from,const FXVec3d& to,const FXVec3d& up){
   register FXdouble x0,x1,x2,tx,ty,tz;
   FXVec3d rz,rx,ry;
-  rz=normalize(eye-cntr);
-  rx=normalize(vup^rz);
+  rz=normalize(from-to);
+  rx=normalize(up^rz);
   ry=normalize(rz^rx);
-  tx= -eye[0]*rx[0]-eye[1]*rx[1]-eye[2]*rx[2];
-  ty= -eye[0]*ry[0]-eye[1]*ry[1]-eye[2]*ry[2];
-  tz= -eye[0]*rz[0]-eye[1]*rz[1]-eye[2]*rz[2];
+  tx= -from[0]*rx[0]-from[1]*rx[1]-from[2]*rx[2];
+  ty= -from[0]*ry[0]-from[1]*ry[1]-from[2]*ry[2];
+  tz= -from[0]*rz[0]-from[1]*rz[1]-from[2]*rz[2];
   x0=m[0][0]; x1=m[0][1]; x2=m[0][2];
   m[0][0]=rx[0]*x0+rx[1]*x1+rx[2]*x2+tx*m[0][3];
   m[0][1]=ry[0]*x0+ry[1]*x1+ry[2]*x2+ty*m[0][3];

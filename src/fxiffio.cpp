@@ -3,7 +3,7 @@
 *                          I F F   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxiffio.cpp,v 1.15 2006/03/24 06:05:03 fox Exp $                         *
+* $Id: fxiffio.cpp,v 1.19 2007/02/07 20:22:20 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -47,8 +47,8 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckIFF(FXStream& store);
-extern FXAPI bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxcheckIFF(FXStream& store);
+extern FXAPI FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 
 
 // Tags
@@ -108,7 +108,7 @@ static inline FXuint read32(FXStream& store){
 
 
 // Check if stream contains a IFF
-bool fxcheckIFF(FXStream& store){
+FXbool fxcheckIFF(FXStream& store){
   FXuint signature;
   signature=read32(store);
   store.position(-4,FXFromCurrent);
@@ -117,7 +117,7 @@ bool fxcheckIFF(FXStream& store){
 
 
 // Load IFF image from stream
-bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   FXuint pixels,bit,view,tag,size,type,colors,i,bytesperline,value,plane,remainingbytes,fmt;
   FXuchar *buffer,*ptr,planes,masking,compress,padding,c1,c2,c3,color,count;
   FXColor colormap[256],*dest,pixelcolor;
@@ -139,7 +139,7 @@ bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // Read tag
   tag=read32(store);
 
-  //FXTRACE((1,"fxloadIFF tag=%c%c%c%c\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255));
+  //FXTRACE((100,"fxloadIFF tag=%c%c%c%c\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255));
 
   // Check for FORM tag
   if(tag!=FORM && tag!=FOR1 && tag!=FOR2 && tag!=FOR3 && tag!=FOR4) return false;
@@ -169,7 +169,7 @@ bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     // Empty block is a problem too
     if(size==0) return false;
 
-    //FXTRACE((1,"CHUNK %c%c%c%c POS=%d SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
+    //FXTRACE((100,"CHUNK %c%c%c%c POS=%d SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
 
     // Bitmap header
     if(tag==BMHD){
@@ -200,7 +200,7 @@ bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     // Commodore AMiGa
     else if(tag==CAMG){
       view=read32(store);
-      FXTRACE((1,"view=%04x\n",view));
+      //FXTRACE((100,"view=%04x\n",view));
       }
 
     // Body
@@ -213,7 +213,7 @@ bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     }
 
   // Wat voor vlees in de kuip?
-  //FXTRACE((1,"fxloadIFF: width=%d height=%d planes=%d masking=%d compress=%d padding=%d\n",width,height,planes,masking,compress,padding));
+  //FXTRACE((100,"fxloadIFF: width=%d height=%d planes=%d masking=%d compress=%d padding=%d\n",width,height,planes,masking,compress,padding));
 
   // Determine format
   if(planes==24){
@@ -301,13 +301,13 @@ bool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       }
 
 /*
-    FXTRACE((1,"y: %d\n",y));
+    FXTRACE((100,"y: %d\n",y));
     for(plane=0; plane<planes; plane++){
-      FXTRACE((1,"P %2d: ",plane));
+      FXTRACE((100,"P %2d: ",plane));
       for(i=0; i<bytesperline; i++){
-        FXTRACE((1,"%02x ",buffer[plane*bytesperline+i]));
+        FXTRACE((100,"%02x ",buffer[plane*bytesperline+i]));
         }
-      FXTRACE((1,"\n"));
+      FXTRACE((100,"\n"));
       }
 */
 

@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileSelector.h,v 1.62 2006/03/31 07:33:01 fox Exp $                    *
+* $Id: FXFileSelector.h,v 1.69 2007/02/07 20:21:54 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXFILESELECTOR_H
 #define FXFILESELECTOR_H
@@ -111,7 +111,7 @@ public:
   long onCmdMove(FXObject*,FXSelector,void*);
   long onCmdCopy(FXObject*,FXSelector,void*);
   long onCmdLink(FXObject*,FXSelector,void*);
-  long onCmdDelete(FXObject*,FXSelector,void*);
+  long onCmdRemove(FXObject*,FXSelector,void*);
   long onUpdSelected(FXObject*,FXSelector,void*);
   long onPopupMenu(FXObject*,FXSelector,void*);
   long onCmdImageSize(FXObject*,FXSelector,void*);
@@ -133,7 +133,7 @@ public:
     ID_BOOKMENU,
     ID_VISIT,
     ID_NEW,
-    ID_DELETE,
+    ID_REMOVE,
     ID_MOVE,
     ID_COPY,
     ID_LINK,
@@ -207,10 +207,10 @@ public:
   FXint getNumPatterns() const;
 
   /// Allow pattern entry
-  void allowPatternEntry(bool allow);
+  void allowPatternEntry(FXbool flag);
 
-  /// Return TRUE if pattern entry is allowed
-  bool allowPatternEntry() const;
+  /// Return true if pattern entry is allowed
+  FXbool allowPatternEntry() const;
 
   /**
   * Given filename pattern of the form "GIF Format (*.gif)",
@@ -257,17 +257,17 @@ public:
   /// Return wildcard matching mode
   FXuint getMatchMode() const;
 
-  /// Return TRUE if showing hidden files
-  bool showHiddenFiles() const;
+  /// Return true if showing hidden files
+  FXbool showHiddenFiles() const;
 
   /// Show or hide hidden files
-  void showHiddenFiles(bool showing);
+  void showHiddenFiles(FXbool flag);
 
-  /// Return TRUE if image preview on
-  bool showImages() const;
+  /// Return true if image preview on
+  FXbool showImages() const;
 
   /// Show or hide preview images
-  void showImages(bool showing);
+  void showImages(FXbool flag);
 
   /// Return images preview size
   FXint getImageSize() const;
@@ -276,22 +276,28 @@ public:
   void setImageSize(FXint size);
 
   /// Show readonly button
-  void showReadOnly(bool show);
+  void showReadOnly(FXbool flag);
 
-  /// Return TRUE if readonly is shown
-  bool shownReadOnly() const;
+  /// Return true if readonly is shown
+  FXbool shownReadOnly() const;
 
   /// Set initial state of readonly button
-  void setReadOnly(bool state);
+  void setReadOnly(FXbool flag);
 
   /// Get readonly state
-  bool getReadOnly() const;
+  FXbool getReadOnly() const;
 
   /// Allow or disallow navigation
-  void allowNavigation(bool flag){ navigable=flag; }
+  void allowNavigation(FXbool flag){ navigable=flag; }
 
   /// Is navigation allowed?
-  bool allowNavigation() const { return navigable; }
+  FXbool allowNavigation() const { return navigable; }
+
+  /// Set draggable files
+  void setDraggableFiles(FXbool flag);
+
+  /// Are draggable files
+  FXbool getDraggableFiles() const;
 
   /// Save object to a stream
   virtual void save(FXStream& store) const;

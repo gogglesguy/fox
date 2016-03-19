@@ -5,7 +5,7 @@
 ##############################################################################
 # Contributed by: Andre Fornacon <afo@zlug.org>                              #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.15 2006/03/22 03:46:48 fox Exp $                     #
+# $Id: Makefile.dmc,v 1.18 2006/08/10 14:07:23 fox Exp $                     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -23,12 +23,12 @@
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later
-CXX	  = sc
+CXX	  = dmc
 CXXFLAGS  = -mn -5 -a8
 RM	  = del
 TOPDIR    = ..
 DEFINES   = -DNDEBUG -DFOX_BIGENDIAN=0 -DWIN32 -D_WINDOWS
-LD	  = sc
+LD	  = link
 LDFLAGS	  =
 LIBS	  = advapi32.lib+shell32.lib+gdi32.lib+wsock32.lib
 INCDIRS   = -I$(TOPDIR)\include
@@ -45,6 +45,7 @@ OBJECTS  = \
 ICONS_1 = \
         bigicons.bmp \
         bigpenguin.bmp \
+        config_gif.gif \
         closepanel.gif \
         clrbook.gif \
         copy.bmp \
@@ -94,14 +95,11 @@ pathfinder.exe: $(OBJECTS) $(FOXLIB)
 PathFinder.obj: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RM) $@
-	$(RESWRAP) -i -oa $@ $(ICONS_1)
-	$(RESWRAP) -i -oa $@ $(ICONS_2)
+	$(RESWRAP) -h -o $@ $(ICONS_1)
+	$(RESWRAP) -h -oa $@ $(ICONS_2)
 
 icons.cpp: $(ICONS)
-	$(RM) $@
-	echo ^#include "icons.h" > $@
-	$(RESWRAP) -oa $@ $(ICONS_1)
+	$(RESWRAP) -i icons.h -o $@ $(ICONS_1)
 	$(RESWRAP) -oa $@ $(ICONS_2)
 
 clean:

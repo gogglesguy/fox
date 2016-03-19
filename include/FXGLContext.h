@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                        G L  C o n t e x t   C l a s s                         *
+*                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLContext.h,v 1.16 2006/04/24 18:19:13 fox Exp $                       *
+* $Id: FXGLContext.h,v 1.35 2007/02/07 20:21:54 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGLCONTEXT_H
 #define FXGLCONTEXT_H
@@ -30,74 +30,78 @@ namespace FX {
 
 class FXApp;
 class FXDrawable;
-class FXGLVisual;
 
-
-/**
-* A GL context is an object representing the OpenGL state information.
-* Multiple GL context may share display lists to conserve memory.
-* When drawing multiple windows, it may be advantageous to share not only
-* display lists, but also GL contexts.  Since the GL context is created
-* for a certain frame-buffer configuration, sharing of GL contexts is
-* only possible if the windows sharing the GL context all have the same
-* GL visual.
-* However, display lists may be shared between different GL contexts.
-*/
+/// OpenGL context
 class FXAPI FXGLContext : public FXId {
-  FXDECLARE(FXGLContext)
 private:
-  FXGLVisual     *visual;     // Visual for this context
-  FXDrawable     *surface;    // Drawable context is locked on
-  FXGLContext    *sgnext;     // Share group next in share list
-  FXGLContext    *sgprev;     // Share group previous in share list
-protected:
-  void           *ctx;        // GL Context
-protected:
-  FXGLContext():visual(NULL),surface(NULL),sgnext(NULL),sgprev(NULL),ctx(NULL){}
+  FXDrawable  *drawable;        // To render on, if any
+  FXGLContext *shared;          // Shared with other
+  FXGLConfig   desired;         // Desired configuration
+  FXGLConfig   actual;          // Actual onfiguration
+  void*        format;          // Configuration format
 private:
   FXGLContext(const FXGLContext&);
   FXGLContext &operator=(const FXGLContext&);
+protected:
+  FXGLContext();
 public:
 
   /**
-  * Construct an OpenGL context with its own private display list.
+  * Construct an OpenGL context with default configuration properties;
+  * it shares a display list with another context shr.
   */
-  FXGLContext(FXApp* a,FXGLVisual *vis);
+  FXGLContext(FXApp *a,FXGLContext* shr=NULL);
 
   /**
-  * Construct an OpenGL context sharing display lists with an existing GL context.
+  * Construct an OpenGL context with given configuration properties cfg;
+  * it shares a display list with another context shr.
   */
-  FXGLContext(FXApp* a,FXGLVisual *vis,FXGLContext *shared);
+  FXGLContext(FXApp *a,const FXGLConfig& cfg,FXGLContext* shr=NULL);
 
-  /// Return TRUE if it is sharing display lists
-  bool isShared() const;
+  /// Change configuration
+  void setConfig(const FXGLConfig& cfg){ desired=cfg; }
 
-  /// Get the visual
-  FXGLVisual* getVisual() const { return visual; }
+  /// Get configuration
+  const FXGLConfig& getConfig() const { return desired; }
+
+  /// Get actual configuration
+  const FXGLConfig& getActualConfig() const { return actual; }
+
+  /// Get matched configuration format
+  void* getFormat() const { return format; }
+
+  /// Change share context prior to calling create()
+  void setShared(FXGLContext *ctx){ shared=ctx; }
+
+  /// Get share context
+  FXGLContext* getShared() const { return shared; }
 
   /// Create context
   virtual void create();
 
-  /// Detach the server-side resources for this window
+  /// Detach context
   virtual void detach();
 
-  /// Destroy the server-side resources for this window
+  /// Destroy context
   virtual void destroy();
 
+  /// Has double buffering
+  FXbool doubleBuffer() const { return actual.doubleBuffer(); }
+
+  /// Has stereo buffering
+  FXbool stereoBuffer() const { return actual.stereoBuffer(); }
+
+  /// Is direct rendering context
+  FXbool direct() const { return actual.direct(); }
+
   /// Make OpenGL context current prior to performing OpenGL commands
-  bool begin(FXDrawable *drawable);
+  FXbool begin(FXDrawable *draw);
 
   /// Make OpenGL context non current
-  bool end();
+  FXbool end();
 
   /// Swap front and back buffer
   void swapBuffers();
-
-  /// Save object to stream
-  virtual void save(FXStream& store) const;
-
-  /// Load object from stream
-  virtual void load(FXStream& store);
 
   /// Destructor
   virtual ~FXGLContext();

@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileSelector.cpp,v 1.197 2006/03/31 07:33:06 fox Exp $                 *
+* $Id: FXFileSelector.cpp,v 1.208 2007/03/08 18:18:49 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -162,14 +162,14 @@ FXDEFMAP(FXFileSelector) FXFileSelectorMap[]={
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_BOOKMARK,FXFileSelector::onCmdBookmark),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_NEW,FXFileSelector::onCmdNew),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_NEW,FXFileSelector::onUpdNew),
-  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_DELETE,FXFileSelector::onCmdDelete),
+  FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_REMOVE,FXFileSelector::onCmdRemove),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_MOVE,FXFileSelector::onCmdMove),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_COPY,FXFileSelector::onCmdCopy),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_LINK,FXFileSelector::onCmdLink),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_COPY,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_MOVE,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_LINK,FXFileSelector::onUpdSelected),
-  FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_DELETE,FXFileSelector::onUpdSelected),
+  FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_REMOVE,FXFileSelector::onUpdSelected),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_BOOKMENU,FXFileSelector::onUpdNavigable),
   FXMAPFUNCS(SEL_COMMAND,FXFileSelector::ID_NORMAL_SIZE,FXFileSelector::ID_GIANT_SIZE,FXFileSelector::onCmdImageSize),
   FXMAPFUNCS(SEL_UPDATE,FXFileSelector::ID_NORMAL_SIZE,FXFileSelector::ID_GIANT_SIZE,FXFileSelector::onUpdImageSize),
@@ -256,11 +256,11 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   bookmarks.setSelector(ID_VISIT);
   readonly->hide();
   if(table){
-    table->addAccel(MKUINT(KEY_BackSpace,0),this,FXSEL(SEL_COMMAND,ID_DIRECTORY_UP));
-    table->addAccel(MKUINT(KEY_Delete,0),this,FXSEL(SEL_COMMAND,ID_DELETE));
-    table->addAccel(MKUINT(KEY_h,CONTROLMASK),this,FXSEL(SEL_COMMAND,ID_HOME));
-    table->addAccel(MKUINT(KEY_w,CONTROLMASK),this,FXSEL(SEL_COMMAND,ID_WORK));
-    table->addAccel(MKUINT(KEY_n,CONTROLMASK),this,FXSEL(SEL_COMMAND,ID_NEW));
+    table->addAccel(MKUINT(KEY_BackSpace,0),this,FXSEL(SEL_COMMAND,FXFileSelector::ID_DIRECTORY_UP));
+    table->addAccel(MKUINT(KEY_Delete,0),this,FXSEL(SEL_COMMAND,FXFileSelector::ID_REMOVE));
+    table->addAccel(MKUINT(KEY_h,CONTROLMASK),this,FXSEL(SEL_COMMAND,FXFileSelector::ID_HOME));
+    table->addAccel(MKUINT(KEY_w,CONTROLMASK),this,FXSEL(SEL_COMMAND,FXFileSelector::ID_WORK));
+    table->addAccel(MKUINT(KEY_n,CONTROLMASK),this,FXSEL(SEL_COMMAND,FXFileSelector::ID_NEW));
     table->addAccel(MKUINT(KEY_a,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SELECT_ALL));
     table->addAccel(MKUINT(KEY_b,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_BIG_ICONS));
     table->addAccel(MKUINT(KEY_s,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_MINI_ICONS));
@@ -269,6 +269,7 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   setSelectMode(SELECTFILE_ANY);    // For backward compatibility, this HAS to be the default!
   setPatternList(allfiles);
   setDirectory(FXSystem::getCurrentDirectory());
+  filebox->setDraggableFiles(false);
   filebox->setFocus();
   accept->hide();
   navigable=true;
@@ -291,7 +292,7 @@ long FXFileSelector::onCmdItemSelected(FXObject*,FXSelector,void* ptr){
     }
   else if(selectmode==SELECTFILE_MULTIPLE_ALL){
     for(i=0; i<filebox->getNumItems(); i++){
-      if(filebox->isItemSelected(i) && filebox->getItemFilename(i)!=".." && filebox->getItemFilename(i)!="."){
+      if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         if(!text.empty()) text+=' ';
         text+="\""+filebox->getItemFilename(i)+"\"";
         }
@@ -329,7 +330,7 @@ long FXFileSelector::onCmdItemDeselected(FXObject*,FXSelector,void*){
     }
   else if(selectmode==SELECTFILE_MULTIPLE_ALL){
     for(i=0; i<filebox->getNumItems(); i++){
-      if(filebox->isItemSelected(i) && filebox->getItemFilename(i)!=".." && filebox->getItemFilename(i)!="."){
+      if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         if(!text.empty()) text+=' ';
         text+="\""+filebox->getItemFilename(i)+"\"";
         }
@@ -546,14 +547,14 @@ FXString *FXFileSelector::getSelectedFiles() const {
   register FXString *files=NULL;
   register FXint i,n;
   for(i=n=0; i<filebox->getNumItems(); i++){
-    if(filebox->isItemSelected(i) && filebox->getItemFilename(i)!=".." && filebox->getItemFilename(i)!="."){
+    if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
       n++;
       }
     }
   if(n){
     files=new FXString [n+1];
     for(i=n=0; i<filebox->getNumItems(); i++){
-      if(filebox->isItemSelected(i) && filebox->getItemFilename(i)!=".." && filebox->getItemFilename(i)!="."){
+      if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         files[n++]=filebox->getItemPathname(i);
         }
       }
@@ -597,7 +598,7 @@ long FXFileSelector::onCmdCopy(FXObject*,FXSelector,void*){
       inputdialog.setNumColumns(60);
       if(inputdialog.execute()){
         FXString newname=inputdialog.getText();
-        if(!FXFile::copyFiles(filenamelist[i],newname,FALSE)){
+        if(!FXFile::copyFiles(filenamelist[i],newname,false)){
           if(FXMessageBox::error(this,MBOX_YES_NO,tr("Error Copying File"),tr("Unable to copy file:\n\n%s  to:  %s\n\nContinue with operation?"),filenamelist[i].text(),newname.text())==MBOX_CLICKED_NO) break;
           }
         }
@@ -620,7 +621,7 @@ long FXFileSelector::onCmdMove(FXObject*,FXSelector,void*){
       inputdialog.setNumColumns(60);
       if(inputdialog.execute()){
         FXString newname=inputdialog.getText();
-        if(!FXFile::moveFiles(filenamelist[i],newname,FALSE)){
+        if(!FXFile::moveFiles(filenamelist[i],newname,false)){
           if(FXMessageBox::error(this,MBOX_YES_NO,tr("Error Moving File"),tr("Unable to move file:\n\n%s  to:  %s\n\nContinue with operation?"),filenamelist[i].text(),newname.text())==MBOX_CLICKED_NO) break;
           }
         }
@@ -654,8 +655,8 @@ long FXFileSelector::onCmdLink(FXObject*,FXSelector,void*){
   }
 
 
-// Delete file or directory
-long FXFileSelector::onCmdDelete(FXObject*,FXSelector,void*){
+// Remove file or directory
+long FXFileSelector::onCmdRemove(FXObject*,FXSelector,void*){
   FXString *filenamelist=getSelectedFiles();
   FXuint answer;
   if(filenamelist){
@@ -663,7 +664,7 @@ long FXFileSelector::onCmdDelete(FXObject*,FXSelector,void*){
       answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("Deleting files"),tr("Are you sure you want to delete the file:\n\n%s"),filenamelist[i].text());
       if(answer==MBOX_CLICKED_CANCEL) break;
       if(answer==MBOX_CLICKED_NO) continue;
-      if(!FXFile::removeFiles(filenamelist[i],TRUE)){
+      if(!FXFile::removeFiles(filenamelist[i],true)){
         if(FXMessageBox::error(this,MBOX_YES_NO,tr("Error Deleting File"),tr("Unable to delete file:\n\n%s\n\nContinue with operation?"),filenamelist[i].text())==MBOX_CLICKED_NO) break;
         }
       }
@@ -699,7 +700,7 @@ long FXFileSelector::onCmdImageSize(FXObject*,FXSelector sel,void*){
 
 // Update image size
 long FXFileSelector::onUpdImageSize(FXObject* sender,FXSelector sel,void*){
-  bool check=FALSE;
+  FXbool check=false;
   switch(FXSELID(sel)){
     case ID_NORMAL_SIZE: check=(getImageSize()==32); break;
     case ID_MEDIUM_SIZE: check=(getImageSize()==48); break;
@@ -775,7 +776,7 @@ long FXFileSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
   new FXMenuCommand(&filemenu,tr("Copy..."),copyicon,this,ID_COPY);
   new FXMenuCommand(&filemenu,tr("Move..."),moveicon,this,ID_MOVE);
   new FXMenuCommand(&filemenu,tr("Link..."),linkicon,this,ID_LINK);
-  new FXMenuCommand(&filemenu,tr("Delete..."),deleteicon,this,ID_DELETE);
+  new FXMenuCommand(&filemenu,tr("Delete..."),deleteicon,this,ID_REMOVE);
 
   filemenu.create();
   filemenu.popup(NULL,event->root_x,event->root_y);
@@ -863,7 +864,7 @@ FXString FXFileSelector::getFilename() const {
   register FXint i;
   if(selectmode==SELECTFILE_MULTIPLE_ALL){
     for(i=0; i<filebox->getNumItems(); i++){
-      if(filebox->isItemSelected(i) && filebox->getItemFilename(i)!=".." && filebox->getItemFilename(i)!="."){
+      if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         return FXPath::absolute(filebox->getDirectory(),filebox->getItemFilename(i));
         }
       }
@@ -877,8 +878,7 @@ FXString FXFileSelector::getFilename() const {
     }
   else{
     if(!filename->getText().empty()){
-      //return FXPath::absolute(filebox->getDirectory(),filename->getText());
-      return FXPath::absolute(filebox->getDirectory(),FXPath::expand(filename->getText()));     // FIXME don't always want to expand!
+      return FXPath::absolute(filebox->getDirectory(),FXPath::expand(filename->getText()));
       }
     }
   return FXString::null;
@@ -972,13 +972,13 @@ FXint FXFileSelector::getNumPatterns() const {
 
 
 // Allow pattern entry
-void FXFileSelector::allowPatternEntry(bool allow){
-  filefilter->setComboStyle(allow?COMBOBOX_NORMAL:COMBOBOX_STATIC);
+void FXFileSelector::allowPatternEntry(FXbool flag){
+  filefilter->setComboStyle(flag?COMBOBOX_NORMAL:COMBOBOX_STATIC);
   }
 
 
-// Return TRUE if pattern entry is allowed
-bool FXFileSelector::allowPatternEntry() const {
+// Return true if pattern entry is allowed
+FXbool FXFileSelector::allowPatternEntry() const {
   return (filefilter->getComboStyle()!=COMBOBOX_STATIC);
   }
 
@@ -1011,20 +1011,20 @@ FXuint FXFileSelector::getFileBoxStyle() const {
 void FXFileSelector::setSelectMode(FXuint mode){
   switch(mode){
     case SELECTFILE_EXISTING:
-      filebox->showOnlyDirectories(FALSE);
+      filebox->showOnlyDirectories(false);
       filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_BROWSESELECT);
       break;
     case SELECTFILE_MULTIPLE:
     case SELECTFILE_MULTIPLE_ALL:
-      filebox->showOnlyDirectories(FALSE);
+      filebox->showOnlyDirectories(false);
       filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_EXTENDEDSELECT);
       break;
     case SELECTFILE_DIRECTORY:
-      filebox->showOnlyDirectories(TRUE);
+      filebox->showOnlyDirectories(true);
       filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_BROWSESELECT);
       break;
     default:
-      filebox->showOnlyDirectories(FALSE);
+      filebox->showOnlyDirectories(false);
       filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_BROWSESELECT);
       break;
     }
@@ -1044,27 +1044,27 @@ FXuint FXFileSelector::getMatchMode() const {
   }
 
 
-// Return TRUE if showing hidden files
-bool FXFileSelector::showHiddenFiles() const {
+// Return true if showing hidden files
+FXbool FXFileSelector::showHiddenFiles() const {
   return filebox->showHiddenFiles();
   }
 
 
 // Show or hide hidden files
-void FXFileSelector::showHiddenFiles(bool showing){
-  filebox->showHiddenFiles(showing);
+void FXFileSelector::showHiddenFiles(FXbool flag){
+  filebox->showHiddenFiles(flag);
   }
 
 
-// Return TRUE if image preview on
-bool FXFileSelector::showImages() const {
+// Return true if image preview on
+FXbool FXFileSelector::showImages() const {
   return filebox->showImages();
   }
 
 
 // Show or hide preview images
-void FXFileSelector::showImages(bool showing){
-  filebox->showImages(showing);
+void FXFileSelector::showImages(FXbool flag){
+  filebox->showImages(flag);
   }
 
 
@@ -1081,27 +1081,39 @@ void FXFileSelector::setImageSize(FXint size){
 
 
 // Show readonly button
-void FXFileSelector::showReadOnly(bool show){
-  show ? readonly->show() : readonly->hide();
+void FXFileSelector::showReadOnly(FXbool flag){
+  flag ? readonly->show() : readonly->hide();
   }
 
 
-// Return TRUE if readonly is shown
-bool FXFileSelector::shownReadOnly() const {
+// Return true if readonly is shown
+FXbool FXFileSelector::shownReadOnly() const {
   return readonly->shown();
   }
 
 
 
 // Set initial state of readonly button
-void FXFileSelector::setReadOnly(bool state){
-  readonly->setCheck(state);
+void FXFileSelector::setReadOnly(FXbool flag){
+  readonly->setCheck(flag);
   }
 
 
 // Get readonly state
-bool FXFileSelector::getReadOnly() const {
-  return readonly->getCheck();
+FXbool FXFileSelector::getReadOnly() const {
+  return (FXbool)readonly->getCheck();
+  }
+
+
+// Set draggable files
+void FXFileSelector::setDraggableFiles(FXbool flag){
+  filebox->setDraggableFiles(flag);
+  }
+
+
+// Are draggable files
+FXbool FXFileSelector::getDraggableFiles() const {
+  return filebox->getDraggableFiles();
   }
 
 

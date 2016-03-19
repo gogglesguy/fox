@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGradientBar.h,v 1.53 2006/03/31 07:33:01 fox Exp $                     *
+* $Id: FXGradientBar.h,v 1.55 2007/02/07 20:21:55 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXGRADIENTBAR_H
 #define FXGRADIENTBAR_H
@@ -212,7 +212,7 @@ public:
   void getGradients(FXGradient*& segments,FXint& nsegments) const;
 
   /// Change current segment
-  void setCurrentSegment(FXint index,bool notify=false);
+  void setCurrentSegment(FXint index,FXbool notify=false);
 
   /// Return current segment, or -1 if there is no current segment
   FXint getCurrentSegment() const { return current; }
@@ -224,19 +224,19 @@ public:
   FXint getAnchorSegment() const { return anchor; }
 
   /// Select segment(s)
-  bool selectSegments(FXint fm,FXint to,bool notify=false);
+  FXbool selectSegments(FXint fm,FXint to,FXbool notify=false);
 
   /// Deselect all segments
-  bool deselectSegments(bool notify=false);
+  FXbool deselectSegments(FXbool notify=false);
 
   /// Returns TRUE if the specified segment is selected
-  bool isSegmentSelected(FXint s) const;
+  FXbool isSegmentSelected(FXint s) const;
 
   /// Set lower color of a segment
-  void setSegmentLowerColor(FXint s,FXColor clr,bool notify=false);
+  void setSegmentLowerColor(FXint s,FXColor clr,FXbool notify=false);
 
   /// Set upper color of a segment
-  void setSegmentUpperColor(FXint s,FXColor clr,bool notify=false);
+  void setSegmentUpperColor(FXint s,FXColor clr,FXbool notify=false);
 
   /// Get lower color of a segment
   FXColor getSegmentLowerColor(FXint s) const;
@@ -245,16 +245,16 @@ public:
   FXColor getSegmentUpperColor(FXint s) const;
 
   /// Move lower point of segment sg
-  void moveSegmentLower(FXint sg,FXdouble val,bool notify=false);
+  void moveSegmentLower(FXint sg,FXdouble val,FXbool notify=false);
 
   /// Move middle point of segment sg
-  void moveSegmentMiddle(FXint sg,FXdouble val,bool notify=false);
+  void moveSegmentMiddle(FXint sg,FXdouble val,FXbool notify=false);
 
   /// Move upper point of segment sg
-  void moveSegmentUpper(FXint sg,FXdouble val,bool notify=false);
+  void moveSegmentUpper(FXint sg,FXdouble val,FXbool notify=false);
 
   /// Move segments sglo to sghi to new position val
-  void moveSegments(FXint sglo,FXint sghi,FXdouble val,bool notify=false);
+  void moveSegments(FXint sglo,FXint sghi,FXdouble val,FXbool notify=false);
 
   /// Get lower value of segment sg
   FXdouble getSegmentLower(FXint sg) const;
@@ -280,16 +280,16 @@ public:
   FXuint getSegmentBlend(FXint s) const;
 
   /// Split segment at the midpoint
-  void splitSegments(FXint sglo,FXint sghi,bool notify=false);
+  void splitSegments(FXint sglo,FXint sghi,FXbool notify=false);
 
   /// Merge segments
-  void mergeSegments(FXint sglo,FXint sghi,bool notify=false);
+  void mergeSegments(FXint sglo,FXint sghi,FXbool notify=false);
 
   /// Make segments uniformly distributed
-  void uniformSegments(FXint sglo,FXint sghi,bool notify=false);
+  void uniformSegments(FXint sglo,FXint sghi,FXbool notify=false);
 
   /// Change blend mode of segment
-  void blendSegments(FXint sglo,FXint sghi,FXuint blend=GRADIENT_BLEND_LINEAR,bool notify=false);
+  void blendSegments(FXint sglo,FXint sghi,FXuint blend=GRADIENT_BLEND_LINEAR,FXbool notify=false);
 
   /// Get the gradient bar style
   FXuint getBarStyle() const;

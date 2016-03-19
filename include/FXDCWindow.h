@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDCWindow.h,v 1.48 2006/04/02 22:37:17 fox Exp $                        *
+* $Id: FXDCWindow.h,v 1.51 2007/02/07 20:21:53 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDCWINDOW_H
 #define FXDCWINDOW_H
@@ -64,10 +64,10 @@ protected:
   FXID        oldpalette;
   FXID        oldbrush;
   FXID        oldpen;
-  bool        needsNewBrush;
-  bool        needsNewPen;
-  bool        needsPath;
-  bool        needsClipReset;
+  FXbool      needsNewBrush;
+  FXbool      needsNewPen;
+  FXbool      needsPath;
+  FXbool      needsClipReset;
 #endif
 private:
 #ifdef WIN32
@@ -240,7 +240,7 @@ public:
   virtual void setFont(FXFont *fnt);
 
   /// Clip against child windows
-  virtual void clipChildren(bool yes);
+  virtual void clipChildren(FXbool yes);
 
   /// Destructor
   virtual ~FXDCWindow();

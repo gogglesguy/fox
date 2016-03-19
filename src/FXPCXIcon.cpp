@@ -3,7 +3,7 @@
 *                        P C X   I c o n   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2007 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPCXIcon.cpp,v 1.27 2006/01/22 17:58:36 fox Exp $                       *
+* $Id: FXPCXIcon.cpp,v 1.29 2007/02/07 20:22:13 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -79,7 +79,7 @@ FXPCXIcon::FXPCXIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FX
 
 
 // Save object to stream
-bool FXPCXIcon::savePixels(FXStream& store) const {
+FXbool FXPCXIcon::savePixels(FXStream& store) const {
   if(fxsavePCX(store,data,width,height)){
     return true;
     }
@@ -88,7 +88,7 @@ bool FXPCXIcon::savePixels(FXStream& store) const {
 
 
 // Load object from stream
-bool FXPCXIcon::loadPixels(FXStream& store){
+FXbool FXPCXIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadPCX(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

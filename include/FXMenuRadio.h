@@ -3,7 +3,7 @@
 *                         M e n u R a d i o   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuRadio.h,v 1.13 2006/01/22 17:58:06 fox Exp $                       *
+* $Id: FXMenuRadio.h,v 1.15 2007/02/07 20:21:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXMENURADIO_H
 #define FXMENURADIO_H
@@ -45,8 +45,8 @@ namespace FX {
 class FXAPI FXMenuRadio : public FXMenuCommand {
   FXDECLARE(FXMenuRadio)
 protected:
-  FXuchar check;        // State of menu
   FXColor radioColor;   // Color of the radio
+  FXuchar check;        // State of menu
 protected:
   FXMenuRadio();
 private:
@@ -79,10 +79,10 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Set radio button state (TRUE, FALSE or MAYBE)
-  void setCheck(FXbool s=TRUE);
+  void setCheck(FXuchar s=TRUE);
 
   /// Get radio button state (TRUE, FALSE or MAYBE)
-  FXbool getCheck() const { return check; }
+  FXuchar getCheck() const { return check; }
 
   /// Get the radio background color
   FXColor getRadioColor() const { return radioColor; }

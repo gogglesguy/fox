@@ -3,7 +3,7 @@
 *                           B u t t o n    O b j e c t s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXButton.cpp,v 1.67 2006/01/22 17:58:18 fox Exp $                        *
+* $Id: FXButton.cpp,v 1.73 2007/02/07 20:22:03 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -78,13 +78,13 @@ FXDEFMAP(FXButton) FXButtonMap[]={
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXButton::onLeftBtnRelease),
   FXMAPFUNC(SEL_KEYPRESS,0,FXButton::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXButton::onKeyRelease),
-  FXMAPFUNC(SEL_KEYPRESS,FXWindow::ID_HOTKEY,FXButton::onHotKeyPress),
-  FXMAPFUNC(SEL_KEYRELEASE,FXWindow::ID_HOTKEY,FXButton::onHotKeyRelease),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_CHECK,FXButton::onCheck),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNCHECK,FXButton::onUncheck),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_SETVALUE,FXButton::onCmdSetValue),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_SETINTVALUE,FXButton::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_GETINTVALUE,FXButton::onCmdGetIntValue),
+  FXMAPFUNC(SEL_KEYPRESS,FXButton::ID_HOTKEY,FXButton::onHotKeyPress),
+  FXMAPFUNC(SEL_KEYRELEASE,FXButton::ID_HOTKEY,FXButton::onHotKeyRelease),
+  FXMAPFUNC(SEL_COMMAND,FXButton::ID_CHECK,FXButton::onCheck),
+  FXMAPFUNC(SEL_COMMAND,FXButton::ID_UNCHECK,FXButton::onUncheck),
+  FXMAPFUNC(SEL_COMMAND,FXButton::ID_SETVALUE,FXButton::onCmdSetValue),
+  FXMAPFUNC(SEL_COMMAND,FXButton::ID_SETINTVALUE,FXButton::onCmdSetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXButton::ID_GETINTVALUE,FXButton::onCmdGetIntValue),
   };
 
 
@@ -112,7 +112,7 @@ FXButton::FXButton(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,
 
 
 // If window can have focus
-bool FXButton::canFocus() const { return true; }
+FXbool FXButton::canFocus() const { return true; }
 
 
 // Set focus to this widget
@@ -132,8 +132,8 @@ void FXButton::killFocus(){
 
 
 // Make widget drawn as default
-void FXButton::setDefault(FXbool enable){
-  FXLabel::setDefault(enable);
+void FXButton::setDefault(FXuchar flag){
+  FXLabel::setDefault(flag);
   update();
   }
 

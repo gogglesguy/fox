@@ -3,7 +3,7 @@
 *                         C o l o r R i n g   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorRing.h,v 1.12 2006/03/31 07:33:01 fox Exp $                       *
+* $Id: FXColorRing.h,v 1.14 2007/02/07 20:21:52 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXCOLORRING_H
 #define FXCOLORRING_H
@@ -72,9 +72,9 @@ protected:
   void hueToXY(FXint& x,FXint& y,FXfloat hue) const;
   void satValToXY(FXint& x,FXint& y,FXfloat s,FXfloat v) const;
   void satValFromXY(FXfloat& s,FXfloat& v,FXint x,FXint y) const;
-  bool inCorner(FXint x,FXint y) const;
-  bool inHueRing(FXint x,FXint y) const;
-  bool inTriangle(FXint x,FXint y) const;
+  FXbool inCorner(FXint x,FXint y) const;
+  FXbool inHueRing(FXint x,FXint y) const;
+  FXbool inTriangle(FXint x,FXint y) const;
 protected:
   enum {
     MOUSE_NONE,         // No mouse operation

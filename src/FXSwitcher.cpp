@@ -3,7 +3,7 @@
 *                      S w i t c h   P a n e l   C l a s s                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSwitcher.cpp,v 1.36 2006/03/31 07:33:11 fox Exp $                      *
+* $Id: FXSwitcher.cpp,v 1.39 2007/02/07 20:22:17 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -113,7 +113,7 @@ long FXSwitcher::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
 
 // Bring nth to the top
 long FXSwitcher::onCmdOpen(FXObject*,FXSelector sel,void*){
-  setCurrent(FXSELID(sel)-ID_OPEN_FIRST,TRUE);
+  setCurrent(FXSELID(sel)-ID_OPEN_FIRST,true);
   return 1;
   }
 
@@ -173,7 +173,7 @@ void FXSwitcher::layout(){
 
 
 // Set current subwindow
-void FXSwitcher::setCurrent(FXint panel,bool notify){
+void FXSwitcher::setCurrent(FXint panel,FXbool notify){
   if(0<=panel && panel<numChildren() && current!=panel){
     current=panel;
     recalc();

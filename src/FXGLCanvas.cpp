@@ -3,7 +3,7 @@
 *                    O p e n G L   C a n v a s   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCanvas.cpp,v 1.63 2006/04/03 03:43:16 fox Exp $                      *
+* $Id: FXGLCanvas.cpp,v 1.68 2007/03/09 03:55:56 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -39,6 +39,7 @@
 #include "FXVisual.h"
 #include "FXGLVisual.h"
 #include "FXCursor.h"
+#include "FXGLConfig.h"
 #include "FXGLContext.h"
 #include "FXGLCanvas.h"
 
@@ -104,12 +105,12 @@ FXGLCanvas::FXGLCanvas(FXComposite* p,FXGLVisual *vis,FXGLCanvas* sharegroup,FXO
 
 
 #ifdef WIN32
-const char* FXGLCanvas::GetClass() const { return "FXGLCanvas"; }
+const void* FXGLCanvas::GetClass() const { return TEXT("FXGLCanvas"); }
 #endif
 
 
-// Return TRUE if it is sharing display lists
-bool FXGLCanvas::isShared() const { return sgnext!=this; }
+// Return true if it is sharing display lists
+FXbool FXGLCanvas::isShared() const { return sgnext!=this; }
 
 
 // Create X window (GL CANVAS)
@@ -144,7 +145,7 @@ void FXGLCanvas::create(){
 #ifndef WIN32
 
     // Make context
-    ctx=glXCreateContext((Display*)getApp()->getDisplay(),(XVisualInfo*)visual->getInfo(),(GLXContext)sharedctx,TRUE);
+    ctx=glXCreateContext((Display*)getApp()->getDisplay(),(XVisualInfo*)visual->getInfo(),(GLXContext)sharedctx,true);
     if(!ctx){
       throw FXWindowException("unable to create GL window.");
       }
@@ -207,7 +208,7 @@ void FXGLCanvas::destroy(){
 
 
 //  Make the rendering context of GL Canvas current
-bool FXGLCanvas::makeCurrent(){
+FXbool FXGLCanvas::makeCurrent(){
 #ifdef HAVE_GL_H
   if(ctx){
 #ifndef WIN32
@@ -215,7 +216,7 @@ bool FXGLCanvas::makeCurrent(){
 #else
     HDC hdc=::GetDC((HWND)xid);
     if(visual->colormap){
-      SelectPalette(hdc,(HPALETTE)visual->colormap,FALSE);
+      SelectPalette(hdc,(HPALETTE)visual->colormap,false);
       RealizePalette(hdc);
       }
     return wglMakeCurrent(hdc,(HGLRC)ctx)!=0;
@@ -227,7 +228,7 @@ bool FXGLCanvas::makeCurrent(){
 
 
 //  Make the rendering context of GL Canvas current
-bool FXGLCanvas::makeNonCurrent(){
+FXbool FXGLCanvas::makeNonCurrent(){
 #ifdef HAVE_GL_H
   if(ctx){
 #ifndef WIN32
@@ -259,8 +260,8 @@ void* FXGLCanvas::getCurrentContext(){
   }
 
 
-//  Return TRUE if this window's context is current
-bool FXGLCanvas::isCurrent() const {
+//  Return true if this window's context is current
+FXbool FXGLCanvas::isCurrent() const {
 #ifdef HAVE_GL_H
   if(ctx){
 #ifndef WIN32
@@ -283,7 +284,7 @@ void FXGLCanvas::swapBuffers(){
   // SwapBuffers(wglGetCurrentDC());
   // wglSwapLayerBuffers(wglGetCurrentDC(),WGL_SWAP_MAIN_PLANE);
   HDC hdc=wglGetCurrentDC();
-  if(wglSwapLayerBuffers(hdc,WGL_SWAP_MAIN_PLANE)==FALSE){
+  if(wglSwapLayerBuffers(hdc,WGL_SWAP_MAIN_PLANE)==false){
     SwapBuffers(hdc);
     }
 #endif

@@ -3,7 +3,7 @@
 *                         M e n u   C o m m a n d    W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuCommand.cpp,v 1.72 2006/01/22 17:58:36 fox Exp $                   *
+* $Id: FXMenuCommand.cpp,v 1.75 2007/02/07 20:22:12 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -141,7 +141,7 @@ FXint FXMenuCommand::getDefaultHeight(){
 
 
 // If window can have focus
-bool FXMenuCommand::canFocus() const { return true; }
+FXbool FXMenuCommand::canFocus() const { return true; }
 
 
 // Enter

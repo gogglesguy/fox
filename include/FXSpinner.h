@@ -3,7 +3,7 @@
 *                        S p i n   B u t t o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Lyle Johnson.   All Rights Reserved.               *
+* Copyright (C) 1998,2007 by Lyle Johnson.   All Rights Reserved.               *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSpinner.h,v 1.47 2006/03/31 07:33:03 fox Exp $                         *
+* $Id: FXSpinner.h,v 1.53 2007/02/07 20:21:58 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSPINNER_H
 #define FXSPINNER_H
@@ -65,14 +65,17 @@ public:
   long onCmdIncrement(FXObject*,FXSelector,void*);
   long onUpdDecrement(FXObject*,FXSelector,void*);
   long onCmdDecrement(FXObject*,FXSelector,void*);
-  long onCmdEntry(FXObject*,FXSelector,void*);
+  long onUpdEntry(FXObject*,FXSelector,void*);
   long onChgEntry(FXObject*,FXSelector,void*);
+  long onCmdEntry(FXObject*,FXSelector,void*);
   long onWheelEntry(FXObject*,FXSelector,void*);
   long onKeyPress(FXObject*,FXSelector,void*);
   long onKeyRelease(FXObject*,FXSelector,void*);
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetIntRange(FXObject*,FXSelector,void*);
   long onCmdGetIntRange(FXObject*,FXSelector,void*);
   long onFocusSelf(FXObject*,FXSelector,void*);
@@ -104,37 +107,37 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Increment spinner
-  void increment(bool notify=false);
+  void increment(FXbool notify=false);
 
   /// Increment spinner by certain amount
-  void incrementByAmount(FXint amount,bool notify=false);
+  void incrementByAmount(FXint amount,FXbool notify=false);
 
   /// Decrement spinner
-  void decrement(bool notify=false);
+  void decrement(FXbool notify=false);
 
   /// Decrement spinner by certain amount
-  void decrementByAmount(FXint amount,bool notify=false);
+  void decrementByAmount(FXint amount,FXbool notify=false);
 
-  /// Return TRUE if in cyclic mode
-  bool isCyclic() const;
+  /// Return true if in cyclic mode
+  FXbool isCyclic() const;
 
   /// Set to cyclic mode, i.e. wrap around at maximum/minimum
-  void setCyclic(bool cyclic);
+  void setCyclic(FXbool cyclic);
 
-  /// Return TRUE if text is visible
-  bool isTextVisible() const;
+  /// Return true if text is visible
+  FXbool isTextVisible() const;
 
   /// Set text visible flag
-  void setTextVisible(bool shown);
+  void setTextVisible(FXbool flag);
 
   /// Change current value
-  virtual void setValue(FXint value,bool notify=false);
+  virtual void setValue(FXint value,FXbool notify=false);
 
   /// Return current value
   FXint getValue() const { return pos; }
 
   /// Change the spinner's range
-  void setRange(FXint lo,FXint hi,bool notify=false);
+  void setRange(FXint lo,FXint hi,FXbool notify=false);
 
   /// Get the spinner's current range
   void getRange(FXint& lo,FXint& hi) const { lo=range[0]; hi=range[1]; }
@@ -170,10 +173,10 @@ public:
   FXuint getSpinnerStyle() const;
 
   /// Allow editing of the text field
-  void setEditable(bool edit=true);
+  void setEditable(FXbool edit=true);
 
-  /// Return TRUE if text field is editable
-  bool isEditable() const;
+  /// Return true if text field is editable
+  FXbool isEditable() const;
 
   /// Change color of the up arrow
   void setUpArrowColor(FXColor clr);

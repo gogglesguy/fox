@@ -3,7 +3,7 @@
 *                         K e y b o a r d   H a n d l i n g                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxkeyboard.cpp,v 1.17 2006/04/05 04:27:26 fox Exp $                      *
+* $Id: fxkeyboard.cpp,v 1.20 2007/02/07 20:22:20 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -206,7 +206,7 @@ static const FXuint keymapCtl[] = {
 
 
 // True if OS does not distinguish between left & right Alt/Ctrl/Shift keys
-static FXbool bNoLR=FALSE;
+static FXbool bNoLR=false;
 static BYTE ksRShft=0;
 static BYTE ksRCtrl=0;
 static BYTE ksLMenu=0;
@@ -230,12 +230,12 @@ UINT wkbGetCodePage(){
 
 // Checks if the right-hand ALT key is used as a 2nd shift key
 static FXbool wkbAltGrDown(PBYTE ks){
-  static FXbool bHasAltGr=FALSE;
+  static FXbool bHasAltGr=false;
   static HKL hklOld = NULL;
   HKL hkl=GetKeyboardLayout(0);
   if(hklOld!=hkl){
     hklOld=hkl;
-    bHasAltGr=FALSE;
+    bHasAltGr=false;
     for(FXuint ch=0x20; ch<=0xff ; ++ch){
       // <MSDN>
       // For keyboard layouts that use the right-hand ALT key as a shift key
@@ -244,7 +244,7 @@ static FXbool wkbAltGrDown(PBYTE ks){
       // converted internally into CTRL+ALT.
       // </MSDN>
       if(HIBYTE(VkKeyScanEx(ch,hkl))==6){
-        bHasAltGr=TRUE;
+        bHasAltGr=true;
         break;
         }
       }

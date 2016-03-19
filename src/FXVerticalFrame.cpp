@@ -3,7 +3,7 @@
 *                 V e r t i c a l   C o n t a i n e r   O b j e c t             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXVerticalFrame.cpp,v 1.28 2006/01/22 17:58:51 fox Exp $                 *
+* $Id: FXVerticalFrame.cpp,v 1.29 2007/02/07 20:22:19 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

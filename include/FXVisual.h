@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXVisual.h,v 1.42 2006/04/02 03:00:35 fox Exp $                          *
+* $Id: FXVisual.h,v 1.46 2007/02/07 20:22:00 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXVISUAL_H
 #define FXVISUAL_H
@@ -40,10 +40,12 @@ enum FXVisualOptions {
   VISUAL_GRAYSCALE    = 8,            /// Gray scale visual
   VISUAL_TRUECOLOR    = 16,           /// Must be true color visual
   VISUAL_OWNCOLORMAP  = 32,           /// Allocate private colormap
-  VISUAL_DOUBLEBUFFER = 64,           /// Double-buffered [FXGLVisual]
-  VISUAL_STEREO       = 128,          /// Stereo [FXGLVisual]
-  VISUAL_NOACCEL      = 256,          /// No hardware acceleration [for broken h/w]
-  VISUAL_SWAP_COPY    = 512           /// Buffer swap by copying [FXGLVisual]
+  VISUAL_FORCE        = 64,           /// Force given visual/format
+
+  VISUAL_DOUBLEBUFFER = 128,          /// Double-buffered [FXGLVisual]
+  VISUAL_STEREO       = 256,          /// Stereo [FXGLVisual]
+  VISUAL_NOACCEL      = 512,          /// No hardware acceleration [for broken h/w]
+  VISUAL_SWAP_COPY    = 1024          /// Buffer swap by copying [FXGLVisual]
   };
 
 
@@ -91,7 +93,7 @@ protected:
   void         *info;                   // Opaque data
   void         *visual;                 // Application visual/pixel format
   FXID          colormap;               // Color map, if any
-  bool          freemap;                // We allocated the map
+  FXbool        freemap;                // We allocated the map
 #ifndef WIN32
 protected:
   void         *gc;                     // Drawing GC
@@ -101,7 +103,6 @@ protected:
   FXPixel       bpix[16][256];          // Mapping from blue -> pixel
   FXPixel       lut[256];               // Color lookup table
 protected:
-  void* setupgc(bool);
   void setuptruecolor();
   void setupdirectcolor();
   void setuppseudocolor();
@@ -110,6 +111,7 @@ protected:
   void setupstaticgray();
   void setuppixmapmono();
   void setupcolormap();
+  void* setupgc(FXbool);
 #endif
 protected:
   FXVisual();
@@ -119,7 +121,7 @@ private:
 public:
 
   /// Construct default visual
-  FXVisual(FXApp* a,FXuint flgs,FXuint d=32);
+  FXVisual(FXApp* a,FXuint flgs,FXuint h=32);
 
   /// Get visual type
   FXVisualType getType() const { return type; }

@@ -3,7 +3,7 @@
 *       P e r s i s t e n t   S t o r a g e   S t r e a m   C l a s s e s       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStream.cpp,v 1.68 2006/03/23 06:51:53 fox Exp $                        *
+* $Id: FXStream.cpp,v 1.73 2007/02/07 20:22:16 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -29,6 +29,7 @@
 #include "FXString.h"
 #include "FXElement.h"
 #include "FXObject.h"
+#include "FXDLL.h"
 
 
 /*
@@ -86,13 +87,13 @@ FXStream::FXStream(const FXObject *cont){
 
 
 // Set stream to big endian mode if true
-void FXStream::setBigEndian(bool big){
+void FXStream::setBigEndian(FXbool big){
   swap=(big^FOX_BIGENDIAN);
   }
 
 
 // Return true if big endian mode.
-bool FXStream::isBigEndian() const {
+FXbool FXStream::isBigEndian() const {
   return (swap^FOX_BIGENDIAN);
   }
 
@@ -168,7 +169,7 @@ void FXStream::setSpace(FXuval size){
 
 
 // Open for save or load
-bool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
+FXbool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
   if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXStream::open: illegal stream direction.\n");}
   if(!dir){
 
@@ -214,14 +215,14 @@ bool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
 
 
 // Flush buffer
-bool FXStream::flush(){
+FXbool FXStream::flush(){
   writeBuffer(0);
   return code==FXStreamOK;
   }
 
 
 // Close store; return true if no errors have been encountered
-bool FXStream::close(){
+FXbool FXStream::close(){
   if(dir){
     hash.clear();
     dir=FXStreamDead;
@@ -238,7 +239,7 @@ bool FXStream::close(){
 
 
 // Move to position
-bool FXStream::position(FXlong offset,FXWhence whence){
+FXbool FXStream::position(FXlong offset,FXWhence whence){
   if(dir==FXStreamDead){fxerror("FXStream::position: stream is not open.\n");}
   if(code==FXStreamOK){
     if(whence==FXFromCurrent) offset=offset+pos;
@@ -811,17 +812,6 @@ FXStream& FXStream::addObject(const FXObject* v){
 /********************************  Save Object  ********************************/
 
 
-// On Windows, the following code may be of interest:
-
-//  MEMORY_BASIC_INFORMATION mbi;
-//  VirtualQuery(functionptr,&mbi,sizeof(mbi));
-//  hmodule=(HINSTANCE)mbi.AllocationBase;
-//char handlefilename[MAX_PATH];
-//GetModuleFileNameA((HINSTANCE)display,handlefilename,sizeof(handlefilename));
-
-// We can use this to determine the DLL module in which the code is implemented.
-// How to find this on UNIX?
-
 // Save object
 FXStream& FXStream::saveObject(const FXObject* v){
   register const FXMetaClass *cls;
@@ -849,7 +839,7 @@ FXStream& FXStream::saveObject(const FXObject* v){
     *this << tag;                               // Save tag
     *this << zero;
     save(name,tag);
-    FXTRACE((100,"saveObject(%s)\n",v->getClassName()));
+    FXTRACE((100,"%08ld: saveObject(%s)\n",(FXuval)pos,v->getClassName()));
     v->save(*this);
     }
   return *this;
@@ -894,7 +884,7 @@ FXStream& FXStream::loadObject(FXObject*& v){
       }
     v=cls->makeInstance();                      // Build some object!!
     hash.insert((void*)(FXuval)seq++,(void*)v); // Add to table
-    FXTRACE((100,"loadObject(%s)\n",v->getClassName()));
+    FXTRACE((100,"%08ld: loadObject(%s)\n",(FXuval)pos,v->getClassName()));
     v->load(*this);
     }
   return *this;

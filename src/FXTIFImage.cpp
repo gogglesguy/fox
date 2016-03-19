@@ -3,7 +3,7 @@
 *                          T I F F  I m a g e   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2007 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTIFImage.cpp,v 1.29 2006/01/22 17:58:44 fox Exp $                      *
+* $Id: FXTIFImage.cpp,v 1.31 2007/02/07 20:22:17 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -62,9 +62,9 @@ FXIMPLEMENT(FXTIFImage,FXImage,NULL,0)
 
 
 #ifdef HAVE_TIFF_H
-const bool FXTIFImage::supported=true;
+const FXbool FXTIFImage::supported=true;
 #else
-const bool FXTIFImage::supported=false;
+const FXbool FXTIFImage::supported=false;
 #endif
 
 
@@ -80,7 +80,7 @@ FXTIFImage::FXTIFImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h):FXI
 
 
 // Save the pixels only
-bool FXTIFImage::savePixels(FXStream& store) const {
+FXbool FXTIFImage::savePixels(FXStream& store) const {
   if(fxsaveTIF(store,data,width,height,codec)){
     return true;
     }
@@ -89,7 +89,7 @@ bool FXTIFImage::savePixels(FXStream& store) const {
 
 
 // Load pixels only
-bool FXTIFImage::loadPixels(FXStream& store){
+FXbool FXTIFImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadTIF(store,pixels,w,h,codec)){
     setData(pixels,IMAGE_OWNED,w,h);

@@ -3,7 +3,7 @@
 *                       S c r o l l   B a r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXScrollBar.h,v 1.16 2006/03/31 07:33:03 fox Exp $                       *
+* $Id: FXScrollBar.h,v 1.23 2007/02/07 20:21:58 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXSCROLLBAR_H
 #define FXSCROLLBAR_H
@@ -44,9 +44,9 @@ enum {
 
 /**
 * The scroll bar is used when a document has a larger content than may be made
-* visible.  The range is the total size of the document, the page is the part
-* of the document which is visible.  The size of the scrollbar thumb is adjusted
-* to give feedback of the relative sizes of each.
+* visible.  The range is the total size of the document, the page size is the viewable
+* space available for the document.  The size of the scrollbar thumb is adjusted to give
+* feedback of the relative sizes of each.
 * The scroll bar may be manipulated by the left mouse button (normal scrolling), by the
 * middle mouse button (same as the left mouse only the scroll position can jump to the
 * place where the click is made), or by the right mouse button (vernier- or fine-scrolling).
@@ -79,11 +79,11 @@ protected:
   FXuchar    mode;            // Current mode of control
 protected:
   FXScrollBar();
-  void drawButton(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,bool down);
-  void drawLeftArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,bool down);
-  void drawRightArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,bool down);
-  void drawUpArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,bool down);
-  void drawDownArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,bool down);
+  void drawButton(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
+  void drawLeftArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
+  void drawRightArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
+  void drawUpArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
+  void drawDownArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
 protected:
   enum {
     MODE_NONE,
@@ -113,6 +113,8 @@ public:
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetIntRange(FXObject*,FXSelector,void*);
   long onCmdGetIntRange(FXObject*,FXSelector,void*);
 public:
@@ -135,29 +137,39 @@ public:
   /// Perform layout
   virtual void layout();
 
-  /// Set content size range
-  void setRange(FXint r);
+  /**
+  * Set content size range.  The range must be at least 1,
+  * but may be smaller than the viewable page size.
+  */
+  void setRange(FXint r,FXbool notify=false);
 
   /// Return content size range
   FXint getRange() const { return range; }
 
-  /// Set viewport page size
-  void setPage(FXint p);
+  /**
+  * Set the viewable page size. The page size must be at least 1,
+  * but may be larger than the range.
+  */
+  void setPage(FXint p,FXbool notify=false);
 
-  /// Return page size
+  /// Return viewable page size
   FXint getPage() const { return page; }
+
+  /**
+  * Change scroll position.  The position is always greater or equal
+  * to 0, up to the range less the page size.  If the range is less
+  * than the page size, the position will simply be equal to zero.
+  */
+  void setPosition(FXint p,FXbool notify=false);
+
+  /// Return current scroll position
+  FXint getPosition() const { return pos; }
 
   /// Set scoll increment for line
   void setLine(FXint l);
 
   /// Return line increment
   FXint getLine() const { return line; }
-
-  /// Change scroll position
-  void setPosition(FXint p);
-
-  /// Return current scroll position
-  FXint getPosition() const { return pos; }
 
   /// Change highlight color
   void setHiliteColor(FXColor clr);

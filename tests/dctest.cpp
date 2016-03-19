@@ -3,9 +3,9 @@
 *                           Device Context Tester                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: dctest.cpp,v 1.50 2006/01/22 17:58:59 fox Exp $                          *
+* $Id: dctest.cpp,v 1.53 2007/02/07 20:22:23 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>
@@ -656,7 +656,7 @@ FXIMPLEMENT(DCTestWindow,FXMainWindow,DCTestWindowMap,ARRAYNUMBER(DCTestWindowMa
 
 
 // Make some windows
-DCTestWindow::DCTestWindow(FXApp *app):FXMainWindow(app,"Device Context Test",NULL,NULL,DECOR_ALL,0,0,900,820){
+DCTestWindow::DCTestWindow(FXApp *ap):FXMainWindow(ap,"Device Context Test",NULL,NULL,DECOR_ALL,0,0,900,820){
 
   // Preferred line attributes
   lineStyle=LINE_SOLID;
@@ -1190,6 +1190,7 @@ long DCTestWindow::onPaintShapes(FXObject *sender,FXSelector,void *ptr){
   dc.setBackground(backWell->getRGBA());
   dc.drawRectangle(5,5,50,50);
   dc.fillRectangle(60,5,50,50);
+  dc.fillRectangle(5,60,50,50);
 
   dc.setForeground(foreWell->getRGBA());
   dc.setBackground(backWell->getRGBA());

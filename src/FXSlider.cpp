@@ -3,7 +3,7 @@
 *                           S l i d e r   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSlider.cpp,v 1.66 2006/03/31 07:33:11 fox Exp $                        *
+* $Id: FXSlider.cpp,v 1.73 2007/02/07 20:22:15 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -76,8 +76,10 @@ FXDEFMAP(FXSlider) FXSliderMap[]={
   FXMAPFUNC(SEL_TIMEOUT,FXSlider::ID_AUTOSLIDE,FXSlider::onAutoSlide),
   FXMAPFUNC(SEL_COMMAND,FXSlider::ID_SETVALUE,FXSlider::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXSlider::ID_SETINTVALUE,FXSlider::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FXSlider::ID_SETREALVALUE,FXSlider::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXSlider::ID_GETINTVALUE,FXSlider::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXSlider::ID_SETLONGVALUE,FXSlider::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXSlider::ID_GETLONGVALUE,FXSlider::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXSlider::ID_SETREALVALUE,FXSlider::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXSlider::ID_GETREALVALUE,FXSlider::onCmdGetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXSlider::ID_SETINTRANGE,FXSlider::onCmdSetIntRange),
   FXMAPFUNC(SEL_COMMAND,FXSlider::ID_GETINTRANGE,FXSlider::onCmdGetIntRange),
@@ -97,7 +99,15 @@ FXIMPLEMENT(FXSlider,FXFrame,FXSliderMap,ARRAYNUMBER(FXSliderMap))
 // Make a slider
 FXSlider::FXSlider(){
   flags|=FLAG_ENABLED;
+  range[0]=0;
+  range[1]=0;
+  pos=0;
+  incr=1;
+  delta=0;
   headpos=0;
+  headsize=0;
+  slotsize=0;
+  slotColor=0;
   dragpoint=0;
   }
 
@@ -143,7 +153,7 @@ void FXSlider::disable(){
   }
 
 
-// Get default size
+// Get default width
 FXint FXSlider::getDefaultWidth(){
   FXint w;
   if(options&SLIDER_VERTICAL){
@@ -160,6 +170,7 @@ FXint FXSlider::getDefaultWidth(){
   }
 
 
+// Get default height
 FXint FXSlider::getDefaultHeight(){
   FXint h;
   if(options&SLIDER_VERTICAL){
@@ -177,7 +188,7 @@ FXint FXSlider::getDefaultHeight(){
 
 
 // Returns true because a slider can receive focus
-bool FXSlider::canFocus() const { return true; }
+FXbool FXSlider::canFocus() const { return true; }
 
 
 // Layout changed; even though the position is still
@@ -252,16 +263,30 @@ long FXSlider::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Update value from a message
-long FXSlider::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
-  setValue((FXint)*((FXdouble*)ptr));
+// Obtain value with a message
+long FXSlider::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
+  *((FXint*)ptr)=getValue();
   return 1;
   }
 
 
-// Obtain value from text field
-long FXSlider::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr)=getValue();
+// Update value from a message
+long FXSlider::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXint)*((FXlong*)ptr));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FXSlider::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=(FXlong)getValue();
+  return 1;
+  }
+
+
+// Update value from a message
+long FXSlider::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXint)*((FXdouble*)ptr));
   return 1;
   }
 
@@ -545,11 +570,11 @@ long FXSlider::onKeyPress(FXObject*,FXSelector,void* ptr){
         break;
       case KEY_plus:
       case KEY_KP_Add:
-inc:    setValue(pos+incr);
+inc:    setValue(pos+incr,true);
         return 1;
       case KEY_minus:
       case KEY_KP_Subtract:
-dec:    setValue(pos-incr);
+dec:    setValue(pos-incr,true);
         return 1;
       }
     }
@@ -841,7 +866,7 @@ long FXSlider::onPaint(FXObject*,FXSelector,void* ptr){
 // Set slider range; this also revalidates the position,
 // and possibly moves the head [even if the position was still OK,
 // the head might still have to be moved to the exact position].
-void FXSlider::setRange(FXint lo,FXint hi,bool notify){
+void FXSlider::setRange(FXint lo,FXint hi,FXbool notify){
   if(lo>hi){ fxerror("%s::setRange: trying to set negative range.\n",getClassName()); }
   if(range[0]!=lo || range[1]!=hi){
     range[0]=lo;
@@ -856,7 +881,7 @@ void FXSlider::setRange(FXint lo,FXint hi,bool notify){
 // head positions may represent the same position!
 // Also, the minimal amount is repainted, as one sometimes as very
 // large/wide sliders.
-void FXSlider::setValue(FXint p,bool notify){
+void FXSlider::setValue(FXint p,FXbool notify){
   register FXint interval=range[1]-range[0];
   register FXint travel,lo,hi,h;
   if(p<range[0]) p=range[0];
@@ -928,6 +953,7 @@ void FXSlider::setSlotSize(FXint bs){
 
 // Set increment
 void FXSlider::setIncrement(FXint inc){
+  if(inc<=0){ fxerror("%s::setIncrement: negative or zero increment specified.\n",getClassName()); }
   incr=inc;
   }
 

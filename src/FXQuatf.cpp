@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXQuatf.cpp,v 1.31 2006/01/22 17:58:37 fox Exp $                         *
+* $Id: FXQuatf.cpp,v 1.33 2007/02/07 20:22:13 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -87,25 +87,36 @@ FXQuatf& FXQuatf::adjust(){
 
 // Set axis and angle
 void FXQuatf::setAxisAngle(const FXVec3f& axis,FXfloat phi){
-  register FXfloat a=0.5f*phi;
-  register FXfloat s=sinf(a)/axis.length();
-  x=axis.x*s;
-  y=axis.y*s;
-  z=axis.z*s;
-  w=cosf(a);
+  register FXfloat mag=axis.length();
+  register FXfloat a,m;
+  if(0.0f<mag){
+    a=0.5f*phi;
+    m=sinf(a)/mag;
+    x=axis.x*m;
+    y=axis.y*m;
+    z=axis.z*m;
+    w=cosf(a);
+    }
+  else{
+    x=0.0f;
+    y=0.0f;
+    z=0.0f;
+    w=1.0f;
+    }
   }
 
 
 // Obtain axis and angle
 // Remeber that: q = sin(A/2)*(x*i+y*j+z*k)+cos(A/2)
-// for unit quaternion |q| == 1
 void FXQuatf::getAxisAngle(FXVec3f& axis,FXfloat& phi) const {
-  register FXfloat n=sqrtf(x*x+y*y+z*z);
-  if(n>0.0f){
-    axis.x=x/n;
-    axis.y=y/n;
-    axis.z=z/n;
-    phi=2.0f*acosf(w);
+  register FXfloat mag=x*x+y*y+z*z;
+  register FXfloat m;
+  if(0.0f<mag){
+    m=sqrtf(mag);
+    axis.x=x/m;
+    axis.y=y/m;
+    axis.z=z/m;
+    phi=2.0f*acosf(w/sqrtf(mag+w*w));
     }
   else{
     axis.x=1.0f;

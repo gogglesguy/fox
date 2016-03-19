@@ -3,7 +3,7 @@
 *                   W i l d c a r d   M a t c h   F u n c t i o n               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxfilematch.cpp,v 1.16 2006/03/01 02:13:22 fox Exp $                     *
+* $Id: fxfilematch.cpp,v 1.18 2007/02/07 20:22:20 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -81,7 +81,7 @@ namespace FX {
 
 
 // Perform match
-static bool domatch(const char *pattern,const char *string,FXuint flags){
+static FXbool domatch(const char *pattern,const char *string,FXuint flags){
   register const char *p=pattern;
   register const char *q=string;
   register const char *s;
@@ -180,7 +180,7 @@ nxt:    if(domatch(p,q,flags)) return true;
 
 
 // Public API to matcher
-bool fxfilematch(const char *pattern,const char *string,FXuint flags){
+FXbool fxfilematch(const char *pattern,const char *string,FXuint flags){
   register const char *p=pattern;
   register const char *q=string;
   register int level;

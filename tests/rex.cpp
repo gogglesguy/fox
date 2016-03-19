@@ -3,15 +3,11 @@
 *                             Regular Expression Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: rex.cpp,v 1.18 2006/01/22 17:59:02 fox Exp $                             *
+* $Id: rex.cpp,v 1.21 2007/02/07 20:22:24 fox Exp $                             *
 ********************************************************************************/
 #include "fx.h"
-#include "FXRex.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 
 /*
@@ -39,7 +35,7 @@ int main(int argc,char** argv){
     exit(1);
     }
   if(2<=argc){
-    err=rex.parse(argv[1],REX_NORMAL);
+    err=rex.parse(argv[1],REX_NORMAL|REX_CAPTURE);
     fprintf(stderr,"parse(\"%s\") = %s\n",argv[1],FXRex::getError(err));
     }
   if(3<=argc){

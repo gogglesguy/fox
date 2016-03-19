@@ -3,7 +3,7 @@
 *          S i n g l e - P r e c i s i o n    E x t e n t    C l a s s          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXExtentf.cpp,v 1.3 2006/01/22 17:58:25 fox Exp $                        *
+* $Id: FXExtentf.cpp,v 1.5 2007/02/07 20:22:07 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -83,24 +83,24 @@ FXVec2f FXExtentf::center() const {
 
 
 // Test if empty
-bool FXExtentf::empty() const {
+FXbool FXExtentf::empty() const {
   return upper.x<lower.x || upper.y<lower.y;
   }
 
 // Test if box contains point
-bool FXExtentf::contains(FXfloat x,FXfloat y) const {
+FXbool FXExtentf::contains(FXfloat x,FXfloat y) const {
   return lower.x<=x && x<=upper.x && lower.y<=y && y<=upper.y;
   }
 
 
 // Test if box contains point p
-bool FXExtentf::contains(const FXVec2f& p) const {
+FXbool FXExtentf::contains(const FXVec2f& p) const {
   return lower.x<=p.x && p.x<=upper.x && lower.y<=p.y && p.y<=upper.y;
   }
 
 
 // Test if box contains another box
-bool FXExtentf::contains(const FXExtentf& ext) const {
+FXbool FXExtentf::contains(const FXExtentf& ext) const {
   return lower.x<=ext.lower.x && ext.upper.x<=upper.x && lower.y<=ext.lower.y && ext.upper.y<=upper.y;
   }
 
@@ -128,7 +128,7 @@ FXExtentf& FXExtentf::include(const FXExtentf& ext){
 
 
 // Test if overlap
-bool overlap(const FXExtentf& a,const FXExtentf& b){
+FXbool overlap(const FXExtentf& a,const FXExtentf& b){
   return a.upper.x>=b.lower.x && a.lower.x<=b.upper.x && a.upper.y>=b.lower.y && a.lower.y<=b.upper.y;
   }
 

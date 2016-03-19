@@ -3,9 +3,9 @@
 *                         OpenGL Application coding sample                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: glviewer.cpp,v 1.83 2006/01/22 17:59:01 fox Exp $                        *
+* $Id: glviewer.cpp,v 1.94 2007/02/07 20:22:24 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include "fx3d.h"
@@ -321,12 +321,16 @@ const unsigned char winapp[]={
 
 // Camera picture
 const unsigned char camera[]={
-  0x47,0x49,0x46,0x38,0x37,0x61,0x10,0x00,0x10,0x00,0xf2,0x00,0x00,0x00,0x00,0x00,
-  0xc0,0xc0,0xc0,0xff,0x00,0x00,0xff,0xff,0x00,0x00,0x00,0xff,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x2c,0x00,0x00,0x00,0x00,0x10,0x00,0x10,0x00,0x00,0x03,
-  0x29,0x18,0xba,0xdc,0xfe,0x8d,0xc8,0x49,0x60,0x00,0x38,0xe7,0xa7,0x3b,0x07,0x42,
-  0x07,0x2c,0x98,0x82,0x85,0xa2,0x66,0xa6,0xe2,0x8a,0x0d,0xec,0x78,0x65,0xf0,0xb6,
-  0xba,0xad,0x13,0x7f,0xb9,0xe5,0xff,0xc0,0x5f,0x02,0x00,0x3b
+  0x47,0x49,0x46,0x38,0x37,0x61,0x10,0x00,0x10,0x00,0xe3,0x00,0x00,0xd1,0xee,0xee,
+  0x00,0x00,0x00,0x68,0x67,0x68,0xff,0xff,0xff,0x84,0x84,0x84,0xbf,0xbf,0xc0,0x80,
+  0x80,0x80,0xa2,0xa2,0xa3,0x47,0x47,0x47,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x2c,0x00,0x00,
+  0x00,0x00,0x10,0x00,0x10,0x00,0x00,0x04,0x47,0x10,0xc8,0x49,0xab,0x05,0x21,0xe7,
+  0xaa,0xbb,0xd7,0x80,0x10,0x0c,0x64,0x46,0x14,0x44,0x66,0x18,0x45,0x70,0x08,0x88,
+  0xd6,0x66,0x73,0xd0,0xbe,0xb1,0x6d,0x17,0xed,0x7c,0xc3,0x81,0x54,0x81,0x34,0x68,
+  0x09,0x5d,0xc0,0x1e,0xb1,0xa7,0xc3,0x05,0x6d,0xcb,0xe7,0x2f,0xd7,0xe3,0xe9,0x9a,
+  0x40,0x9a,0x6c,0x2b,0xc8,0x9a,0x50,0x9f,0xb0,0xf8,0x42,0x2e,0x9b,0xcf,0x94,0x08,
+  0x00,0x3b
   };
 
 /*******************************************************************************/
@@ -448,20 +452,20 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   setIcon(penguinicon);
 
-  FXColorDialog *colordlg=new FXColorDialog(this,"Color Dialog",DECOR_TITLE|DECOR_BORDER);
+  FXColorDialog *colordlg=new FXColorDialog(this,"Color Dialog",DECOR_TITLE|DECOR_BORDER,100,100);
 
   // Make status bar
   statusbar=new FXStatusBar(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
 
   // Site where to dock
-  topdock=new FXDockSite(this,DOCKSITE_NO_WRAP|LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
+  topdock=new FXDockSite(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
   bottomdock=new FXDockSite(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   leftdock=new FXDockSite(this,LAYOUT_SIDE_LEFT|LAYOUT_FILL_Y);
   rightdock=new FXDockSite(this,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_Y);
 
   // Menubar 1
   dragshell1=new FXToolBarShell(this,FRAME_RAISED);
-  menubar=new FXMenuBar(topdock,dragshell1,LAYOUT_DOCK_SAME|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED);
+  menubar=new FXMenuBar(topdock,dragshell1,LAYOUT_DOCK_SAME|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_RAISED|LAYOUT_FILL_Y);
   new FXToolBarGrip(menubar,menubar,FXMenuBar::ID_TOOLBARGRIP,TOOLBARGRIP_DOUBLE);
 
   // Tool bar 2
@@ -520,7 +524,8 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // Tool bar 4
   dragshell4=new FXToolBarShell(this,FRAME_RAISED|FRAME_THICK);
-  dockbar=new FXDockBar(rightdock,dragshell4,LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
+//  dockbar=new FXDockBar(rightdock,dragshell4,LAYOUT_FILL_Y|LAYOUT_SIDE_RIGHT, 0,0,0,0, 2,2,2,2, 2,2);
+  dockbar=new FXDockBar(rightdock,dragshell4,LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_SIDE_RIGHT, 0,0,300,400, 2,2,2,2, 2,2);
 
   // Only dock left and right
   dockbar->allowedSides(FXDockBar::ALLOW_LEFT|FXDockBar::ALLOW_RIGHT);
@@ -531,12 +536,12 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   new FXMDIDeleteButton(dockframe,dockbar,FXWindow::ID_HIDE,LAYOUT_FILL_Y);
 
   // Tab book with switchable panels
-  FXTabBook* panels=new FXTabBook(dockbar,NULL,0,LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
+  FXTabBook* panels=new FXTabBook(dockbar,NULL,0,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0, 0,0,0,0);
 
   new FXTabItem(panels,"Angles\tCamera Angles\tSwitch to camera angles panel.");
 
   // Angles
-  FXMatrix *angles=new FXMatrix(panels,3,FRAME_THICK|FRAME_RAISED|MATRIX_BY_COLUMNS|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,10,10,10,10);
+  FXMatrix *angles=new FXMatrix(panels,3,FRAME_THICK|FRAME_RAISED|MATRIX_BY_COLUMNS|LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0,10,10,10,10);
   new FXLabel(angles,"X:");
   new FXTextField(angles,6,mdiclient,FXGLViewer::ID_ROLL,TEXTFIELD_INTEGER|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   FXDial* x_dial=new FXDial(angles,mdiclient,FXGLViewer::ID_DIAL_X,FRAME_SUNKEN|FRAME_THICK|DIAL_CYCLIC|DIAL_HORIZONTAL|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_Y,0,0,160,14,0,0,0,0);
@@ -615,7 +620,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // File Menu
   filemenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,"&File",NULL,filemenu);
+  new FXMenuTitle(menubar,"&File",NULL,filemenu,LAYOUT_CENTER_Y);
   new FXMenuCommand(filemenu,"&New...\tCtl-N\tCreate new document.",filenewicon);
   new FXMenuCommand(filemenu,"&Open...\tCtl-O\tOpen document file.",fileopenicon,this,ID_OPEN);
   new FXMenuCommand(filemenu,"&Save\tCtl-S\tSave document.",filesaveicon);
@@ -627,7 +632,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // Edit Menu
   editmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,"&Edit",NULL,editmenu);
+  new FXMenuTitle(menubar,"&Edit",NULL,editmenu,LAYOUT_CENTER_Y);
   new FXMenuCommand(editmenu,"Lasso",NULL,mdiclient,FXGLViewer::ID_LASSO_SELECT,MENU_AUTOGRAY);
   new FXMenuCommand(editmenu,"Copy\tCtl-C",NULL,mdiclient,FXGLViewer::ID_COPY_SEL,MENU_AUTOGRAY);
   new FXMenuCommand(editmenu,"Cut\tCtl-X",NULL,mdiclient,FXGLViewer::ID_CUT_SEL,MENU_AUTOGRAY);
@@ -697,7 +702,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   colorpalicon=new FXGIFIcon(getApp(),colorpal);
   zoomicon=new FXGIFIcon(getApp(),zoom);
-  cameraicon=new FXGIFIcon(getApp(),camera,0,IMAGE_OPAQUE);
+  cameraicon=new FXGIFIcon(getApp(),camera);
   foxiconicon=new FXGIFIcon(getApp(),foxicon);
 
   // Miscellaneous buttons
@@ -715,7 +720,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // View menu
   viewmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,"&View",NULL,viewmenu);
+  new FXMenuTitle(menubar,"&View",NULL,viewmenu,LAYOUT_CENTER_Y);
   new FXMenuRadio(viewmenu,"Parallel\t\tSwitch to parallel projection.",mdiclient,FXGLViewer::ID_PARALLEL,MENU_AUTOGRAY);
   new FXMenuRadio(viewmenu,"Perspective\t\tSwitch to perspective projection.",mdiclient,FXGLViewer::ID_PERSPECTIVE,MENU_AUTOGRAY);
   new FXMenuSeparator(viewmenu);
@@ -733,7 +738,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // Rendering menu
   rendermenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,"&Rendering",NULL,rendermenu);
+  new FXMenuTitle(menubar,"&Rendering",NULL,rendermenu,LAYOUT_CENTER_Y);
   new FXMenuCheck(rendermenu,"Points\t\tRender as points.",mdiclient,FXGLShape::ID_STYLE_POINTS,MENU_AUTOGRAY);
   new FXMenuCheck(rendermenu,"Wire Frame\t\tRender as wire frame.",mdiclient,FXGLShape::ID_STYLE_WIREFRAME,MENU_AUTOGRAY);
   new FXMenuCheck(rendermenu,"Surface \t\tRender solid surface.",mdiclient,FXGLShape::ID_STYLE_SURFACE,MENU_AUTOGRAY);
@@ -741,7 +746,7 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // Window menu
   windowmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,"&Windows",NULL,windowmenu);
+  new FXMenuTitle(menubar,"&Windows",NULL,windowmenu,LAYOUT_CENTER_Y);
   new FXMenuCommand(windowmenu,"New Viewer\t\tCreate new viewer window.",NULL,this,ID_NEWVIEWER);
   new FXMenuCommand(windowmenu,"Tile Horizontally\t\tTile windows horizontally.",NULL,mdiclient,FXMDIClient::ID_MDI_TILEHORIZONTAL);
   new FXMenuCommand(windowmenu,"Tile Vertically\t\tTile windows vertically.",NULL,mdiclient,FXMDIClient::ID_MDI_TILEVERTICAL);
@@ -761,11 +766,11 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // Help menu
   helpmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,"&Help",NULL,helpmenu,LAYOUT_RIGHT);
+  new FXMenuTitle(menubar,"&Help",NULL,helpmenu,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
   new FXMenuCommand(helpmenu,"&About FOX...\t\tDisplay FOX about panel.",NULL,this,ID_ABOUT,0);
 
   // Make a tool tip
-  new FXToolTip(getApp(),0);
+  new FXToolTip(getApp(),TOOLTIP_PERMANENT);
 
   // The status bar shows our mode
   statusbar->getStatusLine()->setTarget(this);
@@ -784,8 +789,9 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   FXGLGroup *gp2=new FXGLGroup;
   scene->append(gp2);
   FXGLSphere *sphere=new FXGLSphere(1.0, 1.0, 0.0, 0.5);
-  FXGLSphere *sphere2=new FXGLSphere(0.0, 0.0, 0.0, 0.8);
   sphere->setTipText("Sphere");
+  FXGLSphere *sphere2=new FXGLSphere(0.0, 0.0, 0.0, 0.8);
+  sphere2->setTipText("Sphere2");
   gp2->append(new FXGLCube(-1.0, 0.0, 0.0,  1.0, 1.0, 1.0));
   gp2->append(new FXGLCube( 1.0, 0.0, 0.0,  1.0, 1.0, 1.0));
   gp2->append(new FXGLCube( 0.0,-1.0, 0.0,  1.0, 1.0, 1.0));
@@ -859,7 +865,7 @@ void GLViewWindow::create(){
 
 // About
 long GLViewWindow::onCmdAbout(FXObject*,FXSelector,void*){
-  FXMessageBox::information(this,MBOX_OK,"About FOX","FOX OpenGL Example.\nCopyright (C) 1998,2005 Jeroen van der Zijp");
+  FXMessageBox::information(this,MBOX_OK,"About FOX","FOX OpenGL Example.\nCopyright (C) 1998,2006 Jeroen van der Zijp");
   return 1;
   }
 
@@ -940,6 +946,7 @@ int main(int argc,char *argv[]){
 
   // Make application
   FXApp application("GLViewer","FoxTest");
+
 
   // Open the display
   application.init(argc,argv);

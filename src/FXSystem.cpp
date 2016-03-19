@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSystem.cpp,v 1.22 2006/04/13 22:27:19 fox Exp $                        *
+* $Id: FXSystem.cpp,v 1.30 2007/03/08 17:25:17 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -234,12 +234,12 @@ FXString FXSystem::getEnvironment(const FXString& name){
 
 
 // Change value of environment variable name
-bool FXSystem::setEnvironment(const FXString& name,const FXString& value){
+FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
   if(!name.empty()){
 #ifndef WIN32
 #ifdef __GNU_LIBRARY__
     if(!value.empty()){
-      return setenv(name.text(),value.text(),TRUE)==0;
+      return setenv(name.text(),value.text(),true)==0;
       }
     unsetenv(name.text());
     return true;
@@ -269,15 +269,15 @@ FXString FXSystem::getCurrentDirectory(){
 
 
 // Change current directory
-bool FXSystem::setCurrentDirectory(const FXString& path){
+FXbool FXSystem::setCurrentDirectory(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
     TCHAR buffer[MAXPATHLEN];
     utf2ncs(buffer,path.text(),path.length()+1);
-    return SetCurrentDirectory(buffer);
+    return SetCurrentDirectory(buffer)!=0;
 #else
-    return SetCurrentDirectory(path.text());
+    return SetCurrentDirectory(path.text())!=0;
 #endif
 #else
     return chdir(path.text())==0;
@@ -302,13 +302,13 @@ FXString FXSystem::getCurrentDrive(){
 
 // Change current drive prefix "a:"
 // This is the same method as used in VC++ CRT.
-bool FXSystem::setCurrentDrive(const FXString& prefix){
+FXbool FXSystem::setCurrentDrive(const FXString& prefix){
   FXchar buffer[3];
   if(!prefix.empty() && Ascii::isLetter(prefix[0]) && prefix[1]==':'){
     buffer[0]=prefix[0];
     buffer[1]=':';
     buffer[2]='\0';
-    return SetCurrentDirectoryA(buffer);
+    return SetCurrentDirectoryA(buffer)!=0;
     }
   return false;
   }
@@ -316,7 +316,7 @@ bool FXSystem::setCurrentDrive(const FXString& prefix){
 #else
 
 // Change current drive prefix "a:"
-bool FXSystem::setCurrentDrive(const FXString&){
+FXbool FXSystem::setCurrentDrive(const FXString&){
   return true;
   }
 
@@ -331,7 +331,7 @@ FXString FXSystem::getExecPath(){
 
 // Return the home directory for the current user.
 FXString FXSystem::getHomeDirectory(){
-  return getUserDirectory(FXString::null);
+  return FXSystem::getUserDirectory(FXString::null);
   }
 
 
@@ -373,7 +373,7 @@ FXString FXSystem::getUserDirectory(const FXString& user){
     DWORD size=MAXPATHLEN;
     HKEY hKey;
     LONG result;
-    if((str1=getenv("USERPROFILE"))!=NULL) return str1; // Daniël Hörchner <dbjh@gmx.net>
+    if((str1=getenv("USERPROFILE"))!=NULL) return str1;
     if((str1=getenv("HOME"))!=NULL) return str1;
     if((str2=getenv("HOMEPATH"))!=NULL){      // This should be good for WinNT, Win2K according to MSDN
       if((str1=getenv("HOMEDRIVE"))==NULL) str1="c:";
@@ -381,10 +381,6 @@ FXString FXSystem::getUserDirectory(const FXString& user){
       strncat(home,str2,MAXPATHLEN);
       return home;
       }
-//  FXchar buffer[MAX_PATH]
-//  if(SHGetFolderPath(NULL,CSIDL_PERSONAL|CSIDL_FLAG_CREATE,NULL,O,buffer)==S_OK){
-//    return buffer;
-//    }
     if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
       result=RegQueryValueExA(hKey,"Personal",NULL,NULL,(LPBYTE)home,&size);  // Change "Personal" to "Desktop" if you want...
       RegCloseKey(hKey);
@@ -423,13 +419,28 @@ FXint FXSystem::getProcessId(){
   }
 
 
+
+// Determine if UTF8 locale in effect
+FXbool FXSystem::localeIsUTF8(){
+#ifdef WIN32
+  return GetACP()==CP_UTF8;
+#else
+  const FXchar* str;
+  if((str=getenv("LC_CTYPE"))!=NULL || (str=getenv("LC_ALL"))!=NULL || (str=getenv("LANG"))!=NULL){
+    return (strstr(str,"utf")!=NULL || strstr(str,"UTF")!=NULL);
+    }
+  return false;
+#endif
+  }
+
+
 // Get DLL name for given base name
 FXString FXSystem::dllName(const FXString& name){
 #if defined(WIN32)
   return name+".dll";
 #elif defined(_HPUX_) || defined(_HPUX_SOURCE)
   return "lib"+name+".sl";
-#elif  defined(_APPLE_)
+#elif  defined(__APPLE__)
   return "lib"+name+".dylib";
 #else
   return "lib"+name+".so";

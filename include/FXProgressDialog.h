@@ -3,7 +3,7 @@
 *                      P r o g r e s s   D i a l o g   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXProgressDialog.h,v 1.16 2006/04/02 19:33:22 fox Exp $                  *
+* $Id: FXProgressDialog.h,v 1.20 2007/02/07 20:21:57 fox Exp $                  *
 ********************************************************************************/
 #ifndef FXPROGRESSDIALOG_H
 #define FXPROGRESSDIALOG_H
@@ -33,8 +33,8 @@ namespace FX {
 
 enum {
   PROGRESSDIALOG_NOCANCEL = 0,                        /// Default is no cancel button
-  PROGRESSDIALOG_CANCEL   = 0x01000000,               /// Enable the cancel button
-  PROGRESSDIALOG_NORMAL   = (DECOR_TITLE|DECOR_BORDER)
+  PROGRESSDIALOG_CANCEL   = 0x02000000,               /// Enable the cancel button
+  PROGRESSDIALOG_NORMAL   = (DECOR_TITLE|DECOR_BORDER)/// Normally with title and border
   };
 
 
@@ -55,7 +55,7 @@ protected:
   FXLabel               *message;     // Message
   FXHorizontalSeparator *separator;   // Separator
   FXButton              *cancel;      // Cancel button
-  bool                   cancelled;   // User hit cancel
+  FXbool                 cancelled;   // User hit cancel
 protected:
   FXProgressDialog();
 private:
@@ -65,6 +65,8 @@ public:
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetStringValue(FXObject*,FXSelector,void*);
   long onCmdGetStringValue(FXObject*,FXSelector,void*);
   long onCmdCancel(FXObject*,FXSelector,void*);
@@ -101,10 +103,10 @@ public:
   void increment(FXuint value);
 
   /// Has operation been cancelled?
-  bool isCancelled() const { return cancelled; }
+  FXbool isCancelled() const { return cancelled; }
 
   /// Change cancelled flag
-  void setCancelled(bool flg){ cancelled=flg; }
+  void setCancelled(FXbool flg){ cancelled=flg; }
 
   /// Destroy
   virtual ~FXProgressDialog();

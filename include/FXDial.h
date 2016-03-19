@@ -3,7 +3,7 @@
 *                              D i a l   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDial.h,v 1.36 2006/03/31 07:33:01 fox Exp $                            *
+* $Id: FXDial.h,v 1.39 2007/02/07 20:21:53 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXDIAL_H
 #define FXDIAL_H
@@ -82,6 +82,8 @@ public:
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetRealValue(FXObject*,FXSelector,void*);
   long onCmdGetRealValue(FXObject*,FXSelector,void*);
   long onCmdSetIntRange(FXObject*,FXSelector,void*);
@@ -106,16 +108,16 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Returns true because a dial can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Set the dial value
-  void setValue(FXint value,bool notify=false);
+  void setValue(FXint value,FXbool notify=false);
 
   /// Return the dial value
   FXint getValue() const { return pos; }
 
   /// Change the dial's range
-  void setRange(FXint lo,FXint hi,bool notify=false);
+  void setRange(FXint lo,FXint hi,FXbool notify=false);
 
   /// Obtain the current range of the dial
   void getRange(FXint& lo,FXint& hi) const { lo=range[0]; hi=range[1]; }

@@ -3,7 +3,7 @@
 *                     F S   C o l o r   Q u a n t i z a t i o n                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxfsquantize.cpp,v 1.6 2006/03/23 07:10:03 fox Exp $                     *
+* $Id: fxfsquantize.cpp,v 1.9 2007/02/07 20:22:20 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,8 +71,8 @@ FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
     }
 
   // Temporary storage
-  if(!allocElms(begin,w*2*3)) return FALSE;
-  
+  if(!allocElms(begin,w*2*3)) return false;
+
   // Set up rows
   cr=begin;
   cg=cr+w;
@@ -147,7 +147,7 @@ FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
     }
   freeElms(begin);
   actualcolors=256;
-  return TRUE;
+  return true;
   }
 
 

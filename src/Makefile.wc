@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2005 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
-# $Id: Makefile.wc,v 1.37 2006/04/18 03:21:59 fox Exp $                      #
+# $Id: Makefile.wc,v 1.45 2007/01/31 16:20:02 fox Exp $                      #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -70,6 +70,8 @@ OBJECTS += fxbmpio.obj
 OBJECTS += FXButton.obj
 OBJECTS += FXBZFileStream.obj
 OBJECTS += FXCanvas.obj
+OBJECTS += FXCalendar.obj
+OBJECTS += FXCalendarView.obj
 OBJECTS += FXCheckButton.obj
 OBJECTS += FXChoiceBox.obj
 OBJECTS += FXColorBar.obj
@@ -81,6 +83,8 @@ OBJECTS += FXColorSelector.obj
 OBJECTS += FXColorWell.obj
 OBJECTS += FXColorWheel.obj
 OBJECTS += FXComboBox.obj
+OBJECTS += FXComplexf.obj
+OBJECTS += FXComplexd.obj
 OBJECTS += FXComposeContext.obj
 OBJECTS += FXComposite.obj
 OBJECTS += FXCP1250Codec.obj
@@ -168,7 +172,6 @@ OBJECTS += FXGLViewer.obj
 OBJECTS += FXGLVisual.obj
 OBJECTS += FXGradientBar.obj
 OBJECTS += FXGroupBox.obj
-OBJECTS += FXGUISignal.obj
 OBJECTS += FXGZFileStream.obj
 OBJECTS += FXHash.obj
 OBJECTS += FXHeader.obj
@@ -219,6 +222,7 @@ OBJECTS += FXMenuRadio.obj
 OBJECTS += FXMenuSeparator.obj
 OBJECTS += FXMenuTitle.obj
 OBJECTS += FXMessageBox.obj
+OBJECTS += FXMessageChannel.obj
 OBJECTS += FXObject.obj
 OBJECTS += FXObjectList.obj
 OBJECTS += FXOptionMenu.obj
@@ -245,6 +249,7 @@ OBJECTS += FXProgressDialog.obj
 OBJECTS += fxpsio.obj
 OBJECTS += FXQuatd.obj
 OBJECTS += FXQuatf.obj
+OBJECTS += FXMessenger.obj
 OBJECTS += FXRadioButton.obj
 OBJECTS += FXRanged.obj
 OBJECTS += FXRangef.obj
@@ -302,6 +307,7 @@ OBJECTS += FXTextField.obj
 OBJECTS += FXTGAIcon.obj
 OBJECTS += FXTGAImage.obj
 OBJECTS += FXThread.obj
+OBJECTS += FXThreadPool.obj
 OBJECTS += FXTIFIcon.obj
 OBJECTS += FXTIFImage.obj
 OBJECTS += fxtifio.obj

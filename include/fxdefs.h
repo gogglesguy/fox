@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.182 2006/04/06 05:42:59 fox Exp $                           *
+* $Id: fxdefs.h,v 1.192 2007/02/07 20:22:00 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -41,28 +41,13 @@
 #define NULL 0
 #endif
 
-/// Pi
-#ifndef PI
-#define PI      3.1415926535897932384626433833
-#endif
-
-/// Euler constant
-#define EULER   2.7182818284590452353602874713
-
-/// Multiplier for degrees to radians
-#define DTOR    0.0174532925199432957692369077
-
-/// Multiplier for radians to degrees
-#define RTOD    57.295779513082320876798154814
-
-
 // Path separator
 #ifdef WIN32
 #define PATHSEP '\\'
 #define PATHSEPSTRING "\\"
 #define PATHLISTSEP ';'
 #define PATHLISTSEPSTRING ";"
-#define ISPATHSEP(c) ((c)=='/' || (c)=='\\')
+#define ISPATHSEP(c) ((c)=='\\' || (c)=='/')
 #else
 #define PATHSEP '/'
 #define PATHSEPSTRING "/"
@@ -113,11 +98,14 @@
 #ifdef FOXDLL
 #ifdef FOXDLL_EXPORTS
 #define FXAPI FXEXPORT
+#define FXTEMPLATE_EXTERN
 #else
 #define FXAPI FXIMPORT
+#define FXTEMPLATE_EXTERN extern
 #endif
 #else
 #define FXAPI
+#define FXTEMPLATE_EXTERN
 #endif
 
 // Callback
@@ -128,10 +116,13 @@
 #endif
 
 
-// Templates with DLL linkage
+// Disable some warnings in VC++
 #ifdef _MSC_VER
 #pragma warning(disable: 4251)
+#pragma warning(disable: 4231)
+#pragma warning(disable: 4244)
 #endif
+
 
 // Checking printf and scanf format strings
 #if defined(_CC_GNU_) || defined(__GNUG__) || defined(__GNUC__)
@@ -141,6 +132,7 @@
 #define FX_PRINTF(fmt,arg)
 #define FX_SCANF(fmt,arg)
 #endif
+
 
 // Raw event type
 #ifndef WIN32
@@ -345,7 +337,7 @@ class                          FXString;
 // Streamable types; these are fixed size!
 typedef char                   FXchar;
 typedef unsigned char          FXuchar;
-typedef FXuchar                FXbool;
+typedef bool                   FXbool;
 typedef unsigned short         FXushort;
 typedef short                  FXshort;
 typedef unsigned int           FXuint;
@@ -427,6 +419,27 @@ typedef void*                  FXInputHandle;
 typedef _XEvent                FXRawEvent;
 #else
 typedef tagMSG                 FXRawEvent;
+#endif
+
+
+/// Pi
+const FXdouble PI=3.1415926535897932384626433833;
+
+/// Euler constant
+const FXdouble EULER=2.7182818284590452353602874713;
+
+/// Multiplier for degrees to radians
+const FXdouble DTOR=0.0174532925199432957692369077;
+
+/// Multiplier for radians to degrees
+const FXdouble RTOD=57.295779513082320876798154814;
+
+#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__)
+/// A time in the far, far future
+const FXTime forever=9223372036854775807LL;
+#else
+/// A time in the far, far future
+const FXTime forever=9223372036854775807L;
 #endif
 
 
@@ -667,16 +680,16 @@ typedef tagMSG                 FXRawEvent;
 extern FXAPI FXuint fxrandom(FXuint& seed);
 
 /// Allocate memory
-extern FXAPI bool fxmalloc(void** ptr,unsigned long size);
+extern FXAPI FXbool fxmalloc(void** ptr,unsigned long size);
 
 /// Allocate cleaned memory
-extern FXAPI bool fxcalloc(void** ptr,unsigned long size);
+extern FXAPI FXbool fxcalloc(void** ptr,unsigned long size);
 
 /// Resize memory
-extern FXAPI bool fxresize(void** ptr,unsigned long size);
+extern FXAPI FXbool fxresize(void** ptr,unsigned long size);
 
 /// Duplicate memory
-extern FXAPI bool fxmemdup(void** ptr,const void* src,unsigned long size);
+extern FXAPI FXbool fxmemdup(void** ptr,const void* src,unsigned long size);
 
 /// Free memory, resets ptr to NULL afterward
 extern FXAPI void fxfree(void** ptr);
@@ -700,7 +713,7 @@ extern FXAPI void fxtrace(unsigned int level,const char* format,...) FX_PRINTF(2
 extern FXAPI void fxsleep(unsigned int n);
 
 /// Match a file name with a pattern
-extern FXAPI bool fxfilematch(const char *pattern,const char *string,FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
+extern FXAPI FXbool fxfilematch(const char *pattern,const char *string,FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
 
 /// Get highlight color
 extern FXAPI FXColor makeHiliteColor(FXColor clr);
@@ -712,10 +725,10 @@ extern FXAPI FXColor makeShadowColor(FXColor clr);
 extern FXAPI FXint fxgetpid();
 
 /// Convert string of length len to MSDOS; return new string and new length
-extern FXAPI bool fxtoDOS(FXchar*& string,FXint& len);
+extern FXAPI FXbool fxtoDOS(FXchar*& string,FXint& len);
 
 /// Convert string of length len from MSDOS; return new string and new length
-extern FXAPI bool fxfromDOS(FXchar*& string,FXint& len);
+extern FXAPI FXbool fxfromDOS(FXchar*& string,FXint& len);
 
 /// Duplicate string
 extern FXAPI FXchar *fxstrdup(const FXchar* str);
@@ -749,13 +762,13 @@ extern FXAPI FXwchar fxucs2keysym(FXwchar ucs);
 extern FXAPI FXint fxparsegeometry(const FXchar *string,FXint& x,FXint& y,FXint& w,FXint& h);
 
 /// True if executable with given path is a console application
-extern FXAPI bool fxisconsole(const FXchar *path);
+extern FXAPI FXbool fxisconsole(const FXchar *path);
 
 /// Version number that the library has been compiled with
 extern FXAPI const FXuchar fxversion[3];
 
 /// Controls tracing level
-extern FXAPI unsigned int fxTraceLevel;
+extern FXAPI FXuint fxTraceLevel;
 
 /// Return wide character from utf8 string at ptr
 extern FXAPI FXwchar wc(const FXchar *ptr);

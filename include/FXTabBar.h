@@ -3,7 +3,7 @@
 *                           T a b  B a r   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTabBar.h,v 1.16 2006/03/31 07:33:03 fox Exp $                          *
+* $Id: FXTabBar.h,v 1.19 2007/02/07 20:21:59 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABBAR_H
 #define FXTABBAR_H
@@ -50,7 +50,7 @@ enum {
 * items on the top or on the bottom.  In the vertical arrangement,
 * the tabs can be on the left or on the right.
 * When one of the tab items is pressed, the tab bar's setCurrent()
-* is called with notify=TRUE.  Thus causes the tab bar to send a
+* is called with notify=true.  Thus causes the tab bar to send a
 * SEL_COMMAND message to its target.
 */
 class FXAPI FXTabBar : public FXPacker {
@@ -109,10 +109,10 @@ public:
 
   /**
   * Change currently active tab item; this raises the active tab item
-  * slightly above the neighboring tab items.  If notify=TRUE then the
+  * slightly above the neighboring tab items.  If notify=true then the
   * tab bar will also send a SEL_COMMAND message to its target.
   */
-  virtual void setCurrent(FXint panel,bool notify=false);
+  virtual void setCurrent(FXint panel,FXbool notify=false);
 
   /// Return the currently active tab item
   FXint getCurrent() const { return current; }

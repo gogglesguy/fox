@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFont.cpp,v 1.188 2006/04/13 22:27:18 fox Exp $                         *
+* $Id: FXFont.cpp,v 1.196 2007/02/21 15:59:52 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -217,11 +217,11 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
     }
   lf.lfWeight=wantweight*10;
   if((wantslant==FXFont::Italic) || (wantslant==FXFont::Oblique))
-    lf.lfItalic=TRUE;
+    lf.lfItalic=true;
   else
-    lf.lfItalic=FALSE;
-  lf.lfUnderline=FALSE;
-  lf.lfStrikeOut=FALSE;
+    lf.lfItalic=false;
+  lf.lfUnderline=false;
+  lf.lfStrikeOut=false;
 
   // Character set encoding
   lf.lfCharSet=FXFontEncoding2CharSet(wantencoding);
@@ -451,7 +451,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
   // Scalable font hint; also set if we want rotation
   if(wanthints&(FXFont::Scalable|FXFont::Rotatable)){
-    FcPatternAddBool(pattern,FC_SCALABLE,TRUE);
+    FcPatternAddBool(pattern,FC_SCALABLE,true);
     }
 
   // Always set matrix if rotatable
@@ -713,7 +713,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FXchar **fontnames;
   FXint    nfontnames,b,f;
   FXdouble c,s,a;
-  XFontStruct *font;
+  XFontStruct *fs;
 
   FXTRACE((150,"wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res));
 
@@ -928,7 +928,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         sprintf(xlfd,"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
 
         // Load normal scaled font
-        font=XLoadQueryFont(DISPLAY(getApp()),xlfd);
+        fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
 
         // This is an ugly workaround:- according to docs, the X11 server is supposed to
         // fill XCharStruct's in the XFontStruct such that the attribute data represents
@@ -941,23 +941,20 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         // plug the font id into the XFontStruct.  This works, since while the XCharStruct's
         // may sometimes be located in read-only shared memory, the XFontStruct is always
         // allocated in the client by Xlib.
-        if(font && (flags&FXFont::Rotatable)){
+        if(fs && (flags&FXFont::Rotatable)){
           a=0.00027270769562411399179*angle;
           c=(cos(a)*res*actualSize)/(10.0*byres);
           s=(sin(a)*res*actualSize)/(10.0*byres);
           sprintf(xlfd,"-%s-%s-%s-%s-%s-%s-*-[%s%.3f %s%.3f %s%.3f %s%.3f]-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],SGN(c),fabs(c),SGN(s),fabs(s),SGN(-s),fabs(s),SGN(c),fabs(c),bxres,byres,field[10],field[12]);
-          XUnloadFont(DISPLAY(getApp()),((XFontStruct*)font)->fid);
-          ((XFontStruct*)font)->fid=XLoadFont(DISPLAY(getApp()),xlfd);
+          XUnloadFont(DISPLAY(getApp()),((XFontStruct*)fs)->fid);
+          ((XFontStruct*)fs)->fid=XLoadFont(DISPLAY(getApp()),xlfd);
           }
         }
 
       // Simple case for horizontally drawn fonts
       else{
-        font=XLoadQueryFont(DISPLAY(getApp()),xlfd);
+        fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
         }
-
-      // Remember font id
-      if(font){ xid=((XFontStruct*)font)->fid; }
 
 /*
       if(font){
@@ -965,18 +962,18 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
           if(((XFontStruct*)font)->properties[b].name==XA_FONT){
             char *fn=XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].card32);
             strncpy(candidate,fn,sizeof(candidate));
-            FXTRACE((1,"FONT = %s\n",candidate));
+            FXTRACE((100,"FONT = %s\n",candidate));
             xlfdSplit(field,candidate);
             XFree(fn);
-            FXTRACE((1,"mat  = %s\n",field[6]));
+            FXTRACE((100,"mat  = %s\n",field[6]));
             }
           else{
-            FXTRACE((1,"%d (%s) = %d\n",((XFontStruct*)font)->properties[b].name,XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].name),((XFontStruct*)font)->properties[b].card32));
+            FXTRACE((100,"%d (%s) = %d\n",((XFontStruct*)font)->properties[b].name,XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].name),((XFontStruct*)font)->properties[b].card32));
             }
           }
         }
 */
-      return font;
+      return fs;
       }
     }
   return NULL;
@@ -1238,6 +1235,9 @@ void FXFont::create(){
         font=XLoadQueryFont(DISPLAY(getApp()),actualName.text());
         }
 
+      // Remember font id
+      if(font){ xid=((XFontStruct*)font)->fid; }
+
       // Uh-oh, we failed
       if(!xid){ throw FXFontException("unable to create font"); }
 
@@ -1365,7 +1365,7 @@ GGI_MARK_NONEXISTING_GLYPHS Marks unsupported glyphs with the hexadecimal value 
 */
 
 // Does font have given character glyph?
-bool FXFont::hasChar(FXwchar ch) const {
+FXbool FXFont::hasChar(FXwchar ch) const {
   if(font){
 #if defined(WIN32)              ///// WIN32 /////
     // FIXME may want to use GetGlyphIndices()
@@ -1378,7 +1378,7 @@ bool FXFont::hasChar(FXwchar ch) const {
     register FXuchar row=ch>>8;
     register FXuchar col=ch&255;
     if(fs->min_char_or_byte2<=col && col<=fs->max_char_or_byte2 && fs->min_byte1<=row && row<=fs->max_byte1){
-      if(!fs->per_char) return TRUE;
+      if(!fs->per_char) return true;
       cm=fs->per_char+((row-fs->min_byte1)*(fs->max_char_or_byte2-fs->min_char_or_byte2+1))+(col-fs->min_char_or_byte2);
       if(cm->width || cm->ascent || cm->descent || cm->rbearing || cm->lbearing) return true;
       }
@@ -1499,7 +1499,7 @@ FXint FXFont::rightBearing(FXwchar ch) const {
 
 
 // Is it a mono space font
-bool FXFont::isFontMono() const {
+FXbool FXFont::isFontMono() const {
   if(font){
 #if defined(WIN32)              ///// WIN32 /////
     return !(((TEXTMETRIC*)font)->tmPitchAndFamily&TMPF_FIXED_PITCH);
@@ -1897,7 +1897,7 @@ static int comparefont(const void *a,const void *b){
 
 #if defined(WIN32)              ///////  MS-Windows ///////
 
-// Yuk. Need to get some data into the callback function.
+// Need to get some data into the callback function.
 struct FXFontStore {
   HDC         hdc;
   FXFontDesc *fonts;
@@ -1946,7 +1946,7 @@ static int CALLBACK EnumFontFamExProc(const LOGFONTA *lf,const TEXTMETRICA *lptm
 
   // Get slant
   FXuint slant=FXFont::Straight;
-  if(lf->lfItalic==TRUE) slant=FXFont::Italic;
+  if(lf->lfItalic) slant=FXFont::Italic;
   if(strstr(lf->lfFaceName,"Italic")!=NULL) slant=FXFont::Italic;
   if(strstr(lf->lfFaceName,"Roman")!=NULL) slant=FXFont::Straight;
 
@@ -2020,7 +2020,7 @@ static int CALLBACK EnumFontFamExProc(const LOGFONTA *lf,const TEXTMETRICA *lptm
 
 
 // List all fonts matching hints
-bool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
+FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
   register FXuint i,j;
 
   // Initialize return values
@@ -2108,7 +2108,7 @@ bool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,
 
 
 // List all fonts that match the passed requirements
-bool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
+FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
   int          encoding,setwidth,weight,slant,size,pitch,scalable,res,i,j;
   FXchar       fullname[256];
   FcPattern   *pattern,*p;
@@ -2179,11 +2179,11 @@ bool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,
             // Get full face name
             fullname[0]=0;
             if(FcPatternGetString(p,FC_FAMILY,0,&fam)==FcResultMatch){
-              strcpy(fullname,(const char*)fam);
+              strncpy(fullname,(const char*)fam,sizeof(fullname));
               if(FcPatternGetString(p,FC_FOUNDRY,0,&fdy)==FcResultMatch){
-                strcat(fullname," [");
-                strcat(fullname,(const char*)fdy);
-                strcat(fullname,"]");
+                strncat(fullname," [",sizeof(fullname));
+                strncat(fullname,(const char*)fdy,sizeof(fullname));
+                strncat(fullname,"]",sizeof(fullname));
                 }
               }
 
@@ -2290,7 +2290,7 @@ next:       continue;
 
 
 // Try find matching font
-bool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
+FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
   FXuint   encoding,weight,slant,setwidth,pitch,scalable,rotatable,polymorph,xres,yres,points,size,res;
   FXchar   candidate[256],fullname[256];
   FXchar  *field[13];
@@ -2394,11 +2394,11 @@ bool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,
         }
 
       // Get full face name
-      strcpy(fullname,field[1]);
+      strncpy(fullname,field[1],sizeof(fullname));
       if(field[0][0]){
-        strcat(fullname," [");
-        strcat(fullname,field[0]);
-        strcat(fullname,"]");
+        strncat(fullname," [",sizeof(fullname));
+        strncat(fullname,field[0],sizeof(fullname));
+        strncat(fullname,"]",sizeof(fullname));
         }
 
       // If NULL face name, just list one of each face

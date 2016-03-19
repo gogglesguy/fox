@@ -3,7 +3,7 @@
 *                           T a b   I t e m    W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTabItem.h,v 1.10 2006/01/22 17:58:10 fox Exp $                          *
+* $Id: FXTabItem.h,v 1.13 2007/02/07 20:21:59 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXTABITEM_H
 #define FXTABITEM_H
@@ -79,7 +79,7 @@ public:
   FXTabItem(FXTabBar* p,const FXString& text,FXIcon* ic=0,FXuint opts=TAB_TOP_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Returns true because a tab item can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Return current tab item orientation
   FXuint getTabOrientation() const;

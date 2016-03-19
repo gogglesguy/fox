@@ -105,8 +105,8 @@ InputPath=..\shutterbug\icons
 
 BuildCmds= \
 	cd ..\..\..\shutterbug \
-	$(WkspDir)\reswrap\Release\reswrap -e -o icons.cpp line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
-	$(WkspDir)\reswrap\Release\reswrap -i -o icons.h line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
+	$(WkspDir)\reswrap\Release\reswrap -i icons.h -o icons.cpp line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
+	$(WkspDir)\reswrap\Release\reswrap -h -o icons.h line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
 	
 
 "icons.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -124,8 +124,8 @@ InputPath=..\shutterbug\icons
 
 BuildCmds= \
 	cd ..\..\..\shutterbug \
-	$(WkspDir)\reswrap\Debug\reswrap -e -o icons.cpp line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
-	$(WkspDir)\reswrap\Debug\reswrap -i -o icons.h line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
+	$(WkspDir)\reswrap\Debug\reswrap -i icons.h -o icons.cpp line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
+	$(WkspDir)\reswrap\Debug\reswrap -h -o icons.h line_0.gif line_1.gif line_2.gif line_3.gif line_4.gif line_5.gif line_6.gif line_7.gif line_8.gif shutterbug.gif tinyshutterbug.gif \
 	
 
 "icons.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"

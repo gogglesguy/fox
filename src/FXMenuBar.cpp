@@ -3,7 +3,7 @@
 *                         M e n u   B a r   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuBar.cpp,v 1.26 2006/01/22 17:58:35 fox Exp $                       *
+* $Id: FXMenuBar.cpp,v 1.29 2007/02/07 20:22:12 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -131,14 +131,12 @@ long FXMenuBar::onFocusLeft(FXObject*,FXSelector,void* ptr){
 
 // Enter:- when inside the popup, all is normal!
 long FXMenuBar::onEnter(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent* ev=(FXEvent*)ptr;
-  FXint px, py;
+  FXint px,py;
   FXToolBar::onEnter(sender,sel,ptr);
   if(!getFocus() || !getFocus()->isActive()) return 1;
   if(((FXEvent*)ptr)->code==CROSSINGNORMAL){
-    translateCoordinatesTo(px,py,getParent(),ev->win_x,ev->win_y);
+    translateCoordinatesTo(px,py,getParent(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y);
     if(contains(px,py) && grabbed()) ungrab();
-    //if(grabbed()) ungrab();
     }
   return 1;
   }
@@ -146,16 +144,12 @@ long FXMenuBar::onEnter(FXObject* sender,FXSelector sel,void* ptr){
 
 // Leave:- when outside the popup, a click will hide the popup!
 long FXMenuBar::onLeave(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent* ev=(FXEvent*)ptr;
   FXint px,py;
   FXToolBar::onLeave(sender,sel,ptr);
   if(!getFocus() || !getFocus()->isActive()) return 1;
   if(((FXEvent*)ptr)->code==CROSSINGNORMAL){
-    translateCoordinatesTo(px,py,getParent(),ev->win_x,ev->win_y);
+    translateCoordinatesTo(px,py,getParent(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y);
     if(!contains(px,py) && !grabbed()) grab();
-//#ifndef WIN32
-//    if(!grabbed()) grab();
-//#endif
     }
   return 1;
   }
@@ -163,7 +157,7 @@ long FXMenuBar::onLeave(FXObject* sender,FXSelector sel,void* ptr){
 
 // We're considered inside the menu bar when either
 // in the bar or in any active menus
-bool FXMenuBar::contains(FXint parentx,FXint parenty) const {
+FXbool FXMenuBar::contains(FXint parentx,FXint parenty) const {
   FXint x,y;
   if(FXComposite::contains(parentx,parenty)) return true;
   if(getFocus()){

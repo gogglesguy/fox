@@ -40,15 +40,17 @@ ShutterBug.cpp: icons.h icons.cpp
 
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 
 CLEANFILES = icons.h icons.cpp
 
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc

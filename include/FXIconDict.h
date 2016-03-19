@@ -3,7 +3,7 @@
 *                         I c o n   D i c t i o n a r y                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIconDict.h,v 1.7 2006/03/25 18:03:43 fox Exp $                         *
+* $Id: FXIconDict.h,v 1.9 2007/02/07 20:21:55 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXICONDICT_H
 #define FXICONDICT_H
@@ -95,6 +95,9 @@ public:
 
   /// Find icon by name
   FXIcon* find(const FXchar* name){ return (FXIcon*)FXDict::find(name); }
+
+  /// Return icon at position pos
+  FXIcon* data(FXint pos) const { return (FXIcon*)FXDict::data(pos); }
 
   /// Save to stream
   virtual void save(FXStream& store) const;

@@ -3,9 +3,9 @@
 *                    B i t m a p   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: bitmapviewer.cpp,v 1.20 2006/04/04 05:14:48 fox Exp $                    *
+* $Id: bitmapviewer.cpp,v 1.22 2007/02/07 20:22:23 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -432,17 +432,17 @@ FXbool BitmapWindow::loadimage(const FXString& file){
   FXBitmap *img=NULL;
   FXBitmap *old;
   TIFF *tif;
-  FXint width,height,size,scanline,i;
+  FXint iwidth,iheight,size,scanline,i;
   FXshort spp, bps, order;
-  FXuchar *data,*pa;
+  FXuchar *pixels,*pa;
 
   tif=TIFFOpen(file.text(),"r");
   if(tif==NULL){
     FXMessageBox::error(this,MBOX_OK,"Error Loading Bitmap","Not a tiff file");
     return FALSE;
     }
-  TIFFGetFieldDefaulted(tif,TIFFTAG_IMAGELENGTH,&height);
-  TIFFGetFieldDefaulted(tif,TIFFTAG_IMAGEWIDTH,&width);
+  TIFFGetFieldDefaulted(tif,TIFFTAG_IMAGELENGTH,&iheight);
+  TIFFGetFieldDefaulted(tif,TIFFTAG_IMAGEWIDTH,&iwidth);
   TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bps);
   TIFFGetFieldDefaulted(tif,TIFFTAG_SAMPLESPERPIXEL,&spp);
   TIFFGetFieldDefaulted(tif,TIFFTAG_FILLORDER,&order);
@@ -453,19 +453,19 @@ FXbool BitmapWindow::loadimage(const FXString& file){
     return FALSE;
     }
   scanline=TIFFScanlineSize(tif);
-  size=height*scanline;
-  allocElms(data,size);
-  pa=data;
-  for(i=0; i<height; i++){
+  size=iheight*scanline;
+  allocElms(pixels,size);
+  pa=pixels;
+  for(i=0; i<iheight; i++){
     TIFFReadScanline(tif,pa,i,0);
     pa+=scanline;
     }
   for(i=0; i<size; i++){
-    data[i]=FXBITREVERSE(data[i]);
+    pixels[i]=FXBITREVERSE(pixels[i]);
     }
   TIFFClose(tif);
 
-  img=new FXBitmap(getApp(),data,BITMAP_KEEP|BITMAP_OWNED,width,height);
+  img=new FXBitmap(getApp(),pixels,BITMAP_KEEP|BITMAP_OWNED,iwidth,iheight);
 
   // Perhaps failed
   if(img==NULL){
@@ -487,36 +487,36 @@ FXbool BitmapWindow::saveimage(const FXString& file){
   bitmapview->getBitmap()->restore();
 #ifdef HAVE_TIFF_H
   FXBitmap *img;
-  FXint width,height,size,scanline,i;
-  FXuchar *data,*pa;
+  FXint iwidth,iheight,size,scanline,i;
+  FXuchar *pixels,*pa;
   TIFF *tif;
 
   img=bitmapview->getBitmap();
-  width=img->getWidth();
-  height=img->getHeight();
-  scanline=(width+7)>>3;
-  size=height*scanline;
+  iwidth=img->getWidth();
+  iheight=img->getHeight();
+  scanline=(iwidth+7)>>3;
+  size=iheight*scanline;
 
-  allocElms(data,size);
-  memcpy(data,img->getData(),size);
+  allocElms(pixels,size);
+  memcpy(pixels,img->getData(),size);
   for(i=0; i<size; i++){
-    data[i]=FXBITREVERSE(data[i]);
+    pixels[i]=FXBITREVERSE(pixels[i]);
     }
 
   tif=TIFFOpen(file.text(),"w");
-  TIFFSetField(tif,TIFFTAG_IMAGELENGTH,height);
-  TIFFSetField(tif,TIFFTAG_IMAGEWIDTH,width);
+  TIFFSetField(tif,TIFFTAG_IMAGELENGTH,iheight);
+  TIFFSetField(tif,TIFFTAG_IMAGEWIDTH,iwidth);
   TIFFSetField(tif,TIFFTAG_BITSPERSAMPLE,1);
   TIFFSetField(tif,TIFFTAG_SAMPLESPERPIXEL,1);
   TIFFSetField(tif,TIFFTAG_PLANARCONFIG,1);
 
-  pa=data;
-  for(i=0; i<height; i++) {
+  pa=pixels;
+  for(i=0; i<iheight; i++) {
     TIFFWriteScanline(tif,(tdata_t)pa,i,0);
     pa+=scanline;
     }
   TIFFClose(tif);
-  freeElms(data);
+  freeElms(pixels);
 #endif
   return TRUE;
   }

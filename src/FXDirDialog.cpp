@@ -3,7 +3,7 @@
 *                D i r e c t o r y   S e l e c t i o n   D i a l o g            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirDialog.cpp,v 1.28 2006/03/31 07:33:05 fox Exp $                     *
+* $Id: FXDirDialog.cpp,v 1.32 2007/02/07 20:22:05 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -72,8 +72,8 @@ FXIMPLEMENT(FXDirDialog,FXDialogBox,NULL,0)
 
 
 // Construct directory dialog box
-FXDirDialog::FXDirDialog(FXWindow* owner,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
+FXDirDialog::FXDirDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
   initdialog();
   }
 
@@ -117,26 +117,26 @@ FXString FXDirDialog::getDirectory() const {
   }
 
 
-// Return TRUE if showing files as well as directories
-bool FXDirDialog::showFiles() const {
+// Return true if showing files as well as directories
+FXbool FXDirDialog::showFiles() const {
   return dirbox->showFiles();
   }
 
 
 // Show or hide normal files
-void FXDirDialog::showFiles(bool showing){
+void FXDirDialog::showFiles(FXbool showing){
   dirbox->showFiles(showing);
   }
 
 
-// Return TRUE if showing hidden files
-bool FXDirDialog::showHiddenFiles() const {
+// Return true if showing hidden files
+FXbool FXDirDialog::showHiddenFiles() const {
   return dirbox->showHiddenFiles();
   }
 
 
 // Show or hide hidden files
-void FXDirDialog::showHiddenFiles(bool showing){
+void FXDirDialog::showHiddenFiles(FXbool showing){
   dirbox->showHiddenFiles(showing);
   }
 

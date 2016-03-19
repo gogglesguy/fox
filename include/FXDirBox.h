@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   B o x   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirBox.h,v 1.25 2006/01/22 17:58:00 fox Exp $                          *
+* $Id: FXDirBox.h,v 1.26 2007/02/07 20:21:53 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXDIRBOX_H
 #define FXDIRBOX_H

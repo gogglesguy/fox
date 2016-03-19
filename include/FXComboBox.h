@@ -3,7 +3,7 @@
 *                       C o m b o   B o x   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXComboBox.h,v 1.47 2006/03/31 07:33:01 fox Exp $                        *
+* $Id: FXComboBox.h,v 1.51 2007/03/08 20:26:31 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCOMBOBOX_H
 #define FXCOMBOBOX_H
@@ -124,13 +124,13 @@ public:
   virtual void layout();
 
   /// Return true if combobox is editable
-  bool isEditable() const;
+  FXbool isEditable() const;
 
   /// Set editable state
-  void setEditable(bool edit=true);
+  void setEditable(FXbool edit=true);
 
-  /// Set the text
-  void setText(const FXString& text);
+  /// Set the text; selects the matching item
+  void setText(const FXString& text,FXbool notify=false);
 
   /// Get the text
   FXString getText() const;
@@ -157,10 +157,10 @@ public:
   void setNumVisible(FXint nvis);
 
   /// Return true if current item
-  bool isItemCurrent(FXint index) const;
+  FXbool isItemCurrent(FXint index) const;
 
   /// Set the current item (index is zero-based)
-  void setCurrentItem(FXint index,bool notify=false);
+  void setCurrentItem(FXint index,FXbool notify=false);
 
   /// Get the current item's index
   FXint getCurrentItem() const;
@@ -169,31 +169,31 @@ public:
   FXString getItem(FXint index) const;
 
   /// Replace the item at index
-  FXint setItem(FXint index,const FXString& text,void* ptr=NULL);
+  FXint setItem(FXint index,const FXString& text,void* ptr=NULL,FXbool notify=false);
 
   /// Fill combo box by appending items from array of strings
-  FXint fillItems(const FXchar** strings);
+  FXint fillItems(const FXchar** strings,FXbool notify=false);
 
   /// Fill combo box by appending items from newline separated strings
-  FXint fillItems(const FXString& strings);
+  FXint fillItems(const FXString& strings,FXbool notify=false);
 
   /// Insert a new item at index
-  FXint insertItem(FXint index,const FXString& text,void* ptr=NULL);
+  FXint insertItem(FXint index,const FXString& text,void* ptr=NULL,FXbool notify=false);
 
   /// Append an item to the list
-  FXint appendItem(const FXString& text,void* ptr=NULL);
+  FXint appendItem(const FXString& text,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend an item to the list
-  FXint prependItem(const FXString& text,void* ptr=NULL);
+  FXint prependItem(const FXString& text,void* ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
-  FXint moveItem(FXint newindex,FXint oldindex);
+  FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
 
   /// Remove this item from the list
-  void removeItem(FXint index);
+  void removeItem(FXint index,FXbool notify=false);
 
   /// Remove all items from the list
-  void clearItems();
+  void clearItems(FXbool notify=false);
 
   /**
   * Search items by name, beginning from item start.  If the start item
@@ -229,7 +229,7 @@ public:
   void* getItemData(FXint index) const;
 
   /// Is the pane shown
-  bool isPaneShown() const;
+  FXbool isPaneShown() const;
 
   /// Sort items using current sort function
   void sortItems();

@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXThread.h,v 1.42 2006/04/06 05:42:58 fox Exp $                          *
+* $Id: FXThread.h,v 1.65 2007/02/23 20:02:01 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
@@ -27,12 +27,16 @@
 namespace FX {
 
 
-// Thread ID type
+/// Thread ID type
 #ifndef WIN32
 typedef unsigned long FXThreadID;
 #else
 typedef void*         FXThreadID;
 #endif
+
+
+/// Thread-local storage key
+typedef FXuint FXThreadStorageKey;
 
 
 class FXCondition;
@@ -52,16 +56,16 @@ private:
 public:
 
   /// Initialize the mutex
-  FXMutex(bool recursive=false);
+  FXMutex(FXbool recursive=false);
 
   /// Lock the mutex
   void lock();
 
-  /// Return TRUE if succeeded locking the mutex
-  bool trylock();
+  /// Return true if succeeded locking the mutex
+  FXbool trylock();
 
-  /// Return TRUE if mutex is already locked
-  bool locked();
+  /// Return true if mutex is already locked
+  FXbool locked();
 
   /// Unlock mutex
   void unlock();
@@ -69,6 +73,7 @@ public:
   /// Delete the mutex
   ~FXMutex();
   };
+
 
 
 /**
@@ -96,11 +101,11 @@ public:
   /// Lock mutex
   void lock(){ mtx.lock(); }
 
-  /// Return TRUE if succeeded locking the mutex
-  bool trylock(){ return mtx.trylock(); }
+  /// Return true if succeeded locking the mutex
+  FXbool trylock(){ return mtx.trylock(); }
 
-  /// Return TRUE if mutex is already locked
-  bool locked(){ return mtx.locked(); }
+  /// Return true if mutex is already locked
+  FXbool locked(){ return mtx.locked(); }
 
   /// Unlock mutex
   void unlock(){ mtx.unlock(); }
@@ -108,6 +113,46 @@ public:
   /// Destroy and unlock associated mutex
   ~FXMutexLock(){ unlock(); }
   };
+
+
+
+/**
+* A read / write lock allows multiple readers but only a single
+* writer.
+*/
+class FXAPI FXReadWriteLock {
+private:
+  FXuval data[24];
+private:
+  FXReadWriteLock(const FXReadWriteLock&);
+  FXReadWriteLock &operator=(const FXReadWriteLock&);
+public:
+
+  /// Initialize the read/write lock
+  FXReadWriteLock();
+
+  /// Acquire read lock for read/write lock
+  void readLock();
+
+  /// Try to acquire read lock for read/write lock
+  bool tryReadLock();
+
+  /// Unlock read lock
+  void readUnlock();
+
+  /// Acquire write lock for read/write lock
+  void writeLock();
+
+  /// Try to acquire write lock for read/write lock
+  bool tryWriteLock();
+
+  /// Unlock write lock
+  void writeUnlock();
+
+  /// Delete the read/write lock
+  ~FXReadWriteLock();
+  };
+
 
 
 /**
@@ -131,17 +176,22 @@ public:
   /**
   * Wait until condition becomes signalled, using given mutex,
   * which must already have been locked prior to this call.
+  * Return true if the wait ended due to the condition being
+  * signalled through signal() or broadcast(), and false if the
+  * wait was interrupted or some error occurred.
   */
-  void wait(FXMutex& mtx);
+  FXbool wait(FXMutex& mtx);
 
   /**
   * Wait until condition becomes signalled, using given mutex,
   * which must already have been locked prior to this call.
-  * Returns TRUE if successful, FALSE if timeout occurred.
-  * Note that the wait-time is specified in nanoseconds
-  * since the Epoch (Jan 1, 1970).
+  * Return true if the wait ended due to the condition being
+  * signalled through signal() or broadcast(), and false if the
+  * wait timed out, was interrupted, or some other error occurred.
+  * Note that the wait-time is specified in nanoseconds since
+  * the Epoch (Jan 1, 1970).
   */
-  bool wait(FXMutex& mtx,FXTime nsec);
+  FXbool wait(FXMutex& mtx,FXTime nsec);
 
   /**
   * Wake or unblock a single blocked thread
@@ -158,11 +208,12 @@ public:
   };
 
 
+
 /**
 * A semaphore allows for protection of a resource that can
 * be accessed by a fixed number of simultaneous threads.
 */
-class FXSemaphore {
+class FXAPI FXSemaphore {
 private:
   FXuval data[16];
 private:
@@ -177,7 +228,7 @@ public:
   void wait();
 
   /// Non-blocking semaphore decrement; return true if locked
-  bool trywait();
+  FXbool trywait();
 
   /// Increment semaphore
   void post();
@@ -187,6 +238,56 @@ public:
   };
 
 
+
+/**
+* FXRunnable represents a generic runnable thing.  It serves primarily
+* as a base class for FXThread and tasks in FXThreadPool.
+*/
+class FXAPI FXRunnable {
+private:
+  FXRunnable(const FXRunnable&);
+  FXRunnable &operator=(const FXRunnable&);
+public:
+
+  /// Construct a runnable
+  FXRunnable(){}
+
+  /// Subclasses of FXRunnable overload this function to perform actual work
+  virtual FXint run() = 0;
+
+  /// Destroy a runnable
+  virtual ~FXRunnable(){}
+  };
+
+
+/**
+* Automatically generated thread-local storage key.
+* This class manages a thread-local storage key, generating
+* a new one when constructed, and deleting the storage key when
+* destroyed.
+* These keys can be used just like FXThreadStorageKey itself by
+* virtue of the conversion operator.  Note that no assignment
+* or copy-constructors have been defined; thus each instance of
+* this class represents a unique thread-local storage key.
+*/
+class FXAPI FXAutoThreadStorageKey {
+  FXThreadStorageKey value;
+private:
+  FXAutoThreadStorageKey(const FXAutoThreadStorageKey&);
+  FXAutoThreadStorageKey &operator=(const FXAutoThreadStorageKey&);
+public:
+
+  /// Acquire a unique thread-local storage key
+  FXAutoThreadStorageKey();
+  
+  /// Return the thread-local storage key
+  operator FXThreadStorageKey() const { return value; }
+  
+  /// Release thread-local storage key
+ ~FXAutoThreadStorageKey();
+  };
+  
+
 /**
 * FXThread provides system-independent support for threads.
 * Subclasses must implement the run() function do implement
@@ -194,24 +295,42 @@ public:
 * The storage of the FXThread object is to be managed by the
 * calling thread, not by the thread itself.
 */
-class FXAPI FXThread {
+class FXAPI FXThread : public FXRunnable {
 private:
-  FXThreadID tid;
+  volatile FXThreadID tid;
+  volatile FXbool     busy;
+private:
+  static FXAutoThreadStorageKey selfKey;
 private:
   FXThread(const FXThread&);
   FXThread &operator=(const FXThread&);
 #ifdef WIN32
-  static unsigned int CALLBACK execute(void*);
+  static unsigned int CALLBACK function(void*);
 #else
-  static void* execute(void*);
+  static void* function(void*);
 #endif
 protected:
+  static void self(FXThread* t);
+public:
 
-  /**
-  * All threads execute by deriving the run method of FXThread.
-  * If an uncaught exception was thrown, this function returns -1.
-  */
-  virtual FXint run() = 0;
+  /// Thread priority levels
+  enum Priority {
+    PRIORITY_ERROR=-1,  /// Failed to get priority
+    PRIORITY_DEFAULT,  	/// Default scheduling priority
+    PRIORITY_MINIMUM,   /// Minimum scheduling priority
+    PRIORITY_LOWER,     /// Lower scheduling priority
+    PRIORITY_MEDIUM,    /// Medium priority
+    PRIORITY_HIGHER,    /// Higher scheduling priority
+    PRIORITY_MAXIMUM    /// Maximum scheduling priority
+    };
+
+  /// Thread scheduling policies
+  enum Policy {
+    POLICY_ERROR=-1,    /// Failed to get policy
+    POLICY_DEFAULT,     /// Default scheduling
+    POLICY_FIFO,        /// First in, first out scheduling
+    POLICY_ROUND_ROBIN 	/// Round-robin scheduling
+    };
 
 public:
 
@@ -226,42 +345,48 @@ public:
   FXThreadID id() const;
 
   /**
-  * Return TRUE if this thread is running.
+  * Return true if this thread is running.
   */
-  bool running() const;
+  FXbool running() const;
 
   /**
   * Start thread; the thread is started as attached.
   * The thread is given stacksize for its stack; a value of
   * zero for stacksize will give it the default stack size.
+  * This invokes the run() function in the context of the new
+  * thread.
   */
-  bool start(unsigned long stacksize=0);
+  FXbool start(unsigned long stacksize=0);
 
   /**
-  * Suspend calling thread until thread is done.
+  * Suspend calling thread until thread is done.  The FXThreadID is
+  * reset back to zero.
   */
-  bool join();
+  FXbool join();
 
   /**
   * Suspend calling thread until thread is done, and set code to the
-  * return value of run() or the argument passed into exit().
+  * return value of run() or the argument passed into exit().  The
+  * FXThreadID is reset back to zero.
   * If an exception happened in the thread, return -1.
   */
-  bool join(FXint& code);
+  FXbool join(FXint& code);
 
   /**
   * Cancel the thread, stopping it immediately, running or not.
   * If the calling thread is this thread, nothing happens.
   * It is probably better to wait until it is finished, in case the
   * thread currently holds mutexes.
+  * The FXThreadID is reset back to zero after the thread has been
+  * stopped.
   */
-  bool cancel();
+  FXbool cancel();
 
   /**
   * Detach thread, so that a no join() is necessary to harvest the
   * resources of this thread.
   */
-  bool detach();
+  FXbool detach();
 
   /**
   * Exit the calling thread.
@@ -303,14 +428,59 @@ public:
   static FXThreadID current();
 
   /**
-  * Set thread priority.
+  * Return number of available processors in the system.
   */
-  void priority(FXint prio);
+  static FXint processors();
 
   /**
-  * Return thread priority.
+  * Generate new thread local storage key.
   */
-  FXint priority();
+  static FXThreadStorageKey createStorageKey();
+
+  /**
+  * Dispose of thread local storage key.
+  */
+  static void deleteStorageKey(FXThreadStorageKey key);
+
+  /**
+  * Get thread local storage pointer using key.
+  */
+  static void* getStorage(FXThreadStorageKey key);
+
+  /**
+  * Set thread local storage pointer using key.
+  */
+  static void setStorage(FXThreadStorageKey key,void* ptr);
+
+  /**
+  * Set thread scheduling priority.
+  */
+  FXbool priority(Priority prio);
+
+  /**
+  * Return thread scheduling priority.
+  */
+  Priority priority() const;
+
+  /**
+  * Set thread scheduling policy.
+  */
+  FXbool policy(Policy plcy);
+
+  /**
+  * Get thread scheduling policy.
+  */
+  Policy policy() const;
+
+  /**
+  * Suspend thread.
+  */
+  FXbool suspend();
+
+  /**
+  * Resume thread.
+  */
+  FXbool resume();
 
   /**
   * Destroy the thread immediately, running or not.

@@ -3,7 +3,7 @@
 *                    F o n t   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFontDialog.cpp,v 1.23 2006/01/22 17:58:27 fox Exp $                    *
+* $Id: FXFontDialog.cpp,v 1.25 2007/02/07 20:22:08 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -65,8 +65,8 @@ FXIMPLEMENT(FXFontDialog,FXDialogBox,NULL,0)
 
 
 // Separator item
-FXFontDialog::FXFontDialog(FXWindow* owner,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,x,y,w,h,0,0,0,0,4,4){
+FXFontDialog::FXFontDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,x,y,w,h,0,0,0,0,4,4){
   fontbox=new FXFontSelector(this,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   fontbox->acceptButton()->setTarget(this);
   fontbox->acceptButton()->setSelector(FXDialogBox::ID_ACCEPT);

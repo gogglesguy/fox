@@ -3,7 +3,7 @@
 *                 S h u t t e r   C o n t a i n e r   W i d g e t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Charles W. Warren.   All Rights Reserved.          *
+* Copyright (C) 1998,2007 by Charles W. Warren.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXShutter.cpp,v 1.44 2006/04/02 19:58:50 fox Exp $                       *
+* $Id: FXShutter.cpp,v 1.47 2007/02/07 20:22:15 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -197,7 +197,7 @@ long FXShutter::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
 
 // Open item
 long FXShutter::onCmdOpen(FXObject*,FXSelector sel,void*){
-  setCurrent(FXSELID(sel)-ID_OPEN_FIRST);
+  setCurrent(FXSELID(sel)-ID_OPEN_FIRST,true);
   return 1;
   }
 
@@ -212,11 +212,11 @@ long FXShutter::onUpdOpen(FXObject* sender,FXSelector sel,void* ptr){
 // The sender of the message is the item to open up
 long FXShutter::onOpenItem(FXObject* sender,FXSelector,void*){
   FXint which=indexOfChild((FXWindow*)sender);
-  FXuint speed=getApp()->getAnimSpeed();
+  FXTime speed=getApp()->getAnimSpeed();
   FXShutterItem *closingItem;
   if(current==which) which--;     // Clicking on title button of currently active item should close it; "Markus Fleck" <fleck@gnu.org>
   if(0<=which){
-    if(speed){
+    if(0<speed){
       closing=current;
       heightIncrement=1;
       closingItem=(FXShutterItem*)childAtIndex(closing);
@@ -224,10 +224,8 @@ long FXShutter::onOpenItem(FXObject* sender,FXSelector,void*){
       closingHadScrollbar=closingItem->scrollWindow->verticalScrollBar()->shown();
       getApp()->addTimeout(this,ID_SHUTTER_TIMEOUT,speed);
       }
-    current=which;
-    recalc();
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)current);
     }
+  setCurrent(which);
   return 1;
   }
 
@@ -297,10 +295,11 @@ void FXShutter::layout(){
 
 
 // Set current subwindow
-void FXShutter::setCurrent(FXint panel){
+void FXShutter::setCurrent(FXint panel,FXbool notify){
   if(0<=panel && current!=panel){
     current=panel;
     recalc();
+    if(notify && target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)current); }
     }
   }
 

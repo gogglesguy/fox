@@ -3,7 +3,7 @@
 *                               T a b   O b j e c t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTabBar.cpp,v 1.29 2006/03/31 07:33:11 fox Exp $                        *
+* $Id: FXTabBar.cpp,v 1.32 2007/02/07 20:22:17 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -368,7 +368,7 @@ void FXTabBar::layout(){
 
 
 // Set current subwindow
-void FXTabBar::setCurrent(FXint panel,bool notify){
+void FXTabBar::setCurrent(FXint panel,FXbool notify){
   if(0<=panel && panel!=current){
     current=panel;
     recalc();
@@ -394,7 +394,7 @@ long FXTabBar::onFocusNext(FXObject*,FXSelector,void* ptr){
   if(child) child=child->getNext(); else child=getFirst();
   while(child && !child->shown()) child=child->getNext();
   if(child){
-    setCurrent(indexOfChild(child),TRUE);
+    setCurrent(indexOfChild(child),true);
     child->handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
     return 1;
     }
@@ -408,7 +408,7 @@ long FXTabBar::onFocusPrev(FXObject*,FXSelector,void* ptr){
   if(child) child=child->getPrev(); else child=getLast();
   while(child && !child->shown()) child=child->getPrev();
   if(child){
-    setCurrent(indexOfChild(child),TRUE);
+    setCurrent(indexOfChild(child),true);
     child->handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
     return 1;
     }
@@ -475,7 +475,7 @@ long FXTabBar::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
 
 // Open item
 long FXTabBar::onCmdOpen(FXObject*,FXSelector sel,void*){
-  setCurrent(FXSELID(sel)-ID_OPEN_FIRST,TRUE);
+  setCurrent(FXSELID(sel)-ID_OPEN_FIRST,true);
   return 1;
   }
 
@@ -489,7 +489,7 @@ long FXTabBar::onUpdOpen(FXObject* sender,FXSelector sel,void*){
 
 // The sender of the message is the item to open up
 long FXTabBar::onCmdOpenItem(FXObject* sender,FXSelector,void*){
-  setCurrent(indexOfChild((FXWindow*)sender),TRUE);
+  setCurrent(indexOfChild((FXWindow*)sender),true);
   return 1;
   }
 

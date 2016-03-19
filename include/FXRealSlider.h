@@ -3,7 +3,7 @@
 *                       R e a l S l i d e r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRealSlider.h,v 1.12 2006/03/31 07:33:03 fox Exp $                      *
+* $Id: FXRealSlider.h,v 1.16 2007/02/07 20:21:57 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXREALSLIDER_H
 #define FXREALSLIDER_H
@@ -60,17 +60,18 @@ enum {
 class FXAPI FXRealSlider : public FXFrame {
   FXDECLARE(FXRealSlider)
 protected:
-  FXdouble      range[2];                 // Reported data range
-  FXdouble      pos;                      // Reported data position
-  FXdouble      incr;                     // Increment when auto-sliding
-  FXdouble      delta;                    // Interval between ticks
-  FXint         headpos;                  // Head position
-  FXint         headsize;                 // Head size
-  FXint         slotsize;                 // Slot size
-  FXColor       slotColor;                // Color of slot the head moves in
-  FXint         dragpoint;                // Where on the head is grabbed
-  FXString      help;                     // Help string
-  FXString      tip;                      // Tip string
+  FXdouble      range[2];       // Reported data range
+  FXdouble      pos;            // Reported data position
+  FXdouble      incr;           // Increment when auto-sliding
+  FXdouble      delta;          // Interval between ticks
+  FXdouble      gran;           // Granularity
+  FXint         headpos;        // Head position
+  FXint         headsize;       // Head size
+  FXint         slotsize;       // Slot size
+  FXColor       slotColor;      // Color of slot the head moves in
+  FXint         dragpoint;      // Where on the head is grabbed
+  FXString      help;           // Help string
+  FXString      tip;            // Tip string
 protected:
   FXRealSlider();
   void drawSliderHead(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
@@ -94,6 +95,8 @@ public:
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetRealValue(FXObject*,FXSelector,void*);
   long onCmdGetRealValue(FXObject*,FXSelector,void*);
   long onCmdSetIntRange(FXObject*,FXSelector,void*);
@@ -123,7 +126,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Returns true because a slider can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Perform layout
   virtual void layout();
@@ -135,13 +138,13 @@ public:
   virtual void disable();
 
   /// Change slider value
-  void setValue(FXdouble value,bool notify=false);
+  void setValue(FXdouble value,FXbool notify=false);
 
   /// Return slider value
   FXdouble getValue() const { return pos; }
 
   /// Change the slider's range
-  void setRange(FXdouble lo,FXdouble hi,bool notify=false);
+  void setRange(FXdouble lo,FXdouble hi,FXbool notify=false);
 
   /// Get the slider's current range
   void getRange(FXdouble& lo,FXdouble& hi) const { lo=range[0]; hi=range[1]; }
@@ -169,6 +172,12 @@ public:
 
   /// Change the slider's auto-increment/decrement value
   void setIncrement(FXdouble inc);
+
+  /// Change slider's granularity
+  void setGranularity(FXdouble gr);
+
+  /// Return slider's granularity
+  FXdouble getGranularity() const { return gran; }
 
   /// Change the delta between ticks
   void setTickDelta(FXdouble dist);

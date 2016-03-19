@@ -3,7 +3,7 @@
 *                        D o c k B a r   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockBar.h,v 1.28 2006/04/05 04:49:00 fox Exp $                         *
+* $Id: FXDockBar.h,v 1.38 2007/02/07 20:21:53 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXDOCKBAR_H
 #define FXDOCKBAR_H
@@ -49,12 +49,33 @@ protected:
   FXint        gripx;           // Grip offset x
   FXint        gripy;           // Grip offset y
   FXuchar      allowed;         // Where we're allowed to dock
+//  FXuchar      mode;            // Dragging mode
+//protected:
+//  static const FXDefaultCursor cursorType[16];
 protected:
   FXDockBar();
+//  FXuchar where(FXint x,FXint y) const;
+protected:
+  enum {
+    DRAG_NONE        = 0,
+    DRAG_TOP         = 1,
+    DRAG_BOTTOM      = 2,
+    DRAG_LEFT        = 4,
+    DRAG_RIGHT       = 8,
+    DRAG_TOPLEFT     = (DRAG_TOP|DRAG_LEFT),
+    DRAG_TOPRIGHT    = (DRAG_TOP|DRAG_RIGHT),
+    DRAG_BOTTOMLEFT  = (DRAG_BOTTOM|DRAG_LEFT),
+    DRAG_BOTTOMRIGHT = (DRAG_BOTTOM|DRAG_RIGHT)
+    };
 private:
   FXDockBar(const FXDockBar&);
   FXDockBar &operator=(const FXDockBar&);
 public:
+//  long onEnter(FXObject*,FXSelector,void*);
+//  long onLeave(FXObject*,FXSelector,void*);
+//  long onMotion(FXObject*,FXSelector,void*);
+//  long onLeftBtnPress(FXObject*,FXSelector,void*);
+//  long onLeftBtnRelease(FXObject*,FXSelector,void*);
   long onCmdUndock(FXObject*,FXSelector,void*);
   long onUpdUndock(FXObject*,FXSelector,void*);
   long onCmdDockTop(FXObject*,FXSelector,void*);
@@ -114,12 +135,12 @@ public:
   FXDockBar(FXComposite* p,FXuint opts,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=2,FXint pr=3,FXint pt=3,FXint pb=2,FXint hs=DEFAULT_SPACING,FXint vs=DEFAULT_SPACING);
 
   /// Return true if docked
-  bool isDocked() const;
+  FXbool isDocked() const;
 
   /**
   * Check if the dock bar would dock or undock if at locaton barx, bary.
   */
-  bool insideDock(FXDockSite* docksite,FXint barx,FXint bary);
+  FXbool insideDock(FXDockSite* docksite,FXint barx,FXint bary);
 
   /**
   * Set parent when docked.
@@ -150,20 +171,20 @@ public:
   * However, if after is -1, it will be docked as the innermost bar just before
   * the work-area, while if after is 0, if will be docked as the outermost bar.
   */
-  virtual void dock(FXDockSite* docksite,FXWindow* before=NULL,bool notify=false);
+  virtual void dock(FXDockSite* docksite,FXWindow* other=NULL,FXbool notify=false);
 
   /**
   * Dock the bar against the given side, near the given position relative
   * to the toolbar dock's origin.
   */
-  virtual void dock(FXDockSite* docksite,FXint localx,FXint localy,bool notify);
+  virtual void dock(FXDockSite* docksite,FXint localx,FXint localy,FXbool notify);
 
   /**
   * Undock or float the bar.
   * The initial position of the wet dock is a few pixels
   * below and to the right of the original docked position.
   */
-  virtual void undock(FXint rootx,FXint rooty,bool notify=false);
+  virtual void undock(FXint rootx,FXint rooty,FXbool notify=false);
 
   /**
   * Change set of sides (a combination of ALLOW_TOP, ALLOW_LEFT, etc.),

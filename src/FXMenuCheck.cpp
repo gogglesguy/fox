@@ -3,7 +3,7 @@
 *                          M e n u C h e c k   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuCheck.cpp,v 1.30 2006/01/22 17:58:36 fox Exp $                     *
+* $Id: FXMenuCheck.cpp,v 1.34 2007/02/07 20:22:12 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -119,7 +119,7 @@ FXint FXMenuCheck::getDefaultHeight(){
 
 
 // Check button
-void FXMenuCheck::setCheck(FXbool s){
+void FXMenuCheck::setCheck(FXuchar s){
   if(check!=s){
     check=s;
     update();
@@ -150,14 +150,14 @@ long FXMenuCheck::onUnknown(FXObject*,FXSelector,void*){
 
 // Update value from a message
 long FXMenuCheck::onCmdSetValue(FXObject*,FXSelector,void* ptr){
-  setCheck((FXbool)(FXuval)ptr);
+  setCheck((FXuchar)(FXuval)ptr);
   return 1;
   }
 
 
 // Update value from a message
 long FXMenuCheck::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
-  setCheck((FXbool)*((FXint*)ptr));
+  setCheck((FXuchar)*((FXint*)ptr));
   return 1;
   }
 

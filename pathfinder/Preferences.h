@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Preferences.h,v 1.13 2006/01/22 17:58:15 fox Exp $                       *
+* $Id: Preferences.h,v 1.15 2007/02/07 20:22:01 fox Exp $                       *
 ********************************************************************************/
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
@@ -94,7 +94,7 @@ public:
   Preferences(PathFinderMain *owner);
 
   // Get/set filename patterns
-  void setPatterns(const FXString& pat){ pattern->setText(pat); }
+  void setPatterns(const FXString& ptrn){ pattern->setText(ptrn); }
   FXString getPatterns() const { return pattern->getText(); }
 
   // Get/set text editor
@@ -106,7 +106,7 @@ public:
   FXString getTerminal() const { return terminal->getText(); }
 
   // Set image preview
-  void setPreview(FXbool prev){ preview->setCheck(prev); }
+  void setPreview(FXbool flag){ preview->setCheck(flag); }
   FXbool getPreview() const { return preview->getCheck(); }
 
   // Set image preview

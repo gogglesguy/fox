@@ -3,7 +3,7 @@
 *                     A r r o w   B u t t o n   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXArrowButton.h,v 1.40 2006/04/02 22:37:17 fox Exp $                     *
+* $Id: FXArrowButton.h,v 1.44 2007/02/07 20:21:52 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXARROWBUTTON_H
 #define FXARROWBUTTON_H
@@ -62,8 +62,8 @@ protected:
   FXint     arrowSize;      // Arrow size
   FXString  tip;            // Tooltip value
   FXString  help;           // Help value
-  bool      state;          // State of button
-  bool      fired;          // Timer has fired
+  FXbool    state;          // State of button
+  FXbool    fired;          // Timer has fired
 protected:
   FXArrowButton();
 private:
@@ -113,13 +113,13 @@ public:
   virtual void disable();
 
   /// Returns true because a button can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
-  /// Set the button state (where TRUE means the button is down)
-  void setState(bool s);
+  /// Set the button state (where true means the button is down)
+  void setState(FXbool s);
 
-  /// Get the button state (where TRUE means the button is down)
-  bool getState() const { return state; }
+  /// Get the button state (where true means the button is down)
+  FXbool getState() const { return state; }
 
   /// Set status line help text for this arrow button
   void setHelpText(const FXString& text){ help=text; }

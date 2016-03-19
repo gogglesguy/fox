@@ -3,7 +3,7 @@
 *                         I n p u t   D i a l o g   B o x                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXInputDialog.h,v 1.19 2006/03/29 07:23:00 fox Exp $                     *
+* $Id: FXInputDialog.h,v 1.23 2007/02/07 20:21:55 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXINPUTDIALOG_H
 #define FXINPUTDIALOG_H
@@ -34,9 +34,9 @@ namespace FX {
 /// Input dialog options
 enum {
   INPUTDIALOG_STRING   = 0,             /// Ask for a string
-  INPUTDIALOG_INTEGER  = 0x01000000,    /// Ask for an integer number
-  INPUTDIALOG_REAL     = 0x02000000,    /// Ask for a real number
-  INPUTDIALOG_PASSWORD = 0x04000000     /// Do not reveal key-in
+  INPUTDIALOG_INTEGER  = 0x02000000,    /// Ask for an integer number
+  INPUTDIALOG_REAL     = 0x04000000,    /// Ask for a real number
+  INPUTDIALOG_PASSWORD = 0x08000000     /// Do not reveal key-in
   };
 
 
@@ -93,38 +93,38 @@ public:
 
   /**
   * Prompt for a string, start with the initial value.
-  * Return TRUE if the new value is accepted, and false otherwise.
+  * Return true if the new value is accepted, and false otherwise.
   */
-  static bool getString(FXString& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon=NULL);
+  static FXbool getString(FXString& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon=NULL);
 
   /**
   * Prompt for a string, in free floating window.
   */
-  static bool getString(FXString& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon=NULL);
+  static FXbool getString(FXString& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon=NULL);
 
   /**
   * Prompt for an integer number, start with the given initial value.
-  * Return TRUE if the new value is accepted, and false otherwise.
+  * Return true if the new value is accepted, and false otherwise.
   * The input is constrained between lo and hi.
   */
-  static bool getInteger(FXint& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXint lo=-2147483647,FXint hi=2147483647);
+  static FXbool getInteger(FXint& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXint lo=-2147483647,FXint hi=2147483647);
 
   /**
   * Prompt for a integer number, in free floating window.
   */
-  static bool getInteger(FXint& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXint lo=-2147483647,FXint hi=2147483647);
+  static FXbool getInteger(FXint& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXint lo=-2147483647,FXint hi=2147483647);
 
   /**
   * Prompt for an real number, start with the given initial value.
-  * Return TRUE if the new value is accepted, and false otherwise.
+  * Return true if the new value is accepted, and false otherwise.
   * The input is constrained between lo and hi.
   */
-  static bool getReal(FXdouble& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXdouble lo=-1.797693134862315e+308,FXdouble hi=1.797693134862315e+308);
+  static FXbool getReal(FXdouble& result,FXWindow* owner,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXdouble lo=-1.797693134862315e+308,FXdouble hi=1.797693134862315e+308);
 
   /**
   * Prompt for a real number, in free floating window.
   */
-  static bool getReal(FXdouble& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXdouble lo=-1.797693134862315e+308,FXdouble hi=1.797693134862315e+308);
+  static FXbool getReal(FXdouble& result,FXApp* app,const FXString& caption,const FXString& label,FXIcon* icon=NULL,FXdouble lo=-1.797693134862315e+308,FXdouble hi=1.797693134862315e+308);
   };
 
 }

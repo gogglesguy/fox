@@ -3,7 +3,7 @@
 *                      O p e n G L   S h a p e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * Contributed by: Angel-Ventura Mendo Gomez <ventura@labri.u-bordeaux.fr>       *
 *********************************************************************************
@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLShape.cpp,v 1.45 2006/04/04 04:28:06 fox Exp $                       *
+* $Id: FXGLShape.cpp,v 1.47 2007/02/07 20:22:09 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -167,11 +167,11 @@ FXGLObject* FXGLShape::copy(){
 
 
 // Return true if it can be dragged
-bool FXGLShape::canDrag() const { return true; }
+FXbool FXGLShape::canDrag() const { return true; }
 
 
 // Object may be deleted
-bool FXGLShape::canDelete() const { return true; }
+FXbool FXGLShape::canDelete() const { return true; }
 
 
 // Handle drag-and-drop drop
@@ -251,7 +251,7 @@ long FXGLShape::onUpdShadeSmooth(FXObject* sender,FXSelector,void*){
 
 
 // Drag shape around
-bool FXGLShape::drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty){
+FXbool FXGLShape::drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty){
   FXfloat zz=viewer->worldToEyeZ(position);
   FXVec3f wf=viewer->eyeToWorld(viewer->screenToEye(fx,fy,zz));
   FXVec3f wt=viewer->eyeToWorld(viewer->screenToEye(tx,ty,zz));

@@ -3,7 +3,7 @@
 *                              D a t a   T a r g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDataTarget.h,v 1.25 2006/01/22 17:58:00 fox Exp $                      *
+* $Id: FXDataTarget.h,v 1.28 2007/02/07 20:21:53 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXDATATARGET_H
 #define FXDATATARGET_H
@@ -60,6 +60,7 @@ public:
 public:
   enum {
     DT_VOID=0,
+    DT_BOOL,
     DT_CHAR,
     DT_UCHAR,
     DT_SHORT,
@@ -86,6 +87,9 @@ public:
 
   /// Associate with nothing
   FXDataTarget(FXObject* tgt,FXSelector sel):target(tgt),data(NULL),message(sel),type(DT_VOID){}
+
+  /// Associate with character variable
+  FXDataTarget(FXbool& value,FXObject* tgt=NULL,FXSelector sel=0):target(tgt),data(&value),message(sel),type(DT_BOOL){}
 
   /// Associate with character variable
   FXDataTarget(FXchar& value,FXObject* tgt=NULL,FXSelector sel=0):target(tgt),data(&value),message(sel),type(DT_CHAR){}
@@ -145,6 +149,9 @@ public:
   /// Associate with nothing
   void connect(){ data=NULL; type=DT_VOID; }
 
+  /// Associate with FXbool variable
+  void connect(FXbool& value){ data=&value; type=DT_BOOL; }
+
   /// Associate with character variable
   void connect(FXchar& value){ data=&value; type=DT_CHAR; }
 
@@ -181,6 +188,9 @@ public:
 
   /// Associate with nothing; also set target and message
   void connect(FXObject* tgt,FXSelector sel){ target=tgt; data=NULL; message=sel; type=DT_VOID; }
+
+  /// Associate with character variable; also set target and message
+  void connect(FXbool& value,FXObject* tgt,FXSelector sel){ target=tgt; data=&value; message=sel; type=DT_BOOL; }
 
   /// Associate with character variable; also set target and message
   void connect(FXchar& value,FXObject* tgt,FXSelector sel){ target=tgt; data=&value; message=sel; type=DT_CHAR; }

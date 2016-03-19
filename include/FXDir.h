@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDir.h,v 1.24 2006/01/22 17:58:00 fox Exp $                             *
+* $Id: FXDir.h,v 1.26 2007/02/07 20:21:53 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXDIR_H
 #define FXDIR_H
@@ -58,13 +58,13 @@ public:
   FXDir(const FXString& path);
 
   /// Open directory to path, return true if ok.
-  virtual bool open(const FXString& path);
+  virtual FXbool open(const FXString& path);
 
   /// Returns true if the directory is open
-  virtual bool isOpen() const;
+  virtual FXbool isOpen() const;
 
   /// Go to next one
-  virtual bool next();
+  virtual FXbool next();
 
   /// Return current file name
   virtual FXString name() const;
@@ -73,13 +73,13 @@ public:
   virtual void close();
 
   /// Create directory
-  static bool create(const FXString& path,FXuint mode=FXIO::OwnerFull|FXIO::GroupFull|FXIO::OtherFull);
+  static FXbool create(const FXString& path,FXuint mode=FXIO::OwnerFull|FXIO::GroupFull|FXIO::OtherFull);
 
   /// Remove directory
-  static bool remove(const FXString& path);
+  static FXbool remove(const FXString& path);
 
   /// Rename or move srcpath to dstpath
-  static bool rename(const FXString& srcpath,const FXString& dstpath);
+  static FXbool rename(const FXString& srcpath,const FXString& dstpath);
 
   /**
   * List files in a given directory.

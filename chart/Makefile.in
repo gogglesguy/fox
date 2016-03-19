@@ -104,12 +104,9 @@ lib_LTLIBRARIES = libCHART-1.7.la
 
 libCHART_1_7_la_LIBADD = $(X_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS)
 
-libCHART_1_7_la_LDFLAGS = \
-        -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)    \
-	-export-dynamic
+libCHART_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
 
-
-chartincludedir = $(includedir)/fox-1.6/chart
+chartincludedir = $(includedir)/fox-1.7/chart
 
 chartinclude_HEADERS = \
 FXChart.h
@@ -339,17 +336,17 @@ chart.o: chart.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -420,12 +417,12 @@ chart.o: chart.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	FXChart.h icons.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h FXChart.h icons.h
 FXChart.lo FXChart.o : FXChart.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -433,17 +430,17 @@ FXChart.lo FXChart.o : FXChart.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -514,14 +511,14 @@ FXChart.lo FXChart.o : FXChart.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	../include/FXPNGImage.h ../include/FXJPGImage.h \
-	../include/FXTIFImage.h FXChart.h
-icons.o: icons.cpp
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/FXPNGImage.h \
+	../include/FXJPGImage.h ../include/FXTIFImage.h FXChart.h
+icons.o: icons.cpp icons.h
 
 info-am:
 info: info-am
@@ -608,10 +605,10 @@ mostlyclean distclean maintainer-clean
 chart.cpp: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

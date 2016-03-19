@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.134 2006/04/05 03:22:52 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.150 2007/03/08 05:49:33 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -55,7 +55,7 @@ extern "C" FXAPI void fxfindfox(void){ }
 namespace FX {
 
 // Global flag which controls tracing level
-unsigned int fxTraceLevel=0;
+FXuint fxTraceLevel=0;
 
 
 // Version number that the library has been compiled with
@@ -71,8 +71,8 @@ FXuint fxrandom(FXuint& seed){
 
 #ifdef WIN32
 
-// Return TRUE if console application
-bool fxisconsole(const FXchar *path){
+// Return true if console application
+FXbool fxisconsole(const FXchar *path){
   IMAGE_OPTIONAL_HEADER optional_header;
   IMAGE_FILE_HEADER     file_header;
   IMAGE_DOS_HEADER      dos_header;
@@ -82,7 +82,7 @@ bool fxisconsole(const FXchar *path){
   ULONG                 ulNTSignature;
   HANDLE                hImage;
   DWORD                 dwBytes;
-  bool                  flag=false;     // Assume false on Windows is safest!
+  FXbool                flag=false;     // Assume false on Windows is safest!
 
   // Open the application file.
   hImage=CreateFileA(path,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -154,8 +154,8 @@ x:  CloseHandle(hImage);
 
 #else
 
-// Return TRUE if console application
-bool fxisconsole(const FXchar*){
+// Return true if console application
+FXbool fxisconsole(const FXchar*){
   return true;
   }
 
@@ -166,14 +166,17 @@ bool fxisconsole(const FXchar*){
 void fxassert(const char* expression,const char* filename,unsigned int lineno){
 #ifndef WIN32
   fprintf(stderr,"%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
+  fflush(stderr);
 #else
 #ifdef _WINDOWS
   char msg[MAXMESSAGESIZE];
   sprintf(msg,"%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
   OutputDebugStringA(msg);
   fprintf(stderr,"%s",msg); // if a console is available
+  fflush(stderr);
 #else
   fprintf(stderr,"%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
+  fflush(stderr);
 #endif
 #endif
   }
@@ -185,6 +188,7 @@ void fxmessage(const char* format,...){
   va_list arguments;
   va_start(arguments,format);
   vfprintf(stderr,format,arguments);
+  fflush(stderr);
   va_end(arguments);
 #else
 #ifdef _WINDOWS
@@ -195,10 +199,12 @@ void fxmessage(const char* format,...){
   va_end(arguments);
   OutputDebugStringA(msg);
   fprintf(stderr,"%s",msg); // if a console is available
+  fflush(stderr);
 #else
   va_list arguments;
   va_start(arguments,format);
   vfprintf(stderr,format,arguments);
+  fflush(stderr);
   va_end(arguments);
 #endif
 #endif
@@ -211,6 +217,7 @@ void fxerror(const char* format,...){
   va_list arguments;
   va_start(arguments,format);
   vfprintf(stderr,format,arguments);
+  fflush(stderr);
   va_end(arguments);
   abort();
 #else
@@ -222,12 +229,14 @@ void fxerror(const char* format,...){
   va_end(arguments);
   OutputDebugStringA(msg);
   fprintf(stderr,"%s",msg); // if a console is available
+  fflush(stderr);
   MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONEXCLAMATION|MB_APPLMODAL);
   DebugBreak();
 #else
   va_list arguments;
   va_start(arguments,format);
   vfprintf(stderr,format,arguments);
+  fflush(stderr);
   va_end(arguments);
   abort();
 #endif
@@ -241,6 +250,7 @@ void fxwarning(const char* format,...){
   va_list arguments;
   va_start(arguments,format);
   vfprintf(stderr,format,arguments);
+  fflush(stderr);
   va_end(arguments);
 #else
 #ifdef _WINDOWS
@@ -251,11 +261,13 @@ void fxwarning(const char* format,...){
   va_end(arguments);
   OutputDebugStringA(msg);
   fprintf(stderr,"%s",msg); // if a console is available
+  fflush(stderr);
   MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONINFORMATION|MB_APPLMODAL);
 #else
   va_list arguments;
   va_start(arguments,format);
   vfprintf(stderr,format,arguments);
+  fflush(stderr);
   va_end(arguments);
 #endif
 #endif
@@ -269,6 +281,7 @@ void fxtrace(unsigned int level,const char* format,...){
     va_list arguments;
     va_start(arguments,format);
     vfprintf(stderr,format,arguments);
+    fflush(stderr);
     va_end(arguments);
 #else
 #ifdef _WINDOWS
@@ -276,13 +289,15 @@ void fxtrace(unsigned int level,const char* format,...){
     va_list arguments;
     va_start(arguments,format);
     vsnprintf(msg,sizeof(msg),format,arguments);
-    va_end(arguments);
     OutputDebugStringA(msg);
     fprintf(stderr,"%s",msg); // if a console is available
+    fflush(stderr);
+    va_end(arguments);
 #else
     va_list arguments;
     va_start(arguments,format);
     vfprintf(stderr,format,arguments);
+    fflush(stderr);
     va_end(arguments);
 #endif
 #endif
@@ -355,7 +370,7 @@ FXColor makeShadowColor(FXColor clr){
 /*******************************************************************************/
 
 // Convert string of length len to MSDOS; return new string and new length
-bool fxtoDOS(FXchar*& string,FXint& len){
+FXbool fxtoDOS(FXchar*& string,FXint& len){
   register FXint f=0,t=0;
   while(f<len && string[f]!='\0'){
     if(string[f++]=='\n') t++; t++;
@@ -371,7 +386,7 @@ bool fxtoDOS(FXchar*& string,FXint& len){
 
 
 // Convert string of length len from MSDOS; return new string and new length
-bool fxfromDOS(FXchar*& string,FXint& len){
+FXbool fxfromDOS(FXchar*& string,FXint& len){
   register FXint f=0,t=0,c;
   while(f<len && string[f]!='\0'){
     if((c=string[f++])!='\r') string[t++]=c;
@@ -392,8 +407,37 @@ FXint fxgetpid(){
 #endif
   }
 
+extern FXAPI FILE *fxopen(const char *filename,const char *mode);
+
+FILE *fxopen(const char *filename,const char *mode){
+#ifdef WIN32 && UNICODE
+  FXnchar unifile[1024];
+  FXnchar unimode[1024];
+  utf2ncs(unifile,filename,strlen(filename)+1);
+  utf2ncs(unimode,mode,strlen(mode)+1);
+  return _wfopen(unifile,unimode);
+#else
+  return fopen(filename,mode);
+#endif
+  }
+
+extern FXAPI FILE *fxreopen(const char *filename,const char *mode,FILE * stream);
+
+FILE *fxreopen(const char *filename,const char *mode,FILE * stream){
+#ifdef WIN32 && UNICODE
+  FXnchar unifile[1024];
+  FXnchar unimode[1024];
+  utf2ncs(unifile,filename,strlen(filename)+1);
+  utf2ncs(unimode,mode,strlen(mode)+1);
+  return _wfreopen(unifile,unimode,stream);
+#else
+  return freopen(filename,mode,stream);
+#endif
+  }
+
 
 /*******************************************************************************/
+
 
 // Convert RGB to HSV
 void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloat g,FXfloat b){
@@ -477,7 +521,7 @@ FXint fxieeefloatclass(FXfloat number){
   union { FXfloat f; struct { FXuint s:1; FXuint e:8; FXuint m:23; } n; } num;
 #else
   union { FXfloat f; struct { FXuint m:23; FXuint e:8; FXuint s:1; } n; } num;
-#endif  
+#endif
   num.f=number;
   FXint result=0;
 //  fprintf(stderr,"num=%16.10g: sgn=%d man=%d (%06x) exp=%d\n",number,num.n.s,num.n.m,num.n.m,num.n.e);
@@ -505,7 +549,7 @@ FXint fxieeedoubleclass(FXdouble number){
   union { FXdouble d; struct { FXuint s:1; FXuint e:11; FXuint h:20; FXuint l:32; } n; } num;
 #else
   union { FXdouble d; struct { FXuint l:32; FXuint h:20; FXuint e:11; FXuint s:1; } n; } num;
-#endif  
+#endif
   num.d=number;
 //  fprintf(stderr,"num=%16.10g: sgn=%d hi=%d (%06x) lo=%d (%08x) exp=%d\n",number,num.n.s,num.n.h,num.n.h,num.n.l,num.n.l,num.n.e);
   FXint result=0;
@@ -628,16 +672,17 @@ FXuint fxcpuid(){
 #endif
 
 
+/*******************************************************************************/
 
 
 /*
 * Return clock ticks from x86 TSC register [GCC/ICC x86 version].
 */
-#if (defined(__GNUC__) || defined(__ICC)) && defined(__linux__) && defined(__i386__)
+#if (defined(__GNUC__) || defined(__ICC)) && defined(__i386__)
 extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
   FXlong value;
-  asm volatile ("rdtsc" : "=A" (value));
+  asm ("rdtsc" : "=A" (value));
   return value;
   }
 #endif
@@ -646,13 +691,14 @@ FXlong fxgetticks(){
 /*
 * Return clock ticks from performance counter [GCC AMD64 version].
 */
-#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
+#if defined(__GNUC__) && defined(__x86_64__)
 extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
-  register FXuint a,d;
-  asm volatile("rdtsc" : "=a" (a), "=d" (d));
-//asm volatile("rdtscp" : "=a" (a), "=d" (d): : "%ecx");        // Serializing version (%ecx has processor id)
-  return ((FXulong)a) | (((FXulong)d)<<32);
+  FXlong value;
+  asm ( "rdtsc\n\t"
+        "shlq $32,%%rdx\n\t"
+        "leaq (%%rax,%%rdx),%0\n\t" : "=r" (value) : /*NONE*/ : "%rdx" );
+  return value;
   }
 #endif
 
@@ -660,12 +706,26 @@ FXlong fxgetticks(){
 /*
 * Return clock ticks from performance counter [GCC IA64 version].
 */
-#if !defined(__INTEL_COMPILER) && defined(__GNUC__) && defined(__linux__) && defined(__ia64__)
+#if !defined(__INTEL_COMPILER) && defined(__GNUC__) && defined(__ia64__)
 extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
   FXlong value;
-  asm volatile ("mov %0=ar.itc" : "=r"(value));         // FIXME not tested!
+  asm ("mov %0=ar.itc" : "=r" (value));
   return value;
+  }
+#endif
+
+
+/*
+* Return clock ticks from performance counter [HPUX C++ IA64 version].
+*/
+#if defined(__hpux) && defined(__ia64)
+#include <machine/sys/inline.h>
+extern FXAPI FXlong fxgetticks();
+FXlong fxgetticks(){
+  FXlong ret;
+  ret = _Asm_mov_from_ar (_AREG_ITC);           // FIXME not tested!
+  return ret;
   }
 #endif
 
@@ -678,9 +738,9 @@ extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
   unsigned int tbl, tbu0, tbu1;
   do{
-    asm volatile("mftbu %0" : "=r"(tbu0));
-    asm volatile("mftb %0" : "=r"(tbl));
-    asm volatile("mftbu %0" : "=r"(tbu1));
+    asm ("mftbu %0" : "=r"(tbu0));
+    asm ("mftb %0" : "=r"(tbl));
+    asm ("mftbu %0" : "=r"(tbu1));
     }
   while(tbu0!=tbu1);
   return (((unsigned long long)tbu0) << 32) | tbl;
@@ -695,8 +755,65 @@ FXlong fxgetticks(){
 extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
   FXlong value;
-  asm volatile("mfctl 16, %0": "=r" (value));             // FIXME not tested!
+  asm ("mfctl 16, %0": "=r" (value));           // FIXME not tested!
   return value;
+  }
+#endif
+
+
+/*
+* Return clock ticks from performance counter [HP-C++ PA-RISC version].
+*/
+#if !defined(__GNUC__) && (defined(__hppa__) || defined(__hppa))
+#include <machine/inline.h>
+extern FXAPI FXlong fxgetticks();
+FXlong fxgetticks(){
+  register FXlong ret;
+  _MFCTL(16, ret);                              // FIXME not tested!
+  return ret;
+  }
+#endif
+
+
+/*
+* Return clock ticks from performance counter [GCC ALPHA version];
+* This version only 32-bits accurate ;-(
+*/
+#if defined(__GNUC__) && defined(__alpha__)
+extern FXAPI FXlong fxgetticks();
+FXlong fxgetticks(){
+  FXlong value;
+  asm ("rpcc %0" : "=r"(value));                // FIXME not tested!
+  return (value & 0xFFFFFFFF);
+  }
+#endif
+
+
+/*
+* Return clock ticks from performance counter [DEC C++ ALPHA version];
+* This version only 32-bits accurate ;-(
+*/
+#if (defined(__DECC) || defined(__DECCXX)) && defined(__alpha)
+#include <c_asm.h>
+extern FXAPI FXlong fxgetticks();
+FXlong fxgetticks(){
+  FXlong value;
+  value = asm("rpcc %v0");                      // FIXME not tested!
+  return (value & 0xFFFFFFFF);
+  }
+#endif
+
+
+/*
+* Return clock ticks from performance counter [SGI/IRIX version];
+*/
+#if (defined(__IRIX__) || defined(_SGI)) && defined(CLOCK_SGI_CYCLE)
+extern FXAPI FXlong fxgetticks();
+FXlong fxgetticks(){
+  const FXlong seconds=1000000000;
+  struct timespec tp;
+  clock_gettime(CLOCK_SGI_CYCLE,&tp);           // FIXME not tested!
+  return tp.tv_sec*seconds+tp.tv_nsec;
   }
 #endif
 
@@ -708,7 +825,7 @@ FXlong fxgetticks(){
 extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
   FXlong value;
-  __asm__ __volatile__("rd %%tick, %0" : "=r" (value)); // FIXME not tested!
+  asm ("rd %%tick, %0" : "=r" (value));         // FIXME not tested!
   return value;
   }
 #endif
@@ -725,7 +842,6 @@ FXlong fxgetticks(){
   return value;
   }
 #endif
-
 
 }
 

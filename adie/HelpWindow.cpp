@@ -3,7 +3,7 @@
 *                            H e l p   W i n d o w                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: HelpWindow.cpp,v 1.12 2006/01/22 18:01:10 fox Exp $                      *
+* $Id: HelpWindow.cpp,v 1.13 2007/02/07 20:21:50 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include "icons.h"

@@ -3,7 +3,7 @@
 *                       D o c k H a n d l e r   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockHandler.cpp,v 1.8 2006/01/22 17:58:23 fox Exp $                    *
+* $Id: FXDockHandler.cpp,v 1.12 2007/02/07 20:22:05 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -117,7 +117,7 @@ FXDockHandler::FXDockHandler(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint 
 
 
 // Can have focus
-bool FXDockHandler::canFocus() const { return true; }
+FXbool FXDockHandler::canFocus() const { return true; }
 
 
 // Moved
@@ -155,10 +155,10 @@ long FXDockHandler::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     wattr.backing_store=NotUseful;
     wattr.backing_planes=0;
     wattr.backing_pixel=0;
-    wattr.save_under=FALSE;
+    wattr.save_under=false;
     wattr.event_mask=ButtonPressMask|ButtonReleaseMask|PointerMotionMask|KeyPressMask|KeyReleaseMask | FocusChangeMask|StructureNotifyMask | StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask;
     wattr.do_not_propagate_mask=KeyPressMask|KeyReleaseMask|ButtonPressMask|ButtonReleaseMask|PointerMotionMask|ButtonMotionMask;
-    wattr.override_redirect=TRUE;
+    wattr.override_redirect=true;
     wattr.colormap=DefaultColormap(display,DefaultScreen(display));
     wattr.cursor=None;
     xxx=XCreateWindow(display,RootWindow(display,DefaultScreen(display)),0,0,1,1,0,DefaultDepth(display,DefaultScreen(display)),InputOutput,DefaultVisual(display,DefaultScreen(display)),mask,&wattr);

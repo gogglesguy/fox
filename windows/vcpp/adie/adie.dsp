@@ -141,11 +141,27 @@ SOURCE=..\..\..\adie\Commands.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\config_gif.gif
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\copy2_gif.gif
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\copy_gif.gif
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\cut2_gif.gif
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\cut_gif.gif
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\delete2_gif.gif
 # End Source File
 # Begin Source File
 
@@ -199,8 +215,8 @@ InputPath=.\icons
 
 BuildCmds= \
 	cd ..\..\..\adie \
-	$(WkspDir)\reswrap\Release\reswrap -e -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif close_gif.gif colors_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
-	$(WkspDir)\reswrap\Release\reswrap -i -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif close_gif.gif colors_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
+	$(WkspDir)\reswrap\Release\reswrap -i icons.h  -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
+	$(WkspDir)\reswrap\Release\reswrap -h -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
 	
 
 "icons.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -218,8 +234,8 @@ InputPath=.\icons
 
 BuildCmds= \
 	cd ..\..\..\adie \
-	$(WkspDir)\reswrap\Debug\reswrap -e -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif close_gif.gif colors_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
-	$(WkspDir)\reswrap\Debug\reswrap -i -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif close_gif.gif colors_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
+	$(WkspDir)\reswrap\Debug\reswrap -i icons.h  -o icons.cpp adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
+	$(WkspDir)\reswrap\Debug\reswrap -h -o icons.h adie_gif.gif big_gif.gif bookdel_gif.gif booknext_gif.gif bookprev_gif.gif bookset_gif.gif browser.gif close_gif.gif colors_gif.gif config_gif.gif copy_gif.gif cut_gif.gif delete_gif.gif fonts_gif.gif help_gif.gif indent_gif.gif info_gif.gif lang_gif.gif new_gif.gif nobrowser.gif open_gif.gif palette_gif.gif paste_gif.gif pattern_gif.gif print_gif.gif quit_gif.gif redo_gif.gif reload_gif.gif save_gif.gif saveas_gif.gif saveall_gif.gif search_gif.gif searchnext_gif.gif searchprev_gif.gif shiftleft_gif.gif shiftright_gif.gif small_gif.gif styles_gif.gif syntax_gif.gif undo_gif.gif \
 	
 
 "icons.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -258,6 +274,10 @@ SOURCE=..\..\..\adie\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\new2_gif.gif
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\new_gif.gif
 # End Source File
 # Begin Source File
@@ -271,6 +291,14 @@ SOURCE=..\..\..\adie\palette_gif.gif
 # Begin Source File
 
 SOURCE=..\..\..\adie\parsesyntax.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\paste2_gif.gif
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\paste3_gif.gif
 # End Source File
 # Begin Source File
 
@@ -306,11 +334,23 @@ SOURCE=..\..\..\adie\reload_gif.gif
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\adie\run_gif.gif
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\save2_gif.gif
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\adie\save_gif.gif
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\adie\saveall_gif.gif
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\adie\saveas2_gif.gif
 # End Source File
 # Begin Source File
 

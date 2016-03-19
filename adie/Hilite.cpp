@@ -3,7 +3,7 @@
 *                     H i g h l i g h t   E n g i n e                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Hilite.cpp,v 1.44 2006/01/22 18:01:10 fox Exp $                          *
+* $Id: Hilite.cpp,v 1.45 2007/02/07 20:21:50 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <new>

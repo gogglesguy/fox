@@ -3,7 +3,7 @@
 *                                D i a l   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDial.cpp,v 1.51 2006/03/31 07:33:05 fox Exp $                          *
+* $Id: FXDial.cpp,v 1.56 2007/02/07 20:22:05 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -49,6 +49,7 @@
   - Keep notchangle>=0, as % of negative numbers is implementation defined.
   - Not yet happy with keyboard/wheel mode valuator.
   - Visual cue for focus:- please no ugly border!
+  - Maybe add some delta-mode whereby we report changes?
 */
 
 #define DIALWIDTH     12
@@ -76,8 +77,10 @@ FXDEFMAP(FXDial) FXDialMap[]={
   FXMAPFUNC(SEL_QUERY_HELP,0,FXDial::onQueryHelp),
   FXMAPFUNC(SEL_COMMAND,FXDial::ID_SETVALUE,FXDial::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXDial::ID_SETINTVALUE,FXDial::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FXDial::ID_SETREALVALUE,FXDial::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXDial::ID_GETINTVALUE,FXDial::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXDial::ID_SETLONGVALUE,FXDial::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXDial::ID_GETLONGVALUE,FXDial::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXDial::ID_SETREALVALUE,FXDial::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXDial::ID_GETREALVALUE,FXDial::onCmdGetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXDial::ID_SETINTRANGE,FXDial::onCmdSetIntRange),
   FXMAPFUNC(SEL_COMMAND,FXDial::ID_GETINTRANGE,FXDial::onCmdGetIntRange),
@@ -142,7 +145,7 @@ FXint FXDial::getDefaultHeight(){
 
 
 // Returns true because a dial can receive focus
-bool FXDial::canFocus() const { return true; }
+FXbool FXDial::canFocus() const { return true; }
 
 
 // Set help using a message
@@ -209,16 +212,30 @@ long FXDial::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Update value from a message
-long FXDial::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
-  setValue((FXint)*((FXdouble*)ptr));
+// Obtain value from text field
+long FXDial::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
+  *((FXint*)ptr)=getValue();
   return 1;
   }
 
 
-// Obtain value from text field
-long FXDial::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr) = getValue();
+// Update value from a message
+long FXDial::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXint)*((FXlong*)ptr));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FXDial::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=(FXlong)getValue();
+  return 1;
+  }
+
+
+// Update value from a message
+long FXDial::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXint)*((FXdouble*)ptr));
   return 1;
   }
 
@@ -404,12 +421,12 @@ long FXDial::onKeyPress(FXObject*,FXSelector,void* ptr){
         break;
       case KEY_plus:
       case KEY_KP_Add:
-inc:    //setValue(pos+((incr+359)/360),TRUE);
+inc:    //setValue(pos+((incr+359)/360),true);
         setValue(pos+1);
         return 1;
       case KEY_minus:
       case KEY_KP_Subtract:
-dec:    //setValue(pos-((incr+359)/360),TRUE);
+dec:    //setValue(pos-((incr+359)/360),true);
         setValue(pos-1);
         return 1;
       }
@@ -654,7 +671,7 @@ long FXDial::onPaint(FXObject*,FXSelector,void* ptr){
 
 
 // Set dial range
-void FXDial::setRange(FXint lo,FXint hi,bool notify){
+void FXDial::setRange(FXint lo,FXint hi,FXbool notify){
   if(lo>hi){ fxerror("%s::setRange: trying to set negative range.\n",getClassName()); }
   if(range[0]!=lo || range[1]!=hi){
     range[0]=lo;
@@ -665,7 +682,7 @@ void FXDial::setRange(FXint lo,FXint hi,bool notify){
 
 
 // Set dial value
-void FXDial::setValue(FXint p,bool notify){
+void FXDial::setValue(FXint p,FXbool notify){
   register FXint n;
   if(p<range[0]) p=range[0];
   if(p>range[1]) p=range[1];

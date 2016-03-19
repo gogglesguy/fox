@@ -3,7 +3,7 @@
 *          M u l t i p l e   D o c u m e n t   C l i e n t   W i n d o w        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMDIClient.cpp,v 1.63 2006/03/31 07:33:10 fox Exp $                     *
+* $Id: FXMDIClient.cpp,v 1.67 2007/02/07 20:22:12 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -205,7 +205,7 @@ void FXMDIClient::layout(){
 
 
 // Cascade windows
-void FXMDIClient::cascade(bool notify){
+void FXMDIClient::cascade(FXbool notify){
   register FXMDIChild* child;
   FXint childx,childy,childw,childh;
   childx=5;
@@ -233,7 +233,7 @@ void FXMDIClient::cascade(bool notify){
 
 
 // Layout horizontally
-void FXMDIClient::horizontal(bool notify){
+void FXMDIClient::horizontal(FXbool notify){
   register FXMDIChild* child;
   register FXint n,nr,nc,hroom,vroom,r,c;
   for(n=0,child=(FXMDIChild*)getFirst(); child; child=(FXMDIChild*)child->getNext()){
@@ -263,7 +263,7 @@ void FXMDIClient::horizontal(bool notify){
 
 
 // Layout vertically
-void FXMDIClient::vertical(bool notify){
+void FXMDIClient::vertical(FXbool notify){
   register FXMDIChild* child;
   register FXint n,nr,nc,hroom,vroom,r,c;
   for(n=0,child=(FXMDIChild*)getFirst(); child; child=(FXMDIChild*)child->getNext()){
@@ -294,7 +294,7 @@ void FXMDIClient::vertical(bool notify){
 
 // User clicks on one of the window menus
 long FXMDIClient::onCmdWindowSelect(FXObject*,FXSelector sel,void*){
-  setActiveChild((FXMDIChild*)childAtIndex(FXSELID(sel)-ID_MDI_1),TRUE);
+  setActiveChild((FXMDIChild*)childAtIndex(FXSELID(sel)-ID_MDI_1),true);
   return 1;
   }
 
@@ -424,8 +424,8 @@ long FXMDIClient::onUpdMenuClose(FXObject* sender,FXSelector sel,void* ptr){
 
 
 // Set the active child
-bool FXMDIClient::setActiveChild(FXMDIChild* child,bool notify){
-  bool wasmax=false;
+FXbool FXMDIClient::setActiveChild(FXMDIChild* child,FXbool notify){
+  FXbool wasmax=false;
   if(active!=child){
 
     if(active){
@@ -461,7 +461,7 @@ bool FXMDIClient::setActiveChild(FXMDIChild* child,bool notify){
     getApp()->refresh();
 
     // Notify target
-    if(notify && target && message){ target->tryHandle(this,FXSEL(SEL_CHANGED,message),child); }
+    if(notify && target){ target->tryHandle(this,FXSEL(SEL_CHANGED,message),child); }
 
     return true;
     }
@@ -471,7 +471,7 @@ bool FXMDIClient::setActiveChild(FXMDIChild* child,bool notify){
 
 // Tile horizontally (actually, prefer wider windows)
 long FXMDIClient::onCmdTileHorizontal(FXObject*,FXSelector,void*){
-  horizontal(TRUE);
+  horizontal(true);
   return 1;
   }
 
@@ -485,7 +485,7 @@ long FXMDIClient::onUpdTileHorizontal(FXObject* sender,FXSelector,void*){
 
 // Tile vertically (actually, prefer taller windows)
 long FXMDIClient::onCmdTileVertical(FXObject*,FXSelector,void*){
-  vertical(TRUE);
+  vertical(true);
   return 1;
   }
 
@@ -499,7 +499,7 @@ long FXMDIClient::onUpdTileVertical(FXObject* sender,FXSelector,void*){
 
 // Cascade windows
 long FXMDIClient::onCmdCascade(FXObject*,FXSelector,void*){
-  cascade(TRUE);
+  cascade(true);
   return 1;
   }
 
@@ -561,7 +561,7 @@ long FXMDIClient::forallDocWindows(FXObject* document,FXObject* sender,FXSelecto
 
 // Activate next child
 long FXMDIClient::onCmdActivateNext(FXObject*,FXSelector,void*){
-  if(active && active->getNext()) setActiveChild((FXMDIChild*)active->getNext(),TRUE);
+  if(active && active->getNext()) setActiveChild((FXMDIChild*)active->getNext(),true);
   return 1;
   }
 
@@ -575,7 +575,7 @@ long FXMDIClient::onUpdActivateNext(FXObject* sender,FXSelector,void*){
 
 // Activate previous child
 long FXMDIClient::onCmdActivatePrev(FXObject*,FXSelector,void*){
-  if(active && active->getPrev()) setActiveChild((FXMDIChild*)active->getPrev(),TRUE);
+  if(active && active->getPrev()) setActiveChild((FXMDIChild*)active->getPrev(),true);
   return 1;
   }
 

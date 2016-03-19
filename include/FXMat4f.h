@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMat4f.h,v 1.9 2006/01/22 17:58:06 fox Exp $                            *
+* $Id: FXMat4f.h,v 1.12 2007/02/07 20:21:56 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT4F_H
 #define FXMAT4F_H
@@ -99,10 +99,10 @@ public:
   FXMat4f& eye();
 
   /// Orthographic projection
-  FXMat4f& ortho(FXfloat left,FXfloat right,FXfloat bottom,FXfloat top,FXfloat hither,FXfloat yon);
+  FXMat4f& ortho(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
 
   /// Perspective projection
-  FXMat4f& frustum(FXfloat left,FXfloat right,FXfloat bottom,FXfloat top,FXfloat hither,FXfloat yon);
+  FXMat4f& frustum(FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
 
   /// Multiply by left-hand matrix
   FXMat4f& left();
@@ -129,7 +129,7 @@ public:
   FXMat4f& zrot(FXfloat phi);
 
   /// Look at
-  FXMat4f& look(const FXVec3f& eye,const FXVec3f& cntr,const FXVec3f& vup);
+  FXMat4f& look(const FXVec3f& from,const FXVec3f& to,const FXVec3f& up);
 
   /// Multiply by translation
   FXMat4f& trans(FXfloat tx,FXfloat ty,FXfloat tz);

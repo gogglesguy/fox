@@ -3,7 +3,7 @@
 *                           W i z a r d   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXWizard.cpp,v 1.19 2006/01/22 17:58:52 fox Exp $                        *
+* $Id: FXWizard.cpp,v 1.21 2007/02/07 20:22:20 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -95,8 +95,8 @@ FXWizard::FXWizard(FXApp* a,const FXString& name,FXImage *image,FXuint opts,FXin
 
 
 // Construct Wizard which will always float over the owner window
-FXWizard::FXWizard(FXWindow* owner,const FXString& name,FXImage *image,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXDialogBox(owner,name,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
+FXWizard::FXWizard(FXWindow* own,const FXString& name,FXImage *image,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
+  FXDialogBox(own,name,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
   construct();
   setImage(image);
   }

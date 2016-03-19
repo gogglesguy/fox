@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFont.h,v 1.67 2006/03/31 07:33:01 fox Exp $                            *
+* $Id: FXFont.h,v 1.70 2007/02/07 20:21:54 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXFONT_H
 #define FXFONT_H
@@ -331,10 +331,10 @@ public:
   virtual void setFont(const FXString& string);
 
   /// Find out if the font is monotype or proportional
-  virtual bool isFontMono() const;
+  virtual FXbool isFontMono() const;
 
   /// See if font has glyph for ch
-  virtual bool hasChar(FXwchar ch) const;
+  virtual FXbool hasChar(FXwchar ch) const;
 
   /// Get first character glyph in font
   virtual FXwchar getMinChar() const;
@@ -382,11 +382,11 @@ public:
   virtual FXint getTextHeight(const FXchar *string,FXuint length) const;
 
   /**
-  * List all fonts matching hints. If listFonts() returns TRUE then
+  * List all fonts matching hints. If listFonts() returns true then
   * fonts points to a newly-allocated array of length numfonts. It
   * is the caller's responsibility to free this array using FXFREE().
   */
-  static bool listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt=0,FXuint sl=0,FXuint sw=0,FXuint en=0,FXuint h=0);
+  static FXbool listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt=0,FXuint sl=0,FXuint sw=0,FXuint en=0,FXuint h=0);
 
   /// Save font data into stream
   virtual void save(FXStream& store) const;

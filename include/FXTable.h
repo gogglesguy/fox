@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTable.h,v 1.167 2006/03/31 07:33:03 fox Exp $                          *
+* $Id: FXTable.h,v 1.172 2007/02/07 20:21:59 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -126,7 +126,7 @@ public:
   virtual FXString getText() const { return label; }
 
   /// Change item's icon, deleting the old icon if it was owned
-  virtual void setIcon(FXIcon* icn,bool owned=false);
+  virtual void setIcon(FXIcon* icn,FXbool owned=false);
 
   /// Return item's icon
   virtual FXIcon* getIcon() const { return icon; }
@@ -138,28 +138,28 @@ public:
   void* getData() const { return data; }
 
   /// Make item draw as focused
-  virtual void setFocus(bool focus);
+  virtual void setFocus(FXbool focus);
 
   /// Return true if item has focus
-  bool hasFocus() const { return (state&FOCUS)!=0; }
+  FXbool hasFocus() const { return (state&FOCUS)!=0; }
 
   /// Select item
-  virtual void setSelected(bool selected);
+  virtual void setSelected(FXbool selected);
 
   /// Return true if this item is selected
-  bool isSelected() const { return (state&SELECTED)!=0; }
+  FXbool isSelected() const { return (state&SELECTED)!=0; }
 
   /// Enable or disable item
-  virtual void setEnabled(bool enabled);
+  virtual void setEnabled(FXbool enabled);
 
   /// Return true if this item is enabled
-  bool isEnabled() const { return (state&DISABLED)==0; }
+  FXbool isEnabled() const { return (state&DISABLED)==0; }
 
   /// Make item draggable
-  virtual void setDraggable(bool draggable);
+  virtual void setDraggable(FXbool draggable);
 
   /// Return true if this item is draggable
-  bool isDraggable() const { return (state&DRAGGABLE)!=0; }
+  FXbool isDraggable() const { return (state&DRAGGABLE)!=0; }
 
   /// Change item content justification
   virtual void setJustify(FXuint justify=RIGHT|CENTER_Y);
@@ -246,7 +246,42 @@ public:
   };
 
 
-/// Table Widget
+/**
+* The Table widget displays a table of items, each with a text and optional
+* icon.  A column Header control provide captions for each column, and a row
+* Header control provides captions for each row.  Columns are resizable by
+* means of the column Header control if the TABLE_COL_SIZABLE option is passed.
+* Likewise, rows in the table are resizable if the TABLE_ROW_SIZABLE option is
+* specified.  An entire row (column) can be selected by clicking on the a button
+* in the row (column) Header control.  Passing TABLE_NO_COLSELECT disables column
+* selection, and passing TABLE_NO_ROWSELECT disables column selection.
+* When TABLE_COL_RENUMBER is specified, columns are automatically renumbered when
+* columns are added or removed.  Similarly, TABLE_ROW_RENUMBER will cause row numbers
+* to be recalculated automatically when rows are added or removed.
+* To disable editing of cells in the table, the TABLE_READONLY can be specified.
+* Cells in the table may or may not have items in them.  When populating a cell
+* for the first time, an item will be automatically created if necessary.  Thus,
+* a cell in the table takes no space unless it has actual contents.
+* Moreover, a contiguous, rectangular region of cells in the table may refer to
+* one single item; in that case, the item will be stretched to cover all the
+* cells in the region, and no grid lines will be drawn interior to the spanning
+* item.
+* The Table widget issues SEL_SELECTED or SEL_DESELECTED when cells are selected
+* or deselected, respectively.  The table position affected is passed along as the
+* 3rd parameter of these messages.
+* Whenever the current (focus) item is changed, a SEL_CHANGED message is sent with
+* the new table position as a parameter.
+* When items are added to the table, a SEL_INSERTED message is sent, with the table
+* range of the newly added cells as the parameter in the message.
+* When items are removed from the table, a SEL_DELETED message is sent prior to the
+* removal of the items, and the table range of the removed cells is passed as a parameter.
+* A SEL_REPLACED message is sent when the contents of a cell are changed, either through
+* editing or by other means; the parameter is the range of affected cells.  This message
+* is sent prior to the change.
+* SEL_CLICKED, SEL_DOUBLECLICKED, and SEL_TRIPLECLICKED messages are sent when a cell
+* is clicked, double-clicked, or triple-clicked, respectively.
+* A SEL_COMMAND is sent when an enabled item is clicked inside the table.
+*/
 class FXAPI FXTable : public FXScrollArea {
   FXDECLARE(FXTable)
 protected:
@@ -480,7 +515,7 @@ public:
   virtual void recalc();
 
   /// Table widget can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Move the focus to this window
   virtual void setFocus();
@@ -513,22 +548,22 @@ public:
   FXint getVisibleColumns() const { return visiblecols; }
 
   /// Return true if table is editable
-  bool isEditable() const;
+  FXbool isEditable() const;
 
   /// Set editable flag
-  void setEditable(bool edit=true);
+  void setEditable(FXbool edit=true);
 
   /// Show or hide horizontal grid
-  void showHorzGrid(bool on=true);
+  void showHorzGrid(FXbool on=true);
 
   /// Is horizontal grid shown
-  bool isHorzGridShown() const { return hgrid; }
+  FXbool isHorzGridShown() const { return hgrid; }
 
   /// Show or hide vertical grid
-  void showVertGrid(bool on=true);
+  void showVertGrid(FXbool on=true);
 
   /// Is vertical grid shown
-  bool isVertGridShown() const { return vgrid; }
+  FXbool isVertGridShown() const { return vgrid; }
 
   /// Get number of rows
   FXint getNumRows() const { return nrows; }
@@ -584,7 +619,7 @@ public:
   * has a new value.  You can also accept the input by sending the table
   * an ID_ACCEPT_INPUT message.
   */
-  virtual void acceptInput(bool notify=false);
+  virtual void acceptInput(FXbool notify=false);
 
   /**
   * Determine column containing x.
@@ -604,46 +639,48 @@ public:
   FXTableItem *getItem(FXint row,FXint col) const;
 
   /// Replace the item with a [possibly subclassed] item
-  void setItem(FXint row,FXint col,FXTableItem* item,bool notify=false);
+  void setItem(FXint row,FXint col,FXTableItem* item,FXbool notify=false);
 
   /// Set the table size to nr rows and nc columns; all existing items will be removed
-  virtual void setTableSize(FXint nr,FXint nc,bool notify=false);
+  virtual void setTableSize(FXint nr,FXint nc,FXbool notify=false);
 
   /// Insert new row
-  virtual void insertRows(FXint row,FXint nr=1,bool notify=false);
+  virtual void insertRows(FXint row,FXint nr=1,FXbool notify=false);
 
   /// Insert new column
-  virtual void insertColumns(FXint col,FXint nc=1,bool notify=false);
+  virtual void insertColumns(FXint col,FXint nc=1,FXbool notify=false);
 
   /// Remove rows of cells
-  virtual void removeRows(FXint row,FXint nr=1,bool notify=false);
+  virtual void removeRows(FXint row,FXint nr=1,FXbool notify=false);
 
   /// Remove column of cells
-  virtual void removeColumns(FXint col,FXint nc=1,bool notify=false);
+  virtual void removeColumns(FXint col,FXint nc=1,FXbool notify=false);
 
   /// Extract item from table
-  virtual FXTableItem* extractItem(FXint row,FXint col,bool notify=false);
+  virtual FXTableItem* extractItem(FXint row,FXint col,FXbool notify=false);
 
   /// Clear single cell
-  virtual void removeItem(FXint row,FXint col,bool notify=false);
+  virtual void removeItem(FXint row,FXint col,FXbool notify=false);
 
   /// Clear all cells in the given range
-  virtual void removeRange(FXint startrow,FXint endrow,FXint startcol,FXint endcol,bool notify=false);
+  virtual void removeRange(FXint startrow,FXint endrow,FXint startcol,FXint endcol,FXbool notify=false);
 
   /// Remove all items from table
-  virtual void clearItems(bool notify=false);
+  virtual void clearItems(FXbool notify=false);
 
   /// Scroll to make cell at r,c fully visible
   virtual void makePositionVisible(FXint r,FXint c);
 
   /// Return true if item partially visible
-  bool isItemVisible(FXint r,FXint c) const;
+  FXbool isItemVisible(FXint r,FXint c) const;
 
   /**
   * Change column header height mode to fixed or variable.
   * In variable height mode, the column header will size to
   * fit the contents in it.  In fixed mode, the size is
   * explicitly set using setColumnHeaderHeight().
+  * The default is to determine the column header height
+  * based on the contents, using the LAYOUT_MIN_HEIGHT option.
   */
   void setColumnHeaderMode(FXuint hint=LAYOUT_FIX_HEIGHT);
 
@@ -655,6 +692,8 @@ public:
   * In variable width mode, the row header will size to
   * fit the contents in it.  In fixed mode, the size is
   * explicitly set using setRowHeaderWidth().
+  * The default is to determine the column header height
+  * based on the contents, using the LAYOUT_MIN_WIDTH option.
   */
   void setRowHeaderMode(FXuint hint=LAYOUT_FIX_WIDTH);
 
@@ -752,13 +791,13 @@ public:
   FXIcon* getRowIcon(FXint index) const;
 
   /// Change column header icon position, e.g. FXHeaderItem::BEFORE, etc.
-  void setColumnIconPosition(FXint index,FXuint mode);
+  void setColumnIconPosition(FXint index,FXuint m);
 
   /// Return icon position of column header at index
   FXuint getColumnIconPosition(FXint index) const;
 
   /// Change row header icon position, e.g. FXHeaderItem::BEFORE, etc.
-  void setRowIconPosition(FXint index,FXuint mode);
+  void setRowIconPosition(FXint index,FXuint m);
 
   /// Return icon position of row header at index
   FXuint getRowIconPosition(FXint index) const;
@@ -776,13 +815,13 @@ public:
   FXuint getRowJustify(FXint index) const;
 
   /// Modify cell text
-  void setItemText(FXint r,FXint c,const FXString& text,bool notify=false);
+  void setItemText(FXint r,FXint c,const FXString& text,FXbool notify=false);
 
   /// Return cell text
   FXString getItemText(FXint r,FXint c) const;
 
   /// Modify cell icon, deleting the old icon if it was owned
-  void setItemIcon(FXint r,FXint c,FXIcon* icon,bool owned=false,bool notify=false);
+  void setItemIcon(FXint r,FXint c,FXIcon* icon,FXbool owned=false,FXbool notify=false);
 
   /// Return cell icon
   FXIcon* getItemIcon(FXint r,FXint c) const;
@@ -804,8 +843,8 @@ public:
   * a number of rows separated by a character from the set rs.
   * Cells outside the given cell range are unaffected.
   */
-  void overlayText(FXint startrow,FXint endrow,FXint startcol,FXint endcol,const FXchar* text,FXint size,const FXchar* cs="\t,",const FXchar* rs="\n",bool notify=false);
-  void overlayText(FXint startrow,FXint endrow,FXint startcol,FXint endcol,const FXString& text,const FXchar* cs="\t,",const FXchar* rs="\n",bool notify=false);
+  void overlayText(FXint startrow,FXint endrow,FXint startcol,FXint endcol,const FXchar* text,FXint size,const FXchar* cs="\t,",const FXchar* rs="\n",FXbool notify=false);
+  void overlayText(FXint startrow,FXint endrow,FXint startcol,FXint endcol,const FXString& text,const FXchar* cs="\t,",const FXchar* rs="\n",FXbool notify=false);
 
   /**
   * Determine the number of rows and columns in a block of text
@@ -816,7 +855,7 @@ public:
   void countText(FXint& nr,FXint& nc,const FXString& text,const FXchar* cs="\t,",const FXchar* rs="\n") const;
 
   /// Return true if its a spanning cell
-  bool isItemSpanning(FXint r,FXint c) const;
+  FXbool isItemSpanning(FXint r,FXint c) const;
 
   /// Repaint cells between grid lines sr,er and grid lines sc,ec
   void updateRange(FXint sr,FXint er,FXint sc,FXint ec) const;
@@ -825,13 +864,13 @@ public:
   void updateItem(FXint r,FXint c) const;
 
   /// Enable item
-  virtual bool enableItem(FXint r,FXint c);
+  virtual FXbool enableItem(FXint r,FXint c);
 
   /// Disable item
-  virtual bool disableItem(FXint r,FXint c);
+  virtual FXbool disableItem(FXint r,FXint c);
 
   /// Is item enabled
-  bool isItemEnabled(FXint r,FXint c) const;
+  FXbool isItemEnabled(FXint r,FXint c) const;
 
   /**
   * Change item justification.  Horizontal justification is controlled by passing
@@ -852,7 +891,7 @@ public:
   * FXTableItem::BELOW places it above or below the text, respectively.
   * The default is 0 which places the text on top of the icon.
   */
-  void setItemIconPosition(FXint r,FXint c,FXuint mode);
+  void setItemIconPosition(FXint r,FXint c,FXuint m);
 
   /// Return relative icon and text position
   FXuint getItemIconPosition(FXint r,FXint c) const;
@@ -874,7 +913,7 @@ public:
   FXStipplePattern getItemStipple(FXint r,FXint c) const;
 
   /// Change current item
-  virtual void setCurrentItem(FXint r,FXint c,bool notify=false);
+  virtual void setCurrentItem(FXint r,FXint c,FXbool notify=false);
 
   /// Get row number of current item
   FXint getCurrentRow() const { return current.row; }
@@ -883,7 +922,7 @@ public:
   FXint getCurrentColumn() const { return current.col; }
 
   /// Is item current
-  bool isItemCurrent(FXint r,FXint c) const;
+  FXbool isItemCurrent(FXint r,FXint c) const;
 
   /// Change anchor item
   void setAnchorItem(FXint r,FXint c);
@@ -907,31 +946,31 @@ public:
   FXint getSelEndColumn() const { return selection.to.col; }
 
   /// Is cell selected
-  bool isItemSelected(FXint r,FXint c) const;
+  FXbool isItemSelected(FXint r,FXint c) const;
 
   /// Is row of cells selected
-  bool isRowSelected(FXint r) const;
+  FXbool isRowSelected(FXint r) const;
 
   /// Is column selected
-  bool isColumnSelected(FXint c) const;
+  FXbool isColumnSelected(FXint c) const;
 
   /// Is anything selected
-  bool isAnythingSelected() const;
+  FXbool isAnythingSelected() const;
 
   /// Select a row
-  virtual bool selectRow(FXint row,bool notify=false);
+  virtual FXbool selectRow(FXint row,FXbool notify=false);
 
   /// Select a column
-  virtual bool selectColumn(FXint col,bool notify=false);
+  virtual FXbool selectColumn(FXint col,FXbool notify=false);
 
   /// Select range
-  virtual bool selectRange(FXint startrow,FXint endrow,FXint startcol,FXint endcol,bool notify=false);
+  virtual FXbool selectRange(FXint startrow,FXint endrow,FXint startcol,FXint endcol,FXbool notify=false);
 
   /// Extend selection
-  virtual bool extendSelection(FXint r,FXint c,bool notify=false);
+  virtual FXbool extendSelection(FXint r,FXint c,FXbool notify=false);
 
   /// Kill selection
-  virtual bool killSelection(bool notify=false);
+  virtual FXbool killSelection(FXbool notify=false);
 
   /// Change font
   void setFont(FXFont* fnt);
@@ -982,16 +1021,16 @@ public:
   FXuint getTableStyle() const;
 
   /// Set column renumbering
-  void setColumnRenumbering(bool flag);
+  void setColumnRenumbering(FXbool flag);
 
   /// Get column renumbering
-  bool getColumnRenumbering() const;
+  FXbool getColumnRenumbering() const;
 
   /// Set row renumbering
-  void setRowRenumbering(bool flag);
+  void setRowRenumbering(FXbool flag);
 
   /// Get row renumbering
-  bool getRowRenumbering() const;
+  FXbool getRowRenumbering() const;
 
   /// Change help text
   void setHelpText(const FXString& text){ help=text; }

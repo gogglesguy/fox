@@ -3,7 +3,7 @@
 *                       D r a g   C o r n e r   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDragCorner.cpp,v 1.36 2006/04/04 04:28:06 fox Exp $                    *
+* $Id: FXDragCorner.cpp,v 1.38 2007/02/07 20:22:06 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -56,8 +56,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
-extern FXbool wmNetMoveResizeAvailable;
 
 
 // Map
@@ -177,7 +175,7 @@ long FXDragCorner::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   translateCoordinatesTo(wx,wy,getShell(),event->win_x,event->win_y);
   oldw=wx+xoff;
   oldh=wy+yoff;
-  dc.clipChildren(FALSE);
+  dc.clipChildren(false);
   dc.setFunction(BLT_SRC_XOR_DST);
   dc.setForeground(FXRGB(255,255,255));
   getShell()->translateCoordinatesTo(xx,yy,getRoot(),0,0);
@@ -197,7 +195,7 @@ long FXDragCorner::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     ungrab();
     getShell()->translateCoordinatesTo(xx,yy,getRoot(),0,0);
     translateCoordinatesTo(wx,wy,getShell(),event->win_x,event->win_y);
-    dc.clipChildren(FALSE);
+    dc.clipChildren(false);
     dc.setFunction(BLT_SRC_XOR_DST);
     dc.setForeground(FXRGB(255,255,255));
     dc.drawRectangle(xx,yy,oldw,oldh);
@@ -216,7 +214,7 @@ long FXDragCorner::onMotion(FXObject*,FXSelector,void* ptr){
     FXint xx,yy,wx,wy;
     getShell()->translateCoordinatesTo(xx,yy,getRoot(),0,0);
     translateCoordinatesTo(wx,wy,getShell(),event->win_x,event->win_y);
-    dc.clipChildren(FALSE);
+    dc.clipChildren(false);
     dc.setFunction(BLT_SRC_XOR_DST);
     dc.setForeground(FXRGB(255,255,255));
     dc.drawRectangle(xx,yy,oldw,oldh);

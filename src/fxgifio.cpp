@@ -3,7 +3,7 @@
 *                        G I F   I n p u t / O u t p u t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxgifio.cpp,v 1.80 2006/03/25 05:59:34 fox Exp $                         *
+* $Id: fxgifio.cpp,v 1.82 2007/02/07 20:22:20 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -60,9 +60,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckGIF(FXStream& store);
-extern FXAPI bool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,bool fast=true);
+extern FXAPI FXbool fxcheckGIF(FXStream& store);
+extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
 
 
 // Codes found in the GIF specification
@@ -85,7 +85,7 @@ const FXuchar TAG_SUF         = 0x61;   // Version suffix
 
 
 // Check if stream contains a GIF
-bool fxcheckGIF(FXStream& store){
+FXbool fxcheckGIF(FXStream& store){
   FXuchar signature[3];
   store.load(signature,3);
   store.position(-3,FXFromCurrent);
@@ -94,7 +94,7 @@ bool fxcheckGIF(FXStream& store){
 
 
 // Load image from stream
-bool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   const   FXint Yinit[4]={0,4,2,1};
   const   FXint Yinc[4]={8,8,4,2};
   FXint   imwidth,imheight,interlace,ncolors,npixels,maxpixels,i;
@@ -454,7 +454,7 @@ bool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 
 // Save a gif file to a stream
-bool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,bool fast){
+FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast){
   FXuint   clearcode,endcode,freecode,findcode,prefix,current,outaccu,initcodesize,codesize,hash,step;
   FXint    maxpixels,ncolors,bitsperpixel,colormapsize,outbits,src,dst,i;
   FXuchar  c1,c2,alpha,*pixels,*output;

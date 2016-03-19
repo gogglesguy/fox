@@ -26,6 +26,8 @@
 +FXButton.obj &
 +FXBZFileStream.obj &
 +FXCURCursor.obj &
++FXCalendar.obj &
++FXCalendarView.obj &
 +FXCanvas.obj &
 +FXCheckButton.obj &
 +FXChoiceBox.obj &
@@ -38,8 +40,11 @@
 +FXColorWell.obj &
 +FXColorWheel.obj &
 +FXComboBox.obj &
++FXComplexf.obj &
++FXComplexd.obj &
 +FXComposeContext.obj &
 +FXComposite.obj &
++FXCopyDialog.obj &
 +FXCP1250Codec.obj &
 +FXCP1251Codec.obj &
 +FXCP1252Codec.obj &
@@ -120,7 +125,6 @@
 +FXGLVisual.obj &
 +FXGradientBar.obj &
 +FXGroupBox.obj &
-+FXGUISignal.obj &
 +FXGZFileStream.obj &
 +FXHash.obj &
 +FXHeader.obj &
@@ -168,6 +172,7 @@
 +FXMenuSeparator.obj &
 +FXMenuTitle.obj &
 +FXMessageBox.obj &
++FXMessageChannel.obj &
 +FXObject.obj &
 +FXObjectList.obj &
 +FXOptionMenu.obj &
@@ -188,6 +193,7 @@
 +FXProgressDialog.obj &
 +FXQuatd.obj &
 +FXQuatf.obj &
++FXMessenger.obj &
 +FXRASIcon.obj &
 +FXRASImage.obj &
 +FXRGBIcon.obj &
@@ -244,6 +250,7 @@
 +FXTextCodec.obj &
 +FXTextField.obj &
 +FXThread.obj &
++FXThreadPool.obj &
 +FXToggleButton.obj &
 +FXToolBar.obj &
 +FXToolBarGrip.obj &

@@ -3,7 +3,7 @@
 *                 T o p - L e v e l   W i n d o w   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTopWindow.h,v 1.63 2006/03/29 07:23:00 fox Exp $                       *
+* $Id: FXTopWindow.h,v 1.69 2007/03/09 03:55:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTOPWINDOW_H
 #define FXTOPWINDOW_H
@@ -80,7 +80,7 @@ class FXIcon;
 * data to the disk.  If the target returns 0, then the system will proceed
 * to close the session.  Subsequently a SEL_SESSION_CLOSED will be received
 * which causes the window to be closed with prejudice by calling the
-* function close(FALSE).
+* function close(false).
 * When receiving a SEL_UPDATE, the target can update the title string
 * of the window, so that the title of the window reflects the name
 * of the document, for example.
@@ -114,7 +114,7 @@ private:
   FXTopWindow(const FXTopWindow&);
   FXTopWindow& operator=(const FXTopWindow&);
 #ifdef WIN32
-  virtual const char* GetClass() const;
+  virtual const void* GetClass() const;
 #endif
 public:
   long onFocusUp(FXObject*,FXSelector,void*);
@@ -179,10 +179,13 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Obtain border sizes added to our window by the window manager
-  bool getWMBorders(FXint& left,FXint& right,FXint& top,FXint& bottom);
+  FXbool getWMBorders(FXint& left,FXint& right,FXint& top,FXint& bottom);
 
   /// Raise this window to the top of the stacking order
   virtual void raise();
+
+  /// Lower this window to the bottom of the stacking order
+  virtual void lower();
 
   /// Move this window to the specified position in the parent's coordinates
   virtual void move(FXint x,FXint y);
@@ -193,29 +196,32 @@ public:
   /// Move and resize this window in the parent's coordinates
   virtual void position(FXint x,FXint y,FXint w,FXint h);
 
-  /// Maximize window, return TRUE if maximized
-  virtual bool maximize(bool notify=false);
+  /// Flash the window to get user's attention
+  virtual void flash(FXbool yes);
 
-  /// Minimize or iconify window, return TRUE if minimized
-  virtual bool minimize(bool notify=false);
+  /// Maximize window, return true if maximized
+  virtual FXbool maximize(FXbool notify=false);
 
-  /// Restore window to normal, return TRUE if restored
-  virtual bool restore(bool notify=false);
+  /// Minimize or iconify window, return true if minimized
+  virtual FXbool minimize(FXbool notify=false);
+
+  /// Restore window to normal, return true if restored
+  virtual FXbool restore(FXbool notify=false);
 
   /**
-  * Close the window, return TRUE if actually closed.  If notify=TRUE, the target
+  * Close the window, return true if actually closed.  If notify=true, the target
   * will receive a SEL_CLOSE message to determine if it is OK to close the window.
   * If the target ignores the SEL_CLOSE message or returns 0, the window will
   * be closed, and subsequently deleted.  When the last main window has been
   * closed, the application will receive an ID_QUIT message and will be closed.
   */
-  virtual bool close(bool notify=false);
+  virtual FXbool close(FXbool notify=false);
 
-  /// Return TRUE if maximized
-  bool isMaximized() const;
+  /// Return true if maximized
+  FXbool isMaximized() const;
 
-  /// Return TRUE if minimized
-  bool isMinimized() const;
+  /// Return true if minimized
+  FXbool isMinimized() const;
 
   /// Change window title
   void setTitle(const FXString& name);

@@ -3,7 +3,7 @@
 *                        P o s t S c r i p t   O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxpsio.cpp,v 1.12 2006/04/12 06:15:19 fox Exp $                          *
+* $Id: fxpsio.cpp,v 1.14 2007/02/07 20:22:21 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,7 +43,7 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxsavePS(FXStream& store,const FXColor *data,FXint width,FXint height,FXint paperw=612,FXint paperh=792,FXint margin=35,bool color=true);
+extern FXAPI FXbool fxsavePS(FXStream& store,const FXColor *data,FXint width,FXint height,FXint paperw=612,FXint paperh=792,FXint margin=35,FXbool color=true);
 
 
 // Spit output to stream
@@ -62,7 +62,7 @@ static void output(FXStream& store,const char* fmt,...){
 
 
 // Save image to PostScript file
-bool fxsavePS(FXStream& store,const FXColor* data,FXint width,FXint height,FXint paperw,FXint paperh,FXint margin,bool color){
+FXbool fxsavePS(FXStream& store,const FXColor* data,FXint width,FXint height,FXint paperw,FXint paperh,FXint margin,FXbool color){
   register FXint bx,by,bxx,byy,x,y;
   register FXuchar *p;
 

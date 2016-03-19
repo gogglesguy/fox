@@ -3,7 +3,7 @@
 *                             P i p e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPipe.cpp,v 1.7 2006/01/22 17:58:37 fox Exp $                           *
+* $Id: FXPipe.cpp,v 1.14 2007/02/07 20:22:13 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -57,14 +57,14 @@ namespace FX {
 
 
 // Construct file and attach existing handle h
-FXPipe::FXPipe(FXInputHandle handle,FXuint mode){
-  FXIO::open(handle,mode);
+FXPipe::FXPipe(FXInputHandle h,FXuint m){
+  FXIO::open(h,m);
   }
 
 
 // Open device with access mode and handle
-bool FXPipe::open(FXInputHandle handle,FXuint mode){
-  return FXIO::open(handle,mode);
+FXbool FXPipe::open(FXInputHandle h,FXuint m){
+  return FXIO::open(h,m);
   }
 
 
@@ -73,7 +73,10 @@ FXival FXPipe::readBlock(void* data,FXival count){
   FXival nread=-1;
   if(isOpen()){
 #ifdef WIN32
-    if(0==::ReadFile(device,data,count,(DWORD*)&nread,NULL)) nread=-1;
+    DWORD nr;
+    if(::ReadFile(device,data,(DWORD)count,&nr,NULL)!=0){
+      nread=(FXival)nr;
+      }
 #else
     do{
       nread=::read(device,data,count);
@@ -90,7 +93,10 @@ FXival FXPipe::writeBlock(const void* data,FXival count){
   FXival nwritten=-1;
   if(isOpen()){
 #ifdef WIN32
-    if(0==::WriteFile(device,data,count,(DWORD*)&nwritten,NULL)) nwritten=-1;
+    DWORD nw;
+    if(::WriteFile(device,data,(DWORD)count,&nw,NULL)!=0){
+      nwritten=(FXival)nw;
+      }
 #else
     do{
       nwritten=::write(device,data,count);
@@ -102,23 +108,33 @@ FXival FXPipe::writeBlock(const void* data,FXival count){
   }
 
 
-// Close file
-bool FXPipe::close(){
+// Close pipe
+FXbool FXPipe::close(){
   if(isOpen()){
-    FXInputHandle dev=device;
-    device=BadHandle;
+    if(access&OwnHandle){
 #ifdef WIN32
-    return ::CloseHandle(dev)!=0;
+      if(::CloseHandle(device)!=0){
+        device=BadHandle;
+        access=NoAccess;
+        return true;
+        }
 #else
-    return ::close(dev)==0;
+      if(::close(device)==0){
+        device=BadHandle;
+        access=NoAccess;
+        return true;
+        }
 #endif
+      }
+    device=BadHandle;
+    access=NoAccess;
     }
   return false;
   }
 
 
 // Create new (empty) file
-bool FXPipe::create(const FXString& file,FXuint perm){
+FXbool FXPipe::create(const FXString& file,FXuint perm){
   if(!file.empty()){
 #ifndef WIN32
     return ::mkfifo(file.text(),perm)==0;

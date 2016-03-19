@@ -72,6 +72,8 @@ Questions
   <a href="#DLLS">Building and using DLL's with FOX under Windows.</a><BR>
   <a href="#MDI">Creating an MDI application.</a><BR>
   <a href="#HANDLES">MS-Windows GDI handle limits.</a><BR>
+  <a href="#BUFFERED">How to I make a back-buffered widget?</a><BR>
+  <a href="#DRAGANDDROP">Advanced drag and drop topics.</a><BR>
 </ul>
 
 
@@ -1088,12 +1090,20 @@ very important for portability reasons that it is <b><em>always the same thread<
 performing the User Interface tasks.
 <p>
 You <em>can</em> however use any number of threads in your application, as long as they
-are <b><em>worker bees</em></b>, i.e. they do not perform User Interface functions.  <p>
+are <b><em>worker threads</em></b>, i.e. they do not perform User Interface functions.
+<p>
 Synchronization between the User Interface thread and the worker threads can be performed
-using a synchronization object, a pipe (UNIX/LINUX) or an event object (MS-Windows). <p>
+using a synchronization object, a pipe (UNIX/LINUX) or an event object (MS-Windows).
+<p>
 The synchronization object is passed to FXApp::addInput() so that the User Interface thread
 is awakened when the worker thread turns the synchronization object into a <em>signalled</em>
 state.
+<p>
+In the more recent FOX versions (FOX 1.7 and newer), a facility has been implemented 
+called FXMessageChannel to make this easier.  Using FXMessageChannel, a worker thread
+can send an asynchronous message to the GUI thread, causing it to wake up and dispatch
+to a handler in order to process a message on the worker thread's behalf.  (Older 
+versions of FOX used FXGUISignal, which is a more limited form of this facility).
 </ul>
 
 
@@ -1744,6 +1754,7 @@ parent.
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 </p>
 <!--- TOPIC TITLE -->
+<ul>
 CFD Research has been very nice to work out an arrangement for the legal
 status of FOX which is acceptable to all parties.  The issues were the continued
 availability of the FOX Library to CFD Research, and the acknowledgement of copyrights
@@ -1754,6 +1765,7 @@ The arrangement is as follows:
 <li>CFD Research disclaims all Copyright Interests to the FOX Library.</li>
 <li>CFD Research will continue to be able to use the FOX Library under the Lesser GPL license.</li>
 </ol>
+</ul>
 
 <!--- TOPIC TITLE -->
 <p>
@@ -1763,6 +1775,7 @@ The arrangement is as follows:
 </p>
 <!--- TOPIC TITLE -->
 <p>
+<ul>
 When a target receives a message from a widget, it may want to know several things:
 <p>
 <ul>
@@ -1789,6 +1802,7 @@ macro: <b>FXSEL(type,id)</b>.
 <p>
 For historical reasons, the data type used for the message-id, message-type, as well
 as the combined selector is <b>FXSelector</b>.
+</ul>
 
 <!--- TOPIC TITLE -->
 <p>
@@ -1798,6 +1812,7 @@ as the combined selector is <b>FXSelector</b>.
 </p>
 <!--- TOPIC TITLE -->
 <p>
+<ul>
 You need to create a file, call it "myapp.rc", and then put into it:
 <pre>
   0 ICON DISCARDABLE "myapp16.ico"
@@ -1809,6 +1824,7 @@ be associated with your application.
 <p>
 You will also need to convince your resource compiler to compile that,
 of course.
+</ul>
 
 
 <!--- TOPIC TITLE -->
@@ -1819,6 +1835,7 @@ of course.
 </p>
 <!--- TOPIC TITLE -->
 <p>
+<ul>
 While a Control is being manipulated by the user, the GUI update (the process by which
 the widget updates itself from the application state) is turned off.  <br>
 For most simple controls like Sliders this is done only during the time the mouse has
@@ -1830,6 +1847,7 @@ clear that the TextField can be updated again when:
 <li>You've moved the focus to another Control, or</li>
 <li>You've hit RETURN in the Text Field to accept the typed input.</li>
 </ul>
+</ul>
 
 
 <!--- TOPIC TITLE -->
@@ -1840,6 +1858,7 @@ clear that the TextField can be updated again when:
 </p>
 <!--- TOPIC TITLE -->
 <p>
+<ul>
 When you compile something, the header files can be parsed two ways on
 Windows.  When compiling the FOX library itself as a DLL, the <b>FXAPI</b> macro
 should be set to <b>FXEXPORT</b>, which itself is set to <b>__declspec(dllexport)</b>,
@@ -1869,6 +1888,7 @@ So in a nutshell:
 FOX-based DLL's export ONLY their own symbols but import
 the core library's symbols.</li>
 </ul>
+</ul>
 
 <!--- TOPIC TITLE -->
 <p>
@@ -1878,6 +1898,7 @@ the core library's symbols.</li>
 </p>
 <!--- TOPIC TITLE -->
 <p>
+<ul>
 When you build an MDI application, messages should be routed via the
 FXMDIClient to an FXMDIChild, and from there, to either FXMDIChild's
 content window and the FXMDIChild's target.  The FXMDIChild's target
@@ -2025,6 +2046,7 @@ The implementation of activateDocument() will be responsible for setting
 up the GUI controls with data pertaining to the document.  Likewise,
 deactivateDocument() should tear down the user interface and leave
 widgets in their pristine state [as if there were no document].
+</ul>
 
 
 <!--- TOPIC TITLE -->
@@ -2035,6 +2057,7 @@ widgets in their pristine state [as if there were no document].
 </p>
 <!--- TOPIC TITLE -->
 <p>
+<ul>
 MS-Windows has finite limits on GDI handles; the maximum number of HWND handles
 in the entire system is determined by 16-bit handle values.  There is also a maximum
 number of bitmap handles.
@@ -2057,7 +2080,138 @@ refrain from calling create() on icons or images if all you want to do is load
 and manipulate the image's pixel data.  You only need to call create() when images
 are to be drawn into or used as sources for drawing (like e.g. drawing onto
 widgets).
+</ul>
 
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+<a NAME="BUFFERED"></a>How to I make a back-buffered widget?
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+</p>
+<!--- TOPIC TITLE -->
+<p>
+<ul>
+There is a certain boiler-plate logic underlying a back buffered widget which is described
+below.
+<p>
+<ul>
+<li>Note that there are two types of drawing: program-initiated, and paint-message
+initiated.  In a paint-message initiated onPaint(), you simply do:
+<p>
+<pre>
+FXDCWindow dc(this,(FXEvent*)ptr);
+dc.drawImage(backbufferimage,0,0);
+</pre>
+<p>
+and you are done; the backbufferimage will never get clobbered so there's no
+need to regenerate it each time you paint. Passing the FXEvent to FXDCWindow
+constructor sets the clip rectangle to the dirty-area, and this means that
+in most cases, you'd only paint the smallest sliver of the backbufferimage.
+
+In other words, this is pretty FAST and totally independent of the complexity
+of the drawing in the image! </li>
+
+<li>When your widget changes size, layout() is called. You will need to overload
+layout() and resize the image.  The layout() function is also called when there is reason
+to believe stuff is "dirty".  The layout() function you implement needs to treat two cases:
+<p>
+<ul>
+<li>If it changed size, resize the image. Code will be more or less like:
+<p>
+<pre>
+if(backbufferimage->getWidth()!=width || backbufferimage->getHeight()!=height){
+  backbufferimage->resize(width,height);
+  }
+</pre>
+The test is obviously needed because resizing an image is slow and painful: we
+really don't want to do it unless its necessary!</li>
+<p>
+<li>If the image changed size, <em>or</em> if it was dirty, redraw the image in the layout()
+function.  This goes something like this:
+<pre>
+FXDCWindow dc(backbufferimage);
+dc.drawLine(..); ... // or whatever drawing commands you need!
+</pre>
+At the end of layout() you set the dirty flag back to false:
+<pre>
+flags&=~FLAG_DIRTY;
+</pre>
+</li>
+</ul>
+</li>
+
+<li>Whenever you programmatically change the contents to be displayed in the backbufferimage,
+call recalc().  This sets the FLAG_DIRTY and thus instigates a layout() at some
+point in the future.
+<p>
+Note it doesn't redraw immediately; it just sets a flag to do it later, when we return
+to the event loop.  Thus, you can change many things about the widget, and yet incur the
+cost of redrawing only once!</li>
+
+<li>Some examples of this in FOX widget collection: FXGradientBar, FXColorWheel,
+FXChart, and a few others.  In the case of FXColorWheel, the backbufferimage
+is actually constructed pixel by pixel, and the whole off-screen image regenerated
+by a call to backbufferimage->render().</li>
+</ul>
+<p>
+It should be clear that the logic above takes great pains to avoid the hard work
+[redrawing the off-screen image] as much as possible. 99% of the time, we can
+redraw some tiny sliver from the backbufferimage using a fast BLIT operation.
+Then for the remaining 1% of the time, we'd regenerate the contents only.<br>
+Only once in a while we have to both resize <em>and</em> regenerate the contents; but at
+least, we've put this work off till idle time!
+Because at idle time, the only thing we'd be doing otherwise would be to wait for
+events anyway!
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+<a NAME="DRAGANDDROP"></a>Advanced drag and drop topics.
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+</p>
+<!--- TOPIC TITLE -->
+<p>
+<ul>
+Occasionally, there is a need to perform user-interaction when a drop target
+receives an SEL_DND_DROP message.  Doing this can be a bit tricky, especially
+when dragging and dropping within the same application.
+<p>
+<li>When the widget is the drag source, it calls beginDrag(), handleDrag()
+and endDrag() in succession.</li>
+<p>
+<li>When endDrag() is called, the widget hangs in endDrag() until the drop
+target has acknowledged the receipt of the data; after receiving this
+acknowledgement, endDrag() quickly returns.</li>
+<p>
+<li>So, when the source and the target are in different applications, we 
+don't see any problem:- both applications can perform their end of
+the DND transation with no problem.</li>
+<p>
+<li>However, when source and target are the SAME application, it is difficult
+to do any work on the receiving side, since the source is still in the
+endDrag() function and practically all events are blocked.</li>
+<p>
+<li>What I do to fix this is to use the new dropFinished() API.  dropFinished()
+is called by the drop target in the onDNDDrop() handler after it has obtained
+the dropped data.  dropFinished() basically sends the drag source the acknowledgement
+it is waiting for [under normal circumstances this is done implicitly when the
+onDNDDrop() handler returns; however in this case we want to perform further
+work in the onDNDDrop() handler, but as we already have the data, there is no
+need for the drag source to wait any further: it can proceed to release the
+data].</li>
+<p>
+<li>Now the above would have been enough if the drag source is another application;
+however, if its not then we need to do one more thing: in the onDNDDrop()
+handler, we set a chore to deal with the drop data, and then return.  
+
+Now, the drag source can return from the endDrag() function, and normal event
+processing resumes.  The first thing that will happen after this is the chore which 
+we've set in onDNDDrop(). Since we're no longer in endDrag()'s modal loop we
+can invoke anything we want in the chore handler, which includes popping dialogs
+and invoking popup menus!!</li>
+</ul>
+   
 
 <p>
 <table width=100% cellpadding=0 cellspacing=0><tr><td width=100% valign=top id=HEADLINE align=right>

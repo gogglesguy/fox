@@ -3,7 +3,7 @@
 *                          I C O   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2007 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxicoio.cpp,v 1.34 2006/03/24 06:05:03 fox Exp $                         *
+* $Id: fxicoio.cpp,v 1.39 2007/02/07 20:22:20 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -50,17 +50,17 @@ using namespace FX;
 
 namespace FX {
 
-extern FXAPI bool fxcheckICO(FXStream& store);
-extern FXAPI bool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot);
-extern FXAPI bool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot=-1,FXint yspot=-1);
+extern FXAPI FXbool fxcheckICO(FXStream& store);
+extern FXAPI FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot);
+extern FXAPI FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot=-1,FXint yspot=-1);
 
 
 
 // Check if stream contains ICO
-bool fxcheckICO(FXStream& store){
-  bool swap=store.swapBytes();
+FXbool fxcheckICO(FXStream& store){
+  FXbool swap=store.swapBytes();
   FXshort signature[3];
-  store.setBigEndian(FALSE);
+  store.setBigEndian(false);
   store.load(signature,3);
   store.position(-6,FXFromCurrent);
   store.swapBytes(swap);
@@ -69,7 +69,7 @@ bool fxcheckICO(FXStream& store){
 
 
 // Load ICO image from stream
-bool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot){
+FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot){
   FXColor  colormap[256],*pp;
   FXlong   base,header;
   FXshort  idReserved;
@@ -97,8 +97,8 @@ bool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& 
   FXint    i,j,colormaplen,pad;
   FXuchar  c1;
   FXushort rgb16;
-  bool     swap;
-  bool     ok=FALSE;
+  FXbool     swap;
+  FXbool     ok=false;
 
   // Null out
   data=NULL;
@@ -119,7 +119,7 @@ bool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& 
   store >> idType;         // ICO=1, CUR=2
   store >> idCount;        // Number of images
 
-//  FXTRACE((1,"fxloadICO: idReserved=%d idType=%d idCount=%d\n",idReserved,idType,idCount));
+//  FXTRACE((100,"fxloadICO: idReserved=%d idType=%d idCount=%d\n",idReserved,idType,idCount));
 
   // Check
   if(idReserved!=0 || (idType!=1 && idType!=2) || idCount<1) goto x;
@@ -134,7 +134,7 @@ bool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& 
   store >> dwBytesInRes;
   store >> dwImageOffset;
 
-//  FXTRACE((1,"fxloadICO: bWidth=%d bHeight=%d bColorCount=%d bReserved=%d xspot=%d yspot=%d dwImageOffset=%d\n",bWidth,bHeight,bColorCount,bReserved,xspot,yspot,dwImageOffset));
+//  FXTRACE((100,"fxloadICO: bWidth=%d bHeight=%d bColorCount=%d bReserved=%d xspot=%d yspot=%d dwImageOffset=%d\n",bWidth,bHeight,bColorCount,bReserved,xspot,yspot,dwImageOffset));
 
   // Only certain color counts allowed; bColorCount=0 means 256 colors supposedly
   if(bColorCount!=0 && bColorCount!=2 && bColorCount!=4 && bColorCount!=8 && bColorCount!=16) goto x;
@@ -158,7 +158,7 @@ bool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& 
   store >> biClrUsed;
   store >> biClrImportant;
 
-//  FXTRACE((1,"fxloadICO: biSize=%d biWidth=%d biHeight=%d biBitCount=%d biCompression=%d biClrUsed=%d\n",biSize,biWidth,biHeight,biBitCount,biCompression,biClrUsed));
+//  FXTRACE((100,"fxloadICO: biSize=%d biWidth=%d biHeight=%d biBitCount=%d biCompression=%d biClrUsed=%d\n",biSize,biWidth,biHeight,biBitCount,biCompression,biClrUsed));
 
   // Check for supported depths
   if(biBitCount!=1 && biBitCount!=4 && biBitCount!=8 && biBitCount!=16 && biBitCount!=24 && biBitCount!=32) goto x;
@@ -291,7 +291,7 @@ x:store.swapBytes(swap);
 
 
 // Save a ICO file to a stream
-bool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot,FXint yspot){
+FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot,FXint yspot){
   const FXint    biSize=40;
   const FXshort  biPlanes=1;
   const FXint    biCompression=BIH_RGB;
@@ -318,7 +318,7 @@ bool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXin
   FXuchar        bHeight=(FXuchar)height;
   FXint          i,j,pad;
   FXuchar        c,bit;
-  bool           swap;
+  FXbool           swap;
 
   // Must make sense
   if(!data || width<=0 || height<=0) return false;

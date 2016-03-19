@@ -3,7 +3,7 @@
 *                         T r e e   L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTreeList.h,v 1.103 2006/04/02 22:37:18 fox Exp $                       *
+* $Id: FXTreeList.h,v 1.106 2007/02/07 20:21:59 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTREELIST_H
 #define FXTREELIST_H
@@ -123,13 +123,13 @@ public:
   const FXString& getText() const { return label; }
 
   /// Change open icon, deleting the old icon if it was owned
-  virtual void setOpenIcon(FXIcon* icn,bool owned=false);
+  virtual void setOpenIcon(FXIcon* icn,FXbool owned=false);
 
   /// Get open icon
   FXIcon* getOpenIcon() const { return openIcon; }
 
   /// Change closed icon, deleting the old icon if it was owned
-  virtual void setClosedIcon(FXIcon* icn,bool owned=false);
+  virtual void setClosedIcon(FXIcon* icn,FXbool owned=false);
 
   /// Get closed icon
   FXIcon* getClosedIcon() const { return closedIcon; }
@@ -141,52 +141,52 @@ public:
   void* getData() const { return data; }
 
   /// Make item draw as focused
-  virtual void setFocus(bool focus);
+  virtual void setFocus(FXbool focus);
 
   /// Return true if item has focus
-  bool hasFocus() const { return (state&FOCUS)!=0; }
+  FXbool hasFocus() const { return (state&FOCUS)!=0; }
 
   /// Select item
-  virtual void setSelected(bool selected);
+  virtual void setSelected(FXbool selected);
 
   /// Return true if this item is selected
-  bool isSelected() const { return (state&SELECTED)!=0; }
+  FXbool isSelected() const { return (state&SELECTED)!=0; }
 
   /// Make item show as open
-  virtual void setOpened(bool opened);
+  virtual void setOpened(FXbool opened);
 
   /// Return true if this item is open
-  bool isOpened() const { return (state&OPENED)!=0; }
+  FXbool isOpened() const { return (state&OPENED)!=0; }
 
   /// Expand or collapse item
-  virtual void setExpanded(bool expanded);
+  virtual void setExpanded(FXbool expanded);
 
   /// Return true if this item is expanded into sub items
-  bool isExpanded() const { return (state&EXPANDED)!=0; }
+  FXbool isExpanded() const { return (state&EXPANDED)!=0; }
 
   /// Enable or disable item
-  virtual void setEnabled(bool enabled);
+  virtual void setEnabled(FXbool enabled);
 
   /// Return true if this item is enabled
-  bool isEnabled() const { return (state&DISABLED)==0; }
+  FXbool isEnabled() const { return (state&DISABLED)==0; }
 
   /// Make item draggable
-  virtual void setDraggable(bool draggable);
+  virtual void setDraggable(FXbool draggable);
 
   /// Return true if this item is draggable
-  bool isDraggable() const { return (state&DRAGGABLE)!=0; }
+  FXbool isDraggable() const { return (state&DRAGGABLE)!=0; }
 
   /// Return true if subitems, real or imagined
-  bool hasItems() const { return (state&HASITEMS)!=0; }
+  FXbool hasItems() const { return (state&HASITEMS)!=0; }
 
   /// Change has items flag
-  void setHasItems(bool flag);
+  void setHasItems(FXbool flag);
 
   /// Return true if descendent of parent item
-  bool isChildOf(const FXTreeItem* item) const;
+  FXbool isChildOf(const FXTreeItem* item) const;
 
   /// Return true if ancestor of child item
-  bool isParentOf(const FXTreeItem* item) const;
+  FXbool isParentOf(const FXTreeItem* item) const;
 
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXTreeList* list) const;
@@ -265,7 +265,7 @@ protected:
   FXString           lookup;            // Lookup string
   FXString           tip;
   FXString           help;              // Help string
-  bool               state;             // State of item
+  FXbool             state;             // State of item
 protected:
   FXTreeList();
   virtual FXTreeItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr);
@@ -337,7 +337,7 @@ public:
   virtual void recalc();
 
   /// Tree list can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Move the focus to this window
   virtual void setFocus();
@@ -361,43 +361,43 @@ public:
   FXTreeItem* getLastItem() const { return lastitem; }
 
   /// Fill tree list by appending items from array of strings
-  FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill tree list by appending items from newline separated strings
-  FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Insert [possibly subclassed] item under father before other item
-  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,bool notify=false);
+  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Insert item with given text and optional icons, and user-data pointer under father before other item
-  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Append [possibly subclassed] item as last child of father
-  FXTreeItem* appendItem(FXTreeItem* father,FXTreeItem* item,bool notify=false);
+  FXTreeItem* appendItem(FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Append item with given text and optional icons, and user-data pointer as last child of father
-  FXTreeItem* appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXTreeItem* appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend [possibly subclassed] item as first child of father
-  FXTreeItem* prependItem(FXTreeItem* father,FXTreeItem* item,bool notify=false);
+  FXTreeItem* prependItem(FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Prepend item with given text and optional icons, and user-data pointer as first child of father
-  FXTreeItem* prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXTreeItem* prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Move item under father before other item
   FXTreeItem *moveItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item);
 
   /// Extract item
-  FXTreeItem* extractItem(FXTreeItem* item,bool notify=false);
+  FXTreeItem* extractItem(FXTreeItem* item,FXbool notify=false);
 
   /// Remove item
-  void removeItem(FXTreeItem* item,bool notify=false);
+  void removeItem(FXTreeItem* item,FXbool notify=false);
 
   /// Remove items in range [fm, to] inclusively
-  void removeItems(FXTreeItem* fm,FXTreeItem* to,bool notify=false);
+  void removeItems(FXTreeItem* fm,FXTreeItem* to,FXbool notify=false);
 
   /// Remove all items from list
-  void clearItems(bool notify=false);
+  void clearItems(FXbool notify=false);
 
   /// Return item width
   FXint getItemWidth(const FXTreeItem* item) const { return item->getWidth(this); }
@@ -439,13 +439,13 @@ public:
   FXString getItemText(const FXTreeItem* item) const;
 
   /// Change item's open icon
-  void setItemOpenIcon(FXTreeItem* item,FXIcon* icon,bool owned=false);
+  void setItemOpenIcon(FXTreeItem* item,FXIcon* icon,FXbool owned=false);
 
   /// Return item's open icon, deleting the old icon if it was owned
   FXIcon* getItemOpenIcon(const FXTreeItem* item) const;
 
   /// Chance item's closed icon, deleting the old icon if it was owned
-  void setItemClosedIcon(FXTreeItem* item,FXIcon* icon,bool owned=false);
+  void setItemClosedIcon(FXTreeItem* item,FXIcon* icon,FXbool owned=false);
 
   /// Return item's closed icon
   FXIcon* getItemClosedIcon(const FXTreeItem* item) const;
@@ -457,25 +457,25 @@ public:
   void* getItemData(const FXTreeItem* item) const;
 
   /// Return true if item is selected
-  bool isItemSelected(const FXTreeItem* item) const;
+  FXbool isItemSelected(const FXTreeItem* item) const;
 
   /// Return true if item is current
-  bool isItemCurrent(const FXTreeItem* item) const;
+  FXbool isItemCurrent(const FXTreeItem* item) const;
 
   /// Return true if item is visible
-  bool isItemVisible(const FXTreeItem* item) const;
+  FXbool isItemVisible(const FXTreeItem* item) const;
 
   /// Return true if item opened
-  bool isItemOpened(const FXTreeItem* item) const;
+  FXbool isItemOpened(const FXTreeItem* item) const;
 
   /// Return true if item expanded
-  bool isItemExpanded(const FXTreeItem* item) const;
+  FXbool isItemExpanded(const FXTreeItem* item) const;
 
   /// Return true if item is a leaf-item, i.e. has no children
-  bool isItemLeaf(const FXTreeItem* item) const;
+  FXbool isItemLeaf(const FXTreeItem* item) const;
 
   /// Return true if item is enabled
-  bool isItemEnabled(const FXTreeItem* item) const;
+  FXbool isItemEnabled(const FXTreeItem* item) const;
 
   /// Return item hit code: 0 outside, 1 icon, 2 text, 3 box
   FXint hitItem(const FXTreeItem* item,FXint x,FXint y) const;
@@ -484,40 +484,40 @@ public:
   void updateItem(FXTreeItem* item) const;
 
   /// Enable item
-  virtual bool enableItem(FXTreeItem* item);
+  virtual FXbool enableItem(FXTreeItem* item);
 
   /// Disable item
-  virtual bool disableItem(FXTreeItem* item);
+  virtual FXbool disableItem(FXTreeItem* item);
 
   /// Select item
-  virtual bool selectItem(FXTreeItem* item,bool notify=false);
+  virtual FXbool selectItem(FXTreeItem* item,FXbool notify=false);
 
   /// Deselect item
-  virtual bool deselectItem(FXTreeItem* item,bool notify=false);
+  virtual FXbool deselectItem(FXTreeItem* item,FXbool notify=false);
 
   /// Toggle item selection
-  virtual bool toggleItem(FXTreeItem* item,bool notify=false);
+  virtual FXbool toggleItem(FXTreeItem* item,FXbool notify=false);
 
   /// Extend selection from anchor item to item
-  virtual bool extendSelection(FXTreeItem* item,bool notify=false);
+  virtual FXbool extendSelection(FXTreeItem* item,FXbool notify=false);
 
   /// Deselect all items
-  virtual bool killSelection(bool notify=false);
+  virtual FXbool killSelection(FXbool notify=false);
 
   /// Open item
-  virtual bool openItem(FXTreeItem* item,bool notify=false);
+  virtual FXbool openItem(FXTreeItem* item,FXbool notify=false);
 
   /// Close item
-  virtual bool closeItem(FXTreeItem* item,bool notify=false);
+  virtual FXbool closeItem(FXTreeItem* item,FXbool notify=false);
 
   /// Collapse tree
-  virtual bool collapseTree(FXTreeItem* tree,bool notify=false);
+  virtual FXbool collapseTree(FXTreeItem* tree,FXbool notify=false);
 
   /// Expand tree
-  virtual bool expandTree(FXTreeItem* tree,bool notify=false);
+  virtual FXbool expandTree(FXTreeItem* tree,FXbool notify=false);
 
   /// Change current item
-  virtual void setCurrentItem(FXTreeItem* item,bool notify=false);
+  virtual void setCurrentItem(FXTreeItem* item,FXbool notify=false);
 
   /// Return current item, if any
   FXTreeItem* getCurrentItem() const { return currentitem; }

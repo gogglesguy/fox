@@ -3,7 +3,7 @@
 *                        F r a m e   W i n d o w   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFrame.cpp,v 1.37 2006/01/22 17:58:27 fox Exp $                         *
+* $Id: FXFrame.cpp,v 1.39 2007/02/07 20:22:08 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -239,7 +239,7 @@ long FXFrame::onPaint(FXObject*,FXSelector,void* ptr){
 
 // Change frame border style
 void FXFrame::setFrameStyle(FXuint style){
-  FXuint opts=(options&~FRAME_MASK) | (style&FRAME_MASK);
+  FXuint opts=((style^options)&FRAME_MASK)^options;
   if(options!=opts){
     FXint b=(opts&FRAME_THICK) ? 2 : (opts&(FRAME_SUNKEN|FRAME_RAISED)) ? 1 : 0;
     options=opts;

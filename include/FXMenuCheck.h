@@ -3,7 +3,7 @@
 *                          M e n u C h e c k   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuCheck.h,v 1.13 2006/01/22 17:58:06 fox Exp $                       *
+* $Id: FXMenuCheck.h,v 1.15 2007/02/07 20:21:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXMENUCHECK_H
 #define FXMENUCHECK_H
@@ -42,8 +42,8 @@ namespace FX {
 class FXAPI FXMenuCheck : public FXMenuCommand {
   FXDECLARE(FXMenuCheck)
 protected:
-  FXuchar check;        // State of menu
   FXColor boxColor;     // Box color
+  FXuchar check;        // State of menu
 protected:
   FXMenuCheck();
 private:
@@ -76,10 +76,10 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Set check state (TRUE, FALSE or MAYBE)
-  void setCheck(FXbool s=TRUE);
+  void setCheck(FXuchar s=TRUE);
 
   /// Get check state (TRUE, FALSE or MAYBE)
-  FXbool getCheck() const { return check; }
+  FXuchar getCheck() const { return check; }
 
   /// Get the box background color
   FXColor getBoxColor() const { return boxColor; }

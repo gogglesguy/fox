@@ -3,7 +3,7 @@
 *                          R e c t a n g l e    C l a s s                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRectangle.h,v 1.22 2006/04/23 18:00:36 fox Exp $                       *
+* $Id: FXRectangle.h,v 1.24 2007/02/07 20:21:57 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXRECTANGLE_H
 #define FXRECTANGLE_H
@@ -49,24 +49,24 @@ public:
   FXRectangle(const FXPoint& topleft,const FXPoint& bottomright):x(topleft.x),y(topleft.y),w(bottomright.x-topleft.x+1),h(bottomright.y-topleft.y+1){ }
 
   /// Test if empty
-  bool empty() const { return w<=0 || h<=0; }
+  FXbool empty() const { return w<=0 || h<=0; }
 
   /// Test if zero
-  bool operator!() const { return x==0 && y==0 && w==0 && h==0; }
+  FXbool operator!() const { return x==0 && y==0 && w==0 && h==0; }
 
   /// Equality
-  bool operator==(const FXRectangle& r) const { return x==r.x && y==r.y && w==r.w && h==r.h; }
-  bool operator!=(const FXRectangle& r) const { return x!=r.x || y!=r.y || w!=r.w || h!=r.h; }
+  FXbool operator==(const FXRectangle& r) const { return x==r.x && y==r.y && w==r.w && h==r.h; }
+  FXbool operator!=(const FXRectangle& r) const { return x!=r.x || y!=r.y || w!=r.w || h!=r.h; }
 
   /// Point in rectangle
-  bool contains(const FXPoint& p) const { return x<=p.x && y<=p.y && p.x<x+w && p.y<y+h; }
-  bool contains(FXshort xx,FXshort yy) const { return x<=xx && y<=yy && xx<x+w && yy<y+h; }
+  FXbool contains(const FXPoint& p) const { return x<=p.x && y<=p.y && p.x<x+w && p.y<y+h; }
+  FXbool contains(FXshort xx,FXshort yy) const { return x<=xx && y<=yy && xx<x+w && yy<y+h; }
 
   /// Rectangle properly contained in rectangle
-  bool contains(const FXRectangle& r) const { return x<=r.x && y<=r.y && r.x+r.w<=x+w && r.y+r.h<=y+h; }
+  FXbool contains(const FXRectangle& r) const { return x<=r.x && y<=r.y && r.x+r.w<=x+w && r.y+r.h<=y+h; }
 
   /// Rectangles overlap
-  friend inline bool overlap(const FXRectangle& a,const FXRectangle& b);
+  friend inline FXbool overlap(const FXRectangle& a,const FXRectangle& b);
 
   /// Return moved rectangle
   FXRectangle& move(const FXPoint& p){ x+=p.x; y+=p.y; return *this; }
@@ -122,7 +122,7 @@ public:
   };
 
 
-inline bool overlap(const FXRectangle& a,const FXRectangle& b){ return b.x<a.x+a.w && b.y<a.y+a.h && a.x<b.x+b.w && a.y<b.y+b.h; }
+inline FXbool overlap(const FXRectangle& a,const FXRectangle& b){ return b.x<a.x+a.w && b.y<a.y+a.h && a.x<b.x+b.w && a.y<b.y+b.h; }
 
 extern FXAPI FXStream& operator<<(FXStream& store,const FXRectangle& r);
 extern FXAPI FXStream& operator>>(FXStream& store,FXRectangle& r);

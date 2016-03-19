@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: PathFinder.h,v 1.43 2006/03/31 07:33:04 fox Exp $                        *
+* $Id: PathFinder.h,v 1.47 2007/02/07 20:22:01 fox Exp $                        *
 ********************************************************************************/
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
@@ -27,6 +27,12 @@
 
 class PropertyDialog;
 class Preferences;
+
+
+// Version
+#define VERSION_MAJOR 2
+#define VERSION_MINOR 0
+#define VERSION_PATCH 0
 
 
 // PathFinder Main Window
@@ -89,6 +95,7 @@ protected:
   FXIcon            *rotatelefticon;
   FXIcon            *rotaterighticon;
   FXIcon            *quiticon;
+  FXIcon            *configicon;
   FXString           editor;		// Editor command
   FXString           terminal;		// Terminal command
   FXString           program;		// Last program
@@ -249,7 +256,7 @@ public:
   virtual void create();
 
   // Closed window
-  virtual bool close(bool notify=false);
+  virtual FXbool close(FXbool notify=false);
 
   // Switch current directory
   void setDirectory(const FXString& dir);

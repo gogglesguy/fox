@@ -3,7 +3,7 @@
 *                         D o c u m e n t   O b j e c t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDocument.h,v 1.17 2006/04/02 19:33:22 fox Exp $                        *
+* $Id: FXDocument.h,v 1.19 2007/02/07 20:21:53 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDOCUMENT_H
 #define FXDOCUMENT_H
@@ -41,7 +41,7 @@ class FXAPI FXDocument : public FXObject {
 private:
   FXString     title;             // Title to appear above windows
   FXString     filename;          // File name to save to
-  bool         modified;          // Document has been modified
+  FXbool       modified;          // Document has been modified
 public:
   long onUpdTitle(FXObject*,FXSelector,void*);
   long onUpdFilename(FXObject*,FXSelector,void*);
@@ -57,10 +57,10 @@ public:
   FXDocument();
 
   /// Return true if document is modified
-  bool isModified() const { return modified; }
+  FXbool isModified() const { return modified; }
 
   /// Set its modified state
-  void setModified(bool mdfy=true){ modified=mdfy; }
+  void setModified(FXbool mdfy=true){ modified=mdfy; }
 
   /// Set document title
   void setTitle(const FXString& name);

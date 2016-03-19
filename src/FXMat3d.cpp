@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMat3d.cpp,v 1.12 2006/01/22 17:58:35 fox Exp $                         *
+* $Id: FXMat3d.cpp,v 1.14 2007/02/07 20:22:12 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -373,7 +373,7 @@ FXMat3d FXMat3d::transpose() const {
 
 // Invert matrix
 FXMat3d FXMat3d::invert() const {
-  register FXdouble det;
+  register FXdouble dt;
   FXMat3d res;
   res[0][0]=m[1][1]*m[2][2]-m[1][2]*m[2][1];
   res[0][1]=m[0][2]*m[2][1]-m[0][1]*m[2][2];
@@ -387,19 +387,19 @@ FXMat3d FXMat3d::invert() const {
   res[2][1]=m[0][1]*m[2][0]-m[0][0]*m[2][1];
   res[2][2]=m[0][0]*m[1][1]-m[0][1]*m[1][0];
 
-  det=m[0][0]*res[0][0]+m[0][1]*res[1][0]+m[0][2]*res[2][0];
+  dt=m[0][0]*res[0][0]+m[0][1]*res[1][0]+m[0][2]*res[2][0];
   //if(det==0.0) throw FXException("FXMat3d is singular.");
-  FXASSERT(det!=0.0);
+  FXASSERT(dt!=0.0);
 
-  res[0][0]/=det;
-  res[0][1]/=det;
-  res[0][2]/=det;
-  res[1][0]/=det;
-  res[1][1]/=det;
-  res[1][2]/=det;
-  res[2][0]/=det;
-  res[2][1]/=det;
-  res[2][2]/=det;
+  res[0][0]/=dt;
+  res[0][1]/=dt;
+  res[0][2]/=dt;
+  res[1][0]/=dt;
+  res[1][1]/=dt;
+  res[1][2]/=dt;
+  res[2][0]/=dt;
+  res[2][1]/=dt;
+  res[2][2]/=dt;
   return res;
   }
 

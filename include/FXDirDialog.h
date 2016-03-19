@@ -3,7 +3,7 @@
 *                D i r e c t o r y   S e l e c t i o n   D i a l o g            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirDialog.h,v 1.18 2006/03/31 07:33:01 fox Exp $                       *
+* $Id: FXDirDialog.h,v 1.21 2007/02/07 20:21:53 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXDIRDIALOG_H
 #define FXDIRDIALOG_H
@@ -67,17 +67,17 @@ public:
   /// Return directory
   FXString getDirectory() const;
 
-  /// Return TRUE if showing files as well as directories
-  bool showFiles() const;
+  /// Return true if showing files as well as directories
+  FXbool showFiles() const;
 
   /// Show or hide normal files
-  void showFiles(bool showing);
+  void showFiles(FXbool showing);
 
-  /// Return TRUE if showing hidden files
-  bool showHiddenFiles() const;
+  /// Return true if showing hidden files
+  FXbool showHiddenFiles() const;
 
   /// Show or hide hidden files
-  void showHiddenFiles(bool showing);
+  void showHiddenFiles(FXbool showing);
 
   /// Return wildcard matching mode
   FXuint getMatchMode() const;

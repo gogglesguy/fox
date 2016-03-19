@@ -3,7 +3,7 @@
 *                        C o l o r W h e e l   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorWheel.h,v 1.32 2006/03/31 07:33:01 fox Exp $                      *
+* $Id: FXColorWheel.h,v 1.34 2007/02/07 20:21:52 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXCOLORWHEEL_H
 #define FXCOLORWHEEL_H
@@ -54,8 +54,8 @@ protected:
   FXColorWheel();
   void updatedial();
   void movespot(FXint x,FXint y);
-  bool hstoxy(FXint& x,FXint& y,FXfloat h,FXfloat s) const;
-  bool xytohs(FXfloat& h,FXfloat& s,FXint x,FXint y) const;
+  FXbool hstoxy(FXint& x,FXint& y,FXfloat h,FXfloat s) const;
+  FXbool xytohs(FXfloat& h,FXfloat& s,FXint x,FXint y) const;
 private:
   FXColorWheel(const FXColorWheel&);
   FXColorWheel &operator=(const FXColorWheel&);

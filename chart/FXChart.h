@@ -3,7 +3,7 @@
 *                        C h a r t   B a s e   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXChart.h,v 1.17 2006/01/22 18:01:13 fox Exp $                           *
+* $Id: FXChart.h,v 1.23 2007/02/07 20:21:51 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXCHART_H
 #define FXCHART_H
@@ -45,26 +45,26 @@ namespace FX {
 
 /// Tickmark placement styles
 enum {
-  TICKS_OFF     = 0,                            /// No tickmarks
-  TICKS_MAJOR   = 0x01,                         /// Display major ticks
-  TICKS_MINOR   = 0x02,                         /// Display minor ticks
-  TICKS_INSIDE  = 0x04,                         /// Tickmarks inside box
-  TICKS_OUTSIDE = 0x08,                         /// Tickmarks outside box
-  TICKS_CROSS   = (TICKS_INSIDE|TICKS_OUTSIDE)  /// Tickmarks inside and outside box
+  TICKS_OFF     = 0,            /// No tickmarks
+  TICKS_MAJOR   = 0x01,         /// Display major ticks
+  TICKS_MINOR   = 0x02,         /// Display minor ticks
+  TICKS_INSIDE  = 0x04,         /// Tickmarks inside box
+  TICKS_OUTSIDE = 0x08,         /// Tickmarks outside box
+  TICKS_CROSS   = 0x0C          /// Tickmarks inside and outside box
   };
 
 
 /// Tickmark definition
-struct Ticks {
-  FXuchar  style;               /// Style flags
-  FXuchar  majorlength;         /// Major tick length
-  FXuchar  minorlength;         /// Minor tick length
-  FXuchar  majorweight;         /// Major tick line weight
-  FXuchar  minorweight;         /// Minor tick line weight
+struct TickStyle {
   FXdouble majorspace;          /// Major tick spacing
   FXdouble minorspace;          /// Minor tick spacing
   FXColor  majorcolor;          /// Major tick color
   FXColor  minorcolor;          /// Minor tick color
+  FXuchar  majorlength;         /// Major tick length
+  FXuchar  minorlength;         /// Minor tick length
+  FXuchar  majorweight;         /// Major tick line weight
+  FXuchar  minorweight;         /// Minor tick line weight
+  FXuchar  style;               /// Style flags
   };
 
 
@@ -81,12 +81,12 @@ enum {
 
 /// Line style definition
 struct LineStyle {
-  FXuchar  style;               /// Line style flags
+  FXColor  forecolor;           /// Line color
+  FXColor  backcolor;           /// Back color when stippling (may be clear)
   FXuchar  width;               /// Line width
   FXuchar  cap;                 /// End cap style
   FXuchar  join;                /// Join style
-  FXColor  color;               /// Line color
-  FXColor  backcolor;           /// Back color when stippling (may be clear)
+  FXuchar  style;               /// Line style flags
   };
 
 
@@ -98,21 +98,30 @@ enum {
   FILLSTYLE_TEXTURE,            /// Repeating texture
   FILLSTYLE_IMAGE,              /// Fill with an image
   FILLSTYLE_HORIZONTAL,         /// Horizontal gradient
-  FILLSTYLE_VERTICAL,           /// Vertical gradient
-  FILLSTYLE_DIAGONAL,           /// Diagonal gradient
-  FILLSTYLE_RDIAGONAL           /// Reverse diagonal gradient
+  FILLSTYLE_VERTICAL
   };
 
 
 /// Fill style definition
 struct FillStyle {
-  FXuchar   style;              /// Fill style
-  FXuchar   hatch;              /// Hatch pattern if hatch style
   FXImage  *image;              /// Image used for texture or image fill
-  FXColor   color;              /// Fill color
+  FXColor   forecolor;          /// Fill color
   FXColor   backcolor;          /// Back color when hatching (may be clear)
   FXColor   lower;              /// Lower gradient color
   FXColor   upper;              /// Upper gradient color
+  FXuchar   hatch;              /// Hatch pattern if hatch style
+  FXuchar   style;              /// Fill style
+  };
+
+
+/// Text alignment styles
+enum {
+  HOR_ALIGN_CENTER = 0,         /// Horizontally centered
+  HOR_ALIGN_LEFT   = 1,         /// Left aligned
+  HOR_ALIGN_RIGHT  = 2,         /// Right aligned
+  VER_ALIGN_CENTER = 0,         /// Vertically centered
+  VER_ALIGN_TOP    = 4,         /// Top aligned
+  VER_ALIGN_BOTTOM = 8          /// Bottom aligned
   };
 
 
@@ -121,16 +130,9 @@ struct TextStyle {
   FXFont   *font;               /// Text font
   FXColor   color;              /// Text color
   FXColor   shadowcolor;        /// Text shadow color (may be clear)
-  FXshort   shadowx;            /// X shadow offset
-  FXshort   shadowy;            /// Y shadow offset
-  };
-
-
-/// Tick number definition
-struct Numbers {
-  FXuchar   style;              /// Number format style
-  // ... How to format ... //
-  TextStyle textstyle;          /// Text display style
+  FXuchar   shadowx;            /// X shadow offset
+  FXuchar   shadowy;            /// Y shadow offset
+  FXuchar   style;              /// Text Style
   };
 
 
@@ -150,16 +152,9 @@ enum {
 
 /// Marker definition
 struct Marker {
-  FXuchar style;                /// Marker style
   FXColor color;                /// Color of markers
-  FXint   size;                 /// How big to draw markers
-  };
-
-
-/// Caption definition
-struct Caption {
-  FXString  caption;            /// Text string
-  TextStyle textstyle;          /// Text display style
+  FXuchar size;                 /// How big to draw markers
+  FXuchar style;                /// Marker style
   };
 
 
@@ -172,10 +167,17 @@ enum {
 
 
 /// Grid defintion
-struct Grid {
-  FXuchar   style;              /// Grid draw style
+struct GridStyle {
   LineStyle major;              /// Major grid line styles
   LineStyle minor;              /// Minor grid line styles
+  FXuchar   style;              /// Grid draw style
+  };
+
+
+/// Range description
+struct Range {
+  FXdouble minimum;             /// Minumum value
+  FXdouble maximum;             /// Maximum value
   };
 
 
@@ -197,33 +199,38 @@ enum {
 
 /// Axis definition
 struct Axis {
+  Range       axisrange;        /// Range of displayed part
+  Range       datarange;        /// Range of data
+  TickStyle   tickstyle;        /// Tick drawing style
+  GridStyle   gridstyle;        /// Grid settings
+  TextStyle   labelstyle;       /// Style for axis caption
+  TextStyle   unitstyle;        /// Style for units
+  TextStyle   numberstyle;      /// Style for numbers
+  LineStyle   linestyle;        /// Line style of axis
   FXuint      style;            /// Axis style flags
-  Ticks       ticks;            /// Tick drawing style
-  Grid        grid;             /// Grid settings
-  Caption     label;            /// Axis caption
-  Caption     units;            /// Axis units
-  Numbers     numbers;          /// Number drawing info
-  FXColor     linecolor;        /// Line color of axis line
-  FXuchar     lineweight;       /// Line weight of axis line
-  FXdouble    minimum;          /// Maximum data value
-  FXdouble    maximum;          /// Minimum data value
   };
 
 
 class FXImage;
 
 
-// Base class for the various chart widgets
+/// Base class for the various chart widgets
 class FXCHARTAPI FXChart : public FXComposite {
   FXDECLARE(FXChart)
 protected:
-  FXImage  *chart;      // Chart image
-  FXString  tip;        // Tooltip value
-  FXString  help;       // Help value
-  FillStyle fill;       // Fill style
+  FXImage  *chart;              // Chart image
+  FXString  caption;            // Caption over plot
+  FXString  tip;                // Tooltip value
+  FXString  help;               // Help value
+  FillStyle fillstyle;          // Plot background fill style
+  TextStyle captionstyle;       // Plot caption style
 protected:
   FXChart();
-  void drawMarker(FXDC& dc,FXint x,FXint y,const Marker& m) const;
+  FXint textWidth(const TextStyle& ts,const FXString& string) const;
+  FXint textHeight(const TextStyle& ts,const FXString& string) const;
+  void drawText(FXDC& dc,const TextStyle& ts,FXint x,FXint y,const FXString& string) const;
+  void drawMarker(FXDC& dc,const Marker& ms,FXint x,FXint y) const;
+  void drawRectangle(FXDC& dc,const FillStyle& fs,FXint x,FXint y,FXint w,FXint h) const;
 private:
   FXChart(const FXChart&);
   FXChart &operator=(const FXChart&);
@@ -258,7 +265,7 @@ public:
   void setFillStyle(const FillStyle& fs);
 
   /// Get fill style
-  FillStyle getFillStyle() const { return fill; }
+  FillStyle getFillStyle() const { return fillstyle; }
 
   /// Set status line help text for this chart
   void setHelpText(const FXString& text);

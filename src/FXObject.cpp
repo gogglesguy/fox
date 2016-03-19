@@ -3,7 +3,7 @@
 *                         T o p l e v el   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXObject.cpp,v 1.44 2006/03/22 06:31:37 fox Exp $                        *
+* $Id: FXObject.cpp,v 1.47 2007/02/07 20:22:13 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -53,7 +53,7 @@ using namespace FX;
 namespace FX {
 
 // Allocate memory
-bool fxmalloc(void** ptr,unsigned long size){
+FXbool fxmalloc(void** ptr,unsigned long size){
   *ptr=NULL;
   if(size!=0){
     if((*ptr=malloc(size))==NULL) return false;
@@ -63,7 +63,7 @@ bool fxmalloc(void** ptr,unsigned long size){
 
 
 // Allocate cleaned memory
-bool fxcalloc(void** ptr,unsigned long size){
+FXbool fxcalloc(void** ptr,unsigned long size){
   *ptr=NULL;
   if(size!=0){
     if((*ptr=calloc(size,1))==NULL) return false;
@@ -73,7 +73,7 @@ bool fxcalloc(void** ptr,unsigned long size){
 
 
 // Resize memory
-bool fxresize(void** ptr,unsigned long size){
+FXbool fxresize(void** ptr,unsigned long size){
   register void *p=NULL;
   if(size!=0){
     if((p=realloc(*ptr,size))==NULL) return false;
@@ -87,7 +87,7 @@ bool fxresize(void** ptr,unsigned long size){
 
 
 // Allocate and initialize memory
-bool fxmemdup(void** ptr,const void* src,unsigned long size){
+FXbool fxmemdup(void** ptr,const void* src,unsigned long size){
   *ptr=NULL;
   if(size!=0 && src!=NULL){
     if((*ptr=malloc(size))==NULL) return false;
@@ -99,12 +99,14 @@ bool fxmemdup(void** ptr,const void* src,unsigned long size){
 
 // String duplicate
 FXchar *fxstrdup(const FXchar* str){
-  register FXchar *copy;
-  if(str!=NULL && (copy=(FXchar*)malloc(strlen(str)+1))!=NULL){
-    strcpy(copy,str);
-    return copy;
+  register FXchar *ptr=NULL;
+  if(str!=NULL){
+    register FXint size=strlen(str)+1;
+    if((ptr=(FXchar*)malloc(size))!=NULL){
+      memcpy(ptr,str,size);
+      }
     }
-  return NULL;
+  return ptr;
   }
 
 
@@ -187,7 +189,7 @@ const FXMetaClass* FXMetaClass::getMetaClassFromName(const FXchar* name){
 
 
 // Test if subclass
-bool FXMetaClass::isSubClassOf(const FXMetaClass* metaclass) const {
+FXbool FXMetaClass::isSubClassOf(const FXMetaClass* metaclass) const {
   register const FXMetaClass* cls;
   for(cls=this; cls; cls=cls->baseClass){
     if(cls==metaclass) return true;
@@ -282,7 +284,7 @@ const FXchar* FXObject::getClassName() const { return getMetaClass()->getClassNa
 
 
 // Check if object belongs to a class
-bool FXObject::isMemberOf(const FXMetaClass* metaclass) const {
+FXbool FXObject::isMemberOf(const FXMetaClass* metaclass) const {
   return getMetaClass()->isSubClassOf(metaclass);
   }
 

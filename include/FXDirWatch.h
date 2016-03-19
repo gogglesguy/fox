@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                        S i g n a l   G U I   T h r e a d                      *
+*         I n t e r - T h r e a d    M e s s a g i n g    S e r v i c e         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,14 +19,15 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGUISignal.h,v 1.6 2006/01/22 17:58:04 fox Exp $                        *
+* $Id: FXDirWatch.h,v 1.6 2007/02/07 20:21:53 fox Exp $                         *
 ********************************************************************************/
-#ifndef FXGUISIGNAL_H
-#define FXGUISIGNAL_H
+#ifndef FXDIRWATCH_H
+#define FXDIRWATCH_H
 
 #ifndef FXOBJECT_H
 #include "FXObject.h"
 #endif
+
 
 namespace FX {
 
@@ -34,71 +35,37 @@ class FXApp;
 
 
 /**
-* A GUI Signal is an object used by a worker thread to signal the
-* user interface thread of some event; it wakes up the user interface
-* thread from the blocking state and causes it to send the given message
-* to the GUI Signal object's target.
 */
-class FXAPI FXGUISignal : public FXObject {
-  FXDECLARE(FXGUISignal)
+class FXDirWatch : public FXObject {
+  FXDECLARE(FXDirWatch)
 private:
-  FXApp     *app;       // Application
+  FXApp *app;
+private:
+  FXInputHandle hnd;
 protected:
-  FXObject  *target;    // Target object
-  void      *data;      // User data
-  FXSelector message;   // Message id
+  FXDirWatch();
 private:
-#ifndef WIN32
-  FXInputHandle fd[2];
-#else
-  FXInputHandle event;
-#endif
-protected:
-  FXGUISignal();
-private:
-  FXGUISignal(const FXGUISignal&);
-  FXGUISignal& operator=(const FXGUISignal&);
+  FXDirWatch(const FXDirWatch&);
+  FXDirWatch& operator=(const FXDirWatch&);
 public:
   enum{
-    ID_IO_READ=0,
+    ID_IO_READ=1,
     ID_LAST
     };
 public:
-  long onSignal(FXObject*,FXSelector,void*);
+  long onMessage(FXObject*,FXSelector,void*);
 public:
 
-  /// Constructor
-  FXGUISignal(FXApp* a,FXObject* tgt=NULL,FXSelector sel=0,void* ptr=NULL);
+  /// Initialize directory watcher
+  FXDirWatch(FXApp* a);
 
-  /// Get application
+  /// Get application pointer
   FXApp* getApp() const { return app; }
 
-  /// Set the message target object
-  void setTarget(FXObject *t){ target=t; }
+  FXbool watch(const FXString& dir);
 
-  /// Get the message target object, if any
-  FXObject* getTarget() const { return target; }
-
-  /// Set the message identifier
-  void setSelector(FXSelector sel){ message=sel; }
-
-  /// Get the message identifier
-  FXSelector getSelector() const { return message; }
-
-  /// Set user data pointer
-  void setData(void *ptr){ data=ptr; }
-
-  /// Get user data pointer
-  void* getData() const { return data; }
-
-  /**
-  * Signal the event; this API may be called by the worker thread
-  * to send a message to the user-interface thread.
-  */
-  void signal();
-
-  /// Destructor
-  virtual ~FXGUISignal();
+  /// Clean up directory watcher
+  virtual ~FXDirWatch();
   };
 
 }

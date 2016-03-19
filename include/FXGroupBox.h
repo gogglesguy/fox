@@ -3,7 +3,7 @@
 *                G r o u p  B o x   W i n d o w   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGroupBox.h,v 1.23 2006/01/22 17:58:04 fox Exp $                        *
+* $Id: FXGroupBox.h,v 1.24 2007/02/07 20:21:55 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGROUPBOX_H
 #define FXGROUPBOX_H

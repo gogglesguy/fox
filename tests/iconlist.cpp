@@ -3,9 +3,9 @@
 *                           Test Icon List Widget                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: iconlist.cpp,v 1.23 2006/01/22 17:59:01 fox Exp $                        *
+* $Id: iconlist.cpp,v 1.24 2007/02/07 20:22:24 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

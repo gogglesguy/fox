@@ -3,7 +3,7 @@
 *             D y n a m i c   L i n k   L i b r a r y   S u p p o r t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,37 +19,84 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDLL.h,v 1.8 2006/01/22 17:58:00 fox Exp $                              *
+* $Id: FXDLL.h,v 1.23 2007/02/07 20:21:53 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXDLL_H
 #define FXDLL_H
 
 namespace FX {
 
-/**
-* Open library with given name, returning handle to the
-* library, or NULL if the operation failed.
-*/
-extern FXAPI void* fxdllOpen(const FXchar *dllname);
-
 
 /**
-* Close library represented by dllhandle.
+* Wrap library module handle to allow various operations
+* on libraries to be performed.
 */
-extern FXAPI void fxdllClose(void* dllhandle);
+class FXAPI FXDLL {
+private:
+  void *hnd;
+public:
+
+  /// Default constructor
+  FXDLL():hnd(NULL){}
+
+  /// Constructor with handle
+  FXDLL(void *h):hnd(h){}
+
+  /// Copy constructor
+  FXDLL(const FXDLL& d):hnd(d.hnd){}
+
+  /// Return the name of the library module
+  FXString name() const;
+
+  /// Return library module handle
+  void* handle() const { return hnd; }
+
+  /// True if library was loaded
+  FXbool loaded() const { return hnd!=NULL; }
+
+  /// Load the library module from the given path
+  FXbool load(const FXString& path);
+
+  /// Unload the library module
+  void unload();
+
+  /// Return the address of the symbol in this library module
+  void* address(const FXchar* sym) const;
+  void* address(const FXString& sym) const;
+
+  /// Return the symbol name of the given address
+  static FXString symbol(void *addr);
+
+  /// Return the name of the library module containing the address
+  static FXString name(void *addr);
+
+  /// Find DLL containing symbol
+  static FXDLL dll(void* addr);
+
+  /// Find DLL of ourselves
+  static FXDLL dll();
+
+  /// Return error message if error occurred loading the library module
+  static FXString error();
+  };
 
 
 /**
-* Return address of the symbol in the library represented by
-* dllhandle, or NULL if the operation failed.
+* Wrap DLL handle but owns the handle; thus, the library module
+* will automatically be unloaded when auto-dll is destroyed.
 */
-extern FXAPI void* fxdllSymbol(void* dllhandle,const FXchar* dllsymbol);
+class FXAPI FXAUTODLL : public FXDLL {
+private:
+  FXAUTODLL(const FXAUTODLL&);
+  FXAUTODLL &operator=(const FXAUTODLL&);
+public:
 
+  /// Initialize by loading given library name
+  FXAUTODLL(const FXString& name);
 
-/**
-* Return the string error message when loading dll's.
-*/
-extern FXAPI FXString fxdllError();
+  /// Unload library if we have one
+  ~FXAUTODLL();
+  };
 
 
 }

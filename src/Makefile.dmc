@@ -5,7 +5,7 @@
 ##############################################################################
 # Contributed by: Andre Fornacon <afo@zlug.org>                              #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.51 2006/03/22 03:46:48 fox Exp $		     #
+# $Id: Makefile.dmc,v 1.60 2007/01/31 16:20:02 fox Exp $		     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or 	     #
 # modify it under the terms of the GNU Library General Public		     #
@@ -117,6 +117,8 @@ FXBitmapView.cpp \
 FXButton.cpp \
 FXBZFileStream.cpp \
 FXCURCursor.cpp \
+FXCalendar.cpp \
+FXCalendarView.cpp \
 FXCanvas.cpp \
 FXCheckButton.cpp \
 FXChoiceBox.cpp \
@@ -127,6 +129,8 @@ FXColorNames.cpp \
 FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
+FXComplexf.cpp \
+FXComplexd.cpp \
 FXComboBox.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
@@ -186,7 +190,6 @@ FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
-FXGUISignal.cpp \
 FXGZFileStream.cpp \
 FXHash.cpp \
 FXHeader.cpp \
@@ -232,6 +235,7 @@ FXMenuPane.cpp \
 FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
+FXMessageChannel.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -250,6 +254,7 @@ FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
+FXMessenger.cpp \
 FXRGBIcon.cpp \
 FXRGBImage.cpp \
 FXRadioButton.cpp \
@@ -303,6 +308,7 @@ FXText.cpp \
 FXTextCodec.cpp \
 FXTextField.cpp \
 FXThread.cpp \
+FXThreadPool.cpp \
 FXToggleButton.cpp \
 FXToolBar.cpp \
 FXToolBarGrip.cpp \
@@ -440,7 +446,6 @@ FXGLViewer.obj \
 FXGLVisual.obj \
 FXGradientBar.obj \
 FXGroupBox.obj \
-FXGUISignal.obj \
 FXGZStream.obj \
 FXHash.obj \
 FXHeader.obj \
@@ -486,6 +491,7 @@ FXMenuPane.obj \
 FXMenuSeparator.obj \
 FXMenuTitle.obj \
 FXMessageBox.obj \
+FXMessageChannel.obj \
 FXObject.obj \
 FXObjectList.obj \
 FXOptionMenu.obj \
@@ -504,6 +510,7 @@ FXProgressBar.obj \
 FXProgressDialog.obj \
 FXQuatd.obj \
 FXQuatf.obj \
+FXMessenger.obj \
 FXRGBIcon.obj \
 FXRGBImage.obj \
 FXRadioButton.obj \
@@ -623,13 +630,10 @@ all: $(FOXLIB)
 FXApp.cpp: icons.cpp
 
 icons.h: $(ICONS)
-	$(RM) $@
-	$(RESWRAP) -i -n FX -o icons.h $(ICONS)
+	$(RESWRAP) -h -n FX -o icons.h $(ICONS)
 
 icons.cpp: $(ICONS) icons.h
-	$(RM) $@
-	@echo \#include "icons.h" >$@
-	$(RESWRAP) -n FX -oa $@ $(ICONS)
+	$(RESWRAP) -i icons.h -n FX -oa icons.cpp $(ICONS)
 
 clean:
 	del $(FOXLIB)

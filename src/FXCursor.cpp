@@ -3,7 +3,7 @@
 *                         C u r s o r - O b j e c t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXCursor.cpp,v 1.63 2006/03/25 06:34:08 fox Exp $                        *
+* $Id: FXCursor.cpp,v 1.67 2007/02/07 20:22:04 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -61,7 +61,7 @@ using namespace FX;
 
 namespace FX {
 
-extern bool fxloadXBM(FXColor*& data,const FXuchar *pixels,const FXuchar *mask,FXint width,FXint height);
+extern FXbool fxloadXBM(FXColor*& data,const FXuchar *pixels,const FXuchar *mask,FXint width,FXint height);
 
 
 // Standard colors
@@ -120,8 +120,8 @@ FXCursor::FXCursor(FXApp* a,const FXColor *pix,FXint w,FXint h,FXint hx,FXint hy
   }
 
 
-// Return TRUE if color cursor
-bool FXCursor::isColor() const {
+// Return true if color cursor
+FXbool FXCursor::isColor() const {
   register FXint i;
   if(data){
     for(i=width*height-1; 0<=i; i--){
@@ -134,7 +134,7 @@ bool FXCursor::isColor() const {
 
 #ifdef WIN32
 
-static bool supportsColorCursors(){
+static FXbool supportsColorCursors(){
 
   // Try calling GetVersionEx using the OSVERSIONINFOEX structure.
   // If that fails, try using the OSVERSIONINFO structure.
@@ -201,10 +201,19 @@ void FXCursor::create(){
           src=(FXuchar*)data;
           end=src+width*height*4;
           do{
+#ifndef __APPLE__
             dst[0]=src[2];      // B
             dst[1]=src[1];      // G
             dst[2]=src[0];      // R
             dst[3]=src[3];      // A
+#else
+            // A bug in Apple's X11 implementation has alpha on
+            // the wrong end and BGR wrong way round
+            dst[0]=src[3];      // A
+            dst[1]=src[0];      // R
+            dst[2]=src[1];      // G
+            dst[3]=src[2];      // B
+#endif
             dst+=4;
             src+=4;
             }
@@ -306,7 +315,7 @@ void FXCursor::create(){
           if(!mask){ throw FXImageException("unable to create cursor"); }
 
           // Create cursor
-          ii.fIcon=FALSE;
+          ii.fIcon=false;
           ii.xHotspot=hotx;
           ii.yHotspot=hoty;
           ii.hbmMask=mask;
@@ -394,7 +403,7 @@ void FXCursor::destroy(){
 
 
 // Save pixel data only
-bool FXCursor::savePixels(FXStream& store) const {
+FXbool FXCursor::savePixels(FXStream& store) const {
   FXuint size=width*height;
   store.save(data,size);
   return true;
@@ -402,7 +411,7 @@ bool FXCursor::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXCursor::loadPixels(FXStream& store){
+FXbool FXCursor::loadPixels(FXStream& store){
   FXuint size=width*height;
   if(options&CURSOR_OWNED){freeElms(data);}
   if(!allocElms(data,size)) return false;

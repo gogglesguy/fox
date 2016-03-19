@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXExpression.cpp,v 1.31 2006/03/23 07:10:03 fox Exp $                    *
+* $Id: FXExpression.cpp,v 1.34 2007/02/07 20:22:07 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -190,167 +190,6 @@ struct FXCompile {
 
 /*******************************************************************************/
 
-#ifndef NDEBUG
-
-// Dump program
-void dump(FXuchar *prog){
-  FXint op;
-  fxmessage("\n");
-  fxmessage("Program:\n");
-  fxmessage("%-10p SIZE   %d\n",prog,*((FXint*)prog));
-  prog+=4;
-  while(1){
-    fxmessage("%-10p ",prog);
-    op=*prog++;
-    switch(op){
-      case OP_END:
-        fxmessage("OP_END\n");
-        goto x;
-      case OP_NUM:
-        fxmessage("OP_NUM %.10g\n",*((FXdouble*)prog));
-        prog+=8;
-        break;
-      case OP_VAR:
-        fxmessage("OP_VAR %d\n",*prog);
-        prog++;
-        break;
-      case OP_PI:
-        fxmessage("OP_PI\n");
-        break;
-      case OP_EULER:
-        fxmessage("OP_EULER\n");
-        break;
-      case OP_RAND:
-        fxmessage("OP_RAND\n");
-        break;
-      case OP_NOT:
-        fxmessage("OP_NOT\n");
-        break;
-      case OP_NEG:
-        fxmessage("OP_NEG\n");
-        break;
-      case OP_SIN:
-        fxmessage("OP_SIN\n");
-        break;
-      case OP_COS:
-        fxmessage("OP_COS\n");
-        break;
-      case OP_TAN:
-        fxmessage("OP_TAN\n");
-        break;
-      case OP_ASIN:
-        fxmessage("OP_ASIN\n");
-        break;
-      case OP_ACOS:
-        fxmessage("OP_ACOS\n");
-        break;
-      case OP_ATAN:
-        fxmessage("OP_ATAN\n");
-        break;
-      case OP_SINH:
-        fxmessage("OP_SINH\n");
-        break;
-      case OP_COSH:
-        fxmessage("OP_COSH\n");
-        break;
-      case OP_TANH:
-        fxmessage("OP_TANH\n");
-        break;
-      case OP_ASINH:
-        fxmessage("OP_ASINH\n");
-        break;
-      case OP_ACOSH:
-        fxmessage("OP_ACOSH\n");
-        break;
-      case OP_ATANH:
-        fxmessage("OP_ATANH\n");
-        break;
-      case OP_SQRT:
-        fxmessage("OP_SQRT\n");
-        break;
-      case OP_ABS:
-        fxmessage("OP_ABS\n");
-        break;
-      case OP_CEIL:
-        fxmessage("OP_CEIL\n");
-        break;
-      case OP_FLOOR:
-        fxmessage("OP_FLOOR\n");
-        break;
-      case OP_EXP:
-        fxmessage("OP_EXP\n");
-        break;
-      case OP_LOG:
-        fxmessage("OP_LOG\n");
-        break;
-      case OP_LOG10:
-        fxmessage("OP_LOG10\n");
-        break;
-      case OP_MUL:
-        fxmessage("OP_MUL\n");
-        break;
-      case OP_DIV:
-        fxmessage("OP_DIV\n");
-        break;
-      case OP_MOD:
-        fxmessage("OP_MOD\n");
-        break;
-      case OP_ADD:
-        fxmessage("OP_ADD\n");
-        break;
-      case OP_SUB:
-        fxmessage("OP_SUB\n");
-        break;
-      case OP_AND:
-        fxmessage("OP_AND\n");
-        break;
-      case OP_OR:
-        fxmessage("OP_OR\n");
-        break;
-      case OP_XOR:
-        fxmessage("OP_XOR\n");
-        break;
-      case OP_LT:
-        fxmessage("OP_LT\n");
-        break;
-      case OP_GT:
-        fxmessage("OP_GT\n");
-        break;
-      case OP_LE:
-        fxmessage("OP_LE\n");
-        break;
-      case OP_GE:
-        fxmessage("OP_GE\n");
-        break;
-      case OP_EQ:
-        fxmessage("OP_EQ\n");
-        break;
-      case OP_NE:
-        fxmessage("OP_NE\n");
-        break;
-      case OP_POW:
-        fxmessage("OP_POW\n");
-        break;
-      case OP_MAX:
-        fxmessage("OP_MAX\n");
-        break;
-      case OP_MIN:
-        fxmessage("OP_MIN\n");
-        break;
-      case OP_ATAN2:
-        fxmessage("OP_ATAN2\n");
-        break;
-      default:
-        fxmessage("OP_%d: error\n",op);
-        goto x;
-      }
-    }
-x:fxmessage("end\n");
-  }
-
-#endif
-
-/*******************************************************************************/
 
 // Compile expression
 FXExpressionError FXCompile::compile(){
@@ -934,6 +773,12 @@ FXExpression& FXExpression::operator=(const FXExpression& orig){
   return *this;
   }
 
+/*******************************************************************************/
+
+#ifdef EXPRDEBUG
+#include "fxexpdbg.h"
+#endif
+
 
 // Parse expression, return error code if syntax error is found
 FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* variables){
@@ -969,7 +814,6 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
 
       // Allocate new code
       size=cs.pc-cs.code;
-      code=(FXuchar*)malloc(size);
       if(!allocElms(code,size)){
         code=(FXuchar*)initial;
         return EXPRERR_MEMORY;
@@ -991,7 +835,7 @@ FXExpressionError FXExpression::parse(const FXchar* expression,const FXchar* var
       err=cs.compile();
 
       // Dump for debugging
-#ifndef NDEBUG
+#ifdef EXPRDEBUG
       if(fxTraceLevel>100) dump(code);
 #endif
       }

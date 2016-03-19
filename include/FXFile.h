@@ -3,7 +3,7 @@
 *                             F i l e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFile.h,v 1.100 2006/01/22 17:58:01 fox Exp $                            *
+* $Id: FXFile.h,v 1.105 2007/02/07 20:21:54 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXFILE_H
 #define FXFILE_H
@@ -45,16 +45,16 @@ public:
   FXFile(){ }
 
   /// Construct file and attach existing handle h
-  FXFile(FXInputHandle handle,FXuint mode);
+  FXFile(FXInputHandle h,FXuint m);
 
   /// Construct and open a file
-  FXFile(const FXString& file,FXuint mode=FXIO::Reading,FXuint perm=FXIO::OwnerReadWrite|FXIO::GroupReadWrite|FXIO::OtherReadWrite);
+  FXFile(const FXString& file,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
 
   /// Open file
-  virtual bool open(const FXString& file,FXuint mode=FXIO::Reading,FXuint perm=FXIO::OwnerReadWrite|FXIO::GroupReadWrite|FXIO::OtherReadWrite);
+  virtual FXbool open(const FXString& file,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
 
   /// Open device with access mode and handle
-  virtual bool open(FXInputHandle handle,FXuint mode);
+  virtual FXbool open(FXInputHandle h,FXuint m);
 
   /// Get current file position
   virtual FXlong position() const;
@@ -68,59 +68,59 @@ public:
   /// Write block of bytes, returning number of bytes written
   virtual FXival writeBlock(const void* data,FXival count);
 
-  /// Truncate file
-  virtual FXlong truncate(FXlong size);
+  /// Truncate file to size s
+  virtual FXlong truncate(FXlong s);
 
   /// Flush to disk
-  virtual bool flush();
+  virtual FXbool flush();
 
   /// Return file size
   virtual FXlong size();
 
   /// Test if we're at the end
-  virtual bool eof();
+  virtual FXbool eof();
 
   /// Close file
-  virtual bool close();
+  virtual FXbool close();
 
 
   /// Create new (empty) file
-  static bool create(const FXString& file,FXuint perm=FXIO::OwnerReadWrite|FXIO::GroupReadWrite|FXIO::OtherReadWrite);
+  static FXbool create(const FXString& file,FXuint perm=FXIO::AllReadWrite);
 
   /// Remove file
-  static bool remove(const FXString& file);
+  static FXbool remove(const FXString& file);
 
   /// Rename or move srcfile to dstfile, replacing dstfile if it exists
-  static bool rename(const FXString& srcfile,const FXString& dstfile);
+  static FXbool rename(const FXString& srcfile,const FXString& dstfile);
 
   /// Link file
-  static bool link(const FXString& srcfile,const FXString& dstfile);
+  static FXbool link(const FXString& srcfile,const FXString& dstfile);
 
   /// Read symbolic link
   static FXString symlink(const FXString& file);
 
   /// Symbolic link file
-  static bool symlink(const FXString& srcfile,const FXString& dstfile);
+  static FXbool symlink(const FXString& srcfile,const FXString& dstfile);
 
   /// Return true if files are identical
-  static bool identical(const FXString& file1,const FXString& file2);
+  static FXbool identical(const FXString& file1,const FXString& file2);
 
   /// Copy srcfile to dstfile, overwriting dstfile if allowed
-  static bool copy(const FXString& srcfile,const FXString& dstfile,bool overwrite=false);
+  static FXbool copy(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
 
   /// Concatenate srcfile1 and srcfile2 to dstfile, overwriting dstfile if allowed
-  static bool concat(const FXString& srcfile1,const FXString& srcfile2,const FXString& dstfile,bool overwrite=false);
+  static FXbool concat(const FXString& srcfile1,const FXString& srcfile2,const FXString& dstfile,FXbool overwrite=false);
 
 
 
   /// Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
-  static bool copyFiles(const FXString& srcfile,const FXString& dstfile,bool overwrite=false);
+  static FXbool copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
 
   /// Recursively copy or move files or directories from srcfile to dstfile, overwriting dstfile if allowed
-  static bool moveFiles(const FXString& srcfile,const FXString& dstfile,bool overwrite=false);
+  static FXbool moveFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
 
   /// Recursively remove file or directory, recurse if allowed
-  static bool removeFiles(const FXString& path,bool recursive=false);
+  static FXbool removeFiles(const FXString& path,FXbool recursive=false);
 
   /// Destroy
   virtual ~FXFile();

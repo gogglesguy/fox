@@ -3,7 +3,7 @@
 *                   M e m o r y   S t r e a m   C l a s s e s                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMemoryStream.cpp,v 1.18 2006/03/23 06:51:53 fox Exp $                  *
+* $Id: FXMemoryStream.cpp,v 1.20 2007/02/07 20:22:12 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -66,7 +66,7 @@ FXuval FXMemoryStream::readBuffer(FXuval){
 
 
 // Open a stream, possibly with an initial data array
-bool FXMemoryStream::open(FXStreamDirection save_or_load,FXuchar* data){
+FXbool FXMemoryStream::open(FXStreamDirection save_or_load,FXuchar* data){
   if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXMemoryStream::open: illegal stream direction.\n");}
   if(FXStream::open(save_or_load,data?ULONG_MAX:16UL,data)){
     if(save_or_load==FXStreamSave){
@@ -84,7 +84,7 @@ bool FXMemoryStream::open(FXStreamDirection save_or_load,FXuchar* data){
 
 
 // Open a stream, possibly with initial data array of certain size
-bool FXMemoryStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
+FXbool FXMemoryStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
   if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXMemoryStream::open: illegal stream direction.\n");}
   if(FXStream::open(save_or_load,size,data)){
     if(save_or_load==FXStreamSave){
@@ -132,7 +132,7 @@ void FXMemoryStream::giveBuffer(FXuchar *data,FXuval size){
 
 
 // Close the stream
-bool FXMemoryStream::close(){
+FXbool FXMemoryStream::close(){
   if(dir){
     if(owns){freeElms(begptr);}
     begptr=NULL;
@@ -149,7 +149,7 @@ bool FXMemoryStream::close(){
 // Move to position; if saving and we own the buffer, try to resize
 // and 0-fill the space; if loading and not out of range, move the pointer;
 // otherwise, return error code.
-bool FXMemoryStream::position(FXlong offset,FXWhence whence){
+FXbool FXMemoryStream::position(FXlong offset,FXWhence whence){
   if(dir==FXStreamDead){ fxerror("FXMemoryStream::position: stream is not open.\n"); }
   if(code==FXStreamOK){
     if(whence==FXFromCurrent) offset=offset+pos;

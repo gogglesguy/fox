@@ -3,7 +3,7 @@
 *                       M e n u   C a s c a d e   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuCascade.cpp,v 1.55 2006/01/22 17:58:35 fox Exp $                   *
+* $Id: FXMenuCascade.cpp,v 1.57 2007/02/07 20:22:12 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -126,7 +126,7 @@ void FXMenuCascade::destroy(){
 
 
 // If window can have focus
-bool FXMenuCascade::canFocus() const { return true; }
+FXbool FXMenuCascade::canFocus() const { return true; }
 
 
 // Pressed button
@@ -373,7 +373,7 @@ void FXMenuCascade::drawTriangle(FXDCWindow& dc,FXint l,FXint t,FXint,FXint b){
 
 
 // Test if logically inside
-bool FXMenuCascade::contains(FXint parentx,FXint parenty) const {
+FXbool FXMenuCascade::contains(FXint parentx,FXint parenty) const {
   FXint x,y;
   if(FXMenuCaption::contains(parentx,parenty)) return true;
   if(getMenu() && getMenu()->shown()){

@@ -3,7 +3,7 @@
 *                             B i t m a p    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBitmap.cpp,v 1.93 2006/04/03 03:43:16 fox Exp $                        *
+* $Id: FXBitmap.cpp,v 1.96 2007/02/07 20:22:03 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -516,7 +516,7 @@ void FXBitmap::resize(FXint w,FXint h){
 
 
 // Fill bitmap with uniform value
-void FXBitmap::fill(bool color){
+void FXBitmap::fill(FXbool color){
   if(data){
     memset(data,0-color,height*bytewidth);
     }
@@ -578,7 +578,7 @@ void FXBitmap::scale(FXint w,FXint h){
 
 
 // Mirror bitmap horizontally and/or vertically
-void FXBitmap::mirror(bool horizontal,bool vertical){
+void FXBitmap::mirror(FXbool horizontal,FXbool vertical){
   FXTRACE((100,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
   if(horizontal || vertical){
     if(data){
@@ -720,11 +720,11 @@ void FXBitmap::rotate(FXint degrees){
 
 
 // Crop bitmap to given rectangle
-void FXBitmap::crop(FXint x,FXint y,FXint w,FXint h,bool color){
+void FXBitmap::crop(FXint x,FXint y,FXint w,FXint h,FXbool color){
   if(w<1) w=1;
   if(h<1) h=1;
   if(x>=width || y>=height || x+w<=0 || y+h<=0){ fxerror("%s::crop: bad arguments.\n",getClassName()); }
-  FXTRACE((1,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
+  FXTRACE((100,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
   if(data){
     register FXuchar *pnn,*poo,*yyy,*pn,*po,*xx;
     register FXint oldbw=bytewidth;
@@ -766,7 +766,7 @@ void FXBitmap::crop(FXint x,FXint y,FXint w,FXint h,bool color){
       FXASSERT(ch>0);
       yyy=pnn+newbw*ch;
       cpybw=((cw-x+7)>>3)-((-x)>>3);
-      FXTRACE((1,"ow=%d oh=%d nw=%d nh=%d cw=%d ch=%d sh=%d cpybw=%d\n",ow,oh,nw,nh,cw,ch,sh,cpybw));
+      //FXTRACE((1,"ow=%d oh=%d nw=%d nh=%d cw=%d ch=%d sh=%d cpybw=%d\n",ow,oh,nw,nh,cw,ch,sh,cpybw));
       do{
         pn=pnn;
         po=poo;
@@ -898,7 +898,7 @@ void FXBitmap::setOptions(FXuint opts){
 
 
 // Save pixel data only
-bool FXBitmap::savePixels(FXStream& store) const {
+FXbool FXBitmap::savePixels(FXStream& store) const {
   FXuint size=height*bytewidth;
   store.save(data,size);
   return true;
@@ -906,7 +906,7 @@ bool FXBitmap::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXBitmap::loadPixels(FXStream& store){
+FXbool FXBitmap::loadPixels(FXStream& store){
   FXuint size=height*bytewidth;
   if(options&BITMAP_OWNED){ freeElms(data); }
   if(!allocElms(data,size)) return false;

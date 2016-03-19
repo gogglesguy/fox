@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: PathFinder.cpp,v 1.128 2006/03/31 07:33:04 fox Exp $                     *
+* $Id: PathFinder.cpp,v 1.136 2007/02/07 20:22:01 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -203,6 +203,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   rotatelefticon=new FXGIFIcon(getApp(),rotateleft);
   rotaterighticon=new FXGIFIcon(getApp(),rotateright);
   quiticon=new FXGIFIcon(getApp(),quit_gif);
+  configicon=new FXGIFIcon(getApp(),config_gif);
 
   // Set application icons for Window Manager
   setIcon(foxbigicon);
@@ -315,9 +316,9 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   // Edit Menu Pane
   editmenu=new FXMenuPane(this);
   new FXMenuTitle(menubar,"&Edit",NULL,editmenu);
-  new FXMenuCommand(editmenu,"Cu&t\tCtl-X\tCut to clipboard.",cuticon,this,ID_CLIPBOARD_CUT);
-  new FXMenuCommand(editmenu,"&Copy\tCtl-C\tCopy to clipboard.",copyicon,this,ID_CLIPBOARD_COPY);
-  new FXMenuCommand(editmenu,"&Paste\tCtl-V\tPaste from clipboard.",pasteicon,this,ID_CLIPBOARD_PASTE);
+  new FXMenuCommand(editmenu,"Cu&t\tCtl-X\tCut to clipboard.",cuticon,filelist,FXFileList::ID_CUT_SEL);
+  new FXMenuCommand(editmenu,"&Copy\tCtl-C\tCopy to clipboard.",copyicon,filelist,FXFileList::ID_COPY_SEL);
+  new FXMenuCommand(editmenu,"&Paste\tCtl-V\tPaste from clipboard.",pasteicon,filelist,FXFileList::ID_PASTE_SEL);
   new FXMenuSeparator(editmenu);
   new FXMenuCommand(editmenu,"&Select All\tCtl-A\tSelect all icons",NULL,filelist,FXFileList::ID_SELECT_ALL);
   new FXMenuCommand(editmenu,"&Deselect All\t\tDeselect all icons",NULL,filelist,FXFileList::ID_DESELECT_ALL);
@@ -373,7 +374,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   // Preferences menu
   prefmenu=new FXMenuPane(this);
   new FXMenuTitle(menubar,"&Options",NULL,prefmenu);
-  new FXMenuCommand(prefmenu,"&Preferences...\t\tEdit Preferences.",NULL,this,ID_PREFERENCES);
+  new FXMenuCommand(prefmenu,"&Preferences...\t\tEdit Preferences.",configicon,this,ID_PREFERENCES);
   new FXMenuSeparator(prefmenu);
   new FXMenuCommand(prefmenu,"&Save Settings...\t\tSave current settings.",NULL,this,ID_SAVE_SETTINGS);
 
@@ -556,6 +557,7 @@ PathFinderMain::~PathFinderMain(){
   delete rotatelefticon;
   delete rotaterighticon;
   delete quiticon;
+  delete configicon;
   }
 
 
@@ -768,8 +770,16 @@ long PathFinderMain::onFileListPopup(FXObject*,FXSelector,void* ptr){
 
 // About
 long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
-  FXMessageBox about(this,"About PathFinder","PathFinder File Browser V1.0\n\nUsing the FOX C++ GUI Library (http://www.fox-tookit.org)\n\nCopyright (C) 1998,2003 Jeroen van der Zijp (jeroen@fox-toolkit.org)",foxbigicon,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
-  about.execute();
+  FXDialogBox about(this,tr("About PathFinder"),DECOR_TITLE|DECOR_BORDER,0,0,0,0, 0,0,0,0, 0,0);
+  FXGIFIcon picture(getApp(),foxbig);
+  new FXLabel(&about,FXString::null,&picture,FRAME_GROOVE|LAYOUT_SIDE_LEFT|LAYOUT_CENTER_Y|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y,0,0,0,0, 0,0,0,0);
+  FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
+  new FXLabel(side,"PathFinder",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
+  new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
+  new FXLabel(side,FXStringFormat(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp (jeroen@fox-toolkit.org).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
+  button->setFocus();
+  about.execute(PLACEMENT_OWNER);
   return 1;
   }
 
@@ -882,8 +892,8 @@ long PathFinderMain::onUpdForwardDirectory(FXObject* sender,FXSelector,void*){
 
 // Update title
 long PathFinderMain::onUpdTitle(FXObject* sender,FXSelector,void*){
-  FXString title="PathFinder:- " + filelist->getDirectory();
-  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&title);
+  FXString ttl="PathFinder:- " + filelist->getDirectory();
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&ttl);
   return 1;
   }
 
@@ -1169,7 +1179,7 @@ FXint PathFinderMain::getNumFilenames() const {
   register FXint i;
   if(filelist->getNumItems()){
     for(i=0; i<filelist->getNumItems(); i++){
-      if(filelist->isItemSelected(i) && filelist->getItemFilename(i)!=".." && filelist->getItemFilename(i)!=".") num++;
+      if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)) num++;
       }
     }
   return num;
@@ -1184,7 +1194,7 @@ FXString* PathFinderMain::getFilenames() const {
   if(0<num){
     files=new FXString [num+1];
     for(i=n=0; i<filelist->getNumItems(); i++){
-      if(filelist->isItemSelected(i) && filelist->getItemFilename(i)!=".." && filelist->getItemFilename(i)!="."){
+      if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)){
 	files[n++]=filelist->getItemPathname(i);
 	}
       }
@@ -1416,7 +1426,7 @@ void PathFinderMain::loadSettings(){
 
 
 // Close the window, saving settings
-bool PathFinderMain::close(bool notify){
+FXbool PathFinderMain::close(FXbool notify){
   saveSettings();
   return FXMainWindow::close(notify);
   }
@@ -1508,9 +1518,9 @@ long PathFinderMain::onCmdFilter(FXObject*,FXSelector,void* ptr){
 
 // Goto directory
 long PathFinderMain::onCmdGotoDir(FXObject*,FXSelector,void*){
-  FXBMPIcon icon(getApp(),gotodir,0,IMAGE_ALPHAGUESS);
+  FXBMPIcon gotoicon(getApp(),gotodir,0,IMAGE_ALPHAGUESS);
   FXString dir=getDirectory();
-  if(FXInputDialog::getString(dir,this,"Goto Directory","&Goto directory:",&icon)){
+  if(FXInputDialog::getString(dir,this,"Goto Directory","&Goto directory:",&gotoicon)){
     setDirectory(dir);
     closePreview();
     }
@@ -1651,8 +1661,8 @@ long PathFinderMain::onUpdChmod(FXObject* sender,FXSelector sel,void*){
 long PathFinderMain::onUpdOwner(FXObject* sender,FXSelector,void*){
   FXStat info;
   FXStat::statFile(filelist->getCurrentFile(),info);
-  FXString owner=FXSystem::userName(info.user());
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&owner);
+  FXString ownername=FXSystem::userName(info.user());
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&ownername);
   return 1;
   }
 
@@ -1693,8 +1703,8 @@ long PathFinderMain::onUpdAccessTime(FXObject* sender,FXSelector,void*){
 
 // Update file location
 long PathFinderMain::onUpdFileLocation(FXObject* sender,FXSelector,void*){
-  FXString location=filelist->getCurrentFile();
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&location);
+  FXString string=filelist->getCurrentFile();
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
   return 1;
   }
 

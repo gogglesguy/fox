@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirSelector.h,v 1.22 2006/03/31 07:33:01 fox Exp $                     *
+* $Id: FXDirSelector.h,v 1.26 2007/02/07 20:21:53 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXDIRSELECTOR_H
 #define FXDIRSELECTOR_H
@@ -80,7 +80,7 @@ public:
   long onCmdMove(FXObject*,FXSelector,void*);
   long onCmdCopy(FXObject*,FXSelector,void*);
   long onCmdLink(FXObject*,FXSelector,void*);
-  long onCmdDelete(FXObject*,FXSelector,void*);
+  long onCmdRemove(FXObject*,FXSelector,void*);
   long onUpdSelected(FXObject*,FXSelector,void*);
 public:
   enum {
@@ -92,7 +92,7 @@ public:
     ID_BOOKMARK,
     ID_VISIT,
     ID_NEW,
-    ID_DELETE,
+    ID_REMOVE,
     ID_MOVE,
     ID_COPY,
     ID_LINK,
@@ -115,17 +115,17 @@ public:
   /// Return directory
   FXString getDirectory() const;
 
-  /// Return TRUE if showing files as well as directories
-  bool showFiles() const;
+  /// Return true if showing files as well as directories
+  FXbool showFiles() const;
 
   /// Show or hide normal files
-  void showFiles(bool showing);
+  void showFiles(FXbool showing);
 
-  /// Return TRUE if showing hidden directories
-  bool showHiddenFiles() const;
+  /// Return true if showing hidden directories
+  FXbool showHiddenFiles() const;
 
   /// Show or hide hidden directories
-  void showHiddenFiles(bool showing);
+  void showHiddenFiles(FXbool showing);
 
   /// Return wildcard matching mode
   FXuint getMatchMode() const;

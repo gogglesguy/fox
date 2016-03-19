@@ -3,7 +3,7 @@
 *                            X B M   I m a g e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXXBMImage.cpp,v 1.16 2006/01/22 17:58:52 fox Exp $                      *
+* $Id: FXXBMImage.cpp,v 1.18 2007/02/07 20:22:20 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,7 +75,7 @@ FXXBMImage::FXXBMImage(FXApp* a,const FXuchar *pixels,const FXuchar *mask,FXuint
 
 
 // Save pixel data only
-bool FXXBMImage::savePixels(FXStream& store) const {
+FXbool FXXBMImage::savePixels(FXStream& store) const {
   if(fxsaveXBM(store,data,width,height,-1,-1)){
     return true;
     }
@@ -84,7 +84,7 @@ bool FXXBMImage::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXXBMImage::loadPixels(FXStream& store){
+FXbool FXXBMImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h,hotx,hoty;
   if(fxloadXBM(store,pixels,w,h,hotx,hoty)){
     setData(pixels,IMAGE_OWNED,w,h);

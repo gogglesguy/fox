@@ -131,9 +131,11 @@ $(ICONS)
 
 CLEANFILES = icons.h icons.cpp
 
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -350,7 +352,7 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-icons.o: icons.cpp
+icons.o: icons.cpp icons.h
 ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -358,17 +360,17 @@ ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -439,13 +441,15 @@ ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	../include/fxkeys.h ../include/FXPNGImage.h \
-	../include/FXJPGImage.h ../include/FXTIFImage.h icons.h \
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/fxkeys.h \
+	../include/FXPNGImage.h ../include/FXJPGImage.h \
+	../include/FXTIFImage.h ../include/FXICOImage.h \
+	../include/FXTGAImage.h ../include/FXRGBImage.h icons.h \
 	ShutterBug.h Snapper.h
 Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
@@ -454,17 +458,17 @@ Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -535,12 +539,12 @@ Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	Snapper.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h Snapper.h
 
 info-am:
 info: info-am
@@ -622,10 +626,10 @@ mostlyclean distclean maintainer-clean
 ShutterBug.cpp: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

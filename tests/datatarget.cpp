@@ -3,9 +3,9 @@
 *                                 Data Target Test                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: datatarget.cpp,v 1.49 2006/02/10 03:53:48 fox Exp $                      *
+* $Id: datatarget.cpp,v 1.54 2007/02/07 20:22:23 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -184,6 +184,7 @@ DataTargetWindow::DataTargetWindow(FXApp* a):FXMainWindow(a,"Data Target Test",N
   new FXTextField(matrix,10,&double_target,FXDataTarget::ID_VALUE,TEXTFIELD_REAL|JUSTIFY_RIGHT|LAYOUT_CENTER_Y|LAYOUT_CENTER_X|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_ROW);
   FXRealSlider *rslider=new FXRealSlider(matrix,&double_target,FXDataTarget::ID_VALUE,LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW|LAYOUT_FIX_WIDTH,0,0,100);
   rslider->setRange(0.0,10.0);
+  rslider->setGranularity(0.01);
   new FXDial(matrix,&double_target,FXDataTarget::ID_VALUE,LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW|LAYOUT_FIX_WIDTH|DIAL_HORIZONTAL|DIAL_HAS_NOTCH,0,0,100);
 
   FXRealSpinner *rspinner=new FXRealSpinner(matrix,8,&double_target,FXDataTarget::ID_VALUE,REALSPIN_CYCLIC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW);
@@ -223,9 +224,9 @@ DataTargetWindow::DataTargetWindow(FXApp* a):FXMainWindow(a,"Data Target Test",N
   new FXOption(popup,"Second",NULL,&option_target,FXDataTarget::ID_OPTION+1,JUSTIFY_HZ_APART|ICON_AFTER_TEXT);
   new FXOption(popup,"Third",NULL,&option_target,FXDataTarget::ID_OPTION+2,JUSTIFY_HZ_APART|ICON_AFTER_TEXT);
   new FXOption(popup,"Fourth",NULL,&option_target,FXDataTarget::ID_OPTION+3,JUSTIFY_HZ_APART|ICON_AFTER_TEXT);
-  FXOptionMenu *options=new FXOptionMenu(matrix,popup,LAYOUT_TOP|FRAME_RAISED|FRAME_THICK|JUSTIFY_HZ_APART|ICON_AFTER_TEXT);
-  options->setTarget(&option_target);
-  options->setSelector(FXDataTarget::ID_VALUE);
+  FXOptionMenu *optionsmenu=new FXOptionMenu(matrix,popup,LAYOUT_TOP|FRAME_RAISED|FRAME_THICK|JUSTIFY_HZ_APART|ICON_AFTER_TEXT);
+  optionsmenu->setTarget(&option_target);
+  optionsmenu->setSelector(FXDataTarget::ID_VALUE);
 
   new FXFrame(matrix,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
   new FXFrame(matrix,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
@@ -265,7 +266,7 @@ long DataTargetWindow::onCmdTimer(FXObject*,FXSelector,void*){
   some_progress=(some_progress+1)%100;
 
   // Reset timer for next time
-  getApp()->addTimeout(this,ID_TIMER,80);
+  getApp()->addTimeout(this,ID_TIMER,80000000);
   return 1;
   }
 
@@ -291,7 +292,7 @@ void DataTargetWindow::create(){
   FXMainWindow::create();
 
   // Kick off the timer
-  getApp()->addTimeout(this,ID_TIMER,80);
+  getApp()->addTimeout(this,ID_TIMER,80000000);
 
   // Show
   show(PLACEMENT_SCREEN);

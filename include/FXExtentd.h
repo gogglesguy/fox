@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n    E x t e n t    C l a s s          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXExtentd.h,v 1.8 2006/01/22 17:58:01 fox Exp $                          *
+* $Id: FXExtentd.h,v 1.13 2007/02/07 20:21:54 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXEXTENTD_H
 #define FXEXTENTD_H
@@ -29,7 +29,7 @@ namespace FX {
 
 
 /// Extent
-class FXExtentd {
+class FXAPI FXExtentd {
 public:
   FXVec2d lower;
   FXVec2d upper;
@@ -50,6 +50,15 @@ public:
   /// Assignment
   FXExtentd& operator=(const FXExtentd& ext){ lower=ext.lower; upper=ext.upper; return *this; }
 
+  /// Set value from another range
+  FXExtentd& set(const FXExtentd& ext){ lower=ext.lower; upper=ext.upper; return *this; }
+
+  /// Set value from two vectors
+  FXExtentd& set(const FXVec2d& lo,const FXVec2d& hi){ lower=lo; upper=hi; return *this; }
+
+  /// Set value from four numbers
+  FXExtentd& set(FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi){ lower.set(xlo,ylo); upper.set(xhi,yhi); return *this; }
+
   /// Indexing with 0..1
   FXVec2d& operator[](FXint i){ return (&lower)[i]; }
 
@@ -57,8 +66,8 @@ public:
   const FXVec2d& operator[](FXint i) const { return (&lower)[i]; }
 
   /// Comparison
-  bool operator==(const FXExtentd& ext) const { return lower==ext.lower && upper==ext.upper;}
-  bool operator!=(const FXExtentd& ext) const { return lower!=ext.lower || upper!=ext.upper;}
+  FXbool operator==(const FXExtentd& ext) const { return lower==ext.lower && upper==ext.upper;}
+  FXbool operator!=(const FXExtentd& ext) const { return lower!=ext.lower || upper!=ext.upper;}
 
   /// Width of box
   FXdouble width() const { return upper.x-lower.x; }
@@ -85,16 +94,16 @@ public:
   FXVec2d center() const;
 
   /// Test if empty
-  bool empty() const;
+  FXbool empty() const;
 
   /// Test if box contains point x,y
-  bool contains(FXdouble x,FXdouble y) const;
+  FXbool contains(FXdouble x,FXdouble y) const;
 
   /// Test if box contains point p
-  bool contains(const FXVec2d& p) const;
+  FXbool contains(const FXVec2d& p) const;
 
   /// Test if box properly contains another box
-  bool contains(const FXExtentd& ext) const;
+  FXbool contains(const FXExtentd& ext) const;
 
   /// Include point
   FXExtentd& include(FXdouble x,FXdouble y);
@@ -106,7 +115,7 @@ public:
   FXExtentd& include(const FXExtentd& ext);
 
   /// Test if bounds overlap
-  friend FXAPI bool overlap(const FXExtentd& a,const FXExtentd& b);
+  friend FXAPI FXbool overlap(const FXExtentd& a,const FXExtentd& b);
 
   /// Get corner number 0..3
   FXVec2d corner(FXint c) const { return FXVec2d((&lower)[c&1].x, (&lower)[(c>>1)&1].y); }
@@ -125,7 +134,7 @@ public:
   };
 
 
-extern FXAPI bool overlap(const FXExtentd& a,const FXExtentd& b);
+extern FXAPI FXbool overlap(const FXExtentd& a,const FXExtentd& b);
 
 extern FXAPI FXExtentd unite(const FXExtentd& a,const FXExtentd& b);
 extern FXAPI FXExtentd intersect(const FXExtentd& a,const FXExtentd& b);

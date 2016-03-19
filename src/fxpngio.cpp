@@ -3,7 +3,7 @@
 *                         P N G    I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxpngio.cpp,v 1.43 2006/04/13 22:27:19 fox Exp $                         *
+* $Id: fxpngio.cpp,v 1.45 2007/02/07 20:22:21 fox Exp $                         *
 ********************************************************************************/
 #ifdef HAVE_PNG_H
 #include "png.h"
@@ -47,9 +47,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckPNG(FXStream& store);
-extern FXAPI bool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height);
+extern FXAPI FXbool fxcheckPNG(FXStream& store);
+extern FXAPI FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height);
 
 
 #ifdef HAVE_PNG_H
@@ -87,7 +87,7 @@ static void user_warning_fn(png_structp,png_const_charp){
 
 
 // Check if stream contains a PNG
-bool fxcheckPNG(FXStream& store){
+FXbool fxcheckPNG(FXStream& store){
   FXuchar signature[8];
   store.load(signature,8);
   store.position(-8,FXFromCurrent);
@@ -96,7 +96,7 @@ bool fxcheckPNG(FXStream& store){
 
 
 // Load a PNG image
-bool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   png_structp png_ptr;
   png_infop info_ptr;
   png_uint_32 ww,hh,i;
@@ -210,7 +210,7 @@ bool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 
 // Save a PNG image
-bool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
+FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
   png_structp png_ptr;
   png_infop info_ptr;
   png_bytep *row_pointers;
@@ -277,13 +277,13 @@ bool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
 
 
 // Check if stream contains a PNG
-bool fxcheckPNG(FXStream&){
+FXbool fxcheckPNG(FXStream&){
   return false;
   }
 
 
 // Stub routine
-bool fxloadPNG(FXStream&,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadPNG(FXStream&,FXColor*& data,FXint& width,FXint& height){
   static const FXuchar png_bits[] = {
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
@@ -308,7 +308,7 @@ bool fxloadPNG(FXStream&,FXColor*& data,FXint& width,FXint& height){
 
 
 // Stub routine
-bool fxsavePNG(FXStream&,const FXColor*,FXint,FXint){
+FXbool fxsavePNG(FXStream&,const FXColor*,FXint,FXint){
   return false;
   }
 

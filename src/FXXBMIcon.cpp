@@ -3,7 +3,7 @@
 *                        X B M   I c o n   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXXBMIcon.cpp,v 1.16 2006/01/22 17:58:52 fox Exp $                       *
+* $Id: FXXBMIcon.cpp,v 1.18 2007/02/07 20:22:20 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,7 +77,7 @@ FXXBMIcon::FXXBMIcon(FXApp* a,const FXuchar *pixels,const FXuchar *mask,FXColor 
 
 
 // Save object to stream
-bool FXXBMIcon::savePixels(FXStream& store) const {
+FXbool FXXBMIcon::savePixels(FXStream& store) const {
   if(fxsaveXBM(store,data,width,height,-1,-1)){
     return true;
     }
@@ -86,7 +86,7 @@ bool FXXBMIcon::savePixels(FXStream& store) const {
 
 
 // Load object from stream
-bool FXXBMIcon::loadPixels(FXStream& store){
+FXbool FXXBMIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h,hotx,hoty;
   if(fxloadXBM(store,pixels,w,h,hotx,hoty)){
     setData(pixels,IMAGE_OWNED,w,h);

@@ -3,7 +3,7 @@
 *                        L i s t   B o x   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXListBox.h,v 1.44 2006/03/31 07:33:02 fox Exp $                         *
+* $Id: FXListBox.h,v 1.47 2007/02/07 20:21:56 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXLISTBOX_H
 #define FXLISTBOX_H
@@ -51,6 +51,9 @@ class FXPopup;
 * messages to indicate which option the cursor is hovering over.
 * The List Box is able to receive ID_GETINTVALUE and ID_SETINTVALUE which
 * will retrieve the current option or change the selected option.
+* When items are added, replaced, or removed, the list sends messages of
+* the type SEL_INSERTED, SEL_REPLACED, or SEL_DELETED, with the index of
+* the affected item as argument.
 */
 class FXAPI FXListBox : public FXPacker {
   FXDECLARE(FXListBox)
@@ -72,7 +75,7 @@ public:
   long onFieldButton(FXObject*,FXSelector,void*);
   long onListUpdate(FXObject*,FXSelector,void*);
   long onListClicked(FXObject*,FXSelector,void*);
-  long onListChanged(FXObject*,FXSelector,void*);
+  long onListForward(FXObject*,FXSelector,void*);
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
@@ -121,10 +124,10 @@ public:
   void setNumVisible(FXint nvis);
 
   /// Return true if current item
-  bool isItemCurrent(FXint index) const;
+  FXbool isItemCurrent(FXint index) const;
 
   /// Set the current item (index is zero-based)
-  virtual void setCurrentItem(FXint index,bool notify=false);
+  virtual void setCurrentItem(FXint index,FXbool notify=false);
 
   /// Get the current item's index
   FXint getCurrentItem() const;
@@ -133,34 +136,34 @@ public:
   FXString getItem(FXint index) const;
 
   /// Replace the item at index
-  FXint setItem(FXint index,const FXString& text,FXIcon* icon=NULL,void* ptr=NULL);
+  FXint setItem(FXint index,const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill list box by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon* icon=NULL,void* ptr=NULL);
+  FXint fillItems(const FXchar** strings,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill list box by appending items from newline separated strings
-  FXint fillItems(const FXString& strings,FXIcon* icon=NULL,void* ptr=NULL);
+  FXint fillItems(const FXString& strings,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Insert a new item at index
-  FXint insertItem(FXint index,const FXString& text,FXIcon* icon=NULL,void* ptr=NULL);
+  FXint insertItem(FXint index,const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Add an item to the end of the list
-  FXint appendItem(const FXString& text,FXIcon* icon=NULL,void* ptr=NULL);
+  FXint appendItem(const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend an item to the list
-  FXint prependItem(const FXString& text,FXIcon* icon=NULL,void* ptr=NULL);
+  FXint prependItem(const FXString& text,FXIcon* icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
-  FXint moveItem(FXint newindex,FXint oldindex);
+  FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
 
   /// Extract item from list
-  FXListItem* extractItem(FXint index);
+  FXListItem* extractItem(FXint index,FXbool notify=false);
 
   /// Remove this item from the list
-  void removeItem(FXint index);
+  void removeItem(FXint index,FXbool notify=false);
 
   /// Remove all items from the list
-  void clearItems();
+  void clearItems(FXbool notify=false);
 
   /**
   * Search items by name, beginning from item start.  If the start
@@ -190,7 +193,7 @@ public:
   FXString getItemText(FXint index) const;
 
   /// Change item icon, deleting old one if it was owned
-  void setItemIcon(FXint index,FXIcon* icon,bool owned=false);
+  void setItemIcon(FXint index,FXIcon* icon,FXbool owned=false);
 
   /// Return icon of item at index
   FXIcon* getItemIcon(FXint index) const;
@@ -202,7 +205,7 @@ public:
   void* getItemData(FXint index) const;
 
   /// Is the pane shown
-  bool isPaneShown() const;
+  FXbool isPaneShown() const;
 
   /// Sort items using current sort function
   void sortItems();

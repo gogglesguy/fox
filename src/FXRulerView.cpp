@@ -3,7 +3,7 @@
 *                         R u l e r V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRulerView.cpp,v 1.17 2006/03/31 07:33:11 fox Exp $                     *
+* $Id: FXRulerView.cpp,v 1.26 2007/02/07 22:58:06 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -118,7 +118,7 @@ FXint FXRulerView::getDocumentY() const {
 
 
 // Set document width
-void FXRulerView::setDocumentWidth(FXint w,bool notify){
+void FXRulerView::setDocumentWidth(FXint w,FXbool notify){
   hruler->setDocumentSize(w,notify);
   }
 
@@ -130,7 +130,7 @@ FXint FXRulerView::getDocumentWidth() const {
 
 
 // Set document height
-void FXRulerView::setDocumentHeight(FXint h,bool notify){
+void FXRulerView::setDocumentHeight(FXint h,FXbool notify){
   vruler->setDocumentSize(h,notify);
   }
 
@@ -141,15 +141,27 @@ FXint FXRulerView::getDocumentHeight() const {
   }
 
 
-// Default viewport width
-FXint FXRulerView::getViewportWidth(){
-  return width-vruler->getDefaultWidth();
+// Return visible area x position
+FXint FXRulerView::getVisibleX() const {
+  return vruler->getDefaultWidth();
   }
 
 
-// Default viewport height
-FXint FXRulerView::getViewportHeight(){
-  return height-hruler->getDefaultHeight();
+// Return visible area y position
+FXint FXRulerView::getVisibleY() const {
+  return hruler->getDefaultHeight();
+  }
+
+
+// Return visible area width
+FXint FXRulerView::getVisibleWidth() const {
+  return width-vruler->getDefaultWidth()-vertical->getWidth();
+  }
+
+
+// Return visible area height
+FXint FXRulerView::getVisibleHeight() const {
+  return height-hruler->getDefaultHeight()-horizontal->getHeight();
   }
 
 
@@ -169,7 +181,7 @@ FXint FXRulerView::getContentHeight(){
 void FXRulerView::moveContents(FXint x,FXint y){
   hruler->setPosition(x);
   vruler->setPosition(y);
-  scroll(vruler->getDefaultWidth(),hruler->getDefaultHeight(),viewport_w,viewport_h,x-pos_x,y-pos_y);
+  scroll(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight(),x-pos_x,y-pos_y);
   pos_x=x;
   pos_y=y;
   }
@@ -177,16 +189,15 @@ void FXRulerView::moveContents(FXint x,FXint y){
 
 // Recalculate layout
 void FXRulerView::layout(){
-  FXint vrw,hrh;
+  FXint vrw=vruler->getDefaultWidth();
+  FXint hrh=hruler->getDefaultHeight();
 
   // Layout scroll bars and viewport
-  FXScrollArea::layout();
+  placeScrollBars(width-vrw,height-hrh);
 
   // Place rulers
-  vrw=vruler->getDefaultWidth();
-  hrh=hruler->getDefaultHeight();
-  hruler->position(vrw,0,viewport_w,hrh);
-  vruler->position(0,hrh,vrw,viewport_h);
+  hruler->position(vrw,0,getVisibleWidth(),hrh);
+  vruler->position(0,hrh,vrw,getVisibleHeight());
   filler->position(0,0,vrw,hrh);
 
   // Redraw
@@ -311,7 +322,7 @@ void FXRulerView::setDocumentColor(FXColor clr){
 
 
 // Set horizontal alignment; the default is RULER_ALIGN_NORMAL
-void FXRulerView::setHAlignment(FXuint align,bool notify){
+void FXRulerView::setHAlignment(FXuint align,FXbool notify){
   if(hruler->getRulerAlignment()!=align){
     if(align==RULER_ALIGN_STRETCH)
       setScrollStyle(HSCROLLER_NEVER | (getScrollStyle()&VSCROLLMASK));
@@ -330,7 +341,7 @@ FXuint FXRulerView::getHAlignment() const {
 
 
 // Set vertical alignment; the default is RULER_ALIGN_NORMAL
-void FXRulerView::setVAlignment(FXuint align,bool notify){
+void FXRulerView::setVAlignment(FXuint align,FXbool notify){
   if(vruler->getRulerAlignment()!=align){
     if(align==RULER_ALIGN_STRETCH)
       setScrollStyle(VSCROLLER_NEVER | (getScrollStyle()&HSCROLLMASK));
@@ -370,7 +381,7 @@ FXint FXRulerView::getArrowPosY() const {
 
 
 // Set the horizontal ruler font
-void FXRulerView::setHRulerFont(FXFont *fnt,bool notify){
+void FXRulerView::setHRulerFont(FXFont *fnt,FXbool notify){
   hruler->setFont(fnt,notify);
   recalc();
   }
@@ -383,7 +394,7 @@ FXFont* FXRulerView::getHRulerFont() const {
 
 
 // Set the vertical ruler font
-void FXRulerView::setVRulerFont(FXFont *fnt,bool notify){
+void FXRulerView::setVRulerFont(FXFont *fnt,FXbool notify){
   vruler->setFont(fnt,notify);
   recalc();
   }
@@ -396,13 +407,13 @@ FXFont* FXRulerView::getVRulerFont() const {
 
 
 // Change edge spacing around document
-void FXRulerView::setHEdgeSpacing(FXint es,bool notify){
+void FXRulerView::setHEdgeSpacing(FXint es,FXbool notify){
   hruler->setEdgeSpacing(es,notify);
   }
 
 
 // Change edge spacing around document
-void FXRulerView::setVEdgeSpacing(FXint es,bool notify){
+void FXRulerView::setVEdgeSpacing(FXint es,FXbool notify){
   vruler->setEdgeSpacing(es,notify);
   }
 
@@ -420,13 +431,13 @@ FXint FXRulerView::getVEdgeSpacing() const {
 
 
 // Change horizontal lower margin
-void FXRulerView::setHMarginLower(FXint marg,bool notify){
+void FXRulerView::setHMarginLower(FXint marg,FXbool notify){
   hruler->setMarginLower(marg,notify);
   }
 
 
 // Change horizontal upper margin
-void FXRulerView::setHMarginUpper(FXint marg,bool notify){
+void FXRulerView::setHMarginUpper(FXint marg,FXbool notify){
   hruler->setMarginUpper(marg,notify);
   }
 
@@ -444,13 +455,13 @@ FXint FXRulerView::getHMarginUpper() const {
 
 
 // Change vertical lower margin
-void FXRulerView::setVMarginLower(FXint marg,bool notify){
+void FXRulerView::setVMarginLower(FXint marg,FXbool notify){
   vruler->setMarginLower(marg,notify);
   }
 
 
 // Change vertical upper margin
-void FXRulerView::setVMarginUpper(FXint marg,bool notify){
+void FXRulerView::setVMarginUpper(FXint marg,FXbool notify){
   vruler->setMarginUpper(marg,notify);
   }
 
@@ -468,13 +479,13 @@ FXint FXRulerView::getVMarginUpper() const {
 
 
 // Change horizontal document number placement
-void FXRulerView::setHNumberTicks(FXint ticks,bool notify){
+void FXRulerView::setHNumberTicks(FXint ticks,FXbool notify){
   hruler->setNumberTicks(ticks,notify);
   }
 
 
 // Change vertical document number placement
-void FXRulerView::setVNumberTicks(FXint ticks,bool notify){
+void FXRulerView::setVNumberTicks(FXint ticks,FXbool notify){
   vruler->setNumberTicks(ticks,notify);
   }
 
@@ -492,13 +503,13 @@ FXint FXRulerView::getVNumberTicks() const {
 
 
 // Change horizontal document major ticks
-void FXRulerView::setHMajorTicks(FXint ticks,bool notify){
+void FXRulerView::setHMajorTicks(FXint ticks,FXbool notify){
   hruler->setMajorTicks(ticks,notify);
   }
 
 
 // Change vertical document major ticks
-void FXRulerView::setVMajorTicks(FXint ticks,bool notify){
+void FXRulerView::setVMajorTicks(FXint ticks,FXbool notify){
   vruler->setMajorTicks(ticks,notify);
   }
 
@@ -516,13 +527,13 @@ FXint FXRulerView::getVMajorTicks() const {
 
 
 // Change horizontal document medium ticks
-void FXRulerView::setHMediumTicks(FXint ticks,bool notify){
+void FXRulerView::setHMediumTicks(FXint ticks,FXbool notify){
   hruler->setMediumTicks(ticks,notify);
   }
 
 
 // Change vertical document medium ticks
-void FXRulerView::setVMediumTicks(FXint ticks,bool notify){
+void FXRulerView::setVMediumTicks(FXint ticks,FXbool notify){
   vruler->setMediumTicks(ticks,notify);
   }
 
@@ -540,12 +551,12 @@ FXint FXRulerView::getVMediumTicks() const {
 
 
 // Change horizontal document tiny ticks
-void FXRulerView::setHTinyTicks(FXint ticks,bool notify){
+void FXRulerView::setHTinyTicks(FXint ticks,FXbool notify){
   hruler->setTinyTicks(ticks,notify);
   }
 
 // Change vertical document tiny ticks
-void FXRulerView::setVTinyTicks(FXint ticks,bool notify){
+void FXRulerView::setVTinyTicks(FXint ticks,FXbool notify){
   vruler->setTinyTicks(ticks,notify);
   }
 
@@ -563,13 +574,13 @@ FXint FXRulerView::getVTinyTicks() const {
 
 
 // Change horizontal pixel per tick spacing
-void FXRulerView::setHPixelPerTick(FXdouble space,bool notify){
+void FXRulerView::setHPixelPerTick(FXdouble space,FXbool notify){
   hruler->setPixelPerTick(space,notify);
   }
 
 
 // Change vertical pixel per tick spacing
-void FXRulerView::setVPixelPerTick(FXdouble space,bool notify){
+void FXRulerView::setVPixelPerTick(FXdouble space,FXbool notify){
   vruler->setPixelPerTick(space,notify);
   }
 

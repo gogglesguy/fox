@@ -3,7 +3,7 @@
 *                     I R I S   R G B   I m a g e   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRGBImage.cpp,v 1.27 2006/01/22 17:58:38 fox Exp $                      *
+* $Id: FXRGBImage.cpp,v 1.29 2007/02/07 20:22:14 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,7 +77,7 @@ FXRGBImage::FXRGBImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h):FXI
 
 
 // Save pixel data only
-bool FXRGBImage::savePixels(FXStream& store) const {
+FXbool FXRGBImage::savePixels(FXStream& store) const {
   if(fxsaveRGB(store,data,width,height)){
     return true;
     }
@@ -86,7 +86,7 @@ bool FXRGBImage::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXRGBImage::loadPixels(FXStream& store){
+FXbool FXRGBImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadRGB(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

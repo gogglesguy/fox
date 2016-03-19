@@ -3,7 +3,7 @@
 *             S t r t o l l  a n d   S t r t o u l l   R o u t i n e s          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: strtoll.cpp,v 1.9 2006/01/22 17:58:58 fox Exp $                          *
+* $Id: strtoll.cpp,v 1.12 2007/02/07 20:22:23 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -85,7 +85,7 @@ FXlong strtoll(const char *nptr,char **endptr,int base){
   if(endptr) *endptr=s;
 
   // Skip spaces
-  while((c=*s++)!='\0' && Ascii::isSpace(c)) s++;
+  while(*s!='\0' && Ascii::isSpace(*s)) s++;
 
   // Process sign
   if(*s=='-'){

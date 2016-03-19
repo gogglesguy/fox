@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirSelector.cpp,v 1.52 2006/03/31 07:33:05 fox Exp $                   *
+* $Id: FXDirSelector.cpp,v 1.59 2007/02/07 20:22:05 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -109,8 +109,8 @@ FXDEFMAP(FXDirSelector) FXDirSelectorMap[]={
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_BOOKMARK,FXDirSelector::onCmdBookmark),
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_NEW,FXDirSelector::onCmdNew),
   FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_NEW,FXDirSelector::onUpdNew),
-  FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_DELETE,FXDirSelector::onUpdSelected),
-  FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_DELETE,FXDirSelector::onCmdDelete),
+  FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_REMOVE,FXDirSelector::onUpdSelected),
+  FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_REMOVE,FXDirSelector::onCmdRemove),
   FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_MOVE,FXDirSelector::onUpdSelected),
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_MOVE,FXDirSelector::onCmdMove),
   FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_COPY,FXDirSelector::onUpdSelected),
@@ -151,9 +151,11 @@ FXDirSelector::FXDirSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint 
   mrufiles.setTarget(this);
   mrufiles.setSelector(ID_VISIT);
   if(table){
-    table->addAccel(MKUINT(KEY_BackSpace,0),this,FXSEL(SEL_COMMAND,ID_DIRECTORY_UP));
-    table->addAccel(MKUINT(KEY_h,CONTROLMASK),this,FXSEL(SEL_COMMAND,ID_HOME));
-    table->addAccel(MKUINT(KEY_w,CONTROLMASK),this,FXSEL(SEL_COMMAND,ID_WORK));
+    table->addAccel(MKUINT(KEY_BackSpace,0),this,FXSEL(SEL_COMMAND,FXDirSelector::ID_DIRECTORY_UP));
+    table->addAccel(MKUINT(KEY_Delete,0),this,FXSEL(SEL_COMMAND,FXDirSelector::ID_REMOVE));
+    table->addAccel(MKUINT(KEY_h,CONTROLMASK),this,FXSEL(SEL_COMMAND,FXDirSelector::ID_HOME));
+    table->addAccel(MKUINT(KEY_w,CONTROLMASK),this,FXSEL(SEL_COMMAND,FXDirSelector::ID_WORK));
+    table->addAccel(MKUINT(KEY_n,CONTROLMASK),this,FXSEL(SEL_COMMAND,FXDirSelector::ID_NEW));
     }
   dirbox->setDirectory(currentdirectory);
   dirname->setText(currentdirectory);
@@ -174,26 +176,26 @@ FXString FXDirSelector::getDirectory() const {
   }
 
 
-// Return TRUE if showing files as well as directories
-bool FXDirSelector::showFiles() const {
+// Return true if showing files as well as directories
+FXbool FXDirSelector::showFiles() const {
   return dirbox->showFiles();
   }
 
 
 // Show or hide normal files
-void FXDirSelector::showFiles(bool showing){
+void FXDirSelector::showFiles(FXbool showing){
   dirbox->showFiles(showing);
   }
 
 
-// Return TRUE if showing hidden files
-bool FXDirSelector::showHiddenFiles() const {
+// Return true if showing hidden files
+FXbool FXDirSelector::showHiddenFiles() const {
   return dirbox->showHiddenFiles();
   }
 
 
 // Show or hide hidden files
-void FXDirSelector::showHiddenFiles(bool showing){
+void FXDirSelector::showHiddenFiles(FXbool showing){
   dirbox->showHiddenFiles(showing);
   }
 
@@ -279,16 +281,16 @@ long FXDirSelector::onCmdNew(FXObject*,FXSelector,void*){
   FXString dir=dirbox->getDirectory();
   FXString name="DirectoryName";
   if(FXInputDialog::getString(name,this,tr("Create New Directory"),"Create new directory in: "+dir,&newdirectoryicon)){
-    FXString dirname=FXPath::absolute(dir,name);
-    if(FXStat::exists(dirname)){
-      FXMessageBox::error(this,MBOX_OK,tr("Already Exists"),"File or directory %s already exists.\n",dirname.text());
+    FXString folder=FXPath::absolute(dir,name);
+    if(FXStat::exists(folder)){
+      FXMessageBox::error(this,MBOX_OK,tr("Already Exists"),"File or directory %s already exists.\n",folder.text());
       return 1;
       }
-    if(!FXDir::create(dirname)){
-      FXMessageBox::error(this,MBOX_OK,tr("Cannot Create"),"Cannot create directory %s.\n",dirname.text());
+    if(!FXDir::create(folder)){
+      FXMessageBox::error(this,MBOX_OK,tr("Cannot Create"),"Cannot create directory %s.\n",folder.text());
       return 1;
       }
-    setDirectory(dirname);
+    setDirectory(folder);
     }
   return 1;
   }
@@ -311,7 +313,7 @@ long FXDirSelector::onCmdCopy(FXObject*,FXSelector,void*){
   inputdialog.setNumColumns(60);
   if(inputdialog.execute()){
     newname=inputdialog.getText();
-    if(!FXFile::copyFiles(oldname,newname,FALSE)){
+    if(!FXFile::copyFiles(oldname,newname,false)){
       FXMessageBox::error(this,MBOX_OK,tr("Error Copying File"),"Unable to copy file:\n\n%s  to:  %s.",oldname.text(),newname.text());
       }
     }
@@ -328,7 +330,7 @@ long FXDirSelector::onCmdMove(FXObject*,FXSelector,void*){
   inputdialog.setNumColumns(60);
   if(inputdialog.execute()){
     newname=inputdialog.getText();
-    if(!FXFile::moveFiles(oldname,newname,FALSE)){
+    if(!FXFile::moveFiles(oldname,newname,false)){
       FXMessageBox::error(this,MBOX_OK,tr("Error Moving File"),"Unable to move file:\n\n%s  to:  %s.",oldname.text(),newname.text());
       }
     }
@@ -353,11 +355,11 @@ long FXDirSelector::onCmdLink(FXObject*,FXSelector,void*){
   }
 
 
-// Delete file or directory
-long FXDirSelector::onCmdDelete(FXObject*,FXSelector,void*){
+// Remove file or directory
+long FXDirSelector::onCmdRemove(FXObject*,FXSelector,void*){
   FXString fullname=dirbox->getCurrentFile();
   if(MBOX_CLICKED_YES==FXMessageBox::warning(this,MBOX_YES_NO,tr("Deleting file"),"Are you sure you want to delete the file:\n\n%s",fullname.text())){
-    if(!FXFile::removeFiles(fullname,TRUE)){
+    if(!FXFile::removeFiles(fullname,true)){
       FXMessageBox::error(this,MBOX_YES_NO,tr("Error Deleting File"),"Unable to delete file:\n\n%s.",fullname.text());
       }
     }
@@ -412,7 +414,7 @@ long FXDirSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
   new FXMenuCommand(&filemenu,tr("Copy..."),copyicon,this,ID_COPY);
   new FXMenuCommand(&filemenu,tr("Move..."),moveicon,this,ID_MOVE);
   new FXMenuCommand(&filemenu,tr("Link..."),linkicon,this,ID_LINK);
-  new FXMenuCommand(&filemenu,tr("Delete..."),deleteicon,this,ID_DELETE);
+  new FXMenuCommand(&filemenu,tr("Delete..."),deleteicon,this,ID_REMOVE);
 
   filemenu.create();
   filemenu.popup(NULL,event->root_x,event->root_y);

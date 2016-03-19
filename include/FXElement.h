@@ -3,7 +3,7 @@
 *                           Generic Element Handling                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXElement.h,v 1.22 2006/03/23 07:10:56 fox Exp $                         *
+* $Id: FXElement.h,v 1.24 2007/02/07 20:21:53 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXELEMENT_H
 #define FXELEMENT_H
@@ -82,28 +82,28 @@ inline void clearElms(TYPE* dst,unsigned long n){
 
 /// Allocate array of elements, uninitialized
 template<class TYPE>
-inline bool allocElms(TYPE*& ptr,unsigned long n){
+inline FXbool allocElms(TYPE*& ptr,unsigned long n){
   return fxmalloc((void**)&ptr,sizeof(TYPE)*n);
   }
 
 
 /// Allocate array of elements, initialized with zero
 template<class TYPE>
-inline bool callocElms(TYPE*& ptr,unsigned long n){
+inline FXbool callocElms(TYPE*& ptr,unsigned long n){
   return fxcalloc((void**)&ptr,sizeof(TYPE)*n);
   }
 
 
 /// Allocate array of elements, initialized with bit-wise copy of src array
 template<class TYPE>
-inline bool dupElms(TYPE*& ptr,const TYPE* src,unsigned long n){
+inline FXbool dupElms(TYPE*& ptr,const TYPE* src,unsigned long n){
   return fxmemdup((void**)&ptr,src,sizeof(TYPE)*n);
   }
 
 
 /// Resize array of elements, without constructor or destructor
 template<class TYPE>
-inline bool resizeElms(TYPE*& ptr,unsigned long n){
+inline FXbool resizeElms(TYPE*& ptr,unsigned long n){
   return fxresize((void**)&ptr,sizeof(TYPE)*n);
   }
 

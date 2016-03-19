@@ -1,7 +1,7 @@
 /*******************************************************************************
 *                    FOX Desktop Setup - FOX Desktop Enviroment                *
 ********************************************************************************
-*            Copyright (C) 2004-2005 Sander Jansen. All Rights Reserved        *
+*            Copyright (C) 2004-2007 Sander Jansen. All Rights Reserved        *
 *                               ---                                            *
 * This program is free software; you can redistribute it and/or modify         *
 * it under the terms of the GNU General Public License as published by         *
@@ -22,6 +22,7 @@
 
 #define DEFAULT_SPACING 6
 
+
 struct ColorTheme {
   const FXchar* name;
   FXColor base;
@@ -35,6 +36,7 @@ struct ColorTheme {
   FXColor menuback;
   FXColor menufore;
   };
+
 
 const ColorTheme ColorThemes[]={
 //|--------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------|
@@ -86,6 +88,7 @@ const ColorTheme ColorThemes[]={
   {"Storm"             ,FXRGB(192,192,192),FXRGB(  0,  0,  0),FXRGB(255,255,255),FXRGB(  0,  0,  0),FXRGB(139,  0,139),FXRGB(255,255,255),FXRGB(255,255,225),FXRGB(  0,  0,  0),FXRGB(139,  0,139),FXRGB(255,255,255)},
   {"Sea Sky"           ,FXRGB(165,178,198),FXRGB(  0,  0,  0),FXRGB(255,255,255),FXRGB(  0,  0,  0),FXRGB( 49,101,156),FXRGB(255,255,255),FXRGB(255,255,225),FXRGB(  0,  0,  0),FXRGB( 49,101,156),FXRGB(255,255,255)},
   };
+
 
 const FXint numThemes=ARRAYNUMBER(ColorThemes);
 
@@ -157,15 +160,15 @@ private:
   FXString          applicationname;
   FXString          vendorname;
   FXString          iconpath;
-  FXuint            typingSpeed;
-  FXuint            clickSpeed;
-  FXuint            scrollSpeed;
-  FXuint            scrollDelay;
-  FXuint            blinkSpeed;
-  FXuint            animSpeed;
-  FXuint            menuPause;
-  FXuint            tooltipPause;
-  FXuint            tooltipTime;
+  FXTime            typingSpeed;
+  FXTime            clickSpeed;
+  FXTime            scrollSpeed;
+  FXTime            scrollDelay;
+  FXTime            blinkSpeed;
+  FXTime            animSpeed;
+  FXTime            menuPause;
+  FXTime            tooltipPause;
+  FXTime            tooltipTime;
   FXuint            maxcolors;
   FXint             dragDelta;
   FXint             wheelLines;
@@ -266,7 +269,6 @@ FXDEFMAP(FXDesktopSetup) FXDesktopSetupMap[]={
   FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_REMOVE_FILEBINDING,FXDesktopSetup::onCmdRemoveFileBinding),
   FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_RENAME_FILEBINDING,FXDesktopSetup::onCmdRenameFileBinding),
   FXMAPFUNCS(SEL_COMMAND,FXDesktopSetup::ID_SELECT_ICON_NAME,FXDesktopSetup::ID_SELECT_ICON_BIGNAMEOPEN,FXDesktopSetup::onCmdSelectIcon),
-
   };
 
 
@@ -274,73 +276,70 @@ FXDEFMAP(FXDesktopSetup) FXDesktopSetupMap[]={
 FXIMPLEMENT(FXDesktopSetup,FXMainWindow,FXDesktopSetupMap,ARRAYNUMBER(FXDesktopSetupMap))
 
 
-FXDesktopSetup::FXDesktopSetup(FXApp * app) : FXMainWindow(app,"FOX Desktop Setup",NULL,NULL,DECOR_ALL,0,0,0,0) {
 
-  setTarget(this);
-  setSelector(ID_DESKTOPWINDOW);
+// Construct window
+FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,"FOX Desktop Setup",NULL,NULL,DECOR_ALL,0,0,0,0){
 
-
+  // Get appliation name and vendor name
   const char *const *argv=getApp()->getArgv();
   if(getApp()->getArgc()>1){
-    applicationname = argv[1];
-    if (getApp()->getArgc()>2){
+    applicationname=argv[1];
+    if(getApp()->getArgc()>2){
       vendorname=argv[2];
       }
     }
 
-  FXString desktopdir=FXSystem::getHomeDirectory() + PATHSEPSTRING +".foxrc";
+  // Get registry paths
+  FXString desktopdir=FXSystem::getHomeDirectory()+PATHSEPSTRING ".foxrc";
   FXString desktopfile;
-
   if(FXStat::exists(desktopdir)){
-    if (applicationname.empty()){
-      desktopfile = desktopdir + PATHSEPSTRING + "Desktop";
+    if(applicationname.empty()){
+      desktopfile=desktopdir+PATHSEPSTRING "Desktop";
       }
-    else if (vendorname.empty()){
-      desktopfile = desktopdir + PATHSEPSTRING + applicationname;
+    else if(vendorname.empty()){
+      desktopfile=desktopdir+PATHSEPSTRING+applicationname;
       }
-    else {
-      desktopfile = desktopdir + PATHSEPSTRING + vendorname + PATHSEPSTRING + applicationname;
+    else{
+      desktopfile=desktopdir+PATHSEPSTRING+vendorname+PATHSEPSTRING+applicationname;
       }
-    if (FXStat::exists(desktopfile)){
+    if(FXStat::exists(desktopfile)){
       desktopsettings.parseFile(desktopfile,TRUE);
       }
     }
 
-  tooltip = new FXToolTip(getApp());
+  hilite = getApp()->getHiliteColor();
+  shadow = getApp()->getShadowColor();
 
-  hilite	= getApp()->getHiliteColor();
-  shadow	= getApp()->getShadowColor();
+  // Retrieve Current Color Settings
+  theme_current.base     = getApp()->getBaseColor();
+  theme_current.back     = getApp()->getBackColor();
+  theme_current.border	 = getApp()->getBorderColor();
+  theme_current.fore     = getApp()->getForeColor();
+  theme_current.selfore	 = getApp()->getSelforeColor();
+  theme_current.selback	 = getApp()->getSelbackColor();
+  theme_current.tipfore	 = getApp()->getTipforeColor();
+  theme_current.tipback	 = getApp()->getTipbackColor();
+  theme_current.menufore = getApp()->getSelMenuTextColor();
+  theme_current.menuback = getApp()->getSelMenuBackColor();
 
-  /// Retrieve Current Color Settings
-  theme_current.base		= getApp()->getBaseColor();
-  theme_current.back		= getApp()->getBackColor();
-  theme_current.border	= getApp()->getBorderColor();
-  theme_current.fore		= getApp()->getForeColor();
-  theme_current.selfore	= getApp()->getSelforeColor();
-  theme_current.selback	= getApp()->getSelbackColor();
-  theme_current.tipfore	= getApp()->getTipforeColor();
-  theme_current.tipback	= getApp()->getTipbackColor();
-  theme_current.menufore= getApp()->getSelMenuTextColor();
-  theme_current.menuback= getApp()->getSelMenuBackColor();
+  typingSpeed  = getApp()->getTypingSpeed()/1000000;
+  clickSpeed   = getApp()->getClickSpeed()/1000000;
+  scrollSpeed  = getApp()->getScrollSpeed()/1000000;
+  scrollDelay  = getApp()->getScrollDelay()/1000000;
+  blinkSpeed   = getApp()->getBlinkSpeed()/1000000;
+  animSpeed    = getApp()->getAnimSpeed()/1000000;
+  menuPause    = getApp()->getMenuPause()/1000000;
+  tooltipPause = getApp()->getToolTipPause()/1000000;
+  tooltipTime  = getApp()->getToolTipTime()/1000000;
 
-  typingSpeed =getApp()->getTypingSpeed();
-  clickSpeed  =getApp()->getClickSpeed();
-  scrollSpeed =getApp()->getScrollSpeed();
-  scrollDelay =getApp()->getScrollDelay();
-  blinkSpeed  =getApp()->getBlinkSpeed();
-  animSpeed   =getApp()->getAnimSpeed();
-  menuPause   =getApp()->getMenuPause();
-  tooltipPause=getApp()->getTooltipPause();
-  tooltipTime =getApp()->getTooltipTime();
-  dragDelta   =getApp()->getDragDelta();
-  wheelLines  =getApp()->getWheelLines();
+  dragDelta    = getApp()->getDragDelta();
+  wheelLines   = getApp()->getWheelLines();
 
-  gamma=getApp()->reg().readRealEntry("SETTINGS","displaygamma",1.0);
-  maxcolors=getApp()->reg().readUIntEntry("SETTINGS","maxcolors",125);
-  iconpath = getApp()->reg().readStringEntry("SETTINGS","iconpath");
+  gamma     = getApp()->reg().readRealEntry("SETTINGS","displaygamma",1.0);
+  maxcolors = getApp()->reg().readUIntEntry("SETTINGS","maxcolors",125);
+  iconpath  = getApp()->reg().readStringEntry("SETTINGS","iconpath");
 
-
-  /// Setup the Datatargets
+  // Setup the Datatargets
   target_base.connect(theme_current.base);
   target_back.connect(theme_current.back);
   target_border.connect(theme_current.border);
@@ -353,7 +352,6 @@ FXDesktopSetup::FXDesktopSetup(FXApp * app) : FXMainWindow(app,"FOX Desktop Setu
   target_tipback.connect(theme_current.tipback);
   target_menufore.connect(theme_current.menufore);
   target_menuback.connect(theme_current.menuback);
-
 
   target_typingspeed.connect(typingSpeed);
   target_clickspeed.connect(clickSpeed);
@@ -404,10 +402,16 @@ FXDesktopSetup::FXDesktopSetup(FXApp * app) : FXMainWindow(app,"FOX Desktop Setu
   icon_settings=new FXGIFIcon(getApp(),settings_gif);
   icon_filebinding=new FXGIFIcon(getApp(),filebinding_gif);
 
+  setTarget(this);
+  setSelector(ID_DESKTOPWINDOW);
+
+  tooltip=new FXToolTip(getApp());
+
   setup();
   }
 
 
+// Delete window
 FXDesktopSetup::~FXDesktopSetup(){
   delete titlefont;
   delete font;
@@ -417,6 +421,8 @@ FXDesktopSetup::~FXDesktopSetup(){
   delete icon_filebinding;
   }
 
+
+// Create window
 void FXDesktopSetup::create(){
   FXMainWindow::create();
   initColors();
@@ -436,21 +442,20 @@ void FXDesktopSetup::setup(){
   titlefont = new FXFont(getApp(),fontdescription);
   titlefont->create();
 
-  FXHorizontalFrame * hframe=NULL;
-  FXVerticalFrame   * frame=NULL;
-  FXVerticalFrame   * vframe=NULL;
-  FXMatrix          * matrix=NULL;
-  FXLabel           * label=NULL;
-  FXSpinner         * spinner=NULL;
+  FXHorizontalFrame *hframe=NULL;
+  FXVerticalFrame   *frame=NULL;
+  FXVerticalFrame   *vframe=NULL;
+  FXMatrix          *matrix=NULL;
+  FXLabel           *label=NULL;
+  FXSpinner         *spinner=NULL;
 
-  FXVerticalFrame * main = new FXVerticalFrame(this,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
-
+  FXVerticalFrame *main=new FXVerticalFrame(this,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
 
   // Assuming we have a icon of size 48x48, using different spacing will give us about the same size header.
   const FXint spacing=(desktopicon ? 5 : 15);
 
   // Create nice header
-  label = new FXLabel(main,"FOX Desktop Setup",desktopicon,LAYOUT_FILL_X|JUSTIFY_LEFT|TEXT_AFTER_ICON,0,0,0,0,spacing,spacing,spacing,spacing);
+  label=new FXLabel(main,"FOX Desktop Setup",desktopicon,LAYOUT_FILL_X|JUSTIFY_LEFT|TEXT_AFTER_ICON,0,0,0,0,spacing,spacing,spacing,spacing);
   label->setBackColor(FXRGB(255,255,255));
   label->setTextColor(FXRGB(  0,  0,  0));
   label->setFont(titlefont);
@@ -458,14 +463,14 @@ void FXDesktopSetup::setup(){
   new FXSeparator(main,SEPARATOR_GROOVE|LAYOUT_FILL_X);
 
 
-  FXHorizontalFrame * hmainframe = new FXHorizontalFrame(main,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
+  FXHorizontalFrame *hmainframe=new FXHorizontalFrame(main,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
 
-  FXVerticalFrame * buttonframe = new FXVerticalFrame(hmainframe,LAYOUT_FILL_Y|LAYOUT_LEFT|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0, DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
+  FXVerticalFrame *buttonframe=new FXVerticalFrame(hmainframe,LAYOUT_FILL_Y|LAYOUT_LEFT|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0, DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
 
   new FXSeparator(hmainframe,SEPARATOR_GROOVE|LAYOUT_FILL_Y);
 
 
-  FXSwitcher * switcher = new FXSwitcher(hmainframe,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0);
+  FXSwitcher *switcher = new FXSwitcher(hmainframe,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0);
 
   vframe = new FXVerticalFrame(buttonframe,FRAME_SUNKEN,0,0,0,0,0,0,0,0);
   new FXButton(vframe,"Themes",icon_colors,switcher,FXSwitcher::ID_OPEN_FIRST,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL);
@@ -473,9 +478,6 @@ void FXDesktopSetup::setup(){
   new FXButton(vframe,"Bindings",icon_filebinding,switcher,FXSwitcher::ID_OPEN_SECOND,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL);
   vframe = new FXVerticalFrame(buttonframe,FRAME_SUNKEN,0,0,0,0,0,0,0,0);
   new FXButton(vframe,"General",icon_settings,switcher,FXSwitcher::ID_OPEN_THIRD,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL);
-
-
-
 
   vframe = new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
 
@@ -496,34 +498,34 @@ void FXDesktopSetup::setup(){
   matrix = new FXMatrix(frame,2,LAYOUT_FILL_Y|MATRIX_BY_COLUMNS,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,1,1);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_base,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Base Color");
+  new FXLabel(matrix,"Base Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_border,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Border Color");
+  new FXLabel(matrix,"Border Color,NULL,LAYOUT_CENTER_Y");
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_fore,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Text Color");
+  new FXLabel(matrix,"Text Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_back,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Background Color");
+  new FXLabel(matrix,"Background Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_selfore,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Selected Text Color");
+  new FXLabel(matrix,"Selected Text Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_selback,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Selected Background Color");
+  new FXLabel(matrix,"Selected Background Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_menufore,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Selected Menu Text Color");
+  new FXLabel(matrix,"Selected Menu Text Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_menuback,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Selected Menu Background Color");
+  new FXLabel(matrix,"Selected Menu Background Color",NULL,LAYOUT_CENTER_Y);
 
   new FXColorWell(matrix,FXRGB(0,0,255),&target_tipfore,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Tip Text Color");
+  new FXLabel(matrix,"Tip Text Color",NULL,LAYOUT_CENTER_Y);
 
-   new FXColorWell(matrix,FXRGB(0,0,255),&target_tipback,FXDataTarget::ID_VALUE);
-  label	  = new FXLabel(matrix,"Tip Background Color");
+  new FXColorWell(matrix,FXRGB(0,0,255),&target_tipback,FXDataTarget::ID_VALUE);
+  new FXLabel(matrix,"Tip Background Color",NULL,LAYOUT_CENTER_Y);
 
   frame = new FXVerticalFrame(hframe,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,0,0);
 
@@ -593,10 +595,6 @@ void FXDesktopSetup::setup(){
   new FXButton(listbuttonframe,"&Delete\tDelete Selected Binding",NULL,this,ID_REMOVE_FILEBINDING);
   new FXButton(listbuttonframe,"&Edit\tEdit Binding Name",NULL,this,ID_RENAME_FILEBINDING);
 
-
-
-
-
   vframe = new FXVerticalFrame(hframe,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0,0,0,0,0,0,0);
 
   FXPacker * packer = new FXPacker(vframe,LAYOUT_FILL_X,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
@@ -637,15 +635,15 @@ void FXDesktopSetup::setup(){
   button_nameopen = new FXButton(iconsmatrix,"\tChange icon",NULL,this,ID_SELECT_ICON_NAMEOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,68,68, 1,1,1,1);
   button_bignameopen = new FXButton(iconsmatrix,"\tChange icon",NULL,this,ID_SELECT_ICON_BIGNAMEOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,68,68, 1,1,1,1);
 
-  FXString data;
+  FXString string;
   FXString mime;
   FXStringDict *prefs;
   prefs = desktopsettings.find("FILETYPES");
   if(prefs){
     for(FXint e=prefs->first(); e<prefs->size(); e=prefs->next(e)){
       filebindinglist->appendItem(prefs->key(e),NULL,NULL,TRUE);
-      data = prefs->data(e);
-      mime = data.section(";",4);
+      string = prefs->data(e);
+      mime = string.section(";",4);
       if (!mime.empty() && (mimetypelist->findItem(mime)==-1)){
         mimetypelist->appendItem(mime);
         }
@@ -656,101 +654,92 @@ void FXDesktopSetup::setup(){
   mimetypelist->sortItems();
 
   FXString labelname="Desktop Settings";
-
   if(!applicationname.empty()){
-    labelname = applicationname;
+    labelname=applicationname;
     if(!vendorname.empty()){
-      labelname += " [ " + vendorname + " ]";
+      labelname+=" [ "+vendorname+" ]";
       }
-    labelname+= " Settings";
+    labelname+=" Settings";
     }
 
-
-
-
   hframe = new FXHorizontalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
-
   matrix = new FXMatrix(hframe,3,LAYOUT_FILL_Y|MATRIX_BY_COLUMNS,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
 
-  const FXuint spinnerstyle=FRAME_SUNKEN|FRAME_THICK;
-
   new FXLabel(matrix,"Typing Speed\t\tTyping Speed",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_typingspeed,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_typingspeed,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(500);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
-
   new FXLabel(matrix,"Double Click Speed\t\tDouble Click Speed",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_clickspeed,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_clickspeed,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(100);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Scroll Speed\t\tScroll Speed",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_scrollspeed,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_scrollspeed,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(10);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Scroll Delay\t\tScroll Delay",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_scrolldelay,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_scrolldelay,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(100);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Cursor Blink Speed\t\tCursor Blink Speed",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_blinkspeed,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_blinkspeed,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(100);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Animation Speed\t\tAnimation Speed",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  new FXSpinner(matrix,4,&target_animspeed,FXDataTarget::ID_VALUE,spinnerstyle);
+  new FXSpinner(matrix,4,&target_animspeed,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(1);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Cascade Menu Popup Delay\t\tAmount of delay before cascading menu is shown",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_menupause,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_menupause,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(100);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Tooltip Popup Delay\t\tAmount of Delay before tooltip is shown ",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_tooltippause,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_tooltippause,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(100);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Tooltip Time\t\tTime that tooltips are shown",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_tooltiptime,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_tooltiptime,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(500);
   new FXLabel(matrix,"ms",NULL,LAYOUT_CENTER_Y);
 
   new FXLabel(matrix,"Drag Delta\t\tMinimum distance considered a mouse move",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_dragdelta,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_dragdelta,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,9999);
   spinner->setIncrement(1);
   new FXFrame(matrix,FRAME_NONE);
 
   new FXLabel(matrix,"Wheel Lines",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  spinner=new FXSpinner(matrix,4,&target_wheellines,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner=new FXSpinner(matrix,4,&target_wheellines,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,100);
 
   new FXSeparator(hframe,SEPARATOR_GROOVE|LAYOUT_FILL_Y);
 
   matrix = new FXMatrix(hframe,2,LAYOUT_FILL_Y|MATRIX_BY_COLUMNS,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
   new FXLabel(matrix,"Maximum Colors Allocated");
-  spinner = new FXSpinner(matrix,3,&target_maxcolors,FXDataTarget::ID_VALUE,spinnerstyle);
+  spinner = new FXSpinner(matrix,3,&target_maxcolors,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner->setRange(1,256);
 
   new FXLabel(matrix,"Gamma Correction");
-  FXRealSpinner * rspinner = new FXRealSpinner(matrix,3,&target_gamma,FXDataTarget::ID_VALUE,spinnerstyle);
+  FXRealSpinner * rspinner = new FXRealSpinner(matrix,3,&target_gamma,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   rspinner->setRange(0.0,5.0);
   rspinner->setIncrement(0.1);
-
 
   new FXSeparator(main,SEPARATOR_GROOVE|LAYOUT_FILL_X);
   FXHorizontalFrame *closebox=new FXHorizontalFrame(main,LAYOUT_BOTTOM|LAYOUT_FILL_X,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
@@ -764,20 +753,20 @@ void FXDesktopSetup::setup(){
   }
 
 
-
-static FXIcon * createIconFromName(FXApp * app,const FXString & name, const FXString & iconpath){
-  FXIcon * icon = NULL;
+// Load icon
+static FXIcon *createIconFromName(FXApp *app,const FXString& name,const FXString& iconpath){
   FXIconSource iconsource(app);
+  FXIcon *icon=NULL;
   FXString fullpath;
   if(FXStat::exists(name)){
-    fullpath = name;
+    fullpath=name;
     }
   else{
-    fullpath = FXPath::search(iconpath,name);
+    fullpath=FXPath::search(iconpath,name);
     if(fullpath.empty()) return NULL;
     }
-  icon = iconsource.loadIconFile(fullpath);
-  if (icon) {
+  icon=iconsource.loadIconFile(fullpath);
+  if(icon){
     icon->blend(app->getBaseColor());
     icon->create();
     return icon;
@@ -786,19 +775,17 @@ static FXIcon * createIconFromName(FXApp * app,const FXString & name, const FXSt
   }
 
 
-static void updateIcon(FXApp*app,FXButton * button, const FXString & path){
+static void updateIcon(FXApp* app,FXButton* button,const FXString& path){
   FXIconSource iconsource(app);
-  FXIcon * icon = NULL;
-
-  if (button->getIcon()){
-    icon = button->getIcon();
+  FXIcon *icon=NULL;
+  if(button->getIcon()){
+    icon=button->getIcon();
     button->setIcon(NULL);
     delete icon;
     icon=NULL;
     }
-
-  icon = iconsource.loadIconFile(path);
-  if (icon) {
+  icon=iconsource.loadIconFile(path);
+  if(icon){
     icon->blend(app->getBaseColor());
     icon->create();
     button->setIcon(icon);
@@ -806,73 +793,55 @@ static void updateIcon(FXApp*app,FXButton * button, const FXString & path){
   }
 
 
-
-
-/*
-static FXint findItemInList(FXList * list,FXListItem * item){
-        for(FXint i=0;i<list->getNumItems();i++){
-                if (list->getItem(i)==item) return i;
-                }
-        return -1;
-        }
-*/
-
-
+// Save file binding entry
 void FXDesktopSetup::saveFileBinding(){
-  ///fxmessage("Saving File Binding: %s\n",filebinding.key.text());
-  if (filebinding.key.empty()) return;
-
+  if(filebinding.key.empty()) return;
   FXString entry;
-
-  entry = filebinding.command + ";" + filebinding.description + ";";
-  if (filebinding.bignameopen.empty())
-  entry	+= filebinding.bigname + ";";
+  entry=filebinding.command+";"+filebinding.description+";";
+  if(filebinding.bignameopen.empty())
+    entry+=filebinding.bigname+";";
   else
-    entry += filebinding.bigname + ":" + filebinding.bignameopen + ";";
-
-  if (filebinding.nameopen.empty())
-  entry	+= filebinding.name + ";";
+    entry+=filebinding.bigname+":"+filebinding.bignameopen+";";
+  if(filebinding.nameopen.empty())
+    entry+=filebinding.name+";";
   else
-          entry += filebinding.name + ":" + filebinding.nameopen + ";";
-
-  entry += filebinding.mime;
-
+    entry+=filebinding.name+":" + filebinding.nameopen+";";
+  entry+=filebinding.mime;
   desktopsettings.writeStringEntry("FILETYPES",filebinding.key.text(),entry.text());
   }
 
 
+// Set command association
 long FXDesktopSetup::onCmdSelectCommand(FXObject*,FXSelector,void*){
-  FXString path = (filebinding.command.empty()) ? "/usr/bin/" : filebinding.command.text();
-
-  FXString command = FXFileDialog::getOpenFilename(this,"Select Command",path,"*");
-  if (!command.empty()){
-    filebinding.command = command;
+  FXString path=(filebinding.command.empty()) ? "/usr/bin/" : filebinding.command.text();
+  FXString command=FXFileDialog::getOpenFilename(this,"Select Command",path,"*");
+  if(!command.empty()){
+    filebinding.command=command;
     }
   return 1;
   }
 
 
 long FXDesktopSetup::onCmdMimeType(FXObject*,FXSelector,void*ptr){
-  FXString mime = (FXchar*)ptr;
-  if (!mime.empty() && (mimetypelist->findItem(mime)==-1)){
+  FXString mime=(FXchar*)ptr;
+  if(!mime.empty() && (mimetypelist->findItem(mime)==-1)){
     mimetypelist->appendItem(mime);
     mimetypelist->sortItems();
     }
-  filebinding.mime = mime;
+  filebinding.mime=mime;
   return 1;
   }
 
+
 long FXDesktopSetup::onCmdFileBinding(FXObject*,FXSelector,void*){
   saveFileBinding();
-
-  FXIcon * icon;
-
+  FXIcon *icn;
   FXString iconname;
   FXString association;
-  filebinding.key = filebindinglist->getItemText(filebindinglist->getCurrentItem());
-  if (filebinding.key.empty()) return 1;
+  filebinding.key=filebindinglist->getItemText(filebindinglist->getCurrentItem());
+  if(filebinding.key.empty()) return 1;
 
-  association = desktopsettings.readStringEntry("FILETYPES",filebinding.key.text());
+  association=desktopsettings.readStringEntry("FILETYPES",filebinding.key.text());
 
   filebinding.command = association.section(";",0);
   filebinding.description = association.section(";",1);
@@ -886,61 +855,60 @@ long FXDesktopSetup::onCmdFileBinding(FXObject*,FXSelector,void*){
   filebinding.nameopen = iconname.section(":",1);
 
   filebinding.mime = association.section(";",4);
-  if (!filebinding.mime.empty()){
-    FXint no = mimetypelist->findItem(filebinding.mime);
+  if(!filebinding.mime.empty()){
+    FXint no=mimetypelist->findItem(filebinding.mime);
     mimetypelist->setCurrentItem(no);
     }
   else {
-    FXint no = mimetypelist->findItem(" ");
+    FXint no=mimetypelist->findItem(" ");
     mimetypelist->setCurrentItem(no);
     }
 
-  if (button_bigname->getIcon()){
-    icon = button_bigname->getIcon();
+  if(button_bigname->getIcon()){
+    icn=button_bigname->getIcon();
     button_bigname->setIcon(NULL);
-    delete icon;
+    delete icn;
     }
-  icon = createIconFromName(getApp(),filebinding.bigname,iconpath);
-  button_bigname->setIcon(icon);
+  icn=createIconFromName(getApp(),filebinding.bigname,iconpath);
+  button_bigname->setIcon(icn);
 
-  if (button_bignameopen->getIcon()){
-    icon = button_bignameopen->getIcon();
+  if(button_bignameopen->getIcon()){
+    icn=button_bignameopen->getIcon();
     button_bignameopen->setIcon(NULL);
-    delete icon;
+    delete icn;
     }
-  icon = createIconFromName(getApp(),filebinding.bignameopen,iconpath);
-  button_bignameopen->setIcon(icon);
+  icn=createIconFromName(getApp(),filebinding.bignameopen,iconpath);
+  button_bignameopen->setIcon(icn);
 
-  if (button_name->getIcon()){
-    icon = button_name->getIcon();
+  if(button_name->getIcon()){
+    icn=button_name->getIcon();
     button_name->setIcon(NULL);
-    delete icon;
+    delete icn;
     }
-  icon = createIconFromName(getApp(),filebinding.name,iconpath);
-  button_name->setIcon(icon);
+  icn=createIconFromName(getApp(),filebinding.name,iconpath);
+  button_name->setIcon(icn);
 
-  if (button_nameopen->getIcon()){
-    icon = button_nameopen->getIcon();
+  if(button_nameopen->getIcon()){
+    icn=button_nameopen->getIcon();
     button_nameopen->setIcon(NULL);
-    delete icon;
+    delete icn;
     }
-  icon = createIconFromName(getApp(),filebinding.nameopen,iconpath);
-  button_nameopen->setIcon(icon);
-
+  icn=createIconFromName(getApp(),filebinding.nameopen,iconpath);
+  button_nameopen->setIcon(icn);
   return 1;
   }
 
 
 long FXDesktopSetup::onCmdCreateFileBinding(FXObject*,FXSelector,void*){
   FXString result;
-  if (FXInputDialog::getString(result,this,"New File Binding","Please enter filebinding key:",NULL)){
-    if (result.empty()) return 1;
-    if ((filebindinglist->findItem(result))>=0){
+  if(FXInputDialog::getString(result,this,"New File Binding","Please enter filebinding key:",NULL)){
+    if(result.empty()) return 1;
+    if((filebindinglist->findItem(result))>=0){
       FXMessageBox::question(this,MBOX_OK,"Duplicate Binding","The given key %s already exists.",result.text());
       return 1;
       }
 
-    /// Save Current
+    // Save Current
     saveFileBinding();
 
     filebinding.key = result;
@@ -952,7 +920,7 @@ long FXDesktopSetup::onCmdCreateFileBinding(FXObject*,FXSelector,void*){
     filebinding.nameopen = "";
     filebinding.mime = "";
 
-    /// Save New
+    // Save New
     saveFileBinding();
 
     FXint no = filebindinglist->appendItem(filebinding.key);
@@ -963,9 +931,10 @@ long FXDesktopSetup::onCmdCreateFileBinding(FXObject*,FXSelector,void*){
   return 1;
   }
 
+
 long FXDesktopSetup::onCmdRemoveFileBinding(FXObject*,FXSelector,void*){
-  if (filebinding.key.empty()) return 1;
-  if (FXMessageBox::question(this,MBOX_OK_CANCEL,"Delete Filebinding?","Are you sure you want to delete\nthe filebinding for %s",filebinding.key.text())==MBOX_CLICKED_OK){
+  if(filebinding.key.empty()) return 1;
+  if(FXMessageBox::question(this,MBOX_OK_CANCEL,"Delete Filebinding?","Are you sure you want to delete\nthe filebinding for %s",filebinding.key.text())==MBOX_CLICKED_OK){
     desktopsettings.deleteEntry("FILETYPES",filebinding.key.text());
     filebinding.key="";
     filebindinglist->removeItem(filebindinglist->getCurrentItem(),TRUE);
@@ -976,21 +945,20 @@ long FXDesktopSetup::onCmdRemoveFileBinding(FXObject*,FXSelector,void*){
 
 long FXDesktopSetup::onCmdRenameFileBinding(FXObject*,FXSelector,void*){
   FXint no;
-  FXString result = filebinding.key;
-  if (FXInputDialog::getString(result,this,"Rename File Binding","Rename File Binding",NULL)){
-    if (result==filebinding.key) return 1;
-    if ((no=filebindinglist->findItem(result))>=0){
-      if (FXMessageBox::question(this,MBOX_YES_NO,"Replace Binding?","Would you like to replace the existing binding?")!=MBOX_CLICKED_YES){
+  FXString result=filebinding.key;
+  if(FXInputDialog::getString(result,this,"Rename File Binding","Rename File Binding",NULL)){
+    if(result==filebinding.key) return 1;
+    if((no=filebindinglist->findItem(result))>=0){
+      if(FXMessageBox::question(this,MBOX_YES_NO,"Replace Binding?","Would you like to replace the existing binding?")!=MBOX_CLICKED_YES){
         return 1;
         }
       }
 
-    /// Remove Old Key
+    // Remove Old Key
     desktopsettings.deleteEntry("FILETYPES",filebinding.key.text());
-
-    filebinding.key = result;
+    filebinding.key=result;
     saveFileBinding();
-    if (no>=0){
+    if(no>=0){
       FXint previtem = filebindinglist->getCurrentItem();
       filebindinglist->setCurrentItem(no,TRUE);
       filebindinglist->removeItem(previtem);
@@ -1005,18 +973,15 @@ long FXDesktopSetup::onCmdRenameFileBinding(FXObject*,FXSelector,void*){
 
 long FXDesktopSetup::onCmdSelectIcon(FXObject*,FXSelector sel,void*){
   FXString name,selected;
-
   switch(FXSELID(sel)){
     case ID_SELECT_ICON_NAME: name=filebinding.name; break;
     case ID_SELECT_ICON_BIGNAME: name=filebinding.bigname; break;
     case ID_SELECT_ICON_NAMEOPEN: name=filebinding.nameopen; break;
     case ID_SELECT_ICON_BIGNAMEOPEN: name=filebinding.bignameopen; break;
     }
-
   if(!FXStat::exists(name)){
     name=FXPath::search(iconpath,name);
     }
-
   if(name.empty()){
     if(!iconpath.empty())
       name=iconpath.section(PATHLISTSEP,0)+PATHSEPSTRING;
@@ -1078,9 +1043,10 @@ long FXDesktopSetup::onColorChanged(FXObject*,FXSelector,void*){
 
 long FXDesktopSetup::onColorTheme(FXObject*,FXSelector,void* ptr){
   FXint no=(FXint)(FXival)ptr;
-  ColorTheme * theme_selected = reinterpret_cast<ColorTheme*>(list->getItemData(no));
-  if (theme_selected) {
-    /// Set new colors from selected theme
+  ColorTheme *theme_selected=reinterpret_cast<ColorTheme*>(list->getItemData(no));
+  if(theme_selected){
+
+    // Set new colors from selected theme
     theme_current.base     = theme_selected->base;
     theme_current.border   = theme_selected->border;
     theme_current.back     = theme_selected->back;
@@ -1092,7 +1058,7 @@ long FXDesktopSetup::onColorTheme(FXObject*,FXSelector,void* ptr){
     theme_current.menufore = theme_selected->menufore;
     theme_current.menuback = theme_selected->menuback;
 
-    /// Apply New Colors to Widgets
+    // Apply New Colors to Widgets
     setupColors();
     }
   return 1;
@@ -1117,23 +1083,19 @@ long FXDesktopSetup::onChooseFont(FXObject*,FXSelector,void*){
   }
 
 
-
+// Close the dialog
 long FXDesktopSetup::onCmdClose(FXObject*,FXSelector,void*){
-  FXint result = FXMessageBox::question(this,MBOX_SAVE_CANCEL_DONTSAVE,"Save Changes?","Do you want to save changes to the FOX Registry\nbefore closing?\n\nIf you don't save, your changes will be lost.");
+  FXint result=FXMessageBox::question(this,MBOX_SAVE_CANCEL_DONTSAVE,"Save Changes?","Do you want to save changes to the FOX Registry\nbefore closing?\n\nIf you don't save, your changes will be lost.");
+  if(result==MBOX_CLICKED_CANCEL) return 1;
   if(result==MBOX_CLICKED_SAVE){
     saveFileBinding();
     writeDesktop();
-    return 0;
-    }
-  else if(result==MBOX_CLICKED_CANCEL){
-    return 1;
-    }
-  else{
-    return 0;
     }
   return 0;
   }
 
+
+// Map weight to a string
 static FXString weightToString(FXuint weight){
   switch(weight){
     case FXFont::Thin      : return "thin"; break;
@@ -1150,6 +1112,8 @@ static FXString weightToString(FXuint weight){
   return "";
   }
 
+
+// Map slant to a string
 static FXString slantToString(FXuint slant){
   switch(slant){
     case FXFont::Straight       : return "regular"; break;
@@ -1162,39 +1126,39 @@ static FXString slantToString(FXuint slant){
   return "";
   }
 
-void FXDesktopSetup::setupFont(){
-  FXString fontname = font->getActualName() +", " + FXStringVal(font->getSize()/10);
-  if(font->getWeight()!=0 && font->getWeight()!=FXFont::Normal){
-    fontname += ", " + weightToString(font->getWeight());
-    }
-  if (font->getSlant()!=0 && font->getSlant()!=FXFont::Straight){
-    fontname += ", " + slantToString(font->getSlant());
-    }
 
+// Update dialog according to new font
+void FXDesktopSetup::setupFont(){
+  FXString fontname=font->getActualName()+", "+FXStringVal(font->getSize()/10);
+  if(font->getWeight()!=0 && font->getWeight()!=FXFont::Normal){
+    fontname+=", "+weightToString(font->getWeight());
+    }
+  if(font->getSlant()!=0 && font->getSlant()!=FXFont::Straight){
+    fontname+=", "+slantToString(font->getSlant());
+    }
   tabitem->setFont(font);
   label1->setFont(font);
   label2->setFont(font);
   label3->setFont(font);
   label4->setFont(font);
   label5->setFont(font);
-
   menulabels[0]->setFont(font);
   menulabels[1]->setFont(font);
   menulabels[2]->setFont(font);
   menulabels[3]->setFont(font);
   menulabels[4]->setFont(font);
   menulabels[5]->setFont(font);
-
   textfield1->setFont(font);
   fontbutton->setText(fontname);
   }
 
 
+// Initialize colors
 void FXDesktopSetup::initColors(){
   FXint i,scheme=-1;
 
-  /// Find the correct current scheme
-  for(i=0;i<numThemes;i++){
+  // Find the correct current scheme
+  for(i=0; i<numThemes; i++){
     if((theme_current.base==ColorThemes[i].base) &&
        (theme_current.border==ColorThemes[i].border) &&
        (theme_current.back==ColorThemes[i].back) &&
@@ -1210,7 +1174,8 @@ void FXDesktopSetup::initColors(){
       }
     }
 
-  if (scheme==-1) {
+  // Custom colors were used
+  if(scheme==-1){
     theme_user.base = theme_current.base;
     theme_user.border = theme_current.border;
     theme_user.back = theme_current.back;
@@ -1224,10 +1189,12 @@ void FXDesktopSetup::initColors(){
     list->appendItem("Current",NULL,&theme_user);
     }
 
-  /// Add Standard Themes to List
+  // Add Standard Themes to List
   for(i=0; i<numThemes; i++){
     list->appendItem(ColorThemes[i].name,NULL,(void*)&ColorThemes[i]);
     }
+
+  // Grab X11 defaults
 #ifndef WIN32
   theme_xdefault.base     = FXRGB(212,208,200);
   theme_xdefault.border   = FXRGB(  0,  0,  0);
@@ -1239,7 +1206,6 @@ void FXDesktopSetup::initColors(){
   theme_xdefault.tipfore  = FXRGB(  0,  0,  0);
   theme_xdefault.menuback = FXRGB( 10, 36,106);
   theme_xdefault.menufore = FXRGB(255,255,255);
-
   theme_xdefault.base   = fxcolorfromname(XGetDefault((Display*)getApp()->getDisplay(),"fox","background"));
   theme_xdefault.fore   = fxcolorfromname(XGetDefault((Display*)getApp()->getDisplay(),"fox","foreground"));
   theme_xdefault.border = fxcolorfromname(XGetDefault((Display*)getApp()->getDisplay(),"fox","borderColor"));
@@ -1404,53 +1370,33 @@ void FXDesktopSetup::setupColors(){
 
 
 FXString FXDesktopSetup::getOutputFile(){
-  FXString desktopfile=FXSystem::getHomeDirectory() + PATHSEPSTRING +".foxrc";
-
+  FXString desktopfile=FXSystem::getHomeDirectory()+PATHSEPSTRING ".foxrc";
   if(!FXStat::exists(desktopfile)){
     if(!FXDir::create(desktopfile)){
       return FXString::null;
       }
     }
-
   if(applicationname.empty()){
-    desktopfile = desktopfile + PATHSEPSTRING + "Desktop";
+    desktopfile=desktopfile+PATHSEPSTRING "Desktop";
     }
   else if(vendorname.empty()){
-    desktopfile = desktopfile + PATHSEPSTRING + applicationname;
+    desktopfile=desktopfile+PATHSEPSTRING+applicationname;
     }
   else{
-    desktopfile = desktopfile + PATHSEPSTRING + vendorname;
+    desktopfile=desktopfile+PATHSEPSTRING+vendorname;
     if(!FXStat::exists(desktopfile)){
       if(!FXDir::create(desktopfile)){
         return FXString::null;
         }
       }
-    desktopfile += PATHSEPSTRING + applicationname;
+    desktopfile+=PATHSEPSTRING+applicationname;
     }
   return desktopfile;
   }
 
 
-
-
 FXbool FXDesktopSetup::writeDesktop(){
-/*
-  fxmessage("{\"\",FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d),FXRGB(%d,%d,%d)}\n",
-    FXREDVAL(base),FXGREENVAL(base),FXBLUEVAL(base),
-    FXREDVAL(border),FXGREENVAL(border),FXBLUEVAL(border),
-    FXREDVAL(back),FXGREENVAL(back),FXBLUEVAL(back),
-    FXREDVAL(fore),FXGREENVAL(fore),FXBLUEVAL(fore),
-    FXREDVAL(selback),FXGREENVAL(selback),FXBLUEVAL(selback),
-    FXREDVAL(selfore),FXGREENVAL(selfore),FXBLUEVAL(selfore),
-    FXREDVAL(tipback),FXGREENVAL(tipback),FXBLUEVAL(tipback),
-    FXREDVAL(tipfore),FXGREENVAL(tipfore),FXBLUEVAL(tipfore),
-    FXREDVAL(menuback),FXGREENVAL(menuback),FXBLUEVAL(menuback),
-    FXREDVAL(menufore),FXGREENVAL(menufore),FXBLUEVAL(menufore)
-
-    );
-*/
-
-        FXString desktopfile=getOutputFile();
+  FXString desktopfile=getOutputFile();
 
   // Save Colors
   desktopsettings.writeColorEntry("SETTINGS","basecolor",theme_current.base);
@@ -1467,15 +1413,16 @@ FXbool FXDesktopSetup::writeDesktop(){
   desktopsettings.writeColorEntry("SETTINGS","selmenubackcolor",theme_current.menuback);
 
   // Save General Settings
-  desktopsettings.writeUIntEntry("SETTINGS","typingspeed",typingSpeed);
-  desktopsettings.writeUIntEntry("SETTINGS","clickspeed",clickSpeed);
-  desktopsettings.writeUIntEntry("SETTINGS","scrollspeed",scrollSpeed);
-  desktopsettings.writeUIntEntry("SETTINGS","scrolldelay",scrollDelay);
-  desktopsettings.writeUIntEntry("SETTINGS","blinkspeed",blinkSpeed);
-  desktopsettings.writeUIntEntry("SETTINGS","animspeed",animSpeed);
-  desktopsettings.writeUIntEntry("SETTINGS","menupause",menuPause);
-  desktopsettings.writeUIntEntry("SETTINGS","tippause",tooltipPause);
-  desktopsettings.writeUIntEntry("SETTINGS","tiptime",tooltipTime);
+  desktopsettings.writeLongEntry("SETTINGS","typingspeedns",typingSpeed*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","clickspeedns",clickSpeed*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","scrollspeedns",scrollSpeed*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","scrolldelayns",scrollDelay*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","blinkspeedns",blinkSpeed*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","animspeedns",animSpeed*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","menupausens",menuPause*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","tippausens",tooltipPause*1000000);
+  desktopsettings.writeLongEntry("SETTINGS","tiptimens",tooltipTime*1000000);
+
   desktopsettings.writeUIntEntry("SETTINGS","maxcolors",maxcolors);
 
   desktopsettings.writeIntEntry("SETTINGS","dragdelta",dragDelta);

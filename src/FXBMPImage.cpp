@@ -3,7 +3,7 @@
 *                            B M P   I m a g e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBMPImage.cpp,v 1.35 2006/01/22 17:58:18 fox Exp $                      *
+* $Id: FXBMPImage.cpp,v 1.37 2007/02/07 20:22:03 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -78,7 +78,7 @@ FXBMPImage::FXBMPImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h):FXI
 
 
 // Save pixel data only
-bool FXBMPImage::savePixels(FXStream& store) const {
+FXbool FXBMPImage::savePixels(FXStream& store) const {
   if(fxsaveBMP(store,data,width,height)){
     return true;
     }
@@ -87,7 +87,7 @@ bool FXBMPImage::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXBMPImage::loadPixels(FXStream& store){
+FXbool FXBMPImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadBMP(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

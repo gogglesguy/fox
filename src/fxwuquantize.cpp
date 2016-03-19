@@ -3,7 +3,7 @@
 *                     W U   C o l o r   Q u a n t i z a t i o n                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxwuquantize.cpp,v 1.9 2006/01/22 17:58:58 fox Exp $                     *
+* $Id: fxwuquantize.cpp,v 1.14 2007/02/07 20:22:23 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -379,7 +379,6 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
 
   // Compute histogram
   histogram(wu,src,size);
-  FXTRACE((1,"done hist\n"));
 
   // Compute moments
   moments(wu);
@@ -407,12 +406,9 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
       }
     if(temp<=0.0f){
       maxcolors=i+1;
-      FXTRACE((1,"Only got %d boxes\n",maxcolors));
       break;
       }
     }
-
-  FXTRACE((1,"done partition\n"));
 
   // Construct colormap
   for(k=0; k<maxcolors; ++k){
@@ -425,15 +421,12 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
       ((FXuchar*)(colormap+k))[3]=255;
       }
     else{
-      FXTRACE((1,"bogus box %d\n",k));
       ((FXuchar*)(colormap+k))[0]=0;
       ((FXuchar*)(colormap+k))[1]=0;
       ((FXuchar*)(colormap+k))[2]=0;
       ((FXuchar*)(colormap+k))[3]=0;
       }
     }
-
-  FXTRACE((1,"done mapping\n"));
 
   // Build histogram
   for(i=0; i<size; ++i){
@@ -443,12 +436,10 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
     dst[i]=map[(r>>3)+1][(g>>3)+1][(b>>3)+1];
     }
 
-  FXTRACE((1,"done transform\n"));
-
   // Return actual number of colors
   actualcolors=maxcolors;
 
-  return TRUE;
+  return true;
   }
 
 }

@@ -3,7 +3,7 @@
 *                       T o o l B a r G r i p   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolBarGrip.cpp,v 1.31 2006/03/31 07:33:14 fox Exp $                   *
+* $Id: FXToolBarGrip.cpp,v 1.34 2007/02/07 20:22:18 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -112,11 +112,11 @@ FXint FXToolBarGrip::getDefaultHeight(){
 
 
 // Can have focus
-bool FXToolBarGrip::canFocus() const { return false; }
+FXbool FXToolBarGrip::canFocus() const { return false; }
 
 
 // Change toolbar orientation
-void FXToolBarGrip::setDoubleBar(bool dbl){
+void FXToolBarGrip::setDoubleBar(FXbool dbl){
   FXuint opts=dbl?(options|TOOLBARGRIP_DOUBLE):(options&~TOOLBARGRIP_DOUBLE);
   if(opts!=options){
     options=opts;
@@ -125,8 +125,8 @@ void FXToolBarGrip::setDoubleBar(bool dbl){
   }
 
 
-// Return TRUE if toolbar grip is displayed as a double bar
-bool FXToolBarGrip::isDoubleBar() const {
+// Return true if toolbar grip is displayed as a double bar
+FXbool FXToolBarGrip::isDoubleBar() const {
   return (options&TOOLBARGRIP_DOUBLE)!=0;
   }
 

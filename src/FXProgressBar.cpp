@@ -3,7 +3,7 @@
 *                      P r o g r e s s B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXProgressBar.cpp,v 1.47 2006/01/22 17:58:37 fox Exp $                   *
+* $Id: FXProgressBar.cpp,v 1.49 2007/02/07 20:22:13 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -57,9 +57,11 @@ namespace FX {
 // Map
 FXDEFMAP(FXProgressBar) FXProgressBarMap[]={
   FXMAPFUNC(SEL_PAINT,0,FXProgressBar::onPaint),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_SETVALUE,FXProgressBar::onCmdSetValue),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_SETINTVALUE,FXProgressBar::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_GETINTVALUE,FXProgressBar::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_SETVALUE,FXProgressBar::onCmdSetValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_SETINTVALUE,FXProgressBar::onCmdSetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_GETINTVALUE,FXProgressBar::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_SETLONGVALUE,FXProgressBar::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_GETLONGVALUE,FXProgressBar::onCmdGetLongValue),
   };
 
 
@@ -153,6 +155,20 @@ long FXProgressBar::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
 // Get value
 long FXProgressBar::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
   *((FXint*)ptr)=getProgress();
+  return 1;
+  }
+
+
+// Update value from a message
+long FXProgressBar::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setProgress((FXint)*((FXlong*)ptr));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FXProgressBar::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=(FXlong)getProgress();
   return 1;
   }
 

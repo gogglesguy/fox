@@ -3,7 +3,7 @@
 *                  S t r i n g   D i c t i o n a r y    C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStringDict.h,v 1.17 2006/03/25 18:03:43 fox Exp $                      *
+* $Id: FXStringDict.h,v 1.20 2007/02/07 20:21:59 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXSTRINGDICT_H
 #define FXSTRINGDICT_H
@@ -51,10 +51,10 @@ public:
   FXStringDict &operator=(const FXStringDict& orig);
 
   /// Insert a new string indexed by key, with given mark flag
-  const FXchar* insert(const FXchar* ky,const FXchar* str,bool mrk=false){ return (const FXchar*)FXDict::insert(ky,(void*)str,mrk); }
+  const FXchar* insert(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return (const FXchar*)FXDict::insert(ky,(void*)str,mrk); }
 
   /// Replace or insert a new string indexed by key, unless given mark is lower that the existing mark
-  const FXchar* replace(const FXchar* ky,const FXchar* str,bool mrk=false){ return (const FXchar*)FXDict::replace(ky,(void*)str,mrk); }
+  const FXchar* replace(const FXchar* ky,const FXchar* str,FXbool mrk=false){ return (const FXchar*)FXDict::replace(ky,(void*)str,mrk); }
 
   /// Remove entry indexed by key
   const FXchar* remove(const FXchar* ky){ return (const FXchar*)FXDict::remove(ky); }
@@ -63,7 +63,7 @@ public:
   const FXchar* find(const FXchar* ky) const { return (const FXchar*)FXDict::find(ky); }
 
   /// Return the string at position pos
-  const FXchar* data(FXuint pos) const { return (const FXchar*)dict[pos].data; }
+  const FXchar* data(FXint pos) const { return (const FXchar*)FXDict::data(pos); }
 
   /// Destructor
   virtual ~FXStringDict();

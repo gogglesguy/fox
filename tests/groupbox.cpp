@@ -3,9 +3,9 @@
 *                                 Test Group Box                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: groupbox.cpp,v 1.115 2006/01/22 17:59:01 fox Exp $                       *
+* $Id: groupbox.cpp,v 1.120 2007/02/07 20:22:24 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -566,9 +566,10 @@ long GroupWindow::onCmdRadio(FXObject*,FXSelector sel,void*){
 
 // Test of iconify
 long GroupWindow::onCmdIconify(FXObject*,FXSelector,void*){
-//  minimize();
-//  getApp()->addTimeout(this,ID_DEICONIFY,2000);
-//  FXTRACE((1,"iconify\n"));
+  minimize();
+  getApp()->addTimeout(this,ID_DEICONIFY,2000000000);
+  FXTRACE((1,"iconify\n"));
+/*
   static int full=FALSE;
   full=!full;
   if(full){
@@ -583,6 +584,7 @@ long GroupWindow::onCmdIconify(FXObject*,FXSelector,void*){
     show();
     restore();
     }
+*/
   return 1;
   }
 
@@ -611,9 +613,9 @@ long GroupWindow::onCmdAbout(FXObject*,FXSelector,void*){
 
 // Set choice
 long GroupWindow::onCmdChoice(FXObject*,FXSelector,void*){
-  FXGIFIcon icon(getApp(),minifolderclosed);
-  FXint choice=FXChoiceBox::ask(this,DECOR_RESIZE,"Choose","What is your choice?",&icon,"One\nTwo\nThree\nFour\nFive\nSix\nSeven\nOne very very very very very long entry");
-  FXTRACE((1,"choice=%d\n",choice));
+  FXGIFIcon choiceicon(getApp(),minifolderclosed);
+  FXint result=FXChoiceBox::ask(this,DECOR_RESIZE,"Choose","What is your choice?",&choiceicon,"One\nTwo\nThree\nFour\nFive\nSix\nSeven\nOne very very very very very long entry");
+  FXTRACE((1,"choice=%d\n",result));
   return 1;
   }
 

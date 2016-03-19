@@ -3,7 +3,7 @@
 *               O p e n G L   T r i a n g l e   M e s h   O b j e c t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * Contributed by: Angel-Ventura Mendo Gomez <ventura@labri.u-bordeaux.fr>       *
 *********************************************************************************
@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLTriangleMesh.cpp,v 1.31 2006/03/25 07:24:45 fox Exp $                *
+* $Id: FXGLTriangleMesh.cpp,v 1.32 2007/02/07 20:22:09 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

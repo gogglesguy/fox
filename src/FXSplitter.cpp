@@ -3,7 +3,7 @@
 *                S p l i t t e r   W i n d o w   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSplitter.cpp,v 1.55 2006/02/20 03:32:13 fox Exp $                      *
+* $Id: FXSplitter.cpp,v 1.57 2007/02/07 20:22:16 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -662,8 +662,8 @@ long FXSplitter::onFocusRight(FXObject*,FXSelector,void* ptr){
 // Draw the horizontal split
 void FXSplitter::drawHSplit(FXint pos){
   FXDCWindow dc(this);
-  dc.clipChildren(FALSE);
-  dc.setFunction(BLT_NOT_DST);   
+  dc.clipChildren(false);
+  dc.setFunction(BLT_NOT_DST);
   dc.fillRectangle(pos,0,barsize,height);
   }
 
@@ -671,8 +671,8 @@ void FXSplitter::drawHSplit(FXint pos){
 // Draw the vertical split
 void FXSplitter::drawVSplit(FXint pos){
   FXDCWindow dc(this);
-  dc.clipChildren(FALSE);
-  dc.setFunction(BLT_NOT_DST);  
+  dc.clipChildren(false);
+  dc.setFunction(BLT_NOT_DST);
   dc.fillRectangle(0,pos,width,barsize);
   }
 

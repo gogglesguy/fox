@@ -3,7 +3,7 @@
 *                   M a t r i x   C o n t a i n e r   W i d g e t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMatrix.h,v 1.19 2006/01/22 17:58:06 fox Exp $                          *
+* $Id: FXMatrix.h,v 1.20 2007/02/07 20:21:56 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXMATRIX_H
 #define FXMATRIX_H

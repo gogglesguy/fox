@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.152 2006/04/03 03:43:16 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.155 2007/02/07 20:22:10 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -154,6 +154,7 @@
      {                    } = {               } x {             } x {                }
      { sin(phi)  cos(phi) }   { 0      1      }   { sin(phi)  1 }   { 0      1       }
 
+  - Need to move to BGRA components; 4x faster with OpenGL!
 */
 
 
@@ -289,7 +290,7 @@ void FXImage::destroy(){
 
 
 // Scan the image and return false if fully opaque
-bool FXImage::hasAlpha() const {
+FXbool FXImage::hasAlpha() const {
   if(data){
     register FXint i=width*height-1;
     do{
@@ -326,7 +327,7 @@ void FXImage::restore(){
     register FXuint  redshift,greenshift,blueshift;
     register FXPixel redmask,greenmask,bluemask;
     register int size,dd,i;
-    register bool shmi=false;
+    register FXbool shmi=false;
     register XImage *xim=NULL;
     register Visual *vis;
     register FXint x,y;
@@ -1224,7 +1225,7 @@ void FXImage::render_mono_1_dither(void *xim,FXuchar *img){
 // Render into pixmap
 void FXImage::render(){
   if(xid){
-    register bool shmi=false;
+    register FXbool shmi=false;
     register XImage *xim=NULL;
     register Visual *vis;
     register int dd;
@@ -1819,7 +1820,7 @@ void FXImage::scale(FXint w,FXint h,FXint quality){
 
 
 // Mirror image horizontally and/or vertically
-void FXImage::mirror(bool horizontal,bool vertical){
+void FXImage::mirror(FXbool horizontal,FXbool vertical){
   FXTRACE((100,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
   if(horizontal || vertical){
     if(data){
@@ -2473,7 +2474,7 @@ void FXImage::setOptions(FXuint opts){
 
 
 // Save pixel data only
-bool FXImage::savePixels(FXStream& store) const {
+FXbool FXImage::savePixels(FXStream& store) const {
   FXuint size=width*height;
   store.save(data,size);
   return true;
@@ -2481,7 +2482,7 @@ bool FXImage::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXImage::loadPixels(FXStream& store){
+FXbool FXImage::loadPixels(FXStream& store){
   FXuint size=width*height;
   if(options&IMAGE_OWNED){freeElms(data);}
   if(!allocElms(data,size)) return false;

@@ -3,7 +3,7 @@
 *                   A c c e l e r a t o r   T a b l e   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXAccelTable.h,v 1.27 2006/01/22 17:57:58 fox Exp $                      *
+* $Id: FXAccelTable.h,v 1.29 2007/02/07 20:21:52 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXACCELTABLE_H
 #define FXACCELTABLE_H
@@ -69,7 +69,7 @@ public:
   void removeAccel(FXHotKey hotkey);
 
   /// Return true if accelerator specified
-  bool hasAccel(FXHotKey hotkey) const;
+  FXbool hasAccel(FXHotKey hotkey) const;
 
   /// Return target object of the given accelerator
   FXObject* targetOfAccel(FXHotKey hotkey) const;

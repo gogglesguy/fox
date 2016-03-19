@@ -6,12 +6,11 @@
 #include "fx.h"
 #include "fx3d.h"
 
-
 #ifdef HAVE_GL_H
 
 
-// Timer setting (in milliseconds)
-const FXuint TIMER_INTERVAL = 100;
+// Timer setting (in nanoseconds)
+const FXTime TIMER_INTERVAL=100000000;
 
 
 /*******************************************************************************/
@@ -23,7 +22,7 @@ class GLSettingsDialog : public FXDialogBox {
 private:
   GLSettingsDialog(){}
 public:
-  GLSettingsDialog(FXWindow* owner,FXGLVisual *vis);
+  GLSettingsDialog(FXWindow* own,FXGLVisual *vis);
   };
 
 
@@ -36,12 +35,12 @@ FXIMPLEMENT(GLSettingsDialog,FXDialogBox,NULL,0)
 
 
 // Construct a dialog box
-GLSettingsDialog::GLSettingsDialog(FXWindow* owner,FXGLVisual *vis):FXDialogBox(owner,"OpenGL Info",DECOR_STRETCHABLE|DECOR_TITLE|DECOR_BORDER,0,0,600){
+GLSettingsDialog::GLSettingsDialog(FXWindow* own,FXGLVisual *vis):FXDialogBox(own,"OpenGL Info",DECOR_STRETCHABLE|DECOR_TITLE|DECOR_BORDER,0,0,600){
   FXTabBook *tabbook;
   FXVerticalFrame *frame1;
   FXGroupBox *driverbox, *limitsbox, *glextbox, *displaybox;
   FXMatrix *v_matrix, *v_matrix2;
-  FXHorizontalFrame *options;
+  FXHorizontalFrame *optionframe;
   GLint	intval;
   GLint	intvals[2];
   char	*token, *text, *tmp;
@@ -104,10 +103,10 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* owner,FXGLVisual *vis):FXDialogBox(
   new FXLabel(v_matrix2, "Maximum attribute stack depth: ");
   new FXLabel(v_matrix2, FXStringFormat("%d", intval));
 
-  options=new FXHorizontalFrame(frame1,LAYOUT_SIDE_TOP|FRAME_NONE|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0);
+  optionframe=new FXHorizontalFrame(frame1,LAYOUT_SIDE_TOP|FRAME_NONE|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0);
 
   // Display mode info
-  displaybox=new FXGroupBox(options,"Display Mode",GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_Y);
+  displaybox=new FXGroupBox(optionframe,"Display Mode",GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_Y);
   FXMatrix *mat=new FXMatrix(displaybox, 2, MATRIX_BY_COLUMNS);
 
   new FXLabel(mat,"Hardware-accelerated",NULL,LABEL_NORMAL);
@@ -151,7 +150,7 @@ GLSettingsDialog::GLSettingsDialog(FXWindow* owner,FXGLVisual *vis):FXDialogBox(
   new FXLabel(mat,FXStringFormat("%d-%d-%d-%d",vis->getActualAccumRedSize(),vis->getActualAccumGreenSize(),vis->getActualAccumBlueSize(),vis->getActualAccumAlphaSize()),NULL,LABEL_NORMAL);
 
   // List of extensions
-  glextbox= new FXGroupBox(options,"Available Extensions",GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_Y|LAYOUT_FILL_X);
+  glextbox= new FXGroupBox(optionframe,"Available Extensions",GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_Y|LAYOUT_FILL_X);
   FXVerticalFrame *listframe=new FXVerticalFrame(glextbox,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
 
   FXList *extensionList=new FXList(listframe,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -300,7 +299,7 @@ GLTestWindow::GLTestWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   glpanel=new FXVerticalFrame(glcanvasFrame,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0, 0,0,0,0);
 
   // A Visual to drag OpenGL
-  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLEBUFFER|VISUAL_STEREO);
+  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLEBUFFER);
 
   // Drawing glcanvas
   glcanvas=new FXGLCanvas(glpanel,glvisual,this,ID_CANVAS,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT);
@@ -501,9 +500,9 @@ void GLTestWindow::drawScene(){
   const GLfloat redMaterial[]={1.,0.,0.,1.};
   const GLfloat blueMaterial[]={0.,0.,1.,1.};
 
-  GLdouble width = glcanvas->getWidth();
-  GLdouble height = glcanvas->getHeight();
-  GLdouble aspect = height>0 ? width/height : 1.0;
+  GLdouble canvaswidth = glcanvas->getWidth();
+  GLdouble canvasheight = glcanvas->getHeight();
+  GLdouble aspect = canvasheight>0 ? canvaswidth/canvasheight : 1.0;
 
   // Make context current
   glcanvas->makeCurrent();
@@ -611,6 +610,13 @@ int main(int argc,char *argv[]){
 
   // Open the display
   application.init(argc,argv);
+
+  application.create();
+  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DoubleBuffer|FXGLConfig::DrawWindow);
+//  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
+  FXGLContext context(&application,config);
+  context.create();
+  exit(0);
 
   // Make window
   new GLTestWindow(&application);

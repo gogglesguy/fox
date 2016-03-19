@@ -3,7 +3,7 @@
 *                        C h a r t   B a s e   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXChart.cpp,v 1.19 2006/01/22 18:01:13 fox Exp $                         *
+* $Id: FXChart.cpp,v 1.27 2007/02/07 20:21:51 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include "FXPNGImage.h"
@@ -65,6 +65,8 @@ FXDragType FXChart::tifType=0;
 
 
 /*******************************************************************************/
+//long int lrint(double x);
+//long int lrintf(float x);
 
 // Init
 FXChart::FXChart(){
@@ -79,13 +81,13 @@ FXChart::FXChart(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x
   flags|=FLAG_SHOWN|FLAG_ENABLED|FLAG_DROPTARGET;
   target=tgt;
   message=sel;
-  fill.style=FILLSTYLE_SOLID;
-  fill.hatch=STIPPLE_NONE;
-  fill.image=NULL;
-  fill.color=FXRGB(103,103,255);
-  fill.backcolor=0;
-  fill.lower=FXRGB(255,255,255);
-  fill.upper=FXRGB(0,0,255);
+  fillstyle.style=FILLSTYLE_SOLID;
+  fillstyle.hatch=STIPPLE_NONE;
+  fillstyle.image=NULL;
+  fillstyle.forecolor=FXRGB(103,103,255);
+  fillstyle.backcolor=0;
+  fillstyle.lower=FXRGB(255,255,255);
+  fillstyle.upper=FXRGB(0,0,255);
   }
 
 
@@ -93,7 +95,7 @@ FXChart::FXChart(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x
 void FXChart::create(){
   FXComposite::create();
   chart->create();
-  if(fill.image) fill.image->create();
+  if(fillstyle.image) fillstyle.image->create();
   if(!colorType) colorType=getApp()->registerDragType(colorTypeName);
   if(!textType) textType=getApp()->registerDragType(textTypeName);
   if(!bmpType) bmpType=getApp()->registerDragType(FXBMPImage::mimeType);
@@ -120,13 +122,53 @@ void FXChart::detach(){
   }
 
 
+// Measure text width
+FXint FXChart::textWidth(const TextStyle& ts,const FXString& string) const {
+  register FXint beg,end,w,tw=0;
+  beg=0;
+  do{
+    end=beg;
+    while(end<string.length() && string[end]!='\n') end++;
+    if((w=ts.font->getTextWidth(&string[beg],end-beg))>tw) tw=w;
+    beg=end+1;
+    }
+  while(end<string.length());
+  return tw;
+  }
+
+
+// Measure text height
+FXint FXChart::textHeight(const TextStyle& ts,const FXString& string) const {
+  register FXint beg,end,th=0;
+  beg=0;
+  do{
+    end=beg;
+    while(end<string.length() && string[end]!='\n') end++;
+    th+=ts.font->getFontHeight();
+    beg=end+1;
+    }
+  while(end<string.length());
+  return th;
+  }
+
+
+// Draw text
+void FXChart::drawText(FXDC& dc,const TextStyle& ts,FXint x,FXint y,const FXString& string) const {
+  register FXint tw,th;
+  dc.setFont(ts.font);
+  dc.setForeground(ts.color);
+  tw=textWidth(ts,string);
+  th=textHeight(ts,string);
+  }
+
+
 // Marker size is in pixels; x,y are canvas coordinates of the center
-void FXChart::drawMarker(FXDC& dc,FXint x,FXint y,const Marker& m) const {
-  register FXint s=m.size;
+void FXChart::drawMarker(FXDC& dc,const Marker& ms,FXint x,FXint y) const {
+  register FXint s=ms.size;
   register FXint h=s>>1;
   FXPoint p[5];
-  dc.setForeground(m.color);
-  switch(m.style){
+  dc.setForeground(ms.color);
+  switch(ms.style){
     case MARKER_SQUARE:
       dc.drawRectangle(x-h,y-h,s,s);
       break;
@@ -225,11 +267,128 @@ void FXChart::drawMarker(FXDC& dc,FXint x,FXint y,const Marker& m) const {
   }
 
 
-#define MAXSTEPS 128
+// Draw rectangle
+void FXChart::drawRectangle(FXDC& dc,const FillStyle& fs,FXint x,FXint y,FXint w,FXint h) const {
+  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,yl,yh,xx,yy,dy,dx,n,t;
+  const FXint MAXSTEPS=128;
+  if(0<w && 0<h){
+    switch(fs.style){
+      case FILLSTYLE_SOLID:
+        dc.setStipple(STIPPLE_NONE);
+        dc.setFillStyle(FILL_SOLID);
+        dc.setForeground(fs.forecolor);
+        dc.fillRectangle(x,y,w,h);
+        break;
+      case FILLSTYLE_HATCH:
+        if(fs.backcolor){
+          dc.setFillStyle(FILL_OPAQUESTIPPLED);
+          dc.setBackground(fs.backcolor);
+          }
+        else{
+          dc.setFillStyle(FILL_STIPPLED);
+          }
+        dc.setStipple((FXStipplePattern)fs.hatch);
+        dc.setForeground(fs.forecolor);
+        dc.fillRectangle(x,y,w,h);
+        break;
+      case FILLSTYLE_TEXTURE:
+        dc.setStipple(STIPPLE_NONE);
+        dc.setFillStyle(FILL_TILED);
+        dc.setTile(fs.image);
+        dc.fillRectangle(x,y,w,h);
+        break;
+      case FILLSTYLE_IMAGE:
+        dc.setStipple(STIPPLE_NONE);
+        dc.setFillStyle(FILL_TILED);
+        dc.setTile(fs.image);
+        dc.fillRectangle(x,y,w,h);
+        break;
+      case FILLSTYLE_HORIZONTAL:
+        dc.setStipple(STIPPLE_NONE);
+        dc.setFillStyle(FILL_SOLID);
+
+        r1=FXREDVAL(fs.lower);   r2=FXREDVAL(fs.upper);   dr=r2-r1;
+        g1=FXGREENVAL(fs.lower); g2=FXGREENVAL(fs.upper); dg=g2-g1;
+        b1=FXBLUEVAL(fs.lower);  b2=FXBLUEVAL(fs.upper);  db=b2-b1;
+
+        n=FXABS(dr);
+        if((t=FXABS(dg))>n) n=t;
+        if((t=FXABS(db))>n) n=t;
+        //FXTRACE((1,"max(|dr|,|dg|,|db|)=%d \n",n));
+        n++;
+        if(n>w) n=w;
+        if(n>MAXSTEPS) n=MAXSTEPS;
+        //FXTRACE((1,"n=%d \n",n));
+
+        rr=(r1<<16)+32767;
+        gg=(g1<<16)+32767;
+        bb=(b1<<16)+32767;
+        xx=32767;
+
+        dr=(dr<<16)/n;
+        dg=(dg<<16)/n;
+        db=(db<<16)/n;
+        dx=(w<<16)/n;
+
+        do{
+          xl=xx>>16;
+          xx+=dx;
+          xh=xx>>16;
+          dc.setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
+          dc.fillRectangle(x+xl,y,xh-xl,h);
+          rr+=dr;
+          gg+=dg;
+          bb+=db;
+          }
+        while(xh<w);
+        break;
+      case FILLSTYLE_VERTICAL:
+        dc.setStipple(STIPPLE_NONE);
+        dc.setFillStyle(FILL_SOLID);
+
+        r1=FXREDVAL(fs.lower);   r2=FXREDVAL(fs.upper);   dr=r2-r1;
+        g1=FXGREENVAL(fs.lower); g2=FXGREENVAL(fs.upper); dg=g2-g1;
+        b1=FXBLUEVAL(fs.lower);  b2=FXBLUEVAL(fs.upper);  db=b2-b1;
+
+        n=FXABS(dr);
+        if((t=FXABS(dg))>n) n=t;
+        if((t=FXABS(db))>n) n=t;
+        //FXTRACE((1,"max(|dr|,|dg|,|db|)=%d \n",n));
+        n++;
+        if(n>h) n=h;
+        if(n>MAXSTEPS) n=MAXSTEPS;
+        //FXTRACE((1,"n=%d \n",n));
+
+        rr=(r1<<16)+32767;
+        gg=(g1<<16)+32767;
+        bb=(b1<<16)+32767;
+        yy=32767;
+
+        dr=(dr<<16)/n;
+        dg=(dg<<16)/n;
+        db=(db<<16)/n;
+        dy=(h<<16)/n;
+
+        do{
+          yl=yy>>16;
+          yy+=dy;
+          yh=yy>>16;
+          dc.setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
+          dc.fillRectangle(x,y+yl,w,yh-yl);
+          rr+=dr;
+          gg+=dg;
+          bb+=db;
+          }
+        while(yh<h);
+        break;
+      }
+    }
+  }
+
+
 
 // Resize the dial
 void FXChart::layout(){
-  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xr,n,t,xx,dx;
 
   // Do regular layout of child widgets
   FXComposite::layout();
@@ -237,92 +396,14 @@ void FXChart::layout(){
   // Resize off-screen buffer if needed
   if(chart->getWidth()!=width || chart->getHeight()!=height){
     chart->resize(width,height);
-    FXTRACE((1,"new size = %d x %d\n",width,height));
+    //FXTRACE((1,"new size = %d x %d\n",width,height));
     }
 
   // FIXME regenerate plot
   FXDCWindow dc(chart);
-  switch(fill.style){
-    case FILLSTYLE_SOLID:
-      dc.setStipple(STIPPLE_NONE);
-      dc.setFillStyle(FILL_SOLID);
-      dc.setForeground(fill.color);
-      dc.fillRectangle(0,0,width,height);
-      break;
-    case FILLSTYLE_HATCH:
-      if(fill.backcolor){
-        dc.setFillStyle(FILL_OPAQUESTIPPLED);
-        dc.setBackground(fill.backcolor);
-        }
-      else{
-        dc.setFillStyle(FILL_STIPPLED);
-        }
-      dc.setStipple((FXStipplePattern)fill.hatch);
-      dc.setForeground(fill.color);
-      dc.fillRectangle(0,0,width,height);
-      break;
-    case FILLSTYLE_TEXTURE:
-      dc.setStipple(STIPPLE_NONE);
-      dc.setFillStyle(FILL_TILED);
-      dc.setTile(fill.image);
-      dc.fillRectangle(0,0,width,height);
-      break;
-    case FILLSTYLE_IMAGE:
-      dc.setStipple(STIPPLE_NONE);
-      dc.setFillStyle(FILL_TILED);
-      dc.setTile(fill.image);
-      dc.fillRectangle(0,0,width,height);
-      break;
-    case FILLSTYLE_HORIZONTAL:
-      dc.setStipple(STIPPLE_NONE);
-      dc.setFillStyle(FILL_SOLID);
-dc.setForeground(FXRGB(255,0,255));
-dc.fillRectangle(0,0,width,height);
 
-      r1=FXREDVAL(fill.lower);   r2=FXREDVAL(fill.upper);   dr=r2-r1;
-      g1=FXGREENVAL(fill.lower); g2=FXGREENVAL(fill.upper); dg=g2-g1;
-      b1=FXBLUEVAL(fill.lower);  b2=FXBLUEVAL(fill.upper);  db=b2-b1;
-
-      n=FXABS(dr);
-      if((t=FXABS(dg))>n) n=t;
-      if((t=FXABS(db))>n) n=t;
-FXTRACE((1,"max(|dr|,|dg|,|db|)=%d \n",n));
-      n++;
-      if(n>width) n=width;
-      if(n>MAXSTEPS) n=MAXSTEPS;
-FXTRACE((1,"n=%d \n",n));
-
-      rr=(r1<<16)+32767;
-      gg=(g1<<16)+32767;
-      bb=(b1<<16)+32767;
-      xx=32767;
-
-      dr=(dr<<16)/n;
-      dg=(dg<<16)/n;
-      db=(db<<16)/n;
-      dx=(width<<16)/n;
-
-      do{
-        xl=xx>>16;
-        xx+=dx;
-        xr=xx>>16;
-        dc.setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
-        dc.fillRectangle(xl,0,xr-xl,height);
-FXTRACE((1,"fillRectangle(%d,%d,%d,%d) width=%d n=%d\n",xl,0,xr-xl,height,width,n));
-        rr+=dr;
-        gg+=dg;
-        bb+=db;
-        }
-      while(xr<width);
-
-      break;
-    case FILLSTYLE_VERTICAL:
-      break;
-    case FILLSTYLE_DIAGONAL:
-      break;
-    case FILLSTYLE_RDIAGONAL:
-      break;
-    }
+  // Draw background
+  drawRectangle(dc,fillstyle,0,0,width,height);
 
   flags&=~FLAG_DIRTY;
   }
@@ -359,8 +440,8 @@ long FXChart::onClipboardLost(FXObject*,FXSelector,void*){
 // Request for clipboard data
 long FXChart::onClipboardRequest(FXObject *sender,FXSelector sel,void *ptr){
   FXEvent *event=(FXEvent*)ptr;
-  unsigned long size;
-  FXuchar *data;
+  FXuchar *pointer;
+  FXuval   length;
 
   // Try handling it in base class first
   if(FXComposite::onClipboardRequest(sender,sel,ptr)) return 1;
@@ -392,7 +473,7 @@ long FXChart::onClipboardRequest(FXObject *sender,FXSelector sel,void *ptr){
 #endif
 
     // Grab buffered image
-    ms.takeBuffer(data,size);
+    ms.takeBuffer(pointer,length);
 
     // Close memory stream
     ms.close();
@@ -401,7 +482,7 @@ long FXChart::onClipboardRequest(FXObject *sender,FXSelector sel,void *ptr){
     chart->release();
 
     // Set DND data
-    setDNDData(FROM_CLIPBOARD,event->target,data,size);
+    setDNDData(FROM_CLIPBOARD,event->target,pointer,length);
     return 1;
     }
 
@@ -419,7 +500,7 @@ long FXChart::onPaint(FXObject*,FXSelector,void* ptr){
 
 // Set fill style
 void FXChart::setFillStyle(const FillStyle& fs){
-  fill=fs;
+  fillstyle=fs;
   recalc();
   }
 

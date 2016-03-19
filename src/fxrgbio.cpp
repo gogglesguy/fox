@@ -3,7 +3,7 @@
 *                    I R I S   R G B   I n p u t / O u t p u t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxrgbio.cpp,v 1.29 2006/03/24 05:55:40 fox Exp $                         *
+* $Id: fxrgbio.cpp,v 1.34 2007/02/07 20:22:22 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,9 +43,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckRGB(FXStream& store);
-extern FXAPI bool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height);
+extern FXAPI FXbool fxcheckRGB(FXStream& store);
+extern FXAPI FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 
 // RLE decompress
@@ -73,7 +73,7 @@ static void expandrow(FXuchar* optr,FXuchar *iptr){   // FIXME bad data could bl
 
 
 // Check if stream contains a RGB
-bool fxcheckRGB(FXStream& store){
+FXbool fxcheckRGB(FXStream& store){
   FXuchar signature[2];
   store.load(signature,2);
   store.position(-2,FXFromCurrent);
@@ -82,12 +82,13 @@ bool fxcheckRGB(FXStream& store){
 
 
 // Load image from stream
-bool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   FXint i,j,c,tablen,sub,t,total;
-  FXuchar temp[4096],*array,storage,bpc,swap;
+  FXuchar temp[4096],*array,storage,bpc;
   FXuint *starttab,*lengthtab;
   FXushort magic,dimension,nchannels,w,h;
   FXlong base,start;
+  FXbool swap;
 
   // Null out
   data=NULL;
@@ -96,7 +97,7 @@ bool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
   // Remember swap state
   swap=store.swapBytes();
-  store.setBigEndian(TRUE);
+  store.setBigEndian(true);
 
   // Where the image format starts
   base=store.position();
@@ -110,7 +111,7 @@ bool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   store >> h;           // YSIZE (2)
   store >> nchannels;   // ZSIZE (2)
 
-  FXTRACE((50,"fxloadRGB: magic=%d width=%d height=%d nchannels=%d dimension=%d storage=%d bpc=%d\n",magic,w,h,nchannels,dimension,storage,bpc));
+  //FXTRACE((100,"fxloadRGB: magic=%d width=%d height=%d nchannels=%d dimension=%d storage=%d bpc=%d\n",magic,w,h,nchannels,dimension,storage,bpc));
 
   // Check magic number and other parameters
   if(magic==474 && nchannels==3 && bpc==1 && w>0 && h>0){
@@ -189,7 +190,7 @@ bool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
       // Reset swap status
       store.swapBytes(swap);
-      return TRUE;
+      return true;
       }
     }
 
@@ -203,7 +204,7 @@ bool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 
 // Save a bmp file to a stream
-bool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
+FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
   const FXushort dimension=3;
   const FXushort nchannels=3;
   const FXushort magic=474;
@@ -212,17 +213,18 @@ bool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
   const FXuint dummy=0;
   const FXuchar storage=0;
   const FXuchar bpc=1;
-  FXuchar temp[4096],swap;
+  FXuchar temp[4096];
   FXushort w=width;
   FXushort h=height;
   FXint i,j,c;
+  FXbool swap;
 
   // Must make sense
   if(data && 0<width && 0<height){
 
     // Remember swap state
     swap=store.swapBytes();
-    store.setBigEndian(TRUE);
+    store.setBigEndian(true);
 
     // Save header
     store << magic;             // MAGIC (2)

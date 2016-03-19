@@ -3,7 +3,7 @@
 *                        C o l o r W h e e l   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorWheel.cpp,v 1.50 2006/03/31 07:33:05 fox Exp $                    *
+* $Id: FXColorWheel.cpp,v 1.53 2007/02/07 20:22:04 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -149,7 +149,7 @@ void FXColorWheel::layout(){
 
 
 // Compute x,y location from hue and saturation
-bool FXColorWheel::hstoxy(FXint& x,FXint& y,FXfloat h,FXfloat s) const {
+FXbool FXColorWheel::hstoxy(FXint& x,FXint& y,FXfloat h,FXfloat s) const {
   register FXfloat r=dial->getWidth()*0.5f;
   register FXfloat a=(h-180.0f)*DTOR;
   x=(FXint)(s*r*cosf(a)+r+0.5f);
@@ -158,8 +158,8 @@ bool FXColorWheel::hstoxy(FXint& x,FXint& y,FXfloat h,FXfloat s) const {
   }
 
 
-// Compute hue and saturation from x,y, return FALSE if outside of dial
-bool FXColorWheel::xytohs(FXfloat& h,FXfloat& s,FXint x,FXint y) const {
+// Compute hue and saturation from x,y, return false if outside of dial
+FXbool FXColorWheel::xytohs(FXfloat& h,FXfloat& s,FXint x,FXint y) const {
   register FXfloat r=dial->getWidth()*0.5f;
   register FXfloat rx=x-r;
   register FXfloat ry=y-r;

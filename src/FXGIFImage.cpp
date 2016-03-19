@@ -3,7 +3,7 @@
 *                            G I F   I m a g e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGIFImage.cpp,v 1.35 2006/01/22 17:58:27 fox Exp $                      *
+* $Id: FXGIFImage.cpp,v 1.37 2007/02/07 20:22:08 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -76,7 +76,7 @@ FXGIFImage::FXGIFImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h):FXI
 
 
 // Save object to stream
-bool FXGIFImage::savePixels(FXStream& store) const {
+FXbool FXGIFImage::savePixels(FXStream& store) const {
   if(fxsaveGIF(store,data,width,height)){
     return true;
     }
@@ -85,7 +85,7 @@ bool FXGIFImage::savePixels(FXStream& store) const {
 
 
 // Load object from stream
-bool FXGIFImage::loadPixels(FXStream& store){
+FXbool FXGIFImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadGIF(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

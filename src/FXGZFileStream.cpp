@@ -3,7 +3,7 @@
 *                     G Z F i l e S t r e a m   C l a s s e s                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2006 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2002,2007 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGZFileStream.cpp,v 1.6 2006/03/25 07:24:45 fox Exp $                   *
+* $Id: FXGZFileStream.cpp,v 1.9 2007/02/07 20:22:09 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,7 +75,8 @@ FXuval FXGZFileStream::writeBuffer(FXuval){
     z->stream.next_out=z->buffer;
     z->stream.avail_out=BUFFERSIZE;
     zerror=deflate(&z->stream,f);
-    if(zerror!=Z_OK) break;
+//    if(zerror!=Z_OK) break;
+    if(!(zerror==Z_OK || zerror==Z_STREAM_END)) break;
     m=z->stream.next_out-z->buffer;
     n=file.writeBlock(z->buffer,m);
     if(n<m) break;
@@ -99,14 +100,21 @@ FXuval FXGZFileStream::readBuffer(FXuval){
   wrptr=begptr+(wrptr-rdptr);
   rdptr=begptr;
   while(wrptr<endptr){
-    n=file.readBlock(z->buffer,BUFFERSIZE);
-    if(n<=0) break;
-    z->stream.next_in=z->buffer;
-    z->stream.avail_in=n;
+//    n=file.readBlock(z->buffer,BUFFERSIZE);
+//    if(n<=0) break;
+//    z->stream.next_in=z->buffer;
+//    z->stream.avail_in=n;
+    if(z->stream.avail_in<=0){  // Get more input if buffer is empty
+      n=file.readBlock(z->buffer,BUFFERSIZE);
+      if(n<=0) break;
+      z->stream.next_in=z->buffer;
+      z->stream.avail_in=n;
+      }
     z->stream.next_out=(Bytef*)wrptr;
     z->stream.avail_out=endptr-wrptr;
     zerror=inflate(&z->stream,Z_NO_FLUSH);
-    if(zerror!=Z_OK) break;
+//    if(zerror!=Z_OK) break;
+    if(!(zerror==Z_OK || zerror==Z_STREAM_END)) break;
     wrptr=(FXuchar*)z->stream.next_out;
     if(zerror==Z_STREAM_END) break;
     }
@@ -115,10 +123,14 @@ FXuval FXGZFileStream::readBuffer(FXuval){
 
 
 // Try open file stream
-bool FXGZFileStream::open(const FXString& filename,FXStreamDirection save_or_load,FXuval size){
+FXbool FXGZFileStream::open(const FXString& filename,FXStreamDirection save_or_load,FXuval size){
   if(FXFileStream::open(filename,save_or_load,size)){
     if(callocElms(z,1)){
       int zerror;
+      z->stream.next_in=NULL;
+      z->stream.avail_in=0;
+      z->stream.next_out=NULL;
+      z->stream.avail_out=0;
       f=Z_NO_FLUSH;
       if(save_or_load==FXStreamLoad){
         zerror=inflateInit(&z->stream);
@@ -139,7 +151,7 @@ bool FXGZFileStream::open(const FXString& filename,FXStreamDirection save_or_loa
 
 
 // Close file stream
-bool FXGZFileStream::close(){
+FXbool FXGZFileStream::close(){
   if(dir){
     if(dir==FXStreamLoad){
       FXFileStream::close();

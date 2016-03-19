@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Calculator.h,v 1.28 2006/03/31 07:33:00 fox Exp $                        *
+* $Id: Calculator.h,v 1.31 2007/02/07 20:21:51 fox Exp $                        *
 ********************************************************************************/
 #ifndef CALCULATOR_H
 #define CALCULATOR_H
@@ -27,6 +27,13 @@
 
 /*******************************************************************************/
 
+
+// Show exponent
+enum {
+  EXPONENT_NEVER,
+  EXPONENT_ALWAYS,
+  EXPONENT_IFNEEDED
+  };
 
 
 // Mini application object
@@ -61,7 +68,7 @@ protected:
   FXint        base;                // Number base
   FXint        angles;              // Angle mode
   FXint        precision;	    // How many digits to show
-  FXbool       exponent;     	    // Exponential notation mode
+  FXuchar      exponent;     	    // Exponential notation mode
   FXbool       beep;		    // Beep on error
   FXint        parens;              // Count of ( and )
   FXuchar      modifiers;           // Invert, hyperbolic, entry modifiers
@@ -321,7 +328,7 @@ public:
   Calculator(FXApp* a);
 
   // Close the window and save registry
-  virtual bool close(bool notify=false);
+  virtual FXbool close(FXbool notify=false);
 
   /// Create
   virtual void create();
@@ -387,16 +394,16 @@ public:
   FXint getAngles() const { return angles; }
 
   /// Set exponent mode
-  void setExponentMode(FXbool expmode);
-  FXbool getExponentMode() const { return exponent; }
+  void setExponentMode(FXuchar expmode);
+  FXuchar getExponentMode() const { return exponent; }
 
   /// Set precision
   void setPrecision(FXint prec);
   FXint getPrecision() const { return precision; }
 
   /// Beep on error
-  void setBeep(bool on){ beep=on; }
-  bool getBeep() const { return beep; }
+  void setBeep(FXbool on){ beep=on; }
+  FXbool getBeep() const { return beep; }
 
   /// Set display font
   void setDisplayFont(FXFont* font);

@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIcon.cpp,v 1.72 2006/03/25 07:24:45 fox Exp $                          *
+* $Id: FXIcon.cpp,v 1.75 2007/02/22 23:58:55 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -130,16 +130,16 @@ void FXIcon::create(){
 
       // Create a memory DC compatible with current display
       HDC hdc=::GetDC(GetDesktopWindow());
-      xid=CreateCompatibleBitmap(hdc,FXMAX(width,1),FXMAX(height,1));
+      xid=::CreateCompatibleBitmap(hdc,FXMAX(width,1),FXMAX(height,1));
       ::ReleaseDC(GetDesktopWindow(),hdc);
       if(!xid){ fxerror("%s::create: unable to create image.\n",getClassName()); }
 
       // Make shape bitmap
-      shape=CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
+      shape=::CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
       if(!shape){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 
       // Make etch bitmap
-      etch=CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
+      etch=::CreateBitmap(FXMAX(width,1),FXMAX(height,1),1,1,NULL);
       if(!etch){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 
 #endif
@@ -180,9 +180,9 @@ void FXIcon::destroy(){
 #else
 
       // Delete shape, etch, and image bitmaps
-      DeleteObject(shape);
-      DeleteObject(etch);
-      DeleteObject(xid);
+      ::DeleteObject(shape);
+      ::DeleteObject(etch);
+      ::DeleteObject(xid);
 #endif
       }
     shape=0;
@@ -200,7 +200,7 @@ void FXIcon::render(){
   if(xid){
     register Visual *vis;
     register XImage *xim=NULL;
-    register bool shmi=false;
+    register FXbool shmi=false;
     register FXColor *img;
     register FXint x,y;
     XGCValues values;
@@ -472,27 +472,28 @@ void FXIcon::render(){
       hdcmsk=::CreateCompatibleDC(NULL);
 
       // Set mask data
-      if(!SetDIBits(hdcmsk,(HBITMAP)shape,0,height,maskdata,(BITMAPINFO*)&bmi,DIB_RGB_COLORS)){
+      if(!::SetDIBits(hdcmsk,(HBITMAP)shape,0,height,maskdata,(BITMAPINFO*)&bmi,DIB_RGB_COLORS)){
         fxerror("%s::render: unable to render pixels\n",getClassName());
         }
 
       // Set etch data
-      if(!SetDIBits(hdcmsk,(HBITMAP)etch,0,height,etchdata,(BITMAPINFO*)&bmi,DIB_RGB_COLORS)){
+      if(!::SetDIBits(hdcmsk,(HBITMAP)etch,0,height,etchdata,(BITMAPINFO*)&bmi,DIB_RGB_COLORS)){
         fxerror("%s::render: unable to render pixels\n",getClassName());
         }
       freeElms(maskdata);
       freeElms(etchdata);
-      GdiFlush();
+      ::GdiFlush();
 
       // We AND the image with the mask, then we can do faster and more
       // flicker-free icon painting later using the `black source' method
-      SelectObject(hdcmsk,(HBITMAP)shape);
+      HBITMAP hmsk=(HBITMAP)::SelectObject(hdcmsk,(HBITMAP)shape);
       HDC hdcmem=::CreateCompatibleDC(NULL);
-      HGDIOBJ hbm=SelectObject(hdcmem,(HBITMAP)xid);
-      SetBkColor(hdcmem,RGB(0,0,0));                // 1 -> black
-      SetTextColor(hdcmem,RGB(255,255,255));        // 0 -> white
-      BitBlt(hdcmem,0,0,width,height,hdcmsk,0,0,SRCAND);
-      SelectObject(hdcmem,hbm);
+      HBITMAP hbmp=(HBITMAP)::SelectObject(hdcmem,(HBITMAP)xid);
+      ::SetBkColor(hdcmem,RGB(0,0,0));                // 1 -> black
+      ::SetTextColor(hdcmem,RGB(255,255,255));        // 0 -> white
+      ::BitBlt(hdcmem,0,0,width,height,hdcmsk,0,0,SRCAND);
+      ::SelectObject(hdcmem,hbmp);
+      ::SelectObject(hdcmsk,hmsk);
       ::DeleteDC(hdcmem);
       ::DeleteDC(hdcmsk);
       }
@@ -537,22 +538,22 @@ void FXIcon::resize(FXint w,FXint h){
 #else
 
       // Delete old bitmaps
-      DeleteObject(xid);
-      DeleteObject(shape);
-      DeleteObject(etch);
+      ::DeleteObject(xid);
+      ::DeleteObject(shape);
+      ::DeleteObject(etch);
 
       // Create a bitmap compatible with current display
       HDC hdc=::GetDC(GetDesktopWindow());
-      xid=CreateCompatibleBitmap(hdc,w,h);
+      xid=::CreateCompatibleBitmap(hdc,w,h);
       ::ReleaseDC(GetDesktopWindow(),hdc);
       if(!xid){ fxerror("%s::resize: unable to resize image.\n",getClassName()); }
 
       // Make shape bitmap
-      shape=CreateBitmap(w,h,1,1,NULL);
+      shape=::CreateBitmap(w,h,1,1,NULL);
       if(!shape){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 
       // Make etch bitmap
-      etch=CreateBitmap(w,h,1,1,NULL);
+      etch=::CreateBitmap(w,h,1,1,NULL);
       if(!etch){ fxerror("%s::create: unable to create icon.\n",getClassName()); }
 #endif
       }

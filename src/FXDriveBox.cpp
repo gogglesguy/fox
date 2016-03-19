@@ -3,7 +3,7 @@
 *                         D r i v e   B o x   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDriveBox.cpp,v 1.36 2006/03/31 07:33:06 fox Exp $                      *
+* $Id: FXDriveBox.cpp,v 1.38 2007/02/07 20:22:06 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -273,7 +273,7 @@ long FXDriveBox::onListChanged(FXObject*,FXSelector,void* ptr){
 
 
 // Set directory
-bool FXDriveBox::setDrive(const FXString& drive){
+FXbool FXDriveBox::setDrive(const FXString& drive){
   listDrives();
   setCurrentItem(findItem(FXPath::drive(FXPath::absolute(drive))));
   return true;

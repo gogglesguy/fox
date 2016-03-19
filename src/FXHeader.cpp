@@ -3,7 +3,7 @@
 *                               H e a d e r   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXHeader.cpp,v 1.105 2006/04/05 04:27:26 fox Exp $                       *
+* $Id: FXHeader.cpp,v 1.119 2007/02/07 20:22:10 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -68,12 +68,17 @@ using namespace FX;
 
 namespace FX {
 
+
+// Explicit template specialization
+//template class FXObjectListOf<FXHeaderItem>;
+
+
 // Object implementation
 FXIMPLEMENT(FXHeaderItem,FXObject,NULL,0)
 
 
 // Draw item
-void FXHeaderItem::draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,FXint h){
+void FXHeaderItem::draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const {
   register FXint tx,ty,tw,th,ix,iy,iw,ih,s,ml,mr,mt,mb,beg,end,t,xx,yy,bb,aa,ax,ay;
   register FXFont *font=header->getFont();
 
@@ -180,7 +185,6 @@ void FXHeaderItem::draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,
   dc.setForeground(header->getTextColor());
 
   // Draw text
-  dc.setFont(font);
   yy=ty+font->getFontAscent();
   beg=0;
   do{
@@ -214,7 +218,7 @@ void FXHeaderItem::detach(){ if(icon) icon->detach(); }
 
 // Change sort direction
 void FXHeaderItem::setArrowDir(FXuint dir){
-  state=(state&~(ARROW_UP|ARROW_DOWN)) | (dir&(ARROW_UP|ARROW_DOWN));
+  state^=((dir^state)&(ARROW_UP|ARROW_DOWN));
   }
 
 
@@ -226,37 +230,37 @@ FXuint FXHeaderItem::getArrowDir() const {
 
 // Change justify mode
 void FXHeaderItem::setJustify(FXuint justify){
-  state=(state&~(RIGHT|LEFT|TOP|BOTTOM)) | (justify&(RIGHT|LEFT|TOP|BOTTOM));
+  state^=((justify^state)&(RIGHT|LEFT|TOP|BOTTOM));
   }
 
 
 // Return content justification
-FXuint FXHeaderItem::getJustify() const { 
-  return state&(RIGHT|LEFT|TOP|BOTTOM); 
+FXuint FXHeaderItem::getJustify() const {
+  return state&(RIGHT|LEFT|TOP|BOTTOM);
   }
 
 
 // Change icon positioning
 void FXHeaderItem::setIconPosition(FXuint mode){
-  state=(state&~(BEFORE|AFTER|ABOVE|BELOW)) | (mode&(BEFORE|AFTER|ABOVE|BELOW));
+  state^=((mode^state)&(BEFORE|AFTER|ABOVE|BELOW));
   }
 
 
 // Return icon position
-FXuint FXHeaderItem::getIconPosition() const { 
-  return state&(BEFORE|AFTER|ABOVE|BELOW); 
+FXuint FXHeaderItem::getIconPosition() const {
+  return state&(BEFORE|AFTER|ABOVE|BELOW);
   }
 
 
 // Set button state
-void FXHeaderItem::setPressed(bool pressed){
-  if(pressed) state|=PRESSED; else state&=~PRESSED;
+void FXHeaderItem::setPressed(FXbool pressed){
+  state^=((0-pressed)^state)&PRESSED;
   }
 
 
 // Return pressed state
-bool FXHeaderItem::isPressed() const { 
-  return (state&PRESSED)!=0; 
+FXbool FXHeaderItem::isPressed() const {
+  return (state&PRESSED)!=0;
   }
 
 
@@ -462,7 +466,7 @@ FXHeaderItem *FXHeader::getItem(FXint index) const {
 
 
 // Replace item with another
-FXint FXHeader::setItem(FXint index,FXHeaderItem* item,bool notify){
+FXint FXHeader::setItem(FXint index,FXHeaderItem* item,FXbool notify){
 
   // Must have item
   if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
@@ -490,13 +494,13 @@ FXint FXHeader::setItem(FXint index,FXHeaderItem* item,bool notify){
 
 
 // Replace item with another
-FXint FXHeader::setItem(FXint index,const FXString& text,FXIcon *icon,FXint size,void* ptr,bool notify){
+FXint FXHeader::setItem(FXint index,const FXString& text,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   return setItem(index,createItem(text,icon,FXMAX(size,0),ptr),notify);
   }
 
 
 // Insert item
-FXint FXHeader::insertItem(FXint index,FXHeaderItem* item,bool notify){
+FXint FXHeader::insertItem(FXint index,FXHeaderItem* item,FXbool notify){
   register FXint i,d;
 
   // Must have item
@@ -525,36 +529,36 @@ FXint FXHeader::insertItem(FXint index,FXHeaderItem* item,bool notify){
 
 
 // Insert item
-FXint FXHeader::insertItem(FXint index,const FXString& text,FXIcon *icon,FXint size,void* ptr,bool notify){
+FXint FXHeader::insertItem(FXint index,const FXString& text,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   return insertItem(index,createItem(text,icon,FXMAX(size,0),ptr),notify);
   }
 
 
 // Append item
-FXint FXHeader::appendItem(FXHeaderItem* item,bool notify){
+FXint FXHeader::appendItem(FXHeaderItem* item,FXbool notify){
   return insertItem(items.no(),item,notify);
   }
 
 
 // Append item
-FXint FXHeader::appendItem(const FXString& text,FXIcon *icon,FXint size,void* ptr,bool notify){
+FXint FXHeader::appendItem(const FXString& text,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   return insertItem(items.no(),createItem(text,icon,FXMAX(size,0),ptr),notify);
   }
 
 
 // Prepend item
-FXint FXHeader::prependItem(FXHeaderItem* item,bool notify){
+FXint FXHeader::prependItem(FXHeaderItem* item,FXbool notify){
   return insertItem(0,item,notify);
   }
 
 // Prepend item
-FXint FXHeader::prependItem(const FXString& text,FXIcon *icon,FXint size,void* ptr,bool notify){
+FXint FXHeader::prependItem(const FXString& text,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   return insertItem(0,createItem(text,icon,FXMAX(size,0),ptr),notify);
   }
 
 
 // Fill list by appending items from array of strings
-FXint FXHeader::fillItems(const FXchar** strings,FXIcon *icon,FXint size,void* ptr,bool notify){
+FXint FXHeader::fillItems(const FXchar** strings,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){
@@ -566,7 +570,7 @@ FXint FXHeader::fillItems(const FXchar** strings,FXIcon *icon,FXint size,void* p
 
 
 // Fill list by appending items from newline separated strings
-FXint FXHeader::fillItems(const FXString& strings,FXIcon *icon,FXint size,void* ptr,bool notify){
+FXint FXHeader::fillItems(const FXString& strings,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   register FXint n=0;
   FXString text;
   while(!(text=strings.section('\n',n)).empty()){
@@ -578,7 +582,7 @@ FXint FXHeader::fillItems(const FXString& strings,FXIcon *icon,FXint size,void* 
 
 
 // Extract node from list
-FXHeaderItem* FXHeader::extractItem(FXint index,bool notify){
+FXHeaderItem* FXHeader::extractItem(FXint index,FXbool notify){
   register FXHeaderItem *result;
   register FXint i,d;
 
@@ -606,7 +610,7 @@ FXHeaderItem* FXHeader::extractItem(FXint index,bool notify){
 
 
 // Remove node from list
-void FXHeader::removeItem(FXint index,bool notify){
+void FXHeader::removeItem(FXint index,FXbool notify){
   register FXint i,d;
 
   // Must be in range
@@ -630,7 +634,7 @@ void FXHeader::removeItem(FXint index,bool notify){
 
 
 // Remove all items
-void FXHeader::clearItems(bool notify){
+void FXHeader::clearItems(FXbool notify){
 
   // Delete items
   for(FXint index=items.no()-1; 0<=index; index--){
@@ -711,8 +715,8 @@ FXint FXHeader::getItemOffset(FXint index) const {
 // Get index of item at offset
 FXint FXHeader::getItemAt(FXint coord) const {
   register FXint h=items.no()-1,l=0,m;
+  coord=coord-pos;
   if(l<=h){
-    coord=coord-pos;
     if(coord<items[l]->getPos()) return -1;
     if(coord>=items[h]->getPos()+items[h]->getSize()) return items.no();
     do{
@@ -724,7 +728,7 @@ FXint FXHeader::getItemAt(FXint coord) const {
     while(h>=l);
     return m;
     }
-  return -1;
+  return coord<0 ? -1 : 0;
   }
 
 
@@ -794,7 +798,7 @@ FXuint FXHeader::getItemIconPosition(FXint index) const {
 
 
 // Changed button item's pressed state
-void FXHeader::setItemPressed(FXint index,bool pressed){
+void FXHeader::setItemPressed(FXint index,FXbool pressed){
   if(index<0 || items.no()<=index){ fxerror("%s::setItemPressed: index out of range.\n",getClassName()); }
   if(pressed!=items[index]->isPressed()){
     items[index]->setPressed(pressed);
@@ -803,8 +807,8 @@ void FXHeader::setItemPressed(FXint index,bool pressed){
   }
 
 
-// Return TRUE if button item is pressed in
-bool FXHeader::isItemPressed(FXint index) const {
+// Return true if button item is pressed in
+FXbool FXHeader::isItemPressed(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::isItemPressed: index out of range.\n",getClassName()); }
   return items[index]->isPressed();
   }
@@ -853,111 +857,126 @@ void FXHeader::layout(){
 long FXHeader::onPaint(FXObject*,FXSelector,void* ptr){
   FXEvent *ev=(FXEvent*)ptr;
   FXDCWindow dc(this,ev);
-  register FXint x,y,w,h,i,ilo,ihi;
+  FXint x,y,w,h,i,ilo,ihi;
+
+  // Set font
+  dc.setFont(font);
 
   // Paint background
   dc.setForeground(backColor);
   dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
 
-  // Got items
-  if(items.no()){
-    if(options&HEADER_VERTICAL){
+  // Vertical
+  if(options&HEADER_VERTICAL){
 
-      // Determine affected items
-      ilo=getItemAt(ev->rect.y);
-      ihi=getItemAt(ev->rect.y+ev->rect.h);
+    // Determine affected items
+    ilo=getItemAt(ev->rect.y);
+    ihi=getItemAt(ev->rect.y+ev->rect.h);
 
-      // Fragment below first item
-      if(ilo<0){
+    // Fragment below first item
+    if(ilo<0){
+      y=pos;
+      if(0<items.no()){
         y=pos+items[0]->getPos();
-        if(0<y){
-          if(options&FRAME_THICK)
-            drawDoubleRaisedRectangle(dc,0,0,width,y);
-          else if(options&FRAME_RAISED)
-            drawRaisedRectangle(dc,0,0,width,y);
-          }
-        ilo=0;
         }
-
-      // Fragment above last item
-      if(ihi>=items.no()){
-        y=pos+items[items.no()-1]->getPos()+items[items.no()-1]->getSize();
-        if(y<height){
-          if(options&FRAME_THICK)
-            drawDoubleRaisedRectangle(dc,0,y,width,height-y);
-          else if(options&FRAME_RAISED)
-            drawRaisedRectangle(dc,0,y,width,height-y);
-          }
-        ihi=items.no()-1;
+      if(0<y){
+        if(options&FRAME_THICK)
+          drawDoubleRaisedRectangle(dc,0,0,width,y);
+        else if(options&FRAME_RAISED)
+          drawRaisedRectangle(dc,0,0,width,y);
         }
-
-      // Draw only affected items
-      for(i=ilo; i<=ihi; i++){
-        y=pos+items[i]->getPos();
-        h=items[i]->getSize();
-        if(items[i]->isPressed()){
-          if(options&FRAME_THICK)
-            drawDoubleSunkenRectangle(dc,0,y,width,h);
-          else if(options&FRAME_RAISED)
-            drawSunkenRectangle(dc,0,y,width,h);
-          }
-        else{
-          if(options&FRAME_THICK)
-            drawDoubleRaisedRectangle(dc,0,y,width,h);
-          else if(options&FRAME_RAISED)
-            drawRaisedRectangle(dc,0,y,width,h);
-          }
-        items[i]->draw(this,dc,0,y,width,h);
-        }
+      ilo=0;
       }
-    else{
 
-      // Determine affected items
-      ilo=getItemAt(ev->rect.x);
-      ihi=getItemAt(ev->rect.x+ev->rect.w);
+    // Fragment above last item
+    if(ihi>=items.no()){
+      y=pos;
+      if(0<items.no()){
+        y=pos+items[items.no()-1]->getPos()+items[items.no()-1]->getSize();
+        }
+      if(y<height){
+        if(options&FRAME_THICK)
+          drawDoubleRaisedRectangle(dc,0,y,width,height-y);
+        else if(options&FRAME_RAISED)
+          drawRaisedRectangle(dc,0,y,width,height-y);
+        }
+      ihi=items.no()-1;
+      }
 
-      // Fragment below first item
-      if(ilo<0){
+    // Draw only affected items
+    for(i=ilo; i<=ihi; i++){
+      y=pos+items[i]->getPos();
+      h=items[i]->getSize();
+      if(items[i]->isPressed()){
+        if(options&FRAME_THICK)
+          drawDoubleSunkenRectangle(dc,0,y,width,h);
+        else if(options&FRAME_RAISED)
+          drawSunkenRectangle(dc,0,y,width,h);
+        }
+      else{
+        if(options&FRAME_THICK)
+          drawDoubleRaisedRectangle(dc,0,y,width,h);
+        else if(options&FRAME_RAISED)
+          drawRaisedRectangle(dc,0,y,width,h);
+        }
+      items[i]->draw(this,dc,0,y,width,h);
+      }
+    }
+
+  // Horizontal
+  else{
+
+    // Determine affected items
+    ilo=getItemAt(ev->rect.x);
+    ihi=getItemAt(ev->rect.x+ev->rect.w);
+
+    // Fragment below first item
+    if(ilo<0){
+      x=pos;
+      if(0<items.no()){
         x=pos+items[0]->getPos();
-        if(0<x){
-          if(options&FRAME_THICK)
-            drawDoubleRaisedRectangle(dc,0,0,x,height);
-          else if(options&FRAME_RAISED)
-            drawRaisedRectangle(dc,0,0,x,height);
-          }
-        ilo=0;
         }
+      if(0<x){
+        if(options&FRAME_THICK)
+          drawDoubleRaisedRectangle(dc,0,0,x,height);
+        else if(options&FRAME_RAISED)
+          drawRaisedRectangle(dc,0,0,x,height);
+        }
+      ilo=0;
+      }
 
-      // Fragment above last item
-      if(ihi>=items.no()){
+    // Fragment above last item
+    if(ihi>=items.no()){
+      x=pos;
+      if(0<items.no()){
         x=pos+items[items.no()-1]->getPos()+items[items.no()-1]->getSize();
-        if(x<width){
-          if(options&FRAME_THICK)
-            drawDoubleRaisedRectangle(dc,x,0,width-x,height);
-          else if(options&FRAME_RAISED)
-            drawRaisedRectangle(dc,x,0,width-x,height);
-          }
-        ihi=items.no()-1;
         }
+      if(x<width){
+        if(options&FRAME_THICK)
+          drawDoubleRaisedRectangle(dc,x,0,width-x,height);
+        else if(options&FRAME_RAISED)
+          drawRaisedRectangle(dc,x,0,width-x,height);
+        }
+      ihi=items.no()-1;
+      }
 
-      // Draw only the affected items
-      for(i=ilo; i<=ihi; i++){
-        x=pos+items[i]->getPos();
-        w=items[i]->getSize();
-        if(items[i]->isPressed()){
-          if(options&FRAME_THICK)
-            drawDoubleSunkenRectangle(dc,x,0,w,height);
-          else if(options&FRAME_RAISED)
-            drawSunkenRectangle(dc,x,0,w,height);
-          }
-        else{
-          if(options&FRAME_THICK)
-            drawDoubleRaisedRectangle(dc,x,0,w,height);
-          else if(options&FRAME_RAISED)
-            drawRaisedRectangle(dc,x,0,w,height);
-          }
-        items[i]->draw(this,dc,x,0,w,height);
+    // Draw only the affected items
+    for(i=ilo; i<=ihi; i++){
+      x=pos+items[i]->getPos();
+      w=items[i]->getSize();
+      if(items[i]->isPressed()){
+        if(options&FRAME_THICK)
+          drawDoubleSunkenRectangle(dc,x,0,w,height);
+        else if(options&FRAME_RAISED)
+          drawSunkenRectangle(dc,x,0,w,height);
         }
+      else{
+        if(options&FRAME_THICK)
+          drawDoubleRaisedRectangle(dc,x,0,w,height);
+        else if(options&FRAME_RAISED)
+          drawRaisedRectangle(dc,x,0,w,height);
+        }
+      items[i]->draw(this,dc,x,0,w,height);
       }
     }
   return 1;
@@ -1015,7 +1034,7 @@ long FXHeader::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     // Where clicked
     coord=(options&HEADER_VERTICAL)?event->win_y:event->win_x;
     active=getItemAt(coord);
-    if(0<=active){
+    if(0<=active && active<items.no()){
       if((options&HEADER_RESIZE) && (active<items.no()) && (pos+items[active]->getPos()+items[active]->getSize()-FUDGE<coord)){
         activepos=pos+items[active]->getPos();
         activesize=items[active]->getSize();
@@ -1034,7 +1053,7 @@ long FXHeader::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
       else if((options&HEADER_BUTTON) && (active<items.no())){
         activepos=pos+items[active]->getPos();
         activesize=items[active]->getSize();
-        setItemPressed(active,TRUE);
+        setItemPressed(active,true);
         flags|=FLAG_PRESSED;
         }
       }
@@ -1078,7 +1097,7 @@ long FXHeader::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     // Pressed button
     if(flg&FLAG_PRESSED){
       if(items[active]->isPressed()){
-        setItemPressed(active,FALSE);
+        setItemPressed(active,false);
         if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)active);
         }
       return 1;
@@ -1134,18 +1153,18 @@ long FXHeader::onMotion(FXObject*,FXSelector,void* ptr){
   if(flags&FLAG_PRESSED){
     if(options&HEADER_VERTICAL){
       if(activepos<=event->win_y && event->win_y<activepos+activesize && 0<=event->win_x && event->win_x<width){
-        setItemPressed(active,TRUE);
+        setItemPressed(active,true);
         }
       else{
-        setItemPressed(active,FALSE);
+        setItemPressed(active,false);
         }
       }
     else{
       if(activepos<=event->win_x && event->win_x<activepos+activesize && 0<=event->win_y && event->win_y<height){
-        setItemPressed(active,TRUE);
+        setItemPressed(active,true);
         }
       else{
-        setItemPressed(active,FALSE);
+        setItemPressed(active,false);
         }
       }
     return 1;
@@ -1196,7 +1215,7 @@ void FXHeader::drawSplit(FXint p){
   FXDCWindow dc(getParent());
   FXint px,py;
   translateCoordinatesTo(px,py,getParent(),p,p);
-  dc.clipChildren(FALSE);
+  dc.clipChildren(false);
   dc.setFunction(BLT_NOT_DST);
   if(options&HEADER_VERTICAL){
     dc.fillRectangle(0,py,getParent()->getWidth(),2);

@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorSelector.h,v 1.31 2006/03/31 07:33:01 fox Exp $                   *
+* $Id: FXColorSelector.h,v 1.33 2007/02/07 20:21:52 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXCOLORSELECTOR_H
 #define FXCOLORSELECTOR_H
@@ -159,10 +159,10 @@ public:
   FXColor getRGBA() const;
 
   /// Return true if only opaque colors allowed
-  bool isOpaqueOnly() const;
+  FXbool isOpaqueOnly() const;
 
   /// Change opaque only mode
-  void setOpaqueOnly(bool opaque);
+  void setOpaqueOnly(FXbool opaque);
 
   /// Save to a stream
   virtual void save(FXStream& store) const;

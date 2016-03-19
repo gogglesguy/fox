@@ -3,7 +3,7 @@
 *                          P P M   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxppmio.cpp,v 1.14 2006/03/24 06:05:03 fox Exp $                         *
+* $Id: fxppmio.cpp,v 1.17 2007/02/07 20:22:21 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -44,9 +44,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckPPM(FXStream& store);
-extern FXAPI bool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height);
+extern FXAPI FXbool fxcheckPPM(FXStream& store);
+extern FXAPI FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 
 // Read one integer
@@ -73,7 +73,7 @@ static FXint getint(FXStream& store){
 
 
 // Check if stream contains a PPM
-bool fxcheckPPM(FXStream& store){
+FXbool fxcheckPPM(FXStream& store){
   FXuchar signature[2];
   store.load(signature,2);
   store.position(-2,FXFromCurrent);
@@ -82,7 +82,7 @@ bool fxcheckPPM(FXStream& store){
 
 
 // Load image from stream
-bool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   register FXint npixels,i,j,maxvalue=1;
   register FXuchar *pp;
   FXuchar magic,format,byte,r,g,b;
@@ -114,7 +114,7 @@ bool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     if(maxvalue<=0 || maxvalue>=256) return false;
     }
 
-  FXTRACE((1,"fxloadPPM: width=%d height=%d type=%c \n",width,height,format));
+  //FXTRACE((100,"fxloadPPM: width=%d height=%d type=%c \n",width,height,format));
 
   // Allocate buffer
   if(!callocElms(data,npixels)) return false;
@@ -204,7 +204,7 @@ bool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 
 // Save a bmp file to a stream
-bool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height){
+FXbool fxsavePPM(FXStream& store,const FXColor *data,FXint width,FXint height){
   register const FXuchar *pp=(const FXuchar*)data;
   register FXint i,j,nsize;
   FXchar size[20];
