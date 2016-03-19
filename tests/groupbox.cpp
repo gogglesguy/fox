@@ -361,7 +361,7 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
   new FXCheckButton(vv,"Hilversum 2",NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
   FXCheckButton *chk1=new FXCheckButton(vv,"One multi-line\nCheckbox Widget",NULL,0,CHECKBUTTON_PLUS|JUSTIFY_LEFT|JUSTIFY_TOP|ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
   chk1->setCheck(MAYBE);
-  FXCheckButton *chk2=new FXCheckButton(vv,fromAscii("Ouvres votre fen\\u00EAtre"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
+  FXCheckButton *chk2=new FXCheckButton(vv,unescape("Ouvres votre fen\\u00EAtre"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
   chk2->setCheck(MAYBE);
 
   FXSpinner *spinner=new FXSpinner(group3,20,NULL,0,SPIN_NORMAL|FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP);

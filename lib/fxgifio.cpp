@@ -469,13 +469,13 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   FXushort codetab[5003];
 
   // Must make sense
-  if(!data || width<=0 || height<=0) return false;
+  if(!data || width<=0 || height<=0 || width>65535 || height>65535) return false;
 
   // How many pixels
   maxpixels=width*height;
 
   // Allocate temp buffer for pixels
-  if(!allocElms(output,(maxpixels<<1))) return false;
+  if(!allocElms(output,((FXuval)maxpixels)<<1)) return false;
   pixels=output+maxpixels;
 
   // First, try EZ quantization, because it is exact; a previously

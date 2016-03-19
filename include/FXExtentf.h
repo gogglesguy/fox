@@ -84,6 +84,9 @@ public:
   /// Height of box
   FXfloat height() const { return upper.y-lower.y; }
 
+  /// Area
+  FXfloat area() const { return width()*height(); }
+  
   /// Longest side
   FXfloat longest() const;
 

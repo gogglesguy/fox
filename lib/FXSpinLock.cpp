@@ -27,6 +27,7 @@
   Notes:
 
   - Spin lock variable.
+  - Ticket spinlock flavor does not support more than 256 simultaneous threads.
 */
 
 using namespace FX;

@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
+
 AM_CXXFLAGS = @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP  = $(top_builddir)/utils/reswrap$(EXEEXT)
@@ -10,6 +11,7 @@ lib_LTLIBRARIES = libFOX-1.7.la
 libFOX_1_7_la_LIBADD  = $(X_LIBS) $(X_PRE_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS) $(GL_LIBS)
 
 libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
+
 
 CURSORS = \
 $(top_srcdir)/lib/blank.xbm \
@@ -239,6 +241,7 @@ FXDelegator.cpp \
 FXDial.cpp \
 FXDialogBox.cpp \
 FXDict.cpp \
+FXDictionary.cpp \
 FXDir.cpp \
 FXDirBox.cpp \
 FXDirDialog.cpp \
@@ -309,6 +312,7 @@ FXJP2Icon.cpp \
 FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
+FXJSON.cpp \
 FXKnob.cpp \
 FXLabel.cpp \
 FXLFQueue.cpp \

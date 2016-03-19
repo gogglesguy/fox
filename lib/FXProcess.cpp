@@ -431,7 +431,7 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
       // Stderr was redirected
       si.hStdError=GetStdHandle(STD_ERROR_HANDLE);
       if(errors && errors->isOpen()){
-        si.hStdError=output->handle();
+        si.hStdError=errors->handle();
         }
 
       // Build wide-character command line

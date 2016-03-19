@@ -258,6 +258,7 @@ FXIO.cpp \
 FXIODevice.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
+FXJSON.cpp \
 FXKOI8RCodec.cpp \
 FXKnob.cpp \
 FXLabel.cpp \

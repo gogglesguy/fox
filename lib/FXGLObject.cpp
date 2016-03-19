@@ -63,10 +63,6 @@ using namespace FX;
 namespace FX {
 
 
-// Explicit template specialization
-//template class FXObjectListOf<FXGLObject>;
-
-
 // Object implementation
 FXIMPLEMENT(FXGLObject,FXObject,NULL,0)
 
@@ -109,8 +105,6 @@ FXbool FXGLObject::drag(FXGLViewer*,FXint,FXint,FXint,FXint){ return false; }
 
 
 /*******************************************************************************/
-
-
 
 // Object implementation
 FXIMPLEMENT(FXGLGroup,FXGLObject,NULL,0)

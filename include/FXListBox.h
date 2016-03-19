@@ -72,6 +72,7 @@ public:
   long onFieldButton(FXObject*,FXSelector,void*);
   long onListUpdate(FXObject*,FXSelector,void*);
   long onListClicked(FXObject*,FXSelector,void*);
+  long onListChanged(FXObject*,FXSelector,void*);
   long onListCommand(FXObject*,FXSelector,void*);
   long onListForward(FXObject*,FXSelector,void*);
   long onCmdSetValue(FXObject*,FXSelector,void*);

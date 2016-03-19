@@ -130,12 +130,13 @@ FXObjectList& FXObjectList::operator=(const FXObjectList& orig){
 
 
 // Adopt objects from orig, leaving orig empty
-void FXObjectList::adopt(FXObjectList& orig){
+FXObjectList& FXObjectList::adopt(FXObjectList& orig){
   if(__likely(ptr!=orig.ptr)){
     if(ptr!=EMPTY){ free(ptr-1); }
     ptr=orig.ptr;
     orig.ptr=EMPTY;
     }
+  return *this;
   }
 
 

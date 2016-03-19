@@ -254,7 +254,7 @@ inline FXbool equalElms(const FXfloat* dst,const FXfloat* src,FXuval n){ return 
 inline FXbool equalElms(const FXdouble* dst,const FXdouble* src,FXuval n){ return memcmp(dst,src,n<<3)==0; }
 
 // Simple bit-wise comparison for array of pointers to any type
-template<class EType> inline void equalElms(EType** dst,const EType** src,FXuval n){ return memcmp(dst,src,n*sizeof(void*))==0; }
+template<class EType> inline FXbool equalElms(EType** dst,const EType** src,FXuval n){ return memcmp(dst,src,n*sizeof(void*))==0; }
 
 
 // Fill byte arrays with constant

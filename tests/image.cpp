@@ -86,7 +86,7 @@ FXColor blue_ramp[512*50];
 
 
 // Construct ImageWindow
-ImageWindow::ImageWindow(FXApp* a):FXMainWindow(a,"Image Application",NULL,NULL,DECOR_ALL,0,0,800,600){
+ImageWindow::ImageWindow(FXApp* a):FXMainWindow(a,"Image Application",NULL,NULL,DECOR_ALL,0,0,900,600){
   FXint x,y;
   FXVerticalFrame *canvasFrame;
   FXVerticalFrame *buttonFrame;
@@ -375,7 +375,4 @@ int main(int argc,char *argv[]){
   // Run the application
   return application.run();
   }
-
-
-
 

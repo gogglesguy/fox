@@ -64,7 +64,8 @@ gltest.exe \
 wizard.exe \
 imageviewer.exe \
 half.exe \
-unicode.exe
+unicode.exe \
+variant.exe
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp
@@ -166,6 +167,9 @@ unicode.exe: $(FOXLIB) unicode.obj
 
 process.exe: $(FOXLIB) process.obj
 	$(LD) $(LDFLAGS) process.obj $(FOXLIB)
+
+variant.exe: $(FOXLIB) variant.obj
+	$(LD) $(LDFLAGS) variant.obj $(FOXLIB)
 
 clean:
 	del *.obj

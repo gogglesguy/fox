@@ -224,61 +224,69 @@ FXint FXRanged::intersect(const FXVec4d& plane) const {
 
 // Intersect box with ray u-v
 FXbool FXRanged::intersect(const FXVec3d& u,const FXVec3d& v) const {
+  FXdouble hits[2];
+  return intersect(u,v-u,hits) && hits[1]<=1.0;
+  }
+
+
+// Intersect box with ray p+lambda*d, returning true if hit
+FXbool FXRanged::intersect(const FXVec3d& pos,const FXVec3d& dir,FXdouble hit[]) const {
   register FXdouble f= DBL_MAX;
   register FXdouble n=-DBL_MAX;
-  register FXdouble d,ni,fi;
-  d = v.x-u.x;
-  if(__likely(d!=0.0)){
-    if(0.0<d){
-      ni = (lower.x-u.x)/d;
-      fi = (upper.x-u.x)/d;
+  register FXdouble ni,fi;
+  if(__likely(dir.x!=0.0)){
+    if(0.0<dir.x){
+      ni=(lower.x-pos.x)/dir.x;
+      fi=(upper.x-pos.x)/dir.x;
       }
     else{
-      ni = (upper.x-u.x)/d;
-      fi = (lower.x-u.x)/d;
+      ni=(upper.x-pos.x)/dir.x;
+      fi=(lower.x-pos.x)/dir.x;
+      }
+    if(ni>n) n=ni;
+    if(fi<f) f=fi;
+    if(f<0.0) return false;
+    }
+  else{
+    if((pos.x<lower.x) || (pos.x>upper.x)) return false;
+    }
+  if(__likely(dir.y!=0.0)){
+    if(0.0<dir.y){
+      ni=(lower.y-pos.y)/dir.y;
+      fi=(upper.y-pos.y)/dir.y;
+      }
+    else{
+      ni=(upper.y-pos.y)/dir.y;
+      fi=(lower.y-pos.y)/dir.y;
       }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
+    if(f<0.0) return false;
     }
   else{
-    if((upper.x<u.x) || (u.x<lower.x)) return false;
+    if((pos.y<lower.y) || (pos.y>upper.y)) return false;
     }
-  d = v.y-u.y;
-  if(__likely(d!=0.0)){
-    if(0.0<d){
-      ni = (lower.y-u.y)/d;
-      fi = (upper.y-u.y)/d;
+  if(__likely(dir.z!=0.0)){
+    if(0.0<dir.z){
+      ni=(lower.z-pos.z)/dir.z;
+      fi=(upper.z-pos.z)/dir.z;
       }
     else{
-      ni = (upper.y-u.y)/d;
-      fi = (lower.y-u.y)/d;
+      ni=(upper.z-pos.z)/dir.z;
+      fi=(lower.z-pos.z)/dir.z;
       }
     if(ni>n) n=ni;
     if(fi<f) f=fi;
     if(n>f) return false;
+    if(f<0.0) return false;
     }
   else{
-    if((upper.y<u.y) || (u.y<lower.y)) return false;
+    if((pos.z<lower.z) || (pos.z>upper.z)) return false;
     }
-  d = v.z-u.z;
-  if(__likely(d!=0.0)){
-    if(0.0<d){
-      ni = (lower.z-u.z)/d;
-      fi = (upper.z-u.z)/d;
-      }
-    else{
-      ni = (upper.z-u.z)/d;
-      fi = (lower.z-u.z)/d;
-      }
-    if(ni>n) n=ni;
-    if(fi<f) f=fi;
-    if(n>f) return false;
-    }
-  else{
-    if((upper.z<u.z) || (u.z<lower.z)) return false;
-    }
-  return 0.0<=f && n<=1.0;
+  hit[0]=n;     // May be < 0
+  hit[1]=f;
+  return true;
   }
 
 

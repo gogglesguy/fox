@@ -256,7 +256,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 #ifdef UNICODE
   utf2ncs(lf.lfFaceName,wantfamily.text(),LF_FACESIZE);
 #else
-  strncpy(lf.lfFaceName,wantfamily.text(),LF_FACESIZE);
+  fxstrlcpy(lf.lfFaceName,wantfamily.text(),LF_FACESIZE);
 #endif
 
   // Here we go!
@@ -797,7 +797,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       //FXTRACE((1,"font=%s\n",fontnames[f]));
 
       // Break apart into fields
-      strncpy(candidate,fontnames[f],sizeof(candidate));
+      fxstrlcpy(candidate,fontnames[f],sizeof(candidate));
       xlfdSplit(field,candidate);
 
       // Get info
@@ -942,7 +942,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       FXTRACE((150,"bweight=%-3d bsize=%3d bslant=%d bsetwidth=%d bscalable=%d bpolymorph=%d bxres=%-3d byres=%-3d xlfd=\"%s\"\n",bweight,bsize,bslant,bsetwidth,bscalable,bpolymorph,bxres,byres,fontnames[b]));
 
       // Keep desired font name
-      strncpy(xlfd,fontnames[b],sizeof(xlfd));
+      fxstrlcpy(xlfd,fontnames[b],sizeof(xlfd));
 
       // Free the list
       XFreeFontNames(fontnames);
@@ -952,7 +952,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       if(flags&(FXFont::Scalable|FXFont::Rotatable)){
 
         // Bust up XLFD into parts
-        strncpy(candidate,xlfd,sizeof(candidate));
+        fxstrlcpy(candidate,xlfd,sizeof(candidate));
         xlfdSplit(field,candidate);
 
         // Create rotated font
@@ -977,7 +977,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       if(flags&(FXFont::Scalable|FXFont::Rotatable)){
 
         // Bust up XLFD into parts
-        strncpy(candidate,xlfd,sizeof(candidate));
+        fxstrlcpy(candidate,xlfd,sizeof(candidate));
         xlfdSplit(field,candidate);
 
         // Create scaled font
@@ -1023,7 +1023,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         for(b=0; b<((XFontStruct*)font)->n_properties; b++){
           if(((XFontStruct*)font)->properties[b].name==XA_FONT){
             char *fn=XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].card32);
-            strncpy(candidate,fn,sizeof(candidate));
+            fxstrlcpy(candidate,fn,sizeof(candidate));
             FXTRACE((100,"FONT = %s\n",candidate));
             xlfdSplit(field,candidate);
             XFree(fn);
@@ -2058,7 +2058,7 @@ static int CALLBACK EnumFontFamExProc(const LOGFONTA *lf,const TEXTMETRICA *lptm
   FXFontDesc *fonts=pFontStore->fonts;
   FXuint numfonts=pFontStore->numfonts;
 
-  strncpy(fonts[numfonts].face,lf->lfFaceName,116);
+  fxstrlcpy(fonts[numfonts].face,lf->lfFaceName,116);
   if(lf->lfHeight<0){
     fonts[numfonts].size=-MulDiv(lf->lfHeight,720,GetDeviceCaps(pFontStore->hdc,LOGPIXELSY));
     }
@@ -2118,7 +2118,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
   lf.lfQuality=0;
   lf.lfPitchAndFamily=0;                          // Should be MONO_FONT for Hebrew and Arabic?
   FXASSERT(face.length()<LF_FACESIZE);
-  strncpy(lf.lfFaceName,face.text(),LF_FACESIZE);
+  fxstrlcpy(lf.lfFaceName,face.text(),LF_FACESIZE);
 
   // Start enumerating!
   EnumFontFamiliesExA(hdc,&lf,EnumFontFamExProc,(LPARAM)&fontStore,0);
@@ -2243,11 +2243,11 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
             // Get full face name
             fullname[0]=0;
             if(FcPatternGetString(p,FC_FAMILY,0,&fam)==FcResultMatch){
-              strncpy(fullname,(const char*)fam,sizeof(fullname));
+              fxstrlcpy(fullname,(const char*)fam,sizeof(fullname));
               if(FcPatternGetString(p,FC_FOUNDRY,0,&fdy)==FcResultMatch){
-                strncat(fullname," [",sizeof(fullname));
-                strncat(fullname,(const char*)fdy,sizeof(fullname));
-                strncat(fullname,"]",sizeof(fullname));
+                fxstrlcat(fullname," [",sizeof(fullname));
+                fxstrlcat(fullname,(const char*)fdy,sizeof(fullname));
+                fxstrlcat(fullname,"]",sizeof(fullname));
                 }
               }
 
@@ -2323,7 +2323,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
               }
 
             // Add this font
-            strncpy(fonts[numfonts].face,fullname,116);
+            fxstrlcpy(fonts[numfonts].face,fullname,116);
             fonts[numfonts].size=size;
             fonts[numfonts].weight=weight;
             fonts[numfonts].slant=slant;
@@ -2406,7 +2406,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
     for(f=0; f<nfontnames; f++){
 
       // Break apart into fields
-      strncpy(candidate,fontnames[f],sizeof(candidate));
+      fxstrlcpy(candidate,fontnames[f],sizeof(candidate));
       xlfdSplit(field,candidate);
 
       // Get info
@@ -2460,11 +2460,11 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
         }
 
       // Get full face name
-      strncpy(fullname,field[1],sizeof(fullname));
+      fxstrlcpy(fullname,field[1],sizeof(fullname));
       if(field[0][0]){
-        strncat(fullname," [",sizeof(fullname));
-        strncat(fullname,field[0],sizeof(fullname));
-        strncat(fullname,"]",sizeof(fullname));
+        fxstrlcat(fullname," [",sizeof(fullname));
+        fxstrlcat(fullname,field[0],sizeof(fullname));
+        fxstrlcat(fullname,"]",sizeof(fullname));
         }
 
       // If NULL face name, just list one of each face
@@ -2475,7 +2475,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
         }
 
       // Add this font
-      strncpy(fonts[numfonts].face,fullname,116);
+      fxstrlcpy(fonts[numfonts].face,fullname,116);
       fonts[numfonts].size=size;
       fonts[numfonts].weight=weight;
       fonts[numfonts].slant=slant;
@@ -2745,7 +2745,7 @@ void FXFont::setFontDesc(const FXFontDesc& fontdesc){
 // Get font description
 FXFontDesc FXFont::getFontDesc() const {
   FXFontDesc result;
-  strncpy(result.face,wantedName.text(),sizeof(result.face));
+  fxstrlcpy(result.face,wantedName.text(),sizeof(result.face));
   result.size=wantedSize;
   result.weight=wantedWeight;
   result.slant=wantedSlant;
@@ -2759,7 +2759,7 @@ FXFontDesc FXFont::getFontDesc() const {
 // Get actual font description
 FXFontDesc FXFont::getActualFontDesc() const {
   FXFontDesc result;
-  strncpy(result.face,actualName.text(),sizeof(result.face));
+  fxstrlcpy(result.face,actualName.text(),sizeof(result.face));
   result.size=actualSize;
   result.weight=actualWeight;
   result.slant=actualSlant;
@@ -2802,7 +2802,7 @@ void FXFontDesc::setFont(const FXString& string){
     flags=FXFont::styleFromString(string.section(',',6));
     }
   else{
-    strncpy(face,string.text(),sizeof(face));
+    fxstrlcpy(face,string.text(),sizeof(face));
     size=0;
     weight=0;
     slant=0;

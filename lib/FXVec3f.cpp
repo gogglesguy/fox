@@ -80,9 +80,7 @@ FXfloat dot(const FXVec3f& u,const FXVec3f& v){
 #if defined(FOX_HAS_AVX)
   register __m128 uu=_mm_maskload_ps(&u[0],MMM);
   register __m128 vv=_mm_maskload_ps(&v[0],MMM);
-  FXfloat result;
-  _mm_store_ss(&result,_mm_dp_ps(uu,vv,0x71));
-  return result;
+  return _mm_cvtss_f32(_mm_dp_ps(uu,vv,0x71));
 #else
   return u*v;
 #endif

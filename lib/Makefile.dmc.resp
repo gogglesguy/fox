@@ -112,6 +112,7 @@
 +FXIODevice.obj &
 +FXJPGIcon.obj &
 +FXJPGImage.obj &
++FXJSON.obj &
 +FXKnob.obj &
 +FXLabel.obj &
 +FXList.obj &

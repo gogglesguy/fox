@@ -220,7 +220,7 @@ FXFontSelector::FXFontSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   preview=new FXLabel(scrollwindow,"ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789",NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   preview->setBackColor(getApp()->getBackColor());
 
-  strncpy(selected.face,"helvetica",sizeof(selected.face));
+  fxstrlcpy(selected.face,"helvetica",sizeof(selected.face));
   selected.size=90;
   selected.weight=FXFont::Bold;
   selected.slant=0;
@@ -259,7 +259,7 @@ void FXFontSelector::listFontFaces(){
       familylist->setCurrentItem(selindex);
       familylist->makeItemVisible(selindex);
       family->setText(familylist->getItemText(selindex));
-      strncpy(selected.face,familylist->getItemText(selindex).text(),sizeof(selected.face));
+      fxstrlcpy(selected.face,familylist->getItemText(selindex).text(),sizeof(selected.face));
       }
     freeElms(fonts);
     }
@@ -444,7 +444,7 @@ void FXFontSelector::previewFont(){
 
 // Selected font family
 long FXFontSelector::onCmdFamily(FXObject*,FXSelector,void* ptr){
-  strncpy(selected.face,familylist->getItemText((FXint)(FXival)ptr).text(),sizeof(selected.face));
+  fxstrlcpy(selected.face,familylist->getItemText((FXint)(FXival)ptr).text(),sizeof(selected.face));
   family->setText(selected.face);
   listWeights();
   listSlants();

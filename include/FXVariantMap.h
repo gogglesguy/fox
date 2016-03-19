@@ -38,10 +38,18 @@ protected:
 protected:
   Entry      *table;    // Hash table
 protected:
+
+  // Change size of the table
   FXbool no(FXival n);
-  FXbool resize(FXival n);
+
+  // Change number of used entries
   void used(FXival u){ ((FXival*)table)[-2]=u; }
+
+  // Change number of free entries
   void free(FXival f){ ((FXival*)table)[-3]=f; }
+
+  // Resize the table to the given size, keeping contents
+  FXbool resize(FXival n);
 public:
 
   /// Construct an empty map
@@ -51,15 +59,21 @@ public:
   FXVariantMap(const FXVariantMap& other);
 
   /// Return the size of the table, including the empty slots
-  FXival no() const { return ((const FXival*)table)[-1]; }
+  FXival no() const { return ((FXival*)table)[-1]; }
 
   /// Return number of used slots in the table
-  FXival used() const { return ((const FXival*)table)[-2]; }
+  FXival used() const { return ((FXival*)table)[-2]; }
 
   /// Return number of free slots in the table
-  FXival free() const { return ((const FXival*)table)[-3]; }
+  FXival free() const { return ((FXival*)table)[-3]; }
 
-  /// Adopt map from another
+  /// See if map is empty
+  FXbool empty() const { return ((FXival*)table)[-1]<=1; }
+
+  /// Assignment operator
+  FXVariantMap& operator=(const FXVariantMap& other);
+
+  /// Adopt map from another map; the other map becomes empty
   FXVariantMap& adopt(FXVariantMap& other);
 
   /// Find slot index for key; return -1 if not found
@@ -91,9 +105,6 @@ public:
 
   /// Return constant reference to variant assocated with key
   const FXVariant& operator[](const FXString& ky) const { return at(ky); }
-
-  /// Assignment operator
-  FXVariantMap& operator=(const FXVariantMap& other);
 
   /// Remove entry from the table
   void remove(const FXchar* ky);

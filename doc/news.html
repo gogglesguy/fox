@@ -17,6 +17,36 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+October 24 - FOX DEVELOPMENT 1.7.43
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added FXJSON JavaScript Object Notation I/O class. FXJSON loads and saves JSON, and has a
+great number of options, extensive error reporting, and great degree of control over output.</li>
+<li>Problems in Windows version of fxcpuid.cpp fixed.</li>
+<li>Line segment to box and line segment to sphere intersection routines added; also computes intersection point..</li>
+<li>FXString escape() and unescape() now do \uXXXX unicode escaping.  Old functions for these, fromAscii()
+and toAscii() have been removed.  The new implementation properly handles surrogate pairs.</li>
+<li>Added some API's to FXGLGroup.</li>
+<li>FXListBox current item fix.</li>
+<li>Added new functions to FXElement.h.  Particularly, bulk-comparison function.</li>
+<li>Use new fxstrlcpy() and fxstrlcat() where appropriate; these will always produce null-terminated strings.</li>
+<li>Passed wrong handle for error FD in FXProcess under Windows.</li>
+<li>Fix introduced bugs in FXHash and FXDict.</li>
+<li>Some extra checks added in GIF loader header detection.</li>
+<li>Typo fix in lock-free queue class FXLFQueue.</li>
+<li>Fast accessors added to FXVariant; they can be used if type already known.</li>
+<li>Fixed minor issues with FXVariant implementation.</li>
+<li>Missing FXAPI declaration in FXArrayBase added.</li>
+<li>Added area() and volume() calculation to FXRange and FXSphere classes; added area() to FXExtent classes.</li>
+<li>Added new FXDictionary class; this will replace FXDict at some point in the future.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 September 15 - FOX DEVELOPMENT 1.7.42
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -30,7 +60,7 @@ data structure.</li>
 <li>Fix cased from (__m128) to _mm_castsi128_ps() intrinsic for portability.</li>
 <li>Fix compare operation in FXSize.h.</li>
 <li>Added fxstrlcpy() and fxstrlcat() for safe string copy and string concatenation.</li>
-<li>Added __noreturn macro for flagging non-returning functions like fxerror().  This may 
+<li>Added __noreturn macro for flagging non-returning functions like fxerror().  This may
 help compilers generate better code for places where these functions are called.</li>
 <li>Removed fxsleep(), obsoleted by FXThread::sleep() and FXThread::wkaeat().</li>
 <li>Allow out-of-source builds of FOX on configure-based systems.</li>

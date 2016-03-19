@@ -251,7 +251,7 @@ FXbool FXSettings::unparse(FXString& string) const {
           value=group->data(e);
           string.append(group->key(e));
           string.append("=");
-          string.append(shouldEscape(value,'"','"') ? escape(value,'"','"',false) : value);
+          string.append(shouldEscape(value,'"','"') ? escape(value,'"','"') : value);
           string.append(ENDLINE);
           }
         }

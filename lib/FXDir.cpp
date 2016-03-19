@@ -100,8 +100,8 @@ FXbool FXDir::open(const FXString& path){
     wcsncat(buffer,TEXT("\\*"),MAXPATHLEN);
 #else
     FXchar buffer[MAXPATHLEN];
-    strncpy(buffer,path.text(),MAXPATHLEN);
-    strncat(buffer,"\\*",MAXPATHLEN);
+    fxstrlcpy(buffer,path.text(),MAXPATHLEN);
+    fxstrlcat(buffer,"\\*",MAXPATHLEN);
 #endif
     ((SPACE*)space)->handle=FindFirstFile(buffer,&((SPACE*)space)->result);
     if(((SPACE*)space)->handle!=INVALID_HANDLE_VALUE){

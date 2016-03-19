@@ -51,20 +51,20 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = unicode$(EXEEXT) scan$(EXEEXT) format$(EXEEXT) \
-	console$(EXEEXT) thread$(EXEEXT) calendar$(EXEEXT) \
-	expression$(EXEEXT) dctest$(EXEEXT) codecs$(EXEEXT) \
-	dialog$(EXEEXT) groupbox$(EXEEXT) scribble$(EXEEXT) \
-	wizard$(EXEEXT) layout$(EXEEXT) rex$(EXEEXT) table$(EXEEXT) \
-	memmap$(EXEEXT) minheritance$(EXEEXT) bitmapviewer$(EXEEXT) \
-	imageviewer$(EXEEXT) button$(EXEEXT) datatarget$(EXEEXT) \
-	dirlist$(EXEEXT) foursplit$(EXEEXT) header$(EXEEXT) \
-	hello$(EXEEXT) hello2$(EXEEXT) iconlist$(EXEEXT) \
-	image$(EXEEXT) mditest$(EXEEXT) shutter$(EXEEXT) \
-	splitter$(EXEEXT) process$(EXEEXT) switcher$(EXEEXT) \
-	tabbook$(EXEEXT) ratio$(EXEEXT) half$(EXEEXT) match$(EXEEXT) \
-	gaugetest$(EXEEXT) parallel$(EXEEXT) gltest$(EXEEXT) \
-	glviewer$(EXEEXT)
+noinst_PROGRAMS = unicode$(EXEEXT) variant$(EXEEXT) scan$(EXEEXT) \
+	format$(EXEEXT) console$(EXEEXT) thread$(EXEEXT) \
+	calendar$(EXEEXT) expression$(EXEEXT) dctest$(EXEEXT) \
+	codecs$(EXEEXT) dialog$(EXEEXT) groupbox$(EXEEXT) \
+	scribble$(EXEEXT) wizard$(EXEEXT) layout$(EXEEXT) rex$(EXEEXT) \
+	table$(EXEEXT) memmap$(EXEEXT) minheritance$(EXEEXT) \
+	bitmapviewer$(EXEEXT) imageviewer$(EXEEXT) button$(EXEEXT) \
+	datatarget$(EXEEXT) dirlist$(EXEEXT) foursplit$(EXEEXT) \
+	header$(EXEEXT) hello$(EXEEXT) hello2$(EXEEXT) \
+	iconlist$(EXEEXT) image$(EXEEXT) mditest$(EXEEXT) \
+	shutter$(EXEEXT) splitter$(EXEEXT) process$(EXEEXT) \
+	switcher$(EXEEXT) tabbook$(EXEEXT) ratio$(EXEEXT) \
+	half$(EXEEXT) match$(EXEEXT) gaugetest$(EXEEXT) \
+	parallel$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -239,6 +239,10 @@ am_unicode_OBJECTS = unicode.$(OBJEXT)
 unicode_OBJECTS = $(am_unicode_OBJECTS)
 unicode_LDADD = $(LDADD)
 unicode_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
+am_variant_OBJECTS = variant.$(OBJEXT)
+variant_OBJECTS = $(am_variant_OBJECTS)
+variant_LDADD = $(LDADD)
+variant_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_wizard_OBJECTS = wizard.$(OBJEXT)
 wizard_OBJECTS = $(am_wizard_OBJECTS)
 wizard_LDADD = $(LDADD)
@@ -279,7 +283,7 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
 	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
 	$(table_SOURCES) $(thread_SOURCES) $(unicode_SOURCES) \
-	$(wizard_SOURCES)
+	$(variant_SOURCES) $(wizard_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
@@ -294,7 +298,7 @@ DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
 	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
 	$(table_SOURCES) $(thread_SOURCES) $(unicode_SOURCES) \
-	$(wizard_SOURCES)
+	$(variant_SOURCES) $(wizard_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -483,6 +487,7 @@ half_SOURCES = half.cpp
 match_SOURCES = match.cpp
 unicode_SOURCES = unicode.cpp
 parallel_SOURCES = parallel.cpp
+variant_SOURCES = variant.cpp
 EXTRA_DIST = Makefile.bc \
              Makefile.wc \
              Makefile.dmc
@@ -653,6 +658,9 @@ thread$(EXEEXT): $(thread_OBJECTS) $(thread_DEPENDENCIES) $(EXTRA_thread_DEPENDE
 unicode$(EXEEXT): $(unicode_OBJECTS) $(unicode_DEPENDENCIES) $(EXTRA_unicode_DEPENDENCIES) 
 	@rm -f unicode$(EXEEXT)
 	$(CXXLINK) $(unicode_OBJECTS) $(unicode_LDADD) $(LIBS)
+variant$(EXEEXT): $(variant_OBJECTS) $(variant_DEPENDENCIES) $(EXTRA_variant_DEPENDENCIES) 
+	@rm -f variant$(EXEEXT)
+	$(CXXLINK) $(variant_OBJECTS) $(variant_LDADD) $(LIBS)
 wizard$(EXEEXT): $(wizard_OBJECTS) $(wizard_DEPENDENCIES) $(EXTRA_wizard_DEPENDENCIES) 
 	@rm -f wizard$(EXEEXT)
 	$(CXXLINK) $(wizard_OBJECTS) $(wizard_LDADD) $(LIBS)
@@ -704,6 +712,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variant.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wizard.Po@am__quote@
 
 .cpp.o:

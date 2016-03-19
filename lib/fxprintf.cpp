@@ -95,7 +95,7 @@
     is one off.  This implementation is better for our purposes, however.
 */
 
-#define CONVERTSIZE     512     // Convertsion buffer
+#define CONVERTSIZE     512     // Conversion buffer
 #define NDIG            512     // Maximum space used for numbers
 
 #ifdef WIN32
@@ -147,7 +147,7 @@ static const FXchar upper_digits[]="0123456789ABCDEF";
 
 /*******************************************************************************/
 
-// The buffer must have at least NDIG bytes 
+// The buffer must have at least NDIG bytes
 static FXchar* _cvt(FXchar* buffer,FXdouble arg,FXint& decimal,FXint& negative,FXint ndigits,FXint eflag){
   register FXchar *ptr=buffer;
   register FXchar *p;

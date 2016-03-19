@@ -36,10 +36,20 @@ protected:
     FXptr data;
     };
 protected:
-  Entry* table;         // Hash table
-private:
-  FXHash(const FXHash&);
-  FXHash &operator=(const FXHash&);
+  Entry  *table;
+protected:
+
+  // Change size of the table & hash existing contents
+  FXbool no(FXival n);
+
+  // Change number of used entries
+  void used(FXival u){ ((FXival*)table)[-2]=u; }
+
+  // Change number of free entries
+  void free(FXival f){ ((FXival*)table)[-3]=f; }
+
+  // Resize the table to the given size, keeping contents
+  FXbool resize(FXival n);
 public:
 
   /**
@@ -48,20 +58,44 @@ public:
   FXHash();
 
   /**
-  * Resize the table to the given size; the size must be
-  * a power of two.
+  * Construct from another table.
   */
-  FXbool size(FXival num);
+  FXHash(const FXHash& other);
 
   /**
   * Return the total number of slots in the table.
   */
-  FXival size() const { return ((FXival*)table)[-1]; }
+  FXival no() const { return ((FXival*)table)[-1]; }
 
   /**
-  * Return number of non-empty slots in the table.
+  * Return number of used slots in the table.
   */
-  FXival no() const { return ((FXival*)table)[-2]; }
+  FXival used() const { return ((FXival*)table)[-2]; }
+
+  /**
+  * Return number of free slots in the table.
+  */
+  FXival free() const { return ((FXival*)table)[-3]; }
+
+  /**
+  * See if hash table is empty
+  */
+  FXbool empty() const { return ((FXival*)table)[-1]<=1; }
+
+  /**
+  * Assign from another table.
+  */
+  FXHash &operator=(const FXHash&);
+
+  /**
+  * Adopt table from another; the other table becomes empty.
+  */
+  FXHash& adopt(FXHash& other);
+
+  /**
+  * Return value of key, or return NULL.
+  */
+  FXptr find(FXptr name) const;
 
   /**
   * Insert key into table, unless the key already exists.
@@ -81,14 +115,9 @@ public:
   FXptr remove(FXptr name);
 
   /**
-  * Return value of key, or return NULL.
-  */
-  FXptr find(FXptr name) const;
-
-  /**
   * Return true if slot is not occupied by a key.
   */
-  FXbool empty(FXival pos) const { return (table[pos].name==NULL)||(table[pos].name==(FXptr)-1L); }
+  FXbool empty(FXival pos) const { return (table[pos].name==(FXptr)0L)||(table[pos].name==(FXptr)-1L); }
 
   /**
   * Return key at position pos.

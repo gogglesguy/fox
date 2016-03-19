@@ -806,7 +806,7 @@ const FXuchar FXExpression::initial[]={14,0,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
 #endif
 
 
-// Table of error messages
+// Error messages
 const FXchar *const FXExpression::errors[]={
   "OK",
   "Empty expression",

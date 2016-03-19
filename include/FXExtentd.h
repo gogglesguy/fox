@@ -84,6 +84,9 @@ public:
   /// Height of box
   FXdouble height() const { return upper.y-lower.y; }
 
+  /// Area
+  FXdouble area() const { return width()*height(); }
+
   /// Longest side
   FXdouble longest() const;
 

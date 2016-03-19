@@ -460,8 +460,8 @@ FXString FXSystem::getUserDirectory(const FXString& user){
       }
     if((str2=getenv("HOMEPATH"))!=NULL){      // This should be good for WinNT, Win2K according to MSDN
       if((str1=getenv("HOMEDRIVE"))==NULL) str1="c:";
-      strncpy(home,str1,MAXPATHLEN);
-      strncat(home,str2,MAXPATHLEN);
+      fxstrlcpy(home,str1,MAXPATHLEN);
+      fxstrlcat(home,str2,MAXPATHLEN);
       return FXString(home);
       }
     if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){

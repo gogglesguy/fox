@@ -102,6 +102,7 @@ FXDelegator.h \
 FXDial.h \
 FXDialogBox.h \
 FXDict.h \
+FXDictionary.h \
 FXDir.h \
 FXDirBox.h \
 FXDirDialog.h \
@@ -174,6 +175,7 @@ FXJP2Icon.h \
 FXJP2Image.h \
 FXJPGIcon.h \
 FXJPGImage.h \
+FXJSON.h \
 FXKnob.h \
 FXLabel.h \
 FXLFQueue.h \
