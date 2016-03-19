@@ -82,19 +82,19 @@ public:
   const FXString& getIconPath() const { return path; }
 
   /// Insert unique icon loaded from filename into dictionary
-  FXIcon* insert(const FXchar* name){ return (FXIcon*)FXDict::insert(name,(void*)name); }
+  FXIcon* insert(const FXchar* name){ return static_cast<FXIcon*>(FXDict::insert(name,const_cast<FXchar*>(name))); }
 
   /// Replace icon loaded from filename into dictionary
-  FXIcon* replace(const FXchar* name){ return (FXIcon*)FXDict::replace(name,(void*)name); }
+  FXIcon* replace(const FXchar* name){ return static_cast<FXIcon*>(FXDict::replace(name,const_cast<FXchar*>(name))); }
 
   /// Remove icon from dictionary
-  FXIcon* remove(const FXchar* name){ return (FXIcon*)FXDict::remove(name); }
+  FXIcon* remove(const FXchar* name){ return static_cast<FXIcon*>(FXDict::remove(name)); }
 
   /// Find icon by name
-  FXIcon* find(const FXchar* name){ return (FXIcon*)FXDict::find(name); }
+  FXIcon* find(const FXchar* name){ return static_cast<FXIcon*>(FXDict::find(name)); }
 
   /// Return icon at position pos
-  FXIcon* data(FXint pos) const { return (FXIcon*)FXDict::data(pos); }
+  FXIcon* data(FXint pos) const { return static_cast<FXIcon*>(FXDict::data(pos)); }
 
   /// Save to stream
   virtual void save(FXStream& store) const;

@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxascii.h"
+#include "fxunicode.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -77,9 +78,8 @@ namespace FX {
 FXString FXPath::root(const FXString& file){
   if(!file.empty()){
 #if defined(WIN32)
-    FXString result=file;
-    FXint p=0;
-    FXint q=0;
+    FXString result(file);
+    register FXint p=0,q=0;
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
       if(ISPATHSEP(result[q])){
@@ -112,8 +112,8 @@ FXString FXPath::root(const FXString& file){
 // Return share name from Windows UNC filename
 FXString FXPath::share(const FXString& file){
 #if defined(WIN32)
-  register FXint f,n;
   if(!file.empty()){
+    register FXint f,n;
     if(ISPATHSEP(file[0])){                                   // UNC
       if(ISPATHSEP(file[1])){
         n=2;
@@ -137,8 +137,8 @@ FXString FXPath::share(const FXString& file){
 // However, directory("/bla/bla") is "/bla" as we expect!
 FXString FXPath::directory(const FXString& file){
   if(!file.empty()){
-    FXString result=file;
-    FXint p=0,q=0,s;
+    FXString result(file);
+    register FXint p=0,q=0,s;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -179,8 +179,8 @@ FXString FXPath::directory(const FXString& file){
 // Note that name("/bla/bla/") is "" and NOT "bla".
 // However, name("/bla/bla") is "bla" as we expect!
 FXString FXPath::name(const FXString& file){
-  register FXint f,n;
   if(!file.empty()){
+    register FXint n=0,f;
     n=0;
 #if defined(WIN32)
     if(Ascii::isLetter(file[0]) && file[1]==':') n=2;
@@ -203,9 +203,8 @@ FXString FXPath::name(const FXString& file){
 //  /path/aa.bb.cc  -> aa.bb
 //  /path/.aa       -> .aa
 FXString FXPath::title(const FXString& file){
-  register FXint f,e,b,i;
   if(!file.empty()){
-    i=0;
+    register FXint i=0,f,e,b;
 #if defined(WIN32)
     if(Ascii::isLetter(file[0]) && file[1]==':') i=2;
 #endif
@@ -233,9 +232,8 @@ FXString FXPath::title(const FXString& file){
 //  /path/aa.bb.cc  -> cc
 //  /path/.aa       -> ""
 FXString FXPath::extension(const FXString& file){
-  register FXint f,e,i,n;
   if(!file.empty()){
-    n=0;
+    register FXint n=0,f,e,i;
 #if defined(WIN32)
     if(Ascii::isLetter(file[0]) && file[1]==':') n=2;
 #endif
@@ -263,8 +261,8 @@ FXString FXPath::extension(const FXString& file){
 //  /path/.aa       -> /path/.aa
 FXString FXPath::stripExtension(const FXString& file){
   if(!file.empty()){
-    FXString result=file;
-    FXint p=0,q=0,s,e;
+    FXString result(file);
+    register FXint p=0,q=0,s,e;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -311,11 +309,8 @@ FXString FXPath::stripExtension(const FXString& file){
 
 // Return drive letter prefix "c:"
 FXString FXPath::drive(const FXString& file){
-  FXchar buffer[3];
   if(Ascii::isLetter(file[0]) && file[1]==':'){
-    buffer[0]=Ascii::toLower(file[0]);
-    buffer[1]=':';
-    buffer[2]='\0';
+    FXchar buffer[3]={Ascii::toLower(file[0]),':','\0'};
     return FXString(buffer,2);
     }
   return FXString::null;
@@ -333,11 +328,11 @@ FXString FXPath::drive(const FXString&){
 
 // Perform tilde or environment variable expansion
 FXString FXPath::expand(const FXString& file){
-#if defined(WIN32)
-  FXString result;
   if(!file.empty()){
+    FXString result;
+#if defined(WIN32)
     FXString var,val;
-    FXint b=0,e;
+    register FXint b=0,e;
     while(file[b]){
       if(file[b]=='%'){
         e=file.find('%',b+1);
@@ -369,11 +364,7 @@ FXString FXPath::expand(const FXString& file){
           }
         }
       }
-    }
-  return result;
 #else
-  FXString result;
-  if(!file.empty()){
     register FXint b,e,n;
 
     // Expand leading tilde of the form ~/filename or ~user/filename
@@ -401,9 +392,10 @@ FXString FXPath::expand(const FXString& file){
       result.append(file[n]);
       n++;
       }
-    }
-  return result;
 #endif
+    return result;
+    }
+  return FXString::null;
   }
 
 
@@ -420,7 +412,7 @@ FXString FXPath::expand(const FXString& file){
 //      $ACE_ROOT/TAO
 //
 FXString FXPath::contract(const FXString& file,const FXString& user,const FXString& var){
-  FXString result=file;
+  FXString result(file);
   if(!result.empty()){
     FXString dir=FXSystem::getUserDirectory(user);
     if(compare(result,dir,dir.length())==0){
@@ -458,10 +450,8 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 //  /aa/ccc.../../bb -> /aa/bb
 FXString FXPath::simplify(const FXString& file){
   if(!file.empty()){
-    FXString result=file;
-    register FXint p=0;
-    register FXint q=0;
-    register FXint s;
+    FXString result(file);
+    register FXint p=0,q=0,s;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -625,8 +615,9 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
 //  /p/q       /a/b         ../../a/b   Branch point is /
 //
 FXString FXPath::relative(const FXString& base,const FXString& file){
-  FXTRACE((1,"FXPath::relative(%s,%s)\n",base.text(),file.text()));
-  if(!base.empty() && (FXPath::isAbsolute(base) == FXPath::isAbsolute(file))){  // Both absolute or both relative
+
+  // Base and file non-empty and either both absolute, or both relative
+  if(!base.empty() && !file.empty() && (FXPath::isAbsolute(base) == FXPath::isAbsolute(file))){  
     register FXint p=0,q=0,bp=0,bq=0;
 
     // Find branch point
@@ -822,7 +813,7 @@ b:    if(file[q]=='.'){
 FXString FXPath::convert(const FXString& file,FXchar septo,FXchar sepfm){
   if(!file.empty()){
     FXString result(file);
-    FXint p=0,q=0;
+    register FXint p=0,q=0;
 #if defined(WIN32)
     if(result[q]==sepfm || result[q]==septo){                   // UNC
       result[p++]=septo; q++;
@@ -862,8 +853,8 @@ FXString FXPath::convert(const FXString& file,FXchar septo,FXchar sepfm){
 // Up one level, given absolute path
 FXString FXPath::upLevel(const FXString& file){
   if(!file.empty()){
-    FXString result=file;
-    FXint p=0,q=0,s;
+    FXString result(file);
+    register FXint p=0,q=0,s;
 #if defined(WIN32)
     if(ISPATHSEP(result[q])){                                   // UNC
       result[p++]=PATHSEP; q++;
@@ -1095,11 +1086,7 @@ FXString FXPath::enquote(const FXString& file,FXbool force){
 FXString FXPath::dequote(const FXString& file){
   FXString result(file);
   if(0<result.length()){
-    register FXint e=result.length();
-    register FXint b=0;
-    register FXint r=0;
-    register FXint q=0;
-    register FXint n=0;
+    register FXint e=result.length(),b=0,r=0,q=0,n=0;
 
     // Trim tail
     while(0<e && Ascii::isSpace(file[e-1])) --e;
@@ -1152,8 +1139,7 @@ FXString FXPath::dequote(const FXString& file){
 FXString FXPath::enquote(const FXString& file,FXbool force){
   FXString result(file);
   if(0<file.length()){
-    register FXint p,q,e,c;
-    p=q=e=0;
+    register FXint p=0,q=0,e=0,c;
     while(p<file.length()){
       switch(file[p++]){
         case '\'':              // Quote needs to be escaped to ...'\''....
@@ -1220,10 +1206,7 @@ FXString FXPath::enquote(const FXString& file,FXbool force){
 FXString FXPath::dequote(const FXString& file){
   FXString result(file);
   if(0<result.length()){
-    register FXint e=result.length();
-    register FXint b=0;
-    register FXint r=0;
-    register FXint q=0;
+    register FXint e=result.length(),b=0,r=0,q=0;
 
     // Trim tail
     while(0<e && Ascii::isSpace(file[e-1])) --e;
@@ -1247,84 +1230,110 @@ FXString FXPath::dequote(const FXString& file){
 
 #endif
 
-// FIXME need utf8 version
-
-// If folding case, make lower case
-#define FOLD(c) ((flags&FXPath::CaseFold)?Ascii::toLower(c):(c))
-
 
 // Perform match
 static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
   register const FXchar *s=string;
   register const FXchar *p=pattern;
-  register const FXchar *r;
-  register FXchar c,cs,ce,cc,neg;
   register FXint level;
-  while((c=*p++)!='\0'){
+  register FXwchar c,c2,cc;
+  register FXbool neg,ok;
+  while((c=wc(p))!='\0'){
+    p=wcinc(p);
     switch(c){
-      case '?':
+      case '?':         // Single character wildcard
         if(*s=='\0') return false;
-        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
-        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
-        s++;
+        if((flags&FXPath::PathName) && ISPATHSEP(*s)) return false;
+        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
+        s=wcinc(s);
         break;
-      case '*':
-        c=*p;
-        while(c=='*') c=*++p;
-        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
-        if(c=='\0'){    // Optimize for case of trailing '*'
-          if(flags&FXPath::PathName){ for(r=s; *r; r++){ if(ISPATHSEP(*r)) return false; } }
+      case '*':         // Multiple character wildcard
+        while((c=wc(p))=='*'){ p=wcinc(p); }                    // Squeeze superfluous '*'
+        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
+        if(c=='\0'){                                            // Optimization for trailing '*'
+          if((flags&FXPath::PathName) && !(flags&FXPath::LeadDir)){
+            while(*s){
+              if(ISPATHSEP(*s)) return false;   // If PathName then '*' never matches '/'
+              s=wcinc(s);
+              }
+            }
           return true;
           }
-        while(!domatch(s,p,flags&~FXPath::DotFile)){
-          if((flags&FXPath::PathName) && ISPATHSEP(*s)) return false;
-          if(*s++=='\0') return false;
-          }
-        return true;
-      case '[':
-        if(*s=='\0') return false;
-        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*(s-1))))) return false;
-        cc=FOLD(*s);
-        neg=((*p=='!') || (*p=='^'));
-        if(neg) p++;
-        c=*p++;
-        do{
-          if(c=='\\' && !(flags&FXPath::NoEscape)) c=*p++;
-          cs=ce=FOLD(c);
-          if(c=='\0') return false;
-          c=*p++;
-          c=FOLD(c);
-          if((flags&FXPath::PathName) && ISPATHSEP(c)) return false;
-          if(c=='-' && *p!=']'){
-            c = *p++;
-            if(c=='\\' && !(flags&FXPath::NoEscape)) c=*p++;
-            if(c=='\0') return false;
-            ce=FOLD(c);
-            c=*p++;
+        if((flags&FXPath::PathName) && ISPATHSEP(c)){           // Optimize for '*' followed by '/...'
+          while(*s!='\0' && !ISPATHSEP(*s)){    // Scan through to nearest '/'
+            s=wcinc(s);
             }
-          if(((FXuchar)cs)<=((FXuchar)cc) && ((FXuchar)cc)<=((FXuchar)ce)) goto match;
+          }
+        while(*s!='\0'){
+          if(domatch(s,p,flags&~FXPath::DotFile)) return true;
+          if((flags&FXPath::PathName) && ISPATHSEP(*s)) break;
+          s=wcinc(s);
+          }
+        return false;
+      case '[':         // Single character against character-set
+        if(*s=='\0') return false;
+        if((flags&FXPath::PathName) && ISPATHSEP(*s)) return false;
+        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
+        cc=wc(s);
+        if(flags&FXPath::CaseFold){
+          cc=Unicode::toLower(cc);
+          }
+        c=wc(p);
+        p=wcinc(p);
+        neg=((c=='!') || (c=='^'));
+        if(neg){
+          c=wc(p);
+          p=wcinc(p);
+          }
+        ok=false;
+        do{
+          if(c=='\\' && !(flags&FXPath::NoEscape)){
+            c=wc(p);
+            p=wcinc(p);
+            }
+          if(c=='\0') return false;
+          if((flags&FXPath::PathName) && ISPATHSEP(c)) return false;
+          if(flags&FXPath::CaseFold){
+            c=Unicode::toLower(c);
+            }
+          c2=wc(wcinc(p));
+          if((wc(p)=='-') && (c2!='\0' ) && (c2!=']')){         // Range match
+            p=wcinc(wcinc(p));
+            if(c2=='\\' && !(flags&FXPath::NoEscape)){
+              c2=wc(p);
+              p=wcinc(p);
+              }
+            if(c2=='\0') return false;
+            if(flags&FXPath::CaseFold){
+              c2=Unicode::toLower(c2);
+              }
+            if(c<=cc && cc<=c2){
+              ok=true;
+              }
+            }
+          else{                                                 // Single match
+            if(c==cc){
+              ok=true;
+              }
+            }
+          c=wc(p);
+          p=wcinc(p);
           }
         while(c!=']');
-        if(!neg) return false;
-        s++;
-        break;
-match:  while(c!=']'){
-          if(c=='\0') return false;
-          c=*p++;
-          if(c=='\\' && !(flags&FXPath::NoEscape)) p++;
-          }
-        if(neg) return false;
-        s++;
+        if(ok==neg) return false;
+        s=wcinc(s);
         break;
       case '(':
 nxt:    if(domatch(s,p,flags)) return true;
         for(level=0; *p && 0<=level; ){
-          switch(*p++){
-            case '\\': if(*p) p++; break;
-            case '(': level++; break;
-            case ')': level--; break;
-            case '|':
-            case ',': if (level==0) goto nxt;
+          c=wc(p);
+          p=wcinc(p);
+          switch(c){
+            case '\\': if(!(flags&FXPath::NoEscape) && *p){ p=wcinc(p); } break;
+            case '(' : level++; break;
+            case ')' : level--; break;
+            case '|' :
+            case ',' : if(level==0) goto nxt;
             }
           }
         return false;
@@ -1333,22 +1342,33 @@ nxt:    if(domatch(s,p,flags)) return true;
       case '|':
       case ',':
         for(level=0; *p && 0<=level; ){
-          switch(*p++){
-            case '\\': if(*p) p++; break;
-            case '(': level++; break;
-            case ')': level--; break;
+          c=wc(p);
+          p=wcinc(p);
+          switch(c){
+            case '\\': if(!(flags&FXPath::NoEscape) && *p){ p=wcinc(p); } break;
+            case '(' : level++; break;
+            case ')' : level--; break;
             }
           }
         break;
       case '\\':
-        if(*p && !(flags&FXPath::NoEscape)) c=*p++;   // Trailing escape represents itself
+        if(!(flags&FXPath::NoEscape) && *p){                    // Escapes are used
+          c=wc(p);
+          p=wcinc(p);
+          }
+        // FALL //
       default:
-        if(FOLD(c)!=FOLD(*s)) return false;
-        s++;
+        cc=wc(s);
+        if(flags&FXPath::CaseFold){
+          c=Unicode::toLower(c);
+          cc=Unicode::toLower(cc);
+          }
+        if(c!=cc) return false;
+        s=wcinc(s);
         break;
       }
     }
-  return (*s=='\0') || (ISPATHSEP(*s) && (flags&FXPath::LeadDir));
+  return (*s=='\0') || ((flags&FXPath::LeadDir) && ISPATHSEP(*s));
   }
 
 
@@ -1357,15 +1377,18 @@ FXbool FXPath::match(const FXchar *string,const FXchar *pattern,FXuint flags){
   register const FXchar *s=string;
   register const FXchar *p=pattern;
   register FXint level;
+  register FXwchar c;
   if(s && p){
 nxt:if(domatch(s,p,flags)) return true;
     for(level=0; *p && 0<=level; ){
-      switch(*p++){
-        case '\\': if(*p) p++; break;
-        case '(': level++; break;
-        case ')': level--; break;
-        case '|':
-        case ',': if(level==0) goto nxt;
+      c=wc(p);
+      p=wcinc(p);
+      switch(c){
+        case '\\': if(!(flags&FXPath::NoEscape) && *p){ p=wcinc(p); } break;
+        case '(' : level++; break;
+        case ')' : level--; break;
+        case '|' :
+        case ',' : if(level==0) goto nxt;
         }
       }
     }
@@ -1406,8 +1429,8 @@ FXString FXPath::unique(const FXString& file){
 // Search pathlist for file
 FXString FXPath::search(const FXString& pathlist,const FXString& file){
   if(!file.empty()){
+    register FXint beg,end;
     FXString path;
-    FXint beg,end;
 #if defined(WIN32)
     if(ISPATHSEP(file[0])){
       if(ISPATHSEP(file[1])){
@@ -1445,8 +1468,8 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
 FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
   FXString result(file);
   if(!file.empty()){
+    register FXint beg,end;
     FXString base,rr,r;
-    FXint beg,end;
     for(beg=0; pathlist[beg]; beg=end){
       while(pathlist[beg]==PATHLISTSEP) beg++;
       for(end=beg; pathlist[end] && pathlist[end]!=PATHLISTSEP; end++){}
@@ -1454,7 +1477,7 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
       base=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)));
       if(isInside(base,file)){
         r=FXPath::relative(base,file);
-        if(r.length()<result.length()){
+        if(r.length()<result.length()){         // ??
           if(FXPath::search(pathlist,r)==file){
             result=r;
             }

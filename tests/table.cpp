@@ -157,7 +157,7 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   for(r=0; r<50; r++){
     table->setRowText(r,"Row"+FXString::value(r));
     }
-    
+
 /*
   table->setLeadingRows(1);
   table->setLeadingColumns(1);
@@ -236,6 +236,7 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   new FXMenuCommand(manipmenu,"Insert Column",NULL,table,FXTable::ID_INSERT_COLUMN);
   new FXMenuCommand(manipmenu,"Insert Row",NULL,table,FXTable::ID_INSERT_ROW);
   new FXMenuCommand(manipmenu,"Resize table...",NULL,this,TableWindow::ID_RESIZETABLE);
+  new FXMenuCommand(manipmenu,"Test",NULL,this,TableWindow::ID_TEST);
   new FXMenuTitle(menubar,"&Manipulations",NULL,manipmenu);
 
   selectmenu=new FXMenuPane(this);
@@ -263,6 +264,9 @@ TableWindow::~TableWindow(){
 
 // Test
 long TableWindow::onCmdTest(FXObject*,FXSelector,void*){
+  FXint cr=table->getCurrentRow();
+  FXint cc=table->getCurrentColumn();
+  table->setSpanningRange(cr,cc,FXMAX(cr-1,0),FXMIN(cr+1,table->getNumRows()),FXMAX(cc-1,0),FXMIN(cc+1,table->getNumColumns()-1));
   return 1;
   }
 

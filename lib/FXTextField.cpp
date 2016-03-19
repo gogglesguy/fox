@@ -179,8 +179,8 @@ const FXchar FXTextField::textDelimiters[]="~.,/\\`'!@#$%^&*()-=+{}|[]\":;<>?";
 // For serialization
 FXTextField::FXTextField(){
   flags|=FLAG_ENABLED;
-  delimiters=textDelimiters;
   font=(FXFont*)-1L;
+  delimiters=textDelimiters;
   textColor=0;
   selbackColor=0;
   seltextColor=0;
@@ -201,8 +201,8 @@ FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel
   if(!(options&JUSTIFY_RIGHT)) options|=JUSTIFY_LEFT;
   defaultCursor=getApp()->getDefaultCursor(DEF_TEXT_CURSOR);
   dragCursor=getApp()->getDefaultCursor(DEF_TEXT_CURSOR);
-  delimiters=textDelimiters;
   font=getApp()->getNormalFont();
+  delimiters=textDelimiters;
   backColor=getApp()->getBackColor();
   textColor=getApp()->getForeColor();
   selbackColor=getApp()->getSelbackColor();

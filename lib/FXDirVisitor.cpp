@@ -130,6 +130,10 @@ FXuint FXDirVisitor::leave(const FXString& path){
   }
 
 
+// Destructor
+FXDirVisitor::~FXDirVisitor(){
+  }
+
 /*******************************************************************************/
 
 
@@ -161,5 +165,10 @@ FXuint FXGlobVisitor::visit(const FXString& path){
 #endif
   }
 
+
+// Destructor
+FXGlobVisitor::~FXGlobVisitor(){
+  }
+  
 
 }
