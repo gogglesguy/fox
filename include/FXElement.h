@@ -29,30 +29,51 @@ namespace FX {
 // Generic implementations for generic objects
 
 
+// In-situ construct element at pointer
+template<class EType>
+inline EType* construct(EType* ptr){
+  ::new ((void*)ptr) EType(); return ptr;
+  }
+
+
+// In-situ construct element at pointer, with argument
+template<class EType,class Arg>
+inline EType* construct(EType* ptr,Arg arg){
+  ::new ((void*)ptr) EType(arg); return ptr;
+  }
+
+
+// In-situ destroy element at pointer
+template<class EType>
+inline void destruct(EType* ptr){
+  ptr->~EType();
+  }
+
+
 /// Construct some elements at a location
 template<class EType>
-inline void constructElms(EType* ptr,unsigned long n){
-  while(n--){ ::new ((void*)ptr) EType; ptr++; }
+inline void constructElms(EType* ptr,FXuval n){
+  while(n--){ construct(ptr); ptr++; }
   }
 
 
 /// Destruct some elements at a location
 template<class EType>
-inline void destructElms(EType* ptr,unsigned long n){
-  while(n--){ ptr->~EType(); ptr++; }
+inline void destructElms(EType* ptr,FXuval n){
+  while(n--){ destruct(ptr); ptr++; }
   }
 
 
 /// Copy some elements from one place to another
 template<class EType, class OType>
-inline void copyElms(EType* dst,const OType* src,unsigned long n){
+inline void copyElms(EType* dst,const OType* src,FXuval n){
   while(n--){ *dst++ = *src++; }
   }
 
 
 /// Move some elements from overlapping place to another
 template<class EType>
-inline void moveElms(EType* dst,const EType* src,unsigned long n){
+inline void moveElms(EType* dst,const EType* src,FXuval n){
   if(src>dst){
     while(n--){ *dst++ = *src++; }
     }
@@ -64,44 +85,52 @@ inline void moveElms(EType* dst,const EType* src,unsigned long n){
   }
 
 
+/// Test elements for equality, using equality operator
+template<class EType>
+inline FXbool equalElms(const EType* dst,const EType* src,FXuval n){
+  while(n--){ if(!(*dst++ == *src++)) return false; }
+  return true;
+  }
+
+
 /// Fill array of elements with given element
 template<class EType, class OType>
-inline void fillElms(EType* dst,const OType& src,unsigned long n){
+inline void fillElms(EType* dst,const OType& src,FXuval n){
   while(n--){ *dst++ = src; }
   }
 
 
 /// Zero out array of elements
 template<class EType>
-inline void clearElms(EType* dst,unsigned long n){
+inline void clearElms(EType* dst,FXuval n){
   memset(dst,0,sizeof(EType)*n);
   }
 
 
 /// Allocate array of elements, uninitialized
 template<class EType>
-inline FXbool allocElms(EType*& ptr,unsigned long n){
+inline FXbool allocElms(EType*& ptr,FXuval n){
   return fxmalloc((void**)&ptr,sizeof(EType)*n);
   }
 
 
 /// Allocate array of elements, initialized with zero
 template<class EType>
-inline FXbool callocElms(EType*& ptr,unsigned long n){
+inline FXbool callocElms(EType*& ptr,FXuval n){
   return fxcalloc((void**)&ptr,sizeof(EType)*n);
   }
 
 
 /// Allocate array of elements, initialized with bit-wise copy of src array
 template<class EType>
-inline FXbool dupElms(EType*& ptr,const EType* src,unsigned long n){
+inline FXbool dupElms(EType*& ptr,const EType* src,FXuval n){
   return fxmemdup((void**)&ptr,src,sizeof(EType)*n);
   }
 
 
 /// Resize array of elements, without constructor or destructor
 template<class EType>
-inline FXbool resizeElms(EType*& ptr,unsigned long n){
+inline FXbool resizeElms(EType*& ptr,FXuval n){
   return fxresize((void**)&ptr,sizeof(EType)*n);
   }
 
@@ -119,54 +148,88 @@ inline void freeElms(EType*& ptr){
 
 
 // No-op constructors for array of basic type
-inline void constructElms(FXuchar*,unsigned long){ }
-inline void constructElms(FXchar*,unsigned long){ }
-inline void constructElms(FXushort*,unsigned long){ }
-inline void constructElms(FXshort*,unsigned long){ }
-inline void constructElms(FXuint*,unsigned long){ }
-inline void constructElms(FXint*,unsigned long){ }
-inline void constructElms(FXfloat*,unsigned long){ }
-inline void constructElms(FXdouble*,unsigned long){ }
+inline void constructElms(FXuchar*,FXuval){ }
+inline void constructElms(FXchar*,FXuval){ }
+inline void constructElms(FXushort*,FXuval){ }
+inline void constructElms(FXshort*,FXuval){ }
+inline void constructElms(FXuint*,FXuval){ }
+inline void constructElms(FXint*,FXuval){ }
+inline void constructElms(FXulong*,FXuval){ }
+inline void constructElms(FXlong*,FXuval){ }
+inline void constructElms(FXfloat*,FXuval){ }
+inline void constructElms(FXdouble*,FXuval){ }
+
+// No-op constructors for array of pointers to any type
+template<class EType> inline void constructElms(EType**,FXuval){ }
+
 
 // No-op destructors for array of basic type
-inline void destructElms(FXuchar*,unsigned long){ }
-inline void destructElms(FXchar*,unsigned long){ }
-inline void destructElms(FXushort*,unsigned long){ }
-inline void destructElms(FXshort*,unsigned long){ }
-inline void destructElms(FXuint*,unsigned long){ }
-inline void destructElms(FXint*,unsigned long){ }
-inline void destructElms(FXfloat*,unsigned long){ }
-inline void destructElms(FXdouble*,unsigned long){ }
+inline void destructElms(FXuchar*,FXuval){ }
+inline void destructElms(FXchar*,FXuval){ }
+inline void destructElms(FXushort*,FXuval){ }
+inline void destructElms(FXshort*,FXuval){ }
+inline void destructElms(FXuint*,FXuval){ }
+inline void destructElms(FXint*,FXuval){ }
+inline void destructElms(FXulong*,FXuval){ }
+inline void destructElms(FXlong*,FXuval){ }
+inline void destructElms(FXfloat*,FXuval){ }
+inline void destructElms(FXdouble*,FXuval){ }
+
+// No-op destructors for array of pointers to any type
+template<class EType> inline void destructElms(EType**,FXuval){ }
+
 
 // Simple bit-wise copy for array of basic type
-inline void copyElms(FXuchar* dst,const FXuchar* src,unsigned long n){ memcpy(dst,src,n); }
-inline void copyElms(FXchar* dst,const FXchar* src,unsigned long n){ memcpy(dst,src,n); }
-inline void copyElms(FXushort* dst,const FXushort* src,unsigned long n){ memcpy(dst,src,n<<1); }
-inline void copyElms(FXshort* dst,const FXshort* src,unsigned long n){ memcpy(dst,src,n<<1); }
-inline void copyElms(FXuint* dst,const FXuint* src,unsigned long n){ memcpy(dst,src,n<<2); }
-inline void copyElms(FXint* dst,const FXint* src,unsigned long n){ memcpy(dst,src,n<<2); }
-inline void copyElms(FXfloat* dst,const FXfloat* src,unsigned long n){ memcpy(dst,src,n<<2); }
-inline void copyElms(FXdouble* dst,const FXdouble* src,unsigned long n){ memcpy(dst,src,n<<3); }
+inline void copyElms(FXuchar* dst,const FXuchar* src,FXuval n){ memcpy(dst,src,n); }
+inline void copyElms(FXchar* dst,const FXchar* src,FXuval n){ memcpy(dst,src,n); }
+inline void copyElms(FXushort* dst,const FXushort* src,FXuval n){ memcpy(dst,src,n<<1); }
+inline void copyElms(FXshort* dst,const FXshort* src,FXuval n){ memcpy(dst,src,n<<1); }
+inline void copyElms(FXuint* dst,const FXuint* src,FXuval n){ memcpy(dst,src,n<<2); }
+inline void copyElms(FXint* dst,const FXint* src,FXuval n){ memcpy(dst,src,n<<2); }
+inline void copyElms(FXulong* dst,const FXulong* src,FXuval n){ memcpy(dst,src,n<<3); }
+inline void copyElms(FXlong* dst,const FXlong* src,FXuval n){ memcpy(dst,src,n<<3); }
+inline void copyElms(FXfloat* dst,const FXfloat* src,FXuval n){ memcpy(dst,src,n<<2); }
+inline void copyElms(FXdouble* dst,const FXdouble* src,FXuval n){ memcpy(dst,src,n<<3); }
 
 // Simple bit-wise copy for array of pointers to any type
-template<class EType> inline void copyElms(EType** dst,const EType** src,unsigned long n){ memcpy(dst,src,n*sizeof(void*)); }
+template<class EType> inline void copyElms(EType** dst,const EType** src,FXuval n){ memcpy(dst,src,n*sizeof(void*)); }
+
 
 // Simple bit-wise move for array of basic type
-inline void moveElms(FXuchar* dst,const FXuchar* src,unsigned long n){ memmove(dst,src,n); }
-inline void moveElms(FXchar* dst,const FXchar* src,unsigned long n){ memmove(dst,src,n); }
-inline void moveElms(FXushort* dst,const FXushort* src,unsigned long n){ memmove(dst,src,n<<1); }
-inline void moveElms(FXshort* dst,const FXshort* src,unsigned long n){ memmove(dst,src,n<<1); }
-inline void moveElms(FXuint* dst,const FXuint* src,unsigned long n){ memmove(dst,src,n<<2); }
-inline void moveElms(FXint* dst,const FXint* src,unsigned long n){ memmove(dst,src,n<<2); }
-inline void moveElms(FXfloat* dst,const FXfloat* src,unsigned long n){ memmove(dst,src,n<<2); }
-inline void moveElms(FXdouble* dst,const FXdouble* src,unsigned long n){ memmove(dst,src,n<<3); }
+inline void moveElms(FXuchar* dst,const FXuchar* src,FXuval n){ memmove(dst,src,n); }
+inline void moveElms(FXchar* dst,const FXchar* src,FXuval n){ memmove(dst,src,n); }
+inline void moveElms(FXushort* dst,const FXushort* src,FXuval n){ memmove(dst,src,n<<1); }
+inline void moveElms(FXshort* dst,const FXshort* src,FXuval n){ memmove(dst,src,n<<1); }
+inline void moveElms(FXuint* dst,const FXuint* src,FXuval n){ memmove(dst,src,n<<2); }
+inline void moveElms(FXint* dst,const FXint* src,FXuval n){ memmove(dst,src,n<<2); }
+inline void moveElms(FXulong* dst,const FXulong* src,FXuval n){ memmove(dst,src,n<<3); }
+inline void moveElms(FXlong* dst,const FXlong* src,FXuval n){ memmove(dst,src,n<<3); }
+inline void moveElms(FXfloat* dst,const FXfloat* src,FXuval n){ memmove(dst,src,n<<2); }
+inline void moveElms(FXdouble* dst,const FXdouble* src,FXuval n){ memmove(dst,src,n<<3); }
 
 // Simple bit-wise move for array of pointers to any type
-template<class EType> inline void moveElms(EType** dst,const EType** src,unsigned long n){ memmove(dst,src,n*sizeof(void*)); }
+template<class EType> inline void moveElms(EType** dst,const EType** src,FXuval n){ memmove(dst,src,n*sizeof(void*)); }
+
+
+// Simple bit-wise comparison for array of basic type
+inline FXbool equalElms(const FXuchar* dst,const FXuchar* src,FXuval n){ return memcmp(dst,src,n)==0; }
+inline FXbool equalElms(const FXchar* dst,const FXchar* src,FXuval n){ return memcmp(dst,src,n)==0; }
+inline FXbool equalElms(const FXushort* dst,const FXushort* src,FXuval n){ return memcmp(dst,src,n<<1)==0; }
+inline FXbool equalElms(const FXshort* dst,const FXshort* src,FXuval n){ return memcmp(dst,src,n<<1)==0; }
+inline FXbool equalElms(const FXuint* dst,const FXuint* src,FXuval n){ return memcmp(dst,src,n<<2)==0; }
+inline FXbool equalElms(const FXint* dst,const FXint* src,FXuval n){ return memcmp(dst,src,n<<2)==0; }
+inline FXbool equalElms(const FXulong* dst,const FXulong* src,FXuval n){ return memcmp(dst,src,n<<3)==0; }
+inline FXbool equalElms(const FXlong* dst,const FXlong* src,FXuval n){ return memcmp(dst,src,n<<3)==0; }
+inline FXbool equalElms(const FXfloat* dst,const FXfloat* src,FXuval n){ return memcmp(dst,src,n<<2)==0; }
+inline FXbool equalElms(const FXdouble* dst,const FXdouble* src,FXuval n){ return memcmp(dst,src,n<<3)==0; }
+
+// Simple bit-wise comparison for array of pointers to any type
+template<class EType> inline void equalElms(EType** dst,const EType** src,FXuval n){ return memcmp(dst,src,n*sizeof(void*))==0; }
+
 
 // Fill byte arrays with constant
-inline void fillElms(FXuchar* dst,const FXuchar& src,unsigned long n){ memset(dst,src,n); }
-inline void fillElms(FXchar* dst,const FXchar& src,unsigned long n){ memset(dst,src,n); }
+inline void fillElms(FXuchar* dst,const FXuchar& src,FXuval n){ memset(dst,src,n); }
+inline void fillElms(FXchar* dst,const FXchar& src,FXuval n){ memset(dst,src,n); }
 
 }
 

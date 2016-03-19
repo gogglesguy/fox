@@ -145,17 +145,16 @@ long FXStatusLine::onPaint(FXObject*,FXSelector,void* ptr){
 long FXStatusLine::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
   FXWindow *helpsource=getApp()->getCursorWindow();
 
-  // Set background text
-  setText(normal);
-
-  // GUI update callback may set application mode text
+  // GUI update callback may set application mode-indicating text
   FXFrame::onUpdate(sender,sel,ptr);
 
-  // Ask the help source for a new status text first, but only if the
-  // statusline's shell is a direct or indirect owner of the help source
-  if(helpsource && getShell()->isOwnerOf(helpsource)){
-    helpsource->handle(this,FXSEL(SEL_QUERY_HELP,0),NULL);
+  // Control under the cursor may supply a temporary help message string
+  if(helpsource && getShell()->isOwnerOf(helpsource) && helpsource->handle(this,FXSEL(SEL_QUERY_HELP,0),NULL)){
+    return 1;
     }
+
+  // Otherwise, display normal message
+  setText(normal);
   return 1;
   }
 

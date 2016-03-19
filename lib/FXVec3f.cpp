@@ -37,6 +37,10 @@ using namespace FX;
 namespace FX {
 
 
+// Mask bottom 3 elements
+#define MMM     _mm_set_epi32(0,~0,~0,~0)
+
+
 // Convert from vector to color
 FXColor colorFromVec3f(const FXVec3f& vec){
   return FXRGB((vec.x*255.0f+0.5f),(vec.y*255.0f+0.5f),(vec.z*255.0f+0.5f));
@@ -46,6 +50,42 @@ FXColor colorFromVec3f(const FXVec3f& vec){
 // Convert from color to vector
 FXVec3f colorToVec3f(FXColor clr){
   return FXVec3f(0.003921568627f*FXREDVAL(clr),0.003921568627f*FXGREENVAL(clr),0.003921568627f*FXBLUEVAL(clr));
+  }
+
+
+// Compute fast cross product with vector code
+FXVec3f cross(const FXVec3f& u,const FXVec3f& v){
+#if defined(FOX_HAS_AVX)
+  register __m128 uu=_mm_maskload_ps(&u[0],MMM);
+  register __m128 vv=_mm_maskload_ps(&v[0],MMM);
+  register __m128 a0=_mm_shuffle_ps(uu,uu,_MM_SHUFFLE(3,0,2,1));
+  register __m128 b0=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(3,1,0,2));
+  register __m128 a1=_mm_shuffle_ps(uu,uu,_MM_SHUFFLE(3,1,0,2));
+  register __m128 b1=_mm_shuffle_ps(vv,vv,_MM_SHUFFLE(3,0,2,1));
+  FXVec3f r;
+  _mm_maskstore_ps(&r[0],MMM,_mm_sub_ps(_mm_mul_ps(a0,b0),_mm_mul_ps(a1,b1)));
+  return r;
+#else
+  FXVec3f r;
+  r.x=u.y*v.z - u.z*v.y;
+  r.y=u.z*v.x - u.x*v.z;
+  r.z=u.x*v.y - u.y*v.x;
+  return r;
+#endif
+  }
+
+
+// Compute fast dot product with vector code
+FXfloat dot(const FXVec3f& u,const FXVec3f& v){
+#if defined(FOX_HAS_AVX)
+  register __m128 uu=_mm_maskload_ps(&u[0],MMM);
+  register __m128 vv=_mm_maskload_ps(&v[0],MMM);
+  FXfloat result;
+  _mm_store_ss(&result,_mm_dp_ps(uu,vv,0x71));
+  return result;
+#else
+  return u*v;
+#endif
   }
 
 
@@ -68,7 +108,7 @@ static inline FXfloat rsqrtf(FXfloat r){
 
 // Fast normalize vector
 FXVec3f fastnormalize(const FXVec3f& v){
-  register FXfloat m=v.length2();
+  register FXfloat m=dot(v,v);
   FXVec3f result(v);
   if(__likely(FLT_MIN<m)){ result*=rsqrtf(m); }
   return result;
@@ -77,7 +117,7 @@ FXVec3f fastnormalize(const FXVec3f& v){
 
 // Normalize vector
 FXVec3f normalize(const FXVec3f& v){
-  register FXfloat m=v.length2();
+  register FXfloat m=dot(v,v);
   FXVec3f result(v);
   if(__likely(0.0f<m)){ result/=sqrtf(m); }
   return result;
@@ -99,11 +139,11 @@ FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f&
 // Linearly interpolate
 FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f){
 #if defined(FOX_HAS_AVX)
-  register __m128 u0=_mm_maskload_ps(&u[0],_mm_set_epi32(0,~0,~0,~0));
-  register __m128 v0=_mm_maskload_ps(&v[0],_mm_set_epi32(0,~0,~0,~0));
+  register __m128 u0=_mm_maskload_ps(&u[0],MMM);
+  register __m128 v0=_mm_maskload_ps(&v[0],MMM);
   register __m128 ff=_mm_set1_ps(f);
   FXVec3f r;
-  _mm_maskstore_ps(&r[0],_mm_set_epi32(0,~0,~0,~0),_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff)));
+  _mm_maskstore_ps(&r[0],MMM,_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff)));
   return r;
 #elif defined(FOX_HAS_SSE2)
   register __m128 u0=_mm_loadh_pi(_mm_load_ss(&u[2]),(const __m64*)&u[0]);      // u1 u0 0 u2

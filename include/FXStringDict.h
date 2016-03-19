@@ -57,7 +57,7 @@ public:
   const FXchar* find(const FXchar* ky) const { return static_cast<const FXchar*>(FXDict::find(ky)); }
 
   /// Return the string at position pos
-  const FXchar* data(FXint pos) const { return static_cast<const FXchar*>(FXDict::data(pos)); }
+  const FXchar* data(FXival pos) const { return static_cast<const FXchar*>(FXDict::data(pos)); }
 
   /// Destructor
   virtual ~FXStringDict();

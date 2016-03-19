@@ -192,6 +192,7 @@ FX4Splitter.cpp \
 FX7Segment.cpp \
 FXAccelTable.cpp \
 FXApp.cpp \
+FXArray.cpp \
 FXArrowButton.cpp \
 FXAtomic.cpp \
 FXAutoThreadStorageKey.cpp \

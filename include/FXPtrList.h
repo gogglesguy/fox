@@ -76,7 +76,7 @@ public:
   const FXptr* data() const { return ptr; }
 
   /// Adopt objects from orig, leaving orig empty
-  void adopt(FXPtrList& orig);
+  FXPtrList& adopt(FXPtrList& orig);
 
   /// Assign object to list
   FXbool assign(FXptr object);
@@ -163,7 +163,7 @@ public:
   void clear();
 
   /// Destructor
-  virtual ~FXPtrList();
+ ~FXPtrList();
   };
 
 
@@ -172,6 +172,7 @@ public:
 template<class TYPE>
 class FXPtrListOf : public FXPtrList {
 public:
+
   /// Default constructor
   FXPtrListOf(){}
 
@@ -206,6 +207,9 @@ public:
   /// Access to content array
   TYPE** data(){ return reinterpret_cast<TYPE**>(ptr); }
   TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
+
+  /// Adopt objects from orig, leaving orig empty
+  FXPtrListOf<TYPE>& adopt(FXPtrList& orig){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::adopt(orig)); }
   };
 
 }

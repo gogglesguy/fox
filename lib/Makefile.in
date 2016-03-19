@@ -110,40 +110,41 @@ am__objects_1 = FX88591Codec.lo FX88592Codec.lo FX88593Codec.lo \
 	FXKOI8RCodec.lo FXUTF8Codec.lo FXUTF16Codec.lo FXUTF32Codec.lo
 am__objects_2 =
 am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
-	FX7Segment.lo FXAccelTable.lo FXApp.lo FXArrowButton.lo \
-	FXAtomic.lo FXAutoThreadStorageKey.lo FXBarrier.lo \
-	FXBMPIcon.lo FXBMPImage.lo FXBitmap.lo FXBitmapFrame.lo \
-	FXBitmapView.lo FXButton.lo FXBZFileStream.lo FXCURCursor.lo \
-	FXCalendar.lo FXCalendarView.lo FXCanvas.lo FXCheckButton.lo \
-	FXChoiceBox.lo FXColorBar.lo FXColorDialog.lo FXColorList.lo \
-	FXColorRing.lo FXColors.lo FXColorSelector.lo FXColorWell.lo \
-	FXColorWheel.lo FXComboBox.lo FXComplexf.lo FXComplexd.lo \
-	FXComposeContext.lo FXComposite.lo FXCondition.lo FXConsole.lo \
-	FXCursor.lo FXDataTarget.lo FXDate.lo FXDC.lo FXDCPrint.lo \
-	FXDCWindow.lo FXDDSIcon.lo FXDDSImage.lo FXDLL.lo \
-	FXDebugTarget.lo FXDelegator.lo FXDial.lo FXDialogBox.lo \
-	FXDict.lo FXDir.lo FXDirBox.lo FXDirDialog.lo FXDirList.lo \
-	FXDirSelector.lo FXDirVisitor.lo FXDockBar.lo FXDockSite.lo \
-	FXDockHandler.lo FXDockTitle.lo FXDocument.lo FXDragCorner.lo \
-	FXDrawable.lo FXDriveBox.lo FXException.lo FXExpression.lo \
-	FXExtentd.lo FXExtentf.lo FXFile.lo FXFileDialog.lo \
-	FXFileDict.lo FXFileList.lo FXFileSelector.lo FXFileStream.lo \
-	FXFoldingList.lo FXFont.lo FXFontDialog.lo FXFontSelector.lo \
-	FXFrame.lo FXGIFCursor.lo FXGIFIcon.lo FXGIFImage.lo \
-	FXGLCanvas.lo FXGLCone.lo FXGLContext.lo FXGLCube.lo \
-	FXGLCylinder.lo FXGLObject.lo FXGLShape.lo FXGLSphere.lo \
-	FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo FXGauge.lo \
-	FXGradientBar.lo FXGroupBox.lo FXGZFileStream.lo FXhalf.lo \
-	FXHash.lo FXHeader.lo FXHorizontalFrame.lo FXICOIcon.lo \
-	FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo FXIcon.lo \
-	FXIconDict.lo FXIconList.lo FXIconSource.lo FXId.lo FXImage.lo \
-	FXImageFrame.lo FXImageView.lo FXInputDialog.lo FXIO.lo \
-	FXIODevice.lo FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo \
-	FXJPGImage.lo FXKnob.lo FXLabel.lo FXLFQueue.lo FXList.lo \
-	FXListBox.lo FXLocale.lo FXMDIButton.lo FXMDIChild.lo \
-	FXMDIClient.lo FXMainWindow.lo FXMat2d.lo FXMat2f.lo \
-	FXMat3d.lo FXMat3f.lo FXMat4d.lo FXMat4f.lo FXMatrix.lo \
-	FXMemMap.lo FXMemoryStream.lo FXMenuBar.lo FXMenuButton.lo \
+	FX7Segment.lo FXAccelTable.lo FXApp.lo FXArray.lo \
+	FXArrowButton.lo FXAtomic.lo FXAutoThreadStorageKey.lo \
+	FXBarrier.lo FXBMPIcon.lo FXBMPImage.lo FXBitmap.lo \
+	FXBitmapFrame.lo FXBitmapView.lo FXButton.lo FXBZFileStream.lo \
+	FXCURCursor.lo FXCalendar.lo FXCalendarView.lo FXCanvas.lo \
+	FXCheckButton.lo FXChoiceBox.lo FXColorBar.lo FXColorDialog.lo \
+	FXColorList.lo FXColorRing.lo FXColors.lo FXColorSelector.lo \
+	FXColorWell.lo FXColorWheel.lo FXComboBox.lo FXComplexf.lo \
+	FXComplexd.lo FXComposeContext.lo FXComposite.lo \
+	FXCondition.lo FXConsole.lo FXCursor.lo FXDataTarget.lo \
+	FXDate.lo FXDC.lo FXDCPrint.lo FXDCWindow.lo FXDDSIcon.lo \
+	FXDDSImage.lo FXDLL.lo FXDebugTarget.lo FXDelegator.lo \
+	FXDial.lo FXDialogBox.lo FXDict.lo FXDir.lo FXDirBox.lo \
+	FXDirDialog.lo FXDirList.lo FXDirSelector.lo FXDirVisitor.lo \
+	FXDockBar.lo FXDockSite.lo FXDockHandler.lo FXDockTitle.lo \
+	FXDocument.lo FXDragCorner.lo FXDrawable.lo FXDriveBox.lo \
+	FXException.lo FXExpression.lo FXExtentd.lo FXExtentf.lo \
+	FXFile.lo FXFileDialog.lo FXFileDict.lo FXFileList.lo \
+	FXFileSelector.lo FXFileStream.lo FXFoldingList.lo FXFont.lo \
+	FXFontDialog.lo FXFontSelector.lo FXFrame.lo FXGIFCursor.lo \
+	FXGIFIcon.lo FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo \
+	FXGLContext.lo FXGLCube.lo FXGLCylinder.lo FXGLObject.lo \
+	FXGLShape.lo FXGLSphere.lo FXGLTriangleMesh.lo FXGLViewer.lo \
+	FXGLVisual.lo FXGauge.lo FXGradientBar.lo FXGroupBox.lo \
+	FXGZFileStream.lo FXhalf.lo FXHash.lo FXHeader.lo \
+	FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo \
+	FXIFFImage.lo FXIcon.lo FXIconDict.lo FXIconList.lo \
+	FXIconSource.lo FXId.lo FXImage.lo FXImageFrame.lo \
+	FXImageView.lo FXInputDialog.lo FXIO.lo FXIODevice.lo \
+	FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo FXJPGImage.lo \
+	FXKnob.lo FXLabel.lo FXLFQueue.lo FXList.lo FXListBox.lo \
+	FXLocale.lo FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo \
+	FXMainWindow.lo FXMat2d.lo FXMat2f.lo FXMat3d.lo FXMat3f.lo \
+	FXMat4d.lo FXMat4f.lo FXMatrix.lo FXMemMap.lo \
+	FXMemoryStream.lo FXMenuBar.lo FXMenuButton.lo \
 	FXMenuCaption.lo FXMenuCascade.lo FXMenuCheck.lo \
 	FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
@@ -541,6 +542,7 @@ FX4Splitter.cpp \
 FX7Segment.cpp \
 FXAccelTable.cpp \
 FXApp.cpp \
+FXArray.cpp \
 FXArrowButton.cpp \
 FXAtomic.cpp \
 FXAutoThreadStorageKey.cpp \
@@ -955,6 +957,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FX88599Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXAccelTable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXApp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXArrowButton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXAtomic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXAutoThreadStorageKey.Plo@am__quote@

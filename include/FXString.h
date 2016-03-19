@@ -372,7 +372,7 @@ public:
   FXString right(FXint n) const;
 
   /// Get some part in the middle
-  FXString mid(FXint pos,FXint n=2147483647) const;
+  FXString mid(FXint pos,FXint n) const;
 
   /// Return num partition(s) from a given start partition in a string separated by delimiters delim.
   FXString section(FXchar delim,FXint start,FXint num=1) const;

@@ -17,6 +17,33 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 27 - FOX DEVELOPMENT 1.7.41
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Many changes to Matrix classes for AVX and SSE.</li>
+<li>FXHash hash-table improvements.</li>
+<li>FXHash, FXPtrList needlessly had virtual destructors.</li>
+<li>API's equalElms() added to FXElement.h.</li>
+<li>Problems with initial list fixed in FXFileList and FXDirList.</li>
+<li>Dropped default parameter value for FXString::mid() API.</li>
+<li>Signed/unsigned warning issues fixed in FXArray.h.</li>
+<li>FXArray and FXHash now use FXival to allow truly large arrays and dictionaries.</li>
+<li>Fixed some warnings compiling synchronization classes.</li>
+<li>Use FXuval for fxmalloc() and ilk.</li>
+<li>Minor additional tweaks to CPU identification.</li>
+<li>FXRefPtr moved into the Atomic Age:- use atomic swap when changing pointer value.</li>
+<li>Add overloads for long, unsigned long in FXElement.h.</li>
+<li>FXArray now consists of single (never NULL) pointer, same as FXString.  This means
+FXArray takes up only a pointer's worth of space when empty.</li>
+<li>Sign-extend macro added to fxdefs.h.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 July 18 - FOX DEVELOPMENT 1.7.40
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

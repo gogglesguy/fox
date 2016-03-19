@@ -50,16 +50,13 @@ namespace FX {
 // Mask bottom 3 elements
 #define MMM     _mm_set_epi32(0,~0,~0,~0)
 
-// Mask bottom 2 elements
-#define MM      _mm_set_epi32(0,0,~0,~0)
-
 
 // Initialize matrix from scalar
 FXMat3f::FXMat3f(FXfloat s){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_set1_ps(s));
   _mm_storeu_ps(&m[1][1],_mm_set1_ps(s));
-  _mm_store_ss (&m[2][2],_mm_set1_ps(s));
+  _mm_store_ss(&m[2][2],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s;
@@ -78,10 +75,13 @@ FXMat3f::FXMat3f(const FXMat2f& s){
 
 // Initialize matrix from another matrix
 FXMat3f::FXMat3f(const FXMat3f& s){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0]));
+  _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0]));
   _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1]));
-  _mm_store_ss (&m[2][2],_mm_load_ss (&s[2][2]));
+  _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
@@ -106,10 +106,13 @@ FXMat3f::FXMat3f(const FXMat4f& s){
 
 // Initialize matrix from array
 FXMat3f::FXMat3f(const FXfloat s[]){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
+  _mm_store_ss(&m[2][2],_mm_load_ss(s+8));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
   _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
-  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
+  _mm_store_ss(&m[2][2],_mm_load_ss(s+8));
 #else
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
   m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
@@ -146,7 +149,7 @@ FXMat3f::FXMat3f(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
   m[2]=c;
 #endif
   }
- 
+
 
 // Initialize matrix from quaternion
 FXMat3f::FXMat3f(const FXQuatf& quat){
@@ -159,7 +162,7 @@ FXMat3f& FXMat3f::operator=(FXfloat s){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_set1_ps(s));
   _mm_storeu_ps(&m[1][1],_mm_set1_ps(s));
-  _mm_store_ss (&m[2][2],_mm_set1_ps(s));
+  _mm_store_ss(&m[2][2],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s;
@@ -180,10 +183,13 @@ FXMat3f& FXMat3f::operator=(const FXMat2f& s){
 
 // Assignment operator
 FXMat3f& FXMat3f::operator=(const FXMat3f& s){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0]));
+  _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0]));
   _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1]));
-  _mm_store_ss (&m[2][2],_mm_load_ss (&s[2][2]));
+  _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
@@ -217,10 +223,13 @@ FXMat3f& FXMat3f::operator=(const FXQuatf& quat){
 
 // Assignment from array
 FXMat3f& FXMat3f::operator=(const FXfloat s[]){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
+  _mm_store_ss(&m[2][2],_mm_load_ss(s+8));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
   _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
-  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
+  _mm_store_ss(&m[2][2],_mm_load_ss(s+8));
 #else
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
   m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
@@ -235,7 +244,7 @@ FXMat3f& FXMat3f::set(FXfloat s){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_set1_ps(s));
   _mm_storeu_ps(&m[1][1],_mm_set1_ps(s));
-  _mm_store_ss (&m[2][2],_mm_set1_ps(s));
+  _mm_store_ss(&m[2][2],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s;
@@ -256,10 +265,13 @@ FXMat3f& FXMat3f::set(const FXMat2f& s){
 
 // Set value from another matrix
 FXMat3f& FXMat3f::set(const FXMat3f& s){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0]));
+  _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0]));
   _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1]));
-  _mm_store_ss (&m[2][2],_mm_load_ss (&s[2][2]));
+  _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
@@ -286,10 +298,13 @@ FXMat3f& FXMat3f::set(const FXMat4f& s){
 
 // Set value from array
 FXMat3f& FXMat3f::set(const FXfloat s[]){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
+  _mm_store_ss(&m[2][2],_mm_load_ss(s+8));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
   _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
-  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
+  _mm_store_ss(&m[2][2],_mm_load_ss(s+8));
 #else
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
   m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
@@ -341,10 +356,13 @@ FXMat3f& FXMat3f::set(const FXQuatf& quat){
 
 // Add matrices
 FXMat3f& FXMat3f::operator+=(const FXMat3f& w){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_add_ps(_mm256_loadu_ps(&m[0][0]),_mm256_loadu_ps(&w[0][0])));
+  _mm_store_ss(&m[2][2],_mm_add_ss(_mm_load_ss(&m[2][2]),_mm_load_ss(&w[2][2])));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_add_ps(_mm_loadu_ps(&m[0][0]),_mm_loadu_ps(&w[0][0])));
   _mm_storeu_ps(&m[1][1],_mm_add_ps(_mm_loadu_ps(&m[1][1]),_mm_loadu_ps(&w[1][1])));
-  _mm_store_ss (&m[2][2],_mm_add_ss(_mm_load_ss (&m[2][2]),_mm_load_ss (&w[2][2])));
+  _mm_store_ss(&m[2][2],_mm_add_ss(_mm_load_ss (&m[2][2]),_mm_load_ss(&w[2][2])));
 #else
   m[0][0]+=w[0][0]; m[0][1]+=w[0][1]; m[0][2]+=w[0][2];
   m[1][0]+=w[1][0]; m[1][1]+=w[1][1]; m[1][2]+=w[1][2];
@@ -356,10 +374,13 @@ FXMat3f& FXMat3f::operator+=(const FXMat3f& w){
 
 // Substract matrices
 FXMat3f& FXMat3f::operator-=(const FXMat3f& w){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_sub_ps(_mm256_loadu_ps(&m[0][0]),_mm256_loadu_ps(&w[0][0])));
+  _mm_store_ss(&m[2][2],_mm_sub_ss(_mm_load_ss(&m[2][2]),_mm_load_ss (&w[2][2])));
+#elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_sub_ps(_mm_loadu_ps(&m[0][0]),_mm_loadu_ps(&w[0][0])));
   _mm_storeu_ps(&m[1][1],_mm_sub_ps(_mm_loadu_ps(&m[1][1]),_mm_loadu_ps(&w[1][1])));
-  _mm_store_ss (&m[2][2],_mm_sub_ss(_mm_load_ss (&m[2][2]),_mm_load_ss (&w[2][2])));
+  _mm_store_ss(&m[2][2],_mm_sub_ss(_mm_load_ss(&m[2][2]),_mm_load_ss (&w[2][2])));
 #else
   m[0][0]-=w[0][0]; m[0][1]-=w[0][1]; m[0][2]-=w[0][2];
   m[1][0]-=w[1][0]; m[1][1]-=w[1][1]; m[1][2]-=w[1][2];
@@ -374,7 +395,7 @@ FXMat3f& FXMat3f::operator*=(FXfloat s){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_mul_ps(_mm_loadu_ps(&m[0][0]),_mm_set1_ps(s)));
   _mm_storeu_ps(&m[1][1],_mm_mul_ps(_mm_loadu_ps(&m[1][1]),_mm_set1_ps(s)));
-  _mm_store_ss (&m[2][2],_mm_mul_ss(_mm_load_ss (&m[2][2]),_mm_set1_ps(s)));
+  _mm_store_ss(&m[2][2],_mm_mul_ss(_mm_load_ss(&m[2][2]),_mm_set1_ps(s)));
 #else
   m[0][0]*=s; m[0][1]*=s; m[0][2]*=s;
   m[1][0]*=s; m[1][1]*=s; m[1][2]*=s;
@@ -386,10 +407,32 @@ FXMat3f& FXMat3f::operator*=(FXfloat s){
 
 // Multiply matrix by matrix
 FXMat3f& FXMat3f::operator*=(const FXMat3f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 b0=_mm_loadh_pi(_mm_load_ss(&s[0][2]),(const __m64*)&s[0][0]);
-  register __m128 b1=_mm_loadh_pi(_mm_load_ss(&s[1][2]),(const __m64*)&s[1][0]);
-  register __m128 b2=_mm_loadh_pi(_mm_load_ss(&s[2][2]),(const __m64*)&s[2][0]);
+#if defined(FOX_HAS_AVX)
+  register __m128 b0=_mm_maskload_ps(&s[0][0],MMM);
+  register __m128 b1=_mm_maskload_ps(&s[1][0],MMM);
+  register __m128 b2=_mm_maskload_ps(&s[2][0],MMM);
+  register __m128 r0,r1,r2;
+  register __m128 xx,yy,zz;
+  xx=_mm_set1_ps(m[0][0]);
+  yy=_mm_set1_ps(m[0][1]);
+  zz=_mm_set1_ps(m[0][2]);
+  r0=_mm_add_ps(_mm_add_ps(_mm_mul_ps(b0,xx),_mm_mul_ps(b1,yy)),_mm_mul_ps(b2,zz));
+  xx=_mm_set1_ps(m[1][0]);
+  yy=_mm_set1_ps(m[1][1]);
+  zz=_mm_set1_ps(m[1][2]);
+  r1=_mm_add_ps(_mm_add_ps(_mm_mul_ps(b0,xx),_mm_mul_ps(b1,yy)),_mm_mul_ps(b2,zz));
+  xx=_mm_set1_ps(m[2][0]);
+  yy=_mm_set1_ps(m[2][1]);
+  zz=_mm_set1_ps(m[2][2]);
+  r2=_mm_add_ps(_mm_add_ps(_mm_mul_ps(b0,xx),_mm_mul_ps(b1,yy)),_mm_mul_ps(b2,zz));
+  _mm_maskstore_ps(&m[0][0],MMM,r0);
+  _mm_maskstore_ps(&m[1][0],MMM,r1);
+  _mm_maskstore_ps(&m[1][0],MMM,r2);
+  return *this;
+#elif defined(FOX_HAS_SSE)
+  register __m128 b0=_mm_loadh_pi(_mm_load_ss(&s[0][2]),(const __m64*)&s[0][0]);  // s01  s00  0  s02
+  register __m128 b1=_mm_loadh_pi(_mm_load_ss(&s[1][2]),(const __m64*)&s[1][0]);  // s11  s10  0  s12
+  register __m128 b2=_mm_loadh_pi(_mm_load_ss(&s[2][2]),(const __m64*)&s[2][0]);  // s21  s20  0  s22
   register __m128 r0,r1,r2;
   register __m128 xx,yy,zz;
   xx=_mm_set1_ps(m[0][0]);
@@ -432,7 +475,7 @@ FXMat3f& FXMat3f::operator/=(FXfloat s){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_div_ps(_mm_loadu_ps(&m[0][0]),_mm_set1_ps(s)));
   _mm_storeu_ps(&m[1][1],_mm_div_ps(_mm_loadu_ps(&m[1][1]),_mm_set1_ps(s)));
-  _mm_store_ss (&m[2][2],_mm_div_ss(_mm_load_ss (&m[2][2]),_mm_set1_ps(s)));
+  _mm_store_ss(&m[2][2],_mm_div_ss(_mm_load_ss(&m[2][2]),_mm_set1_ps(s)));
 #else
   m[0][0]/=s; m[0][1]/=s; m[0][2]/=s;
   m[1][0]/=s; m[1][1]/=s; m[1][2]/=s;
@@ -448,7 +491,7 @@ FXMat3f FXMat3f::operator-() const {
   FXMat3f r;
   _mm_storeu_ps(&r[0][0],_mm_sub_ps(_mm_set1_ps(0.0f),_mm_loadu_ps(&m[0][0])));
   _mm_storeu_ps(&r[1][1],_mm_sub_ps(_mm_set1_ps(0.0f),_mm_loadu_ps(&m[1][1])));
-  _mm_store_ss (&r[2][2],_mm_sub_ss(_mm_set1_ps(0.0f),_mm_load_ss (&m[2][2])));
+  _mm_store_ss(&r[2][2],_mm_sub_ss(_mm_set1_ps(0.0f),_mm_load_ss(&m[2][2])));
   return r;
 #else
   return FXMat3f(-m[0][0],-m[0][1],-m[0][2],
@@ -463,7 +506,7 @@ FXMat3f& FXMat3f::identity(){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_set_ps(0.0f,0.0f,0.0f,1.0f));
   _mm_storeu_ps(&m[1][1],_mm_set_ps(0.0f,0.0f,0.0f,1.0f));
-  _mm_store_ss (&m[2][2],_mm_set_ps(0.0f,0.0f,0.0f,1.0f));
+  _mm_store_ss(&m[2][2],_mm_set_ps(0.0f,0.0f,0.0f,1.0f));
 #else
   m[0][0]=1.0f; m[0][1]=0.0f; m[0][2]=0.0f;
   m[1][0]=0.0f; m[1][1]=1.0f; m[1][2]=0.0f;
@@ -625,31 +668,54 @@ FXMat3f FXMat3f::invert() const {
 
 // Matrix times vector
 FXVec2f operator*(const FXMat3f& m,const FXVec2f& v){
+#if defined(FOX_HAS_AVX)
+  register __m128 m0=_mm_maskload_ps(m[0],MMM);         // 0  m02  m01  m00
+  register __m128 m1=_mm_maskload_ps(m[1],MMM);         // 0  m12  m11  m10
+  register __m128 vv=_mm_set_ps(0.0f,1.0f,v[1],v[0]);   // 0  1    v1   v0
+  FXVec2f r;
+  _mm_store_ss(&r[0],_mm_dp_ps(m0,vv,0x71));    // m02+m01*v1+m00*v0
+  _mm_store_ss(&r[1],_mm_dp_ps(m1,vv,0x71));    // m12+m11*v1+m10*v0
+  return r;
+#elif defined(FOX_HAS_SSE3)
+  register __m128 m0=_mm_loadh_pi(_mm_load_ss(&m[0][2]),(const __m64*)&m[0][0]);  // m01  m00  0  m02
+  register __m128 m1=_mm_loadh_pi(_mm_load_ss(&m[1][2]),(const __m64*)&m[1][0]);  // m11  m10  0  m12
+  register __m128 m2=_mm_loadh_pi(_mm_load_ss(&m[2][2]),(const __m64*)&m[2][0]);  // m21  m20  0  m22
+  register __m128 vv=_mm_loadh_pi(_mm_set1_ps(1.0f),(const __m64*)&v[0]);         // v1   v0   1  1
+  register __m128 r0=_mm_mul_ps(m0,vv);         // m01*v1   m00*v0   0   m02
+  register __m128 r1=_mm_mul_ps(m1,vv);         // m11*v1   m10*v0   0   m12
+  register __m128 r2=_mm_mul_ps(m2,vv);         // m21*v1   m20*v0   0   m22
+  FXVec3f r;
+  r0=_mm_hadd_ps(r0,r1);        // m11*v1+m10*v0   m12   m01*v1+m00*v0   m02
+  r2=_mm_hadd_ps(r2,r2);        // m21*v1+m20*v0   m22   m21*v1+m20*v0   m22
+  r2=_mm_hadd_ps(r2,r0);        // m11*v1+m10*v0+m12   m01*v1+m00*v0+m02   m21*v1+m20*v0+m22   m21*v1+m20*v0+m22
+  _mm_storeh_pi((__m64*)&r[0],r2); _mm_store_ss(&r[2],r2);
+  return r;
+#else
   return FXVec2f(m[0][0]*v[0]+m[0][1]*v[1]+m[0][2], m[1][0]*v[0]+m[1][1]*v[1]+m[1][2]);
+#endif
   }
 
 
 // Matrix times vector
 FXVec3f operator*(const FXMat3f& m,const FXVec3f& v){
 #if defined(FOX_HAS_AVX)
-  register __m128 m0=_mm_maskload_ps(m[0],MMM);
-  register __m128 m1=_mm_maskload_ps(m[1],MMM);
-  register __m128 m2=_mm_maskload_ps(m[2],MMM);
-  register __m128 vv=_mm_maskload_ps(v,MMM);
-  register __m128 r0=_mm_mul_ps(m0,vv);
-  register __m128 r1=_mm_mul_ps(m1,vv);
-  register __m128 r2=_mm_mul_ps(m2,vv);
+  register __m128 m0=_mm_maskload_ps(m[0],MMM); // 0  m02  m01  m00
+  register __m128 m1=_mm_maskload_ps(m[1],MMM); // 0  m12  m11  m10
+  register __m128 m2=_mm_maskload_ps(m[2],MMM); // 0  m22  m21  m20
+  register __m128 vv=_mm_maskload_ps(v,MMM);    // 0  v2   v1   v0
   FXVec3f r;
-  r0=_mm_hadd_ps(r0,r1);
-  r2=_mm_hadd_ps(r2,m0);
-  r0=_mm_hadd_ps(r0,r2);
-  _mm_maskstore_ps(&r[0],MMM,r0);
+  _mm_store_ss(&r[0],_mm_dp_ps(m0,vv,0x71));    // m02*v2+m01*v1+m00*v0
+  _mm_store_ss(&r[1],_mm_dp_ps(m1,vv,0x71));    // m12*v2+m11*v1+m10*v0
+  _mm_store_ss(&r[2],_mm_dp_ps(m2,vv,0x71));    // m22*v2+m21*v1+m20*v0
   return r;
 #elif defined(FOX_HAS_SSE3)
-  register __m128 vv=_mm_loadh_pi(_mm_load_ss(&v[2]),(const __m64*)&v[0]);                      // v1       v0       0   v2
-  register __m128 r0=_mm_mul_ps(_mm_loadh_pi(_mm_load_ss(&m[0][2]),(const __m64*)&m[0][0]),vv); // m01*v1   m00*v0   0   m02*v2
-  register __m128 r1=_mm_mul_ps(_mm_loadh_pi(_mm_load_ss(&m[1][2]),(const __m64*)&m[1][0]),vv); // m11*v1   m10*v0   0   m12*v2
-  register __m128 r2=_mm_mul_ps(_mm_loadh_pi(_mm_load_ss(&m[2][2]),(const __m64*)&m[2][0]),vv); // m21*v1   m20*v0   0   m22*v2
+  register __m128 m0=_mm_loadh_pi(_mm_load_ss(&m[0][2]),(const __m64*)&m[0][0]);        // m01 m00 0 m02
+  register __m128 m1=_mm_loadh_pi(_mm_load_ss(&m[1][2]),(const __m64*)&m[1][0]);        // m11 m10 0 m12
+  register __m128 m2=_mm_loadh_pi(_mm_load_ss(&m[2][2]),(const __m64*)&m[2][0]);        // m21 m20 0 m22
+  register __m128 vv=_mm_loadh_pi(_mm_load_ss(&v[2]),(const __m64*)&v[0]);              // v1  v0  0 v2
+  register __m128 r0=_mm_mul_ps(m0,vv);         // m01*v1   m00*v0   0   m02*v2
+  register __m128 r1=_mm_mul_ps(m1,vv);         // m11*v1   m10*v0   0   m12*v2
+  register __m128 r2=_mm_mul_ps(m2,vv);         // m21*v1   m20*v0   0   m22*v2
   FXVec3f r;
   r0=_mm_hadd_ps(r0,r1);        // m11*v1+m10*v0   m12*v2   m01*v1+m00*v0   m02*v2
   r2=_mm_hadd_ps(r2,r2);        // m21*v1+m20*v0   m22*v2   m21*v1+m20*v0   m22*v2
@@ -665,7 +731,20 @@ FXVec3f operator*(const FXMat3f& m,const FXVec3f& v){
 
 // Vector times matrix
 FXVec2f operator*(const FXVec2f& v,const FXMat3f& m){
+#if defined(FOX_HAS_SSE)
+  register __m128 v0=_mm_set1_ps(v[0]);
+  register __m128 v1=_mm_set1_ps(v[1]);
+  register __m128 m0=_mm_loadh_pi(_mm_set1_ps(0.0f),(const __m64*)&m[0][0]);        // m01  m00  0  0
+  register __m128 m1=_mm_loadh_pi(_mm_set1_ps(0.0f),(const __m64*)&m[1][0]);        // m11  m10  0  0
+  register __m128 m2=_mm_loadh_pi(_mm_set1_ps(0.0f),(const __m64*)&m[2][0]);        // m21  m20  0  0
+  register __m128 rr=_mm_add_ps(_mm_add_ps(_mm_mul_ps(m0,v0),_mm_mul_ps(m1,v1)),m2);
+  FXVec2f r;
+  _mm_storeh_pi((__m64*)&r[0],rr);
+  return r;
+  return r;
+#else
   return FXVec2f(v[0]*m[0][0]+v[1]*m[1][0]+m[2][0],v[0]*m[0][1]+v[1]*m[1][1]+m[2][1]);
+#endif
   }
 
 
@@ -675,13 +754,12 @@ FXVec3f operator*(const FXVec3f& v,const FXMat3f& m){
   register __m128 v0=_mm_set1_ps(v[0]);
   register __m128 v1=_mm_set1_ps(v[1]);
   register __m128 v2=_mm_set1_ps(v[2]);
-  register __m128 m0=_mm_loadh_pi(_mm_load_ss(&m[0][2]),(const __m64*)&m[0][0]);
-  register __m128 m1=_mm_loadh_pi(_mm_load_ss(&m[1][2]),(const __m64*)&m[1][0]);
-  register __m128 m2=_mm_loadh_pi(_mm_load_ss(&m[2][2]),(const __m64*)&m[2][0]);
+  register __m128 m0=_mm_loadh_pi(_mm_load_ss(&m[0][2]),(const __m64*)&m[0][0]);   // m01  m00  0  m02
+  register __m128 m1=_mm_loadh_pi(_mm_load_ss(&m[1][2]),(const __m64*)&m[1][0]);   // m11  m10  0  m12
+  register __m128 m2=_mm_loadh_pi(_mm_load_ss(&m[2][2]),(const __m64*)&m[2][0]);   // m21  m20  0  m22
   register __m128 rr=_mm_add_ps(_mm_add_ps(_mm_mul_ps(m0,v0),_mm_mul_ps(m1,v1)),_mm_mul_ps(m2,v2));
   FXVec3f r;
-  _mm_storeh_pi((__m64*)&r[0],rr);
-  _mm_store_ss(&r[2],rr);
+  _mm_storeh_pi((__m64*)&r[0],rr); _mm_store_ss(&r[2],rr);
   return r;
 #else
   return FXVec3f(v[0]*m[0][0]+v[1]*m[1][0]+v[2]*m[2][0], v[0]*m[0][1]+v[1]*m[1][1]+v[2]*m[2][1], v[0]*m[0][2]+v[1]*m[1][2]+v[2]*m[2][2]);
@@ -723,7 +801,30 @@ FXMat3f operator-(const FXMat3f& a,const FXMat3f& b){
 
 // Matrix and matrix multiply
 FXMat3f operator*(const FXMat3f& a,const FXMat3f& b){
-#if defined(FOX_HAS_SSE)
+#if defined(FOX_HAS_AVX)
+  register __m128 b0=_mm_maskload_ps(&b[0][0],MMM);
+  register __m128 b1=_mm_maskload_ps(&b[1][0],MMM);
+  register __m128 b2=_mm_maskload_ps(&b[2][0],MMM);
+  register __m128 r0,r1,r2;
+  register __m128 xx,yy,zz;
+  FXMat3f r;
+  xx=_mm_set1_ps(a[0][0]);
+  yy=_mm_set1_ps(a[0][1]);
+  zz=_mm_set1_ps(a[0][2]);
+  r0=_mm_add_ps(_mm_add_ps(_mm_mul_ps(b0,xx),_mm_mul_ps(b1,yy)),_mm_mul_ps(b2,zz));
+  xx=_mm_set1_ps(a[1][0]);
+  yy=_mm_set1_ps(a[1][1]);
+  zz=_mm_set1_ps(a[1][2]);
+  r1=_mm_add_ps(_mm_add_ps(_mm_mul_ps(b0,xx),_mm_mul_ps(b1,yy)),_mm_mul_ps(b2,zz));
+  xx=_mm_set1_ps(a[2][0]);
+  yy=_mm_set1_ps(a[2][1]);
+  zz=_mm_set1_ps(a[2][2]);
+  r2=_mm_add_ps(_mm_add_ps(_mm_mul_ps(b0,xx),_mm_mul_ps(b1,yy)),_mm_mul_ps(b2,zz));
+  _mm_maskstore_ps(&r[0][0],MMM,r0);
+  _mm_maskstore_ps(&r[1][0],MMM,r1);
+  _mm_maskstore_ps(&r[1][0],MMM,r2);
+  return r;
+#elif defined(FOX_HAS_SSE)
   register __m128 b0=_mm_loadh_pi(_mm_load_ss(&b[0][2]),(const __m64*)&b[0][0]);
   register __m128 b1=_mm_loadh_pi(_mm_load_ss(&b[1][2]),(const __m64*)&b[1][0]);
   register __m128 b2=_mm_loadh_pi(_mm_load_ss(&b[2][2]),(const __m64*)&b[2][0]);

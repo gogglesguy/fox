@@ -54,7 +54,7 @@
 
 
 // Determine if builtin __sync_XXXX() functions are available
-#if defined( __GNUC__ ) && defined ( __GNUC_MINOR__ ) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
+#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
 #define HAVE_BUILTIN_SYNC 1
 #if defined( __arm__ )  || defined( __armel__ )
 #undef HAVE_BUILTIN_SYNC
@@ -73,17 +73,10 @@
 #endif
 #endif
 
-// Have inline assembly only when using GNU C++ or Intel C++
-#if (defined(__GNUC__) || defined(__INTEL_COMPILER))
-#define HAVE_INLINE_ASSEMBLY 1
-#endif
-
 
 using namespace FX;
 
-
 namespace FX {
-
 
 /*******************************************************************************/
 
@@ -91,9 +84,9 @@ namespace FX {
 FXbool atomicsAvailable(){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return true;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i386__))
   return true;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   return true;
 #elif defined(HAVE_BUILTIN_SYNC)
   return true;
@@ -108,7 +101,7 @@ FXbool atomicsAvailable(){
 FXint atomicSet(volatile FXint* ptr,FXint v){
 #if defined(WIN32)
   return InterlockedExchange((LONG*)ptr,v);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret=v;
   __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
@@ -127,7 +120,7 @@ FXint atomicSet(volatile FXint* ptr,FXint v){
 FXint atomicAdd(volatile FXint* ptr,FXint v){
 #if defined(WIN32)
   return InterlockedExchangeAdd((LONG*)ptr,v);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret=v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
@@ -146,7 +139,7 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
 FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
@@ -167,7 +160,7 @@ FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect)==(LONG)expect);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgl %2, (%1)\n\t"
@@ -191,7 +184,7 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
 FXuint atomicSet(volatile FXuint* ptr,FXuint v){
 #if defined(WIN32)
   return InterlockedExchange((LONG*)ptr,v);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXuint ret=v;
   __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
@@ -209,7 +202,7 @@ FXuint atomicSet(volatile FXuint* ptr,FXuint v){
 FXuint atomicAdd(volatile FXuint* ptr,FXuint v){
 #if defined(WIN32)
   return InterlockedExchangeAdd((LONG*)ptr,v);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXuint ret=v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
@@ -228,7 +221,7 @@ FXuint atomicAdd(volatile FXuint* ptr,FXuint v){
 FXuint atomicCas(volatile FXuint* ptr,FXuint expect,FXuint v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXuint ret;
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
@@ -249,7 +242,7 @@ FXuint atomicCas(volatile FXuint* ptr,FXuint expect,FXuint v){
 FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (InterlockedCompareExchange((LONG*)ptr,(LONG)v,(LONG)expect)==(LONG)expect);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__)))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgl %2, (%1)\n\t"
@@ -273,11 +266,11 @@ FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v){
 FXptr atomicSet(volatile FXptr* ptr,FXptr v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
    return (FXptr)InterlockedExchangePointer(ptr,v);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i386__))
   FXptr ret=v;
   __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   FXptr ret=v;
   __asm__ __volatile__("xchgq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
@@ -297,12 +290,12 @@ FXptr atomicAdd(volatile FXptr* ptr,FXival v){
   return (FXptr)InterlockedExchangeAdd64((LONGLONG*)ptr,(LONGLONG)v);
 #elif defined(WIN32)
   return (FXptr)InterlockedExchangeAdd((LONG*)ptr,(LONG)v);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i386__))
   register FXptr ret=(void*)v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   register FXptr ret=(FXptr)v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0" (ret) : "memory", "cc");
@@ -321,12 +314,12 @@ FXptr atomicAdd(volatile FXptr* ptr,FXival v){
 FXptr atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (FXptr)InterlockedCompareExchangePointer((void**)ptr,v,expect);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i386__))
   register FXptr ret=(FXptr)v;
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   register FXptr ret;
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgq %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
@@ -347,14 +340,14 @@ FXptr atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v){
 FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (InterlockedCompareExchangePointer((void**)ptr,v,expect)==expect);
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i386__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgl %2, (%1)\n\t"
                         "sete   %%al\n\t"
                         "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgq %2, (%1)\n\t"
@@ -382,7 +375,7 @@ FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b)
 #elif (defined(WIN32) && defined(_MSC_VER) && defined(_WIN64))
   LONGLONG duet[2]={(LONGLONG)a,(LONGLONG)b};
   return (_InterlockedCompareExchange128((LONGLONG volatile*)ptr,(LONGLONG)cmpb,(LONGLONG)cmpa,duet));
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i386__))
 #if (defined(__PIC__) || defined(__PIE__))
   register FXbool ret;
   __asm__ __volatile__ ("xchgl  %%esi, %%ebx\n\t"
@@ -400,7 +393,7 @@ FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b)
                         "andl   $1, %%eax\n\t" : "=a"(ret) : "D"(ptr), "a"(cmpa), "d"(cmpb), "b"(a), "c"(b) : "memory", "cc");
   return ret;
 #endif
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchg16b (%1)\n\t"

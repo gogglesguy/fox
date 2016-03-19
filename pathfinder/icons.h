@@ -1,4 +1,4 @@
-/*********** Generated on 2013/07/18 21:27:13 by reswrap version 5.1.1 *********/
+/*********** Generated on 2013/08/27 18:16:52 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file addbook.bmp */
 extern const unsigned char addbook[];

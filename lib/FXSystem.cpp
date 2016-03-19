@@ -40,11 +40,6 @@
 */
 
 
-#ifndef TIMEFORMAT
-#define TIMEFORMAT "%m/%d/%Y %H:%M:%S"
-#endif
-
-
 using namespace FX;
 
 /*******************************************************************************/
@@ -59,16 +54,19 @@ extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,.
 // Many nanoseconds in a second
 const FXTime seconds=1000000000;
 
+// Default formatting string used for time formatting
+const char FXSystem::defaultTimeFormat[]="%m/%d/%Y %H:%M:%S";
+
 
 // Convert file time to string
 FXString FXSystem::localTime(FXTime value){
-  return FXSystem::localTime(TIMEFORMAT,value);
+  return FXSystem::localTime(defaultTimeFormat,value);
   }
 
 
 // Convert file time to string
 FXString FXSystem::universalTime(FXTime value){
-  return FXSystem::universalTime(TIMEFORMAT,value);
+  return FXSystem::universalTime(defaultTimeFormat,value);
   }
 
 // FIXME === strptime

@@ -94,7 +94,7 @@ public:
   FXIcon* find(const FXchar* name){ return static_cast<FXIcon*>(FXDict::find(name)); }
 
   /// Return icon at position pos
-  FXIcon* data(FXint pos) const { return static_cast<FXIcon*>(FXDict::data(pos)); }
+  FXIcon* data(FXival pos) const { return static_cast<FXIcon*>(FXDict::data(pos)); }
 
   /// Save to stream
   virtual void save(FXStream& store) const;

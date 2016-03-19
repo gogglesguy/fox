@@ -50,6 +50,20 @@ FXVec4f colorToVec4f(FXColor clr){
   }
 
 
+// Compute fast dot product with vector code
+FXfloat dot(const FXVec4f& u,const FXVec4f& v){
+#if defined(FOX_HAS_AVX)
+  register __m128 uu=_mm_load_ps(&u[0]);
+  register __m128 vv=_mm_load_ps(&v[0]);
+  FXfloat result;
+  _mm_store_ss(&result,_mm_dp_ps(uu,vv,0xF1));
+  return result;
+#else
+  return u*v;
+#endif
+  }
+
+
 #if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
 
 static inline FXfloat rsqrtf(FXfloat r){
@@ -69,7 +83,7 @@ static inline FXfloat rsqrtf(FXfloat r){
 
 // Fast normalize vector
 FXVec4f fastnormalize(const FXVec4f& v){
-  register FXfloat m=v.length2();
+  register FXfloat m=dot(v,v);
   FXVec4f result(v);
   if(__likely(FLT_MIN<m)){ result*=rsqrtf(m); }
   return result;
@@ -78,7 +92,7 @@ FXVec4f fastnormalize(const FXVec4f& v){
 
 // Normalize vector
 FXVec4f normalize(const FXVec4f& v){
-  register FXfloat m=v.length2();
+  register FXfloat m=dot(v,v);
   FXVec4f result(v);
   if(__likely(0.0f<m)){ result/=sqrtf(m); }
   return result;

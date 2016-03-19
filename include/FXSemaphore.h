@@ -38,7 +38,7 @@ namespace FX {
 */
 class FXAPI FXSemaphore {
 private:
-  volatile FXuval data[16];
+  FXuval data[16];
 private:
   FXSemaphore(const FXSemaphore&);
   FXSemaphore& operator=(const FXSemaphore&);

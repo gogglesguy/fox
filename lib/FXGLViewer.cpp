@@ -2556,12 +2556,12 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
   FXint nvertices,smooth,token,i,p;
 
   // Draw background
-  pdc.outf("%g %g %g C\n",background[0][0],background[0][1],background[0][2]);
+  pdc.outf("%lg %lg %lg C\n",background[0][0],background[0][1],background[0][2]);
   pdc.outf("newpath\n");
-  pdc.outf("%g %g moveto\n",0.0,0.0);
-  pdc.outf("%g %g lineto\n",0.0,(FXdouble)height);
-  pdc.outf("%g %g lineto\n",(FXdouble)width,(FXdouble)height);
-  pdc.outf("%g %g lineto\n",(FXdouble)width,0.0);
+  pdc.outf("%lg %lg moveto\n",0.0,0.0);
+  pdc.outf("%lg %lg lineto\n",0.0,(FXdouble)height);
+  pdc.outf("%lg %lg lineto\n",(FXdouble)width,(FXdouble)height);
+  pdc.outf("%lg %lg lineto\n",(FXdouble)width,0.0);
   pdc.outf("closepath fill\n");
 
   pdc.outf("1 setlinewidth\n");
@@ -2574,7 +2574,7 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
 
       // Point primitive
       case GL_POINT_TOKEN:
-        pdc.outf("%g %g %g %g %g P\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5]);
+        pdc.outf("%lg %lg %lg %lg %lg P\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5]);
         p+=7;             // Each vertex element in the feedback buffer is 7 floats
         break;
 
@@ -2582,10 +2582,10 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
       case GL_LINE_RESET_TOKEN:
       case GL_LINE_TOKEN:
         if(fabs(buffer[p+3]-buffer[p+7+3])<1E-4 || fabs(buffer[p+4]-buffer[p+7+4])<1E-4 || fabs(buffer[p+5]-buffer[p+7+5])<1E-4){
-          pdc.outf("%g %g %g %g %g %g %g %g %g %g SL\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5], buffer[p+7+0],buffer[p+7+1],buffer[p+7+3],buffer[p+7+4],buffer[p+7+5]);
+          pdc.outf("%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg SL\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5], buffer[p+7+0],buffer[p+7+1],buffer[p+7+3],buffer[p+7+4],buffer[p+7+5]);
           }
         else{
-          pdc.outf("%g %g %g %g %g %g %g L\n",buffer[p+0],buffer[p+1],buffer[p+7+0],buffer[p+7+1],buffer[p+3],buffer[p+4],buffer[p+5]);
+          pdc.outf("%lg %lg %lg %lg %lg %lg %lg L\n",buffer[p+0],buffer[p+1],buffer[p+7+0],buffer[p+7+1],buffer[p+3],buffer[p+4],buffer[p+5]);
           }
         p+=14;            // Each vertex element in the feedback buffer is 7 GLfloats
         break;
@@ -2599,10 +2599,10 @@ void FXGLViewer::drawFeedback(FXDCPrint& pdc,const FXfloat* buffer,FXint used){
             if(fabs(buffer[p+3]-buffer[p+i*7+3])<1E-4 || fabs(buffer[p+4]-buffer[p+i*7+4])<1E-4 || fabs(buffer[p+5]-buffer[p+i*7+5])<1E-4){ smooth=1; break; }
             }
           if(smooth){
-            pdc.outf("%g %g %g %g %g %g %g %g %g %g %g %g %g %g %g ST\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5], buffer[p+7+0],buffer[p+7+1],buffer[p+7+3],buffer[p+7+4],buffer[p+7+5], buffer[p+14+0],buffer[p+14+1],buffer[p+14+3],buffer[p+14+4],buffer[p+14+5]);
+            pdc.outf("%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg ST\n",buffer[p+0],buffer[p+1],buffer[p+3],buffer[p+4],buffer[p+5], buffer[p+7+0],buffer[p+7+1],buffer[p+7+3],buffer[p+7+4],buffer[p+7+5], buffer[p+14+0],buffer[p+14+1],buffer[p+14+3],buffer[p+14+4],buffer[p+14+5]);
             }
           else{
-            pdc.outf("%g %g %g %g %g %g %g %g %g T\n",buffer[p+0],buffer[p+1], buffer[p+7+0],buffer[p+7+1], buffer[p+14+0],buffer[p+14+1], buffer[p+3],buffer[p+4],buffer[p+5]);
+            pdc.outf("%lg %lg %lg %lg %lg %lg %lg %lg %lg T\n",buffer[p+0],buffer[p+1], buffer[p+7+0],buffer[p+7+1], buffer[p+14+0],buffer[p+14+1], buffer[p+3],buffer[p+4],buffer[p+5]);
             }
           }
         p+=nvertices*7;   // Each vertex element in the feedback buffer is 7 GLfloats

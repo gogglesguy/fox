@@ -381,6 +381,9 @@ const FXTime forever=FXLONG(9223372036854775807);
 /// Return 1 if val > 0, -1 if val < 0, and 0 otherwise
 #define FXSGNZ(val)        ((val)<0?-1:(val)>0?1:0)
 
+/// Sign-extend bit-field of b bits to 32 bit signed integer
+#define FXSGNX(x,b)        (((FXint)((x)<<(32-(b))))>>(32-(b)))
+
 /// Return the maximum of a or b
 #define FXMAX(a,b)         (((a)>(b))?(a):(b))
 
@@ -645,16 +648,16 @@ const FXTime forever=FXLONG(9223372036854775807);
 extern FXAPI FXuint fxrandom(FXuint& seed);
 
 /// Allocate memory
-extern FXAPI FXbool fxmalloc(void** ptr,unsigned long size);
+extern FXAPI FXbool fxmalloc(void** ptr,FXuval size);
 
 /// Allocate cleaned memory
-extern FXAPI FXbool fxcalloc(void** ptr,unsigned long size);
+extern FXAPI FXbool fxcalloc(void** ptr,FXuval size);
 
 /// Resize memory
-extern FXAPI FXbool fxresize(void** ptr,unsigned long size);
+extern FXAPI FXbool fxresize(void** ptr,FXuval size);
 
 /// Duplicate memory
-extern FXAPI FXbool fxmemdup(void** ptr,const void* src,unsigned long size);
+extern FXAPI FXbool fxmemdup(void** ptr,const void* src,FXuval size);
 
 /// Free memory, resets ptr to NULL afterward
 extern FXAPI void fxfree(void** ptr);

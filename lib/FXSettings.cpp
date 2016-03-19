@@ -222,7 +222,7 @@ nxt:while(string[p] && string[p]!='\n') p++;
 FXbool FXSettings::unparse(FXString& string) const {
   FXStringDict* group;
   FXString value;
-  FXint s,e,ss;
+  FXival s,e,ss;
 
   // Loop over all sections
   string.clear();
@@ -891,10 +891,9 @@ FXbool FXSettings::deleteSection(const FXString& section){
 
 
 // Clear all sections
-FXbool FXSettings::clear(){
+void FXSettings::clear(){
   FXDict::clear();
   modified=true;
-  return true;
   }
 
 

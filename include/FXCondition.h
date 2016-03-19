@@ -34,7 +34,7 @@ namespace FX {
 */
 class FXAPI FXCondition {
 private:
-  volatile FXuval data[12];
+  FXuval data[12];
 private:
   FXCondition(const FXCondition&);
   FXCondition& operator=(const FXCondition&);

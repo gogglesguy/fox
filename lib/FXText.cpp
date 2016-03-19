@@ -326,16 +326,16 @@ FXText::FXText(){
   gapstart=0;
   gapend=0;
   toppos=0;
-  keeppos=0;
   toprow=0;
+  keeppos=0;
   selstartpos=0;
   selendpos=0;
   hilitestartpos=0;
   hiliteendpos=0;
   anchorpos=0;
   cursorpos=0;
-  cursorstart=0;
-  cursorend=0;
+  cursorstartpos=0;
+  cursorendpos=0;
   cursorrow=0;
   cursorcol=0;
   prefcol=-1;
@@ -388,16 +388,16 @@ FXText::FXText(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
   gapstart=0;
   gapend=MINSIZE;
   toppos=0;
-  keeppos=0;
   toprow=0;
+  keeppos=0;
   selstartpos=0;
   selendpos=0;
   hilitestartpos=0;
   hiliteendpos=0;
   anchorpos=0;
   cursorpos=0;
-  cursorstart=0;
-  cursorend=0;
+  cursorstartpos=0;
+  cursorendpos=0;
   cursorrow=0;
   cursorcol=0;
   prefcol=-1;
@@ -1313,12 +1313,6 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
   // Try parse the regex
   if(rex.parse(string,rexmode)==FXRex::ErrOK){
 
-FXTRACE((1,"string \"%s\" \n",string.text()));
-FXTRACE((1,"string :"));
-for(FXint i=0; i<string.length(); ++i){ FXTRACE((1,"%02x ",(FXuchar)string[i])); }
-FXTRACE((1,"\n"));
-
-
     // Make all characters contiguous in the buffer
     squeezegap();
 
@@ -1440,8 +1434,9 @@ FXint FXText::getPosAt(FXint x,FXint y) const {
 FXint FXText::getYOfPos(FXint pos) const {
   register FXint h=font->getFontHeight();
   register FXint n,y;
-  if(pos>length) pos=length;
-  if(pos<0) pos=0;
+
+  // Inside text
+  pos=FXCLAMP(0,pos,length);
 
   // Above visible part of buffer
   if(pos<visrows[0]){
@@ -1610,7 +1605,7 @@ void FXText::moveContents(FXint x,FXint y){
   keeppos=toppos;
 
   // Hopefully, all is still in range
-  FXASSERT(0<=toprow && toprow<=nrows-1);
+  FXASSERT(0<=toprow && toprow<nrows);
   FXASSERT(0<=toppos && toppos<=length);
 
   // Scroll stuff in the bar only vertically
@@ -1627,16 +1622,10 @@ void FXText::moveContents(FXint x,FXint y){
 
 // Recalculate line starts
 void FXText::calcVisRows(FXint startline,FXint endline){
-  register FXint line,pos;
+  register FXint pos;
   FXASSERT(nvisrows>0);
-  if(startline<0)
-    startline=0;
-  else if(startline>nvisrows)
-    startline=nvisrows;
-  if(endline<0)
-    endline=0;
-  else if(endline>nvisrows)
-    endline=nvisrows;
+  startline=FXCLAMP(0,startline,nvisrows);
+  endline=FXCLAMP(0,endline,nvisrows);
   if(startline<=endline){
     if(startline==0){
       FXASSERT(0<=toppos && toppos<=length);
@@ -1644,23 +1633,22 @@ void FXText::calcVisRows(FXint startline,FXint endline){
       startline=1;
       }
     pos=visrows[startline-1];
-    line=startline;
     if(options&TEXT_WORDWRAP){
-      while(line<=endline && pos<length){
+      while(startline<=endline && pos<length){
         pos=wrap(pos);
         FXASSERT(0<=pos && pos<=length);
-        visrows[line++]=pos;
+        visrows[startline++]=pos;
         }
       }
     else{
-      while(line<=endline && pos<length){
+      while(startline<=endline && pos<length){
         pos=nextLine(pos);
         FXASSERT(0<=pos && pos<=length);
-        visrows[line++]=pos;
+        visrows[startline++]=pos;
         }
       }
-    while(line<=endline){
-      visrows[line++]=length;
+    while(startline<=endline){
+      visrows[startline++]=length;
       }
     }
   }
@@ -1672,8 +1660,7 @@ void FXText::recompute(){
   FXint ww1,ww2,ww3,hh1,hh2,hh3,hh;
 
   // Make it point somewhere sensible
-  if(keeppos<0) keeppos=0;
-  if(keeppos>length) keeppos=length;
+  keeppos=FXCLAMP(0,keeppos,length);
 
   // Make sure we're pointing to the start of a row again
   toppos=rowStart(keeppos);
@@ -1682,20 +1669,20 @@ void FXText::recompute(){
   hh=font->getFontHeight();
 
   // Get start
-  cursorstart=rowStart(cursorpos);
-  cursorend=nextRow(cursorstart);
-  cursorcol=indentFromPos(cursorstart,cursorpos);
+  cursorstartpos=rowStart(cursorpos);
+  cursorendpos=nextRow(cursorstartpos);
+  cursorcol=indentFromPos(cursorstartpos,cursorpos);
 
   // Avoid measuring huge chunks of text twice!
-  if(cursorstart<toprow){
-    cursorrow=measureText(0,cursorstart,ww1,hh1);
-    toprow=cursorrow+measureText(cursorstart,toppos,ww2,hh2);
+  if(cursorstartpos<toppos){
+    cursorrow=measureText(0,cursorstartpos,ww1,hh1);
+    toprow=cursorrow+measureText(cursorstartpos,toppos,ww2,hh2);
     nrows=toprow+measureText(toppos,length+1,ww3,hh3);
     }
   else{
     toprow=measureText(0,toppos,ww1,hh1);
-    cursorrow=toprow+measureText(toppos,cursorstart,ww2,hh2);
-    nrows=cursorrow+measureText(cursorstart,length+1,ww3,hh3);
+    cursorrow=toprow+measureText(toppos,cursorstartpos,ww2,hh2);
+    nrows=cursorrow+measureText(cursorstartpos,length+1,ww3,hh3);
     }
 
   textWidth=FXMAX3(ww1,ww2,ww3);
@@ -1818,23 +1805,23 @@ void FXText::setCursorPos(FXint pos,FXbool notify){
   FXint p=validPos(pos);
   if(cursorpos!=p){
     if(isEditable()) drawCursor(0);
-    if(p<cursorstart || cursorend<=p){    // Move to other line?
-      FXint cursorstartold=cursorstart;
-      FXint cursorendold=cursorend;
-      cursorstart=rowStart(p);
-      cursorend=nextRow(cursorstart);
-      if(cursorstart<cursorstartold){
-        cursorrow=cursorrow-countRows(cursorstart,cursorstartold);
+    if(p<cursorstartpos || cursorendpos<=p){    // Move to other line?
+      FXint cursorstartold=cursorstartpos;
+      FXint cursorendold=cursorendpos;
+      cursorstartpos=rowStart(p);
+      cursorendpos=nextRow(cursorstartpos);
+      if(cursorstartpos<cursorstartold){
+        cursorrow=cursorrow-countRows(cursorstartpos,cursorstartold);
         }
       else{
-        cursorrow=cursorrow+countRows(cursorstartold,cursorstart);
+        cursorrow=cursorrow+countRows(cursorstartold,cursorstartpos);
         }
       if(options&TEXT_SHOWACTIVE){
         updateRange(cursorstartold,cursorendold);
-        updateRange(cursorstart,cursorend);
+        updateRange(cursorstartpos,cursorendpos);
         }
       }
-    cursorcol=indentFromPos(cursorstart,p);
+    cursorcol=indentFromPos(cursorstartpos,p);
     cursorpos=p;
     prefcol=-1;
     if(isEditable()) drawCursor(FLAG_CARET);
@@ -1869,7 +1856,7 @@ void FXText::setCursorRow(FXint row,FXbool notify){
 void FXText::setCursorColumn(FXint col,FXbool notify){
   register FXint newpos;
   if(cursorcol!=col){
-    newpos=posFromIndent(cursorstart,col);
+    newpos=posFromIndent(cursorstartpos,col);
     moveCursor(newpos,notify);
     }
   }
@@ -2112,8 +2099,8 @@ void FXText::replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style){
   // Cursor is beyond changed area, so simple update
   if(wend<=cursorpos){
     cursorpos+=del;
-    cursorstart+=del;
-    cursorend+=del;
+    cursorstartpos+=del;
+    cursorendpos+=del;
     cursorrow+=nrins-nrdel;
     }
 
@@ -2121,14 +2108,14 @@ void FXText::replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style){
   else if(wbeg<=cursorpos){
     if(pos+m<=cursorpos) cursorpos+=del;                // Beyond changed text
     else if(pos<=cursorpos) cursorpos=pos+n;            // Inside changed text
-    cursorstart=rowStart(cursorpos);
-    cursorend=nextRow(cursorstart);
-    cursorcol=indentFromPos(cursorstart,cursorpos);
-    if(cursorstart<toppos){
-      cursorrow=toprow-countRows(cursorstart,toppos);
+    cursorstartpos=rowStart(cursorpos);
+    cursorendpos=nextRow(cursorstartpos);
+    cursorcol=indentFromPos(cursorstartpos,cursorpos);
+    if(cursorstartpos<toppos){
+      cursorrow=toprow-countRows(cursorstartpos,toppos);
       }
     else{
-      cursorrow=toprow+countRows(toppos,cursorstart);
+      cursorrow=toprow+countRows(toppos,cursorstartpos);
       }
     }
 
@@ -2183,8 +2170,8 @@ void FXText::setStyledText(const FXchar* text,FXint n,FXint style,FXbool notify)
   hiliteendpos=0;
   anchorpos=0;
   cursorpos=0;
-  cursorstart=0;
-  cursorend=0;
+  cursorstartpos=0;
+  cursorendpos=0;
   cursorrow=0;
   cursorcol=0;
   prefcol=-1;
@@ -3008,8 +2995,8 @@ void FXText::drawCursor(FXuint state){
 void FXText::paintCursor(FXDCWindow& dc) const {
   register FXint th=font->getFontHeight(),cursorx,cursory;
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()<cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
-    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
+  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
+    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
     if(getVisibleX()<=cursorx+3 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
       if(0<dc.getClipWidth() && 0<dc.getClipHeight()){
@@ -3032,8 +3019,8 @@ void FXText::paintCursor(FXDCWindow& dc) const {
 void FXText::eraseCursor(FXDCWindow& dc) const {
   register FXint th=font->getFontHeight(),cursorx,cursory,cx,cy,ch,cw;
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()<cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
-    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
+  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
+    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
     if(getVisibleX()<=cursorx+3 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
       if(0<dc.getClipWidth() && 0<dc.getClipHeight()){
@@ -3057,8 +3044,8 @@ void FXText::eraseCursor(FXDCWindow& dc) const {
 void FXText::eraseCursorOverhang(){
   register FXint th=font->getFontHeight(),cursorx,cursory;
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()<=cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
-    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
+  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
+    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
     if(getVisibleX()<=cursorx+3 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       FXDCWindow dc(this);
       if(cursorx-2<=getVisibleX()+marginleft && getVisibleX()<=cursorx+3){
@@ -3097,6 +3084,7 @@ void FXText::drawTextRow(FXDCWindow& dc,FXint row) const {
   register FXint cw,sp,sc,ep,ec;
   register FXwchar cc;
 
+  FXASSERT(toprow<=row && row<toprow+nvisrows);
   FXASSERT(0<=linebeg && lineend<=length);
 
   // Back off past break-character, i.e. space or newline (if any)
@@ -3394,7 +3382,7 @@ long FXText::onIMEStart(FXObject* sender,FXSelector,void* ptr){
       FXint th=font->getFontHeight();
       FXint cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
       if(getVisibleY()<=cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
-        FXint cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
+        FXint cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
         getComposeContext()->setSpot(cursorx,cursory);
         }
       }
@@ -5297,7 +5285,7 @@ void FXText::setBarColor(FXColor clr){
 void FXText::setCursorColor(FXColor clr){
   if(clr!=cursorColor){
     cursorColor=clr;
-    updateRange(cursorstart,cursorend);
+    updateRange(cursorstartpos,cursorendpos);
     }
   }
 

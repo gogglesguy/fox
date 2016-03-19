@@ -170,7 +170,7 @@ public:
   FXFileAssoc* find(const FXchar* ext);
 
   /// Return file association at position pos
-  FXFileAssoc* data(FXint pos) const { return (FXFileAssoc*)FXDict::data(pos); }
+  FXFileAssoc* data(FXival pos) const { return (FXFileAssoc*)FXDict::data(pos); }
 
   /**
   * Determine binding for the given file.

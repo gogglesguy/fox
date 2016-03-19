@@ -340,11 +340,11 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__prefetchw|__prefetch|constructElms|destructElms|copyElms|moveElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms)\>"
+    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__prefetchw|__prefetch|constructElms|destructElms|copyElms|moveElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
   end
 
   rule "FOXType"
-    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXptr|FXColor|FXPixel|FXTime|FXID)\>"
+    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXptr|FXColor|FXPixel|FXTime|FXID|FXString)\>"
   end
 
   rule "Keyword"
@@ -1819,7 +1819,7 @@ language "Ada"
 end
 
 
-# C++ programming language
+# Go Programming language
 language "Go"
 
   # File patterns for this language mode

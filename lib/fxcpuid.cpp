@@ -32,10 +32,6 @@
   - Consult AMD and Intel Programming Manuals for details.
 */
 
-// Have inline assembly only when using GNU C++ or Intel C++
-#if (defined(__GNUC__) || defined(__INTEL_COMPILER))
-#define HAVE_INLINE_ASSEMBLY 1
-#endif
 
 using namespace FX;
 
@@ -51,14 +47,14 @@ FXuint fxCPUCaps(FXuint level){
   level&=0x80000000;
   __cpuid(features,level);
   return features[0]+1;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i686__))
   register FXuint eax,ebx,ecx,edx;
   level&=0x80000000;
   __asm__ __volatile__("xchgl %%ebx, %1 \n\t"  \
                        "cpuid           \n\t"  \
                        "xchgl %%ebx, %1 \n\t"  : "=a"(eax), "=r"(ebx), "=c"(ecx), "=d"(edx) : "0" (level) : "cc");
   return eax+1;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   register FXuint eax,ebx,ecx,edx;
   level&=0x80000000;
   __asm__ __volatile__("cpuid \n\t" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "0" (level) : "cc");
@@ -75,14 +71,14 @@ FXbool fxCPUGetCaps(FXuint level,FXuint features[]){
     __cpuid((int)features,level);
     return true;
     }
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i686__))
   if(level<fxCPUCaps(level)){
   __asm__ __volatile__("xchgl %%ebx, %1 \n\t"  \
                        "cpuid           \n\t"  \
                        "xchgl %%ebx, %1 \n\t"  : "=a"(features[0]), "=r"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0" (level) : "cc");
     return true;
     }
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   if(level<fxCPUCaps(level)){
     __asm__ __volatile__("cpuid \n\t" : "=a"(features[0]), "=b"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0" (level) : "cc");
     return true;
@@ -99,14 +95,14 @@ FXbool fxCPUGetXCaps(FXuint level,FXuint count,FXuint features[]){
    __cpuidex((int)features,level,count);
     return true;
     }
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i686__))
   if(level<fxCPUCaps(level)){
   __asm__ __volatile__("xchgl %%ebx, %1 \n\t"   \
                        "cpuid           \n\t"   \
                        "xchgl %%ebx, %1 \n\t" : "=a"(features[0]), "=r"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0"(level), "2"(count) : "cc");
     return true;
     }
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+#elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   if(level<fxCPUCaps(level)){
     __asm__ __volatile__("cpuid \n\t" : "=a"(features[0]), "=b"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0"(level), "2"(count) : "cc");
     return true;
@@ -137,16 +133,16 @@ FXuint fxCPUFeatures(){
     if(FXBIT(features[3],25)) caps|=CPU_HAS_SSE;
     if(FXBIT(features[3],26)) caps|=CPU_HAS_SSE2;
     if(FXBIT(features[2],27)){                          // OSXSAVE
-#if (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i686__) || defined(__x86_64__)))
+#if ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i686__) || defined(__x86_64__)))
       FXuint lo,hi;
       __asm__ __volatile__(".byte 0x0f,0x01,0xd0" : "=a" (lo), "=d" (hi) : "c" (0));    // XGETBV ecx=0
       if((lo&6)==6) blank=0;                            // Don't blank out AVX, AVX2, FMA, FMA4, XOP later
 #endif
       }
     if(fxCPUGetXCaps(7,0,features)){
-      if(FXBIT(features[2],3)) caps|=CPU_HAS_BMI1;
-      if(FXBIT(features[2],5)) caps|=CPU_HAS_AVX2;
-      if(FXBIT(features[2],8)) caps|=CPU_HAS_BMI2;
+      if(FXBIT(features[1],3)) caps|=CPU_HAS_BMI1;
+      if(FXBIT(features[1],5)) caps|=CPU_HAS_AVX2;
+      if(FXBIT(features[1],8)) caps|=CPU_HAS_BMI2;
       }
     if(fxCPUGetCaps(0,features) && (features[1]==0x68747541) && (features[2]==0x444d4163) && (features[3]==0x69746e65)){
       if(fxCPUGetCaps(0x80000001,features)){

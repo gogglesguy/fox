@@ -80,7 +80,7 @@ public:
   FXStringDict* find(const FXString& section) const { return (FXStringDict*)FXDict::find(section.text()); }
 
   /// Obtain the string dictionary for the given section
-  FXStringDict* data(FXint pos) const { return (FXStringDict*)FXDict::data(pos); }
+  FXStringDict* data(FXival pos) const { return (FXStringDict*)FXDict::data(pos); }
 
   /// Read a formatted registry entry, using scanf-style format
   FXint readFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...) const FX_SCANF(4,5) ;
@@ -191,7 +191,7 @@ public:
   FXbool deleteSection(const FXString& section);
 
   /// Clear all sections
-  FXbool clear();
+  void clear();
 
   /// Cleanup
   virtual ~FXSettings();
