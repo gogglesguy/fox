@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.150 2007/03/08 05:49:33 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.151 2007/03/15 06:07:43 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -678,7 +678,7 @@ FXuint fxcpuid(){
 /*
 * Return clock ticks from x86 TSC register [GCC/ICC x86 version].
 */
-#if (defined(__GNUC__) || defined(__ICC)) && defined(__i386__)
+#if (defined(__GNUC__) || defined(__ICC)) && defined(__i386__) && !defined(WIN32)
 extern FXAPI FXlong fxgetticks();
 FXlong fxgetticks(){
   FXlong value;

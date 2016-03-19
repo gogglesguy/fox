@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software                   #
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    #
 #################################################################################
-# $Id: Adie.stx,v 1.47 2007/01/29 16:25:25 fox Exp $                            #
+# $Id: Adie.stx,v 1.48 2007/03/20 20:04:55 fox Exp $                            #
 #################################################################################
 
 #
@@ -254,7 +254,7 @@ language "C++"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%[\*ahlLq#0 +-]?\d*(\.(\*|\d*))?l?([dDiouxXeEfFgGaAcsp]|\[.*?\])"
+      pattern "%[\*ahlLq#0 +-]?(\*|\d*)(\.(\*|\d*))?l?([dDiouxXeEfFgGaAcsp]|\[.*?\])"
     end
   end
 
@@ -399,7 +399,7 @@ language "C"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%[\*ahlLq#0 +-]?\d*(\.(\*|\d*))?l?([dDiouxXeEfFgGaAcsp]|\[.*?\])"
+      pattern "%[\*ahlLq#0 +-]?(\*|\d*)(\.(\*|\d*))?l?([dDiouxXeEfFgGaAcsp]|\[.*?\])"
     end
   end
 

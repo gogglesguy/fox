@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.230 2007/02/07 19:25:07 fox Exp $                       *
+* $Id: FXString.cpp,v 1.232 2007/03/22 15:55:16 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,9 +75,33 @@ static const FXint emptystring[2]={0,0};
 const FXchar FXString::null[4]={0,0,0,0};
 
 
-// Numbers for hexadecimal
-const FXchar FXString::hex[17]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f',0};
-const FXchar FXString::HEX[17]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F',0};
+// Hexadecimal digit of value
+const FXchar FXString::value2Digit[36]={
+  '0','1','2','3','4','5','6','7','8','9','A','B',
+  'C','D','E','F','G','H','I','J','K','L','M','N',
+  'O','P','Q','R','S','T','U','V','W','X','Y','Z',
+  };
+
+
+// Hexadecimal value of digit
+const signed char FXString::digit2Value[256]={
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+   0, 1, 2, 3, 4, 5, 6, 7, 8, 9,-1,-1,-1,-1,-1,-1,
+  -1,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
+  25,26,27,28,29,30,31,32,33,34,35,-1,-1,-1,-1,-1,
+  -1,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
+  25,26,27,28,29,30,31,32,33,34,35,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+  };
 
 
 // Length of a utf8 character representation
@@ -624,15 +648,29 @@ FXint FXString::validate(FXint p) const {
   }
 
 
-// Advance to next utf8 character start
+// Increment byte offset by one utf8 character
 FXint FXString::inc(FXint p) const {
   return (++p>=length() || FXISUTF(str[p]) || ++p>=length() || FXISUTF(str[p]) || ++p>=length() || FXISUTF(str[p]) || ++p>=length() || FXISUTF(str[p]) || ++p>=length() || FXISUTF(str[p]) || ++p), p;
   }
 
 
-// Retreat to previous utf8 character start
+// Increment byte offset by n utf8 characters
+FXint FXString::inc(FXint p,FXint n) const {
+  while(p<length() && 0<n){ p=inc(p); --n; }
+  return p;
+  }
+
+
+// Decrement byte offset by one utf8 character
 FXint FXString::dec(FXint p) const {
   return (--p<=0 || FXISUTF(str[p]) || --p<=0 || FXISUTF(str[p]) || --p<=0 || FXISUTF(str[p]) || --p<=0 || FXISUTF(str[p]) || --p<=0 || FXISUTF(str[p]) || --p), p;
+  }
+
+
+// Decrement byte offset by n utf8 characters
+FXint FXString::dec(FXint p,FXint n) const {
+  while(0<=p && 0<n){ p=dec(p); --n; }
+  return p;
   }
 
 
@@ -2479,7 +2517,7 @@ FXString& FXString::format(const char* fmt,...){
 #elif defined(_HP_)   // tested only on pa-risc
 
   int status;
-  
+
   // Start with a str capable of holding a 128 characters
   len = 128;
   length(len);
@@ -2500,11 +2538,11 @@ FXString& FXString::format(const char* fmt,...){
     len*=2;
     length(len);
     }
-    
+
 #elif defined(_SGI_)  // tested only on IRIX 6.5
 
   int status;
-  
+
   // Start with a str capable of holding a 128 characters
   len = 128;
   length(len);
@@ -2587,7 +2625,7 @@ FXString FXStringVal(FXlong num,FXint base){
   if(base<2 || base>16){ fxerror("FXStringVal: base out of range.\n"); }
   if(num<0){nn=(FXulong)(~num)+1;}
   do{
-    *--p=FXString::HEX[nn%base];
+    *--p=FXString::value2Digit[nn%base];
     nn/=base;
     }
   while(nn);
@@ -2604,7 +2642,7 @@ FXString FXStringVal(FXulong num,FXint base){
   register FXulong nn=num;
   if(base<2 || base>16){ fxerror("FXStringVal: base out of range.\n"); }
   do{
-    *--p=FXString::HEX[nn%base];
+    *--p=FXString::value2Digit[nn%base];
     nn/=base;
     }
   while(nn);
@@ -2621,7 +2659,7 @@ FXString FXStringVal(FXint num,FXint base){
   if(base<2 || base>16){ fxerror("FXStringVal: base out of range.\n"); }
   if(num<0){nn=(FXuint)(~num)+1;}
   do{
-    *--p=FXString::HEX[nn%base];
+    *--p=FXString::value2Digit[nn%base];
     nn/=base;
     }
   while(nn);
@@ -2638,7 +2676,7 @@ FXString FXStringVal(FXuint num,FXint base){
   register FXuint nn=num;
   if(base<2 || base>16){ fxerror("FXStringVal: base out of range.\n"); }
   do{
-    *--p=FXString::HEX[nn%base];
+    *--p=FXString::value2Digit[nn%base];
     nn/=base;
     }
   while(nn);
@@ -2849,10 +2887,10 @@ FXString toAscii(const FXString& s){
     if(0x80<=c){
       result[p++]='\\';
       result[p++]='u';
-      result[p++]=FXString::HEX[(c>>12)&15];
-      result[p++]=FXString::HEX[(c>>8)&15];
-      result[p++]=FXString::HEX[(c>>4)&15];
-      result[p++]=FXString::HEX[c&15];
+      result[p++]=FXString::value2Digit[(c>>12)&15];
+      result[p++]=FXString::value2Digit[(c>>8)&15];
+      result[p++]=FXString::value2Digit[(c>>4)&15];
+      result[p++]=FXString::value2Digit[c&15];
       continue;
       }
     result[p++]=c;
@@ -2938,8 +2976,8 @@ FXString escape(const FXString& s){
         default:
           result[p++]='\\';
           result[p++]='x';
-          result[p++]=FXString::HEX[(c>>4)&15];
-          result[p++]=FXString::HEX[c&15];
+          result[p++]=FXString::value2Digit[(c>>4)&15];
+          result[p++]=FXString::value2Digit[c&15];
           continue;
         }
       }

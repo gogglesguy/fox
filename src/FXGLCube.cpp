@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCube.cpp,v 1.29 2007/02/07 20:22:09 fox Exp $                        *
+* $Id: FXGLCube.cpp,v 1.30 2007/03/23 14:24:58 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -60,9 +60,7 @@ FXIMPLEMENT(FXGLCube,FXGLShape,NULL,0)
 // Create cube
 FXGLCube::FXGLCube():width(1.0f),height(1.0f),depth(1.0f){
   FXTRACE((100,"FXGLCube::FXGLCube\n"));
-  range.lower.x=-0.5f*width;  range.upper.x=0.5f*width;
-  range.lower.y=-0.5f*height; range.upper.y=0.5f*height;
-  range.lower.z=-0.5f*depth;  range.upper.z=0.5f*depth;
+  range.set(-0.5f*width,0.5f*width,-0.5f*height,0.5f*height,-0.5f*depth,0.5f*depth);
   }
 
 
@@ -70,9 +68,7 @@ FXGLCube::FXGLCube():width(1.0f),height(1.0f),depth(1.0f){
 FXGLCube::FXGLCube(FXfloat x,FXfloat y,FXfloat z,FXfloat w,FXfloat h,FXfloat d):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),width(w),height(h),depth(d){
   FXTRACE((100,"FXGLCube::FXGLCube\n"));
-  range.lower.x=-0.5f*width;  range.upper.x=0.5f*width;
-  range.lower.y=-0.5f*height; range.upper.y=0.5f*height;
-  range.lower.z=-0.5f*depth;  range.upper.z=0.5f*depth;
+  range.set(-0.5f*width,0.5f*width,-0.5f*height,0.5f*height,-0.5f*depth,0.5f*depth);
   }
 
 
@@ -80,9 +76,7 @@ FXGLCube::FXGLCube(FXfloat x,FXfloat y,FXfloat z,FXfloat w,FXfloat h,FXfloat d):
 FXGLCube::FXGLCube(FXfloat x,FXfloat y,FXfloat z,FXfloat w,FXfloat h,FXfloat d,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),width(w),height(h),depth(d){
   FXTRACE((100,"FXGLCube::FXGLCube\n"));
-  range.lower.x=-0.5f*width;  range.upper.x=0.5f*width;
-  range.lower.y=-0.5f*height; range.upper.y=0.5f*height;
-  range.lower.z=-0.5f*depth;  range.upper.z=0.5f*depth;
+  range.set(-0.5f*width,0.5f*width,-0.5f*height,0.5f*height,-0.5f*depth,0.5f*depth);
   }
 
 
@@ -92,6 +86,36 @@ FXGLCube::FXGLCube(const FXGLCube& orig):FXGLShape(orig){
   width=orig.width;
   height=orig.height;
   depth=orig.depth;
+  }
+
+
+// Change width
+void FXGLCube::setWidth(FXfloat w){ 
+  if(width!=w){
+    range.lower.x=-0.5f*w;
+    range.upper.x= 0.5f*w;
+    width=w; 
+    }
+  }
+  
+
+// Change height
+void FXGLCube::setHeight(FXfloat h){ 
+  if(height!=h){
+    range.lower.y=-0.5f*h;
+    range.upper.y= 0.5f*h;
+    height=h; 
+    }
+  }
+
+
+// Change depth
+void FXGLCube::setDepth(FXfloat d){ 
+  if(depth!=d){
+    range.lower.z=-0.5f*d;
+    range.upper.z= 0.5f*d;
+    depth=d; 
+    }
   }
 
 

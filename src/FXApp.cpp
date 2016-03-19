@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.673 2007/03/14 04:39:48 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.676 2007/03/22 21:09:43 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -983,7 +983,7 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
       FXTRACE((100,"X RandR available\n"));
       }
 #endif
-
+ 
     // Window Manager communication
     wmDeleteWindow=XInternAtom((Display*)display,"WM_DELETE_WINDOW",0);
     wmQuitApp=XInternAtom((Display*)display,"_WM_QUIT_APP",0);
@@ -4341,21 +4341,29 @@ Alt key seems to repeat.
     case WM_GETMINMAXINFO:
       if(window->id() && window->shown() &&window->isMemberOf(FXMETACLASS(FXTopWindow))){
         RECT rect;
-        //FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
+        FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
         if(!(((FXTopWindow*)window)->getDecorations()&DECOR_SHRINKABLE)){
-          SetRect(&rect,0,0,window->getDefaultWidth(),window->getDefaultHeight());
-          AdjustWindowRectEx(&rect,GetWindowLong((HWND)hwnd,GWL_STYLE),false,GetWindowLong((HWND)hwnd,GWL_EXSTYLE));
-          ((MINMAXINFO*)lParam)->ptMinTrackSize.x=rect.right-rect.left;
-          ((MINMAXINFO*)lParam)->ptMinTrackSize.y=rect.bottom-rect.top;
+          if(!(((FXTopWindow*)window)->getDecorations()&DECOR_STRETCHABLE)){    // Cannot change at all
+            SetRect(&rect,0,0,window->getWidth(),window->getHeight());
+            AdjustWindowRectEx(&rect,GetWindowLong((HWND)hwnd,GWL_STYLE),false,GetWindowLong((HWND)hwnd,GWL_EXSTYLE));
+            ((MINMAXINFO*)lParam)->ptMinTrackSize.x=((MINMAXINFO*)lParam)->ptMaxTrackSize.x=rect.right-rect.left;
+            ((MINMAXINFO*)lParam)->ptMinTrackSize.y=((MINMAXINFO*)lParam)->ptMaxTrackSize.y=rect.bottom-rect.top;
+            }
+          else{                                                                 // Cannot get smaller than default
+            SetRect(&rect,0,0,window->getDefaultWidth(),window->getDefaultHeight());
+            AdjustWindowRectEx(&rect,GetWindowLong((HWND)hwnd,GWL_STYLE),false,GetWindowLong((HWND)hwnd,GWL_EXSTYLE));
+            ((MINMAXINFO*)lParam)->ptMinTrackSize.x=rect.right-rect.left;
+            ((MINMAXINFO*)lParam)->ptMinTrackSize.y=rect.bottom-rect.top;
+            }
           }
-        if(!(((FXTopWindow*)window)->getDecorations()&DECOR_STRETCHABLE)){
+        else if(!(((FXTopWindow*)window)->getDecorations()&DECOR_STRETCHABLE)){ // Cannot get larger than default
           SetRect(&rect,0,0,window->getDefaultWidth(),window->getDefaultHeight());
           AdjustWindowRectEx(&rect,GetWindowLong((HWND)hwnd,GWL_STYLE),false,GetWindowLong((HWND)hwnd,GWL_EXSTYLE));
           ((MINMAXINFO*)lParam)->ptMaxTrackSize.x=rect.right-rect.left;
           ((MINMAXINFO*)lParam)->ptMaxTrackSize.y=rect.bottom-rect.top;
           }
-        //FXTRACE((100,"width=%d height=%d\n",window->getWidth(),window->getHeight()));
-        //FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
+        FXTRACE((100,"width=%d height=%d\n",window->getWidth(),window->getHeight()));
+        FXTRACE((100,"WM_GETMINMAXINFO ptMaxSize=%d,%d ptMinTrackSize=%d,%d ptMaxTrackSize=%d,%d\n",((MINMAXINFO*)lParam)->ptMaxSize.x,((MINMAXINFO*)lParam)->ptMaxSize.y,((MINMAXINFO*)lParam)->ptMinTrackSize.x,((MINMAXINFO*)lParam)->ptMinTrackSize.y,((MINMAXINFO*)lParam)->ptMaxTrackSize.x,((MINMAXINFO*)lParam)->ptMaxTrackSize.y));
         }
       return 0;
 

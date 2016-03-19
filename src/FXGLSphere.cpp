@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLSphere.cpp,v 1.27 2007/02/07 20:22:09 fox Exp $                      *
+* $Id: FXGLSphere.cpp,v 1.28 2007/03/23 14:24:58 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -70,9 +70,7 @@ FXIMPLEMENT(FXGLSphere,FXGLShape,NULL,0)
 // Create sphere
 FXGLSphere::FXGLSphere(void):radius(0.5f),slices(SPHERE_SLICES),stacks(SPHERE_STACKS){
   FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=-radius; range.upper.y=radius;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,-radius,radius,-radius,radius);
   }
 
 
@@ -80,9 +78,7 @@ FXGLSphere::FXGLSphere(void):radius(0.5f),slices(SPHERE_SLICES),stacks(SPHERE_ST
 FXGLSphere::FXGLSphere(FXfloat x,FXfloat y,FXfloat z,FXfloat r):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),radius(r),slices(SPHERE_SLICES),stacks(SPHERE_STACKS){
   FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=-radius; range.upper.y=radius;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,-radius,radius,-radius,radius);
   }
 
 
@@ -90,9 +86,7 @@ FXGLSphere::FXGLSphere(FXfloat x,FXfloat y,FXfloat z,FXfloat r):
 FXGLSphere::FXGLSphere(FXfloat x,FXfloat y,FXfloat z,FXfloat r,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),radius(r),slices(SPHERE_SLICES),stacks(SPHERE_STACKS){
   FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=-radius; range.upper.y=radius;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,-radius,radius,-radius,radius);
   }
 
 
@@ -102,6 +96,15 @@ FXGLSphere::FXGLSphere(const FXGLSphere& orig):FXGLShape(orig){
   radius=orig.radius;
   slices=orig.slices;
   stacks=orig.stacks;
+  }
+
+
+// Change radius
+void FXGLSphere::setRadius(FXfloat r){ 
+  if(radius!=r){
+    range.set(-r,r,-r,r,-r,r);
+    radius=r; 
+    }
   }
 
 

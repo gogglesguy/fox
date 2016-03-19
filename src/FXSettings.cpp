@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSettings.cpp,v 1.67 2007/02/07 20:22:15 fox Exp $                      *
+* $Id: FXSettings.cpp,v 1.68 2007/03/20 20:04:56 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -410,8 +410,8 @@ FXchar* FXSettings::enquote(FXchar* result,const FXchar* text){
           if(c<0x20 || 0x7f<c){
             *ptr++='\\';
             *ptr++='x';
-            *ptr++=FXString::HEX[c>>4];
-            *ptr++=FXString::HEX[c&15];
+            *ptr++=FXString::value2Digit[c>>4];
+            *ptr++=FXString::value2Digit[c&15];
             }
           else{
             *ptr++=c;

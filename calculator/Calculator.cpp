@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Calculator.cpp,v 1.64 2007/02/07 20:21:51 fox Exp $                      *
+* $Id: Calculator.cpp,v 1.65 2007/03/20 20:04:55 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -1375,14 +1375,14 @@ long Calculator::onCmdDigit(FXObject*,FXSelector sel,void*){
     if(text[pos]=='-' || text[pos]=='+') pos++;     // Skip sign
     if(text[pos]=='0' || (text[pos] && text[pos+1] && text[pos+2])){
       while(text[pos+1]){ text[pos]=text[pos+1]; pos++; }
-      text[pos]=FXString::HEX[FXSELID(sel)-ID_0];
+      text[pos]=FXString::value2Digit[FXSELID(sel)-ID_0];
       }
     else{
-      text.append(FXString::HEX[FXSELID(sel)-ID_0]);
+      text.append(FXString::value2Digit[FXSELID(sel)-ID_0]);
       }
     }
   else if(digits<limit){
-    text+=FXString::HEX[FXSELID(sel)-ID_0];
+    text+=FXString::value2Digit[FXSELID(sel)-ID_0];
     digits++;
     }
   setDisplayText(text);

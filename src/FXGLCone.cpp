@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCone.cpp,v 1.29 2007/02/07 20:22:08 fox Exp $                        *
+* $Id: FXGLCone.cpp,v 1.30 2007/03/23 14:24:58 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -70,29 +70,21 @@ FXIMPLEMENT(FXGLCone,FXGLShape,NULL,0)
 // Create cone
 FXGLCone::FXGLCone():height(1.0f),radius(1.0f){
   FXTRACE((100,"FXGLCone::FXGLCone\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=0.0f;    range.upper.y=height;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
 // Create cone
-FXGLCone::FXGLCone(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):
-  FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),height(h),radius(r){
+FXGLCone::FXGLCone(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),height(h),radius(r){
   FXTRACE((100,"FXGLCone::FXGLCone\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=0.0f;    range.upper.y=height;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
 // Create cone
-FXGLCone::FXGLCone(FXfloat x,FXfloat y,FXfloat z,FXfloat h, FXfloat r,const FXMaterial& mtl):
-  FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),height(h),radius(r){
+FXGLCone::FXGLCone(FXfloat x,FXfloat y,FXfloat z,FXfloat h, FXfloat r,const FXMaterial& mtl):FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),height(h),radius(r){
   FXTRACE((100,"FXGLCone::FXGLCone\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=0.0f;    range.upper.y=height;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
@@ -101,6 +93,25 @@ FXGLCone::FXGLCone(const FXGLCone& orig):FXGLShape(orig){
   FXTRACE((100,"FXGLCone::FXGLCone\n"));
   height=orig.height;
   radius=orig.radius;
+  }
+
+
+// Change radius
+void FXGLCone::setRadius(FXfloat r){
+  if(radius!=r){
+    range.lower.x=range.lower.z=-r;
+    range.upper.x=range.upper.z= r;
+    radius=r;
+    }
+  }
+
+
+// Change height
+void FXGLCone::setHeight(FXfloat h){
+  if(height!=h){
+    range.upper.y=h;
+    height=h;
+    }
   }
 
 

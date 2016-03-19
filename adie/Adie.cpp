@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Adie.cpp,v 1.121 2007/03/13 19:14:25 fox Exp $                           *
+* $Id: Adie.cpp,v 1.122 2007/03/27 21:57:03 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -85,6 +85,8 @@ Adie::Adie(const FXString& name):FXApp(name,FXString::null){
   configicon=new FXGIFIcon(this,config_gif);
   browsericon=new FXGIFIcon(this,browser);
   nobrowsericon=new FXGIFIcon(this,nobrowser);
+  uppercaseicon=new FXGIFIcon(this,uppercase);
+  lowercaseicon=new FXGIFIcon(this,lowercase);
 
   searchicon=new FXGIFIcon(this,search_gif,0,IMAGE_ALPHAGUESS);
   searchnexticon=new FXGIFIcon(this,searchnext_gif,0,IMAGE_ALPHAGUESS);
@@ -166,8 +168,8 @@ FXSyntax* Adie::getSyntaxForContents(const FXString& contents) const {
     }
   return NULL;
   }
-  
-  
+
+
 // Exit application
 void Adie::exit(FXint code){
 
@@ -211,6 +213,8 @@ Adie::~Adie(){
   delete configicon;
   delete browsericon;
   delete nobrowsericon;
+  delete uppercaseicon;
+  delete lowercaseicon;
   delete searchicon;
   delete searchnexticon;
   delete searchprevicon;

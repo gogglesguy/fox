@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSystem.cpp,v 1.30 2007/03/08 17:25:17 fox Exp $                        *
+* $Id: FXSystem.cpp,v 1.33 2007/03/19 15:28:19 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -52,6 +52,10 @@ using namespace FX;
 namespace FX {
 
 
+// Many nanoseconds in a second
+const FXTime seconds=1000000000;
+
+
 // Convert file time to string
 FXString FXSystem::localTime(FXTime value){
   return FXSystem::localTime(TIMEFORMAT,value);
@@ -66,62 +70,84 @@ FXString FXSystem::universalTime(FXTime value){
 
 // Convert file time to string as per strftime format
 FXString FXSystem::localTime(const FXchar *format,FXTime value){
-  const FXTime seconds=1000000000;
   time_t tmp=(time_t)(value/seconds);
-  FXchar buffer[512];
-#ifndef WIN32
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#ifdef WIN32
+  struct tm* ptm=localtime(&tmp);
+  if(ptm){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct tm tmresult;
-  FXint len=strftime(buffer,sizeof(buffer),format,localtime_r(&tmp,&tmresult));
-  return FXString(buffer,len);
+  struct tm* ptm=localtime_r(&tmp,&tmresult);
+  if(ptm){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
 #else
-  FXint len=strftime(buffer,sizeof(buffer),format,localtime(&tmp));
-  return FXString(buffer,len);
-#endif
-#else
-  FXint len=strftime(buffer,sizeof(buffer),format,localtime(&tmp));
-  return FXString(buffer,len);
+  struct tm* ptm=localtime(&tmp);
+  if(ptm){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
 #endif
   }
 
 
 // Convert file time to string as per strftime format
 FXString FXSystem::universalTime(const FXchar *format,FXTime value){
-  const FXTime seconds=1000000000;
   time_t tmp=(time_t)(value/seconds);
-  FXchar buffer[512];
-#ifndef WIN32
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#ifdef WIN32
+  struct tm* ptm=gmtime(&tmp);
+  if(ptm){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct tm tmresult;
-  FXint len=strftime(buffer,sizeof(buffer),format,gmtime_r(&tmp,&tmresult));
-  return FXString(buffer,len);
+  struct tm* ptm=gmtime_r(&tmp,&tmresult);
+  if(ptm){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
 #else
-  FXint len=strftime(buffer,sizeof(buffer),format,gmtime(&tmp));
-  return FXString(buffer,len);
-#endif
-#else
-  FXint len=strftime(buffer,sizeof(buffer),format,gmtime(&tmp));
-  return FXString(buffer,len);
+  struct tm* ptm=gmtime(&tmp);
+  if(ptm){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
 #endif
   }
 
 
 // Get effective user id
 FXuint FXSystem::user(){
-#ifndef WIN32
-  return geteuid();
-#else
+#ifdef WIN32
   return 0;
+#else
+  return geteuid();
 #endif
   }
 
 
 // Get effective group id
 FXuint FXSystem::group(){
-#ifndef WIN32
-  return getegid();
-#else
+#ifdef WIN32
   return 0;
+#else
+  return getegid();
 #endif
   }
 
@@ -221,12 +247,12 @@ FXString FXSystem::modeString(FXuint mode){
 // Return value of environment variable name
 FXString FXSystem::getEnvironment(const FXString& name){
   if(!name.empty()){
-#ifndef WIN32
-    return FXString(getenv(name.text()));
-#else
+#ifdef WIN32
     FXchar value[1024];
     DWORD len=GetEnvironmentVariableA(name.text(),value,1024);
     return FXString(value,len);
+#else
+    return FXString(getenv(name.text()));
 #endif
     }
   return FXString::null;
@@ -236,19 +262,17 @@ FXString FXSystem::getEnvironment(const FXString& name){
 // Change value of environment variable name
 FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
   if(!name.empty()){
-#ifndef WIN32
-#ifdef __GNU_LIBRARY__
+#ifdef WIN32
+    if(!value.empty()){
+      return SetEnvironmentVariableA(name.text(),value.text())!=0;
+      }
+    return SetEnvironmentVariableA(name.text(),NULL)!=0;
+#elif defined(__GNU_LIBRARY__)
     if(!value.empty()){
       return setenv(name.text(),value.text(),true)==0;
       }
     unsetenv(name.text());
     return true;
-#endif
-#else
-    if(!value.empty()){
-      return SetEnvironmentVariableA(name.text(),value.text())!=0;
-      }
-    return SetEnvironmentVariableA(name.text(),NULL)!=0;
 #endif
     }
   return false;
@@ -257,12 +281,12 @@ FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
 
 // Get current working directory
 FXString FXSystem::getCurrentDirectory(){
-#ifndef WIN32
-  FXchar buffer[MAXPATHLEN];
-  if(getcwd(buffer,MAXPATHLEN)) return buffer;
-#else
+#ifdef WIN32
   TCHAR buffer[MAXPATHLEN];
   if(GetCurrentDirectory(MAXPATHLEN,buffer)) return buffer;
+#else
+  FXchar buffer[MAXPATHLEN];
+  if(getcwd(buffer,MAXPATHLEN)) return buffer;
 #endif
   return FXString::null;
   }
@@ -337,8 +361,30 @@ FXString FXSystem::getHomeDirectory(){
 
 // Get home directory for a given user
 FXString FXSystem::getUserDirectory(const FXString& user){
-#ifndef WIN32
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#ifdef WIN32
+  if(user.empty()){
+    register const FXchar *str1,*str2;
+    FXchar home[MAXPATHLEN];
+    DWORD size=MAXPATHLEN;
+    HKEY hKey;
+    LONG result;
+    if((str1=getenv("USERPROFILE"))!=NULL) return str1;
+    if((str1=getenv("HOME"))!=NULL) return str1;
+    if((str2=getenv("HOMEPATH"))!=NULL){      // This should be good for WinNT, Win2K according to MSDN
+      if((str1=getenv("HOMEDRIVE"))==NULL) str1="c:";
+      strncpy(home,str1,MAXPATHLEN);
+      strncat(home,str2,MAXPATHLEN);
+      return home;
+      }
+    if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
+      result=RegQueryValueExA(hKey,"Personal",NULL,NULL,(LPBYTE)home,&size);  // Change "Personal" to "Desktop" if you want...
+      RegCloseKey(hKey);
+      if(result==ERROR_SUCCESS) return home;
+      }
+    return "c:" PATHSEPSTRING;
+    }
+  return "c:" PATHSEPSTRING;
+#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
   struct passwd pwdresult,*pwd;
   char buffer[1024];
   if(user.empty()){
@@ -366,44 +412,20 @@ FXString FXSystem::getUserDirectory(const FXString& user){
   if((pwd=getpwnam(user.text()))!=NULL) return pwd->pw_dir;
   return PATHSEPSTRING;
 #endif
-#else
-  if(user.empty()){
-    register const FXchar *str1,*str2;
-    FXchar home[MAXPATHLEN];
-    DWORD size=MAXPATHLEN;
-    HKEY hKey;
-    LONG result;
-    if((str1=getenv("USERPROFILE"))!=NULL) return str1;
-    if((str1=getenv("HOME"))!=NULL) return str1;
-    if((str2=getenv("HOMEPATH"))!=NULL){      // This should be good for WinNT, Win2K according to MSDN
-      if((str1=getenv("HOMEDRIVE"))==NULL) str1="c:";
-      strncpy(home,str1,MAXPATHLEN);
-      strncat(home,str2,MAXPATHLEN);
-      return home;
-      }
-    if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
-      result=RegQueryValueExA(hKey,"Personal",NULL,NULL,(LPBYTE)home,&size);  // Change "Personal" to "Desktop" if you want...
-      RegCloseKey(hKey);
-      if(result==ERROR_SUCCESS) return home;
-      }
-    return "c:" PATHSEPSTRING;
-    }
-  return "c:" PATHSEPSTRING;
-#endif
   }
 
 
 // Return temporary directory.
 FXString FXSystem::getTempDirectory(){
-#ifndef WIN32
-  // Conform Linux File Hierarchy standard; this should be
-  // good for SUN, SGI, HP-UX, AIX, and OSF1 also.
-  return FXString("/tmp",4);
-#else
+#ifdef WIN32
   TCHAR buffer[MAXPATHLEN];
   DWORD len=GetTempPath(MAXPATHLEN,buffer);
   if(1<len && ISPATHSEP(buffer[len-1]) && !ISPATHSEP(buffer[len-2])) len--;
   return FXString(buffer,len);
+#else
+  // Conform Linux File Hierarchy standard; this should be
+  // good for SUN, SGI, HP-UX, AIX, and OSF1 also.
+  return FXString("/tmp",4);
 #endif
   }
 
@@ -415,7 +437,16 @@ FXint FXSystem::getProcessId(){
 #else
   return getpid();
 #endif
-  return 0;
+  }
+
+
+// Return host name
+FXString FXSystem::getHostName(){
+  FXchar name[1024];
+  if(gethostname(name,sizeof(name))==0){
+    return name;
+    }
+  return "localhost";
   }
 
 

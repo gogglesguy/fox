@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCone.h,v 1.18 2007/02/07 20:21:54 fox Exp $                          *
+* $Id: FXGLCone.h,v 1.19 2007/03/23 14:24:57 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXGLCONE_H
 #define FXGLCONE_H
@@ -55,11 +55,11 @@ public:
   virtual FXGLObject* copy();
 
   /// Change radius
-  void setRadius(FXfloat r){ radius=r; }
+  virtual void setRadius(FXfloat r);
   FXfloat getRadius() const { return radius; }
 
   /// Change height
-  void setHeight(FXfloat h){ height=h; }
+  virtual void setHeight(FXfloat h);
   FXfloat getHeight() const { return height; }
 
   /// Save to a stream

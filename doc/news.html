@@ -14,6 +14,64 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <p>
 <!--- TOPIC TITLE WITH LOGO --->
 
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 28 - FOX DEVELOPMENT 1.7.9
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Renamed FXString::HEX array to FXString::value2Digit; added FXString::digit2Value
+array.  Removed FXString::hex (never used anywhere).</li>
+<li>Minor fix in Adie.stx file for sprintf-style format patterns.</li>
+<li>Fixed interpretation of DECOR_SHRINKABLE and DECOR_STRETCHABLE; when neither is
+specified, programmatically specified size is kept.  If DECOR_STRETCHABLE is specified, size is
+constrained to be at least the default size.  If DECOR_SHRINKABLE is specified, size
+is constrained to be at most the default size; finally, if DECOR_RESIZE (i.e. both
+DECOR_SHRINKABLE and DECOR_STRETCHABLE are set), then size is not constrained and
+window can be manipulated arbitrarily.</li>
+<li>Renamed FXURL::hostname() to FXSystem::getHostName(), which is more appropriate.</li>
+<li>More major updates in FXText.</li>
+<li>Lots of new API's in FXTextField:
+<ul>
+<li>API's added to incrementally modify text, rather than just replace all of it.</li>
+<li>Cursor and anchor properly updated when text is changed.</li>
+<li>API added to obtain only selected text.</li>
+<li>Overstrike mode now works much better for UTF-8.</li>
+<li>Cursor changes shape when in overstrike mode.</li>
+<li>All manipulations done using a single message now.</li>
+<li>API's added to manipulate clipboard and primary selection.</li>
+<li>When setting new text, no longer immediately scrolls to make end of text
+visible (this caused ugliness inside FXComboBox when FXComboBox is too small
+to show all text).</li>
+</ul>
+</li>
+<li>Changed behaviour of FXText: pasting from clipboard or primary selection now
+observe properly the overstrike mode-flag.  When multi-line text is pasted,
+only text from cursor position till end of line is overstruck; the rest is
+just inserted.</li>
+<li>Added API to FXText to obtain selected text.</li>
+<li>Added some API's to FXGLShape, and other FXGLObject's.</li>
+<li>Hidden Windows-only GetClass() API now returns wide characters if FOX
+is compiled with -DUNICODE.  Thus, window-titles now show properly in unicode.</li>
+<li>Secret convenience API's added: fxopen(), fxreopen().  These do what you
+expect, except they encode the filename to wide-characters on Windows.
+Note that these API's are not official and will be removed at some point in
+the future.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 28 - FOX STABLE 1.6.25
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed compile problem with FXThread for build on MacOS-X.</li>
+</ul>
 
 <!--- TOPIC TITLE -->
 <p>
@@ -26,7 +84,7 @@ March 13 - FOX DEVELOPMENT 1.7.8
 <li>Updates to Adie editor; starting it with a non-existing file will
 now set the text window's filename to the new file.  Also, changed
 a few accelerators to more useful bindings.  Tab-stops may be changed
-more quickly from a pulldown menu.  Rearranged Preferences Dialog 
+more quickly from a pulldown menu.  Rearranged Preferences Dialog
 since most-often changed settings should be on the first page.</li>
 <li>Major improvements in FXText widget; many new API's added:
 <ul>
@@ -65,6 +123,8 @@ in the drop-down list, the text is selected only if the combobox is a
 non-static combobox. </li>
 <li>Fixed minor details in NET_WM_PING generated in FXApp; apparently,
 some minor details in the NET_WM_PING had changed. </li>
+<li>Now use unicode CreateWindowEx if -DUNICODE was passed.  Window titles
+show up in unicode properly.</li>
 </ul>
 
 <!--- TOPIC TITLE -->
