@@ -32,8 +32,8 @@ namespace FX {
 class FXAPI FXHash {
 protected:
   struct Entry {
-    void* name;
-    void* data;
+    FXptr name;
+    FXptr data;
     };
 protected:
   Entry* table;         // Hash table
@@ -51,7 +51,7 @@ public:
   * Resize the table to the given size; the size must be
   * a power of two.
   */
-  FXbool size(FXival m);
+  FXbool size(FXival num);
 
   /**
   * Return the total number of slots in the table.
@@ -67,38 +67,38 @@ public:
   * Insert key into table, unless the key already exists.
   * Returns the current value of the key.
   */
-  void* insert(void* name,void* data=NULL);
+  FXptr insert(FXptr name,FXptr data=NULL);
 
   /**
   * Replace key in table, overwriting the old value if the
   * given key already exists.  Returns the old value of the key.
   */
-  void* replace(void* name,void* data=NULL);
+  FXptr replace(FXptr name,FXptr data=NULL);
 
   /**
   * Remove key from the table. Returns the old value of the key.
   */
-  void* remove(void* name);
+  FXptr remove(FXptr name);
 
   /**
   * Return value of key, or return NULL.
   */
-  void* find(void* name) const;
+  FXptr find(FXptr name) const;
 
   /**
   * Return true if slot is not occupied by a key.
   */
-  FXbool empty(FXival pos) const { return (table[pos].name==NULL)||(table[pos].name==(void*)-1L); }
+  FXbool empty(FXival pos) const { return (table[pos].name==NULL)||(table[pos].name==(FXptr)-1L); }
 
   /**
   * Return key at position pos.
   */
-  void* key(FXival pos) const { return table[pos].name; }
+  FXptr key(FXival pos) const { return table[pos].name; }
 
   /**
   * Return data pointer at position pos.
   */
-  void* value(FXival pos) const { return table[pos].data; }
+  FXptr value(FXival pos) const { return table[pos].data; }
 
   /**
   * Clear hash table.

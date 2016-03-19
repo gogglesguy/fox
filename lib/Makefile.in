@@ -108,7 +108,6 @@ am__objects_1 = FX88591Codec.lo FX88592Codec.lo FX88593Codec.lo \
 	FXCP1253Codec.lo FXCP1254Codec.lo FXCP1255Codec.lo \
 	FXCP1256Codec.lo FXCP1257Codec.lo FXCP1258Codec.lo \
 	FXKOI8RCodec.lo FXUTF8Codec.lo FXUTF16Codec.lo FXUTF32Codec.lo
-am__objects_2 =
 am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FX7Segment.lo FXAccelTable.lo FXApp.lo FXArray.lo \
 	FXArrowButton.lo FXAtomic.lo FXAutoThreadStorageKey.lo \
@@ -174,10 +173,11 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXToggleButton.lo FXToolBar.lo FXToolBarGrip.lo \
 	FXToolBarShell.lo FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo \
 	FXTranslator.lo FXTreeList.lo FXTreeListBox.lo \
-	FXTriStateButton.lo FXUndoList.lo FXURL.lo FXVec2d.lo \
-	FXVec2f.lo FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo \
-	FXVerticalFrame.lo FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo \
-	FXWindow.lo FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
+	FXTriStateButton.lo FXUndoList.lo FXURL.lo FXVariant.lo \
+	FXVariantArray.lo FXVariantMap.lo FXVec2d.lo FXVec2f.lo \
+	FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
+	FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo FXWindow.lo \
+	FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxcpuid.lo \
 	fxbmpio.lo fxddsio.lo fxezquantize.lo fxfsquantize.lo \
 	fxgetticks.lo fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo \
@@ -186,7 +186,7 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	fxpsio.lo fxrasio.lo fxrgbio.lo fxscanf.lo fxstrtoll.lo \
 	fxstrtoull.lo fxstrtod.lo fxtargaio.lo fxtifio.lo fxunicode.lo \
 	fxutils.lo fxwebpio.lo fxwuquantize.lo fxxbmio.lo fxxpmio.lo \
-	icons.lo $(am__objects_2) $(am__objects_2)
+	icons.lo
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 libFOX_1_7_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -364,132 +364,132 @@ lib_LTLIBRARIES = libFOX-1.7.la
 libFOX_1_7_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS) $(GL_LIBS)
 libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
 CURSORS = \
-blank.xbm \
-blank_mask.xbm \
-crosshair.xbm \
-crosshair_mask.xbm \
-dndask.xbm \
-dndask_mask.xbm \
-dndcopy.xbm \
-dndcopy_mask.xbm \
-dndlink.xbm \
-dndlink_mask.xbm \
-dndmove.xbm \
-dndmove_mask.xbm \
-dontdrop.xbm \
-dontdrop_mask.xbm \
-drag.xbm \
-drag_mask.xbm \
-gray.xbm \
-hand.xbm \
-hand_mask.xbm \
-helparrow.xbm \
-helparrow_mask.xbm \
-hsplit.xbm \
-hsplit_mask.xbm \
-move.xbm \
-move_mask.xbm \
-ne.xbm \
-ne_mask.xbm \
-se.xbm \
-se_mask.xbm \
-sw.xbm \
-sw_mask.xbm \
-nw.xbm \
-nw_mask.xbm \
-resizeleft.xbm \
-resizeleft_mask.xbm \
-resizetop.xbm \
-resizetop_mask.xbm \
-resizetopleft.xbm \
-resizetopleft_mask.xbm \
-resizetopright.xbm \
-resizetopright_mask.xbm \
-rotate.xbm \
-rotate_mask.xbm \
-swatch.xbm \
-swatch_mask.xbm \
-vsplit.xbm \
-vsplit_mask.xbm \
-xsplit.xbm \
-xsplit_mask.xbm
+$(top_srcdir)/lib/blank.xbm \
+$(top_srcdir)/lib/blank_mask.xbm \
+$(top_srcdir)/lib/crosshair.xbm \
+$(top_srcdir)/lib/crosshair_mask.xbm \
+$(top_srcdir)/lib/dndask.xbm \
+$(top_srcdir)/lib/dndask_mask.xbm \
+$(top_srcdir)/lib/dndcopy.xbm \
+$(top_srcdir)/lib/dndcopy_mask.xbm \
+$(top_srcdir)/lib/dndlink.xbm \
+$(top_srcdir)/lib/dndlink_mask.xbm \
+$(top_srcdir)/lib/dndmove.xbm \
+$(top_srcdir)/lib/dndmove_mask.xbm \
+$(top_srcdir)/lib/dontdrop.xbm \
+$(top_srcdir)/lib/dontdrop_mask.xbm \
+$(top_srcdir)/lib/drag.xbm \
+$(top_srcdir)/lib/drag_mask.xbm \
+$(top_srcdir)/lib/gray.xbm \
+$(top_srcdir)/lib/hand.xbm \
+$(top_srcdir)/lib/hand_mask.xbm \
+$(top_srcdir)/lib/helparrow.xbm \
+$(top_srcdir)/lib/helparrow_mask.xbm \
+$(top_srcdir)/lib/hsplit.xbm \
+$(top_srcdir)/lib/hsplit_mask.xbm \
+$(top_srcdir)/lib/move.xbm \
+$(top_srcdir)/lib/move_mask.xbm \
+$(top_srcdir)/lib/ne.xbm \
+$(top_srcdir)/lib/ne_mask.xbm \
+$(top_srcdir)/lib/se.xbm \
+$(top_srcdir)/lib/se_mask.xbm \
+$(top_srcdir)/lib/sw.xbm \
+$(top_srcdir)/lib/sw_mask.xbm \
+$(top_srcdir)/lib/nw.xbm \
+$(top_srcdir)/lib/nw_mask.xbm \
+$(top_srcdir)/lib/resizeleft.xbm \
+$(top_srcdir)/lib/resizeleft_mask.xbm \
+$(top_srcdir)/lib/resizetop.xbm \
+$(top_srcdir)/lib/resizetop_mask.xbm \
+$(top_srcdir)/lib/resizetopleft.xbm \
+$(top_srcdir)/lib/resizetopleft_mask.xbm \
+$(top_srcdir)/lib/resizetopright.xbm \
+$(top_srcdir)/lib/resizetopright_mask.xbm \
+$(top_srcdir)/lib/rotate.xbm \
+$(top_srcdir)/lib/rotate_mask.xbm \
+$(top_srcdir)/lib/swatch.xbm \
+$(top_srcdir)/lib/swatch_mask.xbm \
+$(top_srcdir)/lib/vsplit.xbm \
+$(top_srcdir)/lib/vsplit_mask.xbm \
+$(top_srcdir)/lib/xsplit.xbm \
+$(top_srcdir)/lib/xsplit_mask.xbm
 
 ICONS = \
-arrownext.gif \
-arrowprev.gif \
-bigapp.gif \
-bigcdrom.gif \
-bigcomputer.gif \
-bigdesktop.gif \
-bigdoc.gif \
-bigfloppy.gif \
-bigfloppy3.gif \
-bigfloppy5.gif \
-bigfolder.gif \
-bigfolderopen.gif \
-bignetdrive.gif \
-bignethood.gif \
-bookset.gif \
-bookclr.gif \
-bookadd.bmp \
-bookdel.bmp \
-clearentry.gif \
-cmymode.gif \
-dialmode.gif \
-dirupicon.gif \
-deleteicon.gif \
-docktop.gif \
-dockbottom.gif \
-dockleft.gif \
-dockright.gif \
-dockfree.gif \
-dockflip.gif \
-entericon.gif \
-erroricon.gif \
-eyedrop.gif \
-filecancel.gif \
-fileaccept.gif \
-filecopy.gif \
-filemove.gif \
-filehidden.gif \
-filelink.gif \
-filerename.gif \
-filedelete.gif \
-fileshown.gif \
-foldernew.gif \
-gotohome.gif \
-gotoicon.gif \
-gotowork.gif \
-hsvmode.gif \
-infoicon.gif \
-landscape.gif \
-listmode.gif \
-miniapp.gif \
-minicdrom.gif \
-minicomputer.gif \
-minidesktop.gif \
-minidoc.gif \
-minifloppy.gif \
-minifolder.gif \
-minifolderopen.gif \
-miniharddisk.gif \
-mininetdrive.gif \
-mininethood.gif \
-minizipdrive.gif \
-newfolder.bmp \
-portrait.gif \
-questionicon.gif \
-rgbmode.gif \
-searchicon.gif \
-showbigicons.gif \
-showdetails.gif \
-showsmallicons.gif \
-sorting.bmp \
-warningicon.gif \
-winclose.gif \
-winmaximize.gif \
-winminimize.gif \
-winrestore.gif
+$(top_srcdir)/lib/arrownext.gif \
+$(top_srcdir)/lib/arrowprev.gif \
+$(top_srcdir)/lib/bigapp.gif \
+$(top_srcdir)/lib/bigcdrom.gif \
+$(top_srcdir)/lib/bigcomputer.gif \
+$(top_srcdir)/lib/bigdesktop.gif \
+$(top_srcdir)/lib/bigdoc.gif \
+$(top_srcdir)/lib/bigfloppy.gif \
+$(top_srcdir)/lib/bigfloppy3.gif \
+$(top_srcdir)/lib/bigfloppy5.gif \
+$(top_srcdir)/lib/bigfolder.gif \
+$(top_srcdir)/lib/bigfolderopen.gif \
+$(top_srcdir)/lib/bignetdrive.gif \
+$(top_srcdir)/lib/bignethood.gif \
+$(top_srcdir)/lib/bookset.gif \
+$(top_srcdir)/lib/bookclr.gif \
+$(top_srcdir)/lib/bookadd.bmp \
+$(top_srcdir)/lib/bookdel.bmp \
+$(top_srcdir)/lib/clearentry.gif \
+$(top_srcdir)/lib/cmymode.gif \
+$(top_srcdir)/lib/dialmode.gif \
+$(top_srcdir)/lib/dirupicon.gif \
+$(top_srcdir)/lib/deleteicon.gif \
+$(top_srcdir)/lib/docktop.gif \
+$(top_srcdir)/lib/dockbottom.gif \
+$(top_srcdir)/lib/dockleft.gif \
+$(top_srcdir)/lib/dockright.gif \
+$(top_srcdir)/lib/dockfree.gif \
+$(top_srcdir)/lib/dockflip.gif \
+$(top_srcdir)/lib/entericon.gif \
+$(top_srcdir)/lib/erroricon.gif \
+$(top_srcdir)/lib/eyedrop.gif \
+$(top_srcdir)/lib/filecancel.gif \
+$(top_srcdir)/lib/fileaccept.gif \
+$(top_srcdir)/lib/filecopy.gif \
+$(top_srcdir)/lib/filemove.gif \
+$(top_srcdir)/lib/filehidden.gif \
+$(top_srcdir)/lib/filelink.gif \
+$(top_srcdir)/lib/filerename.gif \
+$(top_srcdir)/lib/filedelete.gif \
+$(top_srcdir)/lib/fileshown.gif \
+$(top_srcdir)/lib/foldernew.gif \
+$(top_srcdir)/lib/gotohome.gif \
+$(top_srcdir)/lib/gotoicon.gif \
+$(top_srcdir)/lib/gotowork.gif \
+$(top_srcdir)/lib/hsvmode.gif \
+$(top_srcdir)/lib/infoicon.gif \
+$(top_srcdir)/lib/landscape.gif \
+$(top_srcdir)/lib/listmode.gif \
+$(top_srcdir)/lib/miniapp.gif \
+$(top_srcdir)/lib/minicdrom.gif \
+$(top_srcdir)/lib/minicomputer.gif \
+$(top_srcdir)/lib/minidesktop.gif \
+$(top_srcdir)/lib/minidoc.gif \
+$(top_srcdir)/lib/minifloppy.gif \
+$(top_srcdir)/lib/minifolder.gif \
+$(top_srcdir)/lib/minifolderopen.gif \
+$(top_srcdir)/lib/miniharddisk.gif \
+$(top_srcdir)/lib/mininetdrive.gif \
+$(top_srcdir)/lib/mininethood.gif \
+$(top_srcdir)/lib/minizipdrive.gif \
+$(top_srcdir)/lib/newfolder.bmp \
+$(top_srcdir)/lib/portrait.gif \
+$(top_srcdir)/lib/questionicon.gif \
+$(top_srcdir)/lib/rgbmode.gif \
+$(top_srcdir)/lib/searchicon.gif \
+$(top_srcdir)/lib/showbigicons.gif \
+$(top_srcdir)/lib/showdetails.gif \
+$(top_srcdir)/lib/showsmallicons.gif \
+$(top_srcdir)/lib/sorting.bmp \
+$(top_srcdir)/lib/warningicon.gif \
+$(top_srcdir)/lib/winclose.gif \
+$(top_srcdir)/lib/winmaximize.gif \
+$(top_srcdir)/lib/winminimize.gif \
+$(top_srcdir)/lib/winrestore.gif
 
 CODECS = \
 FX88591Codec.cpp \
@@ -793,6 +793,9 @@ FXTreeListBox.cpp \
 FXTriStateButton.cpp \
 FXUndoList.cpp \
 FXURL.cpp \
+FXVariant.cpp \
+FXVariantArray.cpp \
+FXVariantMap.cpp \
 FXVec2d.cpp \
 FXVec2f.cpp \
 FXVec3d.cpp \
@@ -849,19 +852,22 @@ fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
 icons.h \
-jitter.h \
+jitter.h
+
+BUILT_SOURCES = icons.h icons.cpp
+EXTRA_DIST = \
+Makefile.bc \
+Makefile.bc.resp \
+Makefile.dmc \
+Makefile.wc \
+Makefile.dmc.resp \
 version.rc \
 version.rc.in \
 $(CURSORS) \
 $(ICONS)
 
-EXTRA_DIST = Makefile.bc \
-             Makefile.bc.resp \
-             Makefile.dmc \
-             Makefile.wc \
-             Makefile.dmc.resp
-
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .gif .bmp .cpp .lo .o .obj
@@ -1235,6 +1241,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUTF32Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUTF8Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUndoList.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVariant.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVariantArray.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVariantMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVec2d.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVec2f.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVec3d.Plo@am__quote@
@@ -1401,13 +1410,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -1437,6 +1448,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
@@ -1508,7 +1520,7 @@ ps-am:
 
 uninstall-am: uninstall-libLTLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libLTLIBRARIES clean-libtool ctags distclean \
@@ -1525,13 +1537,11 @@ uninstall-am: uninstall-libLTLIBRARIES
 	tags uninstall uninstall-am uninstall-libLTLIBRARIES
 
 
-FXApp.cpp: icons.h
-
 icons.h: $(ICONS)
-	$(RESWRAP) -nc -h -n FX -o icons.h $(ICONS)
+	$(RESWRAP) -nc -h -n FX -o $@ $^
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -nc -i icons.h -n FX -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -nc -i icons.h -n FX -o $@ $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

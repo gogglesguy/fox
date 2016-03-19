@@ -42,8 +42,8 @@
 // Round up to nearest ROUNDVAL
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
-// Empty list
-#define EMPTY       (const_cast<FXptr*>(emptylist+1))
+// Special empty pointer list value
+#define EMPTY       ((FXptr*)(__ptrlist__empty__+1))
 
 using namespace FX;
 
@@ -52,8 +52,9 @@ using namespace FX;
 namespace FX {
 
 
-// Empty object list
-static const FXptr emptylist[2]={0,0};
+// Empty pointer list value
+extern const FXival __ptrlist__empty__[];
+const FXival __ptrlist__empty__[2]={0,0};
 
 
 // Change number of items in list
@@ -128,13 +129,12 @@ FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
 
 
 // Adopt objects from orig, leaving orig empty
-FXPtrList& FXPtrList::adopt(FXPtrList& orig){
+void FXPtrList::adopt(FXPtrList& orig){
   if(__likely(ptr!=orig.ptr)){
     if(ptr!=EMPTY){ free(ptr-1); }
     ptr=orig.ptr;
     orig.ptr=EMPTY;
     }
-  return *this;
   }
 
 

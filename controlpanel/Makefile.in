@@ -63,9 +63,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 =
-am_ControlPanel_OBJECTS = icons.$(OBJEXT) ControlPanel.$(OBJEXT) \
-	$(am__objects_1)
+am_ControlPanel_OBJECTS = icons.$(OBJEXT) ControlPanel.$(OBJEXT)
 ControlPanel_OBJECTS = $(am_ControlPanel_OBJECTS)
 ControlPanel_LDADD = $(LDADD)
 ControlPanel_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
@@ -271,26 +269,29 @@ SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 man_MANS = ControlPanel.1
 ICONS = \
-controlpanel_gif.gif \
-colors_gif.gif \
-filebinding_gif.gif \
-settings_gif.gif
+$(top_srcdir)/controlpanel/controlpanel_gif.gif \
+$(top_srcdir)/controlpanel/colors_gif.gif \
+$(top_srcdir)/controlpanel/filebinding_gif.gif \
+$(top_srcdir)/controlpanel/settings_gif.gif
 
 ControlPanel_SOURCES = \
 icons.h \
 icons.cpp \
 ControlPanel.h \
-ControlPanel.cpp \
+ControlPanel.cpp
+
+BUILT_SOURCES = icons.h icons.cpp
+CLEANFILES = icons.h icons.cpp
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc \
 LICENSE \
 $(ICONS)
 
-CLEANFILES = icons.h icons.cpp
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc
-
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .gif .bmp .cpp .lo .o .obj
@@ -549,13 +550,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS) $(MANS)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -586,6 +589,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -658,7 +662,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-man
 
 uninstall-man: uninstall-man1
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool ctags distclean distclean-compile \
@@ -676,13 +680,11 @@ uninstall-man: uninstall-man1
 	uninstall-man1
 
 
-ControlPanel.cpp: icons.h icons.cpp
-
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

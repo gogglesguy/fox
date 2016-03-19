@@ -85,6 +85,20 @@ inline void moveElms(EType* dst,const EType* src,FXuval n){
   }
 
 
+/// Swap element dst and src
+template<class EType>
+inline void swap(EType& dst,EType& src){
+  EType t=dst; dst=src; src=t;
+  }
+
+
+/// Swap some elements from one place with another
+template<class EType>
+inline void swapElms(EType* dst,const EType* src,FXuval n){
+  while(n--){ swap(*dst++,*src++); }
+  }
+
+
 /// Test elements for equality, using equality operator
 template<class EType>
 inline FXbool equalElms(const EType* dst,const EType* src,FXuval n){
@@ -209,6 +223,22 @@ inline void moveElms(FXdouble* dst,const FXdouble* src,FXuval n){ memmove(dst,sr
 
 // Simple bit-wise move for array of pointers to any type
 template<class EType> inline void moveElms(EType** dst,const EType** src,FXuval n){ memmove(dst,src,n*sizeof(void*)); }
+
+
+// Simple bit-wise swap for array of basic type
+inline void swapElms(FXuchar* dst,FXuchar* src,FXuval n){ memswap(dst,src,n); }
+inline void swapElms(FXchar* dst,FXchar* src,FXuval n){ memswap(dst,src,n); }
+inline void swapElms(FXushort* dst,FXushort* src,FXuval n){ memswap(dst,src,n<<1); }
+inline void swapElms(FXshort* dst,FXshort* src,FXuval n){ memswap(dst,src,n<<1); }
+inline void swapElms(FXuint* dst,FXuint* src,FXuval n){ memswap(dst,src,n<<2); }
+inline void swapElms(FXint* dst,FXint* src,FXuval n){ memswap(dst,src,n<<2); }
+inline void swapElms(FXulong* dst,FXulong* src,FXuval n){ memswap(dst,src,n<<3); }
+inline void swapElms(FXlong* dst,FXlong* src,FXuval n){ memswap(dst,src,n<<3); }
+inline void swapElms(FXfloat* dst,FXfloat* src,FXuval n){ memswap(dst,src,n<<2); }
+inline void swapElms(FXdouble* dst,FXdouble* src,FXuval n){ memswap(dst,src,n<<3); }
+
+// Simple bit-wise swap for array of pointers to any type
+template<class EType> inline void swapElms(EType** dst,EType** src,FXuval n){ memswap(dst,src,n*sizeof(void*)); }
 
 
 // Simple bit-wise comparison for array of basic type

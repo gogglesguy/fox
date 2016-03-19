@@ -542,7 +542,7 @@ FXString FXPath::absolute(const FXString& file){
       return FXPath::simplify(FXSystem::getCurrentDrive()+file);        // \file -> D:\file
       }
     if(Ascii::isLetter(file[0]) && file[1]==':'){
-      return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.mid(2));  // D:file -> D:\file
+      return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.right(file.length()-2));  // D:file -> D:\file
       }
     FXString result(FXSystem::getCurrentDirectory());
     if(!file.empty()){
@@ -574,7 +574,7 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
       return FXPath::simplify(FXSystem::getCurrentDrive()+file);        // \file -> D:\file
       }
     if(Ascii::isLetter(file[0]) && file[1]==':'){
-      return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.mid(2));  // D:file -> D:\file
+      return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.right(file.length()-2));  // D:file -> D:\file
       }
     FXString result(FXPath::absolute(base));
     if(!file.empty()){

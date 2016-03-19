@@ -72,7 +72,7 @@
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
 // Special empty string value
-#define EMPTY       ((FXchar*)(void*)(emptystring+1))
+#define EMPTY       ((FXchar*)(void*)(__string__empty__+1))
 
 using namespace FX;
 
@@ -104,7 +104,8 @@ static const FXint TAIL_OFFSET=0xDC00;
 
 
 // Empty string
-static const FXint emptystring[2]={0,0};
+extern const FXint __string__empty__[];
+const FXint __string__empty__[2]={0,0};
 
 
 // Special NULL string
@@ -2440,14 +2441,20 @@ FXString FXString::vvalue(const FXchar* fmt,va_list args){
   }
 
 
+// Compute hash value from string
+FXuint FXString::hash(const FXchar* s){
+  register FXuint result=0;
+  register FXuchar c;
+  while((c=*s++)!=0){
+    result = ((result << 5) + result) ^ c;      // This should be a very good hash function:- just 4 collisions
+    }                                           // on the webster web2 dictionary of 234936 words, and no
+  return result;                                // collisions at all on the standard dict!
+  }
+
+
 // Get hash value
 FXuint FXString::hash() const {
-  register FXint len=length();
-  register FXuint h=0;
-  for(register FXint i=0; i<len; i++){          // This should be a very good hash function:- just 4 collisions
-    h = ((h << 5) + h) ^ (FXuchar)str[i];       // on the webster web2 dictionary of 234936 words, and no
-    }                                           // collisions at all on the standard dict!
-  return h;
+  return FXString::hash(str);
   }
 
 /*******************************************************************************/

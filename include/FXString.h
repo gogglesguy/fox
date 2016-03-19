@@ -71,7 +71,7 @@ public:
   FXString(FXchar c,FXint n);
 
   /// Length of text in bytes
-  FXint length() const { return *(((FXint*)str)-1); }
+  FXint length() const { return *(((const FXint*)str)-1); }
 
   /// Change the length of the string to len
   void length(FXint len);
@@ -575,6 +575,8 @@ public:
   /// Get hash value
   FXuint hash() const;
 
+  static FXuint hash(const FXchar* s);
+
   /// Swap two strings
   friend inline void swap(FXString& a,FXString& b);
 
@@ -590,7 +592,9 @@ public:
 
 
 /// Swap two strings
-inline void swap(FXString& a,FXString& b){ FXchar *t=a.str; a.str=b.str; b.str=t; }
+inline void swap(FXString& dst,FXString& src){
+  FXchar* t=dst.str; dst.str=src.str; src.str=t;
+  }
 
 
 /// Compare

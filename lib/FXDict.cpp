@@ -53,9 +53,9 @@ FXIMPLEMENT(FXDict,FXObject,NULL,0)
 
 
 // Hash function for string
-FXint FXDict::hash(const FXchar* str){
-  register FXint h=0;
-  register FXint c;
+FXuint FXDict::hash(const FXchar* str){
+  register FXuint h=0;
+  register FXuint c;
   while((c=(FXuchar)*str++)!='\0'){
     h = ((h << 5) + h) ^ c;
     }
@@ -64,7 +64,7 @@ FXint FXDict::hash(const FXchar* str){
 
 
 // Initial value for slot
-const FXDict::Entry FXDict::init={NULL,NULL,-1,false};
+const FXDict::Entry FXDict::init={NULL,NULL,0xFFFFFFFF,false};
 
 
 // Construct empty dictionary
@@ -84,11 +84,12 @@ void FXDict::deleteData(void*){ }               // FIXME maybe should return arg
 FXbool FXDict::size(FXival m){
   FXArray<Entry> elbat;
   if(elbat.assign(init,m)){
-    register FXival p,b,x,i;
+    register FXuval p,b,x;
+    register FXival i;
     for(i=0; i<size(); ++i){
       if(table[i].key){
         p=b=table[i].hash;
-        while(elbat[x=p&(m-1)].hash!=-1){
+        while(elbat[x=p&(m-1)].hash!=0xFFFFFFFF){
           p=(p<<2)+p+b+1;
           b>>=BSHIFT;
           }
@@ -106,17 +107,17 @@ FXbool FXDict::size(FXival m){
 // Insert a new entry, leave it alone if already existing
 void* FXDict::insert(const FXchar* ky,void* ptr,FXbool mrk){
   if(__likely(ky)){
-    register FXival p,b,h,x;
+    register FXuval p,b,h,x;
     p=b=h=hash(ky);
-    while(table[x=p&(size()-1)].hash!=-1){
+    while(table[x=p&(size()-1)].hash!=0xFFFFFFFF){
       if(table[x].hash==h && strcmp(table[x].key,ky)==0){ goto y; }
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
     if(__likely((free<<1)>size()) || __likely(size(size()<<1))){
       p=b=h;
-      while(table[x=p&(size()-1)].hash!=-1){
-        if(table[x].hash==-2) goto x;
+      while(table[x=p&(size()-1)].hash!=0xFFFFFFFF){
+        if(table[x].hash==0xFFFFFFFE) goto x;
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
@@ -136,17 +137,17 @@ y:    return table[x].data;
 // Insert entry or replace existing entry
 void* FXDict::replace(const FXchar* ky,void* ptr,FXbool mrk){
   if(__likely(ky)){
-    register FXival p,b,h,x;
+    register FXuval p,b,h,x;
     p=b=h=hash(ky);
-    while(table[x=p&(size()-1)].hash!=-1){
+    while(table[x=p&(size()-1)].hash!=0xFFFFFFFF){
       if(table[x].hash==h && strcmp(table[x].key,ky)==0){ deleteData(table[x].data); goto y; }
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
     if(__likely((free<<1)>size()) || __likely(size(size()<<1))){
       p=b=h;
-      while(table[x=p&(size()-1)].hash!=-1){
-        if(table[x].hash==-2) goto x;
+      while(table[x=p&(size()-1)].hash!=0xFFFFFFFF){
+        if(table[x].hash==0xFFFFFFFE) goto x;
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
@@ -166,10 +167,10 @@ y:    table[x].mark=mrk;
 // Remove entry
 void* FXDict::remove(const FXchar* ky){
   if(__likely(ky)){
-    register FXival p,b,h,x;
+    register FXuval p,b,h,x;
     p=b=h=hash(ky);
     while(table[x=p&(size()-1)].hash!=h || strcmp(table[x].key,ky)!=0){
-      if(table[x].hash==-1) return NULL;
+      if(table[x].hash==0xFFFFFFFF) return NULL;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
@@ -177,7 +178,7 @@ void* FXDict::remove(const FXchar* ky){
     deleteData(table[x].data);
     table[x].key=NULL;
     table[x].data=NULL;
-    table[x].hash=-2;
+    table[x].hash=0xFFFFFFFE;
     table[x].mark=false;
     used--;
     if(__unlikely(used<(size()>>2))) size(size()>>1);
@@ -189,9 +190,9 @@ void* FXDict::remove(const FXchar* ky){
 // Find entry
 void* FXDict::find(const FXchar* ky) const {
   if(__likely(ky)){
-    register FXival p,b,x,h;
+    register FXuval p,b,x,h;
     p=b=h=hash(ky);
-    while(__likely(table[x=p&(size()-1)].hash!=-1)){
+    while(__likely(table[x=p&(size()-1)].hash!=0xFFFFFFFF)){
       if(__likely(table[x].hash==h && strcmp(table[x].key,ky)==0)){
         return table[x].data;
         }

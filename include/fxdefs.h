@@ -147,6 +147,15 @@
 #endif
 
 
+// Non-returning function
+#if defined(__GNUC__)
+#define __noreturn      __attribute__((__noreturn__))
+#elif (_MSC_VER >= 1400)
+#define __noreturn      __declspec(noreturn)
+#else
+#define __noreturn
+#endif
+
 // Branch prediction optimization
 #if (__GNUC__ >= 3)
 #define __likely(cond)    __builtin_expect(!!(cond),1)
@@ -663,7 +672,7 @@ extern FXAPI FXbool fxmemdup(void** ptr,const void* src,FXuval size);
 extern FXAPI void fxfree(void** ptr);
 
 /// Error routine
-extern FXAPI void fxerror(const FXchar* format,...) FX_PRINTF(1,2) ;
+extern FXAPI __noreturn void fxerror(const FXchar* format,...) FX_PRINTF(1,2) ;
 
 /// Warning routine
 extern FXAPI void fxwarning(const FXchar* format,...) FX_PRINTF(1,2) ;
@@ -680,9 +689,6 @@ extern FXAPI void fxverify(const FXchar* expression,const FXchar* filename,unsig
 /// Trace printout routine:- usually not called directly but called through FXTRACE
 extern FXAPI void fxtrace(FXint level,const FXchar* format,...) FX_PRINTF(2,3) ;
 
-/// Sleep n microseconds
-extern FXAPI void fxsleep(FXuint n);
-
 /// Convert string of length len to MSDOS; return new string and new length
 extern FXAPI FXbool fxtoDOS(FXchar*& string,FXint& len);
 
@@ -694,6 +700,12 @@ extern FXAPI FXchar *fxstrdup(const FXchar* str);
 
 /// Calculate a hash value from a string
 extern FXAPI FXuint fxstrhash(const FXchar* str);
+
+/// Safe string copy
+extern FXAPI FXival fxstrlcpy(FXchar* dst,const FXchar* src,FXival len);
+
+/// Safe string concat
+extern FXAPI FXival fxstrlcat(FXchar* dst,const FXchar* src,FXival len);
 
 /// Convert RGB to HSV
 extern FXAPI void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloat g,FXfloat b);
@@ -862,6 +874,9 @@ extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar* src,FXint dlen);
 /// Convert utf8 string to narrow character string
 extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen,FXint slen);
 extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen);
+
+/// Swap non-overlapping arrays
+extern FXAPI void memswap(void* dst,void* src,FXuval n);
 
 }
 

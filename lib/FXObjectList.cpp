@@ -43,8 +43,8 @@
 // Round up to nearest ROUNDVAL
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
-// Empty list
-#define EMPTY       (const_cast<FXObject**>(emptylist+1))
+// Special empty object list value
+#define EMPTY       ((FXObject**)(__objectlist__empty__+1))
 
 using namespace FX;
 
@@ -53,8 +53,9 @@ using namespace FX;
 namespace FX {
 
 
-// Empty object list
-static const FXObject* emptylist[2]={0,0};
+// Empty object list valie
+extern const FXival __objectlist__empty__[];
+const FXival __objectlist__empty__[2]={0,0};
 
 
 // Change number of items in list
@@ -129,13 +130,12 @@ FXObjectList& FXObjectList::operator=(const FXObjectList& orig){
 
 
 // Adopt objects from orig, leaving orig empty
-FXObjectList& FXObjectList::adopt(FXObjectList& orig){
+void FXObjectList::adopt(FXObjectList& orig){
   if(__likely(ptr!=orig.ptr)){
     if(ptr!=EMPTY){ free(ptr-1); }
     ptr=orig.ptr;
     orig.ptr=EMPTY;
     }
-  return *this;
   }
 
 

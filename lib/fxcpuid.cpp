@@ -68,7 +68,7 @@ FXuint fxCPUCaps(FXuint level){
 FXbool fxCPUGetCaps(FXuint level,FXuint features[]){
 #if defined(WIN32) && (_MSC_VER >= 1400)
   if(level<fxCPUCaps(level)){
-    __cpuid((int)features,level);
+    __cpuid((int*)features,level);
     return true;
     }
 #elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i686__))
@@ -92,7 +92,7 @@ FXbool fxCPUGetCaps(FXuint level,FXuint features[]){
 FXbool fxCPUGetXCaps(FXuint level,FXuint count,FXuint features[]){
 #if defined(WIN32) && (_MSC_VER >= 1400)
   if(level<fxCPUCaps(level)){
-   __cpuidex((int)features,level,count);
+   __cpuidex((int*)features,level,count);
     return true;
     }
 #elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__i686__))
@@ -138,6 +138,7 @@ FXuint fxCPUFeatures(){
       __asm__ __volatile__(".byte 0x0f,0x01,0xd0" : "=a" (lo), "=d" (hi) : "c" (0));    // XGETBV ecx=0
       if((lo&6)==6) blank=0;                            // Don't blank out AVX, AVX2, FMA, FMA4, XOP later
 #endif
+// __xgetbv(0); // For _MSC_VER
       }
     if(fxCPUGetXCaps(7,0,features)){
       if(FXBIT(features[1],3)) caps|=CPU_HAS_BMI1;
@@ -184,4 +185,3 @@ FXbool fxCPUName(FXchar name[]){
   }
 
 }
-

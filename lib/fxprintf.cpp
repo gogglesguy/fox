@@ -147,7 +147,7 @@ static const FXchar upper_digits[]="0123456789ABCDEF";
 
 /*******************************************************************************/
 
-/* buf must have at least NDIG bytes */
+// The buffer must have at least NDIG bytes 
 static FXchar* _cvt(FXchar* buffer,FXdouble arg,FXint& decimal,FXint& negative,FXint ndigits,FXint eflag){
   register FXchar *ptr=buffer;
   register FXchar *p;

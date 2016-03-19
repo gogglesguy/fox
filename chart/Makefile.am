@@ -36,19 +36,19 @@ chartutils.cpp
 
 noinst_PROGRAMS = charttest
 
-ICONS = marble.bmp
+ICONS = $(top_srcdir)/chart/marble.bmp
 
-charttest_SOURCES = charttest.cpp icons.h icons.cpp $(ICONS)
+charttest_SOURCES = charttest.cpp icons.h icons.cpp
 
-charttest.cpp: icons.h icons.cpp
+BUILT_SOURCES = icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 CLEANFILES = icons.h icons.cpp
 
 
-EXTRA_DIST = Makefile.bc
+EXTRA_DIST = Makefile.bc $(ICONS)

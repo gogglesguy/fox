@@ -63,10 +63,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 =
 am_PathFinder_OBJECTS = icons.$(OBJEXT) CopyDialog.$(OBJEXT) \
 	PathFinder.$(OBJEXT) Preferences.$(OBJEXT) \
-	PropertyDialog.$(OBJEXT) $(am__objects_1)
+	PropertyDialog.$(OBJEXT)
 PathFinder_OBJECTS = $(am_PathFinder_OBJECTS)
 PathFinder_LDADD = $(LDADD)
 PathFinder_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
@@ -271,52 +270,51 @@ RESWRAP = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 man_MANS = PathFinder.1
-ICONS = \
-addbook.bmp \
-bigicons.bmp \
-closepanel.gif \
-clrbook.gif \
-copy.bmp \
-config_gif.gif \
-copyit.gif \
-cut.bmp \
-delbook.bmp \
-deleteit.bmp \
-desktop.bmp \
-details.bmp \
-dirup.bmp \
-enter.gif \
-execute.bmp \
-file_gif.gif \
-foldernew.gif \
-foxbig.gif \
-foxmini.gif \
-goback.bmp \
-goforw.bmp \
-gotodir.bmp \
-home.gif \
-hosts.bmp \
-iconpath.gif \
-linkit.bmp \
-location.gif \
-maphost.bmp \
-miscellaneous_gif.gif \
-moveit.gif \
-paste.bmp \
-pattern_gif.gif \
-properties.bmp \
-quit_gif.gif \
-newfolder.bmp \
-renameit.gif \
-rotateleft.gif \
-rotateright.gif \
-run_bmp.bmp \
-setbook.gif \
-setdir.gif \
-smallicons.bmp \
-sorting.bmp \
-unmaphost.bmp \
-work.gif
+ICONS = $(top_srcdir)/pathfinder/addbook.bmp \
+$(top_srcdir)/pathfinder/bigicons.bmp \
+$(top_srcdir)/pathfinder/closepanel.gif \
+$(top_srcdir)/pathfinder/clrbook.gif \
+$(top_srcdir)/pathfinder/copy.bmp \
+$(top_srcdir)/pathfinder/config_gif.gif \
+$(top_srcdir)/pathfinder/copyit.gif \
+$(top_srcdir)/pathfinder/cut.bmp \
+$(top_srcdir)/pathfinder/delbook.bmp \
+$(top_srcdir)/pathfinder/deleteit.bmp \
+$(top_srcdir)/pathfinder/desktop.bmp \
+$(top_srcdir)/pathfinder/details.bmp \
+$(top_srcdir)/pathfinder/dirup.bmp \
+$(top_srcdir)/pathfinder/enter.gif \
+$(top_srcdir)/pathfinder/execute.bmp \
+$(top_srcdir)/pathfinder/file_gif.gif \
+$(top_srcdir)/pathfinder/foldernew.gif \
+$(top_srcdir)/pathfinder/foxbig.gif \
+$(top_srcdir)/pathfinder/foxmini.gif \
+$(top_srcdir)/pathfinder/goback.bmp \
+$(top_srcdir)/pathfinder/goforw.bmp \
+$(top_srcdir)/pathfinder/gotodir.bmp \
+$(top_srcdir)/pathfinder/home.gif \
+$(top_srcdir)/pathfinder/hosts.bmp \
+$(top_srcdir)/pathfinder/iconpath.gif \
+$(top_srcdir)/pathfinder/linkit.bmp \
+$(top_srcdir)/pathfinder/location.gif \
+$(top_srcdir)/pathfinder/maphost.bmp \
+$(top_srcdir)/pathfinder/miscellaneous_gif.gif \
+$(top_srcdir)/pathfinder/moveit.gif \
+$(top_srcdir)/pathfinder/paste.bmp \
+$(top_srcdir)/pathfinder/pattern_gif.gif \
+$(top_srcdir)/pathfinder/properties.bmp \
+$(top_srcdir)/pathfinder/quit_gif.gif \
+$(top_srcdir)/pathfinder/newfolder.bmp \
+$(top_srcdir)/pathfinder/renameit.gif \
+$(top_srcdir)/pathfinder/rotateleft.gif \
+$(top_srcdir)/pathfinder/rotateright.gif \
+$(top_srcdir)/pathfinder/run_bmp.bmp \
+$(top_srcdir)/pathfinder/setbook.gif \
+$(top_srcdir)/pathfinder/setdir.gif \
+$(top_srcdir)/pathfinder/sorting.bmp \
+$(top_srcdir)/pathfinder/smallicons.bmp \
+$(top_srcdir)/pathfinder/unmaphost.bmp \
+$(top_srcdir)/pathfinder/work.gif
 
 PathFinder_SOURCES = \
 icons.h \
@@ -328,17 +326,20 @@ PathFinder.h \
 Preferences.cpp \
 Preferences.h \
 PropertyDialog.cpp \
-PropertyDialog.h \
+PropertyDialog.h
+
+BUILT_SOURCES = icons.h icons.cpp
+CLEANFILES = icons.h icons.cpp
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc \
 LICENSE \
 $(ICONS)
 
-CLEANFILES = icons.h icons.cpp
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc
-
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .gif .bmp .cpp .lo .o .obj
@@ -600,13 +601,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS) $(MANS)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -637,6 +640,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -709,7 +713,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-man
 
 uninstall-man: uninstall-man1
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool ctags distclean distclean-compile \
@@ -727,13 +731,11 @@ uninstall-man: uninstall-man1
 	uninstall-man1
 
 
-PathFinder.cpp: icons.h icons.cpp
-
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

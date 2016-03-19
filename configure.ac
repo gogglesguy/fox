@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [41])
+m4_define([fox_level], [42])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -175,15 +175,8 @@ AC_CHECK_HEADERS([semaphore.h])
 AC_CHECK_HEADERS([dlfcn.h])
 AC_CHECK_HEADERS([sys/statvfs.h])
 
-# SSE/SSE2/SSE3
-SAVE_CPPFLAGS=$CPPFLAGS
-SAVE_CFLAGS=$CFLAGS
-CPPFLAGS=$CXXFLAGS
-CFLAGS=$CXXFLAGS
+# Check for intrinsics
 AC_CHECK_HEADERS([immintrin.h])
-CPPFLAGS=$SAVE_CPPFLAGS
-CFLAGS=$SAVE_CFLAGS
-
 
 # Check for JPEG Image support
 AC_ARG_ENABLE(jpeg,[  --disable-jpeg          compile without JPEG image support])

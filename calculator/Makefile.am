@@ -12,12 +12,12 @@ bin_PROGRAMS = calculator
 man_MANS = calculator.1
 
 ICONS  = \
-colors.gif \
-information.gif \
-bigcalc.gif \
-constmem.bmp \
-question.gif \
-tinycalc.gif
+$(top_srcdir)/calculator/colors.gif \
+$(top_srcdir)/calculator/information.gif \
+$(top_srcdir)/calculator/bigcalc.gif \
+$(top_srcdir)/calculator/constmem.bmp \
+$(top_srcdir)/calculator/question.gif \
+$(top_srcdir)/calculator/tinycalc.gif
 
 
 calculator_SOURCES = \
@@ -30,27 +30,26 @@ HelpWindow.cpp \
 Preferences.h \
 Preferences.cpp \
 help.cpp \
-main.cpp \
-LICENSE \
-$(ICONS)
+main.cpp
 
 
-Calculator.cpp: icons.h icons.cpp
-
+BUILT_SOURCES = icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -h -o icons.h $(ICONS)
+	$(RESWRAP) -h -o $@ $^
 
 
-icons.cpp: $(ICONS) icons.h
-	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
+icons.cpp: $(ICONS)
+	$(RESWRAP) -i icons.h -o $@ $^
 
 
 CLEANFILES = icons.h icons.cpp
 
 
-EXTRA_DIST = $(man_MANS) \
-             Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc
-
+EXTRA_DIST = \
+$(man_MANS) \
+Makefile.bc \
+Makefile.wc \
+Makefile.dmc \
+LICENSE \
+$(ICONS)

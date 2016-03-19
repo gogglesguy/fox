@@ -1,137 +1,137 @@
-/*********** Generated on 2013/08/27 18:16:52 by reswrap version 5.1.1 *********/
+/*********** Generated on 2013/09/15 20:08:14 by reswrap version 5.1.1 *********/
 
-/* Created by reswrap from file addbook.bmp */
+/* Created by reswrap from file ../pathfinder/addbook.bmp */
 extern const unsigned char addbook[];
 
-/* Created by reswrap from file bigicons.bmp */
+/* Created by reswrap from file ../pathfinder/bigicons.bmp */
 extern const unsigned char bigicons[];
 
-/* Created by reswrap from file closepanel.gif */
+/* Created by reswrap from file ../pathfinder/closepanel.gif */
 extern const unsigned char closepanel[];
 
-/* Created by reswrap from file clrbook.gif */
+/* Created by reswrap from file ../pathfinder/clrbook.gif */
 extern const unsigned char clrbook[];
 
-/* Created by reswrap from file copy.bmp */
+/* Created by reswrap from file ../pathfinder/copy.bmp */
 extern const unsigned char copy[];
 
-/* Created by reswrap from file config_gif.gif */
+/* Created by reswrap from file ../pathfinder/config_gif.gif */
 extern const unsigned char config_gif[];
 
-/* Created by reswrap from file copyit.gif */
+/* Created by reswrap from file ../pathfinder/copyit.gif */
 extern const unsigned char copyit[];
 
-/* Created by reswrap from file cut.bmp */
+/* Created by reswrap from file ../pathfinder/cut.bmp */
 extern const unsigned char cut[];
 
-/* Created by reswrap from file delbook.bmp */
+/* Created by reswrap from file ../pathfinder/delbook.bmp */
 extern const unsigned char delbook[];
 
-/* Created by reswrap from file deleteit.bmp */
+/* Created by reswrap from file ../pathfinder/deleteit.bmp */
 extern const unsigned char deleteit[];
 
-/* Created by reswrap from file desktop.bmp */
+/* Created by reswrap from file ../pathfinder/desktop.bmp */
 extern const unsigned char desktop[];
 
-/* Created by reswrap from file details.bmp */
+/* Created by reswrap from file ../pathfinder/details.bmp */
 extern const unsigned char details[];
 
-/* Created by reswrap from file dirup.bmp */
+/* Created by reswrap from file ../pathfinder/dirup.bmp */
 extern const unsigned char dirup[];
 
-/* Created by reswrap from file enter.gif */
+/* Created by reswrap from file ../pathfinder/enter.gif */
 extern const unsigned char enter[];
 
-/* Created by reswrap from file execute.bmp */
+/* Created by reswrap from file ../pathfinder/execute.bmp */
 extern const unsigned char execute[];
 
-/* Created by reswrap from file file_gif.gif */
+/* Created by reswrap from file ../pathfinder/file_gif.gif */
 extern const unsigned char file_gif[];
 
-/* Created by reswrap from file foldernew.gif */
+/* Created by reswrap from file ../pathfinder/foldernew.gif */
 extern const unsigned char foldernew[];
 
-/* Created by reswrap from file foxbig.gif */
+/* Created by reswrap from file ../pathfinder/foxbig.gif */
 extern const unsigned char foxbig[];
 
-/* Created by reswrap from file foxmini.gif */
+/* Created by reswrap from file ../pathfinder/foxmini.gif */
 extern const unsigned char foxmini[];
 
-/* Created by reswrap from file goback.bmp */
+/* Created by reswrap from file ../pathfinder/goback.bmp */
 extern const unsigned char goback[];
 
-/* Created by reswrap from file goforw.bmp */
+/* Created by reswrap from file ../pathfinder/goforw.bmp */
 extern const unsigned char goforw[];
 
-/* Created by reswrap from file gotodir.bmp */
+/* Created by reswrap from file ../pathfinder/gotodir.bmp */
 extern const unsigned char gotodir[];
 
-/* Created by reswrap from file home.gif */
+/* Created by reswrap from file ../pathfinder/home.gif */
 extern const unsigned char home[];
 
-/* Created by reswrap from file hosts.bmp */
+/* Created by reswrap from file ../pathfinder/hosts.bmp */
 extern const unsigned char hosts[];
 
-/* Created by reswrap from file iconpath.gif */
+/* Created by reswrap from file ../pathfinder/iconpath.gif */
 extern const unsigned char iconpath[];
 
-/* Created by reswrap from file linkit.bmp */
+/* Created by reswrap from file ../pathfinder/linkit.bmp */
 extern const unsigned char linkit[];
 
-/* Created by reswrap from file location.gif */
+/* Created by reswrap from file ../pathfinder/location.gif */
 extern const unsigned char location[];
 
-/* Created by reswrap from file maphost.bmp */
+/* Created by reswrap from file ../pathfinder/maphost.bmp */
 extern const unsigned char maphost[];
 
-/* Created by reswrap from file miscellaneous_gif.gif */
+/* Created by reswrap from file ../pathfinder/miscellaneous_gif.gif */
 extern const unsigned char miscellaneous_gif[];
 
-/* Created by reswrap from file moveit.gif */
+/* Created by reswrap from file ../pathfinder/moveit.gif */
 extern const unsigned char moveit[];
 
-/* Created by reswrap from file paste.bmp */
+/* Created by reswrap from file ../pathfinder/paste.bmp */
 extern const unsigned char paste[];
 
-/* Created by reswrap from file pattern_gif.gif */
+/* Created by reswrap from file ../pathfinder/pattern_gif.gif */
 extern const unsigned char pattern_gif[];
 
-/* Created by reswrap from file properties.bmp */
+/* Created by reswrap from file ../pathfinder/properties.bmp */
 extern const unsigned char properties[];
 
-/* Created by reswrap from file quit_gif.gif */
+/* Created by reswrap from file ../pathfinder/quit_gif.gif */
 extern const unsigned char quit_gif[];
 
-/* Created by reswrap from file newfolder.bmp */
+/* Created by reswrap from file ../pathfinder/newfolder.bmp */
 extern const unsigned char newfolder[];
 
-/* Created by reswrap from file renameit.gif */
+/* Created by reswrap from file ../pathfinder/renameit.gif */
 extern const unsigned char renameit[];
 
-/* Created by reswrap from file rotateleft.gif */
+/* Created by reswrap from file ../pathfinder/rotateleft.gif */
 extern const unsigned char rotateleft[];
 
-/* Created by reswrap from file rotateright.gif */
+/* Created by reswrap from file ../pathfinder/rotateright.gif */
 extern const unsigned char rotateright[];
 
-/* Created by reswrap from file run_bmp.bmp */
+/* Created by reswrap from file ../pathfinder/run_bmp.bmp */
 extern const unsigned char run_bmp[];
 
-/* Created by reswrap from file setbook.gif */
+/* Created by reswrap from file ../pathfinder/setbook.gif */
 extern const unsigned char setbook[];
 
-/* Created by reswrap from file setdir.gif */
+/* Created by reswrap from file ../pathfinder/setdir.gif */
 extern const unsigned char setdir[];
 
-/* Created by reswrap from file smallicons.bmp */
-extern const unsigned char smallicons[];
-
-/* Created by reswrap from file sorting.bmp */
+/* Created by reswrap from file ../pathfinder/sorting.bmp */
 extern const unsigned char sorting[];
 
-/* Created by reswrap from file unmaphost.bmp */
+/* Created by reswrap from file ../pathfinder/smallicons.bmp */
+extern const unsigned char smallicons[];
+
+/* Created by reswrap from file ../pathfinder/unmaphost.bmp */
 extern const unsigned char unmaphost[];
 
-/* Created by reswrap from file work.gif */
+/* Created by reswrap from file ../pathfinder/work.gif */
 extern const unsigned char work[];
 
