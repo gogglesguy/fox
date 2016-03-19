@@ -35,20 +35,20 @@ protected:
   FXTextField     *terminal;
   FXCheckButton   *preview;
   FXCheckButton   *blending;
-  FXText          *icondirs;
+  FXTextField     *icondirs;
   FXList          *extensions;
   FXComboBox      *mimetypes;
-  FXButton        *bigopen;
-  FXButton        *bigclosed;
-  FXButton        *smallopen;
-  FXButton        *smallclosed;
+  FXButton        *iconbutton[4];
   FXCheckButton   *runinterminal;
   FXCheckButton   *changedirectory;
   FXTextField     *description;
   FXTextField     *command;
+  FXString         filedesc;
+  FXString         filemime;
+  FXString         filecommand;
+  FXString         fileicons[4];
   FXIcon          *brw;
   FXIcon          *pat;
-  FXIcon          *icp;
   FXIcon          *mim;
   FXIcon          *dir;
 private:
@@ -56,39 +56,61 @@ private:
   Preferences(const Preferences&);
   Preferences& operator=(const Preferences&);
 public:
+  long onCmdAccept(FXObject*,FXSelector,void*);
+  long onCmdBrowsePaths(FXObject*,FXSelector,void*);
   long onCmdBrowseEditor(FXObject*,FXSelector,void*);
   long onCmdBrowseTerminal(FXObject*,FXSelector,void*);
   long onCmdBrowseCommand(FXObject*,FXSelector,void*);
   long onCmdBrowseIcon(FXObject*,FXSelector,void*);
-
   long onCmdCommand(FXObject*,FXSelector,void*);
-  long onCmdMimeType(FXObject*,FXSelector,void*);
+  long onUpdCommand(FXObject*,FXSelector,void*);
   long onCmdDescription(FXObject*,FXSelector,void*);
-
+  long onUpdDescription(FXObject*,FXSelector,void*);
+  long onCmdMimeType(FXObject*,FXSelector,void*);
+  long onUpdMimeType(FXObject*,FXSelector,void*);
   long onCmdAppendExtension(FXObject*,FXSelector,void*);
+  long onCmdChangeExtension(FXObject*,FXSelector,void*);
   long onCmdRemoveExtension(FXObject*,FXSelector,void*);
   long onCmdSelectExtension(FXObject*,FXSelector,void*);
+  long onCmdDeselectExtension(FXObject*,FXSelector,void*);
   long onUpdSelectExtension(FXObject*,FXSelector,void*);
 public:
   enum{
-    ID_BROWSE_EDITOR=FXDialogBox::ID_LAST,
+    ID_BROWSE_PATHS=FXDialogBox::ID_LAST,
+    ID_BROWSE_EDITOR,
     ID_BROWSE_TERMINAL,
     ID_BROWSE_COMMAND,
+    ID_BROWSE_SMALLICON,
+    ID_BROWSE_BIGICON,
+    ID_BROWSE_SMALLICONOPEN,
+    ID_BROWSE_BIGICONOPEN,
     ID_COMMAND,
     ID_MIMETYPE,
     ID_DESCRIPTION,
-    ID_BROWSE_BIGICON,
-    ID_BROWSE_SMALLICON,
-    ID_BROWSE_BIGICONOPEN,
-    ID_BROWSE_SMALLICONOPEN,
     ID_SELECT_EXTENSION,
     ID_APPEND_EXTENSION,
+    ID_CHANGE_EXTENSION,
     ID_REMOVE_EXTENSION
     };
 public:
 
   // Create preferences dialog
   Preferences(PathFinderMain *owner);
+
+  // Populate file bindings and mime types
+  void setupFileBindings();
+
+  // Search iconpath for given name and load the icon
+  FXIcon *createIconFromName(const FXString& name) const;
+
+  // Change icon on button
+  void changeIconButton(const FXString& name,FXint index);
+
+  // Read file extension from registry
+  void readFileExtension(const FXString& ext);
+
+  // Save file extension to registry
+  void writeFileExtension(const FXString& ext);
 
   // Get/set filename patterns
   void setPatterns(const FXString& ptrn){ pattern->setText(ptrn); }

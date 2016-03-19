@@ -42,6 +42,8 @@
   - LAYOUT_FIX_WIDTH and LAYOUT_FIX_HEIGHT take precedence over PACK_UNIFORM_WIDTH and
     PACK_UNIFORM_HEIGHT!
   - Tabbing order takes widget layout into account
+  - FIXME possible new layout flag: place a widget, but don't subtract its space.
+    This is useful for underlay/overlay widgets...
 */
 
 // Side layout modes

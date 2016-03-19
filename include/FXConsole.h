@@ -76,7 +76,7 @@ protected:
   FXint charWidth(FXwchar ch,FXint col) const;
   FXuint styleOf(FXint line,FXint index,FXint p,FXint c) const;
   virtual void moveContents(FXint x,FXint y);
-  void drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,const FXchar *text,FXint n,FXuint style) const;
+  void drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,const FXchar *text,FXint n,FXuint sty) const;
   void drawTextLine(FXDCWindow& dc,FXint line,FXint left,FXint right) const;
   void drawContents(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h) const;
 protected:

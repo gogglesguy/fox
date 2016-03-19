@@ -71,6 +71,7 @@ PROGRAMS += switcher.exe
 PROGRAMS += tabbook.exe
 PROGRAMS += ratio.exe
 PROGRAMS += half.exe
+PROGRAMS += unicode.exe
 
 .cpp.obj: .AUTODEPEND
 	$(CXX) $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp
@@ -178,6 +179,9 @@ ratio.exe: $(FOXLIB) ratio.obj
 
 half.exe: $(FOXLIB) half.obj
 	$(LD) $(LDFLAGS) half.obj $(FOXLIB)
+
+unicode.exe: $(FOXLIB) unicode.obj
+	$(LD) $(LDFLAGS) unicode.obj $(FOXLIB)
 
 
 clean: .SYMBOLIC

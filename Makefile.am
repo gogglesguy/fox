@@ -17,12 +17,12 @@ snapshot: dist-all
 
 
 
-#web: distdir
-#	cd $(distdir)/doc && doxygen doxygen.cfg
-#	cp -r $(distdir)/doc/* /net/linky/mnt/html
-
 web: distdir
+	cd $(distdir)/doc && doxygen doxygen.cfg
 	cp -r $(distdir)/doc/* /net/webby/html
+
+#web: distdir
+#	cp -r $(distdir)/doc/* /net/webby/html
 
 drop: dist-all
 	cp $(distdir).tar.gz /net/webby/ftp/pub
@@ -36,11 +36,6 @@ drop: dist-all
 
 # Suggestion for the above
 # cvs rdiff -u -kk -r fox-1.0.8 -r fox-1.0.9 FOX > fox-path-1.0.8-1.0.9
-
-
-#ref: distdir
-#	(cd $(distdir)/include && doc++ -W -i -j --dir ../doc --footer ../doc/classFooter.inc --header ../doc/classHeader.inc *.h)
-#	cp -r $(distdir)/doc/ref/* /home/html/ref
 
 
 #dist-hook:

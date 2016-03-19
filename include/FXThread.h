@@ -30,10 +30,30 @@ namespace FX {
 
 /**
 * FXThread provides system-independent support for threads.
-* Subclasses must implement the run() function do implement
-* the desired functionality of the thread.
-* The storage of the FXThread object is to be managed by the
-* calling thread, not by the thread itself.
+*
+* Subclasses of FXThread must implement the run() function to implement
+* the desired functionality of the thread object.  The thread can be
+* started by calling start(), passing an optional size to allocate for
+* the thread's stack space.
+* Each thread can have thread-local storage.  FXThread has at least one
+* thread-local variable, a pointer to the FXThread object itself; this
+* value can be obtained at any time during the execution of the thread by
+* calling self().  The value of self() is automatically set when the thread
+* is started.
+* Additional thread-local variables may be obtained using FXAutoThreadStorageKey.
+* Initially, all signals are masked by newly started threads (only the main thread
+* will normally handle signals).
+* To reclaim the resources once the thread is completed, a call to join() must be 
+* made, or the thread must be detached (note however that detaching the thread will
+* sever the association between FXThread and the thread).
+* Exceptions thrown from within the execution of the thread are caught, and cause
+* a return value of -1.
+* Calling the destructor from within the thread itself (suicide) is allowed; the
+* thread will be detached and terminate immediately.
+* Calling the destructor from another thread will cancel() the thread if it is
+* still running.  Due to the asynchronous nature of threads, it is usually not a
+* good idea to do this; it is recommended that subclasses call join(), and delay
+* the execution of the destructor until the thread has completed normally.
 */
 class FXAPI FXThread : public FXRunnable {
 private:
@@ -214,12 +234,12 @@ public:
   Policy policy() const;
 
   /**
-  * Change thread's processor affinity, i.e. the set of
+  * Change thread's processor affinity, the set of
   * processors onto which the thread may be scheduled.
   */
   FXbool affinity(FXulong mask);
 
-  /** 
+  /**
   * Get thread's processor affinity.
   */
   FXulong affinity() const;

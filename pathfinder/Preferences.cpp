@@ -28,21 +28,26 @@
 
 // Map
 FXDEFMAP(Preferences) PreferencesMap[]={
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_ACCEPT,Preferences::onCmdAccept),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_PATHS,Preferences::onCmdBrowsePaths),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_EDITOR,Preferences::onCmdBrowseEditor),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_TERMINAL,Preferences::onCmdBrowseTerminal),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_COMMAND,Preferences::onCmdBrowseCommand),
-
+  FXMAPFUNCS(SEL_UPDATE,Preferences::ID_BROWSE_SMALLICON,Preferences::ID_BROWSE_BIGICONOPEN,Preferences::onUpdSelectExtension),
+  FXMAPFUNCS(SEL_COMMAND,Preferences::ID_BROWSE_SMALLICON,Preferences::ID_BROWSE_BIGICONOPEN,Preferences::onCmdBrowseIcon),
+  FXMAPFUNC(SEL_UPDATE,Preferences::ID_COMMAND,Preferences::onUpdCommand),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_COMMAND,Preferences::onCmdCommand),
-  FXMAPFUNC(SEL_COMMAND,Preferences::ID_MIMETYPE,Preferences::onCmdMimeType),
+  FXMAPFUNC(SEL_UPDATE,Preferences::ID_DESCRIPTION,Preferences::onUpdDescription),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_DESCRIPTION,Preferences::onCmdDescription),
-
-  FXMAPFUNC(SEL_CHANGED,Preferences::ID_SELECT_EXTENSION,Preferences::onCmdSelectExtension),
+  FXMAPFUNC(SEL_UPDATE,Preferences::ID_MIMETYPE,Preferences::onUpdMimeType),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_MIMETYPE,Preferences::onCmdMimeType),
+  FXMAPFUNC(SEL_SELECTED,Preferences::ID_SELECT_EXTENSION,Preferences::onCmdSelectExtension),
+  FXMAPFUNC(SEL_DESELECTED,Preferences::ID_SELECT_EXTENSION,Preferences::onCmdDeselectExtension),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_APPEND_EXTENSION,Preferences::onCmdAppendExtension),
-  FXMAPFUNC(SEL_COMMAND,Preferences::ID_REMOVE_EXTENSION,Preferences::onCmdRemoveExtension),
+  FXMAPFUNC(SEL_UPDATE,Preferences::ID_CHANGE_EXTENSION,Preferences::onUpdSelectExtension),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_CHANGE_EXTENSION,Preferences::onCmdChangeExtension),
   FXMAPFUNC(SEL_UPDATE,Preferences::ID_REMOVE_EXTENSION,Preferences::onUpdSelectExtension),
-
-  FXMAPFUNCS(SEL_COMMAND,Preferences::ID_BROWSE_BIGICON,Preferences::ID_BROWSE_SMALLICONOPEN,Preferences::onCmdBrowseIcon),
-  FXMAPFUNCS(SEL_UPDATE,Preferences::ID_BROWSE_BIGICON,Preferences::ID_BROWSE_SMALLICONOPEN,Preferences::onUpdSelectExtension),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_REMOVE_EXTENSION,Preferences::onCmdRemoveExtension),
   };
 
 
@@ -61,8 +66,7 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   // Icons
   pat=new FXGIFIcon(getApp(),pattern_gif);
   brw=new FXGIFIcon(getApp(),file_gif);
-  icp=new FXGIFIcon(getApp(),iconpath);
-  mim=new FXGIFIcon(getApp(),mimetype);
+  mim=new FXGIFIcon(getApp(),miscellaneous_gif);
   dir=new FXGIFIcon(getApp(),setdir);
 
   ///////////////////////////  Browser settings pane  ////////////////////////////
@@ -70,6 +74,10 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   new FXLabel(browserpane,tr("PathFinder settings"),NULL,LAYOUT_LEFT);
   new FXHorizontalSeparator(browserpane,SEPARATOR_LINE|LAYOUT_FILL_X);
   FXMatrix *matrix2=new FXMatrix(browserpane,3,MATRIX_BY_COLUMNS|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,10,0, 6, 6);
+
+  new FXLabel(matrix2,tr("Icon search paths:"),NULL,LAYOUT_LEFT);
+  icondirs=new FXTextField(matrix2,6,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,2,2);
+  new FXButton(matrix2,tr("\tBrowse..."),dir,this,ID_BROWSE_PATHS,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);
 
   new FXLabel(matrix2,tr("Editor command:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
   editor=new FXTextField(matrix2,6,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,2,2);
@@ -91,73 +99,25 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   new FXButton(buttons,tr("Browser\tFile browser settings\tChange browser settings and other things."),brw,switcher,FXSwitcher::ID_OPEN_FIRST,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
 
-  ///////////////////////  File pattern settings pane  //////////////////////////
-  FXVerticalFrame* filepatpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
-  new FXLabel(filepatpane,tr("Filename patterns"),NULL,LAYOUT_LEFT);
-  new FXHorizontalSeparator(filepatpane,SEPARATOR_LINE|LAYOUT_FILL_X);
-  FXVerticalFrame *sub3=new FXVerticalFrame(filepatpane,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0, 0,0,10,0, 0,0);
-  new FXLabel(sub3,tr("Filename patterns, one per line:"),NULL,JUSTIFY_LEFT);
-  FXVerticalFrame* textwell=new FXVerticalFrame(sub3,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
-  pattern=new FXText(textwell,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
-
-  //// File pattern settings button
-  new FXButton(buttons,tr("Patterns\tFilename patterns\tChange wildcard patterns for filenames."),pat,switcher,FXSwitcher::ID_OPEN_SECOND,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
-
-
-  ///////////////////////  Icon path settings pane  //////////////////////////
-  FXVerticalFrame* iconpathpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
-  new FXLabel(iconpathpane,tr("Icon search path"),NULL,LAYOUT_LEFT);
-  new FXHorizontalSeparator(iconpathpane,SEPARATOR_LINE|LAYOUT_FILL_X);
-  FXVerticalFrame *sub4=new FXVerticalFrame(iconpathpane,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0, 0,0,10,0, 0,0);
-  new FXLabel(sub4,tr("Icon search folders, separated by '" PATHLISTSEPSTRING "', on one line:"),NULL,JUSTIFY_LEFT);
-  FXVerticalFrame* textbox=new FXVerticalFrame(sub4,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
-  icondirs=new FXText(textbox,NULL,0,TEXT_WORDWRAP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-
-  //// File pattern settings button
-  new FXButton(buttons,tr("Icon Path\tIcon search path\tChange folders searched for icons."),icp,switcher,FXSwitcher::ID_OPEN_THIRD,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
-
-
   ///////////////////////  Mime type settings pane  //////////////////////////
   FXPacker* mimetypepane=new FXPacker(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
-  new FXLabel(mimetypepane,tr("Mime Type Setup"),NULL,LAYOUT_LEFT|LAYOUT_SIDE_TOP);
+  new FXLabel(mimetypepane,tr("Extensions Setup"),NULL,LAYOUT_LEFT|LAYOUT_SIDE_TOP);
   new FXHorizontalSeparator(mimetypepane,SEPARATOR_LINE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
 
   // List of possible extensions of this file type
   FXGroupBox *extensiongroup=new FXGroupBox(mimetypepane,tr("File Extensions"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_Y|LAYOUT_SIDE_LEFT);
   FXHorizontalFrame *filetypebuttons=new FXHorizontalFrame(extensiongroup,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0, 0,0,0,0);
-  new FXButton(filetypebuttons,tr("Add..."),NULL,this,ID_APPEND_EXTENSION,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_CENTER_X);
-  new FXButton(filetypebuttons,tr("Remove"),NULL,this,ID_REMOVE_EXTENSION,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_CENTER_X);
+  new FXButton(filetypebuttons,tr("Add"),NULL,this,ID_APPEND_EXTENSION,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_CENTER_X);
+  new FXButton(filetypebuttons,tr("Edit"),NULL,this,ID_CHANGE_EXTENSION,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_CENTER_X);
+  new FXButton(filetypebuttons,tr("Delete"),NULL,this,ID_REMOVE_EXTENSION,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_CENTER_X);
   FXVerticalFrame *extensionFrame=new FXVerticalFrame(extensiongroup,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
   extensions=new FXList(extensionFrame,this,ID_SELECT_EXTENSION,LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|HSCROLLER_NEVER);
   extensions->setSortFunc(FXList::ascendingCase);
   extensions->setNumVisible(4);
 
-  // Various icons for this extension
-  FXGroupBox *iconsgroup=new FXGroupBox(mimetypepane,tr("Icons"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
-  FXMatrix *iconsmatrix=new FXMatrix(iconsgroup,8,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH,0,0,0,0, 0,0,0,0);
-
-  new FXLabel(iconsmatrix,tr("Big\nNormal"),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
-  bigclosed=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_BROWSE_BIGICON,FRAME_RAISED|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,40,40, 1,1,1,1);
-
-  new FXLabel(iconsmatrix,tr("Small\nNormal"),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
-  smallclosed=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_BROWSE_SMALLICON,FRAME_RAISED|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,40,40, 1,1,1,1);
-
-  new FXLabel(iconsmatrix,tr("Big\nOpen"),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
-  bigopen=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_BROWSE_BIGICONOPEN,FRAME_RAISED|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,40,40, 1,1,1,1);
-
-  new FXLabel(iconsmatrix,tr("Small\nOpen"),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
-  smallopen=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_BROWSE_SMALLICONOPEN,FRAME_RAISED|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,40,40, 1,1,1,1);
-
   // Description
   FXGroupBox *descgroup=new FXGroupBox(mimetypepane,tr("Description of extension"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
   description=new FXTextField(descgroup,30,this,ID_DESCRIPTION,LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
-
-  // Mime type
-  FXGroupBox *mimegroup=new FXGroupBox(mimetypepane,tr("Mime Types"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
-  FXVerticalFrame *mimeFrame=new FXVerticalFrame(mimegroup,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
-  mimetypes=new FXComboBox(mimeFrame,10,this,ID_MIMETYPE,COMBOBOX_NO_REPLACE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-  mimetypes->setSortFunc(FXList::ascendingCase);
-  mimetypes->setNumVisible(10);
 
   // Command
   FXGroupBox *commandgroup=new FXGroupBox(mimetypepane,tr("Command"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
@@ -169,20 +129,179 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   runinterminal->disable();
   changedirectory->disable();
 
+  // Mime type
+  FXGroupBox *mimegroup=new FXGroupBox(mimetypepane,tr("Mime Types"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
+  FXVerticalFrame *mimeFrame=new FXVerticalFrame(mimegroup,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
+  mimetypes=new FXComboBox(mimeFrame,10,this,ID_MIMETYPE,COMBOBOX_NO_REPLACE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  mimetypes->setSortFunc(FXList::ascendingCase);
+  mimetypes->setNumVisible(10);
+
+  // Various icons for this extension
+  FXGroupBox *iconsgroup=new FXGroupBox(mimetypepane,tr("Icons"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
+  FXMatrix *iconsmatrix=new FXMatrix(iconsgroup,4,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH,0,0,0,0, 0,0,0,0);
+
+  // Icon labels
+  new FXLabel(iconsmatrix,tr("Small"),NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
+  new FXLabel(iconsmatrix,tr("Big"),NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
+  new FXLabel(iconsmatrix,tr("Small Open"),NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
+  new FXLabel(iconsmatrix,tr("Big Open"),NULL,JUSTIFY_CENTER_X|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
+
+  // Icons
+  iconbutton[0]=new FXButton(iconsmatrix,tr("\tChange small icon."),NULL,this,ID_BROWSE_SMALLICON,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
+  iconbutton[1]=new FXButton(iconsmatrix,tr("\tChange big icon."),NULL,this,ID_BROWSE_BIGICON,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
+  iconbutton[2]=new FXButton(iconsmatrix,tr("\tChange small open icon."),NULL,this,ID_BROWSE_SMALLICONOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
+  iconbutton[3]=new FXButton(iconsmatrix,tr("\tChange big open icon."),NULL,this,ID_BROWSE_BIGICONOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
+
 
   //// Mime type settings button
-  new FXButton(buttons,tr("Mime Types\tMime type setup\tChange mime types for files."),mim,switcher,FXSwitcher::ID_OPEN_FOURTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
+  new FXButton(buttons,tr("Extensions\tFile extensions setup\tChange associations for file extensions."),mim,switcher,FXSwitcher::ID_OPEN_SECOND,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
+
+
+  ///////////////////////  File pattern settings pane  //////////////////////////
+  FXVerticalFrame* filepatpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
+  new FXLabel(filepatpane,tr("Filename patterns"),NULL,LAYOUT_LEFT);
+  new FXHorizontalSeparator(filepatpane,SEPARATOR_LINE|LAYOUT_FILL_X);
+  FXVerticalFrame *sub3=new FXVerticalFrame(filepatpane,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0, 0,0,10,0, 0,0);
+  new FXLabel(sub3,tr("Filename patterns, one per line:"),NULL,JUSTIFY_LEFT);
+  FXVerticalFrame* textwell=new FXVerticalFrame(sub3,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
+  pattern=new FXText(textwell,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
+
+  //// File pattern settings button
+  new FXButton(buttons,tr("Patterns\tFilename patterns\tChange wildcard patterns for filenames."),pat,switcher,FXSwitcher::ID_OPEN_THIRD,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
   // Bottom part
   new FXHorizontalSeparator(vertical,SEPARATOR_RIDGE|LAYOUT_FILL_X);
   FXHorizontalFrame *closebox=new FXHorizontalFrame(vertical,LAYOUT_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH);
   new FXButton(closebox,tr("&Accept"),NULL,this,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|LAYOUT_RIGHT|FRAME_RAISED|FRAME_THICK,0,0,0,0, 20,20);
   new FXButton(closebox,tr("&Cancel"),NULL,this,FXDialogBox::ID_CANCEL,BUTTON_DEFAULT|LAYOUT_RIGHT|FRAME_RAISED|FRAME_THICK,0,0,0,0, 20,20);
+
+  // Populate bindings
+  setupFileBindings();
   }
 
 
-// Select command
-long Preferences::onCmdSelectExtension(FXObject*,FXSelector,void*){
+// Populate file bindings and mime types
+void Preferences::setupFileBindings(){
+  FXStringDict *prefs=getApp()->reg().find("FILETYPES");
+  if(prefs && prefs->no()){
+    FXString string;
+    FXString mime;
+    extensions->clearItems();
+    mimetypes->clearItems();
+    for(FXint e=prefs->first(); e<prefs->size(); e=prefs->next(e)){
+      extensions->appendItem(prefs->key(e),NULL,NULL,true);
+      string=prefs->data(e);
+      mime=string.section(";",4);
+      if(!mime.empty() && (mimetypes->findItem(mime)==-1)){
+        mimetypes->appendItem(mime);
+        }
+      }
+    extensions->sortItems();
+    mimetypes->sortItems();
+    extensions->setCurrentItem(0,true);
+    }
+  }
+
+
+// Search iconpath for given name and load the icon
+FXIcon *Preferences::createIconFromName(const FXString& name) const {
+  FXIconSource iconsource(getApp());
+  FXString iconfilename=FXPath::search(getIconPath(),name);
+  if(!iconfilename.empty()){
+    FXIcon *ico=iconsource.loadIconFile(iconfilename);
+    if(ico){
+      ico->blend(getApp()->getBaseColor());
+      ico->create();
+      return ico;
+      }
+    }
+  return NULL;
+  }
+
+
+// Change icon on button
+void Preferences::changeIconButton(const FXString& name,FXint index){
+  FXIcon *ico=iconbutton[index]->getIcon();
+  if(ico){
+    iconbutton[index]->setIcon(NULL);
+    delete ico;
+    }
+  ico=createIconFromName(name);
+  if(ico){
+    iconbutton[index]->setIcon(ico);
+    }
+  }
+
+
+// Read file extension from registry
+void Preferences::readFileExtension(const FXString& ext){
+  if(!ext.empty()){
+    FXString association=getApp()->reg().readStringEntry("FILETYPES",ext.text());
+    FXString iconname;
+    FXint index;
+
+    // Get command and description names
+    filecommand=association.section(";",0);
+    filedesc=association.section(";",1);
+
+    // Big icon closed and open
+    iconname=association.section(";",2);
+    fileicons[1]=iconname.section(":",0);
+    fileicons[3]=iconname.section(":",1);
+
+    // Small icon closed and open
+    iconname=association.section(";",3);
+    fileicons[0]=iconname.section(":",0);
+    fileicons[2]=iconname.section(":",1);
+
+    // Mime type name
+    filemime=association.section(";",4);
+    if(!filemime.empty()){
+      index=mimetypes->findItem(filemime);
+      mimetypes->setCurrentItem(index);
+      }
+    else {
+      index=mimetypes->findItem(" ");           // FIXME
+      mimetypes->setCurrentItem(index);
+      }
+
+    // Change icons
+    changeIconButton(fileicons[0],0);
+    changeIconButton(fileicons[1],1);
+    changeIconButton(fileicons[2],2);
+    changeIconButton(fileicons[3],3);
+    }
+  }
+
+
+// Save file extension to registry
+void Preferences::writeFileExtension(const FXString& ext){
+  if(!ext.empty()){
+    FXString association=filecommand+";"+filedesc+";";
+    if(fileicons[3].empty())
+      association+=fileicons[1]+";";
+    else
+      association+=fileicons[1]+":"+fileicons[3]+";";
+    if(fileicons[2].empty())
+      association+=fileicons[0]+";";
+    else
+      association+=fileicons[0]+":"+fileicons[2]+";";
+    association+=filemime;
+    getApp()->reg().writeStringEntry("FILETYPES",ext.text(),association.text());
+    }
+  }
+
+
+// Select extension
+long Preferences::onCmdSelectExtension(FXObject*,FXSelector,void* ptr){
+  readFileExtension(extensions->getItemText((FXint)(FXival)ptr));
+  return 1;
+  }
+
+
+// Deselect extension
+long Preferences::onCmdDeselectExtension(FXObject*,FXSelector,void* ptr){
+  writeFileExtension(extensions->getItemText((FXint)(FXival)ptr));
   return 1;
   }
 
@@ -194,44 +313,82 @@ long Preferences::onUpdSelectExtension(FXObject* sender,FXSelector,void*){
   }
 
 
-// Append new extension binding
+// Append new extension name
 long Preferences::onCmdAppendExtension(FXObject*,FXSelector,void*){
+  FXString ext;
+  if(FXInputDialog::getString(ext,this,tr("New File Extension"),tr("Please enter file extension:"),NULL)){
+    if(ext.empty()) return 1;
+    if(0<=extensions->findItem(ext)){
+      FXMessageBox::question(this,MBOX_OK,tr("Duplicate Extension"),tr("The given extension: %s already exists!"),ext.text());
+      return 1;
+      }
+    FXint index=extensions->appendItem(ext);
+    extensions->setCurrentItem(index,true);
+    extensions->sortItems();
+    extensions->makeItemVisible(extensions->getCurrentItem());
+    }
   return 1;
   }
 
 
-// Remove extension binding
+// Change extension name
+long Preferences::onCmdChangeExtension(FXObject*,FXSelector,void*){
+  FXint index=extensions->getCurrentItem();
+  if(0<=index){
+    FXString ext=extensions->getItemText(index);
+    FXString old=ext;
+    if(FXInputDialog::getString(ext,this,tr("Rename File Extension"),tr("Rename file extension:"),NULL)){
+      if(ext==old) return 1;
+      if(0<=extensions->findItem(ext)){
+        FXMessageBox::question(this,MBOX_OK,tr("Duplicate Extension"),tr("The given extension: %s already exists!"),ext.text());
+        return 1;
+        }
+      getApp()->reg().deleteEntry("FILETYPES",old);
+      extensions->setItemText(index,ext);
+      }
+    }
+  return 1;
+  }
+
+
+// Remove extension name
 long Preferences::onCmdRemoveExtension(FXObject*,FXSelector,void*){
-  return 1;
-  }
-
-
-// Change command
-long Preferences::onCmdCommand(FXObject*,FXSelector,void*){
-  return 1;
-  }
-
-
-// Change description
-long Preferences::onCmdDescription(FXObject*,FXSelector,void*){
+  FXint index=extensions->getCurrentItem();
+  if(0<=index){
+    FXString ext=extensions->getItemText(index);
+    if(FXMessageBox::question(this,MBOX_OK_CANCEL,tr("Delete File Extension?"),tr("Are you sure you want to delete the file extension: %s?"),ext.text())==MBOX_CLICKED_OK){
+      getApp()->reg().deleteEntry("FILETYPES",ext);
+      extensions->removeItem(extensions->getCurrentItem(),true);
+      }
+    }
   return 1;
   }
 
 
 // Change mime type
-long Preferences::onCmdMimeType(FXObject*,FXSelector,void*){
+long Preferences::onCmdMimeType(FXObject*,FXSelector,void* ptr){
+  FXString mime=(const FXchar*)ptr;
+  if(!mime.empty() && (mimetypes->findItem(mime)==-1)){
+    mimetypes->appendItem(mime);
+    mimetypes->sortItems();
+    }
+  filemime=mime;
   return 1;
   }
 
 
-// Set icon path
-long Preferences::onCmdBrowseIcon(FXObject*,FXSelector,void*){
+// Update mime type
+long Preferences::onUpdMimeType(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&filemime);
   return 1;
   }
 
 
-// Select command
-long Preferences::onCmdBrowseCommand(FXObject*,FXSelector,void*){
+// Browse icon path
+long Preferences::onCmdBrowsePaths(FXObject*,FXSelector,void*){
+  FXString path=getIconPath();
+  path=FXFileDialog::getOpenDirectory(this,tr("Search Path"),path);
+  if(!path.empty()) setIconPath(path);
   return 1;
   }
 
@@ -245,6 +402,15 @@ long Preferences::onCmdBrowseEditor(FXObject*,FXSelector,void*){
   }
 
 
+// Select command
+long Preferences::onCmdBrowseCommand(FXObject*,FXSelector,void*){
+  FXString path="/usr/bin/";
+  if(!filecommand.empty()) path=filecommand;
+  filecommand=FXFileDialog::getOpenFilename(this,"Select Command",path,"*");
+  return 1;
+  }
+
+
 // Set terminal
 long Preferences::onCmdBrowseTerminal(FXObject*,FXSelector,void*){
   FXString newterminal=terminal->getText();
@@ -254,11 +420,66 @@ long Preferences::onCmdBrowseTerminal(FXObject*,FXSelector,void*){
   }
 
 
+// Set icon path
+long Preferences::onCmdBrowseIcon(FXObject*,FXSelector sel,void*){
+  FXFileDialog opendialog(this,tr("Select Icon"));
+  FXint index=FXSELID(sel)-ID_BROWSE_SMALLICON;
+  FXString iconfilename=FXPath::search(getIconPath(),fileicons[index]);
+  if(iconfilename.empty()) iconfilename=FXPath::search(getIconPath(),".");
+  opendialog.setSelectMode(SELECTFILE_EXISTING);
+  opendialog.showImages(true);
+  opendialog.setFilename(iconfilename);
+  if(opendialog.execute()){
+    iconfilename=opendialog.getFilename();
+    fileicons[index]=FXPath::relativize(getIconPath(),iconfilename);
+    changeIconButton(fileicons[index],index);
+    }
+  return 1;
+  }
+
+
+// Change description
+long Preferences::onCmdDescription(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETSTRINGVALUE),(void*)&filedesc);
+  return 1;
+  }
+
+
+// Update description
+long Preferences::onUpdDescription(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&filedesc);
+  return 1;
+  }
+
+
+// Change command
+long Preferences::onCmdCommand(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETSTRINGVALUE),(void*)&filecommand);
+  return 1;
+  }
+
+
+// Update command
+long Preferences::onUpdCommand(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&filecommand);
+  return 1;
+  }
+
+
+// Close the application, return TRUE if actually closed
+long Preferences::onCmdAccept(FXObject* sender,FXSelector sel,void* ptr){
+  if(FXDialogBox::onCmdAccept(sender,sel,ptr)){
+    FXint index=extensions->getCurrentItem();
+    if(0<=index){ writeFileExtension(extensions->getItemText(index)); }
+    }
+  return 1;
+  }
+
+
 // Clean up
 Preferences::~Preferences(){
   delete pat;
   delete brw;
-  delete icp;
   delete mim;
   delete dir;
   }

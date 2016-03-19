@@ -229,7 +229,7 @@ long FXColorBar::onPaint(FXObject*,FXSelector,void* ptr){
   drawDoubleSunkenRectangle(dc,padleft+border,padtop+border,width-padright-padleft-(border<<1),height-padbottom-padtop-(border<<1));
   drawFrame(dc,0,0,width,height);
   if(options&COLORBAR_VERTICAL)
-    drawDoubleRaisedRectangle(dc,border+padleft+2,border+padtop+2+(FXint)((1.0-hsv[2])*(bar->getHeight()-4)),bar->getWidth(),4);
+    drawDoubleRaisedRectangle(dc,border+padleft+2,border+padtop+2+(FXint)((1.0f-hsv[2])*(bar->getHeight()-4)),bar->getWidth(),4);
   else
     drawDoubleRaisedRectangle(dc,border+padleft+2+(FXint)(hsv[2]*(bar->getWidth()-4)),border+padtop+2,4,bar->getHeight());
   return 1;

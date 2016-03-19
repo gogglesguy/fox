@@ -115,5 +115,4 @@ FXIconDict::~FXIconDict(){
   clear();
   }
 
-
 }

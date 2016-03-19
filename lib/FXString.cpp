@@ -119,7 +119,7 @@ const FXchar FXString::value2Digit[36]={
 
 
 // Hexadecimal value of digit
-const signed char FXString::digit2Value[256]={
+const FXschar FXString::digit2Value[256]={
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
@@ -140,7 +140,7 @@ const signed char FXString::digit2Value[256]={
 
 
 // Length of a utf8 character representation
-const signed char FXString::utfBytes[256]={
+const FXschar FXString::utfBytes[256]={
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -856,71 +856,58 @@ FXint FXString::validate(FXint p) const {
   }
 
 
-// Return partition of string separated by delimiter delim
-FXString FXString::section(FXchar delim,FXint start,FXint num) const {
-  register FXint len=length(),s,e;
-  s=0;
-  if(0<start){
-    while(s<len){
-      ++s;
-      if(str[s-1]==delim && --start==0) break;
-      }
-    }
-  e=s;
-  if(0<num){
-    while(e<len){
-      if(str[e]==delim && --num==0) break;
-      ++e;
-      }
-    }
-  return FXString(str+s,e-s);
+// Assign a constant string to this string
+FXString& FXString::operator=(const FXchar* s){
+  return assign(s);
   }
 
 
-// Return partition of string separated by delimiters in delim
-FXString FXString::section(const FXchar* delim,FXint n,FXint start,FXint num) const {
-  register FXint len=length(),s,e,i;
-  register FXchar c;
-  s=0;
-  if(0<start){
-    while(s<len){
-      c=str[s++];
-      i=n;
-      while(--i>=0){
-        if(delim[i]==c){
-          if(--start==0) goto a;
-          break;
-          }
-        }
-      }
-    }
-a:e=s;
-  if(0<num){
-    while(e<len){
-      c=str[e];
-      i=n;
-      while(--i>=0){
-        if(delim[i]==c){
-          if(--num==0) goto b;
-          break;
-          }
-        }
-      ++e;
-      }
-    }
-b:return FXString(str+s,e-s);
+// Assign a narrow character string to this string
+FXString& FXString::operator=(const FXnchar* s){
+  return assign(s);
   }
 
 
-// Return partition of string separated by delimiters in delim
-FXString FXString::section(const FXchar* delim,FXint start,FXint num) const {
-  return section(delim,strlen(delim),start,num);
+// Assign a wide character string to this string
+FXString& FXString::operator=(const FXwchar* s){
+  return assign(s);
   }
 
 
-// Return partition of string separated by delimiters in delim
-FXString FXString::section(const FXString& delim,FXint start,FXint num) const {
-  return section(delim.text(),delim.length(),start,num);
+// Assign another string to this string
+FXString& FXString::operator=(const FXString& s){
+  if(str!=s.str) assign(s.str,s.length());
+  return *this;
+  }
+
+
+// Append single character to this string
+FXString& FXString::operator+=(FXchar c){
+  return append(c);
+  }
+
+
+// Append constant string after this string
+FXString& FXString::operator+=(const FXchar* s){
+  return append(s);
+  }
+
+
+// Append narrow character string after this string
+FXString& FXString::operator+=(const FXnchar* s){
+  return append(s);
+  }
+
+
+// Append wide characeter string after this string
+FXString& FXString::operator+=(const FXwchar* s){
+  return append(s);
+  }
+
+
+// Append another string after this string
+FXString& FXString::operator+=(const FXString& s){
+  return append(s);
   }
 
 
@@ -1036,31 +1023,6 @@ FXString& FXString::assign(const FXwchar* s){
 
 // Assign input string to this string
 FXString& FXString::assign(const FXString& s){
-  if(str!=s.str) assign(s.str,s.length());
-  return *this;
-  }
-
-
-// Assign a string
-FXString& FXString::operator=(const FXchar* s){
-  return assign(s);
-  }
-
-
-// Assign a narrow character string to this
-FXString& FXString::operator=(const FXnchar* s){
-  return assign(s);
-  }
-
-
-// Assign a wide character string to this
-FXString& FXString::operator=(const FXwchar* s){
-  return assign(s);
-  }
-
-
-// Assignment
-FXString& FXString::operator=(const FXString& s){
   if(str!=s.str) assign(s.str,s.length());
   return *this;
   }
@@ -1341,36 +1303,6 @@ FXString& FXString::append(const FXString& s){
   }
 
 
-// Append character
-FXString& FXString::operator+=(FXchar c){
-  return append(c);
-  }
-
-
-// Append string
-FXString& FXString::operator+=(const FXchar* s){
-  return append(s);
-  }
-
-
-// Append string
-FXString& FXString::operator+=(const FXnchar* s){
-  return append(s);
-  }
-
-
-// Append string
-FXString& FXString::operator+=(const FXwchar* s){
-  return append(s);
-  }
-
-
-// Append FXString
-FXString& FXString::operator+=(const FXString& s){
-  return append(s);
-  }
-
-
 // Prepend character
 FXString& FXString::prepend(FXchar c){
   register FXint len=length();
@@ -1540,7 +1472,7 @@ FXString& FXString::replace(FXint pos,FXint r,const FXwchar* s,FXint n){
     length(len+m-r);
     memmove(str+pos+m,str+pos+r,len-pos-r);
     }
-  else if(m>m){
+  else if(r>m){
     memmove(str+pos+m,str+pos+r,len-pos-r);
     length(len+m-r);
     }
@@ -1618,6 +1550,20 @@ FXString& FXString::erase(FXint pos,FXint n){
       length(len-n);
       }
     }
+  return *this;
+  }
+
+
+// Truncate string
+FXString& FXString::trunc(FXint pos){
+  length(FXMIN(pos,length()));
+  return *this;
+  }
+
+
+// Clean string
+FXString& FXString::clear(){
+  length(0);
   return *this;
   }
 
@@ -1712,6 +1658,60 @@ FXString& FXString::substitute(const FXString& org,const FXString& rep,FXbool al
   }
 
 
+#if 0
+
+// Convert to lower case
+FXString& FXString::lower(){
+  register FXint p=0;
+  while(p<length()){
+    p+=wc2utf(&string[p],Unicode::toLower(wc(p)));           // Only if utf8 length of each character does not change (fix unicode tables for this!)
+    }
+  return *this;
+  }
+
+
+// Convert to upper case
+FXString& FXString::upper(){
+  register FXint p=0;
+  while(p<length()){
+    p+=wc2utf(&string[p],Unicode::toUpper(wc(p)));           // Only if utf8 length of each character does not change (fix unicode tables for this!)
+    }
+  return *this;
+  }
+
+#endif
+
+
+// Convert to lower case
+FXString& FXString::lower(){
+  register FXint p,ow,nw;
+  FXwchar w;
+  for(p=0; p<length(); p+=nw){
+    w=wc(p);
+    ow=wc2utf(w);
+    w=Unicode::toLower(w);
+    nw=wc2utf(w);
+    replace(p,ow,&w,1);
+    }
+  return *this;
+  }
+
+
+// Convert to upper case
+FXString& FXString::upper(){
+  register FXint p,ow,nw;
+  FXwchar w;
+  for(p=0; p<length(); p+=nw){
+    w=wc(p);
+    ow=wc2utf(w);
+    w=Unicode::toUpper(w);
+    nw=wc2utf(w);
+    replace(p,ow,&w,1);
+    }
+  return *this;
+  }
+
+
 // Simplify whitespace in string
 FXString& FXString::simplify(){
   if(str!=EMPTY){
@@ -1769,20 +1769,6 @@ FXString& FXString::trimEnd(){
   }
 
 
-// Truncate string
-FXString& FXString::trunc(FXint pos){
-  length(FXMIN(pos,length()));
-  return *this;
-  }
-
-
-// Clean string
-FXString& FXString::clear(){
-  length(0);
-  return *this;
-  }
-
-
 // Get leftmost part
 FXString FXString::left(FXint n) const {
   register FXint len=length();
@@ -1814,6 +1800,74 @@ FXString FXString::mid(FXint pos,FXint n) const {
     return FXString(str+pos,n);
     }
   return FXString::null;
+  }
+
+
+// Return partition of string separated by delimiter delim
+FXString FXString::section(FXchar delim,FXint start,FXint num) const {
+  register FXint len=length(),s,e;
+  s=0;
+  if(0<start){
+    while(s<len){
+      ++s;
+      if(str[s-1]==delim && --start==0) break;
+      }
+    }
+  e=s;
+  if(0<num){
+    while(e<len){
+      if(str[e]==delim && --num==0) break;
+      ++e;
+      }
+    }
+  return FXString(str+s,e-s);
+  }
+
+
+// Return partition of string separated by delimiters in delim
+FXString FXString::section(const FXchar* delim,FXint n,FXint start,FXint num) const {
+  register FXint len=length(),s,e,i;
+  register FXchar c;
+  s=0;
+  if(0<start){
+    while(s<len){
+      c=str[s++];
+      i=n;
+      while(--i>=0){
+        if(delim[i]==c){
+          if(--start==0) goto a;
+          break;
+          }
+        }
+      }
+    }
+a:e=s;
+  if(0<num){
+    while(e<len){
+      c=str[e];
+      i=n;
+      while(--i>=0){
+        if(delim[i]==c){
+          if(--num==0) goto b;
+          break;
+          }
+        }
+      ++e;
+      }
+    }
+b:return FXString(str+s,e-s);
+  }
+
+
+// Return partition of string separated by delimiters in delim
+FXString FXString::section(const FXchar* delim,FXint start,FXint num) const {
+  return section(delim,strlen(delim),start,num);
+  }
+
+
+// Return partition of string separated by delimiters in delim
+FXString FXString::section(const FXString& delim,FXint start,FXint num) const {
+  return section(delim.text(),delim.length(),start,num);
   }
 
 
@@ -1869,60 +1923,6 @@ FXString FXString::rafter(FXchar c,FXint n) const {
       }
     }
   return FXString(str+p,len-p);
-  }
-
-
-#if 0
-
-// Convert to lower case
-FXString& FXString::lower(){
-  register FXint p=0;
-  while(p<length()){
-    p+=wc2utf(&string[p],Unicode::toLower(wc(p)));           // Only if utf8 length of each character does not change (fix unicode tables for this!)
-    }
-  return *this;
-  }
-
-
-// Convert to upper case
-FXString& FXString::upper(){
-  register FXint p=0;
-  while(p<length()){
-    p+=wc2utf(&string[p],Unicode::toUpper(wc(p)));           // Only if utf8 length of each character does not change (fix unicode tables for this!)
-    }
-  return *this;
-  }
-
-#endif
-
-
-// Convert to lower case
-FXString& FXString::lower(){
-  register FXint p,ow,nw;
-  FXwchar w;
-  for(p=0; p<length(); p+=nw){
-    w=wc(p);
-    ow=wc2utf(w);
-    w=Unicode::toLower(w);
-    nw=wc2utf(w);
-    replace(p,ow,&w,1);
-    }
-  return *this;
-  }
-
-
-// Convert to upper case
-FXString& FXString::upper(){
-  register FXint p,ow,nw;
-  FXwchar w;
-  for(p=0; p<length(); p+=nw){
-    w=wc(p);
-    ow=wc2utf(w);
-    w=Unicode::toUpper(w);
-    nw=wc2utf(w);
-    replace(p,ow,&w,1);
-    }
-  return *this;
   }
 
 
@@ -2202,6 +2202,23 @@ FXint FXString::find_last_not_of(FXchar c,FXint pos) const {
 #endif
 #endif
 
+
+// Scan
+FXint FXString::vscan(const FXchar* fmt,va_list args) const {
+  return __vsscanf(str,fmt,args);
+  }
+
+
+FXint FXString::scan(const FXchar* fmt,...) const {
+  FXint result;
+  va_list args;
+  va_start(args,fmt);
+  result=vscan(fmt,args);
+  va_end(args);
+  return result;
+  }
+
+
 // Print formatted string a-la vprintf
 FXint FXString::vformat(const FXchar* fmt,va_list args){
   FXint result=0;
@@ -2230,36 +2247,7 @@ FXint FXString::format(const FXchar* fmt,...){
   return result;
   }
 
-
-// Scan
-FXint FXString::vscan(const FXchar* fmt,va_list args) const {
-  return __vsscanf(str,fmt,args);
-  }
-
-
-FXint FXString::scan(const FXchar* fmt,...) const {
-  FXint result;
-  va_list args;
-  va_start(args,fmt);
-  result=vscan(fmt,args);
-  va_end(args);
-  return result;
-  }
-
-
 /*******************************************************************************/
-
-// Convert to long integer
-FXlong FXString::toLong(FXint base,FXbool* ok) const {
-  return __strtoll(str,NULL,base,ok);
-  }
-
-
-// Convert to unsigned long integer
-FXulong FXString::toULong(FXint base,FXbool* ok) const {
-  return __strtoull(str,NULL,base,ok);
-  }
-
 
 // Convert to integer
 FXint FXString::toInt(FXint base,FXbool* ok) const {
@@ -2273,9 +2261,15 @@ FXuint FXString::toUInt(FXint base,FXbool* ok) const {
   }
 
 
-// Convert to double number
-FXdouble FXString::toDouble(FXbool* ok) const {
-  return __strtod(str,NULL,ok);
+// Convert to long integer
+FXlong FXString::toLong(FXint base,FXbool* ok) const {
+  return __strtoll(str,NULL,base,ok);
+  }
+
+
+// Convert to unsigned long integer
+FXulong FXString::toULong(FXint base,FXbool* ok) const {
+  return __strtoull(str,NULL,base,ok);
   }
 
 
@@ -2285,32 +2279,9 @@ FXfloat FXString::toFloat(FXbool* ok) const {
   }
 
 
-// Convert from long integer
-FXString& FXString::fromLong(FXlong number,FXint base){
-  register FXulong nn=FXABS(number);
-  FXchar buf[66],*p=buf+sizeof(buf);
-  if(base<2 || base>16){ fxerror("FXString::fromLong: base out of range.\n"); }
-  do{
-    *--p=FXString::value2Digit[nn%base];
-    nn/=base;
-    }
-  while(nn);
-  if(number<0) *--p='-';
-  return assign(p,buf+sizeof(buf)-p);
-  }
-
-
-// Convert from unsigned long integer
-FXString& FXString::fromULong(FXulong number,FXint base){
-  register FXulong nn=number;
-  FXchar buf[66],*p=buf+sizeof(buf);
-  if(base<2 || base>16){ fxerror("FXString::fromULong: base out of range.\n"); }
-  do{
-    *--p=FXString::value2Digit[nn%base];
-    nn/=base;
-    }
-  while(nn);
-  return assign(p,buf+sizeof(buf)-p);
+// Convert to double number
+FXdouble FXString::toDouble(FXbool* ok) const {
+  return __strtod(str,NULL,ok);
   }
 
 
@@ -2343,21 +2314,50 @@ FXString& FXString::fromUInt(FXuint number,FXint base){
   }
 
 
+// Convert from long integer
+FXString& FXString::fromLong(FXlong number,FXint base){
+  register FXulong nn=FXABS(number);
+  FXchar buf[66],*p=buf+sizeof(buf);
+  if(base<2 || base>16){ fxerror("FXString::fromLong: base out of range.\n"); }
+  do{
+    *--p=FXString::value2Digit[nn%base];
+    nn/=base;
+    }
+  while(nn);
+  if(number<0) *--p='-';
+  return assign(p,buf+sizeof(buf)-p);
+  }
+
+
+// Convert from unsigned long integer
+FXString& FXString::fromULong(FXulong number,FXint base){
+  register FXulong nn=number;
+  FXchar buf[66],*p=buf+sizeof(buf);
+  if(base<2 || base>16){ fxerror("FXString::fromULong: base out of range.\n"); }
+  do{
+    *--p=FXString::value2Digit[nn%base];
+    nn/=base;
+    }
+  while(nn);
+  return assign(p,buf+sizeof(buf)-p);
+  }
+
+
 // Formatting for reals
 static const char *const conversionformat[]={"%.*f","%.*E","%.*G"};
-
-
-// Convert from double
-FXString& FXString::fromDouble(FXdouble number,FXint prec,FXint fmt){
-  if(fmt<0 || fmt>2){ fxerror("FXString::fromDouble: fmt out of range.\n"); }
-  format(conversionformat[fmt],prec,number);
-  return *this;
-  }
 
 
 // Convert from float
 FXString& FXString::fromFloat(FXfloat number,FXint prec,FXint fmt){
   if(fmt<0 || fmt>2){ fxerror("FXString::fromFloat: fmt out of range.\n"); }
+  format(conversionformat[fmt],prec,(FXdouble)number);
+  return *this;
+  }
+
+
+// Convert from double
+FXString& FXString::fromDouble(FXdouble number,FXint prec,FXint fmt){
+  if(fmt<0 || fmt>2){ fxerror("FXString::fromDouble: fmt out of range.\n"); }
   format(conversionformat[fmt],prec,number);
   return *this;
   }
@@ -2993,8 +2993,8 @@ FXString& dosToUnix(FXString& str){
 
 /*******************************************************************************/
 
-// Check if the string contains special characters or leading or trailing whitespace
-FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote){
+// Check if the string contains special characters or leading or trailing whitespace; escape utf8 if flag is true
+FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
   if(0<str.length()){
     register FXint p,c;
 
@@ -3003,14 +3003,14 @@ FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote){
 
     // Or contains magic characters
     for(p=0; p<str.length(); p++){
-      if((c=str[p])<0x20 || 0x7e<c || c=='\\' || c==lquote || c==rquote) return true;
+      if((c=(FXuchar)str[p])<'\x20' || c=='\x7F' || c=='\\' || c==lquote || c==rquote || ('\x80'<=c && flag)) return true;
       }
     }
   return false;
   }
 
 
-// Escape special characters, and optionally enclose with left and right quotes; enquote utf8 if flag is true
+// Escape special characters, and optionally enclose with left and right quotes; escape utf8 if flag is true
 FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
   FXString result;
   if(0<str.length()){
@@ -3030,7 +3030,7 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
           q+=2;
           continue;
         default:
-          if(c<'\x20' || c=='\x7F' || ('\x80'<c && flag)){ q+=4; continue; }
+          if(c<'\x20' || c=='\x7F' || ('\x80'<=c && flag)){ q+=4; continue; }
           if(c==lquote){ q+=2; continue; }
           if(c==rquote){ q+=2; continue; }
           q+=1;
@@ -3076,7 +3076,7 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
           result[q++]='\\';
           continue;
         default:
-          if(c<'\x20' || c=='\x7F' || ('\x80'<c && flag)){
+          if(c<'\x20' || c=='\x7F' || ('\x80'<=c && flag)){
             result[q++]='\\';
             result[q++]='x';
             result[q++]=FXString::value2Digit[(c>>4)&15];
@@ -3297,13 +3297,13 @@ static FXint composehangul(FXwchar *result,FXint len){
 
 
 // Recursive decomposition of type kind
-static FXint decomposerecursive(FXwchar *result,FXwchar w,FXuint kind){
+static FXint decomposerecursive(FXwchar *result,FXwchar w,FXbool canonical){
   register const FXwchar* decomposition=Unicode::charDecompose(w);
-  if((FXuint)decomposition[-2]>=kind){
+  if(decomposition[-2] && ((decomposition[-2]==DecomposeCanonical) || !canonical)){
     register FXint p=0;
     register FXint n=0;
     while(p<decomposition[-1]){
-      n+=decomposerecursive(result+n,decomposition[p++],kind);
+      n+=decomposerecursive(result+n,decomposition[p++],canonical);
       }
     return n;
     }
@@ -3391,7 +3391,7 @@ FXString normalize(const FXString& s){
 // the length of the worst recursive decomposition (18).  If unicode
 // tables change, make sure this code is updated.   We have an assert
 // just in case.
-FXString decompose(const FXString& s,FXuint kind){
+FXString decompose(const FXString& s,FXbool canonical){
   FXwchar* wcs=(FXwchar*)malloc(s.length()*sizeof(FXwchar)*18);
   FXString result;
   if(wcs){
@@ -3400,7 +3400,7 @@ FXString decompose(const FXString& s,FXuint kind){
     FXint p=0;
     FXint n=0;
     while(p<m){
-      n+=decomposerecursive(&wcs[n],ptr[p++],kind);
+      n+=decomposerecursive(&wcs[n],ptr[p++],canonical);
       }
     FXASSERT(n<=s.length()*18);
     normalize(wcs,n);
@@ -3412,7 +3412,7 @@ FXString decompose(const FXString& s,FXuint kind){
 
 
 // Return normalized composition of string, as utf8
-FXString compose(const FXString& s,FXuint kind){
+FXString compose(const FXString& s,FXbool canonical){
   FXwchar* wcs=(FXwchar*)malloc(s.length()*sizeof(FXwchar)*18);
   FXString result;
   if(wcs){
@@ -3421,7 +3421,7 @@ FXString compose(const FXString& s,FXuint kind){
     FXint p=0;
     FXint n=0;
     while(p<m){
-      n+=decomposerecursive(&wcs[n],ptr[p++],kind);
+      n+=decomposerecursive(&wcs[n],ptr[p++],canonical);
       }
     FXASSERT(n<=s.length()*18);
     normalize(wcs,n);

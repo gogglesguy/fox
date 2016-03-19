@@ -254,7 +254,7 @@ FXbool FXSpheref::intersect(const FXVec3f& u,const FXVec3f& v) const {
       if(0.0f<=hh){             // Not away from sphere
         FXfloat kk=uv.length2();
         FXfloat disc=hh*hh-kk*(dd-rr);  // FIXME this needs to be checked again!
-        if(disc<=0.0) return false;
+        if(disc<=0.0f) return false;
         return true;
         }
       return false;

@@ -246,11 +246,11 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
 
 // Starts the timer
 void FXFileList::create(){
-  if(!id()) getApp()->addTimeout(this,ID_REFRESHTIMER,REFRESHINTERVAL);
   FXIconList::create();
   if(!deleteType){deleteType=getApp()->registerDragType(deleteTypeName);}
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
   if(!actionType){actionType=getApp()->registerDragType(actionTypeName);}
+  getApp()->addTimeout(this,ID_REFRESHTIMER,REFRESHINTERVAL);
   big_folder->create();
   mini_folder->create();
   big_doc->create();
@@ -263,9 +263,9 @@ void FXFileList::create(){
 
 // Detach disconnects the icons
 void FXFileList::detach(){
-  if(id()) getApp()->removeTimeout(this,ID_REFRESHTIMER);
-  if(id()) getApp()->removeTimeout(this,ID_OPENTIMER);
   FXIconList::detach();
+  getApp()->removeTimeout(this,ID_REFRESHTIMER);
+  getApp()->removeTimeout(this,ID_OPENTIMER);
   big_folder->detach();
   mini_folder->detach();
   big_doc->detach();
@@ -280,9 +280,9 @@ void FXFileList::detach(){
 
 // Destroy zaps the icons
 void FXFileList::destroy(){
-  if(id()) getApp()->removeTimeout(this,ID_REFRESHTIMER);
-  if(id()) getApp()->removeTimeout(this,ID_OPENTIMER);
   FXIconList::destroy();
+  getApp()->removeTimeout(this,ID_REFRESHTIMER);
+  getApp()->removeTimeout(this,ID_OPENTIMER);
   big_folder->destroy();
   mini_folder->destroy();
   big_doc->destroy();
@@ -733,14 +733,22 @@ long FXFileList::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr){
 // Handle drag-and-drop leave, restore current directory prior to drag
 long FXFileList::onDNDLeave(FXObject* sender,FXSelector sel,void* ptr){
   FXIconList::onDNDLeave(sender,sel,ptr);
+
+  // Cancel open up timer
   getApp()->removeTimeout(this,ID_OPENTIMER);
+
+  // Stop autoscroll
   stopAutoScroll();
+
+  // Restore start directory
   setDirectory(startdirectory);
+
+  // Clean up the rest
   startdirectory=FXString::null;
   dropdirectory=FXString::null;
+  dropaction=DRAG_REJECT;
   delete [] dropfiles;
   dropfiles=NULL;
-  dropaction=DRAG_REJECT;
   return 1;
   }
 
@@ -793,11 +801,11 @@ long FXFileList::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 long FXFileList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   FXString string;
 
-  // Stop scrolling
-  stopAutoScroll();
-
   // Cancel open up timer
   getApp()->removeTimeout(this,ID_OPENTIMER);
+
+  // Stop scrolling
+  stopAutoScroll();
 
   // Restore start directory
   setDirectory(startdirectory);
@@ -1332,6 +1340,7 @@ void FXFileList::setDirectory(const FXString& pathname){
       path=FXPath::upLevel(path);
       }
     if(directory!=path){
+      setPosition(0,0);
       directory=path;
       clearItems();
       counter=0;
@@ -1451,38 +1460,39 @@ void FXFileList::showParents(FXbool flag) {
 
 
 // Compare till '\t' or '\0'
-static FXbool fileequal(const FXString& a,const FXString& b){
-  register const FXuchar *p1=(const FXuchar *)a.text();
-  register const FXuchar *p2=(const FXuchar *)b.text();
+static FXbool fileequal(const FXchar* p1,const FXchar* p2){
   register FXint c1,c2;
   do{
     c1=*p1++;
     c2=*p2++;
     }
-  while(c1!='\0' && c1!='\t' && c1==c2);
+  while(c1==c2 && c1!='\0' && c1!='\t');
   return (c1=='\0' || c1=='\t') && (c2=='\0' || c2=='\t');
   }
 
 
 // List directory
 void FXFileList::listItems(FXbool force){
-  FXFileItem *oldlist=list;     // Old insert-order list
-  FXFileItem *newlist=NULL;     // New insert-order list
+  FXFileItem  *curitem=NULL;
+  FXFileItem  *oldlist=list;     // Old insert-order list
+  FXFileItem  *newlist=NULL;     // New insert-order list
   FXFileItem **po=&oldlist;     // Head of old list
   FXFileItem **pn=&newlist;     // Head of new list
-  FXFileItem *curitem=NULL;
-  FXFileItem *item,*link,**pp;
-  FXString pathname;
-  FXString extension;
-  FXString name;
-  FXString grpid;
-  FXString usrid;
-  FXString atts;
-  FXString mod;
-  FXString linkname;
-  FXbool istop;
-  FXStat info;
-  FXDir  dir;
+  FXFileItem **pp;
+  FXFileItem  *item;
+  FXFileItem  *link;
+  FXString    pathname;
+  FXString    extension;
+  FXString    name;
+  FXString    grpid;
+  FXString    usrid;
+  FXString    atts;
+  FXString    mod;
+  FXString    linkname;
+  FXbool      isdir;
+  FXbool      istop;
+  FXStat      info;
+  FXDir       dir;
 
   // Remember current item
   if(0<=current){ curitem=(FXFileItem*)items[current]; }
@@ -1525,28 +1535,35 @@ void FXFileList::listItems(FXbool force){
       // Get file/link info
       if(!FXStat::statFile(pathname,info)) continue;
 
+      // Is directory
+      isdir=info.isDirectory();
+
       // Hidden file or directory normally not shown
       if(info.isHidden() && !(options&FILELIST_SHOWHIDDEN)) continue;
-
 #else
 
       // Get file/link info
       if(!FXStat::statLink(pathname,info)) continue;
 
+      // Is directory
+      isdir=info.isDirectory();
+
+      // Check if link is a link to a directory
+      if(info.isLink()){
+        isdir=FXStat::isDirectory(pathname);
+        }
 #endif
 
       // If it is a file and we want only directories or doesn't match, skip it
-      if(!info.isDirectory() && ((options&FILELIST_SHOWDIRS) || !FXPath::match(name,pattern,matchmode))) continue;
+      if(!isdir && ((options&FILELIST_SHOWDIRS) || !FXPath::match(name,pattern,matchmode))) continue;
 
       // If it is a directory and we want only files, skip it
-      if(info.isDirectory() && (options&FILELIST_SHOWFILES)) continue;
+      if(isdir && (options&FILELIST_SHOWFILES)) continue;
 
-      // Find it, and take it out from the old list if found
+      // Search for item in old list, unlink from old if found
       for(pp=po; (item=*pp)!=NULL; pp=&item->link){
-        if(fileequal(item->label,name)){
-          *pp=item->link;
-          item->link=NULL;
-          po=pp;
+        if(fileequal(item->label.text(),name.text())){
+          *pp=item->link; item->link=NULL;
           goto fnd;
           }
         }
@@ -1554,9 +1571,8 @@ void FXFileList::listItems(FXbool force){
       // Make new item if we have to
       item=(FXFileItem*)createItem(FXString::null,NULL,NULL,NULL);
 
-      // Add to insert-order list
-fnd:  *pn=item;
-      pn=&item->link;
+      // Link items into new list
+fnd:  *pn=item; pn=&item->link;
 
       // Append
       if(item==curitem) current=items.no();
@@ -1583,12 +1599,12 @@ fnd:  *pn=item;
 
         // Update flags
         if(info.isExecutable()){item->state|=FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::EXECUTABLE;}
-        if(info.isDirectory()){item->state|=FXFileItem::FOLDER;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::FOLDER;}
         if(info.isCharacter()){item->state|=FXFileItem::CHARDEV;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::CHARDEV;}
         if(info.isBlock()){item->state|=FXFileItem::BLOCKDEV;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::BLOCKDEV;}
         if(info.isFifo()){item->state|=FXFileItem::FIFO;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::FIFO;}
         if(info.isSocket()){item->state|=FXFileItem::SOCK;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::SOCK;}
         if(info.isLink()){item->state|=FXFileItem::SYMLINK;}else{item->state&=~FXFileItem::SYMLINK;}
+        if(isdir){item->state|=FXFileItem::FOLDER;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::FOLDER;}
 
         // We can drag items only if allowed
         item->setDraggable(draggable);
@@ -1640,7 +1656,6 @@ fnd:  *pn=item;
     dir.close();
     }
 
-
   // Wipe items remaining in list:- they have disappeared!!
   for(item=oldlist; item; item=link){
     link=item->link;
@@ -1668,41 +1683,6 @@ fnd:  *pn=item;
 /*******************************************************************************/
 
 
-// Is directory
-FXbool FXFileList::isItemDirectory(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemDirectory: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isDirectory();
-  }
-
-
-// Is share
-FXbool FXFileList::isItemShare(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemShare: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isShare();
-  }
-
-
-// Is file
-FXbool FXFileList::isItemFile(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemFile: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isFile();
-  }
-
-
-// Is executable
-FXbool FXFileList::isItemExecutable(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemExecutable: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isExecutable();
-  }
-
-
-// Return true if item is navigational item like '.' or '..'
-FXbool FXFileList::isItemNavigational(FXint index) const {
-  if(index<0 || items.no()<=index){ fxerror("%s::isItemNavigational: index out of range.\n",getClassName()); }
-  return ((FXFileItem*)items[index])->isNavigational();
-  }
-
-
 // Get file name from item
 FXString FXFileList::getItemFilename(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::getItemFilename: index out of range.\n",getClassName()); }
@@ -1717,10 +1697,59 @@ FXString FXFileList::getItemPathname(FXint index) const {
   }
 
 
+// Is file
+FXbool FXFileList::isItemFile(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::isItemFile: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isFile();
+  }
+
+
+// Is directory
+FXbool FXFileList::isItemDirectory(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::isItemDirectory: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isDirectory();
+  }
+
+
+// Is executable
+FXbool FXFileList::isItemExecutable(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::isItemExecutable: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isExecutable();
+  }
+
+
+// Return true if this is a symbolic link item
+FXbool FXFileList::isItemSymlink(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::isItemSymlink: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isSymlink();
+  }
+
+
+// Return true if item is navigational item like '.' or '..'
+FXbool FXFileList::isItemNavigational(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::isItemNavigational: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->isNavigational();
+  }
+
+
 // Get associations (if any) from the file
 FXFileAssoc* FXFileList::getItemAssoc(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::getItemAssoc: index out of range.\n",getClassName()); }
   return ((FXFileItem*)items[index])->getAssoc();
+  }
+
+
+// Return the file size for this item
+FXlong FXFileList::getItemSize(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::getItemSize: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->getSize();
+  }
+
+
+// Return the date for this item, in nanoseconds
+FXTime FXFileList::getItemDate(FXint index) const {
+  if(index<0 || items.no()<=index){ fxerror("%s::getItemDate: index out of range.\n",getClassName()); }
+  return ((FXFileItem*)items[index])->getDate();
   }
 
 

@@ -107,6 +107,7 @@ FXIMPLEMENT(FXDesktopSetup,FXMainWindow,FXDesktopSetupMap,ARRAYNUMBER(FXDesktopS
 
 // Construct window
 FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NULL,DECOR_ALL,0,0,0,0){
+  const FXlong milliseconds=1000000L;
 
   // Set title
   setTitle(tr("FOX Desktop Setup"));
@@ -427,6 +428,37 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   // Tool tip
   tooltip=new FXToolTip(getApp());
 
+  // Initial settings
+  theme_current.base=getApp()->getBaseColor();
+  theme_current.border=getApp()->getBorderColor();
+  theme_current.back=getApp()->getBackColor();
+  theme_current.fore=getApp()->getForeColor();
+  theme_current.selfore=getApp()->getSelforeColor();
+  theme_current.selback=getApp()->getSelbackColor();
+  theme_current.tipfore=getApp()->getTipforeColor();
+  theme_current.tipback=getApp()->getTipbackColor();
+  theme_current.menufore=getApp()->getSelMenuTextColor();
+  theme_current.menuback=getApp()->getSelMenuBackColor();
+
+  // Timing values
+  typingSpeed=getApp()->getTypingSpeed()/milliseconds;
+  clickSpeed=getApp()->getClickSpeed()/milliseconds;
+  scrollSpeed=getApp()->getScrollSpeed()/milliseconds;
+  scrollDelay=getApp()->getScrollDelay()/milliseconds;
+  blinkSpeed=getApp()->getBlinkSpeed()/milliseconds;
+  animSpeed=getApp()->getAnimSpeed()/milliseconds;
+  menuPause=getApp()->getMenuPause()/milliseconds;
+  tooltipPause=getApp()->getToolTipPause()/milliseconds;
+  tooltipTime=getApp()->getToolTipTime()/milliseconds;
+
+  // Miscellaneous
+  fontspec=getApp()->getNormalFont()->getFont();
+  iconpath=FXIconDict::defaultIconPath;
+  dragDelta=getApp()->getDragDelta();
+  wheelLines=getApp()->getWheelLines();
+  maxcolors=125;
+  gamma=1.0;
+
   // Color data targets associations
   target_base.connect(theme_current.base,this,ID_COLORS);
   target_back.connect(theme_current.back,this,ID_COLORS);
@@ -468,31 +500,6 @@ void FXDesktopSetup::create(){
   }
 
 
-// Close main window and terminate the application
-FXbool FXDesktopSetup::close(FXbool notify){
-  FXint result=FXMessageBox::question(this,MBOX_SAVE_CANCEL_DONTSAVE,tr("Save Changes?"),tr("Do you want to save changes to the FOX Registry\nbefore closing?\n\nIf you don't save, your changes will be lost."));
-  if(result!=MBOX_CLICKED_CANCEL){
-    if(result==MBOX_CLICKED_SAVE){
-      saveFileBinding();
-      writeSettingsFile(filename);
-      }
-    return FXMainWindow::close(notify);
-    }
-  return false;
-  }
-
-
-// Delete window
-FXDesktopSetup::~FXDesktopSetup(){
-  delete titlefont;
-  delete font;
-  delete desktopicon;
-  delete icon_colors;
-  delete icon_settings;
-  delete icon_filebinding;
-  }
-
-
 // Search iconpath for given name and load the icon
 FXIcon *FXDesktopSetup::createIconFromName(const FXString& name) const {
   FXIconSource iconsource(getApp());
@@ -502,7 +509,7 @@ FXIcon *FXDesktopSetup::createIconFromName(const FXString& name) const {
     if(ico){
       ico->blend(getApp()->getBaseColor());
       ico->create();
-      return icon;
+      return ico;
       }
     }
   return NULL;
@@ -518,7 +525,6 @@ void FXDesktopSetup::setupIconButton(const FXString& name,FXint index){
     }
   ico=createIconFromName(name);
   if(ico){
-    ico->create();
     iconbutton[index]->setIcon(ico);
     }
   }
@@ -1047,10 +1053,10 @@ FXbool FXDesktopSetup::setApplicationAndVendor(const FXString& an,const FXString
   setApplicationName(an);
   setVendorName(vn);
   setFilename(path);
+  setupVendorAndAppLabel();
 
   // Now try to read
   if(readSettingsFile(path)){
-    setupVendorAndAppLabel();
     setupFileBindings();
     setupColors();
     initColors();
@@ -1164,6 +1170,32 @@ FXbool FXDesktopSetup::writeSettingsFile(const FXString& file){
     }
   return false;
   }
+
+
+// Close main window and terminate the application
+FXbool FXDesktopSetup::close(FXbool notify){
+  FXint result=FXMessageBox::question(this,MBOX_SAVE_CANCEL_DONTSAVE,tr("Save Changes?"),tr("Do you want to save changes to the FOX Registry\nbefore closing?\n\nIf you don't save, your changes will be lost."));
+  if(result!=MBOX_CLICKED_CANCEL){
+    if(result==MBOX_CLICKED_SAVE){
+      saveFileBinding();
+      writeSettingsFile(filename);
+      }
+    return FXMainWindow::close(notify);
+    }
+  return false;
+  }
+
+
+// Delete window
+FXDesktopSetup::~FXDesktopSetup(){
+  delete titlefont;
+  delete font;
+  delete desktopicon;
+  delete icon_colors;
+  delete icon_settings;
+  delete icon_filebinding;
+  }
+
 
 /*******************************************************************************/
 

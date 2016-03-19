@@ -53,9 +53,6 @@ public:
   /// Set value from another complex
   FXComplexf& set(const FXComplexf& c){ re=c.re; im=c.im; return *this;}
 
-  /// Test for non-zero
-  operator FXbool() const { return (re!=0.0f) || (im!=0.0f); }
-
   /// Test if zero
   FXbool operator!() const { return (re==0.0f) && (im==0.0f); }
 
@@ -131,7 +128,7 @@ inline FXComplexf operator/(const FXComplexf& a,FXfloat b){ return FXComplexf(a.
 
 /// Operators between real and complex
 inline FXComplexf operator+(FXfloat a,const FXComplexf& b){ return FXComplexf(a+b.re,b.im); }
-inline FXComplexf operator-(FXfloat a,const FXComplexf& b){ return FXComplexf(a-b.re,b.im); }
+inline FXComplexf operator-(FXfloat a,const FXComplexf& b){ return FXComplexf(a-b.re,-b.im); }
 inline FXComplexf operator*(FXfloat a,const FXComplexf& b){ return FXComplexf(a*b.re,a*b.im); }
 inline FXComplexf operator/(FXfloat a,const FXComplexf& b){ FXfloat m=b.modulus2(); return FXComplexf((a*b.re)/m,(-a*b.im)/m); }
 

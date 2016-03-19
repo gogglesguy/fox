@@ -69,6 +69,8 @@ inline FXushort swap16(FXushort x){
 #if (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   __asm__ __volatile__("rorw $8,%0\n\t" : "=r"(x) : "0"(x) : "cc");
   return x;
+#elif (_MSC_VER >= 1500)
+  return _byteswap_ushort(x);
 #else
   return (x>>8) | (x<<8);
 #endif
@@ -82,6 +84,8 @@ inline FXuint swap32(FXuint x){
 #elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   __asm__ __volatile__("bswapl %0\n\t" : "=r"(x): "0"(x));
   return x;
+#elif (_MSC_VER >= 1500)
+  return _byteswap_ulong(x);
 #else
   x=((x<<8)&0xFF00FF00)|((x>>8)&0x00FF00FF);
   return (x>>16)|(x<<16);
@@ -103,6 +107,8 @@ inline FXulong swap64(FXulong x){
 #elif (defined(__GNUC__) && defined(__x86_64__))
   __asm__ __volatile__("bswapq %0\n\t" : "=r"(x) : "0"(x));
   return x;
+#elif (_MSC_VER >= 1500)
+  return _byteswap_uint64(x);
 #else
   x=((x<< 8)&FXULONG(0xFF00FF00FF00FF00))|((x>> 8)&FXULONG(0x00FF00FF00FF00FF));
   x=((x<<16)&FXULONG(0xFFFF0000FFFF0000))|((x>>16)&FXULONG(0x0000FFFF0000FFFF));

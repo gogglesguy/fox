@@ -196,6 +196,12 @@ public:
   // Constructor
   FXDesktopSetup(FXApp *app);
 
+  // Set filename
+  void setFilename(const FXString& file){ filename=file; }
+
+  // Return filename
+  FXString getFilename() const { return filename; }
+
   // Change application name
   void setApplicationName(const FXString& name){ applicationname=name; }
 
@@ -211,20 +217,14 @@ public:
   // Set filename from vendor and application name
   FXbool setApplicationAndVendor(const FXString& an,const FXString& vn=FXString::null);
 
-  // Set filename
-  void setFilename(const FXString& file){ filename=file; }
-
-  // Return filename
-  FXString getFilename() const { return filename; }
+  // Create widgets
+  virtual void create();
 
   // Read settings file
   FXbool readSettingsFile(const FXString& file);
 
   // Write settings file
   FXbool writeSettingsFile(const FXString& file);
-
-  // Create widgets
-  virtual void create();
 
   // Close the application, return TRUE if actually closed
   virtual FXbool close(FXbool notify=false);

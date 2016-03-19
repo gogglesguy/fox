@@ -35,7 +35,7 @@ iconpath.gif \
 linkit.gif \
 location.gif \
 maphost.bmp \
-mimetype.gif \
+miscellaneous_gif.gif \
 moveit.gif \
 paste.bmp \
 pattern_gif.gif \

@@ -46,9 +46,6 @@ public:
   /// Return the mode flags for this file
   FXuint mode() const { return modeFlags; }
 
-  /// Return file size in bytes
-  FXlong size() const { return fileSize; }
-
   /// Return user number
   FXuint user() const { return userNumber; }
 
@@ -58,29 +55,44 @@ public:
   /// Return number of links to file
   FXuint links() const { return linkCount; }
 
+  /// Return time when file was created, in nanoseconds
+  FXTime created() const { return createTime; }
+
+  /// Return time when last accessed, in nanoseconds
+  FXTime accessed() const { return accessTime; }
+
+  /// Return time when last modified, in nanoseconds
+  FXTime modified() const { return modifyTime; }
+
   /// Return file volume number
   FXlong volume() const { return fileVolume; }
 
   /// Return file index number
   FXlong index() const { return fileIndex; }
 
-  /// Return time when last modified, in nanoseconds
-  FXTime modified() const { return modifyTime; }
-
-  /// Return time when last accessed, in nanoseconds
-  FXTime accessed() const { return accessTime; }
-
-  /// Return time when file was created, in nanoseconds
-  FXTime created() const { return createTime; }
+  /// Return file size in bytes
+  FXlong size() const { return fileSize; }
 
   /// Return true if it is a hidden file (Windows-only)
   FXbool isHidden() const;
+
+  /// Return true if input path is a directory
+  FXbool isDirectory() const;
 
   /// Return true if it is a regular file
   FXbool isFile() const;
 
   /// Return true if it is a link
   FXbool isLink() const;
+
+  /// Return true if the file sets the user id on execution
+  FXbool isSetUid() const;
+
+  /// Return true if the file sets the group id on execution
+  FXbool isSetGid() const;
+
+  /// Return true if the file has the sticky bit set
+  FXbool isSetSticky() const;
 
   /// Return true if character device
   FXbool isCharacter() const;
@@ -93,9 +105,6 @@ public:
 
   /// Return true if fifo (pipe) device
   FXbool isFifo() const;
-
-  /// Return true if input path is a directory
-  FXbool isDirectory() const;
 
   /// Return true if file is readable
   FXbool isReadable() const;
@@ -141,15 +150,6 @@ public:
 
   /// Return true if others have execute permissions
   FXbool isOtherExecutable() const;
-
-  /// Return true if the file sets the user id on execution
-  FXbool isSetUid() const;
-
-  /// Return true if the file sets the group id on execution
-  FXbool isSetGid() const;
-
-  /// Return true if the file has the sticky bit set
-  FXbool isSetSticky() const;
 
 
   /// Get statistics of the file into the stat buffer info
@@ -272,7 +272,7 @@ public:
 
   /// Obtain total amount of space on disk mounted at given path
   static FXbool getTotalDiskSpace(const FXString& path,FXulong& space);
-  
+
   /// Obtain available amount of space on disk mounted at given path
   static FXbool getAvailableDiskSpace(const FXString& path,FXulong& space);
   };

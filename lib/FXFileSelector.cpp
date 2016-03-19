@@ -353,7 +353,7 @@ long FXFileSelector::onCmdItemDblClicked(FXObject*,FXSelector,void* ptr){
   if(0<=index){
 
     // If directory, open the directory
-    if(filebox->isItemShare(index) || filebox->isItemDirectory(index)){
+    if(filebox->isItemDirectory(index)){
       if(allowNavigation()) setDirectory(filebox->getItemPathname(index));
       return 1;
       }

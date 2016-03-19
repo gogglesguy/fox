@@ -36,10 +36,10 @@ private:
 public:
   static const FXchar null[];
 public:
-  static const FXchar      value2Digit[36];
-  static const signed char digit2Value[256];
+  static const FXchar  value2Digit[36];
+  static const FXschar digit2Value[256];
 public:
-  static const signed char utfBytes[256];
+  static const FXschar utfBytes[256];
 public:
 
   /// Create empty string
@@ -142,35 +142,32 @@ public:
   /// Return a const reference to the last character
   const FXchar& tail() const { return str[length()-1]; }
 
-  /// Assign a string to this
+  /// Assign a constant string to this string
   FXString& operator=(const FXchar* s);
 
-  /// Assign a narrow character string to this
+  /// Assign a narrow character string to this string
   FXString& operator=(const FXnchar* s);
 
-  /// Assign a wide character string to this
+  /// Assign a wide character string to this string
   FXString& operator=(const FXwchar* s);
 
-  /// Assign another string to this
+  /// Assign another string to this string
   FXString& operator=(const FXString& s);
 
-  /// Convert to lower case
-  FXString& lower();
+  /// Append single character to this string
+  FXString& operator+=(FXchar c);
 
-  /// Convert to upper case
-  FXString& upper();
+  /// Append constant string after this string
+  FXString& operator+=(const FXchar* s);
 
-  /// Return num partition(s) from a given start partition in a string separated by delimiters delim.
-  FXString section(FXchar delim,FXint start,FXint num=1) const;
+  /// Append narrow character string after this string
+  FXString& operator+=(const FXnchar* s);
 
-  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim of size n
-  FXString section(const FXchar* delim,FXint n,FXint start,FXint num) const;
+  /// Append wide characeter string after this string
+  FXString& operator+=(const FXwchar* s);
 
-  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim.
-  FXString section(const FXchar* delim,FXint start,FXint num=1) const;
-
-  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim.
-  FXString section(const FXString& delim,FXint start,FXint num=1) const;
+  /// Append another string after this string
+  FXString& operator+=(const FXString& s);
 
   /// Adopt string s, leaving s empty
   FXString& adopt(FXString& s);
@@ -319,6 +316,12 @@ public:
   /// Remove substring
   FXString& erase(FXint pos,FXint n);
 
+  /// Truncate string at pos
+  FXString& trunc(FXint pos);
+
+  /// Clear
+  FXString& clear();
+
   /// Return number of occurrences of ch in string
   FXint contains(FXchar ch) const;
 
@@ -343,6 +346,12 @@ public:
   /// Substitute one string by another
   FXString& substitute(const FXString& org,const FXString& rep,FXbool all=true);
 
+  /// Convert to lower case
+  FXString& lower();
+
+  /// Convert to upper case
+  FXString& upper();
+
   /// Simplify whitespace in string
   FXString& simplify();
 
@@ -355,12 +364,6 @@ public:
   /// Remove trailing whitespace
   FXString& trimEnd();
 
-  /// Truncate string at pos
-  FXString& trunc(FXint pos);
-
-  /// Clear
-  FXString& clear();
-
   /// Get left most part
   FXString left(FXint n) const;
 
@@ -369,6 +372,18 @@ public:
 
   /// Get some part in the middle
   FXString mid(FXint pos,FXint n=2147483647) const;
+
+  /// Return num partition(s) from a given start partition in a string separated by delimiters delim.
+  FXString section(FXchar delim,FXint start,FXint num=1) const;
+
+  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim of size n
+  FXString section(const FXchar* delim,FXint n,FXint start,FXint num) const;
+
+  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim.
+  FXString section(const FXchar* delim,FXint start,FXint num=1) const;
+
+  /// Return num partition(s) from a given start partition in a string separated by set of delimiters from delim.
+  FXString section(const FXString& delim,FXint start,FXint num=1) const;
 
   /**
   * Return all characters before the n-th occurrence of ch,
@@ -488,29 +503,23 @@ public:
   FXint format(const FXchar* fmt,...) FX_PRINTF(2,3) ;
   FXint vformat(const FXchar* fmt,va_list args);
 
-  /// Convert to long integer
-  FXlong toLong(FXint base=10,FXbool* ok=NULL) const;
-
-  /// Convert to unsigned long integer
-  FXulong toULong(FXint base=10,FXbool* ok=NULL) const;
-
   /// Convert to integer
   FXint toInt(FXint base=10,FXbool* ok=NULL) const;
 
   /// Convert to unsigned integer
   FXuint toUInt(FXint base=10,FXbool* ok=NULL) const;
 
-  /// Convert to double
-  FXdouble toDouble(FXbool* ok=NULL) const;
+  /// Convert to long integer
+  FXlong toLong(FXint base=10,FXbool* ok=NULL) const;
+
+  /// Convert to unsigned long integer
+  FXulong toULong(FXint base=10,FXbool* ok=NULL) const;
 
   /// Convert to float
   FXfloat toFloat(FXbool* ok=NULL) const;
 
-  /// Convert from long integer
-  FXString& fromLong(FXlong number,FXint base=10);
-
-  /// Convert from unsigned long integer
-  FXString& fromULong(FXulong number,FXint base=10);
+  /// Convert to double
+  FXdouble toDouble(FXbool* ok=NULL) const;
 
   /// Convert from integer
   FXString& fromInt(FXint number,FXint base=10);
@@ -518,11 +527,17 @@ public:
   /// Convert from unsigned integer
   FXString& fromUInt(FXuint number,FXint base=10);
 
-  /// Convert from double
-  FXString& fromDouble(FXdouble number,FXint prec=6,FXint fmt=2);
+  /// Convert from long integer
+  FXString& fromLong(FXlong number,FXint base=10);
+
+  /// Convert from unsigned long integer
+  FXString& fromULong(FXulong number,FXint base=10);
 
   /// Convert from float
   FXString& fromFloat(FXfloat number,FXint prec=6,FXint fmt=2);
+
+  /// Convert from double
+  FXString& fromDouble(FXdouble number,FXint prec=6,FXint fmt=2);
 
   /**
   * Return a string value by converting an integer number to a string,
@@ -559,13 +574,6 @@ public:
   /// Get hash value
   FXuint hash() const;
 
-  /// Append operators
-  FXString& operator+=(FXchar c);
-  FXString& operator+=(const FXchar* s);
-  FXString& operator+=(const FXnchar* s);
-  FXString& operator+=(const FXwchar* s);
-  FXString& operator+=(const FXString& s);
-
   /// Swap two strings
   friend inline void swap(FXString& a,FXString& b);
 
@@ -582,12 +590,6 @@ public:
 
 /// Swap two strings
 inline void swap(FXString& a,FXString& b){ FXchar *t=a.str; a.str=b.str; b.str=t; }
-
-/// Saving to a stream
-extern FXAPI FXStream& operator<<(FXStream& store,const FXString& s);
-
-/// Load from a stream
-extern FXAPI FXStream& operator>>(FXStream& store,FXString& s);
 
 
 /// Compare
@@ -673,6 +675,12 @@ extern FXAPI FXString operator+(const FXwchar* s1,const FXString& s2);
 extern FXAPI FXString operator+(const FXString& s,FXchar c);
 extern FXAPI FXString operator+(FXchar c,const FXString& s);
 
+/// Saving to a stream
+extern FXAPI FXStream& operator<<(FXStream& store,const FXString& s);
+
+/// Load from a stream
+extern FXAPI FXStream& operator>>(FXStream& store,FXString& s);
+
 /// Return utf8 from ascii containing unicode escapes
 extern FXAPI FXString fromAscii(const FXString& s);
 
@@ -685,10 +693,10 @@ extern FXAPI FXString& unixToDos(FXString& str);
 /// Convert dos string to unix string
 extern FXAPI FXString& dosToUnix(FXString& str);
 
-/// Check if the string contains special characters or leading or trailing whitespace
-extern FXAPI FXbool shouldEscape(const FXString& str,FXchar lquote=0,FXchar rquote=0);
+/// Check if the string contains special characters or leading or trailing whitespace; escape utf8 if flag is true
+extern FXAPI FXbool shouldEscape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXbool flag=false);
 
-/// Escape special characters, and optionally enclose with left and right quotes; enquote utf8 if flag is true
+/// Escape special characters, and optionally enclose with left and right quotes; escape utf8 if flag is true
 extern FXAPI FXString escape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXbool flag=false);
 
 /// Unescape special characters, and optionally remove left and right quotes
@@ -698,10 +706,10 @@ extern FXAPI FXString unescape(const FXString& str,FXchar lquote=0,FXchar rquote
 extern FXAPI FXString normalize(const FXString& s);
 
 /// Return normalized decomposition of string
-extern FXAPI FXString decompose(const FXString& s,FXuint kind);
+extern FXAPI FXString decompose(const FXString& s,FXbool canonical=true);
 
 /// Return normalized composition of string; this first performs normalized decomposition
-extern FXAPI FXString compose(const FXString& s,FXuint kind);
+extern FXAPI FXString compose(const FXString& s,FXbool canonical=true);
 
 }
 

@@ -777,7 +777,7 @@ FXdouble Calculator::getDisplayValue() const {
   if(base==10)
     val=getDisplayText().toDouble();
   else
-    val=(FXdouble)getDisplayText().toInt(base);
+    val=(FXdouble)getDisplayText().toLong(base);
   return val;
   }
 
@@ -803,7 +803,7 @@ void Calculator::setDisplayValue(FXdouble val){
     setDisplayText(string.fromDouble(val,precision,exponent));
     }
   else{
-    setDisplayText(string.fromUInt((FXuint)floor(val),base));
+    setDisplayText(string.fromLong((FXlong)floor(val),base));
     }
   }
 
@@ -985,19 +985,19 @@ void Calculator::unary(FXuchar op){
   acc=0.0;
   switch(op){
     case UN_NOT:
-      acc=(FXdouble) (~((FXuint)floor(val)));
+      acc=(FXdouble) (~((FXlong)floor(val)));
       break;
     case UN_NEG:
       acc=-val;
       break;
     case UN_SHL:
-      acc=(FXdouble) (((FXuint)floor(val))<<1);
+      acc=(FXdouble) (((FXulong)floor(val))<<1);
       break;
     case UN_SHR:
-      acc=(FXdouble) (((FXuint)floor(val))>>1);
+      acc=(FXdouble) (((FXulong)floor(val))>>1);
       break;
     case UN_SAR:
-      acc=(FXdouble) ((((FXuint)floor(val))>>1) | (((FXuint)floor(val))&0x80000000));
+      acc=(FXdouble) (((FXlong)floor(val))>>1);
       break;
     case UN_RECIP:
       acc=1.0/val;
@@ -1082,13 +1082,13 @@ void Calculator::dyop(FXuchar op){
   acc=getnum();
   switch(op){
     case DY_OR:
-      acc=(FXdouble) (((FXuint)floor(acc)) | ((FXuint)floor(val)));
+      acc=(FXdouble) (((FXulong)floor(acc)) | ((FXulong)floor(val)));
       break;
     case DY_XOR:
-      acc=(FXdouble) (((FXuint)floor(acc)) ^ ((FXuint)floor(val)));
+      acc=(FXdouble) (((FXulong)floor(acc)) ^ ((FXulong)floor(val)));
       break;
     case DY_AND:
-      acc=(FXdouble) (((FXuint)floor(acc)) & ((FXuint)floor(val)));
+      acc=(FXdouble) (((FXulong)floor(acc)) & ((FXulong)floor(val)));
       break;
     case DY_SUB:
       acc=acc-val;

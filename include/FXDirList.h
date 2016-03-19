@@ -224,15 +224,6 @@ public:
   /// Scan the directories and update the items if needed, or if force is true
   void scan(FXbool force=true);
 
-  /// Return true if item is a directory
-  FXbool isItemDirectory(const FXTreeItem* item) const;
-
-  /// Return true if item is a file
-  FXbool isItemFile(const FXTreeItem* item) const;
-
-  /// Return true if item is executable
-  FXbool isItemExecutable(const FXTreeItem* item) const;
-
   /// Collapse tree
   virtual FXbool collapseTree(FXTreeItem* tree,FXbool notify=false);
 
@@ -256,6 +247,27 @@ public:
 
   /// Return the item from the absolute pathname
   FXTreeItem* getPathnameItem(const FXString& path);
+
+  /// Return true if item is a file
+  FXbool isItemFile(const FXTreeItem* item) const;
+
+  /// Return true if item is a directory
+  FXbool isItemDirectory(const FXTreeItem* item) const;
+
+  /// Return true if item is executable
+  FXbool isItemExecutable(const FXTreeItem* item) const;
+
+  /// Return true if this is a symbolic link item
+  FXbool isItemSymlink(const FXTreeItem* item) const;
+
+  /// Return file association of item
+  FXFileAssoc* getItemAssoc(const FXTreeItem* item) const;
+
+  /// Return the file size for this item
+  FXlong getItemSize(const FXTreeItem* item) const;
+
+  /// Return the date for this item, in nanoseconds
+  FXTime getItemDate(const FXTreeItem* item) const;
 
   /// Change wildcard matching pattern
   void setPattern(const FXString& ptrn);

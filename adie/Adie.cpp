@@ -118,14 +118,14 @@ void Adie::init(int& argc,char** argv,FXbool connect){
   // After init, the registry has been loaded
   FXApp::init(argc,argv,connect);
 
-  // Get icon path
-  iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconDict::defaultIconPath);
-
-  // Now we know the icon search path
-  associations->setIconPath(iconpath);
-
   // Exec path is default for syntax path
   execpath=FXSystem::getExecPath();
+
+  // Get icon search path
+  iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconDict::defaultIconPath);
+  
+  // Change icon search path
+  associations->setIconPath(iconpath);
 
   // Get syntax path
   syntaxpath=reg().readStringEntry("SETTINGS","syntaxpath",execpath.text());
@@ -179,9 +179,6 @@ FXSyntax* Adie::getSyntaxForContents(const FXString& contents) const {
 
 // Exit application
 void Adie::exit(FXint code){
-
-  // Save icon paths
-  reg().writeStringEntry("SETTINGS","iconpath",associations->getIconPath().text());
 
   // Save syntax paths
   reg().writeStringEntry("SETTINGS","syntaxpath",syntaxpath.text());

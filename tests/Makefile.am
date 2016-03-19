@@ -7,6 +7,7 @@ SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 
 noinst_PROGRAMS	= \
+unicode \
 scan \
 format \
 console \
@@ -86,6 +87,7 @@ button_SOURCES		= button.cpp
 codecs_SOURCES		= codecs.cpp
 dctest_SOURCES		= dctest.cpp dippy.h
 half_SOURCES		= half.cpp
+unicode_SOURCES		= unicode.cpp
 
 
 

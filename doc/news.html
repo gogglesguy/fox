@@ -14,6 +14,41 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <p>
 <!--- TOPIC TITLE WITH LOGO --->
 
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 9 - FOX DEVELOPMENT 1.7.29
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li><b>Updated to Unicode 6.0 tables</b>!  This is a massive change! Added Arabic Joing groups table.</li>
+<li><b>We now have a FOX <a href='https://forum.fox-toolkit.org' target=_top>Forum</b></a>!
+Register and log in to post articles and converse with other FOX Users!</li>
+<li>Added flag to FXString's shouldEscape() and escape().  If set, escape utf8 strings, otherwise only escape control characters.</li>
+<li>FXStatusLine bug fix: order is (1) text from help source (widget under the cursor), (2) text from GUI update
+callback to its target, (3) fallback text value supplied by setNormalText().</li>
+<li>Fleshed out some missing API's in FXDirList, FXFileList.</li>
+<li>Small problem in SSE2 in FXMat4f fixed.</li>
+<li>File bindings setup panel in PathFinder added.</li>
+<li>FXWindow::forceRefresh() now non-recursive (faster, stack-friendly).</li>
+<li>Meaningful stuff displayed on status line in PathFinder.</li>
+<li>FXString typo fixed.</li>
+<li>Don't assume filename order is stable when listing directory contents (FXFileList, FXDirList).</li>
+<li>Suspect float to double promotions fixed (thanks to CLang++/LLVM compiler!).</li>
+<li>Fixed problem in FXFileList and FXDirList with dead symlinks.</li>
+<li>Signed byte type added (FXschar).</li>
+<li>Updated Python syntax coloring for Adie. Also added JavaScript syntax coloring.</li>
+<li>First-time use of FOX ControlPanel didn't work properly; fixed this problem.</li>
+<li>Updated and clarified doc-comments in FXThread.</li>
+<li>Removed operator FXbool from FXComplexd and FXComplexf.</li>
+<li>Fixed typo in FXComplexf and FXComplexd.</li>
+<li>Added byte-swap built-ins for Microsoft C++ compiler.</li>
+<li>Updated Doxygen scripts for reference documentation generation from header files.</li>
+<li>Fix small bug in FXThreadPool.</li>
+</ul>
+
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>

@@ -77,7 +77,7 @@ ICONS += unmaphost.bmp
 ICONS += work.gif
 ICONS += foxbig.gif
 ICONS += foxmini.gif
-ICONS += mimetype.gif
+ICONS += miscellaneous_gif.gif
 ICONS += setdir.gif
 
 .cpp.obj: .AUTODEPEND

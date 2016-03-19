@@ -475,7 +475,7 @@ long FXFontSelector::onCmdSize(FXObject*,FXSelector,void* ptr){
 
 // User clicked up directory button
 long FXFontSelector::onCmdSizeText(FXObject*,FXSelector,void*){
-  selected.size=(FXuint)(10.0*size->getText().toFloat());
+  selected.size=(FXuint)(10.0*size->getText().toDouble());
   if(selected.size<60) selected.size=60;
   if(selected.size>2400) selected.size=2400;
   previewFont();

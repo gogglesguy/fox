@@ -903,7 +903,7 @@ flg:  switch(ch){
             value=(FXlong)(FXshort)va_arg(ag,FXint);
             }
           else if(modifier==ARG_HALFHALF){              // 8-bit always
-            value=(FXlong)(signed char)va_arg(ag,FXint);
+            value=(FXlong)(FXschar)va_arg(ag,FXint);
             }
           else{                                         // Whatever size a pointer is
             value=(FXlong)va_arg(ag,FXival);

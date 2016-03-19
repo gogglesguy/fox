@@ -26,9 +26,11 @@ namespace FX {
 
 /**
 * Automatically generated thread-local storage key.
+*
 * This class manages a thread-local storage key, generating
 * a new one when constructed, and deleting the storage key when
-* destroyed.
+* destroyed; FXAutoThreadStorageKey is typically used to declare
+* global variables to be used as thread-local storage keys.
 * These keys can be used just like FXThreadStorageKey itself by
 * virtue of the conversion operator.  Note that no assignment
 * or copy-constructors have been defined; thus each instance of

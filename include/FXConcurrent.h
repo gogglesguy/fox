@@ -91,7 +91,35 @@ typedef FXPtrListOf<FXWorkQueue> FXWorkQueues;
 
 
 /**
-* Execute concurrent tasks.
+* FXConcurrent provides a convenient facility to perform data-parallel tasks.
+*
+* FXConcurrent allows multiple threads to work on a single task.  Each thread
+* performs the same function, on a different piece of data.  Thus, on multi-
+* processor systems a large computation can be performed in parallel, and take
+* less time than on a single processor.
+* FXConcurrent is started by calling its start() API, passing the number of threads
+* to start and the size of the work-queue for each thread (default is 32).
+* To minimize needless context-switching, it is usually best to start no more threads
+* than there are processors in the system (you can use FXThread::processors() to find 
+* out how many processors are in your system).
+* Parallel tasks are started by calling execute(), passing the task to be performed
+* and the arguments (data) to perform the task on.  A total of argc tasks is started,
+* each task is allocated on its own thread, the first one on 0 (indx if given).
+* If there are more tasks than threads, some threads may have to perform multiple tasks
+* in sequence.  Thus, you can decompose the problem in a way that will scale to more
+* parallelism when moving to higher-end machines.
+* The argument to FXTask is either a simple integer (0,1,...argc-1) or a void pointer,
+* if argv is passed in the execute() API.
+* If a FXCompletion object is passed to the execute() API, the calling thread can
+* wait to determine when the parallel tasks are done, by calling the wait() API on
+* the completion object.  The wait() API will block until the last thread on the
+* task is done.
+* It is OK to pass the same FXCompletion object to multiple calls to execute(); the
+* FXCompletion object will be signalled when ALL tasks are done in that case.
+* FXConcurrent's run() API can be called by other threads; run() will return when
+* stop() is called.
+* Note that calling stop() does not mean that all threads in run() return immediately;
+* the tasks already queued up will be finished first.
 */
 class FXAPI FXConcurrent : public FXRunnable {
 private:

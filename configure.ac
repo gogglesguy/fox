@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [28])
+m4_define([fox_level], [29])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -112,8 +112,10 @@ AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r p
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
   CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow"
+#  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow -Wdouble-promotion -fvisibility=hidden"
   LDFLAGS="-rdynamic ${LDFLAGS}"
 fi
+
 
 # Debugging turned on
 AC_MSG_CHECKING(for debugging)
@@ -233,7 +235,7 @@ AC_ARG_WITH(xft,[  --with-xft              enable Xft support])
 AC_MSG_RESULT([$with_xft])
 if test "x$with_xft" != "xno"; then
 XFTCFLAGS="-I/usr/include/freetype2"
-XFTLIBS="-lfreetype -lXft"
+XFTLIBS="-lXft -lfontconfig -lfreetype"
 saved_cppflags="${CXXFLAGS}"
 CXXFLAGS="${CXXFLAGS} -DHAVE_XFT_H=1 $XFTCFLAGS"
 X_BASE_LIBS="${X_BASE_LIBS} $XFTLIBS"

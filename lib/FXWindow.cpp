@@ -2090,10 +2090,20 @@ void FXWindow::recalc(){
 
 // Force GUI refresh of this window and all of its children
 void FXWindow::forceRefresh(){
-  register FXWindow *child;
-  handle(this,FXSEL(SEL_UPDATE,0),NULL);
-  for(child=first; child; child=child->next){
-    child->forceRefresh();
+  register FXWindow *child=this;
+  while(1){
+    handle(this,FXSEL(SEL_UPDATE,0),NULL);
+    if(child->getFirst()){
+      child=child->getFirst();
+      continue;
+      }
+nxt:if(child==this) break;
+    if(child->getNext()){
+      child=child->getNext();
+      continue;
+      }
+    child=child->getParent();
+    goto nxt;
     }
   }
 

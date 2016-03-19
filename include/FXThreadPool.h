@@ -37,6 +37,7 @@ typedef FXPtrQueueOf<FXRunnable> FXJobQueue;
 
 /**
 * A Thread Pool manages execution of jobs on a number of worker threads.
+*
 * For compute-bound tasks, the amount of parallelism in a program is limited by the
 * number of physical processors available; however for I/O-bound tasks, it makes sense
 * to create more threads than the number of physical processors, in order to more fully
@@ -45,7 +46,7 @@ typedef FXPtrQueueOf<FXRunnable> FXJobQueue;
 * available thread out of a fixed pool of worker threads.
 * Fluctuations in work-load can be accomodated by creating a few extra worker threads
 * during peak loads, while terminating superfluous worker threads during periods of
-* low activity, thus minimizing resources.
+* low activity, minimizing system resources.
 * In order to prevent falling behind on incoming jobs, the calling thread can be made
 * to block scheduling the next job until a worker thread becomes available to handle
 * it.

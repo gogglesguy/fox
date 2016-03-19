@@ -322,11 +322,11 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__prefetch|constructElms|destructElms|copyElms|moveElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms)\>"
+    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__prefetchw|__prefetch|constructElms|destructElms|copyElms|moveElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms)\>"
   end
 
   rule "FOXType"
-    pattern     "\<(FXuchar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXColor|FXPixel|FXTime|FXID)\>"
+    pattern     "\<(FXuchar|FXschar,FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXColor|FXPixel|FXTime|FXID)\>"
   end
 
   rule "Keyword"
@@ -638,33 +638,109 @@ end
 # Python
 language "Python"
   filesmatch "*.py"
+  
+  # Numbers
   rule "Number"
     pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|l|UL|ul|u|U|F|f)?\>"
   end
+
+  # Quoted string (')
   rule "String"
-    openpattern    "([^\"{2}]\"[^\"{2}])|([^'{2}]'[^\"{2}])"
-    closepattern   "([^\"{2}]\"[^\"{2}])|([^\"{2}]'[^\"{2}])"
-    rule "CharEscape"
-      pattern     "\\."
+    openpattern    "'(?!'')"
+    closepattern   "'(?!'')"
+    rule "ControlEscape"
+      pattern     "\\(\\|'|\"|a|b|f|n|r|t|v)"
+    end
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "Unicode"
+      pattern     "(\\u\h{4}|\\U\h{8})"
     end
   end
-  rule "TripleString"
-    openpattern    "(\"{3})|('{3})"
-    closepattern   "(\"{3})|('{3})"
-    rule "CharEscape"
-      pattern     "\\."
+
+  # Quoted string (")
+  rule "String"
+    openpattern    "\"(?!\"\")"
+    closepattern   "\"(?!\"\")"
+    rule "ControlEscape"
+      pattern     "\\(\\|'|\"|a|b|f|n|r|t|v)"
+    end
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "Unicode"
+      pattern     "(\\u\h{4}|\\U\h{8})"
     end
   end
+  
+  # Triple quoted string (')
+  rule "String"
+    openpattern    "'''"
+    closepattern   "'''"
+    rule "ControlEscape"
+      pattern     "\\(\\|'|\"|a|b|f|n|r|t|v)"
+    end
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "Unicode"
+      pattern     "(\\u\h{4}|\\U\h{8})"
+    end
+  end
+
+  # Triple quoted string (")
+  rule "String"
+    openpattern    "\"\"\""
+    closepattern   "\"\"\""
+    rule "ControlEscape"
+      pattern     "\\(\\|'|\"|a|b|f|n|r|t|v)"
+    end
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "Unicode"
+      pattern     "(\\u\h{4}|\\U\h{8})"
+    end
+  end
+  
   rule "Comment"
     pattern    "#.*?$"
   end
+  
   rule "Operator"
-    pattern     "\+\+|\+=|\+|--|-=|-|==|=|&&|&=|&|=|^=|^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!=|!|~=|~|\*=|\*|/=|/|%=|%"
+    pattern     "\+\+|\+=|\+|--|-=|-|==|=|&&|&=|&|=|^=|^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!=|!|~=|~|\*=|\*|/=|/|%=|%|:"
   end
+  
+  rule "Braces"
+    pattern     "(\{|\})"
+  end
+  
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+  
+  rule "Brackets"
+    pattern     "(\[|\])"
+  end
+  
   rule "Keyword"
-    pattern     "\<(def|import|for|in|while|if|elif|else|try|class|return|break|continue|raise|and|or|not|print|pass|access|global|from|except|exec|is|finally|lambda)\>"
+    pattern     "\<(and|del|from|not|while|as|elif|global|or|with|assert|else|if|pass|yield|break|except|import|print|class|exec|in|raise|continue|finally|is|return|def|for|lambda|try)\>"
   end
 end
+
 
 # Ruby
 language "Ruby"
@@ -1331,6 +1407,86 @@ language "Matlab"
     pattern     "(\+|-|\.\*|\.\/|\.\\|:|\.\^|\.'|\'|\*|\/|\\|\^|==|=|<=|<|>=|>|~=)"
   end
 
+end
+
+# JavaScript
+language "JavaScript"
+
+  # File patterns for this language mode
+  filesmatch "*.js"
+
+  # Word delimiters
+  delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+
+  # C style comment
+  rule "MultiLineComment"
+    openpattern   "/\*"
+    closepattern  "\*/"
+  end
+
+  # C++ style comment
+  rule "SingleLineComment"
+    openpattern   "//"
+    closepattern  "$"
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "ControlEscape"
+      pattern     "\\."
+    end
+    rule "UnicodeEscape"
+      pattern     "\\u\h\h\h\h"
+    end
+  end
+
+  # String
+  rule "String"
+    openpattern   "\'"
+    closepattern  "\'"
+    stoppattern   "$"
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+    end
+    rule "ControlEscape"
+      pattern     "\\."
+    end
+    rule "UnicodeEscape"
+      pattern     "\\u\h\h\h\h"
+    end
+  end
+
+  # Keywords
+  rule "Keyword"
+    pattern     "\<(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with|class|const|enum|export|extends|import|super|implements|interface|let|package|private|protected|public|static|yield)\>"
+  end
+
+  rule "Number"
+    pattern     "\<(((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)[ij]?\>"
+  end
+  rule "Braces"
+    pattern     "(\{|\})"
+  end
+
+  rule "Parentheses"
+    pattern     "(\(|\))"
+  end
+
+  rule "Operator"
+    pattern     "(\[|\]|\.|;|,|<<=|<<|<=|<|>>>=|>>>|>>=|>>|>=|>|===|==|=|!==|!=|!|\+\+|\+=|\+|--|-=|-|%=|%|\*=|\*|\^=|\^|~=|~|&&|&=|&|\|\||\|=|\||:|/=|/|\?)"
+  end
 end
 
 

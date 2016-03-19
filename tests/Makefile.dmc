@@ -61,7 +61,8 @@ PROGRAMS  = \
 	dctest.exe \
 	wizard.exe \
 	imageviewer.exe \
-	half.exe
+	half.exe \
+	unicode.exe
 
 # on the following 2 programs compilation abort in the windows header files
 #	glviewer.exe \
@@ -162,6 +163,9 @@ dctest.exe: $(FOXLIB) dctest.obj
 
 half.exe: $(FOXLIB) half.obj
 	$(LD) $(LDFLAGS) half.obj,,,$(FOXLIB) $(LIBS)
+
+unicode.exe: $(FOXLIB) unicode.obj
+	$(LD) $(LDFLAGS) unicode.obj,,,$(FOXLIB) $(LIBS)
 
 clean:
 	del *.obj

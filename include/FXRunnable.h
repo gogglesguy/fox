@@ -28,6 +28,8 @@ namespace FX {
 /**
 * FXRunnable represents a generic runnable thing.  It serves primarily
 * as a base class for FXThread and jobs in FXThreadPool.
+* FXRunnable must be subclassed to reimplement an overloaded run() function,
+* which is typically invoked by some thread.
 */
 class FXAPI FXRunnable {
 private:
@@ -38,7 +40,7 @@ public:
   /// Construct a runnable
   FXRunnable(){}
 
-  /// Subclasses of FXRunnable overload this function to perform actual work
+  /// Subclasses should overload this function to perform actual work
   virtual FXint run() = 0;
 
   /// Destroy a runnable

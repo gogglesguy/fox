@@ -28,6 +28,13 @@ namespace FX {
 /**
 * A semaphore allows for protection of a resource that can
 * be accessed by a fixed number of simultaneous threads.
+*
+* A typical example of the use of semaphores is for a buffer containing N items.  
+* A producer thread may freely append N items before blocking for space to become
+* available; a consumer thread can remove items and block only when no items are
+* left.  Thus, two counting semaphores could be used to manage such a buffer, one 
+* counting empty slots and one counting filled slots.  As long as production and
+* consumption proceed at comparable rates, no thread needs to be suspended.
 */
 class FXAPI FXSemaphore {
 private:

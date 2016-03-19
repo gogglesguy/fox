@@ -48,6 +48,11 @@ FXbool FXStat::isHidden() const {
   return (modeFlags&FXIO::Hidden)!=0;
   }
 
+// Return true if input path is a directory
+FXbool FXStat::isDirectory() const {
+  return (modeFlags&FXIO::Directory)!=0;
+  }
+
 // Return true if it is a regular file
 FXbool FXStat::isFile() const {
   return (modeFlags&FXIO::File)!=0;
@@ -56,6 +61,21 @@ FXbool FXStat::isFile() const {
 // Return true if it is a link
 FXbool FXStat::isLink() const {
   return (modeFlags&FXIO::SymLink)!=0;
+  }
+
+// Return true if the file sets the user id on execution
+FXbool FXStat::isSetUid() const {
+  return (modeFlags&FXIO::SetUser)!=0;
+  }
+
+// Return true if the file sets the group id on execution
+FXbool FXStat::isSetGid() const {
+  return (modeFlags&FXIO::SetGroup)!=0;
+  }
+
+// Return true if the file has the sticky bit set
+FXbool FXStat::isSetSticky() const {
+  return (modeFlags&FXIO::Sticky)!=0;
   }
 
 // Return true if character device
@@ -76,11 +96,6 @@ FXbool FXStat::isSocket() const {
 // Return true if fifo device
 FXbool FXStat::isFifo() const {
   return (modeFlags&FXIO::Fifo)!=0;
-  }
-
-// Return true if input path is a directory
-FXbool FXStat::isDirectory() const {
-  return (modeFlags&FXIO::Directory)!=0;
   }
 
 // Return true if file is readable
@@ -156,21 +171,6 @@ FXbool FXStat::isOtherWritable() const {
 // Return true if others have execute permissions
 FXbool FXStat::isOtherExecutable() const {
   return (modeFlags&FXIO::OtherExec)!=0;
-  }
-
-// Return true if the file sets the user id on execution
-FXbool FXStat::isSetUid() const {
-  return (modeFlags&FXIO::SetUser)!=0;
-  }
-
-// Return true if the file sets the group id on execution
-FXbool FXStat::isSetGid() const {
-  return (modeFlags&FXIO::SetGroup)!=0;
-  }
-
-// Return true if the file has the sticky bit set
-FXbool FXStat::isSetSticky() const {
-  return (modeFlags&FXIO::Sticky)!=0;
   }
 
 

@@ -1224,7 +1224,7 @@ FXVec3f FXGLViewer::spherePoint(FXint px,FXint py){
   v.x=2.0f*(px-0.5f*wvt.w)/screenmin;
   v.y=2.0f*(0.5f*wvt.h-py)/screenmin;
   d=v.x*v.x+v.y*v.y;
-  if(d<0.75){
+  if(d<0.75f){
     v.z=sqrtf(1.0-d);
     }
   else if(d<3.0f){
