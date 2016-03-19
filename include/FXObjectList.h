@@ -3,7 +3,7 @@
 *                            O b j e c t   L i s t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXObjectList.h,v 1.31 2006/02/07 01:17:26 fox Exp $                      *
+* $Id: FXObjectList.h,v 1.35 2007/02/07 20:21:57 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXOBJECTLIST_H
 #define FXOBJECTLIST_H
@@ -40,10 +40,13 @@ public:
   FXObjectList();
 
   /// Copy constructor
-  FXObjectList(const FXObjectList& orig);
+  FXObjectList(const FXObjectList& src);
 
   /// Construct and init with single object
   FXObjectList(FXObject* object);
+
+  /// Construct and init with n copies of object
+  FXObjectList(FXObject* objects,FXint n);
 
   /// Construct and init with list of objects
   FXObjectList(FXObject** objects,FXint n);
@@ -55,7 +58,7 @@ public:
   FXint no() const { return *((FXint*)(ptr-1)); }
 
   /// Set number of objects
-  void no(FXint num);
+  FXbool no(FXint num);
 
   /// Indexing operator
   FXObject*& operator[](FXint i){ return ptr[i]; }
@@ -68,8 +71,14 @@ public:
   /// Access to content array
   FXObject** data() const { return ptr; }
 
-  /// Assign object p to list
+  /// Adopt objects from orig, leaving orig empty
+  FXObjectList& adopt(FXObjectList& orig);
+
+  /// Assign object to list
   FXObjectList& assign(FXObject* object);
+
+  /// Assign n copies of object to list
+  FXObjectList& assign(FXObject* object,FXint n);
 
   /// Assign n objects to list
   FXObjectList& assign(FXObject** objects,FXint n);
@@ -80,6 +89,9 @@ public:
   /// Insert object at certain position
   FXObjectList& insert(FXint pos,FXObject* object);
 
+  /// Insert n copies of object at specified position
+  FXObjectList& insert(FXint pos,FXObject* object,FXint n);
+
   /// Insert n objects at specified position
   FXObjectList& insert(FXint pos,FXObject** objects,FXint n);
 
@@ -89,6 +101,9 @@ public:
   /// Prepend object
   FXObjectList& prepend(FXObject* object);
 
+  /// Prepend n copies of object
+  FXObjectList& prepend(FXObject* object,FXint n);
+
   /// Prepend n objects
   FXObjectList& prepend(FXObject** objects,FXint n);
 
@@ -97,6 +112,9 @@ public:
 
   /// Append object
   FXObjectList& append(FXObject* object);
+
+  /// Append n copies of object
+  FXObjectList& append(FXObject* object,FXint n);
 
   /// Append n objects
   FXObjectList& append(FXObject** objects,FXint n);
@@ -109,6 +127,9 @@ public:
 
   /// Replaces the m objects at pos with n objects
   FXObjectList& replace(FXint pos,FXint m,FXObject** objects,FXint n);
+
+  /// Replaces the m objects at pos with n copies of object
+  FXObjectList& replace(FXint pos,FXint m,FXObject* object,FXint n);
 
   /// Replace the m objects at pos with objects
   FXObjectList& replace(FXint pos,FXint m,FXObjectList& objects);
@@ -144,7 +165,7 @@ public:
 
 /// Specialize list to pointers to TYPE
 template<class TYPE>
-class FXAPI FXObjectListOf : public FXObjectList {
+class FXObjectListOf : public FXObjectList {
 public:
   FXObjectListOf(){}
 

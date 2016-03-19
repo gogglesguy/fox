@@ -3,7 +3,7 @@
 *                       R e a l S l i d e r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRealSlider.cpp,v 1.21 2006/03/31 07:33:11 fox Exp $                    *
+* $Id: FXRealSlider.cpp,v 1.28 2007/02/07 20:22:14 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,10 +43,6 @@
 /*
   Notes:
   - Maybe add bindings for arrow keys for value changes.
-  - Bug: slider head can only assume discrete pixel positions,
-    and thus odd-ball floating point numbers result.  Would be
-    nice if the head movements would result in "nice" numbers,
-    with a subdivision smaller than a whole pixel.
   - Yes, this *does* have a lot in common with FXSlider and its
     probably a good idea to give FXRealSlider and FXSlider a common
     base class at some point.
@@ -83,8 +79,10 @@ FXDEFMAP(FXRealSlider) FXRealSliderMap[]={
   FXMAPFUNC(SEL_TIMEOUT,FXRealSlider::ID_AUTOSLIDE,FXRealSlider::onAutoSlide),
   FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_SETVALUE,FXRealSlider::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_SETINTVALUE,FXRealSlider::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_SETREALVALUE,FXRealSlider::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_GETINTVALUE,FXRealSlider::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_SETLONGVALUE,FXRealSlider::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_GETLONGVALUE,FXRealSlider::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_SETREALVALUE,FXRealSlider::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_GETREALVALUE,FXRealSlider::onCmdGetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_SETINTRANGE,FXRealSlider::onCmdSetIntRange),
   FXMAPFUNC(SEL_COMMAND,FXRealSlider::ID_GETINTRANGE,FXRealSlider::onCmdGetIntRange),
@@ -101,10 +99,24 @@ FXDEFMAP(FXRealSlider) FXRealSliderMap[]={
 FXIMPLEMENT(FXRealSlider,FXFrame,FXRealSliderMap,ARRAYNUMBER(FXRealSliderMap))
 
 
+#if defined(WIN32) || defined(__sgi) || defined(__sun) || defined(__alpha)
+static double round(double x){ return (x >= 0) ? floor(x+0.5) : ceil(x-0.5); }
+#endif
+
+
 // Make a slider
 FXRealSlider::FXRealSlider(){
   flags|=FLAG_ENABLED;
+  range[0]=0.0;
+  range[1]=0.0;
+  pos=0.0;
+  incr=0.01;
+  gran=0.0;
+  delta=0.0;
   headpos=0;
+  headsize=0;
+  slotsize=0;
+  slotColor=0;
   dragpoint=0;
   }
 
@@ -124,6 +136,7 @@ FXRealSlider::FXRealSlider(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint op
   range[1]=1.0;
   pos=0.5;
   incr=0.01;
+  gran=0.0;
   delta=0.0;
   headpos=0;
   dragpoint=0;
@@ -150,7 +163,7 @@ void FXRealSlider::disable(){
   }
 
 
-// Get default size
+// Get default width
 FXint FXRealSlider::getDefaultWidth(){
   FXint w;
   if(options&REALSLIDER_VERTICAL){
@@ -167,6 +180,7 @@ FXint FXRealSlider::getDefaultWidth(){
   }
 
 
+// Get default height
 FXint FXRealSlider::getDefaultHeight(){
   FXint h;
   if(options&REALSLIDER_VERTICAL){
@@ -184,7 +198,7 @@ FXint FXRealSlider::getDefaultHeight(){
 
 
 // Returns true because a slider can receive focus
-bool FXRealSlider::canFocus() const { return true; }
+FXbool FXRealSlider::canFocus() const { return true; }
 
 
 // Layout changed; even though the position is still
@@ -259,16 +273,30 @@ long FXRealSlider::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Update value from a message
-long FXRealSlider::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
-  setValue(*((FXdouble*)ptr));
+// Obtain value from text field
+long FXRealSlider::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
+  *((FXint*)ptr)=(FXint)getValue();
   return 1;
   }
 
 
-// Obtain value from text field
-long FXRealSlider::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr)=(FXint)getValue();
+// Update value from a message
+long FXRealSlider::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXdouble)*((FXlong*)ptr));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FXRealSlider::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=(FXlong)getValue();
+  return 1;
+  }
+
+
+// Update value from a message
+long FXRealSlider::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
+  setValue(*((FXdouble*)ptr));
   return 1;
   }
 
@@ -324,11 +352,11 @@ long FXRealSlider::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     if(options&REALSLIDER_VERTICAL){
       if(event->win_y<headpos){
         getApp()->addTimeout(this,ID_AUTOSLIDE,getApp()->getScrollDelay(),(void*)(FXival)1);
-        p=pos+incr;
+        p+=incr;
         }
       else if(event->win_y>(headpos+headsize)){
         getApp()->addTimeout(this,ID_AUTOSLIDE,getApp()->getScrollDelay(),(void*)(FXival)-1);
-        p=pos-incr;
+        p-=incr;
         }
       else{
         dragpoint=event->win_y-headpos;
@@ -338,17 +366,18 @@ long FXRealSlider::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     else{
       if(event->win_x<headpos){
         getApp()->addTimeout(this,ID_AUTOSLIDE,getApp()->getScrollDelay(),(void*)(FXival)-1);
-        p=pos-incr;
+        p-=incr;
         }
       else if(event->win_x>(headpos+headsize)){
         getApp()->addTimeout(this,ID_AUTOSLIDE,getApp()->getScrollDelay(),(void*)(FXival)1);
-        p=pos+incr;
+        p+=incr;
         }
       else{
         dragpoint=event->win_x-headpos;
         flags|=FLAG_PRESSED;
         }
       }
+    if(0.0<gran) p=gran*round(p/gran);
     if(p<range[0]) p=range[0];
     if(p>range[1]) p=range[1];
     if(p!=pos){
@@ -423,6 +452,7 @@ long FXRealSlider::onMotion(FXObject*,FXSelector,void* ptr){
       else
         p=range[0];
       }
+    if(0.0<gran) p=gran*round(p/gran);
     if(p<range[0]) p=range[0];
     if(p>range[1]) p=range[1];
     if(pos!=p){
@@ -483,6 +513,7 @@ long FXRealSlider::onMiddleBtnPress(FXObject*,FXSelector,void* ptr){
       else
         p=range[0];
       }
+    if(0.0<gran) p=gran*round(p/gran);
     if(p<range[0]) p=range[0];
     if(p>range[1]) p=range[1];
     if(p!=pos){
@@ -554,11 +585,11 @@ long FXRealSlider::onKeyPress(FXObject*,FXSelector,void* ptr){
         break;
       case KEY_plus:
       case KEY_KP_Add:
-inc:    setValue(pos+incr);
+inc:    setValue(pos+incr,true);
         return 1;
       case KEY_minus:
       case KEY_KP_Subtract:
-dec:    setValue(pos-incr);
+dec:    setValue(pos-incr,true);
         return 1;
       }
     }
@@ -852,7 +883,7 @@ long FXRealSlider::onPaint(FXObject*,FXSelector,void* ptr){
 // Set slider range; this also revalidates the position,
 // and possibly moves the head [even if the position was still OK,
 // the head might still have to be moved to the exact position].
-void FXRealSlider::setRange(FXdouble lo,FXdouble hi,bool notify){
+void FXRealSlider::setRange(FXdouble lo,FXdouble hi,FXbool notify){
   if(lo>hi){ fxerror("%s::setRange: trying to set negative range.\n",getClassName()); }
   if(range[0]!=lo || range[1]!=hi){
     range[0]=lo;
@@ -867,7 +898,7 @@ void FXRealSlider::setRange(FXdouble lo,FXdouble hi,bool notify){
 // head positions may represent the same position!
 // Also, the minimal amount is repainted, as one sometimes as very
 // large/wide sliders.
-void FXRealSlider::setValue(FXdouble p,bool notify){
+void FXRealSlider::setValue(FXdouble p,FXbool notify){
   register FXdouble interval=range[1]-range[0];
   register FXint travel,lo,hi,h;
   if(p<range[0]) p=range[0];
@@ -937,9 +968,17 @@ void FXRealSlider::setSlotSize(FXint bs){
   }
 
 
-// Set increment
+// Set slider increment
 void FXRealSlider::setIncrement(FXdouble inc){
+  if(inc<=0.0){ fxerror("%s::setIncrement: negative or zero increment specified.\n",getClassName()); }
   incr=inc;
+  }
+
+
+// Change slider granularity
+void FXRealSlider::setGranularity(FXdouble gr){
+  if(gr<0.0){ fxerror("%s::setGranularity: negative granularity specified.\n",getClassName()); }
+  gran=gr;
   }
 
 
@@ -970,6 +1009,7 @@ void FXRealSlider::save(FXStream& store) const {
   store << range[0] << range[1];
   store << pos;
   store << incr;
+  store << gran;
   store << delta;
   store << slotColor;
   store << headsize;
@@ -985,6 +1025,7 @@ void FXRealSlider::load(FXStream& store){
   store >> range[0] >> range[1];
   store >> pos;
   store >> incr;
+  store >> gran;
   store >> delta;
   store >> slotColor;
   store >> headsize;

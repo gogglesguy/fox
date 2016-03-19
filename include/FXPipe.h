@@ -3,7 +3,7 @@
 *                             P i p e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPipe.h,v 1.7 2006/01/22 17:58:07 fox Exp $                             *
+* $Id: FXPipe.h,v 1.12 2007/02/07 20:21:57 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPIPE_H
 #define FXFILE_H
@@ -48,10 +48,10 @@ public:
   FXPipe(){ }
 
   /// Construct file and attach existing handle h
-  FXPipe(FXInputHandle handle,FXuint mode);
+  FXPipe(FXInputHandle h,FXuint m);
 
   /// Open device with access mode and handle
-  virtual bool open(FXInputHandle handle,FXuint mode);
+  virtual FXbool open(FXInputHandle h,FXuint m);
 
   /// Read block of bytes, returning number of bytes read
   virtual FXival readBlock(void* data,FXival count);
@@ -60,10 +60,10 @@ public:
   virtual FXival writeBlock(const void* data,FXival count);
 
   /// Close socket
-  virtual bool close();
+  virtual FXbool close();
 
   /// Create a named pipe
-  static bool create(const FXString& file,FXuint perm=FXIO::OwnerReadWrite|FXIO::GroupReadWrite|FXIO::OtherReadWrite);
+  static FXbool create(const FXString& file,FXuint perm=FXIO::AllReadWrite);
 
   /// Destroy
   virtual ~FXPipe();

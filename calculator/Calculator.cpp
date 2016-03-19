@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Calculator.cpp,v 1.60 2006/04/05 04:49:00 fox Exp $                      *
+* $Id: Calculator.cpp,v 1.64 2007/02/07 20:21:51 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -379,7 +379,7 @@ Calculator::Calculator(FXApp* a):FXMainWindow(a,"FOX Calculator",NULL,NULL,DECOR
   base=NUM_DEC;
   angles=ANG_RAD;
   precision=16;
-  exponent=MAYBE;
+  exponent=EXPONENT_IFNEEDED;
   beep=TRUE;
   parens=0;
   modifiers=0;
@@ -622,8 +622,8 @@ FXColor Calculator::getAngleColor() const {
 
 
 // Set display font
-void Calculator::setDisplayFont(FXFont* font){
-  display->setFont(font);
+void Calculator::setDisplayFont(FXFont* fnt){
+  display->setFont(fnt);
   }
 
 
@@ -659,13 +659,13 @@ void Calculator::readRegistry(){
   FXColor angmodeclr=getApp()->reg().readColorEntry("SETTINGS","anglemodecolor",FXRGB(203,203,203));
 
   // Number base
-  FXint numbase=getApp()->reg().readIntEntry("SETTINGS","base",NUM_DEC);
+  FXint nbase=getApp()->reg().readIntEntry("SETTINGS","base",NUM_DEC);
 
   // Angle type
-  FXint angmode=getApp()->reg().readIntEntry("SETTINGS","angles",ANG_RAD);
+  FXint amode=getApp()->reg().readIntEntry("SETTINGS","angles",ANG_RAD);
 
   // Exponent mode
-  FXbool expmode=(FXExponent)getApp()->reg().readIntEntry("SETTINGS","exponent",MAYBE);
+  FXint expmode=(FXExponent)getApp()->reg().readIntEntry("SETTINGS","exponent",EXPONENT_IFNEEDED);
 
   // Precision
   FXint prec=getApp()->reg().readIntEntry("SETTINGS","precision",10);
@@ -698,8 +698,8 @@ void Calculator::readRegistry(){
   setAngleColor(angmodeclr);
 
   // Number base
-  setBase(numbase);
-  setAngles(angmode);
+  setBase(nbase);
+  setAngles(amode);
   setPrecision(prec);
   setExponentMode(expmode);
   setBeep(noise);
@@ -856,7 +856,7 @@ void Calculator::setBase(FXint b){
 
 
 // Set exponent mode
-void Calculator::setExponentMode(FXbool expmode){
+void Calculator::setExponentMode(FXuchar expmode){
   exponent=expmode;
   setDisplayValue(getnum());
   modifiers=0;
@@ -1187,7 +1187,7 @@ void Calculator::rparen(){
 /*******************************************************************************/
 
 // Close the window and save registry
-bool Calculator::close(bool notify){
+FXbool Calculator::close(FXbool notify){
   writeRegistry();
   return FXMainWindow::close(notify);
   }
@@ -1268,18 +1268,18 @@ long Calculator::onCmdFont(FXObject*,FXSelector,void*){
 
 // Change exponential notation
 long Calculator::onCmdExponent(FXObject*,FXSelector sel,void* ptr){
-  if(FXSELID(sel)==ID_EXPONENT_ALWAYS && ptr) setExponentMode(TRUE);
-  else if(FXSELID(sel)==ID_EXPONENT_NEVER && ptr) setExponentMode(FALSE);
-  else setExponentMode(MAYBE);
+  if((FXSELID(sel)==ID_EXPONENT_ALWAYS) && ptr) setExponentMode(EXPONENT_ALWAYS);
+  else if((FXSELID(sel)==ID_EXPONENT_NEVER) && ptr) setExponentMode(EXPONENT_NEVER);
+  else setExponentMode(EXPONENT_IFNEEDED);
   return 1;
   }
 
 
 // Update exponential notation
 long Calculator::onUpdExponent(FXObject* sender,FXSelector sel,void*){
-  if(FXSELID(sel)==ID_EXPONENT_ALWAYS && exponent==TRUE)
+  if(FXSELID(sel)==ID_EXPONENT_ALWAYS && exponent==EXPONENT_ALWAYS)
     sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else if(FXSELID(sel)==ID_EXPONENT_NEVER && exponent==FALSE)
+  else if(FXSELID(sel)==ID_EXPONENT_NEVER && exponent==EXPONENT_NEVER)
     sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
   else
     sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);

@@ -9,6 +9,9 @@ EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README f
 
 bin_SCRIPTS = fox-config
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = fox.pc
+
 CLEANFILES = fox.tar.gz
 
 snapshot: dist-all

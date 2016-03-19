@@ -3,7 +3,7 @@
 *                         C o l o r W e l l   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorWell.h,v 1.36 2006/03/31 07:33:01 fox Exp $                       *
+* $Id: FXColorWell.h,v 1.38 2007/02/07 20:21:52 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXCOLORWELL_H
 #define FXCOLORWELL_H
@@ -125,7 +125,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Returns true because a color well can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Move the focus to this window
   virtual void setFocus();
@@ -134,7 +134,7 @@ public:
   virtual void killFocus();
 
   /// Set color
-  void setRGBA(FXColor clr,bool notify=false);
+  void setRGBA(FXColor clr,FXbool notify=false);
 
   /// Get color
   FXColor getRGBA() const { return rgba; }
@@ -152,10 +152,10 @@ public:
   const FXString& getTipText() const { return tip; }
 
   /// Return true if only opaque colors allowed
-  bool isOpaqueOnly() const;
+  FXbool isOpaqueOnly() const;
 
   /// Change opaque only mode
-  void setOpaqueOnly(bool opaque);
+  void setOpaqueOnly(FXbool opaque);
 
   /// Save color well to a stream
   virtual void save(FXStream& store) const;

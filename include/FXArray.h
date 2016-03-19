@@ -3,7 +3,7 @@
 *                          G e n e r i c   A r r a y                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXArray.h,v 1.24 2006/01/22 17:57:58 fox Exp $                           *
+* $Id: FXArray.h,v 1.29 2007/02/07 20:21:52 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXARRAY_H
 #define FXARRAY_H
@@ -67,7 +67,7 @@ public:
   FXint no() const { return num; }
 
   /// Change number of elements to n
-  bool no(FXint n){
+  FXbool no(FXint n){
     if(n!=num){
       if(n<num){
         destructElms(ptr+n,num-n);
@@ -127,8 +127,7 @@ public:
 
   /// Assign n objects to list
   FXArray<TYPE>& assign(const FXArray<TYPE>& src){
-    if(no(src.num)){ copyElms(ptr,src.ptr,src.num); }
-    return *this;
+    return assign(src.ptr,src.num);
     }
 
   /// Insert an object
@@ -151,8 +150,7 @@ public:
 
   /// Insert n objects at specified position
   FXArray<TYPE>& insert(FXint pos,const FXArray<TYPE>& src){
-    if(no(num+src.num)){ moveElms(ptr+pos+src.num,ptr+pos,num-pos-src.num); copyElms(ptr+pos,src.ptr,src.num); }
-    return *this;
+    return insert(pos,src.ptr,src.num);
     }
 
   /// Prepend object
@@ -175,8 +173,7 @@ public:
 
   /// Prepend n objects
   FXArray<TYPE>& prepend(const FXArray<TYPE>& src){
-    if(no(num+src.num)){ moveElms(ptr+src.num,ptr,num-src.num); copyElms(ptr,src.ptr,src.num); }
-    return *this;
+    return prepend(src.ptr,src.num);
     }
 
   /// Append object
@@ -199,8 +196,46 @@ public:
 
   /// Append n objects
   FXArray<TYPE>& append(const FXArray<TYPE>& src){
-    if(no(num+src.num)){ copyElms(ptr+num-src.num,src.ptr,src.num); }
+    return append(src.ptr,src.num);
+    }
+
+  /// Replace an object
+  FXArray<TYPE>& replace(FXint pos,const TYPE& src){
+    ptr[pos]=src;
     return *this;
+    }
+
+  /// Replace the m objects at pos with n copies of src
+  FXArray<TYPE>& replace(FXint pos,FXint m,const TYPE& src,FXint n){
+    if(m<n){
+      if(!no(num-m+n)) return *this;
+      moveElms(ptr+pos+n,ptr+pos+m,num-pos-n);
+      }
+    else if(m>n){
+      moveElms(ptr+pos+n,ptr+pos+m,num-pos-m);
+      if(!no(num-m+n)) return *this;
+      }
+    fillElms(ptr+pos,src,n);
+    return *this;
+    }
+
+  /// Replace m objects at pos by n objects from src
+  FXArray<TYPE>& replace(FXint pos,FXint m,const TYPE* src,FXint n){
+    if(m<n){
+      if(!no(num-m+n)) return *this;
+      moveElms(ptr+pos+n,ptr+pos+m,num-pos-n);
+      }
+    else if(m>n){
+      moveElms(ptr+pos+n,ptr+pos+m,num-pos-m);
+      if(!no(num-m+n)) return *this;
+      }
+    copyElms(ptr+pos,src,n);
+    return *this;
+    }
+
+  /// Replace m objects at pos by objects from src
+  FXArray<TYPE>& replace(FXint pos,FXint m,const FXArray<TYPE>& src){
+    return replace(pos,m,src.ptr,src.num);
     }
 
   /// Remove object at pos

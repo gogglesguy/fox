@@ -3,7 +3,7 @@
 *                         C o l o r W e l l   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorWell.cpp,v 1.71 2006/04/04 04:28:06 fox Exp $                     *
+* $Id: FXColorWell.cpp,v 1.76 2007/03/01 18:16:34 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -153,7 +153,7 @@ void FXColorWell::detach(){
 
 
 // If window can have focus
-bool FXColorWell::canFocus() const { return true; }
+FXbool FXColorWell::canFocus() const { return true; }
 
 
 // Into focus chain
@@ -274,7 +274,7 @@ long FXColorWell::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
   if(FXFrame::onDNDMotion(sender,sel,ptr)) return 1;
 
   // No more messages while inside
-  setDragRectangle(0,0,width,height,FALSE);
+  setDragRectangle(0,0,width,height,false);
 
   // Is it a color being dropped?
   if(offeredDNDType(FROM_DRAGNDROP,colorType)){
@@ -293,7 +293,9 @@ long FXColorWell::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop drop
 long FXColorWell::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
-  FXuchar *data; FXuint len; FXColor color; 
+  FXuchar *pointer;
+  FXuint   length;
+  FXColor  color;
 
   // Enable updating
   flags|=FLAG_UPDATE;
@@ -302,22 +304,22 @@ long FXColorWell::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   if(FXFrame::onDNDDrop(sender,sel,ptr)) return 1;
 
   // Try and obtain the color first
-  if(getDNDData(FROM_DRAGNDROP,colorType,data,len)){
-    color=FXRGBA((((FXushort*)data)[0]+128)/257,(((FXushort*)data)[1]+128)/257,(((FXushort*)data)[2]+128)/257,(((FXushort*)data)[3]+128)/257);
-    freeElms(data);
-    setRGBA(color,TRUE);
+  if(getDNDData(FROM_DRAGNDROP,colorType,pointer,length)){
+    color=FXRGBA((((FXushort*)pointer)[0]+128)/257,(((FXushort*)pointer)[1]+128)/257,(((FXushort*)pointer)[2]+128)/257,(((FXushort*)pointer)[3]+128)/257);
+    freeElms(pointer);
+    setRGBA(color,true);
     return 1;
     }
 
   // Maybe its the name of a color
-  if(getDNDData(FROM_DRAGNDROP,textType,data,len)){
-    resizeElms(data,len+1); data[len]='\0';
-    color=fxcolorfromname((const FXchar*)data);
-    freeElms(data);
+  if(getDNDData(FROM_DRAGNDROP,textType,pointer,length)){
+    resizeElms(pointer,length+1); pointer[length]='\0';
+    color=fxcolorfromname((const FXchar*)pointer);
+    freeElms(pointer);
 
     // Accept the drop only if it was a valid color name
     if(color!=FXRGBA(0,0,0,0)){
-      setRGBA(color,TRUE);
+      setRGBA(color,true);
       return 1;
       }
     }
@@ -328,27 +330,29 @@ long FXColorWell::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
 // Service requested DND data
 long FXColorWell::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent *event=(FXEvent*)ptr; FXushort *clr; FXchar *str;
+  FXEvent *event=(FXEvent*)ptr;
 
   // Try handling it in base class first
   if(FXFrame::onDNDRequest(sender,sel,ptr)) return 1;
 
   // Requested as a color
   if(event->target==colorType){
-    allocElms(clr,4);
-    clr[0]=257*FXREDVAL(rgba);
-    clr[1]=257*FXGREENVAL(rgba);
-    clr[2]=257*FXBLUEVAL(rgba);
-    clr[3]=257*FXALPHAVAL(rgba);
-    setDNDData(FROM_DRAGNDROP,colorType,(FXuchar*)clr,sizeof(FXushort)*4);
+    FXushort *color;
+    allocElms(color,4);
+    color[0]=257*FXREDVAL(rgba);
+    color[1]=257*FXGREENVAL(rgba);
+    color[2]=257*FXBLUEVAL(rgba);
+    color[3]=257*FXALPHAVAL(rgba);
+    setDNDData(FROM_DRAGNDROP,colorType,(FXuchar*)color,sizeof(FXushort)*4);
     return 1;
     }
 
   // Requested as a color name
   if(event->target==textType){
-    callocElms(str,50);
-    fxnamefromcolor(str,rgba);
-    setDNDData(FROM_DRAGNDROP,textType,(FXuchar*)str,strlen(str));
+    FXchar *string;
+    callocElms(string,50);
+    fxnamefromcolor(string,rgba);
+    setDNDData(FROM_DRAGNDROP,textType,(FXuchar*)string,strlen(string));
     return 1;
     }
   return 0;
@@ -392,13 +396,13 @@ long FXColorWell::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Requested as a color name
   if(event->target==stringType || event->target==textType){
-    FXchar *data;
-    callocElms(data,50);
-    fxnamefromcolor(data,rgba);
+    FXchar *string;
+    callocElms(string,50);
+    fxnamefromcolor(string,rgba);
 #ifndef WIN32
-    setDNDData(FROM_SELECTION,event->target,(FXuchar*)data,strlen(data));
+    setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string));
 #else
-    setDNDData(FROM_SELECTION,event->target,(FXuchar*)data,strlen(data)+1);
+    setDNDData(FROM_SELECTION,event->target,(FXuchar*)string,strlen(string)+1);
 #endif
     return 1;
     }
@@ -408,34 +412,35 @@ long FXColorWell::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
 // Start a drag operation
 long FXColorWell::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
-  FXDragType types[2];
-  if(FXFrame::onBeginDrag(sender,sel,ptr)) return 1;
-  types[0]=colorType;
-  types[1]=textType;
-  beginDrag(types,2);
-  setDragCursor(getApp()->getDefaultCursor(DEF_SWATCH_CURSOR));
+  FXDragType types[2]={colorType,textType};
+  if(!FXFrame::onBeginDrag(sender,sel,ptr)){
+    beginDrag(types,2);
+    setDragCursor(getApp()->getDefaultCursor(DEF_SWATCH_CURSOR));
+    }
   return 1;
   }
 
 
 // End drag operation
 long FXColorWell::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXFrame::onEndDrag(sender,sel,ptr)) return 1;
-  endDrag(didAccept()==DRAG_COPY);
-  setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
+  if(!FXFrame::onEndDrag(sender,sel,ptr)){
+    endDrag(didAccept()==DRAG_COPY);
+    setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
+    }
   return 1;
   }
 
 
 // Dragged stuff around
 long FXColorWell::onDragged(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXFrame::onDragged(sender,sel,ptr)) return 1;
-  handleDrag(((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y,DRAG_COPY);
-  if(didAccept()==DRAG_COPY){
-    setDragCursor(getApp()->getDefaultCursor(DEF_SWATCH_CURSOR));
-    }
-  else{
-    setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+  if(!FXFrame::onDragged(sender,sel,ptr)){
+    handleDrag(((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y,DRAG_COPY);
+    if(didAccept()==DRAG_COPY){
+      setDragCursor(getApp()->getDefaultCursor(DEF_SWATCH_CURSOR));
+      }
+    else{
+      setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+      }
     }
   return 1;
   }
@@ -511,21 +516,23 @@ long FXColorWell::onMiddleBtnPress(FXObject*,FXSelector,void* ptr){
 
 // Released middle button causes paste of selection
 long FXColorWell::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
-  FXuchar *data; FXuint len; FXColor color; 
+  FXuchar *pointer;
+  FXuint   length;
+  FXColor  color;
   if(isEnabled()){
     ungrab();
     if(target && target->tryHandle(this,FXSEL(SEL_MIDDLEBUTTONRELEASE,message),ptr)) return 1;
-    if(getDNDData(FROM_SELECTION,colorType,data,len)){
-      color=FXRGBA((((FXushort*)data)[0]+128)/257,(((FXushort*)data)[1]+128)/257,(((FXushort*)data)[2]+128)/257,(((FXushort*)data)[3]+128)/257);
-      freeElms(data);
-      setRGBA(color,TRUE);
+    if(getDNDData(FROM_SELECTION,colorType,pointer,length)){
+      color=FXRGBA((((FXushort*)pointer)[0]+128)/257,(((FXushort*)pointer)[1]+128)/257,(((FXushort*)pointer)[2]+128)/257,(((FXushort*)pointer)[3]+128)/257);
+      freeElms(pointer);
+      setRGBA(color,true);
       return 1;
       }
-    if(getDNDData(FROM_SELECTION,stringType,data,len)){
-      resizeElms(data,len+1); data[len]='\0';
-      color=fxcolorfromname((const FXchar*)data);
-      freeElms(data);
-      setRGBA(color,TRUE);
+    if(getDNDData(FROM_SELECTION,stringType,pointer,length)){
+      resizeElms(pointer,length+1); pointer[length]='\0';
+      color=fxcolorfromname((const FXchar*)pointer);
+      freeElms(pointer);
+      setRGBA(color,true);
       return 1;
       }
     }
@@ -574,12 +581,9 @@ long FXColorWell::onKeyRelease(FXObject*,FXSelector,void* ptr){
 
 // Clicked in the well
 long FXColorWell::onClicked(FXObject*,FXSelector,void*){
-  FXDragType types[3];
+  FXDragType types[3]={stringType,colorType,textType};
   if(target && target->tryHandle(this,FXSEL(SEL_CLICKED,message),(void*)(FXuval)rgba)) return 1;
   if(!hasSelection()){
-    types[0]=stringType;
-    types[1]=colorType;
-    types[2]=textType;
     acquireSelection(types,3);
     }
   return 1;
@@ -602,7 +606,7 @@ long FXColorWell::onDoubleClicked(FXObject*,FXSelector,void*){
   colordialog.setRGBA(oldcolor);
   colordialog.setOpaqueOnly(isOpaqueOnly());
   if(!colordialog.execute()){
-    setRGBA(oldcolor,TRUE);
+    setRGBA(oldcolor,true);
     }
   return 1;
   }
@@ -613,7 +617,7 @@ long FXColorWell::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
   FXFrame::onUngrabbed(sender,sel,ptr);
   flags&=~(FLAG_TRYDRAG|FLAG_DODRAG);
   flags|=FLAG_UPDATE;
-  endDrag(FALSE);
+  endDrag(false);
   return 1;
   }
 
@@ -687,7 +691,7 @@ long FXColorWell::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 
 
 // Change RGBA color
-void FXColorWell::setRGBA(FXColor clr,bool notify){
+void FXColorWell::setRGBA(FXColor clr,FXbool notify){
   if(options&COLORWELL_OPAQUEONLY) clr|=FXRGBA(0,0,0,255);
   if(clr!=rgba){
     rgba=clr;
@@ -721,13 +725,13 @@ long FXColorWell::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
 
 
 // Return true if only opaque colors allowed
-bool FXColorWell::isOpaqueOnly() const {
+FXbool FXColorWell::isOpaqueOnly() const {
   return (options&COLORWELL_OPAQUEONLY)!=0;
   }
 
 
 // Change opaque only mode
-void FXColorWell::setOpaqueOnly(bool opaque){
+void FXColorWell::setOpaqueOnly(FXbool opaque){
   if(opaque){
     options|=COLORWELL_OPAQUEONLY;
     setRGBA(rgba);
@@ -786,7 +790,7 @@ FXColorWell::~FXColorWell(){
 //   se.xbutton.y_root=ev->root_y;
 //   se.xbutton.state=0;
 //   se.xbutton.button=2;
-//   se.xbutton.same_screen=TRUE;
+//   se.xbutton.same_screen=true;
 // fprintf(stderr,"SendEvent to window %d\n",se.xbutton.window);
 //   XSendEvent(getDisplay(),se.xbutton.window,True,NoEventMask,&se);
 //
@@ -804,7 +808,7 @@ FXColorWell::~FXColorWell(){
 //   se.xbutton.y_root=ev->root_y;
 //   se.xbutton.state=Button2Mask;
 //   se.xbutton.button=2;
-//   se.xbutton.same_screen=TRUE;
+//   se.xbutton.same_screen=true;
 // fprintf(stderr,"SendEvent to window %d\n",se.xbutton.window);
 //   XSendEvent(getDisplay(),se.xbutton.window,True,NoEventMask,&se);
 // }

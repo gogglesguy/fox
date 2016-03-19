@@ -3,7 +3,7 @@
 *                            D a t e   C l a s s                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDate.cpp,v 1.12 2006/03/29 06:48:05 fox Exp $                          *
+* $Id: FXDate.cpp,v 1.14 2007/02/07 20:22:05 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -114,7 +114,7 @@ void FXDate::getDate(FXint& y,FXint& m,FXint& d) const {
 
 
 // is value a leap year?
-bool FXDate::leapYear(FXint y){
+FXbool FXDate::leapYear(FXint y){
   return ((y%4==0) && (y%100!=0)) || (y%400==0);
   }
 
@@ -169,7 +169,7 @@ FXint FXDate::dayOfYear() const {
 
 
 // Return true if leap year
-bool FXDate::leapYear() const {
+FXbool FXDate::leapYear() const {
   FXint d,m,y;
   jul2greg(julian,y,m,d);
   return leapYear(y);

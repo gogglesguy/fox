@@ -3,7 +3,7 @@
 *                            L i s t   W i d g e t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXList.h,v 1.90 2006/04/02 22:37:17 fox Exp $                            *
+* $Id: FXList.h,v 1.98 2007/02/07 20:21:55 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXLIST_H
 #define FXLIST_H
@@ -62,7 +62,7 @@ private:
   FXListItem& operator=(const FXListItem&);
 protected:
   FXListItem():icon(NULL),data(NULL),state(0),x(0),y(0){}
-  virtual void draw(const FXList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h);
+  virtual void draw(const FXList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
   virtual FXint hitItem(const FXList* list,FXint x,FXint y) const;
 public:
   enum {
@@ -84,7 +84,7 @@ public:
   const FXString& getText() const { return label; }
 
   /// Change item's icon, deleting the old icon if it was owned
-  virtual void setIcon(FXIcon* icn,bool owned=false);
+  virtual void setIcon(FXIcon* icn,FXbool owned=false);
 
   /// Return item's icon
   FXIcon* getIcon() const { return icon; }
@@ -96,28 +96,28 @@ public:
   void* getData() const { return data; }
 
   /// Make item draw as focused
-  virtual void setFocus(bool focus);
+  virtual void setFocus(FXbool focus);
 
   /// Return true if item has focus
-  bool hasFocus() const { return (state&FOCUS)!=0; }
+  FXbool hasFocus() const { return (state&FOCUS)!=0; }
 
   /// Select item
-  virtual void setSelected(bool selected);
+  virtual void setSelected(FXbool selected);
 
   /// Return true if this item is selected
-  bool isSelected() const { return (state&SELECTED)!=0; }
+  FXbool isSelected() const { return (state&SELECTED)!=0; }
 
   /// Enable or disable item
-  virtual void setEnabled(bool enabled);
+  virtual void setEnabled(FXbool enabled);
 
   /// Return true if this item is enabled
-  bool isEnabled() const { return (state&DISABLED)==0; }
+  FXbool isEnabled() const { return (state&DISABLED)==0; }
 
   /// Make item draggable
-  virtual void setDraggable(bool draggable);
+  virtual void setDraggable(FXbool draggable);
 
   /// Return true if this item is draggable
-  bool isDraggable() const { return (state&DRAGGABLE)!=0; }
+  FXbool isDraggable() const { return (state&DRAGGABLE)!=0; }
 
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXList* list) const;
@@ -149,6 +149,11 @@ public:
 typedef FXint (*FXListSortFunc)(const FXListItem*,const FXListItem*);
 
 
+/// Explicit template specialization
+//extern template class FXAPI FXObjectListOf<FXListItem>;
+
+
+/// List of FXListItem's
 typedef FXObjectListOf<FXListItem> FXListItemList;
 
 
@@ -186,7 +191,7 @@ protected:
   FXint          grabx;             // Grab point x
   FXint          graby;             // Grab point y
   FXString       lookup;            // Lookup string
-  bool           state;             // State of item
+  FXbool         state;             // State of item
 protected:
   FXList();
   void recompute();
@@ -260,7 +265,7 @@ public:
   virtual void recalc();
 
   /// List widget can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Move the focus to this window
   virtual void setFocus();
@@ -281,46 +286,46 @@ public:
   FXListItem *getItem(FXint index) const;
 
   /// Replace the item with a [possibly subclassed] item
-  FXint setItem(FXint index,FXListItem* item,bool notify=false);
+  FXint setItem(FXint index,FXListItem* item,FXbool notify=false);
 
   /// Replace items text, icon, and user-data pointer
-  FXint setItem(FXint index,const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,bool notify=false);
+  FXint setItem(FXint index,const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,void* ptr=NULL,bool notify=false);
+  FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from newline separated strings
-  FXint fillItems(const FXString& strings,FXIcon *icon=NULL,void* ptr=NULL,bool notify=false);
+  FXint fillItems(const FXString& strings,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Insert a new [possibly subclassed] item at the give index
-  FXint insertItem(FXint index,FXListItem* item,bool notify=false);
+  FXint insertItem(FXint index,FXListItem* item,FXbool notify=false);
 
   /// Insert item at index with given text, icon, and user-data pointer
-  FXint insertItem(FXint index,const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,bool notify=false);
+  FXint insertItem(FXint index,const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Append a [possibly subclassed] item to the list
-  FXint appendItem(FXListItem* item,bool notify=false);
+  FXint appendItem(FXListItem* item,FXbool notify=false);
 
   /// Append new item with given text and optional icon, and user-data pointer
-  FXint appendItem(const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,bool notify=false);
+  FXint appendItem(const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend a [possibly subclassed] item to the list
-  FXint prependItem(FXListItem* item,bool notify=false);
+  FXint prependItem(FXListItem* item,FXbool notify=false);
 
   /// Prepend new item with given text and optional icon, and user-data pointer
-  FXint prependItem(const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,bool notify=false);
+  FXint prependItem(const FXString& text,FXIcon *icon=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Move item from oldindex to newindex
-  FXint moveItem(FXint newindex,FXint oldindex,bool notify=false);
+  FXint moveItem(FXint newindex,FXint oldindex,FXbool notify=false);
 
   /// Extract item from list
-  FXListItem* extractItem(FXint index,bool notify=false);
+  FXListItem* extractItem(FXint index,FXbool notify=false);
 
   /// Remove item from list
-  void removeItem(FXint index,bool notify=false);
+  void removeItem(FXint index,FXbool notify=false);
 
   /// Remove all items from list
-  void clearItems(bool notify=false);
+  void clearItems(FXbool notify=false);
 
   /// Return item width
   FXint getItemWidth(FXint index) const;
@@ -365,7 +370,7 @@ public:
   FXString getItemText(FXint index) const;
 
   /// Change item icon, deleting the old icon if it was owned
-  void setItemIcon(FXint index,FXIcon* icon,bool owned=false);
+  void setItemIcon(FXint index,FXIcon* icon,FXbool owned=false);
 
   /// Return item icon, if any
   FXIcon* getItemIcon(FXint index) const;
@@ -377,43 +382,43 @@ public:
   void* getItemData(FXint index) const;
 
   /// Return true if item is selected
-  bool isItemSelected(FXint index) const;
+  FXbool isItemSelected(FXint index) const;
 
   /// Return true if item is current
-  bool isItemCurrent(FXint index) const;
+  FXbool isItemCurrent(FXint index) const;
 
   /// Return true if item is visible
-  bool isItemVisible(FXint index) const;
+  FXbool isItemVisible(FXint index) const;
 
   /// Return true if item is enabled
-  bool isItemEnabled(FXint index) const;
+  FXbool isItemEnabled(FXint index) const;
 
   /// Repaint item
   void updateItem(FXint index) const;
 
   /// Enable item
-  virtual bool enableItem(FXint index);
+  virtual FXbool enableItem(FXint index);
 
   /// Disable item
-  virtual bool disableItem(FXint index);
+  virtual FXbool disableItem(FXint index);
 
   /// Select item
-  virtual bool selectItem(FXint index,bool notify=false);
+  virtual FXbool selectItem(FXint index,FXbool notify=false);
 
   /// Deselect item
-  virtual bool deselectItem(FXint index,bool notify=false);
+  virtual FXbool deselectItem(FXint index,FXbool notify=false);
 
   /// Toggle item selection state
-  virtual bool toggleItem(FXint index,bool notify=false);
+  virtual FXbool toggleItem(FXint index,FXbool notify=false);
 
   /// Extend selection from anchor item to index
-  virtual bool extendSelection(FXint index,bool notify=false);
+  virtual FXbool extendSelection(FXint index,FXbool notify=false);
 
   /// Deselect all items
-  virtual bool killSelection(bool notify=false);
+  virtual FXbool killSelection(FXbool notify=false);
 
   /// Change current item
-  virtual void setCurrentItem(FXint index,bool notify=false);
+  virtual void setCurrentItem(FXint index,FXbool notify=false);
 
   /// Return current item, if any
   FXint getCurrentItem() const { return current; }

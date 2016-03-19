@@ -8,7 +8,7 @@ dnl Minor Library release number
 FOX_MINOR_VERSION=7
 
 dnl Increment after every source code change
-FOX_PATCH_LEVEL=0
+FOX_PATCH_LEVEL=8
 
 dnl Binaries compiled with this patchlevel of FOX will need at least
 dnl version MAJOR.MINOR.INTERFACE_VERSION to run. The assertion
@@ -54,9 +54,6 @@ AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
 
-dnl Prevents setting flags.
-CXXFLAGS=""
-
 dnl Checks for programs.
 AC_PROG_MAKE_SET
 AC_PROG_CC
@@ -64,9 +61,7 @@ AC_PROG_CPP
 AC_PROG_CXX
 AM_PROG_LIBTOOL
 
-dnl Run tests in C++
-dnl AC_LANG_CPLUSPLUS
-
+CXXFLAGS=
 
 dnl Checks for header files.
 AC_PATH_X
@@ -293,6 +288,14 @@ AC_CHECK_HEADER(X11/Xcursor/Xcursor.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XCURSOR_H=1";
 fi
 
 
+dnl Check for XRender support
+AC_ARG_WITH(xrender,[  --with-xrender           compile with XRender support])
+AC_MSG_RESULT([$with_xrender])
+if test "x$with_xrender" != "xno"; then
+AC_CHECK_HEADER(X11/extensions/Xrender.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XRENDER_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXrender")
+fi
+
+
 dnl Check for XRandR support
 AC_ARG_WITH(xrandr,[  --with-xrandr           compile with XRandR support])
 AC_MSG_RESULT([$with_xrandr])
@@ -338,10 +341,11 @@ dnl For the moment, we only need to link to socket libraries when linking with c
 AC_CHECK_HEADER(cups/cups.h,if test "x${CUPSLIBS}" != "x"; then CXXFLAGS="${CXXFLAGS} -DHAVE_CUPS_H=1"; LIBS="${LIBS} ${CUPSLIBS} ${SOCKLIBS}"; fi)
 fi
 
+echo CXXFLAGS=$CXXFLAGS
 
 dnl Add copious amounts of debugging with gcc, egcs, etc
 if test "${GXX}" = "yes" ; then
-CXXFLAGS="${CXXFLAGS} -Wall -W -Woverloaded-virtual -Wformat"
+CXXFLAGS="${CXXFLAGS} -Wall -W -Woverloaded-virtual -Wformat -Wshadow"
 fi
 
 dnl Debugging turned on
@@ -350,6 +354,8 @@ AC_ARG_ENABLE(debug,[  --enable-debug          compile for debugging])
 AC_MSG_RESULT([$enable_debug])
 if test "x$enable_debug" = "xyes" ; then
 CXXFLAGS="${CXXFLAGS} -g -DDEBUG"
+echo DEBUG
+echo CXXFLAGS=$CXXFLAGS
 fi
 
 dnl Building for release
@@ -361,6 +367,8 @@ CXXFLAGS="${CXXFLAGS} -O2 -DNDEBUG"
 if test "${GXX}" = "yes" ; then
 CXXFLAGS="${CXXFLAGS} -Wuninitialized -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer -fexpensive-optimizations"
 fi
+echo RELEASE
+echo CXXFLAGS=$CXXFLAGS
 fi
 
 dnl Enable profiling
@@ -419,7 +427,8 @@ pathfinder/Makefile
 calculator/Makefile
 windows/Makefile
 fox.spec
-fox-config)
+fox-config
+fox.pc)
 
 echo ""
 echo "Configure finished!"

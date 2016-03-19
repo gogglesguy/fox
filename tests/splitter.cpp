@@ -3,9 +3,9 @@
 *                               Test Splitter Window                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: splitter.cpp,v 1.35 2006/01/22 17:59:02 fox Exp $                        *
+* $Id: splitter.cpp,v 1.36 2007/02/07 20:22:24 fox Exp $                        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

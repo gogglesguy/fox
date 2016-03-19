@@ -3,7 +3,7 @@
 *                         M e s s a g e   B o x e s                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMessageBox.cpp,v 1.40 2006/01/22 17:58:36 fox Exp $                    *
+* $Id: FXMessageBox.cpp,v 1.42 2007/02/07 20:22:12 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -76,25 +76,25 @@ FXIMPLEMENT(FXMessageBox,FXDialogBox,FXMessageBoxMap,ARRAYNUMBER(FXMessageBoxMap
 
 
 // Construct message box with given caption, icon, and message text
-FXMessageBox::FXMessageBox(FXWindow* owner,const FXString& caption,const FXString& text,FXIcon* ic,FXuint opts,FXint x,FXint y):
-  FXDialogBox(owner,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,0,0, 0,0,0,0, 4,4){
-  initialize(text,ic,opts&MBOX_BUTTON_MASK);
+FXMessageBox::FXMessageBox(FXWindow* own,const FXString& caption,const FXString& text,FXIcon* icn,FXuint opts,FXint x,FXint y):
+  FXDialogBox(own,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,0,0, 0,0,0,0, 4,4){
+  initialize(text,icn,opts&MBOX_BUTTON_MASK);
   }
 
 
 // Construct free floating message box with given caption, icon, and message text
-FXMessageBox::FXMessageBox(FXApp* a,const FXString& caption,const FXString& text,FXIcon* ic,FXuint opts,FXint x,FXint y):
+FXMessageBox::FXMessageBox(FXApp* a,const FXString& caption,const FXString& text,FXIcon* icn,FXuint opts,FXint x,FXint y):
   FXDialogBox(a,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,0,0, 0,0,0,0, 4,4){
-  initialize(text,ic,opts&MBOX_BUTTON_MASK);
+  initialize(text,icn,opts&MBOX_BUTTON_MASK);
   }
 
 
 // Build contents
-void FXMessageBox::initialize(const FXString& text,FXIcon* ic,FXuint whichbuttons){
+void FXMessageBox::initialize(const FXString& text,FXIcon* icn,FXuint whichbuttons){
   FXButton *initial;
   FXVerticalFrame* content=new FXVerticalFrame(this,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXHorizontalFrame* info=new FXHorizontalFrame(content,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,10,10,10,10);
-  new FXLabel(info,FXString::null,ic,ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(info,FXString::null,icn,ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXLabel(info,text,NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXHorizontalSeparator(content,SEPARATOR_GROOVE|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
   FXHorizontalFrame* buttons=new FXHorizontalFrame(content,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0,10,10,5,5);

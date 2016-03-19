@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXImage.h,v 1.64 2006/01/22 17:58:05 fox Exp $                           *
+* $Id: FXImage.h,v 1.67 2007/02/07 20:21:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXIMAGE_H
 #define FXIMAGE_H
@@ -56,6 +56,15 @@ class FXDCWindow;
 * compatible with the screen, for fast drawing onto the device.
 * The server-side representation is not directly accessible from the current
 * process as it lives in the process of the X Server or GDI.
+* Before the image can be used in drawing operations, the server-side representation
+* of the image must be realized by calling create(); until this is done, only the
+* client-side pixel buffer exists.
+* Usually the client-side pixel buffer is released when the server-side representation
+* is generated [thus saving substantial amounts of memory when only the server-resident
+* part of the image is of interest].  But if further manipulation of the client-side
+* pixel buffer is needed, the IMAGE_KEEP option can be passed.  In that case, the
+* client-side buffer can be modified, and the server-side pixmap can be updated by
+* calling render().
 */
 class FXAPI FXImage : public FXDrawable {
   FXDECLARE(FXImage)
@@ -141,7 +150,7 @@ public:
   void setPixel(FXint x,FXint y,FXColor color){ data[y*width+x]=color; }
 
   /// Scan the image and return false if fully opaque
-  bool hasAlpha() const;
+  FXbool hasAlpha() const;
 
   /**
   * Create the server side pixmap, then call render() to fill it with the
@@ -201,7 +210,7 @@ public:
   virtual void scale(FXint w,FXint h,FXint quality=0);
 
   /// Mirror image horizontally and/or vertically
-  virtual void mirror(bool horizontal,bool vertical);
+  virtual void mirror(FXbool horizontal,FXbool vertical);
 
   /**
   * Rotate image by degrees ccw; this calls resize() to adjust the client
@@ -256,10 +265,10 @@ public:
   virtual void load(FXStream& store);
 
   /// Save pixel data only
-  virtual bool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const;
 
   /// Load pixel data only
-  virtual bool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store);
 
   /// Destructor
   virtual ~FXImage();

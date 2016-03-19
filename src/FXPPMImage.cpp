@@ -3,7 +3,7 @@
 *                            P P M   I m a g e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPPMImage.cpp,v 1.14 2006/01/22 17:58:37 fox Exp $                      *
+* $Id: FXPPMImage.cpp,v 1.16 2007/02/07 20:22:13 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -78,7 +78,7 @@ FXPPMImage::FXPPMImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h):FXI
 
 
 // Save pixel data only
-bool FXPPMImage::savePixels(FXStream& store) const {
+FXbool FXPPMImage::savePixels(FXStream& store) const {
   if(fxsavePPM(store,data,width,height)){
     return true;
     }
@@ -87,7 +87,7 @@ bool FXPPMImage::savePixels(FXStream& store) const {
 
 
 // Load pixel data only
-bool FXPPMImage::loadPixels(FXStream& store){
+FXbool FXPPMImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadPPM(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

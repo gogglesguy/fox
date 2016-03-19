@@ -3,7 +3,7 @@
 *                               S i z e    C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSize.cpp,v 1.12 2006/01/22 17:58:41 fox Exp $                          *
+* $Id: FXSize.cpp,v 1.13 2007/02/07 20:22:15 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

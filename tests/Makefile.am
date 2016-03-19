@@ -12,6 +12,9 @@ glviewer
 
 
 noinst_PROGRAMS	= \
+console \
+thread \
+calendar \
 expression \
 dctest \
 codecs \
@@ -44,6 +47,9 @@ tabbook \
 ratio \
 $(GL_TESTS)
 
+console_SOURCES         = console.cpp
+thread_SOURCES          = thread.cpp
+calendar_SOURCES        = calendar.cpp
 expression_SOURCES      = expression.cpp
 wizard_SOURCES	        = wizard.cpp
 rex_SOURCES	        = rex.cpp

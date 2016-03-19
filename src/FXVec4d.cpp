@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXVec4d.cpp,v 1.15 2006/01/22 17:58:51 fox Exp $                         *
+* $Id: FXVec4d.cpp,v 1.17 2007/02/07 20:22:19 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -104,7 +104,7 @@ FXdouble FXVec4d::distance(const FXVec3d& p) const {
 
 
 // Return true if edge a-b crosses plane
-bool FXVec4d::crosses(const FXVec3d& a,const FXVec3d& b) const {
+FXbool FXVec4d::crosses(const FXVec3d& a,const FXVec3d& b) const {
   return (distance(a)>=0.0) ^ (distance(b)>=0.0);
   }
 

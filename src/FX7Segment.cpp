@@ -3,7 +3,7 @@
 *                7 - S e g m e n t   D i s p l a y   W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FX7Segment.cpp,v 1.19 2006/03/16 03:19:10 fox Exp $                      *
+* $Id: FX7Segment.cpp,v 1.22 2007/02/07 20:22:02 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -181,10 +181,12 @@ FXDEFMAP(FX7Segment) FX7SegmentMap[]={
   FXMAPFUNC(SEL_QUERY_HELP,0,FX7Segment::onQueryHelp),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETVALUE,FX7Segment::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETINTVALUE,FX7Segment::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETREALVALUE,FX7Segment::onCmdSetRealValue),
-  FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETSTRINGVALUE,FX7Segment::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_GETINTVALUE,FX7Segment::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETREALVALUE,FX7Segment::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_GETREALVALUE,FX7Segment::onCmdGetRealValue),
+  FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETLONGVALUE,FX7Segment::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_GETLONGVALUE,FX7Segment::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETSTRINGVALUE,FX7Segment::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_GETSTRINGVALUE,FX7Segment::onCmdGetStringValue),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_SETHELPSTRING,FX7Segment::onCmdSetHelp),
   FXMAPFUNC(SEL_COMMAND,FX7Segment::ID_GETHELPSTRING,FX7Segment::onCmdGetHelp),
@@ -247,6 +249,20 @@ long FX7Segment::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
 // Set value from int
 long FX7Segment::onCmdSetIntValue(FXObject*,FXSelector,void *ptr){
   setText(FXStringVal(*((FXint*)ptr)));
+  return 1;
+  }
+
+
+// Update value from a message
+long FX7Segment::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setText(FXStringVal(*((FXlong*)ptr)));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FX7Segment::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=FXLongVal(label);
   return 1;
   }
 

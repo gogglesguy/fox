@@ -3,7 +3,7 @@
 *                      O p e n G L   V i e w e r   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLViewer.h,v 1.75 2006/04/01 15:33:16 fox Exp $                        *
+* $Id: FXGLViewer.h,v 1.78 2007/02/07 20:21:54 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVIEWER_H
 #define FXGLVIEWER_H
@@ -82,7 +82,7 @@ struct FXAPI FXMaterial {
 
 
 // Feedback buffer sort routine
-typedef bool (*FXZSortFunc)(FXfloat*& buffer,FXint& used,FXint& size);
+typedef FXbool (*FXZSortFunc)(FXfloat*& buffer,FXint& used,FXint& size);
 
 
 /********************************  Viewer  Class  ******************************/
@@ -358,10 +358,10 @@ public:
   virtual FXGLObject* pick(FXint x,FXint y);
 
   /// Change the model bounding box; this adjusts the viewer
-  virtual bool setBounds(const FXRangef& box);
+  virtual FXbool setBounds(const FXRangef& box);
 
   /// Fit viewer to the given bounding box
-  bool fitToBounds(const FXRangef& box);
+  FXbool fitToBounds(const FXRangef& box);
 
   /// Return the viewer's viewport
   void getViewport(FXViewport& v) const;
@@ -433,7 +433,7 @@ public:
   void translate(FXVec3f vec);
 
   /// Return boresight vector
-  bool getBoreVector(FXint sx,FXint sy,FXVec3f& point,FXVec3f& dir);
+  FXbool getBoreVector(FXint sx,FXint sy,FXVec3f& point,FXVec3f& dir);
 
   /// Return eyesight vector
   FXVec3f getEyeVector() const;
@@ -477,11 +477,14 @@ public:
   /// Return the projection mode
   FXuint getProjection() const { return projection; }
 
-  /// Change top or bottom or both background colors
-  void setBackgroundColor(const FXVec4f& clr,FXbool bottom=MAYBE);
+  /// Change both top and bottom background colors
+  void setBackgroundColor(const FXVec4f& clr);
 
-  /// Return top or bottom window background color.
-  const FXVec4f& getBackgroundColor(FXbool bottom=FALSE) const { return background[bottom]; }
+  /// Change top or bottom background color
+  void setBackgroundColor(const FXVec4f& clr,FXbool bottom);
+
+  /// Return top or bottom window background color
+  const FXVec4f& getBackgroundColor(FXbool bottom) const { return background[bottom]; }
 
   /// Change global ambient light color
   void setAmbientColor(const FXVec4f& clr);
@@ -494,13 +497,13 @@ public:
   * this array can be directly passed to fxsaveBMP and other image
   * output routines.
   */
-  bool readPixels(FXColor*& buffer,FXint x,FXint y,FXint w,FXint h);
+  FXbool readPixels(FXColor*& buffer,FXint x,FXint y,FXint w,FXint h);
 
   /**
   * Read the feedback buffer containing the current scene, returning used
   * and allocated size.
   */
-  bool readFeedback(FXfloat*& buffer,FXint& used,FXint& size,FXint x,FXint y,FXint w,FXint h);
+  FXbool readFeedback(FXfloat*& buffer,FXint& used,FXint& size,FXint x,FXint y,FXint w,FXint h);
 
   /**
   * Change hidden-surface feedback buffer sorting algorithm.
@@ -526,13 +529,13 @@ public:
   * interactively manipulating; another update will be done later when
   * the full complexity drawing can be performed again.
   */
-  bool doesTurbo() const { return doesturbo; }
+  FXbool doesTurbo() const { return doesturbo; }
 
   /// Return turbo mode setting
-  bool getTurboMode() const { return turbomode; }
+  FXbool getTurboMode() const { return turbomode; }
 
   /// Set turbo mode
-  void setTurboMode(bool turbo=true);
+  void setTurboMode(FXbool turbo=true);
 
   /// Return light source settings
   void getLight(FXLight& lite) const;

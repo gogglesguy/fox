@@ -3,7 +3,7 @@
 *                   O p e n G L   S h a p e   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLShape.h,v 1.26 2006/04/02 19:33:22 fox Exp $                         *
+* $Id: FXGLShape.h,v 1.28 2007/02/07 20:21:54 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXGLSHAPE_H
 #define FXGLSHAPE_H
@@ -121,13 +121,13 @@ public:
   virtual FXGLObject* copy();
 
   /// Return true if this object can be dragged around
-  virtual bool canDrag() const;
+  virtual FXbool canDrag() const;
 
   /// Return true if this object can be deleted from the scene
-  virtual bool canDelete() const;
+  virtual FXbool canDelete() const;
 
   /// Drag this object from one position to another
-  virtual bool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
+  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
 
   /// Set the tool tip message for this object
   void setTipText(const FXString& text){ tip=text; }

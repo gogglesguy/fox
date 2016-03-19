@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.165 2006/04/21 19:21:12 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.178 2007/03/01 18:16:34 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,7 +71,7 @@
 */
 
 
-#define REFRESHINTERVAL     1000        // Interval between refreshes
+#define REFRESHINTERVAL     1000000000  // Interval between refreshes
 #define REFRESHFREQUENCY    30          // File systems not supporting mod-time, refresh every nth time
 
 using namespace FX;
@@ -87,7 +87,6 @@ FXIMPLEMENT(FXDirItem,FXTreeItem,NULL,0)
 
 // Map
 FXDEFMAP(FXDirList) FXDirListMap[]={
-  FXMAPFUNC(SEL_DRAGGED,0,FXDirList::onDragged),
   FXMAPFUNC(SEL_TIMEOUT,FXDirList::ID_REFRESHTIMER,FXDirList::onRefreshTimer),
   FXMAPFUNC(SEL_DND_ENTER,0,FXDirList::onDNDEnter),
   FXMAPFUNC(SEL_DND_LEAVE,0,FXDirList::onDNDLeave),
@@ -95,6 +94,7 @@ FXDEFMAP(FXDirList) FXDirListMap[]={
   FXMAPFUNC(SEL_DND_MOTION,0,FXDirList::onDNDMotion),
   FXMAPFUNC(SEL_DND_REQUEST,0,FXDirList::onDNDRequest),
   FXMAPFUNC(SEL_BEGINDRAG,0,FXDirList::onBeginDrag),
+  FXMAPFUNC(SEL_DRAGGED,0,FXDirList::onDragged),
   FXMAPFUNC(SEL_ENDDRAG,0,FXDirList::onEndDrag),
   FXMAPFUNC(SEL_UPDATE,FXDirList::ID_SHOW_HIDDEN,FXDirList::onUpdShowHidden),
   FXMAPFUNC(SEL_UPDATE,FXDirList::ID_HIDE_HIDDEN,FXDirList::onUpdHideHidden),
@@ -128,12 +128,7 @@ FXIMPLEMENT(FXDirList,FXTreeList,FXDirListMap,ARRAYNUMBER(FXDirListMap))
 // For serialization
 FXDirList::FXDirList(){
   dropEnable();
-  sortfunc=ascendingCase;
   associations=NULL;
-  list=NULL;
-  matchmode=0;
-  counter=0;
-  dropaction=DRAG_MOVE;
   opendiricon=NULL;
   closeddiricon=NULL;
   documenticon=NULL;
@@ -143,13 +138,24 @@ FXDirList::FXDirList(){
   networkicon=NULL;
   floppyicon=NULL;
   zipdiskicon=NULL;
+  list=NULL;
+#ifdef WIN32
+  matchmode=FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE|FILEMATCH_CASEFOLD;
+#else
+  matchmode=FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE;
+#endif
+  sortfunc=ascendingCase;
+  dropaction=DRAG_MOVE;
+  draggable=true;
+  counter=0;
   }
 
 
 // Directory List Widget
-FXDirList::FXDirList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXTreeList(p,tgt,sel,opts,x,y,w,h),pattern("*"){
+FXDirList::FXDirList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXTreeList(p,tgt,sel,opts,x,y,w,h),pattern("*"){
   dropEnable();
+  associations=NULL;
+  if(!(options&DIRLIST_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
   opendiricon=new FXGIFIcon(getApp(),minifolderopen);
   closeddiricon=new FXGIFIcon(getApp(),minifolder);
   documenticon=new FXGIFIcon(getApp(),minidoc);
@@ -159,16 +165,15 @@ FXDirList::FXDirList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXi
   networkicon=new FXGIFIcon(getApp(),mininetdrive);
   floppyicon=new FXGIFIcon(getApp(),minifloppy);
   zipdiskicon=new FXGIFIcon(getApp(),minizipdrive);
+  list=NULL;
 #ifdef WIN32
   matchmode=FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE|FILEMATCH_CASEFOLD;
 #else
   matchmode=FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE;
 #endif
-  associations=NULL;
-  if(!(options&DIRLIST_NO_OWN_ASSOC)) associations=new FXFileDict(getApp());
-  list=NULL;
   sortfunc=ascendingCase;
   dropaction=DRAG_MOVE;
+  draggable=true;
   counter=0;
   }
 
@@ -348,21 +353,22 @@ long FXDirList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
       url=dropfiles.mid(beg,end-beg);
 
       // Source filename
-      filesrc=FXURL::fileFromURL(url);
+      filesrc=FXURL::decode(FXURL::fileFromURL(url));
 
       // Destination filename
       filedst=dropdirectory+PATHSEPSTRING+FXPath::name(filesrc);
+
       // Move, Copy, or Link as appropriate
       if(dropaction==DRAG_MOVE){
-        FXTRACE((1,"Moving file: %s to %s\n",filesrc.text(),filedst.text()));
+        FXTRACE((100,"Moving file: %s to %s\n",filesrc.text(),filedst.text()));
         if(!FXFile::moveFiles(filesrc,filedst)) getApp()->beep();
         }
       else if(dropaction==DRAG_COPY){
-        FXTRACE((1,"Copying file: %s to %s\n",filesrc.text(),filedst.text()));
+        FXTRACE((100,"Copying file: %s to %s\n",filesrc.text(),filedst.text()));
         if(!FXFile::copyFiles(filesrc,filedst)) getApp()->beep();
         }
       else if(dropaction==DRAG_LINK){
-        FXTRACE((1,"Linking file: %s to %s\n",filesrc.text(),filedst.text()));
+        FXTRACE((100,"Linking file: %s to %s\n",filesrc.text(),filedst.text()));
         if(!FXFile::symlink(filesrc,filedst)) getApp()->beep();
         }
       }
@@ -398,35 +404,24 @@ long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
 // Start a drag operation
 long FXDirList::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
-  register FXTreeItem *item;
-  if(FXTreeList::onBeginDrag(sender,sel,ptr)) return 1;
-  if(beginDrag(&urilistType,1)){
-    dragfiles=FXString::null;
-    item=firstitem;
-    while(item){
-      if(item->isSelected()){
-        if(!dragfiles.empty()) dragfiles+="\r\n";
-        dragfiles+=FXURL::fileToURL(getItemPathname(item));
-        }
-      if(item->first){
-        item=item->first;
-        }
-      else{
-        while(!item->next && item->parent) item=item->parent;
-        item=item->next;
+  if(!FXTreeList::onBeginDrag(sender,sel,ptr)){
+    if(beginDrag(&urilistType,1)){
+      register FXTreeItem *item=firstitem;
+      dragfiles=FXString::null;
+      while(item){
+        if(item->isSelected()){
+          dragfiles+=FXURL::encode(FXURL::fileToURL(getItemPathname(item)))+"\r\n";      // Each line ends with CRLF
+          }
+        if(item->first){
+          item=item->first;
+          }
+        else{
+          while(!item->next && item->parent) item=item->parent;
+          item=item->next;
+          }
         }
       }
-    return 1;
     }
-  return 0;
-  }
-
-
-// End drag operation
-long FXDirList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
-  if(FXTreeList::onEndDrag(sender,sel,ptr)) return 1;
-  endDrag((didAccept()!=DRAG_REJECT));
-  setDragCursor(getDefaultCursor());
   return 1;
   }
 
@@ -434,23 +429,33 @@ long FXDirList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
 // Dragged stuff around
 long FXDirList::onDragged(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXDragAction action;
-  if(FXTreeList::onDragged(sender,sel,ptr)) return 1;
-  action=DRAG_MOVE;
-  if(event->state&CONTROLMASK) action=DRAG_COPY;
-  if(event->state&SHIFTMASK) action=DRAG_MOVE;
-  if(event->state&ALTMASK) action=DRAG_LINK;
-  handleDrag(event->root_x,event->root_y,action);
-  if(didAccept()!=DRAG_REJECT){
-    if(action==DRAG_MOVE)
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
-    else if(action==DRAG_LINK)
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDLINK_CURSOR));
-    else
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
+  if(!FXTreeList::onDragged(sender,sel,ptr)){
+    FXDragAction action=DRAG_MOVE;
+    if(event->state&CONTROLMASK) action=DRAG_COPY;
+    if(event->state&SHIFTMASK) action=DRAG_MOVE;
+    if(event->state&ALTMASK) action=DRAG_LINK;
+    handleDrag(event->root_x,event->root_y,action);
+    if(didAccept()!=DRAG_REJECT){
+      if(action==DRAG_MOVE)
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
+      else if(action==DRAG_LINK)
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDLINK_CURSOR));
+      else
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
+      }
+    else{
+      setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+      }
     }
-  else{
-    setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+  return 1;
+  }
+
+
+// End drag operation
+long FXDirList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
+  if(!FXTreeList::onEndDrag(sender,sel,ptr)){
+    endDrag((didAccept()!=DRAG_REJECT));
+    setDragCursor(getDefaultCursor());
     }
   return 1;
   }
@@ -615,7 +620,7 @@ long FXDirList::onUpdSortCase(FXObject* sender,FXSelector,void* ptr){
 
 
 // Expand tree
-bool FXDirList::expandTree(FXTreeItem* tree,bool notify){
+FXbool FXDirList::expandTree(FXTreeItem* tree,FXbool notify){
   if(FXTreeList::expandTree(tree,notify)){
     if(isItemDirectory(tree)){
       listChildItems((FXDirItem*)tree);
@@ -628,7 +633,7 @@ bool FXDirList::expandTree(FXTreeItem* tree,bool notify){
 
 
 // Collapse tree
-bool FXDirList::collapseTree(FXTreeItem* tree,bool notify){
+FXbool FXDirList::collapseTree(FXTreeItem* tree,FXbool notify){
   if(FXTreeList::collapseTree(tree,notify)){
     if(isItemDirectory(tree)){
       removeItems(tree->getFirst(),tree->getLast(),notify);
@@ -659,7 +664,7 @@ long FXDirList::onCmdRefresh(FXObject*,FXSelector,void*){
 
 
 // Scan items to see if listing is necessary
-void FXDirList::scan(bool force){
+void FXDirList::scan(FXbool force){
   FXString   pathname;
   FXDirItem *item;
   FXStat     info;
@@ -966,8 +971,8 @@ fnd:  *pn=item;
       if(info.isSocket()){item->state|=FXDirItem::SOCK;item->state&=~FXDirItem::EXECUTABLE;}else{item->state&=~FXDirItem::SOCK;}
       if(islink){item->state|=FXDirItem::SYMLINK;}else{item->state&=~FXDirItem::SYMLINK;}
 
-      // We can drag items only if we can drop them to
-      item->setDraggable(true);
+      // We can drag items only if allowed
+      item->setDraggable(draggable);
 
       // Assume no associations
       fileassoc=NULL;
@@ -1033,19 +1038,19 @@ fnd:  *pn=item;
 /*******************************************************************************/
 
 // Is directory
-bool FXDirList::isItemDirectory(const FXTreeItem* item) const {
+FXbool FXDirList::isItemDirectory(const FXTreeItem* item) const {
   return item && (item->state&FXDirItem::FOLDER);
   }
 
 
 // Is file
-bool FXDirList::isItemFile(const FXTreeItem* item) const {
+FXbool FXDirList::isItemFile(const FXTreeItem* item) const {
   return item && !(item->state&(FXDirItem::FOLDER|FXDirItem::CHARDEV|FXDirItem::BLOCKDEV|FXDirItem::FIFO|FXDirItem::SOCK));
   }
 
 
 // Is executable
-bool FXDirList::isItemExecutable(const FXTreeItem* item) const {
+FXbool FXDirList::isItemExecutable(const FXTreeItem* item) const {
   return item && (item->state&FXDirItem::EXECUTABLE);
   }
 
@@ -1138,7 +1143,7 @@ y:      item=it;
 
 
 // Open all intermediate directories down toward given one
-void FXDirList::setDirectory(const FXString& pathname,bool notify){
+void FXDirList::setDirectory(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
     FXString path=FXPath::absolute(getItemPathname(currentitem),pathname);
@@ -1165,7 +1170,7 @@ FXString FXDirList::getDirectory() const {
 
 
 // Set current (dir/file) name path
-void FXDirList::setCurrentFile(const FXString& pathname,bool notify){
+void FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
   if(!pathname.empty()){
     FXString path=FXPath::absolute(getItemPathname(currentitem),pathname);
@@ -1191,15 +1196,14 @@ FXString FXDirList::getCurrentFile() const {
 
 
 // Get list style
-bool FXDirList::showFiles() const {
+FXbool FXDirList::showFiles() const {
   return (options&DIRLIST_SHOWFILES)!=0;
   }
 
 
 // Change list style
-void FXDirList::showFiles(bool showing){
-  FXuint opts=options;
-  if(showing) opts|=DIRLIST_SHOWFILES; else opts&=~DIRLIST_SHOWFILES;
+void FXDirList::showFiles(FXbool flag){
+  FXuint opts=(((0-flag)^options)&DIRLIST_SHOWFILES)^options;
   if(options!=opts){
     options=opts;
     scan(true);
@@ -1208,15 +1212,14 @@ void FXDirList::showFiles(bool showing){
 
 
 // Return true if showing hidden files
-bool FXDirList::showHiddenFiles() const {
+FXbool FXDirList::showHiddenFiles() const {
   return (options&DIRLIST_SHOWHIDDEN)!=0;
   }
 
 
 // Change show hidden files mode
-void FXDirList::showHiddenFiles(bool showing){
-  FXuint opts=options;
-  if(showing) opts|=DIRLIST_SHOWHIDDEN; else opts&=~DIRLIST_SHOWHIDDEN;
+void FXDirList::showHiddenFiles(FXbool flag){
+  FXuint opts=(((0-flag)^options)&DIRLIST_SHOWHIDDEN)^options;
   if(opts!=options){
     options=opts;
     scan(true);
@@ -1253,14 +1256,21 @@ void FXDirList::setMatchMode(FXuint mode){
   }
 
 
+// Set draggable files
+void FXDirList::setDraggableFiles(FXbool flag){
+  if(draggable!=flag){
+    draggable=flag;
+    scan(true);
+    }
+  }
+
+
 // Save data
 void FXDirList::save(FXStream& store) const {
   FXTreeList::save(store);
   store << associations;
-  store << pattern;
-  store << matchmode;
-  store << closeddiricon;
   store << opendiricon;
+  store << closeddiricon;
   store << documenticon;
   store << applicationicon;
   store << cdromicon;
@@ -1268,6 +1278,9 @@ void FXDirList::save(FXStream& store) const {
   store << networkicon;
   store << floppyicon;
   store << zipdiskicon;
+  store << pattern;
+  store << matchmode;
+  store << draggable;
   }
 
 
@@ -1275,10 +1288,8 @@ void FXDirList::save(FXStream& store) const {
 void FXDirList::load(FXStream& store){
   FXTreeList::load(store);
   store >> associations;
-  store >> pattern;
-  store >> matchmode;
-  store >> closeddiricon;
   store >> opendiricon;
+  store >> closeddiricon;
   store >> documenticon;
   store >> applicationicon;
   store >> cdromicon;
@@ -1286,6 +1297,9 @@ void FXDirList::load(FXStream& store){
   store >> networkicon;
   store >> floppyicon;
   store >> zipdiskicon;
+  store >> pattern;
+  store >> matchmode;
+  store >> draggable;
   }
 
 
@@ -1294,8 +1308,8 @@ FXDirList::~FXDirList(){
   clearItems();
   getApp()->removeTimeout(this,ID_REFRESHTIMER);
   if(!(options&DIRLIST_NO_OWN_ASSOC)) delete associations;
-  delete closeddiricon;
   delete opendiricon;
+  delete closeddiricon;
   delete documenticon;
   delete applicationicon;
   delete cdromicon;
@@ -1304,8 +1318,8 @@ FXDirList::~FXDirList(){
   delete floppyicon;
   delete zipdiskicon;
   associations=(FXFileDict*)-1L;
-  closeddiricon=(FXGIFIcon*)-1L;
   opendiricon=(FXGIFIcon*)-1L;
+  closeddiricon=(FXGIFIcon*)-1L;
   documenticon=(FXGIFIcon*)-1L;
   applicationicon=(FXGIFIcon*)-1L;
   cdromicon=(FXIcon*)-1L;
@@ -1313,6 +1327,7 @@ FXDirList::~FXDirList(){
   networkicon=(FXIcon*)-1L;
   floppyicon=(FXIcon*)-1L;
   zipdiskicon=(FXIcon*)-1L;
+  list=(FXDirItem*)-1L;
   }
 
 }

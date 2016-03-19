@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Adie.h,v 1.55 2006/03/21 05:46:53 fox Exp $                              *
+* $Id: Adie.h,v 1.63 2007/03/13 19:14:25 fox Exp $                              *
 ********************************************************************************/
 #ifndef ADIE_H
 #define ADIE_H
@@ -27,8 +27,9 @@
 
 // Version
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 0
+#define VERSION_MINOR 1
 #define VERSION_PATCH 0
+
 
 class HelpWindow;
 class Preferences;
@@ -70,6 +71,9 @@ protected:
   FXIcon         *bookdelicon;
   FXIcon         *shiftlefticon;
   FXIcon         *shiftrighticon;
+  FXIcon         *configicon;
+  FXIcon         *browsericon;
+  FXIcon         *nobrowsericon;
 private:
   Adie(){}
   Adie(const Adie&);
@@ -88,7 +92,16 @@ public:
   Adie(const FXString& name);
 
   // Initialize application
-  virtual void init(int& argc,char** argv,bool connect=TRUE);
+  virtual void init(int& argc,char** argv,FXbool connect=true);
+
+  // Get syntax for language name
+  FXSyntax* getSyntaxForLanguage(const FXString& name) const;
+  
+  // Get syntax from file name
+  FXSyntax* getSyntaxForFile(const FXString& file) const;
+
+  // Get syntax based on contents
+  FXSyntax* getSyntaxForContents(const FXString& contents) const;
 
   // Exit application
   virtual void exit(FXint code=0);

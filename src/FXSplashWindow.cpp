@@ -3,7 +3,7 @@
 *                            S p l a s h    W i n d o w                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSplashWindow.cpp,v 1.9 2006/01/22 17:58:42 fox Exp $                   *
+* $Id: FXSplashWindow.cpp,v 1.13 2007/02/07 20:22:16 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,21 +71,23 @@ FXIMPLEMENT(FXSplashWindow,FXTopWindow,FXSplashWindowMap,ARRAYNUMBER(FXSplashWin
 // For deserialization
 FXSplashWindow::FXSplashWindow(){
   flags|=FLAG_ENABLED;
+  icon=NULL;
+  delay=0;
   }
 
 
 // Splash window
-FXSplashWindow::FXSplashWindow(FXApp* ap,FXIcon* ic,FXuint opts,FXuint ms):FXTopWindow(ap,FXString::null,NULL,NULL,opts&~DECOR_ALL,0,0,ic->getWidth(),ic->getHeight(),0,0,0,0,0,0){
+FXSplashWindow::FXSplashWindow(FXApp* ap,FXIcon* ic,FXuint opts,FXTime ns):FXTopWindow(ap,FXString::null,NULL,NULL,opts&~DECOR_ALL,0,0,ic->getWidth(),ic->getHeight(),0,0,0,0,0,0){
   flags|=FLAG_ENABLED;
-  delay=ms;
+  delay=ns;
   icon=ic;
   }
 
 
 // Splash window
-FXSplashWindow::FXSplashWindow(FXWindow* ow,FXIcon* ic,FXuint opts,FXuint ms):FXTopWindow(ow,FXString::null,NULL,NULL,opts&~DECOR_ALL,0,0,ic->getWidth(),ic->getHeight(),0,0,0,0,0,0){
+FXSplashWindow::FXSplashWindow(FXWindow* ow,FXIcon* ic,FXuint opts,FXTime ns):FXTopWindow(ow,FXString::null,NULL,NULL,opts&~DECOR_ALL,0,0,ic->getWidth(),ic->getHeight(),0,0,0,0,0,0){
   flags|=FLAG_ENABLED;
-  delay=ms;
+  delay=ns;
   icon=ic;
   }
 
@@ -181,8 +183,8 @@ void FXSplashWindow::setIcon(FXIcon* ic){
 
 
 // Set or change delay
-void FXSplashWindow::setDelay(FXuint ms){
-  delay=ms;
+void FXSplashWindow::setDelay(FXTime ns){
+  delay=ns;
   if(shown()){
     if(options&SPLASH_DESTROY){
       getApp()->addTimeout(this,ID_DELETE,delay);
@@ -212,7 +214,6 @@ void FXSplashWindow::load(FXStream& store){
 
 // Destroy main window
 FXSplashWindow::~FXSplashWindow(){
-  FXTRACE((1,"FXSplashWindow::~FXSplashWindow\n"));
   if(options&SPLASH_OWNS_ICON) delete icon;
   icon=(FXIcon*)-1L;
   }

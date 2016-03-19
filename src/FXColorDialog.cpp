@@ -3,7 +3,7 @@
 *                           C o l o r   D i a l o g                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorDialog.cpp,v 1.33 2006/03/31 07:33:04 fox Exp $                   *
+* $Id: FXColorDialog.cpp,v 1.36 2007/02/07 20:22:03 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,8 +75,8 @@ FXIMPLEMENT(FXColorDialog,FXDialogBox,FXColorDialogMap,ARRAYNUMBER(FXColorDialog
 
 
 // Separator item
-FXColorDialog::FXColorDialog(FXWindow* owner,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
+FXColorDialog::FXColorDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
   colorbox=new FXColorSelector(this,this,ID_COLORSELECTOR,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   colorbox->acceptButton()->setTarget(this);
   colorbox->acceptButton()->setSelector(FXDialogBox::ID_ACCEPT);
@@ -110,13 +110,13 @@ long FXColorDialog::onCmdColor(FXObject*,FXSelector,void* ptr){
 
 
 // Return true if only opaque colors allowed
-bool FXColorDialog::isOpaqueOnly() const {
+FXbool FXColorDialog::isOpaqueOnly() const {
   return colorbox->isOpaqueOnly();
   }
 
 
 // Change opaque only mode
-void FXColorDialog::setOpaqueOnly(bool forceopaque){
+void FXColorDialog::setOpaqueOnly(FXbool forceopaque){
   colorbox->setOpaqueOnly(forceopaque);
   }
 

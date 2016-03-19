@@ -15,6 +15,7 @@ bigicons.bmp \
 closepanel.gif \
 clrbook.gif \
 copy.bmp \
+config_gif.gif \
 copyit.gif \
 cut.bmp \
 deleteit.bmp \
@@ -66,10 +67,10 @@ $(ICONS)
 PathFinder.cpp: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 CLEANFILES	= icons.h icons.cpp
 

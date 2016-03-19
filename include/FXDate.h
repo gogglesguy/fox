@@ -3,7 +3,7 @@
 *                            D a t e   C l a s s                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDate.h,v 1.11 2006/03/29 06:47:35 fox Exp $                            *
+* $Id: FXDate.h,v 1.14 2007/02/07 20:21:53 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXDATE_H
 #define FXDATE_H
@@ -69,7 +69,7 @@ public:
   FXDate(FXuint j):julian(j){}
 
   /// Set julian day number
-  void setJulian(FXuint day){ julian=day; }
+  void setJulian(FXuint d){ julian=d; }
 
   /// Get julian day number
   FXuint getJulian() const { return julian; }
@@ -99,22 +99,22 @@ public:
   FXint daysInMonth() const;
 
   /// Return true if leap year
-  bool leapYear() const;
+  FXbool leapYear() const;
 
   /// Is the value a leap year
-  static bool leapYear(FXint y);
+  static FXbool leapYear(FXint y);
 
   /// Get the name of the month
-  static const FXchar *monthName(FXint month){ return longMonthName[month-1]; }
+  static const FXchar *monthName(FXint m){ return longMonthName[m-1]; }
 
   /// Get the abbreviated name of the month
-  static const FXchar *monthNameShort(FXint month){ return shortMonthName[month-1]; }
+  static const FXchar *monthNameShort(FXint m){ return shortMonthName[m-1]; }
 
   /// Get the name of the day
-  static const FXchar *dayName(FXint day){ return longWeekDay[day]; }
+  static const FXchar *dayName(FXint d){ return longWeekDay[d]; }
 
   /// Get the abbreviated name of the day
-  static const FXchar *dayNameShort(FXint day){ return shortWeekDay[day]; }
+  static const FXchar *dayNameShort(FXint d){ return shortWeekDay[d]; }
 
   /// Return current local date
   static FXDate localDate();
@@ -134,14 +134,14 @@ public:
   FXDate& operator--(){ julian--; return *this; }
 
   /// Equality tests
-  bool operator==(const FXDate& date) const { return julian==date.julian;}
-  bool operator!=(const FXDate& date) const { return julian!=date.julian;}
+  FXbool operator==(const FXDate& date) const { return julian==date.julian;}
+  FXbool operator!=(const FXDate& date) const { return julian!=date.julian;}
 
   /// Inequality tests
-  bool operator<(const FXDate& date) const { return julian<date.julian;}
-  bool operator<=(const FXDate& date) const { return julian<=date.julian;}
-  bool operator>(const FXDate& date) const { return julian>date.julian;}
-  bool operator>=(const FXDate& date) const { return julian>=date.julian;}
+  FXbool operator<(const FXDate& date) const { return julian<date.julian;}
+  FXbool operator<=(const FXDate& date) const { return julian<=date.julian;}
+  FXbool operator>(const FXDate& date) const { return julian>date.julian;}
+  FXbool operator>=(const FXDate& date) const { return julian>=date.julian;}
 
   /// Add days to date yielding another date
   friend inline FXDate operator+(const FXDate& d,FXint x);

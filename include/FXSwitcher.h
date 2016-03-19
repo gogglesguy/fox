@@ -3,7 +3,7 @@
 *                  S w i t c h   C o n t a i n e r   W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSwitcher.h,v 1.18 2006/03/31 07:33:03 fox Exp $                        *
+* $Id: FXSwitcher.h,v 1.20 2007/02/07 20:21:59 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXSWITCHER_H
 #define FXSWITCHER_H
@@ -98,7 +98,7 @@ public:
   virtual void layout();
 
   /// Bring the child window at index to the top
-  void setCurrent(FXint index,bool notify=false);
+  void setCurrent(FXint index,FXbool notify=false);
 
   /// Return the index of the child window currently on top
   FXint getCurrent() const { return current; }

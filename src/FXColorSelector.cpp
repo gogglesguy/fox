@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorSelector.cpp,v 1.75 2006/03/31 07:33:04 fox Exp $                 *
+* $Id: FXColorSelector.cpp,v 1.80 2007/02/07 20:22:04 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -231,7 +231,7 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     // Color wheel
     FXHorizontalFrame *dialblock=new FXHorizontalFrame(panels,FRAME_THICK|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0,15,15,5,5, 5,8);
 
-    wheel=new FXColorRing(dialblock,this,ID_DIAL_WHEEL,LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,120,120,1,1,1,1);
+    wheel=new FXColorRing(dialblock,this,ID_DIAL_WHEEL,LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,130,130,1,1,1,1);
 
     //new FXColorWheel(dialblock,NULL,0,LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,130,130,1,1,1,1);
 
@@ -406,7 +406,6 @@ void FXColorSelector::create(){
 
   // Switch to correct pane
   panels->setCurrent(getApp()->reg().readIntEntry("SETTINGS","activecolorpane",0));
-
   }
 
 
@@ -754,19 +753,19 @@ FXColor FXColorSelector::getRGBA() const {
 
 
 // Return true if only opaque colors allowed
-bool FXColorSelector::isOpaqueOnly() const {
+FXbool FXColorSelector::isOpaqueOnly() const {
   return well->isOpaqueOnly();
   }
 
 
 // Change opaque only mode
-void FXColorSelector::setOpaqueOnly(bool opaque){
+void FXColorSelector::setOpaqueOnly(FXbool opaque){
   if(opaque){
-    well->setOpaqueOnly(TRUE);
+    well->setOpaqueOnly(true);
     setRGBA(well->getRGBA() | FXRGBA(0,0,0,255));
     }
   else{
-    well->setOpaqueOnly(FALSE);
+    well->setOpaqueOnly(false);
     }
   }
 

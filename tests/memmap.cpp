@@ -3,9 +3,9 @@
 *                          M e m o r y   M a p   T e s t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: memmap.cpp,v 1.5 2006/01/22 17:59:02 fox Exp $                           *
+* $Id: memmap.cpp,v 1.7 2007/02/07 20:22:24 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -85,9 +85,9 @@ int main(int argc,char** argv){
     getchar();
 
     // Map
-    base=(char*)map.mapFile(filename,offset,length,FXMemMap::READ,FXMemMap::SHAR);
+    base=(char*)map.openMap(filename,offset,length,FXIO::Reading,FXIO::AllReadWrite);
     if(base==NULL){
-      fprintf(stderr,"mapFile returned NULL\n");
+      fprintf(stderr,"openMap returned NULL\n");
       exit(1);
       }
 
@@ -118,9 +118,9 @@ int main(int argc,char** argv){
     getchar();
 
     // Map
-    base=(char*)map.mapFile(filename,offset,length,FXMemMap::READ|FXMemMap::WRITE|FXMemMap::TRUNC,FXMemMap::SHAR);
+    base=(char*)map.openMap(filename,offset,length,FXIO::Writing,FXIO::AllReadWrite);
     if(base==NULL){
-      fprintf(stderr,"mapFile returned NULL\n");
+      fprintf(stderr,"openMap returned NULL\n");
       exit(1);
       }
 

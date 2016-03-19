@@ -3,7 +3,7 @@
 *                       I m a g e   V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXImageView.cpp,v 1.38 2006/01/22 17:58:32 fox Exp $                     *
+* $Id: FXImageView.cpp,v 1.42 2007/02/07 20:22:11 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -107,7 +107,7 @@ void FXImageView::detach(){
 
 
 // Can have focus
-bool FXImageView::canFocus() const { return true; }
+FXbool FXImageView::canFocus() const { return true; }
 
 
 // Determine content width of scroll area
@@ -135,39 +135,39 @@ void FXImageView::layout(){
 
 // Draw visible part of image
 long FXImageView::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
-  FXDCWindow dc(this,event);
-  FXint xx,yy,ww,hh;
-  FXint xl,xr,yt,yb;
+  FXDCWindow dc(this,(FXEvent*)ptr);
+  FXint xx,yy,ww,hh,vw,vh,xl,xr,yt,yb;
+  vw=getVisibleWidth();
+  vh=getVisibleHeight();
   if(image){
     ww=image->getWidth();
     hh=image->getHeight();
     xx=pos_x;
     yy=pos_y;
-    if(ww<viewport_w){
+    if(ww<vw){
       if(options&IMAGEVIEW_LEFT) xx=0;
-      else if(options&IMAGEVIEW_RIGHT) xx=viewport_w-ww;
-      else xx=(viewport_w-ww)/2;
+      else if(options&IMAGEVIEW_RIGHT) xx=vw-ww;
+      else xx=(vw-ww)/2;
       }
-    if(hh<viewport_h){
+    if(hh<vh){
       if(options&IMAGEVIEW_TOP) yy=0;
-      else if(options&IMAGEVIEW_BOTTOM) yy=viewport_h-hh;
-      else yy=(viewport_h-hh)/2;
+      else if(options&IMAGEVIEW_BOTTOM) yy=vh-hh;
+      else yy=(vh-hh)/2;
       }
     dc.drawImage(image,xx,yy);
     dc.setForeground(backColor);
     xl=xx; xr=xx+ww;
     yt=yy; yb=yy+hh;
-    if(xl<0) xl=0; if(xr>viewport_w) xr=viewport_w;
-    if(yt<0) yt=0; if(yb>viewport_h) yb=viewport_h;
+    if(xl<0) xl=0; if(xr>vw) xr=vw;
+    if(yt<0) yt=0; if(yb>vh) yb=vh;
     dc.fillRectangle(0,0,xr,yt);
-    dc.fillRectangle(0,yt,xl,viewport_h-yt);
-    dc.fillRectangle(xr,0,viewport_w-xr,yb);
-    dc.fillRectangle(xl,yb,viewport_w-xl,viewport_h-yb);
+    dc.fillRectangle(0,yt,xl,vh-yt);
+    dc.fillRectangle(xr,0,vw-xr,yb);
+    dc.fillRectangle(xl,yb,vw-xl,vh-yb);
     }
   else{
     dc.setForeground(backColor);
-    dc.fillRectangle(0,0,width,height);
+    dc.fillRectangle(0,0,vw,vh);
     }
   return 1;
   }
@@ -175,7 +175,6 @@ long FXImageView::onPaint(FXObject*,FXSelector,void* ptr){
 
 // Pressed right button
 long FXImageView::onRightBtnPress(FXObject*,FXSelector,void* ptr){
-  FXEvent* ev=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
@@ -183,8 +182,8 @@ long FXImageView::onRightBtnPress(FXObject*,FXSelector,void* ptr){
     if(target && target->tryHandle(this,FXSEL(SEL_RIGHTBUTTONPRESS,message),ptr)) return 1;
     flags&=~FLAG_UPDATE;
     flags|=FLAG_PRESSED|FLAG_SCROLLING;
-    grabx=ev->win_x-pos_x;
-    graby=ev->win_y-pos_y;
+    grabx=((FXEvent*)ptr)->win_x-pos_x;
+    graby=((FXEvent*)ptr)->win_y-pos_y;
     return 1;
     }
   return 0;
@@ -206,10 +205,12 @@ long FXImageView::onRightBtnRelease(FXObject*,FXSelector,void* ptr){
 
 // Handle real or simulated mouse motion
 long FXImageView::onMotion(FXObject*,FXSelector,void* ptr){
-  FXEvent* ev=(FXEvent*)ptr;
-  if(flags&FLAG_SCROLLING){
-    setPosition(ev->win_x-grabx,ev->win_y-graby);
-    return 1;
+  if(isEnabled()){
+    if(flags&FLAG_SCROLLING){
+      setPosition(((FXEvent*)ptr)->win_x-grabx,((FXEvent*)ptr)->win_y-graby);
+      return 1;
+      }
+    if(target && target->tryHandle(this,FXSEL(SEL_MOTION,message),ptr)) return 1;
     }
   return 0;
   }

@@ -3,7 +3,7 @@
 *                S p r i n g   C o n t a i n e r   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSpring.h,v 1.8 2006/01/22 17:58:10 fox Exp $                           *
+* $Id: FXSpring.h,v 1.12 2007/02/07 20:21:58 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXSPRING_H
 #define FXSPRING_H
@@ -42,7 +42,7 @@ namespace FX {
 * to cause the spring to calculate its default width (height) normally,
 * just like the Packer base class does.
 * In a typical scenario, either the relative width or height is set to
-* zero, an the flag LAYOUT_FILL_X or LAYOUT_FILL_Y is passed. When
+* zero, and the flag LAYOUT_FILL_X or LAYOUT_FILL_Y is passed. When
 * placed inside a horizontal frame, the LAYOUT_FILL_X together with
 * the relative widths of the springs will cause a fixed width-ratio
 * between the springs.
@@ -77,7 +77,7 @@ public:
   void setRelativeWidth(FXint relw);
 
   /// Return relative width
-  FXint  getRelativeWidth() const { return relWidth; }
+  FXint getRelativeWidth() const { return relWidth; }
 
   /// Change relative height
   void setRelativeHeight(FXint relh);

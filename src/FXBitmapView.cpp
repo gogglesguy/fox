@@ -3,7 +3,7 @@
 *                    B i t m a p   V i e w   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBitmapView.cpp,v 1.16 2006/01/22 17:58:18 fox Exp $                    *
+* $Id: FXBitmapView.cpp,v 1.19 2007/02/07 20:22:03 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -113,7 +113,7 @@ void FXBitmapView::detach(){
 
 
 // Can have focus
-bool FXBitmapView::canFocus() const { return true; }
+FXbool FXBitmapView::canFocus() const { return true; }
 
 
 // Determine content width of scroll area
@@ -143,22 +143,23 @@ void FXBitmapView::layout(){
 long FXBitmapView::onPaint(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXDCWindow dc(this,event);
-  FXint xx,yy,ww,hh;
-  FXint xl,xr,yt,yb;
+  FXint xx,yy,ww,hh,vw,vh,xl,xr,yt,yb;
+  vw=getVisibleWidth();
+  vh=getVisibleHeight();
   if(bitmap){
     ww=bitmap->getWidth();
     hh=bitmap->getHeight();
     xx=pos_x;
     yy=pos_y;
-    if(ww<viewport_w){
+    if(ww<vw){
       if(options&BITMAPVIEW_LEFT) xx=0;
-      else if(options&BITMAPVIEW_RIGHT) xx=viewport_w-ww;
-      else xx=(viewport_w-ww)/2;
+      else if(options&BITMAPVIEW_RIGHT) xx=vw-ww;
+      else xx=(vw-ww)/2;
       }
-    if(hh<viewport_h){
+    if(hh<vh){
       if(options&BITMAPVIEW_TOP) yy=0;
-      else if(options&BITMAPVIEW_BOTTOM) yy=viewport_h-hh;
-      else yy=(viewport_h-hh)/2;
+      else if(options&BITMAPVIEW_BOTTOM) yy=vh-hh;
+      else yy=(vh-hh)/2;
       }
     dc.setForeground(onColor);
     dc.setBackground(offColor);
@@ -166,16 +167,16 @@ long FXBitmapView::onPaint(FXObject*,FXSelector,void* ptr){
     dc.setForeground(backColor);
     xl=xx; xr=xx+ww;
     yt=yy; yb=yy+hh;
-    if(xl<0) xl=0; if(xr>viewport_w) xr=viewport_w;
-    if(yt<0) yt=0; if(yb>viewport_h) yb=viewport_h;
+    if(xl<0) xl=0; if(xr>vw) xr=vw;
+    if(yt<0) yt=0; if(yb>vh) yb=vh;
     dc.fillRectangle(0,0,xr,yt);
-    dc.fillRectangle(0,yt,xl,viewport_h-yt);
-    dc.fillRectangle(xr,0,viewport_w-xr,yb);
-    dc.fillRectangle(xl,yb,viewport_w-xl,viewport_h-yb);
+    dc.fillRectangle(0,yt,xl,vh-yt);
+    dc.fillRectangle(xr,0,vw-xr,yb);
+    dc.fillRectangle(xl,yb,vw-xl,vh-yb);
     }
   else{
     dc.setForeground(backColor);
-    dc.fillRectangle(0,0,width,height);
+    dc.fillRectangle(0,0,vw,vh);
     }
   return 1;
   }

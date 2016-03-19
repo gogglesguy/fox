@@ -3,7 +3,7 @@
 *                  F i l e - A s s o c i a t i o n   T a b l e                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileDict.h,v 1.32 2006/03/25 18:03:43 fox Exp $                        *
+* $Id: FXFileDict.h,v 1.34 2007/02/07 20:21:54 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXFILEDICT_H
 #define FXFILEDICT_H
@@ -171,6 +171,9 @@ public:
 
   /// Find file association from registry
   FXFileAssoc* find(const FXchar* ext);
+
+  /// Return file association at position pos
+  FXFileAssoc* data(FXint pos) const { return (FXFileAssoc*)FXDict::data(pos); }
 
   /**
   * Determine binding for the given file.

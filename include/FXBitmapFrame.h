@@ -3,7 +3,7 @@
 *                       B i t m a p   F r a m e   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by H. J. Daniel III. All Rights Reserved.             *
+* Copyright (C) 2001,2007 by H. J. Daniel III. All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBitmapFrame.h,v 1.6 2006/01/22 17:57:59 fox Exp $                      *
+* $Id: FXBitmapFrame.h,v 1.7 2007/02/07 20:21:52 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXBITMAPFRAME_H
 #define FXBITMAPFRAME_H

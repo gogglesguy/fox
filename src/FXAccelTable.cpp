@@ -3,7 +3,7 @@
 *                   A c c e l e r a t o r   T a b l e   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXAccelTable.cpp,v 1.52 2006/03/22 05:38:23 fox Exp $                    *
+* $Id: FXAccelTable.cpp,v 1.55 2007/03/01 22:43:18 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -168,7 +168,7 @@ void FXAccelTable::removeAccel(FXHotKey hotkey){
 
 
 // See if accelerator exists
-bool FXAccelTable::hasAccel(FXHotKey hotkey) const {
+FXbool FXAccelTable::hasAccel(FXHotKey hotkey) const {
   if(hotkey){
     register FXuint p=(hotkey*13)&max;
     register FXuint c;
@@ -442,17 +442,17 @@ FXHotKey parseAccel(const FXString& string){
       }
     }
 
+  // Test if hexadecimal code designator
+  else if(string[pos]=='#'){
+    code=strtoul(&string[pos+1],NULL,16);
+    }
+
   // Test if its a single character accelerator
   else if(Ascii::isPrint(string[pos])){
     if(mods&SHIFTMASK)
       code=Ascii::toUpper(string[pos])+KEY_space-' ';
     else
       code=Ascii::toLower(string[pos])+KEY_space-' ';
-    }
-
-  // Test if hexadecimal code designator
-  else if(string[pos]=='#'){
-    code=strtoul(&string[pos+1],NULL,16);
     }
 
   FXTRACE((110,"parseAccel(%s) = code=%04x mods=%04x\n",string.text(),code,mods));

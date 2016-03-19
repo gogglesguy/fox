@@ -3,7 +3,7 @@
 *                               S i z e    C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSize.h,v 1.15 2006/01/22 17:58:09 fox Exp $                            *
+* $Id: FXSize.h,v 1.17 2007/02/07 20:21:58 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXSIZE_H
 #define FXSIZE_H
@@ -41,14 +41,14 @@ public:
   FXSize(FXshort ww,FXshort hh):w(ww),h(hh){ }
 
   /// Test if empty
-  bool empty() const { return w<=0 || h<=0; }
+  FXbool empty() const { return w<=0 || h<=0; }
 
   /// Test if zero
-  bool operator!() const { return w==0 && h==0; }
+  FXbool operator!() const { return w==0 && h==0; }
 
   /// Equality
-  bool operator==(const FXSize& s) const { return w==s.w && h==s.h; }
-  bool operator!=(const FXSize& s) const { return w!=s.w || h!=s.h; }
+  FXbool operator==(const FXSize& s) const { return w==s.w && h==s.h; }
+  FXbool operator!=(const FXSize& s) const { return w!=s.w || h!=s.h; }
 
   /// Grow by amount
   FXSize& grow(FXshort margin);

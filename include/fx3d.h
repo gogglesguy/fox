@@ -3,7 +3,7 @@
 *      A d d i t i o n a l   F O X   I n c l u d e   F i l e   F o r   3 D      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx3d.h,v 1.22 2006/01/22 17:58:13 fox Exp $                              *
+* $Id: fx3d.h,v 1.25 2007/02/07 20:22:00 fox Exp $                              *
 ********************************************************************************/
 #ifndef FX3D_H
 #define FX3D_H
@@ -63,7 +63,10 @@
 #include "FXSphered.h"
 #include "FXExtentf.h"
 #include "FXExtentd.h"
+#include "FXComplexf.h"
+#include "FXComplexd.h"
 #include "FXGLVisual.h"
+#include "FXGLConfig.h"
 #include "FXGLContext.h"
 #include "FXGLCanvas.h"
 #include "FXGLViewer.h"

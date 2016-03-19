@@ -3,7 +3,7 @@
 *                 K e y S y m   t o   U n i c o d e   M a p p i n g             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxkeysym.cpp,v 1.3 2006/01/22 17:58:53 fox Exp $                         *
+* $Id: fxkeysym.cpp,v 1.4 2007/02/07 20:22:21 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

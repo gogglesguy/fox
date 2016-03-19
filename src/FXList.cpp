@@ -3,7 +3,7 @@
 *                            L i s t   O b j e c t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXList.cpp,v 1.160 2006/03/31 07:33:10 fox Exp $                         *
+* $Id: FXList.cpp,v 1.176 2007/02/07 20:22:11 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -98,12 +98,17 @@ using namespace FX;
 
 namespace FX {
 
+
+// Explicit template specialization
+//template class FXObjectListOf<FXListItem>;
+
+
 // Object implementation
 FXIMPLEMENT(FXListItem,FXObject,NULL,0)
 
 
 // Draw item
-void FXListItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXint hh){
+void FXListItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXint hh) const {
   register FXFont *font=list->getFont();
   register FXint ih=0,th=0;
   if(icon) ih=icon->getHeight();
@@ -122,7 +127,6 @@ void FXListItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXi
     xx+=ICON_SPACING+icon->getWidth();
     }
   if(!label.empty()){
-    dc.setFont(font);
     if(!isEnabled())
       dc.setForeground(makeShadowColor(list->getBackColor()));
     else if(isSelected())
@@ -136,8 +140,8 @@ void FXListItem::draw(const FXList* list,FXDC& dc,FXint xx,FXint yy,FXint ww,FXi
 
 // See if item got hit, and where: 0 is outside, 1 is icon, 2 is text
 FXint FXListItem::hitItem(const FXList* list,FXint xx,FXint yy) const {
-  register FXint iw=0,ih=0,tw=0,th=0,ix,iy,tx,ty,h;
   register FXFont *font=list->getFont();
+  register FXint iw=0,ih=0,tw=0,th=0,ix,iy,tx,ty,h;
   if(icon){
     iw=icon->getWidth();
     ih=icon->getHeight();
@@ -165,25 +169,25 @@ FXint FXListItem::hitItem(const FXList* list,FXint xx,FXint yy) const {
 
 
 // Set or kill focus
-void FXListItem::setFocus(bool focus){
-  if(focus) state|=FOCUS; else state&=~FOCUS;
+void FXListItem::setFocus(FXbool focus){
+  state^=((0-focus)^state)&FOCUS;
   }
 
 // Select or deselect item
-void FXListItem::setSelected(bool selected){
-  if(selected) state|=SELECTED; else state&=~SELECTED;
+void FXListItem::setSelected(FXbool selected){
+  state^=((0-selected)^state)&SELECTED;
   }
 
 
 // Enable or disable the item
-void FXListItem::setEnabled(bool enabled){
-  if(enabled) state&=~DISABLED; else state|=DISABLED;
+void FXListItem::setEnabled(FXbool enabled){
+  state^=((enabled-1)^state)&DISABLED;
   }
 
 
 // Icon is draggable
-void FXListItem::setDraggable(bool draggable){
-  if(draggable) state|=DRAGGABLE; else state&=~DRAGGABLE;
+void FXListItem::setDraggable(FXbool draggable){
+  state^=((0-draggable)^state)&DRAGGABLE;
   }
 
 
@@ -194,7 +198,7 @@ void FXListItem::setText(const FXString& txt){
 
 
 // Change item's icon
-void FXListItem::setIcon(FXIcon* icn,bool owned){
+void FXListItem::setIcon(FXIcon* icn,FXbool owned){
   if(icon && (state&ICONOWNED)){
     if(icon!=icn) delete icon;
     state&=~ICONOWNED;
@@ -381,7 +385,7 @@ void FXList::detach(){
 
 
 // Can have focus
-bool FXList::canFocus() const { return true; }
+FXbool FXList::canFocus() const { return true; }
 
 
 // Into focus chain
@@ -505,7 +509,7 @@ FXString FXList::getItemText(FXint index) const {
 
 
 // Set item icon
-void FXList::setItemIcon(FXint index,FXIcon* icon,bool owned){
+void FXList::setItemIcon(FXint index,FXIcon* icon,FXbool owned){
   if(index<0 || items.no()<=index){ fxerror("%s::setItemIcon: index out of range.\n",getClassName()); }
   if(items[index]->getIcon()!=icon) recalc();
   items[index]->setIcon(icon,owned);
@@ -534,35 +538,35 @@ void* FXList::getItemData(FXint index) const {
 
 
 // True if item is selected
-bool FXList::isItemSelected(FXint index) const {
+FXbool FXList::isItemSelected(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::isItemSelected: index out of range.\n",getClassName()); }
   return items[index]->isSelected();
   }
 
 
 // True if item is current
-bool FXList::isItemCurrent(FXint index) const {
+FXbool FXList::isItemCurrent(FXint index) const {
   return (0<=index) && (index==current);
   }
 
 
 // True if item is enabled
-bool FXList::isItemEnabled(FXint index) const {
+FXbool FXList::isItemEnabled(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::isItemEnabled: index out of range.\n",getClassName()); }
   return items[index]->isEnabled();
   }
 
 
 // True if item (partially) visible
-bool FXList::isItemVisible(FXint index) const {
+FXbool FXList::isItemVisible(FXint index) const {
   if(index<0 || items.no()<=index){ fxerror("%s::isItemVisible: index out of range.\n",getClassName()); }
-  return (0 < (pos_y+items[index]->y+items[index]->getHeight(this))) && ((pos_y+items[index]->y) < viewport_h);
+  return (0 < (pos_y+items[index]->y+items[index]->getHeight(this))) && ((pos_y+items[index]->y) < getVisibleHeight());
   }
 
 
 // Make item fully visible
 void FXList::makeItemVisible(FXint index){
-  register FXint y,h;
+  register FXint y,h,vh;
   if(0<=index && index<items.no()){
 
     // Remember for later
@@ -576,7 +580,8 @@ void FXList::makeItemVisible(FXint index){
 
       y=pos_y;
       h=items[index]->getHeight(this);
-      if(viewport_h<=y+items[index]->y+h) y=viewport_h-items[index]->y-h;
+      vh=getVisibleHeight();
+      if(vh<=y+items[index]->y+h) y=vh-items[index]->y-h;
       if(y+items[index]->y<=0) y=-items[index]->y;
 
       // Scroll into view
@@ -633,13 +638,13 @@ FXint FXList::hitItem(FXint index,FXint x,FXint y) const {
 // Repaint
 void FXList::updateItem(FXint index) const {
   if(0<=index && index<items.no()){
-    update(0,pos_y+items[index]->y,viewport_w,items[index]->getHeight(this));
+    update(0,pos_y+items[index]->y,width,items[index]->getHeight(this));
     }
   }
 
 
 // Enable one item
-bool FXList::enableItem(FXint index){
+FXbool FXList::enableItem(FXint index){
   if(index<0 || items.no()<=index){ fxerror("%s::enableItem: index out of range.\n",getClassName()); }
   if(!items[index]->isEnabled()){
     items[index]->setEnabled(true);
@@ -651,7 +656,7 @@ bool FXList::enableItem(FXint index){
 
 
 // Disable one item
-bool FXList::disableItem(FXint index){
+FXbool FXList::disableItem(FXint index){
   if(index<0 || items.no()<=index){ fxerror("%s::disableItem: index out of range.\n",getClassName()); }
   if(items[index]->isEnabled()){
     items[index]->setEnabled(false);
@@ -663,7 +668,7 @@ bool FXList::disableItem(FXint index){
 
 
 // Select one item
-bool FXList::selectItem(FXint index,bool notify){
+FXbool FXList::selectItem(FXint index,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::selectItem: index out of range.\n",getClassName()); }
   if(!items[index]->isSelected()){
     switch(options&SELECT_MASK){
@@ -684,7 +689,7 @@ bool FXList::selectItem(FXint index,bool notify){
 
 
 // Deselect one item
-bool FXList::deselectItem(FXint index,bool notify){
+FXbool FXList::deselectItem(FXint index,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::deselectItem: index out of range.\n",getClassName()); }
   if(items[index]->isSelected()){
     switch(options&SELECT_MASK){
@@ -703,7 +708,7 @@ bool FXList::deselectItem(FXint index,bool notify){
 
 
 // Toggle one item
-bool FXList::toggleItem(FXint index,bool notify){
+FXbool FXList::toggleItem(FXint index,FXbool notify){
   if(index<0 || items.no()<=index){ fxerror("%s::toggleItem: index out of range.\n",getClassName()); }
   switch(options&SELECT_MASK){
     case LIST_BROWSESELECT:
@@ -746,8 +751,8 @@ bool FXList::toggleItem(FXint index,bool notify){
 
 
 // Extend selection
-bool FXList::extendSelection(FXint index,bool notify){
-  register bool changes=false;
+FXbool FXList::extendSelection(FXint index,FXbool notify){
+  register FXbool changes=false;
   FXint i1,i2,i3,i;
   if(0<=index && 0<=anchor && 0<=extent){
 
@@ -817,8 +822,8 @@ bool FXList::extendSelection(FXint index,bool notify){
 
 
 // Kill selection
-bool FXList::killSelection(bool notify){
-  register bool changes=false;
+FXbool FXList::killSelection(FXbool notify){
+  register FXbool changes=false;
   register FXint i;
   for(i=0; i<items.no(); i++){
     if(items[i]->isSelected()){
@@ -932,12 +937,15 @@ long FXList::onPaint(FXObject*,FXSelector,void* ptr){
   FXDCWindow dc(this,event);
   FXint i,y,h;
 
+  // Set font
+  dc.setFont(font);
+
   // Paint items
   y=pos_y;
   for(i=0; i<items.no(); i++){
     h=items[i]->getHeight(this);
     if(event->rect.y<=y+h && y<event->rect.y+event->rect.h){
-      items[i]->draw(this,dc,pos_x,y,FXMAX(listWidth,viewport_w),h);
+      items[i]->draw(this,dc,pos_x,y,FXMAX(listWidth,getVisibleWidth()),h);
       }
     y+=h;
     }
@@ -1121,7 +1129,6 @@ long FXList::onKeyRelease(FXObject*,FXSelector,void* ptr){
 // Automatic scroll
 long FXList::onAutoScroll(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXint index;
 
   // Scroll the window
   FXScrollArea::onAutoScroll(sender,sel,ptr);
@@ -1135,12 +1142,16 @@ long FXList::onAutoScroll(FXObject* sender,FXSelector sel,void* ptr){
   // In autoselect mode, stop scrolling when mouse outside window
   if((flags&FLAG_PRESSED) || (options&LIST_AUTOSELECT)){
 
+    // Visible size
+    FXint vw=getVisibleWidth();
+    FXint vh=getVisibleHeight();
+
     // Validated position
-    FXint xx=event->win_x; if(xx<0) xx=0; else if(xx>=viewport_w) xx=viewport_w-1;
-    FXint yy=event->win_y; if(yy<0) yy=0; else if(yy>=viewport_h) yy=viewport_h-1;
+    FXint xx=event->win_x; if(xx<0) xx=0; else if(xx>=vw) xx=vw-1;
+    FXint yy=event->win_y; if(yy<0) yy=0; else if(yy>=vh) yy=vh-1;
 
     // Find item
-    index=getItemAt(xx,yy);
+    FXint index=getItemAt(xx,yy);
 
     // Got item and different from last time
     if(0<=index && index!=current){
@@ -1466,7 +1477,7 @@ FXint FXList::descendingCase(const FXListItem* a,const FXListItem* b){
 // Sort the items based on the sort function.
 void FXList::sortItems(){
   register FXListItem *v,*c=0;
-  register bool exch=false;
+  register FXbool exch=false;
   register FXint i,j,h;
   if(sortfunc){
     if(0<=current){
@@ -1496,7 +1507,7 @@ void FXList::sortItems(){
 
 
 // Set current item
-void FXList::setCurrentItem(FXint index,bool notify){
+void FXList::setCurrentItem(FXint index,FXbool notify){
   if(index<-1 || items.no()<=index){ fxerror("%s::setCurrentItem: index out of range.\n",getClassName()); }
   if(index!=current){
 
@@ -1555,7 +1566,7 @@ FXListItem *FXList::getItem(FXint index) const {
 
 
 // Replace item with another
-FXint FXList::setItem(FXint index,FXListItem* item,bool notify){
+FXint FXList::setItem(FXint index,FXListItem* item,FXbool notify){
 
   // Must have item
   if(!item){ fxerror("%s::setItem: item is NULL.\n",getClassName()); }
@@ -1582,13 +1593,13 @@ FXint FXList::setItem(FXint index,FXListItem* item,bool notify){
 
 
 // Replace item with another
-FXint FXList::setItem(FXint index,const FXString& text,FXIcon *icon,void* ptr,bool notify){
+FXint FXList::setItem(FXint index,const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
   return setItem(index,createItem(text,icon,ptr),notify);
   }
 
 
 // Insert item
-FXint FXList::insertItem(FXint index,FXListItem* item,bool notify){
+FXint FXList::insertItem(FXint index,FXListItem* item,FXbool notify){
   register FXint old=current;
 
   // Must have item
@@ -1632,36 +1643,36 @@ FXint FXList::insertItem(FXint index,FXListItem* item,bool notify){
 
 
 // Insert item
-FXint FXList::insertItem(FXint index,const FXString& text,FXIcon *icon,void* ptr,bool notify){
+FXint FXList::insertItem(FXint index,const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
   return insertItem(index,createItem(text,icon,ptr),notify);
   }
 
 
 // Append item
-FXint FXList::appendItem(FXListItem* item,bool notify){
+FXint FXList::appendItem(FXListItem* item,FXbool notify){
   return insertItem(items.no(),item,notify);
   }
 
 
 // Append item
-FXint FXList::appendItem(const FXString& text,FXIcon *icon,void* ptr,bool notify){
+FXint FXList::appendItem(const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
   return insertItem(items.no(),createItem(text,icon,ptr),notify);
   }
 
 
 // Prepend item
-FXint FXList::prependItem(FXListItem* item,bool notify){
+FXint FXList::prependItem(FXListItem* item,FXbool notify){
   return insertItem(0,item,notify);
   }
 
 // Prepend item
-FXint FXList::prependItem(const FXString& text,FXIcon *icon,void* ptr,bool notify){
+FXint FXList::prependItem(const FXString& text,FXIcon *icon,void* ptr,FXbool notify){
   return insertItem(0,createItem(text,icon,ptr),notify);
   }
 
 
 // Fill list by appending items from array of strings
-FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,void* ptr,bool notify){
+FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,void* ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){
@@ -1673,19 +1684,47 @@ FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,void* ptr,bool notif
 
 
 // Fill list by appending items from newline separated strings
-FXint FXList::fillItems(const FXString& strings,FXIcon *icon,void* ptr,bool notify){
-  register FXint n=0;
-  FXString text;
-  while(!(text=strings.section('\n',n)).empty()){
-    appendItem(text,icon,ptr,notify);
+FXint FXList::fillItems(const FXString& strings,FXIcon *icon,void* ptr,FXbool notify){
+  register FXint beg=0,end=0,n=0;
+  while(end<strings.length()){
+    beg=end;
+    while(end<strings.length() && strings[end]!='\n' && strings[end]!='\r') end++;
+    appendItem(strings.mid(beg,end-beg),icon,ptr,notify);
+    while(strings[end]=='\n' || strings[end]=='\r') end++;
     n++;
     }
   return n;
   }
 
 
+/*
+// Retrieve all items into newline separated strings
+FXString FXList::getAllItems() const {
+  FXString result;
+  for(FXint i=0; i<items.no(); i++){
+    result.append(items[i]->getText());
+    result.append("\n");
+    }
+  return result;
+  }
+
+
+// Retrieve all selected items in newline separated strings
+FXString FXList::getSelectedItems() const {
+  FXString result;
+  for(FXint i=0; i<items.no(); i++){
+    if(item[i]->isSelected()){
+      result.append(items[i]->getText());
+      result.append("\n");
+      }
+    }
+  return result;
+  }
+*/
+
+
 // Move item from oldindex to newindex
-FXint FXList::moveItem(FXint newindex,FXint oldindex,bool notify){
+FXint FXList::moveItem(FXint newindex,FXint oldindex,FXbool notify){
   register FXint old=current;
   register FXListItem *item;
 
@@ -1735,7 +1774,7 @@ FXint FXList::moveItem(FXint newindex,FXint oldindex,bool notify){
 
 
 // Extract node from list
-FXListItem* FXList::extractItem(FXint index,bool notify){
+FXListItem* FXList::extractItem(FXint index,FXbool notify){
   register FXListItem *result;
   register FXint old=current;
 
@@ -1781,7 +1820,7 @@ FXListItem* FXList::extractItem(FXint index,bool notify){
 
 
 // Remove node from list
-void FXList::removeItem(FXint index,bool notify){
+void FXList::removeItem(FXint index,FXbool notify){
   register FXint old=current;
 
   // Must be in range
@@ -1823,7 +1862,7 @@ void FXList::removeItem(FXint index,bool notify){
 
 
 // Remove all items
-void FXList::clearItems(bool notify){
+void FXList::clearItems(FXbool notify){
   register FXint old=current;
 
   // Delete items

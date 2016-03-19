@@ -3,7 +3,7 @@
 *                          B M P   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxbmpio.cpp,v 1.54 2006/03/24 02:46:12 fox Exp $                         *
+* $Id: fxbmpio.cpp,v 1.62 2007/02/07 20:22:20 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -27,8 +27,6 @@
 #include "FXHash.h"
 #include "FXElement.h"
 #include "FXStream.h"
-
-
 
 /*
   Notes:
@@ -61,13 +59,13 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckBMP(FXStream& store);
-extern FXAPI bool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height);
+extern FXAPI FXbool fxcheckBMP(FXStream& store);
+extern FXAPI FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 
 // Check if stream contains a BMP
-bool fxcheckBMP(FXStream& store){
+FXbool fxcheckBMP(FXStream& store){
   FXuchar signature[2];
   store.load(signature,2);
   store.position(-2,FXFromCurrent);
@@ -76,15 +74,15 @@ bool fxcheckBMP(FXStream& store){
 
 
 // Load image from stream
-bool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   FXint biXPelsPerMeter,biYPelsPerMeter,biClrUsed,biClrImportant,biCompression,biSize;
   FXint biWidth,biHeight,biSizeImage,bfOffBits,bfSize,i,j,x,y,maxpixels,colormaplen,padw,pad;
   FXushort bfType,bfReserved,biBitCount,biPlanes,rgb16;
   FXColor colormap[256],*pp;
   FXuchar padding[3],c1,c2;
   FXlong base,header;
-  bool swap;
-  bool ok=false;
+  FXbool swap;
+  FXbool ok=false;
 
   // Null out
   data=NULL;
@@ -96,7 +94,7 @@ bool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
   // Bitmaps are little-endian
   swap=store.swapBytes();
-  store.setBigEndian(FALSE);
+  store.setBigEndian(false);
 
   // Get size and offset
   store >> bfType;
@@ -138,7 +136,7 @@ bool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     store >> biClrImportant;
     }
 
-//  FXTRACE((1,"fxloadBMP: biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biClrUsed=%d biClrImportant=%d\n",biWidth,biHeight,biPlanes,biBitCount,biCompression,biClrUsed,biClrImportant));
+//  FXTRACE((100,"fxloadBMP: biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biClrUsed=%d biClrImportant=%d\n",biWidth,biHeight,biPlanes,biBitCount,biCompression,biClrUsed,biClrImportant));
 
   // Ought to be 1
   if(biPlanes!=1) goto x;
@@ -349,7 +347,7 @@ x:store.swapBytes(swap);
 
 
 // Save a bmp file to a stream
-bool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
+FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
   const FXshort  biPlanes=1;
   const FXshort  bfReserved=0;
   const FXint    biXPelsPerMeter=75*39;
@@ -366,7 +364,7 @@ bool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
   FXint          biSizeImage;
   FXint          bfOffBits;
   FXshort        biBitCount=24;
-  bool           swap;
+  FXbool         swap;
 
   // Must make sense
   if(!data || width<=0 || height<=0) return false;
@@ -390,7 +388,7 @@ bool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
 
   // Bitmaps are little-endian
   swap=store.swapBytes();
-  store.setBigEndian(FALSE);
+  store.setBigEndian(false);
 
   // BitmapFileHeader
   store << 'B';                         // Magic number

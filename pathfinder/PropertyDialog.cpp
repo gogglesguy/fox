@@ -3,7 +3,7 @@
 *                  F i l e   P r o p e r t i e s   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: PropertyDialog.cpp,v 1.24 2006/01/22 17:58:15 fox Exp $                  *
+* $Id: PropertyDialog.cpp,v 1.26 2007/02/07 20:22:01 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -44,8 +44,7 @@ FXIMPLEMENT(PropertyDialog,FXDialogBox,NULL,0)
 
 
 // Create properties dialog
-PropertyDialog::PropertyDialog(FXWindow *owner):
-  FXDialogBox(owner,"Properties",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 4,4,4,4, 4,4){
+PropertyDialog::PropertyDialog(FXWindow *own):FXDialogBox(own,"Properties",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 4,4,4,4, 4,4){
 
   setTitle(tr("Properties"));
 
@@ -65,37 +64,37 @@ PropertyDialog::PropertyDialog(FXWindow *owner):
 
   FXGroupBox *namegroup=new FXGroupBox(generalFrame,tr("Description"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
   filename=new FXLabel(namegroup,FXString::null,NULL,LAYOUT_CENTER_Y|LAYOUT_SIDE_LEFT|ICON_BEFORE_TEXT|LAYOUT_FIX_HEIGHT,0,0,0,40);
-  filename->setTarget(owner);
+  filename->setTarget(own);
   filename->setSelector(PathFinderMain::ID_FILE_DESC);
 
   FXGroupBox *attrgroup=new FXGroupBox(generalFrame,tr("Attributes"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
   FXMatrix *attrmatrix=new FXMatrix(attrgroup,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXLabel(attrmatrix,tr("Type:"),NULL,LAYOUT_RIGHT);
   filetype=new FXLabel(attrmatrix,FXString::null,NULL,LAYOUT_LEFT|LAYOUT_FILL_COLUMN);
-  filetype->setTarget(owner);
+  filetype->setTarget(own);
   filetype->setSelector(PathFinderMain::ID_FILE_TYPE);
   new FXLabel(attrmatrix,tr("Location:"),NULL,LAYOUT_RIGHT);
   directory=new FXLabel(attrmatrix,FXString::null,NULL,LAYOUT_LEFT|LAYOUT_FILL_COLUMN);
-  directory->setTarget(owner);
+  directory->setTarget(own);
   directory->setSelector(PathFinderMain::ID_FILE_LOCATION);
   new FXLabel(attrmatrix,tr("Size:"),NULL,LAYOUT_RIGHT);
   filesize=new FXLabel(attrmatrix,FXString::null,NULL,LAYOUT_LEFT|LAYOUT_FILL_COLUMN);
-  filesize->setTarget(owner);
+  filesize->setTarget(own);
   filesize->setSelector(PathFinderMain::ID_FILE_SIZE);
 
   FXGroupBox *timegroup=new FXGroupBox(generalFrame,tr("File Time"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
   FXMatrix *timematrix=new FXMatrix(timegroup,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXLabel(timematrix,tr("Created:"),NULL,LAYOUT_RIGHT);
   createtime=new FXLabel(timematrix,FXString::null,NULL,LAYOUT_LEFT|LAYOUT_FILL_COLUMN);
-  createtime->setTarget(owner);
+  createtime->setTarget(own);
   createtime->setSelector(PathFinderMain::ID_FILE_CREATED);
   new FXLabel(timematrix,tr("Modified:"),NULL,LAYOUT_RIGHT);
   modifytime=new FXLabel(timematrix,FXString::null,NULL,LAYOUT_LEFT|LAYOUT_FILL_COLUMN);
-  modifytime->setTarget(owner);
+  modifytime->setTarget(own);
   modifytime->setSelector(PathFinderMain::ID_FILE_MODIFIED);
   new FXLabel(timematrix,tr("Accessed:"),NULL,LAYOUT_RIGHT);
   accesstime=new FXLabel(timematrix,FXString::null,NULL,LAYOUT_LEFT|LAYOUT_FILL_COLUMN);
-  accesstime->setTarget(owner);
+  accesstime->setTarget(own);
   accesstime->setSelector(PathFinderMain::ID_FILE_ACCESSED);
 
   // ===== Permissions =====
@@ -111,32 +110,32 @@ PropertyDialog::PropertyDialog(FXWindow *owner):
   new FXLabel(accessmatrix,tr("Special"),NULL,LAYOUT_CENTER_X);
 
   new FXLabel(accessmatrix,tr("&User"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_RUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_WUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_XUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_RUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XUSR,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
   new FXLabel(accessmatrix,tr("Set UID"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_SUID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SUID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 
   new FXLabel(accessmatrix,tr("&Group"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_RGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_WGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_XGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_RGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XGRP,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
   new FXLabel(accessmatrix,tr("Set GID"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_SGID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SGID,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 
   new FXLabel(accessmatrix,tr("&Other"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_ROTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_WOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_XOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_ROTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_WOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_XOTH,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
   new FXLabel(accessmatrix,tr("Sticky"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  new FXCheckButton(accessmatrix,FXString::null,owner,PathFinderMain::ID_SVTX,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+  new FXCheckButton(accessmatrix,FXString::null,own,PathFinderMain::ID_SVTX,LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
 
   FXGroupBox *ownergroup=new FXGroupBox(permFrame,tr("Ownership"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
   FXMatrix *ownermatrix=new FXMatrix(ownergroup,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXLabel(ownermatrix,tr("O&wner"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  fileowner=new FXTextField(ownermatrix,20,owner,PathFinderMain::ID_OWNER,LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|FRAME_SUNKEN|FRAME_THICK);
+  fileowner=new FXTextField(ownermatrix,20,own,PathFinderMain::ID_OWNER,LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|FRAME_SUNKEN|FRAME_THICK);
   new FXLabel(ownermatrix,tr("Grou&p"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN);
-  filegroup=new FXTextField(ownermatrix,20,owner,PathFinderMain::ID_GROUP,LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|FRAME_SUNKEN|FRAME_THICK);
+  filegroup=new FXTextField(ownermatrix,20,own,PathFinderMain::ID_GROUP,LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|FRAME_SUNKEN|FRAME_THICK);
   }
 
 

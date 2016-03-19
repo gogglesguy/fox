@@ -3,7 +3,7 @@
 *                   M a t r i x   C o n t a i n e r   O b j e c t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMatrix.cpp,v 1.35 2006/01/22 17:58:35 fox Exp $                        *
+* $Id: FXMatrix.cpp,v 1.37 2007/02/07 20:22:12 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -330,7 +330,7 @@ FXint FXMatrix::getDefaultHeight(){
 void FXMatrix::layout(){
   FXint ncol,nrow,nzcol,nzrow,r,c,x,y,w,h,n,e,t;
   FXint rowh[MAXNUM],colw[MAXNUM];
-  FXbool srow[MAXNUM],scol[MAXNUM];
+  FXuchar srow[MAXNUM],scol[MAXNUM];
   FXint left,right,top,bottom,cw,rh;
   FXint mw=0,mh=0;
   FXint hremain,vremain;

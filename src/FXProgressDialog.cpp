@@ -3,7 +3,7 @@
 *                      P r o g r e s s   D i a l o g   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXProgressDialog.cpp,v 1.27 2006/03/31 07:33:11 fox Exp $                *
+* $Id: FXProgressDialog.cpp,v 1.31 2007/02/07 20:22:13 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -67,6 +67,8 @@ FXDEFMAP(FXProgressDialog) FXProgressDialogMap[]={
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETVALUE,FXProgressDialog::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETINTVALUE,FXProgressDialog::onCmdSetIntValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETINTVALUE,FXProgressDialog::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETLONGVALUE,FXProgressDialog::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETLONGVALUE,FXProgressDialog::onCmdGetLongValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETSTRINGVALUE,FXProgressDialog::onCmdGetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETSTRINGVALUE,FXProgressDialog::onCmdSetStringValue),
   };
@@ -83,8 +85,8 @@ FXProgressDialog::FXProgressDialog(){
 
 
 // Create progress dialog box
-FXProgressDialog::FXProgressDialog(FXWindow* owner,const FXString& caption,const FXString& label,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,caption,opts,x,y,FXMAX(w,300),h,10,10,10,10, 10,10){
+FXProgressDialog::FXProgressDialog(FXWindow* own,const FXString& caption,const FXString& label,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,caption,opts,x,y,w,h,10,10,10,10, 10,10){
   cancel=new FXButton(this,tr("&Cancel"),NULL,this,ID_CANCEL,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_SIDE_BOTTOM|LAYOUT_CENTER_X,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   separator=new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   FXHorizontalFrame* toppart=new FXHorizontalFrame(this,LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 10,10);
@@ -124,6 +126,20 @@ long FXProgressDialog::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
 // Get dial value
 long FXProgressDialog::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
   *((FXint*)ptr)=getProgress();
+  return 1;
+  }
+
+
+// Update value from a message
+long FXProgressDialog::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setProgress((FXint)*((FXlong*)ptr));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FXProgressDialog::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=(FXlong)getProgress();
   return 1;
   }
 

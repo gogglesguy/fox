@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXString.h,v 1.120 2006/02/20 03:32:12 fox Exp $                         *
+* $Id: FXString.h,v 1.122 2007/02/07 20:21:58 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -102,10 +102,10 @@ public:
   const FXchar* text() const { return (const FXchar*)str; }
 
   /// See if string is empty
-  bool empty() const { return (((FXint*)str)[-1]==0); }
+  FXbool empty() const { return (((FXint*)str)[-1]==0); }
 
   /// See if string is empty
-  bool operator!() const { return (((FXint*)str)[-1]==0); }
+  FXbool operator!() const { return (((FXint*)str)[-1]==0); }
 
   /// Return a non-const reference to the ith character
   FXchar& operator[](FXint i){ return str[i]; }
@@ -312,16 +312,16 @@ public:
   FXint contains(const FXString& sub) const;
 
   /// Substitute one character by another
-  FXString& substitute(FXchar org,FXchar sub,bool all=true);
+  FXString& substitute(FXchar org,FXchar sub,FXbool all=true);
 
   /// Substitute one string by another
-  FXString& substitute(const FXchar* org,FXint olen,const FXchar *rep,FXint rlen,bool all=true);
+  FXString& substitute(const FXchar* org,FXint olen,const FXchar *rep,FXint rlen,FXbool all=true);
 
   /// Substitute one string by another
-  FXString& substitute(const FXchar* org,const FXchar *rep,bool all=true);
+  FXString& substitute(const FXchar* org,const FXchar *rep,FXbool all=true);
 
   /// Substitute one string by another
-  FXString& substitute(const FXString& org,const FXString& rep,bool all=true);
+  FXString& substitute(const FXString& org,const FXString& rep,FXbool all=true);
 
   /// Simplify whitespace in string
   FXString& simplify();
@@ -502,29 +502,29 @@ public:
   friend FXAPI FXint compareversion(const FXString& s1,const FXString& s2);
 
   /// Comparison operators
-  friend FXAPI bool operator==(const FXString& s1,const FXString& s2);
-  friend FXAPI bool operator==(const FXString& s1,const FXchar* s2);
-  friend FXAPI bool operator==(const FXchar* s1,const FXString& s2);
+  friend FXAPI FXbool operator==(const FXString& s1,const FXString& s2);
+  friend FXAPI FXbool operator==(const FXString& s1,const FXchar* s2);
+  friend FXAPI FXbool operator==(const FXchar* s1,const FXString& s2);
 
-  friend FXAPI bool operator!=(const FXString& s1,const FXString& s2);
-  friend FXAPI bool operator!=(const FXString& s1,const FXchar* s2);
-  friend FXAPI bool operator!=(const FXchar* s1,const FXString& s2);
+  friend FXAPI FXbool operator!=(const FXString& s1,const FXString& s2);
+  friend FXAPI FXbool operator!=(const FXString& s1,const FXchar* s2);
+  friend FXAPI FXbool operator!=(const FXchar* s1,const FXString& s2);
 
-  friend FXAPI bool operator<(const FXString& s1,const FXString& s2);
-  friend FXAPI bool operator<(const FXString& s1,const FXchar* s2);
-  friend FXAPI bool operator<(const FXchar* s1,const FXString& s2);
+  friend FXAPI FXbool operator<(const FXString& s1,const FXString& s2);
+  friend FXAPI FXbool operator<(const FXString& s1,const FXchar* s2);
+  friend FXAPI FXbool operator<(const FXchar* s1,const FXString& s2);
 
-  friend FXAPI bool operator<=(const FXString& s1,const FXString& s2);
-  friend FXAPI bool operator<=(const FXString& s1,const FXchar* s2);
-  friend FXAPI bool operator<=(const FXchar* s1,const FXString& s2);
+  friend FXAPI FXbool operator<=(const FXString& s1,const FXString& s2);
+  friend FXAPI FXbool operator<=(const FXString& s1,const FXchar* s2);
+  friend FXAPI FXbool operator<=(const FXchar* s1,const FXString& s2);
 
-  friend FXAPI bool operator>(const FXString& s1,const FXString& s2);
-  friend FXAPI bool operator>(const FXString& s1,const FXchar* s2);
-  friend FXAPI bool operator>(const FXchar* s1,const FXString& s2);
+  friend FXAPI FXbool operator>(const FXString& s1,const FXString& s2);
+  friend FXAPI FXbool operator>(const FXString& s1,const FXchar* s2);
+  friend FXAPI FXbool operator>(const FXchar* s1,const FXString& s2);
 
-  friend FXAPI bool operator>=(const FXString& s1,const FXString& s2);
-  friend FXAPI bool operator>=(const FXString& s1,const FXchar* s2);
-  friend FXAPI bool operator>=(const FXchar* s1,const FXString& s2);
+  friend FXAPI FXbool operator>=(const FXString& s1,const FXString& s2);
+  friend FXAPI FXbool operator>=(const FXString& s1,const FXchar* s2);
+  friend FXAPI FXbool operator>=(const FXchar* s1,const FXString& s2);
 
   /// Append operators
   FXString& operator+=(const FXString& s);
@@ -654,29 +654,29 @@ extern FXAPI FXint compareversion(const FXchar* s1,const FXString& s2);
 extern FXAPI FXint compareversion(const FXString& s1,const FXchar* s2);
 extern FXAPI FXint compareversion(const FXString& s1,const FXString& s2);
 
-extern FXAPI bool operator==(const FXString& s1,const FXString& s2);
-extern FXAPI bool operator==(const FXString& s1,const FXchar* s2);
-extern FXAPI bool operator==(const FXchar* s1,const FXString& s2);
+extern FXAPI FXbool operator==(const FXString& s1,const FXString& s2);
+extern FXAPI FXbool operator==(const FXString& s1,const FXchar* s2);
+extern FXAPI FXbool operator==(const FXchar* s1,const FXString& s2);
 
-extern FXAPI bool operator!=(const FXString& s1,const FXString& s2);
-extern FXAPI bool operator!=(const FXString& s1,const FXchar* s2);
-extern FXAPI bool operator!=(const FXchar* s1,const FXString& s2);
+extern FXAPI FXbool operator!=(const FXString& s1,const FXString& s2);
+extern FXAPI FXbool operator!=(const FXString& s1,const FXchar* s2);
+extern FXAPI FXbool operator!=(const FXchar* s1,const FXString& s2);
 
-extern FXAPI bool operator<(const FXString& s1,const FXString& s2);
-extern FXAPI bool operator<(const FXString& s1,const FXchar* s2);
-extern FXAPI bool operator<(const FXchar* s1,const FXString& s2);
+extern FXAPI FXbool operator<(const FXString& s1,const FXString& s2);
+extern FXAPI FXbool operator<(const FXString& s1,const FXchar* s2);
+extern FXAPI FXbool operator<(const FXchar* s1,const FXString& s2);
 
-extern FXAPI bool operator<=(const FXString& s1,const FXString& s2);
-extern FXAPI bool operator<=(const FXString& s1,const FXchar* s2);
-extern FXAPI bool operator<=(const FXchar* s1,const FXString& s2);
+extern FXAPI FXbool operator<=(const FXString& s1,const FXString& s2);
+extern FXAPI FXbool operator<=(const FXString& s1,const FXchar* s2);
+extern FXAPI FXbool operator<=(const FXchar* s1,const FXString& s2);
 
-extern FXAPI bool operator>(const FXString& s1,const FXString& s2);
-extern FXAPI bool operator>(const FXString& s1,const FXchar* s2);
-extern FXAPI bool operator>(const FXchar* s1,const FXString& s2);
+extern FXAPI FXbool operator>(const FXString& s1,const FXString& s2);
+extern FXAPI FXbool operator>(const FXString& s1,const FXchar* s2);
+extern FXAPI FXbool operator>(const FXchar* s1,const FXString& s2);
 
-extern FXAPI bool operator>=(const FXString& s1,const FXString& s2);
-extern FXAPI bool operator>=(const FXString& s1,const FXchar* s2);
-extern FXAPI bool operator>=(const FXchar* s1,const FXString& s2);
+extern FXAPI FXbool operator>=(const FXString& s1,const FXString& s2);
+extern FXAPI FXbool operator>=(const FXString& s1,const FXchar* s2);
+extern FXAPI FXbool operator>=(const FXchar* s1,const FXString& s2);
 
 extern FXAPI FXString operator+(const FXString& s1,const FXString& s2);
 

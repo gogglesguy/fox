@@ -3,7 +3,7 @@
 *         M u l t i p l e   D o c u m e n t   C l i e n t   W i n d o w         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMDIClient.h,v 1.33 2006/03/31 07:33:03 fox Exp $                       *
+* $Id: FXMDIClient.h,v 1.35 2007/02/07 20:21:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXMDICLIENT_H
 #define FXMDICLIENT_H
@@ -146,19 +146,19 @@ public:
   long forallDocWindows(FXObject* document,FXObject* sender,FXSelector sel,void* ptr);
 
   /// Set active MDI Child
-  virtual bool setActiveChild(FXMDIChild* child=NULL,bool notify=true);
+  virtual FXbool setActiveChild(FXMDIChild* child=NULL,FXbool notify=true);
 
   /// Get current active child; may be NULL!
   FXMDIChild* getActiveChild() const { return active; }
 
   /// Cascade windows
-  virtual void cascade(bool notify=false);
+  virtual void cascade(FXbool notify=false);
 
   /// Layout horizontally
-  virtual void horizontal(bool notify=false);
+  virtual void horizontal(FXbool notify=false);
 
   /// Layout vertically
-  virtual void vertical(bool notify=false);
+  virtual void vertical(FXbool notify=false);
 
   /// Change cascade offset X
   void setCascadeX(FXint off){ cascadex=off; }

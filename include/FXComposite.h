@@ -3,7 +3,7 @@
 *                       C o m p o s i t e   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXComposite.h,v 1.24 2006/01/22 17:57:59 fox Exp $                       *
+* $Id: FXComposite.h,v 1.27 2007/02/07 20:21:53 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXCOMPOSITE_H
 #define FXCOMPOSITE_H
@@ -76,8 +76,8 @@ public:
   /// Return the height of the tallest child window
   FXint maxChildHeight() const;
 
-  /// Overrides this virtual function to return TRUE
-  virtual bool isComposite() const;
+  /// Overrides this virtual function to return true
+  virtual FXbool isComposite() const;
 
   /// Destructor
   virtual ~FXComposite();

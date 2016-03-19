@@ -3,7 +3,7 @@
 *                           O p e n G L   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLObject.h,v 1.29 2006/04/02 19:33:22 fox Exp $                        *
+* $Id: FXGLObject.h,v 1.36 2007/02/07 20:21:54 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLOBJECT_H
 #define FXGLOBJECT_H
@@ -35,8 +35,6 @@ class FXGLViewer;
 class FXGLObject;
 
 
-// List of objects
-typedef FXObjectListOf<FXGLObject> FXGLObjectList;
 
 /// Basic OpenGL object
 class FXAPI FXGLObject : public FXObject {
@@ -69,26 +67,25 @@ public:
   virtual FXGLObject* identify(FXuint* path);
 
   /// Return true if this object can be dragged around
-  virtual bool canDrag() const;
+  virtual FXbool canDrag() const;
 
   /// Return true if this object can be deleted from the scene
-  virtual bool canDelete() const;
+  virtual FXbool canDelete() const;
 
   /// Drag this object from one position to another
-  virtual bool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
+  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
 
   /// Destructor
   virtual ~FXGLObject(){}
   };
 
 
-// Suppress warning about FXGLGroup::list not being exported
-#ifdef _MSC_VER
-#if _MSC_VER >= 1200
-#pragma warning( push )
-#endif
-#pragma warning( disable : 4251 )
-#endif
+/// Explicit template specialization
+//extern template class FXAPI FXObjectListOf<FXGLObject>;
+
+
+/// List of GL objects
+typedef FXObjectListOf<FXGLObject> FXGLObjectList;
 
 
 /// Group object
@@ -122,11 +119,11 @@ public:
   /// Identify object by means of path
   virtual FXGLObject* identify(FXuint* path);
 
-  /// Return TRUE if group can be dragged
-  virtual bool canDrag() const;
+  /// Return true if group can be dragged
+  virtual FXbool canDrag() const;
 
   /// Drag group object
-  virtual bool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
+  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
 
   /// Return number of children
   FXint no() const { return list.no(); }
@@ -162,14 +159,6 @@ public:
   /// Destructor
   virtual ~FXGLGroup();
   };
-
-
-// Restore previous warning levels
-#ifdef _MSC_VER
-#if _MSC_VER >= 1200
-#pragma warning( pop )
-#endif
-#endif
 
 
 /// OpenGL Point Object

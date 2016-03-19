@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    R a n g e    C l a s s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRangef.cpp,v 1.14 2006/01/22 17:58:38 fox Exp $                        *
+* $Id: FXRangef.cpp,v 1.16 2007/02/07 20:22:14 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -97,31 +97,31 @@ FXVec3f FXRangef::center() const {
 
 
 // Test if empty
-bool FXRangef::empty() const {
+FXbool FXRangef::empty() const {
   return upper.x<lower.x || upper.y<lower.y || upper.z<lower.z;
   }
 
 
 // Test if box contains point x,y,z
-bool FXRangef::contains(FXfloat x,FXfloat y,FXfloat z) const {
+FXbool FXRangef::contains(FXfloat x,FXfloat y,FXfloat z) const {
   return lower.x<=x && x<=upper.x && lower.y<=y && y<=upper.y && lower.z<=z && z<=upper.z;
   }
 
 
 // Test if box contains point p
-bool FXRangef::contains(const FXVec3f& p) const {
+FXbool FXRangef::contains(const FXVec3f& p) const {
   return lower.x<=p.x && p.x<=upper.x && lower.y<=p.y && p.y<=upper.y && lower.z<=p.z && p.z<=upper.z;
   }
 
 
 // Test if box contains another box
-bool FXRangef::contains(const FXRangef& bounds) const {
+FXbool FXRangef::contains(const FXRangef& bounds) const {
   return lower.x<=bounds.lower.x && bounds.upper.x<=upper.x && lower.y<=bounds.lower.y && bounds.upper.y<=upper.y && lower.z<=bounds.lower.z && bounds.upper.z<=upper.z;
   }
 
 
 // Test if box contains sphere
-bool FXRangef::contains(const FXSpheref& sphere) const {
+FXbool FXRangef::contains(const FXSpheref& sphere) const {
   return lower.x<=sphere.center.x-sphere.radius && sphere.center.x+sphere.radius<=upper.x && lower.y<=sphere.center.y-sphere.radius && sphere.center.y+sphere.radius<=upper.y && lower.z<=sphere.center.z-sphere.radius && sphere.center.z+sphere.radius<=upper.z;
   }
 
@@ -162,7 +162,7 @@ FXRangef& FXRangef::include(const FXSpheref& sphere){
 
 
 // Test if overlap
-bool overlap(const FXRangef& a,const FXRangef& b){
+FXbool overlap(const FXRangef& a,const FXRangef& b){
   return a.upper.x>=b.lower.x && a.lower.x<=b.upper.x && a.upper.y>=b.lower.y && a.lower.y<=b.upper.y && a.upper.z>=b.lower.z && a.lower.z<=b.upper.z;
   }
 
@@ -224,7 +224,7 @@ FXint FXRangef::intersect(const FXVec4f& plane) const {
 
 
 // Intersect box with ray u-v
-bool FXRangef::intersect(const FXVec3f& u,const FXVec3f& v){
+FXbool FXRangef::intersect(const FXVec3f& u,const FXVec3f& v){
   register FXfloat d,ni,fi,t;
   register FXfloat f= FLT_MAX;
   register FXfloat n=-FLT_MAX;

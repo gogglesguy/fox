@@ -3,7 +3,7 @@
 *                             K n o b   W i d g e t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Leandro Nini.   All Rights Reserved.               *
+* Copyright (C) 2005,2007 by Leandro Nini.   All Rights Reserved.               *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXKnob.cpp,v 1.16 2006/03/31 07:33:10 fox Exp $                          *
+* $Id: FXKnob.cpp,v 1.20 2007/02/07 20:22:11 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -102,8 +102,10 @@ FXDEFMAP(FXKnob) FXKnobMap[]={
   FXMAPFUNC(SEL_TIMEOUT,FXKnob::ID_AUTOSLIDE,FXKnob::onAutoSlide),
   FXMAPFUNC(SEL_COMMAND,FXKnob::ID_SETVALUE,FXKnob::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXKnob::ID_SETINTVALUE,FXKnob::onCmdSetIntValue),
-  FXMAPFUNC(SEL_COMMAND,FXKnob::ID_SETREALVALUE,FXKnob::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXKnob::ID_GETINTVALUE,FXKnob::onCmdGetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXKnob::ID_SETLONGVALUE,FXKnob::onCmdSetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXKnob::ID_GETLONGVALUE,FXKnob::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXKnob::ID_SETREALVALUE,FXKnob::onCmdSetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXKnob::ID_GETREALVALUE,FXKnob::onCmdGetRealValue),
   FXMAPFUNC(SEL_COMMAND,FXKnob::ID_SETINTRANGE,FXKnob::onCmdSetIntRange),
   FXMAPFUNC(SEL_COMMAND,FXKnob::ID_GETINTRANGE,FXKnob::onCmdGetIntRange),
@@ -152,7 +154,7 @@ FXKnob::FXKnob(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
 
 
 // Knob can have focus
-bool FXKnob::canFocus() const { return true; }
+FXbool FXKnob::canFocus() const { return true; }
 
 
 // Enable the knob
@@ -275,16 +277,30 @@ long FXKnob::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Update value from a message
-long FXKnob::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
-  setValue((FXint)*((FXdouble*)ptr));
+// Obtain value from text field
+long FXKnob::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
+  *((FXint*)ptr)=getValue();
   return 1;
   }
 
 
-// Obtain value from text field
-long FXKnob::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
-  *((FXint*)ptr)=getValue();
+// Update value from a message
+long FXKnob::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXint)*((FXlong*)ptr));
+  return 1;
+  }
+
+
+// Obtain value with a message
+long FXKnob::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
+  *((FXlong*)ptr)=(FXlong)getValue();
+  return 1;
+  }
+
+
+// Update value from a message
+long FXKnob::onCmdSetRealValue(FXObject*,FXSelector,void* ptr){
+  setValue((FXint)*((FXdouble*)ptr));
   return 1;
   }
 
@@ -446,7 +462,7 @@ long FXKnob::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
 long FXKnob::onMouseWheel(FXObject*,FXSelector,void* ptr){
   register FXEvent *event=(FXEvent*)ptr;
   register FXint p=pos+(event->code*incr)/120;
-  setValue(p,TRUE);
+  setValue(p,true);
   return 1;
   }
 
@@ -493,11 +509,11 @@ long FXKnob::onKeyPress(FXObject*,FXSelector,void* ptr){
     switch(event->code){
       case KEY_Up:
       case KEY_KP_Up:
-        setValue(pos+incr,TRUE);
+        setValue(pos+incr,true);
         return 1;
       case KEY_Down:
       case KEY_KP_Down:
-        setValue(pos-incr,TRUE);
+        setValue(pos-incr,true);
         return 1;
       }
     }
@@ -602,7 +618,7 @@ long FXKnob::onPaint(FXObject*,FXSelector,void* ptr){
 
 
 // Set knob range
-void FXKnob::setRange(FXint lo,FXint hi,bool notify){
+void FXKnob::setRange(FXint lo,FXint hi,FXbool notify){
   if(lo>hi){ fxerror("%s::setRange: trying to set negative range.\n",getClassName()); }
   if(range[0]!=lo || range[1]!=hi){
     range[0]=lo;
@@ -613,7 +629,7 @@ void FXKnob::setRange(FXint lo,FXint hi,bool notify){
 
 
 // Set knob limits
-void FXKnob::setLimits(FXint start,FXint end,bool notify){
+void FXKnob::setLimits(FXint start,FXint end,FXbool notify){
   if(start>end || start<0 || end>360){ fxerror("%s::setLimits: invalid values.\n",getClassName()); }
   if(limits[0]!=start || limits[1]!=end){
     limits[0]=((FXdouble)start/PI*DTOR)-0.5;
@@ -631,7 +647,7 @@ void FXKnob::getLimits(FXint& start,FXint& end){
 
 
 // Set position
-void FXKnob::setValue(FXint p,bool notify){
+void FXKnob::setValue(FXint p,FXbool notify){
   if(p<range[0]) p=range[0];
   if(p>range[1]) p=range[1];
   if(p!=pos){

@@ -3,7 +3,7 @@
 *                     T o o l   B a r   T a b   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolBarTab.cpp,v 1.23 2006/03/31 07:33:14 fox Exp $                    *
+* $Id: FXToolBarTab.cpp,v 1.25 2007/02/07 20:22:18 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -104,7 +104,7 @@ FXToolBarTab::FXToolBarTab(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint op
 
 
 // If window can have focus
-bool FXToolBarTab::canFocus() const { return true; }
+FXbool FXToolBarTab::canFocus() const { return true; }
 
 
 // Enable the window
@@ -178,7 +178,7 @@ FXint FXToolBarTab::getDefaultHeight(){
 
 
 // Collapse or uncollapse
-void FXToolBarTab::collapse(bool fold,bool notify){
+void FXToolBarTab::collapse(FXbool fold,FXbool notify){
   FXWindow *sibling;
   if(fold!=collapsed){
     sibling=getNext() ? getNext() : getPrev();
@@ -257,7 +257,7 @@ long FXToolBarTab::onLeftBtnPress(FXObject* sender,FXSelector sel,void* ptr){
 
 // Released mouse button
 long FXToolBarTab::onLeftBtnRelease(FXObject* sender,FXSelector sel,void* ptr){
-  bool click=down;
+  FXbool click=down;
   if(!FXFrame::onLeftBtnRelease(sender,sel,ptr)){
     if(isEnabled() && (flags&FLAG_PRESSED)){
       flags|=FLAG_UPDATE;

@@ -3,9 +3,9 @@
 *                                  Chart  Test                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: chart.cpp,v 1.7 2006/01/22 18:01:13 fox Exp $                            *
+* $Id: chart.cpp,v 1.9 2007/02/07 20:21:51 fox Exp $                            *
 ********************************************************************************/
 #include "fx.h"
 #include "FXChart.h"
@@ -85,10 +85,10 @@ ChartWindow::ChartWindow(FXApp* a):FXMainWindow(a,"Chart Test",NULL,NULL,DECOR_A
   image=new FXBMPImage(getApp(),marble);
 
   FillStyle fs;
-  fs.style=FILLSTYLE_HORIZONTAL;
+  fs.style=FILLSTYLE_VERTICAL;
   fs.hatch=STIPPLE_NONE;
   fs.image=image;
-  fs.color=FXRGB(128,255,255);
+  fs.forecolor=FXRGB(128,255,255);
   fs.backcolor=FXRGB(128,128,255);
   fs.lower=FXRGB(255,255,255);
   fs.upper=FXRGB(0,0,255);

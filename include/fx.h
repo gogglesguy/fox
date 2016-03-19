@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx.h,v 1.105 2006/04/04 05:00:42 fox Exp $                               *
+* $Id: fx.h,v 1.112 2007/02/07 20:22:00 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H
@@ -51,6 +51,7 @@
 #include "FXFileStream.h"
 #include "FXMemoryStream.h"
 #include "FXString.h"
+#include "FXDLL.h"
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
@@ -74,7 +75,7 @@
 #include "FXVisual.h"
 #include "FXFont.h"
 #include "FXCursor.h"
-#include "FXGUISignal.h"
+#include "FXMessageChannel.h"
 #include "FXCURCursor.h"
 #include "FXGIFCursor.h"
 #include "FXDrawable.h"
@@ -226,6 +227,9 @@
 #include "FXToolBarTab.h"
 #include "FXPrintDialog.h"
 #include "FXDebugTarget.h"
+#include "FXCalendarView.h"
+#include "FXCalendar.h"
+#include "FXConsole.h"
 #include "FXSplashWindow.h"
 
 

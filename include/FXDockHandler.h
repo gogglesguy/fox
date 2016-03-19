@@ -3,7 +3,7 @@
 *                       D o c k H a n d l e r   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockHandler.h,v 1.3 2006/01/22 17:58:00 fox Exp $                      *
+* $Id: FXDockHandler.h,v 1.5 2007/02/07 20:21:53 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXDOCKHANDLER_H
 #define FXDOCKHANDLER_H
@@ -64,7 +64,7 @@ protected:
 public:
 
   /// The grip can receive the focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Set the status line help text for grip
   void setHelpText(const FXString& text){ help=text; }

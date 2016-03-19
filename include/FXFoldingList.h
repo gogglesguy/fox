@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFoldingList.h,v 1.35 2006/03/31 07:33:01 fox Exp $                     *
+* $Id: FXFoldingList.h,v 1.38 2007/02/07 20:21:54 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXFOLDINGLIST_H
 #define FXFOLDINGLIST_H
@@ -123,13 +123,13 @@ public:
   const FXString& getText() const { return label; }
 
   /// Change open icon, deleting old icon if it was owned
-  virtual void setOpenIcon(FXIcon* icn,bool owned=false);
+  virtual void setOpenIcon(FXIcon* icn,FXbool owned=false);
 
   /// Get open icon
   FXIcon* getOpenIcon() const { return openIcon; }
 
   /// Change closed icon, deleting old icon if it was owned
-  virtual void setClosedIcon(FXIcon* icn,bool owned=false);
+  virtual void setClosedIcon(FXIcon* icn,FXbool owned=false);
 
   /// Get closed icon
   FXIcon* getClosedIcon() const { return closedIcon; }
@@ -141,52 +141,52 @@ public:
   void* getData() const { return data; }
 
   /// Make item draw as focused
-  virtual void setFocus(bool focus);
+  virtual void setFocus(FXbool focus);
 
   /// Return true if item has focus
-  bool hasFocus() const { return (state&FOCUS)!=0; }
+  FXbool hasFocus() const { return (state&FOCUS)!=0; }
 
   /// Select item
-  virtual void setSelected(bool selected);
+  virtual void setSelected(FXbool selected);
 
   /// Return true if this item is selected
-  bool isSelected() const { return (state&SELECTED)!=0; }
+  FXbool isSelected() const { return (state&SELECTED)!=0; }
 
   /// Make item show as open
-  virtual void setOpened(bool opened);
+  virtual void setOpened(FXbool opened);
 
   /// Return true if this item is open
-  bool isOpened() const { return (state&OPENED)!=0; }
+  FXbool isOpened() const { return (state&OPENED)!=0; }
 
   /// Expand or collapse item
-  virtual void setExpanded(bool expanded);
+  virtual void setExpanded(FXbool expanded);
 
   /// Return true if this item is expanded into sub items
-  bool isExpanded() const { return (state&EXPANDED)!=0; }
+  FXbool isExpanded() const { return (state&EXPANDED)!=0; }
 
   /// Enable or disable item
-  virtual void setEnabled(bool enabled);
+  virtual void setEnabled(FXbool enabled);
 
   /// Return true if this item is enabled
-  bool isEnabled() const { return (state&DISABLED)==0; }
+  FXbool isEnabled() const { return (state&DISABLED)==0; }
 
   /// Make item draggable
-  virtual void setDraggable(bool draggable);
+  virtual void setDraggable(FXbool draggable);
 
   /// Return true if this item is draggable
-  bool isDraggable() const { return (state&DRAGGABLE)!=0; }
+  FXbool isDraggable() const { return (state&DRAGGABLE)!=0; }
 
-  /// Return TRUE if subitems, real or imagined
-  bool hasItems() const { return (state&HASITEMS)!=0; }
+  /// Return true if subitems, real or imagined
+  FXbool hasItems() const { return (state&HASITEMS)!=0; }
 
   /// Change has items flag
-  void setHasItems(bool flag);
+  void setHasItems(FXbool flag);
 
   /// Return true if descendent of parent item
-  bool isChildOf(const FXFoldingItem* item) const;
+  FXbool isChildOf(const FXFoldingItem* item) const;
 
   /// Return true if ancestor of child item
-  bool isParentOf(const FXFoldingItem* item) const;
+  FXbool isParentOf(const FXFoldingItem* item) const;
 
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXFoldingList* list) const;
@@ -266,7 +266,7 @@ protected:
   FXint              graby;             // Grab point y
   FXString           lookup;            // Lookup string
   FXString           help;              // Help string
-  bool               state;             // State of item
+  FXbool               state;             // State of item
 protected:
   FXFoldingList();
   void recompute();
@@ -344,7 +344,7 @@ public:
   virtual void recalc();
 
   /// Tree list can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Move the focus to this window
   virtual void setFocus();
@@ -404,43 +404,43 @@ public:
   FXFoldingItem* getLastItem() const { return lastitem; }
 
   /// Fill list by appending items from array of strings
-  FXint fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXint fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from newline separated strings
-  FXint fillItems(FXFoldingItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXint fillItems(FXFoldingItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Insert [possibly subclassed] item under father before other item
-  FXFoldingItem* insertItem(FXFoldingItem* other,FXFoldingItem* father,FXFoldingItem* item,bool notify=false);
+  FXFoldingItem* insertItem(FXFoldingItem* other,FXFoldingItem* father,FXFoldingItem* item,FXbool notify=false);
 
   /// Insert item with given text and optional icons, and user-data pointer under father before other item
-  FXFoldingItem* insertItem(FXFoldingItem* other,FXFoldingItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXFoldingItem* insertItem(FXFoldingItem* other,FXFoldingItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Append [possibly subclassed] item as last child of father
-  FXFoldingItem* appendItem(FXFoldingItem* father,FXFoldingItem* item,bool notify=false);
+  FXFoldingItem* appendItem(FXFoldingItem* father,FXFoldingItem* item,FXbool notify=false);
 
   /// Append item with given text and optional icons, and user-data pointer as last child of father
-  FXFoldingItem* appendItem(FXFoldingItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXFoldingItem* appendItem(FXFoldingItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend [possibly subclassed] item as first child of father
-  FXFoldingItem* prependItem(FXFoldingItem* father,FXFoldingItem* item,bool notify=false);
+  FXFoldingItem* prependItem(FXFoldingItem* father,FXFoldingItem* item,FXbool notify=false);
 
   /// Prepend item with given text and optional icons, and user-data pointer as first child of father
-  FXFoldingItem* prependItem(FXFoldingItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,bool notify=false);
+  FXFoldingItem* prependItem(FXFoldingItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Move item under father before other item
   FXFoldingItem *moveItem(FXFoldingItem* other,FXFoldingItem* father,FXFoldingItem* item);
 
   /// Extract item
-  FXFoldingItem* extractItem(FXFoldingItem* item,bool notify=false);
+  FXFoldingItem* extractItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Remove item
-  void removeItem(FXFoldingItem* item,bool notify=false);
+  void removeItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Remove items in range [fm, to] inclusively
-  void removeItems(FXFoldingItem* fm,FXFoldingItem* to,bool notify=false);
+  void removeItems(FXFoldingItem* fm,FXFoldingItem* to,FXbool notify=false);
 
   /// Remove all items from list
-  void clearItems(bool notify=false);
+  void clearItems(FXbool notify=false);
 
   /// Return item width
   FXint getItemWidth(const FXFoldingItem* item) const { return item->getWidth(this); }
@@ -482,13 +482,13 @@ public:
   FXString getItemText(const FXFoldingItem* item) const;
 
   /// Change item's open icon, deleting old icon if it was owned
-  void setItemOpenIcon(FXFoldingItem* item,FXIcon* icon,bool owned=false);
+  void setItemOpenIcon(FXFoldingItem* item,FXIcon* icon,FXbool owned=false);
 
   /// Return item's open icon
   FXIcon* getItemOpenIcon(const FXFoldingItem* item) const;
 
   /// Chance item's closed icon, deleting old icon if it was owned
-  void setItemClosedIcon(FXFoldingItem* item,FXIcon* icon,bool owned=false);
+  void setItemClosedIcon(FXFoldingItem* item,FXIcon* icon,FXbool owned=false);
 
   /// Return item's closed icon
   FXIcon* getItemClosedIcon(const FXFoldingItem* item) const;
@@ -499,26 +499,26 @@ public:
   /// Return item user-data pointer
   void* getItemData(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item is selected
-  bool isItemSelected(const FXFoldingItem* item) const;
+  /// Return true if item is selected
+  FXbool isItemSelected(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item is current
-  bool isItemCurrent(const FXFoldingItem* item) const;
+  /// Return true if item is current
+  FXbool isItemCurrent(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item is visible
-  bool isItemVisible(const FXFoldingItem* item) const;
+  /// Return true if item is visible
+  FXbool isItemVisible(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item opened
-  bool isItemOpened(const FXFoldingItem* item) const;
+  /// Return true if item opened
+  FXbool isItemOpened(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item expanded
-  bool isItemExpanded(const FXFoldingItem* item) const;
+  /// Return true if item expanded
+  FXbool isItemExpanded(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item is a leaf-item, i.e. has no children
-  bool isItemLeaf(const FXFoldingItem* item) const;
+  /// Return true if item is a leaf-item, i.e. has no children
+  FXbool isItemLeaf(const FXFoldingItem* item) const;
 
-  /// Return TRUE if item is enabled
-  bool isItemEnabled(const FXFoldingItem* item) const;
+  /// Return true if item is enabled
+  FXbool isItemEnabled(const FXFoldingItem* item) const;
 
   /// Return item hit code: 0 outside, 1 icon, 2 text, 3 box
   FXint hitItem(const FXFoldingItem* item,FXint x,FXint y) const;
@@ -527,40 +527,40 @@ public:
   void updateItem(FXFoldingItem* item);
 
   /// Enable item
-  virtual bool enableItem(FXFoldingItem* item);
+  virtual FXbool enableItem(FXFoldingItem* item);
 
   /// Disable item
-  virtual bool disableItem(FXFoldingItem* item);
+  virtual FXbool disableItem(FXFoldingItem* item);
 
   /// Select item
-  virtual bool selectItem(FXFoldingItem* item,bool notify=false);
+  virtual FXbool selectItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Deselect item
-  virtual bool deselectItem(FXFoldingItem* item,bool notify=false);
+  virtual FXbool deselectItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Toggle item selection
-  virtual bool toggleItem(FXFoldingItem* item,bool notify=false);
+  virtual FXbool toggleItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Extend selection from anchor item to item
-  virtual bool extendSelection(FXFoldingItem* item,bool notify=false);
+  virtual FXbool extendSelection(FXFoldingItem* item,FXbool notify=false);
 
   /// Deselect all items
-  virtual bool killSelection(bool notify=false);
+  virtual FXbool killSelection(FXbool notify=false);
 
   /// Open item
-  virtual bool openItem(FXFoldingItem* item,bool notify=false);
+  virtual FXbool openItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Close item
-  virtual bool closeItem(FXFoldingItem* item,bool notify=false);
+  virtual FXbool closeItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Collapse tree
-  virtual bool collapseTree(FXFoldingItem* tree,bool notify=false);
+  virtual FXbool collapseTree(FXFoldingItem* tree,FXbool notify=false);
 
   /// Expand tree
-  virtual bool expandTree(FXFoldingItem* tree,bool notify=false);
+  virtual FXbool expandTree(FXFoldingItem* tree,FXbool notify=false);
 
   /// Change current item
-  virtual void setCurrentItem(FXFoldingItem* item,bool notify=false);
+  virtual void setCurrentItem(FXFoldingItem* item,FXbool notify=false);
 
   /// Return current item, if any
   FXFoldingItem* getCurrentItem() const { return currentitem; }

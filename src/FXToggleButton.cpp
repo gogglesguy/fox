@@ -3,7 +3,7 @@
 *                   T o g g l e    B u t t o n    O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToggleButton.cpp,v 1.63 2006/01/22 17:58:47 fox Exp $                  *
+* $Id: FXToggleButton.cpp,v 1.68 2007/02/07 20:22:18 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -164,7 +164,7 @@ FXint FXToggleButton::getDefaultHeight(){
 
 
 // Set button state
-void FXToggleButton::setState(FXbool s,FXbool notify){
+void FXToggleButton::setState(FXuchar s,FXbool notify){
   if(state!=s){
     state=s;
     update();
@@ -174,7 +174,7 @@ void FXToggleButton::setState(FXbool s,FXbool notify){
 
 
 // Press button
-void FXToggleButton::press(FXbool dn){
+void FXToggleButton::press(FXuchar dn){
   if(down!=dn){
     down=dn;
     update();
@@ -183,7 +183,7 @@ void FXToggleButton::press(FXbool dn){
 
 
 // If window can have focus
-bool FXToggleButton::canFocus() const { return true; }
+FXbool FXToggleButton::canFocus() const { return true; }
 
 
 // Update value from a message
@@ -287,7 +287,7 @@ long FXToggleButton::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
 
 // Released mouse button
 long FXToggleButton::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
-  FXbool click=down;
+  FXuchar click=down;
   if(isEnabled() && (flags&FLAG_PRESSED)){
     ungrab();
     flags|=FLAG_UPDATE;
@@ -555,12 +555,14 @@ long FXToggleButton::onPaint(FXObject*,FXSelector,void* ptr){
 // Change text
 void FXToggleButton::setAltText(const FXString& text){
   FXString string=stripHotKey(text);
-  if(altlabel!=string){
+  FXHotKey hkey=parseHotKey(text);
+  FXint hoff=findHotKey(text);
+  if(altlabel!=string || althotkey!=hkey || althotoff!=hoff){
+    altlabel.adopt(string);
     remHotKey(althotkey);
-    althotkey=parseHotKey(text);
-    althotoff=findHotKey(text);
+    althotkey=hkey;
+    althotoff=hoff;
     addHotKey(althotkey);
-    altlabel=string;
     recalc();
     update();
     }

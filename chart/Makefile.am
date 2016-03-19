@@ -10,11 +10,9 @@ lib_LTLIBRARIES = libCHART-1.7.la
 
 libCHART_1_7_la_LIBADD  = $(X_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS)
 
-libCHART_1_7_la_LDFLAGS = \
-        -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)    \
-	-export-dynamic
+libCHART_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
 
-chartincludedir=$(includedir)/fox-1.6/chart
+chartincludedir=$(includedir)/fox-1.7/chart
 
 chartinclude_HEADERS = \
 FXChart.h
@@ -32,10 +30,10 @@ chart_SOURCES = chart.cpp icons.h icons.cpp $(ICONS)
 chart.cpp: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 CLEANFILES = icons.h icons.cpp
 

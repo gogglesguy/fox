@@ -3,7 +3,7 @@
 *                G L  C a n v a s   W i n d o w   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCanvas.h,v 1.34 2006/03/31 07:33:01 fox Exp $                        *
+* $Id: FXGLCanvas.h,v 1.38 2007/03/09 03:55:55 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLCANVAS_H
 #define FXGLCANVAS_H
@@ -48,7 +48,7 @@ private:
   FXGLCanvas(const FXGLCanvas&);
   FXGLCanvas &operator=(const FXGLCanvas&);
 #ifdef WIN32
-  virtual const char* GetClass() const;
+  virtual const void* GetClass() const;
 #endif
 public:
 
@@ -65,8 +65,8 @@ public:
   */
   FXGLCanvas(FXComposite* p,FXGLVisual *vis,FXGLCanvas* sharegroup,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Return TRUE if it is sharing display lists
-  bool isShared() const;
+  /// Return true if it is sharing display lists
+  FXbool isShared() const;
 
   /// Create all of the server-side resources for this window
   virtual void create();
@@ -78,13 +78,13 @@ public:
   virtual void destroy();
 
   /// Make OpenGL context current prior to performing OpenGL commands
-  virtual bool makeCurrent();
+  virtual FXbool makeCurrent();
 
   /// Make OpenGL context non current
-  virtual bool makeNonCurrent();
+  virtual FXbool makeNonCurrent();
 
-  /// Return TRUE if this window's context is current
-  virtual bool isCurrent() const;
+  /// Return true if this window's context is current
+  virtual FXbool isCurrent() const;
 
   /// Return current context, if any
   static void* getCurrentContext();

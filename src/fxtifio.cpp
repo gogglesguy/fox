@@ -3,7 +3,7 @@
 *                          T I F F   I n p u t / O u t p u t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2007 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxtifio.cpp,v 1.36 2006/03/24 05:55:40 fox Exp $                         *
+* $Id: fxtifio.cpp,v 1.40 2007/02/07 20:22:22 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -59,9 +59,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckTIF(FXStream& store);
-extern FXAPI bool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec);
-extern FXAPI bool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec);
+extern FXAPI FXbool fxcheckTIF(FXStream& store);
+extern FXAPI FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec);
+extern FXAPI FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec);
 
 
 #ifdef HAVE_TIFF_H
@@ -72,7 +72,6 @@ struct tiff_store_handle {
   FXStream *store;
   FXlong    begin;
   FXlong    end;
-  FXbool    error;
   };
 
 
@@ -161,7 +160,7 @@ static toff_t tif_size_store(thandle_t handle){
 
 
 // Check if stream contains a TIFF
-bool fxcheckTIF(FXStream& store){
+FXbool fxcheckTIF(FXStream& store){
   FXuchar signature[2];
   store.load(signature,2);
   store.position(-2,FXFromCurrent);
@@ -170,7 +169,7 @@ bool fxcheckTIF(FXStream& store){
 
 
 // Load a TIFF image
-bool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
+FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
   tiff_store_handle s_handle;
   TIFFRGBAImage img;
   TIFF *image;
@@ -192,7 +191,6 @@ bool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushor
   s_handle.store=&store;
   s_handle.begin=store.position();
   s_handle.end=store.position();
-  s_handle.error=FALSE;
 
   // Open image
   image=TIFFClientOpen("tiff","rm",(thandle_t)&s_handle,tif_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,tif_map_store,tif_unmap_store);
@@ -200,7 +198,7 @@ bool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushor
 
   // We try to remember the codec for later when we save the image back out...
   TIFFGetField(image,TIFFTAG_COMPRESSION,&codec);
-  FXTRACE((100,"fxloadTIF: codec=%d\n",codec));
+  //FXTRACE((100,"fxloadTIF: codec=%d\n",codec));
 
   // FIXME TIFFRGBAImage{Begin,Get,End} is too broken!
   if(TIFFRGBAImageBegin(&img,image,0,emsg)!=1){
@@ -208,7 +206,7 @@ bool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushor
     return false;
     }
 
-  FXTRACE((1,"fxloadTIF: width=%u height=%u alpha=%d bitspersample=%u samplesperpixel=%u orientation=%u photometric=%u\n",img.width,img.height,img.alpha,img.bitspersample,img.samplesperpixel,img.orientation,img.photometric));
+  //FXTRACE((100,"fxloadTIF: width=%u height=%u alpha=%d bitspersample=%u samplesperpixel=%u orientation=%u photometric=%u\n",img.width,img.height,img.alpha,img.bitspersample,img.samplesperpixel,img.orientation,img.photometric));
 
   // Make room for data
   size=img.width*img.height;
@@ -245,7 +243,7 @@ bool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushor
 /*******************************************************************************/
 
 // Save a TIFF image
-bool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec){
+FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec){
   tiff_store_handle s_handle;
   long rows_per_strip,line;
   const TIFFCodec* coder;
@@ -272,11 +270,10 @@ bool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXus
   s_handle.store=&store;
   s_handle.begin=store.position();
   s_handle.end=store.position();
-  s_handle.error=FALSE;
 
   // Open image
   image=TIFFClientOpen("tiff","w",(thandle_t)&s_handle,tif_dummy_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,tif_map_store,tif_unmap_store);
-  if(!image) return FALSE;
+  if(!image) return false;
 
   // Size of a strip is 16kb
   rows_per_strip=16*1024/width;
@@ -295,7 +292,7 @@ bool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXus
 
   // Dump each line
   for(line=0; line<height; line++){
-    if(TIFFWriteScanline(image,(void*)data,line,1)!=1 || s_handle.error){
+    if(TIFFWriteScanline(image,(void*)data,line,1)!=1){
       TIFFClose(image);
       return false;
       }
@@ -313,13 +310,13 @@ bool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXus
 
 
 // Check if stream contains a TIFF
-bool fxcheckTIF(FXStream&){
+FXbool fxcheckTIF(FXStream&){
   return false;
   }
 
 
 // Stub routine
-bool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
+FXbool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
   static const FXuchar tiff_bits[] = {
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
@@ -345,7 +342,7 @@ bool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& cod
 
 
 // Stub routine
-bool fxsaveTIF(FXStream&,const FXColor*,FXint,FXint,FXushort){
+FXbool fxsaveTIF(FXStream&,const FXColor*,FXint,FXint,FXushort){
   return false;
   }
 

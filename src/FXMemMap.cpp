@@ -3,7 +3,7 @@
 *                      M e m o r y   M a p p e d   F i l e                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMemMap.cpp,v 1.21 2006/01/22 17:58:35 fox Exp $                        *
+* $Id: FXMemMap.cpp,v 1.33 2007/02/07 20:22:12 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxdefs.h"
@@ -32,7 +32,15 @@
   - Maybe use long sz = sysconf(_SC_PAGESIZE);
   - msync().
   - Need to bring in line with FXIO esp. with interpretation of options and so on.
+  - Need API's to open with existing file handles.
 */
+
+
+#ifdef WIN32
+#define BadHandle INVALID_HANDLE_VALUE
+#else
+#define BadHandle -1
+#endif
 
 
 using namespace FX;
@@ -43,181 +51,193 @@ namespace FX {
 
 
 // Create new map object
-FXMemMap::FXMemMap():mapbase(NULL),maplength(-1),mapoffset(0){
-#ifndef WIN32
-  handle=-1;
-  file=-1;
-#else
-  handle=INVALID_HANDLE_VALUE;
-  file=INVALID_HANDLE_VALUE;
-#endif
+FXMemMap::FXMemMap():maphandle(BadHandle),mapbase(NULL),mapoffset(0L),mapposition(0L),maplength(0){
   }
 
 
-// Map file
-void *FXMemMap::mapFile(const FXString& filename,long off,long len,FXuint access,FXuint share){
-#ifndef WIN32
-#ifdef HAVE_MMAP
-  struct stat info;
-  FXint prot,flags;
+// Open file and map it
+void *FXMemMap::openMap(const FXString& filename,FXlong off,FXival len,FXuint m,FXuint p){
+  if(open(filename,m,p)){
+    void* result=map(off,len);
+    if(result){
+      return result;
+      }
+    close();
+    }
+  return NULL;
+  }
 
-  // Set access flags
-  flags=0;
-  if(access&READ){ flags=O_RDONLY; }
-  if(access&WRITE){ flags=O_RDWR|O_CREAT; }
-  if(access&TRUNC){ flags|=O_TRUNC; }
 
-  // Open file
-  file=open(filename.text(),flags,0666);
-  if(file!=-1){
+// Attach to existing file handle and map it
+void* FXMemMap::openMap(FXInputHandle h,FXlong off,FXival len,FXuint m){
+  if(open(h,m)){
+    void* result=map(off,len);
+    if(result){
+      return result;
+      }
+    close();
+    }
+  return NULL;
+  }
 
-    // If length was not passed, obtain the length
-    if(fstat(file,&info)==0){
+
+// Map an already open file
+void *FXMemMap::map(FXlong off,FXival len){
+  if(isOpen()){
+
+    // Get file size
+    FXlong filesize=size();
+    if(0<=filesize){
+
+#ifdef WIN32
 
       // Map whole file
-      if(len==-1) len=info.st_size-off;
+      if(len==-1) len=filesize-off;
+
+      // Set access flags
+      DWORD prot=0;
+      if(access&ReadOnly){ prot=PAGE_READONLY; }
+      if(access&WriteOnly){ prot=PAGE_READWRITE; }
+
+      DWORD flag=0;
+      if(access&ReadOnly){ flag=FILE_MAP_READ; }
+      if(access&WriteOnly){ flag=FILE_MAP_WRITE; }
+
+      // Now map it
+      FXInputHandle hnd=::CreateFileMapping(handle(),NULL,prot,0,maplength,NULL);
+      if(hnd!=NULL){
+        FXuchar* ptr=(FXuchar*)::MapViewOfFile(maphandle,flag,0,off,len);
+        if(ptr!=NULL){
+          maphandle=hnd;
+          mapbase=ptr;
+          maplength=len;
+          mapoffset=off;
+          mapposition=off;
+          return mapbase;
+          }
+        ::CloseHandle(hnd);
+        }
+#else
+
+      // Map whole file
+      if(len==-1) len=filesize-off;
 
       // Trying to map region larger than the file
-      if(info.st_size<off+len){
-        if(access&WRITE){
-          ftruncate(file,off+len);      // Extend the file if writing
+      if(filesize<off+len){
+        if(access&WriteOnly){
+          truncate(off+len);            // Extends the file if writing
           }
         else{
-          len=info.st_size-off;         // Map smaller region when reading
+          len=filesize-off;             // Map smaller region when reading
           }
         }
 
       // Set access flags
-      prot=PROT_NONE;
-      if(access&READ){ prot|=PROT_READ; }
-      if(access&WRITE){ prot|=PROT_WRITE|PROT_READ; }
-      if(access&EXEC){ prot|=PROT_EXEC; }
-
-      // Map a view of the file
-      flags=MAP_PRIVATE;
-      if(share&SHAR){ flags=MAP_SHARED; }
+      FXint prot=PROT_NONE;
+      if(access&ReadOnly){ prot|=PROT_READ; }
+      if(access&WriteOnly){ prot|=PROT_WRITE|PROT_READ; }
+      if(access&Executable){ prot|=PROT_EXEC; }
 
       // Now map it
-      maplength=len;
-      mapoffset=off;
-      mapbase=mmap(NULL,maplength,prot,flags,file,mapoffset);
-      if(mapbase != (void*)MAP_FAILED){
+      FXuchar* ptr=(FXuchar*)::mmap(NULL,len,prot,MAP_SHARED,handle(),off);
+      if(ptr!=MAP_FAILED){
+        mapbase=ptr;
+        maplength=len;
+        mapoffset=off;
+        mapposition=off;
         return mapbase;
         }
+#endif
       }
-
-    // Close it
-    close(file);
     }
-  handle=-1;
-  file=-1;
-#endif
-
-#else
-  DWORD prot,flags,junk;
-
-  // Set access flags
-  prot=0;
-  flags=0;
-  if(access&READ){ prot=GENERIC_READ; flags=FILE_SHARE_READ; }
-  if(access&WRITE){ prot=GENERIC_WRITE|GENERIC_READ; flags=FILE_SHARE_READ|FILE_SHARE_WRITE; }
-
-// Open file
-#ifdef UNICODE
-  FXnchar unifile[1024];
-  utf2ncs(unifile,filename.text(),filename.length()+1);
-  file=::CreateFileW(unifile,prot,flags,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_RANDOM_ACCESS,NULL);
-#else
-  file=::CreateFileA(filename.text(),prot,flags,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_RANDOM_ACCESS,NULL);
-#endif
-  if(file!=INVALID_HANDLE_VALUE){
-
-    prot=0;
-    if(access&READ){ prot=PAGE_READONLY; }
-    if(access&WRITE){ prot=PAGE_READWRITE; }
-
-    maplength=len;
-    if(len<0) maplength=GetFileSize(file,&junk);
-
-    // Create map object
-    handle=CreateFileMapping(file,NULL,prot,0,maplength,NULL);
-    if(handle!=NULL){
-
-      prot=0;
-      if(access&READ){ prot=FILE_MAP_READ; }
-      if(access&WRITE){ prot=FILE_MAP_WRITE; }
-
-      mapoffset=off;
-      mapbase=MapViewOfFile(handle,prot,0,mapoffset,maplength);
-      if(mapbase!=NULL){
-        return mapbase;
-        }
-      CloseHandle(handle);
-      }
-    CloseHandle(file);
-    }
-  handle=INVALID_HANDLE_VALUE;
-  file=INVALID_HANDLE_VALUE;
-#endif
-  mapbase=NULL;
-  maplength=0;
-  mapoffset=0;
   return NULL;
   }
 
 
 // Unmap the view of the file
 void* FXMemMap::unmap(){
-#ifndef WIN32
-#ifdef HAVE_MMAP
   if(mapbase){
-    munmap((char*)mapbase,maplength);
-    }
-  if(file!=-1){
-    close(file);
-    }
-  handle=-1;
-  file=-1;
-#endif
+#ifdef WIN32
+    ::UnmapViewOfFile(mapbase);
+    ::CloseHandle(maphandle);
 #else
-  if(mapbase){
-    UnmapViewOfFile(mapbase);
-    }
-  if(handle!=INVALID_HANDLE_VALUE){
-    CloseHandle(handle);
-    }
-  if(file!=INVALID_HANDLE_VALUE){
-    CloseHandle(file);
-    }
-  handle=INVALID_HANDLE_VALUE;
-  file=INVALID_HANDLE_VALUE;
+    ::munmap(mapbase,maplength);
 #endif
-  mapbase=NULL;
-  maplength=0;
-  mapoffset=0;
+    maphandle=BadHandle;
+    mapbase=NULL;
+    mapoffset=0L;
+    mapposition=0L;
+    maplength=0;
+    }
   return NULL;
   }
 
 
+// Get current file position
+FXlong FXMemMap::position() const {
+  return mapposition;
+  }
+
+
+// Change file position, returning new position from start
+FXlong FXMemMap::position(FXlong off,FXuint from){
+  if(mapbase){
+    if(from==Current) off=off+mapposition;
+    else if(from==End) off=off+mapoffset+maplength;       // FIXME is this what we want?
+    mapposition=off;
+    return mapposition;
+    }
+  return -1;
+  }
+
+
+// Read block of bytes, returning number of bytes read
+FXival FXMemMap::readBlock(void* data,FXival count){
+  if(mapbase && mapoffset<=mapposition && mapposition<=mapoffset+maplength){
+    if(mapposition+count>mapoffset+maplength) count=mapoffset+maplength-mapposition;
+    memmove(data,mapbase+mapposition-mapoffset,count);
+    mapposition+=count;
+    return count;
+    }
+  return -1;
+  }
+
+
+// Write block of bytes, returning number of bytes written
+FXival FXMemMap::writeBlock(const void* data,FXival count){
+  if(mapbase && mapoffset<=mapposition && mapposition<=mapoffset+maplength){
+    if(mapposition+count>mapoffset+maplength) count=mapoffset+maplength-mapposition;
+    memmove(mapbase+mapposition-mapoffset,data,count);
+    mapposition+=count;
+    return count;
+    }
+  return -1;
+  }
+
+
 // Synchronize disk
-void FXMemMap::sync(){
-#ifndef WIN32
-#ifdef HAVE_MMAP
+FXbool FXMemMap::flush(){
   if(mapbase){
-    msync((char*)mapbase,(size_t)maplength,MS_SYNC|MS_INVALIDATE);
-    }
-#endif
+#ifdef WIN32
+    return ::FlushViewOfFile(mapbase,(size_t)maplength)!=0;
 #else
-  if(mapbase){
-    FlushViewOfFile(mapbase,(size_t)maplength);
-    }
+    return ::msync((char*)mapbase,(size_t)maplength,MS_SYNC|MS_INVALIDATE)==0;
 #endif
+    }
+  return false;
+  }
+
+
+// Close file, and also the map
+FXbool FXMemMap::close(){
+  unmap();
+  return FXFile::close();
   }
 
 
 // Delete the mapping
 FXMemMap::~FXMemMap(){
-  unmap();
+  close();
   }
 
 

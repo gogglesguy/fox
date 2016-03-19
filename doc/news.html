@@ -18,6 +18,492 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 13 - FOX DEVELOPMENT 1.7.8
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Updates to Adie editor; starting it with a non-existing file will
+now set the text window's filename to the new file.  Also, changed
+a few accelerators to more useful bindings.  Tab-stops may be changed
+more quickly from a pulldown menu.  Rearranged Preferences Dialog 
+since most-often changed settings should be on the first page.</li>
+<li>Major improvements in FXText widget; many new API's added:
+<ul>
+<li>copySelection() copies the selection to the clipboard.</li>
+<li>cutSelection() cuts the selection to the clipboard.</li>
+<li>copySelection() copies the selection to the clipboard.</li>
+<li>deleteSelection() deletes the selection.</li>
+<li>pasteSelection() pastes the primary selection.</li>
+<li>pasteClipboard() inserts the clipboard into the text.</li>
+<li>replaceSelection() replaces the selection.</li>
+</ul>
+<li>Cursor movement has been improved:- no longer hides while moving.
+All actions are now mapped to an individual message handler.</li>
+<li>Cursor shape now changes when in overstrike mode.</li>
+<li>New FXAutoThreadStorageKey automatically generates and disposes of
+thread-local storage key.  It behaves as a "pseudo-constant" in the sense
+that is generated at load-time simply by defining a global variable of
+this type.</li>
+<li>Updates to FXThread to use FXAutoThreadStorageKey for its own handle.</li>
+<li>Code to determine monitor (screen) on Windows no longer requires header
+files to be present; we provide our own prototypes.  Now it works even with
+older compilers.  Detection of API's is done purely at runtime.</li>
+<li>FXReplaceDialog and FXSearchDialog support wheel to scroll back through
+search history.</li>
+<li>FXScrollArea now initiates auto-scroll behaviour when cursor is near
+visible area [not the whole window!].  Now FXText to starts scrolling when
+cursor is near the numbers bar, instead of near the edge of the window.</li>
+<li>Fixed leaked resource handles in FXDCWindow, FXIcon; was flagged by GDI handle
+leak-checkers.</li>
+<li>Fixed bug in FXAccelTable::parseAccel(); was not handling "#XXX" properly.</li>
+<li>Added run-time test for multi-head display configuration; it no longer
+depends on having up-to-date header files.</li>
+<li>Fixed FXPath simplify() routine for lots of corner-cases.</li>
+<li>FXComboBox's setText() now has notify argument.  When an item
+in the drop-down list, the text is selected only if the combobox is a
+non-static combobox. </li>
+<li>Fixed minor details in NET_WM_PING generated in FXApp; apparently,
+some minor details in the NET_WM_PING had changed. </li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 8 - FOX STABLE 1.6.24
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed leaked resource handles in FXDCWindow, FXIcon; was flagged by GDI handle
+leak-checkers.</li>
+<li>Fixed bug in FXAccelTable::parseAccel(); was not handling "#XXX" properly.</li>
+<li>Added run-time test for multi-head display configuration; it no longer
+depends on having up-to-date header files.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+February 22 - FOX STABLE 1.6.23
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added test in WIN32 version of FXGLVisual to validate PIXELFORMAT prior to
+obtaining its attributes.  Apparently some PIXELFORMAT's listed by DescribePixelFormat()
+do not actually describe a valid configuration on some graphics cards.</li>
+<li>Fixed problem with X11 XLFD fonts.  If XLFD font name specified directly,
+no font was matched.</li>
+<li>Fixed FXSemaphore compilation issues on MacOSX.  Also pass initial semphore value
+to MacOSX API.</li>
+<li>Fixed spurious call to removeItem() in extractItem() inside FXTreeListBox.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+January 30 - FOX STABLE 1.6.21
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Always define vfscanf(), vscanf(), and vsscanf() when on Windows.</li>
+<li>Remove FXAPI in FXObjectListOf template.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+December 7 - FOX DEVELOPMENT 1.7.7
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Forgot to mention: there has been an important change in the way MDI windows work.
+When closing an MDI Child, the MDI Child is now made inactive first; the target of the
+MDI Client gets a notification to that effect. Then a SEL_CLOSE message is delivered
+to the MDI Child's target.  If the close is approved, the MDI Child will then be deleted.
+But if the close is not approved (SEL_CLOSE handler returns 1), then the MDI Child will
+be made the active MDI Child again (and the MDI Client's target will get a message
+to that effect).  The rationale behind this change is that the MDI Child will be
+not the active window at the time of its demise, and thus updating the GUI now only
+needs to happen when an MDI Child is activated or deactivated (i.e. when the
+target of the MDI Child receives SEL_SELECTED and SEL_DESELECTED).</li>
+<li>FXDataTarget's support for FXlong and FXulong has been extended; when associated
+with FXlong, it now sends/receives ID_SETLONGVALUE and ID_GETLONGVALUE to the associated
+control.  Most valuator controls have now been updated to respond to these messages.</li>
+<li>FXText and FXTextField now have auto-hiding cursor.  As soon as the user begins
+typing, the mouse cursor will disappear to prevent obscuring the text.  The mouse-cursor
+reappears when the mouse is moved.</li>
+<li>Added new API's, showCursor() and cursorShown() to FXWindow.  These control mouse cursor
+visibility.</li>
+<li>Changes and additions to FXDLL.  Added API to obtain DLL containing a function
+pointer.  Also added API to obtain name of loaded DLL.  And added API to get symbol
+name given function pointer (UNIX only).  Renamed a few API's for consistency.</li>
+<li>Implemented Extended Window Manager methods to raise() or lower() toplevel
+windows.  Now these work properly under EWMH-enabled Window Managers.</li>
+<li>New time-configuration varable added in FXApp (autoHideDelay). This controls
+I-beam cursor hiding of text controls.</li>
+<li>Fixed bug in FXLabel, FXMenuCaption, FXToggleButton's setText() API.  Problem was
+changing accelerator or accelerator-location in a string, without changing the
+string itself.  Bug was reported by Lothar.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+December 5 - FOX DEVELOPMENT 1.7.6 (Sinterklaas-Editie!)
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXThreadPool::execute() now returns FXWorker instead of a flag; this is convenient
+as you now have a handle to the thread responsible for executing your FXRunnable.</li>
+<li>Fixed a few buglets in FXThreadPool, particularly having to do with wierd
+cases like stopping the FXThreadPool while trying to schedule new jobs, etc.</li>
+<li>FXCondition::wait() now returns a flag also; return value is true if the function returns
+due to the condition being signalled, and false if interrupted or if there were
+errors.  The overloaded version also returns false if the wait-time expired.</li>
+<li>Added some missing includes in fx.h.</li>
+<li>Fixed missing FXReactor FXIMPLEMENT issue.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 30 - FOX DEVELOPMENT 1.7.5
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added new FXThreadPool class.  FXThreadPool allows parallel execution of jobs (FXRunnable) without
+the overhead of creating a thread for each job; instead, a pool of worker-threads are used to execute
+jobs, and thus the overhead is minimal.  To ensure that the workers do not fall behind with the
+incoming job-stream, new jobs are only accepted when worker-threads are available.
+The FXThreadPool can adapt to changing workloads by spawning new workers during peak-loads (up to
+a set maximum), and removing workers from the pool when there are no jobs (down to a certain minimum).
+Worker threads may be started right away (ensuring that all worker-threads are ready for action),
+or on an as-needed basis.</li>
+<li>Added new FXReactor class.  An FXReactor implements <em>reactor pattern</em>.  FXReactor is
+thread-safe and will allow multi-threaded operation like the <em>leader-follower pattern</em>
+FXReactor is a key component for multi-thread platform-independent network-server development,
+and will also serve as the base class for the new event-dispatch structure being put into place.</li>
+<li>Changed FXApp to use the new <em>pselect()</em> system call.  It provides nano-second timeouts
+and will also make non-immediate signal processing in FOX safe from race-conditions (or at least
+it will when your c-library and linux-kernel support the new pselect() system call ;-)).</li>
+<li>Added API's to FXThread for thread-local storage.  This comes in addition to the thread-local
+storage already implicitly present for the self() API.</li>
+<li>Added API to FXThread to determine number of processors in the system; this may be used when
+creating the FXThreadPool to start the proper number of worker threads based on actual hardware
+in the system.</li>
+<li>FXThread now derives from FXRunnable, which encompasses an overloadable run function and
+some data.  FXRunnable is also used in FXThreadPool.</li>
+<li>Made FXThread safe for suicide of FXThread:- in case of self-destruction, FXThread properly detaches
+the thread and cleans up TLS to FXThread binding.  When FXThread is destroyed by another thread cancels
+the thread.  Normal termination properly resets the running flag but leaves tid to allow a join() operation.</li>
+<li>Added new FXMessageChannel class.  This replaces the old FXGUISignal.  FXMessageChannel delivers a
+way to perform asynchronous message calls from a worker thread to the main GUI thread.  It is implemented
+using an internally created pipe, which is connected to the GUI thread.  A message written by a worker
+thread can thus be delivered to the GUI thread, and dispatched in the GUI thread's context.
+To obtain the behaviour of the old FXGUISignal, note that this is now simply a special case of
+an asynchronous call via FXMessageChannel with no data.</li>
+<li>Fixed bug in vsscanf; New versions of Visual Studio now have one of the two missing functions.</li>
+<li>Added special <b>blank</b> cursor stock cursor.  This can be used when you desire to see no cursor
+at all.</li>
+<li>Speeded up signal handling stuff: only check non-immediate signals if one was actually raised.</li>
+<li>Fixed FXSpinner and FXRealSpinner; they were updating while being changed by the user through the text field.</li>
+<li>Fixed ugly look of FXHeader when no items are present (as reported for its use in FXTable).</li>
+<li>Improvements in FXText word-selection mode.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 17 - FOX STABLE 1.6.20
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Rolled back explicit template instantiation stuff: not supported everywhere.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 9 - FOX STABLE 1.6.19
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fix bug in FXMutex::locked() implementation.</li>
+<li>Suppress 4244 warning (possible loss of data) on VC++ compiler.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 7 - FOX STABLE 1.6.18
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Bug fix in FXApp drag and drop.</li>
+<li>Wrong error message in argument check in FXTable API.</li>
+<li>Fixed minor issues in FXPicker: now issues message on mouse button release.</li>
+<li>Fixed problems in FXFile, FXSocket, FXPipe occurring on 64-bit Windows.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 30 - FOX STABLE 1.6.16
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed issue with FXMDIChild and FXTopWindow close() routine; this mostly affects FXRuby.</li>
+<li>Fixed drag and drop issue with dropFinished() on Windows.</li>
+<li>Fixed FXTextField drawCursor() array overrun and text measurement bugs.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 29 - FOX DEVELOPMENT 1.7.3
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Major upgrade to <b>reswrap</b>.  New in reswrap is long option names.  Also added are a number
+of new options, designed for more easy incorporation of reswrap into custom software build rules.
+First, options and filenames can now be mixed, allowing both icons.h and icons.cpp to be generated
+with one single reswrap command.  Also, static and external linkage decorations can be generated
+for each symbol.  Symbol names may be changed using prefixes, postfixes, or incorporated in
+namespaces.  Size declarations may be added to header files to provide compiler with sizes
+of the embedded resources.  For more, see updated reswrap documentation.
+One important warning: some options have been renamed for consistency!</li>
+<li>Redesign of inner workings of FXScrollArea; getViewportWidth() and getViewportHeight() have been
+removed.  New API's getVisibleX(), getVisibleY(), getVisibleWidth() and getVisibleHeight() are added.
+Also added internal (protected) member function placeScrollBars() which is intended to be called
+by subclasses of FXScrollArea.</li>
+<li>Minor tweaks inside FXScrollBar.</li>
+<li>Added new FXConsole widget (under construction).</li>
+<li>Added some API's to FXArray.</li>
+<li>Fixed some FXFileList drag and drop issues.</li>
+<li>Cut down code size by means of explicit template instantiation.</li>
+<li>FXQuat{d,f} API's setAxisAngle(), and getAxisAngle() have been made safer.</li>
+<li>FXString inc() etc. made safer; won't increment too far.</li>
+<li>Fixed FXTextField drawCursor() array overrun and text measurement bugs.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 14 - FOX STABLE 1.6.14
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Rolled back Niall's BOM-marker patch to FXDCWindow [not working].</li>
+<li>FXSlider, FXRealSlider arrow-movement was not generating callback to target.</li>
+<li>Include &lt;asm/socket.h&gt; for CYGWIN for X11 Windows build.</li>
+<li>Regenerate fxunicode.cpp with surrounding namespace for Digital Mars C++ compile.</li>
+<li>Surround fxascii with namespace for Digital Mars C++.  Plus other issues brought to
+light on Digital Mars C++.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 8 - FOX STABLE 1.6.13
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed Digital Mars C++ makefile.</li>
+<li>Namespace qualification missing from macros in FXObject.h.</li>
+<li>End of stream bugs in FXGZFileStream and FXBZFileStream.</li>
+<li>BOM marker at end of text appears to fix WIN32 drawText() and drawImageText() in FXDCWindow.</li>
+<li>Removed some more FXTRACE statements; fixed trace-levels on some other FXTRACE statements; this only
+affects debug-mode builds.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 1 - FOX STABLE 1.6.12
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fix DLL issue [again].</li>
+<li>Some FXTRACE statements were at too low a level.</li>
+<li>Updated Visual C++ studio projects.</li>
+<li>FXToolTip place() fixed.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 1 - FOX DEVELOPMENT 1.7.2
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fix assorted typo's.</li>
+<li>Change PI, DTOR, RTOD, EULER to const declarations inside FX namespace, preventing conflicts.</li>
+<li>Fix FXChart Makefile.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 30 - FOX DEVELOPMENT 1.7.1
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXCalendar and FXCalendarView widgets added.  The are written by Sander Jansen.</li>
+<li>Added positive (?&lt;= expr) and negative (?&lt;! expr) look-behind patterns to FXRex; look-behind
+patterns are finite-length patterns that need to be matched (or <em>not</em> matched), without
+eating any text.</li>
+<li>Fixed minor bug with case-insensitive back refecences in FXRex.</li>
+<li>Different method implemented for back references; back references now also work even if
+npar is 1 in FXRex::match().</li>
+<li>Added granularity option to FXRealSlider; if set greater than zero, values are
+rounded to multiples of granularity as slider is moved; this will cause slider to report nice
+round numbers.</li>
+<li>getNextEvent() can now be told to wait only a finite amount of time for incoming events.</li>
+<li>The addTimeout() and remainingTimeout() API's in FXApp now work in terms of nanoseconds.</li>
+<li>New addDeadline() API added to FXApp which sets absolute clock value when a timer will expire;
+thus this new API is not subject to cumulative errors.  The timeout is set in nanoseconds
+since Jan 1st, 1970.</li>
+<li>Datatarget now supports FXbool type.</li>
+<li>Added ID_SETLONGVALUE and ID_GETLONGVALUE support to FXTextField.</li>
+<li>FXStream now supports FXbool type.</li>
+<li>FXbool type now defines as bool.</li>
+<li>FXToolBarShell now interprets its child's LAYOUT_FIX_WIDTH and LAYOUT_FIX_HEIGHT hints.</li>
+<li>Change addInput() API; it now takes a void* pointer which is then passed along into
+the SEL_IO_READ (etc.) message handlers. You can get the old behaviour by passing in the file-descriptor
+for the void* pointer.</li>
+<li>New FXGLConfig class decribes OpenGL framebuffer configuration.</li>
+<li>New FXGLContext uses FXGLConfig to match OpenGL hardware capabilities.</li>
+<li>Lasso selection in FXIconList no longer drawn as line, but solid rectangle.  Looks MUCH nicer!.</li>
+<li>New DND type added for files; this is now used internally between FOX applications
+in preference to "text/uri-list", since its much easier to decode and encode.</li>
+<li>FXSettings and FXRegistry now support 64-bit integer values; this necessitated some
+small API changes: readUnsignedEntry() is now called readUIntEntry(), writeUnsignedEntry()
+is now writeUIntEntry(), and the new API's are called readLongEntry(), readULongEntry() and
+writeLongEntry(), writeULongEntry() respectively.</li>
+<li>Also new in FXSettings is support for the type FXbool, which is read/written as a more
+humanly readable "true" and "false" instead of 1 and 0.</li>
+<li>New class FXDLL and FXAUTODLL added to manage dynamic library (plugin) loading.  This
+replaces the old function-based method.  Also new, FXDLL has API to obtain FXDLL given
+a pointer; basically this allows you to determine the FXDLL containing a specific piece of
+code.</li>
+<li>FXToolBar's setDockingSide() now preserves flags. If both LAYOUT_FILL_Y and LAYOUT_FILL_X are
+set the will remain set when orientation flips.</li>
+<li>Added FXReadWriteLock class.  This provides shared-lock support in a platform-independent
+way.</li>
+<li>Added FXAtomic class.  It provides multi-processor safe incrementation/decrementation
+of a lock-variable.</li>
+<li>FXToolBarShell can resize its child if the LAYOUT_FIX_WIDTH and LAYOUT_FIX_HEIGHT are
+specified on the child [in other words, if its set to keep its given size, this size
+may be given through interaction with the user].</li>
+<li>Added missing set() API's to FXExtentf and FXExtentd.</li>
+<li>Cell being edited in FXTable now commits its value if clicking outside of table.</li>
+<li>Fixed subltety in FXPath::relative().</li>
+<li>Added new API FXPath::isInside().</li>
+<li>Speeded up FXString's enquote(), dequote() API's.</li>
+<li>Fixed drawing bug in FXTextField containing UTF8, when not all text is visible.</li>
+<li>Fixed problem of parameters shadowing member functions in FXDate.</li>
+<li>Changes in FXThread to eliminate race conditions.</li>
+<li>New classes FXComplexf and FXComplexd added.</li>
+<li>Fixed reset of scheduling policy in FXThread's priority() API.</li>
+<li>Added API to FXThread to get/set scheduling policy, on systems where scheduling
+policies are implemented.</li>
+<li>FXThread priority and policy now defined in terms of a range of enums for increased
+portability across platforms.</li>
+<li>Fixed bug in FXToolTip's place() routine on Windows.</li>
+<li>Fixed bug in FXDir on Windows where non-unicode version didn't compile.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 25 - FOX STABLE 1.6.10
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Updated VC++ project files.</li>
+<li>Updated Adie.stx; new pattern for <b>#ifdef 0 ... #endif</b> method of commenting out code.</li>
+<li>FXExpression memory leak fix.</li>
+<li>Updated Visual C++ studio project: FXRulerView source file was omitted.</li>
+<li>Missing FXAPI declaration added to FXExtentd and FXExtentf.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 17 - FOX STABLE 1.6.8
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed drawing bug in FXTextField containing UTF8, when not all text is visible.</li>
+<li>Fixed problem of parameters shadowing member functions in FXDate.</li>
+<li>Missing FXAPI declaration added in FXSemaphore.</li>
+<li>Add fflush() to fxassert(), fxmessage(), etc.</li>
+<li>FXToolBar preserves flags if LAYOUT_FILL_X AND LAYOUT_FILL_Y both set on a bar.</li>
+<li>Bug in strtoll() fixed [on machines where no native strtoll() is available].</li>
+<li>A number of subtleties have been fixed in FXPath pathname manipulations.</li>
+<li>Click outside occupied table area now commits input in cell being edited.</li>
+<li>Small addition in Adie.stx for numerical size suffixes (c/c++ coloring).</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+June 15 - FOX STABLE 1.6.6
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added fox.pc for pkgconfig support benefiting FOX package builders and developers.</li>
+<li>Added date-tooltip to Adie clock.</li>
+<li>Removed CXXFLAGS clear in configure.in so it can be passed.</li>
+<li>Removed test on zero-message for callback due to its use in FXRuby.</li>
+<li>Removed cruft from FXDragCorner.</li>
+<li>Fixed little bug in FXTable setItemText().</li>
+<li>Fixed csv clipboard issue in FXTable.</li>
+<li>Fixed clipboard issue in FXText.</li>
+<li>Added workaround for byte order in FXCursor render for Apple MacOSX X Server bug.</li>
+<li>Fixed buglet in own strtoll which is only used on machines which don't have native
+one.</li>
+<li>Fixed Python syntax pattern for Adie.stx.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+June 15 - FOX STABLE 1.4.34
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed buglet in own strtoll which is only used on machines which don't have native
+one.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 April 17 - FOX STABLE 1.6.4
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

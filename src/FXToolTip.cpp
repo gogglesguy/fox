@@ -3,7 +3,7 @@
 *                         T o o l   T i p   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,11 +19,12 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolTip.cpp,v 1.25 2006/03/31 07:33:14 fox Exp $                       *
+* $Id: FXToolTip.cpp,v 1.34 2007/03/09 03:55:56 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxpriv.h"
 #include "FXHash.h"
 #include "FXThread.h"
 #include "FXStream.h"
@@ -81,8 +82,7 @@ FXToolTip::FXToolTip(){
 
 
 // Create a toplevel window
-FXToolTip::FXToolTip(FXApp* a,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXShell(a,opts,x,y,w,h),label("Tooltip"){
+FXToolTip::FXToolTip(FXApp* a,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXShell(a,opts,x,y,w,h),label("Tooltip"){
   font=getApp()->getNormalFont();
   textColor=getApp()->getTipforeColor();
   backColor=getApp()->getTipbackColor();
@@ -91,19 +91,19 @@ FXToolTip::FXToolTip(FXApp* a,FXuint opts,FXint x,FXint y,FXint w,FXint h):
 
 
 // Tooltips do override-redirect
-bool FXToolTip::doesOverrideRedirect() const {
+FXbool FXToolTip::doesOverrideRedirect() const {
   return true;
   }
 
 
 // Tooltips do save-unders
-bool FXToolTip::doesSaveUnder() const {
+FXbool FXToolTip::doesSaveUnder() const {
   return true;
   }
 
 
 #ifdef WIN32
-const char* FXToolTip::GetClass() const { return "FXPopup"; }
+const void* FXToolTip::GetClass() const { return TEXT("FXPopup"); }
 #endif
 
 
@@ -194,19 +194,51 @@ long FXToolTip::onPaint(FXObject*,FXSelector,void* ptr){
 
 // Place the tool tip
 void FXToolTip::place(FXint x,FXint y){
-  FXint rx=getRoot()->getX();
-  FXint ry=getRoot()->getY();
-  FXint rw=getRoot()->getWidth();
-  FXint rh=getRoot()->getHeight();
-  FXint w=getDefaultWidth();
-  FXint h=getDefaultHeight();
-  FXint px,py;
+  FXint rx,ry,rw,rh,px,py,w,h;
+  w=getDefaultWidth();
+  h=getDefaultHeight();
+#ifndef WIN32
+  rx=getRoot()->getX();
+  ry=getRoot()->getY();
+  rw=getRoot()->getWidth();
+  rh=getRoot()->getHeight();
+#else
+  RECT rect;
+  MYMONITORINFO minfo;
+  HANDLE monitor;
+
+  rect.left=x;
+  rect.right=x+w;
+  rect.top=y;
+  rect.bottom=y+h;
+
+  // Get monitor info if we have this API
+  monitor=fxMonitorFromRect(&rect,MONITOR_DEFAULTTOPRIMARY);
+  if(monitor){
+    memset(&minfo,0,sizeof(minfo));
+    minfo.cbSize=sizeof(minfo);
+    fxGetMonitorInfo(monitor,&minfo);
+    rx=minfo.rcWork.left;
+    ry=minfo.rcWork.top;
+    rw=minfo.rcWork.right-minfo.rcWork.left;
+    rh=minfo.rcWork.bottom-minfo.rcWork.top;
+    }
+
+  // Otherwise use the work-area
+  else{
+    SystemParametersInfo(SPI_GETWORKAREA,sizeof(RECT),&rect,0);
+    rx=rect.left;
+    ry=rect.top;
+    rw=rect.right-rect.left;
+    rh=rect.bottom-rect.top;
+    }
+#endif
   px=x+16-w/3;
   py=y+20;
-  if(px+w>rw) px=rw-w;
   if(px<rx) px=rx;
-  if(py+h+50>rh){ py=y-h-10; }
   if(py<ry) py=ry;
+  if(px+w>rx+rw) px=rx+rw-w;
+  if(py+h+50>ry+rh){ py=y-h-10; }
   position(px,py,w,h);
   }
 
@@ -231,7 +263,7 @@ long FXToolTip::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
     if(!popped){
       popped=true;
       if(!shown()){
-        getApp()->addTimeout(this,ID_TIP_SHOW,getApp()->getTooltipPause());
+        getApp()->addTimeout(this,ID_TIP_SHOW,getApp()->getToolTipPause());
         return 1;
         }
       autoplace();
@@ -247,15 +279,16 @@ long FXToolTip::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
 
 // Pop the tool tip now
 long FXToolTip::onTipShow(FXObject*,FXSelector,void*){
+  FXTRACE((250,"%s::onTipShow %p\n",getClassName(),this));
   if(!label.empty()){
     autoplace();
     show();
     if(!(options&TOOLTIP_PERMANENT)){
-      FXint timeoutms=getApp()->getTooltipTime();
+      FXTime timeoutns=getApp()->getToolTipTime();
       if(options&TOOLTIP_VARIABLE){
-        timeoutms=timeoutms/4+(timeoutms*label.length())/64;
+        timeoutns=timeoutns/4+(timeoutns*label.length())/64;
         }
-      getApp()->addTimeout(this,ID_TIP_HIDE,timeoutms);
+      getApp()->addTimeout(this,ID_TIP_HIDE,timeoutns);
       }
     }
   return 1;
@@ -264,6 +297,7 @@ long FXToolTip::onTipShow(FXObject*,FXSelector,void*){
 
 // Tip should hide now
 long FXToolTip::onTipHide(FXObject*,FXSelector,void*){
+  FXTRACE((250,"%s::onTipHide %p\n",getClassName(),this));
   hide();
   return 1;
   }

@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIO.cpp,v 1.6 2006/01/22 17:58:31 fox Exp $                             *
+* $Id: FXIO.cpp,v 1.12 2007/02/07 20:22:10 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -41,6 +41,7 @@
   - An abstract class for low-level IO.
 */
 
+// Bad handle value
 #ifdef WIN32
 #define BadHandle INVALID_HANDLE_VALUE
 #else
@@ -61,31 +62,30 @@ FXIO::FXIO():device(BadHandle),access(NoAccess){
 
 
 // Open file
-bool FXIO::open(FXInputHandle handle,FXuint mode){
-  device=handle;
-  access=mode;
+FXbool FXIO::open(FXInputHandle h,FXuint m){
+  device=h;
+  access=m;
   return true;
   }
 
 
 // Return true if open
-bool FXIO::isOpen() const {
+FXbool FXIO::isOpen() const {
   return device!=BadHandle;
   }
 
 
 // Attach existing file handle
-void FXIO::attach(FXInputHandle handle,FXuint mode){
+void FXIO::attach(FXInputHandle h,FXuint m){
   close();
-  device=handle;
-  access=mode;
+  device=h;
+  access=(m|OwnHandle);
   }
 
 
 // Detach existing file handle
 void FXIO::detach(){
-  device=BadHandle;
-  access=NoAccess;
+  access&=~OwnHandle;
   }
 
 
@@ -120,13 +120,13 @@ FXlong FXIO::truncate(FXlong){
 
 
 // Synchronize disk with cached data
-bool FXIO::flush(){
+FXbool FXIO::flush(){
   return false;
   }
 
 
 // Test if we're at the end
-bool FXIO::eof(){
+FXbool FXIO::eof(){
   return true;
   }
 
@@ -138,8 +138,9 @@ FXlong FXIO::size(){
 
 
 // Close file
-bool FXIO::close(){
+FXbool FXIO::close(){
   device=BadHandle;
+  access=NoAccess;
   return true;
   }
 

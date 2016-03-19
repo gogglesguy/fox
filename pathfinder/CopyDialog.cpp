@@ -3,7 +3,7 @@
 *                       F i l e   C o p y   D i a l o g                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: CopyDialog.cpp,v 1.4 2006/01/22 17:58:15 fox Exp $                       *
+* $Id: CopyDialog.cpp,v 1.6 2007/02/07 20:22:01 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -38,7 +38,7 @@ FXIMPLEMENT(CopyDialog,FXDialogBox,NULL,0)
 
 
 // Create properties dialog
-CopyDialog::CopyDialog(FXWindow *owner,const FXString& name):FXDialogBox(owner,name,DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 4,4,4,4, 4,4){
+CopyDialog::CopyDialog(FXWindow *own,const FXString& name):FXDialogBox(own,name,DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 4,4,4,4, 4,4){
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0, 0,0,0,0);
   new FXButton(buttons,tr("&Cancel"),NULL,this,FXDialogBox::ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y,0,0,0,0,20,20);
   new FXButton(buttons,tr("&OK"),NULL,this,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);

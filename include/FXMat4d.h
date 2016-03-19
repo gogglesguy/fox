@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMat4d.h,v 1.8 2006/01/22 17:58:05 fox Exp $                            *
+* $Id: FXMat4d.h,v 1.10 2007/02/07 20:21:56 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXMAT4D_H
 #define FXMAT4D_H
@@ -99,10 +99,10 @@ public:
   FXMat4d& eye();
 
   /// Orthographic projection
-  FXMat4d& ortho(FXdouble left,FXdouble right,FXdouble bottom,FXdouble top,FXdouble hither,FXdouble yon);
+  FXMat4d& ortho(FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi,FXdouble zlo,FXdouble zhi);
 
   /// Perspective projection
-  FXMat4d& frustum(FXdouble left,FXdouble right,FXdouble bottom,FXdouble top,FXdouble hither,FXdouble yon);
+  FXMat4d& frustum(FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi,FXdouble zlo,FXdouble zhi);
 
   /// Multiply by left-hand matrix
   FXMat4d& left();
@@ -129,7 +129,7 @@ public:
   FXMat4d& zrot(FXdouble phi);
 
   /// Look at
-  FXMat4d& look(const FXVec3d& eye,const FXVec3d& cntr,const FXVec3d& vup);
+  FXMat4d& look(const FXVec3d& from,const FXVec3d& to,const FXVec3d& up);
 
   /// Multiply by translation
   FXMat4d& trans(FXdouble tx,FXdouble ty,FXdouble tz);

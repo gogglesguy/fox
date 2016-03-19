@@ -3,7 +3,7 @@
 *                          P C X   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2007 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxpcxio.cpp,v 1.32 2006/03/25 06:07:15 fox Exp $                         *
+* $Id: fxpcxio.cpp,v 1.36 2007/02/07 20:22:21 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -47,9 +47,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckPCX(FXStream& store);
-extern FXAPI bool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height);
+extern FXAPI FXbool fxcheckPCX(FXStream& store);
+extern FXAPI FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 
 static inline FXuint read16(FXStream& store){
@@ -60,7 +60,7 @@ static inline FXuint read16(FXStream& store){
 
 
 // Check if stream contains a PCX
-bool fxcheckPCX(FXStream& store){
+FXbool fxcheckPCX(FXStream& store){
   FXuchar signature[4];
   store.load(signature,4);
   store.position(-4,FXFromCurrent);
@@ -95,7 +95,7 @@ static void readscanline(FXStream& store,FXuchar line[],int size,int compressed)
 
 
 // Load PCX image from stream
-bool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   const FXuchar Mono[2]={0,255};
   FXuchar Colormap[256][3];
   FXuchar Manufacturer;
@@ -179,7 +179,7 @@ bool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // Get 58 bytes, to get to 128 byte header
   for(i=0; i<58; i++) store >> fill;
 
-  FXTRACE((1,"fxloadPCX: width=%d height=%d Version=%d BitsPerPixel=%d NPlanes=%d BytesPerLine=%d Encoding=%d\n",width,height,Version,BitsPerPixel,NPlanes,BytesPerLine,Encoding));
+  //FXTRACE((100,"fxloadPCX: width=%d height=%d Version=%d BitsPerPixel=%d NPlanes=%d BytesPerLine=%d Encoding=%d\n",width,height,Version,BitsPerPixel,NPlanes,BytesPerLine,Encoding));
 
   // Allocate memory
   if(!callocElms(data,NumPixels)) return false;
@@ -212,7 +212,7 @@ bool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         }
       }
     store >> c;                   // Get VGApaletteID
-    if(c!=12) return FALSE;       // Check VGApaletteID
+    if(c!=12) return false;       // Check VGApaletteID
     store.load(Colormap[0],768);
     pp=(FXuchar*)data;
     for(i=0; i<NumPixels; i++){   // Apply colormap
@@ -279,7 +279,7 @@ static inline void write16(FXStream& store,FXuint i){
 
 
 // Save a PCX file to a stream
-bool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height){
+FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height){
   const FXuchar Colormap[16][3]={{0,0,0},{255,255,255},{0,170,0},{0,170,170},{170,0,0},{170,0,170},{170,170,0},{170,170,170},{85,85,85},{85,85,255},{85,255,85},{85,255,255},{255,85,85},{255,85,255},{255,255,85},{255,255,255}};
   const FXuchar Manufacturer=10;
   const FXuchar Version=5;

@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLVisual.cpp,v 1.76 2006/04/21 21:19:12 fox Exp $                      *
+* $Id: FXGLVisual.cpp,v 1.90 2007/02/22 22:13:53 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -218,30 +218,14 @@ static HPALETTE makeOpenGLPalette(PIXELFORMATDESCRIPTOR* info){
 /*******************************************************************************/
 
 
-// Test if GLX is possible
-bool FXGLVisual::supported(FXApp* application,int& major,int& minor){
-  major=minor=0;
+// Test if OpenGL is possible
+FXbool FXGLVisual::hasOpenGL(FXApp* application){
   if(application->isInitialized()){
 #ifdef HAVE_GL_H
-#ifndef WIN32           // UNIX
-    if(!glXQueryExtension(DISPLAY(application),NULL,NULL)) return false;
-    if(!glXQueryVersion(DISPLAY(application),&major,&minor)) return false;
-#if GLX_VERSION_1_4
-    if(minor>4) minor=4;
-#elif GLX_VERSION_1_3
-    if(minor>3) minor=3;
-#elif GLX_VERSION_1_2
-    if(minor>2) minor=2;
-#elif GLX_VERSION_1_1
-    if(minor>1) minor=1;
-#else
-    if(minor>0) minor=0;
-#endif
+#ifdef WIN32            // WIN32
     return true;
-#else                   // WIN32
-    major=1;
-    minor=0;
-    return true;
+#else                   // UNIX
+    return glXQueryExtension((Display*)application->getDisplay(),NULL,NULL);
 #endif
 #endif
     }
@@ -259,7 +243,6 @@ void FXGLVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-      int major,minor;
       int gdblbuf,gllevel,glstereo,glstencil,gldepth,glrgba;
       int glred,glgreen,glblue,glalpha;
       int glaccred,glaccgreen,glaccblue,glaccalpha;
@@ -276,68 +259,12 @@ void FXGLVisual::create(){
         fxerror("%s::create: requested OpenGL extension not available.\n",getClassName());
         }
 
-      // Try get OpenGL version info
-      if(!glXQueryVersion(DISPLAY(getApp()),&major,&minor)){
-        fxerror("%s::create: Unable to obtain OpenGL version numbers.\n",getClassName());
-        }
-
-/*
-#if defined(GLX_VERSION_1_3)
-      const char *glxexts="";
-      glxexts=glXQueryExtensionsString(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
-      GLXFBConfig *fbconfigs;
-      int nfbconfigs,value;
-      fbconfigs=glXGetFBConfigs(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())),&nfbconfigs);
-      FXTRACE((1,"nfbconfigs: %d\n",nfbconfigs));
-      for(int i=0; i<nfbconfigs; i++){
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_FBCONFIG_ID,&value);
-        FXTRACE((1,"GLX_FBCONFIG_ID=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_RENDER_TYPE,&value);
-        FXTRACE((1,"GLX_RENDER_TYPE=%s %s\n",(value&GLX_RGBA_BIT)?"GLX_RGBA_BIT":"",(value&GLX_COLOR_INDEX_BIT)?"GLX_COLOR_INDEX_BIT":""));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_DRAWABLE_TYPE,&value);
-        FXTRACE((1,"GLX_DRAWABLE_TYPE=%s %s %s\n",(value&GLX_WINDOW_BIT)?"GLX_WINDOW_BIT":"",(value&GLX_PIXMAP_BIT)?"GLX_PIXMAP_BIT":"",(value&GLX_PBUFFER_BIT)?"GLX_PBUFFER_BIT":""));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_X_RENDERABLE,&value);
-        FXTRACE((1,"GLX_X_RENDERABLE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_X_VISUAL_TYPE,&value);
-        FXTRACE((1,"GLX_X_VISUAL_TYPE=0x%04x\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_VISUAL_ID,&value);
-        FXTRACE((1,"GLX_VISUAL_ID=0x%02x\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_RED_SIZE,&value);
-        FXTRACE((1,"GLX_RED_SIZE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_GREEN_SIZE,&value);
-        FXTRACE((1,"GLX_GREEN_SIZE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_BLUE_SIZE,&value);
-        FXTRACE((1,"GLX_BLUE_SIZE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_ALPHA_SIZE,&value);
-        FXTRACE((1,"GLX_ALPHA_SIZE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_DEPTH_SIZE,&value);
-        FXTRACE((1,"GLX_DEPTH_SIZE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_STENCIL_SIZE,&value);
-        FXTRACE((1,"GLX_STENCIL_SIZE=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_LEVEL,&value);
-        FXTRACE((1,"GLX_LEVEL=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_DOUBLEBUFFER,&value);
-        FXTRACE((1,"GLX_DOUBLEBUFFER=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_STEREO,&value);
-        FXTRACE((1,"GLX_STEREO=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_MAX_PBUFFER_WIDTH,&value);
-        FXTRACE((1,"GLX_MAX_PBUFFER_WIDTH=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_MAX_PBUFFER_HEIGHT,&value);
-        FXTRACE((1,"GLX_MAX_PBUFFER_HEIGHT=%d\n",value));
-        glXGetFBConfigAttrib(DISPLAY(getApp()),fbconfigs[i],GLX_MAX_PBUFFER_PIXELS,&value);
-        FXTRACE((1,"GLX_MAX_PBUFFER_PIXELS=%d\n",value));
-        FXTRACE((1,"\n"));
-        }
-      FXTRACE((1,"glx extensions: %s\n",glxexts));
-#endif
-*/
-
       // Scan for all visuals of given screen
       vitemplate.screen=DefaultScreen(DISPLAY(getApp()));
       vi=XGetVisualInfo(DISPLAY(getApp()),VisualScreenMask,&vitemplate,&nvi);
       if(!vi){ fxerror("%s::create: unable to obtain any visuals.\n",getClassName()); }
 
-      FXTRACE((150,"Found GLX version %d.%d; %d visuals\n",major,minor,nvi));
+      FXTRACE((150,"Found %d OpenGL visuals\n",nvi));
 
       // Try to find the best
       bestvis=-1;
@@ -532,7 +459,8 @@ void FXGLVisual::create(){
       int bestvis,dmatch,bestmatch;
       int dred,dgreen,dblue,ddepth,dalpha,dstencil;
       int daccred,daccgreen,daccblue,daccalpha;
-      int nvi,i;
+      int chosen,nvi,i;
+
 
       // Get some window handle
       hdc=GetDC(GetDesktopWindow());
@@ -551,6 +479,10 @@ void FXGLVisual::create(){
 
         // Get info about this visual
         DescribePixelFormat(hdc,i,sizeof(PIXELFORMATDESCRIPTOR),&pfd);
+
+        // Make sure this visual is valid
+        chosen=ChoosePixelFormat(hdc,&pfd);
+        if(chosen!=i) continue;
 
         // Draw to window is required
         if(!(pfd.dwFlags&PFD_DRAW_TO_WINDOW)) continue;
@@ -955,7 +887,7 @@ FXint FXGLVisual::getActualAccumAlphaSize() const {
 
 
 // Is it double buffer
-bool FXGLVisual::isDoubleBuffer() const {
+FXbool FXGLVisual::isDoubleBuffer() const {
   if(!info){ fxerror("%s::isDoubleBuffer: visual not yet initialized.\n",getClassName()); }
 #ifdef HAVE_GL_H
 #ifndef WIN32
@@ -972,7 +904,7 @@ bool FXGLVisual::isDoubleBuffer() const {
 
 
 // Is it stereo
-bool FXGLVisual::isStereo() const {
+FXbool FXGLVisual::isStereo() const {
   if(!info){ fxerror("%s::isStereo: visual not yet initialized.\n",getClassName()); }
 #ifdef HAVE_GL_H
 #ifndef WIN32
@@ -989,7 +921,7 @@ bool FXGLVisual::isStereo() const {
 
 
 // Is it hardware-accelerated?
-bool FXGLVisual::isAccelerated() const {
+FXbool FXGLVisual::isAccelerated() const {
   if(!info){ fxerror("%s::isHardwareAccelerated: visual not yet initialized.\n",getClassName()); }
 #ifdef HAVE_GL_H
 #ifndef WIN32
@@ -1004,7 +936,7 @@ bool FXGLVisual::isAccelerated() const {
 
 
 // Does it swap by copying instead of flipping buffers
-bool FXGLVisual::isBufferSwapCopy() const {
+FXbool FXGLVisual::isBufferSwapCopy() const {
  if(!info){ fxerror("%s::isBufferSwapCopy: visual not yet initialized.\n",getClassName()); }
 #ifdef HAVE_GL_H
 #ifndef WIN32
@@ -1065,13 +997,14 @@ FXGLVisual::~FXGLVisual(){
 #if defined(HAVE_XFT_H) && defined(HAVE_GL_H)
 
 // Xft version
-static void glXUseXftFont(XftFont* font,int first,int count,int listBase){
+static FXbool glXUseXftFont(XftFont* font,int first,int count,int listBase){
   GLint swapbytes,lsbfirst,rowlength,skiprows,skippixels,alignment,list;
   GLfloat x0,y0,dx,dy;
   FT_Face face;
   FT_Error err;
   FXint i,size,x,y;
   FXuchar *glyph;
+  FXbool result=false;
 
   // Save the current packing mode for bitmaps
   glGetIntegerv(GL_UNPACK_SWAP_BYTES,&swapbytes);
@@ -1098,11 +1031,11 @@ static void glXUseXftFont(XftFont* font,int first,int count,int listBase){
 
     // Load glyph
     err=FT_Load_Glyph(face,FT_Get_Char_Index(face,i),FT_LOAD_DEFAULT);
-    if(err){ fxwarning("glXUseXftFont: unable to load glyph.\n"); return; }
+    if(err) goto x;
 
     // Render glyph
     err=FT_Render_Glyph(face->glyph,FT_RENDER_MODE_MONO);
-    if(err){ fxwarning("glXUseXftFont: unable to render glyph.\n"); return; }
+    if(err) goto x;
 
     // Pitch may be negative, its the stride between rows
     size=FXABS(face->glyph->bitmap.pitch) * face->glyph->bitmap.rows;
@@ -1114,7 +1047,7 @@ static void glXUseXftFont(XftFont* font,int first,int count,int listBase){
     dy=0;
 
     // Allocate glyph data
-    allocElms(glyph,size);
+    if(!allocElms(glyph,size)) goto x;
 
     // Copy into OpenGL bitmap format; note OpenGL upside down
     for(y=0; y<face->glyph->bitmap.rows; y++){
@@ -1132,8 +1065,11 @@ static void glXUseXftFont(XftFont* font,int first,int count,int listBase){
     freeElms(glyph);
     }
 
+  // Success
+  result=true;
+
   // Restore packing modes
-  glPixelStorei(GL_UNPACK_SWAP_BYTES,swapbytes);
+x:glPixelStorei(GL_UNPACK_SWAP_BYTES,swapbytes);
   glPixelStorei(GL_UNPACK_LSB_FIRST,lsbfirst);
   glPixelStorei(GL_UNPACK_ROW_LENGTH,rowlength);
   glPixelStorei(GL_UNPACK_SKIP_ROWS,skiprows);
@@ -1142,6 +1078,7 @@ static void glXUseXftFont(XftFont* font,int first,int count,int listBase){
 
   // Unlock face
   XftUnlockFace(font);
+  return result;
   }
 
 
@@ -1149,28 +1086,35 @@ static void glXUseXftFont(XftFont* font,int first,int count,int listBase){
 
 
 // Create a display list of bitmaps from font glyphs in a font
-void glUseFXFont(FXFont* font,int first,int count,int list){
+FXbool glUseFXFont(FXFont* font,int first,int count,int list){
+  FXbool result=false;
   if(!font || !font->id()){ fxerror("glUseFXFont: invalid font.\n"); }
   FXTRACE((100,"glUseFXFont: first=%d count=%d list=%d\n",first,count,list));
 #ifdef HAVE_GL_H
-#ifndef WIN32
-#ifdef HAVE_XFT_H                       // Using XFT
-  glXUseXftFont((XftFont*)font->id(),first,count,list);
-#else                                   // Using XLFD
-  glXUseXFont((Font)font->id(),first,count,list);
-#endif
+#ifdef WIN32
+  if(wglGetCurrentContext()){
+    HDC hdc=wglGetCurrentDC();
+    HFONT oldfont=(HFONT)SelectObject(hdc,(HFONT)font->id());
+    // Replace wglUseFontBitmaps() with wglUseFontBitmapsW()
+    // Change glCallLists() parameter:
+    //   len=utf2ncs(sbuffer,text.text(),text.length());
+    //   glCallLists(len,GL_UNSIGNED_SHORT,(GLushort*)sbuffer);
+    // Figure out better values for "first" and "count".
+    result=wglUseFontBitmaps(hdc,first,count,list);
+    SelectObject(hdc,oldfont);
+    }
 #else
-  HDC hdc=wglGetCurrentDC();
-  HFONT oldfont=(HFONT)SelectObject(hdc,(HFONT)font->id());
-// Replace wglUseFontBitmaps() with wglUseFontBitmapsW()
-// Change glCallLists() parameter:
-//   len=utf2ncs(sbuffer,text.text(),text.length());
-//   glCallLists(len,GL_UNSIGNED_SHORT,(GLushort*)sbuffer);
-// Figure out better values for "first" and "count".
-  wglUseFontBitmaps(hdc,first,count,list);
-  SelectObject(hdc,oldfont);
+  if(glXGetCurrentContext()){
+#ifdef HAVE_XFT_H                       // Using XFT
+    result=glXUseXftFont((XftFont*)font->id(),first,count,list);
+#else                                   // Using XLFD
+    glXUseXFont((Font)font->id(),first,count,list);
+    result=true;
+#endif
+    }
 #endif
 #endif
+  return result;
   }
 
 }

@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: TextWindow.h,v 1.40 2006/03/31 07:33:00 fox Exp $                        *
+* $Id: TextWindow.h,v 1.49 2007/03/13 21:51:15 fox Exp $                        *
 ********************************************************************************/
 #ifndef TEXTWINDOW_H
 #define TEXTWINDOW_H
@@ -55,6 +55,7 @@ protected:
   FXMenuPane          *helpmenu;                // Help menu
   FXMenuPane          *popupmenu;               // Popup menu
   FXMenuPane          *syntaxmenu;              // Syntax menu
+  FXMenuPane          *tabsmenu;                // Tab selection menu
   FXVerticalFrame     *treebox;                 // Tree box containing directories/files
   FXHorizontalFrame   *undoredoblock;           // Undo/redo block on status line
   FXText              *editor;                  // Multiline text widget
@@ -70,12 +71,15 @@ protected:
   FXUndoList           undolist;                // Undo list
   FXRecentFiles        mrufiles;                // Recent files list
   FXString             filename;                // File being edited
-  FXlong               filetime;                // Original modtime of file
+  FXTime               filetime;                // Original modtime of file
   FXbool               filenameset;             // Filename is set
   FXString             delimiters;              // Text delimiters
   FXString             searchpath;              // To search for files
   FXHiliteArray        styles;                  // Highlight styles
   FXint                currentstyle;            // Style being changed
+  FXint                initialwidth;            // Initial width
+  FXint                initialheight;           // Initial height
+  FXbool               initialsize;             // New window is initialwidth x initialheight
   FXbool               colorize;                // Syntax coloring on if possible
   FXbool               stripcr;                 // Strip carriage returns
   FXbool               stripsp;                 // Strip trailing spaces
@@ -83,6 +87,8 @@ protected:
   FXbool               saveviews;               // Save views of files
   FXbool               savemarks;               // Save bookmarks of files
   FXbool               warnchanged;             // Warn if changed by other program
+  FXbool               lastfilesize;            // Keep window size for each file
+  FXbool               lastfileposition;        // Keep window position for each file
 protected:
   void readRegistry();
   void writeRegistry();
@@ -164,6 +170,8 @@ public:
   long onUpdLineNumbers(FXObject*,FXSelector,void*);
   long onCmdTabColumns(FXObject*,FXSelector,void*);
   long onUpdTabColumns(FXObject*,FXSelector,void*);
+  long onCmdTabSelect(FXObject*,FXSelector,void*);
+  long onUpdTabSelect(FXObject*,FXSelector,void*);
   long onCmdBraceMatch(FXObject*,FXSelector,void*);
   long onUpdBraceMatch(FXObject*,FXSelector,void*);
   long onCmdAutoIndent(FXObject*,FXSelector,void*);
@@ -182,7 +190,6 @@ public:
   long onTextReplaced(FXObject*,FXSelector,void*);
   long onTextDeleted(FXObject*,FXSelector,void*);
   long onTextRightMouse(FXObject*,FXSelector,void*);
-  long onTextChanged(FXObject*,FXSelector,void*);
   long onEditDNDMotion(FXObject*,FXSelector,void*);
   long onEditDNDDrop(FXObject*,FXSelector,void*);
 
@@ -237,6 +244,11 @@ public:
   long onUpdStyleColor(FXObject*,FXSelector,void*);
   long onCmdStyleIndex(FXObject*,FXSelector,void*);
   long onUpdStyleIndex(FXObject*,FXSelector,void*);
+  long onCmdUseInitialSize(FXObject*,FXSelector,void*);
+  long onUpdUseInitialSize(FXObject*,FXSelector,void*);
+  long onCmdSetInitialSize(FXObject*,FXSelector,void*);
+  long onCmdToggleBrowser(FXObject*,FXSelector,void*);
+  long onUpdToggleBrowser(FXObject*,FXSelector,void*);
 public:
   enum{
     ID_ABOUT=FXMainWindow::ID_LAST,
@@ -325,6 +337,17 @@ public:
     ID_STYLE_UNDERLINE,
     ID_STYLE_STRIKEOUT,
     ID_STYLE_BOLD,
+    ID_USE_INITIAL_SIZE,
+    ID_SET_INITIAL_SIZE,
+    ID_TOGGLE_BROWSER,
+    ID_TABSELECT_1,
+    ID_TABSELECT_2,
+    ID_TABSELECT_3,
+    ID_TABSELECT_4,
+    ID_TABSELECT_5,
+    ID_TABSELECT_6,
+    ID_TABSELECT_7,
+    ID_TABSELECT_8,
     ID_LAST
     };
 public:
@@ -339,7 +362,7 @@ public:
   virtual void detach();
 
   // Close the window, return TRUE if actually closed
-  virtual bool close(bool notify=false);
+  virtual FXbool close(FXbool notify=false);
 
   // Return Adie application
   Adie* getApp() const { return (Adie*)FXMainWindow::getApp(); }
@@ -350,32 +373,41 @@ public:
   // Change this window's filename
   void setFilename(const FXString& file){ filename=file; }
 
-  // Has a filename been set or is it a new window
-  bool isFilenameSet() const { return filenameset; }
+  // Change file time
+  void setFiletime(FXTime t){ filetime=t; }
+  
+  // Get file time
+  FXTime getFiletime() const { return filetime; }
+  
+  // Set filename is set flag
+  void setFilenameSet(FXbool set){ filenameset=set; }
+  
+  // Has a filename been set
+  FXbool isFilenameSet() const { return filenameset; }
 
   // Is it modified
-  bool isModified() const;
+  FXbool isModified() const;
 
   // Set editable flag
-  void setEditable(bool edit=true);
+  void setEditable(FXbool edit=true);
 
   // Is it editable
-  bool isEditable() const;
+  FXbool isEditable() const;
 
   // Load text from file
-  bool loadFile(const FXString& file);
+  FXbool loadFile(const FXString& file);
 
   // Save text to file
-  bool saveFile(const FXString& file);
+  FXbool saveFile(const FXString& file);
 
   // Insert file at cursor
-  bool insertFile(const FXString& file);
+  FXbool insertFile(const FXString& file);
 
   // Extract selection to file
-  bool extractFile(const FXString& file);
+  FXbool extractFile(const FXString& file);
 
   // Return TRUE if changes have been saved
-  bool saveChanges();
+  FXbool saveChanges();
 
   // Change pattern list
   void setPatterns(const FXString& patterns);
@@ -422,7 +454,7 @@ public:
   void determineSyntax();
 
   // Set syntax by name
-  bool forceSyntax(const FXString& language);
+  void forceSyntax(const FXString& language);
 
   // Change style colors
   void setStyleColors(FXint index,const FXHiliteStyle& style);

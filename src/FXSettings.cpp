@@ -3,7 +3,7 @@
 *                           S e t t i n g s   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSettings.cpp,v 1.59 2006/03/30 13:19:01 fox Exp $                      *
+* $Id: FXSettings.cpp,v 1.67 2007/02/07 20:22:15 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -118,7 +118,7 @@ void FXSettings::deleteData(void* ptr){
 
 
 // Read string
-static bool readString(FXFile& file,FXchar *buffer,FXint& bol,FXint& eol,FXint& end){
+static FXbool readString(FXFile& file,FXchar *buffer,FXint& bol,FXint& eol,FXint& end){
   register FXint n;
   while(eol<end && buffer[eol++]!='\n');
   if(eol>=end){
@@ -136,7 +136,7 @@ static bool readString(FXFile& file,FXchar *buffer,FXint& bol,FXint& eol,FXint& 
 
 
 // Parse filename
-bool FXSettings::parseFile(const FXString& filename,bool mark){
+FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
   FXFile file(filename,FXIO::Reading);
   if(file.isOpen()){
     FXchar line[MAXBUFFER];
@@ -148,6 +148,9 @@ bool FXSettings::parseFile(const FXString& filename,bool mark){
     // Read lines
     while(readString(file,line,bol,eol,end)){
       lineno++;
+
+      // Skip BOM, if any
+      if(lineno==1 && line[bol]==(FXchar)0xef && line[bol+1]==(FXchar)0xbb && line[bol+2]==(FXchar)0xbf) bol+=3;
 
       // Skip leading spaces
       while(bol<eol && Ascii::isBlank(line[bol])) bol++;
@@ -202,7 +205,7 @@ bool FXSettings::parseFile(const FXString& filename,bool mark){
         line[p]='\0';
 
         // Add entry to current section
-        group->replace(line+name,dequote(line+value),mark);
+        group->replace(line+name,dequote(line+value),mrk);
         }
 next: bol=eol;
       }
@@ -215,14 +218,14 @@ next: bol=eol;
 
 
 // Write string
-static bool writeString(FXFile& file,const FXchar* string){
+static FXbool writeString(FXFile& file,const FXchar* string){
   register FXint len=strlen(string);
   return file.writeBlock(string,len)==len;
   }
 
 
 // Unparse registry file
-bool FXSettings::unparseFile(const FXString& filename){
+FXbool FXSettings::unparseFile(const FXString& filename){
   FXFile file(filename,FXIO::Writing);
   FXchar line[MAXVALUE];
   if(file.isOpen()){
@@ -232,7 +235,7 @@ bool FXSettings::unparseFile(const FXString& filename){
 
       // Get group
       FXStringDict* group=data(s);
-      bool sec=false;
+      FXbool sec=false;
 
       // Loop over all entries
       for(FXint e=group->first(); e<group->size(); e=group->next(e)){
@@ -344,7 +347,7 @@ FXchar* FXSettings::dequote(FXchar* text) const {
 
 
 // Check if quotes are needed
-static bool needquotes(const FXchar* text){
+static FXbool needquotes(const FXchar* text){
   register const FXchar *ptr=text;
   register FXuchar c;
   while((c=*ptr++)!='\0'){
@@ -435,16 +438,16 @@ extern "C" int vsscanf(const char* str, const char* format, va_list arg_ptr);
 
 
 // Read a formatted registry entry
-FXint FXSettings::readFormatEntry(const FXchar *section,const FXchar *key,const FXchar *fmt,...){
+FXint FXSettings::readFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...){
   if(!section || !section[0]){ fxerror("FXSettings::readFormatEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readFormatEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readFormatEntry: bad name argument.\n"); }
   if(!fmt){ fxerror("FXSettings::readFormatEntry: bad fmt argument.\n"); }
   FXStringDict *group=find(section);
+  FXint result=0;
   va_list args;
   va_start(args,fmt);
-  FXint result=0;
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       result=vsscanf((char*)value,fmt,args);    // Cast needed for HP-UX 11, which has wrong prototype for vsscanf
       }
@@ -455,12 +458,12 @@ FXint FXSettings::readFormatEntry(const FXchar *section,const FXchar *key,const 
 
 
 // Read a string-valued registry entry
-const FXchar *FXSettings::readStringEntry(const FXchar *section,const FXchar *key,const FXchar *def){
+const FXchar *FXSettings::readStringEntry(const FXchar *section,const FXchar *name,const FXchar *def){
   if(!section || !section[0]){ fxerror("FXSettings::readStringEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readStringEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readStringEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value) return value;
     }
   return def;
@@ -468,20 +471,15 @@ const FXchar *FXSettings::readStringEntry(const FXchar *section,const FXchar *ke
 
 
 // Read a int-valued registry entry
-FXint FXSettings::readIntEntry(const FXchar *section,const FXchar *key,FXint def){
+FXint FXSettings::readIntEntry(const FXchar *section,const FXchar *name,FXint def){
   if(!section || !section[0]){ fxerror("FXSettings::readIntEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readIntEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readIntEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       FXint ivalue;
-      if(value[0]=='0' && (value[1]=='x' || value[1]=='X')){
-        if(sscanf(value+2,"%x",&ivalue)) return ivalue;
-        }
-      else{
-        if(sscanf(value,"%d",&ivalue)==1) return ivalue;
-        }
+      if(sscanf(value,"%d",&ivalue)==1) return ivalue;
       }
     }
   return def;
@@ -489,20 +487,15 @@ FXint FXSettings::readIntEntry(const FXchar *section,const FXchar *key,FXint def
 
 
 // Read a unsigned int-valued registry entry
-FXuint FXSettings::readUIntEntry(const FXchar *section,const FXchar *key,FXuint def){
+FXuint FXSettings::readUIntEntry(const FXchar *section,const FXchar *name,FXuint def){
   if(!section || !section[0]){ fxerror("FXSettings::readUnsignedEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readUnsignedEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readUnsignedEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       FXuint ivalue;
-      if(value[0]=='0' && (value[1]=='x' || value[1]=='X')){
-        if(sscanf(value+2,"%x",&ivalue)) return ivalue;
-        }
-      else{
-        if(sscanf(value,"%u",&ivalue)==1) return ivalue;
-        }
+      if(sscanf(value,"%u",&ivalue)==1) return ivalue;
       }
     }
   return def;
@@ -510,36 +503,21 @@ FXuint FXSettings::readUIntEntry(const FXchar *section,const FXchar *key,FXuint 
 
 
 // Read a 64-bit long integer registry entry
-FXlong FXSettings::readLongEntry(const FXchar *section,const FXchar *key,FXlong def){
+FXlong FXSettings::readLongEntry(const FXchar *section,const FXchar *name,FXlong def){
   if(!section || !section[0]){ fxerror("FXSettings::readLongEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readLongEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readLongEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       FXlong lvalue;
-      if(value[0]=='0' && (value[1]=='x' || value[1]=='X')){
-#ifndef WIN32
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-        if(sscanf(value+2,"%lx",&lvalue)) return lvalue;
+#if defined(WIN32)
+      if(sscanf(value,"%I64d",&lvalue)==1) return lvalue;
+#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
+      if(sscanf(value,"%ld",&lvalue)==1) return lvalue;
 #else
-        if(sscanf(value+2,"%llx",&lvalue)) return lvalue;
+      if(sscanf(value,"%lld",&lvalue)==1) return lvalue;
 #endif
-#else
-        if(sscanf(value+2,"%I64x",&lvalue)) return lvalue;
-#endif
-        }
-      else{
-#ifndef WIN32
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-        if(sscanf(value,"%ld",&lvalue)==1) return lvalue;
-#else
-        if(sscanf(value,"%lld",&lvalue)==1) return lvalue;
-#endif
-#else
-        if(sscanf(value,"%I64d",&lvalue)==1) return lvalue;
-#endif
-        }
       }
     }
   return def;
@@ -547,34 +525,21 @@ FXlong FXSettings::readLongEntry(const FXchar *section,const FXchar *key,FXlong 
 
 
 // Read a 64-bit unsigned long integer registry entry
-FXulong FXSettings::readULongEntry(const FXchar *section,const FXchar *key,FXulong def){
+FXulong FXSettings::readULongEntry(const FXchar *section,const FXchar *name,FXulong def){
   if(!section || !section[0]){ fxerror("FXSettings::readULongEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readULongEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readULongEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       FXulong lvalue;
       if(value[0]=='0' && (value[1]=='x' || value[1]=='X')){
-#ifndef WIN32
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
-        if(sscanf(value+2,"%lx",&lvalue)) return lvalue;
-#else
-        if(sscanf(value+2,"%llx",&lvalue)) return lvalue;
-#endif
-#else
-        if(sscanf(value+2,"%I64x",&lvalue)) return lvalue;
-#endif
-        }
-      else{
-#ifndef WIN32
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
+#if defined(WIN32)
+        if(sscanf(value,"%I64u",&lvalue)==1) return lvalue;
+#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
         if(sscanf(value,"%lu",&lvalue)==1) return lvalue;
 #else
         if(sscanf(value,"%llu",&lvalue)==1) return lvalue;
-#endif
-#else
-        if(sscanf(value,"%I64u",&lvalue)==1) return lvalue;
 #endif
         }
       }
@@ -584,12 +549,12 @@ FXulong FXSettings::readULongEntry(const FXchar *section,const FXchar *key,FXulo
 
 
 // Read a double-valued registry entry
-FXdouble FXSettings::readRealEntry(const FXchar *section,const FXchar *key,FXdouble def){
+FXdouble FXSettings::readRealEntry(const FXchar *section,const FXchar *name,FXdouble def){
   if(!section || !section[0]){ fxerror("FXSettings::readRealEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readRealEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readRealEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       FXdouble dvalue;
       if(sscanf(value,"%lf",&dvalue)==1) return dvalue;
@@ -600,12 +565,12 @@ FXdouble FXSettings::readRealEntry(const FXchar *section,const FXchar *key,FXdou
 
 
 // Read a color registry entry
-FXColor FXSettings::readColorEntry(const FXchar *section,const FXchar *key,FXColor def){
+FXColor FXSettings::readColorEntry(const FXchar *section,const FXchar *name,FXColor def){
   if(!section || !section[0]){ fxerror("FXSettings::readColorEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readColorEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readColorEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       return fxcolorfromname(value);
       }
@@ -615,12 +580,12 @@ FXColor FXSettings::readColorEntry(const FXchar *section,const FXchar *key,FXCol
 
 
 // Read a boolean registry entry
-bool FXSettings::readBoolEntry(const FXchar *section,const FXchar *key,bool def){
+FXbool FXSettings::readBoolEntry(const FXchar *section,const FXchar *name,FXbool def){
   if(!section || !section[0]){ fxerror("FXSettings::readBoolEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::readBoolEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::readBoolEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
   if(group){
-    const char *value=group->find(key);
+    const char *value=group->find(name);
     if(value){
       if(comparecase(value,"true")==0) return true;
       else if(comparecase(value,"false")==0) return false;
@@ -637,14 +602,14 @@ bool FXSettings::readBoolEntry(const FXchar *section,const FXchar *key,bool def)
 
 
 // Write a formatted registry entry
-FXint FXSettings::writeFormatEntry(const FXchar *section,const FXchar *key,const FXchar *fmt,...){
+FXint FXSettings::writeFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...){
   if(!section || !section[0]){ fxerror("FXSettings::writeFormatEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeFormatEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeFormatEntry: bad name argument.\n"); }
   if(!fmt){ fxerror("FXSettings::writeFormatEntry: bad fmt argument.\n"); }
   FXStringDict *group=insert(section);
+  FXint result=0;
   va_list args;
   va_start(args,fmt);
-  FXint result=0;
   if(group){
     FXchar buffer[2048];
 #if defined(WIN32) || defined(HAVE_VSNPRINTF)
@@ -652,7 +617,7 @@ FXint FXSettings::writeFormatEntry(const FXchar *section,const FXchar *key,const
 #else
     result=vsprintf(buffer,fmt,args);
 #endif
-    group->replace(key,buffer,true);
+    group->replace(name,buffer,true);
     modified=true;
     }
   va_end(args);
@@ -661,12 +626,12 @@ FXint FXSettings::writeFormatEntry(const FXchar *section,const FXchar *key,const
 
 
 // Write a string-valued registry entry
-bool FXSettings::writeStringEntry(const FXchar *section,const FXchar *key,const FXchar *val){
+FXbool FXSettings::writeStringEntry(const FXchar *section,const FXchar *name,const FXchar *val){
   if(!section || !section[0]){ fxerror("FXSettings::writeStringEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeStringEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeStringEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
-    group->replace(key,val,true);
+    group->replace(name,val,true);
     modified=true;
     return true;
     }
@@ -675,14 +640,14 @@ bool FXSettings::writeStringEntry(const FXchar *section,const FXchar *key,const 
 
 
 // Write a int-valued registry entry
-bool FXSettings::writeIntEntry(const FXchar *section,const FXchar *key,FXint val){
+FXbool FXSettings::writeIntEntry(const FXchar *section,const FXchar *name,FXint val){
   if(!section || !section[0]){ fxerror("FXSettings::writeIntEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeIntEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeIntEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[32];
     sprintf(buffer,"%d",val);
-    group->replace(key,buffer,true);
+    group->replace(name,buffer,true);
     modified=true;
     return true;
     }
@@ -691,14 +656,14 @@ bool FXSettings::writeIntEntry(const FXchar *section,const FXchar *key,FXint val
 
 
 // Write a unsigned int-valued registry entry
-bool FXSettings::writeUIntEntry(const FXchar *section,const FXchar *key,FXuint val){
+FXbool FXSettings::writeUIntEntry(const FXchar *section,const FXchar *name,FXuint val){
   if(!section || !section[0]){ fxerror("FXSettings::writeUnsignedEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeUnsignedEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeUnsignedEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[32];
     sprintf(buffer,"%u",val);
-    group->replace(key,buffer,true);
+    group->replace(name,buffer,true);
     modified=true;
     return true;
     }
@@ -707,22 +672,20 @@ bool FXSettings::writeUIntEntry(const FXchar *section,const FXchar *key,FXuint v
 
 
 // Write a 64-bit long integer registry entry
-bool FXSettings::writeLongEntry(const FXchar *section,const FXchar *key,FXlong val){
+FXbool FXSettings::writeLongEntry(const FXchar *section,const FXchar *name,FXlong val){
   if(!section || !section[0]){ fxerror("FXSettings::writeLongEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeLongEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeLongEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
-#ifndef WIN32
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
+#if defined(WIN32)
+    sprintf(buffer,"%I64d",val);
+#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
     sprintf(buffer,"%ld",val);
 #else
     sprintf(buffer,"%lld",val);
 #endif
-#else
-    sprintf(buffer,"%I64d",val);
-#endif
-    group->replace(key,buffer,true);
+    group->replace(name,buffer,true);
     modified=true;
     return true;
     }
@@ -731,22 +694,20 @@ bool FXSettings::writeLongEntry(const FXchar *section,const FXchar *key,FXlong v
 
 
 // Write a 64-bit long integer registry entry
-bool FXSettings::writeULongEntry(const FXchar *section,const FXchar *key,FXulong val){
+FXbool FXSettings::writeULongEntry(const FXchar *section,const FXchar *name,FXulong val){
   if(!section || !section[0]){ fxerror("FXSettings::writeULongEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeULongEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeULongEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
-#ifndef WIN32
-#if defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
+#if defined(WIN32)
+    sprintf(buffer,"%I64u",val);
+#elif defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64)
     sprintf(buffer,"%lu",val);
 #else
     sprintf(buffer,"%llu",val);
 #endif
-#else
-    sprintf(buffer,"%I64u",val);
-#endif
-    group->replace(key,buffer,true);
+    group->replace(name,buffer,true);
     modified=true;
     return true;
     }
@@ -755,14 +716,14 @@ bool FXSettings::writeULongEntry(const FXchar *section,const FXchar *key,FXulong
 
 
 // Write a double-valued registry entry
-bool FXSettings::writeRealEntry(const FXchar *section,const FXchar *key,FXdouble val){
+FXbool FXSettings::writeRealEntry(const FXchar *section,const FXchar *name,FXdouble val){
   if(!section || !section[0]){ fxerror("FXSettings::writeRealEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeRealEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeRealEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
     sprintf(buffer,"%.16g",val);
-    group->replace(key,buffer,true);
+    group->replace(name,buffer,true);
     modified=true;
     return true;
     }
@@ -771,13 +732,13 @@ bool FXSettings::writeRealEntry(const FXchar *section,const FXchar *key,FXdouble
 
 
 // Write a color registry entry
-bool FXSettings::writeColorEntry(const FXchar *section,const FXchar *key,FXColor val){
+FXbool FXSettings::writeColorEntry(const FXchar *section,const FXchar *name,FXColor val){
   if(!section || !section[0]){ fxerror("FXSettings::writeColorEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeColorEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeColorEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
     FXchar buffer[64];
-    group->replace(key,fxnamefromcolor(buffer,val),TRUE);
+    group->replace(name,fxnamefromcolor(buffer,val),true);
     modified=true;
     return true;
     }
@@ -786,12 +747,12 @@ bool FXSettings::writeColorEntry(const FXchar *section,const FXchar *key,FXColor
 
 
 // Write a boolean registry entry
-bool FXSettings::writeBoolEntry(const FXchar *section,const FXchar *key,bool val){
+FXbool FXSettings::writeBoolEntry(const FXchar *section,const FXchar *name,FXbool val){
   if(!section || !section[0]){ fxerror("FXSettings::writeBoolEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::writeBoolEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::writeBoolEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
-    group->replace(key,val?"true":"false",true);
+    group->replace(name,val?"true":"false",true);
     modified=true;
     return true;
     }
@@ -800,12 +761,12 @@ bool FXSettings::writeBoolEntry(const FXchar *section,const FXchar *key,bool val
 
 
 // Delete a registry entry
-bool FXSettings::deleteEntry(const FXchar *section,const FXchar *key){
+FXbool FXSettings::deleteEntry(const FXchar *section,const FXchar *name){
   if(!section || !section[0]){ fxerror("FXSettings::deleteEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::deleteEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::deleteEntry: bad name argument.\n"); }
   FXStringDict *group=insert(section);
   if(group){
-    group->remove(key);
+    group->remove(name);
     modified=true;
     return true;
     }
@@ -814,7 +775,7 @@ bool FXSettings::deleteEntry(const FXchar *section,const FXchar *key){
 
 
 // Delete section
-bool FXSettings::deleteSection(const FXchar *section){
+FXbool FXSettings::deleteSection(const FXchar *section){
   if(!section || !section[0]){ fxerror("FXSettings::deleteSection: bad section argument.\n"); }
   remove(section);
   modified=true;
@@ -823,7 +784,7 @@ bool FXSettings::deleteSection(const FXchar *section){
 
 
 // Clear all sections
-bool FXSettings::clear(){
+FXbool FXSettings::clear(){
   FXDict::clear();
   modified=true;
   return true;
@@ -831,18 +792,18 @@ bool FXSettings::clear(){
 
 
 // See if section exists
-bool FXSettings::existingSection(const FXchar *section){
+FXbool FXSettings::existingSection(const FXchar *section){
   if(!section || !section[0]){ fxerror("FXSettings::existingSection: bad section argument.\n"); }
   return find(section)!=NULL;
   }
 
 
 // See if entry exists
-bool FXSettings::existingEntry(const FXchar *section,const FXchar *key){
+FXbool FXSettings::existingEntry(const FXchar *section,const FXchar *name){
   if(!section || !section[0]){ fxerror("FXSettings::existingEntry: bad section argument.\n"); }
-  if(!key || !key[0]){ fxerror("FXSettings::existingEntry: bad key argument.\n"); }
+  if(!name || !name[0]){ fxerror("FXSettings::existingEntry: bad name argument.\n"); }
   FXStringDict *group=find(section);
-  return group && group->find(key)!=NULL;
+  return group && group->find(name)!=NULL;
   }
 
 

@@ -3,7 +3,7 @@
 *                      T e x t   R e p l a c e   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXReplaceDialog.cpp,v 1.50 2006/03/29 06:48:12 fox Exp $                 *
+* $Id: FXReplaceDialog.cpp,v 1.56 2007/03/06 15:55:21 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -95,6 +95,8 @@ FXDEFMAP(FXReplaceDialog) FXReplaceDialogMap[]={
   FXMAPFUNCS(SEL_COMMAND,FXReplaceDialog::ID_MODE+SEARCH_EXACT,FXReplaceDialog::ID_MODE+SEARCH_REGEX,FXReplaceDialog::onCmdMode),
   FXMAPFUNC(SEL_KEYPRESS,FXReplaceDialog::ID_SEARCH_TEXT,FXReplaceDialog::onSearchKey),
   FXMAPFUNC(SEL_KEYPRESS,FXReplaceDialog::ID_REPLACE_TEXT,FXReplaceDialog::onReplaceKey),
+  FXMAPFUNC(SEL_MOUSEWHEEL,FXReplaceDialog::ID_SEARCH_TEXT,FXReplaceDialog::onWheelSearch),
+  FXMAPFUNC(SEL_MOUSEWHEEL,FXReplaceDialog::ID_REPLACE_TEXT,FXReplaceDialog::onWheelReplace),
   FXMAPFUNCS(SEL_COMMAND,FXReplaceDialog::ID_SEARCH_UP,FXReplaceDialog::ID_SEARCH_DN,FXReplaceDialog::onCmdSearchHist),
   FXMAPFUNCS(SEL_COMMAND,FXReplaceDialog::ID_REPLACE_UP,FXReplaceDialog::ID_REPLACE_DN,FXReplaceDialog::onCmdReplaceHist),
   };
@@ -105,8 +107,8 @@ FXIMPLEMENT(FXReplaceDialog,FXDialogBox,FXReplaceDialogMap,ARRAYNUMBER(FXReplace
 
 
 // File Open Dialog
-FXReplaceDialog::FXReplaceDialog(FXWindow* owner,const FXString& caption,FXIcon* ic,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,caption,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,x,y,w,h,10,10,10,10, 10,10){
+FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* icn,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,caption,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,x,y,w,h,10,10,10,10, 10,10){
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
   accept=new FXButton(buttons,tr("&Replace"),NULL,this,ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   every=new FXButton(buttons,tr("Re&place All"),NULL,this,ID_ALL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,6,6,VERT_PAD,VERT_PAD);
@@ -116,7 +118,7 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* owner,const FXString& caption,FXIcon*
   FXArrowButton* searchnext=new FXArrowButton(pair,this,ID_NEXT,ARROW_RIGHT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   FXHorizontalFrame* toppart=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 10,10);
-  new FXLabel(toppart,FXString::null,ic,ICON_BEFORE_TEXT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X);
+  new FXLabel(toppart,FXString::null,icn,ICON_BEFORE_TEXT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X);
   FXVerticalFrame* entry=new FXVerticalFrame(toppart,LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
   searchlabel=new FXLabel(entry,tr("S&earch for:"),NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
   searchbox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
@@ -318,10 +320,35 @@ long FXReplaceDialog::onReplaceKey(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Wheeled in search text
+long FXReplaceDialog::onWheelSearch(FXObject*,FXSelector,void* ptr){
+  if(((FXEvent*)ptr)->code>0){
+    onCmdSearchHist(this,FXSEL(SEL_COMMAND,ID_SEARCH_UP),NULL);
+    }
+  else if(((FXEvent*)ptr)->code<0){
+    onCmdSearchHist(this,FXSEL(SEL_COMMAND,ID_SEARCH_DN),NULL);
+    }
+  return 1;
+  }
+
+
+// Wheeled in replace text
+long FXReplaceDialog::onWheelReplace(FXObject*,FXSelector,void* ptr){
+  if(((FXEvent*)ptr)->code>0){
+    onCmdReplaceHist(this,FXSEL(SEL_COMMAND,ID_REPLACE_UP),NULL);
+    }
+  else if(((FXEvent*)ptr)->code<0){
+    onCmdReplaceHist(this,FXSEL(SEL_COMMAND,ID_REPLACE_DN),NULL);
+    }
+  return 1;
+  }
+
+
 // Force the initial text to be seleced
 FXuint FXReplaceDialog::execute(FXuint placement){
   create();
   searchtext->setFocus();
+//  searchtext->selectAll();
   show(placement);
   current=0;
   return getApp()->runModalFor(this);

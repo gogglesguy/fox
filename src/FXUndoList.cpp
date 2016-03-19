@@ -3,7 +3,7 @@
 *                  U n d o / R e d o - a b l e   C o m m a n d                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXUndoList.cpp,v 1.57 2006/01/22 17:58:50 fox Exp $                      *
+* $Id: FXUndoList.cpp,v 1.60 2007/02/07 20:22:19 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -112,11 +112,11 @@ FXString FXCommand::redoName() const { return "Redo"; }
 
 
 // Allow merging is false by default
-bool FXCommand::canMerge() const { return false; }
+FXbool FXCommand::canMerge() const { return false; }
 
 
 // Don't merge by default
-bool FXCommand::mergeWith(FXCommand*){ return false; }
+FXbool FXCommand::mergeWith(FXCommand*){ return false; }
 
 
 // Default returns size of undo record itself
@@ -235,7 +235,7 @@ void FXUndoList::unmark(){
 
 
 // Check if marked
-bool FXUndoList::marked() const {
+FXbool FXUndoList::marked() const {
   return (group==NULL) && (marker==0);
   }
 
@@ -256,9 +256,9 @@ void FXUndoList::cut(){
 
 
 // Add new command, executing if desired
-void FXUndoList::add(FXCommand* command,bool doit,bool merge){
+void FXUndoList::add(FXCommand* command,FXbool doit,FXbool merge){
   register FXCommandGroup* g=this;
-  register FXuint size=0;
+  register FXuint oldsize=0;
 
   // Must pass a command
   if(!command){ fxerror("FXCommandGroup::add: NULL command argument.\n"); }
@@ -278,7 +278,7 @@ void FXUndoList::add(FXCommand* command,bool doit,bool merge){
   while(g->group){ g=g->group; }
 
   // Old size of previous record
-  if(g->undolist) size=g->undolist->size();
+  if(g->undolist) oldsize=g->undolist->size();
 
   // Try to merge commands when desired and possible
   if(merge && g->undolist && !marked() && command->canMerge() && g->undolist->mergeWith(command)){
@@ -287,7 +287,7 @@ void FXUndoList::add(FXCommand* command,bool doit,bool merge){
     if(this==g){
 
       // Update space, which is the new size less the old size
-      space+=g->undolist->size()-size;
+      space+=g->undolist->size()-oldsize;
       }
 
     // Delete incoming command that was merged
@@ -471,19 +471,19 @@ void FXUndoList::revert(){
 
 
 // Can we undo more commands
-bool FXUndoList::canUndo() const {
+FXbool FXUndoList::canUndo() const {
   return undolist!=NULL;
   }
 
 
 // Can we redo more commands
-bool FXUndoList::canRedo() const {
+FXbool FXUndoList::canRedo() const {
   return redolist!=NULL;
   }
 
 
 // Can revert to marked
-bool FXUndoList::canRevert() const {
+FXbool FXUndoList::canRevert() const {
   return marker!=NOMARK && marker!=0;
   }
 

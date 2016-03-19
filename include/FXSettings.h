@@ -3,7 +3,7 @@
 *                           S e t t i n g s   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSettings.h,v 1.37 2006/03/29 07:23:00 fox Exp $                        *
+* $Id: FXSettings.h,v 1.41 2007/02/07 20:21:58 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXSETTINGS_H
 #define FXSETTINGS_H
@@ -44,7 +44,7 @@ class FXStringDict;
 class FXAPI FXSettings : public FXDict {
   FXDECLARE(FXSettings)
 protected:
-  bool modified;
+  FXbool modified;
 protected:
   virtual void *createData(void*);
   virtual void deleteData(void*);
@@ -65,91 +65,91 @@ public:
   FXSettings &operator=(const FXSettings& orig);
 
   /// Parse a file containing a settings database.
-  bool parseFile(const FXString& filename,bool mark);
+  FXbool parseFile(const FXString& filename,FXbool mark);
 
   /// Unparse settings database into given file.
-  bool unparseFile(const FXString& filename);
-
-  /// Obtain the string dictionary for the given section
-  FXStringDict* data(FXuint pos) const { return (FXStringDict*)FXDict::data(pos); }
+  FXbool unparseFile(const FXString& filename);
 
   /// Find string dictionary for the given section; may be NULL
   FXStringDict* find(const FXchar *section) const { return (FXStringDict*)FXDict::find(section); }
 
+  /// Obtain the string dictionary for the given section
+  FXStringDict* data(FXint pos) const { return (FXStringDict*)FXDict::data(pos); }
+
   /// Read a formatted registry entry, using scanf-style format
-  FXint readFormatEntry(const FXchar *section,const FXchar *key,const FXchar *fmt,...) FX_SCANF(4,5) ;
+  FXint readFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...) FX_SCANF(4,5) ;
 
   /// Read a string registry entry; if no value is found, the default value def is returned
-  const FXchar *readStringEntry(const FXchar *section,const FXchar *key,const FXchar *def=NULL);
+  const FXchar *readStringEntry(const FXchar *section,const FXchar *name,const FXchar *def=NULL);
 
   /// Read a integer registry entry; if no value is found, the default value def is returned
-  FXint readIntEntry(const FXchar *section,const FXchar *key,FXint def=0);
+  FXint readIntEntry(const FXchar *section,const FXchar *name,FXint def=0);
 
   /// Read a unsigned integer registry entry; if no value is found, the default value def is returned
-  FXuint readUIntEntry(const FXchar *section,const FXchar *key,FXuint def=0);
+  FXuint readUIntEntry(const FXchar *section,const FXchar *name,FXuint def=0);
 
   /// Read a 64-bit long integer registry entry; if no value is found, the default value def is returned
-  FXlong readLongEntry(const FXchar *section,const FXchar *key,FXlong def=0);
+  FXlong readLongEntry(const FXchar *section,const FXchar *name,FXlong def=0);
 
   /// Read a 64-bit unsigned long integer registry entry; if no value is found, the default value def is returned
-  FXulong readULongEntry(const FXchar *section,const FXchar *key,FXulong def=0);
+  FXulong readULongEntry(const FXchar *section,const FXchar *name,FXulong def=0);
 
   /// Read a double-precision floating point registry entry; if no value is found, the default value def is returned
-  FXdouble readRealEntry(const FXchar *section,const FXchar *key,FXdouble def=0.0);
+  FXdouble readRealEntry(const FXchar *section,const FXchar *name,FXdouble def=0.0);
 
   /// Read a color value registry entry; if no value is found, the default value def is returned
-  FXColor readColorEntry(const FXchar *section,const FXchar *key,FXColor def=0);
+  FXColor readColorEntry(const FXchar *section,const FXchar *name,FXColor def=0);
 
   /// Read a boolean registry entry
-  bool readBoolEntry(const FXchar *section,const FXchar *key,bool def=false);
+  FXbool readBoolEntry(const FXchar *section,const FXchar *name,FXbool def=false);
 
   /// Write a formatted registry entry, using printf-style format
-  FXint writeFormatEntry(const FXchar *section,const FXchar *key,const FXchar *fmt,...) FX_PRINTF(4,5) ;
+  FXint writeFormatEntry(const FXchar *section,const FXchar *name,const FXchar *fmt,...) FX_PRINTF(4,5) ;
 
   /// Write a string registry entry
-  bool writeStringEntry(const FXchar *section,const FXchar *key,const FXchar *val);
+  FXbool writeStringEntry(const FXchar *section,const FXchar *name,const FXchar *val);
 
   /// Write a integer registry entry
-  bool writeIntEntry(const FXchar *section,const FXchar *key,FXint val);
+  FXbool writeIntEntry(const FXchar *section,const FXchar *name,FXint val);
 
   /// Write a unsigned integer registry entry
-  bool writeUIntEntry(const FXchar *section,const FXchar *key,FXuint val);
+  FXbool writeUIntEntry(const FXchar *section,const FXchar *name,FXuint val);
 
   /// Write a 64-bit long integer registry entry
-  bool writeLongEntry(const FXchar *section,const FXchar *key,FXlong val);
+  FXbool writeLongEntry(const FXchar *section,const FXchar *name,FXlong val);
 
   /// Write a 64-bit unsigned long integer registry entry
-  bool writeULongEntry(const FXchar *section,const FXchar *key,FXulong val);
+  FXbool writeULongEntry(const FXchar *section,const FXchar *name,FXulong val);
 
   /// Write a double-precision floating point registry entry
-  bool writeRealEntry(const FXchar *section,const FXchar *key,FXdouble val);
+  FXbool writeRealEntry(const FXchar *section,const FXchar *name,FXdouble val);
 
   /// Write a color value entry
-  bool writeColorEntry(const FXchar *section,const FXchar *key,FXColor val);
+  FXbool writeColorEntry(const FXchar *section,const FXchar *name,FXColor val);
 
   /// Write a boolean value entry
-  bool writeBoolEntry(const FXchar *section,const FXchar *key,bool val);
+  FXbool writeBoolEntry(const FXchar *section,const FXchar *name,FXbool val);
 
   /// Delete a registry entry
-  bool deleteEntry(const FXchar *section,const FXchar *key);
+  FXbool deleteEntry(const FXchar *section,const FXchar *name);
 
   /// See if entry exists
-  bool existingEntry(const FXchar *section,const FXchar *key);
+  FXbool existingEntry(const FXchar *section,const FXchar *name);
 
   /// Delete section
-  bool deleteSection(const FXchar *section);
+  FXbool deleteSection(const FXchar *section);
 
   /// See if section exists
-  bool existingSection(const FXchar *section);
+  FXbool existingSection(const FXchar *section);
 
   /// Clear all sections
-  bool clear();
+  FXbool clear();
 
   /// Mark as changed
-  void setModified(bool mdfy=true){ modified=mdfy; }
+  void setModified(FXbool mdfy=true){ modified=mdfy; }
 
   /// Is it modified
-  bool isModified() const { return modified; }
+  FXbool isModified() const { return modified; }
 
   /// Cleanup
   virtual ~FXSettings();

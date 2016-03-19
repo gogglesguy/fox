@@ -3,7 +3,7 @@
 *                            O b j e c t   L i s t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXObjectList.cpp,v 1.39 2006/02/07 01:17:26 fox Exp $                    *
+* $Id: FXObjectList.cpp,v 1.44 2007/02/07 20:22:13 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -28,6 +28,7 @@
 #include "FXStream.h"
 #include "FXObject.h"
 #include "FXStream.h"
+#include "FXElement.h"
 #include "FXObjectList.h"
 
 /*
@@ -39,7 +40,6 @@
     it is located in front of the array; since a pointer may be
     larger than an int, there may be some unused space in between the
     first data value and the number field.
-  - When growing the array, newly allocated data are zeroed out.
 */
 
 
@@ -64,17 +64,18 @@ static const FXObject* emptylist[2]={0,0};
 
 
 // Change number of items in list
-void FXObjectList::no(FXint num){
-  register FXint old=*((FXint*)(ptr-1));
+FXbool FXObjectList::no(FXint num){
+  register FXint old=no();
+  register FXObject **p;
   if(old!=num){
     if(0<num){
       if(ptr==EMPTY){
-        ptr=1+((FXObject**)malloc(ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)));
+        if((p=(FXObject**)malloc(ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)))==NULL) return false;
         }
       else{
-        ptr=1+((FXObject**)realloc(ptr-1,ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)));
+        if((p=(FXObject**)realloc(ptr-1,ROUNDUP(num)*sizeof(FXObject*)+sizeof(FXObject*)))==NULL) return false;
         }
-      if(num>old){memset(ptr+old,0,(num-old)*sizeof(FXObject*));}
+      ptr=p+1;
       *((FXint*)(ptr-1))=num;
       }
     else if(ptr!=EMPTY){
@@ -82,6 +83,7 @@ void FXObjectList::no(FXint num){
       ptr=EMPTY;
       }
     }
+  return true;
   }
 
 
@@ -91,27 +93,34 @@ FXObjectList::FXObjectList():ptr(EMPTY){
 
 
 // Copy constructor
-FXObjectList::FXObjectList(const FXObjectList& orig):ptr(EMPTY){
-  register FXint num=orig.no();
-  if(0<num){
-    no(num);
-    memcpy(ptr,orig.ptr,num*sizeof(FXObject*));
+FXObjectList::FXObjectList(const FXObjectList& src):ptr(EMPTY){
+  register FXint num=src.no();
+  if(0<num && no(num)){
+    copyElms(ptr,src.ptr,num);
     }
   }
 
 
 // Construct and init with single object
 FXObjectList::FXObjectList(FXObject* object):ptr(EMPTY){
-  no(1);
-  ptr[0]=object;
+  if(no(1)){
+    ptr[0]=object;
+    }
+  }
+
+
+// Construct and init with n copies of object
+FXObjectList::FXObjectList(FXObject* object,FXint n):ptr(EMPTY){
+  if(0<n && no(n)){
+    fillElms(ptr,object,n);
+    }
   }
 
 
 // Construct and init with list of objects
 FXObjectList::FXObjectList(FXObject** objects,FXint n):ptr(EMPTY){
-  if(0<n){
-    no(n);
-    memcpy(ptr,objects,n*sizeof(FXObject*));
+  if(0<n && no(n)){
+    copyElms(ptr,objects,n);
     }
   }
 
@@ -132,43 +141,61 @@ FXObjectList& FXObjectList::operator=(const FXObjectList& orig){
   }
 
 
+// Adopt objects from orig, leaving orig empty
+FXObjectList& FXObjectList::adopt(FXObjectList& orig){
+  if(ptr!=orig.ptr){
+    if(ptr!=EMPTY){ free(ptr-1); }
+    ptr=orig.ptr;
+    orig.ptr=EMPTY;
+    }
+  return *this;
+  }
+
+
 // Assign object p to list
 FXObjectList& FXObjectList::assign(FXObject* object){
-  no(1);
-  ptr[0]=object;
+  if(no(1)){ ptr[0]=object; }
+  return *this;
+  }
+
+
+// Assign n copies of object to list
+FXObjectList& FXObjectList::assign(FXObject* object,FXint n){
+  if(no(n)){ fillElms(ptr,object,n); }
   return *this;
   }
 
 
 // Assign n objects to list
 FXObjectList& FXObjectList::assign(FXObject** objects,FXint n){
-  no(n);
-  if(0<n){memmove(ptr,objects,n*sizeof(FXObject*));}
+  if(no(n)){ moveElms(ptr,objects,n); }
   return *this;
   }
 
 
 // Assign input string to this string
 FXObjectList& FXObjectList::assign(FXObjectList& objects){
-  assign(objects.ptr,objects.no());
-  return *this;
+  return assign(objects.ptr,objects.no());
   }
 
 
 // Insert an object
 FXObjectList& FXObjectList::insert(FXint pos,FXObject* object){
   register FXint num=no();
-  no(num+1);
-  if(pos<=0){
-    memmove(&ptr[1],ptr,num*sizeof(FXObject*));
-    ptr[0]=object;
-    }
-  else if(pos>=num){
-    ptr[num]=object;
-    }
-  else{
-    memmove(&ptr[pos+1],&ptr[pos],(num-pos)*sizeof(FXObject*));
+  if(no(num+1)){
+    moveElms(ptr+pos+1,ptr+pos,num-pos);
     ptr[pos]=object;
+    }
+  return *this;
+  }
+
+
+// Insert n copies of object at specified position
+FXObjectList& FXObjectList::insert(FXint pos,FXObject* object,FXint n){
+  register FXint num=no();
+  if(no(num+n)){
+    moveElms(ptr+pos+n,ptr+pos,num-pos);
+    fillElms(ptr+pos,object,n);
     }
   return *this;
   }
@@ -176,20 +203,10 @@ FXObjectList& FXObjectList::insert(FXint pos,FXObject* object){
 
 // Insert n objects at specified position
 FXObjectList& FXObjectList::insert(FXint pos,FXObject** objects,FXint n){
-  if(0<n){
-    register FXint num=no();
-    no(num+n);
-    if(pos<=0){
-      memmove(&ptr[n],ptr,num*sizeof(FXObject*));
-      memcpy(ptr,objects,n*sizeof(FXObject*));
-      }
-    else if(pos>=num){
-      memcpy(&ptr[num],objects,n*sizeof(FXObject*));
-      }
-    else{
-      memmove(&ptr[pos+n],&ptr[pos],(num-pos)*sizeof(FXObject*));
-      memcpy(&ptr[pos],objects,n*sizeof(FXObject*));
-      }
+  register FXint num=no();
+  if(no(num+n)){
+    moveElms(ptr+pos+n,ptr+pos,num-pos);
+    copyElms(ptr+pos,objects,n);
     }
   return *this;
   }
@@ -197,28 +214,38 @@ FXObjectList& FXObjectList::insert(FXint pos,FXObject** objects,FXint n){
 
 // Insert objects at specified position
 FXObjectList& FXObjectList::insert(FXint pos,FXObjectList& objects){
-  insert(pos,objects.ptr,objects.no());
-  return *this;
+  return insert(pos,objects.ptr,objects.no());
   }
 
 
 // Prepend an object
 FXObjectList& FXObjectList::prepend(FXObject* object){
   register FXint num=no();
-  no(num+1);
-  memmove(&ptr[1],ptr,num*sizeof(FXObject*));
-  ptr[0]=object;
+  if(no(num+1)){
+    moveElms(ptr+1,ptr,num);
+    ptr[0]=object;
+    }
+  return *this;
+  }
+
+
+// Prepend n copies of object
+FXObjectList& FXObjectList::prepend(FXObject* object,FXint n){
+  register FXint num=no();
+  if(no(num+n)){
+    moveElms(ptr+n,ptr,num);
+    fillElms(ptr,object,n);
+    }
   return *this;
   }
 
 
 // Prepend n objects
 FXObjectList& FXObjectList::prepend(FXObject** objects,FXint n){
-  if(0<n){
-    register FXint num=no();
-    no(num+n);
-    memmove(&ptr[n],ptr,num*sizeof(FXObject*));
-    memcpy(ptr,objects,n*sizeof(FXObject*));
+  register FXint num=no();
+  if(no(num+n)){
+    moveElms(ptr+n,ptr,num);
+    copyElms(ptr,objects,n);
     }
   return *this;
   }
@@ -226,26 +253,35 @@ FXObjectList& FXObjectList::prepend(FXObject** objects,FXint n){
 
 // Prepend objects
 FXObjectList& FXObjectList::prepend(FXObjectList& objects){
-  prepend(objects.ptr,objects.no());
-  return *this;
+  return prepend(objects.ptr,objects.no());
   }
 
 
 // Append an object
 FXObjectList& FXObjectList::append(FXObject* object){
   register FXint num=no();
-  no(num+1);
-  ptr[num]=object;
+  if(no(num+1)){
+    ptr[num]=object;
+    }
+  return *this;
+  }
+
+
+// Append n copies of object
+FXObjectList& FXObjectList::append(FXObject* object,FXint n){
+  register FXint num=no();
+  if(no(num+n)){
+    fillElms(ptr+num,object,n);
+    }
   return *this;
   }
 
 
 // Add string to the end
 FXObjectList& FXObjectList::append(FXObject** objects,FXint n){
-  if(0<n){
-    register FXint num=no();
-    no(num+n);
-    memcpy(&ptr[num],objects,n*sizeof(FXObject*));
+  register FXint num=no();
+  if(no(num+n)){
+    copyElms(ptr+num,objects,n);
     }
   return *this;
   }
@@ -253,26 +289,30 @@ FXObjectList& FXObjectList::append(FXObject** objects,FXint n){
 
 // Add string to the end
 FXObjectList& FXObjectList::append(FXObjectList& objects){
-  append(objects.ptr,objects.no());
-  return *this;
+  return append(objects.ptr,objects.no());
   }
 
 
 // Replace element
 FXObjectList& FXObjectList::replace(FXint pos,FXObject* object){
+  ptr[pos]=object;
+  return *this;
+  }
+
+
+
+// Replaces the m objects at pos with n copies of object
+FXObjectList& FXObjectList::replace(FXint pos,FXint m,FXObject* object,FXint n){
   register FXint num=no();
-  if(pos<0){
-    no(num+1);
-    memmove(&ptr[1],ptr,num*sizeof(FXObject*));
-    ptr[0]=object;
+  if(m<n){
+    if(!no(num-m+n)) return *this;
+    moveElms(ptr+pos+n,ptr+pos+m,num-pos-n);
     }
-  else if(pos>=num){
-    no(num+1);
-    ptr[num]=object;
+  else if(m>n){
+    moveElms(ptr+pos+n,ptr+pos+m,num-pos-m);
+    if(!no(num-m+n)) return *this;
     }
-  else{
-    ptr[pos]=object;
-    }
+  fillElms(ptr+pos,object,n);
   return *this;
   }
 
@@ -280,67 +320,39 @@ FXObjectList& FXObjectList::replace(FXint pos,FXObject* object){
 // Replaces the m objects at pos with n objects
 FXObjectList& FXObjectList::replace(FXint pos,FXint m,FXObject** objects,FXint n){
   register FXint num=no();
-  if(pos+m<=0){
-    if(0<n){
-      no(num+n);
-      memmove(&ptr[pos+n],ptr,num*sizeof(FXObject*));
-      memcpy(ptr,objects,n*sizeof(FXObject*));
-      }
+  if(m<n){
+    if(!no(num-m+n)) return *this;
+    moveElms(ptr+pos+n,ptr+pos+m,num-pos-n);
     }
-  else if(num<=pos){
-    if(0<n){
-      no(num+n);
-      memcpy(&ptr[num],objects,n*sizeof(FXObject*));
-      }
+  else if(m>n){
+    moveElms(ptr+pos+n,ptr+pos+m,num-pos-m);
+    if(!no(num-m+n)) return *this;
     }
-  else{
-    if(pos<0){m+=pos;pos=0;}
-    if(pos+m>num){m=num-pos;}
-    if(m<n){
-      no(num-m+n);
-      memmove(&ptr[pos+n],&ptr[pos+m],(num-pos-m)*sizeof(FXObject*));
-      }
-    else if(m>n){
-      memmove(&ptr[pos+n],&ptr[pos+m],(num-pos-m)*sizeof(FXObject*));
-      no(num-m+n);
-      }
-    if(0<n){
-      memcpy(&ptr[pos],objects,n*sizeof(FXObject*));
-      }
-    }
+  copyElms(ptr+pos,objects,n);
   return *this;
   }
 
 
 // Replace the m objects at pos with objects
 FXObjectList& FXObjectList::replace(FXint pos,FXint m,FXObjectList& objects){
-  replace(pos,m,objects.ptr,objects.no());
-  return *this;
+  return replace(pos,m,objects.ptr,objects.no());
   }
 
 
 // Remove object at pos
 FXObjectList& FXObjectList::erase(FXint pos){
   register FXint num=no();
-  if(0<=pos && pos<num){
-    memmove(&ptr[pos],&ptr[pos+1],(num-pos-1)*sizeof(FXObject*));
-    no(num-1);
-    }
+  moveElms(ptr+pos,ptr+pos+1,num-pos-1);
+  no(num-1);
   return *this;
   }
 
 
 // Remove n objects at pos
 FXObjectList& FXObjectList::erase(FXint pos,FXint n){
-  if(0<n){
-    register FXint num=no();
-    if(pos<num && pos+n>0){
-      if(pos<0){n+=pos;pos=0;}
-      if(pos+n>num){n=num-pos;}
-      memmove(&ptr[pos],&ptr[pos+n],(num-n-pos)*sizeof(FXObject*));
-      no(num-n);
-      }
-    }
+  register FXint num=no();
+  moveElms(ptr+pos,ptr+pos+n,num-n-pos);
+  no(num-n);
   return *this;
   }
 
@@ -351,7 +363,7 @@ FXObjectList& FXObjectList::remove(const FXObject* object){
   register FXint pos;
   for(pos=0; pos<num; pos++){
     if(ptr[pos]==object){
-      memmove(&ptr[pos],&ptr[pos+1],(num-pos-1)*sizeof(FXObject*));
+      moveElms(ptr+pos,ptr+pos+1,num-pos-1);
       no(num-1);
       break;
       }
@@ -362,20 +374,22 @@ FXObjectList& FXObjectList::remove(const FXObject* object){
 
 // Find object in list, searching forward; return position or -1
 FXint FXObjectList::find(const FXObject* object,FXint pos) const {
-  register FXint num=no();
   register FXint p=pos;
-  if(p<0) return -1;
-  while(p<num){ if(ptr[p]==object){ return p; } ++p; }
+  while(p<no()){
+    if(ptr[p]==object){ return p; }
+    ++p;
+    }
   return -1;
   }
 
 
 // Find object in list, searching backward; return position or -1
 FXint FXObjectList::rfind(const FXObject* object,FXint pos) const {
-  register FXint num=no();
   register FXint p=pos;
-  if(p>=num) p=num-1;
-  while(0<=p){ if(ptr[p]==object){ return p; } --p; }
+  while(0<=p){
+    if(ptr[p]==object){ return p; }
+    --p;
+    }
   return -1;
   }
 
@@ -389,9 +403,10 @@ FXObjectList& FXObjectList::clear(){
 
 // Save to stream; children may be NULL
 void FXObjectList::save(FXStream& store) const {
-  FXint num=no();
+  FXint num,i;
+  num=no();
   store << num;
-  for(FXint i=0; i<num; i++){
+  for(i=0; i<num; i++){
     store << ptr[i];
     }
   }
@@ -399,10 +414,10 @@ void FXObjectList::save(FXStream& store) const {
 
 // Load from stream; children may be NULL
 void FXObjectList::load(FXStream& store){
-  FXint num;
+  FXint num,i;
   store >> num;
-  no(num);
-  for(FXint i=0; i<num; i++){
+  if(!no(num)) return;
+  for(i=0; i<num; i++){
     store >> ptr[i];
     }
   }
@@ -410,7 +425,9 @@ void FXObjectList::load(FXStream& store){
 
 // Free up nicely
 FXObjectList::~FXObjectList(){
-  no(0);
+  if(ptr!=EMPTY){
+    free(ptr-1);
+    }
   }
 
 }

@@ -3,9 +3,9 @@
 *                                 Layout Example                             *
 *                                                                            *
 ******************************************************************************
-* Copyright (C) 2004,2006 by Bill Baxter.   All Rights Reserved.             *
+* Copyright (C) 2004,2007 by Bill Baxter.   All Rights Reserved.             *
 ******************************************************************************
-* $Id: layout.cpp,v 1.7 2006/02/09 03:42:07 fox Exp $                        *
+* $Id: layout.cpp,v 1.8 2007/02/07 20:22:24 fox Exp $                        *
 *****************************************************************************/
 #include "fx.h"
 #include <stdio.h>

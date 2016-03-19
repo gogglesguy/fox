@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRegistry.cpp,v 1.61 2006/01/22 17:58:39 fox Exp $                      *
+* $Id: FXRegistry.cpp,v 1.64 2007/02/07 20:22:14 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -132,9 +132,9 @@ FXRegistry::FXRegistry(const FXString& akey,const FXString& vkey):applicationkey
 
 
 // Read registry
-bool FXRegistry::read(){
+FXbool FXRegistry::read(){
   FXString dirname;
-  register bool ok=false;
+  register FXbool ok=false;
 
 #ifdef WIN32      // Either file based or system registry for WIN32
 
@@ -227,8 +227,8 @@ bool FXRegistry::read(){
 
 
 // Try read registry from directory
-bool FXRegistry::readFromDir(const FXString& dirname,bool mark){
-  bool ok=false;
+FXbool FXRegistry::readFromDir(const FXString& dirname,FXbool mrk){
+  FXbool ok=false;
 
   // Directory is empty?
   if(!dirname.empty()){
@@ -250,9 +250,9 @@ bool FXRegistry::readFromDir(const FXString& dirname,bool mark){
       // Have application key
       if(!applicationkey.empty()){
 #ifndef WIN32
-        if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey,mark)) ok=true;
+        if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey,mrk)) ok=true;
 #else
-        if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey+".ini",mark)) ok=true;
+        if(parseFile(dirname+PATHSEPSTRING+vendorkey+PATHSEPSTRING+applicationkey+".ini",mrk)) ok=true;
 #endif
         }
       }
@@ -263,9 +263,9 @@ bool FXRegistry::readFromDir(const FXString& dirname,bool mark){
       // Have application key
       if(!applicationkey.empty()){
 #ifndef WIN32
-        if(parseFile(dirname+PATHSEPSTRING+applicationkey,mark)) ok=true;
+        if(parseFile(dirname+PATHSEPSTRING+applicationkey,mrk)) ok=true;
 #else
-        if(parseFile(dirname+PATHSEPSTRING+applicationkey+".ini",mark)) ok=true;
+        if(parseFile(dirname+PATHSEPSTRING+applicationkey+".ini",mrk)) ok=true;
 #endif
         }
       }
@@ -277,9 +277,9 @@ bool FXRegistry::readFromDir(const FXString& dirname,bool mark){
 #ifdef WIN32
 
 // Read from Windows Registry
-bool FXRegistry::readFromRegistry(void* hRootKey,bool mark){
+FXbool FXRegistry::readFromRegistry(void* hRootKey,FXbool mrk){
   HKEY hSoftKey,hOrgKey;
-  bool ok=false;
+  FXbool ok=false;
 
   // Open Software registry section
   if(RegOpenKeyExA((HKEY)hRootKey,"Software",0,KEY_READ,&hSoftKey)==ERROR_SUCCESS){
@@ -300,7 +300,7 @@ bool FXRegistry::readFromRegistry(void* hRootKey,bool mark){
         if(!applicationkey.empty()){
 
           // Read Software\Vendor\Application
-          if(readFromRegistryGroup(hOrgKey,applicationkey.text(),mark)) ok=true;
+          if(readFromRegistryGroup(hOrgKey,applicationkey.text(),mrk)) ok=true;
           }
         RegCloseKey(hOrgKey);
         }
@@ -313,7 +313,7 @@ bool FXRegistry::readFromRegistry(void* hRootKey,bool mark){
       if(!applicationkey.empty()){
 
         // Read Software\Application
-        if(readFromRegistryGroup(hSoftKey,applicationkey.text(),mark)) ok=true;
+        if(readFromRegistryGroup(hSoftKey,applicationkey.text(),mrk)) ok=true;
         }
       }
     RegCloseKey(hSoftKey);
@@ -323,7 +323,7 @@ bool FXRegistry::readFromRegistry(void* hRootKey,bool mark){
 
 
 // Read from given group
-bool FXRegistry::readFromRegistryGroup(void* org,const char* groupname,bool mark){
+FXbool FXRegistry::readFromRegistryGroup(void* org,const char* groupname,FXbool mrk){
   FXchar section[MAXNAME],name[MAXNAME],value[MAXVALUE];
   DWORD sectionsize,sectionindex,namesize,valuesize,index,type;
   HKEY groupkey,sectionkey;
@@ -343,7 +343,7 @@ bool FXRegistry::readFromRegistryGroup(void* org,const char* groupname,bool mark
         while(RegEnumValueA(sectionkey,index,name,&namesize,NULL,&type,(BYTE*)value,&valuesize)!=ERROR_NO_MORE_ITEMS){
           FXASSERT(type==REG_SZ);
           FXTRACE((100,"%s=%s\n",name,value));
-          group->replace(name,value,mark);
+          group->replace(name,value,mrk);
           namesize=MAXNAME;
           valuesize=MAXVALUE;
           index++;
@@ -365,7 +365,7 @@ bool FXRegistry::readFromRegistryGroup(void* org,const char* groupname,bool mark
 
 
 // Write registry
-bool FXRegistry::write(){
+FXbool FXRegistry::write(){
   FXString pathname,tempname;
 
   // Settings have not changed
@@ -507,10 +507,10 @@ bool FXRegistry::write(){
 #ifdef WIN32
 
 // Update current user's settings
-bool FXRegistry::writeToRegistry(void* hRootKey){
+FXbool FXRegistry::writeToRegistry(void* hRootKey){
   HKEY hSoftKey,hOrgKey;
   DWORD disp;
-  bool ok=false;
+  FXbool ok=false;
 
   // Open Software registry section
   if(RegOpenKeyExA((HKEY)hRootKey,"Software",0,KEY_WRITE,&hSoftKey)==ERROR_SUCCESS){
@@ -550,7 +550,7 @@ bool FXRegistry::writeToRegistry(void* hRootKey){
 
 
 // Write to registry group
-bool FXRegistry::writeToRegistryGroup(void* org,const char* groupname){
+FXbool FXRegistry::writeToRegistryGroup(void* org,const char* groupname){
   FXchar section[MAXNAME];
   DWORD sectionsize,sectionindex,disp;
   HKEY groupkey,sectionkey;

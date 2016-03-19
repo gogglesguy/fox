@@ -9,11 +9,11 @@ lib_LTLIBRARIES = libFOX-1.7.la
 
 libFOX_1_7_la_LIBADD  = $(X_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS) $(GL_LIBS)
 
-libFOX_1_7_la_LDFLAGS = \
-        -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)    \
-	-export-dynamic
+libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
 
 CURSORS = \
+blank.xbm \
+blank_mask.xbm \
 crosshair.xbm \
 crosshair_mask.xbm \
 dndcopy.xbm \
@@ -190,6 +190,8 @@ FXBitmapView.cpp \
 FXButton.cpp \
 FXBZFileStream.cpp \
 FXCURCursor.cpp \
+FXCalendar.cpp \
+FXCalendarView.cpp \
 FXCanvas.cpp \
 FXCheckButton.cpp \
 FXChoiceBox.cpp \
@@ -202,8 +204,12 @@ FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
 FXComboBox.cpp \
+FXComplexf.cpp \
+FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConsole.cpp \
+FXCopyDialog.cpp \
 FXCursor.cpp \
 FXDataTarget.cpp \
 FXDate.cpp \
@@ -249,6 +255,7 @@ FXGIFIcon.cpp \
 FXGIFImage.cpp \
 FXGLCanvas.cpp \
 FXGLCone.cpp \
+FXGLConfig.cpp \
 FXGLContext.cpp \
 FXGLCube.cpp \
 FXGLCylinder.cpp \
@@ -260,7 +267,6 @@ FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
-FXGUISignal.cpp \
 FXGZFileStream.cpp \
 FXHash.cpp \
 FXHeader.cpp \
@@ -327,6 +333,7 @@ FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
+FXMessageChannel.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
 FXRGBIcon.cpp \
@@ -334,6 +341,7 @@ FXRGBImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
+FXReactor.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -383,6 +391,7 @@ FXText.cpp \
 FXTextCodec.cpp \
 FXTextField.cpp \
 FXThread.cpp \
+FXThreadPool.cpp \
 FXToggleButton.cpp \
 FXToolBar.cpp \
 FXToolBarGrip.cpp \
@@ -450,11 +459,11 @@ $(ICONS)
 FXApp.cpp: icons.h
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -n FX -o icons.h $^
+	$(RESWRAP) -nc -h -n FX -o icons.h $(ICONS)
 
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -n FX -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -nc -i icons.h -n FX -o icons.cpp $(ICONS)
 
 
 EXTRA_DIST = Makefile.bc \

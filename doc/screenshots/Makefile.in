@@ -107,6 +107,8 @@ analysisview.png \
 aqx_linux_visualizacao_peq.jpg \
 arithmedrill-screenshot.png \
 arithmedrill-screenshot_small.png \
+big_ctc_osx.gif \
+big_ctc_xp.gif \
 boskalisday.gif \
 boskalisnite.gif \
 clview_icon.gif \
@@ -137,6 +139,8 @@ SbSScreen1_small.jpg \
 scenegraphnavigator.gif \
 scriptolutions.gif \
 searchdialog.png \
+small_ctc_xp.gif \
+small_ctc_osx.gif \
 iims1.png \
 iims1_small.png \
 iims2.png \
@@ -153,8 +157,7 @@ vorhour1_small.jpg \
 vorhour2.jpg \
 vorhour2_small.jpg \
 xfe.png \
-xfe_small.png \
-xtc.gif
+xfe_small.png
 
 
 screenshots_DATA = $(SCREENSHOTS_FILES)

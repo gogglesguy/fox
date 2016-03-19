@@ -3,7 +3,7 @@
 *                         J P E G   I c o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2007 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXJPGIcon.cpp,v 1.28 2006/01/24 13:53:11 fox Exp $                       *
+* $Id: FXJPGIcon.cpp,v 1.30 2007/02/07 20:22:11 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -62,9 +62,9 @@ FXIMPLEMENT(FXJPGIcon,FXIcon,NULL,0)
 
 
 #ifdef HAVE_JPEG_H
-const bool FXJPGIcon::supported=true;
+const FXbool FXJPGIcon::supported=true;
 #else
-const bool FXJPGIcon::supported=false;
+const FXbool FXJPGIcon::supported=false;
 #endif
 
 
@@ -80,7 +80,7 @@ FXJPGIcon::FXJPGIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FX
 
 
 // Save pixels only
-bool FXJPGIcon::savePixels(FXStream& store) const {
+FXbool FXJPGIcon::savePixels(FXStream& store) const {
   if(fxsaveJPG(store,data,width,height,quality)){
     return true;
     }
@@ -89,7 +89,7 @@ bool FXJPGIcon::savePixels(FXStream& store) const {
 
 
 // Load pixels only
-bool FXJPGIcon::loadPixels(FXStream& store){
+FXbool FXJPGIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadJPG(store,pixels,w,h,quality)){
     setData(pixels,IMAGE_OWNED,w,h);

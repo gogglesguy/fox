@@ -3,7 +3,7 @@
 *                       M e n u   T i t l e   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuTitle.cpp,v 1.52 2006/01/22 17:58:36 fox Exp $                     *
+* $Id: FXMenuTitle.cpp,v 1.55 2007/02/07 20:22:12 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -116,7 +116,7 @@ void FXMenuTitle::detach(){
 
 
 // If window can have focus
-bool FXMenuTitle::canFocus() const { return true; }
+FXbool FXMenuTitle::canFocus() const { return true; }
 
 
 // Get default width
@@ -420,7 +420,7 @@ long FXMenuTitle::onPaint(FXObject*,FXSelector,void* ptr){
 
 
 // Test if logically inside
-bool FXMenuTitle::contains(FXint parentx,FXint parenty) const {
+FXbool FXMenuTitle::contains(FXint parentx,FXint parenty) const {
   FXint x,y;
   if(FXMenuCaption::contains(parentx,parenty)) return true;
   if(getMenu() && getMenu()->shown()){

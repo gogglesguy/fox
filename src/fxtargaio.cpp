@@ -3,7 +3,7 @@
 *                      T A R G A   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2007 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxtargaio.cpp,v 1.31 2006/03/24 05:55:40 fox Exp $                       *
+* $Id: fxtargaio.cpp,v 1.35 2007/02/07 20:22:22 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -47,9 +47,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckTGA(FXStream& store);
-extern FXAPI bool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height);
-extern FXAPI bool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height);
+extern FXAPI FXbool fxcheckTGA(FXStream& store);
+extern FXAPI FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 
 static inline FXuint read16(FXStream& store){
@@ -60,7 +60,7 @@ static inline FXuint read16(FXStream& store){
 
 
 
-static bool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
+static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
   register FXuchar *pp;
   register FXint i,j,rc;
   FXuchar R,G,B,A,c;
@@ -198,7 +198,7 @@ static bool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height,F
   }
 
 
-static bool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
+static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
   register int i,j,rc;
   register FXuchar *pp;
   FXuchar R,G,B,c;
@@ -330,7 +330,7 @@ static bool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height,F
   }
 
 
-static bool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
+static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
   register FXushort rgb16;
   register FXuchar *pp;
   register int i,j,rc;
@@ -466,7 +466,7 @@ static bool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height,F
   }
 
 
-static bool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar colormap[][4],FXuchar imgdescriptor,FXuchar ImageType){
+static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar colormap[][4],FXuchar imgdescriptor,FXuchar ImageType){
   register FXint i,j,rc;
   register FXuchar *pp;
   FXuchar R,G,B,A,c;
@@ -602,7 +602,7 @@ static bool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,FX
   }
 
 
-static bool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
+static FXbool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
   register FXint i,j,rc;
   register FXuchar *pp;
   FXuchar c;
@@ -730,7 +730,7 @@ static bool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint height
 
 
 // Check if stream contains a TARGA
-bool fxcheckTGA(FXStream& store){
+FXbool fxcheckTGA(FXStream& store){
   FXuchar signature[3];
   store.load(signature,3);
   store.position(-3,FXFromCurrent);
@@ -739,7 +739,7 @@ bool fxcheckTGA(FXStream& store){
 
 
 // Load Targa image from stream
-bool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   FXuchar IDLength,ColorMapType,ImageType,ColorMapEntrySize,PixelDepth,ImageDescriptor;
   FXuchar colormap[256][4];
   FXuint rgb16,ColorMapLength,i;
@@ -774,7 +774,7 @@ bool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   //      4-pass quadtree-type process.
   store >> ImageType;
 
-//  FXTRACE((1,"fxloadTGA IDLength=%d ColorMapType=%d ImageType=%d\n",IDLength,ColorMapType,ImageType));
+//  FXTRACE((100,"fxloadTGA IDLength=%d ColorMapType=%d ImageType=%d\n",IDLength,ColorMapType,ImageType));
 
   // Check for supported image type
   if(ImageType!=1 && ImageType!=2 && ImageType!=3 && ImageType!=9 && ImageType!=10 && ImageType!=11 && ImageType!=32 && ImageType!=33) return false;
@@ -809,10 +809,10 @@ bool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // but other pixel depths could be used.
   store >> PixelDepth;
 
-//  FXTRACE((1,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d width=%d height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,width,height));
+//  FXTRACE((100,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d width=%d height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,width,height));
 
   // Don't load too many colors
-  if(ColorMapLength>256) return FALSE;
+  if(ColorMapLength>256) return false;
 
   // Verify sanity
   if(PixelDepth!=1 && PixelDepth!=8 && PixelDepth!=15 && PixelDepth!=16 && PixelDepth!=24 && PixelDepth!=32) return false;
@@ -917,7 +917,7 @@ static inline void write16(FXStream& store,FXuint i){
 
 
 // Save a Targa file to a stream
-bool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height){
+FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height){
   FXuchar IDLength,ColorMapType,ImageType,ColorMapEntrySize,PixelDepth,ImageDescriptor;
   const FXuchar *pp;
   FXint i,j;

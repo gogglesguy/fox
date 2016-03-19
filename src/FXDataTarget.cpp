@@ -3,7 +3,7 @@
 *                              D a t a   T a r g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDataTarget.cpp,v 1.36 2006/01/22 17:58:22 fox Exp $                    *
+* $Id: FXDataTarget.cpp,v 1.40 2007/02/07 20:22:05 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -79,6 +79,11 @@ long FXDataTarget::onCmdValue(FXObject* sender,FXSelector sel,void*){
   FXdouble d;
   FXint    i;
   switch(type){
+    case DT_BOOL:
+      i=*((FXbool*)data);
+      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),(void*)&i);
+      *((FXbool*)data)=(i!=0);
+      break;
     case DT_CHAR:
       i=*((FXchar*)data);
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),(void*)&i);
@@ -100,20 +105,12 @@ long FXDataTarget::onCmdValue(FXObject* sender,FXSelector sel,void*){
       *((FXushort*)data)=i;
       break;
     case DT_INT:
-      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),data);
-      break;
     case DT_UINT:
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),data);
       break;
     case DT_LONG:
-      i=(FXint) *((FXlong*)data);
-      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),(void*)&i);
-      *((FXlong*)data)=i;
-      break;
     case DT_ULONG:
-      i=(FXint) *((FXulong*)data);
-      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETINTVALUE),(void*)&i);
-      *((FXulong*)data)=i;
+      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_GETLONGVALUE),data);
       break;
     case DT_FLOAT:
       d=*((FXfloat*)data);
@@ -139,6 +136,10 @@ long FXDataTarget::onUpdValue(FXObject* sender,FXSelector,void*){
   FXdouble d;
   FXint    i;
   switch(type){
+    case DT_BOOL:
+      i=*((FXbool*)data);
+      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&i);
+      break;
     case DT_CHAR:
       i=*((FXchar*)data);
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&i);
@@ -156,18 +157,12 @@ long FXDataTarget::onUpdValue(FXObject* sender,FXSelector,void*){
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&i);
       break;
     case DT_INT:
-      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),data);
-      break;
     case DT_UINT:
       sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),data);
       break;
     case DT_LONG:
-      i=(FXint) *((FXlong*)data);
-      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&i);
-      break;
     case DT_ULONG:
-      i=(FXint) *((FXulong*)data);
-      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&i);
+      sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETLONGVALUE),data);
       break;
     case DT_FLOAT:
       d=*((FXfloat*)data);
@@ -188,6 +183,9 @@ long FXDataTarget::onUpdValue(FXObject* sender,FXSelector,void*){
 long FXDataTarget::onCmdOption(FXObject*,FXSelector sel,void*){
   FXint num=((FXint)FXSELID(sel))-ID_OPTION;
   switch(type){
+    case DT_BOOL:
+      *((FXbool*)data)=(num!=0);
+      break;
     case DT_CHAR:
       *((FXchar*)data)=num;
       break;
@@ -231,6 +229,9 @@ long FXDataTarget::onUpdOption(FXObject* sender,FXSelector sel,void*){
   FXint num=((FXint)FXSELID(sel))-ID_OPTION;
   FXint i=0;
   switch(type){
+    case DT_BOOL:
+      i=*((FXbool*)data);
+      break;
     case DT_CHAR:
       i=*((FXchar*)data);
       break;
@@ -272,7 +273,7 @@ long FXDataTarget::onUpdOption(FXObject* sender,FXSelector sel,void*){
   }
 
 
-/// Destroy
+// Destroy
 FXDataTarget::~FXDataTarget(){
   target=(FXObject*)-1L;
   data=(void*)-1L;

@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Adie.cpp,v 1.111 2006/03/21 05:46:53 fox Exp $                           *
+* $Id: Adie.cpp,v 1.121 2007/03/13 19:14:25 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -28,9 +28,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <signal.h>
-#ifndef WIN32
-#include <unistd.h>
-#endif
 #include <ctype.h>
 #include "FXRex.h"
 #include "FXArray.h"
@@ -85,6 +82,9 @@ Adie::Adie(const FXString& name):FXApp(name,FXString::null){
   quiticon=new FXGIFIcon(this,quit_gif);
   shiftlefticon=new FXGIFIcon(this,shiftleft_gif);
   shiftrighticon=new FXGIFIcon(this,shiftright_gif);
+  configicon=new FXGIFIcon(this,config_gif);
+  browsericon=new FXGIFIcon(this,browser);
+  nobrowsericon=new FXGIFIcon(this,nobrowser);
 
   searchicon=new FXGIFIcon(this,search_gif,0,IMAGE_ALPHAGUESS);
   searchnexticon=new FXGIFIcon(this,searchnext_gif,0,IMAGE_ALPHAGUESS);
@@ -112,7 +112,7 @@ Adie::Adie(const FXString& name):FXApp(name,FXString::null){
 
 
 // Initialize application
-void Adie::init(int& argc,char** argv,bool connect){
+void Adie::init(int& argc,char** argv,FXbool connect){
   FXString syntaxfile;
 
   // After init, the registry has been loaded
@@ -131,6 +131,43 @@ void Adie::init(int& argc,char** argv,bool connect){
   }
 
 
+// Get syntax for language name
+FXSyntax* Adie::getSyntaxForLanguage(const FXString& name) const {
+  for(FXint syn=0; syn<syntaxes.no(); syn++){
+    if(syntaxes[syn]->getName()==name){
+      FXTRACE((1,"language %s found\n",syntaxes[syn]->getName().text()));
+      return syntaxes[syn];
+      }
+    }
+  return NULL;
+  }
+
+
+// Get syntax from file name
+FXSyntax* Adie::getSyntaxForFile(const FXString& file) const {
+  FXString string=FXPath::name(file);
+  for(FXint syn=0; syn<syntaxes.no(); syn++){
+    if(syntaxes[syn]->matchFilename(string)){
+      FXTRACE((1,"language %s matched wildcard %s\n",syntaxes[syn]->getName().text(),file.text()));
+      return syntaxes[syn];
+      }
+    }
+  return NULL;
+  }
+
+
+// Get syntax based on contents
+FXSyntax* Adie::getSyntaxForContents(const FXString& contents) const {
+  for(FXint syn=0; syn<syntaxes.no(); syn++){
+    if(syntaxes[syn]->matchContents(contents)){
+      FXTRACE((1,"language %s matched contents %s\n",syntaxes[syn]->getName().text(),contents.text()));
+      return syntaxes[syn];
+      }
+    }
+  return NULL;
+  }
+  
+  
 // Exit application
 void Adie::exit(FXint code){
 
@@ -171,6 +208,9 @@ Adie::~Adie(){
   delete quiticon;
   delete shiftlefticon;
   delete shiftrighticon;
+  delete configicon;
+  delete browsericon;
+  delete nobrowsericon;
   delete searchicon;
   delete searchnexticon;
   delete searchprevicon;

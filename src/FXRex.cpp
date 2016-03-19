@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRex.cpp,v 1.99 2006/03/22 06:31:37 fox Exp $                           *
+* $Id: FXRex.cpp,v 1.122 2007/02/07 20:22:14 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -61,16 +61,12 @@
           is initialized to a "fallback" program; its thus safe to invoke match
           at any time.
         o The default fallback program will fail to match anything.
-        o Observe current locale if your "ctype.h" functions support it, by calling
-          all locale-sensitive functions during the match.
         o Convenient feature: disallow empty string matches; this is nice as
           it prevents a common problem, for example searching for "a*" in "bbba";
           without the REX_NOT_EMPTY option, this matches "" and not the "a".
         o Another convenient feature is the ability to compile verbatim strings.
           This is practical as it allows FXRex to be populated with a simple
           string with no interpretation of special characters ^*?+{}()\$.[].
-        o Note that FXRex's implementation would naturally move to wide
-          character support...
 
   Because this is completely new implementation of regular expressions, and
   not merely an extension of a previous implementation, some people may want to
@@ -446,12 +442,14 @@
   - Look into optimizing character class when possible (e.g.
     collapse [0-9] to OP_DIGIT and [^A] into OP_NOT_CHAR).
   - Should \D, \W, \L match newline?
-  - Look behind would be nice...
   - Repeating back references, only possible if capturing parentheses
     are known NOT to match "".
   - Note the \uXXXX is going to be used for UNICODE perhaps:
     See: http://www.unicode.org/unicode/reports/tr18.
   - Implement possessive and atomic groups
+  - We need reverse matching capability (Sexegers!) so we can scan backwards
+    through the text.  This also helps for fully general LookBehind implementation.
+  - Look behind would be nice...
 */
 
 
@@ -480,70 +478,144 @@ namespace {
 
 // Opcodes of the engine
 enum {
-  OP_END           =   0,           // End of pattern reached
-  OP_FAIL          =   1,           // Always fail
-  OP_SUCCEED       =   2,           // Always succeed
-  OP_LINE_BEG      =   3,           // Beginning of line
-  OP_LINE_END      =   4,           // End of line
-  OP_WORD_BEG      =   5,           // Beginning of word
-  OP_WORD_END      =   6,           // End of word
-  OP_WORD_BND      =   7,           // Word boundary
-  OP_WORD_INT      =   8,           // Word interior
-  OP_STR_BEG       =   9,           // Beginning of string
-  OP_STR_END       =  10,           // End of string
-  OP_ANY_OF        =  11,           // Any character in set
-  OP_ANY_BUT       =  12,           // Any character not in set
-  OP_ANY           =  13,           // Any character but no newline
-  OP_ANY_NL        =  14,           // Any character including newline
-  OP_SPACE         =  15,           // White space
-  OP_SPACE_NL      =  16,           // White space including newline
-  OP_NOT_SPACE     =  17,           // Non-white space
-  OP_DIGIT         =  18,           // Digit
-  OP_NOT_DIGIT     =  19,           // Non-digit
-  OP_NOT_DIGIT_NL  =  20,           // Non-digit including newline
-  OP_LETTER        =  21,           // Letter
-  OP_NOT_LETTER    =  22,           // Non-letter
-  OP_NOT_LETTER_NL =  23,           // Non-letter including newline
-  OP_WORD          =  24,           // Word character
-  OP_NOT_WORD      =  25,           // Non-word character
-  OP_NOT_WORD_NL   =  26,           // Non-word character including newline
-  OP_HEX           =  27,           // Hex digit
-  OP_NOT_HEX       =  28,           // Non hex digit
-  OP_NOT_HEX_NL    =  29,           // Non hex digit including newline
-  OP_PUNCT         =  30,           // Punctuation
-  OP_NOT_PUNCT     =  31,           // Non punctuation
-  OP_NOT_PUNCT_NL  =  32,           // Non punctuation including newline
-  OP_CHARS         =  33,           // Match literal string
-  OP_CHARS_CI      =  34,           // Match literal string, case insensitive
-  OP_CHAR          =  35,           // Single character
-  OP_CHAR_CI       =  36,           // Single character, case insensitive
-  OP_JUMP          =  37,           // Jump to another location
-  OP_BRANCH        =  38,           // Branch: jump after trying following code
-  OP_BRANCHREV     =  39,           // Branch: jump before trying following code
-  OP_STAR          =  40,           // Greedy * (simple)
-  OP_MIN_STAR      =  41,           // Lazy * (simple)
-  OP_POS_STAR      =  42,           // Possessive * (simple)
-  OP_PLUS          =  43,           // Greedy + (simple)
-  OP_MIN_PLUS      =  44,           // Lazy + (simple)
-  OP_POS_PLUS      =  45,           // Possessive + (simple)
-  OP_QUEST         =  46,           // Greedy ? (simple)
-  OP_MIN_QUEST     =  47,           // Lazy ? (simple)
-  OP_POS_QUEST     =  48,           // Possessive ? (simple)
-  OP_REP           =  49,           // Greedy counted repeat (simple)
-  OP_MIN_REP       =  50,           // Lazy counted repeat (simple)
-  OP_POS_REP       =  51,           // Possessive counted repeat (simple)
-  OP_LOOK_NEG      =  52,           // Negative look ahead
-  OP_LOOK_POS      =  53,           // Positive look ahead
-  OP_UPPER         =  54,           // Match upper case
-  OP_LOWER         =  55,           // Match lower case
-  OP_SUB_BEG       =  56,           // Start of substring i
-  OP_SUB_END       =  66,           // End of substring i
-  OP_REF           =  76,           // Back reference to substring i
-  OP_REF_CI        =  86,           // Match substring i case insensitive
-  OP_ZERO          =  96,           // Zero count i
-  OP_INCR          = 106,           // Increment count i
-  OP_JUMPLT        = 116,           // Jump if count i less than value
-  OP_JUMPGT        = 126            // JUmp if count i greater than value
+  OP_END,               // End of pattern reached
+  OP_FAIL,              // Always fail
+  OP_SUCCEED,           // Always succeed
+  OP_LINE_BEG,          // Beginning of line
+  OP_LINE_END,          // End of line
+  OP_WORD_BEG,          // Beginning of word
+  OP_WORD_END,          // End of word
+  OP_WORD_BND,          // Word boundary
+  OP_WORD_INT,          // Word interior
+  OP_STR_BEG,           // Beginning of string
+  OP_STR_END,           // End of string
+  OP_ANY_OF,            // Any character in set
+  OP_ANY_BUT,           // Any character not in set
+  OP_ANY,               // Any character but no newline
+  OP_ANY_NL,            // Any character including newline
+  OP_SPACE,             // White space
+  OP_SPACE_NL,          // White space including newline
+  OP_NOT_SPACE,         // Non-white space
+  OP_DIGIT,             // Digit
+  OP_NOT_DIGIT,         // Non-digit
+  OP_NOT_DIGIT_NL,      // Non-digit including newline
+  OP_LETTER,            // Letter
+  OP_NOT_LETTER,        // Non-letter
+  OP_NOT_LETTER_NL,     // Non-letter including newline
+  OP_WORD,              // Word character
+  OP_NOT_WORD,          // Non-word character
+  OP_NOT_WORD_NL,       // Non-word character including newline
+  OP_HEX,               // Hex digit
+  OP_NOT_HEX,           // Non hex digit
+  OP_NOT_HEX_NL,        // Non hex digit including newline
+  OP_PUNCT,             // Punctuation
+  OP_NOT_PUNCT,         // Non punctuation
+  OP_NOT_PUNCT_NL,      // Non punctuation including newline
+  OP_CHARS,             // Match literal string
+  OP_CHARS_CI,          // Match literal string, case insensitive
+  OP_CHAR,              // Single character
+  OP_CHAR_CI,           // Single character, case insensitive
+  OP_JUMP,              // Jump to another location
+  OP_BRANCH,            // Branch: jump after trying following code
+  OP_BRANCHREV,         // Branch: jump before trying following code
+  OP_STAR,              // Greedy * (simple)
+  OP_MIN_STAR,          // Lazy * (simple)
+  OP_POS_STAR,          // Possessive * (simple)
+  OP_PLUS,              // Greedy + (simple)
+  OP_MIN_PLUS,          // Lazy + (simple)
+  OP_POS_PLUS,          // Possessive + (simple)
+  OP_QUEST,             // Greedy ? (simple)
+  OP_MIN_QUEST,         // Lazy ? (simple)
+  OP_POS_QUEST,         // Possessive ? (simple)
+  OP_REP,               // Greedy counted repeat (simple)
+  OP_MIN_REP,           // Lazy counted repeat (simple)
+  OP_POS_REP,           // Possessive counted repeat (simple)
+  OP_AHEAD_NEG,         // Negative look-ahead
+  OP_AHEAD_POS,         // Positive look-ahead
+  OP_BEHIND_NEG,        // Negative look-behind
+  OP_BEHIND_POS,        // Positive look-behind
+  OP_UPPER,             // Match upper case
+  OP_LOWER,             // Match lower case
+  OP_SUB_BEG_0,         // Start of substring 0, 1, ...
+  OP_SUB_BEG_1,
+  OP_SUB_BEG_2,
+  OP_SUB_BEG_3,
+  OP_SUB_BEG_4,
+  OP_SUB_BEG_5,
+  OP_SUB_BEG_6,
+  OP_SUB_BEG_7,
+  OP_SUB_BEG_8,
+  OP_SUB_BEG_9,
+  OP_SUB_END_0,         // End of substring 0, 1, ...
+  OP_SUB_END_1,
+  OP_SUB_END_2,
+  OP_SUB_END_3,
+  OP_SUB_END_4,
+  OP_SUB_END_5,
+  OP_SUB_END_6,
+  OP_SUB_END_7,
+  OP_SUB_END_8,
+  OP_SUB_END_9,
+  OP_REF_0,             // Back reference to substring 0, 1, ...
+  OP_REF_1,
+  OP_REF_2,
+  OP_REF_3,
+  OP_REF_4,
+  OP_REF_5,
+  OP_REF_6,
+  OP_REF_7,
+  OP_REF_8,
+  OP_REF_9,
+  OP_REF_CI_0,          // Case insensitive back reference to substring 0, 1, ...
+  OP_REF_CI_1,
+  OP_REF_CI_2,
+  OP_REF_CI_3,
+  OP_REF_CI_4,
+  OP_REF_CI_5,
+  OP_REF_CI_6,
+  OP_REF_CI_7,
+  OP_REF_CI_8,
+  OP_REF_CI_9,
+  OP_ZERO_0,            // Zero counter 0, 1, ...
+  OP_ZERO_1,
+  OP_ZERO_2,
+  OP_ZERO_3,
+  OP_ZERO_4,
+  OP_ZERO_5,
+  OP_ZERO_6,
+  OP_ZERO_7,
+  OP_ZERO_8,
+  OP_ZERO_9,
+  OP_INCR_0,            // Increment counter 0, 1, ...
+  OP_INCR_1,
+  OP_INCR_2,
+  OP_INCR_3,
+  OP_INCR_4,
+  OP_INCR_5,
+  OP_INCR_6,
+  OP_INCR_7,
+  OP_INCR_8,
+  OP_INCR_9,
+  OP_JUMPLT_0,          // Jump if counter 0, 1, ... less than value
+  OP_JUMPLT_1,
+  OP_JUMPLT_2,
+  OP_JUMPLT_3,
+  OP_JUMPLT_4,
+  OP_JUMPLT_5,
+  OP_JUMPLT_6,
+  OP_JUMPLT_7,
+  OP_JUMPLT_8,
+  OP_JUMPLT_9,
+  OP_JUMPGT_0,          // JUmp if counter 0, 1, ... greater than value
+  OP_JUMPGT_1,
+  OP_JUMPGT_2,
+  OP_JUMPGT_3,
+  OP_JUMPGT_4,
+  OP_JUMPGT_5,
+  OP_JUMPGT_6,
+  OP_JUMPGT_7,
+  OP_JUMPGT_8,
+  OP_JUMPGT_9
   };
 
 
@@ -560,6 +632,8 @@ struct FXExecute {
   const FXchar  *str;               // String
   const FXchar  *str_beg;           // Begin of string
   const FXchar  *str_end;           // End of string
+  const FXchar  *bak_beg[NSUBEXP];  // Back reference start
+  const FXchar  *bak_end[NSUBEXP];  // Back reference end
   FXint         *sub_beg;           // Begin of substring i
   FXint         *sub_end;           // End of substring i
   const FXint   *code;              // Program code
@@ -568,13 +642,13 @@ struct FXExecute {
   FXint          mode;              // Match mode
 
   // Attempt to match
-  bool attempt(const FXchar* string);
+  FXbool attempt(const FXchar* string);
 
   // Match at current string position
-  bool match(const FXint* prog);
+  FXbool match(const FXint* prog);
 
   // Execute
-  bool execute(const FXchar* fm,const FXchar* to);
+  FXbool execute(const FXchar* fm,const FXchar* to);
   };
 
 
@@ -600,354 +674,19 @@ struct FXCompile {
   // Patch branches
   void patch(FXint *fm,FXint *to);
 
+  // Fix value
+  void fix(FXint *ptr,FXint val);
+
   // Parsing
   FXRexError compile(FXint& flags);
-  FXRexError expression(FXint& flags);
   FXRexError verbatim(FXint& flags);
-  FXRexError alternative(FXint& flags);
-  FXRexError piece(FXint& flags);
-  FXRexError atom(FXint& flags);
+  FXRexError expression(FXint& flags,FXint& smin,FXint& smax);
+  FXRexError alternative(FXint& flags,FXint& smin,FXint& smax);
+  FXRexError piece(FXint& flags,FXint& smin,FXint& smax);
+  FXRexError atom(FXint& flags,FXint& smin,FXint& smax);
   FXRexError charset();
   };
 
-
-/*******************************************************************************/
-
-#ifndef NDEBUG
-
-// Dump program
-void dump(FXint *prog){
-  FXint op,min,max,no,val;
-  fxmessage("\n");
-  fxmessage("Program:\n");
-  fxmessage("%-10p SIZE %d\n",prog,*prog);
-  prog++;
-  while(1){
-    fxmessage("%-10p ",prog);
-    op=*prog++;
-    switch(op){
-      case OP_END:
-        fxmessage("OP_END\n");
-        goto x;
-      case OP_FAIL:
-        fxmessage("OP_FAIL\n");
-        break;
-      case OP_SUCCEED:
-        fxmessage("OP_SUCCEED\n");
-        break;
-      case OP_LINE_BEG:
-        fxmessage("OP_LINE_BEG\n");
-        break;
-      case OP_LINE_END:
-        fxmessage("OP_LINE_END\n");
-        break;
-      case OP_WORD_BEG:
-        fxmessage("OP_WORD_BEG\n");
-        break;
-      case OP_WORD_END:
-        fxmessage("OP_WORD_END\n");
-        break;
-      case OP_WORD_BND:
-        fxmessage("OP_WORD_BND\n");
-        break;
-      case OP_WORD_INT:
-        fxmessage("OP_WORD_INT\n");
-        break;
-      case OP_STR_BEG:
-        fxmessage("OP_STR_BEG\n");
-        break;
-      case OP_STR_END:
-        fxmessage("OP_STR_END\n");
-        break;
-      case OP_ANY_OF:
-        fxmessage("OP_ANY_OF   \"");
-        for(no=0; no<256; no++){
-          if(ISIN(prog,no)){
-            if(' '<=no){ fxmessage("%c",no); } else { fxmessage("\\x%02x",no); }
-            }
-          }
-        fxmessage("\"\n");
-        prog+=8;
-        break;
-      case OP_ANY_BUT:
-        fxmessage("OP_ANY_BUT  \"");
-        for(no=0; no<256; no++){
-          if(ISIN(prog,no)){
-            if(' '<=no){ fxmessage("%c",no); } else { fxmessage("\\x%02x",no); }
-            }
-          }
-        fxmessage("\"\n");
-        prog+=8;
-        break;
-      case OP_ANY:
-        fxmessage("OP_ANY\n");
-        break;
-      case OP_ANY_NL:
-        fxmessage("OP_ANY_NL\n");
-        break;
-      case OP_SPACE:
-        fxmessage("OP_SPACE\n");
-        break;
-      case OP_SPACE_NL:
-        fxmessage("OP_SPACE_NL\n");
-        break;
-      case OP_NOT_SPACE:
-        fxmessage("OP_NOT_SPACE\n");
-        break;
-      case OP_DIGIT:
-        fxmessage("OP_DIGIT\n");
-        break;
-      case OP_NOT_DIGIT:
-        fxmessage("OP_NOT_DIGIT\n");
-        break;
-      case OP_NOT_DIGIT_NL:
-        fxmessage("OP_NOT_DIGIT_NL\n");
-        break;
-      case OP_LETTER:
-        fxmessage("OP_LETTER\n");
-        break;
-      case OP_NOT_LETTER:
-        fxmessage("OP_NOT_LETTER\n");
-        break;
-      case OP_NOT_LETTER_NL:
-        fxmessage("OP_NOT_LETTER_NL\n");
-        break;
-      case OP_WORD:
-        fxmessage("OP_WORD\n");
-        break;
-      case OP_NOT_WORD:
-        fxmessage("OP_NOT_WORD\n");
-        break;
-      case OP_NOT_WORD_NL:
-        fxmessage("OP_NOT_WORD_NL\n");
-        break;
-      case OP_HEX:
-        fxmessage("OP_HEX\n");
-        break;
-      case OP_NOT_HEX:
-        fxmessage("OP_NOT_HEX\n");
-        break;
-      case OP_NOT_HEX_NL:
-        fxmessage("OP_NOT_HEX_NL\n");
-        break;
-      case OP_PUNCT:
-        fxmessage("OP_PUNCT\n");
-        break;
-      case OP_NOT_PUNCT:
-        fxmessage("OP_NOT_PUNCT\n");
-        break;
-      case OP_NOT_PUNCT_NL:
-        fxmessage("OP_NOT_PUNCT_NL\n");
-        break;
-      case OP_UPPER:
-        fxmessage("OP_UPPER\n");
-        break;
-      case OP_LOWER:
-        fxmessage("OP_LOWER\n");
-        break;
-      case OP_CHARS:
-        no=*prog++;
-        fxmessage("OP_CHARS     %d,\"",no);
-        while(no>0){
-          if(' '<=*prog){ fxmessage("%c",*prog); } else { fxmessage("\\x%02x",*prog); }
-          prog++;
-          no--;
-          }
-        fxmessage("\"\n");
-        break;
-      case OP_CHARS_CI:
-        no=*prog++;
-        fxmessage("OP_CHARS_CI  %d,\"",no);
-        while(no>0){
-          if(' '<=*prog){ fxmessage("%c",*prog); } else { fxmessage("\\x%02x",*prog); }
-          prog++;
-          no--;
-          }
-        fxmessage("\"\n");
-        break;
-      case OP_CHAR:
-        fxmessage("OP_CHAR      \"");
-        if(' '<=*prog){ fxmessage("%c",*prog); } else { fxmessage("\\x%02x",*prog); }
-        fxmessage("\"\n");
-        prog++;
-        break;
-      case OP_CHAR_CI:
-        fxmessage("OP_CHAR_CI   \"");
-        if(' '<=*prog){ fxmessage("%c",*prog); } else { fxmessage("\\x%02x",*prog); }
-        fxmessage("\"\n");
-        prog++;
-        break;
-      case OP_JUMP:
-        fxmessage("OP_JUMP      %-10p\n",*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      case OP_BRANCH:
-        fxmessage("OP_BRANCH    %-10p\n",*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      case OP_BRANCHREV:
-        fxmessage("OP_BRANCHREV %-10p\n",*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      case OP_STAR:
-        fxmessage("OP_STAR\n");
-        break;
-      case OP_MIN_STAR:
-        fxmessage("OP_MIN_STAR\n");
-        break;
-      case OP_POS_STAR:
-        fxmessage("OP_POS_STAR\n");
-        break;
-      case OP_PLUS:
-        fxmessage("OP_PLUS\n");
-        break;
-      case OP_MIN_PLUS:
-        fxmessage("OP_MIN_PLUS\n");
-        break;
-      case OP_POS_PLUS:
-        fxmessage("OP_POS_PLUS\n");
-        break;
-      case OP_QUEST:
-        fxmessage("OP_QUEST\n");
-        break;
-      case OP_MIN_QUEST:
-        fxmessage("OP_MIN_QUEST\n");
-        break;
-      case OP_POS_QUEST:
-        fxmessage("OP_POS_QUEST\n");
-        break;
-      case OP_REP:
-        min=*prog++;
-        max=*prog++;
-        fxmessage("OP_REP       {%d,%d}\n",min,max);
-        break;
-      case OP_MIN_REP:
-        min=*prog++;
-        max=*prog++;
-        fxmessage("OP_MIN_REP   {%d,%d}\n",min,max);
-        break;
-      case OP_POS_REP:
-        min=*prog++;
-        max=*prog++;
-        fxmessage("OP_POS_REP   {%d,%d}\n",min,max);
-        break;
-      case OP_LOOK_NEG:
-        fxmessage("OP_LOOK_NEG  %-10p\n",*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      case OP_LOOK_POS:
-        fxmessage("OP_LOOK_POS  %-10p\n",*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      case OP_SUB_BEG+0:
-      case OP_SUB_BEG+1:
-      case OP_SUB_BEG+2:
-      case OP_SUB_BEG+3:
-      case OP_SUB_BEG+4:
-      case OP_SUB_BEG+5:
-      case OP_SUB_BEG+6:
-      case OP_SUB_BEG+7:
-      case OP_SUB_BEG+8:
-      case OP_SUB_BEG+9:
-        fxmessage("OP_SUB_BEG%d\n",op-OP_SUB_BEG);
-        break;
-      case OP_SUB_END+0:
-      case OP_SUB_END+1:
-      case OP_SUB_END+2:
-      case OP_SUB_END+3:
-      case OP_SUB_END+4:
-      case OP_SUB_END+5:
-      case OP_SUB_END+6:
-      case OP_SUB_END+7:
-      case OP_SUB_END+8:
-      case OP_SUB_END+9:
-        fxmessage("OP_SUB_END%d\n",op-OP_SUB_END);
-        break;
-      case OP_REF+0:
-      case OP_REF+1:
-      case OP_REF+2:
-      case OP_REF+3:
-      case OP_REF+4:
-      case OP_REF+5:
-      case OP_REF+6:
-      case OP_REF+7:
-      case OP_REF+8:
-      case OP_REF+9:
-        fxmessage("OP_REF%d\n",op-OP_REF);
-        break;
-      case OP_REF_CI+0:
-      case OP_REF_CI+1:
-      case OP_REF_CI+2:
-      case OP_REF_CI+3:
-      case OP_REF_CI+4:
-      case OP_REF_CI+5:
-      case OP_REF_CI+6:
-      case OP_REF_CI+7:
-      case OP_REF_CI+8:
-      case OP_REF_CI+9:
-        fxmessage("OP_REF_CI%d\n",op-OP_REF_CI);
-        break;
-      case OP_ZERO+0:
-      case OP_ZERO+1:
-      case OP_ZERO+2:
-      case OP_ZERO+3:
-      case OP_ZERO+4:
-      case OP_ZERO+5:
-      case OP_ZERO+6:
-      case OP_ZERO+7:
-      case OP_ZERO+8:
-      case OP_ZERO+9:
-        fxmessage("OP_ZERO%d\n",op-OP_ZERO);
-        break;
-      case OP_INCR+0:
-      case OP_INCR+1:
-      case OP_INCR+2:
-      case OP_INCR+3:
-      case OP_INCR+4:
-      case OP_INCR+5:
-      case OP_INCR+6:
-      case OP_INCR+7:
-      case OP_INCR+8:
-      case OP_INCR+9:
-        fxmessage("OP_INCR%d\n",op-OP_INCR);
-        break;
-      case OP_JUMPLT+0:
-      case OP_JUMPLT+1:
-      case OP_JUMPLT+2:
-      case OP_JUMPLT+3:
-      case OP_JUMPLT+4:
-      case OP_JUMPLT+5:
-      case OP_JUMPLT+6:
-      case OP_JUMPLT+7:
-      case OP_JUMPLT+8:
-      case OP_JUMPLT+9:
-        val=*prog++;
-        fxmessage("OP_JUMPLT%d   %d,%-10p\n",op-OP_JUMPLT,val,*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      case OP_JUMPGT+0:
-      case OP_JUMPGT+1:
-      case OP_JUMPGT+2:
-      case OP_JUMPGT+3:
-      case OP_JUMPGT+4:
-      case OP_JUMPGT+5:
-      case OP_JUMPGT+6:
-      case OP_JUMPGT+7:
-      case OP_JUMPGT+8:
-      case OP_JUMPGT+9:
-        val=*prog++;
-        fxmessage("OP_JUMPGT%d   %d,%-10p\n",op-OP_JUMPGT,val,*prog ? prog+*prog : 0);
-        prog++;
-        break;
-      default:
-        fxmessage("OP_%d: error\n",op);
-        goto x;
-      }
-    }
-x:fxmessage("end\n");
-  }
-
-#endif
 
 /*******************************************************************************/
 
@@ -975,12 +714,12 @@ FXint oct(const FXchar*& pat){
 
 // Compiler main
 FXRexError FXCompile::compile(FXint& flags){
-  FXRexError err;
+  FXRexError err; FXint smin,smax;
   if(*pat=='\0') return REGERR_EMPTY;
   if(mode&REX_VERBATIM)
     err=verbatim(flags);
   else
-    err=expression(flags);
+    err=expression(flags,smin,smax);
   if(err!=REGERR_OK) return err;
   if(*pat!='\0') return REGERR_PAREN;
   append(OP_END);
@@ -1013,24 +752,23 @@ FXRexError FXCompile::verbatim(FXint& flags){
 
 
 // Parse expression
-FXRexError FXCompile::expression(FXint& flags){
-  FXRexError err;
-  FXint *at,*jp,flg;
-  flags=FLG_WIDTH;
+FXRexError FXCompile::expression(FXint& flags,FXint& smin,FXint& smax){
+  FXRexError err; FXint *at,*jp,flg,smn,smx;
   at=pc;
   jp=NULL;
-  err=alternative(flg);
+  err=alternative(flags,smin,smax);
   if(err!=REGERR_OK) return err;
-  if(!(flg&FLG_WIDTH)) flags&=~FLG_WIDTH;
   while(*pat=='|'){
     pat++;
     insert(at,OP_BRANCH,pc-at+3);
     append(OP_JUMP,jp?jp-pc-1:0);
     jp=pc-1;
     at=pc;
-    err=alternative(flg);
+    err=alternative(flg,smn,smx);
     if(err!=REGERR_OK) return err;
     if(!(flg&FLG_WIDTH)) flags&=~FLG_WIDTH;
+    if(smn<smin) smin=smn;
+    if(smx>smax) smax=smx;
     }
   patch(jp,pc);
   return REGERR_OK;
@@ -1038,83 +776,92 @@ FXRexError FXCompile::expression(FXint& flags){
 
 
 // Parse branch
-FXRexError FXCompile::alternative(FXint& flags){
-  FXRexError err;
-  FXint flg;
+FXRexError FXCompile::alternative(FXint& flags,FXint& smin,FXint& smax){
+  FXRexError err; FXint flg,smn,smx;
   flags=FLG_WORST;
+  smin=0;
+  smax=0;
   while(*pat!='\0' && *pat!='|' && *pat!=')'){
-    err=piece(flg);
+    err=piece(flg,smn,smx);
     if(err!=REGERR_OK) return err;
-    flags|=flg;
+    if(flg&FLG_WIDTH) flags|=FLG_WIDTH;
+    smin=smin+smn;
+    smax=FXMIN(smax+smx,ONEINDIG);
     }
   return REGERR_OK;
   }
 
 
 // Parse piece
-FXRexError FXCompile::piece(FXint& flags){
-  FXint ch,rep_min,rep_max,lazy,flg,*ptr;
-  FXRexError err;
+FXRexError FXCompile::piece(FXint& flags,FXint& smin,FXint& smax){
+  FXRexError err; FXint *ptr,ch,rep_min,rep_max,lazy;
+
+  // Remember point before atom
   ptr=pc;
 
   // Process atom
-  err=atom(flg);
+  err=atom(flags,smin,smax);
 
   // Error in atom
   if(err!=REGERR_OK) return err;
 
   // Followed by repetition
   if((ch=*pat)=='*' || ch=='+' || ch=='?' || ch=='{'){
+    pat++;
 
     // Repeats may not match empty
-    if(!(flg&FLG_WIDTH)) return REGERR_NOATOM;
-
-    pat++;
-    rep_min=1;
-    rep_max=1;
+    if(!(flags&FLG_WIDTH)) return REGERR_NOATOM;
 
     // Handle repetition type
-    switch(ch){
-      case '*':                                           // Repeat 0-INF
-        rep_min=0;
-        rep_max=ONEINDIG;
-        break;
-      case '+':                                           // Repeat 1-INF
-        rep_min=1;
-        rep_max=ONEINDIG;
-        break;
-      case '?':                                           // Repeat 0-1
-        rep_min=0;
-        rep_max=1;
-        break;
-      case '{':                                           // Repeat n-m
-        rep_min=0;
-        rep_max=ONEINDIG;
-        if(*pat!='}'){
-          while(Ascii::isDigit(*pat)){
-            rep_min=10*rep_min+(*pat-'0');
-            pat++;
-            }
-          rep_max=rep_min;
-          if(*pat==','){
-            pat++;
-            rep_max=ONEINDIG;
-            if(*pat!='}'){
-              rep_max=0;
-              while(Ascii::isDigit(*pat)){
-                rep_max=10*rep_max+(*pat-'0');
-                pat++;
-                }
+    if(ch=='*'){                        // Repeat E [0..INF>
+      rep_min=0;
+      rep_max=ONEINDIG;
+      flags&=~FLG_WIDTH;                // No width!
+      smin=0;
+      smax=ONEINDIG;
+      }
+    else if(ch=='+'){                   // Repeat E [1..INF>
+      rep_min=1;
+      rep_max=ONEINDIG;
+      smax=ONEINDIG;
+      }
+    else if(ch=='?'){                   // Repeat E [0..1]
+      rep_min=0;
+      rep_max=1;
+      flags&=~FLG_WIDTH;                // No width!
+      smin=0;
+      }
+    else{                               // Repeat E [N..M]
+      rep_min=0;
+      rep_max=ONEINDIG;
+      if(*pat!='}'){
+        while(Ascii::isDigit(*pat)){
+          rep_min=10*rep_min+(*pat-'0');
+          pat++;
+          }
+        rep_max=rep_min;
+        if(*pat==','){
+          pat++;
+          rep_max=ONEINDIG;
+          if(*pat!='}'){
+            rep_max=0;
+            while(Ascii::isDigit(*pat)){
+              rep_max=10*rep_max+(*pat-'0');
+              pat++;
               }
             }
-          if(rep_min>rep_max) return REGERR_RANGE;              // Illegal range
-          if(rep_min==0 && rep_max==0) return REGERR_COUNT;     // Bad count
           }
-        if(*pat!='}') return REGERR_BRACE;                      // Unmatched brace
-        pat++;
-        break;
-      default:
-        return REGERR_TOKEN;
+        if(rep_min>rep_max) return REGERR_RANGE;        // Illegal range
+        if(rep_max>ONEINDIG) return REGERR_COUNT;       // Bad count
+        if(rep_max<=0) return REGERR_COUNT;             // Bad count
+        }
+      if(rep_min==0){                   // No width!
+        flags&=~FLG_WIDTH;
+        }
+      smin=rep_min*smin;
+      smax=FXMIN(rep_max*smax,ONEINDIG);
+      if(*pat!='}') return REGERR_BRACE;        // Unmatched brace
+      pat++;
       }
 
     // Handle greedy, lazy, or possessive forms
@@ -1128,14 +875,11 @@ FXRexError FXCompile::piece(FXint& flags){
       lazy=0;
       }
 
-    // If zero repetitions are allowed, then may have no width
-    if(rep_min==0) flg&=~FLG_WIDTH;
-
     // Handle only non-trivial cases
-    if(!(rep_min==1 && rep_max==1)){
+    if(rep_min!=1 || rep_max!=1){
 
       // For simple repeats we prefix the last operation
-      if(flg&FLG_SIMPLE){
+      if(flags&FLG_SIMPLE){
         if(rep_min==0 && rep_max==ONEINDIG){
           insert(ptr,OP_STAR+lazy);
           }
@@ -1185,9 +929,9 @@ FXRexError FXCompile::piece(FXint& flags){
           **
           */
           if(nbra>=NSUBEXP) return REGERR_COMPLEX;
-          insert(ptr,OP_ZERO+nbra);
-          append(OP_INCR+nbra);
-          append(OP_JUMPLT+nbra,rep_min,ptr-pc-1);
+          insert(ptr,OP_ZERO_0+nbra);
+          append(OP_INCR_0+nbra);
+          append(OP_JUMPLT_0+nbra,rep_min,ptr-pc-1);
           nbra++;
           }
         else if(rep_min==0 && rep_max<ONEINDIG){
@@ -1197,10 +941,10 @@ FXRexError FXCompile::piece(FXint& flags){
           **       \______________|
           */
           if(nbra>=NSUBEXP) return REGERR_COMPLEX;
-          insert(ptr,OP_ZERO+nbra);
+          insert(ptr,OP_ZERO_0+nbra);
           insert(ptr+1,lazy?OP_BRANCHREV:OP_BRANCH,pc-ptr+4);
-          append(OP_INCR+nbra);
-          append(OP_JUMPLT+nbra,rep_max,ptr-pc-1);
+          append(OP_INCR_0+nbra);
+          append(OP_JUMPLT_0+nbra,rep_max,ptr-pc-1);
           nbra++;
           }
         else if(0<rep_min && rep_max==ONEINDIG){
@@ -1210,9 +954,9 @@ FXRexError FXCompile::piece(FXint& flags){
           ** --Z--+--+--(...)--I--L--B--        (...){n,ONEINDIG}
           */
           if(nbra>=NSUBEXP) return REGERR_COMPLEX;
-          insert(ptr,OP_ZERO+nbra);
-          append(OP_INCR+nbra);
-          append(OP_JUMPLT+nbra,rep_min,ptr-pc-1);
+          insert(ptr,OP_ZERO_0+nbra);
+          append(OP_INCR_0+nbra);
+          append(OP_JUMPLT_0+nbra,rep_min,ptr-pc-1);
           append(lazy?OP_BRANCH:OP_BRANCHREV,ptr-pc);
           nbra++;
           }
@@ -1224,213 +968,251 @@ FXRexError FXCompile::piece(FXint& flags){
           **                          \____|
           */
           if(nbra>=NSUBEXP) return REGERR_COMPLEX;
-          insert(ptr,OP_ZERO+nbra);
-          append(OP_INCR+nbra);
-          append(OP_JUMPLT+nbra,rep_min,ptr-pc-1);
-          append(OP_JUMPGT+nbra,rep_max,3);
+          insert(ptr,OP_ZERO_0+nbra);
+          append(OP_INCR_0+nbra);
+          append(OP_JUMPLT_0+nbra,rep_min,ptr-pc-1);
+          append(OP_JUMPGT_0+nbra,rep_max,3);
           append(lazy?OP_BRANCH:OP_BRANCHREV,ptr-pc);
           nbra++;
           }
         }
       }
     }
-  flags=flg&FLG_WIDTH;
   return REGERR_OK;
   }
 
 
 // Parse atom
-FXRexError FXCompile::atom(FXint& flags){
-  FXint buf[MAXCHARS],level,save,ch,len,flg,*ptr;
-  const FXchar *p;
+FXRexError FXCompile::atom(FXint& flags,FXint& smin,FXint& smax){
+  FXint buf[MAXCHARS],*ptr,*pp,level,save,ch,len;
   FXRexError err;
-  flags=FLG_WORST;                                // Assume the worst
+  const FXchar *p;
+  flags=FLG_WORST;                                      // Assume the worst
+  smin=smax=0;
   switch(*pat){
-    case '(':                                     // Subexpression grouping
-      pat++;
-      if(*pat=='?'){
-        pat++;
-        ch=*pat++;
-        if(ch==':'){                              // Non capturing parentheses
-          err=expression(flg);
-          if(err!=REGERR_OK) return err;          // Propagate error
-          }
-        else if(ch=='=' || ch=='!'){              // Positive or negative look ahead
-          append((ch=='=')?OP_LOOK_POS:OP_LOOK_NEG);
-          ptr=append(0);
-          err=expression(flg);
-          if(err!=REGERR_OK) return err;          // Propagate error
-          append(OP_SUCCEED);
-          patch(ptr,pc);                          // If trailing context matches (fails), go here!
-          flg=FLG_WORST;                          // Look ahead has no width!
-          }
-        else if(ch=='>'){                         // Atomic group
-          // FIXME
+    case '(':                                           // Subexpression grouping
+      ch=*++pat;
+      if(ch=='?'){
+        ch=*++pat;
+        if(ch==':'){                                    // Non capturing parentheses
+          pat++;
+          err=expression(flags,smin,smax);
+          if(err!=REGERR_OK) return err;                // Propagate error
           }
         else if(ch=='i' || ch=='I' || ch=='n' || ch=='N'){
-          save=mode;                              // Save flags
+          pat++;
+          save=mode;                                    // Save flags
           if(ch=='i') mode|=REX_ICASE;
           if(ch=='I') mode&=~REX_ICASE;
           if(ch=='n') mode|=REX_NEWLINE;
           if(ch=='N') mode&=~REX_NEWLINE;
-          err=expression(flg);
-          if(err!=REGERR_OK) return err;          // Propagate error
-          mode=save;                              // Restore flags
+          err=expression(flags,smin,smax);
+          mode=save;                                    // Restore flags
+          if(err!=REGERR_OK) return err;                // Propagate error
+          }
+        else if(ch=='>'){                               // Atomic sub group
+          pat++;
+          // FIXME not yet implemented
+          err=expression(flags,smin,smax);
+          if(err!=REGERR_OK) return err;                // Propagate error
+          }
+        else if(ch=='=' || ch=='!'){                    // Positive or negative look ahead
+          pat++;
+          append((ch=='=')?OP_AHEAD_POS:OP_AHEAD_NEG);
+          ptr=append(0);
+          err=expression(flags,smin,smax);
+          if(err!=REGERR_OK) return err;                // Propagate error
+          append(OP_SUCCEED);
+          patch(ptr,pc);                                // If trailing context matches (fails), go here!
+          flags=FLG_WORST;                              // Look ahead has no width!
+          smin=smax=0;
+          }
+        else if(ch=='<'){                               // Positive or negative look-behind
+          ch=*++pat;
+          if(ch!='=' && ch!='!') return REGERR_TOKEN;
+          pat++;
+          append((ch=='=')?OP_BEHIND_POS:OP_BEHIND_NEG);
+          pp=append(0);
+          ptr=append(0);
+          err=expression(flags,smin,smax);
+          if(err!=REGERR_OK) return err;                // Propagate error
+          if(smin!=smax || smax==ONEINDIG) return REGERR_BEHIND;
+          append(OP_SUCCEED);
+          fix(pp,smax);                                 // Fix up lookbehind size
+          patch(ptr,pc);                                // If trailing context matches (fails), go here!
+          flags=FLG_WORST;                              // Look behind has no width!
+          smin=smax=0;
           }
         else{
           return REGERR_TOKEN;
           }
         }
-      else if(mode&REX_CAPTURE){                  // Capturing
+      else if(mode&REX_CAPTURE){                        // Capturing
         level=++npar;
-        if(level>=NSUBEXP) return REGERR_COMPLEX; // Expression too complex
-        append(OP_SUB_BEG+level);
-        err=expression(flg);
-        if(err!=REGERR_OK) return err;            // Propagate error
-        append(OP_SUB_END+level);
+        if(level>=NSUBEXP) return REGERR_COMPLEX;       // Expression too complex
+        append(OP_SUB_BEG_0+level);
+        err=expression(flags,smin,smax);
+        if(err!=REGERR_OK) return err;                  // Propagate error
+        append(OP_SUB_END_0+level);
         }
-      else{                                       // Normal
-        err=expression(flg);
-        if(err!=REGERR_OK) return err;            // Propagate error
+      else{                                             // Normal
+        err=expression(flags,smin,smax);
+        if(err!=REGERR_OK) return err;                  // Propagate error
         }
-      if(*pat!=')') return REGERR_PAREN;          // Unmatched parenthesis
+      if(*pat!=')') return REGERR_PAREN;                // Unmatched parenthesis
       pat++;
-      flags=flg&~FLG_SIMPLE;
+      flags&=~FLG_SIMPLE;
       break;
-    case '.':                                     // Any character
+    case '.':                                           // Any character
       pat++;
       append((mode&REX_NEWLINE)?OP_ANY_NL:OP_ANY);
       flags=FLG_WIDTH|FLG_SIMPLE;
+      smin=smax=1;
       break;
-    case '^':                                     // Begin of line
+    case '^':                                           // Begin of line
       pat++;
       append(OP_LINE_BEG);
       break;
-    case '$':                                     // End of line
+    case '$':                                           // End of line
       pat++;
       append(OP_LINE_END);
       break;
-    case '*':                                     // No preceding atom
+    case '*':                                           // No preceding atom
     case '+':
     case '?':
     case '{':
       return REGERR_NOATOM;
-    case '\0':                                    // Technically, this can not happen!
+    case '\0':                                          // Technically, this can not happen!
     case '|':
     case ')':
       return REGERR_NOATOM;
-    case '}':                                     // Unmatched brace
+    case '}':                                           // Unmatched brace
       return REGERR_BRACE;
     case '[':
       pat++;
       err=charset();
-      if(err!=REGERR_OK) return err;              // Bad character class
-      if(*pat!=']') return REGERR_BRACK;          // Unmatched bracket
+      if(err!=REGERR_OK) return err;                    // Bad character class
+      if(*pat!=']') return REGERR_BRACK;                // Unmatched bracket
       pat++;
       flags=FLG_WIDTH|FLG_SIMPLE;
+      smin=smax=1;
       break;
-    case ']':                                     // Unmatched bracket
+    case ']':                                           // Unmatched bracket
       return REGERR_BRACK;
-    case '\\':                                    // Escape sequences which are NOT part of simple character-run
+    case '\\':                                          // Escape sequences which are NOT part of simple character-run
       ch=*(pat+1);
       switch(ch){
-        case '\0':                                // Unexpected pattern end
+        case '\0':                                      // Unexpected pattern end
           return REGERR_NOATOM;
-        case 'w':                                 // Word character
+        case 'w':                                       // Word character
+          pat+=2;
           append(OP_WORD);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'W':                                 // Non-word character
+        case 'W':                                       // Non-word character
+          pat+=2;
           append((mode&REX_NEWLINE)?OP_NOT_WORD_NL:OP_NOT_WORD);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 's':                                 // Space
+        case 's':                                       // Space
+          pat+=2;
           append((mode&REX_NEWLINE)?OP_SPACE_NL:OP_SPACE);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'S':                                 // Non-space
+        case 'S':                                       // Non-space
+          pat+=2;
           append(OP_NOT_SPACE);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'd':                                 // Digit
+        case 'd':                                       // Digit
+          pat+=2;
           append(OP_DIGIT);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'D':                                 // Non-digit
+        case 'D':                                       // Non-digit
+          pat+=2;
           append((mode&REX_NEWLINE)?OP_NOT_DIGIT_NL:OP_NOT_DIGIT);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'h':                                 // Hex digit
+        case 'h':                                       // Hex digit
+          pat+=2;
           append(OP_HEX);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'H':                                 // Non-hex digit
+        case 'H':                                       // Non-hex digit
+          pat+=2;
           append((mode&REX_NEWLINE)?OP_NOT_HEX_NL:OP_NOT_HEX);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'p':                                 // Punctuation
+        case 'p':                                       // Punctuation
+          pat+=2;
           append(OP_PUNCT);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'P':                                 // Non-punctuation
+        case 'P':                                       // Non-punctuation
+          pat+=2;
           append((mode&REX_NEWLINE)?OP_NOT_PUNCT_NL:OP_NOT_PUNCT);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'l':                                 // Letter
+        case 'l':                                       // Letter
+          pat+=2;
           append(OP_LETTER);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'L':                                 // Non-letter
+        case 'L':                                       // Non-letter
+          pat+=2;
           append((mode&REX_NEWLINE)?OP_NOT_LETTER_NL:OP_NOT_LETTER);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'u':                                 // Upper case
+        case 'u':                                       // Upper case
+          pat+=2;
           append(OP_UPPER);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'U':                                 // Lower case
+        case 'U':                                       // Lower case
+          pat+=2;
           append(OP_LOWER);
-          pat+=2;
           flags=FLG_WIDTH|FLG_SIMPLE;
+          smin=smax=1;
           return REGERR_OK;
-        case 'b':                                 // Word boundary
+        case 'b':                                       // Word boundary
+          pat+=2;
           append(OP_WORD_BND);
-          pat+=2;
           return REGERR_OK;
-        case 'B':                                 // Word interior
+        case 'B':                                       // Word interior
+          pat+=2;
           append(OP_WORD_INT);
-          pat+=2;
           return REGERR_OK;
-        case 'A':                                 // Match only beginning of string
+        case 'A':                                       // Match only beginning of string
+          pat+=2;
           append(OP_STR_BEG);
-          pat+=2;
           return REGERR_OK;
-        case 'Z':                                 // Match only and end of string
+        case 'Z':                                       // Match only and end of string
+          pat+=2;
           append(OP_STR_END);
-          pat+=2;
           return REGERR_OK;
-        case '<':                                 // Begin of word
+        case '<':                                       // Begin of word
+          pat+=2;
           append(OP_WORD_BEG);
-          pat+=2;
           return REGERR_OK;
-        case '>':                                 // End of word
+        case '>':                                       // End of word
+          pat+=2;
           append(OP_WORD_END);
-          pat+=2;
           return REGERR_OK;
-        case '1':                                 // Back reference to previously matched subexpression
+        case '1':                                       // Back reference to previously matched subexpression
         case '2':
         case '3':
         case '4':
@@ -1439,33 +1221,26 @@ FXRexError FXCompile::atom(FXint& flags){
         case '7':
         case '8':
         case '9':
-          if(!(mode&REX_CAPTURE)) return REGERR_BACKREF;  // Can't do backreferences
+          if(!(mode&REX_CAPTURE)) return REGERR_BACKREF;        // Can't do backreferences
           level=ch-'0';
-          if(level>npar) return REGERR_BACKREF;           // Back reference out of range
-          append((mode&REX_ICASE)?(OP_REF_CI+level):(OP_REF+level));
+          if(level>npar) return REGERR_BACKREF;                 // Back reference out of range
+          append((mode&REX_ICASE)?(OP_REF_CI_0+level):(OP_REF_0+level));
           pat+=2;
+          smin=0;
+          smax=ONEINDIG;
           return REGERR_OK;
         }
       /*fall*/
     default:
       len=0;
       do{
-        p=pat;                                    // In case we need to back up...
+        p=pat;                                          // In case we need to back up...
         ch=*pat;
         switch(ch){
-          case '^':                               // Bail out on magic characters
-          case '$':
-          case '.':
-          case '(':
-          case ')':
-          case '[':
-          case ']':
-          case '|':
-            goto x;
           case '\\':
             ch=*(pat+1);
             switch(ch){
-              case 'w':                           // Bail out on special matching constructs
+              case 'w':                                 // Bail out on special matching constructs
               case 'W':
               case 's':
               case 'S':
@@ -1495,58 +1270,67 @@ FXRexError FXCompile::atom(FXint& flags){
               case '8':
               case '9':
                 goto x;
-              case 'a':                           // Bell
+              case 'a':                                 // Bell
                 pat+=2;
                 ch='\a';
                 break;
-              case 'e':                           // Escape
+              case 'e':                                 // Escape
                 pat+=2;
                 ch='\033';
                 break;
-              case 'f':                           // Form feed
+              case 'f':                                 // Form feed
                 pat+=2;
                 ch='\f';
                 break;
-              case 'n':                           // Newline
+              case 'n':                                 // Newline
                 pat+=2;
                 ch='\n';
                 break;
-              case 'r':                           // Return
+              case 'r':                                 // Return
                 pat+=2;
                 ch='\r';
                 break;
-              case 't':                           // Tab
+              case 't':                                 // Tab
                 pat+=2;
                 ch='\t';
                 break;
-              case 'v':                           // Vertical tab
+              case 'v':                                 // Vertical tab
                 pat+=2;
                 ch='\v';
                 break;
-              case 'c':                           // Control character
+              case 'c':                                 // Control character
                 pat+=2;
                 ch=*pat++;
-                if(ch=='\0') return REGERR_NOATOM;// Unexpected pattern end
+                if(ch=='\0') return REGERR_NOATOM;      // Unexpected pattern end
                 ch=Ascii::toUpper(ch)-'@';
                 break;
-              case '0':                           // Octal digit
+              case '0':                                 // Octal digit
                 pat+=2;
                 ch=oct(pat);
-                if(ch>256) return REGERR_TOKEN;   // Characters should be 0..255
+                if(ch>256) return REGERR_TOKEN;         // Characters should be 0..255
                 break;
-              case 'x':                           // Hex digit
+              case 'x':                                 // Hex digit
                 pat+=2;
                 ch=hex(pat);
-                if(ch>256) return REGERR_TOKEN;   // Characters should be 0..255
+                if(ch>256) return REGERR_TOKEN;         // Characters should be 0..255
                 break;
-              case '\0':                          // Unexpected pattern end
+              case '\0':                                // Unexpected pattern end
                 return REGERR_NOATOM;
               default:
                 pat+=2;
                 break;
               }
             break;
-          case '\0':                              // Unexpected pattern end
+          case '^':                                     // Bail out on magic characters
+          case '$':
+          case '.':
+          case '(':
+          case ')':
+          case '[':
+          case ']':
+          case '|':
+            goto x;
+          case '\0':                                    // Unexpected pattern end
             return REGERR_NOATOM;
           default:
             pat++;
@@ -1571,6 +1355,7 @@ x:    if(1<len && (*pat=='*' || *pat=='+' || *pat=='?' || *pat=='{')){
 
       // Had at least 1 character
       flags=FLG_WIDTH;
+      smin=smax=len;
 
       // Simple only if length is 1
       if(len==1){
@@ -1898,12 +1683,20 @@ void FXCompile::patch(FXint *fm,FXint *to){
   }
 
 
+// Fix value
+void FXCompile::fix(FXint *ptr,FXint val){
+  if(code && ptr){
+    ptr[0]=val;
+    }
+  }
+
+
 /*******************************************************************************/
 
 // FXExecute members
 
 // The workhorse
-bool FXExecute::match(const FXint* prog){
+FXbool FXExecute::match(const FXint* prog){
   register FXint no,keep,rep_min,rep_max,greed,op;
   register const FXchar *save,*beg,*end;
   register FXchar ch;
@@ -1932,10 +1725,12 @@ bool FXExecute::match(const FXint* prog){
         prog++;
         break;
       case OP_LINE_BEG:       // Must be at begin of line
-        if((str==str_beg && (mode&REX_NOT_BOL)) || (str_beg<str && *(str-1)!='\n')) return false;
+        if(str_beg<str && *(str-1)!='\n') return false;
+        if(str<=str_beg && (mode&REX_NOT_BOL)) return false;
         break;
       case OP_LINE_END:       // Must be at end of line
-        if((str==str_end && (mode&REX_NOT_EOL)) || (str<str_end && *str!='\n')) return false;
+        if(str<str_end && *str!='\n') return false;
+        if(str>=str_end && (mode&REX_NOT_EOL)) return false;
         break;
       case OP_WORD_BEG:       // Must be at begin of word
         if(str_beg<str && isword((FXuchar) *(str-1))) return false;
@@ -1946,7 +1741,8 @@ bool FXExecute::match(const FXint* prog){
         if(str<=str_beg || !isword((FXuchar) *(str-1))) return false;
         break;
       case OP_WORD_BND:       // Must be at word boundary
-        if(!(((str==str_beg || !isword((FXuchar) *(str-1))) && (str<str_end && isword((FXuchar) *str))) || ((str==str_end || !isword((FXuchar) *str)) && (str_beg<str && isword((FXuchar) *(str-1)))))) return false;
+        if(!(((str==str_beg || !isword((FXuchar) *(str-1))) && (str<str_end && isword((FXuchar) *str))) ||
+             ((str==str_end || !isword((FXuchar) *str)) && (str_beg<str && isword((FXuchar) *(str-1)))))) return false;
         break;
       case OP_WORD_INT:       // Must be inside a word
         if(str==str_beg || !isword((FXuchar) *(str-1))) return false;
@@ -1973,6 +1769,11 @@ bool FXExecute::match(const FXint* prog){
         prog++;
         str++;
         break;
+//      case OP_R_CHAR:
+//        if(str==str_beg || *prog != *(str-1)) return false;
+//        prog++;
+//        str--;
+//        break;
       case OP_CHAR_CI:        // Match single character, disregard case
         if(str==str_end || *prog != Ascii::toLower(*str)) return false;
         prog++;
@@ -1982,7 +1783,9 @@ bool FXExecute::match(const FXint* prog){
         no=*prog++;
         if(str+no>str_end) return false;
         do{
-          if(*prog++ != (FXuchar)*str++) return false;
+          if(*prog != (FXuchar)*str) return false;
+          prog++;
+          str++;
           }
         while(--no);
         break;
@@ -1990,7 +1793,9 @@ bool FXExecute::match(const FXint* prog){
         no=*prog++;
         if(str+no>str_end) return false;
         do{
-          if(*prog++ != Ascii::toLower(*str++)) return false;
+          if(*prog != Ascii::toLower(*str)) return false;
+          prog++;
+          str++;
           }
         while(--no);
         break;
@@ -2145,7 +1950,7 @@ bool FXExecute::match(const FXint* prog){
         // We need to match more characters than are available
 rep:    if(str+rep_min>str_end) return false;
         beg=str;
-        end=beg+rep_max;
+        end=str+rep_max;
         if(end>str_end) end=str_end;
         save=beg;
 
@@ -2242,7 +2047,7 @@ rep:    if(str+rep_min>str_end) return false;
             while(save<end && *save!='\n') save++;
             break;
           case OP_ANY_NL:
-            save=end; // Big byte
+            save=end;                   // Big byte
             break;
           default:
             fxerror("FXRex::match: bad opcode (%d) at: %p on line: %d\n",op,prog-1,__LINE__);
@@ -2257,74 +2062,74 @@ rep:    if(str+rep_min>str_end) return false;
         end=save;
 
         switch(greed){
-          case 0:                     // Lazily match the fewest characters
+          case 0:                       // Lazily match the fewest characters
             while(beg<=end){
               str=beg;
               if(match(prog)) return true;
               beg++;
               }
             return false;
-          case 1:                     // Greedily match the most characters
+          case 1:                       // Greedily match the most characters
             while(beg<=end){
               str=end;
               if(match(prog)) return true;
               end--;
               }
             return false;
-          case 2:                     // Possessive match
+          case 2:                       // Possessive match
             return match(prog);
           }
         return false;
-      case OP_SUB_BEG+0:              // Capturing open parentheses
-      case OP_SUB_BEG+1:
-      case OP_SUB_BEG+2:
-      case OP_SUB_BEG+3:
-      case OP_SUB_BEG+4:
-      case OP_SUB_BEG+5:
-      case OP_SUB_BEG+6:
-      case OP_SUB_BEG+7:
-      case OP_SUB_BEG+8:
-      case OP_SUB_BEG+9:
-        no=op-OP_SUB_BEG;
-        if(no>=npar) break;           // Match w/o capture if array too small
-        keep=sub_beg[no];             // Keep old value
-        sub_beg[no]=str-str_beg;      // Tentatively set new value
-        if(match(prog)) return true;  // Match the rest
-        sub_beg[no]=keep;             // Restore old value
+      case OP_SUB_BEG_0:                // Capturing open parentheses
+      case OP_SUB_BEG_1:
+      case OP_SUB_BEG_2:
+      case OP_SUB_BEG_3:
+      case OP_SUB_BEG_4:
+      case OP_SUB_BEG_5:
+      case OP_SUB_BEG_6:
+      case OP_SUB_BEG_7:
+      case OP_SUB_BEG_8:
+      case OP_SUB_BEG_9:
+        no=op-OP_SUB_BEG_0;
+        bak_beg[no]=save=str;           // Back reference start set
+        bak_end[no]=NULL;               // Back reference end
+        if(match(prog)){                // Match the rest
+          if(no<npar) sub_beg[no]=save-str_beg;
+          return true;
+          }
         return false;
-      case OP_SUB_END+0:              // Capturing close parentheses
-      case OP_SUB_END+1:
-      case OP_SUB_END+2:
-      case OP_SUB_END+3:
-      case OP_SUB_END+4:
-      case OP_SUB_END+5:
-      case OP_SUB_END+6:
-      case OP_SUB_END+7:
-      case OP_SUB_END+8:
-      case OP_SUB_END+9:
-        no=op-OP_SUB_END;
-        if(no>=npar) break;           // Match w/o capture if array too small
-        keep=sub_end[no];
-        sub_end[no]=str-str_beg;      // Remember capture end for future back reference
-        if(match(prog)) return true;
-        sub_end[no]=keep;             // Restore old value
+      case OP_SUB_END_0:                // Capturing close parentheses
+      case OP_SUB_END_1:
+      case OP_SUB_END_2:
+      case OP_SUB_END_3:
+      case OP_SUB_END_4:
+      case OP_SUB_END_5:
+      case OP_SUB_END_6:
+      case OP_SUB_END_7:
+      case OP_SUB_END_8:
+      case OP_SUB_END_9:
+        no=op-OP_SUB_END_0;
+        bak_end[no]=save=str;           // Back reference end
+        if(match(prog)){                // Match the rest
+          if(no<npar) sub_end[no]=save-str_beg;
+          return true;
+          }
         return false;
-      case OP_REF+0:                  // Back reference to capturing parentheses
-      case OP_REF+1:
-      case OP_REF+2:
-      case OP_REF+3:
-      case OP_REF+4:
-      case OP_REF+5:
-      case OP_REF+6:
-      case OP_REF+7:
-      case OP_REF+8:
-      case OP_REF+9:
-        no=op-OP_REF;
-        if(no>=npar) return false;                    // Arrays were too small
-        if(sub_beg[no]<0) return false;               // Not captured yet
-        if(sub_end[no]<0) return false;               // Not captured yet
-        beg=str_beg+sub_beg[no];
-        end=str_beg+sub_end[no];
+      case OP_REF_0:                    // Back reference to capturing parentheses
+      case OP_REF_1:
+      case OP_REF_2:
+      case OP_REF_3:
+      case OP_REF_4:
+      case OP_REF_5:
+      case OP_REF_6:
+      case OP_REF_7:
+      case OP_REF_8:
+      case OP_REF_9:
+        no=op-OP_REF_0;
+        beg=bak_beg[no];                // Get back reference start
+        end=bak_end[no];                // Get back reference end
+        if(!beg) return false;
+        if(!end) return false;
         if(beg<end){                                  // Empty capture matches!
           if(str+(end-beg)>str_end) return false;     // Not enough characters left
           do{
@@ -2335,90 +2140,102 @@ rep:    if(str+rep_min>str_end) return false;
           while(beg<end);
           }
         break;
-      case OP_REF_CI+0:               // Back reference to capturing parentheses
-      case OP_REF_CI+1:
-      case OP_REF_CI+2:
-      case OP_REF_CI+3:
-      case OP_REF_CI+4:
-      case OP_REF_CI+5:
-      case OP_REF_CI+6:
-      case OP_REF_CI+7:
-      case OP_REF_CI+8:
-      case OP_REF_CI+9:
-        no=op-OP_REF_CI;
-        if(no>=npar) return false;                    // Arrays were too small
-        if(sub_beg[no]<0) return false;               // Not captured yet
-        if(sub_end[no]<0) return false;               // Not captured yet
-        beg=str_beg+sub_beg[no];
-        end=str_beg+sub_end[no];
+      case OP_REF_CI_0:               // Back reference to capturing parentheses
+      case OP_REF_CI_1:
+      case OP_REF_CI_2:
+      case OP_REF_CI_3:
+      case OP_REF_CI_4:
+      case OP_REF_CI_5:
+      case OP_REF_CI_6:
+      case OP_REF_CI_7:
+      case OP_REF_CI_8:
+      case OP_REF_CI_9:
+        no=op-OP_REF_CI_0;
+        beg=bak_beg[no];                // Get back reference start
+        end=bak_end[no];                // Get back reference end
+        if(!beg) return false;
+        if(!end) return false;
         if(beg<end){                                  // Empty capture matches!
           if(str+(end-beg)>str_end) return false;     // Not enough characters left
           do{
-            if(*beg != Ascii::toLower(*str)) return false;            // No match
+            if(Ascii::toLower(*beg) != Ascii::toLower(*str)) return false;      // No match
             beg++;
             str++;
             }
           while(beg<end);
           }
         break;
-      case OP_LOOK_NEG:               // Positive or negative look ahead
-      case OP_LOOK_POS:
+      case OP_AHEAD_NEG:                // Positive or negative look ahead
+      case OP_AHEAD_POS:
         save=str;
-        keep=match(prog+1);
+        keep=match(prog+1);             // Match the assertion
         str=save;
-        if((op-OP_LOOK_NEG)!=keep) return false;      // Didn't get what we expected
-        prog=prog+*prog;              // Jump to code after OP_SUCCEED
+        if((op-OP_AHEAD_NEG)!=keep) return false;       // Didn't get what we expected
+        prog=prog+*prog;                // Jump to code after OP_SUCCEED
         break;
-      case OP_ZERO+0:                 // Initialize counter for counting repeat
-      case OP_ZERO+1:
-      case OP_ZERO+2:
-      case OP_ZERO+3:
-      case OP_ZERO+4:
-      case OP_ZERO+5:
-      case OP_ZERO+6:
-      case OP_ZERO+7:
-      case OP_ZERO+8:
-      case OP_ZERO+9:
-        count[op-OP_ZERO]=0;
+      case OP_BEHIND_NEG:               // Positive or negative look-behind
+      case OP_BEHIND_POS:
+        no=*prog++;                     // Backward skip amount
+        keep=false;
+        if(str_beg<=str-no){            // Can we go back far enough?
+          save=str;
+          str-=no;
+          keep=match(prog+1);           // Match the assertion
+          str=save;
+          }
+        if((op-OP_BEHIND_NEG)!=keep) return false;      // Didn't get what we expected
+        prog=prog+*prog;                // Jump to code after OP_SUCCEED
         break;
-      case OP_INCR+0:                 // Increment counter for counting repeat
-      case OP_INCR+1:
-      case OP_INCR+2:
-      case OP_INCR+3:
-      case OP_INCR+4:
-      case OP_INCR+5:
-      case OP_INCR+6:
-      case OP_INCR+7:
-      case OP_INCR+8:
-      case OP_INCR+9:
-        count[op-OP_INCR]++;
+      case OP_ZERO_0:                   // Initialize counter for counting repeat
+      case OP_ZERO_1:
+      case OP_ZERO_2:
+      case OP_ZERO_3:
+      case OP_ZERO_4:
+      case OP_ZERO_5:
+      case OP_ZERO_6:
+      case OP_ZERO_7:
+      case OP_ZERO_8:
+      case OP_ZERO_9:
+        count[op-OP_ZERO_0]=0;
         break;
-      case OP_JUMPLT+0:               // Jump if counter less than value
-      case OP_JUMPLT+1:
-      case OP_JUMPLT+2:
-      case OP_JUMPLT+3:
-      case OP_JUMPLT+4:
-      case OP_JUMPLT+5:
-      case OP_JUMPLT+6:
-      case OP_JUMPLT+7:
-      case OP_JUMPLT+8:
-      case OP_JUMPLT+9:
-        if(count[op-OP_JUMPLT] < *prog++)   // Compare with value
+      case OP_INCR_0:                   // Increment counter for counting repeat
+      case OP_INCR_1:
+      case OP_INCR_2:
+      case OP_INCR_3:
+      case OP_INCR_4:
+      case OP_INCR_5:
+      case OP_INCR_6:
+      case OP_INCR_7:
+      case OP_INCR_8:
+      case OP_INCR_9:
+        count[op-OP_INCR_0]++;
+        break;
+      case OP_JUMPLT_0:               // Jump if counter less than value
+      case OP_JUMPLT_1:
+      case OP_JUMPLT_2:
+      case OP_JUMPLT_3:
+      case OP_JUMPLT_4:
+      case OP_JUMPLT_5:
+      case OP_JUMPLT_6:
+      case OP_JUMPLT_7:
+      case OP_JUMPLT_8:
+      case OP_JUMPLT_9:
+        if(count[op-OP_JUMPLT_0] < *prog++)   // Compare with value
           prog+=*prog;
         else
           prog++;
         break;
-      case OP_JUMPGT+0:               // Jump if counter greater than value
-      case OP_JUMPGT+1:
-      case OP_JUMPGT+2:
-      case OP_JUMPGT+3:
-      case OP_JUMPGT+4:
-      case OP_JUMPGT+5:
-      case OP_JUMPGT+6:
-      case OP_JUMPGT+7:
-      case OP_JUMPGT+8:
-      case OP_JUMPGT+9:
-        if(count[op-OP_JUMPGT] > *prog++)   // Compare with value
+      case OP_JUMPGT_0:               // Jump if counter greater than value
+      case OP_JUMPGT_1:
+      case OP_JUMPGT_2:
+      case OP_JUMPGT_3:
+      case OP_JUMPGT_4:
+      case OP_JUMPGT_5:
+      case OP_JUMPGT_6:
+      case OP_JUMPGT_7:
+      case OP_JUMPGT_8:
+      case OP_JUMPGT_9:
+        if(count[op-OP_JUMPGT_0] > *prog++)   // Compare with value
           prog+=*prog;
         else
           prog++;
@@ -2433,7 +2250,7 @@ rep:    if(str+rep_min>str_end) return false;
 
 
 // regtry - try match at specific point; 0 failure, 1 success
-bool FXExecute::attempt(const FXchar* string){
+FXbool FXExecute::attempt(const FXchar* string){
   register FXint i=npar;
   str=string;
   do{--i;sub_beg[i]=sub_end[i]=-1;}while(i);          // Possibly move this to FXExecute::execute?
@@ -2449,7 +2266,7 @@ bool FXExecute::attempt(const FXchar* string){
 
 
 // Match subject string, returning number of matches found
-bool FXExecute::execute(const FXchar* fm,const FXchar* to){
+FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
   register FXchar ch;
 
   // Simple case
@@ -2551,7 +2368,8 @@ const FXchar *const FXRex::errors[]={
   "Bad character class",
   "Expression too complex",
   "Out of memory",
-  "Illegal token"
+  "Illegal token",
+  "Bad look-behind pattern"
   };
 
 
@@ -2593,6 +2411,13 @@ FXRex& FXRex::operator=(const FXRex& orig){
     }
   return *this;
   }
+
+
+/*******************************************************************************/
+
+#ifdef REXDEBUG
+#include "fxrexdbg.h"
+#endif
 
 
 // Parse pattern
@@ -2648,7 +2473,7 @@ FXRexError FXRex::parse(const FXchar* pattern,FXint mode){
         err=cs.compile(flags);
 
         // Dump for debugging
-#ifndef NDEBUG
+#ifdef REXDEBUG
         if(fxTraceLevel>100) dump(code);
 #endif
         }
@@ -2668,7 +2493,7 @@ FXRexError FXRex::parse(const FXString& pattern,FXint mode){
 
 
 // Match subject string, returning number of matches found
-bool FXRex::match(const FXchar* string,FXint len,FXint* beg,FXint* end,FXint mode,FXint npar,FXint fm,FXint to) const {
+FXbool FXRex::match(const FXchar* string,FXint len,FXint* beg,FXint* end,FXint mode,FXint npar,FXint fm,FXint to) const {
   if(!string || len<0 || npar<1 || NSUBEXP<npar){ fxerror("FXRex::match: bad argument.\n"); }
   if(fm<0) fm=0;
   if(to>len) to=len;
@@ -2692,7 +2517,7 @@ bool FXRex::match(const FXchar* string,FXint len,FXint* beg,FXint* end,FXint mod
 
 
 // Search for match in string
-bool FXRex::match(const FXString& string,FXint* beg,FXint* end,FXint mode,FXint npar,FXint fm,FXint to) const {
+FXbool FXRex::match(const FXString& string,FXint* beg,FXint* end,FXint mode,FXint npar,FXint fm,FXint to) const {
   return match(string.text(),string.length(),beg,end,mode,npar,fm,to);
   }
 
@@ -2726,13 +2551,13 @@ FXString FXRex::substitute(const FXString& string,FXint* beg,FXint* end,const FX
 
 
 // Equality
-bool FXRex::operator==(const FXRex& rex) const {
+FXbool FXRex::operator==(const FXRex& rex) const {
   return code==rex.code || (code[0]==rex.code[0] && memcmp(code,rex.code,sizeof(FXint)*code[0])==0);
   }
 
 
 // Inequality
-bool FXRex::operator!=(const FXRex& rex) const {
+FXbool FXRex::operator!=(const FXRex& rex) const {
   return !operator==(rex);
   }
 

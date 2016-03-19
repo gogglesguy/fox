@@ -3,7 +3,7 @@
 *                         I F F   I m a g e   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXIFFImage.cpp,v 1.12 2006/01/22 17:58:31 fox Exp $                      *
+* $Id: FXIFFImage.cpp,v 1.14 2007/02/07 20:22:10 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,13 +75,13 @@ FXIFFImage::FXIFFImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h):FXI
 
 
 // Save object to stream
-bool FXIFFImage::savePixels(FXStream&) const {
+FXbool FXIFFImage::savePixels(FXStream&) const {
   return false;
   }
 
 
 // Load object from stream
-bool FXIFFImage::loadPixels(FXStream& store){
+FXbool FXIFFImage::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadIFF(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

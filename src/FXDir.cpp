@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDir.cpp,v 1.39 2006/01/22 17:58:22 fox Exp $                           *
+* $Id: FXDir.cpp,v 1.46 2007/03/06 04:35:22 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -92,7 +92,7 @@ FXDir::FXDir(const FXString& path){
 
 
 // Open directory to path, return true if ok.
-bool FXDir::open(const FXString& path){
+FXbool FXDir::open(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -106,7 +106,7 @@ bool FXDir::open(const FXString& path){
 #endif
     ((SPACE*)space)->handle=FindFirstFile(buffer,&((SPACE*)space)->result);
     if(((SPACE*)space)->handle!=INVALID_HANDLE_VALUE){
-      ((SPACE*)space)->first=TRUE;
+      ((SPACE*)space)->first=true;
       return true;
       }
 #else
@@ -121,7 +121,7 @@ bool FXDir::open(const FXString& path){
 
 
 // Returns true if the directory is open
-bool FXDir::isOpen() const {
+FXbool FXDir::isOpen() const {
 #ifdef WIN32
   return (((SPACE*)space)->handle!=INVALID_HANDLE_VALUE);
 #else
@@ -131,7 +131,7 @@ bool FXDir::isOpen() const {
 
 
 // Get next file name
-bool FXDir::next(){
+FXbool FXDir::next(){
   if(isOpen()){
 #ifdef WIN32
     if(((SPACE*)space)->first || FindNextFile(((SPACE*)space)->handle,&((SPACE*)space)->result)){
@@ -182,7 +182,7 @@ void FXDir::close(){
 
 
 // Create new directory
-bool FXDir::create(const FXString& path,FXuint mode){
+FXbool FXDir::create(const FXString& path,FXuint mode){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -201,7 +201,7 @@ bool FXDir::create(const FXString& path,FXuint mode){
 
 
 // Remove directory
-bool FXDir::remove(const FXString& path){
+FXbool FXDir::remove(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -220,16 +220,16 @@ bool FXDir::remove(const FXString& path){
 
 
 // Rename directory
-bool FXDir::rename(const FXString& srcpath,const FXString& dstpath){
+FXbool FXDir::rename(const FXString& srcpath,const FXString& dstpath){
   if(srcpath!=dstpath){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar oldname[1024],newname[1024];
     utf2ncs(oldname,srcpath.text(),srcpath.length()+1);
     utf2ncs(newname,dstpath.text(),dstpath.length()+1);
-    return ::MoveFileW(oldname,newname)!=0;
+    return ::MoveFileExW(oldname,newname,MOVEFILE_REPLACE_EXISTING)!=0;
 #else
-    return ::MoveFileA(srcpath.text(),dstpath.text())!=0;
+    return ::MoveFileExA(srcpath.text(),dstpath.text(),MOVEFILE_REPLACE_EXISTING)!=0;
 #endif
 #else
     return ::rename(srcpath.text(),dstpath.text())==0;
@@ -332,6 +332,17 @@ FXint FXDir::listDrives(FXString*& drivelist){
   }
 
 
+// Create a directory recursively
+FXbool createDirectory(const FXString& path){
+  if(!path.empty()) return false;
+  if(!FXStat::isDirectory(path)){
+    if(!createDirectory(FXPath::upLevel(path))) return false;
+    if(!FXDir::create(path)) return false;
+    }
+  return true;
+  }
+
+       
 // Cleanup
 FXDir::~FXDir(){
   close();
@@ -524,7 +535,7 @@ void FXDirList::listRootItems(){
       }
 
     // Not found; prepend before list
-    item=(FXDirItem*)appendItem(NULL,name,open_folder,closed_folder,NULL,TRUE);
+    item=(FXDirItem*)appendItem(NULL,name,open_folder,closed_folder,NULL,true);
 
     // Next gets hung after this one
 fnd:*pn=item;
@@ -594,7 +605,7 @@ fnd:*pn=item;
   // Wipe items remaining in list:- they have disappeared!!
   for(item=oldlist; item; item=link){
     link=item->link;
-    removeItem(item,TRUE);
+    removeItem(item,true);
     }
 
   // Remember new list
@@ -670,12 +681,12 @@ void fxenumWNetContainerResource(NETRESOURCE* netResource,FXObjectListOf<FXStrin
       }
 
     for(DWORD n=0; n < nEntries; n++){
-      bool isContainer=FALSE;
+      FXbool isContainer=false;
 
       // if RESOURCE_CONTEXT was passed to WNetOpenEnum(), dwScope will be
       //  RESOURCE_GLOBALNET
       if(netResources[n].dwScope==RESOURCE_GLOBALNET && (netResources[n].dwUsage&RESOURCEUSAGE_CONTAINER)){
-        isContainer=TRUE;
+        isContainer=true;
 
         //  If RESOURCE_CONTEXT was passed to WNetOpenEnum(), the first entry is
         //  a "self reference". For example, starting from the network root one

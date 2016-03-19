@@ -3,7 +3,7 @@
 *                    F i l e   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileDialog.cpp,v 1.53 2006/03/31 07:33:06 fox Exp $                    *
+* $Id: FXFileDialog.cpp,v 1.60 2007/02/07 20:22:07 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -72,8 +72,8 @@ FXIMPLEMENT(FXFileDialog,FXDialogBox,NULL,0)
 
 
 // Construct file fialog box
-FXFileDialog::FXFileDialog(FXWindow* owner,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
+FXFileDialog::FXFileDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,0,0,0,0,4,4){
   initdialog();
   }
 
@@ -95,7 +95,7 @@ void FXFileDialog::initdialog(){
   setWidth(getApp()->reg().readIntEntry("File Dialog","width",getWidth()));
   setHeight(getApp()->reg().readIntEntry("File Dialog","height",getHeight()));
   setFileBoxStyle(getApp()->reg().readUIntEntry("File Dialog","style",getFileBoxStyle()));
-  showHiddenFiles(getApp()->reg().readUIntEntry("File Dialog","showhidden",showHiddenFiles()));
+  showHiddenFiles(getApp()->reg().readBoolEntry("File Dialog","showhidden",showHiddenFiles()));
   }
 
 
@@ -105,7 +105,7 @@ void FXFileDialog::hide(){
   getApp()->reg().writeIntEntry("File Dialog","width",getWidth());
   getApp()->reg().writeIntEntry("File Dialog","height",getHeight());
   getApp()->reg().writeUIntEntry("File Dialog","style",getFileBoxStyle());
-  getApp()->reg().writeUIntEntry("File Dialog","showhidden",showHiddenFiles());
+  getApp()->reg().writeBoolEntry("File Dialog","showhidden",showHiddenFiles());
   }
 
 
@@ -191,13 +191,13 @@ FXint FXFileDialog::getNumPatterns() const {
 
 
 // Allow pattern entry
-void FXFileDialog::allowPatternEntry(bool allow){
-  filebox->allowPatternEntry(allow);
+void FXFileDialog::allowPatternEntry(FXbool flag){
+  filebox->allowPatternEntry(flag);
   }
 
 
-// Return TRUE if pattern entry is allowed
-bool FXFileDialog::allowPatternEntry() const {
+// Return true if pattern entry is allowed
+FXbool FXFileDialog::allowPatternEntry() const {
   return filebox->allowPatternEntry();
   }
 
@@ -250,27 +250,27 @@ FXuint FXFileDialog::getMatchMode() const {
   }
 
 
-// Return TRUE if showing hidden files
-bool FXFileDialog::showHiddenFiles() const {
+// Return true if showing hidden files
+FXbool FXFileDialog::showHiddenFiles() const {
   return filebox->showHiddenFiles();
   }
 
 
 // Show or hide hidden files
-void FXFileDialog::showHiddenFiles(bool showing){
-  filebox->showHiddenFiles(showing);
+void FXFileDialog::showHiddenFiles(FXbool flag){
+  filebox->showHiddenFiles(flag);
   }
 
 
-// Return TRUE if image preview on
-bool FXFileDialog::showImages() const {
+// Return true if image preview on
+FXbool FXFileDialog::showImages() const {
   return filebox->showImages();
   }
 
 
 // Show or hide preview images
-void FXFileDialog::showImages(bool showing){
-  filebox->showImages(showing);
+void FXFileDialog::showImages(FXbool flag){
+  filebox->showImages(flag);
   }
 
 
@@ -287,38 +287,50 @@ void FXFileDialog::setImageSize(FXint size){
 
 
 // Show readonly button
-void FXFileDialog::showReadOnly(bool show){
-  filebox->showReadOnly(show);
+void FXFileDialog::showReadOnly(FXbool flag){
+  filebox->showReadOnly(flag);
   }
 
 
-// Return TRUE if readonly is shown
-bool FXFileDialog::shownReadOnly() const {
+// Return true if readonly is shown
+FXbool FXFileDialog::shownReadOnly() const {
   return filebox->shownReadOnly();
   }
 
 
 // Set initial state of readonly button
-void FXFileDialog::setReadOnly(bool state){
-  filebox->setReadOnly(state);
+void FXFileDialog::setReadOnly(FXbool flag){
+  filebox->setReadOnly(flag);
   }
 
 
 // Get readonly state
-bool FXFileDialog::getReadOnly() const {
+FXbool FXFileDialog::getReadOnly() const {
   return filebox->getReadOnly();
   }
 
 
 // Allow or disallow navigation
-void FXFileDialog::allowNavigation(bool navigable){
-  filebox->allowNavigation(navigable);
+void FXFileDialog::allowNavigation(FXbool flag){
+  filebox->allowNavigation(flag);
   }
 
 
 // Is navigation allowed?
-bool FXFileDialog::allowNavigation() const{
+FXbool FXFileDialog::allowNavigation() const{
   return filebox->allowNavigation();
+  }
+
+
+// Set draggable files
+void FXFileDialog::setDraggableFiles(FXbool flag){
+  filebox->setDraggableFiles(flag);
+  }
+
+
+// Are draggable files
+FXbool FXFileDialog::getDraggableFiles() const {
+  return filebox->getDraggableFiles();
   }
 
 

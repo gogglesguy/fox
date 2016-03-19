@@ -3,7 +3,7 @@
 *                      C l i p p i n g   R e g i o n                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRegion.cpp,v 1.32 2006/04/04 04:28:07 fox Exp $                        *
+* $Id: FXRegion.cpp,v 1.35 2007/02/07 20:22:14 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -80,7 +80,7 @@ FXRegion::FXRegion(const FXRectangle& rect){
 
 
 // Construct polygon region
-FXRegion::FXRegion(const FXPoint* points,FXuint npoints,bool winding){
+FXRegion::FXRegion(const FXPoint* points,FXuint npoints,FXbool winding){
 #ifndef WIN32
   region=XPolygonRegion((XPoint*)points,npoints,winding?WindingRule:EvenOddRule);
 #else
@@ -122,8 +122,8 @@ FXRegion& FXRegion::operator=(const FXRegion& r){
   }
 
 
-// Return TRUE if region is empty
-bool FXRegion::empty() const {
+// Return true if region is empty
+FXbool FXRegion::empty() const {
 #ifndef WIN32
   return XEmptyRegion((Region)region);
 #else
@@ -132,8 +132,8 @@ bool FXRegion::empty() const {
   }
 
 
-// Return TRUE if region contains point
-bool FXRegion::contains(FXint x,FXint y) const {
+// Return true if region contains point
+FXbool FXRegion::contains(FXint x,FXint y) const {
 #ifndef WIN32
   return XPointInRegion((Region)region,x,y);
 #else
@@ -141,9 +141,9 @@ bool FXRegion::contains(FXint x,FXint y) const {
 #endif
   }
 
-// Return TRUE if region contains rectangle
+// Return true if region contains rectangle
 // Contributed by Daniel Gehriger <gehriger@linkcad.com>.
-bool FXRegion::contains(FXint x,FXint y,FXint w,FXint h) const {
+FXbool FXRegion::contains(FXint x,FXint y,FXint w,FXint h) const {
 #ifndef WIN32
   return XRectInRegion((Region)region,x,y,w,h);
 #else
@@ -182,8 +182,8 @@ FXRegion& FXRegion::offset(FXint dx,FXint dy){
   }
 
 
-// Return TRUE if region equal to this one
-bool FXRegion::operator==(const FXRegion& r) const {
+// Return true if region equal to this one
+FXbool FXRegion::operator==(const FXRegion& r) const {
 #ifndef WIN32
   return XEqualRegion((Region)region,(Region)r.region);
 #else
@@ -192,8 +192,8 @@ bool FXRegion::operator==(const FXRegion& r) const {
   }
 
 
-// Return TRUE if region not equal to this one
-bool FXRegion::operator!=(const FXRegion& r) const {
+// Return true if region not equal to this one
+FXbool FXRegion::operator!=(const FXRegion& r) const {
 #ifndef WIN32
   return !XEqualRegion((Region)region,(Region)r.region);
 #else

@@ -113,8 +113,10 @@ bookdel_gif.gif \
 booknext_gif.gif \
 bookprev_gif.gif \
 bookset_gif.gif \
+browser.gif \
 close_gif.gif \
 colors_gif.gif \
+config_gif.gif \
 copy_gif.gif \
 cut_gif.gif \
 delete_gif.gif \
@@ -125,6 +127,7 @@ indent_gif.gif \
 info_gif.gif \
 lang_gif.gif \
 new_gif.gif \
+nobrowser.gif \
 open_gif.gif \
 palette_gif.gif \
 pattern_gif.gif \
@@ -422,17 +425,17 @@ Adie.o: Adie.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
 	../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -503,13 +506,14 @@ Adie.o: Adie.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	../include/fxkeys.h HelpWindow.h Preferences.h Commands.h \
-	Hilite.h TextWindow.h Adie.h icons.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/fxkeys.h \
+	../include/FXRex.h ../include/FXArray.h HelpWindow.h \
+	Preferences.h Commands.h Hilite.h TextWindow.h Adie.h icons.h
 Commands.o: Commands.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -517,17 +521,17 @@ Commands.o: Commands.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -598,12 +602,13 @@ Commands.o: Commands.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	Commands.h Hilite.h TextWindow.h Adie.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h Commands.h ../include/FXRex.h \
+	../include/FXArray.h Hilite.h TextWindow.h Adie.h
 help.o: help.cpp help.h
 HelpWindow.o: HelpWindow.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
@@ -612,17 +617,17 @@ HelpWindow.o: HelpWindow.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -693,13 +698,14 @@ HelpWindow.o: HelpWindow.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h icons.h \
-	help.h Preferences.h Commands.h Hilite.h TextWindow.h Adie.h \
-	HelpWindow.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h icons.h help.h Preferences.h \
+	Commands.h ../include/FXRex.h ../include/FXArray.h Hilite.h \
+	TextWindow.h Adie.h HelpWindow.h
 Hilite.o: Hilite.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -707,17 +713,17 @@ Hilite.o: Hilite.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -788,12 +794,14 @@ Hilite.o: Hilite.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h Hilite.h
-icons.o: icons.cpp
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/FXRex.h \
+	../include/FXArray.h Hilite.h
+icons.o: icons.cpp icons.h
 main.o: main.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/fxascii.h ../include/fxunicode.h ../include/FXHash.h \
 	../include/FXException.h ../include/FXElement.h \
@@ -801,17 +809,17 @@ main.o: main.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
 	../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -882,12 +890,13 @@ main.o: main.cpp ../include/fx.h ../include/fxver.h ../include/fxdefs.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h Hilite.h \
-	TextWindow.h Adie.h icons.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/FXRex.h \
+	../include/FXArray.h Hilite.h TextWindow.h Adie.h icons.h
 parsesyntax.o: parsesyntax.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -895,17 +904,17 @@ parsesyntax.o: parsesyntax.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -976,12 +985,13 @@ parsesyntax.o: parsesyntax.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h Hilite.h \
-	Commands.h TextWindow.h Adie.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/FXRex.h \
+	../include/FXArray.h Hilite.h Commands.h TextWindow.h Adie.h
 Preferences.o: Preferences.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -989,17 +999,17 @@ Preferences.o: Preferences.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -1070,12 +1080,13 @@ Preferences.o: Preferences.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h icons.h \
-	help.h Preferences.h Hilite.h TextWindow.h Adie.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h icons.h help.h ../include/FXRex.h \
+	../include/FXArray.h Preferences.h Hilite.h TextWindow.h Adie.h
 TextWindow.o: TextWindow.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
 	../include/FXHash.h ../include/FXException.h \
@@ -1083,17 +1094,17 @@ TextWindow.o: TextWindow.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
 	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
-	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
-	../include/FXRectangle.h ../include/FXObject.h \
-	../include/FXDelegator.h ../include/FXDict.h \
-	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
-	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
-	../include/FXStringDict.h ../include/FXSettings.h \
-	../include/FXRegistry.h ../include/FXObjectList.h \
-	../include/FXAccelTable.h ../include/FXRecentFiles.h \
-	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
-	../include/FXFont.h ../include/FXCursor.h \
-	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
+	../include/FXPoint.h ../include/FXRectangle.h \
+	../include/FXObject.h ../include/FXDelegator.h \
+	../include/FXDict.h ../include/FXPath.h ../include/FXSystem.h \
+	../include/FXStat.h ../include/FXDir.h ../include/FXDate.h \
+	../include/FXURL.h ../include/FXStringDict.h \
+	../include/FXSettings.h ../include/FXRegistry.h \
+	../include/FXObjectList.h ../include/FXAccelTable.h \
+	../include/FXRecentFiles.h ../include/FXApp.h ../include/FXId.h \
+	../include/FXVisual.h ../include/FXFont.h ../include/FXCursor.h \
+	../include/FXMessageChannel.h ../include/FXCURCursor.h \
 	../include/FXGIFCursor.h ../include/FXDrawable.h \
 	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
 	../include/FXGIFImage.h ../include/FXIFFImage.h \
@@ -1164,13 +1175,14 @@ TextWindow.o: TextWindow.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXWizard.h ../include/FXMDIButton.h \
 	../include/FXMDIClient.h ../include/FXMDIChild.h \
 	../include/FXDocument.h ../include/FXDockSite.h \
-	../include/FXDockBar.h ../include/FXToolBar.h \
 	../include/FXDockHandler.h ../include/FXDockTitle.h \
 	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
 	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
-	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
-	../include/fxkeys.h HelpWindow.h Preferences.h Commands.h \
-	Hilite.h TextWindow.h Adie.h icons.h
+	../include/FXDebugTarget.h ../include/FXCalendarView.h \
+	../include/FXCalendar.h ../include/FXConsole.h \
+	../include/FXSplashWindow.h ../include/fxkeys.h \
+	../include/FXRex.h ../include/FXArray.h HelpWindow.h \
+	Preferences.h Commands.h Hilite.h TextWindow.h Adie.h icons.h
 
 info-am:
 info: info-am
@@ -1254,10 +1266,10 @@ mostlyclean distclean maintainer-clean
 Adie.cpp: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -3,7 +3,7 @@
 *                 S h u t t e r   C o n t a i n e r   W i d g e t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Charles W. Warren.   All Rights Reserved.          *
+* Copyright (C) 1998,2007 by Charles W. Warren.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXShutter.h,v 1.27 2006/04/02 19:58:49 fox Exp $                         *
+* $Id: FXShutter.h,v 1.30 2007/02/07 20:21:58 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSHUTTER_H
 #define FXSHUTTER_H
@@ -104,7 +104,7 @@ protected:
   FXint          closing;               // Item closing down
   FXint          heightIncrement;       // Height delta
   FXint          closingHeight;         // Closing items current height
-  bool           closingHadScrollbar;   // Closing item had a scroll bar
+  FXbool         closingHadScrollbar;   // Closing item had a scroll bar
 protected:
   FXShutter(){}
 private:
@@ -137,7 +137,7 @@ public:
   virtual void layout();
 
   /// Set the currently displayed item (panel = 0, 1, 2, ..., npanels-1)
-  virtual void setCurrent(FXint panel);
+  virtual void setCurrent(FXint panel,FXbool notify=false);
 
   /// Return the index of the currently displayed item
   FXint getCurrent() const { return current; }

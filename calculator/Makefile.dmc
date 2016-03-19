@@ -5,7 +5,7 @@
 ##############################################################################
 # Contributed by: Andre Fornacon <afo@zlug.org>                              #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.13 2006/03/22 03:46:47 fox Exp $                     #
+# $Id: Makefile.dmc,v 1.15 2006/08/10 14:07:23 fox Exp $                     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -23,12 +23,12 @@
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later
-CXX       = sc
+CXX       = dmc
 CXXFLAGS  = -mn -5 -a8
 RM        = del
 TOPDIR    = ..
 DEFINES   = -DNDEBUG -DFOX_BIGENDIAN=0 -DWIN32 -D_WINDOWS
-LD	  = sc
+LD	  = link
 LDFLAGS	  =
 LIBS	  = advapi32.lib+shell32.lib+gdi32.lib+wsock32.lib
 GLLIBS    = opengl32.lib glu32.lib
@@ -55,13 +55,10 @@ calculator.exe: $(OBJECTS) $(FOXLIB)
 calculator.obj: icons.cpp
 
 icons.h: $(ICONS)
-	$(RM) $@
-	$(RESWRAP) -i -oa $@ $(ICONS)
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
 icons.cpp: $(ICONS)
-	$(RM) $@
-	echo ^#include "icons.h" > $@
-	$(RESWRAP) -oa $@ $(ICONS)
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 clean:
 	$(RM) *.obj *.exe *.tds *.map icons.cpp

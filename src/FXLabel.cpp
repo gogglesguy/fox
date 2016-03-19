@@ -3,7 +3,7 @@
 *                            L a b e l   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXLabel.cpp,v 1.59 2006/01/22 17:58:33 fox Exp $                         *
+* $Id: FXLabel.cpp,v 1.61 2007/02/07 20:22:11 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -433,12 +433,14 @@ long FXLabel::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 // Change text
 void FXLabel::setText(const FXString& text){
   FXString string=stripHotKey(text);
-  if(label!=string){
+  FXHotKey hkey=parseHotKey(text);
+  FXint hoff=findHotKey(text);
+  if(label!=string || hkey!=hotkey || hotoff!=hoff){
+    label.adopt(string);
     remHotKey(hotkey);
-    hotkey=parseHotKey(text);
-    hotoff=findHotKey(text);
+    hotkey=hkey;
+    hotoff=hoff;
     addHotKey(hotkey);
-    label=string;
     recalc();
     update();
     }

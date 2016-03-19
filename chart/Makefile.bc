@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 2004 by Jeroen van der Zijp.   All Rights Reserved.          #
 ##############################################################################
-# $Id: Makefile.bc,v 1.6 2006/03/22 03:46:47 fox Exp $                       #
+# $Id: Makefile.bc,v 1.7 2006/08/10 14:07:23 fox Exp $                       #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -67,11 +67,11 @@ chart.obj: icons.h icons.cpp
 
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $**
+	$(RESWRAP) -h -o icons.h $**
 
 
 icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $**
+	$(RESWRAP) -i icons.h -o icons.cpp $**
 
 
 clean:

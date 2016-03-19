@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLVisual.h,v 1.26 2006/04/21 20:39:46 fox Exp $                        *
+* $Id: FXGLVisual.h,v 1.30 2007/02/07 20:21:55 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVISUAL_H
 #define FXGLVISUAL_H
@@ -71,14 +71,9 @@ public:
   FXGLVisual(FXApp* a,FXuint flags);
 
   /**
-  * Test if GLX is possible, and what level is supported.
-  * Because of remote display capability, the display server may
-  * support a different level of GLX than the client; it may
-  * even support no GLX at all!  This function returns the lesser
-  * of the client support level and the display server support level.
-  * Simply returns 1.0 on Windows if OpenGL is enabled.
+  * Test if if OpenGL is supported.
   */
-  static bool supported(FXApp* application,int& major,int& minor);
+  static FXbool hasOpenGL(FXApp* application);
 
   /// Create visual
   virtual void create();
@@ -126,16 +121,16 @@ public:
   FXint getActualAccumAlphaSize() const;
 
   /// Is it double buffered?
-  bool isDoubleBuffer() const;
+  FXbool isDoubleBuffer() const;
 
   /// Is it stereo?
-  bool isStereo() const;
+  FXbool isStereo() const;
 
   /// Is it hardware-accelerated?
-  bool isAccelerated() const;
+  FXbool isAccelerated() const;
 
   /// Does it swap by copying instead of flipping buffers
-  bool isBufferSwapCopy() const;
+  FXbool isBufferSwapCopy() const;
 
   /// Save visual info to a stream
   virtual void save(FXStream& store) const;
@@ -149,7 +144,7 @@ public:
 
 
 /// Create a display list of bitmaps from font glyphs in a font
-extern FXAPI void glUseFXFont(FXFont* font,int first,int count,int list);
+extern FXAPI FXbool glUseFXFont(FXFont* font,int first,int count,int list);
 
 }
 

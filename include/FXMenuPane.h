@@ -3,7 +3,7 @@
 *                        M e n u   P a n e   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMenuPane.h,v 1.16 2006/01/22 17:58:06 fox Exp $                        *
+* $Id: FXMenuPane.h,v 1.18 2007/02/07 20:21:56 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXMENUPANE_H
 #define FXMENUPANE_H
@@ -44,7 +44,7 @@ public:
   FXMenuPane(FXWindow* owner,FXuint opts=0);
 
   /// Return true if popup contains this point
-  virtual bool contains(FXint parentx,FXint parenty) const;
+  virtual FXbool contains(FXint parentx,FXint parenty) const;
   };
 
 }

@@ -3,7 +3,7 @@
 *                     A r r o w   B u t t o n    O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXArrowButton.cpp,v 1.51 2006/04/02 22:37:20 fox Exp $                   *
+* $Id: FXArrowButton.cpp,v 1.53 2007/02/07 20:22:03 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -141,7 +141,7 @@ void FXArrowButton::disable(){
 
 
 // Set button state
-void FXArrowButton::setState(bool s){
+void FXArrowButton::setState(FXbool s){
   if(state!=s){
     state=s;
     update();
@@ -150,7 +150,7 @@ void FXArrowButton::setState(bool s){
 
 
 // If window can have focus
-bool FXArrowButton::canFocus() const { return true; }
+FXbool FXArrowButton::canFocus() const { return true; }
 
 
 // Implement auto-hide or auto-gray modes
@@ -229,7 +229,7 @@ long FXArrowButton::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
 
 // Released mouse button
 long FXArrowButton::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
-  bool click=(!fired && state);
+  FXbool click=(!fired && state);
   if(isEnabled() && (flags&FLAG_PRESSED)){
     ungrab();
     flags|=FLAG_UPDATE;
@@ -289,7 +289,7 @@ long FXArrowButton::onKeyPress(FXObject*,FXSelector,void* ptr){
 // Key Release
 long FXArrowButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  bool click=(!fired && state);
+  FXbool click=(!fired && state);
   if(isEnabled() && (flags&FLAG_PRESSED)){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
     if(event->code==KEY_space || event->code==KEY_KP_Space){
@@ -324,7 +324,7 @@ long FXArrowButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 
 // Hot key combination released
 long FXArrowButton::onHotKeyRelease(FXObject*,FXSelector,void*){
-  bool click=(!fired && state);
+  FXbool click=(!fired && state);
   if(isEnabled() && (flags&FLAG_PRESSED)){
     setState(false);
     flags|=FLAG_UPDATE;

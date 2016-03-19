@@ -264,6 +264,10 @@ SOURCE=..\..\..\include\fxascii.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\FXAtomic.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXBitmap.cpp
 # End Source File
 # Begin Source File
@@ -321,6 +325,22 @@ SOURCE=..\..\..\src\FXBZFileStream.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXBZFileStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXCalendar.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXCalendar.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXCalendarView.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXCalendarView.h
 # End Source File
 # Begin Source File
 
@@ -416,6 +436,22 @@ SOURCE=..\..\..\include\FXComboBox.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\FXComplexd.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXComplexd.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXComplexf.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXComplexf.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXComposeContext.cpp
 # End Source File
 # Begin Source File
@@ -429,6 +465,22 @@ SOURCE=..\..\..\src\FXComposite.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXComposite.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXConsole.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXConsole.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXCopyDialog.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXCopyDialog.h
 # End Source File
 # Begin Source File
 
@@ -1016,6 +1068,14 @@ SOURCE=..\..\..\include\FXGLCone.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\FXGLConfig.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXGLConfig.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXGLContext.cpp
 # End Source File
 # Begin Source File
@@ -1101,14 +1161,6 @@ SOURCE=..\..\..\src\FXGroupBox.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXGroupBox.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\FXGUISignal.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\include\FXGUISignal.h
 # End Source File
 # Begin Source File
 
@@ -1512,6 +1564,14 @@ SOURCE=..\..\..\include\FXMessageBox.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\FXMessageChannel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXMessageChannel.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXObject.cpp
 # End Source File
 # Begin Source File
@@ -1744,6 +1804,14 @@ SOURCE=..\..\..\src\fxrasio.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\FXReactor.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXReactor.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\FXRealSlider.cpp
 # End Source File
 # Begin Source File
@@ -1841,6 +1909,14 @@ SOURCE=..\..\..\src\FXRuler.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXRuler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXRulerView.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXRulerView.h
 # End Source File
 # Begin Source File
 
@@ -2133,6 +2209,14 @@ SOURCE=..\..\..\src\FXThread.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXThread.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXThreadPool.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXThreadPool.h
 # End Source File
 # Begin Source File
 

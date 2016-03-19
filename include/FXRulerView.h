@@ -3,7 +3,7 @@
 *                         R u l e r V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRulerView.h,v 1.16 2006/03/31 07:33:03 fox Exp $                       *
+* $Id: FXRulerView.h,v 1.21 2007/02/07 20:21:58 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXRULERVIEW_H
 #define FXRULERVIEW_H
@@ -82,11 +82,17 @@ public:
   /// Construct a rulerview window
   FXRulerView(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Return viewport height
-  virtual FXint getViewportHeight();
+  /// Return visible area x position
+  virtual FXint getVisibleX() const;
 
-  /// Return viewport width
-  virtual FXint getViewportWidth();
+  /// Return visible area y position
+  virtual FXint getVisibleY() const;
+
+  /// Return visible area width
+  virtual FXint getVisibleWidth() const;
+
+  /// Return visible area height
+  virtual FXint getVisibleHeight() const;
 
   /// Return content width
   virtual FXint getContentWidth();
@@ -110,13 +116,13 @@ public:
   FXint getDocumentY() const;
 
   /// Set document width
-  void setDocumentWidth(FXint w,bool notify=false);
+  void setDocumentWidth(FXint w,FXbool notify=false);
 
   /// Get document width
   FXint getDocumentWidth() const;
 
   /// Set document height
-  void setDocumentHeight(FXint h,bool notify=false);
+  void setDocumentHeight(FXint h,FXbool notify=false);
 
   /// Get document height
   FXint getDocumentHeight() const;
@@ -128,18 +134,18 @@ public:
   FXColor getDocumentColor() const { return docColor; }
 
   /// Change edge spacing around document
-  void setHEdgeSpacing(FXint es,bool notify=false);
-  void setVEdgeSpacing(FXint es,bool notify=false);
+  void setHEdgeSpacing(FXint es,FXbool notify=false);
+  void setVEdgeSpacing(FXint es,FXbool notify=false);
 
   /// Return edge spacing
   FXint getHEdgeSpacing() const;
   FXint getVEdgeSpacing() const;
 
   /// Change horizontal lower margin
-  void setHMarginLower(FXint marg,bool notify=false);
+  void setHMarginLower(FXint marg,FXbool notify=false);
 
   /// Change horizontal upper margin
-  void setHMarginUpper(FXint marg,bool notify=false);
+  void setHMarginUpper(FXint marg,FXbool notify=false);
 
   /// Get horizontal lower margin
   FXint getHMarginLower() const;
@@ -148,10 +154,10 @@ public:
   FXint getHMarginUpper() const;
 
   /// Change vertical lower margin
-  void setVMarginLower(FXint marg,bool notify=false);
+  void setVMarginLower(FXint marg,FXbool notify=false);
 
   /// Change vertical upper margin
-  void setVMarginUpper(FXint marg,bool notify=false);
+  void setVMarginUpper(FXint marg,FXbool notify=false);
 
   /// Get vertical lower margin
   FXint getVMarginLower() const;
@@ -160,13 +166,13 @@ public:
   FXint getVMarginUpper() const;
 
   /// Set horizontal alignment; the default is RULER_ALIGN_NORMAL
-  void setHAlignment(FXuint align,bool notify=false);
+  void setHAlignment(FXuint align,FXbool notify=false);
 
   /// Return horizontal alignment
   FXuint getHAlignment() const;
 
   /// Set vertical alignment; the default is RULER_ALIGN_NORMAL
-  void setVAlignment(FXuint align,bool notify=false);
+  void setVAlignment(FXuint align,FXbool notify=false);
 
   /// Return vertical alignment
   FXuint getVAlignment() const;
@@ -184,52 +190,52 @@ public:
   FXint getArrowPosY() const;
 
   /// Set the horizontal ruler font
-  void setHRulerFont(FXFont *fnt,bool notify=false);
+  void setHRulerFont(FXFont *fnt,FXbool notify=false);
 
   /// Get the horizontal ruler font
   FXFont* getHRulerFont() const;
 
   /// Set the vertical ruler font
-  void setVRulerFont(FXFont *fnt,bool notify=false);
+  void setVRulerFont(FXFont *fnt,FXbool notify=false);
 
   /// Get the vertical ruler font
   FXFont* getVRulerFont() const;
 
   /// Change document number placement
-  void setHNumberTicks(FXint ticks,bool notify=false);
-  void setVNumberTicks(FXint ticks,bool notify=false);
+  void setHNumberTicks(FXint ticks,FXbool notify=false);
+  void setVNumberTicks(FXint ticks,FXbool notify=false);
 
   /// Return document number placement
   FXint getHNumberTicks() const;
   FXint getVNumberTicks() const;
 
   /// Change document major ticks
-  void setHMajorTicks(FXint ticks,bool notify=false);
-  void setVMajorTicks(FXint ticks,bool notify=false);
+  void setHMajorTicks(FXint ticks,FXbool notify=false);
+  void setVMajorTicks(FXint ticks,FXbool notify=false);
 
   /// Return document major ticks
   FXint getHMajorTicks() const;
   FXint getVMajorTicks() const;
 
   /// Change document medium ticks
-  void setHMediumTicks(FXint ticks,bool notify=false);
-  void setVMediumTicks(FXint ticks,bool notify=false);
+  void setHMediumTicks(FXint ticks,FXbool notify=false);
+  void setVMediumTicks(FXint ticks,FXbool notify=false);
 
   /// Return document medium ticks
   FXint getHMediumTicks() const;
   FXint getVMediumTicks() const;
 
   /// Change document tiny ticks
-  void setHTinyTicks(FXint ticks,bool notify=false);
-  void setVTinyTicks(FXint ticks,bool notify=false);
+  void setHTinyTicks(FXint ticks,FXbool notify=false);
+  void setVTinyTicks(FXint ticks,FXbool notify=false);
 
   /// Return document tiny ticks
   FXint getHTinyTicks() const;
   FXint getVTinyTicks() const;
 
   /// Change pixel per tick spacing
-  void setHPixelPerTick(FXdouble space,bool notify=false);
-  void setVPixelPerTick(FXdouble space,bool notify=false);
+  void setHPixelPerTick(FXdouble space,FXbool notify=false);
+  void setVPixelPerTick(FXdouble space,FXbool notify=false);
 
   /// Return pixel per tick spacing
   FXdouble getHPixelPerTick() const;

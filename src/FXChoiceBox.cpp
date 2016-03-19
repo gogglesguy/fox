@@ -3,7 +3,7 @@
 *                            C h o i c e   B o x                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXChoiceBox.cpp,v 1.14 2006/01/22 17:58:20 fox Exp $                     *
+* $Id: FXChoiceBox.cpp,v 1.16 2007/02/07 20:22:03 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -77,53 +77,53 @@ FXIMPLEMENT(FXChoiceBox,FXDialogBox,FXChoiceBoxMap,ARRAYNUMBER(FXChoiceBoxMap))
 
 
 // Construct choice box with given caption, icon, message text, and with choices from array of strings
-FXChoiceBox::FXChoiceBox(FXWindow* owner,const FXString& caption,const FXString& text,FXIcon* icon,const FXchar** choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,w,h,10,10,10,10, 10,10){
+FXChoiceBox::FXChoiceBox(FXWindow* own,const FXString& caption,const FXString& text,FXIcon* icn,const FXchar** choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,w,h,10,10,10,10, 10,10){
   register FXint n;
-  initialize(text,icon);
+  initialize(text,icn);
   n=list->fillItems(choices);
   list->setNumVisible(FXMIN(n,5));
   }
 
 
 // Construct choice box with given caption, icon, message text, and with choices from newline separated strings
-FXChoiceBox::FXChoiceBox(FXWindow* owner,const FXString& caption,const FXString& text,FXIcon* icon,const FXString& choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,w,h,10,10,10,10, 10,10){
+FXChoiceBox::FXChoiceBox(FXWindow* own,const FXString& caption,const FXString& text,FXIcon* icn,const FXString& choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,w,h,10,10,10,10, 10,10){
   register FXint n;
-  initialize(text,icon);
+  initialize(text,icn);
   n=list->fillItems(choices);
   list->setNumVisible(FXMIN(n,5));
   }
 
 
 // Construct free floating choice box with given caption, icon, message text, and with choices from array of strings
-FXChoiceBox::FXChoiceBox(FXApp* a,const FXString& caption,const FXString& text,FXIcon* icon,const FXchar** choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+FXChoiceBox::FXChoiceBox(FXApp* a,const FXString& caption,const FXString& text,FXIcon* icn,const FXchar** choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
   FXDialogBox(a,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,w,h,10,10,10,10, 10,10){
   register FXint n;
-  initialize(text,icon);
+  initialize(text,icn);
   n=list->fillItems(choices);
   list->setNumVisible(FXMIN(n,5));
   }
 
 
 // Construct free floating choice box with given caption, icon, message text, and with choices from newline separated strings
-FXChoiceBox::FXChoiceBox(FXApp* a,const FXString& caption,const FXString& text,FXIcon* icon,const FXString& choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+FXChoiceBox::FXChoiceBox(FXApp* a,const FXString& caption,const FXString& text,FXIcon* icn,const FXString& choices,FXuint opts,FXint x,FXint y,FXint w,FXint h):
   FXDialogBox(a,caption,opts|DECOR_TITLE|DECOR_BORDER,x,y,w,h,10,10,10,10, 10,10){
   register FXint n;
-  initialize(text,icon);
+  initialize(text,icn);
   n=list->fillItems(choices);
   list->setNumVisible(FXMIN(n,5));
   }
 
 
 // Build contents
-void FXChoiceBox::initialize(const FXString& text,FXIcon* icon){
+void FXChoiceBox::initialize(const FXString& text,FXIcon* icn){
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0,0,0,0,0);
   new FXButton(buttons,tr("&OK"),NULL,this,ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   new FXButton(buttons,tr("&Cancel"),NULL,this,ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   FXHorizontalFrame* toppart=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X,0,0,0,0, 0,0,0,0, 10,10);
-  new FXLabel(toppart,FXString::null,icon,ICON_BEFORE_TEXT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X);
+  new FXLabel(toppart,FXString::null,icn,ICON_BEFORE_TEXT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X);
   new FXLabel(toppart,text,NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
   FXHorizontalFrame* midpart=new FXHorizontalFrame(this,FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 10,10);
   list=new FXList(midpart,this,ID_CLICKED,LIST_BROWSESELECT|LAYOUT_FILL_Y|LAYOUT_FILL_X|HSCROLLING_OFF);

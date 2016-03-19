@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Preferences.cpp,v 1.18 2006/04/04 05:14:47 fox Exp $                     *
+* $Id: Preferences.cpp,v 1.20 2007/02/07 20:22:01 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "PathFinder.h"
@@ -54,8 +54,7 @@ FXIMPLEMENT(Preferences,FXDialogBox,PreferencesMap,ARRAYNUMBER(PreferencesMap))
 
 
 // Construct
-Preferences::Preferences(PathFinderMain *owner):
-  FXDialogBox(owner,"PathFinder Preferences",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 0,0,0,0, 4,4){
+Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Preferences",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 0,0,0,0, 4,4){
 
   FXVerticalFrame *vertical=new FXVerticalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXHorizontalFrame *horizontal=new FXHorizontalFrame(vertical,LAYOUT_FILL_X|LAYOUT_FILL_Y);

@@ -3,7 +3,7 @@
 *           D e v i c e   C o n t e x t   F o r   P r i n t i n g               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDCPrint.h,v 1.31 2006/03/31 07:33:01 fox Exp $                         *
+* $Id: FXDCPrint.h,v 1.33 2007/02/07 20:21:53 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXDCPRINT_H
 #define FXDCPRINT_H
@@ -129,18 +129,18 @@ public:
   FXDCPrint(FXApp* a);
 
   /// Generate print job prolog
-  bool beginPrint(FXPrinter& job);
+  FXbool beginPrint(FXPrinter& job);
 
   /// Generate print job epilog
-  bool endPrint();
+  FXbool endPrint();
 
   /// Generate begin of page
-  bool beginPage(FXuint page=1);
+  FXbool beginPage(FXuint page=1);
 
   /// Generate end of page
-  bool endPage();
+  FXbool endPage();
 
-  bool setContentRange(FXint pxmin,FXint pymin,FXint pxmax,FXint pymax);
+  FXbool setContentRange(FXint pxmin,FXint pymin,FXint pxmax,FXint pymax);
 
   /// Draw points
   virtual void drawPoint(FXint x,FXint y);
@@ -279,7 +279,7 @@ public:
   virtual void setFont(FXFont *fnt);
 
   /// Clip drawing by child windows
-  virtual void clipChildren(bool yes);
+  virtual void clipChildren(FXbool yes);
 
   /// Temporarily public; do not rely on this!!
   void outhex(FXuint hex);

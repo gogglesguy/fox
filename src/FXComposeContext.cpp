@@ -3,7 +3,7 @@
 *                         C o m p o s e - C o n t e x t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXComposeContext.cpp,v 1.12 2006/01/22 17:58:21 fox Exp $                *
+* $Id: FXComposeContext.cpp,v 1.15 2007/02/07 20:22:04 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -72,13 +72,13 @@ FXIMPLEMENT(FXComposeContext,FXId,NULL,0)
 
 // Deserialization
 FXComposeContext::FXComposeContext():window(NULL),message(0){
-  FXTRACE((1,"FXComposeContext::FXComposeContext %p\n",this));
+  FXTRACE((100,"FXComposeContext::FXComposeContext %p\n",this));
   }
 
 
 // Create input context
 FXComposeContext::FXComposeContext(FXApp* a,FXWindow* win,FXSelector sel):FXId(a),window(win),message(sel){
-  FXTRACE((1,"FXComposeContext::FXComposeContext %p\n",this));
+  FXTRACE((100,"FXComposeContext::FXComposeContext %p\n",this));
   }
 
 
@@ -148,7 +148,7 @@ FXString FXComposeContext::translateEvent(FXRawEvent& event){
 
 // Delete input context
 FXComposeContext::~FXComposeContext(){
-  FXTRACE((1,"FXComposeContext::~FXComposeContext %p\n",this));
+  FXTRACE((100,"FXComposeContext::~FXComposeContext %p\n",this));
   }
 
 
@@ -157,13 +157,13 @@ FXComposeContext::~FXComposeContext(){
 
 // Deserialization
 FXComposeContext::FXComposeContext():window(NULL),message(0){
-  FXTRACE((1,"FXComposeContext::FXComposeContext %p\n",this));
+  FXTRACE((100,"FXComposeContext::FXComposeContext %p\n",this));
   }
 
 
 // Create input context
 FXComposeContext::FXComposeContext(FXApp* a,FXWindow* win,FXSelector sel):FXId(a),window(win),message(sel){
-  FXTRACE((1,"FXComposeContext::FXComposeContext %p\n",this));
+  FXTRACE((100,"FXComposeContext::FXComposeContext %p\n",this));
   }
 
 
@@ -201,7 +201,7 @@ match:XFree(ximstyles);
 
 
 /*
-bool isIMRunning(Display *display){
+FXbool isIMRunning(Display *display){
   const FXchar *p=XSetLocaleModifiers(NULL);
   if(p){
     FXTRACE((1,"XSetLocaleModifiers=%s\n",p));
@@ -314,7 +314,7 @@ m:      XFree(ximstyles);
 
         // No status callbacks
         else{
-          FXTRACE((1,"On the Spot\n"));
+          FXTRACE((100,"On the Spot\n"));
           xid=(FXID)XCreateIC((XIM)getApp()->xim,XNInputStyle,XIMPreeditCallbacks|XIMStatusNothing,XNClientWindow,window->id(),XNPreeditAttributes,editAttr,NULL);
           }
         XFree(editAttr);
@@ -322,7 +322,7 @@ m:      XFree(ximstyles);
 
       // Off the spot method
       else if(style&XIMPreeditArea){
-        FXTRACE((1,"Off the Spot\n"));
+        FXTRACE((100,"Off the Spot\n"));
         rect.x=0;
         rect.y=0;
         rect.width=window->getWidth();
@@ -334,7 +334,7 @@ m:      XFree(ximstyles);
 
       // Over the spot method
       else if(style&XIMPreeditPosition){
-        FXTRACE((1,"Over the Spot\n"));
+        FXTRACE((100,"Over the Spot\n"));
         spot.x=1;
         spot.y=1;
         editAttr=XVaCreateNestedList(0,XNSpotLocation,&spot,NULL);
@@ -344,7 +344,7 @@ m:      XFree(ximstyles);
 
       // Root method
       else{
-        FXTRACE((1,"Root\n"));
+        FXTRACE((100,"Root\n"));
         xid=(FXID)XCreateIC((XIM)getApp()->xim,XNInputStyle,XIMPreeditNothing|XIMStatusNothing,XNClientWindow,window->id(),NULL);
         }
 
@@ -447,13 +447,13 @@ FXString FXComposeContext::translateEvent(FXRawEvent& event){
 
 
 int FXComposeContext::editStartCallback(void*,FXComposeContext* cc,void*){
-  FXTRACE((1,"editStartCallback\n"));
+  FXTRACE((100,"editStartCallback\n"));
   return -1;			// No length limit
   }
 
 
 void FXComposeContext::editDoneCallback(void*,FXComposeContext* cc,void*){
-  FXTRACE((1,"editDoneCallback\n"));
+  FXTRACE((100,"editDoneCallback\n"));
   }
 
 
@@ -461,7 +461,7 @@ void FXComposeContext::editDrawCallback(void*,FXComposeContext* cc,void* ptr){
 #ifndef NO_XIM
   XIMPreeditDrawCallbackStruct *drawstruct=(XIMPreeditDrawCallbackStruct*)ptr;
   XIMText *ximtext=drawstruct->text;
-  FXTRACE((1,"editDrawCallback caret=%d first=%d len=%d\n",drawstruct->caret,drawstruct->chg_first,drawstruct->chg_length));
+  FXTRACE((100,"editDrawCallback caret=%d first=%d len=%d\n",drawstruct->caret,drawstruct->chg_first,drawstruct->chg_length));
 #endif
   }
 
@@ -469,32 +469,32 @@ void FXComposeContext::editDrawCallback(void*,FXComposeContext* cc,void* ptr){
 void FXComposeContext::editCaretCallback(void*,FXComposeContext* cc,void* ptr){
 #ifndef NO_XIM
   XIMPreeditCaretCallbackStruct *caretstruct=(XIMPreeditCaretCallbackStruct*)ptr;
-  FXTRACE((1,"editCaretCallback position=%d direction=%d style=%d\n",caretstruct->position,caretstruct->direction,caretstruct->style));
+  FXTRACE((100,"editCaretCallback position=%d direction=%d style=%d\n",caretstruct->position,caretstruct->direction,caretstruct->style));
 #endif
   }
 
 
 void FXComposeContext::statusStartCallback(void*,FXComposeContext* cc,void*){
-  FXTRACE((1,"statusStartCallback\n"));
+  FXTRACE((100,"statusStartCallback\n"));
   }
 
 
 void FXComposeContext::statusDoneCallback(void*,FXComposeContext* cc,void*){
-  FXTRACE((1,"statusDoneCallback\n"));
+  FXTRACE((100,"statusDoneCallback\n"));
   }
 
 
 void FXComposeContext::statusDrawCallback(void*,FXComposeContext* cc,void* ptr){
 #ifndef NO_XIM
   XIMStatusDrawCallbackStruct* drawstruct=(XIMStatusDrawCallbackStruct*)ptr;
-  FXTRACE((1,"statusDrawCallback\n"));
+  FXTRACE((100,"statusDrawCallback\n"));
 #endif
   }
 
 
 // Delete input context
 FXComposeContext::~FXComposeContext(){
-  FXTRACE((1,"FXComposeContext::~FXComposeContext %p\n",this));
+  FXTRACE((100,"FXComposeContext::~FXComposeContext %p\n",this));
   destroy();
   window=(FXWindow*)-1L;
   }

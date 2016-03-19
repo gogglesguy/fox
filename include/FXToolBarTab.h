@@ -3,7 +3,7 @@
 *                       T o o l   B a r   T a b   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolBarTab.h,v 1.12 2006/03/31 07:33:04 fox Exp $                      *
+* $Id: FXToolBarTab.h,v 1.14 2007/02/07 20:21:59 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXTOOLBARTAB_H
 #define FXTOOLBARTAB_H
@@ -92,7 +92,7 @@ public:
   FXToolBarTab(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=FRAME_RAISED,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Toolbar tab can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Return default width
   virtual FXint getDefaultWidth();
@@ -107,10 +107,10 @@ public:
   virtual void disable();
 
   /// Collapse or uncollapse the toolbar
-  void collapse(bool fold,bool notify=false);
+  void collapse(FXbool fold,FXbool notify=false);
 
   /// Return true if the toolbar is collapsed
-  bool isCollapsed() const { return collapsed; }
+  FXbool isCollapsed() const { return collapsed; }
 
   /// Change the tab style
   void setTabStyle(FXuint style);

@@ -3,7 +3,7 @@
 *                       S t a t u s B a r   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStatusBar.h,v 1.8 2006/03/31 07:33:03 fox Exp $                        *
+* $Id: FXStatusBar.h,v 1.12 2007/02/07 20:21:58 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXSTATUSBAR_H
 #define FXSTATUSBAR_H
@@ -67,10 +67,10 @@ public:
   virtual void layout();
 
   /// Show or hide the drag corner
-  void setCornerStyle(bool withcorner=true);
+  void setCornerStyle(FXbool withcorner=true);
 
-  /// Return TRUE if drag corner shown
-  bool getCornerStyle() const;
+  /// Return true if drag corner shown
+  FXbool getCornerStyle() const;
 
   /// Acess the status line widget
   FXStatusLine *getStatusLine() const { return status; }

@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2005 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: main.cpp,v 1.19 2005/11/23 07:07:06 fox Exp $                            *
+* $Id: main.cpp,v 1.24 2007/03/13 21:51:15 fox Exp $                            *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -64,7 +64,7 @@ int main(int argc,char *argv[]){
   TextWindow *window=NULL;
   FXchar     *language=NULL;
   FXchar     *tags=NULL;
-  FXbool      edit=TRUE;
+  FXbool      edit=true;
   FXint       line=0;
   FXString    file;
   FXint       arg;
@@ -113,7 +113,7 @@ int main(int argc,char *argv[]){
       g=fxparsegeometry(argv[arg],x,y,w,h);
       }
     else if(compare(argv[arg],"-V")==0 || compare(argv[arg],"--version")==0){
-      fprintf(stdout,"Adie - ADvanced Interactive Editor %d.%d.%d.\nCopyright (C) 1998,2003 Jeroen van der Zijp.\n\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
+      fprintf(stdout,"Adie - ADvanced Interactive Editor %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp.\n\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
       exit(0);
       }
 
@@ -122,12 +122,18 @@ int main(int argc,char *argv[]){
       file=FXPath::absolute(argv[arg]);
       window=new TextWindow(&application,"untitled");
       window->create();
-      window->loadFile(file);
-      window->readBookmarks(file);
-      window->readView(file);
-      window->setEditable(edit);
+      if(window->loadFile(file)){
+        window->readBookmarks(file);
+        window->readView(file);
+        window->setEditable(edit);
+        if(line) window->visitLine(line);
+        }
+      else{
+        window->setFilename(file);
+        window->setFilenameSet(true);
+        window->setSyntax(application.getSyntaxForFile(file));
+        }
       if(language) window->forceSyntax(language);
-      if(line) window->visitLine(line);
       }
     }
 

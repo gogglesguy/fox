@@ -3,7 +3,7 @@
 *              P r i v a t e   I n t e r n a l   F u n c t i o n s              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxpriv.cpp,v 1.48 2006/03/25 06:37:55 fox Exp $                          *
+* $Id: fxpriv.cpp,v 1.52 2007/03/01 17:06:48 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -63,11 +63,11 @@ namespace FX {
 static FXbool fxwaitforevent(Display *display,Window window,int type,XEvent& event){
   FXuint loops=1000;
   while(!XCheckTypedWindowEvent(display,window,type,&event)){
-    if(loops==0){ fxwarning("timed out\n"); return FALSE; }
+    if(loops==0){ fxwarning("timed out\n"); return false; }
     FXThread::sleep(10000000);  // Don't burn too much CPU here:- the other guy needs it more....
     loops--;
     }
-  return TRUE;
+  return true;
   }
 
 
@@ -89,7 +89,7 @@ Atom fxsendrequest(Display *display,Window window,Atom selection,Atom prop,Atom 
 Atom fxsendreply(Display *display,Window window,Atom selection,Atom prop,Atom target,FXuint time){
   XEvent se;
   se.xselection.type=SelectionNotify;
-  se.xselection.send_event=TRUE;
+  se.xselection.send_event=true;
   se.xselection.display=display;
   se.xselection.requestor=window;
   se.xselection.selection=selection;
@@ -293,7 +293,7 @@ void FXApp::selectionGetTypes(const FXWindow* window,FXDragType*& types,FXuint& 
     }
   else{
     answer=fxsendrequest((Display*)display,window->id(),XA_PRIMARY,ddeAtom,ddeTargets,event.time);
-    fxrecvtypes((Display*)display,window->id(),answer,types,numtypes,TRUE);
+    fxrecvtypes((Display*)display,window->id(),answer,types,numtypes,true);
     }
   }
 
@@ -344,7 +344,7 @@ void FXApp::clipboardGetTypes(const FXWindow* window,FXDragType*& types,FXuint& 
     }
   else{
     answer=fxsendrequest((Display*)display,window->id(),xcbSelection,ddeAtom,ddeTargets,event.time);
-    fxrecvtypes((Display*)display,window->id(),answer,types,numtypes,TRUE);
+    fxrecvtypes((Display*)display,window->id(),answer,types,numtypes,true);
     }
   }
 
@@ -413,8 +413,8 @@ HANDLE fxsenddata(HWND window,FXuchar* data,FXuint size){
         UnmapViewOfFile(ptr);
         }
       GetWindowThreadProcessId((HWND)window,&processid);
-      process=OpenProcess(PROCESS_DUP_HANDLE,TRUE,processid);
-      DuplicateHandle(GetCurrentProcess(),hMap,process,&hMapCopy,FILE_MAP_ALL_ACCESS,TRUE,DUPLICATE_CLOSE_SOURCE|DUPLICATE_SAME_ACCESS);
+      process=OpenProcess(PROCESS_DUP_HANDLE,true,processid);
+      DuplicateHandle(GetCurrentProcess(),hMap,process,&hMapCopy,FILE_MAP_ALL_ACCESS,true,DUPLICATE_CLOSE_SOURCE|DUPLICATE_SAME_ACCESS);
       CloseHandle(process);
       }
     return hMapCopy;
@@ -501,8 +501,6 @@ void FXApp::selectionGetTypes(const FXWindow*,FXDragType*& types,FXuint& numtype
 /*******************************************************************************/
 
 
-
-
 // Change CLIPBOARD selection data
 void FXApp::clipboardSetData(const FXWindow*,FXDragType type,FXuchar* data,FXuint size){
   HGLOBAL hGlobalMemory=GlobalAlloc(GMEM_MOVEABLE,size);
@@ -539,7 +537,6 @@ void FXApp::clipboardGetData(const FXWindow* window,FXDragType type,FXuchar*& da
   }
 
 
-
 // Retrieve CLIPBOARD selection types
 void FXApp::clipboardGetTypes(const FXWindow* window,FXDragType*& types,FXuint& numtypes){
   FXuint count;
@@ -559,7 +556,6 @@ void FXApp::clipboardGetTypes(const FXWindow* window,FXDragType*& types,FXuint& 
   }
 
 /*******************************************************************************/
-
 
 
 // Change DND selection data
@@ -600,6 +596,31 @@ void FXApp::dragdropGetTypes(const FXWindow*,FXDragType*& types,FXuint& numtypes
   }
 
 
+/*******************************************************************************/
+
+
+// When called, grab the true API from the DLL if we can
+static BOOL WINAPI MyGetMonitorInfo(HANDLE monitor,MYMONITORINFO* minfo){
+  HINSTANCE hUser32;
+  if((hUser32=GetModuleHandleA("USER32")) && (fxGetMonitorInfo=(PFNGETMONITORINFO)GetProcAddress(hUser32,"GetMonitorInfoA"))){
+    return fxGetMonitorInfo(monitor,minfo);
+    }
+  return 0;
+  }
+
+
+// When called, grab the true API from the DLL if we can
+static HANDLE WINAPI MyMonitorFromRect(RECT* rect,DWORD flags){
+  HINSTANCE hUser32;
+  if((hUser32=GetModuleHandleA("USER32")) && (fxMonitorFromRect=(PFNMONITORFROMRECT)GetProcAddress(hUser32,"MonitorFromRect"))){
+    return fxMonitorFromRect(rect,flags);
+    }
+  return NULL;
+  }
+
+
+PFNGETMONITORINFO fxGetMonitorInfo=MyGetMonitorInfo;
+PFNMONITORFROMRECT fxMonitorFromRect=MyMonitorFromRect;
 
 #endif
 

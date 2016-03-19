@@ -3,7 +3,7 @@
 *                      O n - L i n e   H e l p   T e x t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: help.h,v 1.4 2006/01/22 18:01:12 fox Exp $                               *
+* $Id: help.h,v 1.5 2007/02/07 20:21:51 fox Exp $                               *
 ********************************************************************************/
 #ifndef HELP_H
 #define HELP_H

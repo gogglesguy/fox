@@ -3,7 +3,7 @@
 *                      C o l o r   N a m e   F u n c t i o n s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXColorNames.cpp,v 1.28 2006/01/22 17:58:20 fox Exp $                    *
+* $Id: FXColorNames.cpp,v 1.30 2007/02/07 20:22:03 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -30,6 +30,9 @@
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
+
+#define MAXCOLORNAME 24
+
 
 using namespace FX;
 
@@ -789,7 +792,7 @@ FXchar* fxnamefromcolor(FXchar* colorname,FXColor color){
   else{
     for(i=0; i<ARRAYNUMBER(fxcolornames); i++){
       if(fxcolornames[i].color==color){
-        strcpy(colorname,fxcolornames[i].name);
+        strncpy(colorname,fxcolornames[i].name,MAXCOLORNAME);
         return colorname;
         }
       }

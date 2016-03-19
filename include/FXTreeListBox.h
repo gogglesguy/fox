@@ -3,7 +3,7 @@
 *                      T r e e   L i s t   B o x   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTreeListBox.h,v 1.42 2006/03/31 07:33:04 fox Exp $                     *
+* $Id: FXTreeListBox.h,v 1.47 2007/02/07 20:21:59 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXTREELISTBOX_H
 #define FXTREELISTBOX_H
@@ -49,6 +49,9 @@ class FXPopup;
 * When an item is selected it issues a SEL_COMMAND message with the
 * pointer to the item.  While manipulating the tree list, it may send
 * SEL_CHANGED messages to indicate which item the cursor is hovering over.
+* When items are added, replaced, or removed, the list sends messages of
+* the type SEL_INSERTED, SEL_REPLACED, or SEL_DELETED, with the pointer to
+* the affected item as argument.
 */
 class FXAPI FXTreeListBox : public FXPacker {
   FXDECLARE(FXTreeListBox)
@@ -69,7 +72,7 @@ public:
   long onMouseWheel(FXObject*,FXSelector,void*);
   long onFieldButton(FXObject*,FXSelector,void*);
   long onTreeUpdate(FXObject*,FXSelector,void*);
-  long onTreeChanged(FXObject*,FXSelector,void*);
+  long onTreeForward(FXObject*,FXSelector,void*);
   long onTreeClicked(FXObject*,FXSelector,void*);
 public:
   enum{
@@ -121,44 +124,53 @@ public:
   /// Return last top-level item
   FXTreeItem* getLastItem() const;
 
+  /// Return true if item is the current item
+  FXbool isItemCurrent(const FXTreeItem* item) const;
+
+  /// Change current item
+  virtual void setCurrentItem(FXTreeItem* item,FXbool notify=false);
+
+  /// Return current item
+  FXTreeItem* getCurrentItem() const;
+
   /// Fill tree list box by appending items from array of strings
-  FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL);
+  FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Fill tree list box by appending items from newline separated strings
-  FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL);
+  FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Insert [possibly subclassed] item under father before other item
-  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item);
+  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Insert item with given text and optional icons, and user-data pointer under father before other item
-  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL);
+  FXTreeItem* insertItem(FXTreeItem* other,FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Append [possibly subclassed] item as last child of father
-  FXTreeItem* appendItem(FXTreeItem* father,FXTreeItem* item);
+  FXTreeItem* appendItem(FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Append item with given text and optional icons, and user-data pointer as last child of father
-  FXTreeItem* appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL);
+  FXTreeItem* appendItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend [possibly subclassed] item as first child of father
-  FXTreeItem* prependItem(FXTreeItem* father,FXTreeItem* item);
+  FXTreeItem* prependItem(FXTreeItem* father,FXTreeItem* item,FXbool notify=false);
 
   /// Prepend item with given text and optional icons, and user-data pointer as first child of father
-  FXTreeItem* prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL);
+  FXTreeItem* prependItem(FXTreeItem* father,const FXString& text,FXIcon* oi=NULL,FXIcon* ci=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Move item under father before other item
   FXTreeItem *moveItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item);
 
   /// Extract item
-  FXTreeItem* extractItem(FXTreeItem* item);
+  FXTreeItem* extractItem(FXTreeItem* item,FXbool notify=false);
 
   /// Remove item
-  void removeItem(FXTreeItem* item);
+  void removeItem(FXTreeItem* item,FXbool notify=false);
 
   /// Remove all items in range [fm...to]
-  void removeItems(FXTreeItem* fm,FXTreeItem* to);
+  void removeItems(FXTreeItem* fm,FXTreeItem* to,FXbool notify=false);
 
   /// Remove all items from list
-  void clearItems();
+  void clearItems(FXbool notify=false);
 
   /**
   * Search items by name, beginning from item start.  If the
@@ -181,11 +193,8 @@ public:
   */
   FXTreeItem* findItemByData(const void *ptr,FXTreeItem* start=NULL,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
-  /// Return TRUE if item is the current item
-  bool isItemCurrent(const FXTreeItem* item) const;
-
-  /// Return TRUE if item is leaf-item, i.e. has no children
-  bool isItemLeaf(const FXTreeItem* item) const;
+  /// Return true if item is leaf-item, i.e. has no children
+  FXbool isItemLeaf(const FXTreeItem* item) const;
 
   /// Sort the toplevel items with the sort function
   void sortRootItems();
@@ -196,12 +205,6 @@ public:
   /// Sort child items of item
   void sortChildItems(FXTreeItem* item);
 
-  /// Change current item
-  virtual void setCurrentItem(FXTreeItem* item,bool notify=false);
-
-  /// Return current item
-  FXTreeItem* getCurrentItem() const;
-
   /// Change item label
   void setItemText(FXTreeItem* item,const FXString& text);
 
@@ -209,13 +212,13 @@ public:
   FXString getItemText(const FXTreeItem* item) const;
 
   /// Change item's open icon, delete old one if it was owned
-  void setItemOpenIcon(FXTreeItem* item,FXIcon* icon,bool owned=false);
+  void setItemOpenIcon(FXTreeItem* item,FXIcon* icon,FXbool owned=false);
 
   /// Return item's open icon
   FXIcon* getItemOpenIcon(const FXTreeItem* item) const;
 
   /// Change item's closed icon, delete old one if it was owned
-  void setItemClosedIcon(FXTreeItem* item,FXIcon* icon,bool owned=false);
+  void setItemClosedIcon(FXTreeItem* item,FXIcon* icon,FXbool owned=false);
 
   /// Return item's closed icon
   FXIcon* getItemClosedIcon(const FXTreeItem* item) const;
@@ -233,7 +236,7 @@ public:
   void setSortFunc(FXTreeListSortFunc func);
 
   /// Is the pane shown
-  bool isPaneShown() const;
+  FXbool isPaneShown() const;
 
   /// Change font
   void setFont(FXFont* fnt);

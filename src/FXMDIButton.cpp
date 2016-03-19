@@ -3,7 +3,7 @@
 *             M u l t i p l e   D o c u m e n t   B u t t o n                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXMDIButton.cpp,v 1.28 2006/01/22 17:58:33 fox Exp $                     *
+* $Id: FXMDIButton.cpp,v 1.30 2007/02/07 20:22:12 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -409,7 +409,7 @@ FXIMPLEMENT(FXMDIMenu,FXMenuPane,NULL,0)
 
 
 // Convenience constructor
-FXMDIMenu::FXMDIMenu(FXWindow *owner,FXObject* tgt):FXMenuPane(owner){
+FXMDIMenu::FXMDIMenu(FXWindow *own,FXObject* tgt):FXMenuPane(own){
   closeicon=new FXGIFIcon(getApp(),winclose);
   maximizeicon=new FXGIFIcon(getApp(),winmaximize);
   minimizeicon=new FXGIFIcon(getApp(),winminimize);

@@ -3,7 +3,7 @@
 *                             B i t m a p    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBitmap.h,v 1.39 2006/04/02 22:46:25 fox Exp $                          *
+* $Id: FXBitmap.h,v 1.41 2007/02/07 20:21:52 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXBITMAP_H
 #define FXBITMAP_H
@@ -111,10 +111,10 @@ public:
   FXuchar* getData() const { return data; }
 
   /// Get pixel at x,y
-  bool getPixel(FXint x,FXint y) const { return (bool)((data[y*bytewidth+(x>>3)]>>(x&7))&1); }
+  FXbool getPixel(FXint x,FXint y) const { return (FXbool)((data[y*bytewidth+(x>>3)]>>(x&7))&1); }
 
   /// Change pixel at x,y
-  void setPixel(FXint x,FXint y,bool color){ color ? data[y*bytewidth+(x>>3)]|=(1<<(x&7)) : data[y*bytewidth+(x>>3)]&=~(1<<(x&7)); }
+  void setPixel(FXint x,FXint y,FXbool color){ color ? data[y*bytewidth+(x>>3)]|=(1<<(x&7)) : data[y*bytewidth+(x>>3)]&=~(1<<(x&7)); }
 
   /**
   * Create the server side pixmap, then call render() to fill it with the
@@ -168,7 +168,7 @@ public:
   virtual void scale(FXint w,FXint h);
 
   /// Mirror bitmap horizontally and/or vertically
-  virtual void mirror(bool horizontal,bool vertical);
+  virtual void mirror(FXbool horizontal,FXbool vertical);
 
   /// Rotate bitmap by degrees ccw
   virtual void rotate(FXint degrees);
@@ -179,10 +179,10 @@ public:
   * than the old one; blank areas are filled with color. There must be at
   * least one pixel of overlap between the old and the new bitmap.
   */
-  virtual void crop(FXint x,FXint y,FXint w,FXint h,bool color=false);
+  virtual void crop(FXint x,FXint y,FXint w,FXint h,FXbool color=false);
 
   /// Fill bitmap with uniform value
-  virtual void fill(bool color);
+  virtual void fill(FXbool color);
 
   /// Save object to stream
   virtual void save(FXStream& store) const;
@@ -191,10 +191,10 @@ public:
   virtual void load(FXStream& store);
 
   /// Save pixel data only
-  virtual bool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const;
 
   /// Load pixel data only
-  virtual bool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store);
 
   /// Cleanup
   virtual ~FXBitmap();

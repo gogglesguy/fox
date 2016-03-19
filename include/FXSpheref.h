@@ -3,7 +3,7 @@
 *           S i n g l e - P r e c i s i o n    S p h e r e    C l a s s         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSpheref.h,v 1.18 2006/01/22 17:58:09 fox Exp $                         *
+* $Id: FXSpheref.h,v 1.20 2007/02/07 20:21:58 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSPHEREF_H
 #define FXSPHEREF_H
@@ -66,26 +66,26 @@ public:
   FXSpheref& set(FXfloat x,FXfloat y,FXfloat z,FXfloat rad){ center.set(x,y,z); radius=rad; return *this; }
 
   /// Comparison
-  bool operator==(const FXSpheref& s) const { return center==s.center && radius==s.radius;}
-  bool operator!=(const FXSpheref& s) const { return center!=s.center || radius!=s.radius;}
+  FXbool operator==(const FXSpheref& s) const { return center==s.center && radius==s.radius;}
+  FXbool operator!=(const FXSpheref& s) const { return center!=s.center || radius!=s.radius;}
 
   /// Diameter of sphere
   FXfloat diameter() const { return radius*2.0f; }
 
   /// Test if empty
-  bool empty() const { return radius<0.0f; }
+  FXbool empty() const { return radius<0.0f; }
 
   /// Test if sphere contains point x,y,z
-  bool contains(FXfloat x,FXfloat y,FXfloat z) const;
+  FXbool contains(FXfloat x,FXfloat y,FXfloat z) const;
 
   /// Test if sphere contains point p
-  bool contains(const FXVec3f& p) const;
+  FXbool contains(const FXVec3f& p) const;
 
   /// Test if sphere properly contains another box
-  bool contains(const FXRangef& box) const;
+  FXbool contains(const FXRangef& box) const;
 
   /// Test if sphere properly contains another sphere
-  bool contains(const FXSpheref& sphere) const;
+  FXbool contains(const FXSpheref& sphere) const;
 
   /// Include point
   FXSpheref& include(FXfloat x,FXfloat y,FXfloat z);
@@ -115,16 +115,16 @@ public:
   FXint intersect(const FXVec4f& plane) const;
 
   /// Intersect sphere with ray u-v
-  bool intersect(const FXVec3f& u,const FXVec3f& v) const;
+  FXbool intersect(const FXVec3f& u,const FXVec3f& v) const;
 
   /// Test if box overlaps with sphere
-  friend FXAPI bool overlap(const FXRangef& a,const FXSpheref& b);
+  friend FXAPI FXbool overlap(const FXRangef& a,const FXSpheref& b);
 
   /// Test if sphere overlaps with box
-  friend FXAPI bool overlap(const FXSpheref& a,const FXRangef& b);
+  friend FXAPI FXbool overlap(const FXSpheref& a,const FXRangef& b);
 
   /// Test if spheres overlap
-  friend FXAPI bool overlap(const FXSpheref& a,const FXSpheref& b);
+  friend FXAPI FXbool overlap(const FXSpheref& a,const FXSpheref& b);
 
   /// Save object to a stream
   friend FXAPI FXStream& operator<<(FXStream& store,const FXSpheref& sphere);
@@ -134,9 +134,9 @@ public:
   };
 
 
-extern FXAPI bool overlap(const FXRangef& a,const FXSpheref& b);
-extern FXAPI bool overlap(const FXSpheref& a,const FXRangef& b);
-extern FXAPI bool overlap(const FXSpheref& a,const FXSpheref& b);
+extern FXAPI FXbool overlap(const FXRangef& a,const FXSpheref& b);
+extern FXAPI FXbool overlap(const FXSpheref& a,const FXRangef& b);
+extern FXAPI FXbool overlap(const FXSpheref& a,const FXSpheref& b);
 
 extern FXAPI FXStream& operator<<(FXStream& store,const FXSpheref& sphere);
 extern FXAPI FXStream& operator>>(FXStream& store,FXSpheref& sphere);

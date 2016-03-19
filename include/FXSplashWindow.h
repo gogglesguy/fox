@@ -3,7 +3,7 @@
 *                            S p l a s h    W i n d o w                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSplashWindow.h,v 1.10 2006/01/22 17:58:09 fox Exp $                     *
+* $Id: FXSplashWindow.h,v 1.13 2007/02/07 20:21:58 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXSPLASHWINDOW_H
 #define FXSPLASHWINDOW_H
@@ -50,7 +50,7 @@ class FXAPI FXSplashWindow : public FXTopWindow {
   FXDECLARE(FXSplashWindow)
 protected:
   FXIcon *icon;         // Really big icon
-  FXuint  delay;        // Delay before hiding
+  FXTime  delay;        // Delay before hiding
 protected:
   FXSplashWindow();
 private:
@@ -60,11 +60,21 @@ public:
   long onPaint(FXObject*,FXSelector,void*);
 public:
 
-  /// Construct splash window
-  FXSplashWindow(FXApp* ap,FXIcon* ic,FXuint opts=SPLASH_SIMPLE,FXuint ms=5000);
+  /**
+  * Construct splash window; the window will be automatically hidden (or deleted
+  * if SPLASH_DESTROY is passed) after a given delay, specified in nanoseconds).
+  * The splash window is free floating.  Use this constructor when the splash window
+  * is to be displayed before the main window appears.
+  */
+  FXSplashWindow(FXApp* ap,FXIcon* ic,FXuint opts=SPLASH_SIMPLE,FXTime ns=2000000000);
 
-  /// Construct splash window
-  FXSplashWindow(FXWindow* ow,FXIcon* ic,FXuint opts=SPLASH_SIMPLE,FXuint ms=5000);
+  /**
+  * Construct splash window; the window will be automatically hidden (or deleted
+  * if SPLASH_DESTROY is passed) after a given delay, specified in nanoseconds).
+  * The splash window stays on top of its owner window, which must already have been
+  * created previously.
+  */
+  FXSplashWindow(FXWindow* ow,FXIcon* ic,FXuint opts=SPLASH_SIMPLE,FXTime ns=2000000000);
 
   /// Create
   virtual void create();
@@ -93,11 +103,11 @@ public:
   /// Get the icon for this splash window
   FXIcon* getIcon() const { return icon; }
 
-  /// Set or change delay
-  void setDelay(FXuint ms);
+  /// Set or change delay in nanoseconds
+  void setDelay(FXTime ns);
 
   /// Return delay
-  FXuint getDelay() const { return delay; }
+  FXTime getDelay() const { return delay; }
 
   /// Save label to a stream
   virtual void save(FXStream& store) const;

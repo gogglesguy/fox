@@ -3,7 +3,7 @@
 *                             K n o b   W i d g e t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Leandro Nini.   All Rights Reserved.               *
+* Copyright (C) 2005,2007 by Leandro Nini.   All Rights Reserved.               *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXKnob.h,v 1.8 2006/03/31 07:33:01 fox Exp $                             *
+* $Id: FXKnob.h,v 1.11 2007/02/07 20:21:55 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXKNOB_H
 #define FXKNOB_H
@@ -82,6 +82,8 @@ public:
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetRealValue(FXObject*,FXSelector,void*);
   long onCmdGetRealValue(FXObject*,FXSelector,void*);
   long onCmdSetIntRange(FXObject*,FXSelector,void*);
@@ -105,7 +107,7 @@ public:
   FXKnob(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=KNOB_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Returns true because a knob can receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Return default width
   virtual FXint getDefaultWidth();
@@ -123,13 +125,13 @@ public:
   virtual void disable();
 
   /// Change knob value
-  void setValue(FXint value,bool notify=false);
+  void setValue(FXint value,FXbool notify=false);
 
   /// Return knob value
   FXint getValue() const { return pos; }
 
   /// Change the knob's range
-  void setRange(FXint lo,FXint hi,bool notify=false);
+  void setRange(FXint lo,FXint hi,FXbool notify=false);
 
   /// Get the knob's current range
   void getRange(FXint& lo,FXint& hi) const { lo=range[0]; hi=range[1]; }
@@ -138,7 +140,7 @@ public:
   * Change the knob's movement limits (start and ending angles)
   * accept values in degrees from 0 (south) to 360.
   */
-  void setLimits(FXint start,FXint end,bool notify=false);
+  void setLimits(FXint start,FXint end,FXbool notify=false);
 
   /// Get the knob's current limits
   void getLimits(FXint& start,FXint& end);

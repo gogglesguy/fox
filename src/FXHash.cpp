@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXHash.cpp,v 1.27 2006/03/22 05:38:23 fox Exp $                          *
+* $Id: FXHash.cpp,v 1.30 2007/02/07 20:22:09 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -59,10 +59,10 @@ namespace FX {
 // Make empty table
 FXHash::FXHash(){
   allocElms(table,2);
-  table[0].key=NULL;
-  table[0].value=NULL;
-  table[1].key=NULL;
-  table[1].value=NULL;
+  table[0].name=NULL;
+  table[0].data=NULL;
+  table[1].name=NULL;
+  table[1].data=NULL;
   total=2;
   used=0;
   free=2;
@@ -71,19 +71,19 @@ FXHash::FXHash(){
 
 // Resize hash table, and rehash old stuff into it
 void FXHash::size(FXuint m){
-  register void *key,*value;
+  register void *name,*data;
   register FXuint q,x,i;
   FXEntry *newtable;
   callocElms(newtable,m);
   for(i=0; i<total; i++){
-    key=table[i].key;
-    value=table[i].value;
-    if(key==NULL || key==(void*)-1L) continue;
-    q=HASH1(key,m);
-    x=HASH2(key,m);
-    while(newtable[q].key) q=(q+x)&(m-1);
-    newtable[q].key=key;
-    newtable[q].value=value;
+    name=table[i].name;
+    data=table[i].data;
+    if(name==NULL || name==(void*)-1L) continue;
+    q=HASH1(name,m);
+    x=HASH2(name,m);
+    while(newtable[q].name) q=(q+x)&(m-1);
+    newtable[q].name=name;
+    newtable[q].data=data;
     }
   freeElms(table);
   table=newtable;
@@ -93,94 +93,94 @@ void FXHash::size(FXuint m){
 
 
 // Insert key into the table
-void* FXHash::insert(void* key,void* value){
+void* FXHash::insert(void* name,void* data){
   register FXuint p,q,x;
-  if(key){
+  if(name){
     if((free<<1)<=total) size(total<<1);
-    p=HASH1(key,total);
-    x=HASH2(key,total);
+    p=HASH1(name,total);
+    x=HASH2(name,total);
     q=p;
-    while(table[q].key){
-      if(table[q].key==key) goto y;             // Return existing
+    while(table[q].name){
+      if(table[q].name==name) goto y;              // Return existing
       q=(q+x)&(total-1);
       }
     q=p;
-    while(table[q].key){
-      if(table[q].key==(void*)-1L) goto x;      // Put it in empty slot
+    while(table[q].name){
+      if(table[q].name==(void*)-1L) goto x;      // Put it in empty slot
       q=(q+x)&(total-1);
       }
     free--;
 x:  used++;
-    table[q].key=key;
-    table[q].value=value;
-y:  return table[q].value;
+    table[q].name=name;
+    table[q].data=data;
+y:  return table[q].data;
     }
   return NULL;
   }
 
 
 // Replace key in the table, returning old one
-void* FXHash::replace(void* key,void* value){
+void* FXHash::replace(void* name,void* data){
   register FXuint p,q,x;
-  register void* val;
-  if(key){
+  register void* old;
+  if(name){
     if((free<<1)<=total) size(total<<1);
-    p=HASH1(key,total);
-    x=HASH2(key,total);
+    p=HASH1(name,total);
+    x=HASH2(name,total);
     q=p;
-    while(table[q].key){
-      if(table[q].key==key) goto y;             // Replace existing
+    while(table[q].name){
+      if(table[q].name==name) goto y;            // Replace existing
       q=(q+x)&(total-1);
       }
     q=p;
-    while(table[q].key){
-      if(table[q].key==(void*)-1L) goto x;      // Put it in empty slot
+    while(table[q].name){
+      if(table[q].name==(void*)-1L) goto x;      // Put it in empty slot
       q=(q+x)&(total-1);
       }
     free--;
 x:  used++;
-    table[q].key=key;
-y:  val=table[q].value;
-    table[q].value=value;
-    return val;
+    table[q].name=name;
+y:  old=table[q].data;
+    table[q].data=data;
+    return old;
     }
   return NULL;
   }
 
 
 // Remove association from the table
-void* FXHash::remove(void* key){
+void* FXHash::remove(void* name){
   register FXuint q,x;
-  register void* val;
-  if(key){
-    q=HASH1(key,total);
-    x=HASH2(key,total);
-    while(table[q].key!=key){
-      if(table[q].key==NULL) goto x;
+  register void* data;
+  if(name){
+    q=HASH1(name,total);
+    x=HASH2(name,total);
+    while(table[q].name!=name){
+      if(table[q].name==NULL) goto x;
       q=(q+x)&(total-1);
       }
-    val=table[q].value;
-    table[q].key=(void*)-1L;                    // Empty but not free
-    table[q].value=NULL;
+    data=table[q].data;
+    table[q].name=(void*)-1L;                    // Empty but not free
+    table[q].data=NULL;
     used--;
     if(used<(total>>2)) size(total>>1);
-    return val;
+    return data;
     }
 x:return NULL;
   }
 
 
 // Return true if association in table
-void* FXHash::find(void* key) const {
+void* FXHash::find(void* name) const {
   register FXuint q,x;
-  if(key){
-    q=HASH1(key,total);
-    x=HASH2(key,total);
-    while(table[q].key!=key){
-      if(table[q].key==NULL) goto x;
+  if(name){
+    q=HASH1(name,total);
+    x=HASH2(name,total);
+    while(table[q].name!=name){
+      if(table[q].name==NULL) goto x;
       q=(q+x)&(total-1);
       }
-    return table[q].value;
+    return table[q].data;
     }
 x:return NULL;
   }
@@ -189,10 +189,10 @@ x:return NULL;
 // Clear hash table
 void FXHash::clear(){
   resizeElms(table,2);
-  table[0].key=NULL;
-  table[0].value=NULL;
-  table[1].key=NULL;
-  table[1].value=NULL;
+  table[0].name=NULL;
+  table[0].data=NULL;
+  table[1].name=NULL;
+  table[1].data=NULL;
   total=2;
   used=0;
   free=2;

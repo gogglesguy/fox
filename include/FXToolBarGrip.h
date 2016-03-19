@@ -3,7 +3,7 @@
 *                       T o o l B a r G r i p   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXToolBarGrip.h,v 1.22 2006/03/31 07:33:04 fox Exp $                     *
+* $Id: FXToolBarGrip.h,v 1.25 2007/02/07 20:21:59 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXTOOLBARGRIP_H
 #define FXTOOLBARGRIP_H
@@ -74,13 +74,13 @@ public:
   virtual FXint getDefaultHeight();
 
   /// The grip can not receive the focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Change toolbar grip to double
-  void setDoubleBar(bool dbl=true);
+  void setDoubleBar(FXbool dbl=true);
 
-  /// Return TRUE if toolbar grip is displayed as a double bar
-  bool isDoubleBar() const;
+  /// Return true if toolbar grip is displayed as a double bar
+  FXbool isDoubleBar() const;
 
   /// Set the active color
   void setActiveColor(FXColor clr);

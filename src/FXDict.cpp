@@ -3,7 +3,7 @@
 *                          D i c t i o n a r y    C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDict.cpp,v 1.35 2006/03/25 18:03:43 fox Exp $                          *
+* $Id: FXDict.cpp,v 1.38 2007/02/07 20:22:05 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -141,11 +141,11 @@ FXDict& FXDict::operator=(const FXDict& orig){
   }
 
 
-// Defaul implementation
+// Default implementation
 void *FXDict::createData(void* ptr){ return ptr; }
 
 
-// Defaul implementation
+// Default implementation
 void FXDict::deleteData(void*){ }
 
 
@@ -185,7 +185,7 @@ void FXDict::size(FXint m){
 
 
 // Insert a new entry, leave it alone if already existing
-void* FXDict::insert(const FXchar* ky,void* pdata,bool mrk){
+void* FXDict::insert(const FXchar* ky,void* pdata,FXbool mrk){
   register FXint p,i,x,h,n;
   register void *ptr;
   if(!ky){ fxerror("FXDict::insert: NULL key argument.\n"); }
@@ -223,7 +223,7 @@ void* FXDict::insert(const FXchar* ky,void* pdata,bool mrk){
 
 
 // Add or replace entry
-void* FXDict::replace(const FXchar* ky,void* pdata,bool mrk){
+void* FXDict::replace(const FXchar* ky,void* pdata,FXbool mrk){
   register FXint p,i,x,h,n;
   register void *ptr;
   if(!ky){ fxerror("FXDict::replace: NULL key argument.\n"); }

@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSystem.h,v 1.11 2006/04/14 00:04:03 fox Exp $                          *
+* $Id: FXSystem.h,v 1.14 2007/02/07 20:21:59 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXSYSTEM_H
 #define FXSYSTEM_H
@@ -83,7 +83,7 @@ FXString FXAPI modeString(FXuint mode);
 FXString FXAPI getEnvironment(const FXString& name);
 
 /// Change value of environment variable name, return true if success
-bool FXAPI setEnvironment(const FXString& name,const FXString& value);
+FXbool FXAPI setEnvironment(const FXString& name,const FXString& value);
 
 
 
@@ -91,13 +91,13 @@ bool FXAPI setEnvironment(const FXString& name,const FXString& value);
 FXString FXAPI getCurrentDirectory();
 
 /// Set the current working directory
-bool FXAPI setCurrentDirectory(const FXString& path);
+FXbool FXAPI setCurrentDirectory(const FXString& path);
 
 /// Return the current drive (for Win32 systems)
 FXString FXAPI getCurrentDrive();
 
 /// Set the current drive (for Win32 systems)
-bool FXAPI setCurrentDrive(const FXString& prefix);
+FXbool FXAPI setCurrentDrive(const FXString& prefix);
 
 
 
@@ -116,6 +116,10 @@ FXString FXAPI getTempDirectory();
 
 /// Get process id
 FXint FXAPI getProcessId();
+
+
+/// Determine if UTF8 locale in effect
+FXbool FXAPI localeIsUTF8();
 
 
 /**

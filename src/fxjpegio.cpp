@@ -3,7 +3,7 @@
 *                      J P E G    I n p u t / O u t p u t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2007 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxjpegio.cpp,v 1.54 2006/03/25 06:23:45 fox Exp $                        *
+* $Id: fxjpegio.cpp,v 1.57 2007/02/07 20:22:20 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -73,9 +73,9 @@ using namespace FX;
 namespace FX {
 
 
-extern FXAPI bool fxcheckJPG(FXStream& store);
-extern FXAPI bool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality);
-extern FXAPI bool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
+extern FXAPI FXbool fxcheckJPG(FXStream& store);
+extern FXAPI FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality);
+extern FXAPI FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality);
 
 
 #ifdef HAVE_JPEG_H
@@ -138,7 +138,7 @@ src->pub.bytes_in_buffer=JPEG_BUFFER_SIZE;
     src->pub.next_input_byte=src->buffer;
     src->pub.bytes_in_buffer=1;
     }
-  return TRUE;
+  return true;
   }
 
 
@@ -162,7 +162,7 @@ static void term_source(j_decompress_ptr){
 
 
 // Check if stream contains a JPG
-bool fxcheckJPG(FXStream& store){
+FXbool fxcheckJPG(FXStream& store){
   FXuchar signature[2];
   store.load(signature,2);
   store.position(-2,FXFromCurrent);
@@ -172,7 +172,7 @@ bool fxcheckJPG(FXStream& store){
 
 
 // Load a JPEG image
-bool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&){
+FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&){
   jpeg_decompress_struct srcinfo;
   FOX_jpeg_error_mgr jerr;
   FOX_jpeg_source_mgr src;
@@ -200,7 +200,7 @@ bool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&)
   // Set error handling
   if(setjmp(jerr.jmpbuf)){
     jpeg_destroy_decompress(&srcinfo);
-    return FALSE;
+    return false;
     }
 
   // setup our src manager
@@ -217,7 +217,7 @@ bool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&)
   srcinfo.src=&src.pub;
 
   // read the header from the jpg;
-  jpeg_read_header(&srcinfo,TRUE);
+  jpeg_read_header(&srcinfo,true);
 
   // make sure the output is RGB
   srcinfo.out_color_space=JCS_RGB;
@@ -280,7 +280,7 @@ static boolean empty_output_buffer(j_compress_ptr cinfo){
   dest->stream->save(dest->buffer,JPEG_BUFFER_SIZE);
   dest->pub.free_in_buffer=JPEG_BUFFER_SIZE;
   dest->pub.next_output_byte=dest->buffer;
-  return TRUE;
+  return true;
   }
 
 
@@ -292,7 +292,7 @@ static void term_destination(j_compress_ptr cinfo){
 
 
 // Save a JPEG image
-bool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality){
+FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality){
   jpeg_compress_struct dstinfo;
   FOX_jpeg_error_mgr jerr;
   FOX_jpeg_dest_mgr dst;
@@ -337,8 +337,8 @@ bool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXin
   dstinfo.dest=&dst.pub;
 
   jpeg_set_defaults(&dstinfo);
-  jpeg_set_quality(&dstinfo,quality,TRUE);
-  jpeg_start_compress(&dstinfo,TRUE);
+  jpeg_set_quality(&dstinfo,quality,true);
+  jpeg_start_compress(&dstinfo,true);
 
   // Write the jpeg data
   pp=data;
@@ -367,13 +367,13 @@ bool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXin
 
 
 // Check if stream contains a JPG
-bool fxcheckJPG(FXStream&){
+FXbool fxcheckJPG(FXStream&){
   return false;
   }
 
 
 // Stub routine
-bool fxloadJPG(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& quality){
+FXbool fxloadJPG(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& quality){
   static const FXuchar jpeg_bits[] = {
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
@@ -399,7 +399,7 @@ bool fxloadJPG(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& qualit
 
 
 // Stub routine
-bool fxsaveJPG(FXStream&,const FXColor*,FXint,FXint,FXint){
+FXbool fxsaveJPG(FXStream&,const FXColor*,FXint,FXint,FXint){
   return false;
   }
 

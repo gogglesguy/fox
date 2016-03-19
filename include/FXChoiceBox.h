@@ -3,7 +3,7 @@
 *                            C h o i c e   B o x                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXChoiceBox.h,v 1.8 2006/01/22 17:57:59 fox Exp $                        *
+* $Id: FXChoiceBox.h,v 1.9 2007/02/07 20:21:52 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCHOICEBOX_H
 #define FXCHOICEBOX_H

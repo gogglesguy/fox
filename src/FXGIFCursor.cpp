@@ -3,7 +3,7 @@
 *                        G I F   C u r s o r   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Daniel Gehriger.   All Rights Reserved.            *
+* Copyright (C) 2000,2007 by Daniel Gehriger.   All Rights Reserved.            *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGIFCursor.cpp,v 1.34 2006/03/24 06:05:03 fox Exp $                     *
+* $Id: FXGIFCursor.cpp,v 1.36 2007/02/07 20:22:08 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -79,7 +79,7 @@ FXGIFCursor::FXGIFCursor(FXApp* a,const void *pix,FXint hx,FXint hy):FXCursor(a,
 
 
 // Save object to stream
-bool FXGIFCursor::savePixels(FXStream& store) const {
+FXbool FXGIFCursor::savePixels(FXStream& store) const {
   if(fxsaveGIF(store,data,width,height)){
     return true;
     }
@@ -88,7 +88,7 @@ bool FXGIFCursor::savePixels(FXStream& store) const {
 
 
 // Load object from stream
-bool FXGIFCursor::loadPixels(FXStream& store){
+FXbool FXGIFCursor::loadPixels(FXStream& store){
   if(options&CURSOR_OWNED){freeElms(data);}
   if(fxloadGIF(store,data,width,height)){
     options|=CURSOR_OWNED;

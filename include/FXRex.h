@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRex.h,v 1.53 2006/01/22 17:58:09 fox Exp $                             *
+* $Id: FXRex.h,v 1.57 2007/02/07 20:21:58 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXREX_H
 #define FXREX_H
@@ -44,7 +44,8 @@ enum FXRexError {
   REGERR_CLASS,             /// Bad character class
   REGERR_COMPLEX,           /// Expression too complex
   REGERR_MEMORY,            /// Out of memory
-  REGERR_TOKEN              /// Illegal token
+  REGERR_TOKEN,             /// Illegal token
+  REGERR_BEHIND             /// Bad look-behind pattern
   };
 
 
@@ -124,7 +125,7 @@ public:
   * will be empty when it is unable to parse a pattern due to
   * a syntax error.
   */
-  bool empty() const { return (code==fallback); }
+  FXbool empty() const { return (code==fallback); }
 
   /// Parse pattern, return error code if syntax error is found
   FXRexError parse(const FXchar* pattern,FXint mode=REX_NORMAL);
@@ -133,16 +134,16 @@ public:
   FXRexError parse(const FXString& pattern,FXint mode=REX_NORMAL);
 
   /**
-  * Match a subject string of length len, returning TRUE if a match is found
-  * and FALSE otherwise.  The entire pattern is captured in beg[0] and end[0],
+  * Match a subject string of length len, returning true if a match is found
+  * and false otherwise.  The entire pattern is captured in beg[0] and end[0],
   * where beg[0] refers to the position of the first matched character and end[0]
   * refers to the position after the last matched character.
   * Sub expressions from capturing parenthesis i are returned in beg[i] and end[i].
   */
-  bool match(const FXchar* string,FXint len,FXint* beg=NULL,FXint* end=NULL,FXint mode=REX_FORWARD,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
+  FXbool match(const FXchar* string,FXint len,FXint* beg=NULL,FXint* end=NULL,FXint mode=REX_FORWARD,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
 
   /// Search for match in a string
-  bool match(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint mode=REX_FORWARD,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
+  FXbool match(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint mode=REX_FORWARD,FXint npar=1,FXint fm=0,FXint to=2147483647) const;
 
   /**
   * After performing a regular expression match with capturing parentheses,
@@ -160,8 +161,8 @@ public:
   static const FXchar* getError(FXRexError err){ return errors[err]; }
 
   /// Comparison operators
-  bool operator==(const FXRex& rex) const;
-  bool operator!=(const FXRex& rex) const;
+  FXbool operator==(const FXRex& rex) const;
+  FXbool operator!=(const FXRex& rex) const;
 
   /// Saving and loading
   friend FXAPI FXStream& operator<<(FXStream& store,const FXRex& s);

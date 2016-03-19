@@ -3,7 +3,7 @@
 *                          P i c k e r   B u t t o n                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPicker.cpp,v 1.21 2006/01/22 17:58:37 fox Exp $                        *
+* $Id: FXPicker.cpp,v 1.26 2007/02/07 20:22:13 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -41,6 +41,9 @@
 
 /*
   Notes:
+  - The SEL_COMMAND is generated when the mouse is released; this
+    is done so we won't report SEL_LEFTBUTTONRELEASE to the underlying
+    widget without a preceeding SEL_LEFTBUTTONPRESS.
 */
 
 using namespace FX;
@@ -54,10 +57,12 @@ namespace FX {
 // Map
 FXDEFMAP(FXPicker) FXPickerMap[]={
   FXMAPFUNC(SEL_MOTION,0,FXPicker::onMotion),
-  FXMAPFUNC(SEL_ENTER,0,FXPicker::onEnter),
-  FXMAPFUNC(SEL_LEAVE,0,FXPicker::onLeave),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,0,FXPicker::onLeftBtnPress),
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXPicker::onLeftBtnRelease),
+  FXMAPFUNC(SEL_KEYPRESS,0,FXPicker::onKeyPress),
+  FXMAPFUNC(SEL_KEYRELEASE,0,FXPicker::onKeyRelease),
+  FXMAPFUNC(SEL_KEYPRESS,FXPicker::ID_HOTKEY,FXPicker::onHotKeyPress),
+  FXMAPFUNC(SEL_KEYRELEASE,FXPicker::ID_HOTKEY,FXPicker::onHotKeyRelease),
   };
 
 
@@ -65,36 +70,30 @@ FXDEFMAP(FXPicker) FXPickerMap[]={
 FXIMPLEMENT(FXPicker,FXButton,FXPickerMap,ARRAYNUMBER(FXPickerMap))
 
 
+// Deserialization
+FXPicker::FXPicker(){
+  location.x=0;
+  location.y=0;
+  picked=false;
+  }
+
 
 // Construct and init
 FXPicker::FXPicker(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):
   FXButton(p,text,ic,tgt,sel,opts,x,y,w,h,pl,pr,pt,pb){
   dragCursor=getApp()->getDefaultCursor(DEF_CROSSHAIR_CURSOR);
-  }
-
-
-// Entered button
-long FXPicker::onEnter(FXObject* sender,FXSelector sel,void* ptr){
-  FXLabel::onEnter(sender,sel,ptr);
-  if(isEnabled() && (options&BUTTON_TOOLBAR)) update();
-  return 1;
-  }
-
-
-// Left button
-long FXPicker::onLeave(FXObject* sender,FXSelector sel,void* ptr){
-  FXLabel::onLeave(sender,sel,ptr);
-  if(isEnabled() && (options&BUTTON_TOOLBAR)) update();
-  return 1;
+  location.x=0;
+  location.y=0;
+  picked=false;
   }
 
 
 // Mouse moved
 long FXPicker::onMotion(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
-  if(state==STATE_DOWN){
-    FXPoint point(event->root_x,event->root_y);
-    if(target){ target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)&point); }
+  if(state==STATE_DOWN && !picked){
+    location.x=((FXEvent*)ptr)->root_x;
+    location.y=((FXEvent*)ptr)->root_y;
+    if(target){ target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)&location); }
     return 1;
     }
   return 0;
@@ -103,21 +102,18 @@ long FXPicker::onMotion(FXObject*,FXSelector,void* ptr){
 
 // Pressed mouse button
 long FXPicker::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   flags&=~FLAG_TIP;
-  if(isEnabled()){
-    if(state!=STATE_DOWN){
+  if(isEnabled() && !(flags&FLAG_PRESSED)){
+    flags|=FLAG_PRESSED;
+    if(state==STATE_UP){
       grab();
       setState(STATE_DOWN);
       flags&=~FLAG_UPDATE;
+      picked=false;
       }
     else{
-      ungrab();
-      flags|=FLAG_UPDATE;
-      setState(STATE_UP);
-      FXPoint point(event->root_x,event->root_y);
-      if(target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&point); }
+      picked=true;
       }
     return 1;
     }
@@ -127,7 +123,97 @@ long FXPicker::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
 
 // Released mouse button
 long FXPicker::onLeftBtnRelease(FXObject*,FXSelector,void*){
+  if(isEnabled() && (flags&FLAG_PRESSED)){
+    flags&=~FLAG_PRESSED;
+    if(state==STATE_DOWN && picked){
+      ungrab();
+      flags|=FLAG_UPDATE;
+      setState(STATE_UP);
+      picked=false;
+      if(target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&location); }
+      }
+    return 1;
+    }
   return 0;
+  }
+
+
+// Key Press
+long FXPicker::onKeyPress(FXObject*,FXSelector,void* ptr){
+  FXEvent* event=(FXEvent*)ptr;
+  flags&=~FLAG_TIP;
+  if(isEnabled() && !(flags&FLAG_PRESSED)){
+    if((event->code==KEY_space || event->code==KEY_KP_Space) || (isDefault() && (event->code==KEY_Return || event->code==KEY_KP_Enter))){
+      flags|=FLAG_PRESSED;
+      if(state==STATE_UP){
+        grab();
+        setState(STATE_DOWN);
+        flags&=~FLAG_UPDATE;
+        picked=false;
+        }
+      else{
+        picked=true;
+        }
+      return 1;
+      }
+    }
+  return 0;
+  }
+
+
+// Key Release
+long FXPicker::onKeyRelease(FXObject*,FXSelector,void* ptr){
+  FXEvent* event=(FXEvent*)ptr;
+  if(isEnabled() && (flags&FLAG_PRESSED)){
+    if((event->code==KEY_space || event->code==KEY_KP_Space) || (isDefault() && (event->code==KEY_Return || event->code==KEY_KP_Enter))){
+      flags&=~FLAG_PRESSED;
+      if(state==STATE_DOWN && picked){
+        ungrab();
+        flags|=FLAG_UPDATE;
+        setState(STATE_UP);
+        picked=false;
+        if(target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&location); }
+        }
+      return 1;
+      }
+    }
+  return 0;
+  }
+
+
+// Hot key combination pressed
+long FXPicker::onHotKeyPress(FXObject*,FXSelector,void* ptr){
+  flags&=~FLAG_TIP;
+  handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
+  if(isEnabled() && !(flags&FLAG_PRESSED)){
+    flags|=FLAG_PRESSED;
+    if(state==STATE_UP){
+      grab();
+      setState(STATE_DOWN);
+      flags&=~FLAG_UPDATE;
+      picked=false;
+      }
+    else{
+      picked=true;
+      }
+    }
+  return 1;
+  }
+
+
+// Hot key combination released
+long FXPicker::onHotKeyRelease(FXObject*,FXSelector,void*){
+  if(isEnabled() && (flags&FLAG_PRESSED)){
+    flags&=~FLAG_PRESSED;
+    if(state==STATE_DOWN && picked){
+      ungrab();
+      flags|=FLAG_UPDATE;
+      setState(STATE_UP);
+      picked=false;
+      if(target){ target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&location); }
+      }
+    }
+  return 1;
   }
 
 }

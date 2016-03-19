@@ -3,7 +3,7 @@
 *                     P o p u p   W i n d o w   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPopup.h,v 1.36 2006/03/31 07:33:03 fox Exp $                           *
+* $Id: FXPopup.h,v 1.40 2007/03/09 03:55:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXPOPUP_H
 #define FXPOPUP_H
@@ -55,7 +55,7 @@ protected:
   FXint     border;
 protected:
   FXPopup();
-  virtual bool doesOverrideRedirect() const;
+  virtual FXbool doesOverrideRedirect() const;
   void drawBorderRectangle(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
   void drawRaisedRectangle(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
   void drawSunkenRectangle(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
@@ -68,7 +68,7 @@ private:
   FXPopup(const FXPopup&);
   FXPopup &operator=(const FXPopup&);
 #ifdef WIN32
-  virtual const char* GetClass() const;
+  virtual const void* GetClass() const;
 #endif
 public:
   long onPaint(FXObject*,FXSelector,void*);
@@ -181,12 +181,12 @@ public:
   void setOrientation(FXuint orient);
 
   /// Return shrinkwrap mode
-  bool getShrinkWrap() const;
+  FXbool getShrinkWrap() const;
 
   /// Change shrinkwrap mode
-  void setShrinkWrap(bool sw);
+  void setShrinkWrap(FXbool flag);
 
-  virtual bool doesSaveUnder() const;
+  virtual FXbool doesSaveUnder() const;
 
   /// Destructor
   virtual ~FXPopup();

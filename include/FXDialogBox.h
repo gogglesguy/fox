@@ -3,7 +3,7 @@
 *                              D i a l o g   B o x                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDialogBox.h,v 1.23 2006/01/22 17:58:00 fox Exp $                       *
+* $Id: FXDialogBox.h,v 1.25 2007/02/07 20:21:53 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXDIALOGBOX_H
 #define FXDIALOGBOX_H
@@ -34,7 +34,7 @@ namespace FX {
 /**
 * DialogBox window.
 * When receiving ID_CANCEL or ID_ACCEPT, the DialogBox breaks out of the
-* modal loop and returns FALSE or TRUE, respectively.
+* modal loop and returns false or true, respectively.
 * To close the DialogBox when not running modally, simply send it ID_HIDE.
 */
 class FXAPI FXDialogBox : public FXTopWindow {

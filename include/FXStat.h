@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStat.h,v 1.26 2006/04/06 05:42:55 fox Exp $                            *
+* $Id: FXStat.h,v 1.28 2007/02/07 20:21:58 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXSTAT_H
 #define FXSTAT_H
@@ -45,13 +45,13 @@ private:
 public:
 
   /// Get statistics of the file into the stat buffer info
-  static bool statFile(const FXString& file,FXStat& info);
+  static FXbool statFile(const FXString& file,FXStat& info);
 
   /// Get statistice of the link into the stat buffer info
-  static bool statLink(const FXString& file,FXStat& info);
+  static FXbool statLink(const FXString& file,FXStat& info);
 
   /// Get statistics of already open file into stat buffer info
-  static bool stat(const FXFile& file,FXStat& info);
+  static FXbool stat(const FXFile& file,FXStat& info);
 
   /// Return the mode flags for this file
   FXuint mode() const { return modeFlags; }
@@ -75,91 +75,91 @@ public:
   FXTime created() const { return createTime; }
 
   /// Return true if it is a hidden file (Windows-only)
-  bool isHidden() const;
+  FXbool isHidden() const;
 
   /// Return true if it is a regular file
-  bool isFile() const;
+  FXbool isFile() const;
 
   /// Return true if it is a link
-  bool isLink() const;
+  FXbool isLink() const;
 
   /// Return true if character device
-  bool isCharacter() const;
+  FXbool isCharacter() const;
 
   /// Return true if block device
-  bool isBlock() const;
+  FXbool isBlock() const;
 
   /// Return true if socket device
-  bool isSocket() const;
+  FXbool isSocket() const;
 
   /// Return true if fifo (pipe) device
-  bool isFifo() const;
+  FXbool isFifo() const;
 
   /// Return true if input path is a directory
-  bool isDirectory() const;
+  FXbool isDirectory() const;
 
   /// Return true if file is readable
-  bool isReadable() const;
+  FXbool isReadable() const;
 
   /// Return true if file is writable
-  bool isWritable() const;
+  FXbool isWritable() const;
 
   /// Return true if file is executable
-  bool isExecutable() const;
+  FXbool isExecutable() const;
 
   /// Return true if owner has read-write-execute permissions
-  bool isOwnerReadWriteExecute() const;
+  FXbool isOwnerReadWriteExecute() const;
 
   /// Return true if owner has read permissions
-  bool isOwnerReadable() const;
+  FXbool isOwnerReadable() const;
 
   /// Return true if owner has write permissions
-  bool isOwnerWritable() const;
+  FXbool isOwnerWritable() const;
 
   /// Return true if owner has execute permissions
-  bool isOwnerExecutable() const;
+  FXbool isOwnerExecutable() const;
 
   /// Return true if group has read-write-execute permissions
-  bool isGroupReadWriteExecute() const;
+  FXbool isGroupReadWriteExecute() const;
 
   /// Return true if group has read permissions
-  bool isGroupReadable() const;
+  FXbool isGroupReadable() const;
 
   /// Return true if group has write permissions
-  bool isGroupWritable() const;
+  FXbool isGroupWritable() const;
 
   /// Return true if group has execute permissions
-  bool isGroupExecutable() const;
+  FXbool isGroupExecutable() const;
 
   /// Return true if others have read-write-execute permissions
-  bool isOtherReadWriteExecute() const;
+  FXbool isOtherReadWriteExecute() const;
 
   /// Return true if others have read permissions
-  bool isOtherReadable() const;
+  FXbool isOtherReadable() const;
 
   /// Return true if others have write permissions
-  bool isOtherWritable() const;
+  FXbool isOtherWritable() const;
 
   /// Return true if others have execute permissions
-  bool isOtherExecutable() const;
+  FXbool isOtherExecutable() const;
 
   /// Return true if the file sets the user id on execution
-  bool isSetUid() const;
+  FXbool isSetUid() const;
 
   /// Return true if the file sets the group id on execution
-  bool isSetGid() const;
+  FXbool isSetGid() const;
 
   /// Return true if the file has the sticky bit set
-  bool isSetSticky() const;
+  FXbool isSetSticky() const;
 
   /// Return the mode flags for this file
   static FXuint mode(const FXString& file);
 
   /// Change the mode flags for this file
-  static bool mode(const FXString& file,FXuint perm);
+  static FXbool mode(const FXString& file,FXuint perm);
 
   /// Return true if file exists
-  static bool exists(const FXString& file);
+  static FXbool exists(const FXString& file);
 
   /// Return file size in bytes
   static FXlong size(const FXString& file);
@@ -186,70 +186,70 @@ public:
   static FXTime created(const FXString& file);
 
   /// Return true if file is hidden
-  static bool isHidden(const FXString& file);
+  static FXbool isHidden(const FXString& file);
 
   /// Return true if input path is a file name
-  static bool isFile(const FXString& file);
+  static FXbool isFile(const FXString& file);
 
   /// Return true if input path is a link
-  static bool isLink(const FXString& file);
+  static FXbool isLink(const FXString& file);
 
   /// Return true if input path is a directory
-  static bool isDirectory(const FXString& file);
+  static FXbool isDirectory(const FXString& file);
 
   /// Return true if file is readable
-  static bool isReadable(const FXString& file);
+  static FXbool isReadable(const FXString& file);
 
   /// Return true if file is writable
-  static bool isWritable(const FXString& file);
+  static FXbool isWritable(const FXString& file);
 
   /// Return true if file is executable
-  static bool isExecutable(const FXString& file);
+  static FXbool isExecutable(const FXString& file);
 
   /// Return true if owner has read-write-execute permissions
-  static bool isOwnerReadWriteExecute(const FXString& file);
+  static FXbool isOwnerReadWriteExecute(const FXString& file);
 
   /// Return true if owner has read permissions
-  static bool isOwnerReadable(const FXString& file);
+  static FXbool isOwnerReadable(const FXString& file);
 
   /// Return true if owner has write permissions
-  static bool isOwnerWritable(const FXString& file);
+  static FXbool isOwnerWritable(const FXString& file);
 
   /// Return true if owner has execute permissions
-  static bool isOwnerExecutable(const FXString& file);
+  static FXbool isOwnerExecutable(const FXString& file);
 
   /// Return true if group has read-write-execute permissions
-  static bool isGroupReadWriteExecute(const FXString& file);
+  static FXbool isGroupReadWriteExecute(const FXString& file);
 
   /// Return true if group has read permissions
-  static bool isGroupReadable(const FXString& file);
+  static FXbool isGroupReadable(const FXString& file);
 
   /// Return true if group has write permissions
-  static bool isGroupWritable(const FXString& file);
+  static FXbool isGroupWritable(const FXString& file);
 
   /// Return true if group has execute permissions
-  static bool isGroupExecutable(const FXString& file);
+  static FXbool isGroupExecutable(const FXString& file);
 
   /// Return true if others have read-write-execute permissions
-  static bool isOtherReadWriteExecute(const FXString& file);
+  static FXbool isOtherReadWriteExecute(const FXString& file);
 
   /// Return true if others have read permissions
-  static bool isOtherReadable(const FXString& file);
+  static FXbool isOtherReadable(const FXString& file);
 
   /// Return true if others have write permissions
-  static bool isOtherWritable(const FXString& file);
+  static FXbool isOtherWritable(const FXString& file);
 
   /// Return true if others have execute permissions
-  static bool isOtherExecutable(const FXString& file);
+  static FXbool isOtherExecutable(const FXString& file);
 
   /// Return true if the file sets the user id on execution
-  static bool isSetUid(const FXString& file);
+  static FXbool isSetUid(const FXString& file);
 
   /// Return true if the file sets the group id on execution
-  static bool isSetGid(const FXString& file);
+  static FXbool isSetGid(const FXString& file);
 
   /// Return true if the file has the sticky bit set
-  static bool isSetSticky(const FXString& file);
+  static FXbool isSetSticky(const FXString& file);
 
   };
 

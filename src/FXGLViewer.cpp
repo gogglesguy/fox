@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.159 2006/04/04 04:28:06 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.170 2007/02/07 20:22:09 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -52,6 +52,7 @@
 #include "FXMessageBox.h"
 #include "FXToolTip.h"
 #include "FXCursor.h"
+#include "FXGLConfig.h"
 #include "FXGLContext.h"
 #include "FXGLViewer.h"
 #include "FXGLObject.h"
@@ -294,7 +295,7 @@ FXGLViewer::FXGLViewer(){
   dropped=NULL;
   selection=NULL;
   zsortfunc=NULL;
-  doesturbo=FALSE;
+  doesturbo=false;
   mode=HOVERING;
   }
 
@@ -404,8 +405,8 @@ void FXGLViewer::initialize(){
   selection=NULL;                               // No initial selection
   zsortfunc=NULL;                               // Routine to sort feedback buffer
   scene=NULL;                                   // Scene to look at
-  doesturbo=FALSE;                              // In interaction
-  turbomode=FALSE;                              // Turbo mode
+  doesturbo=false;                              // In interaction
+  turbomode=false;                              // Turbo mode
   mode=HOVERING;                                // Mouse operation
   }
 
@@ -478,7 +479,7 @@ void FXGLViewer::glsetup(){
     glFrontFace(GL_CCW);
 
     // Two sided lighting
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,TRUE);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambient);
 
     // Preferred blend over background
@@ -498,7 +499,7 @@ void FXGLViewer::glsetup(){
     glLightf(GL_LIGHT0,GL_QUADRATIC_ATTENUATION,light.q_attn);
 
     // Viewer is close
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,TRUE);
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
 
     // Material colors
     glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,material.ambient);
@@ -820,9 +821,7 @@ void FXGLViewer::layout(){
 // Start motion timer while in this window
 long FXGLViewer::onEnter(FXObject* sender,FXSelector sel,void* ptr){
   FXGLCanvas::onEnter(sender,sel,ptr);
-  if(isEnabled()){
-    getApp()->addTimeout(this,ID_TIPTIMER,getApp()->getMenuPause());
-    }
+  getApp()->addTimeout(this,ID_TIPTIMER,getApp()->getMenuPause());
   return 1;
   }
 
@@ -830,9 +829,7 @@ long FXGLViewer::onEnter(FXObject* sender,FXSelector sel,void* ptr){
 // Stop motion timer when leaving window
 long FXGLViewer::onLeave(FXObject* sender,FXSelector sel,void* ptr){
   FXGLCanvas::onLeave(sender,sel,ptr);
-  if(isEnabled()){
-    getApp()->removeTimeout(this,ID_TIPTIMER);
-    }
+  getApp()->removeTimeout(this,ID_TIPTIMER);
   return 1;
   }
 
@@ -1017,7 +1014,7 @@ void FXGLViewer::updateTransform(){
 
 
 // Set model bounding box
-bool FXGLViewer::setBounds(const FXRangef& r){
+FXbool FXGLViewer::setBounds(const FXRangef& r){
 //   FXTRACE((100,"xlo=%g xhi=%g ylo=%g yhi=%g zlo=%g zhi=%g\n",r.lower.x,r.upper.x,r.lower.y,r.upper.y,r.lower.z,r.upper.z));
 
   // Model center
@@ -1040,7 +1037,7 @@ bool FXGLViewer::setBounds(const FXRangef& r){
 
 
 // Fit view to new bounds
-bool FXGLViewer::fitToBounds(const FXRangef& box){
+FXbool FXGLViewer::fitToBounds(const FXRangef& box){
   FXRangef r(FLT_MAX,-FLT_MAX,FLT_MAX,-FLT_MAX,FLT_MAX,-FLT_MAX);
   FXMat4f m;
 
@@ -1151,7 +1148,7 @@ FXVec3f FXGLViewer::worldVector(FXint fx,FXint fy,FXint tx,FXint ty){
 
 
 // Get a bore vector
-bool FXGLViewer::getBoreVector(FXint sx,FXint sy,FXVec3f& point,FXVec3f& dir){
+FXbool FXGLViewer::getBoreVector(FXint sx,FXint sy,FXVec3f& point,FXVec3f& dir){
   FXVec3f p=eyeToWorld(screenToEye(sx,sy,(FXfloat)(diameter-distance)));
   if(PARALLEL==projection)
     point=eyeToWorld(screenToEye(sx,sy,0.0f));
@@ -1276,7 +1273,7 @@ void FXGLViewer::drawLasso(FXint x0,FXint y0,FXint x1,FXint y1){
     glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_LIGHTING);
     glShadeModel(GL_FLAT);
-    glDepthMask(FALSE);
+    glDepthMask(GL_FALSE);
     glDisable(GL_DITHER);
 
     // Windows
@@ -1435,7 +1432,7 @@ void FXGLViewer::setOp(FXuint o){
         setDragCursor(getDefaultCursor());
         FXTRACE((100,"HOVERING\n"));
         if(doesturbo) update();
-        doesturbo=FALSE;
+        doesturbo=false;
         break;
       case PICKING:
         FXTRACE((100,"PICKING\n"));
@@ -1890,7 +1887,7 @@ long FXGLViewer::onMotion(FXObject*,FXSelector,void* ptr){
         break;
       }
     }
-  return changed;
+  return 1; //changed;
   }
 
 
@@ -1984,7 +1981,7 @@ long FXGLViewer::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
   flags&=~FLAG_CHANGED;
   flags|=FLAG_UPDATE;
   setOp(HOVERING);
-  doesturbo=FALSE;
+  doesturbo=false;
   return 1;
   }
 
@@ -2201,7 +2198,7 @@ long FXGLViewer::onUpdZoom(FXObject* sender,FXSelector,void*){
 long FXGLViewer::onCmdZoom(FXObject* sender,FXSelector sel,void*){
   FXdouble z=zoom;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETREALVALUE),(void*)&z);
-  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:FALSE;
+  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:false;
   setZoom(z);
   return 1;
   }
@@ -2218,7 +2215,7 @@ long FXGLViewer::onUpdFov(FXObject* sender,FXSelector,void*){
 long FXGLViewer::onCmdFov(FXObject* sender,FXSelector sel,void*){
   FXdouble f=fov;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETREALVALUE),(void*)&f);
-  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:FALSE;
+  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:false;
   setFieldOfView(f);
   return 1;
   }
@@ -2230,7 +2227,7 @@ long FXGLViewer::onCmdXYZScale(FXObject* sender,FXSelector sel,void*){
   FXdouble value;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETREALVALUE),&value);
   s[FXSELID(sel)-ID_SCALE_X]=(FXfloat)value;
-  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:FALSE;
+  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:false;
   setScale(s);
   return 1;
   }
@@ -2275,7 +2272,7 @@ long FXGLViewer::onCmdXYZDial(FXObject*,FXSelector sel,void* ptr){
     setOrientation(q*getOrientation());
     }
   else if(doesturbo){
-    doesturbo=FALSE;
+    doesturbo=false;
     update();
     }
   return 1;
@@ -2298,7 +2295,7 @@ long FXGLViewer::onCmdRollPitchYaw(FXObject* sender,FXSelector sel,void*){
   rotation.getRollPitchYaw(rpy[0],rpy[1],rpy[2]);
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETREALVALUE),(void*)&ang);
   rpy[FXSELID(sel)-ID_ROLL]=(FXfloat)(DTOR*ang);
-  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:FALSE;
+  doesturbo=(FXSELTYPE(sel)==SEL_CHANGED)?turbomode:false;
   setOrientation(FXQuatf(rpy[0],rpy[1],rpy[2]));
   update();
   return 1;
@@ -2321,7 +2318,7 @@ long FXGLViewer::onUpdRollPitchYaw(FXObject* sender,FXSelector sel,void*){
 
 // Read back pixels
 // Derived from code contributed by <sancelot@crosswinds.net>
-bool FXGLViewer::readPixels(FXColor*& buffer,FXint x,FXint y,FXint w,FXint h){
+FXbool FXGLViewer::readPixels(FXColor*& buffer,FXint x,FXint y,FXint w,FXint h){
 #ifdef HAVE_GL_H
   if(1<=w && 1<=h){
     GLint swapbytes,lsbfirst,rowlength,skiprows,skippixels,alignment,oldbuf;
@@ -2474,8 +2471,8 @@ FXint FXGLViewer::renderFeedback(FXfloat *buffer,FXint x,FXint y,FXint w,FXint h
 
 
 // Read feedback buffer
-bool FXGLViewer::readFeedback(FXfloat*& buffer,FXint& used,FXint& size,FXint x,FXint y,FXint w,FXint h){
-  bool ok=false;
+FXbool FXGLViewer::readFeedback(FXfloat*& buffer,FXint& used,FXint& size,FXint x,FXint y,FXint w,FXint h){
+  FXbool ok=false;
   buffer=NULL;
   used=0;
   size=10000;
@@ -2604,7 +2601,7 @@ long FXGLViewer::onCmdPrintVector(FXObject*,FXSelector,void*){
     repaint();
 
     // Flush commands
-    getApp()->flush(TRUE);
+    getApp()->flush(true);
 
     // Page header
     pdc.beginPage(1);
@@ -2661,7 +2658,7 @@ long FXGLViewer::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Requested data from clipboard
   if(event->target==objectType){
-    FXTRACE((1,"requested objectType\n"));
+    FXTRACE((100,"requested objectType\n"));
 //    FXMemoryStream stream;
 //    stream.open(NULL,0,FXStreamSave);
 //    stream.takeBuffer(data,len);
@@ -2972,7 +2969,9 @@ long FXGLViewer::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop drop
 long FXGLViewer::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
-  FXuchar *data; FXuint len; FXVec4f color;
+  FXuchar *pointer;
+  FXuint   length;
+  FXVec4f  color;
 
   // Try base class first
   if(FXGLCanvas::onDNDDrop(sender,sel,ptr)) return 1;
@@ -2991,13 +2990,13 @@ long FXGLViewer::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
     }
 
   // Dropped on viewer
-  if(getDNDData(FROM_DRAGNDROP,FXGLViewer::colorType,data,len)){
-    color[0]=((FXushort*)data)[0]/65535.0f;
-    color[1]=((FXushort*)data)[1]/65535.0f;
-    color[2]=((FXushort*)data)[2]/65535.0f;
-    color[3]=((FXushort*)data)[3]/65535.0f;
+  if(getDNDData(FROM_DRAGNDROP,FXGLViewer::colorType,pointer,length)){
+    color[0]=((FXushort*)pointer)[0]/65535.0f;
+    color[1]=((FXushort*)pointer)[1]/65535.0f;
+    color[2]=((FXushort*)pointer)[2]/65535.0f;
+    color[3]=((FXushort*)pointer)[3]/65535.0f;
     setBackgroundColor(color);
-    freeElms(data);
+    freeElms(pointer);
     update();
     return 1;
     }
@@ -3013,14 +3012,16 @@ void FXGLViewer::setProjection(FXuint proj){
   }
 
 
-// Set background
+// Change both top and bottom background colors
+void FXGLViewer::setBackgroundColor(const FXVec4f& clr){
+  background[0]=background[1]=clr;
+  update();
+  }
+
+
+// Change top or bottom background color
 void FXGLViewer::setBackgroundColor(const FXVec4f& clr,FXbool bottom){
-  if(bottom==MAYBE){
-    background[0]=background[1]=clr;
-    }
-  else{
-    background[bottom]=clr;
-    }
+  background[bottom]=clr;
   update();
   }
 
@@ -3039,7 +3040,7 @@ long FXGLViewer::onDefault(FXObject* sender,FXSelector sel,void* ptr){
 
 
 // Change turbo mode
-void FXGLViewer::setTurboMode(bool turbo){
+void FXGLViewer::setTurboMode(FXbool turbo){
   if(!turbo) doesturbo=false;
   turbomode=turbo;
   }

@@ -3,9 +3,9 @@
 *                      I m a g e   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.114 2006/01/22 17:59:01 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.115 2007/02/07 20:22:24 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #ifdef HAVE_PNG_H

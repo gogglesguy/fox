@@ -3,7 +3,7 @@
 *                             O p t i o n   M e n u                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXOptionMenu.cpp,v 1.70 2006/03/31 07:33:10 fox Exp $                    *
+* $Id: FXOptionMenu.cpp,v 1.73 2007/02/07 20:22:13 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -109,7 +109,7 @@ FXOption::FXOption(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,
 
 
 // If window can have focus
-bool FXOption::canFocus() const { return true; }
+FXbool FXOption::canFocus() const { return true; }
 
 
 // Get default width
@@ -627,9 +627,9 @@ long FXOptionMenu::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent* ev=(FXEvent*)ptr;
   if(isEnabled()){
     if(ev->code>0)
-      setCurrentNo((getCurrentNo()-1+getNumOptions())%getNumOptions(),TRUE);
+      setCurrentNo((getCurrentNo()-1+getNumOptions())%getNumOptions(),true);
     else
-      setCurrentNo((getCurrentNo()+1)%getNumOptions(),TRUE);
+      setCurrentNo((getCurrentNo()+1)%getNumOptions(),true);
     return 1;
     }
   return 0;
@@ -662,7 +662,7 @@ long FXOptionMenu::onCmdUnpost(FXObject*,FXSelector,void* ptr){
     if(grabbed()) ungrab();
     flags|=FLAG_UPDATE;
     if(ptr){
-      setCurrent((FXOption*)ptr,TRUE);
+      setCurrent((FXOption*)ptr,true);
       }
     }
   return 1;
@@ -701,7 +701,7 @@ void FXOptionMenu::layout(){
 
 
 // Logically inside pane
-bool FXOptionMenu::contains(FXint parentx,FXint parenty) const {
+FXbool FXOptionMenu::contains(FXint parentx,FXint parenty) const {
   if(pane && pane->shown() && pane->contains(parentx,parenty)) return true;
   return false;
   }
@@ -715,11 +715,11 @@ void FXOptionMenu::killFocus(){
 
 
 // If window can have focus
-bool FXOptionMenu::canFocus() const { return true; }
+FXbool FXOptionMenu::canFocus() const { return true; }
 
 
 // Set current selection
-void FXOptionMenu::setCurrent(FXOption *win,bool notify){
+void FXOptionMenu::setCurrent(FXOption *win,FXbool notify){
   if(current!=win){
     current=win;
     if(win){
@@ -736,7 +736,7 @@ void FXOptionMenu::setCurrent(FXOption *win,bool notify){
 
 
 // Set current option
-void FXOptionMenu::setCurrentNo(FXint no,bool notify){
+void FXOptionMenu::setCurrentNo(FXint no,FXbool notify){
   register FXOption *win=NULL;
   if(pane) win=dynamic_cast<FXOption*>(pane->childAtIndex(no));
   setCurrent(win,notify);
@@ -816,7 +816,7 @@ long FXOptionMenu::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 
 
 // True if popped up
-bool FXOptionMenu::isPopped() const {
+FXbool FXOptionMenu::isPopped() const {
   return pane && pane->shown();
   }
 

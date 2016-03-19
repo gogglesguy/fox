@@ -3,7 +3,7 @@
 *              F O X   P r i v a t e   I n c l u d e   F i l e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: xincs.h,v 1.73 2006/01/22 17:58:14 fox Exp $                             *
+* $Id: xincs.h,v 1.77 2007/02/07 20:22:01 fox Exp $                             *
 ********************************************************************************/
 #ifndef XINCS_H
 #define XINCS_H
@@ -216,6 +216,9 @@ struct fxdirent : public dirent {
 #ifdef HAVE_XRANDR_H
 #include <X11/extensions/Xrandr.h>
 #endif
+#ifdef HAVE_XRENDER_H
+#include <X11/extensions/Xrender.h>
+#endif
 
 #ifndef NO_XIM
 #ifndef XlibSpecificationRelease        // Not defined until X11R5
@@ -360,7 +363,7 @@ extern "C" char *XSetIMValues(XIM,...);
 #endif
 
 
-// IBM VisualAge for C++ 3.5
+// IBM VisualAge for C++
 #if defined(__IBMCPP__) && defined(WIN32)
 #include <direct.h>
 #include <io.h>         // for _access()
@@ -368,7 +371,6 @@ extern "C" char *XSetIMValues(XIM,...);
 #define _vsnprintf(a, b, c, d) vsprintf(a, c, d)
 #define ICON_SMALL      0
 #define ICON_BIG        1
-#define bool            int
 
 // This declarations come from Microsoft SDK
 #define TME_HOVER       0x00000001
@@ -380,23 +382,19 @@ extern "C" char *XSetIMValues(XIM,...);
 #define WM_MOUSELEAVE   0x02A3
 
 typedef struct tagTRACKMOUSEEVENT {
-    DWORD cbSize;
-    DWORD dwFlags;
-    HWND  hwndTrack;
-    DWORD dwHoverTime;
-} TRACKMOUSEEVENT, *LPTRACKMOUSEEVENT;
+  DWORD cbSize;
+  DWORD dwFlags;
+  HWND  hwndTrack;
+  DWORD dwHoverTime;
+  } TRACKMOUSEEVENT, *LPTRACKMOUSEEVENT;
 
-WINUSERAPI
-BOOL
-WINAPI
-TrackMouseEvent(
-    IN OUT LPTRACKMOUSEEVENT lpEventTrack);
+WINUSERAPI BOOL WINAPI TrackMouseEvent(IN OUT LPTRACKMOUSEEVENT lpEventTrack);
 
 #ifdef __GL_H__
 #define GL_COLOR_LOGIC_OP                 0x0BF2
 #define GL_POLYGON_OFFSET_POINT           0x2A01
 #define GL_POLYGON_OFFSET_LINE            0x2A02
-WINGDIAPI void APIENTRY glPolygonOffset (GLfloat factor,GLfloat units);
+WINGDIAPI void APIENTRY glPolygonOffset(GLfloat factor,GLfloat units);
 #endif
 
 #endif

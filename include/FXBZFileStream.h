@@ -3,7 +3,7 @@
 *                      B Z F i l e S t r e a m   C l a s s e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Lyle Johnson. All Rights Reserved.                 *
+* Copyright (C) 1999,2007 by Lyle Johnson. All Rights Reserved.                 *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXBZFileStream.h,v 1.5 2006/01/22 17:57:59 fox Exp $                     *
+* $Id: FXBZFileStream.h,v 1.10 2007/02/07 20:21:52 fox Exp $                     *
 ********************************************************************************/
 #ifdef HAVE_BZ2LIB_H
 #ifndef FXBZFILESTREAM_H
@@ -50,20 +50,21 @@ public:
   FXBZFileStream(const FXObject* cont=NULL);
 
   /// Open file stream
-  bool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
+  FXbool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
 
   /// Close file stream
-  virtual bool close();
+  virtual FXbool close();
 
   /// Get position
   FXlong position() const { return FXStream::position(); }
 
   /// Move to position
-  virtual bool position(FXlong,FXWhence){ return FALSE; }
+  virtual FXbool position(FXlong,FXWhence){ return false; }
 
   /// Save single items to stream
   FXBZFileStream& operator<<(const FXuchar& v){ FXStream::operator<<(v); return *this; }
   FXBZFileStream& operator<<(const FXchar& v){ FXStream::operator<<(v); return *this; }
+  FXBZFileStream& operator<<(const FXbool& v){ FXStream::operator<<(v); return *this; }
   FXBZFileStream& operator<<(const FXushort& v){ FXStream::operator<<(v); return *this; }
   FXBZFileStream& operator<<(const FXshort& v){ FXStream::operator<<(v); return *this; }
   FXBZFileStream& operator<<(const FXuint& v){ FXStream::operator<<(v); return *this; }
@@ -76,6 +77,7 @@ public:
   /// Save arrays of items to stream
   FXBZFileStream& save(const FXuchar* p,FXuval n){ FXStream::save(p,n); return *this; }
   FXBZFileStream& save(const FXchar* p,FXuval n){ FXStream::save(p,n); return *this; }
+  FXBZFileStream& save(const FXbool* p,FXuval n){ FXStream::save(p,n); return *this; }
   FXBZFileStream& save(const FXushort* p,FXuval n){ FXStream::save(p,n); return *this; }
   FXBZFileStream& save(const FXshort* p,FXuval n){ FXStream::save(p,n); return *this; }
   FXBZFileStream& save(const FXuint* p,FXuval n){ FXStream::save(p,n); return *this; }
@@ -88,6 +90,7 @@ public:
   /// Load single items from stream
   FXBZFileStream& operator>>(FXuchar& v){ FXStream::operator>>(v); return *this; }
   FXBZFileStream& operator>>(FXchar& v){ FXStream::operator>>(v); return *this; }
+  FXBZFileStream& operator>>(FXbool& v){ FXStream::operator>>(v); return *this; }
   FXBZFileStream& operator>>(FXushort& v){ FXStream::operator>>(v); return *this; }
   FXBZFileStream& operator>>(FXshort& v){ FXStream::operator>>(v); return *this; }
   FXBZFileStream& operator>>(FXuint& v){ FXStream::operator>>(v); return *this; }
@@ -100,6 +103,7 @@ public:
   /// Load arrays of items from stream
   FXBZFileStream& load(FXuchar* p,FXuval n){ FXStream::load(p,n); return *this; }
   FXBZFileStream& load(FXchar* p,FXuval n){ FXStream::load(p,n); return *this; }
+  FXBZFileStream& load(FXbool* p,FXuval n){ FXStream::load(p,n); return *this; }
   FXBZFileStream& load(FXushort* p,FXuval n){ FXStream::load(p,n); return *this; }
   FXBZFileStream& load(FXshort* p,FXuval n){ FXStream::load(p,n); return *this; }
   FXBZFileStream& load(FXuint* p,FXuval n){ FXStream::load(p,n); return *this; }

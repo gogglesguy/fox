@@ -3,7 +3,7 @@
 *                        P r i n t   J o b   D i a l o g                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXPrintDialog.cpp,v 1.57 2006/04/21 20:48:23 fox Exp $                   *
+* $Id: FXPrintDialog.cpp,v 1.60 2007/02/07 20:22:13 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -231,8 +231,8 @@ FXIMPLEMENT(FXPrintDialog,FXDialogBox,FXPrintDialogMap,ARRAYNUMBER(FXPrintDialog
 
 
 // Separator item
-FXPrintDialog::FXPrintDialog(FXWindow* owner,const FXString& caption,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-  FXDialogBox(owner,caption,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,x,y,w,h,0,0,0,0,4,4){
+FXPrintDialog::FXPrintDialog(FXWindow* own,const FXString& caption,FXuint opts,FXint x,FXint y,FXint w,FXint h):
+  FXDialogBox(own,caption,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,x,y,w,h,0,0,0,0,4,4){
   FXchar key[20],name[100];
   //const FXchar *paper;
 
@@ -317,11 +317,11 @@ FXPrintDialog::FXPrintDialog(FXWindow* owner,const FXString& caption,FXuint opts
   media->setNumVisible(6);
 
   // Fill up with some defaults
-  sendtoprinter->setCheck(TRUE);
-  printall->setCheck(TRUE);
-  firstpagefirst->setCheck(TRUE);
-  printinblacknwhite->setCheck(TRUE);
-  orientportrait->setCheck(TRUE);
+  sendtoprinter->setCheck(true);
+  printall->setCheck(true);
+  firstpagefirst->setCheck(true);
+  printinblacknwhite->setCheck(true);
+  orientportrait->setCheck(true);
 
   // Initial focus on printer name
   printername->setFocus();
@@ -372,19 +372,19 @@ FXPrintDialog::FXPrintDialog(FXWindow* owner,const FXString& caption,FXuint opts
   printer.flags=0;
 
   // Landscape or portrait
-  if(getApp()->reg().readIntEntry("PRINTER","landscape",FALSE))
+  if(getApp()->reg().readIntEntry("PRINTER","landscape",false))
     printer.flags|=PRINT_LANDSCAPE;
   else
     printer.flags&=~PRINT_LANDSCAPE;
 
   // Print to file or printer
-  if(getApp()->reg().readIntEntry("PRINTER","printtofile",FALSE))
+  if(getApp()->reg().readIntEntry("PRINTER","printtofile",false))
     printer.flags|=PRINT_DEST_FILE;
   else
     printer.flags&=~PRINT_DEST_FILE;
 
   // Color prints
-  if(getApp()->reg().readIntEntry("PRINTER","color",FALSE))
+  if(getApp()->reg().readIntEntry("PRINTER","color",false))
     printer.flags|=PRINT_COLOR;
   else
     printer.flags&=~PRINT_COLOR;
@@ -514,7 +514,7 @@ void FXPrintDialog::create(){
 
 // Send to printer
 long FXPrintDialog::onCmdToPrinter(FXObject*,FXSelector,void*){
-  getApp()->reg().writeIntEntry("PRINTER","printtofile",FALSE);
+  getApp()->reg().writeIntEntry("PRINTER","printtofile",false);
   printer.name=printername->getText();
   printer.flags&=~PRINT_DEST_FILE;
   FXTRACE((100,"Print to printer: %s\n",printer.name.text()));
@@ -586,7 +586,7 @@ long FXPrintDialog::onUpdToPrinter(FXObject* sender,FXSelector,void*){
 
 // Send to file
 long FXPrintDialog::onCmdToFile(FXObject*,FXSelector,void*){
-  getApp()->reg().writeIntEntry("PRINTER","printtofile",TRUE);
+  getApp()->reg().writeIntEntry("PRINTER","printtofile",true);
   printer.name=filename->getText();
   printer.flags|=PRINT_DEST_FILE;
   FXTRACE((100,"Print to file: %s\n",printer.name.text()));
@@ -734,7 +734,7 @@ long FXPrintDialog::onUpdPrinterName(FXObject* sender,FXSelector,void*){
 
 // Portrait
 long FXPrintDialog::onCmdPortrait(FXObject*,FXSelector,void*){
-  getApp()->reg().writeIntEntry("PRINTER","landscape",FALSE);
+  getApp()->reg().writeIntEntry("PRINTER","landscape",false);
   printer.flags&=~PRINT_LANDSCAPE;
   return 1;
   }
@@ -749,7 +749,7 @@ long FXPrintDialog::onUpdPortrait(FXObject* sender,FXSelector,void*){
 
 // Landscape
 long FXPrintDialog::onCmdLandscape(FXObject*,FXSelector,void*){
-  getApp()->reg().writeIntEntry("PRINTER","landscape",TRUE);
+  getApp()->reg().writeIntEntry("PRINTER","landscape",true);
   printer.flags|=PRINT_LANDSCAPE;
   return 1;
   }
@@ -823,7 +823,7 @@ long FXPrintDialog::onUpdPages(FXObject* sender,FXSelector sel,void*){
 
 // Color
 long FXPrintDialog::onCmdColor(FXObject*,FXSelector,void*){
-  getApp()->reg().writeIntEntry("PRINTER","color",TRUE);
+  getApp()->reg().writeIntEntry("PRINTER","color",true);
   printer.flags|=PRINT_COLOR;
   return 1;
   }
@@ -838,7 +838,7 @@ long FXPrintDialog::onUpdColor(FXObject* sender,FXSelector,void*){
 
 // Gray
 long FXPrintDialog::onCmdGray(FXObject*,FXSelector,void*){
-  getApp()->reg().writeIntEntry("PRINTER","color",FALSE);
+  getApp()->reg().writeIntEntry("PRINTER","color",false);
   printer.flags&=~PRINT_COLOR;
   return 1;
   }

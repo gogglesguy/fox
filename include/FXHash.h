@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXHash.h,v 1.13 2006/03/22 04:52:35 fox Exp $                            *
+* $Id: FXHash.h,v 1.18 2007/02/07 20:21:55 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXHASH_H
 #define FXHASH_H
@@ -31,12 +31,12 @@ namespace FX {
 * A hash table for associating pointers to pointers.
 */
 class FXAPI FXHash {
-private:
+protected:
   struct FXEntry {
-    void* key;
-    void* value;
+    void* name;
+    void* data;
     };
-private:
+protected:
   FXEntry *table;       // Hash table
   FXuint   total;       // Table size
   FXuint   used;        // Number of used entries
@@ -60,7 +60,7 @@ public:
   /**
   * Return the total number of slots in the table.
   */
-  FXint size() const { return total; }
+  FXuint size() const { return total; }
 
   /**
   * Return number of non-empty slots in the table.
@@ -71,38 +71,38 @@ public:
   * Insert key into table, unless the key already exists.
   * Returns the current value of the key.
   */
-  void* insert(void* key,void* value);
+  void* insert(void* name,void* data);
 
   /**
   * Replace key in table, overwriting the old value if the
   * given key already exists.  Returns the old value of the key.
   */
-  void* replace(void* key,void* value);
+  void* replace(void* name,void* data);
 
   /**
   * Remove key from the table. Returns the old value of the key.
   */
-  void* remove(void* key);
+  void* remove(void* name);
 
   /**
   * Return value of key, or return NULL.
   */
-  void* find(void* key) const;
+  void* find(void* name) const;
 
   /**
   * Return true if slot is not occupied by a key.
   */
-  bool empty(FXint pos) const { return (table[pos].key==NULL)||(table[pos].key==(void*)-1L); }
+  FXbool empty(FXuint pos) const { return (table[pos].name==NULL)||(table[pos].name==(void*)-1L); }
 
   /**
   * Return key at position pos.
   */
-  void* key(FXint pos) const { return table[pos].key; }
+  void* key(FXuint pos) const { return table[pos].name; }
 
   /**
   * Return data pointer at position pos.
   */
-  void* value(FXint pos) const { return table[pos].value; }
+  void* value(FXuint pos) const { return table[pos].data; }
 
   /**
   * Clear hash table.

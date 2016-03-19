@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXVec2d.h,v 1.21 2006/01/22 17:58:12 fox Exp $                           *
+* $Id: FXVec2d.h,v 1.23 2007/02/07 20:22:00 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXVEC2D_H
 #define FXVEC2D_H
@@ -102,32 +102,32 @@ public:
   FXdouble operator*(const FXVec2d& v) const { return x*v.x+y*v.y; }
 
   /// Test if zero
-  bool operator!() const { return x==0.0 && y==0.0;}
+  FXbool operator!() const { return x==0.0 && y==0.0;}
 
   /// Equality tests
-  bool operator==(const FXVec2d& v) const { return x==v.x && y==v.y; }
-  bool operator!=(const FXVec2d& v) const { return x!=v.x || y!=v.y; }
+  FXbool operator==(const FXVec2d& v) const { return x==v.x && y==v.y; }
+  FXbool operator!=(const FXVec2d& v) const { return x!=v.x || y!=v.y; }
 
-  friend inline bool operator==(const FXVec2d& a,FXdouble n);
-  friend inline bool operator!=(const FXVec2d& a,FXdouble n);
-  friend inline bool operator==(FXdouble n,const FXVec2d& a);
-  friend inline bool operator!=(FXdouble n,const FXVec2d& a);
+  friend inline FXbool operator==(const FXVec2d& a,FXdouble n);
+  friend inline FXbool operator!=(const FXVec2d& a,FXdouble n);
+  friend inline FXbool operator==(FXdouble n,const FXVec2d& a);
+  friend inline FXbool operator!=(FXdouble n,const FXVec2d& a);
 
   /// Inequality tests
-  bool operator<(const FXVec2d& v) const { return x<v.x && y<v.y; }
-  bool operator<=(const FXVec2d& v) const { return x<=v.x && y<=v.y; }
-  bool operator>(const FXVec2d& v) const { return x>v.x && y>v.y; }
-  bool operator>=(const FXVec2d& v) const { return x>=v.x && y>=v.y; }
+  FXbool operator<(const FXVec2d& v) const { return x<v.x && y<v.y; }
+  FXbool operator<=(const FXVec2d& v) const { return x<=v.x && y<=v.y; }
+  FXbool operator>(const FXVec2d& v) const { return x>v.x && y>v.y; }
+  FXbool operator>=(const FXVec2d& v) const { return x>=v.x && y>=v.y; }
 
-  friend inline bool operator<(const FXVec2d& a,FXdouble n);
-  friend inline bool operator<=(const FXVec2d& a,FXdouble n);
-  friend inline bool operator>(const FXVec2d& a,FXdouble n);
-  friend inline bool operator>=(const FXVec2d& a,FXdouble n);
+  friend inline FXbool operator<(const FXVec2d& a,FXdouble n);
+  friend inline FXbool operator<=(const FXVec2d& a,FXdouble n);
+  friend inline FXbool operator>(const FXVec2d& a,FXdouble n);
+  friend inline FXbool operator>=(const FXVec2d& a,FXdouble n);
 
-  friend inline bool operator<(FXdouble n,const FXVec2d& a);
-  friend inline bool operator<=(FXdouble n,const FXVec2d& a);
-  friend inline bool operator>(FXdouble n,const FXVec2d& a);
-  friend inline bool operator>=(FXdouble n,const FXVec2d& a);
+  friend inline FXbool operator<(FXdouble n,const FXVec2d& a);
+  friend inline FXbool operator<=(FXdouble n,const FXVec2d& a);
+  friend inline FXbool operator>(FXdouble n,const FXVec2d& a);
+  friend inline FXbool operator>=(FXdouble n,const FXVec2d& a);
 
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y; }
@@ -156,20 +156,20 @@ inline FXVec2d operator*(FXdouble n,const FXVec2d& a){return FXVec2d(n*a.x,n*a.y
 inline FXVec2d operator/(const FXVec2d& a,FXdouble n){return FXVec2d(a.x/n,a.y/n);}
 inline FXVec2d operator/(FXdouble n,const FXVec2d& a){return FXVec2d(n/a.x,n/a.y);}
 
-inline bool operator==(const FXVec2d& a,FXdouble n){return a.x==n && a.y==n;}
-inline bool operator!=(const FXVec2d& a,FXdouble n){return a.x!=n || a.y!=n;}
-inline bool operator==(FXdouble n,const FXVec2d& a){return n==a.x && n==a.y;}
-inline bool operator!=(FXdouble n,const FXVec2d& a){return n!=a.x || n!=a.y;}
+inline FXbool operator==(const FXVec2d& a,FXdouble n){return a.x==n && a.y==n;}
+inline FXbool operator!=(const FXVec2d& a,FXdouble n){return a.x!=n || a.y!=n;}
+inline FXbool operator==(FXdouble n,const FXVec2d& a){return n==a.x && n==a.y;}
+inline FXbool operator!=(FXdouble n,const FXVec2d& a){return n!=a.x || n!=a.y;}
 
-inline bool operator<(const FXVec2d& a,FXdouble n){return a.x<n && a.y<n;}
-inline bool operator<=(const FXVec2d& a,FXdouble n){return a.x<=n && a.y<=n;}
-inline bool operator>(const FXVec2d& a,FXdouble n){return a.x>n && a.y>n;}
-inline bool operator>=(const FXVec2d& a,FXdouble n){return a.x>=n && a.y>=n;}
+inline FXbool operator<(const FXVec2d& a,FXdouble n){return a.x<n && a.y<n;}
+inline FXbool operator<=(const FXVec2d& a,FXdouble n){return a.x<=n && a.y<=n;}
+inline FXbool operator>(const FXVec2d& a,FXdouble n){return a.x>n && a.y>n;}
+inline FXbool operator>=(const FXVec2d& a,FXdouble n){return a.x>=n && a.y>=n;}
 
-inline bool operator<(FXdouble n,const FXVec2d& a){return n<a.x && n<a.y;}
-inline bool operator<=(FXdouble n,const FXVec2d& a){return n<=a.x && n<=a.y;}
-inline bool operator>(FXdouble n,const FXVec2d& a){return n>a.x && n>a.y;}
-inline bool operator>=(FXdouble n,const FXVec2d& a){return n>=a.x && n>=a.y;}
+inline FXbool operator<(FXdouble n,const FXVec2d& a){return n<a.x && n<a.y;}
+inline FXbool operator<=(FXdouble n,const FXVec2d& a){return n<=a.x && n<=a.y;}
+inline FXbool operator>(FXdouble n,const FXVec2d& a){return n>a.x && n>a.y;}
+inline FXbool operator>=(FXdouble n,const FXVec2d& a){return n>=a.x && n>=a.y;}
 
 inline FXVec2d lo(const FXVec2d& a,const FXVec2d& b){return FXVec2d(FXMIN(a.x,b.x),FXMIN(a.y,b.y));}
 inline FXVec2d hi(const FXVec2d& a,const FXVec2d& b){return FXVec2d(FXMAX(a.x,b.x),FXMAX(a.y,b.y));}

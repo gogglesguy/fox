@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n    R a n g e    C l a s s            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRanged.h,v 1.17 2006/01/22 17:58:08 fox Exp $                          *
+* $Id: FXRanged.h,v 1.19 2007/02/07 20:21:57 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXRANGED_H
 #define FXRANGED_H
@@ -72,8 +72,8 @@ public:
   const FXVec3d& operator[](FXint i) const { return (&lower)[i]; }
 
   /// Comparison
-  bool operator==(const FXRanged& r) const { return lower==r.lower && upper==r.upper; }
-  bool operator!=(const FXRanged& r) const { return lower!=r.lower || upper!=r.upper; }
+  FXbool operator==(const FXRanged& r) const { return lower==r.lower && upper==r.upper; }
+  FXbool operator!=(const FXRanged& r) const { return lower!=r.lower || upper!=r.upper; }
 
   /// Width of box
   FXdouble width() const { return upper.x-lower.x; }
@@ -103,19 +103,19 @@ public:
   FXVec3d center() const;
 
   /// Test if empty
-  bool empty() const;
+  FXbool empty() const;
 
   /// Test if box contains point x,y,z
-  bool contains(FXdouble x,FXdouble y,FXdouble z) const;
+  FXbool contains(FXdouble x,FXdouble y,FXdouble z) const;
 
   /// Test if box contains point p
-  bool contains(const FXVec3d& p) const;
+  FXbool contains(const FXVec3d& p) const;
 
   /// Test if box properly contains another box
-  bool contains(const FXRanged& bounds) const;
+  FXbool contains(const FXRanged& bounds) const;
 
   /// Test if box properly contains sphere
-  bool contains(const FXSphered& sphere) const;
+  FXbool contains(const FXSphered& sphere) const;
 
   /// Include point
   FXRanged& include(FXdouble x,FXdouble y,FXdouble z);
@@ -133,10 +133,10 @@ public:
   FXint intersect(const FXVec4d &plane) const;
 
   /// Intersect box with ray u-v
-  bool intersect(const FXVec3d& u,const FXVec3d& v);
+  FXbool intersect(const FXVec3d& u,const FXVec3d& v);
 
   /// Test if bounds overlap
-  friend FXAPI bool overlap(const FXRanged& a,const FXRanged& b);
+  friend FXAPI FXbool overlap(const FXRanged& a,const FXRanged& b);
 
   /// Get corner number 0..7
   FXVec3d corner(FXint c) const { return FXVec3d((&lower)[c&1].x, (&lower)[(c>>1)&1].y, (&lower)[c>>2].z); }
@@ -155,7 +155,7 @@ public:
   };
 
 
-extern FXAPI bool overlap(const FXRanged& a,const FXRanged& b);
+extern FXAPI FXbool overlap(const FXRanged& a,const FXRanged& b);
 
 extern FXAPI FXRanged unite(const FXRanged& a,const FXRanged& b);
 extern FXAPI FXRanged intersect(const FXRanged& a,const FXRanged& b);

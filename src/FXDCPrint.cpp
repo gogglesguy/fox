@@ -3,7 +3,7 @@
 *           D e v i c e   C o n t e x t   F o r   P r i n t i n g               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDCPrint.cpp,v 1.55 2006/03/31 07:33:05 fox Exp $                       *
+* $Id: FXDCPrint.cpp,v 1.57 2007/02/07 20:22:04 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -138,7 +138,7 @@ void FXDCPrint::bbox(FXfloat x,FXfloat y){
 
 
 // Send the range of coordinates that will be sent
-bool FXDCPrint::setContentRange(FXint pxminArg, FXint pyminArg, FXint pxmaxArg, FXint pymaxArg){
+FXbool FXDCPrint::setContentRange(FXint pxminArg, FXint pyminArg, FXint pxmaxArg, FXint pymaxArg){
   if(flags&PRINT_LANDSCAPE){
     pxmin=pyminArg;
     pymin=pxminArg;
@@ -204,7 +204,7 @@ void FXDCPrint::tfm(FXfloat& xo,FXfloat& yo,FXfloat xi,FXfloat yi){
 
 
 // Generate print job prolog
-bool FXDCPrint::beginPrint(FXPrinter& job){
+FXbool FXDCPrint::beginPrint(FXPrinter& job){
   int numpages;
 
   Yr=792;  //480 // This is essentially the height of the page(used so that the upper left hand corner is the origin)
@@ -455,7 +455,7 @@ bool FXDCPrint::beginPrint(FXPrinter& job){
 
 
 // Generate print job epilog
-bool FXDCPrint::endPrint(){
+FXbool FXDCPrint::endPrint(){
   outf("%%%%Trailer\n");
 
   // We now know the bounding box
@@ -481,7 +481,7 @@ bool FXDCPrint::endPrint(){
 
 
 // Generate begin of page
-bool FXDCPrint::beginPage(FXuint page){
+FXbool FXDCPrint::beginPage(FXuint page){
 
   // Output page number
   outf("%%%%Page: %d\n",page);
@@ -520,7 +520,7 @@ bool FXDCPrint::beginPage(FXuint page){
 
 
 // Generate end of page
-bool FXDCPrint::endPage(){
+FXbool FXDCPrint::endPage(){
   /*
   outf("0 0 0 setcolor\n");
   outf("newpath\n");
@@ -1117,7 +1117,7 @@ void FXDCPrint::setFont(FXFont *fnt){
 
 
 // Change clip-against-child windows mode
-void FXDCPrint::clipChildren(bool){
+void FXDCPrint::clipChildren(FXbool){
   }
 
 

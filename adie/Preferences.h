@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -19,13 +19,11 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Preferences.h,v 1.31 2006/01/22 18:01:11 fox Exp $                       *
+* $Id: Preferences.h,v 1.34 2007/02/07 20:21:50 fox Exp $                       *
 ********************************************************************************/
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
-
-//////////////////////////////  UNDER DEVELOPMENT  //////////////////////////////
 
 
 class TextWindow;

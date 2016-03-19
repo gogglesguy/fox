@@ -3,7 +3,7 @@
 *                        G I F   C u r so r   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2006 by Daniel Gehriger.   All Rights Reserved.            *
+* Copyright (C) 2000,2007 by Daniel Gehriger.   All Rights Reserved.            *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGIFCursor.h,v 1.22 2006/01/22 17:58:02 fox Exp $                       *
+* $Id: FXGIFCursor.h,v 1.25 2007/02/07 20:21:54 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGIFCURSOR_H
 #define FXGIFCURSOR_H
@@ -52,10 +52,10 @@ public:
   FXGIFCursor(FXApp* a,const void* pix,FXint hx=0,FXint hy=0);
 
   /// Save pixel data only, in GIF format
-  virtual bool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const;
 
   /// Load pixel data only, in GIF format
-  virtual bool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store);
 
   /// Destroy
   virtual ~FXGIFCursor(){}
@@ -66,9 +66,9 @@ public:
 #define FXLOADGIF
 
 /**
-* Check if stream contains a GIF, return TRUE if so.
+* Check if stream contains a GIF, return true if so.
 */
-extern FXAPI bool fxcheckGIF(FXStream& store);
+extern FXAPI FXbool fxcheckGIF(FXStream& store);
 
 
 /**
@@ -76,13 +76,13 @@ extern FXAPI bool fxcheckGIF(FXStream& store);
 * Upon successful return, the pixel array and size are returned.
 * If an error occurred, the pixel array is set to NULL.
 */
-extern FXAPI bool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
+extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height);
 
 
 /**
 * Save an GIF (Graphics Interchange Format) file to a stream.
 */
-extern FXAPI bool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,bool fast=true);
+extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
 
 #endif
 

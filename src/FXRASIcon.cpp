@@ -3,7 +3,7 @@
 *                   S U N   R A S T E R   I m a g e   O b j e c t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXRASIcon.cpp,v 1.10 2006/01/22 17:58:38 fox Exp $                        *
+* $Id: FXRASIcon.cpp,v 1.13 2007/02/07 20:22:13 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -78,7 +78,7 @@ FXRASIcon::FXRASIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FX
 
 
 // Save object to stream
-bool FXRASIcon::savePixels(FXStream& store) const {
+FXbool FXRASIcon::savePixels(FXStream& store) const {
   if(fxsaveRAS(store,data,width,height)){
     return true;
     }
@@ -87,7 +87,7 @@ bool FXRASIcon::savePixels(FXStream& store) const {
 
 
 // Load object from stream
-bool FXRASIcon::loadPixels(FXStream& store){
+FXbool FXRASIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadRAS(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);

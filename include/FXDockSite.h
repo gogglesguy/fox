@@ -3,7 +3,7 @@
 *                         D o c k S i t e   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDockSite.h,v 1.31 2006/03/31 07:33:01 fox Exp $                        *
+* $Id: FXDockSite.h,v 1.44 2007/02/07 20:21:53 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDOCKSITE_H
 #define FXDOCKSITE_H
@@ -65,15 +65,38 @@ enum {
 class FXAPI FXDockSite : public FXPacker {
   FXDECLARE(FXDockSite)
 protected:
-  FXDockSite(){}
+//  FXuchar      mode;            // Dragging mode
+protected:
+//  static const FXDefaultCursor cursorType[16];
 private:
   FXDockSite(const FXDockSite&);
   FXDockSite &operator=(const FXDockSite&);
 protected:
-  void moveVerBar(FXWindow* bar,FXWindow *begin,FXWindow* end,FXint bx,FXint by);
-  void moveHorBar(FXWindow* bar,FXWindow *begin,FXWindow* end,FXint bx,FXint by);
-  FXint galleyWidth(FXWindow *begin,FXWindow*& end,FXint space,FXint& require,FXint& expand) const;
-  FXint galleyHeight(FXWindow *begin,FXWindow*& end,FXint space,FXint& require,FXint& expand) const;
+  FXDockSite(){}
+  void moveVerBar(FXWindow*& begin,FXWindow*& end,FXWindow* bar,FXint barx,FXint bary,FXint barw,FXint barh,FXbool hop);
+  void moveHorBar(FXWindow*& begin,FXWindow*& end,FXWindow* bar,FXint barx,FXint bary,FXint barw,FXint barh,FXbool hop);
+  void galleyOfHorzBar(FXWindow *bar,FXWindow*& begin,FXWindow*& end) const;
+  void galleyOfVertBar(FXWindow *bar,FXWindow*& begin,FXWindow*& end) const;
+  FXint galleyWidth(FXWindow* begin,FXWindow*& end,FXint space,FXint& require,FXint& expand) const;
+  FXint galleyHeight(FXWindow* begin,FXWindow*& end,FXint space,FXint& require,FXint& expand) const;
+protected:
+  enum {
+    DRAG_NONE        = 0,
+    DRAG_TOP         = 1,
+    DRAG_BOTTOM      = 2,
+    DRAG_LEFT        = 4,
+    DRAG_RIGHT       = 8,
+    DRAG_TOPLEFT     = (DRAG_TOP|DRAG_LEFT),
+    DRAG_TOPRIGHT    = (DRAG_TOP|DRAG_RIGHT),
+    DRAG_BOTTOMLEFT  = (DRAG_BOTTOM|DRAG_LEFT),
+    DRAG_BOTTOMRIGHT = (DRAG_BOTTOM|DRAG_RIGHT)
+    };
+public:
+//  long onEnter(FXObject*,FXSelector,void*);
+//  long onLeave(FXObject*,FXSelector,void*);
+//  long onMotion(FXObject*,FXSelector,void*);
+//  long onLeftBtnPress(FXObject*,FXSelector,void*);
+//  long onLeftBtnRelease(FXObject*,FXSelector,void*);
 public:
 
   /**
@@ -114,6 +137,9 @@ public:
   /// Perform layout
   virtual void layout();
 
+  /// Resize toolbar
+  virtual void resizeToolBar(FXDockBar* bar,FXint barx,FXint bary,FXint barw,FXint barh);
+
   /**
   * Move tool bar, changing its options to suite the new position.
   * Used by the toolbar dragging to rearrange the toolbars inside the
@@ -123,11 +149,11 @@ public:
 
   /**
   * The dock site is notified that the given bar has been added
-  * logically before the given window, and is to placed on a new
+  * logically before the other window, and is to placed on a new
   * galley all by itself.  The default implementation adjusts
   * the layout options of the bars accordingly.
   */
-  virtual void dockToolBar(FXDockBar* bar,FXWindow* before);
+  virtual void dockToolBar(FXDockBar* bar,FXWindow* other);
 
   /**
   * The dock site is informed that the given bar has been docked
@@ -146,10 +172,10 @@ public:
   virtual void undockToolBar(FXDockBar* bar);
 
   /// Change wrap option
-  void wrapGalleys(bool wrap);
+  void wrapGalleys(FXbool wrap);
 
   /// Get wrap option
-  bool wrapGalleys() const;
+  FXbool wrapGalleys() const;
   };
 
 }

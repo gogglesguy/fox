@@ -55,6 +55,7 @@ FX7Segment.h \
 FXAccelTable.h \
 FXApp.h \
 FXArray.h \
+FXAtomic.h \
 FXArrowButton.h \
 FXBMPIcon.h \
 FXBMPImage.h \
@@ -64,6 +65,8 @@ FXBitmapView.h \
 FXButton.h \
 FXBZFileStream.h \
 FXCURCursor.h \
+FXCalendar.h \
+FXCalendarView.h \
 FXCanvas.h \
 FXCheckButton.h \
 FXChoiceBox.h \
@@ -75,8 +78,12 @@ FXColorSelector.h \
 FXColorWell.h \
 FXColorWheel.h \
 FXComboBox.h \
+FXComplexf.h \
+FXComplexd.h \
 FXComposeContext.h \
 FXComposite.h \
+FXConsole.h \
+FXCopyDialog.h \
 FXCursor.h \
 FXDate.h \
 FXDC.h \
@@ -94,6 +101,7 @@ FXDirBox.h \
 FXDirDialog.h \
 FXDirList.h \
 FXDirSelector.h \
+FXDirWatch.h \
 FXDockBar.h \
 FXDockHandler.h \
 FXDockSite.h \
@@ -123,6 +131,7 @@ FXGIFIcon.h \
 FXGIFImage.h \
 FXGLCanvas.h \
 FXGLCone.h \
+FXGLConfig.h \
 FXGLContext.h \
 FXGLCube.h \
 FXGLCylinder.h \
@@ -134,7 +143,6 @@ FXGLViewer.h \
 FXGLVisual.h \
 FXGroupBox.h \
 FXGradientBar.h \
-FXGUISignal.h \
 FXGZFileStream.h \
 FXHash.h \
 FXHeader.h \
@@ -201,6 +209,7 @@ FXProgressBar.h \
 FXProgressDialog.h \
 FXQuatd.h \
 FXQuatf.h \
+FXMessageChannel.h \
 FXRASIcon.h \
 FXRASImage.h \
 FXRGBIcon.h \
@@ -208,6 +217,7 @@ FXRGBImage.h \
 FXRadioButton.h \
 FXRangef.h \
 FXRanged.h \
+FXReactor.h \
 FXRealSlider.h \
 FXRealSpinner.h \
 FXRecentFiles.h \
@@ -257,6 +267,7 @@ FXText.h \
 FXTextCodec.h \
 FXTextField.h \
 FXThread.h \
+FXThreadPool.h \
 FXToggleButton.h \
 FXToolBar.h \
 FXToolBarGrip.h \

@@ -3,7 +3,7 @@
 *                           S n a p p e r   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Snapper.h,v 1.5 2006/01/22 17:58:16 fox Exp $                            *
+* $Id: Snapper.h,v 1.7 2007/02/07 20:22:02 fox Exp $                            *
 ********************************************************************************/
 #ifndef SNAPPER_H
 #define SNAPPER_H
@@ -30,7 +30,7 @@ class Snapper : public FXShell {
   FXDECLARE(Snapper)
 protected:
   Snapper();
-  virtual bool doesOverrideRedirect() const;
+  virtual FXbool doesOverrideRedirect() const;
 private:
   Snapper(const Snapper&);
   Snapper& operator=(const Snapper&);
@@ -38,7 +38,7 @@ public:
   Snapper(FXApp* a,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
   virtual FXint getDefaultWidth();
   virtual FXint getDefaultHeight();
-  virtual bool doesSaveUnder() const;
+  virtual FXbool doesSaveUnder() const;
   };
 
 

@@ -3,9 +3,9 @@
 *                  D i r e c t o r y   L i s t   C o n t r o l                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: dirlist.cpp,v 1.16 2006/01/22 17:58:59 fox Exp $                         *
+* $Id: dirlist.cpp,v 1.17 2007/02/07 20:22:24 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

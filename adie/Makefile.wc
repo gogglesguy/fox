@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2005 by Jeroen van der Zijp.   All Rights Reserved      #
 ##############################################################################
-# $Id: Makefile.wc,v 1.10 2006/03/22 03:46:47 fox Exp $		             #
+# $Id: Makefile.wc,v 1.16 2006/08/15 22:33:09 fox Exp $		             #
 ##############################################################################
 # This library is free software; you can redistribute it and/or 	     #
 # modify it under the terms of the GNU Library General Public		     #
@@ -33,7 +33,7 @@ LDFLAGS   = -l=nt_win
 GLLIBS	  = opengl32.lib glu32.lib
 INCDIRS   = -I$(TOPDIR)\include
 FOXLIB	  = $(TOPDIR)\src\FOX-1.7.lib $(%WATCOM)\lib386\nt\comctl32.lib $(%WATCOM)\lib386\nt\wsock32.lib
-RESWRAP   = $(TOPDIR)\utils\reswrap.exe
+RESWRAP   = $(TOPDIR)\utils\reswrap.exe -nc
 
 PROGRAMS  = adie.exe
 
@@ -56,9 +56,11 @@ ICONS +=   bookdel_gif.gif
 ICONS +=   booknext_gif.gif
 ICONS +=   bookprev_gif.gif
 ICONS +=   bookset_gif.gif
+ICONS +=   browser.gif
 ICONS +=   close_gif.gif
 ICONS +=   colors_gif.gif
 ICONS +=   copy_gif.gif
+ICONS +=   config_gif.gif
 ICONS +=   cut_gif.gif
 ICONS +=   delete_gif.gif
 ICONS +=   delimit_gif.gif
@@ -68,6 +70,7 @@ ICONS +=   indent_gif.gif
 ICONS +=   info_gif.gif
 ICONS +=   lang_gif.gif
 ICONS +=   new_gif.gif
+ICONS +=   nobrowser.gif
 ICONS +=   open_gif.gif
 ICONS +=   palette_gif.gif
 ICONS +=   paste_gif.gif
@@ -101,10 +104,10 @@ adie.exe: $(OBJECTS) $(FOXLIB)
 adie.obj: icons.h icons.cpp
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $(ICONS)
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
 icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $(ICONS)
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 clean: .SYMBOLIC
 	$(RM) *.obj

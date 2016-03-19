@@ -20,8 +20,10 @@ bookdel_gif.gif \
 booknext_gif.gif \
 bookprev_gif.gif \
 bookset_gif.gif \
+browser.gif \
 close_gif.gif \
 colors_gif.gif \
+config_gif.gif \
 copy_gif.gif \
 cut_gif.gif \
 delete_gif.gif \
@@ -32,6 +34,7 @@ indent_gif.gif \
 info_gif.gif \
 lang_gif.gif \
 new_gif.gif \
+nobrowser.gif \
 open_gif.gif \
 palette_gif.gif \
 pattern_gif.gif \
@@ -81,11 +84,11 @@ Adie.cpp: icons.h icons.cpp
 
 
 icons.h: $(ICONS)
-	$(RESWRAP) -i -o icons.h $^
+	$(RESWRAP) -h -o icons.h $(ICONS)
 
 
-icons.cpp: $(ICONS)
-	$(RESWRAP) -e -o icons.cpp $^
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 
 CLEANFILES = icons.h icons.cpp

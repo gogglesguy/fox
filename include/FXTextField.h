@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTextField.h,v 1.63 2006/03/31 07:33:03 fox Exp $                       *
+* $Id: FXTextField.h,v 1.73 2007/02/26 19:35:44 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTEXTFIELD_H
 #define FXTEXTFIELD_H
@@ -98,6 +98,9 @@ private:
 public:
   long onPaint(FXObject*,FXSelector,void*);
   long onUpdate(FXObject*,FXSelector,void*);
+  long onFocusIn(FXObject*,FXSelector,void*);
+  long onFocusOut(FXObject*,FXSelector,void*);
+  long onFocusSelf(FXObject*,FXSelector,void*);
   long onKeyPress(FXObject*,FXSelector,void*);
   long onKeyRelease(FXObject*,FXSelector,void*);
   long onLeftBtnPress(FXObject*,FXSelector,void*);
@@ -112,16 +115,15 @@ public:
   long onClipboardLost(FXObject*,FXSelector,void*);
   long onClipboardGained(FXObject*,FXSelector,void*);
   long onClipboardRequest(FXObject*,FXSelector,void*);
-  long onFocusSelf(FXObject*,FXSelector,void*);
-  long onFocusIn(FXObject*,FXSelector,void*);
-  long onFocusOut(FXObject*,FXSelector,void*);
   long onBlink(FXObject*,FXSelector,void*);
   long onAutoScroll(FXObject*,FXSelector,void*);
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
+  long onCmdSetLongValue(FXObject*,FXSelector,void*);
   long onCmdSetRealValue(FXObject*,FXSelector,void*);
   long onCmdSetStringValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
+  long onCmdGetLongValue(FXObject*,FXSelector,void*);
   long onCmdGetRealValue(FXObject*,FXSelector,void*);
   long onCmdGetStringValue(FXObject*,FXSelector,void*);
   long onCmdCursorHome(FXObject*,FXSelector,void*);
@@ -130,10 +132,8 @@ public:
   long onCmdCursorLeft(FXObject*,FXSelector,void*);
   long onCmdCursorWordLeft(FXObject*,FXSelector,void*);
   long onCmdCursorWordRight(FXObject*,FXSelector,void*);
-  long onCmdCursorWordStart(FXObject*,FXSelector,void*);
-  long onCmdCursorWordEnd(FXObject*,FXSelector,void*);
-  long onCmdMark(FXObject*,FXSelector,void*);
-  long onCmdExtend(FXObject*,FXSelector,void*);
+long onCmdMark(FXObject*,FXSelector,void*);           // FIXME also goes away!
+long onCmdExtend(FXObject*,FXSelector,void*);
   long onCmdSelectAll(FXObject*,FXSelector,void*);
   long onCmdDeselectAll(FXObject*,FXSelector,void*);
   long onCmdCutSel(FXObject*,FXSelector,void*);
@@ -172,8 +172,6 @@ public:
     ID_CURSOR_LEFT,
     ID_CURSOR_WORD_LEFT,
     ID_CURSOR_WORD_RIGHT,
-    ID_CURSOR_WORD_START,
-    ID_CURSOR_WORD_END,
     ID_MARK,
     ID_EXTEND,
     ID_SELECT_ALL,
@@ -218,7 +216,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Yes, text field may receive focus
-  virtual bool canFocus() const;
+  virtual FXbool canFocus() const;
 
   /// Move the focus to this window
   virtual void setFocus();
@@ -227,16 +225,16 @@ public:
   virtual void killFocus();
 
   /// Set editable mode
-  void setEditable(bool edit=true);
+  void setEditable(FXbool edit=true);
 
   /// Return true if text field may be edited
-  bool isEditable() const;
+  FXbool isEditable() const;
 
   /// Set overstrike mode
-  void setOverstrike(bool over=true);
+  void setOverstrike(FXbool over=true);
 
   /// Return true if overstrike mode in effect
-  bool isOverstrike() const;
+  FXbool isOverstrike() const;
 
   /// Set cursor position
   void setCursorPos(FXint pos);
@@ -251,7 +249,7 @@ public:
   FXint getAnchorPos() const { return anchor; }
 
   /// Change the text and move cursor to end
-  void setText(const FXString& text,bool notify=false);
+  void setText(const FXString& text,FXbool notify=false);
 
   /// Get the text for this label
   FXString getText() const { return contents; }
@@ -331,23 +329,41 @@ public:
   /// Return text style
   FXuint getTextStyle() const;
 
-  /// Select all text
-  bool selectAll();
-
   /// Select len characters starting at given position pos
-  bool setSelection(FXint pos,FXint len);
+  FXbool setSelection(FXint pos,FXint len);
+
+  /// Select all text
+  FXbool selectAll();
 
   /// Extend the selection from the anchor to the given position
-  bool extendSelection(FXint pos);
+  FXbool extendSelection(FXint pos);
+
+  /// Copy primary selection to clipboard
+  FXbool copySelection();
+
+  /// Cut primary selection to clipboard
+  FXbool cutSelection(FXbool notify=false);
+
+  /// Delete primary selection
+  FXbool deleteSelection(FXbool notify=false);
+
+  /// Replace primary selection by other text
+  FXbool replaceSelection(const FXString& text,FXbool notify=false);
+
+  /// Paste primary selection
+  FXbool pasteSelection(FXbool notify=false);
+
+  /// Paste clipboard
+  FXbool pasteClipboard(FXbool notify=false);
 
   /// Unselect the text
-  bool killSelection();
+  FXbool killSelection();
 
   /// Return true if position pos is selected
-  bool isPosSelected(FXint pos) const;
+  FXbool isPosSelected(FXint pos) const;
 
   /// Return true if position is fully visible
-  bool isPosVisible(FXint pos) const;
+  FXbool isPosVisible(FXint pos) const;
 
   /// Scroll text to make the given position visible
   void makePositionVisible(FXint pos);

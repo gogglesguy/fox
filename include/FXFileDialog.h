@@ -3,7 +3,7 @@
 *                   F i l e   S e l e c t i o n   D i a l o g                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXFileDialog.h,v 1.35 2006/03/31 07:33:01 fox Exp $                      *
+* $Id: FXFileDialog.h,v 1.40 2007/02/07 20:21:54 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFILEDIALOG_H
 #define FXFILEDIALOG_H
@@ -109,10 +109,10 @@ public:
   FXint getNumPatterns() const;
 
   /// Allow pattern entry
-  void allowPatternEntry(bool allow);
+  void allowPatternEntry(FXbool flag);
 
-  /// Return TRUE if pattern entry is allowed
-  bool allowPatternEntry() const;
+  /// Return true if pattern entry is allowed
+  FXbool allowPatternEntry() const;
 
   /// Change directory
   void setDirectory(const FXString& path);
@@ -138,17 +138,17 @@ public:
   /// Return wildcard matching mode
   FXuint getMatchMode() const;
 
-  /// Return TRUE if showing hidden files
-  bool showHiddenFiles() const;
+  /// Return true if showing hidden files
+  FXbool showHiddenFiles() const;
 
   /// Show or hide hidden files
-  void showHiddenFiles(bool showing);
+  void showHiddenFiles(FXbool flag);
 
-  /// Return TRUE if image preview on
-  bool showImages() const;
+  /// Return true if image preview on
+  FXbool showImages() const;
 
   /// Show or hide preview images
-  void showImages(bool showing);
+  void showImages(FXbool flag);
 
   /// Return images preview size
   FXint getImageSize() const;
@@ -157,16 +157,16 @@ public:
   void setImageSize(FXint size);
 
   /// Show readonly button
-  void showReadOnly(bool show);
+  void showReadOnly(FXbool flag);
 
-  /// Return TRUE if readonly is shown
-  bool shownReadOnly() const;
+  /// Return true if readonly is shown
+  FXbool shownReadOnly() const;
 
   /// Set initial state of readonly button
-  void setReadOnly(bool state);
+  void setReadOnly(FXbool flag);
 
   /// Get readonly state
-  bool getReadOnly() const;
+  FXbool getReadOnly() const;
 
   /// Change File List style
   void setFileBoxStyle(FXuint style);
@@ -175,10 +175,16 @@ public:
   FXuint getFileBoxStyle() const;
 
   /// Allow or disallow navigation
-  void allowNavigation(bool navigable);
+  void allowNavigation(FXbool flag);
 
   /// Is navigation allowed?
-  bool allowNavigation() const;
+  FXbool allowNavigation() const;
+
+  /// Set draggable files
+  void setDraggableFiles(FXbool flag);
+
+  /// Are draggable files
+  FXbool getDraggableFiles() const;
 
   /// Open existing filename
   static FXString getOpenFilename(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns="*",FXint initial=0);

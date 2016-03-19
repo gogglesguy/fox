@@ -3,7 +3,7 @@
 *                          H e a d e r   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXHeader.h,v 1.72 2006/04/05 04:27:25 fox Exp $                          *
+* $Id: FXHeader.h,v 1.80 2007/02/07 20:21:55 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXHEADER_H
 #define FXHEADER_H
@@ -53,16 +53,16 @@ class FXAPI FXHeaderItem : public FXObject {
 protected:
   FXString  label;      // Text of item
   FXIcon   *icon;       // Icon of item
-  void     *data;       // Item user data pointer
+  void     *data;       // User data pointer
   FXint     size;       // Item size
   FXint     pos;        // Item position
-  FXuint    state;      // Item state flags
+  FXuint    state;      // State flags
 private:
   FXHeaderItem(const FXHeaderItem&);
   FXHeaderItem& operator=(const FXHeaderItem&);
 protected:
   FXHeaderItem(){}
-  virtual void draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,FXint h);
+  virtual void draw(const FXHeader* header,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
 public:
   enum{
     ARROW_NONE = 0,     /// No arrow
@@ -134,10 +134,10 @@ public:
   FXuint getIconPosition() const;
 
   /// Change state to pressed
-  void setPressed(bool pressed);
+  void setPressed(FXbool pressed);
 
   /// Return pressed state
-  bool isPressed() const;
+  FXbool isPressed() const;
 
   /// Return the item's content width in the header
   virtual FXint getWidth(const FXHeader* header) const;
@@ -163,6 +163,11 @@ public:
   };
 
 
+/// Explicit template specialization
+//extern template class FXAPI FXObjectListOf<FXHeaderItem>;
+
+
+/// List of FXHeaderItem's
 typedef FXObjectListOf<FXHeaderItem> FXHeaderItemList;
 
 
@@ -256,43 +261,43 @@ public:
   FXHeaderItem *getItem(FXint index) const;
 
   /// Replace the item with a [possibly subclassed] item
-  FXint setItem(FXint index,FXHeaderItem* item,bool notify=false);
+  FXint setItem(FXint index,FXHeaderItem* item,FXbool notify=false);
 
   /// Replace items text, icon, and user-data pointer
-  FXint setItem(FXint index,const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,bool notify=false);
+  FXint setItem(FXint index,const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
   /// Fill header by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,bool notify=false);
+  FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
   /// Fill header by appending items from newline separated strings
-  FXint fillItems(const FXString& strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,bool notify=false);
+  FXint fillItems(const FXString& strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
   /// Insert a new [possibly subclassed] item at the give index
-  FXint insertItem(FXint index,FXHeaderItem* item,bool notify=false);
+  FXint insertItem(FXint index,FXHeaderItem* item,FXbool notify=false);
 
   /// Insert item at index with given text, icon, and user-data pointer
-  FXint insertItem(FXint index,const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,bool notify=false);
+  FXint insertItem(FXint index,const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
   /// Append a [possibly subclassed] item to the list
-  FXint appendItem(FXHeaderItem* item,bool notify=false);
+  FXint appendItem(FXHeaderItem* item,FXbool notify=false);
 
   /// Append new item with given text and optional icon, and user-data pointer
-  FXint appendItem(const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,bool notify=false);
+  FXint appendItem(const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
   /// Prepend a [possibly subclassed] item to the list
-  FXint prependItem(FXHeaderItem* item,bool notify=false);
+  FXint prependItem(FXHeaderItem* item,FXbool notify=false);
 
   /// Prepend new item with given text and optional icon, and user-data pointer
-  FXint prependItem(const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,bool notify=false);
+  FXint prependItem(const FXString& text,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
   /// Extract item from list
-  FXHeaderItem* extractItem(FXint index,bool notify=false);
+  FXHeaderItem* extractItem(FXint index,FXbool notify=false);
 
   /// Remove item at index
-  void removeItem(FXint index,bool notify=false);
+  void removeItem(FXint index,FXbool notify=false);
 
   /// Remove all items
-  void clearItems(bool notify=false);
+  void clearItems(FXbool notify=false);
 
   /// Change text label for item at index
   void setItemText(FXint index,const FXString& text);
@@ -352,10 +357,10 @@ public:
   FXuint getItemIconPosition(FXint index) const;
 
   /// Changed button item's pressed state
-  void setItemPressed(FXint index,bool pressed=true);
+  void setItemPressed(FXint index,FXbool pressed=true);
 
-  /// Return TRUE if button item is pressed in
-  bool isItemPressed(FXint index) const;
+  /// Return true if button item is pressed in
+  FXbool isItemPressed(FXint index) const;
 
   /// Scroll to make given item visible
   void makeItemVisible(FXint index);

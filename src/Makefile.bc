@@ -5,7 +5,7 @@
 ##############################################################################
 # Copyright (C) 1997,2005 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
-# $Id: Makefile.bc,v 1.133 2006/03/22 03:46:48 fox Exp $                     #
+# $Id: Makefile.bc,v 1.142 2007/01/31 16:20:01 fox Exp $                     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -68,6 +68,8 @@ FXBitmapView.cpp \
 FXButton.cpp \
 FXBZFileStream.cpp \
 FXCURCursor.cpp \
+FXCalendar.cpp \
+FXCalendarView.cpp \
 FXCanvas.cpp \
 FXCheckButton.cpp \
 FXChoiceBox.cpp \
@@ -80,8 +82,11 @@ FXColorSelector.cpp \
 FXColorWell.cpp \
 FXColorWheel.cpp \
 FXComboBox.cpp \
+FXComplexf.cpp \
+FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXCopyDialog.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
 FXCP1252Codec.cpp \
@@ -162,7 +167,6 @@ FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
-FXGUISignal.cpp \
 FXGZFileStream.cpp \
 FXHash.cpp \
 FXHeader.cpp \
@@ -210,6 +214,7 @@ FXMenuPane.cpp \
 FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
+FXMessageChannel.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -230,6 +235,7 @@ FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXQuatd.cpp \
 FXQuatf.cpp \
+FXMessenger.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
 FXRGBIcon.cpp \
@@ -286,6 +292,7 @@ FXText.cpp \
 FXTextCodec.cpp \
 FXTextField.cpp \
 FXThread.cpp \
+FXThreadPool.cpp \
 FXToggleButton.cpp \
 FXToolBar.cpp \
 FXToolBarGrip.cpp \

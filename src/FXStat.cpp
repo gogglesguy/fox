@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStat.cpp,v 1.30 2006/04/06 05:43:46 fox Exp $                          *
+* $Id: FXStat.cpp,v 1.34 2007/02/07 20:22:16 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -47,132 +47,132 @@ namespace FX {
 
 
 // Return true if it is a hidden file (note: Windows-only attribute)
-bool FXStat::isHidden() const {
+FXbool FXStat::isHidden() const {
   return (modeFlags&FXIO::Hidden)!=0;
   }
 
 // Return true if it is a regular file
-bool FXStat::isFile() const {
+FXbool FXStat::isFile() const {
   return (modeFlags&FXIO::File)!=0;
   }
 
 // Return true if it is a link
-bool FXStat::isLink() const {
+FXbool FXStat::isLink() const {
   return (modeFlags&FXIO::SymLink)!=0;
   }
 
 // Return true if character device
-bool FXStat::isCharacter() const {
+FXbool FXStat::isCharacter() const {
   return (modeFlags&FXIO::Character)!=0;
   }
 
 // Return true if block device
-bool FXStat::isBlock() const {
+FXbool FXStat::isBlock() const {
   return (modeFlags&FXIO::Block)!=0;
   }
 
 // Return true if socket device
-bool FXStat::isSocket() const {
+FXbool FXStat::isSocket() const {
   return (modeFlags&FXIO::Socket)!=0;
   }
 
 // Return true if fifo device
-bool FXStat::isFifo() const {
+FXbool FXStat::isFifo() const {
   return (modeFlags&FXIO::Fifo)!=0;
   }
 
 // Return true if input path is a directory
-bool FXStat::isDirectory() const {
+FXbool FXStat::isDirectory() const {
   return (modeFlags&FXIO::Directory)!=0;
   }
 
 // Return true if file is readable
-bool FXStat::isReadable() const {
+FXbool FXStat::isReadable() const {
   return (modeFlags&(FXIO::OtherRead|FXIO::GroupRead|FXIO::OwnerRead))!=0;
   }
 
 // Return true if file is writable
-bool FXStat::isWritable() const {
+FXbool FXStat::isWritable() const {
   return (modeFlags&(FXIO::OtherWrite|FXIO::GroupWrite|FXIO::OwnerWrite))!=0;
   }
 
 // Return true if file is executable
-bool FXStat::isExecutable() const {
+FXbool FXStat::isExecutable() const {
   return (modeFlags&(FXIO::OtherExec|FXIO::GroupExec|FXIO::OwnerExec))!=0;
   }
 
 // Return true if owner has read-write-execute permissions
-bool FXStat::isOwnerReadWriteExecute() const {
+FXbool FXStat::isOwnerReadWriteExecute() const {
   return (modeFlags&FXIO::OwnerExec) && (modeFlags&FXIO::OwnerWrite) && (modeFlags&FXIO::OwnerRead);
   }
 
 // Return true if owner has read permissions
-bool FXStat::isOwnerReadable() const {
+FXbool FXStat::isOwnerReadable() const {
   return (modeFlags&FXIO::OwnerRead)!=0;
   }
 
 // Return true if owner has write permissions
-bool FXStat::isOwnerWritable() const {
+FXbool FXStat::isOwnerWritable() const {
   return (modeFlags&FXIO::OwnerWrite)!=0;
   }
 
 // Return true if owner has execute permissions
-bool FXStat::isOwnerExecutable() const {
+FXbool FXStat::isOwnerExecutable() const {
   return (modeFlags&FXIO::OwnerExec)!=0;
   }
 
 // Return true if group has read-write-execute permissions
-bool FXStat::isGroupReadWriteExecute() const {
+FXbool FXStat::isGroupReadWriteExecute() const {
   return (modeFlags&FXIO::GroupExec) && (modeFlags&FXIO::GroupWrite) && (modeFlags&FXIO::GroupRead);
   }
 
 // Return true if group has read permissions
-bool FXStat::isGroupReadable() const {
+FXbool FXStat::isGroupReadable() const {
   return (modeFlags&FXIO::GroupRead)!=0;
   }
 
 // Return true if group has write permissions
-bool FXStat::isGroupWritable() const {
+FXbool FXStat::isGroupWritable() const {
   return (modeFlags&FXIO::GroupWrite)!=0;
   }
 
 // Return true if group has execute permissions
-bool FXStat::isGroupExecutable() const {
+FXbool FXStat::isGroupExecutable() const {
   return (modeFlags&FXIO::GroupExec)!=0;
   }
 
 // Return true if others have read-write-execute permissions
-bool FXStat::isOtherReadWriteExecute() const {
+FXbool FXStat::isOtherReadWriteExecute() const {
   return (modeFlags&FXIO::OtherExec) && (modeFlags&FXIO::OtherWrite) && (modeFlags&FXIO::OtherRead);
   }
 
 // Return true if others have read permissions
-bool FXStat::isOtherReadable() const {
+FXbool FXStat::isOtherReadable() const {
   return (modeFlags&FXIO::OtherRead)!=0;
   }
 
 // Return true if others have write permissions
-bool FXStat::isOtherWritable() const {
+FXbool FXStat::isOtherWritable() const {
   return (modeFlags&FXIO::OtherWrite)!=0;
   }
 
 // Return true if others have execute permissions
-bool FXStat::isOtherExecutable() const {
+FXbool FXStat::isOtherExecutable() const {
   return (modeFlags&FXIO::OtherExec)!=0;
   }
 
 // Return true if the file sets the user id on execution
-bool FXStat::isSetUid() const {
+FXbool FXStat::isSetUid() const {
   return (modeFlags&FXIO::SetUser)!=0;
   }
 
 // Return true if the file sets the group id on execution
-bool FXStat::isSetGid() const {
+FXbool FXStat::isSetGid() const {
   return (modeFlags&FXIO::SetGroup)!=0;
   }
 
 // Return true if the file has the sticky bit set
-bool FXStat::isSetSticky() const {
+FXbool FXStat::isSetSticky() const {
   return (modeFlags&FXIO::Sticky)!=0;
   }
 
@@ -192,7 +192,7 @@ static inline FXTime fxfiletime(FXTime ft){
 
 
 // Get statistics of given file
-bool FXStat::statFile(const FXString& file,FXStat& info){
+FXbool FXStat::statFile(const FXString& file,FXStat& info){
   info.modeFlags=0;
   info.userNumber=0;
   info.groupNumber=0;
@@ -261,7 +261,7 @@ bool FXStat::statFile(const FXString& file,FXStat& info){
       info.accessTime=data.st_atime*seconds;
       info.modifyTime=data.st_mtime*seconds;
       info.createTime=data.st_ctime*seconds;
-      info.fileSize=data.st_size;
+      info.fileSize=(FXlong)data.st_size;
       return true;
       }
 #endif
@@ -271,7 +271,7 @@ bool FXStat::statFile(const FXString& file,FXStat& info){
 
 
 // Get statistice of the linked file
-bool FXStat::statLink(const FXString& file,FXStat& info){
+FXbool FXStat::statLink(const FXString& file,FXStat& info){
   info.modeFlags=0;
   info.userNumber=0;
   info.groupNumber=0;
@@ -340,7 +340,7 @@ bool FXStat::statLink(const FXString& file,FXStat& info){
       info.accessTime=data.st_atime*seconds;
       info.modifyTime=data.st_mtime*seconds;
       info.createTime=data.st_ctime*seconds;
-      info.fileSize=data.st_size;
+      info.fileSize=(FXlong)data.st_size;
       return true;
       }
 #endif
@@ -350,7 +350,7 @@ bool FXStat::statLink(const FXString& file,FXStat& info){
 
 
 // Get statistice of the linked file
-bool FXStat::stat(const FXFile& file,FXStat& info){
+FXbool FXStat::stat(const FXFile& file,FXStat& info){
   info.modeFlags=0;
   info.userNumber=0;
   info.groupNumber=0;
@@ -394,7 +394,7 @@ bool FXStat::stat(const FXFile& file,FXStat& info){
     info.accessTime=data.st_atime*seconds;
     info.modifyTime=data.st_mtime*seconds;
     info.createTime=data.st_ctime*seconds;
-    info.fileSize=data.st_size;
+    info.fileSize=(FXlong)data.st_size;
     return true;
     }
 #endif
@@ -411,7 +411,7 @@ FXuint FXStat::mode(const FXString& file){
 
 
 // Change the mode flags for this file
-bool FXStat::mode(const FXString& file,FXuint perm){
+FXbool FXStat::mode(const FXString& file,FXuint perm){
 #ifndef WIN32
   FXuint bits=perm&0777;
   if(perm&FXIO::SetUser) bits|=S_ISUID;
@@ -425,7 +425,7 @@ bool FXStat::mode(const FXString& file,FXuint perm){
 
 
 // Return true if file exists
-bool FXStat::exists(const FXString& file){
+FXbool FXStat::exists(const FXString& file){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -477,158 +477,188 @@ FXTime FXStat::created(const FXString& file){
 
 
 // Return true if file is hidden
-bool FXStat::isHidden(const FXString& file){
+FXbool FXStat::isHidden(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isHidden();
   }
 
 
 // Check if file represents a file
-bool FXStat::isFile(const FXString& file){
+FXbool FXStat::isFile(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isFile();
   }
 
 
 // Check if file represents a link
-bool FXStat::isLink(const FXString& file){
+FXbool FXStat::isLink(const FXString& file){
   FXStat data;
   return statLink(file,data) && data.isLink();
   }
 
 
 // Check if file represents a directory
-bool FXStat::isDirectory(const FXString& file){
+FXbool FXStat::isDirectory(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isDirectory();
   }
 
 
 // Return true if file is readable
-bool FXStat::isReadable(const FXString& file){
+FXbool FXStat::isReadable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isReadable();
   }
 
 
 // Return true if file is writable
-bool FXStat::isWritable(const FXString& file){
+FXbool FXStat::isWritable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isWritable();
   }
 
 
 // Return true if file is executable
-bool FXStat::isExecutable(const FXString& file){
+FXbool FXStat::isExecutable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isExecutable();
   }
 
 
 // Check if owner has full permissions
-bool FXStat::isOwnerReadWriteExecute(const FXString& file){
+FXbool FXStat::isOwnerReadWriteExecute(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOwnerReadWriteExecute();
   }
 
 
 // Check if owner can read
-bool FXStat::isOwnerReadable(const FXString& file){
+FXbool FXStat::isOwnerReadable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOwnerReadable();
   }
 
 
 // Check if owner can write
-bool FXStat::isOwnerWritable(const FXString& file){
+FXbool FXStat::isOwnerWritable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOwnerWritable();
   }
 
 
 // Check if owner can execute
-bool FXStat::isOwnerExecutable(const FXString& file){
+FXbool FXStat::isOwnerExecutable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOwnerExecutable();
   }
 
 
 // Check if group has full permissions
-bool FXStat::isGroupReadWriteExecute(const FXString& file){
+FXbool FXStat::isGroupReadWriteExecute(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isGroupReadWriteExecute();
   }
 
 
 // Check if group can read
-bool FXStat::isGroupReadable(const FXString& file){
+FXbool FXStat::isGroupReadable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isGroupReadable();
   }
 
 
 // Check if group can write
-bool FXStat::isGroupWritable(const FXString& file){
+FXbool FXStat::isGroupWritable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isGroupWritable();
   }
 
 
 // Check if group can execute
-bool FXStat::isGroupExecutable(const FXString& file){
+FXbool FXStat::isGroupExecutable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isGroupExecutable();
   }
 
 
 // Check if everybody has full permissions
-bool FXStat::isOtherReadWriteExecute(const FXString& file){
+FXbool FXStat::isOtherReadWriteExecute(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOtherReadWriteExecute();
   }
 
 
 // Check if everybody can read
-bool FXStat::isOtherReadable(const FXString& file){
+FXbool FXStat::isOtherReadable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOtherReadable();
   }
 
 
 // Check if everybody can write
-bool FXStat::isOtherWritable(const FXString& file){
+FXbool FXStat::isOtherWritable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOtherWritable();
   }
 
 
 // Check if everybody can execute
-bool FXStat::isOtherExecutable(const FXString& file){
+FXbool FXStat::isOtherExecutable(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isOtherExecutable();
   }
 
 
 // Test if suid bit set
-bool FXStat::isSetUid(const FXString& file){
+FXbool FXStat::isSetUid(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isSetUid();
   }
 
 
 // Test if sgid bit set
-bool FXStat::isSetGid(const FXString& file){
+FXbool FXStat::isSetGid(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isSetGid();
   }
 
 
 // Test if sticky bit set
-bool FXStat::isSetSticky(const FXString& file){
+FXbool FXStat::isSetSticky(const FXString& file){
   FXStat data;
   return statFile(file,data) && data.isSetSticky();
   }
 
+
+#if 0
+FXulong FXStat::getTotalDiskSpace(const FXString& path){
+#ifdef WIN32
+#else
+  struct statvfs64 info;
+  if(statvfs64(path.text(),&info)==0){
+    if(info.f_frsize)
+      return info.f_blocks*info.f_frsize;
+    else
+      return info.f_blocks*info.f_bsize;
+    }
+#endif
+  return 0;
+  }
+
+FXulong FXStat::getAvailableDiskSpace(const FXString& path){
+#ifdef WIN32
+#else
+  struct statvfs64 info;
+  if(statvfs64(path.text(),&info)==0){
+    if(info.f_frsize)
+      return info.f_bavail*info.f_frsize;
+    else
+      return info.f_bavail*info.f_bsize;
+    }
+#endif
+  return 0;
+  }
+#endif
 
 }
 

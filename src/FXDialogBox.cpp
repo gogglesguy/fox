@@ -3,7 +3,7 @@
 *                     D i a l o g   B o x    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2006 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXDialogBox.cpp,v 1.36 2006/01/22 17:58:22 fox Exp $                     *
+* $Id: FXDialogBox.cpp,v 1.39 2007/02/07 20:22:05 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -82,14 +82,14 @@ FXDialogBox::FXDialogBox(FXApp* a,const FXString& name,FXuint opts,FXint x,FXint
 
 
 // Contruct dialog which will stay on top of owner
-FXDialogBox::FXDialogBox(FXWindow* owner,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
-  FXTopWindow(owner,name,NULL,NULL,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
+FXDialogBox::FXDialogBox(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb,FXint hs,FXint vs):
+  FXTopWindow(own,name,NULL,NULL,opts,x,y,w,h,pl,pr,pt,pb,hs,vs){
   }
 
 
 // Close dialog with an accept
 long FXDialogBox::onCmdAccept(FXObject*,FXSelector,void*){
-  getApp()->stopModal(this,TRUE);
+  getApp()->stopModal(this,true);
   hide();
   return 1;
   }
@@ -97,7 +97,7 @@ long FXDialogBox::onCmdAccept(FXObject*,FXSelector,void*){
 
 // Close dialog with a cancel
 long FXDialogBox::onCmdCancel(FXObject*,FXSelector,void*){
-  getApp()->stopModal(this,FALSE);
+  getApp()->stopModal(this,false);
   hide();
   return 1;
   }

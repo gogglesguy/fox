@@ -3,7 +3,7 @@
 *                     T A R G A   I c o n   O b j e c t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2006 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2007 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXTGAIcon.cpp,v 1.25 2006/01/22 17:58:43 fox Exp $                       *
+* $Id: FXTGAIcon.cpp,v 1.27 2007/02/07 20:22:17 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -91,7 +91,7 @@ FXTGAIcon::FXTGAIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FX
 
 
 // Save pixels to stream
-bool FXTGAIcon::savePixels(FXStream& store) const {
+FXbool FXTGAIcon::savePixels(FXStream& store) const {
   if(fxsaveTGA(store,data,width,height)){
     return true;
     }
@@ -100,7 +100,7 @@ bool FXTGAIcon::savePixels(FXStream& store) const {
 
 
 // Load pixels from stream
-bool FXTGAIcon::loadPixels(FXStream& store){
+FXbool FXTGAIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadTGA(store,pixels,w,h)){
     setData(pixels,IMAGE_OWNED,w,h);
