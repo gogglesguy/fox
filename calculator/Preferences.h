@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -20,7 +20,7 @@
 ********************************************************************************/
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
- 
+
 
 class Calculator;
 

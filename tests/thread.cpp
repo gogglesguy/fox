@@ -3,7 +3,7 @@
 *                                Thread Pool Test                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -62,11 +62,10 @@ FXint Runner::run(){
 FXint Producer::run(){
   FXint job=0;
   fxmessage("producer start on cpus: %llb\n",affinity());
-  FXuint seed=1013904223u;
+  FXRandom rng;
   for(FXint g=0; g<groups; ++g){
     for(FXint c=0; c<count; c++){
-      //FXThread::sleep(50000000);
-      if(!pool->execute(new Runner(job,fxrandom(seed)/1000))) goto x;
+      if(!pool->execute(new Runner(job,(rng.randLong()/4000000)/1000000))) goto x;
       fxmessage("producer job %d\n",job);
       job++;
       }

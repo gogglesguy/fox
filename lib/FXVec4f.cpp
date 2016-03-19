@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -73,7 +74,7 @@ static inline FXfloat rsqrtf(FXfloat r){
 #else
 
 static inline FXfloat rsqrtf(FXfloat r){
-  return 1.0f/sqrtf(r);
+  return 1.0f/Math::sqrt(r);
   }
 
 #endif
@@ -92,7 +93,7 @@ FXVec4f fastnormalize(const FXVec4f& v){
 FXVec4f normalize(const FXVec4f& v){
   register FXfloat m=dot(v,v);
   FXVec4f result(v);
-  if(__likely(0.0f<m)){ result/=sqrtf(m); }
+  if(__likely(0.0f<m)){ result/=Math::sqrt(m); }
   return result;
   }
 
@@ -120,7 +121,7 @@ FXVec4f plane(const FXVec3f& vec,const FXVec3f& p){
 
 // Compute plane equation from 4 vector
 FXVec4f plane(const FXVec4f& vec){
-  register FXfloat t=sqrtf(vec.x*vec.x+vec.y*vec.y+vec.z*vec.z);
+  register FXfloat t=Math::sqrt(vec.x*vec.x+vec.y*vec.y+vec.z*vec.z);
   return FXVec4f(vec.x/t,vec.y/t,vec.z/t,vec.w/t);
   }
 

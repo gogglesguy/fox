@@ -3,7 +3,7 @@
 *                  R a n d o m   N u m b e r   G e n e r a t o r                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXRandom.h"
 
 
@@ -31,7 +32,7 @@
     Journal of Modern Applied Statistical Methods 2, No. 2, 2003.
   - Different shift-counts are certainly possible, and produce different
     sequences (of the same period), see G. Marsaglia, "Xorshift RNGs".
-  - New shift counts based on the paper "An experimental exploration of 
+  - New shift counts based on the paper "An experimental exploration of
     Marsaglia's xorshift generators, scrambled", Sebastiano Vigna, 2014.
 */
 

@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -690,7 +691,7 @@ FXMat4f& FXMat4f::rot(const FXVec3f& v,FXfloat c,FXfloat s){
 
 // Multiply by rotation of phi about unit axis
 FXMat4f& FXMat4f::rot(const FXVec3f& v,FXfloat phi){
-  return rot(v,cosf(phi),sinf(phi));
+  return rot(v,Math::cos(phi),Math::sin(phi));
   }
 
 
@@ -716,7 +717,7 @@ FXMat4f& FXMat4f::xrot(FXfloat c,FXfloat s){
 
 // Rotate by angle about x-axis
 FXMat4f& FXMat4f::xrot(FXfloat phi){
-  return xrot(cosf(phi),sinf(phi));
+  return xrot(Math::cos(phi),Math::sin(phi));
   }
 
 
@@ -742,7 +743,7 @@ FXMat4f& FXMat4f::yrot(FXfloat c,FXfloat s){
 
 // Rotate by angle about y-axis
 FXMat4f& FXMat4f::yrot(FXfloat phi){
-  return yrot(cosf(phi),sinf(phi));
+  return yrot(Math::cos(phi),Math::sin(phi));
   }
 
 
@@ -768,7 +769,7 @@ FXMat4f& FXMat4f::zrot(FXfloat c,FXfloat s){
 
 // Rotate by angle about z-axis
 FXMat4f& FXMat4f::zrot(FXfloat phi){
-  return zrot(cosf(phi),sinf(phi));
+  return zrot(Math::cos(phi),Math::sin(phi));
   }
 
 

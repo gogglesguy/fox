@@ -3,7 +3,7 @@
 *                             K n o b   W i d g e t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2015 by Leandro Nini.   All Rights Reserved.               *
+* Copyright (C) 2005,2016 by Leandro Nini.   All Rights Reserved.               *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -587,13 +588,13 @@ long FXKnob::onPaint(FXObject*,FXSelector,void* ptr){
   dc.setForeground(lineColor);
 
   if(!(options&KNOB_DOT)){
-    px=(FXint)(-cos(p)*rr+0.5)+cx;
-    py=(FXint)(-sin(p)*rr+0.5)+cy;
+    px=(FXint)(-Math::cos(p)*rr+0.5)+cx;
+    py=(FXint)(-Math::sin(p)*rr+0.5)+cy;
     dc.drawLine(cx,cy,px,py);
     }
   else{
-    px=(FXint)(-cos(p)*(rr-lw*2)+0.5)+cx;
-    py=(FXint)(-sin(p)*(rr-lw*2)+0.5)+cy;
+    px=(FXint)(-Math::cos(p)*(rr-lw*2)+0.5)+cx;
+    py=(FXint)(-Math::sin(p)*(rr-lw*2)+0.5)+cy;
     dc.fillEllipse(px-lw,py-lw,lw*2,lw*2);
     }
 
@@ -607,8 +608,8 @@ long FXKnob::onPaint(FXObject*,FXSelector,void* ptr){
     FXASSERT(numTicks<1024);        // FIXME this needs to be done differently
     FXPoint points[1024];
     for(FXint i=0; i<numTicks; i++){
-      px=(FXint)(-cos(p)*rr+0.5)+cx-1;
-      py=(FXint)(-sin(p)*rr+0.5)+cy-1;
+      px=(FXint)(-Math::cos(p)*rr+0.5)+cx-1;
+      py=(FXint)(-Math::sin(p)*rr+0.5)+cy-1;
       points[i]=FXPoint(px,py);
       p+=PI*d;
       }

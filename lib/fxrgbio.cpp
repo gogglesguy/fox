@@ -3,7 +3,7 @@
 *                    I R I S   R G B   I n p u t / O u t p u t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXElement.h"
@@ -270,8 +271,8 @@ FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
             store.load(lengthtab,tablen);
 
             // Offset of RLE chunks in the file
-            FXint sub=store.position()-base;
-            FXint chunklen=0;
+            FXuint sub=store.position()-base;
+            FXuint chunklen=0;
             FXuchar *chunk;
 
             // Fix up the line table & figure space for RLE chunks

@@ -3,7 +3,7 @@
 *                                 Gauge Widget Test                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2010,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2010,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

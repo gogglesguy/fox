@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -348,7 +348,7 @@ FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v){
   return false;
 #endif
   }
- 
+
 
 // Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
 FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b){

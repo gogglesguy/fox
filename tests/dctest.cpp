@@ -3,7 +3,7 @@
 *                           Device Context Tester                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>
@@ -1088,7 +1088,7 @@ long DCTestWindow::onUpdForeColor(FXObject* sender,FXSelector,void*){
 
 // Back Color
 long DCTestWindow::onCmdBackColor(FXObject*,FXSelector,void* ptr){
-  backcolor=(FXColor)(long)ptr;
+  backcolor=(FXColor)(FXuval)ptr;
   linesCanvas->update();
   shapesCanvas->update();
   imagesCanvas->update();

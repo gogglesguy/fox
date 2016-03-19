@@ -3,7 +3,7 @@
 *                    F i l e   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -103,8 +104,8 @@ void FXFileDialog::loadSettings(){
   setFileBoxStyle(getApp()->reg().readUIntEntry(sectionName,"style",getFileBoxStyle()));
   showHiddenFiles(getApp()->reg().readBoolEntry(sectionName,"showhidden",showHiddenFiles()));
   }
-  
-  
+
+
 // Save settings to registry
 void FXFileDialog::saveSettings(){
   getApp()->reg().writeIntEntry(sectionName,"width",getWidth());

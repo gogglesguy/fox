@@ -3,7 +3,7 @@
 *                          L o c k - F r e e   Q u e u e                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2012,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2012,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -25,7 +25,7 @@ namespace FX {
 
 
 /// Lock-free queue of void pointers
-class FXLFQueue {
+class FXAPI FXLFQueue {
 private:
   FXPtrList       items;        // Item buffer
   volatile FXuint whead;        // Head write pointer

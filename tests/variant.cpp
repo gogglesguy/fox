@@ -108,7 +108,7 @@ int main(int argc,char *argv[]){
     var["map"]["more"]["letter"]="\377\xff\b\n\f\v\"";
     var["emptymap"].setType(FXVariant::VMap);
     var["emptyarray"].setType(FXVariant::VArray);
-    for(FXint i=0; i<100; ++i){
+    for(FXival i=0; i<100; ++i){
       var["bigarray"][i]=sin(0.005*i/PI);
       }
     }

@@ -3,7 +3,7 @@
 *                      O n - L i n e   H e l p   T e x t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -21,7 +21,7 @@
 #include "fx.h"
 #include "Calculator.h"
 
- 
+
 // Help text
 const char Calculator::help[]=
 "\n\n"

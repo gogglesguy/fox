@@ -3,7 +3,7 @@
 *             R e a l - V a l u e d   S p i n n e r  W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2015 by Bill Baxter.   All Rights Reserved.                *
+* Copyright (C) 2003,2016 by Bill Baxter.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -92,11 +93,6 @@ FXDEFMAP(FXRealSpinner) FXRealSpinnerMap[]={
 
 // Object implementation
 FXIMPLEMENT(FXRealSpinner,FXPacker,FXRealSpinnerMap,ARRAYNUMBER(FXRealSpinnerMap))
-
-
-#if defined(WIN32) || defined(__sgi) || defined(__sun) || defined(__alpha) || defined(__minix)
-static double round(double x){ return (x >= 0) ? floor(x+0.5) : ceil(x-0.5); }
-#endif
 
 
 // Construct spinner out of two buttons and a text field
@@ -429,9 +425,9 @@ void FXRealSpinner::incrementByAmount(FXdouble amount,FXbool notify){
       }
     else{
       value=pos+amount;
-      if(0.0<gran) value=gran*round(value/gran);
+      if(0.0<gran) value=gran*Math::round(value/gran);
       if(options&REALSPIN_CYCLIC){
-        value=value-floor((value-range[0])/(range[1]-range[0]))*(range[1]-range[0]);
+        value=value-Math::floor((value-range[0])/(range[1]-range[0]))*(range[1]-range[0]);
         }
       }
     setValue(value,notify);
@@ -454,9 +450,9 @@ void FXRealSpinner::decrementByAmount(FXdouble amount,FXbool notify){
       }
     else{
       value=pos-amount;
-      if(0.0<gran) value=gran*round(value/gran);
+      if(0.0<gran) value=gran*Math::round(value/gran);
       if(options&REALSPIN_CYCLIC){
-        value=value-floor((value-range[0])/(range[1]-range[0]))*(range[1]-range[0]);
+        value=value-Math::floor((value-range[0])/(range[1]-range[0]))*(range[1]-range[0]);
         }
       }
     setValue(value,notify);

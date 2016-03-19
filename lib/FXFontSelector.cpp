@@ -3,7 +3,7 @@
 *                        F o n t   S e l e c t i o n   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
@@ -225,7 +226,7 @@ FXFontSelector::FXFontSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   preview=new FXLabel(scrollwindow,"ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789",NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   preview->setBackColor(getApp()->getBackColor());
   new FXFrame(bottom,FRAME_NONE|LAYOUT_FIX_WIDTH|LAYOUT_FILL_Y,0,0,1,0);
-  new FXFrame(bottom,FRAME_NONE|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_ROW,0,0,1,120);  
+  new FXFrame(bottom,FRAME_NONE|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_ROW,0,0,1,120);
 
   // Bottom side
   FXHorizontalFrame *buttons=new FXHorizontalFrame(innards,LAYOUT_BOTTOM|LAYOUT_FILL_X);

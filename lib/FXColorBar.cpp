@@ -3,7 +3,7 @@
 *                       C o l o r   B a r   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"

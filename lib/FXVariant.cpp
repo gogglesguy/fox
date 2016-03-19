@@ -3,7 +3,7 @@
 *                          V a r i a n t   T y p e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 #include "fxunicode.h"
 #include "FXElement.h"
@@ -238,13 +239,13 @@ void FXVariant::setType(VType t){
 
 
 // Return size of array
-FXint FXVariant::no() const {
+FXival FXVariant::no() const {
   return (type==VArray) ? reinterpret_cast<const FXVariantArray*>(&value.p)->no() : 0;
   }
 
 
 // Change number of elements in array
-FXbool FXVariant::no(FXint n){
+FXbool FXVariant::no(FXival n){
   if(type!=VArray){
     reset();
     init(VArray);
@@ -632,9 +633,8 @@ FXVariant& FXVariant::adopt(FXVariantMap& other){
   }
 
 /*******************************************************************************/
-
 // Return value of object member
-FXVariant& FXVariant::operator[](const FXchar* key){
+FXVariant& FXVariant::at(const FXchar* key){
   if(type!=VMap){
     reset();
     init(VMap);
@@ -644,7 +644,7 @@ FXVariant& FXVariant::operator[](const FXchar* key){
 
 
 // Return value of object member
-const FXVariant& FXVariant::operator[](const FXchar* key) const {
+const FXVariant& FXVariant::at(const FXchar* key) const {
   if(type==VMap){
     return reinterpret_cast<const FXVariantMap*>(&value.p)->at(key);
     }
@@ -653,7 +653,7 @@ const FXVariant& FXVariant::operator[](const FXchar* key) const {
 
 
 // Return value of object member
-FXVariant& FXVariant::operator[](const FXString& key){
+FXVariant& FXVariant::at(const FXString& key){
   if(type!=VMap){
     reset();
     init(VMap);
@@ -663,7 +663,7 @@ FXVariant& FXVariant::operator[](const FXString& key){
 
 
 // Return value of object member
-const FXVariant& FXVariant::operator[](const FXString& key) const {
+const FXVariant& FXVariant::at(const FXString& key) const {
   if(type==VMap){
     return reinterpret_cast<const FXVariantMap*>(&value.p)->at(key);
     }
@@ -673,7 +673,7 @@ const FXVariant& FXVariant::operator[](const FXString& key) const {
 /*******************************************************************************/
 
 // Return value of array member
-FXVariant& FXVariant::operator[](FXint idx){
+FXVariant& FXVariant::at(FXival idx){
   if(idx<0){ throw FXRangeException("FXVariant: index out of range\n"); }
   if(type!=VArray){
     reset();
@@ -689,14 +689,14 @@ FXVariant& FXVariant::operator[](FXint idx){
 
 
 // Return value of array member
-const FXVariant& FXVariant::operator[](FXint idx) const {
+const FXVariant& FXVariant::at(FXival idx) const {
   if(idx<0){ throw FXRangeException("FXVariant: index out of range\n"); }
   if(type==VArray && idx<reinterpret_cast<const FXVariantArray*>(&value.p)->no()){
     return reinterpret_cast<const FXVariantArray*>(&value.p)->at(idx);
     }
   return FXVariant::null;
   }
-
+ 
 /*******************************************************************************/
 
 // Clear the data

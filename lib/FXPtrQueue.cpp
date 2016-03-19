@@ -3,7 +3,7 @@
 *                         Q u e u e   O f   P o i n t e r s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -20,6 +20,7 @@
 ********************************************************************************/
 #include "xincs.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXElement.h"
 #include "FXPtrList.h"
 #include "FXPtrQueue.h"
@@ -49,12 +50,12 @@ FXPtrQueue::FXPtrQueue():head(0),tail(0){
 
 
 // Create queue with initial size
-FXPtrQueue::FXPtrQueue(FXuint sz):list((FXptr)NULL,sz),head(0),tail(0){
+FXPtrQueue::FXPtrQueue(FXival sz):list((FXptr)NULL,sz),head(0),tail(0){
   }
 
 
 // Change size of queue; return true if success
-FXbool FXPtrQueue::setSize(FXuint sz){
+FXbool FXPtrQueue::setSize(FXival sz){
   if(list.no(sz)){
     head=0;
     tail=0;
@@ -65,13 +66,13 @@ FXbool FXPtrQueue::setSize(FXuint sz){
 
 
 // Return used slots
-FXuint FXPtrQueue::getUsed() const {
+FXival FXPtrQueue::getUsed() const {
   return head-tail;
   }
 
 
 // Return free slots
-FXuint FXPtrQueue::getFree() const {
+FXival FXPtrQueue::getFree() const {
   return getSize()+tail-head;
   }
 

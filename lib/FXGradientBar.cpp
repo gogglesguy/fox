@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -288,28 +289,28 @@ FXdouble FXGradientBar::blendlinear(FXdouble middle,FXdouble pos){
 // Power blend
 FXdouble FXGradientBar::blendpower(FXdouble middle,FXdouble pos){
   if(middle<EPSILON) middle=EPSILON;
-  return pow(pos,log(0.5)/log(middle));
+  return Math::pow(pos,Math::log(0.5)/Math::log(middle));
   }
 
 
 // Sinusoidal blend
 FXdouble FXGradientBar::blendsine(FXdouble middle,FXdouble pos){
   pos=blendlinear(middle,pos);
-  return (sin((-PI/2.0)+PI*pos)+1.0)/2.0;
+  return (Math::sin((-PI/2.0)+PI*pos)+1.0)/2.0;
   }
 
 
 // Quadratic increasing blend
 FXdouble FXGradientBar::blendincreasing(FXdouble middle,FXdouble pos){
   pos=blendlinear(middle,pos)-1.0;
-  return sqrt(1.0-pos*pos);       // Works for convex increasing and concave decreasing
+  return Math::sqrt(1.0-pos*pos);       // Works for convex increasing and concave decreasing
   }
 
 
 // Quadratic decreasing blend
 FXdouble FXGradientBar::blenddecreasing(FXdouble middle,FXdouble pos){
   pos=blendlinear(middle,pos);
-  return 1.0-sqrt(1.0-pos*pos);   // Works for convex decreasing and concave increasing
+  return 1.0-Math::sqrt(1.0-pos*pos);   // Works for convex decreasing and concave increasing
   }
 
 

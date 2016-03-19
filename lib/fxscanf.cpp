@@ -3,7 +3,7 @@
 *                   V a r a r g s   S c a n f   R o u t i n e s                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 
 
@@ -366,7 +367,7 @@ assign:   if(convert){
               number*=1.0E-16;
               exponent+=16;
               }
-            number*=fxtenToThe(exponent);                       // In range
+            number*=Math::ipow(10.0,exponent);                  // In range
             if(neg){                                            // Apply sign
               number=-number;
               }

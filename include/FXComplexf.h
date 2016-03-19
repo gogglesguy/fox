@@ -3,7 +3,7 @@
 *          S i n g l e - P r e c i s i o n   C o m p l e x   N u m b e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -68,10 +68,10 @@ public:
   FXfloat modulus2() const { return re*re+im*im; }
 
   /// Modulus or absolute value of complex
-  FXfloat modulus() const { return sqrtf(modulus2()); }
+  FXfloat modulus() const { return Math::sqrt(modulus2()); }
 
   /// Argument of complex
-  FXfloat argument() const { return atan2f(im,re); }
+  FXfloat argument() const { return Math::atan2(im,re); }
 
   /// Return a non-const reference to the ith element
   FXfloat& operator[](FXint i){ return (&re)[i]; }
@@ -110,32 +110,22 @@ public:
 inline FXComplexf conj(const FXComplexf& c){ return FXComplexf(c.real(),-c.imag()); }
 
 /// Return complex number from modulus and argument
-inline FXComplexf polar(FXfloat mod,FXfloat arg){ return FXComplexf(cosf(arg)*mod,sinf(arg)*mod); }
+inline FXComplexf polar(FXfloat mod,FXfloat arg){ return FXComplexf(Math::cos(arg)*mod,Math::sin(arg)*mod); }
 
 /// Return norm of complex
 inline FXfloat norm(const FXComplexf& c){ return c.real()*c.real()+c.imag()*c.imag(); }
 
 /// Return modulus or absolute value of complex
-inline FXfloat abs(const FXComplexf& c){ return sqrtf(norm(c)); }
+inline FXfloat abs(const FXComplexf& c){ return Math::sqrt(norm(c)); }
 
 /// Return argument of complex
-inline FXfloat arg(const FXComplexf& c){ return atan2f(c.imag(),c.real()); }
+inline FXfloat arg(const FXComplexf& c){ return Math::atan2(c.imag(),c.real()); }
 
 /// Returns the complex base e exponential of c
-inline FXComplexf exp(const FXComplexf& c){ return polar(::expf(c.real()),c.imag()); }
+inline FXComplexf exp(const FXComplexf& c){ return polar(Math::exp(c.real()),c.imag()); }
 
 /// Returns the complex base e logarithm of c
-inline FXComplexf log(const FXComplexf& c){ return FXComplexf(::logf(abs(c)),arg(c)); }
-
-
-/// Return complex complex conjugate
-inline FXComplexf conjugate(const FXComplexf& c){ return FXComplexf(c.real(),-c.imag()); }
-
-/// Returns the complex base e exponential of c
-inline FXComplexf exponent(const FXComplexf& c){ return polar(::expf(c.real()),c.imag()); }
-
-/// Returns the complex base e logarithm of c
-inline FXComplexf logarithm(const FXComplexf& c){ return FXComplexf(::logf(abs(c)),arg(c)); }
+inline FXComplexf log(const FXComplexf& c){ return FXComplexf(Math::log(abs(c)),arg(c)); }
 
 
 

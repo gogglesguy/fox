@@ -3,7 +3,7 @@
 *                          A x i s - D e f i n i t i o n                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -27,7 +27,7 @@ namespace FXCHART {
 
 class FXChart;
 
- 
+
 /// Axis styles
 enum {
   AXIS_OFF            = 0,              /// Nothing drawn on axis

@@ -80,7 +80,7 @@ FXint FX88591Codec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   return 1;
   }
 
- 
+
 FXint FX88591Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   if(ndst<1) return -1;
   dst[0]=reverse_data[reverse_block[reverse_pages[reverse_plane[wc>>16]+((wc>>10)&63)]+((wc>>4)&63)]+(wc&15)];

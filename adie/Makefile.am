@@ -5,7 +5,7 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP  = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
- 
+
 
 bin_PROGRAMS = adie
 
@@ -93,7 +93,11 @@ SyntaxParser.cpp \
 TextWindow.h \
 TextWindow.cpp
 
-BUILT_SOURCES = icons.h icons.cpp
+BUILT_SOURCES = \
+icons.h \
+icons.cpp \
+help.h \
+help.cpp
 
 icons.h: $(ICONS)
 	$(RESWRAP) -h -o $@ $^
@@ -102,8 +106,13 @@ icons.h: $(ICONS)
 icons.cpp: $(ICONS)
 	$(RESWRAP) -i icons.h -o $@ $^
 
+help.h: help.txt
+	$(RESWRAP) -h -a -o $@ $^
 
-CLEANFILES = icons.h icons.cpp
+help.cpp: help.txt
+	$(RESWRAP) -i help.h -a -o $@ $^
+
+CLEANFILES = icons.h icons.cpp help.h help.cpp
 
 
 EXTRA_DIST = $(man_MANS) \
@@ -112,4 +121,5 @@ Makefile.bc \
 Makefile.wc \
 Makefile.dmc \
 LICENSE \
+help.txt \
 $(ICONS)

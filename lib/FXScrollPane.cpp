@@ -3,7 +3,7 @@
 *               S c r o l l i n g   M e n u   P a n e   W i d g e t             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxkeys.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"

@@ -3,7 +3,7 @@
 *          D o u b l e - P r e c i s i o n   C o m p l e x   N u m b e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -111,32 +112,28 @@ namespace FX {
 // Complex square root
 FXComplexd csqrt(const FXComplexd& c){
   register FXdouble mag=abs(c);
-  register FXdouble rr=sqrt((mag+c.re)*0.5);
-  register FXdouble ii=sqrt((mag-c.re)*0.5);
-#if defined(WIN32)
-  return FXComplexd(rr,c.im<0.0?-ii:ii);
-#else
-  return FXComplexd(rr,copysign(ii,c.im));
-#endif
+  register FXdouble rr=Math::sqrt((mag+c.re)*0.5);
+  register FXdouble ii=Math::sqrt((mag-c.re)*0.5);
+  return FXComplexd(rr,Math::copysign(ii,c.im));
   }
 
 
 // Complex sine
 FXComplexd csin(const FXComplexd& c){
-  return FXComplexd(sin(c.re)*cosh(c.im),cos(c.re)*sinh(c.im));
+  return FXComplexd(Math::sin(c.re)*Math::cosh(c.im),Math::cos(c.re)*Math::sinh(c.im));
   }
 
 
 // Complex cosine
 FXComplexd ccos(const FXComplexd& c){
-  return FXComplexd(cos(c.re)*cosh(c.im),-sin(c.re)*sinh(c.im));
+  return FXComplexd(Math::cos(c.re)*Math::cosh(c.im),-Math::sin(c.re)*Math::sinh(c.im));
   }
 
 
 // Complex tangent
 FXComplexd ctan(const FXComplexd& c){
-  FXComplexd ep=exponent(FXComplexd(-c.im,c.re));
-  FXComplexd em=exponent(FXComplexd(c.im,-c.re));
+  FXComplexd ep=exp(FXComplexd(-c.im,c.re));
+  FXComplexd em=exp(FXComplexd(c.im,-c.re));
   FXComplexd t=(em-ep)/(em+ep);
   return FXComplexd(-t.im,t.re);
   }
@@ -144,13 +141,13 @@ FXComplexd ctan(const FXComplexd& c){
 
 // Complex hyperbolic sine
 FXComplexd csinh(const FXComplexd& c){
-  return FXComplexd(cos(c.im)*sinh(c.re),sin(c.im)*cosh(c.re));
+  return FXComplexd(Math::cos(c.im)*Math::sinh(c.re),Math::sin(c.im)*Math::cosh(c.re));
   }
 
 
 // Complex hyperbolic cosine
 FXComplexd ccosh(const FXComplexd& c){
-  return FXComplexd(cos(c.im)*cosh(c.re),sin(c.im)*sinh(c.re));
+  return FXComplexd(Math::cos(c.im)*Math::cosh(c.re),Math::sin(c.im)*Math::sinh(c.re));
   }
 
 

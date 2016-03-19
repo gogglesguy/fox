@@ -3,7 +3,7 @@
 *                        C o l o r W h e e l   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -165,8 +166,8 @@ void FXColorWheel::layout(){
 FXbool FXColorWheel::hstoxy(FXint& x,FXint& y,FXfloat h,FXfloat s) const {
   register FXfloat r=dial->getWidth()*0.5f;
   register FXfloat a=(h-180.0f)*DTOR;
-  x=(FXint)(s*r*cosf(a)+r+0.5f);
-  y=(FXint)(s*r*sinf(a)+r+0.5f);
+  x=(FXint)(s*r*Math::cos(a)+r+0.5f);
+  y=(FXint)(s*r*Math::sin(a)+r+0.5f);
   return true;
   }
 
@@ -176,11 +177,11 @@ FXbool FXColorWheel::xytohs(FXfloat& h,FXfloat& s,FXint x,FXint y) const {
   register FXfloat r=dial->getWidth()*0.5f;
   register FXfloat rx=x-r;
   register FXfloat ry=y-r;
-  register FXfloat v=sqrtf(rx*rx+ry*ry);
+  register FXfloat v=Math::sqrt(rx*rx+ry*ry);
   h=0.0f;
   s=0.0f;
   if(0.0f<v){
-    h=atan2f(ry,rx)*RTOD+180.0f;
+    h=Math::atan2(ry,rx)*RTOD+180.0f;
     if(v<r){
       s=v/r;
       return true;
@@ -351,7 +352,7 @@ long FXColorWheel::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXfloat amount=((FXEvent*)ptr)->code/12.0f;
   if(isEnabled()){
     if(((FXEvent*)ptr)->state&CONTROLMASK) amount*=0.1f;
-    setHue(fmodf(hsv[0]+amount+360.0f,360.0f));
+    setHue(Math::fmod(hsv[0]+amount+360.0f,360.0f));
     if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)hsv);
     return 1;
     }

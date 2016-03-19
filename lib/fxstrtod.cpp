@@ -3,7 +3,7 @@
 *               S t r i n g   t o   D o u b l e   C o n v e r s i o n           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 
 
@@ -49,6 +50,9 @@ namespace FX {
 extern FXAPI FXdouble __strtod(const FXchar *beg,const FXchar** end=NULL,FXbool* ok=NULL);
 extern FXAPI FXfloat __strtof(const FXchar *beg,const FXchar** end=NULL,FXbool* ok=NULL);
 
+// Some magick
+const union{ FXulong u; FXdouble f; } inf={FXULONG(0x7ff0000000000000)};
+const union{ FXulong u; FXdouble f; } nan={FXULONG(0x7fffffffffffffff)};
 
 // Convert string to double
 FXdouble __strtod(const FXchar *beg,const FXchar** end,FXbool* ok){
@@ -162,7 +166,7 @@ FXdouble __strtod(const FXchar *beg,const FXchar** end,FXbool* ok){
         }
 
       // In range
-      value*=fxtenToThe(exponent);
+      value*=Math::ipow(10.0,exponent);
 
       // Adjust sign
       if(neg){
@@ -170,6 +174,34 @@ FXdouble __strtod(const FXchar *beg,const FXchar** end,FXbool* ok){
         }
       }
     if(ok) *ok=true;            // OK
+    }
+
+  // Infinite
+  else if(*s=='i' || *s=='I'){
+    s++;
+    if(*s=='n' || *s=='N'){
+      s++;
+      if(*s=='f' || *s=='F'){
+        s++;
+        value=neg?-inf.f:inf.f;
+        if(end) *end=s;
+        if(ok) *ok=true;        // OK
+        }
+      }
+    }
+
+  // NaN
+  else if(*s=='n' || *s=='N'){
+    s++;
+    if(*s=='a' || *s=='A'){
+      s++;
+      if(*s=='n' || *s=='N'){
+        s++;
+        value=neg?-nan.f:nan.f;
+        if(end) *end=s;
+        if(ok) *ok=true;        // OK
+        }
+      }
     }
   return value;
   }

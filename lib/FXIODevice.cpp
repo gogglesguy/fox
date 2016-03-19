@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -99,9 +100,9 @@ FXbool FXIODevice::setMode(FXuint m){
     FXint flags=0;
     if(m&NonBlocking) flags|=O_NONBLOCK;
     if(m&Append) flags|=O_APPEND;
-#if defined(O_NOATIME)    
+#if defined(O_NOATIME)
     if(m&NoAccessTime) flags|=O_NOATIME;
-#endif    
+#endif
     if(::fcntl(device,F_SETFL,flags)<0) return false;
 #if defined(O_CLOEXEC)
     flags=O_CLOEXEC;

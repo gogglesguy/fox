@@ -3,7 +3,7 @@
 *                         C o l o r R i n g   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXMutex.h"
@@ -267,12 +268,12 @@ void FXColorRing::updatering(){
   a=(hsv[0]-180.0f)*DTOR;
 
   // Calculate triangle points
-  clrx=(FXint)(ringinner*cosf(a)+0.5f);
-  clry=(FXint)(ringinner*sinf(a)+0.5f);
-  blkx=(FXint)(ringinner*cosf(a+2.0f*PI/3.0f)+0.5f);
-  blky=(FXint)(ringinner*sinf(a+2.0f*PI/3.0f)+0.5f);
-  whtx=(FXint)(ringinner*cosf(a-2.0f*PI/3.0f)+0.5f);
-  whty=(FXint)(ringinner*sinf(a-2.0f*PI/3.0f)+0.5f);
+  clrx=(FXint)(ringinner*Math::cos(a)+0.5f);
+  clry=(FXint)(ringinner*Math::sin(a)+0.5f);
+  blkx=(FXint)(ringinner*Math::cos(a+2.0f*PI/3.0f)+0.5f);
+  blky=(FXint)(ringinner*Math::sin(a+2.0f*PI/3.0f)+0.5f);
+  whtx=(FXint)(ringinner*Math::cos(a-2.0f*PI/3.0f)+0.5f);
+  whty=(FXint)(ringinner*Math::sin(a-2.0f*PI/3.0f)+0.5f);
 
   // To test for ring
   o2=ringouter*ringouter;
@@ -338,8 +339,8 @@ FXfloat FXColorRing::hueFromXY(FXint x,FXint y) const {
 void FXColorRing::hueToXY(FXint& x,FXint& y,FXfloat hue) const {
   register FXfloat a=(hue-180.0f)*DTOR;
   register FXfloat r=ringouter-ringwidth*0.5f;
-  x=dialx+ringouter+(FXint)(r*cosf(a)+0.5f);
-  y=dialy+ringouter+(FXint)(r*sinf(a)+0.5f);
+  x=dialx+ringouter+(FXint)(r*Math::cos(a)+0.5f);
+  y=dialy+ringouter+(FXint)(r*Math::sin(a)+0.5f);
   }
 
 
@@ -581,7 +582,7 @@ long FXColorRing::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXfloat amount=((FXEvent*)ptr)->code/12.0f;
   if(isEnabled()){
     if(((FXEvent*)ptr)->state&CONTROLMASK) amount/=10.0f;
-    setHue(fmodf(hsv[0]+amount+360.0f,360.0f));
+    setHue(Math::fmod(hsv[0]+amount+360.0f,360.0f));
     if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)hsv);
     return 1;
     }

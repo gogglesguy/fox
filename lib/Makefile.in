@@ -182,7 +182,7 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxcpuid.lo \
 	fxbmpio.lo fxddsio.lo fxezquantize.lo fxexeio.lo \
 	fxfsquantize.lo fxgetticks.lo fxgifio.lo fxiffio.lo \
-	fxjpegio.lo fxjp2io.lo fxkeyboard.lo fxkeysym.lo \
+	fxjpegio.lo fxjp2io.lo fxkeyboard.lo fxkeysym.lo fxmath.lo \
 	fxparsegeometry.lo fxpcxio.lo fxpngio.lo fxppmio.lo \
 	fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo fxrgbio.lo \
 	fxscanf.lo fxstrtoll.lo fxstrtoull.lo fxstrtod.lo fxtargaio.lo \
@@ -839,6 +839,7 @@ fxjpegio.cpp \
 fxjp2io.cpp \
 fxkeyboard.cpp \
 fxkeysym.cpp \
+fxmath.cpp \
 fxparsegeometry.cpp \
 fxpcxio.cpp \
 fxpngio.cpp \
@@ -1295,6 +1296,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxjpegio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxkeyboard.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxkeysym.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxmath.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxparsegeometry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxpcxio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxpngio.Plo@am__quote@

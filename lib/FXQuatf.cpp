@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -67,7 +68,7 @@ FXQuatf& FXQuatf::adjust(){
   register FXfloat t=length2();
   register FXfloat f;
   if(__likely(t>0.0f)){
-    f=1.0f/sqrtf(t);
+    f=1.0f/Math::sqrt(t);
     x*=f;
     y*=f;
     z*=f;
@@ -83,11 +84,11 @@ void FXQuatf::setAxisAngle(const FXVec3f& axis,FXfloat phi){
   register FXfloat a,m;
   if(__likely(0.0f<mag)){
     a=0.5f*phi;
-    m=sinf(a)/mag;
+    m=Math::sin(a)/mag;
     x=axis.x*m;
     y=axis.y*m;
     z=axis.z*m;
-    w=cosf(a);
+    w=Math::cos(a);
     return;
     }
   x=0.0f;
@@ -103,11 +104,11 @@ void FXQuatf::getAxisAngle(FXVec3f& axis,FXfloat& phi) const {
   register FXfloat mag=x*x+y*y+z*z;
   register FXfloat m;
   if(__likely(0.0f<mag)){
-    m=sqrtf(mag);
+    m=Math::sqrt(mag);
     axis.x=x/m;
     axis.y=y/m;
     axis.z=z/m;
-    phi=2.0f*acosf(w/sqrtf(mag+w*w));
+    phi=2.0f*Math::acos(w/Math::sqrt(mag+w*w));
     return;
     }
   axis.x=1.0f;
@@ -123,9 +124,9 @@ void FXQuatf::setRollPitchYaw(FXfloat roll,FXfloat pitch,FXfloat yaw){
   register FXfloat rr=0.5f*roll;
   register FXfloat pp=0.5f*pitch;
   register FXfloat yy=0.5f*yaw;
-  sr=sinf(rr); cr=cosf(rr);
-  sp=sinf(pp); cp=cosf(pp);
-  sy=sinf(yy); cy=cosf(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=sr*cp*cy-cr*sp*sy;
   y=cr*sp*cy+sr*cp*sy;
   z=cr*cp*sy-sr*sp*cy;
@@ -139,9 +140,9 @@ void FXQuatf::setYawPitchRoll(FXfloat yaw,FXfloat pitch,FXfloat roll){
   register FXfloat rr=0.5f*roll;
   register FXfloat pp=0.5f*pitch;
   register FXfloat yy=0.5f*yaw;
-  sr=sinf(rr); cr=cosf(rr);
-  sp=sinf(pp); cp=cosf(pp);
-  sy=sinf(yy); cy=cosf(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=sr*cp*cy+cr*sp*sy;
   y=cr*sp*cy-sr*cp*sy;
   z=cr*cp*sy+sr*sp*cy;
@@ -155,9 +156,9 @@ void FXQuatf::setRollYawPitch(FXfloat roll,FXfloat yaw,FXfloat pitch){
   register FXfloat rr=0.5f*roll;
   register FXfloat pp=0.5f*pitch;
   register FXfloat yy=0.5f*yaw;
-  sr=sinf(rr); cr=cosf(rr);
-  sp=sinf(pp); cp=cosf(pp);
-  sy=sinf(yy); cy=cosf(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=cp*cy*sr+sp*sy*cr;
   y=sp*cy*cr+cp*sy*sr;
   z=cp*sy*cr-sp*cy*sr;
@@ -171,9 +172,9 @@ void FXQuatf::setPitchRollYaw(FXfloat pitch,FXfloat roll,FXfloat yaw){
   register FXfloat rr=0.5f*roll;
   register FXfloat pp=0.5f*pitch;
   register FXfloat yy=0.5f*yaw;
-  sr=sinf(rr); cr=cosf(rr);
-  sp=sinf(pp); cp=cosf(pp);
-  sy=sinf(yy); cy=cosf(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=cy*sr*cp-sy*cr*sp;
   y=cy*cr*sp+sy*sr*cp;
   z=cy*sr*sp+sy*cr*cp;
@@ -187,9 +188,9 @@ void FXQuatf::setPitchYawRoll(FXfloat pitch,FXfloat yaw,FXfloat roll){
   register FXfloat rr=0.5f*roll;
   register FXfloat pp=0.5f*pitch;
   register FXfloat yy=0.5f*yaw;
-  sr=sinf(rr); cr=cosf(rr);
-  sp=sinf(pp); cp=cosf(pp);
-  sy=sinf(yy); cy=cosf(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=sr*cy*cp-cr*sy*sp;
   y=cr*cy*sp-sr*sy*cp;
   z=sr*cy*sp+cr*sy*cp;
@@ -203,9 +204,9 @@ void FXQuatf::setYawRollPitch(FXfloat yaw,FXfloat roll,FXfloat pitch){
   register FXfloat rr=0.5f*roll;
   register FXfloat pp=0.5f*pitch;
   register FXfloat yy=0.5f*yaw;
-  sr=sinf(rr); cr=cosf(rr);
-  sp=sinf(pp); cp=cosf(pp);
-  sy=sinf(yy); cy=cosf(yy);
+  sr=Math::sin(rr); cr=Math::cos(rr);
+  sp=Math::sin(pp); cp=Math::cos(pp);
+  sy=Math::sin(yy); cy=Math::cos(yy);
   x=cp*sr*cy+sp*cr*sy;
   y=sp*cr*cy-cp*sr*sy;
   z=cp*cr*sy-sp*sr*cy;
@@ -222,20 +223,20 @@ void FXQuatf::getRollPitchYaw(FXfloat& roll,FXfloat& pitch,FXfloat& yaw) const {
   register FXfloat s=-2.0f*(x*z-w*y);
   if(__likely(s<1.0f)){
     if(__likely(-1.0f<s)){
-      roll=atan2f(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
-      pitch=asinf(s);
-      yaw=atan2f(2.0f*(x*y+w*z),1.0f-2.0f*(y*y+z*z));
+      roll=Math::atan2(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
+      pitch=Math::asin(s);
+      yaw=Math::atan2(2.0f*(x*y+w*z),1.0f-2.0f*(y*y+z*z));
       }
     else{
       roll=0.0f;
       pitch=-1.57079632679489661923f;
-      yaw=-atan2f(-2.0f*(x*y-w*z),2.0f*(x*z+w*y));
+      yaw=-Math::atan2(-2.0f*(x*y-w*z),2.0f*(x*z+w*y));
       }
     }
   else{
     roll=0.0f;
     pitch=1.57079632679489661923f;
-    yaw=atan2f(-2.0f*(x*y-w*z),2.0f*(x*z+w*y));
+    yaw=Math::atan2(-2.0f*(x*y-w*z),2.0f*(x*z+w*y));
     }
   }
 
@@ -245,20 +246,20 @@ void FXQuatf::getYawPitchRoll(FXfloat& yaw,FXfloat& pitch,FXfloat& roll) const {
   register FXfloat s=2.0f*(x*z+w*y);
   if(__likely(s<1.0f)){
     if(__likely(-1.0f<s)){
-      yaw=atan2f(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
-      pitch=asinf(s);
-      roll=atan2f(-2.0f*(y*z-w*x),1.0f-2.0f*(x*x+y*y));
+      yaw=Math::atan2(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
+      pitch=Math::asin(s);
+      roll=Math::atan2(-2.0f*(y*z-w*x),1.0f-2.0f*(x*x+y*y));
       }
     else{
       yaw=0.0f;
       pitch=-1.57079632679489661923f;
-      roll=-atan2f(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
+      roll=-Math::atan2(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
       }
     }
   else{
     yaw=0.0f;
     pitch=1.57079632679489661923f;
-    roll=atan2f(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
+    roll=Math::atan2(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
     }
   }
 
@@ -268,20 +269,20 @@ void FXQuatf::getRollYawPitch(FXfloat& roll,FXfloat& yaw,FXfloat& pitch) const {
   register FXfloat s=2.0f*(x*y+w*z);
   if(__likely(s<1.0f)){
     if(__likely(-1.0f<s)){
-      roll=atan2f(-2.0f*(y*z-w*x),1.0f-2.0f*(x*x+z*z));
-      yaw=asinf(s);
-      pitch=atan2f(-2.0f*(x*z-w*y),1.0f-2.0f*(y*y+z*z));
+      roll=Math::atan2(-2.0f*(y*z-w*x),1.0f-2.0f*(x*x+z*z));
+      yaw=Math::asin(s);
+      pitch=Math::atan2(-2.0f*(x*z-w*y),1.0f-2.0f*(y*y+z*z));
       }
     else{
       roll=0.0f;
       yaw=-1.57079632679489661923f;
-      pitch=-atan2f(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
+      pitch=-Math::atan2(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
       }
     }
   else{
     roll=0.0f;
     yaw=1.57079632679489661923f;
-    pitch=atan2f(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
+    pitch=Math::atan2(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
     }
   }
 
@@ -291,20 +292,20 @@ void FXQuatf::getPitchRollYaw(FXfloat& pitch,FXfloat& roll,FXfloat& yaw) const {
   register FXfloat s=2.0f*(y*z+w*x);
   if(__likely(s<1.0f)){
     if(__likely(-1.0f<s)){
-      pitch=atan2f(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
-      roll=asinf(s);
-      yaw=atan2f(-2.0f*(x*y-w*z),1.0f-2.0f*(x*x+z*z));
+      pitch=Math::atan2(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
+      roll=Math::asin(s);
+      yaw=Math::atan2(-2.0f*(x*y-w*z),1.0f-2.0f*(x*x+z*z));
       }
     else{
       pitch=0.0f;
       roll=-1.57079632679489661923f;
-      yaw=-atan2f(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
+      yaw=-Math::atan2(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
       }
     }
   else{
     pitch=0.0f;
     roll=1.57079632679489661923f;
-    yaw=atan2f(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
+    yaw=Math::atan2(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
     }
   }
 
@@ -314,20 +315,20 @@ void FXQuatf::getPitchYawRoll(FXfloat& pitch,FXfloat& yaw,FXfloat& roll) const {
   register FXfloat s=-2.0f*(x*y-w*z);
   if(__likely(s<1.0f)){
     if(__likely(-1.0f<s)){
-      pitch=atan2f(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
-      yaw=asinf(s);
-      roll=atan2f(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+z*z));
+      pitch=Math::atan2(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
+      yaw=Math::asin(s);
+      roll=Math::atan2(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+z*z));
       }
     else{
       pitch=0.0f;
       yaw=-1.57079632679489661923f;
-      roll=-atan2f(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
+      roll=-Math::atan2(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
       }
     }
   else{
     pitch=0.0f;
     yaw=1.57079632679489661923f;
-    roll=atan2f(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
+    roll=Math::atan2(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
     }
   }
 
@@ -337,20 +338,20 @@ void FXQuatf::getYawRollPitch(FXfloat& yaw,FXfloat& roll,FXfloat& pitch) const {
   register FXfloat s=-2.0f*(y*z-w*x);
   if(__likely(s<1.0f)){
     if(__likely(-1.0f<s)){
-      yaw=atan2f(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
-      roll=asinf(s);
-      pitch=atan2f(2.0f*(x*z+w*y),1.0f-2.0f*(x*x+y*y));
+      yaw=Math::atan2(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
+      roll=Math::asin(s);
+      pitch=Math::atan2(2.0f*(x*z+w*y),1.0f-2.0f*(x*x+y*y));
       }
     else{
       yaw=0.0f;
       roll=-1.57079632679489661923f;
-      pitch=-atan2f(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
+      pitch=-Math::atan2(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
       }
     }
   else{
     yaw=0.0f;
     roll=1.57079632679489661923f;
-    pitch=atan2f(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
+    pitch=Math::atan2(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
     }
   }
 
@@ -360,7 +361,7 @@ void FXQuatf::setAxes(const FXVec3f& ex,const FXVec3f& ey,const FXVec3f& ez){
   register FXfloat trace=ex.x+ey.y+ez.z;
   register FXfloat scale;
   if(trace>0.0f){
-    scale=sqrtf(1.0f+trace);
+    scale=Math::sqrt(1.0f+trace);
     w=0.5f*scale;
     scale=0.5f/scale;
     x=(ey.z-ez.y)*scale;
@@ -368,21 +369,21 @@ void FXQuatf::setAxes(const FXVec3f& ex,const FXVec3f& ey,const FXVec3f& ez){
     z=(ex.y-ey.x)*scale;
     }
   else if(ex.x>ey.y && ex.x>ez.z){
-    scale=2.0f*sqrtf(1.0f+ex.x-ey.y-ez.z);
+    scale=2.0f*Math::sqrt(1.0f+ex.x-ey.y-ez.z);
     x=0.25f*scale;
     y=(ex.y+ey.x)/scale;
     z=(ex.z+ez.x)/scale;
     w=(ey.z-ez.y)/scale;
     }
   else if(ey.y>ez.z){
-    scale=2.0f*sqrtf(1.0f+ey.y-ex.x-ez.z);
+    scale=2.0f*Math::sqrt(1.0f+ey.y-ex.x-ez.z);
     y=0.25f*scale;
     x=(ex.y+ey.x)/scale;
     z=(ey.z+ez.y)/scale;
     w=(ez.x-ex.z)/scale;
     }
   else{
-    scale=2.0f*sqrtf(1.0f+ez.z-ex.x-ey.y);
+    scale=2.0f*Math::sqrt(1.0f+ez.z-ex.x-ey.y);
     z=0.25f*scale;
     x=(ex.z+ez.x)/scale;
     y=(ey.z+ez.y)/scale;
@@ -445,11 +446,11 @@ FXVec3f FXQuatf::getZAxis() const {
 // Given q = theta*(x*i+y*j+z*k), where length of (x,y,z) is 1,
 // then exp(q) = sin(theta)*(x*i+y*j+z*k)+cos(theta).
 FXQuatf FXQuatf::exp() const {
-  register FXfloat theta=sqrtf(x*x+y*y+z*z);
+  register FXfloat theta=Math::sqrt(x*x+y*y+z*z);
   register FXfloat scale;
-  FXQuatf result(x,y,z,cosf(theta));
+  FXQuatf result(x,y,z,Math::cos(theta));
   if(__likely(0.000001f<theta)){
-    scale=sinf(theta)/theta;
+    scale=Math::sin(theta)/theta;
     result.x*=scale;
     result.y*=scale;
     result.z*=scale;
@@ -462,8 +463,8 @@ FXQuatf FXQuatf::exp() const {
 // Given q = sin(theta)*(x*i+y*j+z*k)+cos(theta), length of (x,y,z) is 1,
 // then log(q) = theta*(x*i+y*j+z*k).
 FXQuatf FXQuatf::log() const {
-  register FXfloat scale=sqrtf(x*x+y*y+z*z);
-  register FXfloat theta=atan2f(scale,w);
+  register FXfloat scale=Math::sqrt(x*x+y*y+z*z);
+  register FXfloat theta=Math::atan2(scale,w);
   FXQuatf result(x,y,z,0.0f);
   if(__likely(0.0f<scale)){
     scale=theta/scale;
@@ -589,12 +590,12 @@ FXQuatf arc(const FXVec3f& f,const FXVec3f& t){
     result.w=1.0f;
     }
   else if(__unlikely(dot<-0.999999f)){  // 180 quaternion (Stephen Hardy)
-    if(fabsf(f.z)<fabsf(f.x) && fabsf(f.z)<fabsf(f.y)){ // x, y largest magnitude
+    if(Math::fabs(f.z)<Math::fabs(f.x) && Math::fabs(f.z)<Math::fabs(f.y)){ // x, y largest magnitude
       result.x= f.x*f.z-f.z*f.y;
       result.y= f.z*f.x+f.y*f.z;
       result.z=-f.y*f.y-f.x*f.x;
       }
-    else if(fabsf(f.y)<fabsf(f.x)){                     // y, z largest magnitude
+    else if(Math::fabs(f.y)<Math::fabs(f.x)){                     // y, z largest magnitude
       result.x= f.y*f.z-f.x*f.y;
       result.y= f.x*f.x+f.z*f.z;
       result.z=-f.z*f.y-f.y*f.x;
@@ -605,14 +606,14 @@ FXQuatf arc(const FXVec3f& f,const FXVec3f& t){
       result.z= f.x*f.y+f.z*f.x;
       }
     dot=result.x*result.x+result.y*result.y+result.z*result.z;
-    div=sqrtf(dot);
+    div=Math::sqrt(dot);
     result.x/=div;
     result.y/=div;
     result.z/=div;
     result.w=0.0f;
     }
   else{
-    div=sqrtf((dot+1.0f)*2.0f);
+    div=Math::sqrt((dot+1.0f)*2.0f);
     result.x=(f.y*t.z-f.z*t.y)/div;
     result.y=(f.z*t.x-f.x*t.z)/div;
     result.z=(f.x*t.y-f.y*t.x)/div;
@@ -626,17 +627,17 @@ FXQuatf arc(const FXVec3f& f,const FXVec3f& t){
 // This is equivalent to: u * (u.unitinvert()*v).pow(f)
 FXQuatf lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f){
   register FXfloat dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
-  register FXfloat cost=fabsf(dot);
+  register FXfloat cost=Math::fabs(dot);
   register FXfloat sint;
   register FXfloat fr=1.0f-f;
   register FXfloat to=f;
   register FXfloat theta;
   FXQuatf result;
   if(__likely(cost<0.999999f)){
-    sint=sqrtf(1.0f-cost*cost);
-    theta=atan2f(sint,cost);
-    fr=sinf(fr*theta)/sint;
-    to=sinf(to*theta)/sint;
+    sint=Math::sqrt(1.0f-cost*cost);
+    theta=Math::atan2(sint,cost);
+    fr=Math::sin(fr*theta)/sint;
+    to=Math::sin(to*theta)/sint;
     }
   if(dot<0.0f) to=-to;
   result.x=fr*u.x+to*v.x;
@@ -652,17 +653,17 @@ FXQuatf lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f){
 // which is itself equivalent to: lerp(u,v,f) * (u.unitinvert()*v).log()
 FXQuatf lerpdot(const FXQuatf& u,const FXQuatf& v,FXfloat f){
   register FXfloat dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
-  register FXfloat cost=fabsf(dot);
+  register FXfloat cost=Math::fabs(dot);
   register FXfloat sint;
   register FXfloat fr=1.0f-f;
   register FXfloat to=f;
   register FXfloat theta;
   FXQuatf result;
   if(__likely(cost<0.999999f)){
-    sint=sqrtf(1.0f-cost*cost);
-    theta=atan2f(sint,cost);
-    fr=-theta*cosf(fr*theta)/sint;
-    to=theta*cosf(to*theta)/sint;
+    sint=Math::sqrt(1.0f-cost*cost);
+    theta=Math::atan2(sint,cost);
+    fr=-theta*Math::cos(fr*theta)/sint;
+    to=theta*Math::cos(to*theta)/sint;
     }
   result.x=fr*u.x+to*v.x;
   result.y=fr*u.y+to*v.y;

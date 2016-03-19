@@ -3,7 +3,7 @@
 *                         Q u e u e   O f   P o i n t e r s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,8 +29,8 @@ namespace FX {
 class FXAPI FXPtrQueue {
 private:
   FXPtrList       list;         // List of pointers
-  volatile FXuint head;         // Write side
-  volatile FXuint tail;         // Read side
+  volatile FXival head;         // Write side
+  volatile FXival tail;         // Read side
 private:
   FXPtrQueue(const FXPtrQueue&);
   FXPtrQueue &operator=(const FXPtrQueue&);
@@ -40,19 +40,19 @@ public:
   FXPtrQueue();
 
   /// Create queue with initial size
-  FXPtrQueue(FXuint sz);
+  FXPtrQueue(FXival sz);
 
   /// Change size of queue; return true if success
-  FXbool setSize(FXuint sz);
+  FXbool setSize(FXival sz);
 
   /// Return size
-  FXuint getSize() const { return (FXuint)list.no(); }
+  FXival getSize() const { return list.no(); }
 
   /// Return number of used slots
-  FXuint getUsed() const;
+  FXival getUsed() const;
 
   /// Return number of free slots
-  FXuint getFree() const;
+  FXival getFree() const;
 
   /// Check if queue is full
   FXbool isFull() const;

@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2015 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2016 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *

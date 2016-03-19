@@ -3,7 +3,7 @@
 *                         E v e n t   D i s p a t c h e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXAtomic.h"
 #include "FXHash.h"
@@ -370,7 +371,7 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd,FXuint mode){
 FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
   if(isInitialized()){
     FXTime now,due,delay,interval;
-    FXint sig,nxt;
+    FXint signaled,sig,nxt;
 
     // Loop till we got something
     while(1){
@@ -388,14 +389,14 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
         }
 
       // Check for signal
-      sig=sigreceived;
-      if(signotified[sig] && sigismember(&handles->signals,sig)==1){
-        signotified[sig]=false;
-        nxt=64;
-        while(--nxt && !signotified[nxt]){ }
-        sigreceived=nxt;
-        if(dispatchSignal(sig)) return true;
-        }
+//      sig=sigreceived;
+//      if(signotified[sig] && sigismember(&handles->signals,sig)==1){
+//        signotified[sig]=false;
+//        nxt=64;
+//        while(--nxt && !signotified[nxt]){ }
+//        sigreceived=nxt;
+//        if(dispatchSignal(sig)) return true;
+//        }
 
       // Check active handles
       while(0<numraised){
@@ -408,7 +409,8 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
         }
 
       // Select active handles and check signals; don't block
-      signaled=WaitForMultipleObjects(numhandles,handles->handles,false,0,QS_ALLINPUT);
+//      signaled=WaitForMultipleObjects(numhandles,handles->handles,false,0,QS_ALLINPUT);
+      signaled=WaitForMultipleObjects(numhandles,handles->handles,false,0);
 
       // Start scanning with current
       if(WAIT_OBJECT_0<=signaled && signaled<WAIT_OBJECT_0+numhandles){ current=signaled-WAIT_OBJECT_0; numraised=numhandles; }
@@ -428,7 +430,8 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
         interval=FXMIN(delay,blocking);
 
         // Select active handles and check signals, waiting for timeout or maximum block time
-        signaled=WaitForMultipleObjects(numhandles,handles->handles,false,(interval==forever)?INFINITE:(DWORD)(interval/1000000L),QS_ALLINPUT);
+//        signaled=WaitForMultipleObjects(numhandles,handles->handles,false,(interval==forever)?INFINITE:(DWORD)(interval/1000000L),QS_ALLINPUT);
+        signaled=WaitForMultipleObjects(numhandles,handles->handles,false,(interval==forever)?INFINITE:(DWORD)(interval/1000000L));
 
         // Bad stuff happened
         if(signaled==WAIT_FAILED){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }

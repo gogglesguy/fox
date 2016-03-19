@@ -7,47 +7,48 @@ SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 
 noinst_PROGRAMS	= \
-unicode \
-variant \
-scan \
-format \
-console \
-thread \
-calendar \
-expression \
-dctest \
-codecs \
-dialog \
-groupbox \
-scribble \
-wizard \
-layout \
-rex \
-table \
-memmap \
-minheritance \
 bitmapviewer \
-imageviewer \
 button \
+calendar \
+codecs \
+console \
 datatarget \
+dctest \
+dialog \
 dirlist \
+expression \
+format \
 foursplit \
+gaugetest \
+groupbox \
+half \
 header \
 hello \
 hello2 \
 iconlist \
 image \
+imageviewer \
+layout \
+match \
+math \
 mditest \
+memmap \
+minheritance \
+parallel \
+process \
+ratio \
+rex \
+scan \
+scribble \
 shutter \
 splitter \
-process \
 switcher \
 tabbook \
-ratio \
-half \
-match \
-gaugetest \
-parallel \
+table \
+thread \
+unicode \
+variant \
+wizard \
 gltest \
 glviewer
 
@@ -94,6 +95,7 @@ match_SOURCES		= match.cpp
 unicode_SOURCES		= unicode.cpp
 parallel_SOURCES	= parallel.cpp
 variant_SOURCES         = variant.cpp
+math_SOURCES            = math.cpp
 
 
 

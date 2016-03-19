@@ -3,7 +3,7 @@
 *                      U T F - 3 2  T e x t   C o d e c                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2015 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2016 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"

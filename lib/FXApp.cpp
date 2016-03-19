@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "fxascii.h"
 #include "FXArray.h"
@@ -335,7 +336,7 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright information
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2015 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2016 Jeroen van der Zijp. All Rights Reserved.";
 
 
 // Conversion

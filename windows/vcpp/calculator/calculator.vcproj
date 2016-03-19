@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="calculator"
 	ProjectGUID="{F930A8A4-5263-4550-B45F-98072CB260A3}"
 	TargetFrameworkVersion="0"
@@ -25,6 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -116,9 +117,12 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -238,28 +242,6 @@
 		<File
 			RelativePath="..\..\..\calculator\constmem.bmp"
 			>
-		</File>
-		<File
-			RelativePath="gifs.list"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;&#x0A;"
-					Outputs="icons.h;icons.cpp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;&#x0A;"
-					Outputs="icons.h;icons.cpp"
-				/>
-			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="..\..\..\calculator\help.cpp"

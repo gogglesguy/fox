@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxkeys.h"
 #include "FXArray.h"
 #include "FXHash.h"
@@ -446,10 +447,10 @@ void FXDCWindow::drawArc(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2){
   ang2+=ang1;
   w+=1;
   h+=1;
-  int xStart=int(x+0.5*w+w*cos(ang1*PI/(180.0*64.0)));
-  int yStart=int(y+0.5*h-h*sin(ang1*PI/(180.0*64.0)));
-  int xEnd=int(x+0.5*w+w*cos(ang2*PI/(180.0*64.0)));
-  int yEnd=int(y+0.5*h-h*sin(ang2*PI/(180.0*64.0)));
+  int xStart=int(x+0.5*w+w*Math::cos(ang1*PI/(180.0*64.0)));
+  int yStart=int(y+0.5*h-h*Math::sin(ang1*PI/(180.0*64.0)));
+  int xEnd=int(x+0.5*w+w*Math::cos(ang2*PI/(180.0*64.0)));
+  int yEnd=int(y+0.5*h-h*Math::sin(ang2*PI/(180.0*64.0)));
   if(needsPath){
     ::BeginPath((HDC)ctx);
     }
@@ -536,10 +537,10 @@ void FXDCWindow::fillChord(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2
   ang2+=ang1;
   w+=1;
   h+=1;
-  int xStart=int(x+0.5*w+w*cos(ang1*PI/(180.0*64.0)));
-  int yStart=int(y+0.5*h-h*sin(ang1*PI/(180.0*64.0)));
-  int xEnd=int(x+0.5*w+w*cos(ang2*PI/(180.0*64.0)));
-  int yEnd=int(y+0.5*h-h*sin(ang2*PI/(180.0*64.0)));
+  int xStart=int(x+0.5*w+w*Math::cos(ang1*PI/(180.0*64.0)));
+  int yStart=int(y+0.5*h-h*Math::sin(ang1*PI/(180.0*64.0)));
+  int xEnd=int(x+0.5*w+w*Math::cos(ang2*PI/(180.0*64.0)));
+  int yEnd=int(y+0.5*h-h*Math::sin(ang2*PI/(180.0*64.0)));
   HPEN hpen=(HPEN)::SelectObject((HDC)ctx,GetStockObject(NULL_PEN));
   if(reversed)
     ::Chord((HDC)ctx,x,y,x+w,y+h,xEnd,yEnd,xStart,yStart);
@@ -570,10 +571,10 @@ void FXDCWindow::fillArc(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2){
   ang2+=ang1;
   w+=1;
   h+=1;
-  int xStart=int(x+0.5*w+w*cos(ang1*PI/(180.0*64.0)));
-  int yStart=int(y+0.5*h-h*sin(ang1*PI/(180.0*64.0)));
-  int xEnd=int(x+0.5*w+w*cos(ang2*PI/(180.0*64.0)));
-  int yEnd=int(y+0.5*h-h*sin(ang2*PI/(180.0*64.0)));
+  int xStart=int(x+0.5*w+w*Math::cos(ang1*PI/(180.0*64.0)));
+  int yStart=int(y+0.5*h-h*Math::sin(ang1*PI/(180.0*64.0)));
+  int xEnd=int(x+0.5*w+w*Math::cos(ang2*PI/(180.0*64.0)));
+  int yEnd=int(y+0.5*h-h*Math::sin(ang2*PI/(180.0*64.0)));
   HPEN hpen=(HPEN)::SelectObject((HDC)ctx,GetStockObject(NULL_PEN));
   if(reversed)
     ::Pie((HDC)ctx,x,y,x+w,y+h,xEnd,yEnd,xStart,yStart);
@@ -2311,8 +2312,8 @@ void FXDCWindow::drawText(FXint x,FXint y,const FXchar* string,FXuint length){
   if(font->getAngle()){
     ang=font->getAngle()*0.00027270769562411399179;
     defwidth=FS->min_bounds.width;
-    ux=cos(ang);
-    uy=sin(ang);
+    ux=Math::cos(ang);
+    uy=Math::sin(ang);
     if(FS->per_char){
       r=FS->default_char>>8;
       c=FS->default_char&255;
@@ -2379,8 +2380,8 @@ void FXDCWindow::drawImageText(FXint x,FXint y,const FXchar* string,FXuint lengt
   if(font->getAngle()){
     ang=font->getAngle()*0.00027270769562411399179;
     defwidth=FS->min_bounds.width;
-    ux=cos(ang);
-    uy=sin(ang);
+    ux=Math::cos(ang);
+    uy=Math::sin(ang);
     if(FS->per_char){
       r=FS->default_char>>8;
       c=FS->default_char&255;

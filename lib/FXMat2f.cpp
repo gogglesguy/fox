@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   2 x 2   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -356,7 +357,7 @@ FXMat2f& FXMat2f::rot(FXfloat c,FXfloat s){
 
 // Rotate by angle
 FXMat2f& FXMat2f::rot(FXfloat phi){
-  return rot(cosf(phi),sinf(phi));
+  return rot(Math::cos(phi),Math::sin(phi));
   }
 
 

@@ -3,7 +3,7 @@
 *      S t r i n g   t o   U n s i g n e d   L o n g   C o n v e r s i o n      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxascii.h"
 
 
@@ -114,7 +115,7 @@ FXulong __strtoull(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
         value=ULLONG_MAX;
         }
       else{
-        if(neg) value=-value;
+        if(neg) value=-(FXlong)value;
         if(ok) *ok=true;
         }
       }

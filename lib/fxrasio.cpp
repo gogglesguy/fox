@@ -3,7 +3,7 @@
 *             S U N   R A S T E R   I M A G E   I n p u t / O u t p u t         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXArray.h"
 #include "FXHash.h"
 #include "FXElement.h"

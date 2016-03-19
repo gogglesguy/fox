@@ -3,7 +3,7 @@
 *                          D i c t i o n a r y    C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "FXElement.h"
 #include "FXException.h"
 #include "FXString.h"

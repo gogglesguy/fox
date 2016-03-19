@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxmath.h"
 #include "fxendian.h"
 #include "fxascii.h"
 #include "FXArray.h"
@@ -68,16 +69,6 @@ FXint fxTraceLevel=-1;
 
 // Version number that the library has been compiled with
 const FXuchar fxversion[3]={FOX_MAJOR,FOX_MINOR,FOX_LEVEL};
-
-
-// Thread-safe, xor-shifting random number generator (initial seed value must
-// be non-zero.  A suggested seed value is 2463534242.
-FXuint fxrandom(FXuint& seed){
-  seed^=(seed<<13);
-  seed^=(seed>>17);
-  seed^=(seed<<5);
-  return seed;
-  }
 
 
 #ifdef WIN32
@@ -564,148 +555,6 @@ void memswap(void *dst,void *src,FXuval n){
     }
   }
 
-
-// Fast integer power function for positive exponents
-FXint powi(FXint base,FXint exp){
-  FXint result=1;
-  while(exp){
-    if(exp&1) result*=base;
-    base*=base;
-    exp>>=1;
-    }
-  return result;
-  }
-
-
-/*******************************************************************************/
-
-// Single Precision IEEE 754 number layout
-//            31 30           23 22             0
-// +------------+---------------+---------------+
-// | s[31] 1bit | e[30:23] 8bit | f[22:0] 23bit |
-// +------------+---------------+---------------+
-
-
-// Double Precision IEEE 754 number layout
-//            63 62            52 51            32 31             0
-// +------------+----------------+----------------+---------------+
-// | s[63] 1bit | e[62:52] 11bit | f[51:32] 20bit | f[31:0] 32bit |
-// +------------+----------------+----------------+---------------+
-
-
-// Split a float or double into pieces
-#if FOX_BIGENDIAN == 1
-union FloatStruct { FXfloat f; struct { FXuint s:1; FXuint e:8; FXuint m:23; } n; };
-union DoubleStruct { FXdouble d; struct { FXuint s:1; FXuint e:11; FXuint h:20; FXuint l:32; } n; };
-#else
-union FloatStruct { FXfloat f; struct { FXuint m:23; FXuint e:8; FXuint s:1; } n; };
-union DoubleStruct { FXdouble d; struct { FXuint l:32; FXuint h:20; FXuint e:11; FXuint s:1; } n; };
-#endif
-
-
-// Float number classification: 0=OK, +/-1=Inf, +/-2=NaN
-FXint fxieeefloatclass(FXfloat number){
-  FloatStruct *fs=(FloatStruct*)&number;
-  if(fs->n.e==255){
-    if(fs->n.m==0) return fs->n.s ? -1 : 1;     // Inf
-    return fs->n.s ? -2 : 2;                    // NaN
-    }
-  return 0;
-  }
-
-
-// Double number classification: 0=OK, +/-1=Inf, +/-2=NaN
-FXint fxieeedoubleclass(FXdouble number){
-  DoubleStruct *fs=(DoubleStruct*)&number;
-  if(fs->n.e==2047){
-    if(fs->n.l==0 && fs->n.h==0) return fs->n.s ? -1 : 1;       // Inf
-    return fs->n.s ? -2 : 2;                                    // NaN
-    }
-  return 0;
-  }
-
-
-// Test for finite float
-FXbool fxIsFinite(FXfloat number){
-  return (((FloatStruct*)&number)->n.e!=255);
-  }
-
-
-// Test for finite double
-FXbool fxIsFinite(FXdouble number){
-  return (((DoubleStruct*)&number)->n.e!=2047);
-  }
-
-
-// Test for infinite float
-FXbool fxIsInf(FXfloat number){
-  return (((FloatStruct*)&number)->n.e==255) && (((FloatStruct*)&number)->n.m==0);
-  }
-
-
-// Test for infinite double
-FXbool fxIsInf(FXdouble number){
-  return (((DoubleStruct*)&number)->n.e==2047) && ((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
-  }
-
-
-// Test for not-a-number float
-FXbool fxIsNan(FXfloat number){
-  return (((FloatStruct*)&number)->n.e==255) && (((FloatStruct*)&number)->n.m!=0);
-  }
-
-
-// Test for not-a-number double
-FXbool fxIsNan(FXdouble number){
-  return (((DoubleStruct*)&number)->n.e==2047) && !((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
-  }
-
-
-// Return sign bit of float
-FXint fxSignBit(FXfloat number){
-  return ((FloatStruct*)&number)->n.s;
-  }
-
-
-// Return sign bit of double
-FXint fxSignBit(FXdouble number){
-  return ((DoubleStruct*)&number)->n.s;
-  }
-
-
-
-// Table of 1E+0,...1E+31, in steps of 1
-static FXdouble posPowOfTen1[32]={
-  1E+0,1E+1,1E+2,1E+3,1E+4,1E+5,1E+6,1E+7,1E+8,1E+9,1E+10,1E+11,1E+12,1E+13,1E+14,1E+15,1E+16,1E+17,1E+18,1E+19,1E+20,1E+21,1E+22,1E+23,1E+24,1E+25,1E+26,1E+27,1E+28,1E+29,1E+30,1E+31
-  };
-
-
-// Table of 1E+0,...1E+288, in steps of 32
-static FXdouble posPowOfTen32[10]={
-  1E+0,1E+32,1E+64,1E+96,1E+128,1E+160,1E+192,1E+224,1E+256,1E+288
-  };
-
-
-// Table of 1E-0,...1E-31, in steps of 1
-static FXdouble negPowOfTen1[32]={
-  1E-0,1E-1,1E-2,1E-3,1E-4,1E-5,1E-6,1E-7,1E-8,1E-9,1E-10,1E-11,1E-12,1E-13,1E-14,1E-15,1E-16,1E-17,1E-18,1E-19,1E-20,1E-21,1E-22,1E-23,1E-24,1E-25,1E-26,1E-27,1E-28,1E-29,1E-30,1E-31
-  };
-
-
-// Table of 1E-0,...1E-320, in steps of 32
-static FXdouble negPowOfTen32[11]={
-  1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288,1E-320
-  };
-
-
-// Fast integer power of 10; this is based on the mathematical
-// identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
-// table of 308+ entries, but that would take a lot of space...
-// The exponent should be in the range -324 to +308, these being the limits
-// of double precision IEEE754 standard floating point.
-FXdouble fxtenToThe(FXint e){
-  return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];
-  }
 
 /*******************************************************************************/
 
