@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRanged.h,v 1.22 2008/01/04 15:18:23 fox Exp $                          *
+* $Id: FXRanged.h,v 1.23 2008/06/04 18:34:16 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXRANGED_H
 #define FXRANGED_H
@@ -28,6 +28,7 @@ namespace FX {
 
 
 class FXSphered;
+class FXMat4d;
 
 
 /// Bounds
@@ -151,6 +152,9 @@ public:
 
   /// Get corner number 0..7
   FXVec3d corner(FXint c) const { return FXVec3d((&lower)[c&1].x, (&lower)[(c>>1)&1].y, (&lower)[c>>2].z); }
+
+  /// Transform range by 4x4 matrix
+  FXRanged transform(const FXMat4d& mat) const;
 
   /// Union of two boxes
   friend FXAPI FXRanged unite(const FXRanged& a,const FXRanged& b);

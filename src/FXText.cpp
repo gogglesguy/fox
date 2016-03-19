@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.cpp,v 1.494 2008/03/27 15:51:57 fox Exp $                         *
+* $Id: FXText.cpp,v 1.496 2008/04/30 18:32:20 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -199,14 +199,14 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_UPDATE,FXText::ID_TOGGLE_OVERSTRIKE,FXText::onUpdToggleOverstrike),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_CURSOR_ROW,FXText::onUpdCursorRow),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_CURSOR_COLUMN,FXText::onUpdCursorColumn),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_CUT_SEL,FXText::onUpdHaveSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_CUT_SEL,FXText::onUpdHaveEditableSelection),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_COPY_SEL,FXText::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_PASTE_SEL,FXText::onUpdYes),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_DELETE_SEL,FXText::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_REPLACE_SEL,FXText::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_UPPER_CASE,FXText::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_LOWER_CASE,FXText::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_CLEAN_INDENT,FXText::onUpdHaveSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_PASTE_SEL,FXText::onUpdIsEditable),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_DELETE_SEL,FXText::onUpdHaveEditableSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_REPLACE_SEL,FXText::onUpdHaveEditableSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_UPPER_CASE,FXText::onUpdHaveEditableSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_LOWER_CASE,FXText::onUpdHaveEditableSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_CLEAN_INDENT,FXText::onUpdHaveEditableSelection),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_TOP,FXText::onCmdCursorTop),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_BOTTOM,FXText::onCmdCursorBottom),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_HOME,FXText::onCmdCursorHome),
@@ -444,6 +444,7 @@ void FXText::create(){
   recalc();
   if(getApp()->hasInputMethod()){
     createComposeContext();
+    getComposeContext()->setFont(font);
     }
   }
 
@@ -2560,6 +2561,7 @@ FXint FXText::overstruck(FXint start,const FXchar *text,FXint n){
 
 /*******************************************************************************/
 
+
 // Set selection
 FXbool FXText::setSelection(FXint pos,FXint len,FXbool notify){
   FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
@@ -3395,12 +3397,28 @@ long FXText::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
+// Update somebody who wants to change the text
+long FXText::onUpdIsEditable(FXObject* sender,FXSelector,void*){
+  sender->handle(this,isEditable()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
 // Update somebody who works on the selection
 long FXText::onUpdHaveSelection(FXObject* sender,FXSelector,void*){
   sender->handle(this,(selstartpos<selendpos)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
+
+// Update somebody who works on the selection and change the text
+long FXText::onUpdHaveEditableSelection(FXObject* sender,FXSelector,void*){
+  sender->handle(this,isEditable() && (selstartpos<selendpos)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Start input method editor
 long FXText::onIMEStart(FXObject* sender,FXSelector,void* ptr){
   if(isEditable()){
     if(getComposeContext()){
@@ -3409,7 +3427,6 @@ long FXText::onIMEStart(FXObject* sender,FXSelector,void* ptr){
       if(getVisibleY()<=cursory+th && cursory<=getVisibleY()+getVisibleHeight()){
         FXint cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstart,cursorpos-cursorstart)-1;
         getComposeContext()->setSpot(cursorx,cursory);
-        getComposeContext()->setFont(font);
         }
       }
     return 1;
@@ -5131,6 +5148,7 @@ void FXText::setFont(FXFont* fnt){
     font=fnt;
     tabwidth=tabcolumns*font->getTextWidth(" ",1);
     barwidth=barcolumns*font->getTextWidth("8",1);
+    if(getComposeContext()) getComposeContext()->setFont(font);
     recalc();
     update();
     }

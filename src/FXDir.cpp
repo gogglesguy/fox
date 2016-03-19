@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDir.cpp,v 1.49 2008/02/28 16:14:29 fox Exp $                           *
+* $Id: FXDir.cpp,v 1.51 2008/05/20 16:01:05 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -95,13 +95,13 @@ FXbool FXDir::open(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[1024];
-    utf2ncs(buffer,path.text(),path.length()+1);
-    wcsncat(buffer,TEXT("\\*"),sizeof(buffer));
+    FXnchar buffer[MAXPATHLEN];
+    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
+    wcsncat(buffer,TEXT("\\*"),MAXPATHLEN);
 #else
-    FXchar buffer[1024];
-    strncpy(buffer,path.text(),sizeof(buffer));
-    strncat(buffer,"\\*",sizeof(buffer));
+    FXchar buffer[MAXPATHLEN];
+    strncpy(buffer,path.text(),MAXPATHLEN);
+    strncat(buffer,"\\*",MAXPATHLEN);
 #endif
     ((SPACE*)space)->handle=FindFirstFile(buffer,&((SPACE*)space)->result);
     if(((SPACE*)space)->handle!=INVALID_HANDLE_VALUE){
@@ -185,8 +185,8 @@ FXbool FXDir::create(const FXString& path,FXuint mode){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[1024];
-    utf2ncs(buffer,path.text(),path.length()+1);
+    FXnchar buffer[MAXPATHLEN];
+    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
     return CreateDirectoryW(buffer,NULL)!=0;
 #else
     return CreateDirectoryA(path.text(),NULL)!=0;
@@ -204,8 +204,8 @@ FXbool FXDir::remove(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[1024];
-    utf2ncs(buffer,path.text(),path.length()+1);
+    FXnchar buffer[MAXPATHLEN];
+    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
     return RemoveDirectoryW(buffer)!=0;
 #else
     return RemoveDirectoryA(path.text())!=0;
@@ -223,9 +223,9 @@ FXbool FXDir::rename(const FXString& srcpath,const FXString& dstpath){
   if(srcpath!=dstpath){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar oldname[1024],newname[1024];
-    utf2ncs(oldname,srcpath.text(),srcpath.length()+1);
-    utf2ncs(newname,dstpath.text(),dstpath.length()+1);
+    FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
+    utf2ncs(oldname,MAXPATHLEN,srcpath.text(),srcpath.length()+1);
+    utf2ncs(newname,MAXPATHLEN,dstpath.text(),dstpath.length()+1);
     return ::MoveFileExW(oldname,newname,MOVEFILE_REPLACE_EXISTING)!=0;
 #else
     return ::MoveFileExA(srcpath.text(),dstpath.text(),MOVEFILE_REPLACE_EXISTING)!=0;

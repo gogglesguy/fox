@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.h,v 1.16 2008/01/04 15:18:22 fox Exp $                            *
+* $Id: FXPath.h,v 1.20 2008/06/02 19:08:21 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPATH_H
 #define FXPATH_H
@@ -35,6 +35,13 @@ namespace FXPath {
   * if the given path is not absolute.
   */
   FXString FXAPI root(const FXString& file);
+
+  /**
+  * Return share name from Windows UNC filename.
+  * For example, share("\\Janes PC\Janes Documents\Document.doc")
+  * returns "Janes PC".
+  */
+  FXString FXAPI share(const FXString& file);
 
   /**
   * Return the directory part of the path name.
@@ -88,8 +95,8 @@ namespace FXPath {
   /// Return relative path of file to given base directory
   FXString FXAPI relative(const FXString& base,const FXString& file);
 
-  /// Return path following local path separator conventions
-  FXString FXAPI convert(const FXString& path);
+  /// Convert path from using 'sepfm' or 'septo' to use only 'septo' path-separators
+  FXString FXAPI convert(const FXString& file,FXchar septo=PATHSEP,FXchar sepfm='/');
 
   /// Return path to directory above input directory name
   FXString FXAPI upLevel(const FXString& file);

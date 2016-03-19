@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.269 2008/03/26 15:04:03 fox Exp $                            *
+* $Id: FXApp.h,v 1.273 2008/06/03 20:28:58 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -93,6 +93,7 @@ enum FXDefaultCursor {
   DEF_DRAGTR_CURSOR,                    /// Resize upper-right corner
   DEF_DRAGBL_CURSOR=DEF_DRAGTR_CURSOR,  /// Resize bottom-left corner
   DEF_DNDSTOP_CURSOR,                   /// Drag and drop stop
+  DEF_DNDASK_CURSOR,                    /// Drag and drop ask
   DEF_DNDCOPY_CURSOR,                   /// Drag and drop copy
   DEF_DNDMOVE_CURSOR,                   /// Drag and drop move
   DEF_DNDLINK_CURSOR,                   /// Drag and drop link
@@ -348,11 +349,9 @@ private:
   FXID             xdndDrop;            // XDND drop message
   FXID             xdndFinished;        // XDND finished message
   FXID             xdndSelection;       // XDND selection atom
-  FXID             xdndActionMove;      // XDND Move action
-  FXID             xdndActionCopy;      // XDND Copy action
-  FXID             xdndActionLink;      // XDND Link action
-  FXID             xdndActionPrivate;   // XDND Private action
-  FXID             xdndTypes;           // XDND types list atom
+  FXID             xdndTypes;           // XDND type list atom
+  FXID             xdndActions;         // XDND action list atom
+  FXID             xdndActionList[6];   // XDND actions
   FXID             xdndSource;          // XDND drag source window
   FXID             xdndTarget;          // XDND drop target window
   FXID             xdndProxyTarget;     // XDND window to set messages to
@@ -371,6 +370,7 @@ private:
   void            *xim;                 // Input method
   FXbool           shmi;                // Use XSHM Image possible
   FXbool           shmp;                // Use XSHM Pixmap possible
+  FXbool           xrender;             // XRender available
   FXbool           synchronize;         // Synchronized
 
 #endif

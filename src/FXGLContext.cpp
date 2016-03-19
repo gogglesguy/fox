@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.cpp,v 1.121 2008/04/22 20:14:25 fox Exp $                    *
+* $Id: FXGLContext.cpp,v 1.126 2008/06/24 20:46:31 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -273,7 +273,7 @@ void FXGLContext::swapBuffers(){
   }
 
 
-// Return true if this window's context is current
+// Return true if THIS context is current
 FXbool FXGLContext::isCurrent() const {
 #ifdef HAVE_GL_H
   if(xid){
@@ -285,6 +285,16 @@ FXbool FXGLContext::isCurrent() const {
     }
 #endif
   return false;
+  }
+
+
+// Return true if thread has ANY current context
+FXbool FXGLContext::hasCurrent(){
+#ifdef WIN32
+  return wglGetCurrentContext()!=NULL;
+#else
+  return glXGetCurrentContext()!=NULL;
+#endif
   }
 
 

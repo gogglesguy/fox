@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDrawable.h,v 1.29 2008/01/04 15:18:18 fox Exp $                        *
+* $Id: FXDrawable.h,v 1.30 2008/04/23 17:30:40 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDRAWABLE_H
 #define FXDRAWABLE_H
@@ -43,9 +43,10 @@ class FXAPI FXDrawable : public FXId {
   friend class FXDCWindow;
   friend class FXGLContext;
 protected:
-  FXVisual     *visual;                 // Visual for this window
-  FXint         width;                  // Width
-  FXint         height;                 // Height
+  FXVisual *visual;     // Visual for this window
+  FXint     width;      // Width
+  FXint     height;     // Height
+  FXID      rsc;        // Resource
 protected:
   FXDrawable();
   FXDrawable(FXApp* a,FXint w,FXint h);
@@ -58,14 +59,17 @@ private:
 #endif
 public:
 
+  /// Get the visual
+  FXVisual* getVisual() const { return visual; }
+
   /// Width of drawable
   FXint getWidth() const { return width; }
 
   /// Height of drawable
   FXint getHeight() const { return height; }
 
-  /// Get the visual
-  FXVisual* getVisual() const { return visual; }
+  /// Get resource handle
+  FXID res() const { return rsc; }
 
   /// Change visual
   void setVisual(FXVisual* vis);

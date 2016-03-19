@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLVisual.cpp,v 1.133 2008/04/22 14:02:37 fox Exp $                     *
+* $Id: FXGLVisual.cpp,v 1.134 2008/04/24 15:50:59 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1040,9 +1040,9 @@ void FXGLVisual::create(){
               // All other things being equal, we prefer default visual!
               if((match<bestmatch) || (visualid==defvisualid)){
                 actualRedSize=glredsize;
-                accumGreenSize=glgreensize;
-                accumBlueSize=glbluesize;
-                accumAlphaSize=glalphasize;
+                actualGreenSize=glgreensize;
+                actualBlueSize=glbluesize;
+                actualAlphaSize=glalphasize;
                 actualDepthSize=gldepthsize;
                 actualStencilSize=glstencilsize;
                 actualMultiSamples=glsamples;
@@ -1257,9 +1257,9 @@ void FXGLVisual::create(){
               // All other things being equal, we prefer default visual!
               if((match<bestmatch) || (visualid==defvisualid)){
                 actualRedSize=glredsize;
-                accumGreenSize=glgreensize;
-                accumBlueSize=glbluesize;
-                accumAlphaSize=glalphasize;
+                actualGreenSize=glgreensize;
+                actualBlueSize=glbluesize;
+                actualAlphaSize=glalphasize;
                 actualDepthSize=gldepthsize;
                 actualStencilSize=glstencilsize;
                 actualMultiSamples=0;

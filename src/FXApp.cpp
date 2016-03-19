@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.729 2008/03/28 20:54:20 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.738 2008/06/03 20:28:58 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -194,6 +194,10 @@ namespace FX {
 // Move cursor
 #include "drag.xbm"
 #include "drag_mask.xbm"
+
+// Drag and drop ASK
+#include "dndask.xbm"
+#include "dndask_mask.xbm"
 
 // Drag and drop COPY
 #include "dndcopy.xbm"
@@ -571,6 +575,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
 
   // DND actions
   cursor[DEF_DNDSTOP_CURSOR]=new FXCursor(this,dontdrop_bits,dontdrop_mask_bits,dontdrop_width,dontdrop_height,dontdrop_x_hot,dontdrop_y_hot);
+  cursor[DEF_DNDASK_CURSOR]=new FXCursor(this,dndask_bits,dndask_mask_bits,dndask_width,dndask_height,dndcopy_x_hot,dndask_y_hot);
   cursor[DEF_DNDCOPY_CURSOR]=new FXCursor(this,dndcopy_bits,dndcopy_mask_bits,dndcopy_width,dndcopy_height,dndcopy_x_hot,dndcopy_y_hot);
   cursor[DEF_DNDMOVE_CURSOR]=new FXCursor(this,dndmove_bits,dndmove_mask_bits,dndmove_width,dndmove_height,dndmove_x_hot,dndmove_y_hot);
   cursor[DEF_DNDLINK_CURSOR]=new FXCursor(this,dndlink_bits,dndlink_mask_bits,dndlink_width,dndlink_height,dndlink_x_hot,dndlink_y_hot);
@@ -699,11 +704,16 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   xdndDrop=0;
   xdndFinished=0;
   xdndSelection=0;
-  xdndActionCopy=0;                       // XDND Move action
-  xdndActionMove=0;                       // XDND Copy action
-  xdndActionLink=0;                       // XDND Link action
-  xdndActionPrivate=0;                    // XDND Private action
-  xdndTypes=0;
+
+  xdndTypes=0;                            // XDND type list atom
+  xdndActions=0;                          // XDND action list atom
+  xdndActionList[DRAG_REJECT]=0;          // XDND Reject
+  xdndActionList[DRAG_ASK]=0;             // XDND Ask action
+  xdndActionList[DRAG_COPY]=0;            // XDND Copy action
+  xdndActionList[DRAG_MOVE]=0;            // XDND Move action
+  xdndActionList[DRAG_LINK]=0;            // XDND Link action
+  xdndActionList[DRAG_PRIVATE]=0;         // XDND Private action
+
   xdndSource=0;                           // XDND drag source window
   xdndTarget=0;                           // XDND drop target window
   xdndProxyTarget=0;                      // XDND window to set messages to
@@ -726,6 +736,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   // Miscellaneous stuff
   shmi=true;
   shmp=true;
+  xrender=false;
   synchronize=false;
 
 #endif
@@ -1340,6 +1351,18 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     FXTRACE((100,"X Shared Images  = %d\n",shmi));
     FXTRACE((100,"X Shared Pixmaps = %d\n",shmp));
 
+  // X Render Extension
+#ifdef HAVE_XRENDER_H
+    int xrenderevent,xrendererror;
+    if(XRenderQueryExtension((Display*)display,&xrenderevent,&xrendererror)){
+      int xrendermajor,xrenderminor;
+      if(XRenderQueryVersion((Display*)display,&xrendermajor,&xrenderminor)){
+        xrender=true;
+        FXTRACE((100,"X Render %d.%d available\n",xrendermajor,xrenderminor));
+        }
+      }
+#endif
+
     // Initialize Xft and fontconfig
 #ifdef HAVE_XFT_H
     if(!XftInit(NULL)) return false;
@@ -1450,14 +1473,19 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     // XDND Selection atom
     xdndSelection=(FXID)XInternAtom((Display*)display,"XdndSelection",0);
 
-    // XDND Actions
-    xdndActionCopy=(FXID)XInternAtom((Display*)display,"XdndActionCopy",0);
-    xdndActionMove=(FXID)XInternAtom((Display*)display,"XdndActionMove",0);
-    xdndActionLink=(FXID)XInternAtom((Display*)display,"XdndActionLink",0);
-    xdndActionPrivate=(FXID)XInternAtom((Display*)display,"XdndActionPrivate",0);
-
     // XDND Types list
     xdndTypes=(FXID)XInternAtom((Display*)display,"XdndTypeList",0);
+
+    // XDND Action list
+    xdndActions=(FXID)XInternAtom((Display*)display,"XdndActionList",0);
+
+    // XDND Actions
+    xdndActionList[DRAG_REJECT]=None;
+    xdndActionList[DRAG_ASK]=(FXID)XInternAtom((Display*)display,"XdndActionAsk",0);
+    xdndActionList[DRAG_COPY]=(FXID)XInternAtom((Display*)display,"XdndActionCopy",0);
+    xdndActionList[DRAG_MOVE]=(FXID)XInternAtom((Display*)display,"XdndActionMove",0);
+    xdndActionList[DRAG_LINK]=(FXID)XInternAtom((Display*)display,"XdndActionLink",0);
+    xdndActionList[DRAG_PRIVATE]=(FXID)XInternAtom((Display*)display,"XdndActionPrivate",0);
 
     // Standard stipples
     stipples[STIPPLE_0]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(char*)stipple_patterns[STIPPLE_0],8,8);
@@ -2475,7 +2503,7 @@ FXString translateKeyEvent(XEvent& event,XIC xic){
 
 // Dispatch event to widget
 FXbool FXApp::dispatchEvent(FXRawEvent& ev){
-  FXWindow *window,*ancestor;
+  FXWindow *window,*ancestor,*focuswin;
   Atom      answer;
   FXuint    state;
   XEvent    se;
@@ -2509,6 +2537,16 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
 
       // Keyboard
       case KeyPress:
+#ifndef NO_XIM
+        focuswin=getFocusWindow();
+        if((ev.xkey.keycode!=0) && focuswin && focuswin->getComposeContext()){
+          Window w;
+          XGetICValues((XIC)focuswin->getComposeContext()->id(),XNFocusWindow,&w,NULL);
+          if((focuswin->id()!=w) && XFilterEvent(&ev,(Window)focuswin->id())){
+            return true;
+            }
+          }
+#endif
       case KeyRelease:
         event.type=SEL_KEYPRESS+ev.xkey.type-KeyPress;
         event.time=ev.xkey.time;
@@ -2524,8 +2562,9 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
         // Translate to string on KeyPress
         if(ev.xkey.type==KeyPress){
 //        FXTRACE((100,"getFocusWindow()=%s\n",getFocusWindow()?getFocusWindow()->getClassName():"nil"));
-          if(getFocusWindow() && getFocusWindow()->getComposeContext())
-            event.text=getFocusWindow()->getComposeContext()->translateEvent(ev);
+          focuswin=getFocusWindow();
+          if(focuswin && focuswin->getComposeContext())
+            event.text=focuswin->getComposeContext()->translateEvent(ev);
           else
             event.text=translateKeyEvent(ev);
           }
@@ -2594,6 +2633,12 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           // Dispatch if not in a modal loop or in a modal loop for a window containing the focus window
           if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(keyWindow)) || keyWindow->getShell()->doesSaveUnder()){
             if(keyWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
+            if(inputstyle[1]!='o'){ // not root mode
+              focuswin=getFocusWindow();
+              if(focuswin && focuswin->getComposeContext()){
+                focuswin->handle(this,FXSEL(SEL_IME_START,0),NULL);
+                }
+              }
             return true;
             }
 
@@ -2755,11 +2800,23 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           event.type=SEL_FOCUSOUT;
           if(window->handle(this,FXSEL(SEL_FOCUSOUT,0),&event)) refresh();
           activeWindow=NULL;
+          if(inputstyle[1]!='o'){ // not root mode
+            focuswin=getFocusWindow();
+            if(focuswin && focuswin->getComposeContext()){
+              focuswin->handle(this,FXSEL(SEL_IME_END,0),NULL);
+              }
+            }
           }
         if(ev.xfocus.type==FocusIn && activeWindow!=window){
           event.type=SEL_FOCUSIN;
           if(window->handle(this,FXSEL(SEL_FOCUSIN,0),&event)) refresh();
           activeWindow=window;
+          if(inputstyle[1]!='o'){ // not root mode
+            focuswin=getFocusWindow();
+            if(focuswin && focuswin->getComposeContext()){
+              focuswin->handle(this,FXSEL(SEL_IME_START,0),NULL);
+              }
+            }
           }
         return true;
 
@@ -2994,7 +3051,6 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
 
         // XDND Position from source
         else if(ev.xclient.message_type==xdndPosition){
-          FXTRACE((100,"DNDPosition from remote window %ld\n",ev.xclient.data.l[0]));
           if(xdndSource!=(FXID)ev.xclient.data.l[0]) return true;   // We're not talking to this guy
           event.time=ev.xclient.data.l[3];
           event.root_x=((FXuint)ev.xclient.data.l[2])>>16;
@@ -3003,11 +3059,13 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           // (like e.g. the dragged shape window) right under the cursor.
           // Note this is the target window, not the proxy target....
           window=findWindowAt(event.root_x,event.root_y,ev.xclient.window);
-          if((FXID)ev.xclient.data.l[4]==xdndActionCopy) ddeAction=DRAG_COPY;
-          else if((FXID)ev.xclient.data.l[4]==xdndActionMove) ddeAction=DRAG_MOVE;
-          else if((FXID)ev.xclient.data.l[4]==xdndActionLink) ddeAction=DRAG_LINK;
-          else if((FXID)ev.xclient.data.l[4]==xdndActionPrivate) ddeAction=DRAG_PRIVATE;
+          if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_ASK]) ddeAction=DRAG_ASK;
+          else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_MOVE]) ddeAction=DRAG_MOVE;
+          else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_COPY]) ddeAction=DRAG_COPY;
+          else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_LINK]) ddeAction=DRAG_LINK;
+          else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_PRIVATE]) ddeAction=DRAG_PRIVATE;
           else ddeAction=DRAG_COPY;
+          FXTRACE((100,"DNDPosition from remote window %ld action %d\n",ev.xclient.data.l[0],ddeAction));
           ansAction=DRAG_REJECT;
           xdndWantUpdates=true;
           xdndRect.x=event.root_x;
@@ -3038,24 +3096,20 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           se.xclient.message_type=xdndStatus;
           se.xclient.format=32;
           se.xclient.window=xdndSource;
-          se.xclient.data.l[0]=ev.xclient.window;                   // Proxy Target window
+          se.xclient.data.l[0]=ev.xclient.window;                       // Proxy Target window
           se.xclient.data.l[1]=0;
-          if(ansAction!=DRAG_REJECT) se.xclient.data.l[1]|=1;       // Target accepted
-          if(xdndWantUpdates) se.xclient.data.l[1]|=2;              // Target wants continuous position updates
+          if(ansAction!=DRAG_REJECT) se.xclient.data.l[1]|=1;           // Target accepted
+          if(xdndWantUpdates) se.xclient.data.l[1]|=2;                  // Target wants continuous position updates
           se.xclient.data.l[2]=MKUINT(xdndRect.y,xdndRect.x);
           se.xclient.data.l[3]=MKUINT(xdndRect.h,xdndRect.w);
-          if(ansAction==DRAG_COPY) se.xclient.data.l[4]=xdndActionCopy; // Drag and Drop Action accepted
-          else if(ansAction==DRAG_MOVE) se.xclient.data.l[4]=xdndActionMove;
-          else if(ansAction==DRAG_LINK) se.xclient.data.l[4]=xdndActionLink;
-          else if(ansAction==DRAG_PRIVATE) se.xclient.data.l[4]=xdndActionPrivate;
-          else se.xclient.data.l[4]=None;
+          se.xclient.data.l[4]=xdndActionList[ansAction];               // Drag and Drop Action accepted
           XSendEvent((Display*)display,xdndSource,True,NoEventMask,&se);
           }
 
         // XDND Drop from source
         else if(ev.xclient.message_type==xdndDrop){
           FXTRACE((100,"DNDDrop from remote window %ld\n",ev.xclient.data.l[0]));
-          if(xdndSource!=(FXID)ev.xclient.data.l[0]) return true;   // We're not talking to this guy
+          if(xdndSource!=(FXID)ev.xclient.data.l[0]) return true;       // We're not talking to this guy
           xdndFinishSent=false;
           event.type=SEL_DND_DROP;
           event.time=ev.xclient.data.l[2];
@@ -3072,11 +3126,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
             se.xclient.window=xdndSource;
             se.xclient.data.l[0]=ev.xclient.window;                     // Proxy Target window
             se.xclient.data.l[1]=(ansAction==DRAG_REJECT)?0:1;          // Bit #0 means accepted
-            if(ansAction==DRAG_COPY) se.xclient.data.l[2]=xdndActionCopy;
-            else if(ansAction==DRAG_MOVE) se.xclient.data.l[2]=xdndActionMove;
-            else if(ansAction==DRAG_LINK) se.xclient.data.l[2]=xdndActionLink;
-            else if(ansAction==DRAG_PRIVATE) se.xclient.data.l[2]=xdndActionPrivate;
-            else se.xclient.data.l[2]=None;
+            se.xclient.data.l[2]=xdndActionList[ansAction];             // Drag and Drop Action accepted
             se.xclient.data.l[3]=0;
             se.xclient.data.l[4]=0;
             XSendEvent((Display*)display,xdndSource,True,NoEventMask,&se);
@@ -3097,10 +3147,11 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           //if(xdndTarget!=(FXID)ev.xclient.data.l[0]) return true; // We're not talking to this guy
           ansAction=DRAG_REJECT;
           if(ev.xclient.data.l[1]&1){
-            if((FXID)ev.xclient.data.l[4]==xdndActionCopy) ansAction=DRAG_COPY;
-            else if((FXID)ev.xclient.data.l[4]==xdndActionMove) ansAction=DRAG_MOVE;
-            else if((FXID)ev.xclient.data.l[4]==xdndActionLink) ansAction=DRAG_LINK;
-            else if((FXID)ev.xclient.data.l[4]==xdndActionPrivate) ansAction=DRAG_PRIVATE;
+            if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_ASK]) ansAction=DRAG_ASK;
+            else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_MOVE]) ansAction=DRAG_MOVE;
+            else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_COPY]) ansAction=DRAG_COPY;
+            else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_LINK]) ansAction=DRAG_LINK;
+            else if((FXID)ev.xclient.data.l[4]==xdndActionList[DRAG_PRIVATE]) ansAction=DRAG_PRIVATE;
             }
           xdndWantUpdates=ev.xclient.data.l[1]&2;
           xdndRect.x=((FXuint)ev.xclient.data.l[2])>>16;
@@ -3685,7 +3736,7 @@ static void getSystemFont(FXFontDesc& fontdesc){
   ncm.cbSize=sizeof(NONCLIENTMETRICS);
   SystemParametersInfo(SPI_GETNONCLIENTMETRICS,sizeof(NONCLIENTMETRICS),&ncm,0);
 #ifdef UNICODE
-  nc2utfs(fontdesc.face,ncm.lfMenuFont.lfFaceName);
+  nc2utfs(fontdesc.face,sizeof(fontdesc.face),ncm.lfMenuFont.lfFaceName,LF_FACESIZE);
 #else
   strncpy(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face));
 #endif
@@ -4007,6 +4058,7 @@ void FXApp::create(){
   cursor[DEF_DRAGTL_CURSOR]->create();
   cursor[DEF_DRAGTR_CURSOR]->create();
   cursor[DEF_DNDSTOP_CURSOR]->create();
+  cursor[DEF_DNDASK_CURSOR]->create();
   cursor[DEF_DNDCOPY_CURSOR]->create();
   cursor[DEF_DNDMOVE_CURSOR]->create();
   cursor[DEF_DNDLINK_CURSOR]->create();
@@ -4053,6 +4105,7 @@ void FXApp::detach(){
   cursor[DEF_DRAGTL_CURSOR]->detach();
   cursor[DEF_DRAGTR_CURSOR]->detach();
   cursor[DEF_DNDSTOP_CURSOR]->detach();
+  cursor[DEF_DNDASK_CURSOR]->detach();
   cursor[DEF_DNDCOPY_CURSOR]->detach();
   cursor[DEF_DNDMOVE_CURSOR]->detach();
   cursor[DEF_DNDLINK_CURSOR]->detach();
@@ -4100,6 +4153,7 @@ void FXApp::destroy(){
   cursor[DEF_DRAGTL_CURSOR]->destroy();
   cursor[DEF_DRAGTR_CURSOR]->destroy();
   cursor[DEF_DNDSTOP_CURSOR]->destroy();
+  cursor[DEF_DNDASK_CURSOR]->destroy();
   cursor[DEF_DNDCOPY_CURSOR]->destroy();
   cursor[DEF_DNDMOVE_CURSOR]->destroy();
   cursor[DEF_DNDLINK_CURSOR]->destroy();
@@ -4866,17 +4920,18 @@ Alt key seems to repeat.
       return 0;
 
     case WM_DND_POSITION_REJECT:
+    case WM_DND_POSITION_ASK:
     case WM_DND_POSITION_COPY:
     case WM_DND_POSITION_MOVE:
     case WM_DND_POSITION_LINK:
     case WM_DND_POSITION_PRIVATE:
-      FXTRACE((100,"DNDPosition from remote window %d\n",lParam));
       if(xdndSource!=(FXID)lParam) return 0;
       event.time=GetMessageTime();
       event.root_x=(int)((short)LOWORD(wParam));
       event.root_y=(int)((short)HIWORD(wParam));
       win=findWindowAt(event.root_x,event.root_y);
       ddeAction=(FXDragAction)(iMsg-WM_DND_POSITION_REJECT);    // Action encoded in message
+      FXTRACE((100,"DNDPosition from remote window %d action %d\n",lParam,ddeAction));
       ansAction=DRAG_REJECT;
       xdndRect.x=event.root_x;
       xdndRect.y=event.root_y;
@@ -4910,6 +4965,7 @@ Alt key seems to repeat.
       return 0;
 
     case WM_DND_STATUS_REJECT:
+    case WM_DND_STATUS_ASK:
     case WM_DND_STATUS_COPY:
     case WM_DND_STATUS_MOVE:
     case WM_DND_STATUS_LINK:
@@ -5420,6 +5476,7 @@ FXApp::~FXApp(){
   delete cursor[DEF_DRAGTR_CURSOR];
   delete cursor[DEF_DRAGTL_CURSOR];
   delete cursor[DEF_DNDSTOP_CURSOR];
+  delete cursor[DEF_DNDASK_CURSOR];
   delete cursor[DEF_DNDCOPY_CURSOR];
   delete cursor[DEF_DNDMOVE_CURSOR];
   delete cursor[DEF_DNDLINK_CURSOR];
@@ -5527,6 +5584,7 @@ FXApp::~FXApp(){
   cursor[DEF_DRAGTL_CURSOR]=(FXCursor*)-1L;
   cursor[DEF_DRAGTR_CURSOR]=(FXCursor*)-1L;
   cursor[DEF_DNDSTOP_CURSOR]=(FXCursor*)-1L;
+  cursor[DEF_DNDASK_CURSOR]=(FXCursor*)-1L;
   cursor[DEF_DNDCOPY_CURSOR]=(FXCursor*)-1L;
   cursor[DEF_DNDMOVE_CURSOR]=(FXCursor*)-1L;
   cursor[DEF_DNDLINK_CURSOR]=(FXCursor*)-1L;

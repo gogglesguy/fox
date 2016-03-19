@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.270 2008/03/19 17:37:02 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.285 2008/06/03 20:55:37 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -93,11 +93,7 @@
 #define TIMEFORMAT "%m/%d/%Y %H:%M:%S"
 #endif
 
-
-
-
 using namespace FX;
-
 
 /*******************************************************************************/
 
@@ -164,6 +160,9 @@ FXDEFMAP(FXFileList) FXFileListMap[]={
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_COPY_SEL,FXFileList::onCmdCopySel),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_DELETE_SEL,FXFileList::onCmdDeleteSel),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_PASTE_SEL,FXFileList::onCmdPasteSel),
+  FXMAPFUNC(SEL_COMMAND,FXFileList::ID_DROPCOPY,FXFileList::onCmdDropCopy),
+  FXMAPFUNC(SEL_COMMAND,FXFileList::ID_DROPMOVE,FXFileList::onCmdDropMove),
+  FXMAPFUNC(SEL_COMMAND,FXFileList::ID_DROPLINK,FXFileList::onCmdDropLink),
   };
 
 
@@ -284,38 +283,154 @@ void FXFileList::destroy(){
   }
 
 
+// Create custom item
+FXIconItem *FXFileList::createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr){
+  return new FXFileItem(text,big,mini,ptr);
+  }
+
 /*******************************************************************************/
 
-// Return list of selected files
-FXint FXFileList::getSelectedFiles(FXString& result) const {
-  register FXint count=0;
-  result=FXString::null;
-  for(FXint i=0; i<getNumItems(); i++){
-    if(isItemSelected(i) && !isItemNavigational(i)){
-      result.append(getItemPathname(i));
-      result.append("\n");
-      count++;
-      }
+
+// Compare file names
+FXint FXFileList::ascending(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
+  if(diff==0){
+    diff=compareSection(a->label.text(),b->label.text(),0);
     }
-  return count;
+  return diff;
   }
 
 
-// Return selected files
-FXString* FXFileList::getSelectedFiles() const {
-  register FXString *files=NULL;
-  register FXint i,n;
-  for(i=n=0; i<getNumItems(); i++){
-    if(isItemSelected(i) && !isItemNavigational(i)) n++;
+// Compare file names, case insensitive
+FXint FXFileList::ascendingCase(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
+  if(diff==0){
+    diff=compareSectionCase(a->label.text(),b->label.text(),0);
     }
-  if(n){
-    files=new FXString [n+1];
-    for(i=n=0; i<getNumItems(); i++){
-      if(isItemSelected(i) && !isItemNavigational(i)) files[n++]=getItemPathname(i);
+  return diff;
+  }
+
+
+// Compare file types
+FXint FXFileList::ascendingType(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
+  if(diff==0){
+    diff=compareSection(a->label.text(),b->label.text(),1);
+    if(diff==0){
+      diff=compareSectionCase(a->label.text(),b->label.text(),0);
       }
-    files[n]=FXString::null;
     }
-  return files;
+  return diff;
+  }
+
+
+// Compare file size
+FXint FXFileList::ascendingSize(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
+  if(diff==0){
+    diff=static_cast<const FXFileItem*>(a)->size - static_cast<const FXFileItem*>(b)->size;
+    if(diff==0){
+      diff=compareSectionCase(a->label.text(),b->label.text(),0);
+      }
+    }
+  return diff;
+  }
+
+
+// Compare file time
+FXint FXFileList::ascendingTime(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=(FXint)((FXFileItem*)b)->isDirectory() - (FXint)((FXFileItem*)a)->isDirectory();
+  if(diff==0){
+    diff=static_cast<const FXFileItem*>(a)->date - static_cast<const FXFileItem*>(b)->date;
+    if(diff==0){
+      diff=compareSectionCase(a->label.text(),b->label.text(),0);
+      }
+    }
+  return diff;
+  }
+
+
+// Compare file user
+FXint FXFileList::ascendingUser(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
+  if(diff==0){
+    diff=compareSection(a->label.text(),b->label.text(),4);
+    if(diff==0){
+      diff=compareSectionCase(a->label.text(),b->label.text(),0);
+      }
+    }
+  return diff;
+  }
+
+
+// Compare file group
+FXint FXFileList::ascendingGroup(const FXIconItem* a,const FXIconItem* b){
+  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
+  if(diff==0){
+    diff=compareSection(a->label.text(),b->label.text(),5);
+    if(diff==0){
+      diff=compareSectionCase(a->label.text(),b->label.text(),0);
+      }
+    }
+  return diff;
+  }
+
+
+// Reversed compare file name, case insensitive
+FXint FXFileList::descendingCase(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascendingCase(a,b);
+  }
+
+
+// Reversed compare file name
+FXint FXFileList::descending(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascending(a,b);
+  }
+
+
+// Reversed compare file type
+FXint FXFileList::descendingType(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascendingType(a,b);
+  }
+
+
+// Reversed compare file size
+FXint FXFileList::descendingSize(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascendingSize(a,b);
+  }
+
+
+// Reversed compare file time
+FXint FXFileList::descendingTime(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascendingTime(a,b);
+  }
+
+
+// Reversed compare file user
+FXint FXFileList::descendingUser(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascendingUser(a,b);
+  }
+
+
+// Reversed compare file group
+FXint FXFileList::descendingGroup(const FXIconItem* a,const FXIconItem* b){
+  return -FXFileList::ascendingGroup(a,b);
+  }
+
+
+/*******************************************************************************/
+
+
+// Return uri-list of selected files
+FXString FXFileList::getSelectedFiles() const {
+  FXString result;
+  for(FXint i=0; i<getNumItems(); i++){
+    if(isItemSelected(i) && !isItemNavigational(i)){
+      result.append(FXURL::fileToURL(getItemPathname(i)));
+      result.append("\r\n");
+      }
+    }
+  return result;
   }
 
 
@@ -399,25 +514,6 @@ The actual request is handled like this:
 #endif
 
 // FIXME share code with file clipboard...
-
-// Deal with the drop that has just occurred
-long FXFileList::onDropAction(FXObject*,FXSelector,void* ptr){
-  FXMenuPane dropmenu(this);
-  new FXMenuCommand(&dropmenu,tr("Move Here"),NULL,NULL,0);
-  new FXMenuCommand(&dropmenu,tr("Copy Here"),NULL,NULL,0);
-  new FXMenuCommand(&dropmenu,tr("Link Here"),NULL,NULL,0);
-  new FXMenuSeparator(&dropmenu);
-  new FXMenuCommand(&dropmenu,tr("Cancel"),NULL,NULL,0);
-  dropmenu.create();
-  dropmenu.popup(NULL,((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y);
-  getApp()->runModalWhileShown(&dropmenu);
-
-  // Forget drop data
-  dropdirectory=FXString::null;
-  dropfiles=FXString::null;
-  dropaction=DRAG_REJECT;
-  return 1;
-  }
 
 /*
 // Deal with the drop that has just occurred
@@ -508,6 +604,7 @@ long FXFileList::onDropAction(FXObject*,FXSelector,void*){
   }
 */
 
+/*******************************************************************************/
 
 // Delete selection
 long FXFileList::onCmdDeleteSel(FXObject*,FXSelector,void*){
@@ -523,9 +620,8 @@ long FXFileList::onCmdPasteSel(FXObject*,FXSelector,void*){
 
 // Cut
 long FXFileList::onCmdCutSel(FXObject*,FXSelector,void*){
-  FXDragType types[4]={urilistType,stringType,textType,utf8Type};
-  if(acquireClipboard(types,4)){
-    getSelectedFiles(clipfiles);
+  if(acquireClipboard(&urilistType,1)){
+    clipfiles=getSelectedFiles();
     }
   return 1;
   }
@@ -533,9 +629,8 @@ long FXFileList::onCmdCutSel(FXObject*,FXSelector,void*){
 
 // Copy
 long FXFileList::onCmdCopySel(FXObject*,FXSelector,void*){
-  FXDragType types[4]={urilistType,stringType,textType,utf8Type};
-  if(acquireClipboard(types,4)){
-    getSelectedFiles(clipfiles);
+  if(acquireClipboard(&urilistType,1)){
+    clipfiles=getSelectedFiles();
     }
   return 1;
   }
@@ -544,38 +639,76 @@ long FXFileList::onCmdCopySel(FXObject*,FXSelector,void*){
 // We lost the selection somehow
 long FXFileList::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXIconList::onClipboardLost(sender,sel,ptr);
-  clipfiles.clear();
+  clipfiles=FXString::null;
   return 1;
   }
 
 
 // Somebody wants our selection
 long FXFileList::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
-  FXString string;
 
   // Try base class first
   if(FXIconList::onClipboardRequest(sender,sel,ptr)) return 1;
 
   // Return list of filenames as a uri-list
   if(((FXEvent*)ptr)->target==urilistType){
-    encodeURIList(string,clipfiles);
-    setDNDData(FROM_CLIPBOARD,((FXEvent*)ptr)->target,string);
-    return 1;
-    }
-
-  // Return text of the selection as UTF-8
-  if(((FXEvent*)ptr)->target==utf8Type){
     setDNDData(FROM_CLIPBOARD,((FXEvent*)ptr)->target,clipfiles);
     return 1;
     }
 
-  // Return text of the selection translated to 8859-1
-  if(((FXEvent*)ptr)->target==stringType || ((FXEvent*)ptr)->target==textType){
-    FX88591Codec ascii;
-    setDNDData(FROM_CLIPBOARD,((FXEvent*)ptr)->target,ascii.utf2mb(clipfiles));
-    return 1;
-    }
   return 0;
+  }
+
+
+/*******************************************************************************/
+
+// Copy
+long FXFileList::onCmdDropCopy(FXObject*,FXSelector,void*){
+  FXString filedst,filesrc;
+  FXint beg,end;
+  for(beg=0; beg<dropfiles.length(); beg=end+2){
+    if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
+    filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
+    filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
+    FXTRACE((100,"Copying file: %s to %s\n",filesrc.text(),filedst.text()));
+    }
+  return 1;
+  }
+
+
+// Copy
+long FXFileList::onCmdDropMove(FXObject*,FXSelector,void*){
+  FXTRACE((100,"Moving file: %s to %s\n",dropfiles.text(),dropdirectory.text()));
+  return 1;
+  }
+
+
+// Copy
+long FXFileList::onCmdDropLink(FXObject*,FXSelector,void*){
+  FXTRACE((100,"Linking file: %s to %s\n",dropfiles.text(),dropdirectory.text()));
+  return 1;
+  }
+
+
+// Deal with the drop that has just occurred
+long FXFileList::onDropAction(FXObject*,FXSelector,void* ptr){
+  FXMenuPane dropmenu(this);
+  FXGIFIcon filemoveicon(getApp(),filemove);
+  FXGIFIcon filecopyicon(getApp(),filecopy);
+  FXGIFIcon filelinkicon(getApp(),filelink);
+  FXGIFIcon filecancelicon(getApp(),filecancel);
+  new FXMenuCommand(&dropmenu,tr("Move Here"),&filemoveicon,this,ID_DROPMOVE);
+  new FXMenuCommand(&dropmenu,tr("Copy Here"),&filecopyicon,this,ID_DROPCOPY);
+  new FXMenuCommand(&dropmenu,tr("Link Here"),&filelinkicon,this,ID_DROPLINK);
+  new FXMenuSeparator(&dropmenu);
+  new FXMenuCommand(&dropmenu,tr("Cancel"),&filecancelicon);
+  dropmenu.create();
+  dropmenu.popup(NULL,((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y);
+  getApp()->runModalWhileShown(&dropmenu);
+  dropdirectory=FXString::null;
+  dropfiles=FXString::null;
+  dropaction=DRAG_REJECT;
+  return 1;
   }
 
 
@@ -660,7 +793,6 @@ long FXFileList::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop drop
 long FXFileList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
-  FXString string;
 
   // Stop scrolling
   stopAutoScroll();
@@ -678,10 +810,21 @@ long FXFileList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   if(FXIconList::onDNDDrop(sender,sel,ptr)) return 1;
 
   // Get list of files as uri-list
-  if(getDNDData(FROM_DRAGNDROP,urilistType,string)){
+  if(getDNDData(FROM_DRAGNDROP,urilistType,dropfiles)){
+//    FXTRACE((1,"dropfiles=\n%s\n",dropfiles.text()));
+//    FXTRACE((1,"droppedfile=%s\n",FXURL::fileFromURL(dropfiles).text()));
     dropFinished(DRAG_ACCEPT);
-    decodeURIList(dropfiles,string);
-    getApp()->addChore(this,ID_DROPACTION,ptr);
+    switch(dropaction){
+      case DRAG_COPY:
+        break;
+      case DRAG_MOVE:
+        break;
+      case DRAG_LINK:
+        break;
+      default:
+        getApp()->addChore(this,ID_DROPACTION,ptr);
+        break;
+      }
     return 1;
     }
   return 0;
@@ -690,40 +833,31 @@ long FXFileList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
 // Somebody wants our dragged data
 long FXFileList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
-  FXString string;
 
   // Perhaps the target wants to supply its own data
   if(FXIconList::onDNDRequest(sender,sel,ptr)) return 1;
 
   // Return list of filenames as a uri-list
   if(((FXEvent*)ptr)->target==urilistType){
-    encodeURIList(string,dragfiles);
-    setDNDData(FROM_DRAGNDROP,((FXEvent*)ptr)->target,string);
-    return 1;
-    }
-
-  // Return text of the selection as UTF-8
-  if(((FXEvent*)ptr)->target==utf8Type){
     setDNDData(FROM_DRAGNDROP,((FXEvent*)ptr)->target,dragfiles);
     return 1;
     }
 
-  // Return text of the selection translated to 8859-1
-  if(((FXEvent*)ptr)->target==stringType || ((FXEvent*)ptr)->target==textType){
-    FX88591Codec ascii;
-    setDNDData(FROM_DRAGNDROP,((FXEvent*)ptr)->target,ascii.utf2mb(dragfiles));
+  // Delete selected files
+  if(((FXEvent*)ptr)->target==deleteType){
+    FXTRACE((100,"Delete files not yet implemented\n"));
     return 1;
     }
+
   return 0;
   }
 
 
 // Start a drag operation
 long FXFileList::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
-  FXDragType types[4]={urilistType,stringType,textType,utf8Type};
   if(!FXIconList::onBeginDrag(sender,sel,ptr)){
-    beginDrag(types,4);
-    getSelectedFiles(dragfiles);
+    beginDrag(&urilistType,1);
+    dragfiles=getSelectedFiles();
     }
   return 1;
   }
@@ -733,20 +867,25 @@ long FXFileList::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
 long FXFileList::onDragged(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   if(!FXIconList::onDragged(sender,sel,ptr)){
-    FXDragAction action=DRAG_MOVE;
+    FXDragAction action=DRAG_ASK;
     if(event->state&CONTROLMASK) action=DRAG_COPY;
     if(event->state&SHIFTMASK) action=DRAG_MOVE;
     if(event->state&ALTMASK) action=DRAG_LINK;
     handleDrag(event->root_x,event->root_y,action);
-    if(didAccept()!=DRAG_REJECT){
-      if(action==DRAG_MOVE){
-        setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
-        }
-      else if(action==DRAG_LINK){
-        setDragCursor(getApp()->getDefaultCursor(DEF_DNDLINK_CURSOR));
-        }
-      else{
-        setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
+    if(didAccept()){
+      switch(action){
+        case DRAG_COPY:
+          setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
+          break;
+        case DRAG_MOVE:
+          setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
+          break;
+        case DRAG_LINK:
+          setDragCursor(getApp()->getDefaultCursor(DEF_DNDLINK_CURSOR));
+          break;
+        default:
+          setDragCursor(getApp()->getDefaultCursor(DEF_DNDASK_CURSOR));
+          break;
         }
       }
     else{
@@ -762,14 +901,39 @@ long FXFileList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
   if(!FXIconList::onEndDrag(sender,sel,ptr)){
     endDrag((didAccept()!=DRAG_REJECT));
     setDragCursor(getDefaultCursor());
-    dragfiles.clear();
+    dragfiles=FXString::null;
     }
   return 1;
   }
 
-
 /*******************************************************************************/
 
+// Load preview icon given path
+FXIcon* FXFileList::getItemPreviewIcon(FXint index) const {
+  if(getAssociations() && getAssociations()->getIconDict() && getAssociations()->getIconDict()->getIconSource()){
+    return getAssociations()->getIconDict()->getIconSource()->loadScaledIconFile(getItemPathname(index),imagesize);
+    }
+  return NULL;
+  }
+
+
+// Change directory when hovering over a folder
+long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
+  register FXint index=(FXint)(FXival)ptr;
+  register FXIcon *icon;
+  if(index<getNumItems()){
+    if((icon=getItemPreviewIcon(index))!=NULL){
+      icon->create();
+      setItemBigIcon(index,icon,true);
+      }
+   if(++index<getNumItems()){
+     getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)index);
+     }
+   }
+  return 1;
+  }
+
+/*******************************************************************************/
 
 // Set value from a message
 long FXFileList::onCmdSetValue(FXObject*,FXSelector,void* ptr){
@@ -1063,131 +1227,7 @@ long FXFileList::onUpdHeader(FXObject*,FXSelector,void*){
   return 1;
   }
 
-
-// Compare file names
-FXint FXFileList::ascending(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
-  if(diff==0){
-    return compareSection(a->label.text(),b->label.text(),0);
-    }
-  return diff;
-  }
-
-
-// Compare file names, case insensitive
-FXint FXFileList::ascendingCase(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
-  if(diff==0){
-    return compareSectionCase(a->label.text(),b->label.text(),0);
-    }
-  return diff;
-  }
-
-
-// Compare file types
-FXint FXFileList::ascendingType(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
-  if(diff==0){
-    diff=compareSection(a->label.text(),b->label.text(),1);
-    if(diff==0){
-      return compareSectionCase(a->label.text(),b->label.text(),0);
-      }
-    }
-  return diff;
-  }
-
-
-// Compare file size
-FXint FXFileList::ascendingSize(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
-  if(diff==0){
-    if(static_cast<const FXFileItem*>(a)->size > static_cast<const FXFileItem*>(b)->size) return 1;
-    if(static_cast<const FXFileItem*>(a)->size < static_cast<const FXFileItem*>(b)->size) return -1;
-    return compareSectionCase(a->label.text(),b->label.text(),0);
-    }
-  return diff;
-  }
-
-
-// Compare file time
-FXint FXFileList::ascendingTime(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=(FXint)((FXFileItem*)b)->isDirectory() - (FXint)((FXFileItem*)a)->isDirectory();
-  if(diff==0){
-    if(static_cast<const FXFileItem*>(a)->date > static_cast<const FXFileItem*>(b)->date) return 1;
-    if(static_cast<const FXFileItem*>(a)->date < static_cast<const FXFileItem*>(b)->date) return -1;
-    return compareSectionCase(a->label.text(),b->label.text(),0);
-    }
-  return diff;
-  }
-
-
-// Compare file user
-FXint FXFileList::ascendingUser(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
-  if(diff==0){
-    diff=compareSection(a->label.text(),b->label.text(),4);
-    if(diff==0){
-      return compareSectionCase(a->label.text(),b->label.text(),0);
-      }
-    }
-  return diff;
-  }
-
-
-// Compare file group
-FXint FXFileList::ascendingGroup(const FXIconItem* a,const FXIconItem* b){
-  register FXint diff=static_cast<const FXFileItem*>(b)->isDirectory() - static_cast<const FXFileItem*>(a)->isDirectory();
-  if(diff==0){
-    diff=compareSection(a->label.text(),b->label.text(),5);
-    if(diff==0){
-      return compareSectionCase(a->label.text(),b->label.text(),0);
-      }
-    }
-  return diff;
-  }
-
-
-// Reversed compare file name, case insensitive
-FXint FXFileList::descendingCase(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascendingCase(a,b);
-  }
-
-
-// Reversed compare file name
-FXint FXFileList::descending(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascending(a,b);
-  }
-
-
-// Reversed compare file type
-FXint FXFileList::descendingType(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascendingType(a,b);
-  }
-
-
-// Reversed compare file size
-FXint FXFileList::descendingSize(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascendingSize(a,b);
-  }
-
-
-// Reversed compare file time
-FXint FXFileList::descendingTime(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascendingTime(a,b);
-  }
-
-
-// Reversed compare file user
-FXint FXFileList::descendingUser(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascendingUser(a,b);
-  }
-
-
-// Reversed compare file group
-FXint FXFileList::descendingGroup(const FXIconItem* a,const FXIconItem* b){
-  return -FXFileList::ascendingGroup(a,b);
-  }
-
+/*******************************************************************************/
 
 // Refresh; don't update if user is interacting with the list
 long FXFileList::onRefreshTimer(FXObject*,FXSelector,void*){
@@ -1203,32 +1243,6 @@ long FXFileList::onRefreshTimer(FXObject*,FXSelector,void*){
 // Force an immediate update of the list
 long FXFileList::onCmdRefresh(FXObject*,FXSelector,void*){
   scan(true);
-  return 1;
-  }
-
-
-// Load preview icon given path
-FXIcon* FXFileList::getItemPreviewIcon(FXint index) const {
-  if(getAssociations() && getAssociations()->getIconDict() && getAssociations()->getIconDict()->getIconSource()){
-    return getAssociations()->getIconDict()->getIconSource()->loadScaledIconFile(getItemPathname(index),imagesize);
-    }
-  return NULL;
-  }
-
-
-// Change directory when hovering over a folder
-long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
-  register FXint index=(FXint)(FXival)ptr;
-  register FXIcon *icon;
-  if(index<getNumItems()){
-    if((icon=getItemPreviewIcon(index))!=NULL){
-      icon->create();
-      setItemBigIcon(index,icon,true);
-      }
-   if(++index<getNumItems()){
-     getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)index);
-     }
-   }
   return 1;
   }
 
@@ -1423,12 +1437,6 @@ static FXbool fileequal(const FXString& a,const FXString& b){
     }
   while(c1!='\0' && c1!='\t' && c1==c2);
   return (c1=='\0' || c1=='\t') && (c2=='\0' || c2=='\t');
-  }
-
-
-// Create custom item
-FXIconItem *FXFileList::createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr){
-  return new FXFileItem(text,big,mini,ptr);
   }
 
 

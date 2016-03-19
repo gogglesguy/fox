@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRangef.h,v 1.21 2008/01/04 15:18:23 fox Exp $                          *
+* $Id: FXRangef.h,v 1.22 2008/06/04 18:34:16 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXRANGEF_H
 #define FXRANGEF_H
@@ -28,6 +28,7 @@ namespace FX {
 
 
 class FXSpheref;
+class FXMat4f;
 
 
 /// Bounds
@@ -151,6 +152,9 @@ public:
 
   /// Get corner number 0..7
   FXVec3f corner(FXint c) const { return FXVec3f((&lower)[c&1].x,(&lower)[(c>>1)&1].y,(&lower)[c>>2].z); }
+
+  /// Transform range by 4x4 matrix
+  FXRangef transform(const FXMat4f& mat) const;
 
   /// Union of two boxes
   friend FXAPI FXRangef unite(const FXRangef& a,const FXRangef& b);

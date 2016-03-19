@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComposeContext.cpp,v 1.19 2008/03/27 15:51:57 fox Exp $                *
+* $Id: FXComposeContext.cpp,v 1.21 2008/05/19 12:48:00 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -197,13 +197,13 @@ FXComposeContext::~FXComposeContext(){
 
 
 // Deserialization
-FXComposeContext::FXComposeContext():window(NULL),message(0){
+FXComposeContext::FXComposeContext():window(NULL),message(0),fontset(0){
   FXTRACE((100,"FXComposeContext::FXComposeContext %p\n",this));
   }
 
 
 // Create input context
-FXComposeContext::FXComposeContext(FXApp* a,FXWindow* win,FXSelector sel):FXId(a),window(win),message(sel){
+FXComposeContext::FXComposeContext(FXApp* a,FXWindow* win,FXSelector sel):FXId(a),window(win),message(sel),fontset(0){
   FXTRACE((100,"FXComposeContext::FXComposeContext %p\n",this));
   }
 
@@ -378,8 +378,13 @@ m:      XFree(ximstyles);
         FXTRACE((100,"Over the Spot\n"));
         spot.x=1;
         spot.y=1;
-        editAttr=XVaCreateNestedList(0,XNSpotLocation,&spot,NULL);
+        int missing_charcount;
+        char** missing_charsetlist;
+        char* def_string;
+        fontset=XCreateFontSet(DISPLAY(getApp()),"10x20,10x20",&missing_charsetlist,&missing_charcount,&def_string);
+        editAttr=XVaCreateNestedList(0,XNSpotLocation,&spot,XNFontSet,fontset,NULL);
         xid=(FXID)XCreateIC((XIM)getApp()->xim,XNInputStyle,XIMPreeditPosition|XIMStatusNothing,XNClientWindow,window->id(),XNPreeditAttributes,editAttr,NULL);
+        XFreeStringList(missing_charsetlist);
         XFree(editAttr);
         }
 
@@ -484,13 +489,20 @@ FXString FXComposeContext::translateEvent(FXRawEvent& event){
   FXString result;
 #ifndef NO_XIM
   if(xid){
-    char buffer[40]; KeySym sym; Status s; int n;
-    n=XmbLookupString((XIC)xid,&event.xkey,buffer,sizeof(buffer),&sym,&s);
+    char* buffer=new char [513];
+    KeySym sym; Status s; int n;
+    n=XmbLookupString((XIC)xid,&event.xkey,buffer,512,&sym,&s);
+    if(s==XBufferOverflow){
+      delete [] buffer;
+      buffer=new char [n+1];
+      n=XmbLookupString((XIC)xid,&event.xkey,buffer,n,&sym,&s);
+      }
     if(s!=XLookupChars && s!=XLookupBoth) n=0;
     // FIXME decode buffer based on XLocaleOfIM(XIMOfIC((XIC)xid))
     buffer[n]=0;
     FXTRACE((100,"XLocaleOfIM=%s\n",XLocaleOfIM(XIMOfIC((XIC)xid))));
     result.assign(buffer,n);
+    delete [] buffer;
     }
 #endif
   return result;
@@ -548,6 +560,8 @@ FXComposeContext::~FXComposeContext(){
   FXTRACE((100,"FXComposeContext::~FXComposeContext %p\n",this));
   destroy();
   window=(FXWindow*)-1L;
+  if(fontset) XFreeFontSet(DISPLAY(getApp()),(XFontSet)fontset);
+  fontset=(XFontSet)-1L;
   }
 
 #endif  /////////////////////////////////////////////////////////////////////////

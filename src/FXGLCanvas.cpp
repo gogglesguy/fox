@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCanvas.cpp,v 1.86 2008/04/22 20:14:25 fox Exp $                      *
+* $Id: FXGLCanvas.cpp,v 1.90 2008/06/24 20:40:06 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -121,7 +121,11 @@ void FXGLCanvas::create(){
   FXCanvas::create();
   if(xid){
     if(getApp()->isInitialized()){
+
+      // Create context
       context->create();
+
+      // Change frame buffer according to visual
 #ifdef HAVE_GL_H
 #if defined(WIN32)
       PIXELFORMATDESCRIPTOR pfd={sizeof(PIXELFORMATDESCRIPTOR),1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -135,6 +139,9 @@ void FXGLCanvas::create(){
       rsc=xid;
 #endif
 #endif
+
+      // Uh-oh, we failed
+      if(!rsc){ throw FXWindowException("unable to create GL window."); }
       }
     }
   }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.cpp,v 1.181 2008/04/23 03:10:43 fox Exp $                     *
+* $Id: FXDCWindow.cpp,v 1.186 2008/05/20 14:21:30 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -503,6 +503,145 @@ void FXDCWindow::fillConcavePolygonRel(const FXPoint* points,FXuint npoints){
 void FXDCWindow::fillComplexPolygonRel(const FXPoint* points,FXuint npoints){
   if(!surface){ fxerror("FXDCWindow::fillComplexPolygonRel: DC not connected to drawable.\n"); }
   XFillPolygon((Display*)getApp()->getDisplay(),surface->id(),(GC)ctx,(XPoint*)points,npoints,Complex,CoordModePrevious);
+  }
+
+
+// Fill vertical gradient rectangle
+void FXDCWindow::fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor top,FXColor bottom){
+  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,yl,yh,xx,yy,dy,dx,n,t;
+  if(!surface){ fxerror("FXDCWindow::fillVerticalGradient: DC not connected to drawable.\n"); }
+  if(0<w && 0<h){
+    r1=FXREDVAL(top);
+    r2=FXREDVAL(bottom);
+    g1=FXGREENVAL(top);
+    g2=FXGREENVAL(bottom);
+    b1=FXBLUEVAL(top);
+    b2=FXBLUEVAL(bottom);
+    dr=r2-r1;
+    dg=g2-g1;
+    db=b2-b1;
+    n=FXABS(dr);
+    if((t=FXABS(dg))>n) n=t;
+    if((t=FXABS(db))>n) n=t;
+    n++;
+    if(n>h) n=h;
+    if(n>128) n=128;
+    rr=(r1<<16)+32767;
+    gg=(g1<<16)+32767;
+    bb=(b1<<16)+32767;
+    yy=32767;
+    dr=(dr<<16)/n;
+    dg=(dg<<16)/n;
+    db=(db<<16)/n;
+    dy=(h<<16)/n;
+    do{
+      yl=yy>>16;
+      yy+=dy;
+      yh=yy>>16;
+      setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
+      fillRectangle(x,y+yl,w,yh-yl);
+      rr+=dr;
+      gg+=dg;
+      bb+=db;
+      }
+    while(yh<h);
+    }
+#if 0
+  XLinearGradient grad;
+  XFixed stops[2];
+  XRenderColor colors[2];
+
+  grad.p1.x=0;
+  grad.p1.y=0;
+  grad.p2.x=0;
+  grad.p2.y=h<<16;
+
+  stops[0]=0;
+  stops[1]=1<<16;
+
+  colors[0].red=FXREDVAL(top)*257;
+  colors[0].green=FXGREENVAL(top)*257;
+  colors[0].blue=FXBLUEVAL(top)*257;
+  colors[0].alpha=FXALPHAVAL(top)*257;
+  colors[1].red=FXREDVAL(bottom)*257;
+  colors[1].green=FXGREENVAL(bottom)*257;
+  colors[1].blue=FXBLUEVAL(bottom)*257;
+  colors[1].alpha=FXALPHAVAL(bottom)*257;
+
+  Picture picture=XRenderCreateLinearGradient((Display*)getApp()->getDisplay(),&grad,stops,colors,2);
+  XRenderComposite((Display*)getApp()->getDisplay(),PictOpSrc,picture,0,surface->xrenderpicture,0,0,0,0,x,y,w,h);
+  XRenderFreePicture((Display*)getApp()->getDisplay(),picture);
+#endif
+  }
+
+
+
+// Fill horizontal gradient rectangle
+void FXDCWindow::fillHorizontalGradient(FXint x,FXint y,FXint w,FXint h,FXColor left,FXColor right){
+  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,yl,yh,xx,yy,dy,dx,n,t;
+  if(!surface){ fxerror("FXDCWindow::fillHorizontalGradient: DC not connected to drawable.\n"); }
+  if(0<w && 0<h){
+    r1=FXREDVAL(left);
+    r2=FXREDVAL(right);
+    g1=FXGREENVAL(left);
+    g2=FXGREENVAL(right);
+    b1=FXBLUEVAL(left);
+    b2=FXBLUEVAL(right);
+    dr=r2-r1;
+    dg=g2-g1;
+    db=b2-b1;
+    n=FXABS(dr);
+    if((t=FXABS(dg))>n) n=t;
+    if((t=FXABS(db))>n) n=t;
+    n++;
+    if(n>w) n=w;
+    if(n>128) n=128;
+    rr=(r1<<16)+32767;
+    gg=(g1<<16)+32767;
+    bb=(b1<<16)+32767;
+    xx=32767;
+    dr=(dr<<16)/n;
+    dg=(dg<<16)/n;
+    db=(db<<16)/n;
+    dx=(w<<16)/n;
+    do{
+      xl=xx>>16;
+      xx+=dx;
+      xh=xx>>16;
+      setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
+      fillRectangle(x+xl,y,xh-xl,h);
+      rr+=dr;
+      gg+=dg;
+      bb+=db;
+      }
+    while(xh<w);
+    }
+#if 0
+  XLinearGradient grad;
+  XFixed stops[2];
+  XRenderColor colors[2];
+
+  grad.p1.x=0;
+  grad.p1.y=0;
+  grad.p2.x=w<<16;
+  grad.p2.y=0;
+
+  stops[0]=0;
+  stops[1]=1<<16;
+
+  colors[0].red=FXREDVAL(left)*257;
+  colors[0].green=FXGREENVAL(left)*257;
+  colors[0].blue=FXBLUEVAL(left)*257;
+  colors[0].alpha=FXALPHAVAL(left)*257;
+  colors[1].red=FXREDVAL(right)*257;
+  colors[1].green=FXGREENVAL(right)*257;
+  colors[1].blue=FXBLUEVAL(right)*257;
+  colors[1].alpha=FXALPHAVAL(right)*257;
+
+  Picture picture=XRenderCreateLinearGradient((Display*)getApp()->getDisplay(),&grad,stops,colors,2);
+  XRenderComposite((Display*)getApp()->getDisplay(),PictOpSrc,picture,0,surface->xrenderpicture,0,0,0,0,x,y,w,h);
+  XRenderFreePicture((Display*)getApp()->getDisplay(),picture);
+#endif
   }
 
 
@@ -1716,6 +1855,54 @@ void FXDCWindow::fillComplexPolygonRel(const FXPoint* points,FXuint npoints){
   }
 
 
+// Fill vertical gradient rectangle
+void FXDCWindow::fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor top,FXColor bottom){
+#if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__CYGWIN__) || (_MSC_VER >= 1300)
+  TRIVERTEX v[2];
+  GRADIENT_RECT r;
+  r.UpperLeft=0;
+  r.LowerRight=1;
+  v[0].x=x;
+  v[0].y=y;
+  v[0].Red=FXREDVAL(top)<<8;
+  v[0].Green=FXGREENVAL(top)<<8;
+  v[0].Blue=FXBLUEVAL(top)<<8;
+  v[0].Alpha=0xFF00;
+  v[1].x=x+w;
+  v[1].y=y+h;
+  v[1].Red=FXREDVAL(bottom)<<8;
+  v[1].Green=FXGREENVAL(bottom)<<8;
+  v[1].Blue=FXBLUEVAL(bottom)<<8;
+  v[1].Alpha=0xFF00;
+  ::GradientFill((HDC)ctx,v,2,&r,1,GRADIENT_FILL_RECT_V);
+#endif  
+  }
+
+
+// Fill horizontal gradient rectangle
+void FXDCWindow::fillHorizontalGradient(FXint x,FXint y,FXint w,FXint h,FXColor left,FXColor right){
+#if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__CYGWIN__) || (_MSC_VER >= 1300)
+  TRIVERTEX v[2];
+  GRADIENT_RECT r;
+  r.UpperLeft=0;
+  r.LowerRight=1;
+  v[0].x=x;
+  v[0].y=y;
+  v[0].Red=FXREDVAL(left)<<8;
+  v[0].Green=FXGREENVAL(left)<<8;
+  v[0].Blue=FXBLUEVAL(left)<<8;
+  v[0].Alpha=0xFF00;
+  v[1].x=x+w;
+  v[1].y=y+h;
+  v[1].Red=FXREDVAL(right)<<8;
+  v[1].Green=FXGREENVAL(right)<<8;
+  v[1].Blue=FXBLUEVAL(right)<<8;
+  v[1].Alpha=0xFF00;
+  ::GradientFill((HDC)ctx,v,2,&r,1,GRADIENT_FILL_RECT_H);
+#endif  
+  }
+
+
 // Set text font
 void FXDCWindow::setFont(FXFont *fnt){
   if(!surface){ fxerror("FXDCWindow::setFont: DC not connected to drawable.\n"); }
@@ -1730,7 +1917,7 @@ void FXDCWindow::drawText(FXint x,FXint y,const FXchar* string,FXuint length){
   if(!surface){ fxerror("FXDCWindow::drawText: DC not connected to drawable.\n"); }
   if(!font){ fxerror("FXDCWindow::drawText: no font selected.\n"); }
   FXnchar sbuffer[4096];
-  FXint count=utf2ncs(sbuffer,string,FXMIN(length,4096));
+  FXint count=utf2ncs(sbuffer,4096,string,length);
   FXASSERT(count<=length);
   FXint bkmode=::SetBkMode((HDC)ctx,TRANSPARENT);
   ::TextOutW((HDC)ctx,x,y,sbuffer,count);
@@ -1743,7 +1930,7 @@ void FXDCWindow::drawImageText(FXint x,FXint y,const FXchar* string,FXuint lengt
   if(!surface){ fxerror("FXDCWindow::drawImageText: DC not connected to drawable.\n"); }
   if(!font){ fxerror("FXDCWindow::drawImageText: no font selected.\n"); }
   FXnchar sbuffer[4096];
-  FXint count=utf2ncs(sbuffer,string,FXMIN(length,4096));
+  FXint count=utf2ncs(sbuffer,4096,string,length);
   FXASSERT(count<=length);
   FXint bkmode=::SetBkMode((HDC)ctx,OPAQUE);
   ::TextOutW((HDC)ctx,x,y,sbuffer,count);

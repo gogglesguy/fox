@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTIFImage.cpp,v 1.33 2008/01/04 15:42:34 fox Exp $                      *
+* $Id: FXTIFImage.cpp,v 1.35 2008/06/27 19:44:54 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

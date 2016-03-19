@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFontSelector.cpp,v 1.63 2008/01/04 15:42:15 fox Exp $                  *
+* $Id: FXFontSelector.cpp,v 1.66 2008/06/03 16:15:38 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -253,7 +253,7 @@ void FXFontSelector::listFontFaces(){
     FXASSERT(0<numfonts);
     for(f=0; f<numfonts; f++){
       familylist->appendItem(fonts[f].face,NULL,(void*)(FXuval)fonts[f].flags);
-      if(strcmp(selected.face,fonts[f].face)==0) selindex=f;
+      if(compare(selected.face,fonts[f].face)==0) selindex=f;
       }
     if(selindex==-1) selindex=0;
     if(0<familylist->getNumItems()){
@@ -366,7 +366,7 @@ void FXFontSelector::listFontSizes(){
   const FXuint sizeint[]={60,80,90,100,110,120,140,160,200,240,300,360,420,480,640};
   FXFontDesc *fonts;
   FXuint numfonts,f,s,lasts;
-  FXint selindex=-1;
+  FXint selindex=-1,selindex1=-1;
   sizelist->clearItems();
   size->setText("");
   FXString string;
@@ -379,8 +379,15 @@ void FXFontSelector::listFontSizes(){
         string.format("%.1f",0.1*s);
         sizelist->appendItem(string,NULL,(void*)(FXuval)s);
         if(selected.size == s) selindex=sizelist->getNumItems()-1;
+        // selindex1 is an index for use if there is not an exact match of size,
+        // and will normally be the size from this list just above the actual size
+        // as requested.
+        if(selected.size>lasts && selected.size<=s) selindex1=sizelist->getNumItems()-1;
         lasts=s;
         }
+      // If the requested size was greater than 64.0 I will use 64.0 as the
+      // default item in the list.
+      if(selindex1<0) selindex1=sizelist->getNumItems()-1;
       }
     else{
       for(f=0; f<numfonts; f++){
@@ -393,12 +400,22 @@ void FXFontSelector::listFontSizes(){
           }
         }
       }
-    if(selindex==-1) selindex=0;
+    if(selindex==-1){
+      // For scalable fonts select the best match if there is not a perfect one
+      if(selindex1!=-1) selindex=selindex1;
+      else selindex=0;
+      }
     if(0<sizelist->getNumItems()){
       sizelist->setCurrentItem(selindex);
       sizelist->makeItemVisible(selindex);
-      size->setText(sizelist->getItemText(selindex));
-      selected.size=(FXuint)(FXuval)sizelist->getItemData(selindex);
+      if(fonts[0].flags&FXFont::Scalable){
+        string.format("%.1f",0.1*selected.size);
+        size->setText(string);
+        }
+      else{
+        size->setText(sizelist->getItemText(selindex));
+        selected.size=(FXuint)(FXuval)sizelist->getItemData(selindex);
+        }
       }
     freeElms(fonts);
     }
@@ -585,7 +602,7 @@ long FXFontSelector::onUpdAllFonts(FXObject*,FXSelector,void*){
 
 
 // Change font selection
-void FXFontSelector::setFontSelection(const FXFontDesc& fontdesc){
+void FXFontSelector::setFontDesc(const FXFontDesc& fontdesc){
   selected=fontdesc;
 
   // Validate these numbers
@@ -620,8 +637,8 @@ void FXFontSelector::setFontSelection(const FXFontDesc& fontdesc){
 
 
 // Change font selection
-void FXFontSelector::getFontSelection(FXFontDesc& fontdesc) const {
-  fontdesc=selected;
+const FXFontDesc& FXFontSelector::getFontDesc() const {
+  return selected;
   }
 
 

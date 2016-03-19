@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXURL.cpp,v 1.39 2008/02/19 18:59:04 fox Exp $                           *
+* $Id: FXURL.cpp,v 1.62 2008/06/03 23:03:52 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -33,14 +33,10 @@
 #include "FXURL.h"
 
 
-
 /*
   Notes:
 
   - Functions contributed by Sean Hubbell and Sander Jansen.
-
-  - The result of gethostname should be fed into gethostbyname() to obtain
-    the official host name.
 
   - About drive letters in URL's, Daniel Gehriger has some some
     empirical tests, and determined the following:
@@ -61,11 +57,114 @@
     The conclusion seems to be we should probably try to handle all
     of these possibilities, although keeping the `:' seems favorable.
 
-  - For now we don't encode any reserved characters. They need to be encoded
-    if they're not part of the scheme. I don't have a way of figuring
-    out if they're part of a scheme or not.
+  - Syntax (as per rfc3986):
+
+      URI           =  scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+
+      hier-part     =  "//" authority path-abempty
+                    /  path-absolute
+                    /  path-rootless
+                    /  path-empty
+
+      URI-reference =  URI / relative-ref
+
+      absolute-URI  =  scheme ":" hier-part [ "?" query ]
+
+      relative-ref  =  relative-part [ "?" query ] [ "#" fragment ]
+
+      relative-part =  "//" authority path-abempty
+                    /  path-absolute
+                    /  path-noscheme
+                    /  path-empty
+
+      scheme        =  ALPHA  *( ALPHA / DIGIT / "+" / "-" / "." )
+
+      authority     =  [ userinfo "@" ] host [ ":" port ]
+
+      userinfo      =  *( unreserved / pct-encoded / sub-delims / ":" )
+
+      host          =  IP-literal / IPv4address / reg-name
+
+      IP-literal    =  "[" ( IPv6address / IPvFuture  ) "]"
+
+      IPvFuture     =  "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+      IPv6address   =                             6( h16 ":" ) ls32
+                    /                        "::" 5( h16 ":" ) ls32
+                    /  [               h16 ] "::" 4( h16 ":" ) ls32
+                    /  [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+                    /  [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+                    /  [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+                    /  [ *4( h16 ":" ) h16 ] "::"              ls32
+                    /  [ *5( h16 ":" ) h16 ] "::"              h16
+                    /  [ *6( h16 ":" ) h16 ] "::"
+
+      ls32          =  ( h16 ":" h16 ) / IPv4address                   ; least-significant 32 bits of address
+
+      h16           = 1*4HEXDIG                                        ; 16 bits of address represented in hexadecimal
+
+
+      IPv4address   =  dec-octet "." dec-octet "." dec-octet "." dec-octet
+
+      dec-octet     =  DIGIT                                            ; 0-9
+                    /  %x31-39 DIGIT                                    ; 10-99
+                    /  "1" 2DIGIT                                       ; 100-199
+                    /  "2" %x30-34 DIGIT                                ; 200-249
+                    /  "25" %x30-35                                     ; 250-255
+
+      reg-name      = *( unreserved / pct-encoded / sub-delims )
+
+      port          =  *DIGIT
+
+      path          =  path-abempty                                     ; begins with "/" or is empty
+                    /  path-absolute                                    ; begins with "/" but not "//"
+                    /  path-noscheme                                    ; begins with a non-colon segment
+                    /  path-rootless                                    ; begins with a segment
+                    /  path-empty                                       ; zero characters
+
+      path-abempty  =  *( "/" segment )
+
+      path-absolute =  "/" [ segment-nz *( "/" segment ) ]
+
+      path-noscheme =  segment-nz-nc *( "/" segment )
+
+      path-rootless =  segment-nz *( "/" segment )
+
+      path-empty    =  0<pchar>
+
+      segment       =  *pchar
+
+      segment-nz    =  1*pchar
+
+      segment-nz-nc =  1*( unreserved / pct-encoded / sub-delims / "@" ) ; non-zero-length segment without any colon ":"
+
+      pchar         =  unreserved / pct-encoded / sub-delims / ":" / "@"
+
+      query         =  *( pchar / "/" / "?" )
+
+      fragment      =  *( pchar / "/" / "?" )
+
+      pct-encoded   =  "%" HEXDIG HEXDIG
+
+      unreserved    =  ALPHA / DIGIT / "-" / "." / "_" / "~"
+
+      reserved      =  gen-delims / sub-delims
+
+      gen-delims    =  ":" / "/" / "?" / "#" / "[" / "]" / "@"
+
+      sub-delims    =  "!" / "$" / "&" / "'" / "(" / ")"
+                    /  "*" / "+" / "," / ";" / "="
 
 */
+
+#define UNRESERVED   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~" // Unreserved characters
+#define IPV6DIGITS   "abcdefABCDEF0123456789:."                                           // Stuff in IPv6 numbers
+#define PCTENCODED   "%0123456789abcdefABCDEF"                                            // Percent encoded characters
+#define GENDELIMS    ":/?#[]@"                                                            // General delimiters
+#define SUBDELIMS    "!$&'()*+,;="                                                        // Sub-delimiters
+#define RESERVED     ":/?#[]@!$&'()*+,;="                                                 // Reserved characters (GENDELIMS + SUBDELIMS)
+#define UNSAFE       "<>#%{}|^~[]`\" "                                                    // Unsafe characters
+#define ENCODE_THESE "<>#%{}|^~[]`\"?$&'*,;="                                             // Encode these for pathnames
 
 using namespace FX;
 
@@ -74,90 +173,136 @@ using namespace FX;
 namespace FX {
 
 
-// Return URL of filename
-FXString FXURL::fileToURL(const FXString& file){
-#ifdef WIN32
-  FXString absfile=FXPath::absolute(file).substitute(PATHSEP,'/');
-  if(Ascii::isLetter(absfile[0]) && absfile[1]==':') return "file://"+FXSystem::getHostName()+"/"+absfile;     // Drive letter
-  return "file://"+FXSystem::getHostName()+absfile;
-#else
-  return "file:"+file;        // UNIX is easy
-#endif
-  }
+// URL parts
+class URL {
+public:
+  FXint prot[2];
+  FXint user[2];
+  FXint pass[2];
+  FXint host[2];
+  FXint port[2];
+  FXint path[2];
+  FXint quer[2];
+  FXint frag[2];
+public:
+  URL(const FXString& string);
+  };
 
 
-// Return filename from URL, empty if url is not a local file
-FXString FXURL::fileFromURL(const FXString& url){
-#ifdef WIN32
-  FXString localurl=url;
-  localurl.substitute('/',PATHSEP);
-  if(comparecase("file:" PATHSEPSTRING PATHSEPSTRING,localurl,7)==0){
-    FXString result;
-    FXint path=localurl.find(PATHSEP,7);
-    if(path<0 || path==7){
-      result=localurl.mid(7,2147483647);
+// Parse string to url parts
+URL::URL(const FXString& string){
+  register FXint s=0;
+
+  prot[0]=prot[1]=0;
+
+  // Parse protocol
+  if(Ascii::isLetter(string[0])){
+    s++;
+
+    // Scan till end of scheme name
+    while(Ascii::isAlphaNumeric(string[s]) || string[s]=='+' || string[s]=='-' || string[s]=='.') s++;
+
+    // Scheme end found
+    if(string[s]==':' && s>1){
+      prot[1]=s++;
       }
     else{
-      FXString host=localurl.mid(7,path-7);
-      if(host=="localhost" || host==FXSystem::getHostName()){
-        result=localurl.mid(path,2147483647);
+      s=prot[0];                                // Reset:- wasn't protocol after all since no ':' found
+      }
+    }
+
+  user[0]=user[1]=s;
+  pass[0]=pass[1]=s;
+  host[0]=host[1]=s;
+  port[0]=port[1]=s;
+
+  // Parse hier part
+  if(string[s]=='/' && string[s+1]=='/'){
+    s+=2;
+
+    // Parse user name
+    user[0]=s;
+    while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
+      s++;
+      }
+    user[1]=s;
+
+    // Check for password
+    pass[0]=pass[1]=s;
+    if(string[s]==':'){
+      pass[0]=++s;
+      while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
+        s++;
         }
+      pass[1]=s;
       }
-    if(result[0]==PATHSEP && Ascii::isLetter(result[1]) && (result[2]==':' || result[2]=='|')){
-      result.erase(0,1);
-      if(result[1]=='|') result[1]=':';
+
+    // Check for @ after user:pass
+    if(string[s]=='@'){
+      s++;
       }
-    return result;
+    else{
+      s=pass[0]=pass[1]=user[1]=user[0];        // Reset:- wasn't user:pass after all since no '@' found
+      }
+
+    // Parse hostname
+    host[0]=s;
+    while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
+      s++;
+      }
+    host[1]=s;
+
+    // Check for port number
+    port[0]=port[1]=s;
+    if(string[s]==':'){
+      port[0]=++s;
+      while(Ascii::isDigit(string[s])) s++;
+      port[1]=s;
+      }
     }
-  return FXString::null;
-#else
-  FXint t;
-  if(comparecase("file:",url,5)==0){
-    if(ISPATHSEP(url[5]) && ISPATHSEP(url[6])){
-      t=url.find(PATHSEP,7);
-      if(7<t) return url.mid(t,2147483647);       // We ignore host designation
-      return url.mid(7,2147483647);               // Empty hostname part
-      }
-    return url.mid(5,2147483647);                 // No hostname
+
+  // Eat slash preceding the drive letter (e.g. file:///c:/path)
+  if(string[s]=='/' && Ascii::isLetter(string[s+1]) && (string[s+2]==':' || string[s+2]=='|')){
+    s++;
     }
-  return FXString::null;
-#endif
+
+  // Parse path
+  path[0]=s;
+  while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/ ",string[s])){
+    s++;
+    }
+  path[1]=s;
+
+  // Parse query
+  quer[0]=quer[1]=s;
+  if(string[s]=='?'){
+    quer[0]=++s;
+    while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/?",string[s])){
+      s++;
+      }
+    quer[1]=s;
+    }
+
+  // Parse fragment
+  frag[0]=frag[1]=s;
+  if(string[s]=='#'){
+    frag[0]=++s;
+    while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/?",string[s])){
+      s++;
+      }
+    frag[1]=s;
+    }
   }
 
 
-// Decode url string
-FXString FXURL::decode(const FXString& url){
+// Encode control characters and characters from set using %-encoding
+FXString FXURL::encode(const FXString& url,const FXchar* set){
   register FXint p=0;
   register FXint c;
   FXString result;
   while(p<url.length()){
     c=url[p++];
-    if(c=='%'){
-      if(Ascii::isHexDigit(url[p])){
-        c=Ascii::digitValue(url[p++]);
-        if(Ascii::isHexDigit(url[p])){
-          c=(c<<4)+Ascii::digitValue(url[p++]);
-          }
-        }
-      }
-    result.append(c);
-    }
-  return result;
-  }
-
-
-#define URL_UNSAFE   "$-_.+!*'(),"          // Always Encode
-#define URL_RESERVED ";/?:@=&"              // Only encode if not used as reserved by scheme
-
-
-// Encode url string
-FXString FXURL::encode(const FXString& url){
-  register FXint p=0;
-  register FXint c;
-  FXString result;
-  while(p<url.length()){
-    c=url[p++];
-    if(!Ascii::isAlphaNumeric(c) && (c<=' ' || c>='{') && strchr(URL_UNSAFE URL_RESERVED,c)){
+    if(c<0x20 || c>0x7F || c=='%' || (set && strchr(set,c))){
       result.append('%');
       result.append(FXString::value2Digit[(c>>4)&15]);
       result.append(FXString::value2Digit[c&15]);
@@ -167,5 +312,117 @@ FXString FXURL::encode(const FXString& url){
     }
   return result;
   }
+
+
+// Decode string containing %-encoded characters
+FXString FXURL::decode(const FXString& url){
+  register FXint p=0;
+  register FXint c;
+  FXString result;
+  while(p<url.length()){
+    c=url[p++];
+    if(c=='%' && Ascii::isHexDigit(url[p]) && Ascii::isHexDigit(url[p+1])){
+      c=Ascii::digitValue(url[p])*16+Ascii::digitValue(url[p+1]);
+      p+=2;
+      }
+    result.append(c);
+    }
+  return result;
+  }
+
+
+// Return URL of filename
+FXString FXURL::fileToURL(const FXString& file){
+#ifdef WIN32
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    return "file:"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);         // file://share/path-with-slashes
+    }
+  if(Ascii::isLetter(file[0]) && file[1]==':'){
+    return "file:///"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);      // file:///c:/path-with-slashes
+    }
+  return "file:"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);           // file:path-with-slashes
+#else
+  return "file:"+encode(file,ENCODE_THESE);                                     // file:path
+#endif
+  }
+
+
+// Return filename from URL, empty if url is not a local file
+FXString FXURL::fileFromURL(const FXString& string){
+  if(!string.empty()){
+#ifdef WIN32
+    URL url(string);
+    if(url.host[0]<url.host[1]){
+      return "\\\\"+string.mid(url.host[0],url.host[1]-url.host[0])+decode(FXPath::convert(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
+      }
+    return decode(FXPath::convert(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
+#else
+    URL url(string);
+    return decode(string.mid(url.path[0],url.path[1]-url.path[0]));
+#endif
+    }
+  return FXString::null;
+  }
+
+
+// Parse scheme from url
+FXString FXURL::scheme(const FXString& string){
+  URL url(string);
+  return string.mid(url.prot[0],url.prot[1]-url.prot[0]);
+  }
+
+
+// Parse username from string containing url
+FXString FXURL::username(const FXString& string){
+  URL url(string);
+  return string.mid(url.user[0],url.user[1]-url.user[0]);
+  }
+
+
+// Parse password from string containing url
+FXString FXURL::password(const FXString& string){
+  URL url(string);
+  return string.mid(url.pass[0],url.pass[1]-url.pass[0]);
+  }
+
+
+// Parse hostname from string containing url
+FXString FXURL::host(const FXString& string){
+  URL url(string);
+  return string.mid(url.host[0],url.host[1]-url.host[0]);
+  }
+
+
+// Parse port number from string containing url
+FXint FXURL::port(const FXString& string){
+  register FXint result=0;
+  URL url(string);
+  while(url.port[0]<url.port[1]){
+    result=result*10+Ascii::digitValue(string[url.port[0]++]);
+    }
+  return result;
+  }
+
+
+// Parse path from string containing url
+FXString FXURL::path(const FXString& string){
+  URL url(string);
+  return string.mid(url.path[0],url.path[1]-url.path[0]);
+  }
+
+
+// Parse query from string containing url
+FXString FXURL::query(const FXString& string){
+  URL url(string);
+  return string.mid(url.quer[0],url.quer[1]-url.quer[0]);
+  }
+
+
+// Parse fragment from string containing url
+FXString FXURL::fragment(const FXString& string){
+  URL url(string);
+  return string.mid(url.frag[0],url.frag[1]-url.frag[0]);
+  }
+
 
 }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.169 2008/04/18 16:57:07 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.173 2008/05/20 16:21:36 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -75,6 +75,7 @@ FXuint fxrandom(FXuint& seed){
 
 #ifdef WIN32
 
+
 // Return true if console application
 FXbool fxisconsole(const FXchar *path){
   IMAGE_OPTIONAL_HEADER optional_header;
@@ -127,10 +128,10 @@ FXbool fxisconsole(const FXchar *path){
     if(dwBytes!=IMAGE_SIZEOF_FILE_HEADER) goto x;
 
     // Read the optional header of file.
-    if(ReadFile(hImage,&optional_header,IMAGE_SIZEOF_NT_OPTIONAL_HEADER,&dwBytes,NULL)==0) goto x;
+    if(ReadFile(hImage,&optional_header,sizeof(IMAGE_OPTIONAL_HEADER),&dwBytes,NULL)==0) goto x;
 
     // Test bytes read
-    if(dwBytes!=IMAGE_SIZEOF_NT_OPTIONAL_HEADER) goto x;
+    if(dwBytes!=sizeof(IMAGE_OPTIONAL_HEADER)) goto x;
 
     // Switch on systems
     switch(optional_header.Subsystem){
@@ -392,10 +393,9 @@ extern FXAPI FILE *fxopen(const char *filename,const char *mode);
 
 FILE *fxopen(const char *filename,const char *mode){
 #if defined(WIN32) && defined(UNICODE)
-  FXnchar unifile[1024];
-  FXnchar unimode[1024];
-  utf2ncs(unifile,filename,strlen(filename)+1);
-  utf2ncs(unimode,mode,strlen(mode)+1);
+  FXnchar unifile[MAXPATHLEN],unimode[8];
+  utf2ncs(unifile,MAXPATHLEN,filename,strlen(filename)+1);
+  utf2ncs(unimode,8,mode,strlen(mode)+1);
   return _wfopen(unifile,unimode);
 #else
   return fopen(filename,mode);
@@ -406,10 +406,9 @@ extern FXAPI FILE *fxreopen(const char *filename,const char *mode,FILE * stream)
 
 FILE *fxreopen(const char *filename,const char *mode,FILE * stream){
 #if defined(WIN32) && defined(UNICODE)
-  FXnchar unifile[1024];
-  FXnchar unimode[1024];
-  utf2ncs(unifile,filename,strlen(filename)+1);
-  utf2ncs(unimode,mode,strlen(mode)+1);
+  FXnchar unifile[MAXPATHLEN],unimode[8];
+  utf2ncs(unifile,MAXPATHLEN,filename,strlen(filename)+1);
+  utf2ncs(unimode,8,mode,strlen(mode)+1);
   return _wfreopen(unifile,unimode,stream);
 #else
   return freopen(filename,mode,stream);
@@ -596,7 +595,7 @@ extern FXAPI FXuint fxcpuid();
                 "cpuid           \n\t"  \
                 "xchgl %%ebx, %1 \n\t"  \
                 : "=a" (eax),		\
-                  "=b" (ebx),           \
+                  "=r" (ebx),           \
                   "=c" (ecx),           \
                   "=d" (edx)            \
                 : "a" (op)              \

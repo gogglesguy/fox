@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFont.cpp,v 1.209 2008/03/26 15:04:04 fox Exp $                         *
+* $Id: FXFont.cpp,v 1.217 2008/05/19 20:07:45 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -178,7 +178,7 @@ static FXuint CharSet2FXFontEncoding(BYTE lfCharSet){
     case EASTEUROPE_CHARSET: return FONTENCODING_EASTEUROPE;
     case GB2312_CHARSET: return FONTENCODING_DEFAULT;
     case GREEK_CHARSET: return FONTENCODING_GREEK;
-#if !defined (__WATCOMC__)
+#if !defined (__WATCOMC__) || (__WATCOMC__ >= 1200)
     case HANGUL_CHARSET: return FONTENCODING_DEFAULT;
 #endif
     case HEBREW_CHARSET: return FONTENCODING_HEBREW;
@@ -256,7 +256,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
   // Font substitution
 #ifdef UNICODE
-  utf2ncs(lf.lfFaceName,wantfamily.text(),wantfamily.length()+1);
+  utf2ncs(lf.lfFaceName,LF_FACESIZE,wantfamily.text(),wantfamily.length()+1);
 #else
   strncpy(lf.lfFaceName,wantfamily.text(),sizeof(lf.lfFaceName));
 #endif
@@ -276,7 +276,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   // Get actual face name
   GetTextFaceA((HDC)dc,sizeof(buffer),buffer);
   actualName=buffer;
-  actualSize=MulDiv(((TEXTMETRIC*)font)->tmHeight,720,GetDeviceCaps((HDC)dc,LOGPIXELSY)); // FIXME no cigar yet?
+  actualSize=MulDiv(((TEXTMETRIC*)font)->tmHeight,720,GetDeviceCaps((HDC)dc,LOGPIXELSY));
   actualWeight=((TEXTMETRIC*)font)->tmWeight/10;
   actualSlant=((TEXTMETRIC*)font)->tmItalic?FXFont::Italic:FXFont::Straight;
   actualSetwidth=0;
@@ -388,6 +388,13 @@ static FXint fcSlant2Slant(FXint fcSlant){
 
 // Try find matching font
 void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint wantsize,FXuint wantweight,FXuint wantslant,FXuint wantsetwidth,FXuint wantencoding,FXuint wanthints,FXint res){
+  const FXchar *rgba=getApp()->reg().readStringEntry("Xft","rgba","unknown");
+  const FXchar *hs=getApp()->reg().readStringEntry("Xft","hintstyle","full");
+  FXbool     fc_hinting=getApp()->reg().readBoolEntry("Xft","hinting",true);
+  FXbool     fc_autohint=getApp()->reg().readBoolEntry("Xft","autohint",false);
+  FXbool     fc_antialias=getApp()->reg().readBoolEntry("Xft","antialias",true);
+  FXint      fc_rgba=FC_RGBA_UNKNOWN;
+  FXint      fc_hintstyle=FC_HINT_FULL;
   int        pp,sw,wt,sl;
   double     a,s,c,sz;
   FcPattern *pattern,*p;
@@ -398,10 +405,36 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FcBool     sc;
   FcMatrix   matrix;
 
+
   FXTRACE((150,"wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res));
 
   // Create pattern object
   pattern=FcPatternCreate();
+
+
+  // Should we perhaps pass these hints in the "wanthints" parameter instead?
+
+  // RGBA color order hint
+  if(rgba[0]=='u') fc_rgba=FC_RGBA_UNKNOWN;
+  else if(rgba[0]=='r') fc_rgba=FC_RGBA_RGB;
+  else if(rgba[0]=='b') fc_rgba=FC_RGBA_BGR;
+  else if(rgba[0]=='v' && rgba[1]=='r') fc_rgba=FC_RGBA_VRGB;
+  else if(rgba[0]=='v' && rgba[1]=='b') fc_rgba=FC_RGBA_VBGR;
+
+#ifdef FC_HINT_STYLE
+  if(hs[0]=='s') fc_hintstyle=FC_HINT_SLIGHT;
+  else if(hs[0]=='m') fc_hintstyle=FC_HINT_SLIGHT;
+  else if(hs[0]=='f') fc_hintstyle=FC_HINT_FULL;
+#endif
+
+  // Set additional hints
+  FcPatternAddBool(pattern,FC_HINTING,fc_hinting);
+  FcPatternAddBool(pattern,FC_ANTIALIAS,fc_antialias);
+  FcPatternAddBool(pattern,FC_AUTOHINT,fc_autohint);
+  FcPatternAddInteger(pattern,FC_RGBA,fc_rgba);
+#ifdef FC_HINT_STYLE
+  FcPatternAddInteger(pattern,FC_HINT_STYLE,fc_hintstyle);
+#endif
 
   // Set family
   if(!wantfamily.empty()){
@@ -1628,7 +1661,7 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
 #if defined(WIN32)              ///// WIN32 /////
     FXnchar sbuffer[4096];
     FXASSERT(dc!=NULL);
-    FXint count=utf2ncs(sbuffer,string,FXMIN(length,4096));
+    FXint count=utf2ncs(sbuffer,4096,string,FXMIN(length,4096));
     FXASSERT(count<=length);
     SIZE size;
     GetTextExtentPoint32W((HDC)dc,sbuffer,count,&size);
@@ -1783,7 +1816,7 @@ static FX885916Codec codec_8859_16;
 void FXFont::drawText(FXDC* dc,FXint x,FXint y,const FXchar* string,FXuint length) const {
   FXnchar sbuffer[4096];
   FXint iBkMode=SetBkMode((HDC)dc->ctx,TRANSPARENT);
-  FXint count=utf2ncs(sbuffer,string,FXMIN(length,4096));
+  FXint count=utf2ncs(sbuffer,4096,string,FXMIN(length,4096));
   FXASSERT(count<=length);
   TextOutW((HDC)dc->ctx,x,y,sbuffer,count);
   SetBkMode((HDC)dc->ctx,iBkMode);
@@ -2605,18 +2638,6 @@ static FXuint findbyname(const ENTRY* table,FXint n,const FXString& name){
   }
 
 
-// Get font description
-void FXFont::getFontDesc(FXFontDesc& fontdesc) const {
-  strncpy(fontdesc.face,wantedName.text(),116);
-  fontdesc.size=wantedSize;
-  fontdesc.weight=wantedWeight;
-  fontdesc.slant=wantedSlant;
-  fontdesc.setwidth=wantedSetwidth;
-  fontdesc.encoding=wantedEncoding;
-  fontdesc.flags=hints;
-  }
-
-
 // Change font description
 void FXFont::setFontDesc(const FXFontDesc& fontdesc){
   wantedName=fontdesc.face;
@@ -2626,6 +2647,20 @@ void FXFont::setFontDesc(const FXFontDesc& fontdesc){
   wantedSetwidth=fontdesc.setwidth;
   wantedEncoding=fontdesc.encoding;
   hints=fontdesc.flags;
+  }
+
+
+// Get font description
+FXFontDesc FXFont::getFontDesc() const {
+  FXFontDesc result;
+  strncpy(result.face,wantedName.text(),sizeof(result.face));
+  result.size=wantedSize;
+  result.weight=wantedWeight;
+  result.slant=wantedSlant;
+  result.setwidth=wantedSetwidth;
+  result.encoding=wantedEncoding;
+  result.flags=hints;
+  return result;
   }
 
 
@@ -2647,7 +2682,7 @@ void FXFont::setFont(const FXString& string){
   if(0<=len){
 
     // Name and foundry
-    wantedName=string.left(len);
+    wantedName.trunc(len);
 
     // Point size
     wantedSize=string.section(',',1).toUInt();

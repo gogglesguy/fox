@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: dctest.cpp,v 1.55 2008/01/04 15:18:32 fox Exp $                          *
+* $Id: dctest.cpp,v 1.56 2008/04/29 12:51:38 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>
@@ -1108,11 +1108,10 @@ long DCTestWindow::onUpdBackColor(FXObject* sender,FXSelector,void*){
 // Change font
 long DCTestWindow::onCmdFont(FXObject*,FXSelector,void*){
   FXFontDialog fontdlg(this,"Change Font",DECOR_BORDER|DECOR_TITLE);
-  FXFontDesc fontdesc;
-  testFont->getFontDesc(fontdesc);
-  fontdlg.setFontSelection(fontdesc);
+  FXFontDesc fontdesc=testFont->getFontDesc();
+  fontdlg.setFontDesc(fontdesc);
   if(fontdlg.execute()){
-    fontdlg.getFontSelection(fontdesc);
+    fontdesc=fontdlg.getFontDesc();
     delete testFont;
     delete testFontAngle;
     testFont=new FXFont(getApp(),fontdesc);

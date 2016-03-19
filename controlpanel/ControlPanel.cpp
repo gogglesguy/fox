@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: ControlPanel.cpp,v 1.2 2008/03/06 05:28:34 fox Exp $                     *
+* $Id: ControlPanel.cpp,v 1.3 2008/04/29 12:51:38 fox Exp $                     *
 ********************************************************************************/
 #include <xincs.h>
 #include <fx.h>
@@ -434,12 +434,10 @@ void FXDesktopSetup::create(){
 
 
 void FXDesktopSetup::setup(){
-
   getApp()->getNormalFont()->create();
-  FXFontDesc fontdescription;
-  getApp()->getNormalFont()->getFontDesc(fontdescription);
+  FXFontDesc fontdescription=getApp()->getNormalFont()->getFontDesc();
 
-  font = new FXFont(getApp(),fontdescription);
+  font=new FXFont(getApp(),fontdescription);
   font->create();
 
   fontdescription.size = (FXuint) (((double)fontdescription.size) * 1.5);
@@ -1071,13 +1069,12 @@ long FXDesktopSetup::onColorTheme(FXObject*,FXSelector,void* ptr){
 
 long FXDesktopSetup::onChooseFont(FXObject*,FXSelector,void*){
   FXFontDialog dialog(this,"Select Normal Font");
-  FXFontDesc fontdescription;
-  font->getFontDesc(fontdescription);
+  FXFontDesc fontdescription=font->getFontDesc();
   strncpy(fontdescription.face,font->getActualName().text(),sizeof(fontdescription.face));
-  dialog.setFontSelection(fontdescription);
+  dialog.setFontDesc(fontdescription);
   if(dialog.execute(PLACEMENT_SCREEN)){
     FXFont *oldfont=font;
-    dialog.getFontSelection(fontdescription);
+    fontdescription=dialog.getFontDesc();
     font=new FXFont(getApp(),fontdescription);
     font->create();
     delete oldfont;

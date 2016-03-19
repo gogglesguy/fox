@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.wc,v 1.49 2008/01/04 16:14:04 fox Exp $                      #
+# $Id: Makefile.wc,v 1.51 2008/05/20 13:23:28 fox Exp $                      #
 ##############################################################################
 
 CXX       = wpp386
@@ -29,7 +29,7 @@ TOPDIR    = ..
 
 # Uncomment the following two lines for debug builds...
 #CXXFLAGS  = /d3 /w3
-#DEFINES   = -DFOX_BIGENDIAN=0 -DWIN32 -D_WINDOWS -DHAVE_OPENGL
+#DEFINES   = -DFOX_BIGENDIAN=0 -DWIN32 -D_WINDOWS -DUNICODE -DHAVE_OPENGL
 
 # Uncomment the following two lines for release builds...
 CXXFLAGS  = /w3 /e1 /zq /5r /ei /xs /xr /fp5 /otexan /zp=4
@@ -85,6 +85,8 @@ OBJECTS += FXComplexf.obj
 OBJECTS += FXComplexd.obj
 OBJECTS += FXComposeContext.obj
 OBJECTS += FXComposite.obj
+OBJECTS += FXConsole.obj
+OBJECTS += FXCopyDialog.obj
 OBJECTS += FXCP1250Codec.obj
 OBJECTS += FXCP1251Codec.obj
 OBJECTS += FXCP1252Codec.obj
@@ -236,7 +238,6 @@ OBJECTS += FXProgressBar.obj
 OBJECTS += FXProgressDialog.obj
 OBJECTS += FXQuatd.obj
 OBJECTS += FXQuatf.obj
-OBJECTS += FXMessenger.obj
 OBJECTS += FXRadioButton.obj
 OBJECTS += FXRanged.obj
 OBJECTS += FXRangef.obj
@@ -345,7 +346,7 @@ OBJECTS += fxpriv.obj
 OBJECTS += fxpsio.obj
 OBJECTS += fxrasio.obj
 OBJECTS += fxrgbio.obj
-OBJECTS += fxsscanf.obj
+OBJECTS += fxscanf.obj
 OBJECTS += fxtargaio.obj
 OBJECTS += fxtifio.obj
 OBJECTS += fxunicode.obj

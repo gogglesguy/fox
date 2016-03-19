@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chartutils.cpp,v 1.5 2008/01/04 15:18:14 fox Exp $                       *
+* $Id: chartutils.cpp,v 1.7 2008/04/23 16:21:48 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -280,8 +280,6 @@ void drawMarker(FXDC& dc,const Marker& ms,FXint x,FXint y){
 
 // Draw rectangle
 void drawRectangle(FXDC& dc,const FillStyle& fs,FXint x,FXint y,FXint w,FXint h){
-  register FXint rr,gg,bb,dr,dg,db,r1,g1,b1,r2,g2,b2,xl,xh,yl,yh,xx,yy,dy,dx,n,t;
-  const FXint MAXSTEPS=128;
   if(0<w && 0<h){
     switch(fs.style){
       case FILLSTYLE_SOLID:
@@ -317,80 +315,12 @@ void drawRectangle(FXDC& dc,const FillStyle& fs,FXint x,FXint y,FXint w,FXint h)
       case FILLSTYLE_HORIZONTAL:
         dc.setStipple(STIPPLE_NONE);
         dc.setFillStyle(FILL_SOLID);
-
-        r1=FXREDVAL(fs.lower);   r2=FXREDVAL(fs.upper);   dr=r2-r1;
-        g1=FXGREENVAL(fs.lower); g2=FXGREENVAL(fs.upper); dg=g2-g1;
-        b1=FXBLUEVAL(fs.lower);  b2=FXBLUEVAL(fs.upper);  db=b2-b1;
-
-        n=FXABS(dr);
-        if((t=FXABS(dg))>n) n=t;
-        if((t=FXABS(db))>n) n=t;
-        //FXTRACE((1,"max(|dr|,|dg|,|db|)=%d \n",n));
-        n++;
-        if(n>w) n=w;
-        if(n>MAXSTEPS) n=MAXSTEPS;
-        //FXTRACE((1,"n=%d \n",n));
-
-        rr=(r1<<16)+32767;
-        gg=(g1<<16)+32767;
-        bb=(b1<<16)+32767;
-        xx=32767;
-
-        dr=(dr<<16)/n;
-        dg=(dg<<16)/n;
-        db=(db<<16)/n;
-        dx=(w<<16)/n;
-
-        do{
-          xl=xx>>16;
-          xx+=dx;
-          xh=xx>>16;
-          dc.setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
-          dc.fillRectangle(x+xl,y,xh-xl,h);
-          rr+=dr;
-          gg+=dg;
-          bb+=db;
-          }
-        while(xh<w);
+        dc.fillHorizontalGradient(x,y,w,h,fs.lower,fs.upper);
         break;
       case FILLSTYLE_VERTICAL:
         dc.setStipple(STIPPLE_NONE);
         dc.setFillStyle(FILL_SOLID);
-
-        r1=FXREDVAL(fs.lower);   r2=FXREDVAL(fs.upper);   dr=r2-r1;
-        g1=FXGREENVAL(fs.lower); g2=FXGREENVAL(fs.upper); dg=g2-g1;
-        b1=FXBLUEVAL(fs.lower);  b2=FXBLUEVAL(fs.upper);  db=b2-b1;
-
-        n=FXABS(dr);
-        if((t=FXABS(dg))>n) n=t;
-        if((t=FXABS(db))>n) n=t;
-        //FXTRACE((1,"max(|dr|,|dg|,|db|)=%d \n",n));
-        n++;
-        if(n>h) n=h;
-        if(n>MAXSTEPS) n=MAXSTEPS;
-        //FXTRACE((1,"n=%d \n",n));
-
-        rr=(r1<<16)+32767;
-        gg=(g1<<16)+32767;
-        bb=(b1<<16)+32767;
-        yy=32767;
-
-        dr=(dr<<16)/n;
-        dg=(dg<<16)/n;
-        db=(db<<16)/n;
-        dy=(h<<16)/n;
-
-        do{
-          yl=yy>>16;
-          yy+=dy;
-          yh=yy>>16;
-          dc.setForeground(FXRGB(rr>>16,gg>>16,bb>>16));
-          dc.fillRectangle(x,y+yl,w,yh-yl);
-          rr+=dr;
-          gg+=dg;
-          bb+=db;
-          }
-        while(yh<h);
+        dc.fillVerticalGradient(x,y,w,h,fs.lower,fs.upper);
         break;
       }
     }

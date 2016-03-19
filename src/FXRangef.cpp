@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRangef.cpp,v 1.18 2008/01/04 15:42:28 fox Exp $                        *
+* $Id: FXRangef.cpp,v 1.19 2008/06/04 18:34:17 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -264,6 +264,20 @@ FXbool FXRangef::intersect(const FXVec3f& u,const FXVec3f& v){
     if(n>f) return false;
     }
   return true;
+  }
+
+
+// Transform range by 4x4 matrix
+FXRangef FXRangef::transform(const FXMat4f& mat) const {
+  FXRangef result(corner(0)*mat);
+  result.include(corner(1)*mat);
+  result.include(corner(2)*mat);
+  result.include(corner(3)*mat);
+  result.include(corner(4)*mat);
+  result.include(corner(5)*mat);
+  result.include(corner(6)*mat);
+  result.include(corner(7)*mat);
+  return result;
   }
 
 

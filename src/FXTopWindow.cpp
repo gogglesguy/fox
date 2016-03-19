@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTopWindow.cpp,v 1.221 2008/04/08 13:55:44 fox Exp $                    *
+* $Id: FXTopWindow.cpp,v 1.224 2008/05/19 20:07:46 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -651,7 +651,7 @@ void FXTopWindow::settitle(){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar titlewide[1024];
-    utf2ncs(titlewide,title.text(),title.length()+1);
+    utf2ncs(titlewide,1024,title.text(),title.length()+1);
     SetWindowTextW((HWND)xid,titlewide);
 #else
     SetWindowTextA((HWND)xid,title.text());
@@ -817,6 +817,13 @@ FXuint FXTopWindow::getDecorations() const {
 void FXTopWindow::flash(FXbool yes){
   if(xid){
 #ifdef WIN32
+//    FLASHWINFO flashinfo;
+//    flashinfo.cbSize=sizeof(flashinfo);
+//    flashinfo.hwnd=xid;
+//    flashinfo.dwFlags=FLASHW_ALL;
+//    flashinfo.uCount=5;
+//    flashinfo.dwTimeout=0;
+//    FlashWindowEx(flashinfo);
     FlashWindow((HWND)xid,false);
 #else
     XEvent se;
@@ -1134,14 +1141,6 @@ void FXTopWindow::resize(FXint w,FXint h){
 #else
       XWindowChanges changes;
       XSizeHints size;
-      changes.x=0;
-      changes.y=0;
-      changes.width=width;
-      changes.height=height;
-      changes.border_width=0;
-      changes.sibling=None;
-      changes.stack_mode=Above;
-      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWWidth|CWHeight,&changes);
       size.flags=USSize|PSize|PWinGravity|USPosition|PPosition;
       size.x=xpos;
       size.y=ypos;
@@ -1179,6 +1178,14 @@ void FXTopWindow::resize(FXint w,FXint h){
         size.max_height=getDefaultHeight();
         }
       XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
+      changes.x=0;
+      changes.y=0;
+      changes.width=width;
+      changes.height=height;
+      changes.border_width=0;
+      changes.sibling=None;
+      changes.stack_mode=Above;
+      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWWidth|CWHeight,&changes);
 #endif
       layout();
       }
@@ -1204,14 +1211,6 @@ void FXTopWindow::position(FXint x,FXint y,FXint w,FXint h){
 #else
       XWindowChanges changes;
       XSizeHints size;
-      changes.x=xpos;
-      changes.y=ypos;
-      changes.width=width;
-      changes.height=height;
-      changes.border_width=0;
-      changes.sibling=None;
-      changes.stack_mode=Above;
-      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWX|CWY|CWWidth|CWHeight,&changes);
       size.flags=USSize|PSize|PWinGravity|USPosition|PPosition;
       size.x=xpos;
       size.y=ypos;
@@ -1249,6 +1248,14 @@ void FXTopWindow::position(FXint x,FXint y,FXint w,FXint h){
         size.max_height=getDefaultHeight();
         }
       XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
+      changes.x=xpos;
+      changes.y=ypos;
+      changes.width=width;
+      changes.height=height;
+      changes.border_width=0;
+      changes.sibling=None;
+      changes.stack_mode=Above;
+      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWX|CWY|CWWidth|CWHeight,&changes);
 #endif
       layout();
       }

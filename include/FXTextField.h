@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.h,v 1.85 2008/03/27 15:51:56 fox Exp $                       *
+* $Id: FXTextField.h,v 1.86 2008/04/24 16:22:59 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTEXTFIELD_H
 #define FXTEXTFIELD_H
@@ -128,7 +128,9 @@ public:
   long onCmdGetHelp(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
+  long onUpdIsEditable(FXObject*,FXSelector,void*);
   long onUpdHaveSelection(FXObject*,FXSelector,void*);
+  long onUpdHaveEditableSelection(FXObject*,FXSelector,void*);
 
   // Value access
   long onCmdSetValue(FXObject*,FXSelector,void*);

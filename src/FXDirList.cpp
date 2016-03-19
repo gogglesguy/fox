@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.183 2008/02/28 04:51:08 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.185 2008/05/29 13:54:38 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -230,49 +230,67 @@ void FXDirList::destroy(){
   }
 
 
+// Expand tree
+FXbool FXDirList::expandTree(FXTreeItem* tree,FXbool notify){
+  if(FXTreeList::expandTree(tree,notify)){
+    if(isItemDirectory(tree)){
+      listChildItems((FXDirItem*)tree);
+      sortChildItems(tree);
+      }
+    return true;
+    }
+  return false;
+  }
+
+
+// Collapse tree
+FXbool FXDirList::collapseTree(FXTreeItem* tree,FXbool notify){
+  if(FXTreeList::collapseTree(tree,notify)){
+    if(isItemDirectory(tree)){
+      removeItems(tree->getFirst(),tree->getLast(),notify);
+      ((FXDirItem*)tree)->list=NULL;
+      }
+    return true;
+    }
+  return false;
+  }
+
+
 // Create item
 FXTreeItem* FXDirList::createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr){
   return (FXTreeItem*) new FXDirItem(text,oi,ci,ptr);
   }
 
+/*******************************************************************************/
 
 // Sort ascending order, keeping directories first
 FXint FXDirList::ascending(const FXTreeItem* pa,const FXTreeItem* pb){
-  register const FXDirItem *a=(FXDirItem*)pa;
-  register const FXDirItem *b=(FXDirItem*)pb;
-  register FXint diff=(FXint)b->isDirectory() - (FXint)a->isDirectory();
-  return diff ? diff : compare(a->label,b->label);
+  register FXint diff=static_cast<const FXDirItem*>(pb)->isDirectory() - static_cast<const FXDirItem*>(pa)->isDirectory();
+  return diff ? diff : compare(pa->label,pb->label);
   }
 
 
 // Sort descending order, keeping directories first
 FXint FXDirList::descending(const FXTreeItem* pa,const FXTreeItem* pb){
-  register const FXDirItem *a=(FXDirItem*)pa;
-  register const FXDirItem *b=(FXDirItem*)pb;
-  register FXint diff=(FXint)b->isDirectory() - (FXint)a->isDirectory();
-  return diff ? diff : compare(b->label,a->label);
+  register FXint diff=static_cast<const FXDirItem*>(pb)->isDirectory() - static_cast<const FXDirItem*>(pa)->isDirectory();
+  return diff ? diff : compare(pb->label,pa->label);
   }
 
 
 // Sort ascending order, case insensitive, keeping directories first
 FXint FXDirList::ascendingCase(const FXTreeItem* pa,const FXTreeItem* pb){
-  register const FXDirItem *a=(FXDirItem*)pa;
-  register const FXDirItem *b=(FXDirItem*)pb;
-  register FXint diff=(FXint)b->isDirectory() - (FXint)a->isDirectory();
-  return diff ? diff : comparecase(a->label,b->label);
+  register FXint diff=static_cast<const FXDirItem*>(pb)->isDirectory() - static_cast<const FXDirItem*>(pa)->isDirectory();
+  return diff ? diff : comparecase(pa->label,pb->label);
   }
 
 
 // Sort descending order, case insensitive, keeping directories first
 FXint FXDirList::descendingCase(const FXTreeItem* pa,const FXTreeItem* pb){
-  register const FXDirItem *a=(FXDirItem*)pa;
-  register const FXDirItem *b=(FXDirItem*)pb;
-  register FXint diff=(FXint)b->isDirectory() - (FXint)a->isDirectory();
-  return diff ? diff : comparecase(b->label,a->label);
+  register FXint diff=static_cast<const FXDirItem*>(pb)->isDirectory() - static_cast<const FXDirItem*>(pa)->isDirectory();
+  return diff ? diff : comparecase(pb->label,pa->label);
   }
 
 /*******************************************************************************/
-
 
 // Handle drag-and-drop enter
 long FXDirList::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr){
@@ -458,9 +476,7 @@ long FXDirList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
   return 1;
   }
 
-
 /*******************************************************************************/
-
 
 // Open up the path down to the given string
 long FXDirList::onCmdSetValue(FXObject*,FXSelector,void* ptr){
@@ -617,31 +633,7 @@ long FXDirList::onUpdSortCase(FXObject* sender,FXSelector,void* ptr){
   }
 
 
-// Expand tree
-FXbool FXDirList::expandTree(FXTreeItem* tree,FXbool notify){
-  if(FXTreeList::expandTree(tree,notify)){
-    if(isItemDirectory(tree)){
-      listChildItems((FXDirItem*)tree);
-      sortChildItems(tree);
-      }
-    return true;
-    }
-  return false;
-  }
-
-
-// Collapse tree
-FXbool FXDirList::collapseTree(FXTreeItem* tree,FXbool notify){
-  if(FXTreeList::collapseTree(tree,notify)){
-    if(isItemDirectory(tree)){
-      removeItems(tree->getFirst(),tree->getLast(),notify);
-      ((FXDirItem*)tree)->list=NULL;
-      }
-    return true;
-    }
-  return false;
-  }
-
+/*******************************************************************************/
 
 // Refresh; don't update if user is interacting with the list
 long FXDirList::onRefreshTimer(FXObject*,FXSelector,void*){
@@ -1190,7 +1182,6 @@ void FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
 FXString FXDirList::getCurrentFile() const {
   return getItemPathname(currentitem);
   }
-
 
 
 // Get list style

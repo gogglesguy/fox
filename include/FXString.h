@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.h,v 1.146 2008/03/19 17:43:44 fox Exp $                         *
+* $Id: FXString.h,v 1.147 2008/06/25 18:00:51 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -127,6 +127,18 @@ public:
 
   /// Return a const reference to the ith character
   const FXchar& at(FXint i) const { return str[i]; }
+
+  /// Return a non-const reference to the first character
+  FXchar& head(){ return str[0]; }
+
+  /// Return a const reference to the first character
+  const FXchar& head() const { return str[0]; }
+
+  /// Return a non-const reference to the last character
+  FXchar& tail(){ return str[length()-1]; }
+
+  /// Return a const reference to the last character
+  const FXchar& tail() const { return str[length()-1]; }
 
   /// Return wide character starting at offset i
   FXwchar wc(FXint i) const;

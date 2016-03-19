@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconSource.cpp,v 1.25 2008/01/25 13:59:26 fox Exp $                    *
+* $Id: FXIconSource.cpp,v 1.26 2008/06/27 19:44:54 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -53,6 +53,7 @@
 #include "FXTGAIcon.h"
 #include "FXXBMIcon.h"
 #include "FXXPMIcon.h"
+#include "FXDDSIcon.h"
 
 // Built-in image formats
 #include "FXBMPImage.h"
@@ -66,6 +67,7 @@
 #include "FXTGAImage.h"
 #include "FXXBMImage.h"
 #include "FXXPMImage.h"
+#include "FXDDSImage.h"
 
 // Formats requiring external libraries
 #ifndef CORE_IMAGE_FORMATS
@@ -195,6 +197,9 @@ FXIcon *FXIconSource::loadIconStream(FXStream& store,const FXString& type) const
   else if(comparecase(FXXPMIcon::fileExt,type)==0){
     icon=new FXXPMIcon(app);
     }
+  else if(comparecase(FXDDSIcon::fileExt,type)==0){
+    icon=new FXDDSIcon(app);
+    }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H
   else if(comparecase(FXJPGIcon::fileExt,type)==0 || comparecase("jpeg",type)==0){
@@ -288,6 +293,9 @@ FXImage *FXIconSource::loadImageStream(FXStream& store,const FXString& type) con
     }
   else if(comparecase(FXXPMImage::fileExt,type)==0){
     image=new FXXPMImage(app);
+    }
+  else if(comparecase(FXDDSImage::fileExt,type)==0){
+    image=new FXDDSImage(app);
     }
 #ifndef CORE_IMAGE_FORMATS
 #ifdef HAVE_JPEG_H

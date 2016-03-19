@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFontDialog.h,v 1.17 2008/01/04 15:18:18 fox Exp $                      *
+* $Id: FXFontDialog.h,v 1.19 2008/04/29 12:51:38 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFONTDIALOG_H
 #define FXFONTDIALOG_H
@@ -54,10 +54,10 @@ public:
   virtual void load(FXStream& store);
 
   /// Set the current font selection
-  void setFontSelection(const FXFontDesc& fontdesc);
+  void setFontDesc(const FXFontDesc& fontdesc);
 
   /// Get the current font selection
-  void getFontSelection(FXFontDesc& fontdesc) const;
+  const FXFontDesc& getFontDesc() const;
 
   /// Destructor
   virtual ~FXFontDialog();

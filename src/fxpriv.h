@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxpriv.h,v 1.45 2008/01/04 15:42:46 fox Exp $                            *
+* $Id: fxpriv.h,v 1.46 2008/06/03 15:27:30 fox Exp $                            *
 ********************************************************************************/
 
 namespace FX {
@@ -32,22 +32,25 @@ namespace FX {
 #define WM_DND_ENTER            (WM_APP+2)
 #define WM_DND_LEAVE            (WM_APP+3)
 #define WM_DND_POSITION_REJECT  (WM_APP+4)
-#define WM_DND_POSITION_COPY    (WM_APP+5)
-#define WM_DND_POSITION_MOVE    (WM_APP+6)
-#define WM_DND_POSITION_LINK    (WM_APP+7)
-#define WM_DND_POSITION_PRIVATE (WM_APP+8)
-#define WM_DND_STATUS_REJECT    (WM_APP+9)
-#define WM_DND_STATUS_COPY      (WM_APP+10)
-#define WM_DND_STATUS_MOVE      (WM_APP+11)
-#define WM_DND_STATUS_LINK      (WM_APP+12)
-#define WM_DND_STATUS_PRIVATE   (WM_APP+13)
-#define WM_DND_DROP             (WM_APP+14)
-#define WM_DND_REPLY            (WM_APP+15)
-#define WM_DND_FINISH_REJECT    (WM_APP+16)
-#define WM_DND_FINISH_COPY      (WM_APP+17)
-#define WM_DND_FINISH_MOVE      (WM_APP+18)
-#define WM_DND_FINISH_LINK      (WM_APP+19)
-#define WM_DND_FINISH_PRIVATE   (WM_APP+20)
+#define WM_DND_POSITION_ASK     (WM_APP+5)
+#define WM_DND_POSITION_COPY    (WM_APP+6)
+#define WM_DND_POSITION_MOVE    (WM_APP+7)
+#define WM_DND_POSITION_LINK    (WM_APP+8)
+#define WM_DND_POSITION_PRIVATE (WM_APP+9)
+#define WM_DND_STATUS_REJECT    (WM_APP+10)
+#define WM_DND_STATUS_ASK       (WM_APP+11)
+#define WM_DND_STATUS_COPY      (WM_APP+12)
+#define WM_DND_STATUS_MOVE      (WM_APP+13)
+#define WM_DND_STATUS_LINK      (WM_APP+14)
+#define WM_DND_STATUS_PRIVATE   (WM_APP+15)
+#define WM_DND_DROP             (WM_APP+16)
+#define WM_DND_REPLY            (WM_APP+17)
+#define WM_DND_FINISH_REJECT    (WM_APP+18)
+#define WM_DND_FINISH_ASK       (WM_APP+19)
+#define WM_DND_FINISH_COPY      (WM_APP+20)
+#define WM_DND_FINISH_MOVE      (WM_APP+21)
+#define WM_DND_FINISH_LINK      (WM_APP+22)
+#define WM_DND_FINISH_PRIVATE   (WM_APP+23)
 #endif
 
 // Definitions for multi-head displays on Windows

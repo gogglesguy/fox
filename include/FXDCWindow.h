@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.h,v 1.55 2008/01/04 15:18:15 fox Exp $                        *
+* $Id: FXDCWindow.h,v 1.56 2008/04/23 16:20:35 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDCWINDOW_H
 #define FXDCWINDOW_H
@@ -149,6 +149,12 @@ public:
   virtual void fillPolygonRel(const FXPoint* points,FXuint npoints);
   virtual void fillConcavePolygonRel(const FXPoint* points,FXuint npoints);
   virtual void fillComplexPolygonRel(const FXPoint* points,FXuint npoints);
+
+  /// Fill vertical gradient rectangle
+  virtual void fillVerticalGradient(FXint x,FXint y,FXint w,FXint h,FXColor top,FXColor bottom);
+  
+  /// Fill horizontal gradient rectangle
+  virtual void fillHorizontalGradient(FXint x,FXint y,FXint w,FXint h,FXColor left,FXColor right);
 
   /// Draw hashed box
   virtual void drawHashBox(FXint x,FXint y,FXint w,FXint h,FXint b=1);

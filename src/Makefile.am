@@ -16,6 +16,8 @@ blank.xbm \
 blank_mask.xbm \
 crosshair.xbm \
 crosshair_mask.xbm \
+dndask.xbm \
+dndask_mask.xbm \
 dndcopy.xbm \
 dndcopy_mask.xbm \
 dndlink.xbm \
@@ -88,6 +90,8 @@ dockflip.gif \
 entericon.gif \
 erroricon.gif \
 eyedrop.gif \
+filecancel.gif \
+fileaccept.gif \
 filecopy.gif \
 filemove.gif \
 filehidden.gif \
@@ -216,6 +220,8 @@ FXDate.cpp \
 FXDC.cpp \
 FXDCPrint.cpp \
 FXDCWindow.cpp \
+FXDDSIcon.cpp \
+FXDDSImage.cpp \
 FXDLL.cpp \
 FXDebugTarget.cpp \
 FXDelegator.cpp \
@@ -421,6 +427,7 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxddsio.cpp \
 fxezquantize.cpp \
 fxfilematch.cpp \
 fxfsquantize.cpp \
@@ -451,7 +458,9 @@ fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
 strtoll.cpp \
+icons.cpp \
 icons.h \
+strtoll.cpp \
 jitter.h \
 version.rc \
 version.rc.in \

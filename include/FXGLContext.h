@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.h,v 1.43 2008/01/04 15:18:19 fox Exp $                       *
+* $Id: FXGLContext.h,v 1.46 2008/06/24 20:43:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGLCONTEXT_H
 #define FXGLCONTEXT_H
@@ -83,8 +83,11 @@ public:
   /// Swap front and back buffer
   void swapBuffers();
 
-  /// Return true if this window's context is current
+  /// Return true if THIS context is current
   FXbool isCurrent() const;
+
+  /// Return true if thread has ANY current context
+  static FXbool hasCurrent();
 
   /// Has double buffering
   FXbool isDoubleBuffer() const;

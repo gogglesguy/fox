@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXId.cpp,v 1.28 2008/04/22 20:08:09 fox Exp $                            *
+* $Id: FXId.cpp,v 1.29 2008/04/23 17:37:00 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -35,6 +35,11 @@
 #include "FXId.h"
 #include "FXException.h"
 
+/*
+  Notes:
+  - Base class for all creatable resources connected via the display.
+*/
+
 using namespace FX;
 
 enum { MAGIC = 0x464f5831 };
@@ -46,6 +51,18 @@ namespace FX {
 
 // Object implementation
 FXIMPLEMENT_ABSTRACT(FXId,FXObject,NULL,0)
+
+
+// Create resource
+void FXId::create(){ }
+
+
+// Detach resource
+void FXId::detach(){ }
+
+
+// Destroy resource
+void FXId::destroy(){ }
 
 
 // Save data
@@ -75,5 +92,5 @@ FXId::~FXId(){
   app=(FXApp*)-1L;
   data=(void*)-1L;
   }
-  
+
 }

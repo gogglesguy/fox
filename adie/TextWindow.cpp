@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.cpp,v 1.172 2008/02/29 22:38:54 fox Exp $                     *
+* $Id: TextWindow.cpp,v 1.173 2008/04/29 12:51:37 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -1438,12 +1438,11 @@ long TextWindow::onCmdPreferences(FXObject*,FXSelector,void*){
 // Change font
 long TextWindow::onCmdFont(FXObject*,FXSelector,void*){
   FXFontDialog fontdlg(this,tr("Change Font"),DECOR_BORDER|DECOR_TITLE);
-  FXFontDesc fontdesc;
-  editor->getFont()->getFontDesc(fontdesc);
-  fontdlg.setFontSelection(fontdesc);
+  FXFontDesc fontdesc=editor->getFont()->getFontDesc();
+  fontdlg.setFontDesc(fontdesc);
   if(fontdlg.execute()){
     FXFont *oldfont=font;
-    fontdlg.getFontSelection(fontdesc);
+    fontdesc=fontdlg.getFontDesc();
     font=new FXFont(getApp(),fontdesc);
     font->create();
     editor->setFont(font);

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDrawable.cpp,v 1.31 2008/04/22 20:08:09 fox Exp $                      *
+* $Id: FXDrawable.cpp,v 1.33 2008/04/23 17:37:00 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -38,8 +38,8 @@
 
 /*
   Notes:
-
-  - Abstract drawable surface.
+  - Abstract drawable surface which may be used as drawing target in FXDCWindow;
+    it may also be used as source in drawing operations.
 */
 
 using namespace FX;
@@ -53,18 +53,12 @@ FXIMPLEMENT_ABSTRACT(FXDrawable,FXId,NULL,0)
 
 
 // For deserialization
-FXDrawable::FXDrawable(){
-  visual=(FXVisual*)-1L;
-  width=1;
-  height=1;
+FXDrawable::FXDrawable():visual(NULL),width(0),height(0),rsc(0){
   }
 
 
 // Initialize nicely
-FXDrawable::FXDrawable(FXApp* a,FXint w,FXint h):FXId(a){
-  visual=NULL;
-  width=FXMAX(w,0);
-  height=FXMAX(h,0);
+FXDrawable::FXDrawable(FXApp* a,FXint w,FXint h):FXId(a),visual(NULL),width(FXMAX(w,0)),height(FXMAX(h,0)),rsc(0){
   }
 
 

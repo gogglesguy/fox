@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIChild.cpp,v 1.111 2008/01/04 15:42:24 fox Exp $                     *
+* $Id: FXMDIChild.cpp,v 1.112 2008/04/23 16:50:17 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -576,9 +576,14 @@ long FXMDIChild::onPaint(FXObject*,FXSelector,void* ptr){
     dc.fillRectangle(width-1,0,1,height);
 
     // Draw title background
-    dc.setForeground(isActive() ? (hasFocus() ? titleBackColor : shadowColor) : backColor);
-    dc.fillRectangle(BORDERWIDTH,BORDERWIDTH,width-BORDERWIDTH*2,th);
-
+    if(isActive()){
+      dc.fillHorizontalGradient(BORDERWIDTH,BORDERWIDTH,width-BORDERWIDTH*2,th,(hasFocus()?titleBackColor:shadowColor),backColor);
+      }
+    else{
+      dc.setForeground(backColor);
+      dc.fillRectangle(BORDERWIDTH,BORDERWIDTH,width-BORDERWIDTH*2,th);
+      }
+            
     // Draw title
     if(!title.empty()){
       xx=BORDERWIDTH+mw+2+4;

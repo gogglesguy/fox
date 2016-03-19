@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: charttest.cpp,v 1.13 2008/01/04 15:18:14 fox Exp $                       *
+* $Id: charttest.cpp,v 1.14 2008/04/23 16:20:35 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chart.h"
@@ -108,7 +108,7 @@ ChartWindow::ChartWindow(FXApp* a):FXMainWindow(a,"Chart Test",NULL,NULL,DECOR_A
   //captionFont->setAngle(90*64);
 
   // Set up fill style
-  FillStyle bs={image,FXRGB(128,255,255),FXRGB(128,128,255),FXRGB(200,200,200),FXRGB(128,128,128),STIPPLE_NONE,FILLSTYLE_VERTICAL};
+  FillStyle bs={image,FXRGB(128,255,255),FXRGB(128,128,255),FXRGB(200,200,200),FXRGB(128,128,128),STIPPLE_NONE,FILLSTYLE_HORIZONTAL};
   FillStyle cs={image,FXRGB(128,255,255),FXRGB(128,128,255),FXRGB(230,230,230),FXRGB(128,128,255),STIPPLE_NONE,FILLSTYLE_VERTICAL};
 
   // Change fill styles

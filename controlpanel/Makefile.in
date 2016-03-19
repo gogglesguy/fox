@@ -369,13 +369,14 @@ ControlPanel.o: ControlPanel.cpp ../include/xincs.h ../include/fx.h \
 	../include/FXRASImage.h ../include/FXRGBImage.h \
 	../include/FXTGAImage.h ../include/FXTIFImage.h \
 	../include/FXXBMImage.h ../include/FXXPMImage.h \
-	../include/FXBMPIcon.h ../include/FXGIFIcon.h \
-	../include/FXICOIcon.h ../include/FXIFFIcon.h \
-	../include/FXJPGIcon.h ../include/FXPCXIcon.h \
-	../include/FXPNGIcon.h ../include/FXPPMIcon.h \
-	../include/FXRASIcon.h ../include/FXRGBIcon.h \
-	../include/FXTGAIcon.h ../include/FXTIFIcon.h \
-	../include/FXXBMIcon.h ../include/FXXPMIcon.h \
+	../include/FXDDSImage.h ../include/FXBMPIcon.h \
+	../include/FXGIFIcon.h ../include/FXICOIcon.h \
+	../include/FXIFFIcon.h ../include/FXJPGIcon.h \
+	../include/FXPCXIcon.h ../include/FXPNGIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRGBIcon.h ../include/FXTGAIcon.h \
+	../include/FXTIFIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXDDSIcon.h \
 	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
 	../include/FXDCPrint.h ../include/FXIconSource.h \
 	../include/FXIconDict.h ../include/FXFileDict.h \

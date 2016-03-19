@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDC.cpp,v 1.43 2008/01/04 15:42:06 fox Exp $                            *
+* $Id: FXDC.cpp,v 1.44 2008/04/23 16:20:35 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -258,24 +258,28 @@ void FXDC::fillConcavePolygonRel(const FXPoint*,FXuint){ }
 void FXDC::fillComplexPolygonRel(const FXPoint*,FXuint){ }
 
 
-// Draw string with base line starting at x, y
-void FXDC::drawText(FXint,FXint,const FXchar*,FXuint){
-  }
+// Fill vertical gradient rectangle
+void FXDC::fillVerticalGradient(FXint,FXint,FXint,FXint,FXColor,FXColor){ }
+
+
+// Fill horizontal gradient rectangle
+void FXDC::fillHorizontalGradient(FXint,FXint,FXint,FXint,FXColor,FXColor){ }
 
 
 // Draw string with base line starting at x, y
-void FXDC::drawText(FXint,FXint,const FXString&){
-  }
+void FXDC::drawText(FXint,FXint,const FXchar*,FXuint){ }
+
+
+// Draw string with base line starting at x, y
+void FXDC::drawText(FXint,FXint,const FXString&){ }
 
 
 // Draw text starting at x, y over filled background
-void FXDC::drawImageText(FXint,FXint,const FXchar*,FXuint){
-  }
+void FXDC::drawImageText(FXint,FXint,const FXchar*,FXuint){ }
 
 
 // Draw text starting at x, y over filled background
-void FXDC::drawImageText(FXint,FXint,const FXString&){
-  }
+void FXDC::drawImageText(FXint,FXint,const FXString&){ }
 
 
 // Draw area from source
