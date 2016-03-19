@@ -1,0 +1,539 @@
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
+CC = @CC@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EGREP = @EGREP@
+EXEEXT = @EXEEXT@
+F77 = @F77@
+FOX_BYTEORDER = @FOX_BYTEORDER@
+FOX_MAJOR_VERSION = @FOX_MAJOR_VERSION@
+FOX_MINOR_VERSION = @FOX_MINOR_VERSION@
+FOX_PATCH_LEVEL = @FOX_PATCH_LEVEL@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
+GL_LIBS = @GL_LIBS@
+GL_TESTS = @GL_TESTS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
+LT_AGE = @LT_AGE@
+LT_CURRENT = @LT_CURRENT@
+LT_RELEASE = @LT_RELEASE@
+LT_REVISION = @LT_REVISION@
+MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
+PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
+RC = @RC@
+STRIP = @STRIP@
+VERSION = @VERSION@
+X_BASE_LIBS = @X_BASE_LIBS@
+
+foxincludedir = $(includedir)/fox-1.7
+
+CODECS = \
+FX88591Codec.h \
+FX88592Codec.h \
+FX88593Codec.h \
+FX88594Codec.h \
+FX88595Codec.h \
+FX88596Codec.h \
+FX88597Codec.h \
+FX88598Codec.h \
+FX88599Codec.h \
+FX885910Codec.h \
+FX885911Codec.h \
+FX885913Codec.h \
+FX885914Codec.h \
+FX885915Codec.h \
+FX885916Codec.h \
+FXCP437Codec.h \
+FXCP850Codec.h \
+FXCP852Codec.h \
+FXCP855Codec.h \
+FXCP856Codec.h \
+FXCP857Codec.h \
+FXCP860Codec.h \
+FXCP861Codec.h \
+FXCP862Codec.h \
+FXCP863Codec.h \
+FXCP864Codec.h \
+FXCP865Codec.h \
+FXCP866Codec.h \
+FXCP869Codec.h \
+FXCP874Codec.h \
+FXCP1250Codec.h \
+FXCP1251Codec.h \
+FXCP1252Codec.h \
+FXCP1253Codec.h \
+FXCP1254Codec.h \
+FXCP1255Codec.h \
+FXCP1256Codec.h \
+FXCP1257Codec.h \
+FXCP1258Codec.h \
+FXKOI8RCodec.h \
+FXUTF8Codec.h \
+FXUTF16Codec.h \
+FXUTF32Codec.h
+
+
+foxinclude_HEADERS = \
+$(CODECS) \
+FX4Splitter.h \
+FX7Segment.h \
+FXAccelTable.h \
+FXApp.h \
+FXArray.h \
+FXArrowButton.h \
+FXBMPIcon.h \
+FXBMPImage.h \
+FXBitmap.h \
+FXBitmapFrame.h \
+FXBitmapView.h \
+FXButton.h \
+FXBZFileStream.h \
+FXCURCursor.h \
+FXCanvas.h \
+FXCheckButton.h \
+FXChoiceBox.h \
+FXColorBar.h \
+FXColorDialog.h \
+FXColorList.h \
+FXColorRing.h \
+FXColorSelector.h \
+FXColorWell.h \
+FXColorWheel.h \
+FXComboBox.h \
+FXComposeContext.h \
+FXComposite.h \
+FXCursor.h \
+FXDate.h \
+FXDC.h \
+FXDCPrint.h \
+FXDCWindow.h \
+FXDLL.h \
+FXDataTarget.h \
+FXDebugTarget.h \
+FXDelegator.h \
+FXDial.h \
+FXDialogBox.h \
+FXDict.h \
+FXDir.h \
+FXDirBox.h \
+FXDirDialog.h \
+FXDirList.h \
+FXDirSelector.h \
+FXDockBar.h \
+FXDockHandler.h \
+FXDockSite.h \
+FXDockTitle.h \
+FXDocument.h \
+FXDragCorner.h \
+FXDrawable.h \
+FXDriveBox.h \
+FXElement.h \
+FXException.h \
+FXExpression.h \
+FXExtentd.h \
+FXExtentf.h \
+FXFile.h \
+FXFileDialog.h \
+FXFileDict.h \
+FXFileList.h \
+FXFileSelector.h \
+FXFileStream.h \
+FXFoldingList.h \
+FXFont.h \
+FXFontDialog.h \
+FXFontSelector.h \
+FXFrame.h \
+FXGIFCursor.h \
+FXGIFIcon.h \
+FXGIFImage.h \
+FXGLCanvas.h \
+FXGLCone.h \
+FXGLContext.h \
+FXGLCube.h \
+FXGLCylinder.h \
+FXGLObject.h \
+FXGLShape.h \
+FXGLSphere.h \
+FXGLTriangleMesh.h \
+FXGLViewer.h \
+FXGLVisual.h \
+FXGroupBox.h \
+FXGradientBar.h \
+FXGUISignal.h \
+FXGZFileStream.h \
+FXHash.h \
+FXHeader.h \
+FXHorizontalFrame.h \
+FXICOIcon.h \
+FXICOImage.h \
+FXIFFImage.h \
+FXIFFIcon.h \
+FXIO.h \
+FXIcon.h \
+FXIconDict.h \
+FXIconList.h \
+FXIconSource.h \
+FXId.h \
+FXImage.h \
+FXImageFrame.h \
+FXImageView.h \
+FXInputDialog.h \
+FXJPGIcon.h \
+FXJPGImage.h \
+FXKnob.h \
+FXLabel.h \
+FXList.h \
+FXListBox.h \
+FXMDIButton.h \
+FXMDIChild.h \
+FXMDIClient.h \
+FXMainWindow.h \
+FXMat3d.h \
+FXMat4d.h \
+FXMat3f.h \
+FXMat4f.h \
+FXMatrix.h \
+FXMemoryStream.h \
+FXMemMap.h \
+FXMenuBar.h \
+FXMenuButton.h \
+FXMenuCaption.h \
+FXMenuCascade.h \
+FXMenuCheck.h \
+FXMenuRadio.h \
+FXMenuCommand.h \
+FXMenuPane.h \
+FXMenuSeparator.h \
+FXMenuTitle.h \
+FXMessageBox.h \
+FXObject.h \
+FXObjectList.h \
+FXOptionMenu.h \
+FXPCXIcon.h \
+FXPCXImage.h \
+FXPNGIcon.h \
+FXPNGImage.h \
+FXPPMIcon.h \
+FXPPMImage.h \
+FXPacker.h \
+FXPath.h \
+FXPicker.h \
+FXPipe.h \
+FXPoint.h \
+FXPopup.h \
+FXPrintDialog.h \
+FXProgressBar.h \
+FXProgressDialog.h \
+FXQuatd.h \
+FXQuatf.h \
+FXRASIcon.h \
+FXRASImage.h \
+FXRGBIcon.h \
+FXRGBImage.h \
+FXRadioButton.h \
+FXRangef.h \
+FXRanged.h \
+FXRealSlider.h \
+FXRealSpinner.h \
+FXRecentFiles.h \
+FXRectangle.h \
+FXRegion.h \
+FXRegistry.h \
+FXReplaceDialog.h \
+FXRex.h \
+FXRootWindow.h \
+FXRuler.h \
+FXRulerView.h \
+FXScrollArea.h \
+FXScrollBar.h \
+FXScrollPane.h \
+FXScrollWindow.h \
+FXSearchDialog.h \
+FXSeparator.h \
+FXSettings.h \
+FXShell.h \
+FXShutter.h \
+FXSize.h \
+FXSlider.h \
+FXSocket.h \
+FXSpinner.h \
+FXSpheref.h \
+FXSphered.h \
+FXSplashWindow.h \
+FXSplitter.h \
+FXSpring.h \
+FXStat.h \
+FXStatusBar.h \
+FXStatusLine.h \
+FXStream.h \
+FXString.h \
+FXStringDict.h \
+FXSwitcher.h \
+FXSystem.h \
+FXTGAIcon.h \
+FXTGAImage.h \
+FXTIFIcon.h \
+FXTIFImage.h \
+FXTabBar.h \
+FXTabBook.h \
+FXTabItem.h \
+FXTable.h \
+FXText.h \
+FXTextCodec.h \
+FXTextField.h \
+FXThread.h \
+FXToggleButton.h \
+FXToolBar.h \
+FXToolBarGrip.h \
+FXToolBarShell.h \
+FXToolBarTab.h \
+FXToolTip.h \
+FXTopWindow.h \
+FXTranslator.h \
+FXTreeList.h \
+FXTreeListBox.h \
+FXTriStateButton.h \
+FXUndoList.h \
+FXURL.h \
+FXVec2d.h \
+FXVec2f.h \
+FXVec3d.h \
+FXVec3f.h \
+FXVec4d.h \
+FXVec4f.h \
+FXVerticalFrame.h \
+FXVisual.h \
+FXWindow.h \
+FXWizard.h \
+FXXBMIcon.h \
+FXXBMImage.h \
+FXXPMIcon.h \
+FXXPMImage.h \
+fx.h \
+fx3d.h \
+fxascii.h \
+fxdefs.h \
+fxkeys.h \
+fxunicode.h \
+fxver.h \
+xincs.h
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES =  fxver.h
+HEADERS =  $(foxinclude_HEADERS)
+
+DIST_COMMON =  Makefile.am Makefile.in fxver.h.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = gtar
+GZIP_ENV = --best
+all: all-redirect
+.SUFFIXES:
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps include/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+fxver.h: $(top_builddir)/config.status fxver.h.in
+	cd $(top_builddir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+install-foxincludeHEADERS: $(foxinclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(foxincludedir)
+	@list='$(foxinclude_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d= ; else d="$(srcdir)/"; fi; \
+	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(foxincludedir)/$$p"; \
+	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(foxincludedir)/$$p; \
+	done
+
+uninstall-foxincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	list='$(foxinclude_HEADERS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(foxincludedir)/$$p; \
+	done
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = include
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am:
+install-exec: install-exec-am
+
+install-data-am: install-foxincludeHEADERS
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-foxincludeHEADERS
+uninstall: uninstall-am
+all-am: Makefile $(HEADERS)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(foxincludedir)
+
+
+mostlyclean-generic:
+
+clean-generic:
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-tags mostlyclean-generic
+
+mostlyclean: mostlyclean-am
+
+clean-am:  clean-tags clean-generic mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-tags distclean-generic clean-am
+	-rm -f libtool
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: uninstall-foxincludeHEADERS install-foxincludeHEADERS tags \
+mostlyclean-tags distclean-tags clean-tags maintainer-clean-tags \
+distdir info-am info dvi-am dvi check check-am installcheck-am \
+installcheck install-exec-am install-exec install-data-am install-data \
+install-am install uninstall-am uninstall all-redirect all-am all \
+installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

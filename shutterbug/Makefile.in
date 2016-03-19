@@ -1,0 +1,632 @@
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
+CC = @CC@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DLLTOOL = @DLLTOOL@
+ECHO = @ECHO@
+EGREP = @EGREP@
+EXEEXT = @EXEEXT@
+F77 = @F77@
+FOX_BYTEORDER = @FOX_BYTEORDER@
+FOX_MAJOR_VERSION = @FOX_MAJOR_VERSION@
+FOX_MINOR_VERSION = @FOX_MINOR_VERSION@
+FOX_PATCH_LEVEL = @FOX_PATCH_LEVEL@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
+GL_LIBS = @GL_LIBS@
+GL_TESTS = @GL_TESTS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
+LT_AGE = @LT_AGE@
+LT_CURRENT = @LT_CURRENT@
+LT_RELEASE = @LT_RELEASE@
+LT_REVISION = @LT_REVISION@
+MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
+PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
+RC = @RC@
+STRIP = @STRIP@
+VERSION = @VERSION@
+X_BASE_LIBS = @X_BASE_LIBS@
+
+CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
+INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
+RESWRAP = $(top_builddir)/utils/reswrap
+SUFFIXES = .gif .bmp
+LDADD = ../src/libFOX-1.7.la -lm
+
+bin_PROGRAMS = shutterbug
+
+man_MANS = shutterbug.1
+
+ICONS = \
+line_0.gif \
+line_1.gif \
+line_2.gif \
+line_3.gif \
+line_4.gif \
+line_5.gif \
+line_6.gif \
+line_7.gif \
+line_8.gif \
+shutterbug.gif \
+tinyshutterbug.gif
+
+
+shutterbug_SOURCES = \
+icons.h \
+icons.cpp \
+ShutterBug.h \
+ShutterBug.cpp \
+Snapper.h \
+Snapper.cpp \
+LICENSE \
+$(ICONS)
+
+
+CLEANFILES = icons.h icons.cpp
+
+EXTRA_DIST = $(man_MANS) \
+             Makefile.bc \
+             Makefile.wc
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+bin_PROGRAMS =  shutterbug$(EXEEXT)
+PROGRAMS =  $(bin_PROGRAMS)
+
+
+DEFS = @DEFS@ -I. -I$(srcdir) 
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+X_CFLAGS = @X_CFLAGS@
+X_LIBS = @X_LIBS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
+shutterbug_OBJECTS =  icons.$(OBJEXT) ShutterBug.$(OBJEXT) \
+Snapper.$(OBJEXT)
+shutterbug_LDADD = $(LDADD)
+shutterbug_DEPENDENCIES =  ../src/libFOX-1.7.la
+shutterbug_LDFLAGS = 
+CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+man1dir = $(mandir)/man1
+MANS = $(man_MANS)
+
+NROFF = nroff
+DIST_COMMON =  Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = gtar
+GZIP_ENV = --best
+SOURCES = $(shutterbug_SOURCES)
+OBJECTS = $(shutterbug_OBJECTS)
+
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .S .bmp .c .cpp .gif .lo .o .obj .s
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps shutterbug/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+
+mostlyclean-binPROGRAMS:
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+distclean-binPROGRAMS:
+
+maintainer-clean-binPROGRAMS:
+
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	done
+
+.c.o:
+	$(COMPILE) -c $<
+
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
+
+clean-compile:
+
+distclean-compile:
+	-rm -f *.tab.c
+
+maintainer-clean-compile:
+
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
+shutterbug$(EXEEXT): $(shutterbug_OBJECTS) $(shutterbug_DEPENDENCIES)
+	@rm -f shutterbug$(EXEEXT)
+	$(CXXLINK) $(shutterbug_LDFLAGS) $(shutterbug_OBJECTS) $(shutterbug_LDADD) $(LIBS)
+.cpp.o:
+	$(CXXCOMPILE) -c $<
+.cpp.obj:
+	$(CXXCOMPILE) -c `cygpath -w $<`
+.cpp.lo:
+	$(LTCXXCOMPILE) -c $<
+
+install-man1:
+	$(mkinstalldirs) $(DESTDIR)$(man1dir)
+	@list='$(man1_MANS)'; \
+	l2='$(man_MANS)'; for i in $$l2; do \
+	  case "$$i" in \
+	    *.1*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  if test -f $(srcdir)/$$i; then file=$(srcdir)/$$i; \
+	  else file=$$i; fi; \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$inst"; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$inst; \
+	done
+
+uninstall-man1:
+	@list='$(man1_MANS)'; \
+	l2='$(man_MANS)'; for i in $$l2; do \
+	  case "$$i" in \
+	    *.1*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " rm -f $(DESTDIR)$(man1dir)/$$inst"; \
+	  rm -f $(DESTDIR)$(man1dir)/$$inst; \
+	done
+install-man: $(MANS)
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-man1
+uninstall-man:
+	@$(NORMAL_UNINSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-man1
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = shutterbug
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+icons.o: icons.cpp
+ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
+	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
+	../include/FXHash.h ../include/FXException.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXFileStream.h ../include/FXMemoryStream.h \
+	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
+	../include/FXRectangle.h ../include/FXObject.h \
+	../include/FXDelegator.h ../include/FXDict.h \
+	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
+	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
+	../include/FXStringDict.h ../include/FXSettings.h \
+	../include/FXRegistry.h ../include/FXObjectList.h \
+	../include/FXAccelTable.h ../include/FXRecentFiles.h \
+	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
+	../include/FXFont.h ../include/FXCursor.h \
+	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXGIFCursor.h ../include/FXDrawable.h \
+	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
+	../include/FXGIFImage.h ../include/FXIFFImage.h \
+	../include/FXBMPImage.h ../include/FXICOImage.h \
+	../include/FXXBMImage.h ../include/FXXPMImage.h \
+	../include/FXPCXImage.h ../include/FXTGAImage.h \
+	../include/FXRGBImage.h ../include/FXPPMImage.h \
+	../include/FXRASImage.h ../include/FXGIFIcon.h \
+	../include/FXIFFIcon.h ../include/FXBMPIcon.h \
+	../include/FXICOIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXPCXIcon.h \
+	../include/FXTGAIcon.h ../include/FXRGBIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
+	../include/FXDCPrint.h ../include/FXIconSource.h \
+	../include/FXIconDict.h ../include/FXFileDict.h \
+	../include/FXWindow.h ../include/FXFrame.h \
+	../include/FXSeparator.h ../include/FXLabel.h \
+	../include/FX7Segment.h ../include/FXDial.h ../include/FXKnob.h \
+	../include/FXColorBar.h ../include/FXColorRing.h \
+	../include/FXColorWell.h ../include/FXColorWheel.h \
+	../include/FXTextField.h ../include/FXButton.h \
+	../include/FXPicker.h ../include/FXToggleButton.h \
+	../include/FXTriStateButton.h ../include/FXCheckButton.h \
+	../include/FXRadioButton.h ../include/FXArrowButton.h \
+	../include/FXMenuButton.h ../include/FXComposite.h \
+	../include/FXPacker.h ../include/FXHorizontalFrame.h \
+	../include/FXVerticalFrame.h ../include/FXSpring.h \
+	../include/FXMatrix.h ../include/FXSpinner.h \
+	../include/FXRealSpinner.h ../include/FXRootWindow.h \
+	../include/FXCanvas.h ../include/FXGroupBox.h \
+	../include/FXShell.h ../include/FXToolTip.h \
+	../include/FXPopup.h ../include/FXTopWindow.h \
+	../include/FXDialogBox.h ../include/FXMainWindow.h \
+	../include/FXMenuPane.h ../include/FXScrollPane.h \
+	../include/FXMenuCaption.h ../include/FXMenuSeparator.h \
+	../include/FXMenuTitle.h ../include/FXMenuCascade.h \
+	../include/FXMenuCommand.h ../include/FXMenuCheck.h \
+	../include/FXMenuRadio.h ../include/FXMenuBar.h \
+	../include/FXToolBar.h ../include/FXDockBar.h \
+	../include/FXOptionMenu.h ../include/FXSwitcher.h \
+	../include/FXTabBar.h ../include/FXTabBook.h \
+	../include/FXTabItem.h ../include/FXScrollBar.h \
+	../include/FXScrollArea.h ../include/FXScrollWindow.h \
+	../include/FXList.h ../include/FXComboBox.h \
+	../include/FXListBox.h ../include/FXTreeList.h \
+	../include/FXTreeListBox.h ../include/FXFoldingList.h \
+	../include/FXBitmapView.h ../include/FXBitmapFrame.h \
+	../include/FXImageView.h ../include/FXImageFrame.h \
+	../include/FXTable.h ../include/FXDragCorner.h \
+	../include/FXStatusBar.h ../include/FXStatusLine.h \
+	../include/FXChoiceBox.h ../include/FXMessageBox.h \
+	../include/FXDirList.h ../include/FXSlider.h \
+	../include/FXRealSlider.h ../include/FXSplitter.h \
+	../include/FX4Splitter.h ../include/FXHeader.h \
+	../include/FXShutter.h ../include/FXIconList.h \
+	../include/FXFileList.h ../include/FXDirBox.h \
+	../include/FXDriveBox.h ../include/FXDirSelector.h \
+	../include/FXDirDialog.h ../include/FXFileSelector.h \
+	../include/FXFileDialog.h ../include/FXColorSelector.h \
+	../include/FXColorDialog.h ../include/FXFontSelector.h \
+	../include/FXFontDialog.h ../include/FXUndoList.h \
+	../include/FXRex.h ../include/FXText.h \
+	../include/FXDataTarget.h ../include/FXProgressBar.h \
+	../include/FXReplaceDialog.h ../include/FXRuler.h \
+	../include/FXRulerView.h ../include/FXSearchDialog.h \
+	../include/FXInputDialog.h ../include/FXProgressDialog.h \
+	../include/FXWizard.h ../include/FXMDIButton.h \
+	../include/FXMDIClient.h ../include/FXMDIChild.h \
+	../include/FXDocument.h ../include/FXDockSite.h \
+	../include/FXDockBar.h ../include/FXToolBar.h \
+	../include/FXDockHandler.h ../include/FXDockTitle.h \
+	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
+	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
+	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
+	../include/fxkeys.h ../include/FXPNGImage.h \
+	../include/FXJPGImage.h ../include/FXTIFImage.h icons.h \
+	ShutterBug.h Snapper.h
+Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
+	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
+	../include/FXHash.h ../include/FXException.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXFileStream.h ../include/FXMemoryStream.h \
+	../include/FXString.h ../include/FXSize.h ../include/FXPoint.h \
+	../include/FXRectangle.h ../include/FXObject.h \
+	../include/FXDelegator.h ../include/FXDict.h \
+	../include/FXPath.h ../include/FXSystem.h ../include/FXStat.h \
+	../include/FXDir.h ../include/FXDate.h ../include/FXURL.h \
+	../include/FXStringDict.h ../include/FXSettings.h \
+	../include/FXRegistry.h ../include/FXObjectList.h \
+	../include/FXAccelTable.h ../include/FXRecentFiles.h \
+	../include/FXApp.h ../include/FXId.h ../include/FXVisual.h \
+	../include/FXFont.h ../include/FXCursor.h \
+	../include/FXGUISignal.h ../include/FXCURCursor.h \
+	../include/FXGIFCursor.h ../include/FXDrawable.h \
+	../include/FXBitmap.h ../include/FXImage.h ../include/FXIcon.h \
+	../include/FXGIFImage.h ../include/FXIFFImage.h \
+	../include/FXBMPImage.h ../include/FXICOImage.h \
+	../include/FXXBMImage.h ../include/FXXPMImage.h \
+	../include/FXPCXImage.h ../include/FXTGAImage.h \
+	../include/FXRGBImage.h ../include/FXPPMImage.h \
+	../include/FXRASImage.h ../include/FXGIFIcon.h \
+	../include/FXIFFIcon.h ../include/FXBMPIcon.h \
+	../include/FXICOIcon.h ../include/FXXBMIcon.h \
+	../include/FXXPMIcon.h ../include/FXPCXIcon.h \
+	../include/FXTGAIcon.h ../include/FXRGBIcon.h \
+	../include/FXPPMIcon.h ../include/FXRASIcon.h \
+	../include/FXRegion.h ../include/FXDC.h ../include/FXDCWindow.h \
+	../include/FXDCPrint.h ../include/FXIconSource.h \
+	../include/FXIconDict.h ../include/FXFileDict.h \
+	../include/FXWindow.h ../include/FXFrame.h \
+	../include/FXSeparator.h ../include/FXLabel.h \
+	../include/FX7Segment.h ../include/FXDial.h ../include/FXKnob.h \
+	../include/FXColorBar.h ../include/FXColorRing.h \
+	../include/FXColorWell.h ../include/FXColorWheel.h \
+	../include/FXTextField.h ../include/FXButton.h \
+	../include/FXPicker.h ../include/FXToggleButton.h \
+	../include/FXTriStateButton.h ../include/FXCheckButton.h \
+	../include/FXRadioButton.h ../include/FXArrowButton.h \
+	../include/FXMenuButton.h ../include/FXComposite.h \
+	../include/FXPacker.h ../include/FXHorizontalFrame.h \
+	../include/FXVerticalFrame.h ../include/FXSpring.h \
+	../include/FXMatrix.h ../include/FXSpinner.h \
+	../include/FXRealSpinner.h ../include/FXRootWindow.h \
+	../include/FXCanvas.h ../include/FXGroupBox.h \
+	../include/FXShell.h ../include/FXToolTip.h \
+	../include/FXPopup.h ../include/FXTopWindow.h \
+	../include/FXDialogBox.h ../include/FXMainWindow.h \
+	../include/FXMenuPane.h ../include/FXScrollPane.h \
+	../include/FXMenuCaption.h ../include/FXMenuSeparator.h \
+	../include/FXMenuTitle.h ../include/FXMenuCascade.h \
+	../include/FXMenuCommand.h ../include/FXMenuCheck.h \
+	../include/FXMenuRadio.h ../include/FXMenuBar.h \
+	../include/FXToolBar.h ../include/FXDockBar.h \
+	../include/FXOptionMenu.h ../include/FXSwitcher.h \
+	../include/FXTabBar.h ../include/FXTabBook.h \
+	../include/FXTabItem.h ../include/FXScrollBar.h \
+	../include/FXScrollArea.h ../include/FXScrollWindow.h \
+	../include/FXList.h ../include/FXComboBox.h \
+	../include/FXListBox.h ../include/FXTreeList.h \
+	../include/FXTreeListBox.h ../include/FXFoldingList.h \
+	../include/FXBitmapView.h ../include/FXBitmapFrame.h \
+	../include/FXImageView.h ../include/FXImageFrame.h \
+	../include/FXTable.h ../include/FXDragCorner.h \
+	../include/FXStatusBar.h ../include/FXStatusLine.h \
+	../include/FXChoiceBox.h ../include/FXMessageBox.h \
+	../include/FXDirList.h ../include/FXSlider.h \
+	../include/FXRealSlider.h ../include/FXSplitter.h \
+	../include/FX4Splitter.h ../include/FXHeader.h \
+	../include/FXShutter.h ../include/FXIconList.h \
+	../include/FXFileList.h ../include/FXDirBox.h \
+	../include/FXDriveBox.h ../include/FXDirSelector.h \
+	../include/FXDirDialog.h ../include/FXFileSelector.h \
+	../include/FXFileDialog.h ../include/FXColorSelector.h \
+	../include/FXColorDialog.h ../include/FXFontSelector.h \
+	../include/FXFontDialog.h ../include/FXUndoList.h \
+	../include/FXRex.h ../include/FXText.h \
+	../include/FXDataTarget.h ../include/FXProgressBar.h \
+	../include/FXReplaceDialog.h ../include/FXRuler.h \
+	../include/FXRulerView.h ../include/FXSearchDialog.h \
+	../include/FXInputDialog.h ../include/FXProgressDialog.h \
+	../include/FXWizard.h ../include/FXMDIButton.h \
+	../include/FXMDIClient.h ../include/FXMDIChild.h \
+	../include/FXDocument.h ../include/FXDockSite.h \
+	../include/FXDockBar.h ../include/FXToolBar.h \
+	../include/FXDockHandler.h ../include/FXDockTitle.h \
+	../include/FXToolBarGrip.h ../include/FXToolBarShell.h \
+	../include/FXToolBarTab.h ../include/FXPrintDialog.h \
+	../include/FXDebugTarget.h ../include/FXSplashWindow.h \
+	Snapper.h
+
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am: install-binPROGRAMS
+install-exec: install-exec-am
+
+install-data-am: install-man
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-binPROGRAMS uninstall-man
+uninstall: uninstall-am
+all-am: Makefile $(PROGRAMS) $(MANS)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(bindir) $(DESTDIR)$(mandir)/man1
+
+
+mostlyclean-generic:
+
+clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-tags \
+		mostlyclean-generic
+
+mostlyclean: mostlyclean-am
+
+clean-am:  clean-binPROGRAMS clean-compile clean-libtool clean-tags \
+		clean-generic mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-binPROGRAMS distclean-compile distclean-libtool \
+		distclean-tags distclean-generic clean-am
+	-rm -f libtool
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-binPROGRAMS \
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: mostlyclean-binPROGRAMS distclean-binPROGRAMS clean-binPROGRAMS \
+maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool install-man1 uninstall-man1 \
+install-man uninstall-man tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
+
+
+ShutterBug.cpp: icons.h icons.cpp
+
+icons.h: $(ICONS)
+	$(RESWRAP) -i -o icons.h $^
+
+icons.cpp: $(ICONS)
+	$(RESWRAP) -e -o icons.cpp $^
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
