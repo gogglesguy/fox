@@ -3,7 +3,7 @@
 *                            W i n d o w   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1010,7 +1010,6 @@ long FXWindow::onFocusSelf(FXObject*,FXSelector,void*){
   if(isEnabled() && canFocus()){ setFocus(); return 1; }
   return 0;
   }
-
 
 
 // Create compose context

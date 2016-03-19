@@ -3,7 +3,7 @@
 *                          T I F F  I c o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2009 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2010 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -90,7 +90,8 @@ FXbool FXTIFIcon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadTIF(store,pixels,w,h,codec)){
     setData(pixels,IMAGE_OWNED,w,h);
-    if(options&IMAGE_ALPHAGUESS) transp=guesstransp();
+    if(options&IMAGE_ALPHAGUESS) setTransparentColor(guesstransp());
+    if(options&IMAGE_THRESGUESS) setThresholdValue(guessthresh());
     return true;
     }
   return false;

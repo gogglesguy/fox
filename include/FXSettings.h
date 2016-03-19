@@ -3,7 +3,7 @@
 *                           S e t t i n g s   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -67,10 +67,16 @@ public:
   void setModified(FXbool mdfy=true){ modified=mdfy; }
 
   /// Parse a file containing a settings database.
-  FXbool parseFile(const FXString& filename,FXbool mark);
+  FXbool parseFile(const FXString& filename,FXbool mrk);
+
+  /// Parse single string to populate settings
+  FXbool parse(const FXString& string,FXbool mrk);
 
   /// Unparse settings database into given file.
   FXbool unparseFile(const FXString& filename);
+
+  /// Unparse settings to a single string
+  FXbool unparse(FXString& string) const;
 
   /// Find string dictionary for the given section; may be NULL
   FXStringDict* find(const FXchar *section) const { return (FXStringDict*)FXDict::find(section); }

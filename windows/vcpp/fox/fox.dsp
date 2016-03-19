@@ -1508,6 +1508,26 @@ SOURCE=..\..\..\include\FXIO.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXJP2Icon.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXJP2Icon.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXJP2Image.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXJP2Image.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\fxjp2io.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\fxjpegio.cpp
 # End Source File
 # Begin Source File

@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -200,7 +200,12 @@ void fxassert(const FXchar* expression,const FXchar* filename,unsigned int linen
 #ifdef WIN32
   fxmessage("%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
 #else
-  fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
+//  if(isatty(fileno(stderr))){
+//    fxmessage("\033[1;31m%s:%d:\033[0m FXASSERT(%s) failed.\n",filename,lineno,expression);
+//    }
+//  else{
+    fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
+//    }
 #endif
   }
 
@@ -210,7 +215,12 @@ void fxverify(const FXchar* expression,const FXchar* filename,unsigned int linen
 #ifdef WIN32
   fxmessage("%s(%d): FXVERIFY(%s) failed.\n",filename,lineno,expression);
 #else
-  fxmessage("%s:%d: FXVERIFY(%s) failed.\n",filename,lineno,expression);
+//  if(isatty(fileno(stderr))){
+//    fxmessage("\033[1;31m%s:%d:\033[0m FXVERIFY(%s) failed.\n",filename,lineno,expression);
+//    }
+//  else{
+    fxmessage("%s:%d: FXVERIFY(%s) failed.\n",filename,lineno,expression);
+//    }
 #endif
   }
 
@@ -596,113 +606,6 @@ FXbool fxIsNan(FXdouble number){
   return (((DoubleStruct*)&number)->n.e==2047) && !((((DoubleStruct*)&number)->n.l==0) && (((DoubleStruct*)&number)->n.h==0));
   }
 
-/*******************************************************************************/
-
-#if defined(__GNUC__) && defined(__linux__) && (defined(__i386__) || defined(__x86_64__))
-
-extern FXAPI FXuint fxcpuid();
-
-// Capabilities
-#define CPU_HAS_TSC             0x001
-#define CPU_HAS_MMX             0x002
-#define CPU_HAS_MMXEX           0x004
-#define CPU_HAS_SSE             0x008
-#define CPU_HAS_SSE2            0x010
-#define CPU_HAS_3DNOW           0x020
-#define CPU_HAS_3DNOWEXT        0x040
-#define CPU_HAS_SSE3            0x080
-#define CPU_HAS_HT              0x100
-#define CPU_HAS_SSE4            0x200
-
-
-// The CPUID instruction returns stuff in eax, ecx, edx.
-#define cpuid(op,eax,ebx,ecx,edx)	\
-  asm volatile ("xchgl %%ebx, %1 \n\t"  \
-                "cpuid           \n\t"  \
-                "xchgl %%ebx, %1 \n\t"  \
-                : "=a" (eax),		\
-                  "=r" (ebx),           \
-                  "=c" (ecx),           \
-                  "=d" (edx)            \
-                : "a" (op)              \
-                : "cc")
-
-
-/*
-* Find out some useful stuff about the CPU we're running on.
-* We don't care about everything, but just MMX, XMMS, SSE, SSE2, 3DNOW, 3DNOWEXT,
-* for the obvious reasons.
-* If we're generating for Pentium or above then assume CPUID is present; otherwise,
-* test if CPUID is present first using the recommended code...
-*/
-FXuint fxcpuid(){
-  FXuint eax, ebx, ecx, edx, caps;
-
-  // Generating code for pentium or better :- don't bother checking for CPUID presence.
-#if !(defined(__i586__) || defined(__i686__) || defined(__athlon__) || defined(__pentium4__) || defined(__x86_64__))
-
-  // If EFLAGS bit 21 can be changed, we have CPUID capability.
-  asm volatile ("pushfl                 \n\t"
-                "popl   %0              \n\t"
-                "movl   %0,%1           \n\t"
-                "xorl   $0x200000,%0    \n\t"
-                "pushl  %0              \n\t"
-                "popfl                  \n\t"
-                "pushfl                 \n\t"
-                "popl   %0              \n\t"
-                : "=a" (eax),
-                  "=d" (edx)
-                :
-                : "cc");
-
-  // Yes, we have no CPUID!
-  if(eax==edx) return 0;
-#endif
-
-  // Capabilities
-  caps=0;
-
-  // Get vendor string; this also returns the highest CPUID code in eax.
-  // If highest CPUID code is zero, we can't call any other CPUID functions.
-  cpuid(0x00000000,eax,ebx,ecx,edx);
-  if(eax){
-
-    // AMD:   ebx="Auth" edx="enti" ecx="cAMD",
-    // Intel: ebx="Genu" edx="ineI" ecx="ntel"
-    // VIAC3: ebx="Cent" edx="aurH" ecx="auls"
-
-    // Test for AMD
-    if((ecx==0x444d4163) && (edx==0x69746e65)){
-
-      // Any extended capabilities; this returns highest extended CPUID code in eax.
-      cpuid(0x80000000,eax,ebx,ecx,edx);
-      if(eax>0x80000000){
-
-        // Test extended athlon capabilities
-        cpuid(0x80000001,eax,ebx,ecx,edx);
-        if(edx&0x08000000) caps|=CPU_HAS_MMXEX;
-        if(edx&0x80000000) caps|=CPU_HAS_3DNOW;
-        if(edx&0x40000000) caps|=CPU_HAS_3DNOWEXT;
-        }
-      }
-
-    // Standard CPUID code 1.
-    cpuid(0x00000001,eax,ebx,ecx,edx);
-    if(edx&0x00000010) caps|=CPU_HAS_TSC;
-    if(edx&0x00800000) caps|=CPU_HAS_MMX;
-    if(edx&0x02000000) caps|=CPU_HAS_SSE;
-    if(edx&0x04000000) caps|=CPU_HAS_SSE2;
-    if(edx&0x10000000) caps|=CPU_HAS_HT;
-    if(ecx&0x00000001) caps|=CPU_HAS_SSE3;
-    if(ecx&0x00080000) caps|=CPU_HAS_SSE4;
-    }
-
-  // Return capabilities
-  return caps;
-  }
-#endif
-
-
 #if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
 
 // MXCSR controls SSE(2) operation:
@@ -745,7 +648,6 @@ unsigned int fxgetmxcsr(){
   __asm("stmxcsr %0" : "=m"(*&mxcsr));
   return mxcsr;
   }
-
 
 #endif
 

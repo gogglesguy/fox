@@ -3,7 +3,7 @@
 *                     H i g h l i g h t   E n g i n e                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *

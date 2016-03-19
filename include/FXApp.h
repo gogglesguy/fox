@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -161,7 +161,6 @@ private:
 
   // Platform independent private data
   void            *display;             // Display we're talking to
-  const FXchar    *dpy;                 // Initial display guess
   FXHash           hash;                // Window handle hash table
   FXRegistry       registry;            // Application setting registry
   FXWindow        *activeWindow;        // Active toplevel window
@@ -413,47 +412,35 @@ public:
   */
   FXApp(const FXString& name="Application",const FXString& vendor="FoxDefault");
 
+  /// Change application name
+  void setAppName(const FXString& name);
+
   /// Get application name
-  const FXString& getAppName() const { return registry.getAppKey(); }
+  const FXString& getAppName() const;
+
+  /// Change vendor name
+  void setVendorName(const FXString& name);
 
   /// Get vendor name
-  const FXString& getVendorName() const { return registry.getVendorKey(); }
-
-  /// Connection to display; this is called by init()
-  FXbool openDisplay(const FXchar* dpyname=NULL);
-
-  /// Close connection to the display
-  FXbool closeDisplay();
-
-  /// Return pointer
-  void* getDisplay() const { return display; }
-
-  /// Is application initialized
-  FXbool isInitialized() const { return initialized; }
-
-  /// Get argument count
-  FXint getArgc() const { return appArgc; }
-
-  /// Get argument vector
-  const FXchar *const *getArgv() const { return appArgv; }
+  const FXString& getVendorName() const;
 
   /// Return true if input method support
   FXbool hasInputMethod() const;
 
-  /// Get default visual
-  FXVisual* getDefaultVisual() const { return defaultVisual; }
-
   /// Change default visual
   void setDefaultVisual(FXVisual* vis);
+
+  /// Get default visual
+  FXVisual* getDefaultVisual() const { return defaultVisual; }
 
   /// Get monochrome visual
   FXVisual* getMonoVisual() const { return monoVisual; }
 
-  /// Get root Window
-  FXRootWindow* getRootWindow() const { return root; }
-
   /// Set root Window
   void setRootWindow(FXRootWindow* rt);
+
+  /// Get root Window
+  FXRootWindow* getRootWindow() const { return root; }
 
   /// Return window at the end of the focus chain
   FXWindow *getFocusWindow() const;
@@ -482,14 +469,55 @@ public:
   /// Find window from root x,y, starting from given window
   FXWindow* findWindowAt(FXint rx,FXint ry,FXID window=0) const;
 
-  /// Create application's windows
-  virtual void create();
+  /// Change default font
+  void setNormalFont(FXFont* font);
 
-  /// Destroy application's windows
-  virtual void destroy();
+  /// Return default font
+  FXFont* getNormalFont() const { return normalFont; }
 
-  /// Detach application's windows
-  virtual void detach();
+  /// Begin of wait-cursor block; wait-cursor blocks may be nested.
+  void beginWaitCursor();
+
+  /// End of wait-cursor block
+  void endWaitCursor();
+
+  /// Change to a new wait cursor
+  void setWaitCursor(FXCursor *cur);
+
+  /// Return current wait cursor
+  FXCursor* getWaitCursor() const { return waitCursor; }
+
+  /// Change default cursor
+  void setDefaultCursor(FXDefaultCursor which,FXCursor* cur);
+
+  /// Obtain a default cursor
+  FXCursor* getDefaultCursor(FXDefaultCursor which) const { return cursor[which]; }
+
+  /// Register new DND type
+  FXDragType registerDragType(const FXString& name) const;
+
+  /// Get drag type name
+  FXString getDragTypeName(FXDragType type) const;
+
+  /**
+  * Change message translator.
+  * The new translator will be owned by FXApp.
+  */
+  void setTranslator(FXTranslator* trans);
+
+  /**
+  * Return message translator.
+  */
+  FXTranslator* getTranslator() const { return translator; }
+
+  /// Return pointer
+  void* getDisplay() const { return display; }
+
+  /// Connection to display; this is called by init()
+  virtual FXbool openDisplay(const FXchar* dpy=NULL);
+
+  /// Close connection to the display
+  virtual FXbool closeDisplay();
 
   /**
   * Add timeout message sel to be sent to target object tgt after an interval of ns
@@ -677,13 +705,21 @@ public:
   */
   void stopModal(FXint value=0);
 
-  /// Force GUI refresh
-  void forceRefresh();
-
-  /// Schedule a refresh
+  /**
+  * Schedule SEL_UPDATE refreshes on the entire widget tree, to be
+  * performed at some future time.
+  */
   void refresh();
 
-  /// Flush pending repaints
+  /**
+  * Perform SEL_UPDATE refreshes on the entire widget tree immediately.
+  */
+  void forceRefresh();
+
+  /**
+  * Flush drawing commands to display; if sync then wait till drawing commands
+  * have been performed.
+  */
   void flush(FXbool sync=false);
 
   /**
@@ -691,6 +727,15 @@ public:
   * On return all the applications windows have been painted.
   */
   void repaint();
+
+  /// Get argument count
+  FXint getArgc() const { return appArgc; }
+
+  /// Get argument vector
+  const FXchar *const *getArgv() const { return appArgv; }
+
+  /// Has application been initialized
+  FXbool isInitialized() const { return initialized; }
 
   /**
   * Initialize application.
@@ -713,42 +758,6 @@ public:
   */
   FXRegistry& reg(){ return registry; }
 
-  /// Register new DND type
-  FXDragType registerDragType(const FXString& name) const;
-
-  /// Get drag type name
-  FXString getDragTypeName(FXDragType type) const;
-
-  /// Beep
-  void beep();
-
-  /// Return application instance
-  static inline FXApp* instance(){ return app; }
-
-  /// Change default font
-  void setNormalFont(FXFont* font);
-
-  /// Return default font
-  FXFont* getNormalFont() const { return normalFont; }
-
-  /// Begin of wait-cursor block; wait-cursor blocks may be nested.
-  void beginWaitCursor();
-
-  /// End of wait-cursor block
-  void endWaitCursor();
-
-  /// Change to a new wait cursor
-  void setWaitCursor(FXCursor *cur);
-
-  /// Return current wait cursor
-  FXCursor* getWaitCursor() const { return waitCursor; }
-
-  /// Obtain a default cursor
-  FXCursor* getDefaultCursor(FXDefaultCursor which) const { return cursor[which]; }
-
-  /// Change default cursor
-  void setDefaultCursor(FXDefaultCursor which,FXCursor* cur);
-
   /**
   * Return a reference to the application-wide mutex.
   * Normally, the main user interface thread holds this mutex,
@@ -763,14 +772,8 @@ public:
   */
   FXMutex& mutex(){ return appMutex; }
 
-  /**
-  * Change message translator.
-  * The new translator will be owned by FXApp.
-  */
-  void setTranslator(FXTranslator* trans);
-
-  /// Return message translator
-  FXTranslator* getTranslator() const { return translator; }
+  /// Beep the speaker
+  void beep();
 
   /// Obtain application-wide timing constants, in nanoseconds
   FXTime getTypingSpeed() const { return typingSpeed; }
@@ -839,6 +842,15 @@ public:
   /// Get number of existing windows
   FXuint getWindowCount() const { return windowCount; }
 
+  /// Create application's windows
+  virtual void create();
+
+  /// Destroy application's windows
+  virtual void destroy();
+
+  /// Detach application's windows
+  virtual void detach();
+
   /// Save
   virtual void save(FXStream& store) const;
 
@@ -847,6 +859,9 @@ public:
 
   /// Dump widget information
   void dumpWidgets() const;
+
+  /// Return application instance
+  static inline FXApp* instance(){ return app; }
 
   /// Destroy the application and all reachable resources
   virtual ~FXApp();

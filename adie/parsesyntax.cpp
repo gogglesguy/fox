@@ -3,7 +3,7 @@
 *                     P a r s e   S y n t a x   F i l e                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -21,7 +21,6 @@
 #include "fx.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include "FXRex.h"
 #include "FXArray.h"
 #include "Hilite.h"
@@ -69,7 +68,7 @@ FXchar* Parser::getline(){
   register FXchar *ptr;
   while((ptr=fgets(buffer,sizeof(buffer),fp))!=NULL){
     number++;
-    while(*ptr && isspace((FXuchar)*ptr)) ptr++;
+    while(*ptr && Ascii::isSpace(*ptr)) ptr++;
     if(*ptr!='\0' && *ptr!='\n' && *ptr!='\r' && *ptr!='#') break;
     }
   return ptr;
@@ -80,7 +79,7 @@ FXchar* Parser::getline(){
 const FXchar* Parser::token(){
   line=tok=getline();
   if(!line) return NULL;
-  while(*line && isalpha((FXuchar)*line)) line++;
+  while(*line && Ascii::isLetter(*line)) line++;
   *line++='\0';
   return tok;
   }
@@ -89,9 +88,9 @@ const FXchar* Parser::token(){
 // Parse word from line
 FXint Parser::integer(){
   register FXchar *value;
-  while(*line && isspace((FXuchar)*line)) line++;
+  while(*line && Ascii::isSpace(*line)) line++;
   value=line;
-  while(*line && !isspace((FXuchar)*line)) line++;
+  while(*line && !Ascii::isSpace(*line)) line++;
   *line++='\0';
   return strtol(value,NULL,10);
   }

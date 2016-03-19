@@ -3,7 +3,7 @@
 *                           C o l o r   D i a l o g                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -81,13 +81,13 @@ public:
 
   /// Change active panel
   void setActivePanel(FXint pnl=COLORTAB_COLOR_RING);
-  
+
   /// Return active panel
   FXint getActivePanel() const;
-  
+
   /// Change well color
   void setWellColor(FXint w,FXColor clr);
-  
+
   /// Return well color
   FXColor getWellColor(FXint w) const;
 

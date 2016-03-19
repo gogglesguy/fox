@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -44,6 +44,7 @@
 
 
 /*******************************************************************************/
+
 
 // Map
 FXDEFMAP(Adie) AdieMap[]={
@@ -112,16 +113,25 @@ Adie::Adie(const FXString& name):FXApp(name,FXString::null){
 
 // Initialize application
 void Adie::init(int& argc,char** argv,FXbool connect){
-  FXString syntaxfile;
+  FXString execpath,iconpath,syntaxpath,syntaxfile;
 
   // After init, the registry has been loaded
   FXApp::init(argc,argv,connect);
 
+  // Get icon path
+  iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconDict::defaultIconPath);
+
   // Now we know the icon search path
-  associations->setIconPath(reg().readStringEntry("SETTINGS","iconpath",FXIconDict::defaultIconPath));
+  associations->setIconPath(iconpath);
+
+  // Get exec path
+  execpath=FXSystem::getExecPath();
+
+  // Get syntax path
+  syntaxpath=reg().readStringEntry("SETTINGS","syntaxpath",execpath.text());
 
   // Hunt for the syntax file
-  syntaxfile=FXPath::search(FXSystem::getExecPath(),"Adie.stx");
+  syntaxfile=FXPath::search(syntaxpath,"Adie.stx");
 
   // Load syntax file
   if(!syntaxfile.empty()){

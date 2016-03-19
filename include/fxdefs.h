@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -109,23 +109,30 @@
 
 // Data alignment attribute
 #if defined(__GNUC__)
-#define FXALIGNED(x)    __attribute__((aligned(x)))
+#define __align(x)    __attribute__((aligned(x)))
 #elif defined(_MSC_VER)
-#define FXALIGNED(x)    __declspec(align(x))
+#define __align(x)    __declspec(align(x))
 #else
-#define FXALIGNED(x)
+#define __align(x)
 #endif
-
 
 // Thread-local storage attribute
 #if defined(__GNUC__)
-#define FXTHREADLOCAL   __thread
+#define __threadlocal   __thread
 #elif defined(_MSC_VER)
-#define FXTHREADLOCAL   __declspec(thread)
+#define __threadlocal   __declspec(thread)
 #else
-#define FXTHREADLOCAL
+#define __threadlocal
 #endif
 
+// Branch prediction optimization
+#if __GNUC__ >= 3
+#define __likely(cond)    __builtin_expect(!!(cond),1)
+#define __unlikely(cond)  __builtin_expect(!!(cond),0)
+#else
+#define __likely(cond)    (!!(cond))
+#define __unlikely(cond)  (!!(cond))
+#endif
 
 // Callback
 #ifdef WIN32
@@ -209,7 +216,7 @@ typedef unsigned int           FXwchar;
 #if defined(_MSC_VER) && !defined(_NATIVE_WCHAR_T_DEFINED)
 typedef unsigned short         FXnchar;
 #elif defined(__WATCOMC__) && !defined(_WCHAR_T_DEFINED)
-typedef long char FXnchar;
+typedef long char              FXnchar;
 #else
 typedef wchar_t                FXnchar;
 #endif
@@ -305,15 +312,6 @@ const FXTime forever=9223372036854775807L;
 
 /**********************************  Macros  ***********************************/
 
-/// Branch prediction optimization
-#if __GNUC__ >= 3
-#define __likely(cond)    __builtin_expect(!!(cond),1)
-#define __unlikely(cond)  __builtin_expect(!!(cond),0)
-#else
-#define __likely(cond)    (!!(cond))
-#define __unlikely(cond)  (!!(cond))
-#endif
-
 /// Abolute value
 #define FXABS(val) (((val)>=0)?(val):-(val))
 
@@ -378,7 +376,10 @@ const FXTime forever=9223372036854775807L;
 #define FXBITREVERSE(b) (((b&0x01)<<7)|((b&0x02)<<5)|((b&0x04)<<3)|((b&0x08)<<1)|((b&0x10)>>1)|((b&0x20)>>3)|((b&0x40)>>5)|((b&0x80)>>7))
 
 /// Test if character c is at the start of a utf8 sequence
-#define FXISUTF(c) (((c)&0xC0)!=0x80)
+#define FXISUTF8(c) (((c)&0xC0)!=0x80)
+
+/// Test if character c is at start of utf16 sequence
+#define FXISUTF16(c) (((c)&0xDC00)!=0xDC00)
 
 /// Average of two FXColor ca and FXColor cb
 #define FXAVGCOLOR(ca,cb) (((ca)&(cb))+((((ca)^(cb))&0xFEFEFEFE)>>1))
@@ -692,6 +693,12 @@ extern FXAPI FXint wcvalidate(const FXchar* string,FXint pos);
 /// Return start of utf16 character containing position
 extern FXAPI FXint wcvalidate(const FXnchar *string,FXint pos);
 
+/// Check if valid utf8 wide character representation
+extern FXAPI FXbool wcvalid(const FXchar* ptr);
+
+/// Check if valid utf16 wide character representation
+extern FXAPI FXbool wcvalid(const FXnchar* ptr);
+
 /// Advance to next utf8 character start
 extern FXAPI FXint wcinc(const FXchar* string,FXint pos);
 
@@ -727,6 +734,15 @@ extern FXAPI FXint ncslen(const FXchar *str,FXint n);
 
 /// Length of narrow character representation of utf8 string str
 extern FXAPI FXint ncslen(const FXchar *str);
+
+
+/// Convert utf8 string from src to wide character w, returning number of bytes consumed
+extern FXAPI FXint utf2wc(FXwchar& w,const FXchar* src);
+
+
+/// Convert wide character w to utf8 string at dst, returning number of bytes produced
+extern FXAPI FXint wc2utf(FXchar* dst,FXwchar w);
+
 
 /// Copy utf8 string of length sn to wide character string dst of size dn
 extern FXAPI FXint utf2wcs(FXwchar *dst,FXint dn,const FXchar *src,FXint sn);

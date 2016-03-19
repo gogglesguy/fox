@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -484,7 +484,7 @@ FXQuatd FXQuatd::log() const {
 
 // Invert quaternion
 FXQuatd FXQuatd::invert() const {
-  register FXdouble n=x*x+y*y+z*z+w*w;
+  register FXdouble n=length2();
   return FXQuatd(-x/n,-y/n,-z/n,w/n);
   }
 
@@ -592,18 +592,23 @@ FXQuatd& FXQuatd::lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   }
 
 
-// Multiply quaternions
-FXQuatd FXQuatd::operator*(const FXQuatd& q) const {
-  return FXQuatd(w*q.x+x*q.w+y*q.z-z*q.y, w*q.y+y*q.w+z*q.x-x*q.z, w*q.z+z*q.w+x*q.y-y*q.x, w*q.w-x*q.x-y*q.y-z*q.z);
-  }
-
-
 // Rotation of a vector by a quaternion; this is defined as q.v.q*
 // where q* is the conjugate of q.
 FXVec3d FXQuatd::operator*(const FXVec3d& v) const {
   return v*FXMat3d(*this);
   }
 
+// Save vector to stream
+FXStream& operator<<(FXStream& store,const FXQuatd& v){
+  store << v.x << v.y << v.z << v.w;
+  return store;
+  }
+
+// Load vector from stream
+FXStream& operator>>(FXStream& store,FXQuatd& v){
+  store >> v.x >> v.y >> v.z >> v.w;
+  return store;
+  }
 
 }
 

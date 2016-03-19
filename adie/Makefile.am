@@ -35,6 +35,7 @@ indent_gif.gif \
 info_gif.gif \
 lang_gif.gif \
 lowercase.gif \
+miscellaneous_gif.gif \
 new_gif.gif \
 nobrowser.gif \
 open_gif.gif \

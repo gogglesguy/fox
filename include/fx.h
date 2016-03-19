@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -34,6 +34,7 @@
 #include "fxdefs.h"
 #include "fxascii.h"
 #include "fxunicode.h"
+#include "fxcpuid.h"
 
 // FOX classes
 #include "FXhalf.h"

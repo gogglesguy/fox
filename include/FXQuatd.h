@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,20 +29,31 @@ class FXMat3d;
 
 
 /// Double-precision quaternion
-class FXAPI FXQuatd : public FXVec4d {
+class FXAPI FXQuatd {
+public:
+  double x;
+  double y;
+  double z;
+  double w;
 public:
 
   /// Default constructor; value is not initialized
   FXQuatd(){}
 
   /// Copy constructor
-  FXQuatd(const FXQuatd& q):FXVec4d(q){}
-
-  /// Construct from components
-  FXQuatd(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww):FXVec4d(xx,yy,zz,ww){}
+  FXQuatd(const FXQuatd& q):x(q.x),y(q.y),z(q.z),w(q.w){}
 
   /// Construct from array of doubles
-  FXQuatd(const FXdouble v[]):FXVec4d(v){}
+  FXQuatd(const FXdouble v[]):x(v[0]),y(v[1]),z(v[2]),w(v[3]){}
+
+  /// Construct from components
+  FXQuatd(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww):x(xx),y(yy),z(zz),w(ww){}
+
+  /// Construct quaternion from 3x3 matrix
+  FXQuatd(const FXMat3d& mat);
+
+  /// Construct quaternion from two unit vectors
+  FXQuatd(const FXVec3d& fr,const FXVec3d& to);
 
   /// Construct from axis and angle
   FXQuatd(const FXVec3d& axis,FXdouble phi=0.0);
@@ -50,14 +61,52 @@ public:
   /// Construct from euler angles yaw (z), pitch (y), and roll (x)
   FXQuatd(FXdouble roll,FXdouble pitch,FXdouble yaw);
 
-  /// Construct quaternion from two unit vectors
-  FXQuatd(const FXVec3d& fr,const FXVec3d& to);
-
   /// Construct quaternion from three axes
   FXQuatd(const FXVec3d& ex,const FXVec3d& ey,const FXVec3d& ez);
 
-  /// Construct quaternion from 3x3 matrix
-  FXQuatd(const FXMat3d& mat);
+  /// Return a non-const reference to the ith element
+  FXdouble& operator[](FXint i){return (&x)[i];}
+
+  /// Return a const reference to the ith element
+  const FXdouble& operator[](FXint i) const {return (&x)[i];}
+
+  /// Assignment
+  FXQuatd& operator=(const FXQuatd& v){x=v.x;y=v.y;z=v.z;w=v.w;return *this;}
+
+  /// Assignment from array of doubles
+  FXQuatd& operator=(const FXdouble v[]){x=v[0];y=v[1];z=v[2];w=v[3];return *this;}
+
+  /// Set value from another vector
+  FXQuatd& set(const FXQuatd& v){x=v.x;y=v.y;z=v.z;w=v.w;return *this;}
+
+  /// Set value from array of floats
+  FXQuatd& set(const FXdouble v[]){x=v[0];y=v[1];z=v[2];w=v[3];return *this;}
+
+  /// Set value from components
+  FXQuatd& set(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww){x=xx;y=yy;z=zz;w=ww;return *this;}
+
+  /// Assigning operators
+  FXQuatd& operator*=(FXdouble n){ return set(x*n,y*n,z*n,w*n); }
+  FXQuatd& operator/=(FXdouble n){ return set(x/n,y/n,z/n,w/n); }
+  FXQuatd& operator+=(const FXQuatd& v){ return set(x+v.x,y+v.y,z+v.z,w+v.w); }
+  FXQuatd& operator-=(const FXQuatd& v){ return set(x-v.x,y-v.y,z-v.z,w-v.w); }
+  FXQuatd& operator*=(const FXQuatd& b){ return set(w*b.x+x*b.w+y*b.z-z*b.y, w*b.y+y*b.w+z*b.x-x*b.z, w*b.z+z*b.w+x*b.y-y*b.x, w*b.w-x*b.x-y*b.y-z*b.z); }
+  FXQuatd& operator/=(const FXQuatd& b){ return *this*=b.invert(); }
+
+  /// Conversion
+  operator FXdouble*(){return &x;}
+  operator const FXdouble*() const {return &x;}
+
+  /// Test if zero
+  FXbool operator!() const {return x==0.0 && y==0.0 && z==0.0 && w==0.0; }
+
+  /// Unary
+  FXQuatd operator+() const { return *this; }
+  FXQuatd operator-() const { return FXQuatd(-x,-y,-z,-w); }
+
+  /// Length and square of length
+  FXdouble length2() const { return x*x+y*y+z*z+w*w; }
+  FXdouble length() const { return sqrt(length2()); }
 
   /// Adjust quaternion length
   FXQuatd& adjust();
@@ -128,13 +177,39 @@ public:
   /// Spherical lerp
   FXQuatd& lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f);
 
-  /// Multiply quaternions
-  FXQuatd operator*(const FXQuatd& q) const;
-
   /// Rotation of a vector by a quaternion
   FXVec3d operator*(const FXVec3d& v) const;
   };
 
+/// Scaling
+inline FXQuatd operator*(const FXQuatd& a,FXdouble n){return FXQuatd(a.x*n,a.y*n,a.z*n,a.w*n);}
+inline FXQuatd operator*(FXdouble n,const FXQuatd& a){return FXQuatd(n*a.x,n*a.y,n*a.z,n*a.w);}
+inline FXQuatd operator/(const FXQuatd& a,FXdouble n){return FXQuatd(a.x/n,a.y/n,a.z/n,a.w/n);}
+inline FXQuatd operator/(FXdouble n,const FXQuatd& a){return FXQuatd(n/a.x,n/a.y,n/a.z,n/a.w);}
+
+/// Quaternion and quaternion multiply
+inline FXQuatd operator*(const FXQuatd& a,const FXQuatd& b){ return FXQuatd(a.w*b.x+a.x*b.w+a.y*b.z-a.z*b.y, a.w*b.y+a.y*b.w+a.z*b.x-a.x*b.z, a.w*b.z+a.z*b.w+a.x*b.y-a.y*b.x, a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z); }
+inline FXQuatd operator/(const FXQuatd& a,const FXQuatd& b){ return a*b.invert(); }
+
+/// Quaternion and quaternion addition
+inline FXQuatd operator+(const FXQuatd& a,const FXQuatd& b){ return FXQuatd(a.x+b.x,a.y+b.y,a.z+b.z,a.w+b.w); }
+inline FXQuatd operator-(const FXQuatd& a,const FXQuatd& b){ return FXQuatd(a.x-b.x,a.y-b.y,a.z-b.z,a.w-b.w); }
+
+/// Equality tests
+inline FXbool operator==(const FXQuatd& a,FXdouble n){return a.x==n && a.y==n && a.z==n && a.w==n;}
+inline FXbool operator!=(const FXQuatd& a,FXdouble n){return a.x!=n || a.y!=n || a.z!=n || a.w!=n;}
+inline FXbool operator==(FXdouble n,const FXQuatd& a){return n==a.x && n==a.y && n==a.z && n==a.w;}
+inline FXbool operator!=(FXdouble n,const FXQuatd& a){return n!=a.x || n!=a.y || n!=a.z || n!=a.w;}
+
+/// Equality tests
+inline FXbool operator==(const FXQuatd& a,const FXQuatd& b){ return a.x==b.x && a.y==b.y && a.z==b.z && a.w==b.w; }
+inline FXbool operator!=(const FXQuatd& a,const FXQuatd& b){ return a.x!=b.x || a.y!=b.y || a.z!=b.z || a.w!=b.w; }
+
+/// Save quaternion to a stream
+extern FXAPI FXStream& operator<<(FXStream& store,const FXQuatd& v);
+
+/// Load quaternion from a stream
+extern FXAPI FXStream& operator>>(FXStream& store,FXQuatd& v);
 
 }
 

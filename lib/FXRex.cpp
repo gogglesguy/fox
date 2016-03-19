@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,9 +51,6 @@
         o Forward and backward subject string scanning mode.
         o Single line/multi line matching modes.
         o 8-bit safe (you can use it to grep binary data!).
-        o No arbitrary limitations.  Patterns can be as long as you need them
-          to be, memory allowing.  This is possible due to representing the
-          progam as 32-bit integers.
         o When parsing fails, or when created with default constructor, FXRex
           is initialized to a "fallback" program; its thus safe to invoke match
           at any time.
@@ -90,7 +87,7 @@
   memory reference.
 
   Sometimes one needs to jump out of sequence; this is implemented by an
-  explicit jump instruction.  Because it works with 32-bit offsets, there
+  explicit jump instruction.  Because it works with relative offsets, there
   is no need to distinguish between forward and backward jumps.
 
   Henry Spencer implemented a trick to "prefix" simple single-character matching
@@ -250,15 +247,15 @@
 
       .         Match any character
       \d        Digit [0-9]
-      \D        Non-digit
-      \s        Space
-      \S        Non-space
+      \D        Non-digit [^0-9]
+      \s        Space [ \t\n\r\f\v]
+      \S        Non-space [^ \t\n\r\f\v]
       \w        Word character [a-zA-Z_0-9]
-      \W        Non-word character
+      \W        Non-word character [^a-zA-Z0-9_]
       \l        Letter [a-zA-Z]
-      \L        Non-letter
+      \L        Non-letter [^a-zA-Z]
       \h        Hex digit [0-9a-fA-F]
-      \H        Non-hex digit
+      \H        Non-hex digit [^0-9a-fA-F]
       \u        Single uppercase character
       \U        Single lowercase character
       \p        Punctuation (not including '_')
@@ -427,7 +424,7 @@
       branch     ::= { piece }*
       piece      ::= atom [ rep ]
       rep        ::= ( "*" | "+" | "?" | counts ) [ "?" ]
-      counts     ::= "{" digits ["," [ digits] ] "}"
+      counts     ::= "{" digits ["," [ digits ] ] "}"
       atom       ::= "(" exp ")" | "[" [^] range "]" | characters
       range      ::= { character | character "-" character } +
       characters ::= { character }*
@@ -451,9 +448,9 @@
 
 
 // As close to infinity as we're going to get; this seems big
-// enough.  We can not make it MAX_INT as this may wrap around when
+// enough.  We can not make it too large as this may wrap around when
 // added to something else!
-#define ONEINDIG 1000000
+#define ONEINDIG 16384
 
 // Number of capturing sub-expressions allowed
 #define NSUBEXP  10
@@ -462,10 +459,12 @@
 #define MAXCHARS 512
 
 // Set operations
-#define EXCL(set,ch) (set[((FXuchar)(ch))>>5]&=~(1<<(((FXuchar)(ch))&31)))
-#define INCL(set,ch) (set[((FXuchar)(ch))>>5]|=(1<<(((FXuchar)(ch))&31)))
-#define ISIN(set,ch) (set[((FXuchar)(ch))>>5]&(1<<(((FXuchar)(ch))&31)))
-#define CLEAR(set)   (set[0]=set[1]=set[2]=set[3]=set[4]=set[5]=set[6]=set[7]=0)
+#define EXCL(set,ch) (set[((FXuchar)(ch))>>4]&=~(1<<(((FXuchar)(ch))&15)))
+#define INCL(set,ch) (set[((FXuchar)(ch))>>4]|=(1<<(((FXuchar)(ch))&15)))
+#define ISIN(set,ch) (set[((FXuchar)(ch))>>4]&(1<<(((FXuchar)(ch))&15)))
+#define CLEAR(set)   (set[0]=set[1]=set[2]=set[3]=set[4]=set[5]=set[6]=set[7]=set[8]=set[9]=set[10]=set[11]=set[12]=set[13]=set[14]=set[15]=0)
+
+//#define REXDEBUG 1
 
 using namespace FX;
 
@@ -508,8 +507,10 @@ enum {
   OP_PUNCT,             // Punctuation
   OP_NOT_PUNCT,         // Non punctuation
   OP_NOT_PUNCT_NL,      // Non punctuation including newline
-  OP_CHARS,             // Match literal string
-  OP_CHARS_CI,          // Match literal string, case insensitive
+//  OP_CHARS,             // Match literal string
+//  OP_CHARS_CI,          // Match literal string, case insensitive
+  OP_CHARS_NEW,         // Match literal string
+  OP_CHARS_CI_NEW,      // Match literal string, case insensitive
   OP_CHAR,              // Single character
   OP_CHAR_CI,           // Single character, case insensitive
   OP_JUMP,              // Jump to another location
@@ -531,6 +532,7 @@ enum {
   OP_AHEAD_POS,         // Positive look-ahead
   OP_BEHIND_NEG,        // Negative look-behind
   OP_BEHIND_POS,        // Positive look-behind
+  OP_ATOMIC,            // Atomic subgroup
   OP_UPPER,             // Match upper case
   OP_LOWER,             // Match lower case
   OP_SUB_BEG_0,         // Start of substring 0, 1, ...
@@ -633,7 +635,7 @@ struct FXExecute {
   const FXchar  *bak_end[NSUBEXP];  // Back reference end
   FXint         *sub_beg;           // Begin of substring i
   FXint         *sub_end;           // End of substring i
-  const FXint   *code;              // Program code
+  const FXshort *code;              // Program code
   FXint          npar;              // Number of capturing parentheses
   FXint          count[10];         // Counters for counted repeats
   FXint          mode;              // Match mode
@@ -642,7 +644,7 @@ struct FXExecute {
   FXbool attempt(const FXchar* string);
 
   // Match at current string position
-  FXbool match(const FXint* prog);
+  FXbool match(const FXshort* prog);
 
   // Execute
   FXbool execute(const FXchar* fm,const FXchar* to);
@@ -652,35 +654,44 @@ struct FXExecute {
 // Structure used during compiling
 struct FXCompile {
   const FXchar  *pat;               // Pattern string pointer
-  FXint         *code;              // Program code
-  FXint         *pc;                // Program counter
+  FXshort       *code;              // Program code
+  FXshort       *pc;                // Program counter
   FXint          mode;              // Compile mode
   FXint          nbra;              // Number of counting braces
   FXint          npar;              // Number of capturing parentheses
+  FXint          tok;               // Current token while parsing
 
   // Code generation
-  FXint* append(FXint op);
-  FXint* append(FXint op,FXint arg);
-  FXint* append(FXint op,FXint arg1,FXint arg2);
-  FXint* append(FXint op,FXint set[]);
-  FXint* append(FXint op,FXint len,FXint *data);
-  FXint* insert(FXint *ptr,FXint op);
-  FXint* insert(FXint *ptr,FXint op,FXint arg);
-  FXint* insert(FXint *ptr,FXint op,FXint arg1,FXint arg2);
+  FXshort* append(FXshort op);
+  FXshort* append(FXshort op,FXshort arg);
+  FXshort* append(FXshort op,FXshort arg1,FXshort arg2);
+  FXshort* append(FXshort op,const FXshort set[]);
+
+  FXshort* append(FXshort op,FXshort len,const FXchar *data);
+
+  FXshort* insert(FXshort *ptr,FXshort op);
+  FXshort* insert(FXshort *ptr,FXshort op,FXshort arg);
+  FXshort* insert(FXshort *ptr,FXshort op,FXshort arg1,FXshort arg2);
 
   // Patch branches
-  void patch(FXint *fm,FXint *to);
+  void patch(FXshort *fm,FXshort *to);
 
   // Fix value
-  void fix(FXint *ptr,FXint val);
+  void fix(FXshort *ptr,FXshort val);
+
+  // Lexing
+  FXshort token();
+  FXshort gethex();
+  FXshort getoct();
+  FXshort getctl();
 
   // Parsing
   FXRex::Error compile(FXint& flags);
   FXRex::Error verbatim(FXint& flags);
-  FXRex::Error expression(FXint& flags,FXint& smin,FXint& smax);
-  FXRex::Error alternative(FXint& flags,FXint& smin,FXint& smax);
-  FXRex::Error piece(FXint& flags,FXint& smin,FXint& smax);
-  FXRex::Error atom(FXint& flags,FXint& smin,FXint& smax);
+  FXRex::Error expression(FXint& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error alternative(FXint& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error piece(FXint& flags,FXshort& smin,FXshort& smax);
+  FXRex::Error atom(FXint& flags,FXshort& smin,FXshort& smax);
   FXRex::Error charset();
   };
 
@@ -688,6 +699,65 @@ struct FXCompile {
 /*******************************************************************************/
 
 // FXCompile members
+
+enum {
+  TK_END=256,           // End of string
+
+  TK_BAD,               // Bad token
+
+  TK_LPAREN,            // Parentheses
+  TK_RPAREN,
+
+  TK_ALTER,             // Alternatives
+  TK_DASH,              // Dash
+
+  TK_STAR,              // Zero or more repeat
+  TK_PLUS,              // One or more repeat
+  TK_QUEST,             // Zero or one repeat
+
+  TK_LBRACE,            // Counted repeat
+  TK_RBRACE,
+  TK_COMMA,
+
+  TK_CARET,             // Zero-width Assertions
+  TK_DOLLAR,
+  TK_BEGWORD,
+  TK_ENDWORD,
+  TK_BEGTEXT,
+  TK_ENDTEXT,
+  TK_WORDBOUND,
+  TK_INTRAWORD,
+
+  TK_LBRACK,            // General character classes
+  TK_RBRACK,
+
+  TK_WORD,              // Special character classes
+  TK_NONWORD,
+  TK_SPACE,
+  TK_NONSPACE,
+  TK_DIGIT,
+  TK_NONDIGIT,
+  TK_HEXDIGIT,
+  TK_NONHEXDIGIT,
+  TK_PUNCT,
+  TK_NONPUNCT,
+  TK_LETTER,
+  TK_NONLETTER,
+  TK_UPPER,
+  TK_LOWER,
+  TK_ANY,
+
+  TK_BACKREF1,          // Back references
+  TK_BACKREF2,
+  TK_BACKREF3,
+  TK_BACKREF4,
+  TK_BACKREF5,
+  TK_BACKREF6,
+  TK_BACKREF7,
+  TK_BACKREF8,
+  TK_BACKREF9
+  };
+
 
 // Parse hex escape code
 FXint hex(const FXchar*& pat){
@@ -709,9 +779,182 @@ FXint oct(const FXchar*& pat){
   }
 
 
+// Parse control code
+FXint ctl(const FXchar*& pat){
+  register FXint ch=Ascii::toUpper(*pat);
+  if('@'<=ch && ch<='_'){
+    pat++;
+    return ch-'@';
+    }
+  return TK_BAD;
+  }
+
+
+// Read control code
+FXshort FXCompile::getctl(){
+  register FXshort ch=TK_BAD;
+  if('@'<=*pat && *pat<='_'){
+    ch=*pat++ - '@';
+    }
+  return TK_BAD;
+  }
+
+
+// Read octal digits
+FXshort FXCompile::getoct(){
+  register FXshort ch=TK_BAD;
+  if('0'<=*pat && *pat<'7'){
+    ch=*pat++ - '0';
+    if('0'<=*pat && *pat<'7'){
+      ch=(ch<<3) + *pat++ - '0';
+      if('0'<=*pat && *pat<'7'){
+        ch=(ch<<3) + *pat++ - '0';
+        }
+      }
+    }
+  return ch;
+  }
+
+
+// Read hex digits
+FXshort FXCompile::gethex(){
+  register FXshort ch=TK_BAD;
+  if(Ascii::isHexDigit(*pat)){
+    ch=Ascii::digitValue(*pat++);
+    if(Ascii::isHexDigit(*pat)){
+      ch=(ch<<4)+Ascii::digitValue(*pat++);
+      }
+    }
+  return ch;
+  }
+
+
+// Lexing
+FXshort FXCompile::token(){
+  register FXshort ch;
+  switch(ch=(FXuchar)*pat++){
+    case   0: return TK_END;                       // End of pattern
+    case '(': return TK_LPAREN;
+    case ')': return TK_RPAREN;
+    case '[': return TK_LBRACK;
+    case ']': return TK_RBRACK;
+    case '{': return TK_LBRACE;
+    case '}': return TK_RBRACE;
+    case '|': return TK_ALTER;
+    case '-': return TK_DASH;
+    case '*': return TK_STAR;
+    case '+': return TK_PLUS;
+    case '?': return TK_QUEST;
+    case ',': return TK_COMMA;
+    case '^': return TK_CARET;
+    case '$': return TK_DOLLAR;
+    case '.': return TK_ANY;
+    case '\\':
+      switch(ch=(FXuchar)*pat++){
+        case  0 : return TK_BAD;                        // End of pattern
+        case 'a': return '\a';                          // Bell
+        case 'e': return '\033';                        // Escape
+        case 'f': return '\f';                          // Form feed
+        case 'n': return '\n';                          // Newline
+        case 'r': return '\r';                          // Return
+        case 't': return '\t';                          // Tab
+        case 'v': return '\v';                          // Vertical tab
+        case 'w': return TK_WORD;
+        case 'W': return TK_NONWORD;
+        case 's': return TK_SPACE;
+        case 'S': return TK_NONSPACE;
+        case 'd': return TK_DIGIT;
+        case 'D': return TK_NONDIGIT;
+        case 'h': return TK_HEXDIGIT;
+        case 'H': return TK_NONHEXDIGIT;
+        case 'p': return TK_PUNCT;
+        case 'P': return TK_NONPUNCT;
+        case 'l': return TK_LETTER;
+        case 'L': return TK_NONLETTER;
+        case 'u': return TK_UPPER;
+        case 'U': return TK_LOWER;
+        case 'b': return TK_WORDBOUND;
+        case 'B': return TK_INTRAWORD;
+        case 'A': return TK_BEGTEXT;
+        case 'Z': return TK_ENDTEXT;
+        case '<': return TK_BEGWORD;
+        case '>': return TK_ENDWORD;
+        case '1': return TK_BACKREF1;
+        case '2': return TK_BACKREF2;
+        case '3': return TK_BACKREF3;
+        case '4': return TK_BACKREF4;
+        case '5': return TK_BACKREF5;
+        case '6': return TK_BACKREF6;
+        case '7': return TK_BACKREF7;
+        case '8': return TK_BACKREF8;
+        case '9': return TK_BACKREF9;
+        case 'c': return getctl();                      // Control character
+        case '0': return getoct();                      // Octal digit
+        case 'x': return gethex();                      // Hex digit
+        }
+    }
+  return ch;
+  }
+
+#if 0
+
+// FXuchar* pat
+
+FXwchar FXCompile::wc(){
+  register FXwchar w=*pat++;
+  if(__unlikely(0xC0<=w)){ w=(w<<6)^0x3080^*pat++;
+  if(__unlikely(0x800<=w)){ w=(w<<6)^0x20080^*pat++;
+  if(__unlikely(0x10000<=w)){ w=(w<<6)^0x400080^*pat++;
+  if(__unlikely(0x200000<=w)){ w=(w<<6)^0x8000080^*pat++;
+  if(__unlikely(0x4000000<=w)){ w=(w<<6)^0x80^*pat++; }}}}}
+  return w;
+  }
+
+FXint utf2wc(FXwchar& w,const FXchar* src){
+  register FXint n=0;
+  w=(FXuchar)src[n++];
+  if(__unlikely(0xC0<=w)){ w=(w<<6)^(FXuchar)src[n++]^0x3080;
+  if(__unlikely(0x800<=w)){ w=(w<<6)^(FXuchar)src[n++]^0x20080;
+  if(__unlikely(0x10000<=w)){ w=(w<<6)^(FXuchar)src[n++]^0x400080;
+  if(__unlikely(0x200000<=w)){ w=(w<<6)^(FXuchar)src[n++]^0x8000080;
+  if(__unlikely(0x4000000<=w)){ w=(w<<6)^(FXuchar)src[n++]^0x80; }}}}}
+  return n;
+  }
+
+const FXwchar SURROGATE_OFFSET=0x10000-(0xD800<<10)-0xDC00;
+const FXwchar LEAD_OFFSET=0xD800-(0x10000>>10);
+const FXwchar TAIL_OFFSET=0xDC00;
+
+
+// Read wc from program
+FXwchar FXExecute::wc(const FXnchar* prog){
+  register FXwchar w=*prog++;
+  if(__unlikely((w&0xDC00)==0xD800)){
+    FXASSERT(0xDC00<=*prog && *prog<0xE000);
+    w=(w<<10) + *prog++ + SURROGATE_OFFSET;
+    }
+  return w;
+  }
+
+
+// Convert to utf16be
+FXint FXCompile::appendWc(FXwchar w){
+  register FXnchar *val=pc;
+  if(code){ pc[0]=w; }
+  if(__unlikely(0xFFFF<w)){
+    if(code){ pc[0]=(wc>>10)+LEAD_OFFSET; pc[1]=(wc&0x3FF)+TAIL_OFFSET; }
+    pc++;
+    }
+  pc++;
+  return val;
+  }
+
+#endif
+
+
 // Compiler main
 FXRex::Error FXCompile::compile(FXint& flags){
-  FXRex::Error err; FXint smin,smax;
+  FXRex::Error err; FXshort smin,smax;
   if(*pat=='\0') return FXRex::ErrEmpty;
   if(mode&FXRex::Verbatim)
     err=verbatim(flags);
@@ -726,13 +969,14 @@ FXRex::Error FXCompile::compile(FXint& flags){
 
 // Parse without interpretation of magic characters
 FXRex::Error FXCompile::verbatim(FXint& flags){
-  FXint buf[MAXCHARS],ch,len;
+  FXchar buf[MAXCHARS],ch;
+  FXshort len;
   flags=FLG_WIDTH;
   while(*pat!='\0'){
     len=0;
     do{
       ch=*pat++;
-      if(mode&FXRex::IgnoreCase) ch=Ascii::toLower(ch);
+      if(mode&FXRex::IgnoreCase) ch=Ascii::toLower(ch);                 // FIXME copy straight into regex code
       buf[len++]=(FXuchar)ch;
       }
     while(*pat!='\0' && len<MAXCHARS);
@@ -741,7 +985,7 @@ FXRex::Error FXCompile::verbatim(FXint& flags){
       append((mode&FXRex::IgnoreCase)?OP_CHAR_CI:OP_CHAR,buf[0]);
       }
     else{
-      append((mode&FXRex::IgnoreCase)?OP_CHARS_CI:OP_CHARS,len,buf);
+      append((mode&FXRex::IgnoreCase)?OP_CHARS_CI_NEW:OP_CHARS_NEW,len,buf);
       }
     }
   return FXRex::ErrOK;
@@ -749,8 +993,8 @@ FXRex::Error FXCompile::verbatim(FXint& flags){
 
 
 // Parse expression
-FXRex::Error FXCompile::expression(FXint& flags,FXint& smin,FXint& smax){
-  FXRex::Error err; FXint *at,*jp,flg,smn,smx;
+FXRex::Error FXCompile::expression(FXint& flags,FXshort& smin,FXshort& smax){
+  FXRex::Error err; FXint flg; FXshort *at,*jp,smn,smx;
   at=pc;
   jp=NULL;
   err=alternative(flags,smin,smax);
@@ -773,8 +1017,8 @@ FXRex::Error FXCompile::expression(FXint& flags,FXint& smin,FXint& smax){
 
 
 // Parse branch
-FXRex::Error FXCompile::alternative(FXint& flags,FXint& smin,FXint& smax){
-  FXRex::Error err; FXint flg,smn,smx;
+FXRex::Error FXCompile::alternative(FXint& flags,FXshort& smin,FXshort& smax){
+  FXRex::Error err; FXint flg; FXshort smn,smx;
   flags=FLG_WORST;
   smin=0;
   smax=0;
@@ -790,8 +1034,8 @@ FXRex::Error FXCompile::alternative(FXint& flags,FXint& smin,FXint& smax){
 
 
 // Parse piece
-FXRex::Error FXCompile::piece(FXint& flags,FXint& smin,FXint& smax){
-  FXRex::Error err; FXint *ptr,ch,rep_min,rep_max,lazy;
+FXRex::Error FXCompile::piece(FXint& flags,FXshort& smin,FXshort& smax){
+  FXRex::Error err; FXshort *ptr,ch,rep_min,rep_max,lazy;
 
   // Remember point before atom
   ptr=pc;
@@ -980,8 +1224,10 @@ FXRex::Error FXCompile::piece(FXint& flags,FXint& smin,FXint& smax){
 
 
 // Parse atom
-FXRex::Error FXCompile::atom(FXint& flags,FXint& smin,FXint& smax){
-  FXint buf[MAXCHARS],*ptr,*pp,level,save,ch,len;
+FXRex::Error FXCompile::atom(FXint& flags,FXshort& smin,FXshort& smax){
+  FXchar buf[MAXCHARS];
+  FXshort *ptr,*pp,level,len,ch;
+  FXint save;
   FXRex::Error err;
   const FXchar *p;
   flags=FLG_WORST;                                      // Assume the worst
@@ -1007,11 +1253,14 @@ FXRex::Error FXCompile::atom(FXint& flags,FXint& smin,FXint& smax){
           mode=save;                                    // Restore flags
           if(err) return err;                           // Propagate error
           }
-        else if(ch=='>'){                               // Atomic sub group
+        else if(ch=='>'){                               // Atomic sub group (possessive match)
           pat++;
-          // FIXME not yet implemented
+          append(OP_ATOMIC);
+          ptr=append(0);
           err=expression(flags,smin,smax);
           if(err) return err;                           // Propagate error
+          append(OP_SUCCEED);
+          patch(ptr,pc);                                // If subgroup matches, go here!
           }
         else if(ch=='=' || ch=='!'){                    // Positive or negative look ahead
           pat++;
@@ -1340,7 +1589,7 @@ FXRex::Error FXCompile::atom(FXint& flags,FXint& smin,FXint& smax){
         // Add to buffer
         buf[len++]=(FXuchar)ch;
         }
-      while(*pat!='\0' && *pat!='*' && *pat!='+' && *pat!='?' && *pat!='{' && len<MAXCHARS);
+      while(*pat!='\0' && *pat!='*' && *pat!='+' && *pat!='?' && *pat!='{' && len<MAXCHARS);    // FIXME copy straight into regex code
 
       // Back up one character if followed by a repetition: aaa* is interpreted as (aa)a*
 x:    if(1<len && (*pat=='*' || *pat=='+' || *pat=='?' || *pat=='{')){
@@ -1362,7 +1611,7 @@ x:    if(1<len && (*pat=='*' || *pat=='+' || *pat=='?' || *pat=='{')){
 
       // Array of characters
       else{
-        append((mode&FXRex::IgnoreCase)?OP_CHARS_CI:OP_CHARS,len,buf);
+        append((mode&FXRex::IgnoreCase)?OP_CHARS_CI_NEW:OP_CHARS_NEW,len,buf);
         }
       break;
     }
@@ -1393,7 +1642,7 @@ inline FXbool isDelim(FXchar ch){
 // Parse character class
 FXRex::Error FXCompile::charset(){
   register FXint first,last,op,i;
-  FXint set[8];
+  FXshort set[16];
   CLEAR(set);
   first=-1;
   if(*pat=='^'){                                  // Negated character class
@@ -1546,8 +1795,8 @@ in: last=(FXuchar)*pat++;
 
 
 // Append opcode
-FXint* FXCompile::append(FXint op){
-  register FXint *val=pc;
+FXshort* FXCompile::append(FXshort op){
+  register FXshort *val=pc;
   if(code){
     pc[0]=op;
     }
@@ -1557,8 +1806,8 @@ FXint* FXCompile::append(FXint op){
 
 
 // Append one-argument opcode
-FXint* FXCompile::append(FXint op,FXint arg){
-  register FXint *val=pc;
+FXshort* FXCompile::append(FXshort op,FXshort arg){
+  register FXshort *val=pc;
   if(code){
     pc[0]=op;
     pc[1]=arg;
@@ -1569,8 +1818,8 @@ FXint* FXCompile::append(FXint op,FXint arg){
 
 
 // Append two-argument opcode
-FXint* FXCompile::append(FXint op,FXint arg1,FXint arg2){
-  register FXint *val=pc;
+FXshort* FXCompile::append(FXshort op,FXshort arg1,FXshort arg2){
+  register FXshort *val=pc;
   if(code){
     pc[0]=op;
     pc[1]=arg1;
@@ -1582,8 +1831,8 @@ FXint* FXCompile::append(FXint op,FXint arg1,FXint arg2){
 
 
 // Append character class opcode
-FXint* FXCompile::append(FXint op,FXint set[]){
-  register FXint *val=pc;
+FXshort* FXCompile::append(FXshort op,const FXshort set[]){
+  register FXshort *val=pc;
   if(code){
     pc[0]=op;
     pc[1]=set[0];
@@ -1594,29 +1843,37 @@ FXint* FXCompile::append(FXint op,FXint set[]){
     pc[6]=set[5];
     pc[7]=set[6];
     pc[8]=set[7];
+    pc[9]=set[8];
+    pc[10]=set[9];
+    pc[11]=set[10];
+    pc[12]=set[11];
+    pc[13]=set[12];
+    pc[14]=set[13];
+    pc[15]=set[14];
+    pc[16]=set[15];
     }
-  pc+=9;
+  pc+=17;
   return val;
   }
 
 
 // Append character array
-FXint* FXCompile::append(FXint op,FXint len,FXint *data){
-  register FXint *val=pc;
+FXshort* FXCompile::append(FXshort op,FXshort len,const FXchar *data){
+  register FXshort *val=pc;
   if(code){
     pc[0]=op;
     pc[1]=len;
-    memcpy(pc+2,data,sizeof(FXint)*len);
+    memcpy(pc+2,data,len);
     }
-  pc+=len+2;
+  pc+=(len+5)>>1;
   return val;
   }
 
 
 // Insert opcode at ptr
-FXint* FXCompile::insert(FXint *ptr,FXint op){
+FXshort* FXCompile::insert(FXshort *ptr,FXshort op){
   if(code){
-    memmove(ptr+1,ptr,sizeof(FXint)*(pc-ptr));
+    memmove(ptr+1,ptr,sizeof(FXshort)*(pc-ptr));
     ptr[0]=op;
     }
   pc+=1;
@@ -1625,9 +1882,9 @@ FXint* FXCompile::insert(FXint *ptr,FXint op){
 
 
 // Insert one-argument opcode at ptr
-FXint* FXCompile::insert(FXint *ptr,FXint op,FXint arg){
+FXshort* FXCompile::insert(FXshort *ptr,FXshort op,FXshort arg){
   if(code){
-    memmove(ptr+2,ptr,sizeof(FXint)*(pc-ptr));
+    memmove(ptr+2,ptr,sizeof(FXshort)*(pc-ptr));
     ptr[0]=op;
     ptr[1]=arg;
     }
@@ -1637,9 +1894,9 @@ FXint* FXCompile::insert(FXint *ptr,FXint op,FXint arg){
 
 
 // Insert two-argument opcode at ptr
-FXint* FXCompile::insert(FXint *ptr,FXint op,FXint arg1,FXint arg2){
+FXshort* FXCompile::insert(FXshort *ptr,FXshort op,FXshort arg1,FXshort arg2){
   if(code){
-    memmove(ptr+3,ptr,sizeof(FXint)*(pc-ptr));
+    memmove(ptr+3,ptr,sizeof(FXshort)*(pc-ptr));
     ptr[0]=op;
     ptr[1]=arg1;
     ptr[2]=arg2;
@@ -1667,8 +1924,8 @@ FXint* FXCompile::insert(FXint *ptr,FXint op,FXint arg1,FXint arg2){
 //      9:  ....       9:  ....
 // to->10:  ....      10:  ....
 //
-void FXCompile::patch(FXint *fm,FXint *to){
-  register FXint delta;
+void FXCompile::patch(FXshort *fm,FXshort *to){
+  register FXshort delta;
   if(code && fm){
     do{
       delta=*fm;
@@ -1681,7 +1938,7 @@ void FXCompile::patch(FXint *fm,FXint *to){
 
 
 // Fix value
-void FXCompile::fix(FXint *ptr,FXint val){
+void FXCompile::fix(FXshort *ptr,FXshort val){
   if(code && ptr){
     ptr[0]=val;
     }
@@ -1693,7 +1950,7 @@ void FXCompile::fix(FXint *ptr,FXint val){
 // FXExecute members
 
 // The workhorse
-FXbool FXExecute::match(const FXint* prog){
+FXbool FXExecute::match(const FXshort* prog){
   register FXint no,keep,rep_min,rep_max,greed,op;
   register const FXchar *save,*beg,*end;
   register FXchar ch;
@@ -1722,26 +1979,34 @@ FXbool FXExecute::match(const FXint* prog){
         prog++;
         break;
       case OP_LINE_BEG:       // Must be at begin of line
-        if(str_beg<str && *(str-1)!='\n') return false;
-        if(str<=str_beg && (mode&FXRex::NotBol)) return false;
+        if(str_beg<str){
+          if(*(str-1)!='\n') return false;
+          }
+        else{
+          if(mode&FXRex::NotBol) return false;
+          }
         break;
       case OP_LINE_END:       // Must be at end of line
-        if(str<str_end && *str!='\n') return false;
-        if(str>=str_end && (mode&FXRex::NotEol)) return false;
+        if(str<str_end){
+          if(*str!='\n') return false;
+          }
+        else{
+          if(mode&FXRex::NotEol) return false;
+          }
         break;
       case OP_WORD_BEG:       // Must be at begin of word
-        if(str_beg<str && isWord(*(str-1))) return false;
+        if(str_beg<str && isWord(*(str-1))) return false;               // FIXME before start of subject is non-word
         if(str_end<=str || !isWord(*str)) return false;
         break;
-      case OP_WORD_END:       // Must be at end of word
+      case OP_WORD_END:       // Must be at end of word                 // FIXME after end of subject is non-word
         if(str<str_end && isWord(*str)) return false;
         if(str<=str_beg || !isWord(*(str-1))) return false;
         break;
-      case OP_WORD_BND:       // Must be at word boundary
+      case OP_WORD_BND:       // Must be at word boundary               // FIXME see above
         if(!(((str==str_beg || !isWord(*(str-1))) && (str<str_end && isWord(*str))) ||
              ((str==str_end || !isWord(*str)) && (str_beg<str && isWord(*(str-1)))))) return false;
         break;
-      case OP_WORD_INT:       // Must be inside a word
+      case OP_WORD_INT:       // Must be inside a word                  // FIXME see above
         if(str==str_beg || !isWord(*(str-1))) return false;
         if(str==str_end || !isWord(*str)) return false;
         break;
@@ -1753,16 +2018,21 @@ FXbool FXExecute::match(const FXint* prog){
         break;
       case OP_ANY_OF:         // Match a character in a set
         if(str==str_end || !ISIN(prog,*str)) return false;
-        prog+=8;
+        prog+=16;
         str++;
         break;
       case OP_ANY_BUT:        // Match a character NOT in a set
         if(str==str_end || ISIN(prog,*str)) return false;
-        prog+=8;
+        prog+=16;
         str++;
         break;
       case OP_CHAR:           // Match single character
         if(str==str_end || *prog != (FXuchar)*str) return false;
+        prog++;
+        str++;
+        break;
+      case OP_CHAR_CI:        // Match single character, disregard case
+        if(str==str_end || *prog != Ascii::toLower(*str)) return false;
         prog++;
         str++;
         break;
@@ -1771,27 +2041,26 @@ FXbool FXExecute::match(const FXint* prog){
 //        prog++;
 //        str--;
 //        break;
-      case OP_CHAR_CI:        // Match single character, disregard case
-        if(str==str_end || *prog != Ascii::toLower(*str)) return false;
-        prog++;
-        str++;
-        break;
-      case OP_CHARS:          // Match a run of 1 or more characters
+      case OP_CHARS_NEW:      // Match a run of 1 or more characters
         no=*prog++;
         if(str+no>str_end) return false;
+        save=(const FXchar*)prog;
+        prog+=((no+1)>>1);
         do{
-          if(*prog != (FXuchar)*str) return false;
-          prog++;
+          if(*save != *str) return false;
+          save++;
           str++;
           }
         while(--no);
         break;
-      case OP_CHARS_CI:       // Match a run of 1 or more characters, disregard case
+      case OP_CHARS_CI_NEW:  // Match a run of 1 or more characters, disregard case
         no=*prog++;
         if(str+no>str_end) return false;
+        save=(const FXchar*)prog;
+        prog+=((no+1)>>1);
         do{
-          if(*prog != Ascii::toLower(*str)) return false;
-          prog++;
+          if(*save != Ascii::toLower(*str)) return false;
+          save++;
           str++;
           }
         while(--no);
@@ -1954,7 +2223,7 @@ rep:    if(str+rep_min>str_end) return false;
         // Find out how much could be matched
         op=*prog++;
         switch(op){
-          case OP_CHAR:         // For UTF8 we should have OP_CHAR2, OP_CHAR3, ... OP_CHAR6, for  possible UTF8 lengths
+          case OP_CHAR:
             ch=*prog++;
             while(save<end && (FXuchar)*save==ch) save++;
             break;
@@ -1962,23 +2231,27 @@ rep:    if(str+rep_min>str_end) return false;
             ch=*prog++;
             while(save<end && Ascii::toLower(*save)==ch && *save!='\n') save++;
             break;
-          case OP_CHARS:
-            ch=*++prog;
-            while(save<end && (FXuchar)*save==ch) save++;
-            prog+=3;
+          case OP_CHARS_NEW:
+            no=*prog++;
+            prog+=((no+1)>>1);
+            // FIXME //
+            FXASSERT(0);
+            return false;
             break;
-          case OP_CHARS_CI:
-            ch=*++prog;
-            while(save<end && Ascii::toLower(*save)==ch) save++;
-            prog+=3;
+          case OP_CHARS_CI_NEW:
+            no=*prog++;
+            prog+=((no+1)>>1);
+            // FIXME //
+            FXASSERT(0);
+            return false;
             break;
           case OP_ANY_OF:
             while(save<end && ISIN(prog,*save)) save++;
-            prog+=8;
+            prog+=16;
             break;
           case OP_ANY_BUT:
             while(save<end && !ISIN(prog,*save)) save++;
-            prog+=8;
+            prog+=16;
             break;
           case OP_SPACE:
             while(save<end && *save!='\n' && Ascii::isSpace(*save)) save++;
@@ -2183,6 +2456,10 @@ rep:    if(str+rep_min>str_end) return false;
         if((op-OP_BEHIND_NEG)!=keep) return false;      // Didn't get what we expected
         prog=prog+*prog;                // Jump to code after OP_SUCCEED
         break;
+      case OP_ATOMIC:
+        if(!match(prog+1)) return false;
+        prog=prog+*prog;                // Jump to code after OP_SUCCEED
+        break;
       case OP_ZERO_0:                   // Initialize counter for counting repeat
       case OP_ZERO_1:
       case OP_ZERO_2:
@@ -2271,6 +2548,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
 
   // Match backwards
   if(mode&FXRex::Backward){
+#if 0
     if(code[1]==OP_STR_BEG){                          // Anchored at string start
       return (fm==str_beg) && attempt(str_beg);
       }
@@ -2299,6 +2577,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
         }
       return false;
       }
+#endif
     while(fm<=to){                                    // General case
       if(attempt(to)) return true;
       to--;
@@ -2307,6 +2586,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
 
   // Match forwards
   else{
+#if 0
     if(code[1]==OP_STR_BEG){                          // Anchored at string start
       return (fm==str_beg) && attempt(str_beg);
       }
@@ -2335,6 +2615,7 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
         }
       return false;
       }
+#endif
     while(fm<=to){                                   // General case
       if(attempt(fm)) return true;
       fm++;
@@ -2371,17 +2652,17 @@ const FXchar *const FXRex::errors[]={
 
 
 // Default program always fails
-const FXint FXRex::fallback[]={2,OP_FAIL};
+const FXshort FXRex::fallback[]={2,OP_FAIL};
 
 
 
 // Construct empty regular expression object
-FXRex::FXRex():code((FXint*)(void*)fallback){
+FXRex::FXRex():code((FXshort*)(void*)fallback){
   }
 
 
 // Copy regex object
-FXRex::FXRex(const FXRex& orig):code((FXint*)(void*)fallback){
+FXRex::FXRex(const FXRex& orig):code((FXshort*)(void*)fallback){
   if(orig.code!=fallback){
     dupElms(code,orig.code,orig.code[0]);
     }
@@ -2389,14 +2670,14 @@ FXRex::FXRex(const FXRex& orig):code((FXint*)(void*)fallback){
 
 
 // Compile expression from pattern; fail if error
-FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error):code((FXint*)(void*)fallback){
+FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error):code((FXshort*)(void*)fallback){
   FXRex::Error err=parse(pattern,mode);
   if(error){ *error=err; }
   }
 
 
 // Compile expression from pattern; fail if error
-FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXint*)(void*)fallback){
+FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXshort*)(void*)fallback){
   FXRex::Error err=parse(pattern.text(),mode);
   if(error){ *error=err; }
   }
@@ -2406,7 +2687,7 @@ FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXint
 FXRex& FXRex::operator=(const FXRex& orig){
   if(code!=orig.code){
     if(code!=fallback) freeElms(code);
-    code=(FXint*)(void*)fallback;
+    code=(FXshort*)(void*)fallback;
     if(orig.code!=fallback){
       dupElms(code,orig.code,orig.code[0]);
       }
@@ -2430,7 +2711,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
 
   // Free old code, if any
   if(code!=fallback) freeElms(code);
-  code=(FXint*)(void*)fallback;
+  code=(FXshort*)(void*)fallback;
 
   // Check
   if(pattern){
@@ -2454,9 +2735,9 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
       if(!(mode&FXRex::Syntax)){
 
         // Allocate new code
-        size=cs.pc-((FXint*)NULL);
+        size=cs.pc-((FXshort*)NULL);
         if(!allocElms(code,size)){
-          code=(FXint*)(void*)fallback;
+          code=(FXshort*)(void*)fallback;
           return FXRex::ErrMemory;
           }
 
@@ -2566,7 +2847,7 @@ FXbool FXRex::operator!=(const FXRex& rex) const {
 
 // Save
 FXStream& operator<<(FXStream& store,const FXRex& s){
-  FXint size=s.code[0];
+  FXshort size=s.code[0];
   store << size;
   store.save(s.code+1,size-1);
   return store;
@@ -2575,7 +2856,7 @@ FXStream& operator<<(FXStream& store,const FXRex& s){
 
 // Load
 FXStream& operator>>(FXStream& store,FXRex& s){
-  FXint size;
+  FXshort size;
   store >> size;
   allocElms(s.code,size);
   store.load(s.code+1,size-1);

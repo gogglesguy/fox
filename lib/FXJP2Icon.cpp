@@ -3,7 +3,7 @@
 *                   J P E G - 2 0 0 0   I c o n   O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2009 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2009,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -90,7 +90,8 @@ FXbool FXJP2Icon::loadPixels(FXStream& store){
   FXColor *pixels; FXint w,h;
   if(fxloadJP2(store,pixels,w,h,quality)){
     setData(pixels,IMAGE_OWNED,w,h);
-    if(options&IMAGE_ALPHAGUESS) transp=guesstransp();
+    if(options&IMAGE_ALPHAGUESS) setTransparentColor(guesstransp());
+    if(options&IMAGE_THRESGUESS) setThresholdValue(guessthresh());
     return true;
     }
   return false;

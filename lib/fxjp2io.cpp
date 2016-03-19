@@ -3,7 +3,7 @@
 *                    J P E G - 2 0 0 0   I n p u t / O u t p u t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2009 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2009,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -262,7 +262,7 @@ FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       freeElms(ptr);
       }
     }
-x:store.swapBytes(swap);
+  store.swapBytes(swap);
   return result;
   }
 

@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -91,6 +91,8 @@
     one is assumed to be of type "int".
     Its therefore best if no parameters are skipped; referencing a single parameter
     multiple times however, is no problem!!
+  - FIXME Subtle difference between glibc: does NOT output '\0' at the end.  So
+    is one off.  This implementation is better for our purposes, however.
 */
 
 #define CONVERTSIZE     512     // Convertsion buffer

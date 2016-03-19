@@ -3,7 +3,7 @@
 *                         T o p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -365,7 +365,8 @@ void FXTopWindow::raise(){
   FXShell::raise();
   if(xid){
 #ifdef WIN32
-    SetForegroundWindow((HWND)xid);
+//    SetForegroundWindow((HWND)xid);
+    SetActiveWindow((HWND)xid);
 #else
     XEvent se;
     se.xclient.type=ClientMessage;
@@ -923,6 +924,30 @@ FXbool FXTopWindow::minimize(FXbool notify){
   return false;
   }
 
+#if 0
+
+    // Go to fullscreen
+    DWORD dWStyle=GetWindowLong((HWND)xid,GWL_STYLE);
+    WINDOWPLACEMENT windowplacement={sizeof(WINDOWPLACEMENT)};
+    if(GetWindowPlacement((HWND)xid,&windowplacement)){
+      HANDLE hmonitor=fxMonitorFromWindow((HWND)xid,MONITOR_DEFAULTTOPRIMARY);
+      if(hmonitor){
+        MYMONITORINFO monitorinfo={sizeof(MYMONITORINFO)};
+        if(fxGetMonitorInfo(hmonitor,&monitorinfo)){
+          SetWindowLong((HWND)xid,GWL_STYLE,dwStyle&~WS_OVERLAPPEDWINDOW);
+          SetWindowPos((HWND)xid,HWND_TOP,monitorinfo.rcMonitor.left,monitorinfo.rcMonitor.top,monitorinfo.rcMonitor.right-monitorinfo.rcMonitor.left,monitorinfo.rcMonitor.bottom-monitorinfo.rcMonitor.top,SWP_NOOWNERZORDER|SWP_FRAMECHANGED);
+          }
+        }
+      }
+
+    // Go back to normal
+    DWORD dWStyle=GetWindowLong((HWND)xid,GWL_STYLE);
+    SetWindowLong((HWND)xid,GWL_STYLE,dwStyle|WS_OVERLAPPEDWINDOW);
+    SetWindowPlacement((HWND)xid,&windowplacement);
+    SetWindowPos((HWND)xid,NULL,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_NOOWNERZORDER|SWP_FRAMECHANGED);
+  
+
+#endif
 
 // Make window full screen, return true if success
 FXbool FXTopWindow::fullScreen(FXbool notify){
@@ -1831,7 +1856,7 @@ void FXTopWindow::load(FXStream& store){
 FXTopWindow::~FXTopWindow(){
 #ifdef WIN32
   HICON icold;
-  if((icold=(HICON)SendMessage((HWND)xid,WM_SETICON,ICON_BIG,0))!=0){
+  if((icold=(HICON)SendMessage((HWND)xid,WM_SETICON,ICON_BIG,0))!=0){           // FIXME move to destroy()?
     DestroyIcon(icold);
     }
   if((icold=(HICON)SendMessage((HWND)xid,WM_SETICON,ICON_SMALL,0))!=0){

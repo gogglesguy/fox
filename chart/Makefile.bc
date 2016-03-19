@@ -3,9 +3,7 @@
 #                  FOX:  A Free C++ Class Library for X                      #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 2004 by Jeroen van der Zijp.   All Rights Reserved.          #
-##############################################################################
-# $Id: Makefile.bc,v 1.8 2007/07/09 15:38:10 fox Exp $                       #
+# Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or modify       #
 # it under the terms of the GNU Lesser General Public License as published   #
@@ -32,8 +30,8 @@ LD        = bcc32
 LDFLAGS   = -laa
 GLLIBS    = opengl32.lib glu32.lib
 INCDIRS   = -I$(TOPDIR)\include
-FOXLIB    = $(TOPDIR)\src\FOX-1.7.lib
-CHARTLIB  = $(TOPDIR)\src\CHART-1.7.lib
+FOXLIB    = $(TOPDIR)\lib\FOX-1.7.lib
+CHARTLIB  = $(TOPDIR)\lib\CHART-1.7.lib
 RESWRAP   = $(TOPDIR)\utils\reswrap.exe
 
 

@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -46,19 +46,27 @@ using namespace FX;
 namespace FX {
 
 
+// Initialize matrix from scalar
+FXMat3f::FXMat3f(FXfloat s){
+  m[0][0]=s; m[0][1]=s; m[0][2]=s;
+  m[1][0]=s; m[1][1]=s; m[1][2]=s;
+  m[2][0]=s; m[2][1]=s; m[2][2]=s;
+  }
+
+
 // Initialize matrix from another matrix
-FXMat3f::FXMat3f(const FXMat3f& other){
-  m[0]=other[0];
-  m[1]=other[1];
-  m[2]=other[2];
+FXMat3f::FXMat3f(const FXMat3f& s){
+  m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
+  m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
+  m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
   }
 
 
 // Initialize from rotation and scaling part of 4x4 matrix
-FXMat3f::FXMat3f(const FXMat4f& other){
-  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
-  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
-  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+FXMat3f::FXMat3f(const FXMat4f& s){
+  m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
+  m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
+  m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
   }
 
 
@@ -67,14 +75,6 @@ FXMat3f::FXMat3f(const FXfloat s[]){
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
   m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
   m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
-  }
-
-
-// Initialize matrix from scalar
-FXMat3f::FXMat3f(FXfloat w){
-  m[0][0]=w; m[0][1]=w; m[0][2]=w;
-  m[1][0]=w; m[1][1]=w; m[1][2]=w;
-  m[2][0]=w; m[2][1]=w; m[2][2]=w;
   }
 
 
@@ -108,20 +108,29 @@ FXMat3f::FXMat3f(const FXQuatf& quat){
   }
 
 
+// Assign from scalar
+FXMat3f& FXMat3f::operator=(FXfloat s){
+  m[0][0]=s; m[0][1]=s; m[0][2]=s;
+  m[1][0]=s; m[1][1]=s; m[1][2]=s;
+  m[2][0]=s; m[2][1]=s; m[2][2]=s;
+  return *this;
+  }
+
+
 // Assignment operator
-FXMat3f& FXMat3f::operator=(const FXMat3f& other){
-  m[0]=other[0];
-  m[1]=other[1];
-  m[2]=other[2];
+FXMat3f& FXMat3f::operator=(const FXMat3f& s){
+  m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
+  m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
+  m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
   return *this;
   }
 
 
 // Assign from rotation and scaling part of 4x4 matrix
-FXMat3f& FXMat3f::operator=(const FXMat4f& other){
-  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
-  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
-  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+FXMat3f& FXMat3f::operator=(const FXMat4f& s){
+  m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
+  m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
+  m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
   return *this;
   }
 
@@ -135,29 +144,29 @@ FXMat3f& FXMat3f::operator=(const FXfloat s[]){
   }
 
 
-// Assign from scalar
-FXMat3f& FXMat3f::operator=(FXfloat w){
-  m[0][0]=w; m[0][1]=w; m[0][2]=w;
-  m[1][0]=w; m[1][1]=w; m[1][2]=w;
-  m[2][0]=w; m[2][1]=w; m[2][2]=w;
+// Set value from scalar
+FXMat3f& FXMat3f::set(FXfloat s){
+  m[0][0]=s; m[0][1]=s; m[0][2]=s;
+  m[1][0]=s; m[1][1]=s; m[1][2]=s;
+  m[2][0]=s; m[2][1]=s; m[2][2]=s;
   return *this;
   }
 
 
 // Set value from another matrix
-FXMat3f& FXMat3f::set(const FXMat3f& other){
-  m[0]=other[0];
-  m[1]=other[1];
-  m[2]=other[2];
+FXMat3f& FXMat3f::set(const FXMat3f& s){
+  m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
+  m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
+  m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
   return *this;
   }
 
 
 // Set from rotation and scaling part of 4x4 matrix
-FXMat3f& FXMat3f::set(const FXMat4f& other){
-  m[0][0]=other[0][0]; m[0][1]=other[0][1]; m[0][2]=other[0][2];
-  m[1][0]=other[1][0]; m[1][1]=other[1][1]; m[1][2]=other[1][2];
-  m[2][0]=other[2][0]; m[2][1]=other[2][1]; m[2][2]=other[2][2];
+FXMat3f& FXMat3f::set(const FXMat4f& s){
+  m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
+  m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
+  m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
   return *this;
   }
 
@@ -167,15 +176,6 @@ FXMat3f& FXMat3f::set(const FXfloat s[]){
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
   m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
   m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
-  return *this;
-  }
-
-
-// Set value from scalar
-FXMat3f& FXMat3f::set(FXfloat w){
-  m[0][0]=w; m[0][1]=w; m[0][2]=w;
-  m[1][0]=w; m[1][1]=w; m[1][2]=w;
-  m[2][0]=w; m[2][1]=w; m[2][2]=w;
   return *this;
   }
 
@@ -277,107 +277,6 @@ FXMat3f FXMat3f::operator-() const {
   }
 
 
-// Add matrices
-FXMat3f FXMat3f::operator+(const FXMat3f& w) const {
-  return FXMat3f(m[0][0]+w[0][0],m[0][1]+w[0][1],m[0][2]+w[0][2],
-                 m[1][0]+w[1][0],m[1][1]+w[1][1],m[1][2]+w[1][2],
-                 m[2][0]+w[2][0],m[2][1]+w[2][1],m[2][2]+w[2][2]);
-  }
-
-
-// Substract matrices
-FXMat3f FXMat3f::operator-(const FXMat3f& w) const {
-  return FXMat3f(m[0][0]-w[0][0],m[0][1]-w[0][1],m[0][2]-w[0][2],
-                 m[1][0]-w[1][0],m[1][1]-w[1][1],m[1][2]-w[1][2],
-                 m[2][0]-w[2][0],m[2][1]-w[2][1],m[2][2]-w[2][2]);
-  }
-
-
-// Multiply matrices
-FXMat3f FXMat3f::operator*(const FXMat3f& w) const {
-  register FXfloat x,y,z;
-  FXMat3f r;
-  x=m[0][0]; y=m[0][1]; z=m[0][2];
-  r[0][0]=x*w[0][0]+y*w[1][0]+z*w[2][0];
-  r[0][1]=x*w[0][1]+y*w[1][1]+z*w[2][1];
-  r[0][2]=x*w[0][2]+y*w[1][2]+z*w[2][2];
-  x=m[1][0]; y=m[1][1]; z=m[1][2];
-  r[1][0]=x*w[0][0]+y*w[1][0]+z*w[2][0];
-  r[1][1]=x*w[0][1]+y*w[1][1]+z*w[2][1];
-  r[1][2]=x*w[0][2]+y*w[1][2]+z*w[2][2];
-  x=m[2][0]; y=m[2][1]; z=m[2][2];
-  r[2][0]=x*w[0][0]+y*w[1][0]+z*w[2][0];
-  r[2][1]=x*w[0][1]+y*w[1][1]+z*w[2][1];
-  r[2][2]=x*w[0][2]+y*w[1][2]+z*w[2][2];
-  return r;
-  }
-
-
-// Multiply scalar by matrix
-FXMat3f operator*(FXfloat x,const FXMat3f& m){
-  return FXMat3f(x*m[0][0],x*m[0][1],x*m[0][2],
-                 x*m[1][0],x*m[1][1],x*m[1][2],
-                 x*m[2][0],x*m[2][1],x*m[2][2]);
-  }
-
-
-// Multiply matrix by scalar
-FXMat3f operator*(const FXMat3f& m,FXfloat x){
-  return FXMat3f(m[0][0]*x,m[0][1]*x,m[0][2]*x,
-                 m[1][0]*x,m[1][1]*x,m[1][2]*x,
-                 m[2][0]*x,m[2][1]*x,m[2][2]*x);
-  }
-
-
-// Divide scalar by matrix
-FXMat3f operator/(FXfloat x,const FXMat3f& m){
-  return FXMat3f(x/m[0][0],x/m[0][1],x/m[0][2],
-                 x/m[1][0],x/m[1][1],x/m[1][2],
-                 x/m[2][0],x/m[2][1],x/m[2][2]);
-  }
-
-
-// Divide matrix by scalar
-FXMat3f operator/(const FXMat3f& m,FXfloat x){
-  return FXMat3f(m[0][0]/x,m[0][1]/x,m[0][2]/x,
-                 m[1][0]/x,m[1][1]/x,m[1][2]/x,
-                 m[2][0]/x,m[2][1]/x,m[2][2]/x);
-  }
-
-
-// Matrix times vector
-FXVec3f FXMat3f::operator*(const FXVec3f& v) const {
-  register FXfloat x=v.x,y=v.y,z=v.z;
-  return FXVec3f(x*m[0][0]+y*m[0][1]+z*m[0][2], x*m[1][0]+y*m[1][1]+z*m[1][2], x*m[2][0]+y*m[2][1]+z*m[2][2]);
-  }
-
-
-// Matrix times vector
-FXVec2f FXMat3f::operator*(const FXVec2f& v) const {
-  register FXfloat x=v.x,y=v.y;
-  FXASSERT(m[0][2]==0.0f && m[1][2]==0.0f && m[2][2]==1.0f);
-  return FXVec2f(x*m[0][0]+y*m[0][1]+m[0][2], x*m[1][0]+y*m[1][1]+m[1][2]);
-  }
-
-
-// Equality
-FXbool FXMat3f::operator==(const FXMat3f& a) const { return m[0]==a.m[0] && m[1]==a.m[1] && m[2]==a.m[2]; }
-
-
-// Inequality
-FXbool FXMat3f::operator!=(const FXMat3f& a) const { return m[0]!=a.m[0] || m[1]!=a.m[1] || m[2]!=a.m[2]; }
-
-
-// Equality
-FXbool operator==(const FXMat3f& a,FXfloat n){ return a[0]==n && a[1]==n && a[2]==n; }
-FXbool operator==(FXfloat n,const FXMat3f& a){ return n==a[0] && n==a[1] && n==a[2]; }
-
-
-// Inequality
-FXbool operator!=(const FXMat3f& a,FXfloat n){ return a[0]!=n || a[1]!=n || a[2]!=n; }
-FXbool operator!=(FXfloat n,const FXMat3f& a){ return n!=a[0] || n!=a[1] || n!=a[2]; }
-
-
 // Set to identity matrix
 FXMat3f& FXMat3f::identity(){
   m[0][0]=1.0f; m[0][1]=0.0f; m[0][2]=0.0f;
@@ -453,33 +352,158 @@ FXMat3f FXMat3f::transpose() const {
 
 // Invert matrix
 FXMat3f FXMat3f::invert() const {
-  register FXfloat dt;
+  register FXfloat dd;
   FXMat3f res;
   res[0][0]=m[1][1]*m[2][2]-m[1][2]*m[2][1];
   res[0][1]=m[0][2]*m[2][1]-m[0][1]*m[2][2];
   res[0][2]=m[0][1]*m[1][2]-m[0][2]*m[1][1];
-
   res[1][0]=m[1][2]*m[2][0]-m[1][0]*m[2][2];
   res[1][1]=m[0][0]*m[2][2]-m[0][2]*m[2][0];
   res[1][2]=m[0][2]*m[1][0]-m[0][0]*m[1][2];
-
   res[2][0]=m[1][0]*m[2][1]-m[1][1]*m[2][0];
   res[2][1]=m[0][1]*m[2][0]-m[0][0]*m[2][1];
   res[2][2]=m[0][0]*m[1][1]-m[0][1]*m[1][0];
-
-  dt=m[0][0]*res[0][0]+m[0][1]*res[1][0]+m[0][2]*res[2][0];
-  FXASSERT(dt!=0.0f);
-
-  res[0][0]/=dt;
-  res[0][1]/=dt;
-  res[0][2]/=dt;
-  res[1][0]/=dt;
-  res[1][1]/=dt;
-  res[1][2]/=dt;
-  res[2][0]/=dt;
-  res[2][1]/=dt;
-  res[2][2]/=dt;
+  dd=m[0][0]*res[0][0]+m[0][1]*res[1][0]+m[0][2]*res[2][0];
+  FXASSERT(dd!=0.0f);
+  dd=1.0f/dd;
+  res[0][0]*=dd;
+  res[0][1]*=dd;
+  res[0][2]*=dd;
+  res[1][0]*=dd;
+  res[1][1]*=dd;
+  res[1][2]*=dd;
+  res[2][0]*=dd;
+  res[2][1]*=dd;
+  res[2][2]*=dd;
   return res;
+  }
+
+
+// Matrix times vector
+FXVec2f operator*(const FXMat3f& m,const FXVec2f& v){
+  return FXVec2f(m[0][0]*v[0]+m[0][1]*v[1]+m[0][2], m[1][0]*v[0]+m[1][1]*v[1]+m[1][2]);
+  }
+
+
+// Matrix times vector
+FXVec3f operator*(const FXMat3f& m,const FXVec3f& v){
+  return FXVec3f(m[0][0]*v[0]+m[0][1]*v[1]+m[0][2]*v[2], m[1][0]*v[0]+m[1][1]*v[1]+m[1][2]*v[2], m[2][0]*v[0]+m[2][1]*v[1]+m[2][2]*v[2]);
+  }
+
+
+// Vector times matrix
+FXVec2f operator*(const FXVec2f& v,const FXMat3f& m){
+  return FXVec2f(v[0]*m[0][0]+v[1]*m[1][0]+m[2][0],v[0]*m[0][1]+v[1]*m[1][1]+m[2][1]);
+  }
+
+
+// Vector times matrix
+FXVec3f operator*(const FXVec3f& v,const FXMat3f& m){
+  return FXVec3f(v[0]*m[0][0]+v[1]*m[1][0]+v[2]*m[2][0], v[0]*m[0][1]+v[1]*m[1][1]+v[2]*m[2][1], v[0]*m[0][2]+v[1]*m[1][2]+v[2]*m[2][2]);
+  }
+
+
+// Matrix and matrix add
+FXMat3f operator+(const FXMat3f& a,const FXMat3f& b){
+  return FXMat3f(a[0][0]+b[0][0],a[0][1]+b[0][1],a[0][2]+b[0][2],
+                 a[1][0]+b[1][0],a[1][1]+b[1][1],a[1][2]+b[1][2],
+                 a[2][0]+b[2][0],a[2][1]+b[2][1],a[2][2]+b[2][2]);
+  }
+
+
+// Matrix and matrix subtract
+FXMat3f operator-(const FXMat3f& a,const FXMat3f& b){
+  return FXMat3f(a[0][0]-b[0][0],a[0][1]-b[0][1],a[0][2]-b[0][2],
+                 a[1][0]-b[1][0],a[1][1]-b[1][1],a[1][2]-b[1][2],
+                 a[2][0]-b[2][0],a[2][1]-b[2][1],a[2][2]-b[2][2]);
+  }
+
+
+// Matrix and matrix multiply
+FXMat3f operator*(const FXMat3f& a,const FXMat3f& b){
+  register FXfloat x,y,z;
+  FXMat3f r;
+  x=a[0][0]; y=a[0][1]; z=a[0][2];
+  r[0][0]=x*b[0][0]+y*b[1][0]+z*b[2][0];
+  r[0][1]=x*b[0][1]+y*b[1][1]+z*b[2][1];
+  r[0][2]=x*b[0][2]+y*b[1][2]+z*b[2][2];
+  x=a[1][0]; y=a[1][1]; z=a[1][2];
+  r[1][0]=x*b[0][0]+y*b[1][0]+z*b[2][0];
+  r[1][1]=x*b[0][1]+y*b[1][1]+z*b[2][1];
+  r[1][2]=x*b[0][2]+y*b[1][2]+z*b[2][2];
+  x=a[2][0]; y=a[2][1]; z=a[2][2];
+  r[2][0]=x*b[0][0]+y*b[1][0]+z*b[2][0];
+  r[2][1]=x*b[0][1]+y*b[1][1]+z*b[2][1];
+  r[2][2]=x*b[0][2]+y*b[1][2]+z*b[2][2];
+  return r;
+  }
+
+
+// Multiply scalar by matrix
+FXMat3f operator*(FXfloat x,const FXMat3f& m){
+  return FXMat3f(x*m[0][0],x*m[0][1],x*m[0][2],
+                 x*m[1][0],x*m[1][1],x*m[1][2],
+                 x*m[2][0],x*m[2][1],x*m[2][2]);
+  }
+
+
+// Multiply matrix by scalar
+FXMat3f operator*(const FXMat3f& m,FXfloat x){
+  return FXMat3f(m[0][0]*x,m[0][1]*x,m[0][2]*x,
+                 m[1][0]*x,m[1][1]*x,m[1][2]*x,
+                 m[2][0]*x,m[2][1]*x,m[2][2]*x);
+  }
+
+
+// Divide scalar by matrix
+FXMat3f operator/(FXfloat x,const FXMat3f& m){
+  return FXMat3f(x/m[0][0],x/m[0][1],x/m[0][2],
+                 x/m[1][0],x/m[1][1],x/m[1][2],
+                 x/m[2][0],x/m[2][1],x/m[2][2]);
+  }
+
+
+// Divide matrix by scalar
+FXMat3f operator/(const FXMat3f& m,FXfloat x){
+  return FXMat3f(m[0][0]/x,m[0][1]/x,m[0][2]/x,
+                 m[1][0]/x,m[1][1]/x,m[1][2]/x,
+                 m[2][0]/x,m[2][1]/x,m[2][2]/x);
+  }
+
+
+// Matrix and matrix equality
+FXbool operator==(const FXMat3f& a,const FXMat3f& b){
+  return a[0]==b[0] && a[1]==b[1] && a[2]==b[2];
+  }
+
+
+// Matrix and matrix inequality
+FXbool operator!=(const FXMat3f& a,const FXMat3f& b){
+  return a[0]!=b[0] || a[1]!=b[1] || a[2]!=b[2];
+  }
+
+
+// Matrix and scalar equality
+FXbool operator==(const FXMat3f& a,FXfloat n){
+  return a[0]==n && a[1]==n && a[2]==n;
+  }
+
+
+// Matrix and scalar inequality
+FXbool operator!=(const FXMat3f& a,FXfloat n){
+  return a[0]!=n || a[1]!=n || a[2]!=n;
+  }
+
+
+// Scalar and matrix equality
+FXbool operator==(FXfloat n,const FXMat3f& a){
+  return n==a[0] && n==a[1] && n==a[2];
+  }
+
+
+// Scalar and matrix inequality
+FXbool operator!=(FXfloat n,const FXMat3f& a){
+  return n!=a[0] || n!=a[1] || n!=a[2];
   }
 
 

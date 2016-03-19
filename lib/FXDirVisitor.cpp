@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -127,7 +127,7 @@ FXuint FXDirVisitor::leave(const FXString& path){
   FXTRACE((1,"leave(%s)\n",path.text()));
   return 1;
   }
-  
+
 /*
 // Recursively visit files and directories
 FXint FXDirVisitor::traverse(const FXString& path,const FXString& pattern,FXuint flags){

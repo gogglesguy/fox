@@ -3,7 +3,7 @@
 *                           S e t t i n g s   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,7 +51,7 @@
 
   - Extensive error checking in unparseFile() to ensure no settings data is
     lost when disk is full.
-    
+
   - FIXME only writeFormatEntry() still has arbitrary limits.
 */
 
@@ -120,6 +120,7 @@ void FXSettings::deleteData(void* ptr){
 // Parse filename
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
   FXFile file(filename,FXIO::Reading);
+  FXTRACE((1,"%s::parseFile(%s,%d)\n",getClassName(),filename.text(),mrk));
   if(file.isOpen()){
 
     // Prepare buffer string
@@ -227,6 +228,7 @@ next:   while(string[p] && string[p]!='\n') p++;
 // Unparse registry file
 FXbool FXSettings::unparseFile(const FXString& filename){
   FXFile file(filename,FXIO::Writing);
+  FXTRACE((1,"%s::unparseFile(%s)\n",getClassName(),filename.text()));
   if(file.isOpen()){
     FXString string;
 
@@ -272,6 +274,146 @@ FXbool FXSettings::unparseFile(const FXString& filename){
       }
     }
   return false;
+  }
+
+
+// Parse single string to populate settings
+FXbool FXSettings::parse(const FXString& string,FXbool mrk){
+  FXStringDict *group=NULL;
+  FXint lineno=1,p=0,b,e;
+  FXString name;
+  FXString value;
+
+  // Skip BOM, if any
+  if(string[p]=='\xef' && string[p+1]=='\xbb' && string[p+2]=='\xbf') p+=3;
+
+  // Parse one line at a time
+  while(string[p]){
+
+    // Skip leading blanks
+    while(Ascii::isBlank(string[p])) p++;
+
+    // Non-comment
+    if(string[p] && string[p]!='\n' && string[p]!='\r' && string[p]!='#' && string[p]!=';'){
+
+      // Parse section name
+      if(string[p]=='['){
+
+        b=++p;
+
+        // Scan section name
+        while(string[p] && string[p]!=']' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
+
+        // Check errors
+        if(string[p]!=']'){ fxwarning("%d: illegal section name.\n",lineno); goto nxt; }
+
+        e=p++;
+
+        // Grab name
+        name=string.mid(b,e-b);
+
+        // Add new section dict
+        group=insert(name.text());
+        }
+
+      // Parse name-value pair
+      else{
+
+        // Should have seen section prior to this
+        if(!group){ fxwarning("%d: settings entry should follow a section.\n",lineno); goto nxt; }
+
+        b=p;
+
+        // Scan key name
+        while(string[p] && string[p]!='=' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
+
+        // Check errors
+        if(string[p]!='='){ fxwarning("%d: expected '=' to follow key.\n",lineno); goto nxt; }
+
+        e=p++;
+
+        // Remove trailing spaces after name
+        while(b<e && Ascii::isBlank(string[e-1])) e--;
+
+        // Grab name
+        name=string.mid(b,e-b);
+
+        // Skip leading spaces
+        while(Ascii::isBlank(string[p])) p++;
+
+        // Mark value
+        b=p;
+
+        // Scan value
+        while(string[p] && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
+
+        e=p;
+
+        // Remove trailing spaces after value
+        while(b<e && Ascii::isBlank(string[e-1])) e--;
+
+        // Grab the unescaped value
+        value=string.mid(b,e-b).unescape('"','"');
+
+        // Add entry to current section
+        group->replace(name.text(),value.text(),mrk);
+        }
+      }
+
+    // Skip to end of line
+nxt:while(string[p] && string[p]!='\n') p++;
+
+    // End of line
+    if(string[p]=='\n'){
+      lineno++;
+      p++;
+      }
+    }
+  return true;
+  }
+
+
+// Unparse settings to a single string
+FXbool FXSettings::unparse(FXString& string) const {
+
+  string.clear();
+
+  // Loop over all sections
+  for(FXint s=first(); s<size(); s=next(s)){
+
+    // Get group
+    FXStringDict* group=data(s);
+    FXbool sec=false;
+
+    // Loop over all entries
+    for(FXint e=group->first(); e<group->size(); e=group->next(e)){
+
+      // Is key-value pair marked?
+      if(group->mark(e)){
+        FXString value=group->data(e);
+
+        // Write section name if not written yet
+        if(!sec){
+          string.append("[");
+          string.append(key(s));
+          string.append("]" ENDLINE);
+          sec=true;
+          }
+
+        // Write marked key-value pairs only
+        string.append(group->key(e));
+        string.append("=");
+        string.append(value.shouldEscape('"','"') ? value.escape('"','"') : value);
+        string.append(ENDLINE);
+        }
+      }
+
+    // Blank line after end
+    if(sec){
+      string.append(ENDLINE);
+      }
+    }
+  return true;
   }
 
 

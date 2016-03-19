@@ -3,7 +3,7 @@
 *                            D a t e   C l a s s                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -272,11 +272,11 @@ FXDate& FXDate::addYears(FXint y){
 
 // Return current local date
 FXDate FXDate::localDate(){
-#ifdef WIN32
+#if defined(WIN32)
   SYSTEMTIME t;
   GetLocalTime(&t);
   return FXDate(t.wYear,t.wMonth,t.wDay);
-#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_LOCALTIME_R)
   struct tm result,*t;
   time_t ltime;
   time(&ltime);
@@ -294,11 +294,11 @@ FXDate FXDate::localDate(){
 
 // Return current universal (UTC) date
 FXDate FXDate::universalDate(){
-#ifdef WIN32
+#if defined(WIN32)
   SYSTEMTIME t;
   GetSystemTime(&t);
   return FXDate(t.wYear,t.wMonth,t.wDay);
-#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_GMTIME_R)
   struct tm result,*t;
   time_t ltime;
   time(&ltime);

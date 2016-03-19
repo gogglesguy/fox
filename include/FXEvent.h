@@ -3,7 +3,7 @@
 *                         F O X   E v e n t   S t u f f                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -154,6 +154,7 @@ enum {
   SEL_SPACEBALLBUTTONRELEASE,   /// Released space ball button
   SEL_SESSION_NOTIFY,           /// Session is about to close
   SEL_SESSION_CLOSED,           /// Session is closed
+  SEL_COPYDATA,                 /// Copy data message
   SEL_IME_START,                /// IME mode
   SEL_IME_END,                  /// IME mode
   SEL_LAST
@@ -185,8 +186,8 @@ struct FXAPI FXEvent {
   FXRectangle rect;           /// Rectangle
   FXbool      synthetic;      /// True if synthetic expose event
   FXDragType  target;         /// Target drag type being requested
-  
-  /// Initialize empty event 
+
+  /// Initialize empty event
   FXEvent(FXuint t=SEL_NONE){
     type=t;
     time=0;

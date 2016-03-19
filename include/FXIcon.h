@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -53,7 +53,8 @@ protected:
   FXshort  thresh;            // Treshold for etch mask
 protected:
   FXIcon();
-  FXColor guesstransp();
+  FXColor guesstransp() const;
+  FXshort guessthresh() const;
 private:
   FXIcon(const FXIcon&);
   FXIcon &operator=(const FXIcon&);

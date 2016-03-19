@@ -3,7 +3,7 @@
 #                  FOX:  A Free C++ Class Library for X                      #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 2006,2009 by Andre Fornacon.   All Rights Reserved.          #
+# Copyright (C) 2006,2010 by Andre Fornacon.   All Rights Reserved.          #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -31,7 +31,7 @@ LDFLAGS   = -noignorecase
 LIBS	  = c:\dm\lib\advapi32.lib c:\dm\lib\shell32.lib c:\dm\lib\gdi32.lib c:\dm\lib\wsock32.lib c:\dm\lib\winspool.lib
 GLLIBS	  = opengl32.lib glu32.lib
 INCDIRS   = -I$(TOPDIR)\include
-FOXLIB	  = $(TOPDIR)\src\FOX-1.6.lib
+FOXLIB	  = $(TOPDIR)\lib\FOX-1.6.lib
 RESWRAP	  = $(TOPDIR)\utils\reswrap.exe
 
 PROGRAMS  = adie.exe

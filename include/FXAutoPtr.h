@@ -3,7 +3,7 @@
 *                      A u t o m a t i c   P o i n t e r                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -25,7 +25,7 @@ namespace FX {
 
 
 /// Automatic pointer
-template<class EType> class FXAutoPtr {
+template <class EType> class FXAutoPtr {
 private:
   EType* ptr;
 public:
@@ -37,7 +37,7 @@ public:
   FXAutoPtr(FXAutoPtr& src):ptr(src.release()){ }
 
   /// Construct from another automatic pointer of compatible type
-  template<class T> FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
+  template <class T> FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
 
   /// Assign from pointer
   FXAutoPtr& operator=(EType *src){ ptr=src; return *this; }
@@ -46,7 +46,7 @@ public:
   FXAutoPtr& operator=(FXAutoPtr& src){ return reset(src.release()); }
 
   /// Assign from an automatic pointer with compatible type
-  template<class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
+  template <class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
 
   /// Convert to true/false
   operator FXbool() const { return !!ptr; }

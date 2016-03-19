@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXSystem.cpp,v 1.42 2009/01/06 13:24:41 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,10 +69,11 @@ FXString FXSystem::universalTime(FXTime value){
   }
 
 
+// FIXME === strptime
 // Convert file time to string as per strftime format
 FXString FXSystem::localTime(const FXchar *format,FXTime value){
   time_t tmp=(time_t)(value/seconds);
-#ifdef WIN32
+#if defined(WIN32)
   struct tm* ptm=localtime(&tmp);
   if(ptm){
     FXchar buffer[512];
@@ -82,7 +81,7 @@ FXString FXSystem::localTime(const FXchar *format,FXTime value){
     return FXString(buffer,len);
     }
   return FXString::null;
-#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_LOCALTIME_R)
   struct tm tmresult;
   struct tm* ptm=localtime_r(&tmp,&tmresult);
   if(ptm){
@@ -114,7 +113,7 @@ FXString FXSystem::universalTime(const FXchar *format,FXTime value){
     return FXString(buffer,len);
     }
   return FXString::null;
-#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_GMTIME_R)
   struct tm tmresult;
   struct tm* ptm=gmtime_r(&tmp,&tmresult);
   if(ptm){
@@ -159,7 +158,7 @@ FXuint FXSystem::group(){
 FXString FXSystem::userName(FXuint uid){
   FXchar result[64];
 #ifndef WIN32
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#ifdef HAVE_GETPWUID_R
   struct passwd pwdresult,*pwd;
   char buffer[1024];
   if(getpwuid_r(uid,&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd) return pwd->pw_name;
@@ -177,7 +176,7 @@ FXString FXSystem::userName(FXuint uid){
 FXString FXSystem::groupName(FXuint gid){
   FXchar result[64];
 #ifndef WIN32
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#ifdef HAVE_GETGRGID_R
   ::group grpresult;
   ::group *grp;
   char buffer[1024];
@@ -200,8 +199,7 @@ FXString FXSystem::currentUserName(){
   if(GetUserName(buffer,&size)){
     return FXString(buffer);
     }
-#else
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_GETPWUID_R)
   struct passwd pwdresult,*pwd;
   char buffer[1024];
   if(getpwuid_r(geteuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
@@ -213,7 +211,6 @@ FXString FXSystem::currentUserName(){
     return FXString(pwd->pw_name);
     }
 #endif
-#endif
   return FXString::null;
   }
 
@@ -221,7 +218,7 @@ FXString FXSystem::currentUserName(){
 // Get current effective group name
 FXString FXSystem::currentGroupName(){
 #ifndef WIN32
-#if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#ifdef HAVE_GETGRGID_R
   ::group grpresult;
   ::group *grp;
   char buffer[1024];
@@ -396,7 +393,7 @@ FXString FXSystem::getHomeDirectory(){
 
 // Get home directory for a given user
 FXString FXSystem::getUserDirectory(const FXString& user){
-#ifdef WIN32
+#if defined(WIN32)
   if(user.empty()){
     const FXchar *str1,*str2;
     FXchar home[MAXPATHLEN];
@@ -425,7 +422,7 @@ FXString FXSystem::getUserDirectory(const FXString& user){
     return "c:" PATHSEPSTRING;
     }
   return "c:" PATHSEPSTRING;
-#elif defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
+#elif defined(HAVE_GETPWNAM_R)
   struct passwd pwdresult,*pwd;
   const FXchar* str;
   char buffer[1024];
@@ -480,9 +477,11 @@ FXString FXSystem::getTempDirectory(){
   if(1<len && ISPATHSEP(buffer[len-1]) && !ISPATHSEP(buffer[len-2])) len--;
   return FXString(buffer,len);
 #else
-  // Conform Linux File Hierarchy standard; this should be
-  // good for SUN, SGI, HP-UX, AIX, and OSF1 also.
-  return FXString("/tmp",4);
+  const FXchar* dir;
+  if((dir=getenv("TMPDIR"))!=NULL){
+    return FXString(dir);
+    }
+  return FXString("/tmp");
 #endif
   }
 
@@ -499,7 +498,7 @@ FXint FXSystem::getProcessId(){
 
 // Return host name
 FXString FXSystem::getHostName(){
-  FXchar name[1024];
+  FXchar name[MAXHOSTNAMELEN];
   if(gethostname(name,sizeof(name))==0){
     return FXString(name);
     }
@@ -528,7 +527,7 @@ FXString FXSystem::dllName(const FXString& name){
   return name+".dll";
 #elif defined(_HPUX_) || defined(_HPUX_SOURCE)
   return "lib"+name+".sl";
-#elif  defined(__APPLE__)
+#elif defined(__APPLE__)
   return "lib"+name+".dylib";
 #else
   return "lib"+name+".so";

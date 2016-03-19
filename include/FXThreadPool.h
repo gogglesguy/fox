@@ -3,7 +3,7 @@
 *                             T h r e a d   P o o l                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -124,10 +124,13 @@ private:
   FXTime          expire;       // Quit if no job within this time
   volatile FXuint maximum;      // Maximum number of workers
   volatile FXuint minimum;      // Minimum number of workers
-  volatile FXuint running;      // Running number of workers
-  volatile FXuint waiting;      // Waiting number of workers
+  volatile FXuint started;      // Number of workers started
+  volatile FXuint stopped;      // Number of workers stopped
+  volatile FXuint pwaiting;     // Producers waiting 
+  volatile FXuint cwaiting;     // Consumers waiting 
+  volatile FXuint watching;     // Threads watching completion
   volatile FXbool runs;         // Thread pool is running
-protected:
+private:
   FXbool startWorker();
 private:
   FXThreadPool(const FXThreadPool&);
@@ -196,7 +199,7 @@ public:
   /**
   * Stop pool.
   * Wait until all workers have terminated gracefully, i.e. until
-  * the last job has been completed.
+  * the last job has been completed and all threads have stopped running.
   */
   void stop();
 

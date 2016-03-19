@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -571,7 +571,7 @@ FXString FXPath::simplify(const FXString& file){
 
 // Build absolute pathname
 FXString FXPath::absolute(const FXString& file){
-  if(file.empty()) return FXSystem::getCurrentDirectory();
+  FXString result;
 #ifdef WIN32
   if(ISPATHSEP(file[0])){
     if(ISPATHSEP(file[1])) return FXPath::simplify(file);       // UNC
@@ -582,15 +582,21 @@ FXString FXPath::absolute(const FXString& file){
     return FXPath::simplify(file.mid(0,2)+PATHSEPSTRING+file.mid(2,2147483647));
     }
 #else
-  if(ISPATHSEP(file[0])) return FXPath::simplify(file);
+  if(ISPATHSEP(file[0])){
+    return FXPath::simplify(file);
+    }
 #endif
-  return FXPath::simplify(FXSystem::getCurrentDirectory()+PATHSEPSTRING+file);
+  result=FXSystem::getCurrentDirectory();
+  if(!file.empty()){
+    result.append(PATHSEPSTRING+file);
+    }
+  return FXPath::simplify(result);
   }
 
 
 // Build absolute pathname from parts
 FXString FXPath::absolute(const FXString& base,const FXString& file){
-  if(file.empty()) return FXPath::absolute(base);
+  FXString result;
 #ifdef WIN32
   if(ISPATHSEP(file[0])){
     if(ISPATHSEP(file[1])) return FXPath::simplify(file);       // UNC
@@ -601,9 +607,15 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
     return FXPath::simplify(file.mid(0,2)+PATHSEPSTRING+file.mid(2,2147483647));
     }
 #else
-  if(ISPATHSEP(file[0])) return FXPath::simplify(file);
+  if(ISPATHSEP(file[0])){
+    return FXPath::simplify(file);
+    }
 #endif
-  return FXPath::simplify(FXPath::absolute(base)+PATHSEPSTRING+file);
+  result=FXPath::absolute(base);
+  if(!file.empty()){
+    result.append(PATHSEPSTRING+file);
+    }
+  return FXPath::simplify(result);
   }
 
 
@@ -977,7 +989,7 @@ FIXME
   CaseFold
   DotFile
   DirName
-  
+
     PathName   = 1,        /// No wildcard can ever match "/'
     NoEscape   = 2,        /// Backslashes don't quote special chars
     DotFile    = 4,        /// Leading "." is matched only explicitly

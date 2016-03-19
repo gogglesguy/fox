@@ -3,7 +3,7 @@
 *                   U n i c o d e   T e x t   C o d e c                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2009 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2010 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -153,9 +153,9 @@ FXint FXTextCodec::utf2wc(FXwchar& wc,const FXnchar* src,FXint nsrc){
   const FXint SURROGATE_OFFSET=0x10000-(0xD800<<10)-0xDC00;
   if(nsrc<1) return -1;
   wc=src[0];
-  if(0xD800<=wc && wc<0xDC00){
+  if((wc&0xDC00)==0xD800){
     if(nsrc<2) return -2;
-    if(src[1]<0xDC00 || 0xE000<=src[1]) return 0;
+    if((src[1]&0xDC00)!=0xDC00) return 0;
     wc=(wc<<10)+src[1]+SURROGATE_OFFSET;
     return 2;
     }

@@ -3,6 +3,7 @@
 +FXAccelTable.obj &
 +FXApp.obj &
 +FXArrowButton.obj &
++FXAtomic.obj &
 +FXBMPIcon.obj &
 +FXBMPImage.obj &
 +FXBitmap.obj &

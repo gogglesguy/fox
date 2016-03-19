@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -76,7 +76,7 @@ FXIcon::FXIcon(FXApp* a,const FXColor *pix,FXColor clr,FXuint opts,FXint w,FXint
 
 
 // Guess alpha color based on corners; the initial guess is standard GUI color
-FXColor FXIcon::guesstransp(){
+FXColor FXIcon::guesstransp() const {
   register FXColor guess=FXRGB(192,192,192);
   register FXint best,t;
   FXColor color[4];
@@ -90,6 +90,29 @@ FXColor FXIcon::guesstransp(){
     if((t=((color[1]==color[2])+(color[1]==color[3])+(color[1]==color[0])))>best){ guess=color[1]; best=t; }
     if((t=((color[2]==color[3])+(color[2]==color[0])+(color[2]==color[1])))>best){ guess=color[2]; best=t; }
     if((t=((color[3]==color[0])+(color[3]==color[1])+(color[3]==color[2])))>best){ guess=color[3]; }
+    }
+  return guess;
+  }
+
+
+// Determine threshold for etch mask
+FXshort FXIcon::guessthresh() const {
+  register FXshort guess=382;
+  FXint frequency[766];
+  if(data && 0<width && 0<height){
+    register FXint med=(width*height)>>1;
+    register FXint i,j,cum;
+    memset(frequency,0,sizeof(frequency));
+    for(i=0; i<width*height; ++i){
+      frequency[((const FXuchar*)(data+i))[0]+((const FXuchar*)(data+i))[1]+((const FXuchar*)(data+i))[2]]++;
+      }
+    for(i=0,cum=0; i<766; ++i){
+      if((cum+=frequency[i])>=med) break;
+      }
+    for(j=765,cum=0; j>0; --j){
+      if((cum+=frequency[j])>=med) break;
+      }
+    guess=(i+j+1)>>1;
     }
   return guess;
   }

@@ -20,6 +20,7 @@ settings_gif.gif
 ControlPanel_SOURCES = \
 icons.h \
 icons.cpp \
+ControlPanel.h \
 ControlPanel.cpp \
 LICENSE \
 $(ICONS)

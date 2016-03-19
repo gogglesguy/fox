@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -291,14 +291,14 @@ public:
   /// Allow or disallow navigation
   void allowNavigation(FXbool flag){ navigable=flag; }
 
+  /// Is navigation allowed?
+  FXbool allowNavigation() const { return navigable; }
+
   /// Change file associations; delete old ones if owned
   void setAssociations(FXFileDict* assoc,FXbool owned=false);
 
   /// Return file associations
   FXFileDict* getAssociations() const;
-
-  /// Is navigation allowed?
-  FXbool allowNavigation() const { return navigable; }
 
   /// Set draggable files
   void setDraggableFiles(FXbool flag);

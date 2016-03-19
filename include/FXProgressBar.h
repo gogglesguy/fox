@@ -3,7 +3,7 @@
 *                      P r o g r e s s B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -46,7 +46,7 @@ protected:
   FXuint   total;               // Amount for completion
   FXint    barsize;             // Bar size
   FXFont*  font;                // Text font
-  FXColor  barBGColor;          // Bar background color 
+  FXColor  barBGColor;          // Bar background color
   FXColor  barColor;            // Filled bar color
   FXColor  textNumColor;        // Text color inside bar background
   FXColor  textAltColor;        // Text color inside filled bar
