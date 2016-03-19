@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -71,63 +71,63 @@ namespace {
 
 // Tokens
 enum {
-  TK_EOF        = 0,
-  TK_INT        = 1,
-  TK_INT_HEX    = 2,
-  TK_INT_BIN    = 3,
-  TK_INT_OCT    = 4,
-  TK_REAL       = 5,
-  TK_PLUS       = 6,
-  TK_MINUS      = 7,
-  TK_TIMES      = 8,
-  TK_DIVIDE     = 9,
-  TK_MODULO     = 10,
-  TK_POWER      = 11,
-  TK_LPAR       = 12,
-  TK_RPAR       = 13,
-  TK_LESS       = 14,
-  TK_GREATER    = 15,
-  TK_LESSEQ     = 16,
-  TK_GREATEREQ  = 17,
-  TK_EQUAL      = 18,
-  TK_NOTEQUAL   = 19,
-  TK_AND        = 20,
-  TK_OR         = 21,
-  TK_XOR        = 22,
-  TK_NOT        = 23,
-  TK_SHIFTLEFT  = 24,
-  TK_SHIFTRIGHT = 25,
-  TK_COMMA      = 26,
-  TK_QUEST      = 27,
-  TK_COLON      = 28,
-  TK_ERROR      = 29,
-  TK_PI         = 2585,
-  TK_EULER      = 69,
-  TK_RTOD       = 3005613,
-  TK_DTOR       = 2389741,
-  TK_ABS        = 108848,
-  TK_ACOS       = 3592862,
-  TK_ACOSH      = 118564406,
-  TK_ASIN       = 3610325,
-  TK_ASINH      = 119140637,
-  TK_ATAN       = 3615258,
-  TK_ATANH      = 119303474,
-  TK_CEIL       = 3523203,
-  TK_COS        = 107103,
-  TK_COSH       = 3534423,
-  TK_EXP        = 114029,
-  TK_FLOOR      = 122360152,
-  TK_LOG        = 114052,
-  TK_LOG10      = 124204261,
-  TK_SIN        = 124308,
-  TK_SINH       = 4102268,
+  TK_EOF        = 0U,
+  TK_INT        = 1U,
+  TK_INT_HEX    = 2U,
+  TK_INT_BIN    = 3U,
+  TK_INT_OCT    = 4U,
+  TK_REAL       = 5U,
+  TK_PLUS       = 6U,
+  TK_MINUS      = 7U,
+  TK_TIMES      = 8U,
+  TK_DIVIDE     = 9U,
+  TK_MODULO     = 10U,
+  TK_POWER      = 11U,
+  TK_LPAR       = 12U,
+  TK_RPAR       = 13U,
+  TK_LESS       = 14U,
+  TK_GREATER    = 15U,
+  TK_LESSEQ     = 16U,
+  TK_GREATEREQ  = 17U,
+  TK_EQUAL      = 18U,
+  TK_NOTEQUAL   = 19U,
+  TK_AND        = 20U,
+  TK_OR         = 21U,
+  TK_XOR        = 22U,
+  TK_NOT        = 23U,
+  TK_SHIFTLEFT  = 24U,
+  TK_SHIFTRIGHT = 25U,
+  TK_COMMA      = 26U,
+  TK_QUEST      = 27U,
+  TK_COLON      = 28U,
+  TK_ERROR      = 29U,
+  TK_PI         = 2585U,
+  TK_EULER      = 69U,
+  TK_RTOD       = 3005613U,
+  TK_DTOR       = 2389741U,
+  TK_ABS        = 108848U,
+  TK_ACOS       = 3592862U,
+  TK_ACOSH      = 118564406U,
+  TK_ASIN       = 3610325U,
+  TK_ASINH      = 119140637U,
+  TK_ATAN       = 3615258U,
+  TK_ATANH      = 119303474U,
+  TK_CEIL       = 3523203U,
+  TK_COS        = 107103U,
+  TK_COSH       = 3534423U,
+  TK_EXP        = 114029U,
+  TK_FLOOR      = 122360152U,
+  TK_LOG        = 114052U,
+  TK_LOG10      = 124204261U,
+  TK_SIN        = 124308U,
+  TK_SINH       = 4102268U,
   TK_SQRT       = 4076772,
-  TK_TAN        = 123227,
-  TK_TANH       = 4066515,
-  TK_MAX        = 121748,
-  TK_MIN        = 121482,
-  TK_POW        = 119176,
-  TK_ATAN2      = 119303528
+  TK_TAN        = 123227U,
+  TK_TANH       = 4066515U,
+  TK_MAX        = 121748U,
+  TK_MIN        = 121482U,
+  TK_POW        = 119176U,
+  TK_ATAN2      = 119303528U
   };
 
 
@@ -204,7 +204,7 @@ public:
 
   // Return size of generated code
   FXival size() const { return pc-code; }
-  
+
   // Get token
   void gettok();
 
@@ -741,9 +741,9 @@ void FXCompile::gettok(){
       default:
         token=TK_ERROR;
         if(Ascii::isLetter(*tail)){
-          token=*tail++;
+          token=(FXuchar)*tail++;
           while(Ascii::isAlphaNumeric(*tail)){
-            token=((token<<5)+token)^*tail++;
+            token=((token<<5)+token) ^ (FXuchar)*tail++;
             }
           }
         return;
@@ -779,7 +779,7 @@ FXuchar* FXCompile::offset(FXshort n){
 FXuchar* FXCompile::number(FXdouble n){
   register FXuchar* result=pc;
   if(code){
-#if defined(__i386__) || defined(__x86_64__) 
+#if defined(__i386__) || defined(__x86_64__)
     ((FXdouble*)pc)[0]=n;
 #else
     pc[0]=((const FXuchar*)&n)[0];
@@ -894,7 +894,7 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
 
       // Allocate new code
       if(allocElms(prog,cs.size())){
-        
+
         // Create compile engine
         FXCompile gs(prog,expression,variables);
 
@@ -906,7 +906,7 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
 
           // Install new program
           code=prog;
-          
+
 #ifdef EXPRDEBUG
           if(fxTraceLevel>100) dump(code);
 #endif
@@ -915,7 +915,7 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
           return ErrOK;
           }
         freeElms(prog);
-        }        
+        }
       }
     }
   return err;

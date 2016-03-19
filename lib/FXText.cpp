@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1273,13 +1273,13 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
     // Make all characters contiguous in the buffer
     squeezegap();
 
+    // Enforce legal range
+    start=FXCLAMP(0,start,length);
+    
     // Search forward
     if(flgs&SEARCH_FORWARD){
-      if(start<=length){
-        if(start<0) start=0;
-        if(rex.search(buffer,length,start,length,FXRex::Normal,beg,end,npar)>=0) return true;
-        }
-      if((flgs&SEARCH_WRAP) && (start!=0)){
+      if(rex.search(buffer,length,start,length,FXRex::Normal,beg,end,npar)>=0) return true;
+      if(flgs&SEARCH_WRAP){
         if(rex.search(buffer,length,0,start,FXRex::Normal,beg,end,npar)>=0) return true;
         }
       return false;
@@ -1287,11 +1287,8 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
 
     // Search backward
     if(flgs&SEARCH_BACKWARD){
-      if(0<=start){
-        if(start>length) start=length;
-        if(rex.search(buffer,length,start,0,FXRex::Normal,beg,end,npar)>=0) return true;
-        }
-      if((flgs&SEARCH_WRAP) && (start!=length)){
+      if(rex.search(buffer,length,start,0,FXRex::Normal,beg,end,npar)>=0) return true;
+      if(flgs&SEARCH_WRAP){
         if(rex.search(buffer,length,length,start,FXRex::Normal,beg,end,npar)>=0) return true;
         }
       return false;

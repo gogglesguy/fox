@@ -15,55 +15,56 @@
 
 /*******************************************************************************/
 
-static FXbool matchtest(const FXchar* pattern,const FXchar* string,FXbool expected){
+static FXbool matchtest(const FXchar* pattern,const FXchar* string,FXuint flags,FXbool expected){
   const FXchar *const passorfail[]={"false","true "};
   const FXchar *const okorbad[]={"BAD","   "};
-  FXbool result=FXPath::match(string,pattern,FXPath::CaseFold);
+  FXbool result=FXPath::match(string,pattern,flags);
   FXbool ok=result==expected;
-  fxwarning("%s match: %-10s pattern: %-10s  result: %s expected: %s\n",okorbad[ok],string,pattern,passorfail[result],passorfail[expected]);
+  fxwarning("%s pattern: %-25s match: %-25s  result: %s expected: %s\n",okorbad[ok],pattern,string,passorfail[result],passorfail[expected]);
   return ok;
   }
 
 
 // Start
 int main(int,char*[]){
-
-  matchtest("*x", "x", true);
-  matchtest("*x", "xx", true);
-  matchtest("*x", "yyyx", true);
-  matchtest("*x", "yyxy", false);
-  matchtest("?x", "x", false);
-  matchtest("?x", "xx", true);
-  matchtest("?x", "yyyx", false);
-  matchtest("?x", "yyxy", false);
-  matchtest("*?x", "xx", true);
-  matchtest("?*x", "xx", true);
-  matchtest("*?x", "x", false);
-  matchtest("?*x", "x", false);
-  matchtest("*?*x", "yx", true);
-  matchtest("*?*x", "xxxx", true);
-  matchtest("x*??", "xyzw", true);
-  matchtest("*x", "\xc3\x84x", true);
-  matchtest("?x", "\xc3\x84x", true);
-  matchtest("??x", "\xc3\x84x", false);
-  matchtest("ab\xc3\xa4\xc3\xb6", "ab\xc3\xa4\xc3\xb6", true);
-  matchtest("ab\xc3\xa4\xc3\xb6", "abao", false);
-  matchtest("ab?\xc3\xb6", "ab\xc3\xa4\xc3\xb6", true);
-  matchtest("ab?\xc3\xb6", "abao", false);
-  matchtest("ab\xc3\xa4?", "ab\xc3\xa4\xc3\xb6", true);
-  matchtest("ab\xc3\xa4?", "abao", false);
-  matchtest("ab??", "ab\xc3\xa4\xc3\xb6", true);
-  matchtest("ab*", "ab\xc3\xa4\xc3\xb6", true);
-  matchtest("ab*\xc3\xb6", "ab\xc3\xa4\xc3\xb6", true);
-  matchtest("ab*\xc3\xb6", "aba\xc3\xb6x\xc3\xb6", true);
-  matchtest("*.o", "FXApp.o", true);
-  matchtest("A*.o", "AA.o", true);
-  matchtest("A*.o", "aaaa.o", true);
-  matchtest("A*.o", "B.o", false);
-  matchtest("[A-Z].o", "B.o", true);
-  matchtest("[0-9].o", "B.o", false);
-  matchtest("[!0-9].o", "B.o", true);
-  matchtest("[]].o", "].o", true);
+  fxTraceLevel=2;
+  matchtest("ABCD", "ABCD", 0, true);
+  matchtest("ABCD", "abcd", 0, false);
+  matchtest("ABCD", "abcd", FXPath::CaseFold, true);
+  matchtest("ABCD", "ABCD", FXPath::CaseFold, true);
+  matchtest("ABC?", "abcd", FXPath::CaseFold, true);
+  matchtest("A*", "a", FXPath::CaseFold, true);
+  matchtest("A*", "ab", FXPath::CaseFold, true);
+  matchtest("A*", "abc", FXPath::CaseFold, true);
+  matchtest("A*", "a/b", FXPath::CaseFold, true);
+  matchtest("A*", "a/b", FXPath::CaseFold|FXPath::PathName|FXPath::LeadDir, true);
+  matchtest("A*", "a/b", FXPath::CaseFold|FXPath::PathName, false);
+  matchtest("*", ".bashrc", FXPath::CaseFold, true);
+  matchtest("*", ".bashrc", FXPath::CaseFold|FXPath::DotFile, false);
+  matchtest("*.bashrc", ".bashrc", FXPath::CaseFold|FXPath::DotFile, true);
+  matchtest("*", ".bashrc", FXPath::CaseFold|FXPath::DotFile, false);
+  matchtest("A\\*", "a*", FXPath::CaseFold, true);
+  matchtest("A\\*", "a\\bc", FXPath::CaseFold|FXPath::NoEscape, true);
+  matchtest("[ABCD", "aefgh", FXPath::CaseFold, false);
+  matchtest("[]]", "]", FXPath::CaseFold, true);
+  matchtest("[ABCD]efgh", "aefgh", FXPath::CaseFold, true);
+  matchtest("[^ABCD]efgh", "aefgh", FXPath::CaseFold, false);
+  matchtest("[A-D]efgh", "aefgh", FXPath::CaseFold, true);
+  matchtest("[A-D]efgh", "defgh", FXPath::CaseFold, true);
+  matchtest("[A-D]efgh", "xefgh", FXPath::CaseFold, false);
+  matchtest("[]A-D]efgh", "]efgh", FXPath::CaseFold, true);
+  matchtest("[A-]efgh", "-efgh", FXPath::CaseFold, true);
+  matchtest("*J*", "ABCDJEFGH", FXPath::CaseFold, true);
+  matchtest("a,b,c", "B", FXPath::CaseFold, true);
+  matchtest("a,b,\\,", ",", FXPath::CaseFold, true);
+  matchtest("ABC\\", "ABC", FXPath::CaseFold, false);
+  matchtest(")", ")", FXPath::CaseFold, false);
+  matchtest("c.(e|f*)", "c.fx", 0, true);
+  matchtest("(a.(b|c)|c.(e|f))", "a.c", 0, true);
+  matchtest("(a.(b|c)|c.(e|f*))", "c.fx", 0, true);
+  matchtest("(A|B).o", "B.o", FXPath::CaseFold, true);
+  matchtest("*x", "x", FXPath::CaseFold, true);
+  matchtest("*x", "yyyx", FXPath::CaseFold, true);
   return 1;
   }
 

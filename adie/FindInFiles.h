@@ -23,31 +23,50 @@
 
 
 class Adie;
+class FindInFiles;
+
+
+/// Directory search visitor
+class SearchVisitor : public FXGlobVisitor {
+private:
+  FXRex    rex;         // Regex parser
+private:
+  FXint loadFileBody(const FXString& file,FXString& body) const;
+  FXint searchFileBody(const FXString& body) const;
+public:
+  SearchVisitor(const FXString& pattern=FXString::null,FXint mode=FXRex::Normal);
+  virtual FXuint visit(const FXString& path);
+  };
 
 
 /// Find patterns in Files
 class FindInFiles : public FXDialogBox {
   FXDECLARE(FindInFiles)
 protected:
-  FXIconList  *locations;
-  FXTextField *findstring;
-  FXTextField *filefolder;
-  FXComboBox  *filefilter;
-  FXString     history[20];
-  FXuint       searchflags;
-  FXint        index;
+  FXIconList  *locations;               // Search hits
+  FXTextField *findstring;              // String to search for
+  FXTextField *filefolder;              // Folder to search
+  FXComboBox  *filefilter;              // File filters
+  FXString     filePattern;             // Search files matching pattern
+  FXString     patternHistory[20];      // Search string history
+  FXuint       optionsHistory[20];      // Search option history
+  FXuint       searchmode;              // Search options
+  FXint        index;                   // History index
 protected:
   static const FXchar sectionName[];
 private:
   FindInFiles(){}
   FindInFiles(const FindInFiles&);
-  void appendhist(const FXString& string);
-  void scrollback();
-  void scrollforw();
+  void appendHistory(const FXString& patt,FXuint opts);
+  void readRegistry();
+  void writeRegistry();
 public:
   long onCmdSearch(FXObject*,FXSelector,void*);
-  long onUpdHistory(FXObject*,FXSelector,void*);
-  long onCmdHistory(FXObject*,FXSelector,void*);
+  long onCmdFilter(FXObject*,FXSelector,void*);
+  long onUpdHistoryUp(FXObject*,FXSelector,void*);
+  long onUpdHistoryDn(FXObject*,FXSelector,void*);
+  long onCmdHistoryUp(FXObject*,FXSelector,void*);
+  long onCmdHistoryDn(FXObject*,FXSelector,void*);
   long onCmdFolder(FXObject*,FXSelector,void*);
   long onArrowKey(FXObject*,FXSelector,void*);
   long onMouseWheel(FXObject*,FXSelector,void*);
@@ -77,6 +96,7 @@ public:
     ID_RECURSIVE,
     ID_HIDDEN,
     ID_FILELIST,
+    ID_PAUSE,
     ID_LAST
     };
 public:
@@ -87,11 +107,14 @@ public:
   /// Create server-side resources
   virtual void create();
 
-  /// Destroy server-side resources
-  virtual void destroy();
+  /// Close the window, return true if actually closed
+  virtual FXbool close(FXbool notify=false);
 
   /// Change directory
   void setDirectory(const FXString& path);
+
+  /// Return directory
+  FXString getDirectory() const;
 
   /// Set text or pattern to search for
   void setSearchText(const FXString& text);
@@ -99,8 +122,17 @@ public:
   /// Return text or pattern the user has entered
   FXString getSearchText() const;
 
-  /// Return directory
-  FXString getDirectory() const;
+  /// Set search match mode
+  void setSearchMode(FXuint mode){ searchmode=mode; }
+
+  /// Return search mode the user has selected
+  FXuint getSearchMode() const { return searchmode; }
+
+  /// Change file pattern
+  void setPattern(const FXString& ptrn);
+
+  /// Return file pattern
+  const FXString& getPattern() const { return filePattern; }
 
   /// Set list of patterns
   void setPatternList(const FXString& patterns);

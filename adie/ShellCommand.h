@@ -21,7 +21,7 @@
 #ifndef SHELLCOMMAND_H
 #define SHELLCOMMAND_H
 
-
+ 
 class TextWindow;
 
 

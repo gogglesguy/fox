@@ -3,7 +3,7 @@
 *                  R a n d o m   N u m b e r   G e n e r a t o r                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,9 +33,9 @@
     sequences (of the same period), see G. Marsaglia, "Xorshift RNGs".
 */
 
-#define SHIFTA    21
-#define SHIFTB    35
-#define SHIFTC     4
+#define SHIFTA    12
+#define SHIFTB    25
+#define SHIFTC    27
 
 using namespace FX;
 
@@ -59,7 +59,7 @@ void FXRandom::seed(FXulong s){
   state=s^FXULONG(4101842887655102017);
   }
 
-
+	
 // Generate next state
 FXulong FXRandom::next(){
   state^=state>>SHIFTA;
@@ -80,7 +80,7 @@ FXfloat FXRandom::randFloat(){
 #if (_MSC_VER <= 1300)
   return ((FXuint)randLong())*2.3283064370808E-10f;
 #else
-  return randLong()*5.42101086242752217E-20f;
+  return randLong()*5.42101086242752217033113759206E-20f;
 #endif
   }
 
@@ -90,7 +90,7 @@ FXdouble FXRandom::randDouble(){
 #if (_MSC_VER <= 1300)
   return ((FXuint)randLong())*2.3283064370808E-10;
 #else
-  return randLong()*5.42101086242752217E-20;
+  return randLong()*5.42101086242752217033113759206E-20;
 #endif
   }
 

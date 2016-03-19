@@ -3,7 +3,7 @@
 *                   F i l e   S e l e c t i o n   D i a l o g                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,7 +42,8 @@ protected:
   static const FXchar sectionName[];
 protected:
   FXFileDialog(){}
-  void initdialog();
+  void loadSettings();
+  void saveSettings();
 private:
   FXFileDialog(const FXFileDialog&);
   FXFileDialog &operator=(const FXFileDialog&);
@@ -53,9 +54,6 @@ public:
 
   /// Construct free-floating file dialog box
   FXFileDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=500,FXint h=300);
-
-  /// Hide this window
-  virtual void hide();
 
   /// Change file name
   void setFilename(const FXString& path);

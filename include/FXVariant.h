@@ -3,7 +3,7 @@
 *                          V a r i a n t   T y p e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,15 +30,15 @@ class FXVariantArray;
 
 
 /**
-* A Variant type can hold any kind of object, be it a boolean, integer, real, string, 
+* A Variant type can hold any kind of object, be it a boolean, integer, real, string,
 * or even array of Variants or dictionaries of variants.
 * Complex hierarchies of Variants can be loaded (and saved) using the JSON parser.
 * When writing Variants, dictionaries and arrays are automatically grown.  When
-* reading Variants, non-existing dictionary entries or indexes outside arrays will read 
+* reading Variants, non-existing dictionary entries or indexes outside arrays will read
 * as 0 (for numbers), the empty string (for arrays), or empty dictionaries or arrays.
 * For efficiency, you can hold references to Variants, for example to avoid repeatedly
 * accessing dictionaries or arrays with the same key or index. However, be aware that
-* adding or removing sub-items to dictionaries or arrays may cause reallocations of 
+* adding or removing sub-items to dictionaries or arrays may cause reallocations of
 * existing items and thus some care must be exercised when doing this.
 */
 class FXAPI FXVariant {
@@ -283,6 +283,12 @@ public:
 
   /// Adopt variant from another
   FXVariant& adopt(FXVariant& other);
+
+  /// Adopt variant array
+  FXVariant& adopt(FXVariantArray& other);
+
+  /// Adopt a variant map
+  FXVariant& adopt(FXVariantMap& other);
 
   /// Return value of object member
   FXVariant& operator[](const FXchar* key);

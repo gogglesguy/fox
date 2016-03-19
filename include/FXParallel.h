@@ -3,7 +3,7 @@
 *                     P a r a l l e l   C o m p u t a t i o n                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2012,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2012,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -25,7 +25,7 @@
 namespace FX {
 
 
-enum{ 
+enum{
   FXParallelMax=128     // Maximum number of parallel jobs
   };
 

@@ -22,7 +22,7 @@
 #define FXCURVE_H
 
 namespace FXCHART {
-
+ 
 
 class FXData;
 class FX2DPlot;

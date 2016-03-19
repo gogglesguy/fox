@@ -3,7 +3,7 @@
 *                              D i a l o g   B o x                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,8 +42,6 @@ private:
   FXDialogBox(const FXDialogBox&);
   FXDialogBox &operator=(const FXDialogBox&);
 public:
-  long onKeyPress(FXObject*,FXSelector,void*);
-  long onKeyRelease(FXObject*,FXSelector,void*);
   long onCmdAccept(FXObject*,FXSelector,void*);
   long onCmdCancel(FXObject*,FXSelector,void*);
 public:

@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -40,9 +40,9 @@ namespace FX {
 *       a,b,c
 *
 * then a subsequent evaluation can pass an array of three numbers:
-* 
+*
 *       [1 4 2]
-* 
+*
 * which will then evaluate the expression:
 *
 *       4**2-4*1*2

@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -336,7 +336,7 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
           }
         }
 
-      // Integral notation 
+      // Integral notation
       else if(prec<=decimal){
         while(prec-->0){                          // Generate prec digits
           *ptr++=*p++;

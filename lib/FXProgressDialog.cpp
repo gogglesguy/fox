@@ -3,7 +3,7 @@
 *                      P r o g r e s s   D i a l o g   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -93,7 +93,7 @@ FXProgressDialog::FXProgressDialog(FXWindow* own,const FXString& caption,const F
   cancel=new FXButton(this,tr("&Cancel"),NULL,this,ID_CANCEL,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_SIDE_BOTTOM|LAYOUT_CENTER_X,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   separator=new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   FXHorizontalFrame* toppart=new FXHorizontalFrame(this,LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 10,10);
-  progress=new FXProgressBar(toppart,NULL,0,PROGRESSBAR_PERCENTAGE|PROGRESSBAR_DIAL|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,64,64,0,0,0,0);
+  progress=new FXProgressBar(toppart,NULL,0,PROGRESSBAR_PERCENTAGE|PROGRESSBAR_DIAL|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,96,96,0,0,0,0);
   message=new FXLabel(toppart,label,NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
   cancel->setFocus();
   if(!(opts&PROGRESSDIALOG_CANCEL)){

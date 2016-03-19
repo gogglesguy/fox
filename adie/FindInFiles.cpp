@@ -48,13 +48,17 @@
 FXDEFMAP(FindInFiles) FindInFilesMap[]={
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_SEARCH,FindInFiles::onCmdSearch),
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_FOLDER,FindInFiles::onCmdFolder),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onCmdSearch),
   FXMAPFUNC(SEL_KEYPRESS,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onArrowKey),
   FXMAPFUNC(SEL_MOUSEWHEEL,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onMouseWheel),
-  FXMAPFUNCS(SEL_UPDATE,FindInFiles::ID_HIST_UP,FindInFiles::ID_HIST_DN,FindInFiles::onUpdHistory),
-  FXMAPFUNCS(SEL_COMMAND,FindInFiles::ID_HIST_UP,FindInFiles::ID_HIST_DN,FindInFiles::onCmdHistory),
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_HIST_UP,FindInFiles::onUpdHistoryUp),
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_HIST_DN,FindInFiles::onUpdHistoryDn),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_HIST_UP,FindInFiles::onCmdHistoryUp),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_HIST_DN,FindInFiles::onCmdHistoryDn),
+  FXMAPFUNC(SEL_DOUBLECLICKED,FindInFiles::ID_FILELIST,FindInFiles::onCmdFileDblClicked),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_FILTER_TEXT,FindInFiles::onCmdFilter),
   FXMAPFUNCS(SEL_UPDATE,FindInFiles::ID_EXACT,FindInFiles::ID_HIDDEN,FindInFiles::onUpdFlags),
   FXMAPFUNCS(SEL_COMMAND,FindInFiles::ID_EXACT,FindInFiles::ID_HIDDEN,FindInFiles::onCmdFlags),
-  FXMAPFUNC(SEL_DOUBLECLICKED,FindInFiles::ID_FILELIST,FindInFiles::onCmdFileDblClicked),
   };
 
 
@@ -66,9 +70,15 @@ FXIMPLEMENT(FindInFiles,FXDialogBox,FindInFilesMap,ARRAYNUMBER(FindInFilesMap))
 const FXchar FindInFiles::sectionName[]="Find In Files";
 
 
-// Registry keys
+// Registry keys for search pattern
 static const FXchar skey[20][3]={
   "SA","SB","SC","SD","SE","SF","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SP","SQ","SR","SS","ST"
+  };
+
+
+// Registry keys for search options
+static const FXchar mkey[20][3]={
+  "MA","MB","MC","MD","ME","MF","MG","MH","MI","MJ","MK","ML","MM","MN","MO","MP","MQ","MR","MS","MT"
   };
 
 
@@ -78,7 +88,8 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   // Buttons at bottom
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
   new FXButton(buttons,tr("&Search"),NULL,this,ID_SEARCH,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
-  new FXButton(buttons,tr("&Cancel"),NULL,this,ID_CLOSE,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,6,6,VERT_PAD,VERT_PAD);
+  new FXButton(buttons,tr("&Close"),NULL,this,ID_CLOSE,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,6,6,VERT_PAD,VERT_PAD);
+  new FXToggleButton(buttons,tr("Pause"),tr("Resume"),NULL,NULL,this,ID_PAUSE,FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_LEFT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
 
   // Above button block
   new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
@@ -129,65 +140,52 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   // Initial pattern
   setPatternList(tr("All Files (*)"));
 
+  // Start with this
+  filePattern="*";
+
   // Search flags
-  searchflags=SearchExact;
+  searchmode=SearchExact;
   index=-1;
   }
 
 
 // Create server-side resources
 void FindInFiles::create(){
-  setWidth(getApp()->reg().readIntEntry(sectionName,"width",600));
-  setHeight(getApp()->reg().readIntEntry(sectionName,"height",400));
-  history[ 0]=getApp()->reg().readStringEntry(sectionName,skey[ 0],FXString::null);
-  history[ 1]=getApp()->reg().readStringEntry(sectionName,skey[ 1],FXString::null);
-  history[ 2]=getApp()->reg().readStringEntry(sectionName,skey[ 2],FXString::null);
-  history[ 3]=getApp()->reg().readStringEntry(sectionName,skey[ 3],FXString::null);
-  history[ 4]=getApp()->reg().readStringEntry(sectionName,skey[ 4],FXString::null);
-  history[ 5]=getApp()->reg().readStringEntry(sectionName,skey[ 5],FXString::null);
-  history[ 6]=getApp()->reg().readStringEntry(sectionName,skey[ 6],FXString::null);
-  history[ 7]=getApp()->reg().readStringEntry(sectionName,skey[ 7],FXString::null);
-  history[ 8]=getApp()->reg().readStringEntry(sectionName,skey[ 8],FXString::null);
-  history[ 9]=getApp()->reg().readStringEntry(sectionName,skey[ 9],FXString::null);
-  history[10]=getApp()->reg().readStringEntry(sectionName,skey[10],FXString::null);
-  history[11]=getApp()->reg().readStringEntry(sectionName,skey[11],FXString::null);
-  history[12]=getApp()->reg().readStringEntry(sectionName,skey[12],FXString::null);
-  history[13]=getApp()->reg().readStringEntry(sectionName,skey[13],FXString::null);
-  history[14]=getApp()->reg().readStringEntry(sectionName,skey[14],FXString::null);
-  history[15]=getApp()->reg().readStringEntry(sectionName,skey[15],FXString::null);
-  history[16]=getApp()->reg().readStringEntry(sectionName,skey[16],FXString::null);
-  history[17]=getApp()->reg().readStringEntry(sectionName,skey[17],FXString::null);
-  history[18]=getApp()->reg().readStringEntry(sectionName,skey[18],FXString::null);
-  history[19]=getApp()->reg().readStringEntry(sectionName,skey[19],FXString::null);
+  FXTRACE((1,"FindInFiles::create\n"));
+  readRegistry();
   FXDialogBox::create();
   }
 
 
-// Destroy server-side resources
-void FindInFiles::destroy(){
+// Close window
+FXbool FindInFiles::close(FXbool notify){
+  FXTRACE((1,"FindInFiles::close\n"));
+  writeRegistry();
+  return FXDialogBox::close(notify);
+  }
+
+
+// Load registy
+void FindInFiles::readRegistry(){
+  setWidth(getApp()->reg().readIntEntry(sectionName,"width",600));
+  setHeight(getApp()->reg().readIntEntry(sectionName,"height",400));
+  for(FXint i=0; i<20; ++i){
+    if(getApp()->reg().readStringEntry(sectionName,skey[i],NULL)==NULL) break;
+    patternHistory[i]=getApp()->reg().readStringEntry(sectionName,skey[i],FXString::null);
+    optionsHistory[i]=getApp()->reg().readUIntEntry(sectionName,mkey[i],SearchExact);
+    }
+  }
+
+
+// Save registry
+void FindInFiles::writeRegistry(){
   getApp()->reg().writeIntEntry("SETTINGS","width",getWidth());
   getApp()->reg().writeIntEntry("SETTINGS","height",getHeight());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 0],history[ 0].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 1],history[ 1].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 2],history[ 2].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 3],history[ 3].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 4],history[ 4].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 5],history[ 5].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 6],history[ 6].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 7],history[ 7].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 8],history[ 8].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[ 9],history[ 9].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[10],history[10].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[11],history[11].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[12],history[12].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[13],history[13].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[14],history[14].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[15],history[15].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[16],history[16].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[17],history[17].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[18],history[18].text());
-  getApp()->reg().writeStringEntry(sectionName,skey[19],history[19].text());
-  FXDialogBox::destroy();
+  for(FXint i=0; i<20; ++i){
+    if(patternHistory[i].empty()) break;
+    getApp()->reg().writeStringEntry(sectionName,skey[i],patternHistory[i].text());
+    getApp()->reg().writeUIntEntry(sectionName,mkey[i],optionsHistory[i]);
+    }
   }
 
 
@@ -212,6 +210,13 @@ void FindInFiles::setDirectory(const FXString& path){
 // Return directory
 FXString FindInFiles::getDirectory() const {
   return filefolder->getText();
+  }
+
+
+// Change file pattern
+void FindInFiles::setPattern(const FXString& ptrn){
+  filefilter->setText(ptrn);
+  filePattern=ptrn;
   }
 
 
@@ -240,6 +245,7 @@ FXString FindInFiles::getPatternList() const {
 void FindInFiles::setCurrentPattern(FXint patno){
   if(patno<0 || patno>=filefilter->getNumItems()){ fxerror("%s::setCurrentPattern: index out of range.\n",getClassName()); }
   filefilter->setCurrentItem(patno);
+  filePattern=FXFileSelector::patternFromText(filefilter->getItemText(patno));
   }
 
 
@@ -253,6 +259,9 @@ FXint FindInFiles::getCurrentPattern() const {
 void FindInFiles::setPatternText(FXint patno,const FXString& text){
   if(patno<0 || patno>=filefilter->getNumItems()){ fxerror("%s::setPatternText: index out of range.\n",getClassName()); }
   filefilter->setItemText(patno,text);
+  if(patno==filefilter->getCurrentItem()){
+    filePattern=FXFileSelector::patternFromText(text);
+    }
   }
 
 
@@ -281,95 +290,62 @@ FXbool FindInFiles::allowPatternEntry() const {
   }
 
 
-// Start search
-long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
-  appendhist(getSearchText());
-  return 1;
-  }
-
-
-// Set directory to search in
-long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
-  FXString path=FXFileDialog::getOpenDirectory(this,tr("Search In Folder"),getDirectory());
-  if(!path.empty()){
-    setDirectory(path);
-    }
-  return 1;
-  }
-
-/*
-  if(FXSELID(sel)==ID_HIST_UP){
-    if(current<20 && getApp()->reg().readStringEntry(sectionName,regkey[current],NULL)) current++;
-    }
-  else{
-    if(current>0) current--;
-    }
-  if(current){
-    setSearchText(getApp()->reg().readStringEntry(sectionName,regkey[current-1],FXString::null));
-    }
-  else{
-    setSearchText(FXString::null);
-    setReplaceText(FXString::null);
-    setSearchMode(SEARCH_EXACT|SEARCH_FORWARD);
-    }
-*/
-
 // Add string to history buffer
-void FindInFiles::appendhist(const FXString& string){
-  if(!string.empty() && string!=history[0]){
-    for(FXint i=19; i>0; i--){
-      history[i].adopt(history[i-1]);
+void FindInFiles::appendHistory(const FXString& patt,FXuint opts){
+  if(!patt.empty()){
+    if(patt!=patternHistory[0]){
+      for(FXint i=19; i>0; i--){
+        swap(patternHistory[i],patternHistory[i-1]);
+        swap(optionsHistory[i],optionsHistory[i-1]);
+        }
       }
-    history[0]=string;
+    patternHistory[0]=patt;
+    optionsHistory[0]=opts;
     index=0;
     }
   }
 
 
-// Scroll back in history
-void FindInFiles::scrollback(){
-  if(index<19 && !history[index+1].empty()){
-    setSearchText(history[++index]);
-    }
-  else{
-    getApp()->beep();
-    }
-  }
-
-
-// Scroll forward in history
-void FindInFiles::scrollforw(){
-  if(0<=index){
-    --index;
-    if(0<=index){
-      setSearchText(history[index]);
-      }
-    else{
-      setSearchText(FXString::null);
-      }
-    }
+// Update arrows
+long FindInFiles::onUpdHistoryUp(FXObject* sender,FXSelector sel,void*){
+  sender->handle(this,(index<19 && !patternHistory[index+1].empty())?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
   }
 
 
 // Update arrows
-long FindInFiles::onUpdHistory(FXObject* sender,FXSelector sel,void*){
-  if(FXSELID(sel)==ID_HIST_UP){
-    sender->handle(this,(index<19 && !history[index+1].empty())?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+long FindInFiles::onUpdHistoryDn(FXObject* sender,FXSelector sel,void*){
+  sender->handle(this,(-1<index)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Scroll back in search history
+long FindInFiles::onCmdHistoryUp(FXObject*,FXSelector,void*){
+  if(index<19 && !patternHistory[index+1].empty()){
+    ++index;
+    setSearchText(patternHistory[index]);
+    setSearchMode(optionsHistory[index]);
     }
   else{
-    sender->handle(this,(-1<index)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+    getApp()->beep();
     }
   return 1;
   }
 
 
 // Scroll back in search history
-long FindInFiles::onCmdHistory(FXObject*,FXSelector sel,void*){
-  if(FXSELID(sel)==ID_HIST_UP){
-    scrollback();
-    }
-  else{
-    scrollforw();
+long FindInFiles::onCmdHistoryDn(FXObject*,FXSelector,void*){
+  if(0<=index){
+    --index;
+    if(0<=index){
+      setSearchText(patternHistory[index]);
+      setSearchMode(optionsHistory[index]);
+      }
+    else{
+      setSearchText(FXString::null);
+      setSearchMode(SearchExact);
+      }
     }
   return 1;
   }
@@ -380,12 +356,10 @@ long FindInFiles::onArrowKey(FXObject*,FXSelector,void* ptr){
   switch(((FXEvent*)ptr)->code){
     case KEY_Up:
     case KEY_KP_Up:
-      scrollback();
-      return 1;
+      return onCmdHistoryUp(this,FXSEL(SEL_COMMAND,ID_HIST_UP),NULL);
     case KEY_Down:
     case KEY_KP_Down:
-      scrollforw();
-      return 1;
+      return onCmdHistoryDn(this,FXSEL(SEL_COMMAND,ID_HIST_DN),NULL);
     }
   return 0;
   }
@@ -394,10 +368,10 @@ long FindInFiles::onArrowKey(FXObject*,FXSelector,void* ptr){
 // Wheeling in text field scrolls through history
 long FindInFiles::onMouseWheel(FXObject*,FXSelector,void* ptr){
   if(((FXEvent*)ptr)->code>0){
-    scrollback();
+    return onCmdHistoryUp(this,FXSEL(SEL_COMMAND,ID_HIST_UP),NULL);
     }
-  else if(((FXEvent*)ptr)->code<0){
-    scrollforw();
+  if(((FXEvent*)ptr)->code<0){
+    return onCmdHistoryDn(this,FXSEL(SEL_COMMAND,ID_HIST_DN),NULL);
     }
   return 1;
   }
@@ -407,11 +381,11 @@ long FindInFiles::onMouseWheel(FXObject*,FXSelector,void* ptr){
 long FindInFiles::onUpdFlags(FXObject* sender,FXSelector sel,void*){
   FXuint value=0;
   switch(FXSELID(sel)){
-    case ID_EXACT: value=!(searchflags&(SearchCaseFold|SearchRegex)); break;
-    case ID_ICASE: value=(searchflags&SearchCaseFold); break;
-    case ID_REGEX: value=(searchflags&SearchRegex); break;
-    case ID_RECURSIVE: value=(searchflags&SearchRecurse); break;
-    case ID_HIDDEN: value=(searchflags&SeachHidden); break;
+    case ID_EXACT: value=!(searchmode&(SearchCaseFold|SearchRegex)); break;
+    case ID_ICASE: value=(searchmode&SearchCaseFold); break;
+    case ID_REGEX: value=(searchmode&SearchRegex); break;
+    case ID_RECURSIVE: value=(searchmode&SearchRecurse); break;
+    case ID_HIDDEN: value=(searchmode&SeachHidden); break;
     }
   sender->handle(this,value?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
   return 1;
@@ -422,11 +396,22 @@ long FindInFiles::onUpdFlags(FXObject* sender,FXSelector sel,void*){
 // Handle flags
 long FindInFiles::onCmdFlags(FXObject*,FXSelector sel,void*){
   switch(FXSELID(sel)){
-    case ID_EXACT: searchflags=(searchflags&~(SearchCaseFold|SearchRegex)); break;
-    case ID_ICASE: searchflags=(searchflags&~SearchRegex)|SearchCaseFold; break;
-    case ID_REGEX: searchflags=(searchflags&~SearchCaseFold)|SearchRegex; break;
-    case ID_RECURSIVE: searchflags^=SearchRecurse; break;
-    case ID_HIDDEN: searchflags^=SeachHidden; break;
+    case ID_EXACT: searchmode=(searchmode&~(SearchCaseFold|SearchRegex)); break;
+    case ID_ICASE: searchmode=(searchmode&~SearchRegex)|SearchCaseFold; break;
+    case ID_REGEX: searchmode=(searchmode&~SearchCaseFold)|SearchRegex; break;
+    case ID_RECURSIVE: searchmode^=SearchRecurse; break;
+    case ID_HIDDEN: searchmode^=SeachHidden; break;
+    }
+  return 1;
+  }
+
+/*******************************************************************************/
+
+// Set directory to search in
+long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
+  FXString path=FXFileDialog::getOpenDirectory(this,tr("Search In Folder"),getDirectory());
+  if(!path.empty()){
+    setDirectory(path);
     }
   return 1;
   }
@@ -434,10 +419,88 @@ long FindInFiles::onCmdFlags(FXObject*,FXSelector sel,void*){
 
 // File list double clicked
 long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
-  index=(FXint)(FXival)ptr;
+  FXint which=(FXint)(FXival)ptr;
   return 1;
   }
 
+
+
+// Change the pattern; change the filename to the suggested extension
+long FindInFiles::onCmdFilter(FXObject*,FXSelector,void* ptr){
+  filePattern=FXFileSelector::patternFromText((FXchar*)ptr);
+  return 1;
+  }
+
+
+/*******************************************************************************/
+
+
+// Initialize search parameters
+SearchVisitor::SearchVisitor(const FXString& pattern,FXint mode):rex(pattern,mode){
+  }
+
+
+// Load file contents
+FXint SearchVisitor::loadFileBody(const FXString& file,FXString& body) const {
+  FXFile textfile(file,FXFile::Reading);
+  if(textfile.isOpen()){
+    FXlong size=textfile.size();
+    if(0<size && size<2147483647){
+      body.length(size);
+      return textfile.readBlock(body.text(),body.length());
+      }
+    }
+  return 0;
+  }
+
+
+// Search file contents for pattern
+FXint SearchVisitor::searchFileBody(const FXString& body) const {
+  FXint beg[10],end[10],pos=0,line=1;
+  while(pos<body.length()){
+    if(rex.amatch(body,pos,FXRex::Normal,beg,end,10)){
+      fxmessage("hit: at %d\n",line);
+      }
+    line+=(body[pos++]=='\n');
+    }
+  return 0;
+  }
+
+
+// Visit file
+FXuint SearchVisitor::visit(const FXString& path){
+  if(FXGlobVisitor::visit(path)){
+    FXString body;
+    fxmessage("visit(%s)\n",path.text());
+    if(loadFileBody(path,body)){
+      fxmessage("loaded %s: %d bytes\n",path.text(),body.length());
+      searchFileBody(body);
+      return 1;
+      }
+    }
+  return 0;
+  }
+
+
+// Start search
+long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
+  FXuint opts=FXDir::AllDirs|FXRex::Capture;
+  FXint rexmode=FXRex::Capture;
+  if(getSearchMode()&SearchCaseFold) rexmode|=FXRex::IgnoreCase;           // Case insensitivity
+  if(!(getSearchMode()&SearchRegex)) rexmode|=FXRex::Verbatim;             // Verbatim match
+  if(getSearchMode()&SeachHidden) opts|=FXDir::HiddenFiles|FXDir::HiddenDirs;
+//  SearchVisitor visitor(getSearchText(),rexmode);
+  appendHistory(getSearchText(),getSearchMode());
+//  visitor.traverse(getDirectory(),getPattern(),opts);
+  
+  FXGlobCountVisitor viz;
+  viz.traverse(getDirectory(),getPattern(),opts);
+  fxmessage("info: %s:\nfolders: %ld\nfiles:   %ld\nbytes:   %ld\ndepth:   %ld\n\n",getDirectory().text(),viz.getTotalFolders(),viz.getTotalFiles(),viz.getTotalBytes(),viz.getMaximumDepth());
+
+  return 1;
+  }
+
+/*******************************************************************************/
 
 // Clean up
 FindInFiles::~FindInFiles(){

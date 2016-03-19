@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -52,7 +52,7 @@ public:
 
   /// Return handle
   FXInputHandle handle() const { return device; }
-  
+
   /// Change access mode of open device
   virtual FXbool setMode(FXuint m);
 

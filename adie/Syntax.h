@@ -20,7 +20,7 @@
 ********************************************************************************/
 #ifndef SYNTAX_H
 #define SYNTAX_H
-
+ 
 class Rule;
 class Syntax;
 
@@ -62,7 +62,7 @@ public:
   // Rule name
   const FXString& getName() const { return name; }
   void setName(const FXString& nm){ name=nm; }
-  
+
   // Style coloring, if not changed
   const FXString& getStyle() const { return style; }
   void setStyle(const FXString& st){ style=st; }
@@ -236,6 +236,9 @@ public:
   // Context characters
   FXint getContextChars() const { return contextChars; }
   void setContextChars(FXint num){ contextChars=num; }
+
+  // Find rule index, given name
+  FXint getNamedRule(const FXString& name) const;
 
   // Match filename against wildcards
   FXbool matchFilename(const FXString& name) const;

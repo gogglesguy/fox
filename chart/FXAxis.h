@@ -27,7 +27,7 @@ namespace FXCHART {
 
 class FXChart;
 
-
+ 
 /// Axis styles
 enum {
   AXIS_OFF            = 0,              /// Nothing drawn on axis

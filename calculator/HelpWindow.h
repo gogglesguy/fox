@@ -21,7 +21,7 @@
 #ifndef HELPWINDOW_H
 #define HELPWINDOW_H
 
-
+ 
 /// Online help dialog box
 class HelpWindow : public FXDialogBox {
   FXDECLARE(HelpWindow)

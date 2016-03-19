@@ -6,7 +6,7 @@ RESWRAP  = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 
-
+ 
 bin_PROGRAMS = calculator
 
 man_MANS = calculator.1

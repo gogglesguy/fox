@@ -30,7 +30,7 @@
 #include <ctype.h>
 #include "Calculator.h"
 
-
+ 
 // Start the whole thing
 int main(int argc,char *argv[]){
 

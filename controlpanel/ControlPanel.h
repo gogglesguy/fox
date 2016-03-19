@@ -21,7 +21,7 @@
 #ifndef CONTROLPANEL_H
 #define CONTROLPANEL_H
 
-
+ 
 // Color theme info
 struct ColorTheme {
   const FXchar* name;

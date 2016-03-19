@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1258,165 +1258,219 @@ FXString FXPath::dequote(const FXString& file){
 #endif
 
 
-// Perform match
-static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
-  const FXchar *s=string;
-  const FXchar *p=pattern;
-  FXint level;
-  FXwchar c,c2,cc;
-  FXbool neg,ok;
-  while((c=wc(p))!='\0'){
-    p=wcinc(p);
-    switch(c){
-      case '?':         // Single character wildcard
-        if(*s=='\0') return false;
-        if((flags&FXPath::PathName) && ISPATHSEP(*s)) return false;
-        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
-        s=wcinc(s);
+#if 1
+
+// Skip over part of pattern
+static const FXchar* skip(const FXchar* p,FXuint flags,FXbool alt){
+  FXint set=0;          // Characters in set [ ]
+  FXint brk=0;          // Bracket set
+  FXint par=0;          // Group level
+  FXint neg=0;          // Negated
+  while(*p!='\0'){
+    switch(*p){
+      case '[':         // Enter character set [ ]
+        p++;
+        if(brk==0){ brk++; set=neg=0; break; }
+        set++;
         break;
-      case '*':         // Multiple character wildcard
-        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
-        while((c=wc(p))=='*'){ p=wcinc(p); }                    // Squeeze superfluous '*'
-        if(c=='\0'){                                            // Optimization for trailing '*'
-          if((flags&FXPath::PathName) && !(flags&FXPath::LeadDir)){
-            while(*s){
-              if(ISPATHSEP(*s)) return false;   // If PathName then '*' never matches '/'
-              s=wcinc(s);
-              }
-            }
-          return true;
-          }
-        if((flags&FXPath::PathName) && ISPATHSEP(c)){           // Optimize for '*' followed by '/...'
-          while(*s!='\0' && !ISPATHSEP(*s)){    // Scan through to nearest '/'
-            s=wcinc(s);
-            }
-          }
-        while(*s!='\0'){
-          if(domatch(s,p,flags&~FXPath::DotFile)) return true;
-          if((flags&FXPath::PathName) && ISPATHSEP(*s)) break;
-          s=wcinc(s);
-          }
-        return false;
-      case '[':         // Single character against character-set
-        if(*s=='\0') return false;
-        if((flags&FXPath::PathName) && ISPATHSEP(*s)) return false;
-        if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
-        cc=wc(s);
-        if(flags&FXPath::CaseFold){
-          cc=Unicode::toLower(cc);
-          }
-        c=wc(p);
-        p=wcinc(p);
-        neg=((c=='!') || (c=='^'));
-        if(neg){
-          c=wc(p);
-          p=wcinc(p);
-          }
-        ok=false;
-        do{
-          if(c=='\\' && !(flags&FXPath::NoEscape)){
-            c=wc(p);
-            p=wcinc(p);
-            }
-          if(c=='\0') return false;
-          if((flags&FXPath::PathName) && ISPATHSEP(c)) return false;
-          if(flags&FXPath::CaseFold){
-            c=Unicode::toLower(c);
-            }
-          c2=wc(wcinc(p));
-          if((wc(p)=='-') && (c2!='\0' ) && (c2!=']')){         // Range match
-            p=wcinc(wcinc(p));
-            if(c2=='\\' && !(flags&FXPath::NoEscape)){
-              c2=wc(p);
-              p=wcinc(p);
-              }
-            if(c2=='\0') return false;
-            if(flags&FXPath::CaseFold){
-              c2=Unicode::toLower(c2);
-              }
-            if(c<=cc && cc<=c2){
-              ok=true;
-              }
-            }
-          else{                                                 // Single match
-            if(c==cc){
-              ok=true;
-              }
-            }
-          c=wc(p);
-          p=wcinc(p);
-          }
-        while(c!=']');
-        if(ok==neg) return false;
-        s=wcinc(s);
+      case ']':         // Leave character set [ ]
+        p++;
+        if(brk==1 && 0<set){ brk--; break; }
+        set++;
         break;
-      case '(':
-nxt:    if(domatch(s,p,flags)) return true;
-        for(level=0; *p && 0<=level; ){
-          c=wc(p);
-          p=wcinc(p);
-          switch(c){
-            case '\\': if(!(flags&FXPath::NoEscape) && *p){ p=wcinc(p); } break;
-            case '(' : level++; break;
-            case ')' : level--; break;
-            case '|' :
-            case ',' : if(level==0) goto nxt;
-            }
-          }
-        return false;
-      case ')':
+      case '!':
+      case '^':
+        p++;
+        set++;
+        if(!neg){ neg=1; set=0; }
         break;
+      case '(':         // Enter sub group ( )
+        p++;
+        if(brk==0){ par++; }
+        set++;
+        break;
+      case ')':         // Leave sub group ( )
+        p++;
+        if(brk==0){ if(--par<=0) goto x; }
+        set++;
+        break;
+      case ',':         // Separation of alternatives
       case '|':
-      case ',':
-        for(level=0; *p && 0<=level; ){
-          c=wc(p);
-          p=wcinc(p);
-          switch(c){
-            case '\\': if(!(flags&FXPath::NoEscape) && *p){ p=wcinc(p); } break;
-            case '(' : level++; break;
-            case ')' : level--; break;
-            }
-          }
+        p++;
+        if(brk==0 && par==0 && alt){ goto x; }
+        set++;
         break;
-      case '\\':
-        if(!(flags&FXPath::NoEscape) && *p){                    // Escapes are used
-          c=wc(p);
-          p=wcinc(p);
-          }
+      case '\\':        // Escape code
+        if(!(flags&FXPath::NoEscape)){ if(*++p=='\0') goto x; }
         // FALL //
-      default:
-        cc=wc(s);
-        if(flags&FXPath::CaseFold){
-          c=Unicode::toLower(c);
-          cc=Unicode::toLower(cc);
-          }
-        if(c!=cc) return false;
-        s=wcinc(s);
+      default:          // Regular character
+        p=wcinc(p);     // Next unicode character
+        set++;          // One more in set
         break;
       }
     }
-  return (*s=='\0') || ((flags&FXPath::LeadDir) && ISPATHSEP(*s));
+x:return p;
+  }
+
+
+// Perform match
+static FXbool domatch(const FXchar* string,const FXchar* s,const FXchar* p,FXuint flags){
+  FXwchar pp,qq,ss;
+  FXint level=0;
+  FXbool neg;
+  FXbool ok;
+  //FXTRACE((1,"p: %s s: %s\n",p,s));
+  while(*p!='\0'){
+    switch(*p){
+      case '?':         // Single character wildcard
+        p++;                                                    // Eat '?'
+        if(*s=='\0') return false;
+        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
+        s=wcinc(s);
+        break;
+      case '*':         // Multiple character wildcard
+        while(*p=='*') p++;                                     // Eat '*'
+        while(*s!='\0'){
+          if(domatch(string,s,p,flags)) return true;
+          if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
+          if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+          s=wcinc(s);
+          }
+        break;
+      case '[':         // Single character against character-set
+        p++;                                                    // Eat '['
+        if(*s=='\0') return false;
+        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && ((s==string) || ISPATHSEP(*(s-1))) && (flags&FXPath::DotFile)) return false;
+        neg=(*p=='!' || *p=='^');
+        if(neg) p++;
+        ss=wc(s);
+        if(flags&FXPath::CaseFold){ ss=Unicode::toLower(ss); }
+        s=wcinc(s);
+        ok=false;
+        do{
+          if(*p=='\\' && !(flags&FXPath::NoEscape)) p++;
+          if(*p=='\0') return false;
+          pp=wc(p);
+          if(flags&FXPath::CaseFold){ pp=Unicode::toLower(pp); }
+          p=wcinc(p);
+          if(*p=='-' && *(p+1)!=']'){                           // Range match
+            p++;
+            if(*p=='\\' && !(flags&FXPath::NoEscape)) p++;
+            if(*p=='\0') return false;
+            qq=wc(p);
+            if(flags&FXPath::CaseFold){ qq=Unicode::toLower(qq); }
+            p=wcinc(p);
+            if(pp<=ss && ss<=qq) ok=true;
+            }
+          else{                                                 // Single match
+            if(pp==ss) ok=true;
+            }
+          }
+        while(*p!=']');
+        p++;
+        if(ok==neg) return false;
+        break;
+      case '(':         // Start subpattern
+        p++;
+nxt:    if(domatch(string,s,p,flags)) return true;
+        for(level=0; *p && 0<=level; ){
+          switch(*p){
+            case '(' :
+              p++;
+              level++;
+              break;
+            case ')' :
+              p++;
+              level--;
+              break;
+            case '|' :
+            case ',' :
+              p++;
+              if(level==0) goto nxt;
+              break;
+            case '\\':
+              if(!(flags&FXPath::NoEscape)){ if(*++p=='\0') return false; }
+              // FALL //
+            default:
+              p=wcinc(p);
+              break;
+            }
+          }
+        return false;
+      case ')':         // End subpattern
+        p++;
+        break;
+      case '|':         // Alternatives
+      case ',':
+        p++;
+        for(level=0; *p && 0<=level; ){
+          switch(*p){
+            case '(':
+              level++;
+              p++;
+              break;
+            case ')':
+              level--;
+              p++;
+              break;
+            case '\\':
+              if(!(flags&FXPath::NoEscape)){ if(*++p=='\0') return false; }
+              // FALL //
+            default:
+              p=wcinc(p);
+              break;
+            }
+          }
+        break;
+      case '\\':        // Escaped character follows
+        if(!(flags&FXPath::NoEscape)){ if(*++p=='\0') return false; }
+        // FALL //
+      default:          // Match characters against pattern
+        pp=wc(p);
+        ss=wc(s);
+        if(flags&FXPath::CaseFold){
+          pp=Unicode::toLower(pp);
+          ss=Unicode::toLower(ss);
+          }
+        if(pp!=ss) return false;
+        s=wcinc(s);
+        p=wcinc(p);
+        break;
+      }
+    }
+  return (*s=='\0') || (ISPATHSEP(*s) && (flags&FXPath::LeadDir));
   }
 
 
 // Match filename against a pattern, subject to flags
-FXbool FXPath::match(const FXchar *string,const FXchar *pattern,FXuint flags){
-  const FXchar *s=string;
-  const FXchar *p=pattern;
-  FXint level;
-  FXwchar c;
-  if(s && p){
-nxt:if(domatch(s,p,flags)) return true;
-    for(level=0; *p && 0<=level; ){
-      c=wc(p);
-      p=wcinc(p);
-      switch(c){
-        case '\\': if(!(flags&FXPath::NoEscape) && *p){ p=wcinc(p); } break;
-        case '(' : level++; break;
-        case ')' : level--; break;
-        case '|' :
-        case ',' : if(level==0) goto nxt;
-        }
+FXbool FXPath::match(const FXchar* string,const FXchar* pattern,FXuint flags){
+  if(__likely(string && pattern)){
+    FXint level=0;
+a:  if(domatch(string,string,pattern,flags)) return true;
+b:  switch(*pattern){
+      case '\0':
+        return false;
+      case '(':
+        ++pattern;
+        ++level;
+        goto b;
+      case ')':
+        ++pattern;
+        if(--level<0){ return false; }          // Unmatched parentheses
+        goto b;
+      case '|':
+      case ',':
+        ++pattern;
+        if(level==0) goto a;                    // Attempt next alternative
+        goto b;
+      case '\\':
+        if(!(flags&FXPath::NoEscape)){ if(*++pattern=='\0') return false; }     
+        // FALL //
+      default:
+        pattern=wcinc(pattern);
+        goto b;
       }
     }
   return false;
@@ -1424,7 +1478,7 @@ nxt:if(domatch(s,p,flags)) return true;
 
 
 // Match filename against pattern (like *, ?, [^a-z], and so on)
-FXbool FXPath::match(const FXString& file,const FXchar *pattern,FXuint flags){
+FXbool FXPath::match(const FXString& file,const FXchar* pattern,FXuint flags){
   return FXPath::match(file.text(),pattern,flags);
   }
 
@@ -1433,6 +1487,257 @@ FXbool FXPath::match(const FXString& file,const FXchar *pattern,FXuint flags){
 FXbool FXPath::match(const FXString& file,const FXString& pattern,FXuint flags){
   return FXPath::match(file.text(),pattern.text(),flags);
   }
+
+#endif
+
+
+#if 0
+// Skip over part of pattern
+static const FXchar* skip(const FXchar* p,const FXchar* pe,FXuint flags,FXbool alt){
+  FXint set=0;          // Characters in set [ ]
+  FXint brk=0;          // Bracket set
+  FXint par=0;          // Group level
+  FXint neg=0;          // Negated
+  while(p<pe){
+    switch(*p){
+      case '[':         // Enter character set [ ]
+        p++;
+        set++;
+        if(brk==0){ brk++; set=0; neg=0; }
+        break;
+      case ']':         // Leave character set [ ]
+        p++;
+        set++;
+        if(brk==1){ if(set>1) brk--; }
+        break;
+      case '!':
+      case '^':
+        p++;
+        set++;
+        if(!neg){ neg=1; set=0; }
+        break;
+      case '(':         // Enter sub group ( )
+        p++;
+        set++;
+        if(brk==0){ par++; }
+        break;
+      case ')':         // Leave sub group ( )
+        p++;
+        set++;
+        if(brk==0){ par--; if(par<=0) return p; }
+        break;
+      case ',':         // Separation of alternatives
+      case '|':
+        p++;
+        set++;
+        if(brk==0 && par==0 && alt){ return p; }
+        break;
+      case '\\':        // Escape code
+        if(!(flags&FXPath::NoEscape)){ if(++p>=pe) return pe; }
+        // FALL //
+      default:          // Regular character
+        p=wcinc(p);     // Next unicode character
+        set++;          // One more in set
+        break;
+      }
+    }
+  return pe;
+  }
+
+
+// Perform match
+//
+// Special pattern characters are interpreted as follows:
+//
+//   ?  Normally matches a single unicode character. However, when the DotFile flag is passed,
+//      the ? does NOT match a '.' if it appears at the start of the string, or if it follows a
+//      '/' and the PathName flag is also passed.
+//
+//   *  Normally matches zero or more unicode characters. However, when the DotFile flag is passed,
+//      the * does NOT match a '.' if the '.' appears at the start of the string, or if it follows a
+//      '/' and the PathName flag is also passed.
+//
+//   [] Character set matches a single unicode character in the set.  However, then the DotFile flag
+//      is passed, the [] does NOT match a '.' if it appears at the start of the string, or if it follows
+//      a '/' and the PathName flag is also passed.
+//
+//   \  Escaped characters match the unicode character.  If \ is NOT followed by a character, the match
+//      will fail.
+//
+static FXbool domatch(const FXchar* string,const FXchar* s,const FXchar* se,const FXchar* p,const FXchar* pe,FXuint flags){
+  const FXchar* e;
+  FXwchar pp,qq,ss;
+  FXint level=0;
+  FXbool neg,ok;
+  //FXTRACE((1,"p: %s s: %s\n",p,s));
+  while(p<pe){
+    switch(*p){
+      case '?':         // Single character wildcard
+        p++;                                                    // Eat '?'
+        if(s>=se) return false;                                 // No more text
+        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
+        s=wcinc(s);
+        break;
+      case '*':         // Multiple character wildcard
+        while(*p=='*') p++;                                     // Eat '*'
+        if(flags&FXPath::PathName){                             // '*' does NOT match '/'
+          e=s;
+          while(e<se && !ISPATHSEP(*e)){
+            e=wcinc(e);
+            }
+          }
+        else{                                                   // '*' DOES match '/'
+          e=se;
+          }
+        while(s<e){
+          if(domatch(string,s,se,p,pe,flags)) return true;      // Match the part after the '*'
+          if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
+          s=wcinc(s);
+          }
+        break;
+      case '[':         // Single character against character-set
+        p++;                                                    // Eat '['
+        if(s>=se) return false;                                 // No more text
+        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
+        if(p>=pe) return false;
+        if((neg=(*p=='!' || *p=='^'))) p++;
+        if(p>=pe) return false;
+        ss=wc(s);
+        if(flags&FXPath::CaseFold){ ss=Unicode::toLower(ss); }
+        s=wcinc(s);
+        ok=false;
+        do{
+          if(*p=='\\' && !(flags&FXPath::NoEscape)){ if(++p>=pe) return false; }
+          pp=wc(p);
+          if(flags&FXPath::CaseFold){ pp=Unicode::toLower(pp); }
+          p=wcinc(p);
+          if(*p=='-' && *(p+1)!=']'){                           // Range match
+            p++;
+            if(*p=='\\' && !(flags&FXPath::NoEscape)){ if(++p>=pe) return false; }
+            qq=wc(p);
+            if(flags&FXPath::CaseFold){ qq=Unicode::toLower(qq); }
+            p=wcinc(p);
+            if(pp<=ss && ss<=qq) ok=true;
+            }
+          else{                                                 // Single match
+            if(pp==ss) ok=true;
+            }
+          if(p>=pe) return false;
+          }
+        while(*p!=']');
+        p++;
+        if(ok==neg) return false;
+        break;
+/*
+      case '(':         // Start subpattern
+        p++;
+nxt:    if(domatch(s,p,flags)) return true;
+        for(level=0; *p && 0<=level; ){
+          switch(*p){
+            case '(' :
+              p++;
+              level++;
+              break;
+            case ')' :
+              p++;
+              level--;
+              break;
+            case '|' :
+            case ',' :
+              p++;
+              if(level==0) goto nxt;
+              break;
+            case '\\':
+              if(!(flags&FXPath::NoEscape) && *(p+1)) p++;
+              // FALL //
+            default:
+              p=wcinc(p);
+              break;
+            }
+          }
+        return false;
+*/
+      case ')':         // End subpattern or alternative
+      case '|':
+      case ',':
+        p++;
+        goto x;
+      case '\\':        // Escaped character follows
+        if(!(flags&FXPath::NoEscape)){ if(++p>=pe) return false; }
+        // FALL //
+      default:          // Match characters against pattern
+        FXASSERT(p<pe);
+        FXASSERT(s<se);
+        pp=wc(p);
+        ss=wc(s);
+        if(flags&FXPath::CaseFold){
+          pp=Unicode::toLower(pp);
+          ss=Unicode::toLower(ss);
+          }
+        if(pp!=ss) return false;
+        s=wcinc(s);
+        p=wcinc(p);
+        break;
+      }
+    }
+x:return (s==se) || ((flags&FXPath::LeadDir) && ISPATHSEP(*s));
+  }
+
+
+// Match filename against a pattern, subject to flags
+FXbool FXPath::match(const FXchar* string,const FXchar* pattern,FXuint flags){
+  if(__likely(string && pattern)){
+    const FXchar* s=string;
+    const FXchar* p=pattern;
+    const FXchar* se=string+strlen(string);
+    const FXchar* pe=pattern+strlen(pattern);
+    FXint level=0;
+a:  if(domatch(string,s,se,p,pe,flags)) return true;
+    while(p<pe){
+      switch(*p){
+        case '(':
+          level++;
+          p++;
+          break;
+        case ')':
+          level--;
+          p++;
+          if(level<0) return false;
+          break;
+        case '|':
+        case ',':
+          p++;
+          if(level==0) goto a;
+          break;
+        case '\\':
+          if(!(flags&FXPath::NoEscape)){ if(++p>=pe) return false; }
+          // FALL //
+        default:
+          FXASSERT(p<pe);
+          p=wcinc(p);
+          break;
+        }
+      }
+    }
+  return false;
+  }
+
+
+// Match filename against pattern (like *, ?, [^a-z], and so on)
+FXbool FXPath::match(const FXString& file,const FXchar* pattern,FXuint flags){
+  return FXPath::match(file.text(),pattern,flags);
+  }
+
+
+// Match filename against pattern (like *, ?, [^a-z], and so on)
+FXbool FXPath::match(const FXString& file,const FXString& pattern,FXuint flags){
+  return FXPath::match(file.text(),pattern.text(),flags);
+  }
+  
+#endif
+
 
 
 // Generate unique filename of the form pathnameXXX.ext, where pathname.ext is the

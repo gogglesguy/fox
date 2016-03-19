@@ -3,7 +3,7 @@
 *                          E x c e p t i o n  T y p e s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -166,7 +166,7 @@ public:
   FXThreadException(const FXchar *msg,FXint xc=-1):FXException(msg),exitcode(xc){}
   FXint code() const { return exitcode; }
   };
-  
+
 }
 
 #endif

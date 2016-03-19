@@ -27,7 +27,7 @@
 
 namespace FXCHART {
 
-
+ 
 class FXCurve;
 
 

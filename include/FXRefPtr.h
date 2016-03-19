@@ -3,7 +3,7 @@
 *         R e f e r e n c e   C o u n t e d   O b j e c t  P o i n t e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,7 +26,7 @@ namespace FX {
 
 
 /// Pointer to shared object
-template<typename EType> 
+template<typename EType>
 class FXRefPtr {
 private:
   EType* ptr;

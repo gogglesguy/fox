@@ -3,7 +3,7 @@
 *                    F i l e   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -76,33 +76,37 @@ FXIMPLEMENT(FXFileDialog,FXDialogBox,NULL,0)
 
 // Construct file fialog box
 FXFileDialog::FXFileDialog(FXWindow* own,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDialogBox(own,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,4,4,4,4,4,4){
-  initdialog();
-  }
-
-
-// Construct free-floating file dialog box
-FXFileDialog::FXFileDialog(FXApp* a,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDialogBox(a,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,4,4,4,4,4,4){
-  initdialog();
-  }
-
-
-// Initialize dialog and load settings
-void FXFileDialog::initdialog(){
   filebox=new FXFileSelector(this,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   filebox->acceptButton()->setTarget(this);
   filebox->acceptButton()->setSelector(FXDialogBox::ID_ACCEPT);
   filebox->cancelButton()->setTarget(this);
   filebox->cancelButton()->setSelector(FXDialogBox::ID_CANCEL);
+  loadSettings();
+  }
+
+
+// Construct free-floating file dialog box
+FXFileDialog::FXFileDialog(FXApp* a,const FXString& name,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDialogBox(a,name,opts|DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,x,y,w,h,4,4,4,4,4,4){
+  filebox=new FXFileSelector(this,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  filebox->acceptButton()->setTarget(this);
+  filebox->acceptButton()->setSelector(FXDialogBox::ID_ACCEPT);
+  filebox->cancelButton()->setTarget(this);
+  filebox->cancelButton()->setSelector(FXDialogBox::ID_CANCEL);
+  loadSettings();
+  }
+
+
+// Load settings from registry
+void FXFileDialog::loadSettings(){
   setWidth(getApp()->reg().readIntEntry(sectionName,"width",getWidth()));
   setHeight(getApp()->reg().readIntEntry(sectionName,"height",getHeight()));
   setFileBoxStyle(getApp()->reg().readUIntEntry(sectionName,"style",getFileBoxStyle()));
   showHiddenFiles(getApp()->reg().readBoolEntry(sectionName,"showhidden",showHiddenFiles()));
   }
-
-
-// Hide window and save settings
-void FXFileDialog::hide(){
-  FXDialogBox::hide();
+  
+  
+// Save settings to registry
+void FXFileDialog::saveSettings(){
   getApp()->reg().writeIntEntry(sectionName,"width",getWidth());
   getApp()->reg().writeIntEntry(sectionName,"height",getHeight());
   getApp()->reg().writeUIntEntry(sectionName,"style",getFileBoxStyle());
@@ -390,6 +394,7 @@ void FXFileDialog::load(FXStream& store){
 
 // Cleanup
 FXFileDialog::~FXFileDialog(){
+  saveSettings();
   filebox=(FXFileSelector*)-1L;
   }
 

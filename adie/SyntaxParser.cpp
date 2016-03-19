@@ -111,6 +111,8 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
       fxwarning("%s:%d: error: expected 'rule' <name>.\n",from,line);
       return false;
       }
+      
+    // Snarf name from parse buffer
     name.assign(head+1,tail-head-2);
     token=gettok();
 

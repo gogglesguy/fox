@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -154,16 +154,16 @@ namespace FXPath {
   *
   *  PathName      No wildcard can ever match /
   *  NoEscape      Backslashes don't quote special chars
-  *  DotFile       Leading . is matched only explicitly
+  *  DotFile       Leading . is matched only explicitly, and not against wildcard
   *  LeadDir       Ignore /... after a match
   *  CaseFold      Compare without regard to case
   */
-  extern FXAPI FXbool match(const FXchar *string,const FXchar *pattern="*",FXuint flags=(NoEscape|PathName));
+  extern FXAPI FXbool match(const FXchar* string,const FXchar* pattern="*",FXuint flags=(NoEscape|PathName));
 
   /**
   * Perform match of a filename against a wildcard pattern.
   */
-  extern FXAPI FXbool match(const FXString& file,const FXchar *pattern="*",FXuint flags=(NoEscape|PathName));
+  extern FXAPI FXbool match(const FXString& file,const FXchar* pattern="*",FXuint flags=(NoEscape|PathName));
 
   /**
   * Perform match of a filename against a wildcard pattern.

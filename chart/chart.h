@@ -20,7 +20,7 @@
 ********************************************************************************/
 #ifndef CHART_H
 #define CHART_H
-
+ 
 // Chart includes
 #include "chartdefs.h"
 #include "FXAxis.h"

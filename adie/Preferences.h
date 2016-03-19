@@ -21,7 +21,7 @@
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
-
+ 
 
 class TextWindow;
 class Adie;

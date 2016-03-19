@@ -290,6 +290,15 @@ Syntax::Syntax(const FXString& lang,const FXString& grp):language(lang),group(gr
   }
 
 
+// Find rule given name
+FXint Syntax::getNamedRule(const FXString& name) const {
+  for(FXint i=0; i<rules.no(); ++i){
+    if(rules[i]->getName()==name) return i;
+    }
+  return -1;
+  }
+
+
 // Match filename against wildcards
 FXbool Syntax::matchFilename(const FXString& name) const {
   return FXPath::match(name,extensions);

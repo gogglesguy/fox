@@ -3,7 +3,7 @@
 *          S i n g l e - P r e c i s i o n   C o m p l e x   N u m b e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -59,7 +59,7 @@ public:
   /// Access real part
   FXfloat& real() { return re; }
   const FXfloat& real() const { return re; }
-  
+
   /// Access imaginary part
   FXfloat& imag() { return im; }
   const FXfloat& imag() const { return im; }

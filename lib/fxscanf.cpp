@@ -434,7 +434,7 @@ assign:   if(convert){
             if(nn==']') break;
             if(nn=='-'){
               nn=(FXuchar)*format;
-              if(nn!=']' && ch<=nn){                    // Range if not at end 
+              if(nn!=']' && ch<=nn){                    // Range if not at end
                 while(ch<nn){ set[++ch]=v; }
                 format++;
                 }

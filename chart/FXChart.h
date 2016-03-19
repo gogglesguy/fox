@@ -21,7 +21,7 @@
 #ifndef FXCHART_H
 #define FXCHART_H
 
-
+ 
 namespace FXCHART {
 
 
