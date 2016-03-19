@@ -432,7 +432,6 @@ void FXGLViewer::create(){
   glsetup();
 
   // Register drag type for color
-  if(!colorType){colorType=getApp()->registerDragType(colorTypeName);}
   if(!objectType){objectType=getApp()->registerDragType(objectTypeName);}
 
   // If have scene already, get correct bounds
@@ -446,7 +445,6 @@ void FXGLViewer::create(){
 // Detach window
 void FXGLViewer::detach(){
   FXGLCanvas::detach();
-  colorType=0;
   objectType=0;
   }
 

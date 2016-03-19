@@ -214,7 +214,7 @@ FXlong FXFile::position(FXlong offset,FXuint from){
       }
 #endif
     }
-  return -1;
+  return FXIO::Error;
   }
 
 
@@ -238,7 +238,7 @@ FXlong FXFile::truncate(FXlong sz){
       }
 #endif
     }
-  return -1;
+  return FXIO::Error;
   }
 
 
@@ -247,7 +247,7 @@ FXbool FXFile::flush(){
   if(__likely(device!=BadHandle)){
 #if defined(WIN32)
     return ::FlushFileBuffers(device)!=0;
-#else
+#elif defined(_BSD_SOURCE) || defined(_XOPEN_SOURCE) || (_POSIX_C_SOURCE >= 200112L)
     return ::fsync(device)==0;
 #endif
     }
@@ -260,7 +260,7 @@ FXint FXFile::eof(){
   if(__likely(device!=BadHandle)){
     return !(pointer<size());
     }
-  return -1;
+  return FXIO::Error;
   }
 
 
@@ -276,7 +276,7 @@ FXlong FXFile::size(){
     if(::fstat(device,&data)==0) return data.st_size;
 #endif
     }
-  return -1;
+  return FXIO::Error;
   }
 
 /*******************************************************************************/

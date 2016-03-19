@@ -162,6 +162,49 @@ public:
  ~FXHash();
   };
 
+
+/// Hash table of pointers to KEYTYPE to pointers of VALUETYPE
+template<typename KEYTYPE,typename VALUETYPE>
+class FXHashOf : public FXHash {
+public:
+
+  /// Default constructor
+  FXHashOf(){}
+
+  /// Copy constructor
+  FXHashOf(const FXHashOf<KEYTYPE,VALUETYPE>& src):FXHash(src){}
+
+  /// Return reference to slot assocated with given key
+  VALUETYPE*& at(KEYTYPE* name){ return reinterpret_cast<VALUETYPE*&>(FXHash::at((FXptr)name)); }
+
+  /// Return constant reference to slot assocated with given key
+  VALUETYPE *const& at(KEYTYPE* name) const { return reinterpret_cast<VALUETYPE *const&>(FXHash::at((FXptr)name)); }
+
+  /// Return reference to slot assocated with given key
+  VALUETYPE*& operator[](KEYTYPE* name){ return reinterpret_cast<VALUETYPE*&>(FXHash::at((FXptr)name)); }
+
+  /// Return constant reference to slot assocated with given key
+  VALUETYPE *const& operator[](KEYTYPE* name) const { return reinterpret_cast<VALUETYPE *const&>(FXHash::at((FXptr)name)); }
+
+  /// Insert association with given key; return old value, if any
+  VALUETYPE* insert(KEYTYPE* name,VALUETYPE* data=NULL){ return reinterpret_cast<VALUETYPE*>(FXHash::insert((FXptr)name,(FXptr)data)); }
+
+  /// Remove association with given key; return old value, if any
+  VALUETYPE* remove(KEYTYPE* name){ return reinterpret_cast<VALUETYPE*>(FXHash::remove((FXptr)name)); }
+
+  /// Erase data at pos in the table; return old value, if any
+  VALUETYPE* erase(FXival pos){ return reinterpret_cast<VALUETYPE*>(FXHash::erase(pos)); }
+
+  /// Return key at position pos
+  KEYTYPE* key(FXival pos) const { return reinterpret_cast<KEYTYPE*>(FXHash::key(pos)); }
+
+  /// Return reference to slot at position pos
+  VALUETYPE*& value(FXival pos){ return reinterpret_cast<VALUETYPE*&>(FXHash::value(pos)); }
+
+  /// Return constant reference to slot at position pos
+  VALUETYPE *const& value(FXival pos) const { return reinterpret_cast<VALUETYPE *const&>(FXHash::value(pos)); }
+  };
+
 }
 
 #endif

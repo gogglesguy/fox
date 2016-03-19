@@ -78,6 +78,12 @@ FXbool FXIO::isWritable() const {
   }
 
 
+// Change access mode
+FXbool FXIO::setMode(FXuint){
+  return false;
+  }
+
+
 // Return true if open
 FXbool FXIO::isOpen() const {
   return true;
@@ -103,7 +109,7 @@ FXlong FXIO::position(FXlong offset,FXuint from){
     pointer=offset;
     return pointer;
     }
-  return -1;
+  return FXIO::Error;
   }
 
 
@@ -140,7 +146,7 @@ FXlong FXIO::truncate(FXlong sz){
     if(pointer>=sz) pointer=sz;
     return sz;
     }
-  return -1;
+  return FXIO::Error;
   }
 
 

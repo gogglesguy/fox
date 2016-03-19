@@ -36,7 +36,6 @@
   - Old as night, but recently rediscovered ;-).
   - Better treatment of identifiers needed [user-supplied names].
   - Maintain stack-depth during compile phase for possible limit check.
-  - Potential issue is that ran uses global state.
 */
 
 // Debugging expression code
@@ -106,7 +105,6 @@ enum {
   TK_EULER      = 69,
   TK_RTOD       = 3005613,
   TK_DTOR       = 2389741,
-  TK_RAN        = 125277,
   TK_ABS        = 108848,
   TK_ACOS       = 3592862,
   TK_ACOSH      = 118564406,
@@ -143,7 +141,6 @@ enum {
 
   OP_NUM,
   OP_VAR,
-  OP_RAND,
 
   OP_NOT,
   OP_NEG,
@@ -193,14 +190,21 @@ enum {
 
 
 // Compile class
-struct FXCompile {
-  const FXchar *head;
-  const FXchar *tail;
-  const FXchar *vars;
-  FXuchar      *code;
-  FXuchar      *pc;
-  FXuint        token;
+class FXCompile {
+  const FXchar *head;           // Start of token
+  const FXchar *tail;           // End of token + 1
+  const FXchar *vars;           // Variables
+  FXuchar      *code;           // Program code
+  FXuchar      *pc;             // Program counter
+  FXuint        token;          // Token
+public:
 
+  // Create compile engine
+  FXCompile(FXuchar *prog,const FXchar* ex,const FXchar* vs);
+
+  // Return size of generated code
+  FXival size() const { return pc-code; }
+  
   // Get token
   void gettok();
 
@@ -232,14 +236,23 @@ struct FXCompile {
 
 /*******************************************************************************/
 
+// Construct compile engine
+FXCompile::FXCompile(FXuchar *prog,const FXchar* ex,const FXchar* vs):head(ex),tail(ex),vars(vs),code(prog),pc(prog),token(TK_EOF){
+  }
+
+
 // Compile expression
 FXExpression::Error FXCompile::compile(){
   FXExpression::Error err;
+  FXuchar* at=pc;
+  gettok();
+  pc+=2;
   if(token==TK_EOF) return FXExpression::ErrEmpty;
   err=expression();
   if(err!=FXExpression::ErrOK) return err;
   if(token!=TK_EOF) return FXExpression::ErrToken;
   opcode(OP_END);
+  fix(at,pc-code);
   return FXExpression::ErrOK;
   }
 
@@ -454,9 +467,6 @@ FXExpression::Error FXCompile::element(){
     case TK_DTOR:
       opcode(OP_NUM);
       number(0.0174532925199432957692369077);
-      break;
-    case TK_RAN:
-      opcode(OP_RAND);
       break;
     case TK_MAX:
       op=OP_MAX;
@@ -769,7 +779,7 @@ FXuchar* FXCompile::offset(FXshort n){
 FXuchar* FXCompile::number(FXdouble n){
   register FXuchar* result=pc;
   if(code){
-#if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
+#if defined(__i386__) || defined(__x86_64__) 
     ((FXdouble*)pc)[0]=n;
 #else
     pc[0]=((const FXuchar*)&n)[0];
@@ -868,61 +878,44 @@ FXExpression& FXExpression::operator=(const FXExpression& orig){
 // Parse expression, return error code if syntax error is found
 FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* variables){
   FXExpression::Error err=FXExpression::ErrEmpty;
-  FXint size=0;
-  FXCompile cs;
 
   // Free old code, if any
-  if(code!=initial) freeElms(code);
-  code=(FXuchar*)(void*)initial;
+  clear();
 
   // If not empty, parse expression
   if(expression){
 
-    // Fill in compile data
-    cs.tail=expression;
-    cs.vars=variables;
-    cs.code=NULL;
-    cs.pc=NULL;
-    cs.token=TK_EOF;
-
-    // Get first token
-    cs.gettok();
-
-    // Emit unknown size
-    cs.offset(0);
+    // Create compile engine
+    FXCompile cs(NULL,expression,variables);
 
     // Parse to check syntax and determine size
-    err=cs.compile();
-
-    // Was OK?
-    if(err==FXExpression::ErrOK){
+    if((err=cs.compile())==ErrOK){
+      FXuchar *prog;
 
       // Allocate new code
-      size=cs.pc-cs.code;
-      if(!allocElms(code,size)){
-        code=(FXuchar*)(void*)initial;
-        return FXExpression::ErrMemory;
-        }
+      if(allocElms(prog,cs.size())){
+        
+        // Create compile engine
+        FXCompile gs(prog,expression,variables);
 
-      // Fill in compile data
-      cs.tail=expression;
-      cs.code=code;
-      cs.pc=code;
-      cs.token=TK_EOF;
+        // Now generate code for expression
+        if((err=gs.compile())==ErrOK){
 
-      // Get first token
-      cs.gettok();
+          // Size still checking out?
+          FXASSERT(gs.size()==cs.size());
 
-      // Emit code size
-      cs.offset(size);
-
-      // Generate program
-      err=cs.compile();
-
-      // Dump for debugging
+          // Install new program
+          code=prog;
+          
 #ifdef EXPRDEBUG
-      if(fxTraceLevel>100) dump(code);
+          if(fxTraceLevel>100) dump(code);
 #endif
+
+          // Report success
+          return ErrOK;
+          }
+        freeElms(prog);
+        }        
       }
     }
   return err;
@@ -952,11 +945,6 @@ FXdouble FXExpression::evaluate(const FXdouble *args) const {
       case OP_NUM:   ++sp; ((FXuchar*)sp)[0]=*pc++; ((FXuchar*)sp)[1]=*pc++; ((FXuchar*)sp)[2]=*pc++; ((FXuchar*)sp)[3]=*pc++; ((FXuchar*)sp)[4]=*pc++; ((FXuchar*)sp)[5]=*pc++; ((FXuchar*)sp)[6]=*pc++; ((FXuchar*)sp)[7]=*pc++; break;
 #endif
       case OP_VAR:   *++sp=args[*pc++]; break;
-#if defined(WIN32) || defined(__minix)
-      case OP_RAND:  *++sp=(FXdouble)rand()/(FXdouble)RAND_MAX; break;
-#else
-      case OP_RAND:  *++sp=drand48(); break;
-#endif
       case OP_NOT:   *sp=(FXdouble)(~((FXlong)*sp)); break;
       case OP_NEG:   *sp=-*sp; break;
       case OP_SIN:   *sp=sin(*sp); break;
@@ -1030,9 +1018,18 @@ FXStream& operator>>(FXStream& store,FXExpression& s){
   }
 
 
+// Clear the expression
+void FXExpression::clear(){
+  if(code!=initial){
+    freeElms(code);
+    code=(FXuchar*)(void*)initial;
+    }
+  }
+
+
 // Clean up
 FXExpression::~FXExpression(){
-  if(code!=initial) freeElms(code);
+  clear();
   }
 
 }

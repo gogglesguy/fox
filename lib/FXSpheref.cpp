@@ -270,27 +270,14 @@ FXbool FXSpheref::intersect(const FXVec3f& pos,const FXVec3f& dir,FXfloat hit[])
   }
 
 
-// Test if box overlaps with sphere; algorithm due to Arvo (GEMS I)
+// Test if box overlaps with sphere (QRI Larsson, Moeller, Lengyel)
 FXbool overlap(const FXSpheref& a,const FXRangef& b){
   if(0.0f<=a.radius){
-    FXfloat dd=0.0f;
-
-    if(a.center.x<b.lower.x)
-      dd+=sqrf(a.center.x-b.lower.x);
-    else if(a.center.x>b.upper.x)
-      dd+=sqrf(a.center.x-b.upper.x);
-
-    if(a.center.y<b.lower.y)
-      dd+=sqrf(a.center.y-b.lower.y);
-    else if(a.center.y>b.upper.y)
-      dd+=sqrf(a.center.y-b.upper.y);
-
-    if(a.center.z<b.lower.z)
-      dd+=sqrf(a.center.z-b.lower.z);
-    else if(a.center.z>b.upper.z)
-      dd+=sqrf(a.center.z-b.upper.z);
-
-    return dd<=a.radius*a.radius;
+    FXfloat e1,e2,e3;
+    if((e1=fmaxf(b.lower.x-a.center.x,0.0f)+fmaxf(a.center.x-b.upper.x,0.0f))>a.radius) return false;
+    if((e2=fmaxf(b.lower.y-a.center.y,0.0f)+fmaxf(a.center.y-b.upper.y,0.0f))>a.radius) return false;
+    if((e3=fmaxf(b.lower.z-a.center.z,0.0f)+fmaxf(a.center.z-b.upper.z,0.0f))>a.radius) return false;
+    return e1*e1+e2*e2+e3*e3<=a.radius*a.radius;
     }
   return false;
   }

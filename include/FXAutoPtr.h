@@ -27,7 +27,7 @@ namespace FX {
 
 /// Implicitly used FXAutoPtrRef to hand FXAutoPtr through implicitly called
 /// constructors and conversion operators.  Probably not used directly.
-template<typename EType> 
+template<typename EType>
 struct FXAutoPtrRef {
   EType* ptr;
   explicit FXAutoPtrRef(EType* src):ptr(src){ }
@@ -36,7 +36,7 @@ struct FXAutoPtrRef {
 
 
 /// Automatic pointer
-template<typename EType> 
+template<typename EType>
 class FXAutoPtr {
 private:
   EType* ptr;
@@ -64,7 +64,7 @@ public:
   FXAutoPtr& operator=(FXAutoPtrRef<EType> src){ if(src.ptr!=ptr){ delete ptr; ptr=src.ptr; } return *this; }
 
   /// Assign from an automatic pointer with compatible type
-  template <typename T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
+  template<typename T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
 
   /// Conversion operators
   operator EType*() const { return ptr; }

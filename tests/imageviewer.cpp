@@ -3,7 +3,7 @@
 *                      I m a g e   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -401,7 +401,7 @@ ImageWindow::~ImageWindow(){
 
 // About box
 long ImageWindow::onCmdAbout(FXObject*,FXSelector,void*){
-  FXMessageBox about(this,"About Image Viewer","Image Viewer demonstrates the FOX ImageView widget.\n\nUsing the FOX C++ GUI Library (http://www.fox-toolkit.org)\n\nCopyright (C) 2000,2014 Jeroen van der Zijp (jeroen@fox-toolkit.com)",NULL,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox about(this,"About Image Viewer","Image Viewer demonstrates the FOX ImageView widget.\n\nUsing the FOX C++ GUI Library (http://www.fox-toolkit.org)\n\nCopyright (C) 2000,2015 Jeroen van der Zijp (jeroen@fox-toolkit.com)",NULL,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
   about.execute();
   return 1;
   }

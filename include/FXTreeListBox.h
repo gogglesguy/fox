@@ -197,18 +197,6 @@ public:
   */
   FXTreeItem* findItemByData(FXptr ptr,FXTreeItem* start=NULL,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
 
-  /// Return true if item is leaf-item, i.e. has no children
-  FXbool isItemLeaf(const FXTreeItem* item) const;
-
-  /// Sort the toplevel items with the sort function
-  void sortRootItems();
-
-  /// Sort all items recursively
-  void sortItems();
-
-  /// Sort child items of item
-  void sortChildItems(FXTreeItem* item);
-
   /// Change item label
   void setItemText(FXTreeItem* item,const FXString& text);
 
@@ -233,6 +221,9 @@ public:
   /// Return item's user data
   FXptr getItemData(const FXTreeItem* item) const;
 
+  /// Return true if item is leaf-item, i.e. has no children
+  FXbool isItemLeaf(const FXTreeItem* item) const;
+
   /// Return true if item is enabled
   FXbool isItemEnabled(const FXTreeItem* item) const;
 
@@ -242,17 +233,20 @@ public:
   /// Disable item
   FXbool disableItem(FXTreeItem* item);
 
-  /// Return item sort function
-  FXTreeListSortFunc getSortFunc() const;
-
-  /// Change item sort function
-  void setSortFunc(FXTreeListSortFunc func);
-
   /// Show or hide menu
   void showMenu(FXbool shw);
 
   /// Is the menu pane shown
   FXbool isMenuShown() const;
+
+  /// Sort all items recursively
+  void sortItems();
+
+  /// Sort the toplevel items with the sort function
+  void sortRootItems();
+
+  /// Sort child items of item
+  void sortChildItems(FXTreeItem* item);
 
   /// Change font
   void setFont(FXFont* fnt);
@@ -271,6 +265,12 @@ public:
 
   /// Return popup pane shrinkwrap mode
   FXbool getShrinkWrap() const;
+
+  /// Return item sort function
+  FXTreeListSortFunc getSortFunc() const;
+
+  /// Change item sort function
+  void setSortFunc(FXTreeListSortFunc func);
 
   /// Change help text
   void setHelpText(const FXString& txt);

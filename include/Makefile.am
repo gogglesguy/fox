@@ -109,6 +109,7 @@ FXDirDialog.h \
 FXDirList.h \
 FXDirSelector.h \
 FXDirVisitor.h \
+FXDispatcher.h \
 FXDockBar.h \
 FXDockHandler.h \
 FXDockSite.h \

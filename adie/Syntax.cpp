@@ -3,7 +3,7 @@
 *                   S y n t a x   H i g h l i g h t   E n g i n e               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -148,7 +148,7 @@ FXIMPLEMENT(SimpleRule,Rule,NULL,0)
 // Stylize complex recursive expression
 FXbool SimpleRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   if(pat.amatch(text,to,fm,FXRex::Normal,&start,&stop,1)){
-    fillstyle(textstyle,style,start,stop);
+    fillstyle(textstyle,index,start,stop);
     return true;
     }
   return false;
@@ -158,7 +158,7 @@ FXbool SimpleRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,FXi
 // Stylize simple expression
 FXbool SimpleRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   if(pat.amatch(text,to,fm,FXRex::Normal,&start,&stop,1)){
-    fillstyle(textstyle,style,start,stop);
+    fillstyle(textstyle,index,start,stop);
     return true;
     }
   return false;
@@ -181,10 +181,10 @@ FXbool BracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,FX
         }
       }
     if(end.amatch(text,to,fm,FXRex::Normal,&head,&stop,1)){
-      fillstyle(textstyle,style,head,stop);
+      fillstyle(textstyle,index,head,stop);
       return true;
       }
-    textstyle[fm++]=style;
+    textstyle[fm++]=index;
 nxt:continue;
     }
   stop=fm;
@@ -196,7 +196,7 @@ nxt:continue;
 FXbool BracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   FXint head,tail;
   if(beg.amatch(text,to,fm,FXRex::Normal,&start,&tail,1)){
-    fillstyle(textstyle,style,start,tail);
+    fillstyle(textstyle,index,start,tail);
     BracketRule::stylizeBody(text,textstyle,tail,to,head,stop);
     return true;
     }
@@ -214,7 +214,7 @@ FXbool SafeBracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint f
   start=fm;
   while(fm<to){
     if(esc.amatch(text,to,fm,FXRex::Normal,&head,&stop,1)){     // Each time around, check stop pattern (changed from old method!)
-      fillstyle(textstyle,style,head,stop);
+      fillstyle(textstyle,index,head,stop);
       return true;
       }
     for(node=0; node<rules.no(); node++){
@@ -224,10 +224,10 @@ FXbool SafeBracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint f
         }
       }
     if(end.amatch(text,to,fm,FXRex::Normal,&head,&stop,1)){
-      fillstyle(textstyle,style,head,stop);
+      fillstyle(textstyle,index,head,stop);
       return true;
       }
-    textstyle[fm++]=style;
+    textstyle[fm++]=index;
 nxt:continue;
     }
   stop=fm;
@@ -239,7 +239,7 @@ nxt:continue;
 FXbool SafeBracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   FXint head,tail;
   if(beg.amatch(text,to,fm,FXRex::Normal,&start,&tail,1)){
-    fillstyle(textstyle,style,start,tail);
+    fillstyle(textstyle,index,start,tail);
     SafeBracketRule::stylizeBody(text,textstyle,tail,to,head,stop);
     return true;
     }
@@ -262,7 +262,7 @@ FXbool DefaultRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,FX
         goto nxt;
         }
       }
-    textstyle[fm++]=style;
+    textstyle[fm++]=index;
 nxt:continue;
     }
   stop=to;
@@ -281,8 +281,9 @@ FXIMPLEMENT(Syntax,FXObject,NULL,0)
 
 
 // Construct syntax object; needs at least one master rule
-Syntax::Syntax(const FXString& lang):language(lang){
-  rules.append(new DefaultRule("Default",-1,0));
+Syntax::Syntax(const FXString& lang,const FXString& grp):language(lang),group(grp){
+  FXTRACE((10,"Syntax::Syntax(\"%s\",\"%s\")\n",lang.text(),grp.text()));
+  rules.append(new DefaultRule("Default",FXString::null,-1,0));
   delimiters=FXText::textDelimiters;
   contextLines=1;
   contextChars=1;
@@ -303,10 +304,11 @@ FXbool Syntax::matchContents(const FXString& text) const {
 
 
 // Append default rule
-FXint Syntax::appendDefault(const FXString& name,FXint parent){
+FXint Syntax::appendDefault(const FXString& name,const FXString& style,FXint parent){
+  FXTRACE((10,"Syntax::appendDefault(\"%s\",\"%s\",%d)\n",name.text(),style.text(),parent));
   FXint index=rules.no();
   FXASSERT(0<=parent && parent<rules.no());
-  DefaultRule *rule=new DefaultRule(name,parent,index);
+  DefaultRule *rule=new DefaultRule(name,style,parent,index);
   rules.append(rule);
   rules[parent]->rules.append(rule);
   return index;
@@ -314,10 +316,11 @@ FXint Syntax::appendDefault(const FXString& name,FXint parent){
 
 
 // Append simple rule
-FXint Syntax::appendSimple(const FXString& name,const FXString& rex,FXint parent){
+FXint Syntax::appendSimple(const FXString& name,const FXString& style,const FXString& rex,FXint parent){
+  FXTRACE((10,"Syntax::appendSimple(\"%s\",\"%s\",\"%s\",%d)\n",name.text(),style.text(),rex.text(),parent));
   FXint index=rules.no();
   FXASSERT(0<=parent && parent<rules.no());
-  SimpleRule *rule=new SimpleRule(name,rex,parent,index);
+  SimpleRule *rule=new SimpleRule(name,style,rex,parent,index);
   rules.append(rule);
   rules[parent]->rules.append(rule);
   return index;
@@ -325,10 +328,11 @@ FXint Syntax::appendSimple(const FXString& name,const FXString& rex,FXint parent
 
 
 // Append bracket rule
-FXint Syntax::appendBracket(const FXString& name,const FXString& brex,const FXString& erex,FXint parent){
+FXint Syntax::appendBracket(const FXString& name,const FXString& style,const FXString& brex,const FXString& erex,FXint parent){
+  FXTRACE((10,"Syntax::appendBracket(\"%s\",\"%s\",\"%s\",\"%s\",%d)\n",name.text(),style.text(),brex.text(),erex.text(),parent));
   FXint index=rules.no();
   FXASSERT(0<=parent && parent<rules.no());
-  BracketRule *rule=new BracketRule(name,brex,erex,parent,index);
+  BracketRule *rule=new BracketRule(name,style,brex,erex,parent,index);
   rules.append(rule);
   rules[parent]->rules.append(rule);
   return index;
@@ -336,10 +340,11 @@ FXint Syntax::appendBracket(const FXString& name,const FXString& brex,const FXSt
 
 
 // Append safe bracket rule
-FXint Syntax::appendSafeBracket(const FXString& name,const FXString& brex,const FXString& erex,const FXString& srex,FXint parent){
+FXint Syntax::appendSafeBracket(const FXString& name,const FXString& style,const FXString& brex,const FXString& erex,const FXString& srex,FXint parent){
+  FXTRACE((10,"Syntax::appendSafeBracket(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)\n",name.text(),style.text(),brex.text(),erex.text(),srex.text(),parent));
   FXint index=rules.no();
   FXASSERT(0<=parent && parent<rules.no());
-  SafeBracketRule *rule=new SafeBracketRule(name,brex,erex,srex,parent,index);
+  SafeBracketRule *rule=new SafeBracketRule(name,style,brex,erex,srex,parent,index);
   rules.append(rule);
   rules[parent]->rules.append(rule);
   return index;
@@ -386,5 +391,5 @@ FXint Syntax::commonAncestor(FXint a,FXint b) const {
 
 // Clean up
 Syntax::~Syntax(){
-  for(int i=0; i<rules.no(); i++) delete rules[i];
+  for(FXint i=0; i<rules.no(); i++){ delete rules[i]; }
   }

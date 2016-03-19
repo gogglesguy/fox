@@ -75,6 +75,15 @@ FXString FXSystem::universalTime(FXTime value){
 FXString FXSystem::localTime(const FXchar *format,FXTime value){
   time_t tmp=(time_t)(value/seconds);
 #if defined(WIN32)
+#if (_MSC_VER >= 1500)
+  struct tm tmv;
+  if(localtime_s(&tmv,&tmp)==0){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#else
   struct tm* ptm=localtime(&tmp);
   if(ptm){
     FXchar buffer[512];
@@ -82,6 +91,7 @@ FXString FXSystem::localTime(const FXchar *format,FXTime value){
     return FXString(buffer,len);
     }
   return FXString::null;
+#endif
 #elif defined(HAVE_LOCALTIME_R)
   struct tm tmresult;
   struct tm* ptm=localtime_r(&tmp,&tmresult);
@@ -107,6 +117,15 @@ FXString FXSystem::localTime(const FXchar *format,FXTime value){
 FXString FXSystem::universalTime(const FXchar *format,FXTime value){
   time_t tmp=(time_t)(value/seconds);
 #ifdef WIN32
+#if (_MSC_VER >= 1500)
+  struct tm tmv;
+  if(gmtime_s(&tmv,&tmp)==0){
+    FXchar buffer[512];
+    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#else
   struct tm* ptm=gmtime(&tmp);
   if(ptm){
     FXchar buffer[512];
@@ -114,6 +133,7 @@ FXString FXSystem::universalTime(const FXchar *format,FXTime value){
     return FXString(buffer,len);
     }
   return FXString::null;
+#endif
 #elif defined(HAVE_GMTIME_R)
   struct tm tmresult;
   struct tm* ptm=gmtime_r(&tmp,&tmresult);
@@ -391,14 +411,34 @@ FXbool FXSystem::setCurrentDrive(const FXString&){
 
 // Get executable path
 FXString FXSystem::getExecPath(){
+#if defined(WIN32)
+#ifdef UNICODE
+  FXnchar string[1024];
+  DWORD len=GetEnvironmentVariableW(L"PATH",string,1024);
+  return FXString(string,len);
+#else
+  FXchar string[1024];
+  DWORD len=GetEnvironmentVariableA("PATH",string,1024);
+  return FXString(string,len);
+#endif
+#else
   return FXString(getenv("PATH"));
+#endif
   }
 
 
 // Return known executable file extensions (Windows)
 FXString FXSystem::getExecExtensions(){
 #if defined(WIN32)
-  return FXString(getenv("PATHEXT"));
+#ifdef UNICODE
+  FXnchar string[1024];
+  DWORD len=GetEnvironmentVariableW(L"PATHEXT",string,1024);
+  return FXString(string,len);
+#else
+  FXchar string[1024];
+  DWORD len=GetEnvironmentVariableA("PATHEXT",string,1024);
+  return FXString(string,len);
+#endif
 #else
   return FXString::null;
 #endif
@@ -602,3 +642,4 @@ FXString FXSystem::dllName(const FXString& name){
   }
 
 }
+

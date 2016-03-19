@@ -118,7 +118,7 @@ static inline FXulong swap64(FXulong x){
 
 // Isolate least significant bit set
 static inline FXuint lsb32(FXuint x){
-  return (x&(-x));
+  return FXuint(x&(-FXint(x)));
   }
 
 
@@ -138,16 +138,16 @@ static inline FXuint pop32(FXuint x){
 #if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
   return __builtin_popcount(x);
 #else
-  x=x-((x>>1)&0x55555555); 
-  x=(x&0x33333333)+((x>>2)&0x33333333); 
-  x=(x+(x>>4))&0x0F0F0F0F; 
-  x=x+(x>>8); 
-  x=x+(x>>16); 
-  return (x&0x3F); 
+  x=x-((x>>1)&0x55555555);
+  x=(x&0x33333333)+((x>>2)&0x33333333);
+  x=(x+(x>>4))&0x0F0F0F0F;
+  x=x+(x>>8);
+  x=x+(x>>16);
+  return (x&0x3F);
 #endif
   }
-  
-  
+
+
 // Count leading zeros in non-zero integer
 static inline FXuint clz32(FXuint x){
 #if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
@@ -161,7 +161,7 @@ static inline FXuint clz32(FXuint x){
   b=!(x&0x80000000);
   return f+e+d+c+b;
 #endif
-  }  
+  }
 
 
 // Count trailing zeros in non-zero integer
@@ -177,7 +177,7 @@ static inline FXuint ctz32(FXuint x){
   b=!(x&0x00000001);
   return f+e+d+c+b;
 #endif
-  }  
+  }
 
 
 }

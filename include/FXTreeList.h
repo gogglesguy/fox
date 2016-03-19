@@ -413,6 +413,12 @@ public:
   /// Get item at x,y, if any
   virtual FXTreeItem* getItemAt(FXint x,FXint y) const;
 
+  /// Return item hit code: 0 outside, 1 icon, 2 text, 3 box
+  FXint hitItem(const FXTreeItem* item,FXint x,FXint y) const;
+
+  /// Scroll to make item visible
+  virtual void makeItemVisible(FXTreeItem* item);
+
   /**
   * Search items by name, beginning from item start.  If the start item
   * is NULL the search will start at the first, top-most item in the list.
@@ -433,9 +439,6 @@ public:
   * to control whether the search wraps at the start or end of the list.
   */
   FXTreeItem* findItemByData(FXptr ptr,FXTreeItem* start=NULL,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
-
-  /// Scroll to make item visible
-  virtual void makeItemVisible(FXTreeItem* item);
 
   /// Change item's text
   void setItemText(FXTreeItem* item,const FXString& text);
@@ -481,9 +484,6 @@ public:
 
   /// Return true if item is enabled
   FXbool isItemEnabled(const FXTreeItem* item) const;
-
-  /// Return item hit code: 0 outside, 1 icon, 2 text, 3 box
-  FXint hitItem(const FXTreeItem* item,FXint x,FXint y) const;
 
   /// Repaint item
   void updateItem(FXTreeItem* item) const;

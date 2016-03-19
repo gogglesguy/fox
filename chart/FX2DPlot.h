@@ -3,7 +3,7 @@
 *              T w o - D i m e n s i o n a l   P l o t   W i d g e t            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *

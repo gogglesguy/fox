@@ -119,6 +119,13 @@ public:
     Fifo           = 0x80000    /// Fifo device
     };
 
+  /// Error return codes for readBlock() and writeBlock()
+  enum {
+    Error  = -1,                /// Error in operation
+    Again  = -2,                /// Try again (for non-blocking handles)
+    Broken = -3                 /// Broken pipe or socket
+    };
+
 public:
 
   /// Is readable
@@ -129,6 +136,9 @@ public:
 
   /// Return access mode
   FXuint mode() const { return access; }
+
+  /// Change access mode of open device
+  virtual FXbool setMode(FXuint m);
 
   /// Return true if open
   virtual FXbool isOpen() const;

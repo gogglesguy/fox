@@ -139,9 +139,6 @@ public:
   };
 
 
-// DEPRECATED
-typedef FXScopedMutex FXMutexLock;
-
 }
 
 #endif

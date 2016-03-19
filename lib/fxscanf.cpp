@@ -3,7 +3,7 @@
 *                   V a r a r g s   S c a n f   R o u t i n e s                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -425,19 +425,22 @@ assign:   if(convert){
             ch=(FXuchar)*format++;
             v=0;
             }
+          memset(set,1-v,sizeof(set));                  // Initialize set
           if(ch=='\0') goto x;                          // Format error
-          memset(set,1-v,sizeof(set));
           for(;;){                                      // Parse set
             set[ch]=v;
             nn=(FXuchar)*format++;
             if(nn=='\0') goto x;                        // Format error
             if(nn==']') break;
-            if(nn=='-' && *format && *format!=']' && ch<=(FXuchar)*format){
-              nn=(FXuchar)*format++;
-              do{
-                set[++ch]=v;
+            if(nn=='-'){
+              nn=(FXuchar)*format;
+              if(nn!=']' && ch<=nn){                    // Range if not at end 
+                while(ch<nn){ set[++ch]=v; }
+                format++;
                 }
-              while(ch<nn);
+              else{                                     // Otherwise just '-'
+                nn='-';
+                }
               }
             ch=nn;
             }

@@ -159,7 +159,7 @@ FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,F
 #if !(defined(__LP64__) || defined(_LP64) || (_MIPS_SZLONG == 64) || (__WORDSIZE == 64) || defined(_WIN64))
   pkg.pad=0;
 #endif
-  pkg.size=size;
+  pkg.size=FXMIN(size,MAXMESSAGE);
 #ifdef WIN32
   DWORD nwritten=-1;
   if(::WriteFile(h[1],&pkg,sizeof(FXMessage),&nwritten,NULL) && nwritten==sizeof(FXMessage)){

@@ -561,7 +561,7 @@ public:
   * forever (LLONG_MAX) is returned.  If sel=0, return the earliest timeout that will be
   * received by target object tgt.
   */
-  FXTime remainingTimeout(FXObject *tgt,FXSelector sel=0);
+  FXTime remainingTimeout(FXObject *tgt,FXSelector sel=0) const;
 
   /**
   * Add a chore message sel to be sent to target object tgt when

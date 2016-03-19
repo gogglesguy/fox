@@ -103,12 +103,6 @@ public:
   /// Construct color well with initial color clr
   FXColorWell(FXComposite* p,FXColor clr=0,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=COLORWELL_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
-  /// Create server-side resources
-  virtual void create();
-
-  /// Detach server-side resources
-  virtual void detach();
-
   /// Return default width
   virtual FXint getDefaultWidth();
 

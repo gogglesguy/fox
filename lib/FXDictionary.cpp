@@ -75,9 +75,9 @@ const FXival __dictionary__empty__[6]={1,0,1,(FXival)(__string__empty__+1),0,0};
 
 // Adjust the size of the table
 FXbool FXDictionary::no(FXival n){
-  register FXival m=no();
+  FXival m=no();
   if(__likely(m!=n)){
-    register Entry *elbat;
+    Entry *elbat;
 
     // Release old table
     if(1<m){
@@ -107,8 +107,8 @@ FXbool FXDictionary::resize(FXival n){
   FXASSERT((n-used())>0);       // At least one free slot
   if(elbat.no(n)){
     if(1<elbat.no() && 1<no()){
-      register FXuval p,b,h,x;
-      register FXival i;
+      FXuval p,b,h,x;
+      FXival i;
       for(i=0; i<no(); ++i){                  // Hash existing entries into new table
         p=b=h=table[i].hash;
         if(!table[i].key.empty()){
@@ -180,14 +180,16 @@ FXDictionary& FXDictionary::adopt(FXDictionary& other){
 
 // Find position of given key
 FXival FXDictionary::find(const FXchar* ky) const {
-  register FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::find: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) return x;
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,x,h;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash){
+      if(table[x].hash==h && table[x].key==ky) return x;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
     }
   return -1;
   }
@@ -195,7 +197,7 @@ FXival FXDictionary::find(const FXchar* ky) const {
 
 // Return reference to slot assocated with given key
 FXptr& FXDictionary::at(const FXchar* ky){
-  register FXuval p,b,h,x;
+  FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
@@ -221,36 +223,40 @@ x:return table[x].data;
 
 // Return constant reference to slot assocated with given key
 const FXptr& FXDictionary::at(const FXchar* ky) const {
-  register FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) goto x;    // Return existing slot
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,x,h;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash){
+      if(table[x].hash==h && table[x].key==ky) return table[x].data;   
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
     }
-x:return table[x].data;                                 // Stopped at empty slot
+  return EMPTY[0].data;
   }
 
 
 // Remove association with given key; return old value, if any
 FXptr FXDictionary::remove(const FXchar* ky){
-  register FXuval p,b,h,x;
-  register FXptr old;
+  FXptr old=NULL;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::remove: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash!=h || table[x].key!=ky){
-    if(!table[x].hash) return NULL;
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,h,x;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash!=h || table[x].key!=ky){
+      if(!table[x].hash) return NULL;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
+    table[x].key.clear();                                 // Void the slot (not empty!)
+    old=table[x].data;
+    table[x].data=NULL;
+    used(used()-1);
+    if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
     }
-  table[x].key.clear();                                 // Void the slot (not empty!)
-  old=table[x].data;
-  table[x].data=NULL;
-  used(used()-1);
-  if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
   return old;
   }
 
@@ -259,7 +265,7 @@ FXptr FXDictionary::remove(const FXchar* ky){
 FXptr FXDictionary::erase(FXival pos){
   if(__unlikely(pos<0 || no()<=pos)){ throw FXRangeException("FXDictionary::erase: argument out of range\n"); }
   if(!table[pos].key.empty()){
-    register FXptr old=table[pos].data;
+    FXptr old=table[pos].data;
     table[pos].key.clear();                             // Void the slot (not empty!)
     table[pos].data=NULL;
     used(used()-1);

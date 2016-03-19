@@ -251,6 +251,7 @@ FXDirDialog.cpp \
 FXDirList.cpp \
 FXDirSelector.cpp \
 FXDirVisitor.cpp \
+FXDispatcher.cpp \
 FXDockBar.cpp \
 FXDockSite.cpp \
 FXDockHandler.cpp \

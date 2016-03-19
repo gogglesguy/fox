@@ -3,7 +3,7 @@
 *                             Regular Expression Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -28,7 +28,7 @@ int main(int argc,char** argv){
   FXint mode;
   FXRex rex;
   FXRex::Error err;
-  
+
   fxTraceLevel=101;
 
   // Got nothing

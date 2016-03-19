@@ -46,8 +46,8 @@ namespace FX {
 * To reclaim the resources once the thread is completed, a call to join() must be
 * made, or the thread must be detached (note however that detaching the thread will
 * sever the association between FXThread and the thread).
-* The special FXThreadException may be used to terminate a thread gracefully, 
-* and pass a return code to the corresponding join() operation.  This is preferred 
+* The special FXThreadException may be used to terminate a thread gracefully,
+* and pass a return code to the corresponding join() operation.  This is preferred
 * over the raw FXThread::exit().
 * Unknown exceptions cause the program to terminate with an error.
 * Calling the destructor from within the thread itself (suicide) is allowed; the

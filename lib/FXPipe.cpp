@@ -52,6 +52,12 @@ using namespace FX;
 
 namespace FX {
 
+/*
+BOOL WINAPI ConnectNamedPipe(
+  _In_         HANDLE hNamedPipe,
+  _Inout_opt_  LPOVERLAPPED lpOverlapped
+);
+*/
 
 // Construct and open pipes with access mode m for this one and the reverse for the other
 FXPipe::FXPipe(FXPipe& other,FXuint m){

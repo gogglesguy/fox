@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -58,6 +58,27 @@ const FXchar *floatnumbers[]={
   };
 
 
+const FXchar *stringformat[]={
+  "%s",
+  "%4s",
+  "%[0-9.Ee+-]",
+  "%[^a-c]",
+  "%[]]",
+  "%[0-9-]",
+  "%[a-a]",
+  "%[a-zA-Z0-9_]"
+  };
+
+const FXchar *stringinputs[]={
+  "1.0E-99",
+  "123abc",
+  "]]]][[[[",
+  "123-1456",
+  "aaaaabbbb",
+  "Camel_Case_1337"
+  };
+
+
 // Uncomment to revert to native version
 //#define __sscanf sscanf
 
@@ -68,6 +89,7 @@ int main(int,char*[]){
   FXint    res;
   FXint    ia,ib,ic;
   FXdouble da,db,dc;
+  FXchar   buf[1000];
 
   // Reading integers
   for(x=0; x<ARRAYNUMBER(intformat); x++){
@@ -87,23 +109,13 @@ int main(int,char*[]){
       }
     }
 
-/*
-  FXString st;
-  char buf[1000];
-  FXdouble capacite1,capacite2,capacite3;
-
-  while(gets(buf)){
-    st=buf;
-    capacite2= st.toDouble();
-    fprintf(stderr,"toDouble: %.30lg\n", capacite2);
-    capacite1=strtod(buf,NULL);
-    fprintf(stderr,"strtod:   %.30lg\n", capacite1);
-    st.scan("%lf",&capacite3);
-    fprintf(stderr,"fxscanf:  %.30lg\n", capacite3);
-    fprintf(stderr,"DIFF %.30lg (rel %.10lg)\n",capacite1-capacite2,fabs(capacite1-capacite2)/fabs(capacite1));
-    fprintf(stderr,"DIFF %.30lg (rel %.10lg)\n",capacite1-capacite3,fabs(capacite1-capacite3)/fabs(capacite1));
+  // Reading strings
+  for(x=0; x<ARRAYNUMBER(stringformat); x++){
+    for(y=0; y<ARRAYNUMBER(stringinputs); y++){
+      res=__sscanf(stringinputs[y],stringformat[x],buf);
+      fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d str=%s\n",stringformat[x],stringinputs[y],res,buf);
+      }
     }
-*/
 
   return 1;
   }

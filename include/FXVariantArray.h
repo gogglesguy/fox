@@ -43,12 +43,6 @@ public:
   /// Allocate initialized with array of n objects
   FXVariantArray(const FXVariant* src,FXival n);
 
-  /// Equality operator
-  FXbool operator==(const FXVariantArray& other) const;
-
-  /// Inequality operator
-  FXbool operator!=(const FXVariantArray& other) const;
-
   /// Destructor
  ~FXVariantArray();
   };

@@ -24,10 +24,6 @@
 
 namespace FX {
 
-
-//////////////////////////////  UNDER DEVELOPMENT  //////////////////////////////
-
-
 class FXIODevice;
 
 

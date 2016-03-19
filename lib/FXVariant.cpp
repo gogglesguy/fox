@@ -621,14 +621,14 @@ FXVariant& FXVariant::operator[](const FXchar* key){
     reset();
     init(VMap);
     }
-  return reinterpret_cast<FXVariantMap*>(&value.p)->operator[](key);
+  return reinterpret_cast<FXVariantMap*>(&value.p)->at(key);
   }
 
 
 // Return value of object member
 const FXVariant& FXVariant::operator[](const FXchar* key) const {
   if(type==VMap){
-    return reinterpret_cast<const FXVariantMap*>(&value.p)->operator[](key);
+    return reinterpret_cast<const FXVariantMap*>(&value.p)->at(key);
     }
   return FXVariant::null;
   }
@@ -640,14 +640,14 @@ FXVariant& FXVariant::operator[](const FXString& key){
     reset();
     init(VMap);
     }
-  return reinterpret_cast<FXVariantMap*>(&value.p)->operator[](key);
+  return reinterpret_cast<FXVariantMap*>(&value.p)->at(key);
   }
 
 
 // Return value of object member
 const FXVariant& FXVariant::operator[](const FXString& key) const {
   if(type==VMap){
-    return reinterpret_cast<const FXVariantMap*>(&value.p)->operator[](key);
+    return reinterpret_cast<const FXVariantMap*>(&value.p)->at(key);
     }
   return FXVariant::null;
   }
@@ -680,37 +680,6 @@ const FXVariant& FXVariant::operator[](FXint idx) const {
   }
 
 /*******************************************************************************/
-
-// Comparison
-FXbool FXVariant::operator==(const FXVariant& other) const {
-  if(type==other.type){
-    switch(type){
-    case VNull:
-      return true;
-    case VBool:
-    case VChar:
-    case VInt:
-    case VUInt:
-    case VLong:
-    case VULong:
-    case VPointer:
-      return value.u==other.value.u;
-    case VFloat:
-    case VDouble:
-      return value.d==other.value.d;
-    case VString:
-      return *reinterpret_cast<const FXString*>(&value.p) == *reinterpret_cast<const FXString*>(&other.value.p);
-    case VArray:
-      return *reinterpret_cast<const FXVariantArray*>(&value.p) == *reinterpret_cast<const FXVariantArray*>(&other.value.p);
-      break;
-    case VMap:
-      return *reinterpret_cast<const FXVariantMap*>(&value.p) == *reinterpret_cast<const FXVariantMap*>(&other.value.p);
-      break;
-      }
-    }
-  return false;
-  }
-
 
 // Clear the data
 void FXVariant::clear(){

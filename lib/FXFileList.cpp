@@ -67,7 +67,6 @@
 #include "FXProgressDialog.h"
 #include "FXDir.h"
 #include "FXMessageBox.h"
-#include "FX88591Codec.h"
 #include "icons.h"
 
 /*
@@ -245,9 +244,6 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
 // Starts the timer
 void FXFileList::create(){
   FXIconList::create();
-  if(!deleteType){deleteType=getApp()->registerDragType(deleteTypeName);}
-  if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
-  if(!actionType){actionType=getApp()->registerDragType(actionTypeName);}
   getApp()->addTimeout(this,ID_REFRESHTIMER,REFRESHINTERVAL);
   big_folder->create();
   mini_folder->create();

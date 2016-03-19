@@ -87,7 +87,7 @@ FXlong FXIOBuffer::position() const {
 
 // Move to position
 FXlong FXIOBuffer::position(FXlong offset,FXuint from){
-  if(access&ReadWrite){
+  if(__likely(access&ReadWrite)){
     if(from==Current) offset=pointer+offset;
     else if(from==End) offset=space+offset;
     if(0<=offset && offset<=(FXlong)space){
@@ -101,7 +101,7 @@ FXlong FXIOBuffer::position(FXlong offset,FXuint from){
 
 // Read block
 FXival FXIOBuffer::readBlock(void* ptr,FXival count){
-  if(access&ReadOnly){
+  if(__likely(access&ReadOnly)){
     FXival remaining=space-pointer;
     if(count>remaining) count=remaining;
     memcpy(ptr,&buffer[pointer],count);
@@ -114,7 +114,7 @@ FXival FXIOBuffer::readBlock(void* ptr,FXival count){
 
 // Write block
 FXival FXIOBuffer::writeBlock(const void* ptr,FXival count){
-  if(access&WriteOnly){
+  if(__likely(access&WriteOnly)){
     FXival remaining=space-pointer;
     if(count>remaining) count=remaining;
     memcpy(&buffer[pointer],ptr,count);

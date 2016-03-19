@@ -3,7 +3,7 @@
 *                   S y n t a x   H i g h l i g h t   E n g i n e               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -39,9 +39,10 @@ class Rule : public FXObject {
   friend class Syntax;
 protected:
   FXString      name;   // Name of rule
+  FXString      style;  // Colors for highlighting (default)
   RuleList      rules;  // Subrules
   FXint         parent; // Parent style index
-  FXint         style;  // Own style index
+  FXint         index;  // Own style index
 protected:
   Rule(){}
 private:
@@ -50,23 +51,27 @@ private:
 public:
 
   // Construct node
-  Rule(const FXString& nm,FXint p,FXint s):name(nm),parent(p),style(s){}
+  Rule(const FXString& nm,const FXString& st,FXint p,FXint s):name(nm),style(st),parent(p),index(s){}
 
   // Get number of child rules
   FXint getNumRules() const { return rules.no(); }
 
   // Get child rule
-  Rule* getRule(FXint index) const { return rules[index]; }
+  Rule* getRule(FXint inx) const { return rules[inx]; }
 
   // Rule name
   const FXString& getName() const { return name; }
   void setName(const FXString& nm){ name=nm; }
+  
+  // Style coloring, if not changed
+  const FXString& getStyle() const { return style; }
+  void setStyle(const FXString& st){ style=st; }
 
-  // Get parent
+  // Get parent index
   FXint getParent() const { return parent; }
 
-  // Get style
-  FXint getStyle() const { return style; }
+  // Get style index
+  FXint getIndex() const { return index; }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -89,7 +94,7 @@ private:
 public:
 
   // Construct node
-  SimpleRule(const FXString& nm,const FXString& rex,FXint p,FXint s):Rule(nm,p,s),pat(rex,FXRex::Newline|FXRex::NotEmpty){ }
+  SimpleRule(const FXString& nm,const FXString& st,const FXString& rex,FXint p,FXint s):Rule(nm,st,p,s),pat(rex,FXRex::Newline|FXRex::NotEmpty){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -113,7 +118,7 @@ private:
 public:
 
   // Construct node
-  BracketRule(const FXString& nm,const FXString& brex,const FXString& erex,FXint p,FXint s):Rule(nm,p,s),beg(brex,FXRex::Newline),end(erex,FXRex::Newline){ }
+  BracketRule(const FXString& nm,const FXString& st,const FXString& brex,const FXString& erex,FXint p,FXint s):Rule(nm,st,p,s),beg(brex,FXRex::Newline),end(erex,FXRex::Newline){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -136,7 +141,7 @@ private:
 public:
 
   // Construct node
-  SafeBracketRule(const FXString& nm,const FXString& brex,const FXString& erex,const FXString& srex,FXint p,FXint s):BracketRule(nm,brex,erex,p,s),esc(srex,FXRex::Newline){ }
+  SafeBracketRule(const FXString& nm,const FXString& st,const FXString& brex,const FXString& erex,const FXString& srex,FXint p,FXint s):BracketRule(nm,st,brex,erex,p,s),esc(srex,FXRex::Newline){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -157,7 +162,7 @@ private:
 public:
 
   // Construct node
-  DefaultRule(const FXString& nm,FXint p,FXint s):Rule(nm,p,s){ }
+  DefaultRule(const FXString& nm,const FXString& st,FXint p,FXint s):Rule(nm,st,p,s){ }
 
   // Stylize text
   virtual FXbool stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const;
@@ -173,6 +178,7 @@ class Syntax : public FXObject {
 protected:
   RuleList      rules;          // Highlight rules
   FXString      language;       // Language name
+  FXString      group;          // Group name for syntax coloring
   FXString      extensions;     // File extensions to recognize language
   FXString      contents;       // Contents to recognize language
   FXString      delimiters;     // Word delimiters in this language
@@ -186,7 +192,7 @@ private:
 public:
 
   // New language
-  Syntax(const FXString& lang);
+  Syntax(const FXString& lang,const FXString& grp);
 
   // Get number of child rules
   FXint getNumRules() const { return rules.no(); }
@@ -206,6 +212,10 @@ public:
   // Language name
   const FXString& getName() const { return language; }
   void setName(const FXString& lang){ language=lang; }
+
+  // Style coloring group
+  const FXString& getGroup() const { return group; }
+  void setGroup(const FXString& grp){ group=grp; }
 
   // Extensions
   const FXString& getExtensions() const { return extensions; }
@@ -234,16 +244,16 @@ public:
   FXbool matchContents(const FXString& text) const;
 
   // Append default rule
-  FXint appendDefault(const FXString& name,FXint parent=0);
+  FXint appendDefault(const FXString& name,const FXString& style,FXint parent=0);
 
   // Append simple rule
-  FXint appendSimple(const FXString& name,const FXString& rex,FXint parent=0);
+  FXint appendSimple(const FXString& name,const FXString& style,const FXString& rex,FXint parent=0);
 
   // Append bracket rule
-  FXint appendBracket(const FXString& name,const FXString& brex,const FXString& erex,FXint parent=0);
+  FXint appendBracket(const FXString& name,const FXString& style,const FXString& brex,const FXString& erex,FXint parent=0);
 
   // Append safe bracket rule
-  FXint appendSafeBracket(const FXString& name,const FXString& brex,const FXString& erex,const FXString& srex,FXint parent=0);
+  FXint appendSafeBracket(const FXString& name,const FXString& style,const FXString& brex,const FXString& erex,const FXString& srex,FXint parent=0);
 
   // Wipes the rules
   virtual ~Syntax();

@@ -350,7 +350,7 @@ public:
 
 public:
 
-  // Common DND type names
+  // Predefined DND type names
   static const FXchar octetTypeName[];
   static const FXchar deleteTypeName[];
   static const FXchar textTypeName[];
@@ -807,8 +807,8 @@ public:
   FXDragAction inquireDNDAction() const;
 
   /**
-  * Set DND data; the array must be allocated with FXMALLOC and ownership is
-  * transferred to the system
+  * Set DND data; the array must be allocated with allocElms() and ownership is
+  * transferred to the system.
   */
   FXbool setDNDData(FXDNDOrigin origin,FXDragType type,FXuchar* data,FXuint size) const;
 
@@ -819,7 +819,7 @@ public:
 
   /**
   * Get DND data; the caller becomes the owner of the array and must free it
-  * with FXFREE
+  * with freeElms().
   */
   FXbool getDNDData(FXDNDOrigin origin,FXDragType type,FXuchar*& data,FXuint& size) const;
 

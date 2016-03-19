@@ -335,7 +335,7 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright information
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2014 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2015 Jeroen van der Zijp. All Rights Reserved.";
 
 
 // Conversion
@@ -842,7 +842,7 @@ FXWindow* FXApp::getForegroundWindow() const {
 
 // Find window from id
 FXWindow* FXApp::findWindowWithId(FXID xid) const {
-  return (FXWindow*)hash.at((FXptr)xid); 
+  return (FXWindow*)hash.at((FXptr)xid);
   }
 
 
@@ -1470,6 +1470,16 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
     // when switching to drive w/no media mounted in it...
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
+    // Preregister some drag types
+    FXWindow::octetType=RegisterClipboardFormatA(FXWindow::octetTypeName);
+    FXWindow::deleteType=RegisterClipboardFormatA(FXWindow::deleteTypeName);
+    FXWindow::textType=RegisterClipboardFormatA(FXWindow::textTypeName);
+    FXWindow::colorType=RegisterClipboardFormatA(FXWindow::colorTypeName);
+    FXWindow::urilistType=RegisterClipboardFormatA(FXWindow::urilistTypeName);
+    FXWindow::utf8Type=RegisterClipboardFormatA(FXWindow::utf8TypeName);
+    FXWindow::utf16Type=CF_UNICODETEXT;
+    FXWindow::actionType=RegisterClipboardFormatA(FXWindow::actionTypeName);
+
 #else                   // X11
 
     // Using thread-safe X11 if possible
@@ -1705,6 +1715,15 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
     stipples[STIPPLE_REVDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(const char*)revdiag_bits,16,16);
     stipples[STIPPLE_CROSSDIAG]=(FXID)XCreateBitmapFromData((Display*)display,XDefaultRootWindow((Display*)display),(const char*)crossdiag_bits,16,16);
 
+    // Preregister some drag types
+    FXWindow::octetType=(FXDragType)XInternAtom((Display*)display,FXWindow::octetTypeName,0);
+    FXWindow::deleteType=(FXDragType)XInternAtom((Display*)display,FXWindow::deleteTypeName,0);
+    FXWindow::textType=(FXDragType)XInternAtom((Display*)display,FXWindow::textTypeName,0);
+    FXWindow::colorType=(FXDragType)XInternAtom((Display*)display,FXWindow::colorTypeName,0);
+    FXWindow::urilistType=(FXDragType)XInternAtom((Display*)display,FXWindow::urilistTypeName,0);
+    FXWindow::utf8Type=(FXDragType)XInternAtom((Display*)display,FXWindow::utf8TypeName,0);
+    FXWindow::utf16Type=(FXDragType)XInternAtom((Display*)display,FXWindow::utf16TypeName,0);
+    FXWindow::actionType=(FXDragType)XInternAtom((Display*)display,FXWindow::actionTypeName,0);
 #endif
 
     // Open input devices
@@ -1870,7 +1889,7 @@ void FXApp::removeTimeout(FXObject* tgt,FXSelector sel){
 
 
 // Return the remaining time, in nanoseconds
-FXTime FXApp::remainingTimeout(FXObject *tgt,FXSelector sel){
+FXTime FXApp::remainingTimeout(FXObject *tgt,FXSelector sel) const {
   for(register FXTimer *t=timers; t; t=t->next){
     if(t->target==tgt && (sel==0 || t->message==sel)){
       register FXTime now=FXThread::time();
@@ -2507,7 +2526,7 @@ a:ev.xany.type=0;
           if(in.write.target && in.write.target->tryHandle(this,FXSEL(SEL_IO_WRITE,in.write.message),in.write.data)) refresh();
           }
         if(FD_ISSET(fff,&exceptfds)){
-          if(in.excpt.target && in.excpt.target->tryHandle(this,FXSEL(SEL_IO_EXCEPT,in.read.message),in.excpt.data)) refresh();
+          if(in.excpt.target && in.excpt.target->tryHandle(this,FXSEL(SEL_IO_EXCEPT,in.excpt.message),in.excpt.data)) refresh();
           }
         }
       }

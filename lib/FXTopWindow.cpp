@@ -192,9 +192,6 @@ void FXTopWindow::create(){
   if(icon) icon->create();
   if(miniIcon) miniIcon->create();
 
-  // Register string types
-  if(!utf8Type){ utf8Type=getApp()->registerDragType(utf8TypeName); }
-
   if(xid){
     if(getApp()->isInitialized()){
 

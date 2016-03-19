@@ -211,7 +211,6 @@ FXGradientBar::FXGradientBar(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint 
 // Create window
 void FXGradientBar::create(){
   FXFrame::create();
-  if(!colorType){colorType=getApp()->registerDragType(colorTypeName);}
   updatebar();
   bar->create();
   }
