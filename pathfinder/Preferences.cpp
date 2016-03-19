@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Preferences.cpp,v 1.21 2007/07/06 04:22:32 fox Exp $                     *
+* $Id: Preferences.cpp,v 1.22 2008/01/04 15:18:30 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "PathFinder.h"

@@ -3,7 +3,7 @@
 *                         C u r s o r - O b j e c t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCursor.h,v 1.31 2007/07/09 16:02:42 fox Exp $                          *
+* $Id: FXCursor.h,v 1.32 2008/01/04 15:18:15 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXCURSOR_H
 #define FXCURSOR_H

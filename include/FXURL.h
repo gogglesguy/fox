@@ -3,7 +3,7 @@
 *                       U R L   M a n i p u l a t i o n                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXURL.h,v 1.16 2007/07/09 16:02:51 fox Exp $                             *
+* $Id: FXURL.h,v 1.17 2008/01/04 15:18:27 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXURL_H
 #define FXURL_H

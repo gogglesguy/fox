@@ -3,7 +3,7 @@
 *                        C h a r t   B a s e   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXChart.cpp,v 1.62 2007/07/25 17:38:41 fox Exp $                         *
+* $Id: FXChart.cpp,v 1.63 2008/01/04 15:18:13 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -355,8 +355,8 @@ void FXChart::setCaptionOffset(FXint off){
     update();
     }
   }
-  
-  
+
+
 // Change help text
 void FXChart::setHelpText(const FXString& text){
   help=text;

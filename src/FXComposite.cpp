@@ -3,7 +3,7 @@
 *                C o m p o s i t e   W i n d o w   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComposite.cpp,v 1.60 2007/07/09 16:26:45 fox Exp $                     *
+* $Id: FXComposite.cpp,v 1.61 2008/01/04 15:42:06 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -258,8 +258,8 @@ long FXComposite::onKeyPress(FXObject* sender,FXSelector sel,void* ptr){
       return handle(this,FXSEL(SEL_FOCUS_NEXT,0),ptr);
     case KEY_Prior:
     case KEY_ISO_Left_Tab:
-    case MKUINT(KEY_ISO_Left_Tab,SHIFTMASK): 
-    case MKUINT(KEY_Tab,SHIFTMASK):    
+    case MKUINT(KEY_ISO_Left_Tab,SHIFTMASK):
+    case MKUINT(KEY_Tab,SHIFTMASK):
       return handle(this,FXSEL(SEL_FOCUS_PREV,0),ptr);
     case KEY_Up:
     case KEY_KP_Up:

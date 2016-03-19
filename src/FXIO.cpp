@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIO.cpp,v 1.20 2007/07/09 16:26:57 fox Exp $                            *
+* $Id: FXIO.cpp,v 1.21 2008/01/04 15:42:20 fox Exp $                            *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

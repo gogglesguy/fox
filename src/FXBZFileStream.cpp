@@ -3,7 +3,7 @@
 *                      B Z F i l e S t r e a m   C l a s s e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Lyle Johnson. All Rights Reserved.                 *
+* Copyright (C) 1999,2008 by Lyle Johnson. All Rights Reserved.                 *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.cpp,v 1.15 2007/10/05 14:09:04 fox Exp $                  *
+* $Id: FXBZFileStream.cpp,v 1.16 2008/01/04 15:42:04 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -106,7 +106,7 @@ FXuval FXBZFileStream::readBuffer(FXuval){
   wrptr=begptr+(wrptr-rdptr);
   rdptr=begptr;
   while(wrptr<endptr){
-    if(bz->stream.avail_in<=0){                         // Read more input 
+    if(bz->stream.avail_in<=0){                         // Read more input
       n=file.readBlock(bz->buffer,BUFFERSIZE);
       if(n<=0) break;
       bz->stream.next_in=bz->buffer;

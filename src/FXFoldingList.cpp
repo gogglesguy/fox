@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.cpp,v 1.93 2007/12/31 18:22:59 fox Exp $                   *
+* $Id: FXFoldingList.cpp,v 1.94 2008/01/04 15:42:14 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

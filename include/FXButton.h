@@ -3,7 +3,7 @@
 *                           B u t t o n   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXButton.h,v 1.43 2007/07/09 16:02:41 fox Exp $                          *
+* $Id: FXButton.h,v 1.44 2008/01/04 15:18:14 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXBUTTON_H
 #define FXBUTTON_H

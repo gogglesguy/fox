@@ -3,7 +3,7 @@
 *                         I c o n   D i c t i o n a r y                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconDict.cpp,v 1.15 2007/07/09 16:26:57 fox Exp $                      *
+* $Id: FXIconDict.cpp,v 1.16 2008/01/04 15:42:20 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

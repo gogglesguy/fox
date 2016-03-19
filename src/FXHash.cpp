@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXHash.cpp,v 1.31 2007/07/09 16:26:56 fox Exp $                          *
+* $Id: FXHash.cpp,v 1.33 2008/01/04 15:42:20 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -100,7 +100,7 @@ void* FXHash::insert(void* name,void* data){
     x=HASH2(name,total);
     q=p;
     while(table[q].name){
-      if(table[q].name==name) goto y;              // Return existing
+      if(table[q].name==name) goto y;            // Return existing
       q=(q+x)&(total-1);
       }
     q=p;

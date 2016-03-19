@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4d.cpp,v 1.37 2007/09/24 21:00:49 fox Exp $                         *
+* $Id: FXMat4d.cpp,v 1.38 2008/01/04 15:42:24 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -92,7 +92,7 @@ FXMat4d::FXMat4d(FXdouble w){
   }
 
 
-// Initialize diagonal matrix 
+// Initialize diagonal matrix
 FXMat4d::FXMat4d(FXdouble a,FXdouble b,FXdouble c,FXdouble d){
   m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0; m[0][3]=0.0;
   m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0; m[1][3]=0.0;
@@ -179,7 +179,7 @@ FXMat4d& FXMat4d::set(FXdouble w){
   }
 
 
-// Set diagonal matrix 
+// Set diagonal matrix
 FXMat4d& FXMat4d::set(FXdouble a,FXdouble b,FXdouble c,FXdouble d){
   m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0; m[0][3]=0.0;
   m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0; m[1][3]=0.0;

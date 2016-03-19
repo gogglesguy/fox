@@ -3,7 +3,7 @@
 *                              D a t a   T a r g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDataTarget.h,v 1.30 2007/07/17 22:51:01 fox Exp $                      *
+* $Id: FXDataTarget.h,v 1.31 2008/01/04 15:18:15 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXDATATARGET_H
 #define FXDATATARGET_H
@@ -43,7 +43,7 @@ namespace FX {
 * A Data Target may be subclassed to handle additional, user-defined data types; to
 * this end, the message handlers return 1 if the type is one of DT_VOID...DT_STRING
 * and 0 otherwise.  Thus subclasses can handle any data types not dealt with in the
-* default implementation. 
+* default implementation.
 */
 class FXAPI FXDataTarget : public FXObject {
   FXDECLARE(FXDataTarget)

@@ -3,7 +3,7 @@
 *                           S l i d e r   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRangeSlider.h,v 1.8 2007/11/06 22:07:23 fox Exp $                      *
+* $Id: FXRangeSlider.h,v 1.9 2008/01/04 15:18:23 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXRANGERANGESLIDER_H
 #define FXRANGERANGESLIDER_H

@@ -3,7 +3,7 @@
 *                      S c r o l l A r e a   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXScrollArea.cpp,v 1.73 2007/07/09 16:27:07 fox Exp $                    *
+* $Id: FXScrollArea.cpp,v 1.74 2008/01/04 15:42:30 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -54,7 +54,7 @@
   - The placement of the viewport is returned by getVisibleX(), getVisibleY(), getVisibleWidth(),
     and getVisibleHeight().  Subclass these when header controls need to be substracted from
     the visible area.
-    If the document is not scrolled, (getVisibleX(), getVisibleY()) corresponds to 
+    If the document is not scrolled, (getVisibleX(), getVisibleY()) corresponds to
     the document coordinate (0,0).  Drawing should be relative to getVisibleX() and
     getVisibleY() so that subclasses may place header controls around the visible area.
   - The getVisibleX(), getVisibleY(), getVisibleWidth() and getVisibleHeight()
@@ -67,7 +67,7 @@
     HSCROLLING_OFF mode is in effect.  Then the width of the vertical scrollbar is
     added unless the vertical scrollbar is suppressed (using VSCROLLER_NEVER).
     A subclass may subsequently add any additional space needed for headers or rulers.
-  - Likewise, when computing default height, the content height is assumed to be 0, unless 
+  - Likewise, when computing default height, the content height is assumed to be 0, unless
     the VSCROLLING_OFF mode is in effect.  Then the height of the horizontal scrollbar is
     added unless the horizontal scrollbar is suppressed (using HSCROLLER_NEVER).
     A subclass may subsequently add any additional space needed for headers or rulers.
@@ -75,7 +75,7 @@
     elements such as headers or rules) will be fully visible.
   - Note that the horizontal scrollbar width NO LONGER influences the default width,
     and the vertical scrollbar NO LONGER influences default height.  This was done
-    to get accurate minimum sizes for subclasses which add headers or rulers. 
+    to get accurate minimum sizes for subclasses which add headers or rulers.
 */
 
 

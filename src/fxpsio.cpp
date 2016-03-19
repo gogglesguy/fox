@@ -3,7 +3,7 @@
 *                        P o s t S c r i p t   O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxpsio.cpp,v 1.16 2007/07/09 16:27:23 fox Exp $                          *
+* $Id: fxpsio.cpp,v 1.17 2008/01/04 15:42:46 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

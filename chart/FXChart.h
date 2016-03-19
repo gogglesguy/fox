@@ -3,7 +3,7 @@
 *                        C h a r t   B a s e   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXChart.h,v 1.46 2007/07/24 17:37:45 fox Exp $                           *
+* $Id: FXChart.h,v 1.47 2008/01/04 15:18:13 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXCHART_H
 #define FXCHART_H
@@ -92,10 +92,10 @@ public:
 
   /// Change caption
   void setCaption(const FXString& cap);
-  
+
   /// Return caption
   const FXString& getCaption() const { return caption; }
-  
+
   /// Set fill style
   void setBackStyle(const FillStyle& bs);
 

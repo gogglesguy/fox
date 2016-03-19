@@ -3,7 +3,7 @@
 *                       F r a m e   W i n d o w   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFrame.h,v 1.26 2007/07/09 16:02:44 fox Exp $                           *
+* $Id: FXFrame.h,v 1.27 2008/01/04 15:18:19 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXFRAME_H
 #define FXFRAME_H

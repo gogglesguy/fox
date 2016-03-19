@@ -3,7 +3,7 @@
 *             T w o - D i m e n s i o n a l   C h a r t   W i d g e t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX2DChart.cpp,v 1.58 2007/07/24 20:30:44 fox Exp $                       *
+* $Id: FX2DChart.cpp,v 1.59 2008/01/04 15:18:13 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -107,7 +107,7 @@ void FX2DChart::drawSelf(FXDC& dc) const {
   plottop=dc.getClipY()+margintop;
   plotright=dc.getClipX()+dc.getClipWidth()-marginright-1;
   plotbottom=dc.getClipY()+dc.getClipHeight()-marginbottom-1;
- 
+
   // Space left after margins?
   if(plotleft<plotright && plottop<plotbottom){
 
@@ -120,22 +120,22 @@ void FX2DChart::drawSelf(FXDC& dc) const {
       caph=textHeight(captionfont,caption);
       if(options&CAPTION_LEFT){           // Caption left of chart
         caps|=TEXT_ATTACH_LEFT;
-        capx=plotleft; 
+        capx=plotleft;
         plotleft+=capw+captionoffset;
         }
       else if(options&CAPTION_RIGHT){     // Caption right of chart
         caps|=TEXT_ATTACH_RIGHT;
-        capx=plotright; 
+        capx=plotright;
         plotright-=capw+captionoffset;
         }
       if(options&CAPTION_ABOVE){          // Caption above chart
         caps|=TEXT_ATTACH_TOP;
-        capy=plottop; 
+        capy=plottop;
         plottop+=caph+captionoffset;
         }
       else if(options&CAPTION_BELOW){     // Caption below chart
         caps|=TEXT_ATTACH_BOTTOM;
-        capy=plotbottom; 
+        capy=plotbottom;
         plotbottom-=caph+captionoffset;
         }
       }

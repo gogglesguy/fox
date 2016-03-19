@@ -3,7 +3,7 @@
 *                          A x i s - D e f i n i t i o n                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAxis.cpp,v 1.31 2007/07/28 16:00:44 fox Exp $                          *
+* $Id: FXAxis.cpp,v 1.32 2008/01/04 15:18:13 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -197,7 +197,7 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       dc.setFont(labelfont);
       dc.setForeground(labelcolor);
       tout+=labeloffset;
-      
+
       // Horizontal attachment
       if(labelstyle&TEXT_ATTACH_LEFT) x=fx;
       else if(labelstyle&TEXT_ATTACH_RIGHT) x=tx;
@@ -333,7 +333,7 @@ void FXAxis::setMajorTickSize(FXint sz){
     chart->recalc();
     }
   }
-  
+
 
 // Change minor tick size
 void FXAxis::setMinorTickSize(FXint sz){
@@ -342,8 +342,8 @@ void FXAxis::setMinorTickSize(FXint sz){
     chart->recalc();
     }
   }
-  
-  
+
+
 // Change major tick space
 void FXAxis::setMajorTickSpace(FXdouble space){
   if(space<=0.0){ fxerror("FXAxis::setMajorTickSpace: tick space should be > 0.\n"); }

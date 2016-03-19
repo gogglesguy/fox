@@ -820,14 +820,6 @@ SOURCE=..\..\..\include\FXDirSelector.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\FXDirWatch.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\include\FXDirWatch.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\FXDLL.cpp
 # End Source File
 # Begin Source File

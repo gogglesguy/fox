@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.cpp,v 1.262 2007/12/31 20:31:53 fox Exp $                     *
+* $Id: FXFileList.cpp,v 1.263 2008/01/04 15:42:13 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1188,8 +1188,8 @@ FXIcon* FXFileList::getItemPreviewIcon(FXint index) const {
     }
   return NULL;
   }
-      
-    
+
+
 
 // Change directory when hovering over a folder
 long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
@@ -1594,7 +1594,7 @@ fnd:  *pn=item;
       }
     dir.close();
     }
-  
+
 
   // Wipe items remaining in list:- they have disappeared!!
   for(item=oldlist; item; item=link){
@@ -1613,7 +1613,7 @@ fnd:  *pn=item;
   if(options&FILELIST_SHOWIMAGES){
     getApp()->addChore(this,ID_PREVIEWCHORE,(void*)(FXival)0);
     }
-    
+
   // Gotta recalc size of content
   recalc();
   }

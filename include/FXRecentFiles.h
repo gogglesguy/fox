@@ -3,7 +3,7 @@
 *                     R e c e n t   F i l e s   L i s t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRecentFiles.h,v 1.27 2007/07/09 16:02:47 fox Exp $                     *
+* $Id: FXRecentFiles.h,v 1.28 2008/01/04 15:18:23 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXRECENTFILES_H
 #define FXRECENTFILES_H

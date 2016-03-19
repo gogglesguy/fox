@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx.h,v 1.115 2007/11/02 20:06:17 fox Exp $                               *
+* $Id: fx.h,v 1.116 2008/01/04 15:18:28 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H

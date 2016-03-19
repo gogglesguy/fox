@@ -1,25 +1,25 @@
 ##############################################################################
-#									     #
-#			FOX:  A Free C++ Class Library for X		     #
-#									     #
+#                                                                            #
+#                       FOX:  A Free C++ Class Library for X                 #
+#                                                                            #
 ##############################################################################
-# Contributed by: Andre Fornacon <afo@zlug.org>                              #
+# Copyright (C) 2006,2008 by Andre Fornacon.   All Rights Reserved.          #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.65 2007/11/02 19:02:29 fox Exp $		     #
+# This library is free software; you can redistribute it and/or              #
+# modify it under the terms of the GNU Library General Public                #
+# License as published by the Free Software Foundation; either               #
+# version 2 of the License, or (at your option) any later version.           #
+#                                                                            #
+# This library is distributed in the hope that it will be useful,            #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU          #
+# Library General Public License for more details.                           #
+#                                                                            #
+# You should have received a copy of the GNU Library General Public          #
+# License along with this library; if not, write to the Free                 #
+# Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# This library is free software; you can redistribute it and/or 	     #
-# modify it under the terms of the GNU Library General Public		     #
-# License as published by the Free Software Foundation; either		     #
-# version 2 of the License, or (at your option) any later version.	     #
-#									     #
-# This library is distributed in the hope that it will be useful,	     #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of	     #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU	     #
-# Library General Public License for more details.			     #
-#									     #
-# You should have received a copy of the GNU Library General Public	     #
-# License along with this library; if not, write to the Free		     #
-# Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.	     #
+# $Id: Makefile.dmc,v 1.67 2008/01/04 16:14:04 fox Exp $                     #
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later

@@ -3,7 +3,7 @@
 *                            X P M   I m a g e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXXPMImage.h,v 1.24 2007/07/09 16:02:51 fox Exp $                        *
+* $Id: FXXPMImage.h,v 1.25 2008/01/04 15:18:28 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXXPMIMAGE_H
 #define FXXPMIMAGE_H

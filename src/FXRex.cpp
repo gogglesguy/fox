@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRex.cpp,v 1.123 2007/07/09 16:27:06 fox Exp $                          *
+* $Id: FXRex.cpp,v 1.124 2008/01/04 15:42:29 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

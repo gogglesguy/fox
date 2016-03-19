@@ -3,7 +3,7 @@
 *                  S w i t c h   C o n t a i n e r   W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSwitcher.h,v 1.22 2007/08/24 22:08:52 fox Exp $                        *
+* $Id: FXSwitcher.h,v 1.23 2008/01/04 15:18:25 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXSWITCHER_H
 #define FXSWITCHER_H

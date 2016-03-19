@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGradientBar.h,v 1.57 2007/07/09 16:02:45 fox Exp $                     *
+* $Id: FXGradientBar.h,v 1.58 2008/01/04 15:18:19 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXGRADIENTBAR_H
 #define FXGRADIENTBAR_H
@@ -292,16 +292,16 @@ public:
 
   /// Change control size
   void setControlSize(FXint cs);
-  
+
   /// Get control size
   FXint getControlSize() const { return controlsize; }
 
   /// Change bar size
   void setBarSize(FXint bs);
-  
+
   /// Get bar size
   FXint getBarSize() const { return barsize; }
-  
+
   /// Get the gradient bar style
   FXuint getBarStyle() const;
 

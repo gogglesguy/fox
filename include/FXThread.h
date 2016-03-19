@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.h,v 1.76 2007/11/28 07:20:47 fox Exp $                          *
+* $Id: FXThread.h,v 1.77 2008/01/04 15:18:27 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H

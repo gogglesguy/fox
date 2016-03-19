@@ -3,7 +3,7 @@
 *                   M a i n   C h a r t   I n c l u d e   F i l e               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chart.h,v 1.6 2007/07/19 05:03:09 fox Exp $                              *
+* $Id: chart.h,v 1.7 2008/01/04 15:18:13 fox Exp $                              *
 ********************************************************************************/
 #ifndef CHART_H
 #define CHART_H

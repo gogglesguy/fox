@@ -3,7 +3,7 @@
 *                 T o p - L e v e l   W i n d o w   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTopWindow.h,v 1.74 2007/07/09 16:02:50 fox Exp $                       *
+* $Id: FXTopWindow.h,v 1.76 2008/01/11 18:27:34 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTOPWINDOW_H
 #define FXTOPWINDOW_H
@@ -60,7 +60,7 @@ enum {
 
 /// Special stacking orders
 enum {
-  STACK_NORMAL,                 /// Stack normally (default) 
+  STACK_NORMAL,                 /// Stack normally (default)
   STACK_BOTTOM,                 /// Stack below other windows
   STACK_TOP                     /// Stack above other windows
   };
@@ -129,6 +129,9 @@ public:
   long onFocusRight(FXObject*,FXSelector,void*);
   long onSessionNotify(FXObject*,FXSelector,void*);
   long onSessionClosed(FXObject*,FXSelector,void*);
+  long onRestore(FXObject*,FXSelector,void*);
+  long onMaximize(FXObject*,FXSelector,void*);
+  long onMinimize(FXObject*,FXSelector,void*);
   long onCmdRestore(FXObject*,FXSelector,void*);
   long onCmdMaximize(FXObject*,FXSelector,void*);
   long onCmdMinimize(FXObject*,FXSelector,void*);

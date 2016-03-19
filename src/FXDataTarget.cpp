@@ -3,7 +3,7 @@
 *                              D a t a   T a r g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDataTarget.cpp,v 1.42 2007/07/17 22:51:01 fox Exp $                    *
+* $Id: FXDataTarget.cpp,v 1.43 2008/01/04 15:42:09 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -53,7 +53,7 @@
   - Need to add ID_GETLONGVALUE/ID_SETLONGVALUE message handlers some day.
   - onCmdValue, onUpdValue, onCmdOption, and onUpdOption now return 0 if the type
     variable is not one of the known types.  This allows more easy subclassing of
-    FXDataTarget to add custom data types.  
+    FXDataTarget to add custom data types.
   - When the type is DT_VOID, a change message does not change any data but simply
     passes along the message to data target's target; an update message will be a
     no-op, but return 1 so that the sending message will remain sensitized if auto-
@@ -250,7 +250,7 @@ long FXDataTarget::onUpdOption(FXObject* sender,FXSelector sel,void*){
     case DT_VOID:
       break;
     case DT_BOOL:
-      i=*((FXbool*)data);    
+      i=*((FXbool*)data);
       sender->handle(this,(num==i)?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
       break;
     case DT_CHAR:

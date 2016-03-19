@@ -3,7 +3,7 @@
 *                         I c o n   L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconList.h,v 1.117 2007/08/11 17:39:21 fox Exp $                       *
+* $Id: FXIconList.h,v 1.118 2008/01/04 15:18:20 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXICONLIST_H
 #define FXICONLIST_H

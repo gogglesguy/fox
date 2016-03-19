@@ -3,7 +3,7 @@
 *                    M e n u   S e p a r a t o r   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuSeparator.h,v 1.21 2007/07/09 16:02:46 fox Exp $                   *
+* $Id: FXMenuSeparator.h,v 1.22 2008/01/04 15:18:22 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXMENUSEPARATOR_H
 #define FXMENUSEPARATOR_H
@@ -31,8 +31,8 @@ namespace FX {
 
 
 /**
-* The menu separator is a simple decorative groove used to delineate items in a 
-* popup menu.  When a target/message is given, the menu separator is usually 
+* The menu separator is a simple decorative groove used to delineate items in a
+* popup menu.  When a target/message is given, the menu separator is usually
 * connected to an instance of the recent files class using the ID_ANYFILES
 * message.  This automatically hides the menu separator when no files are listed
 * in the recent files section.  Another possible target is the MDI client using

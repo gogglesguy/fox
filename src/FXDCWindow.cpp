@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.cpp,v 1.179 2007/12/24 15:01:16 fox Exp $                     *
+* $Id: FXDCWindow.cpp,v 1.180 2008/01/04 15:42:06 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -233,9 +233,9 @@ void FXDCWindow::end(){
     }
   surface=NULL;
 #ifdef HAVE_XFT_H
-  if(xftDraw){ 
-    XftDrawDestroy((XftDraw*)xftDraw); 
-    xftDraw=NULL; 
+  if(xftDraw){
+    XftDrawDestroy((XftDraw*)xftDraw);
+    xftDraw=NULL;
     }
 #endif
   }

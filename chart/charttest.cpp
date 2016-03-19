@@ -3,9 +3,9 @@
 *                                  Chart  Test                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: charttest.cpp,v 1.12 2007/07/24 20:30:45 fox Exp $                        *
+* $Id: charttest.cpp,v 1.13 2008/01/04 15:18:14 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chart.h"

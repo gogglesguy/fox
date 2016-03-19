@@ -3,7 +3,7 @@
 *                        C h a r t    D e f i n i t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chartdefs.h,v 1.18 2007/07/24 17:37:45 fox Exp $                         *
+* $Id: chartdefs.h,v 1.19 2008/01/04 15:18:14 fox Exp $                         *
 ********************************************************************************/
 #ifndef CHARTDEFS_H
 #define CHARTDEFS_H

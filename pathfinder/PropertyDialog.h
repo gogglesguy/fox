@@ -3,7 +3,7 @@
 *                  F i l e   P r o p e r t i e s   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: PropertyDialog.h,v 1.17 2007/07/06 04:22:32 fox Exp $                    *
+* $Id: PropertyDialog.h,v 1.18 2008/01/04 15:18:30 fox Exp $                    *
 ********************************************************************************/
 #ifndef PROPERTYDIALOG_H
 #define PROPERTYDIALOG_H

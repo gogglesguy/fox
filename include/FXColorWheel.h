@@ -3,7 +3,7 @@
 *                        C o l o r W h e e l   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorWheel.h,v 1.35 2007/07/09 16:02:42 fox Exp $                      *
+* $Id: FXColorWheel.h,v 1.36 2008/01/04 15:18:14 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXCOLORWHEEL_H
 #define FXCOLORWHEEL_H

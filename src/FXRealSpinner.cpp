@@ -3,7 +3,7 @@
 *             R e a l - V a l u e d   S p i n n e r  W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Bill Baxter.   All Rights Reserved.                *
+* Copyright (C) 2003,2008 by Bill Baxter.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRealSpinner.cpp,v 1.57 2007/08/10 17:41:58 fox Exp $                   *
+* $Id: FXRealSpinner.cpp,v 1.58 2008/01/04 15:42:29 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

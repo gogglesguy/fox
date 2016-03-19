@@ -3,7 +3,7 @@
 *                      P r o g r e s s B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressBar.h,v 1.25 2007/07/09 16:02:47 fox Exp $                     *
+* $Id: FXProgressBar.h,v 1.26 2008/01/04 15:18:23 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXPROGRESSBAR_H
 #define FXPROGRESSBAR_H

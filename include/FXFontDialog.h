@@ -3,7 +3,7 @@
 *                    F o n t   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFontDialog.h,v 1.16 2007/07/09 16:02:44 fox Exp $                      *
+* $Id: FXFontDialog.h,v 1.17 2008/01/04 15:18:18 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFONTDIALOG_H
 #define FXFONTDIALOG_H

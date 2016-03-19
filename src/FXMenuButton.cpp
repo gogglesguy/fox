@@ -3,7 +3,7 @@
 *                       M e n u    B u t t o n    O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuButton.cpp,v 1.56 2007/09/04 22:09:10 fox Exp $                    *
+* $Id: FXMenuButton.cpp,v 1.57 2008/01/04 15:42:25 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -334,7 +334,7 @@ long FXMenuButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 long FXMenuButton::onHotKeyRelease(FXObject*,FXSelector,void*){
   return 1;
   }
- 
+
 
 // Post the menu
 long FXMenuButton::onCmdPost(FXObject*,FXSelector,void*){

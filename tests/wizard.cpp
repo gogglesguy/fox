@@ -3,9 +3,9 @@
 *                                 Test Wizard                                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: wizard.cpp,v 1.15 2007/05/24 20:42:16 fox Exp $                          *
+* $Id: wizard.cpp,v 1.16 2008/01/04 15:18:34 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

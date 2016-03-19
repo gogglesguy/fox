@@ -3,9 +3,9 @@
 *                                 Test Table Widget                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: table.cpp,v 1.77 2007/08/27 18:27:30 fox Exp $                           *
+* $Id: table.cpp,v 1.78 2008/01/04 15:18:34 fox Exp $                           *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

@@ -3,7 +3,7 @@
 *                           O p e n G L   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLObject.h,v 1.37 2007/07/09 16:02:44 fox Exp $                        *
+* $Id: FXGLObject.h,v 1.38 2008/01/04 15:18:19 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLOBJECT_H
 #define FXGLOBJECT_H

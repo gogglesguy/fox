@@ -3,7 +3,7 @@
 *                7 - S e g m e n t   D i s p l a y   W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX7Segment.h,v 1.15 2007/07/09 16:02:41 fox Exp $                        *
+* $Id: FX7Segment.h,v 1.16 2008/01/04 15:18:14 fox Exp $                        *
 ********************************************************************************/
 #ifndef FX7SEGMENT_H
 #define FX7SEGMENT_H
@@ -123,16 +123,16 @@ public:
   /// Get the current text-justification mode.
   FXuint getJustify() const;
 
-  /// Set the status line help text 
+  /// Set the status line help text
   void setHelpText(const FXString& text){ help=text; }
 
-  /// Get the status line help text 
+  /// Get the status line help text
   const FXString& getHelpText() const { return help; }
 
-  /// Set the tool tip message 
+  /// Set the tool tip message
   void setTipText(const FXString& text){ tip=text; }
 
-  /// Get the tool tip message 
+  /// Get the tool tip message
   const FXString& getTipText() const { return tip; }
 
   /// Save to a stream

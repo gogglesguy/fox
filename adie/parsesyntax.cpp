@@ -3,7 +3,7 @@
 *                     P a r s e   S y n t a x   F i l e                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: parsesyntax.cpp,v 1.19 2007/08/10 22:06:38 fox Exp $                     *
+* $Id: parsesyntax.cpp,v 1.20 2008/01/04 15:59:38 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

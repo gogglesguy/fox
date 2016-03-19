@@ -3,9 +3,9 @@
 *                                 Data Target Test                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: datatarget.cpp,v 1.55 2007/06/24 14:53:10 fox Exp $                      *
+* $Id: datatarget.cpp,v 1.56 2008/01/04 15:18:32 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

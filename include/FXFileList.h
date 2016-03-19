@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.h,v 1.79 2007/07/09 16:02:44 fox Exp $                        *
+* $Id: FXFileList.h,v 1.80 2008/01/04 15:18:18 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXFILELIST_H
 #define FXFILELIST_H

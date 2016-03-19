@@ -3,7 +3,7 @@
 *                 S h u t t e r   C o n t a i n e r   W i d g e t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Charles W. Warren.   All Rights Reserved.          *
+* Copyright (C) 1998,2008 by Charles W. Warren.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXShutter.cpp,v 1.56 2007/08/27 17:31:49 fox Exp $                       *
+* $Id: FXShutter.cpp,v 1.57 2008/01/04 15:42:31 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *                      O p e n G L   S h a p e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLShape.cpp,v 1.49 2007/07/09 16:26:55 fox Exp $                       *
+* $Id: FXGLShape.cpp,v 1.50 2008/01/04 15:42:16 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -398,8 +398,8 @@ void FXGLShape::bounds(FXRangef& box){
 void FXGLShape::setPosition(const FXVec3f& pos){
   position=pos;
   }
-  
-  
+
+
 // Draw a box
 void FXGLShape::drawbox(){
 #ifdef HAVE_GL_H

@@ -3,7 +3,7 @@
 *              F O X   P r i v a t e   I n c l u d e   F i l e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: xincs.h,v 1.81 2007/12/28 21:27:45 fox Exp $                             *
+* $Id: xincs.h,v 1.82 2008/01/04 15:18:29 fox Exp $                             *
 ********************************************************************************/
 #ifndef XINCS_H
 #define XINCS_H

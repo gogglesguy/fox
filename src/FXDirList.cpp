@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.181 2007/07/09 16:26:49 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.182 2008/01/04 15:42:10 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -921,7 +921,7 @@ void FXDirList::listChildItems(FXDirItem *par){
       pathname=directory;
       if(!ISPATHSEP(pathname[pathname.length()-1])) pathname+=PATHSEPSTRING;
       pathname+=name;
-      
+
 #ifdef WIN32
 
       // Get file/link info
@@ -929,7 +929,7 @@ void FXDirList::listChildItems(FXDirItem *par){
 
       // Hidden file or directory normally not shown
       if(info.isHidden() && !(options&DIRLIST_SHOWHIDDEN)) continue;
-      
+
 #else
 
       // Get file/link info

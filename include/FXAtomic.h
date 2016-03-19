@@ -3,7 +3,7 @@
 *                         A t o m i c   I n t e g e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAtomic.h,v 1.24 2007/11/02 15:43:45 fox Exp $                          *
+* $Id: FXAtomic.h,v 1.25 2008/01/04 15:18:14 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXATOMIC_H
 #define FXATOMIC_H

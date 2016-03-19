@@ -3,9 +3,9 @@
 *                                 Codecs Tests                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: codecs.cpp,v 1.25 2007/06/22 18:50:59 fox Exp $                          *
+* $Id: codecs.cpp,v 1.26 2008/01/04 15:18:32 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirSelector.cpp,v 1.62 2007/07/09 16:26:49 fox Exp $                   *
+* $Id: FXDirSelector.cpp,v 1.63 2008/01/04 15:42:10 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

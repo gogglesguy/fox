@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.h,v 1.143 2007/11/25 15:34:32 fox Exp $                         *
+* $Id: FXString.h,v 1.144 2008/01/04 15:18:24 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -476,7 +476,7 @@ public:
   /// Format a string a-la printf
   FXString& format(const FXchar* fmt,...) FX_PRINTF(2,3) ;
   FXString& vformat(const FXchar* fmt,va_list args);
-  
+
   /// Convert to long integer
   FXlong toLong(FXint base=10) const;
 
@@ -514,22 +514,22 @@ public:
   FXString& fromFloat(FXfloat number,FXint prec=6,FXint fmt=2);
 
   /**
-  * Return a string value by converting an integer number to a string, 
+  * Return a string value by converting an integer number to a string,
   * using the given number base, which must be between 2 and 16.
   */
   static FXString value(FXint num,FXint base=10);
   static FXString value(FXuint num,FXint base=10);
 
   /**
-  * Return a string value by converting a long integer number to a string, 
+  * Return a string value by converting a long integer number to a string,
   * using the given number base, which must be between 2 and 16.
   */
   static FXString value(FXlong num,FXint base=10);
   static FXString value(FXulong num,FXint base=10);
 
   /**
-  * Return a string value by converting real number to a string, using the given 
-  * procision and exponential notation mode, which may be 0 (never), 1 (always), 
+  * Return a string value by converting real number to a string, using the given
+  * procision and exponential notation mode, which may be 0 (never), 1 (always),
   * or 2 (when needed).
   */
   static FXString value(FXfloat num,FXint prec=6,FXint fmt=2);

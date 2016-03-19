@@ -3,7 +3,7 @@
 *             D y n a m i c   L i n k   L i b r a r y   S u p p o r t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDLL.cpp,v 1.50 2007/10/10 19:15:21 fox Exp $                           *
+* $Id: FXDLL.cpp,v 1.51 2008/01/04 15:42:09 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

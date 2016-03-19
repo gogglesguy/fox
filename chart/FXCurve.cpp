@@ -3,7 +3,7 @@
 *                      P l o t - C u r v e   D e s c r i p t i o n              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCurve.cpp,v 1.12 2007/07/19 05:03:09 fox Exp $                         *
+* $Id: FXCurve.cpp,v 1.13 2008/01/04 15:18:13 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"

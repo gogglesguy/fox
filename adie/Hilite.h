@@ -3,7 +3,7 @@
 *                     H i g h l i g h t   E n g i n e                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Hilite.h,v 1.37 2007/07/06 04:22:28 fox Exp $                            *
+* $Id: Hilite.h,v 1.38 2008/01/04 15:18:11 fox Exp $                            *
 ********************************************************************************/
 #ifndef HILITE_H
 #define HILITE_H

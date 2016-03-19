@@ -3,7 +3,7 @@
 *                         I n p u t   D i a l o g   B o x                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXInputDialog.cpp,v 1.47 2007/08/10 17:41:58 fox Exp $                   *
+* $Id: FXInputDialog.cpp,v 1.48 2008/01/04 15:42:23 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

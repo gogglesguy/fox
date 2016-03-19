@@ -3,7 +3,7 @@
 *                          U t i l i t y - F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chartutils.cpp,v 1.4 2007/07/24 02:16:46 fox Exp $                       *
+* $Id: chartutils.cpp,v 1.5 2008/01/04 15:18:14 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"

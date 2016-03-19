@@ -3,7 +3,7 @@
 *                  U n d o / R e d o - a b l e   C o m m a n d                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXUndoList.cpp,v 1.61 2007/07/09 16:27:17 fox Exp $                      *
+* $Id: FXUndoList.cpp,v 1.62 2008/01/04 15:42:41 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

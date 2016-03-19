@@ -3,7 +3,7 @@
 *                      O p e n G L   S p h e r e   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLSphere.cpp,v 1.29 2007/07/09 16:26:55 fox Exp $                      *
+* $Id: FXGLSphere.cpp,v 1.30 2008/01/04 15:42:16 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -97,10 +97,10 @@ FXGLSphere::FXGLSphere(const FXGLSphere& orig):FXGLShape(orig){
 
 
 // Change radius
-void FXGLSphere::setRadius(FXfloat r){ 
+void FXGLSphere::setRadius(FXfloat r){
   if(radius!=r){
     range.set(-r,r,-r,r,-r,r);
-    radius=r; 
+    radius=r;
     }
   }
 

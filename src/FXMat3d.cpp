@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3d.cpp,v 1.22 2007/09/24 21:00:49 fox Exp $                         *
+* $Id: FXMat3d.cpp,v 1.23 2008/01/04 15:42:24 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -82,7 +82,7 @@ FXMat3d::FXMat3d(FXdouble w){
   }
 
 
-// Initialize diagonal matrix 
+// Initialize diagonal matrix
 FXMat3d::FXMat3d(FXdouble a,FXdouble b,FXdouble c){
   m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0;
   m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0;
@@ -346,11 +346,11 @@ FXVec2d FXMat3d::operator*(const FXVec2d& v) const {
   }
 
 
-// Equality 
+// Equality
 FXbool FXMat3d::operator==(const FXMat3d& a) const { return m[0]==a.m[0] && m[1]==a.m[1] && m[2]==a.m[2]; }
-  
-  
-// Inequality 
+
+
+// Inequality
 FXbool FXMat3d::operator!=(const FXMat3d& a) const { return m[0]!=a.m[0] || m[1]!=a.m[1] || m[2]!=a.m[2]; }
 
 
@@ -359,7 +359,7 @@ FXbool operator==(const FXMat3d& a,FXdouble n){ return a[0]==n && a[1]==n && a[2
 FXbool operator==(FXdouble n,const FXMat3d& a){ return n==a[0] && n==a[1] && n==a[2]; }
 
 
-// Inequality 
+// Inequality
 FXbool operator!=(const FXMat3d& a,FXdouble n){ return a[0]!=n || a[1]!=n || a[2]!=n; }
 FXbool operator!=(FXdouble n,const FXMat3d& a){ return n!=a[0] || n!=a[1] || n!=a[2]; }
 

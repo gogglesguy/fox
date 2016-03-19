@@ -3,7 +3,7 @@
 *                          G e n e r i c   A r r a y                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXArray.h,v 1.32 2008/01/03 03:52:33 fox Exp $                           *
+* $Id: FXArray.h,v 1.33 2008/01/04 15:18:14 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXARRAY_H
 #define FXARRAY_H

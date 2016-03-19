@@ -3,9 +3,9 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: format.cpp,v 1.33 2007/11/01 04:55:10 fox Exp $                          *
+* $Id: format.cpp,v 1.34 2008/01/04 15:18:33 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 
@@ -151,7 +151,7 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",floatformat[x],buffer);
       }
     }
-    
+
   return 1;
   }
 

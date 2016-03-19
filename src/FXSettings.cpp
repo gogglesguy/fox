@@ -3,7 +3,7 @@
 *                           S e t t i n g s   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSettings.cpp,v 1.82 2007/08/31 05:36:32 fox Exp $                      *
+* $Id: FXSettings.cpp,v 1.84 2008/01/09 21:23:11 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -146,7 +146,7 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
         while(Ascii::isBlank(string[p])) p++;
 
         // Non-comment
-        if(string[p] && string[p]!='\n' && string[p]!='#' && string[p]!=';'){
+        if(string[p] && string[p]!='\n' && string[p]!='\r' && string[p]!='#' && string[p]!=';'){
 
           // Parse section name
           if(string[p]=='['){
@@ -154,7 +154,7 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
             b=++p;
 
             // Scan section name
-            while(string[p] && string[p]!=']' && string[p]!='\n' && !Ascii::isControl(string[p])) p++;
+            while(string[p] && string[p]!=']' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
 
             // Check errors
             if(string[p]!=']'){ fxwarning("%s:%d: illegal section name.\n",filename.text(),lineno); goto next; }
@@ -177,7 +177,7 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
             b=p;
 
             // Scan key name
-            while(string[p] && string[p]!='=' && string[p]!='\n' && !Ascii::isControl(string[p])) p++;
+            while(string[p] && string[p]!='=' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
 
             // Check errors
             if(string[p]!='='){ fxwarning("%s:%d: expected '=' to follow key.\n",filename.text(),lineno); goto next; }
@@ -197,7 +197,7 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
             b=p;
 
             // Scan value
-            while(string[p] && string[p]!='\n' && !Ascii::isControl(string[p])) p++;
+            while(string[p] && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
 
             e=p;
 

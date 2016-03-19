@@ -3,9 +3,9 @@
 *                                 Test Group Box                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: groupbox.cpp,v 1.127 2007/11/06 22:07:23 fox Exp $                       *
+* $Id: groupbox.cpp,v 1.128 2008/01/04 15:18:33 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -352,7 +352,7 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
   new FXArrowButton(abmatrix,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_RAISED|FRAME_THICK|ARROW_LEFT|ARROW_TOOLBAR|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN);
   new FXArrowButton(abmatrix,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_RAISED|FRAME_THICK|ARROW_RIGHT|ARROW_TOOLBAR|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN);
 
-  // Radio buttons 
+  // Radio buttons
   FXGroupBox *gp=new FXGroupBox(group3,"Group Box",LAYOUT_SIDE_TOP|FRAME_GROOVE|LAYOUT_FILL_X, 0,0,0,0);
   new FXRadioButton(gp,"Radio &1",&radiotarget,FXDataTarget::ID_OPTION+1,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
   new FXRadioButton(gp,"Radio &2",&radiotarget,FXDataTarget::ID_OPTION+2,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);

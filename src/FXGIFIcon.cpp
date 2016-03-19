@@ -3,7 +3,7 @@
 *                        G I F   I c o n   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGIFIcon.cpp,v 1.36 2007/08/07 01:19:06 fox Exp $                       *
+* $Id: FXGIFIcon.cpp,v 1.37 2008/01/04 15:42:15 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *                7 - S e g m e n t   D i s p l a y   W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX7Segment.cpp,v 1.27 2007/08/27 18:50:59 fox Exp $                      *
+* $Id: FX7Segment.cpp,v 1.28 2008/01/04 15:42:02 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

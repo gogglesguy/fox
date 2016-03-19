@@ -3,7 +3,7 @@
 *                R e s o u r c e   W r a p p i n g   U t i l i t y              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: reswrap.cpp,v 1.38 2007/08/23 01:46:20 fox Exp $                         *
+* $Id: reswrap.cpp,v 1.39 2008/01/04 15:18:34 fox Exp $                         *
 ********************************************************************************/
 #include "stdio.h"
 #include "stdlib.h"

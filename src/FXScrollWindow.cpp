@@ -3,7 +3,7 @@
 *                     S c r o l l W i n d o w   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXScrollWindow.cpp,v 1.42 2007/07/09 16:27:07 fox Exp $                  *
+* $Id: FXScrollWindow.cpp,v 1.43 2008/01/04 15:42:30 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

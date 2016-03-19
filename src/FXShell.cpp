@@ -3,7 +3,7 @@
 *                     S h e l l   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXShell.cpp,v 1.88 2007/07/09 16:27:08 fox Exp $                         *
+* $Id: FXShell.cpp,v 1.90 2008/01/09 04:01:54 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -91,10 +91,6 @@ void FXShell::create(){
   resize(w,h);
   }
 
-
-//#ifndef WIN32
-//  XChangeProperty(DISPLAY(getApp()),xid,getApp()->wmNetWindowName,XA_ATOM,32,PropModeReplace,(unsigned char*)title.text(),title.length());
-//#endif
 
 // Schedule layout to be peformed during idle time
 void FXShell::recalc(){

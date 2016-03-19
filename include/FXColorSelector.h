@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorSelector.h,v 1.34 2007/07/09 16:02:42 fox Exp $                   *
+* $Id: FXColorSelector.h,v 1.35 2008/01/04 15:18:14 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXCOLORSELECTOR_H
 #define FXCOLORSELECTOR_H

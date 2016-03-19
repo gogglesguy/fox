@@ -3,7 +3,7 @@
 *                          I c o n L i s t   O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIconList.cpp,v 1.242 2007/08/28 04:02:05 fox Exp $                     *
+* $Id: FXIconList.cpp,v 1.243 2008/01/04 15:42:20 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -731,7 +731,7 @@ void FXIconList::recompute(){
   if(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)){
     if(!(options&ICONLIST_AUTOSIZE)) itemWidth=itemSpace;
     }
-    
+
   // In detail mode, item width depends only on header
   else{
     itemWidth=header->getTotalSize();
