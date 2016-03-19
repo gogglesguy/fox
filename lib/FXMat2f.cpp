@@ -89,12 +89,8 @@ FXMat2f::FXMat2f(const FXfloat s[]){
 
 // Initialize diagonal matrix
 FXMat2f::FXMat2f(FXfloat a,FXfloat b){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(b,0.0f,0.0f,a));
-#else
   m[0][0]=a;    m[0][1]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;
-#endif
   }
 
 
@@ -218,12 +214,8 @@ FXMat2f& FXMat2f::set(const FXfloat s[]){
 
 // Set diagonal matrix
 FXMat2f& FXMat2f::set(FXfloat a,FXfloat b){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(b,0.0f,0.0f,a));
-#else
   m[0][0]=a;    m[0][1]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;
-#endif
   return *this;
   }
 

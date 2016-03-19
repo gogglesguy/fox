@@ -21,7 +21,9 @@
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
+
 class Calculator;
+
 
 class Preferences : public FXDialogBox {
   FXDECLARE(Preferences)

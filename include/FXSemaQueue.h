@@ -40,16 +40,16 @@ public:
   FXSemaQueue(FXuint sz=32);
 
   /// Try push object into queue
-  FXbool trypush(void* obj);
+  FXbool trypush(FXptr obj);
 
   /// Add item to queue, return true if success
-  FXbool push(void* ptr);
+  FXbool push(FXptr ptr);
 
   /// Try pop object from queue
-  FXbool trypop(void*& obj);
+  FXbool trypop(FXptr& obj);
 
   /// Remove item from queue, return true if success
-  FXbool pop(void*& ptr);
+  FXbool pop(FXptr& ptr);
 
   /// Drop item from queue, return true if success
   FXbool pop();
@@ -65,10 +65,10 @@ class FXSemaQueueOf : public FXSemaQueue {
 public:
   FXSemaQueueOf(){}
   FXSemaQueueOf(FXuint sz):FXSemaQueue(sz){}
-  FXbool trypush(TYPE* obj){ return FXSemaQueue::trypush((void*)obj); }
-  FXbool push(TYPE* obj){ return FXSemaQueue::push((void*)obj); }
-  FXbool trypop(TYPE*& obj){ return FXSemaQueue::trypop((void*&)obj); }
-  FXbool pop(TYPE*& obj){ return FXSemaQueue::pop((void*&)obj); }
+  FXbool trypush(TYPE* obj){ return FXSemaQueue::trypush((FXptr)obj); }
+  FXbool push(TYPE* obj){ return FXSemaQueue::push((FXptr)obj); }
+  FXbool trypop(TYPE*& obj){ return FXSemaQueue::trypop((FXptr&)obj); }
+  FXbool pop(TYPE*& obj){ return FXSemaQueue::pop((FXptr&)obj); }
   };
 
 

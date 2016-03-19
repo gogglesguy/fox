@@ -163,6 +163,7 @@ FXbool FXThread::join(FXint& code){
     tid=0;
     return true;
     }
+  return false;
 #else
   void *trc=NULL;
   if(tid && pthread_join((pthread_t)tid,&trc)==0){
@@ -170,8 +171,8 @@ FXbool FXThread::join(FXint& code){
     tid=0;
     return true;
     }
-#endif
   return false;
+#endif
   }
 
 
@@ -183,13 +184,14 @@ FXbool FXThread::join(){
     tid=0;
     return true;
     }
+  return false;
 #else
   if(tid && pthread_join((pthread_t)tid,NULL)==0){
     tid=0;
     return true;
     }
-#endif
   return false;
+#endif
   }
 
 
@@ -203,6 +205,7 @@ FXbool FXThread::cancel(){
       return true;
       }
     }
+  return false;
 #else
   if(tid){
     if(busy && pthread_cancel((pthread_t)tid)==0) busy=false;
@@ -211,8 +214,8 @@ FXbool FXThread::cancel(){
       return true;
       }
     }
-#endif
   return false;
+#endif
   }
 
 
@@ -223,13 +226,14 @@ FXbool FXThread::detach(){
     tid=0;
     return true;
     }
+  return false;
 #else
   if(tid && pthread_detach((pthread_t)tid)==0){
     tid=0;
     return true;
     }
-#endif
   return false;
+#endif
   }
 
 
@@ -262,8 +266,7 @@ FXTime FXThread::time(){
   FXTime now;
   GetSystemTimeAsFileTime((FILETIME*)&now);
   return (now-FXLONG(116444736000000000))*FXLONG(100);
-#else
-#if (_POSIX_C_SOURCE >= 199309L)
+#elif (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec ts;
   clock_gettime(CLOCK_REALTIME,&ts);
@@ -275,30 +278,34 @@ FXTime FXThread::time(){
   gettimeofday(&tv,NULL);
   return tv.tv_sec*seconds+tv.tv_usec*microseconds;
 #endif
-#endif
   }
 
 
 // Make the calling thread sleep for a number of nanoseconds
 void FXThread::sleep(FXTime nsec){
 #if defined(WIN32)
-  Sleep((DWORD)(nsec/1000000));
-#else
-#if (_POSIX_C_SOURCE >= 199309L)
+  const FXTime milliseconds=1000000;
+  if(milliseconds<=nsec){
+    Sleep((DWORD)(nsec/milliseconds));
+    }
+#elif (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec value;
-  value.tv_sec=nsec/seconds;
-  value.tv_nsec=nsec%seconds;
-  nanosleep(&value,NULL);
+  if(1<=nsec){
+    value.tv_sec=nsec/seconds;
+    value.tv_nsec=nsec%seconds;
+    while(nanosleep(&value,&value)!=0){ }
+    }
 #else
   const FXTime seconds=1000000000;
   const FXTime microseconds=1000;
   const FXTime milliseconds=1000000;
   struct timeval value;
-  value.tv_usec=(nsec/microseconds)%milliseconds;
-  value.tv_sec=nsec/seconds;
-  select(1,0,0,0,&value);
-#endif
+  if(microseconds<=nsec){
+    value.tv_usec=(nsec/microseconds)%milliseconds;
+    value.tv_sec=nsec/seconds;
+    select(0,NULL,NULL,NULL,&value);
+    }
 #endif
   }
 
@@ -306,34 +313,39 @@ void FXThread::sleep(FXTime nsec){
 // Wake at appointed time
 void FXThread::wakeat(FXTime nsec){
 #if defined(WIN32)
+  const FXTime milliseconds=1000000;
   nsec-=FXThread::time();
-  if(nsec<0) nsec=0;
-  Sleep((DWORD)(nsec/1000000));
-#else
-#if (_POSIX_C_SOURCE >= 199309L)
+  if(milliseconds<=nsec){
+    Sleep((DWORD)(nsec/milliseconds));
+    }
+#elif (_XOPEN_SOURCE >= 600) || (_POSIX_C_SOURCE >= 200112L)
   const FXTime seconds=1000000000;
   struct timespec value;
-#if (_XOPEN_SOURCE >= 600)
-  value.tv_sec=nsec/seconds;
-  value.tv_nsec=nsec%seconds;
-  clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&value,NULL);
-#else
+  if(0<=nsec){
+    value.tv_sec=nsec/seconds;
+    value.tv_nsec=nsec%seconds;
+    while(clock_nanosleep(CLOCK_REALTIME,TIMER_ABSTIME,&value,NULL)!=0){ }
+    }
+#elif (_POSIX_C_SOURCE >= 199309L)
+  const FXTime seconds=1000000000;
+  struct timespec value;
   nsec-=FXThread::time();
-  if(nsec<0) nsec=0;
-  value.tv_sec=nsec/seconds;
-  value.tv_nsec=nsec%seconds;
-  nanosleep(&value,NULL);
-#endif
+  if(1<=nsec){
+    value.tv_sec=nsec/seconds;
+    value.tv_nsec=nsec%seconds;
+    while(nanosleep(&value,&value)!=0){ }
+    }
 #else
   const FXTime seconds=1000000000;
   const FXTime microseconds=1000;
   const FXTime milliseconds=1000000;
   struct timeval value;
-  if(nsec<0) nsec=0;
-  value.tv_usec=(nsec/microseconds)%milliseconds;
-  value.tv_sec=nsec/seconds;
-  select(1,0,0,0,&value);
-#endif
+  nsec-=FXThread::time();
+  if(microseconds<=nsec){
+    value.tv_usec=(nsec/microseconds)%milliseconds;
+    value.tv_sec=nsec/seconds;
+    select(0,NULL,NULL,NULL,&value);
+    }
 #endif
   }
 
@@ -354,23 +366,25 @@ FXint FXThread::processors(){
   SYSTEM_INFO info={{0}};
   GetSystemInfo(&info);
   return info.dwNumberOfProcessors;
-#else
-#if defined(_SC_NPROCESSORS_ONLN)
+#elif defined(_SC_NPROCESSORS_ONLN)
   int result;
   if((result=sysconf(_SC_NPROCESSORS_ONLN))>0){
     return result;
     }
+  return 1;
 #elif defined(__IRIX__) && defined(_SC_NPROC_ONLN)
   int result;
   if((result=sysconf(_SC_NPROC_ONLN))>0){
     return result;
     }
+  return 1;
 #elif defined(__APPLE__) || defined(__FreeBSD__)
   int result=1;
   size_t len=sizeof(result);
   if(sysctlbyname("hw.ncpu",&result,&len,NULL,0)!=-1){
     return result;
     }
+  return 1;
 #elif defined(HW_NCPU)
   int result=1;
   int mib[2]={CTL_HW,HW_NCPU};
@@ -378,14 +392,31 @@ FXint FXThread::processors(){
   if(sysctl(mib,2,&result,&len,NULL,0)!=-1){
     return result;
     }
+  return 1;
 #elif defined(hpux) || defined(__hpux) || defined(_hpux)
   struct pst_dynamic psd;
   if(!pstat_getdynamic(&psd,sizeof(psd),(size_t)1,0)){
     return (int)psd.psd_proc_cnt;
     }
-#endif
   return 1;
 #endif
+  }
+
+
+// Return processor index of the calling thread
+FXint FXThread::processor(){
+  if(1<processors()){
+#if defined(WIN32)
+#if (WINVER >= 0x0600)                  // Vista and up
+    return GetCurrentProcessorNumber();
+#endif    
+#endif    
+#if defined(HAVE_SCHED_GETCPU)
+    return sched_getcpu();
+#endif
+    return -1;
+    }
+  return 0;
   }
 
 
@@ -659,6 +690,7 @@ FXbool FXThread::affinity(FXulong mask){
       return SetThreadAffinityMask((HANDLE)tid,(FXuval)mask)!=0;
       }
     }
+  return false;
 #elif defined(HAVE_PTHREAD_SETAFFINITY_NP)
   const FXulong bit=1;
   if(tid){
@@ -673,8 +705,8 @@ FXbool FXThread::affinity(FXulong mask){
       return pthread_setaffinity_np((pthread_t)tid,sizeof(cpuset),&cpuset)==0;
       }
     }
-#endif
   return false;
+#endif
   }
 
 
@@ -690,6 +722,7 @@ FXulong FXThread::affinity() const {
       return (FXulong)cpuset;
       }
     }
+  return 0;
 #elif defined(HAVE_PTHREAD_SETAFFINITY_NP)
   const FXulong bit=1;
   if(tid){
@@ -703,8 +736,8 @@ FXulong FXThread::affinity() const {
       return mask;
       }
     }
-#endif
   return 0;
+#endif
   }
 
 

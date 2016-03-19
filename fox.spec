@@ -1,5 +1,5 @@
 %define name fox
-%define version 1.7.39
+%define version 1.7.40
 %define release 1
 
 Summary: The FOX toolkit.
@@ -8,7 +8,7 @@ Version: %{version}
 Release: %{release}
 License: LGPL+Addendum
 Group: System Environment/Libraries
-Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.39.tar.gz
+Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.40.tar.gz
 URL: http://www.fox-toolkit.org
 Packager: Jeroen van der Zijp <jeroen@fox-toolkit.com>
 BuildRoot: %{_tmppath}/%{name}-buildroot
@@ -116,10 +116,10 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %defattr(-,root,root)
 %{_libdir}/libFOX-1.7.so
 %{_libdir}/libFOX-1.7.so.0
-%{_libdir}/libFOX-1.7.so.0.0.39
+%{_libdir}/libFOX-1.7.so.0.0.40
 %{_libdir}/libCHART-1.7.so
 %{_libdir}/libCHART-1.7.so.0
-%{_libdir}/libCHART-1.7.so.0.0.39
+%{_libdir}/libCHART-1.7.so.0.0.40
 %{_libdir}/pkgconfig/fox17.pc
 
 %doc doc

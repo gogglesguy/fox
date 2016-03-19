@@ -64,7 +64,8 @@ vorhour1_small.jpg \
 vorhour2.jpg \
 vorhour2_small.jpg \
 xfe.png \
-xfe_small.png
+xfe_small.png \
+sumo.png
 
 
 

@@ -131,9 +131,8 @@ FXVec4f lerp(const FXVec4f& u,const FXVec4f& v,FXfloat f){
   register __m128 u0=_mm_loadu_ps(&u[0]);
   register __m128 v0=_mm_loadu_ps(&v[0]);
   register __m128 ff=_mm_set1_ps(f);
-  register __m128 rr=_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff));
   FXVec4f r;
-  _mm_storeu_ps(&r[0],rr);
+  _mm_storeu_ps(&r[0],_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff)));
   return r;
 #else
   return FXVec4f(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f,u.w+(v.w-u.w)*f);

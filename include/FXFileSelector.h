@@ -75,8 +75,11 @@ protected:
   FXIcon            *workicon;          // Go home icon
   FXIcon            *shownicon;         // Files shown icon
   FXIcon            *hiddenicon;        // Files hidden icon
-  FXIcon            *markicon;          // Book mark icon
-  FXIcon            *clearicon;         // Book clear icon
+  FXIcon            *bookmarkicon;      // Book mark icon
+  FXIcon            *bookaddicon;       // Book add icon
+  FXIcon            *bookdelicon;       // Book delete icon
+  FXIcon            *bookclricon;       // Book clear icon
+  FXIcon            *sortingicon;       // Sorting icon
   FXIcon            *newicon;           // New directory icon
   FXIcon            *renameicon;        // Rename file icon
   FXIcon            *copyicon;          // Copy file icon
@@ -105,6 +108,7 @@ public:
   long onCmdHome(FXObject*,FXSelector,void*);
   long onCmdWork(FXObject*,FXSelector,void*);
   long onCmdBookmark(FXObject*,FXSelector,void*);
+  long onCmdUnBookmark(FXObject*,FXSelector,void*);
   long onCmdVisit(FXObject*,FXSelector,void*);
   long onCmdNew(FXObject*,FXSelector,void*);
   long onUpdNew(FXObject*,FXSelector,void*);
@@ -131,6 +135,7 @@ public:
     ID_HOME,
     ID_WORK,
     ID_BOOKMARK,
+    ID_UNBOOKMARK,
     ID_BOOKMENU,
     ID_VISIT,
     ID_NEW,
@@ -304,7 +309,7 @@ public:
   /// Set draggable files
   void setDraggableFiles(FXbool flag);
 
-  /// Are draggable files
+  /// Are files draggable?
   FXbool getDraggableFiles() const;
 
   /// Save object to a stream

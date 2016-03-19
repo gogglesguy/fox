@@ -419,6 +419,9 @@ public:
   /// Fill list by appending items from newline separated strings
   FXint fillItems(FXFoldingItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
+  /// Replace the original item orig with new [possibly subclassed] item
+  FXFoldingItem* setItem(FXFoldingItem* orig,FXFoldingItem* item,FXbool notify=false);
+
   /// Insert [possibly subclassed] item under father before other item
   FXFoldingItem* insertItem(FXFoldingItem* other,FXFoldingItem* father,FXFoldingItem* item,FXbool notify=false);
 

@@ -2030,6 +2030,68 @@ FXTreeItem* FXTreeList::createItem(const FXString& text,FXIcon* oi,FXIcon* ci,FX
   }
 
 
+// Replace the original item with new [possibly subclassed] item
+FXTreeItem* FXTreeList::setItem(FXTreeItem* orig,FXTreeItem* item,FXbool notify){
+  if(!orig || !item){ fxerror("%s::setItem: NULL argument.\n",getClassName()); }
+  if(orig!=item){
+    register FXTreeItem *par=orig->parent;
+    register FXTreeItem *fst=orig->first;
+    register FXTreeItem *lst=orig->last;
+    register FXTreeItem *nxt=orig->next;
+    register FXTreeItem *prv=orig->prev;
+    register FXTreeItem *ch;
+
+    // Notify old item will be deleted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)orig);
+      }
+
+    // Unhook from parent and siblings
+    if(prv) prv->next=item; else if(par) par->first=item; else firstitem=item;
+    if(nxt) nxt->prev=item; else if(par) par->last=item; else lastitem=item;
+
+    // Replace references to org with references to item
+    if(anchoritem==orig) anchoritem=item;
+    if(currentitem==orig) currentitem=item;
+    if(extentitem==orig) extentitem=item;
+    if(viewableitem==orig) viewableitem=item;
+
+    // Copy state over
+    item->setFocus(orig->hasFocus());
+    item->setSelected(orig->isSelected());
+    item->setOpened(orig->isOpened());
+    item->setExpanded(orig->isExpanded());
+    item->setHasItems(orig->hasItems());
+
+    // Hook it up
+    item->parent=par;
+    item->first=fst;
+    item->last=lst;
+    item->prev=prv;
+    item->next=nxt;
+
+    // Point children's parent to new item
+    for(ch=fst; ch; ch=ch->next){
+      ch->parent=item;
+      }
+
+    // Notify new item has been inserted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)item);
+      if(currentitem==item){
+        target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)item);
+        }
+      }
+
+    // Delete original item
+    delete orig;
+
+    recalc();
+    }
+  return item;
+  }
+
+
 // Insert item under father before other item
 FXTreeItem* FXTreeList::insertItem(FXTreeItem* other,FXTreeItem* father,FXTreeItem* item,FXbool notify){
   register FXTreeItem* olditem=currentitem;
@@ -2274,13 +2336,15 @@ FXTreeItem* FXTreeList::extractItem(FXTreeItem* item,FXbool notify){
 
 // Remove all siblings from [fm,to]
 void FXTreeList::removeItems(FXTreeItem* fm,FXTreeItem* to,FXbool notify){
-  register FXTreeItem *olditem=currentitem;
-  register FXTreeItem *prv;
-  register FXTreeItem *nxt;
-  register FXTreeItem *par;
   if(fm && to){
     if(fm->parent!=to->parent){ fxerror("%s::removeItems: arguments have different parent.\n",getClassName()); }
+    register FXTreeItem *old;
+    register FXTreeItem *prv;
+    register FXTreeItem *nxt;
+    register FXTreeItem *par;
 
+    old=currentitem;
+    
     // Delete items
     while(1){
 
@@ -2319,12 +2383,12 @@ void FXTreeList::removeItems(FXTreeItem* fm,FXTreeItem* to,FXbool notify){
       }
 
     // Current item has changed
-x:  if(notify && target && olditem!=currentitem){
+x:  if(notify && target && old!=currentitem){
       target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);
       }
 
     // Deleted current item
-    if(currentitem && currentitem!=olditem){
+    if(currentitem && currentitem!=old){
       currentitem->setFocus(hasFocus());
       if(currentitem->isEnabled() && (options&SELECT_MASK)==TREELIST_BROWSESELECT){
         selectItem(currentitem,notify);

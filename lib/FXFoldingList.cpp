@@ -2179,6 +2179,68 @@ FXFoldingItem* FXFoldingList::createItem(const FXString& text,FXIcon* oi,FXIcon*
   }
 
 
+// Replace the original item with new [possibly subclassed] item
+FXFoldingItem* FXFoldingList::setItem(FXFoldingItem* orig,FXFoldingItem* item,FXbool notify){
+  if(!orig || !item){ fxerror("%s::setItem: NULL argument.\n",getClassName()); }
+  if(orig!=item){
+    register FXFoldingItem *par=orig->parent;
+    register FXFoldingItem *fst=orig->first;
+    register FXFoldingItem *lst=orig->last;
+    register FXFoldingItem *nxt=orig->next;
+    register FXFoldingItem *prv=orig->prev;
+    register FXFoldingItem *ch;
+
+    // Notify old item will be deleted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_DELETED,message),(void*)orig);
+      }
+
+    // Unhook from parent and siblings
+    if(prv) prv->next=item; else if(par) par->first=item; else firstitem=item;
+    if(nxt) nxt->prev=item; else if(par) par->last=item; else lastitem=item;
+
+    // Replace references to org with references to item
+    if(anchoritem==orig) anchoritem=item;
+    if(currentitem==orig) currentitem=item;
+    if(extentitem==orig) extentitem=item;
+    if(viewableitem==orig) viewableitem=item;
+
+    // Copy state over
+    item->setFocus(orig->hasFocus());
+    item->setSelected(orig->isSelected());
+    item->setOpened(orig->isOpened());
+    item->setExpanded(orig->isExpanded());
+    item->setHasItems(orig->hasItems());
+
+    // Hook it up
+    item->parent=par;
+    item->first=fst;
+    item->last=lst;
+    item->prev=prv;
+    item->next=nxt;
+
+    // Point children's parent to new item
+    for(ch=item->first; ch; ch=ch->next){
+      ch->parent=item;
+      }
+
+    // Notify new item has been inserted
+    if(notify && target){
+      target->tryHandle(this,FXSEL(SEL_INSERTED,message),(void*)item);
+      if(currentitem==item){
+        target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)item);
+        }
+      }
+
+    // Delete original item
+    delete orig;
+
+    recalc();
+    }
+  return item;
+  }
+
+
 // Insert item under father before other item
 FXFoldingItem* FXFoldingList::insertItem(FXFoldingItem* other,FXFoldingItem* father,FXFoldingItem* item,FXbool notify){
   register FXFoldingItem* olditem=currentitem;
@@ -2423,12 +2485,14 @@ FXFoldingItem* FXFoldingList::extractItem(FXFoldingItem* item,FXbool notify){
 
 // Remove all siblings from [fm,to]
 void FXFoldingList::removeItems(FXFoldingItem* fm,FXFoldingItem* to,FXbool notify){
-  register FXFoldingItem *olditem=currentitem;
-  register FXFoldingItem *prv;
-  register FXFoldingItem *nxt;
-  register FXFoldingItem *par;
   if(fm && to){
     if(fm->parent!=to->parent){ fxerror("%s::removeItems: arguments have different parent.\n",getClassName()); }
+    register FXFoldingItem *old;
+    register FXFoldingItem *prv;
+    register FXFoldingItem *nxt;
+    register FXFoldingItem *par;
+
+    old=currentitem;
 
     // Delete items
     while(1){
@@ -2468,12 +2532,12 @@ void FXFoldingList::removeItems(FXFoldingItem* fm,FXFoldingItem* to,FXbool notif
       }
 
     // Current item has changed
-x:  if(notify && target && olditem!=currentitem){
+x:  if(notify && target && old!=currentitem){
       target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)currentitem);
       }
 
     // Deleted current item
-    if(currentitem && currentitem!=olditem){
+    if(currentitem && currentitem!=old){
       currentitem->setFocus(hasFocus());
       if(currentitem->isEnabled() && (options&SELECT_MASK)==FOLDINGLIST_BROWSESELECT){
         selectItem(currentitem,notify);

@@ -45,6 +45,7 @@
 #include "FXWindow.h"
 #include "FXApp.h"
 #include "FXGIFIcon.h"
+#include "FXBMPIcon.h"
 #include "FXFrame.h"
 #include "FXLabel.h"
 #include "FXButton.h"
@@ -107,6 +108,7 @@ FXDEFMAP(FXDirSelector) FXDirSelectorMap[]={
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_DIRECTORY_UP,FXDirSelector::onCmdDirectoryUp),
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_VISIT,FXDirSelector::onCmdVisit),
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_BOOKMARK,FXDirSelector::onCmdBookmark),
+  FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_UNBOOKMARK,FXDirSelector::onCmdUnBookmark),
   FXMAPFUNC(SEL_COMMAND,FXDirSelector::ID_NEW,FXDirSelector::onCmdNew),
   FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_NEW,FXDirSelector::onUpdNew),
   FXMAPFUNC(SEL_UPDATE,FXDirSelector::ID_REMOVE,FXDirSelector::onUpdSelected),
@@ -142,8 +144,11 @@ FXDirSelector::FXDirSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint 
   updiricon=new FXGIFIcon(getApp(),dirupicon);
   homeicon=new FXGIFIcon(getApp(),gotohome);
   workicon=new FXGIFIcon(getApp(),gotowork);
-  markicon=new FXGIFIcon(getApp(),bookset);
-  clearicon=new FXGIFIcon(getApp(),bookclr);
+  bookmarkicon=new FXGIFIcon(getApp(),bookset);
+  bookaddicon=new FXBMPIcon(getApp(),bookadd,0,IMAGE_ALPHAGUESS);
+  bookdelicon=new FXBMPIcon(getApp(),bookdel,0,IMAGE_ALPHAGUESS);
+  bookclricon=new FXGIFIcon(getApp(),bookclr);
+  sortingicon=new FXBMPIcon(getApp(),sorting,0,IMAGE_ALPHAGUESS);
   newicon=new FXGIFIcon(getApp(),foldernew);
   deleteicon=new FXGIFIcon(getApp(),filedelete);
   moveicon=new FXGIFIcon(getApp(),filemove);
@@ -264,7 +269,13 @@ long FXDirSelector::onCmdDirectoryUp(FXObject*,FXSelector,void*){
 
 // Move to recent directory
 long FXDirSelector::onCmdVisit(FXObject*,FXSelector,void* ptr){
-  setDirectory((FXchar*)ptr);
+  FXString path((const FXchar*)ptr);
+  if(FXStat::exists(path)){
+    setDirectory(path);
+    return 1;
+    }
+  mrufiles.removeFile(path);
+  getApp()->beep();
   return 1;
   }
 
@@ -276,12 +287,19 @@ long FXDirSelector::onCmdBookmark(FXObject*,FXSelector,void*){
   }
 
 
+// Unbookmark this directory
+long FXDirSelector::onCmdUnBookmark(FXObject*,FXSelector,void*){
+  mrufiles.removeFile(dirbox->getDirectory());
+  return 1;
+  }
+
+
 // Create new directory
 long FXDirSelector::onCmdNew(FXObject*,FXSelector,void*){
-  FXGIFIcon newdirectoryicon(getApp(),bigfolder);
-  FXString dir=dirbox->getDirectory();
-  FXString name=tr("Folder");
-  if(FXInputDialog::getString(name,this,tr("Create New Directory"),"Create new directory in: "+dir,&newdirectoryicon)){
+  FXBMPIcon newfoldericon(getApp(),newfolder,0,IMAGE_ALPHAGUESS);
+  FXString dir(getDirectory());
+  FXString name(tr("folder"));
+  if(FXInputDialog::getString(name,this,tr("Create New Directory"),"Create new directory in: "+dir,&newfoldericon)){
     FXString folder=FXPath::absolute(dir,name);
     if(FXStat::exists(folder)){
       FXMessageBox::error(this,MBOX_OK,tr("Already Exists"),"File or directory %s already exists.\n",folder.text());
@@ -299,8 +317,7 @@ long FXDirSelector::onCmdNew(FXObject*,FXSelector,void*){
 
 // Update create new directory
 long FXDirSelector::onUpdNew(FXObject* sender,FXSelector,void*){
-  FXString dir=dirbox->getDirectory();
-  sender->handle(this,FXStat::isWritable(dir)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  sender->handle(this,FXStat::isAccessible(getDirectory(),FXIO::Writing)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
@@ -387,15 +404,16 @@ long FXDirSelector::onPopupMenu(FXObject*,FXSelector,void* ptr){
   new FXMenuSeparator(&filemenu);
 
   FXMenuPane sortmenu(this);
-  new FXMenuCascade(&filemenu,tr("Sorting"),NULL,&sortmenu);
+  new FXMenuCascade(&filemenu,tr("Sorting"),sortingicon,&sortmenu);
   new FXMenuCheck(&sortmenu,tr("Reverse"),dirbox,FXDirList::ID_SORT_REVERSE);
   new FXMenuCheck(&sortmenu,tr("Ignore case"),dirbox,FXDirList::ID_SORT_CASE);
   new FXMenuCheck(&sortmenu,tr("Hidden files"),dirbox,FXDirList::ID_TOGGLE_HIDDEN);
 
   FXMenuPane bookmenu(this);
-  new FXMenuCascade(&filemenu,tr("Bookmarks"),NULL,&bookmenu);
-  new FXMenuCommand(&bookmenu,tr("Set bookmark"),markicon,this,ID_BOOKMARK);
-  new FXMenuCommand(&bookmenu,tr("Clear bookmarks"),clearicon,&mrufiles,FXRecentFiles::ID_CLEAR);
+  new FXMenuCascade(&filemenu,tr("Bookmarks"),bookmarkicon,&bookmenu);
+  new FXMenuCommand(&bookmenu,tr("Set bookmark"),bookaddicon,this,ID_BOOKMARK);
+  new FXMenuCommand(&bookmenu,tr("&Unset bookmark"),bookdelicon,this,ID_UNBOOKMARK);
+  new FXMenuCommand(&bookmenu,tr("Clear bookmarks"),bookclricon,&mrufiles,FXRecentFiles::ID_CLEAR);
   FXMenuSeparator* sep1=new FXMenuSeparator(&bookmenu);
   sep1->setTarget(&mrufiles);
   sep1->setSelector(FXRecentFiles::ID_ANYFILES);
@@ -446,8 +464,11 @@ void FXDirSelector::save(FXStream& store) const {
   store << updiricon;
   store << homeicon;
   store << workicon;
-  store << markicon;
-  store << clearicon;
+  store << bookmarkicon;
+  store << bookaddicon;
+  store << bookdelicon;
+  store << bookclricon;
+  store << sortingicon;
   store << newicon;
   store << deleteicon;
   store << moveicon;
@@ -466,8 +487,11 @@ void FXDirSelector::load(FXStream& store){
   store >> updiricon;
   store >> homeicon;
   store >> workicon;
-  store >> markicon;
-  store >> clearicon;
+  store >> bookmarkicon;
+  store >> bookaddicon;
+  store >> bookdelicon;
+  store >> bookclricon;
+  store >> sortingicon;
   store >> newicon;
   store >> deleteicon;
   store >> moveicon;
@@ -487,8 +511,11 @@ FXDirSelector::~FXDirSelector(){
   delete updiricon;
   delete homeicon;
   delete workicon;
-  delete markicon;
-  delete clearicon;
+  delete bookmarkicon;
+  delete bookaddicon;
+  delete bookdelicon;
+  delete bookclricon;
+  delete sortingicon;
   delete newicon;
   delete deleteicon;
   delete moveicon;
@@ -501,8 +528,11 @@ FXDirSelector::~FXDirSelector(){
   updiricon=(FXIcon*)-1L;
   homeicon=(FXIcon*)-1L;
   workicon=(FXIcon*)-1L;
-  markicon=(FXIcon*)-1L;
-  clearicon=(FXIcon*)-1L;
+  bookmarkicon=(FXIcon*)-1L;
+  bookaddicon=(FXIcon*)-1L;
+  bookdelicon=(FXIcon*)-1L;
+  bookclricon=(FXIcon*)-1L;
+  sortingicon=(FXIcon*)-1L;
   newicon=(FXIcon*)-1L;
   deleteicon=(FXIcon*)-1L;
   moveicon=(FXIcon*)-1L;

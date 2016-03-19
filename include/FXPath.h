@@ -122,6 +122,9 @@ namespace FXPath {
   /// Return true if input path is a hidden file or directory
   extern FXAPI FXbool isHidden(const FXString& file);
 
+  /// Return valid part of absolute path
+  extern FXAPI FXString validPath(const FXString& file);
+
   /// Enquote filename to make safe for shell
   extern FXAPI FXString enquote(const FXString& file,FXbool force=false);
 

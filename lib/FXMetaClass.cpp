@@ -206,7 +206,7 @@ FXbool FXMetaClass::isSubClassOf(const FXMetaClass* metaclass) const {
 
 // Find the FXMetaClass belonging to class name
 const FXMetaClass* FXMetaClass::getMetaClassFromName(const FXchar* name){
-  if(metaClassSlots){
+  if(metaClassSlots && name){
     register FXuint p=hashstring(name);
     register FXuint x=(p<<1)|1;
     while(metaClassTable[p=(p+x)&(metaClassSlots-1)]!=NULL){

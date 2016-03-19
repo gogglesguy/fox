@@ -270,21 +270,21 @@ FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v){
 /*******************************************************************************/
 
 // Atomically set pointer variable at ptr to v, and return its old contents
-void* atomicSet(void* volatile* ptr,void* v){
+FXptr atomicSet(volatile FXptr* ptr,FXptr v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
-   return InterlockedExchangePointer(ptr,v);
+   return (FXptr)InterlockedExchangePointer(ptr,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
-  void* ret=v;
+  FXptr ret=v;
   __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
-  void* ret=v;
+  FXptr ret=v;
   __asm__ __volatile__("xchgq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_lock_test_and_set(ptr,v);
 #else
-  void* ret=*ptr;
+  FXptr ret=*ptr;
   *ptr=v;
   return ret;
 #endif
@@ -292,25 +292,25 @@ void* atomicSet(void* volatile* ptr,void* v){
 
 
 // Atomically add v to pointer variable at ptr, and return its old contents
-void* atomicAdd(void* volatile* ptr,FXival v){
+FXptr atomicAdd(volatile FXptr* ptr,FXival v){
 #if defined(WIN32) && defined(_WIN64)
-  return (void*)InterlockedExchangeAdd64((LONGLONG*)ptr,(LONGLONG)v);
+  return (FXptr)InterlockedExchangeAdd64((LONGLONG*)ptr,(LONGLONG)v);
 #elif defined(WIN32)
-  return (void*)InterlockedExchangeAdd((LONG*)ptr,(LONG)v);
+  return (FXptr)InterlockedExchangeAdd((LONG*)ptr,(LONG)v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
-  register void* ret=(void*)v;
+  register FXptr ret=(void*)v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
-  register void* ret=(void*)v;
+  register FXptr ret=(FXptr)v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0" (ret) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_fetch_and_add(ptr,v);
 #else
-  void* ret=*ptr;
+  FXptr ret=*ptr;
   *((unsigned char**)ptr)+=v;
   return ret;
 #endif
@@ -318,23 +318,23 @@ void* atomicAdd(void* volatile* ptr,FXival v){
 
 
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
-void* atomicCas(void* volatile* ptr,void* expect,void* v){
+FXptr atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
-  return InterlockedCompareExchangePointer((void**)ptr,v,expect);
+  return (FXptr)InterlockedCompareExchangePointer((void**)ptr,v,expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
-  register void* ret=(void*)v;
+  register FXptr ret=(FXptr)v;
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
-  register void* ret;
+  register FXptr ret;
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgq %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #else
-  void* ret=*ptr;
+  FXptr ret=*ptr;
   if(*ptr==expect){
     *ptr=v;
     }
@@ -344,7 +344,7 @@ void* atomicCas(void* volatile* ptr,void* expect,void* v){
 
 
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
-FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v){
+FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v){
 #if defined(WIN32) && ((_MSC_VER >= 1400) || (__BORLANDC__ >= 0x500))
   return (InterlockedCompareExchangePointer((void**)ptr,v,expect)==expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
@@ -374,7 +374,7 @@ FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v){
 
 
 // Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
-FXbool atomicBoolDCas(void* volatile* ptr,void* cmpa,void* cmpb,void* a,void* b){
+FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b){
 #if (defined(WIN32) && (_WIN32_WINNT >= 0x0600) && !defined(_WIN64))
   LONGLONG ab=(((LONGLONG)(FXuval)a)|((LONGLONG)(FXuval)b)<<32);
   LONGLONG compab=(((LONGLONG)(FXuval)cmpa)|((LONGLONG)(FXuval)cmpb)<<32);

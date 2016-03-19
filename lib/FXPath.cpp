@@ -963,6 +963,19 @@ FXbool FXPath::isHidden(const FXString& file){
 #endif
 
 
+// Return valid part of absolute path
+FXString FXPath::validPath(const FXString& file){
+  if(FXPath::isAbsolute(file)){
+    FXString result(file);
+    while(!FXStat::exists(result) && !FXPath::isTopDirectory(result)){
+      result=FXPath::upLevel(result);
+      }
+    return result;
+    }
+  return FXString::null;
+  }
+
+
 #if defined(WIN32)           // WINDOWS
 
 // Enquote filename to make safe for shell

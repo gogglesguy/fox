@@ -22,7 +22,11 @@
 #define FXASCII_H
 
 
+/******** Generated on 2013/07/17 09:50:20 by ascii tool version 3.0.0 *********/
+
+
 namespace FX {
+
 
 namespace Ascii {
 
@@ -45,8 +49,10 @@ extern FXAPI FXbool isPunct(FXchar asc);
 extern FXAPI FXbool isGraph(FXchar asc);
 extern FXAPI FXbool isPrint(FXchar asc);
 extern FXAPI FXbool isHexDigit(FXchar asc);
-extern FXAPI FXbool isSymbol(FXchar asc);
-extern FXAPI FXbool isSep(FXchar asc);
+extern FXAPI FXbool isOctDigit(FXchar asc);
+extern FXAPI FXbool isBinDigit(FXchar asc);
+extern FXAPI FXbool isWord(FXchar asc);
+extern FXAPI FXbool isDelim(FXchar asc);
 
 /// Case conversion
 extern FXAPI FXchar toUpper(FXchar asc);

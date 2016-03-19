@@ -182,7 +182,7 @@ static inline FXint strlen(const FXwchar *src){
   while(src[i]) i++;
   return i;
   }
-
+ 
 /*******************************************************************************/
 
 // Return wide character from utf8 string at ptr
@@ -327,9 +327,8 @@ FXint wc2utf(FXwchar w){
 
 // Return number of narrow characters for utf16 representation of wide character w
 FXint wc2nc(FXwchar w){
-  if(__likely(w<0x110000)){
-    return 1+(0xFFFF<w);
-    }
+  if(__likely(w<0xFFFF)) return 1;
+  if(__likely(w<0x110000)) return 2;
   return 0;
   }
 
@@ -387,17 +386,20 @@ FXint utf2wcs(const FXchar *ptr,FXint len){
   register FXwchar w;
   while(q<len){
     w=(FXuchar)ptr[q++];
-    if(0x80<=w){
-      if(w<0xC0) break;
-      if(q>=len || !FXISFOLLOWUTF8(ptr[q])) break;
+    if(__unlikely(0x80<=w)){
+      if(__unlikely(w<0xC0)) break;
+      if(__unlikely(q>=len)) break;
+      if(__unlikely(!FXISFOLLOWUTF8(ptr[q]))) break;
       w=(w<<6)^(FXuchar)ptr[q++]^0x3080;
-      if(0x800<=w){
-        if(q>=len || !FXISFOLLOWUTF8(ptr[q])) break;
+      if(__unlikely(0x800<=w)){
+        if(__unlikely(q>=len)) break;
+        if(__unlikely(!FXISFOLLOWUTF8(ptr[q]))) break;
         w=(w<<6)^(FXuchar)ptr[q++]^0x20080;
-        if(0x10000<=w){
-          if(q>=len || !FXISFOLLOWUTF8(ptr[q])) break;
+        if(__unlikely(0x10000<=w)){
+          if(__unlikely(q>=len)) break;
+          if(__unlikely(!FXISFOLLOWUTF8(ptr[q]))) break;
           w=(w<<6)^(FXuchar)ptr[q++]^0x400080;
-          if(0x110000<=w) break;
+          if(__unlikely(0x110000<=w)) break;
           }
         }
       }
@@ -420,17 +422,20 @@ FXint utf2ncs(const FXchar *ptr,FXint len){
   register FXwchar w;
   while(q<len){
     w=(FXuchar)ptr[q++];
-    if(0x80<=w){
-      if(w<0xC0) break;
-      if(q>=len || !FXISFOLLOWUTF8(ptr[q])) break;
+    if(__unlikely(0x80<=w)){
+      if(__unlikely(w<0xC0)) break;
+      if(__unlikely(q>=len)) break;
+      if(__unlikely(!FXISFOLLOWUTF8(ptr[q]))) break;
       w=(w<<6)^(FXuchar)ptr[q++]^0x3080;
-      if(0x800<=w){
-        if(q>=len || !FXISFOLLOWUTF8(ptr[q])) break;
+      if(__unlikely(0x800<=w)){
+        if(__unlikely(q>=len)) break;
+        if(__unlikely(!FXISFOLLOWUTF8(ptr[q]))) break;
         w=(w<<6)^(FXuchar)ptr[q++]^0x20080;
-        if(0x10000<=w){
-          if(q>=len || !FXISFOLLOWUTF8(ptr[q])) break;
+        if(__unlikely(0x10000<=w)){
+          if(__unlikely(q>=len)) break;
+          if(__unlikely(!FXISFOLLOWUTF8(ptr[q]))) break;
           w=(w<<6)^(FXuchar)ptr[q++]^0x400080;
-          if(0x110000<=w) break;
+          if(__unlikely(0x110000<=w)) break;
           p++;
           }
         }
@@ -563,8 +568,8 @@ FXint ncs2utf(FXchar *dst,const FXnchar* src,FXint dlen,FXint slen){
       continue;
       }
     if(__likely(FXISLEADUTF16(w) && q<slen && FXISFOLLOWUTF16(src[q]))){
-      w=SURROGATE_OFFSET+(w<<10)+src[q++];
       if(__unlikely(p+3>=dlen)) break;
+      w=SURROGATE_OFFSET+(w<<10)+src[q++];
       dst[p++]=(w>>18)|0xF0;
       dst[p++]=((w>>12)&0x3F)|0x80;
       dst[p++]=((w>>6)&0x3F)|0x80;
@@ -590,21 +595,24 @@ FXint utf2wcs(FXwchar *dst,const FXchar* src,FXint dlen,FXint slen){
   register FXwchar w;
   while(q<slen){
     w=(FXuchar)src[q++];
-    if(0x80<=w){
-      if(w<0xC0) break;
-      if(q>=slen || !FXISFOLLOWUTF8(src[q])) break;
+    if(__unlikely(0x80<=w)){
+      if(__unlikely(w<0xC0)) break;
+      if(__unlikely(q>=slen)) break;
+      if(__unlikely(!FXISFOLLOWUTF8(src[q]))) break;
       w=(w<<6)^(FXuchar)src[q++]^0x3080;
-      if(0x800<=w){
-        if(q>=slen || !FXISFOLLOWUTF8(src[q])) break;
+      if(__unlikely(0x800<=w)){
+        if(__unlikely(q>=slen)) break;
+        if(__unlikely(!FXISFOLLOWUTF8(src[q]))) break;
         w=(w<<6)^(FXuchar)src[q++]^0x20080;
-        if(0x10000<=w){
-          if(q>=slen || !FXISFOLLOWUTF8(src[q])) break;
+        if(__unlikely(0x10000<=w)){
+          if(__unlikely(q>=slen)) break;
+          if(__unlikely(!FXISFOLLOWUTF8(src[q]))) break;
           w=(w<<6)^(FXuchar)src[q++]^0x400080;
-          if(0x110000<=w) break;
+          if(__unlikely(0x110000<=w)) break;
           }
         }
       }
-    if(p>=dlen) break;
+    if(__unlikely(p>=dlen)) break;
     dst[p++]=w;
     }
   return p;
@@ -624,25 +632,28 @@ FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen,FXint slen){
   register FXwchar w;
   while(q<slen){
     w=(FXuchar)src[q++];
-    if(0x80<=w){
-      if(w<0xC0) break;
-      if(q>=slen || !FXISFOLLOWUTF8(src[q])) break;
+    if(__unlikely(0x80<=w)){
+      if(__unlikely(w<0xC0)) break;
+      if(__unlikely(q>=slen)) break;
+      if(__unlikely(!FXISFOLLOWUTF8(src[q]))) break;
       w=(w<<6)^(FXuchar)src[q++]^0x3080;
-      if(0x800<=w){
-        if(q>=slen || !FXISFOLLOWUTF8(src[q])) break;
+      if(__unlikely(0x800<=w)){
+        if(__unlikely(q>=slen)) break;
+        if(__unlikely(!FXISFOLLOWUTF8(src[q]))) break;
         w=(w<<6)^(FXuchar)src[q++]^0x20080;
-        if(0x10000<=w){
-          if(q>=slen || !FXISFOLLOWUTF8(src[q])) break;
+        if(__unlikely(0x10000<=w)){
+          if(__unlikely(q>=slen)) break;
+          if(__unlikely(!FXISFOLLOWUTF8(src[q]))) break;
           w=(w<<6)^(FXuchar)src[q++]^0x400080;
-          if(0x110000<=w) break;
-          if(p+1>=dlen) break;
+          if(__unlikely(0x110000<=w)) break;
+          if(__unlikely(p+1>=dlen)) break;
           dst[p++]=LEAD_OFFSET+(w>>10);
           dst[p++]=TAIL_OFFSET+(w&0x3FF);
           continue;
           }
         }
       }
-    if(p>=dlen) break;
+    if(__unlikely(p>=dlen)) break;
     dst[p++]=w;
     }
   return p;
@@ -2368,20 +2379,6 @@ FXString& FXString::fromDouble(FXdouble number,FXint prec,FXint fmt){
   }
 
 
-// Return string by converting a long integer
-FXString FXString::value(FXlong num,FXint base){
-  FXString result;
-  return result.fromLong(num,base);
-  }
-
-
-// Return string by converting an unsigned long
-FXString FXString::value(FXulong num,FXint base){
-  FXString result;
-  return result.fromULong(num,base);
-  }
-
-
 // Return string by converting a integer
 FXString FXString::value(FXint num,FXint base){
   FXString result;
@@ -2393,6 +2390,20 @@ FXString FXString::value(FXint num,FXint base){
 FXString FXString::value(FXuint num,FXint base){
   FXString result;
   return result.fromUInt(num,base);
+  }
+
+
+// Return string by converting a long integer
+FXString FXString::value(FXlong num,FXint base){
+  FXString result;
+  return result.fromLong(num,base);
+  }
+
+
+// Return string by converting an unsigned long
+FXString FXString::value(FXulong num,FXint base){
+  FXString result;
+  return result.fromULong(num,base);
   }
 
 
@@ -3017,6 +3028,34 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
     if(lquote) q++;
     while(p<str.length()){
       switch(c=(FXuchar)str[p++]){
+        case '\x00':
+        case '\x01':
+        case '\x02':
+        case '\x03':
+        case '\x04':
+        case '\x05':
+        case '\x06':
+        case '\x0E':
+        case '\x0F':
+        case '\x10':
+        case '\x11':
+        case '\x12':
+        case '\x13':
+        case '\x14':
+        case '\x15':
+        case '\x16':
+        case '\x17':
+        case '\x18':
+        case '\x19':
+        case '\x1A':
+        case '\x1B':
+        case '\x1C':
+        case '\x1D':
+        case '\x1E':
+        case '\x1F':
+        case '\x7F':
+          q+=4;
+          continue;
         case '\n':
         case '\r':
         case '\b':
@@ -3028,9 +3067,18 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
           q+=2;
           continue;
         default:
-          if(c<'\x20' || c=='\x7F' || ('\x80'<=c && flag)){ q+=4; continue; }
-          if(c==lquote){ q+=2; continue; }
-          if(c==rquote){ q+=2; continue; }
+          if(__unlikely('\x80'<=c && flag)){
+            q+=4;
+            continue;
+            }
+          if(__unlikely(c==lquote)){
+            q+=2;
+            continue;
+            }
+          if(__unlikely(c==rquote)){
+            q+=2;
+            continue;
+            }
           q+=1;
           continue;
         }
@@ -3041,6 +3089,37 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
     if(lquote) result[q++]=lquote;
     while(p<str.length()){
       switch(c=(FXuchar)str[p++]){
+        case '\x00':
+        case '\x01':
+        case '\x02':
+        case '\x03':
+        case '\x04':
+        case '\x05':
+        case '\x06':
+        case '\x0E':
+        case '\x0F':
+        case '\x10':
+        case '\x11':
+        case '\x12':
+        case '\x13':
+        case '\x14':
+        case '\x15':
+        case '\x16':
+        case '\x17':
+        case '\x18':
+        case '\x19':
+        case '\x1A':
+        case '\x1B':
+        case '\x1C':
+        case '\x1D':
+        case '\x1E':
+        case '\x1F':
+        case '\x7F':
+          result[q++]='\\';
+          result[q++]='x';
+          result[q++]=FXString::value2Digit[(c>>4)&15];
+          result[q++]=FXString::value2Digit[c&15];
+          continue;
         case '\n':
           result[q++]='\\';
           result[q++]='n';
@@ -3074,19 +3153,19 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
           result[q++]='\\';
           continue;
         default:
-          if(c<'\x20' || c=='\x7F' || ('\x80'<=c && flag)){
+          if(__unlikely('\x80'<=c && flag)){
             result[q++]='\\';
             result[q++]='x';
             result[q++]=FXString::value2Digit[(c>>4)&15];
             result[q++]=FXString::value2Digit[c&15];
             continue;
             }
-          if(c==lquote){
+          if(__unlikely(c==lquote)){
             result[q++]='\\';
             result[q++]=lquote;
             continue;
             }
-          if(c==rquote){
+          if(__unlikely(c==rquote)){
             result[q++]='\\';
             result[q++]=rquote;
             continue;
@@ -3122,9 +3201,9 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
           case '5':
           case '6':
           case '7':
-            if('0'<=str[p] && str[p]<='7'){
+            if(Ascii::isOctDigit(str[p])){
               p++;
-              if('0'<=str[p] && str[p]<='7') p++;
+              if(Ascii::isOctDigit(str[p])) p++;
               }
             break;
           case 'n':
@@ -3163,9 +3242,9 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
           case '6':
           case '7':
             c=c-'0';
-            if('0'<=str[p] && str[p]<='7'){
+            if(Ascii::isOctDigit(str[p])){
               c=(c<<3)+str[p++]-'0';
-              if('0'<=str[p] && str[p]<='7'){
+              if(Ascii::isOctDigit(str[p])){
                 c=(c<<3)+str[p++]-'0';
                 }
               }

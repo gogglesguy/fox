@@ -50,7 +50,7 @@ FXSemaQueue::FXSemaQueue(FXuint sz):list(sz),free(sz),used(0){
 
 
 // Try push object into queue
-FXbool FXSemaQueue::trypush(void* obj){
+FXbool FXSemaQueue::trypush(FXptr obj){
   if(free.trywait()){
     list.push(obj);
     used.post();
@@ -61,7 +61,7 @@ FXbool FXSemaQueue::trypush(void* obj){
 
 
 // Push object into queue
-FXbool FXSemaQueue::push(void* obj){
+FXbool FXSemaQueue::push(FXptr obj){
   free.wait();
   list.push(obj);
   used.post();
@@ -70,7 +70,7 @@ FXbool FXSemaQueue::push(void* obj){
 
 
 // Try pop object from queue
-FXbool FXSemaQueue::trypop(void*& obj){
+FXbool FXSemaQueue::trypop(FXptr& obj){
   if(used.trywait()){
     list.pop(obj);
     free.post();
@@ -81,7 +81,7 @@ FXbool FXSemaQueue::trypop(void*& obj){
 
 
 // Pop onject from queue
-FXbool FXSemaQueue::pop(void*& obj){
+FXbool FXSemaQueue::pop(FXptr& obj){
   used.wait();
   list.pop(obj);
   free.post();

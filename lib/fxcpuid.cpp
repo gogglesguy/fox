@@ -26,48 +26,15 @@
 
 /*
   Notes:
-  - Two major functions:
-
-      o Check for presence of CPUID instruction.  This is x86 architecture
-        from pentium processor on up.
-
-      o CPUID instruction to obtain information on run-time platform.
-
-  - Utility functions to quickly obtain commonly interesting information.
-
+  - Obtain processor capabilities at runtime.
+  - Utility API's to discover CPU vendor and CPU instruction-set extensions.
+  - Only supported on x86 and x86-64 cpus.
+  - Consult AMD and Intel Programming Manuals for details.
 */
 
 // Have inline assembly only when using GNU C++ or Intel C++
 #if (defined(__GNUC__) || defined(__INTEL_COMPILER))
 #define HAVE_INLINE_ASSEMBLY 1
-#endif
-
-// In 64-bit, we can use EAX, EBX, ECX, EDX
-#if defined(__x86_64__)
-
-// The CPUID instruction returns stuff in eax, ebx, ecx, edx.
-#define mycpuid(op,eax,ebx,ecx,edx)  \
-  __asm__ __volatile__("cpuid           \n\t"  : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "0" (op) : "cc")
-
-// The CPUID instruction returns stuff in eax, ebx, ecx, edx.
-#define mycpuidcount(op,count,eax,ebx,ecx,edx)  \
-  __asm__ __volatile__("cpuid           \n\t" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "0"(op), "2"(count) : "cc")
-
-// In 32-bit, don't use EBX it contains address in PIC
-#elif defined(__i386__)
-
-// The CPUID instruction returns stuff in eax, ebx, ecx, edx.
-#define mycpuid(op,eax,ebx,ecx,edx)  \
-  __asm__ __volatile__("xchgl %%ebx, %1 \n\t"  \
-                       "cpuid           \n\t"  \
-                       "xchgl %%ebx, %1 \n\t"  : "=a"(eax), "=r"(ebx), "=c"(ecx), "=d"(edx) : "0" (op) : "cc")
-
-// The CPUID instruction returns stuff in eax, ebx, ecx, edx.
-#define mycpuidcount(op,count,eax,ebx,ecx,edx)  \
-  __asm__ __volatile__("xchgl %%ebx, %1 \n\t"   \
-                       "cpuid           \n\t"   \
-                       "xchgl %%ebx, %1 \n\t" : "=a"(eax), "=r"(ebx), "=c"(ecx), "=d"(edx) : "0"(op), "2"(count) : "cc")
-
 #endif
 
 using namespace FX;
@@ -77,42 +44,25 @@ using namespace FX;
 namespace FX {
 
 
-// Return true if CPUID present
-FXbool fxCPUIDPresent(){
-#if defined(WIN32)
-  return false;         // FIXME change later
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
-  return true;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
-  return true;
-#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
-  register FXuint eax,edx;
-  __asm__ __volatile__("pushfl\n\t"
-                       "popl   %0\n\t"
-                       "movl   %0,%1\n\t"
-                       "xorl   $0x00200000,%0\n\t"
-                       "pushl  %0\n\t"
-                       "popfl  \n\t"
-                       "pushfl \n\t"
-                       "popl   %0\n\t" : "=a" (eax), "=d" (edx) : /**/ : "cc");
-  return ((eax^edx)>>21)&1;
-#else
-  return false;
-#endif
-  }
-
-
 // Return number of levels of CPUID feature-requests supported
 FXuint fxCPUCaps(FXuint level){
-#if defined(WIN32)
-  return 0;             // FIXME change later
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(fxCPUIDPresent()){
-    register FXuint eax,ebx,ecx,edx;
-    level&=0x80000000;
-    mycpuid(level,eax,ebx,ecx,edx);
-    return eax+1;
-    }
+#if defined(WIN32) && (_MSC_VER >= 1400)
+  FXint features[4];
+  level&=0x80000000;
+  __cpuid(features,level);
+  return features[0]+1;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+  register FXuint eax,ebx,ecx,edx;
+  level&=0x80000000;
+  __asm__ __volatile__("xchgl %%ebx, %1 \n\t"  \
+                       "cpuid           \n\t"  \
+                       "xchgl %%ebx, %1 \n\t"  : "=a"(eax), "=r"(ebx), "=c"(ecx), "=d"(edx) : "0" (level) : "cc");
+  return eax+1;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXuint eax,ebx,ecx,edx;
+  level&=0x80000000;
+  __asm__ __volatile__("cpuid \n\t" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "0" (level) : "cc");
+  return eax+1;
 #endif
   return 0;
   }
@@ -120,145 +70,122 @@ FXuint fxCPUCaps(FXuint level){
 
 // Get CPU info
 FXbool fxCPUGetCaps(FXuint level,FXuint features[]){
-#if defined(WIN32)
-  return false;         // FIXME change later
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#if defined(WIN32) && (_MSC_VER >= 1400)
   if(level<fxCPUCaps(level)){
-    mycpuid(level,features[0],features[1],features[2],features[3]);
+    __cpuid((int)features,level);
     return true;
     }
-  return false;
-#else
-  return false;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+  if(level<fxCPUCaps(level)){
+  __asm__ __volatile__("xchgl %%ebx, %1 \n\t"  \
+                       "cpuid           \n\t"  \
+                       "xchgl %%ebx, %1 \n\t"  : "=a"(features[0]), "=r"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0" (level) : "cc");
+    return true;
+    }
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  if(level<fxCPUCaps(level)){
+    __asm__ __volatile__("cpuid \n\t" : "=a"(features[0]), "=b"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0" (level) : "cc");
+    return true;
+    }
 #endif
+  return false;
   }
 
 
 // Get CPU info
 FXbool fxCPUGetXCaps(FXuint level,FXuint count,FXuint features[]){
-#if defined(WIN32)
-  return false;         // FIXME change later
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
+#if defined(WIN32) && (_MSC_VER >= 1400)
   if(level<fxCPUCaps(level)){
-    mycpuidcount(level,count,features[0],features[1],features[2],features[3]);
+   __cpuidex((int)features,level,count);
     return true;
     }
-  return false;
-#else
-  return false;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i686__))
+  if(level<fxCPUCaps(level)){
+  __asm__ __volatile__("xchgl %%ebx, %1 \n\t"   \
+                       "cpuid           \n\t"   \
+                       "xchgl %%ebx, %1 \n\t" : "=a"(features[0]), "=r"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0"(level), "2"(count) : "cc");
+    return true;
+    }
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  if(level<fxCPUCaps(level)){
+    __asm__ __volatile__("cpuid \n\t" : "=a"(features[0]), "=b"(features[1]), "=c"(features[2]), "=d"(features[3]) : "0"(level), "2"(count) : "cc");
+    return true;
+    }
 #endif
+  return false;
   }
 
 
 // Return exciting features
 FXuint fxCPUFeatures(){
-#if defined(WIN32)
-  // FIXME //
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(fxCPUIDPresent()){
-    FXuint feature[4],caps=0;
-    mycpuid(1,feature[0],feature[1],feature[2],feature[3]);
-    if(feature[2]&0x00000001) caps|=CPU_HAS_SSE3;
-    if(feature[2]&0x00000200) caps|=CPU_HAS_SSSE3;
-    if(feature[2]&0x00002000) caps|=CPU_HAS_CMPXCHG16;
-    if(feature[2]&0x00080000) caps|=CPU_HAS_SSE41;
-    if(feature[2]&0x00100000) caps|=CPU_HAS_SSE42;
-    if(feature[2]&0x00800000) caps|=CPU_HAS_POPCNT;
-    if(feature[2]&0x00400000) caps|=CPU_HAS_MOVBE;
-    if(feature[3]&0x00000010) caps|=CPU_HAS_TSC;
-    if(feature[3]&0x00000100) caps|=CPU_HAS_CMPXCHG8;
-    if(feature[3]&0x00008000) caps|=CPU_HAS_CMOV;
-    if(feature[3]&0x00800000) caps|=CPU_HAS_MMX;
-    if(feature[3]&0x02000000) caps|=CPU_HAS_SSE;
-    if(feature[3]&0x04000000) caps|=CPU_HAS_SSE2;
-    mycpuid(0,feature[0],feature[1],feature[2],feature[3]);
-    if(__likely(feature[1]==0x68747541) && __likely(feature[2]==0x444d4163) && __likely(feature[3]==0x69746e65)){
-      mycpuid(0x80000001,feature[0],feature[1],feature[2],feature[3]);
-      if(feature[2]&0x00000040) caps|=CPU_HAS_SSE4A;
-      if(feature[3]&0x40000000) caps|=CPU_HAS_3DNOWEXT;
-      if(feature[3]&0x80000000) caps|=CPU_HAS_3DNOW;
+  FXuint features[4];
+  if(fxCPUGetCaps(1,features)){
+    FXuint blank=(CPU_HAS_AVX|CPU_HAS_AVX2|CPU_HAS_FMA|CPU_HAS_FMA4|CPU_HAS_XOP);
+    FXuint caps=0;
+    if(FXBIT(features[2],0)) caps|=CPU_HAS_SSE3;
+    if(FXBIT(features[3],8)) caps|=CPU_HAS_CX8;
+    if(FXBIT(features[2],9)) caps|=CPU_HAS_SSSE3;
+    if(FXBIT(features[2],12)) caps|=CPU_HAS_FMA;
+    if(FXBIT(features[2],13)) caps|=CPU_HAS_CX16;
+    if(FXBIT(features[2],19)) caps|=CPU_HAS_SSE41;
+    if(FXBIT(features[2],20)) caps|=CPU_HAS_SSE42;
+    if(FXBIT(features[2],23)) caps|=CPU_HAS_POPCNT;
+    if(FXBIT(features[2],25)) caps|=CPU_HAS_AES;
+    if(FXBIT(features[2],28)) caps|=CPU_HAS_AVX;
+    if(FXBIT(features[2],29)) caps|=CPU_HAS_F16;        // Half-floats
+    if(FXBIT(features[2],30)) caps|=CPU_HAS_RAND;
+    if(FXBIT(features[3],25)) caps|=CPU_HAS_SSE;
+    if(FXBIT(features[3],26)) caps|=CPU_HAS_SSE2;
+    if(FXBIT(features[2],27)){                          // OSXSAVE
+#if (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i686__) || defined(__x86_64__)))
+      FXuint lo,hi;
+      __asm__ __volatile__(".byte 0x0f,0x01,0xd0" : "=a" (lo), "=d" (hi) : "c" (0));    // XGETBV ecx=0
+      if((lo&6)==6) blank=0;                            // Don't blank out AVX, AVX2, FMA, FMA4, XOP later
+#endif
       }
+    if(fxCPUGetXCaps(7,0,features)){
+      if(FXBIT(features[2],3)) caps|=CPU_HAS_BMI1;
+      if(FXBIT(features[2],5)) caps|=CPU_HAS_AVX2;
+      if(FXBIT(features[2],8)) caps|=CPU_HAS_BMI2;
+      }
+    if(fxCPUGetCaps(0,features) && (features[1]==0x68747541) && (features[2]==0x444d4163) && (features[3]==0x69746e65)){
+      if(fxCPUGetCaps(0x80000001,features)){
+        if(FXBIT(features[2],6)) caps|=CPU_HAS_SSE4A;
+        if(FXBIT(features[2],5)) caps|=CPU_HAS_ABM;
+        if(FXBIT(features[2],11)) caps|=CPU_HAS_XOP;
+        if(FXBIT(features[2],16)) caps|=CPU_HAS_FMA4;
+        if(FXBIT(features[2],21)) caps|=CPU_HAS_TBM;
+        }
+      }
+    caps&=~blank;
     return caps;
     }
-#endif
   return 0;
   }
 
 
 // Return CPU Identification.
 FXbool fxCPUName(FXchar name[]){
-#if defined(WIN32)
-  // FIXME //
-#elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
-  if(fxCPUIDPresent()){
-    FXuint feature[4];
-    mycpuid(0,feature[0],feature[1],feature[2],feature[3]);
-    name[0]=((char*)feature)[4];
-    name[1]=((char*)feature)[5];
-    name[2]=((char*)feature)[6];
-    name[3]=((char*)feature)[7];
-    name[4]=((char*)feature)[12];
-    name[5]=((char*)feature)[13];
-    name[6]=((char*)feature)[14];
-    name[7]=((char*)feature)[15];
-    name[8]=((char*)feature)[8];
-    name[9]=((char*)feature)[9];
-    name[10]=((char*)feature)[10];
-    name[11]=((char*)feature)[11];
+  FXuint features[4];
+  if(fxCPUGetCaps(0,features)){
+    name[0]=((char*)features)[4];
+    name[1]=((char*)features)[5];
+    name[2]=((char*)features)[6];
+    name[3]=((char*)features)[7];
+    name[4]=((char*)features)[12];
+    name[5]=((char*)features)[13];
+    name[6]=((char*)features)[14];
+    name[7]=((char*)features)[15];
+    name[8]=((char*)features)[8];
+    name[9]=((char*)features)[9];
+    name[10]=((char*)features)[10];
+    name[11]=((char*)features)[11];
     name[12]='\0';
     return true;
     }
-#endif
   name[0]='\0';
   return false;
   }
-
-/*
-FXchar name[32];
-FXuint flags;
-fxCPUName(name);
-fxmessage("name=%s\n",name);
-flags=fxCPUFeatures();
-fxmessage("bits=%b\n",flags);
-FXchar name[32];
-FXuint features[4];
-FXuint flags;
-fxCPUName(name);
-fxmessage("name=%s\n",name);
-flags=fxCPUFeatures();
-fxmessage("bits=%b\n",flags);
-if(fxCPUGetCaps(0,features)){
-  fxmessage("feature[0]=0x%08x 0b%032b\n",features[0],features[0]);
-  fxmessage("feature[1]=0x%08x 0b%032b\n",features[1],features[1]);
-  fxmessage("feature[2]=0x%08x 0b%032b\n",features[2],features[2]);
-  fxmessage("feature[3]=0x%08x 0b%032b\n",features[3],features[3]);
-  }
-
-  void* cmpa=(void*)1;
-  void* cmpb=(void*)2;
-  void* a=(void*)3;
-  void* b=(void*)4;
-  void* volatile dd[2]={(void*)1,(void*)2};
-  fxmessage("dd=(%p,%p)\n",dd[0],dd[1]);
-  fxmessage("swapped: ");
-  if(atomicBoolDCas(dd,cmpa,cmpb,a,b)){
-    fxmessage("yes\n");
-    }
-  else{
-    fxmessage("no\n");
-    }
-  fxmessage("dd=(%p,%p)\n",dd[0],dd[1]);
-  fxmessage("swapped: ");
-  if(atomicBoolDCas(dd,cmpa,cmpb,a,b)){
-    fxmessage("yes\n");
-    }
-  else{
-    fxmessage("no\n");
-    }
-  fxmessage("dd=(%p,%p)\n",dd[0],dd[1]);
-  exit(0);
-
-*/
 
 }
 

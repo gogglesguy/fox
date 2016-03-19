@@ -17,6 +17,36 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 18 - FOX DEVELOPMENT 1.7.40
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Updated fxcpuid() with AVX, AVX2, FMA, XOP, etc. detection.</li>
+<li>Updated tables for fxascii.cpp.</li>
+<li>Added various macros for memory alignment in fxdefs.h.</li>
+<li>Added API's to FXTreeList and FXFoldingList to replace one item with custom item.</li>
+<li>Added API to return processor index of calling thread in FXThread.</li>
+<li>Bounds check in FXTabBook's setCurrent().</li>
+<li>Added isAccessible API to FXStat.</li>
+<li>Added API to rotate vector by quaternion to FXQuatd, FXQuatf.</li>
+<li>Check valid path in FXPath.</li>
+<li>FXFileList Drag and Drop now enabled.</li>
+<li>Improvements to File Open Dialog right-click menu.</li>
+<li>Add ability to remove as well as add directory bookmarks in File Open Dialogs.</li>
+<li>AVX capabilities added to matrix and vector classes (if compiled with avx intrinsics).</li>
+<li>FXThread sleep() function reverts to sleep if interrupted by signal.</li>
+<li>4x4 Double matrix transpose using AVX permute intrinsic.</li>
+<li>Check UTIME_OMIT before using utimensat().</li>
+<li>Updates to PathFinder file manager.</li>
+<li>Check for NULL name in FXMetaClass hash table additions.</li>
+<li>Added isBinDigit() and isOctDigit() to Ascii character class functions.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 May 12 - FOX DEVELOPMENT 1.7.39
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

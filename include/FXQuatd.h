@@ -98,6 +98,9 @@ public:
   FXQuatd operator+() const { return *this; }
   FXQuatd operator-() const { return FXQuatd(-x,-y,-z,-w); }
 
+  /// Rotation of a vector by a quaternion
+  FXVec3d operator*(const FXVec3d& v) const;
+
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z+w*w; }
   FXdouble length() const { return sqrt(length2()); }
@@ -167,9 +170,6 @@ public:
 
   /// Conjugate quaternion
   FXQuatd conj() const;
-
-  /// Rotation of a vector by a quaternion
-  FXVec3d operator*(const FXVec3d& v) const;
 
   /// Destructor
  ~FXQuatd(){}

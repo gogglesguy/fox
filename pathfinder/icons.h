@@ -1,4 +1,7 @@
-/*********** Generated on 2013/05/12 18:03:26 by reswrap version 5.1.1 *********/
+/*********** Generated on 2013/07/18 21:27:13 by reswrap version 5.1.1 *********/
+
+/* Created by reswrap from file addbook.bmp */
+extern const unsigned char addbook[];
 
 /* Created by reswrap from file bigicons.bmp */
 extern const unsigned char bigicons[];
@@ -21,6 +24,9 @@ extern const unsigned char copyit[];
 /* Created by reswrap from file cut.bmp */
 extern const unsigned char cut[];
 
+/* Created by reswrap from file delbook.bmp */
+extern const unsigned char delbook[];
+
 /* Created by reswrap from file deleteit.bmp */
 extern const unsigned char deleteit[];
 
@@ -36,8 +42,14 @@ extern const unsigned char dirup[];
 /* Created by reswrap from file enter.gif */
 extern const unsigned char enter[];
 
+/* Created by reswrap from file execute.bmp */
+extern const unsigned char execute[];
+
 /* Created by reswrap from file file_gif.gif */
 extern const unsigned char file_gif[];
+
+/* Created by reswrap from file foldernew.gif */
+extern const unsigned char foldernew[];
 
 /* Created by reswrap from file foxbig.gif */
 extern const unsigned char foxbig[];
@@ -63,7 +75,7 @@ extern const unsigned char hosts[];
 /* Created by reswrap from file iconpath.gif */
 extern const unsigned char iconpath[];
 
-/* Created by reswrap from file linkit.gif */
+/* Created by reswrap from file linkit.bmp */
 extern const unsigned char linkit[];
 
 /* Created by reswrap from file location.gif */
@@ -90,6 +102,9 @@ extern const unsigned char properties[];
 /* Created by reswrap from file quit_gif.gif */
 extern const unsigned char quit_gif[];
 
+/* Created by reswrap from file newfolder.bmp */
+extern const unsigned char newfolder[];
+
 /* Created by reswrap from file renameit.gif */
 extern const unsigned char renameit[];
 
@@ -110,6 +125,9 @@ extern const unsigned char setdir[];
 
 /* Created by reswrap from file smallicons.bmp */
 extern const unsigned char smallicons[];
+
+/* Created by reswrap from file sorting.bmp */
+extern const unsigned char sorting[];
 
 /* Created by reswrap from file unmaphost.bmp */
 extern const unsigned char unmaphost[];

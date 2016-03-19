@@ -28,6 +28,7 @@ int main(int argc,char** argv){
   FXint beg[NCAP];
   FXint end[NCAP];
   fxTraceLevel=101;
+
   if(argc==1){
     fprintf(stderr,"no arguments\n");
     exit(1);

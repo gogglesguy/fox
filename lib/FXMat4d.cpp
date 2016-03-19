@@ -47,6 +47,9 @@ using namespace FX;
 
 namespace FX {
 
+// Mask bottom 3 elements
+#define MMM _mm256_set_epi64x(0,~0,~0,~0)
+
 
 // Initialize matrix from scalar
 FXMat4d::FXMat4d(FXdouble s){
@@ -72,9 +75,9 @@ FXMat4d::FXMat4d(FXdouble s){
 // Initialize with 3x3 rotation and scaling matrix
 FXMat4d::FXMat4d(const FXMat3d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_maskload_pd(s[0],_mm256_set_epi64x(0,~0,~0,~0)));
-  _mm256_storeu_pd(m[1],_mm256_maskload_pd(s[1],_mm256_set_epi64x(0,~0,~0,~0)));
-  _mm256_storeu_pd(m[2],_mm256_maskload_pd(s[2],_mm256_set_epi64x(0,~0,~0,~0)));
+  _mm256_storeu_pd(m[0],_mm256_maskload_pd(s[0],MMM));
+  _mm256_storeu_pd(m[1],_mm256_maskload_pd(s[1],MMM));
+  _mm256_storeu_pd(m[2],_mm256_maskload_pd(s[2],MMM));
   _mm256_storeu_pd(m[3],_mm256_set_pd(1.0,0.0,0.0,0.0));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0][0])); _mm_storeu_pd(&m[0][2],_mm_set_pd(0.0,s[0][2]));
@@ -226,9 +229,9 @@ FXMat4d& FXMat4d::operator=(FXdouble s){
 // Assign from 3x3 rotation and scaling matrix
 FXMat4d& FXMat4d::operator=(const FXMat3d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_maskload_pd(s[0],_mm256_set_epi64x(0,~0,~0,~0)));
-  _mm256_storeu_pd(m[1],_mm256_maskload_pd(s[1],_mm256_set_epi64x(0,~0,~0,~0)));
-  _mm256_storeu_pd(m[2],_mm256_maskload_pd(s[2],_mm256_set_epi64x(0,~0,~0,~0)));
+  _mm256_storeu_pd(m[0],_mm256_maskload_pd(s[0],MMM));
+  _mm256_storeu_pd(m[1],_mm256_maskload_pd(s[1],MMM));
+  _mm256_storeu_pd(m[2],_mm256_maskload_pd(s[2],MMM));
   _mm256_storeu_pd(m[3],_mm256_set_pd(1.0,0.0,0.0,0.0));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0][0])); _mm_storeu_pd(&m[0][2],_mm_set_pd(0.0,s[0][2]));
@@ -320,9 +323,9 @@ FXMat4d& FXMat4d::set(FXdouble s){
 // Set from 3x3 rotation and scaling matrix
 FXMat4d& FXMat4d::set(const FXMat3d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_set_pd(0.0,s[0][2],s[0][1],s[0][0]));
-  _mm256_storeu_pd(m[1],_mm256_set_pd(0.0,s[1][2],s[1][1],s[1][0]));
-  _mm256_storeu_pd(m[2],_mm256_set_pd(0.0,s[2][2],s[2][1],s[2][0]));
+  _mm256_storeu_pd(m[0],_mm256_maskload_pd(s[0],MMM));
+  _mm256_storeu_pd(m[1],_mm256_maskload_pd(s[1],MMM));
+  _mm256_storeu_pd(m[2],_mm256_maskload_pd(s[2],MMM));
   _mm256_storeu_pd(m[3],_mm256_set_pd(1.0,0.0,0.0,0.0));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0][0])); _mm_storeu_pd(&m[0][2],_mm_set_pd(0.0,s[0][2]));
@@ -1046,7 +1049,22 @@ FXdouble FXMat4d::det() const {
 
 // Transpose matrix
 FXMat4d FXMat4d::transpose() const {
-#if defined(FOX_HAS_SSE2)
+#if defined(FOX_HAS_AVX)
+  register __m256d m0=_mm256_loadu_pd(m[0]);    // a3 a2 a1 a0
+  register __m256d m1=_mm256_loadu_pd(m[1]);    // b3 b2 b1 b0
+  register __m256d m2=_mm256_loadu_pd(m[2]);    // c3 c2 c1 c0
+  register __m256d m3=_mm256_loadu_pd(m[3]);    // d3 d2 d1 d0
+  register __m256d s0=_mm256_unpackhi_pd(m0,m1);        // b3 a3 b1 a1
+  register __m256d s1=_mm256_unpacklo_pd(m0,m1);        // b2 a2 b0 a0
+  register __m256d s2=_mm256_unpackhi_pd(m2,m3);        // d3 c3 d1 c1
+  register __m256d s3=_mm256_unpacklo_pd(m2,m3);        // d2 c2 d0 c0
+  FXMat4d r;
+  _mm256_storeu_pd(r[0],_mm256_permute2f128_pd(s1,s3,0x20));    // d0 c0 b0 a0
+  _mm256_storeu_pd(r[1],_mm256_permute2f128_pd(s0,s2,0x20));    // d1 c1 b1 a1
+  _mm256_storeu_pd(r[2],_mm256_permute2f128_pd(s1,s3,0x31));    // d2 c2 b2 a2
+  _mm256_storeu_pd(r[3],_mm256_permute2f128_pd(s0,s2,0x31));    // d3 c3 b3 a3
+  return r;
+#elif defined(FOX_HAS_SSE2)
   register __m128d m00=_mm_loadu_pd(&m[0][0]);
   register __m128d m02=_mm_loadu_pd(&m[0][2]);
   register __m128d m10=_mm_loadu_pd(&m[1][0]);
@@ -1061,7 +1079,7 @@ FXMat4d FXMat4d::transpose() const {
   _mm_storeu_pd(&r[2][0],_mm_unpacklo_pd(m02,m12)); _mm_storeu_pd(&r[2][2],_mm_unpacklo_pd(m22,m32));
   _mm_storeu_pd(&r[3][0],_mm_unpackhi_pd(m02,m12)); _mm_storeu_pd(&r[3][2],_mm_unpackhi_pd(m22,m32));
   return r;
-#else  
+#else
   return FXMat4d(m[0][0],m[1][0],m[2][0],m[3][0],
                  m[0][1],m[1][1],m[2][1],m[3][1],
                  m[0][2],m[1][2],m[2][2],m[3][2],
@@ -1205,7 +1223,7 @@ FXVec3d operator*(const FXMat4d& m,const FXVec3d& v){
   register __m256d m0=_mm256_loadu_pd(m[0]);
   register __m256d m1=_mm256_loadu_pd(m[1]);
   register __m256d m2=_mm256_loadu_pd(m[2]);
-  register __m256d vv=_mm256_maskload_pd(v,_mm256_set_epi64x(0,~0,~0,~0));
+  register __m256d vv=_mm256_maskload_pd(v,MMM);
   register __m256d r0=_mm256_mul_pd(m0,vv);
   register __m256d r1=_mm256_mul_pd(m1,vv);
   register __m256d r2=_mm256_mul_pd(m2,vv);
@@ -1213,7 +1231,7 @@ FXVec3d operator*(const FXMat4d& m,const FXVec3d& v){
   r0=_mm256_hadd_pd(r0,r1);
   r2=_mm256_hadd_pd(r2,m0);
   r0=_mm256_hadd_pd(r0,r2);
-  _mm256_maskstore_pd(&r[0],_mm256_set_epi64x(0,~0,~0,~0),r0);
+  _mm256_maskstore_pd(&r[0],MMM,r0);
   return r;
 #elif defined(FOX_HAS_SSE3)
   register __m128d v0=_mm_loadu_pd(&v[0]);
@@ -1294,9 +1312,8 @@ FXVec3d operator*(const FXVec3d& v,const FXMat4d& m){
   register __m256d v0=_mm256_set1_pd(v[0]);
   register __m256d v1=_mm256_set1_pd(v[1]);
   register __m256d v2=_mm256_set1_pd(v[2]);
-  register __m256d rr=_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(v0,m0),_mm256_mul_pd(v1,m1)),_mm256_add_pd(_mm256_mul_pd(v2,m2),m3));
   FXVec3d r;
-  _mm256_maskstore_pd(&r[0],_mm256_set_epi64x(0,~0,~0,~0),rr);
+  _mm256_maskstore_pd(&r[0],MMM,_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(v0,m0),_mm256_mul_pd(v1,m1)),_mm256_add_pd(_mm256_mul_pd(v2,m2),m3)));
   return r;
 #elif defined(FOX_HAS_SSE2)
   register __m128d m00=_mm_loadu_pd(&m[0][0]);

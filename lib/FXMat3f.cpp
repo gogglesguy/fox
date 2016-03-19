@@ -47,6 +47,12 @@ using namespace FX;
 
 namespace FX {
 
+// Mask bottom 3 elements
+#define MMM     _mm_set_epi32(0,~0,~0,~0)
+
+// Mask bottom 2 elements
+#define MM      _mm_set_epi32(0,0,~0,~0)
+
 
 // Initialize matrix from scalar
 FXMat3f::FXMat3f(FXfloat s){
@@ -64,16 +70,9 @@ FXMat3f::FXMat3f(FXfloat s){
 
 // Initialize with 2x2 rotation and scale matrix
 FXMat3f::FXMat3f(const FXMat2f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 mm=_mm_loadu_ps(&s[0][0]);
-  _mm_storel_pi((__m64*)&m[2][0],_mm_set1_ps(0.0f)); _mm_store_ss(&m[2][2],_mm_set1_ps(1.0f));
-  _mm_storel_pi((__m64*)&m[0][0],mm);                _mm_store_ss(&m[0][2],_mm_set1_ps(0.0f));
-  _mm_storeh_pi((__m64*)&m[1][0],mm);                _mm_store_ss(&m[1][2],_mm_set1_ps(0.0f));
-#else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=0.0f;
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=0.0f;
   m[2][0]=0.0f;    m[2][1]=0.0f;    m[2][2]=1.0f;
-#endif
   }
 
 
@@ -93,13 +92,10 @@ FXMat3f::FXMat3f(const FXMat3f& s){
 
 // Initialize from rotation and scaling part of 4x4 matrix
 FXMat3f::FXMat3f(const FXMat4f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 m0=_mm_loadu_ps(&s[0][0]);
-  register __m128 m1=_mm_loadu_ps(&s[1][0]);
-  register __m128 m2=_mm_loadu_ps(&s[2][0]);
-  _mm_storel_pi((__m64*)&m[0][0],m0); _mm_store_ss(&m[0][2],_mm_movehl_ps(m0,m0));
-  _mm_storel_pi((__m64*)&m[1][0],m1); _mm_store_ss(&m[1][2],_mm_movehl_ps(m1,m1));
-  _mm_storel_pi((__m64*)&m[2][0],m2); _mm_store_ss(&m[2][2],_mm_movehl_ps(m2,m2));
+#if defined(FOX_HAS_AVX)
+  _mm_maskstore_ps(&m[0][0],MMM,_mm_loadu_ps(&s[0][0]));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_loadu_ps(&s[1][0]));
+  _mm_maskstore_ps(&m[2][0],MMM,_mm_loadu_ps(&s[2][0]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
@@ -124,39 +120,33 @@ FXMat3f::FXMat3f(const FXfloat s[]){
 
 // Initialize diagonal matrix
 FXMat3f::FXMat3f(FXfloat a,FXfloat b,FXfloat c){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(0.0f,0.0f,0.0f,a));
-  _mm_storeu_ps(&m[1][1],_mm_set_ps(0.0f,0.0f,0.0f,b));
-  _mm_store_ss (&m[2][2],_mm_set_ss(c));
-#else
   m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
   m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
-#endif
   }
 
 
 // Initialize matrix from components
 FXMat3f::FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(a10,a02,a01,a00));
-  _mm_storeu_ps(&m[1][1],_mm_set_ps(a21,a20,a12,a11));
-  _mm_store_ss (&m[2][2],_mm_set_ss(a22));
-#else
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
-#endif
   }
 
 
 // Initialize matrix from three vectors
 FXMat3f::FXMat3f(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
+#if defined(FOX_HAS_AVX)
+  _mm_maskstore_ps(&m[0][0],MMM,_mm_maskload_ps(a,MMM));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_maskload_ps(b,MMM));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_maskload_ps(c,MMM));
+#else
   m[0]=a;
   m[1]=b;
   m[2]=c;
+#endif
   }
-
+ 
 
 // Initialize matrix from quaternion
 FXMat3f::FXMat3f(const FXQuatf& quat){
@@ -181,16 +171,9 @@ FXMat3f& FXMat3f::operator=(FXfloat s){
 
 // Assign from 2x2 rotation and scale matrix
 FXMat3f& FXMat3f::operator=(const FXMat2f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 mm=_mm_loadu_ps(&s[0][0]);
-  _mm_storel_pi((__m64*)&m[2][0],_mm_set1_ps(0.0f)); _mm_store_ss(&m[2][2],_mm_set1_ps(1.0f));
-  _mm_storel_pi((__m64*)&m[0][0],mm);                _mm_store_ss(&m[0][2],_mm_set1_ps(0.0f));
-  _mm_storeh_pi((__m64*)&m[1][0],mm);                _mm_store_ss(&m[1][2],_mm_set1_ps(0.0f));
-#else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=0.0f;
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=0.0f;
   m[2][0]=0.0f;    m[2][1]=0.0f;    m[2][2]=1.0f;
-#endif
   return *this;
   }
 
@@ -212,13 +195,10 @@ FXMat3f& FXMat3f::operator=(const FXMat3f& s){
 
 // Assign from rotation and scaling part of 4x4 matrix
 FXMat3f& FXMat3f::operator=(const FXMat4f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 m0=_mm_loadu_ps(&s[0][0]);
-  register __m128 m1=_mm_loadu_ps(&s[1][0]);
-  register __m128 m2=_mm_loadu_ps(&s[2][0]);
-  _mm_storel_pi((__m64*)&m[0][0],m0); _mm_store_ss(&m[0][2],_mm_movehl_ps(m0,m0));
-  _mm_storel_pi((__m64*)&m[1][0],m1); _mm_store_ss(&m[1][2],_mm_movehl_ps(m1,m1));
-  _mm_storel_pi((__m64*)&m[2][0],m2); _mm_store_ss(&m[2][2],_mm_movehl_ps(m2,m2));
+#if defined(FOX_HAS_AVX)
+  _mm_maskstore_ps(&m[0][0],MMM,_mm_loadu_ps(&s[0][0]));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_loadu_ps(&s[1][0]));
+  _mm_maskstore_ps(&m[2][0],MMM,_mm_loadu_ps(&s[2][0]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
@@ -267,16 +247,9 @@ FXMat3f& FXMat3f::set(FXfloat s){
 
 // Set value from 2x2 rotation and scale matrix
 FXMat3f& FXMat3f::set(const FXMat2f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 mm=_mm_loadu_ps(&s[0][0]);
-  _mm_storel_pi((__m64*)&m[2][0],_mm_set1_ps(0.0f)); _mm_store_ss(&m[2][2],_mm_set1_ps(1.0f));
-  _mm_storel_pi((__m64*)&m[0][0],mm);                _mm_store_ss(&m[0][2],_mm_set1_ps(0.0f));
-  _mm_storeh_pi((__m64*)&m[1][0],mm);                _mm_store_ss(&m[1][2],_mm_set1_ps(0.0f));
-#else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=0.0f;
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=0.0f;
   m[2][0]=0.0f;    m[2][1]=0.0f;    m[2][2]=1.0f;
-#endif
   return *this;
   }
 
@@ -298,13 +271,10 @@ FXMat3f& FXMat3f::set(const FXMat3f& s){
 
 // Set from rotation and scaling part of 4x4 matrix
 FXMat3f& FXMat3f::set(const FXMat4f& s){
-#if defined(FOX_HAS_SSE)
-  register __m128 m0=_mm_loadu_ps(&s[0][0]);
-  register __m128 m1=_mm_loadu_ps(&s[1][0]);
-  register __m128 m2=_mm_loadu_ps(&s[2][0]);
-  _mm_storel_pi((__m64*)&m[0][0],m0); _mm_store_ss(&m[0][2],_mm_movehl_ps(m0,m0));
-  _mm_storel_pi((__m64*)&m[1][0],m1); _mm_store_ss(&m[1][2],_mm_movehl_ps(m1,m1));
-  _mm_storel_pi((__m64*)&m[2][0],m2); _mm_store_ss(&m[2][2],_mm_movehl_ps(m2,m2));
+#if defined(FOX_HAS_AVX)
+  _mm_maskstore_ps(&m[0][0],MMM,_mm_loadu_ps(&s[0][0]));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_loadu_ps(&s[1][0]));
+  _mm_maskstore_ps(&m[2][0],MMM,_mm_loadu_ps(&s[2][0]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
@@ -331,39 +301,33 @@ FXMat3f& FXMat3f::set(const FXfloat s[]){
 
 // Set diagonal matrix
 FXMat3f& FXMat3f::set(FXfloat a,FXfloat b,FXfloat c){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(0.0f,0.0f,0.0f,a));
-  _mm_storeu_ps(&m[1][1],_mm_set_ps(0.0f,0.0f,0.0f,b));
-  _mm_store_ss (&m[2][2],_mm_set_ss(c));
-#else
   m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
   m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
-#endif
   return *this;
   }
 
 
 // Set value from components
 FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(a10,a02,a01,a00));
-  _mm_storeu_ps(&m[1][1],_mm_set_ps(a21,a20,a12,a11));
-  _mm_store_ss (&m[2][2],_mm_set_ss(a22));
-#else
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
-#endif
   return *this;
   }
 
 
 // Set value from three vectors
 FXMat3f& FXMat3f::set(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
+#if defined(FOX_HAS_AVX)
+  _mm_maskstore_ps(&m[0][0],MMM,_mm_maskload_ps(a,MMM));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_maskload_ps(b,MMM));
+  _mm_maskstore_ps(&m[1][0],MMM,_mm_maskload_ps(c,MMM));
+#else
   m[0]=a;
   m[1]=b;
   m[2]=c;
+#endif
   return *this;
   }
 
@@ -667,7 +631,21 @@ FXVec2f operator*(const FXMat3f& m,const FXVec2f& v){
 
 // Matrix times vector
 FXVec3f operator*(const FXMat3f& m,const FXVec3f& v){
-#if defined(FOX_HAS_SSE3)
+#if defined(FOX_HAS_AVX)
+  register __m128 m0=_mm_maskload_ps(m[0],MMM);
+  register __m128 m1=_mm_maskload_ps(m[1],MMM);
+  register __m128 m2=_mm_maskload_ps(m[2],MMM);
+  register __m128 vv=_mm_maskload_ps(v,MMM);
+  register __m128 r0=_mm_mul_ps(m0,vv);
+  register __m128 r1=_mm_mul_ps(m1,vv);
+  register __m128 r2=_mm_mul_ps(m2,vv);
+  FXVec3f r;
+  r0=_mm_hadd_ps(r0,r1);
+  r2=_mm_hadd_ps(r2,m0);
+  r0=_mm_hadd_ps(r0,r2);
+  _mm_maskstore_ps(&r[0],MMM,r0);
+  return r;
+#elif defined(FOX_HAS_SSE3)
   register __m128 vv=_mm_loadh_pi(_mm_load_ss(&v[2]),(const __m64*)&v[0]);                      // v1       v0       0   v2
   register __m128 r0=_mm_mul_ps(_mm_loadh_pi(_mm_load_ss(&m[0][2]),(const __m64*)&m[0][0]),vv); // m01*v1   m00*v0   0   m02*v2
   register __m128 r1=_mm_mul_ps(_mm_loadh_pi(_mm_load_ss(&m[1][2]),(const __m64*)&m[1][0]),vv); // m11*v1   m10*v0   0   m12*v2

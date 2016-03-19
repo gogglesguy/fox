@@ -1749,7 +1749,7 @@ language "Ada"
 
   # File patterns for this language mode
   filesmatch "*.ada,*.ad,*.ads,*.adb,*.a,*.ADA,*.AD,*.ADS,*.ADB,*.A"
-  
+
   contextlines 1
 
   # Word delimiters

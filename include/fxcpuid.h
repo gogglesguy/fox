@@ -25,31 +25,32 @@
 namespace FX {
 
 
-// CPU Features for x86/x86-64
+// Runtime CPU features check (x86/x86-64 only)
 enum {
-  CPU_HAS_TSC       = 0x00001,
-  CPU_HAS_MMX       = 0x00002,
-  CPU_HAS_CMOV      = 0x00004,
-  CPU_HAS_SSE       = 0x00008,
-  CPU_HAS_SSE2      = 0x00010,
-  CPU_HAS_SSE3      = 0x00020,
-  CPU_HAS_SSSE3     = 0x00040,
-  CPU_HAS_SSE4A     = 0x00080,
-  CPU_HAS_SSE41     = 0x00100,
-  CPU_HAS_SSE42     = 0x00200,
-  CPU_HAS_POPCNT    = 0x00400,
-  CPU_HAS_MOVBE     = 0x00800,
-  CPU_HAS_CMPXCHG8  = 0x01000,
-  CPU_HAS_CMPXCHG16 = 0x02000,
-  CPU_HAS_3DNOWEXT  = 0x04000,
-  CPU_HAS_3DNOW     = 0x08000
+  CPU_HAS_SSE       = 0x0000001,
+  CPU_HAS_SSE2      = 0x0000002,
+  CPU_HAS_SSE3      = 0x0000004,
+  CPU_HAS_SSSE3     = 0x0000008,
+  CPU_HAS_SSE41     = 0x0000010,
+  CPU_HAS_SSE42     = 0x0000020,
+  CPU_HAS_AVX       = 0x0000040,
+  CPU_HAS_AVX2      = 0x0000080,
+  CPU_HAS_FMA       = 0x0000100,
+  CPU_HAS_AES       = 0x0000200,
+  CPU_HAS_POPCNT    = 0x0000400,
+  CPU_HAS_CX8       = 0x0000800,
+  CPU_HAS_CX16      = 0x0001000,
+  CPU_HAS_F16       = 0x0002000,
+  CPU_HAS_BMI1      = 0x0004000,
+  CPU_HAS_BMI2      = 0x0008000,
+  CPU_HAS_SSE4A     = 0x0010000,
+  CPU_HAS_ABM       = 0x0020000,
+  CPU_HAS_XOP       = 0x0040000,
+  CPU_HAS_FMA4      = 0x0080000,
+  CPU_HAS_TBM       = 0x0100000,
+  CPU_HAS_RAND      = 0x0200000
   };
 
-
-/**
-* Check if cpuid is available.
-*/
-extern FXAPI FXbool fxCPUIDPresent();
 
 /**
 * On x86 or x86-64 processors, check the number of feature-requests
@@ -89,7 +90,7 @@ extern FXAPI FXuint fxCPUFeatures();
 
 /**
 * Return CPU Identification.  For example, on AMD processors this returns
-* "AuthenticAMD".
+* "AuthenticAMD", while on Intel processors it returns "GenuineIntel".
 * Name should be at least 16 bytes, plus 1 for end-of-string.
 */
 extern FXAPI FXbool fxCPUName(FXchar name[]);

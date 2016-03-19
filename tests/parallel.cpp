@@ -5,6 +5,8 @@
 *********************************************************************************
 * Copyright (C) 2012,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
+
+#include "xincs.h"
 #include "fx.h"
 
 
@@ -68,18 +70,18 @@ FXint QTest::run(){
 // Churn cpu for a random while, then return
 void churn(){
   FXRandom random(fxgetticks());
-  fxmessage("Churn start th %p\n",FXThread::current());
+  fxmessage("Churn start th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   while(random.randDouble()<0.99999999){ }
-  fxmessage("Churn done  th %p\n",FXThread::current());
+  fxmessage("Churn done  th %p code %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   }
 
 
 // Loop through index range
 void looping(FXint i){
   FXRandom random(fxgetticks());
-  fxmessage("Looping %3d start th %p\n",i,FXThread::current());
+  fxmessage("Looping %03d start th %p\n",i,FXThread::current());
   while(random.randDouble()<0.9999999){ }
-  fxmessage("Looping %3d done  th %p\n",i,FXThread::current());
+  fxmessage("Looping %03d done  th %p\n",i,FXThread::current());
   }
 
 
@@ -284,8 +286,8 @@ int main(int argc,char* argv[]){
     FXParallelInvoke(churn,churn,churn,churn,churn,churn,churn,churn);
     fxmessage("...done\n");
 
-    fxmessage("8-way parallel for-loop...\n");
-    FXParallelFor(0,100,1,8,looping);
+    fxmessage("%d-way parallel for-loop...\n",nthreads);
+    FXParallelFor(0U,njobs,1U,looping);
     fxmessage("...done\n");
 
     fxmessage("stopping...\n");

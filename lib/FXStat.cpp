@@ -587,7 +587,7 @@ FXbool FXStat::modified(const FXString& file,FXTime ns){
       CloseHandle(hnd);
       }
 #else
-#if defined(_ATFILE_SOURCE)
+#if (defined(_ATFILE_SOURCE) && defined(UTIME_OMIT))
     const FXTime seconds=1000000000;
     struct timespec values[2];
     values[0].tv_sec=UTIME_OMIT;
@@ -642,7 +642,7 @@ FXbool FXStat::accessed(const FXString& file,FXTime ns){
       CloseHandle(hnd);
       }
 #else
-#if defined(_ATFILE_SOURCE)
+#if (defined(_ATFILE_SOURCE) && defined(UTIME_OMIT))
     const FXTime seconds=1000000000;
     struct timespec values[2];
     values[0].tv_sec=ns/seconds;
@@ -857,6 +857,35 @@ FXbool FXStat::isSetSticky(const FXString& file){
   return statFile(file,data) && data.isSetSticky();
   }
 
+
+// Return true if file is accessible
+FXbool FXStat::isAccessible(const FXString& file,FXuint m){
+  if(!file.empty()){
+#ifdef WIN32
+#ifdef UNICODE
+    FXnchar unifile[MAXPATHLEN];
+    FXuint mode=0;
+    if(m&FXIO::ReadOnly) mode|=4;
+    if(m&FXIO::WriteOnly) mode|=2;
+    utf2ncs(unifile,path.text(),MAXPATHLEN);
+    return _waccess(unifile,mode)==0;
+#else
+    FXuint mode=0;
+    if(m&FXIO::ReadOnly) mode|=4;
+    if(m&FXIO::WriteOnly) mode|=2;
+    return _access(file.text(),mode)==0;
+#endif
+#else
+    FXuint mode=F_OK;
+    if(m&FXIO::ReadOnly) mode|=R_OK;
+    if(m&FXIO::WriteOnly) mode|=W_OK;
+    if(m&FXIO::Executable) mode|=X_OK;
+    return access(file.text(),mode)==0;
+#endif
+    }
+  return false;
+  }
+ 
 
 // Obtain total amount of space on disk
 FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){

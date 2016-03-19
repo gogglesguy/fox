@@ -284,7 +284,7 @@ FXint FXDirList::descendingCase(const FXTreeItem* pa,const FXTreeItem* pb){
 
 /*******************************************************************************/
 
-// Copy
+// Copy files to drop directory
 long FXDirList::onCmdDropCopy(FXObject*,FXSelector,void*){
   FXString filedst,filesrc;
   FXint beg,end;
@@ -304,7 +304,7 @@ long FXDirList::onCmdDropCopy(FXObject*,FXSelector,void*){
   }
 
 
-// Copy
+// Move files to drop directory
 long FXDirList::onCmdDropMove(FXObject*,FXSelector,void*){
   FXString filedst,filesrc;
   FXint beg,end;
@@ -324,7 +324,7 @@ long FXDirList::onCmdDropMove(FXObject*,FXSelector,void*){
   }
 
 
-// Copy
+// Link to files from drop directory
 long FXDirList::onCmdDropLink(FXObject*,FXSelector,void*){
   FXString filedst,filesrc;
   FXint beg,end;
@@ -430,25 +430,24 @@ long FXDirList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
   // Get uri-list of files being dropped
   if(getDNDData(FROM_DRAGNDROP,urilistType,dropfiles)){
-
-    // Now handle it
-    switch(dropaction){
-      case DRAG_COPY:
-        getApp()->addChore(this,ID_DROPCOPY,ptr);
-        break;
-      case DRAG_MOVE:
-        getApp()->addChore(this,ID_DROPMOVE,ptr);
-        break;
-      case DRAG_LINK:
-        getApp()->addChore(this,ID_DROPLINK,ptr);
-        break;
-      default:
-        getApp()->addChore(this,ID_DROPASK,ptr);
-        break;
+    if(!dropfiles.empty()){
+      switch(dropaction){
+        case DRAG_COPY:
+          getApp()->addChore(this,ID_DROPCOPY,ptr);
+          break;
+        case DRAG_MOVE:
+          getApp()->addChore(this,ID_DROPMOVE,ptr);
+          break;
+        case DRAG_LINK:
+          getApp()->addChore(this,ID_DROPLINK,ptr);
+          break;
+        default:
+          getApp()->addChore(this,ID_DROPASK,ptr);
+          break;
+        }
+      return 1;
       }
-    return 1;
     }
-
   return 0;
   }
 
@@ -470,7 +469,6 @@ long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
     FXTRACE((100,"Delete files not yet implemented\n"));
     return 1;
     }
-
   return 0;
   }
 
@@ -897,22 +895,22 @@ void FXDirList::listRootItems(){
 
 /*******************************************************************************/
 
-// FIXME make like FXFileList in terms of logic
-
 // List child items
 void FXDirList::listChildItems(FXDirItem *par){
-  FXDirItem   *oldlist=par->list;
-  FXDirItem   *newlist=NULL;
-  FXDirItem  **po=&oldlist;
-  FXDirItem  **pn=&newlist;
-  FXDirItem   *item;
-  FXDirItem   *link;
-  FXString     pathname;
-  FXString     directory;
-  FXString     name;
-  FXStat       info;
-  FXDir        dir;
-  FXuint       mode;
+  FXDirItem  *oldlist=par->list;
+  FXDirItem  *newlist=NULL;
+  FXDirItem **po=&oldlist;
+  FXDirItem **pn=&newlist;
+  FXDirItem  *olditem=NULL;
+  FXDirItem  *newitem=NULL;
+  FXDirItem  *link;
+  FXDirItem **pp;
+  FXString    pathname;
+  FXString    directory;
+  FXString    name;
+  FXStat      info;
+  FXDir       dir;
+  FXuint      mode;
 
   // Path to parent node
   directory=getItemPathname(par);
@@ -923,10 +921,10 @@ void FXDirList::listChildItems(FXDirItem *par){
     // Process directory entries
     while(dir.next(name)){
 
-      // A dot special file?
+      // Never show "." and ".." in the directory list widget
       if(name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) continue;
 
-      // Hidden file or directory normally not shown
+      // Normally don't show hiden files or directories
       if(name[0]=='.' && !(options&DIRLIST_SHOWHIDDEN)) continue;
 
       // Build full pathname of entry
@@ -941,7 +939,7 @@ void FXDirList::listChildItems(FXDirItem *par){
 
       mode=info.mode();
 
-      // Hidden file or directory normally not shown
+      // Normally don't show hiden files or directories
       if((mode&FXIO::Hidden) && !(options&DIRLIST_SHOWHIDDEN)) continue;
 
 #else
@@ -962,71 +960,79 @@ void FXDirList::listChildItems(FXDirItem *par){
       if(!(mode&FXIO::Directory) && !((options&DIRLIST_SHOWFILES) && FXPath::match(name,pattern,matchmode))) continue;
 
       // Find it, and take it out from the old list if found
-      for(FXDirItem** pp=po; (item=*pp)!=NULL; pp=&item->link){
-        if(compare(item->label,name)==0){
-          *pp=item->link; item->link=NULL;
-          goto fnd;
+      for(pp=po; (olditem=*pp)!=NULL; pp=&olditem->link){
+        if(compare(olditem->label,name)==0){
+          *pp=olditem->link; olditem->link=NULL;
+          break;
           }
         }
 
-      // Not found; prepend before list
-      item=(FXDirItem*)appendItem(par,name,opendiricon,closeddiricon,NULL,true);
+      // No change, keep old item
+      if(olditem && olditem->getMode()==mode && olditem->getSize()==info.size() && olditem->getDate()==info.modified()){
+        *pn=olditem; pn=&olditem->link;
+        continue;
+        }
 
-      // Next gets hung after this one
-fnd:  *pn=item; pn=&item->link;
+      // Otherwise, make new item
+      newitem=(FXDirItem*)createItem(name,NULL,NULL,NULL);
 
       // Update item information
-      item->setDraggable(draggable);
-      item->setAssoc(NULL);
-      item->setSize(info.size());
-      item->setDate(info.modified());
-      item->setMode(mode);
+      newitem->setDraggable(draggable);
+      newitem->setAssoc(NULL);
+      newitem->setSize(info.size());
+      newitem->setDate(info.modified());
+      newitem->setMode(mode);
 
       // Determine icons and type
-      if(item->isDirectory()){
-        item->setHasItems(true);
-        item->setOpenIcon(opendiricon);
-        item->setClosedIcon(closeddiricon);
-        if(associations) item->setAssoc(associations->findDirBinding(pathname.text()));
+      if(newitem->isDirectory()){
+        newitem->setHasItems(true);
+        newitem->setOpenIcon(opendiricon);
+        newitem->setClosedIcon(closeddiricon);
+        if(associations) newitem->setAssoc(associations->findDirBinding(pathname.text()));
         }
-      else if(item->isExecutable()){
-        item->setHasItems(false);
-        item->setOpenIcon(applicationicon);
-        item->setClosedIcon(applicationicon);
-        if(associations) item->setAssoc(associations->findExecBinding(pathname.text()));
+      else if(newitem->isExecutable()){
+        newitem->setHasItems(false);
+        newitem->setOpenIcon(applicationicon);
+        newitem->setClosedIcon(applicationicon);
+        if(associations) newitem->setAssoc(associations->findExecBinding(pathname.text()));
         }
       else{
-        item->setHasItems(false);
-        item->setOpenIcon(documenticon);
-        item->setClosedIcon(documenticon);
-        if(associations) item->setAssoc(associations->findFileBinding(pathname.text()));
+        newitem->setHasItems(false);
+        newitem->setOpenIcon(documenticon);
+        newitem->setClosedIcon(documenticon);
+        if(associations) newitem->setAssoc(associations->findFileBinding(pathname.text()));
         }
 
       // If association is found, use it
-      if(item->getAssoc()){
-        if(item->getAssoc()->miniicon) item->setClosedIcon(item->getAssoc()->miniicon);
-        if(item->getAssoc()->miniiconopen) item->setOpenIcon(item->getAssoc()->miniiconopen);
+      if(newitem->getAssoc()){
+        if(newitem->getAssoc()->miniicon) newitem->setClosedIcon(newitem->getAssoc()->miniicon);
+        if(newitem->getAssoc()->miniiconopen) newitem->setOpenIcon(newitem->getAssoc()->miniiconopen);
         }
 
       // Create item
-      if(id()) item->create();
-      }
+      if(id()) newitem->create();
 
-    // Close it
+      // Replace existing item or add new one
+      if(olditem){
+        newitem->list=olditem->list;            // Old items list of children
+        setItem(olditem,newitem,true);
+        }
+      else{
+        appendItem(par,newitem,true);
+        }
+      *pn=newitem; pn=&newitem->link;
+      }
     dir.close();
     }
 
   // Wipe items remaining in list:- they have disappeared!!
-  for(item=oldlist; item; item=link){
-    link=item->link;
-    removeItem(item,true);
+  for(olditem=oldlist; olditem; olditem=link){
+    link=olditem->link;
+    removeItem(olditem,true);
     }
 
   // Now we know for sure whether we really have subitems or not
-  if(par->first)
-    par->state|=FXDirItem::HASITEMS;
-  else
-    par->state&=~FXDirItem::HASITEMS;
+  par->setHasItems(!!par->first);
 
   // Remember new list
   par->list=newlist;
@@ -1037,24 +1043,20 @@ fnd:  *pn=item; pn=&item->link;
 
 /*******************************************************************************/
 
-// Set current (dir/file) name path
-void FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
+// Set current file; return true if success
+FXbool FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
-  if(!pathname.empty()){
-    FXTreeItem* item;
-    FXbool expand=false;
-    FXString path=FXPath::absolute(pathname);
-    while(!FXPath::isTopDirectory(path) && !FXStat::exists(path)){
-      path=FXPath::upLevel(path);
-      expand=true;
-      }
-    if((item=getPathnameItem(path))!=NULL){
-      if(expand) expandTree(item,notify);
+  FXString path(FXPath::validPath(FXPath::absolute(pathname)));
+  if(FXStat::exists(path)){
+    FXTreeItem* item=getPathnameItem(path);
+    if(item){
       setAnchorItem(item);
       setCurrentItem(item,notify);
       makeItemVisible(item);
+      return true;
       }
     }
+  return false;
   }
 
 
@@ -1085,22 +1087,21 @@ FXString FXDirList::getSelectedFiles() const {
   }
 
 
-// Open all intermediate directories down toward given one
-void FXDirList::setDirectory(const FXString& pathname,FXbool notify){
+// Set current directory; return true if success
+FXbool FXDirList::setDirectory(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
-  if(!pathname.empty()){
-    FXTreeItem* item;
-    FXString path=FXPath::absolute(pathname);
-    while(!FXPath::isTopDirectory(path) && !FXStat::isDirectory(path)){
-      path=FXPath::upLevel(path);
-      }
-    if((item=getPathnameItem(path))!=NULL){
+  FXString path(FXPath::validPath(FXPath::absolute(pathname)));
+  if(FXStat::isDirectory(path)){
+    FXTreeItem* item=getPathnameItem(path);
+    if(item){
       expandTree(item,notify);
       setAnchorItem(item);
       setCurrentItem(item,notify);
       makeItemVisible(item);
+      return true;
       }
     }
+  return false;
   }
 
 
@@ -1203,7 +1204,7 @@ x:    item=it;
         return item;
 y:      item=it;
         FXASSERT(item);
-        if(end<path.length() && ISPATHSEP(path[end])) end++;
+        if(ISPATHSEP(path[end])) end++;
         }
       FXASSERT(item);
       return item;

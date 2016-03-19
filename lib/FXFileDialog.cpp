@@ -343,7 +343,7 @@ void FXFileDialog::setDraggableFiles(FXbool flag){
   }
 
 
-// Are draggable files
+// Are files draggable?
 FXbool FXFileDialog::getDraggableFiles() const {
   return filebox->getDraggableFiles();
   }

@@ -32,6 +32,10 @@ extern const unsigned char bookset[];
 
 extern const unsigned char bookclr[];
 
+extern const unsigned char bookadd[];
+
+extern const unsigned char bookdel[];
+
 extern const unsigned char clearentry[];
 
 extern const unsigned char cmymode[];
@@ -118,6 +122,8 @@ extern const unsigned char mininethood[];
 
 extern const unsigned char minizipdrive[];
 
+extern const unsigned char newfolder[];
+
 extern const unsigned char portrait[];
 
 extern const unsigned char questionicon[];
@@ -131,6 +137,8 @@ extern const unsigned char showbigicons[];
 extern const unsigned char showdetails[];
 
 extern const unsigned char showsmallicons[];
+
+extern const unsigned char sorting[];
 
 extern const unsigned char warningicon[];
 
