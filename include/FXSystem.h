@@ -101,6 +101,9 @@ namespace FXSystem {
   /// Get executable path
   extern FXAPI FXString getExecPath();
 
+  /// Return known executable file extensions (Windows)
+  extern FXAPI FXString getExecExtensions();
+
   /// Return the home directory for the current user
   extern FXAPI FXString getHomeDirectory();
 
@@ -119,14 +122,13 @@ namespace FXSystem {
   extern FXAPI FXbool localeIsUTF8();
 
   /// Get name of calling executable
-  extern FXAPI FXString getExecutableFilename();
+  extern FXAPI FXString getExecFilename();
 
   /**
   * Get DLL name for given base name; for example "png"
   * becomes "libpng.so" on Linux, and "png.dll" on Windows.
   */
   extern FXAPI FXString dllName(const FXString& name);
-
   }
 
 }

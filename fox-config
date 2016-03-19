@@ -1,6 +1,6 @@
 #! /bin/sh
 
-version="1.7.46"
+version="1.7.47"
 prefix="/usr/local"
 exec_prefix="${prefix}"
 libdir="${exec_prefix}/lib"

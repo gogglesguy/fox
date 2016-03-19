@@ -368,6 +368,9 @@ public:
   /// Set headers from array of strings
   void setHeaders(const FXchar** strings,FXint size=1);
 
+  /// Set headers from array of strings
+  void setHeaders(const FXString* strings,FXint size=1);
+
   /// Set headers from newline separated strings
   void setHeaders(const FXString& strings,FXint size=1);
 
@@ -415,6 +418,9 @@ public:
 
   /// Fill list by appending items from array of strings
   FXint fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
+
+  /// Fill list by appending items from array of strings
+  FXint fillItems(FXFoldingItem* father,const FXString* strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list by appending items from newline separated strings
   FXint fillItems(FXFoldingItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
@@ -556,6 +562,9 @@ public:
 
   /// Extend selection from anchor item to item
   virtual FXbool extendSelection(FXFoldingItem* item,FXbool notify=false);
+
+  /// Select all items
+  virtual FXbool selectAll(FXbool notify=false);
 
   /// Deselect all items
   virtual FXbool killSelection(FXbool notify=false);

@@ -161,14 +161,14 @@ FXbool FXColorWell::canFocus() const { return true; }
 // Into focus chain
 void FXColorWell::setFocus(){
   FXFrame::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   }
 
 
 // Out of focus chain
 void FXColorWell::killFocus(){
   FXFrame::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   }
 
 
@@ -340,7 +340,7 @@ long FXColorWell::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 long FXColorWell::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
   FXDragType types[2]={colorType,textType};
   if(!FXFrame::onBeginDrag(sender,sel,ptr)){
-    beginDrag(types,2);
+    beginDrag(types,ARRAYNUMBER(types));
     setDragCursor(getApp()->getDefaultCursor(DEF_SWATCH_CURSOR));
     }
   return 1;

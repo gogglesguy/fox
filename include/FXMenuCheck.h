@@ -73,7 +73,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Set check state (TRUE, FALSE or MAYBE)
-  void setCheck(FXuchar s=TRUE);
+  void setCheck(FXuchar s=true);
 
   /// Get check state (TRUE, FALSE or MAYBE)
   FXuchar getCheck() const { return check; }

@@ -62,8 +62,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXToolTip) FXToolTipMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXToolTip::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXToolTip::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXToolTip::onPaint),
   FXMAPFUNC(SEL_TIMEOUT,FXToolTip::ID_TIP_SHOW,FXToolTip::onTipShow),
   FXMAPFUNC(SEL_TIMEOUT,FXToolTip::ID_TIP_HIDE,FXToolTip::onTipHide),
   FXMAPFUNC(SEL_COMMAND,FXToolTip::ID_SETSTRINGVALUE,FXToolTip::onCmdSetStringValue),

@@ -62,8 +62,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXTriStateButton) FXTriStateButtonMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXTriStateButton::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXTriStateButton::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXTriStateButton::onPaint),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXTriStateButton::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXTriStateButton::onQueryHelp),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNKNOWN,FXTriStateButton::onUnknown)
@@ -154,7 +154,7 @@ FXint FXTriStateButton::getDefaultHeight(){
 
 // Check the menu button
 long FXTriStateButton::onUnknown(FXObject*,FXSelector,void*){
-  setState(MAYBE);
+  setState(maybe);
   return 1;
   }
 
@@ -163,13 +163,13 @@ long FXTriStateButton::onUnknown(FXObject*,FXSelector,void*){
 long FXTriStateButton::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
   if(FXWindow::onQueryHelp(sender,sel,ptr)) return 1;
   if(flags&FLAG_HELP){
-    if(state==TRUE){
+    if(state==true){
       if(!althelp.empty()){
         sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&althelp);
         return 1;
         }
       }
-    else if(state==MAYBE){
+    else if(state==maybe){
       if(!maybehelp.empty()){
         sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&maybehelp);
         return 1;
@@ -190,13 +190,13 @@ long FXTriStateButton::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 long FXTriStateButton::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
   if(FXWindow::onQueryTip(sender,sel,ptr)) return 1;
   if(flags&FLAG_TIP){
-    if(state==TRUE){
+    if(state==true){
       if(!alttip.empty()){
         sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&alttip);
         return 1;
         }
       }
-    else if(state==MAYBE){
+    else if(state==maybe){
       if(!maybetip.empty()){
         sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&maybetip);
         return 1;
@@ -275,11 +275,11 @@ long FXTriStateButton::onPaint(FXObject*,FXSelector,void* ptr){
     }
 
   // Place text & icon
-  if(state==TRUE && !altlabel.empty()){
+  if(state==true && !altlabel.empty()){
     tw=labelWidth(altlabel);
     th=labelHeight(altlabel);
     }
-  else if(state==MAYBE && !maybelabel.empty()){
+  else if(state==maybe && !maybelabel.empty()){
     tw=labelWidth(maybelabel);
     th=labelHeight(maybelabel);
     }
@@ -287,11 +287,11 @@ long FXTriStateButton::onPaint(FXObject*,FXSelector,void* ptr){
     tw=labelWidth(label);
     th=labelHeight(label);
     }
-  if(state==TRUE && alticon){
+  if(state==true && alticon){
     iw=alticon->getWidth();
     ih=alticon->getHeight();
     }
-  else if(state==MAYBE && maybeicon){
+  else if(state==maybe && maybeicon){
     iw=maybeicon->getWidth();
     ih=maybeicon->getHeight();
     }
@@ -310,10 +310,10 @@ long FXTriStateButton::onPaint(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
 
     // Paint the right icon
-    if(state==TRUE && alticon){
+    if(state==true && alticon){
       dc.drawIcon(alticon,ix,iy);
       }
-    else if(state==MAYBE &&maybeicon){
+    else if(state==maybe &&maybeicon){
       dc.drawIcon(maybeicon,ix,iy);
       }
     else if(icon){
@@ -321,12 +321,12 @@ long FXTriStateButton::onPaint(FXObject*,FXSelector,void* ptr){
       }
 
     // Paint the right text
-    if(state==TRUE && !altlabel.empty()){
+    if(state==true && !altlabel.empty()){
       dc.setFont(font);
       dc.setForeground(textColor);
       drawLabel(dc,altlabel,althotoff,tx,ty,tw,th);
       }
-    else if(state==MAYBE && !maybelabel.empty()){
+    else if(state==maybe && !maybelabel.empty()){
       dc.setFont(font);
       dc.setForeground(textColor);
       drawLabel(dc,maybelabel,-1,tx,ty,tw,th);
@@ -345,10 +345,10 @@ long FXTriStateButton::onPaint(FXObject*,FXSelector,void* ptr){
   else{
 
     // Paint the right icon
-    if(state==TRUE && alticon){
+    if(state==true && alticon){
       dc.drawIconSunken(alticon,ix,iy);
       }
-    else if(state==MAYBE &&maybeicon){
+    else if(state==maybe &&maybeicon){
       dc.drawIconSunken(maybeicon,ix,iy);
       }
     else if(icon){
@@ -356,14 +356,14 @@ long FXTriStateButton::onPaint(FXObject*,FXSelector,void* ptr){
       }
 
     // Paint the right text
-    if(state==TRUE && !altlabel.empty()){
+    if(state==true && !altlabel.empty()){
       dc.setFont(font);
       dc.setForeground(hiliteColor);
       drawLabel(dc,altlabel,althotoff,tx+1,ty+1,tw,th);
       dc.setForeground(shadowColor);
       drawLabel(dc,altlabel,althotoff,tx,ty,tw,th);
       }
-    else if(state==MAYBE && !maybelabel.empty()){
+    else if(state==maybe && !maybelabel.empty()){
       dc.setFont(font);
       dc.setForeground(hiliteColor);
       drawLabel(dc,maybelabel,-1,tx+1,ty+1,tw,th);

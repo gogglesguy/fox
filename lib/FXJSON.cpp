@@ -599,7 +599,7 @@ FXJSON::Error FXJSON::saveMap(const FXVariant& var){
         }
 
       // Write variant
-      if(!saveVariant(var.asMap().data(i))<0) return ErrSave;
+      if(saveVariant(var.asMap().data(i))!=ErrOK) return ErrSave;
 
       // Another item to follow?
       if(--count>0){
@@ -665,7 +665,7 @@ FXJSON::Error FXJSON::saveArray(const FXVariant& var){
     for(FXint i=0; i<var.asArray().no(); ++i){
 
       // Write variant
-      if(!saveVariant(var.asArray().at(i))<0) return ErrSave;
+      if(saveVariant(var.asArray().at(i))!=ErrOK) return ErrSave;
 
       // Another item to follow?
       if(i+1<var.asArray().no()){

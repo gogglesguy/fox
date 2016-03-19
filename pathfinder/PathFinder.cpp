@@ -116,11 +116,6 @@ FXDEFMAP(PathFinderMain) PathFinderMainMap[]={
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_PROPERTIES,PathFinderMain::onCmdProperties),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_BOOKMARK,PathFinderMain::onCmdBookmark),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_UNBOOKMARK,PathFinderMain::onCmdUnBookmark),
-  FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_CLIPBOARD_CUT,PathFinderMain::onCmdClipboardCut),
-  FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_CLIPBOARD_CUT,PathFinderMain::onUpdSelected),
-  FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_CLIPBOARD_COPY,PathFinderMain::onCmdClipboardCopy),
-  FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_CLIPBOARD_COPY,PathFinderMain::onUpdSelected),
-  FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_CLIPBOARD_PASTE,PathFinderMain::onCmdClipboardPaste),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_NEW,PathFinderMain::onCmdNew),
   FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_NEW,PathFinderMain::onUpdNew),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_COPY,PathFinderMain::onCmdCopy),
@@ -237,6 +232,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   rotaterighticon=new FXGIFIcon(getApp(),rotateright);
   quiticon=new FXGIFIcon(getApp(),quit_gif);
   configicon=new FXGIFIcon(getApp(),config_gif);
+  warningicon=new FXGIFIcon(getApp(),warningicon_gif);
 
   // Set application icons for Window Manager
   setIcon(foxbigicon);
@@ -498,13 +494,13 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   new FXButton(toolbar,tr("\tNew Directory\tCreate new directory."),newdiricon,this,ID_NEW,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
-//  new FXButton(toolbar,tr("\tCut\tCut to clipboard."),cuticon,this,ID_CLIPBOARD_CUT,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//  new FXButton(toolbar,tr("\tCopy\tCopy to clipboard."),copyicon,this,ID_CLIPBOARD_COPY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//  new FXButton(toolbar,tr("\tPaste\tPaste from clipboard."),pasteicon,this,ID_CLIPBOARD_PASTE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tCopy\tCopy to clipboard."),copyicon,this,ID_COPY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tMove\tMove file."),moveicon,this,ID_MOVE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tLink\tLink file."),linkicon,this,ID_LINK,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tRename\tRename file."),renameicon,this,ID_RENAME,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tCut\tCut to clipboard."),cuticon,filelist,FXFileList::ID_CUT_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tCopy\tCopy to clipboard."),copyicon,filelist,FXFileList::ID_COPY_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tPaste\tPaste from clipboard."),pasteicon,filelist,FXFileList::ID_PASTE_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tCopy\tCopy file."),copyicon,this,ID_COPY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tMove\tMove file."),moveicon,this,ID_MOVE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tLink\tLink file."),linkicon,this,ID_LINK,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tRename\tRename file."),renameicon,this,ID_RENAME,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
@@ -973,6 +969,12 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
       FXString executable=FXPath::enquote(filelist->getItemPathname(index)) + " &";
       FXTRACE((10,"system(%s)\n",executable.text()));
       system(executable.text());
+/*    
+      FXProcess process;
+      FXString executable=filelist->getItemPathname(index);
+      const FXchar* argvec[]={executable.text(),executable.text(),NULL};
+      process.start(argvec[0],argvec,NULL);
+*/
       }
 
     // If regular file return as the selected file
@@ -1170,8 +1172,8 @@ long PathFinderMain::onFilePopup(FXObject*,FXSelector,void* ptr){
   if(!event->moved){
     FXMenuPane pane(this);
     new FXMenuCommand(&pane,tr("&Up\t\tChange up one level."),upicon,this,ID_UPDIRECTORY);
-//    new FXMenuCommand(&pane,tr("&Back\t\tChange to previous directory."),backicon,this,ID_GO_BACKWARD);
-//    new FXMenuCommand(&pane,tr("&Forward\t\tChange to next directory."),forwicon,this,ID_GO_FORWARD);
+    new FXMenuCommand(&pane,tr("&Back\t\tChange to previous directory."),backicon,this,ID_GO_BACKWARD);
+    new FXMenuCommand(&pane,tr("&Forward\t\tChange to next directory."),forwicon,this,ID_GO_FORWARD);
     new FXMenuCommand(&pane,tr("&Home\t\tChange to home directory."),homeicon,this,ID_GO_HOME);
     new FXMenuCommand(&pane,tr("&Work\t\tChange to current working directory."),workicon,this,ID_GO_WORK);
     new FXMenuSeparator(&pane);
@@ -1359,6 +1361,7 @@ long PathFinderMain::onUpdDiskSpace(FXObject* sender,FXSelector,void*){
   if(FXStat::getTotalDiskSpace(getDirectory(),totalspace) && FXStat::getAvailableDiskSpace(getDirectory(),availspace)){
     FXString space;
     space.format("Free: %.4lgGB / %.4lgGB",1.0E-9*availspace,1.0E-9*totalspace);
+//    space.format("Free: %'llu / %'llu",availspace,totalspace);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SHOW),NULL);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&space);
     return 1;
@@ -1386,15 +1389,15 @@ long PathFinderMain::onUpdStatusline(FXObject* sender,FXSelector,void*){
         info.format(tr("File \"%s\" -> \"%s\"."),filelist->getItemFilename(currentitem).text(),filelist->getItemText(currentitem).section('\t',7).text());
         }
       else{
-        info.format(tr("File \"%s\" [%s] (%lld bytes)."),filelist->getItemFilename(currentitem).text(),filelist->getItemText(currentitem).section('\t',1).text(),filelist->getItemSize(currentitem));
+        info.format(tr("File \"%s\" [%s] (%'lld bytes)."),filelist->getItemFilename(currentitem).text(),filelist->getItemText(currentitem).section('\t',1).text(),filelist->getItemSize(currentitem));
         }
       }
     }
   else if(1<=selectedCount){
-    info.format(tr("Selected %d items (%lld bytes)."),selectedCount,selectedSpace);
+    info.format(tr("Selected %d items (%'lld bytes)."),selectedCount,selectedSpace);
     }
   else{
-    info.format(tr("Total %d items (%lld bytes)."),totalCount,totalSpace);
+    info.format(tr("Total %d items (%'lld bytes)."),totalCount,totalSpace);
     }
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&info);
   return 1;
@@ -1417,21 +1420,6 @@ long PathFinderMain::onCmdNewPathFinder(FXObject*,FXSelector,void*){
   getApp()->reg().write();
   FXString command=FXString::value("%s %s &",pathfindercommand,path.text());
   system(command.text());
-  return 1;
-  }
-
-
-/*******************************************************************************/
-
-long PathFinderMain::onCmdClipboardCut(FXObject*,FXSelector,void*){
-  return 1;
-  }
-
-long PathFinderMain::onCmdClipboardCopy(FXObject*,FXSelector,void*){
-  return 1;
-  }
-
-long PathFinderMain::onCmdClipboardPaste(FXObject*,FXSelector,void*){
   return 1;
   }
 
@@ -1553,39 +1541,34 @@ long PathFinderMain::onCmdRename(FXObject*,FXSelector,void*){
 
 // Delete file or directory
 long PathFinderMain::onCmdDelete(FXObject*,FXSelector,void*){
-/*
-  FXDialogBox deletedialog(this,"Delete File",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE);
-  FXString file;
-  FXHorizontalFrame* buttons=new FXHorizontalFrame(&deletedialog,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0, 0,0,0,0);
-  new FXButton(buttons,"&Cancel",NULL,&deletedialog,FXDialogBox::ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y,0,0,0,0,20,20);
-  new FXButton(buttons,"&OK",NULL,&deletedialog,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
-  new FXHorizontalSeparator(&deletedialog,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
-  FXMatrix *matrix=new FXMatrix(&deletedialog,2,MATRIX_BY_COLUMNS|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
-  new FXLabel(matrix,"Delete files:",NULL,LAYOUT_FILL_X|JUSTIFY_LEFT|LAYOUT_FILL_ROW);
-  FXHorizontalFrame *frame=new FXHorizontalFrame(matrix,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
-  FXList *files=new FXList(frame,5,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y|LIST_MULTIPLESELECT|HSCROLLING_OFF);
-  for(FXint i=0; i<filelist->getNumItems(); i++){
-    if(filelist->isItemSelected(i)){
-      file=filelist->getItemFilename(i);
-      if(file=="..") continue;
-      files->selectItem(files->appendItem(file));
-      }
-    }
-  deletedialog.create();
-  deletedialog.execute();
-*/
-  FXuint answer=FXMessageBox::warning(this,MBOX_YES_NO,tr("Deleting files"),tr("Are you sure you want to delete these files?"));
-  if(answer==MBOX_CLICKED_YES){
-    FXString filetoremove,file;
-    for(FXint i=0; i<filelist->getNumItems(); i++){
-      if(filelist->isItemSelected(i)){
-        file=filelist->getItemFilename(i);
-        if(file=="..") continue;
-        filetoremove=FXPath::absolute(filelist->getDirectory(),file);
-        FXTRACE((10,"filetoremove=%s\n",filetoremove.text()));
-        if(!FXFile::removeFiles(filetoremove,TRUE)){
-          if(MBOX_CLICKED_NO==FXMessageBox::error(this,MBOX_YES_NO,tr("Error Deleting File"),tr("Unable to delete file: %s\nContinue with operation?"),filetoremove.text())){
-            break;
+  FXString *filenamelist=getSelectedFiles();
+  if(filenamelist){
+    FXDialogBox deletedialog(this,tr("Deleting Files"),DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,500,0);
+    FXString filename;
+    FXHorizontalFrame* buttons=new FXHorizontalFrame(&deletedialog,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0,0,0,0,0);
+    new FXButton(buttons,tr("&Delete"),NULL,&deletedialog,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,20,20,2,2);
+    new FXButton(buttons,tr("&Cancel"),NULL,&deletedialog,FXDialogBox::ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,20,20,2,2);
+    new FXHorizontalSeparator(&deletedialog,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
+    FXHorizontalFrame* toppart=new FXHorizontalFrame(&deletedialog,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    new FXLabel(toppart,FXString::null,warningicon,ICON_BEFORE_TEXT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X);
+    FXVerticalFrame *vframe=new FXVerticalFrame(toppart,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
+    new FXLabel(vframe,tr("You're about to delete the following files:"),NULL,LAYOUT_FILL_X|JUSTIFY_LEFT|LAYOUT_FILL_ROW);
+    FXHorizontalFrame *listframe=new FXHorizontalFrame(vframe,LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
+    FXList *list=new FXList(listframe,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y|LIST_MULTIPLESELECT|HSCROLLING_OFF);
+    list->setNumVisible(5);
+    list->fillItems(filenamelist);
+    list->selectAll();
+    delete [] filenamelist;
+    deletedialog.create();
+    if(deletedialog.execute()){
+      for(FXint i=0; i<list->getNumItems(); i++){
+        if(list->isItemSelected(i)){
+          filename=list->getItemText(i);
+          FXTRACE((10,"filetoremove=%s\n",filename.text()));
+          if(!FXFile::removeFiles(filename,true)){
+            if(MBOX_CLICKED_NO==FXMessageBox::error(this,MBOX_YES_NO,tr("Error Deleting File"),tr("Unable to delete file: %s\nContinue with operation?"),filename.text())){
+              break;
+              }
             }
           }
         }
@@ -1626,7 +1609,7 @@ long PathFinderMain::onCmdOpenWith(FXObject*,FXSelector,void*){
     // Spawn child
     if(fork()==0){
       // Close on exec of file descriptor
-      //fcntl(fd,F_SETFD,TRUE);
+      //fcntl(fd,F_SETFD,true);
       // Start command and pass it the filename
       execlp(cmd.text(),cmd.text(),filename.text(),NULL);
 
@@ -2047,10 +2030,10 @@ FXbool PathFinderMain::previewImage(const FXString& filename){
 
       // Switch to preview
       switcher->setCurrent(1);
-      return TRUE;
+      return true;
       }
     }
-  return FALSE;
+  return false;
   }
 
 
@@ -2115,6 +2098,7 @@ PathFinderMain::~PathFinderMain(){
   delete rotaterighticon;
   delete quiticon;
   delete configicon;
+  delete warningicon;
   }
 
 
@@ -2143,7 +2127,7 @@ int main(int argc,char *argv[]){
 
   // On unix, we need to catch SIGCHLD to harvest zombie child processes.
 #ifndef WIN32
-  application.addSignal(SIGCHLD,window,PathFinderMain::ID_HARVEST,TRUE);
+  application.addSignal(SIGCHLD,window,PathFinderMain::ID_HARVEST,true);
 #endif
 
   // Also catch interrupt so we can gracefully terminate

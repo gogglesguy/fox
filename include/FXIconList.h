@@ -401,6 +401,9 @@ public:
   /// Fill list by appending items from array of strings
   FXint fillItems(const FXchar** strings,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
+  /// Fill list by appending items from array of strings
+  FXint fillItems(const FXString* strings,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
+
   /// Fill list by appending items from newline separated strings
   FXint fillItems(const FXString& strings,FXIcon *big=NULL,FXIcon* mini=NULL,FXptr ptr=NULL,FXbool notify=false);
 
@@ -529,6 +532,9 @@ public:
 
   /// Extend selection from anchor index to index
   virtual FXbool extendSelection(FXint index,FXbool notify=false);
+
+  /// Select all items
+  virtual FXbool selectAll(FXbool notify=false);
 
   /// Deselect all items
   virtual FXbool killSelection(FXbool notify=false);

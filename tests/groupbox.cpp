@@ -266,7 +266,7 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
   new FXButton(group1,"Big Fat Wide Button\nComprising\nthree lines",NULL,NULL,0,FRAME_RAISED|FRAME_THICK);
   new FXToggleButton(group1,"C&losed\tTooltip for closed\tHelp for closed","O&pen\nState\tTooltip for open\tHelp for open",folder_closed,folder_open,NULL,0,ICON_BEFORE_TEXT|JUSTIFY_LEFT|FRAME_RAISED|FRAME_THICK);
   FXTriStateButton *tsb=new FXTriStateButton(group1,"False","True","Maybe",folder_closed,folder_open,doc,NULL,0,ICON_BEFORE_TEXT|JUSTIFY_LEFT|FRAME_RAISED|FRAME_THICK);
-  tsb->setState(MAYBE);
+  tsb->setState(maybe);
 
   pop=new FXPopup(this);
 
@@ -360,9 +360,9 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
   new FXCheckButton(vv,"Hilversum 1",NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
   new FXCheckButton(vv,"Hilversum 2",NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
   FXCheckButton *chk1=new FXCheckButton(vv,"One multi-line\nCheckbox Widget",NULL,0,CHECKBUTTON_PLUS|JUSTIFY_LEFT|JUSTIFY_TOP|ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
-  chk1->setCheck(MAYBE);
+  chk1->setCheck(maybe);
   FXCheckButton *chk2=new FXCheckButton(vv,unescape("Ouvres votre fen\\u00EAtre"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_TOP);
-  chk2->setCheck(MAYBE);
+  chk2->setCheck(maybe);
 
   FXSpinner *spinner=new FXSpinner(group3,20,NULL,0,SPIN_NORMAL|FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP);
   spinner->setRange(1,20);
@@ -525,7 +525,7 @@ long GroupWindow::onCmdFileDlgDirectory(FXObject*,FXSelector,void*){
 // Open
 long GroupWindow::onCmdDirDlg(FXObject*,FXSelector,void*){
   FXDirDialog open(this,"Open directory");
-  open.showFiles(TRUE);
+  open.showFiles(true);
   open.setDirectory("/etc/sysconfig/networking");
   if(open.execute()){
     fxmessage("Dir=%s\n",open.getDirectory().text());

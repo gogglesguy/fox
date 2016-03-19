@@ -581,7 +581,7 @@ public:
   * default window.  Finally, when the flag is MAYBE, the default window
   * will revert to the initial default window.
   */
-  virtual void setDefault(FXuchar flag=TRUE);
+  virtual void setDefault(FXuchar flag=true);
 
   /// Find default window among this window's children
   FXWindow* findDefault() const;

@@ -543,10 +543,10 @@ public:
   /// Convert from unsigned long integer
   FXString& fromULong(FXulong number,FXint base=10);
 
-  /// Convert from float
+  /// Convert from float; fmt is 0 (no exponent), 1 (force exponent), or 2 (exponent when needed)
   FXString& fromFloat(FXfloat number,FXint prec=6,FXint fmt=2);
 
-  /// Convert from double
+  /// Convert from double; fmt is 0 (no exponent), 1 (force exponent), or 2 (exponent when needed)
   FXString& fromDouble(FXdouble number,FXint prec=6,FXint fmt=2);
 
   /**

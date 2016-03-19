@@ -59,8 +59,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXStatusLine) FXStatusLineMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXStatusLine::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXStatusLine::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXStatusLine::onPaint),
   FXMAPFUNC(SEL_COMMAND,FXStatusLine::ID_SETSTRINGVALUE,FXStatusLine::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXStatusLine::ID_GETSTRINGVALUE,FXStatusLine::onCmdGetStringValue),
   };

@@ -214,7 +214,7 @@ public:
 
   /// Return number of patterns
   FXint getNumPatterns() const;
-
+  
   /// Allow pattern entry
   void allowPatternEntry(FXbool flag);
 

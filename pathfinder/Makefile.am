@@ -54,6 +54,7 @@ $(top_srcdir)/pathfinder/setdir.gif \
 $(top_srcdir)/pathfinder/sorting.bmp \
 $(top_srcdir)/pathfinder/smallicons.bmp \
 $(top_srcdir)/pathfinder/unmaphost.bmp \
+$(top_srcdir)/pathfinder/warningicon_gif.gif \
 $(top_srcdir)/pathfinder/work.gif
 
 PathFinder_SOURCES =  \

@@ -68,8 +68,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXMenuCaption) FXMenuCaptionMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXMenuCaption::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXMenuCaption::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXMenuCaption::onPaint),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXMenuCaption::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXMenuCaption::onQueryHelp),
   FXMAPFUNC(SEL_COMMAND,FXMenuCaption::ID_SETVALUE,FXMenuCaption::onCmdSetValue),

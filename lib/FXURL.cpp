@@ -346,6 +346,7 @@ FXString FXURL::decode(const FXString& url){
   return result;
   }
 
+/*******************************************************************************/
 
 // Return URL of filename
 FXString FXURL::fileToURL(const FXString& file){
@@ -380,6 +381,37 @@ FXString FXURL::fileFromURL(const FXString& string){
   return FXString::null;
   }
 
+/*******************************************************************************/
+
+// Make URI list from array of filenames
+FXString FXURL::filesToURIList(const FXString* files){
+  FXString result;
+  if(files){
+    FXint n=0;
+    while(!files[n].empty()){
+      result.append(FXURL::fileToURL(files[n++]));
+      result.append("\r\n");
+      }
+    }
+  return result;
+  }
+
+
+// Make array of filenames from URI list
+FXString* FXURL::filesFromURIList(const FXString& urilist){
+  FXString* result=NULL;
+  if(!urilist.empty()){
+    FXint beg,end,n=0;
+    result=new FXString [urilist.contains("\r\n")+2];
+    for(beg=n=0; beg<urilist.length(); beg=end+2){
+      if((end=urilist.find("\r\n",beg))<0) end=urilist.length();
+      result[n++]=FXURL::fileFromURL(urilist.mid(beg,end-beg));
+      }
+    }
+  return result;
+  }
+
+/*******************************************************************************/
 
 // Parse scheme from url
 FXString FXURL::scheme(const FXString& string){

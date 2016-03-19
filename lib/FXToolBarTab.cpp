@@ -61,8 +61,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXToolBarTab) FXToolBarTabMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXToolBarTab::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXToolBarTab::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXToolBarTab::onPaint),
   FXMAPFUNC(SEL_ENTER,0,FXToolBarTab::onEnter),
   FXMAPFUNC(SEL_LEAVE,0,FXToolBarTab::onLeave),
   FXMAPFUNC(SEL_UNGRABBED,0,FXToolBarTab::onUngrabbed),

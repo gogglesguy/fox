@@ -255,7 +255,7 @@ FXint FXCalendarView::getDefaultHeight(){
 // Into focus chain
 void FXCalendarView::setFocus(){
   FXWindow::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   flags&=~FLAG_UPDATE;
   }
 
@@ -263,7 +263,7 @@ void FXCalendarView::setFocus(){
 // Out of focus chain
 void FXCalendarView::killFocus(){
   FXWindow::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   flags|=FLAG_UPDATE;
   }
 

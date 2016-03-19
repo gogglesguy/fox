@@ -5,7 +5,6 @@
 *********************************************************************************
 * Copyright (C) 2012,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
-
 #include "xincs.h"
 #include "fx.h"
 
@@ -69,7 +68,7 @@ FXint QTest::run(){
 
 // Churn cpu for a random while, then return
 void churn(){
-  FXRandom random(FXThread::time()+128628761545);
+  FXRandom random(FXThread::time()+FXLONG(128628761545));
   fxmessage("Churn start th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   while(random.randDouble()<0.999999999){ }
   fxmessage("Churn done  th %p code %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
@@ -78,7 +77,7 @@ void churn(){
 
 // Loop through index range
 void looping(FXint i){
-  FXRandom random(FXThread::time()+128628761545);
+  FXRandom random(FXThread::time()+FXLONG(128628761545));
   fxmessage("Looping %05d begin th %p core %d/%d\n",i,FXThread::current(),FXThread::processor(),FXThread::processors());
   while(random.randDouble()<0.9999999){ }
   fxmessage("Looping %05d finis th %p core %d/%d\n",i,FXThread::current(),FXThread::processor(),FXThread::processors());

@@ -466,7 +466,7 @@ FXbool ImageWindow::loadimage(const FXString& file){
   // Perhaps failed
   if(img==NULL){
     FXMessageBox::error(this,MBOX_OK,"Error Loading Image","Unsupported type: %s",ext.text());
-    return FALSE;
+    return false;
     }
 
   // Load it
@@ -493,7 +493,7 @@ FXbool ImageWindow::loadimage(const FXString& file){
     delete old;
     getApp()->endWaitCursor();
     }
-  return TRUE;
+  return true;
   }
 
 
@@ -508,7 +508,7 @@ FXbool ImageWindow::saveimage(const FXString& file){
     stream.close();
     getApp()->endWaitCursor();
     }
-  return TRUE;
+  return true;
   }
 
 
@@ -636,9 +636,9 @@ long ImageWindow::onCmdMirror(FXObject*,FXSelector sel,void*){
   FXImage* image=imageview->getImage();
   FXASSERT(image);
   switch(FXSELID(sel)){
-    case ID_MIRROR_HOR: image->mirror(TRUE,FALSE); break;
-    case ID_MIRROR_VER: image->mirror(FALSE,TRUE); break;
-    case ID_MIRROR_BOTH: image->mirror(TRUE,TRUE); break;
+    case ID_MIRROR_HOR: image->mirror(true,false); break;
+    case ID_MIRROR_VER: image->mirror(false,true); break;
+    case ID_MIRROR_BOTH: image->mirror(true,true); break;
     }
   imageview->setImage(image);
   return 1;
@@ -719,7 +719,7 @@ void ImageWindow::create(){
   hh=getApp()->reg().readIntEntry("SETTINGS","height",400);
 
   fh=getApp()->reg().readIntEntry("SETTINGS","fileheight",100);
-  fs=getApp()->reg().readIntEntry("SETTINGS","filesshown",TRUE);
+  fs=getApp()->reg().readIntEntry("SETTINGS","filesshown",true);
 
   dir=getApp()->reg().readStringEntry("SETTINGS","directory","~");
   filelist->setDirectory(dir);

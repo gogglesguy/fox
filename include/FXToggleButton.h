@@ -116,7 +116,7 @@ public:
   FXIcon* getAltIcon() const { return alticon; }
 
   /// Change toggled state
-  void setState(FXuchar s=TRUE,FXbool notify=false);
+  void setState(FXuchar s=true,FXbool notify=false);
 
   /// Return toggled state
   FXuchar getState() const { return state; }

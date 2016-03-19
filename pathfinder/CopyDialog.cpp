@@ -43,7 +43,7 @@ CopyDialog::CopyDialog(FXWindow *own,const FXString& name):FXDialogBox(own,name,
   FXMatrix *matrix=new FXMatrix(this,2,MATRIX_BY_COLUMNS|LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
   new FXLabel(matrix,tr("&Old name:"),NULL,LAYOUT_FILL_X|JUSTIFY_LEFT);
   oldname=new FXTextField(matrix,50,NULL,0,TEXTFIELD_ENTER_ONLY|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN);
-  oldname->setEditable(FALSE);
+  oldname->setEditable(false);
   new FXLabel(matrix,tr("&New name:"),NULL,LAYOUT_FILL_X|JUSTIFY_LEFT);
   newname=new FXTextField(matrix,50,this,FXDialogBox::ID_ACCEPT,TEXTFIELD_ENTER_ONLY|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN);
   }

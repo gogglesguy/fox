@@ -99,7 +99,7 @@ FXProcessID FXProcess::id() const {
 // create the security descriptor
 SECURITY_ATTRIBUTES saAttr;
 saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-saAttr.bInheritHandle = TRUE;
+saAttr.bInheritHandle = true;
 saAttr.lpSecurityDescriptor = NULL;
 CreatePipe(  &hStdInRead,  &hStdInWrite, &saAttr, 0);
 CreatePipe( &hStdOutRead, &hStdOutWrite, &saAttr, 0);
@@ -441,7 +441,7 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
       FXnchar *envir=enviroblock(env);
 
       // Create process
-      if(CreateProcessW(uniexec,command,NULL,NULL,TRUE,CREATE_UNICODE_ENVIRONMENT,envir,NULL,&si,&pi)){
+      if(CreateProcessW(uniexec,command,NULL,NULL,true,CREATE_UNICODE_ENVIRONMENT,envir,NULL,&si,&pi)){
         CloseHandle(pi.hThread);
         pid=pi.hProcess;
         result=true;
@@ -489,7 +489,7 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
       FXchar *envir=enviroblock(env);
 
       // Create process
-      if(CreateProcessA(exec,command,NULL,NULL,TRUE,0,envir,NULL,&si,&pi)){
+      if(CreateProcessA(exec,command,NULL,NULL,true,0,envir,NULL,&si,&pi)){
         CloseHandle(pi.hThread);
         pid=pi.hProcess;
         result=true;
@@ -527,6 +527,8 @@ FXbool FXProcess::start(const FXchar* exec,const FXchar *const *args,const FXcha
           while(--fd>STDERR_FILENO){
             close(fd);
             }
+            
+          //setsid();
 
           // Kick off with arguments and environment
           if(env){
@@ -587,7 +589,7 @@ FXbool FXProcess::suspend(){
       if(Thread32First(hThreadSnap,&te32)){
         do{
           if(te32.th32OwnerProcessID==pid){
-            HANDLE hThread=OpenThread(THREAD_SUSPEND_RESUME,FALSE,te32.th32ThreadID);
+            HANDLE hThread=OpenThread(THREAD_SUSPEND_RESUME,false,te32.th32ThreadID);
             if(hThread){
               ResumeThread(hThread);
               CloseHandle(hThread);
@@ -620,7 +622,7 @@ FXbool FXProcess::resume(){
       if(Thread32First(hThreadSnap,&te32)){
         do{
           if(te32.th32OwnerProcessID==pid){
-            HANDLE hThread=OpenThread(THREAD_SUSPEND_RESUME,FALSE,te32.th32ThreadID);
+            HANDLE hThread=OpenThread(THREAD_SUSPEND_RESUME,false,te32.th32ThreadID);
             if(hThread){
               SuspendThread(hThread);
               CloseHandle(hThread);

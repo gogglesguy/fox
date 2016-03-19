@@ -35,6 +35,7 @@
 #include "FXSettings.h"
 #include "FXRegistry.h"
 #include "FXAccelTable.h"
+#include "FXColors.h"
 #include "FXFont.h"
 #include "FXEvent.h"
 #include "FXWindow.h"
@@ -808,7 +809,7 @@ FXTable::FXTable(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x
   borderColor=getApp()->getBorderColor();
   selbackColor=getApp()->getSelbackColor();
   seltextColor=getApp()->getSelforeColor();
-  gridColor=getApp()->getBaseColor();
+  gridColor=makeShadowColor(getApp()->getBackColor());
   stippleColor=FXRGB(255,0,0);
   cellBorderColor=getApp()->getBorderColor();
   cellBorderWidth=2;
@@ -1002,14 +1003,14 @@ FXbool FXTable::canFocus() const { return true; }
 // Into focus chain
 void FXTable::setFocus(){
   FXScrollArea::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   }
 
 
 // Out of focus chain
 void FXTable::killFocus(){
   FXScrollArea::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   acceptInput(true);
   }
 
@@ -2236,7 +2237,7 @@ long FXTable::onCmdCutSel(FXObject*,FXSelector,void*){
       types[2]=csvType;
       types[3]=utf8Type;
       types[4]=utf16Type;
-      if(acquireClipboard(types,5)){
+      if(acquireClipboard(types,ARRAYNUMBER(types))){
         extractText(clipped,selection.fm.row,selection.to.row,selection.fm.col,selection.to.col);
         removeRange(selection.fm.row,selection.to.row,selection.fm.col,selection.to.col,true);
         }
@@ -2258,7 +2259,7 @@ long FXTable::onCmdCopySel(FXObject*,FXSelector,void*){
     types[2]=csvType;
     types[3]=utf8Type;
     types[4]=utf16Type;
-    if(acquireClipboard(types,5)){
+    if(acquireClipboard(types,ARRAYNUMBER(types))){
       extractText(clipped,selection.fm.row,selection.to.row,selection.fm.col,selection.to.col);
       }
     }

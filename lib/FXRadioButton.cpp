@@ -62,8 +62,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXRadioButton) FXRadioButtonMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXRadioButton::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXRadioButton::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXRadioButton::onPaint),
   FXMAPFUNC(SEL_ENTER,0,FXRadioButton::onEnter),
   FXMAPFUNC(SEL_LEAVE,0,FXRadioButton::onLeave),
   FXMAPFUNC(SEL_FOCUSIN,0,FXRadioButton::onFocusIn),
@@ -92,8 +92,8 @@ FXIMPLEMENT(FXRadioButton,FXLabel,FXRadioButtonMap,ARRAYNUMBER(FXRadioButtonMap)
 FXRadioButton::FXRadioButton(){
   radioColor=0;
   diskColor=0;
-  check=FALSE;
-  oldcheck=FALSE;
+  check=false;
+  oldcheck=false;
   }
 
 
@@ -103,8 +103,8 @@ FXRadioButton::FXRadioButton(FXComposite* p,const FXString& text,FXObject* tgt,F
   diskColor=getApp()->getBackColor();
   target=tgt;
   message=sel;
-  check=FALSE;
-  oldcheck=FALSE;
+  check=false;
+  oldcheck=false;
   }
 
 
@@ -147,21 +147,21 @@ void FXRadioButton::setCheck(FXuchar s,FXbool notify){
 
 // Change state to checked
 long FXRadioButton::onCheck(FXObject*,FXSelector,void*){
-  setCheck(TRUE);
+  setCheck(true);
   return 1;
   }
 
 
 // Change state to unchecked
 long FXRadioButton::onUncheck(FXObject*,FXSelector,void*){
-  setCheck(FALSE);
+  setCheck(false);
   return 1;
   }
 
 
 // Change state to indeterminate
 long FXRadioButton::onUnknown(FXObject*,FXSelector,void*){
-  setCheck(MAYBE);
+  setCheck(maybe);
   return 1;
   }
 
@@ -216,7 +216,7 @@ long FXRadioButton::onFocusOut(FXObject* sender,FXSelector sel,void* ptr){
 // Entered button
 long FXRadioButton::onEnter(FXObject* sender,FXSelector sel,void* ptr){
   FXLabel::onEnter(sender,sel,ptr);
-  if(isEnabled() && (flags&FLAG_PRESSED)) setCheck(TRUE);
+  if(isEnabled() && (flags&FLAG_PRESSED)) setCheck(true);
   return 1;
   }
 
@@ -237,7 +237,7 @@ long FXRadioButton::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     grab();
     if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONPRESS,message),ptr)) return 1;
     oldcheck=check;
-    setCheck(TRUE);
+    setCheck(true);
     flags|=FLAG_PRESSED;
     flags&=~FLAG_UPDATE;
     return 1;
@@ -253,7 +253,7 @@ long FXRadioButton::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONRELEASE,message),ptr)) return 1;
     flags|=FLAG_UPDATE;
     flags&=~FLAG_PRESSED;
-    if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)TRUE);
+    if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)true);
     return 1;
     }
   return 0;
@@ -278,7 +278,7 @@ long FXRadioButton::onKeyPress(FXObject*,FXSelector,void* ptr){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
     if(!(flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       oldcheck=check;
-      setCheck(TRUE);
+      setCheck(true);
       flags|=FLAG_PRESSED;
       flags&=~FLAG_UPDATE;
       return 1;
@@ -296,7 +296,7 @@ long FXRadioButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
     if((flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
       flags|=FLAG_UPDATE;
       flags&=~FLAG_PRESSED;
-      if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)TRUE);
+      if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)true);
       return 1;
       }
     }
@@ -310,7 +310,7 @@ long FXRadioButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
   flags&=~FLAG_TIP;
   if(isEnabled() && !(flags&FLAG_PRESSED)){
     oldcheck=check;
-    setCheck(TRUE);
+    setCheck(true);
     flags|=FLAG_PRESSED;
     flags&=~FLAG_UPDATE;
     }
@@ -324,7 +324,7 @@ long FXRadioButton::onHotKeyRelease(FXObject*,FXSelector,void*){
   if(isEnabled() && (flags&FLAG_PRESSED)){
     flags|=FLAG_UPDATE;
     flags&=~FLAG_PRESSED;
-    if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)TRUE);
+    if(check!=oldcheck && target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)true);
     }
   return 1;
   }
@@ -421,7 +421,7 @@ long FXRadioButton::onPaint(FXObject*,FXSelector,void* ptr){
   dc.fillRectangles(recs,6);
 
   // Ball inside
-  if(check!=FALSE){
+  if(check!=false){
     recs[0].x=ix+5; recs[0].y=iy+4; recs[0].w=2; recs[0].h=1;
     recs[1].x=ix+4; recs[1].y=iy+5; recs[1].w=4; recs[1].h=2;
     recs[2].x=ix+5; recs[2].y=iy+7; recs[2].w=2; recs[2].h=1;

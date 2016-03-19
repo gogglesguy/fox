@@ -187,6 +187,12 @@ namespace FXPath {
   * uniquely resolves to the given file name.
   */
   FXString relativize(const FXString& pathlist,const FXString& file);
+
+  /**
+  * Check if the file has an extension from the list of known executable
+  * extensions (Windows)
+  */
+  FXbool hasExecExtension(const FXString& file);
   }
 
 }

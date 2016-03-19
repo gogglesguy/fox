@@ -280,9 +280,9 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
     table->addAccel(MKUINT(KEY_b,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_BIG_ICONS));
     table->addAccel(MKUINT(KEY_s,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_MINI_ICONS));
     table->addAccel(MKUINT(KEY_l,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_DETAILS));
-//    table->addAccel(MKUINT(KEY_c,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_COPY_SEL));
-//    table->addAccel(MKUINT(KEY_x,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_CUT_SEL));
-//    table->addAccel(MKUINT(KEY_v,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_PASTE_SEL));
+    table->addAccel(MKUINT(KEY_c,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_COPY_SEL));
+    table->addAccel(MKUINT(KEY_x,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_CUT_SEL));
+    table->addAccel(MKUINT(KEY_v,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_PASTE_SEL));
     }
 
   // Now use up to 15 bookmarked directories
@@ -743,7 +743,7 @@ long FXFileSelector::onCmdRemove(FXObject*,FXSelector,void*){
 // Sensitize when files are selected
 long FXFileSelector::onUpdSelected(FXObject* sender,FXSelector,void*){
   for(FXint i=0; i<filebox->getNumItems(); i++){
-    if(filebox->isItemSelected(i)){
+    if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
       sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
       return 1;
       }
@@ -896,7 +896,7 @@ FXString FXFileSelector::extensionFromPattern(const FXString& pattern){
 long FXFileSelector::onCmdFilter(FXObject*,FXSelector,void* ptr){
   FXString pat=patternFromText((FXchar*)ptr);
   filebox->setPattern(pat);
-  if(selectmode==SELECTFILE_ANY){
+  if(selectmode!=SELECTFILE_ANY){               // Change extension ONLY if we want existing file or directory
     FXString ext=extensionFromPattern(pat);
     if(!ext.empty()){
       FXString name=FXPath::stripExtension(filename->getText());
@@ -926,10 +926,11 @@ FXString FXFileSelector::getDirectory() const {
 
 // Set file name
 void FXFileSelector::setFilename(const FXString& path){
-  FXString abspath(FXPath::absolute(path));
-  filebox->setCurrentFile(abspath);
+  FXString fullname(FXPath::absolute(path));
+  FXString name(FXPath::name(fullname));
+  filebox->setCurrentFile(fullname);
   dirbox->setDirectory(filebox->getDirectory());
-  filename->setText(FXPath::name(abspath));
+  filename->setText(name);
   }
 
 
@@ -1308,9 +1309,9 @@ FXFileSelector::~FXFileSelector(){
     table->removeAccel(MKUINT(KEY_b,CONTROLMASK));
     table->removeAccel(MKUINT(KEY_s,CONTROLMASK));
     table->removeAccel(MKUINT(KEY_l,CONTROLMASK));
-//    table->removeAccel(MKUINT(KEY_c,CONTROLMASK));
-//    table->removeAccel(MKUINT(KEY_x,CONTROLMASK));
-//    table->removeAccel(MKUINT(KEY_v,CONTROLMASK));
+    table->removeAccel(MKUINT(KEY_c,CONTROLMASK));
+    table->removeAccel(MKUINT(KEY_x,CONTROLMASK));
+    table->removeAccel(MKUINT(KEY_v,CONTROLMASK));
     }
   delete bookmarkmenu;
   delete updiricon;

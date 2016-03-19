@@ -36,6 +36,17 @@ using namespace FX;
 namespace FX {
 
 
+/*
+// Complex square root
+FXComplexf csqrt(const FXComplexf& c) const {
+  register FXfloat mag=c.modulus();
+  register FXfloat rr=sqrt((mag+c.re)*0.5f);
+  register FXfloat ii=sqrt((mag-c.re)*0.5f);
+  return FXComplexf(rr,copysignf(ii,c.im));
+  }
+*/
+  
+  
 FXStream& operator<<(FXStream& store,const FXComplexf& c){
   store << c.re << c.im;
   return store;

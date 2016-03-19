@@ -518,14 +518,14 @@ FXbool FXFoldingList::canFocus() const { return true; }
 // Into focus chain
 void FXFoldingList::setFocus(){
   FXScrollArea::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   }
 
 
 // Out of focus chain
 void FXFoldingList::killFocus(){
   FXScrollArea::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   }
 
 
@@ -661,6 +661,13 @@ long FXFoldingList::onChgHeader(FXObject*,FXSelector,void*){
 
 // Set headers from array of strings
 void FXFoldingList::setHeaders(const FXchar** strings,FXint size){
+  header->clearItems();
+  header->fillItems(strings,NULL,size);
+  }
+
+
+// Set headers from array of strings
+void FXFoldingList::setHeaders(const FXString* strings,FXint size){
   header->clearItems();
   header->fillItems(strings,NULL,size);
   }
@@ -1119,6 +1126,23 @@ FXbool FXFoldingList::extendSelection(FXFoldingItem* item,FXbool notify){
         }
       }
     extentitem=item;
+    }
+  return changes;
+  }
+
+
+// Select all items
+FXbool FXFoldingList::selectAll(FXbool notify){
+  register FXFoldingItem *item=firstitem;
+  register FXbool changes=false;
+  while(item){
+    if(!item->isSelected()){
+      item->setSelected(true);
+      updateItem(item);
+      changes=true;
+      if(notify && target){target->tryHandle(this,FXSEL(SEL_SELECTED,message),(void*)item);}
+      }
+    item=item->getBelow();
     }
   return changes;
   }
@@ -2345,6 +2369,18 @@ FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXchar** strings,FXIc
   register FXint n=0;
   if(strings){
     while(strings[n]){
+      appendItem(father,strings[n++],oi,ci,ptr,notify);
+      }
+    }
+  return n;
+  }
+
+
+// Fill list by appending items from array of strings
+FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXString* strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
+  register FXint n=0;
+  if(strings){
+    while(!strings[n].empty()){
       appendItem(father,strings[n++],oi,ci,ptr,notify);
       }
     }

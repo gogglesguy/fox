@@ -433,7 +433,7 @@ FXbool BitmapWindow::loadimage(const FXString& file){
   tif=TIFFOpen(file.text(),"r");
   if(tif==NULL){
     FXMessageBox::error(this,MBOX_OK,"Error Loading Bitmap","Not a tiff file");
-    return FALSE;
+    return false;
     }
   TIFFGetFieldDefaulted(tif,TIFFTAG_IMAGELENGTH,&iheight);
   TIFFGetFieldDefaulted(tif,TIFFTAG_IMAGEWIDTH,&iwidth);
@@ -444,7 +444,7 @@ FXbool BitmapWindow::loadimage(const FXString& file){
   if(bps!=1 || spp!=1){
     TIFFClose(tif);
     FXMessageBox::error(this,MBOX_OK,"Error Loading Bitmap","SPP = %hd, BPS = %hd",spp,bps);
-    return FALSE;
+    return false;
     }
   scanline=TIFFScanlineSize(tif);
   size=iheight*scanline;
@@ -464,7 +464,7 @@ FXbool BitmapWindow::loadimage(const FXString& file){
   // Perhaps failed
   if(img==NULL){
     FXMessageBox::error(this,MBOX_OK,"Error Loading Bitmap","Unsupported type: %s",FXPath::extension(file).text());
-    return FALSE;
+    return false;
     }
 
   img->create();
@@ -472,7 +472,7 @@ FXbool BitmapWindow::loadimage(const FXString& file){
   bitmapview->setBitmap(img);
   delete old;
 #endif
-  return TRUE;
+  return true;
   }
 
 
@@ -512,7 +512,7 @@ FXbool BitmapWindow::saveimage(const FXString& file){
   TIFFClose(tif);
   freeElms(pixels);
 #endif
-  return TRUE;
+  return true;
   }
 
 
@@ -640,9 +640,9 @@ long BitmapWindow::onCmdMirror(FXObject*,FXSelector sel,void*){
   FXBitmap* bitmap=bitmapview->getBitmap();
   FXASSERT(bitmap);
   switch(FXSELID(sel)){
-    case ID_MIRROR_HOR: bitmap->mirror(TRUE,FALSE); break;
-    case ID_MIRROR_VER: bitmap->mirror(FALSE,TRUE); break;
-    case ID_MIRROR_BOTH: bitmap->mirror(TRUE,TRUE); break;
+    case ID_MIRROR_HOR: bitmap->mirror(true,false); break;
+    case ID_MIRROR_VER: bitmap->mirror(false,true); break;
+    case ID_MIRROR_BOTH: bitmap->mirror(true,true); break;
     }
   bitmapview->setBitmap(bitmap);
   return 1;
@@ -717,7 +717,7 @@ void BitmapWindow::create(){
   hh=getApp()->reg().readIntEntry("SETTINGS","height",400);
 
   fh=getApp()->reg().readIntEntry("SETTINGS","fileheight",100);
-  fs=getApp()->reg().readIntEntry("SETTINGS","filesshown",TRUE);
+  fs=getApp()->reg().readIntEntry("SETTINGS","filesshown",true);
 
   dir=getApp()->reg().readStringEntry("SETTINGS","directory","~");
   filelist->setDirectory(dir);

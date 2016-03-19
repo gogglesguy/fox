@@ -282,6 +282,9 @@ public:
   /// Fill header by appending items from array of strings
   FXint fillItems(const FXchar** strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 
+  /// Fill header by appending items from array of strings
+  FXint fillItems(const FXString* strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
+
   /// Fill header by appending items from newline separated strings
   FXint fillItems(const FXString& strings,FXIcon *icon=NULL,FXint size=0,void* ptr=NULL,FXbool notify=false);
 

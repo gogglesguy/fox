@@ -383,6 +383,19 @@ FXint FXListBox::fillItems(const FXchar** strings,FXIcon* icon,FXptr ptr,FXbool 
   }
 
 
+// Fill list by appending items from array of strings
+FXint FXListBox::fillItems(const FXString* strings,FXIcon* icon,FXptr ptr,FXbool notify){
+  register FXint numberofitems=list->getNumItems();
+  register FXint n=list->fillItems(strings,icon,ptr,notify);
+  if(numberofitems<=list->getCurrentItem()){
+    field->setIcon(list->getItemIcon(list->getCurrentItem()));
+    field->setText(list->getItemText(list->getCurrentItem()));
+    }
+  recalc();
+  return n;
+  }
+
+
 // Fill list by appending items from newline separated strings
 FXint FXListBox::fillItems(const FXString& strings,FXIcon* icon,FXptr ptr,FXbool notify){
   register FXint numberofitems=list->getNumItems();

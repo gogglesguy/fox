@@ -55,8 +55,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXCheckButton) FXCheckButtonMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXCheckButton::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXCheckButton::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXCheckButton::onPaint),
   FXMAPFUNC(SEL_ENTER,0,FXCheckButton::onEnter),
   FXMAPFUNC(SEL_LEAVE,0,FXCheckButton::onLeave),
   FXMAPFUNC(SEL_FOCUSIN,0,FXCheckButton::onFocusIn),
@@ -86,8 +86,8 @@ FXIMPLEMENT(FXCheckButton,FXLabel,FXCheckButtonMap,ARRAYNUMBER(FXCheckButtonMap)
 FXCheckButton::FXCheckButton(){
   checkColor=0;
   boxColor=0;
-  check=FALSE;
-  oldcheck=FALSE;
+  check=false;
+  oldcheck=false;
   }
 
 
@@ -97,8 +97,8 @@ FXCheckButton::FXCheckButton(FXComposite* p,const FXString& text,FXObject* tgt,F
   boxColor=getApp()->getBackColor();
   target=tgt;
   message=sel;
-  check=FALSE;
-  oldcheck=FALSE;
+  check=false;
+  oldcheck=false;
   }
 
 
@@ -141,21 +141,21 @@ void FXCheckButton::setCheck(FXuchar state,FXbool notify){
 
 // Change state to checked
 long FXCheckButton::onCheck(FXObject*,FXSelector,void*){
-  setCheck(TRUE);
+  setCheck(true);
   return 1;
   }
 
 
 // Change state to unchecked
 long FXCheckButton::onUncheck(FXObject*,FXSelector,void*){
-  setCheck(FALSE);
+  setCheck(false);
   return 1;
   }
 
 
 // Change state to indeterminate
 long FXCheckButton::onUnknown(FXObject*,FXSelector,void*){
-  setCheck(MAYBE);
+  setCheck(maybe);
   return 1;
   }
 
@@ -344,7 +344,7 @@ long FXCheckButton::onPaint(FXObject*,FXSelector,void* ptr){
   dc.fillRectangle(ev->rect.x,ev->rect.y,ev->rect.w,ev->rect.h);
 
   // Check background
-  if(check==MAYBE || !isEnabled())
+  if(check==maybe || !isEnabled())
     dc.setForeground(baseColor);
   else
     dc.setForeground(boxColor);
@@ -371,14 +371,14 @@ long FXCheckButton::onPaint(FXObject*,FXSelector,void* ptr){
     }
 
   // Check color
-  if(check==MAYBE || !isEnabled())
+  if(check==maybe || !isEnabled())
     dc.setForeground(shadowColor);
   else
     dc.setForeground(checkColor);
 
   // Show as +
   if(options&CHECKBUTTON_PLUS){
-    if(check!=TRUE){
+    if(check!=true){
       dc.fillRectangle(ix+6,iy+4,1,5);
       }
     dc.fillRectangle(ix+4,iy+6,5,1);
@@ -386,7 +386,7 @@ long FXCheckButton::onPaint(FXObject*,FXSelector,void* ptr){
 
   // Show as v
   else{
-    if(check!=FALSE){
+    if(check!=false){
       FXSegment seg[6];
 #ifdef WIN32
       seg[0].x1=3+ix; seg[0].y1=5+iy; seg[0].x2=5+ix; seg[0].y2=7+iy;

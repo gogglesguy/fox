@@ -400,14 +400,14 @@ FXbool FXList::canFocus() const { return true; }
 // Into focus chain
 void FXList::setFocus(){
   FXScrollArea::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   }
 
 
 // Out of focus chain
 void FXList::killFocus(){
   FXScrollArea::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   }
 
 
@@ -751,8 +751,8 @@ FXbool FXList::toggleItem(FXint index,FXbool notify){
 // Extend selection
 FXbool FXList::extendSelection(FXint index,FXbool notify){
   register FXbool changes=false;
-  FXint i1,i2,i3,i;
   if(0<=index && 0<=anchor && 0<=extent){
+    register FXint i1,i2,i3,i;
 
     // Find segments
     i1=index;
@@ -819,11 +819,25 @@ FXbool FXList::extendSelection(FXint index,FXbool notify){
   }
 
 
+// Select all items
+FXbool FXList::selectAll(FXbool notify){
+  register FXbool changes=false;
+  for(FXint i=0; i<items.no(); i++){
+    if(!items[i]->isSelected()){
+      items[i]->setSelected(true);
+      updateItem(i);
+      changes=true;
+      if(notify && target){target->tryHandle(this,FXSEL(SEL_SELECTED,message),(void*)(FXival)i);}
+      }
+    }
+  return changes;
+  }
+
+
 // Kill selection
 FXbool FXList::killSelection(FXbool notify){
   register FXbool changes=false;
-  register FXint i;
-  for(i=0; i<items.no(); i++){
+  for(FXint i=0; i<items.no(); i++){
     if(items[i]->isSelected()){
       items[i]->setSelected(false);
       updateItem(i);
@@ -1679,6 +1693,18 @@ FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,FXptr ptr,FXbool not
   register FXint n=0;
   if(strings){
     while(strings[n]){
+      appendItem(strings[n++],icon,ptr,notify);
+      }
+    }
+  return n;
+  }
+
+
+// Fill list by appending items from array of strings
+FXint FXList::fillItems(const FXString* strings,FXIcon *icon,FXptr ptr,FXbool notify){
+  register FXint n=0;
+  if(strings){
+    while(!strings[n].empty()){
       appendItem(strings[n++],icon,ptr,notify);
       }
     }

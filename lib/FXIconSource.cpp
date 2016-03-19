@@ -127,7 +127,7 @@ FXImage* FXIconSource::scaleToSize(FXImage *image,FXint size,FXint qual) const {
 // Create icon from file type
 FXIcon *FXIconSource::iconFromType(FXApp* app,const FXString& type) const {
   if(comparecase(FXBMPIcon::fileExt,type)==0){
-    return new FXBMPIcon(app);
+    return new FXBMPIcon(app,NULL,0,IMAGE_ALPHAGUESS);
     }
   if(comparecase(FXGIFIcon::fileExt,type)==0){
     return new FXGIFIcon(app);
@@ -265,7 +265,7 @@ FXImage *FXIconSource::imageFromType(FXApp* app,const FXString& type) const {
 // Determine icon type from first header bytes in stream
 FXIcon *FXIconSource::iconFromStream(FXApp* app,FXStream& store) const {
   if(fxcheckBMP(store)){
-    return new FXBMPIcon(app);
+    return new FXBMPIcon(app,NULL,0,IMAGE_ALPHAGUESS);
     }
   if(fxcheckGIF(store)){
     return new FXGIFIcon(app);

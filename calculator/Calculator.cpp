@@ -28,6 +28,7 @@
 #include <unistd.h>
 #endif
 #include <ctype.h>
+#include <math.h>
 #include "icons.h"
 #include "Calculator.h"
 #include "Preferences.h"
@@ -377,7 +378,7 @@ Calculator::Calculator(FXApp* a):FXMainWindow(a,"FOX Calculator",NULL,NULL,DECOR
   angles=ANG_RAD;
   precision=16;
   exponent=EXPONENT_IFNEEDED;
-  beep=TRUE;
+  beep=true;
   parens=0;
   modifiers=0;
   }
@@ -668,7 +669,7 @@ void Calculator::readRegistry(){
   FXint prec=getApp()->reg().readIntEntry("SETTINGS","precision",10);
 
   // Beep
-  FXbool noise=getApp()->reg().readIntEntry("SETTINGS","beep",TRUE);
+  FXbool noise=getApp()->reg().readIntEntry("SETTINGS","beep",true);
 
   // Memory cell
   recall=getApp()->reg().readRealEntry("SETTINGS","memory",0.0);
@@ -803,7 +804,7 @@ void Calculator::setDisplayValue(FXdouble val){
     setDisplayText(string.fromDouble(val,precision,exponent));
     }
   else{
-    setDisplayText(string.fromLong((FXlong)round(val),base));
+    setDisplayText(string.fromLong((FXlong)((0.0<=val)?val+0.5:val-0.5),base));
     }
   }
 

@@ -39,27 +39,6 @@ public:
   /// Construct text codec
   FXTextCodec(){}
 
-
-  /// Convert utf8 to single wide character
-  static FXint utf2wc(FXwchar& wc,const FXchar* src,FXint nsrc);
-
-  /// Convert utf16 to single wide character
-  static FXint utf2wc(FXwchar& wc,const FXnchar* src,FXint nsrc);
-
-  /// Convert utf32 to single wide character
-  static FXint utf2wc(FXwchar& wc,const FXwchar* src,FXint nsrc);
-
-
-  /// Convert single wide character to utf8
-  static FXint wc2utf(FXchar* dst,FXint ndst,FXwchar wc);
-
-  /// Convert single wide character to utf16
-  static FXint wc2utf(FXnchar* dst,FXint ndst,FXwchar wc);
-
-  /// Convert single wide character to utf32
-  static FXint wc2utf(FXwchar* dst,FXint ndst,FXwchar wc);
-
-
   /// Count utf8 bytes needed to convert multi-byte characters from src
   virtual FXint mb2utflen(const FXchar* src,FXint nsrc) const;
 

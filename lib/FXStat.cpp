@@ -26,6 +26,7 @@
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
+#include "FXPath.h"
 #include "FXStat.h"
 #include "FXFile.h"
 
@@ -218,8 +219,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
-// FIXME some other way to determine if its an executable??
-        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
+        if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -243,7 +243,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
-        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
+        if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -317,7 +317,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
-        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
+        if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -341,7 +341,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) info.modeFlags|=FXIO::Hidden;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~FXIO::AllWrite;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory|FXIO::AllWrite; else info.modeFlags|=FXIO::File;     // Directories (folders) always writable on Windows
-        if(::SHGetFileInfo(file.text(),0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~FXIO::AllExec;
+        if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)) info.modeFlags&=~FXIO::AllExec;
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -509,17 +509,21 @@ FXbool FXStat::mode(const FXString& file,FXuint perm){
 
 // Return true if file exists
 FXbool FXStat::exists(const FXString& file){
+  FXTRACE((100,"FXStat::exists(\"%s\"\n",file.text()));
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
+    FXTRACE((100,"FXStat::exists: %d\n",(::GetFileAttributesW(unifile)!=INVALID_FILE_ATTRIBUTES)));
     return ::GetFileAttributesW(unifile)!=INVALID_FILE_ATTRIBUTES;
 #else
+    FXTRACE((100,"FXStat::exists: %d\n",(::GetFileAttributesA(file.text())!=INVALID_FILE_ATTRIBUTES)));
     return ::GetFileAttributesA(file.text())!=INVALID_FILE_ATTRIBUTES;
 #endif
 #else
     struct stat status;
+    FXTRACE((100,"FXStat::exists: %d\n",(::stat(file.text(),&status)==0)));
     return ::stat(file.text(),&status)==0;
 #endif
     }

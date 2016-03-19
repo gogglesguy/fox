@@ -45,6 +45,10 @@
 
 namespace FX {
 
+const FXnchar BOM_BE=0xFEFF;
+const FXnchar BOM_LE=0xFFFE;
+
+
 FXIMPLEMENT(FXUTF16BECodec,FXTextCodec,NULL,0)
 
 
@@ -52,12 +56,12 @@ FXIMPLEMENT(FXUTF16BECodec,FXTextCodec,NULL,0)
 FXint FXUTF16BECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   const FXint SURROGATE_OFFSET=0x10000-(0xD800<<10)-0xDC00;
   register FXwchar w;
-  if(nsrc<2) return -2;
+  if(nsrc<2) return 0;
   wc=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
-  if(0xD800<=wc && wc<0xDC00){
-    if(nsrc<2) return -2;
+  if(__unlikely(FXISLEADUTF16(wc))){
+    if(nsrc<4) return 0;
     w=(((FXuchar)src[2])<<8)|((FXuchar)src[3]);
-    if(w<0xDC00 || 0xE000<=w) return 0;
+    if(__unlikely(!FXISFOLLOWUTF16(w))) return 0;
     wc=(wc<<10)+w+SURROGATE_OFFSET;
     return 4;
     }
@@ -68,17 +72,18 @@ FXint FXUTF16BECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
 // Convert to utf16be
 FXint FXUTF16BECodec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   const FXint LEAD_OFFSET=0xD800-(0x10000>>10);
+  const FXint TAIL_OFFSET=0xDC00;
   register FXwchar w;
+  if(ndst<2) return 0;
   if(0xD800<=wc && wc<0xE000) return 0;
-  if(ndst<2) return -2;
   dst[0]=(FXchar)(wc>>8);
   dst[1]=(FXchar)(wc);
-  if(0xFFFF<wc){
-    if(ndst<4) return -4;
+  if(__unlikely(0xFFFF<wc)){
+    if(ndst<4) return 0;
     w=(wc>>10)+LEAD_OFFSET;
     dst[0]=(FXchar)(w>>8);
     dst[1]=(FXchar)(w);
-    w=(wc&0x3FF)+0xDC00;
+    w=(wc&0x3FF)+TAIL_OFFSET;
     dst[2]=(FXchar)(w>>8);
     dst[3]=(FXchar)(w);
     return 4;
@@ -121,12 +126,12 @@ FXIMPLEMENT(FXUTF16LECodec,FXTextCodec,NULL,0)
 FXint FXUTF16LECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   const FXint SURROGATE_OFFSET=0x10000-(0xD800<<10)-0xDC00;
   register FXwchar w;
-  if(nsrc<2) return -2;
+  if(nsrc<2) return 0;
   wc=(((FXuchar)src[1])<<8)|((FXuchar)src[0]);
-  if(0xD800<=wc && wc<0xDC00){
-    if(nsrc<2) return -2;
+  if(__unlikely(FXISLEADUTF16(wc))){
+    if(nsrc<4) return 0;
     w=(((FXuchar)src[3])<<8)|((FXuchar)src[2]);
-    if(w<0xDC00 || 0xE000<=w) return 0;
+    if(__unlikely(!FXISFOLLOWUTF16(w))) return 0;
     wc=(wc<<10)+w+SURROGATE_OFFSET;
     return 4;
     }
@@ -137,17 +142,18 @@ FXint FXUTF16LECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
 // Convert to utf16le
 FXint FXUTF16LECodec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   const FXint LEAD_OFFSET=0xD800-(0x10000>>10);
+  const FXint TAIL_OFFSET=0xDC00;
   register FXwchar w;
+  if(ndst<2) return 0;
   if(0xD800<=wc && wc<0xE000) return 0;
-  if(ndst<2) return -2;
   dst[0]=(FXchar)(wc);
   dst[1]=(FXchar)(wc>>8);
   if(0xFFFF<wc){
-    if(ndst<4) return -4;
+    if(ndst<4) return 0;
     w=(wc>>10)+LEAD_OFFSET;
     dst[0]=(FXchar)(w);
     dst[1]=(FXchar)(w>>8);
-    w=(wc&0x3FF)+0xDC00;
+    w=(wc&0x3FF)+TAIL_OFFSET;
     dst[2]=(FXchar)(w);
     dst[3]=(FXchar)(w>>8);
     return 4;
@@ -190,51 +196,40 @@ FXint FXUTF16Codec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   const FXint SURROGATE_OFFSET=0x10000-(0xD800<<10)-0xDC00;
   register const FXuchar *s=(const FXuchar*)src;
   register FXwchar w;
-  if(nsrc<2) return -2;
+  if(nsrc<2) return 0;
   wc=(s[0]<<8)|s[1];
-  if(wc==0xFEFF){
-    if(nsrc<4) return -4;
+  if(wc==BOM_BE){
+    if(nsrc<4) return 0;
     wc=(s[2]<<8)|s[3];
-    if(0xD800<=wc && wc<0xDC00){
-      if(nsrc<6) return -6;
+    if(__unlikely(FXISLEADUTF16(wc))){
+      if(nsrc<6) return 0;
       w=(s[4]<<8)|s[5];
-      if(w<0xDC00 || 0xE000<=w) return 0;
+      if(__unlikely(!FXISFOLLOWUTF16(w))) return 0;
       wc=(wc<<10)+w+SURROGATE_OFFSET;
       return 6;
       }
     return 4;
     }
-  if(wc==0xFFFE){
-    if(nsrc<4) return -4;
+  if(wc==BOM_LE){
+    if(nsrc<4) return 0;
     wc=(s[3]<<8)|s[2];
-    if(0xD800<=wc && wc<0xDC00){
-      if(nsrc<6) return -6;
+    if(__unlikely(FXISLEADUTF16(wc))){
+      if(nsrc<6) return 0;
       w=(s[5]<<8)|s[4];
-      if(w<0xDC00 || 0xE000<=w) return 0;
+      if(__unlikely(!FXISFOLLOWUTF16(w))) return 0;
       wc=(wc<<10)+w+SURROGATE_OFFSET;
       return 6;
       }
     return 4;
     }
-  if(0xD800<=wc && wc<0xDC00){
-    if(nsrc<4) return -4;
+  if(__unlikely(FXISLEADUTF16(wc))){
+    if(nsrc<4) return 0;
     w=(s[2]<<8)|s[3];
-    if(w<0xDC00 || 0xE000<=w) return 0;
+    if(__unlikely(!FXISFOLLOWUTF16(w))) return 0;
     wc=(wc<<10)+w+SURROGATE_OFFSET;
     return 4;
     }
   return 2;
-  }
-
-
-// Number of bytes for wide character
-static inline FXint utflen(FXwchar w){
-  if(w<0x80) return 1;
-  if(w<0x800) return 2;
-  if(w<0x10000) return 3;
-  if(w<0x200000) return 4;
-  if(w<0x4000000) return 5;
-  return 6;
   }
 
 
@@ -246,8 +241,8 @@ FXint FXUTF16Codec::mb2utflen(const FXchar* src,FXint nsrc) const {
   if(src && 0<nsrc){
     if(nsrc<2) return -2;
     w=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
-    if(w!=0xFFFE){              // Big-endian (default)
-      if(w==0xFEFF){
+    if(w!=BOM_LE){              // Big-endian (default)
+      if(w==BOM_BE){
         src+=2;
         nsrc-=2;
         }
@@ -256,15 +251,15 @@ FXint FXUTF16Codec::mb2utflen(const FXchar* src,FXint nsrc) const {
         w=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
         src+=2;
         nsrc-=2;
-        if(0xD800<=w && w<0xDC00){
+        if(__unlikely(FXISLEADUTF16(w))){
           if(nsrc<2) return -2;
           v=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
-          if(v<0xDC00 || 0xE000<=v) return 0;
+          if(__unlikely(!FXISFOLLOWUTF16(v))) return 0;
           w=(w<<10)+v+SURROGATE_OFFSET;
           src+=2;
           nsrc-=2;
           }
-        len+=utflen(w);
+        len+=FX::wc2utf(w);
         }
       }
     else{                       // Little-endian
@@ -275,15 +270,15 @@ FXint FXUTF16Codec::mb2utflen(const FXchar* src,FXint nsrc) const {
         w=(((FXuchar)src[1])<<8)|((FXuchar)src[0]);
         src+=2;
         nsrc-=2;
-        if(0xD800<=w && w<0xDC00){
+        if(__unlikely(FXISLEADUTF16(w))){
           if(nsrc<2) return -2;
           v=(((FXuchar)src[1])<<8)|((FXuchar)src[0]);
-          if(v<0xDC00 || 0xE000<=v) return 0;
+          if(__unlikely(!FXISFOLLOWUTF16(v))) return 0;
           w=(w<<10)+v+SURROGATE_OFFSET;
           src+=2;
           nsrc-=2;
           }
-        len+=utflen(w);
+        len+=FX::wc2utf(w);
         }
       }
     }
@@ -299,8 +294,8 @@ FXint FXUTF16Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
   if(dst && src && 0<nsrc){
     if(nsrc<2) return -2;
     w=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
-    if(w!=0xFFFE){              // Big-endian (default)
-      if(w==0xFEFF){
+    if(w!=BOM_LE){              // Big-endian (default)
+      if(w==BOM_BE){
         src+=2;
         nsrc-=2;
         }
@@ -309,16 +304,16 @@ FXint FXUTF16Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
         w=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
         src+=2;
         nsrc-=2;
-        if(0xD800<=w && w<0xDC00){
+        if(__unlikely(FXISLEADUTF16(w))){
           if(nsrc<2) return -2;
           v=(((FXuchar)src[0])<<8)|((FXuchar)src[1]);
-          if(v<0xDC00 || 0xE000<=v) return 0;
+          if(__unlikely(!FXISFOLLOWUTF16(v))) return 0;
           w=(w<<10)+v+SURROGATE_OFFSET;
           src+=2;
           nsrc-=2;
           }
-        nw=wc2utf(dst,ndst,w);
-        if(nw<=0) return nw;
+        if(FX::wc2utf(w)>ndst) break;
+        nw=wc2utf(dst,w);
         len+=nw;
         dst+=nw;
         ndst-=nw;
@@ -332,16 +327,16 @@ FXint FXUTF16Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
         w=(((FXuchar)src[1])<<8)|((FXuchar)src[0]);
         src+=2;
         nsrc-=2;
-        if(0xD800<=w && w<0xDC00){
+        if(__unlikely(FXISLEADUTF16(w))){
           if(nsrc<2) return -2;
           v=(((FXuchar)src[1])<<8)|((FXuchar)src[0]);
-          if(v<0xDC00 || 0xE000<=v) return 0;
+          if(__unlikely(!FXISFOLLOWUTF16(v))) return 0;
           w=(w<<10)+v+SURROGATE_OFFSET;
           src+=2;
           nsrc-=2;
           }
-        nw=wc2utf(dst,ndst,w);
-        if(nw<=0) return nw;
+        if(FX::wc2utf(w)>ndst) break;
+        nw=wc2utf(dst,w);
         len+=nw;
         dst+=nw;
         ndst-=nw;
@@ -355,6 +350,7 @@ FXint FXUTF16Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
 // Convert to utf16
 FXint FXUTF16Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   const FXint LEAD_OFFSET=0xD800-(0x10000>>10);
+  const FXint TAIL_OFFSET=0xDC00;
   register FXwchar w;
   if(0xD800<=wc && wc<0xE000) return 0;
   if(ndst<2) return -2;
@@ -365,7 +361,7 @@ FXint FXUTF16Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
     w=(wc>>10)+LEAD_OFFSET;
     dst[0]=(FXchar)(w>>8);
     dst[1]=(FXchar)(w);
-    w=(wc&0x3FF)+0xDC00;
+    w=(wc&0x3FF)+TAIL_OFFSET;
     dst[2]=(FXchar)(w>>8);
     dst[3]=(FXchar)(w);
     return 4;
@@ -380,13 +376,13 @@ FXint FXUTF16Codec::utf2mblen(const FXchar* src,FXint nsrc) const {
   FXchar buffer[64];
   FXwchar w;
   if(src && 0<nsrc){
-    len+=2;
+    len+=2;             // BOM
     while(0<nsrc){
-      nr=utf2wc(w,src,nsrc);
-      if(nr<=0) return nr;
+      nr=FX::wclen(src);
+      if(nr>nsrc) break;
+      len+=wc2mb(buffer,sizeof(buffer),w);
       src+=nr;
       nsrc-=nr;
-      len+=wc2mb(buffer,sizeof(buffer),w);
       }
     }
   return len;
@@ -403,12 +399,12 @@ FXint FXUTF16Codec::utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
     dst+=2;
     len+=2;
     while(0<nsrc){
-      nr=utf2wc(w,src,nsrc);
-      if(nr<=0) return nr;
-      src+=nr;
-      nsrc-=nr;
+      nr=FX::wclen(src);
+      if(nr>nsrc) break;
       nw=wc2mb(dst,ndst,w);
       if(nw<=0) return nw;
+      src+=nr;
+      nsrc-=nr;
       len+=nw;
       dst+=nw;
       ndst-=nw;

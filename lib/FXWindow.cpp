@@ -1097,21 +1097,21 @@ FXbool FXWindow::isDefault() const {
 void FXWindow::setDefault(FXuchar flag){
   register FXWindow *win;
   switch(flag){
-    case FALSE:
+    case false:
       flags&=~FLAG_DEFAULT;
       break;
-    case TRUE:
+    case true:
       if(!(flags&FLAG_DEFAULT)){
         win=getShell()->findDefault();
-        if(win) win->setDefault(FALSE);
+        if(win) win->setDefault(false);
         flags|=FLAG_DEFAULT;
         }
       break;
-    case MAYBE:
+    case maybe:
       if(flags&FLAG_DEFAULT){
         flags&=~FLAG_DEFAULT;
         win=getShell()->findInitial();
-        if(win) win->setDefault(TRUE);
+        if(win) win->setDefault(true);
         }
       break;
     }
@@ -1147,7 +1147,7 @@ void FXWindow::setInitial(FXbool flag){
     }
   if(!(flags&FLAG_INITIAL) && flag){
     win=getShell()->findInitial();
-    if(win) win->setInitial(FALSE);
+    if(win) win->setInitial(false);
     flags|=FLAG_INITIAL;
     }
   }

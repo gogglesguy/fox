@@ -32,7 +32,7 @@ namespace FX {
 // In-situ construct element at pointer
 template<class EType>
 inline EType* construct(EType* ptr){
-  ::new ((void*)ptr) EType(); return ptr;
+  ::new ((void*)ptr) EType; return ptr;
   }
 
 

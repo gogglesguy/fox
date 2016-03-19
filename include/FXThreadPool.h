@@ -73,7 +73,7 @@ private:
   FXSemaphore     sayonara;     // Last worker left
   FXuval          stacksize;    // Stack size
   FXTime          expiration;   // Quit if no job within this time
-  volatile FXuint processing;   // Stop when this reaches 0
+  volatile FXuint processing;   // Number of jobs being processed
   volatile FXuint maximum;      // Maximum number of workers
   volatile FXuint minimum;      // Minimum number of workers
   volatile FXuint workers;      // Number of worker threads

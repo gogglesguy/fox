@@ -362,6 +362,9 @@ public:
   /// Fill tree list by appending items from array of strings
   FXint fillItems(FXTreeItem* father,const FXchar** strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
+  /// Fill tree list by appending items from array of strings
+  FXint fillItems(FXTreeItem* father,const FXString* strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
+
   /// Fill tree list by appending items from newline separated strings
   FXint fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi=NULL,FXIcon* ci=NULL,FXptr ptr=NULL,FXbool notify=false);
 
@@ -502,6 +505,9 @@ public:
 
   /// Extend selection from anchor item to item
   virtual FXbool extendSelection(FXTreeItem* item,FXbool notify=false);
+
+  /// Select all items
+  virtual FXbool selectAll(FXbool notify=false);
 
   /// Deselect all items
   virtual FXbool killSelection(FXbool notify=false);

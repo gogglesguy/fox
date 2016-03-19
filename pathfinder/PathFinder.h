@@ -98,6 +98,7 @@ protected:
   FXIcon             *rotaterighticon;
   FXIcon             *quiticon;
   FXIcon             *configicon;
+  FXIcon             *warningicon;
   FXString            editor;		        // Editor command
   FXString            terminal;		        // Terminal command
   FXString            program;		        // Last program
@@ -159,10 +160,6 @@ public:
   long onUpdForwardDirectory(FXObject*,FXSelector,void*);
   long onUpdDiskSpace(FXObject*,FXSelector,void*);
 
-  long onCmdClipboardCut(FXObject*,FXSelector,void*);
-  long onCmdClipboardCopy(FXObject*,FXSelector,void*);
-  long onCmdClipboardPaste(FXObject*,FXSelector,void*);
-
   long onCmdNew(FXObject*,FXSelector,void*);
   long onUpdNew(FXObject*,FXSelector,void*);
   long onCmdCopy(FXObject*,FXSelector,void*);
@@ -223,9 +220,6 @@ public:
     ID_PROPERTIES,
     ID_BOOKMARK,
     ID_UNBOOKMARK,
-    ID_CLIPBOARD_CUT,
-    ID_CLIPBOARD_COPY,
-    ID_CLIPBOARD_PASTE,
     ID_RENAME,
     ID_COPY,
     ID_MOVE,

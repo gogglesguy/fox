@@ -1,4 +1,4 @@
-/*********** Generated on 2014/01/29 22:05:17 by reswrap version 5.1.1 *********/
+/*********** Generated on 2014/05/19 22:39:07 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file ../pathfinder/addbook.bmp */
 extern const unsigned char addbook[];
@@ -131,6 +131,9 @@ extern const unsigned char smallicons[];
 
 /* Created by reswrap from file ../pathfinder/unmaphost.bmp */
 extern const unsigned char unmaphost[];
+
+/* Created by reswrap from file ../pathfinder/warningicon_gif.gif */
+extern const unsigned char warningicon_gif[];
 
 /* Created by reswrap from file ../pathfinder/work.gif */
 extern const unsigned char work[];
