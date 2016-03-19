@@ -53,6 +53,15 @@ using namespace FX;
 namespace FX {
 
 /*
+// create the security descriptor
+SECURITY_ATTRIBUTES saAttr;
+saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+saAttr.bInheritHandle = TRUE;
+saAttr.lpSecurityDescriptor = NULL;
+CreatePipe(  &hStdInRead,  &hStdInWrite, &saAttr, 0);
+CreatePipe( &hStdOutRead, &hStdOutWrite, &saAttr, 0);
+CreatePipe( &hStdErrRead, &hStdErrWrite, &saAttr, 0);
+
 // Create pipes for stdin and stdout
 CreatePipe(&hReadStdin, &hWriteStdin, NULL, 0);
 CreatePipe(&hReadStdout, &hWriteStdout, NULL, 0);

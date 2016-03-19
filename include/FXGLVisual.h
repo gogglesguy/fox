@@ -45,6 +45,8 @@ class FXAPI FXGLVisual : public FXVisual {
   friend class FXBitmap;
   friend class FXDCWindow;
 protected:
+  struct FXGLSpecs;
+protected:
   FXuchar redSize;              // Red bits
   FXuchar greenSize;            // Green depth
   FXuchar blueSize;             // Blue bits
@@ -76,6 +78,7 @@ protected:
 private:
   FXGLVisual(const FXGLVisual&);
   FXGLVisual &operator=(const FXGLVisual&);
+  FXint matchSpecs(const FXGLSpecs& s);
 public:
 
   /// Construct default visual

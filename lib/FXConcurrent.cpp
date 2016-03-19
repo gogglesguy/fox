@@ -172,9 +172,15 @@ FXConcurrent::FXConcurrent():started(0),stopped(0),running(false),slots(32){
   }
 
 
+// Create a (subclass of) Worker
+FXWorker* FXConcurrent::createWorker(){
+  return new FXWorker(this);
+  }
+  
+  
 // Make a new worker
 FXWorker* FXConcurrent::startWorker(){
-  FXWorker* worker=new FXWorker(this);
+  FXWorker* worker=createWorker();
   if(!worker->start()){
     delete worker;
     return NULL;

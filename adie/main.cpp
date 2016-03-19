@@ -84,10 +84,10 @@ int main(int argc,char *argv[]){
 
     // Parse a few options
     if(compare(argv[arg],"-v")==0 || compare(argv[arg],"--view")==0){
-      edit=FALSE;
+      edit=false;
       }
     else if(compare(argv[arg],"-e")==0 || compare(argv[arg],"--edit")==0){
-      edit=TRUE;
+      edit=true;
       }
     else if(compare(argv[arg],"-h")==0 || compare(argv[arg],"--help")==0){
       printusage();

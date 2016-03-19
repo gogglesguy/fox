@@ -33,37 +33,37 @@ INCDIRS   = -I$(TOPDIR)\include
 FOXLIB    = $(TOPDIR)\lib\FOX-1.7.lib
 
 PROGRAMS  = \
-	rex.exe \
-	minheritance.exe \
-	expression.exe \
-	memmap.exe \
-	mditest.exe \
-	table.exe \
-	format.exe \
-	scan.exe \
-	groupbox.exe \
-	foursplit.exe \
-	datatarget.exe \
-	scribble.exe \
-	splitter.exe \
-	shutter.exe \
-	image.exe \
-	header.exe \
-	hello.exe \
-	hello2.exe \
-	switcher.exe \
-	iconlist.exe \
-	process.exe \
-	tabbook.exe \
-	dialog.exe \
-	dirlist.exe \
-	button.exe \
-	dctest.exe \
-	glviewer.exe \
-	gltest.exe \
-	wizard.exe \
-	imageviewer.exe \
-	half.exe
+rex.exe \
+minheritance.exe \
+expression.exe \
+memmap.exe \
+mditest.exe \
+table.exe \
+format.exe \
+scan.exe \
+groupbox.exe \
+foursplit.exe \
+datatarget.exe \
+scribble.exe \
+splitter.exe \
+shutter.exe \
+image.exe \
+header.exe \
+hello.exe \
+hello2.exe \
+switcher.exe \
+iconlist.exe \
+process.exe \
+tabbook.exe \
+dialog.exe \
+dirlist.exe \
+button.exe \
+dctest.exe \
+glviewer.exe \
+gltest.exe \
+wizard.exe \
+imageviewer.exe \
+half.exe
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp

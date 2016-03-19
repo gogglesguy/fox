@@ -704,11 +704,11 @@ FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){
 #ifdef UNICODE
   FXnchar unifile[MAXPATHLEN];
   utf2ncs(unifile,path.text(),MAXPATHLEN);
-  if(GetDiskFreeSpaceExW(unifile,NULL,(PULARGE_INTEGER*)&space,NULL)){
+  if(GetDiskFreeSpaceExW(unifile,NULL,(PULARGE_INTEGER)&space,NULL)){
     return true;
     }
 #else
-  if(GetDiskFreeSpaceExA(path.text(),NULL,(PULARGE_INTEGER*)&space,NULL)){
+  if(GetDiskFreeSpaceExA(path.text(),NULL,(PULARGE_INTEGER)&space,NULL)){
     return true;
     }
 #endif
@@ -729,11 +729,11 @@ FXbool FXStat::getAvailableDiskSpace(const FXString& path,FXulong& space){
 #ifdef UNICODE
   FXnchar unifile[MAXPATHLEN];
   utf2ncs(unifile,path.text(),MAXPATHLEN);
-  if(GetDiskFreeSpaceExW(unifile,(PULARGE_INTEGER*)&space,NULL,NULL)){
+  if(GetDiskFreeSpaceExW(unifile,(PULARGE_INTEGER)&space,NULL,NULL)){
     return true;
     }
 #else
-  if(GetDiskFreeSpaceExA(path.text(),(PULARGE_INTEGER*)&space,NULL,NULL)){
+  if(GetDiskFreeSpaceExA(path.text(),(PULARGE_INTEGER)&space,NULL,NULL)){
     return true;
     }
 #endif

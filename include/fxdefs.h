@@ -126,12 +126,19 @@
 #endif
 
 // Branch prediction optimization
-#if __GNUC__ >= 3
+#if (__GNUC__ >= 3)
 #define __likely(cond)    __builtin_expect(!!(cond),1)
 #define __unlikely(cond)  __builtin_expect(!!(cond),0)
 #else
 #define __likely(cond)    (!!(cond))
 #define __unlikely(cond)  (!!(cond))
+#endif
+
+// Prefetch address
+#if (__GNUC__ >= 4) && (defined(__i386__) || defined(__x86_64__))
+#define __prefetch(addr,hint)  __builtin_prefetch((addr),0,hint)
+#else
+#define __prefetch(addr,hint) 
 #endif
 
 // Callback

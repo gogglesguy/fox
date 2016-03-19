@@ -28,26 +28,6 @@
 /*
   Notes:
 
-  - We have a amorphous blob of memory reserved for the mutex implementation.
-    Since we're trying to avoid having to include platform-specific headers
-    in application code, we can't easily know how much to allocate for
-    pthread_mutex_t [or CRITICAL_SECTION].
-
-  - We don't want to allocate dynamically because of the performance
-    issues, and also because obviously, since heap memory is shared between
-    threads, a malloc itself involves locking another mutex, leaving a
-    potential for an unexpected deadlock.
-
-  - So we just reserve some memory which we will hope to be enough.  If it
-    ever turns out its not, the assert should trigger and we'll just have
-    to change the source a bit.
-
-  - I do recommend running this in debug mode first time around on a
-    new platform.
-
-  - Picked unsigned long so as to ensure alignment issues are taken
-    care off.
-
   - Note that the FXThreadID is only valid when busy==true, except insofar
     as when its used to harvest thread exit status like e.g. join!
 
@@ -68,10 +48,6 @@
     however, an exceptionally inelegant solution in Boehm's GC code (file
     linux_threads.c).  But its so ugly we'd rather live without until a real
     suspend/resume facility is implemented in the linux kernel.
-
-  - To find all preprocessor defines in GCC:
-
-      echo | gcc -E -dM -
 
 */
 
@@ -454,67 +430,6 @@ void FXThread::setStorage(FXThreadStorageKey key,void* ptr){
   }
 
 
-#if 0
-
-#if defined(WIN32)
-#define MS_VC_EXCEPTION 0x406D1388
-
-#pragma pack(push,8)
-typedef struct tagTHREADNAME_INFO {
-  DWORD dwType;         // Must be 0x1000.
-  LPCSTR szName;        // Pointer to name (in user addr space).
-  DWORD dwThreadID;     // Thread ID (-1=caller thread).
-  DWORD dwFlags;        // Reserved for future use, must be zero.
-  } THREADNAME_INFO;
-#pragma pack(pop)
-#endif
-
-
-// Change thread name
-FXbool FXThread::setName(const FXString& nm){
-#if defined(WIN32)
-  if(tid){
-    THREADNAME_INFO info;
-    FXASSERT(nm.length()<32);
-    info.dwType=0x1000;
-    info.szName=nm.text();
-    info.dwThreadID=tid;
-    info.dwFlags=0;
-    __try {
-       RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
-      }
-    __except(EXCEPTION_EXECUTE_HANDLER){
-      }
-    return true;
-    }
-  return false;
-#else
-  if(tid && nm.length()<32){
-    return pthread_setname_np(tid,nm.text())==0;
-    }
-  return false;
-#endif
-  }
-
-
-// Return thread name
-FXString FXThread::getName() const {
-#if defined(WIN32)
-  return FXString::null;
-#else
-  if(tid){
-    FXchar name[32];
-    if(pthread_getname_np(tid,name,sizeof(name)==0)){
-      return name;
-      }
-    }
-  return FXString::null;
-#endif
-  }
-
-#endif
-
-
 // Set thread priority
 FXbool FXThread::priority(FXThread::Priority prio){
 #if defined(WIN32)
@@ -733,6 +648,66 @@ FXThread::Policy FXThread::policy() const {
   }
 
 
+// Change thread's processor affinity
+FXbool FXThread::affinity(FXulong mask){
+#if defined(WIN32)
+  const FXulong bit=1;
+  if(tid){
+    FXint ncpus=processors();
+    mask&=((bit<<ncpus)-1);
+    if(mask){
+      return SetThreadAffinityMask((HANDLE)tid,(FXuval)mask)!=0;
+      }
+    }
+#elif defined(HAVE_PTHREAD_SETAFFINITY_NP)
+  const FXulong bit=1;
+  if(tid){
+    FXint ncpus=processors();
+    mask&=((bit<<ncpus)-1);
+    if(mask){
+      cpu_set_t cpuset;
+      CPU_ZERO(&cpuset);
+      for(FXint cpu=0; cpu<ncpus; ++cpu){
+        if((bit<<cpu)&mask){ CPU_SET(cpu,&cpuset); }
+        }
+      return pthread_setaffinity_np((pthread_t)tid,sizeof(cpuset),&cpuset)==0;
+      }
+    }
+#endif
+  return false;
+  }
+
+
+// Get thread's processor affinity
+FXulong FXThread::affinity() const {
+#if defined(WIN32)
+  const FXulong bit=1;
+  if(tid){
+    FXint ncpus=processors();
+    FXuval cpuset=SetThreadAffinityMask((HANDLE)tid,(FXuval)((bit<<ncpus)-1));
+    if(cpuset){
+      SetThreadAffinityMask((HANDLE)tid,cpuset);
+      return (FXulong)cpuset;
+      }
+    }
+#elif defined(HAVE_PTHREAD_SETAFFINITY_NP)
+  const FXulong bit=1;
+  if(tid){
+    FXint ncpus=processors();
+    cpu_set_t cpuset;
+    if(pthread_getaffinity_np((pthread_t)tid,sizeof(cpuset),&cpuset)==0){
+      FXulong mask=0;
+      for(FXint cpu=0; cpu<ncpus; ++cpu){
+        if(CPU_ISSET(cpu,&cpuset)){ mask|=(bit<<cpu); }
+        }
+      return mask;
+      }
+    }
+#endif
+  return 0;
+  }
+
+
 // Suspend thread
 FXbool FXThread::suspend(){
 #if defined(WIN32)
@@ -742,7 +717,6 @@ FXbool FXThread::suspend(){
 #elif defined(SUNOS)
   return tid && (thr_suspend((pthread_t)tid)==0);
 #else
-  // return tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);   // FIXME this does not work.
   return false;
 #endif
   }
@@ -757,7 +731,6 @@ FXbool FXThread::resume(){
 #elif defined(SUNOS)
   return tid && (thr_continue((pthread_t)tid)==0);
 #else
-  // return tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);   // FIXME this does not work.
   return false;
 #endif
   }

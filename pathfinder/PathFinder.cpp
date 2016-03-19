@@ -252,7 +252,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   diskspace=new FXLabel(statusbar,"1000000/1000000",NULL,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
   diskspace->setTarget(this);
   diskspace->setSelector(ID_DISKSPACE);
-  new FXLabel(statusbar,"Free/Total:",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+//  new FXLabel(statusbar,"Free/Total:",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
 
   // Make file associations object; shared between FXFileList and FXDirList
@@ -897,7 +897,8 @@ long PathFinderMain::onUpdDiskSpace(FXObject* sender,FXSelector,void*){
   FXulong totalspace,availspace;
   FXString space="0/0";
   if(FXStat::getTotalDiskSpace(getDirectory(),totalspace) && FXStat::getAvailableDiskSpace(getDirectory(),availspace)){
-    space.format("%'llu/%'llu",availspace,totalspace);
+//    space.format("Free: %'llu / Total: %'llu",availspace,totalspace);
+    space.format("Free: %.4lgGB / Total: %.4lgGB",1.0E-9*availspace,1.0E-9*totalspace);
     }
   sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&space);
   return 1;

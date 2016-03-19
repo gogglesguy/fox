@@ -43,7 +43,7 @@ public:
   /// Initialize the spinlock
   FXSpinLock();
 
-  /// Lock the mutex
+  /// Lock the spinlock
   void lock();
 
   /// Return true if succeeded locking the spinlock
@@ -77,25 +77,25 @@ private:
   FXScopedSpinLock& operator=(const FXScopedSpinLock&);
 public:
 
-  /// Construct & lock associated mutex
+  /// Construct & lock associated spinlock
   FXScopedSpinLock(FXSpinLock& s):spn(s){ lock(); }
 
-  /// Return reference to associated mutex
+  /// Return reference to associated spinlock
   FXSpinLock& spinlock(){ return spn; }
 
-  /// Lock mutex
+  /// Lock spinlock
   void lock(){ spn.lock(); }
 
-  /// Return true if succeeded locking the mutex
+  /// Return true if succeeded locking the spinlock
   FXbool trylock(){ return spn.trylock(); }
 
-  /// Return true if mutex is already locked
+  /// Return true if spinlock is already locked
   FXbool locked(){ return spn.locked(); }
 
-  /// Unlock mutex
+  /// Unlock spin lock
   void unlock(){ spn.unlock(); }
 
-  /// Destroy and unlock associated mutex
+  /// Destroy and unlock associated spinlock
   ~FXScopedSpinLock(){ unlock(); }
   };
 

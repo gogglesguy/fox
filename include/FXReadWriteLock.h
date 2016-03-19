@@ -49,6 +49,9 @@ public:
   /// Unlock read lock
   void readUnlock();
 
+  /// Test if read locked
+  FXbool readLocked();
+
   /// Acquire write lock for read/write mutex
   void writeLock();
 
@@ -58,8 +61,78 @@ public:
   /// Unlock write mutex
   void writeUnlock();
 
+  /// Test if write locked
+  FXbool writeLocked();
+
   /// Delete the read/write lock
  ~FXReadWriteLock();
+  };
+
+
+/// Scoped read lock
+class FXAPI FXScopedReadLock {
+private:
+  FXReadWriteLock& rwlock;
+private:
+  FXScopedReadLock();
+  FXScopedReadLock(const FXScopedReadLock&);
+  FXScopedReadLock& operator=(const FXScopedReadLock&);
+public:
+
+  /// Construct & lock associated read-write lock
+  FXScopedReadLock(FXReadWriteLock& rwl):rwlock(rwl){ lock(); }
+
+  /// Return reference to associated read-write lock
+  FXReadWriteLock& readwritelock(){ return rwlock; }
+
+  /// Lock read-write lock
+  void lock(){ rwlock.readLock(); }
+
+  /// Return true if succeeded locking the read-write lock
+  FXbool trylock(){ return rwlock.tryReadLock(); }
+
+  /// Return true if read-write lock is already locked
+  FXbool locked(){ return rwlock.readLocked(); }
+
+  /// Unlock mutex
+  void unlock(){ rwlock.readUnlock(); }
+
+  /// Destroy and unlock associated read-write lock
+  ~FXScopedReadLock(){ unlock(); }
+  };
+
+
+
+/// Scoped write lock
+class FXAPI FXScopedWriteLock {
+private:
+  FXReadWriteLock& rwlock;
+private:
+  FXScopedWriteLock();
+  FXScopedWriteLock(const FXScopedWriteLock&);
+  FXScopedWriteLock& operator=(const FXScopedWriteLock&);
+public:
+
+  /// Construct & lock associated read-write lock
+  FXScopedWriteLock(FXReadWriteLock& rwl):rwlock(rwl){ lock(); }
+
+  /// Return reference to associated read-write lock
+  FXReadWriteLock& readwritelock(){ return rwlock; }
+
+  /// Lock read-write lock
+  void lock(){ rwlock.writeLock(); }
+
+  /// Return true if succeeded locking the read-write lock
+  FXbool trylock(){ return rwlock.tryWriteLock(); }
+
+  /// Return true if read-write lock is already locked
+  FXbool locked(){ return rwlock.writeLocked(); }
+
+  /// Unlock read-write lock
+  void unlock(){ rwlock.writeUnlock(); }
+
+  /// Destroy and unlock associated read-write lock
+  ~FXScopedWriteLock(){ unlock(); }
   };
 
 }

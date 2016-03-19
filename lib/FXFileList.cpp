@@ -1480,7 +1480,6 @@ void FXFileList::listItems(FXbool force){
   FXString atts;
   FXString mod;
   FXString linkname;
-  FXbool islink;
   FXbool istop;
   FXStat info;
   FXDir  dir;
@@ -1493,9 +1492,6 @@ void FXFileList::listItems(FXbool force){
 
   // Are we at the top directory?
   istop=FXPath::isTopDirectory(directory);
-
-  // Assume not a link
-  islink=false;
 
   // Get directory stream pointer
   if(dir.open(directory)){
@@ -1536,10 +1532,6 @@ void FXFileList::listItems(FXbool force){
 
       // Get file/link info
       if(!FXStat::statLink(pathname,info)) continue;
-
-      // If its a link, get the info on file itself
-      islink=info.isLink();
-      if(islink && !FXStat::statFile(pathname,info)) continue;
 
 #endif
 
@@ -1585,8 +1577,9 @@ fnd:  *pn=item;
         // Mod time
         mod=FXSystem::localTime(info.modified());
 
-        // Link
-        if(islink) linkname=FXFile::symlink(pathname); else linkname=FXString::null;
+        // Link name, if any
+        linkname=FXString::null;
+        if(info.isLink()) linkname=FXFile::symlink(pathname);
 
         // Update flags
         if(info.isExecutable()){item->state|=FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::EXECUTABLE;}
@@ -1595,7 +1588,7 @@ fnd:  *pn=item;
         if(info.isBlock()){item->state|=FXFileItem::BLOCKDEV;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::BLOCKDEV;}
         if(info.isFifo()){item->state|=FXFileItem::FIFO;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::FIFO;}
         if(info.isSocket()){item->state|=FXFileItem::SOCK;item->state&=~FXFileItem::EXECUTABLE;}else{item->state&=~FXFileItem::SOCK;}
-        if(islink){item->state|=FXFileItem::SYMLINK;}else{item->state&=~FXFileItem::SYMLINK;}
+        if(info.isLink()){item->state|=FXFileItem::SYMLINK;}else{item->state&=~FXFileItem::SYMLINK;}
 
         // We can drag items only if allowed
         item->setDraggable(draggable);

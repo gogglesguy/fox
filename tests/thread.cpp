@@ -46,12 +46,12 @@ public:
 
 // Run jobs
 FXint Runner::run(){
-  fprintf(stderr,"runner %d start\n",number);
+  fxmessage("runner %d start\n",number);
   value=1.0;
   for(FXint i=0; i<count; i++){
     value=cos(value);
     }
-  fprintf(stderr,"runner %d done\n",number);
+  fxmessage("runner %d done\n",number);
   delete this;
   return 1;
   }
@@ -61,20 +61,20 @@ FXint Runner::run(){
 // Generate jobs
 FXint Producer::run(){
   FXint job=0;
-  fprintf(stderr,"producer start\n");
+  fxmessage("producer start on cpus: %llb\n",affinity());
   FXuint seed=1013904223u;
   for(FXint g=0; g<groups; ++g){
     for(FXint c=0; c<count; c++){
       //FXThread::sleep(50000000);
       if(!pool->execute(new Runner(job,fxrandom(seed)/1000))) goto x;
-      fprintf(stderr,"producer job %d\n",job);
+      fxmessage("producer job %d\n",job);
       job++;
       }
-    fprintf(stderr,"producer waiting\n");
+    fxmessage("producer waiting\n");
     pool->wait();
-    fprintf(stderr,"producer resumed\n");
+    fxmessage("producer resumed\n");
     }
-x:fprintf(stderr,"producer done\n");
+x:fxmessage("producer done\n");
   return 1;
   }
 
@@ -94,29 +94,29 @@ int main(int,char**){
   // Make producer thread
   Producer producer(&pool,100,10);
 
-  fprintf(stderr,"Found %d processors\n",cpus);
+  fxmessage("Found %d processors\n",cpus);
 
-  fprintf(stderr,"starting pool\n");
+  fxmessage("starting pool\n");
   started=pool.start(cpus,8,cpus);
-  fprintf(stderr,"running: %d (%d)\n",pool.getRunningThreads(),started);
+  fxmessage("running: %d (%d)\n",pool.getRunningThreads(),started);
   getchar();
-  fprintf(stderr,"started pool %d\n",started);
+  fxmessage("started pool %d\n",started);
   getchar();
 
-  fprintf(stderr,"running: %d\n",pool.getRunningThreads());
-  fprintf(stderr,"starting jobs\n");
+  fxmessage("running: %d\n",pool.getRunningThreads());
+  fxmessage("starting jobs\n");
   producer.start();
-  fprintf(stderr,"running jobs\n");
-  fprintf(stderr,"running: %d\n",pool.getRunningThreads());
+  fxmessage("running jobs\n");
+  fxmessage("running: %d\n",pool.getRunningThreads());
 
   getchar();
-  fprintf(stderr,"stopping\n");
+  fxmessage("stopping\n");
   pool.stop();
-  fprintf(stderr,"running: %d\n",pool.getRunningThreads());
-  fprintf(stderr,"stopped\n");
+  fxmessage("running: %d\n",pool.getRunningThreads());
+  fxmessage("stopped\n");
 
   getchar();
   producer.join();
-  fprintf(stderr,"bye\n");
+  fxmessage("bye\n");
   return 1;
   }
