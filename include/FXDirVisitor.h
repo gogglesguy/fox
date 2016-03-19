@@ -46,19 +46,20 @@ public:
 
 
 /**
-* Visit directory entries according to flags and matching given pattern.
+* Visit directory entries according to flags and matching given pattern,
+* with similar matching conditions as FXDir::listFiles().
 */
 class FXAPI FXGlobVisitor : public FXDirVisitor {
 private:
   FXString pattern;
   FXuint   flags;
-  FXuint   mode;
 public:
-  FXGlobVisitor():flags(0),mode(0){}
-  FXGlobVisitor(const FXGlobVisitor& org):pattern(org.pattern),flags(org.flags),mode(org.mode){}
+  FXGlobVisitor():flags(0){}
+  FXGlobVisitor(const FXGlobVisitor& org):pattern(org.pattern),flags(org.flags){}
   FXuint traverse(const FXString& path,const FXString& pat="*",FXuint flg=FXDir::MatchAll);
   virtual FXuint enter(const FXString& path);
   virtual FXuint visit(const FXString& path);
+  virtual FXuint leave(const FXString& path);
   virtual ~FXGlobVisitor();
   };
 

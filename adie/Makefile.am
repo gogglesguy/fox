@@ -37,10 +37,12 @@ $(top_srcdir)/adie/help_gif.gif \
 $(top_srcdir)/adie/indent_gif.gif \
 $(top_srcdir)/adie/info_gif.gif \
 $(top_srcdir)/adie/lang_gif.gif \
+$(top_srcdir)/adie/logger.gif \
 $(top_srcdir)/adie/lowercase.gif \
 $(top_srcdir)/adie/miscellaneous_gif.gif \
 $(top_srcdir)/adie/new_gif.gif \
 $(top_srcdir)/adie/nobrowser.gif \
+$(top_srcdir)/adie/nologger.gif \
 $(top_srcdir)/adie/open_gif.gif \
 $(top_srcdir)/adie/palette_gif.gif \
 $(top_srcdir)/adie/pattern_gif.gif \
@@ -82,6 +84,8 @@ icons.cpp \
 main.cpp \
 Preferences.h \
 Preferences.cpp \
+ShellCommand.h \
+ShellCommand.cpp \
 Syntax.h \
 Syntax.cpp \
 SyntaxParser.h \

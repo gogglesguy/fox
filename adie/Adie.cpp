@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -22,6 +22,9 @@
 #include "fxkeys.h"
 #include <new>
 #include <signal.h>
+#ifndef WIN32
+#include <sys/wait.h>
+#endif
 #include "HelpWindow.h"
 #include "Preferences.h"
 #include "Commands.h"
@@ -43,6 +46,7 @@
 
 // Map
 FXDEFMAP(Adie) AdieMap[]={
+  FXMAPFUNC(SEL_SIGNAL,Adie::ID_HARVEST,Adie::onSigHarvest),
   FXMAPFUNC(SEL_SIGNAL,Adie::ID_CLOSEALL,Adie::onCmdCloseAll),
   FXMAPFUNC(SEL_COMMAND,Adie::ID_CLOSEALL,Adie::onCmdCloseAll),
   FXMAPFUNC(SEL_COMMAND,Adie::ID_SYNTAXPATHS,Adie::onCmdSyntaxPaths),
@@ -88,6 +92,8 @@ Adie::Adie(const FXString& name):FXApp(name){
   configicon=new FXGIFIcon(this,config_gif);
   browsericon=new FXGIFIcon(this,browser);
   nobrowsericon=new FXGIFIcon(this,nobrowser);
+  loggericon=new FXGIFIcon(this,logger);
+  nologgericon=new FXGIFIcon(this,nologger);
   uppercaseicon=new FXGIFIcon(this,uppercase);
   lowercaseicon=new FXGIFIcon(this,lowercase);
   backwardicon=new FXGIFIcon(this,backward_gif);
@@ -103,6 +109,11 @@ Adie::Adie(const FXString& name):FXApp(name){
   addSignal(SIGHUP,this,ID_CLOSEALL);
   addSignal(SIGPIPE,this,ID_CLOSEALL);
 #endif
+#endif
+
+#ifndef WIN32
+  // On unix, we need to catch SIGCHLD to harvest zombie child processes.
+  //addSignal(SIGCHLD,this,ID_HARVEST,true);
 #endif
 
   // File associations, shared between all windows
@@ -173,6 +184,16 @@ long Adie::onCmdSyntaxPaths(FXObject* sender,FXSelector,void*){
 // Update syntax paths
 long Adie::onUpdSyntaxPaths(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&syntaxpaths);
+  return 1;
+  }
+
+
+// Harvest the zombies :-)
+long Adie::onSigHarvest(FXObject*,FXSelector,void*){
+  fxmessage("Harvesting...\n");
+#ifndef WIN32
+  while(waitpid(-1,NULL,WNOHANG)>0){ }
+#endif
   return 1;
   }
 

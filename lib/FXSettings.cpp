@@ -183,14 +183,16 @@ FXSettings& FXSettings::adopt(FXSettings& other){
 
 // Find position of given key
 FXival FXSettings::find(const FXchar* ky) const {
-  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXSettings::find: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) return x;
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,x,h;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash){
+      if(table[x].hash==h && table[x].key==ky) return x;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
     }
   return -1;
   }
@@ -225,16 +227,18 @@ x:modified=true;                                        // Assume its to be writ
 
 // Return constant reference to string assocated with key
 const FXStringDictionary& FXSettings::at(const FXchar* ky) const {
-  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXSettings::at: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) goto x;    // Return existing slot
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,x,h;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash){
+      if(table[x].hash==h && table[x].key==ky) return table[x].data;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
     }
-x:return table[x].data;                                 // Stopped at empty slot
+  return EMPTY[0].data;
   }
 
 
@@ -490,9 +494,10 @@ FXint FXSettings::writeFormatEntry(const FXString& section,const FXString& name,
 
 // Read a string-valued registry entry
 const FXchar* FXSettings::readStringEntry(const FXchar* section,const FXchar* name,const FXchar* def) const {
-  const FXString& value=at(section).at(name);
-  if(!value.empty()){
-    return value.text();
+  const FXStringDictionary& dict=at(section);
+  FXival slot=dict.find(name);
+  if(0<=slot){
+    return dict.data(slot).text();      // Use value at slot even if value was empty string!
     }
   return def;
   }
@@ -885,20 +890,22 @@ void FXSettings::deleteEntry(const FXString& section,const FXString& name){
 
 // Delete section
 void FXSettings::deleteSection(const FXchar* section){
-  FXuval p,b,h,x;
   if(__unlikely(!section || !*section)){ throw FXRangeException("FXSettings::deleteSection: null or empty key\n"); }
-  p=b=h=FXString::hash(section);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash!=h || table[x].key!=section){
-    if(!table[x].hash) return;
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,h,x;
+    p=b=h=FXString::hash(section);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash!=h || table[x].key!=section){
+      if(!table[x].hash) return;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
+    table[x].key.clear();                                 // Void the slot (not empty!)
+    table[x].data.clear();
+    used(used()-1);
+    modified=true;
+    if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
     }
-  table[x].key.clear();                                 // Void the slot (not empty!)
-  table[x].data.clear();
-  used(used()-1);
-  modified=true;
-  if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
   }
 
 

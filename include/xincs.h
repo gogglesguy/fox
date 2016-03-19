@@ -166,6 +166,12 @@
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
+#ifdef HAVE_SYS_EPOLL_H
+#include <sys/epoll.h>
+#endif
+#ifdef HAVE_SYS_TIMERFD_H
+#include <sys/timerfd.h>
+#endif
 #ifdef HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif

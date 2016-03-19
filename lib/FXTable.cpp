@@ -47,9 +47,6 @@
 #include "FXButton.h"
 #include "FXHeader.h"
 #include "FXTable.h"
-#include "FX88591Codec.h"
-#include "FXCP1252Codec.h"
-#include "FXUTF16Codec.h"
 #include "FXList.h"
 #include "FXComboBox.h"
 #include "FXSpinner.h"
@@ -849,10 +846,6 @@ FXTableItem* FXTable::createItem(const FXString& text,FXIcon* icon,void* ptr){
 // Create window
 void FXTable::create(){
   FXScrollArea::create();
-  if(!deleteType){ deleteType=getApp()->registerDragType(deleteTypeName); }
-  if(!textType){ textType=getApp()->registerDragType(textTypeName); }
-  if(!utf8Type){ utf8Type=getApp()->registerDragType(utf8TypeName); }
-  if(!utf16Type){ utf16Type=getApp()->registerDragType(utf16TypeName); }
   if(!csvType){ csvType=getApp()->registerDragType(csvTypeName); }
   for(FXint i=0; i<nrows*ncols; i++){ if(cells[i]) cells[i]->create(); }
   font->create();
@@ -864,8 +857,6 @@ void FXTable::detach(){
   FXScrollArea::detach();
   for(FXint i=0; i<nrows*ncols; i++){ if(cells[i]) cells[i]->detach(); }
   font->detach();
-  deleteType=0;
-  textType=0;
   csvType=0;
   }
 
@@ -2133,18 +2124,14 @@ long FXTable::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return text of the selection translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
       FXTRACE((100,"Request ASCII\n"));
-      string=ascii.utf2mb(string);
       setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;           // FIXME maybe other endianness for unix
       FXTRACE((100,"Request UTF16\n"));
-      string=unicode.utf2mb(string);
       setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
@@ -2202,17 +2189,15 @@ long FXTable::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return clipped text translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
       FXTRACE((100,"Request ASCII\n"));
-      setDNDData(FROM_CLIPBOARD,event->target,ascii.utf2mb(clipped));
+      setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;             // FIXME maybe other endianness for unix
       FXTRACE((100,"Request UTF16\n"));
-      setDNDData(FROM_CLIPBOARD,event->target,unicode.utf2mb(clipped));
+      setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
     }
@@ -2372,9 +2357,7 @@ long FXTable::onCmdPasteSel(FXObject*,FXSelector,void*){
 
       // Next, try UTF-16
       if(getDNDData(FROM_CLIPBOARD,utf16Type,string)){
-        FXUTF16LECodec unicode;           // FIXME maybe other endianness for unix
         FXTRACE((100,"Paste UTF16\n"));
-        string=unicode.mb2utf(string);
 #ifdef WIN32
         dosToUnix(string);
 #endif
@@ -2389,9 +2372,7 @@ long FXTable::onCmdPasteSel(FXObject*,FXSelector,void*){
 
       // Next, try good old Latin-1
       if(getDNDData(FROM_CLIPBOARD,stringType,string)){
-        FX88591Codec ascii;
         FXTRACE((100,"Paste ASCII\n"));
-        string=ascii.mb2utf(string);
 #ifdef WIN32
         dosToUnix(string);
 #endif

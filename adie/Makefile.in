@@ -68,7 +68,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am_adie_OBJECTS = Adie.$(OBJEXT) Commands.$(OBJEXT) \
 	FindInFiles.$(OBJEXT) help.$(OBJEXT) HelpWindow.$(OBJEXT) \
 	icons.$(OBJEXT) main.$(OBJEXT) Preferences.$(OBJEXT) \
-	Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) TextWindow.$(OBJEXT)
+	ShellCommand.$(OBJEXT) Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) \
+	TextWindow.$(OBJEXT)
 adie_OBJECTS = $(am_adie_OBJECTS)
 adie_LDADD = $(LDADD)
 adie_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
@@ -299,10 +300,12 @@ $(top_srcdir)/adie/help_gif.gif \
 $(top_srcdir)/adie/indent_gif.gif \
 $(top_srcdir)/adie/info_gif.gif \
 $(top_srcdir)/adie/lang_gif.gif \
+$(top_srcdir)/adie/logger.gif \
 $(top_srcdir)/adie/lowercase.gif \
 $(top_srcdir)/adie/miscellaneous_gif.gif \
 $(top_srcdir)/adie/new_gif.gif \
 $(top_srcdir)/adie/nobrowser.gif \
+$(top_srcdir)/adie/nologger.gif \
 $(top_srcdir)/adie/open_gif.gif \
 $(top_srcdir)/adie/palette_gif.gif \
 $(top_srcdir)/adie/pattern_gif.gif \
@@ -343,6 +346,8 @@ icons.cpp \
 main.cpp \
 Preferences.h \
 Preferences.cpp \
+ShellCommand.h \
+ShellCommand.cpp \
 Syntax.h \
 Syntax.cpp \
 SyntaxParser.h \
@@ -491,6 +496,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FindInFiles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpWindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preferences.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShellCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Syntax.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SyntaxParser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TextWindow.Po@am__quote@

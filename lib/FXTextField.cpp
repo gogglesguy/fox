@@ -42,9 +42,6 @@
 #include "FXApp.h"
 #include "FXCursor.h"
 #include "FXTextField.h"
-#include "FX88591Codec.h"
-#include "FXCP1252Codec.h"
-#include "FXUTF16Codec.h"
 #include "FXComposeContext.h"
 
 
@@ -220,9 +217,6 @@ FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel
 // Create X window
 void FXTextField::create(){
   FXFrame::create();
-  if(!textType){ textType=getApp()->registerDragType(textTypeName); }
-  if(!utf8Type){ utf8Type=getApp()->registerDragType(utf8TypeName); }
-  if(!utf16Type){ utf16Type=getApp()->registerDragType(utf16TypeName); }
   font->create();
   if(getApp()->hasInputMethod()){
     createComposeContext();
@@ -656,6 +650,12 @@ void FXTextField::removeText(FXint pos,FXint m,FXbool notify){
     }
   }
 
+
+// Remove all text
+void FXTextField::clearText(FXbool notify){
+  removeText(0,contents.length(),notify);
+  }
+
 /*******************************************************************************/
 
 // Enter text at cursor
@@ -792,15 +792,13 @@ FXbool FXTextField::pasteSelection(FXbool notify){
 
   // Next, try UTF-16
   if(getDNDData(FROM_SELECTION,utf16Type,string)){
-    FXUTF16LECodec unicode;
-    enterText(unicode.mb2utf(string),notify);
+    enterText(string,notify);
     return true;
     }
 
   // Finally, try good old 8859-1
   if(getDNDData(FROM_SELECTION,stringType,string)){
-    FX88591Codec ascii;
-    enterText(ascii.mb2utf(string),notify);
+    enterText(string,notify);
     return true;
     }
   return false;
@@ -822,8 +820,6 @@ FXbool FXTextField::pasteClipboard(FXbool notify){
 
   // Next, try UTF-16
   if(getDNDData(FROM_CLIPBOARD,utf16Type,string)){
-    FXUTF16LECodec unicode;
-    string=unicode.mb2utf(string);
 #ifdef WIN32
     dosToUnix(string);
 #endif
@@ -833,8 +829,6 @@ FXbool FXTextField::pasteClipboard(FXbool notify){
 
   // Next, try good old Latin-1
   if(getDNDData(FROM_CLIPBOARD,stringType,string)){
-    FX88591Codec ascii;
-    string=ascii.mb2utf(string);
 #ifdef WIN32
     dosToUnix(string);
 #endif
@@ -1402,15 +1396,13 @@ long FXTextField::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return text of the selection translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
-      setDNDData(FROM_SELECTION,event->target,ascii.utf2mb(string));
+      setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;
-      setDNDData(FROM_SELECTION,event->target,unicode.utf2mb(string));
+      setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
     }
@@ -1459,15 +1451,13 @@ long FXTextField::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return clipped text translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
-      setDNDData(FROM_CLIPBOARD,event->target,ascii.utf2mb(string));
+      setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;
-      setDNDData(FROM_CLIPBOARD,event->target,unicode.utf2mb(string));
+      setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
     }

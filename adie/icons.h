@@ -1,4 +1,4 @@
-/*********** Generated on 2014/11/10 19:02:15 by reswrap version 5.2.0 *********/
+/*********** Generated on 2015/03/15 10:52:25 by reswrap version 5.2.0 *********/
 
 /* Created by reswrap from file ../adie/adie_gif.gif */
 extern const unsigned char adie_gif[];
@@ -69,6 +69,9 @@ extern const unsigned char info_gif[];
 /* Created by reswrap from file ../adie/lang_gif.gif */
 extern const unsigned char lang_gif[];
 
+/* Created by reswrap from file ../adie/logger.gif */
+extern const unsigned char logger[];
+
 /* Created by reswrap from file ../adie/lowercase.gif */
 extern const unsigned char lowercase[];
 
@@ -80,6 +83,9 @@ extern const unsigned char new_gif[];
 
 /* Created by reswrap from file ../adie/nobrowser.gif */
 extern const unsigned char nobrowser[];
+
+/* Created by reswrap from file ../adie/nologger.gif */
+extern const unsigned char nologger[];
 
 /* Created by reswrap from file ../adie/open_gif.gif */
 extern const unsigned char open_gif[];

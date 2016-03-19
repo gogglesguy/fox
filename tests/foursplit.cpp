@@ -3,7 +3,7 @@
 *                          Test 4-Way  Splitter  Widget                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

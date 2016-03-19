@@ -183,14 +183,16 @@ FXVariantMap& FXVariantMap::adopt(FXVariantMap& other){
 
 // Find slot index for key; return -1 if not found
 FXival FXVariantMap::find(const FXchar* ky) const {
-  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::find: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) return x;
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,x,h;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash){
+      if(table[x].hash==h && table[x].key==ky) return x;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
     }
   return -1;
   }
@@ -224,34 +226,38 @@ x:return table[x].data;
 
 // Return constant reference to variant assocated with key
 const FXVariant& FXVariantMap::at(const FXchar* ky) const {
-  FXuval p,b,x,h;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::at: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) goto x;   // Return existing slot
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,x,h;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash){
+      if(table[x].hash==h && table[x].key==ky) return table[x].data;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
     }
-x:return table[x].data;                                 // If not found we stopped at a free slot
+  return EMPTY[0].data;
   }
 
 
 // Remove entry from table
 void FXVariantMap::remove(const FXchar* ky){
-  FXuval p,b,h,x;
   if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::remove: null or empty key\n"); }
-  p=b=h=FXString::hash(ky);
-  FXASSERT(h);
-  while(table[x=p&(no()-1)].hash!=h || table[x].key!=ky){
-    if(!table[x].hash) return;
-    p=(p<<2)+p+b+1;
-    b>>=BSHIFT;
+  if(__likely(!empty())){
+    FXuval p,b,h,x;
+    p=b=h=FXString::hash(ky);
+    FXASSERT(h);
+    while(table[x=p&(no()-1)].hash!=h || table[x].key!=ky){
+      if(!table[x].hash) return;
+      p=(p<<2)+p+b+1;
+      b>>=BSHIFT;
+      }
+    table[x].key.clear();         // Void the slot (not empty!)
+    table[x].data.clear();        // Clear the variant
+    used(used()-1);
+    if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
     }
-  table[x].key.clear();         // Void the slot (not empty!)
-  table[x].data.clear();        // Clear the variant
-  used(used()-1);
-  if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
   }
 
 
@@ -264,20 +270,6 @@ void FXVariantMap::erase(FXival pos){
     used(used()-1);
     if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
     }
-  }
-
-
-// Compare all non-empty entries
-FXbool FXVariantMap::operator==(const FXVariantMap& other) const {
-  FXival i,j;
-  if(table!=other.table){
-    for(i=0; i<no(); ++i){
-      if(key(i).empty()) continue;
-      if((j=other.find(key(i)))<0) return false;
-      if(data(i)!=other.data(j)) return false;
-      }
-    }
-  return true;
   }
 
 

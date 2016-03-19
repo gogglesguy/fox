@@ -340,6 +340,9 @@ public:
   /// Return item hit code: 0 no hit; 1 hit the icon; 2 hit the text
   FXint hitItem(FXint index,FXint x,FXint y) const;
 
+  /// Scroll to bring item into view
+  virtual void makeItemVisible(FXint index);
+
   /**
   * Search items by name, beginning from item start.  If the start
   * item is -1 the search will start at the first item in the list.
@@ -360,9 +363,6 @@ public:
   * to control whether the search wraps at the start or end of the list.
   */
   FXint findItemByData(FXptr ptr,FXint start=-1,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
-
-  /// Scroll to bring item into view
-  virtual void makeItemVisible(FXint index);
 
   /// Change item text
   void setItemText(FXint index,const FXString& text);

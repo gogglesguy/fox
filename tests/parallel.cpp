@@ -3,7 +3,7 @@
 *                P a r a l l e l   P r o g r a m m i n g   T e s t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2012,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2012,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"
@@ -43,8 +43,6 @@ void churn3(){
   FXParallelInvoke(churn2,churn2,churn2);
   fxmessage("Churn3 done  th %p core %d/%d\n",FXThread::current(),FXThread::processor(),FXThread::processors());
   }
-
-
 
 
 // Make-work procedure like the ones above, this one depending on loop index i.

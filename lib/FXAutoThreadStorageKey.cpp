@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "FXException.h"
 #include "FXAutoThreadStorageKey.h"
 
 /*
@@ -43,18 +44,18 @@ namespace FX {
 FXAutoThreadStorageKey::FXAutoThreadStorageKey(){
 #if defined(WIN32)
   FXASSERT(sizeof(FXThreadStorageKey)>=sizeof(DWORD));
-  value=(FXThreadStorageKey)TlsAlloc();
+  if((value=(FXThreadStorageKey)TlsAlloc())==TLS_OUT_OF_INDEXES){ throw FXMemoryException("FXAutoThreadStorageKey::FXAutoThreadStorageKey: out of memory\n"); }
 #else
   FXASSERT(sizeof(FXThreadStorageKey)>=sizeof(pthread_key_t));
   pthread_key_t key;
-  pthread_key_create(&key,NULL);
+  if(pthread_key_create(&key,NULL)!=0){ throw FXMemoryException("FXAutoThreadStorageKey::FXAutoThreadStorageKey: out of memory\n"); }
   value=(FXThreadStorageKey)key;
 #endif
   }
 
 
 // Set thread local storage associated with this key
-void FXAutoThreadStorageKey::set(void* ptr) const {
+void FXAutoThreadStorageKey::set(FXptr ptr) const {
 #if defined(WIN32)
   TlsSetValue((DWORD)value,ptr);
 #else
@@ -64,7 +65,7 @@ void FXAutoThreadStorageKey::set(void* ptr) const {
 
 
 // Get thread local storage associated with this key
-void* FXAutoThreadStorageKey::get() const {
+FXptr FXAutoThreadStorageKey::get() const {
 #if defined(WIN32)
   return TlsGetValue((DWORD)value);
 #else

@@ -3125,7 +3125,7 @@ FXbool FXRex::amatch(const FXchar* string,FXint len,FXint pos,FXint mode,FXint* 
   // Initialize matcher state
   FXExecute ms(string,len,beg,end,npar,mode);
 
-  // Zero arrays
+  // Reset arrays
   switch(npar){
     case 10: beg[9]=end[9]=-1;
     case  9: beg[8]=end[8]=-1;

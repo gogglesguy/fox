@@ -121,12 +121,6 @@ public:
   /// Erase entry at pos in the table
   void erase(FXival pos);
 
-  /// Equality operator
-  FXbool operator==(const FXVariantMap& other) const;
-
-  /// Inequality operator
-  FXbool operator!=(const FXVariantMap& other) const { return !operator==(other); }
-
   /// Return true if slot is empty.
   FXbool empty(FXival pos) const { return table[pos].key.empty(); }
 

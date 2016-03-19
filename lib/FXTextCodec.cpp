@@ -62,7 +62,7 @@ FXIMPLEMENT_ABSTRACT(FXTextCodec,FXObject,NULL,0)
 
 // Convert multi-byte characters from src to single wide character
 FXint FXTextCodec::mb2wc(FXwchar& w,const FXchar* src,FXint nsrc) const {
-  if(0<src){
+  if(0<nsrc){
     FXint nr=wclen(src);
     if(nr<=nsrc){
       w=wc(src);

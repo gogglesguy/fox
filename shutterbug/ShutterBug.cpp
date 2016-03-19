@@ -3,7 +3,7 @@
 *                S h u t t e r   B u g   A p p l i c a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -571,6 +571,7 @@ long ShutterBug::onCmdSnap(FXObject*,FXSelector,void*){
 
     // Construct file dialog
     FXFileDialog savedialog(this,tr("Save Image"));
+    savedialog.setSelectMode(SELECTFILE_ANY);
     savedialog.setPatternList(patterns);
     savedialog.setCurrentPattern(fileformat);
     savedialog.setFilename(FXPath::absolute(filename));

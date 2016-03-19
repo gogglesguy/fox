@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                         S y n t a x   P a r s e  r                            *
+*                         S y n t a x   P a r s e r                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -77,12 +77,11 @@ FXuint SyntaxParser::gettok(){
       return TK_INTEGER;
       }
     if(Ascii::isLetter(*tail)){         // Keyword
-      tail++;
       tok=(FXuchar)*tail++;
       while(Ascii::isAlphaNumeric(*tail)){
         tok=((tok<<5)+tok) ^ (FXuchar)*tail++;
         }
-      //FXTRACE((110,"hash(%s) = %u\n",FXString(head,tail-head).text(),tok));
+      FXTRACE((20,"hash(%s) = %u\n",FXString(head,tail-head).text(),tok));
       return tok;
       }
     return TK_ERROR;                    // Error
@@ -94,14 +93,14 @@ FXuint SyntaxParser::gettok(){
 
 // Check syntax
 static FXRex::Error checkRexSyntax(const FXString& text){
-  FXRex rex; 
+  FXRex rex;
   return rex.parse(text,FXRex::Syntax);
   }
-  
+
 
 // Parse rule and sub rules
 FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
-  FXString name,openpat,clospat,stoppat;
+  FXString name,style,openpat,clospat,stoppat;
   FXRex::Error error;
   FXint index;
   if(token==TK_RULE){
@@ -174,22 +173,32 @@ FXbool SyntaxParser::parseRule(Syntax *syntax,FXint parent){
             }
           token=gettok();
           continue;
+        case TK_STYLE:                  // Default style
+          token=gettok();
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'style' colors.\n",from,line);
+            return false;
+            }
+          style.assign(head+1,tail-head-2);
+          style.substitute("\\\"","\"",true);
+          token=gettok();
+          continue;
         }
       break;
       }
 
     // Create rule
     if(openpat.empty()){
-      index=syntax->appendDefault(name,parent);
+      index=syntax->appendDefault(name,style,parent);
       }
     else if(clospat.empty()){
-      index=syntax->appendSimple(name,openpat,parent);
+      index=syntax->appendSimple(name,style,openpat,parent);
       }
     else if(stoppat.empty()){
-      index=syntax->appendBracket(name,openpat,clospat,parent);
+      index=syntax->appendBracket(name,style,openpat,clospat,parent);
       }
     else{
-      index=syntax->appendSafeBracket(name,openpat,clospat,stoppat,parent);
+      index=syntax->appendSafeBracket(name,style,openpat,clospat,stoppat,parent);
       }
 
     // Parse subrules, if any
@@ -215,6 +224,7 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
   FXString contentsmatch;
   FXString filesmatch;
   FXString name;
+  FXString group;
   FXint contextlines=0;
   FXint contextchars=0;
   FXRex::Error error;
@@ -231,6 +241,9 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
       }
     name.assign(head+1,tail-head-2);
     token=gettok();
+
+    // Default same as language
+    group=name;
 
     // Parse various features
     while(1){
@@ -287,12 +300,22 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
           contextchars=strtol(head,NULL,0);
           token=gettok();
           continue;
+        case TK_GROUP:                  // Style group
+          token=gettok();
+          if(token!=TK_STRING){
+            fxwarning("%s:%d: error: expected 'group' <wildcard>.\n",from,line);
+            return false;
+            }
+          group.assign(head+1,tail-head-2);
+          group.substitute("\\\"","\"",true);
+          token=gettok();
+          continue;
         }
       break;
       }
 
     // Create language
-    syntax=new Syntax(name);
+    syntax=new Syntax(name,group);
     syntax->setExtensions(filesmatch);
     syntax->setContents(contentsmatch);
     syntax->setDelimiters(delimiters);
@@ -313,6 +336,7 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
       return false;
       }
     token=gettok();
+    FXTRACE((10,"\n\n"));
     return true;
     }
   return false;
@@ -331,7 +355,7 @@ FXbool SyntaxParser::parse(SyntaxList& syntaxes){
 
 // Parse string and return syntaxes found in it; return false if problem.
 FXbool SyntaxParser::parse(SyntaxList& syntaxes,const FXchar* patterns){
-  SyntaxParser parser(patterns,"Syntax");
+  SyntaxParser parser(patterns);
   return parser.parse(syntaxes);
   }
 

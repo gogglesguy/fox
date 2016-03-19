@@ -3,7 +3,7 @@
 *                R e s o u r c e   W r a p p i n g   U t i l i t y              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -149,7 +149,7 @@ static void printusage(){
 /* Print version information */
 static void printversion(){
   printf("reswrap %s\n\n",version);
-  printf("Copyright (C) 1997,2014 Jeroen van der Zijp. All Rights Reserved.\n");
+  printf("Copyright (C) 1997,2015 Jeroen van der Zijp. All Rights Reserved.\n");
   printf("Please visit: http://www.fox-toolkit.org for further information.\n");
   printf("\n");
   printf("This program is free software: you can redistribute it and/or modify\n");
@@ -263,7 +263,7 @@ static int processresourcefile(const char* filename,const char* name,OPTIONS* op
     fseek(file,0,SEEK_END);
     ressize=ftell(file);
     fseek(file,0,SEEK_SET);
-    
+
     /* Add one if text mode, for end of string */
     if(opts->mode>=MODE_TEXT){
       ressize++;
@@ -376,7 +376,7 @@ static int processresourcefile(const char* filename,const char* name,OPTIONS* op
     if(opts->verbose){
       fprintf(stderr,"%-30s  %s%s%s%s%s%s%s\n",filename,linkstr,conststr,typestr,opts->prefix,name,opts->suffix,sizestr);
       }
-      
+
     /* Close resource file */
     fclose(file);
     return 1;
@@ -667,7 +667,7 @@ int main(int argc,char **argv){
         prologue(&opts);
         needprologue=0;
         }
-        
+
       /* Process resource file */
       if(!processresourcefile(argv[arg],resource,&opts)){
         fprintf(stderr,"reswrap: error reading resource file: %s\n",argv[arg]);
@@ -684,6 +684,6 @@ int main(int argc,char **argv){
   if(needepilogue){
     epilogue(&opts);
     }
-  
+
   return 0;
   }

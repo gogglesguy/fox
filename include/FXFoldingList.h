@@ -470,6 +470,12 @@ public:
   /// Get item at x,y, if any
   virtual FXFoldingItem* getItemAt(FXint x,FXint y) const;
 
+  /// Return item hit code: 0 outside, 1 icon, 2 text, 3 box
+  FXint hitItem(const FXFoldingItem* item,FXint x,FXint y) const;
+
+  /// Scroll to make item visible
+  virtual void makeItemVisible(FXFoldingItem* item);
+
   /**
   * Search items by name, beginning from item start.  If the start item
   * is NULL the search will start at the first, top-most item in the list.
@@ -490,9 +496,6 @@ public:
   * to control whether the search wraps at the start or end of the list.
   */
   FXFoldingItem* findItemByData(FXptr ptr,FXFoldingItem* start=NULL,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP) const;
-
-  /// Scroll to make item visible
-  virtual void makeItemVisible(FXFoldingItem* item);
 
   /// Change item's text
   void setItemText(FXFoldingItem* item,const FXString& text);
@@ -538,9 +541,6 @@ public:
 
   /// Return true if item is enabled
   FXbool isItemEnabled(const FXFoldingItem* item) const;
-
-  /// Return item hit code: 0 outside, 1 icon, 2 text, 3 box
-  FXint hitItem(const FXFoldingItem* item,FXint x,FXint y) const;
 
   /// Repaint item
   void updateItem(FXFoldingItem* item);

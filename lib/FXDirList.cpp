@@ -201,9 +201,6 @@ FXDirList::FXDirList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXi
 // Create X window
 void FXDirList::create(){
   FXTreeList::create();
-  if(!deleteType){deleteType=getApp()->registerDragType(deleteTypeName);}
-  if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
-  if(!actionType){actionType=getApp()->registerDragType(actionTypeName);}
   getApp()->addTimeout(this,ID_REFRESHTIMER,REFRESHINTERVAL);
   opendiricon->create();
   closeddiricon->create();
@@ -231,9 +228,6 @@ void FXDirList::detach(){
   networkicon->detach();
   floppyicon->detach();
   zipdiskicon->detach();
-  deleteType=0;
-  urilistType=0;
-  actionType=0;
   }
 
 

@@ -90,7 +90,7 @@ FXbool FXJSONFile::open(const FXString& filename,Direction d,FXuval sz){
 FXbool FXJSONFile::fill(){
   register FXival n;
   if(file.isReadable()){
-    if(rptr<wptr){ memmove(begptr,rptr,wptr-rptr); }
+    if(rptr<wptr){ moveElms(begptr,rptr,wptr-rptr); }
     wptr=begptr+(wptr-rptr);
     sptr-=rptr-begptr;
     rptr=begptr;
@@ -111,7 +111,7 @@ FXbool FXJSONFile::flush(){
     n=file.writeBlock(rptr,wptr-rptr);
     if(0<=n){
       rptr+=n;
-      if(rptr<wptr){ memmove(begptr,rptr,wptr-rptr); }
+      if(rptr<wptr){ moveElms(begptr,rptr,wptr-rptr); }
       wptr=begptr+(wptr-rptr);
       rptr=begptr;
       return wptr<endptr;

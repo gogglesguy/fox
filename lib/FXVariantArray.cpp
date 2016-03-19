@@ -65,19 +65,6 @@ FXVariantArray::FXVariantArray(const FXVariant& src,FXival n):FXArray<FXVariant>
 FXVariantArray::FXVariantArray(const FXVariant* src,FXival n):FXArray<FXVariant>(src,n){
   }
 
-
-// Equality operator
-FXbool FXVariantArray::operator==(const FXVariantArray& other) const {
-  return equalElms(data(),other.data(),no());
-  }
-
-
-// Inequality operator
-FXbool FXVariantArray::operator!=(const FXVariantArray& other) const {
-  return !equalElms(data(),other.data(),no());
-  }
-
-
 // Destructor
 FXVariantArray::~FXVariantArray(){
   }

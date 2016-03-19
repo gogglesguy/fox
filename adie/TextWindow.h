@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -27,7 +27,7 @@ class Adie;
 class Syntax;
 class HelpWindow;
 class Preferences;
-
+class ShellCommand;
 
 // Array of styles
 typedef FXArray<FXHiliteStyle> FXHiliteArray;
@@ -48,6 +48,7 @@ protected:
   FXMenuPane          *editmenu;                // Edit menu
   FXMenuPane          *gotomenu;                // Goto menu
   FXMenuPane          *searchmenu;              // Search menu
+  FXMenuPane          *shellmenu;               // Shell menu
   FXMenuPane          *optionmenu;              // Option menu
   FXMenuPane          *viewmenu;                // View menu
   FXMenuPane          *windowmenu;              // Window menu
@@ -56,7 +57,10 @@ protected:
   FXMenuPane          *tabsmenu;                // Tab selection menu
   FXVerticalFrame     *treebox;                 // Tree box containing directories/files
   FXHorizontalFrame   *undoredoblock;           // Undo/redo block on status line
-  FXText              *editor;                  // Multiline text widget
+  FXHorizontalFrame   *editorframe;             // Editor frame
+  FXHorizontalFrame   *loggerframe;             // Logger frame
+  FXText              *editor;                  // Editor text widget
+  FXText              *logger;                  // Logger text widget
   FXDirList           *dirlist;                 // Directory view
   FXComboBox          *filter;                  // Combobox for pattern list
   FXTextField         *clock;                   // Time
@@ -76,6 +80,9 @@ protected:
   FXString             delimiters;              // Text delimiters
   FXString             searchpaths;             // Search paths for files
   FXHiliteArray        styles;                  // Highlight styles
+  ShellCommand        *shellCommand;            // Running shell command, if any
+  FXint                replaceStart;            // Start of text to be replaced
+  FXint                replaceEnd;              // End of text to be replaced
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
   FXString             searchstring;            // String of last search
@@ -83,6 +90,7 @@ protected:
   FXint                searchpos;               // Incremental search position
   FXbool               searching;               // Incremental search in effect
   FXbool               showsearchbar;           // Showing incremental search bar
+  FXbool               showlogger;              // Showing error logger
   FXbool               initialsize;             // New window is initialwidth x initialheight
   FXbool               colorize;                // Syntax coloring on if possible
   FXbool               stripcr;                 // Strip carriage returns
@@ -110,8 +118,8 @@ protected:
   void restyleText();
   void restyleText(FXint pos,FXint del,FXint ins);
   FXint restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint rule);
-  FXHiliteStyle readStyleForRule(const FXString& name);
-  void writeStyleForRule(const FXString& name,const FXHiliteStyle& style);
+  FXHiliteStyle readStyleForRule(const FXString& group,const FXString& name,const FXString& style);
+  void writeStyleForRule(const FXString& group,const FXString& name,const FXHiliteStyle& style);
   FXbool matchesSelection(const FXString& string,FXint* beg,FXint* end,FXuint flgs,FXint npar) const;
 protected:
   enum{
@@ -262,9 +270,25 @@ public:
   long onCmdSearchPaths(FXObject*,FXSelector,void*);
   long onUpdSearchPaths(FXObject*,FXSelector,void*);
 
+  // Shell commands
+  long onCmdShellDialog(FXObject*,FXSelector,void*);
+  long onUpdShellDialog(FXObject*,FXSelector,void*);
+  long onCmdShellFilter(FXObject*,FXSelector,void*);
+  long onUpdShellFilter(FXObject*,FXSelector,void*);
+  long onCmdShellCancel(FXObject*,FXSelector,void*);
+  long onUpdShellCancel(FXObject*,FXSelector,void*);
+  long onCmdShellOutput(FXObject*,FXSelector,void*);
+  long onCmdShellError(FXObject*,FXSelector,void*);
+  long onCmdShellDone(FXObject*,FXSelector,void*);
+
   // Evaluate expression
   long onCmdExpression(FXObject*,FXSelector,void*);
   long onUpdExpression(FXObject*,FXSelector,void*);
+
+  // URL encode/decode
+  long onCmdURLEncode(FXObject*,FXSelector,void*);
+  long onCmdURLDecode(FXObject*,FXSelector,void*);
+  long onUpdURLCoding(FXObject*,FXSelector,void*);
 
   // Jumping around
   long onCmdGotoLine(FXObject*,FXSelector,void*);
@@ -345,6 +369,7 @@ public:
     ID_FIXED_WRAP,
     ID_SAVE_SETTINGS,
     ID_TEXT,
+    ID_LOGGER,
     ID_STRIP_CR,
     ID_STRIP_SP,
     ID_APPEND_NL,
@@ -446,6 +471,14 @@ public:
     ID_TABSELECT_6,
     ID_TABSELECT_7,
     ID_TABSELECT_8,
+    ID_SHELL_DIALOG,
+    ID_SHELL_FILTER,
+    ID_SHELL_CANCEL,
+    ID_SHELL_OUTPUT,
+    ID_SHELL_ERROR,
+    ID_SHELL_DONE,
+    ID_URL_ENCODE,
+    ID_URL_DECODE,
     ID_LAST
     };
 public:
@@ -565,6 +598,15 @@ public:
 
   // Search next incremental text
   FXbool performISearch(const FXString& text,FXbool advance=false,FXbool notify=false);
+
+  // Start shell command
+  FXbool startCommand(const FXString& command,const FXString& input=FXString::null);
+
+  // Done with command
+  FXbool doneCommand();
+
+  // Stop shell command
+  FXbool stopCommand();
 
   // Set syntax
   void setSyntax(Syntax* syn);

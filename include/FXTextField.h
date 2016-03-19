@@ -285,6 +285,9 @@ public:
   /// Remove range of text
   void removeText(FXint pos,FXint m,FXbool notify=false);
 
+  /// Remove all text
+  void clearText(FXbool notify=false);
+  
   /// Select all text
   FXbool selectAll();
 
@@ -329,7 +332,7 @@ public:
 
   /// Return cursor position
   FXint getCursorPos() const { return cursor; }
-  
+
   /// Move cursor to position, and scroll into view
   void moveCursor(FXint pos);
 

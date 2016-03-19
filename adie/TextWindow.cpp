@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -39,6 +39,7 @@
 #include "TextWindow.h"
 #include "Adie.h"
 #include "FindInFiles.h"
+#include "ShellCommand.h"
 #include "icons.h"
 
 
@@ -115,8 +116,6 @@
     replace selection with result.
   - When making new window (i.e. no file), initialize directory part
     of the untitled file to that of the current text window.
-  - FIXME search and replace, as well as findText() etc. does NOT belong
-    in FXText widget but here.
 */
 
 #define CLOCKTIMER      1000000000
@@ -129,7 +128,6 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,0,TextWindow::onUpdate),
   FXMAPFUNC(SEL_FOCUSIN,0,TextWindow::onFocusIn),
   FXMAPFUNC(SEL_TIMEOUT,TextWindow::ID_CLOCKTIME,TextWindow::onClock),
-
   FXMAPFUNC(SEL_FOCUSIN,TextWindow::ID_TEXT,TextWindow::onTextFocus),
   FXMAPFUNC(SEL_INSERTED,TextWindow::ID_TEXT,TextWindow::onTextInserted),
   FXMAPFUNC(SEL_REPLACED,TextWindow::ID_TEXT,TextWindow::onTextReplaced),
@@ -263,8 +261,23 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCHPATHS,TextWindow::onCmdSearchPaths),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATHS,TextWindow::onUpdSearchPaths),
 
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHELL_DIALOG,TextWindow::onCmdShellDialog),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SHELL_DIALOG,TextWindow::onUpdShellDialog),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHELL_FILTER,TextWindow::onCmdShellFilter),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SHELL_FILTER,TextWindow::onUpdShellFilter),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHELL_CANCEL,TextWindow::onCmdShellCancel),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SHELL_CANCEL,TextWindow::onUpdShellCancel),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHELL_OUTPUT,TextWindow::onCmdShellOutput),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHELL_ERROR,TextWindow::onCmdShellError),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SHELL_DONE,TextWindow::onCmdShellDone),
+
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXPRESSION,TextWindow::onCmdExpression),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXPRESSION,TextWindow::onUpdExpression),
+
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_URL_ENCODE,TextWindow::onCmdURLEncode),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_URL_ENCODE,TextWindow::onUpdURLCoding),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_URL_DECODE,TextWindow::onCmdURLDecode),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_URL_DECODE,TextWindow::onUpdURLCoding),
 
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_GOTO_LINE,TextWindow::onCmdGotoLine),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_GOTO_SELECTED,TextWindow::onCmdGotoSelected),
@@ -395,13 +408,18 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   filter=new FXComboBox(filterframe,25,this,ID_FILEFILTER,COMBOBOX_STATIC|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
   filter->setNumVisible(4);
 
-  // Sunken border for text widget
-  FXHorizontalFrame *textbox=new FXHorizontalFrame(splitter,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
+  FXSplitter* subsplitter=new FXSplitter(splitter,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|LAYOUT_FILL_Y|SPLITTER_VERTICAL|SPLITTER_REVERSED|SPLITTER_TRACKING);
 
-  // Make editor window
-  editor=new FXText(textbox,this,ID_TEXT,LAYOUT_FILL_X|LAYOUT_FILL_Y|TEXT_SHOWACTIVE);
+  // Editor frame and text widgets
+  editorframe=new FXHorizontalFrame(subsplitter,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
+  editor=new FXText(editorframe,this,ID_TEXT,LAYOUT_FILL_X|LAYOUT_FILL_Y|TEXT_SHOWACTIVE);
   editor->setHiliteMatchTime(2000000000);
   editor->setBarColumns(6);
+
+  // Logger frame and logger widget
+  loggerframe=new FXHorizontalFrame(subsplitter,LAYOUT_SIDE_BOTTOM|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X,0,0,0,0, 0,0,0,0);
+  logger=new FXText(loggerframe,this,ID_LOGGER,LAYOUT_FILL_X|LAYOUT_FILL_Y|TEXT_READONLY);
+  logger->setVisibleRows(6);
 
   // Create status bar
   createStatusbar();
@@ -446,10 +464,17 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   searchpaths="/usr/include";
   setPatterns("All Files (*)");
   setCurrentPattern(0);
+  shellCommand=NULL;
+  replaceStart=0;
+  replaceEnd=0;
+  initialwidth=640;
+  initialheight=480;
   searchflags=SEARCH_FORWARD|SEARCH_EXACT;
   searchpos=-1;
   searching=false;
   showsearchbar=false;
+  showlogger=false;
+  initialsize=true;
   colorize=false;
   stripcr=true;
   stripsp=false;
@@ -458,9 +483,6 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   saveviews=false;
   savemarks=false;
   warnchanged=false;
-  initialwidth=640;
-  initialheight=480;
-  initialsize=true;
   lastfilesize=false;
   lastfileposition=false;
   undolist.mark();
@@ -520,7 +542,9 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
   new FXMenuCommand(editmenu,tr("&Delete\t\tDelete selection."),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
   new FXMenuSeparator(editmenu);
-  new FXMenuCommand(editmenu,tr("Evaluate\t\tEvaluate selected expression."),NULL,this,ID_EXPRESSION);
+  new FXMenuCommand(editmenu,tr("Expression\t\tEvaluate selected expression."),NULL,this,ID_EXPRESSION);
+  new FXMenuCommand(editmenu,tr("URL Encode\t\tEncode url special characters."),NULL,this,ID_URL_ENCODE);
+  new FXMenuCommand(editmenu,tr("URL Decode\t\tDecode url special characters."),NULL,this,ID_URL_DECODE);
   new FXMenuCommand(editmenu,tr("Lo&wer-case\tCtl-U\tChange to lower case."),getApp()->lowercaseicon,editor,FXText::ID_LOWER_CASE);
   new FXMenuCommand(editmenu,tr("Upp&er-case\tCtl-Shift-U\tChange to upper case."),getApp()->uppercaseicon,editor,FXText::ID_UPPER_CASE);
   new FXMenuCommand(editmenu,tr("Clean indent\t\tClean indentation to either all tabs or all spaces."),NULL,editor,FXText::ID_CLEAN_INDENT);
@@ -569,10 +593,10 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,this,ID_SEARCH);
   new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),getApp()->replaceicon,this,ID_REPLACE);
 
-  // Syntax menu
-  syntaxmenu=new FXMenuPane(this);
-  new FXMenuRadio(syntaxmenu,tr("Plain"),this,ID_SYNTAX_FIRST);
-  for(int syn=0; syn<getApp()->syntaxes.no(); syn++){
+  // Syntax menu; it scrolls if we get too many
+  syntaxmenu=new FXScrollPane(this,25);
+  new FXMenuRadio(syntaxmenu,tr("Plain\t\tNo syntax for this file."),this,ID_SYNTAX_FIRST);
+  for(int syn=0; syn<getApp()->syntaxes.no() && syn<100; syn++){
     new FXMenuRadio(syntaxmenu,getApp()->syntaxes[syn]->getName(),this,ID_SYNTAX_FIRST+1+syn);
     }
 
@@ -586,6 +610,16 @@ void TextWindow::createMenubar(){
   new FXMenuRadio(tabsmenu,"6",this,ID_TABSELECT_6);
   new FXMenuRadio(tabsmenu,"7",this,ID_TABSELECT_7);
   new FXMenuRadio(tabsmenu,"8",this,ID_TABSELECT_8);
+
+
+  // Shell Menu
+  shellmenu=new FXMenuPane(this);
+  new FXMenuTitle(menubar,tr("&Command"),NULL,shellmenu);
+
+  // Options menu
+  new FXMenuCommand(shellmenu,tr("Execute &Command...\t\tExecute a shell command."),NULL,this,ID_SHELL_DIALOG);
+  new FXMenuCommand(shellmenu,tr("&Filter Selection...\t\tFilter selection through shell command."),NULL,this,ID_SHELL_FILTER);
+  new FXMenuCommand(shellmenu,tr("C&ancel Command\t\tCancel shell command."),NULL,this,ID_SHELL_CANCEL);
 
   // Options Menu
   optionmenu=new FXMenuPane(this);
@@ -603,7 +637,7 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(optionmenu,tr("Set initial size\t\tSet current window size as the initial window size."),NULL,this,ID_SET_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("&Restyle\t\tToggle syntax coloring."),NULL,this,ID_RESTYLE);
   new FXMenuCascade(optionmenu,tr("Tab stops"),NULL,tabsmenu);
-  new FXMenuCascade(optionmenu,tr("Syntax patterns"),NULL,syntaxmenu);
+  new FXMenuCascade(optionmenu,tr("Syntax patterns\t\tSelect syntax for this file."),NULL,syntaxmenu);
   new FXMenuSeparator(optionmenu);
   new FXMenuCommand(optionmenu,tr("Save Settings\t\tSave settings now."),NULL,this,ID_SAVE_SETTINGS);
 
@@ -614,6 +648,7 @@ void TextWindow::createMenubar(){
   // View Menu entries
   new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
   new FXMenuCheck(viewmenu,tr("File Browser\t\tDisplay file list."),this,ID_TOGGLE_BROWSER);
+  new FXMenuCheck(viewmenu,tr("Error Logger\t\tDisplay error logger."),loggerframe,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Toolbar\t\tDisplay toolbar."),toolbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Searchbar\t\tDisplay search bar."),searchbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Status line\t\tDisplay status line."),statusbar,FXWindow::ID_TOGGLESHOWN);
@@ -704,11 +739,8 @@ void TextWindow::createToolbar(){
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
   new FXToggleButton(toolbar,tr("\tShow Browser\t\tShow file browser."),tr("\tHide Browser\t\tHide file browser."),getApp()->nobrowsericon,getApp()->browsericon,this,ID_TOGGLE_BROWSER,ICON_ABOVE_TEXT|TOGGLEBUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-
-  // Color
+  new FXToggleButton(toolbar,tr("\tShow Logger\t\tShow error logger."),tr("\tHide Logger\t\tHide error logger."),getApp()->nologgericon,getApp()->loggericon,loggerframe,FXWindow::ID_TOGGLESHOWN,ICON_ABOVE_TEXT|TOGGLEBUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tPreferences\tDisplay preferences dialog."),getApp()->configicon,this,ID_PREFERENCES,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-
-  // Color
   new FXButton(toolbar,tr("\tFonts\tDisplay font dialog."),getApp()->fontsicon,this,ID_FONT,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Help
@@ -843,6 +875,7 @@ void TextWindow::detach(){
 TextWindow::~TextWindow(){
   getApp()->windowlist.remove(this);
   getApp()->removeTimeout(this,ID_CLOCKTIME);
+  delete shellCommand;
   delete font;
   delete dragshell1;
   delete dragshell2;
@@ -851,6 +884,7 @@ TextWindow::~TextWindow(){
   delete editmenu;
   delete gotomenu;
   delete searchmenu;
+  delete shellmenu;
   delete optionmenu;
   delete viewmenu;
   delete windowmenu;
@@ -1239,7 +1273,7 @@ void TextWindow::setStatusMessage(const FXString& msg){
 void TextWindow::readRegistry(){
   FXColor textback,textfore,textselback,textselfore,textcursor,texthilitefore,texthiliteback;
   FXColor dirback,dirfore,dirselback,dirselfore,dirlines,textactiveback,textbar,textnumber;
-  FXint ww,hh,xx,yy,treewidth,wrapping,wrapcols,tabcols,barcols;
+  FXint ww,hh,xx,yy,treewidth,wrapping,wrapcols,tabcols,barcols,loggerheight;
   FXbool hiddenfiles,autoindent,showactive,hardtabs,hidetree,hideclock,hidestatus,hideundo,hidetoolbar,fixedwrap,jumpscroll;
   FXString fontspec;
 
@@ -1270,6 +1304,7 @@ void TextWindow::readRegistry(){
   if(!fontspec.empty()){
     font=new FXFont(getApp(),fontspec);
     editor->setFont(font);
+    logger->setFont(font);
     }
 
   // Get size
@@ -1298,6 +1333,9 @@ void TextWindow::readRegistry(){
 
   // Showing the tree?
   hidetree=getApp()->reg().readBoolEntry("SETTINGS","hidetree",true);
+  treewidth=getApp()->reg().readIntEntry("SETTINGS","treewidth",100);
+  if(!hidetree) ww+=treewidth;
+  treebox->setWidth(treewidth);
 
   // Showing the clock?
   hideclock=getApp()->reg().readBoolEntry("SETTINGS","hideclock",false);
@@ -1311,12 +1349,13 @@ void TextWindow::readRegistry(){
   // Showing the search bar?
   showsearchbar=getApp()->reg().readBoolEntry("SETTINGS","showsearchbar",false);
 
+  // Showing the errors display?
+  showlogger=getApp()->reg().readBoolEntry("SETTINGS","showlogger",false);
+  loggerheight=getApp()->reg().readIntEntry("SETTINGS","loggerheight",32);
+  loggerframe->setHeight(loggerheight);
+
   // Highlight match time
   editor->setHiliteMatchTime(getApp()->reg().readLongEntry("SETTINGS","bracematchpause",2000000000));
-
-  // Width of tree
-  treewidth=getApp()->reg().readIntEntry("SETTINGS","treewidth",100);
-  if(!hidetree) ww+=treewidth;
 
   // Active Background
   showactive=getApp()->reg().readBoolEntry("SETTINGS","showactive",false);
@@ -1389,11 +1428,11 @@ void TextWindow::readRegistry(){
   // Hide search bar
   if(!showsearchbar) searchbar->hide();
 
+  // Hide errors
+  if(!showlogger) loggerframe->hide();
+
   // Hide undo counters
   if(hideundo) undoredoblock->hide();
-
-  // Set tree width
-  treebox->setWidth(treewidth);
 
   // Wrap mode
   if(wrapping)
@@ -1484,6 +1523,7 @@ void TextWindow::writeRegistry(){
 
   // Was tree shown
   getApp()->reg().writeBoolEntry("SETTINGS","hidetree",!treebox->shown());
+  getApp()->reg().writeIntEntry("SETTINGS","treewidth",treebox->getWidth());
 
   // Was status line shown
   getApp()->reg().writeBoolEntry("SETTINGS","hidestatus",!statusbar->shown());
@@ -1497,14 +1537,15 @@ void TextWindow::writeRegistry(){
   // Was search bar shown
   getApp()->reg().writeBoolEntry("SETTINGS","showsearchbar",searchbar->shown());
 
+  // Was logger display shown
+  getApp()->reg().writeBoolEntry("SETTINGS","showlogger",loggerframe->shown());
+  getApp()->reg().writeIntEntry("SETTINGS","loggerheight",loggerframe->getHeight());
+
   // Were undo counters shown
   getApp()->reg().writeBoolEntry("SETTINGS","hideundo",!undoredoblock->shown());
 
   // Highlight match time
   getApp()->reg().writeLongEntry("SETTINGS","bracematchpause",editor->getHiliteMatchTime());
-
-  // Width of tree
-  getApp()->reg().writeIntEntry("SETTINGS","treewidth",treebox->getWidth());
 
   // Wrap mode
   getApp()->reg().writeBoolEntry("SETTINGS","wordwrap",(editor->getTextStyle()&TEXT_WORDWRAP)!=0);
@@ -1556,7 +1597,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2014 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and text\nfile viewer with an integrated file browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2015 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1596,6 +1637,7 @@ long TextWindow::onCmdFont(FXObject*,FXSelector,void*){
     font=new FXFont(getApp(),fontdesc);
     font->create();
     editor->setFont(font);
+    logger->setFont(font);
     delete oldfont;
     }
   return 1;
@@ -2716,6 +2758,7 @@ long TextWindow::onUpdSearchPaths(FXObject* sender,FXSelector,void*){
   return 1;
   }
 
+/*******************************************************************************/
 
 // Evaluate expression
 long TextWindow::onCmdExpression(FXObject* sender,FXSelector,void*){
@@ -2731,15 +2774,205 @@ long TextWindow::onCmdExpression(FXObject* sender,FXSelector,void*){
   }
 
 
-// Update evaluate expression
+// Update evaluate expression; ensure that no more than one line is selected
 long TextWindow::onUpdExpression(FXObject* sender,FXSelector,void*){
-  FXString string(editor->getSelectedText());
-  FXExpression expression;
-  if(expression.parse(string)==FXExpression::ErrOK){
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
-    return 1;
+  if(editor->getSelStartPos()<editor->getSelEndPos() && editor->getSelEndPos()<=editor->lineEnd(editor->getSelStartPos())){
+    FXString string(editor->getSelectedText());
+    FXExpression expression;
+    if(expression.parse(string)==FXExpression::ErrOK){
+      sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+      return 1;
+      }
     }
   sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+/*******************************************************************************/
+
+// Encode URL characters
+long TextWindow::onCmdURLEncode(FXObject*,FXSelector,void*){
+  FXString string(editor->getSelectedText());
+  editor->replaceSelection(FXURL::encode(string,"<>#%{}|^~[]`\"\\?$&'*,;= "),true);
+  return 1;
+  }
+
+// Decode URL characters
+long TextWindow::onCmdURLDecode(FXObject*,FXSelector,void*){
+  FXString string(editor->getSelectedText());
+  editor->replaceSelection(FXURL::decode(string),true);
+  return 1;
+  }
+
+
+// Enable url decode/encode if single line
+long TextWindow::onUpdURLCoding(FXObject* sender,FXSelector,void*){
+  FXbool onelineselected=editor->getSelStartPos()<editor->getSelEndPos() && editor->getSelEndPos()<=editor->lineEnd(editor->getSelStartPos());
+  sender->handle(this,onelineselected?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+/*******************************************************************************/
+
+// Start shell command
+FXbool TextWindow::startCommand(const FXString& command,const FXString& input){
+  if(!shellCommand){
+    shellCommand=new ShellCommand(getApp(),this,FXSEL(SEL_COMMAND,ID_SHELL_OUTPUT),FXSEL(SEL_COMMAND,ID_SHELL_ERROR),FXSEL(SEL_COMMAND,ID_SHELL_DONE));
+    shellCommand->setInput(input);
+    if(!shellCommand->start(command)){
+      FXMessageBox::error(this,MBOX_OK,tr("Command Error"),tr("Unable to execute command: %s"),command.text());
+      delete shellCommand;
+      shellCommand=NULL;
+      return false;
+      }
+    undolist.begin(new FXCommandGroup);
+    getApp()->beginWaitCursor();
+    logger->clearText();
+    return true;
+    }
+  return false;
+  }
+
+
+// Stop shell command
+FXbool TextWindow::stopCommand(){
+  if(shellCommand){
+    undolist.end();
+    getApp()->endWaitCursor();
+    if(!showlogger){
+      loggerframe->hide();
+      loggerframe->recalc();
+      }
+    shellCommand->cancel();
+    delete shellCommand;
+    shellCommand=NULL;
+    return true;
+    }
+  return false;
+  }
+
+
+// Done with command
+FXbool TextWindow::doneCommand(){
+  if(shellCommand){
+    undolist.end();
+    getApp()->endWaitCursor();
+    delete shellCommand;
+    shellCommand=NULL;
+    return true;
+    }
+  return false;
+  }
+
+
+// Shell command dialog
+long TextWindow::onCmdShellDialog(FXObject*,FXSelector,void*){
+  if(!shellCommand){
+    FXInputDialog dialog(this,tr("Execute Command"),tr("&Execute shell command:"),NULL,INPUTDIALOG_STRING,0,0,400,0);
+    if(dialog.execute(PLACEMENT_OWNER)){
+
+      // Get command
+      FXString command=dialog.getText();
+
+      // Output goes to insertion point
+      replaceStart=replaceEnd=editor->getCursorPos();
+
+      // Start
+      startCommand(command);
+      }
+    }
+  return 1;
+  }
+
+
+// Update command dialog
+long TextWindow::onUpdShellDialog(FXObject* sender,FXSelector,void*){
+  sender->handle(this,!shellCommand?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Filter selection through shell command
+long TextWindow::onCmdShellFilter(FXObject*,FXSelector,void*){
+  if(!shellCommand){
+    FXInputDialog dialog(this,tr("Filter Selection"),tr("&Filter selection with shell command:"),NULL,INPUTDIALOG_STRING,0,0,400,0);
+    if(dialog.execute(PLACEMENT_OWNER)){
+
+      // Get command
+      FXString command=dialog.getText();
+      FXString selection;
+
+      // Get selection
+      replaceStart=editor->getSelStartPos();
+      replaceEnd=editor->getSelEndPos();
+      editor->extractText(selection,replaceStart,replaceEnd-replaceStart);
+
+      // Start
+      startCommand(command,selection);
+      }
+    }
+  return 1;
+  }
+
+
+// Update filter selection
+long TextWindow::onUpdShellFilter(FXObject* sender,FXSelector,void*){
+  sender->handle(this,!shellCommand && editor->hasSelection()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Cancel shell command
+long TextWindow::onCmdShellCancel(FXObject*,FXSelector,void*){
+  stopCommand();
+  return 1;
+  }
+
+
+// Update shell command
+long TextWindow::onUpdShellCancel(FXObject* sender,FXSelector,void*){
+  sender->handle(this,shellCommand?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Output from shell
+long TextWindow::onCmdShellOutput(FXObject*,FXSelector,void* ptr){
+  FXTRACE((1,"TextWindow::onCmdShellOutput\n"));
+  const FXchar* string=(const FXchar*)ptr;
+  FXint len=strlen(string);
+  if(replaceStart>editor->getLength()) replaceStart=editor->getLength();
+  if(replaceEnd>editor->getLength()) replaceEnd=editor->getLength();
+  editor->replaceText(replaceStart,replaceEnd-replaceStart,string,len,true);
+  replaceStart=replaceStart+len;
+  replaceEnd=replaceStart;
+  editor->setCursorPos(replaceEnd);
+  editor->makePositionVisible(replaceEnd);
+  return 1;
+  }
+
+
+// Shell command has error
+long TextWindow::onCmdShellError(FXObject*,FXSelector,void* ptr){
+  FXTRACE((1,"TextWindow::onCmdShellError\n"));
+  const FXchar* string=(const FXchar*)ptr;
+  FXint len=strlen(string);
+  showlogger=loggerframe->shown();
+  if(!showlogger){
+    loggerframe->show();
+    loggerframe->recalc();
+    }
+  logger->appendText(string,len,true);
+  logger->setCursorPos(logger->getLength());
+  logger->makePositionVisible(logger->getLength());
+  return 1;
+  }
+
+
+// Shell command is done
+long TextWindow::onCmdShellDone(FXObject*,FXSelector,void*){
+  FXTRACE((1,"TextWindow::onCmdShellDone\n"));
+  doneCommand();
   return 1;
   }
 
@@ -2776,9 +3009,7 @@ long TextWindow::onCmdGotoSelected(FXObject*,FXSelector,void*){
   return 1;
   }
 
-
 /*******************************************************************************/
-
 
 // Check if the selection (if any) matches the pattern
 FXbool TextWindow::matchesSelection(const FXString& string,FXint* beg,FXint* end,FXuint flgs,FXint npar) const {
@@ -3812,7 +4043,7 @@ long TextWindow::onUpdSyntaxSwitch(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleNormalFG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_NORMAL_FG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].normalForeColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3829,7 +4060,7 @@ long TextWindow::onUpdStyleNormalFG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleNormalBG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_NORMAL_BG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].normalBackColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3846,7 +4077,7 @@ long TextWindow::onUpdStyleNormalBG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleSelectFG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_SELECT_FG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].selectForeColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3863,7 +4094,7 @@ long TextWindow::onUpdStyleSelectFG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleSelectBG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_SELECT_BG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].selectBackColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3880,7 +4111,7 @@ long TextWindow::onUpdStyleSelectBG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleHiliteFG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_HILITE_FG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].hiliteForeColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3897,7 +4128,7 @@ long TextWindow::onUpdStyleHiliteFG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleHiliteBG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_HILITE_BG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].hiliteBackColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3914,7 +4145,7 @@ long TextWindow::onUpdStyleHiliteBG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleActiveBG(FXObject* sender,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_ACTIVE_BG_FIRST;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&styles[index].activeBackColor);
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3931,7 +4162,7 @@ long TextWindow::onUpdStyleActiveBG(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleUnderline(FXObject*,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_UNDERLINE_FIRST;
   styles[index].style^=FXText::STYLE_UNDERLINE;
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3948,7 +4179,7 @@ long TextWindow::onUpdStyleUnderline(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleStrikeout(FXObject*,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_STRIKEOUT_FIRST;
   styles[index].style^=FXText::STYLE_STRIKEOUT;
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3965,7 +4196,7 @@ long TextWindow::onUpdStyleStrikeout(FXObject* sender,FXSelector sel,void*){
 long TextWindow::onCmdStyleBold(FXObject*,FXSelector sel,void*){
   FXint index=FXSELID(sel)-ID_STYLE_BOLD_FIRST;
   styles[index].style^=FXText::STYLE_BOLD;
-  writeStyleForRule(syntax->getRule(index+1)->getName(),styles[index]);
+  writeStyleForRule(syntax->getGroup(),syntax->getRule(index+1)->getName(),styles[index]);
   editor->update();
   return 1;
   }
@@ -3984,17 +4215,17 @@ void TextWindow::setSyntax(Syntax* syn){
   FXint rule;
   syntax=syn;
   if(syntax){
-    editor->setDelimiters(syntax->getDelimiters().text());
     styles.no(syntax->getNumRules()-1);
     for(rule=1; rule<syntax->getNumRules(); rule++){
-      styles[rule-1]=readStyleForRule(syntax->getRule(rule)->getName());
+      styles[rule-1]=readStyleForRule(syntax->getGroup(),syntax->getRule(rule)->getName(),syntax->getRule(rule)->getStyle());
       }
+    editor->setDelimiters(syntax->getDelimiters().text());
     editor->setHiliteStyles(styles.data());
     editor->setStyled(colorize);
     restyleText();
     }
   else{
-    editor->setDelimiters(FXText::textDelimiters);
+    editor->setDelimiters(delimiters.text());
     editor->setHiliteStyles(NULL);
     editor->setStyled(false);
     }
@@ -4002,25 +4233,26 @@ void TextWindow::setSyntax(Syntax* syn){
 
 
 // Read style
-FXHiliteStyle TextWindow::readStyleForRule(const FXString& name){
+FXHiliteStyle TextWindow::readStyleForRule(const FXString& group,const FXString& name,const FXString& style){
   FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100]; FXint sty;
-  FXHiliteStyle style={0,0,0,0,0,0,0,0};
-  if(getApp()->reg().readFormatEntry("STYLE",name,"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)==8){
-    style.normalForeColor=colorFromName(nfg);
-    style.normalBackColor=colorFromName(nbg);
-    style.selectForeColor=colorFromName(sfg);
-    style.selectBackColor=colorFromName(sbg);
-    style.hiliteForeColor=colorFromName(hfg);
-    style.hiliteBackColor=colorFromName(hbg);
-    style.activeBackColor=colorFromName(abg);
-    style.style=sty;
+  FXHiliteStyle result={0,0,0,0,0,0,0,0};
+  result.normalForeColor=colorFromName(style);  // Fallback color
+  if(getApp()->reg().readFormatEntry(group,name,"%99[^,],%99[^,],%99[^,],%99[^,],%99[^,],%99[^,],%99[^,],%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,&sty)==8){
+    result.normalForeColor=colorFromName(nfg);
+    result.normalBackColor=colorFromName(nbg);
+    result.selectForeColor=colorFromName(sfg);
+    result.selectBackColor=colorFromName(sbg);
+    result.hiliteForeColor=colorFromName(hfg);
+    result.hiliteBackColor=colorFromName(hbg);
+    result.activeBackColor=colorFromName(abg);
+    result.style=sty;
     }
-  return style;
+  return result;
   }
 
 
 // Write style
-void TextWindow::writeStyleForRule(const FXString& name,const FXHiliteStyle& style){
+void TextWindow::writeStyleForRule(const FXString& group,const FXString& name,const FXHiliteStyle& style){
   FXchar nfg[100],nbg[100],sfg[100],sbg[100],hfg[100],hbg[100],abg[100];
   nameFromColor(nfg,style.normalForeColor);
   nameFromColor(nbg,style.normalBackColor);
@@ -4029,7 +4261,7 @@ void TextWindow::writeStyleForRule(const FXString& name,const FXHiliteStyle& sty
   nameFromColor(hfg,style.hiliteForeColor);
   nameFromColor(hbg,style.hiliteBackColor);
   nameFromColor(abg,style.activeBackColor);
-  getApp()->reg().writeFormatEntry("STYLE",name,"%s,%s,%s,%s,%s,%s,%s,%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,style.style);
+  getApp()->reg().writeFormatEntry(group,name,"%s,%s,%s,%s,%s,%s,%s,%d",nfg,nbg,sfg,sbg,hfg,hbg,abg,style.style);
   }
 
 
@@ -4183,7 +4415,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint
   }
 
 
-// Restyle text after change in buffer [fm,to]
+// Restyle text after change in buffer
 void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
   FXint head,tail,changed,affected,beg,end,len,rule,restylejump;
   FXTRACE((1,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));

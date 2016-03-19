@@ -69,9 +69,48 @@
   - The following reference was used to achieve proper enquoting of commandline parameters
     to pass along to CreateProcess():
 
-        http://www.autohotkey.net/~deleyd/parameters/parameters.htm
-
+        http://www.daviddeley.com/autohotkey/parameters/parameters.htm
+        
   - On *NIX, we close all file descriptors except the stdin, stdout, stderr.
+  
+  - The Microsoft C/C++ Parameter Parsing Rules Rephrased:
+
+     o Parameters are always separated by a space or tab (multiple spaces/tabs OK).
+
+     o If the parameter does not contain any spaces, tabs, or double quotes, then all the characters 
+       in the parameter are accepted as is (there is no need to enclose the parameter in double quotes).
+
+     o Enclose spaces and tabs in a double quoted part.
+
+     o A double quoted part can be anywhere within a parameter.
+
+     o 2n backslashes followed by a " produce n backslashes + start/end double quoted part.
+
+     o 2n+1 backslashes followed by a " produce n backslashes + a literal quotation mark
+       n backslashes not followed by a quotation mark produce n backslashes.
+
+     o undocumented rules regarding double quotes:
+
+       Prior to 2008:
+         A " outside a double quoted block starts a double quoted block.
+         A " inside a double quoted block ends the double quoted block.
+         If a closing " is followed immediately by another ", the 2nd " is accepted literally and 
+         added to the parameter.
+
+       Post 2008:
+         Outside a double quoted block a " starts a double quoted block.
+         Inside a double quoted block a " followed by a different character (not another ") ends the 
+         double quoted block.
+         Inside a double quoted block a " followed immediately by another " (i.e. "") causes a 
+         single " to be added to the output, and the double quoted block continues.
+
+     o Thus:
+
+        Use "    to start/end a double quoted part
+        Use \"   to insert a literal "
+        Use \\"  to insert a \ then start or end a double quoted part
+        Use \\\" to insert a literal \"
+        Use \    to insert a literal \
 
 */
 
@@ -84,6 +123,7 @@ namespace FX {
 
 // Initialize process
 FXProcess::FXProcess():pid(0),input(NULL),output(NULL),errors(NULL){
+  FXTRACE((100,"FXProcess::FXProcess\n"));
   }
 
 
@@ -91,60 +131,6 @@ FXProcess::FXProcess():pid(0),input(NULL),output(NULL),errors(NULL){
 FXProcessID FXProcess::id() const {
   return pid;
   }
-
-/*
-
-//  while(waitpid(-1,NULL,WNOHANG)>0){}
-
-// create the security descriptor
-SECURITY_ATTRIBUTES saAttr;
-saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-saAttr.bInheritHandle = true;
-saAttr.lpSecurityDescriptor = NULL;
-CreatePipe(  &hStdInRead,  &hStdInWrite, &saAttr, 0);
-CreatePipe( &hStdOutRead, &hStdOutWrite, &saAttr, 0);
-CreatePipe( &hStdErrRead, &hStdErrWrite, &saAttr, 0);
-if ( ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) )
-
-  int fds[2],pid;
-  if(pipe(fds)<0){
-    return false;
-    }
-  pid=fork();
-  if(pid<0){
-    ::close(fds[0]);
-    ::close(fds[1]);
-    return false;
-    }
-  if(pid==0){
-    ::close(fds[0]);
-    ::dup2(fds[1],STDOUT_FILENO);
-    ::dup2(fds[1],STDERR_FILENO);
-    ::execl(pdshexecpath.text(),pdshexecpath.text(),"-R",pdshprotocol.text(),"-l",pdshusername.text(),"-w",hosts.text(),cmd.text(),NULL);
-    ::exit(1);
-    return false;
-    }
-  ::close(fds[1]);
-  ::fcntl(fds[0],F_SETFL,O_ASYNC);
-
-
-    FXnchar variable[256],string[1024];
-    utf2ncs(variable,name.text(),256);
-    if(!value.empty()){
-      utf2ncs(string,value.text(),1024);
-      return SetEnvironmentVariableW(variable,string)!=0;
-      }
-    return SetEnvironmentVariableW(variable,NULL)!=0;
-
-
-    if(!value.empty()){
-      return SetEnvironmentVariableA(name.text(),value.text())!=0;
-      }
-    return SetEnvironmentVariableA(name.text(),NULL)!=0;
-
-
-*/
-
 
 #if defined(WIN32)
 
@@ -191,7 +177,6 @@ static FXbool needquotes(const FXchar* ptr){
     }
   return false;
   }
-
 
 #ifdef UNICODE
 
@@ -699,12 +684,15 @@ FXbool FXProcess::wait(FXint& code){
   }
 
 
+
 // Delete
 FXProcess::~FXProcess(){
+  FXTRACE((100,"FXProcess::~FXProcess\n"));
   if(pid){
 #if defined(WIN32)
     ::CloseHandle((HANDLE)pid);
 #else
+    //// Zombie ////
 #endif
     }
   }

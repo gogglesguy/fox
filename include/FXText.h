@@ -758,6 +758,9 @@ public:
   /// Remove n bytes of text at position pos from the buffer
   virtual void removeText(FXint pos,FXint n,FXbool notify=false);
 
+  /// Remove all text from the buffer
+  virtual void clearText(FXbool notify=false);
+  
   /// Change style of text range
   virtual void changeStyle(FXint pos,FXint n,FXint style);
 

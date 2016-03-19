@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -299,13 +299,13 @@ long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
 
 /*
   if(FXSELID(sel)==ID_HIST_UP){
-    if(current<20 && getApp()->reg().readStringEntry("FindInFiles",regkey[current],NULL)) current++;
+    if(current<20 && getApp()->reg().readStringEntry(sectionName,regkey[current],NULL)) current++;
     }
   else{
     if(current>0) current--;
     }
   if(current){
-    setSearchText(getApp()->reg().readStringEntry("FindInFiles",regkey[current-1],FXString::null));
+    setSearchText(getApp()->reg().readStringEntry(sectionName,regkey[current-1],FXString::null));
     }
   else{
     setSearchText(FXString::null);

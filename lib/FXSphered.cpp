@@ -270,27 +270,14 @@ FXbool FXSphered::intersect(const FXVec3d& pos,const FXVec3d& dir,FXdouble hit[]
   }
 
 
-// Test if sphere overlaps with box
+// Test if box overlaps with sphere (QRI Larsson, Moeller, Lengyel)
 FXbool overlap(const FXSphered& a,const FXRanged& b){
   if(0.0<=a.radius){
-    FXdouble dd=0.0;
-
-    if(a.center.x<b.lower.x)
-      dd+=sqr(a.center.x-b.lower.x);
-    else if(a.center.x>b.upper.x)
-      dd+=sqr(a.center.x-b.upper.x);
-
-    if(a.center.y<b.lower.y)
-      dd+=sqr(a.center.y-b.lower.y);
-    else if(a.center.y>b.upper.y)
-      dd+=sqr(a.center.y-b.upper.y);
-
-    if(a.center.z<b.lower.z)
-      dd+=sqr(a.center.z-b.lower.z);
-    else if(a.center.z>b.upper.z)
-      dd+=sqr(a.center.z-b.upper.z);
-
-    return dd<=a.radius*a.radius;
+    FXdouble e1,e2,e3;
+    if((e1=fmax(b.lower.x-a.center.x,0.0)+fmax(a.center.x-b.upper.x,0.0))>a.radius) return false;
+    if((e2=fmax(b.lower.y-a.center.y,0.0)+fmax(a.center.y-b.upper.y,0.0))>a.radius) return false;
+    if((e3=fmax(b.lower.z-a.center.z,0.0)+fmax(a.center.z-b.upper.z,0.0))>a.radius) return false;
+    return e1*e1+e2*e2+e3*e3<=a.radius*a.radius;
     }
   return false;
   }

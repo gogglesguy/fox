@@ -30,9 +30,16 @@ class FXVariantArray;
 
 
 /**
-* A Variant type can hold any kind of object, be it a boolean,
-* integer, real, string, or even array of variants or mapping
-* from strings to variants.
+* A Variant type can hold any kind of object, be it a boolean, integer, real, string, 
+* or even array of Variants or dictionaries of variants.
+* Complex hierarchies of Variants can be loaded (and saved) using the JSON parser.
+* When writing Variants, dictionaries and arrays are automatically grown.  When
+* reading Variants, non-existing dictionary entries or indexes outside arrays will read 
+* as 0 (for numbers), the empty string (for arrays), or empty dictionaries or arrays.
+* For efficiency, you can hold references to Variants, for example to avoid repeatedly
+* accessing dictionaries or arrays with the same key or index. However, be aware that
+* adding or removing sub-items to dictionaries or arrays may cause reallocations of 
+* existing items and thus some care must be exercised when doing this.
 */
 class FXAPI FXVariant {
 public:
@@ -126,40 +133,40 @@ public:
 
   /// Is it a null?
   FXbool isNull() const { return type==VNull; }
-  
+
   /// Is it a bool?
   FXbool isBool() const { return type==VBool; }
-  
+
   /// Is it a character?
   FXbool isChar() const { return type==VChar; }
-  
+
   /// Is it a int?
   FXbool isInt() const { return type==VInt; }
-  
+
   /// Is it a unsigned int?
   FXbool isUInt() const { return type==VUInt; }
-  
+
   /// Is it a long?
   FXbool isLong() const { return type==VLong; }
-  
+
   /// Is it a unsigned long?
   FXbool isULong() const { return type==VULong; }
-  
+
   /// Is it a float?
   FXbool isFloat() const { return type==VFloat; }
-  
+
   /// Is it a double?
   FXbool isDouble() const { return type==VDouble; }
-  
+
   /// Is it a pointer?
   FXbool isPtr() const { return type==VPointer; }
-  
+
   /// Is it a string?
   FXbool isString() const { return type==VString; }
-  
+
   /// Is it a array?
   FXbool isArray() const { return type==VArray; }
-  
+
   /// Is it a map?
   FXbool isMap() const { return type==VMap; }
 
@@ -294,12 +301,6 @@ public:
 
   /// Return value of array member
   const FXVariant& operator[](FXint idx) const;
-
-  /// Equality operator
-  FXbool operator==(const FXVariant& other) const;
-
-  /// Inequality operator
-  FXbool operator!=(const FXVariant& other) const { return !operator==(other); }
 
   /// Check if key is mapped
   FXbool has(const FXchar* key) const;

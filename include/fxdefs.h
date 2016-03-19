@@ -182,14 +182,6 @@
 #endif
 
 
-// Disable some warnings in VC++
-#ifdef _MSC_VER
-#pragma warning(disable: 4251)
-#pragma warning(disable: 4231)
-#pragma warning(disable: 4244)
-#endif
-
-
 // Checking printf and scanf format strings
 #if defined(_CC_GNU_) || defined(__GNUG__) || defined(__GNUC__)
 #define FX_PRINTF(fmt,arg) __attribute__((format(printf,fmt,arg)))
@@ -665,6 +657,10 @@ const FXTime forever=FXLONG(9223372036854775807);
 #define expf(x)     ((float)exp((double)(x)))
 #define logf(x)     ((float)log((double)(x)))
 #define log10f(x)   ((float)log10((double)(x)))
+#define fmax(x,y)   (((x)>(y))?(x):(y))
+#define fmin(x,y)   (((x)<(y))?(x):(y))
+#define fmaxf(x,y)  (((x)>(y))?(x):(y))
+#define fminf(x,y)  (((x)<(y))?(x):(y))
 #endif
 #endif
 

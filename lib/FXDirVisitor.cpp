@@ -66,6 +66,12 @@ FIXME
   exit(0);
 
   what if we want to see '.' and '..'??
+
+  fxTraceLevel=2;
+  FXDirVisitor dv;
+  dv.traverse(argv[1]); //,"*",FXDir::NoDirs|FXDir::NoParent);
+  exit(0);
+
 */
 
 // Keep track of visited directories
@@ -79,10 +85,16 @@ struct FXDirVisitor::Seen {
 FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen){
   FXStat data;
   if(FXStat::statLink(path,data)){
+
+    // Directory
     if(data.isDirectory()){
+
+      // Check if we cycled back through symlinks
       for(Seen *s=seen; s; s=s->next){
         if(data.index()==s->node) return 1;
         }
+
+      // Conditionally enter subdirectories
       if(enter(path)){
         Seen here={seen,data.index()};
         FXDir directory(path);
@@ -92,12 +104,12 @@ FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen){
             if(!recurse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,&here)) break;
             }
           }
-        return leave(path);
         }
+      return leave(path);
       }
-    else{
-      return visit(path);
-      }
+
+    // Regular file
+    return visit(path);
     }
   return 0;
   }
@@ -109,7 +121,7 @@ FXuint FXDirVisitor::traverse(const FXString& path){
   }
 
 
-// Handle directory
+// Enter directory
 FXuint FXDirVisitor::enter(const FXString& path){
   FXTRACE((1,"enter(%s)\n",path.text()));
   return 1;
@@ -123,7 +135,7 @@ FXuint FXDirVisitor::visit(const FXString& path){
   }
 
 
-// Handle directory
+// Leave directory
 FXuint FXDirVisitor::leave(const FXString& path){
   FXTRACE((1,"leave(%s)\n",path.text()));
   return 1;
@@ -140,15 +152,15 @@ FXDirVisitor::~FXDirVisitor(){
 
 // Recursively traverse starting from path
 FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& pat,FXuint flg){
-  mode=(flg&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
   pattern=pat;
   flags=flg;
   return recurse(path,NULL);
   }
 
 
-// Handle directory
+// Enter directory
 FXuint FXGlobVisitor::enter(const FXString& path){
+  FXuint mode=(flags&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
 #ifdef WIN32
   return !(flags&FXDir::NoDirs) && ((flags&FXDir::HiddenDirs) || !FXStat::isHidden(path)) && ((flags&FXDir::AllDirs) || FXPath::match(path,pattern,mode));
 #else
@@ -159,11 +171,18 @@ FXuint FXGlobVisitor::enter(const FXString& path){
 
 // Handle file
 FXuint FXGlobVisitor::visit(const FXString& path){
+  FXuint mode=(flags&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
 #ifdef WIN32
   return !(flags&FXDir::NoFiles) && ((flags&FXDir::HiddenFiles) || !FXStat::isHidden(path)) && ((flags&FXDir::AllFiles) || FXPath::match(path,pattern,mode));
 #else
   return !(flags&FXDir::NoFiles) && ((flags&FXDir::HiddenFiles) || !FXPath::isHidden(path)) && ((flags&FXDir::AllFiles) || FXPath::match(path,pattern,mode));
 #endif
+  }
+
+
+// Leave directory
+FXuint FXGlobVisitor::leave(const FXString& path){
+  return 1;
   }
 
 

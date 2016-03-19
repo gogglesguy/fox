@@ -52,10 +52,10 @@ public:
   operator FXThreadStorageKey() const { return value; }
 
   /// Set thread local storage associated with this key
-  void set(void* ptr) const;
+  void set(FXptr ptr) const;
 
   /// Get thread local storage associated with this key
-  void* get() const;
+  FXptr get() const;
 
   /// Release thread-local storage key
  ~FXAutoThreadStorageKey();

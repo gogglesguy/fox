@@ -137,23 +137,6 @@ FXColorWell::FXColorWell(FXComposite* p,FXColor clr,FXObject* tgt,FXSelector sel
   }
 
 
-// Create window
-void FXColorWell::create(){
-  FXFrame::create();
-  if(!colorType){ colorType=getApp()->registerDragType(colorTypeName); }
-  if(!textType){ textType=getApp()->registerDragType(textTypeName); }
-  if(!utf8Type){ utf8Type=getApp()->registerDragType(utf8TypeName); }
-  }
-
-
-// Detach window
-void FXColorWell::detach(){
-  FXFrame::detach();
-  colorType=0;
-  textType=0;
-  }
-
-
 // If window can have focus
 FXbool FXColorWell::canFocus() const { return true; }
 

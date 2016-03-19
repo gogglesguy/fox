@@ -103,12 +103,12 @@ FXTreeListBox::FXTreeListBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint 
   flags|=FLAG_ENABLED;
   target=tgt;
   message=sel;
-  field=new FXButton(this," ",NULL,this,FXTreeListBox::ID_FIELD,ICON_BEFORE_TEXT|JUSTIFY_LEFT, 0,0,0,0, pl,pr,pt,pb);
+  field=new FXButton(this," ",NULL,this,FXTreeListBox::ID_FIELD,ICON_BEFORE_TEXT|JUSTIFY_LEFT,0,0,0,0,pl,pr,pt,pb);
   field->setBackColor(getApp()->getBackColor());
   pane=new FXPopup(this,FRAME_LINE);
   tree=new FXTreeList(pane,this,FXTreeListBox::ID_TREE,TREELIST_BROWSESELECT|TREELIST_AUTOSELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLING_OFF);
   tree->setIndent(0);
-  button=new FXMenuButton(this,FXString::null,NULL,pane,FRAME_RAISED|FRAME_THICK|MENUBUTTON_DOWN|MENUBUTTON_ATTACH_RIGHT, 0,0,0,0, 0,0,0,0);
+  button=new FXMenuButton(this,FXString::null,NULL,pane,FRAME_RAISED|FRAME_THICK|MENUBUTTON_DOWN|MENUBUTTON_ATTACH_RIGHT,0,0,0,0,0,0,0,0);
   button->setXOffset(border);
   button->setYOffset(border);
   flags&=~FLAG_UPDATE;  // Never GUI update
@@ -255,7 +255,6 @@ long FXTreeListBox::onFocusDown(FXObject*,FXSelector,void*){
     }
   return 0;
   }
-
 
 
 // Mouse wheel

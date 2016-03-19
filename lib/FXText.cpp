@@ -48,9 +48,6 @@
 #include "FXGIFIcon.h"
 #include "FXScrollBar.h"
 #include "FXText.h"
-#include "FX88591Codec.h"
-#include "FXCP1252Codec.h"
-#include "FXUTF16Codec.h"
 #include "FXComposeContext.h"
 #include "icons.h"
 
@@ -413,10 +410,6 @@ FXText::FXText(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
 void FXText::create(){
   FXScrollArea::create();
   font->create();
-  if(!deleteType){ deleteType=getApp()->registerDragType(deleteTypeName); }
-  if(!textType){ textType=getApp()->registerDragType(textTypeName); }
-  if(!utf8Type){ utf8Type=getApp()->registerDragType(utf8TypeName); }
-  if(!utf16Type){ utf16Type=getApp()->registerDragType(utf16TypeName); }
   tabwidth=tabcolumns*font->getTextWidth(" ",1);
   barwidth=barcolumns*font->getTextWidth("8",1);
   recalc();
@@ -431,10 +424,6 @@ void FXText::create(){
 void FXText::detach(){
   FXScrollArea::detach();
   font->detach();
-  deleteType=0;
-  textType=0;
-  utf8Type=0;
-  utf16Type=0;
   }
 
 
@@ -636,13 +625,9 @@ void FXText::squeezegap(){
 
 // Character width
 FXint FXText::charWidth(FXwchar ch,FXint indent) const {
-  if(__unlikely(ch<' ')){
-    if(__likely(ch=='\t')){
-      return (tabwidth-indent%tabwidth);
-      }
-    return font->getCharWidth('^')+font->getCharWidth(ch|0x40);
-    }
-  return font->getCharWidth(ch);
+  if(__likely(' '<=ch)) return font->getCharWidth(ch);
+  if(__likely(ch=='\t')) return (tabwidth-indent%tabwidth);
+  return font->getCharWidth('^')+font->getCharWidth(ch|0x40);
   }
 
 
@@ -1288,12 +1273,12 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
     // Make all characters contiguous in the buffer
     squeezegap();
 
-    // Use a validated position
-    start=validPos(start);
-
     // Search forward
     if(flgs&SEARCH_FORWARD){
-      if(rex.search(buffer,length,start,length,FXRex::Normal,beg,end,npar)>=0) return true;
+      if(start<=length){
+        if(start<0) start=0;
+        if(rex.search(buffer,length,start,length,FXRex::Normal,beg,end,npar)>=0) return true;
+        }
       if((flgs&SEARCH_WRAP) && (start!=0)){
         if(rex.search(buffer,length,0,start,FXRex::Normal,beg,end,npar)>=0) return true;
         }
@@ -1302,7 +1287,10 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
 
     // Search backward
     if(flgs&SEARCH_BACKWARD){
-      if(rex.search(buffer,length,start,0,FXRex::Normal,beg,end,npar)>=0) return true;
+      if(0<=start){
+        if(start>length) start=length;
+        if(rex.search(buffer,length,start,0,FXRex::Normal,beg,end,npar)>=0) return true;
+        }
       if((flgs&SEARCH_WRAP) && (start!=length)){
         if(rex.search(buffer,length,length,start,FXRex::Normal,beg,end,npar)>=0) return true;
         }
@@ -2301,6 +2289,12 @@ void FXText::removeText(FXint pos,FXint n,FXbool notify){
   }
 
 
+// Remove all text from the buffer
+void FXText::clearText(FXbool notify){
+  removeText(0,length,notify);
+  }
+
+
 // Change style of text range
 void FXText::changeStyle(FXint pos,FXint n,FXint style){
   if(n<0 || pos<0 || length<pos+n){ fxerror("%s::changeStyle: bad argument.\n",getClassName()); }
@@ -2690,8 +2684,6 @@ FXbool FXText::pasteSelection(FXbool notify){
 
     // Next, try UTF-16
     if(getDNDData(FROM_SELECTION,utf16Type,string)){
-      FXUTF16LECodec unicode;
-      string=unicode.mb2utf(string);
       if(isOverstrike()){
         end=overstruck(start,end,string.text(),string.length());
         }
@@ -2705,8 +2697,6 @@ FXbool FXText::pasteSelection(FXbool notify){
 
     // Finally, try good old 8859-1
     if(getDNDData(FROM_SELECTION,stringType,string)){
-      FX88591Codec ascii;
-      string=ascii.mb2utf(string);
       if(isOverstrike()){
         end=overstruck(start,end,string.text(),string.length());
         }
@@ -2737,8 +2727,6 @@ FXbool FXText::pasteClipboard(FXbool notify){
 
   // Next, try UTF-16
   if(getDNDData(FROM_CLIPBOARD,utf16Type,string)){
-    FXUTF16LECodec unicode;
-    string=unicode.mb2utf(string);
 #ifdef WIN32
     dosToUnix(string);
 #endif
@@ -2748,8 +2736,6 @@ FXbool FXText::pasteClipboard(FXbool notify){
 
   // Next, try good old Latin-1
   if(getDNDData(FROM_CLIPBOARD,stringType,string)){
-    FX88591Codec ascii;
-    string=ascii.mb2utf(string);
 #ifdef WIN32
     dosToUnix(string);
 #endif
@@ -3501,22 +3487,20 @@ long FXText::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
     // Next, try UTF-16
     if(getDNDData(FROM_DRAGNDROP,utf16Type,string)){
-      FXUTF16LECodec unicode;
       if(inquireDNDAction()==DRAG_MOVE){
         getDNDData(FROM_DRAGNDROP,deleteType,junk);
         }
-      replaceText(cursorpos,0,unicode.mb2utf(string),true);
+      replaceText(cursorpos,0,string,true);
       setCursorPos(cursorpos,true);
       return 1;
       }
 
     // Next, try good old Latin-1
     if(getDNDData(FROM_DRAGNDROP,textType,string)){
-      FX88591Codec ascii;
       if(inquireDNDAction()==DRAG_MOVE){
         getDNDData(FROM_DRAGNDROP,deleteType,junk);
         }
-      replaceText(cursorpos,0,ascii.mb2utf(string),true);
+      replaceText(cursorpos,0,string,true);
       setCursorPos(cursorpos,true);
       return 1;
       }
@@ -3548,15 +3532,13 @@ long FXText::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return text of the selection translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
-      setDNDData(FROM_DRAGNDROP,event->target,ascii.utf2mb(string));
+      setDNDData(FROM_DRAGNDROP,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;
-      setDNDData(FROM_DRAGNDROP,event->target,unicode.utf2mb(string));
+      setDNDData(FROM_DRAGNDROP,event->target,string);
       return 1;
       }
     }
@@ -3619,15 +3601,13 @@ long FXText::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return text of the selection translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
-      setDNDData(FROM_SELECTION,event->target,ascii.utf2mb(string));
+      setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;
-      setDNDData(FROM_SELECTION,event->target,unicode.utf2mb(string));
+      setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
     }
@@ -3675,15 +3655,13 @@ long FXText::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return clipped text translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FX88591Codec ascii;
-      setDNDData(FROM_CLIPBOARD,event->target,ascii.utf2mb(string));
+      setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXUTF16LECodec unicode;
-      setDNDData(FROM_CLIPBOARD,event->target,unicode.utf2mb(string));
+      setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
     }

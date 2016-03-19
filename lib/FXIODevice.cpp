@@ -35,6 +35,7 @@
   Notes:
 
   - An abstract class for low-level IO.
+  - You can change some access mode flags of the file descriptor.
 */
 
 // Bad handle value
@@ -63,12 +64,54 @@ FXIODevice::FXIODevice(FXInputHandle h,FXuint m):device(BadHandle){
   }
 
 
-// Open device with access mode m and handle h
+// Return true if handle is valid
+static FXbool isvalid(FXInputHandle h){
+#if defined(WIN32)
+  DWORD flags;
+  return GetHandleInformation(h,&flags)!=0;
+#else
+  return (fcntl(h,F_GETFD)!=-1) || (errno!=EBADF);
+#endif
+  }
+
+
+// Open device with access mode m and existing handle h
 FXbool FXIODevice::open(FXInputHandle h,FXuint m){
-  device=h;
-  access=m;
-  pointer=0L;
-  return true;
+  if(__likely(h!=BadHandle && isvalid(h))){
+    device=h;
+    access=m;
+    pointer=0L;
+    return true;
+    }
+  return false;
+  }
+
+
+// Change access mode of open device
+FXbool FXIODevice::setMode(FXuint m){
+  if(__likely(device!=BadHandle)){
+#if defined(WIN32)
+    FXint flags=0;
+    if(m&Inheritable) flags=HANDLE_FLAG_INHERIT;
+    if(::SetHandleInformation(device,HANDLE_FLAG_INHERIT,flags)!=0) return false;
+    access^=(access^m)&Inheritable;
+    return true;
+#else
+    FXint flags=0;
+    if(m&NonBlocking) flags|=O_NONBLOCK;
+    if(m&Append) flags|=O_APPEND;
+    if(m&NoAccessTime) flags|=O_NOATIME;
+    if(::fcntl(device,F_SETFL,flags)<0) return false;
+#if defined(O_CLOEXEC)
+    flags=O_CLOEXEC;
+    if(m&Inheritable) flags=0;
+    if(::fcntl(device,F_SETFD,flags)<0) return false;
+#endif
+    access^=(access^m)&(NonBlocking|Append|NoAccessTime|Inheritable);
+    return true;
+#endif
+    }
+  return false;
   }
 
 
@@ -85,19 +128,24 @@ FXbool FXIODevice::isSerial() const {
 
 
 // Attach existing file handle
-void FXIODevice::attach(FXInputHandle h,FXuint m){
-  close();
-  device=h;
-  access=(m|OwnHandle);
-  pointer=0L;
+FXbool FXIODevice::attach(FXInputHandle h,FXuint m){
+  if(__likely(h!=BadHandle && isvalid(h))){
+    close();
+    device=h;
+    access=(m|OwnHandle);
+    pointer=0L;
+    return true;
+    }
+  return false;
   }
 
 
 // Detach existing file handle
-void FXIODevice::detach(){
+FXbool FXIODevice::detach(){
   device=BadHandle;
   access=NoAccess;
   pointer=0L;
+  return true;
   }
 
 
@@ -109,57 +157,69 @@ FXlong FXIODevice::position() const {
 
 // Move to position
 FXlong FXIODevice::position(FXlong,FXuint){
-  return -1;
+  return FXIO::Error;
   }
 
 
 // Read block
 FXival FXIODevice::readBlock(void* ptr,FXival count){
-  FXival nread=-1;
   if(__likely(device!=BadHandle) && __likely(access&ReadOnly)){
 #if defined(WIN32)
-    DWORD nr;
-    if(::ReadFile(device,ptr,(DWORD)count,&nr,NULL)!=0){
-      nread=(FXival)nr;
+    DWORD nread;
+    if(::ReadFile(device,ptr,(DWORD)count,&nread,NULL)==0){
+      if(GetLastError()==ERROR_IO_PENDING) return FXIO::Again;
+      return FXIO::Error;
       }
     pointer+=nread;
+    return nread;
 #else
-    do{
-      nread=::read(device,ptr,count);
+    FXival nread;
+a:  nread=::read(device,ptr,count);
+    if(__unlikely(nread<0)){
+      if(errno==EINTR) goto a;
+      if(errno==EAGAIN) return FXIO::Again;
+      if(errno==EWOULDBLOCK) return FXIO::Again;
+      return FXIO::Error;
       }
-    while(nread<0 && errno==EINTR);
     pointer+=nread;
+    return nread;
 #endif
     }
-  return nread;
+  return FXIO::Error;
   }
 
 
 // Write block
 FXival FXIODevice::writeBlock(const void* ptr,FXival count){
-  FXival nwritten=-1;
   if(__likely(device!=BadHandle) && __likely(access&WriteOnly)){
 #if defined(WIN32)
-    DWORD nw;
-    if(::WriteFile(device,ptr,(DWORD)count,&nw,NULL)!=0){
-      nwritten=(FXival)nw;
+    DWORD nwritten;
+    if(::WriteFile(device,ptr,(DWORD)count,&nwritten,NULL)==0){
+      return FXIO::Error;
       }
     pointer+=nwritten;
+    return nwritten;
 #else
-    do{
-      nwritten=::write(device,ptr,count);
+    FXival nwritten;
+a:  nwritten=::write(device,ptr,count);
+    if(__unlikely(nwritten<0)){
+      if(errno==EINTR) goto a;
+      if(errno==EAGAIN) return FXIO::Again;
+      if(errno==EWOULDBLOCK) return FXIO::Again;
+      if(errno==EPIPE) return FXIO::Broken;
+      return FXIO::Error;
       }
-    while(nwritten<0 && errno==EINTR);
     pointer+=nwritten;
+    return nwritten;
 #endif
     }
-  return nwritten;
+  return FXIO::Error;
   }
 
 
 // Truncate file
 FXlong FXIODevice::truncate(FXlong){
-  return -1;
+  return FXIO::Error;
   }
 
 
@@ -171,13 +231,13 @@ FXbool FXIODevice::flush(){
 
 // Test if we're at the end; -1 if error
 FXint FXIODevice::eof(){
-  return -1;
+  return FXIO::Error;
   }
 
 
 // Return file size
 FXlong FXIODevice::size(){
-  return -1;
+  return FXIO::Error;
   }
 
 

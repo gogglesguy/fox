@@ -191,7 +191,7 @@ FXIMPLEMENT(FXFileSelector,FXPacker,FXFileSelectorMap,ARRAYNUMBER(FXFileSelector
 /*******************************************************************************/
 
 // Separator item
-FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXPacker(p,opts,x,y,w,h,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,8,8),bookmarks(p->getApp(),"Visited Directories"){
+FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXPacker(p,opts,x,y,w,h,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,8,8),bookmarks(p->getApp(),"Visited Directories"),selectmode(SELECTFILE_ANY){
   FXAccelTable *table=getShell()->getAccelTable();
   target=tgt;
   message=sel;
