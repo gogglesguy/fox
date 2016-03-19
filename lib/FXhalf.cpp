@@ -3,7 +3,7 @@
 *                     H a l f - F l o a t   S u p p o r t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,10 +29,10 @@
 
 /*
   Notes:
-  - Reference my writeup: 
-  
+  - Reference my writeup:
+
         ftp://www.fox-toolkit.org/pub/fasthalffloatconversion.pdf
-        
+
   - Half floats are often needed for HDR [High Dynamic Range] images,
     signal processing, and so on, where the shear volume of data precludes
     the use of floats.  Halfs, as the name implies, take only half as much

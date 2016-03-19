@@ -3,7 +3,7 @@
 *                           S l i d e r   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -774,10 +774,9 @@ void FXSlider::drawSliderHead(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h){
 
 // Handle repaint
 long FXSlider::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *event=(FXEvent*)ptr;
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint tx,ty,hhs=headSize/2;
   FXint xx,yy,ww,hh;
-  FXDCWindow dc(this,event);
 
   // Repaint background
   dc.setForeground(backColor);

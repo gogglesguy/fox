@@ -3,7 +3,7 @@
 *                          X B M   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -217,7 +217,7 @@ FXbool fxsaveXBM(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   // Write pixels
   for(y=count=0; y<height; y++){
     for(x=code=0,bit=1; x<width; x++){
-      if((ptr[0]*77+ptr[1]*151+ptr[2]*29)<dither[y&3][x&3]) code|=bit;
+      if((ptr[0]*29+ptr[1]*151+ptr[2]*77)<dither[y&3][x&3]) code|=bit;
       bit<<=1;
       if(bit==256 || x==width-1){
         if(count){

@@ -144,8 +144,9 @@ FXGLSphere.h \
 FXGLTriangleMesh.h \
 FXGLViewer.h \
 FXGLVisual.h \
-FXGroupBox.h \
+FXGauge.h \
 FXGradientBar.h \
+FXGroupBox.h \
 FXGZFileStream.h \
 FXhalf.h \
 FXHash.h \
@@ -198,6 +199,7 @@ FXMenuPane.h \
 FXMenuSeparator.h \
 FXMenuTitle.h \
 FXMessageBox.h \
+FXMetaClass.h \
 FXObject.h \
 FXObjectList.h \
 FXOptionMenu.h \

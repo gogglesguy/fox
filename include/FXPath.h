@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -121,7 +121,7 @@ namespace FXPath {
   extern FXAPI FXbool isShare(const FXString& file);
 
   /// Enquote filename to make safe for shell
-  extern FXAPI FXString enquote(const FXString& file,FXbool forcequotes=false);
+  extern FXAPI FXString enquote(const FXString& file,FXbool force=false);
 
   /// Dequote filename to get original again
   extern FXAPI FXString dequote(const FXString& file);

@@ -3,7 +3,7 @@
 *                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -138,13 +138,6 @@ void FXGLContext::create(){
         }
       ::ReleaseDC(hwnd,hdc);
       DestroyWindow(hwnd);
-/*
-#elif defined(GLX_VERSION_1_3)
-      xid=(FXID)glXCreateNewContext((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),GLX_RGBA_TYPE,shared?(GLXContext)shared->id():NULL,true);
-      if(!xid){
-        throw FXWindowException("unable to create GL context.");
-        }
-*/
 #else
       XVisualInfo vi;
       vi.visual=(Visual*)visual->visual;

@@ -3,7 +3,7 @@
 *                      J P E G    I n p u t / O u t p u t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2010 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2011 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -167,7 +167,6 @@ FXbool fxcheckJPG(FXStream& store){
   }
 
 
-
 // Load a JPEG image
 FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&){
   jpeg_decompress_struct srcinfo;
@@ -245,10 +244,10 @@ FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
     jpeg_read_scanlines(&srcinfo,buffer,1);
     qq=buffer[0];
     for(FXint i=0; i<width; i++,pp++){
-      ((FXuchar*)pp)[0]=*qq++;
-      ((FXuchar*)pp)[1]=*qq++;
-      ((FXuchar*)pp)[2]=*qq++;
       ((FXuchar*)pp)[3]=255;
+      ((FXuchar*)pp)[2]=*qq++;
+      ((FXuchar*)pp)[1]=*qq++;
+      ((FXuchar*)pp)[0]=*qq++;
       }
     }
 
@@ -342,9 +341,9 @@ FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FX
   while(dstinfo.next_scanline<dstinfo.image_height){
     qq=buffer[0];
     for(FXint i=0; i<width; i++,pp++){
-      *qq++=((FXuchar*)pp)[0];
-      *qq++=((FXuchar*)pp)[1];
       *qq++=((FXuchar*)pp)[2];
+      *qq++=((FXuchar*)pp)[1];
+      *qq++=((FXuchar*)pp)[0];
       }
     jpeg_write_scanlines(&dstinfo,buffer,1);
     }

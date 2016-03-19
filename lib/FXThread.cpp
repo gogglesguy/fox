@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -196,7 +196,8 @@ void FXSpinLock::lock(){
     }
 #elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
   __asm__ __volatile__ ("movw $0x0100, %%ax \n\t"
-                        "lock xaddw %%ax, %0 \n\t"
+                        "lock\n\t"
+                        "xaddw %%ax, %0 \n\t"
                         "1: \n\t"
                         "cmpb %%ah, %%al\n\t"
                         "je 2f\n\t"
@@ -223,7 +224,8 @@ FXbool FXSpinLock::trylock(){
                         "jne 1f\n\t"
                         "movw %%ax,%%cx\n\t"
                         "addw $0x0100,%%cx\n\t"
-                        "lock cmpxchgw %%cx,%1\n\t"
+                        "lock\n\t"
+                        "cmpxchgw %%cx,%1\n\t"
                         "1:\n\t"
                         "sete %b0\n\t" :"=a" (ret), "+m" (data) : : "ecx", "memory", "cc");
   return ret;
@@ -240,7 +242,8 @@ void FXSpinLock::unlock(){
 #if defined(WIN32)
   InterlockedExchange((LONG*)data,0L);
 #elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
-  __asm__ __volatile__ ("lock incb %0\n\t" : "+m" (data) : : "memory", "cc");
+  __asm__ __volatile__ ("lock\n\t"
+                        "incb %0\n\t" : "+m" (data) : : "memory", "cc");
 #elif defined(__APPLE__)
   OSSpinLockUnlock((OSSpinLock*)data);
 #else
@@ -332,6 +335,8 @@ static NTSTATUS WINAPI myQuerySemaphore(HANDLE Handle,UINT InfoClass,SEMAINFO* S
 FXSemaphore::FXSemaphore(FXint initial){
 #if defined(WIN32)
   data[0]=(FXuval)CreateSemaphore(NULL,initial,0x7fffffff,NULL);
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
 #else
   // If this fails on your machine, determine what value
   // of sizeof(sem_t) is supposed to be on your
@@ -352,6 +357,9 @@ FXint FXSemaphore::value() const {
     return SemInfo.Count;
     }
   return -1;
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
+  return -1;
 #else
   int result=-1;
   sem_getvalue((sem_t*)data,&result);
@@ -364,6 +372,8 @@ FXint FXSemaphore::value() const {
 void FXSemaphore::wait(){
 #if defined(WIN32)
   WaitForSingleObject((HANDLE)data[0],INFINITE);
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
 #else
   sem_wait((sem_t*)data);
 #endif
@@ -374,6 +384,9 @@ void FXSemaphore::wait(){
 FXbool FXSemaphore::trywait(){
 #if defined(WIN32)
   return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
+  return false;
 #else
   return sem_trywait((sem_t*)data)==0;
 #endif
@@ -384,6 +397,8 @@ FXbool FXSemaphore::trywait(){
 void FXSemaphore::post(){
 #if defined(WIN32)
   ReleaseSemaphore((HANDLE)data[0],1,NULL);
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
 #else
   sem_post((sem_t*)data);
 #endif
@@ -394,6 +409,8 @@ void FXSemaphore::post(){
 FXSemaphore::~FXSemaphore(){
 #if defined(WIN32)
   CloseHandle((HANDLE)data[0]);
+#elif defined(__minix)
+  //// NOT SUPPORTED ////
 #else
   sem_destroy((sem_t*)data);
 #endif
@@ -597,7 +614,9 @@ FXReadWriteLock::FXReadWriteLock(){
   FXASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
   pthread_rwlockattr_t rwlockatt;
   pthread_rwlockattr_init(&rwlockatt);
+#if defined(__linux__)
   pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_WRITER_NP);
+#endif
   pthread_rwlock_init((pthread_rwlock_t*)data,&rwlockatt);
   pthread_rwlockattr_destroy(&rwlockatt);
 #endif
@@ -747,11 +766,13 @@ FXBarrier::~FXBarrier(){
 // Automatically acquire a thread-local storage key
 FXAutoThreadStorageKey::FXAutoThreadStorageKey(){
 #if defined(WIN32)
-  FXASSERT(sizeof(FXThreadStorageKey)==sizeof(DWORD));
+  FXASSERT(sizeof(FXThreadStorageKey)>=sizeof(DWORD));
   value=(FXThreadStorageKey)TlsAlloc();
 #else
-  FXASSERT(sizeof(FXThreadStorageKey)==sizeof(pthread_key_t));
-  pthread_key_create((pthread_key_t*)&value,NULL);
+  FXASSERT(sizeof(FXThreadStorageKey)>=sizeof(pthread_key_t));
+  pthread_key_t key;
+  pthread_key_create(&key,NULL);
+  value=(FXThreadStorageKey)key;
 #endif
   }
 
@@ -1126,10 +1147,10 @@ FXThreadStorageKey FXThread::createStorageKey(){
   return (FXThreadStorageKey)TlsAlloc();
 #else
   pthread_key_t key;
-  return pthread_key_create(&key,NULL)==0 ? (FXThreadStorageKey)key : ~0;
+  return pthread_key_create(&key,NULL)==0UL ? (FXThreadStorageKey)key : ~0UL;
 #endif
   }
-
+ 
 
 // Dispose of thread local storage key
 void FXThread::deleteStorageKey(FXThreadStorageKey key){
@@ -1250,7 +1271,7 @@ FXbool FXThread::priority(FXThread::Priority prio){
     return SetThreadPriority((HANDLE)tid,pri)!=0;
     }
   return false;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__minix)
   return false;
 #else
   if(tid){
@@ -1328,7 +1349,7 @@ FXThread::Priority FXThread::priority() const {
       }
     }
   return result;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__minix)
   return PriorityError;
 #else
   Priority result=PriorityError;
@@ -1380,7 +1401,7 @@ FXThread::Priority FXThread::priority() const {
 FXbool FXThread::policy(FXThread::Policy plcy){
 #if defined(WIN32)
   return false;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__minix)
   return false;
 #else
   if(tid){
@@ -1414,7 +1435,7 @@ FXbool FXThread::policy(FXThread::Policy plcy){
 FXThread::Policy FXThread::policy() const {
 #if defined(WIN32)
   return PolicyError;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__minix)
   return PolicyError;
 #else
   Policy result=PolicyError;

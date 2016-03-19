@@ -108,7 +108,7 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXFrame.lo FXGIFCursor.lo FXGIFIcon.lo FXGIFImage.lo \
 	FXGLCanvas.lo FXGLCone.lo FXGLContext.lo FXGLCube.lo \
 	FXGLCylinder.lo FXGLObject.lo FXGLShape.lo FXGLSphere.lo \
-	FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo \
+	FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo FXGauge.lo \
 	FXGradientBar.lo FXGroupBox.lo FXGZFileStream.lo FXhalf.lo \
 	FXHash.lo FXHeader.lo FXHorizontalFrame.lo FXICOIcon.lo \
 	FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo FXIcon.lo \
@@ -122,7 +122,7 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXMenuBar.lo FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
 	FXMenuCheck.lo FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
-	FXMessageChannel.lo FXObject.lo FXObjectList.lo \
+	FXMessageChannel.lo FXMetaClass.lo FXObject.lo FXObjectList.lo \
 	FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo FXPNGIcon.lo \
 	FXPNGImage.lo FXPPMIcon.lo FXPPMImage.lo FXPacker.lo FXPath.lo \
 	FXPicker.lo FXPipe.lo FXPopup.lo FXPoint.lo FXPrintDialog.lo \
@@ -153,10 +153,10 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo fxjp2io.lo \
 	fxkeyboard.lo fxkeysym.lo fxparsegeometry.lo fxpcxio.lo \
 	fxpngio.lo fxppmio.lo fxprintf.lo fxpriv.lo fxpsio.lo \
-	fxrasio.lo fxrgbio.lo fxscanf.lo fxtargaio.lo fxtifio.lo \
-	fxunicode.lo fxutils.lo fxwuquantize.lo fxxbmio.lo fxxpmio.lo \
-	strtoll.lo icons.lo strtoll.lo $(am__objects_2) \
-	$(am__objects_2)
+	fxrasio.lo fxrgbio.lo fxscanf.lo fxstrtoll.lo fxstrtoull.lo \
+	fxstrtod.lo fxtargaio.lo fxtifio.lo fxunicode.lo fxutils.lo \
+	fxwuquantize.lo fxxbmio.lo fxxpmio.lo icons.lo \
+	$(am__objects_2) $(am__objects_2)
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 libFOX_1_7_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -207,6 +207,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -239,6 +240,7 @@ LT_CURRENT = @LT_CURRENT@
 LT_RELEASE = @LT_RELEASE@
 LT_REVISION = @LT_REVISION@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -270,6 +272,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
@@ -583,6 +586,7 @@ FXGLSphere.cpp \
 FXGLTriangleMesh.cpp \
 FXGLViewer.cpp \
 FXGLVisual.cpp \
+FXGauge.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
 FXGZFileStream.cpp \
@@ -638,6 +642,7 @@ FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
+FXMetaClass.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -770,6 +775,9 @@ fxpsio.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
 fxscanf.cpp \
+fxstrtoll.cpp \
+fxstrtoull.cpp \
+fxstrtod.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
@@ -777,10 +785,8 @@ fxutils.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
-strtoll.cpp \
 icons.cpp \
 icons.h \
-strtoll.cpp \
 jitter.h \
 version.rc \
 version.rc.in \
@@ -999,6 +1005,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLViewer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLVisual.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGZFileStream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGauge.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGradientBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGroupBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXHash.Plo@am__quote@
@@ -1053,6 +1060,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMenuTitle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMessageBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMessageChannel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMetaClass.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXObjectList.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXOptionMenu.Plo@am__quote@
@@ -1188,6 +1196,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxrasio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxrgbio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxscanf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxstrtod.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxstrtoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxstrtoull.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxtargaio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxtifio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxunicode.Plo@am__quote@
@@ -1196,7 +1207,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxxbmio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxxpmio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/icons.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strtoll.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

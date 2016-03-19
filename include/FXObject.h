@@ -3,7 +3,7 @@
 *                         T o p l e v el   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -21,65 +21,11 @@
 #ifndef FXOBJECT_H
 #define FXOBJECT_H
 
+#ifndef FXMETACLASS_H
+#include "FXMetaClass.h"
+#endif
 
 namespace FX {
-
-/// Minimum and maximum message id
-enum {
-  MINKEY = 0,
-  MAXKEY = 65535
-  };
-
-
-/// Minimum and maximum message type
-enum {
-  MINTYPE = 0,
-  MAXTYPE = 65535
-  };
-
-
-/// Association key
-typedef FXuint FXSelector;
-
-
-/// Describes a FOX object
-class FXAPI FXMetaClass {
-private:
-  const FXchar              *className;
-  FXObject*                (*manufacture)();
-  const FXMetaClass         *baseClass;
-  const void                *assoc;
-  FXuint                     nassocs;
-  FXuint                     assocsz;
-private:
-  static const FXMetaClass **metaClassTable;
-  static FXuint              nmetaClassTable;
-  static FXuint              nmetaClasses;
-private:
-  static void resize(FXuint n);
-public:
-  FXMetaClass(const FXchar* name,FXObject *(fac)(),const FXMetaClass* base,const void* ass,FXuint nass,FXuint assz);
-
-  /// Check if metaclass is subclass of some other metaclass
-  FXbool isSubClassOf(const FXMetaClass* metaclass) const;
-
-  /// Make instance of some object
-  FXObject* makeInstance() const;
-
-  /// Ask class name
-  const FXchar* getClassName() const { return className; }
-
-  /// Ask base class
-  const FXMetaClass* getBaseClass() const { return baseClass; }
-
-  /// Find metaclass object
-  static const FXMetaClass* getMetaClassFromName(const FXchar* name);
-
-  /// Search message map
-  const void* search(FXSelector key) const;
-
- ~FXMetaClass();
-  };
 
 
 /// Macro to set up class declaration
@@ -159,11 +105,6 @@ class FXAPI FXObject {
   FXDECLARE(FXObject)
 public:
 
-  /// Called for unhandled messages
-  virtual long onDefault(FXObject*,FXSelector,void*);
-
-public:
-
   /// Get class name of some object
   const FXchar* getClassName() const;
 
@@ -172,6 +113,9 @@ public:
 
   /// Try handle message safely, catching certain exceptions
   virtual long tryHandle(FXObject* sender,FXSelector sel,void* ptr);
+
+  /// Called for unhandled messages
+  virtual long onDefault(FXObject*,FXSelector,void*);
 
   /// Save object to stream
   virtual void save(FXStream& store) const;

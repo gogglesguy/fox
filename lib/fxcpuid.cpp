@@ -3,7 +3,7 @@
 *                              C P U I D   S u p p o r t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -158,13 +158,13 @@ FXuint fxCPUFeatures(){
     mycpuid(1,feature[0],feature[1],feature[2],feature[3]);
     if(feature[2]&0x00000001) caps|=CPU_HAS_SSE3;
     if(feature[2]&0x00000200) caps|=CPU_HAS_SSSE3;
-    if(feature[2]&0x00002000) caps|=CPU_HAS_CMPXCGH16;
+    if(feature[2]&0x00002000) caps|=CPU_HAS_CMPXCHG16;
     if(feature[2]&0x00080000) caps|=CPU_HAS_SSE41;
     if(feature[2]&0x00100000) caps|=CPU_HAS_SSE42;
     if(feature[2]&0x00800000) caps|=CPU_HAS_POPCNT;
     if(feature[2]&0x00400000) caps|=CPU_HAS_MOVBE;
     if(feature[3]&0x00000010) caps|=CPU_HAS_TSC;
-    if(feature[3]&0x00000100) caps|=CPU_HAS_CMPXCGH8;
+    if(feature[3]&0x00000100) caps|=CPU_HAS_CMPXCHG8;
     if(feature[3]&0x00008000) caps|=CPU_HAS_CMOV;
     if(feature[3]&0x00800000) caps|=CPU_HAS_MMX;
     if(feature[3]&0x02000000) caps|=CPU_HAS_SSE;

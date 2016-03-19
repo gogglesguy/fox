@@ -3,7 +3,7 @@
 *                      M e m o r y   M a p p e d   F i l e                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -218,7 +218,9 @@ FXbool FXMemMap::flush(){
 #ifdef WIN32
     return ::FlushViewOfFile(mapbase,(size_t)maplength)!=0;
 #else
+#ifndef __minix
     return ::msync((char*)mapbase,(size_t)maplength,MS_SYNC|MS_INVALIDATE)==0;
+#endif
 #endif
     }
   return false;

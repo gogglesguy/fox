@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -148,6 +148,8 @@ public:
   long onCmdCursorLeft(FXObject*,FXSelector,void*);
   long onCmdCursorWordLeft(FXObject*,FXSelector,void*);
   long onCmdCursorWordRight(FXObject*,FXSelector,void*);
+  
+  // Cursor drag movement
   long onCmdCursorShiftHome(FXObject*,FXSelector,void*);
   long onCmdCursorShiftEnd(FXObject*,FXSelector,void*);
   long onCmdCursorShiftRight(FXObject*,FXSelector,void*);

@@ -3,9 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
-*********************************************************************************
-* Major Contributions for Windows NT by Lyle Johnson                            *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -67,6 +65,8 @@
 
 /*
   Notes:
+
+  - Major Contributions for Windows NT by Lyle Johnson.
 
   - Application should have a target to be notified of certain app-wide events,
     such as activation of [a window of] the application etc.
@@ -330,7 +330,11 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright information
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2010 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2011 Jeroen van der Zijp. All Rights Reserved.";
+
+
+// Conversion
+extern FXAPI FXuint __strtoul(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
 
 
 #ifdef WIN32            // Windows
@@ -602,10 +606,12 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
 #else                   // X Window specific inits
 
   wmDeleteWindow=0;                       // Window Manager stuff
+  wmSaveYourself=0;
   wmQuitApp=0;
   wmProtocols=0;
   wmMotifHints=0;
   wmTakeFocus=0;
+  wmClientMachine=0;
   wmState=0;
 
   wmNetState=0;
@@ -623,6 +629,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   wmNetMoveResize=0;
   wmNetRestack=0;
   wmNetPing=0;
+  wmNetProcessId=0;
   wmNetWindowType=0;
 
   wmWindowRole=0;                         // Window Role
@@ -686,10 +693,8 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   xdndRect.h=0;
   xrrScreenChange=0;                      // Xrandr event
   xfxFixesSelection=0;                    // Xfixes event
-  xsbBallMotion=0;                        // Space ball motion
-  xsbButtonPress=0;                       // Space ball button press
-  xsbButtonRelease=0;                     // Space ball button release
-  xsbDevice=NULL;                         // Space ball device
+  xInputOpcode=0;                         // XInput2 Opcode
+  xsbDevice=0;                            // Space ball device
   xim=NULL;                               // Input method stuff
 
   // Miscellaneous stuff
@@ -718,7 +723,7 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   scrollBarSize=15;
 
   // Make font
-#ifdef HAVE_XFT_H
+#if defined(HAVE_XFT_H)
   normalFont=new FXFont(this,"Sans,90");
 #else
   normalFont=new FXFont(this,"helvetica,90");
@@ -824,9 +829,15 @@ FXWindow* FXApp::findWindowAt(FXint rx,FXint ry,FXID window) const {
   if(initialized){
 #ifdef WIN32
     POINT point;
-    point.x=rx;
-    point.y=ry;
-    window=WindowFromPoint(point);      // FIXME this finds only enabled/visible windows
+    FXID child;
+    if(!window) window=(FXID)GetDesktopWindow();
+    while(1){
+      point.x=rx; point.y=ry;
+      ScreenToClient((HWND)window,&point);
+      child=ChildWindowFromPoint((HWND)window,point);
+      if(!child || child==window) break;
+      window=child;
+      }
 #else
     Window rootwin=XDefaultRootWindow((Display*)display);
     Window child;
@@ -1032,27 +1043,27 @@ void FXApp::openInputDevices(){
         switch(devinfo.dwType){
           case RIM_TYPEMOUSE:
 #if 0
-            tlog("dwId:\t%d\n", devinfo.mouse.dwId);
-            tlog("dwNumberOfButtons:\t%d\n", devinfo.mouse.dwNumberOfButtons);
-            tlog("dwSampleRate:\t%d\n", devinfo.mouse.dwSampleRate);
+            FXTRACE((1,"dwId:\t%d\n", devinfo.mouse.dwId));
+            FXTRACE((1,"dwNumberOfButtons:\t%d\n", devinfo.mouse.dwNumberOfButtons));
+            FXTRACE((1,"dwSampleRate:\t%d\n", devinfo.mouse.dwSampleRate));
 #endif
             break;
           case RIM_TYPEKEYBOARD:
 #if 0
-            tlog("dwType:\t%d\n", devinfo.keyboard.dwType);
-            tlog("dwSubType:\t%d\n", devinfo.keyboard.dwSubType);
-            tlog("dwKeyboardMode:\t%d\n", devinfo.keyboard.dwKeyboardMode);
-            tlog("dwNumberOfFunctionKeys:\t%d\n", devinfo.keyboard.dwNumberOfFunctionKeys);
-            tlog("dwNumberOfIndicators:\t%d\n", devinfo.keyboard.dwNumberOfIndicators);
-            tlog("dwNumberOfKeysTotal:\t%d\n", devinfo.keyboard.dwNumberOfKeysTotal);
+            FXTRACE((1,"dwType:\t%d\n", devinfo.keyboard.dwType));
+            FXTRACE((1,"dwSubType:\t%d\n", devinfo.keyboard.dwSubType));
+            FXTRACE((1,"dwKeyboardMode:\t%d\n", devinfo.keyboard.dwKeyboardMode));
+            FXTRACE((1,"dwNumberOfFunctionKeys:\t%d\n", devinfo.keyboard.dwNumberOfFunctionKeys));
+            FXTRACE((1,"dwNumberOfIndicators:\t%d\n", devinfo.keyboard.dwNumberOfIndicators));
+            FXTRACE((1,"dwNumberOfKeysTotal:\t%d\n", devinfo.keyboard.dwNumberOfKeysTotal));
 #endif
             break;
           case RIM_TYPEHID:
-         //   tlog("dwVendorId:\t0x%x (%s)\n", devinfo.hid.dwVendorId, fmt_vendor(devinfo.hid.dwVendorId));
-         //   tlog("dwProductId:\t0x%x (%s)\n", devinfo.hid.dwProductId, fmt_product(devinfo.hid.dwProductId));
-         //   tlog("dwVersionNumber:\t%d\n", devinfo.hid.dwVersionNumber);
-         //   tlog("usUsagePage:\t%d\n", devinfo.hid.usUsagePage);
-         //   tlog("usUsage:\t%d\n", devinfo.hid.usUsage);
+            //   FXTRACE((1,"dwVendorId:\t0x%x (%s)\n", devinfo.hid.dwVendorId, fmt_vendor(devinfo.hid.dwVendorId)));
+            //   FXTRACE((1,"dwProductId:\t0x%x (%s)\n", devinfo.hid.dwProductId, fmt_product(devinfo.hid.dwProductId)));
+            //   FXTRACE((1,"dwVersionNumber:\t%d\n", devinfo.hid.dwVersionNumber));
+            //   FXTRACE((1,"usUsagePage:\t%d\n", devinfo.hid.usUsagePage));
+            //   FXTRACE((1,"usUsage:\t%d\n", devinfo.hid.usUsage));
             //
             // register to receive input from the SpaceNavigator
             //
@@ -1060,17 +1071,16 @@ void FXApp::openInputDevices(){
             //	    www.3dconnexion.com/forum/viewtopic.php?t=1031#5666
             //	    www.usb.org/developers/hidpage/
             //
-            if((devinfo.hid.dwVendorId==0x046d) &&	    // Logitech
-                (devinfo.hid.dwProductId==0xc626) &&	    // SpaceNavigator
-                (devinfo.hid.usUsagePage==1) &&	    // Generic Desktop Controls
-                (devinfo.hid.usUsage==8)){		    // Multi-axis Controller
-                dev.usUsagePage=1;
-                dev.usUsage=8;
-                dev.dwFlags=0;
-                dev.hwndTarget=NULL;		    // follow keyboard focus
-                if(RegisterRawInputDevices(&dev,1,sizeof(dev))){
-                  spaceNavHandle=devlist[i].hDevice;  // assume only one device is connected
- //                 tlog("\nRegistered for WM_INPUT!\n");
+
+            // Match 3Dconnexion SpaceNavigator / Generic Desktop Controls / Multi-axis Controller
+            if((devinfo.hid.dwVendorId==0x046d) && (devinfo.hid.dwProductId==0xc626) && (devinfo.hid.usUsagePage==1) && (devinfo.hid.usUsage==8)){
+              dev.usUsagePage=1;
+              dev.usUsage=8;
+              dev.dwFlags=0;
+              dev.hwndTarget=NULL;		    // follow keyboard focus
+              if(RegisterRawInputDevices(&dev,1,sizeof(dev))){
+                spaceNavHandle=devlist[i].hDevice;  // assume only one device is connected
+                // FXTRACE((1,"\nRegistered for WM_INPUT!\n"));
                 }
               }
             break;
@@ -1230,50 +1240,52 @@ void FXApp::imdestroycallback(void*,FXApp* a,void*){
 
 // Open Input devices
 void FXApp::openInputDevices(){
-#ifdef HAVE_XINPUT_H
-  int majoropcode,errorbase,eventbase;
-  if(XQueryExtension((Display*)display,INAME,&majoropcode,&eventbase,&errorbase)){
-    XExtensionVersion *xie=XGetExtensionVersion((Display*)display,INAME);
-    if(xie && (xie!=(XExtensionVersion*)NoSuchExtension)){
-      if(xie->present){
-        XDeviceInfo *list; int ndevices;
-        FXTRACE((100,"Found XInput version: %d.%d (Major: %d, Error: %d, Event: %d)\n",xie->major_version,xie->minor_version,majoropcode,errorbase,eventbase));
-        list=XListInputDevices((Display*)display,&ndevices);
-        if(list){
-          for(int d=0; d<ndevices; ++d){
-            FXTRACE((100,"device: %d: name: %s id: %d classes: %d use: %d\n",d,list[d].name,list[d].id,list[d].num_classes,list[d].use));
-            if(list[d].use!=IsXPointer && list[d].use!=IsXKeyboard){
-              XAnyClassInfo *ci=list[d].inputclassinfo;
-              for(int c=0; c<list[d].num_classes; ++c){
-                FXTRACE((100,"class[%d]: %d\n",c,ci->c_class));
-                if(ci->c_class==ValuatorClass && ((XValuatorInfo*)ci)->num_axes==6){        // 6DOF controller!
-                  xsbDevice=XOpenDevice((Display*)display,list[d].id);
-                  if(xsbDevice){
-                    XInputClassInfo *ici=((XDevice*)xsbDevice)->classes;
-                    //XSetDeviceMode((Display*)display,(XDevice*)xsbDevice,Absolute);
-                    for(int i=0; i<((XDevice*)xsbDevice)->num_classes; ++i,++ici){
-                      if(ici->input_class==ValuatorClass){
-                        xsbBallMotion=ici->event_type_base+_deviceMotionNotify;
-                        }
-                      else if(ici->input_class==ButtonClass){
-                        xsbButtonPress=ici->event_type_base+_deviceButtonPress;
-                        xsbButtonRelease=ici->event_type_base+_deviceButtonRelease;
-                        }
-                      }
-                    FXTRACE((100,"xsbBallMotion: %d\n",xsbBallMotion));
-                    FXTRACE((100,"xsbButtonPress: %d\n",xsbButtonPress));
-                    FXTRACE((100,"xsbButtonRelease: %d\n",xsbButtonRelease));
-                    break;
-                    }
-                  }
-                ci=(XAnyClassPtr)(((FXuchar*)ci)+ci->length);
-                }
-              }
+#if defined(HAVE_XINPUT2_H)
+  int majoropcode,eventbase,errorbase,ndevices;
+  if(XQueryExtension((Display*)display,"XInputExtension",&majoropcode,&eventbase,&errorbase)){
+    int majorversion=XI_2_Major,minorversion=XI_2_Minor;
+    FXTRACE((100,"XInputExtension maj:%d, evt:%d, err:%d\n",majoropcode,eventbase,errorbase));
+    if(XIQueryVersion((Display*)display,&majorversion,&minorversion)==Success){
+      FXTRACE((100,"XInput2 ver:%d.%d\n",majorversion,minorversion));
+      unsigned char maskbits[4]={0,0,0,0};
+      XIEventMask eventmask={XIAllDevices,sizeof(maskbits),maskbits};
+      XISetMask(eventmask.mask,XI_DeviceChanged);
+      XISetMask(eventmask.mask,XI_HierarchyChanged);
+      XISetMask(eventmask.mask,XI_PropertyEvent);
+      XISelectEvents((Display*)display,XDefaultRootWindow((Display*)display),&eventmask,1);
+      XIDeviceInfo *devices=XIQueryDevice((Display*)display,XIAllDevices,&ndevices);
+      if(devices){
+        for(FXint i=0; i<ndevices; i++){
+          FXTRACE((100,"Device %s id: %d attached to: %d is a ",devices[i].name,devices[i].deviceid,devices[i].attachment));
+          switch(devices[i].use){
+            case XIMasterPointer: FXTRACE((100,"master pointer\n")); break;
+            case XIMasterKeyboard: FXTRACE((100,"master keyboard\n")); break;
+            case XISlavePointer: FXTRACE((100,"slave pointer\n")); break;
+            case XISlaveKeyboard: FXTRACE((100,"slave keyboard\n")); break;
+            case XIFloatingSlave: FXTRACE((100,"floating slave\n")); break;
             }
-          XFreeDeviceList(list);
           }
+/*
+unsigned char maskbits[4]={0,0,0,0};
+XIEventMask eventmask={XIAllDevices,sizeof(maskbits),maskbits};
+XISetMask(eventmask.mask,XI_DeviceChanged);
+XISetMask(eventmask.mask,XI_HierarchyChanged);
+XISetMask(eventmask.mask,XI_PropertyEvent);
+XISelectEvents(DISPLAY(getApp()),xid,&eventmask,1);
+XIClearMask(eventmask.mask,XI_DeviceChanged);
+XIClearMask(eventmask.mask,XI_HierarchyChanged);
+XIClearMask(eventmask.mask,XI_PropertyEvent);
+eventmask.deviceid=12;
+XISetMask(eventmask.mask,XI_RawKeyPress);
+XISetMask(eventmask.mask,XI_RawKeyRelease);
+XISetMask(eventmask.mask,XI_RawButtonPress);
+XISetMask(eventmask.mask,XI_RawButtonRelease);
+XISetMask(eventmask.mask,XI_RawMotion);
+XISelectEvents(DISPLAY(getApp()),xid,&eventmask,1);
+*/
+        XIFreeDeviceInfo(devices);
+        xInputOpcode=majoropcode;
         }
-      XFree(xie);
       }
     }
 #endif
@@ -1282,11 +1294,8 @@ void FXApp::openInputDevices(){
 
 // Close Input devices
 void FXApp::closeInputDevices(){
-#ifdef HAVE_XINPUT_H
-  if(xsbDevice){
-    XCloseDevice((Display*)display,(XDevice*)xsbDevice);
-    xsbDevice=NULL;
-    }
+#if defined(HAVE_XINPUT2_H)
+  // FIXME
 #endif
   }
 
@@ -1308,6 +1317,7 @@ const FXchar* windowTypeAtoms[14]={
   "_NET_WM_WINDOW_TYPE_DND",
   "_NET_WM_WINDOW_TYPE_NORMAL"
   };
+
 
 #endif
 
@@ -1474,7 +1484,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
         }
       }
 
-#ifdef HAVE_XSHM_H
+#if defined(HAVE_XSHM_H)
 
     // Displaying remotely turns it off for sure
     if(!(dpy[0]==':' && Ascii::isDigit(dpy[1]))){
@@ -1507,8 +1517,8 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
     FXTRACE((100,"X Shared Images  = %d\n",shmi));
     FXTRACE((100,"X Shared Pixmaps = %d\n",shmp));
 
-  // X Render Extension
-#ifdef HAVE_XRENDER_H
+    // X Render Extension
+#if defined(HAVE_XRENDER_H)
     int xrenderevent,xrendererror;
     if(XRenderQueryExtension((Display*)display,&xrenderevent,&xrendererror)){
       int xrendermajor,xrenderminor;
@@ -1520,7 +1530,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
 #endif
 
     // Initialize Xft and fontconfig
-#ifdef HAVE_XFT_H
+#if defined(HAVE_XFT_H)
     if(!XftInit(NULL)) return false;
     if(XftGetVersion()<XftVersion){
       fxwarning("Expected Xft library version %d or greater; was %d.\n",XftVersion,XftGetVersion());
@@ -1543,7 +1553,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
 #endif
 
     // Check for X Rotation and Reflection support
-#ifdef HAVE_XRANDR_H
+#if defined(HAVE_XRANDR_H)
     int rreventbase,rrerrorbase;
     if(XRRQueryExtension((Display*)display,&rreventbase,&rrerrorbase)){
       XRRSelectInput((Display*)display,XDefaultRootWindow((Display*)display),True);
@@ -1553,7 +1563,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
 #endif
 
     // Check for X Fixes support
-#ifdef HAVE_XFIXES_H
+#if defined(HAVE_XFIXES_H)
     int fxeventbase,fxerrorbase;
     if(XFixesQueryExtension((Display*)display,&fxeventbase,&fxerrorbase)){
       xfxFixesSelection=fxeventbase+XFixesSelectionNotify;
@@ -1567,10 +1577,12 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
 
     // Window Manager communication
     wmDeleteWindow=XInternAtom((Display*)display,"WM_DELETE_WINDOW",0);
+    wmSaveYourself=XInternAtom((Display*)display,"WM_SAVE_YOURSELF",0);
     wmQuitApp=XInternAtom((Display*)display,"_WM_QUIT_APP",0);
     wmProtocols=XInternAtom((Display*)display,"WM_PROTOCOLS",0);
     wmMotifHints=XInternAtom((Display*)display,"_MOTIF_WM_HINTS",0);
     wmTakeFocus=XInternAtom((Display*)display,"WM_TAKE_FOCUS",0);
+    wmClientMachine=XInternAtom((Display*)display,"WM_CLIENT_MACHINE",0);
     wmState=XInternAtom((Display*)display,"WM_STATE",0);
 
     // Extended Window Manager support
@@ -1590,6 +1602,7 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
     wmNetMoveResize=XInternAtom((Display*)display,"_NET_WM_MOVERESIZE",0);
     wmNetRestack=XInternAtom((Display*)display,"_NET_RESTACK_WINDOW",0);
     wmNetPing=XInternAtom((Display*)display,"_NET_WM_PING",0);
+    wmNetProcessId=XInternAtom((Display*)display,"_NET_WM_PID",0);
     wmNetWindowType=XInternAtom((Display*)display,"_NET_WM_WINDOW_TYPE",0);
 
     // Register window types
@@ -1881,7 +1894,7 @@ void FXApp::addSignal(FXint sig,FXObject* tgt,FXSelector sel,FXbool immediate,FX
     else
       handler=signalhandler;
 #ifdef WIN32
-#ifdef __IBMCPP__
+#if defined(__IBMCPP__)
     if(signal(sig,(_SigFunc)handler)==SIG_ERR){ fxwarning("%s::addSignal: error setting signal handler\n",getClassName()); }
 #else
     if(signal(sig,handler)==SIG_ERR){ fxwarning("%s::addSignal: error setting signal handler\n",getClassName()); }
@@ -2297,7 +2310,7 @@ a:ev.xany.type=0;
 
   // Are there no events already queued up?
   if(!initialized || !XEventsQueued((Display*)display,QueuedAfterFlush)){
-#ifdef __USE_XOPEN2K
+#if defined(__USE_XOPEN2K)
     struct timespec delta;
 #else
     struct timeval delta;
@@ -2321,7 +2334,7 @@ a:ev.xany.type=0;
       }
 
     // Do a quick poll for any ready events or inputs
-#ifdef __USE_XOPEN2K
+#if defined(__USE_XOPEN2K)
     delta.tv_nsec=0;
     delta.tv_sec=0;
     nfds=pselect(maxfds+1,&readfds,&writefds,&exceptfds,&delta,NULL);
@@ -2407,7 +2420,7 @@ a:ev.xany.type=0;
         appMutex.unlock();
 
         // Block till timer or event or interrupt
-#ifdef __USE_XOPEN2K
+#if defined(__USE_XOPEN2K)
         delta.tv_nsec=blocking%1000000000;
         delta.tv_sec=blocking/1000000000;
         nfds=pselect(maxfds+1,&readfds,&writefds,&exceptfds,&delta,NULL);
@@ -2428,7 +2441,7 @@ a:ev.xany.type=0;
         appMutex.unlock();
 
         // Block until something happens
-#ifdef __USE_XOPEN2K
+#if defined(__USE_XOPEN2K)
         nfds=pselect(maxfds+1,&readfds,&writefds,&exceptfds,NULL,NULL);
 #else
         nfds=select(maxfds+1,&readfds,&writefds,&exceptfds,NULL);
@@ -2540,7 +2553,7 @@ a:ev.xany.type=0;
 // Peek for event
 FXbool FXApp::peekEvent(){
   if(initialized){
-#ifdef __USE_XOPEN2K
+#if defined(__USE_XOPEN2K)
     struct timespec delta;
 #else
     struct timeval delta;
@@ -2578,7 +2591,7 @@ FXbool FXApp::peekEvent(){
     maxfds=ConnectionNumber((Display*)display);
 
     // Do a quick poll for any ready events
-#ifdef __USE_XOPEN2K
+#if defined(__USE_XOPEN2K)
     delta.tv_nsec=0;
     delta.tv_sec=0;
     nfds=pselect(maxfds+1,&readfds,&writefds,&exceptfds,&delta,NULL);
@@ -2658,6 +2671,251 @@ FXString translateKeyEvent(XEvent& event,XIC xic){
 */
 
 
+
+
+#if 0
+The XIHierarchyEvent has a couple of interesting fields:
+
+
+typedef struct {
+    int           type;         /* GenericEvent */
+    unsigned long serial;       /* # of last request processed by server */
+    Bool          send_event;   /* true if this came from a SendEvent request */
+    Display       *display;     /* Display the event was read from */
+    int           extension;    /* XI extension offset */
+    int           evtype;       /* XI_DeviceHierarchyChangedNotify */
+    Time          time;
+    int           flags;
+    int           num_devices;
+    XIHierarchyInfo *info;
+} XIHierarchyEvent;
+
+
+The first couple of fields are standard. The flags field lists all changes that occurred, a combination of:
+
+
+XIMasterAdded           A new master device has been created.
+XIMasterRemoved         A master device has been deleted.
+XISlaveAdded            A new slave device has been added (e.g. plugged in).
+XISlaveRemoved          A slave device has been removed (e.g. unplugged).
+XISlaveAttached         A slave device has been attached to a master device.
+XISlaveDetached         A slave device has been detached (set floating).
+XIDeviceEnabled         A device has been enabled (i.e. it may send events now)).
+XIDeviceDisabled        A device has been disabled (i.e. it will not send events until enabled again).
+
+
+The info field contains the details for all devices currently present and those
+removed with this change. Each info->flags states what happened to this particular device.
+For example, one could search for the slave device that just got removed by searching
+for the XISlaveRemoved flag.
+
+
+if (!(ev.flags & XISlaveRemoved)) {
+  printf("No slave device removed.\n");
+  return;
+  }
+
+for (i = 0; i < ev.num_devices; i++) {
+  if (info[i].flags & XISlaveRemoved) {
+    printf("Device %d has been removed.\n", info[i].deviceid);
+    }
+  }
+
+
+With this information, it is possible to keep track of the device hierarchy at all times and
+adjust the user interface as necessary.
+
+#endif
+
+
+#if 0
+
+        if(ev.type==xsbBallMotion){     // FIXME consecutive xsbBallMotion events should be compressed!
+          static int axis_data[6];
+          static Window prevwindow=0;
+          Window pw;
+          XDeviceMotionEvent& sbe=(XDeviceMotionEvent&)ev;
+          event.type=SEL_SPACEBALLMOTION;
+          event.time=sbe.time;
+          //event.win_x=sbe.x;
+          //event.win_y=sbe.y;
+          //event.root_x=sbe.x_root;
+          //event.root_y=sbe.y_root;
+          event.values[0]=sbe.axis_data[0]-axis_data[0];
+          event.values[1]=sbe.axis_data[1]-axis_data[1];
+          event.values[2]=sbe.axis_data[2]-axis_data[2];
+          event.values[3]=sbe.axis_data[3]-axis_data[3];
+          event.values[4]=sbe.axis_data[4]-axis_data[4];
+          event.values[5]=sbe.axis_data[5]-axis_data[5];
+
+//          FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
+          axis_data[0]=sbe.axis_data[0];
+          axis_data[1]=sbe.axis_data[1];
+          axis_data[2]=sbe.axis_data[2];
+          axis_data[3]=sbe.axis_data[3];
+          axis_data[4]=sbe.axis_data[4];
+          axis_data[5]=sbe.axis_data[5];
+          pw=prevwindow;
+          prevwindow=ev.xmotion.window;
+          if(pw!=ev.xmotion.window) return false;
+         // if((FXABS(event.values[0])>400) || (FXABS(event.values[1])>400) || (FXABS(event.values[2])>400) || (FXABS(event.values[3])>400) || (FXABS(event.values[4])>400) || (FXABS(event.values[5])>400)) return false;
+          //FXTRACE((1,"spaceballmotion\n"));
+          //FXTRACE((1,"state : %08x axes_count=%d first_axis=%d\n",sbe.device_state,sbe.axes_count,sbe.first_axis));
+        //  FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
+          // FIXME
+
+          // Dispatch to grab window
+          if(mouseGrabWindow){
+            window->translateCoordinatesTo(event.win_x,event.win_y,mouseGrabWindow,event.win_x,event.win_y);
+            if(mouseGrabWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
+
+          // Dispatch if inside model window
+          // FIXME doesSaveUnder test should go away
+          else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
+            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
+          }
+        else if(ev.type==xsbButtonPress){
+          event.type=SEL_SPACEBALLBUTTONPRESS;
+          event.time=ev.xmotion.time;
+          event.win_x=ev.xmotion.x;
+          event.win_y=ev.xmotion.y;
+          event.root_x=ev.xmotion.x_root;
+          event.root_y=ev.xmotion.y_root;
+
+          // Dispatch to grab window
+          if(mouseGrabWindow){
+            window->translateCoordinatesTo(event.win_x,event.win_y,mouseGrabWindow,event.win_x,event.win_y);
+            if(mouseGrabWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
+
+          // Dispatch if inside model window
+          // FIXME doesSaveUnder test should go away
+          else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
+            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
+          }
+        else if(ev.type==xsbButtonRelease){
+          event.type=SEL_SPACEBALLBUTTONRELEASE;
+          event.time=ev.xmotion.time;
+          event.win_x=ev.xmotion.x;
+          event.win_y=ev.xmotion.y;
+          event.root_x=ev.xmotion.x_root;
+          event.root_y=ev.xmotion.y_root;
+
+          // Dispatch to grab window
+          if(mouseGrabWindow){
+            window->translateCoordinatesTo(event.win_x,event.win_y,mouseGrabWindow,event.win_x,event.win_y);
+            if(mouseGrabWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
+
+          // Dispatch if inside model window
+          // FIXME doesSaveUnder test should go away
+          else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
+            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
+          }
+
+
+      // Enable extra events when input extension supported
+#if defined(HAVE_XINPUT2_H)
+/*
+      if(1){
+        unsigned char maskbits[4]={0,0,0,0};
+        XIEventMask eventmask={11,sizeof(maskbits),maskbits};
+        XISetMask(eventmask.mask,XI_Enter);
+        XISetMask(eventmask.mask,XI_Leave);
+        XISetMask(eventmask.mask,XI_FocusIn);
+        XISetMask(eventmask.mask,XI_FocusOut);
+        XISetMask(eventmask.mask,XI_PropertyEvent);
+        if(isEnabled()){
+//          XISetMask(eventmask.mask,XI_KeyPress);
+//          XISetMask(eventmask.mask,XI_KeyRelease);
+//          XISetMask(eventmask.mask,XI_ButtonPress);
+//          XISetMask(eventmask.mask,XI_ButtonRelease);
+//          XISetMask(eventmask.mask,XI_Motion);
+          }
+        XISelectEvents((Display*)getApp()->getDisplay(),xid,&eventmask,1);
+
+//XIGrabModifiers modifiers[]={{0,0},{0,0x10},{0,0x1},{0,0x11}};
+//int nmods=sizeof(modifiers)/sizeof(modifiers[0]);
+//XIGrabButton((Display*)getApp()->getDisplay(),eventmask.deviceid,1,xid,None,GrabModeAsync,GrabModeAsync,False,&eventmask,nmods,modifiers);
+//XIUngrabButton((Display*)getApp()->getDisplay(),eventmask.deviceid,1,xid,nmods-2,&modifiers[2]);
+//XIGrabKeycode((Display*)getApp()->getDisplay(),eventmask.deviceid, 24, xid, GrabModeAsync, GrabModeAsync,False, &eventmask, nmods, modifiers);
+//XIUngrabKeycode((Display*)getApp()->getDisplay(),eventmask.deviceid, 24, xid, nmods - 2, &modifiers[2]);
+        }
+*/
+#endif
+
+#endif
+
+#if defined(HAVE_XINPUT2_H)
+static void print_hierarchychangedevent(XIHierarchyEvent *event){
+  const char *use;
+  int i;
+  FXTRACE((100,"    Changes happened: %s %s %s %s %s %s %s %s\n",(event->flags & XIMasterAdded) ? "[new master]" : "",(event->flags & XIMasterRemoved) ? "[master removed]" : "",(event->flags & XISlaveAdded) ? "[new slave]" : "",(event->flags & XISlaveRemoved) ? "[slave removed]" : "",(event->flags & XISlaveAttached) ? "[slave attached]" : "",(event->flags & XISlaveDetached) ? "[slave detached]" : "",(event->flags & XIDeviceEnabled) ? "[device enabled]" : "",(event->flags & XIDeviceDisabled) ? "[device disabled]" : ""));
+
+  for(i=0; i<event->num_info; i++){
+    switch(event->info[i].use){
+      case XIMasterPointer: use = "master pointer"; break;
+      case XIMasterKeyboard: use = "master keyboard"; break;
+      case XISlavePointer: use = "slave pointer"; break;
+      case XISlaveKeyboard: use = "slave keyboard"; break;
+      case XIFloatingSlave: use = "floating slave"; break;
+      default: use=""; break;
+      }
+    FXTRACE((100,"    device %d [%s (%d)] is %s\n",event->info[i].deviceid,use,event->info[i].attachment,(event->info[i].enabled) ? "enabled" : "disabled"));
+    if(event->info[i].flags){
+      FXTRACE((100,"    changes: %s %s %s %s %s %s %s %s\n",(event->info[i].flags & XIMasterAdded) ? "[new master]" : "",(event->info[i].flags & XIMasterRemoved) ? "[master removed]" : "",(event->info[i].flags & XISlaveAdded) ? "[new slave]" : "",(event->info[i].flags & XISlaveRemoved) ? "[slave removed]" : "",(event->info[i].flags & XISlaveAttached) ? "[slave attached]" : "",(event->info[i].flags & XISlaveDetached) ? "[slave detached]" : "",(event->info[i].flags & XIDeviceEnabled) ? "[device enabled]" : "",(event->info[i].flags & XIDeviceDisabled) ? "[device disabled]" : ""));
+      }
+    }
+  }
+
+
+static void print_deviceevent(XIDeviceEvent* event){
+  double *val;
+  int i;
+  FXTRACE((100,"    device: %d (%d)\n", event->deviceid, event->sourceid));
+  FXTRACE((100,"    detail: %d\n", event->detail));
+  FXTRACE((100,"    flags: %s\n", (event->flags & XIKeyRepeat) ? "repeat" : ""));
+  FXTRACE((100,"    root: %.2f/%.2f\n", event->root_x, event->root_y));
+  FXTRACE((100,"    event: %.2f/%.2f\n", event->event_x, event->event_y));
+  FXTRACE((100,"    buttons:"));
+  for(i=0; i<event->buttons.mask_len*8; i++){
+    if(XIMaskIsSet(event->buttons.mask,i)) FXTRACE((100," %d", i));
+    }
+  FXTRACE((100,"\n"));
+  FXTRACE((100,"    modifiers: locked %#x latched %#x base %#x effective: %#x\n",event->mods.locked, event->mods.latched,event->mods.base, event->mods.effective));
+  FXTRACE((100,"    group: locked %#x latched %#x base %#x effective: %#x\n",event->group.locked, event->group.latched,event->group.base, event->group.effective));
+  FXTRACE((100,"    valuators:"));
+  val = event->valuators.values;
+  for(i=0; i<event->valuators.mask_len*8; i++){
+    if(XIMaskIsSet(event->valuators.mask,i)) FXTRACE((100," %.2f", *val++));
+    }
+  FXTRACE((100,"\n"));
+  FXTRACE((100,"    windows: root 0x%lx event 0x%lx child 0x%ld\n",event->root, event->event, event->child));
+  }
+
+
+static void print_rawevent(XIRawEvent *event){
+  int i;
+  double *val, *raw_val;
+  FXTRACE((100,"    device: %d\n", event->deviceid));
+  FXTRACE((100,"    detail: %d\n", event->detail));
+  FXTRACE((100,"    valuators:\n"));
+  val = event->valuators.values;
+  raw_val = event->raw_values;
+  for (i = 0; i < event->valuators.mask_len * 8; i++){
+    if (XIMaskIsSet(event->valuators.mask, i)) FXTRACE((100,"         %2d: %.2f (%.2f)\n", i, *val++, *raw_val++));
+    }
+  FXTRACE((100,"\n"));
+  }
+
+#endif
+
+
+
 // Dispatch event to widget
 FXbool FXApp::dispatchEvent(FXRawEvent& ev){
   FXWindow *window,*ancestor,*focuswin;
@@ -2668,6 +2926,11 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
 
   // Get window
   window=findWindowWithId(ev.xany.window);
+
+  // Workaround XInput2
+#ifdef HAVE_XINPUT2_H
+  if(ev.xany.type==GenericEvent) window=getRootWindow();
+#endif
 
   // Was one of our windows, so dispatch
   if(window){
@@ -3144,6 +3407,18 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
               beep();
               }
             }
+          else if((FXID)ev.xclient.data.l[0]==wmSaveYourself){      // WM_SAVE_YOURSELF
+            FXTRACE((100,"WM_SAVE_YOURSELF\n"));
+/*
+            event.type=SEL_SESSION_NOTIFY;
+            return !window->handle(this,FXSEL(SEL_SESSION_NOTIFY,0),&event); // Return 1 if OK to terminate
+
+          case WM_ENDSESSION:         // Session will now end for sure
+            event.type=SEL_SESSION_CLOSED;
+            if(wParam) window->handle(this,FXSEL(SEL_SESSION_CLOSED,0),&event);
+            return 0;
+*/
+            }
           else if((FXID)ev.xclient.data.l[0]==wmQuitApp){           // WM_QUIT_APP
             event.type=SEL_CLOSE;
             if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window))){
@@ -3362,9 +3637,41 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
         FXTRACE((200,"VisibilityNotify window=%ld %s\n",ev.xvisibility.window,(ev.xvisibility.state==VisibilityUnobscured)?"VisibilityUnobscured":(ev.xvisibility.state==VisibilityPartiallyObscured)?"VisibilityPartiallyObscured":"VisibilityFullyObscured"));
         return true;
 
+#if defined(HAVE_XINPUT2_H)
+      case GenericEvent:
+        FXTRACE((100,"GenericEvent\n"));
+        if(ev.xcookie.extension==xInputOpcode && XGetEventData((Display*)display,&ev.xcookie)){
+          FXTRACE((100,"XInput2 type: %d\n",ev.xcookie.evtype));
+          switch(ev.xcookie.evtype){
+            case XI_ButtonPress:
+            case XI_ButtonRelease:
+            case XI_Motion:
+            case XI_KeyPress:
+            case XI_KeyRelease:
+              print_deviceevent((XIDeviceEvent*)ev.xcookie.data);
+              break;
+            case XI_RawKeyPress:
+            case XI_RawKeyRelease:
+            case XI_RawButtonPress:
+            case XI_RawButtonRelease:
+            case XI_RawMotion:
+              print_rawevent((XIRawEvent*)ev.xcookie.data);
+              break;
+            case XI_HierarchyChanged:
+              print_hierarchychangedevent((XIHierarchyEvent*)ev.xcookie.data);
+              break;
+            case XI_DeviceChanged:
+//              print_devicechangedevent(display,cookie->data);
+              break;
+            }
+          XFreeEventData((Display*)display,&ev.xcookie);
+          }
+        return true;
+#endif
+
       // Other events
       default:
-#ifdef HAVE_XRANDR_H
+#if defined(HAVE_XRANDR_H)
         if(ev.type==xrrScreenChange){
           XRRUpdateConfiguration(&ev);
           root->setWidth(root->getDefaultWidth());
@@ -3374,97 +3681,9 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           // FIXME This should be a SEL_CONFIGURE for the root window, eventually
           }
 #endif
-#ifdef HAVE_XFIXES_H
+#if defined(HAVE_XFIXES_H)
         if(ev.type==xfxFixesSelection){
           FXTRACE((100,"XFixesSelectionNotifyEvent window=%lu owner=%lu selection=%lu\n",((XFixesSelectionNotifyEvent*)&ev)->window,((XFixesSelectionNotifyEvent*)&ev)->owner,((XFixesSelectionNotifyEvent*)&ev)->selection));
-          }
-#endif
-#ifdef HAVE_XINPUT_H
-        if(ev.type==xsbBallMotion){     // FIXME consecutive xsbBallMotion events should be compressed!
-          static int axis_data[6];
-          static Window prevwindow=0;
-          Window pw;
-          XDeviceMotionEvent& sbe=(XDeviceMotionEvent&)ev;
-          event.type=SEL_SPACEBALLMOTION;
-          event.time=sbe.time;
-          //event.win_x=sbe.x;
-          //event.win_y=sbe.y;
-          //event.root_x=sbe.x_root;
-          //event.root_y=sbe.y_root;
-          event.values[0]=sbe.axis_data[0]-axis_data[0];
-          event.values[1]=sbe.axis_data[1]-axis_data[1];
-          event.values[2]=sbe.axis_data[2]-axis_data[2];
-          event.values[3]=sbe.axis_data[3]-axis_data[3];
-          event.values[4]=sbe.axis_data[4]-axis_data[4];
-          event.values[5]=sbe.axis_data[5]-axis_data[5];
-
-//          FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
-          axis_data[0]=sbe.axis_data[0];
-          axis_data[1]=sbe.axis_data[1];
-          axis_data[2]=sbe.axis_data[2];
-          axis_data[3]=sbe.axis_data[3];
-          axis_data[4]=sbe.axis_data[4];
-          axis_data[5]=sbe.axis_data[5];
-          pw=prevwindow;
-          prevwindow=ev.xmotion.window;
-          if(pw!=ev.xmotion.window) return false;
-         // if((FXABS(event.values[0])>400) || (FXABS(event.values[1])>400) || (FXABS(event.values[2])>400) || (FXABS(event.values[3])>400) || (FXABS(event.values[4])>400) || (FXABS(event.values[5])>400)) return false;
-          //FXTRACE((1,"spaceballmotion\n"));
-          //FXTRACE((1,"state : %08x axes_count=%d first_axis=%d\n",sbe.device_state,sbe.axes_count,sbe.first_axis));
-        //  FXTRACE((1,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",sbe.axis_data[0],sbe.axis_data[1],sbe.axis_data[2],sbe.axis_data[3],sbe.axis_data[4],sbe.axis_data[5]));
-          // FIXME
-
-          // Dispatch to grab window
-          if(mouseGrabWindow){
-            window->translateCoordinatesTo(event.win_x,event.win_y,mouseGrabWindow,event.win_x,event.win_y);
-            if(mouseGrabWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
-            }
-
-          // Dispatch if inside model window
-          // FIXME doesSaveUnder test should go away
-          else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
-            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
-            }
-          }
-        else if(ev.type==xsbButtonPress){
-          event.type=SEL_SPACEBALLBUTTONPRESS;
-          event.time=ev.xmotion.time;
-          event.win_x=ev.xmotion.x;
-          event.win_y=ev.xmotion.y;
-          event.root_x=ev.xmotion.x_root;
-          event.root_y=ev.xmotion.y_root;
-
-          // Dispatch to grab window
-          if(mouseGrabWindow){
-            window->translateCoordinatesTo(event.win_x,event.win_y,mouseGrabWindow,event.win_x,event.win_y);
-            if(mouseGrabWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
-            }
-
-          // Dispatch if inside model window
-          // FIXME doesSaveUnder test should go away
-          else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
-            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
-            }
-          }
-        else if(ev.type==xsbButtonRelease){
-          event.type=SEL_SPACEBALLBUTTONRELEASE;
-          event.time=ev.xmotion.time;
-          event.win_x=ev.xmotion.x;
-          event.win_y=ev.xmotion.y;
-          event.root_x=ev.xmotion.x_root;
-          event.root_y=ev.xmotion.y_root;
-
-          // Dispatch to grab window
-          if(mouseGrabWindow){
-            window->translateCoordinatesTo(event.win_x,event.win_y,mouseGrabWindow,event.win_x,event.win_y);
-            if(mouseGrabWindow->handle(this,FXSEL(event.type,0),&event)) refresh();
-            }
-
-          // Dispatch if inside model window
-          // FIXME doesSaveUnder test should go away
-          else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
-            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
-            }
           }
 #endif
         return true;
@@ -3892,9 +4111,17 @@ static FXColor getSystemColor(FXuint which){
 #ifdef WIN32
 static void getSystemFont(FXFontDesc& fontdesc){
   NONCLIENTMETRICS ncm;
+  memset(&ncm,0,sizeof(NONCLIENTMETRICS));
   ncm.cbSize=sizeof(NONCLIENTMETRICS);
+#if (WINVER >= 0x0600)                          // Fix from: Daniel Stine <robodanny@gmail.com>
+  OSVERSIONINFO osvi;                           // Adjust size based on operating system version
+  memset(&osvi,0,sizeof(osvi));                 // So get run-time operating system version first
+  osvi.dwOSVersionInfoSize=sizeof(osvi);        // if headers include new member iPaddedBorderWidth
+  GetVersionEx(&osvi);                          // in NONCLIENTMETRICS struct
+  if(osvi.dwMajorVersion<6) ncm.cbSize-=sizeof(ncm.iPaddedBorderWidth);
+#endif
   SystemParametersInfo(SPI_GETNONCLIENTMETRICS,sizeof(NONCLIENTMETRICS),&ncm,0);
-#ifdef UNICODE
+#if defined(UNICODE)
   nc2utfs(fontdesc.face,sizeof(fontdesc.face),ncm.lfMenuFont.lfFaceName,LF_FACESIZE);
 #else
   strncpy(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face));
@@ -4043,7 +4270,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
         fxwarning("%s:init: missing argument for -tracelevel.\n",getClassName());
         ::exit(1);
         }
-      fxTraceLevel=strtoul(argv[j++],NULL,10);
+      fxTraceLevel=__strtoul(argv[j++]);
       continue;
       }
 
@@ -4063,7 +4290,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
         fxwarning("%s:init: missing argument for -maxcolors.\n",getClassName());
         ::exit(1);
         }
-      maxcols=strtol(argv[j++],NULL,10);
+      maxcols=__strtoul(argv[j++]);
       if(maxcols<2 || maxcols>256){
         fxwarning("%s::init: expected value between 2 and 256.\n",getClassName());
         ::exit(1);
@@ -4198,7 +4425,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
 
 // Exit application and close display
-void FXApp::exit(FXint code){  
+void FXApp::exit(FXint code){
   FXTRACE((100,"%s::exit\n",getClassName()));
 
   // Close the display

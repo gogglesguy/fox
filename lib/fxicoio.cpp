@@ -3,7 +3,7 @@
 *                          I C O   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2010 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2011 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -171,9 +171,9 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   if(biBitCount<=8){
     colormaplen = biClrUsed ? biClrUsed : 1 << biBitCount;
     for(i=0; i<colormaplen; i++){
-      store >> c1; ((FXuchar*)(colormap+i))[2]=c1;      // Blue
+      store >> c1; ((FXuchar*)(colormap+i))[0]=c1;      // Blue
       store >> c1; ((FXuchar*)(colormap+i))[1]=c1;      // Green
-      store >> c1; ((FXuchar*)(colormap+i))[0]=c1;      // Red
+      store >> c1; ((FXuchar*)(colormap+i))[2]=c1;      // Red
       store >> c1; ((FXuchar*)(colormap+i))[3]=255;     // Opaque
       }
     }
@@ -223,10 +223,10 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
          pp=data+i*biWidth;
          for(j=0; j<biWidth; j++,pp++){
            store >> rgb16;
-           ((FXuchar*)pp)[0]=((rgb16>>7)&0xf8)+((rgb16>>12)&0x7);  // Red
-           ((FXuchar*)pp)[1]=((rgb16>>2)&0xf8)+((rgb16>> 7)&0x7);  // Green
-           ((FXuchar*)pp)[2]=((rgb16<<3)&0xf8)+((rgb16>> 2)&0x7);  // Blue
            ((FXuchar*)pp)[3]=255;                                  // Alpha
+           ((FXuchar*)pp)[2]=((rgb16>>7)&0xf8)+((rgb16>>12)&0x7);  // Red
+           ((FXuchar*)pp)[1]=((rgb16>>2)&0xf8)+((rgb16>> 7)&0x7);  // Green
+           ((FXuchar*)pp)[0]=((rgb16<<3)&0xf8)+((rgb16>> 2)&0x7);  // Blue
            }
          store.position(pad,FXFromCurrent);
          }
@@ -236,9 +236,9 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       for(i=biHeight-1; i>=0; i--){
         pp=data+i*biWidth;
         for(j=0; j<biWidth; j++,pp++){
-          store >> ((FXuchar*)pp)[2];             // Blue
+          store >> ((FXuchar*)pp)[0];             // Blue
           store >> ((FXuchar*)pp)[1];             // Green
-          store >> ((FXuchar*)pp)[0];             // Red
+          store >> ((FXuchar*)pp)[2];             // Red
                    ((FXuchar*)pp)[3]=255;         // Alpha
           }
         store.position(pad,FXFromCurrent);
@@ -248,9 +248,9 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       for(i=biHeight-1; i>=0; i--){
         pp=data+i*biWidth;
         for(j=0; j<biWidth; j++,pp++){
-          store >> ((FXuchar*)pp)[2];             // Blue
+          store >> ((FXuchar*)pp)[0];             // Blue
           store >> ((FXuchar*)pp)[1];             // Green
-          store >> ((FXuchar*)pp)[0];             // Red
+          store >> ((FXuchar*)pp)[2];             // Red
           store >> ((FXuchar*)pp)[3];             // Alpha
           }
         }
@@ -369,9 +369,9 @@ FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FX
     for(i=height-1; i>=0; i--){
       pp=data+i*width;
       for(j=0; j<width; j++){
-        store << ((FXuchar*)pp)[2];
-        store << ((FXuchar*)pp)[1];
         store << ((FXuchar*)pp)[0];
+        store << ((FXuchar*)pp)[1];
+        store << ((FXuchar*)pp)[2];
         pp++;
         }
       store.save(padding,pad);
@@ -383,9 +383,9 @@ FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FX
     for(i=height-1; i>=0; i--){
       pp=data+i*width;
       for(j=0; j<width; j++){
-        store << ((FXuchar*)pp)[2];
-        store << ((FXuchar*)pp)[1];
         store << ((FXuchar*)pp)[0];
+        store << ((FXuchar*)pp)[1];
+        store << ((FXuchar*)pp)[2];
         store << ((FXuchar*)pp)[3];
         pp++;
         }

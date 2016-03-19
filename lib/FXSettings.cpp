@@ -3,7 +3,7 @@
 *                           S e t t i n g s   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -119,106 +119,12 @@ void FXSettings::deleteData(void* ptr){
 
 // Parse filename
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
-  FXFile file(filename,FXIO::Reading);
   FXTRACE((100,"%s::parseFile(%s,%d)\n",getClassName(),filename.text(),mrk));
+  FXFile file(filename,FXIO::Reading);
   if(file.isOpen()){
-
-    // Prepare buffer string
     FXString string('\0',file.size());
-
-    // Load file
     if(file.readBlock(string.text(),string.length())==string.length()){
-      FXStringDict *group=NULL;
-      FXint lineno=1,p=0,b,e;
-      FXString name;
-      FXString value;
-
-      // Skip BOM, if any
-      if(string[p]=='\xef' && string[p+1]=='\xbb' && string[p+2]=='\xbf') p+=3;
-
-      // Parse one line at a time
-      while(string[p]){
-
-        // Skip leading blanks
-        while(Ascii::isBlank(string[p])) p++;
-
-        // Non-comment
-        if(string[p] && string[p]!='\n' && string[p]!='\r' && string[p]!='#' && string[p]!=';'){
-
-          // Parse section name
-          if(string[p]=='['){
-
-            b=++p;
-
-            // Scan section name
-            while(string[p] && string[p]!=']' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
-
-            // Check errors
-            if(string[p]!=']'){ fxwarning("%s:%d: illegal section name.\n",filename.text(),lineno); goto next; }
-
-            e=p++;
-
-            // Grab name
-            name=string.mid(b,e-b);
-
-            // Add new section dict
-            group=insert(name.text());
-            }
-
-          // Parse name-value pair
-          else{
-
-            // Should have seen section prior to this
-            if(!group){ fxwarning("%s:%d: settings entry should follow a section.\n",filename.text(),lineno); goto next; }
-
-            b=p;
-
-            // Scan key name
-            while(string[p] && string[p]!='=' && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
-
-            // Check errors
-            if(string[p]!='='){ fxwarning("%s:%d: expected '=' to follow key.\n",filename.text(),lineno); goto next; }
-
-            e=p++;
-
-            // Remove trailing spaces after name
-            while(b<e && Ascii::isBlank(string[e-1])) e--;
-
-            // Grab name
-            name=string.mid(b,e-b);
-
-            // Skip leading spaces
-            while(Ascii::isBlank(string[p])) p++;
-
-            // Mark value
-            b=p;
-
-            // Scan value
-            while(string[p] && string[p]!='\n' && string[p]!='\r' && !Ascii::isControl(string[p])) p++;
-
-            e=p;
-
-            // Remove trailing spaces after value
-            while(b<e && Ascii::isBlank(string[e-1])) e--;
-
-            // Grab the unescaped value
-            value=string.mid(b,e-b).unescape('"','"');
-
-            // Add entry to current section
-            group->replace(name.text(),value.text(),mrk);
-            }
-          }
-
-        // Skip to end of line
-next:   while(string[p] && string[p]!='\n') p++;
-
-        // End of line
-        if(string[p]=='\n'){
-          lineno++;
-          p++;
-          }
-        }
-      return true;
+      return parse(string,mrk);
       }
     }
   return false;
@@ -227,50 +133,12 @@ next:   while(string[p] && string[p]!='\n') p++;
 
 // Unparse registry file
 FXbool FXSettings::unparseFile(const FXString& filename){
-  FXFile file(filename,FXIO::Writing);
   FXTRACE((100,"%s::unparseFile(%s)\n",getClassName(),filename.text()));
+  FXFile file(filename,FXIO::Writing);
   if(file.isOpen()){
     FXString string;
-
-    // Loop over all sections
-    for(FXint s=first(); s<size(); s=next(s)){
-
-      // Get group
-      FXStringDict* group=data(s);
-      FXbool sec=false;
-
-      // Loop over all entries
-      for(FXint e=group->first(); e<group->size(); e=group->next(e)){
-
-        // Is key-value pair marked?
-        if(group->mark(e)){
-          FXString value=group->data(e);
-
-          // Write section name if not written yet
-          if(!sec){
-            string.append("[");
-            string.append(key(s));
-            string.append("]" ENDLINE);
-            sec=true;
-            }
-
-          // Write marked key-value pairs only
-          string.append(group->key(e));
-          string.append("=");
-          string.append(value.shouldEscape('"','"') ? value.escape('"','"') : value);
-          string.append(ENDLINE);
-          }
-        }
-
-      // Blank line after end
-      if(sec){
-        string.append(ENDLINE);
-        }
-      }
-
-    // Save file
-    if(file.writeBlock(string.text(),string.length())==string.length()){
-      return true;
+    if(unparse(string)){
+      return file.writeBlock(string.text(),string.length())==string.length();
       }
     }
   return false;
@@ -353,7 +221,7 @@ FXbool FXSettings::parse(const FXString& string,FXbool mrk){
         while(b<e && Ascii::isBlank(string[e-1])) e--;
 
         // Grab the unescaped value
-        value=string.mid(b,e-b).unescape('"','"');
+        value=unescape(string.mid(b,e-b),'"','"');
 
         // Add entry to current section
         group->replace(name.text(),value.text(),mrk);
@@ -375,42 +243,46 @@ nxt:while(string[p] && string[p]!='\n') p++;
 
 // Unparse settings to a single string
 FXbool FXSettings::unparse(FXString& string) const {
-
-  string.clear();
+  FXStringDict* group;
+  FXString value;
+  FXint s,e,ss;
 
   // Loop over all sections
-  for(FXint s=first(); s<size(); s=next(s)){
+  string.clear();
+  for(s=0; s<size(); ++s){
 
-    // Get group
-    FXStringDict* group=data(s);
-    FXbool sec=false;
+    // Get group, if any
+    if(key(s)){
 
-    // Loop over all entries
-    for(FXint e=group->first(); e<group->size(); e=group->next(e)){
+      group=data(s);
 
-      // Is key-value pair marked?
-      if(group->mark(e)){
-        FXString value=group->data(e);
+      // Loop over all entries
+      for(e=0,ss=0; e<group->size(); ++e){
 
-        // Write section name if not written yet
-        if(!sec){
-          string.append("[");
-          string.append(key(s));
-          string.append("]" ENDLINE);
-          sec=true;
+        // Is key-value pair marked?
+        if(group->key(e) && group->mark(e)){
+
+          // Write section name if not written yet
+          if(!ss){
+            string.append("[");
+            string.append(key(s));
+            string.append("]" ENDLINE);
+            ss=1;
+            }
+
+          // Write marked key-value pairs only
+          value=group->data(e);
+          string.append(group->key(e));
+          string.append("=");
+          string.append(shouldEscape(value,'"','"') ? escape(value,'"','"',false) : value);
+          string.append(ENDLINE);
           }
+        }
 
-        // Write marked key-value pairs only
-        string.append(group->key(e));
-        string.append("=");
-        string.append(value.shouldEscape('"','"') ? value.escape('"','"') : value);
+      // Blank line after end
+      if(ss){
         string.append(ENDLINE);
         }
-      }
-
-    // Blank line after end
-    if(sec){
-      string.append(ENDLINE);
       }
     }
   return true;

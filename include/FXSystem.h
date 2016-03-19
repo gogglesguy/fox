@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,10 +31,10 @@ namespace FXSystem {
 
 
 /// Convert time in nanoseconds since 1/1/1970 to local date string
-FXString FXAPI localTime(FXTime value);
+extern FXAPI FXString localTime(FXTime value);
 
 /// Convert time in nanoseconds since 1/1/1970 to universal date string
-FXString FXAPI universalTime(FXTime value);
+extern FXAPI FXString universalTime(FXTime value);
 
 /**
 * Convert time in nanoseconds since 1/1/1970 to local date string as per strftime.
@@ -44,75 +44,75 @@ FXString FXAPI universalTime(FXTime value);
 *
 * Some systems support additional conversions.
 */
-FXString FXAPI localTime(const FXchar *format,FXTime value);
+extern FXAPI FXString localTime(const FXchar *format,FXTime value);
 
 /**
 * Convert time in nanoseconds since 1/1/1970 to universal date string as per strftime.
 */
-FXString FXAPI universalTime(const FXchar *format,FXTime value);
+extern FXAPI FXString universalTime(const FXchar *format,FXTime value);
 
 
 /// Get effective user id
-FXuint FXAPI user();
+extern FXAPI FXuint user();
 
 /// Get effective group id
-FXuint FXAPI group();
+extern FXAPI FXuint group();
 
 /// Return owner name from uid if available
-FXString FXAPI userName(FXuint uid);
+extern FXAPI FXString userName(FXuint uid);
 
 /// Return group name from gid if available
-FXString FXAPI groupName(FXuint gid);
+extern FXAPI FXString groupName(FXuint gid);
 
 /// Get current effective user name
-FXString FXAPI currentUserName();
+extern FXAPI FXString currentUserName();
 
 /// Get current effective group name
-FXString FXAPI currentGroupName();
+extern FXAPI FXString currentGroupName();
 
 
 /// Get permissions string
-FXString FXAPI modeString(FXuint mode);
+extern FXAPI FXString modeString(FXuint mode);
 
 
 
 /// Return value of environment variable name
-FXString FXAPI getEnvironment(const FXString& name);
+extern FXAPI FXString getEnvironment(const FXString& name);
 
 /// Change value of environment variable name, return true if success
-FXbool FXAPI setEnvironment(const FXString& name,const FXString& value);
+extern FXAPI FXbool setEnvironment(const FXString& name,const FXString& value);
 
 
 
 /// Get the current working directory
-FXString FXAPI getCurrentDirectory();
+extern FXAPI FXString getCurrentDirectory();
 
 /// Set the current working directory
-FXbool FXAPI setCurrentDirectory(const FXString& path);
+extern FXAPI FXbool setCurrentDirectory(const FXString& path);
 
 /// Return the current drive (for Win32 systems)
-FXString FXAPI getCurrentDrive();
+extern FXAPI FXString getCurrentDrive();
 
 /// Set the current drive (for Win32 systems)
-FXbool FXAPI setCurrentDrive(const FXString& prefix);
+extern FXAPI FXbool setCurrentDrive(const FXString& prefix);
 
 
 
 /// Get executable path
-FXString FXAPI getExecPath();
+extern FXAPI FXString getExecPath();
 
 /// Return the home directory for the current user
-FXString FXAPI getHomeDirectory();
+extern FXAPI FXString getHomeDirectory();
 
 /// Return the home directory for a given user
-FXString FXAPI getUserDirectory(const FXString& user);
+extern FXAPI FXString getUserDirectory(const FXString& user);
 
 /// Return temporary directory
-FXString FXAPI getTempDirectory();
+extern FXAPI FXString getTempDirectory();
 
 
 /// Get process id
-FXint FXAPI getProcessId();
+extern FXAPI FXint getProcessId();
 
 
 /// Return host name
@@ -120,14 +120,16 @@ extern FXAPI FXString getHostName();
 
 
 /// Determine if UTF8 locale in effect
-FXbool FXAPI localeIsUTF8();
+extern FXAPI FXbool localeIsUTF8();
 
+/// Get name of calling executable
+extern FXAPI FXString getExecutableFilename();
 
 /**
 * Get DLL name for given base name; for example "png"
 * becomes "libpng.so" on Linux, and "png.dll" on Windows.
 */
-FXString FXAPI dllName(const FXString& name);
+extern FXAPI FXString dllName(const FXString& name);
 
 }
 

@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -35,6 +35,7 @@
   - Old as night, but recently rediscovered ;-).
   - Better treatment of identifiers needed [user-supplied names].
   - Maintain stack-depth during compile phase for possible limit check.
+  - Potential issue is that ran uses global state.
 */
 
 #define MAXSTACKDEPTH 128
@@ -43,7 +44,13 @@ using namespace FX;
 
 /*******************************************************************************/
 
-namespace {
+namespace FX {
+
+
+// Furnish our own versions
+extern FXAPI FXlong __strtoll(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
+extern FXAPI FXdouble __strtod(const FXchar *beg,const FXchar** end=NULL,FXbool* ok=NULL);
+
 
 // Tokens
 enum {
@@ -74,10 +81,12 @@ enum {
   TK_SHIFTLEFT  = 24,
   TK_SHIFTRIGHT = 25,
   TK_COMMA      = 26,
-  TK_PI         = 27,
-  TK_EULER      = 28,
-  TK_RAN        = 29,
-  TK_ERROR      = 30,
+  TK_ERROR      = 27,
+  TK_PI         = 2585,
+  TK_EULER      = 69,
+  TK_RTOD       = 3005613,
+  TK_DTOR       = 2389741,
+  TK_RAN        = 125277,
   TK_ABS        = 108848,
   TK_ACOS       = 3592862,
   TK_ACOSH      = 118564406,
@@ -109,8 +118,6 @@ enum {
   OP_END,
   OP_NUM,
   OP_VAR,
-  OP_PI,
-  OP_EULER,
   OP_RAND,
 
   OP_NOT,
@@ -170,8 +177,8 @@ struct FXCompile {
   FXuint        token;
   FXExpressionError compile();
   FXExpressionError expression();
-  FXExpressionError compexp();
   FXExpressionError shiftexp();
+  FXExpressionError bitexp();
   FXExpressionError addexp();
   FXExpressionError mulexp();
   FXExpressionError powexp();
@@ -187,7 +194,6 @@ struct FXCompile {
 
 /*******************************************************************************/
 
-
 // Compile expression
 FXExpressionError FXCompile::compile(){
   FXExpressionError err;
@@ -202,23 +208,6 @@ FXExpressionError FXCompile::compile(){
 
 // Expression
 FXExpressionError FXCompile::expression(){
-  FXExpressionError err=compexp();
-  if(err!=EXPRERR_OK) return err;
-  while(TK_AND<=token && token<=TK_XOR){
-    FXuint t=token;
-    gettok();
-    err=compexp();
-    if(err!=EXPRERR_OK) return err;
-    if(t==TK_AND) opcode(OP_AND);
-    else if(t==TK_OR) opcode(OP_OR);
-    else opcode(OP_XOR);
-    }
-  return EXPRERR_OK;
-  }
-
-
-// Compare expression
-FXExpressionError FXCompile::compexp(){
   FXExpressionError err=shiftexp();
   if(err!=EXPRERR_OK) return err;
   if(TK_LESS<=token && token<=TK_NOTEQUAL){
@@ -239,15 +228,32 @@ FXExpressionError FXCompile::compexp(){
 
 // Shift expression
 FXExpressionError FXCompile::shiftexp(){
-  FXExpressionError err=addexp();
+  FXExpressionError err=bitexp();
   if(err!=EXPRERR_OK) return err;
   while(TK_SHIFTLEFT<=token && token<=TK_SHIFTRIGHT){
     FXuint t=token;
     gettok();
-    err=mulexp();
+    err=bitexp();
     if(err!=EXPRERR_OK) return err;
     if(t==TK_SHIFTLEFT) opcode(OP_SHL);
     else opcode(OP_SHR);
+    }
+  return EXPRERR_OK;
+  }
+
+
+// Bit expression
+FXExpressionError FXCompile::bitexp(){
+  FXExpressionError err=addexp();
+  if(err!=EXPRERR_OK) return err;
+  while(TK_AND<=token && token<=TK_XOR){
+    FXuint t=token;
+    gettok();
+    err=addexp();
+    if(err!=EXPRERR_OK) return err;
+    if(t==TK_AND) opcode(OP_AND);
+    else if(t==TK_OR) opcode(OP_OR);
+    else opcode(OP_XOR);
     }
   return EXPRERR_OK;
   }
@@ -324,6 +330,7 @@ FXExpressionError FXCompile::element(){
   FXExpressionError err;
   FXdouble num;
   FXuchar op;
+  FXbool ok;
   FXint v;
   switch(token){
     case TK_LPAR:
@@ -333,35 +340,50 @@ FXExpressionError FXCompile::element(){
       if(token!=TK_RPAR) return EXPRERR_PAREN;
       break;
     case TK_INT_HEX:
-      num=(FXdouble)strtol(head+2,NULL,16);
+      num=(FXdouble)__strtoll(head+2,NULL,16,&ok);
+      if(!ok) return EXPRERR_TOKEN;
       opcode(OP_NUM);
       operand(num);
       break;
     case TK_INT_BIN:
-      num=(FXdouble)strtol(head+2,NULL,2);
+      num=(FXdouble)__strtoll(head+2,NULL,2,&ok);
+      if(!ok) return EXPRERR_TOKEN;
       opcode(OP_NUM);
       operand(num);
       break;
     case TK_INT_OCT:
-      num=(FXdouble)strtol(head+1,NULL,8);
+      num=(FXdouble)__strtoll(head+1,NULL,8,&ok);
+      if(!ok) return EXPRERR_TOKEN;
       opcode(OP_NUM);
       operand(num);
       break;
     case TK_INT:
-      num=(FXdouble)strtol(head,NULL,10);
+      num=(FXdouble)__strtoll(head,NULL,10,&ok);
       opcode(OP_NUM);
+      if(!ok) return EXPRERR_TOKEN;
       operand(num);
       break;
     case TK_REAL:
-      num=strtod(head,NULL);
+      num=__strtod(head,NULL,&ok);
+      if(!ok) return EXPRERR_TOKEN;
       opcode(OP_NUM);
       operand(num);
       break;
     case TK_PI:
-      opcode(OP_PI);
+      opcode(OP_NUM);
+      operand(3.1415926535897932384626433832795029);
       break;
     case TK_EULER:
-      opcode(OP_EULER);
+      opcode(OP_NUM);
+      operand(2.7182818284590452353602874713526625);
+      break;
+    case TK_RTOD:
+      opcode(OP_NUM);
+      operand(57.295779513082320876798154814);
+      break;
+    case TK_DTOR:
+      opcode(OP_NUM);
+      operand(0.0174532925199432957692369077);
       break;
     case TK_RAN:
       opcode(OP_RAND);
@@ -628,24 +650,6 @@ void FXCompile::gettok(){
           while(Ascii::isDigit(*tail)) tail++;
           }
         return;
-      case 'e':
-        if(Ascii::isAlphaNumeric(tail[1])) goto ident;
-        token=TK_EULER;
-        tail+=1;
-        return;
-      case 'p':
-        if(tail[1]!='i') goto ident;
-        if(Ascii::isAlphaNumeric(tail[2])) goto ident;
-        token=TK_PI;
-        tail+=2;
-        return;
-      case 'r':
-        if(tail[1]!='a') goto ident;
-        if(tail[2]!='n') goto ident;
-        if(Ascii::isAlphaNumeric(tail[3])) goto ident;
-        token=TK_RAN;
-        tail+=3;
-        return;
       default:
 ident:  token=TK_ERROR;
         if(Ascii::isLetter(*tail)){
@@ -673,7 +677,7 @@ void FXCompile::opcode(FXuchar op){
 // Emit integer operand
 void FXCompile::operand(FXint n){
   if(code){
-#if defined(__i386__) || defined(__x86_64__) || defined(WIN32)
+#if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
     ((FXint*)pc)[0]=n;
 #else
     pc[0]=((const FXuchar*)&n)[0];
@@ -689,7 +693,7 @@ void FXCompile::operand(FXint n){
 // Emit double operand
 void FXCompile::operand(FXdouble n){
   if(code){
-#if defined(__i386__) || defined(__x86_64__) || defined(WIN32)
+#if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
     ((FXdouble*)pc)[0]=n;
 #else
     pc[0]=((const FXuchar*)&n)[0];
@@ -705,11 +709,7 @@ void FXCompile::operand(FXdouble n){
   pc+=8;
   }
 
-}
-
 /*******************************************************************************/
-
-namespace FX {
 
 #if FOX_BIGENDIAN == 1
 const FXuchar FXExpression::initial[]={0,0,0,14,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
@@ -855,20 +855,18 @@ FXdouble FXExpression::evaluate(const FXdouble *args){
   while(1){
     switch(*pc++){
       case OP_END:   return *sp;
-#if defined(__i386__) || defined(__x86_64__) || defined(WIN32)
+#if defined(__i386__) || defined(__x86_64__) || defined(WIN32) || defined(__minix)
       case OP_NUM:   *++sp=*((FXdouble*)pc); pc+=8; break;
 #else
       case OP_NUM:   ++sp; ((FXuchar*)sp)[0]=*pc++; ((FXuchar*)sp)[1]=*pc++; ((FXuchar*)sp)[2]=*pc++; ((FXuchar*)sp)[3]=*pc++; ((FXuchar*)sp)[4]=*pc++; ((FXuchar*)sp)[5]=*pc++; ((FXuchar*)sp)[6]=*pc++; ((FXuchar*)sp)[7]=*pc++; break;
 #endif
       case OP_VAR:   *++sp=args[*pc++]; break;
-      case OP_PI:    *++sp=3.1415926535897932384626433833; break;
-      case OP_EULER: *++sp=2.7182818284590452353602874713; break;
-#ifdef WIN32
+#if defined(WIN32) || defined(__minix)
       case OP_RAND:  *++sp=(FXdouble)rand()/(FXdouble)RAND_MAX; break;
 #else
       case OP_RAND:  *++sp=drand48(); break;
 #endif
-      case OP_NOT:   *sp=(FXdouble)(~((FXint)*sp)); break;
+      case OP_NOT:   *sp=(FXdouble)(~((FXlong)*sp)); break;
       case OP_NEG:   *sp=-*sp; break;
       case OP_SIN:   *sp=sin(*sp); break;
       case OP_COS:   *sp=cos(*sp); break;
@@ -879,7 +877,7 @@ FXdouble FXExpression::evaluate(const FXdouble *args){
       case OP_SINH:  *sp=sinh(*sp); break;
       case OP_COSH:  *sp=cosh(*sp); break;
       case OP_TANH:  *sp=tanh(*sp); break;
-#ifdef WIN32
+#if defined(WIN32) || defined(__minix)
       case OP_ASINH: *sp=log(*sp + sqrt(*sp * *sp + 1.0)); break;
       case OP_ACOSH: *sp=log(*sp + sqrt(*sp * *sp - 1.0)); break;
       case OP_ATANH: *sp=0.5 * log((1.0 + *sp)/(1.0 - *sp)); break;
@@ -900,11 +898,11 @@ FXdouble FXExpression::evaluate(const FXdouble *args){
       case OP_MOD:   *(sp-1)=fmod(*(sp-1),*sp); --sp; break;
       case OP_ADD:   *(sp-1)=*(sp-1) + *sp; --sp; break;
       case OP_SUB:   *(sp-1)=*(sp-1) - *sp; --sp; break;
-      case OP_AND:   *(sp-1)=(FXdouble)(((FXint)*(sp-1)) & ((FXint)*sp)); --sp; break;
-      case OP_OR:    *(sp-1)=(FXdouble)(((FXint)*(sp-1)) | ((FXint)*sp)); --sp; break;
-      case OP_XOR:   *(sp-1)=(FXdouble)(((FXint)*(sp-1)) ^ ((FXint)*sp)); --sp; break;
-      case OP_SHL:   *(sp-1)=(FXdouble)(((FXint)*(sp-1)) << ((FXint)*sp)); --sp; break;
-      case OP_SHR:   *(sp-1)=(FXdouble)(((FXint)*(sp-1)) >> ((FXint)*sp)); --sp; break;
+      case OP_AND:   *(sp-1)=(FXdouble)(((FXlong)*(sp-1)) & ((FXlong)*sp)); --sp; break;
+      case OP_OR:    *(sp-1)=(FXdouble)(((FXlong)*(sp-1)) | ((FXlong)*sp)); --sp; break;
+      case OP_XOR:   *(sp-1)=(FXdouble)(((FXlong)*(sp-1)) ^ ((FXlong)*sp)); --sp; break;
+      case OP_SHL:   *(sp-1)=(FXdouble)(((FXlong)*(sp-1)) << ((FXlong)*sp)); --sp; break;
+      case OP_SHR:   *(sp-1)=(FXdouble)(((FXlong)*(sp-1)) >> ((FXlong)*sp)); --sp; break;
       case OP_LT:    *(sp-1)=(FXdouble)(*(sp-1) < *sp); --sp; break;
       case OP_GT:    *(sp-1)=(FXdouble)(*(sp-1) > *sp); --sp; break;
       case OP_LE:    *(sp-1)=(FXdouble)(*(sp-1) <= *sp); --sp; break;

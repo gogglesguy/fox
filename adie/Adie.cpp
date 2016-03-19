@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -113,7 +113,7 @@ Adie::Adie(const FXString& name):FXApp(name,FXString::null){
 
 // Initialize application
 void Adie::init(int& argc,char** argv,FXbool connect){
-  FXString execpath,iconpath,syntaxpath,syntaxfile;
+  FXString execpath,iconpath,syntaxfile;
 
   // After init, the registry has been loaded
   FXApp::init(argc,argv,connect);
@@ -124,7 +124,7 @@ void Adie::init(int& argc,char** argv,FXbool connect){
   // Now we know the icon search path
   associations->setIconPath(iconpath);
 
-  // Get exec path
+  // Exec path is default for syntax path
   execpath=FXSystem::getExecPath();
 
   // Get syntax path
@@ -179,6 +179,12 @@ FXSyntax* Adie::getSyntaxForContents(const FXString& contents) const {
 
 // Exit application
 void Adie::exit(FXint code){
+
+  // Save icon paths
+  reg().writeStringEntry("SETTINGS","iconpath",associations->getIconPath().text());
+
+  // Save syntax paths
+  reg().writeStringEntry("SETTINGS","syntaxpath",syntaxpath.text());
 
   // Writes registry, and quits
   FXApp::exit(code);

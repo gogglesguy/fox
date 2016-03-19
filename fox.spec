@@ -1,5 +1,5 @@
 %define name fox
-%define version 1.7.25
+%define version 1.7.26
 %define release 1
 
 Summary: The FOX toolkit.
@@ -8,7 +8,7 @@ Version: %{version}
 Release: %{release}
 License: LGPL+Addendum
 Group: System Environment/Libraries
-Source: ftp://ftp.fox-toolkit.org/pub/%{name}-%{version}.tar.gz
+Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.26.tar.gz
 URL: http://www.fox-toolkit.org
 Packager: Jeroen van der Zijp <jeroen@fox-toolkit.com>
 BuildRoot: %{_tmppath}/%{name}-buildroot
@@ -86,7 +86,7 @@ Group: X11/Applications
 Version: 1.0.0
 
 %description -n controlpanel
-ControlPanel is an application to edit colors, file associations, and 
+ControlPanel is an application to edit colors, file associations, and
 various other parameters common between all FOX applications.
 
 %prep
@@ -116,11 +116,11 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %defattr(-,root,root)
 %{_libdir}/libFOX-1.7.so
 %{_libdir}/libFOX-1.7.so.0
-%{_libdir}/libFOX-1.7.so.0.0.25
+%{_libdir}/libFOX-1.7.so.0.0.26
 %{_libdir}/libCHART-1.7.so
 %{_libdir}/libCHART-1.7.so.0
-%{_libdir}/libCHART-1.7.so.0.0.25
-%{_libdir}/pkgconfig/fox.pc
+%{_libdir}/libCHART-1.7.so.0.0.26
+%{_libdir}/pkgconfig/fox17.pc
 
 %doc doc
 %doc ADDITIONS AUTHORS INSTALL LICENSE README TRACING index.html
@@ -128,7 +128,6 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %files devel
 %defattr(-,root,root)
 %{_bindir}/reswrap
-%{_bindir}/fox-config
 %{_mandir}/man1/reswrap.1*
 %{_includedir}/fox-1.7
 %{_libdir}/libFOX-1.7.la
@@ -166,7 +165,7 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %{_mandir}/man1/ControlPanel.1*
 
 %changelog
-* Wed Oct 6 2010 Jeroen van der Zijp <jeroen@fox-toolkit.com>
+* Sat Feb 9 2011 Jeroen van der Zijp <jeroen@fox-toolkit.com>
 - Added Control Panel application.
 - Added package config to installed.
 - Deleted very old stuff in change log.

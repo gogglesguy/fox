@@ -3,7 +3,7 @@
 *                     P a r s e   S y n t a x   F i l e                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -121,7 +121,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
   FXRex::Error error;
   FXint        index;
 
-  FXTRACE((1,"parserules begin parent = %d\n",parent));
+  FXTRACE((10,"parserules begin parent = %d\n",parent));
 
   // Parse the rules
   while(strcmp(tok,"rule")==0){
@@ -181,9 +181,9 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
       return false;
       }
 
-    FXTRACE((1,"brex = %s\n",brex.text()));
-    FXTRACE((1,"erex = %s\n",erex.text()));
-    FXTRACE((1,"srex = %s\n",srex.text()));
+    FXTRACE((10,"brex = %s\n",brex.text()));
+    FXTRACE((10,"erex = %s\n",erex.text()));
+    FXTRACE((10,"srex = %s\n",srex.text()));
 
     // Validation
     if(brex.empty()) return false;
@@ -212,7 +212,7 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
     token();
     if(!tok) return false;
     }
-  FXTRACE((1,"parserules end parent = %d\n",parent));
+  FXTRACE((10,"parserules end parent = %d\n",parent));
   return true;
   }
 
@@ -222,7 +222,7 @@ FXbool Parser::parse(FXSyntaxList& syntaxes){
   FXSyntax *syntax;
   FXString  name;
 
-  FXTRACE((1,"Parser::parse: file = %s\n",file.text()));
+  FXTRACE((10,"Parser::parse: file = %s\n",file.text()));
 
   // Open file
   fp=fopen(file.text(),"r");
@@ -289,7 +289,7 @@ FXbool Parser::parse(FXSyntaxList& syntaxes){
       return false;
       }
     }
-  FXTRACE((1,"Parser::parse: OK\n"));
+  FXTRACE((10,"Parser::parse: OK\n"));
   return true;
   }
 

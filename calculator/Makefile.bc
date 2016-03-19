@@ -3,7 +3,7 @@
 #                  FOX:  A Free C++ Class Library for X                      #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -65,7 +65,7 @@ Calculator.obj: icons.h icons.cpp
 icons.h: $(ICONS)
 	$(RESWRAP) -h -o icons.h $**
 
-icons.cpp: $(ICONS)
+icons.cpp: $(ICONS) icons.h 
 	$(RESWRAP) -i icons.h -o icons.cpp $**
 
 clean:

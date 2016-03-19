@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,12 +62,18 @@ public:
   /// Initialize matrix from four vectors
   FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d);
 
+  /// Initialize matrix from quaternion
+  FXMat4d(const FXQuatd& quat);
+
   /// Assignment from scalar
   FXMat4d& operator=(FXdouble s);
 
   /// Assignment
   FXMat4d& operator=(const FXMat3d& s);
   FXMat4d& operator=(const FXMat4d& s);
+  
+  /// Assignment from quaternion
+  FXMat4d& operator=(const FXQuatd& quat);
 
   /// Assignment from array
   FXMat4d& operator=(const FXdouble s[]);
@@ -95,6 +101,9 @@ public:
 
   /// Set value from four vectors
   FXMat4d& set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d);
+
+  /// Set value from quaternion
+  FXMat4d& set(const FXQuatd& quat);
 
   /// Assignment operators
   FXMat4d& operator+=(const FXMat4d& w);
@@ -147,10 +156,10 @@ public:
   /// Multiply by rotation about unit-quaternion
   FXMat4d& rot(const FXQuatd& q);
 
-  /// Multiply by rotation c,s about axis
+  /// Multiply by rotation c,s about unit axis
   FXMat4d& rot(const FXVec3d& v,FXdouble c,FXdouble s);
 
-  /// Multiply by rotation of phi about axis
+  /// Multiply by rotation of phi about unit axis
   FXMat4d& rot(const FXVec3d& v,FXdouble phi);
 
   /// Multiply by x-rotation
@@ -174,8 +183,8 @@ public:
 
   /// Multiply by scaling
   FXMat4d& scale(FXdouble sx,FXdouble sy,FXdouble sz);
-  FXMat4d& scale(FXdouble s);
   FXMat4d& scale(const FXVec3d& v);
+  FXMat4d& scale(FXdouble s);
 
   /// Determinant
   FXdouble det() const;

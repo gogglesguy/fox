@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -265,10 +265,12 @@ private:
 
 private:
   FXID             wmDeleteWindow;      // Catch delete window
+  FXID             wmSaveYourself;      // Catch shutdown
   FXID             wmQuitApp;           // Catch quit application
   FXID             wmProtocols;         // Window manager protocols
   FXID             wmMotifHints;        // Motif hints
   FXID             wmTakeFocus;         // Focus explicitly set by app
+  FXID             wmClientMachine;     // Client machine
   FXID             wmState;             // Window state
   FXID             wmNetState;          // Extended Window Manager window state
   FXID             wmNetIconName;       // Extended Window Manager icon name
@@ -285,6 +287,7 @@ private:
   FXID             wmNetMoveResize;     // Extended Window Manager drag corner
   FXID             wmNetRestack;        // Extended Window Manager change stacking order
   FXID             wmNetPing;           // Extended Window Manager ping
+  FXID             wmNetProcessId;      // Extended Window Manager process id
   FXID             wmNetWindowType;     // Extended Window Manager window type
   FXID             wmWindowTypes[14];   // Window types
   FXID             wmWindowRole;        // Window Role
@@ -330,11 +333,9 @@ private:
   FXRectangle      xdndRect;            // XDND rectangle bounding target
   FXint            xrrScreenChange;     // Xrandr ScreenChange event
   FXint            xfxFixesSelection;   // Xfixes selection event
-  FXint            xsbBallMotion;       // Space ball motion event
-  FXint            xsbButtonPress;      // Space ball button press event
-  FXint            xsbButtonRelease;    // Space ball button release event
+  FXint            xInputOpcode;        // XInput2 opcode
+  FXint            xsbDevice;           // Space ball input device id
   FXID             stipples[23];        // Standard stipple patterns
-  void            *xsbDevice;           // Space ball input device
   void            *xim;                 // Input method
   FXbool           shmi;                // Use XSHM Image possible
   FXbool           shmp;                // Use XSHM Pixmap possible
@@ -402,7 +403,7 @@ public:
 
   /// Copyright information
   static const FXuchar copyright[];
-  
+
 public:
 
   /**

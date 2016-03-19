@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -223,6 +223,13 @@ FXMat3f& FXMat3f::operator=(const FXMat4f& s){
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2];
   m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2];
 #endif
+  return *this;
+  }
+
+
+// Assignment from quaternion
+FXMat3f& FXMat3f::operator=(const FXQuatf& quat){
+  quat.getAxes(m[0],m[1],m[2]);
   return *this;
   }
 
@@ -509,8 +516,68 @@ FXbool FXMat3f::isIdentity() const {
   }
 
 
-// Rotate by cosine, sine
-FXMat3f& FXMat3f::rot(FXfloat c,FXfloat s){
+// Rotate using unit quaternion
+FXMat3f& FXMat3f::rot(const FXQuatf& q){
+  return *this*=FXMat3f(q);
+  }
+
+
+// Multiply by rotation c,s about unit axis
+FXMat3f& FXMat3f::rot(const FXVec3f& v,FXfloat c,FXfloat s){
+  register FXfloat xx=v.x*v.x;
+  register FXfloat yy=v.y*v.y;
+  register FXfloat zz=v.z*v.z;
+  register FXfloat xy=v.x*v.y;
+  register FXfloat yz=v.y*v.z;
+  register FXfloat zx=v.z*v.x;
+  register FXfloat xs=v.x*s;
+  register FXfloat ys=v.y*s;
+  register FXfloat zs=v.z*s;
+  register FXfloat t=1.0f-c;
+  return *this*=FXMat3f(t*xx+c,t*xy+zs,t*zx-ys,t*xy-zs,t*yy+c,t*yz+xs,t*zx+ys,t*yz-xs,t*zz+c);
+  }
+
+
+// Multiply by rotation of phi about unit axis
+FXMat3f& FXMat3f::rot(const FXVec3f& v,FXfloat phi){
+  return rot(v,cosf(phi),sinf(phi));
+  }
+
+
+// Rotate about x-axis
+FXMat3f& FXMat3f::xrot(FXfloat c,FXfloat s){
+  register FXfloat u,v;
+  u=m[1][0]; v=m[2][0]; m[1][0]=c*u+s*v; m[2][0]=c*v-s*u;
+  u=m[1][1]; v=m[2][1]; m[1][1]=c*u+s*v; m[2][1]=c*v-s*u;
+  u=m[1][2]; v=m[2][2]; m[1][2]=c*u+s*v; m[2][2]=c*v-s*u;
+  return *this;
+  }
+
+
+// Rotate by angle about x-axis
+FXMat3f& FXMat3f::xrot(FXfloat phi){
+  return xrot(cosf(phi),sinf(phi));
+  }
+
+
+// Rotate about y-axis
+FXMat3f& FXMat3f::yrot(FXfloat c,FXfloat s){
+  register FXfloat u,v;
+  u=m[0][0]; v=m[2][0]; m[0][0]=c*u-s*v; m[2][0]=c*v+s*u;
+  u=m[0][1]; v=m[2][1]; m[0][1]=c*u-s*v; m[2][1]=c*v+s*u;
+  u=m[0][2]; v=m[2][2]; m[0][2]=c*u-s*v; m[2][2]=c*v+s*u;
+  return *this;
+  }
+
+
+// Rotate by angle about y-axis
+FXMat3f& FXMat3f::yrot(FXfloat phi){
+  return yrot(cosf(phi),sinf(phi));
+  }
+
+
+// Rotate about z-axis
+FXMat3f& FXMat3f::zrot(FXfloat c,FXfloat s){
   register FXfloat u,v;
   u=m[0][0]; v=m[1][0]; m[0][0]=c*u+s*v; m[1][0]=c*v-s*u;
   u=m[0][1]; v=m[1][1]; m[0][1]=c*u+s*v; m[1][1]=c*v-s*u;
@@ -519,32 +586,30 @@ FXMat3f& FXMat3f::rot(FXfloat c,FXfloat s){
   }
 
 
-// Rotate by angle
-FXMat3f& FXMat3f::rot(FXfloat phi){
-  return rot(cosf(phi),sinf(phi));
+// Rotate by angle about z-axis
+FXMat3f& FXMat3f::zrot(FXfloat phi){
+  return zrot(cosf(phi),sinf(phi));
   }
 
 
-// Translate
-FXMat3f& FXMat3f::trans(FXfloat tx,FXfloat ty){
-  m[2][0]=m[2][0]+tx*m[0][0]+ty*m[1][0];
-  m[2][1]=m[2][1]+tx*m[0][1]+ty*m[1][1];
-  m[2][2]=m[2][2]+tx*m[0][2]+ty*m[1][2];
+// Scale unqual
+FXMat3f& FXMat3f::scale(FXfloat sx,FXfloat sy,FXfloat sz){
+  m[0][0]*=sx; m[0][1]*=sx; m[0][2]*=sx;
+  m[1][0]*=sy; m[1][1]*=sy; m[1][2]*=sy;
+  m[2][0]*=sz; m[2][1]*=sz; m[2][2]*=sz;
   return *this;
   }
 
 
 // Scale unqual
-FXMat3f& FXMat3f::scale(FXfloat sx,FXfloat sy){
-  m[0][0]*=sx; m[0][1]*=sx; m[0][2]*=sx;
-  m[1][0]*=sy; m[1][1]*=sy; m[1][2]*=sy;
-  return *this;
+FXMat3f& FXMat3f::scale(const FXVec3f& v){
+  return scale(v[0],v[1],v[2]);
   }
 
 
 // Scale uniform
 FXMat3f& FXMat3f::scale(FXfloat s){
-  return scale(s,s);
+  return scale(s,s,s);
   }
 
 

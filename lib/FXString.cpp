@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -80,18 +80,16 @@ using namespace FX;
 namespace FX {
 
 
-// Furnish our own version
+// Furnish our own versions
 extern FXAPI FXint __vsscanf(const FXchar* string,const FXchar* format,va_list arg_ptr);
 extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
-
-// Use system version of these functions if available
-#ifndef HAVE_STRTOLL
-extern "C" FXlong strtoll(const char *nptr, char **endptr, int base);
-#endif
-#ifndef HAVE_STRTOULL
-extern "C" FXulong strtoull(const char *nptr, char **endptr, int base);
-#endif
+extern FXAPI FXlong __strtoll(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
+extern FXAPI FXulong __strtoull(const FXchar* beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
+extern FXAPI FXint __strtol(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
+extern FXAPI FXuint __strtoul(const FXchar* beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
+extern FXAPI FXdouble __strtod(const FXchar *beg,const FXchar** end=NULL,FXbool* ok=NULL);
+extern FXAPI FXfloat __strtof(const FXchar *beg,const FXchar** end=NULL,FXbool* ok=NULL);
 
 
 // For conversion from UTF16 to UTF32
@@ -1815,8 +1813,8 @@ FXString& FXString::clear(){
 
 // Get leftmost part
 FXString FXString::left(FXint n) const {
+  register FXint len=length();
   if(0<n){
-    register FXint len=length();
     if(n>len) n=len;
     return FXString(str,n);
     }
@@ -1826,8 +1824,8 @@ FXString FXString::left(FXint n) const {
 
 // Get rightmost part
 FXString FXString::right(FXint n) const {
+  register FXint len=length();
   if(0<n){
-    register FXint len=length();
     if(n>len) n=len;
     return FXString(str+len-n,n);
     }
@@ -1837,13 +1835,11 @@ FXString FXString::right(FXint n) const {
 
 // Get some part in the middle
 FXString FXString::mid(FXint pos,FXint n) const {
-  if(0<n){
-    register FXint len=length();
-    if(pos<len && n>-pos){
-      if(pos<0){n+=pos;pos=0;}
-      if(n>len-pos){n=len-pos;}
-      return FXString(str+pos,n);
-      }
+  register FXint len=length();
+  if(0<n && 0<pos+n && pos<len){
+    if(pos<0){n+=pos;pos=0;}
+    if(n>len-pos){n=len-pos;}
+    return FXString(str+pos,n);
     }
   return FXString::null;
   }
@@ -2282,42 +2278,38 @@ FXint FXString::scan(const FXchar* fmt,...) const {
 /*******************************************************************************/
 
 // Convert to long integer
-FXlong FXString::toLong(FXint base) const {
-  if(base<2 || base>16){ fxerror("FXString::toLong: base out of range.\n"); }
-  return (FXlong)strtoll(str,NULL,base);
+FXlong FXString::toLong(FXint base,FXbool* ok) const {
+  return __strtoll(str,NULL,base,ok);
   }
 
 
 // Convert to unsigned long integer
-FXulong FXString::toULong(FXint base) const {
-  if(base<2 || base>16){ fxerror("FXString::toULong: base out of range.\n"); }
-  return (FXulong)strtoull(str,NULL,base);
+FXulong FXString::toULong(FXint base,FXbool* ok) const {
+  return __strtoull(str,NULL,base,ok);
   }
 
 
 // Convert to integer
-FXint FXString::toInt(FXint base) const {
-  if(base<2 || base>16){ fxerror("FXString::toInt: base out of range.\n"); }
-  return (FXint)strtol(str,NULL,base);
+FXint FXString::toInt(FXint base,FXbool* ok) const {
+  return __strtol(str,NULL,base,ok);
   }
 
 
 // Convert to unsigned integer
-FXuint FXString::toUInt(FXint base) const {
-  if(base<2 || base>16){ fxerror("FXString::toUInt: base out of range.\n"); }
-  return (FXuint)strtoul(str,NULL,base);
+FXuint FXString::toUInt(FXint base,FXbool* ok) const {
+  return __strtoul(str,NULL,base,ok);
   }
 
 
 // Convert to double number
-FXdouble FXString::toDouble() const {
-  return strtod(str,NULL);
+FXdouble FXString::toDouble(FXbool* ok) const {
+  return __strtod(str,NULL,ok);
   }
 
 
 // Convert to float
-FXfloat FXString::toFloat() const {
-  return (FXfloat)strtod(str,NULL);
+FXfloat FXString::toFloat(FXbool* ok) const {
+  return __strtof(str,NULL,ok);
   }
 
 
@@ -2401,37 +2393,43 @@ FXString& FXString::fromFloat(FXfloat number,FXint prec,FXint fmt){
 
 // Return string by converting a long integer
 FXString FXString::value(FXlong num,FXint base){
-  FXString result; return result.fromLong(num,base);
+  FXString result;
+  return result.fromLong(num,base);
   }
 
 
 // Return string by converting an unsigned long
 FXString FXString::value(FXulong num,FXint base){
-  FXString result; return result.fromULong(num,base);
+  FXString result;
+  return result.fromULong(num,base);
   }
 
 
 // Return string by converting a integer
 FXString FXString::value(FXint num,FXint base){
-  FXString result; return result.fromInt(num,base);
+  FXString result;
+  return result.fromInt(num,base);
   }
 
 
 // Return string by converting an unsigned integer
 FXString FXString::value(FXuint num,FXint base){
-  FXString result; return result.fromUInt(num,base);
+  FXString result;
+  return result.fromUInt(num,base);
   }
 
 
 // Return string by converting a float
 FXString FXString::value(FXfloat num,FXint prec,FXint fmt){
-  FXString result; return result.fromFloat(num,prec,fmt);
+  FXString result;
+  return result.fromFloat(num,prec,fmt);
   }
 
 
 // Return string by converting a double
 FXString FXString::value(FXdouble num,FXint prec,FXint fmt){
-  FXString result; return result.fromDouble(num,prec,fmt);
+  FXString result;
+  return result.fromDouble(num,prec,fmt);
   }
 
 
@@ -2450,229 +2448,6 @@ FXString FXString::value(const FXchar* fmt,...){
 FXString FXString::vvalue(const FXchar* fmt,va_list args){
   FXString result;
   result.vformat(fmt,args);
-  return result;
-  }
-
-
-/*******************************************************************************/
-
-// Check if the string contains special characters or leading or trailing whitespace
-FXbool FXString::shouldEscape(FXchar lquote,FXchar rquote) const {
-  register FXint len=length(),p,c;
-  if(0<len){
-
-    // Starts or ends with white space
-    if(Ascii::isSpace(str[0]) || Ascii::isSpace(str[len-1])) return true;
-
-    // Or contains magic characters
-    for(p=0; p<len; p++){
-      if((c=str[p])<0x20 || 0x7e<c || c=='\\' || c==lquote || c==rquote) return true;
-      }
-    }
-  return false;
-  }
-
-
-// Escape special characters in a string; optionally surround with quote characters
-FXString FXString::escape(FXchar lquote,FXchar rquote){
-  FXString result;
-  if(0<length()){
-    register FXint p,q,c;
-    p=q=0;
-    if(lquote) q++;
-    while(p<length()){
-      switch(c=str[p++]){
-        case '\n':
-        case '\r':
-        case '\b':
-        case '\v':
-        case '\a':
-        case '\f':
-        case '\t':
-        case '\\':
-          q+=2;
-          continue;
-        default:
-          if(c<'\x20' || '\x7E'<c){ q+=4; continue; }
-          if(c==lquote){ q+=2; continue; }
-          if(c==rquote){ q+=2; continue; }
-          q+=1;
-          continue;
-        }
-      }
-    if(rquote) q++;
-    result.length(q);
-    p=q=0;
-    if(lquote) result[q++]=lquote;
-    while(p<length()){
-      switch(c=str[p++]){
-        case '\n':
-          result[q++]='\\';
-          result[q++]='n';
-          continue;
-        case '\r':
-          result[q++]='\\';
-          result[q++]='r';
-          continue;
-        case '\b':
-          result[q++]='\\';
-          result[q++]='b';
-          continue;
-        case '\v':
-          result[q++]='\\';
-          result[q++]='v';
-          continue;
-        case '\a':
-          result[q++]='\\';
-          result[q++]='a';
-          continue;
-        case '\f':
-          result[q++]='\\';
-          result[q++]='f';
-          continue;
-        case '\t':
-          result[q++]='\\';
-          result[q++]='t';
-          continue;
-        case '\\':
-          result[q++]='\\';
-          result[q++]='\\';
-          continue;
-        default:
-          if(c<'\x20' || '\x7E'<c){
-            result[q++]='\\';
-            result[q++]='x';
-            result[q++]=FXString::value2Digit[(c>>4)&15];
-            result[q++]=FXString::value2Digit[c&15];
-            continue;
-            }
-          if(c==lquote){
-            result[q++]='\\';
-            result[q++]=lquote;
-            continue;
-            }
-          if(c==rquote){
-            result[q++]='\\';
-            result[q++]=rquote;
-            continue;
-            }
-          result[q++]=c;
-          continue;
-        }
-      }
-    if(rquote) result[q++]=rquote;
-    FXASSERT(q==result.length());
-    }
-  return result;
-  }
-
-
-// Unescape special characters in a string; optionally strip quote characters
-FXString FXString::unescape(FXchar lquote,FXchar rquote){
-  FXString result;
-  if(0<length()){
-    register FXint p,q,c;
-    p=q=0;
-    if(str[p]==lquote && lquote) p++;
-    while(p<length()){
-      c=str[p++];
-      if(c==rquote && rquote) break;
-      if(c=='\\' && p<length()){
-        switch(str[p++]){
-          case '0':
-          case '1':
-          case '2':
-          case '3':
-          case '4':
-          case '5':
-          case '6':
-          case '7':
-            if('0'<=str[p] && str[p]<='7'){
-              p++;
-              if('0'<=str[p] && str[p]<='7') p++;
-              }
-            break;
-          case 'n':
-          case 'r':
-          case 'b':
-          case 'v':
-          case 'a':
-          case 'f':
-          case 't':
-          case '\\':
-            break;
-          case 'x':
-            if(Ascii::isHexDigit(str[p])){
-              p++;
-              if(Ascii::isHexDigit(str[p])) p++;
-              }
-            break;
-          }
-        }
-      q++;
-      }
-    result.length(q);
-    p=q=0;
-    if(str[p]==lquote && lquote) p++;
-    while(p<length()){
-      c=str[p++];
-      if(c==rquote && rquote) break;
-      if(c=='\\' && p<length()){
-        switch((c=str[p++])){
-          case '0':
-          case '1':
-          case '2':
-          case '3':
-          case '4':
-          case '5':
-          case '6':
-          case '7':
-            c=c-'0';
-            if('0'<=str[p] && str[p]<='7'){
-              c=(c<<3)+str[p++]-'0';
-              if('0'<=str[p] && str[p]<='7'){
-                c=(c<<3)+str[p++]-'0';
-                }
-              }
-            break;
-          case 'n':
-            c='\n';
-            break;
-          case 'r':
-            c='\r';
-            break;
-          case 'b':
-            c='\b';
-            break;
-          case 'v':
-            c='\v';
-            break;
-          case 'a':
-            c='\a';
-            break;
-          case 'f':
-            c='\f';
-            break;
-          case 't':
-            c='\t';
-            break;
-          case '\\':
-            c='\\';
-            break;
-          case 'x':
-            if(Ascii::isHexDigit(str[p])){
-              c=Ascii::digitValue(str[p++]);
-              if(Ascii::isHexDigit(str[p])){
-                c=(c<<4)+Ascii::digitValue(str[p++]);
-                }
-              }
-            break;
-          }
-        }
-      result[q++]=c;
-      }
-    FXASSERT(q==result.length());
-    }
   return result;
   }
 
@@ -3193,6 +2968,229 @@ FXString& dosToUnix(FXString& str){
   str.length(t);
   return str;
   }
+
+/*******************************************************************************/
+
+// Check if the string contains special characters or leading or trailing whitespace
+FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote){
+  if(0<str.length()){
+    register FXint p,c;
+
+    // Starts or ends with white space
+    if(Ascii::isSpace(str.head()) || Ascii::isSpace(str.tail())) return true;
+
+    // Or contains magic characters
+    for(p=0; p<str.length(); p++){
+      if((c=str[p])<0x20 || 0x7e<c || c=='\\' || c==lquote || c==rquote) return true;
+      }
+    }
+  return false;
+  }
+
+
+// Escape special characters, and optionally enclose with left and right quotes; enquote utf8 if flag is true
+FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
+  FXString result;
+  if(0<str.length()){
+    register FXint p,q,c;
+    p=q=0;
+    if(lquote) q++;
+    while(p<str.length()){
+      switch(c=(FXuchar)str[p++]){
+        case '\n':
+        case '\r':
+        case '\b':
+        case '\v':
+        case '\a':
+        case '\f':
+        case '\t':
+        case '\\':
+          q+=2;
+          continue;
+        default:
+          if(c<'\x20' || c=='\x7F' || ('\x80'<c && flag)){ q+=4; continue; }
+          if(c==lquote){ q+=2; continue; }
+          if(c==rquote){ q+=2; continue; }
+          q+=1;
+          continue;
+        }
+      }
+    if(rquote) q++;
+    result.length(q);
+    p=q=0;
+    if(lquote) result[q++]=lquote;
+    while(p<str.length()){
+      switch(c=(FXuchar)str[p++]){
+        case '\n':
+          result[q++]='\\';
+          result[q++]='n';
+          continue;
+        case '\r':
+          result[q++]='\\';
+          result[q++]='r';
+          continue;
+        case '\b':
+          result[q++]='\\';
+          result[q++]='b';
+          continue;
+        case '\v':
+          result[q++]='\\';
+          result[q++]='v';
+          continue;
+        case '\a':
+          result[q++]='\\';
+          result[q++]='a';
+          continue;
+        case '\f':
+          result[q++]='\\';
+          result[q++]='f';
+          continue;
+        case '\t':
+          result[q++]='\\';
+          result[q++]='t';
+          continue;
+        case '\\':
+          result[q++]='\\';
+          result[q++]='\\';
+          continue;
+        default:
+          if(c<'\x20' || c=='\x7F' || ('\x80'<c && flag)){
+            result[q++]='\\';
+            result[q++]='x';
+            result[q++]=FXString::value2Digit[(c>>4)&15];
+            result[q++]=FXString::value2Digit[c&15];
+            continue;
+            }
+          if(c==lquote){
+            result[q++]='\\';
+            result[q++]=lquote;
+            continue;
+            }
+          if(c==rquote){
+            result[q++]='\\';
+            result[q++]=rquote;
+            continue;
+            }
+          result[q++]=c;
+          continue;
+        }
+      }
+    if(rquote) result[q++]=rquote;
+    FXASSERT(q==result.length());
+    }
+  return result;
+  }
+
+
+// Unescape special characters in a string; optionally strip quote characters
+FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
+  FXString result;
+  if(0<str.length()){
+    register FXint p,q,c;
+    p=q=0;
+    if(str[p]==lquote && lquote) p++;
+    while(p<str.length()){
+      c=str[p++];
+      if(c==rquote && rquote) break;
+      if(c=='\\' && p<str.length()){
+        switch(str[p++]){
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+            if('0'<=str[p] && str[p]<='7'){
+              p++;
+              if('0'<=str[p] && str[p]<='7') p++;
+              }
+            break;
+          case 'n':
+          case 'r':
+          case 'b':
+          case 'v':
+          case 'a':
+          case 'f':
+          case 't':
+          case '\\':
+            break;
+          case 'x':
+            if(Ascii::isHexDigit(str[p])){
+              p++;
+              if(Ascii::isHexDigit(str[p])) p++;
+              }
+            break;
+          }
+        }
+      q++;
+      }
+    result.length(q);
+    p=q=0;
+    if(str[p]==lquote && lquote) p++;
+    while(p<str.length()){
+      c=str[p++];
+      if(c==rquote && rquote) break;
+      if(c=='\\' && p<str.length()){
+        switch((c=str[p++])){
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7':
+            c=c-'0';
+            if('0'<=str[p] && str[p]<='7'){
+              c=(c<<3)+str[p++]-'0';
+              if('0'<=str[p] && str[p]<='7'){
+                c=(c<<3)+str[p++]-'0';
+                }
+              }
+            break;
+          case 'n':
+            c='\n';
+            break;
+          case 'r':
+            c='\r';
+            break;
+          case 'b':
+            c='\b';
+            break;
+          case 'v':
+            c='\v';
+            break;
+          case 'a':
+            c='\a';
+            break;
+          case 'f':
+            c='\f';
+            break;
+          case 't':
+            c='\t';
+            break;
+          case '\\':
+            c='\\';
+            break;
+          case 'x':
+            if(Ascii::isHexDigit(str[p])){
+              c=Ascii::digitValue(str[p++]);
+              if(Ascii::isHexDigit(str[p])){
+                c=(c<<4)+Ascii::digitValue(str[p++]);
+                }
+              }
+            break;
+          }
+        }
+      result[q++]=c;
+      }
+    FXASSERT(q==result.length());
+    }
+  return result;
+  }
+
 
 /*******************************************************************************/
 

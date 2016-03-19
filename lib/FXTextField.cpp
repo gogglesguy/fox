@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -302,41 +302,63 @@ static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
 
 // Find end of previous word
 FXint FXTextField::leftWord(FXint pos) const {
-  register FXint pp=pos,p;
-
-  // Ensure input is valid
+  register FXint ch;
   FXASSERT(0<=pos && pos<=contents.length());
-
-  // Back up until space or delimiter
-  while(0<=(p=contents.dec(pp)) && !Unicode::isSpace(contents.wc(p)) && !isdelimiter(delimiters,contents.wc(p))) pp=p;
-
-  // Back up over run of spaces
-  while(0<=(p=contents.dec(pp)) && Unicode::isSpace(contents.wc(p))) pp=p;
-
-  // One more in case we didn't move
-  if((pos==pp) && 0<=(p=contents.dec(pp))) pp=p;
-
-  return pp;
+  if(0<pos){
+    pos=contents.dec(pos);
+    ch=contents.wc(pos);
+    if(isdelimiter(delimiters,ch)){
+      while(0<pos){
+        ch=contents.wc(contents.dec(pos));
+        if(Unicode::isSpace(ch) || !isdelimiter(delimiters,ch)) return pos;
+        pos=contents.dec(pos);
+        }
+      }
+    else if(!Unicode::isSpace(ch)){
+      while(0<pos){
+        ch=contents.wc(contents.dec(pos));
+        if(Unicode::isSpace(ch) || isdelimiter(delimiters,ch)) return pos;
+        pos=contents.dec(pos);
+        }
+      }
+    while(0<pos){
+      ch=contents.wc(contents.dec(pos));
+      if(!Unicode::isBlank(ch)) return pos;
+      pos=contents.dec(pos);
+      }
+    }
+  return pos;
   }
 
 
 // Find begin of next word
 FXint FXTextField::rightWord(FXint pos) const {
-  register FXint pp=pos;
-
-  // Ensure input is valid
+  register FXint ch;
   FXASSERT(0<=pos && pos<=contents.length());
-
-  // Advance until space or delimiter
-  while(pp<contents.length() && !Unicode::isSpace(contents.wc(pp)) && !isdelimiter(delimiters,contents.wc(pp))) pp=contents.inc(pp);
-
-  // Advance over run of spaces
-  while(pp<contents.length() && Unicode::isSpace(contents.wc(pp))) pp=contents.inc(pp);
-
-  // One more in case we didn't move
-  if((pos==pp) && pp<contents.length()) pp=contents.inc(pp);
-
-  return pp;
+  if(pos<contents.length()){
+    ch=contents.wc(pos);
+    pos=contents.inc(pos);
+    if(isdelimiter(delimiters,ch)){
+      while(pos<contents.length()){
+        ch=contents.wc(pos);
+        if(Unicode::isSpace(ch) || !isdelimiter(delimiters,ch)) return pos;
+        pos=contents.inc(pos);
+        }
+      }
+    else if(!Unicode::isSpace(ch)){
+      while(pos<contents.length()){
+        ch=contents.wc(pos);
+        if(Unicode::isSpace(ch) || isdelimiter(delimiters,ch)) return pos;
+        pos=contents.inc(pos);
+        }
+      }
+    while(pos<contents.length()){
+      ch=contents.wc(pos);
+      if(!Unicode::isBlank(ch)) return pos;
+      pos=contents.inc(pos);
+      }
+    }
+  return pos;
   }
 
 

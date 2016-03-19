@@ -3,7 +3,7 @@
 *           D e v i c e   C o n t e x t   F o r   P r i n t i n g               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -946,7 +946,7 @@ void FXDCPrint::drawImage(const FXImage *img,FXint dx,FXint dy){
       outhex(buffer[i+2]);
       }
     outf("\n");
-    outf("grestore\n"); 
+    outf("grestore\n");
     }
   }
 

@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -266,6 +266,10 @@ public:
   long onCmdCursorPageDown(FXObject*,FXSelector,void*);
   long onCmdCursorWordLeft(FXObject*,FXSelector,void*);
   long onCmdCursorWordRight(FXObject*,FXSelector,void*);
+  long onCmdCursorSelStart(FXObject*,FXSelector,void*);
+  long onCmdCursorSelEnd(FXObject*,FXSelector,void*);
+  
+  // Cursor drag movement
   long onCmdCursorShiftTop(FXObject*,FXSelector,void*);
   long onCmdCursorShiftBottom(FXObject*,FXSelector,void*);
   long onCmdCursorShiftHome(FXObject*,FXSelector,void*);
@@ -369,6 +373,8 @@ public:
     ID_CURSOR_PAGEDOWN,
     ID_CURSOR_WORD_LEFT,
     ID_CURSOR_WORD_RIGHT,
+    ID_CURSOR_SEL_START,
+    ID_CURSOR_SEL_END,
     ID_CURSOR_SHIFT_TOP,
     ID_CURSOR_SHIFT_BOTTOM,
     ID_CURSOR_SHIFT_HOME,

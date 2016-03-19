@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -2405,7 +2405,7 @@ FXbool FXGLViewer::readPixels(FXColor*& buffer,FXint x,FXint y,FXint w,FXint h){
       glReadBuffer((GLenum)GL_FRONT);
 
       // Read the pixels
-      glReadPixels(x,y,w,h,GL_RGBA,GL_UNSIGNED_BYTE,(GLvoid*)buffer);
+      glReadPixels(x,y,w,h,GL_BGRA,GL_UNSIGNED_BYTE,(GLvoid*)buffer);
 
       // Flip image upside down
       pp=buffer;
@@ -2451,11 +2451,6 @@ long FXGLViewer::onCmdPrintImage(FXObject*,FXSelector,void*){
 
   // Then try grab the pixels
   if(readPixels(buffer,0,0,width,height)){
-//    FXFileStream outfile;
-//    if(outfile.open("testje.bmp",FXStreamSave)){
-//      fxsaveBMP(outfile,buffer,width,height);
-//      outfile.close();
-//      }
 
     // Open print dialog
     FXPrintDialog dlg(this,tr("Print Scene"));

@@ -3,7 +3,7 @@
 *                          G e n e r i c   A r r a y                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,36 +42,36 @@ public:
 
   /// Create with given size n
   FXArray(FXint n):ptr(NULL),num(0){
-    if(__likely(allocElms(ptr,n))){ 
-      constructElms(ptr,n); 
-      num=n; 
+    if(__likely(allocElms(ptr,n))){
+      constructElms(ptr,n);
+      num=n;
       }
     }
 
   /// Create initialized from another array
   FXArray(const FXArray<EType>& src):ptr(NULL),num(0){
-    if(__likely(allocElms(ptr,src.num))){ 
-      constructElms(ptr,src.num); 
-      copyElms(ptr,src.ptr,src.num); 
-      num=src.num; 
+    if(__likely(allocElms(ptr,src.num))){
+      constructElms(ptr,src.num);
+      copyElms(ptr,src.ptr,src.num);
+      num=src.num;
       }
     }
 
   /// Create initialized with n copies of object
   FXArray(const EType& src,FXint n):ptr(NULL),num(0){
-    if(__likely(allocElms(ptr,n))){ 
-      constructElms(ptr,n); 
-      fillElms(ptr,src,n); 
-      num=n; 
+    if(__likely(allocElms(ptr,n))){
+      constructElms(ptr,n);
+      fillElms(ptr,src,n);
+      num=n;
       }
     }
 
   /// Create initialized with array of n objects
   FXArray(const EType* src,FXint n):ptr(NULL),num(0){
-    if(__likely(allocElms(ptr,n))){ 
-      constructElms(ptr,n); 
-      copyElms(ptr,src,n); 
-      num=n; 
+    if(__likely(allocElms(ptr,n))){
+      constructElms(ptr,n);
+      copyElms(ptr,src,n);
+      num=n;
       }
     }
 
@@ -96,8 +96,8 @@ public:
 
   /// Assign from another list
   FXArray<EType>& operator=(const FXArray<EType>& src){
-    if(__likely(ptr!=src.ptr && no(src.num))){ 
-      copyElms(ptr,src.ptr,src.num); 
+    if(__likely(ptr!=src.ptr && no(src.num))){
+      copyElms(ptr,src.ptr,src.num);
       }
     return *this;
     }
@@ -124,34 +124,34 @@ public:
 
   /// Adopt array from source
   void adopt(FXArray<EType>& src){
-    if(__likely(ptr!=src.ptr && no(0))){ 
-      ptr=src.ptr; src.ptr=NULL; num=src.num; src.num=0; 
+    if(__likely(ptr!=src.ptr && no(0))){
+      ptr=src.ptr; src.ptr=NULL; num=src.num; src.num=0;
       }
     }
 
   /// Assign object p to list
   FXbool assign(const EType& src){
-    if(__likely(no(1))){ 
-      ptr[0]=src; 
-      return true; 
+    if(__likely(no(1))){
+      ptr[0]=src;
+      return true;
       }
     return false;
     }
 
   /// Assign n copies of object to list
   FXbool assign(const EType& src,FXint n){
-    if(__likely(no(n))){ 
-      fillElms(ptr,src,n); 
-      return true; 
+    if(__likely(no(n))){
+      fillElms(ptr,src,n);
+      return true;
       }
     return false;
     }
 
   /// Assign n objects to list
   FXbool assign(const EType* src,FXint n){
-    if(__likely(no(n))){ 
-      copyElms(ptr,src,n); 
-      return true; 
+    if(__likely(no(n))){
+      copyElms(ptr,src,n);
+      return true;
       }
     return false;
     }
@@ -163,30 +163,30 @@ public:
 
   /// Insert an object
   FXbool insert(FXint pos,const EType& src){
-    if(__likely(no(num+1))){ 
-      moveElms(ptr+pos+1,ptr+pos,num-pos-1); 
-      ptr[pos]=src; 
-      return true; 
+    if(__likely(no(num+1))){
+      moveElms(ptr+pos+1,ptr+pos,num-pos-1);
+      ptr[pos]=src;
+      return true;
       }
     return false;
     }
 
   /// Insert n copies of object at specified position
   FXbool insert(FXint pos,const EType& src,FXint n){
-    if(__likely(no(num+n))){ 
-      moveElms(ptr+pos+n,ptr+pos,num-pos-n); 
-      fillElms(ptr+pos,src,n); 
-      return true; 
+    if(__likely(no(num+n))){
+      moveElms(ptr+pos+n,ptr+pos,num-pos-n);
+      fillElms(ptr+pos,src,n);
+      return true;
       }
     return false;
     }
 
   /// Insert n objects at specified position
   FXbool insert(FXint pos,const EType* src,FXint n){
-    if(__likely(no(num+n))){ 
-      moveElms(ptr+pos+n,ptr+pos,num-pos-n); 
-      copyElms(ptr+pos,src,n); 
-      return true; 
+    if(__likely(no(num+n))){
+      moveElms(ptr+pos+n,ptr+pos,num-pos-n);
+      copyElms(ptr+pos,src,n);
+      return true;
       }
     return false;
     }
@@ -198,30 +198,30 @@ public:
 
   /// Prepend object
   FXbool prepend(const EType& src){
-    if(__likely(no(num+1))){ 
-      moveElms(ptr+1,ptr,num-1); 
-      ptr[0]=src; 
-      return true; 
+    if(__likely(no(num+1))){
+      moveElms(ptr+1,ptr,num-1);
+      ptr[0]=src;
+      return true;
       }
     return false;
     }
 
   /// Prepend n copies of object
   FXbool prepend(const EType& src,FXint n){
-    if(__likely(no(num+n))){ 
-      moveElms(ptr+n,ptr,num-n); 
-      fillElms(ptr,src,n); 
-      return true; 
+    if(__likely(no(num+n))){
+      moveElms(ptr+n,ptr,num-n);
+      fillElms(ptr,src,n);
+      return true;
       }
     return false;
     }
 
   /// Prepend n objects
   FXbool prepend(const EType* src,FXint n){
-    if(__likely(no(num+n))){ 
-      moveElms(ptr+n,ptr,num-n); 
-      copyElms(ptr,src,n); 
-      return true; 
+    if(__likely(no(num+n))){
+      moveElms(ptr+n,ptr,num-n);
+      copyElms(ptr,src,n);
+      return true;
       }
     return false;
     }
@@ -233,27 +233,27 @@ public:
 
   /// Append object
   FXbool append(const EType& src){
-    if(__likely(no(num+1))){ 
-      ptr[num-1]=src; 
-      return true; 
+    if(__likely(no(num+1))){
+      ptr[num-1]=src;
+      return true;
       }
     return false;
     }
 
   /// Append n copies of object
   FXbool append(const EType& src,FXint n){
-    if(__likely(no(num+n))){ 
-      fillElms(ptr+num-n,src,n); 
-      return true; 
+    if(__likely(no(num+n))){
+      fillElms(ptr+num-n,src,n);
+      return true;
       }
     return false;
     }
 
   /// Append n objects
   FXbool append(const EType* src,FXint n){
-    if(__likely(no(num+n))){ 
-      copyElms(ptr+num-n,src,n); 
-      return true; 
+    if(__likely(no(num+n))){
+      copyElms(ptr+num-n,src,n);
+      return true;
       }
     return false;
     }
@@ -304,21 +304,21 @@ public:
 
   /// Remove object at pos
   FXbool erase(FXint pos){
-    moveElms(ptr+pos,ptr+pos+1,num-pos-1); 
+    moveElms(ptr+pos,ptr+pos+1,num-pos-1);
     return no(num-1);
     }
 
   /// Remove n objects starting at pos
   FXbool erase(FXint pos,FXint n){
-    moveElms(ptr+pos,ptr+pos+n,num-n-pos); 
+    moveElms(ptr+pos,ptr+pos+n,num-n-pos);
     return no(num-n);
     }
 
   /// Push object to end
   FXbool push(const EType& src){
-    if(__likely(no(num+1))){ 
-      ptr[num-1]=src; 
-      return true; 
+    if(__likely(no(num+1))){
+      ptr[num-1]=src;
+      return true;
       }
     return false;
     }
@@ -330,14 +330,14 @@ public:
 
   /// Remove all objects
   void clear(){
-    destructElms(ptr,num); 
-    freeElms(ptr); 
+    destructElms(ptr,num);
+    freeElms(ptr);
     num=0;
     }
 
   /// Delete data
   ~FXArray(){
-    destructElms(ptr,num); 
+    destructElms(ptr,num);
     freeElms(ptr);
     }
   };

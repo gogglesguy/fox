@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,6 +26,7 @@
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXIO.h"
+#include "FXFile.h"
 #include "FXSystem.h"
 #include "FXStat.h"
 
@@ -505,6 +506,19 @@ FXString FXSystem::getHostName(){
   return "localhost";
   }
 
+/*
+//#include <sys/utsname.h>
+
+// Return host name
+FXString FXSystem::getHostName(){
+  struct utsname name;
+  if(0<=uname(&name)){
+    return FXString(name.nodename);
+    }
+  return "localhost";
+  }
+*/
+
 
 
 // Determine if UTF8 locale in effect
@@ -517,6 +531,22 @@ FXbool FXSystem::localeIsUTF8(){
     return (strstr(str,"utf")!=NULL || strstr(str,"UTF")!=NULL);
     }
   return false;
+#endif
+  }
+
+
+// Get name of calling executable
+FXString FXSystem::getExecutableFilename(){
+#if defined(WIN32)
+  TCHAR buffer[MAXPATHLEN];
+  DWORD len=GetModuleFileName(NULL,buffer,MAXPATHLEN);
+  return FXString(buffer,len);
+#elif defined(__linux__)
+  FXint pid=FXSystem::getProcessId();
+  FXString filename=FXString::value("/proc/%d/exe",pid);
+  return FXFile::symlink(filename);
+#else
+  return FXString::null;
 #endif
   }
 

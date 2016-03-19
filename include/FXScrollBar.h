@@ -3,7 +3,7 @@
 *                       S c r o l l   B a r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -77,6 +77,7 @@ protected:
 protected:
   FXScrollBar();
   void drawButton(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
+  void drawThumb(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
   void drawLeftArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
   void drawRightArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);
   void drawUpArrow(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXbool down);

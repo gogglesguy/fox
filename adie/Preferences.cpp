@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -238,6 +238,11 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   searchtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where files are to be found."));
   searchtext->setHelpText(tr("Change file search path."));
 
+  new FXLabel(matrix3,tr("Syntax path:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  syntaxtext=new FXTextField(matrix3,10,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
+  syntaxtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where syntax file is to be found."));
+  syntaxtext->setHelpText(tr("Change syntax file search path."));
+
   //// File pattern settings button
   new FXButton(buttons,tr("Misc\tMiscellaneous\tMiscellaneous settings."),mis,switcher,FXSwitcher::ID_OPEN_FIFTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
@@ -277,6 +282,18 @@ FXString Preferences::getSearchPaths() const {
   }
 
 
+// Set syntax file paths
+void Preferences::setSyntaxPaths(const FXString& paths){
+  syntaxtext->setText(paths);
+  }
+
+
+// Get syntax file paths
+FXString Preferences::getSyntaxPaths() const {
+  return syntaxtext->getText();
+  }
+  
+  
 // Set language syntax
 void Preferences::setSyntax(FXSyntax* syn){
   stylelist->clearItems(TRUE);

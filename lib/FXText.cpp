@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -219,6 +219,8 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_PAGEDOWN,FXText::onCmdCursorPageDown),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_WORD_LEFT,FXText::onCmdCursorWordLeft),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_WORD_RIGHT,FXText::onCmdCursorWordRight),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_SEL_START,FXText::onCmdCursorSelStart),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_SEL_END,FXText::onCmdCursorSelEnd),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_SHIFT_TOP,FXText::onCmdCursorShiftTop),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_SHIFT_BOTTOM,FXText::onCmdCursorShiftBottom),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_SHIFT_HOME,FXText::onCmdCursorShiftHome),
@@ -300,8 +302,8 @@ FXIMPLEMENT(FXText,FXScrollArea,FXTextMap,ARRAYNUMBER(FXTextMap))
 const FXchar FXText::textDelimiters[]="~.,/\\`'!@#$%^&*()-=+{}|[]\":;<>?";
 
 // Matching things
-static const FXchar righthand[]="}])>";
 static const FXchar lefthand[]="{[(<";
+static const FXchar righthand[]="}])>";
 
 /*******************************************************************************/
 
@@ -848,112 +850,126 @@ FXint FXText::measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const {
 // Find end of previous word
 FXint FXText::leftWord(FXint pos) const {
   register FXint ch;
-  if(pos>length) pos=length;
+  FXASSERT(0<=pos && pos<=length);
   if(0<pos){
-    ch=getChar(dec(pos));
-    if(isdelimiter(delimiters,ch)) return dec(pos);
-    }
-  while(0<pos){
-    ch=getChar(dec(pos));
-    if(isdelimiter(delimiters,ch)) return pos;
-    if(Unicode::isSpace(ch)) break;
     pos=dec(pos);
+    ch=getChar(pos);
+    if(isdelimiter(delimiters,ch)){
+      while(0<pos){
+        ch=getChar(dec(pos));
+        if(Unicode::isSpace(ch) || !isdelimiter(delimiters,ch)) return pos;
+        pos=dec(pos);
+        }
+      }
+    else if(!Unicode::isSpace(ch)){
+      while(0<pos){
+        ch=getChar(dec(pos));
+        if(Unicode::isSpace(ch) || isdelimiter(delimiters,ch)) return pos;
+        pos=dec(pos);
+        }
+      }
+    while(0<pos){
+      ch=getChar(dec(pos));
+      if(!Unicode::isBlank(ch)) return pos;
+      pos=dec(pos);
+      }
     }
-  while(0<pos){
-    ch=getChar(dec(pos));
-    if(!Unicode::isSpace(ch)) return pos;
-    pos=dec(pos);
-    }
-  return 0;
+  return pos;
   }
 
 
 // Find begin of next word
 FXint FXText::rightWord(FXint pos) const {
   register FXint ch;
-  if(pos<0) pos=0;
+  FXASSERT(0<=pos && pos<=length);
   if(pos<length){
     ch=getChar(pos);
-    if(isdelimiter(delimiters,ch)) return inc(pos);
-    }
-  while(pos<length){
-    ch=getChar(pos);
-    if(isdelimiter(delimiters,ch)) return pos;
-    if(Unicode::isSpace(ch)) break;
     pos=inc(pos);
+    if(isdelimiter(delimiters,ch)){
+      while(pos<length){
+        ch=getChar(pos);
+        if(Unicode::isSpace(ch) || !isdelimiter(delimiters,ch)) return pos;
+        pos=inc(pos);
+        }
+      }
+    else if(!Unicode::isSpace(ch)){
+      while(pos<length){
+        ch=getChar(pos);
+        if(Unicode::isSpace(ch) || isdelimiter(delimiters,ch)) return pos;
+        pos=inc(pos);
+        }
+      }
+    while(pos<length){
+      ch=getChar(pos);
+      if(!Unicode::isBlank(ch)) return pos;
+      pos=inc(pos);
+      }
     }
-  while(pos<length){
-    ch=getChar(pos);
-    if(!Unicode::isSpace(ch)) return pos;
-    pos=inc(pos);
-    }
-  return length;
+  return pos;
   }
 
 
 // Find begin of a word
 FXint FXText::wordStart(FXint pos) const {
-  register FXint c=' ';
-  if(pos<=0) return 0;
-  if(pos<length) c=getChar(pos); else pos=length;
-  if(c=='\n'){
-    return pos;
-    }
-  else if(Unicode::isBlank(c)){
-    while(0<pos){
-      c=getChar(dec(pos));
-      if(!Unicode::isBlank(c)) return pos;
-      pos=dec(pos);
+  FXASSERT(0<=pos && pos<=length);
+  if(0<pos){
+    FXint ch=(pos<length)?getChar(pos):' ';
+    if(ch=='\n') return pos;
+    if(Unicode::isBlank(ch)){
+      while(0<pos){
+        ch=getChar(dec(pos));
+        if(!Unicode::isBlank(ch)) return pos;
+        pos=dec(pos);
+        }
+      }
+    else if(isdelimiter(delimiters,ch)){
+      while(0<pos){
+        ch=getChar(dec(pos));
+        if(!isdelimiter(delimiters,ch)) return pos;
+        pos=dec(pos);
+        }
+      }
+    else{
+      while(0<pos){
+        ch=getChar(dec(pos));
+        if(isdelimiter(delimiters,ch) || Unicode::isSpace(ch)) return pos;
+        pos=dec(pos);
+        }
       }
     }
-  else if(isdelimiter(delimiters,c)){
-    while(0<pos){
-      c=getChar(dec(pos));
-      if(!isdelimiter(delimiters,c)) return pos;
-      pos=dec(pos);
-      }
-    }
-  else{
-    while(0<pos){
-      c=getChar(dec(pos));
-      if(isdelimiter(delimiters,c) || Unicode::isSpace(c)) return pos;
-      pos=dec(pos);
-      }
-    }
-  return 0;
+  return pos;
   }
 
 
 // Find end of word
 FXint FXText::wordEnd(FXint pos) const {
-  register FXint c=' ';
-  if(pos>=length) return length;
-  if(0<=pos) c=getChar(pos); else pos=0;
-  if(c=='\n'){
-    return pos+1;
-    }
-  else if(Unicode::isBlank(c)){
-    while(pos<length){
-      c=getChar(pos);
-      if(!Unicode::isBlank(c)) return pos;
-      pos=inc(pos);
+  FXASSERT(0<=pos && pos<=length);
+  if(pos<length){
+    FXint ch=getChar(pos);
+    if(ch=='\n') return pos+1;
+    if(Unicode::isBlank(ch)){
+      while(pos<length){
+        ch=getChar(pos);
+        if(!Unicode::isBlank(ch)) return pos;
+        pos=inc(pos);
+        }
+      }
+    else if(isdelimiter(delimiters,ch)){
+      while(pos<length){
+        ch=getChar(pos);
+        if(!isdelimiter(delimiters,ch)) return pos;
+        pos=inc(pos);
+        }
+      }
+    else{
+      while(pos<length){
+        ch=getChar(pos);
+        if(isdelimiter(delimiters,ch) || Unicode::isSpace(ch)) return pos;
+        pos=inc(pos);
+        }
       }
     }
-  else if(isdelimiter(delimiters,c)){
-    while(pos<length){
-      c=getChar(pos);
-      if(!isdelimiter(delimiters,c)) return pos;
-      pos=inc(pos);
-      }
-    }
-  else{
-    while(pos<length){
-      c=getChar(pos);
-      if(isdelimiter(delimiters,c) || Unicode::isSpace(c)) return pos;
-      pos=inc(pos);
-      }
-    }
-  return length;
+  return pos;
   }
 
 
@@ -1539,7 +1555,7 @@ void FXText::moveContents(FXint x,FXint y){
   register FXint vx=getVisibleX();
   register FXint vy=getVisibleY();
   register FXint vw=getVisibleWidth();
-  register FXint vh=getVisibleHeight();  
+  register FXint vh=getVisibleHeight();
   register FXint dx=x-pos_x;
   register FXint dy=y-pos_y;
   register FXint i;
@@ -3873,7 +3889,7 @@ long FXText::onMotion(FXObject*,FXSelector,void* ptr){
     case MOUSE_WORDS:
       if(startAutoScroll(event,false)) return 1;
       if((fxabs(event->win_x-grabx-pos_x)>getApp()->getDragDelta())||(fxabs(event->win_y-graby-pos_y)>getApp()->getDragDelta())){
-        setCursorPos(getPosAt(event->win_x,event->win_y),true);
+        setCursorPos(getPosContaining(event->win_x,event->win_y),true);
         extendSelection(cursorpos,SelectWords,true);
         }
       return 1;
@@ -3918,7 +3934,7 @@ long FXText::onAutoScroll(FXObject* sender,FXSelector sel,void* ptr){
       return 1;
     case MOUSE_WORDS:
       if((fxabs(event->win_x-grabx-pos_x)>getApp()->getDragDelta())||(fxabs(event->win_y-graby-pos_y)>getApp()->getDragDelta())){
-        setCursorPos(getPosAt(event->win_x,event->win_y),true);
+        setCursorPos(getPosContaining(event->win_x,event->win_y),true);
         extendSelection(cursorpos,SelectWords,true);
         }
       return 1;
@@ -4279,6 +4295,34 @@ long FXText::onCmdCursorWordRight(FXObject*,FXSelector,void*){
   }
 
 
+// Process cursor to start of selection
+long FXText::onCmdCursorSelStart(FXObject*,FXSelector,void*){
+  if(selstartpos<=cursorpos && cursorpos<=selendpos){
+    setAnchorPos(selendpos);
+    setCursorPos(selstartpos,true);
+    makePositionVisible(selstartpos);
+    flashMatching();
+    return 1;
+    }
+  getApp()->beep();
+  return 1;
+  }
+
+
+// Process cursor to end of selection
+long FXText::onCmdCursorSelEnd(FXObject*,FXSelector,void*){
+  if(selstartpos<=cursorpos && cursorpos<=selendpos){
+    setAnchorPos(selstartpos);
+    setCursorPos(selendpos,true);
+    makePositionVisible(selendpos);
+    flashMatching();
+    return 1;
+    }
+  getApp()->beep();
+  return 1;
+  }
+
+
 // Process cursor shift+top
 long FXText::onCmdCursorShiftTop(FXObject*,FXSelector,void*){
   moveCursorAndSelect(0,SelectChars,true);
@@ -4548,14 +4592,18 @@ long FXText::onCmdSelectMatching(FXObject*,FXSelector,void*){
     FXchar ch=getByte(cursorpos-1);
     FXint pos=findMatching(cursorpos-1,0,length,ch,1);
     if(0<=pos){
-      if(pos>cursorpos){
+      if(cursorpos<=pos){
         setSelection(cursorpos-1,pos-cursorpos+2,true);
-        setAnchorPos(pos+1);
+        setAnchorPos(cursorpos-1);
+        setCursorPos(pos+1,true);
         }
       else{
         setSelection(pos,cursorpos-pos,true);
-        setAnchorPos(pos);
+        setAnchorPos(cursorpos);
+        setCursorPos(pos+1,true);
         }
+      makePositionVisible(cursorpos);
+      flashMatching();
       return 1;
       }
     }

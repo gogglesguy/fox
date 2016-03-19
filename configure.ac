@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [25])
+m4_define([fox_level], [26])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -74,6 +74,9 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
+# Disable annoying warning
+AC_DISABLE_OPTION_CHECKING
+
 X_BASE_LIBS="-lX11 -lXext"
 LIBGLU="-lGLU"
 LIBGL="-lGL"
@@ -103,15 +106,12 @@ AC_CHECK_LIB(pthread, pthread_exit)
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(dld, shl_load)
 
-# Check vsscanf, vsnprintf, strtoll, strtoull
-AC_CHECK_FUNCS(vsscanf vsnprintf strtoll strtoull)
-
 # Check thread-safe alternatives
 AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r)
 
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
-  CXXFLAGS="${CXXFLAGS} -Wall -Wextra -Wformat -Woverloaded-virtual -Wshadow"
+  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow"
   LDFLAGS="-rdynamic ${LDFLAGS}"
 fi
 
@@ -130,7 +130,7 @@ AC_MSG_RESULT([$enable_release])
 if test "x$enable_release" = "xyes" ; then
   CXXFLAGS="${CXXFLAGS} -O2 -DNDEBUG"
   if test "${GXX}" = "yes" ; then
-    CXXFLAGS="${CXXFLAGS} -Wuninitialized -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer -fexpensive-optimizations"
+    CXXFLAGS="${CXXFLAGS} -Wuninitialized -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer"
     LDFLAGS="-s ${LDFLAGS}"
   fi
 fi
@@ -164,6 +164,8 @@ AC_CHECK_HEADERS([sys/shm.h])
 AC_CHECK_HEADERS([sys/mman.h])
 AC_CHECK_HEADERS([sys/sysctl.h])
 AC_CHECK_HEADERS([sys/pstat.h])
+AC_CHECK_HEADERS([semaphore.h])
+AC_CHECK_HEADERS([dlfcn.h])
 
 # SSE/SSE2/SSE3
 SAVE_CPPFLAGS=$CPPFLAGS
@@ -286,11 +288,11 @@ AC_CHECK_HEADERS(X11/extensions/Xfixes.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XFIXES_H=1
 fi
 
 
-# Check for XInput support
-AC_ARG_WITH(xinput,[  --with-xinput           compile with XInput support])
+# Check for XInput2 support
+AC_ARG_WITH(xinput,[  --with-xinput           compile with XInput2 support])
 AC_MSG_RESULT([$with_xinput])
 if test "x$with_xinput" != "xno"; then
-AC_CHECK_HEADERS(X11/extensions/XInput.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XINPUT_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXi",, [#include <X11/Xlib.h>])
+AC_CHECK_HEADERS(X11/extensions/XInput2.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XINPUT2_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXi",, [#include <X11/Xlib.h>])
 fi
 
 
@@ -316,8 +318,8 @@ if test "x$with_opengl" != "xno" ; then
 AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU}")
 AC_CHECK_HEADER(GL/gl.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GL_H=1"; LIBS="${LIBS} ${LIBGL}")
 AC_CHECK_HEADER(GL/glx.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLX_H=1")
-fi
 GL_LIBS="${LIBGL} ${LIBGLU}"
+fi
 
 # Substitute variables in output files
 AC_SUBST(GL_LIBS)
@@ -341,5 +343,4 @@ calculator/Makefile
 controlpanel/Makefile
 windows/Makefile
 fox.spec
-fox-config
-fox.pc)
+fox17.pc)

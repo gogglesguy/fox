@@ -3,7 +3,7 @@
 *                          I F F   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -88,38 +88,25 @@ enum {
  };
 
 
-// Read short
-static inline FXuint read16(FXStream& store){
-  FXuchar c1,c2;
-  store >> c1 >> c2;
-  return ((FXuint)c2) | (((FXuint)c1)<<8);
-  }
-
-
-// Read int
-static inline FXuint read32(FXStream& store){
-  FXuchar c1,c2,c3,c4;
-  store >> c1 >> c2 >> c3 >> c4;
-  return ((FXuint)c4) | (((FXuint)c3)<<8) | (((FXuint)c2)<<16) | (((FXuint)c1)<<24);
-  }
-
-
 // Check if stream contains a IFF
 FXbool fxcheckIFF(FXStream& store){
-  FXuint signature;
-  signature=read32(store);
+  FXuchar signature[4];
+  store.load(signature,4);
   store.position(-4,FXFromCurrent);
-  return signature==FORM || signature==FOR1 || signature==FOR2 || signature==FOR3 || signature==FOR4;
+  return signature[0]=='F' && signature[1]=='O' && signature[2]=='R' && (signature[3]=='M' || signature[3]=='1' || signature[3]=='2' || signature[3]=='3' || signature[3]=='4');
   }
 
 
 // Load IFF image from stream
 FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXuint pixels,bit,view,tag,size,type,colors,i,bytesperline,value,plane,remainingbytes,fmt;
-  FXuchar *buffer,*ptr,planes,masking,compress,padding,c1,c2,c3,color,count;
-  FXColor colormap[256],*dest,pixelcolor;
-  FXlong pos,end;
-  FXint x,y;
+  FXuint   pixels,bit,view,tag,size,type,colors,i,bytesperline,value,plane,remainingbytes,fmt;
+  FXuchar *buffer,*ptr,planes,masking,compress,padding,XAspect,YAspect,c1,c2,c3,color,count;
+  FXColor  colormap[256],*dest,pixelcolor;
+  FXshort  X,Y,Width,Height,PageWidth,PageHeight,TransparentColor;
+  FXlong   pos,end;
+  FXint    x,y;
+  FXbool   swap;
+  FXbool   ok=false;
 
   // Init
   data=NULL;
@@ -133,224 +120,233 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   pixelcolor=0;
   fmt=ILBM_NORMAL;
 
-  // Read tag
-  tag=read32(store);
+  // Bitmaps are little-endian
+  swap=store.swapBytes();
+  store.setBigEndian(true);
 
-  //FXTRACE((100,"fxloadIFF tag=%c%c%c%c\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255));
+  // Read tag
+  store >> tag;
+
+  FXTRACE((100,"fxloadIFF tag=%c%c%c%c\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255));
 
   // Check for FORM tag
-  if(tag!=FORM && tag!=FOR1 && tag!=FOR2 && tag!=FOR3 && tag!=FOR4) return false;
+  if(tag==FORM || tag==FOR1 || tag==FOR2 || tag==FOR3 || tag==FOR4){
 
-  // Read size
-  size=read32(store);
+    // Read size
+    store >> size;
 
-  // Calculate end of data
-  pos=store.position();
-  end=pos+size;
-
-  // Read type
-  type=read32(store);
-  if(type!=ILBM) return false;
-
-  // Read stuff
-  while(1){
-
-    // Bail if at the end
-    if(store.position()+8>end) return false;
-
-    // Read next chunk header
-    tag=read32(store);
-    size=read32(store);
+    // Calculate end of data
     pos=store.position();
+    end=pos+size;
 
-    // Empty block is a problem too
-    if(size==0) return false;
+    // Read type
+    store >> type;
+    if(type==ILBM){
 
-    //FXTRACE((100,"CHUNK %c%c%c%c POS=%d SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
+      // Read stuff
+      while(1){
 
-    // Bitmap header
-    if(tag==BMHD){
-      width=read16(store);
-      height=read16(store);
-      store.position(4,FXFromCurrent);
-      store >> planes;
-      store >> masking;
-      store >> compress;
-      store >> padding;
-      store.position(8,FXFromCurrent);
-      pixels=width*height;                      // Total image size
-      bytesperline=((width+15)>>4)<<1;          // Bytes per line
-      }
+        // Bail if at the end
+        if(store.position()+8>end) goto x;
 
-    // Colormap
-    else if(tag==CMAP){
-      colors=size/3;
-      if(colors<1) return false;
-      if(colors>256) return false;
-      memset(colormap,0,sizeof(colormap));
-      for(i=0; i<colors; i++){                  // Load colors
-        store >> c1 >> c2 >> c3;
-        colormap[i]=FXRGB(c1,c2,c3);
-        }
-      }
+        // Read next chunk header
+        store >> tag;
+        store >> size;
+        pos=store.position();
 
-    // Commodore AMiGa
-    else if(tag==CAMG){
-      view=read32(store);
-      //FXTRACE((100,"view=%04x\n",view));
-      }
+        // Empty block is a problem too
+        if(size==0) goto x;
 
-    // Body
-    else if(tag==BODY){
-      break;
-      }
+        FXTRACE((100,"CHUNK %c%c%c%c POS=%d SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
 
-    // Next chunk
-    store.position(pos+size+(size&1));
-    }
-
-  // Wat voor vlees in de kuip?
-  //FXTRACE((100,"fxloadIFF: width=%d height=%d planes=%d masking=%d compress=%d padding=%d\n",width,height,planes,masking,compress,padding));
-
-  // Determine format
-  if(planes==24){
-    fmt=ILBM_24BIT;
-    }
-  else if(planes==8){
-    if(view&0x800){
-      fmt=ILBM_HAM8;
-      }
-    }
-  else if(planes>5){
-    if(view&0x80){
-      fmt=ILBM_EHB;
-      }
-    else if(view&0x800){
-      fmt=ILBM_HAM;
-      }
-    }
-
-  // Tweak colormap
-  if((fmt==ILBM_NORMAL) || (fmt==ILBM_EHB) || (fmt==ILBM_HAM)){
-
-    // Colors based on HAM mode
-    switch(fmt) {
-      case ILBM_NORMAL: colors=1<<planes; break;
-      case ILBM_EHB: colors=32*2; break;
-      case ILBM_HAM: colors=16; break;
-      }
-
-    // Divide colors
-    for(i=0; i<colors; i++){
-      ((FXuchar*)&colormap[i])[0]=(((FXuchar*)&colormap[i])[0]>>4)*17;
-      ((FXuchar*)&colormap[i])[1]=(((FXuchar*)&colormap[i])[1]>>4)*17;
-      ((FXuchar*)&colormap[i])[2]=(((FXuchar*)&colormap[i])[2]>>4)*17;
-      }
-
-    // Extended half-bright mode
-    if(fmt==ILBM_EHB){
-      for(i=0; i<32; i++) {
-        ((FXuchar*)&colormap[colors+i])[0]=((FXuchar*)&colormap[i])[0]>>1;
-        ((FXuchar*)&colormap[colors+i])[1]=((FXuchar*)&colormap[i])[1]>>1;
-        ((FXuchar*)&colormap[colors+i])[2]=((FXuchar*)&colormap[i])[2]>>1;
-        }
-      }
-    }
-
-  // Try allocate image
-  if(!allocElms(data,pixels)) return false;
-
-  // Temp buffer
-  if(!allocElms(buffer,bytesperline*planes)){ freeElms(data); return false; }
-
-  dest=data;
-
-  // Loop over y
-  for(y=0; y<height; y++){
-
-    // Uncompress data of each planes
-    for(plane=0; plane<planes; plane++){
-      ptr=buffer+bytesperline*plane;
-      remainingbytes=bytesperline;
-      if(compress==1){	        // Compressed
-        do{
-          store >> count;
-          if(count&0x80){
-            count^=0xFF;
-            count+=2;
-            store >> color;
-            if(count>remainingbytes) count=remainingbytes;
-            memset(ptr,color,count);
-            }
-          else{
-            count+=1;
-            if(count>remainingbytes) count=remainingbytes;
-            store.load(ptr,count);
-            }
-          ptr+=count;
-          remainingbytes-=count;
+        // Bitmap header
+        if(tag==BMHD){
+          store >> Width;
+          store >> Height;
+          store >> X;
+          store >> Y;
+          store >> planes;
+          store >> masking;
+          store >> compress;
+          store >> padding;
+          store >> TransparentColor;
+          store >> XAspect;
+          store >> YAspect;
+          store >> PageWidth;
+          store >> PageHeight;
+          pixels=Width*Height;                      // Total image size
+          bytesperline=((Width+15)>>4)<<1;          // Bytes per line
           }
-        while(remainingbytes>0);
-        }
-      else{                     // Not compressed
-        store.load(ptr,bytesperline);
-        }
-      }
 
-/*
-    FXTRACE((100,"y: %d\n",y));
-    for(plane=0; plane<planes; plane++){
-      FXTRACE((100,"P %2d: ",plane));
-      for(i=0; i<bytesperline; i++){
-        FXTRACE((100,"%02x ",buffer[plane*bytesperline+i]));
-        }
-      FXTRACE((100,"\n"));
-      }
-*/
-
-    // Loop over x
-    for(x=0; x<width; x++){
-
-      // Build value from the planes
-      for(plane=value=0; plane<planes; plane++){
-        bit=(buffer[bytesperline*plane+(x>>3)]>>(7-(x&7)))&1;
-        value|=bit<<plane;
-        }
-
-      // Determine what to do based on mode
-      switch(fmt){
-        case ILBM_NORMAL:
-        case ILBM_EHB:
-          pixelcolor=colormap[value&255];
-          break;
-        case ILBM_24BIT:
-          pixelcolor=value;
-          break;
-        case ILBM_HAM:
-          switch(value&0x30) {
-            case 0x00: pixelcolor=colormap[value&15]; break;
-            case 0x10: pixelcolor=(pixelcolor&FXRGB(255,255,0))|FXRGB(0,0,(value&15)*17); break;
-            case 0x20: pixelcolor=(pixelcolor&FXRGB(0,255,255))|FXRGB((value&15)*17,0,0); break;
-            case 0x30: pixelcolor=(pixelcolor&FXRGB(255,0,255))|FXRGB(0,(value&15)*17,0); break;
+        // Colormap
+        else if(tag==CMAP){
+          colors=size/3;
+          if(colors<1) goto x;
+          if(colors>256) goto x;
+          memset(colormap,0,sizeof(colormap));
+          for(i=0; i<colors; i++){                  // Load colors
+            store >> c1 >> c2 >> c3;
+            colormap[i]=FXRGB(c1,c2,c3);
             }
+          }
+
+        // Commodore AMiGa
+        else if(tag==CAMG){
+          store >> view;
+          FXTRACE((100,"view=%04x\n",view));
+          }
+
+        // Body
+        else if(tag==BODY){
           break;
-        case ILBM_HAM8:
-          switch(value&0xc0) {
-            case 0x00: pixelcolor=colormap[value&0x3f]; break;
-            case 0x40: pixelcolor=(pixelcolor&FXRGB(255,255,0))|FXRGB(0,0,(value&0x3f)<<2); break;
-            case 0x80: pixelcolor=(pixelcolor&FXRGB(0,255,255))|FXRGB((value&0x3f)<<2,0,0); break;
-            case 0xc0: pixelcolor=(pixelcolor&FXRGB(255,0,255))|FXRGB(0,(value&0x3f)<<2,0); break;
-            }
-          break;
+          }
+
+        // Next chunk
+        store.position(pos+size+(size&1));
         }
-      *dest++=pixelcolor;
+
+      // Wat voor vlees in de kuip?
+      FXTRACE((100,"fxloadIFF: Width=%d Height=%d planes=%d masking=%d compress=%d padding=%d\n",Width,Height,planes,masking,compress,padding));
+
+      // Determine format
+      if(planes==24){
+        fmt=ILBM_24BIT;
+        }
+      else if(planes==8){
+        if(view&0x800){
+          fmt=ILBM_HAM8;
+          }
+        }
+      else if(planes>5){
+        if(view&0x80){
+          fmt=ILBM_EHB;
+          }
+        else if(view&0x800){
+          fmt=ILBM_HAM;
+          }
+        }
+
+      // Tweak colormap
+      if((fmt==ILBM_NORMAL) || (fmt==ILBM_EHB) || (fmt==ILBM_HAM)){
+
+        // Colors based on HAM mode
+        switch(fmt) {
+          case ILBM_NORMAL: colors=1<<planes; break;
+          case ILBM_EHB: colors=32*2; break;
+          case ILBM_HAM: colors=16; break;
+          }
+
+        // Divide colors
+        for(i=0; i<colors; i++){
+          ((FXuchar*)&colormap[i])[0]=(((FXuchar*)&colormap[i])[0]>>4)*17;
+          ((FXuchar*)&colormap[i])[1]=(((FXuchar*)&colormap[i])[1]>>4)*17;
+          ((FXuchar*)&colormap[i])[2]=(((FXuchar*)&colormap[i])[2]>>4)*17;
+          }
+
+        // Extended half-bright mode
+        if(fmt==ILBM_EHB){
+          for(i=0; i<32; i++) {
+            ((FXuchar*)&colormap[colors+i])[0]=((FXuchar*)&colormap[i])[0]>>1;
+            ((FXuchar*)&colormap[colors+i])[1]=((FXuchar*)&colormap[i])[1]>>1;
+            ((FXuchar*)&colormap[colors+i])[2]=((FXuchar*)&colormap[i])[2]>>1;
+            }
+          }
+        }
+
+      // Temp buffer
+      if(allocElms(buffer,bytesperline*planes)){
+
+        // Try allocate image
+        if(allocElms(data,pixels)){
+
+          // Returned image size
+          width=Width;
+          height=Height;
+
+          dest=data;
+
+          // Loop over y
+          for(y=0; y<height; y++){
+
+            // Uncompress data of each planes
+            for(plane=0; plane<planes; plane++){
+              ptr=buffer+bytesperline*plane;
+              remainingbytes=bytesperline;
+              if(compress==1){	        // Compressed
+                do{
+                  store >> count;
+                  if(count&0x80){
+                    count^=0xFF;
+                    count+=2;
+                    store >> color;
+                    if(count>remainingbytes) count=remainingbytes;
+                    memset(ptr,color,count);
+                    }
+                  else{
+                    count+=1;
+                    if(count>remainingbytes) count=remainingbytes;
+                    store.load(ptr,count);
+                    }
+                  ptr+=count;
+                  remainingbytes-=count;
+                  }
+                while(remainingbytes>0);
+                }
+              else{                     // Not compressed
+                store.load(ptr,bytesperline);
+                }
+              }
+
+            // Loop over x
+            for(x=0; x<width; x++){
+
+              // Build value from the planes
+              for(plane=value=0; plane<planes; plane++){
+                bit=(buffer[bytesperline*plane+(x>>3)]>>(7-(x&7)))&1;
+                value|=bit<<plane;
+                }
+
+              // Determine what to do based on mode
+              switch(fmt){
+                case ILBM_NORMAL:
+                case ILBM_EHB:
+                  pixelcolor=colormap[value&255];
+                  break;
+                case ILBM_24BIT:
+                  pixelcolor=(value<<8);
+                  break;
+                case ILBM_HAM:
+                  switch(value&0x30) {
+                    case 0x00: pixelcolor=colormap[value&15]; break;
+                    case 0x10: pixelcolor=(pixelcolor&FXRGB(255,255,0))|FXRGB(0,0,(value&15)*17); break;
+                    case 0x20: pixelcolor=(pixelcolor&FXRGB(0,255,255))|FXRGB((value&15)*17,0,0); break;
+                    case 0x30: pixelcolor=(pixelcolor&FXRGB(255,0,255))|FXRGB(0,(value&15)*17,0); break;
+                    }
+                  break;
+                case ILBM_HAM8:
+                  switch(value&0xc0) {
+                    case 0x00: pixelcolor=colormap[value&0x3f]; break;
+                    case 0x40: pixelcolor=(pixelcolor&FXRGB(255,255,0))|FXRGB(0,0,(value&0x3f)<<2); break;
+                    case 0x80: pixelcolor=(pixelcolor&FXRGB(0,255,255))|FXRGB((value&0x3f)<<2,0,0); break;
+                    case 0xc0: pixelcolor=(pixelcolor&FXRGB(255,0,255))|FXRGB(0,(value&0x3f)<<2,0); break;
+                    }
+                  break;
+                }
+              *dest++=pixelcolor;
+              }
+            }
+
+          // OK
+          ok=true;
+          }
+
+        // Release buffer
+        freeElms(buffer);
+        }
       }
     }
-
-  // Release buffer
-  freeElms(buffer);
-
-  return true;
+x:store.swapBytes(swap);
+  return ok;
   }
 
 

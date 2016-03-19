@@ -3,7 +3,7 @@
 *                      T A R G A   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2010 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2011 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,7 +32,6 @@
   - To map from 5-bit to 8-bit, we use value*8+floor(value/4) which
     is almost the same as the correct value*8.225806.
   - Yes, in 16 bit its still 5,5,5 and not 5,6,5.
-  - We need to clean this up and simplify a bit some day.
 */
 
 
@@ -49,18 +48,9 @@ extern FXAPI FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint&
 extern FXAPI FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height);
 
 
-static inline FXuint read16(FXStream& store){
-  FXuchar c1,c2;
-  store >> c1 >> c2;
-  return ((FXuint)c1) | (((FXuint)c2)<<8);
-  }
-
-
-
 static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
-  register FXuchar *pp;
   register FXint i,j,rc;
-  FXuchar R,G,B,A,c;
+  FXuchar *pp,R,G,B,A,c;
 
   // 2 - Uncompressed, RGB images.
   if(ImageType==2){
@@ -70,9 +60,9 @@ static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height
       pp=(FXuchar*)data;
       for(i=0; i<height; i++){
         for(j=0; j<width; j++){
-          store >> pp[2];       // Blue
+          store >> pp[0];       // Blue
           store >> pp[1];       // Green
-          store >> pp[0];       // Red
+          store >> pp[2];       // Red
           store >> pp[3];       // Alpha
           pp+=4;
           }
@@ -84,9 +74,9 @@ static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height
       for(i=height-1; i>=0; i--){
         pp=(FXuchar*)(data+i*width);
         for(j=0; j<width; j++){
-          store >> pp[2];       // Blue
+          store >> pp[0];       // Blue
           store >> pp[1];       // Green
-          store >> pp[0];       // Red
+          store >> pp[2];       // Red
           store >> pp[3];       // Alpha
           pp+=4;
           }
@@ -104,25 +94,23 @@ static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height
         j=0;
         while(j<width){
 
-          // read Repetition Count field
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field - get R, G, B, A values
             store >> B;
             store >> G;
             store >> R;
             store >> A;
-
             while(rc--){
-              *pp++=R; // Red
-              *pp++=G; // Green
-              *pp++=B; // Blue
-              *pp++=A; // Alpha
+              pp[0]=B;          // Blue
+              pp[1]=G;          // Green
+              pp[2]=R;          // Red
+              pp[3]=A;          // Alpha
+              pp+=4;
               }
             }
 
@@ -131,14 +119,11 @@ static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height
             rc=c+1;
             j+=rc;
             while(rc--){
-              store >> B;
-              store >> G;
-              store >> R;
-              store >> A;
-              *pp++=R; // Red
-              *pp++=G; // Green
-              *pp++=B; // Blue
-              *pp++=A; // Alpha
+              store >> pp[0];   // Blue
+              store >> pp[1];   // Green
+              store >> pp[2];   // Red
+              store >> pp[3];   // Alpha
+              pp+=4;
               }
             }
           }
@@ -152,39 +137,36 @@ static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height
         pp=(FXuchar*)(data+i*width);
         while(j<width){
 
-          // read Repetition Count field
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field - get R,G,B,A values
             store >> B;
             store >> G;
             store >> R;
             store >> A;
             while(rc--){
-              *pp++=R; // Red
-              *pp++=G; // Green
-              *pp++=B; // Blue
-              *pp++=A; // Alpha
+              pp[0]=B;          // Blue
+              pp[1]=G;          // Green
+              pp[2]=R;          // Red
+              pp[3]=A;          // Alpha
+              pp+=4;
               }
             }
+
           // Raw Packet
           else{
             rc=c+1;
             j+=rc;
             while(rc--){
-              store >> B;
-              store >> G;
-              store >> R;
-              store >> A;
-              *pp++=R; // Red
-              *pp++=G; // Green
-              *pp++=B; // Blue
-              *pp++=A; // Alpha
+              store >> pp[0];   // Blue
+              store >> pp[1];   // Green
+              store >> pp[2];   // Red
+              store >> pp[3];   // Alpha
+              pp+=4;
               }
             }
           }
@@ -197,8 +179,7 @@ static FXbool loadTarga32(FXStream& store,FXColor* data,FXint width,FXint height
 
 static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
   register int i,j,rc;
-  register FXuchar *pp;
-  FXuchar R,G,B,c;
+  FXuchar *pp,R,G,B,c;
 
   // 2 - Uncompressed, RGB images.
   if(ImageType == 2){
@@ -208,9 +189,9 @@ static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height
       pp=(FXuchar*)data;
       for(i=0; i<height; i++){
         for(j=0; j<width; j++){
-          store >> pp[2];       // Blue
+          store >> pp[0];       // Blue
           store >> pp[1];       // Green
-          store >> pp[0];       // Red
+          store >> pp[2];       // Red
           pp[3]=255;            // Alpha
           pp+=4;
           }
@@ -222,9 +203,9 @@ static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height
       for(i=height-1; i>=0; i--){
         pp=(FXuchar*)(data+i*width);
         for(j=0; j<width; j++){
-          store >> pp[2];       // Blue
+          store >> pp[0];       // Blue
           store >> pp[1];       // Green
-          store >> pp[0];       // Red
+          store >> pp[2];       // Red
           pp[3]=255;            // Alpha
           pp+=4;
           }
@@ -242,37 +223,35 @@ static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height
         j=0;
         while(j<width){
 
-          // read Repetition Count field
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field - get R, G, B values
             store >> B;
             store >> G;
             store >> R;
             while(rc--){
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=255;        // Alpha
+              pp[0]=B;          // Blue
+              pp[1]=G;          // Green
+              pp[2]=R;          // Red
+              pp[3]=255;        // Alpha
+              pp+=4;
               }
             }
+
           // Raw Packet
           else{
             rc=c+1;
             j+=rc;
             while(rc--){
-              store >> B;
-              store >> G;
-              store >> R;
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=255;        // Alpha
+              store >> pp[0];   // Blue
+              store >> pp[1];   // Green
+              store >> pp[2];   // Red
+              pp[3]=255;        // Alpha
+              pp+=4;
               }
             }
           }
@@ -286,37 +265,35 @@ static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height
         pp=(FXuchar*)(data+i*width);
         while(j<width){
 
-          // read Repetition Count field
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field - get R,G,B values
             store >> B;
             store >> G;
             store >> R;
             while(rc--){
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=255;        // Alpha
+              pp[0]=B;          // Blue
+              pp[1]=G;          // Green
+              pp[2]=R;          // Red
+              pp[3]=255;        // Alpha
+              pp+=4;
               }
             }
+
           // Raw Packet
           else{
             rc = c + 1;
             j += rc;
             while(rc--){
-              store >> B;
-              store >> G;
-              store >> R;
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=255;        // Alpha
+              store >> pp[0];   // Blue
+              store >> pp[1];   // Green
+              store >> pp[2];   // Red
+              pp[3]=255;        // Alpha
+              pp+=4;
               }
             }
           }
@@ -335,30 +312,33 @@ static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height
 
   // 2 - Uncompressed, RGB images.
   if(ImageType==2){
-    // check Image Descriptor
+
     // Origin in upper left-hand corner
     if((imgdescriptor&0x20)==0x20){
       pp=(FXuchar*)data;
       for(i=0; i<height; i++){
         for(j=0; j<width; j++){
-          rgb16=read16(store);
-          *pp++=((rgb16>>7)&0xf8)+((rgb16>>12)&7);      // Red
-          *pp++=((rgb16>>2)&0xf8)+((rgb16>>7)&7);       // Green
-          *pp++=((rgb16<<3)&0xf8)+((rgb16>>2)&7);       // Blue
-          *pp++=255;                                    // Alpha
+          store >> rgb16;
+          pp[0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);       // Blue
+          pp[1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);       // Green
+          pp[2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);      // Red
+          pp[3]=255;                                    // Alpha
+          pp+=4;
           }
         }
       }
+
+    // Origin in lower left-hand corner
     else{
-      // Origin in lower left-hand corner
       for(i=height-1; i>=0; i--){
         pp=(FXuchar*)(data+i*width);
         for(j=0; j<width; j++){
-          rgb16=read16(store);
-          *pp++=((rgb16>>7)&0xf8)+((rgb16>>12)&7);      // Red
-          *pp++=((rgb16>>2)&0xf8)+((rgb16>>7)&7);       // Green
-          *pp++=((rgb16<<3)&0xf8)+((rgb16>>2)&7);       // Blue
-          *pp++=255;                                    // Alpha
+          store >> rgb16;
+          pp[0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);       // Blue
+          pp[1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);       // Green
+          pp[2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);      // Red
+          pp[3]=255;                                    // Alpha
+          pp+=4;
           }
         }
       }
@@ -366,7 +346,7 @@ static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height
 
   // 10 - Runlength encoded RGB images.
   else if(ImageType==10){
-    // check Image Descriptor
+
     // Origin in upper left-hand corner
     if((imgdescriptor&0x20)==0x20){
       pp=(FXuchar*)data;
@@ -374,26 +354,23 @@ static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height
         j=0;
         while(j<width){
 
-          // read Repetition Count field
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field -
-            rgb16=read16(store);
-
-            // get R, G, B values
-            R=((rgb16>>7)&0xf8)+((rgb16>>12)&7);      // Red
-            G=((rgb16>>2)&0xf8)+((rgb16>>7)&7);       // Green
-            B=((rgb16<<3)&0xf8)+((rgb16>>2)&7);       // Blue
+            store >> rgb16;
+            B=((rgb16<<3)&0xf8)+((rgb16>>2)&7);         // Blue
+            G=((rgb16>>2)&0xf8)+((rgb16>>7)&7);         // Green
+            R=((rgb16>>7)&0xf8)+((rgb16>>12)&7);        // Red
             while(rc--){
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=255;        // Alpha
+              pp[0]=B;                                  // Blue
+              pp[1]=G;                                  // Green
+              pp[2]=R;                                  // Red
+              pp[3]=255;                                // Alpha
+              pp+=4;
               }
             }
 
@@ -402,11 +379,12 @@ static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height
             rc=c+1;
             j+=rc;
             while(rc--){
-              rgb16=read16(store);
-              *pp++=((rgb16>>7)&0xf8)+((rgb16>>12)&7);// Red
-              *pp++=((rgb16>>2)&0xf8)+((rgb16>>7)&7); // Green
-              *pp++=((rgb16<<3)&0xf8)+((rgb16>>2)&7); // Blue
-              *pp++=255;                                // Alpha
+              store >> rgb16;
+              pp[0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);   // Blue
+              pp[1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);   // Green
+              pp[2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);  // Red
+              pp[3]=255;                                // Alpha
+              pp+=4;
               }
             }
           }
@@ -420,26 +398,23 @@ static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height
         pp=(FXuchar*)(data+i*width);
         while(j<width){
 
-          // read Repetition Count field
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field
-            rgb16=read16(store);
-
-            // get R, G, B values
-            R=((rgb16>>7)&0xf8)+((rgb16>>12)&7);      // Red
-            G=((rgb16>>2)&0xf8)+((rgb16>>7)&7);       // Green
-            B=((rgb16<<3)&0xf8)+((rgb16>>2)&7);       // Blue
+            store >> rgb16;
+            B=((rgb16<<3)&0xf8)+((rgb16>>2)&7);         // Blue
+            G=((rgb16>>2)&0xf8)+((rgb16>>7)&7);         // Green
+            R=((rgb16>>7)&0xf8)+((rgb16>>12)&7);        // Red
             while(rc--){
-              *pp++=R;                  // Red
-              *pp++=G;                  // Green
-              *pp++=B;                  // Blue
-              *pp++=255;                // Alpha
+              pp[0]=B;                                  // Blue
+              pp[1]=G;                                  // Green
+              pp[2]=R;                                  // Red
+              pp[3]=255;                                // Alpha
+              pp+=4;
               }
             }
 
@@ -448,11 +423,12 @@ static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height
             rc=c+1;
             j+=rc;
             while(rc--){
-              rgb16=read16(store);
-              *pp++=((rgb16>>7)&0xf8)+((rgb16>>12)&7);// Red
-              *pp++=((rgb16>>2)&0xf8)+((rgb16>>7)&7); // Green
-              *pp++=((rgb16<<3)&0xf8)+((rgb16>>2)&7); // Blue
-              *pp++=255;                                // Alpha
+              store >> rgb16;
+              pp[0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);   // Blue
+              pp[1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);   // Green
+              pp[2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);  // Red
+              pp[3]=255;                                // Alpha
+              pp+=4;
               }
             }
           }
@@ -470,30 +446,33 @@ static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,
 
   // 1 - Uncompressed, color-mapped images
   if(ImageType==1){
-    // check Image Descriptor
+
     // Origin in upper left-hand corner
     if((imgdescriptor&0x20)==0x20){
       pp=(FXuchar*)data;
       for(i=0; i<height; i++){
         for(j=0; j<width; j++){
           store >> c;
-          *pp++=colormap[c][2];         // Red
-          *pp++=colormap[c][1];         // Green
-          *pp++=colormap[c][0];         // Blue
-          *pp++=colormap[c][3];         // Alpha
+          pp[0]=colormap[c][0];         // Blue
+          pp[1]=colormap[c][1];         // Green
+          pp[2]=colormap[c][2];         // Red
+          pp[3]=colormap[c][3];         // Alpha
+          pp+=4;
           }
         }
       }
+
     // Origin in lower left-hand corner
     else{
       for(i=height-1; i>=0; i--){
         pp=(FXuchar*)(data+i*width);
         for(j=0; j<width; j++){
           store >> c;
-          *pp++=colormap[c][2];         // Red
-          *pp++=colormap[c][1];         // Green
-          *pp++=colormap[c][0];         // Blue
-          *pp++=colormap[c][3];         // Alpha
+          pp[0]=colormap[c][0];         // Blue
+          pp[1]=colormap[c][1];         // Green
+          pp[2]=colormap[c][2];         // Red
+          pp[3]=colormap[c][3];         // Alpha
+          pp+=4;
           }
         }
       }
@@ -501,34 +480,32 @@ static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,
 
   // 9 - Runlength encoded color-mapped images
   else if(ImageType==9){
-    // check Image Descriptor
+
     // Origin in upper left-hand corner
     if((imgdescriptor&0x20)==0x20){
       pp=(FXuchar*)data;
       for(i=0; i<height; i++){
         j=0;
         while(j<width){
-          // read Repetition Count field
+
+          // Read Repetition Count field
           store >> c;
 
-          // check for Run-length Packet
-          if(c>127){
+          // Check for Run-length Packet
+          if(c&128){
             rc=c-127;
             j+=rc;
-
-            // read Pixel Value field
             store >> c;
-
-            // get R,G,B values
-            R=colormap[c][2];
-            G=colormap[c][1];
             B=colormap[c][0];
+            G=colormap[c][1];
+            R=colormap[c][2];
             A=colormap[c][3];
             while(rc--){
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=A;          // Alpha
+              pp[0]=B;                  // Blue
+              pp[1]=G;                  // Green
+              pp[2]=R;                  // Red
+              pp[3]=A;                  // Alpha
+              pp+=4;
               }
             }
 
@@ -538,10 +515,11 @@ static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,
             j+=rc;
             while(rc--){
               store >> c;
-              *pp++=colormap[c][2];     // Red
-              *pp++=colormap[c][1];     // Green
-              *pp++=colormap[c][0];     // Blue
-              *pp++=colormap[c][3];     // Alpha
+              pp[0]=colormap[c][0];     // Blue
+              pp[1]=colormap[c][1];     // Green
+              pp[2]=colormap[c][2];     // Red
+              pp[3]=colormap[c][3];     // Alpha
+              pp+=4;
               }
             }
           }
@@ -559,7 +537,7 @@ static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,
           store >> c;
 
           // check for Run-length Packet
-          if(c>127){
+          if(c&128){
             rc=c-127;
             j+=rc;
 
@@ -567,15 +545,16 @@ static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,
             store >> c;
 
             // get R,G,B values
-            R=colormap[c][2];
-            G=colormap[c][1];
             B=colormap[c][0];
+            G=colormap[c][1];
+            R=colormap[c][2];
             A=colormap[c][3];
             while(rc--){
-              *pp++=R;          // Red
-              *pp++=G;          // Green
-              *pp++=B;          // Blue
-              *pp++=A;          // Alpha
+              pp[0]=B;                  // Blue
+              pp[1]=G;                  // Green
+              pp[2]=R;                  // Red
+              pp[3]=A;                  // Alpha
+              pp+=4;
               }
             }
 
@@ -585,10 +564,11 @@ static FXbool loadTarga8(FXStream& store,FXColor* data,FXint width,FXint height,
             j+=rc;
             while(rc--){
               store >> c;
-              *pp++=colormap[c][2];     // Red
-              *pp++=colormap[c][1];     // Green
-              *pp++=colormap[c][0];     // Blue
-              *pp++=colormap[c][3];     // Alpha
+              pp[0]=colormap[c][0];     // Blue
+              pp[1]=colormap[c][1];     // Green
+              pp[2]=colormap[c][2];     // Red
+              pp[3]=colormap[c][3];     // Alpha
+              pp+=4;
               }
             }
           }
@@ -606,7 +586,7 @@ static FXbool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint heig
 
   // 3 - Uncompressed, black and white images.
   if(ImageType==3){
-    // check Image Descriptor
+
     // Origin in upper left-hand corner
     if((imgdescriptor&0x20)==0x20){
       pp=(FXuchar*)data;
@@ -639,7 +619,6 @@ static FXbool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint heig
   // 11 - Compressed, black and white images.
   else if(ImageType==11){
 
-    // check Image Descriptor
     // Origin in upper left-hand corner
     if((imgdescriptor&0x20)==0x20){
       pp=(FXuchar*)data;
@@ -651,7 +630,7 @@ static FXbool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint heig
           store >> c;
 
           // check for Run-length Packet
-          if(c>127){
+          if(c&128){
             rc=c-127;
             j+=rc;
 
@@ -692,7 +671,7 @@ static FXbool loadTargaGray(FXStream& store,FXColor* data,FXint width,FXint heig
           store >> c;
 
           // check for Run-length Packet
-          if(c>127){
+          if(c&128){
             rc=c-127;
             j+=rc;
 
@@ -737,18 +716,28 @@ FXbool fxcheckTGA(FXStream& store){
 
 // Load Targa image from stream
 FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXuchar IDLength,ColorMapType,ImageType,ColorMapEntrySize,PixelDepth,ImageDescriptor;
-  FXuchar colormap[256][4];
-  FXuint rgb16,ColorMapLength,i;
-  FXlong start;
+  FXuchar  IDLength;
+  FXuchar  ColorMapType;
+  FXuchar  ImageType;
+  FXshort  ColorMapOrigin;
+  FXshort  ColorMapLength;
+  FXuchar  ColorMapEntrySize;
+  FXshort  XOrg;
+  FXshort  YOrg;
+  FXshort  Width;
+  FXshort  Height;
+  FXuchar  PixelDepth;
+  FXuchar  ImageDescriptor;
+  FXushort rgb16;
+  FXuchar  colormap[256][4];
+  FXbool   swap;
+  FXbool   ok=false;
+  FXint    i;
 
   // Null out
   data=NULL;
   width=0;
   height=0;
-
-  // Remember start
-  start=store.position();
 
   // Length of Image ID Field
   store >> IDLength;
@@ -771,214 +760,191 @@ FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   //      4-pass quadtree-type process.
   store >> ImageType;
 
-//  FXTRACE((100,"fxloadTGA IDLength=%d ColorMapType=%d ImageType=%d\n",IDLength,ColorMapType,ImageType));
+  FXTRACE((100,"fxloadTGA IDLength=%d ColorMapType=%d ImageType=%d\n",IDLength,ColorMapType,ImageType));
 
   // Check for supported image type
-  if(ImageType!=1 && ImageType!=2 && ImageType!=3 && ImageType!=9 && ImageType!=10 && ImageType!=11 && ImageType!=32 && ImageType!=33) return false;
+  if(ImageType==1 || ImageType==2 || ImageType==3 || ImageType==9 || ImageType==10 || ImageType==11 || ImageType==32 || ImageType==33){
 
-  // Color Map Specification
+    // Switch to little-endian
+    swap=store.swapBytes();
+    store.setBigEndian(false);
 
-  // FirstEntryIndex - index of the first color map entry
-  read16(store);
+    // First color map entry
+    store >> ColorMapOrigin;
 
-  // Color map Length
-  ColorMapLength=read16(store);
+    // Color map length
+    store >> ColorMapLength;
 
-  // Color map Entry Size
-  // Establishes the number of bits per entry.
-  // Typically 15, 16, 24 or 32-bit values are used.
-  store >> ColorMapEntrySize;
+    // Don't load too many colors
+    if(ColorMapLength>256) goto x;
 
-  // Image Specification Field
+    // Color map Entry Size
+    // Establishes the number of bits per entry.
+    // Typically 15, 16, 24 or 32-bit values are used.
+    store >> ColorMapEntrySize;
 
-  // X-origin of Image and Y-origin of Image
-  read16(store);
-  read16(store);
+    // X-origin of image and Y-origin of image
+    store >> XOrg;
+    store >> YOrg;
 
-  // This field specifies the width of the image in pixels
-  width=read16(store);
+    // This field specifies the width of the image in pixels
+    store >> Width;
 
-  // This field specifies the height of the image in pixels
-  height=read16(store);
+    // This field specifies the height of the image in pixels
+    store >> Height;
 
-  // This field indicates the number of bits per pixel. This number includes
-  // the Attribute or Alpha channel bits. Common values are 8, 16, 24 and 32
-  // but other pixel depths could be used.
-  store >> PixelDepth;
+    // This field indicates the number of bits per pixel. This number includes
+    // the Attribute or Alpha channel bits. Common values are 8, 16, 24 and 32
+    // but other pixel depths could be used.
+    store >> PixelDepth;
 
-  //FXTRACE((100,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d width=%d height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,width,height));
+    FXTRACE((100,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d Width=%d Height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,Width,Height));
 
-  // Don't load too many colors
-  if(ColorMapLength>256) return false;
+    // Sanity check
+    if(PixelDepth!=1 && PixelDepth!=8 && PixelDepth!=15 && PixelDepth!=16 && PixelDepth!=24 && PixelDepth!=32) goto x;
 
-  // Verify sanity
-  if(PixelDepth!=1 && PixelDepth!=8 && PixelDepth!=15 && PixelDepth!=16 && PixelDepth!=24 && PixelDepth!=32) return false;
+    // Bits 3-0 - number of attribute bits associated with each pixel
+    // Bit 4    - reserved.  Must be set to 0
+    // Bit 5    - screen origin bit:
+    //            0 = Origin in lower left-hand corner
+    //            1 = Origin in upper left-hand corner
+    //            Must be 0 for Truevision images
+    // Bits 7-6 - Data storage interleaving flag:
+    //            00 = non-interleaved
+    //            01 = two-way (even/odd) interleaving
+    //            10 = four way interleaving
+    //            11 = reserved
+    store >> ImageDescriptor;
 
-  // Bits 3-0 - number of attribute bits associated with each pixel
-  // Bit 4    - reserved.  Must be set to 0
-  // Bit 5    - screen origin bit:
-  //            0 = Origin in lower left-hand corner
-  //            1 = Origin in upper left-hand corner
-  //            Must be 0 for Truevision images
-  // Bits 7-6 - Data storage interleaving flag:
-  //            00 = non-interleaved
-  //            01 = two-way (even/odd) interleaving
-  //            10 = four way interleaving
-  //            11 = reserved
-  store >> ImageDescriptor;
+    // Skip over Image Identification Field; its length is IDLength
+    store.position(IDLength,FXFromCurrent);
 
-  // skip Image ID Field (18 - standard header length)
-  store.position(start+18+IDLength);
+    // Allocate memory
+    if(allocElms(data,Width*Height)){
 
-  // color map
-  if(ColorMapLength>0){
-    switch(ColorMapEntrySize){
-      case 15:
-      case 16:          // Is this also 5:5:5 or is it 5:6:5?
-        for(i=0; i<ColorMapLength; i++){
-          rgb16=read16(store);
-          colormap[i][0]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);     // Red
-          colormap[i][1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);      // Green
-          colormap[i][2]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);      // Blue
-          colormap[i][3]=255;                                   // Alpha
+      // Set return size
+      width=Width;
+      height=Height;
+
+      // Read color map
+      if(0<ColorMapLength){
+        switch(ColorMapEntrySize){
+          case 15:          // 15- or 16-bit RGB
+          case 16:
+            for(i=0; i<ColorMapLength; i++){
+              store >> rgb16;
+              colormap[i][0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);      // Blue
+              colormap[i][1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);      // Green
+              colormap[i][2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);     // Red
+              colormap[i][3]=255;                                   // Alpha
+              }
+            break;
+          case 24:           // 24-bit RGB
+            for(i=0; i<ColorMapLength; i++){
+              store >> colormap[i][0];                              // Red
+              store >> colormap[i][1];                              // Green
+              store >> colormap[i][2];                              // Blue
+              colormap[i][3]=255;                                   // Alpha
+              }
+            break;
+          case 32:          // 32-bit RGBA
+            for(i=0; i<ColorMapLength; i++){
+              store >> colormap[i][0];                              // Red
+              store >> colormap[i][1];                              // Green
+              store >> colormap[i][2];                              // Blue
+              store >> colormap[i][3];                              // Alpha
+              }
+            break;
+          default:          // Unexpected depth
+            goto x;
           }
-        break;
+        }
 
-      // R,G,B
-      case 24:
-        for(i=0; i<ColorMapLength; i++){
-          store >> colormap[i][0];
-          store >> colormap[i][1];
-          store >> colormap[i][2];
-          colormap[i][3]=255;
-          }
-        break;
+      FXTRACE((100,"fxloadTARGA: Width=%d Height=%d IDLength=%d ColorMapType=%d ColorMapLength=%d ColorMapEntrySize=%d ImageType=%d PixelDepth=%d ImageDescriptor=%02x\n",Width,Height,IDLength,ColorMapType,ColorMapLength,ColorMapEntrySize,ImageType,PixelDepth,ImageDescriptor));
 
-      // R,G,B,A
-      case 32:
-        for(i=0; i<ColorMapLength; i++){
-          store >> colormap[i][0];
-          store >> colormap[i][1];
-          store >> colormap[i][2];
-          store >> colormap[i][3];
-          }
-        break;
-
-      // Huh?
-      default:
-        return false;
+      // Load up the image
+      if(PixelDepth==32 && (ImageType==2 || ImageType==10)){
+        ok=loadTarga32(store,data,Width,Height,ImageDescriptor,ImageType);
+        }
+      else if(PixelDepth==24 && (ImageType==2 || ImageType==10)){
+        ok=loadTarga24(store,data,Width,Height,ImageDescriptor,ImageType);
+        }
+      else if(PixelDepth==16 && (ImageType==2 || ImageType==10)){
+        ok=loadTarga16(store,data,Width,Height,ImageDescriptor,ImageType);
+        }
+      else if(PixelDepth==15 && (ImageType==2 || ImageType==10)){
+        ok=loadTarga16(store,data,Width,Height,ImageDescriptor,ImageType);
+        }
+      else if(PixelDepth==8 && (ImageType==1 || ImageType==9)){
+        ok=loadTarga8(store,data,Width,Height,colormap,ImageDescriptor,ImageType);
+        }
+      else if(ImageType==3 || ImageType==11){
+        ok=loadTargaGray(store,data,Width,Height,ImageDescriptor,ImageType);
+        }
       }
+
+    // Reset byte order
+x:  store.swapBytes(swap);
     }
-
-  FXTRACE((100,"fxloadTARGA: width=%d height=%d IDLength=%d ColorMapType=%d ColorMapLength=%d ColorMapEntrySize=%d ImageType=%d PixelDepth=%d ImageDescriptor=%02x\n",width,height,IDLength,ColorMapType,ColorMapLength,ColorMapEntrySize,ImageType,PixelDepth,ImageDescriptor));
-
-  // Allocate memory
-  if(!allocElms(data,width*height)) return false;
-
-  // load up the image
-  if(PixelDepth==32 && (ImageType==2 || ImageType==10)){
-    return loadTarga32(store,data,width,height,ImageDescriptor,ImageType);
-    }
-
-  if(PixelDepth==24 && (ImageType==2 || ImageType==10)){
-    return loadTarga24(store,data,width,height,ImageDescriptor,ImageType);
-    }
-
-  if(PixelDepth==16 && (ImageType==2 || ImageType==10)){
-    return loadTarga16(store,data,width,height,ImageDescriptor,ImageType);
-    }
-
-  if(PixelDepth==15 && (ImageType==2 || ImageType==10)){
-    return loadTarga16(store,data,width,height,ImageDescriptor,ImageType);
-    }
-
-  if(PixelDepth==8 && (ImageType==1 || ImageType==9)){
-    return loadTarga8(store,data,width,height,colormap,ImageDescriptor,ImageType);
-    }
-
-  if(ImageType==3 || ImageType==11){
-    return loadTargaGray(store,data,width,height,ImageDescriptor,ImageType);
-    }
-
-  return false;
+  return ok;
   }
 
 /*******************************************************************************/
 
-static inline void write16(FXStream& store,FXuint i){
-  FXuchar c1,c2;
-  c1=i&0xff;
-  c2=(i>>8)&0xff;
-  store << c1 << c2;
-  }
-
 
 // Save a Targa file to a stream
 FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height){
-  FXuchar IDLength,ColorMapType,ImageType,ColorMapEntrySize,PixelDepth,ImageDescriptor;
-  const FXuchar *pp;
-  FXint i,j;
+  FXuchar IDLength=0;
+  FXuchar ColorMapType=0;
+  FXuchar ImageType=2;
+  FXshort ColorMapOrigin=0;
+  FXshort ColorMapLength=0;
+  FXuchar ColorMapEntrySize=0;
+  FXshort XOrg=0;
+  FXshort YOrg=0;
+  FXshort Width=width;
+  FXshort Height=height;
+  FXuchar PixelDepth=32;
+  FXuchar ImageDescriptor=8;
+  FXbool  swap;
+  FXint   i,j;
 
   // Must make sense
   if(!data || width<=0 || height<=0) return false;
 
-  IDLength=0;
-  ColorMapType=0;
-  ImageType=2;
-  PixelDepth=32;
+  // Switch to little-endian
+  swap=store.swapBytes();
+  store.setBigEndian(false);
 
-  ImageDescriptor=0;
-  ColorMapEntrySize=0;
-
-  // length of Image ID Field
+  // Length of Image ID Field
   store << IDLength;
 
-  // type of color map (if any) included with the image
-  // 0 - indicates that no color-map data is included with this image
-  // 1 - indicates that a color-map is included with this image
+  // Type of color map
   store << ColorMapType;
 
   // Image Type
-  //  0 - No image data included.
-  //  1 - Uncompressed, color-mapped images.
-  //  2 - Uncompressed, RGB images.
-  //  3 - Uncompressed, black and white images.
-  //  9 - Runlength encoded color-mapped images.
-  // 10 - Runlength encoded RGB images.
-  // 11 - Compressed, black and white images.
-  // 32 - Compressed color-mapped data, using Huffman, Delta, and runlength encoding.
-  // 33 - Compressed color-mapped data, using Huffman, Delta, and runlength encoding.
-  //      4-pass quadtree-type process.
   store << ImageType;
 
-  // Color Map Specification
-
   // Index of the first color map entry
-  write16(store,0);
+  store << ColorMapOrigin;
 
-  // Color map Length
-  write16(store,0);
+  // Color map length
+  store << ColorMapLength;
 
-  // Color map Entry Size
-  // Establishes the number of bits per entry.
-  // Typically 15, 16, 24 or 32-bit values are used.
+  // Color map entry size
   store << ColorMapEntrySize;
 
-  // Image Specification Field
+  // X-origin of image and Y-origin of image
+  store << XOrg;
+  store << YOrg;
 
-  // X-origin of Image and Y-origin of Image
-  write16(store,0);
-  write16(store,0);
+  // Width of the image in pixels
+  store << Width;
 
-  // This field specifies the width of the image in pixels
-  write16(store,width);
+  // Height of the image in pixels
+  store << Height;
 
-  // This field specifies the height of the image in pixels
-  write16(store,height);
-
-  // This field indicates the number of bits per pixel. This number includes
-  // the Attribute or Alpha channel bits. Common values are 8, 16, 24 and 32
-  // but other pixel depths could be used.
+  // This field indicates the number of bits per pixel
   store << PixelDepth;
 
   // Bits 3-0 - number of attribute bits associated with each pixel
@@ -996,15 +962,16 @@ FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height){
 
   // Write image
   for(i=height-1; i>=0; i--){
-    pp=(FXuchar*)(data+i*width);
     for(j=0; j<width; j++){
-      store << pp[2];     // blue
-      store << pp[1];     // green
-      store << pp[0];     // red
-      store << pp[3];     // alpha
-      pp+=4;
+      store << ((FXuchar*)(&data[i*width+j]))[0];
+      store << ((FXuchar*)(&data[i*width+j]))[1];
+      store << ((FXuchar*)(&data[i*width+j]))[2];
+      store << ((FXuchar*)(&data[i*width+j]))[3];
       }
     }
+
+  // Reset byte order
+  store.swapBytes(swap);
   return true;
   }
 

@@ -4,18 +4,16 @@
 AUTOMAKE_OPTIONS = foreign dist-zip
 
 SUBDIRS    = utils include lib chart doc tests shutterbug adie pathfinder calculator controlpanel windows
-EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README fox.spec fox.lsm index.html aclocal.m4
-
-bin_SCRIPTS = fox-config
+EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README fox.spec index.html aclocal.m4
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = fox.pc
+pkgconfig_DATA = fox17.pc
 
-CLEANFILES = fox.tar.gz
+CLEANFILES = $(distdir).tar.gz $(distdir).zip 
 
 snapshot: dist-all
-	cp $(distdir).tar.gz /net/linky/mnt/ftp/pub/fox-snapshot.tar.gz
-	cp $(distdir).zip /net/linky/mnt/ftp/pub/fox-snapshot.zip
+	cp $(distdir).tar.gz /net/linkyftp/pub/fox-snapshot.tar.gz
+	cp $(distdir).zip /net/linkyftp/pub/fox-snapshot.zip
 
 
 
@@ -24,13 +22,13 @@ snapshot: dist-all
 #	cp -r $(distdir)/doc/* /net/linky/mnt/html
 
 web: distdir
-	cp -r $(distdir)/doc/* /net/linky/mnt/html
+	cp -r $(distdir)/doc/* /net/linkyweb
 
 drop: dist-all
-	cp $(distdir).tar.gz /net/linky/mnt/ftp/pub
-	cp $(distdir).zip /net/linky/mnt/ftp/pub
-	cd /net/linky/mnt/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
-	cd /net/linky/mnt/ftp/pub && ln -sf $(distdir).zip fox-latest.zip
+	cp $(distdir).tar.gz /net/linkyftp/pub
+	cp $(distdir).zip /net/linkyftp/pub
+	cd /net/linkyftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
+	cd /net/linkyftp/pub && ln -sf $(distdir).zip fox-latest.zip
 
 
 #diff: distdir

@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -104,7 +104,7 @@ FXshort FXIcon::guessthresh() const {
     register FXint i,j,cum;
     memset(frequency,0,sizeof(frequency));
     for(i=0; i<width*height; ++i){
-      frequency[((const FXuchar*)(data+i))[0]+((const FXuchar*)(data+i))[1]+((const FXuchar*)(data+i))[2]]++;
+      frequency[((const FXuchar*)(data+i))[2]+((const FXuchar*)(data+i))[1]+((const FXuchar*)(data+i))[0]]++;
       }
     for(i=0,cum=0; i<766; ++i){
       if((cum+=frequency[i])>=med) break;
@@ -261,7 +261,7 @@ void FXIcon::render(){
         for(y=0; y<height; y++){
           ets-=bytes_per_line;
           for(x=0; x<width; x++){
-            if(!DARKCOLOR(((FXuchar*)(img+x))[0],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[2])){ ets[x>>3]|=0x80>>(x&7); }
+            if(!DARKCOLOR(((FXuchar*)(img+x))[2],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[0])){ ets[x>>3]|=0x80>>(x&7); }
             }
           img+=width;
           }
@@ -272,7 +272,7 @@ void FXIcon::render(){
           msk-=bytes_per_line;
           ets-=bytes_per_line;
           for(x=0; x<width; x++){
-            if(!DARKCOLOR(((FXuchar*)(img+x))[0],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[2])){ ets[x>>3]|=0x80>>(x&7); }
+            if(!DARKCOLOR(((FXuchar*)(img+x))[2],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[0])){ ets[x>>3]|=0x80>>(x&7); }
             if(img[x]==transp){ msk[x>>3]|=0x80>>(x&7); ets[x>>3]|=0x80>>(x&7); }
             }
           img+=width;
@@ -284,7 +284,7 @@ void FXIcon::render(){
           msk-=bytes_per_line;
           ets-=bytes_per_line;
           for(x=0; x<width; x++){
-            if(!DARKCOLOR(((FXuchar*)(img+x))[0],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[2])){ ets[x>>3]|=0x80>>(x&7); }
+            if(!DARKCOLOR(((FXuchar*)(img+x))[2],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[0])){ ets[x>>3]|=0x80>>(x&7); }
             if(((FXuchar*)(img+x))[3]==0){ msk[x>>3]|=0x80>>(x&7); ets[x>>3]|=0x80>>(x&7); }
             }
           img+=width;
@@ -449,7 +449,7 @@ void FXIcon::render(){
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
-            XPutPixel(xim,x,y,DARKCOLOR(((FXuchar*)(img+x))[0],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[2]));
+            XPutPixel(xim,x,y,DARKCOLOR(((FXuchar*)(img+x))[2],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[0]));
             }
           img+=width;
           }
@@ -458,7 +458,7 @@ void FXIcon::render(){
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
-            XPutPixel(xim,x,y,(img[x]!=transp) && DARKCOLOR(((FXuchar*)(img+x))[0],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[2]));
+            XPutPixel(xim,x,y,(img[x]!=transp) && DARKCOLOR(((FXuchar*)(img+x))[2],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[0]));
             }
           img+=width;
           }
@@ -467,7 +467,7 @@ void FXIcon::render(){
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
-            XPutPixel(xim,x,y,(((FXuchar*)(img+x))[3]!=0) && DARKCOLOR(((FXuchar*)(img+x))[0],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[2]));
+            XPutPixel(xim,x,y,(((FXuchar*)(img+x))[3]!=0) && DARKCOLOR(((FXuchar*)(img+x))[2],((FXuchar*)(img+x))[1],((FXuchar*)(img+x))[0]));
             }
           img+=width;
           }

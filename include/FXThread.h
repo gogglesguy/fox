@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -34,7 +34,7 @@ typedef unsigned long FXThreadID;
 
 
 /// Thread-local storage key
-typedef FXuint FXThreadStorageKey;
+typedef FXuval FXThreadStorageKey;
 
 
 class FXCondition;

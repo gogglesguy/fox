@@ -3,7 +3,7 @@
 *              F O X   P r i v a t e   I n c l u d e   F i l e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -162,7 +162,47 @@
 #include <libkern/OSAtomic.h>
 #endif
 #include <pthread.h>
+#ifdef HAVE_SEMAPHORE_H
 #include <semaphore.h>
+#endif
+#if defined(__minix)            // MINIX
+#ifdef sleep
+#undef sleep                    // We mean sleep not __pthread_sleep
+#endif
+#ifdef read
+#undef read                     // We mean read not __pthread_read
+#endif
+#ifdef write
+#undef write                    // We mean write not __pthread_write
+#endif
+#ifdef select
+#undef select                   // We mean select not __pthread_select
+#endif
+#endif
+
+// Dynamic library loading
+#ifdef HAVE_SHL_LOAD
+#include <dl.h>                 // HP-UX
+#ifndef	DYNAMIC_PATH
+#define DYNAMIC_PATH 0
+#endif
+#ifndef	BIND_RESTRICTED
+#define BIND_RESTRICTED	0
+#endif
+#else
+#ifdef HAVE_DLFCN_H
+#include <dlfcn.h>              // POSIX
+#endif
+#endif
+#ifndef RTLD_GLOBAL
+#define RTLD_GLOBAL 0           // Does not exist on DEC
+#endif
+#ifndef RTLD_NOLOAD             // Older GLIBC libraries
+#define RTLD_NOLOAD 0
+#endif
+#ifndef RTLD_NOW                // for OpenBSD
+#define RTLD_NOW DL_LAZY
+#endif
 
 // SSE Intrinsics only if available and turned on
 #if (defined(__GNUC__) || defined(__INTEL_COMPILER))
@@ -209,9 +249,8 @@
 #ifdef HAVE_XRENDER_H
 #include <X11/extensions/Xrender.h>
 #endif
-#ifdef HAVE_XINPUT_H
-#include <X11/extensions/XI.h>
-#include <X11/extensions/XInput.h>
+#ifdef HAVE_XINPUT2_H
+#include <X11/extensions/XInput2.h>
 #endif
 #ifndef NO_XIM
 #ifndef XlibSpecificationRelease        // Not defined until X11R5

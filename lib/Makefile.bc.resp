@@ -182,6 +182,7 @@
 +FXMenuTitle.obj &
 +FXMessageBox.obj &
 +FXMessageChannel.obj &
++FXMetaClass.obj &
 +FXObject.obj &
 +FXObjectList.obj &
 +FXOptionMenu.obj &
@@ -315,6 +316,9 @@
 +fxrasio.obj &
 +fxrgbio.obj &
 +fxscanf.obj &
++fxstrtoll.obj &
++fxstrtoull.obj &
++fxstrtod.obj &
 +fxtargaio.obj &
 +fxtifio.obj &
 +fxunicode.obj &
@@ -322,6 +326,5 @@
 +fxwuquantize.obj &
 +fxxbmio.obj &
 +fxxpmio.obj &
-+icons.obj &
-+strtoll.obj
++icons.obj
 

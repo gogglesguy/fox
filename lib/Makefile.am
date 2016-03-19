@@ -271,6 +271,7 @@ FXGLSphere.cpp \
 FXGLTriangleMesh.cpp \
 FXGLViewer.cpp \
 FXGLVisual.cpp \
+FXGauge.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
 FXGZFileStream.cpp \
@@ -326,6 +327,7 @@ FXMenuSeparator.cpp \
 FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
+FXMetaClass.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -458,6 +460,9 @@ fxpsio.cpp \
 fxrasio.cpp \
 fxrgbio.cpp \
 fxscanf.cpp \
+fxstrtoll.cpp \
+fxstrtoull.cpp \
+fxstrtod.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
@@ -465,10 +470,8 @@ fxutils.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
-strtoll.cpp \
 icons.cpp \
 icons.h \
-strtoll.cpp \
 jitter.h \
 version.rc \
 version.rc.in \

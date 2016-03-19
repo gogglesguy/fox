@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -470,7 +470,8 @@ using namespace FX;
 
 /*******************************************************************************/
 
-namespace {
+namespace FX {
+
 
 // Opcodes of the engine
 enum {
@@ -2624,11 +2625,9 @@ FXbool FXExecute::execute(const FXchar* fm,const FXchar* to){
   return false;
   }
 
-}
 
 /*******************************************************************************/
 
-namespace FX {
 
 // Table of error messages
 const FXchar *const FXRex::errors[]={

@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -326,15 +326,15 @@ void FXGradientBar::gradient(FXColor *ramp,FXint nramp){
   for(s=0; s<nsegs; s++){
 
     // Lower color components
-    lr=((FXuchar*)&seg[s].lowerColor)[0];
+    lb=((FXuchar*)&seg[s].lowerColor)[0];
     lg=((FXuchar*)&seg[s].lowerColor)[1];
-    lb=((FXuchar*)&seg[s].lowerColor)[2];
+    lr=((FXuchar*)&seg[s].lowerColor)[2];
     la=((FXuchar*)&seg[s].lowerColor)[3];
 
     // Upper color components
-    ur=((FXuchar*)&seg[s].upperColor)[0];
+    ub=((FXuchar*)&seg[s].upperColor)[0];
     ug=((FXuchar*)&seg[s].upperColor)[1];
-    ub=((FXuchar*)&seg[s].upperColor)[2];
+    ur=((FXuchar*)&seg[s].upperColor)[2];
     ua=((FXuchar*)&seg[s].upperColor)[3];
 
     // Pixel range of segment
@@ -358,9 +358,9 @@ void FXGradientBar::gradient(FXColor *ramp,FXint nramp){
         FXASSERT(0<=i && i<nramp);
         f=blend(((FXdouble)m-(FXdouble)l)/(FXdouble)d,((FXdouble)i-(FXdouble)l)/(FXdouble)d);
         t=1.0-f;
-        ((FXuchar*)&ramp[i])[0]=(FXuchar)(t*lr+f*ur+0.5);
+        ((FXuchar*)&ramp[i])[0]=(FXuchar)(t*lb+f*ub+0.5);
         ((FXuchar*)&ramp[i])[1]=(FXuchar)(t*lg+f*ug+0.5);
-        ((FXuchar*)&ramp[i])[2]=(FXuchar)(t*lb+f*ub+0.5);
+        ((FXuchar*)&ramp[i])[2]=(FXuchar)(t*lr+f*ur+0.5);
         ((FXuchar*)&ramp[i])[3]=(FXuchar)(t*la+f*ua+0.5);
         }
       }
@@ -387,9 +387,9 @@ void FXGradientBar::updatebar(){
 
     // Fill image
     for(y=0; y<barh; y++){
-      r=((FXuchar*)&ramp[y])[0];
+      b=((FXuchar*)&ramp[y])[0];
       g=((FXuchar*)&ramp[y])[1];
-      b=((FXuchar*)&ramp[y])[2];
+      r=((FXuchar*)&ramp[y])[2];
       a=((FXuchar*)&ramp[y])[3];
       clr=FXRGB(BLEND(r,255,a), BLEND(g,255,a), BLEND(b,255,a));
       for(x=0; x<barw/2; x++){
@@ -413,9 +413,9 @@ void FXGradientBar::updatebar(){
 
     // Fill image
     for(x=0; x<barw; x++){
-      r=((FXuchar*)&ramp[x])[0];
+      b=((FXuchar*)&ramp[x])[0];
       g=((FXuchar*)&ramp[x])[1];
-      b=((FXuchar*)&ramp[x])[2];
+      r=((FXuchar*)&ramp[x])[2];
       a=((FXuchar*)&ramp[x])[3];
       clr=FXRGB(BLEND(r,255,a), BLEND(g,255,a), BLEND(b,255,a));
       for(y=0; y<barh/2; y++){

@@ -3,7 +3,7 @@
 *                        G I F   I n p u t / O u t p u t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -161,9 +161,9 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXboo
   // Read global map if there is one
   if(flagbits&0x80){
     for(i=0; i<ncolors; i++){
-      store >> ((FXuchar*)(colormap+i))[0];     // Blue
-      store >> ((FXuchar*)(colormap+i))[1];     // Green
       store >> ((FXuchar*)(colormap+i))[2];     // Red
+      store >> ((FXuchar*)(colormap+i))[1];     // Green
+      store >> ((FXuchar*)(colormap+i))[0];     // Blue
       ((FXuchar*)(colormap+i))[3]=255;          // Alpha
       }
     }
@@ -220,9 +220,9 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXboo
       if(flagbits&0x80){
         ncolors=2<<(flagbits&7);
         for(i=0; i<ncolors; i++){
-          store >> ((FXuchar*)(colormap+i))[0]; // Red
+          store >> ((FXuchar*)(colormap+i))[2]; // Red
           store >> ((FXuchar*)(colormap+i))[1]; // Green
-          store >> ((FXuchar*)(colormap+i))[2]; // Blue
+          store >> ((FXuchar*)(colormap+i))[0]; // Blue
           ((FXuchar*)(colormap+i))[3]=255;      // Alpha
           }
         }
@@ -517,14 +517,14 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
 
   // Output colormap
   for(i=0; i<colormapsize; i++){
-    store << ((FXuchar*)(colormap+i))[0]; // Blue
+    store << ((FXuchar*)(colormap+i))[2]; // Blue
     store << ((FXuchar*)(colormap+i))[1]; // Green
-    store << ((FXuchar*)(colormap+i))[2]; // Red
+    store << ((FXuchar*)(colormap+i))[0]; // Red
     }
 
   // Output Graphics Control Extension, if alpha is present
   for(i=0,alpha=0; i<ncolors; i++){
-    if(((FXuchar*)(colormap+i))[3]==0){
+    if(((FXuchar*)(colormap+i))[0]==0){
       alpha=i;
       store << TAG_EXTENSION;   // Extension Introducer
       store << TAG_GRAPHIC;     // Graphic Control Label

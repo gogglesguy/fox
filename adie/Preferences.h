@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -34,6 +34,7 @@ protected:
   FXText          *filepattext;
   FXList          *stylelist;
   FXTextField     *searchtext;
+  FXTextField     *syntaxtext;
   FXIcon          *pal;
   FXIcon          *ind;
   FXIcon          *pat;
@@ -59,10 +60,16 @@ public:
 
   // Set search paths
   void setSearchPaths(const FXString& paths);
-  
+
   // Get search paths
   FXString getSearchPaths() const;
-  
+
+  // Set syntax file paths
+  void setSyntaxPaths(const FXString& paths);
+
+  // Get syntax file paths
+  FXString getSyntaxPaths() const;
+
   // Set language syntax
   void setSyntax(FXSyntax* syn);
 

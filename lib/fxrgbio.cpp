@@ -3,7 +3,7 @@
 *                    I R I S   R G B   I n p u t / O u t p u t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -156,7 +156,7 @@ FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
             // Load all RLE chunks
             store.load(array,total);
-            for(c=0; c<3; c++){
+            for(c=2; c>=0; c--){
               for(j=h-1; j>=0; j--){
                 expandrow(((FXuchar*)(data+j*w))+c,&array[starttab[h-1-j+c*h]]);
                 }
@@ -173,7 +173,7 @@ FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
       // NON compressed
       else{
-        for(c=0; c<3; c++){
+        for(c=2; c>=0; c--){
           for(j=h-1; j>=0; j--){
             store.load(temp,w);
             for(i=0; i<w; i++) ((FXuchar*)(data+j*w+i))[c]=temp[i];
@@ -242,7 +242,7 @@ FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
     store.save(temp,404);       // DUMMY (404)
 
     // Write pixels
-    for(c=0; c<3; c++){
+    for(c=2; c>=0; c--){
       for(j=height-1; j>=0; j--){
         for(i=0; i<width; i++) temp[i]=((FXuchar*)(data+j*width+i))[c];
         store.save(temp,width);

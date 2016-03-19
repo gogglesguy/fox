@@ -3,7 +3,7 @@
 *             D y n a m i c   L i n k   L i b r a r y   S u p p o r t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -25,31 +25,6 @@
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXDLL.h"
-#ifndef WIN32
-#ifdef HAVE_SHL_LOAD
-#include <dl.h>                 // HP-UX
-#else
-#include <dlfcn.h>              // POSIX
-#endif
-#endif
-#ifndef RTLD_GLOBAL
-#define RTLD_GLOBAL 0           // Does not exist on DEC
-#endif
-#ifndef RTLD_NOLOAD             // Older GLIBC libraries
-#define RTLD_NOLOAD 0
-#endif
-#ifndef RTLD_NOW                // for OpenBSD
-#define RTLD_NOW DL_LAZY
-#endif
-#ifdef HAVE_SHL_LOAD
-#ifndef	DYNAMIC_PATH            // HP-UX
-#define DYNAMIC_PATH 0
-#endif
-#ifndef	BIND_RESTRICTED
-#define BIND_RESTRICTED	0
-#endif
-#endif
-
 
 /*
   Notes:
@@ -101,6 +76,8 @@ FXString FXDLL::name() const {
     if(shl_gethandle_r((shl_t)hnd,&desc)!=-1){
       return FXString(desc.filename);
       }
+#elif defined(__minix)          // MINIX
+    //// NOT SUPPORTED ////
 #else                           // POSIX
     Dl_info info;
     void *ptr=dlsym(hnd,"_init");       // FIXME any better way?
@@ -142,6 +119,8 @@ FXbool FXDLL::load(const FXString& nm){
     hnd=LoadLibraryExA(nm.text(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
     hnd=shl_load(nm.text(),BIND_IMMEDIATE|BIND_NONFATAL|DYNAMIC_PATH,0L);
+#elif defined(__minix)          // MINIX
+    //// NOT SUPPORTED ////
 #else			        // POSIX
     hnd=dlopen(nm.text(),RTLD_NOW|RTLD_GLOBAL);
 #endif
@@ -157,6 +136,8 @@ void FXDLL::unload(){
     FreeLibrary((HMODULE)hnd);
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
     shl_unload((shl_t)hnd);
+#elif defined(__minix)          // MINIX
+    //// NOT SUPPORTED ////
 #else			        // POSIX
     dlclose(hnd);
 #endif
@@ -173,6 +154,8 @@ void* FXDLL::address(const FXchar* sym) const {
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
     void* ptr=NULL;
     if(shl_findsym((shl_t*)&hnd,sym,TYPE_UNDEFINED,&ptr)==0) return ptr;
+#elif defined(__minix)          // MINIX
+    //// NOT SUPPORTED ////
 #else			        // POSIX
     return dlsym(hnd,sym);
 #endif
@@ -193,6 +176,8 @@ FXString FXDLL::symbol(void *addr){
   // FIXME //
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
   // FIXME //
+#elif defined(__minix)          // MINIX
+  //// NOT SUPPORTED ////
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
@@ -215,6 +200,8 @@ FXString FXDLL::name(void *addr){
     }
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
   // FIXME //
+#elif defined(__minix)          // MINIX
+  //// NOT SUPPORTED ////
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
@@ -241,6 +228,8 @@ FXDLL FXDLL::dll(void* addr){
     }
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
   // FIXME //
+#elif defined(__minix)          // MINIX
+  //// NOT SUPPORTED ////
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
@@ -270,6 +259,8 @@ FXString FXDLL::error(){
   return FXString(buffer);
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
   return FXString::null;
+#elif defined(__minix)          // MINIX
+  //// NOT SUPPORTED ////
 #else			        // POSIX
   return FXString(dlerror());
 #endif
@@ -291,4 +282,3 @@ FXAUTODLL::~FXAUTODLL(){
   }
 
 }
-

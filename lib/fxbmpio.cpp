@@ -3,7 +3,7 @@
 *                          B M P   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,14 +72,14 @@ FXbool fxcheckBMP(FXStream& store){
 
 // Load image from stream
 FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXint biXPelsPerMeter,biYPelsPerMeter,biClrUsed,biClrImportant,biCompression,biSize;
-  FXint biWidth,biHeight,biSizeImage,bfOffBits,bfSize,i,j,x,y,maxpixels,colormaplen,padw,pad;
+  FXint    biXPelsPerMeter,biYPelsPerMeter,biClrUsed,biClrImportant,biCompression,biSize;
+  FXint    biWidth,biHeight,biSizeImage,bfOffBits,bfSize,i,j,x,y,maxpixels,colormaplen,padw,pad;
   FXushort bfType,bfReserved,biBitCount,biPlanes,rgb16;
-  FXColor colormap[256],*pp;
-  FXuchar padding[3],c1,c2;
-  FXlong base,header;
-  FXbool swap;
-  FXbool ok=false;
+  FXColor  colormap[256],*pp;
+  FXuchar  padding[3],c1,c2;
+  FXlong   base,header;
+  FXbool   swap;
+  FXbool   ok=false;
 
   // Null out
   data=NULL;
@@ -154,17 +154,17 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     FXASSERT(colormaplen<=256);
     if(biSize!=OS2_OLD){
       for(i=0; i<colormaplen; i++){
-        store >> c1; ((FXuchar*)(colormap+i))[2]=c1;      // Blue
+        store >> c1; ((FXuchar*)(colormap+i))[0]=c1;      // Blue
         store >> c1; ((FXuchar*)(colormap+i))[1]=c1;      // Green
-        store >> c1; ((FXuchar*)(colormap+i))[0]=c1;      // Red
+        store >> c1; ((FXuchar*)(colormap+i))[2]=c1;      // Red
         store >> c1; ((FXuchar*)(colormap+i))[3]=255;     // Opaque
         }
       }
     else{
       for(i=0; i<colormaplen; i++){
-        store >> c1; ((FXuchar*)(colormap+i))[2]=c1;      // Blue
+        store >> c1; ((FXuchar*)(colormap+i))[0]=c1;      // Blue
         store >> c1; ((FXuchar*)(colormap+i))[1]=c1;      // Green
-        store >> c1; ((FXuchar*)(colormap+i))[0]=c1;      // Red
+        store >> c1; ((FXuchar*)(colormap+i))[2]=c1;      // Red
                      ((FXuchar*)(colormap+i))[3]=255;     // Opaque
         }
       }
@@ -299,10 +299,10 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         pp=data+i*biWidth;
         for(j=0; j<biWidth; j++,pp++){
           store >> rgb16;
-          ((FXuchar*)pp)[0]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);  // Red
-          ((FXuchar*)pp)[1]=((rgb16>>2)&0xf8)+((rgb16>> 7)&7);  // Green
-          ((FXuchar*)pp)[2]=((rgb16<<3)&0xf8)+((rgb16>> 2)&7);  // Blue
           ((FXuchar*)pp)[3]=255;                                // Alpha
+          ((FXuchar*)pp)[2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);  // Red
+          ((FXuchar*)pp)[1]=((rgb16>>2)&0xf8)+((rgb16>> 7)&7);  // Green
+          ((FXuchar*)pp)[0]=((rgb16<<3)&0xf8)+((rgb16>> 2)&7);  // Blue
           }
         store.load(padding,pad);
         }
@@ -312,9 +312,9 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       for(i=biHeight-1; i>=0; i--){
         pp=data+i*biWidth;
         for(j=0; j<biWidth; j++,pp++){
-          store >> ((FXuchar*)pp)[2];           // Blue
+          store >> ((FXuchar*)pp)[0];           // Blue
           store >> ((FXuchar*)pp)[1];           // Green
-          store >> ((FXuchar*)pp)[0];           // Red
+          store >> ((FXuchar*)pp)[2];           // Red
                    ((FXuchar*)pp)[3]=255;       // Alpha
           }
         store.load(padding,pad);
@@ -324,9 +324,9 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       for(i=biHeight-1; i>=0; i--){
         pp=data+i*biWidth;
         for(j=0; j<biWidth; j++,pp++){
-          store >> ((FXuchar*)pp)[2];           // Blue
+          store >> ((FXuchar*)pp)[0];           // Blue
           store >> ((FXuchar*)pp)[1];           // Green
-          store >> ((FXuchar*)pp)[0];           // Red
+          store >> ((FXuchar*)pp)[2];           // Red
           store >> ((FXuchar*)pp)[3];           // Alpha
           }
         }
@@ -414,9 +414,9 @@ FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
     for(i=height-1; i>=0; i--){
       pp=data+i*width;
       for(j=0; j<width; j++,pp++){
-        store << ((FXuchar*)pp)[2];
-        store << ((FXuchar*)pp)[1];
         store << ((FXuchar*)pp)[0];
+        store << ((FXuchar*)pp)[1];
+        store << ((FXuchar*)pp)[2];
         }
       store.save(padding,pad);
       }
@@ -427,9 +427,9 @@ FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
     for(i=height-1; i>=0; i--){
       pp=data+i*width;
       for(j=0; j<width; j++,pp++){
-        store << ((FXuchar*)pp)[2];
-        store << ((FXuchar*)pp)[1];
         store << ((FXuchar*)pp)[0];
+        store << ((FXuchar*)pp)[1];
+        store << ((FXuchar*)pp)[2];
         store << ((FXuchar*)pp)[3];
         }
       }

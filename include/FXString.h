@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -368,7 +368,7 @@ public:
   FXString right(FXint n) const;
 
   /// Get some part in the middle
-  FXString mid(FXint pos,FXint n) const;
+  FXString mid(FXint pos,FXint n=2147483647) const;
 
   /**
   * Return all characters before the n-th occurrence of ch,
@@ -489,22 +489,22 @@ public:
   FXint vformat(const FXchar* fmt,va_list args);
 
   /// Convert to long integer
-  FXlong toLong(FXint base=10) const;
+  FXlong toLong(FXint base=10,FXbool* ok=NULL) const;
 
   /// Convert to unsigned long integer
-  FXulong toULong(FXint base=10) const;
+  FXulong toULong(FXint base=10,FXbool* ok=NULL) const;
 
   /// Convert to integer
-  FXint toInt(FXint base=10) const;
+  FXint toInt(FXint base=10,FXbool* ok=NULL) const;
 
   /// Convert to unsigned integer
-  FXuint toUInt(FXint base=10) const;
+  FXuint toUInt(FXint base=10,FXbool* ok=NULL) const;
 
   /// Convert to double
-  FXdouble toDouble() const;
+  FXdouble toDouble(FXbool* ok=NULL) const;
 
   /// Convert to float
-  FXfloat toFloat() const;
+  FXfloat toFloat(FXbool* ok=NULL) const;
 
   /// Convert from long integer
   FXString& fromLong(FXlong number,FXint base=10);
@@ -556,24 +556,15 @@ public:
   */
   static FXString vvalue(const FXchar* fmt,va_list args);
 
-  /// Check if the string contains special characters or leading or trailing whitespace
-  FXbool shouldEscape(FXchar lquote=0,FXchar rquote=0) const;
-
-  /// Escape special characters, and optionally enclose with left and right quotes
-  FXString escape(FXchar lquote=0,FXchar rquote=0);
-
-  /// Unescape special characters, and optionally remove left and right quotes
-  FXString unescape(FXchar lquote=0,FXchar rquote=0);
-
   /// Get hash value
   FXuint hash() const;
 
   /// Append operators
-  FXString& operator+=(const FXString& s);
+  FXString& operator+=(FXchar c);
   FXString& operator+=(const FXchar* s);
   FXString& operator+=(const FXwchar* s);
   FXString& operator+=(const FXnchar* s);
-  FXString& operator+=(FXchar c);
+  FXString& operator+=(const FXString& s);
 
   /// Swap two strings
   friend inline void swap(FXString& a,FXString& b);
@@ -687,6 +678,15 @@ extern FXAPI FXString& unixToDos(FXString& str);
 
 /// Convert dos string to unix string
 extern FXAPI FXString& dosToUnix(FXString& str);
+
+/// Check if the string contains special characters or leading or trailing whitespace
+extern FXAPI FXbool shouldEscape(const FXString& str,FXchar lquote=0,FXchar rquote=0);
+
+/// Escape special characters, and optionally enclose with left and right quotes; enquote utf8 if flag is true
+extern FXAPI FXString escape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXbool flag=false);
+
+/// Unescape special characters, and optionally remove left and right quotes
+extern FXAPI FXString unescape(const FXString& str,FXchar lquote=0,FXchar rquote=0);
 
 /// Return normalized string, i.e. reordering of diacritical marks
 extern FXAPI FXString normalize(const FXString& s);

@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2010 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,7 +51,7 @@ FXQuatf::FXQuatf(FXfloat roll,FXfloat pitch,FXfloat yaw){
 
 // Construct quaternion from two unit vectors
 FXQuatf::FXQuatf(const FXVec3f& fr,const FXVec3f& to){
-  arc(fr,to);
+  set(arc(fr,to));
   }
 
 
@@ -61,17 +61,11 @@ FXQuatf::FXQuatf(const FXVec3f& ex,const FXVec3f& ey,const FXVec3f& ez){
   }
 
 
-// Construct quaternion from 3x3 matrix
-FXQuatf::FXQuatf(const FXMat3f& mat){
-  setAxes(mat[0],mat[1],mat[2]);
-  }
-
-
 // Adjust quaternion length
 FXQuatf& FXQuatf::adjust(){
   register FXfloat t=length2();
   register FXfloat f;
-  if(t>0.0f){
+  if(__likely(t>0.0f)){
     f=1.0f/sqrtf(t);
     x*=f;
     y*=f;
@@ -86,20 +80,19 @@ FXQuatf& FXQuatf::adjust(){
 void FXQuatf::setAxisAngle(const FXVec3f& axis,FXfloat phi){
   register FXfloat mag=axis.length();
   register FXfloat a,m;
-  if(0.0f<mag){
+  if(__likely(0.0f<mag)){
     a=0.5f*phi;
     m=sinf(a)/mag;
     x=axis.x*m;
     y=axis.y*m;
     z=axis.z*m;
     w=cosf(a);
+    return;
     }
-  else{
-    x=0.0f;
-    y=0.0f;
-    z=0.0f;
-    w=1.0f;
-    }
+  x=0.0f;
+  y=0.0f;
+  z=0.0f;
+  w=1.0f;
   }
 
 
@@ -108,19 +101,18 @@ void FXQuatf::setAxisAngle(const FXVec3f& axis,FXfloat phi){
 void FXQuatf::getAxisAngle(FXVec3f& axis,FXfloat& phi) const {
   register FXfloat mag=x*x+y*y+z*z;
   register FXfloat m;
-  if(0.0f<mag){
+  if(__likely(0.0f<mag)){
     m=sqrtf(mag);
     axis.x=x/m;
     axis.y=y/m;
     axis.z=z/m;
     phi=2.0f*acosf(w/sqrtf(mag+w*w));
+    return;
     }
-  else{
-    axis.x=1.0f;
-    axis.y=0.0f;
-    axis.z=0.0f;
-    phi=0.0f;
-    }
+  axis.x=1.0f;
+  axis.y=0.0f;
+  axis.z=0.0f;
+  phi=0.0f;
   }
 
 
@@ -227,8 +219,8 @@ void FXQuatf::setYawRollPitch(FXfloat yaw,FXfloat roll,FXfloat pitch){
 // asin doesn't like arguments outside [-1,1].
 void FXQuatf::getRollPitchYaw(FXfloat& roll,FXfloat& pitch,FXfloat& yaw) const {
   register FXfloat s=-2.0f*(x*z-w*y);
-  if(s<1.0f){
-    if(-1.0f<s){
+  if(__likely(s<1.0f)){
+    if(__likely(-1.0f<s)){
       roll=atan2f(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+y*y));
       pitch=asinf(s);
       yaw=atan2f(2.0f*(x*y+w*z),1.0f-2.0f*(y*y+z*z));
@@ -250,8 +242,8 @@ void FXQuatf::getRollPitchYaw(FXfloat& roll,FXfloat& pitch,FXfloat& yaw) const {
 // Obtain yaw, pitch, and roll
 void FXQuatf::getYawPitchRoll(FXfloat& yaw,FXfloat& pitch,FXfloat& roll) const {
   register FXfloat s=2.0f*(x*z+w*y);
-  if(s<1.0f){
-    if(-1.0f<s){
+  if(__likely(s<1.0f)){
+    if(__likely(-1.0f<s)){
       yaw=atan2f(-2.0f*(x*y-w*z),1.0f-2.0f*(y*y+z*z));
       pitch=asinf(s);
       roll=atan2f(-2.0f*(y*z-w*x),1.0f-2.0f*(x*x+y*y));
@@ -273,8 +265,8 @@ void FXQuatf::getYawPitchRoll(FXfloat& yaw,FXfloat& pitch,FXfloat& roll) const {
 // Obtain roll, yaw, pitch
 void FXQuatf::getRollYawPitch(FXfloat& roll,FXfloat& yaw,FXfloat& pitch) const {
   register FXfloat s=2.0f*(x*y+w*z);
-  if(s<1.0f){
-    if(-1.0f<s){
+  if(__likely(s<1.0f)){
+    if(__likely(-1.0f<s)){
       roll=atan2f(-2.0f*(y*z-w*x),1.0f-2.0f*(x*x+z*z));
       yaw=asinf(s);
       pitch=atan2f(-2.0f*(x*z-w*y),1.0f-2.0f*(y*y+z*z));
@@ -296,8 +288,8 @@ void FXQuatf::getRollYawPitch(FXfloat& roll,FXfloat& yaw,FXfloat& pitch) const {
 // Obtain pitch, roll, yaw
 void FXQuatf::getPitchRollYaw(FXfloat& pitch,FXfloat& roll,FXfloat& yaw) const {
   register FXfloat s=2.0f*(y*z+w*x);
-  if(s<1.0f){
-    if(-1.0f<s){
+  if(__likely(s<1.0f)){
+    if(__likely(-1.0f<s)){
       pitch=atan2f(-2.0f*(x*z-w*y),1.0f-2.0f*(x*x+y*y));
       roll=asinf(s);
       yaw=atan2f(-2.0f*(x*y-w*z),1.0f-2.0f*(x*x+z*z));
@@ -319,8 +311,8 @@ void FXQuatf::getPitchRollYaw(FXfloat& pitch,FXfloat& roll,FXfloat& yaw) const {
 // Obtain pitch, yaw, roll
 void FXQuatf::getPitchYawRoll(FXfloat& pitch,FXfloat& yaw,FXfloat& roll) const {
   register FXfloat s=-2.0f*(x*y-w*z);
-  if(s<1.0f){
-    if(-1.0f<s){
+  if(__likely(s<1.0f)){
+    if(__likely(-1.0f<s)){
       pitch=atan2f(2.0f*(x*z+w*y),1.0f-2.0f*(y*y+z*z));
       yaw=asinf(s);
       roll=atan2f(2.0f*(y*z+w*x),1.0f-2.0f*(x*x+z*z));
@@ -342,8 +334,8 @@ void FXQuatf::getPitchYawRoll(FXfloat& pitch,FXfloat& yaw,FXfloat& roll) const {
 // Obtain yaw, roll, pitch
 void FXQuatf::getYawRollPitch(FXfloat& yaw,FXfloat& roll,FXfloat& pitch) const {
   register FXfloat s=-2.0f*(y*z-w*x);
-  if(s<1.0f){
-    if(-1.0f<s){
+  if(__likely(s<1.0f)){
+    if(__likely(-1.0f<s)){
       yaw=atan2f(2.0f*(x*y+w*z),1.0f-2.0f*(x*x+z*z));
       roll=asinf(s);
       pitch=atan2f(2.0f*(x*z+w*y),1.0f-2.0f*(x*x+y*y));
@@ -455,7 +447,7 @@ FXQuatf FXQuatf::exp() const {
   register FXfloat theta=sqrtf(x*x+y*y+z*z);
   register FXfloat scale;
   FXQuatf result(x,y,z,cosf(theta));
-  if(theta>0.000001f){
+  if(__likely(0.000001f<theta)){
     scale=sinf(theta)/theta;
     result.x*=scale;
     result.y*=scale;
@@ -472,13 +464,19 @@ FXQuatf FXQuatf::log() const {
   register FXfloat scale=sqrtf(x*x+y*y+z*z);
   register FXfloat theta=atan2f(scale,w);
   FXQuatf result(x,y,z,0.0f);
-  if(scale>0.0f){
+  if(__likely(0.0f<scale)){
     scale=theta/scale;
     result.x*=scale;
     result.y*=scale;
     result.z*=scale;
     }
   return result;
+  }
+
+
+// Power of quaternion
+FXQuatf FXQuatf::pow(FXfloat t) const {
+  return (log()*t).exp();
   }
 
 
@@ -498,97 +496,6 @@ FXQuatf FXQuatf::unitinvert() const {
 // Conjugate quaternion
 FXQuatf FXQuatf::conj() const {
   return FXQuatf(-x,-y,-z,w);
-  }
-
-
-// Construct quaternion from arc a->b on unit sphere.
-//
-// Explanation: a quaternion which rotates by angle theta about unit axis a
-// is specified as:
-//
-//   q = (a * sin(theta/2), cos(theta/2)).
-//
-// Assuming is f and t are unit length, we have:
-//
-//  sin(theta) = | f x t |
-//
-// and
-//
-//  cos(theta) = f . t
-//
-// Using sin(2 * x) = 2 * sin(x) * cos(x), we get:
-//
-//  a * sin(theta/2) = (f x t) * sin(theta/2) / (2 * sin(theta/2) * cos(theta/2))
-//
-//                   = (f x t) / (2 * cos(theta/2))
-//
-// Using cos^2(x)=(1 + cos(2 * x)) / 2, we get:
-//
-//  4 * cos^2(theta/2) = 2 + 2 * cos(theta)
-//
-//                     = 2 + 2 * (f . t)
-// Ergo:
-//
-//  2 * cos(theta/2)   = sqrt(2 + 2 * (f . t))
-//
-FXQuatf& FXQuatf::arc(const FXVec3f& f,const FXVec3f& t){
-  register FXfloat dot=f.x*t.x+f.y*t.y+f.z*t.z,div;
-  if(dot> 0.999999f){           // Unit quaternion
-    x=0.0f;
-    y=0.0f;
-    z=0.0f;
-    w=1.0f;
-    }
-  else if(dot<-0.999999f){      // 180 quaternion (Stephen Hardy)
-    x=f.y-f.z;
-    y=f.z-f.x;
-    z=f.x-f.y;
-    dot=x*x+y*y+z*z;
-    if(dot<0.1f){               // Ensure non-zero orthogonal vector
-      x=-f.y-f.z;
-      y=f.x-f.z;
-      z=f.x+f.y;
-      dot=x*x+y*y+z*z;
-      }
-    div=sqrtf(dot);             // Renormalize axis
-    x/=div;
-    y/=div;
-    z/=div;
-    w=0.0f;
-    }
-  else{
-    div=sqrtf((dot+1.0f)*2.0f);
-    x=(f.y*t.z-f.z*t.y)/div;
-    y=(f.z*t.x-f.x*t.z)/div;
-    z=(f.x*t.y-f.y*t.x)/div;
-    w=div*0.5f;
-    }
-  return *this;
-  }
-
-
-// Spherical lerp
-FXQuatf& FXQuatf::lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f){
-  register FXfloat alpha,beta,theta,sin_t,cos_t;
-  register FXint flip=0;
-  cos_t = u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
-  if(cos_t<0.0f){ cos_t = -cos_t; flip=1; }
-  if((1.0f-cos_t)<0.000001f){
-    beta = 1.0f-f;
-    alpha = f;
-    }
-  else{
-    theta = acosf(cos_t);
-    sin_t = sinf(theta);
-    beta = sinf(theta-f*theta)/sin_t;
-    alpha = sinf(f*theta)/sin_t;
-    }
-  if(flip) alpha = -alpha;
-  x=beta*u.x+alpha*v.x;
-  y=beta*u.y+alpha*v.y;
-  z=beta*u.z+alpha*v.z;
-  w=beta*u.w+alpha*v.w;
-  return *this;
   }
 
 
@@ -631,12 +538,132 @@ giving us the final formula:
 v' = v + 2(s x (s x v + vw))
 */
 
+// FIXME try the above
+// FIXME remove dependence on FXMat3f.
 
 // Rotation of a vector by a quaternion; this is defined as q.v.q*
 // where q* is the conjugate of q.
 FXVec3f FXQuatf::operator*(const FXVec3f& v) const {
   return v*FXMat3f(*this);
   }
+
+
+// Construct quaternion from arc a->b on unit sphere.
+//
+// Explanation: a quaternion which rotates by angle theta about unit axis a
+// is specified as:
+//
+//   q = (a * sin(theta/2), cos(theta/2)).
+//
+// Assuming is f and t are unit length, we have:
+//
+//  sin(theta) = | f x t |
+//
+// and
+//
+//  cos(theta) = f . t
+//
+// Using sin(2 * x) = 2 * sin(x) * cos(x), we get:
+//
+//  a * sin(theta/2) = (f x t) * sin(theta/2) / (2 * sin(theta/2) * cos(theta/2))
+//
+//                   = (f x t) / (2 * cos(theta/2))
+//
+// Using cos^2(x)=(1 + cos(2 * x)) / 2, we get:
+//
+//  4 * cos^2(theta/2) = 2 + 2 * cos(theta)
+//
+//                     = 2 + 2 * (f . t)
+// Ergo:
+//
+//  2 * cos(theta/2)   = sqrt(2 + 2 * (f . t))
+//
+FXQuatf arc(const FXVec3f& f,const FXVec3f& t){
+  register FXfloat dot=f.x*t.x+f.y*t.y+f.z*t.z,div;
+  FXQuatf result;
+  if(__unlikely(dot> 0.999999f)){       // Unit quaternion
+    result.x=0.0f;
+    result.y=0.0f;
+    result.z=0.0f;
+    result.w=1.0f;
+    }
+  else if(__unlikely(dot<-0.999999f)){  // 180 quaternion (Stephen Hardy)
+    result.x=f.y-f.z;
+    result.y=f.z-f.x;
+    result.z=f.x-f.y;
+    dot=result.x*result.x+result.y*result.y+result.z*result.z;
+    if(dot<0.1f){                       // Ensure non-zero orthogonal vector
+      result.x=-f.y-f.z;
+      result.y=f.x-f.z;
+      result.z=f.x+f.y;
+      dot=result.x*result.x+result.y*result.y+result.z*result.z;
+      }
+    div=sqrtf(dot);                     // Renormalize axis
+    result.x/=div;
+    result.y/=div;
+    result.z/=div;
+    result.w=0.0f;
+    }
+  else{
+    div=sqrtf((dot+1.0f)*2.0f);
+    result.x=(f.y*t.z-f.z*t.y)/div;
+    result.y=(f.z*t.x-f.x*t.z)/div;
+    result.z=(f.x*t.y-f.y*t.x)/div;
+    result.w=div*0.5f;
+    }
+  return result;
+  }
+
+
+// Spherical lerp of unit quaternions u,v
+// This is equivalent to: u * (u.unitinvert()*v).pow(f)
+FXQuatf lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f){
+  register FXfloat dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
+  register FXfloat cost=fabsf(dot);
+  register FXfloat sint;
+  register FXfloat fr=1.0f-f;
+  register FXfloat to=f;
+  register FXfloat theta;
+  FXQuatf result;
+  if(__likely(cost<0.999999f)){
+    sint=sqrtf(1.0f-cost*cost);
+    theta=atan2f(sint,cost);
+    fr=sinf(fr*theta)/sint;
+    to=sinf(to*theta)/sint;
+    }
+  if(dot<0.0f) to=-to;
+  result.x=fr*u.x+to*v.x;
+  result.y=fr*u.y+to*v.y;
+  result.z=fr*u.z+to*v.z;
+  result.w=fr*u.w+to*v.w;
+  return result;
+  }
+
+
+// Derivative of spherical lerp of unit quaternions u,v 
+// This is equivalent to: u * (u.unitinvert()*v).pow(f) * (u.unitinvert()*v).log(),
+// which is itself equivalent to: lerp(u,v,f) * (u.unitinvert()*v).log()
+FXQuatf lerpdot(const FXQuatf& u,const FXQuatf& v,FXfloat f){
+  register FXfloat dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
+  register FXfloat cost=fabsf(dot);
+  register FXfloat sint;
+  register FXfloat fr=1.0f-f;
+  register FXfloat to=f;
+  register FXfloat theta;
+  FXQuatf result;
+  if(__likely(cost<0.999999f)){
+    sint=sqrtf(1.0f-cost*cost);
+    theta=atan2f(sint,cost);
+    fr=-theta*cosf(fr*theta)/sint;
+    to=theta*cosf(to*theta)/sint;
+    }
+  result.x=fr*u.x+to*v.x;
+  result.y=fr*u.y+to*v.y;
+  result.z=fr*u.z+to*v.z;
+  result.w=fr*u.w+to*v.w;
+  return result;
+  }
+
 
 // Save vector to stream
 FXStream& operator<<(FXStream& store,const FXQuatf& v){
