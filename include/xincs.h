@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: xincs.h,v 1.87 2009/01/06 13:07:30 fox Exp $                             *
 ********************************************************************************/
 #ifndef XINCS_H
 #define XINCS_H
@@ -268,8 +266,6 @@ extern "C" char *XSetIMValues(XIM,...);
 #ifdef HAVE_GLU_H
 #include <GL/glu.h>
 #endif
-
-//#undef GLX_VERSION_1_3
 
 // Maximum path length
 #ifndef MAXPATHLEN

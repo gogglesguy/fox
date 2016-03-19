@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXFile.h,v 1.110 2009/01/06 13:07:23 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXFILE_H
 #define FXFILE_H

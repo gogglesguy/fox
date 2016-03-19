@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXColorSelector.h,v 1.38 2009/01/06 13:07:22 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXCOLORSELECTOR_H
 #define FXCOLORSELECTOR_H
@@ -42,6 +40,16 @@ class FXTextField;
 class FXButton;
 class FXIcon;
 class FXLabel;
+
+
+// Color panel tabs
+enum {
+  COLORTAB_COLOR_RING,
+  COLORTAB_RED_GREEN_BLUE,
+  COLORTAB_HUE_SATURATION_VALUE,
+  COLORTAB_CYAN_MAGENTA_YELLOW,
+  COLORTAB_COLOR_LIST
+  };
 
 
 /// Color selection widget
@@ -70,8 +78,6 @@ protected:
   FXfloat       rgba[4];              // Accurate RGBA color
   FXfloat       hsva[4];              // Accurate HSVA color
 protected:
-  static const FXchar *const wellname[24];
-protected:
   FXColorSelector(){}
   void updateWell();
 private:
@@ -94,9 +100,7 @@ public:
   long onUpdCMYText(FXObject*,FXSelector,void*);
   long onCmdList(FXObject*,FXSelector,void*);
   long onCmdCustomWell(FXObject*,FXSelector,void*);
-  long onChgCustomWell(FXObject*,FXSelector,void*);
   long onCmdSetValue(FXObject*,FXSelector,void*);
-  long onCmdActivePane(FXObject*,FXSelector,void*);
   long onCmdAlphaSlider(FXObject*,FXSelector,void*);
   long onUpdAlphaSlider(FXObject*,FXSelector,void*);
   long onCmdAlphaText(FXObject*,FXSelector,void*);
@@ -132,7 +136,6 @@ public:
     ID_DIAL_WHEEL,
     ID_COLOR_LIST,
     ID_WELL_CHANGED,
-    ID_ACTIVEPANE,
     ID_ALPHA_SLIDER,
     ID_ALPHA_TEXT,
     ID_ALPHA_LABEL,
@@ -144,9 +147,6 @@ public:
   /// Construct a new ColorSelector
   FXColorSelector(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Create the ColorSelector
-  virtual void create();
-
   /// Return a pointer to the "Accept" button
   FXButton *acceptButton() const { return accept; }
 
@@ -154,16 +154,28 @@ public:
   FXButton *cancelButton() const { return cancel; }
 
   /// Set the selected color
-  void setRGBA(FXColor clr);
+  void setRGBA(FXColor color,FXbool notify=false);
 
   /// Get the selected color
   FXColor getRGBA() const;
 
-  /// Return true if only opaque colors allowed
-  FXbool isOpaqueOnly() const;
+  /// Change active panel
+  void setActivePanel(FXint pnl=COLORTAB_COLOR_RING);
+  
+  /// Return active panel
+  FXint getActivePanel() const;
+  
+  /// Change well color
+  void setWellColor(FXint w,FXColor clr);
+  
+  /// Return well color
+  FXColor getWellColor(FXint w) const;
 
   /// Change opaque only mode
   void setOpaqueOnly(FXbool opaque);
+  
+  /// Return true if only opaque colors allowed
+  FXbool isOpaqueOnly() const;
 
   /// Save to a stream
   virtual void save(FXStream& store) const;

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXColorDialog.h,v 1.27 2009/01/06 13:07:22 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXCOLORDIALOG_H
 #define FXCOLORDIALOG_H
@@ -66,17 +64,38 @@ public:
   /// Construct color dialog
   FXColorDialog(FXWindow* owner,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
+  /// Construct free-floating color dialog box
+  FXColorDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+
+  /// Create server-side resources
+  virtual void create();
+
+  /// Destroy server-side resources
+  virtual void destroy();
+
   /// Set the color
   void setRGBA(FXColor clr);
 
   /// Get the color
   FXColor getRGBA() const;
 
-  /// Return true if only opaque colors allowed
-  FXbool isOpaqueOnly() const;
+  /// Change active panel
+  void setActivePanel(FXint pnl=COLORTAB_COLOR_RING);
+  
+  /// Return active panel
+  FXint getActivePanel() const;
+  
+  /// Change well color
+  void setWellColor(FXint w,FXColor clr);
+  
+  /// Return well color
+  FXColor getWellColor(FXint w) const;
 
   /// Change opaque only mode
   void setOpaqueOnly(FXbool forceopaque);
+
+  /// Return true if only opaque colors allowed
+  FXbool isOpaqueOnly() const;
 
   /// Save dialog to a stream
   virtual void save(FXStream& store) const;

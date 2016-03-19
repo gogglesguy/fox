@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FX2DChart.h,v 1.29 2009/01/06 13:07:21 fox Exp $                         *
 ********************************************************************************/
 #ifndef FX2DCHART_H
 #define FX2DCHART_H

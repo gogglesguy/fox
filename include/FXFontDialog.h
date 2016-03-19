@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXFontDialog.h,v 1.20 2009/01/06 13:07:24 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFONTDIALOG_H
 #define FXFONTDIALOG_H

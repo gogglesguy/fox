@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXTreeList.h,v 1.109 2009/01/06 13:07:28 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTREELIST_H
 #define FXTREELIST_H
@@ -187,6 +185,9 @@ public:
   /// Return true if ancestor of child item
   FXbool isParentOf(const FXTreeItem* item) const;
 
+  /// Return tip text
+  virtual FXString getTipText() const;
+
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXTreeList* list) const;
 
@@ -247,7 +248,6 @@ protected:
   FXTreeItem        *anchoritem;        // Selection anchor item
   FXTreeItem        *currentitem;       // Current item
   FXTreeItem        *extentitem;        // Selection extent
-  FXTreeItem        *cursoritem;        // Item under cursor
   FXTreeItem        *viewableitem;      // Visible item
   FXFont            *font;              // Font
   FXTreeListSortFunc sortfunc;          // Item sort function
@@ -526,9 +526,6 @@ public:
 
   /// Return anchor item, if any
   FXTreeItem* getAnchorItem() const { return anchoritem; }
-
-  /// Return item under cursor, if any
-  FXTreeItem* getCursorItem() const { return cursoritem; }
 
   /// Sort all items recursively
   void sortItems();

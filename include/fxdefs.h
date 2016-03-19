@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: fxdefs.h,v 1.211 2009/01/21 12:35:21 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -83,8 +81,8 @@
 #define FXIMPORT __declspec(dllimport)
 #else
 #if defined(__GNUC__) && (__GNUC__ >= 4)
-#define FXLOCAL  __attribute__ ((visibility("hidden")))
-#define FXEXPORT __attribute__ ((visibility("default")))
+#define FXLOCAL  __attribute__((visibility("hidden")))
+#define FXEXPORT __attribute__((visibility("default")))
 #define FXIMPORT
 #else
 #define FXLOCAL
@@ -92,6 +90,7 @@
 #define FXIMPORT
 #endif
 #endif
+
 
 // Define FXAPI for DLL builds
 #ifdef FOXDLL
@@ -106,6 +105,27 @@
 #define FXAPI
 #define FXTEMPLATE_EXTERN
 #endif
+
+
+// Data alignment attribute
+#if defined(__GNUC__)
+#define FXALIGNED(x)    __attribute__((aligned(x)))
+#elif defined(_MSC_VER)
+#define FXALIGNED(x)    __declspec(align(x))
+#else
+#define FXALIGNED(x)
+#endif
+
+
+// Thread-local storage attribute
+#if defined(__GNUC__)
+#define FXTHREADLOCAL   __thread
+#elif defined(_MSC_VER)
+#define FXTHREADLOCAL   __declspec(thread)
+#else
+#define FXTHREADLOCAL
+#endif
+
 
 // Callback
 #ifdef WIN32
@@ -127,194 +147,22 @@
 #if defined(_CC_GNU_) || defined(__GNUG__) || defined(__GNUC__)
 #define FX_PRINTF(fmt,arg) __attribute__((format(printf,fmt,arg)))
 #define FX_SCANF(fmt,arg)  __attribute__((format(scanf,fmt,arg)))
+#define FX_FORMAT(arg) __attribute__((format_arg(arg)))
 #else
 #define FX_PRINTF(fmt,arg)
 #define FX_SCANF(fmt,arg)
+#define FX_FORMAT(arg)
 #endif
 
-
 // Raw event type
-#ifndef WIN32
-union _XEvent;
-#else
+#ifdef WIN32
 struct tagMSG;
+#else
+union _XEvent;
 #endif
 
 
 namespace FX {
-
-
-// FOX System Defined Selector Types
-enum FXSelType {
-  SEL_NONE,
-  SEL_KEYPRESS,                         /// Key pressed
-  SEL_KEYRELEASE,                       /// Key released
-  SEL_LEFTBUTTONPRESS,                  /// Left mouse button pressed
-  SEL_LEFTBUTTONRELEASE,                /// Left mouse button released
-  SEL_MIDDLEBUTTONPRESS,                /// Middle mouse button pressed
-  SEL_MIDDLEBUTTONRELEASE,              /// Middle mouse button released
-  SEL_RIGHTBUTTONPRESS,                 /// Right mouse button pressed
-  SEL_RIGHTBUTTONRELEASE,               /// Right mouse button released
-  SEL_MOTION,                           /// Mouse motion
-  SEL_ENTER,                            /// Mouse entered window
-  SEL_LEAVE,                            /// Mouse left window
-  SEL_FOCUSIN,                          /// Focus into window
-  SEL_FOCUSOUT,                         /// Focus out of window
-  SEL_KEYMAP,
-  SEL_UNGRABBED,                        /// Lost the grab (Windows)
-  SEL_PAINT,                            /// Must repaint window
-  SEL_CREATE,
-  SEL_DESTROY,
-  SEL_UNMAP,                            /// Window was hidden
-  SEL_MAP,                              /// Window was shown
-  SEL_CONFIGURE,                        /// Resize
-  SEL_SELECTION_LOST,                   /// Widget lost selection
-  SEL_SELECTION_GAINED,                 /// Widget gained selection
-  SEL_SELECTION_REQUEST,                /// Inquire selection data
-  SEL_RAISED,                           /// Window to top of stack
-  SEL_LOWERED,                          /// Window to bottom of stack
-  SEL_CLOSE,                            /// Close window
-  SEL_DELETE,                           /// Delete window
-  SEL_MINIMIZE,                         /// Iconified
-  SEL_RESTORE,                          /// No longer iconified or maximized
-  SEL_MAXIMIZE,                         /// Maximized
-  SEL_UPDATE,                           /// GUI update
-  SEL_COMMAND,                          /// GUI command
-  SEL_CLICKED,                          /// Clicked
-  SEL_DOUBLECLICKED,                    /// Double-clicked
-  SEL_TRIPLECLICKED,                    /// Triple-clicked
-  SEL_MOUSEWHEEL,                       /// Mouse wheel
-  SEL_CHANGED,                          /// GUI has changed
-  SEL_VERIFY,                           /// Verify change
-  SEL_DESELECTED,                       /// Deselected
-  SEL_SELECTED,                         /// Selected
-  SEL_INSERTED,                         /// Inserted
-  SEL_REPLACED,                         /// Replaced
-  SEL_DELETED,                          /// Deleted
-  SEL_OPENED,                           /// Opened
-  SEL_CLOSED,                           /// Closed
-  SEL_EXPANDED,                         /// Expanded
-  SEL_COLLAPSED,                        /// Collapsed
-  SEL_BEGINDRAG,                        /// Start a drag
-  SEL_ENDDRAG,                          /// End a drag
-  SEL_DRAGGED,                          /// Dragged
-  SEL_LASSOED,                          /// Lassoed
-  SEL_TIMEOUT,                          /// Timeout occurred
-  SEL_SIGNAL,                           /// Signal received
-  SEL_CLIPBOARD_LOST,                   /// Widget lost clipboard
-  SEL_CLIPBOARD_GAINED,                 /// Widget gained clipboard
-  SEL_CLIPBOARD_REQUEST,                /// Inquire clipboard data
-  SEL_CHORE,                            /// Background chore
-  SEL_FOCUS_SELF,                       /// Focus on widget itself
-  SEL_FOCUS_RIGHT,                      /// Focus moved right
-  SEL_FOCUS_LEFT,                       /// Focus moved left
-  SEL_FOCUS_DOWN,                       /// Focus moved down
-  SEL_FOCUS_UP,                         /// Focus moved up
-  SEL_FOCUS_NEXT,                       /// Focus moved to next widget
-  SEL_FOCUS_PREV,                       /// Focus moved to previous widget
-  SEL_DND_ENTER,                        /// Drag action entering potential drop target
-  SEL_DND_LEAVE,                        /// Drag action leaving potential drop target
-  SEL_DND_DROP,                         /// Drop on drop target
-  SEL_DND_MOTION,                       /// Drag position changed over potential drop target
-  SEL_DND_REQUEST,                      /// Inquire drag and drop data
-  SEL_IO_READ,                          /// Read activity on a pipe
-  SEL_IO_WRITE,                         /// Write activity on a pipe
-  SEL_IO_EXCEPT,                        /// Except activity on a pipe
-  SEL_PICKED,                           /// Picked some location
-  SEL_QUERY_TIP,                        /// Message inquiring about tooltip
-  SEL_QUERY_HELP,                       /// Message inquiring about statusline help
-  SEL_DOCKED,                           /// Toolbar docked
-  SEL_FLOATED,                          /// Toolbar floated
-  SEL_SPACEBALLMOTION,                  /// Moved space ball puck
-  SEL_SPACEBALLBUTTONPRESS,             /// Pressed space ball button
-  SEL_SPACEBALLBUTTONRELEASE,           /// Released space ball button
-  SEL_SESSION_NOTIFY,                   /// Session is about to close
-  SEL_SESSION_CLOSED,                   /// Session is closed
-  SEL_IME_START,                        /// IME mode
-  SEL_IME_END,                          /// IME mode
-  SEL_LAST
-  };
-
-
-/// FOX Keyboard and Button states
-enum {
-  SHIFTMASK        = 0x001,           /// Shift key is down
-  CAPSLOCKMASK     = 0x002,           /// Caps Lock key is down
-  CONTROLMASK      = 0x004,           /// Ctrl key is down
-#ifdef __APPLE__
-  ALTMASK          = 0x2000,          /// Alt key is down
-  METAMASK         = 0x10,            /// Meta key is down
-#else
-  ALTMASK          = 0x008,           /// Alt key is down
-  METAMASK         = 0x040,           /// Meta key is down
-#endif
-  NUMLOCKMASK      = 0x010,           /// Num Lock key is down
-  SCROLLLOCKMASK   = 0x0E0,           /// Scroll Lock key is down (seems to vary)
-  LEFTBUTTONMASK   = 0x100,           /// Left mouse button is down
-  MIDDLEBUTTONMASK = 0x200,           /// Middle mouse button is down
-  RIGHTBUTTONMASK  = 0x400            /// Right mouse button is down
-  };
-
-
-/// FOX Mouse buttons
-enum {
-  LEFTBUTTON       = 1,
-  MIDDLEBUTTON     = 2,
-  RIGHTBUTTON      = 3
-  };
-
-
-/// FOX window crossing modes
-enum {
-  CROSSINGNORMAL,		     /// Normal crossing event
-  CROSSINGGRAB,			     /// Crossing due to mouse grab
-  CROSSINGUNGRAB		     /// Crossing due to mouse ungrab
-  };
-
-
-/// FOX window visibility modes
-enum {
-  VISIBILITYTOTAL,
-  VISIBILITYPARTIAL,
-  VISIBILITYNONE
-  };
-
-
-/// Options for fxfilematch
-enum {
-  FILEMATCH_FILE_NAME   = 1,        /// No wildcard can ever match `/'
-  FILEMATCH_NOESCAPE    = 2,        /// Backslashes don't quote special chars
-  FILEMATCH_PERIOD      = 4,        /// Leading `.' is matched only explicitly
-  FILEMATCH_LEADING_DIR = 8,        /// Ignore `/...' after a match
-  FILEMATCH_CASEFOLD    = 16        /// Compare without regard to case
-  };
-
-
-/// Drag and drop actions
-enum FXDragAction {
-  DRAG_REJECT  = 0,                 /// Reject all drop actions
-  DRAG_ASK     = 1,                 /// Ask
-  DRAG_COPY    = 2,                 /// Copy
-  DRAG_MOVE    = 3,                 /// Move
-  DRAG_LINK    = 4,                 /// Link
-  DRAG_PRIVATE = 5,                 /// Private
-  DRAG_ACCEPT  = 6                  /// Accept any drop action
-  };
-
-
-/// Clipboard actions
-enum FXClipAction {
-  CLIP_COPY    = 0,                 /// Copy to clipboard
-  CLIP_CUT     = 1                  /// Clip to clipboard
-  };
-
-
-/// Origin of data
-enum FXDNDOrigin {
-  FROM_SELECTION  = 0,              /// Primary selection
-  FROM_CLIPBOARD  = 1,              /// Clipboard
-  FROM_DRAGNDROP  = 2               /// Drag and drop source
-  };
 
 
 /// Exponent display
@@ -394,10 +242,10 @@ typedef unsigned long          FXuval;
 
 
 // Handle to something in server
-#ifndef WIN32
-typedef unsigned long          FXID;
-#else
+#ifdef WIN32
 typedef void*                  FXID;
+#else
+typedef unsigned long          FXID;
 #endif
 
 // Time since January 1, 1970 (UTC)
@@ -412,25 +260,26 @@ typedef FXuint                 FXColor;
 // Hot key
 typedef FXuint                 FXHotKey;
 
-// Drag type
-#ifndef WIN32
-typedef FXID                   FXDragType;
-#else
-typedef FXushort               FXDragType;
-#endif
-
 // Input source handle type
-#ifndef WIN32
-typedef FXint                  FXInputHandle;
-#else
+#ifdef WIN32
 typedef void*                  FXInputHandle;
+#else
+typedef FXint                  FXInputHandle;
 #endif
 
 // Raw event type
-#ifndef WIN32
-typedef _XEvent                FXRawEvent;
+#ifdef WIN32
+typedef tagMSG    FXRawEvent;
 #else
-typedef tagMSG                 FXRawEvent;
+typedef _XEvent   FXRawEvent;
+#endif
+
+
+/// Drag and drop data type
+#ifdef WIN32
+typedef FXushort  FXDragType;
+#else
+typedef FXID      FXDragType;
 #endif
 
 
@@ -457,6 +306,14 @@ const FXTime forever=9223372036854775807L;
 
 /**********************************  Macros  ***********************************/
 
+/// Branch prediction optimization
+#if __GNUC__ >= 3
+#define __likely(cond)    __builtin_expect(!!(cond),1)
+#define __unlikely(cond)  __builtin_expect(!!(cond),0)
+#else
+#define __likely(cond)    (!!(cond))
+#define __unlikely(cond)  (!!(cond))
+#endif
 
 /// Abolute value
 #define FXABS(val) (((val)>=0)?(val):-(val))
@@ -590,7 +447,7 @@ const FXTime forever=9223372036854775807L;
 * are compiled out; thus there is no impact on execution speed.
 */
 #ifndef NDEBUG
-#define FXASSERT(exp) ((exp)?((void)0):(void)FX::fxassert(#exp,__FILE__,__LINE__))
+#define FXASSERT(exp) (__likely(exp)?((void)0):(void)FX::fxassert(#exp,__FILE__,__LINE__))
 #else
 #define FXASSERT(exp) ((void)0)
 #endif
@@ -604,7 +461,7 @@ const FXTime forever=9223372036854775807L;
 * the expression.
 */
 #ifndef NDEBUG
-#define FXVERIFY(exp) ((exp)?((void)0):(void)FX::fxverify(#exp,__FILE__,__LINE__))
+#define FXVERIFY(exp) (__likely(exp)?((void)0):(void)FX::fxverify(#exp,__FILE__,__LINE__))
 #else
 #define FXVERIFY(exp) ((void)(exp))
 #endif
@@ -631,7 +488,7 @@ const FXTime forever=9223372036854775807L;
 /**
 * Allocate a memory block of no elements of type and store a pointer
 * to it into the address pointed to by ptr.
-* Return FALSE if size!=0 and allocation fails, TRUE otherwise.
+* Return false if size!=0 and allocation fails, true otherwise.
 * An allocation of a zero size block returns a NULL pointer.
 */
 #define FXMALLOC(ptr,type,no)     (FX::fxmalloc((void **)(ptr),sizeof(type)*(no)))
@@ -639,7 +496,7 @@ const FXTime forever=9223372036854775807L;
 /**
 * Allocate a zero-filled memory block no elements of type and store a pointer
 * to it into the address pointed to by ptr.
-* Return FALSE if size!=0 and allocation fails, TRUE otherwise.
+* Return false if size!=0 and allocation fails, true otherwise.
 * An allocation of a zero size block returns a NULL pointer.
 */
 #define FXCALLOC(ptr,type,no)     (FX::fxcalloc((void **)(ptr),sizeof(type)*(no)))
@@ -647,7 +504,7 @@ const FXTime forever=9223372036854775807L;
 /**
 * Resize the memory block referred to by the pointer at the address ptr, to a
 * hold no elements of type.
-* Returns FALSE if size!=0 and reallocation fails, TRUE otherwise.
+* Returns false if size!=0 and reallocation fails, true otherwise.
 * If reallocation fails, pointer is left to point to old block; a reallocation
 * to a zero size block has the effect of freeing it.
 * The ptr argument must be the address where the pointer to the allocated
@@ -657,7 +514,7 @@ const FXTime forever=9223372036854775807L;
 
 /**
 * Allocate and initialize memory from another block.
-* Return FALSE if size!=0 and source!=NULL and allocation fails, TRUE otherwise.
+* Return false if size!=0 and source!=NULL and allocation fails, true otherwise.
 * An allocation of a zero size block returns a NULL pointer.
 * The ptr argument must be the address where the pointer to the allocated
 * block is to be stored.
@@ -729,34 +586,25 @@ extern FXAPI FXbool fxmemdup(void** ptr,const void* src,unsigned long size);
 extern FXAPI void fxfree(void** ptr);
 
 /// Error routine
-extern FXAPI void fxerror(const char* format,...) FX_PRINTF(1,2) ;
+extern FXAPI void fxerror(const FXchar* format,...) FX_PRINTF(1,2) ;
 
 /// Warning routine
-extern FXAPI void fxwarning(const char* format,...) FX_PRINTF(1,2) ;
+extern FXAPI void fxwarning(const FXchar* format,...) FX_PRINTF(1,2) ;
 
 /// Log message to [typically] stderr
-extern FXAPI void fxmessage(const char* format,...) FX_PRINTF(1,2) ;
+extern FXAPI void fxmessage(const FXchar* format,...) FX_PRINTF(1,2) ;
 
 /// Assert failed routine:- usually not called directly but called through FXASSERT
-extern FXAPI void fxassert(const char* expression,const char* filename,unsigned int lineno);
+extern FXAPI void fxassert(const FXchar* expression,const FXchar* filename,unsigned int lineno);
 
 /// Verify failed routine:- usually not called directly but called through FXVERIFY
-extern FXAPI void fxverify(const char* expression,const char* filename,unsigned int lineno);
+extern FXAPI void fxverify(const FXchar* expression,const FXchar* filename,unsigned int lineno);
 
 /// Trace printout routine:- usually not called directly but called through FXTRACE
-extern FXAPI void fxtrace(unsigned int level,const char* format,...) FX_PRINTF(2,3) ;
+extern FXAPI void fxtrace(FXint level,const FXchar* format,...) FX_PRINTF(2,3) ;
 
 /// Sleep n microseconds
 extern FXAPI void fxsleep(FXuint n);
-
-/// Match a file name with a pattern
-extern FXAPI FXbool fxfilematch(const FXchar *string,const FXchar *pattern="*",FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
-
-/// Get highlight color
-extern FXAPI FXColor makeHiliteColor(FXColor clr);
-
-/// Get shadow color
-extern FXAPI FXColor makeShadowColor(FXColor clr);
 
 /// Get process id
 extern FXAPI FXint fxgetpid();
@@ -773,17 +621,17 @@ extern FXAPI FXchar *fxstrdup(const FXchar* str);
 /// Calculate a hash value from a string
 extern FXAPI FXuint fxstrhash(const FXchar* str);
 
-/// Get RGB value from color name
-extern FXAPI FXColor fxcolorfromname(const FXchar* colorname);
-
-/// Get name of (closest) color to RGB
-extern FXAPI FXchar* fxnamefromcolor(FXchar *colorname,FXColor color);
-
 /// Convert RGB to HSV
 extern FXAPI void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloat g,FXfloat b);
 
 /// Convert HSV to RGB
 extern FXAPI void fxhsv_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat v);
+
+/// Convert RGB to HSL
+extern FXAPI void fxrgb_to_hsl(FXfloat& h,FXfloat& s,FXfloat& l,FXfloat r,FXfloat g,FXfloat b);
+
+/// Convert HSL to RGB
+extern FXAPI void fxhsl_to_rgb(FXfloat& r,FXfloat& g,FXfloat& b,FXfloat h,FXfloat s,FXfloat l);
 
 /// Float number classification: 0=OK, +/-1=Inf, +/-2=NaN
 extern FXAPI FXint fxieeefloatclass(FXfloat number);
@@ -825,7 +673,7 @@ extern FXAPI FXbool fxisconsole(const FXchar *path);
 extern FXAPI const FXuchar fxversion[3];
 
 /// Controls tracing level
-extern FXAPI FXuint fxTraceLevel;
+extern FXAPI FXint fxTraceLevel;
 
 /// Return wide character from utf8 string at ptr
 extern FXAPI FXwchar wc(const FXchar *ptr);

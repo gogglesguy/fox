@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXFoldingList.h,v 1.46 2009/01/06 13:07:24 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXFOLDINGLIST_H
 #define FXFOLDINGLIST_H
@@ -187,6 +185,9 @@ public:
   /// Return true if ancestor of child item
   FXbool isParentOf(const FXFoldingItem* item) const;
 
+  /// Return tip text
+  virtual FXString getTipText() const;
+
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXFoldingList* list) const;
 
@@ -254,7 +255,6 @@ protected:
   FXFoldingItem     *anchoritem;        // Selection anchor item
   FXFoldingItem     *currentitem;       // Current item
   FXFoldingItem     *extentitem;        // Selection extent
-  FXFoldingItem     *cursoritem;        // Item under cursor
   FXFoldingItem     *viewableitem;      // Viewable item
   FXFont            *font;              // Font
   FXFoldingListSortFunc sortfunc;       // Item sort function
@@ -580,9 +580,6 @@ public:
 
   /// Return anchor item, if any
   FXFoldingItem* getAnchorItem() const { return anchoritem; }
-
-  /// Return item under cursor, if any
-  FXFoldingItem* getCursorItem() const { return cursoritem; }
 
   /// Sort all items recursively
   void sortItems();

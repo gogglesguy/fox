@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXRecentFiles.h,v 1.32 2009/01/07 13:24:50 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXRECENTFILES_H
 #define FXRECENTFILES_H
@@ -85,23 +83,23 @@ public:
 public:
 
   /**
-  * Make new recent files group. 
+  * Make new recent files group.
   * A Settings object and group name must be assigned prior to usage.
   */
   FXRecentFiles();
 
   /**
   * Make new recent files group, using settings database from application.
-  * An optional target and message may be passed to invoke when one of the 
+  * An optional target and message may be passed to invoke when one of the
   * list of files is invoked.
   */
   FXRecentFiles(FXApp* a,const FXString& gp="Recent Files",FXObject *tgt=NULL,FXSelector sel=0);
 
   /**
   * Make new recent files group, using given settings database.
-  * An optional target and message may be passed to invoke when one of the 
+  * An optional target and message may be passed to invoke when one of the
   * list of files is invoked.
-  */  
+  */
   FXRecentFiles(FXSettings* st,const FXString& gp="Recent Files",FXObject *tgt=NULL,FXSelector sel=0);
 
   /// Change settings database

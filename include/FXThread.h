@@ -17,20 +17,19 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXThread.h,v 1.82 2009/01/06 13:07:28 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
+
 
 namespace FX {
 
 
 /// Thread ID type
-#ifndef WIN32
-typedef unsigned long FXThreadID;
-#else
+#ifdef WIN32
 typedef void*         FXThreadID;
+#else
+typedef unsigned long FXThreadID;
 #endif
 
 
@@ -163,10 +162,13 @@ public:
   /// Initialize semaphore with given count
   FXSemaphore(FXint initial=1);
 
-  /// Decrement semaphore
+  /// Get semaphore value
+  FXint value() const;
+
+  /// Decrement semaphore, waiting if count is zero
   void wait();
 
-  /// Non-blocking semaphore decrement; return true if locked
+  /// Decrement semaphore; returning false if count is zero
   FXbool trywait();
 
   /// Increment semaphore
@@ -210,8 +212,8 @@ public:
   * Return true if the wait ended due to the condition being
   * signalled through signal() or broadcast(), and false if the
   * wait timed out, was interrupted, or some other error occurred.
-  * The absolute time is specified in nanoseconds since the Epoch
-  * (Jan 1, 1970).
+  * The relative timeout nsec is specified in nanoseconds; if the
+  * special value 'forever' is passed, wait indefinitely.
   */
   FXbool wait(FXMutex& mtx,FXTime nsec);
 
@@ -249,7 +251,7 @@ public:
   void readLock();
 
   /// Try to acquire read lock for read/write lock
-  bool tryReadLock();
+  FXbool tryReadLock();
 
   /// Unlock read lock
   void readUnlock();
@@ -258,13 +260,13 @@ public:
   void writeLock();
 
   /// Try to acquire write lock for read/write lock
-  bool tryWriteLock();
+  FXbool tryWriteLock();
 
   /// Unlock write mutex
   void writeUnlock();
 
   /// Delete the read/write lock
-  ~FXReadWriteLock();
+ ~FXReadWriteLock();
   };
 
 
@@ -309,9 +311,15 @@ public:
 
   /// Acquire a unique thread-local storage key
   FXAutoThreadStorageKey();
-
+  
   /// Return the thread-local storage key
   operator FXThreadStorageKey() const { return value; }
+
+  /// Set thread local storage associated with this key
+  void set(void* ptr) const;
+  
+  /// Get thread local storage associated with this key
+  void* get() const;
 
   /// Release thread-local storage key
  ~FXAutoThreadStorageKey();

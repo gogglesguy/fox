@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXVec4f.h,v 1.39 2009/02/04 18:11:55 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXVEC4F_H
 #define FXVEC4F_H
@@ -142,7 +140,7 @@ public:
 
   /// Clamp values of vector between limits
   FXVec4f& clamp(FXfloat lo,FXfloat hi){x=FXCLAMP(lo,x,hi);y=FXCLAMP(lo,y,hi);z=FXCLAMP(lo,z,hi);w=FXCLAMP(lo,w,hi);return *this;}
-  
+
   /// Lowest or highest components
   friend inline FXVec4f lo(const FXVec4f& a,const FXVec4f& b);
   friend inline FXVec4f hi(const FXVec4f& a,const FXVec4f& b);

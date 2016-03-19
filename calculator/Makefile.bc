@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.bc,v 1.16 2009/01/06 13:31:20 fox Exp $                      #
+# $Id: Makefile.bc,v 1.17 2009/02/24 02:12:43 fox Exp $                      #
 ##############################################################################
 
 # For use with Borland C++ Builder 3 or later
@@ -38,20 +38,20 @@ RESWRAP   = $(TOPDIR)\utils\reswrap.exe
 PROGRAMS  = calculator.exe
 
 OBJECTS   = \
-        Calculator.obj \
-        main.obj \
-        icons.obj \
-        HelpWindow.obj \
-        Preferences.obj \
-        help.obj
+Calculator.obj \
+main.obj \
+icons.obj \
+HelpWindow.obj \
+Preferences.obj \
+help.obj
 
 ICONS = \
-        bigcalc.gif \
-        colors.gif \
-        constmem.bmp \
-        information.gif \
-        question.gif \
-        tinycalc.gif
+bigcalc.gif \
+colors.gif \
+constmem.bmp \
+information.gif \
+question.gif \
+tinycalc.gif
 
 .cpp.obj:
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp

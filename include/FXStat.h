@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXStat.h,v 1.33 2009/01/06 13:07:27 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXSTAT_H
 #define FXSTAT_H
@@ -32,7 +30,6 @@ class FXFile;
 
 /// Statistics about a file or directory
 class FXAPI FXStat {
-  friend class FXFile;
 private:
   FXuint  modeFlags;            /// Mode bits
   FXuint  userNumber;           /// User number

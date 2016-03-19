@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXRangef.h,v 1.24 2009/01/26 09:40:23 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXRANGEF_H
 #define FXRANGEF_H

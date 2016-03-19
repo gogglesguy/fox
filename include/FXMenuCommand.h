@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXMenuCommand.h,v 1.36 2009/01/19 22:51:50 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXMENUCOMMAND_H
 #define FXMENUCOMMAND_H

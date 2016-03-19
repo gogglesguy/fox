@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDial.h,v 1.43 2009/01/06 13:07:22 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXDIAL_H
 #define FXDIAL_H

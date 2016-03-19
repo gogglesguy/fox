@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDirVisitor.h,v 1.4 2009/01/06 13:07:23 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXDIRVISITOR_H
 #define FXDIRVISITOR_H
@@ -34,8 +32,8 @@ namespace FX {
 class FXAPI FXDirVisitor {
 private:
   struct Seen;
-private:
-  FXuint recurse(const FXString& path,Seen *seen);
+protected:
+  virtual FXuint recurse(const FXString& path,Seen *seen);
 public:
   FXuint traverse(const FXString& path);
   virtual FXuint enter(const FXString& path);
@@ -43,8 +41,6 @@ public:
   virtual FXuint leave(const FXString& path);
   virtual ~FXDirVisitor(){}
   };
-
-
 
 }
 

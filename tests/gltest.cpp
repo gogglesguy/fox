@@ -508,8 +508,7 @@ GLTestWindow::GLTestWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   glpanel=new FXVerticalFrame(glcanvasFrame,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT,0,0,0,0, 0,0,0,0);
 
   // A Visual to drag OpenGL
-  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLE_BUFFER|VISUAL_WINDOW);
-  //glvisual->setMultiSamples(4);
+  glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLE_BUFFER);
 
   // Drawing glcanvas
   glcanvas=new FXGLCanvas(glpanel,glvisual,this,ID_CANVAS,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT);

@@ -4,7 +4,7 @@
 all:
 	cd ..\..\utils
 	make -fMakefile.bc
-	cd ..\src
+	cd ..\lib
 	make -fMakefile.bc
 	cd ..\tests
 	make -fMakefile.bc
@@ -20,7 +20,7 @@ all:
 clean:
 	cd ..\..\utils
 	make -fMakefile.bc clean
-	cd ..\src
+	cd ..\lib
 	make -fMakefile.bc clean
 	cd ..\tests
 	make -fMakefile.bc clean

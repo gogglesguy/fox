@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXMessageChannel.h,v 1.9 2009/01/06 13:07:26 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXMESSAGECHANNEL_H
 #define FXMESSAGECHANNEL_H
@@ -55,7 +53,7 @@ class FXAPI FXMessageChannel : public FXObject {
   FXDECLARE(FXMessageChannel)
 private:
   FXApp *app;
-private:
+protected:
   FXInputHandle h[3];
   FXMutex       m;
 protected:

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXRulerView.h,v 1.25 2009/01/06 13:07:27 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXRULERVIEW_H
 #define FXRULERVIEW_H
@@ -43,7 +41,7 @@ class FXFrame;
 * being edited, and coordinates the movement of the ruler displays
 * as the document is being scrolled.
 */
-class FXRulerView : public FXScrollArea {
+class FXAPI FXRulerView : public FXScrollArea {
   FXDECLARE(FXRulerView)
 protected:
   FXRuler *hruler;      // Horizontal ruler

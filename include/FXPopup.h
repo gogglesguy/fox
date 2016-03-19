@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXPopup.h,v 1.46 2009/02/05 07:23:56 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXPOPUP_H
 #define FXPOPUP_H
@@ -45,7 +43,7 @@ enum {
 * principal characteristics is that no other controls, except the
 * ones inside the popup are capable of interaction.  Any click outside
 * of a popup will cause the popup to be closed.
-* Contents of popups may be arranged vertically (POPUP_VERTICAL) or 
+* Contents of popups may be arranged vertically (POPUP_VERTICAL) or
 * horizontally (POPUP_HORIZONTAL).
 * The special POPUP_SHRINKWRAP option causes the application to recompute
 * the size of the popup window based on its contents at the time it is

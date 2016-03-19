@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXApp.h,v 1.275 2009/01/06 13:07:21 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -107,35 +105,6 @@ enum FXDefaultCursor {
   DEF_ROTATE_CURSOR,                    /// Rotate cursor
   DEF_BLANK_CURSOR,                     /// Blank cursor
   DEF_WAIT_CURSOR                       /// Wait cursor
-  };
-
-
-
-/// FOX Event
-struct FXAPI FXEvent {
-  FXuint      type;           /// Event type
-  FXuint      time;           /// Time of last event
-  FXint       win_x;          /// Window-relative x-coord
-  FXint       win_y;          /// Window-relative y-coord
-  FXint       root_x;         /// Root x-coord
-  FXint       root_y;         /// Root y-coord
-  FXint       state;          /// Mouse button and modifier key state
-  FXint       code;           /// Button, Keysym, or mode; DDE Source
-  FXString    text;           /// Text of keyboard event
-  FXint       last_x;         /// Window-relative x-coord of previous mouse location
-  FXint       last_y;         /// Window-relative y-coord of previous mouse location
-  FXint       click_x;        /// Window-relative x-coord of mouse press
-  FXint       click_y;        /// Window-relative y-coord of mouse press
-  FXint       rootclick_x;    /// Root-relative x-coord of mouse press
-  FXint       rootclick_y;    /// Root-relative y-coord of mouse press
-  FXuint      click_time;     /// Time of mouse button press
-  FXint       click_button;   /// Mouse button pressed
-  FXint       click_count;    /// Click-count
-  FXint       values[6];      /// Valuators from space ball
-  FXbool      moved;          /// Moved cursor since press
-  FXRectangle rect;           /// Rectangle
-  FXbool      synthetic;      /// True if synthetic expose event
-  FXDragType  target;         /// Target drag type being requested
   };
 
 

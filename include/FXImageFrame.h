@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXImageFrame.h,v 1.12 2009/01/06 13:07:25 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXIMAGEFRAME_H
 #define FXIMAGEFRAME_H

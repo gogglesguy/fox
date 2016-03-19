@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: Commands.h,v 1.21 2009/01/06 13:07:20 fox Exp $                          *
 ********************************************************************************/
 #ifndef COMMANDS_H
 #define COMMANDS_H

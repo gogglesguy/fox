@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXFileSelector.h,v 1.75 2009/01/06 13:07:24 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXFILESELECTOR_H
 #define FXFILESELECTOR_H
@@ -254,7 +252,7 @@ public:
   /// Return file selection mode
   FXuint getSelectMode() const { return selectmode; }
 
-  /// Change wildcard matching mode
+  /// Change wildcard matching mode (see FXPath)
   void setMatchMode(FXuint mode);
 
   /// Return wildcard matching mode

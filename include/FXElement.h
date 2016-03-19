@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXElement.h,v 1.28 2009/01/06 13:07:23 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXELEMENT_H
 #define FXELEMENT_H

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXList.h,v 1.104 2009/01/06 13:07:25 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXLIST_H
 #define FXLIST_H
@@ -118,6 +116,9 @@ public:
   /// Return true if this item is draggable
   FXbool isDraggable() const { return (state&DRAGGABLE)!=0; }
 
+  /// Return tip text
+  virtual FXString getTipText() const;
+
   /// Return width of item as drawn in list
   virtual FXint getWidth(const FXList* list) const;
 
@@ -148,6 +149,9 @@ public:
 typedef FXint (*FXListSortFunc)(const FXListItem*,const FXListItem*);
 
 
+/// Explicit template specialization
+//extern template class FXAPI FXObjectListOf<FXListItem>;
+
 /// List of FXListItem's
 typedef FXObjectListOf<FXListItem> FXListItemList;
 
@@ -172,7 +176,6 @@ protected:
   FXint          anchor;            // Anchor item
   FXint          current;           // Current item
   FXint          extent;            // Extent item
-  FXint          cursor;            // Cursor item
   FXint          viewable;          // Viewable item
   FXFont        *font;              // Font
   FXColor        textColor;         // Text color
@@ -423,9 +426,6 @@ public:
 
   /// Return anchor item, if any
   FXint getAnchorItem() const { return anchor; }
-
-  /// Get item under the cursor, if any
-  FXint getCursorItem() const { return cursor; }
 
   /// Sort items using current sort function
   void sortItems();

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXDrawable.h,v 1.31 2009/01/06 13:07:23 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDRAWABLE_H
 #define FXDRAWABLE_H
@@ -46,7 +44,6 @@ protected:
   FXVisual *visual;     // Visual for this window
   FXint     width;      // Width
   FXint     height;     // Height
-  FXID      rsc;        // Resource
 protected:
   FXDrawable();
   FXDrawable(FXApp* a,FXint w,FXint h);
@@ -67,9 +64,6 @@ public:
 
   /// Height of drawable
   FXint getHeight() const { return height; }
-
-  /// Get resource handle
-  FXID res() const { return rsc; }
 
   /// Change visual
   void setVisual(FXVisual* vis);

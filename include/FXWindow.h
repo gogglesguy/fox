@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXWindow.h,v 1.171 2009/01/06 13:07:29 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXWINDOW_H
 #define FXWINDOW_H
@@ -29,6 +27,17 @@
 
 
 namespace FX {
+
+
+// Forward declarations
+class FXIcon;
+class FXBitmap;
+class FXCursor;
+class FXRegion;
+class FXDCWindow;
+class FXComposite;
+class FXAccelTable;
+class FXComposeContext;
 
 
 /// Layout hints for child widgets
@@ -83,16 +92,42 @@ enum {
   };
 
 
-class FXIcon;
-class FXBitmap;
-class FXCursor;
-class FXRegion;
-class FXComposite;
-class FXAccelTable;
-class FXComposeContext;
+/// Data exchange modes
+enum FXDNDOrigin {
+  FROM_SELECTION  = 0,              /// Primary selection
+  FROM_CLIPBOARD  = 1,              /// Clipboard
+  FROM_DRAGNDROP  = 2               /// Drag and drop source
+  };
 
 
-/// Base class for all windows
+/// Drag and drop actions
+enum FXDragAction {
+  DRAG_REJECT  = 0,             /// Reject all drop actions
+  DRAG_ASK     = 1,             /// Ask
+  DRAG_COPY    = 2,             /// Copy
+  DRAG_MOVE    = 3,             /// Move
+  DRAG_LINK    = 4,             /// Link
+  DRAG_PRIVATE = 5,             /// Private
+  DRAG_ACCEPT  = 6              /// Accept any drop action
+  };
+
+
+/**
+* Window is the base class for all widgets in FOX.
+* All widgets are organized in a tree structure, with a single root window
+* at the top.
+* Each window links to its parent window, next and previous siblings windows,
+* as well as its first and last child windows.  A window also has an owner window,
+* which is the window responsible for its creation and destruction.  In most cases,
+* the owner window will be the same as the parent window, except for top-level windows.
+* The focus window determines to which child keyboard messages are delegated if the
+* window is a composite window (i.e. if it has children).
+* Windows are geometrically arranged by their immediate parent window; the actual
+* method of placement is determined by the type of layout supported by the parent
+* window, as well as the window's layout hints.
+* The position of a window is determined relative to its immediate parent window;
+* A window can send a message to its target object when an event happens.
+*/
 class FXAPI FXWindow : public FXDrawable {
   FXDECLARE(FXWindow)
   friend class FXApp;
@@ -119,22 +154,20 @@ protected:
   FXuint            flags;              // Window state flags
   FXuint            options;            // Window options
 public:
-  static FXDragType octetType;          // Raw octet stream
-  static FXDragType deleteType;         // Delete request
-  static FXDragType textType;           // Ascii text request
-  static FXDragType colorType;          // Color request
-  static FXDragType urilistType;        // URI list request
-  static FXDragType utf8Type;           // UTF-8 text request
-  static FXDragType utf16Type;          // UTF-16 text request
-  static FXDragType actionType;         // Clipboard action
+  static FXDragType       octetType;    // Raw octet stream
+  static FXDragType       deleteType;   // Delete request
+  static FXDragType       textType;     // Ascii text request
+  static FXDragType       colorType;    // Color request
+  static FXDragType       urilistType;  // URI list request
+  static FXDragType       utf8Type;     // UTF-8 text request
+  static FXDragType       utf16Type;    // UTF-16 text request
+  static FXDragType       actionType;   // Clipboard action
   static const FXDragType stringType;   // Clipboard text type (pre-registered)
   static const FXDragType imageType;    // Clipboard image type (pre-registered)
 protected:
   FXWindow();
   FXWindow(FXApp* a,FXVisual *vis);
   FXWindow(FXApp* a,FXWindow* own,FXuint opts,FXint x,FXint y,FXint w,FXint h);
-  static FXWindow* findDefault(FXWindow* window);
-  static FXWindow* findInitial(FXWindow* window);
   virtual FXbool doesOverrideRedirect() const;
 protected:
 #ifdef WIN32
@@ -176,6 +209,26 @@ protected:
     FLAG_SCROLLING    = 0x00200000,     // Right mouse scrolling
     FLAG_OWNED        = 0x00400000,     // Owned window handle
     FLAG_CURSOR       = 0x00800000      // Showing cursor
+    };
+
+public:
+
+  /// Window classes
+  enum WindowClass {
+    ClassNormal,        /// Normal child window
+    ClassGraphic,       /// Graphics child window
+    ClassSpecial,       /// Special child window
+    ClassRoot,          /// Root window
+    ClassShell,         /// Shell window
+    ClassPopup,         /// Popup window
+    ClassToolTip,       /// Tooltip window
+    ClassMain,          /// Main application window
+    ClassDialog,        /// Dialog box window
+    ClassToolBar,       /// Toolbar window
+    ClassSplash,        /// Splash window
+    ClassNotify,        /// Notify window
+    ClassPanel,         /// Panel window
+    ClassDesktop        /// Desktop backdrop window
     };
 
 public:
@@ -241,23 +294,20 @@ public:
   // Message ID's common to most Windows
   enum {
     ID_NONE,
-    ID_HIDE,            // ID_HIDE+FALSE
-    ID_SHOW,            // ID_HIDE+TRUE
+    ID_HIDE,
+    ID_SHOW,
     ID_TOGGLESHOWN,
     ID_LOWER,
     ID_RAISE,
     ID_DELETE,
-    ID_DISABLE,         // ID_DISABLE+FALSE
-    ID_ENABLE,          // ID_DISABLE+TRUE
+    ID_DISABLE,
+    ID_ENABLE,
     ID_TOGGLEENABLED,
-    ID_UNCHECK,         // ID_UNCHECK+FALSE
-    ID_CHECK,           // ID_UNCHECK+TRUE
-    ID_UNKNOWN,         // ID_UNCHECK+MAYBE
+    ID_UNCHECK,
+    ID_CHECK,
+    ID_UNKNOWN,
     ID_UPDATE,
-    ID_AUTOSCROLL,
     ID_TIPTIMER,
-    ID_HSCROLLED,
-    ID_VSCROLLED,
     ID_SETVALUE,
     ID_SETINTVALUE,
     ID_SETLONGVALUE,
@@ -342,6 +392,9 @@ public:
 
   /// Return a pointer to the currently focused child window
   FXWindow* getFocus() const { return focus; }
+
+  /// Get window class
+  virtual WindowClass getWindowClass() const;
 
   /// Change window key
   void setKey(FXuint k){ wk=k; }
@@ -459,10 +512,10 @@ public:
   /// Return the common ancestor of window a and window b
   static FXWindow* commonAncestor(FXWindow* a,FXWindow* b);
 
-  /// Return TRUE if sibling a <= sibling b in list
+  /// Return true if sibling a <= sibling b in list
   static FXbool before(const FXWindow *a,const FXWindow* b);
 
-  /// Return TRUE if sibling a >= sibling b in list
+  /// Return true if sibling a >= sibling b in list
   static FXbool after(const FXWindow *a,const FXWindow* b);
 
   /// Return compose context
@@ -498,9 +551,6 @@ public:
   /// Warp the cursor to the new position
   FXbool setCursorPosition(FXint x,FXint y);
 
-  /// Return true if this window is able to receive mouse and keyboard events
-  FXbool isEnabled() const;
-
   /// Return true if the window is active
   FXbool isActive() const;
 
@@ -522,23 +572,32 @@ public:
   /// Notification that focus moved to new child
   virtual void changeFocus(FXWindow *child);
 
+  /// Return true if this is the default window
+  FXbool isDefault() const;
+
   /**
   * This changes the default window which responds to the Return
-  * key in a dialog. If enable is TRUE, this window becomes the default
-  * window; when enable is FALSE, this window will be no longer the
-  * default window.  Finally, when enable is MAYBE, the default window
+  * key in a dialog. If the flag is TRUE, this window becomes the default
+  * window; when the flag is FALSE, this window will be no longer the
+  * default window.  Finally, when the flag is MAYBE, the default window
   * will revert to the initial default window.
   */
   virtual void setDefault(FXuchar flag=TRUE);
 
-  /// Return true if this is the default window
-  FXbool isDefault() const;
+  /// Find default window among this window's children
+  FXWindow* findDefault() const;
+
+  /// Return true if this is the initial default window
+  FXbool isInitial() const;
 
   /// Make this window the initial default window
   void setInitial(FXbool flag=true);
 
-  /// Return true if this is the initial default window
-  FXbool isInitial() const;
+  /// Find inital default window among this window's children
+  FXWindow* findInitial() const;
+
+  /// Return true if this window is able to receive mouse and keyboard events
+  FXbool isEnabled() const;
 
   /// Enable the window to receive mouse and keyboard events
   virtual void enable();
@@ -624,6 +683,9 @@ public:
   /// Process any outstanding repaint messages immediately
   void repaint() const;
 
+  /// Return true if the window has been grabbed
+  FXbool grabbed() const;
+
   /**
   * Grab the mouse to this window; future mouse events will be
   * reported to this window even while the cursor goes outside of this window
@@ -633,8 +695,8 @@ public:
   /// Release the mouse grab
   void ungrab();
 
-  /// Return true if the window has been grabbed
-  FXbool grabbed() const;
+  /// Return true if active grab is in effect
+  FXbool grabbedKeyboard() const;
 
   /// Grab keyboard device
   void grabKeyboard();
@@ -642,17 +704,14 @@ public:
   /// Ungrab keyboard device
   void ungrabKeyboard();
 
-  /// Return true if active grab is in effect
-  FXbool grabbedKeyboard() const;
+  /// Return true if the window is shown
+  FXbool shown() const;
 
   /// Show this window
   virtual void show();
 
   /// Hide this window
   virtual void hide();
-
-  /// Return true if the window is shown
-  FXbool shown() const;
 
   /// Return true if the window is composite
   virtual FXbool isComposite() const;
@@ -678,14 +737,14 @@ public:
   /// Release the clipboard
   FXbool releaseClipboard();
 
+  /// Return true if this window is able to receive drops
+  FXbool isDropEnabled() const;
+
   /// Enable this window to receive drops
   virtual void dropEnable();
 
   /// Disable this window from receiving drops
   virtual void dropDisable();
-
-  /// Return true if this window is able to receive drops
-  FXbool isDropEnabled() const;
 
   /// Return true if a drag operaion has been initiated from this window
   FXbool isDragging() const;
@@ -796,7 +855,7 @@ public:
   * In addition, the name of the widget is passed as context name so
   * that translations for a single dialog may be grouped together.
   */
-  virtual const FXchar* tr(const FXchar* text,const FXchar* hint=NULL,FXint count=-1) const;
+  virtual const FXchar* tr(const FXchar* text,const FXchar* hint=NULL,FXint count=-1) const FX_FORMAT(2) ;
 
   /// Save window to stream
   virtual void save(FXStream& store) const;

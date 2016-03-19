@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXPath.h,v 1.24 2009/01/06 13:07:26 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPATH_H
 #define FXPATH_H
@@ -28,6 +26,15 @@ namespace FX {
 
 
 namespace FXPath {
+
+  /// Options for FXPath::match
+  enum {
+    PathName   = 1,        /// No wildcard can ever match "/'
+    NoEscape   = 2,        /// Backslashes don't quote special chars
+    DotFile    = 4,        /// Leading "." is matched only explicitly
+    LeadDir    = 8,        /// Ignore "/..." after a match
+    CaseFold   = 16        /// Compare without regard to case
+    };
 
   /**
   * Return root of absolute path; on Unix, this is just "/". On
@@ -120,7 +127,7 @@ namespace FXPath {
   extern FXAPI FXString dequote(const FXString& file);
 
   /**
-  * Perform wildcard match of a filename against a wildcard pattern.
+  * Perform match of a filename against a wildcard pattern.
   * The wildcard pattern may comprise ordinary characters or special
   * matching characters, as given below:
   *
@@ -140,13 +147,23 @@ namespace FXPath {
   * The special characters may be escaped to treat them as ordinary characters.
   * Matching may be influenced by a number of flags:
   *
-  *  FILEMATCH_FILE_NAME         No wildcard can ever match /
-  *  FILEMATCH_NOESCAPE          Backslashes don't quote special chars
-  *  FILEMATCH_PERIOD            Leading . is matched only explicitly
-  *  FILEMATCH_LEADING_DIR       Ignore /... after a match
-  *  FILEMATCH_CASEFOLD          Compare without regard to case
+  *  PathName      No wildcard can ever match /
+  *  NoEscape      Backslashes don't quote special chars
+  *  DotFile       Leading . is matched only explicitly
+  *  LeadDir       Ignore /... after a match
+  *  CaseFold      Compare without regard to case
   */
-  extern FXAPI FXbool match(const FXString& file,const FXString& pattern="*",FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
+  extern FXAPI FXbool match(const FXchar *string,const FXchar *pattern="*",FXuint flags=(NoEscape|PathName));
+
+  /**
+  * Perform match of a filename against a wildcard pattern.
+  */
+  extern FXAPI FXbool match(const FXString& file,const FXchar *pattern="*",FXuint flags=(NoEscape|PathName));
+
+  /**
+  * Perform match of a filename against a wildcard pattern.
+  */
+  extern FXAPI FXbool match(const FXString& file,const FXString& pattern,FXuint flags=(NoEscape|PathName));
 
   /**
   * Generate unique filename of the form pathnameXXX.ext, where

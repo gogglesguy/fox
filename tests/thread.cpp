@@ -4,8 +4,6 @@
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1999,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
-*********************************************************************************
-* $Id: thread.cpp,v 1.29 2009/01/06 13:31:22 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include "FXThreadPool.h"
@@ -21,6 +19,7 @@
 /*******************************************************************************/
 
 
+
 // Job runner
 class Runner : public FXRunnable {
 protected:
@@ -34,12 +33,13 @@ public:
 
 
 // Job producer
-class Producer : public FXRunnable {
+class Producer : public FXThread {
 protected:
   FXThreadPool *pool;
   FXint         count;
+  FXint         groups;
 public:
-  Producer(FXThreadPool *p,FXint c):pool(p),count(c){}
+  Producer(FXThreadPool *p,FXint c,FXint g):pool(p),count(c),groups(g){}
   virtual FXint run();
   };
 
@@ -59,14 +59,21 @@ FXint Runner::run(){
 
 // Generate jobs
 FXint Producer::run(){
+  FXint job=0;
   fprintf(stderr,"producer start\n");
   FXuint seed=1013904223u;
-  for(FXint i=0; i<count; i++){
-    fprintf(stderr,"producer job %d\n",i);
-    pool->execute(new Runner(i,fxrandom(seed)/43));
+  for(FXint g=0; g<groups; ++g){
+    for(FXint c=0; c<count; c++){
+      //FXThread::sleep(50000000);
+      if(!pool->execute(new Runner(job,fxrandom(seed)/1000))) goto x;
+      fprintf(stderr,"producer job %d\n",job);
+      job++;
+      }
+    fprintf(stderr,"producer waiting\n");
+    pool->wait();
+    fprintf(stderr,"producer resumed\n");
     }
-  fprintf(stderr,"producer done\n");
-  delete this;
+x:fprintf(stderr,"producer done\n");
   return 1;
   }
 
@@ -74,28 +81,29 @@ FXint Producer::run(){
 
 // Start
 int main(int,char**){
+  int cpus=FXThread::processors();
+  int started;
 
   // Trace
   fxTraceLevel=151;
 
   // Make thread pool
-  FXThreadPool pool;
+  FXThreadPool pool(10);
 
-  fprintf(stderr,"Found %d processors\n",FXThread::processors());
+  // Make producer thread
+  Producer producer(&pool,100,10);
+  
+  fprintf(stderr,"Found %d processors\n",cpus);
 
   fprintf(stderr,"starting pool\n");
-  pool.start(0,8,0);
-  fprintf(stderr,"started pool %d\n",pool.getRunningThreads());
+  started=pool.start(1,8,1);
+  getchar();
+  fprintf(stderr,"started pool %d\n",started);
   getchar();
 
   fprintf(stderr,"starting jobs\n");
-  pool.execute(new Producer(&pool,20));
+  producer.start();
   fprintf(stderr,"running jobs\n");
-
-//  getchar();
-//  fprintf(stderr,"waiting\n");
-//  pool.wait();
-//  fprintf(stderr,"all done\n");
 
   getchar();
   fprintf(stderr,"stopping\n");
@@ -103,6 +111,7 @@ int main(int,char**){
   fprintf(stderr,"stopped\n");
 
   getchar();
+  producer.join();
   fprintf(stderr,"bye\n");
   return 1;
   }

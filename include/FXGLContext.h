@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXGLContext.h,v 1.47 2009/01/06 13:07:24 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGLCONTEXT_H
 #define FXGLCONTEXT_H
@@ -30,12 +28,12 @@
 namespace FX {
 
 
-/// OpenGL context
+/// GL Context
 class FXAPI FXGLContext : public FXId {
   FXDECLARE(FXGLContext)
 private:
   FXDrawable  *surface;         // Drawable surface
-  FXGLVisual  *visual;          // Visual for this window
+  FXGLVisual  *visual;          // Visual of the context
   FXGLContext *shared;          // Shared with other
 private:
   FXGLContext(const FXGLContext&);

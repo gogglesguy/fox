@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXComboBox.h,v 1.58 2009/01/06 13:07:22 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCOMBOBOX_H
 #define FXCOMBOBOX_H
@@ -37,7 +35,7 @@ enum {
   COMBOBOX_INSERT_BEFORE  = 0x00040000,         /// Typed text inserted before current
   COMBOBOX_INSERT_AFTER   = 0x00060000,         /// Typed text inserted after current
   COMBOBOX_INSERT_FIRST   = 0x00080000,         /// Typed text inserted at begin of list
-  COMBOBOX_INSERT_LAST    = 0x00090000,         /// Typed text inserted at end of list
+  COMBOBOX_INSERT_LAST    = 0x000A0000,         /// Typed text inserted at end of list
   COMBOBOX_STATIC         = 0x00100000,         /// Unchangable text box
   COMBOBOX_NORMAL         = 0                   /// Can type text but list is not changed
   };

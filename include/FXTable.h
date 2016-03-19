@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXTable.h,v 1.182 2009/01/16 11:14:51 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -211,7 +209,7 @@ public:
   /// Load from stream
   virtual void load(FXStream& store);
 
-  /// Destroy item and free icon if owned
+  /// Delete item and free icon if owned
   virtual ~FXTableItem();
   };
 

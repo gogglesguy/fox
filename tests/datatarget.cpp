@@ -4,8 +4,6 @@
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1997,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
-*********************************************************************************
-* $Id: datatarget.cpp,v 1.57 2009/01/06 13:31:21 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -172,7 +170,7 @@ DataTargetWindow::DataTargetWindow(FXApp* a):FXMainWindow(a,"Data Target Test",N
   new FXKnob(matrix,&int_target,FXDataTarget::ID_VALUE,KNOB_TICKS|LAYOUT_CENTER_Y|LAYOUT_CENTER_X);
   new FXSpinner(matrix,5,&int_target,FXDataTarget::ID_VALUE,SPIN_CYCLIC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW);
   new FXProgressBar(matrix,&int_target,FXDataTarget::ID_VALUE,LAYOUT_CENTER_Y|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK|PROGRESSBAR_PERCENTAGE|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
-  FX7Segment *seven=new FX7Segment(matrix,FXString::null,SEVENSEGMENT_SHADOW|JUSTIFY_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW|LAYOUT_FILL_X);
+  FX7Segment *seven=new FX7Segment(matrix,FXString::null,SEVENSEGMENT_SHADOW|JUSTIFY_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW|LAYOUT_FIX_WIDTH,0,0,40,0);
   seven->setTarget(&int_target);
   seven->setSelector(FXDataTarget::ID_VALUE);
 

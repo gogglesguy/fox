@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXScrollWindow.h,v 1.26 2009/01/06 13:07:27 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXSCROLLWINDOW_H
 #define FXSCROLLWINDOW_H

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
-*********************************************************************************
-* $Id: CopyDialog.cpp,v 1.9 2009/01/06 13:07:30 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"

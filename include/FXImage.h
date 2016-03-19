@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXImage.h,v 1.72 2009/01/06 13:07:25 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXIMAGE_H
 #define FXIMAGE_H
@@ -76,8 +74,7 @@ private:
 #ifdef WIN32
   virtual FXID GetDC() const;
   virtual int ReleaseDC(FXID) const;
-#endif
-#ifndef WIN32
+#else
   void render_true_32(void *xim,FXuchar *img);
   void render_true_24(void *xim,FXuchar *img);
   void render_true_16_fast(void *xim,FXuchar *img);

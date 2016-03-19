@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXScrollBar.h,v 1.26 2009/01/06 13:07:27 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXSCROLLBAR_H
 #define FXSCROLLBAR_H
@@ -118,8 +116,8 @@ public:
   long onCmdGetIntRange(FXObject*,FXSelector,void*);
 public:
   enum{
-    ID_TIMEWHEEL=FXWindow::ID_LAST,
-    ID_AUTOSCROLL,
+    ID_AUTOSCROLL=FXWindow::ID_LAST,
+    ID_TIMEWHEEL,
     ID_LAST
     };
 public:

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXHash.h,v 1.21 2009/01/06 13:07:24 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXHASH_H
 #define FXHASH_H
@@ -54,7 +52,7 @@ public:
   * Resize the table to the given size; the size must be
   * a power of two.
   */
-  void size(FXuint m);
+  FXbool size(FXuint m);
 
   /**
   * Return the total number of slots in the table.
@@ -70,13 +68,13 @@ public:
   * Insert key into table, unless the key already exists.
   * Returns the current value of the key.
   */
-  void* insert(void* name,void* data);
+  void* insert(void* name,void* data=NULL);
 
   /**
   * Replace key in table, overwriting the old value if the
   * given key already exists.  Returns the old value of the key.
   */
-  void* replace(void* name,void* data);
+  void* replace(void* name,void* data=NULL);
 
   /**
   * Remove key from the table. Returns the old value of the key.

@@ -3,7 +3,7 @@
 #
 
 all: .SYMBOLIC
-	cd ..\..\src
+	cd ..\..\lib
 	wmake -f makefile.wc
 	cd ..\utils
 	wmake -f makefile.wc
@@ -17,7 +17,7 @@ all: .SYMBOLIC
 	wmake -f makefile.wc
 
 clean: .SYMBOLIC
-	cd ..\..\src
+	cd ..\..\lib
 	wmake -f makefile.wc clean
 	cd ..\utils
 	wmake -f makefile.wc clean

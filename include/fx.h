@@ -18,8 +18,6 @@
 * You should have received a copy of the GNU Lesser General Public              *
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
-*********************************************************************************
-* $Id: fx.h,v 1.120 2009/01/06 13:07:29 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H
@@ -42,8 +40,10 @@
 #include "FXHash.h"
 #include "FXException.h"
 #include "FXAutoPtr.h"
+#include "FXRefPtr.h"
 #include "FXElement.h"
 #include "FXArray.h"
+#include "FXAtomic.h"
 #include "FXThread.h"
 #include "FXStream.h"
 #include "FXIO.h"
@@ -57,6 +57,7 @@
 #include "FXSize.h"
 #include "FXPoint.h"
 #include "FXRectangle.h"
+#include "FXColors.h"
 #include "FXObject.h"
 #include "FXDelegator.h"
 #include "FXDict.h"
@@ -73,18 +74,20 @@
 #include "FXObjectList.h"
 #include "FXAccelTable.h"
 #include "FXRecentFiles.h"
-#include "FXApp.h"
-#include "FXId.h"
-#include "FXVisual.h"
 #include "FXFont.h"
 #include "FXCursor.h"
-#include "FXMessageChannel.h"
-#include "FXCURCursor.h"
-#include "FXGIFCursor.h"
+#include "FXVisual.h"
+#include "FXEvent.h"
+#include "FXId.h"
 #include "FXDrawable.h"
 #include "FXBitmap.h"
 #include "FXImage.h"
 #include "FXIcon.h"
+#include "FXWindow.h"
+#include "FXApp.h"
+#include "FXMessageChannel.h"
+#include "FXCURCursor.h"
+#include "FXGIFCursor.h"
 #include "FXBMPImage.h"
 #include "FXGIFImage.h"
 #include "FXICOImage.h"
@@ -122,7 +125,6 @@
 #include "FXIconSource.h"
 #include "FXIconDict.h"
 #include "FXFileDict.h"
-#include "FXWindow.h"
 #include "FXFrame.h"
 #include "FXSeparator.h"
 #include "FXLabel.h"

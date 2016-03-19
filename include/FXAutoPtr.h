@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                    A u t o m a t i c   P o i n t e r                          *
+*                      A u t o m a t i c   P o i n t e r                        *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 2007,2009 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXAutoPtr.h,v 1.15 2009/01/06 13:07:21 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXAUTOPTR_H
 #define FXAUTOPTR_H
@@ -32,17 +30,26 @@ private:
   EType* ptr;
 public:
 
-  /// Construct with optional pointer
-  FXAutoPtr(EType* p=NULL):ptr(p){ }
+  /// Construct from optional pointer
+  FXAutoPtr(EType* src=NULL):ptr(src){ }
 
-  /// Copy constructor from an automatic pointer with compatible type
-  template<class T> FXAutoPtr(FXAutoPtr<T>& orig):ptr(orig.release()){ }
+  /// Construct from another automatic pointer
+  FXAutoPtr(FXAutoPtr& src):ptr(src.release()){ }
+
+  /// Construct from another automatic pointer of compatible type
+  template<class T> FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
 
   /// Assign from pointer
-  FXAutoPtr& operator=(EType *p){ ptr=p; return *this; }
+  FXAutoPtr& operator=(EType *src){ ptr=src; return *this; }
+
+  /// Assign from an another automatic pointer
+  FXAutoPtr& operator=(FXAutoPtr& src){ return reset(src.release()); }
 
   /// Assign from an automatic pointer with compatible type
-  template<class T> FXAutoPtr& operator=(FXAutoPtr<T>& orig){ reset(orig.release()); return *this; }
+  template<class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
+
+  /// Convert to true/false
+  operator FXbool() const { return !!ptr; }
 
   /// Conversion operators
   operator EType*() const { return ptr; }
@@ -57,11 +64,23 @@ public:
   EType* release(){ EType* tmp=ptr; ptr=NULL; return tmp; }
 
   /// Delete old object, replace by new, if any
-  void reset(EType* p=NULL){ if(p!=ptr){ delete ptr; ptr=p; } }
+  FXAutoPtr& reset(EType* p=NULL){ if(p!=ptr){ delete ptr; ptr=p; } return *this; }
 
   /// Destruction deletes pointer
   ~FXAutoPtr(){ delete ptr; }
   };
+
+
+/// Serialize of automatic pointer
+template <class EType> FXStream& operator<<(FXStream& store,const FXAutoPtr<EType>& obj){
+  EType *temp=obj; store << temp; return store;
+  }
+
+
+/// Deserialize of automatic pointer
+template <class EType> FXStream& operator>>(FXStream& store,FXAutoPtr<EType>& obj){
+  EType *temp; store >> temp; obj=temp; return store;
+  }
 
 }
 

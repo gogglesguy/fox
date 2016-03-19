@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXSystem.h,v 1.18 2009/01/06 13:07:27 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXSYSTEM_H
 #define FXSYSTEM_H

@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXTabBook.h,v 1.15 2009/01/06 13:07:28 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXTABBOOK_H
 #define FXTABBOOK_H
@@ -44,7 +42,8 @@ namespace FX {
 * other and using tab items to select the desired panel.
 * When one of the tab items is pressed, the tab book's setCurrent()
 * is called with notify=true.  Thus causes the tab book to send a
-* SEL_COMMAND message to its target.
+* SEL_COMMAND message to its target, with the currently active
+* tab index in the void pointer.
 */
 class FXAPI FXTabBook : public FXTabBar {
   FXDECLARE(FXTabBook)

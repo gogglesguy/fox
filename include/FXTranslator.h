@@ -17,8 +17,6 @@
 *                                                                               *
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
-*********************************************************************************
-* $Id: FXTranslator.h,v 1.13 2009/01/06 13:07:28 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXTRANSLATOR_H
 #define FXTRANSLATOR_H
@@ -48,7 +46,7 @@ public:
   FXTranslator();
 
   /// Translate a string
-  virtual const FXchar* tr(const FXchar* context,const FXchar* message,const FXchar* hint=NULL,FXint count=-1) const;
+  virtual const FXchar* tr(const FXchar* context,const FXchar* message,const FXchar* hint=NULL,FXint count=-1) const FX_FORMAT(2) ;
 
   /// Save translator to a stream
   virtual void save(FXStream& store) const;
