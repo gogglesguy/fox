@@ -138,7 +138,7 @@ src->pub.bytes_in_buffer=JPEG_BUFFER_SIZE;
     src->pub.next_input_byte=src->buffer;
     src->pub.bytes_in_buffer=1;
     }
-  return true;
+  return TRUE;
   }
 
 
@@ -216,7 +216,7 @@ FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   srcinfo.src=&src.pub;
 
   // read the header from the jpg;
-  jpeg_read_header(&srcinfo,true);
+  jpeg_read_header(&srcinfo,TRUE);
 
   // Output format supported by libjpeg
   switch (srcinfo.jpeg_color_space) {
@@ -310,7 +310,7 @@ static boolean empty_output_buffer(j_compress_ptr cinfo){
   dest->stream->save(dest->buffer,JPEG_BUFFER_SIZE);
   dest->pub.free_in_buffer=JPEG_BUFFER_SIZE;
   dest->pub.next_output_byte=dest->buffer;
-  return true;
+  return TRUE;
   }
 
 
@@ -367,8 +367,8 @@ FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FX
   dstinfo.dest=&dst.pub;
 
   jpeg_set_defaults(&dstinfo);
-  jpeg_set_quality(&dstinfo,quality,true);
-  jpeg_start_compress(&dstinfo,true);
+  jpeg_set_quality(&dstinfo,quality,TRUE);
+  jpeg_start_compress(&dstinfo,TRUE);
 
   // Write the jpeg data
   pp=data;

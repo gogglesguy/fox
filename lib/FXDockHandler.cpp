@@ -159,7 +159,7 @@ long FXDockHandler::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     wattr.backing_planes=0;
     wattr.backing_pixel=0;
     wattr.save_under=false;
-    wattr.event_mask=ButtonPressMask|ButtonReleaseMask|PointerMotionMask|KeyPressMask|KeyReleaseMask | FocusChangeMask|StructureNotifyMask | StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask;
+    wattr.event_mask=ButtonPressMask|ButtonReleaseMask|PointerMotionMask|KeyPressMask|KeyReleaseMask|FocusChangeMask|StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask;
     wattr.do_not_propagate_mask=KeyPressMask|KeyReleaseMask|ButtonPressMask|ButtonReleaseMask|PointerMotionMask|ButtonMotionMask;
     wattr.override_redirect=true;
     wattr.colormap=DefaultColormap(display,DefaultScreen(display));

@@ -312,10 +312,10 @@ FXPrintDialog::FXPrintDialog(FXWindow* own,const FXString& caption,FXuint opts,F
 
   // Layout
   FXGroupBox *orientation=new FXGroupBox(right,tr("Layout"),GROUPBOX_TITLE_LEFT|FRAME_RIDGE|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_FILL_Y,0,0,0,0, 10,10,5,5);
-  new FXLabel(orientation,FXString::null,portraitIcon,LAYOUT_SIDE_LEFT|LAYOUT_CENTER_Y|LAYOUT_RIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y);
+  new FXLabel(orientation,FXString::null,portraitIcon,LAYOUT_SIDE_LEFT|LAYOUT_RIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y);
   orientportrait=new FXRadioButton(orientation,tr("Portrait"),this,ID_PORTRAIT,LAYOUT_SIDE_LEFT|ICON_BEFORE_TEXT|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y);
-  orientlanscape=new FXRadioButton(orientation,tr("Landscape"),this,ID_LANDSCAPE,LAYOUT_SIDE_RIGHT|ICON_BEFORE_TEXT|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y);
-  new FXLabel(orientation,FXString::null,landscapeIcon,LAYOUT_SIDE_RIGHT|LAYOUT_CENTER_Y|LAYOUT_RIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y);
+  orientlanscape=new FXRadioButton(orientation,tr("Landscape"),this,ID_LANDSCAPE,LAYOUT_SIDE_RIGHT|ICON_BEFORE_TEXT|JUSTIFY_CENTER_Y);
+  new FXLabel(orientation,FXString::null,landscapeIcon,LAYOUT_SIDE_RIGHT|LAYOUT_RIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y);
 
   // Paper
   FXGroupBox *paperdims=new FXGroupBox(right,tr("Paper Size"),GROUPBOX_TITLE_LEFT|FRAME_RIDGE|LAYOUT_FILL_X|LAYOUT_TOP|LAYOUT_FILL_Y,0,0,0,0, 10,10,5,5);
@@ -453,7 +453,7 @@ void FXPrintDialog::create(){
       }
 
     // Snarf printer name (we read until the ':' or the '|' which separates aliases)
-    for(i=0; i<1000 && buf[i]!=0 && buf[i]!=':' && buf[i]!='|'; i++){}
+    for(i=0; i<ARRAYNUMBER(buf)-1 && buf[i]!=0 && buf[i]!=':' && buf[i]!='|'; i++){}
     buf[i]=0;
 
     // Append human-readable info, if any

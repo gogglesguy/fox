@@ -29,12 +29,35 @@ class FindInFiles;
 /// Directory search visitor
 class SearchVisitor : public FXGlobVisitor {
 private:
-  FXRex    rex;         // Regex parser
+  FindInFiles* dlg;     // Find dialog
+  FXString     base;    // Scan starting from this
+  FXRex        rex;     // Regex parser
+  FXlong       limit;   // File size limit
 private:
-  FXint loadFileBody(const FXString& file,FXString& body) const;
-  FXint searchFileBody(const FXString& body) const;
+  FXlong loadFile(const FXString& path,FXString& text) const;
+  FXint searchFile(const FXString& path) const;
+private:
+  SearchVisitor();
+  SearchVisitor(const SearchVisitor&);
+  SearchVisitor& operator=(const SearchVisitor&);
 public:
-  SearchVisitor(const FXString& pattern=FXString::null,FXint mode=FXRex::Normal);
+
+  // Construct search file for pattern visitor
+  SearchVisitor(FindInFiles* dg):dlg(dg),base(PATHSEPSTRING),limit(100000000L){ }
+
+  // Traverse files under path and search for pattern in each
+  FXuint traverse(const FXString& path,const FXString& pattern,const FXString& wild="*",FXint mode=FXRex::Normal,FXuint opts=FXDir::MatchAll,FXint depth=1000);
+
+  // Get base of traversal
+  const FXString& getBase() const { return base; }
+
+  // Set file size limit
+  void setLimit(FXlong size);
+
+  // Get file size limit
+  FXlong getLimit() const { return limit; }
+
+  // Visit given file and scan it
   virtual FXuint visit(const FXString& path);
   };
 
@@ -43,35 +66,49 @@ public:
 class FindInFiles : public FXDialogBox {
   FXDECLARE(FindInFiles)
 protected:
-  FXIconList  *locations;               // Search hits
-  FXTextField *findstring;              // String to search for
-  FXTextField *filefolder;              // Folder to search
-  FXComboBox  *filefilter;              // File filters
-  FXString     filePattern;             // Search files matching pattern
-  FXString     patternHistory[20];      // Search string history
-  FXuint       optionsHistory[20];      // Search option history
-  FXuint       searchmode;              // Search options
-  FXint        index;                   // History index
+  SearchVisitor   visitor;              // Search visitor
+  FXIconList     *locations;            // Search hits
+  FXTextField    *findstring;           // String to search for
+  FXTextField    *filefolder;           // Folder to search
+  FXComboBox     *filefilter;           // File filters
+  FXToggleButton *pausebutton;          // Pause button
+  FXString        filePattern;          // Search files matching pattern
+  FXString        patternHistory[20];   // Search string history
+  FXuint          optionsHistory[20];   // Search option history
+  FXuint          searchmode;           // Search options
+  FXint           index;                // History index
+  FXuint          proceed;              // Flag
+  FXbool          firsthit;             // Record only first hit in file
 protected:
-  static const FXchar sectionName[];
+  FindInFiles();
 private:
-  FindInFiles(){}
   FindInFiles(const FindInFiles&);
-  void appendHistory(const FXString& patt,FXuint opts);
+  FindInFiles& operator=(const FindInFiles&);
+private:
   void readRegistry();
   void writeRegistry();
+  void appendHistory(const FXString& patt,FXuint opts);
 public:
+  long onUpdStop(FXObject*,FXSelector,void*);
+  long onCmdStop(FXObject*,FXSelector,void*);
+  long onUpdPause(FXObject*,FXSelector,void*);
+  long onCmdPause(FXObject*,FXSelector,void*);
+  long onUpdSearch(FXObject*,FXSelector,void*);
   long onCmdSearch(FXObject*,FXSelector,void*);
+  long onUpdDelete(FXObject*,FXSelector,void*);
+  long onCmdDelete(FXObject*,FXSelector,void*);
   long onCmdFilter(FXObject*,FXSelector,void*);
+  long onUpdFirstHit(FXObject*,FXSelector,void*);
+  long onCmdFirstHit(FXObject*,FXSelector,void*);
+  long onUpdFlags(FXObject*,FXSelector,void*);
+  long onCmdFlags(FXObject*,FXSelector,void*);
+  long onCmdFolder(FXObject*,FXSelector,void*);
   long onUpdHistoryUp(FXObject*,FXSelector,void*);
   long onUpdHistoryDn(FXObject*,FXSelector,void*);
   long onCmdHistoryUp(FXObject*,FXSelector,void*);
   long onCmdHistoryDn(FXObject*,FXSelector,void*);
-  long onCmdFolder(FXObject*,FXSelector,void*);
   long onArrowKey(FXObject*,FXSelector,void*);
   long onMouseWheel(FXObject*,FXSelector,void*);
-  long onUpdFlags(FXObject*,FXSelector,void*);
-  long onCmdFlags(FXObject*,FXSelector,void*);
   long onCmdFileDblClicked(FXObject*,FXSelector,void*);
 public:
   enum {
@@ -90,13 +127,15 @@ public:
     ID_FOLDER,
     ID_HIST_UP,
     ID_HIST_DN,
-    ID_EXACT,
     ID_ICASE,
     ID_REGEX,
     ID_RECURSIVE,
     ID_HIDDEN,
+    ID_FIRST_HIT,
     ID_FILELIST,
     ID_PAUSE,
+    ID_STOP,
+    ID_DELETE,
     ID_LAST
     };
 public:
@@ -104,11 +143,23 @@ public:
   /// Create find-in-files widget
   FindInFiles(Adie *a);
 
+  /// Return Adie application
+  Adie* getApp() const { return (Adie*)FXDialogBox::getApp(); }
+
   /// Create server-side resources
   virtual void create();
 
   /// Close the window, return true if actually closed
   virtual FXbool close(FXbool notify=false);
+
+  /// Called by visitor to see if we should continue processing
+  FXbool continueProcessing();
+
+  /// Called by visitor to deposit new search result
+  void appendSearchResult(const FXString& file,const FXString& text,FXint lineno,FXint column);
+
+  /// Clear search results
+  void clearSearchResults();
 
   /// Change directory
   void setDirectory(const FXString& path);
@@ -127,6 +178,12 @@ public:
 
   /// Return search mode the user has selected
   FXuint getSearchMode() const { return searchmode; }
+
+  /// Set first hit only flag
+  void setFirstHit(FXbool flag){ firsthit=flag; }
+
+  /// Return first hit only flag
+  FXbool getFirstHit() const { return firsthit; }
 
   /// Change file pattern
   void setPattern(const FXString& ptrn);
@@ -161,6 +218,7 @@ public:
   /// Return true if pattern entry is allowed
   FXbool allowPatternEntry() const;
 
+  /// Destroy it
   virtual ~FindInFiles();
   };
 

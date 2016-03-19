@@ -26,7 +26,7 @@
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 5
 #define VERSION_PATCH 0
- 
+
 
 class HelpWindow;
 class Preferences;
@@ -39,12 +39,12 @@ class Adie : public FXApp {
   FXDECLARE(Adie)
   friend class TextWindow;
 protected:
-  TextWindowList      windowlist;                   // Window list
-  FXFileAssociations *associations;                 // File association table
-  SyntaxList          syntaxes;                     // List of syntax patterns
-  FXString            syntaxpaths;                  // Where to look for syntax file
-  FXIcon             *bigicon;                      // Big application icon
-  FXIcon             *smallicon;                    // Small application icon
+  TextWindowList      windowlist;               // Window list
+  FXFileAssociations *associations;             // File association table
+  SyntaxList          syntaxes;                 // List of syntax patterns
+  FXString            syntaxpaths;              // Where to look for syntax file
+  FXIcon             *bigicon;                  // Big application icon
+  FXIcon             *smallicon;                // Small application icon
   FXIcon             *newicon;
   FXIcon             *reloadicon;
   FXIcon             *openicon;
@@ -102,7 +102,19 @@ public:
 
   // Run the application
   FXint start(int argc,char** argv);
+  
+  // Generate unique name from given path
+  FXString unique(const FXString& path) const;
 
+  // Find an as yet untitled, unedited window
+  TextWindow* findUnused() const;
+
+  // Find window, if any, currently editing the given file
+  TextWindow* findWindow(const FXString& file) const;
+
+  // Open file and jump to line, or just jump to line/column if already open
+  TextWindow* openFileWindow(const FXString& file,FXint lineno=0,FXint column=0);
+  
   // Get syntax for language name
   Syntax* getSyntaxByName(const FXString& lang);
 

@@ -39,8 +39,8 @@ enum {
 
 /**
 * A Check Button is a tri-state button.  Normally, it is either
-* TRUE or FALSE, and toggles between TRUE or FALSE whenever it is pressed.
-* A third state MAYBE may be set to indicate that no selection has been made yet
+* true or false, and toggles between true or false whenever it is pressed.
+* A third state (maybe) may be set to indicate that no selection has been made yet
 * by the user, or that the state is ambiguous.
 * When pressed, the Check Button sends a SEL_COMMAND to its target, and the
 * message data represents the state of the check button.
@@ -97,10 +97,10 @@ public:
   /// Get default height
   virtual FXint getDefaultHeight();
 
-  /// Set check button state (TRUE, FALSE or MAYBE)
+  /// Set check button state (true, false or maybe)
   void setCheck(FXuchar state=true,FXbool notify=false);
 
-  /// Get check button state (TRUE, FALSE or MAYBE)
+  /// Get check button state (true, false or maybe)
   FXuchar getCheck() const { return check; }
 
   /// Change check button style

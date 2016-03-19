@@ -246,7 +246,7 @@ public:
   virtual void layout();
 
   /// Return number of items
-  FXint getNumItems() const { return items.no(); }
+  FXint getNumItems() const { return (FXint)items.no(); }
 
   /// Return total size of all items
   FXint getTotalSize() const;

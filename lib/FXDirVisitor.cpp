@@ -43,6 +43,7 @@
   - Automatically skip directories already being visited to avoid circular symlinks
     from causing infinite recursion.
   - Also skip directories with insufficient permissions.
+  - Recursion limiter feature added; allows one to stop below a certain level.
 */
 
 
@@ -61,39 +62,41 @@ struct FXDirVisitor::Seen {
 
 
 // Recurse, keeping track of where we've been already
-FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen){
-  FXStat data;
-  if(FXStat::statLink(path,data)){
-    if(data.isDirectory()){                     // Directory
-      FXuint code;
-      for(Seen *s=seen; s; s=s->next){
-        if(data.index()==s->node) return 0;     // Skip if we've been here already
-        }
-      if((code=enter(path))==1){                // Conditionally enter subdirectories
-        Seen here={seen,data.index()};
-        FXDir directory(path);
-        FXString name;
-        while(directory.next(name)){
-          if(!(name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))){
-            if(recurse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,&here)==2){
-              leave(path);
-              return 2;                         // Bail
+FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen,FXint depth){
+  if(0<depth){
+    FXStat data;
+    if(FXStat::statLink(path,data)){
+      if(data.isDirectory()){                     // Directory
+        FXuint code;
+        for(Seen *s=seen; s; s=s->next){
+          if(data.index()==s->node) return 0;     // Skip if we've been here already
+          }
+        if((code=enter(path))==1){                // Conditionally enter subdirectories
+          Seen here={seen,data.index()};
+          FXDir directory(path);
+          FXString name;
+          while(directory.next(name)){
+            if(!(name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))){
+              if(recurse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,&here,depth-1)==2){
+                leave(path);
+                return 2;                         // Bail
+                }
               }
             }
+          return leave(path);
           }
-        return leave(path);
+        return code;
         }
-      return code;
+      return visit(path);                         // Regular file
       }
-    return visit(path);                         // Regular file
     }
   return 0;
   }
 
 
 // Recursively traverse starting from path
-FXuint FXDirVisitor::traverse(const FXString& path){
-  return recurse(path,NULL);
+FXuint FXDirVisitor::traverse(const FXString& path,FXint depth){
+  return recurse(path,NULL,depth);
   }
 
 
@@ -122,10 +125,10 @@ FXDirVisitor::~FXDirVisitor(){
 /*******************************************************************************/
 
 // Recursively traverse starting from path
-FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts){
+FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts,FXint depth){
   wildcard=wild;
   options=opts;
-  return recurse(path,NULL);
+  return recurse(path,NULL,depth);
   }
 
 
@@ -165,19 +168,19 @@ FXGlobVisitor::~FXGlobVisitor(){
 
 
 
-/// Create new glob counting visitor
+// Create new glob counting visitor
 FXGlobCountVisitor::FXGlobCountVisitor():countFolders(0),countFiles(0),countBytes(0),maxDepth(0),depth(0){
   }
-  
-/// Copy glob counting visitor
+
+// Copy glob counting visitor
 FXGlobCountVisitor::FXGlobCountVisitor(const FXGlobCountVisitor& org):countFolders(org.countFolders),countFiles(org.countFiles),countBytes(org.countBytes),maxDepth(org.maxDepth),depth(0){
   }
 
 
-// Start traversal of path  
-FXuint FXGlobCountVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts){
+// Start traversal of path
+FXuint FXGlobCountVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts,FXint limit){
   countFolders=countFiles=countBytes=maxDepth=depth=0;
-  return FXGlobVisitor::traverse(path,wild,opts);
+  return FXGlobVisitor::traverse(path,wild,opts,limit);
   }
 
 

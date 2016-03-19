@@ -26,8 +26,6 @@
 #include "Preferences.h"
 #include "CopyDialog.h"
 #include "icons.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 // Support for extra image formats
 #ifdef HAVE_PNG_H
@@ -472,61 +470,61 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,2,0);
 
   // Add some toolbar buttons
-  new FXButton(toolbar,tr("\tUp\tChange up one level."),upicon,this,ID_UPDIRECTORY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tHome\tChange to home directory."),homeicon,this,ID_GO_HOME,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tWork\tChange to current working directory."),workicon,this,ID_GO_WORK,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXMenuButton(toolbar,tr("\tBookmarks\tVisit bookmarked directories."),setbookicon,bookmarkmenu,BUTTON_TOOLBAR|MENUBUTTON_NOARROWS|MENUBUTTON_ATTACH_LEFT|FRAME_RAISED);
-  new FXButton(toolbar,tr("\tBack\tChange to previous directory."),backicon,this,ID_GO_BACKWARD,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tForward\tChange to next directory."),forwicon,this,ID_GO_FORWARD,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tUp\tChange up one level."),upicon,this,ID_UPDIRECTORY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tHome\tChange to home directory."),homeicon,this,ID_GO_HOME,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tWork\tChange to current working directory."),workicon,this,ID_GO_WORK,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXMenuButton(toolbar,tr("\tBookmarks\tVisit bookmarked directories."),setbookicon,bookmarkmenu,BUTTON_TOOLBAR|MENUBUTTON_NOARROWS|MENUBUTTON_ATTACH_LEFT|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tBack\tChange to previous directory."),backicon,this,ID_GO_BACKWARD,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tForward\tChange to next directory."),forwicon,this,ID_GO_FORWARD,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
   // Spacer
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
   new FXFrame(toolbar,FRAME_SUNKEN|LAYOUT_CENTER_Y|LAYOUT_FIX_HEIGHT|LAYOUT_FIX_WIDTH,0,0,2,22);
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
 
-  new FXButton(toolbar,tr("\tMount\tMount device."),mapicon,NULL,0,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tUnmount\tUnmount device."),unmapicon,NULL,0,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tMount\tMount device."),mapicon,NULL,0,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tUnmount\tUnmount device."),unmapicon,NULL,0,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
    // Spacer
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
   new FXFrame(toolbar,FRAME_SUNKEN|LAYOUT_CENTER_Y|LAYOUT_FIX_HEIGHT|LAYOUT_FIX_WIDTH,0,0,2,22);
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
 
-  new FXButton(toolbar,tr("\tNew Directory\tCreate new directory."),newdiricon,this,ID_NEW,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tNew Directory\tCreate new directory."),newdiricon,this,ID_NEW,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
-  new FXButton(toolbar,tr("\tCut\tCut to clipboard."),cuticon,filelist,FXFileList::ID_CUT_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tCopy\tCopy to clipboard."),copyicon,filelist,FXFileList::ID_COPY_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tPaste\tPaste from clipboard."),pasteicon,filelist,FXFileList::ID_PASTE_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//  new FXButton(toolbar,tr("\tCopy\tCopy file."),copyicon,this,ID_COPY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//  new FXButton(toolbar,tr("\tMove\tMove file."),moveicon,this,ID_MOVE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//  new FXButton(toolbar,tr("\tLink\tLink file."),linkicon,this,ID_LINK,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-//  new FXButton(toolbar,tr("\tRename\tRename file."),renameicon,this,ID_RENAME,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tCut\tCut to clipboard."),cuticon,filelist,FXFileList::ID_CUT_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tCopy\tCopy to clipboard."),copyicon,filelist,FXFileList::ID_COPY_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tPaste\tPaste from clipboard."),pasteicon,filelist,FXFileList::ID_PASTE_SEL,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tCopy\tCopy file."),copyicon,this,ID_COPY,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tMove\tMove file."),moveicon,this,ID_MOVE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tLink\tLink file."),linkicon,this,ID_LINK,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+//  new FXButton(toolbar,tr("\tRename\tRename file."),renameicon,this,ID_RENAME,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
   // Spacer
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
   new FXFrame(toolbar,FRAME_SUNKEN|LAYOUT_CENTER_Y|LAYOUT_FIX_HEIGHT|LAYOUT_FIX_WIDTH,0,0,2,22);
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
 
-  new FXButton(toolbar,tr("\tPreferences\tDisplay preferences panel."),configicon,this,ID_PREFERENCES,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tProperties\tDisplay file properties."),propicon,this,ID_PROPERTIES,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tPreferences\tDisplay preferences panel."),configicon,this,ID_PREFERENCES,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tProperties\tDisplay file properties."),propicon,this,ID_PROPERTIES,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
   // Spacer
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
   new FXFrame(toolbar,FRAME_SUNKEN|LAYOUT_CENTER_Y|LAYOUT_FIX_HEIGHT|LAYOUT_FIX_WIDTH,0,0,2,22);
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
 
   // Switch display modes
-  new FXButton(toolbar,tr("\tBig Icons\tShow big icons."),bigiconsicon,filelist,FXFileList::ID_SHOW_BIG_ICONS,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tSmall Icons\tShow small icons."),miniiconsicon,filelist,FXFileList::ID_SHOW_MINI_ICONS,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tDetails\tShow detail view."),detailsicon,filelist,FXFileList::ID_SHOW_DETAILS,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tBig Icons\tShow big icons."),bigiconsicon,filelist,FXFileList::ID_SHOW_BIG_ICONS,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSmall Icons\tShow small icons."),miniiconsicon,filelist,FXFileList::ID_SHOW_MINI_ICONS,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tDetails\tShow detail view."),detailsicon,filelist,FXFileList::ID_SHOW_DETAILS,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
   // Spacer
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
   new FXFrame(toolbar,FRAME_SUNKEN|LAYOUT_CENTER_Y|LAYOUT_FIX_HEIGHT|LAYOUT_FIX_WIDTH,0,0,2,22);
-  new FXFrame(toolbar,LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
+  new FXFrame(toolbar,LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FIX_WIDTH,0,0,4,0);
 
   // Delete button far away
-  new FXButton(toolbar,tr("\tDelete\tDelete file."),deleteicon,this,ID_DELETE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tDelete\tDelete file."),deleteicon,this,ID_DELETE,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_LEFT);
 
 
   // Location bar
@@ -589,13 +587,12 @@ FXbool PathFinderMain::close(FXbool notify){
 
 
 // Switch to given directory
-void PathFinderMain::setDirectory(const FXString& dir){
-  FXString oldpath=getDirectory();
-  FXString newpath=FXPath::absolute(oldpath,dir);
-  filelist->setDirectory(newpath,true);
-  dirbox->setDirectory(newpath);
-  dirlist->setDirectory(newpath);
-  address->setText(newpath);
+void PathFinderMain::setDirectory(const FXString& path){
+  FXTRACE((10,"PathFinderMain::setDirectory(%s)\n",path.text()));
+  filelist->setDirectory(path,true);
+  dirlist->setDirectory(filelist->getDirectory());
+  dirbox->setDirectory(filelist->getDirectory());
+  address->setText(filelist->getDirectory());
   }
 
 
@@ -928,6 +925,8 @@ void PathFinderMain::loadSettings(){
 
   // Read last path setting
   path=getApp()->reg().readStringEntry("SETTINGS","directory","~");
+
+  // Jump to there
   setDirectory(FXPath::expand(path));
   }
 
@@ -953,20 +952,18 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
   FXint index=filelist->getCurrentItem();       // FIXME use selected item(s)
   if(0<=index){
 
+    // Pathname of item
+    FXString pathname=filelist->getItemPathname(index);
+
     // If directory, open the directory
     if(filelist->isItemDirectory(index)){
-      FXString directory=filelist->getItemPathname(index);
-      FXTRACE((10,"directory=%s\n",directory.text()));
-      filelist->setDirectory(directory,true);
-      dirlist->setDirectory(directory);
-      dirbox->setDirectory(directory);
-      address->setText(directory);
-      visitDirectory(directory);
+      setDirectory(pathname);
+      visitDirectory(pathname);
       }
 
     // If executable, execute it!
     else if(filelist->isItemExecutable(index)){
-      FXString executable=FXPath::enquote(filelist->getItemPathname(index)) + " &";
+      FXString executable=FXPath::enquote(pathname) + " &";
       FXTRACE((10,"system(%s)\n",executable.text()));
       system(executable.text());
 /*
@@ -982,16 +979,16 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
         if(association->command.text()){
-          FXString command=FXString::value(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
+          FXString command=FXString::value(association->command.text(),FXPath::enquote(pathname).text());
           FXTRACE((10,"system(%s)\n",command.text()));
           ::system(command.text());
           }
         else{
-          FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),filelist->getItemFilename(index).text());
+          FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),pathname.text());
           }
         }
       else{
-        FXMessageBox::information(this,MBOX_OK,tr("Unknown File Type"),tr("No association has been set for file: %s."),filelist->getItemFilename(index).text());
+        FXMessageBox::information(this,MBOX_OK,tr("Unknown File Type"),tr("No association has been set for file: %s."),pathname.text());
         }
       }
     }
@@ -1004,22 +1001,18 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
   FXint index=(FXint)(FXival)ptr;
   if(0<=index){
 
-    // Get file name
-    FXString name=filelist->getItemPathname(index);
+    // Pathname of item
+    FXString pathname=filelist->getItemPathname(index);
 
     // If directory, open the directory
     if(filelist->isItemDirectory(index)){
-      FXTRACE((10,"directory=%s\n",name.text()));
-      filelist->setDirectory(name,true);
-      dirlist->setDirectory(name);
-      dirbox->setDirectory(name);
-      address->setText(name);
-      visitDirectory(name);
+      setDirectory(pathname);
+      visitDirectory(pathname);
       }
 
     // If executable, execute it!
     else if(filelist->isItemExecutable(index)){
-      FXString executable=FXPath::enquote(name)+" &";
+      FXString executable=FXPath::enquote(pathname)+" &";
       FXTRACE((10,"system(%s)\n",executable.text()));
       system(executable.text());
       }
@@ -1029,22 +1022,22 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
 
       // Load image if preview mode on
       if(preview){
-        if(previewImage(name)) return 1;
+        if(previewImage(pathname)) return 1;
         }
 
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
         if(association->command.text()){
-          FXString command=FXString::value(association->command.text(),FXPath::enquote(name).text());
+          FXString command=FXString::value(association->command.text(),FXPath::enquote(pathname).text());
           FXTRACE((10,"system(%s)\n",command.text()));
           system(command.text());
           }
         else{
-          FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),name.text());
+          FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),pathname.text());
           }
         }
       else{
-        FXMessageBox::information(this,MBOX_OK,tr("Unknown File Type"),tr("No association has been set for file: %s."),name.text());
+        FXMessageBox::information(this,MBOX_OK,tr("Unknown File Type"),tr("No association has been set for file: %s."),pathname.text());
         }
       }
     }
@@ -1131,27 +1124,13 @@ long PathFinderMain::onFileDeleted(FXObject* sender,FXSelector sel,void* ptr){
 long PathFinderMain::onCmdGotoLocation(FXObject*,FXSelector,void*){
 
   // Get given path, relative to current directory if not absolute
-  FXString path=FXPath::absolute(getDirectory(),address->getText());
-
-  // Go up to the lowest directory which still exists
-  FXString dir=FXPath::validPath(path);
+  FXString path=FXPath::absolute(getDirectory(),FXPath::expand(address->getText()));
 
   // Move to this existing directory
-  filelist->setDirectory(dir,true);
-  dirlist->setDirectory(dir);
-  dirbox->setDirectory(dir);
-  address->setText(path);
-
-  // Select tail end, was not good path
-  if(dir.length()<path.length()){
-    if(ISPATHSEP(path[dir.length()]))
-      address->setSelection(dir.length()+1,path.length()-dir.length()-1);
-    else
-      address->setSelection(dir.length(),path.length()-dir.length());
-    }
+  setDirectory(path);
 
   // Mark this directory
-  visitDirectory(dir);
+  visitDirectory(path);
 
   // Close preview
   closePreview();
@@ -1224,9 +1203,9 @@ long PathFinderMain::onCmdDirectory(FXObject*,FXSelector,void* ptr){
   FXTreeItem *item=(FXTreeItem*)ptr;
   FXString path=dirlist->getItemPathname(item);
   filelist->setDirectory(path,true);
-  dirbox->setDirectory(path);
-  address->setText(path);
-  visitDirectory(path);
+  dirbox->setDirectory(filelist->getDirectory());
+  address->setText(filelist->getDirectory());
+  visitDirectory(filelist->getDirectory());
   closePreview();
   return 1;
   }
@@ -1235,10 +1214,10 @@ long PathFinderMain::onCmdDirectory(FXObject*,FXSelector,void* ptr){
 // Change the directory from the FXDirBox
 long PathFinderMain::onCmdDirTree(FXObject*,FXSelector,void*){
   FXString path=dirbox->getDirectory();
-  dirlist->setDirectory(path);
   filelist->setDirectory(path,true);
-  address->setText(path);
-  visitDirectory(path);
+  dirlist->setDirectory(filelist->getDirectory());
+  address->setText(filelist->getDirectory());
+  visitDirectory(filelist->getDirectory());
   closePreview();
   return 1;
   }
@@ -1246,7 +1225,7 @@ long PathFinderMain::onCmdDirTree(FXObject*,FXSelector,void*){
 
 // Move up one directory
 long PathFinderMain::onCmdUpDirectory(FXObject*,FXSelector,void*){
-  FXString path=FXPath::upLevel(filelist->getDirectory());
+  FXString path=FXPath::upLevel(getDirectory());
   setDirectory(path);
   visitDirectory(path);
   closePreview();
@@ -1415,7 +1394,7 @@ long PathFinderMain::onCmdSaveSettings(FXObject*,FXSelector,void*){
 
 // Spawn new PathFinder
 long PathFinderMain::onCmdNewPathFinder(FXObject*,FXSelector,void*){
-  FXString path=filelist->getDirectory();
+  FXString path=getDirectory();
   saveSettings();
   getApp()->reg().write();
   FXString command=FXString::value("%s %s &",pathfindercommand,path.text());
@@ -1446,7 +1425,7 @@ long PathFinderMain::onCmdNew(FXObject*,FXSelector,void*){
 
 // Update create new directory
 long PathFinderMain::onUpdNew(FXObject* sender,FXSelector,void*){
-  FXString path=filelist->getDirectory();
+  FXString path=getDirectory();
   if(FXStat::isAccessible(path,FXIO::Writing))
     sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
   else
@@ -1585,12 +1564,12 @@ long PathFinderMain::onCmdFilter(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Goto directory
+// Goto directory dialog
 long PathFinderMain::onCmdGotoDir(FXObject*,FXSelector,void*){
   FXBMPIcon gotoicon(getApp(),gotodir,0,IMAGE_ALPHAGUESS);
-  FXString dir=getDirectory();
+  FXString dir;
   if(FXInputDialog::getString(dir,this,tr("Goto Directory"),tr("&Goto directory:"),&gotoicon)){
-    setDirectory(dir);
+    setDirectory(FXPath::validPath(FXPath::absolute(getDirectory(),FXPath::expand(dir))));
     closePreview();
     }
   return 1;
@@ -1746,8 +1725,9 @@ long PathFinderMain::onCmdProperties(FXObject*,FXSelector,void*){
 
 
 // Change mode
-long PathFinderMain::onCmdChmod(FXObject*,FXSelector sel,void*){
+long PathFinderMain::onCmdChmod(FXObject*,FXSelector sel,void* ptr){
   FXuint bit=1<<(FXSELID(sel)-ID_PROP_XOTH);
+  FXuint state=(ptr!=0);
   FXString filename;
   FXuint mode;
   for(FXint i=0; i<filelist->getNumItems(); ++i){
@@ -1757,7 +1737,7 @@ long PathFinderMain::onCmdChmod(FXObject*,FXSelector sel,void*){
         if(FXMessageBox::error(this,MBOX_YES_NO,tr("Error Reading Permissions"),tr("Unable to read permissions on file:\n\n%s\n\nContinue with operation?"),filename.text())==MBOX_CLICKED_YES) continue;
         break;
         }
-      mode^=bit;
+      mode^=((0-state)^mode)&bit;       // Make bit equal to state
       if(!FXStat::mode(filename,mode)){
         if(FXMessageBox::error(this,MBOX_YES_NO,tr("Error Changing Permissions"),tr("Unable to change permissions on file:\n\n%s\n\nContinue with operation?"),filename.text())==MBOX_CLICKED_YES) continue;
         break;

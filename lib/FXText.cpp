@@ -1273,23 +1273,24 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
     // Make all characters contiguous in the buffer
     squeezegap();
 
-    // Enforce legal range
-    start=FXCLAMP(0,start,length);
-    
     // Search forward
     if(flgs&SEARCH_FORWARD){
-      if(rex.search(buffer,length,start,length,FXRex::Normal,beg,end,npar)>=0) return true;
-      if(flgs&SEARCH_WRAP){
-        if(rex.search(buffer,length,0,start,FXRex::Normal,beg,end,npar)>=0) return true;
+      if(start<=length){
+        if(rex.search(buffer,length,FXMAX(start,0),length,FXRex::Normal,beg,end,npar)>=0) return true;
+        }
+      if((flgs&SEARCH_WRAP) && (start>0)){
+        if(rex.search(buffer,length,0,FXMIN(start,length),FXRex::Normal,beg,end,npar)>=0) return true;
         }
       return false;
       }
 
     // Search backward
     if(flgs&SEARCH_BACKWARD){
-      if(rex.search(buffer,length,start,0,FXRex::Normal,beg,end,npar)>=0) return true;
-      if(flgs&SEARCH_WRAP){
-        if(rex.search(buffer,length,length,start,FXRex::Normal,beg,end,npar)>=0) return true;
+      if(0<=start){
+        if(rex.search(buffer,length,FXMIN(start,length),0,FXRex::Normal,beg,end,npar)>=0) return true;
+        }
+      if((flgs&SEARCH_WRAP) && (start<length)){
+        if(rex.search(buffer,length,length,FXMAX(start,0),FXRex::Normal,beg,end,npar)>=0) return true;
         }
       return false;
       }
@@ -3180,8 +3181,7 @@ void FXText::updateRange(FXint beg,FXint end) const {
 
 // Draw the text
 long FXText::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
-  FXDCWindow dc(this,event);
+  FXDCWindow dc(this,(FXEvent*)ptr);
 
   // Set font
   dc.setFont(font);

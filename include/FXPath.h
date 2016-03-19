@@ -125,6 +125,9 @@ namespace FXPath {
   /// Return valid part of absolute path
   extern FXAPI FXString validPath(const FXString& file);
 
+  /// Return true if path is valid
+  extern FXAPI FXbool isValidPath(const FXString& file);
+
   /// Enquote filename to make safe for shell
   extern FXAPI FXString enquote(const FXString& file,FXbool force=false);
 

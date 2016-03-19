@@ -67,8 +67,8 @@ protected:
   FXString           searchHistory[20]; // Search string history
   FXString           replacHistory[20]; // Replace string history
   FXuint             optionHistory[20]; // Options history
+  FXint              activeHistory;     // Current active history index
   FXuint             searchmode;        // Search mode
-  FXint              current;           // History index
 protected:
   static const FXchar sectionName[];
 protected:
@@ -82,10 +82,12 @@ private:
 public:
   long onUpdDir(FXObject*,FXSelector,void*);
   long onCmdDir(FXObject*,FXSelector,void*);
-  long onUpdMode(FXObject*,FXSelector,void*);
-  long onCmdMode(FXObject*,FXSelector,void*);
   long onUpdWrap(FXObject*,FXSelector,void*);
   long onCmdWrap(FXObject*,FXSelector,void*);
+  long onUpdCase(FXObject*,FXSelector,void*);
+  long onCmdCase(FXObject*,FXSelector,void*);
+  long onUpdRegex(FXObject*,FXSelector,void*);
+  long onCmdRegex(FXObject*,FXSelector,void*);
   long onSearchKey(FXObject*,FXSelector,void*);
   long onReplaceKey(FXObject*,FXSelector,void*);
   long onCmdSearchHistUp(FXObject*,FXSelector,void*);
@@ -112,11 +114,11 @@ public:
     ID_REPLACE_SEL,
     ID_REPLACE_ALL,
     ID_DIR,
+    ID_CASE,
+    ID_REGEX,
+    ID_WRAP,
     ID_SEARCH_TEXT,
     ID_REPLACE_TEXT,
-    ID_MODE_FIRST,
-    ID_MODE_LAST=ID_MODE_FIRST+SEARCH_SUFFIX,
-    ID_WRAP,
     ID_LAST
     };
 public:

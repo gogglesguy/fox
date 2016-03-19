@@ -291,7 +291,7 @@ FXbool FXSettings::parse(const FXString& str,FXbool mrk){
       b=++p;
 
       // Scan over section name
-      while(str[p] && str[p]!=']' && str[p]!='\r' && str[p]!='\r'){
+      while(str[p] && str[p]!=']' && str[p]!='\r' && str[p]!='\n'){
         if(Ascii::isControl(str[p])){ fxwarning("%d: control character in section name.\n",lineno); goto nxt; }
         ++p;
         }
@@ -314,7 +314,7 @@ FXbool FXSettings::parse(const FXString& str,FXbool mrk){
       b=p;
 
       // Scan key name
-      while(str[p] && str[p]!='=' && str[p]!='\r' && str[p]!='\r'){
+      while(str[p] && str[p]!='=' && str[p]!='\r' && str[p]!='\n'){
         if(Ascii::isControl(str[p])){ fxwarning("%d: control character in entry name.\n",lineno); goto nxt; }
         ++p;
         }

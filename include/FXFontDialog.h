@@ -37,21 +37,21 @@ class FXAPI FXFontDialog : public FXDialogBox {
 protected:
   FXFontSelector *fontbox;
 protected:
+  static const FXchar sectionName[];
+protected:
   FXFontDialog(){}
-  void initdialog();
+  void loadSettings();
+  void saveSettings();
 private:
   FXFontDialog(const FXFontDialog&);
   FXFontDialog &operator=(const FXFontDialog&);
 public:
 
   /// Constructor font dialog box
-  FXFontDialog(FXWindow* owner,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=600,FXint h=380);
+  FXFontDialog(FXWindow* owner,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Constructor free-floating font dialog box
-  FXFontDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=600,FXint h=380);
-
-  /// Hide this window
-  virtual void hide();
+  FXFontDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Set font selection as a string
   void setFont(const FXString& string);

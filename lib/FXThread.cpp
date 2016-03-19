@@ -618,7 +618,7 @@ FXThread::Priority FXThread::priority() const {
             result=PriorityLower;
             }
           }
-        else if(sched.sched_priority<priomed){
+        else if(sched.sched_priority>priomed){
           if(sched.sched_priority>=priomax){
             result=PriorityMaximum;
             }

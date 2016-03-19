@@ -21,7 +21,7 @@
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
- 
+
 
 class TextWindow;
 class Adie;
@@ -52,11 +52,11 @@ public:
   // Owner is text window
   Adie* getApp() const { return (Adie*)FXDialogBox::getApp(); }
 
-  // Set filename patterns
-  void setPatterns(const FXString& patterns);
+  // Set list of filename patterns
+  void setPatternList(const FXString& patterns);
 
-  // Get filename patterns
-  FXString getPatterns() const;
+  // Get list of filename patterns
+  FXString getPatternList() const;
 
   // Set language syntax
   void setSyntax(Syntax* syn);

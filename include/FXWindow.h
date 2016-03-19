@@ -576,9 +576,9 @@ public:
 
   /**
   * This changes the default window which responds to the Return
-  * key in a dialog. If the flag is TRUE, this window becomes the default
-  * window; when the flag is FALSE, this window will be no longer the
-  * default window.  Finally, when the flag is MAYBE, the default window
+  * key in a dialog. If the flag is true, this window becomes the default
+  * window; when the flag is false, this window will be no longer the
+  * default window.  Finally, when the flag is maybe, the default window
   * will revert to the initial default window.
   */
   virtual void setDefault(FXuchar flag=true);

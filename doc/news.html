@@ -17,6 +17,45 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 24 - FOX DEVELOPMENT 1.7.53
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXFontDialog initialized to sensible size when first-ran.</li>
+<li>FXPath::match() algorithm major correctness improvements for nested patterns, and better error
+detection for broken patterns.</li>
+<li>Fixed some layout issues in PathFinder when choosing large fonts, menubar icons were not centered vertically.</li>
+<li>Dialog to search files for regular expression in Adie now fully functional.</li>
+<li>Invalidated bookmark locations could cause trouble when bookmark menu popped up; now fixed.</li>
+<li>Some functions refactored in Adie.</li>
+<li>Minor problem in groupbox example application fixed.</li>
+<li>Added facility to change scroll bar width in ControlPanel.</li>
+<li>Added checkbutton to search only for first occurrence of pattern in file in FindInFiles dialog.</li>
+<li>Pass base directory of search to FindInFiles visitor so we can relativize paths to it when recording search matches.</li>
+<li>Zero array in FXIcon to shut up valgrind.</li>
+<li>FXComplexf and FXComplexd APIs more compatible to standard C++ library: added norm(), abs(), arg(), exp(), log(), and conj().
+The old names conjugate(), logarithm() and exponent() will probably be deprecated.</li>
+<li>Some improvements to Adie's incremental search capability.</li>
+<li>FXDirVisitor recursion limit added.</li>
+<li>FXDirVisitor now has skip as well as early-out return mode.</li>
+<li>Included paper reference motivating FXRandom shift-xor counts changes.</li>
+<li>Change file mode improvement in PathFinder.</li>
+<li>FXPath::isValidPath() API added.</li>
+<li>Some fixes to PathFinder directory handling.</li>
+<li>Expand environment variables when switching directories in PathFinder.</li>
+<li>Some compiler warnings fixed.</li>
+<li>FXThread priority issue fixed.</li>
+<li>FXSettings parser issues fixed.</li>
+<li>Incremental search history now being saved in Adie.</li>
+<li>Backward search issue fixed in Adie.</li>
+<li>Search and Replace Dialog fixes.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 July 1 - FOX DEVELOPMENT 1.7.52
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

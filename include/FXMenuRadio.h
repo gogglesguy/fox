@@ -75,10 +75,10 @@ public:
   /// Return default height
   virtual FXint getDefaultHeight();
 
-  /// Set radio button state (TRUE, FALSE or MAYBE)
+  /// Set radio button state (true, false or maybe)
   void setCheck(FXuchar s=true);
 
-  /// Get radio button state (TRUE, FALSE or MAYBE)
+  /// Get radio button state (true, false or maybe)
   FXuchar getCheck() const { return check; }
 
   /// Get the radio background color

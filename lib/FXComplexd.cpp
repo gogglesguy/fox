@@ -110,7 +110,7 @@ namespace FX {
 
 // Complex square root
 FXComplexd csqrt(const FXComplexd& c){
-  register FXdouble mag=c.modulus();
+  register FXdouble mag=abs(c);
   register FXdouble rr=sqrt((mag+c.re)*0.5);
   register FXdouble ii=sqrt((mag-c.re)*0.5);
 #if defined(WIN32)

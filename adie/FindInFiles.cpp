@@ -46,19 +46,30 @@
 
 // Map
 FXDEFMAP(FindInFiles) FindInFilesMap[]={
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_STOP,FindInFiles::onUpdStop),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_STOP,FindInFiles::onCmdStop),
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_PAUSE,FindInFiles::onUpdPause),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_PAUSE,FindInFiles::onCmdPause),
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_SEARCH,FindInFiles::onUpdSearch),
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_SEARCH,FindInFiles::onCmdSearch),
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_DELETE,FindInFiles::onUpdDelete),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_DELETE,FindInFiles::onCmdDelete),
+//  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_HEADER,FindInFiles::onUpdHeader),
+//  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_HEADER,FindInFiles::onCmdHeader),
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_FOLDER,FindInFiles::onCmdFolder),
-  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onCmdSearch),
-  FXMAPFUNC(SEL_KEYPRESS,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onArrowKey),
-  FXMAPFUNC(SEL_MOUSEWHEEL,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onMouseWheel),
   FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_HIST_UP,FindInFiles::onUpdHistoryUp),
   FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_HIST_DN,FindInFiles::onUpdHistoryDn),
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_HIST_UP,FindInFiles::onCmdHistoryUp),
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_HIST_DN,FindInFiles::onCmdHistoryDn),
-  FXMAPFUNC(SEL_DOUBLECLICKED,FindInFiles::ID_FILELIST,FindInFiles::onCmdFileDblClicked),
   FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_FILTER_TEXT,FindInFiles::onCmdFilter),
-  FXMAPFUNCS(SEL_UPDATE,FindInFiles::ID_EXACT,FindInFiles::ID_HIDDEN,FindInFiles::onUpdFlags),
-  FXMAPFUNCS(SEL_COMMAND,FindInFiles::ID_EXACT,FindInFiles::ID_HIDDEN,FindInFiles::onCmdFlags),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onCmdSearch),
+  FXMAPFUNC(SEL_KEYPRESS,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onArrowKey),
+  FXMAPFUNC(SEL_MOUSEWHEEL,FindInFiles::ID_SEARCH_TEXT,FindInFiles::onMouseWheel),
+  FXMAPFUNC(SEL_DOUBLECLICKED,FindInFiles::ID_FILELIST,FindInFiles::onCmdFileDblClicked),
+  FXMAPFUNC(SEL_UPDATE,FindInFiles::ID_FIRST_HIT,FindInFiles::onUpdFirstHit),
+  FXMAPFUNC(SEL_COMMAND,FindInFiles::ID_FIRST_HIT,FindInFiles::onCmdFirstHit),
+  FXMAPFUNCS(SEL_UPDATE,FindInFiles::ID_ICASE,FindInFiles::ID_HIDDEN,FindInFiles::onUpdFlags),
+  FXMAPFUNCS(SEL_COMMAND,FindInFiles::ID_ICASE,FindInFiles::ID_HIDDEN,FindInFiles::onCmdFlags),
   };
 
 
@@ -67,7 +78,7 @@ FXIMPLEMENT(FindInFiles,FXDialogBox,FindInFilesMap,ARRAYNUMBER(FindInFilesMap))
 
 
 // Search and replace dialog registry section name
-const FXchar FindInFiles::sectionName[]="Find In Files";
+static const FXchar sectionName[]="Find In Files";
 
 
 // Registry keys for search pattern
@@ -81,26 +92,35 @@ static const FXchar mkey[20][3]={
   "MA","MB","MC","MD","ME","MF","MG","MH","MI","MJ","MK","ML","MM","MN","MO","MP","MQ","MR","MS","MT"
   };
 
+/*******************************************************************************/
+
+
+// For deserialization
+FindInFiles::FindInFiles():visitor(this){
+  }
+
 
 // Construct file in files dialog
-FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,600,400, 10,10,10,10, 10,10){
+FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,600,400, 10,10,10,10, 10,10),visitor(this){
 
   // Buttons at bottom
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
-  new FXButton(buttons,tr("&Search"),NULL,this,ID_SEARCH,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   new FXButton(buttons,tr("&Close"),NULL,this,ID_CLOSE,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0,6,6,VERT_PAD,VERT_PAD);
-  new FXToggleButton(buttons,tr("Pause"),tr("Resume"),NULL,NULL,this,ID_PAUSE,FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_LEFT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
+  new FXButton(buttons,tr("&Delete"),NULL,this,ID_DELETE,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
+  new FXButton(buttons,tr("&Search"),NULL,this,ID_SEARCH,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
+  pausebutton=new FXToggleButton(buttons,tr("Pause"),tr("Resume"),NULL,NULL,this,ID_PAUSE,FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_LEFT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
+  new FXButton(buttons,tr("Stop"),NULL,this,ID_STOP,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_Y|LAYOUT_LEFT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
 
   // Above button block
   new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
 
   // Options block
   FXHorizontalFrame* frame=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
-  new FXRadioButton(frame,tr("Ex&act"),this,ID_EXACT,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXRadioButton(frame,tr("I&gnore Case"),this,ID_ICASE,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXRadioButton(frame,tr("E&xpression"),this,ID_REGEX,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXCheckButton(frame,tr("&Recursive"),this,ID_RECURSIVE,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
-  new FXCheckButton(frame,tr("&Hidden Files"),this,ID_HIDDEN,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("E&xpression\tRegular Expression"),this,ID_REGEX,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("I&gnore Case\tCase insensitive"),this,ID_ICASE,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("&Recursive\tSearch subdirectories"),this,ID_RECURSIVE,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("&Hidden Files\tSearch hidden files"),this,ID_HIDDEN,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
+  new FXCheckButton(frame,tr("First &Hit\tRecord only first matches for each file"),this,ID_FIRST_HIT,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
 
   // Entry block
   FXMatrix *matrix=new FXMatrix(this,3,MATRIX_BY_COLUMNS|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X,0,0,0,0,0,0,0,0);
@@ -118,7 +138,7 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
   // Folder to search
   new FXLabel(matrix,tr("In &Folder:"),NULL,JUSTIFY_RIGHT|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
-  filefolder=new FXTextField(matrix,40,this,ID_FOLDER_TEXT,JUSTIFY_LEFT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
+  filefolder=new FXTextField(matrix,40,this,ID_FOLDER_TEXT,JUSTIFY_LEFT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X);
   new FXButton(matrix,"...",NULL,this,ID_FOLDER,LAYOUT_CENTER_Y|FRAME_RAISED|FRAME_THICK|LAYOUT_FIX_WIDTH,0,0,20,0);
 
   // Filter for files
@@ -130,9 +150,8 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   // Matching files
   FXHorizontalFrame* resultbox=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
   locations=new FXIconList(resultbox,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_DETAILED|ICONLIST_SINGLESELECT);
-  locations->appendHeader(tr("File"),NULL,300);
-  locations->appendHeader(tr("Line"),NULL,50);
-  locations->appendHeader(tr("Text"),NULL,200);
+  locations->appendHeader(tr("Location"),NULL,200);
+  locations->appendHeader(tr("Context"),NULL,800);
 
   // Set title
   setTitle(tr("Find In Files"));
@@ -142,36 +161,26 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
   // Start with this
   filePattern="*";
-
+  
   // Search flags
-  searchmode=SearchExact;
+  searchmode=SearchExact|SearchRecurse;
   index=-1;
-  }
-
-
-// Create server-side resources
-void FindInFiles::create(){
-  FXTRACE((1,"FindInFiles::create\n"));
-  readRegistry();
-  FXDialogBox::create();
-  }
-
-
-// Close window
-FXbool FindInFiles::close(FXbool notify){
-  FXTRACE((1,"FindInFiles::close\n"));
-  writeRegistry();
-  return FXDialogBox::close(notify);
+  proceed=1;
+  firsthit=false;
   }
 
 
 // Load registy
 void FindInFiles::readRegistry(){
+  FXTRACE((1,"FindInFiles::readRegistry()\n"));
   setWidth(getApp()->reg().readIntEntry(sectionName,"width",600));
   setHeight(getApp()->reg().readIntEntry(sectionName,"height",400));
+  firsthit=getApp()->reg().readBoolEntry(sectionName,"firsthit",false);
+  locations->setHeaderSize(0,getApp()->reg().readIntEntry(sectionName,"filespace",200));
+  locations->setHeaderSize(1,getApp()->reg().readIntEntry(sectionName,"matchspace",800));
   for(FXint i=0; i<20; ++i){
-    if(getApp()->reg().readStringEntry(sectionName,skey[i],NULL)==NULL) break;
     patternHistory[i]=getApp()->reg().readStringEntry(sectionName,skey[i],FXString::null);
+    if(patternHistory[i].empty()) break;
     optionsHistory[i]=getApp()->reg().readUIntEntry(sectionName,mkey[i],SearchExact);
     }
   }
@@ -179,25 +188,74 @@ void FindInFiles::readRegistry(){
 
 // Save registry
 void FindInFiles::writeRegistry(){
-  getApp()->reg().writeIntEntry("SETTINGS","width",getWidth());
-  getApp()->reg().writeIntEntry("SETTINGS","height",getHeight());
+  FXTRACE((1,"FindInFiles::writeRegistry()\n"));
+  getApp()->reg().writeIntEntry(sectionName,"width",getWidth());
+  getApp()->reg().writeIntEntry(sectionName,"height",getHeight());
+  getApp()->reg().writeBoolEntry(sectionName,"firsthit",firsthit);
+  getApp()->reg().writeIntEntry(sectionName,"filespace",locations->getHeaderSize(0));
+  getApp()->reg().writeIntEntry(sectionName,"matchspace",locations->getHeaderSize(1));
   for(FXint i=0; i<20; ++i){
-    if(patternHistory[i].empty()) break;
-    getApp()->reg().writeStringEntry(sectionName,skey[i],patternHistory[i].text());
-    getApp()->reg().writeUIntEntry(sectionName,mkey[i],optionsHistory[i]);
+    if(!patternHistory[i].empty()){
+      getApp()->reg().writeStringEntry(sectionName,skey[i],patternHistory[i].text());
+      getApp()->reg().writeUIntEntry(sectionName,mkey[i],optionsHistory[i]);
+      }
+    else{
+      getApp()->reg().deleteEntry(sectionName,skey[i]);
+      getApp()->reg().deleteEntry(sectionName,mkey[i]);
+      }
     }
   }
 
 
-// Set text or pattern to search for
-void FindInFiles::setSearchText(const FXString& text){
-  findstring->setText(text);
+// Add string to history buffer
+void FindInFiles::appendHistory(const FXString& patt,FXuint opts){
+  if(!patt.empty()){
+    if(patt!=patternHistory[0]){
+      for(FXint i=19; i>0; i--){
+        swap(patternHistory[i],patternHistory[i-1]);
+        swap(optionsHistory[i],optionsHistory[i-1]);
+        }
+      }
+    patternHistory[0]=patt;
+    optionsHistory[0]=opts;
+    index=0;
+    }
   }
 
 
-// Return text or pattern the user has entered
-FXString FindInFiles::getSearchText() const {
-  return findstring->getText();
+// Create server-side resources
+void FindInFiles::create(){
+  readRegistry();
+  FXDialogBox::create();
+  }
+
+
+// Close window
+FXbool FindInFiles::close(FXbool notify){
+  writeRegistry();
+  return FXDialogBox::close(notify);
+  }
+
+
+// Called by visitor to see if we should continue processing
+FXbool FindInFiles::continueProcessing(){
+  getApp()->runModalWhileEvents(pausebutton,1000000L);
+  getApp()->runUntil(proceed);
+  return (proceed!=2);
+  }
+
+
+// Called by visitor to deposit new search result
+void FindInFiles::appendSearchResult(const FXString& file,const FXString& text,FXint lineno,FXint column){
+  FXString string;
+  string.format("%s:%d:%d\t%s",file.text(),lineno,column,text.text());
+  locations->appendItem(string);
+  }
+
+
+// Clear search results
+void FindInFiles::clearSearchResults(){
+  locations->clearItems();
   }
 
 
@@ -210,6 +268,18 @@ void FindInFiles::setDirectory(const FXString& path){
 // Return directory
 FXString FindInFiles::getDirectory() const {
   return filefolder->getText();
+  }
+
+
+// Set text or pattern to search for
+void FindInFiles::setSearchText(const FXString& text){
+  findstring->setText(text);
+  }
+
+
+// Return text or pattern the user has entered
+FXString FindInFiles::getSearchText() const {
+  return findstring->getText();
   }
 
 
@@ -289,20 +359,229 @@ FXbool FindInFiles::allowPatternEntry() const {
   return (filefilter->getComboStyle()!=COMBOBOX_STATIC);
   }
 
+/*******************************************************************************/
 
-// Add string to history buffer
-void FindInFiles::appendHistory(const FXString& patt,FXuint opts){
-  if(!patt.empty()){
-    if(patt!=patternHistory[0]){
-      for(FXint i=19; i>0; i--){
-        swap(patternHistory[i],patternHistory[i-1]);
-        swap(optionsHistory[i],optionsHistory[i-1]);
-        }
-      }
-    patternHistory[0]=patt;
-    optionsHistory[0]=opts;
-    index=0;
+// Traverse files under path and search for pattern in each
+FXuint SearchVisitor::traverse(const FXString& path,const FXString& pattern,const FXString& wild,FXint mode,FXuint opts,FXint depth){
+  if(rex.parse(pattern,mode)==FXRex::ErrOK){
+    base=path;
+    return FXGlobVisitor::traverse(path,wild,opts,depth);
     }
+  return 0;
+  }
+
+
+// Set file size limit
+void SearchVisitor::setLimit(FXlong size){
+  limit=FXCLAMP(1,size,2147483647);
+  }
+
+
+// Visit file
+FXuint SearchVisitor::visit(const FXString& path){
+  if(!dlg->continueProcessing()) return 2;
+  if(FXGlobVisitor::visit(path)){
+    if(searchFile(path)) return 1;
+    }
+  return 0;
+  }
+
+
+// Search file contents for pattern
+FXint SearchVisitor::searchFile(const FXString& path) const {
+  FXString text;
+  FXTRACE((1,"searchFile(%s)\n",path.text()));
+  if(loadFile(path,text)){
+    FXString file=FXPath::relative(getBase(),path);
+    FXString hit;
+    FXint beg[10],end[10],ls,le,p;
+    FXint lineno=1;
+    FXint column=0;
+    FXint pos=0;
+    FXTRACE((1,"loadFile(%s) -> %d bytes\n",file.text(),text.length()));
+    while(pos<text.length()){
+      if(rex.amatch(text,pos,FXRex::Normal,beg,end,10)){
+        for(ls=beg[0]; 0<ls && text[ls-1]!='\n'; --ls){ }               // Back up to line start
+        for(le=beg[0]; le<text.length() && text[le]!='\n'; ++le){ }     // Advance to line end
+        for(p=ls,column=0; p<beg[0]; p=text.inc(p)){                    // Count columns, assuming for now tabs are set at 8
+          column+=(text[p]=='\t')?8-column%8:1;
+          }
+        hit.assign(&text[ls],le-ls);
+        hit.trim();
+        dlg->appendSearchResult(file,hit,lineno,column);
+        if(dlg->getFirstHit()) break;
+        pos=le;
+        }
+      lineno+=(text[pos++]=='\n');              // Moved to next line
+      }
+    }
+  return 0;
+  }
+
+
+// Load file contents
+FXlong SearchVisitor::loadFile(const FXString& path,FXString& text) const {
+  FXFile file(path,FXFile::Reading);
+  if(file.isOpen()){
+    FXlong size=file.size();
+    if(0<size && size<=limit){
+      try{
+        text.length(size);
+        }
+      catch(...){
+        return 0L;
+        }
+      return file.readBlock(text.text(),text.length());
+      }
+    }
+  return 0L;
+  }
+
+/*******************************************************************************/
+
+// Update stop button
+long FindInFiles::onUpdStop(FXObject* sender,FXSelector,void*){
+  sender->handle(this,proceed?FXSEL(SEL_COMMAND,ID_DISABLE):FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+  return 1;
+  }
+
+
+// Stop scanning disk
+long FindInFiles::onCmdStop(FXObject*,FXSelector,void*){
+  proceed=2;
+  return 1;
+  }
+
+
+// Update pause/resume button
+long FindInFiles::onUpdPause(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(proceed==0)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Pause/resume
+long FindInFiles::onCmdPause(FXObject*,FXSelector,void*){
+  proceed=(proceed==1)?0:1;
+  return 1;
+  }
+
+
+// Grey out delete if no results
+long FindInFiles::onUpdDelete(FXObject* sender,FXSelector,void*){
+  sender->handle(this,locations->getNumItems()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Delete results
+long FindInFiles::onCmdDelete(FXObject*,FXSelector,void*){
+  clearSearchResults();
+  return 1;
+  }
+
+// Grey out buttons if no search text
+long FindInFiles::onUpdSearch(FXObject* sender,FXSelector,void*){
+  sender->handle(this,findstring->getText().empty()?FXSEL(SEL_COMMAND,ID_DISABLE):FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+  return 1;
+  }
+
+
+// Start search
+long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
+  FXuint opts=FXDir::AllDirs;
+  FXint rexmode=FXRex::Capture;
+  FXint limit=1000;
+  if(getSearchMode()&SearchCaseFold) rexmode|=FXRex::IgnoreCase;                // Case insensitivity
+  if(!(getSearchMode()&SearchRegex)) rexmode|=FXRex::Verbatim;                  // Verbatim match
+  if(getSearchMode()&SeachHidden) opts|=FXDir::HiddenFiles|FXDir::HiddenDirs;   // Visit hidden files and directories
+  if(!(getSearchMode()&SearchRecurse)) limit=2;                                 // Don't recurse
+  appendHistory(getSearchText(),getSearchMode());
+  proceed=1;
+  visitor.traverse(getDirectory(),getSearchText(),getPattern(),rexmode,opts,limit);
+  return 1;
+  }
+
+/*
+  long onCmdHeader(FXObject*,FXSelector,void*);
+  long onUpdHeader(FXObject*,FXSelector,void*);
+
+// Clicked header button
+long FindInFiles::onCmdHeader(FXObject*,FXSelector,void* ptr){
+  if(locations->getSortFunc()==FXIconList::ascending){
+    locations->setSortFunc(FXIconList::descending);
+    }
+  else{
+    locations->setSortFunc(FXIconList::ascending);
+    }
+  sortItems();
+  return 1;
+  }
+
+
+// Clicked header button
+long FindInFiles::onUpdHeader(FXObject*,FXSelector,void*){
+  locations->getHeader()->setArrowDir(0,(locations->getSortFunc()==FXIconList::ascending) ? FXHeaderItem::ARROW_DOWN : (locations->getSortFunc()==FXIconList::descending) ? FXHeaderItem::ARROW_UP : FXHeaderItem::ARROW_NONE);
+  return 1;
+  }
+*/
+
+/*******************************************************************************/
+
+// Change the pattern; change the filename to the suggested extension
+long FindInFiles::onCmdFilter(FXObject*,FXSelector,void* ptr){
+  filePattern=FXFileSelector::patternFromText((FXchar*)ptr);
+  return 1;
+  }
+
+
+// Update flags
+long FindInFiles::onUpdFlags(FXObject* sender,FXSelector sel,void*){
+  FXuint value=0;
+  switch(FXSELID(sel)){
+    case ID_ICASE: value=(searchmode&SearchCaseFold); break;
+    case ID_REGEX: value=(searchmode&SearchRegex); break;
+    case ID_RECURSIVE: value=(searchmode&SearchRecurse); break;
+    case ID_HIDDEN: value=(searchmode&SeachHidden); break;
+    }
+  sender->handle(this,value?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Handle flags
+long FindInFiles::onCmdFlags(FXObject*,FXSelector sel,void*){
+  switch(FXSELID(sel)){
+    case ID_ICASE: searchmode^=SearchCaseFold; break;
+    case ID_REGEX: searchmode^=SearchRegex; break;
+    case ID_RECURSIVE: searchmode^=SearchRecurse; break;
+    case ID_HIDDEN: searchmode^=SeachHidden; break;
+    }
+  return 1;
+  }
+
+
+// Update all hits check button
+long FindInFiles::onUpdFirstHit(FXObject* sender,FXSelector,void*){
+  sender->handle(this,firsthit?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change all hits flag
+long FindInFiles::onCmdFirstHit(FXObject*,FXSelector,void*){
+  firsthit=!firsthit;
+  return 1;
+  }
+
+
+// Set directory to search in
+long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
+  FXString path=FXFileDialog::getOpenDirectory(this,tr("Search In Folder"),getDirectory());
+  if(!path.empty()){
+    setDirectory(path);
+    }
+  return 1;
   }
 
 
@@ -377,126 +656,17 @@ long FindInFiles::onMouseWheel(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Update flags
-long FindInFiles::onUpdFlags(FXObject* sender,FXSelector sel,void*){
-  FXuint value=0;
-  switch(FXSELID(sel)){
-    case ID_EXACT: value=!(searchmode&(SearchCaseFold|SearchRegex)); break;
-    case ID_ICASE: value=(searchmode&SearchCaseFold); break;
-    case ID_REGEX: value=(searchmode&SearchRegex); break;
-    case ID_RECURSIVE: value=(searchmode&SearchRecurse); break;
-    case ID_HIDDEN: value=(searchmode&SeachHidden); break;
-    }
-  sender->handle(this,value?FXSEL(SEL_COMMAND,FXWindow::ID_CHECK):FXSEL(SEL_COMMAND,FXWindow::ID_UNCHECK),NULL);
-  return 1;
-  }
-
-
-
-// Handle flags
-long FindInFiles::onCmdFlags(FXObject*,FXSelector sel,void*){
-  switch(FXSELID(sel)){
-    case ID_EXACT: searchmode=(searchmode&~(SearchCaseFold|SearchRegex)); break;
-    case ID_ICASE: searchmode=(searchmode&~SearchRegex)|SearchCaseFold; break;
-    case ID_REGEX: searchmode=(searchmode&~SearchCaseFold)|SearchRegex; break;
-    case ID_RECURSIVE: searchmode^=SearchRecurse; break;
-    case ID_HIDDEN: searchmode^=SeachHidden; break;
-    }
-  return 1;
-  }
-
-/*******************************************************************************/
-
-// Set directory to search in
-long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
-  FXString path=FXFileDialog::getOpenDirectory(this,tr("Search In Folder"),getDirectory());
-  if(!path.empty()){
-    setDirectory(path);
-    }
-  return 1;
-  }
-
-
 // File list double clicked
 long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
   FXint which=(FXint)(FXival)ptr;
-  return 1;
-  }
-
-
-
-// Change the pattern; change the filename to the suggested extension
-long FindInFiles::onCmdFilter(FXObject*,FXSelector,void* ptr){
-  filePattern=FXFileSelector::patternFromText((FXchar*)ptr);
-  return 1;
-  }
-
-
-/*******************************************************************************/
-
-
-// Initialize search parameters
-SearchVisitor::SearchVisitor(const FXString& pattern,FXint mode):rex(pattern,mode){
-  }
-
-
-// Load file contents
-FXint SearchVisitor::loadFileBody(const FXString& file,FXString& body) const {
-  FXFile textfile(file,FXFile::Reading);
-  if(textfile.isOpen()){
-    FXlong size=textfile.size();
-    if(0<size && size<2147483647){
-      body.length(size);
-      return textfile.readBlock(body.text(),body.length());
+  if(0<=which){
+    FXchar name[1024];
+    FXint lineno=0;
+    FXint column=0;
+    if(locations->getItem(which)->getText().scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
+      getApp()->openFileWindow(FXPath::absolute(visitor.getBase(),name),lineno,column);
       }
     }
-  return 0;
-  }
-
-
-// Search file contents for pattern
-FXint SearchVisitor::searchFileBody(const FXString& body) const {
-  FXint beg[10],end[10],pos=0,line=1;
-  while(pos<body.length()){
-    if(rex.amatch(body,pos,FXRex::Normal,beg,end,10)){
-      fxmessage("hit: at %d\n",line);
-      }
-    line+=(body[pos++]=='\n');
-    }
-  return 0;
-  }
-
-
-// Visit file
-FXuint SearchVisitor::visit(const FXString& path){
-  if(FXGlobVisitor::visit(path)){
-    FXString body;
-    fxmessage("visit(%s)\n",path.text());
-    if(loadFileBody(path,body)){
-      fxmessage("loaded %s: %d bytes\n",path.text(),body.length());
-      searchFileBody(body);
-      return 1;
-      }
-    }
-  return 0;
-  }
-
-
-// Start search
-long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
-  FXuint opts=FXDir::AllDirs|FXRex::Capture;
-  FXint rexmode=FXRex::Capture;
-  if(getSearchMode()&SearchCaseFold) rexmode|=FXRex::IgnoreCase;           // Case insensitivity
-  if(!(getSearchMode()&SearchRegex)) rexmode|=FXRex::Verbatim;             // Verbatim match
-  if(getSearchMode()&SeachHidden) opts|=FXDir::HiddenFiles|FXDir::HiddenDirs;
-//  SearchVisitor visitor(getSearchText(),rexmode);
-  appendHistory(getSearchText(),getSearchMode());
-//  visitor.traverse(getDirectory(),getPattern(),opts);
-  
-  FXGlobCountVisitor viz;
-  viz.traverse(getDirectory(),getPattern(),opts);
-  fxmessage("info: %s:\nfolders: %ld\nfiles:   %ld\nbytes:   %ld\ndepth:   %ld\n\n",getDirectory().text(),viz.getTotalFolders(),viz.getTotalFiles(),viz.getTotalBytes(),viz.getMaximumDepth());
-
   return 1;
   }
 

@@ -180,7 +180,8 @@ static const FXchar *const listofitems[]={
   "Fourth Item",
   "Fifth Item",
   "Sixth Item",
-  "Seventh Item"
+  "Seventh Item",
+  NULL
   };
 
 // Make some windows
