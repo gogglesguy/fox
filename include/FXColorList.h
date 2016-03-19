@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorList.h,v 1.10 2007/07/09 16:02:42 fox Exp $                        *
+* $Id: FXColorList.h,v 1.11 2007/11/07 19:19:51 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXCOLORLIST_H
 #define FXCOLORLIST_H

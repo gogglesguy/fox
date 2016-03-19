@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIcon.h,v 1.31 2007/07/09 16:02:45 fox Exp $                            *
+* $Id: FXIcon.h,v 1.32 2007/11/02 04:12:56 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXICON_H
 #define FXICON_H
@@ -52,8 +52,9 @@ protected:
   FXID     shape;             // Shape pixmap
   FXID     etch;              // Etch pixmap
   FXColor  transp;            // Transparency color
+  FXshort  thresh;            // Treshold for etch mask 
 protected:
-  FXIcon(){}
+  FXIcon();
   FXColor guesstransp();
 private:
   FXIcon(const FXIcon&);
@@ -110,12 +111,18 @@ public:
   */
   virtual void resize(FXint w,FXint h);
 
-  /// Obtain transparency color
+  /// Get transparency color
   FXColor getTransparentColor() const { return transp; }
 
   /// Change transparency color
   void setTransparentColor(FXColor color){ transp=color; }
 
+  /// Get threshold value
+  FXshort getThresholdValue() const { return thresh; }
+  
+  /// Change threshold value
+  void setThresholdValue(FXshort value){ thresh=value; }
+  
   /// Destructor
   virtual ~FXIcon();
   };

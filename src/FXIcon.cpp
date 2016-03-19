@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXIcon.cpp,v 1.78 2007/07/09 16:26:57 fox Exp $                          *
+* $Id: FXIcon.cpp,v 1.79 2007/11/02 04:12:57 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -52,7 +52,7 @@
     This simplifies the shape/etch mask procedure.
 */
 
-#define DARKCOLOR(r,g,b) (((r)+(g)+(b))<382)
+#define DARKCOLOR(r,g,b) (((r)+(g)+(b))<thresh)
 
 
 #define DISPLAY(app) ((Display*)((app)->display))
@@ -67,13 +67,14 @@ namespace FX {
 FXIMPLEMENT(FXIcon,FXImage,NULL,0)
 
 
+// For deserialization
+FXIcon::FXIcon():shape(0),etch(0),transp(0),thresh(382){
+  }
+
+
 // Initialize nicely
-FXIcon::FXIcon(FXApp* a,const FXColor *pix,FXColor clr,FXuint opts,FXint w,FXint h):
-  FXImage(a,pix,opts,w,h){
+FXIcon::FXIcon(FXApp* a,const FXColor *pix,FXColor clr,FXuint opts,FXint w,FXint h):FXImage(a,pix,opts,w,h),shape(0),etch(0),transp(clr),thresh(382){
   FXTRACE((100,"FXIcon::FXIcon %p\n",this));
-  shape=0;
-  etch=0;
-  transp=clr;
   }
 
 

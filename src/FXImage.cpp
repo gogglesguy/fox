@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.159 2007/07/09 16:27:00 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.160 2007/11/02 04:12:57 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -192,9 +192,7 @@ FXIMPLEMENT(FXImage,FXDrawable,NULL,0)
 
 
 // For deserialization
-FXImage::FXImage(){
-  data=NULL;
-  options=0;
+FXImage::FXImage():data(NULL),options(0){
   }
 
 

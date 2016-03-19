@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDockBar.h,v 1.39 2007/07/09 16:02:43 fox Exp $                         *
+* $Id: FXDockBar.h,v 1.40 2007/10/11 17:16:24 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXDOCKBAR_H
 #define FXDOCKBAR_H
@@ -53,6 +53,7 @@ protected:
 //  static const FXDefaultCursor cursorType[16];
 protected:
   FXDockBar();
+  FXbool isAllowable(FXuint hints) const;
 //  FXuchar where(FXint x,FXint y) const;
 protected:
   enum {

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.112 2007/10/05 16:27:44 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.119 2007/11/01 04:55:10 fox Exp $                       *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -43,7 +43,6 @@
 #else
 #include <process.h>
 #endif
-
 
 /*
   Notes:
@@ -89,6 +88,11 @@
     right away; however join() doesn't because then we wait for the
     thread to finish normally.
 
+  - About thread suspend/resume.  This does not work on Linux since there is
+    no pthread equivalent for SuspendThread() and ResumeThread().  There is,
+    however, an exceptionally inelegant solution in Boehm's GC code (file
+    linux_threads.c).  But its so ugly we'd rather live without until a real
+    suspend/resume facility is implemented in the linux kernel.
 */
 
 using namespace FX;
@@ -151,6 +155,46 @@ FXbool FXMutex::locked(){
 // Delete mutex
 FXMutex::~FXMutex(){
   DeleteCriticalSection((CRITICAL_SECTION*)data);
+  }
+
+
+/*******************************************************************************/
+
+// Initialize spinlock
+FXSpinLock::FXSpinLock(){
+  FXASSERT(0);
+  }
+
+
+// Lock the spinlock
+void FXSpinLock::lock(){
+  FXASSERT(0);
+  }
+
+
+// Try lock the spinlock
+FXbool FXSpinLock::trylock(){
+  FXASSERT(0);
+  return false;
+  }
+
+
+// Unlock spinlock
+void FXSpinLock::unlock(){
+  FXASSERT(0);
+  }
+
+
+// Test if locked
+FXbool FXSpinLock::locked(){
+  FXASSERT(0);
+  return true;
+  }
+
+
+// Delete spinlock
+FXSpinLock::~FXSpinLock(){
+  FXASSERT(0);
   }
 
 
@@ -236,7 +280,7 @@ void FXReadWriteLock::writeUnlock(){
   }
 
 
-// read/write lock
+// Delete read/write lock
 FXReadWriteLock::~FXReadWriteLock(){
   DeleteCriticalSection(((RWLOCK*)data)->mutex);
   DeleteCriticalSection(((RWLOCK*)data)->access);
@@ -713,6 +757,52 @@ FXMutex::~FXMutex(){
 
 /*******************************************************************************/
 
+// Initialize spinlock
+FXSpinLock::FXSpinLock(){
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_mutex_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.org!!
+  //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
+  pthread_spin_init((pthread_spinlock_t*)data,PTHREAD_PROCESS_PRIVATE);
+  }
+
+
+// Lock the spinlock
+void FXSpinLock::lock(){
+  pthread_spin_lock((pthread_spinlock_t*)data);
+  }
+
+
+// Try lock the spinlock
+FXbool FXSpinLock::trylock(){
+  return pthread_spin_trylock((pthread_spinlock_t*)data)==0;
+  }
+
+
+// Unlock spinlock
+void FXSpinLock::unlock(){
+  pthread_spin_unlock((pthread_spinlock_t*)data);
+  }
+
+
+// Test if locked
+FXbool FXSpinLock::locked(){
+  if(pthread_spin_trylock((pthread_spinlock_t*)data)==0){
+    pthread_spin_unlock((pthread_spinlock_t*)data);
+    return false;
+    }
+  return true;
+  }
+
+
+// Delete spinlock
+FXSpinLock::~FXSpinLock(){
+  pthread_spin_destroy((pthread_spinlock_t*)data);
+  }
+
+/*******************************************************************************/
+
 
 // Initialize read/write lock
 FXReadWriteLock::FXReadWriteLock(){
@@ -769,7 +859,7 @@ void FXReadWriteLock::writeUnlock(){
   }
 
 
-// read/write lock
+// Delete read/write lock
 FXReadWriteLock::~FXReadWriteLock(){
   pthread_rwlock_destroy((pthread_rwlock_t*)data);
   }
@@ -1309,26 +1399,28 @@ FXThread::Policy FXThread::policy() const {
   }
 
 
-// Suspend thread
+// Suspend thread; return true if success.
 FXbool FXThread::suspend(){
 #if defined(_HPUX_SOURCE)
   return busy && tid && (pthread_suspend((pthread_t)tid)==0);
 #elif defined(SUNOS)
   return busy && tid && (thr_suspend((pthread_t)tid)==0);
 #else
-  return busy && tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);      // FIXME does not work
+  // return busy && tid && (pthread_kill((pthread_t)tid,SIGSTOP)==0);   // FIXME this does not work.
+  return false;
 #endif
   }
 
 
-// Resume thread
+// Resume thread; return true if success.
 FXbool FXThread::resume(){
 #if defined(_HPUX_SOURCE)
   return busy && tid && (pthread_resume_np((pthread_t)tid,PTHREAD_COUNT_RESUME_NP)==0);
 #elif defined(SUNOS)
   return busy && tid && (thr_continue((pthread_t)tid)==0);
 #else
-  return busy && tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);      // FIXME does not work
+  // return busy && tid && (pthread_kill((pthread_t)tid,SIGCONT)==0);   // FIXME this does not work.
+  return false;
 #endif
   }
 

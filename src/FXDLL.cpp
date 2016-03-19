@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDLL.cpp,v 1.49 2007/07/09 16:26:46 fox Exp $                           *
+* $Id: FXDLL.cpp,v 1.50 2007/10/10 19:15:21 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -115,9 +115,9 @@ FXString FXDLL::name() const {
   }
 
 
-// Load the library module from the given path
-FXbool FXDLL::load(const FXString& path){
-  if(!hnd && !path.empty()){
+// Load the library module from the given name
+FXbool FXDLL::load(const FXString& nm){
+  if(!hnd && !nm.empty()){
 #if defined(WIN32)              // WIN32
     // Order of loading with LoadLibrary (or LoadLibraryEx with no
     // LOAD_WITH_ALTERED_SEARCH_PATH flag):
@@ -141,11 +141,11 @@ FXbool FXDLL::load(const FXString& path){
     // We switched to the latter so sub-modules needed by a DLL are
     // plucked from the same place as name (thanks to Rafael de
     // Pelegrini Soares" <Rafael@enq.ufrgs.br>).
-    hnd=LoadLibraryExA(path.text(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
+    hnd=LoadLibraryExA(nm.text(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
-    hnd=shl_load(path.text(),BIND_IMMEDIATE|BIND_NONFATAL|DYNAMIC_PATH,0L);
+    hnd=shl_load(nm.text(),BIND_IMMEDIATE|BIND_NONFATAL|DYNAMIC_PATH,0L);
 #else			        // POSIX
-    hnd=dlopen(path.text(),RTLD_NOW|RTLD_GLOBAL);
+    hnd=dlopen(nm.text(),RTLD_NOW|RTLD_GLOBAL);
 #endif
     }
   return hnd!=NULL;
@@ -282,8 +282,8 @@ FXString FXDLL::error(){
 
 
 // Initialize by loading given library name
-FXAUTODLL::FXAUTODLL(const FXString& nam){
-  load(nam);
+FXAUTODLL::FXAUTODLL(const FXString& nm){
+  load(nm);
   }
 
 

@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.689 2007/09/07 21:02:41 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.691 2007/10/10 15:34:50 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -1986,19 +1986,18 @@ FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
         chorerecs=c;
         }
 
-      // GUI updating:- walk the whole widget tree.
+      // GUI updating:- walk the whole widget tree, stop after updating refresherstop
       if(refresher){
-        refresher->handle(this,FXSEL(SEL_UPDATE,0),NULL);
         if(refresher->getFirst()){
           refresher=refresher->getFirst();
           }
         else{
           while(refresher->getParent()){
-            if(refresher->getNext()){refresher=refresher->getNext();break;}
+            if(refresher->getNext()){ refresher=refresher->getNext(); break; }
             refresher=refresher->getParent();
             }
           }
-        FXASSERT(refresher);
+        refresher->handle(this,FXSEL(SEL_UPDATE,0),NULL);
         if(refresher!=refresherstop) return false;
         refresher=refresherstop=NULL;
         }
@@ -3028,19 +3027,18 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
       chorerecs=c;
       }
 
-    // GUI updating:- walk the whole widget tree.
+    // GUI updating:- walk the whole widget tree, stop after updating refresherstop
     if(refresher){
-      refresher->handle(this,FXSEL(SEL_UPDATE,0),NULL);
       if(refresher->getFirst()){
         refresher=refresher->getFirst();
         }
       else{
         while(refresher->getParent()){
-          if(refresher->getNext()){refresher=refresher->getNext();break;}
+          if(refresher->getNext()){ refresher=refresher->getNext(); break; }
           refresher=refresher->getParent();
           }
         }
-      FXASSERT(refresher);
+      refresher->handle(this,FXSEL(SEL_UPDATE,0),NULL);
       if(refresher!=refresherstop) return false;
       refresher=refresherstop=NULL;
       }

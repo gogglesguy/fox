@@ -17,6 +17,44 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 16 - FOX DEVELOPMENT 1.7.13
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added FXRangeSlider widget.</li>
+<li>Updated FXAtomic with new API's, and made it use new GCC 4.1 compiler built-ins where available; it uses
+inline assembler code if not available.</li>
+<li>Added API to change threshold level in FXIcon; the threshold level is used to determine etched-in looking
+icon when button with icon on it is disabled.</li>
+<li>Added FXSpinLock spin locking primitive for multi-processing; Note: currently not available on MS-Windows yet;
+coming soon, however!</li>
+<li>Missing FXAPI declaration added to FXMessageChannel.</li>
+<li>Updated documentation for FXDLL.</li>
+<li>Fixed esoteric problem with GUI update refresh cycle; always skipped last widget.  Not a very
+serious problem since refresh cycle always never starts from the same widget.</li>
+<li>Problem with FXDockBar stickyness fixed.  Needed to block docking at unallowed dock sides
+even when done via menu.</li>
+<li>Every once in a while, got X-Window error from inside FXDockHandler. This was due to temporary
+dummy window which only exists during dragging.  Made sure this is now blocked off.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 16 - FOX STABLE 1.6.31
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Bug fix to strtoull() for systems which have no native strtoull().</li>
+<li>Missing tr() added in FXMDIClient.</li>
+<li>Fix for <a href='http://www.fxruby.org/'>FXRuby</a> in FXMDIClient (don't test for message==0 in notify message).</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 October 6 - FOX DEVELOPMENT 1.7.12
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

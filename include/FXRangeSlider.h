@@ -18,10 +18,10 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSlider.h,v 1.50 2007/11/06 15:31:30 fox Exp $                          *
+* $Id: FXRangeSlider.h,v 1.8 2007/11/06 22:07:23 fox Exp $                      *
 ********************************************************************************/
-#ifndef FXSLIDER_H
-#define FXSLIDER_H
+#ifndef FXRANGERANGESLIDER_H
+#define FXRANGERANGESLIDER_H
 
 #ifndef FXFRAME_H
 #include "FXFrame.h"
@@ -30,54 +30,48 @@
 namespace FX {
 
 
-/// Slider Control styles
+/// Range Slider Control styles
 enum {
-  SLIDER_HORIZONTAL   = 0,                        /// Slider shown horizontally
-  SLIDER_VERTICAL     = 0x00008000,               /// Slider shown vertically
-  SLIDER_ARROW_UP     = 0x00010000,               /// Slider has arrow head pointing up
-  SLIDER_ARROW_DOWN   = 0x00020000,               /// Slider has arrow head pointing down
-  SLIDER_ARROW_LEFT   = SLIDER_ARROW_UP,          /// Slider has arrow head pointing left
-  SLIDER_ARROW_RIGHT  = SLIDER_ARROW_DOWN,        /// Slider has arrow head pointing right
-  SLIDER_INSIDE_BAR   = 0x00040000,               /// Slider is inside the slot rather than overhanging
-  SLIDER_TICKS_TOP    = 0x00080000,               /// Ticks on the top of horizontal slider
-  SLIDER_TICKS_BOTTOM = 0x00100000,               /// Ticks on the bottom of horizontal slider
-  SLIDER_TICKS_LEFT   = SLIDER_TICKS_TOP,         /// Ticks on the left of vertical slider
-  SLIDER_TICKS_RIGHT  = SLIDER_TICKS_BOTTOM,      /// Ticks on the right of vertical slider
-  SLIDER_NORMAL       = SLIDER_HORIZONTAL
+  RANGESLIDER_HORIZONTAL   = 0,                         /// Slider shown horizontally
+  RANGESLIDER_VERTICAL     = 0x00008000,                /// Slider shown vertically
+  RANGESLIDER_ARROW_UP     = 0x00010000,                /// Slider has arrow head pointing up
+  RANGESLIDER_ARROW_DOWN   = 0x00020000,                /// Slider has arrow head pointing down
+  RANGESLIDER_ARROW_LEFT   = RANGESLIDER_ARROW_UP,      /// Slider has arrow head pointing left
+  RANGESLIDER_ARROW_RIGHT  = RANGESLIDER_ARROW_DOWN,    /// Slider has arrow head pointing right
+  RANGESLIDER_INSIDE_BAR   = 0x00040000,                /// Slider is inside the slot rather than overhanging
+  RANGESLIDER_NORMAL       = RANGESLIDER_HORIZONTAL
   };
 
 
 /**
-* The slider widget is a valuator widget which provides simple linear value range.
+* The range slider widget is a valuator widget which determines a subrange of the
+* given range.  It has two heads, one for the lower and one for the upper range.
 * Two visual appearances are supported:- the sunken look, which is enabled with
-* the SLIDER_INSIDE_BAR option and the regular look.  The latter may have optional
+* the RANGESLIDER_INSIDE_BAR option and the regular look.  The latter may have optional
 * arrows on the slider thumb.
 * While being moved, the slider sends a SEL_CHANGED message to its target;
 * at the end of the interaction, a SEL_COMMAND message is sent.
 * The message data represents the current slider value, of type FXint.
 */
-class FXAPI FXSlider : public FXFrame {
-  FXDECLARE(FXSlider)
+class FXAPI FXRangeSlider : public FXFrame {
+  FXDECLARE(FXRangeSlider)
 protected:
-  FXint         headPos;                  // Head position
-  FXint         headSize;                 // Head size
-  FXint         slotSize;                 // Slot size
-  FXColor       slotColor;                // Color of slot the head moves in
-  FXint         dragPoint;                // Where the head is grabbed
-  FXint         range[2];                 // Reported data range
-  FXint         delta;                    // Interval between ticks
-  FXint         incr;                     // Increment when auto-sliding
-  FXint         pos;                      // Reported data position
-  FXString      help;                     // Help string
-  FXString      tip;                      // Tip string
+  FXint         headPos[2];     // Head position
+  FXint         headSize;       // Head size
+  FXint         slotSize;       // Slot size
+  FXColor       slotColor;      // Color of slot the head moves in
+  FXint         dragPoint;      // Where the head is grabbed
+  FXint         values[4];      // Slider values
+  FXint         active;         // Which head is being manipulated
+  FXint         incr;           // Increment when auto-sliding
+  FXString      help;           // Help string
+  FXString      tip;            // Tip string
 protected:
-  FXSlider();
+  FXRangeSlider();
   void drawSliderHead(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
-  void drawHorzTicks(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
-  void drawVertTicks(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
 private:
-  FXSlider(const FXSlider&);
-  FXSlider &operator=(const FXSlider&);
+  FXRangeSlider(const FXRangeSlider&);
+  FXRangeSlider &operator=(const FXRangeSlider&);
 public:
   long onPaint(FXObject*,FXSelector,void*);
   long onMotion(FXObject*,FXSelector,void*);
@@ -90,13 +84,6 @@ public:
   long onKeyRelease(FXObject*,FXSelector,void*);
   long onUngrabbed(FXObject*,FXSelector,void*);
   long onAutoSlide(FXObject*,FXSelector,void*);
-  long onCmdSetValue(FXObject*,FXSelector,void*);
-  long onCmdSetIntValue(FXObject*,FXSelector,void*);
-  long onCmdGetIntValue(FXObject*,FXSelector,void*);
-  long onCmdSetLongValue(FXObject*,FXSelector,void*);
-  long onCmdGetLongValue(FXObject*,FXSelector,void*);
-  long onCmdSetRealValue(FXObject*,FXSelector,void*);
-  long onCmdGetRealValue(FXObject*,FXSelector,void*);
   long onCmdSetIntRange(FXObject*,FXSelector,void*);
   long onCmdGetIntRange(FXObject*,FXSelector,void*);
   long onCmdSetRealRange(FXObject*,FXSelector,void*);
@@ -115,7 +102,7 @@ public:
 public:
 
   /// Construct a slider widget
-  FXSlider(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=SLIDER_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=0,FXint pr=0,FXint pt=0,FXint pb=0);
+  FXRangeSlider(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=RANGESLIDER_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=0,FXint pr=0,FXint pt=0,FXint pb=0);
 
   /// Return default width
   virtual FXint getDefaultWidth();
@@ -135,17 +122,17 @@ public:
   /// Disable the slider
   virtual void disable();
 
-  /// Change slider value
-  void setValue(FXint value,FXbool notify=false);
+  /// Change slider values
+  void setValue(FXint head,FXint value,FXbool notify=false);
 
   /// Return slider value
-  FXint getValue() const { return pos; }
+  FXint getValue(FXint head) const { return values[1+head]; }
 
   /// Change the slider's range
   void setRange(FXint lo,FXint hi,FXbool notify=false);
 
   /// Get the slider's current range
-  void getRange(FXint& lo,FXint& hi) const { lo=range[0]; hi=range[1]; }
+  void getRange(FXint& lo,FXint& hi) const { lo=values[0]; hi=values[3]; }
 
   /// Change the slider style
   FXuint getSliderStyle() const;
@@ -170,12 +157,6 @@ public:
 
   /// Change the slider's auto-increment/decrement value
   void setIncrement(FXint inc);
-
-  /// Change the delta between ticks
-  void setTickDelta(FXint dist);
-
-  /// Get delta between ticks
-  FXint getTickDelta() const { return delta; }
 
   /// Change the color of the slot the slider head moves in
   void setSlotColor(FXColor clr);
@@ -202,7 +183,7 @@ public:
   virtual void load(FXStream& store);
 
   /// Destroy the slider
-  virtual ~FXSlider();
+  virtual ~FXRangeSlider();
   };
 
 }

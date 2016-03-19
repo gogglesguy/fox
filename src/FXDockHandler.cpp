@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDockHandler.cpp,v 1.15 2007/07/09 16:26:49 fox Exp $                   *
+* $Id: FXDockHandler.cpp,v 1.16 2007/10/10 15:30:57 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -177,20 +177,23 @@ long FXDockHandler::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
 // Released LEFT button
 long FXDockHandler::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
-    if(flags&FLAG_DODRAG){handle(this,FXSEL(SEL_ENDDRAG,0),ptr);}
+    FXuint flg=flags;
     flags=(flags&~(FLAG_TRYDRAG|FLAG_DODRAG))|FLAG_UPDATE;
+    if(flg&(FLAG_DODRAG|FLAG_TRYDRAG)){
 #ifdef WIN32
-    ungrab();
+      ungrab();
 #else
-    Display *display=(Display*)getApp()->getDisplay();
-    FXID tempxid=xid;
-    xid=xxx;
-    ungrab();
-    xid=tempxid;
-    getApp()->hash.remove((void*)xxx);
-    XDestroyWindow(display,xxx);
-    xxx=0;
+      Display *display=(Display*)getApp()->getDisplay();
+      FXID tempxid=xid;
+      xid=xxx;
+      ungrab();
+      xid=tempxid;
+      getApp()->hash.remove((void*)xxx);
+      XDestroyWindow(display,xxx);
+      xxx=0;
 #endif
+      }
+    if(flg&FLAG_DODRAG){handle(this,FXSEL(SEL_ENDDRAG,0),ptr);}
     update();
     }
   return 1;

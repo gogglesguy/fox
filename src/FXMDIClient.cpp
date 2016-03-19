@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIClient.cpp,v 1.69 2007/07/09 16:27:01 fox Exp $                     *
+* $Id: FXMDIClient.cpp,v 1.70 2007/10/25 14:14:41 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -324,10 +324,10 @@ long FXMDIClient::onUpdWindowSelect(FXObject *sender,FXSelector sel,void*){
 
 // Show a menu of other MDI child windows
 long FXMDIClient::onCmdOthersWindows(FXObject*,FXSelector,void*){
-  FXDialogBox choose(this,"Select Window",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,300,200,10,10,10,10, 10,10);
+  FXDialogBox choose(this,tr("Select Window"),DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,300,200,10,10,10,10, 10,10);
   FXHorizontalFrame* buttons=new FXHorizontalFrame(&choose,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
-  new FXButton(buttons,"&OK",NULL,&choose,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
-  new FXButton(buttons,"&Cancel",NULL,&choose,FXDialogBox::ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
+  new FXButton(buttons,tr("&OK"),NULL,&choose,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
+  new FXButton(buttons,tr("&Cancel"),NULL,&choose,FXDialogBox::ID_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,HORZ_PAD,HORZ_PAD,VERT_PAD,VERT_PAD);
   FXVerticalFrame* mdilistframe=new FXVerticalFrame(&choose,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
   FXList* mdilist=new FXList(mdilistframe,NULL,0,LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   mdilist->setNumVisible(10);

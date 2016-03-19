@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRealSlider.h,v 1.17 2007/07/09 16:02:47 fox Exp $                      *
+* $Id: FXRealSlider.h,v 1.18 2007/11/06 15:31:30 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXREALSLIDER_H
 #define FXREALSLIDER_H
@@ -59,16 +59,16 @@ enum {
 class FXAPI FXRealSlider : public FXFrame {
   FXDECLARE(FXRealSlider)
 protected:
-  FXdouble      range[2];       // Reported data range
-  FXdouble      pos;            // Reported data position
-  FXdouble      incr;           // Increment when auto-sliding
-  FXdouble      delta;          // Interval between ticks
-  FXdouble      gran;           // Granularity
-  FXint         headpos;        // Head position
-  FXint         headsize;       // Head size
-  FXint         slotsize;       // Slot size
+  FXint         headPos;        // Head position
+  FXint         headSize;       // Head size
+  FXint         slotSize;       // Slot size
   FXColor       slotColor;      // Color of slot the head moves in
-  FXint         dragpoint;      // Where on the head is grabbed
+  FXint         dragPoint;      // Where on the head is grabbed
+  FXdouble      range[2];       // Reported data range
+  FXdouble      delta;          // Interval between ticks
+  FXdouble      incr;           // Increment when auto-sliding
+  FXdouble      gran;           // Granularity
+  FXdouble      pos;            // Reported data position
   FXString      help;           // Help string
   FXString      tip;            // Tip string
 protected:
@@ -155,13 +155,13 @@ public:
   void setSliderStyle(FXuint style);
 
   /// Get the slider's head size
-  FXint getHeadSize() const { return headsize; }
+  FXint getHeadSize() const { return headSize; }
 
   /// Change the slider's head size
   void setHeadSize(FXint hs);
 
   /// Get the slider's current slot size
-  FXint getSlotSize() const { return slotsize; }
+  FXint getSlotSize() const { return slotSize; }
 
   /// Change the slider's slot size
   void setSlotSize(FXint bs);

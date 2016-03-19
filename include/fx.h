@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx.h,v 1.114 2007/05/24 20:42:16 fox Exp $                               *
+* $Id: fx.h,v 1.115 2007/11/02 20:06:17 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H
@@ -192,6 +192,7 @@
 #include "FXDirList.h"
 #include "FXSlider.h"
 #include "FXRealSlider.h"
+#include "FXRangeSlider.h"
 #include "FXSplitter.h"
 #include "FX4Splitter.h"
 #include "FXHeader.h"
