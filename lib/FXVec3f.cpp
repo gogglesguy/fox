@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -93,6 +93,23 @@ FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
 // Compute approximate normal from four points a,b,c,d
 FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f& d){
   return normalize((c-a)^(d-b));
+  }
+
+
+// Linearly interpolate
+FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f){
+#if defined(FOX_HAS_SSE2)
+  register __m128 u0=_mm_loadh_pi(_mm_load_ss(&u[2]),(const __m64*)&u[0]);      // u1 u0 0 u2
+  register __m128 v0=_mm_loadh_pi(_mm_load_ss(&v[2]),(const __m64*)&v[0]);      // v1 v0 0 v2
+  register __m128 ff=_mm_set1_ps(f);
+  register __m128 rr=_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff));
+  FXVec3f r;
+  _mm_storeh_pi((__m64*)&r[0],rr);
+  _mm_store_ss(&r[2],rr);
+  return r;
+#else
+  return FXVec3f(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f);
+#endif
   }
 
 

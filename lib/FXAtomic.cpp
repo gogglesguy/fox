@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -147,7 +147,7 @@ FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
   __asm__ __volatile__("lock\n\t"
-                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
+                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
@@ -170,7 +170,7 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgl %2, (%1)\n\t"
                         "sete   %%al\n\t"
-                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
+                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
@@ -239,12 +239,12 @@ void* atomicCas(void* volatile* ptr,void* expect,void* v){
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register void* ret=(void*)v;
   __asm__ __volatile__("lock\n\t"
-                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
+                       "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   register void* ret;
   __asm__ __volatile__("lock\n\t"
-                       "cmpxchgq %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
+                       "cmpxchgq %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
@@ -267,14 +267,14 @@ FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v){
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgl %2, (%1)\n\t"
                         "sete   %%al\n\t"
-                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
+                        "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"
                         "cmpxchgq %2, (%1)\n\t"
                         "sete   %%al\n\t"
-                        "andq   $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "0"(expect) : "memory", "cc");
+                        "andq   $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
@@ -298,24 +298,29 @@ FXbool atomicBoolDCas(void* volatile* ptr,void* cmpa,void* cmpb,void* a,void* b)
   LONGLONG duet[2]={(LONGLONG)a,(LONGLONG)b};
   return (_InterlockedCompareExchange128((LONGLONG volatile*)ptr,(LONGLONG)cmpb,(LONGLONG)cmpa,duet));
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+#if (defined(__PIC__) || defined(__PIE__)
   register FXbool ret;
-  // CMPXCHG8B: if(EDX:EAX == MEM64){ MEM64 = ECX:EBX } else { EDX:EAX = MEM64; }
-  __asm__ __volatile__ ("xchgl   %%esi, %%ebx\n\t"              // Swap EBX to ESI to get a into EBX and save EBX
+  __asm__ __volatile__ ("xchgl  %%esi, %%ebx\n\t"
                         "lock\n\t"
                         "cmpxchg8b (%1)\n\t"
                         "setz   %%al\n\t"
                         "andl   $1, %%eax\n\t"
                         "xchgl  %%esi, %%ebx\n\t" : "=a"(ret) : "D"(ptr), "a"(cmpa), "d"(cmpb), "S"(a), "c"(b) : "memory", "cc");
   return ret;
+#else
+  register TBool ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "setz   %%al\n\t"
+                        "andl   $1, %%eax\n\t" : "=a"(ret) : "D"(ptr), "a"(cmpa), "d"(cmpb), "b"(a), "c"(b) : "memory", "cc");
+  return ret;
+#endif
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
-  // CMPXCHG16B: if(RDX:RAX == MEM128){ MEM128 = RCX:RBX } else { RDX:RAX = MEM128; }
   register FXbool ret;
-  __asm__ __volatile__ ("xchgq   %%rsi, %%rbx\n\t"              // Swap RSI and RBX to get a into RBX and save RBX
-                        "lock\n\t"
+  __asm__ __volatile__ ("lock\n\t"
                         "cmpxchg16b (%1)\n\t"
                         "setz    %%al\n\t"
-                        "andq    $1, %%rax\n\t"
-                        "xchgq   %%rsi, %%rbx\n\t" : "=a"(ret) : "r"(ptr), "a"(cmpa), "d"(cmpb), "S"(a), "c"(b) : "memory", "cc");
+                        "andq    $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "a"(cmpa), "d"(cmpb), "b"(a), "c"(b) : "memory", "cc");
   return ret;
 #elif (defined(HAVE_BUILTIN_SYNC) && defined(__LP64__) && defined(__GNUC__))
   __uint128_t expectab=((__uint128_t)(FXuval)cmpa) | (((__uint128_t)(FXuval)cmpb)<<64);

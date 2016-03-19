@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -101,6 +101,9 @@ public:
 
   /// Return true if edge a-b crosses plane
   FXbool crosses(const FXVec3f& a,const FXVec3f& b) const;
+
+  /// Destructor
+ ~FXVec4f(){}
   };
 
 
@@ -164,6 +167,9 @@ extern FXAPI FXVec4f colorToVec4f(FXColor clr);
 /// Normalize vector
 extern FXAPI FXVec4f normalize(const FXVec4f& v);
 extern FXAPI FXVec4f fastnormalize(const FXVec4f& v);
+
+/// Linearly interpolate
+extern FXAPI FXVec4f lerp(const FXVec4f& u,const FXVec4f& v,FXdouble f);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec4f& v);

@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -39,47 +39,6 @@
 
 /*
   Notes:
-
-  - On FXPath::match():
-
-    - This is "upward compatible" from the standard fnmatch function in glibc,
-      in addition to the basic matching, FXPath::match can also handle alternatives.
-
-    - Match patterns are as follows:
-
-      ?           Matches single character.
-      *           Matches zero or more characters.
-      [abc]       Matches a single character, which must be a, b, or c.
-      [^abc]      Matches a single character, which must be anything other than a, b, or c.
-      [!abc]      Ditto.
-      [a-zA-Z]    Matches single character, which must be one of a-z or A-Z.
-      [^a-zA-Z]   Matches single character, which must be anything other than a-z or A-Z.
-      [!a-zA-Z]   Ditto.
-      pat1|pat2   Matches either pat1 or pat2.
-      pat1,pat2   Ditto.
-      (pat1|pat2) Matches either pat1 or pat2; patterns may be nested.
-      (pat1,pat2) Ditto.
-
-    - Examples:
-
-      *.cpp|*.cc|*.cxx|*.C  Matches some common extensions for C++ source files.
-
-      image.(bmp,gif,jpg)   Matches a file called image given as either bmp, gif, or jpg.
-
-      *.[^o]                Matches any file except object files.
-
-    - You can escape meta characters like '?', '*', '(', ')', '|', '^', '!', and ','
-      with the backslash '\'.
-
-    - Match modes:
-
-      MatchFilename     No wildcard can ever match "/" (or "\","/" under Windows).
-      MatchNoEscape     Backslashes don't quote special chars ("\" is treated as "\").
-      MatchPeriod       Leading "." is matched only explicitly (Useful to match hidden files on Unix).
-      MatchLeadingDir   Ignore "/..." after a match.
-      MatchCaseFold     Compare without regard to case.
-
-    - Note that under Windows, MatchNoEscape must be passed!
 
   - Windows 95 and NT:
       -  1 to 255 character name.
@@ -956,12 +915,34 @@ FXbool FXPath::isShare(const FXString& file){
   return ISPATHSEP(file[0]) && ISPATHSEP(file[1]) && file.find(PATHSEP,2)<0;
   }
 
+
+/// Return true if input path is a hidden file or directory
+FXbool FXPath::isHidden(const FXString&){
+  return false;
+  }
+
+
 #else
 
 // Check if file represents a file share
 FXbool FXPath::isShare(const FXString&){
   return false;
   }
+
+
+/// Return true if input path is a hidden file or directory
+FXbool FXPath::isHidden(const FXString& file){
+  register FXint f=0,n=0;
+  if(!file.empty()){
+    while(file[n]){
+      if(ISPATHSEP(file[n])) f=n+1;
+      n++;
+      }
+    return file[f]=='.';
+    }
+  return false;
+  }
+
 
 #endif
 
@@ -1361,7 +1342,7 @@ nxt:    if(domatch(s,p,flags)) return true;
   }
 
 
-// Match filename against pattern (like *, ?, [^a-z], and so on)
+// Match filename against a pattern, subject to flags
 FXbool FXPath::match(const FXchar *string,const FXchar *pattern,FXuint flags){
   register const FXchar *s=string;
   register const FXchar *p=pattern;

@@ -3,7 +3,7 @@
 *            C o n c u r r e n t   T a s k   E x e c u t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2010,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2010,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -176,8 +176,8 @@ FXConcurrent::FXConcurrent():started(0),stopped(0),running(false),slots(32){
 FXWorker* FXConcurrent::createWorker(){
   return new FXWorker(this);
   }
-  
-  
+
+
 // Make a new worker
 FXWorker* FXConcurrent::startWorker(){
   FXWorker* worker=createWorker();

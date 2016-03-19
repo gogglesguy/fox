@@ -3,7 +3,7 @@
 *                              M u t e x   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -29,11 +29,11 @@
   - Simple (optionally recursive) mutex variable.
 
   - An amorphous blob of memory is reserved in the declaration, without revealing
-    implementation details.  This is better than allocating memory dynamically, both 
-    in terms of speed as well as the possibility that hitting malloc() will involve 
+    implementation details.  This is better than allocating memory dynamically, both
+    in terms of speed as well as the possibility that hitting malloc() will involve
     another mutex.
 
-  - Hopefully it is big enough for all supported platforms.  But just in case, there's 
+  - Hopefully it is big enough for all supported platforms.  But just in case, there's
     an assert in the constructor to verify that enough space is reserved for the
     implementation.
 

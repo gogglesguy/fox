@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -2427,7 +2427,6 @@ void FXImage::colorize(FXColor color){
     register FXint lum,w;
     do{
       if(pix[3]){
-//        lum=(65535-77*pix[0]-151*pix[1]-29*pix[2])>>8;
         lum=(77*pix[2]+151*pix[1]+29*pix[0])>>8;
         w=r*lum; pix[2]=(w+(w>>8))>>8;
         w=g*lum; pix[1]=(w+(w>>8))>>8;

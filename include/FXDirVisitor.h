@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,6 +42,22 @@ public:
   virtual ~FXDirVisitor(){}
   };
 
+
+
+/**
+* Visit directory entries according to flags and matching given pattern.
+*/
+class FXAPI FXGlobVisitor : public FXDirVisitor {
+private:
+  FXString pattern;
+  FXuint   flags;
+  FXuint   mode;
+public:
+  FXuint traverse(const FXString& path,const FXString& pat="*",FXuint flg=FXDir::MatchAll);
+  virtual FXuint enter(const FXString& path);
+  virtual FXuint visit(const FXString& path);
+  };
+  
 }
 
 #endif

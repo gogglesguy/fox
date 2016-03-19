@@ -3,7 +3,7 @@
 *                           S p i n l o c k   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -27,10 +27,10 @@ namespace FX {
 
 /**
 * FXSpinLock can be used to provide safe access to very small critical sections.
-* 
-* Similar to FXMutex, a FXSpinLock provides safe access to a critical section 
-* shared by multiple threads.  Unlike FXMutex, however, a thread which is unable 
-* to obtain the lock will not block, but spin in a tight loop until the lock can 
+*
+* Similar to FXMutex, a FXSpinLock provides safe access to a critical section
+* shared by multiple threads.  Unlike FXMutex, however, a thread which is unable
+* to obtain the lock will not block, but spin in a tight loop until the lock can
 * be obtained.  The advantage of FXSpinLock over FXMutex is that no operating
 * system calls are performed suspending and resuming the calling thread.
 */

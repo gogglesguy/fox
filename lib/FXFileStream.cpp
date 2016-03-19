@@ -3,7 +3,7 @@
 *                       F i l e   S t r e a m   C l a s s                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -128,7 +128,7 @@ FXbool FXFileStream::close(){
 // Move to position
 FXbool FXFileStream::position(FXlong offset,FXWhence whence){
   register FXlong p;
-  if(dir==FXStreamDead){ fxerror("FXMemoryStream::position: stream is not open.\n"); }
+  if(dir==FXStreamDead){ fxerror("FXFileStream::position: stream is not open.\n"); }
   if(code==FXStreamOK){
     FXASSERT(FXFromStart==SEEK_SET);
     FXASSERT(FXFromCurrent==SEEK_CUR);

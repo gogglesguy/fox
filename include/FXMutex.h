@@ -3,7 +3,7 @@
 *                              M u t e x   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -64,10 +64,10 @@ public:
 /**
 * Establish a correspondence between a C++ scope and a mutex,
 * so that entering and leaving the scope in which the scoped lock
-* is defined will automatically lock and unlock the associated 
+* is defined will automatically lock and unlock the associated
 * mutex.
 * This will typically result in much less coding, and in addition
-* will make the code safe from exceptions. 
+* will make the code safe from exceptions.
 */
 class FXAPI FXScopedMutex {
 private:

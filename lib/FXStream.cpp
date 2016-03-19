@@ -3,7 +3,7 @@
 *       P e r s i s t e n t   S t o r a g e   S t r e a m   C l a s s e s       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -158,7 +158,6 @@ void FXStream::setSpace(FXuval size){
 
 
 // Open for save or load
-//FXbool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data,FXbool owned){
 FXbool FXStream::open(FXStreamDirection save_or_load,FXuchar* data,FXuval size,FXbool owned){
   if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXStream::open: illegal stream direction.\n");}
   if(!dir){

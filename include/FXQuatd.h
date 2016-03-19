@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -170,6 +170,9 @@ public:
 
   /// Rotation of a vector by a quaternion
   FXVec3d operator*(const FXVec3d& v) const;
+
+  /// Destructor
+ ~FXQuatd(){}
   };
 
 /// Scaling
@@ -203,7 +206,7 @@ extern FXAPI FXQuatd arc(const FXVec3d& a,const FXVec3d& b);
 /// Spherical lerp of unit quaternions u,v
 extern FXAPI FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f);
 
-/// Derivative of spherical lerp of unit quaternions u,v 
+/// Derivative of spherical lerp of unit quaternions u,v
 extern FXAPI FXQuatd lerpdot(const FXQuatd& u,const FXQuatd& v,FXdouble f);
 
 /// Save quaternion to a stream

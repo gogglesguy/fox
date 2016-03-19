@@ -3,7 +3,7 @@
 *                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -89,7 +89,6 @@ FXGLContext::FXGLContext(FXApp *a,FXGLVisual *vis,FXGLContext* shr):FXId(a),surf
 
 // Create GL context
 void FXGLContext::create(){
-#ifdef HAVE_GL_H
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
@@ -103,15 +102,13 @@ void FXGLContext::create(){
       // Initialize visual
       visual->create();
 
+#ifdef HAVE_GL_H
 #if defined(WIN32)
       PIXELFORMATDESCRIPTOR pfd={sizeof(PIXELFORMATDESCRIPTOR),1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
       HWND hwnd=CreateWindow(TEXT("GLTEMP"),TEXT(""),0,0,0,0,0,(HWND)NULL,(HMENU)NULL,(HINSTANCE)getApp()->getDisplay(),NULL);
       HDC hdc=::GetDC(hwnd);
       SetPixelFormat(hdc,(FXint)(FXival)visual->id(),&pfd);
       xid=(FXID)wglCreateContext(hdc);
-      if(!xid){
-        throw FXWindowException("unable to create GL window.");
-        }
 #if 0 // New code from Vadim ///
       if(desired_gl>2){
         int attribList[8]={
@@ -139,6 +136,8 @@ void FXGLContext::create(){
         }
       ::ReleaseDC(hwnd,hdc);
       DestroyWindow(hwnd);
+//#elif defined(GLX_VERSION_1_3)
+//      xid=(FXID)glXCreateNewContext((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),GLX_RGBA_TYPE,shared?(GLXContext)shared->id():NULL,true);
 #else
       XVisualInfo vi;
       vi.visual=(Visual*)visual->visual;
@@ -152,13 +151,13 @@ void FXGLContext::create(){
       vi.colormap_size=vi.visual->map_entries;
       vi.bits_per_rgb=vi.visual->bits_per_rgb;
       xid=(FXID)glXCreateContext((Display*)getApp()->getDisplay(),&vi,shared?(GLXContext)shared->id():NULL,true);
+#endif
+#endif
       if(!xid){
         throw FXWindowException("unable to create GL context.");
         }
-#endif
       }
     }
-#endif
   }
 
 #if 0
@@ -466,13 +465,11 @@ FXbool FXGLContext::begin(FXDrawable *draw){
       surface=draw;
       return true;
       }
-/*
-#elif defined(GLX_VERSION_1_3)
-    if(glXMakeContextCurrent((Display*)getApp()->getDisplay(),draw->res(),draw->res(),(GLXContext)xid)){
-      surface=draw;
-      return true;
-      }
-*/
+//#elif defined(GLX_VERSION_1_3)
+//    if(glXMakeContextCurrent((Display*)getApp()->getDisplay(),draw->id(),draw->id(),(GLXContext)xid)){
+//      surface=draw;
+//      return true;
+//      }
 #else
     if(glXMakeCurrent((Display*)getApp()->getDisplay(),draw->id(),(GLXContext)xid)){
       surface=draw;
@@ -496,13 +493,11 @@ FXbool FXGLContext::end(){
       surface=NULL;
       return true;
       }
-/*
-#elif defined(GLX_VERSION_1_3)
-    if(glXMakeContextCurrent((Display*)getApp()->getDisplay(),None,None,NULL)){
-      surface=NULL;
-      return true;
-      }
-*/
+//#elif defined(GLX_VERSION_1_3)
+//    if(glXMakeContextCurrent((Display*)getApp()->getDisplay(),None,None,NULL)){
+//      surface=NULL;
+//      return true;
+//      }
 #else
     if(glXMakeCurrent((Display*)getApp()->getDisplay(),None,(GLXContext)NULL)){
       surface=NULL;

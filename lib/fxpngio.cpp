@@ -3,7 +3,7 @@
 *                         P N G    I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -124,9 +124,11 @@ FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     }
 
   // Set error handling
+#if (PNG_LIBPNG_VER < 10500)
   if(setjmp(png_jmpbuf(png_ptr))){
-
-    // Free all of the memory associated with the png_ptr and info_ptr
+#else
+  if(setjmp((*png_set_longjmp_fn((png_ptr),(png_longjmp_ptr)longjmp,sizeof(jmp_buf))))){
+#endif
     png_destroy_read_struct(&png_ptr,&info_ptr,(png_infopp)NULL);
     return false;
     }
@@ -214,8 +216,6 @@ FXbool fxloadPNG(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 /*******************************************************************************/
 
-
-
 // Save a PNG image
 FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
   png_structp png_ptr;
@@ -238,7 +238,11 @@ FXbool fxsavePNG(FXStream& store,const FXColor* data,FXint width,FXint height){
     }
 
   // Set error handling.
+#if (PNG_LIBPNG_VER < 10500)
   if(setjmp(png_jmpbuf(png_ptr))){
+#else
+  if(setjmp((*png_set_longjmp_fn((png_ptr),(png_longjmp_ptr)longjmp,sizeof(jmp_buf))))){
+#endif
     png_destroy_write_struct(&png_ptr,&info_ptr);
     return false;
     }

@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -122,6 +122,22 @@ FXfloat FXVec4f::distance(const FXVec3f& p) const {
 // Return true if edge a-b crosses plane
 FXbool FXVec4f::crosses(const FXVec3f& a,const FXVec3f& b) const {
   return (distance(a)>=0.0f) ^ (distance(b)>=0.0f);
+  }
+
+
+// Linearly interpolate
+FXVec4f lerp(const FXVec4f& u,const FXVec4f& v,FXfloat f){
+#if defined(FOX_HAS_SSE2)
+  register __m128 u0=_mm_loadu_ps(&u[0]);
+  register __m128 v0=_mm_loadu_ps(&v[0]);
+  register __m128 ff=_mm_set1_ps(f);
+  register __m128 rr=_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff));
+  FXVec4f r;
+  _mm_storeu_ps(&r[0],rr);
+  return r;
+#else
+  return FXVec4f(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f,u.w+(v.w-u.w)*f);
+#endif
   }
 
 

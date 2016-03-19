@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,8 +54,8 @@ FXWorker::FXWorker(FXRunnable *r):runnable(r){
 
 // Worker runs jobs, then dies
 FXint FXWorker::run(){
-  if(runnable){ 
-    try{ runnable->run(); } catch(...){ } 
+  if(runnable){
+    try{ runnable->run(); } catch(...){ }
     }
   delete this;
   return 0;

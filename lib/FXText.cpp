@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1312,6 +1312,12 @@ FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start
 
   // Try parse the regex
   if(!rex.parse(string,rexmode)){
+
+FXTRACE((1,"string \"%s\" \n",string.text()));
+FXTRACE((1,"string :"));
+for(FXint i=0; i<string.length(); ++i){ FXTRACE((1,"%02x ",(FXuchar)string[i])); }
+FXTRACE((1,"\n"));
+    
 
     // Make all characters contiguous in the buffer
     squeezegap();

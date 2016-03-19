@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -120,6 +120,9 @@ namespace FXPath {
   /// Return true if input path is a file share
   extern FXAPI FXbool isShare(const FXString& file);
 
+  /// Return true if input path is a hidden file or directory
+  extern FXAPI FXbool isHidden(const FXString& file);
+
   /// Enquote filename to make safe for shell
   extern FXAPI FXString enquote(const FXString& file,FXbool force=false);
 
@@ -135,14 +138,14 @@ namespace FXPath {
   *  *           Zero or more of any character.
   *  [abc]       Any character from the set {a,b,c}.
   *  [^abc]      Any character BUT the ones from the set {a,b,c}.
-  *  [!abc]      Ditto.
+  *  [!abc]      Any character BUT the ones from the set {a,b,c}.
   *  [a-zA-Z]    Matches single character, which must be one of a-z or A-Z.
-  *  [^a-zA-Z]   Matches single character, which must be anything other than a-z or A-Z.
-  *  [!a-zA-Z]   Ditto.
+  *  [^a-zA-Z]   Matches single character, which must be anything BUT a-z or A-Z.
+  *  [!a-zA-Z]   Matches single character, which must be anything BUT a-z or A-Z.
   *  pat1|pat2   Match sub-pattern pat1 or pat2.
-  *  pat1,pat2   Ditto.
+  *  pat1,pat2   Match sub-pattern pat1 or pat2.
   *  (pat1|pat2) Match sub-pattern pat1 or pat2; patterns may be nested.
-  *  (pat1,pat2) Ditto.
+  *  (pat1,pat2) Match sub-pattern pat1 or pat2; patterns may be nested.
   *
   * The special characters may be escaped to treat them as ordinary characters.
   * Matching may be influenced by a number of flags:

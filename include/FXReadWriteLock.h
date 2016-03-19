@@ -3,7 +3,7 @@
 *                  R e a d - W r i t e   L o c k   C l a s s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,7 +33,7 @@ namespace FX {
 * excluding each other.  When a thread tries to write, however, it can
 * only proceed when no other writers or readers are present.
 * Thus, data structures which are frequently inspected but rarely updated
-* can be more effectively accessed with a read/write lock than with a mutex.  
+* can be more effectively accessed with a read/write lock than with a mutex.
 */
 class FXAPI FXReadWriteLock {
 private:

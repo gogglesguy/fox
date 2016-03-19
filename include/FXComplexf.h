@@ -3,7 +3,7 @@
 *          S i n g l e - P r e c i s i o n   C o m p l e x   N u m b e r        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -92,6 +92,9 @@ public:
   FXComplexf& operator-=(const FXComplexf& c){ return set(re-c.re,im-c.im); }
   FXComplexf& operator*=(const FXComplexf& c){ return set(re*c.re-im*c.im,re*c.im+im*c.re); }
   FXComplexf& operator/=(const FXComplexf& c){ FXfloat m=c.modulus2(); return set((re*c.re+im*c.im)/m,(im*c.re-re*c.im)/m); }
+
+  /// Destructor
+ ~FXComplexf(){}
   };
 
 

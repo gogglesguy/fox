@@ -3,7 +3,7 @@
 *          M u l t i p l e   D o c u m e n t   C h i l d   W i n d o w          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -676,16 +676,11 @@ long FXMDIChild::onLeave(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
-// Focus on widget itself
-long FXMDIChild::onFocusSelf(FXObject*,FXSelector,void* ptr){
-  setFocus();
-  if(contentWindow()) contentWindow()->handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
+// Focus on widget itself and try put focus on the content window as well
+long FXMDIChild::onFocusSelf(FXObject* sender,FXSelector,void* ptr){            // See FXScrollWindow
+  setFocus();                           
+  if(contentWindow()) contentWindow()->handle(sender,FXSEL(SEL_FOCUS_SELF,0),ptr);
   return 1;
-//  if(contentWindow() && contentWindow()->handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr)) return 1;
-//  setFocus();
-//  return 1;   ///// FIXME See ScrollWindow /////
-//  FXWindow *child=contentWindow();
-//  return child && child->handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   }
 
 

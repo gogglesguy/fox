@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -95,6 +95,9 @@ public:
 
   /// Clamp values of vector between limits
   FXVec3f& clamp(FXfloat lo,FXfloat hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi),FXCLAMP(lo,z,hi)); }
+
+  /// Destructor
+ ~FXVec3f(){}
   };
 
 
@@ -161,6 +164,9 @@ extern FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,c
 /// Normalize vector
 extern FXAPI FXVec3f normalize(const FXVec3f& v);
 extern FXAPI FXVec3f fastnormalize(const FXVec3f& v);
+
+/// Linearly interpolate
+extern FXAPI FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3f& v);

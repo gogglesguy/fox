@@ -3,7 +3,7 @@
 *                      A u t o m a t i c   P o i n t e r                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,9 +62,6 @@ public:
 
   /// Assign from an automatic pointer with compatible type
   template <class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
-
-  /// Convert to true/false
-  operator FXbool() const { return !!ptr; }
 
   /// Conversion operators
   operator EType*() const { return ptr; }

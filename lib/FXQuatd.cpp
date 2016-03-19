@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -547,17 +547,23 @@ FXQuatd arc(const FXVec3d& f,const FXVec3d& t){
     result.w=1.0;
     }
   else if(__unlikely(dot<-0.999999)){   // 180 quaternion (Stephen Hardy)
-    result.x=f.y-f.z;
-    result.y=f.z-f.x;
-    result.z=f.x-f.y;
-    dot=result.x*result.x+result.y*result.y+result.z*result.z;
-    if(dot<0.1){                        // Ensure non-zero orthogonal vector
-      result.x=-f.y-f.z;
-      result.y=f.x-f.z;
-      result.z=f.x+f.y;
-      dot=result.x*result.x+result.y*result.y+result.z*result.z;
+    if(fabs(f.z)<fabs(f.x) && fabs(f.z)<fabs(f.y)){     // x, y largest magnitude
+      result.x= f.x*f.z-f.z*f.y;
+      result.y= f.z*f.x+f.y*f.z;
+      result.z=-f.y*f.y-f.x*f.x;
       }
-    div=sqrt(dot);                      // Renormalize axis
+    else if(fabs(f.y)<fabs(f.x)){                       // y, z largest magnitude
+      result.x= f.y*f.z-f.x*f.y;
+      result.y= f.x*f.x+f.z*f.z;
+      result.z=-f.z*f.y-f.y*f.x;
+      }
+    else{                                               // x, z largest magnitude
+      result.x=-f.z*f.z-f.y*f.y;
+      result.y= f.y*f.x-f.x*f.z;
+      result.z= f.x*f.y+f.z*f.x;
+      }
+    dot=result.x*result.x+result.y*result.y+result.z*result.z;
+    div=sqrt(dot);
     result.x/=div;
     result.y/=div;
     result.z/=div;

@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -949,6 +949,35 @@ FXMat4f FXMat4f::rigidInvert() const {
   r[3][2]=-(r[0][2]*m[3][0]+r[1][2]*m[3][1]+r[2][2]*m[3][2]);
   r[3][3]=1.0f;
   return r;
+  }
+
+
+// Return normal-transformation matrix (inverse transpose of upper 3x3 block)
+FXMat3f FXMat4f::normalMatrix() const {
+  register FXfloat dd;
+  FXMat3f res;
+  res[0][0]=m[1][1]*m[2][2]-m[1][2]*m[2][1];
+  res[0][1]=m[1][2]*m[2][0]-m[1][0]*m[2][2];
+  res[0][2]=m[1][0]*m[2][1]-m[1][1]*m[2][0];
+  res[1][0]=m[0][2]*m[2][1]-m[0][1]*m[2][2];
+  res[1][1]=m[0][0]*m[2][2]-m[0][2]*m[2][0];
+  res[1][2]=m[0][1]*m[2][0]-m[0][0]*m[2][1];
+  res[2][0]=m[0][1]*m[1][2]-m[0][2]*m[1][1];
+  res[2][1]=m[0][2]*m[1][0]-m[0][0]*m[1][2];
+  res[2][2]=m[0][0]*m[1][1]-m[0][1]*m[1][0];
+  dd=m[0][0]*res[0][0]+m[0][1]*res[0][1]+m[0][2]*res[0][2];
+  FXASSERT(dd!=0.0f);
+  dd=1.0f/dd;
+  res[0][0]*=dd;
+  res[0][1]*=dd;
+  res[0][2]*=dd;
+  res[1][0]*=dd;
+  res[1][1]*=dd;
+  res[1][2]*=dd;
+  res[2][0]*=dd;
+  res[2][1]*=dd;
+  res[2][2]*=dd;
+  return res;
   }
 
 

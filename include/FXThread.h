@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -43,7 +43,7 @@ namespace FX {
 * Additional thread-local variables may be obtained using FXAutoThreadStorageKey.
 * Initially, all signals are masked by newly started threads (only the main thread
 * will normally handle signals).
-* To reclaim the resources once the thread is completed, a call to join() must be 
+* To reclaim the resources once the thread is completed, a call to join() must be
 * made, or the thread must be detached (note however that detaching the thread will
 * sever the association between FXThread and the thread).
 * Exceptions thrown from within the execution of the thread are caught, and cause

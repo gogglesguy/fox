@@ -3,7 +3,7 @@
 *                          D D S   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2012 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -319,7 +319,24 @@
 #define DXGI_FORMAT_BC7_UNORM                   98              // A block-compression format.
 #define DXGI_FORMAT_BC7_UNORM_SRGB              99              // A block-compression format.
 
-
+#define DXGI_FORMAT_AYUV                        100             // Most common YUV 4:4:4 video resource format
+#define DXGI_FORMAT_Y410                        101             // 10-bit per channel packed YUV 4:4:4 video resource format
+#define DXGI_FORMAT_Y416                        102             // 16-bit per channel packed YUV 4:4:4 video resource format
+#define DXGI_FORMAT_NV12                        103             // Most common YUV 4:2:0 video resource format
+#define DXGI_FORMAT_P010                        104             // 10-bit per channel planar YUV 4:2:0 video resource format
+#define DXGI_FORMAT_P016                        105             // 16-bit per channel planar YUV 4:2:0 video resource format
+#define DXGI_FORMAT_420_OPAQUE                  106             // 8-bit per channel planar YUV 4:2:0 video resource format 
+#define DXGI_FORMAT_YUY2                        107             // Most common YUV 4:2:2 video resource format
+#define DXGI_FORMAT_Y210                        108             // 10-bit per channel packed YUV 4:2:2 video resource format
+#define DXGI_FORMAT_Y216                        109             // 16-bit per channel packed YUV 4:2:2 video resource format.
+#define DXGI_FORMAT_NV11                        110             // Most common planar YUV 4:1:1 video resource format
+#define DXGI_FORMAT_AI44                        111             // 4-bit palletized YUV format that is commonly used for DVD subpicture
+#define DXGI_FORMAT_IA44                        112             // 4-bit palletized YUV format that is commonly used for DVD subpicture
+#define DXGI_FORMAT_P8                          113             // 88-bit palletized format that is used for palletized RGB data when the processor processes ISDB-T data and for palletized YUV data when the processor processes BluRay data
+#define DXGI_FORMAT_A8P8                        114             // 8-bit palletized format with 8 bits of alpha that is used for palletized YUV data when the processor processes BluRay data
+#define DXGI_FORMAT_B4G4R4A4_UNORM              115             // A four-component, 16-bit unsigned-normalized integer format that supports 4 bits for each channel including alpha
+  
+  
 // Internal codes
 #define CODE_NONE       0
 #define CODE_DXT1       1
