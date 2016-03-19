@@ -455,7 +455,7 @@ FXbool BitmapWindow::loadimage(const FXString& file){
     pa+=scanline;
     }
   for(i=0; i<size; i++){
-    pixels[i]=FXBITREVERSE(pixels[i]);
+    pixels[i]=reverse8(pixels[i]);
     }
   TIFFClose(tif);
 
@@ -494,7 +494,7 @@ FXbool BitmapWindow::saveimage(const FXString& file){
   allocElms(pixels,size);
   memcpy(pixels,img->getData(),size);
   for(i=0; i<size; i++){
-    pixels[i]=FXBITREVERSE(pixels[i]);
+    pixels[i]=reverse8(pixels[i]);
     }
 
   tif=TIFFOpen(file.text(),"w");

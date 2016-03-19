@@ -108,7 +108,7 @@ enum {
 
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  register FXint ch,nn,v,neg,pos,width,base,digits,signifs,modifier,convert,count,exponent;
+  register FXint ch,nn,v,neg,nex,pos,width,base,digits,signifs,modifier,convert,count,exponent;
   register const FXchar *start=string;
   register FXchar *ptr;
   FXdouble number;
@@ -312,22 +312,19 @@ assign:   if(convert){
                 if(number) signifs++;
                 digits++;
                 string++;
-                exponent--;
+                exponent--;                                     // Decrement exponent for digits after decimal point
                 width--;
                 }
               }
             }
           if(!digits) goto x;                                   // No digits in mantissa at all!
-          if(neg){                                              // Apply sign
-            number=-number;
-            }
           if(0<width && (*string=='e' || *string=='E')){        // Handle exponent
             string++;
             width--;
             nn=0;
             digits=0;
             if(0<width){
-              if((neg=(*string=='-')) || (*string=='+')){       // Handle exponent sign
+              if((nex=(*string=='-')) || (*string=='+')){       // Handle exponent sign
                 string++;
                 width--;
                 }
@@ -338,7 +335,7 @@ assign:   if(convert){
                 width--;
                 }
               if(!digits) goto x;                               // No digits in exponent!
-              if(neg){
+              if(nex){
                 exponent-=nn;
                 }
               else{
@@ -349,10 +346,10 @@ assign:   if(convert){
           if(number!=0.0){
             number*=fxtenToThe(-signifs);                       // Mantissa to form X.XXXXXX
             exponent+=signifs;
-            if((exponent>308) || ((exponent==308) && (value>=1.79769313486231570815))){         // Check overflow
+            if((exponent>308) || ((exponent==308) && (number>=1.79769313486231570815))){         // Check overflow
               number=1.79769313486231570815E+308;
               }
-            else if((exponent<-324) || ((exponent==-324) && (value<=4.94065645841246544177))){  // Check underflow
+            else if((exponent<-324) || ((exponent==-324) && (number<=4.94065645841246544177))){  // Check underflow
               number=0.0;
               }
             else{
@@ -361,6 +358,9 @@ assign:   if(convert){
                 exponent+=16;
                 }
               number*=fxtenToThe(exponent);                     // Shift floating point
+              }
+            if(neg){                                            // Apply sign
+              number=-number;
               }
             }
           if(convert){

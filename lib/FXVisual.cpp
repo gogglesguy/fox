@@ -22,7 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXElement.h"
@@ -335,7 +335,7 @@ void FXVisual::setuptruecolor(){
       rpix[d][i]=alphamask | (r << redshift);           // Unused (alpha) bits are set to 1
       gpix[d][i]=alphamask | (g << greenshift);
       bpix[d][i]=alphamask | (b << blueshift);
-//      rpix[d][i]=r << redshift;     
+//      rpix[d][i]=r << redshift;
 //      gpix[d][i]=g << greenshift;
 //      bpix[d][i]=b << blueshift;
       }

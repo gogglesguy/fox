@@ -1957,6 +1957,14 @@ SOURCE=..\..\..\lib\fxpriv.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXProcess.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXProcess.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXProgressBar.cpp
 # End Source File
 # Begin Source File
@@ -2362,6 +2370,18 @@ SOURCE=..\..\..\lib\FXStringDict.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXStringDict.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\fxstrtod.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\fxstrtoll.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\fxstrtoull.cpp
 # End Source File
 # Begin Source File
 
@@ -2910,10 +2930,6 @@ SOURCE=..\..\..\lib\showdetails.gif
 # Begin Source File
 
 SOURCE=..\..\..\lib\showsmallicons.gif
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\lib\strtoll.cpp
 # End Source File
 # Begin Source File
 

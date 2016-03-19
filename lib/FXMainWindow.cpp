@@ -21,7 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"

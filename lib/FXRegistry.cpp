@@ -26,6 +26,7 @@
 #include "FXObject.h"
 #include "FXString.h"
 #include "FXSystem.h"
+#include "FXProcess.h"
 #include "FXPath.h"
 #include "FXStat.h"
 #include "FXFile.h"
@@ -494,7 +495,7 @@ FXbool FXRegistry::write(){
             realfile=path+PATHSEPSTRING+applicationkey+ext;
 
             // Temporary registry filename
-            tempfile=path+PATHSEPSTRING+applicationkey+"_"+FXString::value(FXSystem::getProcessId())+ext;
+            tempfile=path+PATHSEPSTRING+applicationkey+"_"+FXString::value(FXProcess::current())+ext;
 
             // Unparse settings into temp file first
             if(unparseFile(tempfile)){

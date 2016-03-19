@@ -25,7 +25,7 @@
 #include "fxascii.h"
 #include "fxunicode.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXSize.h"
@@ -1938,7 +1938,7 @@ long FXTextField::onVerify(FXObject*,FXSelector,void* ptr){
 
   // Limit number of columns
   if(options&TEXTFIELD_LIMITED){
-    if((FXint)wcslen(p)>columns) return 1;
+    if((FXint)utf2wcs(p)>columns) return 1;
     }
 
   // Integer input

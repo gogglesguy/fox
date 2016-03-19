@@ -71,6 +71,8 @@ bigcomputer.gif \
 bigdesktop.gif \
 bigdoc.gif \
 bigfloppy.gif \
+bigfloppy3.gif \
+bigfloppy5.gif \
 bigfolder.gif \
 bigfolderopen.gif \
 bignetdrive.gif \
@@ -187,6 +189,8 @@ FXAccelTable.cpp \
 FXApp.cpp \
 FXArrowButton.cpp \
 FXAtomic.cpp \
+FXAutoThreadStorageKey.cpp \
+FXBarrier.cpp \
 FXBMPIcon.cpp \
 FXBMPImage.cpp \
 FXBitmap.cpp \
@@ -213,6 +217,8 @@ FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConcurrent.cpp \
+FXCondition.cpp \
 FXConsole.cpp \
 FXCursor.cpp \
 FXDataTarget.cpp \
@@ -293,6 +299,7 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXIODevice.cpp \
 FXJP2Icon.cpp \
 FXJP2Image.cpp \
 FXJPGIcon.cpp \
@@ -328,6 +335,7 @@ FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
 FXMetaClass.cpp \
+FXMutex.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -344,6 +352,7 @@ FXPipe.cpp  \
 FXPopup.cpp \
 FXPoint.cpp \
 FXPrintDialog.cpp \
+FXProcess.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXPtrList.cpp \
@@ -358,6 +367,7 @@ FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
 FXRangeSlider.cpp \
+FXReadWriteLock.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -374,6 +384,7 @@ FXScrollBar.cpp \
 FXScrollPane.cpp \
 FXScrollWindow.cpp \
 FXSearchDialog.cpp \
+FXSemaphore.cpp \
 FXSeparator.cpp \
 FXSettings.cpp \
 FXShell.cpp \
@@ -382,6 +393,7 @@ FXSize.cpp \
 FXSlider.cpp \
 FXSocket.cpp \
 FXSpinner.cpp \
+FXSpinLock.cpp \
 FXSpheref.cpp \
 FXSphered.cpp \
 FXSplashWindow.cpp \
@@ -431,6 +443,7 @@ FXVerticalFrame.cpp \
 FXVisual.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
+FXWorker.cpp \
 FXXBMIcon.cpp \
 FXXBMImage.cpp \
 FXXPMIcon.cpp \

@@ -27,6 +27,7 @@
 #include "FXString.h"
 #include "FXPath.h"
 #include "FXIO.h"
+#include "FXIODevice.h"
 #include "FXStat.h"
 #include "FXFile.h"
 #include "FXPipe.h"
@@ -70,7 +71,7 @@ namespace FX {
 
 // Construct file and attach existing handle h
 FXFile::FXFile(FXInputHandle h,FXuint m){
-  FXIO::open(h,m);
+  open(h,m);
   }
 
 
@@ -84,6 +85,7 @@ FXFile::FXFile(const FXString& file,FXuint m,FXuint perm){
 FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
   if(!file.empty() && !isOpen()){
 #ifdef WIN32
+    SECURITY_ATTRIBUTES sat;
     DWORD flags=GENERIC_READ;
     DWORD creation=OPEN_EXISTING;
 
@@ -102,6 +104,11 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
       case Create|Truncate|Exclusive: creation=CREATE_NEW; break;
       }
 
+    // Inheritable
+    sat.nLength=sizeof(SECURITY_ATTRIBUTES);
+    sat.bInheritHandle=(m&Inheritable)?true:false;
+    sat.lpSecurityDescriptor=NULL;
+
     // Non-blocking mode
     if(m&NonBlocking){
       // FIXME
@@ -110,10 +117,10 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
     // Do it
 #ifdef UNICODE
     FXnchar unifile[MAXPATHLEN];
-    utf2ncs(unifile,MAXPATHLEN,file.text(),file.length()+1);
-    device=::CreateFileW(unifile,flags,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,creation,FILE_ATTRIBUTE_NORMAL,NULL);
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    device=::CreateFileW(unifile,flags,FILE_SHARE_READ|FILE_SHARE_WRITE,&sat,creation,FILE_ATTRIBUTE_NORMAL,NULL);
 #else
-    device=::CreateFileA(file.text(),flags,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,creation,FILE_ATTRIBUTE_NORMAL,NULL);
+    device=::CreateFileA(file.text(),flags,FILE_SHARE_READ|FILE_SHARE_WRITE,&sat,creation,FILE_ATTRIBUTE_NORMAL,NULL);
 #endif
     if(device!=BadHandle){
       if(m&Append){                             // Appending
@@ -145,6 +152,11 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
     if(m&NoAccessTime) flags|=O_NOATIME;
 #endif
 
+    // Inheritable only if specified
+#ifdef O_CLOEXEC
+    if(!(m&Inheritable)) flags|=O_CLOEXEC;
+#endif
+
     // Creation mode
     if(m&Create){
       flags|=O_CREAT;
@@ -170,7 +182,7 @@ FXbool FXFile::open(const FXString& file,FXuint m,FXuint perm){
 
 // Open device with access mode and handle
 FXbool FXFile::open(FXInputHandle h,FXuint m){
-  return FXIO::open(h,m);
+  return FXIODevice::open(h,m);
   }
 
 
@@ -258,7 +270,8 @@ FXival FXFile::writeBlock(const void* data,FXival count){
 FXlong FXFile::truncate(FXlong s){
   if(isOpen()){
 #ifdef WIN32
-    LARGE_INTEGER oldpos,newpos;
+    LARGE_INTEGER oldpos;
+    LARGE_INTEGER newpos;
     oldpos.QuadPart=0;
     newpos.QuadPart=s;
     oldpos.LowPart=::SetFilePointer(device,0,&oldpos.HighPart,FILE_CURRENT);
@@ -350,9 +363,9 @@ FXbool FXFile::create(const FXString& file,FXuint perm){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
-    FXInputHandle h=::CreateFileW(buffer,GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    FXInputHandle h=::CreateFileW(unifile,GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
 #else
     FXInputHandle h=::CreateFileA(file.text(),GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
 #endif
@@ -371,9 +384,9 @@ FXbool FXFile::remove(const FXString& file){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
-    return ::DeleteFileW(buffer)!=0;
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    return ::DeleteFileW(unifile)!=0;
 #else
     return ::DeleteFileA(file.text())!=0;
 #endif
@@ -390,10 +403,11 @@ FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
   if(srcfile!=dstfile){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
-    utf2ncs(oldname,MAXPATHLEN,srcfile.text(),srcfile.length()+1);
-    utf2ncs(newname,MAXPATHLEN,dstfile.text(),dstfile.length()+1);
-    return ::MoveFileExW(oldname,newname,MOVEFILE_REPLACE_EXISTING)!=0;
+    FXnchar srcname[MAXPATHLEN];
+    FXnchar dstname[MAXPATHLEN];
+    utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
+    utf2ncs(dstname,dstfile.text(),MAXPATHLEN);
+    return ::MoveFileExW(srcname,dstname,MOVEFILE_REPLACE_EXISTING)!=0;
 #else
     return ::MoveFileExA(srcfile.text(),dstfile.text(),MOVEFILE_REPLACE_EXISTING)!=0;
 #endif
@@ -439,19 +453,20 @@ static BOOL WINAPI HelpCreateHardLink(const TCHAR* newname,const TCHAR* oldname,
 
 
 // Link file
-FXbool FXFile::link(const FXString& oldfile,const FXString& newfile){
-  if(newfile!=oldfile){
+FXbool FXFile::link(const FXString& srcfile,const FXString& dstfile){
+  if(srcfile!=dstfile){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
-    utf2ncs(oldname,MAXPATHLEN,oldfile.text(),oldfile.length()+1);
-    utf2ncs(newname,MAXPATHLEN,newfile.text(),newfile.length()+1);
-    return MyCreateHardLink(newname,oldname,NULL)!=0;
+    FXnchar srcname[MAXPATHLEN];
+    FXnchar dstname[MAXPATHLEN];
+    utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
+    utf2ncs(dstname,dstfile.text(),MAXPATHLEN);
+    return MyCreateHardLink(dstname,srcname,NULL)!=0;
 #else
-    return MyCreateHardLink(newfile.text(),oldfile.text(),NULL)!=0;
+    return MyCreateHardLink(dstfile.text(),srcfile.text(),NULL)!=0;
 #endif
 #else
-    return ::link(oldfile.text(),newfile.text())==0;
+    return ::link(srcfile.text(),dstfile.text())==0;
 #endif
     }
   return false;
@@ -474,10 +489,10 @@ FXString FXFile::symlink(const FXString& file){
 
 
 // Symbolic Link file
-FXbool FXFile::symlink(const FXString& oldfile,const FXString& newfile){
-  if(newfile!=oldfile){
+FXbool FXFile::symlink(const FXString& srcfile,const FXString& dstfile){
+  if(dstfile!=srcfile){
 #ifndef WIN32
-    return ::symlink(oldfile.text(),newfile.text())==0;
+    return ::symlink(srcfile.text(),dstfile.text())==0;
 #endif
     }
   return false;

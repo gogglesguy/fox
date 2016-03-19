@@ -178,11 +178,7 @@ FXbool FXStat::isSetSticky() const {
 
 // Convert 100ns since 01/01/1601 to ns since 01/01/1970
 static inline FXTime fxfiletime(FXTime ft){
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__)
-  return (ft-116444736000000000LL)*100LL;
-#else
-  return (ft-116444736000000000L)*100L;
-#endif
+  return (ft-FXLONG(116444736000000000))*FXLONG(100);
   }
 
 #endif
@@ -204,11 +200,10 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    TCHAR buffer[MAXPATHLEN];
+    FXnchar unifile[MAXPATHLEN];
     HANDLE hfile;
-    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
-    if((hfile=::CreateFile(buffer,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
-//    if((hfile=::CreateFile(buffer,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    if((hfile=::CreateFile(unifile,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
@@ -217,7 +212,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
         else info.modeFlags|=FXIO::File;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(buffer,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -234,7 +229,6 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
 #else
     HANDLE hfile;
     if((hfile=::CreateFile(file.text(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
-//    if((hfile=::CreateFile(file.text(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
@@ -306,11 +300,10 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    TCHAR buffer[MAXPATHLEN];
+    FXnchar unifile[MAXPATHLEN];
     HANDLE hfile;
-    utf2ncs(buffer,MAXPATHLEN,file.text(),file.length()+1);
-    if((hfile=::CreateFile(buffer,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
-//    if((hfile=::CreateFile(buffer,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    if((hfile=::CreateFile(unifile,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
@@ -319,7 +312,7 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) info.modeFlags|=FXIO::Directory;
         else info.modeFlags|=FXIO::File;
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY) info.modeFlags&=~(FXIO::OwnerWrite|FXIO::GroupWrite|FXIO::OtherWrite);
-        if(::SHGetFileInfoW(buffer,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
+        if(::SHGetFileInfoW(unifile,0,&sfi,sizeof(SHFILEINFO),SHGFI_EXETYPE)==0) info.modeFlags&=~(FXIO::OwnerExec|FXIO::GroupExec|FXIO::OtherExec);
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
@@ -336,7 +329,6 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
 #else
     HANDLE hfile;
     if((hfile=::CreateFile(file.text(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
-//    if((hfile=::CreateFile(file.text(),GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS,NULL))!=INVALID_HANDLE_VALUE){
       BY_HANDLE_FILE_INFORMATION data;
       if(::GetFileInformationByHandle(hfile,&data)){
         SHFILEINFO sfi;
@@ -481,11 +473,11 @@ FXbool FXStat::exists(const FXString& file){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar name[MAXPATHLEN];
-    utf2ncs(name,MAXPATHLEN,file.text(),file.length()+1);
-    return ::GetFileAttributesW(name)!=0xffffffff;
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    return ::GetFileAttributesW(unifile)!=INVALID_FILE_ATTRIBUTES;
 #else
-    return ::GetFileAttributesA(file.text())!=0xffffffff;
+    return ::GetFileAttributesA(file.text())!=INVALID_FILE_ATTRIBUTES;
 #endif
 #else
     struct stat status;
@@ -706,35 +698,53 @@ FXbool FXStat::isSetSticky(const FXString& file){
   }
 
 
-#if 0
-FXulong FXStat::getTotalDiskSpace(const FXString& path){
+// Obtain total amount of space on disk
+FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){
 #ifdef WIN32
+#ifdef UNICODE
+  FXnchar unifile[MAXPATHLEN];
+  utf2ncs(unifile,path.text(),MAXPATHLEN);
+  if(GetDiskFreeSpaceExW(unifile,NULL,(PULARGE_INTEGER*)&space,NULL)){
+    return true;
+    }
 #else
-  struct statvfs64 info;
-  if(statvfs64(path.text(),&info)==0){
-    if(info.f_frsize)
-      return info.f_blocks*info.f_frsize;
-    else
-      return info.f_blocks*info.f_bsize;
+  if(GetDiskFreeSpaceExA(path.text(),NULL,(PULARGE_INTEGER*)&space,NULL)){
+    return true;
     }
 #endif
-  return 0;
+#else
+  struct statfs info;
+  if(statfs(path.text(),&info)==0){
+    space=info.f_bsize*info.f_blocks;
+    return true;
+    }
+#endif
+  return false;
   }
 
-FXulong FXStat::getAvailableDiskSpace(const FXString& path){
+
+// Obtain available amount of space on disk
+FXbool FXStat::getAvailableDiskSpace(const FXString& path,FXulong& space){
 #ifdef WIN32
+#ifdef UNICODE
+  FXnchar unifile[MAXPATHLEN];
+  utf2ncs(unifile,path.text(),MAXPATHLEN);
+  if(GetDiskFreeSpaceExW(unifile,(PULARGE_INTEGER*)&space,NULL,NULL)){
+    return true;
+    }
 #else
-  struct statvfs64 info;
-  if(statvfs64(path.text(),&info)==0){
-    if(info.f_frsize)
-      return info.f_bavail*info.f_frsize;
-    else
-      return info.f_bavail*info.f_bsize;
+  if(GetDiskFreeSpaceExA(path.text(),(PULARGE_INTEGER*)&space,NULL,NULL)){
+    return true;
     }
 #endif
-  return 0;
-  }
+#else
+  struct statfs info;
+  if(statfs(path.text(),&info)==0){
+    space=info.f_bsize*info.f_bfree;
+    return true;
+    }
 #endif
+  return false;
+  }
 
 }
-

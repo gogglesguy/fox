@@ -121,7 +121,7 @@ FXPtrList::FXPtrList(void** objects,FXint n):ptr(EMPTY){
 // Assignment operator
 FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
   if(__likely(ptr!=orig.ptr && no(orig.no()))){
-    copyElms(ptr,orig.ptr,orig.no());
+    copyElms(ptr,(void**)orig.ptr,orig.no());
     }
   return *this;
   }
@@ -169,7 +169,7 @@ FXbool FXPtrList::assign(void** objects,FXint n){
 
 // Assign input string to this string
 FXbool FXPtrList::assign(const FXPtrList& objects){
-  return assign(objects.ptr,objects.no());
+  return assign((void**)objects.ptr,objects.no());
   }
 
 
@@ -211,7 +211,7 @@ FXbool FXPtrList::insert(FXint pos,void** objects,FXint n){
 
 // Insert objects at specified position
 FXbool FXPtrList::insert(FXint pos,const FXPtrList& objects){
-  return insert(pos,objects.ptr,objects.no());
+  return insert(pos,(void**)objects.ptr,objects.no());
   }
 
 
@@ -253,7 +253,7 @@ FXbool FXPtrList::prepend(void** objects,FXint n){
 
 // Prepend objects
 FXbool FXPtrList::prepend(const FXPtrList& objects){
-  return prepend(objects.ptr,objects.no());
+  return prepend((void**)objects.ptr,objects.no());
   }
 
 
@@ -292,7 +292,7 @@ FXbool FXPtrList::append(void** objects,FXint n){
 
 // Add string to the end
 FXbool FXPtrList::append(const FXPtrList& objects){
-  return append(objects.ptr,objects.no());
+  return append((void**)objects.ptr,objects.no());
   }
 
 
@@ -337,7 +337,7 @@ FXbool FXPtrList::replace(FXint pos,FXint m,void** objects,FXint n){
 
 // Replace the m objects at pos with objects
 FXbool FXPtrList::replace(FXint pos,FXint m,const FXPtrList& objects){
-  return replace(pos,m,objects.ptr,objects.no());
+  return replace(pos,m,(void**)objects.ptr,objects.no());
   }
 
 

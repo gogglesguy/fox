@@ -121,7 +121,7 @@ FXObjectList::FXObjectList(FXObject** objects,FXint n):ptr(EMPTY){
 // Assignment operator
 FXObjectList& FXObjectList::operator=(const FXObjectList& orig){
   if(__likely(ptr!=orig.ptr && no(orig.no()))){
-    copyElms(ptr,orig.ptr,orig.no());
+    copyElms(ptr,(FXObject**)orig.ptr,orig.no());
     }
   return *this;
   }
@@ -169,7 +169,7 @@ FXbool FXObjectList::assign(FXObject** objects,FXint n){
 
 // Assign input string to this string
 FXbool FXObjectList::assign(const FXObjectList& objects){
-  return assign(objects.ptr,objects.no());
+  return assign((FXObject**)objects.ptr,objects.no());
   }
 
 
@@ -211,7 +211,7 @@ FXbool FXObjectList::insert(FXint pos,FXObject** objects,FXint n){
 
 // Insert objects at specified position
 FXbool FXObjectList::insert(FXint pos,const FXObjectList& objects){
-  return insert(pos,objects.ptr,objects.no());
+  return insert(pos,(FXObject**)objects.ptr,objects.no());
   }
 
 
@@ -253,7 +253,7 @@ FXbool FXObjectList::prepend(FXObject** objects,FXint n){
 
 // Prepend objects
 FXbool FXObjectList::prepend(const FXObjectList& objects){
-  return prepend(objects.ptr,objects.no());
+  return prepend((FXObject**)objects.ptr,objects.no());
   }
 
 
@@ -292,7 +292,7 @@ FXbool FXObjectList::append(FXObject** objects,FXint n){
 
 // Add string to the end
 FXbool FXObjectList::append(const FXObjectList& objects){
-  return append(objects.ptr,objects.no());
+  return append((FXObject**)objects.ptr,objects.no());
   }
 
 
@@ -337,7 +337,7 @@ FXbool FXObjectList::replace(FXint pos,FXint m,FXObject** objects,FXint n){
 
 // Replace the m objects at pos with objects
 FXbool FXObjectList::replace(FXint pos,FXint m,const FXObjectList& objects){
-  return replace(pos,m,objects.ptr,objects.no());
+  return replace(pos,m,(FXObject**)objects.ptr,objects.no());
   }
 
 

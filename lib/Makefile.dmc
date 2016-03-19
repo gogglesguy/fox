@@ -151,6 +151,7 @@ FXComplexd.cpp \
 FXComboBox.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConcurrent.cpp \
 FXConsole.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
@@ -254,6 +255,7 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXIODevice.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXKOI8RCodec.cpp \
@@ -302,6 +304,7 @@ FXPipe.cpp \
 FXPopup.cpp \
 FXPoint.cpp \
 FXPrintDialog.cpp \
+FXProcess.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXPtrList.cpp \

@@ -38,7 +38,7 @@ namespace FX {
 
 
 // Create queue with initial size
-FXPtrQueue::FXPtrQueue(FXuint sz):list(NULL),head(0),tail(0),size(0){
+FXPtrQueue::FXPtrQueue(FXuint sz):list(NULL),size(0),head(0),tail(0){
   if(callocElms(list,sz)){ size=sz; }
   }
 

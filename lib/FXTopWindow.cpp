@@ -22,7 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXSize.h"
@@ -40,6 +40,7 @@
 #include "FXMainWindow.h"
 #include "FXToolBar.h"
 #include "FXToolBarGrip.h"
+#include "FXProcess.h"
 #include "FXSystem.h"
 #include "FX88591Codec.h"
 #include "fxpriv.h"
@@ -244,7 +245,7 @@ void FXTopWindow::create(){
       // Set client machine name and application pid
       FXString hostname=FXSystem::getHostName();
       XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->wmClientMachine,XA_STRING,8,PropModeReplace,(unsigned char*)hostname.text(),hostname.length());
-      FXint proccessid=FXSystem::getProcessId();
+      FXint proccessid=FXProcess::current();
       XChangeProperty((Display*)getApp()->getDisplay(),xid,getApp()->wmNetProcessId,XA_CARDINAL,32,PropModeReplace,(unsigned char*)&proccessid,1);
 
 //#ifdef HAVE_XFIXES_H
@@ -671,9 +672,9 @@ void FXTopWindow::settitle(){
   if(!title.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar titlewide[1024];
-    utf2ncs(titlewide,1024,title.text(),title.length()+1);
-    SetWindowTextW((HWND)xid,titlewide);
+    FXnchar unititle[1024];
+    utf2ncs(unititle,title.text(),1024);
+    SetWindowTextW((HWND)xid,unititle);
 #else
     SetWindowTextA((HWND)xid,title.text());
 #endif

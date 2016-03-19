@@ -104,6 +104,7 @@ FXDEFMAP(PathFinderMain) PathFinderMainMap[]={
   FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_GO_BACKWARD,PathFinderMain::onUpdBackDirectory),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_GO_FORWARD,PathFinderMain::onCmdForwardDirectory),
   FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_GO_FORWARD,PathFinderMain::onUpdForwardDirectory),
+  FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_DISKSPACE,PathFinderMain::onUpdDiskSpace),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_SAVE_SETTINGS,PathFinderMain::onCmdSaveSettings),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_NEW_PATHFINDER,PathFinderMain::onCmdNewPathFinder),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_PROPERTIES,PathFinderMain::onCmdProperties),
@@ -248,6 +249,10 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // Caption before pattern
   new FXLabel(statusbar,"Pattern:",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  diskspace=new FXLabel(statusbar,"1000000/1000000",NULL,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  diskspace->setTarget(this);
+  diskspace->setSelector(ID_DISKSPACE);
+  new FXLabel(statusbar,"Free/Total:",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
 
   // Make file associations object; shared between FXFileList and FXDirList
@@ -591,7 +596,7 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
         if(association->command.text()){
           FXString command=FXString::value(association->command.text(),FXPath::enquote(filelist->getItemPathname(index)).text());
           FXTRACE((100,"system(%s)\n",command.text()));
-          system(command.text());
+          ::system(command.text());
           }
         else{
           FXMessageBox::information(this,MBOX_OK,"Unknown Command","No command defined for file: %s",filelist->getItemFilename(index).text());
@@ -883,6 +888,18 @@ long PathFinderMain::onCmdForwardDirectory(FXObject*,FXSelector,void*){
 // Update move to next directory
 long PathFinderMain::onUpdForwardDirectory(FXObject* sender,FXSelector,void*){
   sender->handle(this,(0<visiting)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Update diskspace
+long PathFinderMain::onUpdDiskSpace(FXObject* sender,FXSelector,void*){
+  FXulong totalspace,availspace;
+  FXString space="0/0";
+  if(FXStat::getTotalDiskSpace(getDirectory(),totalspace) && FXStat::getAvailableDiskSpace(getDirectory(),availspace)){
+    space.format("%'llu/%'llu",availspace,totalspace);
+    }
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&space);
   return 1;
   }
 

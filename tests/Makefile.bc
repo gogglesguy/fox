@@ -53,6 +53,7 @@ PROGRAMS  = \
 	hello2.exe \
 	switcher.exe \
 	iconlist.exe \
+	process.exe \
 	tabbook.exe \
 	dialog.exe \
 	dirlist.exe \
@@ -158,6 +159,9 @@ dctest.exe: $(FOXLIB) dctest.obj
 
 half.exe: $(FOXLIB) half.obj
 	$(LD) $(LDFLAGS) half.obj $(FOXLIB)
+
+process.exe: $(FOXLIB) process.obj
+	$(LD) $(LDFLAGS) process.obj $(FOXLIB)
 
 clean:
 	del *.obj

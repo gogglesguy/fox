@@ -21,36 +21,18 @@
 #ifndef FXTHREADPOOL_H
 #define FXTHREADPOOL_H
 
+#ifndef FXRUNNABLE_H
+#include "FXRunnable.h"
+#endif
+
 namespace FX {
 
 
 class FXWorker;
-class FXRunnable;
-class FXThreadPool;
 
 
 /// Job queue
 typedef FXPtrQueueOf<FXRunnable> FXJobQueue;
-
-
-/// A worker thread runs jobs from a thread pool
-class FXAPI FXWorker : public FXThread {
-private:
-  FXThreadPool *pool;   // Thread pool
-private:
-  FXWorker(const FXWorker&);
-  FXWorker &operator=(const FXWorker&);
-public:
-
-  /// Create worker for given pool
-  FXWorker(FXThreadPool* p);
-
-  /// Run worker
-  virtual FXint run();
-
-  /// Destroy worker
-  virtual ~FXWorker();
-  };
 
 
 /**
@@ -91,7 +73,7 @@ private:
   volatile FXuint watching;     // Threads watching completion
   volatile FXbool runs;         // Thread pool is running
 private:
-  FXbool startWorker();
+  FXWorker* startWorker();
 private:
   FXThreadPool(const FXThreadPool&);
   FXThreadPool &operator=(const FXThreadPool&);

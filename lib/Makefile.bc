@@ -69,6 +69,8 @@ FXAccelTable.cpp \
 FXApp.cpp \
 FXArrowButton.cpp \
 FXAtomic.cpp \
+FXAutoThreadStorageKey.cpp \
+FXBarrier.cpp \
 FXBMPIcon.cpp \
 FXBMPImage.cpp \
 FXBitmap.cpp \
@@ -95,6 +97,8 @@ FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConcurrent.cpp \
+FXCondition.cpp \
 FXConsole.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
@@ -199,6 +203,7 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXIODevice.cpp \
 FXJP2Icon.cpp \
 FXJP2Image.cpp \
 FXJPGIcon.cpp \
@@ -233,6 +238,7 @@ FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
 FXMetaClass.cpp \
+FXMutex.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -249,6 +255,7 @@ FXPipe.cpp \
 FXPopup.cpp \
 FXPoint.cpp \
 FXPrintDialog.cpp \
+FXProcess.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXPtrList.cpp \
@@ -261,6 +268,7 @@ FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
 FXRangeSlider.cpp \
+FXReadWriteLock.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -279,6 +287,7 @@ FXScrollPane.cpp \
 FXScrollWindow.cpp \
 FXScrollBar.cpp \
 FXSearchDialog.cpp \
+FXSemaphore.cpp \
 FXSeparator.cpp \
 FXSettings.cpp \
 FXShell.cpp \
@@ -289,6 +298,7 @@ FXSocket.cpp \
 FXSpheref.cpp \
 FXSphered.cpp \
 FXSpinner.cpp \
+FXSpinLock.cpp \
 FXSplashWindow.cpp \
 FXSplitter.cpp \
 FXSpring.cpp \
@@ -339,6 +349,7 @@ FXVerticalFrame.cpp \
 FXVisual.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
+FXWorker.cpp \
 FXXBMIcon.cpp \
 FXXBMImage.cpp \
 FXXPMIcon.cpp \
@@ -378,6 +389,76 @@ fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp
 
+ICONS = \
+arrownext.gif \
+arrowprev.gif \
+bigapp.gif \
+bigcdrom.gif \
+bigcomputer.gif \
+bigdesktop.gif \
+bigdoc.gif \
+bigfloppy.gif \
+bigfolder.gif \
+bigfolderopen.gif \
+bignetdrive.gif \
+bignethood.gif \
+bookset.gif \
+bookclr.gif \
+cmymode.gif \
+dialmode.gif \
+dirupicon.gif \
+deleteicon.gif \
+docktop.gif \
+dockbottom.gif \
+dockleft.gif \
+dockright.gif \
+dockfree.gif \
+dockflip.gif \
+entericon.gif \
+erroricon.gif \
+eyedrop.gif \
+filecancel.gif \
+fileaccept.gif \
+filecopy.gif \
+filemove.gif \
+filehidden.gif \
+filelink.gif \
+filerename.gif \
+filedelete.gif \
+fileshown.gif \
+foldernew.gif \
+gotohome.gif \
+gotoicon.gif \
+gotowork.gif \
+hsvmode.gif \
+infoicon.gif \
+landscape.gif \
+listmode.gif \
+miniapp.gif \
+minicdrom.gif \
+minicomputer.gif \
+minidesktop.gif \
+minidoc.gif \
+minifloppy.gif \
+minifolder.gif \
+minifolderopen.gif \
+miniharddisk.gif \
+mininetdrive.gif \
+mininethood.gif \
+minizipdrive.gif \
+portrait.gif \
+questionicon.gif \
+rgbmode.gif \
+searchicon.gif \
+showbigicons.gif \
+showdetails.gif \
+showsmallicons.gif \
+warningicon.gif \
+winclose.gif \
+winmaximize.gif \
+winminimize.gif \
+winrestore.gif
+
 # Objects
 OBJECTS = $(SOURCES:.cpp=.obj)
 
@@ -395,6 +476,15 @@ clean:
         del $(FOXLIB)
         del *.obj
 
+
+FXApp.cpp: icons.h
+
+icons.h: $(ICONS)
+	$(RESWRAP) -nc -h -n FX -o icons.h $(ICONS)
+
+
+icons.cpp: $(ICONS) icons.h
+	$(RESWRAP) -nc -i icons.h -n FX -o icons.cpp $(ICONS)
 
 # Make the library
 !ifdef FOXDLL

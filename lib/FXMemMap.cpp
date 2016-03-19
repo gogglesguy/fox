@@ -21,6 +21,9 @@
 #include "xincs.h"
 #include "fxdefs.h"
 #include "FXString.h"
+#include "FXIODevice.h"
+#include "FXStat.h"
+#include "FXFile.h"
 #include "FXMemMap.h"
 
 /*

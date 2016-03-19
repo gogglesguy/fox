@@ -51,20 +51,20 @@ public:
   /// Construct and init from string
   FXString(const FXchar* s);
 
-  /// Construct and init from wide character string
-  FXString(const FXwchar* s);
-
   /// Construct and init from narrow character string
   FXString(const FXnchar* s);
+
+  /// Construct and init from wide character string
+  FXString(const FXwchar* s);
 
   /// Construct and init with substring
   FXString(const FXchar* s,FXint n);
 
-  /// Construct and init with wide character substring
-  FXString(const FXwchar* s,FXint n);
-
   /// Construct and init with narrow character substring
   FXString(const FXnchar* s,FXint n);
+
+  /// Construct and init with wide character substring
+  FXString(const FXwchar* s,FXint n);
 
   /// Construct and fill with constant
   FXString(FXchar c,FXint n);
@@ -74,6 +74,24 @@ public:
 
   /// Change the length of the string to len
   void length(FXint len);
+
+  /// Return wide character starting at offset p
+  FXwchar wc(FXint p) const;
+
+  /// Increment byte offset by one utf8 character
+  FXint inc(FXint p) const;
+
+  /// Increment byte offset by n utf8 characters
+  FXint inc(FXint p,FXint n) const;
+
+  /// Decrement byte offset by one utf8 character
+  FXint dec(FXint p) const;
+
+  /// Decrement byte offset by n utf8 characters
+  FXint dec(FXint p,FXint n) const;
+
+  /// Return extent of utf8 character at position
+  FXint extent(FXint p) const { return utfBytes[(FXuchar)str[p]]; }
 
   /// Count number of utf8 characters
   FXint count() const;
@@ -89,21 +107,6 @@ public:
 
   /// Validate position to point to begin of utf8 character
   FXint validate(FXint p) const;
-
-  /// Return extent of utf8 character at position
-  FXint extent(FXint p) const { return utfBytes[(FXuchar)str[p]]; }
-
-  /// Increment byte offset by one utf8 character
-  FXint inc(FXint p) const;
-
-  /// Increment byte offset by n utf8 characters
-  FXint inc(FXint p,FXint n) const;
-
-  /// Decrement byte offset by one utf8 character
-  FXint dec(FXint p) const;
-
-  /// Decrement byte offset by n utf8 characters
-  FXint dec(FXint p,FXint n) const;
 
   /// Get text contents
   FXchar* text(){ return str; }
@@ -139,17 +142,14 @@ public:
   /// Return a const reference to the last character
   const FXchar& tail() const { return str[length()-1]; }
 
-  /// Return wide character starting at offset i
-  FXwchar wc(FXint i) const;
-
   /// Assign a string to this
   FXString& operator=(const FXchar* s);
 
-  /// Assign a wide character string to this
-  FXString& operator=(const FXwchar* s);
-
   /// Assign a narrow character string to this
   FXString& operator=(const FXnchar* s);
+
+  /// Assign a wide character string to this
+  FXString& operator=(const FXwchar* s);
 
   /// Assign another string to this
   FXString& operator=(const FXString& s);
@@ -184,20 +184,20 @@ public:
   /// Assign first n characters of string s to this string
   FXString& assign(const FXchar *s,FXint n);
 
-  /// Assign first n characters of wide character string s to this string
-  FXString& assign(const FXwchar *s,FXint n);
-
   /// Assign first n characters of narrow character string s to this string
   FXString& assign(const FXnchar *s,FXint n);
+
+  /// Assign first n characters of wide character string s to this string
+  FXString& assign(const FXwchar *s,FXint n);
 
   /// Assign string s to this string
   FXString& assign(const FXchar* s);
 
-  /// Assign wide character string s to this string
-  FXString& assign(const FXwchar* s);
-
   /// Assign narrow character string s to this string
   FXString& assign(const FXnchar* s);
+
+  /// Assign wide character string s to this string
+  FXString& assign(const FXwchar* s);
 
   /// Assign string s to this string
   FXString& assign(const FXString& s);
@@ -211,20 +211,20 @@ public:
   /// Insert first n characters of string at specified position
   FXString& insert(FXint pos,const FXchar* s,FXint n);
 
-  /// Insert first n characters of wide character string at specified position
-  FXString& insert(FXint pos,const FXwchar* s,FXint n);
-
   /// Insert first n characters of narrow character string at specified position
   FXString& insert(FXint pos,const FXnchar* s,FXint n);
+
+  /// Insert first n characters of wide character string at specified position
+  FXString& insert(FXint pos,const FXwchar* s,FXint n);
 
   /// Insert string at specified position
   FXString& insert(FXint pos,const FXchar* s);
 
-  /// Insert wide character string at specified position
-  FXString& insert(FXint pos,const FXwchar* s);
-
   /// Insert narrow character string at specified position
   FXString& insert(FXint pos,const FXnchar* s);
+
+  /// Insert wide character string at specified position
+  FXString& insert(FXint pos,const FXwchar* s);
 
   /// Insert string at specified position
   FXString& insert(FXint pos,const FXString& s);
@@ -238,20 +238,20 @@ public:
   /// Prepend first n characters of string s
   FXString& prepend(const FXchar* s,FXint n);
 
-  /// Prepend first n characters of wide character string s
-  FXString& prepend(const FXwchar* s,FXint n);
-
   /// Prepend first n characters of narrow character string s
   FXString& prepend(const FXnchar* s,FXint n);
+
+  /// Prepend first n characters of wide character string s
+  FXString& prepend(const FXwchar* s,FXint n);
 
   /// Prepend string with string s
   FXString& prepend(const FXchar* s);
 
-  /// Prepend string with wide character string
-  FXString& prepend(const FXwchar* s);
-
   /// Prepend string with narrow character string
   FXString& prepend(const FXnchar* s);
+
+  /// Prepend string with wide character string
+  FXString& prepend(const FXwchar* s);
 
   /// Prepend string with string s
   FXString& prepend(const FXString& s);
@@ -265,20 +265,20 @@ public:
   /// Append first n characters of string s to this string
   FXString& append(const FXchar* s,FXint n);
 
-  /// Append first n characters of wide character string s to this string
-  FXString& append(const FXwchar* s,FXint n);
-
   /// Append first n characters of narrow character string s to this string
   FXString& append(const FXnchar* s,FXint n);
+
+  /// Append first n characters of wide character string s to this string
+  FXString& append(const FXwchar* s,FXint n);
 
   /// Append string s to this string
   FXString& append(const FXchar* s);
 
-  /// Append wide character string s to this string
-  FXString& append(const FXwchar* s);
-
   /// Append narrow character string s to this string
   FXString& append(const FXnchar* s);
+
+  /// Append wide character string s to this string
+  FXString& append(const FXwchar* s);
 
   /// Append string s to this string
   FXString& append(const FXString& s);
@@ -286,29 +286,29 @@ public:
   /// Replace a single character
   FXString& replace(FXint pos,FXchar c);
 
-  /// Replace the m characters at pos with n characters c
-  FXString& replace(FXint pos,FXint m,FXchar c,FXint n);
+  /// Replace the r characters at pos with n characters c
+  FXString& replace(FXint pos,FXint r,FXchar c,FXint n);
 
-  /// Replaces the m characters at pos with first n characters of string s
-  FXString& replace(FXint pos,FXint m,const FXchar* s,FXint n);
+  /// Replaces the r characters at pos with first n characters of string s
+  FXString& replace(FXint pos,FXint r,const FXchar* s,FXint n);
 
-  /// Replaces the m characters at pos with first n characters of wide character string s
-  FXString& replace(FXint pos,FXint m,const FXwchar* s,FXint n);
+  /// Replaces the r characters at pos with first n characters of narrow character string s
+  FXString& replace(FXint pos,FXint r,const FXnchar* s,FXint n);
 
-  /// Replaces the m characters at pos with first n characters of narrow character string s
-  FXString& replace(FXint pos,FXint m,const FXnchar* s,FXint n);
+  /// Replaces the r characters at pos with first n characters of wide character string s
+  FXString& replace(FXint pos,FXint r,const FXwchar* s,FXint n);
 
-  /// Replace the m characters at pos with string s
-  FXString& replace(FXint pos,FXint m,const FXchar* s);
+  /// Replace the r characters at pos with string s
+  FXString& replace(FXint pos,FXint r,const FXchar* s);
 
-  /// Replace the m characters at pos with wide character string s
-  FXString& replace(FXint pos,FXint m,const FXwchar* s);
+  /// Replace the r characters at pos with narrow character string s
+  FXString& replace(FXint pos,FXint r,const FXnchar* s);
 
-  /// Replace the m characters at pos with narrow character string s
-  FXString& replace(FXint pos,FXint m,const FXnchar* s);
+  /// Replace the r characters at pos with wide character string s
+  FXString& replace(FXint pos,FXint r,const FXwchar* s);
 
-  /// Replace the m characters at pos with string s
-  FXString& replace(FXint pos,FXint m,const FXString& s);
+  /// Replace the r characters at pos with string s
+  FXString& replace(FXint pos,FXint r,const FXString& s);
 
   /// Move range of m characters from src position to dst position
   FXString& move(FXint dst,FXint src,FXint n);
@@ -562,8 +562,8 @@ public:
   /// Append operators
   FXString& operator+=(FXchar c);
   FXString& operator+=(const FXchar* s);
-  FXString& operator+=(const FXwchar* s);
   FXString& operator+=(const FXnchar* s);
+  FXString& operator+=(const FXwchar* s);
   FXString& operator+=(const FXString& s);
 
   /// Swap two strings
@@ -614,11 +614,17 @@ extern FXAPI FXint comparecase(const FXchar* s1,const FXString& s2,FXint n);
 extern FXAPI FXint comparecase(const FXString& s1,const FXchar* s2,FXint n);
 extern FXAPI FXint comparecase(const FXString& s1,const FXString& s2,FXint n);
 
-/// Compare with numeric interpretation
+/// Compare with natural interpretation
 extern FXAPI FXint compareversion(const FXchar* s1,const FXchar* s2);
 extern FXAPI FXint compareversion(const FXchar* s1,const FXString& s2);
 extern FXAPI FXint compareversion(const FXString& s1,const FXchar* s2);
 extern FXAPI FXint compareversion(const FXString& s1,const FXString& s2);
+
+/// Compare case insensitive with natural interpretation
+extern FXAPI FXint compareversioncase(const FXchar* s1,const FXchar* s2);
+extern FXAPI FXint compareversioncase(const FXchar* s1,const FXString& s2);
+extern FXAPI FXint compareversioncase(const FXString& s1,const FXchar* s2);
+extern FXAPI FXint compareversioncase(const FXString& s1,const FXString& s2);
 
 /// Equality operators
 extern FXAPI FXbool operator==(const FXString& s1,const FXString& s2);
@@ -655,13 +661,13 @@ extern FXAPI FXString operator+(const FXString& s1,const FXString& s2);
 
 /// Concatenate FXString and a string
 extern FXAPI FXString operator+(const FXString& s1,const FXchar* s2);
-extern FXAPI FXString operator+(const FXString& s1,const FXwchar* s2);
 extern FXAPI FXString operator+(const FXString& s1,const FXnchar* s2);
+extern FXAPI FXString operator+(const FXString& s1,const FXwchar* s2);
 
 /// Concatenate string and FXString
 extern FXAPI FXString operator+(const FXchar* s1,const FXString& s2);
-extern FXAPI FXString operator+(const FXwchar* s1,const FXString& s2);
 extern FXAPI FXString operator+(const FXnchar* s1,const FXString& s2);
+extern FXAPI FXString operator+(const FXwchar* s1,const FXString& s2);
 
 /// Concatenate string and single character
 extern FXAPI FXString operator+(const FXString& s,FXchar c);

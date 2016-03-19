@@ -21,8 +21,9 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxendian.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXException.h"
 #include "FXElement.h"
 #include "FXStream.h"
@@ -233,7 +234,7 @@ void FXBitmap::restore(){
       // Fill our own data from pixels
       for(y=0,p=pixels,q=data; y<height; y++){
         for(x=0; x<bytewidth; x++){
-          q[x]=~FXBITREVERSE(p[x]);
+          q[x]=~reverse8(p[x]);
           }
         q+=bytewidth;
         p+=bytes_per_line;
@@ -290,7 +291,7 @@ void FXBitmap::render(){
       // Fill pixels from our own data
       for(y=0,p=pixels,q=data; y<height; y++){
         for(x=0; x<bytewidth; x++){
-          p[x]=~FXBITREVERSE(q[x]);
+          p[x]=~reverse8(q[x]);
           }
         q+=bytewidth;
         p+=bytes_per_line;
@@ -427,7 +428,7 @@ void FXBitmap::render(){
 
       // Most significant bit first
       if(xim->bitmap_bit_order==MSBFirst){
-        for(i=0; i<size; i++) pix[i]=FXBITREVERSE(data[i]);
+        for(i=0; i<size; i++) pix[i]=reverse8(data[i]);
         }
 
       // Least significant bit first
@@ -595,7 +596,7 @@ void FXBitmap::mirror(FXbool horizontal,FXbool vertical){
           do{
             t=*pb++ << sa;
             t|=*pb >> sb;
-            *pa++=FXBITREVERSE(t);
+            *pa++=reverse8(t);
             }
           while(pa<paa);
           }

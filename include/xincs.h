@@ -80,6 +80,12 @@
 #ifdef UNICODE
 #include <wchar.h>              // Wide character support
 #endif
+#ifndef PROCESS_SUSPEND_RESUME
+#define PROCESS_SUSPEND_RESUME 0x0800
+#endif
+#ifndef INVALID_FILE_ATTRIBUTES
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
 
 // OpenGL includes
 #ifdef HAVE_GL_H
@@ -91,6 +97,9 @@
 #ifndef GLAPI
 #define GLAPI
 #endif
+#ifndef GL_BGRA
+#define GL_BGRA GL_BGRA_EXT
+#endif
 #ifdef HAVE_GLU_H
 #include <GL/glu.h>
 #endif
@@ -101,6 +110,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <sys/ioctl.h>
+#include <sys/statfs.h>
 #ifdef HAVE_UNISTD_H
 #include <sys/types.h>
 #include <unistd.h>

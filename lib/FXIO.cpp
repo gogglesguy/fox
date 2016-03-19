@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                        I / O   D e v i c e   C l a s s                        *
+*                       A b s t r a c t   I / O   C l a s s                     *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 2005,2011 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -32,7 +32,7 @@
 /*
   Notes:
 
-  - An abstract class for low-level IO.
+  - An abstract class for IO.
 */
 
 // Bad handle value
@@ -51,7 +51,12 @@ namespace FX {
 
 
 // Construct
-FXIO::FXIO():device(BadHandle),access(NoAccess){
+FXIO::FXIO():access(NoAccess){
+  }
+
+
+// Construct with given mode
+FXIO::FXIO(FXuint m):access(m){
   }
 
 
@@ -67,37 +72,15 @@ FXbool FXIO::isWritable() const {
   }
 
 
-// Open file
-FXbool FXIO::open(FXInputHandle h,FXuint m){
-  device=h;
-  access=m;
-  return true;
-  }
-
-
 // Return true if open
 FXbool FXIO::isOpen() const {
-  return device!=BadHandle;
+  return true;
   }
 
 
 // Return true if serial access only
 FXbool FXIO::isSerial() const {
   return true;
-  }
-
-
-// Attach existing file handle
-void FXIO::attach(FXInputHandle h,FXuint m){
-  close();
-  device=h;
-  access=(m|OwnHandle);
-  }
-
-
-// Detach existing file handle
-void FXIO::detach(){
-  access&=~OwnHandle;
   }
 
 
@@ -151,15 +134,12 @@ FXlong FXIO::size(){
 
 // Close file
 FXbool FXIO::close(){
-  device=BadHandle;
-  access=NoAccess;
   return true;
   }
 
 
 // Destroy
 FXIO::~FXIO(){
-  close();
   }
 
 

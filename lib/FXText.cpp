@@ -25,7 +25,7 @@
 #include "fxascii.h"
 #include "fxunicode.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXElement.h"
@@ -550,7 +550,7 @@ FXint FXText::validPos(FXint pos) const {
   register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
   if(pos<=0) return 0;
   if(pos>=length) return length;
-  return (FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
+  return (FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
   }
 
 
@@ -558,7 +558,7 @@ FXint FXText::validPos(FXint pos) const {
 // or below below the gap, we read from the segment below the gap
 FXint FXText::dec(FXint pos) const {
   register const FXchar *ptr=pos<=gapstart ? buffer : buffer-gapstart+gapend;
-  return (--pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
+  return (--pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
   }
 
 
@@ -566,7 +566,7 @@ FXint FXText::dec(FXint pos) const {
 // start under the gap the last character accessed is below the gap
 FXint FXText::inc(FXint pos) const {
   register const FXchar *ptr=pos<gapstart ? buffer : buffer-gapstart+gapend;
-  return (++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos), pos;
+  return (++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos), pos;
   }
 
 
@@ -582,9 +582,7 @@ FXwchar FXText::getChar(FXint pos) const {
   register FXwchar w=ptr[0];
   if(__unlikely(0xC0<=w)){ w=(w<<6)^ptr[1]^0x3080;
   if(__unlikely(0x800<=w)){ w=(w<<6)^ptr[2]^0x20080;
-  if(__unlikely(0x10000<=w)){ w=(w<<6)^ptr[3]^0x400080;
-  if(__unlikely(0x200000<=w)){ w=(w<<6)^ptr[4]^0x8000080;
-  if(__unlikely(0x4000000<=w)){ w=(w<<6)^ptr[5]^0x80; }}}}}
+  if(__unlikely(0x10000<=w)){ w=(w<<6)^ptr[3]^0x400080; }}}
   return w;
   }
 
@@ -2503,46 +2501,53 @@ void FXText::enterText(const FXString& text,FXbool notify){
 void FXText::enterText(const FXchar *text,FXint n,FXbool notify){
   register FXint start=cursorpos;
   register FXint end=cursorpos;
-  if(isPosSelected(cursorpos)){         // Replace selected characters
+
+  // Replace selected characters
+  if(isPosSelected(cursorpos)){
     start=selstartpos;
     end=selendpos;
     }
-  else if(isOverstrike()){              // Replace overstruck characters
-    end=overstruck(start,text,n);
+
+  // Replace overstruck characters
+  else if(isOverstrike()){
+    end=overstruck(start,end,text,n);
     }
+
+  // Replace text
   replaceText(start,end-start,text,n,notify);
   moveCursor(start+n,notify);
   }
 
 
 // End of overstruck character range
-FXint FXText::overstruck(FXint start,const FXchar *text,FXint n){
-  register FXint sindent,eindent,indent,newline=0,end,c;
+FXint FXText::overstruck(FXint start,FXint end,const FXchar *text,FXint n){
+  if(!memchr(text,'\n',n)){
+    register FXint sindent,eindent,indent,p,c;
+    register const FXchar *ptr;
 
-  // Measure indent at pos
-  for(end=lineStart(start),sindent=0; end<start; end+=getCharLen(end)){
-    sindent+=(getChar(end)=='\t') ? (tabcolumns-sindent%tabcolumns) : 1;
-    }
-
-  // Measure indent at end of (first line of the) new text
-  for(end=0,eindent=sindent; end<n; end=wcinc(text,end)){
-    c=wc(text+end);
-    if(c=='\n'){ newline=1; break; }
-    eindent+=(c=='\t') ? (tabcolumns-eindent%tabcolumns) : 1;
-    }
-
-  // Now figure out how much text to replace
-  for(end=start,indent=sindent; end<length; end+=getCharLen(end)){
-    c=getChar(end);
-    if(c=='\n'){                      // Stuff past the newline just gets inserted
-      if(newline) end+=getCharLen(end);
-      break;
+    // Measure indent at pos
+    for(p=lineStart(start),sindent=0; p<start; p+=getCharLen(p)){
+      sindent+=(getChar(p)=='\t') ? (tabcolumns-sindent%tabcolumns) : 1;
       }
-    indent+=(c=='\t') ? (tabcolumns-indent%tabcolumns) : 1;
-    if(indent>=eindent){              // Replace string fits inside here
-      if(indent==eindent) end+=getCharLen(end);
-      break;
+
+    eindent=sindent;
+
+    // Measure indent at end of (first line of the) new text
+    for(ptr=text; ptr<text+n; ptr=wcinc(ptr)){
+      eindent+=(wc(ptr)=='\t') ? (tabcolumns-eindent%tabcolumns) : 1;
       }
+
+    // Now figure out how much text to replace
+    for(p=start,indent=sindent; p<length; p+=getCharLen(p)){
+      c=getChar(p);
+      if(c=='\n') break;                // Stuff past the newline just gets inserted
+      indent+=(c=='\t') ? (tabcolumns-indent%tabcolumns) : 1;
+      if(indent>=eindent){              // Replace string fits inside here
+        if(indent==eindent) p+=getCharLen(p);
+        break;
+        }
+      }
+    end=p;
     }
   return end;
   }
@@ -2721,7 +2726,7 @@ FXbool FXText::pasteSelection(FXbool notify){
     // First, try UTF-8
     if(getDNDData(FROM_SELECTION,utf8Type,string)){
       if(isOverstrike()){
-        end=overstruck(start,string.text(),string.length());
+        end=overstruck(start,end,string.text(),string.length());
         }
       replaceText(start,end-start,string,notify);
       makePositionVisible(cursorpos);
@@ -2736,7 +2741,7 @@ FXbool FXText::pasteSelection(FXbool notify){
       FXUTF16LECodec unicode;
       string=unicode.mb2utf(string);
       if(isOverstrike()){
-        end=overstruck(start,string.text(),string.length());
+        end=overstruck(start,end,string.text(),string.length());
         }
       replaceText(start,end-start,string,notify);
       makePositionVisible(cursorpos);
@@ -2751,7 +2756,7 @@ FXbool FXText::pasteSelection(FXbool notify){
       FX88591Codec ascii;
       string=ascii.mb2utf(string);
       if(isOverstrike()){
-        end=overstruck(start,string.text(),string.length());
+        end=overstruck(start,end,string.text(),string.length());
         }
       replaceText(start,end-start,string,notify);
       makePositionVisible(cursorpos);

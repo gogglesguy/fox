@@ -17,6 +17,39 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 22 - FOX DEVELOPMENT 1.7.27
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>New class FXProcess to manage child process creation in a platform-independent way.</li>
+<li>Split out FXThread into constituent files, one for each class (FXMutex, FXSemaphore, etc).</li>
+<li>Overstrike mode behaviour improved in FXText.</li>
+<li>New collection of functions to deal with utf8/utf16/utf32 conversions to replace the old
+ones.  The new implementations are more strict in stream errors and overrun-safe.
+Due to dropping non-unicode code points they are also perhaps a bit faster.</li>
+<li>New macros for testing utf8, utf16 lead/follow properties.</li>
+<li>New fxendian.h header file for <em>fast</em> byte swapping primitives, on processors where this
+is supported.</li>
+<li>New macro FXLONG() to embed 64-bit integer constants in your code, in a way that survives various compilers.</li>
+<li>Added FXIO::Inheritable flag for i/o devices.  By default file handles are not inheritable by child processes.</li>
+<li>Added new FXConcurrent class.  This provides multi-threaded SIMD style concurrency.  It is extremely efficient
+for recurrent tasks due to predictable task-to-thread assignments.</li>
+<li>Better method to force thread signal masks when starting new threads using FXThread.</li>
+<li>Some improvements in the enquoting algorithm for shell-safe commandline parameters on Windows.</li>
+<li>Issues in fxscanf() for parsing doubles fixed.</li>
+<li>API's added to determine free disk space.</li>
+<li>Some members of FXEvent were not initialized in the constructor.</li>
+<li>New intermediate class FXIODevice.  This makes FXIO an purely abstract base class.</li>
+<li>New class FXWorker is a thread that runs a FXRunnable.  This makes sense for FXConcurrent and FXThreadPool.</li>
+<li>Renamed FXMutexLock to FXScopedMutex; added FXScopedSpinLock as well.  Old FXMutexLock still works, but
+is now deprecated.</li>
+<li>Fix to FXAutoPtr when using implicitly called constructors or conversion operators.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 May 17 - FOX DEVELOPMENT 1.7.26
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

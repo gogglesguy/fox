@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "FXMemMap.h"
 
 /*
   Notes:
@@ -73,7 +72,7 @@ int main(int argc,char** argv){
   filename=argv[3];
 
   // Show process id
-  fprintf(stderr,"Process id=%d\n",FXSystem::getProcessId());
+  fprintf(stderr,"Process id=%d\n",FXProcess::current());
 
   // Test reading
   if(action==TEST_READ){

@@ -9,11 +9,11 @@ EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README f
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = fox17.pc
 
-CLEANFILES = $(distdir).tar.gz $(distdir).zip 
+CLEANFILES = $(distdir).tar.gz $(distdir).zip
 
 snapshot: dist-all
-	cp $(distdir).tar.gz /net/linkyftp/pub/fox-snapshot.tar.gz
-	cp $(distdir).zip /net/linkyftp/pub/fox-snapshot.zip
+	cp $(distdir).tar.gz /net/webby/ftp/pub/fox-snapshot.tar.gz
+	cp $(distdir).zip /net/webby/ftp/pub/fox-snapshot.zip
 
 
 
@@ -22,13 +22,13 @@ snapshot: dist-all
 #	cp -r $(distdir)/doc/* /net/linky/mnt/html
 
 web: distdir
-	cp -r $(distdir)/doc/* /net/linkyweb
+	cp -r $(distdir)/doc/* /net/webby/html
 
 drop: dist-all
-	cp $(distdir).tar.gz /net/linkyftp/pub
-	cp $(distdir).zip /net/linkyftp/pub
-	cd /net/linkyftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
-	cd /net/linkyftp/pub && ln -sf $(distdir).zip fox-latest.zip
+	cp $(distdir).tar.gz /net/webby/ftp/pub
+	cp $(distdir).zip /net/webby/ftp/pub
+	cd /net/webby/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
+	cd /net/webby/ftp/pub && ln -sf $(distdir).zip fox-latest.zip
 
 
 #diff: distdir

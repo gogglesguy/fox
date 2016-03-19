@@ -44,9 +44,9 @@ noinst_PROGRAMS = scan$(EXEEXT) format$(EXEEXT) console$(EXEEXT) \
 	dirlist$(EXEEXT) foursplit$(EXEEXT) header$(EXEEXT) \
 	hello$(EXEEXT) hello2$(EXEEXT) iconlist$(EXEEXT) \
 	image$(EXEEXT) mditest$(EXEEXT) shutter$(EXEEXT) \
-	splitter$(EXEEXT) switcher$(EXEEXT) tabbook$(EXEEXT) \
-	ratio$(EXEEXT) half$(EXEEXT) gaugetest$(EXEEXT) \
-	gltest$(EXEEXT) glviewer$(EXEEXT)
+	splitter$(EXEEXT) process$(EXEEXT) switcher$(EXEEXT) \
+	tabbook$(EXEEXT) ratio$(EXEEXT) half$(EXEEXT) \
+	gaugetest$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -165,6 +165,10 @@ am_minheritance_OBJECTS = minheritance.$(OBJEXT)
 minheritance_OBJECTS = $(am_minheritance_OBJECTS)
 minheritance_LDADD = $(LDADD)
 minheritance_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
+am_process_OBJECTS = process.$(OBJEXT)
+process_OBJECTS = $(am_process_OBJECTS)
+process_LDADD = $(LDADD)
+process_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_ratio_OBJECTS = ratio.$(OBJEXT)
 ratio_OBJECTS = $(am_ratio_OBJECTS)
 ratio_LDADD = $(LDADD)
@@ -240,10 +244,11 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
 	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
 	$(layout_SOURCES) $(mditest_SOURCES) $(memmap_SOURCES) \
-	$(minheritance_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
-	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
-	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
-	$(table_SOURCES) $(thread_SOURCES) $(wizard_SOURCES)
+	$(minheritance_SOURCES) $(process_SOURCES) $(ratio_SOURCES) \
+	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
+	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
+	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
+	$(wizard_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
@@ -253,10 +258,11 @@ DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
 	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
 	$(layout_SOURCES) $(mditest_SOURCES) $(memmap_SOURCES) \
-	$(minheritance_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
-	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
-	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
-	$(table_SOURCES) $(thread_SOURCES) $(wizard_SOURCES)
+	$(minheritance_SOURCES) $(process_SOURCES) $(ratio_SOURCES) \
+	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
+	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
+	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
+	$(wizard_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -427,6 +433,7 @@ header_SOURCES = header.cpp
 hello_SOURCES = hello.cpp
 hello2_SOURCES = hello2.cpp
 switcher_SOURCES = switcher.cpp
+process_SOURCES = process.cpp
 iconlist_SOURCES = iconlist.cpp
 tabbook_SOURCES = tabbook.cpp
 ratio_SOURCES = ratio.cpp
@@ -564,6 +571,9 @@ memmap$(EXEEXT): $(memmap_OBJECTS) $(memmap_DEPENDENCIES)
 minheritance$(EXEEXT): $(minheritance_OBJECTS) $(minheritance_DEPENDENCIES) 
 	@rm -f minheritance$(EXEEXT)
 	$(CXXLINK) $(minheritance_OBJECTS) $(minheritance_LDADD) $(LIBS)
+process$(EXEEXT): $(process_OBJECTS) $(process_DEPENDENCIES) 
+	@rm -f process$(EXEEXT)
+	$(CXXLINK) $(process_OBJECTS) $(process_LDADD) $(LIBS)
 ratio$(EXEEXT): $(ratio_OBJECTS) $(ratio_DEPENDENCIES) 
 	@rm -f ratio$(EXEEXT)
 	$(CXXLINK) $(ratio_OBJECTS) $(ratio_LDADD) $(LIBS)
@@ -631,6 +641,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mditest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minheritance.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/process.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ratio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan.Po@am__quote@
