@@ -94,6 +94,12 @@ public:
   /// Depth of box
   FXdouble depth() const { return upper.z-lower.z; }
 
+  /// Area of box
+  FXdouble area() const { return (width()*height()+width()*depth()+height()*depth())*2.0; }
+
+  /// Volume of box
+  FXdouble volume() const { return width()*height()*depth(); }
+
   /// Longest side
   FXdouble longest() const;
 
@@ -144,6 +150,9 @@ public:
 
   /// Intersect box with ray u-v
   FXbool intersect(const FXVec3d& u,const FXVec3d& v) const;
+
+  /// Intersect box with ray pos+lambda*dir, returning true if hit
+  FXbool intersect(const FXVec3d& pos,const FXVec3d& dir,FXdouble hit[]) const;
 
   /// Get corner number 0..7
   FXVec3d corner(FXint c) const { return FXVec3d((&lower)[c&1].x, (&lower)[(c>>1)&1].y, (&lower)[c>>2].z); }

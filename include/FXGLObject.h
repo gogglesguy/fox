@@ -77,10 +77,6 @@ public:
   };
 
 
-/// Explicit template specialization
-//extern template class FXAPI FXObjectListOf<FXGLObject>;
-
-
 /// List of GL objects
 typedef FXObjectListOf<FXGLObject> FXGLObjectList;
 
@@ -130,12 +126,21 @@ public:
 
   /// Insert child object at given position
   void insert(FXint pos,FXGLObject* obj){ list.insert(pos,obj); }
+  
+  /// Insert list of child objects at given position
+  void insert(FXint pos,const FXGLObjectList& objs){ list.insert(pos,objs); }
 
   /// Prepend child object
   void prepend(FXGLObject* obj){ list.prepend(obj); }
 
+  /// Prepend list of child objects at given position
+  void prepend(const FXGLObjectList& objs){ list.prepend(objs); }
+
   /// Append child object
   void append(FXGLObject* obj){ list.append(obj); }
+
+  /// Append list of child objects at given position
+  void append(const FXGLObjectList& objs){ list.append(objs); }
 
   /// Replace child object
   void replace(FXint pos,FXGLObject* obj){ list.replace(pos,obj); }

@@ -129,12 +129,13 @@ FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
 
 
 // Adopt objects from orig, leaving orig empty
-void FXPtrList::adopt(FXPtrList& orig){
+FXPtrList& FXPtrList::adopt(FXPtrList& orig){
   if(__likely(ptr!=orig.ptr)){
     if(ptr!=EMPTY){ free(ptr-1); }
     ptr=orig.ptr;
     orig.ptr=EMPTY;
     }
+  return *this;
   }
 
 

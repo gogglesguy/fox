@@ -29,7 +29,16 @@ class FXStream;
 
 
 /**
-* FXString provides essential string manipulation capabilities.
+* FXString provides essential string manipulation capabilities in FOX.
+* Internally, all strings are stored as an array of bytes preceeded by
+* the length of the string; an end-of-string character is appended at the end,
+* but is not included in the length of the string.
+* An empty string is represented by unique empty-string value which comprises
+* a length of 0, followed by an end-of-string character.
+* Thus, it is ALWAYS safe to dereference FXString as it will never be NULL.
+* FXString can be initialized direcly from literal strings in UTF-8 encoding,
+* but supports automatic conversion from UTF-16 encoded ("narrow") character
+* strings and UTF-32 encoded ("wide") character strings.
 */
 class FXAPI FXString {
 private:
@@ -71,7 +80,7 @@ public:
   FXString(FXchar c,FXint n);
 
   /// Length of text in bytes
-  FXint length() const { return *(((const FXint*)str)-1); }
+  FXint length() const { return *(((FXint*)str)-1); }
 
   /// Change the length of the string to len
   void length(FXint len);
@@ -578,7 +587,7 @@ public:
   static FXuint hash(const FXchar* s);
 
   /// Swap two strings
-  friend inline void swap(FXString& a,FXString& b);
+  friend inline void swap(FXString& dst,FXString& src);
 
   /// Saving to a stream
   friend FXAPI FXStream& operator<<(FXStream& store,const FXString& s);
@@ -686,23 +695,17 @@ extern FXAPI FXStream& operator<<(FXStream& store,const FXString& s);
 /// Load from a stream
 extern FXAPI FXStream& operator>>(FXStream& store,FXString& s);
 
-/// Return utf8 from ascii containing unicode escapes
-extern FXAPI FXString fromAscii(const FXString& s);
-
-/// Return ascii containing unicode escapes from utf8
-extern FXAPI FXString toAscii(const FXString& s);
-
 /// Convert unix string to dos string
 extern FXAPI FXString& unixToDos(FXString& str);
 
 /// Convert dos string to unix string
 extern FXAPI FXString& dosToUnix(FXString& str);
 
-/// Check if the string contains special characters or leading or trailing whitespace; escape utf8 if flag is true
-extern FXAPI FXbool shouldEscape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXbool flag=false);
+/// Check if the string contains special characters or leading or trailing whitespace, or contains utf8 if flag!=0
+extern FXAPI FXbool shouldEscape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXint flag=0);
 
-/// Escape special characters, and optionally enclose with left and right quotes; escape utf8 if flag is true
-extern FXAPI FXString escape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXbool flag=false);
+/// Escape special characters, and optionally enclose with left and right quotes; escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2
+extern FXAPI FXString escape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXint flag=0);
 
 /// Unescape special characters, and optionally remove left and right quotes
 extern FXAPI FXString unescape(const FXString& str,FXchar lquote=0,FXchar rquote=0);

@@ -207,6 +207,7 @@ FXJP2Icon.cpp \
 FXJP2Image.cpp \
 FXJPGIcon.cpp \
 FXJPGImage.cpp \
+FXJSON.cpp \
 FXKOI8RCodec.cpp \
 FXKnob.cpp \
 FXLabel.cpp \

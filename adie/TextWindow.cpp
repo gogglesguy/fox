@@ -623,7 +623,7 @@ void TextWindow::createMenubar(){
 
   // Help menu
   helpmenu=new FXMenuPane(this);
-  new FXMenuTitle(menubar,tr("&Help"),NULL,helpmenu,LAYOUT_RIGHT);
+  new FXMenuTitle(menubar,tr("&Help"),NULL,helpmenu);
 
   // Help Menu entries
   new FXMenuCommand(helpmenu,tr("&Help...\t\tDisplay help information."),getApp()->helpicon,this,ID_HELP,0);

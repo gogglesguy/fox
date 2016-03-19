@@ -176,6 +176,7 @@ void FXListItem::setFocus(FXbool focus){
   state^=((0-focus)^state)&FOCUS;
   }
 
+
 // Select or deselect item
 void FXListItem::setSelected(FXbool selected){
   state^=((0-selected)^state)&SELECTED;

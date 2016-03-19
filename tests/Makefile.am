@@ -8,6 +8,7 @@ LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 
 noinst_PROGRAMS	= \
 unicode \
+variant \
 scan \
 format \
 console \
@@ -92,6 +93,7 @@ half_SOURCES		= half.cpp
 match_SOURCES		= match.cpp
 unicode_SOURCES		= unicode.cpp
 parallel_SOURCES	= parallel.cpp
+variant_SOURCES         = variant.cpp
 
 
 

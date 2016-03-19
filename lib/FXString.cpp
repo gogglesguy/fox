@@ -2361,21 +2361,19 @@ FXString& FXString::fromULong(FXulong number,FXint base){
 
 
 // Formatting for reals
-static const char *const conversionformat[]={"%.*f","%.*E","%.*G"};
+static const char conversionformat[4][6]={"%.*lf","%.*lE","%.*lG","%.*lf"};
 
 
 // Convert from float
 FXString& FXString::fromFloat(FXfloat number,FXint prec,FXint fmt){
-  if(fmt<0 || fmt>2){ fxerror("FXString::fromFloat: fmt out of range.\n"); }
-  format(conversionformat[fmt],prec,(FXdouble)number);
+  format(conversionformat[fmt&3],prec,(FXdouble)number);
   return *this;
   }
 
 
 // Convert from double
 FXString& FXString::fromDouble(FXdouble number,FXint prec,FXint fmt){
-  if(fmt<0 || fmt>2){ fxerror("FXString::fromDouble: fmt out of range.\n"); }
-  format(conversionformat[fmt],prec,number);
+  format(conversionformat[fmt&3],prec,number);
   return *this;
   }
 
@@ -2892,95 +2890,6 @@ FXString operator+(FXchar c,const FXString& s){
   return result.append(s);
   }
 
-
-/*******************************************************************************/
-
-// Return utf8 from ascii containing unicode escapes
-FXString fromAscii(const FXString& s){
-  register FXint p,q,c;
-  FXString result;
-  for(p=q=0; q<s.length(); ){
-    c=s[q++];
-    if(c=='\\' && q<s.length()){
-      c=s[q++];
-      if(c=='u'){
-        if(Ascii::isHexDigit(s[q])){
-          c=Ascii::digitValue(s[q++]);
-          if(Ascii::isHexDigit(s[q])){
-            c=(c<<4)+Ascii::digitValue(s[q++]);
-            if(Ascii::isHexDigit(s[q])){
-              c=(c<<4)+Ascii::digitValue(s[q++]);
-              if(Ascii::isHexDigit(s[q])){
-                c=(c<<4)+Ascii::digitValue(s[q++]);
-                }
-              }
-            }
-          }
-        p+=wc2utf(c);
-        continue;
-        }
-      }
-    p++;
-    }
-  result.length(p);                     // Resize result
-  for(p=q=0; q<s.length(); ){
-    c=s[q++];
-    if(c=='\\' && q<s.length()){
-      c=s[q++];
-      if(c=='u'){
-        if(Ascii::isHexDigit(s[q])){
-          c=Ascii::digitValue(s[q++]);
-          if(Ascii::isHexDigit(s[q])){
-            c=(c<<4)+Ascii::digitValue(s[q++]);
-            if(Ascii::isHexDigit(s[q])){
-              c=(c<<4)+Ascii::digitValue(s[q++]);
-              if(Ascii::isHexDigit(s[q])){
-                c=(c<<4)+Ascii::digitValue(s[q++]);
-                }
-              }
-            }
-          }
-        p+=wc2utf(&result[p],c);
-        continue;
-        }
-      }
-    result[p++]=c;
-    }
-  FXASSERT(result.length()==p);
-  return result;
-  }
-
-
-// Return ascii containing unicode escapes from utf8
-FXString toAscii(const FXString& s){
-  register FXint p,q,c;
-  FXString result;
-  for(p=q=0; q<s.length(); q+=s.extent(q)){
-    c=s.wc(q);
-    if(0x80<=c){
-      p+=6;
-      continue;
-      }
-    p++;
-    }
-  result.length(p);                     // Resize result
-  for(p=q=0; q<s.length(); q+=s.extent(q)){
-    c=s.wc(q);
-    if(0x80<=c){
-      result[p++]='\\';
-      result[p++]='u';
-      result[p++]=FXString::value2Digit[(c>>12)&15];
-      result[p++]=FXString::value2Digit[(c>>8)&15];
-      result[p++]=FXString::value2Digit[(c>>4)&15];
-      result[p++]=FXString::value2Digit[c&15];
-      continue;
-      }
-    result[p++]=c;
-    }
-  FXASSERT(result.length()==p);
-  return result;
-  }
-
 /*******************************************************************************/
 
 // Convert unix string to dos string
@@ -3009,15 +2918,11 @@ FXString& dosToUnix(FXString& str){
 
 /*******************************************************************************/
 
-// Check if the string contains special characters or leading or trailing whitespace; escape utf8 if flag is true
-FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
+// Check if the string contains special characters or leading or trailing whitespace, or contains utf8 if flag!=0
+FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
   if(0<str.length()){
     register FXint p,c;
-
-    // Starts or ends with white space
     if(Ascii::isSpace(str.head()) || Ascii::isSpace(str.tail())) return true;
-
-    // Or contains magic characters
     for(p=0; p<str.length(); p++){
       if((c=(FXuchar)str[p])<'\x20' || c=='\x7F' || c=='\\' || c==lquote || c==rquote || ('\x80'<=c && flag)) return true;
       }
@@ -3026,274 +2931,365 @@ FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag)
   }
 
 
-// Escape special characters, and optionally enclose with left and right quotes; escape utf8 if flag is true
-FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXbool flag){
+// Escape special characters, and optionally enclose with left and right quotes; escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2
+FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
+  register FXint p,q,c,w;
   FXString result;
-  if(0<str.length()){
-    register FXint p,q,c;
-    p=q=0;
-    if(lquote) q++;
-    while(p<str.length()){
-      switch(c=(FXuchar)str[p++]){
-        case '\x00':
-        case '\x01':
-        case '\x02':
-        case '\x03':
-        case '\x04':
-        case '\x05':
-        case '\x06':
-        case '\x0E':
-        case '\x0F':
-        case '\x10':
-        case '\x11':
-        case '\x12':
-        case '\x13':
-        case '\x14':
-        case '\x15':
-        case '\x16':
-        case '\x17':
-        case '\x18':
-        case '\x19':
-        case '\x1A':
-        case '\x1B':
-        case '\x1C':
-        case '\x1D':
-        case '\x1E':
-        case '\x1F':
-        case '\x7F':
-          q+=4;
-          continue;
-        case '\n':
-        case '\r':
-        case '\b':
-        case '\v':
-        case '\a':
-        case '\f':
-        case '\t':
-        case '\\':
-          q+=2;
-          continue;
-        default:
-          if(__unlikely('\x80'<=c && flag)){
-            q+=4;
-            continue;
-            }
-          if(__unlikely(c==lquote)){
-            q+=2;
-            continue;
-            }
-          if(__unlikely(c==rquote)){
-            q+=2;
-            continue;
-            }
-          q+=1;
-          continue;
+  p=q=0;
+  if(lquote) q++;                       // Opening quote
+  while(p<str.length()){                // Measure length of converted string
+    switch(c=(FXuchar)str[p++]){
+    case '\x00':                        // Control characters
+    case '\x01':
+    case '\x02':
+    case '\x03':
+    case '\x04':
+    case '\x05':
+    case '\x06':
+    case '\x0E':
+    case '\x0F':
+    case '\x10':
+    case '\x11':
+    case '\x12':
+    case '\x13':
+    case '\x14':
+    case '\x15':
+    case '\x16':
+    case '\x17':
+    case '\x18':
+    case '\x19':
+    case '\x1A':
+    case '\x1B':
+    case '\x1C':
+    case '\x1D':
+    case '\x1E':
+    case '\x1F':
+    case '\x7F':
+hex1: q+=4;                             // Escape as \xHH
+      continue;
+    case '\n':                          // Special characters
+    case '\r':
+    case '\b':
+    case '\v':
+    case '\a':
+    case '\f':
+    case '\t':
+    case '\\':
+      q+=2;
+      continue;
+    default:
+      if(__unlikely(c==lquote)){        // Escape opening quote if found in string
+        q+=2;
+        continue;
         }
+      if(__unlikely(c==rquote)){        // Escape closing quote if found in string
+        q+=2;
+        continue;
+        }
+      if(__unlikely(0x80<=c)){          // Escape specials
+        if(flag){
+          if(flag==1) goto hex1;        // Output \xHH for everything
+          if(!FXISLEADUTF8(c)) goto hex1;               // UTF8 starter?
+          if(!FXISFOLLOWUTF8(str[p])) goto hex1;        // UTF8 follower?
+          c=(c<<6)^(FXuchar)str[p]^0x3080;
+          if(0x800<=c){
+            if(!FXISFOLLOWUTF8(str[p+1])) goto hex1;    // UTF8 follower?
+            c=(c<<6)^(FXuchar)str[p+1]^0x20080;
+            if(0x10000<=c){                             // Surrogate pair needed
+              if(!FXISFOLLOWUTF8(str[p+2])) goto hex1;// UTF8 follower?
+              c=(c<<6)^(FXuchar)str[p+2]^0x400080;
+              if(0x110000<=c) goto hex1;                // Beyond assigned code space?
+              p++;
+              q+=6;
+              }
+            p++;
+            }
+          p++;
+          q+=6;                                         // Escape as \uHHHH
+          continue;
+          }
+        }
+      q+=1;                             // Normal characters
+      continue;
       }
-    if(rquote) q++;
-    result.length(q);
-    p=q=0;
-    if(lquote) result[q++]=lquote;
-    while(p<str.length()){
-      switch(c=(FXuchar)str[p++]){
-        case '\x00':
-        case '\x01':
-        case '\x02':
-        case '\x03':
-        case '\x04':
-        case '\x05':
-        case '\x06':
-        case '\x0E':
-        case '\x0F':
-        case '\x10':
-        case '\x11':
-        case '\x12':
-        case '\x13':
-        case '\x14':
-        case '\x15':
-        case '\x16':
-        case '\x17':
-        case '\x18':
-        case '\x19':
-        case '\x1A':
-        case '\x1B':
-        case '\x1C':
-        case '\x1D':
-        case '\x1E':
-        case '\x1F':
-        case '\x7F':
-          result[q++]='\\';
-          result[q++]='x';
+    }
+  if(rquote) q++;                       // Closing quote
+  result.length(q);
+  p=q=0;
+  if(lquote) result[q++]=lquote;        // Opening quote
+  while(p<str.length()){                // Then convert the string
+    switch(c=(FXuchar)str[p++]){
+    case '\x00':                        // Control characters
+    case '\x01':
+    case '\x02':
+    case '\x03':
+    case '\x04':
+    case '\x05':
+    case '\x06':
+    case '\x0E':
+    case '\x0F':
+    case '\x10':
+    case '\x11':
+    case '\x12':
+    case '\x13':
+    case '\x14':
+    case '\x15':
+    case '\x16':
+    case '\x17':
+    case '\x18':
+    case '\x19':
+    case '\x1A':
+    case '\x1B':
+    case '\x1C':
+    case '\x1D':
+    case '\x1E':
+    case '\x1F':
+    case '\x7F':
+hex2: result[q++]='\\';                 // Escape as \xHH
+      result[q++]='x';
+      result[q++]=FXString::value2Digit[(c>>4)&15];
+      result[q++]=FXString::value2Digit[c&15];
+      continue;
+    case '\n':                          // Special characters
+      result[q++]='\\';
+      result[q++]='n';
+      continue;
+    case '\r':
+      result[q++]='\\';
+      result[q++]='r';
+      continue;
+    case '\b':
+      result[q++]='\\';
+      result[q++]='b';
+      continue;
+    case '\v':
+      result[q++]='\\';
+      result[q++]='v';
+      continue;
+    case '\a':
+      result[q++]='\\';
+      result[q++]='a';
+      continue;
+    case '\f':
+      result[q++]='\\';
+      result[q++]='f';
+      continue;
+    case '\t':
+      result[q++]='\\';
+      result[q++]='t';
+      continue;
+    case '\\':
+      result[q++]='\\';
+      result[q++]='\\';
+      continue;
+    default:
+      if(__unlikely(c==lquote)){        // Escape opening quote if found in string
+        result[q++]='\\';
+        result[q++]=lquote;
+        continue;
+        }
+      if(__unlikely(c==rquote)){        // Escape closing quote if found in string
+        result[q++]='\\';
+        result[q++]=rquote;
+        continue;
+        }
+      if(__unlikely(0x80<=c)){          // Escape specials
+        if(flag){
+          if(flag==1) goto hex2;        // Output \xHH for everything
+          if(!FXISLEADUTF8(c)) goto hex2;               // UTF8 starter?
+          if(!FXISFOLLOWUTF8(str[p])) goto hex2;        // UTF8 follower?
+          c=(c<<6)^(FXuchar)str[p]^0x3080;
+          if(0x800<=c){
+            if(!FXISFOLLOWUTF8(str[p+1])) goto hex2;    // UTF8 follower?
+            c=(c<<6)^(FXuchar)str[p+1]^0x20080;
+            if(0x10000<=c){                             // Surrogate pair needed
+              if(!FXISFOLLOWUTF8(str[p+2])) goto hex2;  // UTF8 follower?
+              c=(c<<6)^(FXuchar)str[p+2]^0x400080;
+              if(0x110000<=c) goto hex1;                // Beyond assigned code space?
+              w=LEAD_OFFSET+(c>>10);
+              c=TAIL_OFFSET+(c&0x3FF);
+              result[q++]='\\';
+              result[q++]='u';
+              result[q++]=FXString::value2Digit[(w>>12)&15];
+              result[q++]=FXString::value2Digit[(w>>8)&15];
+              result[q++]=FXString::value2Digit[(w>>4)&15];
+              result[q++]=FXString::value2Digit[w&15];
+              p++;
+              }
+            p++;
+            }
+          p++;
+          result[q++]='\\';                             // Escape as \uHHHH
+          result[q++]='u';
+          result[q++]=FXString::value2Digit[(c>>12)&15];
+          result[q++]=FXString::value2Digit[(c>>8)&15];
           result[q++]=FXString::value2Digit[(c>>4)&15];
           result[q++]=FXString::value2Digit[c&15];
           continue;
-        case '\n':
-          result[q++]='\\';
-          result[q++]='n';
-          continue;
-        case '\r':
-          result[q++]='\\';
-          result[q++]='r';
-          continue;
-        case '\b':
-          result[q++]='\\';
-          result[q++]='b';
-          continue;
-        case '\v':
-          result[q++]='\\';
-          result[q++]='v';
-          continue;
-        case '\a':
-          result[q++]='\\';
-          result[q++]='a';
-          continue;
-        case '\f':
-          result[q++]='\\';
-          result[q++]='f';
-          continue;
-        case '\t':
-          result[q++]='\\';
-          result[q++]='t';
-          continue;
-        case '\\':
-          result[q++]='\\';
-          result[q++]='\\';
-          continue;
-        default:
-          if(__unlikely('\x80'<=c && flag)){
-            result[q++]='\\';
-            result[q++]='x';
-            result[q++]=FXString::value2Digit[(c>>4)&15];
-            result[q++]=FXString::value2Digit[c&15];
-            continue;
-            }
-          if(__unlikely(c==lquote)){
-            result[q++]='\\';
-            result[q++]=lquote;
-            continue;
-            }
-          if(__unlikely(c==rquote)){
-            result[q++]='\\';
-            result[q++]=rquote;
-            continue;
-            }
-          result[q++]=c;
-          continue;
+          }
         }
+      result[q++]=c;                    // Normal characters
+      continue;
       }
-    if(rquote) result[q++]=rquote;
-    FXASSERT(q==result.length());
     }
+  if(rquote) result[q++]=rquote;        // Closing quote
+  FXASSERT(q==result.length());
   return result;
   }
 
 
 // Unescape special characters in a string; optionally strip quote characters
 FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
+  register FXint p,q,c,w;
   FXString result;
-  if(0<str.length()){
-    register FXint p,q,c;
-    p=q=0;
-    if(str[p]==lquote && lquote) p++;
-    while(p<str.length()){
-      c=str[p++];
-      if(c==rquote && rquote) break;
-      if(c=='\\' && p<str.length()){
-        switch(str[p++]){
-          case '0':
-          case '1':
-          case '2':
-          case '3':
-          case '4':
-          case '5':
-          case '6':
-          case '7':
-            if(Ascii::isOctDigit(str[p])){
-              p++;
-              if(Ascii::isOctDigit(str[p])) p++;
-              }
-            break;
-          case 'n':
-          case 'r':
-          case 'b':
-          case 'v':
-          case 'a':
-          case 'f':
-          case 't':
-          case '\\':
-            break;
-          case 'x':
+  p=q=c=0;
+  if(str[p]==lquote && lquote) p++;     // Opening quote
+  while(p<str.length()){                // Measure length of converted string
+    w=c;                                // Keep previous decoded character
+    c=str[p++];
+    if(c==rquote && rquote) break;      // Closing quote
+    if(c=='\\' && p<str.length()){      // Escape sequence
+      switch((c=str[p++])){
+      case 'u':                         // Unicode escape
+        c=0;
+        if(Ascii::isHexDigit(str[p])){
+          c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){
+            c=(c<<4)+Ascii::digitValue(str[p++]);
             if(Ascii::isHexDigit(str[p])){
-              p++;
-              if(Ascii::isHexDigit(str[p])) p++;
-              }
-            break;
-          }
-        }
-      q++;
-      }
-    result.length(q);
-    p=q=0;
-    if(str[p]==lquote && lquote) p++;
-    while(p<str.length()){
-      c=str[p++];
-      if(c==rquote && rquote) break;
-      if(c=='\\' && p<str.length()){
-        switch((c=str[p++])){
-          case '0':
-          case '1':
-          case '2':
-          case '3':
-          case '4':
-          case '5':
-          case '6':
-          case '7':
-            c=c-'0';
-            if(Ascii::isOctDigit(str[p])){
-              c=(c<<3)+str[p++]-'0';
-              if(Ascii::isOctDigit(str[p])){
-                c=(c<<3)+str[p++]-'0';
-                }
-              }
-            break;
-          case 'n':
-            c='\n';
-            break;
-          case 'r':
-            c='\r';
-            break;
-          case 'b':
-            c='\b';
-            break;
-          case 'v':
-            c='\v';
-            break;
-          case 'a':
-            c='\a';
-            break;
-          case 'f':
-            c='\f';
-            break;
-          case 't':
-            c='\t';
-            break;
-          case '\\':
-            c='\\';
-            break;
-          case 'x':
-            if(Ascii::isHexDigit(str[p])){
-              c=Ascii::digitValue(str[p++]);
+              c=(c<<4)+Ascii::digitValue(str[p++]);
               if(Ascii::isHexDigit(str[p])){
                 c=(c<<4)+Ascii::digitValue(str[p++]);
                 }
               }
-            break;
+            }
           }
+        if(FXISLEADUTF16(c)) continue;
+        if(FXISFOLLOWUTF16(c)){
+          if(!FXISLEADUTF16(w)) continue;
+          c=SURROGATE_OFFSET+(w<<10)+c;
+          }
+        q+=wc2utf(c);
+        continue;
+      case 'x':                         // Hex escape
+        if(Ascii::isHexDigit(str[p])){
+          p++;
+          if(Ascii::isHexDigit(str[p])) p++;
+          }
+        q++;
+        continue;
+      case '0':                         // Octal escape
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+        if(Ascii::isOctDigit(str[p])){
+          p++;
+          if(Ascii::isOctDigit(str[p])) p++;
+          }
+        q++;
+        continue;
+      case 'n':                         // Special characters
+      case 'r':
+      case 'b':
+      case 'v':
+      case 'a':
+      case 'f':
+      case 't':
+      case '\\':
+        q++;
+        continue;
         }
-      result[q++]=c;
       }
-    FXASSERT(q==result.length());
+    q++;                                // Normal characters
     }
+  result.length(q);                     // Resize result string
+  p=q=c=0;
+  if(str[p]==lquote && lquote) p++;     // Opening quote
+  while(p<str.length()){                // Then convert the string
+    w=c;                                // Keep previous decoded character
+    c=str[p++];
+    if(c==rquote && rquote) break;      // Closing quote
+    if(c=='\\' && p<str.length()){      // Escape sequence
+      switch((c=str[p++])){
+      case 'u':                         // Unicode escape
+        if(Ascii::isHexDigit(str[p])){
+          c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){
+            c=(c<<4)+Ascii::digitValue(str[p++]);
+            if(Ascii::isHexDigit(str[p])){
+              c=(c<<4)+Ascii::digitValue(str[p++]);
+              if(Ascii::isHexDigit(str[p])){
+                c=(c<<4)+Ascii::digitValue(str[p++]);
+                }
+              }
+            }
+          }
+        if(FXISLEADUTF16(c)) continue;
+        if(FXISFOLLOWUTF16(c)){
+          if(!FXISLEADUTF16(w)) continue;
+          c=SURROGATE_OFFSET+(w<<10)+c;
+          }
+        q+=wc2utf(&result[q],c);
+        continue;
+      case 'x':                         // Hex escape
+        if(Ascii::isHexDigit(str[p])){
+          c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){
+            c=(c<<4)+Ascii::digitValue(str[p++]);
+            }
+          }
+        result[q++]=c;
+        continue;
+      case '0':                         // Octal escape
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+        c=c-'0';
+        if(Ascii::isOctDigit(str[p])){
+          c=(c<<3)+str[p++]-'0';
+          if(Ascii::isOctDigit(str[p])){
+            c=(c<<3)+str[p++]-'0';
+            }
+          }
+        result[q++]=c;
+        continue;
+      case 'n':                         // Special characters
+        result[q++]='\n';
+        continue;
+      case 'r':
+        result[q++]='\r';
+        continue;
+      case 'b':
+        result[q++]='\b';
+        continue;
+      case 'v':
+        result[q++]='\v';
+        continue;
+      case 'a':
+        result[q++]='\a';
+        continue;
+      case 'f':
+        result[q++]='\f';
+        continue;
+      case 't':
+        result[q++]='\t';
+        continue;
+      case '\\':
+        result[q++]='\\';
+        continue;
+        }
+      }
+    result[q++]=c;                      // Normal characters
+    }
+  FXASSERT(q==result.length());
   return result;
   }
 

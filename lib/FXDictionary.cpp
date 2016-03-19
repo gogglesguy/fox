@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                              V a r i a n t - M a p                            *
+*                          D i c t i o n a r y    C l a s s                     *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1998,2013 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -21,13 +21,10 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
-#include "FXArray.h"
-#include "FXString.h"
 #include "FXElement.h"
 #include "FXException.h"
-#include "FXVariant.h"
-#include "FXVariantMap.h"
-
+#include "FXString.h"
+#include "FXDictionary.h"
 
 /*
   Notes:
@@ -56,10 +53,10 @@
     
   - NULL keys or empty-string keys are not allowed.
   
-  - Similar to FXDictionary; reimplemented to support FXVariant as payload.
+  - Similar to FXVariantMap; reimplemented to support plain void* as payload.
 */
 
-#define EMPTY     ((Entry*)(__variantmap__empty__+3))
+#define EMPTY     ((Entry*)(__dictionary__empty__+3))
 #define NOMEMORY  ((Entry*)(((FXival*)NULL)+3))
 #define BSHIFT    5
 
@@ -72,21 +69,21 @@ namespace FX {
 
 // Empty dictionary table value
 extern const FXint __string__empty__[];
-extern const FXival __variantmap__empty__[];
-const FXival __variantmap__empty__[8]={1,0,1,(FXival)(__string__empty__+1),0,0,0,0};
+extern const FXival __dictionary__empty__[];
+const FXival __dictionary__empty__[6]={1,0,1,(FXival)(__string__empty__+1),0,0};
 
 
 // Construct empty dictionary
-FXVariantMap::FXVariantMap():table(EMPTY){
-  FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
-  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
+FXDictionary::FXDictionary():table(EMPTY){
+  FXASSERT(sizeof(FXDictionary)==sizeof(FXptr));
+  FXASSERT(sizeof(Entry)<=sizeof(FXival)*3);
   }
 
 
-// Construct from another map
-FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
-  FXASSERT(sizeof(FXVariantMap)==sizeof(FXptr));
-  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
+// Construct empty dictionary
+FXDictionary::FXDictionary(const FXDictionary& other):table(EMPTY){
+  FXASSERT(sizeof(FXDictionary)==sizeof(FXptr));
+  FXASSERT(sizeof(Entry)<=sizeof(FXival)*3);
   if(no(other.no())){
     copyElms(table,other.table,no());
     free(other.free());
@@ -96,7 +93,7 @@ FXVariantMap::FXVariantMap(const FXVariantMap& other):table(EMPTY){
 
 
 // Adjust the size of the table
-FXbool FXVariantMap::no(FXival n){
+FXbool FXDictionary::no(FXival n){
   register FXival m=no();
   if(__likely(m!=n)){
     register Entry *elbat;
@@ -122,9 +119,9 @@ FXbool FXVariantMap::no(FXival n){
   }
 
 
-// Resize the table to the given size, keeping contents
-FXbool FXVariantMap::resize(FXival n){
-  FXVariantMap elbat;
+// Resize the table to the given size; the size must be a power of two
+FXbool FXDictionary::resize(FXival n){
+  FXDictionary elbat;
   FXASSERT((n&(n-1))==0);       // Power of 2
   FXASSERT((n-used())>0);       // At least one free slot
   if(elbat.no(n)){
@@ -138,8 +135,8 @@ FXbool FXVariantMap::resize(FXival n){
             p=(p<<2)+p+b+1;
             b>>=BSHIFT;
             }
-          elbat.table[x].key.adopt(table[i].key);   // Steal string from old table
-          elbat.table[x].data.adopt(table[i].data); // Steal data from old table
+          swap(elbat.table[x].key,table[i].key);    // Steal the string buffer
+          elbat.table[x].data=table[i].data;
           elbat.table[x].hash=h;                    // And copy the hash value
           }
         }
@@ -154,7 +151,7 @@ FXbool FXVariantMap::resize(FXival n){
 
 
 // Assignment operator
-FXVariantMap& FXVariantMap::operator=(const FXVariantMap& other){
+FXDictionary& FXDictionary::operator=(const FXDictionary& other){
   if(table!=other.table && no(other.no())){
     copyElms(table,other.table,no());
     free(other.free());
@@ -164,8 +161,8 @@ FXVariantMap& FXVariantMap::operator=(const FXVariantMap& other){
   }
 
 
-// Adopt array from another
-FXVariantMap& FXVariantMap::adopt(FXVariantMap& other){
+// Adopt dictionary from another
+FXDictionary& FXDictionary::adopt(FXDictionary& other){
   if(table!=other.table && no(1)){
     table=other.table;
     other.table=EMPTY;
@@ -174,25 +171,25 @@ FXVariantMap& FXVariantMap::adopt(FXVariantMap& other){
   }
 
 
-// Find slot index for key; return -1 if not found
-FXival FXVariantMap::find(const FXchar* ky) const {
+// Find entry
+FXptr FXDictionary::find(const FXchar* ky) const {
   register FXuval p,b,x,h;
-  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::find: null or empty key\n"); }
+  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::find: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
   while(table[x=p&(no()-1)].hash){
-    if(table[x].hash==h && table[x].key==ky) return x;
+    if(table[x].hash==h && table[x].key==ky) goto x;
     p=(p<<2)+p+b+1;
     b>>=BSHIFT;
     }
-  return -1;
+x:return table[x].data;
   }
 
 
 // Return reference to variant assocated with key
-FXVariant& FXVariantMap::at(const FXchar* ky){
+FXptr& FXDictionary::at(const FXchar* ky){
   register FXuval p,b,h,x;
-  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::at: null or empty key\n"); }
+  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
   while(table[x=p&(no()-1)].hash){
@@ -200,7 +197,7 @@ FXVariant& FXVariantMap::at(const FXchar* ky){
     p=(p<<2)+p+b+1;
     b>>=BSHIFT;
     }
-  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXVariantMap::at: out of memory\n"); }
+  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXDictionary::at: out of memory\n"); }
   p=b=h;
   while(table[x=p&(no()-1)].hash){
     if(table[x].key.empty()) goto y;                    // Return voided slot
@@ -216,9 +213,9 @@ x:return table[x].data;
 
 
 // Return constant reference to variant assocated with key
-const FXVariant& FXVariantMap::at(const FXchar* ky) const {
+const FXptr& FXDictionary::at(const FXchar* ky) const {
   register FXuval p,b,x,h;
-  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::at: null or empty key\n"); }
+  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::at: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
   while(table[x=p&(no()-1)].hash){
@@ -230,46 +227,91 @@ x:return table[x].data;                                 // If not found we stopp
   }
 
 
-// Remove entry from table
-void FXVariantMap::remove(const FXchar* ky){
+// Remove entry from table, returning old one
+FXptr FXDictionary::remove(const FXchar* ky){
   register FXuval p,b,h,x;
-  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXVariantMap::remove: null or empty key\n"); }
+  register FXptr old;
+  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::remove: null or empty key\n"); }
   p=b=h=FXString::hash(ky);
   FXASSERT(h);
   while(table[x=p&(no()-1)].hash!=h || table[x].key!=ky){
-    if(!table[x].hash) return;
+    if(!table[x].hash) return NULL;
     p=(p<<2)+p+b+1;
     b>>=BSHIFT;
     }
-  table[x].key.clear();         // Void the slot (not empty!)
-  table[x].data.clear();        // Clear the variant
+  table[x].key.clear();                                 // Void the slot (not empty!)
+  old=table[x].data;
+  table[x].data=NULL;
   used(used()-1);
   if(__unlikely(used()<=(no()>>2))) resize(no()>>1);
+  return old;
   }
 
 
-// Compare all non-empty entries
-FXbool FXVariantMap::operator==(const FXVariantMap& other) const {
-  register FXival i,j;
-  if(table!=other.table){
-    for(i=0; i<no(); ++i){
-      if(key(i).empty()) continue;
-      if((j=other.find(key(i)))<0) return false;
-      if(data(i)!=other.data(j)) return false;
-      }
+// Insert entry into the table, unless it already exists
+FXptr FXDictionary::insert(const FXchar* ky,FXptr ptr){
+  register FXuval p,b,h,x;
+  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::insert: null or empty key\n"); }
+  p=b=h=FXString::hash(ky);
+  FXASSERT(h);
+  while(table[x=p&(no()-1)].hash){
+    if(table[x].hash==h && table[x].key==ky) goto x;    // Return existing
+    p=(p<<2)+p+b+1;
+    b>>=BSHIFT;
     }
-  return true;
+  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXDictionary::insert: out of memory\n"); }
+  p=b=h;
+  while(table[x=p&(no()-1)].hash){
+    if(table[x].key.empty()) goto y;                    // Put into voided slot
+    p=(p<<2)+p+b+1;
+    b>>=BSHIFT;
+    }
+  free(free()-1);                                       // Put into empty slot
+y:used(used()+1);
+  table[x].key=ky;
+  table[x].hash=h;
+  table[x].data=ptr;
+x:return table[x].data;
   }
 
 
-// Clear the table
-void FXVariantMap::clear(){
+// Replace entry in the table, returning old one
+FXptr FXDictionary::replace(const FXchar* ky,FXptr ptr){
+  register FXuval p,b,h,x;
+  register FXptr old;
+  if(__unlikely(!ky || !*ky)){ throw FXRangeException("FXDictionary::replace: null or empty key\n"); }
+  p=b=h=FXString::hash(ky);
+  FXASSERT(h);
+  while(table[x=p&(no()-1)].hash){
+    if(table[x].hash==h && table[x].key==ky) goto x;    // Replace existing
+    p=(p<<2)+p+b+1;
+    b>>=BSHIFT;
+    }
+  if(__unlikely(free()<=1+(no()>>2)) && __unlikely(!resize(no()<<1))){ throw FXMemoryException("FXDictionary::replace: out of memory\n"); }
+  p=b=h;
+  while(table[x=p&(no()-1)].hash){
+    if(table[x].key.empty()) goto y;                    // Put into voided slot
+    p=(p<<2)+p+b+1;
+    b>>=BSHIFT;
+    }
+  free(free()-1);                                       // Put into empty slot
+y:used(used()+1);
+  table[x].key=ky;
+  table[x].hash=h;
+x:old=table[x].data;
+  table[x].data=ptr;
+  return old;
+  }
+
+
+// Remove all
+void FXDictionary::clear(){
   no(1);
   }
 
 
 // Destroy table
-FXVariantMap::~FXVariantMap(){
+FXDictionary::~FXDictionary(){
   clear();
   }
 

@@ -61,7 +61,7 @@ namespace FX {
 
 // Send data via shared memory
 HANDLE fxsenddata(HWND window,FXuchar* data,FXuint size){
-  HANDLE hMap,hMapCopy;
+  HANDLE hMap=0,hMapCopy=0;
   FXuchar *ptr;
   DWORD processid;
   HANDLE process;

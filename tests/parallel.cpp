@@ -56,12 +56,12 @@ FXint QTest::run(){
     }
   while(!stopit);
   tot=fxgetticks()-tot;
-  fxmessage("%p: npush=%ld\n",self(),npush);
-  fxmessage("%p: npull=%ld\n",self(),npull);
-  fxmessage("%p: ncros=%ld\n",self(),ncros);
+  fxmessage("%p: npush=%lld\n",self(),npush);
+  fxmessage("%p: npull=%lld\n",self(),npull);
+  fxmessage("%p: ncros=%lld\n",self(),ncros);
   fxmessage("%p: niter=%ld\n",self(),niter);
-  fxmessage("%p: avg=%lld\n",self(),tot/npush);
-  fxmessage("%p: ticks=%lld (%.16lfs) tick/push=%.2lf push/s=%.2lf\n",self(),tot,FXdouble(tot)*0.33333333333333E-9,FXdouble(tot)/FXdouble(npush),FXdouble(npush)/(FXdouble(tot)*0.33333333333333E-9));
+  fxmessage("%p: avg=%lld\n",self(),tot/(npush+npull));
+  fxmessage("%p: ticks=%lld tick/(push+pull)=%.2lf\n",self(),tot,FXdouble(tot)/FXdouble(npush+npull));
   return 0;
   }
 
@@ -140,7 +140,7 @@ FXuint powoftwo(FXuint n){
 // Test program
 int main(int argc,char* argv[]){
   FXuint maximum=FXThread::processors();
-  FXuint minimum=1;
+  FXuint minimum=FXThread::processors();
   FXuint nthreads=1;
   FXuint size=512;
   FXuint njobs=0;
@@ -282,7 +282,7 @@ int main(int argc,char* argv[]){
 
 
     // 8-way parallelism if you got the cores
-    fxmessage("8-way parallel call...\n");
+    fxmessage("%d-way parallel call...\n",nthreads);
     FXParallelInvoke(churn,churn,churn,churn,churn,churn,churn,churn);
     fxmessage("...done\n");
 

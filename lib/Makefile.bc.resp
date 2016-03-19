@@ -157,6 +157,7 @@
 +FXJP2Image.obj &
 +FXJPGIcon.obj &
 +FXJPGImage.obj &
++FXJSON.obj &
 +FXKOI8RCodec.obj &
 +FXKnob.obj &
 +FXLabel.obj &

@@ -29,7 +29,7 @@ namespace FX {
 
 
 /// ArrayBase manages a memory buffer
-class FXArrayBase {
+class FXAPI FXArrayBase {
 protected:
   FXptr ptr;
 protected:
@@ -68,7 +68,7 @@ public:
     }
 
   /// Return number of items
-  FXival no() const { return *(((const FXival*)ptr)-1); }
+  FXival no() const { return *(((FXival*)ptr)-1); }
 
   /// Change number of elements in array to n
   FXbool no(FXival n){
@@ -110,7 +110,7 @@ public:
   EType& tail(){ return data()[no()-1]; }
   const EType& tail() const { return data()[no()-1]; }
 
-  /// Adopt array from another
+  /// Adopt array from another one; the other array becomes empty
   FXArray<EType>& adopt(FXArray<EType>& src){
     if(ptr!=src.ptr && no(0)){ swap(ptr,src.ptr); }
     return *this;

@@ -70,6 +70,12 @@ public:
   /// Diameter of sphere
   FXfloat diameter() const { return radius*2.0f; }
 
+  /// Area of sphere
+  FXfloat area() const { return radius*radius*12.5663706143591729538505735331f; }
+
+  /// Volume of sphere
+  FXfloat volume() const { return radius*radius*radius*4.18879020478639098461685784437f; }
+
   /// Test if empty
   FXbool empty() const { return radius<0.0f; }
 

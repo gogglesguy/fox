@@ -1499,7 +1499,7 @@ FXchar* nameFromColor(FXchar* name,FXColor color){
   else{
     for(i=0; i<ARRAYNUMBER(colorValue); i++){
       if(colorValue[i]==color){
-        strncpy(name,colorName[i],MAXCOLORNAME);
+        fxstrlcpy(name,colorName[i],MAXCOLORNAME);
         return name;
         }
       }

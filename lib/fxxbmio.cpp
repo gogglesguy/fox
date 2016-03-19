@@ -128,7 +128,7 @@ FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       }
 
     // Recognize #define
-    if(__sscanf(buffer,"#define %s %d",name,&value)==2){
+    if(__sscanf(buffer,"#define %100s %d",name,&value)==2){
       if(strstr(name,"width")) width=value;
       else if(strstr(name,"height")) height=value;
       else if(strstr(name,"x_hot")) hotx=value;
@@ -137,8 +137,8 @@ FXbool fxloadXBM(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       }
 
     // Recognize declaration
-    if(__sscanf(buffer,"static unsigned char %s = {",name)==1) break;
-    if(__sscanf(buffer,"static char %s = {", name)==1) break;
+    if(__sscanf(buffer,"static unsigned char %100s = {",name)==1) break;
+    if(__sscanf(buffer,"static char %100s = {", name)==1) break;
     }
 
   // Test sensible width, height

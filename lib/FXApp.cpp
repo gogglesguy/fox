@@ -1495,8 +1495,8 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
     if(XSupportsLocale()){
       FXchar mods[100]="";
       if(inputmethod[0]){
-        strncpy(mods,"@im=",sizeof(mods));
-        strncat(mods,inputmethod,sizeof(mods));
+        fxstrlcpy(mods,"@im=",sizeof(mods));
+        fxstrlcat(mods,inputmethod,sizeof(mods));
         }
       if(!XSetLocaleModifiers(mods)){
         if(!XSetLocaleModifiers("")){
@@ -4149,7 +4149,7 @@ static void getSystemFont(FXFontDesc& fontdesc){
 #if defined(UNICODE)
   ncs2utf(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face),LF_FACESIZE);
 #else
-  strncpy(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face));
+  fxstrlcpy(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face));
 #endif
   fontdesc.face[sizeof(fontdesc.face)-1]='\0';
   HDC hDC=CreateCompatibleDC(NULL);

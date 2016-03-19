@@ -1497,7 +1497,7 @@ end
 language "JavaScript"
 
   # File patterns for this language mode
-  filesmatch "*.js"
+  filesmatch "*.js,*.json"
 
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"

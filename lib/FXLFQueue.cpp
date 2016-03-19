@@ -112,7 +112,7 @@ FXbool FXLFQueue::pop(FXptr& ptr){
   register FXuint mask=getSize()-1;
   register FXuint r;
 x:r=rhead;
-  if(__likely(wtail-r)>=1){
+  if(__likely((wtail-r)>=1)){
     if(__unlikely(!atomicBoolCas(&rhead,r,r+1))) goto x;
     ptr=items[r&mask];
     while(__unlikely(rtail!=r)){}

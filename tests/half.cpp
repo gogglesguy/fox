@@ -43,7 +43,7 @@ FXhalf  convertedback[65536];
 int main(int argc,char* argv[]){
   FXint i;
   CNV c;
-
+  
   // Fill initial half data
   for(i=0; i<65536; ++i){ *((FXushort*)&initial[i])=i; }
 

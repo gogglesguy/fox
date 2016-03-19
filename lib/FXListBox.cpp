@@ -75,7 +75,7 @@ FXDEFMAP(FXListBox) FXListBoxMap[]={
   FXMAPFUNC(SEL_UPDATE,FXListBox::ID_LIST,FXListBox::onListUpdate),
   FXMAPFUNC(SEL_CLICKED,FXListBox::ID_LIST,FXListBox::onListClicked),
   FXMAPFUNC(SEL_DOUBLECLICKED,FXListBox::ID_LIST,FXListBox::onListClicked),
-  FXMAPFUNC(SEL_CHANGED,FXListBox::ID_LIST,FXListBox::onListForward),
+  FXMAPFUNC(SEL_CHANGED,FXListBox::ID_LIST,FXListBox::onListChanged),
   FXMAPFUNC(SEL_DELETED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_INSERTED,FXListBox::ID_LIST,FXListBox::onListForward),
   FXMAPFUNC(SEL_COMMAND,FXListBox::ID_LIST,FXListBox::onListCommand),
@@ -211,6 +211,14 @@ long FXListBox::onListUpdate(FXObject*,FXSelector,void*){
 // Forward message from list widget
 long FXListBox::onListForward(FXObject*,FXSelector sel,void* ptr){
   return target && target->tryHandle(this,FXSEL(FXSELTYPE(sel),message),ptr);
+  }
+
+
+// Forward message from list widget
+long FXListBox::onListChanged(FXObject*,FXSelector sel,void* ptr){
+  field->setText(list->getItemText((FXint)(FXival)ptr));        // FIXME but also called in notify callbacks...
+  field->setIcon(list->getItemIcon((FXint)(FXival)ptr));
+  return target && target->tryHandle(this,FXSEL(SEL_CHANGED,message),ptr);
   }
 
 
