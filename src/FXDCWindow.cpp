@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.cpp,v 1.180 2008/01/04 15:42:06 fox Exp $                     *
+* $Id: FXDCWindow.cpp,v 1.181 2008/04/23 03:10:43 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1937,6 +1937,14 @@ void FXDCWindow::drawImage(const FXImage* image,FXint dx,FXint dy){
     case BLT_SET:                     // D := 1
       ::BitBlt((HDC)ctx,dx,dy,image->width,image->height,dcMem,0,0,WHITENESS);
       break;
+/*
+      BLENDFUNCTION bf;
+      bf.BlendOp=AC_SRC_OVER;   // For RGBA image
+      bf.BlendFlags=0;
+      bf.SourceConstantAlpha=0xff;
+      bf.AlphaFormat=AC_SRC_ALPHA;
+      AlphaBlend((HDC)ctx,dx,dy,image->width,image->height,dcMem,0,0,image->width,image->height,bf);
+*/
     }
   image->ReleaseDC(dcMem);
   }

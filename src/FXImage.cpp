@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.164 2008/01/04 15:42:21 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.165 2008/04/23 03:10:43 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -596,6 +596,25 @@ void FXImage::render(){
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
 
+/*
+      // Set up the bitmap info
+      bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+      bmi.bmiHeader.biWidth=width;
+      bmi.bmiHeader.biHeight=height;
+      bmi.bmiHeader.biPlanes=1;
+      bmi.bmiHeader.biBitCount=32;
+      bmi.bmiHeader.biCompression=BI_RGB;
+      bmi.bmiHeader.biSizeImage=0;
+      bmi.bmiHeader.biXPelsPerMeter=0;
+      bmi.bmiHeader.biYPelsPerMeter=0;
+      bmi.bmiHeader.biClrUsed=0;
+      bmi.bmiHeader.biClrImportant=0;
+          FXuchar * dst=NULL;   
+        
+     xid=CreateDIBSection(NULL,&bmi,DIB_RGB_COLORS,(void**)&dst,NULL,0);
+*/     
+     
+     
       // Set up the bitmap info
       bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
       bmi.bmiHeader.biWidth=width;

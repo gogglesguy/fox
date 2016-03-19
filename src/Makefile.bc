@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.bc,v 1.150 2008/01/04 16:14:04 fox Exp $                     #
+# $Id: Makefile.bc,v 1.154 2008/03/31 15:05:55 fox Exp $                     #
 ##############################################################################
 
 CXX       = bcc32
@@ -40,7 +40,8 @@ RESWRAP   = $(TOPDIR)\utils\reswrap.exe
 
 .SUFFIXES: .cpp .c
 
-SOURCES = FX4Splitter.cpp \
+SOURCES = \
+FX4Splitter.cpp \
 FX7Segment.cpp \
 FX885910Codec.cpp \
 FX885911Codec.cpp \
@@ -86,6 +87,7 @@ FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConsole.cpp \
 FXCopyDialog.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
@@ -238,8 +240,6 @@ FXQuatd.cpp \
 FXQuatf.cpp \
 FXRASIcon.cpp \
 FXRASImage.cpp \
-FXRGBIcon.cpp \
-FXRGBImage.cpp \
 FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
@@ -252,6 +252,8 @@ FXRegion.cpp \
 FXRegistry.cpp \
 FXReplaceDialog.cpp \
 FXRex.cpp \
+FXRGBIcon.cpp \
+FXRGBImage.cpp \
 FXRootWindow.cpp \
 FXRuler.cpp \
 FXRulerView.cpp \
@@ -269,8 +271,8 @@ FXSlider.cpp \
 FXSocket.cpp \
 FXSpheref.cpp \
 FXSphered.cpp \
-FXSplashWindow.cpp \
 FXSpinner.cpp \
+FXSplashWindow.cpp \
 FXSplitter.cpp \
 FXSpring.cpp \
 FXStat.cpp \
@@ -354,8 +356,6 @@ fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
 icons.cpp \
-version.rc \
-version.rc.in \
 strtoll.cpp
 
 OBJECTS = $(SOURCES:.cpp=.obj)

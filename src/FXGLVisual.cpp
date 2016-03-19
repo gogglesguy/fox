@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLVisual.cpp,v 1.128 2008/01/11 20:38:13 fox Exp $                     *
+* $Id: FXGLVisual.cpp,v 1.133 2008/04/22 14:02:37 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -358,7 +358,7 @@ void FXGLVisual::create(){
       HWND hwnd=CreateWindow(TEXT("GLTEMP"),TEXT(""),0,0,0,0,0,(HWND)NULL,(HMENU)NULL,(HINSTANCE)getApp()->getDisplay(),NULL);
 
       // Get device handle
-      HDC hdc=GetDC(hwnd);
+      HDC hdc=::GetDC(hwnd);
 
       // Choose pdf & set it
       v=ChoosePixelFormat(hdc,&pfd);
@@ -370,7 +370,7 @@ void FXGLVisual::create(){
 
           // Make context current
           if(wglMakeCurrent(hdc,context)){
-            int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glsamples,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,gldrawwnd,gldrawbmp,gldrawbuf,glrender,glaccel,glneedpal,glswapcopy;
+            int glredsize,glgreensize,glbluesize,glalphasize,gldepthsize,glstencilsize,glsamples,glaccumredsize,glaccumgreensize,glaccumbluesize,glaccumalphasize,gldouble,glstereo,glsupport,gldrawwnd,gldrawbmp,gldrawbuf,glrender,glaccel,glneedpal,glswapcopy;
             int dred,dgreen,dblue,dalpha,ddepth,dstencil,dsamples,daccred,daccgreen,daccblue,daccalpha,match;
             int bestmatch=1000000000;
             int best=-1;
@@ -391,6 +391,11 @@ void FXGLVisual::create(){
 
                 // Try to find the best
                 for(v=1; v<=npf; v++){
+
+                  // OpenGL support is required
+                  att=WGL_SUPPORT_OPENGL_ARB;
+                  if(!wglGetPixelFormatAttribivARB(hdc,v,0,1,&att,&glsupport)) continue;
+                  if(!glsupport) continue;
 
                   // Get supported drawable targets
                   att=WGL_DRAW_TO_WINDOW_ARB;
@@ -513,6 +518,9 @@ void FXGLVisual::create(){
                     dsamples=glsamples-multiSamples;
                     if(dsamples<0) dsamples*=-10;
                     match+=dsamples;
+                    }
+                  else{
+                    if(glsamples>0) match+=100;
                     }
 
                   // Double buffering also quite strongly preferred
@@ -811,7 +819,7 @@ void FXGLVisual::create(){
         }
 
       // Release hdc
-      ReleaseDC(hwnd,hdc);
+      ::ReleaseDC(hwnd,hdc);
 
       // Destroy dummy window
       DestroyWindow(hwnd);
@@ -882,7 +890,7 @@ void FXGLVisual::create(){
 
             // Get supported render type; we don't want index mode
             if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_RENDER_TYPE,&glrender)!=Success) continue;
-            if(!(glrender&GLX_RGBA_BIT|GLX_RGBA_FLOAT_BIT_ARB)) continue;
+            if(!(glrender&(GLX_RGBA_BIT|GLX_RGBA_FLOAT_BIT_ARB))) continue;
 
             // Get overlay level; we don't want overlays
             if(glXGetFBConfigAttrib((Display*)getApp()->getDisplay(),fb[v],GLX_LEVEL,&gllevel)!=Success) continue;
@@ -976,6 +984,9 @@ void FXGLVisual::create(){
               if(dsamples<0) dsamples*=-10;
               match+=dsamples;
               }
+            else{
+              if(glsamples>0) match+=100;
+              }
 
             // Double buffering also quite strongly preferred
             if(flags&VISUAL_DOUBLE_BUFFER){
@@ -1005,7 +1016,7 @@ void FXGLVisual::create(){
             FXTRACE((150,"Config: #%d: match=%d\n",v,match));
             FXTRACE((150,"  drawables  = %s%s%s\n",(gldrawables&GLX_WINDOW_BIT)?"GLX_WINDOW_BIT ":"",(gldrawables&GLX_PIXMAP_BIT)?"GLX_PIXMAP_BIT ":"",(gldrawables&GLX_PBUFFER_BIT)?"GLX_PBUFFER_BIT":""));
             FXTRACE((150,"  render     = %s%s%s\n",(glrender&GLX_RGBA_BIT)?"GLX_RGBA_BIT ":"",(glrender&GLX_COLOR_INDEX_BIT)?"GLX_COLOR_INDEX_BIT ":"",(glrender&GLX_RGBA_FLOAT_BIT_ARB)?"GLX_RGBA_FLOAT_BIT_ARB":""));
-            FXTRACE((150,"  format     = %zd\n",fb[v]));
+            FXTRACE((150,"  format     = %p\n",fb[v]));
             FXTRACE((150,"  configid   = 0x%02x\n",configid));
             FXTRACE((150,"  visualid   = 0x%02x\n",visualid));
             FXTRACE((150,"  red size   = %d\n",glredsize));

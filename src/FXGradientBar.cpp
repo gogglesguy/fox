@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGradientBar.cpp,v 1.85 2008/01/04 15:42:19 fox Exp $                   *
+* $Id: FXGradientBar.cpp,v 1.86 2008/01/25 19:12:18 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -158,7 +158,7 @@ FXGradientBar::FXGradientBar(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint 
   target=tgt;
   message=sel;
   backColor=getApp()->getHiliteColor();
-  selectColor=FXRGB((92*FXREDVAL(backColor))/100,(92*FXGREENVAL(backColor))/100,(92*FXBLUEVAL(backColor))/100);
+  selectColor=FXRGB((85*FXREDVAL(backColor))/100,(85*FXGREENVAL(backColor))/100,(85*FXBLUEVAL(backColor))/100);
   bar=new FXImage(getApp(),NULL,IMAGE_DITHER|IMAGE_KEEP|IMAGE_OWNED|IMAGE_SHMI|IMAGE_SHMP,2,2);
   nsegs=3;
   allocElms(seg,nsegs);

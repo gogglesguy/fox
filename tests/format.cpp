@@ -5,20 +5,20 @@
 *********************************************************************************
 * Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: format.cpp,v 1.34 2008/01/04 15:18:33 fox Exp $                          *
+* $Id: format.cpp,v 1.39 2008/03/25 03:26:43 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 
 /*
   Notes:
-
+  - Test battery for fxprintf().
 */
+
 
 /*******************************************************************************/
 
 namespace FX {
 
-extern FXint __sscanf(const FXchar* string,const FXchar* format,...);
 extern FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 }
@@ -104,37 +104,25 @@ const FXint intnumbers[]={
   };
 
 
+const FXchar *positionalformat[]={
+  "%d%d%d",
+  "%3$d%2$d%1$d",
+  "%2$*1$d%3$d"
+  };
+
+const FXchar *positionalformat2="%1$*2$.*3$lf";
+
+const FXchar *positionalformat3="%3$d%3$d";
+
+
+// Uncomment to revert to native version
+//#define __snprintf snprintf
+
+
 // Start
 int main(int,char*[]){
-  FXchar   buffer[1024];
-  FXchar   str[100];
-  FXdouble dbl;
-  FXfloat  flt;
-  FXint    num;
-  FXshort  sht;
-  FXchar   chr;
-  FXint    res;
-  FXlong   lng;
-  void*    ptr;
-  FXuint    x,y;
-
-/*
-  while(fgets(buffer,sizeof(buffer),stdin)){
-    buffer[strlen(buffer)-1]='\0';
-
-    // Test
-    res=__sscanf(buffer,"%2lf\n",&dbl);
-    fprintf(stdout,"_sscanf(%s)=%d dbl=%.16G\n",buffer,res,dbl);
-    res=sscanf(buffer,"%2lf\n",&dbl);
-    fprintf(stdout," sscanf(%s)=%d dbl=%.16G\n",buffer,res,dbl);
-    }
-*/
-
-//  res=snprintf(buffer,sizeof(buffer),"%g",12345E12);
-//  fprintf(stdout,"%d \"%s\"\n",res,buffer);
-//  res=__snprintf(buffer,sizeof(buffer),"%g",12345E12);
-//  fprintf(stdout,"%d \"%s\"\n",res,buffer);
-
+  FXchar buffer[1024];
+  FXuint x,y;
 
   // Testing int formats
   for(x=0; x<ARRAYNUMBER(intformat); x++){
@@ -151,6 +139,18 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",floatformat[x],buffer);
       }
     }
+
+  // Testing positional formats
+  for(x=0; x<ARRAYNUMBER(positionalformat); x++){
+    __snprintf(buffer,sizeof(buffer),positionalformat[x],10,20,30);
+    fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat[x],buffer);
+    }
+
+  __snprintf(buffer,sizeof(buffer),positionalformat2,3.14159265358979,20,10);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat2,buffer);
+
+  __snprintf(buffer,sizeof(buffer),positionalformat3,10,20,30);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat3,buffer);
 
   return 1;
   }

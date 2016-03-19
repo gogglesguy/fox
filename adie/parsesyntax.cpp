@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: parsesyntax.cpp,v 1.20 2008/01/04 15:59:38 fox Exp $                     *
+* $Id: parsesyntax.cpp,v 1.21 2008/03/26 19:08:45 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -119,10 +119,10 @@ const FXchar* Parser::string(){
 
 // Parse rules and sub rules
 FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
-  FXString   name,brex,erex,srex;
-  FXRex      expression;
-  FXRexError error;
-  FXint      index;
+  FXString     name,brex,erex,srex;
+  FXRex        expression;
+  FXRex::Error error;
+  FXint        index;
 
   FXTRACE((1,"parserules begin parent = %d\n",parent));
 
@@ -141,7 +141,8 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
     while(token()){
       if(strcmp(tok,"pattern")==0){             // Simple pattern
         brex=string();
-        if((error=expression.parse(brex,REX_SYNTAX))!=REGERR_OK){
+        error=expression.parse(brex,FXRex::Syntax);
+        if(error){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
           return false;
           }
@@ -149,7 +150,8 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         }
       if(strcmp(tok,"openpattern")==0){         // Open pattern
         brex=string();
-        if((error=expression.parse(brex,REX_SYNTAX))!=REGERR_OK){
+        error=expression.parse(brex,FXRex::Syntax);
+        if(error){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
           return false;
           }
@@ -157,7 +159,8 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         }
       if(strcmp(tok,"closepattern")==0){        // Close pattern
         erex=string();
-        if((error=expression.parse(erex,REX_SYNTAX))!=REGERR_OK){
+        error=expression.parse(erex,FXRex::Syntax);
+        if(error){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
           return false;
           }
@@ -165,7 +168,8 @@ FXbool Parser::parserules(FXSyntax *syntax,FXint parent){
         }
       if(strcmp(tok,"stoppattern")==0){         // Stop pattern
         srex=string();
-        if((error=expression.parse(srex,REX_SYNTAX))!=REGERR_OK){
+        error=expression.parse(srex,FXRex::Syntax);
+        if(error){
           fxwarning("%s:%d: error: %s.\n",file.text(),number,FXRex::getError(error));
           return false;
           }

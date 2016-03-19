@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXListBox.cpp,v 1.76 2008/01/04 15:42:24 fox Exp $                       *
+* $Id: FXListBox.cpp,v 1.80 2008/01/15 05:31:34 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -204,7 +204,7 @@ long FXListBox::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
 
 // Forward GUI update of list to target; but only if pane is not popped
 long FXListBox::onListUpdate(FXObject*,FXSelector,void*){
-  return target && !isPaneShown() && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
+  return target && !isMenuShown() && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
   }
 
 
@@ -230,7 +230,7 @@ long FXListBox::onListCommand(FXObject*,FXSelector,void* ptr){
 
 // Pressed left button in text field
 long FXListBox::onFieldButton(FXObject*,FXSelector,void*){
-  button->handle(this,FXSEL(SEL_COMMAND,ID_POST),NULL);    // Post the list
+  button->showMenu(true);
   return 1;
   }
 
@@ -543,9 +543,15 @@ void* FXListBox::getItemData(FXint index) const {
   }
 
 
+// Show menu
+void FXListBox::showMenu(FXbool shw){
+  button->showMenu(shw);
+  }
+
+
 // Is the pane shown
-FXbool FXListBox::isPaneShown() const {
-  return pane->shown();
+FXbool FXListBox::isMenuShown() const {
+  return button->isMenuShown();
   }
 
 

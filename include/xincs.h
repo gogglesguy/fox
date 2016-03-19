@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: xincs.h,v 1.82 2008/01/04 15:18:29 fox Exp $                             *
+* $Id: xincs.h,v 1.85 2008/04/01 19:12:04 fox Exp $                             *
 ********************************************************************************/
 #ifndef XINCS_H
 #define XINCS_H
@@ -67,6 +67,7 @@
 #ifdef HAVE_SYS_FILIO_H         // Get FIONREAD on Solaris
 #include <sys/filio.h>
 #endif
+
 #else
 
 #include <io.h>                 // For _access()
@@ -77,7 +78,6 @@
 #define getcwd _getcwd
 #define mkdir _mkdir
 #define access _access
-#define vsnprintf _vsnprintf
 #define execl _execl
 #define execlp _execlp
 #define execle _execle
@@ -89,19 +89,18 @@
 #endif
 #ifdef __BORLANDC__	        // Borland C++ Builder
 #include <dir.h>
-#if __BORLANDC__ <= 0x0530      // C++ Builder 3.0
-#define vsnprintf(a, b, c, d) vsprintf(a, c, d)
-#endif
 #define lstat stat
 #endif
 #ifdef __MINGW32__              // GCC MingW32
 #include <direct.h>
-#define vsnprintf _vsnprintf
 #endif
 #ifdef __SC__                   // Digital Mars C++ Compiler
 #include <direct.h>
 #include <io.h>                 // For _access()
-#define vsnprintf _vsnprintf
+#endif
+
+#ifndef WM_INPUT
+#define WM_INPUT  0x00FF
 #endif
 
 #endif
@@ -180,6 +179,7 @@ struct fxdirent : public dirent {
 #endif
 #include <commctrl.h>           // For _TrackMouseEvent
 #include <shellapi.h>
+#include <imm.h>                // IME
 
 // X windows includes
 #else

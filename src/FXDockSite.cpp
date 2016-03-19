@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDockSite.cpp,v 1.113 2008/01/04 15:42:11 fox Exp $                     *
+* $Id: FXDockSite.cpp,v 1.114 2008/03/25 20:00:58 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1152,7 +1152,7 @@ void FXDockSite::dockToolBar(FXDockBar* bar,FXint barx,FXint bary){
             if(left<=cx && cx<left+w){
 
               // Find spot on galley
-              for(child=begin; child!=end->getNext() && (!child->shown() || bary>=child->getY()); child=child->getNext());
+              for(child=begin; child!=end->getNext() && (!child->shown() || bary>=child->getY()); child=child->getNext()){}
 
               // At the front
               if((child==begin) && (child->getLayoutHints()&LAYOUT_DOCK_NEXT)){
@@ -1200,7 +1200,7 @@ ver:  bar->move(FXCLAMP(left,barx,right),bary);
             if(top<=cy && cy<top+h){
 
               // Find spot on galley
-              for(child=begin; child!=end->getNext() && (!child->shown() || barx>=child->getX()); child=child->getNext());
+              for(child=begin; child!=end->getNext() && (!child->shown() || barx>=child->getX()); child=child->getNext()){}
 
               // At the front
               if((child==begin) && (child->getLayoutHints()&LAYOUT_DOCK_NEXT)){

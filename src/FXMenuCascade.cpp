@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuCascade.cpp,v 1.60 2008/01/04 15:42:25 fox Exp $                   *
+* $Id: FXMenuCascade.cpp,v 1.61 2008/03/18 19:56:21 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -157,7 +157,7 @@ long FXMenuCascade::onKeyPress(FXObject*,FXSelector sel,void* ptr){
         FXint x,y;
         getApp()->removeTimeout(this,ID_MENUTIMER);
         translateCoordinatesTo(x,y,getRoot(),width,0);
-        pane->popup(((FXMenuPane*)getParent())->getGrabOwner(),x,y);
+        pane->popup(((FXPopup*)getParent())->getGrabOwner(),x,y);
         return 1;
         }
       break;
@@ -223,7 +223,7 @@ long FXMenuCascade::onCmdPost(FXObject*,FXSelector,void*){
   getApp()->removeTimeout(this,ID_MENUTIMER);
   if(pane && !pane->shown()){
     translateCoordinatesTo(x,y,getRoot(),width,0);
-    pane->popup(((FXMenuPane*)getParent())->getGrabOwner(),x,y);
+    pane->popup(((FXPopup*)getParent())->getGrabOwner(),x,y);
     }
   return 1;
   }
@@ -399,7 +399,7 @@ void FXMenuCascade::load(FXStream& store){
 // Delete it
 FXMenuCascade::~FXMenuCascade(){
   getApp()->removeTimeout(this,ID_MENUTIMER);
-  pane=(FXMenuPane*)-1L;
+  pane=(FXPopup*)-1L;
   }
 
 }

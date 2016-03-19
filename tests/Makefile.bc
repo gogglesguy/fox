@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.bc,v 1.28 2008/01/04 16:14:04 fox Exp $                      #
+# $Id: Makefile.bc,v 1.29 2008/03/24 15:19:55 fox Exp $                      #
 ##############################################################################
 
 # For use with Borland C++ Builder 3 or later
@@ -41,6 +41,8 @@ PROGRAMS  = \
 	memmap.exe \
 	mditest.exe \
 	table.exe \
+	format.exe \
+	scan.exe \
 	groupbox.exe \
 	foursplit.exe \
 	datatarget.exe \
@@ -145,6 +147,12 @@ glviewer.exe: $(FOXLIB) glviewer.obj
 
 dialog.exe: $(FOXLIB) dialog.obj
 	$(LD) $(LDFLAGS) dialog.obj $(FOXLIB)
+
+format.exe: $(FOXLIB) format.obj
+	$(LD) $(LDFLAGS) format.obj $(FOXLIB)
+
+scan.exe: $(FOXLIB) scan.obj
+	$(LD) $(LDFLAGS) scan.obj $(FOXLIB)
 
 dctest.exe: $(FOXLIB) dctest.obj
 	$(LD) $(LDFLAGS) dctest.obj $(FOXLIB)

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.cpp,v 1.170 2008/01/04 15:18:12 fox Exp $                     *
+* $Id: TextWindow.cpp,v 1.172 2008/02/29 22:38:54 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -182,6 +182,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_FILEFILTER,      TextWindow::onCmdFilter),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_OVERSTRIKE,      TextWindow::onUpdOverstrike),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_READONLY,        TextWindow::onUpdReadOnly),
+  FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_TABMODE,         TextWindow::onUpdTabMode),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_NUM_ROWS,        TextWindow::onUpdNumRows),
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_PREFERENCES,     TextWindow::onCmdPreferences),
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_TABCOLUMNS,      TextWindow::onCmdTabColumns),
@@ -355,7 +356,6 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   clock=new FXTextField(statusbar,8,NULL,0,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y|TEXTFIELD_READONLY,0,0,0,0,2,2,1,1);
   clock->setBackColor(statusbar->getBackColor());
 
-
   // Undo/redo block
   undoredoblock=new FXHorizontalFrame(statusbar,LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
   new FXLabel(undoredoblock,tr("  Undo:"),NULL,LAYOUT_CENTER_Y);
@@ -369,22 +369,33 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   FXLabel* readonly=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   readonly->setTarget(this);
   readonly->setSelector(ID_READONLY);
+  readonly->setTipText(tr("Editable"));
 
   // Show insert mode in status bar
   FXLabel* overstrike=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   overstrike->setTarget(this);
   overstrike->setSelector(ID_OVERSTRIKE);
+  overstrike->setTipText(tr("Overstrike mode"));
+
+  // Show tab mode in status bar
+  FXLabel* tabmode=new FXLabel(statusbar,FXString::null,NULL,FRAME_SUNKEN|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  tabmode->setTarget(this);
+  tabmode->setSelector(ID_TABMODE);
+  tabmode->setTipText(tr("Tab mode"));
+
 
   // Show size of text in status bar
-  FXTextField* numchars=new FXTextField(statusbar,7,this,ID_NUM_ROWS,TEXTFIELD_READONLY|FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  FXTextField* numchars=new FXTextField(statusbar,2,this,ID_TABCOLUMNS,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   numchars->setBackColor(statusbar->getBackColor());
+  numchars->setTipText(tr("Tab setting"));
 
-  // Caption before number
-  new FXLabel(statusbar,tr("  Lines:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  // Caption before tab columns
+  new FXLabel(statusbar,tr("  Tab:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
   // Show column number in status bar
   FXTextField* columnno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_COLUMN,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   columnno->setBackColor(statusbar->getBackColor());
+  columnno->setTipText(tr("Current column"));
 
   // Caption before number
   new FXLabel(statusbar,tr("  Col:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
@@ -392,6 +403,7 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   // Show line number in status bar
   FXTextField* rowno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_ROW,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   rowno->setBackColor(statusbar->getBackColor());
+  rowno->setTipText(tr("Current line"));
 
   // Caption before number
   new FXLabel(statusbar,tr("  Line:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
@@ -2211,6 +2223,14 @@ long TextWindow::onUpdReadOnly(FXObject* sender,FXSelector,void*){
   }
 
 
+// Update box for tabmode display
+long TextWindow::onUpdTabMode(FXObject* sender,FXSelector,void*){
+  FXString tab((editor->getTextStyle()&TEXT_NO_TABS)?"EMT":"TAB");
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tab);
+  return 1;
+  }
+
+
 // Update box for size display
 long TextWindow::onUpdNumRows(FXObject* sender,FXSelector,void*){
   FXuint size=editor->getNumRows();
@@ -2593,7 +2613,7 @@ long TextWindow::onClock(FXObject*,FXSelector,void*){
   clock->setText(FXSystem::localTime(tr("%H:%M:%S"),current));
   clock->setTipText(FXSystem::localTime(tr("%A %B %d %Y"),current));
   getApp()->addTimeout(this,ID_CLOCKTIME,CLOCKTIMER);
-  return 1;
+  return 0;
   }
 
 
@@ -3266,6 +3286,3 @@ long TextWindow::onUpdRestyle(FXObject* sender,FXSelector,void*){
   sender->handle(this,editor->isStyled()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
-
-
-

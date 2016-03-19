@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeListBox.h,v 1.51 2008/01/04 15:18:27 fox Exp $                     *
+* $Id: FXTreeListBox.h,v 1.53 2008/01/15 05:31:34 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXTREELISTBOX_H
 #define FXTREELISTBOX_H
@@ -235,8 +235,11 @@ public:
   /// Change item sort function
   void setSortFunc(FXTreeListSortFunc func);
 
-  /// Is the pane shown
-  FXbool isPaneShown() const;
+  /// Show or hide menu
+  void showMenu(FXbool shw);
+
+  /// Is the menu pane shown
+  FXbool isMenuShown() const;
 
   /// Change font
   void setFont(FXFont* fnt);

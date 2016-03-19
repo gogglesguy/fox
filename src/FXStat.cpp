@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStat.cpp,v 1.38 2008/01/04 15:42:32 fox Exp $                          *
+* $Id: FXStat.cpp,v 1.39 2008/03/28 20:54:21 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -180,7 +180,7 @@ FXbool FXStat::isSetSticky() const {
 
 // Convert 100ns since 01/01/1601 to ns since 01/01/1970
 static inline FXTime fxfiletime(FXTime ft){
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__)
+#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__)
   return (ft-116444736000000000LL)*100LL;
 #else
   return (ft-116444736000000000L)*100L;

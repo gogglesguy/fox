@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXChart.cpp,v 1.63 2008/01/04 15:18:13 fox Exp $                         *
+* $Id: FXChart.cpp,v 1.64 2008/02/21 18:29:07 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -149,13 +149,13 @@ void FXChart::updateChart(){
 
 // Layout the chart
 void FXChart::layout(){
+  FXuint dirty=(flags&FLAG_DIRTY);
   FXComposite::layout();
-  if((chart->getWidth()!=width) || (chart->getHeight()!=height) || (flags&FLAG_DIRTY)){
+  if((chart->getWidth()!=width) || (chart->getHeight()!=height) || dirty){
     if((chart->getWidth()!=width) || (chart->getHeight()!=height)){
       chart->resize(width,height);
       }
     updateChart();
-    flags&=~FLAG_DIRTY;
     }
   }
 

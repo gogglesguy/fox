@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFont.cpp,v 1.205 2008/01/04 15:42:14 fox Exp $                         *
+* $Id: FXFont.cpp,v 1.209 2008/03/26 15:04:04 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -145,7 +145,7 @@ static inline FXint fxabs(FXint a){ return a<0?-a:a; }
 
 extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
-#if defined(WIN32) /////////////////////////////// WIN32 ////////////////////////
+#if defined(WIN32) /////////////////////////// WIN32 ////////////////////////////
 
 
 // Character set encoding
@@ -393,7 +393,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FcPattern *pattern,*p;
   FcChar8   *fam,*fdy;
   FcCharSet *charset;
-  XftFont   *font;
+  XftFont   *fnt;
   FcResult   result;
   FcBool     sc;
   FcMatrix   matrix;
@@ -523,13 +523,13 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   actualEncoding=FONTENCODING_UNICODE;
 
   // Open font
-  font=XftFontOpenPattern(DISPLAY(getApp()),p);
-  xid=(FXID)font;
+  fnt=XftFontOpenPattern(DISPLAY(getApp()),p);
+  xid=(FXID)fnt;
 
   // Destroy pattern
   FcPatternDestroy(pattern);
 
-  return font;
+  return fnt;
   }
 
 
@@ -676,18 +676,19 @@ static FXuint xlfdEncoding(const FXchar* text){
 
 
 // Split XLFD into pieces
-static int xlfdSplit(char *fld[],char* font){
-  fld[0]=fld[2]=fld[3]=fld[4]=fld[5]=fld[6]=fld[7]=fld[8]=fld[9]=fld[10]=fld[11]=fld[12]="";
-  fld[1]=font;
-  if(*font++=='-'){
-    fld[0]=font;
+static void xlfdSplit(const char *fld[],char* font){
+  fld[0]=fld[1]=fld[2]=fld[3]=fld[4]=fld[5]=fld[6]=fld[7]=fld[8]=fld[9]=fld[10]=fld[11]=fld[12]="";
+  if(*font=='-'){
+    fld[0]=++font;
     for(int f=1; f<=12; f++){
       while(*font && *font!='-') font++;
       if(*font=='-') *font++='\0';
       fld[f]=font;
       }
     }
-  return 1;
+  else{
+    fld[1]=font;
+    }
   }
 
 
@@ -709,9 +710,9 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FXint    bencoding,bweight,bslant,bsetwidth,bpitch,bscalable,brotatable,bpolymorph,bsize,bxres,byres;
   FXint    dencoding,dweight,dslant,dsetwidth,dpitch,dscalable,drotatable,dpolymorph,dsize;
   FXchar   candidate[256],xlfd[256];
-  FXchar  *field[13];
   FXchar **fontnames;
   FXint    nfontnames,b,f;
+  const FXchar *field[13];
   FXdouble c,s,a;
   XFontStruct *fs;
 
@@ -2293,7 +2294,7 @@ next:       continue;
 FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt,FXuint sl,FXuint sw,FXuint en,FXuint h){
   FXuint   encoding,weight,slant,setwidth,pitch,scalable,rotatable,polymorph,xres,yres,points,size,res;
   FXchar   candidate[256],fullname[256];
-  FXchar  *field[13];
+  const FXchar  *field[13];
   FXchar **fontnames;
   FXint    nfontnames,f,j;
   FXString family;
@@ -2740,7 +2741,6 @@ void FXFont::save(FXStream& store) const {
   store << wantedEncoding;
   store << angle;
   store << hints;
-  store << angle;
   }
 
 
@@ -2755,7 +2755,6 @@ void FXFont::load(FXStream& store){
   store >> wantedEncoding;
   store >> angle;
   store >> hints;
-  store >> angle;
   }
 
 

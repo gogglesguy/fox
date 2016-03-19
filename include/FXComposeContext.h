@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComposeContext.h,v 1.11 2008/01/04 15:18:15 fox Exp $                  *
+* $Id: FXComposeContext.h,v 1.12 2008/03/27 15:51:55 fox Exp $                  *
 ********************************************************************************/
 #ifndef FXCOMPOSECONTEXT_H
 #define FXCOMPOSECONTEXT_H
@@ -32,7 +32,7 @@ namespace FX {
 
 class FXApp;
 class FXWindow;
-
+class FXFont;
 
 /**
 * Compose Context manages the state of an input method
@@ -74,6 +74,9 @@ public:
 
   /// Focus out
   void focusOut();
+
+  /// Set the font
+  void setFont(FXFont* fnt);
 
   /// Set the spot
   void setSpot(FXint x,FXint y);

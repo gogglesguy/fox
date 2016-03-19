@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXObjectList.h,v 1.37 2008/01/04 15:18:22 fox Exp $                      *
+* $Id: FXObjectList.h,v 1.38 2008/04/14 21:22:43 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXOBJECTLIST_H
 #define FXOBJECTLIST_H
@@ -171,6 +171,7 @@ public:
   /// Indexing operator
   TYPE*& operator[](FXint i){ return (TYPE*&)ptr[i]; }
   TYPE *const& operator[](FXint i) const { return (TYPE*const&)ptr[i]; }
+
 
   /// Access to list
   TYPE*& at(FXint i){ return (TYPE*&)ptr[i]; }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTopWindow.cpp,v 1.220 2008/01/11 18:27:36 fox Exp $                    *
+* $Id: FXTopWindow.cpp,v 1.221 2008/04/08 13:55:44 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -41,6 +41,7 @@
 #include "FXMainWindow.h"
 #include "FXToolBar.h"
 #include "FXToolBarGrip.h"
+#include "FX88591Codec.h"
 
 /*
   Notes:
@@ -656,10 +657,10 @@ void FXTopWindow::settitle(){
     SetWindowTextA((HWND)xid,title.text());
 #endif
 #else
+    FX88591Codec ascii;
+    FXString string=ascii.utf2mb(title);
     XTextProperty t;
-    char *s;
-    s=(char*)title.text();
-    if(XStringListToTextProperty((char**)&s,1,&t)){     // FIXME encode to iso8859-1?
+    if(XStringListToTextProperty((char**)&string,1,&t)){
       XSetWMIconName(DISPLAY(getApp()),xid,&t);
       XSetWMName(DISPLAY(getApp()),xid,&t);
       XFree(t.value);

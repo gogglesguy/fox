@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.h,v 1.77 2008/01/04 15:18:27 fox Exp $                          *
+* $Id: FXThread.h,v 1.80 2008/02/05 22:02:10 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
@@ -149,42 +149,32 @@ public:
 
 
 /**
-* A read / write lock allows multiple readers but only a single
-* writer.
+* A semaphore allows for protection of a resource that can
+* be accessed by a fixed number of simultaneous threads.
 */
-class FXAPI FXReadWriteLock {
+class FXAPI FXSemaphore {
 private:
-  volatile FXuval data[32];
+  volatile FXuval data[16];
 private:
-  FXReadWriteLock(const FXReadWriteLock&);
-  FXReadWriteLock &operator=(const FXReadWriteLock&);
+  FXSemaphore(const FXSemaphore&);
+  FXSemaphore& operator=(const FXSemaphore&);
 public:
 
-  /// Initialize the read/write lock
-  FXReadWriteLock();
+  /// Initialize semaphore with given count
+  FXSemaphore(FXint initial=1);
 
-  /// Acquire read lock for read/write lock
-  void readLock();
+  /// Decrement semaphore
+  void wait();
 
-  /// Try to acquire read lock for read/write lock
-  bool tryReadLock();
+  /// Non-blocking semaphore decrement; return true if locked
+  FXbool trywait();
 
-  /// Unlock read lock
-  void readUnlock();
+  /// Increment semaphore
+  void post();
 
-  /// Acquire write lock for read/write mutex
-  void writeLock();
-
-  /// Try to acquire write lock for read/write lock
-  bool tryWriteLock();
-
-  /// Unlock write mutex
-  void writeUnlock();
-
-  /// Delete the read/write lock
-  ~FXReadWriteLock();
+  /// Delete semaphore
+  ~FXSemaphore();
   };
-
 
 
 /**
@@ -240,35 +230,42 @@ public:
   };
 
 
-
 /**
-* A semaphore allows for protection of a resource that can
-* be accessed by a fixed number of simultaneous threads.
+* A read / write lock allows multiple readers but only a single
+* writer.
 */
-class FXAPI FXSemaphore {
+class FXAPI FXReadWriteLock {
 private:
-  volatile FXuval data[16];
+  volatile FXuval data[32];
 private:
-  FXSemaphore(const FXSemaphore&);
-  FXSemaphore& operator=(const FXSemaphore&);
+  FXReadWriteLock(const FXReadWriteLock&);
+  FXReadWriteLock &operator=(const FXReadWriteLock&);
 public:
 
-  /// Initialize semaphore with given count
-  FXSemaphore(FXint initial=1);
+  /// Initialize the read/write lock
+  FXReadWriteLock();
 
-  /// Decrement semaphore
-  void wait();
+  /// Acquire read lock for read/write lock
+  void readLock();
 
-  /// Non-blocking semaphore decrement; return true if locked
-  FXbool trywait();
+  /// Try to acquire read lock for read/write lock
+  bool tryReadLock();
 
-  /// Increment semaphore
-  void post();
+  /// Unlock read lock
+  void readUnlock();
 
-  /// Delete semaphore
-  ~FXSemaphore();
+  /// Acquire write lock for read/write mutex
+  void writeLock();
+
+  /// Try to acquire write lock for read/write lock
+  bool tryWriteLock();
+
+  /// Unlock write mutex
+  void writeUnlock();
+
+  /// Delete the read/write lock
+  ~FXReadWriteLock();
   };
-
 
 
 /**

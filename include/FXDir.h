@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDir.h,v 1.28 2008/01/04 15:18:15 fox Exp $                             *
+* $Id: FXDir.h,v 1.29 2008/02/28 16:14:28 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXDIR_H
 #define FXDIR_H
@@ -71,6 +71,7 @@ public:
   /// Close directory
   virtual void close();
 
+
   /// Create directory
   static FXbool create(const FXString& path,FXuint mode=FXIO::OwnerFull|FXIO::GroupFull|FXIO::OtherFull);
 
@@ -79,6 +80,7 @@ public:
 
   /// Rename or move srcpath to dstpath
   static FXbool rename(const FXString& srcpath,const FXString& dstpath);
+
 
   /**
   * List files in a given directory.

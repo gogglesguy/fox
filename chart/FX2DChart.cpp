@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX2DChart.cpp,v 1.59 2008/01/04 15:18:13 fox Exp $                       *
+* $Id: FX2DChart.cpp,v 1.60 2008/03/26 15:04:03 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -285,7 +285,7 @@ void FX2DChart::drawSelf(FXDC& dc) const {
   }
 
 
-long FX2DChart::onCmdXXX(FXObject*,FXSelector,void* ptr){
+long FX2DChart::onCmdXXX(FXObject*,FXSelector,void*){
   return 1;
   }
 

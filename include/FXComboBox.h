@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXComboBox.h,v 1.55 2008/01/04 15:18:15 fox Exp $                        *
+* $Id: FXComboBox.h,v 1.57 2008/01/15 05:31:34 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCOMBOBOX_H
 #define FXCOMBOBOX_H
@@ -228,8 +228,11 @@ public:
   /// Get data pointer for specified item
   void* getItemData(FXint index) const;
 
-  /// Is the pane shown
-  FXbool isPaneShown() const;
+  /// Show or hide menu
+  void showMenu(FXbool shw);
+
+  /// Is the menu pane shown
+  FXbool isMenuShown() const;
 
   /// Sort items using current sort function
   void sortItems();

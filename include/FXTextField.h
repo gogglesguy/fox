@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.h,v 1.84 2008/01/04 15:18:27 fox Exp $                       *
+* $Id: FXTextField.h,v 1.85 2008/03/27 15:51:56 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTEXTFIELD_H
 #define FXTEXTFIELD_H
@@ -157,6 +157,7 @@ public:
 
   // Inserting
   long onCmdInsertString(FXObject*,FXSelector,void*);
+  long onIMEStart(FXObject*,FXSelector,void*);
 
   // Manipulation Selection
   long onCmdCutSel(FXObject*,FXSelector,void*);

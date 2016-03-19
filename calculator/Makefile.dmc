@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.16 2008/01/04 16:14:04 fox Exp $                     #
+# $Id: Makefile.dmc,v 1.17 2008/03/27 13:36:33 fox Exp $                     #
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later
@@ -54,10 +54,10 @@ calculator.exe: $(OBJECTS) $(FOXLIB)
 
 calculator.obj: icons.cpp
 
-icons.h: $(ICONS)
+icons.h : $(ICONS)
 	$(RESWRAP) -h -o icons.h $(ICONS)
 
-icons.cpp: $(ICONS)
+icons.cpp : $(ICONS)
 	$(RESWRAP) -i icons.h -o icons.cpp $(ICONS)
 
 clean:

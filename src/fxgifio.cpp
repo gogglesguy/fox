@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxgifio.cpp,v 1.85 2008/01/04 15:42:45 fox Exp $                         *
+* $Id: fxgifio.cpp,v 1.86 2008/03/25 20:00:59 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -494,7 +494,7 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   store << TAG_SUF;
 
   // Figure out bits per pixel
-  for(bitsperpixel=1; ncolors>(1<<bitsperpixel); bitsperpixel++);
+  for(bitsperpixel=1; ncolors>(1<<bitsperpixel); bitsperpixel++){}
 
   // Colormap size
   colormapsize=1<<bitsperpixel;

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.165 2008/01/04 15:42:50 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.169 2008/04/18 16:57:07 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -195,6 +195,16 @@ void fxassert(const char* expression,const char* filename,unsigned int lineno){
   fxmessage("%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
 #else
   fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
+#endif
+  }
+
+
+// Verify failed routine
+void fxverify(const char* expression,const char* filename,unsigned int lineno){
+#ifdef WIN32
+  fxmessage("%s(%d): FXVERIFY(%s) failed.\n",filename,lineno,expression);
+#else
+  fxmessage("%s:%d: FXVERIFY(%s) failed.\n",filename,lineno,expression);
 #endif
   }
 
@@ -561,35 +571,9 @@ FXbool fxIsNan(FXdouble number){
   }
 
 
-// Fast integer power of 10
-extern FXAPI FXdouble tenToThe(FXint e);
-
-// Table of 1E+0,...1E+31, in steps of 1
-static FXdouble posPowOfTen1[32]={1E+0,1E+1,1E+2,1E+3,1E+4,1E+5,1E+6,1E+7,1E+8,1E+9,1E+10,1E+11,1E+12,1E+13,1E+14,1E+15,1E+16,1E+17,1E+18,1E+19,1E+20,1E+21,1E+22,1E+23,1E+24,1E+25,1E+26,1E+27,1E+28,1E+29,1E+30,1E+31};
-
-// Table of 1E+0,...1E+288, in steps of 32
-static FXdouble posPowOfTen32[10]={1E+0,1E+32,1E+64,1E+96,1E+128,1E+160,1E+192,1E+224,1E+256,1E+288};
-
-// Table of 1E-0,...1E-31, in steps of 1
-static FXdouble negPowOfTen1[32]={1E-0,1E-1,1E-2,1E-3,1E-4,1E-5,1E-6,1E-7,1E-8,1E-9,1E-10,1E-11,1E-12,1E-13,1E-14,1E-15,1E-16,1E-17,1E-18,1E-19,1E-20,1E-21,1E-22,1E-23,1E-24,1E-25,1E-26,1E-27,1E-28,1E-29,1E-30,1E-31};
-
-// Table of 1E-0,...1E-288, in steps of 32
-static FXdouble negPowOfTen32[10]={1E-0,1E-32,1E-64,1E-96,1E-128,1E-160,1E-192,1E-224,1E-256,1E-288};
-
-
-// Fast integer power of 10; this is based on the mathematical
-// identity 10^(a+b) = 10^a * 10^b.  We could also use a really large
-// table of 308 entries, but that would take a lot of space...
-// The exponent should be in the range -308 to 308, these being the limits
-// of double precision IEEE754 standard floating point.
-FXdouble tenToThe(FXint e){
-  return e<0 ? negPowOfTen1[-e&31]*negPowOfTen32[-e>>5] : posPowOfTen1[e&31]*posPowOfTen32[e>>5];
-  }
-
-
 /*******************************************************************************/
 
-#if defined(__GNUC__) && defined(__linux__) && defined(__i386__)
+#if defined(__GNUC__) && defined(__linux__) && (defined(__i386__) || defined(__x86_64__))
 
 extern FXAPI FXuint fxcpuid();
 
@@ -603,14 +587,16 @@ extern FXAPI FXuint fxcpuid();
 #define CPU_HAS_3DNOWEXT        0x040
 #define CPU_HAS_SSE3            0x080
 #define CPU_HAS_HT              0x100
+#define CPU_HAS_SSE4            0x200
 
 
 // The CPUID instruction returns stuff in eax, ecx, edx.
-#define cpuid(op,eax,ecx,edx)	\
-  asm volatile ("pushl %%ebx \n\t"    	\
-                "cpuid       \n\t"    	\
-                "popl  %%ebx \n\t"      \
+#define cpuid(op,eax,ebx,ecx,edx)	\
+  asm volatile ("xchgl %%ebx, %1 \n\t"  \
+                "cpuid           \n\t"  \
+                "xchgl %%ebx, %1 \n\t"  \
                 : "=a" (eax),		\
+                  "=b" (ebx),           \
                   "=c" (ecx),           \
                   "=d" (edx)            \
                 : "a" (op)              \
@@ -625,7 +611,7 @@ extern FXAPI FXuint fxcpuid();
 * test if CPUID is present first using the recommended code...
 */
 FXuint fxcpuid(){
-  FXuint eax, ecx, edx, caps;
+  FXuint eax, ebx, ecx, edx, caps;
 
   // Generating code for pentium or better :- don't bother checking for CPUID presence.
 #if !(defined(__i586__) || defined(__i686__) || defined(__athlon__) || defined(__pentium4__) || defined(__x86_64__))
@@ -653,7 +639,7 @@ FXuint fxcpuid(){
 
   // Get vendor string; this also returns the highest CPUID code in eax.
   // If highest CPUID code is zero, we can't call any other CPUID functions.
-  cpuid(0x00000000,eax,ecx,edx);
+  cpuid(0x00000000,eax,ebx,ecx,edx);
   if(eax){
 
     // AMD:   ebx="Auth" edx="enti" ecx="cAMD",
@@ -664,11 +650,11 @@ FXuint fxcpuid(){
     if((ecx==0x444d4163) && (edx==0x69746e65)){
 
       // Any extended capabilities; this returns highest extended CPUID code in eax.
-      cpuid(0x80000000,eax,ecx,edx);
+      cpuid(0x80000000,eax,ebx,ecx,edx);
       if(eax>0x80000000){
 
         // Test extended athlon capabilities
-        cpuid(0x80000001,eax,ecx,edx);
+        cpuid(0x80000001,eax,ebx,ecx,edx);
         if(edx&0x08000000) caps|=CPU_HAS_MMXEX;
         if(edx&0x80000000) caps|=CPU_HAS_3DNOW;
         if(edx&0x40000000) caps|=CPU_HAS_3DNOWEXT;
@@ -676,13 +662,14 @@ FXuint fxcpuid(){
       }
 
     // Standard CPUID code 1.
-    cpuid(0x00000001,eax,ecx,edx);
+    cpuid(0x00000001,eax,ebx,ecx,edx);
     if(edx&0x00000010) caps|=CPU_HAS_TSC;
     if(edx&0x00800000) caps|=CPU_HAS_MMX;
     if(edx&0x02000000) caps|=CPU_HAS_SSE;
     if(edx&0x04000000) caps|=CPU_HAS_SSE2;
     if(edx&0x10000000) caps|=CPU_HAS_HT;
     if(ecx&0x00000001) caps|=CPU_HAS_SSE3;
+    if(ecx&0x00080000) caps|=CPU_HAS_SSE4;
     }
 
   // Return capabilities

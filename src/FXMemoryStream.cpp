@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMemoryStream.cpp,v 1.22 2008/01/04 15:42:25 fox Exp $                  *
+* $Id: FXMemoryStream.cpp,v 1.23 2008/03/29 03:08:29 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -152,7 +152,7 @@ FXbool FXMemoryStream::position(FXlong offset,FXWhence whence){
   if(dir==FXStreamDead){ fxerror("FXMemoryStream::position: stream is not open.\n"); }
   if(code==FXStreamOK){
     if(whence==FXFromCurrent) offset=offset+pos;
-    else if(whence==FXFromEnd) offset=offset+endptr-begptr;
+    else if(whence==FXFromEnd) offset=offset+(endptr-begptr);
     if(dir==FXStreamSave){
       if(begptr+offset>=endptr){
         if(!owns){ setError(FXStreamFull); return false; }

@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.120 2008/01/04 15:18:33 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.121 2008/03/26 15:04:04 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -433,7 +433,7 @@ FXbool ImageWindow::loadimage(const FXString& file){
   else if(comparecase(ext,"xbm")==0){
     img=new FXXBMImage(getApp(),NULL,NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-  else if(comparecase(ext,"ppm")==0){
+  else if(comparecase(ext,"ppm")==0 || comparecase(ext,"pbm")==0 || comparecase(ext,"pgm")==0){
     img=new FXPPMImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
   else if(comparecase(ext,"iff")==0 || comparecase(ext,"lbm")==0){
@@ -442,13 +442,13 @@ FXbool ImageWindow::loadimage(const FXString& file){
   else if(comparecase(ext,"ras")==0){
     img=new FXRASImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-  else if(FXPNGImage::supported && comparecase(ext,"png")==0){
+  else if(comparecase(ext,"png")==0){
     img=new FXPNGImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-  else if(FXJPGImage::supported && comparecase(ext,"jpg")==0){
+  else if(comparecase(ext,"jpg")==0 || comparecase(ext,"jpeg")==0){
     img=new FXJPGImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-  else if(FXTIFImage::supported && comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
+  else if(comparecase(ext,"tif")==0 || comparecase(ext,"tiff")==0){
     img=new FXTIFImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 

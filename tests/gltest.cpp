@@ -324,7 +324,8 @@ GLTestWindow::GLTestWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
 
   // A Visual to drag OpenGL
   glvisual=new FXGLVisual(getApp(),VISUAL_DOUBLE_BUFFER|VISUAL_WINDOW);
-
+  glvisual->setMultiSamples(4);
+  
   // Drawing glcanvas
   glcanvas=new FXGLCanvas(glpanel,glvisual,this,ID_CANVAS,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT);
 
@@ -635,18 +636,6 @@ int main(int argc,char *argv[]){
 
   // Open the display
   application.init(argc,argv);
-
-/*
-//  FXGLConfig config(32,32,32,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
-//  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DoubleBuffer|FXGLConfig::DrawWindow);
-//  FXGLConfig config(8,8,8,0,24,0,FXGLConfig::DrawBuffer|FXGLConfig::FloatBuffer);
-  FXGLContext context(&application,config);
-  context.create();
-  FXVisual visual(&application,VISUAL_FORCE,context.getVisual());
-  visual.create();
-  FXTRACE((1,"OK\n"));
-  exit(0);
-*/
 
   // Make window
   new GLTestWindow(&application);

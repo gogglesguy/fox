@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXHash.cpp,v 1.33 2008/01/04 15:42:20 fox Exp $                          *
+* $Id: FXHash.cpp,v 1.34 2008/03/26 02:44:30 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -46,7 +46,7 @@
 */
 
 #define HASH1(x,m) (((FXuint)((FXuval)(x)^(((FXuval)(x))>>13)))&((m)-1))
-#define HASH2(x,m) (((FXuint)((FXuval)(x)^(((FXuval)(x))>>17)|1))&((m)-1))
+#define HASH2(x,m) (((FXuint)(((FXuval)(x)^(((FXuval)(x))>>17))|1))&((m)-1))
 
 
 using namespace FX;

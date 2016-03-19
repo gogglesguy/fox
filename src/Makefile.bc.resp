@@ -44,6 +44,7 @@
 +FXComplexd.obj &
 +FXComposeContext.obj &
 +FXComposite.obj &
++FXConsole.obj &
 +FXCopyDialog.obj &
 +FXCP1250Codec.obj &
 +FXCP1251Codec.obj &

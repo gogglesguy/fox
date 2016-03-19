@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageChannel.cpp,v 1.12 2008/01/04 15:42:25 fox Exp $                *
+* $Id: FXMessageChannel.cpp,v 1.13 2008/03/27 15:39:46 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -128,7 +128,7 @@ long FXMessageChannel::onMessage(FXObject*,FXSelector,void*){
 #ifdef WIN32
   DWORD nread=-1;
   if(::ReadFile(h[0],&pkg,sizeof(FXMessage),&nread,NULL) && nread==sizeof(FXMessage)){
-    if(0<pkg.size && (::ReadFile(h[0],&pkg.data,pkg.size,&nread,NULL) && nread==pkg.size)){
+    if(0<pkg.size && (::ReadFile(h[0],pkg.data,pkg.size,&nread,NULL) && nread==pkg.size)){
       return pkg.target && pkg.target->tryHandle(this,pkg.message,pkg.data);
       }
     return pkg.target && pkg.target->tryHandle(this,pkg.message,NULL);

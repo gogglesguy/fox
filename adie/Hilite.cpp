@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Hilite.cpp,v 1.47 2008/01/04 15:18:11 fox Exp $                          *
+* $Id: Hilite.cpp,v 1.48 2008/03/26 19:08:45 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <new>
@@ -83,7 +83,7 @@ FXIMPLEMENT(FXSimpleRule,FXRule,NULL,0)
 
 // Stylize simple expression
 FXbool FXSimpleRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
-  if(pat.match(text,to,&start,&stop,REX_NOT_EMPTY|REX_FORWARD,1,fm,fm)){
+  if(pat.match(text,to,&start,&stop,FXRex::NotEmpty|FXRex::Forward,1,fm,fm)){
     fillstyle(textstyle,style,start,stop);
     return TRUE;
     }
@@ -104,7 +104,7 @@ FXbool FXBracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint fm,
         goto nxt;
         }
       }
-    if(end.match(text,to,&head,&stop,REX_FORWARD,1,fm,fm)){
+    if(end.match(text,to,&head,&stop,FXRex::Forward,1,fm,fm)){
       fillstyle(textstyle,style,head,stop);
       return TRUE;
       }
@@ -119,7 +119,7 @@ nxt:continue;
 // Stylize complex recursive expression
 FXbool FXBracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   FXint head,tail;
-  if(beg.match(text,to,&start,&tail,REX_FORWARD,1,fm,fm)){
+  if(beg.match(text,to,&start,&tail,FXRex::Forward,1,fm,fm)){
     fillstyle(textstyle,style,start,tail);
     FXBracketRule::stylizeBody(text,textstyle,tail,to,head,stop);
     return TRUE;
@@ -141,11 +141,11 @@ FXbool FXSafeBracketRule::stylizeBody(const FXchar* text,FXchar *textstyle,FXint
         goto nxt;
         }
       }
-    if(end.match(text,to,&head,&stop,REX_FORWARD,1,fm,fm)){
+    if(end.match(text,to,&head,&stop,FXRex::Forward,1,fm,fm)){
       fillstyle(textstyle,style,head,stop);
       return TRUE;
       }
-    if(esc.match(text,to,&head,&stop,REX_FORWARD,1,fm,fm)){
+    if(esc.match(text,to,&head,&stop,FXRex::Forward,1,fm,fm)){
       fillstyle(textstyle,style,head,stop);
       return TRUE;
       }
@@ -160,7 +160,7 @@ nxt:continue;
 // Stylize complex recursive expression with termination pattern
 FXbool FXSafeBracketRule::stylize(const FXchar* text,FXchar *textstyle,FXint fm,FXint to,FXint& start,FXint& stop) const {
   FXint head,tail;
-  if(beg.match(text,to,&start,&tail,REX_FORWARD,1,fm,fm)){
+  if(beg.match(text,to,&start,&tail,FXRex::Forward,1,fm,fm)){
     fillstyle(textstyle,style,start,tail);
     FXSafeBracketRule::stylizeBody(text,textstyle,tail,to,head,stop);
     return TRUE;

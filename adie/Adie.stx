@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software                   #
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    #
 #################################################################################
-# $Id: Adie.stx,v 1.52 2008/01/04 15:18:11 fox Exp $                            #
+# $Id: Adie.stx,v 1.55 2008/04/08 14:48:10 fox Exp $                            #
 #################################################################################
 
 #
@@ -254,15 +254,15 @@ language "C++"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%['#0 +-]?(\*|\d*)(\.(\*|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%(\d+\$)?['#0 +-]?(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
     end
   end
-
 
   # Char constant
   rule "Char"
     openpattern  "'"
     closepattern "'"
+    stoppattern  "$"
     rule "OctalEscape"
       pattern "\\\d+"
     end
@@ -399,7 +399,7 @@ language "C"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%[\*ahlLq#0 +-]?(\*|\d*)(\.(\*|\d*))?l?([dDiouxXeEfFgGaAcsp]|\[.*?\])"
+      pattern "%(\d+\$)?['#0 +-]?(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
     end
   end
 
@@ -407,6 +407,7 @@ language "C"
   rule "Char"
     openpattern  "'"
     closepattern "'"
+    stoppattern  "$"
     rule "OctalEscape"
       pattern "\\\d+"
     end

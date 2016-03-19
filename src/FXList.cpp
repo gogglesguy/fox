@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXList.cpp,v 1.188 2008/01/04 15:42:24 fox Exp $                         *
+* $Id: FXList.cpp,v 1.190 2008/03/25 20:00:59 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -1465,7 +1465,7 @@ void FXList::sortItems(){
     if(0<=current){
       c=items[current];
       }
-    for(h=1; h<=items.no()/9; h=3*h+1);
+    for(h=1; h<=items.no()/9; h=3*h+1){}
     for(; h>0; h/=3){
       for(i=h+1;i<=items.no();i++){
         v=items[i-1];
@@ -1646,6 +1646,7 @@ FXint FXList::appendItem(const FXString& text,FXIcon *icon,void* ptr,FXbool noti
 FXint FXList::prependItem(FXListItem* item,FXbool notify){
   return insertItem(0,item,notify);
   }
+
 
 // Prepend item
 FXint FXList::prependItem(const FXString& text,FXIcon *icon,void* ptr,FXbool notify){

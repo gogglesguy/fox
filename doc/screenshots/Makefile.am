@@ -35,6 +35,7 @@ foxcalc_prefdialog_02_small.jpg \
 foxcalc_prefdialog_03_small.jpg \
 glview.png \
 goggles.png \
+igscanner-screenshot-small.png \
 imagedebugger.gif \
 inload.jpg \
 openspace.gif \

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.cpp,v 1.39 2008/01/04 15:42:26 fox Exp $                          *
+* $Id: FXPath.cpp,v 1.44 2008/04/23 03:10:43 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -93,7 +93,6 @@ FXString FXPath::root(const FXString& file){
   }
 
 
-
 // Return directory part of pathname, assuming full pathname.
 // Note that directory("/bla/bla/") is "/bla/bla" and NOT "/bla".
 // However, directory("/bla/bla") is "/bla" as we expect!
@@ -136,7 +135,7 @@ FXString FXPath::directory(const FXString& file){
   return FXString::null;
   }
 
-
+ 
 // Return name and extension part of pathname.
 // Note that name("/bla/bla/") is "" and NOT "bla".
 // However, name("/bla/bla") is "bla" as we expect!
@@ -299,7 +298,7 @@ FXString FXPath::expand(const FXString& file){
 
     // Expand environment variables of the form %HOMEPATH%
     if(ExpandEnvironmentStringsA(file.text(),buffer,sizeof(buffer))){
-      return buffer;
+      return FXString(buffer);
       }
     return file;
     }
@@ -691,7 +690,6 @@ FXbool FXPath::isTopDirectory(const FXString& file){
   }
 
 
-
 #ifdef WIN32
 
 // Check if file represents a file share
@@ -887,7 +885,7 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
 #endif
     for(beg=0; pathlist[beg]; beg=end){
       while(pathlist[beg]==PATHLISTSEP) beg++;
-      for(end=beg; pathlist[end] && pathlist[end]!=PATHLISTSEP; end++);
+      for(end=beg; pathlist[end] && pathlist[end]!=PATHLISTSEP; end++){}
       if(beg==end) break;
       path=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)),file);
       if(FXStat::exists(path)) return path;

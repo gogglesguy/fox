@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuButton.cpp,v 1.57 2008/01/04 15:42:25 fox Exp $                    *
+* $Id: FXMenuButton.cpp,v 1.61 2008/01/30 16:44:09 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -97,8 +97,12 @@ FXDEFMAP(FXMenuButton) FXMenuButtonMap[]={
   FXMAPFUNC(SEL_FOCUSIN,0,FXMenuButton::onFocusIn),
   FXMAPFUNC(SEL_FOCUSOUT,0,FXMenuButton::onFocusOut),
   FXMAPFUNC(SEL_UNGRABBED,0,FXMenuButton::onUngrabbed),
-  FXMAPFUNC(SEL_LEFTBUTTONPRESS,0,FXMenuButton::onLeftBtnPress),
-  FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXMenuButton::onLeftBtnRelease),
+  FXMAPFUNC(SEL_LEFTBUTTONPRESS,0,FXMenuButton::onButtonPress),
+  FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXMenuButton::onButtonRelease),
+  FXMAPFUNC(SEL_MIDDLEBUTTONPRESS,0,FXMenuButton::onButtonPress),
+  FXMAPFUNC(SEL_MIDDLEBUTTONRELEASE,0,FXMenuButton::onButtonRelease),
+  FXMAPFUNC(SEL_RIGHTBUTTONPRESS,0,FXMenuButton::onButtonPress),
+  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,FXMenuButton::onButtonRelease),
   FXMAPFUNC(SEL_KEYPRESS,0,FXMenuButton::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXMenuButton::onKeyRelease),
   FXMAPFUNC(SEL_KEYPRESS,FXWindow::ID_HOTKEY,FXMenuButton::onHotKeyPress),
@@ -117,7 +121,7 @@ FXMenuButton::FXMenuButton(){
   pane=(FXPopup*)-1L;
   offsetx=0;
   offsety=0;
-  state=FALSE;
+  state=false;
   }
 
 
@@ -126,7 +130,7 @@ FXMenuButton::FXMenuButton(FXComposite* p,const FXString& text,FXIcon* ic,FXPopu
   pane=pup;
   offsetx=0;
   offsety=0;
-  state=FALSE;
+  state=false;
   }
 
 
@@ -228,12 +232,12 @@ long FXMenuButton::onLeave(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
-// Pressed left button
-long FXMenuButton::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
+// Pressed button
+long FXMenuButton::onButtonPress(FXObject*,FXSelector sel,void* ptr){
   flags&=~FLAG_TIP;
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
-    if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONPRESS,message),ptr)) return 1;
+    if(target && target->tryHandle(this,FXSEL(FXSELTYPE(sel),message),ptr)) return 1;
     if(state)
       handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
     else
@@ -244,11 +248,11 @@ long FXMenuButton::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   }
 
 
-// Released left button
-long FXMenuButton::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
+// Released button
+long FXMenuButton::onButtonRelease(FXObject*,FXSelector sel,void* ptr){
   FXEvent* ev=(FXEvent*)ptr;
   if(isEnabled()){
-    if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONRELEASE,message),ptr)) return 1;
+    if(target && target->tryHandle(this,FXSEL(FXSELTYPE(sel),message),ptr)) return 1;
     if(ev->moved){ handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL); }
     return 1;
     }
@@ -336,10 +340,10 @@ long FXMenuButton::onHotKeyRelease(FXObject*,FXSelector,void*){
   }
 
 
-// Post the menu
-long FXMenuButton::onCmdPost(FXObject*,FXSelector,void*){
-  if(!state){
-    if(pane){
+// Show menu
+void FXMenuButton::showMenu(FXbool shw){
+  if(pane){
+    if(shw && !state){
       FXint x,y,w,h;
       translateCoordinatesTo(x,y,getRoot(),0,0);
       w=pane->getShrinkWrap() ? pane->getDefaultWidth() : pane->getWidth();
@@ -398,26 +402,37 @@ long FXMenuButton::onCmdPost(FXObject*,FXSelector,void*){
         }
       pane->popup(this,x,y,w,h);
       if(!grabbed()) grab();
+      flags&=~FLAG_UPDATE;
+      state=true;
+      update();
       }
-    flags&=~FLAG_UPDATE;
-    state=TRUE;
-    update();
+    else if(!shw && state){
+      pane->popdown();
+      if(grabbed()) ungrab();
+      flags|=FLAG_UPDATE;
+      state=false;
+      update();
+      }
     }
+  }
+
+
+// Is the pane shown
+FXbool FXMenuButton::isMenuShown() const {
+  return pane && pane->shown();
+  }
+
+
+// Post the menu
+long FXMenuButton::onCmdPost(FXObject*,FXSelector,void*){
+  showMenu(true);
   return 1;
   }
 
 
 // Unpost the menu
 long FXMenuButton::onCmdUnpost(FXObject*,FXSelector,void*){
-  if(state){
-    if(pane){
-      pane->popdown();
-      if(grabbed()) ungrab();
-      }
-    flags|=FLAG_UPDATE;
-    state=FALSE;
-    update();
-    }
+  showMenu(false);
   return 1;
   }
 

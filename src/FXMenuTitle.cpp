@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuTitle.cpp,v 1.58 2008/01/04 15:42:25 fox Exp $                     *
+* $Id: FXMenuTitle.cpp,v 1.59 2008/03/18 19:27:24 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -157,9 +157,10 @@ long FXMenuTitle::onFocusOut(FXObject* sender,FXSelector sel,void* ptr){
 // Enter
 long FXMenuTitle::onEnter(FXObject* sender,FXSelector sel,void* ptr){
   FXMenuCaption::onEnter(sender,sel,ptr);
-  if(!isEnabled()) return 1;
-  if(canFocus() && getParent()->getFocus()) setFocus();
-  update();
+  if(isEnabled()){
+    if(canFocus() && getParent()->getFocus()) setFocus();
+    update();
+    }
   return 1;
   }
 
@@ -167,8 +168,9 @@ long FXMenuTitle::onEnter(FXObject* sender,FXSelector sel,void* ptr){
 // Leave
 long FXMenuTitle::onLeave(FXObject* sender,FXSelector sel,void* ptr){
   FXMenuCaption::onLeave(sender,sel,ptr);
-  if(!isEnabled()) return 1;
-  update();
+  if(isEnabled()){
+    update();
+    }
   return 1;
   }
 
@@ -325,7 +327,6 @@ void FXMenuTitle::setFocus(){
   }
 
 
-
 // Out of focus chain
 void FXMenuTitle::killFocus(){
   FXMenuCaption::killFocus();
@@ -354,7 +355,6 @@ long FXMenuTitle::onPaint(FXObject*,FXSelector,void* ptr){
     if(isActive()){
       dc.setForeground(selbackColor);
       dc.fillRectangle(1,1,width-2,height-2);
-      //drawSunkenRectangle(dc,0,0,width,height);
       dc.setForeground(shadowColor);
       dc.fillRectangle(0,0,width,1);
       dc.fillRectangle(0,0,1,height);
@@ -367,7 +367,6 @@ long FXMenuTitle::onPaint(FXObject*,FXSelector,void* ptr){
     else if(underCursor()){
       dc.setForeground(backColor);
       dc.fillRectangle(1,1,width-2,height-2);
-      //drawRaisedRectangle(dc,0,0,width,height);
       dc.setForeground(shadowColor);
       dc.fillRectangle(0,height-1,width,1);
       dc.fillRectangle(width-1,0,1,height);

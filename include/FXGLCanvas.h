@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCanvas.h,v 1.45 2008/01/04 15:18:19 fox Exp $                        *
+* $Id: FXGLCanvas.h,v 1.46 2008/04/22 20:08:08 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLCANVAS_H
 #define FXGLCANVAS_H
@@ -44,9 +44,7 @@ enum {
 class FXAPI FXGLCanvas : public FXCanvas {
   FXDECLARE(FXGLCanvas)
 protected:
-  FXGLContext *context;         // GL Context
-private:
-  FXID         xxx;
+  FXGLContext *context; // Graphic context
 protected:
   FXGLCanvas();
 private:

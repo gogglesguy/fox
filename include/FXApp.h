@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.267 2008/01/11 18:27:34 fox Exp $                            *
+* $Id: FXApp.h,v 1.269 2008/03/26 15:04:03 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -361,11 +361,11 @@ private:
   FXbool           xdndWantUpdates;     // XDND target wants new positions while in rect
   FXbool           xdndFinishSent;      // XDND finish sent
   FXRectangle      xdndRect;            // XDND rectangle bounding target
-  FXID             xrrScreenChange;     // Xrandr ScreenChange event
-  FXID             xfxFixesSelection;   // Xfixes selection event
-  FXID             xsbBallMotion;       // Space ball motion event
-  FXID             xsbButtonPress;      // Space ball button press event
-  FXID             xsbButtonRelease;    // Space ball button release event
+  FXint            xrrScreenChange;     // Xrandr ScreenChange event
+  FXint            xfxFixesSelection;   // Xfixes selection event
+  FXint            xsbBallMotion;       // Space ball motion event
+  FXint            xsbButtonPress;      // Space ball button press event
+  FXint            xsbButtonRelease;    // Space ball button release event
   FXID             stipples[23];        // Standard stipple patterns
   void            *xsbDevice;           // Space ball input device
   void            *xim;                 // Input method
@@ -393,6 +393,8 @@ private:
   void dragdropSetData(const FXWindow* window,FXDragType type,FXuchar* data,FXuint size);
   void dragdropGetData(const FXWindow* window,FXDragType type,FXuchar*& data,FXuint& size);
   void dragdropGetTypes(const FXWindow* window,FXDragType*& types,FXuint& numtypes);
+  void openInputDevices();
+  void closeInputDevices();
 #ifdef WIN32
   static long CALLBACK wndproc(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
 protected:
@@ -403,8 +405,6 @@ protected:
   void scrollRepaints(FXID win,FXint dx,FXint dy);
   static void imcreatecallback(void*,FXApp*,void*);
   static void imdestroycallback(void*,FXApp*,void*);
-  void openInputDevices();
-  void closeInputDevices();
 #endif
 
 protected:

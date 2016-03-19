@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXObject.h,v 1.41 2008/01/04 15:18:22 fox Exp $                          *
+* $Id: FXObject.h,v 1.43 2008/04/17 02:10:08 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXOBJECT_H
 #define FXOBJECT_H

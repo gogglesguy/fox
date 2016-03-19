@@ -5,13 +5,12 @@
 *********************************************************************************
 * Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: button.cpp,v 1.24 2008/01/04 15:18:32 fox Exp $                          *
+* $Id: button.cpp,v 1.25 2008/03/07 02:44:37 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 /*******************************************************************************/
 
@@ -318,6 +317,7 @@ long ButtonWindow::onCmdJustification(FXObject*,FXSelector sel,void*){
   return 1;
   }
 
+
 // Update justification radio buttons
 long ButtonWindow::onUpdJustification(FXObject* sender,FXSelector sel,void*){
   FXSelector updatemessage=FXSEL(SEL_COMMAND,ID_UNCHECK);
@@ -448,5 +448,3 @@ int main(int argc,char *argv[]){
   // Run
   return application.run();
   }
-
-

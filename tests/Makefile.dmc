@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.18 2008/01/04 16:14:04 fox Exp $                     #
+# $Id: Makefile.dmc,v 1.21 2008/04/02 14:32:07 fox Exp $                     #
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later
@@ -30,14 +30,15 @@ TOPDIR    = ..
 DEFINES   = -DFOX_BIGENDIAN=0 -DNDEBUG -D_WINDOWS -DWIN32 -DHAVE_VSSCANF -DHAVE_OPENGL #-DHAVE_PNG_H -DHAVE_JPEG_H -DHAVE_ZLIB_H -DHAVE_TIFF_H -DHAVE_BZ2LIB_H -DXMD_H
 LD	  = link
 LDFLAGS	  = /NOI /DELEXECUTABLE /PACKFUNCTIONS /EXETYPE:NT /SU:WINDOWS
-LIBS	  = gc.lib+snn.lib+kernel32.lib+user32.lib+comctl32.lib+comdlg32.lib+advapi32.lib+shell32.lib+gdi32.lib+wsock32.lib+winspool.lib
+LIBS	  = gc.lib+snn.lib+kernel32.lib+user32.lib+comctl32.lib+comdlg32.lib+advapi32.lib+shell32.lib+gdi32.lib+wsock32.lib+winspool.lib+imm32.lib
 GLLIBS    = opengl32.lib+glu32.lib
 INCDIRS   = -I$(TOPDIR)\include
 FOXLIB    = $(TOPDIR)\src\FOX-1.7.lib
 
 PROGRAMS  = \
-	ControlPanel.exe \
 	rex.exe \
+	format.exe \
+	scan.exe \
 	minheritance.exe \
 	expression.exe \
 	memmap.exe \
@@ -72,9 +73,6 @@ PROGRAMS  = \
 	$(CXX) -c $(INCDIRS) $(CXXFLAGS) $(DEFINES) $*.cpp
 
 all: $(PROGRAMS)
-
-ControlPanel.exe: $(FOXLIB) ControlPanel.obj
-	$(LD) $(LDFLAGS) ControlPanel.obj,,,$(FOXLIB) $(LIBS)
 
 rex.exe: $(FOXLIB) rex.obj
 	$(LD) $(LDFLAGS) rex.obj,,,$(FOXLIB) $(LIBS)
@@ -153,6 +151,12 @@ glviewer.exe: $(FOXLIB) glviewer.obj
 
 dialog.exe: $(FOXLIB) dialog.obj
 	$(LD) $(LDFLAGS) dialog.obj,,,$(FOXLIB) $(LIBS)
+
+format.exe: $(FOXLIB) format.obj
+	$(LD) $(LDFLAGS) format.obj,,,$(FOXLIB) $(LIBS)
+
+scan.exe: $(FOXLIB) scan.obj
+	$(LD) $(LDFLAGS) scan.obj,,,$(FOXLIB) $(LIBS)
 
 dctest.exe: $(FOXLIB) dctest.obj
 	$(LD) $(LDFLAGS) dctest.obj,,,$(FOXLIB) $(LIBS)

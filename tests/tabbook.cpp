@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: tabbook.cpp,v 1.26 2008/01/04 15:18:34 fox Exp $                         *
+* $Id: tabbook.cpp,v 1.27 2008/03/06 05:44:01 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 
@@ -57,8 +57,8 @@ public:
     ID_TABS_RIGHT,
     ID_HIDESHOW,
     ID_PANEL,
-	ID_PACK_UNIFORM_WIDTH,
-	ID_PACK_NON_UNIFORM_WIDTH,
+    ID_PACK_UNIFORM_WIDTH,
+    ID_PACK_NON_UNIFORM_WIDTH,
     };
 public:
   TabBookWindow(FXApp* a);

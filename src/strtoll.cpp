@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: strtoll.cpp,v 1.16 2008/01/04 15:42:51 fox Exp $                         *
+* $Id: strtoll.cpp,v 1.18 2008/03/29 03:08:30 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -36,7 +36,7 @@
 
 
 // Systems that like LL for 64-bit long constant suffix
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || !defined(WIN32)
+#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__) || !defined(WIN32)
 #ifndef ULLONG_MAX
 #define ULLONG_MAX 18446744073709551615ULL
 #endif
@@ -108,7 +108,8 @@ FXlong strtoll(const char *nptr,char **endptr,int base){
   if(base==16 && s[0]=='0' && (s[1]=='x' || s[1]=='X')) s+=2;
 
   // Overflow detection
-  cutoff=neg?LLONG_MAX+1:LLONG_MAX;
+  cutoff=LLONG_MAX;
+  if(neg) cutoff++;
   cutlim=cutoff%base;
   cutoff=cutoff/base;
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.127 2008/01/04 15:42:39 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.131 2008/02/05 22:02:10 fox Exp $                       *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -71,9 +71,6 @@
   - Picked unsigned long so as to ensure alignment issues are taken
     care off.
 
-  - The ReadWriteLock currently favors readers; we may implement a fair
-    algorithm at some future time!
-
   - Note that the FXThreadID is only valid when busy==true, except insofar
     as when its used to harvest thread exit status like e.g. join!
 
@@ -103,9 +100,9 @@ namespace FX {
 
 /*******************************************************************************/
 
-// Windows implementation
 
-#ifdef WIN32
+#if defined(WIN32)                      // Windows implementation
+
 
 // Initialize mutex
 FXMutex::FXMutex(FXbool){
@@ -161,6 +158,7 @@ FXMutex::~FXMutex(){
 
 /*******************************************************************************/
 
+
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){
   data[0]=0;
@@ -201,93 +199,6 @@ FXbool FXSpinLock::locked(){
 FXSpinLock::~FXSpinLock(){
   }
 
-/*******************************************************************************/
-
-
-struct RWLOCK {
-  CRITICAL_SECTION mutex[1];
-  CRITICAL_SECTION access[1];
-  DWORD            readers;
-  };
-
-
-// Initialize read/write lock
-FXReadWriteLock::FXReadWriteLock(){
-  // If this fails on your machine, determine what value
-  // of sizeof(RWLOCK) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
-  //FXTRACE((150,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
-  FXASSERT(sizeof(data)>=sizeof(RWLOCK));
-  InitializeCriticalSection(((RWLOCK*)data)->mutex);
-  InitializeCriticalSection(((RWLOCK*)data)->access);
-  ((RWLOCK*)data)->readers=0;
-  }
-
-
-// Acquire read lock for read/write lock
-void FXReadWriteLock::readLock(){
-  EnterCriticalSection(((RWLOCK*)data)->mutex);
-  if(++((RWLOCK*)data)->readers==1){
-    EnterCriticalSection(((RWLOCK*)data)->access);
-    }
-  LeaveCriticalSection(((RWLOCK*)data)->mutex);
-  }
-
-
-// Try to acquire read lock for read/write lock
-bool FXReadWriteLock::tryReadLock(){
-#if(_WIN32_WINNT >= 0x0400)
-  if(TryEnterCriticalSection(((RWLOCK*)data)->mutex)){
-    if(++((RWLOCK*)data)->readers==1 && !TryEnterCriticalSection(((RWLOCK*)data)->access)){
-      --((RWLOCK*)data)->readers;
-      LeaveCriticalSection(((RWLOCK*)data)->mutex);
-      return false;
-      }
-    LeaveCriticalSection(((RWLOCK*)data)->mutex);
-    return true;
-    }
-#endif
-  return false;
-  }
-
-
-// Unlock read lock
-void FXReadWriteLock::readUnlock(){
-  EnterCriticalSection(((RWLOCK*)data)->mutex);
-  if(--((RWLOCK*)data)->readers==0){
-    LeaveCriticalSection(((RWLOCK*)data)->access);
-    }
-  LeaveCriticalSection(((RWLOCK*)data)->mutex);
-  }
-
-
-// Acquire write lock for read/write lock
-void FXReadWriteLock::writeLock(){
-  EnterCriticalSection(((RWLOCK*)data)->access);
-  }
-
-
-// Try to acquire write lock for read/write lock
-bool FXReadWriteLock::tryWriteLock(){
-#if(_WIN32_WINNT >= 0x0400)
-  return TryEnterCriticalSection(((RWLOCK*)data)->access)!=0;
-#else
-  return false;
-#endif
-  }
-
-
-// Unlock write lock
-void FXReadWriteLock::writeUnlock(){
-  LeaveCriticalSection(((RWLOCK*)data)->access);
-  }
-
-
-// Delete read/write lock
-FXReadWriteLock::~FXReadWriteLock(){
-  DeleteCriticalSection(((RWLOCK*)data)->mutex);
-  DeleteCriticalSection(((RWLOCK*)data)->access);
-  }
 
 /*******************************************************************************/
 
@@ -320,8 +231,8 @@ void FXSemaphore::post(){
 FXSemaphore::~FXSemaphore(){
   CloseHandle((HANDLE)data[0]);
   }
-
-
+  
+  
 /*******************************************************************************/
 
 
@@ -407,6 +318,178 @@ FXCondition::~FXCondition(){
 
 
 /*******************************************************************************/
+
+struct RWLOCK {
+  CRITICAL_SECTION mutex[1];
+  CRITICAL_SECTION access[1];
+  DWORD            readers;
+  };
+
+
+// Initialize read/write lock
+FXReadWriteLock::FXReadWriteLock(){
+  // If this fails on your machine, determine what value
+  // of sizeof(RWLOCK) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.org!!
+  //FXTRACE((150,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
+  FXASSERT(sizeof(data)>=sizeof(RWLOCK));
+  InitializeCriticalSection(((RWLOCK*)data)->mutex);
+  InitializeCriticalSection(((RWLOCK*)data)->access);
+  ((RWLOCK*)data)->readers=0;
+  }
+
+
+// Acquire read lock for read/write lock
+void FXReadWriteLock::readLock(){
+  EnterCriticalSection(((RWLOCK*)data)->mutex);
+  if(++((RWLOCK*)data)->readers==1){
+    EnterCriticalSection(((RWLOCK*)data)->access);
+    }
+  LeaveCriticalSection(((RWLOCK*)data)->mutex);
+  }
+
+
+// Try to acquire read lock for read/write lock
+FXbool FXReadWriteLock::tryReadLock(){
+#if(_WIN32_WINNT >= 0x0400)
+  if(TryEnterCriticalSection(((RWLOCK*)data)->mutex)){
+    if(++((RWLOCK*)data)->readers==1 && !TryEnterCriticalSection(((RWLOCK*)data)->access)){
+      --((RWLOCK*)data)->readers;
+      LeaveCriticalSection(((RWLOCK*)data)->mutex);
+      return false;
+      }
+    LeaveCriticalSection(((RWLOCK*)data)->mutex);
+    return true;
+    }
+#endif
+  return false;
+  }
+
+
+// Unlock read lock
+void FXReadWriteLock::readUnlock(){
+  EnterCriticalSection(((RWLOCK*)data)->mutex);
+  if(--((RWLOCK*)data)->readers==0){
+    LeaveCriticalSection(((RWLOCK*)data)->access);
+    }
+  LeaveCriticalSection(((RWLOCK*)data)->mutex);
+  }
+
+
+// Acquire write lock for read/write lock
+void FXReadWriteLock::writeLock(){
+  EnterCriticalSection(((RWLOCK*)data)->access);
+  }
+
+
+// Try to acquire write lock for read/write lock
+FXbool FXReadWriteLock::tryWriteLock(){
+#if(_WIN32_WINNT >= 0x0400)
+  return TryEnterCriticalSection(((RWLOCK*)data)->access)!=0;
+#else
+  return false;
+#endif
+  }
+
+
+// Unlock write lock
+void FXReadWriteLock::writeUnlock(){
+  LeaveCriticalSection(((RWLOCK*)data)->access);
+  }
+
+
+// Delete read/write lock
+FXReadWriteLock::~FXReadWriteLock(){
+  DeleteCriticalSection(((RWLOCK*)data)->mutex);
+  DeleteCriticalSection(((RWLOCK*)data)->access);
+  }
+
+#if 0
+  FXMutex     access;
+  FXCondition reader;
+  FXCondition writer;  
+  FXint       numreaders;
+  FXint       numwriters;
+  FXint       inside;
+
+// Initialize read/write lock
+FXReadWriteLock::FXReadWriteLock():numreaders(0),numwriters(0),inside(0){
+  }
+
+
+// Acquire read lock for read/write lock
+void FXReadWriteLock::readLock(){
+  FXMutexLock lock(access);
+  while(inside<0 || numwriters){
+    ++numreaders;  
+    reader.wait(access);
+    --numreaders;  
+    }
+  ++inside;
+  }
+
+
+// Try to acquire read lock for read/write lock
+FXbool FXReadWriteLock::tryReadLock(){
+//  return pthread_rwlock_tryrdlock((pthread_rwlock_t*)data)==0;
+  }
+
+
+// Unlock read lock
+void FXReadWriteLock::readUnlock(){
+  FXMutexLock lock(access);
+  if(--inside==0){
+    if(numwriters){
+      writer.signal();
+      }
+    else if(numreaders){
+      reader.broadcast();
+      }
+    }
+  }
+
+
+// Acquire write lock for read/write lock
+void FXReadWriteLock::writeLock(){
+  FXMutexLock lock(access);
+  while(inside){
+    ++numwriters;
+    writer.wait(access);
+    --numwriters;
+    }
+  --inside;
+  }
+
+
+// Try to acquire write lock for read/write lock
+FXbool FXReadWriteLock::tryWriteLock(){
+//  return pthread_rwlock_trywrlock((pthread_rwlock_t*)data)==0;
+  }
+
+
+// Unlock write lock
+void FXReadWriteLock::writeUnlock(){
+  FXMutexLock lock(access);
+  if(++inside==0){
+    if(numwriters){
+      writer.signal();
+      }
+    else if(numreaders){
+      reader.broadcast();
+      }
+    }
+  }
+
+
+// Delete read/write lock
+FXReadWriteLock::~FXReadWriteLock(){
+  }
+#endif
+
+
+
+/*******************************************************************************/
+
 
 // Automatically acquire a thread-local storage key
 FXAutoThreadStorageKey::FXAutoThreadStorageKey(){
@@ -552,7 +635,7 @@ FXTime FXThread::time(){
   }
 
 
-// Sleep for some time
+// Make the calling thread sleep for a number of nanoseconds
 void FXThread::sleep(FXTime nsec){
   Sleep((DWORD)(nsec/1000000));
   }
@@ -704,9 +787,8 @@ FXThread::~FXThread(){
 
 /*******************************************************************************/
 
-// Unix implementation
 
-#else
+#else                                   // Unix implementation
 
 
 // Initialize mutex
@@ -759,7 +841,7 @@ FXMutex::~FXMutex(){
 
 /*******************************************************************************/
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){
@@ -854,71 +936,7 @@ FXSpinLock::~FXSpinLock(){
 
 /*******************************************************************************/
 
-
-// Initialize read/write lock
-FXReadWriteLock::FXReadWriteLock(){
-  // If this fails on your machine, determine what value
-  // of sizeof(pthread_rwlock_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.org!!
-  //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
-  FXASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
-#ifdef __APPLE__
-  pthread_rwlock_init((pthread_rwlock_t*)data,NULL);
-#else
-  pthread_rwlockattr_t rwlockatt;
-  pthread_rwlockattr_init(&rwlockatt);
-  pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_READER_NP);
-  pthread_rwlock_init((pthread_rwlock_t*)data,&rwlockatt);
-  pthread_rwlockattr_destroy(&rwlockatt);
-#endif
-  }
-
-
-// Acquire read lock for read/write lock
-void FXReadWriteLock::readLock(){
-  pthread_rwlock_rdlock((pthread_rwlock_t*)data);
-  }
-
-
-// Try to acquire read lock for read/write lock
-bool FXReadWriteLock::tryReadLock(){
-  return pthread_rwlock_tryrdlock((pthread_rwlock_t*)data)==0;
-  }
-
-
-// Unlock read lock
-void FXReadWriteLock::readUnlock(){
-  pthread_rwlock_unlock((pthread_rwlock_t*)data);
-  }
-
-
-// Acquire write lock for read/write lock
-void FXReadWriteLock::writeLock(){
-  pthread_rwlock_wrlock((pthread_rwlock_t*)data);
-  }
-
-
-// Try to acquire write lock for read/write lock
-bool FXReadWriteLock::tryWriteLock(){
-  return pthread_rwlock_trywrlock((pthread_rwlock_t*)data)==0;
-  }
-
-
-// Unlock write lock
-void FXReadWriteLock::writeUnlock(){
-  pthread_rwlock_unlock((pthread_rwlock_t*)data);
-  }
-
-
-// Delete read/write lock
-FXReadWriteLock::~FXReadWriteLock(){
-  pthread_rwlock_destroy((pthread_rwlock_t*)data);
-  }
-
-
-/*******************************************************************************/
-
-#ifdef __APPLE__
+#if defined(__APPLE__)
 
 // Initialize semaphore
 FXSemaphore::FXSemaphore(FXint initial){
@@ -1040,6 +1058,72 @@ FXCondition::~FXCondition(){
 
 
 /*******************************************************************************/
+
+
+// Initialize read/write lock
+FXReadWriteLock::FXReadWriteLock(){
+  // If this fails on your machine, determine what value
+  // of sizeof(pthread_rwlock_t) is supposed to be on your
+  // machine and mail it to: jeroen@fox-toolkit.org!!
+  //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
+  FXASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
+#ifdef __APPLE__
+  pthread_rwlock_init((pthread_rwlock_t*)data,NULL);
+#else
+  pthread_rwlockattr_t rwlockatt;
+  pthread_rwlockattr_init(&rwlockatt);
+//  pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_READER_NP);
+  pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_WRITER_NP);
+  pthread_rwlock_init((pthread_rwlock_t*)data,&rwlockatt);
+  pthread_rwlockattr_destroy(&rwlockatt);
+#endif
+  }
+
+
+// Acquire read lock for read/write lock
+void FXReadWriteLock::readLock(){
+  pthread_rwlock_rdlock((pthread_rwlock_t*)data);
+  }
+
+
+// Try to acquire read lock for read/write lock
+FXbool FXReadWriteLock::tryReadLock(){
+  return pthread_rwlock_tryrdlock((pthread_rwlock_t*)data)==0;
+  }
+
+
+// Unlock read lock
+void FXReadWriteLock::readUnlock(){
+  pthread_rwlock_unlock((pthread_rwlock_t*)data);
+  }
+
+
+// Acquire write lock for read/write lock
+void FXReadWriteLock::writeLock(){
+  pthread_rwlock_wrlock((pthread_rwlock_t*)data);
+  }
+
+
+// Try to acquire write lock for read/write lock
+FXbool FXReadWriteLock::tryWriteLock(){
+  return pthread_rwlock_trywrlock((pthread_rwlock_t*)data)==0;
+  }
+
+
+// Unlock write lock
+void FXReadWriteLock::writeUnlock(){
+  pthread_rwlock_unlock((pthread_rwlock_t*)data);
+  }
+
+
+// Delete read/write lock
+FXReadWriteLock::~FXReadWriteLock(){
+  pthread_rwlock_destroy((pthread_rwlock_t*)data);
+  }
+
+
+/*******************************************************************************/
+
 
 // Automatically acquire a thread-local storage key
 FXAutoThreadStorageKey::FXAutoThreadStorageKey(){
@@ -1206,7 +1290,7 @@ FXTime FXThread::time(){
   }
 
 
-// Sleep for some time
+// Make the calling thread sleep for a number of nanoseconds
 void FXThread::sleep(FXTime nsec){
 #ifdef __USE_POSIX199309
   const FXTime seconds=1000000000;

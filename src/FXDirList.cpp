@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.182 2008/01/04 15:42:10 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.183 2008/02/28 04:51:08 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -380,19 +380,18 @@ long FXDirList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
 // Somebody wants our dragged data
 long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent *event=(FXEvent*)ptr;
 
   // Perhaps the target wants to supply its own data
   if(FXTreeList::onDNDRequest(sender,sel,ptr)) return 1;
 
   // Return list of filenames as a uri-list
-  if(event->target==urilistType){
-    setDNDData(FROM_DRAGNDROP,event->target,dragfiles);
+  if(((FXEvent*)ptr)->target==urilistType){
+    setDNDData(FROM_DRAGNDROP,((FXEvent*)ptr)->target,dragfiles);
     return 1;
     }
 
   // Delete selected files
-  if(event->target==deleteType){
+  if(((FXEvent*)ptr)->target==deleteType){
     FXTRACE((100,"Delete files not yet implemented\n"));
     return 1;
     }

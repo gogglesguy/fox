@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXId.h,v 1.21 2008/01/04 15:18:20 fox Exp $                              *
+* $Id: FXId.h,v 1.22 2008/04/22 20:08:09 fox Exp $                              *
 ********************************************************************************/
 #ifndef FXID_H
 #define FXID_H
@@ -40,12 +40,13 @@ private:
   void  *data;            // User data
 protected:
   FXID   xid;
+  FXID   rsc;
 private:
   FXId(const FXId&);
   FXId &operator=(const FXId&);
 protected:
-  FXId():app((FXApp*)-1L),data(NULL),xid(0){}
-  FXId(FXApp* a):app(a),data(NULL),xid(0){}
+  FXId():app((FXApp*)-1L),data(NULL),xid(0),rsc(0){}
+  FXId(FXApp* a):app(a),data(NULL),xid(0),rsc(0){}
 public:
 
   /// Get application
@@ -54,6 +55,9 @@ public:
   /// Get XID handle
   FXID id() const { return xid; }
 
+  /// Get resource handle
+  FXID res() const { return rsc; }
+  
   /// Create resource
   virtual void create(){}
 
@@ -76,7 +80,7 @@ public:
   virtual void load(FXStream& store);
 
   /// Destructor
-  virtual ~FXId(){app=(FXApp*)-1L;}
+  virtual ~FXId();
   };
 
 }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDLL.cpp,v 1.51 2008/01/04 15:42:09 fox Exp $                           *
+* $Id: FXDLL.cpp,v 1.52 2008/03/28 20:54:21 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -94,20 +94,20 @@ namespace FX {
 FXString FXDLL::name() const {
   if(hnd){
 #if defined(WIN32)              // WIN32
-    char modulename[1024];
-    if(GetModuleFileNameA((HINSTANCE)hnd,modulename,sizeof(modulename))){
-      return modulename;
+    char buffer[1024];
+    if(GetModuleFileNameA((HINSTANCE)hnd,buffer,sizeof(buffer))){
+      return FXString(buffer);
       }
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
     struct shl_descriptor desc;
     if(shl_gethandle_r((shl_t)hnd,&desc)!=-1){
-      return desc.filename;
+      return FXString(desc.filename);
       }
 #else                           // POSIX
     Dl_info info;
     void *ptr=dlsym(hnd,"_init");       // FIXME any better way?
     if(ptr && dladdr(ptr,&info)){
-      return info.dli_fname;
+      return FXString(info.dli_fname);
       }
 #endif
     }
@@ -198,7 +198,7 @@ FXString FXDLL::symbol(void *addr){
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
-    return info.dli_sname;
+    return FXString(info.dli_sname);
     }
 #endif
   return FXString::null;
@@ -210,9 +210,9 @@ FXString FXDLL::name(void *addr){
 #if defined(WIN32)              // WIN32
   MEMORY_BASIC_INFORMATION mbi;
   if(VirtualQuery((const void*)addr,&mbi,sizeof(mbi))){
-    char modulename[1024];
-    if(GetModuleFileNameA((HINSTANCE)mbi.AllocationBase,modulename,sizeof(modulename))){
-      return modulename;
+    char buffer[1024];
+    if(GetModuleFileNameA((HINSTANCE)mbi.AllocationBase,buffer,sizeof(buffer))){
+      return FXString(buffer);
       }
     }
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
@@ -220,7 +220,7 @@ FXString FXDLL::name(void *addr){
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
-    return info.dli_fname;
+    return FXString(info.dli_fname);
     }
 #endif
   return FXString::null;
@@ -269,11 +269,11 @@ FXString FXDLL::error(){
   DWORD dw=GetLastError();
   FXchar buffer[512];
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,NULL,dw,MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),(LPTSTR)buffer,sizeof(buffer),NULL);
-  return buffer;
+  return FXString(buffer);
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
   return FXString::null;
 #else			        // POSIX
-  return dlerror();
+  return FXString(dlerror());
 #endif
   }
 

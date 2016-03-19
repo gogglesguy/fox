@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFoldingList.cpp,v 1.94 2008/01/04 15:42:14 fox Exp $                   *
+* $Id: FXFoldingList.cpp,v 1.95 2008/03/25 20:00:58 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -124,7 +124,7 @@ void FXFoldingItem::draw(const FXFoldingList* list,FXDC& dc,FXint xx,FXint yy,FX
     used=xx-header->getItemOffset(0);
     for(hi=beg=0; beg<label.length() && hi<header->getNumItems(); hi++,beg=end+1){
       space=header->getItemSize(hi)-used;
-      for(end=beg; end<label.length() && label[end]!='\t'; end++);
+      for(end=beg; end<label.length() && label[end]!='\t'; end++){}
       if(end>beg){
         drw=end-beg;
         tw=font->getTextWidth(&label[beg],drw);
@@ -1956,8 +1956,8 @@ long FXFoldingList::onTripleClicked(FXObject*,FXSelector,void* ptr){
 // Compare sectioned strings
 FXint FXFoldingList::compareSection(const FXchar *p,const FXchar* q,FXint s){
   register FXint c1,c2,x;
-  for(x=s; x && *p; x-=(*p++=='\t'));
-  for(x=s; x && *q; x-=(*q++=='\t'));
+  for(x=s; x && *p; x-=(*p++=='\t')){}
+  for(x=s; x && *q; x-=(*q++=='\t')){}
   do{
     c1=FXuchar(*p++);
     c2=FXuchar(*q++);
@@ -1970,8 +1970,8 @@ FXint FXFoldingList::compareSection(const FXchar *p,const FXchar* q,FXint s){
 // Compare sectioned strings, case-insensitive
 FXint FXFoldingList::compareSectionCase(const FXchar *p,const FXchar* q,FXint s){
   register FXint c1,c2,x;
-  for(x=s; x && *p; x-=(*p++=='\t'));
-  for(x=s; x && *q; x-=(*q++=='\t'));
+  for(x=s; x && *p; x-=(*p++=='\t')){}
+  for(x=s; x && *q; x-=(*q++=='\t')){}
   do{
     if((*p & 0x80) && (*q & 0x80)){
       c1=Unicode::toLower(wc(p)); p+=wclen(p);
@@ -2525,7 +2525,7 @@ FXFoldingItem* FXFoldingList::findItem(const FXString& text,FXFoldingItem* start
         item=item->getAbove();
         }
       if(start && !(flgs&SEARCH_WRAP)) return NULL;
-      for(item=lastitem; item->getLast(); item=item->getLast());
+      for(item=lastitem; item->getLast(); item=item->getLast()){}
       while(item!=start){
         if((*comparefunc)(item->getText(),text,len)==0) return item;
         item=item->getAbove();
@@ -2560,7 +2560,7 @@ FXFoldingItem* FXFoldingList::findItemByData(const void *ptr,FXFoldingItem* star
         item=item->getAbove();
         }
       if(start && !(flgs&SEARCH_WRAP)) return NULL;
-      for(item=lastitem; item->getLast(); item=item->getLast());
+      for(item=lastitem; item->getLast(); item=item->getLast()){}
       while(item!=start){
         if(item->getData()==ptr) return item;
         item=item->getAbove();

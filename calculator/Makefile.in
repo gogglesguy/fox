@@ -99,7 +99,7 @@ CXXFLAGS = @CXXFLAGS@ @X_CFLAGS@
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap
 SUFFIXES = .gif .bmp
-LDADD = ../src/libFOX-1.7.la -lm
+LDADD = $(top_builddir)/src/libFOX-1.7.la -lm
 
 bin_PROGRAMS = calculator
 
@@ -154,7 +154,7 @@ calculator_OBJECTS =  icons.$(OBJEXT) Calculator.$(OBJEXT) \
 HelpWindow.$(OBJEXT) Preferences.$(OBJEXT) help.$(OBJEXT) \
 main.$(OBJEXT)
 calculator_LDADD = $(LDADD)
-calculator_DEPENDENCIES =  ../src/libFOX-1.7.la
+calculator_DEPENDENCIES =  $(top_builddir)/src/libFOX-1.7.la
 calculator_LDFLAGS = 
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

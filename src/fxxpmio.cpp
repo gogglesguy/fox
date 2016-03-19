@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxxpmio.cpp,v 1.63 2008/01/04 15:42:51 fox Exp $                         *
+* $Id: fxxpmio.cpp,v 1.64 2008/03/25 20:01:00 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -289,7 +289,7 @@ FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
   // Read the pixels
   for(i=0,pix=data; i<height; i++){
-    while(!store.eof() && (store>>ch,ch!='"'));
+    while(!store.eof() && (store>>ch,ch!='"')){}
     for(j=0; j<width; j++){
       store.load(line,cpp);
       if(cpp==1){
@@ -305,7 +305,7 @@ FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         }
       *pix++=color;
       }
-    while(!store.eof() && (store>>ch,ch!='"'));
+    while(!store.eof() && (store>>ch,ch!='"')){}
     }
 
   // We got the image, but we're not done yet; need to read few more bytes
