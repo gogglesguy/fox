@@ -89,14 +89,14 @@ FXIMPLEMENT(FXMenuCheck,FXMenuCommand,FXMenuCheckMap,ARRAYNUMBER(FXMenuCheckMap)
 // Command menu item
 FXMenuCheck::FXMenuCheck(){
   boxColor=0;
-  check=FALSE;
+  check=false;
   }
 
 
 // Command menu item
 FXMenuCheck::FXMenuCheck(FXComposite* p,const FXString& text,FXObject* tgt,FXSelector sel,FXuint opts):FXMenuCommand(p,text,NULL,tgt,sel,opts){
   boxColor=getApp()->getBackColor();
-  check=FALSE;
+  check=false;
   }
 
 
@@ -130,21 +130,21 @@ void FXMenuCheck::setCheck(FXuchar s){
 
 // Change state to checked
 long FXMenuCheck::onCheck(FXObject*,FXSelector,void*){
-  setCheck(TRUE);
+  setCheck(true);
   return 1;
   }
 
 
 // Change state to unchecked
 long FXMenuCheck::onUncheck(FXObject*,FXSelector,void*){
-  setCheck(FALSE);
+  setCheck(false);
   return 1;
   }
 
 
 // Change state to indeterminate
 long FXMenuCheck::onUnknown(FXObject*,FXSelector,void*){
-  setCheck(MAYBE);
+  setCheck(maybe);
   return 1;
   }
 
@@ -322,7 +322,7 @@ long FXMenuCheck::onPaint(FXObject*,FXSelector,void* ptr){
   dc.drawRectangle(xx,yy,9,9);
 
   // Draw the check
-  if(check!=FALSE){
+  if(check!=false){
     FXSegment seg[6];
     seg[0].x1=2+xx; seg[0].y1=4+yy; seg[0].x2=4+xx; seg[0].y2=6+yy;
     seg[1].x1=2+xx; seg[1].y1=5+yy; seg[1].x2=4+xx; seg[1].y2=7+yy;
@@ -331,7 +331,7 @@ long FXMenuCheck::onPaint(FXObject*,FXSelector,void* ptr){
     seg[4].x1=4+xx; seg[4].y1=7+yy; seg[4].x2=8+xx; seg[4].y2=3+yy;
     seg[5].x1=4+xx; seg[5].y1=8+yy; seg[5].x2=8+xx; seg[5].y2=4+yy;
     if(isEnabled()){
-      if(check==MAYBE)
+      if(check==maybe)
         dc.setForeground(shadowColor);
       else
         dc.setForeground(textColor);

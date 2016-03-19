@@ -63,6 +63,12 @@ namespace FXURL {
   /// Return filename from URL, empty if url is not a local file
   extern FXAPI FXString fileFromURL(const FXString& string);
 
+
+  /// Make URI list from array of filenames
+  extern FXAPI FXString filesToURIList(const FXString* files);
+
+  /// Make array of filenames from URI list
+  extern FXAPI FXString* filesFromURIList(const FXString& urilist);
   }
 
 }

@@ -355,7 +355,11 @@ FXfloat FXVariant::toFloat(FXbool* ok) const {
   case VUInt:
   case VULong:
     if(ok) *ok=true;
+#if _MSC_VER <= 1200
+    return (FXfloat)(FXuint)value.u;
+#else
     return (FXfloat)value.u;
+#endif
   case VFloat:
   case VDouble:
     if(ok) *ok=true;
@@ -382,7 +386,11 @@ FXdouble FXVariant::toDouble(FXbool* ok) const {
   case VUInt:
   case VULong:
     if(ok) *ok=true;
+#if _MSC_VER <= 1200
+    return (FXdouble)(FXuint)value.u;
+#else
     return (FXdouble)value.u;
+#endif
   case VFloat:
   case VDouble:
     if(ok) *ok=true;

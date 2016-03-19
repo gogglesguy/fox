@@ -125,6 +125,10 @@ FXbool FXPipe::open(FXPipe& other,FXuint m){
         access=(m&~ReadOnly)|WriteOnly|OwnHandle;
         other.access=(m&~WriteOnly)|ReadOnly|OwnHandle;
         }
+#if !defined(HAVE_PIPE2)
+      if(m&NonBlocking){fcntl(device,F_SETFL,O_NONBLOCK);}
+      if(!(m&Inheritable)){fcntl(device,F_SETFD,FD_CLOEXEC);}
+#endif
       return true;
       }
 #endif

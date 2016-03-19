@@ -58,7 +58,7 @@ FXIODevice::FXIODevice():device(BadHandle){
 
 
 // Construct with given handle and mode
-FXIODevice::FXIODevice(FXInputHandle h,FXuint m){
+FXIODevice::FXIODevice(FXInputHandle h,FXuint m):device(BadHandle){
   attach(h,m);
   }
 

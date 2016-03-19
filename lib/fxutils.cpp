@@ -352,6 +352,26 @@ FXival fxstrlcat(FXchar* dst,const FXchar* src,FXival len){
   return (s-src)+m;
   }
 
+/*
+FXchar* fxstrcasestr(const FXchar* s,const FXchar* find){
+  FXchar c, sc;
+  size_t len;
+  if((c=*find++)!=0){
+    c=tolower((unsigned char)c);
+    len=strlen(find);
+    do{
+      do{
+        if((sc=*s++)==0) return NULL;
+        }
+      while((FXchar)tolower((FXuchar)sc)!=c);
+      }
+    while(strncasecmp(s,find,len)!=0);
+    s--;
+    }
+  return ((char *)s);
+  }
+*/
+
 /*******************************************************************************/
 
 // Convert string of length len to MSDOS; return new string and new length

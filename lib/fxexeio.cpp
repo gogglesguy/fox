@@ -50,7 +50,7 @@ extern FXAPI FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint&
 #if defined(WIN32)
 
 /*******************************************************************************/
-#if 0  
+#if 0
 
 #pragma pack( push )
 #pragma pack( 2 )
@@ -85,10 +85,10 @@ typedef struct {
   DWORD dwBytesInRes;
   DWORD dwImageOffset;
   } ICONDIRENTRY, *LPICONDIRENTRY;
-  
-  
+
+
 static char *arg_output;
-static int arg_verbose = FALSE;
+static int arg_verbose = false;
 static int count;
 
 #define prgname "extrico"
@@ -137,15 +137,15 @@ xwrite(file, data, size)
 
 	if (!WriteFile(file, data, size, &written_count, NULL)) {
 		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-        return FALSE;
+        return false;
     }
 
     if(written_count != size) {
 		fprintf(stderr, "%s: Could not write all data.\n", prgname);
-        return FALSE;
+        return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int
@@ -163,24 +163,24 @@ write_icon_to_file (library, icon, filename)
 	  FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE) {
 		fprintf(stderr, "%s: %s: %s\n", prgname, filename, errorstr());
-		return FALSE;
+		return false;
 	}
 
 	/* write icon file header */
 	output = 0;	/* reserved */
 	if (!xwrite(file, &output, sizeof(WORD))) {
 		CloseHandle(file);
-		return FALSE;
+		return false;
 	}
     output = 1;	/* type */
 	if (!xwrite(file, &output, sizeof(WORD))) {
 		CloseHandle(file);
-		return FALSE;
+		return false;
 	}
 	output = icon->idCount;	/* number of images */
 	if (!xwrite(file, &output, sizeof(WORD))) {
 		CloseHandle(file);
-		return FALSE;
+		return false;
 	}
 
  	/* write ICONDIRENTRY for each image */
@@ -205,7 +205,7 @@ write_icon_to_file (library, icon, filename)
 		/* output the ICONDIRENTRY */
 		if (!xwrite(file, &icon_dir_entry, sizeof(ICONDIRENTRY))) {
 			CloseHandle(file);
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -219,26 +219,26 @@ write_icon_to_file (library, icon, filename)
 		if (!resource) {
 			fprintf(stderr, "%s: %s\n", prgname, errorstr());
 			CloseHandle(file);
-			return FALSE;
+			return false;
 		}
 		/* load the resource */
 		memory = LoadResource (library, resource);
 		if (!memory) {
 			fprintf(stderr, "%s: %s\n", prgname, errorstr());
 			CloseHandle(file);
-			return FALSE;
+			return false;
 		}
 
 		/* output the image data */
 		if (!xwrite(file, LockResource(memory), SizeofResource(library, resource))) {
 			CloseHandle(file);
-			return FALSE;
+			return false;
 		}
 	}
 
 	CloseHandle(file);
 
-	return TRUE;
+	return true;
 }
 
 BOOL CALLBACK resource_enum (module, type, name, param)
@@ -265,19 +265,19 @@ BOOL CALLBACK resource_enum (module, type, name, param)
 	resource = FindResource(module, name, type);
 	if (!resource) {
 		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		return TRUE;
+		return true;
 	}
 	/* load the resource */
 	memory = LoadResource(module, resource);
 	if (!resource) {
 		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		return TRUE;
+		return true;
 	}
 	/* lock the resource */
 	icon = LockResource(memory);
 	if (!icon) {
 		fprintf(stderr, "%s: %s\n", prgname, errorstr());
-		return TRUE;
+		return true;
 	}
 
 	if (arg_verbose)
@@ -286,10 +286,10 @@ BOOL CALLBACK resource_enum (module, type, name, param)
 
 	/* write icon to file */
 	if (!write_icon_to_file(module, icon, dest_filename)) {
-		return TRUE;
+		return true;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int
@@ -356,6 +356,7 @@ FXbool fxcheckEXE(FXStream&){
 
 // Stub routine returns placeholder bitmap
 FXbool fxloadEXE(FXStream&,FXColor*& data,FXint& width,FXint& height){
+  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
   static const FXuchar image_bits[]={
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
@@ -371,7 +372,7 @@ FXbool fxloadEXE(FXStream&,FXColor*& data,FXint& width,FXint& height){
   register FXint p;
   allocElms(data,32*32);
   for(p=0; p<32*32; p++){
-    data[p]=(image_bits[p>>3]&(1<<(p&7))) ? FXRGB(0,0,0) : FXRGB(255,255,255);
+    data[p]=color[(image_bits[p>>3]>>(p&7))&1];
     }
   width=32;
   height=32;

@@ -132,10 +132,10 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
 //  table->setRowHeaderMode(0);
   table->setTableSize(50,14);
   table->setBackColor(FXRGB(255,255,255));
-  table->setCellColor(0,0,FXRGB(255,255,255));
-  table->setCellColor(0,1,FXRGB(255,240,240));
-  table->setCellColor(1,0,FXRGB(240,255,240));
-  table->setCellColor(1,1,FXRGB(240,240,255));
+  table->setCellColor(0,0,FXColors::WhiteSmoke);
+  table->setCellColor(0,1,FXColors::WhiteSmoke);
+  table->setCellColor(1,0,FXColors::MistyRose2);
+  table->setCellColor(1,1,FXColors::MistyRose2);
   table->setHelpText("Editable table.");
 
   table->setRowRenumbering(FXHeader::decimalNumbering);
@@ -173,19 +173,19 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   for(c=1; c<=12; c++){
     table->setItemText(0,c,months[c-1]);
     table->setItemText(49,c,months[c-1]);
-    table->setItemButton(0,c,TRUE);
+    table->setItemButton(0,c,true);
     table->setItemJustify(0,c,FXTableItem::LEFT|FXTableItem::CENTER_Y);
     }
-  table->setItemButton(0,0,TRUE);
-  table->setItemButton(0,13,TRUE);
+  table->setItemButton(0,0,true);
+  table->setItemButton(0,13,true);
 
   // Initialize first/last fixed columns
   for(r=1; r<=48; r++){
     table->setItemText(r,0,FXStringVal(r));
     table->setItemText(r,13,FXStringVal(r));
-    table->setItemButton(r,0,TRUE);
+    table->setItemButton(r,0,true);
     }
-  table->setItemButton(49,0,TRUE);
+  table->setItemButton(49,0,true);
 */
   table->setItemText(10,10,"This is multi-\nline text");
 //  table->setRowHeight(10,35);

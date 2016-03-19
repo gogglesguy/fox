@@ -6,6 +6,7 @@
 * Copyright (C) 2007,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
+//#include <locale.h>
 
 
 /*
@@ -24,6 +25,7 @@ extern FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 const FXchar *floatformat[]={
   "%.10e",
+  "%'.5e",
   "%10.5f",
   "%-10.5f",
   "%+10.5f",
@@ -36,13 +38,15 @@ const FXchar *floatformat[]={
   "%3.1f",
   "%3.2f",
   "%.0f",
-  "%.1f",
+  "%.3f",
+  "%'.8f",
   "%+.3g",
   "%#.3g",
   "%.g",
   "%#.g",
   "%g",
-  "%#g"
+  "%#g",
+  "%'.8g"
   };
 
 
@@ -68,7 +72,7 @@ const double floatnumbers[]={
   4.136,
   6442452944.1234,
   1.23456789E+20,
-  0.00000123456,
+  0.123456789,
   2.2250738585072014e-308,
   1.7976931348623157e+308,
   0.0
@@ -76,6 +80,7 @@ const double floatnumbers[]={
 
 const FXchar *intformat[]={
   "%d",
+  "%'d",
   "%02x",
   "%0.2x",
   "%-8d",
@@ -123,6 +128,8 @@ int main(int,char*[]){
   FXchar buffer[1024];
   FXuint x,y;
 
+  //setlocale(LC_ALL,"");
+
   // Testing int formats
   for(x=0; x<ARRAYNUMBER(intformat); x++){
     for(y=0; y<ARRAYNUMBER(intnumbers); y++){
@@ -130,6 +137,8 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",intformat[x],buffer);
       }
     }
+
+  fprintf(stdout,"\n");
 
   // Testing double formats
   for(x=0; x<ARRAYNUMBER(floatformat); x++){
@@ -139,11 +148,15 @@ int main(int,char*[]){
       }
     }
 
+  fprintf(stdout,"\n");
+
   // Testing positional formats
   for(x=0; x<ARRAYNUMBER(positionalformat); x++){
     __snprintf(buffer,sizeof(buffer),positionalformat[x],10,20,30);
     fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat[x],buffer);
     }
+
+  fprintf(stdout,"\n");
 
   __snprintf(buffer,sizeof(buffer),positionalformat2,3.14159265358979,20,10);
   fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat2,buffer);

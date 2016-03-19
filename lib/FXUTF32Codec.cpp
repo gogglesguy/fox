@@ -337,10 +337,10 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
         ((FXuchar*)&w)[1]=src[2];
         ((FXuchar*)&w)[0]=src[3];
 #endif
+        if(FX::wc2utf(w)>ndst) break;
+        nw=FX::wc2utf(dst,w);
         src+=4;
         nsrc-=4;
-        nw=wc2utf(dst,ndst,w);
-        if(nw<=0) return nw;
         len+=nw;
         dst+=nw;
         ndst-=nw;
@@ -362,10 +362,10 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
         ((FXuchar*)&w)[1]=src[1];
         ((FXuchar*)&w)[0]=src[0];
 #endif
+        if(FX::wc2utf(w)>ndst) break;
+        nw=FX::wc2utf(dst,w);
         src+=4;
         nsrc-=4;
-        nw=wc2utf(dst,ndst,w);
-        if(nw<=0) return nw;
         len+=nw;
         dst+=nw;
         ndst-=nw;
@@ -378,7 +378,7 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
 
 // Convert to utf32
 FXint FXUTF32Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
-  if(ndst<4) return -4;
+  if(ndst<4) return 0;
 #if FOX_BIGENDIAN
   dst[0]=((FXuchar*)&wc)[0];
   dst[1]=((FXuchar*)&wc)[1];
@@ -401,8 +401,8 @@ FXint FXUTF32Codec::utf2mblen(const FXchar* src,FXint nsrc) const {
   if(src && 0<nsrc){
     len+=4;
     while(0<nsrc){
-      nr=utf2wc(w,src,nsrc);
-      if(nr<=0) return nr;
+      nr=FX::wclen(src);
+      if(nr>nsrc) break;
       src+=nr;
       nsrc-=nr;
       len+=4;
@@ -417,7 +417,7 @@ FXint FXUTF32Codec::utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
   register FXint nr,len=0;
   FXwchar w;
   if(dst && src && 0<nsrc){
-    if(ndst<4) return -4;
+    if(ndst<4) return 0;
     dst[0]='\0';
     dst[1]='\0';
     dst[2]='\xFE';
@@ -425,11 +425,10 @@ FXint FXUTF32Codec::utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
     dst+=4;
     len+=4;
     while(0<nsrc){
-      nr=utf2wc(w,src,nsrc);
-      if(nr<=0) return nr;
-      src+=nr;
-      nsrc-=nr;
-      if(ndst<4) return -4;
+      nr=FX::wclen(src);
+      if(nr>nsrc) break;
+      w=wc(src);
+      if(ndst<4) break;
 #if FOX_BIGENDIAN
       dst[0]=((FXuchar*)&w)[0];
       dst[1]=((FXuchar*)&w)[1];
@@ -441,6 +440,8 @@ FXint FXUTF32Codec::utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
       dst[2]=((FXuchar*)&w)[1];
       dst[3]=((FXuchar*)&w)[0];
 #endif
+      src+=nr;
+      nsrc-=nr;
       len+=4;
       dst+=4;
       ndst-=4;

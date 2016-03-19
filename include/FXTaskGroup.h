@@ -44,6 +44,8 @@ namespace FX {
 * semaphore to ensure all tasks are completed.
 */
 class FXAPI FXTaskGroup {
+  class Task;
+  friend class Task;
 private:
   class Task : public FXRunnable {
   private:

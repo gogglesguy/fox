@@ -137,7 +137,7 @@ FXString FXSystem::universalTime(const FXchar *format,FXTime value){
 
 // Get effective user id
 FXuint FXSystem::user(){
-#ifdef WIN32
+#if defined(WIN32)
   return 0;
 #else
   return geteuid();
@@ -147,7 +147,7 @@ FXuint FXSystem::user(){
 
 // Get effective group id
 FXuint FXSystem::group(){
-#ifdef WIN32
+#if defined(WIN32)
   return 0;
 #else
   return getegid();
@@ -202,7 +202,7 @@ FXString FXSystem::groupName(FXuint gid){
 
 // Get current user name
 FXString FXSystem::currentUserName(){
-#ifdef WIN32
+#if defined(WIN32)
   TCHAR buffer[MAXPATHLEN];
   DWORD size=MAXPATHLEN;
   if(GetUserName(buffer,&size)){
@@ -266,7 +266,7 @@ FXString FXSystem::modeString(FXuint mode){
 // Return value of environment variable name
 FXString FXSystem::getEnvironment(const FXString& name){
   if(!name.empty()){
-#ifdef WIN32
+#if defined(WIN32)
 #ifdef UNICODE
     FXnchar variable[256],string[1024];
     utf2ncs(variable,name.text(),256);
@@ -288,8 +288,8 @@ FXString FXSystem::getEnvironment(const FXString& name){
 // Change value of environment variable name
 FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
   if(!name.empty()){
-#ifdef WIN32
-#ifdef UNICODE
+#if defined(WIN32)
+#if defined(UNICODE)
     FXnchar variable[256],string[1024];
     utf2ncs(variable,name.text(),256);
     if(!value.empty()){
@@ -317,7 +317,7 @@ FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
 
 // Get current working directory
 FXString FXSystem::getCurrentDirectory(){
-#ifdef WIN32
+#if defined(WIN32)
   TCHAR buffer[MAXPATHLEN];
   if(GetCurrentDirectory(MAXPATHLEN,buffer)){
     return FXString(buffer);
@@ -335,8 +335,8 @@ FXString FXSystem::getCurrentDirectory(){
 // Change current directory
 FXbool FXSystem::setCurrentDirectory(const FXString& path){
   if(!path.empty()){
-#ifdef WIN32
-#ifdef UNICODE
+#if defined(WIN32)
+#if defined(UNICODE)
     FXnchar unipath[MAXPATHLEN];
     utf2ncs(unipath,path.text(),MAXPATHLEN);
     return SetCurrentDirectory(unipath)!=0;
@@ -354,7 +354,7 @@ FXbool FXSystem::setCurrentDirectory(const FXString& path){
 // Get current drive prefix "a:", if any
 // This is the same method as used in VC++ CRT.
 FXString FXSystem::getCurrentDrive(){
-#ifdef WIN32
+#if defined(WIN32)
   FXchar buffer[MAXPATHLEN];
   if(GetCurrentDirectoryA(MAXPATHLEN,buffer) && Ascii::isLetter((FXuchar)buffer[0]) && buffer[1]==':'){
     return FXString(buffer,2);
@@ -364,7 +364,7 @@ FXString FXSystem::getCurrentDrive(){
   }
 
 
-#ifdef WIN32
+#if defined(WIN32)
 
 // Change current drive prefix "a:"
 // This is the same method as used in VC++ CRT.
@@ -392,6 +392,16 @@ FXbool FXSystem::setCurrentDrive(const FXString&){
 // Get executable path
 FXString FXSystem::getExecPath(){
   return FXString(getenv("PATH"));
+  }
+
+
+// Return known executable file extensions (Windows)
+FXString FXSystem::getExecExtensions(){
+#if defined(WIN32)
+  return FXString(getenv("PATHEXT"));
+#else
+  return FXString::null;
+#endif
   }
 
 
@@ -522,7 +532,7 @@ FXString FXSystem::getUserDirectory(const FXString& user){
 
 // Return temporary directory.
 FXString FXSystem::getTempDirectory(){
-#ifdef WIN32
+#if defined(WIN32)
   TCHAR buffer[MAXPATHLEN];
   DWORD len=GetTempPath(MAXPATHLEN,buffer);
   if(1<len && ISPATHSEP(buffer[len-1]) && !ISPATHSEP(buffer[len-2])) len--;
@@ -550,7 +560,7 @@ FXString FXSystem::getHostName(){
 
 // Determine if UTF8 locale in effect
 FXbool FXSystem::localeIsUTF8(){
-#ifdef WIN32
+#if defined(WIN32)
   return GetACP()==CP_UTF8;
 #else
   const FXchar* str;
@@ -563,7 +573,7 @@ FXbool FXSystem::localeIsUTF8(){
 
 
 // Get name of calling executable
-FXString FXSystem::getExecutableFilename(){
+FXString FXSystem::getExecFilename(){
 #if defined(WIN32)
   TCHAR buffer[MAXPATHLEN];
   DWORD len=GetModuleFileName(NULL,buffer,MAXPATHLEN);
@@ -590,6 +600,5 @@ FXString FXSystem::dllName(const FXString& name){
   return "lib"+name+".so";
 #endif
   }
-
 
 }

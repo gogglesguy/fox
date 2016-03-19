@@ -53,7 +53,7 @@ namespace FX {
 // Empty string dictionary table value
 extern const FXint __string__empty__[];
 extern const FXival __stringdictionary__empty__[];
-const FXival __stringdictionary__empty__[6]={1,0,1,(FXival)(__string__empty__+1),(FXival)(__string__empty__+1),0};
+const FXival __stringdictionary__empty__[7]={1,0,1,(FXival)(__string__empty__+1),(FXival)(__string__empty__+1),0,0};
 
 
 // Adjust the size of the table
@@ -118,14 +118,14 @@ FXbool FXStringDictionary::resize(FXival n){
 // Construct empty dictionary
 FXStringDictionary::FXStringDictionary():table(EMPTY){
   FXASSERT(sizeof(FXStringDictionary)==sizeof(FXptr));
-  FXASSERT(sizeof(Entry)<=sizeof(FXival)*3);
+  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
   }
 
 
 // Construct from another string dictionary
 FXStringDictionary::FXStringDictionary(const FXStringDictionary& other):table(EMPTY){
   FXASSERT(sizeof(FXStringDictionary)==sizeof(FXptr));
-  FXASSERT(sizeof(Entry)<=sizeof(FXival)*3);
+  FXASSERT(sizeof(Entry)<=sizeof(FXival)*4);
   if(1<other.no()){
     if(__unlikely(!no(other.no()))){ throw FXMemoryException("FXStringDictionary::FXStringDictionary: out of memory\n"); }
     copyElms(table,other.table,no());

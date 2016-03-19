@@ -32,7 +32,7 @@
 /*
   Notes:
   - This is the utf-8 codec used for external inputs; it takes care of
-    things like BOM's being inserted.
+    things like BOM's (0xFEFF or "\xEFxBB\xBF" )being inserted.
 */
 
 /*******************************************************************************/
@@ -40,24 +40,37 @@
 namespace FX {
 
 
-
 // Convert utf8 but strip BOM
-FXint FXUTF8Codec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
-  register FXint n1,n2;
-  n1=utf2wc(wc,src,nsrc);
-  if(0<n1 && wc==0xFEFF){
-    n2=utf2wc(wc,src,nsrc);
-    if(n2<0) return -n1+n2;
-    if(n2==0) return 0;
-    return n1+n2;
+FXint FXUTF8Codec::mb2wc(FXwchar& w,const FXchar* src,FXint nsrc) const {
+  register FXint n=0;
+a:if(n>=nsrc) return 0;
+  w=(FXuchar)src[n++];
+  if(__unlikely(0x80<=w)){
+    if(__unlikely(w<0xC0)) return 0;
+    if(__unlikely(n>=nsrc)) return 0;
+    if(__unlikely(!FXISFOLLOWUTF8(src[n]))) return 0;
+    w=(w<<6)^(FXuchar)src[n++]^0x3080;
+    if(__unlikely(0x800<=w)){
+      if(__unlikely(n>=nsrc)) return 0;
+      if(__unlikely(!FXISFOLLOWUTF8(src[n]))) return 0;
+      w=(w<<6)^(FXuchar)src[n++]^0x20080;
+      if(__unlikely(0x10000<=w)){
+        if(__unlikely(n>=nsrc)) return 0;
+        if(__unlikely(!FXISFOLLOWUTF8(src[n]))) return 0;
+        w=(w<<6)^(FXuchar)src[n++]^0x400080;
+        if(__unlikely(0x110000<=w)) return 0;
+        }
+      if(__unlikely(w==0xFEFF)) goto a;
+      }
     }
-  return n1;
+  return n;
   }
 
 
 // Convert to utf8
-FXint FXUTF8Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
-  return wc2utf(dst,ndst,wc);
+FXint FXUTF8Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar w) const {
+  if(__unlikely(ndst<wc2utf(w))) return 0;
+  return wc2utf(dst,w);
   }
 
 

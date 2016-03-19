@@ -95,7 +95,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Set radio button state (TRUE, FALSE or MAYBE)
-  void setCheck(FXuchar s=TRUE,FXbool notify=false);
+  void setCheck(FXuchar s=true,FXbool notify=false);
 
   /// Get radio button state (TRUE, FALSE or MAYBE)
   FXuchar getCheck() const { return check; }

@@ -88,7 +88,7 @@ FXAutoThreadStorageKey FXThreadPool::reference;
 
 
 // Create thread pool
-FXThreadPool::FXThreadPool(FXuint sz):queue(sz),freeslots(sz),usedslots(0),sayonara(0),stacksize(0),expiration(forever),processing(1),maximum(FXThread::processors()),minimum(1),workers(0),running(0){
+FXThreadPool::FXThreadPool(FXuint sz):queue(sz),freeslots(sz),usedslots(0),sayonara(0),stacksize(0),expiration(forever),processing(0),maximum(FXThread::processors()),minimum(1),workers(0),running(0){
   FXTRACE((100,"FXThreadPool::FXThreadPool(%d)\n",sz));
   }
 
@@ -210,6 +210,7 @@ void FXThreadPool::processTasksWhile(volatile FXuint& count,FXTime nsec){
       freeslots.post();
       throw;
       }
+    atomicAdd(&processing,-1);
     freeslots.post();           // Adjust semaphore
     }
   }
@@ -218,8 +219,9 @@ void FXThreadPool::processTasksWhile(volatile FXuint& count,FXTime nsec){
 // Execute task, returning false if queue is still full after blocking timeout
 FXbool FXThreadPool::execute(FXRunnable* task,FXTime blocking){
   if(__likely(active() && task)){
-    if(maximum<=workers || queue.getUsed()<=workers || startWorker()){
+    if(maximum<=workers || processing<workers || startWorker()){
       if(freeslots.wait(blocking)){
+        atomicAdd(&processing,1);
         queue.push(task);
         usedslots.post();
         return true;
@@ -233,7 +235,7 @@ FXbool FXThreadPool::execute(FXRunnable* task,FXTime blocking){
 // Execute task and run until queue is empty; return false if unsuccessful
 FXbool FXThreadPool::executeAndRun(FXRunnable* task,FXTime blocking){
   if(execute(task,blocking)){
-    processTasksWhile(processing,0);
+    processTasksWhile(running,0);
     return true;
     }
   return false;
@@ -253,7 +255,7 @@ FXbool FXThreadPool::executeAndRunWhile(FXRunnable* task,volatile FXuint& count,
 // Wait until queue is empty; return false if unsuccessful
 FXbool FXThreadPool::wait(){
   if(__likely(active())){
-    processTasksWhile(processing,0);
+    processTasksWhile(running,0);
     return true;
     }
   return false;
@@ -275,7 +277,7 @@ FXbool FXThreadPool::waitDone(){
   register FXint p,w;
   if(__likely(active())){
     w=p=queue.getSize();
-    processTasksWhile(processing,0);
+    processTasksWhile(running,0);
     while(w){ freeslots.wait(); --w; }  // Decrement free slot count to zero; this means all threads are done!
     while(p){ freeslots.post(); --p; }  // Increment free slot count back to number of slots
     return true;
@@ -316,7 +318,7 @@ FXuint FXThreadPool::start(FXuint count){
 FXint FXThreadPool::run(){
   instance(this);
   try{
-    processTasksWhile(processing,(workers<minimum)?forever:expiration);
+    processTasksWhile(running,(workers<minimum)?forever:expiration);
     }
   catch(...){
     instance(NULL);
@@ -337,10 +339,11 @@ FXint FXThreadPool::run(){
 FXbool FXThreadPool::stop(){
   FXTRACE((150,"FXThreadPool::stop()\n"));
   if(atomicBoolCas(&running,1,2)){
+    volatile FXuint count=1;
     register FXint w=workers;
 
     // Help out processing tasks while waiting
-    processTasksWhile(processing,0);
+    processTasksWhile(running,0);
 
     // Queue empty now
     FXASSERT(queue.isEmpty());

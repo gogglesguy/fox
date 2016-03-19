@@ -481,8 +481,8 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   keyWindow=NULL;                         // Window in which keyboard key was pressed
   selectionWindow=NULL;                   // Window which has the selection
   clipboardWindow=NULL;                   // Window which has the clipboard
-  dragWindow=NULL;                        // Drop target window
   dropWindow=NULL;                        // Drag source window
+  dragWindow=NULL;                        // Drop target window
   refresher=NULL;                         // GUI refresher pointer
   refresherstop=NULL;                     // GUI refresher end pointer
   popupWindow=NULL;                       // No popup windows
@@ -493,12 +493,12 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   chorerecs=NULL;                         // No chore records
   repaintrecs=NULL;                       // No repaint records
   invocation=NULL;                        // Modal loop invocation
+  callocElms(signals,MAXSIGNALS);         // Signals array
+  signalreceived=0;                       // Latest received signal
   callocElms(inputs,8);                   // Input file descriptors
   ninputs=8;                              // Number of these
   callocElms(handles,1);                  // Input handles
   maxhandle=-1;                           // Maximum handle number
-  callocElms(signals,MAXSIGNALS);         // Signals array
-  signalreceived=0;                       // Latest received signal
   inputmethod="";                         // Input method name
   inputstyle="overthespot";               // Input method style
   maxcolors=MAXCOLORS;                    // Maximum number of colors to allocate
@@ -2302,6 +2302,7 @@ void FXApp::scrollRepaints(FXID win,FXint dx,FXint dy){
 
 #ifndef WIN32
 
+
 // Get an event
 FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
   XEvent e;
@@ -2341,7 +2342,8 @@ a:ev.xany.type=0;
     fd_set writefds;
     fd_set exceptfds;
     int    maxfds;
-    int    nfds;
+    int    nfds=0;
+
 
     // Prepare fd's to check
     maxfds=maxhandle;
@@ -2479,6 +2481,11 @@ a:ev.xany.type=0;
       if(nfds<0 && errno!=EAGAIN && errno!=EINTR){fxerror("Application terminated: interrupt or lost connection errno=%d\n",errno);}
       return false;
       }
+
+// FIXME
+// When handling callback and entering recursive event loop, the value
+// in readfds in the upper invocation is no longer correct.  This needs
+// to be fixed. [do this in FXDispatcher at some point].
 
     // Any other file descriptors set?
     if(0<=maxhandle){
@@ -2943,6 +2950,7 @@ static void print_rawevent(XIRawEvent *event){
 
 // Dispatch event to widget
 FXbool FXApp::dispatchEvent(FXRawEvent& ev){
+  const FXTime milliseconds=1000000;
   FXWindow *window,*ancestor,*focuswin;
   Atom      answer;
   FXuint    state;
@@ -3166,7 +3174,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           if(ev.xbutton.button==Button1){ event.type=SEL_LEFTBUTTONPRESS; event.state|=LEFTBUTTONMASK; }
           if(ev.xbutton.button==Button2){ event.type=SEL_MIDDLEBUTTONPRESS; event.state|=MIDDLEBUTTONMASK; }
           if(ev.xbutton.button==Button3){ event.type=SEL_RIGHTBUTTONPRESS; event.state|=RIGHTBUTTONMASK; }
-          if(!event.moved && (event.code==event.click_button) && (1000000*(event.time-event.click_time)<clickSpeed)){
+          if(!event.moved && (event.code==event.click_button) && (milliseconds*(event.time-event.click_time)<clickSpeed)){
             event.click_count++;
             event.click_time=event.time;
             }
@@ -3435,6 +3443,8 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           else if((FXID)ev.xclient.data.l[0]==wmSaveYourself){      // WM_SAVE_YOURSELF
             FXTRACE((100,"WM_SAVE_YOURSELF\n"));
 /*
+            XSetCommand((Display*)display,ev.xany.window,(char**)appArgv,appArgc);
+            XChangeProperty((Display*)display,ev.xany.window,wmCommand,XA_STRING,8,PropModeReplace,(unsigned char*)"",0);
             event.type=SEL_SESSION_NOTIFY;
             return !window->handle(this,FXSEL(SEL_SESSION_NOTIFY,0),&event); // Return 1 if OK to terminate
 
@@ -3723,8 +3733,8 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
 
 // Get an event
 FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
-  register FXint allinputs;
-  register DWORD signaled;
+  FXint allinputs;
+  DWORD signaled;
 
   // Set to no-op just in case
   msg.message=0;
@@ -3750,6 +3760,7 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
     return false;
     }
 
+
   // Peek for messages; this marks the message queue as unsignalled, i.e.
   // MsgWaitForMultipleObjects would block even if there are unhandled events;
   // the fix is to call MsgWaitForMultipleObjects only AFTER having ascertained
@@ -3759,7 +3770,7 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
   // Poll to see if any waitable objects are signalled
   allinputs=maxhandle+1;
   signaled=MsgWaitForMultipleObjects(allinputs,handles->hnd,false,0,QS_ALLINPUT);
-//signaled=MsgWaitForMultipleObjectsEx(allinputs,handles,0,QS_ALLINPUT, MWMO_ALERTABLE);
+// signaled=MsgWaitForMultipleObjectsEx(allinputs,handles,0,QS_ALLINPUT, MWMO_ALERTABLE);
 
   // No objects were signalled, so perform background tasks now
   if(signaled==WAIT_TIMEOUT){
@@ -4659,6 +4670,7 @@ FXString translateKeyEvent(FXuint,FXuval wParam,FXival lParam){
 
 // Message dispatching
 FXival FXApp::dispatchEvent(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam){
+  const FXTime milliseconds=1000000;
   FXWindow *window,*ancestor,*win,*focuswin;
   static HWND lastmovehwnd=0;
   static LPARAM lastmovelParam=0;
@@ -4963,7 +4975,7 @@ Alt key seems to repeat.
         if(iMsg==WM_LBUTTONDOWN){ event.type=SEL_LEFTBUTTONPRESS; event.code=LEFTBUTTON; }
         if(iMsg==WM_MBUTTONDOWN){ event.type=SEL_MIDDLEBUTTONPRESS; event.code=MIDDLEBUTTON; }
         if(iMsg==WM_RBUTTONDOWN){ event.type=SEL_RIGHTBUTTONPRESS; event.code=RIGHTBUTTON; }
-        if(!event.moved && (event.code==event.click_button) && (1000000*(event.time-event.click_time)<clickSpeed)){
+        if(!event.moved && (event.code==event.click_button) && (milliseconds*(event.time-event.click_time)<clickSpeed)){
           event.click_count++;
           event.click_time=event.time;
           }

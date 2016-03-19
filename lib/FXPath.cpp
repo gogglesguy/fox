@@ -1276,8 +1276,8 @@ static FXbool domatch(const FXchar *string,const FXchar *pattern,FXuint flags){
         s=wcinc(s);
         break;
       case '*':         // Multiple character wildcard
-        while((c=wc(p))=='*'){ p=wcinc(p); }                    // Squeeze superfluous '*'
         if((flags&FXPath::DotFile) && (*s=='.') && ((s==string) || ((flags&FXPath::PathName) && ISPATHSEP(*wcdec(s))))) return false;
+        while((c=wc(p))=='*'){ p=wcinc(p); }                    // Squeeze superfluous '*'
         if(c=='\0'){                                            // Optimization for trailing '*'
           if((flags&FXPath::PathName) && !(flags&FXPath::LeadDir)){
             while(*s){
@@ -1456,29 +1456,15 @@ FXString FXPath::unique(const FXString& file){
 
 // Search pathlist for file
 FXString FXPath::search(const FXString& pathlist,const FXString& file){
+  FXTRACE((100,"FXPath::search(\"%s\",\"%s\")\n",pathlist.text(),file.text()));
   if(!file.empty()){
-    register FXint beg,end;
+    register FXint beg;
+    register FXint end;
     FXString path;
-#if defined(WIN32)
-    if(ISPATHSEP(file[0])){
-      if(ISPATHSEP(file[1])){
-        if(FXStat::exists(file)) return file;           // UNC
-        return FXString::null;
-        }
-      path=FXSystem::getCurrentDrive()+file;
-      if(FXStat::exists(path)) return path;
-      return FXString::null;
-      }
-    if(Ascii::isLetter(file[0]) && file[1]==':'){       // C:
+    if(FXPath::isAbsolute(file)){
       if(FXStat::exists(file)) return file;
       return FXString::null;
       }
-#else
-    if(ISPATHSEP(file[0])){
-      if(FXStat::exists(file)) return file;
-      return FXString::null;
-      }
-#endif
     for(beg=0; pathlist[beg]; beg=end){
       while(pathlist[beg]==PATHLISTSEP) beg++;
       end=beg;
@@ -1514,6 +1500,25 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
       }
     }
   return result;
+  }
+
+
+// Check if file has executable extension
+FXbool FXPath::hasExecExtension(const FXString& file){
+#if defined(WIN32)
+  if(!file.empty()){
+    FXString pathext(FXSystem::getExecExtensions());
+    register FXint beg=0,end;
+    do{
+      end=beg;
+      while(end<pathext.length() && pathext[end]!=PATHLISTSEP) end++;
+      if(0<=(file.length()-end+beg) && comparecase(&file[file.length()-end+beg],&pathext[beg],end-beg)==0) return true;
+      beg=end+1;
+      }
+    while(end<pathext.length());
+    }
+#endif
+  return false;
   }
 
 

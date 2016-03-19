@@ -93,9 +93,9 @@ public:
 
   /**
   * After setting the list of patterns, this call will
-  * initially select pattern n as the active one.
+  * initially select pattern patno as the active one.
   */
-  void setCurrentPattern(FXint n);
+  void setCurrentPattern(FXint patno);
 
   /// Return current pattern number
   FXint getCurrentPattern() const;

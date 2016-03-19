@@ -213,6 +213,7 @@ public:
   long onCmdHeader(FXObject*,FXSelector,void*);
   long onUpdHeader(FXObject*,FXSelector,void*);
   long onCmdRefresh(FXObject*,FXSelector,void*);
+  long onUpdHaveSel(FXObject*,FXSelector,void*);
   long onCmdCutSel(FXObject*,FXSelector,void*);
   long onCmdCopySel(FXObject*,FXSelector,void*);
   long onCmdPasteSel(FXObject*,FXSelector,void*);

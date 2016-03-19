@@ -91,10 +91,6 @@
 #define REFRESHINTERVAL     1000000000  // Interval between refreshes
 #define REFRESHFREQUENCY    30          // File systems not supporting mod-time, refresh every nth time
 
-#ifndef TIMEFORMAT
-#define TIMEFORMAT "%m/%d/%Y %H:%M:%S"
-#endif
-
 using namespace FX;
 
 /*******************************************************************************/
@@ -137,6 +133,9 @@ FXDEFMAP(FXFileList) FXFileListMap[]={
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_TOGGLE_HIDDEN,FXFileList::onUpdToggleHidden),
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_TOGGLE_IMAGES,FXFileList::onUpdToggleImages),
   FXMAPFUNC(SEL_UPDATE,FXFileList::ID_HEADER,FXFileList::onUpdHeader),
+  FXMAPFUNC(SEL_UPDATE,FXFileList::ID_CUT_SEL,FXFileList::onUpdHaveSel),
+  FXMAPFUNC(SEL_UPDATE,FXFileList::ID_COPY_SEL,FXFileList::onUpdHaveSel),
+  FXMAPFUNC(SEL_UPDATE,FXFileList::ID_DELETE_SEL,FXFileList::onUpdHaveSel),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_HEADER,FXFileList::onCmdHeader),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_DIRECTORY_UP,FXFileList::onCmdDirectoryUp),
   FXMAPFUNC(SEL_COMMAND,FXFileList::ID_SORT_BY_NAME,FXFileList::onCmdSortByName),
@@ -200,7 +199,7 @@ FXFileList::FXFileList(){
   draggable=true;
   timestamp=0;
   counter=0;
-  };
+  }
 
 
 // File List
@@ -471,89 +470,8 @@ FXint FXFileList::descendingGroup(const FXIconItem* a,const FXIconItem* b){
 
 /*******************************************************************************/
 
-
-// Make URI list from array of filenames
-FXint encodeURIList(FXString& list,const FXString* files){
-  register FXint n=0;
-  list.clear();
-  if(files){
-    while(!files[n].empty()){
-      list.append(FXURL::fileToURL(files[n++]));
-      list.append("\r\n");
-      }
-    }
-  return n;
-  }
-
-
-// Make array of filenames from URI list
-FXint decodeURIList(FXString*& files,const FXString& list){
-  register FXint beg,end,n=0;
-  files=NULL;
-  if(!list.empty()){
-    files=new FXString [list.contains("\r\n")+2];
-    for(beg=n=0; beg<list.length(); beg=end+2){
-      if((end=list.find_first_of("\r\n",beg))<0) end=list.length();
-      files[n++]=FXURL::fileFromURL(list.mid(beg,end-beg));
-      }
-    }
-  return n;
-  }
-
-
-#if 0
- - kde_clipboard=registerDragType("application/x-kde-cutselection");
- - gnome_clipboard=registerDragType("x-special/gnome-copied-files");
- - gnome_dragndrop=registerDragType("x-special/gnome-icon-list");
- - urilistType
-
-
-My internal code to keep track of the selected files put on the clipboard:
-
-   for(int i=0; i<filelist->getNumItems(); i++){
-     if(filelist->isItemSelected(i) && filelist->getItemFilename(i)!=".." && filelist->getItemFilename(i)!="."){
-       clipboard.append(FXURL::fileToURL(filelist->getItemPathname(i)));
-       }
-     }
-
-The actual request is handled like this:
-
-  if (event->target==fileapp->kde_clipboard) {
-    /// 1 == cut, 0 == copy
-    setDNDData(FROM_CLIPBOARD,event->target,clipboard_cut ? "1" : "0");
-    }
-  else if (event->target==urilistType){
-    FXString list;
-    list+=clipboard[0];
-    for (int i=1;i<clipboard.no();i++){
-      list+="\r\n";
-      list+=clipboard[i];
-      }
-    setDNDData(FROM_CLIPBOARD,event->target,list);
-    }
-  else if (event->target==fileapp->gnome_clipboard){
-    FXString list;
-
-    if (clipboard_cut)
-      list+="cut\n";
-    else
-      list+="copy\n";
-
-    list+=clipboard[0];
-    for (int i=1;i<clipboard.no();i++){
-      list+="\n";
-      list+=clipboard[i];
-      }
-    setDNDData(FROM_CLIPBOARD,event->target,list);
-    }
-
-#endif
-
-
-/*******************************************************************************/
-
 // Delete selection
-long FXFileList::onCmdDeleteSel(FXObject*,FXSelector,void*){
+long FXFileList::onCmdDeleteSel(FXObject*,FXSelector,void*){    // FIXME
   FXString delfiles=getSelectedFiles();
   ////
   return 1;
@@ -561,17 +479,20 @@ long FXFileList::onCmdDeleteSel(FXObject*,FXSelector,void*){
 
 
 // Paste clipboard
-long FXFileList::onCmdPasteSel(FXObject*,FXSelector,void*){
-  FXString pastefiles,action;
-  if(getDNDData(FROM_CLIPBOARD,urilistType,pastefiles)){
-    getDNDData(FROM_CLIPBOARD,actionType,action);
-    if(action=="1"){
-      FXTRACE((1,"Cut files: %s\n",pastefiles.text()));
-      }
-    else{
-      FXTRACE((1,"Copy files: %s\n",pastefiles.text()));
+long FXFileList::onCmdPasteSel(FXObject*,FXSelector,void*){     // FIXME
+  FXString files,action;
+  if(getDNDData(FROM_CLIPBOARD,urilistType,files)){
+    if(getDNDData(FROM_CLIPBOARD,actionType,action)){
+      if(action=="1"){  // Cut
+        FXTRACE((1,"CUT Files: %s\n",files.text()));
+        }
+      else{             // Copy
+        FXTRACE((1,"COPY Files: %s\n",files.text()));
+        }
+      return 1;
       }
     }
+  getApp()->beep();
   return 1;
   }
 
@@ -579,7 +500,7 @@ long FXFileList::onCmdPasteSel(FXObject*,FXSelector,void*){
 // Cut
 long FXFileList::onCmdCutSel(FXObject*,FXSelector,void*){
   FXDragType types[2]={urilistType,actionType};
-  if(acquireClipboard(types,2)){
+  if(acquireClipboard(types,ARRAYNUMBER(types))){
     clipfiles=getSelectedFiles();
     clipcut=true;
     }
@@ -590,10 +511,23 @@ long FXFileList::onCmdCutSel(FXObject*,FXSelector,void*){
 // Copy
 long FXFileList::onCmdCopySel(FXObject*,FXSelector,void*){
   FXDragType types[2]={urilistType,actionType};
-  if(acquireClipboard(types,2)){
+  if(acquireClipboard(types,ARRAYNUMBER(types))){
     clipfiles=getSelectedFiles();
     clipcut=false;
     }
+  return 1;
+  }
+
+
+// Update if we have selection
+long FXFileList::onUpdHaveSel(FXObject* sender,FXSelector,void*){
+  for(FXint i=0; i<getNumItems(); i++){
+    if(isItemSelected(i) && !isItemNavigational(i)){
+      sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+      return 1;
+      }
+    }
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
@@ -603,6 +537,7 @@ long FXFileList::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXIconList::onClipboardLost(sender,sel,ptr);
   FXTRACE((1,"deleting clipfiles\n"));
   clipfiles=FXString::null;
+  clipcut=false;
   return 1;
   }
 
@@ -610,30 +545,27 @@ long FXFileList::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
 // Somebody wants our selection
 long FXFileList::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
+  FXTRACE((1,"FXFileList::onClipboardRequest: requested: %d\n",((FXEvent*)ptr)->target));
+
   // Try base class first
   if(FXIconList::onClipboardRequest(sender,sel,ptr)) return 1;
 
   // Return list of filenames as a uri-list
   if(((FXEvent*)ptr)->target==urilistType){
+    FXTRACE((1,"Returning urilistType\n"));
     setDNDData(FROM_CLIPBOARD,urilistType,clipfiles);
     return 1;
     }
 
   // Return type of clipboard action
   if(((FXEvent*)ptr)->target==actionType){
+    FXTRACE((1,"Returning actionType\n"));
     setDNDData(FROM_CLIPBOARD,actionType,clipcut?"1":"0");
     return 1;
     }
 
-  // Gnome clipboard
-//  if(((FXEvent*)ptr)->target==gnome_clipboard){
-//    setDNDData(FROM_CLIPBOARD,gnome_clipboard,clipcut?"cut\n"+string:"copy\n"+clipfiles);
-//    return 1;
-//    }
-
   return 0;
   }
-
 
 /*******************************************************************************/
 
@@ -953,7 +885,7 @@ long FXFileList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
 // Cycle through items that represent images
 long FXFileList::onPreviewChore(FXObject*,FXSelector,void* ptr){
   FXint index=(FXint)(FXival)ptr;
-  if(index<getNumItems() && iconloader){
+  if(showImages() && iconloader && index<getNumItems()){
     FXIcon *icon=iconloader->loadScaledIconFile(getApp(),getItemPathname(index),imagesize);;
     if(icon){
       icon->create();

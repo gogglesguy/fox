@@ -58,7 +58,7 @@ FXTextInsert::FXTextInsert(FXText* txt,FXint p,FXint ni,const FXchar* ins):FXTex
 
 // Undo an insert removes the inserted text
 void FXTextInsert::undo(){
-  text->removeText(pos,nins,TRUE);
+  text->removeText(pos,nins,true);
   text->setCursorPos(pos);
   text->makePositionVisible(pos);
   }
@@ -66,7 +66,7 @@ void FXTextInsert::undo(){
 
 // Redo an insert inserts the same old text again
 void FXTextInsert::redo(){
-  text->insertText(pos,buffer,nins,TRUE);
+  text->insertText(pos,buffer,nins,true);
   text->setCursorPos(pos+nins);
   text->makePositionVisible(pos+nins);
   }
@@ -83,7 +83,7 @@ FXTextDelete::FXTextDelete(FXText* txt,FXint p,FXint nd,const FXchar* del):FXTex
 
 // Undo a delete reinserts the old text
 void FXTextDelete::undo(){
-  text->insertText(pos,buffer,ndel,TRUE);
+  text->insertText(pos,buffer,ndel,true);
   text->setCursorPos(pos+ndel);
   text->makePositionVisible(pos+ndel);
   }
@@ -91,7 +91,7 @@ void FXTextDelete::undo(){
 
 // Redo a delete removes it again
 void FXTextDelete::redo(){
-  text->removeText(pos,ndel,TRUE);
+  text->removeText(pos,ndel,true);
   text->setCursorPos(pos);
   text->makePositionVisible(pos);
   }
@@ -109,7 +109,7 @@ FXTextReplace::FXTextReplace(FXText* txt,FXint p,FXint nd,FXint ni,const FXchar*
 
 // Undo a replace reinserts the old text
 void FXTextReplace::undo(){
-  text->replaceText(pos,nins,buffer,ndel,TRUE);
+  text->replaceText(pos,nins,buffer,ndel,true);
   text->setCursorPos(pos+ndel);
   text->makePositionVisible(pos+ndel);
   }
@@ -117,7 +117,7 @@ void FXTextReplace::undo(){
 
 // Redo a replace reinserts the new text
 void FXTextReplace::redo(){
-  text->replaceText(pos,ndel,buffer+ndel,nins,TRUE);
+  text->replaceText(pos,ndel,buffer+ndel,nins,true);
   text->setCursorPos(pos+nins);
   text->makePositionVisible(pos+nins);
   }

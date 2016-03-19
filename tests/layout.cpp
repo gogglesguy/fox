@@ -321,7 +321,7 @@ long ButtonWindow::onCmdLayoutSide(FXObject*,FXSelector sel,void*){
 long ButtonWindow::onUpdLayoutSide(FXObject* sender,FXSelector sel,void*){
   if(lastButton){
     FXuint hints=lastButton->getLayoutHints()&LAYOUT_SIDE_MASK;
-    FXint equal=FALSE;
+    FXint equal=false;
     switch(FXSELID(sel)){
       case ID_LAYOUT_SIDE_TOP:    equal=(hints==LAYOUT_SIDE_TOP); break;
       case ID_LAYOUT_SIDE_BOTTOM: equal=(hints==LAYOUT_SIDE_BOTTOM); break;
@@ -357,7 +357,7 @@ long ButtonWindow::onCmdLayoutHorz(FXObject*,FXSelector sel,void*){
 long ButtonWindow::onUpdLayoutHorz(FXObject* sender,FXSelector sel,void*){
   if(lastButton){
     FXuint hints=lastButton->getLayoutHints()&LAYOUT_HORZ_MASK;
-    FXint equal=FALSE;
+    FXint equal=false;
     switch(FXSELID(sel)){
       case ID_LAYOUT_LEFT:     equal=(hints==LAYOUT_LEFT); break;
       case ID_LAYOUT_RIGHT:    equal=(hints==LAYOUT_RIGHT); break;
@@ -394,7 +394,7 @@ long ButtonWindow::onCmdLayoutVert(FXObject*,FXSelector sel,void*){
 long ButtonWindow::onUpdLayoutVert(FXObject* sender,FXSelector sel,void*){
   if(lastButton){
     FXuint hints=lastButton->getLayoutHints()&LAYOUT_VERT_MASK;
-    FXint equal=FALSE;
+    FXint equal=false;
     switch(FXSELID(sel)){
       case ID_LAYOUT_TOP:      equal=(hints==LAYOUT_TOP); break;
       case ID_LAYOUT_BOTTOM:   equal=(hints==LAYOUT_BOTTOM); break;
@@ -430,7 +430,7 @@ long ButtonWindow::onCmdLayoutWidth(FXObject*,FXSelector sel,void*){
 long ButtonWindow::onUpdLayoutWidth(FXObject* sender,FXSelector sel,void*){
   if(lastButton){
     FXuint hints=lastButton->getLayoutHints()&LAYOUT_WIDTH_MASK;
-    FXint equal=FALSE;
+    FXint equal=false;
     switch(FXSELID(sel)){
       case ID_LAYOUT_MIN_WIDTH: equal=(hints==LAYOUT_MIN_WIDTH); break;
       case ID_LAYOUT_FIX_WIDTH: equal=(hints==LAYOUT_FIX_WIDTH); break;
@@ -464,7 +464,7 @@ long ButtonWindow::onCmdLayoutHeight(FXObject*,FXSelector sel,void*){
 long ButtonWindow::onUpdLayoutHeight(FXObject* sender,FXSelector sel,void*){
   if(lastButton){
     FXuint hints=lastButton->getLayoutHints()&LAYOUT_HEIGHT_MASK;
-    FXint equal=FALSE;
+    FXint equal=false;
     switch(FXSELID(sel)){
       case ID_LAYOUT_MIN_HEIGHT: equal=(hints==LAYOUT_MIN_HEIGHT); break;
       case ID_LAYOUT_FIX_HEIGHT: equal=(hints==LAYOUT_FIX_HEIGHT); break;

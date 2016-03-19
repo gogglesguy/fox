@@ -110,7 +110,7 @@ public:
   virtual void killFocus();
 
   /// Set as default button
-  virtual void setDefault(FXuchar flag=TRUE);
+  virtual void setDefault(FXuchar flag=true);
 
   /// Set the button state
   void setState(FXuint s);

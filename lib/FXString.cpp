@@ -44,22 +44,27 @@
 
   - UTF-8 Encoding scheme:
 
-      U-00000000 - U-0000007F 0xxxxxxx
-      U-00000080 - U-000007FF 110xxxxx 10xxxxxx
-      U-00000800 - U-0000FFFF 1110xxxx 10xxxxxx 10xxxxxx
-      U-00010000 - U-001FFFFF 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-      U-00200000 - U-03FFFFFF 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
-      U-04000000 - U-7FFFFFFF 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
-
-    The last two cases shouldn't occur since all unicode is between 0 and 0x10FFFF.
+      Hex Range                 Binary                          Encoding
+      -----------------------   -----------------------------   -----------------------------------
+      U-00000000 - U-0000007F   0000 0000 0000 0000 0xxx xxxx   0xxxxxxx
+      U-00000080 - U-000007FF   0000 0000 0000 0yyy yyxx xxxx   110yyyyy 10xxxxxx
+      U-00000800 - U-0000FFFF   0000 0000 zzzz yyyy yyxx xxxx   1110zzzz 10yyyyyy 10xxxxxx
+      U-00010000 - U-001FFFFF   000u uuzz zzzz yyyy yyxx xxxx   11110uuu 10zzzzzz 10yyyyyy 10xxxxxx
 
   - UTF-16 Encoding scheme:
 
-      W1 = 110110yy yyyyyyyy
-      W2 = 110111xx xxxxxxxx
+      Hex Range                 Binary                          Encoding
+      -----------------------   -----------------------------   -----------------------------------
+      U-00000000 - U-0000FFFF   0000 0000 xxxx xxxx xxxx xxxx   xxxxxxxx xxxxxxxx
+      U-00010000 - U-0010FFFF   000y yyyy yyyy yyxx xxxx xxxx   110110zz zzzzzzzz 110111xx xxxxxxxx
+      
+    The range U-D800 - U-DFFF is reserved for surrogate pairs; Leading-surrogates or high-surrogates 
+    are from U-D800 to U-DBFF, and trailing-surrogates or low-surrogates are from U-DC00 to U-DFFF.
+    Surrogates CH and CL are computed as follows for U > 0x10000:
 
-    Leading-surrogates or high-surrogates are from D800 to DBFF, and trailing-surrogates
-    or low-surrogates are from DC00 to DFFF.
+      CH = (U >> 10) + 0xD800
+      CL = (U & 0x3FF) + 0xDC00
+    
 */
 
 

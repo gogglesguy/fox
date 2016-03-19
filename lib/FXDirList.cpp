@@ -116,6 +116,7 @@ FXDEFMAP(FXDirList) FXDirListMap[]={
   FXMAPFUNC(SEL_UPDATE,FXDirList::ID_SET_PATTERN,FXDirList::onUpdSetPattern),
   FXMAPFUNC(SEL_UPDATE,FXDirList::ID_SORT_REVERSE,FXDirList::onUpdSortReverse),
   FXMAPFUNC(SEL_UPDATE,FXDirList::ID_SORT_CASE,FXDirList::onUpdSortCase),
+  FXMAPFUNC(SEL_UPDATE,FXDirList::ID_DELETE_SEL,FXDirList::onUpdHaveSel),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_SETVALUE,FXDirList::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE,FXDirList::onCmdSetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_GETSTRINGVALUE,FXDirList::onCmdGetStringValue),
@@ -129,6 +130,7 @@ FXDEFMAP(FXDirList) FXDirListMap[]={
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_SORT_REVERSE,FXDirList::onCmdSortReverse),
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_SORT_CASE,FXDirList::onCmdSortCase),
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_REFRESH,FXDirList::onCmdRefresh),
+  FXMAPFUNC(SEL_COMMAND,FXDirList::ID_DELETE_SEL,FXDirList::onCmdDeleteSel),
   FXMAPFUNC(SEL_CHORE,FXDirList::ID_DROPASK,FXDirList::onCmdDropAsk),
   FXMAPFUNC(SEL_CHORE,FXDirList::ID_DROPCOPY,FXDirList::onCmdDropCopy),
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_DROPCOPY,FXDirList::onCmdDropCopy),
@@ -283,6 +285,36 @@ FXint FXDirList::ascendingCase(const FXTreeItem* pa,const FXTreeItem* pb){
 FXint FXDirList::descendingCase(const FXTreeItem* pa,const FXTreeItem* pb){
   register FXint diff=static_cast<const FXDirItem*>(pb)->isDirectory() - static_cast<const FXDirItem*>(pa)->isDirectory();
   return diff ? diff : comparecase(pb->label,pa->label);
+  }
+
+/*******************************************************************************/
+
+// Update if we have selection
+long FXDirList::onUpdHaveSel(FXObject* sender,FXSelector,void*){
+  FXTreeItem *item=getFirstItem();
+  while(item){
+    if(isItemSelected(item)){
+      sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+      return 1;
+      }
+    if(item->getFirst()){
+      item=item->getFirst();
+      }
+    else{
+      while(!item->getNext() && item->getParent()) item=item->getParent();
+      item=item->getNext();
+      }
+    }
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Delete selection
+long FXDirList::onCmdDeleteSel(FXObject*,FXSelector,void*){     // FIXME
+  FXString delfiles=getSelectedFiles();
+  ////
+  return 1;
   }
 
 /*******************************************************************************/

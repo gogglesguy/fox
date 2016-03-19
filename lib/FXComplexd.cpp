@@ -108,6 +108,17 @@ using namespace FX;
 namespace FX {
 
 
+/*
+// Complex square root
+FXComplexd csqrt(const FXComplexd& c) const {
+  register FXdouble mag=c.modulus();
+  register FXdouble rr=sqrt((mag+c.re)*0.5);
+  register FXdouble ii=sqrt((mag-c.re)*0.5);
+  return FXComplexd(rr,copysign(ii,c.im));
+  }
+*/
+  
+  
 FXStream& operator<<(FXStream& store,const FXComplexd& c){
   store << c.re << c.im;
   return store;

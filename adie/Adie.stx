@@ -172,7 +172,7 @@ language "Registry"
     pattern   "^\s*?\[[^]]*?\]\s*?$"
   end
   rule "RegistryEntry"
-    openpattern   "^\s*?[!\"$%&'()*+,\-./:;<>?@\[\\\]^\`{|}~\w]*?\s*?(?==)"
+    openpattern   "^[^=]*?(?==)"
     closepattern  "$"
     stoppattern   "$"
     rule "RegistryEquals"
@@ -348,7 +348,7 @@ language "C++"
   end
 
   rule "Keyword"
-    pattern     "\<(alignas|alignof|and_eq|and|asm|auto|bitand|bitor|break|case|catch|class|compl|constexpr|const_cast|const|continue|decltype|default|delete|do|dynamic_cast|else|enum|explicit|export|extern|final|for|friend|goto|if|inline|mutable|namespace|new|noexcept|not_eq|not|nullptr|operator|or_eq|or|override|private|protected|public|register|reinterpret_cast|return|sizeof|static_cast|static|struct|switch|template|this|thread_local|throw|try|typedef|typeid|typename|union|using|virtual|volatile|while|xor_eq|xor|true|false)\>"
+    pattern     "\<(alignas|alignof|and_eq|and|asm|auto|bitand|bitor|break|case|catch|class|compl|constexpr|const_cast|const|continue|decltype|default|delete|do|dynamic_cast|else|enum|explicit|export|extern|final|for|friend|goto|if|inline|mutable|namespace|new|noexcept|not_eq|not|nullptr|operator|or_eq|or|override|private|protected|public|register|reinterpret_cast|return|sizeof|static_cast|static|struct|switch|template|this|thread_local|throw|try|typedef|typeid|typename|union|using|virtual|volatile|while|xor_eq|xor|true|false|maybe)\>"
   end
 
   rule "Number"
@@ -1923,3 +1923,85 @@ language "Go"
   end
 
 end
+
+
+
+# Ada Programming Language
+language "Fortran"
+
+  # File patterns for this language mode
+  filesmatch "*.f,*.F,*.f90,*.F90,*.interface,*.INTERFACE"
+
+  contextlines 1
+
+  # Word delimiters
+  delimiters "~.,/\`'!@$%^&*()-=+{}|[]\":;<>?"
+
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
+
+  # Comment
+  rule "Comment"
+    openpattern   "!|^C|^\*"
+    closepattern  "$"
+    rule "FIXME"
+      pattern     "FIXME"
+    end
+  end
+
+  # Decimal number
+  rule "Number"
+    pattern     "(([bBoOzZ](('\h+')|(\"\h+\")))|(((\.\d+)|(\d+(\.\d*)?))([eEdD][-+]?\d+)?)|(?i\.true\.|\.false\.))(_\d)?"
+  end
+
+  # String
+  rule "String"
+    openpattern   "'"
+    closepattern  "'"
+    stoppattern   "$"
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+  end
+
+  # Types
+  rule "Types"
+    pattern     "\<(?iINTEGER|REAL|COMPLEX|DOUBLE *?PRECISION|CHARACTER|LOGICAL|TYPE|END *?TYPE)\>"
+  end
+
+  # Attribute
+  rule "Attribute"
+    pattern     "\<(?iPARAMETER|ALLOCATABLE|DIMENSION|EXTERNAL|INTENT *?(IN|OUT|INOUT)|INTRINSIC|OPTIONAL|POINTER|SAVE|TARGET|PRIVATE|PUBLIC|KIND|IMPLICIT( *?NONE)?|COMMON|NAMELIST|EQUIVALENCE|DATA|SEQUENCE)\>"
+  end
+
+  # Reserved keywords
+  rule "Keyword"
+    pattern     "\<(?iINCLUDE|IF|THEN|ELSE *?IF|ELSE|END *?IF|SELECT *?CASE|CASE|DEFAULT|END *?SELECT|DO *?WHILE|DO|END *?DO|CYCLE|CONTINUE|GO *?TO|MODULE|CONTAINS|USE|ONLY|END *?MODULE|SUBROUTINE|END *?SUBROUTINE|PROGRAM|END *?PROGRAM|INTERFACE|END *?INTERFACE|FUNCTION|END *?FUNCTION|EXIT|CALL|RETURN|RECURSIVE|WHERE|ELSE *?WHERE|END *?WHERE|FORALL|END *?FORALL|END)\>"
+  end
+
+  # Operators
+  rule "Operator"
+    pattern     "(?i\.AND\.|\.OR\.|\.NOT\.|\.EQV\.|\.NEQV\.|\.EQ\.|\.NE\.|\.LT\.|\.LE\.|\.GT\.|\.GE\.|<=|<|>=|>|==|/=|%|\*\*|\*|\+|\-|/|=|\(|\)|:|,|//)"
+  end
+
+  # Identifiers
+  rule "Identifier"
+    pattern     "\<(\l[\l\d_]*)\>"
+  end
+end
+
+

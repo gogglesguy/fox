@@ -188,8 +188,8 @@ ShutterBug::ShutterBug(FXApp* a):FXShell(a,0,0,0,0,0){
   size=0;
   delay=2000000000;
   rate=1000000000;
-  inside=FALSE;
-  quantize=TRUE;
+  inside=false;
+  quantize=true;
   spotx=0;
   spoty=0;
   mode=MODE_NONE;
@@ -259,10 +259,10 @@ void ShutterBug::readRegistry(){
   delay=getApp()->reg().readLongEntry("SETTINGS","snapdelay",2000000000);
   rate=getApp()->reg().readLongEntry("SETTINGS","snaprate",1000000000);
   filecount=getApp()->reg().readIntEntry("SETTINGS","count",1);
-  inside=getApp()->reg().readIntEntry("SETTINGS","inside",FALSE);
+  inside=getApp()->reg().readIntEntry("SETTINGS","inside",false);
   color=getApp()->reg().readColorEntry("SETTINGS","color",FXRGB(255,128,128));
   size=getApp()->reg().readIntEntry("SETTINGS","size",0);
-  quantize=getApp()->reg().readIntEntry("SETTINGS","quantize",TRUE);
+  quantize=getApp()->reg().readIntEntry("SETTINGS","quantize",true);
   if(size){
     if(size<0){
       rectangle.x=0;
@@ -491,7 +491,7 @@ void ShutterBug::showSnapRectangle(){
   snapper[1]->raise();
   snapper[2]->raise();
   snapper[3]->raise();
-  getApp()->flush(TRUE);
+  getApp()->flush(true);
   }
 
 
@@ -501,7 +501,7 @@ void ShutterBug::hideSnapRectangle(){
   snapper[1]->hide();
   snapper[2]->hide();
   snapper[3]->hide();
-  getApp()->flush(TRUE);
+  getApp()->flush(true);
   }
 
 
@@ -514,7 +514,7 @@ FXbool ShutterBug::snapRectangleShown() const {
 // Read pixels from root to image
 void ShutterBug::readPixels(FXImage* image,const FXRectangle& r){
   FXDCWindow dc(image);
-  dc.clipChildren(FALSE);
+  dc.clipChildren(false);
   dc.setFunction(BLT_SRC);
   dc.drawArea(getRoot(),r.x,r.y,r.w,r.h,0,0);
   }
@@ -529,10 +529,10 @@ FXbool ShutterBug::grabRectangle(FXColor*& pixels,const FXRectangle& r){
       image.create();
       readPixels(&image,r);
       image.restore();
-      return TRUE;
+      return true;
       }
     }
-  return FALSE;
+  return false;
   }
 
 
@@ -594,7 +594,7 @@ x:  freeElms(pixels);
 
 // Save an image
 FXbool ShutterBug::saveImage(const FXString& file,FXColor* pixels,FXint w,FXint h){
-  FXbool ok=FALSE;
+  FXbool ok=false;
   FXFileStream outfile;
   if(outfile.open(file,FXStreamSave)){
     switch(fileformat){
@@ -788,7 +788,7 @@ long ShutterBug::onCmdRecordMovie(FXObject*,FXSelector,void*){
 long ShutterBug::onCmdRecordFrame(FXObject*,FXSelector,void*){
   FXint curx,cury; FXuint state;
   FXColor *pointer=NULL;
-  FXbool ok=FALSE;
+  FXbool ok=false;
   FXWindow *root=getRoot();
   filename=filenameFromFrame(filename,filecount);
   FXTRACE((1,"Snap Frame: %s\n",filename.text()));
@@ -1026,7 +1026,7 @@ long ShutterBug::onCmdLineWeight(FXObject*,FXSelector sel,void*){
 // Change line color
 long ShutterBug::onCmdLineColor(FXObject*,FXSelector,void*){
   FXColorDialog colordialog(this,tr("Line Color"));
-  colordialog.setOpaqueOnly(TRUE);
+  colordialog.setOpaqueOnly(true);
   colordialog.setRGBA(color);
   if(colordialog.execute()){
     color=colordialog.getRGBA();

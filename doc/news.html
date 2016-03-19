@@ -17,7 +17,39 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-January 129 - FOX DEVELOPMENT 1.7.46
+May 19 - FOX DEVELOPMENT 1.7.47
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Project files updated to Visual Studio 2008.</li>
+<li>Much faster file dialog due to using file extension and PATHEXT for executable status.</li>
+<li>PathFinder lists files about to be deleted.</li>
+<li>New API's to list widgets for much more convenient way to populate with fixed lists of items.</li>
+<li>New selectAll() API added to list widgets.</li>
+<li>Updated syntax coloring file Adie.stx with FORTRAN syntax coloring.</li>
+<li>IMAGE_ALPHAGUESS used when loading BMP icons in FXIconSource.</li>
+<li>Added APIs filesToURIList() and filesFromURIList() in FXURL namespace.</li>
+<li>Bug fix in FXStringDictionary.</li>
+<li>Bug fixes in FXThreadPool.</li>
+<li>Replaced preprocessor <b>MAYBE</b> with enum <b>maybe</b>.</li>
+<li>Message map search improvement using branch probability macro and test-order.</li>
+<li>TIFF image loader improvements.</li>
+<li>FXString::format() now knows about thousands separator option for printing floating point.</li>
+<li>Bugs fixed in IRIS RGB image support.</li>
+<li>FXObjectListOf::adopt() argument should not have been declared const.</li>
+<li>Suggested file extension changes automatically ONLY when picking existing file.</li>
+<li>New hasExecExtension() API added to FXPath (Windows specific).</li>
+<li>Integer overflow fixed in FXApp having to do with click speed interval.</li>
+<li>New API getExecExtensions() added in FXSystem (Windows specific).</li>
+<li>If pipe2() system call not available, try set file descriptor flags with fcntl() instead.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+January 29 - FOX DEVELOPMENT 1.7.46
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
@@ -26,7 +58,7 @@ January 129 - FOX DEVELOPMENT 1.7.46
 <li>A default FXIconSource implementation in FOX will be used to load icons if not overloaded by a user-extended one
 explicitly.</li>
 <li>Replaced FXIconDict with FXIconCache.</li>
-<li>Replaced FXFileDict with FXFileAssociations.  The new implementation uses FXDictionary, 
+<li>Replaced FXFileDict with FXFileAssociations.  The new implementation uses FXDictionary,
 and the new FXIconCache.</li>
 <li>Fixed problem in FXDictionary: object pointed to by data is itself not const.  This affects const-accessors.</li>
 <li>Fixed bug in Adie: dumping core when started with unknown commandline parameter.</li>

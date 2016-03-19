@@ -435,6 +435,18 @@ FXint FXComboBox::fillItems(const FXchar** strings,FXbool notify){
   }
 
 
+// Fill list by appending items from array of strings
+FXint FXComboBox::fillItems(const FXString* strings,FXbool notify){
+  register FXint numberofitems=list->getNumItems();
+  register FXint n=list->fillItems(strings);
+  recalc();
+  if(numberofitems<=list->getCurrentItem()){
+    setText(list->getItemText(list->getCurrentItem()),notify);
+    }
+  return n;
+  }
+
+
 // Fill list by appending items from newline separated strings
 FXint FXComboBox::fillItems(const FXString& strings,FXbool notify){
   register FXint numberofitems=list->getNumItems();

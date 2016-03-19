@@ -28,7 +28,12 @@
 #include "FXObject.h"
 #include "FXElement.h"
 #include "FXException.h"
+#include "FXRectangle.h"
+#include "FXStream.h"
+#include "FXString.h"
+#include "FXEvent.h"
 
+#include "FXDebugTarget.h"
 
 /*
   Notes:
@@ -185,10 +190,11 @@ FXObject* FXMetaClass::makeInstance() const {
 // Find function
 const void* FXMetaClass::search(FXSelector key) const {
   register const FXObject::FXMapEntry* lst=(const FXObject::FXMapEntry*)assoc;
+  register FXuint inc=assocsz;
   register FXuint n=nassocs;
   while(n--){
-    if(lst->keylo<=key && key<=lst->keyhi) return lst;
-    lst=(const FXObject::FXMapEntry*) (((const FXchar*)lst)+assocsz);
+    if(__unlikely(key<=lst->keyhi) && __likely(lst->keylo<=key)) return lst;
+    lst=(const FXObject::FXMapEntry*) (((const FXchar*)lst)+inc);
     }
   return NULL;
   }
@@ -218,6 +224,35 @@ const FXMetaClass* FXMetaClass::getMetaClassFromName(const FXchar* name){
   return NULL;
   }
 
+
+/*
+  /// Dump all metaclasses
+  static void dumpMetaClasses();
+
+  /// Dump metaclass
+  void dumpMetaClass() const;
+*/
+
+/*
+// Dump all metaclasses
+void FXMetaClass::dumpMetaClasses(){
+  for(FXuint p=0; p<metaClassSlots; ++p){
+    if(metaClassTable[p]!=NULL && metaClassTable[p]!=EMPTY) metaClassTable[p]->dumpMetaClass();
+    }
+  }
+
+
+// Dump metaclass
+void FXMetaClass::dumpMetaClass() const {
+  const FXObject::FXMapEntry* lst=(const FXObject::FXMapEntry*)assoc;
+  FXuint n=nassocs;
+  fxmessage("%s : %s\n",className,baseClass?baseClass->className:"(root)");
+  while(n--){
+    fxmessage("  %s:%04x - %s:%04x\n",FXSELTYPE(lst->keylo)<SEL_LAST?FXDebugTarget::messageTypeName[FXSELTYPE(lst->keylo)]:"Unknown",FXSELID(lst->keylo),FXSELTYPE(lst->keyhi)<SEL_LAST?FXDebugTarget::messageTypeName[FXSELTYPE(lst->keyhi)]:"Unknown",FXSELID(lst->keyhi));
+    lst=(const FXObject::FXMapEntry*) (((const FXchar*)lst)+assocsz);
+    }
+  }
+*/
 
 // Destructor removes metaclass from the table
 FXMetaClass::~FXMetaClass(){

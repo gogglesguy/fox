@@ -165,8 +165,8 @@ FXString FXFileDialog::getDirectory() const {
 
 
 // Set current file pattern from the list
-void FXFileDialog::setCurrentPattern(FXint n){
-  filebox->setCurrentPattern(n);
+void FXFileDialog::setCurrentPattern(FXint patno){
+  filebox->setCurrentPattern(patno);
   }
 
 
@@ -399,8 +399,8 @@ FXString FXFileDialog::getOpenFilename(FXWindow* owner,const FXString& caption,c
   FXFileDialog opendialog(owner,caption);
   FXString filename;
   opendialog.setSelectMode(SELECTFILE_EXISTING);
-  opendialog.setFilename(path);
   opendialog.setPatternList(patterns);
+  opendialog.setFilename(path);
   opendialog.setCurrentPattern(initial);
   if(opendialog.execute()){
     filename=opendialog.getFilename();
@@ -414,8 +414,8 @@ FXString FXFileDialog::getOpenFilename(FXWindow* owner,const FXString& caption,c
 FXString FXFileDialog::getSaveFilename(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns,FXint initial){
   FXFileDialog savedialog(owner,caption);
   savedialog.setSelectMode(SELECTFILE_ANY);
-  savedialog.setFilename(path);
   savedialog.setPatternList(patterns);
+  savedialog.setFilename(path);
   savedialog.setCurrentPattern(initial);
   if(savedialog.execute()){
     return savedialog.getFilename();
@@ -428,8 +428,8 @@ FXString FXFileDialog::getSaveFilename(FXWindow* owner,const FXString& caption,c
 FXString* FXFileDialog::getOpenFilenames(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns,FXint initial){
   FXFileDialog opendialog(owner,caption);
   opendialog.setSelectMode(SELECTFILE_MULTIPLE);
-  opendialog.setFilename(path);
   opendialog.setPatternList(patterns);
+  opendialog.setFilename(path);
   opendialog.setCurrentPattern(initial);
   if(opendialog.execute()){
     return opendialog.getFilenames();

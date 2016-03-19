@@ -91,8 +91,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXTextField) FXTextFieldMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXTextField::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXTextField::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXTextField::onPaint),
   FXMAPFUNC(SEL_MOTION,0,FXTextField::onMotion),
   FXMAPFUNC(SEL_TIMEOUT,FXTextField::ID_BLINK,FXTextField::onBlink),
   FXMAPFUNC(SEL_TIMEOUT,FXTextField::ID_AUTOSCROLL,FXTextField::onAutoScroll),
@@ -250,7 +250,7 @@ FXbool FXTextField::canFocus() const { return true; }
 // Into focus chain
 void FXTextField::setFocus(){
   FXFrame::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   flags&=~FLAG_UPDATE;
   if(getApp()->hasInputMethod()){
     createComposeContext();
@@ -262,7 +262,7 @@ void FXTextField::setFocus(){
 // Out of focus chain
 void FXTextField::killFocus(){
   FXFrame::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   flags|=FLAG_UPDATE;
   if(flags&FLAG_CHANGED){
     flags&=~FLAG_CHANGED;
@@ -727,7 +727,7 @@ FXbool FXTextField::extendSelection(FXint pos){
 FXbool FXTextField::copySelection(){
   FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
   if(hasSelection()){
-    if(acquireClipboard(types,4)){
+    if(acquireClipboard(types,ARRAYNUMBER(types))){
       if(anchor<cursor)
         clipped=contents.mid(anchor,cursor-anchor);
       else

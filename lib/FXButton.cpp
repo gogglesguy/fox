@@ -68,8 +68,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXButton) FXButtonMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXButton::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXButton::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXButton::onPaint),
   FXMAPFUNC(SEL_ENTER,0,FXButton::onEnter),
   FXMAPFUNC(SEL_LEAVE,0,FXButton::onLeave),
   FXMAPFUNC(SEL_FOCUSIN,0,FXButton::onFocusIn),
@@ -105,8 +105,8 @@ FXButton::FXButton(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,
   message=sel;
   state=STATE_UP;
   if(options&BUTTON_INITIAL){
-    setInitial(TRUE);
-    setDefault(TRUE);
+    setInitial(true);
+    setDefault(true);
     }
   }
 
@@ -118,7 +118,7 @@ FXbool FXButton::canFocus() const { return true; }
 // Set focus to this widget
 void FXButton::setFocus(){
   FXLabel::setFocus();
-  if(options&BUTTON_DEFAULT) setDefault(TRUE);
+  if(options&BUTTON_DEFAULT) setDefault(true);
   update();
   }
 
@@ -126,7 +126,7 @@ void FXButton::setFocus(){
 // Kill focus to this widget
 void FXButton::killFocus(){
   FXLabel::killFocus();
-  if(options&BUTTON_DEFAULT) setDefault(MAYBE);
+  if(options&BUTTON_DEFAULT) setDefault(maybe);
   update();
   }
 

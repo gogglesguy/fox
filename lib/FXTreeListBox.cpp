@@ -374,6 +374,19 @@ FXint FXTreeListBox::fillItems(FXTreeItem* father,const FXchar** strings,FXIcon*
   }
 
 
+// Fill tree list box by appending items from array of strings
+FXint FXTreeListBox::fillItems(FXTreeItem* father,const FXString* strings,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
+  register FXTreeItem* currentitem=tree->getCurrentItem();
+  register FXint n=tree->fillItems(father,strings,oi,ci,ptr,notify);
+  if(currentitem!=tree->getCurrentItem()){
+    field->setIcon(tree->getItemClosedIcon(tree->getCurrentItem()));
+    field->setText(tree->getItemText(tree->getCurrentItem()));
+    }
+  recalc();
+  return n;
+  }
+
+
 // Fill tree list box by appending items from newline separated strings
 FXint FXTreeListBox::fillItems(FXTreeItem* father,const FXString& strings,FXIcon* oi,FXIcon* ci,void* ptr,FXbool notify){
   register FXTreeItem* currentitem=tree->getCurrentItem();

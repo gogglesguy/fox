@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                          T I F F   I n p u t / O u t p u t                    *
+*                        T I F F   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 2001,2014 Eric Gillet.   All Rights Reserved.                   *
@@ -29,25 +29,19 @@
 #include <tiffio.h>
 #endif
 
+
 /*
   Notes:
-  - Made it thread-safe.
   - Made error and warning handlers call FOX's warning handler.
   - References:
-    http://www.libtiff.org/
+    http://www.libtiff.org/libtiff.html
     ftp://ftp.onshore.com/pub/libtiff/TIFF6.ps.Z
     ftp://ftp.sgi.com/graphics/tiff/TTN2.draft.txt
     http://partners.adobe.com/asn/developer/technotes.html
   - Bugs: libtiff does not gracefully recover from certain errors;
     this causes core dump!
-  - FOX keeps order in FXColor to RGBA (i.e. red at lowest memory
-    address, alpha at highest). Currently not known if this does
-    or does not require swapping when read in.
-  - Updated for libtiff 3.6.1.
+  - ARGB means Alpha(0), Red(1), Green(2), Blue(3) in memory.
 */
-
-
-#define TIFF_SWAP(p) (((p)&0xff)<<24 | ((p)&0xff00)<<8 | ((p)&0xff0000)>>8 | ((p)&0xff000000)>>24)
 
 
 using namespace FX;
@@ -64,11 +58,8 @@ extern FXAPI FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint&
 extern FXAPI FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec);
 #endif
 
-// Furnish our own version
-extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 
 #ifdef HAVE_TIFF_H
-
 
 // Stuff being passed around
 struct tiff_store_handle {
@@ -128,17 +119,6 @@ static int tif_close_store(thandle_t){
   }
 
 
-// Dummy map file
-static int tif_map_store(thandle_t, tdata_t*, toff_t*){
-  return 0;
-  }
-
-
-// Dummy unmap file
-static void tif_unmap_store(thandle_t, tdata_t, toff_t){
-  }
-
-
 // Compute size of what's been written
 static toff_t tif_size_store(thandle_t handle){
   tiff_store_handle *h=(tiff_store_handle*)handle;
@@ -158,6 +138,7 @@ FXbool fxcheckTIF(FXStream& store){
 // Load a TIFF image
 FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
   tiff_store_handle s_handle;
+  FXuval size,s;
 
   // Null out
   data=NULL;
@@ -173,62 +154,184 @@ FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXush
   s_handle.begin=store.position();
   s_handle.end=store.position();
 
+  FXTRACE((100,"fxloadTIF\n"));
+
   // Open image
-  TIFF* image=TIFFClientOpen("tiff","rm",(thandle_t)&s_handle,tif_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,tif_map_store,tif_unmap_store);
+  TIFF* image=TIFFClientOpen("tiff","rm",(thandle_t)&s_handle,tif_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,NULL,NULL);
   if(image){
-    TIFFRGBAImage img;
-    char emsg[1024];
 
-
-    // We try to remember the codec for later when we save the image back out...
+    // Get sizes
+    TIFFGetField(image,TIFFTAG_IMAGEWIDTH,&width);
+    TIFFGetField(image,TIFFTAG_IMAGELENGTH,&height);
     TIFFGetField(image,TIFFTAG_COMPRESSION,&codec);
-    FXTRACE((100,"fxloadTIF: codec=%d\n",codec));
 
-    // Start image load
-    if(TIFFRGBAImageBegin(&img,image,0,emsg)){
+    FXTRACE((100,"fxloadTIF: width=%d height=%d codec=%d\n",width,height,codec));
 
-      // Make room for data
-      FXint size=img.width*img.height;
-      if(allocElms(data,size)){
-
-        // Get the pixels
-        if(TIFFRGBAImageGet(&img,(uint32*)data,img.width,img.height)){
-
-          // If we got this far, we have the data; nothing can go wrong from here on.
-          width=img.width;
-          height=img.height;
-
-          // Maybe flip image upside down?
-          if(img.orientation==ORIENTATION_TOPLEFT){
-            register FXColor *dn=data+(height-1)*width;
-            register FXColor *up=data;
-            register FXColor t;
-            while(up<dn){
-              for(FXint x=0; x<width; x++){ FXSWAP(up[x],dn[x],t); }
-              up+=width;
-              dn-=width;
-              }
-            }
-
-          // Convert to local format
-          for(FXint s=0; s<size; s++){
-            data[s]=((data[s]&0xff)<<16)|((data[s]&0xff0000)>>16)|(data[s]&0xff00)|(data[s]&0xff000000);
-            }
-
-          // Return with success
-          TIFFRGBAImageEnd(&img);
-          TIFFClose(image);
-          return true;
+    // Make room for data
+    size=width*height;
+    if(allocElms(data,size)){
+      if(TIFFReadRGBAImageOriented(image,width,height,data,ORIENTATION_TOPLEFT,0)){
+        for(s=0; s<size; s++){
+          data[s]=((data[s]&0xff)<<16)|((data[s]&0xff0000)>>16)|(data[s]&0xff00)|(data[s]&0xff000000);
           }
-        freeElms(data);
+        TIFFClose(image);
+        return true;
         }
-      TIFFRGBAImageEnd(&img);
+      freeElms(data);
       }
     TIFFClose(image);
     }
   return false;
   }
 
+#if 0
+
+/*******************************************************************************/
+
+// Load GEO TIFF
+FXbool fxloadTIF__(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
+  tiff_store_handle s_handle;
+  FXbool result=false;
+  TIFF* image;
+
+  // Null out
+  data=NULL;
+  width=0;
+  height=0;
+  codec=0;
+
+  // Set error/warning handlers
+  TIFFSetErrorHandler(NULL);
+  TIFFSetWarningHandler(NULL);
+
+  // Initialize
+  s_handle.store=&store;
+  s_handle.begin=store.position();
+  s_handle.end=store.position();
+
+  FXTRACE((100,"fxloadGEOTIF\n"));
+
+  // Open image
+  if((image=TIFFClientOpen("tiff","rm",(thandle_t)&s_handle,tif_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,NULL,NULL))!=NULL){
+    FXushort samples=0;
+    FXushort samplebits=0;
+    FXushort format=0;
+    FXuint   scanlinesize;
+    FXuchar *scanline;
+
+    // Get size
+    TIFFGetField(image,TIFFTAG_IMAGEWIDTH,&width);
+    TIFFGetField(image,TIFFTAG_IMAGELENGTH,&height);
+    TIFFGetField(image,TIFFTAG_SAMPLESPERPIXEL,&samples);
+    TIFFGetField(image,TIFFTAG_BITSPERSAMPLE,&samplebits);
+    TIFFGetField(image,TIFFTAG_SAMPLEFORMAT,&format);
+
+    // We try to remember the codec for later when we save the image back out...
+    TIFFGetField(image,TIFFTAG_COMPRESSION,&codec);
+
+    // Get line size (bytes)
+    scanlinesize=TIFFScanlineSize(image);
+
+    // Show image configuration
+    FXTRACE((100,"width=%d height=%d codec=%u samples=%u samplebits=%u format=%u scanlinesize=%u\n",width,height,codec,samples,samplebits,format,scanlinesize));
+
+    // Supported formats
+    if((format==SAMPLEFORMAT_UINT || format==SAMPLEFORMAT_INT || format==SAMPLEFORMAT_IEEEFP) && (samples==1 || samples==3)){
+
+      // Allocate scanline buffer
+      if(callocElms(scanline,scanlinesize)){
+
+        // Make room for data
+        if(callocElms(data,width*height)){
+
+/*
+
+    FXuint nPlanarConfig=0;
+    FXuint nCompressFlag=0;
+    FXuint nPhotometric=0;
+
+
+
+
+    TIFFGetField(image,TIFFTAG_PLANARCONFIG,&nPlanarConfig);
+    TIFFGetField(image,TIFFTAG_COMPRESSION,&nCompressFlag);
+    TIFFGetField(image,TIFFTAG_PHOTOMETRIC,&nPhotometric);
+
+    FXTRACE((100,"nPlanarConfig=%u\n",nPlanarConfig));
+    FXTRACE((100,"nCompressFlag=%u\n",nCompressFlag));
+    FXTRACE((100,"nPhotometric=%u\n",nPhotometric));
+
+    switch(nSampleFormat){
+      case SAMPLEFORMAT_UINT:
+        break;
+      case SAMPLEFORMAT_INT:
+        break;
+      case SAMPLEFORMAT_IEEEFP:
+        break;
+      case SAMPLEFORMAT_VOID:
+        break;
+      case SAMPLEFORMAT_COMPLEXINT:
+        break;
+      case SAMPLEFORMAT_COMPLEXIEEEFP:
+        break;
+      default:
+        break;
+      }
+*/
+
+          // Read lines
+          for(FXint y=0; y<height; ++y){
+            TIFFReadScanline(image,scanline,y,0);
+
+            if(samples==3){
+              if(samplebits==8){
+                for(FXint x=0; x<width; ++x){
+                  ((FXuchar*)&data[y*width+x])[0]=scanline[3*x+2];        // Blue
+                  ((FXuchar*)&data[y*width+x])[1]=scanline[3*x+1];        // Green
+                  ((FXuchar*)&data[y*width+x])[2]=scanline[3*x+0];        // Red
+                  ((FXuchar*)&data[y*width+x])[3]=255;                    // Alpha
+                  }
+                }
+              else if(samplebits==16){
+                for(FXint x=0; x<width; ++x){
+                  ((FXuchar*)&data[y*width+x])[0]=((FXushort*)scanline)[3*x+2]/257;
+                  ((FXuchar*)&data[y*width+x])[1]=((FXushort*)scanline)[3*x+1]/257;
+                  ((FXuchar*)&data[y*width+x])[2]=((FXushort*)scanline)[3*x+0]/257;
+                  ((FXuchar*)&data[y*width+x])[3]=255;
+                  }
+                }
+              }
+            else{
+              if(samplebits==8){
+                for(FXint x=0; x<width; ++x){
+                  ((FXuchar*)&data[y*width+x])[0]=scanline[x];          // Blue
+                  ((FXuchar*)&data[y*width+x])[1]=scanline[x];          // Green
+                  ((FXuchar*)&data[y*width+x])[2]=scanline[x];          // Red
+                  ((FXuchar*)&data[y*width+x])[3]=255;                  // Alpha
+                  }
+                }
+              else if(samplebits==16){
+                for(FXint x=0; x<width; ++x){
+                  ((FXuchar*)&data[y*width+x])[0]=((FXushort*)scanline)[x]/257;
+                  ((FXuchar*)&data[y*width+x])[1]=((FXushort*)scanline)[x]/257;
+                  ((FXuchar*)&data[y*width+x])[2]=((FXushort*)scanline)[x]/257;
+                  ((FXuchar*)&data[y*width+x])[3]=255;
+                  }
+                }
+              }
+            }
+
+          // Got as far as this if success
+          result=true;
+          }
+        }
+      freeElms(scanline);
+      }
+    TIFFClose(image);
+    }
+  return result;
+  }
+#endif
 
 /*******************************************************************************/
 
@@ -260,7 +363,7 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
     s_handle.end=store.position();
 
     // Open image
-    TIFF* image=TIFFClientOpen("tiff","w",(thandle_t)&s_handle,tif_dummy_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,tif_map_store,tif_unmap_store);
+    TIFF* image=TIFFClientOpen("tiff","w",(thandle_t)&s_handle,tif_dummy_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,NULL,NULL);
     if(image){
       FXColor *buffer=NULL;
 
@@ -276,7 +379,7 @@ FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FX
       TIFFSetField(image,TIFFTAG_ROWSPERSTRIP,rows_per_strip);
       TIFFSetField(image,TIFFTAG_BITSPERSAMPLE,8);
       TIFFSetField(image,TIFFTAG_SAMPLESPERPIXEL,4);
-      TIFFSetField(image,TIFFTAG_PLANARCONFIG,1);
+      TIFFSetField(image,TIFFTAG_PLANARCONFIG,PLANARCONFIG_CONTIG);
       TIFFSetField(image,TIFFTAG_PHOTOMETRIC,PHOTOMETRIC_RGB);
 
       // Allocate scanline buffer
@@ -308,12 +411,9 @@ x:      freeElms(buffer);
   return result;
   }
 
-
 /*******************************************************************************/
 
-
 #else
-
 
 // Check if stream contains a TIFF
 FXbool fxcheckTIF(FXStream&){
@@ -323,7 +423,8 @@ FXbool fxcheckTIF(FXStream&){
 
 // Stub routine
 FXbool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
-  static const FXuchar tiff_bits[] = {
+  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
+  static const FXuchar tiff_bits[]={
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
@@ -338,7 +439,7 @@ FXbool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& c
   register FXint p;
   allocElms(data,32*32);
   for(p=0; p<32*32; p++){
-    data[p]=(tiff_bits[p>>3]&(1<<(p&7))) ? FXRGB(0,0,0) : FXRGB(255,255,255);
+    data[p]=color[(tiff_bits[p>>3]>>(p&7))&1];
     }
   width=32;
   height=32;
@@ -351,7 +452,6 @@ FXbool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& c
 FXbool fxsaveTIF(FXStream&,const FXColor*,FXint,FXint,FXushort){
   return false;
   }
-
 
 #endif
 

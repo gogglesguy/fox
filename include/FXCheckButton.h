@@ -98,7 +98,7 @@ public:
   virtual FXint getDefaultHeight();
 
   /// Set check button state (TRUE, FALSE or MAYBE)
-  void setCheck(FXuchar state=TRUE,FXbool notify=false);
+  void setCheck(FXuchar state=true,FXbool notify=false);
 
   /// Get check button state (TRUE, FALSE or MAYBE)
   FXuchar getCheck() const { return check; }

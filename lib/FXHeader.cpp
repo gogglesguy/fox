@@ -662,6 +662,18 @@ FXint FXHeader::fillItems(const FXchar** strings,FXIcon *icon,FXint size,void* p
   }
 
 
+// Fill list by appending items from array of strings
+FXint FXHeader::fillItems(const FXString* strings,FXIcon *icon,FXint size,void* ptr,FXbool notify){
+  register FXint n=0;
+  if(strings){
+    while(!strings[n].empty()){
+      appendItem(strings[n++],icon,size,ptr,notify);
+      }
+    }
+  return n;
+  }
+
+
 // Fill list by appending items from newline separated strings
 FXint FXHeader::fillItems(const FXString& strings,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   register FXint n=0;

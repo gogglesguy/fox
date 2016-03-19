@@ -63,8 +63,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXArrowButton) FXArrowButtonMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXArrowButton::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXArrowButton::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXArrowButton::onPaint),
   FXMAPFUNC(SEL_ENTER,0,FXArrowButton::onEnter),
   FXMAPFUNC(SEL_LEAVE,0,FXArrowButton::onLeave),
   FXMAPFUNC(SEL_TIMEOUT,FXArrowButton::ID_AUTO,FXArrowButton::onAuto),

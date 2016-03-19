@@ -198,7 +198,7 @@ SplitterWindow::SplitterWindow(FXApp* a):FXMainWindow(a,"Splitter Test",NULL,NUL
         tree->appendItem(twig,"Fourth-Third-Second",doc,doc);
         tree->appendItem(twig,"Fourth-Third-Third",doc,doc);
         leaf=tree->appendItem(twig,"Fourth-Third-Fourth",folder_open,folder_closed);
-        leaf->setEnabled(FALSE);
+        leaf->setEnabled(false);
           tree->appendItem(leaf,"Fourth-Third-Fourth-First",doc,doc);
           tree->appendItem(leaf,"Fourth-Third-Fourth-Second",doc,doc);
           tree->appendItem(leaf,"Fourth-Third-Fourth-Third",doc,doc);

@@ -184,6 +184,8 @@ public:
   long onCmdSortCase(FXObject*,FXSelector,void*);
   long onUpdSortCase(FXObject*,FXSelector,void*);
   long onCmdRefresh(FXObject*,FXSelector,void*);
+  long onUpdHaveSel(FXObject*,FXSelector,void*);
+  long onCmdDeleteSel(FXObject*,FXSelector,void*);
   long onCmdDropAsk(FXObject*,FXSelector,void*);
   long onCmdDropCopy(FXObject*,FXSelector,void*);
   long onCmdDropMove(FXObject*,FXSelector,void*);
@@ -210,6 +212,7 @@ public:
     ID_SORT_REVERSE,
     ID_SORT_CASE,
     ID_REFRESH,
+    ID_DELETE_SEL,
     ID_LAST
     };
 public:

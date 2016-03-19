@@ -490,7 +490,7 @@ FXbool FXText::canFocus() const {
 // Into focus chain
 void FXText::setFocus(){
   FXScrollArea::setFocus();
-  setDefault(TRUE);
+  setDefault(true);
   flags&=~FLAG_UPDATE;
   if(getApp()->hasInputMethod()){
     createComposeContext();
@@ -502,7 +502,7 @@ void FXText::setFocus(){
 // Out of focus chain
 void FXText::killFocus(){
   FXScrollArea::killFocus();
-  setDefault(MAYBE);
+  setDefault(maybe);
   flags|=FLAG_UPDATE;
   if(getApp()->hasInputMethod()){
     destroyComposeContext();
@@ -2625,7 +2625,7 @@ FXbool FXText::extendSelection(FXint pos,FXuint select,FXbool notify){
 FXbool FXText::copySelection(){
   FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
   if(selstartpos<selendpos){
-    if(acquireClipboard(types,4)){
+    if(acquireClipboard(types,ARRAYNUMBER(types))){
       extractText(clipped,selstartpos,selendpos-selstartpos);
       return true;
       }
@@ -3399,7 +3399,7 @@ long FXText::onIMEStart(FXObject* sender,FXSelector,void* ptr){
 long FXText::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
   FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
   if(!FXScrollArea::onBeginDrag(sender,sel,ptr)){
-    beginDrag(types,4);
+    beginDrag(types,ARRAYNUMBER(types));
     setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
     }
   return 1;

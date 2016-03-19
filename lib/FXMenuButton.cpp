@@ -92,8 +92,8 @@ namespace FX {
 
 // Map
 FXDEFMAP(FXMenuButton) FXMenuButtonMap[]={
-  FXMAPFUNC(SEL_PAINT,0,FXMenuButton::onPaint),
   FXMAPFUNC(SEL_UPDATE,0,FXMenuButton::onUpdate),
+  FXMAPFUNC(SEL_PAINT,0,FXMenuButton::onPaint),
   FXMAPFUNC(SEL_ENTER,0,FXMenuButton::onEnter),
   FXMAPFUNC(SEL_LEAVE,0,FXMenuButton::onLeave),
   FXMAPFUNC(SEL_MOTION,0,FXMenuButton::onMotion),

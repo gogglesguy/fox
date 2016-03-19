@@ -92,8 +92,8 @@ FXIMPLEMENT(FXToggleButton,FXLabel,FXToggleButtonMap,ARRAYNUMBER(FXToggleButtonM
 // Deserialization
 FXToggleButton::FXToggleButton(){
   alticon=(FXIcon*)-1L;
-  state=FALSE;
-  down=FALSE;
+  state=false;
+  down=false;
   }
 
 
@@ -109,8 +109,8 @@ FXToggleButton::FXToggleButton(FXComposite* p,const FXString& text1,const FXStri
   althotkey=parseHotKey(string);
   althotoff=findHotKey(string);
   addHotKey(althotkey);
-  state=FALSE;
-  down=FALSE;
+  state=false;
+  down=false;
   }
 
 
@@ -210,14 +210,14 @@ long FXToggleButton::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
 
 // Check the menu button
 long FXToggleButton::onCheck(FXObject*,FXSelector,void*){
-  setState(TRUE);
+  setState(true);
   return 1;
   }
 
 
 // Check the menu button
 long FXToggleButton::onUncheck(FXObject*,FXSelector,void*){
-  setState(FALSE);
+  setState(false);
   return 1;
   }
 
@@ -252,7 +252,7 @@ long FXToggleButton::onFocusOut(FXObject* sender,FXSelector sel,void* ptr){
 long FXToggleButton::onEnter(FXObject* sender,FXSelector sel,void* ptr){
   FXLabel::onEnter(sender,sel,ptr);
   if(isEnabled()){
-    if(flags&FLAG_PRESSED) press(TRUE);
+    if(flags&FLAG_PRESSED) press(true);
     if(options&TOGGLEBUTTON_TOOLBAR) update();
     }
   return 1;
@@ -263,7 +263,7 @@ long FXToggleButton::onEnter(FXObject* sender,FXSelector sel,void* ptr){
 long FXToggleButton::onLeave(FXObject* sender,FXSelector sel,void* ptr){
   FXLabel::onLeave(sender,sel,ptr);
   if(isEnabled()){
-    if(flags&FLAG_PRESSED) press(FALSE);
+    if(flags&FLAG_PRESSED) press(false);
     if(options&TOGGLEBUTTON_TOOLBAR) update();
     }
   return 1;
@@ -277,7 +277,7 @@ long FXToggleButton::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   if(isEnabled() && !(flags&FLAG_PRESSED)){
     grab();
     if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONPRESS,message),ptr)) return 1;
-    press(TRUE);
+    press(true);
     flags|=FLAG_PRESSED;
     flags&=~FLAG_UPDATE;
     return 1;
@@ -294,7 +294,7 @@ long FXToggleButton::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     flags|=FLAG_UPDATE;
     flags&=~FLAG_PRESSED;
     if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONRELEASE,message),ptr)) return 1;
-    press(FALSE);
+    press(false);
     if(click){
       setState(!state);
       if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)state);
@@ -308,7 +308,7 @@ long FXToggleButton::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
 // The widget lost the grab for some reason
 long FXToggleButton::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
   FXLabel::onUngrabbed(sender,sel,ptr);
-  press(FALSE);
+  press(false);
   flags&=~FLAG_PRESSED;
   flags|=FLAG_UPDATE;
   return 1;
@@ -322,7 +322,7 @@ long FXToggleButton::onKeyPress(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
     if(!(flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
-      press(TRUE);
+      press(true);
       flags|=FLAG_PRESSED;
       flags&=~FLAG_UPDATE;
       return 1;
@@ -338,7 +338,7 @@ long FXToggleButton::onKeyRelease(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
     if((flags&FLAG_PRESSED) && (event->code==KEY_space || event->code==KEY_KP_Space)){
-      press(FALSE);
+      press(false);
       setState(!state);
       flags|=FLAG_UPDATE;
       flags&=~FLAG_PRESSED;
@@ -355,7 +355,7 @@ long FXToggleButton::onHotKeyPress(FXObject*,FXSelector,void* ptr){
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   flags&=~FLAG_TIP;
   if(isEnabled() && !(flags&FLAG_PRESSED)){
-    press(TRUE);
+    press(true);
     flags|=FLAG_PRESSED;
     flags&=~FLAG_UPDATE;
     }
@@ -368,7 +368,7 @@ long FXToggleButton::onHotKeyRelease(FXObject*,FXSelector,void*){
   if(isEnabled() && (flags&FLAG_PRESSED)){
     flags|=FLAG_UPDATE;
     flags&=~FLAG_PRESSED;
-    press(FALSE);
+    press(false);
     setState(!state);
     if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)state);
     }

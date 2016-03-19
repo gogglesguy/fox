@@ -28,20 +28,6 @@
 // Placement new
 #include <new>
 
-// Truth values
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
-#ifndef MAYBE
-#define MAYBE 2
-#endif
-#ifndef NULL
-#define NULL 0
-#endif
-
 
 // Path separator
 #ifdef WIN32
@@ -225,11 +211,15 @@ union _XEvent;
 namespace FX {
 
 
+/// Third logic state: unknown/indeterminate
+enum { maybe=2 };
+
+
 /// Exponent display
 enum FXExponent {
-  EXP_NEVER=FALSE,                  /// Never use exponential notation
-  EXP_ALWAYS=TRUE,                  /// Always use exponential notation
-  EXP_AUTO=MAYBE                    /// Use exponential notation if needed
+  EXP_NEVER=0,                          /// Never use exponential notation
+  EXP_ALWAYS=1,                         /// Always use exponential notation
+  EXP_AUTO=2                            /// Use exponential notation if needed
   };
 
 
@@ -853,25 +843,25 @@ extern FXAPI FXint utf2ncs(const FXchar *ptr,FXint len);
 extern FXAPI FXint utf2ncs(const FXchar *ptr);
 
 
-/// Convert wide character to utf8 string
+/// Convert wide character to utf8 string; return number of items written to dst
 extern FXAPI FXint wc2utf(FXchar *dst,FXwchar w);
 
-/// Convert wide character to narrow character string
+/// Convert wide character to narrow character string; return number of items written to dst
 extern FXAPI FXint wc2nc(FXnchar *dst,FXwchar w);
 
-/// Convert wide character string to utf8 string
+/// Convert wide character string to utf8 string; return number of items written to dst
 extern FXAPI FXint wcs2utf(FXchar *dst,const FXwchar* src,FXint dlen,FXint slen);
 extern FXAPI FXint wcs2utf(FXchar *dst,const FXwchar* src,FXint dlen);
 
-/// Convert narrow character string to utf8 string
+/// Convert narrow character string to utf8 string; return number of items written to dst
 extern FXAPI FXint ncs2utf(FXchar *dst,const FXnchar* src,FXint dlen,FXint slen);
 extern FXAPI FXint ncs2utf(FXchar *dst,const FXnchar* src,FXint dlen);
 
-/// Convert utf8 string to wide character string
+/// Convert utf8 string to wide character string; return number of items written to dst
 extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar* src,FXint dlen,FXint slen);
 extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar* src,FXint dlen);
 
-/// Convert utf8 string to narrow character string
+/// Convert utf8 string to narrow character string; return number of items written to dst
 extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen,FXint slen);
 extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen);
 

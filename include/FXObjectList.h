@@ -217,7 +217,7 @@ public:
   TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
 
   /// Adopt objects from orig, leaving orig empty
-  FXObjectListOf<TYPE>& adopt(const FXObjectListOf<TYPE>& src){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::adopt(src)); }
+  FXObjectListOf<TYPE>& adopt(FXObjectListOf<TYPE>& src){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::adopt(src)); }
   };
 
 }

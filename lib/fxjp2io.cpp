@@ -385,6 +385,7 @@ FXbool fxcheckJP2(FXStream&){
 
 // Stub routine
 FXbool fxloadJP2(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& quality){
+  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
   static const FXuchar image_bits[]={
    0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
    0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
@@ -400,7 +401,7 @@ FXbool fxloadJP2(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& qual
   register FXint p;
   allocElms(data,32*32);
   for(p=0; p<32*32; p++){
-    data[p]=(image_bits[p>>3]&(1<<(p&7))) ? FXRGB(0,0,0) : FXRGB(255,255,255);
+    data[p]=color[(image_bits[p>>3]>>(p&7))&1];
     }
   width=32;
   height=32;
