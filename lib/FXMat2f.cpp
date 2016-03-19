@@ -89,9 +89,7 @@ FXMat2f::FXMat2f(const FXfloat s[]){
 // Initialize diagonal matrix
 FXMat2f::FXMat2f(FXfloat a,FXfloat b){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-  m[0][0]=a;
-  m[1][1]=b;
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(b,0.0f,0.0f,a));
 #else
   m[0][0]=a;    m[0][1]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;
@@ -101,8 +99,12 @@ FXMat2f::FXMat2f(FXfloat a,FXfloat b){
 
 // Initialize matrix from components
 FXMat2f::FXMat2f(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(a11,a10,a01,a00));
+#else
   m[0][0]=a00; m[0][1]=a01;
   m[1][0]=a10; m[1][1]=a11;
+#endif
   }
 
 
@@ -216,9 +218,7 @@ FXMat2f& FXMat2f::set(const FXfloat s[]){
 // Set diagonal matrix
 FXMat2f& FXMat2f::set(FXfloat a,FXfloat b){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-  m[0][0]=a;
-  m[1][1]=b;
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(b,0.0f,0.0f,a));
 #else
   m[0][0]=a;    m[0][1]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;
@@ -229,8 +229,12 @@ FXMat2f& FXMat2f::set(FXfloat a,FXfloat b){
 
 // Set value from components
 FXMat2f& FXMat2f::set(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(a11,a10,a01,a00));
+#else
   m[0][0]=a00; m[0][1]=a01;
   m[1][0]=a10; m[1][1]=a11;
+#endif
   return *this;
   }
 
@@ -363,8 +367,7 @@ FXMat2f& FXMat2f::rot(FXfloat phi){
 // Scale unqual
 FXMat2f& FXMat2f::scale(FXfloat sx,FXfloat sy){
 #if defined(FOX_HAS_SSE)
-  register __m128 ss=_mm_set_ps(sy,sy,sx,sx);
-  _mm_storeu_ps(&m[0][0],_mm_mul_ps(_mm_loadu_ps(&m[0][0]),ss));
+  _mm_storeu_ps(&m[0][0],_mm_mul_ps(_mm_loadu_ps(&m[0][0]),_mm_set_ps(sy,sy,sx,sx)));
 #else
   m[0][0]*=sx; m[0][1]*=sx;
   m[1][0]*=sy; m[1][1]*=sy;
@@ -376,8 +379,7 @@ FXMat2f& FXMat2f::scale(FXfloat sx,FXfloat sy){
 // Scale uniform
 FXMat2f& FXMat2f::scale(FXfloat s){
 #if defined(FOX_HAS_SSE)
-  register __m128 ss=_mm_set_ps(s,s,s,s);
-  _mm_storeu_ps(&m[0][0],_mm_mul_ps(_mm_loadu_ps(&m[0][0]),ss));
+  _mm_storeu_ps(&m[0][0],_mm_mul_ps(_mm_loadu_ps(&m[0][0]),_mm_set_ps(s,s,s,s)));
 #else
   m[0][0]*=s; m[0][1]*=s;
   m[1][0]*=s; m[1][1]*=s;

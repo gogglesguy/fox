@@ -46,15 +46,13 @@ using namespace FX;
 
 namespace FX {
 
-
 // Initialize matrix from scalar
 FXMat4f::FXMat4f(FXfloat s){
 #if defined(FOX_HAS_SSE)
-  register __m128 mm=_mm_set1_ps(s);
-  _mm_storeu_ps(m[0],mm);
-  _mm_storeu_ps(m[1],mm);
-  _mm_storeu_ps(m[2],mm);
-  _mm_storeu_ps(m[3],mm);
+  _mm_storeu_ps(m[0],_mm_set1_ps(s));
+  _mm_storeu_ps(m[1],_mm_set1_ps(s));
+  _mm_storeu_ps(m[2],_mm_set1_ps(s));
+  _mm_storeu_ps(m[3],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s; m[0][3]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s; m[1][3]=s;
@@ -67,12 +65,9 @@ FXMat4f::FXMat4f(FXfloat s){
 // Initialize with 3x3 rotation and scaling matrix
 FXMat4f::FXMat4f(const FXMat3f& s){
 #if defined(FOX_HAS_SSE)
-  register __m128 r0=_mm_set_ps(0.0f,0.0f,0.0f,s[0][2]);
-  register __m128 r1=_mm_set_ps(0.0f,0.0f,0.0f,s[1][2]);
-  register __m128 r2=_mm_set_ps(0.0f,0.0f,0.0f,s[2][2]);
-  _mm_storeu_ps(m[0],_mm_loadl_pi(_mm_movelh_ps(r0,r0),(const __m64*)&s[0][0]));
-  _mm_storeu_ps(m[1],_mm_loadl_pi(_mm_movelh_ps(r1,r1),(const __m64*)&s[0][0]));
-  _mm_storeu_ps(m[2],_mm_loadl_pi(_mm_movelh_ps(r2,r2),(const __m64*)&s[0][0]));
+  _mm_storeu_ps(m[0],_mm_set_ps(0.0f,s[0][2],s[0][1],s[0][0]));
+  _mm_storeu_ps(m[1],_mm_set_ps(0.0f,s[1][2],s[1][1],s[1][0]));
+  _mm_storeu_ps(m[2],_mm_set_ps(0.0f,s[2][2],s[2][1],s[2][0]));
   _mm_storeu_ps(m[3],_mm_set_ps(1.0f,0.0f,0.0f,0.0f));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2]; m[0][3]=0.0f;
@@ -118,13 +113,10 @@ FXMat4f::FXMat4f(const FXfloat s[]){
 // Initialize diagonal matrix
 FXMat4f::FXMat4f(FXfloat a,FXfloat b,FXfloat c,FXfloat d){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][1],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-  _mm_storeu_ps(&m[1][2],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-  _mm_storeu_ps(&m[2][3],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-   m[0][0]=a;
-   m[1][1]=b;
-   m[2][2]=c;
-   m[3][3]=d;
+  _mm_storeu_ps(m[0],_mm_set_ps(0.0f,0.0f,0.0f,a));
+  _mm_storeu_ps(m[1],_mm_set_ps(0.0f,0.0f,b,0.0f));
+  _mm_storeu_ps(m[2],_mm_set_ps(0.0f,c,0.0f,0.0f));
+  _mm_storeu_ps(m[3],_mm_set_ps(d,0.0f,0.0f,0.0f));
 #else
   m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f; m[0][3]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f; m[1][3]=0.0f;
@@ -136,10 +128,17 @@ FXMat4f::FXMat4f(FXfloat a,FXfloat b,FXfloat c,FXfloat d){
 
 // Initialize matrix from components
 FXMat4f::FXMat4f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(m[0],_mm_set_ps(a03,a02,a01,a00));
+  _mm_storeu_ps(m[1],_mm_set_ps(a13,a12,a11,a10));
+  _mm_storeu_ps(m[2],_mm_set_ps(a23,a22,a21,a20));
+  _mm_storeu_ps(m[3],_mm_set_ps(a33,a32,a31,a30));
+#else
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
   m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+#endif
   }
 
 
@@ -162,11 +161,10 @@ FXMat4f::FXMat4f(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4
 // Assign from scalar
 FXMat4f& FXMat4f::operator=(FXfloat s){
 #if defined(FOX_HAS_SSE)
-  register __m128 mm=_mm_set1_ps(s);
-  _mm_storeu_ps(m[0],mm);
-  _mm_storeu_ps(m[1],mm);
-  _mm_storeu_ps(m[2],mm);
-  _mm_storeu_ps(m[3],mm);
+  _mm_storeu_ps(m[0],_mm_set1_ps(s));
+  _mm_storeu_ps(m[1],_mm_set1_ps(s));
+  _mm_storeu_ps(m[2],_mm_set1_ps(s));
+  _mm_storeu_ps(m[3],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s; m[0][3]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s; m[1][3]=s;
@@ -179,10 +177,17 @@ FXMat4f& FXMat4f::operator=(FXfloat s){
 
 // Assign from 3x3 rotation and scaling matrix
 FXMat4f& FXMat4f::operator=(const FXMat3f& s){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(m[0],_mm_set_ps(0.0f,s[0][2],s[0][1],s[0][0]));
+  _mm_storeu_ps(m[1],_mm_set_ps(0.0f,s[1][2],s[1][1],s[1][0]));
+  _mm_storeu_ps(m[2],_mm_set_ps(0.0f,s[2][2],s[2][1],s[2][0]));
+  _mm_storeu_ps(m[3],_mm_set_ps(1.0f,0.0f,0.0f,0.0f));
+#else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2]; m[0][3]=0.0f;
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2]; m[1][3]=0.0f;
   m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2]; m[2][3]=0.0f;
   m[3][0]=0.0f;    m[3][1]=0.0f;    m[3][2]=0.0f;    m[3][3]=1.0f;
+#endif
   return *this;
   }
 
@@ -224,11 +229,10 @@ FXMat4f& FXMat4f::operator=(const FXfloat s[]){
 // Set value from scalar
 FXMat4f& FXMat4f::set(FXfloat s){
 #if defined(FOX_HAS_SSE)
-  register __m128 mm=_mm_set1_ps(s);
-  _mm_storeu_ps(m[0],mm);
-  _mm_storeu_ps(m[1],mm);
-  _mm_storeu_ps(m[2],mm);
-  _mm_storeu_ps(m[3],mm);
+  _mm_storeu_ps(m[0],_mm_set1_ps(s));
+  _mm_storeu_ps(m[1],_mm_set1_ps(s));
+  _mm_storeu_ps(m[2],_mm_set1_ps(s));
+  _mm_storeu_ps(m[3],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s; m[0][3]=s;
   m[1][0]=s; m[1][1]=s; m[1][2]=s; m[1][3]=s;
@@ -241,10 +245,17 @@ FXMat4f& FXMat4f::set(FXfloat s){
 
 // Set from 3x3 rotation and scaling matrix
 FXMat4f& FXMat4f::set(const FXMat3f& s){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(m[0],_mm_set_ps(0.0f,s[0][2],s[0][1],s[0][0]));
+  _mm_storeu_ps(m[1],_mm_set_ps(0.0f,s[1][2],s[1][1],s[1][0]));
+  _mm_storeu_ps(m[2],_mm_set_ps(0.0f,s[2][2],s[2][1],s[2][0]));
+  _mm_storeu_ps(m[3],_mm_set_ps(1.0f,0.0f,0.0f,0.0f));
+#else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2]; m[0][3]=0.0f;
   m[1][0]=s[1][0]; m[1][1]=s[1][1]; m[1][2]=s[1][2]; m[1][3]=0.0f;
   m[2][0]=s[2][0]; m[2][1]=s[2][1]; m[2][2]=s[2][2]; m[2][3]=0.0f;
   m[3][0]=0.0f;    m[3][1]=0.0f;    m[3][2]=0.0f;    m[3][3]=1.0f;
+#endif
   return *this;
   }
 
@@ -286,13 +297,10 @@ FXMat4f& FXMat4f::set(const FXfloat s[]){
 // Set diagonal matrix
 FXMat4f& FXMat4f::set(FXfloat a,FXfloat b,FXfloat c,FXfloat d){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][1],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-  _mm_storeu_ps(&m[1][2],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-  _mm_storeu_ps(&m[2][3],_mm_set_ps(0.0f,0.0f,0.0f,0.0f));
-   m[0][0]=a;
-   m[1][1]=b;
-   m[2][2]=c;
-   m[3][3]=d;
+  _mm_storeu_ps(m[0],_mm_set_ps(0.0f,0.0f,0.0f,a));
+  _mm_storeu_ps(m[1],_mm_set_ps(0.0f,0.0f,b,0.0f));
+  _mm_storeu_ps(m[2],_mm_set_ps(0.0f,c,0.0f,0.0f));
+  _mm_storeu_ps(m[3],_mm_set_ps(d,0.0f,0.0f,0.0f));
 #else
   m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f; m[0][3]=0.0f;
   m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f; m[1][3]=0.0f;
@@ -305,10 +313,17 @@ FXMat4f& FXMat4f::set(FXfloat a,FXfloat b,FXfloat c,FXfloat d){
 
 // Set value from components
 FXMat4f& FXMat4f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(m[0],_mm_set_ps(a03,a02,a01,a00));
+  _mm_storeu_ps(m[1],_mm_set_ps(a13,a12,a11,a10));
+  _mm_storeu_ps(m[2],_mm_set_ps(a23,a22,a21,a20));
+  _mm_storeu_ps(m[3],_mm_set_ps(a33,a32,a31,a30));
+#else
   m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
   m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
   m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
   m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+#endif
   return *this;
   }
 
@@ -367,11 +382,10 @@ FXMat4f& FXMat4f::operator-=(const FXMat4f& s){
 // Multiply matrix by scalar
 FXMat4f& FXMat4f::operator*=(FXfloat s){
 #if defined(FOX_HAS_SSE)
-  register __m128 ss=_mm_set1_ps(s);
-  _mm_storeu_ps(m[0],_mm_mul_ps(_mm_loadu_ps(m[0]),ss));
-  _mm_storeu_ps(m[1],_mm_mul_ps(_mm_loadu_ps(m[1]),ss));
-  _mm_storeu_ps(m[2],_mm_mul_ps(_mm_loadu_ps(m[2]),ss));
-  _mm_storeu_ps(m[3],_mm_mul_ps(_mm_loadu_ps(m[3]),ss));
+  _mm_storeu_ps(m[0],_mm_mul_ps(_mm_loadu_ps(m[0]),_mm_set1_ps(s)));
+  _mm_storeu_ps(m[1],_mm_mul_ps(_mm_loadu_ps(m[1]),_mm_set1_ps(s)));
+  _mm_storeu_ps(m[2],_mm_mul_ps(_mm_loadu_ps(m[2]),_mm_set1_ps(s)));
+  _mm_storeu_ps(m[3],_mm_mul_ps(_mm_loadu_ps(m[3]),_mm_set1_ps(s)));
 #else
   m[0][0]*=s; m[0][1]*=s; m[0][2]*=s; m[0][3]*=s;
   m[1][0]*=s; m[1][1]*=s; m[1][2]*=s; m[2][3]*=s;
@@ -440,11 +454,10 @@ FXMat4f& FXMat4f::operator*=(const FXMat4f& s){
 // Divide matric by scalar
 FXMat4f& FXMat4f::operator/=(FXfloat s){
 #if defined(FOX_HAS_SSE)
-  register __m128 ss=_mm_set1_ps(s);
-  _mm_storeu_ps(m[0],_mm_div_ps(_mm_loadu_ps(m[0]),ss));
-  _mm_storeu_ps(m[1],_mm_div_ps(_mm_loadu_ps(m[1]),ss));
-  _mm_storeu_ps(m[2],_mm_div_ps(_mm_loadu_ps(m[2]),ss));
-  _mm_storeu_ps(m[3],_mm_div_ps(_mm_loadu_ps(m[3]),ss));
+  _mm_storeu_ps(m[0],_mm_div_ps(_mm_loadu_ps(m[0]),_mm_set1_ps(s)));
+  _mm_storeu_ps(m[1],_mm_div_ps(_mm_loadu_ps(m[1]),_mm_set1_ps(s)));
+  _mm_storeu_ps(m[2],_mm_div_ps(_mm_loadu_ps(m[2]),_mm_set1_ps(s)));
+  _mm_storeu_ps(m[3],_mm_div_ps(_mm_loadu_ps(m[3]),_mm_set1_ps(s)));
 #else
   m[0][0]/=s; m[0][1]/=s; m[0][2]/=s; m[0][3]/=s;
   m[1][0]/=s; m[1][1]/=s; m[1][2]/=s; m[1][3]/=s;
@@ -1145,12 +1158,11 @@ FXMat4f operator*(const FXMat4f& a,const FXMat4f& b){
 // Multiply scalar by matrix
 FXMat4f operator*(FXfloat x,const FXMat4f& a){
 #if defined(FOX_HAS_SSE)
-  register __m128 xx=_mm_set1_ps(x);
   FXMat4f r;
-  _mm_storeu_ps(r[0],_mm_mul_ps(xx,_mm_loadu_ps(a[0])));
-  _mm_storeu_ps(r[1],_mm_mul_ps(xx,_mm_loadu_ps(a[1])));
-  _mm_storeu_ps(r[2],_mm_mul_ps(xx,_mm_loadu_ps(a[2])));
-  _mm_storeu_ps(r[3],_mm_mul_ps(xx,_mm_loadu_ps(a[3])));
+  _mm_storeu_ps(r[0],_mm_mul_ps(_mm_set1_ps(x),_mm_loadu_ps(a[0])));
+  _mm_storeu_ps(r[1],_mm_mul_ps(_mm_set1_ps(x),_mm_loadu_ps(a[1])));
+  _mm_storeu_ps(r[2],_mm_mul_ps(_mm_set1_ps(x),_mm_loadu_ps(a[2])));
+  _mm_storeu_ps(r[3],_mm_mul_ps(_mm_set1_ps(x),_mm_loadu_ps(a[3])));
   return r;
 #else
   return FXMat4f(x*a[0][0],x*a[0][1],x*a[0][2],a[0][3],
@@ -1164,12 +1176,11 @@ FXMat4f operator*(FXfloat x,const FXMat4f& a){
 // Multiply matrix by scalar
 FXMat4f operator*(const FXMat4f& a,FXfloat x){
 #if defined(FOX_HAS_SSE)
-  register __m128 xx=_mm_set1_ps(x);
   FXMat4f r;
-  _mm_storeu_ps(r[0],_mm_mul_ps(_mm_loadu_ps(a[0]),xx));
-  _mm_storeu_ps(r[1],_mm_mul_ps(_mm_loadu_ps(a[1]),xx));
-  _mm_storeu_ps(r[2],_mm_mul_ps(_mm_loadu_ps(a[2]),xx));
-  _mm_storeu_ps(r[3],_mm_mul_ps(_mm_loadu_ps(a[3]),xx));
+  _mm_storeu_ps(r[0],_mm_mul_ps(_mm_loadu_ps(a[0]),_mm_set1_ps(x)));
+  _mm_storeu_ps(r[1],_mm_mul_ps(_mm_loadu_ps(a[1]),_mm_set1_ps(x)));
+  _mm_storeu_ps(r[2],_mm_mul_ps(_mm_loadu_ps(a[2]),_mm_set1_ps(x)));
+  _mm_storeu_ps(r[3],_mm_mul_ps(_mm_loadu_ps(a[3]),_mm_set1_ps(x)));
   return r;
 #else
   return FXMat4f(a[0][0]*x,a[0][1]*x,a[0][2]*x,a[0][3],
@@ -1183,12 +1194,11 @@ FXMat4f operator*(const FXMat4f& a,FXfloat x){
 // Divide scalar by matrix
 FXMat4f operator/(FXfloat x,const FXMat4f& a){
 #if defined(FOX_HAS_SSE)
-  register __m128 xx=_mm_set1_ps(x);
   FXMat4f r;
-  _mm_storeu_ps(r[0],_mm_div_ps(xx,_mm_loadu_ps(a[0])));
-  _mm_storeu_ps(r[1],_mm_div_ps(xx,_mm_loadu_ps(a[1])));
-  _mm_storeu_ps(r[2],_mm_div_ps(xx,_mm_loadu_ps(a[2])));
-  _mm_storeu_ps(r[3],_mm_div_ps(xx,_mm_loadu_ps(a[3])));
+  _mm_storeu_ps(r[0],_mm_div_ps(_mm_set1_ps(x),_mm_loadu_ps(a[0])));
+  _mm_storeu_ps(r[1],_mm_div_ps(_mm_set1_ps(x),_mm_loadu_ps(a[1])));
+  _mm_storeu_ps(r[2],_mm_div_ps(_mm_set1_ps(x),_mm_loadu_ps(a[2])));
+  _mm_storeu_ps(r[3],_mm_div_ps(_mm_set1_ps(x),_mm_loadu_ps(a[3])));
   return r;
 #else
   return FXMat4f(x/a[0][0],x/a[0][1],x/a[0][2],a[0][3],
@@ -1202,12 +1212,11 @@ FXMat4f operator/(FXfloat x,const FXMat4f& a){
 // Divide matrix by scalar
 FXMat4f operator/(const FXMat4f& a,FXfloat x){
 #if defined(FOX_HAS_SSE)
-  register __m128 xx=_mm_set1_ps(x);
   FXMat4f r;
-  _mm_storeu_ps(r[0],_mm_div_ps(_mm_loadu_ps(a[0]),xx));
-  _mm_storeu_ps(r[1],_mm_div_ps(_mm_loadu_ps(a[1]),xx));
-  _mm_storeu_ps(r[2],_mm_div_ps(_mm_loadu_ps(a[2]),xx));
-  _mm_storeu_ps(r[3],_mm_div_ps(_mm_loadu_ps(a[3]),xx));
+  _mm_storeu_ps(r[0],_mm_div_ps(_mm_loadu_ps(a[0]),_mm_set1_ps(x)));
+  _mm_storeu_ps(r[1],_mm_div_ps(_mm_loadu_ps(a[1]),_mm_set1_ps(x)));
+  _mm_storeu_ps(r[2],_mm_div_ps(_mm_loadu_ps(a[2]),_mm_set1_ps(x)));
+  _mm_storeu_ps(r[3],_mm_div_ps(_mm_loadu_ps(a[3]),_mm_set1_ps(x)));
   return r;
 #else
   return FXMat4f(a[0][0]/x,a[0][1]/x,a[0][2]/x,a[0][3],

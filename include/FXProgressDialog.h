@@ -104,10 +104,10 @@ public:
   void increment(FXuint value);
 
   /// Has operation been cancelled?
-  FXbool isCancelled() const { return cancelled; }
+  FXbool isCancelled() const;
 
   /// Change cancelled flag
-  void setCancelled(FXbool flg){ cancelled=flg; }
+  void setCancelled(FXbool flg);
 
   /// Destroy
   virtual ~FXProgressDialog();
