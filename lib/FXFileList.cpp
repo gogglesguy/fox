@@ -1378,19 +1378,19 @@ void FXFileList::listItems(FXbool force){
           extension=tr("Folder");
           newitem->setBigIcon(big_folder);
           newitem->setMiniIcon(mini_folder);
-          if(associations) newitem->setAssoc(associations->findDirBinding(pathname.text()));
+          if(associations) newitem->setAssoc(associations->findDirBinding(pathname));
           }
         else if(newitem->isExecutable()){
           extension=tr("Application");
           newitem->setBigIcon(big_app);
           newitem->setMiniIcon(mini_app);
-          if(associations) newitem->setAssoc(associations->findExecBinding(pathname.text()));
+          if(associations) newitem->setAssoc(associations->findExecBinding(pathname));
           }
         else{
           extension=tr("Document");
           newitem->setBigIcon(big_doc);
           newitem->setMiniIcon(mini_doc);
-          if(associations) newitem->setAssoc(associations->findFileBinding(pathname.text()));
+          if(associations) newitem->setAssoc(associations->findFileBinding(pathname));
           }
 
         // If association is found, use it

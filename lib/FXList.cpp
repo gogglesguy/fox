@@ -1689,7 +1689,7 @@ FXint FXList::prependItem(const FXString& text,FXIcon *icon,FXptr ptr,FXbool not
 
 
 // Fill list by appending items from array of strings
-FXint FXList::fillItems(const FXchar** strings,FXIcon *icon,FXptr ptr,FXbool notify){
+FXint FXList::fillItems(const FXchar *const *strings,FXIcon *icon,FXptr ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){

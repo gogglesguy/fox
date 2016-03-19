@@ -440,7 +440,7 @@ void FXImage::restore(){
 
 
 // Find shift amount
-static inline FXuint findshift(unsigned long mask){
+static inline FXuint findshift(FXPixel mask){
   register FXuint sh=0;
   while(!(mask&(1UL<<sh))) sh++;
   return sh;

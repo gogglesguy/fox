@@ -165,7 +165,7 @@ FXListItem *FXColorList::createItem(const FXString& text,FXIcon*,void* ptr){
 
 
 // Fill list by appending color items from array of strings and array of colors
-FXint FXColorList::fillItems(const FXchar** strings,FXColor *colors,void* ptr,FXbool notify){
+FXint FXColorList::fillItems(const FXchar *const *strings,FXColor *colors,void* ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){

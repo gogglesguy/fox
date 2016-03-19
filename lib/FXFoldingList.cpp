@@ -660,7 +660,7 @@ long FXFoldingList::onChgHeader(FXObject*,FXSelector,void*){
 
 
 // Set headers from array of strings
-void FXFoldingList::setHeaders(const FXchar** strings,FXint size){
+void FXFoldingList::setHeaders(const FXchar *const *strings,FXint size){
   header->clearItems();
   header->fillItems(strings,NULL,size);
   }
@@ -2365,7 +2365,7 @@ FXFoldingItem* FXFoldingList::prependItem(FXFoldingItem* father,const FXString& 
 
 
 // Fill list by appending items from array of strings
-FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXchar** strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
+FXint FXFoldingList::fillItems(FXFoldingItem* father,const FXchar *const *strings,FXIcon* oi,FXIcon* ci,FXptr ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){

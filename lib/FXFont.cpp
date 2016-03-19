@@ -1947,7 +1947,7 @@ void FXFont::drawImageText(FXDC* dc,FXint x,FXint y,const FXString& string) cons
 
 
 // Function to sort by name, weight, slant, and size
-static int comparefont(const void *a,const void *b){
+static int CDECL comparefont(const void *a,const void *b){
   register const FXFontDesc *fa=(const FXFontDesc*)a;
   register const FXFontDesc *fb=(const FXFontDesc*)b;
   register FXint cmp=strcmp(fa->face,fb->face);

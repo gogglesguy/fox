@@ -124,8 +124,8 @@ public:
   /// Change number of elements in array
   FXbool no(FXint n);
 
-  /// Convert to bool
-  FXbool toBool(FXbool* ok=NULL) const;
+  /// Convert to bool; always OK
+  FXbool toBool() const;
 
   /// Convert to int
   FXint toInt(FXbool* ok=NULL) const;
@@ -184,7 +184,7 @@ public:
   /// Convert to double
   operator FXdouble() const { return toDouble(); }
 
-  /// Convert to double
+  /// Convert to pointer
   operator FXptr() const { return toPointer(); }
 
   /// Convert to string
@@ -276,6 +276,9 @@ public:
 
   /// Return the value of the variant as a pointer
   const FXptr& asPtr() const { return value.p; }
+
+  /// Return the value of the variant as a char pointer; variant MUST be a string
+  const FXchar* asChars() const { return value.s; }
 
   /// Return the value of the variant as a string-reference; variant MUST be a string
   const FXString& asString() const { return *reinterpret_cast<const FXString*>(&value.p); }

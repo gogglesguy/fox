@@ -871,7 +871,7 @@ fnd:*pn=item; pn=&item->link;
       }
 
     // If association is found, use it
-    if(associations) item->assoc=associations->findDirBinding(name.text());
+    if(associations) item->assoc=associations->findDirBinding(name);
     if(item->assoc){
       if(item->assoc->miniicon) item->setClosedIcon(item->assoc->miniicon);
       if(item->assoc->miniiconopen) item->setOpenIcon(item->assoc->miniiconopen);
@@ -1023,19 +1023,19 @@ void FXDirList::listChildItems(FXDirItem *par){
         newitem->setHasItems(true);
         newitem->setOpenIcon(opendiricon);
         newitem->setClosedIcon(closeddiricon);
-        if(associations) newitem->setAssoc(associations->findDirBinding(pathname.text()));
+        if(associations) newitem->setAssoc(associations->findDirBinding(pathname));
         }
       else if(newitem->isExecutable()){
         newitem->setHasItems(false);
         newitem->setOpenIcon(applicationicon);
         newitem->setClosedIcon(applicationicon);
-        if(associations) newitem->setAssoc(associations->findExecBinding(pathname.text()));
+        if(associations) newitem->setAssoc(associations->findExecBinding(pathname));
         }
       else{
         newitem->setHasItems(false);
         newitem->setOpenIcon(documenticon);
         newitem->setClosedIcon(documenticon);
-        if(associations) newitem->setAssoc(associations->findFileBinding(pathname.text()));
+        if(associations) newitem->setAssoc(associations->findFileBinding(pathname));
         }
 
       // If association is found, use it

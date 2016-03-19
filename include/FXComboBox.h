@@ -170,7 +170,7 @@ public:
   FXint setItem(FXint index,const FXString& text,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill combo box by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXbool notify=false);
+  FXint fillItems(const FXchar *const *strings,FXbool notify=false);
 
   /// Fill combo box by appending items from array of strings
   FXint fillItems(const FXString* strings,FXbool notify=false);

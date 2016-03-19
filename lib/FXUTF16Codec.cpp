@@ -375,11 +375,12 @@ FXint FXUTF16Codec::utf2mblen(const FXchar* src,FXint nsrc) const {
   register FXint nr,len=0;
   FXchar buffer[64];
   FXwchar w;
-  if(src && 0<nsrc){
+  if(0<nsrc){
     len+=2;             // BOM
     while(0<nsrc){
       nr=FX::wclen(src);
       if(nr>nsrc) break;
+      w=wc(src);
       len+=wc2mb(buffer,sizeof(buffer),w);
       src+=nr;
       nsrc-=nr;
@@ -401,6 +402,7 @@ FXint FXUTF16Codec::utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
     while(0<nsrc){
       nr=FX::wclen(src);
       if(nr>nsrc) break;
+      w=wc(src);
       nw=wc2mb(dst,ndst,w);
       if(nw<=0) return nw;
       src+=nr;

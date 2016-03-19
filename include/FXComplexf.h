@@ -141,6 +141,27 @@ inline FXComplexf operator-(const FXComplexf& a,const FXComplexf& b){ return FXC
 inline FXComplexf operator*(const FXComplexf& a,const FXComplexf& b){ return FXComplexf(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re); }
 inline FXComplexf operator/(const FXComplexf& a,const FXComplexf& b){ FXfloat m=b.modulus2(); return FXComplexf((a.re*b.re+a.im*b.im)/m,(a.im*b.re-a.re*b.im)/m); }
 
+/// Complex square root
+extern FXAPI FXComplexf csqrt(const FXComplexf& c);
+
+/// Complex sine
+extern FXAPI FXComplexf csin(const FXComplexf& c);
+
+/// Complex cosine
+extern FXAPI FXComplexf ccos(const FXComplexf& c);
+
+/// Complex tangent
+extern FXAPI FXComplexf ctan(const FXComplexf& c);
+
+/// Complex hyperbolic sine 
+extern FXAPI FXComplexf csinh(const FXComplexf& c);
+
+/// Complex hyperbolic cosine
+extern FXAPI FXComplexf ccosh(const FXComplexf& c);
+
+/// Complex hyperbolic tangent
+extern FXAPI FXComplexf ctanh(const FXComplexf& c);
+
 /// Save to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXComplexf& c);
 

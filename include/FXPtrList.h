@@ -41,27 +41,27 @@ public:
   FXPtrList(FXptr object);
 
   /// Construct and init with n copies of object
-  FXPtrList(FXptr object,FXint n);
+  FXPtrList(FXptr object,FXival n);
 
   /// Construct and init with list of objects
-  FXPtrList(FXptr* objects,FXint n);
+  FXPtrList(FXptr* objects,FXival n);
 
   /// Assignment operator
-  FXPtrList& operator=(const FXPtrList& orig);
+  FXPtrList& operator=(const FXPtrList& src);
 
   /// Return number of objects
-  FXint no() const { return *((FXint*)(ptr-1)); }
+  FXival no() const { return *((FXival*)(ptr-1)); }
 
   /// Set number of objects
-  FXbool no(FXint num);
+  FXbool no(FXival num);
 
   /// Indexing operator
-  FXptr& operator[](FXint i){ return ptr[i]; }
-  FXptr const& operator[](FXint i) const { return ptr[i]; }
+  FXptr& operator[](FXival i){ return ptr[i]; }
+  FXptr const& operator[](FXival i) const { return ptr[i]; }
 
   /// Indexing operator
-  FXptr& at(FXint i){ return ptr[i]; }
-  FXptr const& at(FXint i) const { return ptr[i]; }
+  FXptr& at(FXival i){ return ptr[i]; }
+  FXptr const& at(FXival i) const { return ptr[i]; }
 
   /// First element in list
   FXptr& head(){ return ptr[0]; }
@@ -75,41 +75,47 @@ public:
   FXptr* data(){ return ptr; }
   const FXptr* data() const { return ptr; }
 
-  /// Adopt objects from orig, leaving orig empty
-  FXPtrList& adopt(FXPtrList& orig);
+  /// Adopt objects from src, leaving src empty
+  FXPtrList& adopt(FXPtrList& src);
+
+  /// Find object in list, searching forward; return position or -1
+  FXival find(FXptr object,FXival pos=0) const;
+
+  /// Find object in list, searching backward; return position or -1
+  FXival rfind(FXptr object,FXival pos=2147483647) const;
 
   /// Assign object to list
   FXbool assign(FXptr object);
 
   /// Assign n copies of object to list
-  FXbool assign(FXptr object,FXint n);
+  FXbool assign(FXptr object,FXival n);
 
   /// Assign n objects to list
-  FXbool assign(FXptr* objects,FXint n);
+  FXbool assign(FXptr* objects,FXival n);
 
   /// Assign objects to list
   FXbool assign(const FXPtrList& objects);
 
   /// Insert object at certain position
-  FXbool insert(FXint pos,FXptr object);
+  FXbool insert(FXival pos,FXptr object);
 
   /// Insert n copies of object at specified position
-  FXbool insert(FXint pos,FXptr object,FXint n);
+  FXbool insert(FXival pos,FXptr object,FXival n);
 
   /// Insert n objects at specified position
-  FXbool insert(FXint pos,FXptr* objects,FXint n);
+  FXbool insert(FXival pos,FXptr* objects,FXival n);
 
   /// Insert objects at specified position
-  FXbool insert(FXint pos,const FXPtrList& objects);
+  FXbool insert(FXival pos,const FXPtrList& objects);
 
   /// Prepend object
   FXbool prepend(FXptr object);
 
   /// Prepend n copies of object
-  FXbool prepend(FXptr object,FXint n);
+  FXbool prepend(FXptr object,FXival n);
 
   /// Prepend n objects
-  FXbool prepend(FXptr* objects,FXint n);
+  FXbool prepend(FXptr* objects,FXival n);
 
   /// Prepend objects
   FXbool prepend(const FXPtrList& objects);
@@ -118,46 +124,40 @@ public:
   FXbool append(FXptr object);
 
   /// Append n copies of object
-  FXbool append(FXptr object,FXint n);
+  FXbool append(FXptr object,FXival n);
 
   /// Append n objects
-  FXbool append(FXptr* objects,FXint n);
+  FXbool append(FXptr* objects,FXival n);
 
   /// Append objects
   FXbool append(const FXPtrList& objects);
 
   /// Replace object at position by given object
-  FXbool replace(FXint pos,FXptr object);
+  FXbool replace(FXival pos,FXptr object);
 
   /// Replaces the m objects at pos with n copies of object
-  FXbool replace(FXint pos,FXint m,FXptr object,FXint n);
+  FXbool replace(FXival pos,FXival m,FXptr object,FXival n);
 
   /// Replaces the m objects at pos with n objects
-  FXbool replace(FXint pos,FXint m,FXptr* objects,FXint n);
+  FXbool replace(FXival pos,FXival m,FXptr* objects,FXival n);
 
   /// Replace the m objects at pos with objects
-  FXbool replace(FXint pos,FXint m,const FXPtrList& objects);
+  FXbool replace(FXival pos,FXival m,const FXPtrList& objects);
 
   /// Remove object at pos
-  FXbool erase(FXint pos);
+  FXbool erase(FXival pos);
 
   /// Remove n objects at pos
-  FXbool erase(FXint pos,FXint n);
+  FXbool erase(FXival pos,FXival n);
+
+  /// Remove object
+  FXbool remove(FXptr object);
 
   /// Push object to end
   FXbool push(FXptr object);
 
   /// Pop object from end
   FXbool pop();
-
-  /// Remove object
-  FXbool remove(FXptr object);
-
-  /// Find object in list, searching forward; return position or -1
-  FXint find(FXptr object,FXint pos=0) const;
-
-  /// Find object in list, searching backward; return position or -1
-  FXint rfind(FXptr object,FXint pos=2147483647) const;
 
   /// Remove all objects
   void clear();
@@ -183,18 +183,18 @@ public:
   FXPtrListOf(TYPE* object):FXPtrList(reinterpret_cast<FXptr>(object)){ }
 
   /// Construct and init with n copies of object
-  FXPtrListOf(TYPE* object,FXint n):FXPtrList(reinterpret_cast<FXptr>(object),n){ }
+  FXPtrListOf(TYPE* object,FXival n):FXPtrList(reinterpret_cast<FXptr>(object),n){ }
 
   /// Construct and init with list of objects
-  FXPtrListOf(TYPE** objects,FXint n):FXPtrList(reinterpret_cast<FXptr*>(objects),n){ }
+  FXPtrListOf(TYPE** objects,FXival n):FXPtrList(reinterpret_cast<FXptr*>(objects),n){ }
 
   /// Indexing operator
-  TYPE*& operator[](FXint i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
-  TYPE *const& operator[](FXint i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
+  TYPE*& operator[](FXival i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
+  TYPE *const& operator[](FXival i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
 
-  /// Access to list
-  TYPE*& at(FXint i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
-  TYPE *const& at(FXint i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
+  /// Indexing operator
+  TYPE*& at(FXival i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
+  TYPE *const& at(FXival i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
 
   /// First element in list
   TYPE*& head(){ return reinterpret_cast<TYPE*&>(ptr[0]); }
@@ -209,7 +209,7 @@ public:
   TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
 
   /// Adopt objects from orig, leaving orig empty
-  FXPtrListOf<TYPE>& adopt(FXPtrList& orig){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::adopt(orig)); }
+  FXPtrListOf<TYPE>& adopt(FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::adopt(src)); }
   };
 
 }

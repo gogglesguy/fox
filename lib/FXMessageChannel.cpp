@@ -152,7 +152,7 @@ long FXMessageChannel::onMessage(FXObject*,FXSelector,void*){
 
 // Send a message to a target
 FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,FXint size){
-  FXMutexLock locker(m);
+  FXScopedMutex locker(m);
   FXMessage pkg;
   pkg.target=tgt;
   pkg.message=msg;

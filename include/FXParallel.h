@@ -284,17 +284,16 @@ public:
 */
 template <typename Functor,typename Index>
 void FXParallelFor(FXThreadPool* pool,Index fm,Index to,Index by,Index nc,const Functor& fun){
-  const FXuval size=sizeof(FXParallelLoopFunctor<Functor,Index>);
+  const FXuval size((sizeof(FXParallelLoopFunctor<Functor,Index>)+sizeof(FXulong)-1)/sizeof(FXulong));
   if(fm<to){
     FXTaskGroup group(pool);
-    FXuchar space[128*size];
+    FXlong space[128*size];
     Index nits=1+(to-fm-1)/by,ni,c;
     if(nc>128) nc=128;
     if(nc>nits) nc=nits;
     for(c=0; c<nc; fm+=ni*by,++c){
       ni=(nits+nc-1-c)/nc;
-      new (&space[c*size]) FXParallelLoopFunctor<Functor,Index>(fun,fm,fm+ni*by,by);
-      group.execute((FXParallelLoopFunctor<Functor,Index>*)&space[c*size]);
+      group.execute(new (&space[c*size]) FXParallelLoopFunctor<Functor,Index>(fun,fm,fm+ni*by,by));
       }
     }
   }

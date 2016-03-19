@@ -37,6 +37,7 @@ protected:
   FXGroupBox*        group2;
   FXGroupBox*        group3;
   FXGroupBox*        group4;
+  FXListBox*         listbox;
   FXIcon            *doc;
   FXIcon            *folder_open;
   FXIcon            *folder_closed;
@@ -66,6 +67,7 @@ public:
   long onCmdIconify(FXObject*,FXSelector,void*);
   long onCmdDeiconify(FXObject*,FXSelector,void*);
   long onCmdChoice(FXObject*,FXSelector,void*);
+  long onCmdListBox(FXObject*,FXSelector,void*);
 
 public:
 
@@ -90,7 +92,8 @@ public:
     ID_RADIO1,
     ID_RADIO2,
     ID_RADIO3,
-    ID_CHOICE
+    ID_CHOICE,
+    ID_LISTBOX
     };
 
 public:
@@ -123,6 +126,9 @@ FXDEFMAP(GroupWindow) GroupWindowMap[]={
   FXMAPFUNC(SEL_TIMEOUT,  GroupWindow::ID_DEICONIFY,                         GroupWindow::onCmdDeiconify),
   FXMAPFUNCS(SEL_COMMAND, GroupWindow::ID_OPTION1,GroupWindow::ID_OPTION4,   GroupWindow::onCmdOption),
   FXMAPFUNC(SEL_COMMAND,  GroupWindow::ID_CHOICE,                            GroupWindow::onCmdChoice),
+
+  FXMAPFUNC(SEL_CHANGED,  GroupWindow::ID_LISTBOX,                           GroupWindow::onCmdListBox),
+  FXMAPFUNC(SEL_COMMAND,  GroupWindow::ID_LISTBOX,                           GroupWindow::onCmdListBox),
   };
 
 
@@ -165,6 +171,17 @@ const unsigned char minifolderclosed[]={
   0x48,0x05,0x20,0x38,0x9f,0x50,0xe8,0x66,0x4a,0x75,0x24,0x00,0x00,0x3b
   };
 
+
+// List of items
+static const FXchar *const listofitems[]={
+  "First Item",
+  "Second Item",
+  "Third Item",
+  "Fourth Item",
+  "Fifth Item",
+  "Sixth Item",
+  "Seventh Item"
+  };
 
 // Make some windows
 GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DECOR_ALL,0,0,0,0),radiotarget(choice){
@@ -321,10 +338,9 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
   slider=new FXSlider(group2,NULL,0,LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR|SLIDER_TICKS_BOTTOM,0,0,200,20);
   slider->setRange(0,3);
 
-  FXRangeSlider *rangeslider;
-  rangeslider=new FXRangeSlider(group2,NULL,0,LAYOUT_TOP|LAYOUT_FILL_X|RANGESLIDER_HORIZONTAL|RANGESLIDER_INSIDE_BAR,0,0,200,0);
+  new FXRangeSlider(group2,NULL,0,LAYOUT_TOP|LAYOUT_FILL_X|RANGESLIDER_HORIZONTAL|RANGESLIDER_INSIDE_BAR,0,0,200,0);
 
-  FXMatrix* vsmatrix=new FXMatrix(group2,1,LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  FXMatrix* vsmatrix=new FXMatrix(group2,1,LAYOUT_FILL_X);
 
   slider=new FXSlider(vsmatrix,NULL,0,LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_X|SLIDER_VERTICAL|SLIDER_TICKS_LEFT|SLIDER_TICKS_RIGHT|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN,0,0,30,200);
   slider->setRange(0,10);
@@ -337,7 +353,12 @@ GroupWindow::GroupWindow(FXApp* a):FXMainWindow(a,"Group Box Test",NULL,NULL,DEC
   slider->setTickDelta(7);
   new FXScrollBar(vsmatrix,NULL,0,LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_X|SCROLLBAR_VERTICAL|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN,0,0,20,200);
 
-  rangeslider=new FXRangeSlider(vsmatrix,NULL,0,LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_X|RANGESLIDER_VERTICAL|RANGESLIDER_INSIDE_BAR|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN,0,0,20,200);
+  new FXRangeSlider(vsmatrix,NULL,0,LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_X|RANGESLIDER_VERTICAL|RANGESLIDER_INSIDE_BAR|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN,0,0,20,200);
+
+  // List box
+  listbox=new FXListBox(group2,this,ID_LISTBOX,FRAME_SUNKEN|FRAME_THICK|LAYOUT_TOP);
+  listbox->fillItems(listofitems);
+  listbox->setNumVisible(4);
 
   // Arrow buttons
   FXMatrix* abmatrix=new FXMatrix(group4,4,LAYOUT_FILL_X|LAYOUT_FILL_Y|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT);
@@ -607,6 +628,13 @@ long GroupWindow::onCmdChoice(FXObject*,FXSelector,void*){
   FXGIFIcon choiceicon(getApp(),minifolderclosed);
   FXint result=FXChoiceBox::ask(this,DECOR_RESIZE,"Choose","What is your choice?",&choiceicon,"One\nTwo\nThree\nFour\nFive\nSix\nSeven\nOne very very very very very long entry");
   FXTRACE((1,"choice=%d\n",result));
+  return 1;
+  }
+
+
+// Listbox
+long GroupWindow::onCmdListBox(FXObject*,FXSelector sel,void* ptr){
+  FXTRACE((1,"%s: %d (%d)\n",FXSELTYPE(sel)==SEL_COMMAND?"SEL_COMMAND":"SEL_CHANGED",(FXint)(FXival)ptr,listbox->getCurrentItem()));
   return 1;
   }
 

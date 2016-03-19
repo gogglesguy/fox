@@ -72,7 +72,7 @@
 /*******************************************************************************/
 
 
-const char version[]="5.1.1";
+const char version[]="5.2.0";
 
 
 typedef struct {
@@ -93,9 +93,11 @@ typedef struct {
   int         comments;
   int         keepext;
   int         binary;
+  int         verbose;
   int         mode;
   } OPTIONS;
 
+/*******************************************************************************/
 
 /* Print short help */
 static void printhelp(const char *option){
@@ -115,6 +117,7 @@ static void printusage(){
   printf("  -v, --version             Print version number\n");
   printf("  -h, --header              Create header file containing only declarations\n");
   printf("  -s, --source              Create source file containing data arrays (default)\n");
+  printf("  -V, --verbose             Show which resource files are being processed\n");
   printf("  -i file, --include file   Generate #include \"file\" in output file\n");
   printf("  -o file, --output file    Output to file instead of stdout\n");
   printf("  -oa file, --append file   Append to file instead of stdout\n");
@@ -163,6 +166,7 @@ static void printversion(){
   printf("along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
   }
 
+/*******************************************************************************/
 
 /* Build resource name */
 static const char* resourcename(char *name,const char* filename,int keepdot){
@@ -242,142 +246,145 @@ static void epilogue(OPTIONS* opts){
 
 
 /* Process resource file */
-static void processresourcefile(const char* filename,const char* name,OPTIONS* opts){
-  char resource[MAX_RESOURCE];
+static int processresourcefile(const char* filename,const char* name,OPTIONS* opts){
+  const char *typestr="unsigned char ";
+  const char *sizestr="[]";
+  const char *conststr="";
+  const char *linkstr="";
+  char resource[MAX_RESOURCE],size[10];
   int ressize,first,col,hex,b;
   FILE *file;
 
   /* Open resource file; always open as binary */
   file=fopen(filename,"rb");
-  if(!file){
-    fprintf(stderr,"reswrap: unable to open input file: %s\n",filename);
-    exit(1);
-    }
+  if(file){
 
-  /* Get the size */
-  fseek(file,0,SEEK_END);
-  ressize=ftell(file);
-  fseek(file,0,SEEK_SET);
-
-  /* Add one if text mode, for end of string */
-  if(opts->mode>=MODE_TEXT){
-    ressize++;
-    }
-
-  /* Output header */
-  if(opts->comments){
-    fprintf(opts->outfile,"/* Created by reswrap from file %s */\n",filename);
-    }
-
-  /* Generate external reference */
-  if(opts->linkage==LINKAGE_EXTERN){
-    fprintf(opts->outfile,"extern ");
-    }
-
-  /* Generate static reference */
-  else if(opts->linkage==LINKAGE_STATIC){
-    fprintf(opts->outfile,"static ");
-    }
-
-  /* Generate const declaration */
-  if(opts->constant){
-    fprintf(opts->outfile,"const ");
-    }
-
-  /* In text mode, output a 'char' declaration */
-  if((opts->mode>=MODE_TEXT) && !opts->forceunsigned){
-    fprintf(opts->outfile,"char ");
-    }
-
-  /* In binary mode, output a 'unsigned char' declaration */
-  else{
-    fprintf(opts->outfile,"unsigned char ");
-    }
-
-  /* Compute resource name from filename if no override */
-  if(!name){
-    name=resourcename(resource,filename,opts->keepext);
-    }
-
-  /* Generate resource name */
-  fprintf(opts->outfile,"%s%s%s",opts->prefix,name,opts->suffix);
-
-  /* Size specifier */
-  if(opts->declaresize){
-    fprintf(opts->outfile,"[%d]",ressize);
-    }
-  else{
-    fprintf(opts->outfile,"[]");
-    }
-
-  /* Generating source file */
-  if(opts->filetype==TYPE_SOURCE){
-
-    /* Text Mode */
+    /* Get the size */
+    fseek(file,0,SEEK_END);
+    ressize=ftell(file);
+    fseek(file,0,SEEK_SET);
+    
+    /* Add one if text mode, for end of string */
     if(opts->mode>=MODE_TEXT){
-      col=0;
-      hex=0;
-      fprintf(opts->outfile,"=\n  \"");
-      while((b=fgetc(file))!=EOF){
-        if(!opts->binary && (b=='\r')) continue;
-        if(col>=opts->maxcols){
-          fprintf(opts->outfile,"\"\n  \"");
-          col=0;
-          }
-        if(opts->mode==MODE_ASCII){
-          if(b=='\\'){ fprintf(opts->outfile,"\\\\"); col+=2; hex=0; }
-          else if(b=='\a'){ fprintf(opts->outfile,"\\a"); col+=2; hex=0; }
-          else if(b=='\t'){ fprintf(opts->outfile,"\\t"); col+=2; hex=0; }
-          else if(b=='\r'){ fprintf(opts->outfile,"\\r"); col+=2; hex=0; }
-          else if(b=='\f'){ fprintf(opts->outfile,"\\f"); col+=2; hex=0; }
-          else if(b=='\v'){ fprintf(opts->outfile,"\\v"); col+=2; hex=0; }
-          else if(b=='\"'){ fprintf(opts->outfile,"\\\""); col+=2; hex=0; }
-          else if(b=='\n'){ fprintf(opts->outfile,"\\n\"\n  \""); col=0; hex=0; }
-          else if(b<32 || b>=127){ fprintf(opts->outfile,"\\x%02x",b); col+=4; hex=1; }
-          else if(hex && isxdigit(b)){ fprintf(opts->outfile,"\\x%02x",b); col+=4; hex=1; }
-          else{ fprintf(opts->outfile,"%c",b); col+=1; hex=0; }
-          }
-        else{
-          fprintf(opts->outfile,"\\x%02x",b); col+=4;
-          }
-        }
-      fprintf(opts->outfile,"\"\n  ");
+      ressize++;
       }
 
-    /* Normal Mode */
-    else{
-      col=0;
-      first=1;
-      fprintf(opts->outfile,"={\n  ");
-      while((b=fgetc(file))!=EOF){
-        if(!opts->binary && (b=='\r')) continue;
-        if(!first){
-          fprintf(opts->outfile,",");
-          }
-        if(col>=opts->maxcols){
-          fprintf(opts->outfile,"\n  ");
-          col=0;
-          }
-        if(opts->mode==MODE_HEX){
-          fprintf(opts->outfile,"0x%02x",b);
-          }
-        else{
-          fprintf(opts->outfile,"%3d",b);
-          }
-        first=0;
-        col++;
-        }
-      fprintf(opts->outfile,"\n  }");
+    /* Output header */
+    if(opts->comments){
+      fprintf(opts->outfile,"/* Created by reswrap from file %s */\n",filename);
       }
+
+    /* Generate external reference */
+    if(opts->linkage==LINKAGE_EXTERN){
+      linkstr="extern ";
+      }
+
+    /* Generate static reference */
+    else if(opts->linkage==LINKAGE_STATIC){
+      linkstr="static ";
+      }
+
+    /* Generate const declaration */
+    if(opts->constant){
+      conststr="const ";
+      }
+
+    /* In text mode, output a 'char' declaration */
+    if((opts->mode>=MODE_TEXT) && !opts->forceunsigned){
+      typestr="char ";
+      }
+
+    /* Compute resource name from filename if no override */
+    if(!name){
+      name=resourcename(resource,filename,opts->keepext);
+      }
+
+    /* Size specifier */
+    if(opts->declaresize){
+      sprintf(size,"[%d]",ressize);
+      sizestr=size;
+      }
+
+    /* Generate resource name */
+    fprintf(opts->outfile,"%s%s%s%s%s%s%s",linkstr,conststr,typestr,opts->prefix,name,opts->suffix,sizestr);
+
+    /* Generating source file */
+    if(opts->filetype==TYPE_SOURCE){
+
+      /* Text Mode */
+      if(opts->mode>=MODE_TEXT){
+        col=0;
+        hex=0;
+        fprintf(opts->outfile,"=\n  \"");
+        while((b=fgetc(file))!=EOF){
+          if(!opts->binary && (b=='\r')) continue;
+          if(col>=opts->maxcols){
+            fprintf(opts->outfile,"\"\n  \"");
+            col=0;
+            }
+          if(opts->mode==MODE_ASCII){
+            if(b=='\\'){ fprintf(opts->outfile,"\\\\"); col+=2; hex=0; }
+            else if(b=='\a'){ fprintf(opts->outfile,"\\a"); col+=2; hex=0; }
+            else if(b=='\t'){ fprintf(opts->outfile,"\\t"); col+=2; hex=0; }
+            else if(b=='\r'){ fprintf(opts->outfile,"\\r"); col+=2; hex=0; }
+            else if(b=='\f'){ fprintf(opts->outfile,"\\f"); col+=2; hex=0; }
+            else if(b=='\v'){ fprintf(opts->outfile,"\\v"); col+=2; hex=0; }
+            else if(b=='\"'){ fprintf(opts->outfile,"\\\""); col+=2; hex=0; }
+            else if(b=='\n'){ fprintf(opts->outfile,"\\n\"\n  \""); col=0; hex=0; }
+            else if(b<32 || b>=127){ fprintf(opts->outfile,"\\x%02x",b); col+=4; hex=1; }
+            else if(hex && isxdigit(b)){ fprintf(opts->outfile,"\\x%02x",b); col+=4; hex=1; }
+            else{ fprintf(opts->outfile,"%c",b); col+=1; hex=0; }
+            }
+          else{
+            fprintf(opts->outfile,"\\x%02x",b); col+=4;
+            }
+          }
+        fprintf(opts->outfile,"\"\n  ");
+        }
+
+      /* Normal Mode */
+      else{
+        col=0;
+        first=1;
+        fprintf(opts->outfile,"={\n  ");
+        while((b=fgetc(file))!=EOF){
+          if(!opts->binary && (b=='\r')) continue;
+          if(!first){
+            fprintf(opts->outfile,",");
+            }
+          if(col>=opts->maxcols){
+            fprintf(opts->outfile,"\n  ");
+            col=0;
+            }
+          if(opts->mode==MODE_HEX){
+            fprintf(opts->outfile,"0x%02x",b);
+            }
+          else{
+            fprintf(opts->outfile,"%3d",b);
+            }
+          first=0;
+          col++;
+          }
+        fprintf(opts->outfile,"\n  }");
+        }
+      }
+
+    /* Append ; */
+    fprintf(opts->outfile,";\n\n");
+
+    /* Verbose mode */
+    if(opts->verbose){
+      fprintf(stderr,"%-30s  %s%s%s%s%s%s%s\n",filename,linkstr,conststr,typestr,opts->prefix,name,opts->suffix,sizestr);
+      }
+      
+    /* Close resource file */
+    fclose(file);
+    return 1;
     }
-
-  /* Append ; */
-  fprintf(opts->outfile,";\n\n");
-
-  /* Close resource file */
-  fclose(file);
+  return 0;
   }
 
+/*******************************************************************************/
 
 /* Main */
 int main(int argc,char **argv){
@@ -405,6 +412,7 @@ int main(int argc,char **argv){
   opts.comments=1;
   opts.keepext=0;
   opts.binary=1;
+  opts.verbose=0;
   opts.mode=MODE_HEX;
 
   /* Process all options first, except for the -r option */
@@ -594,6 +602,11 @@ int main(int argc,char **argv){
         opts.comments=0;
         }
 
+      /* Verbose */
+      else if(strcmp(argv[arg],"-V")==0 || strcmp(argv[arg],"--verbose")==0){
+        opts.verbose=1;
+        }
+
       /* Embed in namespace */
       else if(strcmp(argv[arg],"-n")==0 || strcmp(argv[arg],"--namespace")==0){
         if(++arg>=argc){
@@ -618,7 +631,7 @@ int main(int argc,char **argv){
           }
         }
 
-      /* Prefix in front of declarations */
+      /* Suffix behind declarations */
       else if(strcmp(argv[arg],"-f")==0 || strcmp(argv[arg],"--suffix")==0){
         if(++arg>=argc){
           fprintf(stderr,"reswrap: missing argument for -f or --suffix option\n");
@@ -654,9 +667,12 @@ int main(int argc,char **argv){
         prologue(&opts);
         needprologue=0;
         }
-
-      /* Generate data array */
-      processresourcefile(argv[arg],resource,&opts);
+        
+      /* Process resource file */
+      if(!processresourcefile(argv[arg],resource,&opts)){
+        fprintf(stderr,"reswrap: error reading resource file: %s\n",argv[arg]);
+        break;
+        }
 
       /* Reset for next time */
       needepilogue=1;
@@ -668,6 +684,6 @@ int main(int argc,char **argv){
   if(needepilogue){
     epilogue(&opts);
     }
-
+  
   return 0;
   }

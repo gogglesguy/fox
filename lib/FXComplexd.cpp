@@ -108,17 +108,58 @@ using namespace FX;
 namespace FX {
 
 
-/*
 // Complex square root
-FXComplexd csqrt(const FXComplexd& c) const {
+FXComplexd csqrt(const FXComplexd& c){
   register FXdouble mag=c.modulus();
   register FXdouble rr=sqrt((mag+c.re)*0.5);
   register FXdouble ii=sqrt((mag-c.re)*0.5);
+#if defined(WIN32)
+  return FXComplexd(rr,c.im<0.0?-ii:ii);
+#else
   return FXComplexd(rr,copysign(ii,c.im));
+#endif
   }
-*/
-  
-  
+
+
+// Complex sine
+FXComplexd csin(const FXComplexd& c){
+  return FXComplexd(sin(c.re)*cosh(c.im),cos(c.re)*sinh(c.im));
+  }
+
+
+// Complex cosine
+FXComplexd ccos(const FXComplexd& c){
+  return FXComplexd(cos(c.re)*cosh(c.im),-sin(c.re)*sinh(c.im));
+  }
+
+
+// Complex tangent
+FXComplexd ctan(const FXComplexd& c){
+  FXComplexd ep=exponent(FXComplexd(-c.im,c.re));
+  FXComplexd em=exponent(FXComplexd(c.im,-c.re));
+  FXComplexd t=(em-ep)/(em+ep);
+  return FXComplexd(-t.im,t.re);
+  }
+
+
+// Complex hyperbolic sine
+FXComplexd csinh(const FXComplexd& c){
+  return FXComplexd(cos(c.im)*sinh(c.re),sin(c.im)*cosh(c.re));
+  }
+
+
+// Complex hyperbolic cosine
+FXComplexd ccosh(const FXComplexd& c){
+  return FXComplexd(cos(c.im)*cosh(c.re),sin(c.im)*sinh(c.re));
+  }
+
+
+// Complex hyperbolic tangent
+FXComplexd ctanh(const FXComplexd& c){
+  return csinh(c)/ccosh(c);
+  }
+
+
 FXStream& operator<<(FXStream& store,const FXComplexd& c){
   store << c.re << c.im;
   return store;

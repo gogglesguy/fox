@@ -77,9 +77,43 @@ using namespace FX;
 namespace FX {
 
 
-// Construct new task group task
+// Create new group of tasks
+FXTaskGroup::FXTaskGroup():threadpool(FXThreadPool::instance()),completed(1),counter(0){
+  if(!threadpool){ fxerror("FXTaskGroup::FXTaskGroup: No thread pool was set."); }
+  }
+
+
+// Create new group of tasks
+FXTaskGroup::FXTaskGroup(FXThreadPool* p):threadpool(p),completed(1),counter(0){
+  if(!threadpool){ fxerror("FXTaskGroup::FXTaskGroup: No thread pool was set."); }
+  }
+
+
+// Task was started
+void FXTaskGroup::incrementAndReset(){
+  if(atomicAdd(&counter,1)==0){
+    completed.trywait();
+    }
+  }
+
+
+// Task has completed
+void FXTaskGroup::decrementAndNotify(){
+  if(atomicAdd(&counter,-1)==1){
+    completed.post();
+    }
+  }
+
+
+// Construct task group task
 FXTaskGroup::Task::Task(FXTaskGroup* g,FXRunnable *r):taskgroup(g),runnable(r){
   taskgroup->incrementAndReset();
+  }
+
+
+// Destruct task group task
+FXTaskGroup::Task::~Task(){
+  taskgroup->decrementAndNotify();
   }
 
 
@@ -107,41 +141,6 @@ FXint FXTaskGroup::Task::run(){
   }
 
 
-// Destroy task group task
-FXTaskGroup::Task::~Task(){
-  taskgroup->decrementAndNotify();
-  }
-
-/*******************************************************************************/
-
-// Create new group of tasks
-FXTaskGroup::FXTaskGroup():threadpool(FXThreadPool::instance()),completion(1),counter(0){
-  if(!threadpool){ fxerror("FXTaskGroup::FXTaskGroup: No thread pool was set."); }
-  }
-
-
-// Create new group of tasks
-FXTaskGroup::FXTaskGroup(FXThreadPool* p):threadpool(p),completion(1),counter(0){
-  if(!threadpool){ fxerror("FXTaskGroup::FXTaskGroup: No thread pool was set."); }
-  }
-
-
-// Task was started
-void FXTaskGroup::incrementAndReset(){
-  if(atomicAdd(&counter,1)==0){
-    completion.trywait();
-    }
-  }
-
-
-// Task has completed
-void FXTaskGroup::decrementAndNotify(){
-  if(atomicAdd(&counter,-1)==1){
-    completion.post();
-    }
-  }
-
-
 // Start task
 FXbool FXTaskGroup::execute(FXRunnable* task){
   if(__likely(task)){
@@ -153,7 +152,7 @@ FXbool FXTaskGroup::execute(FXRunnable* task){
   }
 
 
-// Start task and wait
+// Start task and wait until queue is empty or counter is zero
 FXbool FXTaskGroup::executeAndRun(FXRunnable* task){
   if(__likely(task)){
     if(threadpool->executeAndRunWhile(new FXTaskGroup::Task(this,task),counter)){
@@ -164,17 +163,24 @@ FXbool FXTaskGroup::executeAndRun(FXRunnable* task){
   }
 
 
-// Wait for completion
-FXbool FXTaskGroup::wait(){
-  return threadpool->waitWhile(counter);
+// Start task in this task group, then wait till done
+FXbool FXTaskGroup::executeAndWait(FXRunnable* task){
+  if(__likely(task)){
+    if(threadpool->executeAndRunWhile(new FXTaskGroup::Task(this,task),counter)){
+      completed.wait();
+      completed.post();
+      return true;
+      }
+    }
+  return false;
   }
 
 
 // Wait for completion
-FXbool FXTaskGroup::waitDone(){
+FXbool FXTaskGroup::wait(){
   if(threadpool->waitWhile(counter)){
-    completion.wait();
-    completion.post();
+    completed.wait();
+    completed.post();
     return true;
     }
   return false;
@@ -183,9 +189,7 @@ FXbool FXTaskGroup::waitDone(){
 
 // Wait for stuff
 FXTaskGroup::~FXTaskGroup(){
-  if(wait()){
-    completion.wait();
-    }
+  wait();
   }
 
 }

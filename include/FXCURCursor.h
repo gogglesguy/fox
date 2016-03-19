@@ -65,14 +65,12 @@ public:
 */
 extern FXAPI FXbool fxcheckICO(FXStream& store);
 
-
 /**
 * Load an ICO (Microsoft icon format) file from a stream.
 * Upon successful return, the pixel array and size are returned.
 * If an error occurred, the pixel array is set to NULL.
 */
 extern FXAPI FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot);
-
 
 /**
 * Save an ICO (Microsoft icon format) file to a stream.

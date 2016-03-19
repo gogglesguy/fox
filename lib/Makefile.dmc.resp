@@ -259,11 +259,11 @@
 +fxascii.obj &
 +fxbmpio.obj &
 +fxddsio.obj &
++fxexeio.obj &
 +fxezquantize.obj &
 +fxfsquantize.obj &
 +fxgetticks.obj &
 +fxgifio.obj &
-+fxicoio.obj &
 +fxiffio.obj &
 +fxjpegio.obj &
 +fxkeyboard.obj &

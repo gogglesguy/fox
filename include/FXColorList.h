@@ -75,7 +75,7 @@ public:
   FXColorList(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=LIST_BROWSESELECT,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Fill list by appending color items from array of strings and array of colors
-  FXint fillItems(const FXchar** strings,FXColor *colors=NULL,void* ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXchar *const *strings,FXColor *colors=NULL,void* ptr=NULL,FXbool notify=false);
 
   /// Insert item at index with given text, color, and user-data pointer
   FXint insertItem(FXint index,const FXString& text,FXColor color=0,void* ptr=NULL,FXbool notify=false);

@@ -78,7 +78,7 @@ private:
   FXScopedMutex& operator=(const FXScopedMutex&);
 public:
 
-  /// Construct & lock associated mutex
+  /// Construct and lock associated mutex
   FXScopedMutex(FXMutex& m):mtx(m){ lock(); }
 
   /// Return reference to associated mutex
@@ -98,6 +98,44 @@ public:
 
   /// Destroy and unlock associated mutex
   ~FXScopedMutex(){ unlock(); }
+  };
+
+
+/**
+* The Reverse Mutex unlocks its associated Mutex when entering the
+* scope, and automatically relocks it upon exiting the scope.
+* Exceptions raised while in this region will automatically relock
+* the mutex upon leaving the enclosing scope.
+*/
+class FXAPI FXReverseMutex {
+private:
+  FXMutex& mtx;
+private:
+  FXReverseMutex();
+  FXReverseMutex(const FXReverseMutex&);
+  FXReverseMutex& operator=(const FXReverseMutex&);
+public:
+
+  /// Construct and unlock associated mutex
+  FXReverseMutex(FXMutex& m):mtx(m){ unlock(); }
+
+  /// Return reference to associated mutex
+  FXMutex& mutex(){ return mtx; }
+
+  /// Lock mutex
+  void lock(){ mtx.lock(); }
+
+  /// Return true if succeeded locking the mutex
+  FXbool trylock(){ return mtx.trylock(); }
+
+  /// Return true if mutex is already locked
+  FXbool locked(){ return mtx.locked(); }
+
+  /// Unlock mutex
+  void unlock(){ mtx.unlock(); }
+
+  /// Destroy and relock associated mutex
+  ~FXReverseMutex(){ lock(); }
   };
 
 

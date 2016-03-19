@@ -43,6 +43,9 @@
     The const operators will return default Null variant if referencing non-
     existing members.
   - New mebers or array entries will be automatically created in this case.
+  - Converting any non-empty string to type bool yields true; this was changed
+    from older implementation.  New implementation makes more sense.
+  - Likewise, converting non-empty map or array to boolean also yields true.
 */
 
 using namespace FX;
@@ -257,7 +260,7 @@ FXbool FXVariant::has(const FXchar* key) const {
 
 
 // Convert to bool
-FXbool FXVariant::toBool(FXbool* ok) const {
+FXbool FXVariant::toBool() const {
   switch(type){
   case VBool:
   case VChar:
@@ -265,17 +268,17 @@ FXbool FXVariant::toBool(FXbool* ok) const {
   case VUInt:
   case VLong:
   case VULong:
-    if(ok) *ok=true;
+  case VPointer:
     return !!value.u;
   case VFloat:
   case VDouble:
-    if(ok) *ok=true;
     return !!value.d;
   case VString:
-    if(strstr("TRUE true YES yes ON on 1",value.s)){ if(ok) *ok=true; return true; }
-    if(strstr("FALSE false NO no OFF off 0",value.s)){ if(ok) *ok=true; return false; }
-  default:
-    if(ok) *ok=false;
+    return !reinterpret_cast<const FXString*>(&value.p)->empty();       // True for non-empty string
+  case VArray:
+    return !!reinterpret_cast<const FXVariantArray*>(&value.p)->no();   // True for non-empty array
+  case VMap:
+    return !reinterpret_cast<const FXVariantMap*>(&value.p)->empty();   // True for non-empty map
     }
   return false;
   }
@@ -447,6 +450,7 @@ FXString FXVariant::toString(FXbool* ok) const {
     }
   return FXString::null;
   }
+
 
 /*******************************************************************************/
 

@@ -25,6 +25,9 @@
 namespace FX {
 
 
+class FXThreadPool;
+
+
 /**
 * An FXTaskGroup manages a number of tasks, executing on the associated FXThreadPool.
 * In a typical use, an FXTaskGroup is constructed on the stack of the calling function.
@@ -62,13 +65,14 @@ private:
     };
 private:
   FXThreadPool   *threadpool;   // Thread pool
-  FXSemaphore     completion;   // Completion semaphore
+  FXSemaphore     completed;    // Signaled when group completed
   volatile FXuint counter;      // Completion counter
+private:
+  void incrementAndReset();
+  void decrementAndNotify();
 private:
   FXTaskGroup(const FXTaskGroup&);
   FXTaskGroup &operator=(const FXTaskGroup&);
-  void incrementAndReset();
-  void decrementAndNotify();
 public:
 
   /**
@@ -96,21 +100,23 @@ public:
   * Start task in this task group, and then enter the task-processing
   * loop, returning when either the completion count reaches zero, or the
   * thread pool's task queue becomes empty.
+  * Return false if unable to start the task.
   */
   FXbool executeAndRun(FXRunnable* task);
 
   /**
-  * Enter the task processing loop and return when either the completion count
-  * reaches zero, or the thread pool's task queue becomes empty.
+  * Start task in this task group, and then enter the task-processing
+  * loop, returning when all tasks have been completed.
+  * Return false if unable to start the task.
   */
-  FXbool wait();
+  FXbool executeAndWait(FXRunnable* task);
 
   /**
   * Wait until all tasks of this group have finished executing, then return.
   * The completion semaphore is reset after being signaled by the last completed
   * task.
   */
-  FXbool waitDone();
+  FXbool wait();
 
   /**
   * Wait for the semaphore to be signaled, then destroy the task group.

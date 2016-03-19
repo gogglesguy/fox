@@ -1902,7 +1902,7 @@ void FXApp::immediatesignalhandler(int sig){
 
 // Add a signal message
 void FXApp::addSignal(FXint sig,FXObject* tgt,FXSelector sel,FXbool immediate,FXuint flags){
-  void (*handler)(int);
+  void (CDECL *handler)(int);
   if(sig<0 || MAXSIGNALS<sig){ fxerror("%s::addSignal: bad signal number\n",getClassName()); }
 
   // May have just changed the message and/or target

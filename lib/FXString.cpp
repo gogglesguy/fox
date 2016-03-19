@@ -57,14 +57,14 @@
       -----------------------   -----------------------------   -----------------------------------
       U-00000000 - U-0000FFFF   0000 0000 xxxx xxxx xxxx xxxx   xxxxxxxx xxxxxxxx
       U-00010000 - U-0010FFFF   000y yyyy yyyy yyxx xxxx xxxx   110110zz zzzzzzzz 110111xx xxxxxxxx
-      
-    The range U-D800 - U-DFFF is reserved for surrogate pairs; Leading-surrogates or high-surrogates 
+
+    The range U-D800 - U-DFFF is reserved for surrogate pairs; Leading-surrogates or high-surrogates
     are from U-D800 to U-DBFF, and trailing-surrogates or low-surrogates are from U-DC00 to U-DFFF.
     Surrogates CH and CL are computed as follows for U > 0x10000:
 
       CH = (U >> 10) + 0xD800
       CL = (U & 0x3FF) + 0xDC00
-    
+
 */
 
 
@@ -666,33 +666,6 @@ FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen){
 
 /*******************************************************************************/
 
-
-#if 0
-// Change the length of the string to len
-FXbool FXString::length(FXint len){
-  if(__likely(len!=length())){
-    if(0<len){
-      register FXchar *ptr;
-      if(str==EMPTY){
-        ptr=(FXchar*)::malloc(ROUNDUP(1+len)+sizeof(FXint));
-        }
-      else{
-        ptr=(FXchar*)::realloc(str-sizeof(FXint),ROUNDUP(1+len)+sizeof(FXint));
-        }
-      if(__unlikely(!ptr)) return false;
-      str=ptr+sizeof(FXint);
-      str[len]=0;
-      *(((FXint*)str)-1)=len;
-      }
-    else if(str!=EMPTY){
-      ::free(str-sizeof(FXint));
-      str=EMPTY;
-      }
-    }
-  return true;
-  }
-#endif
-
 // Change the length of the string to len
 void FXString::length(FXint len){
   if(__likely(len!=length())){
@@ -732,7 +705,6 @@ FXString::FXString(const FXString& s):str(EMPTY){
     memcpy(str,s.str,n);
     }
   }
-
 
 
 // Construct and init

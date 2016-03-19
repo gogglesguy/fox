@@ -119,6 +119,8 @@ FXDriveBox.h \
 FXElement.h \
 FXEvent.h \
 FXException.h \
+FXEXEIcon.h \
+FXEXEImage.h \
 FXExpression.h \
 FXExtentd.h \
 FXExtentf.h \

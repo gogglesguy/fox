@@ -42,7 +42,6 @@ using namespace FX;
 namespace FX {
 
 
-// Declarations
 #ifndef FXLOADPPM
 extern FXAPI FXbool fxcheckPPM(FXStream& store);
 extern FXAPI FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height);

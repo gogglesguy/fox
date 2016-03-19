@@ -138,7 +138,7 @@ public:
   FXint setItem(FXint index,const FXString& text,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list box by appending items from array of strings
-  FXint fillItems(const FXchar** strings,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
+  FXint fillItems(const FXchar *const *strings,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);
 
   /// Fill list box by appending items from array of strings
   FXint fillItems(const FXString* strings,FXIcon* icon=NULL,FXptr ptr=NULL,FXbool notify=false);

@@ -651,7 +651,7 @@ FXint FXHeader::prependItem(const FXString& text,FXIcon *icon,FXint size,void* p
 
 
 // Fill list by appending items from array of strings
-FXint FXHeader::fillItems(const FXchar** strings,FXIcon *icon,FXint size,void* ptr,FXbool notify){
+FXint FXHeader::fillItems(const FXchar *const *strings,FXIcon *icon,FXint size,void* ptr,FXbool notify){
   register FXint n=0;
   if(strings){
     while(strings[n]){

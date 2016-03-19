@@ -190,6 +190,7 @@ const FXchar patterns[]=
   "\nDDS Image (*.dds)"
   "\nIFF Image (*.iff)"
   "\nJP2 Image (*.jp2)"
+  "\nEXE Image (*.exe)"
   ;
 
 /*******************************************************************************/
@@ -400,7 +401,7 @@ ImageWindow::~ImageWindow(){
 
 // About box
 long ImageWindow::onCmdAbout(FXObject*,FXSelector,void*){
-  FXMessageBox about(this,"About Image Viewer","Image Viewer demonstrates the FOX ImageView widget.\n\nUsing the FOX C++ GUI Library (http://www.fox-toolkit.org)\n\nCopyright (C) 2000,2011 Jeroen van der Zijp (jeroen@fox-toolkit.com)",NULL,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
+  FXMessageBox about(this,"About Image Viewer","Image Viewer demonstrates the FOX ImageView widget.\n\nUsing the FOX C++ GUI Library (http://www.fox-toolkit.org)\n\nCopyright (C) 2000,2014 Jeroen van der Zijp (jeroen@fox-toolkit.com)",NULL,MBOX_OK|DECOR_TITLE|DECOR_BORDER);
   about.execute();
   return 1;
   }
@@ -461,6 +462,9 @@ FXbool ImageWindow::loadimage(const FXString& file){
     }
   else if(comparecase(ext,"webp")==0){
     img=new FXWEBPImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    }
+  else if(comparecase(ext,"exe")==0 || comparecase(ext,"dll")==0){
+    img=new FXEXEImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 
   // Perhaps failed

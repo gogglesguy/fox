@@ -153,8 +153,9 @@ public:
 
   /**
   * Exit the calling thread.
-  * No destructors are invoked for objects on thread's stack;
-  * to invoke destructors, throw an exception instead.
+  * No destructors are invoked for objects on thread's stack; to invoke destructors, 
+  * throw an exception instead; the special FXThreadException causes graceful termination 
+  * of the calling thread with return of an exit code for join().
   */
   static void exit(FXint code=0);
 
