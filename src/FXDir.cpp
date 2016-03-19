@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDir.cpp,v 1.51 2008/05/20 16:01:05 fox Exp $                           *
+* $Id: FXDir.cpp,v 1.71 2008/09/24 04:58:20 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -36,6 +36,15 @@
   - This class implements a way to list the files in a directory.
   - We just want to wrap directory iteration, nothing fancy.
   - Maybe add positioning for seek and tell type functions.
+  - Maybe add API like:
+
+        FXString name;
+        while(dir.next(name)){
+          ...
+          }
+
+    This would be mode efficient, due to elimination of string copies being returned
+    by dir.name().
 */
 
 
@@ -129,40 +138,31 @@ FXbool FXDir::isOpen() const {
   }
 
 
-// Get next file name
-FXbool FXDir::next(){
+// Go to next directory entry and return its name
+FXbool FXDir::next(FXString& name){
   if(isOpen()){
 #ifdef WIN32
     if(((SPACE*)space)->first || FindNextFile(((SPACE*)space)->handle,&((SPACE*)space)->result)){
       ((SPACE*)space)->first=false;
+      name.assign(((SPACE*)space)->result.cFileName);
       return true;
       }
 #else
 #if defined(FOX_THREAD_SAFE) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
     if(!readdir_r(((SPACE*)space)->handle,&((SPACE*)space)->result,&((SPACE*)space)->dp) && ((SPACE*)space)->dp){
+      name.assign(((SPACE*)space)->dp->d_name);
       return true;
       }
 #else
     if((((SPACE*)space)->dp=readdir(((SPACE*)space)->handle))!=NULL){
+      name.assign(((SPACE*)space)->dp->d_name);
       return true;
       }
 #endif
 #endif
     }
+  name.clear();
   return false;
-  }
-
-
-// Return current file name
-FXString FXDir::name() const {
-  if(isOpen()){
-#ifdef WIN32
-    return ((SPACE*)space)->result.cFileName;
-#else
-    return ((SPACE*)space)->dp->d_name;
-#endif
-    }
-  return FXString::null;
   }
 
 
@@ -181,7 +181,7 @@ void FXDir::close(){
 
 
 // Create new directory
-FXbool FXDir::create(const FXString& path,FXuint mode){
+FXbool FXDir::create(const FXString& path,FXuint perm){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -192,7 +192,7 @@ FXbool FXDir::create(const FXString& path,FXuint mode){
     return CreateDirectoryA(path.text(),NULL)!=0;
 #endif
 #else
-    return ::mkdir(path.text(),mode)==0;
+    return ::mkdir(path.text(),perm)==0;
 #endif
     }
   return false;
@@ -247,7 +247,7 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 
   // Get directory stream pointer
   if(dir.isOpen()){
-    FXuint    mode=FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE;
+    FXuint    mode=(flags&CaseFold)?(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE|FILEMATCH_CASEFOLD):(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE);
     FXString *newlist;
     FXint     size=0;
     FXint     count=0;
@@ -255,18 +255,12 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
     FXString  name;
     FXStat    data;
 
-    // Folding case
-    if(flags&CaseFold) mode|=FILEMATCH_CASEFOLD;
-
     // Loop over directory entries
-    while(dir.next()){
-
-      // Get name
-      name=dir.name();
+    while(dir.next(name)){
 
       // Build full pathname
       pathname=path;
-      if(!ISPATHSEP(pathname[pathname.length()-1])) pathname+=PATHSEPSTRING;
+      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
       pathname+=name;
 
       // Get info on file
@@ -278,7 +272,7 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
       if(!data.isDirectory() && ((flags&NoFiles) || (data.isHidden() && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(pattern,name,mode)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0 && (flags&NoParent)))) || (!(flags&AllDirs) && !FXPath::match(pattern,name,mode)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(pattern,name,mode)))) continue;
 
 #else
 
@@ -286,7 +280,7 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
       if(!data.isDirectory() && ((flags&NoFiles) || (name[0]=='.' && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(pattern,name,mode)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0 && (flags&NoParent)) || (name[1]!='.' && !(flags&HiddenDirs)))) || (!(flags&AllDirs) && !FXPath::match(pattern,name,mode)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(pattern,name,mode)))) continue;
 
 #endif
 
@@ -329,20 +323,128 @@ FXint FXDir::listDrives(FXString*& drivelist){
   }
 
 
-// Create a directory recursively
-FXbool createDirectory(const FXString& path){
-  if(!path.empty()) return false;
-  if(!FXStat::isDirectory(path)){
-    if(!createDirectory(FXPath::upLevel(path))) return false;
-    if(!FXDir::create(path)) return false;
+#if 0
+
+FXint FXDir::listShares(FXString*& sharelist){
+  register FXint count=0;
+#ifdef WIN32
+#else
+  sharelist=new FXString [2];
+  sharelist[count++].assign(PATHSEP);
+#endif
+  return count;
+  }
+#endif
+
+
+// Create a directories recursively
+FXbool FXDir::createDirectories(const FXString& path,FXuint perm){
+  FXTRACE((1,"path=%s\n",path.text()));
+  if(!path.empty()){
+    if(FXStat::isDirectory(path)) return true;
+    if(createDirectories(FXPath::upLevel(path),perm)){
+      if(FXDir::create(path,perm)) return true;
+      }
     }
-  return true;
+  return false;
   }
 
 
 // Cleanup
 FXDir::~FXDir(){
   close();
+  }
+
+
+// Recursively visit files and directories
+FXbool FXDirVisitor::traverse(const FXString& path){
+  FXStat data;
+  if(FXStat::statLink(path,data)){
+    if(data.isDirectory()){
+      if(enter(path)){
+        FXDir directory(path);
+        FXString name;
+        while(directory.next(name)){
+          if(name[0]!='.' || (name[1]!=0 && (name[1]!='.' || name[2]!=0))){ 
+            if(!traverse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name)) break;
+            }
+          }
+        return leave(path);
+        }
+      }
+    else{
+      return visit(path);                // Its a file
+      }
+    }
+  return false;
+  }
+
+
+/*
+// Recursively visit files and directories
+FXint FXDirVisitor::traverse(const FXString& path,const FXString& pattern,FXuint flags){
+  FXDir dir(path);
+  if(dir.isOpen()){
+    FXuint   mode=(flags&FXDir::CaseFold)?(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE|FILEMATCH_CASEFOLD):(FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE);
+    FXString pathname;
+    FXString name;
+    FXStat   data;
+    while(dir.next(name)){
+
+      // Get full path
+      pathname=path;
+      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
+      pathname+=name;
+
+      // Get file info
+      if(!FXStat::statFile(pathname,data)) continue;
+
+      // Handle directory
+      if(data.isDirectory()){
+#ifdef WIN32
+        if((flags&FXDir::NoDirs) || (data.isHidden() && !(flags&FXDir::HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&FXDir::NoParent)) || (!(flags&FXDir::AllDirs) && !FXPath::match(pattern,name,mode))) continue;
+#else
+        if((flags&FXDir::NoDirs) || (name[0]=='.' && !(flags&FXDir::HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&FXDir::NoParent)) || (!(flags&FXDir::AllDirs) && !FXPath::match(pattern,name,mode))) continue;
+#endif
+        enter(pathname);
+        if(name[0]!='.' || (name[1]!=0 && (name[1]!='.' || name[2]!=0))){ traverse(pathname,pattern,flags); }
+        leave(pathname);
+        }
+
+      // Handle file
+      else{
+#ifdef WIN32
+        if((flags&FXDir::NoFiles) || (data.isHidden() && !(flags&FXDir::HiddenFiles)) || (!(flags&FXDir::AllFiles) && !FXPath::match(pattern,name,mode))) continue;
+#else
+        if((flags&FXDir::NoFiles) || (name[0]=='.' && !(flags&FXDir::HiddenFiles)) || (!(flags&FXDir::AllFiles) && !FXPath::match(pattern,name,mode))) continue;
+#endif
+        visit(pathname);
+        }
+      }
+    }
+  return 1;
+  }
+*/
+
+
+// Handle directory
+FXbool FXDirVisitor::enter(const FXString& path){
+  FXTRACE((1,"enter(%s)\n",path.text()));
+  return true;
+  }
+
+
+// Handle file
+FXbool FXDirVisitor::visit(const FXString& path){
+  FXTRACE((1,"visit(%s)\n",path.text()));
+  return true;
+  }
+
+
+// Handle directory
+FXbool FXDirVisitor::leave(const FXString& path){
+  FXTRACE((1,"leave(%s)\n",path.text()));
+  return true;
   }
 
 }
@@ -493,121 +595,6 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 
 
 
-
-
-
-
-// List root directories
-void FXDirList::listRootItems(){
-  FXDirItem      *oldlist,*newlist,**po,**pp,**pn,*item,*link;
-  FXIcon         *openicon;
-  FXIcon         *closedicon;
-  FXFileAssoc    *fileassoc;
-  FXString        name;
-  DWORD           mask;
-  UINT            drivetype;
-
-  // Build new insert-order list
-  oldlist=list;
-  newlist=NULL;
-
-  // Assemble lists
-  po=&oldlist;
-  pn=&newlist;
-
-  // Loop over drive letters
-  for(mask=GetLogicalDrives(),name="A:\\"; mask; mask>>=1,name[0]++){
-
-    // Skip unavailable drives
-    if(!(mask&1)) continue;
-
-    // Find it, and take it out from the old list if found
-    for(pp=po; (item=*pp)!=NULL; pp=&item->link){
-      if(comparecase(item->label,name)==0){
-        *pp=item->link;
-        item->link=NULL;
-        po=pp;
-        goto fnd;
-        }
-      }
-
-    // Not found; prepend before list
-    item=(FXDirItem*)appendItem(NULL,name,open_folder,closed_folder,NULL,true);
-
-    // Next gets hung after this one
-fnd:*pn=item;
-    pn=&item->link;
-
-    // Its a folder
-    item->state=FXDirItem::FOLDER|FXDirItem::HASITEMS;
-
-    // Assume no associations
-    fileassoc=NULL;
-    drivetype=GetDriveType(name.text());
-    switch(drivetype){
-      case DRIVE_REMOVABLE:
-        if(name[0]=='A' || name[0]=='B'){
-          openicon=floppyicon;
-          closedicon=floppyicon;
-          }
-        else{
-          openicon=zipdiskicon;
-          closedicon=zipdiskicon;
-          }
-        break;
-      case DRIVE_REMOTE:
-        openicon=networkicon;
-        closedicon=networkicon;
-        break;
-      case DRIVE_CDROM:
-        openicon=cdromicon;
-        closedicon=cdromicon;
-        break;
-      case DRIVE_RAMDISK:
-        openicon=open_folder;
-        closedicon=closed_folder;
-        break;
-      case DRIVE_FIXED:
-        openicon=harddiskicon;
-        closedicon=harddiskicon;
-        break;
-      case DRIVE_UNKNOWN:
-      case DRIVE_NO_ROOT_DIR:
-      default:
-        openicon=open_folder;
-        closedicon=closed_folder;
-        break;
-      }
-    if(associations) fileassoc=associations->findDirBinding(name.text());
-
-    // If association is found, use it
-    if(fileassoc){
-      if(fileassoc->miniicon) closedicon=fileassoc->miniicon;
-      if(fileassoc->miniiconopen) openicon=fileassoc->miniiconopen;
-      }
-
-    // Update item information
-    item->openIcon=openicon;
-    item->closedIcon=closedicon;
-    item->size=0L;
-    item->assoc=fileassoc;
-    item->date=0;
-
-    // Create item
-    if(id()) item->create();
-    }
-
-  // FIXME what about network neighborhood?
-
-  // Wipe items remaining in list:- they have disappeared!!
-  for(item=oldlist; item; item=link){
-    link=item->link;
-    removeItem(item,true);
-    }
-
-  // Remember new list
-  list=newlist;
-  }
 
 
 

@@ -18,8 +18,10 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxpriv.h,v 1.46 2008/06/03 15:27:30 fox Exp $                            *
+* $Id: fxpriv.h,v 1.47 2008/09/22 20:50:13 fox Exp $                            *
 ********************************************************************************/
+#ifndef FXPRIV_H
+#define FXPRIV_H
 
 namespace FX {
 
@@ -134,5 +136,4 @@ extern PFNMONITORFROMRECT fxMonitorFromRect;
 
 }
 
-
-
+#endif

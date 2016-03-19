@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorDialog.cpp,v 1.39 2008/01/04 15:42:05 fox Exp $                   *
+* $Id: FXColorDialog.cpp,v 1.40 2008/07/22 19:21:32 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -65,6 +65,8 @@ namespace FX {
 FXDEFMAP(FXColorDialog) FXColorDialogMap[]={
   FXMAPFUNC(SEL_CHANGED,FXColorDialog::ID_COLORSELECTOR,FXColorDialog::onChgColor),
   FXMAPFUNC(SEL_COMMAND,FXColorDialog::ID_COLORSELECTOR,FXColorDialog::onCmdColor),
+  FXMAPFUNC(SEL_COMMAND,FXColorDialog::ID_SETINTVALUE,FXColorDialog::onCmdSetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXColorDialog::ID_GETINTVALUE,FXColorDialog::onCmdGetIntValue),
   };
 
 
@@ -104,6 +106,20 @@ long FXColorDialog::onChgColor(FXObject*,FXSelector,void* ptr){
 // Forward ColorSelector color command to target [a color well]
 long FXColorDialog::onCmdColor(FXObject*,FXSelector,void* ptr){
   return target && target->tryHandle(this,FXSEL(SEL_COMMAND,message),ptr);
+  }
+
+
+// Update color dialog from a message
+long FXColorDialog::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
+  setRGBA(*((FXColor*)ptr));
+  return 1;
+  }
+
+
+// Obtain value from color dialog
+long FXColorDialog::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
+  *((FXColor*)ptr)=getRGBA();
+  return 1;
   }
 
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.h,v 1.169 2008/03/18 21:32:08 fox Exp $                         *
+* $Id: FXWindow.h,v 1.170 2008/09/05 22:50:07 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXWINDOW_H
 #define FXWINDOW_H
@@ -126,6 +126,7 @@ public:
   static FXDragType urilistType;        // URI list request
   static FXDragType utf8Type;           // UTF-8 text request
   static FXDragType utf16Type;          // UTF-16 text request
+  static FXDragType actionType;         // Clipboard action 
   static const FXDragType stringType;   // Clipboard text type (pre-registered)
   static const FXDragType imageType;    // Clipboard image type (pre-registered)
 protected:
@@ -308,6 +309,7 @@ public:
   static const FXchar urilistTypeName[];
   static const FXchar utf8TypeName[];
   static const FXchar utf16TypeName[];
+  static const FXchar actionTypeName[];
 
 public:
 

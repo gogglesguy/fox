@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGradientBar.cpp,v 1.86 2008/01/25 19:12:18 fox Exp $                   *
+* $Id: FXGradientBar.cpp,v 1.92 2008/07/22 22:16:51 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -106,12 +106,18 @@ FXDEFMAP(FXGradientBar) FXGradientBarMap[]={
   FXMAPFUNC(SEL_MOTION,0,FXGradientBar::onMotion),
   FXMAPFUNC(SEL_LEFTBUTTONPRESS,0,FXGradientBar::onLeftBtnPress),
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,FXGradientBar::onLeftBtnRelease),
+  FXMAPFUNC(SEL_RIGHTBUTTONPRESS,0,FXGradientBar::onRightBtnPress),
+  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,FXGradientBar::onRightBtnRelease),
   FXMAPFUNC(SEL_DND_ENTER,0,FXGradientBar::onDNDEnter),
   FXMAPFUNC(SEL_DND_LEAVE,0,FXGradientBar::onDNDLeave),
   FXMAPFUNC(SEL_DND_DROP,0,FXGradientBar::onDNDDrop),
   FXMAPFUNC(SEL_DND_MOTION,0,FXGradientBar::onDNDMotion),
   FXMAPFUNC(SEL_QUERY_TIP,0,FXGradientBar::onQueryTip),
   FXMAPFUNC(SEL_QUERY_HELP,0,FXGradientBar::onQueryHelp),
+  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_SETHELPSTRING,FXGradientBar::onCmdSetHelp),
+  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_GETHELPSTRING,FXGradientBar::onCmdGetHelp),
+  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_SETTIPSTRING,FXGradientBar::onCmdSetTip),
+  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_GETTIPSTRING,FXGradientBar::onCmdGetTip),
   FXMAPFUNC(SEL_UPDATE,FXGradientBar::ID_RECENTER,FXGradientBar::onUpdRecenter),
   FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_RECENTER,FXGradientBar::onCmdRecenter),
   FXMAPFUNC(SEL_UPDATE,FXGradientBar::ID_SPLIT,FXGradientBar::onUpdSplit),
@@ -120,21 +126,28 @@ FXDEFMAP(FXGradientBar) FXGradientBarMap[]={
   FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_MERGE,FXGradientBar::onCmdMerge),
   FXMAPFUNC(SEL_UPDATE,FXGradientBar::ID_UNIFORM,FXGradientBar::onUpdUniform),
   FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_UNIFORM,FXGradientBar::onCmdUniform),
+  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_RESET,FXGradientBar::onCmdReset),
   FXMAPFUNCS(SEL_COMMAND,FXGradientBar::ID_BLEND_LINEAR,FXGradientBar::ID_BLEND_DECREASING,FXGradientBar::onCmdBlending),
   FXMAPFUNCS(SEL_UPDATE,FXGradientBar::ID_BLEND_LINEAR,FXGradientBar::ID_BLEND_DECREASING,FXGradientBar::onUpdBlending),
   FXMAPFUNCS(SEL_UPDATE,FXGradientBar::ID_LOWER_COLOR,FXGradientBar::ID_UPPER_COLOR,FXGradientBar::onUpdSegColor),
   FXMAPFUNCS(SEL_CHANGED,FXGradientBar::ID_LOWER_COLOR,FXGradientBar::ID_UPPER_COLOR,FXGradientBar::onCmdSegColor),
   FXMAPFUNCS(SEL_COMMAND,FXGradientBar::ID_LOWER_COLOR,FXGradientBar::ID_UPPER_COLOR,FXGradientBar::onCmdSegColor),
-  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_SETHELPSTRING,FXGradientBar::onCmdSetHelp),
-  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_GETHELPSTRING,FXGradientBar::onCmdGetHelp),
-  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_SETTIPSTRING,FXGradientBar::onCmdSetTip),
-  FXMAPFUNC(SEL_COMMAND,FXGradientBar::ID_GETTIPSTRING,FXGradientBar::onCmdGetTip),
   };
 
 
 // Object implementation
 FXIMPLEMENT(FXGradientBar,FXFrame,FXGradientBarMap,ARRAYNUMBER(FXGradientBarMap))
 
+
+// Default gradient ramp
+const FXGradient FXGradientBar::defaultGradient[3]={
+  {0.0/6.0,1.0/6.0,2.0/6.0,FXRGBA(0,0,255,255),FXRGBA(255,0,0,255),GRADIENT_BLEND_LINEAR},
+  {2.0/6.0,3.0/6.0,4.0/6.0,FXRGBA(255,0,0,255),FXRGBA(255,255,0,255),GRADIENT_BLEND_LINEAR},
+  {4.0/6.0,5.0/6.0,6.0/6.0,FXRGBA(255,255,0,255),FXRGBA(255,255,255,255),GRADIENT_BLEND_LINEAR}
+  };
+
+
+/*******************************************************************************/
 
 // For serialization
 FXGradientBar::FXGradientBar(){
@@ -162,23 +175,23 @@ FXGradientBar::FXGradientBar(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint 
   bar=new FXImage(getApp(),NULL,IMAGE_DITHER|IMAGE_KEEP|IMAGE_OWNED|IMAGE_SHMI|IMAGE_SHMP,2,2);
   nsegs=3;
   allocElms(seg,nsegs);
-  seg[0].lower=0.0;
-  seg[0].middle=0.2;
-  seg[0].upper=0.4;
-  seg[0].lowerColor=FXRGBA(255,0,0,255);
-  seg[0].upperColor=FXRGBA(0,255,0,255);
+  seg[0].lower=0.0/6.0;
+  seg[0].middle=1.0/6.0;
+  seg[0].upper=2.0/6.0;
+  seg[0].lowerColor=FXRGBA(0,0,255,255);
+  seg[0].upperColor=FXRGBA(255,0,0,255);
   seg[0].blend=GRADIENT_BLEND_LINEAR;
-  seg[1].lower=0.4;
-  seg[1].middle=0.5;
-  seg[1].upper=0.6;
-  seg[1].lowerColor=FXRGBA(0,0,0,0);
+  seg[1].lower=2.0/6.0;
+  seg[1].middle=3.0/6.0;
+  seg[1].upper=4.0/6.0;
+  seg[1].lowerColor=FXRGBA(255,0,0,255);
   seg[1].upperColor=FXRGBA(255,255,0,255);
   seg[1].blend=GRADIENT_BLEND_LINEAR;
-  seg[2].lower=0.6;
-  seg[2].middle=0.8;
-  seg[2].upper=1.0;
-  seg[2].lowerColor=FXRGBA(0,0,0,0);
-  seg[2].upperColor=FXRGBA(255,0,0,255);
+  seg[2].lower=4.0/6.0;
+  seg[2].middle=5.0/6.0;
+  seg[2].upper=6.0/6.0;
+  seg[2].lowerColor=FXRGBA(255,255,0,255);
+  seg[2].upperColor=FXRGBA(255,255,255,255);
   seg[2].blend=GRADIENT_BLEND_LINEAR;
   sellower=-1;
   selupper=-1;
@@ -423,7 +436,7 @@ void FXGradientBar::updatebar(){
 // Draw up arrow
 void FXGradientBar::drawUpArrow(FXDCWindow& dc,FXint x,FXint y,FXColor clr){
   FXPoint arrow[3];
-  arrow[0].x=x;                arrow[0].y=y;
+  arrow[0].x=x;               arrow[0].y=y;
   arrow[1].x=x-controlsize/2; arrow[1].y=y+controlsize;
   arrow[2].x=x+controlsize/2; arrow[2].y=y+controlsize;
   dc.setForeground(clr);
@@ -440,7 +453,7 @@ void FXGradientBar::drawDnArrow(FXDCWindow& dc,FXint x,FXint y,FXColor clr){
   FXPoint arrow[3];
   arrow[0].x=x-controlsize/2; arrow[0].y=y;
   arrow[1].x=x+controlsize/2; arrow[1].y=y;
-  arrow[2].x=x;                arrow[2].y=y+controlsize;
+  arrow[2].x=x;               arrow[2].y=y+controlsize;
   dc.setForeground(clr);
   dc.fillPolygon(arrow,3);
   dc.setForeground(FXRGB(0,0,0));
@@ -453,8 +466,8 @@ void FXGradientBar::drawDnArrow(FXDCWindow& dc,FXint x,FXint y,FXColor clr){
 // Draw right arrow
 void FXGradientBar::drawRtArrow(FXDCWindow& dc,FXint x,FXint y,FXColor clr){
   FXPoint arrow[3];
-  arrow[0].x=x;              arrow[0].y=y-controlsize/2;
-  arrow[1].x=x;              arrow[1].y=y+controlsize/2;
+  arrow[0].x=x;             arrow[0].y=y-controlsize/2;
+  arrow[1].x=x;             arrow[1].y=y+controlsize/2;
   arrow[2].x=x+controlsize; arrow[2].y=y;
   dc.setForeground(clr);
   dc.fillPolygon(arrow,3);
@@ -470,7 +483,7 @@ void FXGradientBar::drawLtArrow(FXDCWindow& dc,FXint x,FXint y,FXColor clr){
   FXPoint arrow[3];
   arrow[0].x=x+controlsize; arrow[0].y=y-controlsize/2;
   arrow[1].x=x+controlsize; arrow[1].y=y+controlsize/2;
-  arrow[2].x=x;              arrow[2].y=y;
+  arrow[2].x=x;             arrow[2].y=y;
   dc.setForeground(clr);
   dc.fillPolygon(arrow,3);
   dc.setForeground(FXRGB(0,0,0));
@@ -626,6 +639,12 @@ long FXGradientBar::onPaint(FXObject*,FXSelector,void* ptr){
       }
     }
   return 1;
+  }
+
+
+// Reset gradients to default color ramp
+void FXGradientBar::resetGradients(){
+  setGradients(defaultGradient,ARRAYNUMBER(defaultGradient));
   }
 
 
@@ -1045,6 +1064,7 @@ long FXGradientBar::onMotion(FXObject*,FXSelector,void* ptr){
 long FXGradientBar::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
+  handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
     grab();
     if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONPRESS,message),ptr)) return 1;
@@ -1110,6 +1130,36 @@ long FXGradientBar::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     setAnchorSegment(current);
     setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
     return 1;
+    }
+  return 0;
+  }
+
+
+// Pressed right button
+long FXGradientBar::onRightBtnPress(FXObject*,FXSelector,void* ptr){
+  FXEvent* event=(FXEvent*)ptr;
+  flags&=~FLAG_TIP;
+  handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
+  if(isEnabled()){
+    grab();
+    if(target && target->tryHandle(this,FXSEL(SEL_RIGHTBUTTONPRESS,message),ptr)) return 1;
+    setCurrentSegment(getSegment(event->win_x,event->win_y),true);
+    if(0<=current){
+      if(!isSegmentSelected(current)){
+        selectSegments(current,current,true);
+        setAnchorSegment(current);
+        }
+      }
+    }
+  return 0;
+  }
+
+
+// Released right button
+long FXGradientBar::onRightBtnRelease(FXObject*,FXSelector,void* ptr){
+  if(isEnabled()){
+    ungrab();
+    if(target && target->tryHandle(this,FXSEL(SEL_RIGHTBUTTONRELEASE,message),ptr)) return 1;
     }
   return 0;
   }
@@ -1190,29 +1240,26 @@ long FXGradientBar::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
 // Update upper or lower color of current segment
 long FXGradientBar::onUpdSegColor(FXObject* sender,FXSelector sel,void*){
+  FXColor color=0;
   if(0<=current){
-    if(FXSELID(sel)==ID_LOWER_COLOR){
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&seg[current].lowerColor);
-      }
-    else if(FXSELID(sel)==ID_UPPER_COLOR){
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&seg[current].upperColor);
+    switch(FXSELID(sel)){
+      case ID_LOWER_COLOR: color=seg[current].lowerColor; break;
+      case ID_UPPER_COLOR: color=seg[current].upperColor; break;
       }
     }
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&color);
   return 1;
   }
 
 
 // Change upper or lower color of current segment
 long FXGradientBar::onCmdSegColor(FXObject* sender,FXSelector sel,void*){
-  FXColor color;
+  FXColor color=0;
   if(0<=current){
-    if(FXSELID(sel)==ID_LOWER_COLOR){
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&color);
-      setSegmentLowerColor(current,color,true);
-      }
-    else if(FXSELID(sel)==ID_UPPER_COLOR){
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&color);
-      setSegmentUpperColor(current,color,true);
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&color);
+    switch(FXSELID(sel)){
+      case ID_LOWER_COLOR: setSegmentLowerColor(current,color,true); break;
+      case ID_UPPER_COLOR: setSegmentUpperColor(current,color,true); break;
       }
     }
   return 1;
@@ -1279,6 +1326,13 @@ long FXGradientBar::onUpdUniform(FXObject* sender,FXSelector,void*){
 // Make selected segments uniform
 long FXGradientBar::onCmdUniform(FXObject*,FXSelector,void*){
   if(0<=sellower && 0<=selupper) uniformSegments(sellower,selupper,true);
+  return 1;
+  }
+
+
+// Reset gradient
+long FXGradientBar::onCmdReset(FXObject*,FXSelector,void*){
+  resetGradients();
   return 1;
   }
 

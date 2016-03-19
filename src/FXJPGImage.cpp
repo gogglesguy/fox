@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXJPGImage.cpp,v 1.34 2008/01/04 15:42:23 fox Exp $                      *
+* $Id: FXJPGImage.cpp,v 1.35 2008/07/02 19:36:27 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -70,10 +70,8 @@ const FXbool FXJPGImage::supported=false;
 // Initialize
 FXJPGImage::FXJPGImage(FXApp* a,const void *pix,FXuint opts,FXint w,FXint h,FXint q):FXImage(a,NULL,opts,w,h),quality(q){
   if(pix){
-    FXMemoryStream ms;
-    ms.open(FXStreamLoad,(FXuchar*)pix);
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
     loadPixels(ms);
-    ms.close();
     }
   }
 

@@ -18,11 +18,10 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chart.h,v 1.7 2008/01/04 15:18:13 fox Exp $                              *
+* $Id: chart.h,v 1.9 2008/09/26 00:42:12 fox Exp $                              *
 ********************************************************************************/
 #ifndef CHART_H
 #define CHART_H
-
 
 // Chart includes
 #include "chartdefs.h"
@@ -32,5 +31,8 @@
 #include "FX2DChart.h"
 #include "FX2DPlot.h"
 
+#ifndef FX_NO_GLOBAL_NAMESPACE
+using namespace FXCHART;
+#endif
 
 #endif

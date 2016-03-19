@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.cpp,v 1.54 2008/06/02 18:59:14 fox Exp $                          *
+* $Id: FXPath.cpp,v 1.56 2008/09/12 20:09:28 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -70,7 +70,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 
 // Return root of given path; this is just "/" or "" if not absolute

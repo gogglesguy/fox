@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMemoryStream.cpp,v 1.23 2008/03/29 03:08:29 fox Exp $                  *
+* $Id: FXMemoryStream.cpp,v 1.26 2008/07/03 21:17:19 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -46,8 +46,14 @@ using namespace FX;
 namespace FX {
 
 
-// Initialize memory stream
+// Create memory stream
 FXMemoryStream::FXMemoryStream(const FXObject* cont):FXStream(cont){
+  }
+
+
+// Create and open memory stream
+FXMemoryStream::FXMemoryStream(FXStreamDirection save_or_load,FXuchar* data,FXuval size,FXbool owned){
+  open(save_or_load,data,size,owned);
   }
 
 
@@ -64,28 +70,10 @@ FXuval FXMemoryStream::readBuffer(FXuval){
   }
 
 
-// Open a stream, possibly with an initial data array
-FXbool FXMemoryStream::open(FXStreamDirection save_or_load,FXuchar* data){
-  if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXMemoryStream::open: illegal stream direction.\n");}
-  if(FXStream::open(save_or_load,data?ULONG_MAX:16UL,data)){
-    if(save_or_load==FXStreamSave){
-      wrptr=begptr;
-      rdptr=begptr;
-      }
-    else{
-      wrptr=endptr;
-      rdptr=begptr;
-      }
-    return true;
-    }
-  return false;
-  }
-
-
 // Open a stream, possibly with initial data array of certain size
-FXbool FXMemoryStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
+FXbool FXMemoryStream::open(FXStreamDirection save_or_load,FXuchar* data,FXuval size,FXbool owned){
   if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXMemoryStream::open: illegal stream direction.\n");}
-  if(FXStream::open(save_or_load,size,data)){
+  if(FXStream::open(save_or_load,data,size,owned)){
     if(save_or_load==FXStreamSave){
       wrptr=begptr;
       rdptr=begptr;
@@ -130,21 +118,6 @@ void FXMemoryStream::giveBuffer(FXuchar *data,FXuval size){
   }
 
 
-// Close the stream
-FXbool FXMemoryStream::close(){
-  if(dir){
-    if(owns){freeElms(begptr);}
-    begptr=NULL;
-    wrptr=NULL;
-    rdptr=NULL;
-    endptr=NULL;
-    owns=false;
-    return FXStream::close();
-    }
-  return false;
-  }
-
-
 // Move to position; if saving and we own the buffer, try to resize
 // and 0-fill the space; if loading and not out of range, move the pointer;
 // otherwise, return error code.
@@ -171,5 +144,10 @@ FXbool FXMemoryStream::position(FXlong offset,FXWhence whence){
   return false;
   }
 
+
+// Destructor
+FXMemoryStream::~FXMemoryStream(){
+  close();
+  }
 
 }

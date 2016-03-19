@@ -356,11 +356,11 @@ distdir: $(DISTFILES)
 icons.o: icons.cpp icons.h
 ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -459,11 +459,11 @@ ShutterBug.o: ShutterBug.cpp ../include/fx.h ../include/fxver.h \
 	../include/FXRGBImage.h icons.h ShutterBug.h Snapper.h
 Snapper.o: Snapper.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \

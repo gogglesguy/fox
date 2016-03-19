@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressBar.cpp,v 1.53 2008/01/04 15:42:27 fox Exp $                   *
+* $Id: FXProgressBar.cpp,v 1.54 2008/09/09 23:32:52 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -65,6 +65,8 @@ FXDEFMAP(FXProgressBar) FXProgressBarMap[]={
   FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_GETINTVALUE,FXProgressBar::onCmdGetIntValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_SETLONGVALUE,FXProgressBar::onCmdSetLongValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_GETLONGVALUE,FXProgressBar::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_SETINTRANGE,FXProgressBar::onCmdSetIntRange),
+  FXMAPFUNC(SEL_COMMAND,FXProgressBar::ID_GETINTRANGE,FXProgressBar::onCmdGetIntRange),
   };
 
 
@@ -170,6 +172,21 @@ long FXProgressBar::onCmdSetLongValue(FXObject*,FXSelector,void* ptr){
 // Obtain value with a message
 long FXProgressBar::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
   *((FXlong*)ptr)=(FXlong)getProgress();
+  return 1;
+  }
+
+
+// Update range from a message
+long FXProgressBar::onCmdSetIntRange(FXObject*,FXSelector,void* ptr){
+  setTotal(((FXint*)ptr)[1]-((FXint*)ptr)[0]);
+  return 1;
+  }
+
+
+// Get range with a message
+long FXProgressBar::onCmdGetIntRange(FXObject*,FXSelector,void* ptr){
+  ((FXint*)ptr)[0]=0;
+  ((FXint*)ptr)[1]=getTotal();
   return 1;
   }
 

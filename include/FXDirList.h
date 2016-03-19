@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirList.h,v 1.83 2008/01/04 15:18:15 fox Exp $                         *
+* $Id: FXDirList.h,v 1.84 2008/07/09 05:54:09 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXDIRLIST_H
 #define FXDIRLIST_H
@@ -144,6 +144,7 @@ protected:
   FXDirList();
   void listRootItems();
   void listChildItems(FXDirItem *par);
+  FXString getSelectedFiles() const;
   virtual FXTreeItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr);
 private:
   FXDirList(const FXDirList&);
@@ -180,6 +181,10 @@ public:
   long onCmdSortCase(FXObject*,FXSelector,void*);
   long onUpdSortCase(FXObject*,FXSelector,void*);
   long onCmdRefresh(FXObject*,FXSelector,void*);
+  long onCmdDropAsk(FXObject*,FXSelector,void*);
+  long onCmdDropCopy(FXObject*,FXSelector,void*);
+  long onCmdDropMove(FXObject*,FXSelector,void*);
+  long onCmdDropLink(FXObject*,FXSelector,void*);
 public:
   static FXint ascending(const FXTreeItem* a,const FXTreeItem* b);
   static FXint descending(const FXTreeItem* a,const FXTreeItem* b);
@@ -188,6 +193,10 @@ public:
 public:
   enum {
     ID_REFRESHTIMER=FXTreeList::ID_LAST,
+    ID_DROPASK,
+    ID_DROPCOPY,
+    ID_DROPMOVE,
+    ID_DROPLINK,
     ID_SHOW_FILES,
     ID_HIDE_FILES,
     ID_TOGGLE_FILES,

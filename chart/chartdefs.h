@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chartdefs.h,v 1.19 2008/01/04 15:18:14 fox Exp $                         *
+* $Id: chartdefs.h,v 1.20 2008/09/26 00:42:12 fox Exp $                         *
 ********************************************************************************/
 #ifndef CHARTDEFS_H
 #define CHARTDEFS_H
@@ -38,7 +38,7 @@
 #endif
 
 
-namespace FX {
+namespace FXCHART {
 
 
 /// Line styles

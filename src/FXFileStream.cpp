@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileStream.cpp,v 1.31 2008/01/04 15:42:14 fox Exp $                    *
+* $Id: FXFileStream.cpp,v 1.32 2008/07/02 19:05:39 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -44,8 +44,14 @@ using namespace FX;
 namespace FX {
 
 
-// Initialize file stream
+// Create file stream
 FXFileStream::FXFileStream(const FXObject* cont):FXStream(cont){
+  }
+
+
+// Create and open file stream
+FXFileStream::FXFileStream(const FXString& filename,FXStreamDirection save_or_load,FXuval size){
+  open(filename,save_or_load,size);
   }
 
 
@@ -103,7 +109,7 @@ FXbool FXFileStream::open(const FXString& filename,FXStreamDirection save_or_loa
         return false;
         }
       }
-    return FXStream::open(save_or_load,size);
+    return FXStream::open(save_or_load,NULL,size);
     }
   return false;
   }

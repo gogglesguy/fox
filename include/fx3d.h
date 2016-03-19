@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fx3d.h,v 1.28 2008/01/04 15:18:28 fox Exp $                              *
+* $Id: fx3d.h,v 1.29 2008/08/13 17:49:34 fox Exp $                              *
 ********************************************************************************/
 #ifndef FX3D_H
 #define FX3D_H
@@ -31,6 +31,9 @@
 #include <windows.h>
 #endif
 #ifdef HAVE_GL_H
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES 1
+#endif
 #include <GL/gl.h>
 #endif
 #ifndef GLAPIENTRY

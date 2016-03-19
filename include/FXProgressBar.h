@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressBar.h,v 1.26 2008/01/04 15:18:23 fox Exp $                     *
+* $Id: FXProgressBar.h,v 1.27 2008/09/09 23:32:52 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXPROGRESSBAR_H
 #define FXPROGRESSBAR_H
@@ -65,6 +65,8 @@ public:
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
   long onCmdSetLongValue(FXObject*,FXSelector,void*);
   long onCmdGetLongValue(FXObject*,FXSelector,void*);
+  long onCmdSetIntRange(FXObject*,FXSelector,void*);
+  long onCmdGetIntRange(FXObject*,FXSelector,void*);
 public:
 
   /// Construct progress bar

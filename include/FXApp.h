@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.273 2008/06/03 20:28:58 fox Exp $                            *
+* $Id: FXApp.h,v 1.274 2008/07/08 18:50:51 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -523,11 +523,11 @@ public:
   virtual void detach();
 
   /**
-  * Add timeout message to be sent to target object in ns nanoseconds;
-  * the timer fires only once after the interval expires.  The void* ptr
-  * is user data which will be passed into the void* ptr of the message
-  * handler.  If a timer with the same target and message already exists,
-  * it will be rescheduled.
+  * Add timeout message sel to be sent to target object tgt after an interval of ns 
+  * nanoseconds; the timer fires only once after the interval expires.  
+  * The void* ptr is user data which will be passed into the void* ptr of the message
+  * handler.  
+  * If a timer with the same target and message already exists, it will be rescheduled.
   * Note: the smallest interval that one can wait is actually much larger
   * than a nanosecond; on Unix systems, the smallest interval is about 1000 ns,
   * whereas on Windows, it is about 1000000 ns.
@@ -535,33 +535,38 @@ public:
   void addTimeout(FXObject* tgt,FXSelector sel,FXTime ns=1000000000,void* ptr=NULL);
 
   /**
-  * Add deadline timeout message to be sent when the due time, expressed in nanoseconds
-  * since Epoch (Jan 1, 1970), is reached.  This is the preferred way to schedule regularly
-  * occuring events, as the exact time of issue will not suffer increasing errors as with the
-  * addTimeout() method.  However, it is important to ensure that the due time is sufficiently far
-  * into the future, as otherwise the system may be swamped executing nothing but timeout messages.
+  * Add deadline timeout message sel to be sent to target object tgt when the due time, 
+  * expressed in nanoseconds since Epoch (Jan 1, 1970), is reached.  
+  * This is the preferred way to schedule regularly occuring events, as the exact time of issue will 
+  * not suffer accumulating errors as with the addTimeout() method.  However, it is important to ensure 
+  * that the due time is sufficiently far into the future, as otherwise the system may be swamped 
+  * executing nothing but timeout messages.
   */
   void addDeadline(FXObject* tgt,FXSelector sel,FXTime due=forever,void* ptr=NULL);
 
   /**
-  * Remove timeout identified by tgt and sel.
+  * Remove timeout identified by target object tgt and message sel; if sel=0, remove all timeouts which
+  * reference object tgt.
   */
-  void removeTimeout(FXObject* tgt,FXSelector sel);
+  void removeTimeout(FXObject* tgt,FXSelector sel=0);
 
   /**
-  * Return true if given timeout has been set.
+  * Return true if a timeout with target object tgt and message sel has been set; 
+  * if sel=0, return true if any timeout has been set with target object tgt.
   */
-  FXbool hasTimeout(FXObject *tgt,FXSelector sel) const;
+  FXbool hasTimeout(FXObject *tgt,FXSelector sel=0) const;
 
   /**
-  * Return, in nanoseconds, the time remaining until the given timer fires.
+  * Return the time (in nanoseconds) remaining until the timer identified by target object
+  * tgt and message sel will fire.
   * If the timer is past due, 0 is returned.  If there is no such timer, the constant
-  * forever (LLONG_MAX) is returned.
+  * forever (LLONG_MAX) is returned.  If sel=0, return the earliest timeout that will be
+  * received by target object tgt.
   */
-  FXTime remainingTimeout(FXObject *tgt,FXSelector sel);
+  FXTime remainingTimeout(FXObject *tgt,FXSelector sel=0);
 
   /**
-  * Add a idle processing message to be sent to target object when
+  * Add a chore message sel to be sent to target object tgt when
   * the system becomes idle, i.e. there are no events to be processed.
   * The void* ptr is user data which will be passed into the void* ptr
   * of the message handler. If a chore with the same target and message
@@ -570,14 +575,16 @@ public:
   void addChore(FXObject* tgt,FXSelector sel,void *ptr=NULL);
 
   /**
-  * Remove idle processing message identified by tgt and sel.
+  * Remove chore identified by target object tgt and message sel; if sel=0, 
+  * remove all idle processing messages which refernce object tgt.
   */
-  void removeChore(FXObject* tgt,FXSelector sel);
+  void removeChore(FXObject* tgt,FXSelector sel=0);
 
   /**
-  * Return true if given chore has been set
+  * Return true if a chore with target object tgt and message sel has been set;
+  * if sel=0, return true if any chore has been set with target object tgt.
   */
-  FXbool hasChore(FXObject *tgt,FXSelector sel) const;
+  FXbool hasChore(FXObject *tgt,FXSelector sel=0) const;
 
   /**
   * Add signal processing message to be sent to target object when

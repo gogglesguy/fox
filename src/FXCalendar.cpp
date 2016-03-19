@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.cpp,v 1.17 2008/01/04 15:42:05 fox Exp $                      *
+* $Id: FXCalendar.cpp,v 1.20 2008/09/30 02:50:43 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -104,26 +104,35 @@ FXCalendar::FXCalendar(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   target=tgt;
   message=sel;
 
-  // Popup for months
-  months=new FXPopup(this);
-  for(FXint i=1; i<=12; i++){
-    new FXOption(months,tr(FXDate::monthName(i)),NULL,this,ID_MONTH_START+(i-1),OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
-    }
-
-  // Caption above
+  // Caption above calendar
   frame=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X,0,0,0,0,0,0,0,0,0,0);
 
+  // Popup for months
+  monthpopup=new FXPopup(this);
+  months[ 0]=new FXOption(monthpopup,tr(FXDate::monthName( 1)),NULL,this,ID_MONTH_START+ 0,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 1]=new FXOption(monthpopup,tr(FXDate::monthName( 2)),NULL,this,ID_MONTH_START+ 1,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 2]=new FXOption(monthpopup,tr(FXDate::monthName( 3)),NULL,this,ID_MONTH_START+ 2,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 3]=new FXOption(monthpopup,tr(FXDate::monthName( 4)),NULL,this,ID_MONTH_START+ 3,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 4]=new FXOption(monthpopup,tr(FXDate::monthName( 5)),NULL,this,ID_MONTH_START+ 4,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 5]=new FXOption(monthpopup,tr(FXDate::monthName( 6)),NULL,this,ID_MONTH_START+ 5,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 6]=new FXOption(monthpopup,tr(FXDate::monthName( 7)),NULL,this,ID_MONTH_START+ 6,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 7]=new FXOption(monthpopup,tr(FXDate::monthName( 8)),NULL,this,ID_MONTH_START+ 7,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 8]=new FXOption(monthpopup,tr(FXDate::monthName( 9)),NULL,this,ID_MONTH_START+ 8,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[ 9]=new FXOption(monthpopup,tr(FXDate::monthName(10)),NULL,this,ID_MONTH_START+ 9,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[10]=new FXOption(monthpopup,tr(FXDate::monthName(11)),NULL,this,ID_MONTH_START+10,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+  months[11]=new FXOption(monthpopup,tr(FXDate::monthName(12)),NULL,this,ID_MONTH_START+11,OPTIONMENU_NOGLYPH|LAYOUT_LEFT|JUSTIFY_CENTER_X|ICON_AFTER_TEXT);
+
   // Month selector
-  arrows[0]=new FXArrowButton(frame,this,ID_PREVMONTH,ARROW_LEFT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y);
-  month=new FXOptionMenu(frame,months,OPTIONMENU_NOGLYPH|OPTIONMENU_TOOLBAR|FRAME_RAISED|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y,0,0,0,0);
+  arrows[0]=new FXArrowButton(frame,this,ID_PREVMONTH,ARROW_LEFT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_FILL_Y,0,0,0,0,2,2,4,4);
+  month=new FXOptionMenu(frame,monthpopup,OPTIONMENU_NOGLYPH|OPTIONMENU_TOOLBAR|FRAME_RAISED|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_CENTER_Y,0,0,0,0);
   month->setTarget(this);
   month->setSelector(ID_MONTH);
+  arrows[1]=new FXArrowButton(frame,this,ID_NEXTMONTH,ARROW_RIGHT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_FILL_Y,0,0,0,0,2,2,4,4);
 
   // Year selector
-  arrows[1]=new FXArrowButton(frame,this,ID_NEXTMONTH,ARROW_RIGHT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y);
-  arrows[2]=new FXArrowButton(frame,this,ID_NEXTYEAR,ARROW_RIGHT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
+  arrows[2]=new FXArrowButton(frame,this,ID_NEXTYEAR,ARROW_RIGHT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,2,2,4,4);
   year=new FXLabel(frame,"0000",NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
-  arrows[3]=new FXArrowButton(frame,this,ID_PREVYEAR,ARROW_LEFT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
+  arrows[3]=new FXArrowButton(frame,this,ID_PREVYEAR,ARROW_LEFT|ARROW_REPEAT|ARROW_TOOLBAR|FRAME_RAISED|LAYOUT_FILL_Y|LAYOUT_RIGHT,0,0,0,0,2,2,4,4);
 
   // Main widget
   view=new FXCalendarView(this,this,ID_CALENDAR,(options&CALENDAR_MASK)|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_SIDE_BOTTOM);
@@ -154,8 +163,8 @@ void FXCalendar::create(){
 void FXCalendar::enable(){
   FXPacker::enable();
   view->enable();
-  month->enable();
   year->enable();
+  month->enable();
   arrows[0]->enable();
   arrows[1]->enable();
   arrows[2]->enable();
@@ -167,8 +176,8 @@ void FXCalendar::enable(){
 void FXCalendar::disable(){
   FXPacker::disable();
   view->disable();
-  month->disable();
   year->disable();
+  month->disable();
   arrows[0]->disable();
   arrows[1]->disable();
   arrows[2]->disable();
@@ -337,6 +346,42 @@ FXColor FXCalendar::getOtherWeekendColor() const {
   }
 
 
+// Set font used by the header
+void FXCalendar::setHeaderFont(FXFont *fnt){
+  year->setFont(fnt);
+  months[0]->setFont(fnt); 
+  months[1]->setFont(fnt); 
+  months[2]->setFont(fnt); 
+  months[3]->setFont(fnt); 
+  months[4]->setFont(fnt); 
+  months[5]->setFont(fnt); 
+  months[6]->setFont(fnt); 
+  months[7]->setFont(fnt); 
+  months[8]->setFont(fnt); 
+  months[9]->setFont(fnt); 
+  months[10]->setFont(fnt); 
+  months[11]->setFont(fnt); 
+  }
+  
+
+// Get font used by the header
+FXFont* FXCalendar::getHeaderFont() const {
+  return year->getFont();
+  }
+
+
+// Set font used by the calendar
+void FXCalendar::setCalendarFont(FXFont *fnt){
+  view->setFont(fnt);
+  }
+
+
+// Get font used by the calendar
+FXFont* FXCalendar::getCalendarFont() const {
+  return view->getFont();
+  }
+
+
 // Switch date
 long FXCalendar::onCmdDate(FXObject*,FXSelector,void* ptr){
   FXDate date((FXuint)(FXival)(ptr));
@@ -411,12 +456,24 @@ long FXCalendar::onFwdToTarget(FXObject*,FXSelector sel,void* ptr){
 
 // Destroy
 FXCalendar::~FXCalendar(){
-  delete months;
+  delete monthpopup;
   view=(FXCalendarView*)-1L;
   year=(FXLabel*)-1L;
-  months=(FXPopup*)-1L;
   month=(FXOptionMenu*)-1L;
+  monthpopup=(FXPopup*)-1L;
   frame=(FXHorizontalFrame*)-1L;
+  months[0]=(FXOption*)-1L;
+  months[1]=(FXOption*)-1L;
+  months[2]=(FXOption*)-1L;
+  months[3]=(FXOption*)-1L;
+  months[4]=(FXOption*)-1L;
+  months[5]=(FXOption*)-1L;
+  months[6]=(FXOption*)-1L;
+  months[7]=(FXOption*)-1L;
+  months[8]=(FXOption*)-1L;
+  months[9]=(FXOption*)-1L;
+  months[10]=(FXOption*)-1L;
+  months[11]=(FXOption*)-1L;
   arrows[0]=(FXArrowButton*)-1L;
   arrows[1]=(FXArrowButton*)-1L;
   arrows[2]=(FXArrowButton*)-1L;

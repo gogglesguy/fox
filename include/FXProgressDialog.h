@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressDialog.h,v 1.23 2008/02/04 21:56:59 fox Exp $                  *
+* $Id: FXProgressDialog.h,v 1.24 2008/09/09 23:32:52 fox Exp $                  *
 ********************************************************************************/
 #ifndef FXPROGRESSDIALOG_H
 #define FXPROGRESSDIALOG_H
@@ -68,6 +68,8 @@ public:
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
   long onCmdSetLongValue(FXObject*,FXSelector,void*);
   long onCmdGetLongValue(FXObject*,FXSelector,void*);
+  long onCmdSetIntRange(FXObject*,FXSelector,void*);
+  long onCmdGetIntRange(FXObject*,FXSelector,void*);
   long onCmdSetStringValue(FXObject*,FXSelector,void*);
   long onCmdGetStringValue(FXObject*,FXSelector,void*);
   long onCmdCancel(FXObject*,FXSelector,void*);

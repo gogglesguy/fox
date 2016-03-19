@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStream.h,v 1.48 2008/01/04 15:18:24 fox Exp $                          *
+* $Id: FXStream.h,v 1.51 2008/07/30 23:55:13 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXSTREAM_H
 #define FXSTREAM_H
@@ -122,7 +122,7 @@ public:
   * If data is not NULL, it is expected to point to an external data buffer
   * of length size; otherwise stream will use an internally managed buffer.
   */
-  FXbool open(FXStreamDirection save_or_load,FXuval size=8192,FXuchar* data=NULL);
+  FXbool open(FXStreamDirection save_or_load,FXuchar* data=NULL,FXuval size=8192UL,FXbool owned=false);
 
   /// Flush buffer
   virtual FXbool flush();
@@ -135,6 +135,12 @@ public:
 
   /// Set available buffer space
   void setSpace(FXuval sp);
+
+  /// Set buffer ownership flag
+  void setOwned(FXbool owned){ owns=owned; }
+
+  /// Get buffer ownership flag
+  FXbool isOwned() const { return owns; }
 
   /// Get status code
   FXStreamStatus status() const { return code; }

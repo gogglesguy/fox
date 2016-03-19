@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.dmc,v 1.72 2008/05/27 18:54:00 fox Exp $                     #
+# $Id: Makefile.dmc,v 1.76 2008/10/16 21:23:53 fox Exp $                     #
 ##############################################################################
 
 # Digital Mars C++ Compiler 8.x or later
@@ -153,7 +153,6 @@ FXComboBox.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
 FXConsole.cpp \
-FXCopyDialog.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
 FXCP1252Codec.cpp \
@@ -184,6 +183,8 @@ FXDate.cpp \
 FXDC.cpp \
 FXDCPrint.cpp \
 FXDCWindow.cpp \
+FXDDSIcon.cpp \
+FXDDSImage.cpp \
 FXDLL.cpp \
 FXDebugTarget.cpp \
 FXDelegator.cpp \
@@ -235,6 +236,7 @@ FXGLVisual.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
 FXGZFileStream.cpp \
+FXhalf.cpp \
 FXHash.cpp \
 FXHeader.cpp \
 FXHorizontalFrame.cpp \
@@ -393,6 +395,7 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxddsio.cpp \
 fxezquantize.cpp \
 fxfilematch.cpp \
 fxfsquantize.cpp \

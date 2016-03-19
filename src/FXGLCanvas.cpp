@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCanvas.cpp,v 1.90 2008/06/24 20:40:06 fox Exp $                      *
+* $Id: FXGLCanvas.cpp,v 1.91 2008/08/06 03:59:14 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -79,7 +79,7 @@ FXGLCanvas::FXGLCanvas(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector s
 // Construct a GL canvas with its private context but shared display lists
 FXGLCanvas::FXGLCanvas(FXComposite* p,FXGLVisual *vis,FXGLCanvas* share,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXCanvas(p,tgt,sel,opts|GLCANVAS_OWN_CONTEXT,x,y,w,h){
   flags|=FLAG_ENABLED|FLAG_SHOWN;
-  context=new FXGLContext(getApp(),vis,share->getContext());
+  context=new FXGLContext(getApp(),vis,share ? share->getContext() : NULL);
   visual=vis;
   }
 

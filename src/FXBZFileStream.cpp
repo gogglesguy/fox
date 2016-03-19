@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.cpp,v 1.16 2008/01/04 15:42:04 fox Exp $                  *
+* $Id: FXBZFileStream.cpp,v 1.17 2008/07/02 19:05:39 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -62,8 +62,14 @@ struct BZBlock {
   };
 
 
-// Initialize file stream
+// Create BZIP2 file stream
 FXBZFileStream::FXBZFileStream(const FXObject* cont):FXFileStream(cont),bz(NULL),ac(0){
+  }
+  
+  
+// Create and open BZIP2 file stream
+FXBZFileStream::FXBZFileStream(const FXString& filename,FXStreamDirection save_or_load,FXuval size):bz(NULL),ac(0){
+  open(filename,save_or_load,size);
   }
 
 

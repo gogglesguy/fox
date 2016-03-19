@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTIFIcon.cpp,v 1.33 2008/01/04 15:42:34 fox Exp $                       *
+* $Id: FXTIFIcon.cpp,v 1.34 2008/07/02 19:36:27 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -70,10 +70,8 @@ const FXbool FXTIFIcon::supported=false;
 // Initialize
 FXTIFIcon::FXTIFIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FXint h):FXIcon(a,NULL,clr,opts,w,h),codec(0){
   if(pix){
-    FXMemoryStream ms;
-    ms.open(FXStreamLoad,(FXuchar*)pix);
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
     loadPixels(ms);
-    ms.close();
     }
   }
 

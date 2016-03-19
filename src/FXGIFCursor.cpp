@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGIFCursor.cpp,v 1.39 2008/01/04 15:42:15 fox Exp $                     *
+* $Id: FXGIFCursor.cpp,v 1.40 2008/07/02 19:36:27 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -66,13 +66,11 @@ FXIMPLEMENT(FXGIFCursor,FXCursor,NULL,0)
 // Constructor
 FXGIFCursor::FXGIFCursor(FXApp* a,const void *pix,FXint hx,FXint hy):FXCursor(a,NULL,0,0,0,0){
   if(pix){
-    FXMemoryStream ms;
-    ms.open(FXStreamLoad,(FXuchar*)pix);
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
     fxloadGIF(ms,data,width,height,true);
     hotx=FXCLAMP(0,hx,width-1);
     hoty=FXCLAMP(0,hy,height-1);
     options|=CURSOR_OWNED;
-    ms.close();
     }
   }
 

@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.bc,v 1.155 2008/05/20 13:23:28 fox Exp $                     #
+# $Id: Makefile.bc,v 1.159 2008/10/16 21:23:53 fox Exp $                     #
 ##############################################################################
 
 CXX       = bcc32
@@ -88,7 +88,6 @@ FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
 FXConsole.cpp \
-FXCopyDialog.cpp \
 FXCP1250Codec.cpp \
 FXCP1251Codec.cpp \
 FXCP1252Codec.cpp \
@@ -119,6 +118,8 @@ FXDate.cpp \
 FXDC.cpp \
 FXDCPrint.cpp \
 FXDCWindow.cpp \
+FXDDSIcon.cpp \
+FXDDSImage.cpp \
 FXDLL.cpp \
 FXDebugTarget.cpp \
 FXDelegator.cpp \
@@ -170,6 +171,7 @@ FXGLVisual.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
 FXGZFileStream.cpp \
+FXhalf.cpp \
 FXHash.cpp \
 FXHeader.cpp \
 FXHorizontalFrame.cpp \
@@ -328,6 +330,7 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbmpio.cpp \
+fxddsio.cpp \
 fxezquantize.cpp \
 fxfilematch.cpp \
 fxfsquantize.cpp \

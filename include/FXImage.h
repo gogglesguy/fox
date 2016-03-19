@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.h,v 1.69 2008/01/04 15:18:20 fox Exp $                           *
+* $Id: FXImage.h,v 1.70 2008/07/30 23:55:13 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXIMAGE_H
 #define FXIMAGE_H
@@ -122,6 +122,12 @@ public:
 
   /// To get to the option flags
   FXuint getOptions() const { return options; }
+
+  /// Set pixel data ownership flag
+  void setOwned(FXbool owned);
+
+  /// Get pixel data ownership flag
+  FXbool isOwned() const;
 
   /**
   * Populate the image with new pixel data of the same size; it will assume

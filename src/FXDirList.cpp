@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirList.cpp,v 1.185 2008/05/29 13:54:38 fox Exp $                      *
+* $Id: FXDirList.cpp,v 1.191 2008/09/15 17:54:44 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -46,7 +46,15 @@
 #include "FXGIFIcon.h"
 #include "FXScrollBar.h"
 #include "FXDirList.h"
+#include "FXMenuPane.h"
+#include "FXMenuCaption.h"
+#include "FXMenuCommand.h"
+#include "FXMenuCascade.h"
+#include "FXMenuRadio.h"
+#include "FXMenuCheck.h"
+#include "FXMenuSeparator.h"
 #include "FXFileDict.h"
+#include "FXMessageBox.h"
 #ifdef WIN32
 #include <shellapi.h>
 #endif
@@ -117,6 +125,13 @@ FXDEFMAP(FXDirList) FXDirListMap[]={
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_SORT_REVERSE,FXDirList::onCmdSortReverse),
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_SORT_CASE,FXDirList::onCmdSortCase),
   FXMAPFUNC(SEL_COMMAND,FXDirList::ID_REFRESH,FXDirList::onCmdRefresh),
+  FXMAPFUNC(SEL_CHORE,FXDirList::ID_DROPASK,FXDirList::onCmdDropAsk),
+  FXMAPFUNC(SEL_CHORE,FXDirList::ID_DROPCOPY,FXDirList::onCmdDropCopy),
+  FXMAPFUNC(SEL_COMMAND,FXDirList::ID_DROPCOPY,FXDirList::onCmdDropCopy),
+  FXMAPFUNC(SEL_CHORE,FXDirList::ID_DROPMOVE,FXDirList::onCmdDropMove),
+  FXMAPFUNC(SEL_COMMAND,FXDirList::ID_DROPMOVE,FXDirList::onCmdDropMove),
+  FXMAPFUNC(SEL_CHORE,FXDirList::ID_DROPLINK,FXDirList::onCmdDropLink),
+  FXMAPFUNC(SEL_COMMAND,FXDirList::ID_DROPLINK,FXDirList::onCmdDropLink),
   };
 
 
@@ -183,6 +198,7 @@ void FXDirList::create(){
   FXTreeList::create();
   if(!deleteType){deleteType=getApp()->registerDragType(deleteTypeName);}
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
+  if(!actionType){actionType=getApp()->registerDragType(actionTypeName);}
   opendiricon->create();
   closeddiricon->create();
   documenticon->create();
@@ -211,6 +227,7 @@ void FXDirList::detach(){
   zipdiskicon->detach();
   deleteType=0;
   urilistType=0;
+  actionType=0;
   }
 
 
@@ -292,6 +309,109 @@ FXint FXDirList::descendingCase(const FXTreeItem* pa,const FXTreeItem* pb){
 
 /*******************************************************************************/
 
+// Return uri-list of selected files
+FXString FXDirList::getSelectedFiles() const {
+  register FXTreeItem *item=getFirstItem();
+  FXString result;
+  while(item){
+    if(isItemSelected(item)){
+      result.append(FXURL::fileToURL(getItemPathname(item)));
+      result.append("\r\n");
+      }
+    if(item->getFirst()){
+      item=item->getFirst();
+      }
+    else{
+      while(!item->getNext() && item->getParent()) item=item->getParent();
+      item=item->getNext();
+      }
+    }
+  return result;
+  }
+
+/*******************************************************************************/
+
+// Copy
+long FXDirList::onCmdDropCopy(FXObject*,FXSelector,void*){
+  FXString filedst,filesrc;
+  FXint beg,end;
+  for(beg=0; beg<dropfiles.length(); beg=end+2){
+    if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
+    filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
+    filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
+    if(!FXFile::copyFiles(filesrc,filedst,false)){
+      if(FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text())==MBOX_CLICKED_NO) break;
+      FXFile::copyFiles(filesrc,filedst,true);
+      }
+    }
+  dropdirectory=FXString::null;
+  dropfiles=FXString::null;
+  dropaction=DRAG_REJECT;
+  return 1;
+  }
+
+
+// Copy
+long FXDirList::onCmdDropMove(FXObject*,FXSelector,void*){
+  FXString filedst,filesrc;
+  FXint beg,end;
+  for(beg=0; beg<dropfiles.length(); beg=end+2){
+    if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
+    filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
+    filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
+    if(!FXFile::moveFiles(filesrc,filedst,false)){
+      if(FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text())==MBOX_CLICKED_NO) break;
+      FXFile::moveFiles(filesrc,filedst,true);
+      }
+    }
+  dropdirectory=FXString::null;
+  dropfiles=FXString::null;
+  dropaction=DRAG_REJECT;
+  return 1;
+  }
+
+
+// Copy
+long FXDirList::onCmdDropLink(FXObject*,FXSelector,void*){
+  FXString filedst,filesrc;
+  FXint beg,end;
+  for(beg=0; beg<dropfiles.length(); beg=end+2){
+    if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
+    filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
+    filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
+    if(!FXFile::symlink(filesrc,filedst)){
+      if(FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text())==MBOX_CLICKED_NO) break;
+      }
+    }
+  dropdirectory=FXString::null;
+  dropfiles=FXString::null;
+  dropaction=DRAG_REJECT;
+  return 1;
+  }
+
+
+// Deal with the drop that has just occurred
+long FXDirList::onCmdDropAsk(FXObject*,FXSelector,void* ptr){
+  FXMenuPane dropmenu(this);
+  FXGIFIcon filemoveicon(getApp(),filemove);
+  FXGIFIcon filecopyicon(getApp(),filecopy);
+  FXGIFIcon filelinkicon(getApp(),filelink);
+  FXGIFIcon filecancelicon(getApp(),filecancel);
+  new FXMenuCommand(&dropmenu,tr("Move Here"),&filemoveicon,this,ID_DROPMOVE);
+  new FXMenuCommand(&dropmenu,tr("Copy Here"),&filecopyicon,this,ID_DROPCOPY);
+  new FXMenuCommand(&dropmenu,tr("Link Here"),&filelinkicon,this,ID_DROPLINK);
+  new FXMenuSeparator(&dropmenu);
+  new FXMenuCommand(&dropmenu,tr("Cancel"),&filecancelicon);
+  dropmenu.create();
+  dropmenu.popup(NULL,((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y);
+  getApp()->runModalWhileShown(&dropmenu);
+  dropdirectory=FXString::null;
+  dropfiles=FXString::null;
+  dropaction=DRAG_REJECT;
+  return 1;
+  }
+
+
 // Handle drag-and-drop enter
 long FXDirList::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr){
   FXTreeList::onDNDEnter(sender,sel,ptr);
@@ -301,8 +421,10 @@ long FXDirList::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop leave
 long FXDirList::onDNDLeave(FXObject* sender,FXSelector sel,void* ptr){
-  stopAutoScroll();
   FXTreeList::onDNDLeave(sender,sel,ptr);
+  stopAutoScroll();
+  dropdirectory.clear();
+  dropaction=DRAG_REJECT;
   return 1;
   }
 
@@ -335,7 +457,6 @@ long FXDirList::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
       // See if this is writable
       if(FXStat::isWritable(dropdirectory)){
-        FXTRACE((100,"accepting drop on %s\n",dropdirectory.text()));
         acceptDrop(DRAG_ACCEPT);
         }
       }
@@ -347,8 +468,6 @@ long FXDirList::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop drop
 long FXDirList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
-  FXString dropfiles,filesrc,filedst,url;
-  FXint beg,end;
 
   // Stop scrolling
   stopAutoScroll();
@@ -359,35 +478,20 @@ long FXDirList::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   // Get uri-list of files being dropped
   if(getDNDData(FROM_DRAGNDROP,urilistType,dropfiles)){
 
-    // Tell drag source we got it
-    dropFinished(DRAG_ACCEPT);
-
-    // Loop over urls
-    for(beg=0; beg<dropfiles.length(); beg=end+2){
-      if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
-
-      // File url
-      url=dropfiles.mid(beg,end-beg);
-
-      // Source filename
-      filesrc=FXURL::decode(FXURL::fileFromURL(url));
-
-      // Destination filename
-      filedst=dropdirectory+PATHSEPSTRING+FXPath::name(filesrc);
-
-      // Move, Copy, or Link as appropriate
-      if(dropaction==DRAG_MOVE){
-        FXTRACE((100,"Moving file: %s to %s\n",filesrc.text(),filedst.text()));
-        if(!FXFile::moveFiles(filesrc,filedst)) getApp()->beep();
-        }
-      else if(dropaction==DRAG_COPY){
-        FXTRACE((100,"Copying file: %s to %s\n",filesrc.text(),filedst.text()));
-        if(!FXFile::copyFiles(filesrc,filedst)) getApp()->beep();
-        }
-      else if(dropaction==DRAG_LINK){
-        FXTRACE((100,"Linking file: %s to %s\n",filesrc.text(),filedst.text()));
-        if(!FXFile::symlink(filesrc,filedst)) getApp()->beep();
-        }
+    // Now handle it
+    switch(dropaction){
+      case DRAG_COPY:
+        getApp()->addChore(this,ID_DROPCOPY,ptr);
+        break;
+      case DRAG_MOVE:
+        getApp()->addChore(this,ID_DROPMOVE,ptr);
+        break;
+      case DRAG_LINK:
+        getApp()->addChore(this,ID_DROPLINK,ptr);
+        break;
+      default:
+        getApp()->addChore(this,ID_DROPASK,ptr);
+        break;
       }
     return 1;
     }
@@ -404,7 +508,7 @@ long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Return list of filenames as a uri-list
   if(((FXEvent*)ptr)->target==urilistType){
-    setDNDData(FROM_DRAGNDROP,((FXEvent*)ptr)->target,dragfiles);
+    setDNDData(FROM_DRAGNDROP,urilistType,dragfiles);
     return 1;
     }
 
@@ -421,22 +525,8 @@ long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 // Start a drag operation
 long FXDirList::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
   if(!FXTreeList::onBeginDrag(sender,sel,ptr)){
-    if(beginDrag(&urilistType,1)){
-      register FXTreeItem *item=firstitem;
-      dragfiles=FXString::null;
-      while(item){
-        if(item->isSelected()){
-          dragfiles+=FXURL::encode(FXURL::fileToURL(getItemPathname(item)))+"\r\n";      // Each line ends with CRLF
-          }
-        if(item->first){
-          item=item->first;
-          }
-        else{
-          while(!item->next && item->parent) item=item->parent;
-          item=item->next;
-          }
-        }
-      }
+    beginDrag(&urilistType,1);
+    dragfiles=getSelectedFiles();
     }
   return 1;
   }
@@ -446,21 +536,28 @@ long FXDirList::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
 long FXDirList::onDragged(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   if(!FXTreeList::onDragged(sender,sel,ptr)){
-    FXDragAction action=DRAG_MOVE;
+    FXDragAction action=DRAG_ASK;
     if(event->state&CONTROLMASK) action=DRAG_COPY;
     if(event->state&SHIFTMASK) action=DRAG_MOVE;
     if(event->state&ALTMASK) action=DRAG_LINK;
     handleDrag(event->root_x,event->root_y,action);
-    if(didAccept()!=DRAG_REJECT){
-      if(action==DRAG_MOVE)
-        setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
-      else if(action==DRAG_LINK)
-        setDragCursor(getApp()->getDefaultCursor(DEF_DNDLINK_CURSOR));
-      else
+    action=didAccept();
+    switch(action){
+      case DRAG_COPY:
         setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
-      }
-    else{
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+        break;
+      case DRAG_MOVE:
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
+        break;
+      case DRAG_LINK:
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDLINK_CURSOR));
+        break;
+      case DRAG_ASK:
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDASK_CURSOR));
+        break;
+      default:
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+        break;
       }
     }
   return 1;
@@ -472,6 +569,7 @@ long FXDirList::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
   if(!FXTreeList::onEndDrag(sender,sel,ptr)){
     endDrag((didAccept()!=DRAG_REJECT));
     setDragCursor(getDefaultCursor());
+    dragfiles=FXString::null;
     }
   return 1;
   }
@@ -897,10 +995,7 @@ void FXDirList::listChildItems(FXDirItem *par){
   if(dir.open(directory)){
 
     // Process directory entries
-    while(dir.next()){
-
-      // Get name of entry
-      name=dir.name();
+    while(dir.next(name)){
 
       // A dot special file?
       if(name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) continue;
@@ -910,7 +1005,7 @@ void FXDirList::listChildItems(FXDirItem *par){
 
       // Build full pathname of entry
       pathname=directory;
-      if(!ISPATHSEP(pathname[pathname.length()-1])) pathname+=PATHSEPSTRING;
+      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
       pathname+=name;
 
 #ifdef WIN32
@@ -1296,6 +1391,7 @@ void FXDirList::load(FXStream& store){
 // Cleanup
 FXDirList::~FXDirList(){
   clearItems();
+  getApp()->removeChore(this);
   getApp()->removeTimeout(this,ID_REFRESHTIMER);
   if(!(options&DIRLIST_NO_OWN_ASSOC)) delete associations;
   delete opendiricon;

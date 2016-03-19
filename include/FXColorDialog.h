@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorDialog.h,v 1.25 2008/01/04 15:18:14 fox Exp $                     *
+* $Id: FXColorDialog.h,v 1.26 2008/07/22 19:21:32 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXCOLORDIALOG_H
 #define FXCOLORDIALOG_H
@@ -54,6 +54,8 @@ private:
 public:
   long onChgColor(FXObject*,FXSelector,void*);
   long onCmdColor(FXObject*,FXSelector,void*);
+  long onCmdSetIntValue(FXObject*,FXSelector,void*);
+  long onCmdGetIntValue(FXObject*,FXSelector,void*);
 public:
   enum {
     ID_COLORSELECTOR=FXDialogBox::ID_LAST,

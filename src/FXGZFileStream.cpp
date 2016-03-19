@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGZFileStream.cpp,v 1.13 2008/01/04 15:42:19 fox Exp $                  *
+* $Id: FXGZFileStream.cpp,v 1.14 2008/07/02 19:05:39 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -56,8 +56,14 @@ struct ZBlock {
   };
 
 
-// Initialize file stream
+// Create GZIP compressed file stream
 FXGZFileStream::FXGZFileStream(const FXObject* cont):FXFileStream(cont),gz(NULL),ac(0){
+  }
+  
+  
+// Create and open GZIP compressed file stream
+FXGZFileStream::FXGZFileStream(const FXString& filename,FXStreamDirection save_or_load,FXuval size):gz(NULL),ac(0){
+  open(filename,save_or_load,size);
   }
 
 

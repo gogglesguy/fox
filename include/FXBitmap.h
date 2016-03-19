@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmap.h,v 1.43 2008/01/04 15:18:14 fox Exp $                          *
+* $Id: FXBitmap.h,v 1.44 2008/07/30 23:55:12 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXBITMAP_H
 #define FXBITMAP_H
@@ -89,6 +89,12 @@ public:
 
   /// To get to the option flags
   FXuint getOptions() const { return options; }
+
+  /// Set pixel data ownership flag
+  void setOwned(FXbool owned);
+
+  /// Get pixel data ownership flag
+  FXbool isOwned() const;
 
   /**
   * Populate the bitmap with new pixel data of the same size; it will assume

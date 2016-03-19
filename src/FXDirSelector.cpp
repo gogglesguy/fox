@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDirSelector.cpp,v 1.63 2008/01/04 15:42:10 fox Exp $                   *
+* $Id: FXDirSelector.cpp,v 1.64 2008/09/15 18:23:29 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -278,7 +278,7 @@ long FXDirSelector::onCmdBookmark(FXObject*,FXSelector,void*){
 long FXDirSelector::onCmdNew(FXObject*,FXSelector,void*){
   FXGIFIcon newdirectoryicon(getApp(),bigfolder);
   FXString dir=dirbox->getDirectory();
-  FXString name="DirectoryName";
+  FXString name=tr("Folder");
   if(FXInputDialog::getString(name,this,tr("Create New Directory"),"Create new directory in: "+dir,&newdirectoryicon)){
     FXString folder=FXPath::absolute(dir,name);
     if(FXStat::exists(folder)){

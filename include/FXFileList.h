@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileList.h,v 1.82 2008/05/29 17:45:19 fox Exp $                        *
+* $Id: FXFileList.h,v 1.88 2008/09/15 22:47:28 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXFILELIST_H
 #define FXFILELIST_H
@@ -77,7 +77,7 @@ protected:
 public:
 
   /// Constructor
-  FXFileItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,void* ptr=NULL):FXIconItem(text,bi,mi,ptr),assoc(NULL),link(NULL),size(0L),date(0){}
+  FXFileItem(const FXString& text,FXIcon* bi=NULL,FXIcon* mi=NULL,void* ptr=NULL):FXIconItem(text,bi,mi,ptr),assoc(NULL),link(NULL),size(0L),date(0L){}
 
   /// Return true if this is a file item
   FXbool isFile() const { return (state&(FOLDER|BLOCKDEV|CHARDEV|FIFO|SOCK|SHARE))==0; }
@@ -145,20 +145,20 @@ protected:
   FXString      pattern;        // Pattern of file names
   FXString      startdirectory; // Start directory
   FXString      dropdirectory;  // Drop directory
-  FXString      dragfiles;      // Dragged file names
-  FXString      dropfiles;      // Dropped file names
-  FXString      clipfiles;      // Clipped file names
-  FXDragAction  dropaction;     // Drop action
+  FXString     *clipfiles;      // Clipped files
+  FXString     *dragfiles;      // Dragged files
+  FXString     *dropfiles;      // Dropped files
   FXuint        matchmode;      // File wildcard match mode
   FXint         imagesize;      // Image size
   FXTime        timestamp;      // Time when last refreshed
   FXuint        counter;        // Refresh counter
+  FXDragAction  dropaction;     // Drop action
+  FXClipAction  clipaction;     // Clipboard action
   FXbool        draggable;      // Dragable files
 protected:
   FXFileList();
-  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
   void listItems(FXbool force);
-  FXString getSelectedFiles() const;
+  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
   FXIcon* getItemPreviewIcon(FXint index) const;
 private:
   FXFileList(const FXFileList&);
@@ -166,7 +166,6 @@ private:
 public:
   long onOpenTimer(FXObject*,FXSelector,void*);
   long onRefreshTimer(FXObject*,FXSelector,void*);
-  long onDropAction(FXObject*,FXSelector,void*);
   long onPreviewChore(FXObject*,FXSelector,void*);
   long onDNDEnter(FXObject*,FXSelector,void*);
   long onDNDLeave(FXObject*,FXSelector,void*);
@@ -218,6 +217,7 @@ public:
   long onCmdCopySel(FXObject*,FXSelector,void*);
   long onCmdPasteSel(FXObject*,FXSelector,void*);
   long onCmdDeleteSel(FXObject*,FXSelector,void*);
+  long onCmdDropAsk(FXObject*,FXSelector,void*);
   long onCmdDropCopy(FXObject*,FXSelector,void*);
   long onCmdDropMove(FXObject*,FXSelector,void*);
   long onCmdDropLink(FXObject*,FXSelector,void*);
@@ -240,7 +240,7 @@ public:
   enum {
     ID_OPENTIMER=FXIconList::ID_LAST,
     ID_REFRESHTIMER,
-    ID_DROPACTION,
+    ID_DROPASK,
     ID_DROPCOPY,
     ID_DROPMOVE,
     ID_DROPLINK,
@@ -289,6 +289,9 @@ public:
 
   /// Return current file
   FXString getCurrentFile() const;
+
+  /// Get selected files
+  FXString *getSelectedFiles() const;
 
   /// Set current directory
   void setDirectory(const FXString& path);

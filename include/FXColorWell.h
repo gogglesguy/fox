@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorWell.h,v 1.40 2008/01/04 15:18:14 fox Exp $                       *
+* $Id: FXColorWell.h,v 1.41 2008/07/22 20:46:37 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXCOLORWELL_H
 #define FXCOLORWELL_H
@@ -93,17 +93,18 @@ public:
   long onCmdSetValue(FXObject*,FXSelector,void*);
   long onCmdSetIntValue(FXObject*,FXSelector,void*);
   long onCmdGetIntValue(FXObject*,FXSelector,void*);
-  long onCmdColorWell(FXObject*,FXSelector,void*);
-  long onChgColorWell(FXObject*,FXSelector,void*);
   long onCmdSetHelp(FXObject*,FXSelector,void*);
   long onCmdGetHelp(FXObject*,FXSelector,void*);
   long onCmdSetTip(FXObject*,FXSelector,void*);
   long onCmdGetTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
+  long onUpdColor(FXObject*,FXSelector,void*);
+  long onChgColor(FXObject*,FXSelector,void*);
+  long onCmdColor(FXObject*,FXSelector,void*);
 public:
   enum {
-    ID_COLORDIALOG=FXFrame::ID_LAST,
+    ID_COLOR=FXFrame::ID_LAST,
     ID_LAST
     };
 public:

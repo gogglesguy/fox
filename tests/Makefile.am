@@ -46,6 +46,7 @@ splitter \
 switcher \
 tabbook \
 ratio \
+half \
 $(GL_TESTS)
 
 format_SOURCES          = format.cpp
@@ -84,6 +85,7 @@ dirlist_SOURCES		= dirlist.cpp
 button_SOURCES		= button.cpp
 codecs_SOURCES		= codecs.cpp
 dctest_SOURCES		= dctest.cpp dippy.h
+half_SOURCES		= half.cpp
 
 
 

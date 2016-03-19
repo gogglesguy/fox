@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMemoryStream.h,v 1.17 2008/01/04 15:18:22 fox Exp $                    *
+* $Id: FXMemoryStream.h,v 1.21 2008/07/03 21:17:19 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXMEMORYSTREAM_H
 #define FXMEMORYSTREAM_H
@@ -37,23 +37,30 @@ protected:
   virtual FXuval readBuffer(FXuval count);
 public:
 
-  /// Create memory store
+  /// Create memory stream
   FXMemoryStream(const FXObject* cont=NULL);
 
-  /// Open file store
-  FXbool open(FXStreamDirection save_or_load,FXuchar* data);
+  /// Create and open memory stream
+  FXMemoryStream(FXStreamDirection save_or_load,FXuchar* data=NULL,FXuval size=~0UL,FXbool owned=false);
 
-  /// Open memory store
-  FXbool open(FXStreamDirection save_or_load,FXuval size,FXuchar* data);
+  /**
+  * Open memory stream.
+  * When reading from the data buffer, the size parameter is optional.  If not given,
+  * the reader will need to know when to stop reading by some other means, like end-of-file
+  * markers in the data.  When writing, the size parameter must be set to reflect the actual
+  * buffer size, and should be at least 16.
+  * If the owned flag is true, the stream becomes the owner of the data buffer; otherwise,
+  * the stream will not delete the buffer.
+  * Passing NULL for the data buffer will cause the stream to allocate a buffer of the
+  * given size.
+  */
+  FXbool open(FXStreamDirection save_or_load,FXuchar* data=NULL,FXuval size=~0UL,FXbool owned=false);
 
   /// Take buffer away from stream
   void takeBuffer(FXuchar*& data,FXuval& size);
 
-  /// Give buffer to stream
+  /// Give buffer to stream, making it the owner of this buffer
   void giveBuffer(FXuchar *data,FXuval size);
-
-  /// Close memory store
-  virtual FXbool close();
 
   /// Get position
   FXlong position() const { return FXStream::position(); }
@@ -118,6 +125,9 @@ public:
 
   /// Load object
   FXMemoryStream& loadObject(FXObject*& v){ FXStream::loadObject(v); return *this; }
+
+  /// Destructor
+  virtual ~FXMemoryStream();
   };
 
 }

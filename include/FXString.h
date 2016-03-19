@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.h,v 1.147 2008/06/25 18:00:51 fox Exp $                         *
+* $Id: FXString.h,v 1.148 2008/07/19 21:44:31 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
@@ -80,8 +80,8 @@ public:
   /// Count number of utf8 characters
   FXint count() const;
 
-  /// Count number of utf8 characters in subrange
-  FXint count(FXint pos,FXint len) const;
+  /// Count number of utf8 characters in subrange start...end
+  FXint count(FXint start,FXint end) const;
 
   /// Return byte offset of utf8 character at index
   FXint offset(FXint indx) const;

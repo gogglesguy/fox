@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAxis.cpp,v 1.32 2008/01/04 15:18:13 fox Exp $                          *
+* $Id: FXAxis.cpp,v 1.33 2008/09/26 00:42:12 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -33,12 +33,12 @@
 #define FUDGE_FACTOR  0.001     // For tickmark computation
 
 
-using namespace FX;
+using namespace FXCHART;
 
 
 /*******************************************************************************/
 
-namespace FX {
+namespace FXCHART {
 
 
 // Construct axis

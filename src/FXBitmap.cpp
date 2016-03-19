@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmap.cpp,v 1.102 2008/01/04 15:42:04 fox Exp $                       *
+* $Id: FXBitmap.cpp,v 1.103 2008/07/30 23:55:13 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -833,6 +833,24 @@ int FXBitmap::ReleaseDC(FXID hdc) const {
 #endif
 
 
+// Change options
+void FXBitmap::setOptions(FXuint opts){
+  options=(options&~BITMAP_MASK) | (opts&BITMAP_MASK);
+  }
+
+
+// Set pixel data ownership flag
+void FXBitmap::setOwned(FXbool owned){ 
+  options^=((0-owned)^options)&BITMAP_OWNED;
+  }
+
+
+// Get pixel ownership flag
+FXbool FXBitmap::isOwned() const { 
+  return (options&BITMAP_OWNED)!=0; 
+  }
+
+
 // Attach pixel buffer to bitmap, and assume ownership of it if BITMAP_OWNED is passed
 void FXBitmap::setData(FXuchar *pix,FXuint opts){
 
@@ -871,12 +889,6 @@ void FXBitmap::setData(FXuchar *pix,FXuint opts,FXint w,FXint h){
 
   // Set the pointer
   data=pix;
-  }
-
-
-// Change options
-void FXBitmap::setOptions(FXuint opts){
-  options=(options&~BITMAP_MASK) | (opts&BITMAP_MASK);
   }
 
 

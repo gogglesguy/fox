@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free                 #
 # Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         #
 ##############################################################################
-# $Id: Makefile.wc,v 1.51 2008/05/20 13:23:28 fox Exp $                      #
+# $Id: Makefile.wc,v 1.55 2008/10/16 21:23:53 fox Exp $                      #
 ##############################################################################
 
 CXX       = wpp386
@@ -86,7 +86,6 @@ OBJECTS += FXComplexd.obj
 OBJECTS += FXComposeContext.obj
 OBJECTS += FXComposite.obj
 OBJECTS += FXConsole.obj
-OBJECTS += FXCopyDialog.obj
 OBJECTS += FXCP1250Codec.obj
 OBJECTS += FXCP1251Codec.obj
 OBJECTS += FXCP1252Codec.obj
@@ -118,6 +117,8 @@ OBJECTS += FXDate.obj
 OBJECTS += FXDC.obj
 OBJECTS += FXDCPrint.obj
 OBJECTS += FXDCWindow.obj
+OBJECTS += FXDDSIcon.obj
+OBJECTS += FXDDSImage.obj
 OBJECTS += FXDebugTarget.obj
 OBJECTS += FXDelegator.obj
 OBJECTS += FXDial.obj
@@ -170,6 +171,7 @@ OBJECTS += FXGLVisual.obj
 OBJECTS += FXGradientBar.obj
 OBJECTS += FXGroupBox.obj
 OBJECTS += FXGZFileStream.obj
+OBJECTS += FXhalf.obj
 OBJECTS += FXHash.obj
 OBJECTS += FXHeader.obj
 OBJECTS += FXHorizontalFrame.obj
@@ -328,6 +330,7 @@ OBJECTS += FXXPMIcon.obj
 OBJECTS += FXXPMImage.obj
 OBJECTS += fxascii.obj
 OBJECTS += fxbmpio.obj
+OBJECTS += fxddsio.obj
 OBJECTS += fxezquantize.obj
 OBJECTS += fxfsquantize.obj
 OBJECTS += fxgetticks.obj

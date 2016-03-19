@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.391 2008/06/03 20:29:00 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.393 2008/09/10 06:49:29 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -200,7 +200,7 @@ const FXchar FXWindow::colorTypeName[]="application/x-color";
 const FXchar FXWindow::urilistTypeName[]="text/uri-list";
 const FXchar FXWindow::utf8TypeName[]="UTF8_STRING";
 const FXchar FXWindow::utf16TypeName[]="text/utf16";
-
+const FXchar FXWindow::actionTypeName[]="application/x-kde-cutselection";
 
 // Drag type atoms; first widget to need it should register the type
 FXDragType FXWindow::octetType=0;
@@ -209,6 +209,7 @@ FXDragType FXWindow::textType=0;
 FXDragType FXWindow::colorType=0;
 FXDragType FXWindow::urilistType=0;
 FXDragType FXWindow::utf8Type=0;
+FXDragType FXWindow::actionType=0;
 
 
 // The string type is predefined and hardwired
@@ -2836,11 +2837,7 @@ FXbool FXWindow::setDNDData(FXDNDOrigin origin,FXDragType targettype,const FXStr
   size=string.length();
   if(callocElms(ptr,size+2)){
     memcpy(ptr,string.text(),size);
-#ifdef WIN32
-    setDNDData(origin,targettype,ptr,size+2);
-#else
     setDNDData(origin,targettype,ptr,size);
-#endif
     return true;
     }
   return false;

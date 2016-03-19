@@ -120,6 +120,7 @@ vcpp/dctest/dctest.dsp \
 vcpp/dialog/dialog.dsp \
 vcpp/dirlist/dirlist.dsp \
 vcpp/expression/expression.dsp \
+vcpp/format/format.dsp \
 vcpp/foursplit/foursplit.dsp \
 vcpp/fox/fox.dsp \
 vcpp/foxdll/foxdll.dsp \
@@ -195,20 +196,21 @@ distdir: $(DISTFILES)
 	   $(distdir)/vcpp/chartdll $(distdir)/vcpp/datatarget \
 	   $(distdir)/vcpp/dctest $(distdir)/vcpp/dialog \
 	   $(distdir)/vcpp/dirlist $(distdir)/vcpp/expression \
-	   $(distdir)/vcpp/foursplit $(distdir)/vcpp/fox \
-	   $(distdir)/vcpp/foxdll $(distdir)/vcpp/gltest \
-	   $(distdir)/vcpp/glviewer $(distdir)/vcpp/groupbox \
-	   $(distdir)/vcpp/header $(distdir)/vcpp/hello \
-	   $(distdir)/vcpp/hello2 $(distdir)/vcpp/iconlist \
-	   $(distdir)/vcpp/image $(distdir)/vcpp/imageviewer \
-	   $(distdir)/vcpp/layout $(distdir)/vcpp/mditest \
-	   $(distdir)/vcpp/memmap $(distdir)/vcpp/minheritance \
-	   $(distdir)/vcpp/pathfinder $(distdir)/vcpp/ratio \
-	   $(distdir)/vcpp/reswrap $(distdir)/vcpp/scribble \
-	   $(distdir)/vcpp/shutter $(distdir)/vcpp/shutterbug \
-	   $(distdir)/vcpp/splitter $(distdir)/vcpp/switcher \
-	   $(distdir)/vcpp/tabbook $(distdir)/vcpp/table \
-	   $(distdir)/vcpp/wizard $(distdir)/watcom
+	   $(distdir)/vcpp/format $(distdir)/vcpp/foursplit \
+	   $(distdir)/vcpp/fox $(distdir)/vcpp/foxdll \
+	   $(distdir)/vcpp/gltest $(distdir)/vcpp/glviewer \
+	   $(distdir)/vcpp/groupbox $(distdir)/vcpp/header \
+	   $(distdir)/vcpp/hello $(distdir)/vcpp/hello2 \
+	   $(distdir)/vcpp/iconlist $(distdir)/vcpp/image \
+	   $(distdir)/vcpp/imageviewer $(distdir)/vcpp/layout \
+	   $(distdir)/vcpp/mditest $(distdir)/vcpp/memmap \
+	   $(distdir)/vcpp/minheritance $(distdir)/vcpp/pathfinder \
+	   $(distdir)/vcpp/ratio $(distdir)/vcpp/reswrap \
+	   $(distdir)/vcpp/scribble $(distdir)/vcpp/shutter \
+	   $(distdir)/vcpp/shutterbug $(distdir)/vcpp/splitter \
+	   $(distdir)/vcpp/switcher $(distdir)/vcpp/tabbook \
+	   $(distdir)/vcpp/table $(distdir)/vcpp/wizard \
+	   $(distdir)/watcom
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

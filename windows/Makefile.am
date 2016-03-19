@@ -24,6 +24,7 @@ vcpp/dctest/dctest.dsp \
 vcpp/dialog/dialog.dsp \
 vcpp/dirlist/dirlist.dsp \
 vcpp/expression/expression.dsp \
+vcpp/format/format.dsp \
 vcpp/foursplit/foursplit.dsp \
 vcpp/fox/fox.dsp \
 vcpp/foxdll/foxdll.dsp \

@@ -18,13 +18,13 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chartutils.h,v 1.2 2008/01/04 15:18:14 fox Exp $                         *
+* $Id: chartutils.h,v 1.3 2008/09/26 00:42:12 fox Exp $                         *
 ********************************************************************************/
 #ifndef CHARTUTILS_H
 #define CHARTUTILS_H
 
 
-namespace FX {
+namespace FXCHART {
 
 // Helper functions
 extern FXCHARTAPI FXint textWidth(FXFont *font,const FXString& string);

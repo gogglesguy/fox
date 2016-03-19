@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGZFileStream.h,v 1.13 2008/01/04 15:18:19 fox Exp $                    *
+* $Id: FXGZFileStream.h,v 1.14 2008/07/02 19:05:39 fox Exp $                    *
 ********************************************************************************/
 #ifdef HAVE_ZLIB_H
 #ifndef FXGZFILESTREAM_H
@@ -48,8 +48,11 @@ public:
   /// Create GZIP compressed file stream
   FXGZFileStream(const FXObject* cont=NULL);
 
+  /// Create and open GZIP compressed file stream
+  FXGZFileStream(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
+
   /// Open file stream
-  FXbool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
+  FXbool open(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
 
   /// Flush buffer
   virtual FXbool flush();

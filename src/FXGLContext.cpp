@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.cpp,v 1.126 2008/06/24 20:46:31 fox Exp $                    *
+* $Id: FXGLContext.cpp,v 1.127 2008/09/17 00:38:53 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -290,10 +290,14 @@ FXbool FXGLContext::isCurrent() const {
 
 // Return true if thread has ANY current context
 FXbool FXGLContext::hasCurrent(){
+#ifdef HAVE_GL_H
 #ifdef WIN32
   return wglGetCurrentContext()!=NULL;
 #else
   return glXGetCurrentContext()!=NULL;
+#endif
+#else
+  return false;
 #endif
   }
 

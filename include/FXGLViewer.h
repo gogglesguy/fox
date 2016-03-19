@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.h,v 1.86 2008/01/04 15:18:19 fox Exp $                        *
+* $Id: FXGLViewer.h,v 1.87 2008/07/28 20:59:45 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXGLVIEWER_H
 #define FXGLVIEWER_H
@@ -334,8 +334,8 @@ public:
   /// Construct GL viewer widget
   FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Construct GL viewer widget sharing display lists with another GL viewer
-  FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* share,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
+  /// Construct GL viewer widget sharing display lists with another GL canvas
+  FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLCanvas* share,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Construct GL viewer widget sharing context
   FXGLViewer(FXComposite* p,FXGLContext* ctx,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);

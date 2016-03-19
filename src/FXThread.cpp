@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.135 2008/06/25 16:27:26 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.138 2008/11/14 01:13:02 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -838,7 +838,68 @@ FXMutex::~FXMutex(){
 
 /*******************************************************************************/
 
-#if defined(__APPLE__)
+#if (defined(__GNUC__) || defined(__ICC)) && (defined(__i386__) || defined(__x86_64__))
+
+// Initialize spinlock
+FXSpinLock::FXSpinLock(){
+  data[0]=data[1]=data[2]=data[3]=0;
+  }
+
+
+// Lock the spinlock
+void FXSpinLock::lock(){
+  __asm__ __volatile__ (
+        "movw $0x100, %%ax \n\t"
+        "lock \n\t"
+        "xaddw %%ax, %0 \n\t"
+        "1: \n\t"
+        "cmpb %%ah, %%al\n\t"
+        "je 2f\n\t"
+        "rep; nop\n\t"
+        "movb %0, %%al\n\t"
+        "jmp 1b\n\t"
+        "2:"  : "+m" (data) : : "memory", "ax", "cc");
+  }
+
+
+// Try lock the spinlock
+FXbool FXSpinLock::trylock(){
+  FXushort tmp,old;
+  __asm__ __volatile__ (
+        "movw %2,%w0\n\t"
+        "cmpb %h0, %b0\n\t"
+        "jne 1f\n\t"
+        "movw %w0,%w1\n\t"
+        "incb %h1\n\t"
+        "lock \n\t"
+        "cmpxchgw %w1,%2\n\t"
+        "1:" :"=a" (old), "=Q" (tmp), "+m" (data) : : "memory", "cc");
+  return ((old&0xff)==((old>>8)&0xff));
+  }
+
+
+// Unlock spinlock
+void FXSpinLock::unlock(){
+  __asm__ __volatile__ (
+        "lock\n\t"
+        "incb %0" : "+m" (data) : : "memory", "cc");
+  }
+
+
+// Test if locked
+FXbool FXSpinLock::locked(){
+  FXushort tmp=*((volatile FXushort*)(void*)data);
+  return (((tmp>>8)&0xff)!=(tmp&0xff));
+  }
+
+
+// Delete spinlock
+FXSpinLock::~FXSpinLock(){
+  }
+
+
+#elif defined(__APPLE__)          
+
 
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){
@@ -883,7 +944,9 @@ FXbool FXSpinLock::locked(){
 FXSpinLock::~FXSpinLock(){
   }
 
+
 #else
+
 
 // Initialize spinlock
 FXSpinLock::FXSpinLock(){

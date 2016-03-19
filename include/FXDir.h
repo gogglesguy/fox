@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDir.h,v 1.29 2008/02/28 16:14:28 fox Exp $                             *
+* $Id: FXDir.h,v 1.44 2008/09/24 04:58:20 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXDIR_H
 #define FXDIR_H
@@ -44,7 +44,7 @@ public:
     AllDirs     = 8,              /// List all directories
     HiddenFiles = 16,             /// List hidden files also
     HiddenDirs  = 32,             /// List hidden directories also
-    NoParent    = 64,             /// Don't include '..' in the listing
+    NoParent    = 64,             /// Don't include '.' and '..' in the listing
     CaseFold    = 128             /// Matching is case-insensitive
     };
 
@@ -62,23 +62,20 @@ public:
   /// Returns true if the directory is open
   virtual FXbool isOpen() const;
 
-  /// Go to next one
-  virtual FXbool next();
-
-  /// Return current file name
-  virtual FXString name() const;
+  /// Go to next directory entry and return its name
+  virtual FXbool next(FXString& name);
 
   /// Close directory
   virtual void close();
 
 
   /// Create directory
-  static FXbool create(const FXString& path,FXuint mode=FXIO::OwnerFull|FXIO::GroupFull|FXIO::OtherFull);
+  static FXbool create(const FXString& path,FXuint perm=FXIO::AllFull);
 
   /// Remove directory
   static FXbool remove(const FXString& path);
 
-  /// Rename or move srcpath to dstpath
+  /// Rename directory
   static FXbool rename(const FXString& srcpath,const FXString& dstpath);
 
 
@@ -96,9 +93,25 @@ public:
   static FXint listDrives(FXString*& drivelist);
 
 
+  /// Create a directories recursively
+  static FXbool createDirectories(const FXString& path,FXuint perm=FXIO::AllFull);
+
+
   /// Destructor
   virtual ~FXDir();
   };
+
+
+class FXDirVisitor {
+public:
+  virtual FXbool traverse(const FXString& path);
+  virtual FXbool enter(const FXString& path);
+  virtual FXbool visit(const FXString& path);
+  virtual FXbool leave(const FXString& path);
+  virtual ~FXDirVisitor(){}
+  };
+
+
 
 }
 

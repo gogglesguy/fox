@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCursor.h,v 1.32 2008/01/04 15:18:15 fox Exp $                          *
+* $Id: FXCursor.h,v 1.33 2008/07/30 23:55:13 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXCURSOR_H
 #define FXCURSOR_H
@@ -75,6 +75,18 @@ public:
 
   /// Make cursor from FXColor pixels; cursor size should be at most 32x32 for portability!
   FXCursor(FXApp* a,const FXColor* pix,FXint w=32,FXint h=32,FXint hx=0,FXint hy=0);
+
+  /// Change options
+  void setOptions(FXuint opts);
+
+  /// To get to the option flags
+  FXuint getOptions() const { return options; }
+
+  /// Set pixel data ownership flag
+  void setOwned(FXbool owned);
+
+  /// Get pixel data ownership flag
+  FXbool isOwned() const;
 
   /// Width of cursor; returns 0 for stock cursors
   FXint getWidth() const { return width; }

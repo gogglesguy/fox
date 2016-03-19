@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLVisual.cpp,v 1.134 2008/04/24 15:50:59 fox Exp $                     *
+* $Id: FXGLVisual.cpp,v 1.135 2008/09/22 20:50:12 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -178,6 +178,8 @@ FXbool FXGLVisual::hasOpenGL(FXApp* application){
 #if defined(WIN32) ///////////////// WIN32 //////////////////////////////////////
 
 
+#ifdef HAVE_GL_H
+
 // New tokens for ICD drivers
 #ifndef WGL_ARB_pixel_format
 #define WGL_NUMBER_PIXEL_FORMATS_ARB    0x2000
@@ -250,6 +252,8 @@ FXbool FXGLVisual::hasOpenGL(FXApp* application){
 #ifndef WGL_ARB_pixel_format_float
 #define WGL_TYPE_RGBA_FLOAT_ARB         0x21A0
 #endif
+
+
 
 //  Prototype for wglGetPixelFormatAttribivARB()
 typedef BOOL (WINAPI* PFNWGLGETPIXELFORMATATTRIBIVARBPROC)(HDC hdc,int iPixelFormat,int iLayerPlane,UINT nAttributes,const int *piAttributes,int *piValues);
@@ -343,14 +347,17 @@ static HPALETTE makeOpenGLPalette(PIXELFORMATDESCRIPTOR* info){
 
   return hPalette;
   }
+#endif
 
 
 // Initialize
 void FXGLVisual::create(){
-#ifdef HAVE_GL_H
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      
+#ifdef HAVE_GL_H
+
       PIXELFORMATDESCRIPTOR pfd={sizeof(PIXELFORMATDESCRIPTOR),1,PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|PFD_DOUBLEBUFFER,PFD_TYPE_RGBA,24,0,0,0,0,0,0,0,0,0,0,0,0,0,24,0,0,PFD_MAIN_PLANE,0,0,0,0};
       int v;
 
@@ -823,14 +830,16 @@ void FXGLVisual::create(){
 
       // Destroy dummy window
       DestroyWindow(hwnd);
+      
+#endif
 
-      // Check if successful
-      if(!xid){
-        throw FXWindowException("unable to create GL context.");
-        }
+      }
+      
+    // Test if successful
+    if(!xid){
+      throw FXWindowException("unable to create GL context.");
       }
     }
-#endif
   }
 
 
@@ -851,10 +860,11 @@ void FXGLVisual::create(){
 
 // Initialize
 void FXGLVisual::create(){
-#ifdef HAVE_GL_H
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      
+#ifdef HAVE_GL_H
 
       // Assume the default
       visual=DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()));
@@ -1097,10 +1107,16 @@ void FXGLVisual::create(){
           XFree(fb);
           }
         }
-      }
-    if(!xid){ throw FXWindowException("no matching GL configuration."); }
-    }
+        
 #endif
+
+      }
+      
+    // Test if successful
+    if(!xid){ 
+      throw FXWindowException("no matching GL configuration."); 
+      }
+    }
   }
 
 
@@ -1109,10 +1125,11 @@ void FXGLVisual::create(){
 
 // Initialize
 void FXGLVisual::create(){
-#ifdef HAVE_GL_H
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
+
+#ifdef HAVE_GL_H
 
       // Assume the default
       visual=DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()));
@@ -1300,10 +1317,16 @@ void FXGLVisual::create(){
           XFree((char*)vi);
           }
         }
-      }
-    if(!xid){ throw FXWindowException("no matching GL configuration."); }
-    }
+        
 #endif
+
+      }
+      
+    // Test if successful
+    if(!xid){ 
+      throw FXWindowException("no matching GL configuration."); 
+      }
+    }
   }
 
 

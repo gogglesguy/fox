@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStream.cpp,v 1.80 2008/01/04 15:42:33 fox Exp $                        *
+* $Id: FXStream.cpp,v 1.82 2008/07/02 19:05:40 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -167,20 +167,21 @@ void FXStream::setSpace(FXuval size){
 
 
 // Open for save or load
-FXbool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data){
+//FXbool FXStream::open(FXStreamDirection save_or_load,FXuval size,FXuchar* data,FXbool owned){
+FXbool FXStream::open(FXStreamDirection save_or_load,FXuchar* data,FXuval size,FXbool owned){
   if(save_or_load!=FXStreamSave && save_or_load!=FXStreamLoad){fxerror("FXStream::open: illegal stream direction.\n");}
   if(!dir){
 
     // Use external buffer space
     if(data){
       begptr=data;
-      if(size==ULONG_MAX)
+      if(size==~0UL)
         endptr=(FXuchar*)(FXival)-1L;
       else
         endptr=begptr+size;
       wrptr=begptr;
       rdptr=begptr;
-      owns=false;
+      owns=owned;
       }
 
     // Use internal buffer space

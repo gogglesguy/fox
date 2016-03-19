@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAtomic.h,v 1.25 2008/01/04 15:18:14 fox Exp $                          *
+* $Id: FXAtomic.h,v 1.26 2008/11/07 00:58:31 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXATOMIC_H
 #define FXATOMIC_H
@@ -49,7 +49,7 @@ public:
   inline int set(int v){
 #if defined(WIN32)
     return InterlockedExchange((LONG*)&val,v);
-#elif defined(__GNUC__) && defined (__GNUC_MINOR__) && ((4 < __GNUC__) || (4 == __GNUC__ && 1 <= __GNUC_MINOR__))
+#elif (defined(__GNUC__) || defined(__ICC)) && (defined(__i386__) || defined(__x86_64__))
     int ret=v;
     __asm__ __volatile__("lock\n\t"
                          "xchgl %0,%1\n\t" : "=r" (ret) : "m" (val), "0" (ret) : "memory");

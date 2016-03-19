@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCURCursor.cpp,v 1.30 2008/01/04 15:42:05 fox Exp $                     *
+* $Id: FXCURCursor.cpp,v 1.31 2008/07/02 19:36:27 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -63,11 +63,9 @@ FXIMPLEMENT(FXCURCursor,FXCursor,NULL,0)
 // Constructor
 FXCURCursor::FXCURCursor(FXApp* a,const void *pix):FXCursor(a,NULL,0,0,0,0){
   if(pix){
-    FXMemoryStream ms;
-    ms.open(FXStreamLoad,(FXuchar*)pix);
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
     fxloadICO(ms,data,width,height,hotx,hoty);
     options|=CURSOR_OWNED;
-    ms.close();
     }
   }
 

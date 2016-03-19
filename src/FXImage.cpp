@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXImage.cpp,v 1.165 2008/04/23 03:10:43 fox Exp $                        *
+* $Id: FXImage.cpp,v 1.166 2008/07/30 23:55:13 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -609,12 +609,12 @@ void FXImage::render(){
       bmi.bmiHeader.biYPelsPerMeter=0;
       bmi.bmiHeader.biClrUsed=0;
       bmi.bmiHeader.biClrImportant=0;
-          FXuchar * dst=NULL;   
-        
+          FXuchar * dst=NULL;
+
      xid=CreateDIBSection(NULL,&bmi,DIB_RGB_COLORS,(void**)&dst,NULL,0);
-*/     
-     
-     
+*/
+
+
       // Set up the bitmap info
       bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
       bmi.bmiHeader.biWidth=width;
@@ -2381,6 +2381,24 @@ int FXImage::ReleaseDC(FXID hdc) const {
 #endif
 
 
+// Change options
+void FXImage::setOptions(FXuint opts){
+  options=(options&~IMAGE_MASK) | (opts&IMAGE_MASK);
+  }
+
+
+// Set pixel data ownership flag
+void FXImage::setOwned(FXbool owned){ 
+  options^=((0-owned)^options)&IMAGE_OWNED;
+  }
+
+
+// Get pixel ownership flag
+FXbool FXImage::isOwned() const { 
+  return (options&IMAGE_OWNED)!=0; 
+  }
+
+
 // Attach pixel buffer to image, and assume ownership of it if IMAGE_OWNED is passed
 void FXImage::setData(FXColor *pix,FXuint opts){
 
@@ -2419,12 +2437,6 @@ void FXImage::setData(FXColor *pix,FXuint opts,FXint w,FXint h){
 
   // Set the pointer
   data=pix;
-  }
-
-
-// Change options
-void FXImage::setOptions(FXuint opts){
-  options=(options&~IMAGE_MASK) | (opts&IMAGE_MASK);
   }
 
 
