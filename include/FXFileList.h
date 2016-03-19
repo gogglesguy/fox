@@ -144,6 +144,7 @@ protected:
   FXIcon       *mini_app;       // Mini application icon
   FXString      directory;      // Current directory
   FXString      pattern;        // Pattern of file names
+  FXString      timeformat;     // File time formatting
   FXString      startdirectory; // Start directory
   FXString      dropdirectory;  // Drop directory
   FXString      clipfiles;      // Clipped files
@@ -390,6 +391,12 @@ public:
 
   /// Are draggable files
   FXbool getDraggableFiles() const { return draggable; }
+
+  /// Set file time format 
+  void setTimeFormat(const FXString& fmt);
+
+  /// Return file time format
+  const FXString& getTimeFormat() const { return timeformat; }
 
   /// Save to stream
   virtual void save(FXStream& store) const;

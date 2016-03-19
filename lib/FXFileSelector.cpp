@@ -1199,6 +1199,18 @@ FXbool FXFileSelector::getDraggableFiles() const {
   }
 
 
+// Set file time format
+void FXFileSelector::setTimeFormat(const FXString& fmt){
+  filebox->setTimeFormat(fmt);
+  }
+
+
+// Return file time format
+FXString FXFileSelector::getTimeFormat() const {
+  return filebox->getTimeFormat();
+  }
+
+
 // Save data
 void FXFileSelector::save(FXStream& store) const {
   FXPacker::save(store);

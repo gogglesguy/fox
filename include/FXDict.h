@@ -46,8 +46,8 @@ protected:
     };
 protected:
   FXArray<Entry> table;         // Hash table
-  FXint          used;          // Used entries
-  FXint          free;          // Free entries
+  FXival         used;          // Used entries
+  FXival         free;          // Free entries
 protected:
   static const Entry init;      // Initialization value
 protected:
@@ -80,17 +80,17 @@ public:
   /**
   * Resize the table to the given size.
   */
-  FXbool size(FXint m);
+  FXbool size(FXival m);
 
   /**
   * Return the size of the table, including the empty slots.
   */
-  FXint size() const { return table.no(); }
+  FXival size() const { return table.no(); }
 
   /**
   * Return the total number of entries in the table.
   */
-  FXint no() const { return used; }
+  FXival no() const { return used; }
 
   /**
   * Insert a new entry into the table given key and mark.
@@ -119,32 +119,32 @@ public:
   /**
   * Return true if slot is empty.
   */
-  FXbool empty(FXint pos) const { return !table[pos].key; }
+  FXbool empty(FXival pos) const { return !table[pos].key; }
 
   /**
   * Return key at position pos.
   */
-  const FXchar* key(FXint pos) const { return table[pos].key; }
+  const FXchar* key(FXival pos) const { return table[pos].key; }
 
   /**
   * Return data pointer at position pos.
   */
-  void* data(FXint pos) const { return table[pos].data; }
+  void* data(FXival pos) const { return table[pos].data; }
 
   /**
   * Return mark flag of entry at position pos.
   */
-  FXbool mark(FXint pos) const { return table[pos].mark; }
+  FXbool mark(FXival pos) const { return table[pos].mark; }
 
   /**
   * Return position of first filled slot, or >= total
   */
-  FXint first() const;
+  FXival first() const;
 
   /**
   * Return position of last filled slot or -1
   */
-  FXint last() const;
+  FXival last() const;
 
 
   /**
@@ -152,13 +152,13 @@ public:
   * or a value greater than or equal to total if no filled
   * slot was found
   */
-  FXint next(FXint pos) const;
+  FXival next(FXival pos) const;
 
   /**
   * Return position of previous filled slot in hash table
   * or a -1 if no filled slot was found
   */
-  FXint prev(FXint pos) const;
+  FXival prev(FXival pos) const;
 
   /// Clear all entries
   void clear();

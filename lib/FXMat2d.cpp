@@ -42,12 +42,6 @@ using namespace FX;
 
 namespace FX {
 
-// Mask bottom 3 elements
-#define MMM _mm_set_epi32(0,~0,~0,~0)
-
-// Mask bottom 2 elements
-#define MM  _mm_set_epi32(0,0,~0,~0)
-
 
 // Initialize matrix from scalar
 FXMat2d::FXMat2d(FXdouble s){
@@ -64,7 +58,7 @@ FXMat2d::FXMat2d(FXdouble s){
 // Initialize matrix from another matrix
 FXMat2d::FXMat2d(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_loadu_pd(s[0]));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0][0]));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0][0]));
   _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&s[1][0]));
@@ -90,7 +84,7 @@ FXMat2d::FXMat2d(const FXMat3d& s){
 // Initialize matrix from array
 FXMat2d::FXMat2d(const FXdouble s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_loadu_pd(s));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
   _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
@@ -110,13 +104,8 @@ FXMat2d::FXMat2d(FXdouble a,FXdouble b){
 
 // Initialize matrix from components
 FXMat2d::FXMat2d(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11){
-#if defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_set_pd(a01,a00));
-  _mm_storeu_pd(&m[1][0],_mm_set_pd(a11,a10));
-#else
   m[0][0]=a00; m[0][1]=a01;
   m[1][0]=a10; m[1][1]=a11;
-#endif
   }
 
 
@@ -148,7 +137,7 @@ FXMat2d& FXMat2d::operator=(FXdouble s){
 // Assignment operator
 FXMat2d& FXMat2d::operator=(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_loadu_pd(s[0]));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0][0]));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0][0]));
   _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&s[1][0]));
@@ -176,7 +165,7 @@ FXMat2d& FXMat2d::operator=(const FXMat3d& s){
 // Assignment from array
 FXMat2d& FXMat2d::operator=(const FXdouble s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_loadu_pd(s));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
   _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
@@ -204,7 +193,7 @@ FXMat2d& FXMat2d::set(FXdouble s){
 // Set value from another matrix
 FXMat2d& FXMat2d::set(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_loadu_pd(s[0]));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0][0]));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0][0]));
   _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&s[1][0]));
@@ -232,7 +221,7 @@ FXMat2d& FXMat2d::set(const FXMat3d& s){
 // Set value from array
 FXMat2d& FXMat2d::set(const FXdouble s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_loadu_pd(s));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
   _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
@@ -254,13 +243,8 @@ FXMat2d& FXMat2d::set(FXdouble a,FXdouble b){
 
 // Set value from components
 FXMat2d& FXMat2d::set(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11){
-#if defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_set_pd(a01,a00));
-  _mm_storeu_pd(&m[1][0],_mm_set_pd(a11,a10));
-#else
   m[0][0]=a00; m[0][1]=a01;
   m[1][0]=a10; m[1][1]=a11;
-#endif
   return *this;
   }
 
@@ -281,7 +265,7 @@ FXMat2d& FXMat2d::set(const FXVec2d& a,const FXVec2d& b){
 // Add matrices
 FXMat2d& FXMat2d::operator+=(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_add_pd(_mm256_loadu_pd(m[0]),_mm256_loadu_pd(s[0])));
+  _mm256_storeu_pd(&m[0][0],_mm256_add_pd(_mm256_loadu_pd(&m[0][0]),_mm256_loadu_pd(&s[0][0])));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_add_pd(_mm_loadu_pd(&m[0][0]),_mm_loadu_pd(&s[0][0])));
   _mm_storeu_pd(&m[1][0],_mm_add_pd(_mm_loadu_pd(&m[1][0]),_mm_loadu_pd(&s[1][0])));
@@ -296,7 +280,7 @@ FXMat2d& FXMat2d::operator+=(const FXMat2d& s){
 // Substract matrices
 FXMat2d& FXMat2d::operator-=(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_sub_pd(_mm256_loadu_pd(m[0]),_mm256_loadu_pd(s[0])));
+  _mm256_storeu_pd(&m[0][0],_mm256_sub_pd(_mm256_loadu_pd(&m[0][0]),_mm256_loadu_pd(&s[0][0])));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_sub_pd(_mm_loadu_pd(&m[0][0]),_mm_loadu_pd(&s[0][0])));
   _mm_storeu_pd(&m[1][0],_mm_sub_pd(_mm_loadu_pd(&m[1][0]),_mm_loadu_pd(&s[1][0])));
@@ -311,7 +295,7 @@ FXMat2d& FXMat2d::operator-=(const FXMat2d& s){
 // Multiply matrix by scalar
 FXMat2d& FXMat2d::operator*=(FXdouble s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_mul_pd(_mm256_loadu_pd(m[0]),_mm256_set1_pd(s)));
+  _mm256_storeu_pd(&m[0][0],_mm256_mul_pd(_mm256_loadu_pd(&m[0][0]),_mm256_set1_pd(s)));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_mul_pd(_mm_loadu_pd(&m[0][0]),_mm_set1_pd(s)));
   _mm_storeu_pd(&m[1][0],_mm_mul_pd(_mm_loadu_pd(&m[1][0]),_mm_set1_pd(s)));
@@ -344,11 +328,10 @@ FXMat2d& FXMat2d::operator*=(const FXMat2d& s){
 // Divide matrix by scalar
 FXMat2d& FXMat2d::operator/=(FXdouble s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(m[0],_mm256_div_pd(_mm256_loadu_pd(m[0]),_mm256_set1_pd(s)));
+  _mm256_storeu_pd(&m[0][0],_mm256_div_pd(_mm256_loadu_pd(&m[0][0]),_mm256_set1_pd(s)));
 #elif defined(FOX_HAS_SSE2)
-  register __m128d ss=_mm_set1_pd(s);
-  _mm_storeu_pd(&m[0][0],_mm_div_pd(_mm_loadu_pd(&m[0][0]),ss));
-  _mm_storeu_pd(&m[1][0],_mm_div_pd(_mm_loadu_pd(&m[1][0]),ss));
+  _mm_storeu_pd(&m[0][0],_mm_div_pd(_mm_loadu_pd(&m[0][0]),_mm_set1_pd(s)));
+  _mm_storeu_pd(&m[1][0],_mm_div_pd(_mm_loadu_pd(&m[1][0]),_mm_set1_pd(s)));
 #else
   m[0][0]/=s; m[0][1]/=s;
   m[1][0]/=s; m[1][1]/=s;
@@ -361,7 +344,7 @@ FXMat2d& FXMat2d::operator/=(FXdouble s){
 FXMat2d FXMat2d::operator-() const {
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_sub_pd(_mm256_set1_pd(0.0),_mm256_loadu_pd(m[0])));
+  _mm256_storeu_pd(&r[0][0],_mm256_sub_pd(_mm256_set1_pd(0.0),_mm256_loadu_pd(&m[0][0])));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;
@@ -400,10 +383,10 @@ FXMat2d& FXMat2d::rot(FXdouble c,FXdouble s){
 #if defined(FOX_HAS_SSE2)
   register __m128d cc=_mm_set1_pd(c);
   register __m128d ss=_mm_set1_pd(s);
-  register __m128d uu=_mm_loadu_pd(m[0]);
-  register __m128d vv=_mm_loadu_pd(m[1]);
-  _mm_storeu_pd(m[0],_mm_add_pd(_mm_mul_pd(cc,uu),_mm_mul_pd(ss,vv)));
-  _mm_storeu_pd(m[1],_mm_sub_pd(_mm_mul_pd(cc,vv),_mm_mul_pd(ss,uu)));
+  register __m128d uu=_mm_loadu_pd(&m[0][0]);
+  register __m128d vv=_mm_loadu_pd(&m[1][0]);
+  _mm_storeu_pd(&m[0][0],_mm_add_pd(_mm_mul_pd(cc,uu),_mm_mul_pd(ss,vv)));
+  _mm_storeu_pd(&m[1][0],_mm_sub_pd(_mm_mul_pd(cc,vv),_mm_mul_pd(ss,uu)));
 #else
   register FXdouble u,v;
   u=m[0][0]; v=m[1][0]; m[0][0]=c*u+s*v; m[1][0]=c*v-s*u;
@@ -437,7 +420,7 @@ FXMat2d& FXMat2d::scale(FXdouble sx,FXdouble sy){
 // Scale uniform
 FXMat2d& FXMat2d::scale(FXdouble s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_mul_pd(_mm256_loadu_pd(&m[0][0]),_mm256_set_pd(s,s,s,s)));
+  _mm256_storeu_pd(&m[0][0],_mm256_mul_pd(_mm256_loadu_pd(&m[0][0]),_mm256_set1_pd(s)));
 #elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_mul_pd(_mm_loadu_pd(&m[0][0]),_mm_set1_pd(s)));
   _mm_storeu_pd(&m[1][0],_mm_mul_pd(_mm_loadu_pd(&m[1][0]),_mm_set1_pd(s)));
@@ -457,14 +440,7 @@ FXdouble FXMat2d::det() const {
 
 // Transpose matrix
 FXMat2d FXMat2d::transpose() const {
-#if defined(FOX_HAS_SSE2)
-  FXMat2d r;
-  _mm_storeu_pd(&r[0][0],_mm_set_pd(m[1][0],m[0][0]));
-  _mm_storeu_pd(&r[1][0],_mm_set_pd(m[0][1],m[1][0]));
-  return r;
-#else
   return FXMat2d(m[0][0],m[1][0],m[0][1],m[1][1]);
-#endif
   }
 
 
@@ -478,7 +454,7 @@ FXMat2d FXMat2d::invert() const {
 // Matrix times vector
 FXVec2d operator*(const FXMat2d& m,const FXVec2d& v){
 #if defined(FOX_HAS_SSE3)
-  register __m128d vv=_mm_loadu_pd(&v[0]);
+  register __m128d vv=_mm_loadu_pd(v);
   register __m128d r0=_mm_mul_pd(_mm_loadu_pd(&m[0][0]),vv);
   register __m128d r1=_mm_mul_pd(_mm_loadu_pd(&m[1][0]),vv);
   FXVec2d r;
@@ -508,7 +484,7 @@ FXVec2d operator*(const FXVec2d& v,const FXMat2d& m){
 FXMat2d operator+(const FXMat2d& a,const FXMat2d& b){
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_add_pd(_mm256_loadu_pd(a[0]),_mm256_loadu_pd(b[0])));
+  _mm256_storeu_pd(&r[0][0],_mm256_add_pd(_mm256_loadu_pd(&a[0][0]),_mm256_loadu_pd(&b[0][0])));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;
@@ -525,7 +501,7 @@ FXMat2d operator+(const FXMat2d& a,const FXMat2d& b){
 FXMat2d operator-(const FXMat2d& a,const FXMat2d& b){
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_sub_pd(_mm256_loadu_pd(a[0]),_mm256_loadu_pd(b[0])));
+  _mm256_storeu_pd(&r[0][0],_mm256_sub_pd(_mm256_loadu_pd(&a[0][0]),_mm256_loadu_pd(&b[0][0])));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;
@@ -557,7 +533,7 @@ FXMat2d operator*(const FXMat2d& a,const FXMat2d& b){
 FXMat2d operator*(FXdouble x,const FXMat2d& m){
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_mul_pd(_mm256_set1_pd(x),_mm256_loadu_pd(m[0])));
+  _mm256_storeu_pd(&r[0][0],_mm256_mul_pd(_mm256_set1_pd(x),_mm256_loadu_pd(&m[0][0])));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;
@@ -574,7 +550,7 @@ FXMat2d operator*(FXdouble x,const FXMat2d& m){
 FXMat2d operator*(const FXMat2d& m,FXdouble x){
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_mul_pd(_mm256_loadu_pd(m[0]),_mm256_set1_pd(x)));
+  _mm256_storeu_pd(&r[0][0],_mm256_mul_pd(_mm256_loadu_pd(&m[0][0]),_mm256_set1_pd(x)));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;
@@ -591,7 +567,7 @@ FXMat2d operator*(const FXMat2d& m,FXdouble x){
 FXMat2d operator/(FXdouble x,const FXMat2d& m){
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_div_pd(_mm256_set1_pd(x),_mm256_loadu_pd(m[0])));
+  _mm256_storeu_pd(&r[0][0],_mm256_div_pd(_mm256_set1_pd(x),_mm256_loadu_pd(m[0])));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;
@@ -608,7 +584,7 @@ FXMat2d operator/(FXdouble x,const FXMat2d& m){
 FXMat2d operator/(const FXMat2d& m,FXdouble x){
 #if defined(FOX_HAS_AVX)
   FXMat2d r;
-  _mm256_storeu_pd(r[0],_mm256_div_pd(_mm256_loadu_pd(m[0]),_mm256_set1_pd(x)));
+  _mm256_storeu_pd(&r[0][0],_mm256_div_pd(_mm256_loadu_pd(&m[0][0]),_mm256_set1_pd(x)));
   return r;
 #elif defined(FOX_HAS_SSE2)
   FXMat2d r;

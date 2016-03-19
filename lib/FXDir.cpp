@@ -122,9 +122,9 @@ FXbool FXDir::open(const FXString& path){
 // Returns true if the directory is open
 FXbool FXDir::isOpen() const {
 #ifdef WIN32
-  return (((SPACE*)space)->handle!=INVALID_HANDLE_VALUE);
+  return (((const SPACE*)space)->handle!=INVALID_HANDLE_VALUE);
 #else
-  return (((SPACE*)space)->handle!=NULL);
+  return (((const SPACE*)space)->handle!=NULL);
 #endif
   }
 

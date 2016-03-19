@@ -349,6 +349,18 @@ FXbool FXFileDialog::getDraggableFiles() const {
   }
 
 
+// Set file time format
+void FXFileDialog::setTimeFormat(const FXString& fmt){
+  filebox->setTimeFormat(fmt);
+  }
+  
+
+// Return file time format
+FXString FXFileDialog::getTimeFormat() const {
+  return filebox->getTimeFormat();
+  }
+
+
 // Save data
 void FXFileDialog::save(FXStream& store) const {
   FXDialogBox::save(store);

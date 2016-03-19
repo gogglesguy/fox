@@ -79,7 +79,7 @@ public:
   FXObject *const * data() const { return ptr; }
 
   /// Adopt objects from orig, leaving orig empty
-  void adopt(FXObjectList& orig);
+  FXObjectList& adopt(FXObjectList& orig);
 
   /// Assign object to list
   FXbool assign(FXObject* object);
@@ -172,7 +172,7 @@ public:
   void load(FXStream& store);
 
   /// Destructor
-  virtual ~FXObjectList();
+ ~FXObjectList();
   };
 
 
@@ -180,6 +180,7 @@ public:
 template<class TYPE>
 class FXObjectListOf : public FXObjectList {
 public:
+
   /// Default constructor
   FXObjectListOf(){}
 
@@ -214,6 +215,9 @@ public:
   /// Access to content array
   TYPE** data(){ return reinterpret_cast<TYPE**>(ptr); }
   TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
+
+  /// Adopt objects from orig, leaving orig empty
+  FXObjectListOf<TYPE>& adopt(const FXObjectListOf<TYPE>& src){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::adopt(src)); }
   };
 
 }

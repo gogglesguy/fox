@@ -30,30 +30,59 @@
 /*
   Notes:
   - The table hashes pointers to pointers, or things which fit into a pointer to
-    things which fit into a pointer.  This covers a large number of hashing cases.
-  - We distinguish between used slots, free slots, and formerly used empty slots.
-    The members "used" and "free" keep track of the number of slots in the table which
-    are occupied, and the number of slots which are free.  These numbers do not always
-    sum to the total number of slots!
-  - An occupied slot which is removed will be marked as empty; it can not be counted
-    as free, since the slot may be part of the probe-chain of some other slot's probe-
-    sequence.
-  - Only when the table is resized will the empty slots be reclaimed.
-  - The probe sequence will eventually visit each table location, thus guaranteeing that
-    items will be found if they're in the table.
-  - When items are added, the load factor is kept below half full; any additional items
-    will cause the table to be resized to double the previous size.
-  - When items are removed, the load factor is kept above one quarter full, and the
-    table will be resized to half the original size.
-  - The calculations are tweaked such that the minimal table size is exactly 2.
-  - Use of __likely() and __unlikely() causes very optimal code generation on the
-    compilers; it makes a noticeable difference.
+    things which fit into a pointers.
+
+  - The hash table does not know anything about the keys, or the values; thus, subclasses
+    are responsible for managing the memory of the contents.
+
+  - Initially the table is initialized to the empty-table pointer.  This will have only
+    a single free slot; this means the table pointer is NEVER null.
+
+  - The hash-table object requires only one pointer's worth of memory.  Thus an empty
+    hash table requires very little space, and no table is allocated until at least one
+    element is added.
+
+  - The table resize algorithm:
+
+      - Table maintains count of used slots, and count of free slots; when an entry
+        is removed, used slot count will be decremented, but free slot count will
+        stay the same, because the slot is voided, not freed.  This is because the
+        removed slot may still be part of another entry's probe sequence.
+        When an entry is added, it will be placed in a voided slot if possible;
+        if not, then it will be placed in a free slot.
+
+      - When the table is resized, all entries wil be re-hashed, and voided slots be
+        reclaimed as free slots.
+
+      - Table is grown PRIOR to adding entries, and shrunk AFTER removing entries.
+
+      - Table is grown when the number of remaining free slots is less than or
+        equal to 1/4 of the table size (plus 1, because the resize occurs PRIOR to
+        adding the entry).
+
+      - Table is shrunk when the number of used slots is less than or equal to 1/4
+        of the table size.
+
+      - Table must always maintain at least one free slot to insure that probing
+        sequence is always finite (all locations are eventually visited, and thus
+        the probing sequence is guaranteed to be finite).
+
+      - Thus the new implementation will be at least 1/4 used, and at most 3/4 filled
+        (used and voided slots do not exceed 3/4 of table size).  The "hysteresis"
+        between growing and shrinking means that adding, then removing a single item
+        will not cause a table resize (except when the table is near empty, of course).
+
 */
 
-#define HASH(x)   ((FXuval)(x))
+#define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
 #define BSHIFT    5
 #define VOID      ((void*)-1L)
 #define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
+#define NOMEMORY  ((Entry*)(((FXival*)NULL)+3))
+#define SIZE      -1
+#define USED      -2
+#define FREE      -3
+
 
 using namespace FX;
 
@@ -61,62 +90,83 @@ using namespace FX;
 
 namespace FX {
 
-// Initial value for slot
-const FXHash::Entry FXHash::init={NULL,NULL};
+
+// Empty object list
+static const FXival emptytable[7]={1,0,1,0,0,0,0};
+
+
+// Empty buffer designator
+#define EMPTY   (const_cast<Entry*>((Entry*)(emptytable+3)))
 
 
 // Make empty table
-FXHash::FXHash():table(init,2),used(0),free(2){
+FXHash::FXHash():table(EMPTY){
   }
 
 
-// Resize hash table, and rehash old stuff into it
-FXbool FXHash::size(FXint m){
-  FXArray<Entry> elbat;
-  if(__likely(elbat.assign(init,m))){
-    register FXuval p,b,x;
-    register void *name;
-    register void *data;
-    register FXint i;
-    for(i=0; i<table.no(); ++i){
-      name=table[i].name;
-      data=table[i].data;
-      if(!LEGAL(name)) continue;
-      p=b=HASH(name);
-      while(elbat[x=p&(m-1)].name){
-        p=(p<<2)+p+b+1;
-        b>>=BSHIFT;
-        }
-      elbat[x].name=name;
-      elbat[x].data=data;
-      }
-    table.adopt(elbat);
-    free=m-used;
-    return true;
+// Clear hash table, marking all slots as free
+void FXHash::clear(){
+  if(table!=EMPTY){
+    free(((FXival*)table)-3);
+    table=EMPTY;
     }
-  return false;
+  }
+
+
+// Resize the table to the given size; the size must be a power of two
+FXbool FXHash::size(FXival num){
+  FXASSERT((num&(num-1))==0);
+  if(size()!=num){
+    register Entry* elbat=EMPTY;
+    register FXival p,b,x,i;
+    register void* name;
+    register void* data;
+    if(1<num){
+      if(__unlikely((elbat=(Entry*)(((FXival*)calloc(sizeof(FXival)*3+sizeof(Entry)*num,1))+3))==NOMEMORY)) return false;
+      for(i=0; i<size(); ++i){                  // Hash existing entries into new table
+        name=table[i].name;
+        data=table[i].data;
+        if(!LEGAL(name)) continue;              // Skip empty or voided slots
+        p=b=HASH(name);
+        while(elbat[x=p&(num-1)].name){         // Locate slot
+          p=(p<<2)+p+b+1;
+          b>>=BSHIFT;
+          }
+        elbat[x].name=name;
+        elbat[x].data=data;
+        }
+      ((FXival*)elbat)[FREE]=num-no();          // All non-empty slots now free
+      ((FXival*)elbat)[USED]=no();              // Used slots not changed
+      ((FXival*)elbat)[SIZE]=num;               // Total number of slots in table
+      }
+    if(table!=EMPTY){
+      free(((FXival*)table)-3);
+      }
+    table=elbat;
+    }
+  return true;
   }
 
 
 // Insert key into the table
 void* FXHash::insert(void* name,void* data){
   if(__likely(LEGAL(name))){
-    register FXuval p,b,h,x;
+    register FXival p,b,h,x;
     p=b=h=HASH(name);
-    while(table[x=p&(table.no()-1)].name){
+    while(table[x=p&(size()-1)].name){
       if(table[x].name==name) goto y;            // Return existing
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-    if(__likely((free<<1)>table.no()) || __likely(size(table.no()<<1))){
+    if(__likely(((FXival*)table)[FREE]>1+(size()>>2)) || __likely(size(size()<<1))){
       p=b=h;
-      while(table[x=p&(table.no()-1)].name){
-        if(table[x].name==VOID) goto x;         // Put it in empty slot
+      while(table[x=p&(size()-1)].name){
+        if(table[x].name==VOID) goto x;         // Put into voided slot
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
-      free--;
-x:    used++;
+      ((FXival*)table)[FREE]--;                 // Put into empty slot
+x:    ((FXival*)table)[USED]++;
       table[x].name=name;
       table[x].data=data;
 y:    return table[x].data;
@@ -129,23 +179,23 @@ y:    return table[x].data;
 // Replace key in the table, returning old one
 void* FXHash::replace(void* name,void* data){
   if(__likely(LEGAL(name))){
-    register FXuval p,b,h,x;
+    register FXival p,b,h,x;
     register void* old;
     p=b=h=HASH(name);
-    while(table[x=p&(table.no()-1)].name){
+    while(table[x=p&(size()-1)].name){
       if(table[x].name==name) goto y;            // Replace existing
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
-    if(__likely((free<<1)>table.no()) || __likely(size(table.no()<<1))){
+    if(__likely(((FXival*)table)[FREE]>1+(size()>>2)) || __likely(size(size()<<1))){
       p=b=h;
-      while(table[x=p&(table.no()-1)].name){
-        if(table[x].name==VOID) goto x;         // Put it in empty slot
+      while(table[x=p&(size()-1)].name){
+        if(table[x].name==VOID) goto x;         // Put into voided slot
         p=(p<<2)+p+b+1;
         b>>=BSHIFT;
         }
-      free--;
-x:    used++;
+      ((FXival*)table)[FREE]--;                 // Put into empty slot
+x:    ((FXival*)table)[USED]++;
       table[x].name=name;
 y:    old=table[x].data;
       table[x].data=data;
@@ -154,24 +204,24 @@ y:    old=table[x].data;
     }
   return NULL;
   }
- 
- 
+
+
 // Remove association from the table
 void* FXHash::remove(void* name){
   if(__likely(LEGAL(name))){
-    register FXuval p,b,x;
+    register FXival p,b,x;
     register void* old;
     p=b=HASH(name);
-    while(table[x=p&(table.no()-1)].name!=name){
+    while(table[x=p&(size()-1)].name!=name){
       if(table[x].name==NULL) goto x;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }
     old=table[x].data;
-    table[x].name=VOID;                         // Empty but not free
+    table[x].name=VOID;                         // Void the slot (not empty!)
     table[x].data=NULL;
-    used--;
-    if(__unlikely(used<(table.no()>>2))) size(table.no()>>1);
+    ((FXival*)table)[USED]--;
+    if(__unlikely(((FXival*)table)[USED]<=(size()>>2))) size(size()>>1);
     return old;
     }
 x:return NULL;
@@ -181,9 +231,9 @@ x:return NULL;
 // Return true if association in table
 void* FXHash::find(void* name) const {
   if(__likely(LEGAL(name))){
-    register FXuval p,b,x;
+    register FXival p,b,x;
     p=b=HASH(name);
-    while(__likely(table[x=p&(table.no()-1)].name)){
+    while(__likely(table[x=p&(size()-1)].name)){
       if(__likely(table[x].name==name)) return table[x].data;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
@@ -193,16 +243,9 @@ void* FXHash::find(void* name) const {
   }
 
 
-// Clear hash table
-void FXHash::clear(){
-  table.assign(init,2);
-  used=0;
-  free=2;
-  }
-
-
 // Destroy table
 FXHash::~FXHash(){
+  clear();
   }
 
 }

@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [40])
+m4_define([fox_level], [41])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -115,7 +115,7 @@ AC_CHECK_FUNCS(statvfs)
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
   CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow"
-#  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow -Wdouble-promotion -fvisibility=hidden"
+#  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow -Wstrict-overflow -Wcast-qual -Wcast-align -Wdouble-promotion -fvisibility=hidden"
 #  LDFLAGS="-rdynamic ${LDFLAGS}"
 fi
 

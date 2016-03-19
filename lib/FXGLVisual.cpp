@@ -663,7 +663,7 @@ void FXGLVisual::create(){
 
                 // Trace
                 FXTRACE((150,"Config: #%d: match=%d\n",v,match));
-                FXTRACE((150,"  visualid   = 0x%02x\n",vi[v].visualid));
+                FXTRACE((150,"  visualid   = 0x%02lx\n",vi[v].visualid));
                 FXTRACE((150,"  red size   = %d\n",specs.redsize));
                 FXTRACE((150,"  green size = %d\n",specs.greensize));
                 FXTRACE((150,"  blue size  = %d\n",specs.bluesize));

@@ -32,7 +32,7 @@ namespace FX {
 class FXAPI FXMutex {
   friend class FXCondition;
 private:
-  volatile FXuval data[24];
+  FXuval data[24];
 private:
   FXMutex(const FXMutex&);
   FXMutex &operator=(const FXMutex&);

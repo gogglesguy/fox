@@ -147,16 +147,16 @@ protected:
   FXint          gapstart;            // Start of the insertion point (the gap)
   FXint          gapend;              // End of the insertion point+1
   FXint          toppos;              // Start position of first visible row
-  FXint          keeppos;             // Position to keep on top visible row
   FXint          toprow;              // Row number of first visible row
+  FXint          keeppos;             // Position to keep on top visible row
   FXint          selstartpos;         // Start of selection
   FXint          selendpos;           // End of selection
   FXint          hilitestartpos;      // Hightlight start position
   FXint          hiliteendpos;        // Hightlight end position
   FXint          anchorpos;           // Anchor position
   FXint          cursorpos;           // Cursor position
-  FXint          cursorstart;         // Cursor row start pos
-  FXint          cursorend;           // Cursor row end pos
+  FXint          cursorstartpos;      // Cursor row start pos
+  FXint          cursorendpos;        // Cursor row end pos
   FXint          cursorrow;           // Cursor row
   FXint          cursorcol;           // Cursor column indent (not character offset!)
   FXint          prefcol;             // Preferred cursor column

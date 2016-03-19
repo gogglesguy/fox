@@ -223,6 +223,7 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   mini_doc=new FXGIFIcon(getApp(),minidoc);
   big_app=new FXGIFIcon(getApp(),bigapp);
   mini_app=new FXGIFIcon(getApp(),miniapp);
+  timeformat=tr(FXSystem::defaultTimeFormat);
 #ifdef WIN32
   matchmode=FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold;
   setSortFunc(ascendingCase);
@@ -1432,7 +1433,7 @@ void FXFileList::listItems(FXbool force){
         attrs=FXSystem::modeString(mode);
 
         // Mod time
-        modtm=FXSystem::localTime(info.modified());
+        modtm=FXSystem::localTime(timeformat.text(),info.modified());
 
         // Link name, if any
         lnknm=FXString::null;
@@ -1583,7 +1584,7 @@ void FXFileList::setPattern(const FXString& ptrn){
   if(ptrn.empty()) return;
   if(pattern!=ptrn){
     pattern=ptrn;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1671,7 +1672,7 @@ FXuint FXFileList::getItemMode(FXint index) const {
 void FXFileList::setMatchMode(FXuint mode){
   if(matchmode!=mode){
     matchmode=mode;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1681,7 +1682,7 @@ void FXFileList::showHiddenFiles(FXbool flag){
   FXuint opts=((-(FXint)flag^options)&FILELIST_SHOWHIDDEN)^options;
   if(opts!=options){
     options=opts;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1697,7 +1698,7 @@ void FXFileList::showOnlyDirectories(FXbool flag){
   FXuint opts=(((0-flag)^options)&FILELIST_SHOWDIRS)^options;
   if(opts!=options){
     options=opts;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1713,7 +1714,7 @@ void FXFileList::showOnlyFiles(FXbool flag){
   FXuint opts=(((0-flag)^options)&FILELIST_SHOWFILES)^options;
   if(opts!=options){
     options=opts;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1729,7 +1730,7 @@ void FXFileList::showParents(FXbool flag) {
   FXuint opts=(((flag-1)^options)&FILELIST_NO_PARENT)^options;
   if(opts!=options){
     options=opts;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1745,7 +1746,7 @@ void FXFileList::showImages(FXbool flag){
   FXuint opts=(((0-flag)^options)&FILELIST_SHOWIMAGES)^options;
   if(opts!=options){
     options=opts;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1760,7 +1761,7 @@ FXbool FXFileList::showImages() const {
 void FXFileList::setImageSize(FXint size){
   if(size!=imagesize){
     imagesize=size;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1772,7 +1773,7 @@ void FXFileList::setAssociations(FXFileDict* assocs,FXbool owned){
   if(associations!=assocs){
     if(!(opts&FILELIST_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
-    if(getNumItems()) scan(true);
+    scan(true);
     }
   }
 
@@ -1781,7 +1782,16 @@ void FXFileList::setAssociations(FXFileDict* assocs,FXbool owned){
 void FXFileList::setDraggableFiles(FXbool flg){
   if(draggable!=flg){
     draggable=flg;
-    if(getNumItems()) scan(true);
+    scan(true);
+    }
+  }
+
+
+// Set file time format
+void FXFileList::setTimeFormat(const FXString& fmt){
+  if(timeformat!=fmt){
+    timeformat=fmt;
+    scan(true);
     }
   }
 
@@ -1799,6 +1809,7 @@ void FXFileList::save(FXStream& store) const {
   store << mini_app;
   store << directory;
   store << pattern;
+  store << timeformat;
   store << matchmode;
   store << imagesize;
   store << draggable;
@@ -1817,6 +1828,7 @@ void FXFileList::load(FXStream& store){
   store >> mini_app;
   store >> directory;
   store >> pattern;
+  store >> timeformat;
   store >> matchmode;
   store >> imagesize;
   store >> draggable;

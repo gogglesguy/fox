@@ -1109,7 +1109,7 @@ FXbool FXDirList::setDirectory(const FXString& pathname,FXbool notify){
 FXString FXDirList::getDirectory() const {
   const FXTreeItem* item=currentitem;
   while(item){
-    if(((FXDirItem*)item)->isDirectory()) return getItemPathname(item);
+    if(((const FXDirItem*)item)->isDirectory()) return getItemPathname(item);
     item=item->parent;
     }
   return FXString::null;
@@ -1121,7 +1121,7 @@ void FXDirList::setPattern(const FXString& ptrn){
   if(ptrn.empty()) return;
   if(pattern!=ptrn){
     pattern=ptrn;
-    if(getFirst()) scan(true);
+    scan(true);
     }
   }
 
@@ -1216,49 +1216,49 @@ y:      item=it;
 
 // Is file
 FXbool FXDirList::isItemFile(const FXTreeItem* item) const {
-  return item && ((FXDirItem*)item)->isFile();
+  return item && ((const FXDirItem*)item)->isFile();
   }
 
 
 // Is directory
 FXbool FXDirList::isItemDirectory(const FXTreeItem* item) const {
-  return item && ((FXDirItem*)item)->isDirectory();
+  return item && ((const FXDirItem*)item)->isDirectory();
   }
 
 
 // Is executable
 FXbool FXDirList::isItemExecutable(const FXTreeItem* item) const {
-  return item && ((FXDirItem*)item)->isExecutable();
+  return item && ((const FXDirItem*)item)->isExecutable();
   }
 
 
 // Return true if this is a symbolic link item
 FXbool FXDirList::isItemSymlink(const FXTreeItem* item) const {
-  return item && ((FXDirItem*)item)->isSymlink();
+  return item && ((const FXDirItem*)item)->isSymlink();
   }
 
 
 // Return file association of item
 FXFileAssoc* FXDirList::getItemAssoc(const FXTreeItem* item) const {
-  return item ? ((FXDirItem*)item)->getAssoc() : NULL;
+  return item ? ((const FXDirItem*)item)->getAssoc() : NULL;
   }
 
 
 // Return the file size for this item
 FXlong FXDirList::getItemSize(const FXTreeItem* item) const {
-  return item ? ((FXDirItem*)item)->getSize() : 0;
+  return item ? ((const FXDirItem*)item)->getSize() : 0;
   }
 
 
 // Return the date for this item, in nanoseconds
 FXTime FXDirList::getItemDate(const FXTreeItem* item) const {
-  return item ? ((FXDirItem*)item)->getDate() : 0;
+  return item ? ((const FXDirItem*)item)->getDate() : 0;
   }
 
 
 // Return the mode bits for this item
 FXuint FXDirList::getItemMode(const FXTreeItem* item) const {
-  return item ? ((FXDirItem*)item)->getMode() : 0;
+  return item ? ((const FXDirItem*)item)->getMode() : 0;
   }
 
 
@@ -1294,7 +1294,7 @@ FXbool FXDirList::collapseTree(FXTreeItem* tree,FXbool notify){
 void FXDirList::setMatchMode(FXuint mode){
   if(matchmode!=mode){
     matchmode=mode;
-    if(getFirst()) scan(true);
+    scan(true);
     }
   }
 
@@ -1310,7 +1310,7 @@ void FXDirList::showFiles(FXbool flag){
   FXuint opts=(((0-flag)^options)&DIRLIST_SHOWFILES)^options;
   if(options!=opts){
     options=opts;
-    if(getFirst()) scan(true);
+    scan(true);
     }
   }
 
@@ -1326,7 +1326,7 @@ void FXDirList::showHiddenFiles(FXbool flag){
   FXuint opts=(((0-flag)^options)&DIRLIST_SHOWHIDDEN)^options;
   if(opts!=options){
     options=opts;
-    if(getFirst()) scan(true);
+    scan(true);
     }
   }
 
@@ -1338,7 +1338,7 @@ void FXDirList::setAssociations(FXFileDict* assocs,FXbool owned){
   if(associations!=assocs){
     if(!(opts&DIRLIST_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
-    if(getFirst()) scan(true);
+    scan(true);
     }
   }
 
@@ -1347,7 +1347,7 @@ void FXDirList::setAssociations(FXFileDict* assocs,FXbool owned){
 void FXDirList::setDraggableFiles(FXbool flag){
   if(draggable!=flag){
     draggable=flag;
-    if(getFirst()) scan(true);
+    scan(true);
     }
   }
 

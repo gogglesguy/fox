@@ -312,6 +312,12 @@ public:
   /// Are files draggable?
   FXbool getDraggableFiles() const;
 
+  /// Set file time format
+  void setTimeFormat(const FXString& fmt);
+
+  /// Return file time format
+  FXString getTimeFormat() const;
+
   /// Save object to a stream
   virtual void save(FXStream& store) const;
 

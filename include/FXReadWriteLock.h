@@ -37,7 +37,7 @@ namespace FX {
 */
 class FXAPI FXReadWriteLock {
 private:
-  volatile FXuval data[32];
+  FXuval data[32];
 private:
   FXReadWriteLock(const FXReadWriteLock&);
   FXReadWriteLock &operator=(const FXReadWriteLock&);

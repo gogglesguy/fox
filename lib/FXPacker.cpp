@@ -513,7 +513,7 @@ FXint FXPacker::getDefaultWidth(){
         if(child->getNext()) wcum+=hspacing;
         wcum+=w;
         }
-      else{
+      else{                                                     // Top or bottom
         if(w>wcum) wcum=w;
         }
       }
@@ -544,7 +544,7 @@ FXint FXPacker::getDefaultHeight(){
         if(child->getNext()) hcum+=vspacing;
         hcum+=h;
         }
-      else{
+      else{                                                     // Left or right
         if(h>hcum) hcum=h;
         }
       }
@@ -590,7 +590,7 @@ void FXPacker::layout(){
       else if(hints&LAYOUT_FILL_X) w=right-left;
       else w=child->getDefaultWidth();
 
-      // Vertical
+      // Left or right
       if(hints&LAYOUT_SIDE_LEFT){
 
         // Y
@@ -614,7 +614,7 @@ void FXPacker::layout(){
           }
         }
 
-      // Horizontal
+      // Top or bottom
       else{
 
         // X

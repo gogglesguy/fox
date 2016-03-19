@@ -72,7 +72,7 @@
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
 // Special empty string value
-#define EMPTY       ((FXchar*)(void*)&emptystring[1])
+#define EMPTY       ((FXchar*)(void*)(emptystring+1))
 
 using namespace FX;
 
@@ -182,7 +182,7 @@ static inline FXint strlen(const FXwchar *src){
   while(src[i]) i++;
   return i;
   }
- 
+
 /*******************************************************************************/
 
 // Return wide character from utf8 string at ptr
@@ -954,7 +954,7 @@ FXString& FXString::operator+=(const FXString& s){
 // Adopt string s, leaving s empty
 FXString& FXString::adopt(FXString& s){
   if(this!=&s){
-    if(str!=EMPTY){ free(str-sizeof(FXint)); }
+    if(str!=EMPTY){free(str-sizeof(FXint));}
     str=s.str;
     s.str=EMPTY;
     }

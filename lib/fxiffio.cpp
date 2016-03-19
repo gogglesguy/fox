@@ -160,7 +160,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         // Empty block is a problem too
         if(size==0) goto x;
 
-        FXTRACE((100,"CHUNK %c%c%c%c POS=%d SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
+        FXTRACE((100,"CHUNK %c%c%c%c POS=%ld SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
 
         // Bitmap header
         if(tag==BMHD){

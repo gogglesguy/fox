@@ -43,7 +43,7 @@
 #define ROUNDUP(n)  (((n)+ROUNDVAL-1)&-ROUNDVAL)
 
 // Empty list
-#define EMPTY       ((FXptr*)(emptylist+1))
+#define EMPTY       (const_cast<FXptr*>(emptylist+1))
 
 using namespace FX;
 
@@ -128,12 +128,13 @@ FXPtrList& FXPtrList::operator=(const FXPtrList& orig){
 
 
 // Adopt objects from orig, leaving orig empty
-void FXPtrList::adopt(FXPtrList& orig){
+FXPtrList& FXPtrList::adopt(FXPtrList& orig){
   if(__likely(ptr!=orig.ptr)){
     if(ptr!=EMPTY){ free(ptr-1); }
     ptr=orig.ptr;
     orig.ptr=EMPTY;
     }
+  return *this;
   }
 
 

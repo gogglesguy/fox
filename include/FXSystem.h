@@ -27,6 +27,9 @@ namespace FX {
 namespace FXSystem {
 
 
+  /// Default formatting string used for time formatting
+  extern FXAPI const char defaultTimeFormat[];
+  
   /// Convert time in nanoseconds since 1/1/1970 to local date string
   extern FXAPI FXString localTime(FXTime value);
 

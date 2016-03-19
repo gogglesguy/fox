@@ -53,7 +53,7 @@ namespace FX {
 /***********************  Memory Allocation Functions  *************************/
 
 // Allocate memory
-FXbool fxmalloc(void** ptr,unsigned long size){
+FXbool fxmalloc(void** ptr,FXuval size){
   *ptr=NULL;
   if(size!=0){
     if((*ptr=malloc(size))==NULL) return false;
@@ -63,7 +63,7 @@ FXbool fxmalloc(void** ptr,unsigned long size){
 
 
 // Allocate cleaned memory
-FXbool fxcalloc(void** ptr,unsigned long size){
+FXbool fxcalloc(void** ptr,FXuval size){
   *ptr=NULL;
   if(size!=0){
     if((*ptr=calloc(size,1))==NULL) return false;
@@ -73,7 +73,7 @@ FXbool fxcalloc(void** ptr,unsigned long size){
 
 
 // Resize memory
-FXbool fxresize(void** ptr,unsigned long size){
+FXbool fxresize(void** ptr,FXuval size){
   register void *p=NULL;
   if(size!=0){
     if((p=realloc(*ptr,size))==NULL) return false;
@@ -87,7 +87,7 @@ FXbool fxresize(void** ptr,unsigned long size){
 
 
 // Allocate and initialize memory
-FXbool fxmemdup(void** ptr,const void* src,unsigned long size){
+FXbool fxmemdup(void** ptr,const void* src,FXuval size){
   *ptr=NULL;
   if(size!=0 && src!=NULL){
     if((*ptr=malloc(size))==NULL) return false;

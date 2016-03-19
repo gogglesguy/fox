@@ -865,7 +865,7 @@ long GLTestWindow::onUpdMultiSample(FXObject* sender,FXSelector sel,void*){
 
 // Here we begin
 int main(int argc,char *argv[]){
-
+  
   // Make application
   FXApp application("GLTest","FoxTest");
 

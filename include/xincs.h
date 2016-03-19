@@ -249,7 +249,7 @@ typedef cpuset_t   cpu_set_t;
 #if defined(__SSE3__)
 #define FOX_HAS_SSE3
 #endif
-#if defined(__SSE4_1__)
+#if defined(__SSE4_2__)
 #define FOX_HAS_SSE4
 #endif
 #if defined(__AVX__)

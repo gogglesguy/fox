@@ -186,6 +186,12 @@ public:
   /// Are files draggable?
   FXbool getDraggableFiles() const;
 
+  /// Set file time format
+  void setTimeFormat(const FXString& fmt);
+
+  /// Return file time format
+  FXString getTimeFormat() const;
+
   /// Change file associations; delete old ones if owned
   void setAssociations(FXFileDict* assoc,FXbool owned=false);
 

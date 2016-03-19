@@ -150,8 +150,8 @@ FXIMPLEMENT(FXColorSelector,FXPacker,FXColorSelectorMap,ARRAYNUMBER(FXColorSelec
 
 // Sort items based on color
 static FXint hueSort(const FXListItem* a,const FXListItem* b){
-  FXColor colora=((FXColorItem*)a)->getColor();
-  FXColor colorb=((FXColorItem*)b)->getColor();
+  FXColor colora=((const FXColorItem*)a)->getColor();
+  FXColor colorb=((const FXColorItem*)b)->getColor();
   FXfloat ca[3],cb[3];
   fxrgb_to_hsl(ca[0],ca[1],ca[2],0.003921568627f*FXREDVAL(colora),0.003921568627f*FXGREENVAL(colora),0.003921568627f*FXBLUEVAL(colora));
   fxrgb_to_hsl(cb[0],cb[1],cb[2],0.003921568627f*FXREDVAL(colorb),0.003921568627f*FXGREENVAL(colorb),0.003921568627f*FXBLUEVAL(colorb));

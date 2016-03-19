@@ -56,16 +56,16 @@ public:
   FXDir(const FXString& path);
 
   /// Open directory to path, return true if ok.
-  virtual FXbool open(const FXString& path);
+  FXbool open(const FXString& path);
 
   /// Returns true if the directory is open
-  virtual FXbool isOpen() const;
+  FXbool isOpen() const;
 
   /// Go to next directory entry and return its name
-  virtual FXbool next(FXString& name);
+  FXbool next(FXString& name);
 
   /// Close directory
-  virtual void close();
+  void close();
 
 
   /// Create directory
@@ -97,7 +97,7 @@ public:
 
 
   /// Destructor
-  virtual ~FXDir();
+ ~FXDir();
   };
 
 

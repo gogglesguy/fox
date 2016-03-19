@@ -21,12 +21,13 @@
 #ifndef FXHASH_H
 #define FXHASH_H
 
+
 namespace FX {
 
 
 /**
-* A hash table for associating pointers to pointers.
-* All values may be used as a key, except 0 and -1.
+* A hash table for mapping pointers to pointers.
+* Any value may be used as a key, except 0 and -1.
 */
 class FXAPI FXHash {
 protected:
@@ -35,11 +36,7 @@ protected:
     void* data;
     };
 protected:
-  FXArray<Entry> table;         // Hash table
-  FXint          used;          // Number of used entries
-  FXint          free;          // Number of free entries
-protected:
-  static const Entry init;      // Initialization value
+  Entry* table;         // Hash table
 private:
   FXHash(const FXHash&);
   FXHash &operator=(const FXHash&);
@@ -54,17 +51,17 @@ public:
   * Resize the table to the given size; the size must be
   * a power of two.
   */
-  FXbool size(FXint m);
+  FXbool size(FXival m);
 
   /**
   * Return the total number of slots in the table.
   */
-  FXint size() const { return table.no(); }
+  FXival size() const { return ((FXival*)table)[-1]; }
 
   /**
   * Return number of non-empty slots in the table.
   */
-  FXuint no() const { return used; }
+  FXival no() const { return ((FXival*)table)[-2]; }
 
   /**
   * Insert key into table, unless the key already exists.
@@ -91,17 +88,17 @@ public:
   /**
   * Return true if slot is not occupied by a key.
   */
-  FXbool empty(FXint pos) const { return (table[pos].name==NULL)||(table[pos].name==(void*)-1L); }
+  FXbool empty(FXival pos) const { return (table[pos].name==NULL)||(table[pos].name==(void*)-1L); }
 
   /**
   * Return key at position pos.
   */
-  void* key(FXint pos) const { return table[pos].name; }
+  void* key(FXival pos) const { return table[pos].name; }
 
   /**
   * Return data pointer at position pos.
   */
-  void* value(FXint pos) const { return table[pos].data; }
+  void* value(FXival pos) const { return table[pos].data; }
 
   /**
   * Clear hash table.
@@ -109,9 +106,8 @@ public:
   void clear();
 
   /// Destructor
-  virtual ~FXHash();
+ ~FXHash();
   };
-
 
 }
 

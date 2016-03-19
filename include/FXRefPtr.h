@@ -52,7 +52,7 @@ public:
 
   /// Swap this and other, pain-free
   FXRefPtr<EType>& swap(FXRefPtr<EType>& other){
-    EType* tmp=ptr; ptr=other.ptr; other.ptr=tmp;
+    other.ptr=atomicSet(&ptr,other.ptr);
     return *this;
     }
 
