@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -115,13 +115,6 @@
 // Align pointer to b=2^n bytes
 #define __alignto(p,b)     ((void*)((((FXival)(p))+((FXival)((b)-1)))&~((FXival)((b)-1))))
 
-
-// Restrict aliasing on pointers
-#if defined(__GNUC__) && !defined(__restrict)
-#define __restrict __restrict__
-#else
-#define __restrict
-#endif
 
 // Thread-local storage attribute
 #if defined(__GNUC__)
@@ -666,6 +659,9 @@ const FXTime forever=FXLONG(9223372036854775807);
 
 
 /**********************************  Globals  **********************************/
+
+/// Fast integer power function for positive exponents
+extern FXint powi(FXint base,FXint exp);
 
 /// Simple, thread-safe xor-shifting random number generator (initial seed should be non-zero)
 extern FXAPI FXuint fxrandom(FXuint& seed);

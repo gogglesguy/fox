@@ -26,7 +26,7 @@ class Adie;
 
 
 /// Online help dialog box
-class HelpWindow : public FXDialogBox {
+class HelpWindow : public FXTopWindow {
   FXDECLARE(HelpWindow)
 protected:
   FXText *helptext;         // Help display

@@ -245,6 +245,12 @@ FXString Preferences::getPatterns() const {
 void Preferences::setSyntax(Syntax* syn){
   while(stylemat->getFirst()){ delete stylemat->getFirst(); }
   if(syn){
+    FXCheckButton *check;
+    FXColorWell   *well;
+    FXLabel       *label;
+    FXint          i;
+    
+    // Captions
     new FXLabel(stylemat,tr("Rule\tSyntax rule name"),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Nfg\tNormal foreground color"),NULL,JUSTIFY_RIGHT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Nbg\tNormal background color"),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
@@ -256,38 +262,46 @@ void Preferences::setSyntax(Syntax* syn){
     new FXLabel(stylemat,tr("Und\tUnderline"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Str\tStrikeout"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
     new FXLabel(stylemat,tr("Bld\tBold face"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
-    for(FXint i=0; i<syn->getNumRules()-1; i++){
-      FXLabel *label=new FXLabel(stylemat,syn->getRule(i+1)->getName(),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
+    
+    // Add controls for each rule
+    for(i=0; i<syn->getNumRules()-1; i++){
+    
+      // Rule name
+      label=new FXLabel(stylemat,syn->getRule(i+1)->getName(),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
       label->setBackColor(getApp()->getBackColor());
-      FXColorWell *well1=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_NORMAL_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      FXColorWell *well2=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_NORMAL_BG_FIRST+i,FRAME_LINE|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      FXColorWell *well3=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_SELECT_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      FXColorWell *well4=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_SELECT_BG_FIRST+i,FRAME_LINE|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      FXColorWell *well5=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_HILITE_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      FXColorWell *well6=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_HILITE_BG_FIRST+i,FRAME_LINE|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      FXColorWell *well7=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_ACTIVE_BG_FIRST+i,FRAME_LINE|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
-      well1->setBackColor(getApp()->getBackColor());
-      well2->setBackColor(getApp()->getBackColor());
-      well3->setBackColor(getApp()->getBackColor());
-      well4->setBackColor(getApp()->getBackColor());
-      well5->setBackColor(getApp()->getBackColor());
-      well6->setBackColor(getApp()->getBackColor());
-      well7->setBackColor(getApp()->getBackColor());
-      FXCheckButton *check1=new FXCheckButton(stylemat,FXString::null,getOwner(),TextWindow::ID_STYLE_UNDERLINE_FIRST+i,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
-      FXCheckButton *check2=new FXCheckButton(stylemat,FXString::null,getOwner(),TextWindow::ID_STYLE_STRIKEOUT_FIRST+i,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
-      FXCheckButton *check3=new FXCheckButton(stylemat,FXString::null,getOwner(),TextWindow::ID_STYLE_BOLD_FIRST+i,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
-      check1->setShadowColor(getApp()->getBorderColor());
-      check1->setHiliteColor(getApp()->getBorderColor());
-      check1->setBorderColor(getApp()->getBackColor());
-      check1->setBaseColor(getApp()->getBackColor());
-      check2->setShadowColor(getApp()->getBorderColor());
-      check2->setHiliteColor(getApp()->getBorderColor());
-      check2->setBorderColor(getApp()->getBackColor());
-      check2->setBaseColor(getApp()->getBackColor());
-      check3->setShadowColor(getApp()->getBorderColor());
-      check3->setHiliteColor(getApp()->getBorderColor());
-      check3->setBorderColor(getApp()->getBackColor());
-      check3->setBaseColor(getApp()->getBackColor());
+      
+      // Color wells
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_NORMAL_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_NORMAL_BG_FIRST+i,FRAME_LINE|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_SELECT_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_SELECT_BG_FIRST+i,FRAME_LINE|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_HILITE_FG_FIRST+i,FRAME_LINE|LAYOUT_RIGHT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_HILITE_BG_FIRST+i,FRAME_LINE|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+      well=new FXColorWell(stylemat,FXRGB(255,255,255),getOwner(),TextWindow::ID_STYLE_ACTIVE_BG_FIRST+i,FRAME_LINE|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_COLUMN,0,0,28,18);
+      well->setBackColor(getApp()->getBackColor());
+
+      // Style check buttons
+      check=new FXCheckButton(stylemat,FXString::null,getOwner(),TextWindow::ID_STYLE_UNDERLINE_FIRST+i,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
+      check->setShadowColor(getApp()->getBorderColor());
+      check->setHiliteColor(getApp()->getBorderColor());
+      check->setBorderColor(getApp()->getBackColor());
+      check->setBaseColor(getApp()->getBackColor());
+      check=new FXCheckButton(stylemat,FXString::null,getOwner(),TextWindow::ID_STYLE_STRIKEOUT_FIRST+i,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
+      check->setShadowColor(getApp()->getBorderColor());
+      check->setHiliteColor(getApp()->getBorderColor());
+      check->setBorderColor(getApp()->getBackColor());
+      check->setBaseColor(getApp()->getBackColor());
+      check=new FXCheckButton(stylemat,FXString::null,getOwner(),TextWindow::ID_STYLE_BOLD_FIRST+i,LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
+      check->setShadowColor(getApp()->getBorderColor());
+      check->setHiliteColor(getApp()->getBorderColor());
+      check->setBorderColor(getApp()->getBackColor());
+      check->setBaseColor(getApp()->getBackColor());
       }
     }
   }

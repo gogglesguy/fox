@@ -22,7 +22,7 @@
 #include "icons.h"
 #include "Preferences.h"
 #include "Calculator.h"
-
+ 
 
 /*******************************************************************************/
 

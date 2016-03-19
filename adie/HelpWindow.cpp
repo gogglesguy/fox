@@ -28,16 +28,19 @@
 #include "Adie.h"
 #include "HelpWindow.h"
 
+/*
+  Notes:
+  - Help window showing some usage information for the editor.
+*/
 
 /*******************************************************************************/
 
 
-FXIMPLEMENT(HelpWindow,FXDialogBox,NULL,0)
+FXIMPLEMENT(HelpWindow,FXTopWindow,NULL,0)
 
 
 // Construct help dialog box
-HelpWindow::HelpWindow(Adie *a):
-  FXDialogBox(a,"Help on Adie",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 6,6,6,6, 4,4){
+HelpWindow::HelpWindow(Adie *a):FXTopWindow(a,"Help on Adie",NULL,NULL,DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,0,0, 6,6,6,6, 4,4){
 
   // Set title
   setTitle(tr("Help on Adie"));
@@ -51,7 +54,7 @@ HelpWindow::HelpWindow(Adie *a):
   // Editor part
   FXHorizontalFrame *editbox=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, 0,0,0,0);
   helptext=new FXText(editbox,NULL,0,TEXT_READONLY|TEXT_WORDWRAP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-  helptext->setVisibleRows(50);
+  helptext->setVisibleRows(40);
   helptext->setVisibleColumns(90);
 
   // Fill with help

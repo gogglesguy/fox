@@ -5,7 +5,7 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP  = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
-
+ 
 
 bin_PROGRAMS = adie
 

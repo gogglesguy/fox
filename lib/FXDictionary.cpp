@@ -3,7 +3,7 @@
 *                          D i c t i o n a r y    C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -229,7 +229,7 @@ const FXptr& FXDictionary::at(const FXchar* ky) const {
     p=b=h=FXString::hash(ky);
     FXASSERT(h);
     while(table[x=p&(no()-1)].hash){
-      if(table[x].hash==h && table[x].key==ky) return table[x].data;   
+      if(table[x].hash==h && table[x].key==ky) return table[x].data;
       p=(p<<2)+p+b+1;
       b>>=BSHIFT;
       }

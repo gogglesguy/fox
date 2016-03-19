@@ -21,7 +21,7 @@
 #ifndef CHARTDEFS_H
 #define CHARTDEFS_H
 
-
+ 
 /********************************  Definitions  ********************************/
 
 // Define FXCHARTAPI for DLL builds

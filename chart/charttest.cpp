@@ -15,7 +15,7 @@
 */
 
 /*******************************************************************************/
-
+ 
 
 // Mini application object
 class ChartWindow : public FXMainWindow {

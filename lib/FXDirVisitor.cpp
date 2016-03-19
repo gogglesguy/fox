@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,11 +33,16 @@
 
 /*
   Notes:
-  - There should be three return value categories:
-      rv > 0      Proceed scanning.
-      rv = 0      Stop with scanning and return with 0.
-      rv < 0      Skip scanning current directory or file.
-  - Not all traversals are top-down.  Some might be upward.
+
+  - There are three return codes to influence processing:
+
+      0 : Skip item, move to next
+      1 : Continue with processing.
+      2 : Bail on the whole thing.
+
+  - Automatically skip directories already being visited to avoid circular symlinks
+    from causing infinite recursion.
+  - Also skip directories with insufficient permissions.
 */
 
 
@@ -47,32 +52,6 @@ using namespace FX;
 
 namespace FX {
 
-
-/*
-FIXME
-  three options:
-  - continue traversing.
-  - stop traversing.
-  - skip file or directory during traversal.
-
-  pass pattern, flags.  Test pattern first, then
-  as below.
-
-  - Need glob function.
-
-  FXDirVisitor vis;
-  fxTraceLevel=10;
-  vis.traverse(argv[1]);
-  exit(0);
-
-  what if we want to see '.' and '..'??
-
-  fxTraceLevel=2;
-  FXDirVisitor dv;
-  dv.traverse(argv[1]); //,"*",FXDir::NoDirs|FXDir::NoParent);
-  exit(0);
-
-*/
 
 // Keep track of visited directories
 struct FXDirVisitor::Seen {
@@ -85,31 +64,28 @@ struct FXDirVisitor::Seen {
 FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen){
   FXStat data;
   if(FXStat::statLink(path,data)){
-
-    // Directory
-    if(data.isDirectory()){
-
-      // Check if we cycled back through symlinks
+    if(data.isDirectory()){                     // Directory
+      FXuint code;
       for(Seen *s=seen; s; s=s->next){
-        if(data.index()==s->node) return 1;
+        if(data.index()==s->node) return 0;     // Skip if we've been here already
         }
-
-      // Conditionally enter subdirectories
-      if(enter(path)){
+      if((code=enter(path))==1){                // Conditionally enter subdirectories
         Seen here={seen,data.index()};
         FXDir directory(path);
         FXString name;
         while(directory.next(name)){
           if(!(name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))){
-            if(!recurse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,&here)) break;
+            if(recurse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,&here)==2){
+              leave(path);
+              return 2;                         // Bail
+              }
             }
           }
+        return leave(path);
         }
-      return leave(path);
+      return code;
       }
-
-    // Regular file
-    return visit(path);
+    return visit(path);                         // Regular file
     }
   return 0;
   }
@@ -122,22 +98,19 @@ FXuint FXDirVisitor::traverse(const FXString& path){
 
 
 // Enter directory
-FXuint FXDirVisitor::enter(const FXString& path){
-  FXTRACE((1,"enter(%s)\n",path.text()));
+FXuint FXDirVisitor::enter(const FXString&){
   return 1;
   }
 
 
 // Handle file
-FXuint FXDirVisitor::visit(const FXString& path){
-  FXTRACE((1,"visit(%s)\n",path.text()));
+FXuint FXDirVisitor::visit(const FXString&){
   return 1;
   }
 
 
 // Leave directory
-FXuint FXDirVisitor::leave(const FXString& path){
-  FXTRACE((1,"leave(%s)\n",path.text()));
+FXuint FXDirVisitor::leave(const FXString&){
   return 1;
   }
 
@@ -148,46 +121,101 @@ FXDirVisitor::~FXDirVisitor(){
 
 /*******************************************************************************/
 
-
-
 // Recursively traverse starting from path
-FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& pat,FXuint flg){
-  pattern=pat;
-  flags=flg;
+FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts){
+  wildcard=wild;
+  options=opts;
   return recurse(path,NULL);
   }
 
 
 // Enter directory
 FXuint FXGlobVisitor::enter(const FXString& path){
-  FXuint mode=(flags&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
+  FXuint mode=(options&FXDir::CaseFold)?(FXPath::NoEscape|FXPath::CaseFold):(FXPath::NoEscape);
 #ifdef WIN32
-  return !(flags&FXDir::NoDirs) && ((flags&FXDir::HiddenDirs) || !FXStat::isHidden(path)) && ((flags&FXDir::AllDirs) || FXPath::match(path,pattern,mode));
+  return !(options&FXDir::NoDirs) && ((options&FXDir::HiddenDirs) || !FXStat::isHidden(path)) && ((options&FXDir::AllDirs) || FXPath::match(path,wildcard,mode));
 #else
-  return !(flags&FXDir::NoDirs) && ((flags&FXDir::HiddenDirs) || !FXPath::isHidden(path)) && ((flags&FXDir::AllDirs) || FXPath::match(path,pattern,mode));
+  return !(options&FXDir::NoDirs) && ((options&FXDir::HiddenDirs) || !FXPath::isHidden(path)) && ((options&FXDir::AllDirs) || FXPath::match(path,wildcard,mode));
 #endif
   }
 
 
 // Handle file
 FXuint FXGlobVisitor::visit(const FXString& path){
-  FXuint mode=(flags&FXDir::CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
+  FXuint mode=(options&FXDir::CaseFold)?(FXPath::NoEscape|FXPath::CaseFold):(FXPath::NoEscape);
 #ifdef WIN32
-  return !(flags&FXDir::NoFiles) && ((flags&FXDir::HiddenFiles) || !FXStat::isHidden(path)) && ((flags&FXDir::AllFiles) || FXPath::match(path,pattern,mode));
+  return !(options&FXDir::NoFiles) && ((options&FXDir::HiddenFiles) || !FXStat::isHidden(path)) && ((options&FXDir::AllFiles) || FXPath::match(path,wildcard,mode));
 #else
-  return !(flags&FXDir::NoFiles) && ((flags&FXDir::HiddenFiles) || !FXPath::isHidden(path)) && ((flags&FXDir::AllFiles) || FXPath::match(path,pattern,mode));
+  return !(options&FXDir::NoFiles) && ((options&FXDir::HiddenFiles) || !FXPath::isHidden(path)) && ((options&FXDir::AllFiles) || FXPath::match(path,wildcard,mode));
 #endif
   }
 
 
 // Leave directory
-FXuint FXGlobVisitor::leave(const FXString& path){
+FXuint FXGlobVisitor::leave(const FXString&){
   return 1;
   }
 
 
 // Destructor
 FXGlobVisitor::~FXGlobVisitor(){
+  }
+
+/*******************************************************************************/
+
+
+
+/// Create new glob counting visitor
+FXGlobCountVisitor::FXGlobCountVisitor():countFolders(0),countFiles(0),countBytes(0),maxDepth(0),depth(0){
+  }
+  
+/// Copy glob counting visitor
+FXGlobCountVisitor::FXGlobCountVisitor(const FXGlobCountVisitor& org):countFolders(org.countFolders),countFiles(org.countFiles),countBytes(org.countBytes),maxDepth(org.maxDepth),depth(0){
+  }
+
+
+// Start traversal of path  
+FXuint FXGlobCountVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts){
+  countFolders=countFiles=countBytes=maxDepth=depth=0;
+  return FXGlobVisitor::traverse(path,wild,opts);
+  }
+
+
+// Enter directory
+FXuint FXGlobCountVisitor::enter(const FXString& path){
+  if(FXGlobVisitor::enter(path)){
+    countFolders++;
+    depth++;
+    return 1;
+    }
+  return 0;
+  }
+
+
+// He mister tally man, tally me banana...
+FXuint FXGlobCountVisitor::visit(const FXString& path){
+  if(FXGlobVisitor::visit(path)){
+    countBytes+=FXStat::size(path);
+    countFiles++;
+    return 1;
+    }
+  return 0;
+  }
+
+
+// Leave directory
+FXuint FXGlobCountVisitor::leave(const FXString& path){
+  if(FXGlobVisitor::leave(path)){
+    maxDepth=FXMAX(maxDepth,depth);
+    depth--;
+    return 1;
+    }
+  return 0;
+  }
+
+
+// Destructor
+FXGlobCountVisitor::~FXGlobCountVisitor(){
   }
 
 

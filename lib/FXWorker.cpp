@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -55,7 +55,7 @@ FXWorker::FXWorker(FXRunnable* task):runnable(task){
 FXint FXWorker::run(){
   if(runnable){
     try{
-      runnable->run();                  
+      runnable->run();
       }
     catch(...){
       delete this;

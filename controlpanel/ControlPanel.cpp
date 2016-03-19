@@ -22,7 +22,7 @@
 #include <fx.h>
 #include "ControlPanel.h"
 #include "icons.h"
-
+ 
 #define DEFAULT_SPACING 6
 
 

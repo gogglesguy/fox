@@ -40,7 +40,6 @@
   - Manage list of open windows.
 */
 
-
 /*******************************************************************************/
 
 
@@ -218,7 +217,7 @@ static void printusage(){
 // Print verson info
 static void printversion(){
   fxmessage("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  fxmessage("Copyright (C) 2000,2014 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Copyright (C) 2000,2015 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
   fxmessage("\n");
   fxmessage("This program is free software: you can redistribute it and/or modify\n");

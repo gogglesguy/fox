@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -562,6 +562,18 @@ void memswap(void *dst,void *src,FXuval n){
     p++;
     q++;
     }
+  }
+
+
+// Fast integer power function for positive exponents
+FXint powi(FXint base,FXint exp){
+  FXint result=1;
+  while(exp){
+    if(exp&1) result*=base;
+    base*=base;
+    exp>>=1;
+    }
+  return result;
   }
 
 

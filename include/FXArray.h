@@ -3,7 +3,7 @@
 *                          G e n e r i c   A r r a y                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -34,9 +34,7 @@ protected:
   FXptr ptr;
 protected:
   FXArrayBase();
-  FXArrayBase(const FXArrayBase&);
   FXbool resize(FXival num,FXival sz);
-public:
  ~FXArrayBase();
   };
 
@@ -53,7 +51,7 @@ public:
   FXArray(FXival n){ no(n); }
 
   /// Allocate array copied from another
-  FXArray(const FXArray<EType>& src):FXArrayBase(src){
+  FXArray(const FXArray<EType>& src){
     if(no(src.no())){ copyElms(data(),src.data(),src.no()); }
     }
 

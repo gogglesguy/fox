@@ -3,7 +3,7 @@
 *                      T e x t   R e p l a c e   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -64,13 +64,18 @@ protected:
   FXButton          *replacesel;
   FXButton          *replaceall;
   FXButton          *cancel;
-  FXuint             searchmode;
-  FXuint             current;
+  FXString           searchHistory[20]; // Search string history
+  FXString           replacHistory[20]; // Replace string history
+  FXuint             optionHistory[20]; // Options history
+  FXuint             searchmode;        // Search mode
+  FXint              current;           // History index
 protected:
   static const FXchar sectionName[];
 protected:
   FXReplaceDialog(){}
-  void appendHistory(const FXString& searchstr,const FXString& replacestr,FXuint mode);
+  void appendHistory(const FXString& pat,const FXString& sub,FXuint opt);
+  void loadHistory();
+  void saveHistory();
 private:
   FXReplaceDialog(const FXReplaceDialog&);
   FXReplaceDialog &operator=(const FXReplaceDialog&);
@@ -83,8 +88,10 @@ public:
   long onCmdWrap(FXObject*,FXSelector,void*);
   long onSearchKey(FXObject*,FXSelector,void*);
   long onReplaceKey(FXObject*,FXSelector,void*);
-  long onCmdSearchHist(FXObject*,FXSelector,void*);
-  long onCmdReplaceHist(FXObject*,FXSelector,void*);
+  long onCmdSearchHistUp(FXObject*,FXSelector,void*);
+  long onCmdSearchHistDn(FXObject*,FXSelector,void*);
+  long onCmdReplaceHistUp(FXObject*,FXSelector,void*);
+  long onCmdReplaceHistDn(FXObject*,FXSelector,void*);
   long onWheelSearch(FXObject*,FXSelector,void*);
   long onWheelReplace(FXObject*,FXSelector,void*);
   long onCmdSearch(FXObject*,FXSelector,void*);
@@ -145,16 +152,16 @@ public:
 
   /// Change search text color
   void setSearchTextColor(FXColor clr);
-  
+
   /// Return search text color
   FXColor getSearchTextColor() const;
-  
+
   /// Change replace text color
   void setReplaceTextColor(FXColor clr);
-  
+
   /// Return replace text color
   FXColor getReplaceTextColor() const;
-  
+
   /// Run modal invocation of the dialog
   virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
 

@@ -34,7 +34,7 @@
 #include "Preferences.h"
 #include "HelpWindow.h"
 
-
+ 
 #define BINARY_LIMIT      32                      // 32 bits
 #define OCTAL_LIMIT       11                      // 11 digits
 #define DECIMAL_LIMIT     16                      // +1.234567890123456E-308

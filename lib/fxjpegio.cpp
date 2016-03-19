@@ -3,7 +3,7 @@
 *                      J P E G    I n p u t / O u t p u t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2014 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2015 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -48,7 +48,7 @@ typedef int INT32;
 
 
 /*
-  To Do:
+  Notes:
   - Add more options for fast jpeg loading.
   - Write a more detailed class that offers more options.
   - Add the ability to load jpegs in the background.
@@ -178,7 +178,7 @@ FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   JSAMPLE *buffer[1];
   register FXColor *pp;
   register JSAMPLE *qq;
-  int row_stride;
+  int row_stride,color,i;
 
   // Null out
   data=NULL;
@@ -212,14 +212,26 @@ FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   src.pub.next_input_byte=NULL;
   src.stream=&store;
 
-  // set our src manager
+  // Set our src manager
   srcinfo.src=&src.pub;
 
   // read the header from the jpg;
   jpeg_read_header(&srcinfo,true);
 
-  // make sure the output is RGB
-  srcinfo.out_color_space=JCS_RGB;
+  // Output format supported by libjpeg
+  switch (srcinfo.jpeg_color_space) {
+    case JCS_GRAYSCALE: // 1
+    case JCS_RGB:       // 2
+    case JCS_YCbCr:     // 3
+      srcinfo.out_color_space=JCS_RGB;
+      break;
+    case JCS_CMYK:      // 4
+    case JCS_YCCK:      // 5
+      srcinfo.out_color_space=JCS_CMYK;
+      break;
+    default:
+      return false;
+    }
 
   jpeg_start_decompress(&srcinfo);
 
@@ -243,14 +255,33 @@ FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
 
   // Read the jpeg data
   pp=data;
+  color=srcinfo.out_color_space;
   while(srcinfo.output_scanline<srcinfo.output_height){
     jpeg_read_scanlines(&srcinfo,buffer,1);
     qq=buffer[0];
-    for(FXint i=0; i<width; i++,pp++){
-      ((FXuchar*)pp)[3]=255;
-      ((FXuchar*)pp)[2]=*qq++;
-      ((FXuchar*)pp)[1]=*qq++;
-      ((FXuchar*)pp)[0]=*qq++;
+    if(color==JCS_RGB){
+      for(i=0; i<width; i++,pp++){
+        ((FXuchar*)pp)[3]=255;
+        ((FXuchar*)pp)[2]=*qq++;
+        ((FXuchar*)pp)[1]=*qq++;
+        ((FXuchar*)pp)[0]=*qq++;
+        }
+      }
+    else{
+      for(i=0; i<width; i++,pp++){
+        ((FXuchar*)pp)[3]=255;
+        if(qq[3]==255){
+          ((FXuchar*)pp)[2]=qq[0];                      // No black
+          ((FXuchar*)pp)[1]=qq[1];
+          ((FXuchar*)pp)[0]=qq[2];
+          }
+        else{
+          ((FXuchar*)pp)[2]=(qq[0]*qq[3])/255;          // Approximated CMYK -> RGB
+          ((FXuchar*)pp)[1]=(qq[1]*qq[3])/255;
+          ((FXuchar*)pp)[0]=(qq[2]*qq[3])/255;
+          }
+        qq+=4;
+        }
       }
     }
 

@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -26,9 +26,28 @@ namespace FX {
 
 
 /**
-* Directory visitor frequents all files and directories
-* recursively, calling visit() for every file, and enter()/leave()
-* for every directory.
+* Directory visitor walks across all files and directories recursively,
+* starting from the given path.
+* If the path represents a directory, enter() is called to determine if
+* the directory should be processed.  The visitor then recursively processes
+* items in the directory, and concludes by calling leave() to indicate it
+* has left that directory.
+* If the path represents a regular file, visit() is called to process the
+* file.
+* Thus the functions are called in nested fashion, and each successful
+* call to enter() is matched with a call to leave(), and calls to visit()
+* are made for each regular file in between.
+* To influence processing, the three API's can return any of the following values:
+*
+*   0   Skip the entry and proceed to the next item.
+*   1   Continue processing the entry.
+*   2   Abandon processing altogether and return from traverse().
+*
+* If processing is abandoned, the visitor closes off each unmatched enter()
+* with a call to leave() and returns without visiting any further directories
+* or files.
+* The visitor automatically skips entries already visited or directories with
+* unsufficient permissions.
 */
 class FXAPI FXDirVisitor {
 private:
@@ -36,32 +55,106 @@ private:
 protected:
   virtual FXuint recurse(const FXString& path,Seen *seen);
 public:
+
+  /// Start traversal at given path
   FXuint traverse(const FXString& path);
+  
+  /// Enter directory
   virtual FXuint enter(const FXString& path);
+  
+  /// Visit file
   virtual FXuint visit(const FXString& path);
+  
+  /// Leave directory
   virtual FXuint leave(const FXString& path);
+  
+  /// Destructor
   virtual ~FXDirVisitor();
   };
 
 
-
 /**
-* Visit directory entries according to flags and matching given pattern,
+* Visit directory entries according to flags and matching with wild card pattern,
 * with similar matching conditions as FXDir::listFiles().
 */
 class FXAPI FXGlobVisitor : public FXDirVisitor {
 private:
-  FXString pattern;
-  FXuint   flags;
+  FXString wildcard;            // Match files against this wild card
+  FXuint   options;             // Matching options
 public:
-  FXGlobVisitor():flags(0){}
-  FXGlobVisitor(const FXGlobVisitor& org):pattern(org.pattern),flags(org.flags){}
-  FXuint traverse(const FXString& path,const FXString& pat="*",FXuint flg=FXDir::MatchAll);
+
+  /// Construct directory visitor 
+  FXGlobVisitor():options(0){}
+
+  /// Construct directory visitor from original
+  FXGlobVisitor(const FXGlobVisitor& org):wildcard(org.wildcard),options(org.options){}
+
+  /// Start traversal at given path
+  FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll);
+
+  /// Enter directory; returns 1 if path matches criteria
   virtual FXuint enter(const FXString& path);
+
+  /// Visit file; returns 1 if path matches criteria
   virtual FXuint visit(const FXString& path);
+
+  /// Leave directory; always returns 1
   virtual FXuint leave(const FXString& path);
+  
+  /// Destructor
   virtual ~FXGlobVisitor();
   };
+
+
+/**
+* Visit directory entries according to flags and matching with wild card pattern,
+* as per FXGlobVisitor above.
+* In addition, count numbers of items visited, with an eye toward setting progress
+* bar boundaries.
+*/
+class FXAPI FXGlobCountVisitor : public FXGlobVisitor {
+private:
+  FXlong countFolders;          // Count of folders seen
+  FXlong countFiles;            // Count of files seen
+  FXlong countBytes;            // Total number of bytes in files
+  FXlong maxDepth;              // Maximum depth
+  FXlong depth;                 // Current depth during traversal
+public:
+
+  /// Create new glob counting visitor
+  FXGlobCountVisitor();
+  
+  /// Copy glob counting visitor
+  FXGlobCountVisitor(const FXGlobCountVisitor& org);
+
+  /// Start traversal of path  
+  FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll);
+
+  /// Return total number of folders found
+  FXlong getTotalFolders() const { return countFolders; }
+  
+  /// Return total number of files matched
+  FXlong getTotalFiles() const { return countFiles; }
+  
+  /// Return total number of bytes in matching files
+  FXlong getTotalBytes() const { return countBytes; }
+  
+  /// Return maximum depth of directory tree
+  FXlong getMaximumDepth() const { return maxDepth; }
+  
+  /// Count directories
+  virtual FXuint enter(const FXString& path);
+  
+  /// Count files
+  virtual FXuint visit(const FXString& path);
+  
+  /// Count depth
+  virtual FXuint leave(const FXString& path);
+  
+  /// Destructor
+  virtual ~FXGlobCountVisitor();
+  };
+
 
 }
 

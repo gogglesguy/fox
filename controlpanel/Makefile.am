@@ -22,7 +22,7 @@ icons.h \
 icons.cpp \
 ControlPanel.h \
 ControlPanel.cpp
-
+ 
 BUILT_SOURCES = icons.h icons.cpp
 
 icons.h: $(ICONS)

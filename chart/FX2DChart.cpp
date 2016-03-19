@@ -25,7 +25,7 @@
 #include "FXChart.h"
 #include "FX2DChart.h"
 
-
+ 
 /*
   Notes:
 */

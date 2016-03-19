@@ -3,7 +3,7 @@
 *                    I R I S   R G B   I n p u t / O u t p u t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -403,10 +403,10 @@ FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
           array[j*width+i+size+size]=((const FXuchar*)&data[k])[0];
           }
         }
-        
+
       // Save it
       store.save(array,size*channels);
-      
+
       // Clean up temp memory
       freeElms(array);
 

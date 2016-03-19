@@ -104,7 +104,7 @@ TabBookWindow::TabBookWindow(FXApp *a):FXMainWindow(a,"Tab Book Test",NULL,NULL,
   tabbook=new FXTabBook(contents,this,ID_PANEL,PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_RIGHT);
 
   // First item is a list
-  tab1=new FXTabItem(tabbook,"&Simple List",NULL);
+  tab1=new FXTabItem(tabbook,"&Simple List\tSwitch to first panel",NULL);
 
   listframe=new FXHorizontalFrame(tabbook,FRAME_THICK|FRAME_RAISED);
   boxframe=new FXHorizontalFrame(listframe,FRAME_THICK|FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
@@ -115,19 +115,19 @@ TabBookWindow::TabBookWindow(FXApp *a):FXMainWindow(a,"Tab Book Test",NULL,NULL,
   simplelist->appendItem("Fourth Entry");
 
   // Second item is a file list
-  tab2=new FXTabItem(tabbook,"F&ile List",NULL);
+  tab2=new FXTabItem(tabbook,"F&ile List\tSwitch to second panel",NULL);
   fileframe=new FXHorizontalFrame(tabbook,FRAME_THICK|FRAME_RAISED);
   boxframe=new FXHorizontalFrame(fileframe,FRAME_THICK|FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
   filelist=new FXFileList(boxframe,NULL,0,ICONLIST_EXTENDEDSELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
   // Third item is a directory list
-  tab3=new FXTabItem(tabbook,"T&ree List",NULL);
+  tab3=new FXTabItem(tabbook,"T&ree List\tSwitch to third panel",NULL);
   dirframe=new FXHorizontalFrame(tabbook,FRAME_THICK|FRAME_RAISED);
   boxframe=new FXHorizontalFrame(dirframe,FRAME_THICK|FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
   dirlist=new FXDirList(boxframe,NULL,0,DIRLIST_SHOWFILES|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
   // Fourth item is text
-  tab4=new FXTabItem(tabbook,"Text",NULL);
+  tab4=new FXTabItem(tabbook,"Text\tSwitch to fourth panel",NULL);
   textframe=new FXHorizontalFrame(tabbook,FRAME_THICK|FRAME_RAISED);
   boxframe=new FXHorizontalFrame(textframe,FRAME_THICK|FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
   text=new FXText(boxframe,NULL,0,LAYOUT_FILL_X|LAYOUT_FILL_Y);

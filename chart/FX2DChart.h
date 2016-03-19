@@ -27,7 +27,7 @@
 
 namespace FXCHART {
 
-
+ 
 /// Base class for two-dimensional chart widgets
 class FXCHARTAPI FX2DChart : public FXChart {
   FXDECLARE(FX2DChart)

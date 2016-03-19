@@ -3,7 +3,7 @@
 *                         A t o m i c   O p e r a t i o n s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -53,26 +53,10 @@
 */
 
 
-// Determine if builtin __sync_XXXX() functions are available
+// Use sync for GCC >= 4.1
 #if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
-#define HAVE_BUILTIN_SYNC 1
-#if defined( __arm__ )  || defined( __armel__ )
-#undef HAVE_BUILTIN_SYNC
+#define BUILTIN_SYNC   1
 #endif
-#if defined( __hppa ) || defined( __hppa__ )
-#undef HAVE_BUILTIN_SYNC
-#endif
-#if defined( __m68k__ )
-#undef HAVE_BUILTIN_SYNC
-#endif
-#if defined( __sparc__ )
-#undef HAVE_BUILTIN_SYNC
-#endif
-#if defined( __INTEL_COMPILER ) && !defined( __ia64__ )
-#undef HAVE_BUILTIN_SYNC
-#endif
-#endif
-
 
 using namespace FX;
 
@@ -88,7 +72,7 @@ FXbool atomicsAvailable(){
   return true;
 #elif ((defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__x86_64__))
   return true;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return true;
 #else
   return false;
@@ -105,7 +89,7 @@ FXint atomicSet(volatile FXint* ptr,FXint v){
   register FXint ret=v;
   __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_lock_test_and_set(ptr,v);
 #else
   FXint ret=*ptr;
@@ -125,7 +109,7 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_fetch_and_add(ptr,v);
 #else
   FXint ret=*ptr;
@@ -144,7 +128,7 @@ FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #else
   FXint ret=*ptr;
@@ -167,7 +151,7 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
                         "sete   %%al\n\t"
                         "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
 #else
   if(*ptr==expect){
@@ -188,7 +172,7 @@ FXuint atomicSet(volatile FXuint* ptr,FXuint v){
   register FXuint ret=v;
   __asm__ __volatile__("xchgl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_lock_test_and_set(ptr,v);
 #else
   FXuint ret=*ptr;
@@ -207,7 +191,7 @@ FXuint atomicAdd(volatile FXuint* ptr,FXuint v){
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_fetch_and_add(ptr,v);
 #else
   FXuint ret=*ptr;
@@ -226,7 +210,7 @@ FXuint atomicCas(volatile FXuint* ptr,FXuint expect,FXuint v){
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgl %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #else
   FXuint ret=*ptr;
@@ -249,7 +233,7 @@ FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v){
                         "sete   %%al\n\t"
                         "andl   $1, %%eax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
 #else
   if(*ptr==expect){
@@ -274,7 +258,7 @@ FXptr atomicSet(volatile FXptr* ptr,FXptr v){
   FXptr ret=v;
   __asm__ __volatile__("xchgq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_lock_test_and_set(ptr,v);
 #else
   FXptr ret=*ptr;
@@ -300,8 +284,8 @@ FXptr atomicAdd(volatile FXptr* ptr,FXival v){
   __asm__ __volatile__ ("lock\n\t"
                         "xaddq %0, (%1)\n\t" : "=r"(ret) : "r"(ptr), "0" (ret) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
-  return __sync_fetch_and_add(ptr,v);
+#elif defined(BUILTIN_SYNC)
+  return __sync_fetch_and_add(ptr,(FXptr)v);
 #else
   FXptr ret=*ptr;
   *((unsigned char**)ptr)+=v;
@@ -324,7 +308,7 @@ FXptr atomicCas(volatile FXptr* ptr,FXptr expect,FXptr v){
   __asm__ __volatile__("lock\n\t"
                        "cmpxchgq %2, (%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #else
   FXptr ret=*ptr;
@@ -354,7 +338,7 @@ FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v){
                         "sete   %%al\n\t"
                         "andq   $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
   return ret;
-#elif defined(HAVE_BUILTIN_SYNC)
+#elif defined(BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
 #else
   if(*ptr==expect){
@@ -364,7 +348,7 @@ FXbool atomicBoolCas(volatile FXptr* ptr,FXptr expect,FXptr v){
   return false;
 #endif
   }
-
+ 
 
 // Atomically compare pair of variables at ptr against (cmpa,cmpb), setting them to (a,b) if equal and return true, or false otherwise
 FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b){
@@ -400,14 +384,14 @@ FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FXptr a,FXptr b)
                         "setz   %%al\n\t"
                         "andq    $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "a"(cmpa), "d"(cmpb), "b"(a), "c"(b) : "memory", "cc");
   return ret;
-#elif (defined(HAVE_BUILTIN_SYNC) && defined(__LP64__) && defined(__GNUC__))
+#elif (defined(BUILTIN_SYNC) && defined(__LP64__) && defined(__GNUC__))
   __uint128_t expectab=((__uint128_t)(FXuval)cmpa) | (((__uint128_t)(FXuval)cmpb)<<64);
   __uint128_t ab=((__uint128_t)(FXuval)a) | (((__uint128_t)(FXuval)b)<<64);
   return __sync_bool_compare_and_swap((__uint128_t*)ptr,expectab,ab);
-#elif (defined(HAVE_BUILTIN_SYNC) && !defined(__LP64__))
-  FXulong expectab=((FXulong)(FXuval)cmpa) | (((FXulong)(FXuval)cmpb)<<32);
-  FXulong ab=((FXulong)(FXuval)a) | (((FXulong)(FXuval)b)<<32);
-  return __sync_bool_compare_and_swap((FXulong*)ptr,expectab,ab);
+#elif (defined(BUILTIN_SYNC) && !defined(__LP64__))
+  __uint64_t expectab=((__uint64_t)(FXuval)cmpa) | (((__uint64_t)(FXuval)cmpb)<<32);
+  __uint64_t ab=((__uint64_t)(FXuval)a) | (((__uint64_t)(FXuval)b)<<32);
+  return __sync_bool_compare_and_swap((__uint64_t*)ptr,expectab,ab);
 #else
   if(ptr[0]==cmpa && ptr[1]==cmpb){
     ptr[0]=a;

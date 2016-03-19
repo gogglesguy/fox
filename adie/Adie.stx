@@ -74,22 +74,8 @@ language "Adie Syntax"
     style           "darkgreen"
   end
   rule "Keyword"
-    pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|end)\>"
+    pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|end|pattern|openpattern|closepattern|stoppattern|style)\>"
     style           "red"
-  end
-  rule "Expression"
-    openpattern     "pattern|openpattern|closepattern|stoppattern|style"
-    closepattern    "$"
-    rule "Pattern"
-      openpattern   "\""
-      closepattern  "\""
-      stoppattern   "$"
-      style         "brown"
-      rule "Escape"
-        pattern     "\\\""
-        style       "black"
-      end
-    end
   end
   rule "String"
     openpattern     "\""
@@ -98,7 +84,7 @@ language "Adie Syntax"
     style           "blue"
     rule "Escape"
       pattern       "\\\""
-      style         "black"
+      style         "red"
     end
   end
 end
@@ -1469,6 +1455,47 @@ language "Perl"
   rule "String"
     openpattern   "'"
     closepattern  "'"
+    stoppattern   "$"
+    style         "blue"
+    rule "OctalEscape"
+      pattern     "\\\d+"
+      style       "fuchsia"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h+"
+      style       "fuchsia"
+    end
+    rule "ControlEscape"
+      pattern     "\\."
+      style       "fuchsia"
+    end
+  end
+end
+
+
+# TCL/TK
+language "TCL/TK"
+  filesmatch "*.tcl"
+  contextlines 1
+  rule "Comment"
+    openpattern  "#"
+    closepattern "$"
+    style        "darkgreen"
+  end
+  rule "Operator"
+    pattern     "(\*|/|%|\+|-|<<|<=|<|>>|>=|>|!=|==|&&|&|\|\||\||\^|\?|:)"
+    style       "red"
+  end
+  rule "Number"
+    pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|LL|l|ll|UL|ULL|ul|ull|u|U|F|f|Q|q)?\>"
+    style       "blue"
+  end
+  rule "Keyword"
+    pattern     "\<(if|elsif|else|switch|foreach|for|while|proc)\>"
+  end
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
     stoppattern   "$"
     style         "blue"
     rule "OctalEscape"

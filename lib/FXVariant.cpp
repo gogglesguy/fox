@@ -3,7 +3,7 @@
 *                          V a r i a n t   T y p e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -610,6 +610,24 @@ FXVariant& FXVariant::adopt(FXVariant& other){
       }
     other.reset();
     }
+  return *this;
+  }
+
+
+// Adopt variant array
+FXVariant& FXVariant::adopt(FXVariantArray& other){
+  reset();
+  init(VArray);
+  reinterpret_cast<FXVariantArray*>(&value.p)->adopt(other);
+  return *this;
+  }
+
+
+// Adopt a variant map
+FXVariant& FXVariant::adopt(FXVariantMap& other){
+  reset();
+  init(VMap);
+  reinterpret_cast<FXVariantMap*>(&value.p)->adopt(other);
   return *this;
   }
 

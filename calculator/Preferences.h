@@ -20,7 +20,7 @@
 ********************************************************************************/
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
-
+ 
 
 class Calculator;
 

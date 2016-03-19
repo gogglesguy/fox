@@ -310,6 +310,10 @@ public:
   long onCmdISearchFinish(FXObject*,FXSelector,void*);
   long onUpdISearchModifiers(FXObject*,FXSelector,void*);
   long onCmdISearchModifiers(FXObject*,FXSelector,void*);
+  long onUpdISearchHistUp(FXObject*,FXSelector,void*);
+  long onCmdISearchHistUp(FXObject*,FXSelector,void*);
+  long onUpdISearchHistDn(FXObject*,FXSelector,void*);
+  long onCmdISearchHistDn(FXObject*,FXSelector,void*);
 
   // Style changes
   long onCmdStyleNormalFG(FXObject*,FXSelector,void*);
@@ -463,6 +467,8 @@ public:
     ID_ISEARCH_NEXT,
     ID_ISEARCH_START,
     ID_ISEARCH_FINISH,
+    ID_ISEARCH_HIST_UP,
+    ID_ISEARCH_HIST_DN,
     ID_TABSELECT_1,
     ID_TABSELECT_2,
     ID_TABSELECT_3,

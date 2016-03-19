@@ -299,6 +299,10 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_FINISH,TextWindow::onCmdISearchFinish),
   FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_ISEARCH_REVERSE,TextWindow::ID_ISEARCH_REGEX,TextWindow::onUpdISearchModifiers),
   FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_ISEARCH_REVERSE,TextWindow::ID_ISEARCH_REGEX,TextWindow::onCmdISearchModifiers),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_ISEARCH_HIST_UP,TextWindow::onUpdISearchHistUp),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_HIST_UP,TextWindow::onCmdISearchHistUp),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_ISEARCH_HIST_DN,TextWindow::onUpdISearchHistDn),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ISEARCH_HIST_DN,TextWindow::onCmdISearchHistDn),
 
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_USE_INITIAL_SIZE,TextWindow::onUpdUseInitialSize),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_USE_INITIAL_SIZE,TextWindow::onCmdUseInitialSize),
@@ -646,7 +650,6 @@ void TextWindow::createMenubar(){
   new FXMenuTitle(menubar,tr("&View"),NULL,viewmenu);
 
   // View Menu entries
-  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
   new FXMenuCheck(viewmenu,tr("File Browser\t\tDisplay file list."),this,ID_TOGGLE_BROWSER);
   new FXMenuCheck(viewmenu,tr("Error Logger\t\tDisplay error logger."),loggerframe,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Toolbar\t\tDisplay toolbar."),toolbar,FXWindow::ID_TOGGLESHOWN);
@@ -654,6 +657,7 @@ void TextWindow::createMenubar(){
   new FXMenuCheck(viewmenu,tr("Status line\t\tDisplay status line."),statusbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Undo Counters\t\tShow undo/redo counters on status line."),undoredoblock,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Clock\t\tShow clock on status line."),clock,FXWindow::ID_TOGGLESHOWN);
+  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
 
   // Window menu
   windowmenu=new FXMenuPane(this);
@@ -761,6 +765,10 @@ void TextWindow::createSearchbar(){
   FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_DN,ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
   ar1->setArrowSize(3);
   ar2->setArrowSize(3);
+  ar1->setBackColor(searchtext->getBackColor());
+  ar2->setBackColor(searchtext->getBackColor());
+*/
+/*
 */
   searchtext=new FXTextField(searchbar,50,this,ID_ISEARCH_TEXT,TEXTFIELD_ENTER_ONLY|FRAME_LINE|JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0,4,4,1,1);
   searchtext->setTipText(tr("Incremental Search (Ctl-I)"));
@@ -3528,6 +3536,32 @@ long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Update scroll back in search history button
+long TextWindow::onUpdISearchHistUp(FXObject* sender,FXSelector,void*){
+//sender->handle(this,(-1<index)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Scroll back in incremental search history
+long TextWindow::onCmdISearchHistUp(FXObject*,FXSelector,void*){
+  return 1;
+  }
+
+
+// Update scroll forward in search history button
+long TextWindow::onUpdISearchHistDn(FXObject* sender,FXSelector,void*){
+//sender->handle(this,(-1<index)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Scroll forward in incremental search history
+long TextWindow::onCmdISearchHistDn(FXObject*,FXSelector,void*){
+  return 1;
+  }
+
+
 // Search incremental backward for next occurrence
 long TextWindow::onCmdISearchPrev(FXObject*,FXSelector,void*){
   searchflags&=~SEARCH_FORWARD;
@@ -3580,7 +3614,7 @@ long TextWindow::onCmdISearchModifiers(FXObject*,FXSelector sel,void*){
     case ID_ISEARCH_IGNCASE: searchflags^=SEARCH_IGNORECASE; break;
     case ID_ISEARCH_REGEX: searchflags^=SEARCH_REGEX; break;
     }
-  // FIXME should change of flags re-search immediately?
+  performISearch(searchtext->getText(),false,true);
   return 1;
   }
 

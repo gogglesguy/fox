@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -760,7 +760,7 @@ public:
 
   /// Remove all text from the buffer
   virtual void clearText(FXbool notify=false);
-  
+
   /// Change style of text range
   virtual void changeStyle(FXint pos,FXint n,FXint style);
 

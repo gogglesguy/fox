@@ -21,7 +21,7 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-
+ 
 
 // Undo record for text fragment
 class FXTextCommand : public FXCommand {

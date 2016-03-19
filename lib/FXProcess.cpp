@@ -3,7 +3,7 @@
 *                         P r o c e s s   S u p p o r t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2014 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2015 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -70,14 +70,14 @@
     to pass along to CreateProcess():
 
         http://www.daviddeley.com/autohotkey/parameters/parameters.htm
-        
+
   - On *NIX, we close all file descriptors except the stdin, stdout, stderr.
-  
+
   - The Microsoft C/C++ Parameter Parsing Rules Rephrased:
 
      o Parameters are always separated by a space or tab (multiple spaces/tabs OK).
 
-     o If the parameter does not contain any spaces, tabs, or double quotes, then all the characters 
+     o If the parameter does not contain any spaces, tabs, or double quotes, then all the characters
        in the parameter are accepted as is (there is no need to enclose the parameter in double quotes).
 
      o Enclose spaces and tabs in a double quoted part.
@@ -94,14 +94,14 @@
        Prior to 2008:
          A " outside a double quoted block starts a double quoted block.
          A " inside a double quoted block ends the double quoted block.
-         If a closing " is followed immediately by another ", the 2nd " is accepted literally and 
+         If a closing " is followed immediately by another ", the 2nd " is accepted literally and
          added to the parameter.
 
        Post 2008:
          Outside a double quoted block a " starts a double quoted block.
-         Inside a double quoted block a " followed by a different character (not another ") ends the 
+         Inside a double quoted block a " followed by a different character (not another ") ends the
          double quoted block.
-         Inside a double quoted block a " followed immediately by another " (i.e. "") causes a 
+         Inside a double quoted block a " followed immediately by another " (i.e. "") causes a
          single " to be added to the output, and the double quoted block continues.
 
      o Thus:
