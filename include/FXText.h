@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXText.h,v 1.213 2007/03/09 04:08:35 fox Exp $                           *
+* $Id: FXText.h,v 1.223 2007/03/28 15:46:21 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXTEXT_H
 #define FXTEXT_H
@@ -178,16 +178,14 @@ protected:
   void moveContents(FXint x,FXint y);
   void moveCursor(FXint pos,FXbool notify=false);
   void moveCursorAndSelect(FXint pos,FXuint select,FXbool notify=false);
+  FXint overstruck(FXint start,const FXchar *text,FXint n);
+  void enterTab(FXbool notify);
+  void enterNewline(FXbool notify);
+  void enterText(const FXchar *text,FXint n,FXbool notify);
+  void enterText(const FXString& text,FXbool notify);
   FXbool deletePendingSelection(FXbool notify);
-  FXbool replacePendingSelection(const FXchar *text,FXint n,FXbool notify);
-  void insertTab(FXbool notify);
-  void insertNewline(FXbool notify);
-  void insertAtCursor(const FXchar *text,FXint n,FXbool notify);
-  void insertAtCursor(const FXString& text,FXbool notify);
-  void overstrikeAtCursor(const FXchar *text,FXint n,FXbool notify=false);
-  void overstrikeAtCursor(const FXString& text,FXbool notify=false);
 protected:
-  enum { 
+  enum {
     MOUSE_NONE,                 // No mouse operation
     MOUSE_CHARS,                // Selecting characters
     MOUSE_WORDS,                // Selecting words
@@ -216,16 +214,21 @@ private:
   FXText& operator=(const FXText&);
 public:
   long onPaint(FXObject*,FXSelector,void*);
+  long onBlink(FXObject*,FXSelector,void*);
+  long onFlash(FXObject*,FXSelector,void*);
   long onFocusIn(FXObject*,FXSelector,void*);
   long onFocusOut(FXObject*,FXSelector,void*);
+  long onMotion(FXObject*,FXSelector,void*);
+  long onAutoScroll(FXObject*,FXSelector,void*);
   long onLeftBtnPress(FXObject*,FXSelector,void*);
   long onLeftBtnRelease(FXObject*,FXSelector,void*);
   long onMiddleBtnPress(FXObject*,FXSelector,void*);
   long onMiddleBtnRelease(FXObject*,FXSelector,void*);
   long onRightBtnPress(FXObject*,FXSelector,void*);
   long onRightBtnRelease(FXObject*,FXSelector,void*);
+  long onKeyPress(FXObject*,FXSelector,void*);
+  long onKeyRelease(FXObject*,FXSelector,void*);
   long onUngrabbed(FXObject*,FXSelector,void*);
-  long onMotion(FXObject*,FXSelector,void*);
   long onBeginDrag(FXObject*,FXSelector,void*);
   long onEndDrag(FXObject*,FXSelector,void*);
   long onDragged(FXObject*,FXSelector,void*);
@@ -240,31 +243,17 @@ public:
   long onClipboardLost(FXObject*,FXSelector,void*);
   long onClipboardGained(FXObject*,FXSelector,void*);
   long onClipboardRequest(FXObject*,FXSelector,void*);
-  long onKeyPress(FXObject*,FXSelector,void*);
-  long onKeyRelease(FXObject*,FXSelector,void*);
-  long onBlink(FXObject*,FXSelector,void*);
-  long onFlash(FXObject*,FXSelector,void*);
-  long onAutoScroll(FXObject*,FXSelector,void*);
-  long onQueryHelp(FXObject*,FXSelector,void*);
+  long onCmdSetTip(FXObject*,FXSelector,void*);
+  long onCmdGetTip(FXObject*,FXSelector,void*);
+  long onCmdSetHelp(FXObject*,FXSelector,void*);
+  long onCmdGetHelp(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
-
-  // Control commands
-  long onCmdToggleEditable(FXObject*,FXSelector,void*);
-  long onUpdToggleEditable(FXObject*,FXSelector,void*);
-  long onCmdToggleOverstrike(FXObject*,FXSelector,void*);
-  long onUpdToggleOverstrike(FXObject*,FXSelector,void*);
-  long onCmdCursorRow(FXObject*,FXSelector,void*);
-  long onUpdCursorRow(FXObject*,FXSelector,void*);
-  long onCmdCursorColumn(FXObject*,FXSelector,void*);
-  long onUpdCursorColumn(FXObject*,FXSelector,void*);
+  long onQueryHelp(FXObject*,FXSelector,void*);
   long onUpdHaveSelection(FXObject*,FXSelector,void*);
-  long onUpdSelectAll(FXObject*,FXSelector,void*);
+
+  // Value access
   long onCmdSetStringValue(FXObject*,FXSelector,void*);
   long onCmdGetStringValue(FXObject*,FXSelector,void*);
-  long onCmdSearch(FXObject*,FXSelector,void*);
-  long onCmdReplace(FXObject*,FXSelector,void*);
-  long onCmdSearchNext(FXObject*,FXSelector,void*);
-  long onCmdSearchSel(FXObject*,FXSelector,void*);
 
   // Cursor movement
   long onCmdCursorTop(FXObject*,FXSelector,void*);
@@ -292,11 +281,7 @@ public:
   long onCmdCursorShiftWordLeft(FXObject*,FXSelector,void*);
   long onCmdCursorShiftWordRight(FXObject*,FXSelector,void*);
 
-  long onCmdBlockBeg(FXObject*,FXSelector,void*);
-  long onCmdBlockEnd(FXObject*,FXSelector,void*);
-  long onCmdGotoMatching(FXObject*,FXSelector,void*);
-  long onCmdGotoSelected(FXObject*,FXSelector,void*);
-  long onCmdGotoLine(FXObject*,FXSelector,void*);
+  // Positioning
   long onCmdScrollUp(FXObject*,FXSelector,void*);
   long onCmdScrollDown(FXObject*,FXSelector,void*);
   long onCmdScrollTop(FXObject*,FXSelector,void*);
@@ -304,7 +289,6 @@ public:
   long onCmdScrollCenter(FXObject*,FXSelector,void*);
 
   // Inserting
-  long onCmdOverstString(FXObject*,FXSelector,void*);
   long onCmdInsertString(FXObject*,FXSelector,void*);
   long onCmdInsertNewline(FXObject*,FXSelector,void*);
   long onCmdInsertTab(FXObject*,FXSelector,void*);
@@ -316,17 +300,13 @@ public:
   long onCmdPasteSel(FXObject*,FXSelector,void*);
   long onCmdDeleteSel(FXObject*,FXSelector,void*);
   long onCmdReplaceSel(FXObject*,FXSelector,void*);
-  long onCmdChangeCase(FXObject*,FXSelector,void*);
-  long onCmdShiftText(FXObject*,FXSelector,void*);
   long onCmdPasteMiddle(FXObject*,FXSelector,void*);
-
-  // Changing Selection
   long onCmdSelectChar(FXObject*,FXSelector,void*);
   long onCmdSelectWord(FXObject*,FXSelector,void*);
   long onCmdSelectLine(FXObject*,FXSelector,void*);
-  long onCmdSelectAll(FXObject*,FXSelector,void*);
   long onCmdSelectMatching(FXObject*,FXSelector,void*);
   long onCmdSelectBlock(FXObject*,FXSelector,void*);
+  long onCmdSelectAll(FXObject*,FXSelector,void*);
   long onCmdDeselectAll(FXObject*,FXSelector,void*);
 
   // Deletion
@@ -339,6 +319,26 @@ public:
   long onCmdDeleteAll(FXObject*,FXSelector,void*);
   long onCmdDeleteLine(FXObject*,FXSelector,void*);
 
+  // Control commands
+  long onCmdShiftText(FXObject*,FXSelector,void*);
+  long onCmdChangeCase(FXObject*,FXSelector,void*);
+  long onCmdBlockBeg(FXObject*,FXSelector,void*);
+  long onCmdBlockEnd(FXObject*,FXSelector,void*);
+  long onCmdGotoMatching(FXObject*,FXSelector,void*);
+  long onCmdGotoSelected(FXObject*,FXSelector,void*);
+  long onCmdCursorRow(FXObject*,FXSelector,void*);
+  long onUpdCursorRow(FXObject*,FXSelector,void*);
+  long onCmdCursorColumn(FXObject*,FXSelector,void*);
+  long onUpdCursorColumn(FXObject*,FXSelector,void*);
+  long onCmdGotoLine(FXObject*,FXSelector,void*);
+  long onCmdSearch(FXObject*,FXSelector,void*);
+  long onCmdReplace(FXObject*,FXSelector,void*);
+  long onCmdSearchNext(FXObject*,FXSelector,void*);
+  long onCmdSearchSel(FXObject*,FXSelector,void*);
+  long onCmdToggleEditable(FXObject*,FXSelector,void*);
+  long onUpdToggleEditable(FXObject*,FXSelector,void*);
+  long onCmdToggleOverstrike(FXObject*,FXSelector,void*);
+  long onUpdToggleOverstrike(FXObject*,FXSelector,void*);
 public:
   static const FXchar textDelimiters[];
 
@@ -385,7 +385,6 @@ public:
     ID_SCROLL_TOP,
     ID_SCROLL_BOTTOM,
     ID_SCROLL_CENTER,
-    ID_OVERST_STRING,
     ID_INSERT_STRING,
     ID_INSERT_NEWLINE,
     ID_INSERT_TAB,
@@ -659,13 +658,29 @@ public:
   /// Get style at position pos
   FXint getStyle(FXint pos) const;
 
-  /// Extract n bytes of text from position pos
-  void extractText(FXchar *text,FXint pos,FXint n) const;
-  void extractText(FXString& text,FXint pos,FXint n) const;
+  /// Return length of buffer
+  FXint getLength() const { return length; }
 
-  /// Extract n bytes of style info from position pos
-  void extractStyle(FXchar *style,FXint pos,FXint n) const;
-  void extractStyle(FXString& text,FXint pos,FXint n) const;
+  /// Return number of rows in buffer
+  FXint getNumRows() const { return nrows; }
+
+  /// Return entire text
+  FXString getText() const;
+
+  /// Get selected text
+  FXString getSelectedText() const;
+
+  /// Retrieve text into buffer
+  void getText(FXchar* text,FXint n) const;
+  void getText(FXString& text) const;
+
+  /// Change the text in the buffer to new text
+  virtual void setText(const FXchar* text,FXint n,FXbool notify=false);
+  virtual void setText(const FXString& text,FXbool notify=false);
+
+  /// Change the text in the buffer to new text
+  virtual void setStyledText(const FXchar* text,FXint n,FXint style=0,FXbool notify=false);
+  virtual void setStyledText(const FXString& text,FXint style=0,FXbool notify=false);
 
   /// Replace m bytes at pos by n characters
   virtual void replaceText(FXint pos,FXint m,const FXchar *text,FXint n,FXbool notify=false);
@@ -701,26 +716,13 @@ public:
   virtual void changeStyle(FXint pos,const FXchar* style,FXint n);
   virtual void changeStyle(FXint pos,const FXString& style);
 
-  /// Change the text in the buffer to new text
-  virtual void setText(const FXchar* text,FXint n,FXbool notify=false);
-  virtual void setText(const FXString& text,FXbool notify=false);
+  /// Extract n bytes of text from position pos
+  void extractText(FXchar *text,FXint pos,FXint n) const;
+  void extractText(FXString& text,FXint pos,FXint n) const;
 
-  /// Change the text in the buffer to new text
-  virtual void setStyledText(const FXchar* text,FXint n,FXint style=0,FXbool notify=false);
-  virtual void setStyledText(const FXString& text,FXint style=0,FXbool notify=false);
-
-  /// Retrieve text into buffer
-  void getText(FXchar* text,FXint n) const;
-  void getText(FXString& text) const;
-
-  /// Return text in the widget
-  FXString getText() const;
-
-  /// Return length of buffer
-  FXint getLength() const { return length; }
-
-  /// Return number of rows in buffer
-  FXint getNumRows() const { return nrows; }
+  /// Extract n bytes of style info from position pos
+  void extractStyle(FXchar *style,FXint pos,FXint n) const;
+  void extractStyle(FXString& text,FXint pos,FXint n) const;
 
   /// Shift block of lines from position start up to end by given amount
   FXint shiftText(FXint start,FXint end,FXint amount,FXbool notify=false);
@@ -822,41 +824,11 @@ public:
   /// Make line containing pos the center line
   void setCenterLine(FXint pos);
 
-  /// Set the cursor position
-  virtual void setCursorPos(FXint pos,FXbool notify=false);
-
-  /// Set cursor row
-  void setCursorRow(FXint row,FXbool notify=false);
-
-  /// Return cursor row
-  FXint getCursorRow() const { return cursorrow; }
-
-  /// Set cursor column
-  void setCursorColumn(FXint col,FXbool notify=false);
-
-  /// Return cursor row, i.e. indent position
-  FXint getCursorColumn() const { return cursorcol; }
-
-  /// Return the cursor position
-  FXint getCursorPos() const { return cursorpos; }
-
-  /// Set the anchor position
-  void setAnchorPos(FXint pos);
-
-  /// Return the anchor position
-  FXint getAnchorPos() const { return anchorpos; }
-
-  /// Return selection start position
-  FXint getSelStartPos() const { return selstartpos; }
-
-  /// Return selection end position
-  FXint getSelEndPos() const { return selendpos; }
+  /// Select all text
+  FXbool selectAll(FXbool notify=false);
 
   /// Select len characters starting at given position pos
   FXbool setSelection(FXint pos,FXint len,FXbool notify=false);
-
-  /// Select all text
-  FXbool selectAll(FXbool notify=false);
 
   /// Extend the primary selection from the anchor to the given position
   FXbool extendSelection(FXint pos,FXuint select=SelectChars,FXbool notify=false);
@@ -899,6 +871,36 @@ public:
 
   /// Unhighlight the text
   FXbool killHighlight();
+
+  /// Set the cursor position
+  virtual void setCursorPos(FXint pos,FXbool notify=false);
+
+  /// Set cursor row
+  void setCursorRow(FXint row,FXbool notify=false);
+
+  /// Return cursor row
+  FXint getCursorRow() const { return cursorrow; }
+
+  /// Set cursor column
+  void setCursorColumn(FXint col,FXbool notify=false);
+
+  /// Return cursor row, i.e. indent position
+  FXint getCursorColumn() const { return cursorcol; }
+
+  /// Return the cursor position
+  FXint getCursorPos() const { return cursorpos; }
+
+  /// Set the anchor position
+  void setAnchorPos(FXint pos);
+
+  /// Return the anchor position
+  FXint getAnchorPos() const { return anchorpos; }
+
+  /// Return selection start position
+  FXint getSelStartPos() const { return selstartpos; }
+
+  /// Return selection end position
+  FXint getSelEndPos() const { return selendpos; }
 
   /// Change text widget style
   void setTextStyle(FXuint style);

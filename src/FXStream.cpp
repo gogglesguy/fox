@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXStream.cpp,v 1.73 2007/02/07 20:22:16 fox Exp $                        *
+* $Id: FXStream.cpp,v 1.74 2007/03/15 20:48:31 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -83,7 +83,6 @@ FXStream::FXStream(const FXObject *cont){
   swap=false;
   owns=false;
   }
-
 
 
 // Set stream to big endian mode if true

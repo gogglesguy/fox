@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXReactor.cpp,v 1.31 2007/02/23 20:12:16 fox Exp $                       *
+* $Id: FXReactor.cpp,v 1.32 2007/03/22 21:09:46 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -99,7 +99,7 @@ FXIMPLEMENT(FXReactor,FXObject,NULL,0)
 
 
 // Construct reactor object
-FXReactor::FXReactor():accessing(true),working(true),current(0),initialized(false){
+FXReactor::FXReactor():accessing(true),working(true),timers(NULL),current(0),initialized(false){
   memset(signotified,0,sizeof(signotified));
   callocElms(handles,1);
   sigreceived=0;
@@ -204,6 +204,30 @@ void FXReactor::signalhandler(int sig){
     }
   }
 
+/*******************************************************************************/
+
+// Add timer from the list
+FXTimerDispatchable* FXReactor::addTimer(FXTimerDispatchable* timer){
+  register FXTimerDispatchable **tt=&timers;
+  while(*tt && ((*tt)->due < timer->due)){
+    tt=&(*tt)->next;
+    }
+  timer->next=*tt; 
+  *tt=timer;
+  return timer;
+  }
+
+
+// Remove timer from the list
+FXTimerDispatchable* FXReactor::remTimer(FXTimerDispatchable* timer){
+  register FXTimerDispatchable **tt=&timers;
+  while(*tt && *tt!=timer){
+    tt=&(*tt)->next;
+    }
+  *tt=timer->next; 
+  timer->next=NULL;
+  return timer;
+  }
 
 /*******************************************************************************/
 
@@ -338,14 +362,14 @@ FXint FXReactor::processActiveHandles(FXTime block,FXuint flags){
 #endif
   fd_set hand[3];
 
-  // Empty set
-  sigemptyset(&emptyset);
-
   // Prepare handles to check
   hand[0]=handles->hnd[0];
   hand[1]=handles->hnd[1];
   hand[2]=handles->hnd[2];
   maxhand=maxhandle;
+
+  // Empty set
+  sigemptyset(&emptyset);
 
   // Do a quick poll for any ready events or inputs
 #ifdef __USE_XOPEN2K
@@ -376,7 +400,12 @@ FXint FXReactor::processActiveHandles(FXTime block,FXuint flags){
     maxhand=maxhandle;
 
     // Waiting for finite amount of time?
-    if(block<forever){
+    if(timers || block<forever){
+
+      // Block till timer or maximum wait time
+      if(timers && (timers->due<block)) block=timers->due;
+      
+      // Calculate relative time
       block=block-FXThread::time();
 
       // Time is already due; return right away!
@@ -444,6 +473,13 @@ FXint FXReactor::processActiveHandles(FXTime block,FXuint flags){
       }
 
     // Timed out
+    if(timers && timers->due<=FXThread::time()){        // FIXME
+      FXTimerDispatchable* timer=timers;
+      timers=timer->next;
+      timer->next=NULL;
+      timer->dispatch();
+      delete timer;
+      }
     return 0;
     }
 
@@ -468,7 +504,13 @@ FXint FXReactor::processActiveHandles(FXTime block,FXuint flags){
 
 // Destroy reactor object
 FXReactor::~FXReactor(){
+  FXTimerDispatchable* timer;
   freeElms(handles);
+  while(timers){
+    timer=timers; 
+    timers=timers->next;
+    delete timer;
+    }
   }
 
 

@@ -19,11 +19,12 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fxascii.cpp,v 1.9 2007/02/07 20:22:20 fox Exp $                          *
+* $Id: fxascii.cpp,v 1.11 2007/03/28 16:17:37 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxdefs.h"
 #include "fxascii.h"
+#include "FXString.h"
 
 /*
   Notes:
@@ -83,7 +84,7 @@ const unsigned short ascii_data[256]={
 
 
 FXint digitValue(FXchar asc){
-  return ('0'<=asc && asc<='9') ? (asc-'0') : ('a'<=asc && asc<='z') ? (asc-'a'+10) : ('A'<=asc && asc<='Z') ? asc-'A'+10 : -1;
+  return FXString::digit2Value[(FXuchar)asc];
   }
 
 

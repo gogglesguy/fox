@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCylinder.cpp,v 1.28 2007/02/07 20:22:09 fox Exp $                    *
+* $Id: FXGLCylinder.cpp,v 1.29 2007/03/23 14:24:58 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -71,9 +71,7 @@ FXIMPLEMENT(FXGLCylinder,FXGLShape,NULL,0)
 // Create cylinder
 FXGLCylinder::FXGLCylinder():height(1.0f),radius(1.0f){
   FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=0.0f;    range.upper.y=height;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
@@ -81,9 +79,7 @@ FXGLCylinder::FXGLCylinder():height(1.0f),radius(1.0f){
 FXGLCylinder::FXGLCylinder(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),height(h),radius(r){
   FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=0.0f;    range.upper.y=height;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
@@ -91,9 +87,7 @@ FXGLCylinder::FXGLCylinder(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):
 FXGLCylinder::FXGLCylinder(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),height(h),radius(r){
   FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
-  range.lower.x=-radius; range.upper.x=radius;
-  range.lower.y=0.0f;    range.upper.y=height;
-  range.lower.z=-radius; range.upper.z=radius;
+  range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
@@ -102,6 +96,24 @@ FXGLCylinder::FXGLCylinder(const FXGLCylinder& orig):FXGLShape(orig){
   FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
   height=orig.height;
   radius=orig.radius;
+  }
+
+// Change radius
+void FXGLCylinder::setRadius(FXfloat r){
+  if(radius!=r){
+    range.lower.x=range.lower.z=-r;
+    range.upper.x=range.upper.z= r;
+    radius=r;
+    }
+  }
+
+
+// Change height
+void FXGLCylinder::setHeight(FXfloat h){
+  if(height!=h){
+    range.upper.y=h;
+    height=h;
+    }
   }
 
 

@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLShape.h,v 1.28 2007/02/07 20:21:54 fox Exp $                         *
+* $Id: FXGLShape.h,v 1.29 2007/03/23 14:24:57 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXGLSHAPE_H
 #define FXGLSHAPE_H
@@ -134,6 +134,12 @@ public:
 
   /// Get the tool tip message for this object
   const FXString& getTipText() const { return tip; }
+
+  /// Set the position
+  virtual void setPosition(const FXVec3f& pos);
+
+  /// Get the position
+  const FXVec3f& getPosition() const { return position; }
 
   /// Set the material for specified side (where side = 0 or 1)
   void setMaterial(FXint side,const FXMaterial &mtl);

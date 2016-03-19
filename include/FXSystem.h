@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXSystem.h,v 1.14 2007/02/07 20:21:59 fox Exp $                          *
+* $Id: FXSystem.h,v 1.15 2007/03/19 15:28:19 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXSYSTEM_H
 #define FXSYSTEM_H
@@ -116,6 +116,10 @@ FXString FXAPI getTempDirectory();
 
 /// Get process id
 FXint FXAPI getProcessId();
+
+
+/// Return host name
+extern FXAPI FXString getHostName();
 
 
 /// Determine if UTF8 locale in effect

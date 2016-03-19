@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXURL.cpp,v 1.33 2007/02/07 20:22:19 fox Exp $                           *
+* $Id: FXURL.cpp,v 1.35 2007/03/20 20:04:57 fox Exp $                           *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -30,6 +30,7 @@
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXPath.h"
+#include "FXSystem.h"
 #include "FXURL.h"
 
 
@@ -74,26 +75,14 @@ using namespace FX;
 namespace FX {
 
 
-// Return host name
-FXString FXURL::hostname(){
-  FXchar name[512];
-  if(gethostname(name,sizeof(name))==0){
-    return name;
-    }
-  return "localhost";
-  }
-
-
 // Return URL of filename
 FXString FXURL::fileToURL(const FXString& file){
 #ifndef WIN32
   return "file:"+file;        // UNIX is easy
 #else
   FXString absfile=FXPath::absolute(file).substitute(PATHSEP,'/');
-  if(Ascii::isLetter(absfile[0]) && absfile[1]==':') return "file://"+FXURL::hostname()+"/"+absfile;     // Drive letter
-  return "file://"+FXURL::hostname()+absfile;
-  //if(isalpha(absfile[0]) && absfile[1]==':') return "file:///"+absfile;     // Drive letter
-  //return "file://"+absfile;
+  if(Ascii::isLetter(absfile[0]) && absfile[1]==':') return "file://"+FXSystem::getHostName()+"/"+absfile;     // Drive letter
+  return "file://"+FXSystem::getHostName()+absfile;
 #endif
   }
 
@@ -122,7 +111,7 @@ FXString FXURL::fileFromURL(const FXString& url){
       }
     else{
       FXString host=localurl.mid(7,path-7);
-      if(host=="localhost" || host==FXURL::hostname()){
+      if(host=="localhost" || host==FXSystem::getHostName()){
         result=localurl.mid(path,2000);
         }
       }
@@ -171,8 +160,8 @@ FXString FXURL::encode(const FXString& url){
     c=url[p++];
     if(!Ascii::isAlphaNumeric(c) && (c<=' ' || c>='{') && strchr(URL_UNSAFE URL_RESERVED,c)){
       result.append('%');
-      result.append(FXString::HEX[(c>>4)&15]);
-      result.append(FXString::HEX[c&15]);
+      result.append(FXString::value2Digit[(c>>4)&15]);
+      result.append(FXString::value2Digit[c&15]);
       continue;
       }
     result.append(c);

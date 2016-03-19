@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLCube.h,v 1.18 2007/02/07 20:21:54 fox Exp $                          *
+* $Id: FXGLCube.h,v 1.19 2007/03/23 14:24:57 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXGLCUBE_H
 #define FXGLCUBE_H
@@ -56,15 +56,15 @@ public:
   virtual FXGLObject* copy();
 
   /// Change width
-  void setWidth(FXfloat w){ width=w; }
+  virtual void setWidth(FXfloat w);
   FXfloat getWidth() const { return width; }
 
   /// Change height
-  void setHeight(FXfloat h){ height=h; }
+  virtual void setHeight(FXfloat h);
   FXfloat getHeight() const { return height; }
 
   /// Change depth
-  void setDepth(FXfloat d){ depth=d; }
+  virtual void setDepth(FXfloat d);
   FXfloat getDepth() const { return depth; }
 
   /// Save to a stream

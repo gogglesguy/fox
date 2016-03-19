@@ -78,8 +78,11 @@ GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 GL_LIBS = @GL_LIBS@
 GL_TESTS = @GL_TESTS@
+HAVE_LIB = @HAVE_LIB@
+LIB = @LIB@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+LTLIB = @LTLIB@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_RELEASE = @LT_RELEASE@
@@ -927,7 +930,7 @@ FXArrowButton.lo FXArrowButton.o : FXArrowButton.cpp ../include/xincs.h \
 	../include/FXArrowButton.h ../include/FXFrame.h \
 	../include/FXWindow.h ../include/FXDrawable.h ../include/FXId.h
 fxascii.lo fxascii.o : fxascii.cpp ../include/xincs.h \
-	../include/fxdefs.h ../include/fxascii.h
+	../include/fxdefs.h ../include/fxascii.h ../include/FXString.h
 FXBitmap.lo FXBitmap.o : FXBitmap.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXThread.h ../include/FXElement.h \
@@ -3508,7 +3511,7 @@ fxunicode.lo fxunicode.o : fxunicode.cpp ../include/xincs.h \
 FXURL.lo FXURL.o : FXURL.cpp ../include/xincs.h ../include/fxver.h \
 	../include/fxdefs.h fxpriv.h ../include/fxascii.h \
 	../include/FXHash.h ../include/FXStream.h ../include/FXString.h \
-	../include/FXPath.h ../include/FXURL.h
+	../include/FXPath.h ../include/FXSystem.h ../include/FXURL.h
 FXUTF16Codec.lo FXUTF16Codec.o : FXUTF16Codec.cpp ../include/xincs.h \
 	../include/fxver.h ../include/fxdefs.h ../include/FXHash.h \
 	../include/FXStream.h ../include/FXDict.h ../include/FXObject.h \

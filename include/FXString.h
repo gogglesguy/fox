@@ -19,12 +19,15 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXString.h,v 1.122 2007/02/07 20:21:58 fox Exp $                         *
+* $Id: FXString.h,v 1.124 2007/03/22 15:55:15 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXSTRING_H
 #define FXSTRING_H
 
 namespace FX {
+
+
+class FXStream;
 
 
 /**
@@ -35,8 +38,9 @@ private:
   FXchar* str;
 public:
   static const FXchar null[];
-  static const FXchar hex[17];
-  static const FXchar HEX[17];
+public:
+  static const FXchar      value2Digit[36];
+  static const signed char digit2Value[256];
 public:
   static const signed char utfBytes[256];
 public:
@@ -92,11 +96,17 @@ public:
   /// Return extent of utf8 character at position
   FXint extent(FXint p) const { return utfBytes[(FXuchar)str[p]]; }
 
-  /// Return start of next utf8 character
+  /// Increment byte offset by one utf8 character
   FXint inc(FXint p) const;
 
-  /// Return start of previous utf8 character
+  /// Increment byte offset by n utf8 characters
+  FXint inc(FXint p,FXint n) const;
+
+  /// Decrement byte offset by one utf8 character
   FXint dec(FXint p) const;
+
+  /// Decrement byte offset by n utf8 characters
+  FXint dec(FXint p,FXint n) const;
 
   /// Get text contents
   const FXchar* text() const { return (const FXchar*)str; }

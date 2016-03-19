@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXReactor.h,v 1.28 2007/02/23 20:12:16 fox Exp $                         *
+* $Id: FXReactor.h,v 1.29 2007/03/22 21:09:43 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXREACTOR_H
 #define FXREACTOR_H
@@ -34,7 +34,47 @@
 namespace FX {
 
 
+class FXReactor;
 struct FXHandles;
+
+
+/// Dispatchable
+class FXAPI FXDispatchable {
+private:
+  FXDispatchable(const FXDispatchable&);
+  FXDispatchable &operator=(const FXDispatchable&);
+public:
+  FXDispatchable(){}
+  virtual FXbool dispatch();
+  virtual ~FXDispatchable(){}
+  };
+
+
+/// Timer dispatchable 
+class FXAPI FXTimerDispatchable : public FXDispatchable {
+  friend class FXReactor;
+private:
+  FXTimerDispatchable *next;    // Next timeout in list
+  FXTime               due;     // When timer is due (ns)
+private:
+  FXTimerDispatchable(const FXTimerDispatchable&);
+  FXTimerDispatchable &operator=(const FXTimerDispatchable&);
+public:
+  FXTimerDispatchable(FXTime d=0):next(NULL),due(d){}
+  };
+  
+
+/// Chore dispatchable
+class FXAPI FXChoreDispatchable : public FXDispatchable {
+  friend class FXReactor;
+private:
+  FXChoreDispatchable *next;    // Next timeout in list
+private:
+  FXChoreDispatchable(const FXChoreDispatchable&);
+  FXChoreDispatchable &operator=(const FXChoreDispatchable&);
+public:
+  FXChoreDispatchable():next(NULL){}
+  };
 
 
 /**
@@ -44,14 +84,15 @@ struct FXHandles;
 class FXAPI FXReactor : public FXObject {
   FXDECLARE(FXReactor)
 private:
-  FXMutex    accessing;         // Accessing internals
-  FXMutex    working;           // Working and not blocked
-  FXHandles *handles;           // Handle to watch
-  FXbool     signotified[64];   // Notified signals
-  FXint      sigreceived;       // Latest signal received
-  FXint      maxhandle;         // Highest active handle
-  FXint      current;           // Current handle
-  FXbool     initialized;       // Is initialized
+  FXMutex              accessing;       // Accessing internals
+  FXMutex              working;         // Working and not blocked
+  FXHandles           *handles;         // Handle to watch
+  FXTimerDispatchable *timers;          // Timers
+  FXbool               signotified[64]; // Notified signals
+  FXint                sigreceived;     // Latest signal received
+  FXint                maxhandle;       // Highest active handle
+  FXint                current;         // Current handle
+  FXbool               initialized;     // Is initialized
 protected:
   static FXAutoThreadStorageKey reactorStorageKey;
 private:
@@ -115,6 +156,21 @@ public:
   * Check if handle hnd is in signal-set observed by the reactor.
   */
   FXbool hasSignal(FXint sig);
+
+  /**
+  * Reactor has timers scheduled.
+  */
+  FXbool hasTimers() const { return timers!=NULL; }
+
+  /**
+  * Add timer dispatchable.
+  */
+  FXTimerDispatchable* addTimer(FXTimerDispatchable* timer);
+
+  /** 
+  * Remove timer dispatchable.
+  */
+  FXTimerDispatchable* remTimer(FXTimerDispatchable* timer);
 
   /**
   * Wait for active handles.

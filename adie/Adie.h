@@ -19,7 +19,7 @@
 * along with this program; if not, write to the Free Software                   *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: Adie.h,v 1.63 2007/03/13 19:14:25 fox Exp $                              *
+* $Id: Adie.h,v 1.65 2007/03/27 21:57:04 fox Exp $                              *
 ********************************************************************************/
 #ifndef ADIE_H
 #define ADIE_H
@@ -27,7 +27,7 @@
 
 // Version
 #define VERSION_MAJOR 3
-#define VERSION_MINOR 1
+#define VERSION_MINOR 2
 #define VERSION_PATCH 0
 
 
@@ -74,6 +74,8 @@ protected:
   FXIcon         *configicon;
   FXIcon         *browsericon;
   FXIcon         *nobrowsericon;
+  FXIcon         *uppercaseicon;
+  FXIcon         *lowercaseicon;
 private:
   Adie(){}
   Adie(const Adie&);
@@ -96,7 +98,7 @@ public:
 
   // Get syntax for language name
   FXSyntax* getSyntaxForLanguage(const FXString& name) const;
-  
+
   // Get syntax from file name
   FXSyntax* getSyntaxForFile(const FXString& file) const;
 

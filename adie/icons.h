@@ -1,4 +1,4 @@
-/*********** Generated on 2007/03/13 20:12:39 by reswrap version 5.0.0 *********/
+/*********** Generated on 2007/03/28 11:25:04 by reswrap version 5.0.0 *********/
 
 /* Created by reswrap from file adie_gif.gif */
 extern const unsigned char adie_gif[];
@@ -20,6 +20,9 @@ extern const unsigned char bookset_gif[];
 
 /* Created by reswrap from file browser.gif */
 extern const unsigned char browser[];
+
+/* Created by reswrap from file capitalize.gif */
+extern const unsigned char capitalize[];
 
 /* Created by reswrap from file close_gif.gif */
 extern const unsigned char close_gif[];
@@ -56,6 +59,9 @@ extern const unsigned char info_gif[];
 
 /* Created by reswrap from file lang_gif.gif */
 extern const unsigned char lang_gif[];
+
+/* Created by reswrap from file lowercase.gif */
+extern const unsigned char lowercase[];
 
 /* Created by reswrap from file new_gif.gif */
 extern const unsigned char new_gif[];
@@ -122,4 +128,7 @@ extern const unsigned char syntax_gif[];
 
 /* Created by reswrap from file undo_gif.gif */
 extern const unsigned char undo_gif[];
+
+/* Created by reswrap from file uppercase.gif */
+extern const unsigned char uppercase[];
 

@@ -21,6 +21,7 @@ booknext_gif.gif \
 bookprev_gif.gif \
 bookset_gif.gif \
 browser.gif \
+capitalize.gif \
 close_gif.gif \
 colors_gif.gif \
 config_gif.gif \
@@ -33,6 +34,7 @@ help_gif.gif \
 indent_gif.gif \
 info_gif.gif \
 lang_gif.gif \
+lowercase.gif \
 new_gif.gif \
 nobrowser.gif \
 open_gif.gif \
@@ -54,7 +56,8 @@ shiftright_gif.gif \
 small_gif.gif \
 styles_gif.gif \
 syntax_gif.gif \
-undo_gif.gif
+undo_gif.gif \
+uppercase.gif 
 
 
 adie_SOURCES = \

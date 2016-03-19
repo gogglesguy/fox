@@ -21,7 +21,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXGLShape.cpp,v 1.47 2007/02/07 20:22:09 fox Exp $                       *
+* $Id: FXGLShape.cpp,v 1.48 2007/03/23 14:24:58 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -84,67 +84,46 @@ FXIMPLEMENT_ABSTRACT(FXGLShape,FXGLObject,FXGLShapeMap,ARRAYNUMBER(FXGLShapeMap)
 
 // Serialization
 FXGLShape::FXGLShape(){
-  position.x=0.0f;
-  position.y=0.0f;
-  position.z=0.0f;
-  material[0].ambient=FXVec4f(0.2f,0.2f,0.2f,1.0f);
-  material[0].diffuse=FXVec4f(0.8f,0.8f,0.8f,1.0f);
-  material[0].specular=FXVec4f(1.0f,1.0f,1.0f,1.0f);
-  material[0].emission=FXVec4f(0.0f,0.0f,0.0f,1.0f);
+  position.set(0.0f,0.0f,0.0f);
+  material[0].ambient.set(0.2f,0.2f,0.2f,1.0f);
+  material[0].diffuse.set(0.8f,0.8f,0.8f,1.0f);
+  material[0].specular.set(1.0f,1.0f,1.0f,1.0f);
+  material[0].emission.set(0.0f,0.0f,0.0f,1.0f);
   material[0].shininess=30.0f;
-  material[1].ambient=FXVec4f(0.2f,0.2f,0.2f,1.0f);
-  material[1].diffuse=FXVec4f(0.8f,0.8f,0.8f,1.0f);
-  material[1].specular=FXVec4f(1.0f,1.0f,1.0f,1.0f);
-  material[1].emission=FXVec4f(0.0f,0.0f,0.0f,1.0f);
-  material[1].shininess=30.0;
-  range.lower.x=-1.0f;
-  range.lower.y=-1.0f;
-  range.lower.z=-1.0f;
-  range.upper.x= 1.0f;
-  range.upper.y= 1.0f;
-  range.upper.z= 1.0f;
+  material[1].ambient.set(0.2f,0.2f,0.2f,1.0f);
+  material[1].diffuse.set(0.8f,0.8f,0.8f,1.0f);
+  material[1].specular.set(1.0f,1.0f,1.0f,1.0f);
+  material[1].emission.set(0.0f,0.0f,0.0f,1.0f);
+  material[1].shininess=30.0f;
+  range.set(-1.0f,1.0f,-1.0f,1.0f,-1.0f,1.0f);
   options=SHADING_SMOOTH|STYLE_SURFACE;
   }
 
 
 // Create initialized shape
 FXGLShape::FXGLShape(FXfloat x,FXfloat y,FXfloat z,FXuint opts){
-  position.x=x;
-  position.y=y;
-  position.z=z;
-  material[0].ambient=FXVec4f(0.2f,0.2f,0.2f,1.0f);
-  material[0].diffuse=FXVec4f(0.8f,0.8f,0.8f,1.0f);
-  material[0].specular=FXVec4f(1.0f,1.0f,1.0f,1.0f);
-  material[0].emission=FXVec4f(0.0f,0.0f,0.0f,1.0f);
+  position.set(x,y,z);
+  material[0].ambient.set(0.2f,0.2f,0.2f,1.0f);
+  material[0].diffuse.set(0.8f,0.8f,0.8f,1.0f);
+  material[0].specular.set(1.0f,1.0f,1.0f,1.0f);
+  material[0].emission.set(0.0f,0.0f,0.0f,1.0f);
   material[0].shininess=30.0f;
-  material[1].ambient=FXVec4f(0.2f,0.2f,0.2f,1.0f);
-  material[1].diffuse=FXVec4f(0.8f,0.8f,0.8f,1.0f);
-  material[1].specular=FXVec4f(1.0f,1.0f,1.0f,1.0f);
-  material[1].emission=FXVec4f(0.0f,0.0f,0.0f,1.0f);
+  material[1].ambient.set(0.2f,0.2f,0.2f,1.0f);
+  material[1].diffuse.set(0.8f,0.8f,0.8f,1.0f);
+  material[1].specular.set(1.0f,1.0f,1.0f,1.0f);
+  material[1].emission.set(0.0f,0.0f,0.0f,1.0f);
   material[1].shininess=30.0f;
-  range.lower.x=-1.0f;
-  range.lower.y=-1.0f;
-  range.lower.z=-1.0f;
-  range.upper.x= 1.0f;
-  range.upper.y= 1.0f;
-  range.upper.z= 1.0f;
+  range.set(-1.0f,1.0f,-1.0f,1.0f,-1.0f,1.0f);
   options=opts;
   }
 
 
 // Create initialized shape
 FXGLShape::FXGLShape(FXfloat x,FXfloat y,FXfloat z,FXuint opts,const FXMaterial& front,const FXMaterial& back){
-  position.x=x;
-  position.y=y;
-  position.z=z;
+  position.set(x,y,z);
   material[0]=front;
   material[1]=back;
-  range.lower.x=-1.0f;
-  range.lower.y=-1.0f;
-  range.lower.z=-1.0f;
-  range.upper.x= 1.0f;
-  range.upper.y= 1.0f;
-  range.upper.z= 1.0f;
+  range.set(-1.0f,1.0f,-1.0f,1.0f,-1.0f,1.0f);
   options=opts;
   }
 
@@ -417,6 +396,13 @@ void FXGLShape::bounds(FXRangef& box){
   }
 
 
+
+// Set the position
+void FXGLShape::setPosition(const FXVec3f& pos){
+  position=pos;
+  }
+  
+  
 // Draw a box
 void FXGLShape::drawbox(){
 #ifdef HAVE_GL_H

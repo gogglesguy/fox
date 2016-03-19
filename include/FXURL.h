@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: FXURL.h,v 1.14 2007/02/07 20:22:00 fox Exp $                             *
+* $Id: FXURL.h,v 1.15 2007/03/19 15:28:19 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXURL_H
 #define FXURL_H
@@ -27,9 +27,6 @@
 namespace FX {
 
 namespace FXURL {
-
-/// Return host name
-extern FXAPI FXString hostname();
 
 /// Return URL of filename
 extern FXAPI FXString fileToURL(const FXString& file);
