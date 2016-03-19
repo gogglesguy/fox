@@ -453,6 +453,7 @@ FXXBMImage.cpp \
 FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
+fxbase64.cpp \
 fxcpuid.cpp \
 fxbmpio.cpp \
 fxddsio.cpp \

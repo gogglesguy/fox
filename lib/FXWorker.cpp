@@ -52,6 +52,16 @@ FXWorker::FXWorker(FXRunnable *r):runnable(r){
   }
 
 
+// Change runnable if not started yet
+FXbool FXWorker::setRunnable(FXRunnable* r){
+  if(!running()){
+    runnable=r;
+    return true;
+    }
+  return false;
+  }
+  
+  
 // Worker runs jobs, then dies
 FXint FXWorker::run(){
   if(runnable){

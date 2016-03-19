@@ -509,7 +509,7 @@ FXbool FXThread::priority(FXThread::Priority prio){
 // Return thread priority
 FXThread::Priority FXThread::priority() const {
 #if defined(WIN32)
-  Priority result=PriorityError;
+  FXThread::Priority result=PriorityError;
   if(tid){
     int pri=GetThreadPriority((HANDLE)tid);
     if(pri!=THREAD_PRIORITY_ERROR_RETURN){
@@ -539,7 +539,7 @@ FXThread::Priority FXThread::priority() const {
 #elif defined(__APPLE__) || defined(__minix)
   return PriorityError;
 #else
-  Priority result=PriorityError;
+  FXThread::Priority result=PriorityError;
   if(tid){
     sched_param sched={0};
     int plcy=0;

@@ -45,10 +45,7 @@ private:
 public:
 
   /// Initialize semaphore with given count
-  FXSemaphore(FXint initial=1);
-
-  /// Get semaphore value
-  FXint value() const;
+  FXSemaphore(FXint count=1);
 
   /// Decrement semaphore, waiting if count is zero
   void wait();

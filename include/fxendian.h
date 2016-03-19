@@ -63,7 +63,6 @@ inline FXulong reverse64(FXulong x){
   }
 
 
-
 // Byte swap unsigned short
 inline FXushort swap16(FXushort x){
 #if (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))

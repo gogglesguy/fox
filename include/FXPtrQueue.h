@@ -72,6 +72,9 @@ public:
   /// Remove item from queue, return true if success
   FXbool pop(void*& ptr);
 
+  /// Drop item from queue, return true if success
+  FXbool pop();
+
   /// Destroy queue
  ~FXPtrQueue();
   };

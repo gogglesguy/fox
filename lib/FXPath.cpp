@@ -60,9 +60,6 @@
       -  Must not begin with $
       -  Uppercase only filename.
 
-  - Perhaps also taking into account certain environment variables in the
-    contraction function?
-
   - Deal with Windows paths "\\?\" long pathname convention.
 */
 
@@ -414,12 +411,30 @@ FXString FXPath::expand(const FXString& file){
 FXString FXPath::contract(const FXString& file,const FXString& user,const FXString& var){
   FXString result(file);
   if(!result.empty()){
-    FXString dir=FXSystem::getUserDirectory(user);
-    if(compare(result,dir,dir.length())==0){
-      result.replace(0,dir.length(),"~"+user);
+    FXString val;
+    FXint pos;
+    if(FXPath::isAbsolute(result)){
+      val=FXSystem::getUserDirectory(user);
+      if(!val.empty()){
+#if defined(WIN32)
+        if(comparecase(result,val,val.length())==0 && ((result.length()==val.length()) || ISPATHSEP(result[val.length()]))){
+          result.replace(0,val.length(),"~"+user);
+          }
+#else
+        if(compare(result,val,val.length())==0 && ((result.length()==val.length()) || ISPATHSEP(result[val.length()]))){
+          result.replace(0,val.length(),"~"+user);
+          }
+#endif
+        }
       }
-    dir=FXSystem::getEnvironment(var);
-    result.substitute(dir,"$"+var);
+    val=FXSystem::getEnvironment(var);
+    if(!val.empty()){
+      if(0<=(pos=result.find(val))){
+        if((pos==0 || ISPATHSEP(result[pos-1])) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+          result.replace(pos,val.length(),"$"+var);
+          }
+        }
+      }
     }
   return result;
   }
@@ -617,7 +632,7 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
 FXString FXPath::relative(const FXString& base,const FXString& file){
 
   // Base and file non-empty and either both absolute, or both relative
-  if(!base.empty() && !file.empty() && (FXPath::isAbsolute(base) == FXPath::isAbsolute(file))){  
+  if(!base.empty() && !file.empty() && (FXPath::isAbsolute(base) == FXPath::isAbsolute(file))){
     register FXint p=0,q=0,bp=0,bq=0;
 
     // Find branch point
@@ -1490,4 +1505,3 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
 
 
 }
-

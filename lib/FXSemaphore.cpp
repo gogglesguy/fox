@@ -37,47 +37,10 @@ namespace FX {
 
 /*******************************************************************************/
 
-
+// Initialize semaphore with given count
+FXSemaphore::FXSemaphore(FXint count){
 #if defined(WIN32)
-
-#ifndef SEMAQUERYINFOCLASS
-#define SEMAQUERYINFOCLASS 0
-#endif
-
-typedef long NTSTATUS;
-
-typedef struct _SEMAINFO {
-  UINT Count;		// current semaphore count
-  UINT Limit;		// max semaphore count
-  } SEMAINFO;
-
-// Stub function
-static NTSTATUS WINAPI myQuerySemaphore(HANDLE Handle,UINT InfoClass,SEMAINFO* SemaInfo,UINT InfoSize,UINT* RetLen);
-
-// Function variable decl
-typedef NTSTATUS (WINAPI *PFNQUERYSEMAPHORE)(HANDLE Handle,UINT InfoClass,SEMAINFO* SemaInfo,UINT InfoSize,UINT* RetLen);
-
-// Function pointer into ntdll.dll
-static PFNQUERYSEMAPHORE fxQuerySemaphore=myQuerySemaphore;
-
-// When called, grab the true API from the DLL if we can
-static NTSTATUS WINAPI myQuerySemaphore(HANDLE Handle,UINT InfoClass,SEMAINFO* SemaInfo,UINT InfoSize,UINT* RetLen){
-  HINSTANCE HNTDLL;
-  PFNQUERYSEMAPHORE pqs;
-  if((HNTDLL=GetModuleHandleA("NTDLL")) && (pqs=(PFNQUERYSEMAPHORE)GetProcAddress(HNTDLL,"NtQuerySemaphore"))){
-    fxQuerySemaphore=pqs;
-    return fxQuerySemaphore(Handle,InfoClass,SemaInfo,InfoSize,RetLen);
-    }
-  return -1;
-  }
-
-#endif
-
-
-// Initialize semaphore
-FXSemaphore::FXSemaphore(FXint initial){
-#if defined(WIN32)
-  data[0]=(FXuval)CreateSemaphore(NULL,initial,0x7fffffff,NULL);
+  data[0]=(FXuval)CreateSemaphore(NULL,count,0x7fffffff,NULL);
 #elif defined(__minix)
   //// NOT SUPPORTED ////
 #else
@@ -86,27 +49,7 @@ FXSemaphore::FXSemaphore(FXint initial){
   // machine and mail it to: jeroen@fox-toolkit.com!!
   //FXTRACE((150,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
   FXASSERT(sizeof(data)>=sizeof(sem_t));
-  sem_init((sem_t*)data,0,(unsigned int)initial);
-#endif
-  }
-
-
-// Get semaphore value
-FXint FXSemaphore::value() const {
-#if defined(WIN32)
-  SEMAINFO SemInfo;
-  UINT RetLen;
-  if(fxQuerySemaphore((HANDLE)data[0],SEMAQUERYINFOCLASS,&SemInfo,sizeof(SemInfo),&RetLen)>=0){
-    return SemInfo.Count;
-    }
-  return -1;
-#elif defined(__minix)
-  //// NOT SUPPORTED ////
-  return -1;
-#else
-  int result=-1;
-  sem_getvalue((sem_t*)data,&result);
-  return result;
+  sem_init((sem_t*)data,0,(unsigned int)count);
 #endif
   }
 

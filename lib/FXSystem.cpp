@@ -350,7 +350,9 @@ FXbool FXSystem::setCurrentDirectory(const FXString& path){
 FXString FXSystem::getCurrentDrive(){
 #ifdef WIN32
   FXchar buffer[MAXPATHLEN];
-  if(GetCurrentDirectoryA(MAXPATHLEN,buffer) && Ascii::isLetter((FXuchar)buffer[0]) && buffer[1]==':') return FXString(buffer,2);
+  if(GetCurrentDirectoryA(MAXPATHLEN,buffer) && Ascii::isLetter((FXuchar)buffer[0]) && buffer[1]==':'){
+    return FXString(buffer,2);
+    }
 #endif
   return FXString::null;
   }
@@ -392,6 +394,48 @@ FXString FXSystem::getHomeDirectory(){
   return FXSystem::getUserDirectory(FXString::null);
   }
 
+/*
+BOOL WINAPI LookupAccountName(
+  _In_opt_   LPCTSTR lpSystemName,
+  _In_       LPCTSTR lpAccountName,
+  _Out_opt_  PSID Sid,
+  _Inout_    LPDWORD cbSid,
+  _Out_opt_  LPTSTR ReferencedDomainName,
+  _Inout_    LPDWORD cchReferencedDomainName,
+  _Out_      PSID_NAME_USE peUse
+);
+
+PSID GetUserSID(const FXString& name){
+  FXString user=name.empty()?currentUserName():name;
+  if(!user.empty()){
+    PSID   sid=NULL;
+    DWORD  sid_size=0;
+    TCHAR *domain=NULL;
+    DWORD  domain_size=0;
+    SID_NAME_USE use=SidTypeUnknown;
+
+    // First call to LookupAccountName to get the buffer sizes
+    if(LookupAccountNameA(NULL,user.text(),sid,&sid_size,domain,&domain_size,&use)){
+
+      // Allocate 
+      sid=(PSID)LocalAlloc(LMEM_FIXED,sid_size);
+      domain=new TCHAR [domain_size];
+
+      // Second call to LookupAccountName to get the actual account info
+      if(LookupAccountName(NULL,user.text(),sid,&sid_size,domain,&domain_size,&use)){
+        delete [] domain;
+        return sid;
+        }
+        
+      // Free 
+      LocalFree(sid);
+      delete [] domain;
+      }
+    }
+  return NULL
+  }
+
+*/
 
 // Get home directory for a given user
 FXString FXSystem::getUserDirectory(const FXString& user){
@@ -421,9 +465,9 @@ FXString FXSystem::getUserDirectory(const FXString& user){
         return FXString(home);
         }
       }
-    return "c:" PATHSEPSTRING;
+    return FXString::null;
     }
-  return "c:" PATHSEPSTRING;
+  return FXString::null;
 #elif defined(HAVE_GETPWNAM_R)
   struct passwd pwdresult,*pwd;
   const FXchar* str;
@@ -440,12 +484,12 @@ FXString FXSystem::getUserDirectory(const FXString& user){
     if(getpwuid_r(getuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
       return FXString(pwd->pw_dir);
       }
-    return PATHSEPSTRING;
+    return FXString::null;
     }
   if(getpwnam_r(user.text(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
     return FXString(pwd->pw_dir);
     }
-  return PATHSEPSTRING;
+  return FXString::null;
 #else
   struct passwd *pwd;
   const FXchar* str;
@@ -461,12 +505,12 @@ FXString FXSystem::getUserDirectory(const FXString& user){
     if((pwd=getpwuid(getuid()))!=NULL){
       return FXString(pwd->pw_dir);
       }
-    return PATHSEPSTRING;
+    return FXString::null;
     }
   if((pwd=getpwnam(user.text()))!=NULL){
     return FXString(pwd->pw_dir);
     }
-  return PATHSEPSTRING;
+  return FXString::null;
 #endif
   }
 

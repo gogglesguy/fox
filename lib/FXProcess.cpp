@@ -272,12 +272,11 @@ static FXnchar* enviroblock(const FXchar *const *env){
   FXnchar* result=NULL;
   if(env){
     const FXchar **tmp;
-    const FXchar *ptr;
     FXint size=0,n=0,s,d;
     while(env[n]) n++;
     if(callocElms(tmp,n+1)){
       for(s=0; s<n; ++s){
-        tmp[s]=ptr;
+        tmp[s]=env[s];
         size+=utf2ncs(env[s])+1;
         }
       qsort((void*)tmp,(size_t)s,sizeof(const FXchar*),comparison);

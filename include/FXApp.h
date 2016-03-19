@@ -365,9 +365,9 @@ private:
   void openInputDevices();
   void closeInputDevices();
 #ifdef WIN32
-  static long CALLBACK wndproc(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
+  static FXival CALLBACK wndproc(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam); 
 protected:
-  virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
+  virtual FXival dispatchEvent(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam);
 #else
   void addRepaint(FXID win,FXint x,FXint y,FXint w,FXint h,FXbool synth=false);
   void removeRepaints(FXID win,FXint x,FXint y,FXint w,FXint h);

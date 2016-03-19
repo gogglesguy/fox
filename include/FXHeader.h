@@ -225,7 +225,12 @@ public:
   long onQueryTip(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
 public:
+
+  /// Generate numbers 1, 2, 3, ... as a function of index 0,1,2,...
   static FXString decimalNumbering(FXint index);
+
+  /// Generate letters A, B, C, ... as a function of index 0,1,2,...
+  static FXString alphaNumbering(FXint index);
 public:
 
   /// Construct new header control
@@ -393,7 +398,7 @@ public:
 
   /// Enable auto-renumbering using the given function, or disable it if NULL
   void setAutoNumbering(FXNumberingFunc func);
-  
+
   /// Return auto-renumbering function
   FXNumberingFunc getAutoNumbering() const { return numbering; }
 
