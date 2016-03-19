@@ -214,6 +214,17 @@ public:
   Policy policy() const;
 
   /**
+  * Change thread's processor affinity, i.e. the set of
+  * processors onto which the thread may be scheduled.
+  */
+  FXbool affinity(FXulong mask);
+
+  /** 
+  * Get thread's processor affinity.
+  */
+  FXulong affinity() const;
+
+  /**
   * Suspend thread; return true if success.
   */
   FXbool suspend();

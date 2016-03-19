@@ -684,7 +684,7 @@ void TextWindow::create(){
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
   getApp()->addTimeout(this,ID_CLOCKTIME,CLOCKTIMER);
   editor->setFocus();
-  dirlist->setCurrentFile(FXSystem::getCurrentDirectory());
+  dirlist->setCurrentFile(FXSystem::getHomeDirectory());
   show(PLACEMENT_DEFAULT);
   }
 

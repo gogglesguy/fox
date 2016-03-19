@@ -33,19 +33,21 @@ int main(int argc,char* argv[]){
   const FXchar command[]="C:\\Program Files\\Windows NT\\Accessories\\wordpad.exe";
   const FXchar *const args[]={command,"c:\\WINDOWS\\win.ini",NULL};
 #else
-  const FXchar command[]="/bin/ls";
-  const FXchar *const args[]={command,"-l","/usr/bin",NULL};
+//  const FXchar command[]="/bin/ls";
+//  const FXchar *const args[]={command,"-l","/usr/bin",NULL};
+  const FXchar command[]="/usr/local/bin/adie";
+  const FXchar *const args[]={command,"process.cpp",NULL};
 #endif
 
   // Kick off
   if(!process.start(command,args)){
-    fprintf(stderr,"failed to start: %s\n",command);
+    fxwarning("failed to start: %s\n",command);
     return 1;
     }
 
   // Wait
   if(process.wait(code)){
-    fprintf(stderr,"chiled exited with code: %d\n",code);
+    fxwarning("chiled exited with code: %d\n",code);
     }
 
   return 1;

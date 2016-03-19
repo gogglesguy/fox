@@ -144,6 +144,16 @@ void FXReadWriteLock::readUnlock(){
   }
 
 
+// Test if read locked
+FXbool FXReadWriteLock::readLocked(){
+  if(tryReadLock()){
+    readUnlock();
+    return false;
+    }
+  return true;
+  }
+
+
 // Acquire write lock for read/write lock
 void FXReadWriteLock::writeLock(){
 #if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
@@ -179,6 +189,16 @@ void FXReadWriteLock::writeUnlock(){
 #else
   pthread_rwlock_unlock((pthread_rwlock_t*)data);
 #endif
+  }
+
+
+// Test if write locked
+FXbool FXReadWriteLock::writeLocked(){
+  if(tryWriteLock()){
+    writeUnlock();
+    return false;
+    }
+  return true;
   }
 
 

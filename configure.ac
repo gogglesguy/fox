@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [27])
+m4_define([fox_level], [28])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -106,8 +106,8 @@ AC_CHECK_LIB(pthread, pthread_exit)
 AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(dld, shl_load)
 
-# Check thread-safe alternatives
-AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r)
+# Check thread functions
+AC_CHECK_FUNCS(localtime_r gmtime_r readdir_r getpwuid_r getgrgid_r getpwnam_r pthread_setaffinity_np)
 
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
@@ -323,6 +323,9 @@ fi
 
 # Substitute variables in output files
 AC_SUBST(GL_LIBS)
+
+# To find all preprocessor defines in GCC, run:
+# echo | gcc -E -dM -
 
 # Done.
 AC_OUTPUT(Makefile

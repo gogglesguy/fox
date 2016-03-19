@@ -32,6 +32,7 @@ template<typename EType> struct FXAutoPtrRef {
   };
 
 
+
 /// Automatic pointer
 template <class EType> class FXAutoPtr {
 private:
@@ -44,14 +45,14 @@ public:
   /// Construct from another automatic pointer
   FXAutoPtr(FXAutoPtr<EType>& src):ptr(src.release()){ }
 
-  /// Construct from FXAutoPtrRef 
+  /// Construct from FXAutoPtrRef
   FXAutoPtr(FXAutoPtrRef<EType> src):ptr(src.ptr){ }
-  
+
   /// Construct from another automatic pointer of compatible type
   template <class T> explicit FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
 
   /// Assign from pointer
-  FXAutoPtr& operator=(EType *src){ ptr=src; return *this; }
+  FXAutoPtr& operator=(EType *src){ return reset(src); }
 
   /// Assign from an another automatic pointer
   FXAutoPtr& operator=(FXAutoPtr<EType>& src){ return reset(src.release()); }

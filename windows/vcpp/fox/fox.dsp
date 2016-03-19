@@ -1508,6 +1508,14 @@ SOURCE=..\..\..\include\FXIO.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXIODevice.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXIODevice.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXJP2Icon.cpp
 # End Source File
 # Begin Source File
@@ -1796,6 +1804,14 @@ SOURCE=..\..\..\include\FXMessageChannel.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXMutex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXMutex.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXObject.cpp
 # End Source File
 # Begin Source File
@@ -2064,7 +2080,11 @@ SOURCE=..\..\..\lib\fxrasio.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\lib\FXReactor.cpp
+SOURCE=..\..\..\lib\FXReadWriteLock.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXReadWriteLock.h
 # End Source File
 # Begin Source File
 
@@ -2224,6 +2244,14 @@ SOURCE=..\..\..\include\FXSearchDialog.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\lib\FXSemaphore.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXSemaphore.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXSeparator.cpp
 # End Source File
 # Begin Source File
@@ -2293,6 +2321,14 @@ SOURCE=..\..\..\lib\FXSpheref.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXSpheref.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\lib\FXSpinLock.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXSpinLock.h
 # End Source File
 # Begin Source File
 

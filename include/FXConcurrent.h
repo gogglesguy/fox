@@ -109,8 +109,8 @@ private:
 private:
   FXConcurrent(const FXConcurrent&);
   FXConcurrent &operator=(const FXConcurrent&);
-public:
-
+protected:
+  virtual FXWorker* createWorker();
 public:
 
   /// Create ane initialize

@@ -41,7 +41,7 @@
 #include "FXhalf.h"
 #include "FXHash.h"
 #include "FXException.h"
-#include "FXAutoPtr.h"
+//#include "FXAutoPtr.h"
 #include "FXRefPtr.h"
 #include "FXElement.h"
 #include "FXArray.h"
