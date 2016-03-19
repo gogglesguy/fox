@@ -95,7 +95,7 @@ FXbool FXDir::open(const FXString& path){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
+    utf2ncs(buffer,path.text(),MAXPATHLEN);
     wcsncat(buffer,TEXT("\\*"),MAXPATHLEN);
 #else
     FXchar buffer[MAXPATHLEN];
@@ -174,7 +174,7 @@ FXbool FXDir::create(const FXString& path,FXuint perm){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
+    utf2ncs(buffer,path.text(),MAXPATHLEN);
     return CreateDirectoryW(buffer,NULL)!=0;
 #else
     return CreateDirectoryA(path.text(),NULL)!=0;
@@ -193,7 +193,7 @@ FXbool FXDir::remove(const FXString& path){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
+    utf2ncs(buffer,path.text(),MAXPATHLEN);
     return RemoveDirectoryW(buffer)!=0;
 #else
     return RemoveDirectoryA(path.text())!=0;
@@ -211,10 +211,11 @@ FXbool FXDir::rename(const FXString& srcpath,const FXString& dstpath){
   if(srcpath!=dstpath){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
-    utf2ncs(oldname,MAXPATHLEN,srcpath.text(),srcpath.length()+1);
-    utf2ncs(newname,MAXPATHLEN,dstpath.text(),dstpath.length()+1);
-    return ::MoveFileExW(oldname,newname,MOVEFILE_REPLACE_EXISTING)!=0;
+    FXnchar srcname[MAXPATHLEN];
+    FXnchar dstname[MAXPATHLEN];
+    utf2ncs(srcname,srcpath.text(),MAXPATHLEN);
+    utf2ncs(dstname,dstpath.text(),MAXPATHLEN);
+    return ::MoveFileExW(srcname,dstname,MOVEFILE_REPLACE_EXISTING)!=0;
 #else
     return ::MoveFileExA(srcpath.text(),dstpath.text(),MOVEFILE_REPLACE_EXISTING)!=0;
 #endif

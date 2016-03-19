@@ -1,4 +1,4 @@
-/*********** Generated on 2011/05/12 23:15:00 by reswrap version 5.1.1 *********/
+/*********** Generated on 2011/07/22 16:07:57 by reswrap version 5.1.1 *********/
 
 /* Created by reswrap from file adie_gif.gif */
 extern const unsigned char adie_gif[];

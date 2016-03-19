@@ -419,7 +419,6 @@ int main(int argc,char **argv){
         /* Output epilogue */
         if(needepilogue){
           epilogue(&opts);
-          needepilogue=0;
           }
 
         /* Check if argument provided */
@@ -441,7 +440,6 @@ int main(int argc,char **argv){
         /* Output epilogue */
         if(needepilogue){
           epilogue(&opts);
-          needepilogue=0;
           }
 
         /* Check if argument provided */

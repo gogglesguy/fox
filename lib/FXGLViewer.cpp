@@ -23,7 +23,7 @@
 #include "fxdefs.h"
 #include "fxkeys.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXElement.h"
 #include "FXStream.h"
 #include "FXVec2f.h"
@@ -2368,7 +2368,6 @@ long FXGLViewer::onUpdRollPitchYaw(FXObject* sender,FXSelector sel,void*){
 
 
 /******************************  Printing Support  *****************************/
-
 
 // Read back pixels
 // Derived from code contributed by <sancelot@crosswinds.net>

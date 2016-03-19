@@ -21,8 +21,8 @@
 #ifndef FXFILE_H
 #define FXFILE_H
 
-#ifndef FXIO_H
-#include "FXIO.h"
+#ifndef FXIODEVICE_H
+#include "FXIODevice.h"
 #endif
 
 
@@ -32,7 +32,7 @@ namespace FX {
 /**
 * Low level file access.
 */
-class FXAPI FXFile : public FXIO {
+class FXAPI FXFile : public FXIODevice {
 private:
   FXFile(const FXFile&);
   FXFile &operator=(const FXFile&);

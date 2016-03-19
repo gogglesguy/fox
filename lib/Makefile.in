@@ -88,32 +88,34 @@ am__objects_1 = FX88591Codec.lo FX88592Codec.lo FX88593Codec.lo \
 am__objects_2 =
 am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FX7Segment.lo FXAccelTable.lo FXApp.lo FXArrowButton.lo \
-	FXAtomic.lo FXBMPIcon.lo FXBMPImage.lo FXBitmap.lo \
-	FXBitmapFrame.lo FXBitmapView.lo FXButton.lo FXBZFileStream.lo \
-	FXCURCursor.lo FXCalendar.lo FXCalendarView.lo FXCanvas.lo \
-	FXCheckButton.lo FXChoiceBox.lo FXColorBar.lo FXColorDialog.lo \
-	FXColorList.lo FXColorRing.lo FXColors.lo FXColorSelector.lo \
-	FXColorWell.lo FXColorWheel.lo FXComboBox.lo FXComplexf.lo \
-	FXComplexd.lo FXComposeContext.lo FXComposite.lo FXConsole.lo \
-	FXCursor.lo FXDataTarget.lo FXDate.lo FXDC.lo FXDCPrint.lo \
-	FXDCWindow.lo FXDDSIcon.lo FXDDSImage.lo FXDLL.lo \
-	FXDebugTarget.lo FXDelegator.lo FXDial.lo FXDialogBox.lo \
-	FXDict.lo FXDir.lo FXDirBox.lo FXDirDialog.lo FXDirList.lo \
-	FXDirSelector.lo FXDirVisitor.lo FXDockBar.lo FXDockSite.lo \
-	FXDockHandler.lo FXDockTitle.lo FXDocument.lo FXDragCorner.lo \
-	FXDrawable.lo FXDriveBox.lo FXException.lo FXExpression.lo \
-	FXExtentd.lo FXExtentf.lo FXFile.lo FXFileDialog.lo \
-	FXFileDict.lo FXFileList.lo FXFileSelector.lo FXFileStream.lo \
-	FXFoldingList.lo FXFont.lo FXFontDialog.lo FXFontSelector.lo \
-	FXFrame.lo FXGIFCursor.lo FXGIFIcon.lo FXGIFImage.lo \
-	FXGLCanvas.lo FXGLCone.lo FXGLContext.lo FXGLCube.lo \
-	FXGLCylinder.lo FXGLObject.lo FXGLShape.lo FXGLSphere.lo \
-	FXGLTriangleMesh.lo FXGLViewer.lo FXGLVisual.lo FXGauge.lo \
-	FXGradientBar.lo FXGroupBox.lo FXGZFileStream.lo FXhalf.lo \
-	FXHash.lo FXHeader.lo FXHorizontalFrame.lo FXICOIcon.lo \
-	FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo FXIcon.lo \
-	FXIconDict.lo FXIconList.lo FXIconSource.lo FXId.lo FXImage.lo \
-	FXImageFrame.lo FXImageView.lo FXInputDialog.lo FXIO.lo \
+	FXAtomic.lo FXAutoThreadStorageKey.lo FXBarrier.lo \
+	FXBMPIcon.lo FXBMPImage.lo FXBitmap.lo FXBitmapFrame.lo \
+	FXBitmapView.lo FXButton.lo FXBZFileStream.lo FXCURCursor.lo \
+	FXCalendar.lo FXCalendarView.lo FXCanvas.lo FXCheckButton.lo \
+	FXChoiceBox.lo FXColorBar.lo FXColorDialog.lo FXColorList.lo \
+	FXColorRing.lo FXColors.lo FXColorSelector.lo FXColorWell.lo \
+	FXColorWheel.lo FXComboBox.lo FXComplexf.lo FXComplexd.lo \
+	FXComposeContext.lo FXComposite.lo FXConcurrent.lo \
+	FXCondition.lo FXConsole.lo FXCursor.lo FXDataTarget.lo \
+	FXDate.lo FXDC.lo FXDCPrint.lo FXDCWindow.lo FXDDSIcon.lo \
+	FXDDSImage.lo FXDLL.lo FXDebugTarget.lo FXDelegator.lo \
+	FXDial.lo FXDialogBox.lo FXDict.lo FXDir.lo FXDirBox.lo \
+	FXDirDialog.lo FXDirList.lo FXDirSelector.lo FXDirVisitor.lo \
+	FXDockBar.lo FXDockSite.lo FXDockHandler.lo FXDockTitle.lo \
+	FXDocument.lo FXDragCorner.lo FXDrawable.lo FXDriveBox.lo \
+	FXException.lo FXExpression.lo FXExtentd.lo FXExtentf.lo \
+	FXFile.lo FXFileDialog.lo FXFileDict.lo FXFileList.lo \
+	FXFileSelector.lo FXFileStream.lo FXFoldingList.lo FXFont.lo \
+	FXFontDialog.lo FXFontSelector.lo FXFrame.lo FXGIFCursor.lo \
+	FXGIFIcon.lo FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo \
+	FXGLContext.lo FXGLCube.lo FXGLCylinder.lo FXGLObject.lo \
+	FXGLShape.lo FXGLSphere.lo FXGLTriangleMesh.lo FXGLViewer.lo \
+	FXGLVisual.lo FXGauge.lo FXGradientBar.lo FXGroupBox.lo \
+	FXGZFileStream.lo FXhalf.lo FXHash.lo FXHeader.lo \
+	FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo \
+	FXIFFImage.lo FXIcon.lo FXIconDict.lo FXIconList.lo \
+	FXIconSource.lo FXId.lo FXImage.lo FXImageFrame.lo \
+	FXImageView.lo FXInputDialog.lo FXIO.lo FXIODevice.lo \
 	FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo FXJPGImage.lo \
 	FXKnob.lo FXLabel.lo FXList.lo FXListBox.lo FXLocale.lo \
 	FXMDIButton.lo FXMDIChild.lo FXMDIClient.lo FXMainWindow.lo \
@@ -122,40 +124,42 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXMenuBar.lo FXMenuButton.lo FXMenuCaption.lo FXMenuCascade.lo \
 	FXMenuCheck.lo FXMenuRadio.lo FXMenuCommand.lo FXMenuPane.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
-	FXMessageChannel.lo FXMetaClass.lo FXObject.lo FXObjectList.lo \
-	FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo FXPNGIcon.lo \
-	FXPNGImage.lo FXPPMIcon.lo FXPPMImage.lo FXPacker.lo FXPath.lo \
-	FXPicker.lo FXPipe.lo FXPopup.lo FXPoint.lo FXPrintDialog.lo \
-	FXProgressBar.lo FXProgressDialog.lo FXPtrList.lo \
-	FXPtrQueue.lo FXQuatd.lo FXQuatf.lo FXRASIcon.lo FXRASImage.lo \
-	FXRGBIcon.lo FXRGBImage.lo FXRadioButton.lo FXRangef.lo \
-	FXRanged.lo FXRangeSlider.lo FXRealSlider.lo FXRealSpinner.lo \
-	FXRecentFiles.lo FXRectangle.lo FXRegion.lo FXRegistry.lo \
-	FXReplaceDialog.lo FXRex.lo FXRootWindow.lo FXRuler.lo \
-	FXRulerView.lo FXScrollArea.lo FXScrollBar.lo FXScrollPane.lo \
-	FXScrollWindow.lo FXSearchDialog.lo FXSeparator.lo \
-	FXSettings.lo FXShell.lo FXShutter.lo FXSize.lo FXSlider.lo \
-	FXSocket.lo FXSpinner.lo FXSpheref.lo FXSphered.lo \
-	FXSplashWindow.lo FXSplitter.lo FXSpring.lo FXStat.lo \
-	FXStatusBar.lo FXStatusLine.lo FXStream.lo FXString.lo \
-	FXStringDict.lo FXSwitcher.lo FXSystem.lo FXTGAIcon.lo \
-	FXTGAImage.lo FXTIFIcon.lo FXTIFImage.lo FXTabBar.lo \
-	FXTabBook.lo FXTabItem.lo FXTable.lo FXText.lo FXTextCodec.lo \
+	FXMessageChannel.lo FXMetaClass.lo FXMutex.lo FXObject.lo \
+	FXObjectList.lo FXOptionMenu.lo FXPCXIcon.lo FXPCXImage.lo \
+	FXPNGIcon.lo FXPNGImage.lo FXPPMIcon.lo FXPPMImage.lo \
+	FXPacker.lo FXPath.lo FXPicker.lo FXPipe.lo FXPopup.lo \
+	FXPoint.lo FXPrintDialog.lo FXProcess.lo FXProgressBar.lo \
+	FXProgressDialog.lo FXPtrList.lo FXPtrQueue.lo FXQuatd.lo \
+	FXQuatf.lo FXRASIcon.lo FXRASImage.lo FXRGBIcon.lo \
+	FXRGBImage.lo FXRadioButton.lo FXRangef.lo FXRanged.lo \
+	FXRangeSlider.lo FXReadWriteLock.lo FXRealSlider.lo \
+	FXRealSpinner.lo FXRecentFiles.lo FXRectangle.lo FXRegion.lo \
+	FXRegistry.lo FXReplaceDialog.lo FXRex.lo FXRootWindow.lo \
+	FXRuler.lo FXRulerView.lo FXScrollArea.lo FXScrollBar.lo \
+	FXScrollPane.lo FXScrollWindow.lo FXSearchDialog.lo \
+	FXSemaphore.lo FXSeparator.lo FXSettings.lo FXShell.lo \
+	FXShutter.lo FXSize.lo FXSlider.lo FXSocket.lo FXSpinner.lo \
+	FXSpinLock.lo FXSpheref.lo FXSphered.lo FXSplashWindow.lo \
+	FXSplitter.lo FXSpring.lo FXStat.lo FXStatusBar.lo \
+	FXStatusLine.lo FXStream.lo FXString.lo FXStringDict.lo \
+	FXSwitcher.lo FXSystem.lo FXTGAIcon.lo FXTGAImage.lo \
+	FXTIFIcon.lo FXTIFImage.lo FXTabBar.lo FXTabBook.lo \
+	FXTabItem.lo FXTable.lo FXText.lo FXTextCodec.lo \
 	FXTextField.lo FXThread.lo FXThreadPool.lo FXToggleButton.lo \
 	FXToolBar.lo FXToolBarGrip.lo FXToolBarShell.lo \
 	FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo FXTranslator.lo \
 	FXTreeList.lo FXTreeListBox.lo FXTriStateButton.lo \
 	FXUndoList.lo FXURL.lo FXVec2d.lo FXVec2f.lo FXVec3d.lo \
 	FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
-	FXVisual.lo FXWindow.lo FXWizard.lo FXXBMIcon.lo FXXBMImage.lo \
-	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxcpuid.lo fxbmpio.lo \
-	fxddsio.lo fxezquantize.lo fxfsquantize.lo fxgetticks.lo \
-	fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo fxjp2io.lo \
-	fxkeyboard.lo fxkeysym.lo fxparsegeometry.lo fxpcxio.lo \
-	fxpngio.lo fxppmio.lo fxprintf.lo fxpriv.lo fxpsio.lo \
-	fxrasio.lo fxrgbio.lo fxscanf.lo fxstrtoll.lo fxstrtoull.lo \
-	fxstrtod.lo fxtargaio.lo fxtifio.lo fxunicode.lo fxutils.lo \
-	fxwuquantize.lo fxxbmio.lo fxxpmio.lo icons.lo \
+	FXVisual.lo FXWindow.lo FXWizard.lo FXWorker.lo FXXBMIcon.lo \
+	FXXBMImage.lo FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxcpuid.lo \
+	fxbmpio.lo fxddsio.lo fxezquantize.lo fxfsquantize.lo \
+	fxgetticks.lo fxgifio.lo fxicoio.lo fxiffio.lo fxjpegio.lo \
+	fxjp2io.lo fxkeyboard.lo fxkeysym.lo fxparsegeometry.lo \
+	fxpcxio.lo fxpngio.lo fxppmio.lo fxprintf.lo fxpriv.lo \
+	fxpsio.lo fxrasio.lo fxrgbio.lo fxscanf.lo fxstrtoll.lo \
+	fxstrtoull.lo fxstrtod.lo fxtargaio.lo fxtifio.lo fxunicode.lo \
+	fxutils.lo fxwuquantize.lo fxxbmio.lo fxxpmio.lo icons.lo \
 	$(am__objects_2) $(am__objects_2)
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 libFOX_1_7_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -388,6 +392,8 @@ bigcomputer.gif \
 bigdesktop.gif \
 bigdoc.gif \
 bigfloppy.gif \
+bigfloppy3.gif \
+bigfloppy5.gif \
 bigfolder.gif \
 bigfolderopen.gif \
 bignetdrive.gif \
@@ -502,6 +508,8 @@ FXAccelTable.cpp \
 FXApp.cpp \
 FXArrowButton.cpp \
 FXAtomic.cpp \
+FXAutoThreadStorageKey.cpp \
+FXBarrier.cpp \
 FXBMPIcon.cpp \
 FXBMPImage.cpp \
 FXBitmap.cpp \
@@ -528,6 +536,8 @@ FXComplexf.cpp \
 FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
+FXConcurrent.cpp \
+FXCondition.cpp \
 FXConsole.cpp \
 FXCursor.cpp \
 FXDataTarget.cpp \
@@ -608,6 +618,7 @@ FXImageFrame.cpp \
 FXImageView.cpp \
 FXInputDialog.cpp \
 FXIO.cpp \
+FXIODevice.cpp \
 FXJP2Icon.cpp \
 FXJP2Image.cpp \
 FXJPGIcon.cpp \
@@ -643,6 +654,7 @@ FXMenuTitle.cpp \
 FXMessageBox.cpp \
 FXMessageChannel.cpp \
 FXMetaClass.cpp \
+FXMutex.cpp \
 FXObject.cpp \
 FXObjectList.cpp \
 FXOptionMenu.cpp \
@@ -659,6 +671,7 @@ FXPipe.cpp  \
 FXPopup.cpp \
 FXPoint.cpp \
 FXPrintDialog.cpp \
+FXProcess.cpp \
 FXProgressBar.cpp \
 FXProgressDialog.cpp \
 FXPtrList.cpp \
@@ -673,6 +686,7 @@ FXRadioButton.cpp \
 FXRangef.cpp \
 FXRanged.cpp \
 FXRangeSlider.cpp \
+FXReadWriteLock.cpp \
 FXRealSlider.cpp \
 FXRealSpinner.cpp \
 FXRecentFiles.cpp \
@@ -689,6 +703,7 @@ FXScrollBar.cpp \
 FXScrollPane.cpp \
 FXScrollWindow.cpp \
 FXSearchDialog.cpp \
+FXSemaphore.cpp \
 FXSeparator.cpp \
 FXSettings.cpp \
 FXShell.cpp \
@@ -697,6 +712,7 @@ FXSize.cpp \
 FXSlider.cpp \
 FXSocket.cpp \
 FXSpinner.cpp \
+FXSpinLock.cpp \
 FXSpheref.cpp \
 FXSphered.cpp \
 FXSplashWindow.cpp \
@@ -746,6 +762,7 @@ FXVerticalFrame.cpp \
 FXVisual.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
+FXWorker.cpp \
 FXXBMIcon.cpp \
 FXXBMImage.cpp \
 FXXPMIcon.cpp \
@@ -896,9 +913,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXApp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXArrowButton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXAtomic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXAutoThreadStorageKey.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBMPIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBMPImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBZFileStream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBarrier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBitmap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBitmapFrame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXBitmapView.Plo@am__quote@
@@ -946,6 +965,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComplexf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComposeContext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXComposite.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXConcurrent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXCondition.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXConsole.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXCursor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXDC.Plo@am__quote@
@@ -1016,6 +1037,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIFFIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIFFImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIO.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIODevice.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIconDict.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXIconList.Plo@am__quote@
@@ -1061,6 +1083,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMessageBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMessageChannel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMetaClass.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXMutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXObject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXObjectList.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXOptionMenu.Plo@am__quote@
@@ -1077,6 +1100,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPoint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPopup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPrintDialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProcess.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProgressBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXProgressDialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPtrList.Plo@am__quote@
@@ -1091,6 +1115,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRangeSlider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRanged.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRangef.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXReadWriteLock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRealSlider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRealSpinner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXRecentFiles.Plo@am__quote@
@@ -1107,6 +1132,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXScrollPane.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXScrollWindow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSearchDialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSemaphore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSeparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSettings.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXShell.Plo@am__quote@
@@ -1116,6 +1142,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSocket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSphered.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSpheref.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSpinLock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSpinner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSplashWindow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXSplitter.Plo@am__quote@
@@ -1167,6 +1194,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVisual.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWindow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWizard.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWorker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXBMIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXBMImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXPMIcon.Plo@am__quote@

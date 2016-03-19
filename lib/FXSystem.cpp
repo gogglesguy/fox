@@ -27,6 +27,7 @@
 #include "FXString.h"
 #include "FXIO.h"
 #include "FXFile.h"
+#include "FXProcess.h"
 #include "FXSystem.h"
 #include "FXStat.h"
 
@@ -261,7 +262,7 @@ FXString FXSystem::getEnvironment(const FXString& name){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar variable[256],string[1024];
-    utf2ncs(variable,256,name.text(),name.length()+1);
+    utf2ncs(variable,name.text(),256);
     DWORD len=GetEnvironmentVariableW(variable,string,1024);
     return FXString(string,len);
 #else
@@ -282,11 +283,10 @@ FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
   if(!name.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar variable[256];
-    utf2ncs(variable,256,name.text(),name.length()+1);
+    FXnchar variable[256],string[1024];
+    utf2ncs(variable,name.text(),256);
     if(!value.empty()){
-      FXnchar string[1024];
-      utf2ncs(string,1024,value.text(),value.length()+1);
+      utf2ncs(string,value.text(),1024);
       return SetEnvironmentVariableW(variable,string)!=0;
       }
     return SetEnvironmentVariableW(variable,NULL)!=0;
@@ -330,9 +330,9 @@ FXbool FXSystem::setCurrentDirectory(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    TCHAR buffer[MAXPATHLEN];
-    utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
-    return SetCurrentDirectory(buffer)!=0;
+    FXnchar unipath[MAXPATHLEN];
+    utf2ncs(unipath,path.text(),MAXPATHLEN);
+    return SetCurrentDirectory(unipath)!=0;
 #else
     return SetCurrentDirectory(path.text())!=0;
 #endif
@@ -487,16 +487,6 @@ FXString FXSystem::getTempDirectory(){
   }
 
 
-// Get process id
-FXint FXSystem::getProcessId(){
-#ifdef WIN32
-  return GetCurrentProcessId();
-#else
-  return getpid();
-#endif
-  }
-
-
 // Return host name
 FXString FXSystem::getHostName(){
   FXchar name[MAXHOSTNAMELEN];
@@ -542,7 +532,7 @@ FXString FXSystem::getExecutableFilename(){
   DWORD len=GetModuleFileName(NULL,buffer,MAXPATHLEN);
   return FXString(buffer,len);
 #elif defined(__linux__)
-  FXint pid=FXSystem::getProcessId();
+  FXint pid=FXProcess::current();
   FXString filename=FXString::value("/proc/%d/exe",pid);
   return FXFile::symlink(filename);
 #else

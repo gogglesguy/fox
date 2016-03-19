@@ -31,19 +31,10 @@
 */
 
 
-// Systems that like LL for 64-bit long constant suffix
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__) || !defined(WIN32)
+// Largest unsigned long value
 #ifndef ULLONG_MAX
-#define ULLONG_MAX 18446744073709551615ULL
+#define ULLONG_MAX FXULONG(18446744073709551615)
 #endif
-
-// Systems with L for 64-bit long constant suffix
-#else
-#ifndef ULLONG_MAX
-#define ULLONG_MAX 18446744073709551615UL
-#endif
-#endif
-
 
 /*******************************************************************************/
 
@@ -105,7 +96,7 @@ FXulong __strtoull(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
     // Overflow check values
     cutlim=cutoff%base;
     cutoff=cutoff/base;
- 
+
     // Scan digits and aggregate number
     while(0<=(v=Ascii::digitValue(*s)) && v<base){
       if(!ovf){

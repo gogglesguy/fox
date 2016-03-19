@@ -204,6 +204,8 @@ struct FXAPI FXEvent {
     rootclick_x=0;
     rootclick_y=0;
     click_time=0;
+    click_button=0;
+    click_count=0;
     values[0]=0;
     values[1]=0;
     values[2]=0;

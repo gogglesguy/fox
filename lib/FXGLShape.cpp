@@ -22,7 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXElement.h"
 #include "FXStream.h"
 #include "FXVec2f.h"

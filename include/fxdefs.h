@@ -211,7 +211,7 @@ typedef unsigned int           FXuint;
 typedef int                    FXint;
 typedef float                  FXfloat;
 typedef double                 FXdouble;
-#ifdef WIN32
+#if defined(WIN32)
 typedef unsigned int           FXwchar;
 #if defined(_MSC_VER) && !defined(_NATIVE_WCHAR_T_DEFINED)
 typedef unsigned short         FXnchar;
@@ -237,6 +237,7 @@ typedef long long              FXlong;
 #error "FXlong and FXulong not defined for this architecture!"
 #endif
 
+
 // Integral types large enough to hold value of a pointer
 #if defined(_MSC_VER) && defined(_WIN64)
 typedef __int64                FXival;
@@ -244,6 +245,16 @@ typedef unsigned __int64       FXuval;
 #else
 typedef long                   FXival;
 typedef unsigned long          FXuval;
+#endif
+
+
+// Suffixes for 64-bit long constants
+#if defined(WIN32) && !defined(__GNUC__)
+#define FXLONG(c)  c ## i64
+#define FXULONG(c) c ## ui64
+#else
+#define FXLONG(c)  c ## LL
+#define FXULONG(c) c ## ULL
 #endif
 
 
@@ -273,6 +284,16 @@ typedef void*                  FXInputHandle;
 typedef FXint                  FXInputHandle;
 #endif
 
+// Thread ID type
+#if defined(WIN32)
+typedef void*                  FXThreadID;
+#else
+typedef unsigned long          FXThreadID;
+#endif
+
+// Thread-local storage key
+typedef FXuval                 FXThreadStorageKey;
+
 // Raw event type
 #ifdef WIN32
 typedef tagMSG    FXRawEvent;
@@ -301,55 +322,50 @@ const FXdouble DTOR=0.0174532925199432957692369077;
 /// Multiplier for radians to degrees
 const FXdouble RTOD=57.295779513082320876798154814;
 
-#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__)
 /// A time in the far, far future
-const FXTime forever=9223372036854775807LL;
-#else
-/// A time in the far, far future
-const FXTime forever=9223372036854775807L;
-#endif
+const FXTime forever=FXLONG(9223372036854775807);
 
 
 /**********************************  Macros  ***********************************/
 
 /// Abolute value
-#define FXABS(val) (((val)>=0)?(val):-(val))
+#define FXABS(val)         (((val)>=0)?(val):-(val))
 
 /// Return 1 if val >= 0 and -1 otherwise
-#define FXSGN(val) (((val)<0)?-1:1)
+#define FXSGN(val)         (((val)<0)?-1:1)
 
 /// Return 1 if val > 0, -1 if val < 0, and 0 otherwise
-#define FXSGNZ(val) ((val)<0?-1:(val)>0?1:0)
+#define FXSGNZ(val)        ((val)<0?-1:(val)>0?1:0)
 
 /// Return the maximum of a or b
-#define FXMAX(a,b) (((a)>(b))?(a):(b))
+#define FXMAX(a,b)         (((a)>(b))?(a):(b))
 
 /// Return the minimum of a or b
-#define FXMIN(a,b) (((a)>(b))?(b):(a))
+#define FXMIN(a,b)         (((a)>(b))?(b):(a))
 
 /// Return the minimum of x, y and z
-#define FXMIN3(x,y,z) ((x)<(y)?FXMIN(x,z):FXMIN(y,z))
+#define FXMIN3(x,y,z)      ((x)<(y)?FXMIN(x,z):FXMIN(y,z))
 
 /// Return the maximum of x, y and z
-#define FXMAX3(x,y,z) ((x)>(y)?FXMAX(x,z):FXMAX(y,z))
+#define FXMAX3(x,y,z)      ((x)>(y)?FXMAX(x,z):FXMAX(y,z))
 
 /// Return the minimum of x, y, z, and w
-#define FXMIN4(x,y,z,w) (FXMIN(FXMIN(x,y),FXMIN(z,w)))
+#define FXMIN4(x,y,z,w)    (FXMIN(FXMIN(x,y),FXMIN(z,w)))
 
 /// Return the maximum of of x, y, z, and w
-#define FXMAX4(x,y,z,w) (FXMAX(FXMAX(x,y),FXMAX(z,w)))
+#define FXMAX4(x,y,z,w)    (FXMAX(FXMAX(x,y),FXMAX(z,w)))
 
 /// Return minimum and maximum of a, b
 #define FXMINMAX(lo,hi,a,b) ((a)<(b)?((lo)=(a),(hi)=(b)):((lo)=(b),(hi)=(a)))
 
 /// Clamp value x to range [lo..hi]
-#define FXCLAMP(lo,x,hi) ((x)<(lo)?(lo):((x)>(hi)?(hi):(x)))
+#define FXCLAMP(lo,x,hi)   ((x)<(lo)?(lo):((x)>(hi)?(hi):(x)))
 
 /// Swap a pair of numbers
-#define FXSWAP(a,b,t) ((t)=(a),(a)=(b),(b)=(t))
+#define FXSWAP(a,b,t)      ((t)=(a),(a)=(b),(b)=(t))
 
 /// Linear interpolation between a and b, where 0<=f<=1
-#define FXLERP(a,b,f) ((a)+((b)-(a))*(f))
+#define FXLERP(a,b,f)      ((a)+((b)-(a))*(f))
 
 /// Offset of member in a structure
 #define STRUCTOFFSET(str,member) (((char *)(&(((str *)0)->member)))-((char *)0))
@@ -361,28 +377,42 @@ const FXTime forever=9223372036854775807L;
 #define CONTAINER(ptr,str,mem) ((str*)(((char*)(ptr))-STRUCTOFFSET(str,mem)))
 
 /// Make int out of two shorts
-#define MKUINT(l,h) ((((FX::FXuint)(l))&0xffff) | (((FX::FXuint)(h))<<16))
+#define MKUINT(l,h)        ((((FX::FXuint)(l))&0xffff) | (((FX::FXuint)(h))<<16))
 
 /// Make selector from message type and message id
-#define FXSEL(type,id) ((((FX::FXuint)(id))&0xffff) | (((FX::FXuint)(type))<<16))
+#define FXSEL(type,id)     ((((FX::FXuint)(id))&0xffff) | (((FX::FXuint)(type))<<16))
 
 /// Get type from selector
-#define FXSELTYPE(s) ((FX::FXushort)(((s)>>16)&0xffff))
+#define FXSELTYPE(s)       ((FX::FXushort)(((s)>>16)&0xffff))
 
 /// Get ID from selector
-#define FXSELID(s) ((FX::FXushort)((s)&0xffff))
+#define FXSELID(s)         ((FX::FXushort)((s)&0xffff))
 
-/// Reverse bits in byte
-#define FXBITREVERSE(b) (((b&0x01)<<7)|((b&0x02)<<5)|((b&0x04)<<3)|((b&0x08)<<1)|((b&0x10)>>1)|((b&0x20)>>3)|((b&0x40)>>5)|((b&0x80)>>7))
+/// Test if character c is at the start of a utf8 sequence (not a follower byte)
+#define FXISUTF8(c)        (((c)&0xC0)!=0x80)
 
-/// Test if character c is at the start of a utf8 sequence
-#define FXISUTF8(c) (((c)&0xC0)!=0x80)
+/// Check if c is leader/follower of a utf8 multi-byte sequence
+#define FXISLEADUTF8(c)    (((c)&0xC0)==0xC0)
+#define FXISFOLLOWUTF8(c)  (((c)&0xC0)==0x80)
 
-/// Test if character c is at start of utf16 sequence
-#define FXISUTF16(c) (((c)&0xDC00)!=0xDC00)
+/// Check if c is part of a utf8 multi-byte sequence
+#define FXISSEQUTF8(c)     (((c)&0x80)==0x80)
+
+/// Test if character c is at start of utf16 sequence (not a follower from surrogate pair)
+#define FXISUTF16(c)       (((c)&0xFC00)!=0xDC00)
+
+/// Check if c is leader/follower of a utf16 surrogate pair sequence
+#define FXISLEADUTF16(c)   (((c)&0xFC00)==0xD800)
+#define FXISFOLLOWUTF16(c) (((c)&0xFC00)==0xDC00)
+
+/// Check if c is part of a utf16 surrogate pair sequence
+#define FXISSEQUTF16(c)    (((c)&0xF800)==0xD800)
+
+/// Test if c is a legal utf32 character
+#define FXISUTF32(c)       ((c)<0x110000)
 
 /// Average of two FXColor ca and FXColor cb
-#define FXAVGCOLOR(ca,cb) (((ca)&(cb))+((((ca)^(cb))&0xFEFEFEFE)>>1))
+#define FXAVGCOLOR(ca,cb)  (((ca)&(cb))+((((ca)^(cb))&0xFEFEFEFE)>>1))
 
 
 // Definitions for big-endian machines
@@ -606,9 +636,6 @@ extern FXAPI void fxtrace(FXint level,const FXchar* format,...) FX_PRINTF(2,3) ;
 /// Sleep n microseconds
 extern FXAPI void fxsleep(FXuint n);
 
-/// Get process id
-extern FXAPI FXint fxgetpid();
-
 /// Convert string of length len to MSDOS; return new string and new length
 extern FXAPI FXbool fxtoDOS(FXchar*& string,FXint& len);
 
@@ -672,11 +699,15 @@ extern FXAPI FXint fxparsegeometry(const FXchar *string,FXint& x,FXint& y,FXint&
 /// True if executable with given path is a console application
 extern FXAPI FXbool fxisconsole(const FXchar *path);
 
+/// Return clock ticks from cpu tick-counter
+extern FXAPI FXTime fxgetticks();
+
 /// Version number that the library has been compiled with
 extern FXAPI const FXuchar fxversion[3];
 
 /// Controls tracing level
 extern FXAPI FXint fxTraceLevel;
+
 
 /// Return wide character from utf8 string at ptr
 extern FXAPI FXwchar wc(const FXchar *ptr);
@@ -684,83 +715,100 @@ extern FXAPI FXwchar wc(const FXchar *ptr);
 /// Return wide character from utf16 string at ptr
 extern FXAPI FXwchar wc(const FXnchar *ptr);
 
+
+/// Increment to start of next wide character in utf8 string
+extern FXAPI const FXchar* wcinc(const FXchar* ptr);
+
+/// Increment to start of next wide character in utf8 string
+extern FXAPI FXchar* wcinc(FXchar* ptr);
+
+/// Increment to start of next wide character in utf16 string
+extern FXAPI const FXnchar* wcinc(const FXnchar* ptr);
+
+/// Increment to start of next wide character in utf16 string
+extern FXAPI FXnchar* wcinc(FXnchar* ptr);
+
+/// Decrement to start of previous wide character in utf8 string
+extern FXAPI const FXchar* wcdec(const FXchar* ptr);
+
+/// Decrement to start of previous wide character in utf8 string
+extern FXAPI FXchar* wcdec(FXchar* ptr);
+
+/// Decrement to start of previous wide character in utf16 string
+extern FXAPI const FXnchar* wcdec(const FXnchar* ptr);
+
+/// Decrement to start of previous wide character in utf16 string
+extern FXAPI FXnchar* wcdec(FXnchar* ptr);
+
+/// Adjust ptr to point to leader of multi-byte sequence
+extern FXAPI const FXchar* wcstart(const FXchar* ptr);
+
+/// Adjust ptr to point to leader of multi-byte sequence
+extern FXAPI FXchar* wcstart(FXchar* ptr);
+
+/// Adjust ptr to point to leader of surrogate pair sequence
+extern FXAPI const FXnchar* wcstart(const FXnchar *ptr);
+
+/// Adjust ptr to point to leader of surrogate pair sequence
+extern FXAPI FXnchar* wcstart(FXnchar *ptr);
+
 /// Return number of FXchar's of wide character at ptr
 extern FXAPI FXint wclen(const FXchar *ptr);
 
 /// Return number of FXnchar's of narrow character at ptr
 extern FXAPI FXint wclen(const FXnchar *ptr);
 
-/// Return start of utf8 character containing position
-extern FXAPI FXint wcvalidate(const FXchar* string,FXint pos);
+/// Check if valid utf8 wide character representation; returns length or 0
+extern FXAPI FXint wcvalid(const FXchar* ptr);
 
-/// Return start of utf16 character containing position
-extern FXAPI FXint wcvalidate(const FXnchar *string,FXint pos);
-
-/// Check if valid utf8 wide character representation
-extern FXAPI FXbool wcvalid(const FXchar* ptr);
-
-/// Check if valid utf16 wide character representation
-extern FXAPI FXbool wcvalid(const FXnchar* ptr);
-
-/// Advance to next utf8 character start
-extern FXAPI FXint wcinc(const FXchar* string,FXint pos);
-
-/// Advance to next utf16 character start
-extern FXAPI FXint wcinc(const FXnchar *string,FXint pos);
-
-/// Retreat to previous utf8 character start
-extern FXAPI FXint wcdec(const FXchar* string,FXint pos);
-
-/// Retreat to previous utf16 character start
-extern FXAPI FXint wcdec(const FXnchar *string,FXint pos);
-
-/// Length of utf8 representation of wide characters string str of length n
-extern FXAPI FXint utfslen(const FXwchar *str,FXint n);
-
-/// Length of utf8 representation of wide character string str
-extern FXAPI FXint utfslen(const FXwchar *str);
-
-/// Length of utf8 representation of narrow characters string str of length n
-extern FXAPI FXint utfslen(const FXnchar *str,FXint n);
-
-/// Length of utf8 representation of narrow characters string str
-extern FXAPI FXint utfslen(const FXnchar *str);
-
-/// Length of wide character representation of utf8 string str of length n
-extern FXAPI FXint wcslen(const FXchar *str,FXint n);
-
-/// Length of wide character representation of utf8 string str
-extern FXAPI FXint wcslen(const FXchar *str);
-
-/// Length of narrow character representation of utf8 string str of length n
-extern FXAPI FXint ncslen(const FXchar *str,FXint n);
-
-/// Length of narrow character representation of utf8 string str
-extern FXAPI FXint ncslen(const FXchar *str);
+/// Check if valid utf16 wide character representation; returns length or 0
+extern FXAPI FXint wcvalid(const FXnchar* ptr);
 
 
-/// Convert utf8 string from src to wide character w, returning number of bytes consumed
-extern FXAPI FXint utf2wc(FXwchar& w,const FXchar* src);
+/// Return number of bytes for utf8 representation of wide character w
+extern FXAPI FXint wc2utf(FXwchar w);
+
+/// Return number of narrow characters for utf16 representation of wide character w
+extern FXAPI FXint wc2nc(FXwchar w);
+
+/// Return number of bytes for utf8 representation of wide character string
+extern FXAPI FXint wcs2utf(const FXwchar* ptr,FXint len);
+extern FXAPI FXint wcs2utf(const FXwchar* ptr);
+
+/// Return number of bytes for utf8 representation of narrow character string
+extern FXAPI FXint ncs2utf(const FXnchar* ptr,FXint len);
+extern FXAPI FXint ncs2utf(const FXnchar* ptr);
+
+/// Return number of wide characters for utf8 character string
+extern FXAPI FXint utf2wcs(const FXchar *ptr,FXint len);
+extern FXAPI FXint utf2wcs(const FXchar *ptr);
+
+/// Return number of narrow characters for utf8 character string
+extern FXAPI FXint utf2ncs(const FXchar *ptr,FXint len);
+extern FXAPI FXint utf2ncs(const FXchar *ptr);
 
 
-/// Convert wide character w to utf8 string at dst, returning number of bytes produced
-extern FXAPI FXint wc2utf(FXchar* dst,FXwchar w);
+/// Convert wide character to utf8 string
+extern FXAPI FXint wc2utf(FXchar *dst,FXwchar w);
 
+/// Convert wide character to narrow character string
+extern FXAPI FXint wc2nc(FXnchar *dst,FXwchar w);
 
-/// Copy utf8 string of length sn to wide character string dst of size dn
-extern FXAPI FXint utf2wcs(FXwchar *dst,FXint dn,const FXchar *src,FXint sn);
+/// Convert wide character string to utf8 string
+extern FXAPI FXint wcs2utf(FXchar *dst,const FXwchar* src,FXint dlen,FXint slen);
+extern FXAPI FXint wcs2utf(FXchar *dst,const FXwchar* src,FXint dlen);
 
-/// Copy utf8 string of length sn to narrow character string dst of size dn
-extern FXAPI FXint utf2ncs(FXnchar *dst,FXint dn,const FXchar *src,FXint sn);
+/// Convert narrow character string to utf8 string
+extern FXAPI FXint ncs2utf(FXchar *dst,const FXnchar* src,FXint dlen,FXint slen);
+extern FXAPI FXint ncs2utf(FXchar *dst,const FXnchar* src,FXint dlen);
 
-/// Copy wide character substring of length sn to dst of size dn
-extern FXAPI FXint wc2utfs(FXchar* dst,FXint dn,const FXwchar *src,FXint sn);
+/// Convert utf8 string to wide character string
+extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar* src,FXint dlen,FXint slen);
+extern FXAPI FXint utf2wcs(FXwchar *dst,const FXchar* src,FXint dlen);
 
-/// Copy narrow character substring of length sn to dst of size dn
-extern FXAPI FXint nc2utfs(FXchar* dst,FXint dn,const FXnchar *src,FXint sn);
-
-/// Return clock ticks from cpu tick-counter
-extern FXAPI FXTime fxgetticks();
+/// Convert utf8 string to narrow character string
+extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen,FXint slen);
+extern FXAPI FXint utf2ncs(FXnchar *dst,const FXchar* src,FXint dlen);
 
 }
 

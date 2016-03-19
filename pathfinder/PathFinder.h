@@ -60,6 +60,7 @@ protected:
   FXDirList         *dirlist;		// Directory tree
   FXFileList        *filelist;		// File list
   FXComboBox        *pattern;		// Filter pattern
+  FXLabel           *diskspace;         // Show free space
   FXTextField       *address;		// Address field
   FXImageView       *imagepreview;	// Image preview panel
   FXRecentFiles      bookmarkeddirs;	// Bookmarked directories
@@ -138,6 +139,7 @@ public:
   long onUpdBackDirectory(FXObject*,FXSelector,void*);
   long onCmdForwardDirectory(FXObject*,FXSelector,void*);
   long onUpdForwardDirectory(FXObject*,FXSelector,void*);
+  long onUpdDiskSpace(FXObject*,FXSelector,void*);
 
   long onCmdClipboardCut(FXObject*,FXSelector,void*);
   long onCmdClipboardCopy(FXObject*,FXSelector,void*);
@@ -184,6 +186,7 @@ public:
     ID_FILELIST,
     ID_DIRBOX,
     ID_UPDATE_FILES,
+    ID_DISKSPACE,
     ID_UPDIRECTORY,
     ID_MAINWINDOW,
     ID_GOTO_LOCATION,

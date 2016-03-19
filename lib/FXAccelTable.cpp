@@ -25,7 +25,7 @@
 #include "fxascii.h"
 #include "fxunicode.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXElement.h"

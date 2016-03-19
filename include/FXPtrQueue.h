@@ -28,9 +28,9 @@ namespace FX {
 class FXAPI FXPtrQueue {
 private:
   void**          list;         // List of pointers
+  volatile FXuint size;         // Size of list
   volatile FXuint head;         // Write side
   volatile FXuint tail;         // Read side
-  volatile FXuint size;         // Size of list
 private:
   FXPtrQueue(const FXPtrQueue&);
   FXPtrQueue &operator=(const FXPtrQueue&);

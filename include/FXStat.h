@@ -43,15 +43,6 @@ private:
   FXlong  fileSize;             /// File size
 public:
 
-  /// Get statistics of the file into the stat buffer info
-  static FXbool statFile(const FXString& file,FXStat& info);
-
-  /// Get statistice of the link into the stat buffer info
-  static FXbool statLink(const FXString& file,FXStat& info);
-
-  /// Get statistics of already open file into stat buffer info
-  static FXbool stat(const FXFile& file,FXStat& info);
-
   /// Return the mode flags for this file
   FXuint mode() const { return modeFlags; }
 
@@ -159,6 +150,17 @@ public:
 
   /// Return true if the file has the sticky bit set
   FXbool isSetSticky() const;
+
+
+  /// Get statistics of the file into the stat buffer info
+  static FXbool statFile(const FXString& file,FXStat& info);
+
+  /// Get statistice of the link into the stat buffer info
+  static FXbool statLink(const FXString& file,FXStat& info);
+
+  /// Get statistics of already open file into stat buffer info
+  static FXbool stat(const FXFile& file,FXStat& info);
+
 
   /// Return the mode flags for this file
   static FXuint mode(const FXString& file);
@@ -268,6 +270,11 @@ public:
   /// Return true if the file has the sticky bit set
   static FXbool isSetSticky(const FXString& file);
 
+  /// Obtain total amount of space on disk mounted at given path
+  static FXbool getTotalDiskSpace(const FXString& path,FXulong& space);
+  
+  /// Obtain available amount of space on disk mounted at given path
+  static FXbool getAvailableDiskSpace(const FXString& path,FXulong& space);
   };
 
 

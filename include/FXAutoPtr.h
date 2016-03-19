@@ -24,6 +24,14 @@
 namespace FX {
 
 
+/// Implicitly used FXAutoPtrRef to hand FXAutoPtr through implicitly called
+/// constructors and conversion operators.  Probably not used directly.
+template<typename EType> struct FXAutoPtrRef {
+  EType* ptr;
+  explicit FXAutoPtrRef(EType* src):ptr(src){ }
+  };
+
+
 /// Automatic pointer
 template <class EType> class FXAutoPtr {
 private:
@@ -31,19 +39,25 @@ private:
 public:
 
   /// Construct from optional pointer
-  FXAutoPtr(EType* src=NULL):ptr(src){ }
+  explicit FXAutoPtr(EType* src=NULL):ptr(src){ }
 
   /// Construct from another automatic pointer
   FXAutoPtr(FXAutoPtr<EType>& src):ptr(src.release()){ }
 
+  /// Construct from FXAutoPtrRef 
+  FXAutoPtr(FXAutoPtrRef<EType> src):ptr(src.ptr){ }
+  
   /// Construct from another automatic pointer of compatible type
-  template <class T> FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
+  template <class T> explicit FXAutoPtr(FXAutoPtr<T>& src):ptr(src.release()){ }
 
   /// Assign from pointer
   FXAutoPtr& operator=(EType *src){ ptr=src; return *this; }
 
   /// Assign from an another automatic pointer
   FXAutoPtr& operator=(FXAutoPtr<EType>& src){ return reset(src.release()); }
+
+  /// Assign from FXAutoPtrRef
+  FXAutoPtr& operator=(FXAutoPtrRef<EType> src){ if(src.ptr!=ptr){ delete ptr; ptr=src.ptr; } return *this; }
 
   /// Assign from an automatic pointer with compatible type
   template <class T> FXAutoPtr& operator=(FXAutoPtr<T>& src){ return reset(src.release()); }
@@ -53,6 +67,12 @@ public:
 
   /// Conversion operators
   operator EType*() const { return ptr; }
+
+  /// Conversion to FXAutoPtr of another type T
+  template<typename T> operator FXAutoPtr<T>() throw() { return FXAutoPtr<T>(this->release()); }
+
+  /// Conversion to FXAutoPtrRef of another type T
+  template<typename T> operator FXAutoPtrRef<T>() throw() { return FXAutoPtrRef<T>(this->release()); }
 
   /// Dereference operator
   EType& operator*() const { return *ptr; }

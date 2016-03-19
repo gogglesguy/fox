@@ -111,10 +111,6 @@ extern FXAPI FXString getUserDirectory(const FXString& user);
 extern FXAPI FXString getTempDirectory();
 
 
-/// Get process id
-extern FXAPI FXint getProcessId();
-
-
 /// Return host name
 extern FXAPI FXString getHostName();
 

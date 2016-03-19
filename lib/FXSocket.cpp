@@ -27,6 +27,7 @@
 #include "FXString.h"
 #include "FXPath.h"
 #include "FXIO.h"
+#include "FXIODevice.h"
 #include "FXSocket.h"
 
 
@@ -55,13 +56,13 @@ namespace FX {
 
 // Construct file and attach existing handle h
 FXSocket::FXSocket(FXInputHandle h,FXuint m){
-  FXIO::open(h,m);
+  open(h,m);
   }
 
 
 // Open device with access mode and handle
 FXbool FXSocket::open(FXInputHandle h,FXuint m){
-  return FXIO::open(h,m);
+  return FXIODevice::open(h,m);
   }
 
 

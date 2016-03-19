@@ -24,7 +24,7 @@
 #include "fxascii.h"
 #include "fxkeys.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXColors.h"

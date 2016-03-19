@@ -38,6 +38,7 @@ image \
 mditest \
 shutter \
 splitter \
+process \
 switcher \
 tabbook \
 ratio \
@@ -46,7 +47,7 @@ gaugetest \
 gltest \
 glviewer
 
-gaugetest_SOURCES           = gaugetest.cpp
+gaugetest_SOURCES       = gaugetest.cpp
 format_SOURCES          = format.cpp
 scan_SOURCES            = scan.cpp
 console_SOURCES         = console.cpp
@@ -75,6 +76,7 @@ header_SOURCES		= header.cpp
 hello_SOURCES		= hello.cpp
 hello2_SOURCES		= hello2.cpp
 switcher_SOURCES	= switcher.cpp
+process_SOURCES	        = process.cpp
 iconlist_SOURCES	= iconlist.cpp
 tabbook_SOURCES		= tabbook.cpp
 ratio_SOURCES		= ratio.cpp

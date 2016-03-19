@@ -23,7 +23,12 @@
 #include "fxdefs.h"
 #include "FXElement.h"
 #include "FXPtrQueue.h"
+#include "FXMutex.h"
+#include "FXCondition.h"
+#include "FXAutoThreadStorageKey.h"
+#include "FXRunnable.h"
 #include "FXThread.h"
+#include "FXWorker.h"
 #include "FXThreadPool.h"
 #include "FXException.h"
 
@@ -63,29 +68,6 @@ using namespace FX;
 
 
 namespace FX {
-
-/*******************************************************************************/
-
-
-// Create worker
-FXWorker::FXWorker(FXThreadPool *p):pool(p){
-  FXTRACE((100,"FXWorker::FXWorker %p\n",this));
-  }
-
-
-// Worker runs jobs, then dies
-FXint FXWorker::run(){
-  pool->run();
-  delete this;
-  return 0;
-  }
-
-
-// Destroy worker
-FXWorker::~FXWorker(){
-  FXTRACE((100,"FXWorker::~FXWorker %p\n",this));
-  }
-
 
 /*******************************************************************************/
 
@@ -173,13 +155,13 @@ FXTime FXThreadPool::getExpiration() const {
 
 
 // Create and start a worker
-FXbool FXThreadPool::startWorker(){
-  FXWorker *wrk=new FXWorker(this);
-  if(!wrk->start()){
-    delete wrk;
-    return false;
+FXWorker* FXThreadPool::startWorker(){
+  FXWorker *worker=new FXWorker(this);
+  if(!worker->start()){
+    delete worker;
+    return NULL;
     }
-  return true;
+  return worker;
   }
 
 

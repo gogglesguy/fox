@@ -21,8 +21,8 @@
 #ifndef FXPIPE_H
 #define FXPIPE_H
 
-#ifndef FXIO_H
-#include "FXIO.h"
+#ifndef FXIODEVICE_H
+#include "FXIODevice.h"
 #endif
 
 
@@ -35,7 +35,7 @@ namespace FX {
 /**
 * Pipe i/o device.
 */
-class FXAPI FXPipe : public FXIO {
+class FXAPI FXPipe : public FXIODevice {
 private:
   FXPipe(const FXPipe&);
   FXPipe &operator=(const FXPipe&);

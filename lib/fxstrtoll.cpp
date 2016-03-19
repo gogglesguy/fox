@@ -29,27 +29,15 @@
   - Thread-safe conversion of strings to signed long and int, with extra parameter
     for conversion success.
 */
+ 
 
-
-// Systems that like LL for 64-bit long constant suffix
-#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(__SC__) || defined(__BCPLUSPLUS__) || !defined(WIN32)
+// Largest and smallest unsigned long value
 #ifndef LLONG_MAX
-#define LLONG_MAX  9223372036854775807LL
+#define LLONG_MAX  FXLONG(9223372036854775807)
 #endif
 #ifndef LLONG_MIN
-#define LLONG_MIN  (-LLONG_MAX-1LL)
+#define LLONG_MIN  (-LLONG_MAX-FXLONG(1))
 #endif
-
-// Systems with L for 64-bit long constant suffix
-#else
-#ifndef LLONG_MAX
-#define LLONG_MAX  9223372036854775807L
-#endif
-#ifndef LLONG_MIN
-#define LLONG_MIN  (-LLONG_MAX-1L)
-#endif
-#endif
-
 
 /*******************************************************************************/
 

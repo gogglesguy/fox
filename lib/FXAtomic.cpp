@@ -141,7 +141,7 @@ FXint atomicAdd(volatile FXint* ptr,FXint v){
 // Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 FXint atomicCas(volatile FXint* ptr,FXint expect,FXint v){
 #if defined(WIN32)
-  return InterlockedCompareExchange((volatile LONG*)ptr,v,expect);
+  return InterlockedCompareExchange((LONG*)ptr,v,expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && (defined(__i386__) || defined(__x86_64__)))
   register FXint ret;
   __asm__ __volatile__("lock\n\t"
@@ -233,7 +233,7 @@ void* atomicAdd(void* volatile* ptr,FXival v){
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 void* atomicCas(void* volatile* ptr,void* expect,void* v){
 #if defined(WIN32)
-  return InterlockedCompareExchangePointer(ptr,v,expect);
+  return InterlockedCompareExchangePointer((void**)ptr,v,expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register void* ret=(void*)v;
   __asm__ __volatile__("lock\n\t"
@@ -259,7 +259,7 @@ void* atomicCas(void* volatile* ptr,void* expect,void* v){
 // Atomically compare pointer variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 FXbool atomicBoolCas(void* volatile* ptr,void* expect,void* v){
 #if defined(WIN32)
-  return (InterlockedCompareExchangePointer(ptr,v,expect)==expect);
+  return (InterlockedCompareExchangePointer((void**)ptr,v,expect)==expect);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
   register FXbool ret;
   __asm__ __volatile__ ("lock\n\t"

@@ -23,7 +23,7 @@
 #include "fxdefs.h"
 #include "fxascii.h"
 #include "FXHash.h"
-#include "FXThread.h"
+#include "FXMutex.h"
 #include "FXStream.h"
 #include "FXString.h"
 #include "FXElement.h"
@@ -253,9 +253,9 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
   // Font substitution
 #ifdef UNICODE
-  utf2ncs(lf.lfFaceName,LF_FACESIZE,wantfamily.text(),wantfamily.length()+1);
+  utf2ncs(lf.lfFaceName,wantfamily.text(),LF_FACESIZE);
 #else
-  strncpy(lf.lfFaceName,wantfamily.text(),sizeof(lf.lfFaceName));
+  strncpy(lf.lfFaceName,wantfamily.text(),LF_FACESIZE);
 #endif
 
   // Here we go!
@@ -1687,9 +1687,7 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
   if(font){
 #if defined(WIN32)              ///// WIN32 /////
     FXnchar sbuffer[4096];
-    FXASSERT(dc!=NULL);
-    FXint count=utf2ncs(sbuffer,4096,string,FXMIN(length,4096));
-    FXASSERT(count<=length);
+    FXint count=utf2ncs(sbuffer,string,4096,length);
     SIZE size;
     GetTextExtentPoint32W((HDC)dc,sbuffer,count,&size);
     return size.cx;

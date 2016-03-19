@@ -21,8 +21,8 @@
 #ifndef FXSOCKET_H
 #define FXSOCKET_H
 
-#ifndef FXIO_H
-#include "FXIO.h"
+#ifndef FXIODEVICE_H
+#include "FXIODevice.h"
 #endif
 
 
@@ -35,7 +35,7 @@ namespace FX {
 /**
 * Socket i/o device.
 */
-class FXAPI FXSocket : public FXIO {
+class FXAPI FXSocket : public FXIODevice {
 private:
   FXSocket(const FXSocket&);
   FXSocket &operator=(const FXSocket&);

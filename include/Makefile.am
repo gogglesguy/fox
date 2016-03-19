@@ -55,9 +55,11 @@ FX7Segment.h \
 FXAccelTable.h \
 FXApp.h \
 FXArray.h \
-FXAtomic.h \
 FXArrowButton.h \
+FXAtomic.h \
 FXAutoPtr.h \
+FXAutoThreadStorageKey.h \
+FXBarrier.h \
 FXBMPIcon.h \
 FXBMPImage.h \
 FXBitmap.h \
@@ -84,6 +86,8 @@ FXComplexf.h \
 FXComplexd.h \
 FXComposeContext.h \
 FXComposite.h \
+FXConcurrent.h \
+FXCondition.h \
 FXConsole.h \
 FXCursor.h \
 FXDate.h \
@@ -157,6 +161,7 @@ FXICOImage.h \
 FXIFFImage.h \
 FXIFFIcon.h \
 FXIO.h \
+FXIODevice.h \
 FXIcon.h \
 FXIconDict.h \
 FXIconList.h \
@@ -200,6 +205,7 @@ FXMenuSeparator.h \
 FXMenuTitle.h \
 FXMessageBox.h \
 FXMetaClass.h \
+FXMutex.h \
 FXObject.h \
 FXObjectList.h \
 FXOptionMenu.h \
@@ -216,6 +222,7 @@ FXPipe.h \
 FXPoint.h \
 FXPopup.h \
 FXPrintDialog.h \
+FXProcess.h \
 FXProgressBar.h \
 FXProgressDialog.h \
 FXPtrList.h \
@@ -231,6 +238,7 @@ FXRadioButton.h \
 FXRangef.h \
 FXRanged.h \
 FXRangeSlider.h \
+FXReadWriteLock.h \
 FXRealSlider.h \
 FXRealSpinner.h \
 FXRecentFiles.h \
@@ -243,11 +251,13 @@ FXRex.h \
 FXRootWindow.h \
 FXRuler.h \
 FXRulerView.h \
+FXRunnable.h \
 FXScrollArea.h \
 FXScrollBar.h \
 FXScrollPane.h \
 FXScrollWindow.h \
 FXSearchDialog.h \
+FXSemaphore.h \
 FXSeparator.h \
 FXSettings.h \
 FXShell.h \
@@ -256,6 +266,7 @@ FXSize.h \
 FXSlider.h \
 FXSocket.h \
 FXSpinner.h \
+FXSpinLock.h \
 FXSpheref.h \
 FXSphered.h \
 FXSplashWindow.h \
@@ -305,6 +316,7 @@ FXVerticalFrame.h \
 FXVisual.h \
 FXWindow.h \
 FXWizard.h \
+FXWorker.h \
 FXXBMIcon.h \
 FXXBMImage.h \
 FXXPMIcon.h \
@@ -314,6 +326,7 @@ fx3d.h \
 fxascii.h \
 fxcpuid.h \
 fxdefs.h \
+fxendian.h \
 fxkeys.h \
 fxunicode.h \
 fxver.h \

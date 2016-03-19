@@ -24,6 +24,9 @@
 #include "fxkeys.h"
 #include "fxascii.h"
 #include "FXHash.h"
+#include "FXMutex.h"
+#include "FXAutoThreadStorageKey.h"
+#include "FXRunnable.h"
 #include "FXThread.h"
 #include "FXStream.h"
 #include "FXString.h"
@@ -1999,19 +2002,19 @@ FXbool FXApp::addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode
 #ifdef WIN32
   register FXint in;
   if(fd==INVALID_HANDLE_VALUE || fd==NULL) return false;
-  for(in=0; in<=maxhandle; in++){      // See if existing handle
-    if(handles->hnd[in]==fd) goto r;       // If existing handle, just replace callbacks
+  for(in=0; in<=maxhandle; in++){       // See if existing handle
+    if(handles->hnd[in]==fd) goto r;    // If existing handle, just replace callbacks
     }
   if(maxhandle+1>=MAXIMUM_WAIT_OBJECTS) return false;
-  if(maxhandle+1>=ninputs){            // Grow table of callbacks
+  if(maxhandle+1>=ninputs){             // Grow table of callbacks
     resizeElms(inputs,ninputs+1);
     memset(&inputs[ninputs],0,sizeof(FXInput));
     ninputs=ninputs+1;
     }
-  in=++maxhandle;                      // One more handle
+  in=++maxhandle;                       // One more handle
   handles->hnd[in]=fd;
 r:FXASSERT(in<ninputs);
-  if(mode&INPUT_READ){                // Replace callbacks
+  if(mode&INPUT_READ){                  // Replace callbacks
     inputs[in].read.target=tgt;
     inputs[in].read.message=sel;
     inputs[in].read.data=ptr;
@@ -2028,7 +2031,7 @@ r:FXASSERT(in<ninputs);
     }
 #else
   if(fd<0 || fd>=FD_SETSIZE) return false;
-  if(fd>=ninputs){                    // Grow table of callbacks
+  if(fd>=ninputs){                      // Grow table of callbacks
     resizeElms(inputs,fd+1);
     memset(&inputs[ninputs],0,sizeof(FXInput)*(fd+1-ninputs));
     ninputs=fd+1;
@@ -2065,7 +2068,7 @@ FXbool FXApp::removeInput(FXInputHandle fd,FXuint mode){
 #ifdef WIN32
   register FXint in;
   if(fd==INVALID_HANDLE_VALUE || fd==NULL) return false;
-  for(in=0; in<=maxhandle; in++){        // See if existing handle
+  for(in=0; in<=maxhandle; in++){       // See if existing handle
     if(handles->hnd[in]==fd) goto r;
     }
   return false;                         // Handle didn't exist, so nothing to remove
@@ -4122,7 +4125,7 @@ static void getSystemFont(FXFontDesc& fontdesc){
 #endif
   SystemParametersInfo(SPI_GETNONCLIENTMETRICS,sizeof(NONCLIENTMETRICS),&ncm,0);
 #if defined(UNICODE)
-  nc2utfs(fontdesc.face,sizeof(fontdesc.face),ncm.lfMenuFont.lfFaceName,LF_FACESIZE);
+  ncs2utf(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face),LF_FACESIZE);
 #else
   strncpy(fontdesc.face,ncm.lfMenuFont.lfFaceName,sizeof(fontdesc.face));
 #endif

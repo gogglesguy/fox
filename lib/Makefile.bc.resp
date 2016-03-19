@@ -19,6 +19,8 @@
 +FXApp.obj &
 +FXArrowButton.obj &
 +FXAtomic.obj &
++FXAutoThreadStorageKey.obj &
++FXBarrier.obj &
 +FXBMPIcon.obj &
 +FXBMPImage.obj &
 +FXBitmap.obj &
@@ -45,6 +47,8 @@
 +FXComplexd.obj &
 +FXComposeContext.obj &
 +FXComposite.obj &
++FXConcurrent.obj &
++FXCondition.obj &
 +FXConsole.obj &
 +FXCP1250Codec.obj &
 +FXCP1251Codec.obj &
@@ -149,6 +153,7 @@
 +FXImageView.obj &
 +FXInputDialog.obj &
 +FXIO.obj &
++FXIODevice.obj &
 +FXJP2Icon.obj &
 +FXJP2Image.obj &
 +FXJPGIcon.obj &
@@ -183,6 +188,7 @@
 +FXMessageBox.obj &
 +FXMessageChannel.obj &
 +FXMetaClass.obj &
++FXMutex.obj &
 +FXObject.obj &
 +FXObjectList.obj &
 +FXOptionMenu.obj &
@@ -199,6 +205,7 @@
 +FXPopup.obj &
 +FXPoint.obj &
 +FXPrintDialog.obj &
++FXProcess.obj &
 +FXProgressBar.obj &
 +FXProgressDialog.obj &
 +FXPtrList.obj &
@@ -211,6 +218,7 @@
 +FXRangef.obj &
 +FXRanged.obj &
 +FXRangeSlider.obj &
++FXReadWriteLock.obj &
 +FXRealSlider.obj &
 +FXRealSpinner.obj &
 +FXRecentFiles.obj &
@@ -229,6 +237,7 @@
 +FXScrollWindow.obj &
 +FXScrollBar.obj &
 +FXSearchDialog.obj &
++FXSemaphore.obj &
 +FXSeparator.obj &
 +FXSettings.obj &
 +FXShell.obj &
@@ -240,6 +249,7 @@
 +FXSphered.obj &
 +FXSplashWindow.obj &
 +FXSpinner.obj &
++FXSpinLock.obj &
 +FXSplitter.obj &
 +FXSpring.obj &
 +FXStat.obj &
@@ -289,6 +299,7 @@
 +FXVisual.obj &
 +FXWindow.obj &
 +FXWizard.obj &
++FXWorker.obj &
 +FXXBMIcon.obj &
 +FXXBMImage.obj &
 +FXXPMIcon.obj &

@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxendian.h"
 #include "fxascii.h"
 #include "FXHash.h"
 #include "FXStream.h"
@@ -206,7 +207,7 @@ void fxassert(const FXchar* expression,const FXchar* filename,unsigned int linen
     }
   else{
     fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
-    }    
+    }
 #endif
   }
 
@@ -371,22 +372,14 @@ FXbool fxfromDOS(FXchar*& string,FXint& len){
   }
 
 
-// Get process id
-FXint fxgetpid(){
-#ifdef WIN32
-  return (int)GetCurrentProcessId();
-#else
-  return getpid();
-#endif
-  }
-
 extern FXAPI FILE *fxopen(const char *filename,const char *mode);
 
 FILE *fxopen(const char *filename,const char *mode){
 #if defined(WIN32) && defined(UNICODE)
-  FXnchar unifile[MAXPATHLEN],unimode[8];
-  utf2ncs(unifile,MAXPATHLEN,filename,strlen(filename)+1);
-  utf2ncs(unimode,8,mode,strlen(mode)+1);
+  FXnchar unifile[MAXPATHLEN];
+  FXnchar unimode[8];
+  utf2ncs(unifile,filename,MAXPATHLEN);
+  utf2ncs(unimode,mode,8);
   return _wfopen(unifile,unimode);
 #else
   return fopen(filename,mode);
@@ -397,9 +390,10 @@ extern FXAPI FILE *fxreopen(const char *filename,const char *mode,FILE * stream)
 
 FILE *fxreopen(const char *filename,const char *mode,FILE * stream){
 #if defined(WIN32) && defined(UNICODE)
-  FXnchar unifile[MAXPATHLEN],unimode[8];
-  utf2ncs(unifile,MAXPATHLEN,filename,strlen(filename)+1);
-  utf2ncs(unimode,8,mode,strlen(mode)+1);
+  FXnchar unifile[MAXPATHLEN];
+  FXnchar unimode[8];
+  utf2ncs(unifile,filename,MAXPATHLEN);
+  utf2ncs(unimode,mode,8);
   return _wfreopen(unifile,unimode,stream);
 #else
   return freopen(filename,mode,stream);

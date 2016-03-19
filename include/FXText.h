@@ -175,7 +175,7 @@ protected:
   void moveContents(FXint x,FXint y);
   void moveCursor(FXint pos,FXbool notify=false);
   void moveCursorAndSelect(FXint pos,FXuint select,FXbool notify=false);
-  FXint overstruck(FXint start,const FXchar *text,FXint n);
+  FXint overstruck(FXint start,FXint end,const FXchar *text,FXint n);
   void enterText(const FXchar *text,FXint n,FXbool notify);
   void enterText(const FXString& text,FXbool notify);
   FXbool deletePendingSelection(FXbool notify);
@@ -268,7 +268,7 @@ public:
   long onCmdCursorWordRight(FXObject*,FXSelector,void*);
   long onCmdCursorSelStart(FXObject*,FXSelector,void*);
   long onCmdCursorSelEnd(FXObject*,FXSelector,void*);
-  
+
   // Cursor drag movement
   long onCmdCursorShiftTop(FXObject*,FXSelector,void*);
   long onCmdCursorShiftBottom(FXObject*,FXSelector,void*);

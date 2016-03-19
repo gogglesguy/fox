@@ -651,7 +651,7 @@ void FXCompile::gettok(){
           }
         return;
       default:
-ident:  token=TK_ERROR;
+        token=TK_ERROR;
         if(Ascii::isLetter(*tail)){
           token=*tail++;
           while(Ascii::isAlphaNumeric(*tail)){

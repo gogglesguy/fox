@@ -27,6 +27,7 @@
 #include "FXString.h"
 #include "FXPath.h"
 #include "FXIO.h"
+#include "FXIODevice.h"
 #include "FXPipe.h"
 
 
@@ -38,7 +39,7 @@
 */
 
 
-#ifdef WIN32
+#if defined(WIN32)
 #define BadHandle INVALID_HANDLE_VALUE
 #else
 #define BadHandle -1
@@ -51,17 +52,25 @@ using namespace FX;
 
 namespace FX {
 
+/*
+// Create pipes for stdin and stdout
+CreatePipe(&hReadStdin, &hWriteStdin, NULL, 0);
+CreatePipe(&hReadStdout, &hWriteStdout, NULL, 0);
 
+// hook them up to the process we're about to create
+startup_info.hStdOutput = hWriteStdout;
+startup_info.hStdInput = hReadStdin;
+*/
 
 // Construct file and attach existing handle h
 FXPipe::FXPipe(FXInputHandle h,FXuint m){
-  FXIO::open(h,m);
+  open(h,m);
   }
 
 
 // Open device with access mode and handle
 FXbool FXPipe::open(FXInputHandle h,FXuint m){
-  return FXIO::open(h,m);
+  return FXIODevice::open(h,m);
   }
 
 
@@ -69,7 +78,7 @@ FXbool FXPipe::open(FXInputHandle h,FXuint m){
 FXival FXPipe::readBlock(void* data,FXival count){
   FXival nread=-1;
   if(isOpen()){
-#ifdef WIN32
+#if defined(WIN32)
     DWORD nr;
     if(::ReadFile(device,data,(DWORD)count,&nr,NULL)!=0){
       nread=(FXival)nr;
@@ -89,7 +98,7 @@ FXival FXPipe::readBlock(void* data,FXival count){
 FXival FXPipe::writeBlock(const void* data,FXival count){
   FXival nwritten=-1;
   if(isOpen()){
-#ifdef WIN32
+#if defined(WIN32)
     DWORD nw;
     if(::WriteFile(device,data,(DWORD)count,&nw,NULL)!=0){
       nwritten=(FXival)nw;
@@ -109,7 +118,7 @@ FXival FXPipe::writeBlock(const void* data,FXival count){
 FXbool FXPipe::close(){
   if(isOpen()){
     if(access&OwnHandle){
-#ifdef WIN32
+#if defined(WIN32)
       if(::CloseHandle(device)!=0){
         device=BadHandle;
         access=NoAccess;
@@ -133,7 +142,20 @@ FXbool FXPipe::close(){
 // Create new (empty) file
 FXbool FXPipe::create(const FXString& file,FXuint perm){
   if(!file.empty()){
-#ifndef WIN32
+#if defined(WIN32)
+/*
+HANDLE WINAPI CreateNamedPipe(
+  __in      LPCTSTR lpName,
+  __in      DWORD dwOpenMode,
+  __in      DWORD dwPipeMode,
+  __in      DWORD nMaxInstances,
+  __in      DWORD nOutBufferSize,
+  __in      DWORD nInBufferSize,
+  __in      DWORD nDefaultTimeOut,
+  __in_opt  LPSECURITY_ATTRIBUTES lpSecurityAttributes
+);
+*/
+#else
     return ::mkfifo(file.text(),perm)==0;
 #endif
     }
