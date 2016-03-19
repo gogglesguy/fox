@@ -18,6 +18,77 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 24 - FOX DEVELOPMENT 1.7.18
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added FXhalf half-precision floating point format support.  This is a 16-bit float as needed for
+signal processing and high-dynamic range imaging.  FXhalf is designed to behave in all respects
+like a float number, except with a more limited range [up to 65504.0].
+We have developed some extremely fast, table-based conversion methods.</li>
+<li>Small problem in preprocessor conditions fixed in FXAtomic.h</li>
+<li>Get/set font added to FXCalendarView.</li>
+<li>FXCalendar header and body font can be changed independently.</li>
+<li>Now have ticket spinlock implementation inside FXThread [GCC/x86/x86-64 only].</li>
+<li>Added RGBA save for FXDDSImage and FXDDSIcon.</li>
+<li>Small API changes in FXStream and its subclasses. Made things more easy to remember and more consistent.</li>
+<li>Improved documentation in FXThread.h</li>
+<li>Added getSelectedFiles() API to FXFileList.</li>
+<li>API's added to FXStat to yield link count and file inode(index) on filesystems where such
+info is available.</li>
+<li>Simpler enumeration of entries in FXDir. Also, its faster.</li>
+<li>Added resetGradients() API to FXGradientBar.</li>
+<li>Initialize FXGradientBar to more sensible default gradient.</li>
+<li>Message handlers ID_UPPER_COLOR and ID_LOWER_COLOR could be interfaced directly
+to FXColorWell.  Now, they can also be directly interfaced to FXColorDialog and
+FXColorSelector since these now ID_SETINTVALUE and ID_GETINTVALUE which permits
+bi-directional dataflow similar to other widgets which can be connected to FXDataTarget.</li>
+<li>FXMDIClient now as optional background tile image.</li>
+<li>Generate SEL_MINIMIZE, SEL_MAXIMIZE, SEL_RESTORE messages on Windows as well as X11 when windows
+are iconified/minimized, maximized, or restored through Window Manager.</li>
+<li>Added setOwned(), isOwned() API's to FXImage, FXBitmap.  This affects the way the client-side
+pixel buffer is managed.</li>
+<li>Added getActualFontDesc() API to FXFont so we can get the info about which font was actually
+matched in a more convenient form than using the individual API's.</li>
+<li>DDS support now includes half float and float (R16F, G16R16F, A16B16G16R16F, R32F, G32R32F, A32B32G32R32F 
+formats.</li>
+<li>Fixed problem in FXMessageChannel: using Semaphore instead of Event on Windows fixes
+sporadic lock-ups.</li>
+<li>Added extra option to FXMessageBox.</li>
+<li>FXProgressDialog and FXProgressBar now support ID_SETINTRANGE and ID_GETINTRANGE, 
+permitting connection through messages.</li>
+<li>Updated XDND system with DRAG_ASK. DRAG_ASK causes menu popup; this eliminates
+accidental drag-and-drops when you really wanted to click.</li>
+<li>Some small fixes for compile w/o OpenGL.</li>
+<li>Fixed possible memory leak [small one] when things end with timer or chore.</li>
+<li>Fixed bug reading monochrome .pbm bitmap.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 28 - FOX STABLE 1.6.34
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fixed bug in FXSettings; symptoms: every once in a while, a key-value pair was skipped.</li>
+<li>Small update to MAC-OSX implementation of FXThread.</li>
+<li>Fixed some minor things in fxutils for particular Windows header files.</li>
+<li>On Windows, block widget size update if it is minimized; minimized is a state, and
+does not cause a new size.</li>
+<li>Minor tweak to order in which size constraints are being passed to Window Managers
+on X11.  Some Window Managers had a problem with the old order.</li>
+<li>Added FXSGN() and FXSGNZ() macros.</li>
+<li>Updated FXFileList drag and drop.  Popup menu appears when normal drop occurs.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 July 1 - FOX DEVELOPMENT 1.7.17
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -33,7 +104,7 @@ this code will however be made available at some time as well.</li>
 <li>Added transform() API to FXSphere; it may be used to transform bounding sphere by affine transformation
 matrix.</li>
 <li>Also added transform to FXRange.  Again, matrix must be an affine transformation matrix.</li>
-<li>Many Input Method Editor improvements.</li> 
+<li>Many Input Method Editor improvements.</li>
 <li>Added head() and tail() API's to FXArray and FXObjectList.  Mostly for convenience sake.<\li>
 <li>Updated documentation for FXRangeSlider.</li>
 <li>Extended drag and drop protocol with DND_ASK.</li>

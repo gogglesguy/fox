@@ -346,11 +346,11 @@ distdir: $(DISTFILES)
 	done
 charttest.o: charttest.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -447,7 +447,7 @@ charttest.o: charttest.cpp ../include/fx.h ../include/fxver.h \
 	icons.h
 chartutils.lo chartutils.o : chartutils.cpp ../include/fx.h \
 	../include/fxver.h ../include/fxdefs.h ../include/fxascii.h \
-	../include/fxunicode.h ../include/FXHash.h \
+	../include/fxunicode.h ../include/FXhalf.h ../include/FXHash.h \
 	../include/FXException.h ../include/FXAutoPtr.h \
 	../include/FXElement.h ../include/FXArray.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
@@ -547,7 +547,7 @@ chartutils.lo chartutils.o : chartutils.cpp ../include/fx.h \
 	chartutils.h
 FX2DChart.lo FX2DChart.o : FX2DChart.cpp ../include/fx.h \
 	../include/fxver.h ../include/fxdefs.h ../include/fxascii.h \
-	../include/fxunicode.h ../include/FXHash.h \
+	../include/fxunicode.h ../include/FXhalf.h ../include/FXHash.h \
 	../include/FXException.h ../include/FXAutoPtr.h \
 	../include/FXElement.h ../include/FXArray.h \
 	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
@@ -647,11 +647,11 @@ FX2DChart.lo FX2DChart.o : FX2DChart.cpp ../include/fx.h \
 	chartutils.h FXAxis.h FXChart.h FX2DChart.h
 FX2DPlot.lo FX2DPlot.o : FX2DPlot.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -747,11 +747,11 @@ FX2DPlot.lo FX2DPlot.o : FX2DPlot.cpp ../include/fx.h ../include/fxver.h \
 	chartutils.h FXChart.h FXCurve.h FX2DChart.h FX2DPlot.h
 FXAxis.lo FXAxis.o : FXAxis.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -847,11 +847,11 @@ FXAxis.lo FXAxis.o : FXAxis.cpp ../include/fx.h ../include/fxver.h \
 	chartutils.h FXAxis.h FXChart.h
 FXChart.lo FXChart.o : FXChart.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \
@@ -947,11 +947,11 @@ FXChart.lo FXChart.o : FXChart.cpp ../include/fx.h ../include/fxver.h \
 	chartutils.h FXAxis.h FXChart.h
 FXCurve.lo FXCurve.o : FXCurve.cpp ../include/fx.h ../include/fxver.h \
 	../include/fxdefs.h ../include/fxascii.h ../include/fxunicode.h \
-	../include/FXHash.h ../include/FXException.h \
-	../include/FXAutoPtr.h ../include/FXElement.h \
-	../include/FXArray.h ../include/FXThread.h \
-	../include/FXStream.h ../include/FXIO.h ../include/FXFile.h \
-	../include/FXPipe.h ../include/FXSocket.h \
+	../include/FXhalf.h ../include/FXHash.h \
+	../include/FXException.h ../include/FXAutoPtr.h \
+	../include/FXElement.h ../include/FXArray.h \
+	../include/FXThread.h ../include/FXStream.h ../include/FXIO.h \
+	../include/FXFile.h ../include/FXPipe.h ../include/FXSocket.h \
 	../include/FXFileStream.h ../include/FXMemoryStream.h \
 	../include/FXString.h ../include/FXDLL.h ../include/FXSize.h \
 	../include/FXPoint.h ../include/FXRectangle.h \

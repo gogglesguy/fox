@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorSelector.cpp,v 1.86 2008/01/04 15:42:05 fox Exp $                 *
+* $Id: FXColorSelector.cpp,v 1.88 2008/07/22 19:28:31 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -135,6 +135,8 @@ FXDEFMAP(FXColorSelector) FXColorSelectorMap[]={
   FXMAPFUNC(SEL_COMMAND,FXColorSelector::ID_DIAL_WHEEL,FXColorSelector::onCmdWheel),
   FXMAPFUNC(SEL_CHANGED,FXColorSelector::ID_DIAL_WHEEL,FXColorSelector::onCmdWheel),
   FXMAPFUNC(SEL_COMMAND,FXColorSelector::ID_COLORPICK,FXColorSelector::onCmdColorPick),
+  FXMAPFUNC(SEL_COMMAND,FXColorSelector::ID_SETINTVALUE,FXColorSelector::onCmdSetIntValue),
+  FXMAPFUNC(SEL_COMMAND,FXColorSelector::ID_GETINTVALUE,FXColorSelector::onCmdGetIntValue),
   };
 
 
@@ -404,6 +406,23 @@ void FXColorSelector::create(){
 
   // Switch to correct pane
   panels->setCurrent(getApp()->reg().readIntEntry("SETTINGS","activecolorpane",0));
+  }
+
+
+/*******************************************************************************/
+
+
+// Update color selector from a message
+long FXColorSelector::onCmdSetIntValue(FXObject*,FXSelector,void* ptr){
+  setRGBA(*((FXColor*)ptr));
+  return 1;
+  }
+
+
+// Obtain value from color selector
+long FXColorSelector::onCmdGetIntValue(FXObject*,FXSelector,void* ptr){
+  *((FXColor*)ptr)=getRGBA();
+  return 1;
   }
 
 

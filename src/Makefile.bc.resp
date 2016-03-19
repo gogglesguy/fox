@@ -45,7 +45,6 @@
 +FXComposeContext.obj &
 +FXComposite.obj &
 +FXConsole.obj &
-+FXCopyDialog.obj &
 +FXCP1250Codec.obj &
 +FXCP1251Codec.obj &
 +FXCP1252Codec.obj &
@@ -76,6 +75,8 @@
 +FXDC.obj &
 +FXDCPrint.obj &
 +FXDCWindow.obj &
++FXDDSIcon.obj &
++FXDDSImage.obj &
 +FXDLL.obj &
 +FXDebugTarget.obj &
 +FXDelegator.obj &
@@ -127,6 +128,7 @@
 +FXGradientBar.obj &
 +FXGroupBox.obj &
 +FXGZFileStream.obj &
++FXhalf.obj &
 +FXHash.obj &
 +FXHeader.obj &
 +FXHorizontalFrame.obj &
@@ -285,6 +287,7 @@
 +FXXPMImage.obj &
 +fxascii.obj &
 +fxbmpio.obj &
++fxddsio.obj &
 +fxezquantize.obj &
 +fxfilematch.obj &
 +fxfsquantize.obj &

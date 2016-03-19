@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendar.h,v 1.11 2008/01/04 15:18:14 fox Exp $                        *
+* $Id: FXCalendar.h,v 1.14 2008/09/30 02:50:43 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXCALENDAR_H
 #define FXCALENDAR_H
@@ -46,10 +46,11 @@ class FXAPI FXCalendar : public FXPacker {
 FXDECLARE(FXCalendar)
 protected:
   FXCalendarView    *view;
-  FXLabel           *year;
-  FXPopup           *months;
-  FXOptionMenu      *month;
   FXHorizontalFrame *frame;
+  FXLabel           *year;
+  FXOptionMenu      *month;
+  FXPopup           *monthpopup;
+  FXOption          *months[12];
   FXArrowButton     *arrows[4];
 protected:
   FXCalendar();
@@ -100,8 +101,10 @@ public:
   /// Set the current month; current day will be properly updated for the choosen month
   void setCurrentMonth(FXint mo,FXbool notify=false);
 
-  /// Return the current month shown. The month may be different than the current
-  /// date if a day in a sibling month is current.
+  /**
+  * Return the current month shown. The month may be different than
+  * the current date if a day in a sibling month is current.
+  */
   FXint getCurrentMonth() const;
 
   /// Return calendar view control
@@ -169,6 +172,18 @@ public:
 
   /// Get the display color of days in the weekend not in the current month
   FXColor getOtherWeekendColor() const;
+
+  /// Set font used by the header
+  void setHeaderFont(FXFont *fnt);
+
+  /// Get font used by the header
+  FXFont* getHeaderFont() const;
+
+  /// Set font used by the calendar
+  void setCalendarFont(FXFont *fnt);
+
+  /// Get font used by the calendar
+  FXFont* getCalendarFont() const;
 
   /// Destructor
   virtual ~FXCalendar();

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageChannel.cpp,v 1.13 2008/03/27 15:39:46 fox Exp $                *
+* $Id: FXMessageChannel.cpp,v 1.15 2008/08/29 16:43:52 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -43,9 +43,11 @@
   - Because of unbelievably retarded design of Windows, we need to
     use an Event-object to actually signal the GUI thread when we've
     written something to the pipe.
-  - Possible problem: should probably NOT reset Event unless pipe is
-    empty.  But are we actually falling out of MsgWaitForMultipleObject if
-    Event is already signalled when we enter MsgWaitForMultipleObject?
+  - Based on suggestion from Axel Schmidt <axel.schmidt@analytica-karlsruhe.de>,
+    the Event object was replaced by counting Semaphore.  
+    This way, the number of calls to message() has to be equal to the number of calls 
+    to MsgWaitForMultipleObjects.  Thus, each call to message() results in exactly
+    one callback in the GUI thread.
 */
 
 
@@ -110,7 +112,7 @@ FXMessageChannel::FXMessageChannel():app((FXApp*)-1L){
 // Add handler to application
 FXMessageChannel::FXMessageChannel(FXApp* a):app(a){
 #ifdef WIN32
-  if((h[2]=::CreateEvent(NULL,false,false,NULL))==NULL){ throw FXResourceException("unable to create event."); }
+  if((h[2]=::CreateSemaphore(NULL,0,2147483647,NULL))==NULL){ throw FXResourceException("unable to create semaphore."); }
   if(::CreatePipe(&h[0],&h[1],NULL,0)==0){ throw FXResourceException("unable to create pipe."); }
   app->addInput(this,ID_IO_READ,h[2],INPUT_READ,NULL);
 #else
@@ -159,7 +161,7 @@ FXbool FXMessageChannel::message(FXObject* tgt,FXSelector msg,const void* data,F
   DWORD nwritten=-1;
   if(::WriteFile(h[1],&pkg,sizeof(FXMessage),&nwritten,NULL) && nwritten==sizeof(FXMessage)){
     if(pkg.size<=0 || (::WriteFile(h[1],data,pkg.size,&nwritten,NULL) && nwritten==pkg.size)){
-      ::SetEvent(h[2]);
+      ::ReleaseSemaphore(h[2],1,NULL);
       return true;
       }
     }

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.h,v 1.52 2008/02/29 21:19:21 fox Exp $                        *
+* $Id: TextWindow.h,v 1.53 2008/07/29 16:42:57 fox Exp $                        *
 ********************************************************************************/
 #ifndef TEXTWINDOW_H
 #define TEXTWINDOW_H
@@ -73,7 +73,7 @@ protected:
   FXTime               filetime;                // Original modtime of file
   FXbool               filenameset;             // Filename is set
   FXString             delimiters;              // Text delimiters
-  FXString             searchpath;              // To search for files
+  FXString             searchpaths;             // Search paths for files
   FXHiliteArray        styles;                  // Highlight styles
   FXint                currentstyle;            // Style being changed
   FXint                initialwidth;            // Initial width
@@ -199,7 +199,7 @@ public:
   long onUpdStripSpaces(FXObject*,FXSelector,void*);
   long onCmdAppendNewline(FXObject*,FXSelector,void*);
   long onUpdAppendNewline(FXObject*,FXSelector,void*);
-  long onCmdIncludePaths(FXObject*,FXSelector,void*);
+  long onCmdSearchPaths(FXObject*,FXSelector,void*);
   long onCmdFilter(FXObject*,FXSelector,void*);
   long onUpdOverstrike(FXObject*,FXSelector,void*);
   long onUpdReadOnly(FXObject*,FXSelector,void*);
@@ -288,7 +288,7 @@ public:
     ID_STRIP_CR,
     ID_STRIP_SP,
     ID_APPEND_NL,
-    ID_INCLUDE_PATH,
+    ID_SEARCH_PATHS,
     ID_OVERSTRIKE,
     ID_READONLY,
     ID_TABMODE,

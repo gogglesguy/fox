@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXString.cpp,v 1.269 2008/06/25 18:00:51 fox Exp $                       *
+* $Id: FXString.cpp,v 1.270 2008/07/19 21:44:31 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -595,11 +595,11 @@ FXString::~FXString(){
   }
 
 
-// Count number of utf8 characters in subrange
-FXint FXString::count(FXint pos,FXint len) const {
+// Count number of utf8 characters in subrange start...end
+FXint FXString::count(FXint start,FXint end) const {
   register FXint cnt=0;
-  while(pos<len){
-    pos+=utfBytes[(FXuchar)str[pos]];
+  while(start<end){
+    start+=utfBytes[(FXuchar)str[start]];
     cnt++;
     }
   return cnt;

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDDSIcon.cpp,v 1.5 2008/06/30 15:50:44 fox Exp $                        *
+* $Id: FXDDSIcon.cpp,v 1.7 2008/07/02 19:36:27 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -47,7 +47,6 @@
   - Support for displaying texture images; note, FOX decompresses these back to RGB;
     for direct use, the non-decompressed image data should be handed directly to
     OpenGL.
-  - FIXME saving to this format is not yet supported.
 */
 
 using namespace FX;
@@ -72,17 +71,17 @@ FXIMPLEMENT(FXDDSIcon,FXIcon,NULL,0)
 // Initialize nicely
 FXDDSIcon::FXDDSIcon(FXApp* a,const void *pix,FXColor clr,FXuint opts,FXint w,FXint h):FXIcon(a,NULL,clr,opts,w,h){
   if(pix){
-    FXMemoryStream ms;
-    ms.open(FXStreamLoad,(FXuchar*)pix);
+    FXMemoryStream ms(FXStreamLoad,(FXuchar*)pix);
     loadPixels(ms);
-    ms.close();
     }
   }
 
 
 // Save object to stream
-FXbool FXDDSIcon::savePixels(FXStream&) const {
-  // FIXME saving not yet supported FIXME //
+FXbool FXDDSIcon::savePixels(FXStream& store) const {
+  if(fxsaveDDS(store,data,width,height,1)){
+    return true;
+    }
   return false;
   }
 

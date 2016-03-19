@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXChart.cpp,v 1.64 2008/02/21 18:29:07 fox Exp $                         *
+* $Id: FXChart.cpp,v 1.67 2008/09/26 00:42:12 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -32,12 +32,12 @@
 
 #define CAPTION_MASK    (CAPTION_ABOVE|CAPTION_BELOW|CAPTION_LEFT|CAPTION_RIGHT|CAPTION_SHOWN)
 
-using namespace FX;
+using namespace FXCHART;
 
 
 /*******************************************************************************/
 
-namespace FX {
+namespace FXCHART {
 
 // Map
 FXDEFMAP(FXChart) FXChartMap[]={
@@ -64,7 +64,7 @@ FXDragType FXChart::tifType=0;
 
 // Default back fill style
 const FillStyle defaultBackStyle={
-  NULL,FXRGB(103,103,255),FXRGBA(0,0,0,0),FXRGB(255,255,255),FXRGB(0,0,255),STIPPLE_NONE,FILLSTYLE_SOLID
+  NULL,FXRGB(255,255,255),FXRGBA(0,0,0,0),FXRGB(255,255,255),FXRGB(0,0,255),STIPPLE_NONE,FILLSTYLE_SOLID
   };
 
 /*******************************************************************************/
@@ -205,7 +205,7 @@ long FXChart::onClipboardRequest(FXObject *sender,FXSelector sel,void *ptr){
     chart->restore();
 
     // Open memory stream
-    ms.open(FXStreamSave,NULL);
+    ms.open(FXStreamSave,NULL,0);
 
     // Render image to memory stream
     if(event->target==bmpType)

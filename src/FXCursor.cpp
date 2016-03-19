@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCursor.cpp,v 1.71 2008/05/12 16:48:45 fox Exp $                        *
+* $Id: FXCursor.cpp,v 1.72 2008/07/30 23:55:13 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -51,7 +51,8 @@
 
 #define DISPLAY(app)     ((Display*)((app)->display))
 #define DARKCOLOR(r,g,b) (((r)+(g)+(b))<382)
-#define CURSOR_MASK      (255)
+#define CURSOR_STOCK     255
+#define CURSOR_MASK      (CURSOR_KEEP)
 
 
 using namespace FX;
@@ -173,9 +174,9 @@ void FXCursor::create(){
       const LPCTSTR stock[]={IDC_ARROW,IDC_ARROW,IDC_ARROW,IDC_IBEAM,IDC_WAIT,IDC_CROSS,IDC_SIZENS,IDC_SIZEWE,IDC_SIZEALL};
 
       // Building stock cursor
-      if(options&CURSOR_MASK){
+      if(options&CURSOR_STOCK){
         FXTRACE((100,"%s::create: stock cursor\n",getClassName()));
-        xid=LoadCursor(NULL,stock[options&CURSOR_MASK]);
+        xid=LoadCursor(NULL,stock[options&CURSOR_STOCK]);
         }
 
       // Building custom cursor
@@ -264,9 +265,9 @@ void FXCursor::create(){
       const FXuint stock[]={XC_left_ptr,XC_left_ptr,XC_right_ptr,XC_xterm,XC_watch,XC_crosshair,XC_sb_h_double_arrow,XC_sb_v_double_arrow,XC_fleur};
 
       // Building stock cursor
-      if(options&CURSOR_MASK){
+      if(options&CURSOR_STOCK){
         FXTRACE((100,"%s::create: stock cursor\n",getClassName()));
-        xid=XCreateFontCursor(DISPLAY(getApp()),stock[options&CURSOR_MASK]);
+        xid=XCreateFontCursor(DISPLAY(getApp()),stock[options&CURSOR_STOCK]);
         }
 
       // Building custom cursor
@@ -391,6 +392,24 @@ void FXCursor::destroy(){
       }
     xid=0;
     }
+  }
+
+
+// Change options
+void FXCursor::setOptions(FXuint opts){
+  options=(options&~CURSOR_MASK) | (opts&CURSOR_MASK);
+  }
+
+
+// Set pixel data ownership flag
+void FXCursor::setOwned(FXbool owned){ 
+  options^=((0-owned)^options)&CURSOR_OWNED;
+  }
+
+
+// Get pixel ownership flag
+FXbool FXCursor::isOwned() const { 
+  return (options&CURSOR_OWNED)!=0; 
   }
 
 

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxppmio.cpp,v 1.20 2008/01/04 15:42:46 fox Exp $                         *
+* $Id: fxppmio.cpp,v 1.21 2008/10/31 09:41:33 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -128,8 +128,8 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
     case '1':   // ascii bitmap
       for(i=0; i<height; i++){
         for(j=0; j<width; j++,byte<<=1,pp+=4){
-          if((j&7)==0){ byte=getint(store); }
-          g=(byte&0x80)?255:0;
+          byte=getint(store);
+          g=byte?255:0;
           pp[0]=g;
           pp[1]=g;
           pp[2]=g;

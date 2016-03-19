@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXStat.h,v 1.30 2008/01/04 15:18:24 fox Exp $                            *
+* $Id: FXStat.h,v 1.31 2008/09/17 22:13:02 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXSTAT_H
 #define FXSTAT_H
@@ -37,9 +37,11 @@ private:
   FXuint  modeFlags;            /// Mode bits
   FXuint  userNumber;           /// User number
   FXuint  groupNumber;          /// Group number
+  FXuint  linkCount;            /// Number of links
   FXTime  createTime;           /// Create time (ns)
   FXTime  accessTime;           /// Access time (ns)
   FXTime  modifyTime;           /// Modify time (ns)
+  FXlong  fileIndex;            /// File index (inode)
   FXlong  fileSize;             /// File size
 public:
 
@@ -54,7 +56,7 @@ public:
 
   /// Return the mode flags for this file
   FXuint mode() const { return modeFlags; }
-
+  
   /// Return file size in bytes
   FXlong size() const { return fileSize; }
 
@@ -63,6 +65,12 @@ public:
 
   /// Return group number
   FXuint group() const { return groupNumber; }
+
+  /// Return number of links to file
+  FXuint links() const { return linkCount; }
+  
+  /// Return file index number
+  FXlong index() const { return fileIndex; }
 
   /// Return time when last modified, in nanoseconds
   FXTime modified() const { return modifyTime; }
@@ -162,6 +170,12 @@ public:
 
   /// Return file size in bytes
   static FXlong size(const FXString& file);
+
+  /// Return file index number
+  static FXlong index(const FXString& file);
+
+  /// Return number of links to file
+  static FXuint links(const FXString& file);
 
   /**
   * Return last modified time for this file, on filesystems

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCurve.cpp,v 1.13 2008/01/04 15:18:13 fox Exp $                         *
+* $Id: FXCurve.cpp,v 1.14 2008/09/26 00:42:12 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -33,11 +33,11 @@
 */
 
 
-using namespace FX;
+using namespace FXCHART;
 
 /*******************************************************************************/
 
-namespace FX {
+namespace FXCHART {
 
 // Object implementation
 FXIMPLEMENT(FXCurve,FXObject,NULL,0)

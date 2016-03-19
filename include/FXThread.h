@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.h,v 1.80 2008/02/05 22:02:10 fox Exp $                          *
+* $Id: FXThread.h,v 1.81 2008/07/23 21:21:29 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTHREAD_H
 #define FXTHREAD_H
@@ -210,8 +210,8 @@ public:
   * Return true if the wait ended due to the condition being
   * signalled through signal() or broadcast(), and false if the
   * wait timed out, was interrupted, or some other error occurred.
-  * Note that the wait-time is specified in nanoseconds since
-  * the Epoch (Jan 1, 1970).
+  * The absolute time is specified in nanoseconds since the Epoch 
+  * (Jan 1, 1970).
   */
   FXbool wait(FXMutex& mtx,FXTime nsec);
 

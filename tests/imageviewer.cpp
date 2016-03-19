@@ -5,7 +5,7 @@
 *********************************************************************************
 * Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: imageviewer.cpp,v 1.124 2008/06/30 18:08:58 fox Exp $                    *
+* $Id: imageviewer.cpp,v 1.125 2008/11/25 10:13:02 fox Exp $                    *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -434,7 +434,7 @@ FXbool ImageWindow::loadimage(const FXString& file){
   else if(comparecase(ext,"xbm")==0){
     img=new FXXBMImage(getApp(),NULL,NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
-  else if(comparecase(ext,"ppm")==0 || comparecase(ext,"pbm")==0 || comparecase(ext,"pgm")==0){
+  else if(comparecase(ext,"ppm")==0 || comparecase(ext,"pbm")==0 || comparecase(ext,"pgm")==0 || comparecase(ext,"pnm")==0){
     img=new FXPPMImage(getApp(),NULL,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
   else if(comparecase(ext,"iff")==0 || comparecase(ext,"lbm")==0){

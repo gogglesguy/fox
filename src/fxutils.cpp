@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxutils.cpp,v 1.173 2008/05/20 16:21:36 fox Exp $                        *
+* $Id: fxutils.cpp,v 1.174 2008/07/17 20:39:00 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -675,6 +675,53 @@ FXuint fxcpuid(){
   return caps;
   }
 #endif
+
+
+#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
+
+// MXCSR controls SSE(2) operation:
+//
+// +----+-------+----+----+----+----+----+----+----+----+----+----+----+----+----+
+// | FZ |   RC  | PM | UM | OM | ZM | DM | IM | DAZ| PE | UE | OE | ZE | DE | IE |
+// +----+-------+----+----+----+----+----+----+----+----+----+----+----+----+----+
+// | 15 | 14 13 | 12 | 11 | 10 |  9 |  8 |  7 |  6 |  5 |  4 |  3 |  2 |  1 |  0 |
+// +----+-------+----+----+----+----+----+----+----+----+----+----+----+----+----+
+//
+// FZ  Flush to zero
+// RC  Round control (00=nearest, 01=down, 10=up, 11=toward zero)
+// PM  Precision exception mask
+// UM  Underflow exception mask
+// OM  Overflow exception mask
+// ZM  Zero divide exception mask
+// DM  Denormalized operand exception mask
+// IM  Invalid operation exception mask
+// DAZ Denormals are zeros
+// PE  Precision exception
+// UE  Underflow exception
+// OE  Overflow exception
+// ZE  Zero-divide exception
+// DE  Denormalized operand exception
+// IE  Invalid operation exception
+
+extern FXAPI FXuint fxgetmxcsr();
+extern FXAPI void fxsetmxcsr(FXuint mxcsr);
+
+
+// Get current value of MXCSR control register
+FXuint fxgetmxcsr(){
+  FXuint mxcsr;
+  asm ( "stmxcsr %0" :  "=m" (mxcsr) );
+  return mxcsr;
+  }
+
+
+// Set value to MXCSR control register
+void fxsetmxcsr(FXuint mxcsr){
+  asm ( "ldmxcsr %0" : : "m" (mxcsr) );
+  }
+  
+#endif
+
 
 }
 

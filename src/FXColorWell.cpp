@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorWell.cpp,v 1.81 2008/01/04 15:42:06 fox Exp $                     *
+* $Id: FXColorWell.cpp,v 1.82 2008/07/22 20:46:37 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -96,12 +96,13 @@ FXDEFMAP(FXColorWell) FXColorWellMap[]={
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_SETVALUE,FXColorWell::onCmdSetValue),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_SETINTVALUE,FXColorWell::onCmdSetIntValue),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_GETINTVALUE,FXColorWell::onCmdGetIntValue),
-  FXMAPFUNC(SEL_CHANGED,FXColorWell::ID_COLORDIALOG,FXColorWell::onChgColorWell),
-  FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_COLORDIALOG,FXColorWell::onCmdColorWell),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_SETHELPSTRING,FXColorWell::onCmdSetHelp),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_GETHELPSTRING,FXColorWell::onCmdGetHelp),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_SETTIPSTRING,FXColorWell::onCmdSetTip),
   FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_GETTIPSTRING,FXColorWell::onCmdGetTip),
+  FXMAPFUNC(SEL_UPDATE,FXColorWell::ID_COLOR,FXColorWell::onUpdColor),
+  FXMAPFUNC(SEL_CHANGED,FXColorWell::ID_COLOR,FXColorWell::onChgColor),
+  FXMAPFUNC(SEL_COMMAND,FXColorWell::ID_COLOR,FXColorWell::onCmdColor),
   };
 
 
@@ -600,8 +601,7 @@ long FXColorWell::onDoubleClicked(FXObject*,FXSelector,void*){
   FXColorDialog colordialog(this,tr("Color Dialog"));
   FXColor oldcolor=getRGBA();
   colordialog.setTarget(this);
-  colordialog.setSelector(ID_COLORDIALOG);
-  colordialog.setRGBA(oldcolor);
+  colordialog.setSelector(ID_COLOR);
   colordialog.setOpaqueOnly(isOpaqueOnly());
   if(!colordialog.execute()){
     setRGBA(oldcolor,true);
@@ -620,8 +620,15 @@ long FXColorWell::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
   }
 
 
+// Update another Color Well
+long FXColorWell::onUpdColor(FXObject* sender,FXSelector,void* ptr){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&rgba);
+  return 1;
+  }
+
+
 // Change from another Color Well
-long FXColorWell::onChgColorWell(FXObject*,FXSelector,void* ptr){
+long FXColorWell::onChgColor(FXObject*,FXSelector,void* ptr){
   flags&=~FLAG_UPDATE;
   setRGBA((FXColor)(FXuval)ptr);
   if(target) target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXuval)rgba);
@@ -630,7 +637,7 @@ long FXColorWell::onChgColorWell(FXObject*,FXSelector,void* ptr){
 
 
 // Command from another Color Well
-long FXColorWell::onCmdColorWell(FXObject*,FXSelector,void* ptr){
+long FXColorWell::onCmdColor(FXObject*,FXSelector,void* ptr){
   flags|=FLAG_UPDATE;
   setRGBA((FXColor)(FXuval)ptr);
   if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)rgba);

@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software                   #
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    #
 #################################################################################
-# $Id: Adie.stx,v 1.55 2008/04/08 14:48:10 fox Exp $                            #
+# $Id: Adie.stx,v 1.62 2008/11/25 07:47:16 fox Exp $                            #
 #################################################################################
 
 #
@@ -254,7 +254,7 @@ language "C++"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%(\d+\$)?['#0 +-]?(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
     end
   end
 
@@ -323,11 +323,11 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern     "\<(FXAPI|FXDEFMAP|FXMALLOC|FXFREE|FXCALLOC|FXRESIZE|FXMEMDUP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|allocElms|callocElms|dupElms|resizeElms|freeElms)\>"
+    pattern     "\<(FXAPI|FXDEFMAP|FXMALLOC|FXFREE|FXCALLOC|FXRESIZE|FXMEMDUP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|allocElms|callocElms|dupElms|resizeElms|freeElms)\>"
   end
 
   rule "FOXType"
-    pattern     "\<(FXchar|FXuchar|FXbool|FXushort|FXshort|FXuint|FXwchar|FXnchar|FXint|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXColor|FXObject|FXString|FXWString)\>"
+    pattern     "\<(FXuchar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXColor|FXPixel|FXTime|FXID)\>"
   end
 
   rule "Keyword"
@@ -399,7 +399,7 @@ language "C"
       pattern     "\\."
     end
     rule "Format"
-      pattern "%(\d+\$)?['#0 +-]?(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
     end
   end
 
@@ -488,6 +488,74 @@ language "C"
 
 end
 
+
+# Assembly language
+language "AS"
+
+  # File patterns for this language mode
+  filesmatch "*.s,*.S"
+
+  # Word delimiters
+  delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+
+  contextlines 100
+
+  # Block comment
+  rule "BlockComment"
+    openpattern   "/\*"
+    closepattern  "\*/"
+  end
+
+  # Line comment
+  rule "LineComment"
+    pattern ";.*?$"
+  end
+
+  # Number
+  rule "Number"
+    pattern     "\<((0[xXbB][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)\>"
+  end
+
+  # Operator
+  rule "Operator"
+    pattern     "(\*|/|%|<<|>>|<>|<=|<|>=|>|\+|-|~|\|\||\||&&|&|\^|!=|!|==)"
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+    rule "OctalEscape"
+      pattern     "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h+"
+    end
+    rule "ControlEscape"
+      pattern     "\\."
+    end
+  end
+
+  # Char constant
+  rule "Char"
+    openpattern  "'"
+    closepattern "'"
+    stoppattern  "$"
+    rule "OctalEscape"
+      pattern "\\\d+"
+    end
+    rule "HexEscape"
+      pattern     "\\x\h+"
+    end
+    rule "ControlEscape"
+      pattern "\\."
+    end
+  end
+end
+
+
+# Shell scripts
 language "Shell"
   contentsmatch "\A#!\s*/bin/(ba)?sh"
   rule "Comment"
@@ -501,6 +569,7 @@ language "Shell"
   end
 end
 
+# Pascal
 language "Pascal"
   filesmatch "*.pas,*.p"
   rule "Number"
@@ -523,7 +592,7 @@ language "Pascal"
   end
 end
 
-
+# GNU configure scripts
 language "Configure"
   filesmatch "configure.in,configure.ac"
   rule "Comment"
@@ -559,6 +628,7 @@ language "Configure"
 end
 
 
+# Python
 language "Python"
   filesmatch "*.py"
   rule "Number"
@@ -589,6 +659,7 @@ language "Python"
   end
 end
 
+# Ruby
 language "Ruby"
   filesmatch "*.rb"
   rule "Number"
@@ -619,6 +690,7 @@ language "Ruby"
   end
 end
 
+# HTML and XML
 language "Xml/Html"
   filesmatch "*.xml,*.htm,*.html,*.ui"
   rule "Comment"
@@ -677,6 +749,7 @@ language "Xml/Html"
     end
   end
 end
+
 
 # IDL interface definition language
 language "IDL"
@@ -907,6 +980,7 @@ language "Make"
   end
 end
 
+
 # Perl
 language "Perl"
   filesmatch "*.pl"
@@ -949,6 +1023,7 @@ language "Perl"
     end
   end
 end
+
 
 # GLSL shading language
 language "GLSL"
@@ -1015,7 +1090,7 @@ language "GLSL"
 end
 
 
-# C# programming language
+# Java programming language
 language "Java"
 
   # File patterns for this language mode
@@ -1220,7 +1295,6 @@ language "Matlab"
       pattern     "\\."
     end
   end
-
 
   rule "Keyword"
     pattern     "\<(break|case|catch|continue|else|elseif|end|for|function|global|if|otherwise|persistent|return|switch|try|while)\>"

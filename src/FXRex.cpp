@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRex.cpp,v 1.128 2008/03/26 19:21:37 fox Exp $                          *
+* $Id: FXRex.cpp,v 1.129 2008/09/12 23:24:55 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -2252,7 +2252,7 @@ rep:    if(str+rep_min>str_end) return false;
 FXbool FXExecute::attempt(const FXchar* string){
   register FXint i=npar;
   str=string;
-  do{--i;sub_beg[i]=sub_end[i]=-1;}while(i);          // Possibly move this to FXExecute::execute?
+  do{--i;sub_beg[i]=sub_end[i]=-1;}while(i);            // Possibly move this to FXExecute::execute?
   if(match(code+1)){
     if(string!=str || !(mode&FXRex::NotEmpty)){         // Match if non-empty or empty is allowed!
       sub_beg[0]=string-str_beg;

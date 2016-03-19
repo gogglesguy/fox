@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.738 2008/06/03 20:28:58 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.745 2008/09/17 22:13:03 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -1665,20 +1665,22 @@ void FXApp::addTimeout(FXObject* tgt,FXSelector sel,FXTime ns,void* ptr){
 // Check if timeout identified by tgt and sel has been set
 FXbool FXApp::hasTimeout(FXObject* tgt,FXSelector sel) const {
   for(register FXTimer *t=timers; t; t=t->next){
-    if(t->target==tgt && t->message==sel) return true;
+    if(t->target==tgt && (sel==0 || t->message==sel)) return true;
     }
   return false;
   }
 
 
-// Remove timeout identified by tgt and sel from the list
+// Remove timeout(s) identified by tgt and sel from the list
 void FXApp::removeTimeout(FXObject* tgt,FXSelector sel){
-  register FXTimer *t,**tt;
-  for(tt=&timers; (t=*tt)!=NULL; tt=&t->next){
-    if(t->target==tgt && t->message==sel){
+  register FXTimer **tt=&timers;
+  register FXTimer *t;
+  while((t=*tt)!=NULL){
+    if(t->target==tgt && (sel==0 || t->message==sel)){
       *tt=t->next; t->next=timerrecs; timerrecs=t;
-      break;
+      continue;
       }
+    tt=&t->next;
     }
   }
 
@@ -1686,7 +1688,7 @@ void FXApp::removeTimeout(FXObject* tgt,FXSelector sel){
 // Return the remaining time, in nanoseconds
 FXTime FXApp::remainingTimeout(FXObject *tgt,FXSelector sel){
   for(register FXTimer *t=timers; t; t=t->next){
-    if(t->target==tgt && t->message==sel){
+    if(t->target==tgt && (sel==0 || t->message==sel)){
       register FXTime now=FXThread::time();
       return t->due>now ? t->due-now : 0L;
       }
@@ -1804,14 +1806,16 @@ a:c->data=ptr;
   }
 
 
-// Remove chore identified by tgt and sel from the list
+// Remove chore(s) identified by tgt and sel from the list
 void FXApp::removeChore(FXObject* tgt,FXSelector sel){
-  register FXChore *c,**cc;
-  for(cc=&chores; (c=*cc)!=NULL; cc=&c->next){
-    if(c->target==tgt && c->message==sel){
+  register FXChore **cc=&chores;
+  register FXChore *c;
+  while((c=*cc)!=NULL){
+    if(c->target==tgt && (sel==0 || c->message==sel)){
       *cc=c->next; c->next=chorerecs; chorerecs=c;
-      break;
+      continue;
       }
+    cc=&c->next;
     }
   }
 
@@ -1819,7 +1823,7 @@ void FXApp::removeChore(FXObject* tgt,FXSelector sel){
 // Check if chore identified by tgt and sel has been set
 FXbool FXApp::hasChore(FXObject* tgt,FXSelector sel) const {
   for(register FXChore *c=chores; c; c=c->next){
-    if(c->target==tgt && c->message==sel) return true;
+    if(c->target==tgt && (sel==0 || c->message==sel)) return true;
     }
   return false;
   }
@@ -2123,16 +2127,16 @@ void FXApp::scrollRepaints(FXID win,FXint dx,FXint dy){
 FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
   XEvent e;
 
-  // Set to no-op just in case
-  ev.xany.type=0;
+  // Assume non-event
+a:ev.xany.type=0;
 
   // If a timer is due, handle it
   if(timers && timers->due<=FXThread::time()){
     register FXTimer* t=timers;
     timers=t->next;
-    if(t->target && t->target->tryHandle(this,FXSEL(SEL_TIMEOUT,t->message),t->data)) refresh();
     t->next=timerrecs;
     timerrecs=t;
+    if(t->target && t->target->tryHandle(this,FXSEL(SEL_TIMEOUT,t->message),t->data)) refresh();
     return false;
     }
 
@@ -2143,9 +2147,7 @@ FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
     signals[sig].notified=false;
     while(--nxt && !signals[nxt].notified){}
     signalreceived=nxt;
-    if(signals[sig].target && signals[sig].target->tryHandle(this,FXSEL(SEL_SIGNAL,signals[sig].message),(void*)(FXival)sig)){
-      refresh();
-      }
+    if(signals[sig].target && signals[sig].target->tryHandle(this,FXSEL(SEL_SIGNAL,signals[sig].message),(void*)(FXival)sig)) refresh();
     return false;
     }
 
@@ -2208,9 +2210,9 @@ FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
       if(chores){
         register FXChore *c=chores;
         chores=c->next;
-        if(c->target && c->target->tryHandle(this,FXSEL(SEL_CHORE,c->message),c->data)) refresh();
         c->next=chorerecs;
         chorerecs=c;
+        if(c->target && c->target->tryHandle(this,FXSEL(SEL_CHORE,c->message),c->data)) refresh();
         }
 
       // GUI updating:- walk the whole widget tree, stop after updating refresherstop
@@ -2331,13 +2333,15 @@ FXbool FXApp::getNextEvent(FXRawEvent& ev,FXTime blocking){
   // Get an event
   XNextEvent((Display*)display,&ev);
 
-  // Filter event through input method context, if any
-  if(xim && XFilterEvent(&ev,None)) return false;
+  // Event was filtered by input method; get next one
+  if(xim && XFilterEvent(&ev,None)){
+    goto a;
+    }
 
-  // Save expose events for later...
+  // Event was repaint event; get next one
   if(ev.xany.type==Expose || ev.xany.type==GraphicsExpose){
     addRepaint((FXID)ev.xexpose.window,ev.xexpose.x,ev.xexpose.y,ev.xexpose.width,ev.xexpose.height,0);
-    return false;
+    goto a;
     }
 
   // Compress motion events
@@ -3305,8 +3309,9 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
           else if(!invocation || invocation->modality==MODAL_FOR_NONE || (invocation->window && invocation->window->isOwnerOf(window)) || window->getShell()->doesSaveUnder()){
             if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
             }
-         }
+          }
 #endif
+        return true;
       }
     }
   return false;
@@ -3328,9 +3333,9 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
   if(timers && timers->due<=FXThread::time()){
     register FXTimer* t=timers;
     timers=t->next;
-    if(t->target && t->target->tryHandle(this,FXSEL(SEL_TIMEOUT,t->message),t->data)) refresh();
     t->next=timerrecs;
     timerrecs=t;
+    if(t->target && t->target->tryHandle(this,FXSEL(SEL_TIMEOUT,t->message),t->data)) refresh();
     return false;
     }
 
@@ -3341,9 +3346,7 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
     signals[sig].notified=false;
     while(--nxt && !signals[nxt].notified);
     signalreceived=nxt;
-    if(signals[sig].target && signals[sig].target->tryHandle(this,FXSEL(SEL_SIGNAL,signals[sig].message),(void*)(FXival)sig)){
-      refresh();
-      }
+    if(signals[sig].target && signals[sig].target->tryHandle(this,FXSEL(SEL_SIGNAL,signals[sig].message),(void*)(FXival)sig)) refresh();
     return false;
     }
 
@@ -3365,9 +3368,9 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
     if(chores){
       register FXChore *c=chores;
       chores=c->next;
-      if(c->target && c->target->tryHandle(this,FXSEL(SEL_CHORE,c->message),c->data)) refresh();
       c->next=chorerecs;
       chorerecs=c;
+      if(c->target && c->target->tryHandle(this,FXSEL(SEL_CHORE,c->message),c->data)) refresh();
       }
 
     // GUI updating:- walk the whole widget tree, stop after updating refresherstop
@@ -3431,7 +3434,7 @@ FXbool FXApp::getNextEvent(FXRawEvent& msg,FXTime blocking){
 
       // Now we will block...
       signaled=MsgWaitForMultipleObjects(allinputs,handles->hnd,false,INFINITE,QS_ALLINPUT);
-      //signaled=MsgWaitForMultipleObjectsEx(allinputs,handles,INFINITE,QS_ALLINPUT, MWMO_ALERTABLE);
+      //signaled=MsgWaitForMultipleObjectsEx(allinputs,handles,INFINITE,QS_ALLINPUT,MWMO_ALERTABLE);
 
       // Enter critical section
       appMutex.lock();
@@ -4259,7 +4262,8 @@ long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long l
       EndPaint((HWND)hwnd,&ps);
       return 0;
 
-	case WM_IME_STARTCOMPOSITION:
+    // Start Input Method Editor
+    case WM_IME_STARTCOMPOSITION:
       focuswin=getFocusWindow();
       if(inputstyle[1]!='o'){ // not root mode
         if(focuswin && focuswin->getComposeContext())
@@ -4272,7 +4276,8 @@ long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long l
       // other mode
       return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
 
-	case WM_IME_ENDCOMPOSITION:
+    // End Input Method Editor
+    case WM_IME_ENDCOMPOSITION:
       focuswin=getFocusWindow();
       if(inputstyle[1]!='o'){ // not root mode
         if(focuswin && focuswin->getComposeContext())
@@ -4285,6 +4290,7 @@ long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long l
       // other mode
       return DefWindowProc((HWND)hwnd,iMsg,wParam,lParam);
 
+    // Character Input from Input Method Editor
     case WM_IME_CHAR:
       // ignore this message, coming after WM_IME_COMPOSITION
       // because IME string is handled in WM_IME_COMPOSITION message
@@ -4649,13 +4655,40 @@ Alt key seems to repeat.
 
     // Configure (size)
     case WM_SIZE:
-      if(wParam==SIZE_MINIMIZED) return 0;
-      event.type=SEL_CONFIGURE;
-      event.rect.x=window->getX();
-      event.rect.y=window->getY();
-      event.rect.w=LOWORD(lParam);
-      event.rect.h=HIWORD(lParam);
-      if(window->handle(this,FXSEL(SEL_CONFIGURE,0),&event)) refresh();
+      switch(wParam){
+        case SIZE_MINIMIZED:            // Send SEL_MINIMIZE to window if not yet minimized
+          if(!IsIconic((HWND)hwnd)){
+            event.type=SEL_MINIMIZE;
+            if(window->handle(this,FXSEL(SEL_MINIMIZE,0),&event)) refresh();
+            }
+          break;
+        case SIZE_MAXIMIZED:            // Send SEL_MAXIMIZE to window if not yet maximized
+          if(!IsZoomed((HWND)hwnd)){
+            event.type=SEL_MAXIMIZE;
+            if(window->handle(this,FXSEL(SEL_MAXIMIZE,0),&event)) refresh();
+            }
+          event.type=SEL_CONFIGURE;
+          event.rect.x=window->getX();
+          event.rect.y=window->getY();
+          event.rect.w=LOWORD(lParam);
+          event.rect.h=HIWORD(lParam);
+          if(window->handle(this,FXSEL(SEL_CONFIGURE,0),&event)) refresh();
+          break;
+        case SIZE_RESTORED:             // Send SEL_RESTORE to window if maximized or minimized
+          if(IsZoomed((HWND)hwnd) || IsIconic((HWND)hwnd)){
+            event.type=SEL_RESTORE;
+            if(window->handle(this,FXSEL(SEL_RESTORE,0),&event)) refresh();
+            }
+        case SIZE_MAXHIDE:
+        case SIZE_MAXSHOW:
+          event.type=SEL_CONFIGURE;
+          event.rect.x=window->getX();
+          event.rect.y=window->getY();
+          event.rect.w=LOWORD(lParam);
+          event.rect.h=HIWORD(lParam);
+          if(window->handle(this,FXSEL(SEL_CONFIGURE,0),&event)) refresh();
+          break;
+        }
       return 0;
 
     // Configure (move)

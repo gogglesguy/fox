@@ -213,7 +213,6 @@ FXComplexd.cpp \
 FXComposeContext.cpp \
 FXComposite.cpp \
 FXConsole.cpp \
-FXCopyDialog.cpp \
 FXCursor.cpp \
 FXDataTarget.cpp \
 FXDate.cpp \
@@ -273,6 +272,7 @@ FXGLVisual.cpp \
 FXGradientBar.cpp \
 FXGroupBox.cpp \
 FXGZFileStream.cpp \
+FXhalf.cpp \
 FXHash.cpp \
 FXHeader.cpp \
 FXHorizontalFrame.cpp \
@@ -456,7 +456,6 @@ fxutils.cpp \
 fxwuquantize.cpp \
 fxxbmio.cpp \
 fxxpmio.cpp \
-icons.cpp \
 strtoll.cpp \
 icons.cpp \
 icons.h \

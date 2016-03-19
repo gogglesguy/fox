@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendarView.h,v 1.15 2008/01/04 15:18:14 fox Exp $                    *
+* $Id: FXCalendarView.h,v 1.18 2008/10/02 02:01:59 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXCALENDARVIEW_H
 #define FXCALENDARVIEW_H
@@ -94,8 +94,11 @@ public:
   /// Construct a Calendar View
   FXCalendarView(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=CALENDAR_BROWSESELECT,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Create X window
+  /// Create server-side resources
   virtual void create();
+
+  /// Detach server-side resources
+  virtual void detach();
 
   /// Yes we can
   virtual FXbool canFocus() const;
@@ -130,8 +133,10 @@ public:
   /// Set the current month; current day will be properly updated for the choosen month
   void setCurrentMonth(FXint month,FXbool notify=false);
 
-  /// Return the current month shown. The month may be different than the current
-  /// date if a day in a sibling month is current.
+  /**
+  * Return the current month shown. The month may be different than the current
+  * date if a day in a sibling month is current.
+  */
   FXint getCurrentMonth() const { return month; }
 
   /// Select Date
@@ -196,6 +201,12 @@ public:
 
   /// Get the display color of days in the weekend not in the current month
   FXColor getOtherWeekendColor() const { return otherWeekendColor; }
+
+  /// Set the text font
+  void setFont(FXFont *fnt);
+
+  /// Get the text font
+  FXFont* getFont() const { return font; }
 
   /// Destructor
   virtual ~FXCalendarView();

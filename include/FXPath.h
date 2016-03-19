@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.h,v 1.20 2008/06/02 19:08:21 fox Exp $                            *
+* $Id: FXPath.h,v 1.21 2008/09/12 19:56:44 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXPATH_H
 #define FXPATH_H
@@ -34,46 +34,46 @@ namespace FXPath {
   * Windows, this is "\\" or "C:\".  Returns the empty string
   * if the given path is not absolute.
   */
-  FXString FXAPI root(const FXString& file);
+  extern FXAPI FXString root(const FXString& file);
 
   /**
   * Return share name from Windows UNC filename.
   * For example, share("\\Janes PC\Janes Documents\Document.doc")
   * returns "Janes PC".
   */
-  FXString FXAPI share(const FXString& file);
+  extern FXAPI FXString share(const FXString& file);
 
   /**
   * Return the directory part of the path name.
   * Note that directory("/bla/bla/") is "/bla/bla" and NOT "/bla".
   * However, directory("/bla/bla") is "/bla" as we expect!
   */
-  FXString FXAPI directory(const FXString& file);
+  extern FXAPI FXString directory(const FXString& file);
 
   /**
   * Return name and extension part of the path name.
   * Note that name("/bla/bla/") is "" and NOT "bla".
   * However, name("/bla/bla") is "bla" as we expect!
   */
-  FXString FXAPI name(const FXString& file);
+  extern FXAPI FXString name(const FXString& file);
 
   /// Return file title, i.e. document name only
-  FXString FXAPI title(const FXString& file);
+  extern FXAPI FXString title(const FXString& file);
 
   /// Return extension part of the file name
-  FXString FXAPI extension(const FXString& file);
+  extern FXAPI FXString extension(const FXString& file);
 
   /// Return file name less the extension
-  FXString FXAPI stripExtension(const FXString& file);
+  extern FXAPI FXString stripExtension(const FXString& file);
 
   /// Return the drive letter prefixing this file name (if any).
-  FXString FXAPI drive(const FXString& file);
+  extern FXAPI FXString drive(const FXString& file);
 
   /// Perform tilde or environment variable expansion
-  FXString FXAPI expand(const FXString& file);
+  extern FXAPI FXString expand(const FXString& file);
 
   /// Contract path based on user name and environment variable
-  FXString FXAPI contract(const FXString& file,const FXString& user=FXString::null,const FXString& var=FXString::null);
+  extern FXAPI FXString contract(const FXString& file,const FXString& user=FXString::null,const FXString& var=FXString::null);
 
   /**
   * Simplify a file path; the path will remain relative if it was relative,
@@ -81,43 +81,43 @@ namespace FXPath {
   * as this is important in other functions.
   * For example, simplify("..//aaa/./bbb//../c/") becomes "../aaa/c/".
   */
-  FXString FXAPI simplify(const FXString& file);
+  extern FXAPI FXString simplify(const FXString& file);
 
   /// Return absolute path from current directory and file name
-  FXString FXAPI absolute(const FXString& file);
+  extern FXAPI FXString absolute(const FXString& file);
 
   /// Return absolute path from base directory and file name
-  FXString FXAPI absolute(const FXString& base,const FXString& file);
+  extern FXAPI FXString absolute(const FXString& base,const FXString& file);
 
   /// Return relative path of file to the current directory
-  FXString FXAPI relative(const FXString& file);
+  extern FXAPI FXString relative(const FXString& file);
 
   /// Return relative path of file to given base directory
-  FXString FXAPI relative(const FXString& base,const FXString& file);
+  extern FXAPI FXString relative(const FXString& base,const FXString& file);
 
   /// Convert path from using 'sepfm' or 'septo' to use only 'septo' path-separators
-  FXString FXAPI convert(const FXString& file,FXchar septo=PATHSEP,FXchar sepfm='/');
+  extern FXAPI FXString convert(const FXString& file,FXchar septo=PATHSEP,FXchar sepfm='/');
 
   /// Return path to directory above input directory name
-  FXString FXAPI upLevel(const FXString& file);
+  extern FXAPI FXString upLevel(const FXString& file);
 
   /// Return true if file positively inside base directory
-  FXbool FXAPI isInside(const FXString& base,const FXString& file);
+  extern FXAPI FXbool isInside(const FXString& base,const FXString& file);
 
   /// Return true if file name is absolute
-  FXbool FXAPI isAbsolute(const FXString& file);
+  extern FXAPI FXbool isAbsolute(const FXString& file);
 
   /// Return true if input directory is a top-level directory
-  FXbool FXAPI isTopDirectory(const FXString& file);
+  extern FXAPI FXbool isTopDirectory(const FXString& file);
 
   /// Return true if input path is a file share
-  FXbool FXAPI isShare(const FXString& file);
+  extern FXAPI FXbool isShare(const FXString& file);
 
   /// Enquote filename to make safe for shell
-  FXString FXAPI enquote(const FXString& file,FXbool forcequotes=false);
+  extern FXAPI FXString enquote(const FXString& file,FXbool forcequotes=false);
 
   /// Dequote filename to get original again
-  FXString FXAPI dequote(const FXString& file);
+  extern FXAPI FXString dequote(const FXString& file);
 
   /**
   * Perform wildcard match of a filename against a wildcard pattern.
@@ -146,19 +146,19 @@ namespace FXPath {
   *  FILEMATCH_LEADING_DIR       Ignore /... after a match
   *  FILEMATCH_CASEFOLD          Compare without regard to case
   */
-  FXbool FXAPI match(const FXString& pattern,const FXString& file,FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
+  extern FXAPI FXbool match(const FXString& pattern,const FXString& file,FXuint flags=(FILEMATCH_NOESCAPE|FILEMATCH_FILE_NAME));
 
   /**
   * Generate unique filename of the form pathnameXXX.ext, where
   * pathname.ext is the original input file, and XXX is a number,
   * possibly empty, that makes the file unique.
   */
-  FXString FXAPI unique(const FXString& file);
+  extern FXAPI FXString unique(const FXString& file);
 
   /**
   * Search path list for this file, return full path name for first occurrence.
   */
-  FXString FXAPI search(const FXString& pathlist,const FXString& file);
+  extern FXAPI FXString search(const FXString& pathlist,const FXString& file);
 
   }
 

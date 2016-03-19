@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.h,v 1.14 2008/01/04 15:18:14 fox Exp $                    *
+* $Id: FXBZFileStream.h,v 1.15 2008/07/02 19:05:39 fox Exp $                    *
 ********************************************************************************/
 #ifdef HAVE_BZ2LIB_H
 #ifndef FXBZFILESTREAM_H
@@ -47,9 +47,12 @@ public:
 
   /// Create BZIP2 file stream
   FXBZFileStream(const FXObject* cont=NULL);
-
+  
+  /// Create and open BZIP2 file stream
+  FXBZFileStream(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
+  
   /// Open file stream
-  FXbool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
+  FXbool open(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
 
   /// Flush buffer
   virtual FXbool flush();

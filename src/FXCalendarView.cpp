@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCalendarView.cpp,v 1.22 2008/01/04 15:42:05 fox Exp $                  *
+* $Id: FXCalendarView.cpp,v 1.30 2008/10/02 07:22:30 fox Exp $                  *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -118,6 +118,13 @@ FXCalendarView::FXCalendarView(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
 void FXCalendarView::create(){
   FXWindow::create();
   font->create();
+  }
+
+
+// Detach window
+void FXCalendarView::detach(){
+  FXWindow::detach();
+  font->detach();
   }
 
 
@@ -222,22 +229,26 @@ void FXCalendarView::setOtherWeekendColor(FXColor clr){
 
 // Compute default width
 FXint FXCalendarView::getDefaultWidth(){
-  FXint tw=0;
-  FXint cw=0;
-  for(FXint i=0; i<7; i++){
-    tw=font->getTextWidth(FXDate::dayNameShort(i),strlen(FXDate::dayNameShort(i)));     // FIXME use translated names
+  FXint cw=0,tw,i;
+  FXString text;
+  for(i=0; i<7; i++){
+    text=tr(FXDate::dayNameShort(i));
+    tw=font->getTextWidth(text);
     if(tw>cw) cw=tw;
     }
-  cw+=4; // Spacing
-  return (options&CALENDAR_WEEKNUMBERS) ? (cw*8) : (cw*7);
+  if(options&CALENDAR_WEEKNUMBERS){
+    text=tr("Wk");
+    tw=font->getTextWidth(text);
+    if(tw>cw) cw=tw;
+    return (cw+4)*8;
+    }
+  return (cw+4)*7;
   }
 
 
 // Compute default height
 FXint FXCalendarView::getDefaultHeight(){
-  FXint ch=font->getFontHeight();
-  ch+=4; // Spacing
-  return ch*7;
+  return (font->getFontHeight()+4)*7;
   }
 
 
@@ -266,27 +277,26 @@ void FXCalendarView::moveFocus(FXDate f){
 
 // Get date at x,y if any
 FXbool FXCalendarView::getDateAt(FXint x,FXint y,FXDate& date) const {
-  FXint ncols     = ((options&CALENDAR_WEEKNUMBERS) ? 8 : 7);
-  FXint nrows     = 7;
-  FXint cw        = width / ncols;
-  FXint ch        = height / nrows;
-  FXint cwr       = width % ncols;
-  FXint chr       = height % nrows;
+  FXint ncols=(options&CALENDAR_WEEKNUMBERS)?8:7;
+  FXint nrows=7;
+  FXint cw=width/ncols;
+  FXint ch=height/nrows;
+  FXint cwr=width%ncols;
+  FXint chr=height%nrows;
+  FXint col=0,row=0,xx=0,yy=0;
   FXint columnwidth[8];
   FXint rowheight[7];
-  FXint xx=0,col=0;
-  FXint yy=0,row=0;
-  FXint i=0,e=0;
+  FXint i,e;
 
-  // Calculate Column Widths
-  for(i=0,e=0; i<ncols; i++){
+  // Calculate column widths
+  for(i=e=0; i<ncols; i++){
     columnwidth[i]=cw;
     e+=cwr;
     if(e>=ncols){ columnwidth[i]++; e-=ncols; }
     }
 
-  // Calculate Row Heights
-  for(i=0,e=0; i<nrows; i++){
+  // Calculate row heights
+  for(i=e=0; i<nrows; i++){
     rowheight[i]=ch;
     e+=chr;
     if(e>=nrows){ rowheight[i]++; e-=nrows; }
@@ -299,7 +309,7 @@ FXbool FXCalendarView::getDateAt(FXint x,FXint y,FXDate& date) const {
   // Determine where we clicked
   while(xx<x && col<ncols) xx+=columnwidth[col++];
   while(yy<y && row<nrows) yy+=rowheight[row++];
-  if (options&CALENDAR_WEEKNUMBERS) col-=1;
+  if(options&CALENDAR_WEEKNUMBERS) col-=1;
   col-=1;
   row-=2;
   date=ds+(row*7)+col;
@@ -308,18 +318,18 @@ FXbool FXCalendarView::getDateAt(FXint x,FXint y,FXDate& date) const {
 
 
 // Redraw widget
-long FXCalendarView::onPaint(FXObject*,FXSelector,void*ptr){
-  FXDate now             = FXDate::localDate();
-  FXint coloffset        = ((options&CALENDAR_WEEKNUMBERS) ? 1 : 0);
-  FXbool displayselected = (has_selection || ((options&SELECT_MASK)==CALENDAR_BROWSESELECT));
-  FXint ncols            = ((options&CALENDAR_WEEKNUMBERS) ? 8 : 7);
-  FXint nrows            = 7;
-  FXint cw               = width / ncols;
-  FXint ch               = height / nrows;
-  FXint cwr              = width % ncols;
-  FXint chr              = height % nrows;
-  FXint textwidth        = font->getTextWidth("88",2);
-  FXint fontheight       = font->getFontHeight();
+long FXCalendarView::onPaint(FXObject*,FXSelector,void* ptr){
+  FXDate now=FXDate::localDate();
+  FXint coloffset=(options&CALENDAR_WEEKNUMBERS)?1:0;
+  FXbool displayselected=(has_selection || ((options&SELECT_MASK)==CALENDAR_BROWSESELECT));
+  FXint ncols=(options&CALENDAR_WEEKNUMBERS)?8:7;
+  FXint nrows=7;
+  FXint cw=width/ncols;
+  FXint ch=height/nrows;
+  FXint cwr=width%ncols;
+  FXint chr=height%nrows;
+  FXint textwidth=font->getTextWidth("88",2);
+  FXint fontheight=font->getFontHeight();
   FXint i=0,c=0,r=0,e=0;
   FXint xx=0,yy=0;
   FXint columnwidth[8];      // Width of each column
@@ -328,7 +338,10 @@ long FXCalendarView::onPaint(FXObject*,FXSelector,void*ptr){
   FXString text;
   FXDate pd=ds;
 
-  // Calculate Column Widths
+  // The acual painting
+  FXDCWindow dc(this,(FXEvent*)ptr);
+
+  // Calculate column widths
   for(i=0,e=0; i<ncols; i++){
     columnwidth[i]=cw;
     e+=cwr;
@@ -336,89 +349,90 @@ long FXCalendarView::onPaint(FXObject*,FXSelector,void*ptr){
     columnoffset[i]=(columnwidth[i]-textwidth)/2;
     }
 
-  // Calculate Row Heights
+  // Calculate row heights
   for(i=0,e=0; i<nrows; i++){
     rowheight[i]=ch;
     e+=chr;
     if(e>=nrows){ rowheight[i]++; e-=nrows; }
     }
 
-
-  // The acual painting
-  FXDCWindow dc(this,(FXEvent*)ptr);
-
-  // Paint Backgrounds
-  if(isEnabled())
+  // Paint backgrounds
+  if(isEnabled()){
     dc.setForeground(backColor);
-  else
+    }
+  else{
     dc.setForeground(getApp()->getBaseColor());
+    }
 
   dc.fillRectangle(0,rowheight[0],width,height-rowheight[0]);
   dc.setForeground(titleBackColor);
   dc.fillRectangle(0,0,width,rowheight[0]);
 
-  // Paint Separator between week numbers and days
+  // Paint separator between week numbers and days
   if(options&CALENDAR_WEEKNUMBERS) {
     dc.setForeground(getApp()->getForeColor());
     dc.fillRectangle(columnwidth[0]-1,0,1,height);
     }
 
-  // Paint Header
+  // Paint header
   dc.setForeground(titleColor);
   dc.setFont(font);
 
+  // Week number caption
   if(options&CALENDAR_WEEKNUMBERS){
     text=tr("Wk");
-    dc.drawText(((columnwidth[0]-font->getTextWidth(text))/2),((rowheight[0]-fontheight)/2)+font->getFontAscent(),text);
+    dc.drawText((columnwidth[0]-font->getTextWidth(text))/2,(rowheight[0]-fontheight)/2+font->getFontAscent(),text);
     xx+=columnwidth[0];
     }
 
+  // Day of week captions
   for(c=firstday,i=coloffset; c<firstday+7; c++,i++){
-    text.format("%s",tr(FXDate::dayNameShort(c%7)));
-    if(c%7==0 || c%7==6)
+    text=tr(FXDate::dayNameShort(c%7));
+    if(c%7==0 || c%7==6){
       dc.setForeground(weekendColor);
-    else
+      }
+    else{
       dc.setForeground(titleColor);
-
-    dc.drawText(xx+((columnwidth[i]-font->getTextWidth(text))/2),((rowheight[0]-fontheight)/2)+font->getFontAscent(),text);
+      }
+    dc.drawText(xx+(columnwidth[i]-font->getTextWidth(text))/2,(rowheight[0]-fontheight)/2+font->getFontAscent(),text);
     xx+=columnwidth[i];
     }
 
-  // Next Row
+  // Next row
   yy+=rowheight[0];
 
-
-  // Paint Days
+  // Paint days
   dc.setForeground(getApp()->getForeColor());
   for(r=1; r<nrows; r++){
     xx=0;
 
     if(options&CALENDAR_WEEKNUMBERS){
-      text.format("%d",pd.weekOfYear());
+      text.fromInt(pd.weekOfYear());
       dc.setForeground(dayColor);
 
       // Draw Text
-      dc.drawText(xx+((columnwidth[0]-font->getTextWidth(text)))-columnoffset[0],yy+((rowheight[r]-fontheight)/2)+font->getFontAscent(),text);
+      dc.drawText(xx+columnwidth[0]-font->getTextWidth(text)-columnoffset[0],yy+(rowheight[r]-fontheight)/2+font->getFontAscent(),text);
       xx+=columnwidth[0];
       }
 
 
     for(c=coloffset; c<ncols; c++){
       if((options&CALENDAR_HIDEOTHER) && pd.month()!=month){
-        ++pd; // Next Day
-        xx+=columnwidth[c]; // Next Column
+        ++pd; // Next day
+        xx+=columnwidth[c]; // Next column
         continue;
         }
 
-      text.format("%d",pd.day());
+      text.fromInt(pd.day());
 
-      // Determine Drawing Colors
+      // Determine drawing colors
       if(displayselected && selected==pd){
-        if(isEnabled())
+        if(isEnabled()){
           dc.setForeground(getApp()->getSelbackColor());
-        else
+          }
+        else{
           dc.setForeground(getApp()->getShadowColor());
-
+          }
         dc.fillRectangle(xx,yy,columnwidth[c],rowheight[r]);
         dc.setForeground(getApp()->getSelforeColor());
         }
@@ -443,14 +457,14 @@ long FXCalendarView::onPaint(FXObject*,FXSelector,void*ptr){
         }
 
       // Draw Text
-      dc.drawText(xx+((columnwidth[c]-font->getTextWidth(text)))-columnoffset[c],yy+((rowheight[r]-fontheight)/2)+font->getFontAscent(),text);
+      dc.drawText(xx+columnwidth[c]-font->getTextWidth(text)-columnoffset[c],yy+(rowheight[r]-fontheight)/2+font->getFontAscent(),text);
 
       if(hasFocus() && current==pd){
         dc.drawFocusRectangle(xx,yy,columnwidth[c],rowheight[r]);
         }
 
-      ++pd; // Next Day
-      xx+=columnwidth[c]; // Next Column
+      ++pd; // Next day
+      xx+=columnwidth[c]; // Next column
       }
 
     // Next Row
@@ -482,7 +496,6 @@ long FXCalendarView::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
           state=true;
         else
           state=false;
-
         selectDate(cd,true);
         }
       }
@@ -669,7 +682,7 @@ long FXCalendarView::onKeyPress(FXObject*sender,FXSelector sel,void* ptr){
 
 
 // Mark as dirty
-void FXCalendarView::markdirty(FXDate d) {
+void FXCalendarView::markdirty(FXDate d){
   if(xid){
     FXint ncols = ((options&CALENDAR_WEEKNUMBERS) ? 8 : 7);
     FXint nrows = 7;
@@ -837,6 +850,17 @@ void FXCalendarView::setFirstDay(FXint d){
   if(firstday!=d){
     firstday=d;
     updateview();
+    update();
+    }
+  }
+
+
+// Change the font
+void FXCalendarView::setFont(FXFont *fnt){
+  if(!fnt){ fxerror("%s::setFont: NULL font specified.\n",getClassName()); }
+  if(font!=fnt){
+    font=fnt;
+    recalc();
     update();
     }
   }

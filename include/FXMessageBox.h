@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMessageBox.h,v 1.31 2008/01/04 15:18:22 fox Exp $                      *
+* $Id: FXMessageBox.h,v 1.32 2008/09/09 23:32:51 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXMESSAGEBOX_H
 #define FXMESSAGEBOX_H
@@ -32,14 +32,15 @@ namespace FX {
 
 // Message box buttons
 enum {
-  MBOX_OK                   = 0x10000000, /// Message box has a only an OK button
-  MBOX_OK_CANCEL            = 0x20000000, /// Message box has OK and CANCEL buttons
-  MBOX_YES_NO               = 0x30000000, /// Message box has YES and NO buttons
-  MBOX_YES_NO_CANCEL        = 0x40000000, /// Message box has YES, NO, and CANCEL buttons
-  MBOX_QUIT_CANCEL          = 0x50000000, /// Message box has QUIT and CANCEL buttons
-  MBOX_QUIT_SAVE_CANCEL     = 0x60000000, /// Message box has QUIT, SAVE, and CANCEL buttons
-  MBOX_SKIP_SKIPALL_CANCEL  = 0x70000000, /// Message box has SKIP, SKIP ALL, and CANCEL buttons
-  MBOX_SAVE_CANCEL_DONTSAVE = 0x80000000  /// Message box has DON'T SAVE,CANCEL and SAVE buttons
+  MBOX_OK                         = 0x10000000, /// Message box has a only an OK button
+  MBOX_OK_CANCEL                  = 0x20000000, /// Message box has OK and CANCEL buttons
+  MBOX_YES_NO                     = 0x30000000, /// Message box has YES and NO buttons
+  MBOX_YES_NO_CANCEL              = 0x40000000, /// Message box has YES, NO, and CANCEL buttons
+  MBOX_QUIT_CANCEL                = 0x50000000, /// Message box has QUIT and CANCEL buttons
+  MBOX_QUIT_SAVE_CANCEL           = 0x60000000, /// Message box has QUIT, SAVE, and CANCEL buttons
+  MBOX_SKIP_SKIPALL_CANCEL        = 0x70000000, /// Message box has SKIP, SKIP ALL, and CANCEL buttons
+  MBOX_SAVE_CANCEL_DONTSAVE       = 0x80000000, /// Message box has DON'T SAVE,CANCEL and SAVE buttons
+  MBOX_YES_YESALL_NO_NOALL_CANCEL = 0xA0000000  /// Message box has YES, YES ALL, NO, NO ALL, and CANCEL buttons
   };
 
 
@@ -52,7 +53,9 @@ enum {
   MBOX_CLICKED_QUIT     = 5,            /// The QUIT button was clicked
   MBOX_CLICKED_SAVE     = 6,            /// The SAVE button was clicked
   MBOX_CLICKED_SKIP     = 7,            /// The SKIP button was clicked
-  MBOX_CLICKED_SKIPALL  = 8             /// The SKIP ALL button was clicked
+  MBOX_CLICKED_SKIPALL  = 8,            /// The SKIP ALL button was clicked
+  MBOX_CLICKED_YESALL   = 9,            /// The YES ALL button was clicked
+  MBOX_CLICKED_NOALL    = 10            /// The NO ALL button was clicked
   };
 
 
@@ -86,6 +89,8 @@ public:
     ID_CLICKED_SAVE,
     ID_CLICKED_SKIP,
     ID_CLICKED_SKIPALL,
+    ID_CLICKED_YESALL,
+    ID_CLICKED_NOALL,
     ID_LAST
     };
 public:

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: chartutils.cpp,v 1.7 2008/04/23 16:21:48 fox Exp $                       *
+* $Id: chartutils.cpp,v 1.8 2008/09/26 00:42:12 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 #include "chartdefs.h"
@@ -30,12 +30,12 @@
 */
 
 
-using namespace FX;
+using namespace FXCHART;
 
 
 /*******************************************************************************/
 
-namespace FX {
+namespace FXCHART {
 
 
 // Measure text width

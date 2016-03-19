@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxdefs.h,v 1.204 2008/06/03 15:27:29 fox Exp $                           *
+* $Id: fxdefs.h,v 1.206 2008/09/05 22:50:07 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXDEFS_H
 #define FXDEFS_H
@@ -302,6 +302,13 @@ enum FXDragAction {
   };
 
 
+/// Clipboard actions
+enum FXClipAction {
+  CLIP_COPY    = 0,                 /// Copy to clipboard
+  CLIP_CUT     = 1                  /// Clip to clipboard
+  };
+  
+  
 /// Origin of data
 enum FXDNDOrigin {
   FROM_SELECTION  = 0,              /// Primary selection
@@ -453,6 +460,12 @@ const FXTime forever=9223372036854775807L;
 
 /// Abolute value
 #define FXABS(val) (((val)>=0)?(val):-(val))
+
+/// Return 1 if val >= 0 and -1 otherwise
+#define FXSGN(val) (((val)<0)?-1:1)
+
+/// Return 1 if val > 0, -1 if val < 0, and 0 otherwise
+#define FXSGNZ(val) ((val)<0?-1:(val)>0?1:0)
 
 /// Return the maximum of a or b
 #define FXMAX(a,b) (((a)>(b))?(a):(b))

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDDSImage.h,v 1.4 2008/06/30 15:50:44 fox Exp $                         *
+* $Id: FXDDSImage.h,v 1.5 2008/07/02 05:42:00 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXDDSIMAGE_H
 #define FXDDSIMAGE_H
@@ -72,6 +72,11 @@ extern FXAPI FXbool fxcheckDDS(FXStream& store);
 * If an error occurred, the pixel array is set to NULL.
 */
 extern FXAPI FXbool fxloadDDS(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& depth);
+
+/**
+* Save a DDS (Direct Draw Surface) file to a stream.
+*/
+extern FXAPI FXbool fxsaveDDS(FXStream& store,FXColor* data,FXint width,FXint height,FXint depth);
 
 }
 

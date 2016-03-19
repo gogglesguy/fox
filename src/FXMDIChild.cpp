@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIChild.cpp,v 1.112 2008/04/23 16:50:17 fox Exp $                     *
+* $Id: FXMDIChild.cpp,v 1.113 2008/07/15 19:01:42 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -251,8 +251,8 @@ void FXMDIChild::layout(){
   th=FXMAX3(fh,mh,bh)+2;
   bx=width-BORDERWIDTH-bw-2;
   by=BORDERWIDTH+(th-bh)/2;
-  windowbtn->position(BORDERWIDTH+2,BORDERWIDTH+(th-mh)/2,mw,mh);
   if(isMaximized()){
+    windowbtn->hide();
     deletebtn->hide();
     maximizebtn->hide();
     minimizebtn->hide();
@@ -264,9 +264,11 @@ void FXMDIChild::layout(){
       }
     }
   else if(isMinimized()){
+    windowbtn->position(BORDERWIDTH+2,BORDERWIDTH+(th-mh)/2,mw,mh);
     deletebtn->position(bx,by,bw,bh); bx-=bw+3;
     maximizebtn->position(bx,by,bw,bh); bx-=bw+3;
     restorebtn->position(bx,by,bw,bh);
+    windowbtn->show();
     deletebtn->show();
     maximizebtn->show();
     minimizebtn->hide();
@@ -276,9 +278,11 @@ void FXMDIChild::layout(){
       }
     }
   else{
+    windowbtn->position(BORDERWIDTH+2,BORDERWIDTH+(th-mh)/2,mw,mh);
     deletebtn->position(bx,by,bw,bh); bx-=bw+3;
     maximizebtn->position(bx,by,bw,bh); bx-=bw+3;
     minimizebtn->position(bx,by,bw,bh);
+    windowbtn->show();
     deletebtn->show();
     maximizebtn->show();
     minimizebtn->show();
@@ -583,7 +587,7 @@ long FXMDIChild::onPaint(FXObject*,FXSelector,void* ptr){
       dc.setForeground(backColor);
       dc.fillRectangle(BORDERWIDTH,BORDERWIDTH,width-BORDERWIDTH*2,th);
       }
-            
+
     // Draw title
     if(!title.empty()){
       xx=BORDERWIDTH+mw+2+4;

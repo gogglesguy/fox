@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTextField.cpp,v 1.214 2008/04/30 18:32:21 fox Exp $                    *
+* $Id: FXTextField.cpp,v 1.215 2008/09/22 20:50:13 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -296,7 +296,7 @@ FXbool FXTextField::isPosSelected(FXint pos) const {
 
 // Check if w is delimiter
 static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
-  return w<256 && strchr(delimiters,w); // FIXME for w>256
+  return w<128 && strchr(delimiters,w); // FIXME for w>=128
   }
 
 

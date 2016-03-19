@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLViewer.cpp,v 1.186 2008/06/09 18:10:47 fox Exp $                     *
+* $Id: FXGLViewer.cpp,v 1.187 2008/07/28 20:59:45 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -307,7 +307,7 @@ FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXObject* tgt,FXSelector s
 
 
 // Construct GL viewer widget with shared display list
-FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLViewer* share,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,share,tgt,sel,opts,x,y,w,h){
+FXGLViewer::FXGLViewer(FXComposite* p,FXGLVisual *vis,FXGLCanvas* share,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXGLCanvas(p,vis,share,tgt,sel,opts,x,y,w,h){
   initialize();
   }
 

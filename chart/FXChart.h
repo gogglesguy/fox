@@ -18,13 +18,13 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXChart.h,v 1.47 2008/01/04 15:18:13 fox Exp $                           *
+* $Id: FXChart.h,v 1.48 2008/09/26 00:42:12 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXCHART_H
 #define FXCHART_H
 
 
-namespace FX {
+namespace FXCHART {
 
 
 class FXAxis;

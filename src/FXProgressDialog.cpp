@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressDialog.cpp,v 1.34 2008/01/04 15:42:27 fox Exp $                *
+* $Id: FXProgressDialog.cpp,v 1.35 2008/09/09 23:32:53 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -68,6 +68,8 @@ FXDEFMAP(FXProgressDialog) FXProgressDialogMap[]={
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETINTVALUE,FXProgressDialog::onCmdGetIntValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETLONGVALUE,FXProgressDialog::onCmdSetLongValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETLONGVALUE,FXProgressDialog::onCmdGetLongValue),
+  FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETINTRANGE,FXProgressDialog::onCmdSetIntRange),
+  FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETINTRANGE,FXProgressDialog::onCmdGetIntRange),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_GETSTRINGVALUE,FXProgressDialog::onCmdGetStringValue),
   FXMAPFUNC(SEL_COMMAND,FXProgressDialog::ID_SETSTRINGVALUE,FXProgressDialog::onCmdSetStringValue),
   };
@@ -142,11 +144,27 @@ long FXProgressDialog::onCmdGetLongValue(FXObject*,FXSelector,void* ptr){
   }
 
 
+// Update range from a message
+long FXProgressDialog::onCmdSetIntRange(FXObject*,FXSelector,void* ptr){
+  setTotal(((FXint*)ptr)[1]-((FXint*)ptr)[0]);
+  return 1;
+  }
+
+
+// Get range with a message
+long FXProgressDialog::onCmdGetIntRange(FXObject*,FXSelector,void* ptr){
+  ((FXint*)ptr)[0]=0;
+  ((FXint*)ptr)[1]=getTotal();
+  return 1;
+  }
+
+
 // Change message label
 long FXProgressDialog::onCmdSetStringValue(FXObject*,FXSelector,void* ptr){
   setMessage(*((FXString*)ptr));
   return 1;
   }
+
 
 // Get message label
 long FXProgressDialog::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){

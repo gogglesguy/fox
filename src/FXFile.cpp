@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFile.cpp,v 1.267 2008/05/19 20:07:45 fox Exp $                         *
+* $Id: FXFile.cpp,v 1.269 2008/09/10 23:44:46 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -532,8 +532,6 @@ FXbool FXFile::identical(const FXString& file1,const FXString& file2){
   }
 
 
-// FIXME use FXFile::identical to keep struct on stack for cycle-test
-
 // Copy srcfile to dstfile, overwriting dstfile if allowed
 FXbool FXFile::copy(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
   if(srcfile!=dstfile){
@@ -591,6 +589,8 @@ FXbool FXFile::concat(const FXString& srcfile1,const FXString& srcfile2,const FX
   return false;
   }
 
+// FIXME use FXFile::identical to keep struct on stack for cycle-test
+
 
 // Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
 FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
@@ -625,10 +625,7 @@ FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
         FXDir dir(srcfile);
 
         // Copy source directory
-        while(dir.next()){
-
-          // Next name
-          name=dir.name();
+        while(dir.next(name)){
 
           // Skip '.' and '..'
           if(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))) continue;
@@ -643,7 +640,7 @@ FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
 
       // Source is a file
       if(srcstat.isFile()){
-        //FXTRACE((100,"FXFile::copyFile(%s,%s)\n",srcfile.text(),dstfile.text()));
+        //FXTRACE((100,"FXFile::copy(%s,%s)\n",srcfile.text(),dstfile.text()));
 
         // Simply copy
         if(!FXFile::copy(srcfile,dstfile,overwrite)) return false;
@@ -711,14 +708,12 @@ FXbool FXFile::moveFiles(const FXString& srcfile,const FXString& dstfile,FXbool 
 // Remove file or directory, recursively if allowed
 FXbool FXFile::removeFiles(const FXString& path,FXbool recursive){
   FXStat stat;
-  //FXTRACE((100,"removeFiles(%s)\n",path.text()));
   if(FXStat::statLink(path,stat)){
     if(stat.isDirectory()){
       if(recursive){
         FXDir dir(path);
         FXString name;
-        while(dir.next()){
-          name=dir.name();
+        while(dir.next(name)){
           if(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))) continue;
           if(!FXFile::removeFiles(path+PATHSEP+name,true)) return false;
           }

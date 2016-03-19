@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.cpp,v 1.173 2008/04/29 12:51:37 fox Exp $                     *
+* $Id: TextWindow.cpp,v 1.175 2008/07/29 16:42:57 fox Exp $                     *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -178,7 +178,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_STRIP_SP,        TextWindow::onCmdStripSpaces),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_APPEND_NL,       TextWindow::onUpdAppendNewline),
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_APPEND_NL,       TextWindow::onCmdAppendNewline),
-  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_INCLUDE_PATH,    TextWindow::onCmdIncludePaths),
+  FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_SEARCH_PATHS,    TextWindow::onCmdSearchPaths),
   FXMAPFUNC(SEL_COMMAND,           TextWindow::ID_FILEFILTER,      TextWindow::onCmdFilter),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_OVERSTRIKE,      TextWindow::onUpdOverstrike),
   FXMAPFUNC(SEL_UPDATE,            TextWindow::ID_READONLY,        TextWindow::onUpdReadOnly),
@@ -593,7 +593,7 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   new FXMenuCheck(optionmenu,tr("Use initial size\t\tToggle initial window size mode."),this,ID_USE_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("Set initial size\t\tSet current window size as the initial window size."),NULL,this,ID_SET_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("&Restyle\t\tToggle syntax coloring."),NULL,this,ID_RESTYLE);
-  new FXMenuCommand(optionmenu,tr("Include path...\t\tDirectories to search for include files."),NULL,this,ID_INCLUDE_PATH);
+  new FXMenuCommand(optionmenu,tr("Search paths...\t\tDirectories to search for files."),NULL,this,ID_SEARCH_PATHS);
   new FXMenuCascade(optionmenu,tr("Tab stops"),NULL,tabsmenu);
   new FXMenuCascade(optionmenu,tr("Syntax patterns"),NULL,syntaxmenu);
   new FXMenuSeparator(optionmenu);
@@ -651,7 +651,7 @@ TextWindow::TextWindow(Adie* a,const FXString& file):FXMainWindow(a,"Adie",NULL,
   filetime=0;
 
   // Initialize other stuff
-  searchpath="/usr/include";
+  searchpaths="/usr/include";
   setPatterns(tr("All Files (*)"));
   setCurrentPattern(0);
   currentstyle=-1;
@@ -1203,7 +1203,7 @@ void TextWindow::readRegistry(){
   setCurrentPattern(getApp()->reg().readIntEntry("SETTINGS","filepatternno",0));
 
   // Search path
-  searchpath=getApp()->reg().readStringEntry("SETTINGS","searchpath","/usr/include");
+  searchpaths=getApp()->reg().readStringEntry("SETTINGS","searchpaths","/usr/include");
 
   // Change the colors
   editor->setTextColor(textfore);
@@ -1386,7 +1386,7 @@ void TextWindow::writeRegistry(){
   getApp()->reg().writeStringEntry("SETTINGS","filepatterns",getPatterns().text());
 
   // Search path
-  getApp()->reg().writeStringEntry("SETTINGS","searchpath",searchpath.text());
+  getApp()->reg().writeStringEntry("SETTINGS","searchpaths",searchpaths.text());
 
   // Font
   fontspec=editor->getFont()->getFont();
@@ -1529,26 +1529,34 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
 
     // Its too big, most likely not a file name
     if(string.length()<1024){
-      FXString file=FXString::null;
-      FXString dir=FXSystem::getCurrentDirectory();
-
-      // Base off currently loaded file
-      if(!getFilename().empty()) dir=FXPath::directory(getFilename());
+    
+      // File to load
+      FXString file;
+      
+      // Use current file's directory as base directory
+      FXString dir=FXPath::directory(getFilename());
+      
+      // If no directory part, use current directory
+      if(dir.empty()){
+        dir=FXSystem::getCurrentDirectory();
+        }
 
       // Strip leading/trailing space
       string.trim();
 
-      // Extract name from #include syntax
+      // Extract name from #include "file.h" syntax
       if(string.scan("#include \"%[^\"]\"",name)==1){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpath,name);
+          file=FXPath::search(searchpaths,name);
           }
         }
+
+      // Extract name from #include <file.h> syntax
       else if(string.scan("#include <%[^>]>",name)==1){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpath,name);
+          file=FXPath::search(searchpaths,name);
           }
         }
 
@@ -1556,7 +1564,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
       else if(string.scan("%[^:]:%d:",name,&lineno)==2){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(dir,string);
+          file=FXPath::search(searchpaths,name);
           }
         }
 
@@ -1564,7 +1572,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
       else if(string.scan("%[^(](%d)",name,&lineno)==2){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(dir,string);
+          file=FXPath::search(searchpaths,name);
           }
         }
 
@@ -1572,7 +1580,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
       else if(string.scan("\"%[^\"]\", line %d",name,&lineno)==2){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(dir,string);
+          file=FXPath::search(searchpaths,name);
           }
         }
 
@@ -1580,7 +1588,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
       else if(string.scan("%*[^:]: %*s File = %[^,], Line = %d",name,&lineno)==2){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(dir,string);
+          file=FXPath::search(searchpaths,name);
           }
         }
 
@@ -1588,16 +1596,19 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
       else if(string.scan("%[^:]:",name)==1){
         file=FXPath::absolute(dir,name);
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(dir,string);
+          file=FXPath::search(searchpaths,name);
           }
         }
 
-      // Try whole selection
-      else{
-        file=FXPath::absolute(dir,string);
+      // Still not found; try whole string
+      if(!FXStat::exists(file)){
+        file=string;
+        if(!FXStat::exists(file)){
+          file=FXPath::absolute(dir,string);
+          }
         }
-
-      // Not a file name
+        
+      // If exists, try load it!
       if(FXStat::exists(file)){
 
         // File loaded already?
@@ -2238,9 +2249,9 @@ long TextWindow::onUpdNumRows(FXObject* sender,FXSelector,void*){
   }
 
 
-// Set TextWindow path
-long TextWindow::onCmdIncludePaths(FXObject*,FXSelector,void*){
-  FXInputDialog::getString(searchpath,this,tr("Change include file search path"),tr("Specify a list of directories separated by a `" PATHLISTSEPSTRING "' where include files are to be found.\nFor example:\n\n  /usr/include" PATHLISTSEPSTRING "/usr/local/include\n\nThis list will be used to locate the selected file name."));
+// Set search paths
+long TextWindow::onCmdSearchPaths(FXObject*,FXSelector,void*){
+  FXInputDialog::getString(searchpaths,this,tr("Change file search path"),tr("Specify a list of directories separated by a `" PATHLISTSEPSTRING "' where files are to be found.\nFor example:\n\n  /usr/include" PATHLISTSEPSTRING "/usr/local/include\n\nThis list will be used to locate the selected file name."));
   return 1;
   }
 
@@ -2591,6 +2602,7 @@ long TextWindow::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
   if(warnchanged && getFiletime()!=0){
     FXTime t=FXStat::modified(getFilename());
     if(t && t!=getFiletime()){
+      warnchanged=false;
       setFiletime(t);
       if(MBOX_CLICKED_OK==FXMessageBox::warning(this,MBOX_OK_CANCEL,tr("File Was Changed"),tr("%s\nwas changed by another program. Reload this file from disk?"),getFilename().text())){
         FXint top=editor->getTopLine();
@@ -2600,6 +2612,7 @@ long TextWindow::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
           editor->setCursorPos(pos);
           }
         }
+      warnchanged=true;
       }
     }
   return 1;

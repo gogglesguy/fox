@@ -19,7 +19,7 @@
 * License along with this library; if not, write to the Free Software           *
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    *
 *********************************************************************************
-* $Id: fx.h,v 1.117 2008/06/27 19:44:54 fox Exp $                               *
+* $Id: fx.h,v 1.118 2008/07/18 20:31:20 fox Exp $                               *
 ********************************************************************************/
 #ifndef FX_H
 #define FX_H
@@ -38,6 +38,7 @@
 #include "fxunicode.h"
 
 // FOX classes
+#include "FXhalf.h"
 #include "FXHash.h"
 #include "FXException.h"
 #include "FXAutoPtr.h"

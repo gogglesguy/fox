@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileSelector.cpp,v 1.214 2008/03/26 20:04:22 fox Exp $                 *
+* $Id: FXFileSelector.cpp,v 1.219 2008/09/16 00:24:41 fox Exp $                 *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -184,10 +184,6 @@ FXDEFMAP(FXFileSelector) FXFileSelectorMap[]={
 FXIMPLEMENT(FXFileSelector,FXPacker,FXFileSelectorMap,ARRAYNUMBER(FXFileSelectorMap))
 
 
-// Default pattern
-static const FXchar allfiles[]="All Files (*)";
-
-
 /*******************************************************************************/
 
 // Separator item
@@ -270,9 +266,12 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
     table->addAccel(MKUINT(KEY_b,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_BIG_ICONS));
     table->addAccel(MKUINT(KEY_s,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_MINI_ICONS));
     table->addAccel(MKUINT(KEY_l,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_SHOW_DETAILS));
+table->addAccel(MKUINT(KEY_c,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_COPY_SEL));
+table->addAccel(MKUINT(KEY_x,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_CUT_SEL));
+table->addAccel(MKUINT(KEY_v,CONTROLMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_PASTE_SEL));
     }
   setSelectMode(SELECTFILE_ANY);    // For backward compatibility, this HAS to be the default!
-  setPatternList(allfiles);
+  setPatternList(tr("All Files (*)"));
   setDirectory(FXSystem::getCurrentDirectory());
   filebox->setDraggableFiles(false);
   filebox->setFocus();
@@ -522,7 +521,7 @@ long FXFileSelector::onCmdDirTree(FXObject*,FXSelector,void* ptr){
 // Create new directory
 long FXFileSelector::onCmdNew(FXObject*,FXSelector,void*){
   FXString dir=filebox->getDirectory();
-  FXString name="DirectoryName";
+  FXString name=tr("Folder");
   FXGIFIcon newdirectoryicon(getApp(),bigfolder);
   if(FXInputDialog::getString(name,this,tr("Create New Directory"),tr("Create new directory with name: "),&newdirectoryicon)){
     FXString dirname=FXPath::absolute(dir,name);
@@ -548,7 +547,7 @@ long FXFileSelector::onUpdNew(FXObject* sender,FXSelector,void*){
 
 
 // Selected files and directories
-FXString *FXFileSelector::getSelectedFiles() const {
+FXString *FXFileSelector::getSelectedFiles() const {    // FIXME use filebox->getSelectedFiles()
   register FXString *files=NULL;
   register FXint i,n;
   for(i=n=0; i<filebox->getNumItems(); i++){
@@ -936,7 +935,7 @@ void FXFileSelector::setPatternList(const FXString& patterns){
   FXint count;
   filefilter->clearItems();
   count=filefilter->fillItems(patterns);
-  if(count==0) filefilter->appendItem(allfiles);
+  if(count==0) filefilter->appendItem(tr("All Files (*)"));
   filefilter->setNumVisible(FXMIN(count,12));
   setCurrentPattern(0);
   }

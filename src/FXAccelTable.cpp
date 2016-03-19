@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAccelTable.cpp,v 1.58 2008/01/04 15:42:03 fox Exp $                    *
+* $Id: FXAccelTable.cpp,v 1.59 2008/08/26 20:35:59 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -205,7 +205,7 @@ FXObject* FXAccelTable::targetOfAccel(FXHotKey hotkey) const {
 long FXAccelTable::onKeyPress(FXObject* sender,FXSelector,void* ptr){
   FXTRACE((200,"%p->FXAccelTable::onKeyPress keysym=0x%04x state=%04x\n",this,((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
   register FXEvent* event=(FXEvent*)ptr;
-  register FXuint code=MKUINT(event->code,event->state&(SHIFTMASK|CONTROLMASK|ALTMASK|METAMASK));
+  register FXuint code=MKUINT(event->code,event->state&(SHIFTMASK|CONTROLMASK|ALTMASK));
   register FXuint p=(code*13)&max;
   register FXuint c;
   FXASSERT(code!=UNUSEDSLOT);
@@ -225,7 +225,7 @@ long FXAccelTable::onKeyPress(FXObject* sender,FXSelector,void* ptr){
 long FXAccelTable::onKeyRelease(FXObject* sender,FXSelector,void* ptr){
   FXTRACE((200,"%p->FXAccelTable::onKeyRelease keysym=0x%04x state=%04x\n",this,((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
   register FXEvent* event=(FXEvent*)ptr;
-  register FXuint code=MKUINT(event->code,event->state&(SHIFTMASK|CONTROLMASK|ALTMASK|METAMASK));
+  register FXuint code=MKUINT(event->code,event->state&(SHIFTMASK|CONTROLMASK|ALTMASK));
   register FXuint p=(code*13)&max;
   register FXuint c;
   FXASSERT(code!=UNUSEDSLOT);

@@ -480,14 +480,6 @@ SOURCE=..\..\..\include\FXConsole.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\FXCopyDialog.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\include\FXCopyDialog.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\FXCP1250Codec.cpp
 # End Source File
 # Begin Source File
@@ -733,6 +725,26 @@ SOURCE=..\..\..\src\FXDCWindow.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXDCWindow.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXDDSIcon.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXDDSIcon.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXDDSImage.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXDDSImage.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\fxddsio.cpp
 # End Source File
 # Begin Source File
 
@@ -1173,6 +1185,14 @@ SOURCE=..\..\..\src\FXGZFileStream.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXGZFileStream.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\FXhalf.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXhalf.h
 # End Source File
 # Begin Source File
 

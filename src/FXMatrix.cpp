@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMatrix.cpp,v 1.40 2008/01/04 15:42:25 fox Exp $                        *
+* $Id: FXMatrix.cpp,v 1.41 2008/07/15 22:09:51 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -321,7 +321,6 @@ FXint FXMatrix::getDefaultHeight(){
   if(nzrow>1) hmax+=(nzrow-1)*vspacing;
   return padtop+padbottom+hmax+(border<<1);
   }
-
 
 
 // Recalculate layout

@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFileStream.h,v 1.21 2008/01/04 15:18:18 fox Exp $                      *
+* $Id: FXFileStream.h,v 1.22 2008/07/02 19:05:39 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXFILESTREAM_H
 #define FXFILESTREAM_H
@@ -39,16 +39,19 @@ protected:
   virtual FXuval readBuffer(FXuval count);
 public:
 
-  /// Create file store
+  /// Create file stream
   FXFileStream(const FXObject* cont=NULL);
+
+  /// Create and open file stream
+  FXFileStream(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
 
   /**
   * Open binary data file stream; allocate a buffer of the given size
   * for the file I/O; the buffer must be at least 16 bytes.
   */
-  FXbool open(const FXString& filename,FXStreamDirection save_or_load,FXuval size=8192);
+  FXbool open(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
 
-  /// Close file store
+  /// Close file stream
   virtual FXbool close();
 
   /// Get position

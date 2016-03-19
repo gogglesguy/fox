@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIClient.h,v 1.38 2008/01/04 15:18:20 fox Exp $                       *
+* $Id: FXMDIClient.h,v 1.40 2008/07/14 17:06:19 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXMDICLIENT_H
 #define FXMDICLIENT_H
@@ -56,15 +56,17 @@ class FXAPI FXMDIClient : public FXComposite {
   FXDECLARE(FXMDIClient)
   friend class FXMDIChild;
 protected:
-  FXMDIChild *active;             // Active child
-  FXint       cascadex;           // Cascade offset X
-  FXint       cascadey;           // Cascade offset Y
+  FXMDIChild *active;           // Active child
+  FXImage    *backImage;        // Optional background image
+  FXint       cascadex;         // Cascade offset X
+  FXint       cascadey;         // Cascade offset Y
 protected:
   FXMDIClient();
 private:
   FXMDIClient(const FXMDIClient&);
   FXMDIClient &operator=(const FXMDIClient&);
 public:
+  long onPaint(FXObject*,FXSelector,void*);
   long onCmdActivateNext(FXObject*,FXSelector,void*);
   long onCmdActivatePrev(FXObject*,FXSelector,void*);
   long onCmdTileHorizontal(FXObject*,FXSelector,void*);
@@ -119,6 +121,9 @@ public:
   /// Construct MDI Client window
   FXMDIClient(FXComposite* p,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
+  /// Create window
+  virtual void create();
+
   /// Return default width
   virtual FXint getDefaultWidth();
 
@@ -151,6 +156,15 @@ public:
 
   /// Get current active child; may be NULL!
   FXMDIChild* getActiveChild() const { return active; }
+
+  /// Get active document; this is the target of the active MDI Child, if any
+  FXObject* getActiveDocument() const;
+  
+  /// Change background image
+  void setBackImage(FXImage* img);
+
+  /// Return background image
+  FXImage* getBackImage() const { return backImage; }
 
   /// Cascade windows
   virtual void cascade(FXbool notify=false);

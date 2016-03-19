@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX2DChart.h,v 1.27 2008/01/04 15:18:13 fox Exp $                         *
+* $Id: FX2DChart.h,v 1.28 2008/09/26 00:42:12 fox Exp $                         *
 ********************************************************************************/
 #ifndef FX2DCHART_H
 #define FX2DCHART_H
@@ -27,7 +27,7 @@
 #include "FXChart.h"
 #endif
 
-namespace FX {
+namespace FXCHART {
 
 
 /// Base class for two-dimensional chart widgets

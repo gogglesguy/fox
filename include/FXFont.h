@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFont.h,v 1.74 2008/04/29 12:51:38 fox Exp $                            *
+* $Id: FXFont.h,v 1.76 2008/08/26 03:05:46 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXFONT_H
 #define FXFONT_H
@@ -116,7 +116,7 @@ enum FXFontEncoding {
 /// Font style
 struct FXFontDesc {
   FXchar          face[116];                /// Face name
-  FXushort        size;                     /// Size in deci-points
+  FXushort        size;                     /// Size in deci-points (one point is 1/72 inch)
   FXushort        weight;                   /// Weight [light, normal, bold, ...]
   FXushort        slant;                    /// Slant [normal, italic, oblique, ...]
   FXushort        setwidth;                 /// Set width [normal, condensed, expanded, ...]
@@ -311,6 +311,9 @@ public:
 
   /// Get font description
   FXFontDesc getFontDesc() const;
+
+  /// Get actual font description
+  FXFontDesc getActualFontDesc() const;
 
   /// Return angle
   FXint getAngle() const { return angle; }

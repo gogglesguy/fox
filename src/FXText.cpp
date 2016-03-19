@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.cpp,v 1.496 2008/04/30 18:32:20 fox Exp $                         *
+* $Id: FXText.cpp,v 1.497 2008/09/15 17:54:46 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -3467,14 +3467,17 @@ long FXText::onDragged(FXObject* sender,FXSelector sel,void* ptr){
       if(((FXEvent*)ptr)->state&SHIFTMASK) action=DRAG_MOVE;
       }
     handleDrag(((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y,action);
-    if(didAccept()!=DRAG_REJECT){
-      if(action==DRAG_MOVE)
+    action=didAccept();
+    switch(action){
+      case DRAG_MOVE:
         setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
-      else
+        break;
+      case DRAG_COPY:
         setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
-      }
-    else{
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+        break;
+      default:
+        setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+        break;
       }
     }
   return 1;

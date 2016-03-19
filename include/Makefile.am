@@ -84,7 +84,6 @@ FXComplexd.h \
 FXComposeContext.h \
 FXComposite.h \
 FXConsole.h \
-FXCopyDialog.h \
 FXCursor.h \
 FXDate.h \
 FXDC.h \
@@ -145,6 +144,7 @@ FXGLVisual.h \
 FXGroupBox.h \
 FXGradientBar.h \
 FXGZFileStream.h \
+FXhalf.h \
 FXHash.h \
 FXHeader.h \
 FXHorizontalFrame.h \

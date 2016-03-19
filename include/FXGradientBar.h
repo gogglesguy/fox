@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGradientBar.h,v 1.58 2008/01/04 15:18:19 fox Exp $                     *
+* $Id: FXGradientBar.h,v 1.60 2008/07/22 21:51:12 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXGRADIENTBAR_H
 #define FXGRADIENTBAR_H
@@ -110,6 +110,7 @@ protected:
   static FXdouble blendsine(FXdouble middle,FXdouble pos);
   static FXdouble blendincreasing(FXdouble middle,FXdouble pos);
   static FXdouble blenddecreasing(FXdouble middle,FXdouble pos);
+  static const FXGradient defaultGradient[3];
 private:
   FXGradientBar(const FXGradientBar&);
   FXGradientBar &operator=(const FXGradientBar&);
@@ -124,9 +125,11 @@ public:
     };
 public:
   long onPaint(FXObject*,FXSelector,void*);
+  long onMotion(FXObject*,FXSelector,void*);
   long onLeftBtnPress(FXObject*,FXSelector,void*);
   long onLeftBtnRelease(FXObject*,FXSelector,void*);
-  long onMotion(FXObject*,FXSelector,void*);
+  long onRightBtnPress(FXObject*,FXSelector,void*);
+  long onRightBtnRelease(FXObject*,FXSelector,void*);
   long onDNDEnter(FXObject*,FXSelector,void*);
   long onDNDLeave(FXObject*,FXSelector,void*);
   long onDNDMotion(FXObject*,FXSelector,void*);
@@ -143,6 +146,7 @@ public:
   long onCmdMerge(FXObject*,FXSelector,void*);
   long onUpdUniform(FXObject*,FXSelector,void*);
   long onCmdUniform(FXObject*,FXSelector,void*);
+  long onCmdReset(FXObject*,FXSelector,void*);
   long onCmdSetHelp(FXObject*,FXSelector,void*);
   long onCmdGetHelp(FXObject*,FXSelector,void*);
   long onCmdSetTip(FXObject*,FXSelector,void*);
@@ -162,6 +166,7 @@ public:
     ID_SPLIT,
     ID_MERGE,
     ID_UNIFORM,
+    ID_RESET,
     ID_LAST
     };
 public:
@@ -198,16 +203,21 @@ public:
   FXint getNumSegments() const { return nsegs; }
 
   /**
+  * Reset gradients to default color ramp.
+  */
+  void resetGradients();
+
+  /**
    * Replace the current gradient segments.
    * The gradient bar makes a copy of the input segments array.
    */
   void setGradients(const FXGradient *segments,FXint nsegments);
 
   /**
-   * Return a copy of the gradient segments.
-   * The array of segments is allocated using FXMALLOC and should be freed
-   * by the caller using FXFREE.
-   */
+  * Return a copy of the gradient segments.
+  * The array of segments is allocated using FXMALLOC and should be freed
+  * by the caller using FXFREE.
+  */
   void getGradients(FXGradient*& segments,FXint& nsegments) const;
 
   /// Change current segment

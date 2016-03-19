@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorSelector.h,v 1.35 2008/01/04 15:18:14 fox Exp $                   *
+* $Id: FXColorSelector.h,v 1.36 2008/07/22 19:28:02 fox Exp $                   *
 ********************************************************************************/
 #ifndef FXCOLORSELECTOR_H
 #define FXCOLORSELECTOR_H
@@ -105,6 +105,8 @@ public:
   long onCmdWheel(FXObject*,FXSelector,void*);
   long onUpdWheel(FXObject*,FXSelector,void*);
   long onCmdColorPick(FXObject*,FXSelector,void*);
+  long onCmdSetIntValue(FXObject*,FXSelector,void*);
+  long onCmdGetIntValue(FXObject*,FXSelector,void*);
 public:
   enum {
     ID_CUSTOM_FIRST=FXPacker::ID_LAST,

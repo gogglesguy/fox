@@ -30,13 +30,14 @@
 +FXComposeContext.obj &
 +FXComposite.obj &
 +FXConsole.obj &
-+FXCopyDialog.obj &
 +FXCursor.obj &
 +FXDate.obj &
 +FXDataTarget.obj &
 +FXDC.obj &
 +FXDCPrint.obj &
 +FXDCWindow.obj &
++FXDDSIcon.obj &
++FXDDSImage.obj &
 +FXDLL.obj &
 +FXDebugTarget.obj &
 +FXDelegator.obj &
@@ -88,6 +89,7 @@
 +FXGradientBar.obj &
 +FXGroupBox.obj &
 +FXGZFileStream.obj &
++FXhalf.obj &
 +FXHash.obj &
 +FXHeader.obj &
 +FXHorizontalFrame.obj &
@@ -244,6 +246,7 @@
 +FXXPMIcon.obj &
 +fxascii.obj &
 +fxbmpio.obj &
++fxddsio.obj &
 +fxezquantize.obj &
 +fxfilematch.obj &
 +fxfsquantize.obj &

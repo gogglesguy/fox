@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: ShutterBug.cpp,v 1.63 2008/01/04 15:59:39 fox Exp $                      *
+* $Id: ShutterBug.cpp,v 1.64 2008/07/11 20:30:32 fox Exp $                      *
 ********************************************************************************/
 #include "fx.h"
 #include "fxkeys.h"
@@ -647,7 +647,7 @@ long ShutterBug::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
       FXMemoryStream ms;
 
       // Open memory stream
-      ms.open(FXStreamSave,NULL);
+      ms.open(FXStreamSave,NULL,0);
 
       // Render image to memory stream
       if(event->target==dndTypes[0]){
