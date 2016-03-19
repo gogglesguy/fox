@@ -3,7 +3,7 @@
 *                            L a b e l   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXLabel.h,v 1.33 2007/07/09 16:02:45 fox Exp $                           *
+* $Id: FXLabel.h,v 1.34 2008/01/04 15:18:20 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXLABEL_H
 #define FXLABEL_H

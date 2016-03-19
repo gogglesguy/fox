@@ -3,9 +3,9 @@
 *                          Test 4-Way  Splitter  Widget                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: foursplit.cpp,v 1.23 2007/02/07 20:22:24 fox Exp $                       *
+* $Id: foursplit.cpp,v 1.24 2008/01/04 15:18:33 fox Exp $                       *
 ********************************************************************************/
 #include "fx.h"
 

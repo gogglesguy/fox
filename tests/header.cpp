@@ -3,9 +3,9 @@
 *                          Test Header Controls                                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: header.cpp,v 1.28 2007/02/07 20:22:24 fox Exp $                          *
+* $Id: header.cpp,v 1.29 2008/01/04 15:18:33 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

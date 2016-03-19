@@ -3,7 +3,7 @@
 *          M u l t i p l e   D o c u m e n t   C l i e n t   W i n d o w        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMDIClient.cpp,v 1.70 2007/10/25 14:14:41 fox Exp $                     *
+* $Id: FXMDIClient.cpp,v 1.72 2008/01/07 17:39:34 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -432,16 +432,16 @@ FXbool FXMDIClient::setActiveChild(FXMDIChild* child,FXbool notify){
       wasmax=active->isMaximized();
 
       // Deactivate old MDIChild
-      active->handle(this,FXSEL(SEL_DESELECTED,0),(void*)child);     // FIXME should call member function
+      active->handle(this,FXSEL(SEL_DESELECTED,0),(void*)child);        // FIXME should call member function
 
       // Restore to normal size if it was maximized
-      if(wasmax) active->restore(notify);
+      if(wasmax && child) active->restore(notify);
       }
 
     if(child){
 
       // Activate new MDIChild
-      child->handle(this,FXSEL(SEL_SELECTED,0),(void*)active);     // FIXME should call member function
+      child->handle(this,FXSEL(SEL_SELECTED,0),(void*)active);          // FIXME should call member function
 
       // Maximize because the old MDIChild was maximized
       if(wasmax) child->maximize(notify);

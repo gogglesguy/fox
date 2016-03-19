@@ -3,7 +3,7 @@
 *                            S p l a s h    W i n d o w                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSplashWindow.h,v 1.14 2007/07/09 16:02:49 fox Exp $                    *
+* $Id: FXSplashWindow.h,v 1.15 2008/01/04 15:18:24 fox Exp $                    *
 ********************************************************************************/
 #ifndef FXSPLASHWINDOW_H
 #define FXSPLASHWINDOW_H

@@ -3,7 +3,7 @@
 *                        L i s t   B o x   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXListBox.h,v 1.50 2007/09/04 22:09:10 fox Exp $                         *
+* $Id: FXListBox.h,v 1.51 2008/01/04 15:18:20 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXLISTBOX_H
 #define FXLISTBOX_H

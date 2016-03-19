@@ -3,7 +3,7 @@
 *                        G I F   C u r s o r   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Daniel Gehriger.   All Rights Reserved.            *
+* Copyright (C) 2000,2008 by Daniel Gehriger.   All Rights Reserved.            *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGIFCursor.cpp,v 1.38 2007/08/07 01:19:06 fox Exp $                     *
+* $Id: FXGIFCursor.cpp,v 1.39 2008/01/04 15:42:15 fox Exp $                     *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

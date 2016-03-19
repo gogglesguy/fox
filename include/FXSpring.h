@@ -3,7 +3,7 @@
 *                S p r i n g   C o n t a i n e r   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSpring.h,v 1.13 2007/07/09 16:02:49 fox Exp $                          *
+* $Id: FXSpring.h,v 1.14 2008/01/04 15:18:24 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXSPRING_H
 #define FXSPRING_H

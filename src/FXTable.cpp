@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.cpp,v 1.272 2007/08/27 18:51:00 fox Exp $                        *
+* $Id: FXTable.cpp,v 1.273 2008/01/04 15:42:35 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -994,7 +994,7 @@ void FXTable::recalc(){
 
 
 // Get default width
-FXint FXTable::getDefaultWidth(){  
+FXint FXTable::getDefaultWidth(){
   register FXint rw=(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) ? rowHeader->getWidth() : rowHeader->getDefaultWidth();
   return 0<visiblecols ? visiblecols*defColWidth+vgrid+rw : FXScrollArea::getDefaultWidth()+rw;
   }
@@ -1966,7 +1966,7 @@ long FXTable::onTipTimer(FXObject*,FXSelector,void*){
 // We were asked about tip text
 long FXTable::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
   if(FXScrollArea::onQueryTip(sender,sel,ptr)) return 1;
-  if((flags&FLAG_TIP)){ 
+  if((flags&FLAG_TIP)){
     FXint cx,cy,r,c; FXuint state;
     getCursorPosition(cx,cy,state);
     c=colAtX(cx);

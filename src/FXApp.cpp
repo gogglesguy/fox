@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * Major Contributions for Windows NT by Lyle Johnson                            *
 *********************************************************************************
@@ -20,7 +20,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.cpp,v 1.706 2008/01/02 15:16:27 fox Exp $                          *
+* $Id: FXApp.cpp,v 1.710 2008/01/11 18:27:34 fox Exp $                          *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400
@@ -334,7 +334,7 @@ FXApp* FXApp::app=NULL;
 
 
 // Copyright notice
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2007 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2008 Jeroen van der Zijp. All Rights Reserved.";
 
 
 #ifdef WIN32            // Windows
@@ -648,6 +648,8 @@ FXApp::FXApp(const FXString& name,const FXString& vendor):registry(name,vendor){
   wmNetIconName=0;
   wmNetWindowName=0;
   wmNetSupported=0;                       // Extended Window Manager stuff
+  wmNetHidden=0;
+  wmNetShaded=0;
   wmNetHMaximized=0;
   wmNetVMaximized=0;
   wmNetFullScreen=0;
@@ -1247,6 +1249,8 @@ FXbool FXApp::openDisplay(const FXchar* dpyname){
     wmNetIconName=XInternAtom((Display*)display,"_NET_WM_ICON_NAME",0);
     wmNetWindowName=XInternAtom((Display*)display,"_NET_WM_NAME",0);
     wmNetSupported=XInternAtom((Display*)display,"_NET_SUPPORTED",0);
+    wmNetHidden=XInternAtom((Display*)display,"_NET_WM_STATE_HIDDEN",0);
+    wmNetShaded=XInternAtom((Display*)display,"_NET_WM_STATE_SHADED",0);
     wmNetHMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_HORZ",0);
     wmNetVMaximized=XInternAtom((Display*)display,"_NET_WM_STATE_MAXIMIZED_VERT",0);
     wmNetFullScreen=XInternAtom((Display*)display,"_NET_WM_STATE_FULLSCREEN",0);
@@ -3003,19 +3007,27 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
       case PropertyNotify:
         FXTRACE((200,"PropertyNotify %ld\n",ev.xproperty.atom));
 
-        event.time=ev.xproperty.time;
-
         // Update window position after minimize/maximize/restore whatever
         if(ev.xproperty.atom==wmState || ev.xproperty.atom==wmNetState){
-          //FXTRACE((100,"Window wmState Change window=%ld atom=%ld state=%d\n",ev.xproperty.window,ev.xproperty.atom,ev.xproperty.state));
-          event.type=SEL_CONFIGURE;
-          XTranslateCoordinates((Display*)display,ev.xproperty.window,XDefaultRootWindow((Display*)display),0,0,&tmp_x,&tmp_y,&tmp);
-          event.rect.x=tmp_x;
-          event.rect.y=tmp_y;
-          event.rect.w=window->getWidth();
-          event.rect.h=window->getHeight();
-          event.synthetic=ev.xproperty.send_event;
-          if(window->handle(this,FXSEL(SEL_CONFIGURE,0),&event)) refresh();
+          unsigned long n,i; Atom type; unsigned char *prop; int format;
+          if(Success==XGetWindowProperty((Display*)display,ev.xproperty.window,ev.xproperty.atom,0,10,false,AnyPropertyType,&type,&format,&n,&i,&prop)){
+            event.type=SEL_RESTORE;
+            event.time=ev.xproperty.time;
+            if(format==32){
+              for(i=0; i<n; i++){
+                if(((FXID*)prop)[i]==wmNetHidden){ event.type=SEL_MINIMIZE; break; }
+                if(((FXID*)prop)[i]==wmNetShaded){ event.type=SEL_MINIMIZE; break; }
+                if(((FXID*)prop)[i]==wmNetHMaximized){ event.type=SEL_MAXIMIZE; break; }
+                if(((FXID*)prop)[i]==wmNetVMaximized){ event.type=SEL_MAXIMIZE; break; }
+                if(((FXID*)prop)[i]==wmNetFullScreen){ event.type=SEL_MAXIMIZE; break; }
+                if(((FXID*)prop)[i]==IconicState){ event.type=SEL_MINIMIZE; break; }
+                if(((FXID*)prop)[i]==NormalState){ event.type=SEL_RESTORE; break; }
+                if(((FXID*)prop)[i]==WithdrawnState){ event.type=SEL_MINIMIZE; break; }
+                }
+              }
+            XFree(prop);
+            if(window->handle(this,FXSEL(event.type,0),&event)) refresh();
+            }
           }
         return true;
 
@@ -3027,7 +3039,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
 
       // Visibility notification
       case VisibilityNotify:
-        FXTRACE((100,"VisibilityNotify window=%ld %s\n",ev.xvisibility.window,(ev.xvisibility.state==VisibilityUnobscured)?"VisibilityUnobscured":(ev.xvisibility.state==VisibilityPartiallyObscured)?"VisibilityPartiallyObscured":"VisibilityFullyObscured"));
+        FXTRACE((200,"VisibilityNotify window=%ld %s\n",ev.xvisibility.window,(ev.xvisibility.state==VisibilityUnobscured)?"VisibilityUnobscured":(ev.xvisibility.state==VisibilityPartiallyObscured)?"VisibilityPartiallyObscured":"VisibilityFullyObscured"));
         return true;
 
       // Other events

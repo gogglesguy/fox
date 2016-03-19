@@ -3,7 +3,7 @@
 *                        L i s t   B o x   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXListBox.cpp,v 1.75 2007/09/04 22:09:10 fox Exp $                       *
+* $Id: FXListBox.cpp,v 1.76 2008/01/04 15:42:24 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -216,7 +216,7 @@ long FXListBox::onListForward(FXObject*,FXSelector sel,void* ptr){
 
 // Clicked inside or outside an item in the list; unpost the pane
 long FXListBox::onListClicked(FXObject*,FXSelector,void*){
-  return button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL); 
+  return button->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),NULL);
   }
 
 
@@ -568,14 +568,14 @@ FXFont* FXListBox::getFont() const {
 void FXListBox::setShrinkWrap(FXbool flag){
   pane->setShrinkWrap(flag);
   }
-  
+
 
 // Return popup pane shrinkwrap mode
 FXbool FXListBox::getShrinkWrap() const {
   return pane->getShrinkWrap();
   }
-  
-  
+
+
 // Set window background color
 void FXListBox::setBackColor(FXColor clr){
   field->setBackColor(clr);

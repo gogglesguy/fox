@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXPath.cpp,v 1.38 2007/07/13 20:49:37 fox Exp $                          *
+* $Id: FXPath.cpp,v 1.39 2008/01/04 15:42:26 fox Exp $                          *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -430,7 +430,7 @@ FXString FXPath::simplify(const FXString& file){
         p--;
         if(s<p) p--;
         }
-      else if(3<=p && ISPATHSEP(result[p-3]) && result[p-2]=='.' && ISPATHSEP(result[p-1])){    // Case "xxx/./"   
+      else if(3<=p && ISPATHSEP(result[p-3]) && result[p-2]=='.' && ISPATHSEP(result[p-1])){    // Case "xxx/./"
         p-=2;
         }
       else if(3<=p && ISPATHSEP(result[p-3]) && result[p-2]=='.' && result[p-1]=='.' && !(((6<=p && ISPATHSEP(result[p-6])) || 5==p) && result[p-5]=='.' && result[p-4]=='.')){ // Case "xxx/.."
@@ -449,7 +449,7 @@ FXString FXPath::simplify(const FXString& file){
         if(s<p){                // Pathological case "/../" will become "/"
           p--;
           while(s<p && !ISPATHSEP(result[p-1])) p--;
-          if(p==0){                             // Don't allow empty path                                 
+          if(p==0){                             // Don't allow empty path
             result[p++]='.';
             result[p++]=PATHSEP;                // Keep trailing "/" around
             }

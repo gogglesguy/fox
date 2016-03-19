@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat3f.h,v 1.24 2007/09/24 21:00:48 fox Exp $                           *
+* $Id: FXMat3f.h,v 1.25 2008/01/04 15:18:21 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT3F_H
 #define FXMAT3F_H
@@ -42,14 +42,14 @@ public:
 
   /// Initialize matrix from another matrix
   FXMat3f(const FXMat3f& other);
-  
+
   /// Initialize from rotation and scaling part of 4x4 matrix
   FXMat3f(const FXMat4f& other);
 
   /// Initialize matrix from scalar
   FXMat3f(FXfloat w);
 
-  /// Initialize diagonal matrix 
+  /// Initialize diagonal matrix
   FXMat3f(FXfloat a,FXfloat b,FXfloat c);
 
   /// Initialize matrix from components
@@ -77,7 +77,7 @@ public:
   /// Set value from scalar
   FXMat3f& set(FXfloat w);
 
-  /// Set diagonal matrix 
+  /// Set diagonal matrix
   FXMat3f& set(FXfloat a,FXfloat b,FXfloat c);
 
   /// Set value from components

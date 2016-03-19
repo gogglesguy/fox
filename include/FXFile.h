@@ -3,7 +3,7 @@
 *                             F i l e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXFile.h,v 1.107 2007/07/09 16:02:44 fox Exp $                           *
+* $Id: FXFile.h,v 1.108 2008/01/04 15:18:18 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXFILE_H
 #define FXFILE_H
@@ -54,10 +54,10 @@ public:
 
   /// Open device with access mode and handle
   virtual FXbool open(FXInputHandle h,FXuint m);
-  
+
   /// Return true if serial access only
   virtual FXbool isSerial() const;
-  
+
   /// Get current file position
   virtual FXlong position() const;
 

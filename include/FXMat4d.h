@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMat4d.h,v 1.27 2007/09/24 21:00:49 fox Exp $                           *
+* $Id: FXMat4d.h,v 1.28 2008/01/04 15:18:21 fox Exp $                           *
 ********************************************************************************/
 #ifndef FXMAT4D_H
 #define FXMAT4D_H
@@ -48,7 +48,7 @@ public:
   /// Initialize matrix from scalar
   FXMat4d(FXdouble w);
 
-  /// Initialize diagonal matrix 
+  /// Initialize diagonal matrix
   FXMat4d(FXdouble a,FXdouble b,FXdouble c,FXdouble d);
 
   /// Initialize matrix from components
@@ -74,7 +74,7 @@ public:
   /// Set value from scalar
   FXMat4d& set(FXdouble w);
 
-  /// Set diagonal matrix 
+  /// Set diagonal matrix
   FXMat4d& set(FXdouble a,FXdouble b,FXdouble c,FXdouble d);
 
   /// Set value from components

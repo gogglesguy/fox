@@ -3,7 +3,7 @@
 *                       C o l o r   B a r   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorBar.cpp,v 1.35 2007/08/27 18:50:59 fox Exp $                      *
+* $Id: FXColorBar.cpp,v 1.36 2008/01/04 15:42:05 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *                         T o p l e v el   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXObject.h,v 1.40 2007/07/22 01:01:24 fox Exp $                          *
+* $Id: FXObject.h,v 1.41 2008/01/04 15:18:22 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXOBJECT_H
 #define FXOBJECT_H

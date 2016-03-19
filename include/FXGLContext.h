@@ -3,7 +3,7 @@
 *                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.h,v 1.42 2007/12/27 18:54:53 fox Exp $                       *
+* $Id: FXGLContext.h,v 1.43 2008/01/04 15:18:19 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXGLCONTEXT_H
 #define FXGLCONTEXT_H

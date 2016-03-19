@@ -3,7 +3,7 @@
 *                         T o p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTopWindow.cpp,v 1.212 2007/07/12 12:07:33 fox Exp $                    *
+* $Id: FXTopWindow.cpp,v 1.220 2008/01/11 18:27:36 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -105,6 +105,9 @@ FXDEFMAP(FXTopWindow) FXTopWindowMap[]={
   FXMAPFUNC(SEL_FOCUS_DOWN,0,FXTopWindow::onFocusDown),
   FXMAPFUNC(SEL_FOCUS_LEFT,0,FXTopWindow::onFocusLeft),
   FXMAPFUNC(SEL_FOCUS_RIGHT,0,FXTopWindow::onFocusRight),
+  FXMAPFUNC(SEL_RESTORE,0,FXTopWindow::onRestore),
+  FXMAPFUNC(SEL_MAXIMIZE,0,FXTopWindow::onMaximize),
+  FXMAPFUNC(SEL_MINIMIZE,0,FXTopWindow::onMinimize),
   FXMAPFUNC(SEL_SESSION_NOTIFY,0,FXTopWindow::onSessionNotify),
   FXMAPFUNC(SEL_SESSION_CLOSED,0,FXTopWindow::onSessionClosed),
   FXMAPFUNC(SEL_CHORE,FXTopWindow::ID_CLOSE,FXTopWindow::onCmdClose),
@@ -210,78 +213,25 @@ void FXTopWindow::create(){
         if(height<getDefaultHeight()) height=getDefaultHeight();
         }
 
-#ifdef WIN32            // WIN32
-
-      // Tweak needed because the options affect window size
+#ifdef WIN32
       RECT rect;
       SetRect(&rect,xpos,ypos,xpos+width,ypos+height);
       DWORD dwStyle=GetWindowLong((HWND)xid,GWL_STYLE);
       DWORD dwExStyle=GetWindowLong((HWND)xid,GWL_EXSTYLE);
-      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);
+      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);        // Calculate based on *client* rectangle
       SetWindowPos((HWND)xid,NULL,rect.left,rect.top,FXMAX(rect.right-rect.left,1),FXMAX(rect.bottom-rect.top,1),SWP_NOZORDER|SWP_NOOWNERZORDER);
-
-#else                   // X11
-
-      // Catch delete window
+#else
       Atom protocols[3];
       protocols[0]=getApp()->wmDeleteWindow;
       protocols[1]=getApp()->wmTakeFocus;
       protocols[2]=getApp()->wmNetPing;
-      XSetWMProtocols(DISPLAY(getApp()),xid,protocols,3);
-
-      // Set position for Window Manager
-      XSizeHints size;
-
-      // Placement hints
-      size.flags=USSize|PSize|PWinGravity|USPosition|PPosition;
-      size.x=xpos;
-      size.y=ypos;
-      size.width=width;
-      size.height=height;
-      size.min_width=0;
-      size.min_height=0;
-      size.max_width=0;
-      size.max_height=0;
-      size.width_inc=0;
-      size.height_inc=0;
-      size.min_aspect.x=0;
-      size.min_aspect.y=0;
-      size.max_aspect.x=0;
-      size.max_aspect.y=0;
-      size.base_width=0;
-      size.base_height=0;
-      size.win_gravity=NorthWestGravity;        // Tim Alexeevsky <realtim@mail.ru>
-      size.win_gravity=StaticGravity;           // Account for border (ICCCM)
-
-      // Apply resize limitations
-      if(!(options&DECOR_SHRINKABLE)){
-        if(!(options&DECOR_STRETCHABLE)){       // Cannot change at all
-          size.flags|=PMinSize|PMaxSize;
-          size.min_width=size.max_width=width;
-          size.min_height=size.max_height=height;
-          }
-        else{                                   // Cannot get smaller than default
-          size.flags|=PMinSize;
-          size.min_width=getDefaultWidth();
-          size.min_height=getDefaultHeight();
-          }
-        }
-      else if(!(options&DECOR_STRETCHABLE)){    // Cannot get larger than default
-        size.flags|=PMaxSize;
-        size.max_width=getDefaultWidth();
-        size.max_height=getDefaultHeight();
-        }
-
-      // Set hints
-      XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
-
+      XSetWMProtocols(DISPLAY(getApp()),xid,protocols,3);       // Catch delete window
 //#ifdef HAVE_XFIXES_H
 //      int evb,erb;
 //      if(XFixesQueryExtension(DISPLAY(getApp()),&evb,&erb)){
 //        XFixesSelectSelectionInput(DISPLAY(getApp()),xid,getApp()->xcbSelection,XFixesSetSelectionOwnerNotifyMask|XFixesSelectionWindowDestroyNotifyMask|XFixesSelectionClientCloseNotifyMask);
 //        }
 //#endif
-
 #endif
       }
     }
@@ -1150,13 +1100,11 @@ void FXTopWindow::move(FXint x,FXint y){
     ypos=y;
     if(xid){
 #ifdef WIN32
-      // Calculate the required window position based on the desired
-      // position of the *client* rectangle.
       RECT rect;
       SetRect(&rect,xpos,ypos,0,0);
       DWORD dwStyle=GetWindowLong((HWND)xid,GWL_STYLE);
       DWORD dwExStyle=GetWindowLong((HWND)xid,GWL_EXSTYLE);
-      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);
+      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);        // Calculate based on *client* rectangle
       SetWindowPos((HWND)xid,NULL,rect.left,rect.top,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOOWNERZORDER);
 #else
       XWindowChanges cw;
@@ -1176,19 +1124,60 @@ void FXTopWindow::resize(FXint w,FXint h){
     height=FXMAX(h,1);
     if(xid){
 #ifdef WIN32
-      // Calculate the required window size based on the desired
-      // size of the *client* rectangle.
       RECT rect;
       SetRect(&rect,0,0,width,height);
       DWORD dwStyle=GetWindowLong((HWND)xid,GWL_STYLE);
       DWORD dwExStyle=GetWindowLong((HWND)xid,GWL_EXSTYLE);
-      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);
+      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);        // Calculate based on *client* rectangle
       SetWindowPos((HWND)xid,NULL,0,0,FXMAX(rect.right-rect.left,1),FXMAX(rect.bottom-rect.top,1),SWP_NOMOVE|SWP_NOZORDER|SWP_NOOWNERZORDER);
 #else
-      XWindowChanges cw;
-      cw.width=width;
-      cw.height=height;
-      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWWidth|CWHeight,&cw);
+      XWindowChanges changes;
+      XSizeHints size;
+      changes.x=0;
+      changes.y=0;
+      changes.width=width;
+      changes.height=height;
+      changes.border_width=0;
+      changes.sibling=None;
+      changes.stack_mode=Above;
+      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWWidth|CWHeight,&changes);
+      size.flags=USSize|PSize|PWinGravity|USPosition|PPosition;
+      size.x=xpos;
+      size.y=ypos;
+      size.width=width;
+      size.height=height;
+      size.min_width=0;
+      size.min_height=0;
+      size.max_width=0;
+      size.max_height=0;
+      size.width_inc=0;
+      size.height_inc=0;
+      size.min_aspect.x=0;
+      size.min_aspect.y=0;
+      size.max_aspect.x=0;
+      size.max_aspect.y=0;
+      size.base_width=0;
+      size.base_height=0;
+      size.win_gravity=NorthWestGravity;                        // Tim Alexeevsky <realtim@mail.ru>
+      size.win_gravity=StaticGravity;                           // Account for border (ICCCM)
+      if(!(options&DECOR_SHRINKABLE)){
+        if(!(options&DECOR_STRETCHABLE)){                       // Cannot change at all
+          size.flags|=PMinSize|PMaxSize;
+          size.min_width=size.max_width=width;
+          size.min_height=size.max_height=height;
+          }
+        else{                                                   // Cannot get smaller than default
+          size.flags|=PMinSize;
+          size.min_width=getDefaultWidth();
+          size.min_height=getDefaultHeight();
+          }
+        }
+      else if(!(options&DECOR_STRETCHABLE)){                    // Cannot get larger than default
+        size.flags|=PMaxSize;
+        size.max_width=getDefaultWidth();
+        size.max_height=getDefaultHeight();
+        }
+      XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
 #endif
       layout();
       }
@@ -1205,21 +1194,60 @@ void FXTopWindow::position(FXint x,FXint y,FXint w,FXint h){
     height=FXMAX(h,1);
     if(xid){
 #ifdef WIN32
-      // Calculate the required window position & size based on the desired
-      // position & size of the *client* rectangle.
       RECT rect;
       SetRect(&rect,xpos,ypos,xpos+width,ypos+height);
       DWORD dwStyle=GetWindowLong((HWND)xid,GWL_STYLE);
       DWORD dwExStyle=GetWindowLong((HWND)xid,GWL_EXSTYLE);
-      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);
+      AdjustWindowRectEx(&rect,dwStyle,false,dwExStyle);        // Calculate based on *client* rectangle
       SetWindowPos((HWND)xid,NULL,rect.left,rect.top,FXMAX(rect.right-rect.left,1),FXMAX(rect.bottom-rect.top,1),SWP_NOZORDER|SWP_NOOWNERZORDER);
 #else
-      XWindowChanges cw;
-      cw.x=xpos;
-      cw.y=ypos;
-      cw.width=width;
-      cw.height=height;
-      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWX|CWY|CWWidth|CWHeight,&cw);
+      XWindowChanges changes;
+      XSizeHints size;
+      changes.x=xpos;
+      changes.y=ypos;
+      changes.width=width;
+      changes.height=height;
+      changes.border_width=0;
+      changes.sibling=None;
+      changes.stack_mode=Above;
+      XReconfigureWMWindow(DISPLAY(getApp()),xid,DefaultScreen(DISPLAY(getApp())),CWX|CWY|CWWidth|CWHeight,&changes);
+      size.flags=USSize|PSize|PWinGravity|USPosition|PPosition;
+      size.x=xpos;
+      size.y=ypos;
+      size.width=width;
+      size.height=height;
+      size.min_width=0;
+      size.min_height=0;
+      size.max_width=0;
+      size.max_height=0;
+      size.width_inc=0;
+      size.height_inc=0;
+      size.min_aspect.x=0;
+      size.min_aspect.y=0;
+      size.max_aspect.x=0;
+      size.max_aspect.y=0;
+      size.base_width=0;
+      size.base_height=0;
+      size.win_gravity=NorthWestGravity;                        // Tim Alexeevsky <realtim@mail.ru>
+      size.win_gravity=StaticGravity;                           // Account for border (ICCCM)
+      if(!(options&DECOR_SHRINKABLE)){
+        if(!(options&DECOR_STRETCHABLE)){                       // Cannot change at all
+          size.flags|=PMinSize|PMaxSize;
+          size.min_width=size.max_width=width;
+          size.min_height=size.max_height=height;
+          }
+        else{                                                   // Cannot get smaller than default
+          size.flags|=PMinSize;
+          size.min_width=getDefaultWidth();
+          size.min_height=getDefaultHeight();
+          }
+        }
+      else if(!(options&DECOR_STRETCHABLE)){                    // Cannot get larger than default
+        size.flags|=PMaxSize;
+        size.max_width=getDefaultWidth();
+        size.max_height=getDefaultHeight();
+        }
+      XSetWMNormalHints(DISPLAY(getApp()),xid,&size);
 #endif
       layout();
       }
@@ -1593,6 +1621,27 @@ long FXTopWindow::onFocusRight(FXObject*,FXSelector,void* ptr){
       }
     }
   return 0;
+  }
+
+
+// Handle restore notify
+long FXTopWindow::onRestore(FXObject*,FXSelector,void* ptr){
+  FXTRACE((100,"%s::onRestore %p\n",getClassName(),this));
+  return target && target->tryHandle(this,FXSEL(SEL_RESTORE,message),ptr);
+  }
+
+
+// Handle maximize notify
+long FXTopWindow::onMaximize(FXObject*,FXSelector,void* ptr){
+  FXTRACE((100,"%s::onMaximize %p\n",getClassName(),this));
+  return target && target->tryHandle(this,FXSEL(SEL_MAXIMIZE,message),ptr);
+  }
+
+
+// Handle minimize notify
+long FXTopWindow::onMinimize(FXObject*,FXSelector,void* ptr){
+  FXTRACE((100,"%s::onMinimize %p\n",getClassName(),this));
+  return target && target->tryHandle(this,FXSEL(SEL_MINIMIZE,message),ptr);
   }
 
 

@@ -3,9 +3,9 @@
 *                                 Test Console Widget                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: console.cpp,v 1.3 2007/02/07 20:22:23 fox Exp $                          *
+* $Id: console.cpp,v 1.4 2008/01/04 15:18:32 fox Exp $                          *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

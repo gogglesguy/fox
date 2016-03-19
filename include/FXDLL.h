@@ -3,7 +3,7 @@
 *             D y n a m i c   L i n k   L i b r a r y   S u p p o r t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDLL.h,v 1.25 2007/10/10 19:15:21 fox Exp $                             *
+* $Id: FXDLL.h,v 1.26 2008/01/04 15:18:15 fox Exp $                             *
 ********************************************************************************/
 #ifndef FXDLL_H
 #define FXDLL_H
@@ -53,7 +53,7 @@ public:
   /// True if library was loaded
   FXbool loaded() const { return hnd!=NULL; }
 
-  /// Load the library module from the name 
+  /// Load the library module from the name
   FXbool load(const FXString& nm);
 
   /// Unload the library module
@@ -81,7 +81,7 @@ public:
 
 
 /**
-* Auto DLL wraps a library module handle but also owns it; thus, the library 
+* Auto DLL wraps a library module handle but also owns it; thus, the library
 * module will automatically be unloaded when auto-dll is destroyed.
 */
 class FXAPI FXAUTODLL : public FXDLL {
@@ -90,7 +90,7 @@ private:
   FXAUTODLL &operator=(const FXAUTODLL&);
 public:
 
-  /// Initialize by loading given library name 
+  /// Initialize by loading given library name
   FXAUTODLL(const FXString& nm);
 
   /// Unload library if we have one

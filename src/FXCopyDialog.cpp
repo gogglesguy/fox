@@ -3,7 +3,7 @@
 *      F i l e   C o p y / M o v e / L i n k / D e l e t e   D i a l o g s      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXCopyDialog.cpp,v 1.12 2007/07/09 16:26:45 fox Exp $                    *
+* $Id: FXCopyDialog.cpp,v 1.13 2008/01/04 15:42:06 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

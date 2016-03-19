@@ -3,7 +3,7 @@
 *                          E x c e p t i o n  T y p e s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXException.h,v 1.19 2007/07/23 03:32:52 fox Exp $                       *
+* $Id: FXException.h,v 1.20 2008/01/04 15:18:18 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXEXCEPTION_H
 #define FXEXCEPTION_H
@@ -28,7 +28,7 @@ namespace FX {
 
 /**
 * Generic catch-all exception.
-* An optional message may be passed in the constructor, which must be a string 
+* An optional message may be passed in the constructor, which must be a string
 * literal constant.
 */
 class FXAPI FXException {

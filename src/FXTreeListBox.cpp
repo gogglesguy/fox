@@ -3,7 +3,7 @@
 *                       T r e e  L i s t  B o x  O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeListBox.cpp,v 1.69 2007/09/04 22:09:10 fox Exp $                   *
+* $Id: FXTreeListBox.cpp,v 1.70 2008/01/04 15:42:41 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -643,14 +643,14 @@ FXuint FXTreeListBox::getListStyle() const {
 void FXTreeListBox::setShrinkWrap(FXbool flag){
   pane->setShrinkWrap(flag);
   }
-  
+
 
 // Return popup pane shrinkwrap mode
 FXbool FXTreeListBox::getShrinkWrap() const {
   return pane->getShrinkWrap();
   }
-  
-  
+
+
 // Set help text
 void FXTreeListBox::setHelpText(const FXString& txt){
   field->setHelpText(txt);

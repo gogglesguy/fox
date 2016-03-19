@@ -3,7 +3,7 @@
 *                    A u t o m a t i c   P o i n t e r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAutoPtr.h,v 1.12 2007/08/03 19:20:26 fox Exp $                         *
+* $Id: FXAutoPtr.h,v 1.13 2008/01/04 15:18:14 fox Exp $                         *
 ********************************************************************************/
 #ifndef FXAUTOPTR_H
 #define FXAUTOPTR_H

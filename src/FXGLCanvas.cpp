@@ -3,7 +3,7 @@
 *                    O p e n G L   C a n v a s   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCanvas.cpp,v 1.81 2007/12/31 15:25:36 fox Exp $                      *
+* $Id: FXGLCanvas.cpp,v 1.83 2008/01/10 19:00:51 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -128,12 +128,9 @@ void FXGLCanvas::create(){
       context->create();
 #ifdef HAVE_GL_H
 #if defined(WIN32)
-      PIXELFORMATDESCRIPTOR pfd;
+      PIXELFORMATDESCRIPTOR pfd={sizeof(PIXELFORMATDESCRIPTOR),1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
       HDC hdc=::GetDC((HWND)xid);       // FIXME should this be this->GetDC()
-      pfd.nSize=sizeof(PIXELFORMATDESCRIPTOR);
-      pfd.nVersion=1;
-      DescribePixelFormat(hdc,(FXint)(FXival)visual->visual,sizeof(PIXELFORMATDESCRIPTOR),&pfd);     // FIXME needed?
-      SetPixelFormat(hdc,(FXint)(FXival)visual->visual,&pfd);
+      SetPixelFormat(hdc,(FXint)(FXival)visual->id(),&pfd);
       ::ReleaseDC((HWND)xid,hdc);       // FIXME should this be this->ReleaseDC()
 #elif defined(GLX_VERSION_1_3)
       xxx=glXCreateWindow((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),xid,NULL);

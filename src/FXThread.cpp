@@ -3,7 +3,7 @@
 *                 M u l i t h r e a d i n g   S u p p o r t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThread.cpp,v 1.126 2008/01/02 17:54:44 fox Exp $                       *
+* $Id: FXThread.cpp,v 1.127 2008/01/04 15:42:39 fox Exp $                       *
 ********************************************************************************/
 #ifdef WIN32
 #if _WIN32_WINNT < 0x0400

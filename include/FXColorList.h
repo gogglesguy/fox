@@ -3,7 +3,7 @@
 *                         C o l o r   L i s t   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXColorList.h,v 1.11 2007/11/07 19:19:51 fox Exp $                       *
+* $Id: FXColorList.h,v 1.12 2008/01/04 15:18:14 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXCOLORLIST_H
 #define FXCOLORLIST_H

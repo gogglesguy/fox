@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: main.cpp,v 1.25 2007/07/06 04:22:29 fox Exp $                            *
+* $Id: main.cpp,v 1.27 2008/01/04 15:59:38 fox Exp $                            *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -112,7 +112,7 @@ int main(int argc,char *argv[]){
       g=fxparsegeometry(argv[arg],x,y,w,h);
       }
     else if(compare(argv[arg],"-V")==0 || compare(argv[arg],"--version")==0){
-      fprintf(stdout,"Adie - ADvanced Interactive Editor %d.%d.%d.\nCopyright (C) 2000,2007 Jeroen van der Zijp.\n\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
+      fprintf(stdout,"Adie - ADvanced Interactive Editor %d.%d.%d.\nCopyright (C) 2000,2008 Jeroen van der Zijp.\n\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
       exit(0);
       }
 

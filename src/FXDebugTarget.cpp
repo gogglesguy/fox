@@ -3,7 +3,7 @@
 *                      D e b u g - T a r g e t   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDebugTarget.cpp,v 1.37 2007/11/30 19:30:12 fox Exp $                   *
+* $Id: FXDebugTarget.cpp,v 1.38 2008/01/04 15:42:09 fox Exp $                   *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -123,8 +123,8 @@ const char *const FXDebugTarget::messageTypeName[]={
   "SEL_QUERY_HELP",
   "SEL_DOCKED",
   "SEL_FLOATED",
-  "SEL_SPACEBALLMOTION", 
-  "SEL_SPACEBALLBUTTONPRESS",  
+  "SEL_SPACEBALLMOTION",
+  "SEL_SPACEBALLBUTTONPRESS",
   "SEL_SPACEBALLBUTTONRELEASE",
   "SEL_SESSION_NOTIFY",
   "SEL_SESSION_CLOSED"

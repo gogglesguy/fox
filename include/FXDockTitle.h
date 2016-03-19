@@ -3,7 +3,7 @@
 *                         D o c k T i t l e   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDockTitle.h,v 1.5 2007/07/09 16:02:43 fox Exp $                        *
+* $Id: FXDockTitle.h,v 1.6 2008/01/04 15:18:18 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDOCKTITLE_H
 #define FXDOCKTITLE_H

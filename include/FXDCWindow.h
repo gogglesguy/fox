@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDCWindow.h,v 1.54 2007/12/21 18:02:49 fox Exp $                        *
+* $Id: FXDCWindow.h,v 1.55 2008/01/04 15:18:15 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDCWINDOW_H
 #define FXDCWINDOW_H
@@ -84,7 +84,7 @@ public:
   /// Construct for normal drawing;
   /// This sets clip rectangle to the whole drawable
   FXDCWindow(FXDrawable* draw);
-  
+
   /// Return active drawable
   FXDrawable *drawable() const { return surface; }
 

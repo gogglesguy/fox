@@ -3,7 +3,7 @@
 #                       A d i e   S y n t a x   F i l e                         #
 #                                                                               #
 #################################################################################
-# Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        #
+# Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        #
 #################################################################################
 # This program is free software; you can redistribute it and/or modify          #
 # it under the terms of the GNU General Public License as published by          #
@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software                   #
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.    #
 #################################################################################
-# $Id: Adie.stx,v 1.51 2007/06/01 01:05:59 fox Exp $                            #
+# $Id: Adie.stx,v 1.52 2008/01/04 15:18:11 fox Exp $                            #
 #################################################################################
 
 #

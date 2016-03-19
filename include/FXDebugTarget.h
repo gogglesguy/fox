@@ -3,7 +3,7 @@
 *                              D e b u g   T a r g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDebugTarget.h,v 1.17 2007/07/09 16:02:43 fox Exp $                     *
+* $Id: FXDebugTarget.h,v 1.18 2008/01/04 15:18:15 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXDEBUGTARGET_H
 #define FXDEBUGTARGET_H

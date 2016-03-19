@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                       T o o l B a r G r i p   W i d g e t                     *
+*                    T o o l   B a r   G r i p   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXToolBarGrip.h,v 1.26 2007/07/09 16:02:50 fox Exp $                     *
+* $Id: FXToolBarGrip.h,v 1.27 2008/01/04 15:18:27 fox Exp $                     *
 ********************************************************************************/
 #ifndef FXTOOLBARGRIP_H
 #define FXTOOLBARGRIP_H

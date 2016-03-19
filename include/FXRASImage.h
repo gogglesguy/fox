@@ -3,7 +3,7 @@
 *                   S U N   R A S T E R   I m a g e   O b j e c t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXRASImage.h,v 1.13 2007/07/09 16:02:47 fox Exp $                        *
+* $Id: FXRASImage.h,v 1.14 2008/01/04 15:18:23 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXRASIMAGE_H
 #define FXRASIMAGE_H

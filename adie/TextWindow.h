@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: TextWindow.h,v 1.50 2007/07/06 04:22:29 fox Exp $                        *
+* $Id: TextWindow.h,v 1.51 2008/01/04 15:18:12 fox Exp $                        *
 ********************************************************************************/
 #ifndef TEXTWINDOW_H
 #define TEXTWINDOW_H

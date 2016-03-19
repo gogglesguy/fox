@@ -3,7 +3,7 @@
 *                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLContext.cpp,v 1.117 2007/12/28 21:27:45 fox Exp $                    *
+* $Id: FXGLContext.cpp,v 1.119 2008/01/10 20:08:06 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -104,13 +104,10 @@ void FXGLContext::create(){
       visual->create();
 
 #if defined(WIN32)
+      PIXELFORMATDESCRIPTOR pfd={sizeof(PIXELFORMATDESCRIPTOR),1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
       HWND hwnd=CreateWindow(TEXT("GLTEMP"),TEXT(""),0,0,0,0,0,(HWND)NULL,(HMENU)NULL,(HINSTANCE)getApp()->getDisplay(),NULL);
-      HDC hdc=GetDC(hwnd);
-      PIXELFORMATDESCRIPTOR pfd;
-      pfd.nSize=sizeof(PIXELFORMATDESCRIPTOR);
-      pfd.nVersion=1;
-      DescribePixelFormat(hdc,(FXint)(FXival)visual->visual,sizeof(PIXELFORMATDESCRIPTOR),&pfd);     // FIXME needed?
-      SetPixelFormat(hdc,(FXint)(FXival)visual->visual,&pfd);
+      HDC hdc=::GetDC(hwnd);
+      SetPixelFormat(hdc,(FXint)(FXival)visual->id(),&pfd);
       xid=(FXID)wglCreateContext(hdc);
       if(!xid){
         throw FXWindowException("unable to create GL window.");
@@ -122,7 +119,7 @@ void FXGLContext::create(){
       if(shared && !wglShareLists((HGLRC)shared->id(),(HGLRC)xid)){
         throw FXWindowException("unable to share GL context.");
         }
-      ReleaseDC(hwnd,hdc);
+      ::ReleaseDC(hwnd,hdc);
       DestroyWindow(hwnd);
 #elif defined(GLX_VERSION_1_3)
       xid=(FXID)glXCreateNewContext((Display*)getApp()->getDisplay(),(GLXFBConfig)visual->id(),GLX_RGBA_TYPE,shared?(GLXContext)shared->id():NULL,true);

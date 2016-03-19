@@ -3,7 +3,7 @@
 *                             B i t m a p    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBitmap.cpp,v 1.101 2007/12/13 21:44:49 fox Exp $                        *
+* $Id: FXBitmap.cpp,v 1.102 2008/01/04 15:42:04 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -456,7 +456,7 @@ void FXBitmap::resize(FXint w,FXint h){
   FXTRACE((100,"%s::resize(%d,%d)\n",getClassName(),w,h));
   bw=(w+7)>>3;
   if(xid){
-  
+
 #ifdef WIN32
 
     // Delete old bitmap
@@ -465,7 +465,7 @@ void FXBitmap::resize(FXint w,FXint h){
     // Create a bitmap compatible with current display
     xid=CreateBitmap(w,h,1,1,NULL);
     if(!xid){ throw FXImageException("unable to resize bitmap"); }
-    
+
 #else
 
     // Free old pixmap
@@ -474,7 +474,7 @@ void FXBitmap::resize(FXint w,FXint h){
     // Make new pixmap
     xid=XCreatePixmap((Display*)getApp()->getDisplay(),XDefaultRootWindow((Display*)getApp()->getDisplay()),w,h,1);
     if(!xid){ throw FXImageException("unable to resize bitmap"); }
-    
+
 #endif
 
     }

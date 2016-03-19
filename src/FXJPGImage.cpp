@@ -3,7 +3,7 @@
 *                      J P E G   I m a g e   O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2007 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2008 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXJPGImage.cpp,v 1.33 2007/07/09 16:27:01 fox Exp $                      *
+* $Id: FXJPGImage.cpp,v 1.34 2008/01/04 15:42:23 fox Exp $                      *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: Calculator.h,v 1.32 2007/07/06 04:22:30 fox Exp $                        *
+* $Id: Calculator.h,v 1.33 2008/01/04 15:18:13 fox Exp $                        *
 ********************************************************************************/
 #ifndef CALCULATOR_H
 #define CALCULATOR_H

@@ -3,7 +3,7 @@
 *                      O p e n G L   C u b e   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGLCube.cpp,v 1.31 2007/07/09 16:26:55 fox Exp $                        *
+* $Id: FXGLCube.cpp,v 1.32 2008/01/04 15:42:16 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -87,31 +87,31 @@ FXGLCube::FXGLCube(const FXGLCube& orig):FXGLShape(orig){
 
 
 // Change width
-void FXGLCube::setWidth(FXfloat w){ 
+void FXGLCube::setWidth(FXfloat w){
   if(width!=w){
     range.lower.x=-0.5f*w;
     range.upper.x= 0.5f*w;
-    width=w; 
+    width=w;
     }
   }
-  
+
 
 // Change height
-void FXGLCube::setHeight(FXfloat h){ 
+void FXGLCube::setHeight(FXfloat h){
   if(height!=h){
     range.lower.y=-0.5f*h;
     range.upper.y= 0.5f*h;
-    height=h; 
+    height=h;
     }
   }
 
 
 // Change depth
-void FXGLCube::setDepth(FXfloat d){ 
+void FXGLCube::setDepth(FXfloat d){
   if(depth!=d){
     range.lower.z=-0.5f*d;
     range.upper.z= 0.5f*d;
-    depth=d; 
+    depth=d;
     }
   }
 

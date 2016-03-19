@@ -3,7 +3,7 @@
 *                     F S   C o l o r   Q u a n t i z a t i o n                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxfsquantize.cpp,v 1.11 2007/07/09 16:31:34 fox Exp $                    *
+* $Id: fxfsquantize.cpp,v 1.12 2008/01/04 15:42:45 fox Exp $                    *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXText.cpp,v 1.491 2007/08/27 18:27:29 fox Exp $                         *
+* $Id: FXText.cpp,v 1.492 2008/01/04 15:42:35 fox Exp $                         *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *             T w o - D i m e n s i o n a l   C h a r t   W i d g e t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FX2DChart.h,v 1.26 2007/07/24 17:37:45 fox Exp $                         *
+* $Id: FX2DChart.h,v 1.27 2008/01/04 15:18:13 fox Exp $                         *
 ********************************************************************************/
 #ifndef FX2DCHART_H
 #define FX2DCHART_H

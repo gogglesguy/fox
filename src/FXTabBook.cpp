@@ -3,7 +3,7 @@
 *                         T a b   B o o k   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTabBook.cpp,v 1.30 2007/08/23 21:44:12 fox Exp $                       *
+* $Id: FXTabBook.cpp,v 1.31 2008/01/04 15:42:35 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

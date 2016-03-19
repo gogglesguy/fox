@@ -3,7 +3,7 @@
 *                        D r i v e   B o x   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDriveBox.h,v 1.21 2007/07/09 16:02:43 fox Exp $                        *
+* $Id: FXDriveBox.h,v 1.22 2008/01/04 15:18:18 fox Exp $                        *
 ********************************************************************************/
 #ifndef FXDRIVEBOX_H
 #define FXDRIVEBOX_H

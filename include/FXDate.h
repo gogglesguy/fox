@@ -3,7 +3,7 @@
 *                            D a t e   C l a s s                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDate.h,v 1.27 2007/07/09 16:02:42 fox Exp $                            *
+* $Id: FXDate.h,v 1.28 2008/01/04 15:18:15 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXDATE_H
 #define FXDATE_H
@@ -117,7 +117,7 @@ public:
 
   /// Return days in this month
   FXint daysInMonth() const;
-  
+
   /// Add d days to this date
   FXDate& addDays(FXint d);
 
@@ -164,7 +164,7 @@ public:
   /// Pre-Increment and decrement
   FXDate& operator++(){ ++julian; return *this; }
   FXDate& operator--(){ --julian; return *this; }
-  
+
   /// Post-Increment and decrement
   FXDate operator++(int){ FXDate t(julian++); return t; }
   FXDate operator--(int){ FXDate t(julian--); return t; }

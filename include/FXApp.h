@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXApp.h,v 1.265 2007/11/30 18:16:54 fox Exp $                            *
+* $Id: FXApp.h,v 1.267 2008/01/11 18:27:34 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAPP_H
 #define FXAPP_H
@@ -305,6 +305,8 @@ private:
   FXID             wmNetIconName;       // Extended Window Manager icon name
   FXID             wmNetWindowName;     // Extended Window Manager window name
   FXID             wmNetSupported;      // Extended Window Manager states list
+  FXID             wmNetHidden;         // Extended Window Manager hidden
+  FXID             wmNetShaded;         // Extended Window Manager shaded
   FXID             wmNetHMaximized;     // Extended Window Manager horizontally maximized
   FXID             wmNetVMaximized;     // Extended Window Manager vertically maximized
   FXID             wmNetFullScreen;     // Extended Window Manager full screen
@@ -359,8 +361,8 @@ private:
   FXbool           xdndWantUpdates;     // XDND target wants new positions while in rect
   FXbool           xdndFinishSent;      // XDND finish sent
   FXRectangle      xdndRect;            // XDND rectangle bounding target
-  FXID             xrrScreenChange;     // Xrandr ScreenChange event 
-  FXID             xfxFixesSelection;   // Xfixes selection event 
+  FXID             xrrScreenChange;     // Xrandr ScreenChange event
+  FXID             xfxFixesSelection;   // Xfixes selection event
   FXID             xsbBallMotion;       // Space ball motion event
   FXID             xsbButtonPress;      // Space ball button press event
   FXID             xsbButtonRelease;    // Space ball button release event

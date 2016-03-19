@@ -3,9 +3,9 @@
 *                                 Test MDI Widgets                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
-* $Id: mditest.cpp,v 1.44 2007/06/14 16:10:43 fox Exp $                         *
+* $Id: mditest.cpp,v 1.45 2008/01/04 15:18:34 fox Exp $                         *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

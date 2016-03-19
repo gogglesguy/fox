@@ -3,7 +3,7 @@
 *                       M e s s a g e   T r a n s l a t o r                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTranslator.h,v 1.8 2007/07/09 16:02:51 fox Exp $                       *
+* $Id: FXTranslator.h,v 1.9 2008/01/04 15:18:27 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTRANSLATOR_H
 #define FXTRANSLATOR_H

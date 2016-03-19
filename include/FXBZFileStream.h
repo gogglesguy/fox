@@ -3,7 +3,7 @@
 *                      B Z F i l e S t r e a m   C l a s s e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Lyle Johnson. All Rights Reserved.                 *
+* Copyright (C) 1999,2008 by Lyle Johnson. All Rights Reserved.                 *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXBZFileStream.h,v 1.13 2007/10/01 20:54:39 fox Exp $                    *
+* $Id: FXBZFileStream.h,v 1.14 2008/01/04 15:18:14 fox Exp $                    *
 ********************************************************************************/
 #ifdef HAVE_BZ2LIB_H
 #ifndef FXBZFILESTREAM_H

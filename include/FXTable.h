@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTable.h,v 1.176 2007/08/27 18:50:58 fox Exp $                          *
+* $Id: FXTable.h,v 1.177 2008/01/04 15:18:25 fox Exp $                          *
 ********************************************************************************/
 #ifndef FXTABLE_H
 #define FXTABLE_H
@@ -505,7 +505,7 @@ public:
 
   /// Computes content height
   virtual FXint getContentHeight();
-  
+
   /// Return visible area x position
   virtual FXint getVisibleX() const;
 

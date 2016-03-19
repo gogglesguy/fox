@@ -3,7 +3,7 @@
 *                       F i l e   C o p y   D i a l o g                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU General Public License             *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.         *
 *********************************************************************************
-* $Id: CopyDialog.cpp,v 1.7 2007/07/06 04:22:30 fox Exp $                       *
+* $Id: CopyDialog.cpp,v 1.8 2008/01/04 15:18:29 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fx.h"

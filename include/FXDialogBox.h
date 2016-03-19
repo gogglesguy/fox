@@ -3,7 +3,7 @@
 *                              D i a l o g   B o x                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXDialogBox.h,v 1.26 2007/07/09 16:02:43 fox Exp $                       *
+* $Id: FXDialogBox.h,v 1.27 2008/01/04 15:18:15 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXDIALOGBOX_H
 #define FXDIALOGBOX_H

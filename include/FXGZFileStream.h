@@ -3,7 +3,7 @@
 *                     G Z F i l e S t r e a m   C l a s s e s                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2002,2008 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXGZFileStream.h,v 1.12 2007/10/04 13:18:50 fox Exp $                    *
+* $Id: FXGZFileStream.h,v 1.13 2008/01/04 15:18:19 fox Exp $                    *
 ********************************************************************************/
 #ifdef HAVE_ZLIB_H
 #ifndef FXGZFILESTREAM_H

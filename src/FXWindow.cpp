@@ -3,7 +3,7 @@
 *                            W i n d o w   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXWindow.cpp,v 1.379 2007/11/30 19:33:24 fox Exp $                       *
+* $Id: FXWindow.cpp,v 1.381 2008/01/10 21:42:43 fox Exp $                       *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -86,7 +86,8 @@
 #ifndef WIN32
 
 // Basic events
-#define BASIC_EVENT_MASK   (StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask|KeyPressMask|KeyReleaseMask|KeymapStateMask|VisibilityChangeMask)
+#define BASIC_EVENT_MASK   (StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask|KeyPressMask|KeyReleaseMask|KeymapStateMask)
+//#define BASIC_EVENT_MASK   (StructureNotifyMask|ExposureMask|PropertyChangeMask|EnterWindowMask|LeaveWindowMask|KeyPressMask|KeyReleaseMask|KeymapStateMask|VisibilityChangeMask)
 
 // Additional events for shell widget events
 #define SHELL_EVENT_MASK   (FocusChangeMask|StructureNotifyMask)
@@ -766,13 +767,13 @@ long FXWindow::onKeyRelease(FXObject*,FXSelector,void* ptr){
 long FXWindow::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
   return isEnabled() && target && target->tryHandle(this,FXSEL(SEL_SPACEBALLMOTION,message),ptr);
   }
-  
-  
+
+
 // Space ball button press
 long FXWindow::onSpaceBallButtonPress(FXObject*,FXSelector,void* ptr){
   return isEnabled() && target && target->tryHandle(this,FXSEL(SEL_SPACEBALLBUTTONPRESS,message),ptr);
   }
-  
+
 
 // Space ball button release
 long FXWindow::onSpaceBallButtonRelease(FXObject*,FXSelector,void* ptr){
@@ -1370,7 +1371,7 @@ void FXWindow::create(){
       if(visual->colormap!=DefaultColormap((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()))){
         addColormapWindows();
         }
-        
+
       // Enable extra events when input extension supported
 #ifdef HAVE_XINPUT_H
       if(getApp()->xsbDevice){

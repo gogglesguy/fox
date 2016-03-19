@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: fxprintf.cpp,v 1.59 2008/01/02 15:16:29 fox Exp $                        *
+* $Id: fxprintf.cpp,v 1.60 2008/01/04 15:42:46 fox Exp $                        *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"
@@ -799,7 +799,7 @@ flg:  if(ch==' '){ flags|=FLG_BLANK; ch=*format++; goto flg; }
           else{                                         // Whatever size a pointer is
             *va_arg(args,FXival*)=(FXival)count;
             }
-          continue;                                     // No printout 
+          continue;                                     // No printout
         case 'p':
           flags&=~FLG_ZERO;
           value=(FXulong)va_arg(args,FXuval);

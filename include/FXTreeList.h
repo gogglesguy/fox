@@ -3,7 +3,7 @@
 *                         T r e e   L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXTreeList.h,v 1.107 2007/07/09 16:02:51 fox Exp $                       *
+* $Id: FXTreeList.h,v 1.108 2008/01/04 15:18:27 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXTREELIST_H
 #define FXTREELIST_H

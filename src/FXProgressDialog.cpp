@@ -3,7 +3,7 @@
 *                      P r o g r e s s   D i a l o g   B o x                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXProgressDialog.cpp,v 1.33 2007/07/09 16:27:05 fox Exp $                *
+* $Id: FXProgressDialog.cpp,v 1.34 2008/01/04 15:42:27 fox Exp $                *
 ********************************************************************************/
 #include "xincs.h"
 #include "fxver.h"

@@ -3,7 +3,7 @@
 *                          A x i s - D e f i n i t i o n                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2007,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXAxis.h,v 1.24 2007/07/25 17:38:41 fox Exp $                            *
+* $Id: FXAxis.h,v 1.25 2008/01/04 15:18:13 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXAXIS_H
 #define FXAXIS_H
@@ -85,7 +85,7 @@ public:
 
   /// Create an axis
   FXAxis(FXChart* ch,const FXString& nm,FXuint lblsty=TEXT_ATTACH_TOP,FXuint numsty=TEXT_ATTACH_TOP,FXuint sty=AXIS_LINE|AXIS_TICKS_MAJOR|AXIS_NUMBERS|AXIS_LABEL);
-  
+
   /// Create server-side resources
   virtual void create();
 
@@ -97,10 +97,10 @@ public:
 
   /// Set axis style
   void setStyle(FXuint sty);
-  
+
   /// Get axis style
   FXuint getStyle() const { return style; }
-  
+
   /// Change axis label
   void setLabel(const FXString& text);
 
@@ -163,16 +163,16 @@ public:
 
   /// Change major tick size
   void setMajorTickSize(FXint sz);
-  
+
   /// Return major tick size
   FXint getMajorTickSize() const { return majorticksize; }
 
   /// Change minor tick size
   void setMinorTickSize(FXint sz);
-  
+
   /// Return minor tick size
   FXint getMinorTickSize() const { return minorticksize; }
-  
+
   /// Change major tick space
   void setMajorTickSpace(FXdouble space);
 

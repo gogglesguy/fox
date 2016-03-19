@@ -3,7 +3,7 @@
 *                             T h r e a d   P o o l                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXThreadPool.h,v 1.54 2007/07/09 16:02:50 fox Exp $                      *
+* $Id: FXThreadPool.h,v 1.55 2008/01/04 15:18:27 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXTHREADPOOL_H
 #define FXTHREADPOOL_H

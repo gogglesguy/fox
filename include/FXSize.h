@@ -3,7 +3,7 @@
 *                               S i z e    C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXSize.h,v 1.18 2007/07/09 16:02:49 fox Exp $                            *
+* $Id: FXSize.h,v 1.19 2008/01/04 15:18:24 fox Exp $                            *
 ********************************************************************************/
 #ifndef FXSIZE_H
 #define FXSIZE_H

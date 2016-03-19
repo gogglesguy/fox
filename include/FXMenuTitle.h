@@ -3,7 +3,7 @@
 *                      M e n u   T i t l e   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2007 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2008 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXMenuTitle.h,v 1.25 2007/07/09 16:02:46 fox Exp $                       *
+* $Id: FXMenuTitle.h,v 1.26 2008/01/04 15:18:22 fox Exp $                       *
 ********************************************************************************/
 #ifndef FXMENUTITLE_H
 #define FXMENUTITLE_H

@@ -3,7 +3,7 @@
 *                      U T F - 1 6  T e x t   C o d e c                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2007 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2008 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -18,7 +18,7 @@
 * You should have received a copy of the GNU Lesser General Public License      *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>          *
 *********************************************************************************
-* $Id: FXUTF16Codec.h,v 1.13 2007/07/09 16:02:51 fox Exp $                      *
+* $Id: FXUTF16Codec.h,v 1.14 2008/01/04 15:18:27 fox Exp $                      *
 ********************************************************************************/
 #ifndef FXUTF16CODEC_H
 #define FXUTF16CODEC_H
