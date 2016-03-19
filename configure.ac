@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [36])
+m4_define([fox_level], [37])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init

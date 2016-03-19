@@ -1044,6 +1044,10 @@ SOURCE=..\..\..\include\FXDirVisitor.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\FXDirWatch.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\lib\FXDLL.cpp
 # End Source File
 # Begin Source File
@@ -1117,6 +1121,10 @@ SOURCE=..\..\..\include\FXDriveBox.h
 # Begin Source File
 
 SOURCE=..\..\..\include\FXElement.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXEmbedderWindow.h
 # End Source File
 # Begin Source File
 
@@ -1729,6 +1737,10 @@ SOURCE=..\..\..\lib\FXMatrix.cpp
 # Begin Source File
 
 SOURCE=..\..\..\include\FXMatrix.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\FXMBCSCodec.h
 # End Source File
 # Begin Source File
 

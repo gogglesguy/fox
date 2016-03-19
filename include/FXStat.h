@@ -189,6 +189,13 @@ public:
   * in the file was last modified, in nanoseconds since Epoch.
   */
   static FXTime modified(const FXString& file);
+  
+  /**
+  * Change modified time for the given file, on filesystems
+  * where this is supported.  Time is specified in nanoseconds
+  * since Epoch.
+  */
+  static FXbool modified(const FXString& file,FXTime ns);
 
   /**
   * Return last accessed time for this file, on filesystems
@@ -197,6 +204,13 @@ public:
   static FXTime accessed(const FXString& file);
 
   /**
+  * Change accessed time for the given file, on filesystems
+  * where this is supported.  Time is specified in nanoseconds
+  * since Epoch.
+  */
+  static FXbool accessed(const FXString& file,FXTime ns);
+  
+  /**
   * Return created time for this file, on filesystems
   * where this is supported.  This is also the time when
   * ownership, permissions, links, and other meta-data may
@@ -204,6 +218,13 @@ public:
   */
   static FXTime created(const FXString& file);
 
+  /**
+  * Change created time for the given file, on filesystems
+  * where this is supported.  Time is specified in nanoseconds
+  * since Epoch.
+  */
+  static FXbool created(const FXString& file,FXTime ns);
+  
   /// Return true if file is hidden
   static FXbool isHidden(const FXString& file);
 

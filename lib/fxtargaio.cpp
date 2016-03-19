@@ -713,7 +713,7 @@ FXbool fxcheckTGA(FXStream& store){
   FXuchar signature[3];
   store.load(signature,3);
   store.position(-3,FXFromCurrent);
-  return signature[2]==1 || signature[2]==2 || signature[2]==3 || signature[2]==9 || signature[2]==10 || signature[2]==11 || signature[2]==32 || signature[2]==33;
+  return (signature[1]==0 || signature[1]==1) && (signature[2]==1 || signature[2]==2 || signature[2]==3 || signature[2]==9 || signature[2]==10 || signature[2]==11 || signature[2]==32 || signature[2]==33);
   }
 
 

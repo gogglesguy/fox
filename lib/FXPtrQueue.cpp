@@ -131,6 +131,16 @@ FXbool FXPtrQueue::pop(void*& ptr){
   }
 
 
+// Pop onject from queue
+FXbool FXPtrQueue::pop(){
+  if(__likely(head!=tail)){
+    tail=(tail+1)%size;
+    return true;
+    }
+  return false;
+  }
+
+
 // Destroy job queue
 FXPtrQueue::~FXPtrQueue(){
   freeElms(list);

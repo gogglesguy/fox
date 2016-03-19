@@ -49,6 +49,12 @@ public:
   /// Create worker for runnable
   FXWorker(FXRunnable* r=NULL);
 
+  /// Change runnable if not started yet
+  FXbool setRunnable(FXRunnable* r);
+  
+  /// Return runnable
+  FXRunnable* getRunnable() const { return runnable; }
+
   /// Run worker
   virtual FXint run();
 

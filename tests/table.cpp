@@ -139,7 +139,7 @@ TableWindow::TableWindow(FXApp* a):FXMainWindow(a,"Table Widget Test",NULL,NULL,
   table->setHelpText("Editable table.");
 
   table->setRowRenumbering(FXHeader::decimalNumbering);
-  table->setColumnRenumbering(FXHeader::decimalNumbering);
+  table->setColumnRenumbering(FXHeader::alphaNumbering);
 
   // Initialize scrollable part of table
   for(r=0; r<50; r++){

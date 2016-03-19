@@ -54,10 +54,10 @@ namespace FX {
 
 // Up to 32 files kepts
 const FXchar FXRecentFiles::key[32][7]={
-  {"FILE0"}, {"FILE1"}, {"FILE2"}, {"FILE3"}, {"FILE4"}, {"FILE5"}, {"FILE6"}, {"FILE7"},
-  {"FILE8"}, {"FILE9"}, {"FILE10"},{"FILE11"},{"FILE12"},{"FILE13"},{"FILE14"},{"FILE15"},
-  {"FILE16"},{"FILE17"},{"FILE18"},{"FILE19"},{"FILE20"},{"FILE21"},{"FILE22"},{"FILE23"},
-  {"FILE24"},{"FILE25"},{"FILE26"},{"FILE27"},{"FILE28"},{"FILE29"},{"FILE30"},{"FILE31"}
+  {"FILE1"}, {"FILE2"}, {"FILE3"}, {"FILE4"}, {"FILE5"}, {"FILE6"}, {"FILE7"}, {"FILE8"}, 
+  {"FILE9"}, {"FILE10"},{"FILE11"},{"FILE12"},{"FILE13"},{"FILE14"},{"FILE15"},{"FILE16"},
+  {"FILE17"},{"FILE18"},{"FILE19"},{"FILE20"},{"FILE21"},{"FILE22"},{"FILE23"},{"FILE24"},
+  {"FILE25"},{"FILE26"},{"FILE27"},{"FILE28"},{"FILE29"},{"FILE30"},{"FILE31"},{"FILE32"}
   };
 
 
@@ -71,8 +71,8 @@ FXDEFMAP(FXRecentFiles) FXRecentFilesMap[] = {
   FXMAPFUNC(SEL_UPDATE,FXRecentFiles::ID_ANYFILES,FXRecentFiles::onUpdAnyFiles),
   FXMAPFUNC(SEL_UPDATE,FXRecentFiles::ID_CLEAR,FXRecentFiles::onUpdAnyFiles),
   FXMAPFUNC(SEL_COMMAND,FXRecentFiles::ID_CLEAR,FXRecentFiles::onCmdClear),
-  FXMAPFUNCS(SEL_COMMAND,FXRecentFiles::ID_FILE_1,FXRecentFiles::ID_FILE_10,FXRecentFiles::onCmdFile),
-  FXMAPFUNCS(SEL_UPDATE,FXRecentFiles::ID_FILE_1,FXRecentFiles::ID_FILE_10,FXRecentFiles::onUpdFile),
+  FXMAPFUNCS(SEL_COMMAND,FXRecentFiles::ID_FILE_1,FXRecentFiles::ID_FILE_32,FXRecentFiles::onCmdFile),
+  FXMAPFUNCS(SEL_UPDATE,FXRecentFiles::ID_FILE_1,FXRecentFiles::ID_FILE_32,FXRecentFiles::onUpdFile),
   };
 
 
@@ -122,13 +122,15 @@ void FXRecentFiles::appendFile(const FXString& filename){
   if(!filename.empty()){
     FXString newname=filename;
     FXString oldname;
-    FXuint i=1,j=1;
+    FXuint i=0;
+    FXuint j=0;
     do{
       do{ oldname=settings->readStringEntry(group,key[j++],NULL); }while(oldname==filename);
       settings->writeStringEntry(group,key[i],newname.text());
+      if(oldname.empty()) break;
       newname=oldname;
       }
-    while(!oldname.empty() && ++i<=maxfiles);
+    while(++i<maxfiles);
     }
   }
 
@@ -137,16 +139,17 @@ void FXRecentFiles::appendFile(const FXString& filename){
 void FXRecentFiles::removeFile(const FXString& filename){
   if(!filename.empty()){
     FXString name;
-    FXuint i=1,j=1;
+    FXuint i=0;
+    FXuint j=0;
     do{
       name=settings->readStringEntry(group,key[i],NULL);
-      settings->deleteEntry(group,key[i]);
       if(name.empty()) break;
       if(name!=filename){
         settings->writeStringEntry(group,key[j++],name.text());
         }
       }
-    while(++i<=maxfiles);
+    while(++i<maxfiles);
+    settings->deleteEntry(group,key[j++]);
     }
   }
 
@@ -166,7 +169,7 @@ long FXRecentFiles::onCmdClear(FXObject*,FXSelector,void*){
 
 // User clicks on one of the file names
 long FXRecentFiles::onCmdFile(FXObject*,FXSelector sel,void*){
-  const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1+1],NULL);
+  const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1],NULL);
   if(filename){
     if(target){ target->handle(this,FXSEL(SEL_COMMAND,message),(void*)filename); }
     }
@@ -176,13 +179,18 @@ long FXRecentFiles::onCmdFile(FXObject*,FXSelector sel,void*){
 
 // Update handler for same
 long FXRecentFiles::onUpdFile(FXObject *sender,FXSelector sel,void*){
-  const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1+1],NULL);
+  const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1],NULL);
   if(filename){
     FXString string;
-    if(FXSELID(sel)<ID_FILE_10)
+    if(FXSELID(sel)<ID_FILE_10){
       string.format("&%d %s",FXSELID(sel)-ID_FILE_1+1,filename);
-    else
+      }
+    else if(FXSELID(sel)==ID_FILE_10){
       string.format("1&0 %s",filename);
+      }
+    else{
+      string.format("%d %s",FXSELID(sel)-ID_FILE_1+1,filename);
+      }
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&string);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SHOW),NULL);
     }
@@ -195,7 +203,7 @@ long FXRecentFiles::onUpdFile(FXObject *sender,FXSelector sel,void*){
 
 // Show or hide depending on whether there are any files
 long FXRecentFiles::onUpdAnyFiles(FXObject *sender,FXSelector,void*){
-  if(settings->readStringEntry(group,key[1],NULL))
+  if(settings->readStringEntry(group,key[0],NULL))
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SHOW),NULL);
   else
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_HIDE),NULL);

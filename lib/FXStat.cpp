@@ -178,8 +178,14 @@ FXbool FXStat::isOtherExecutable() const {
 #ifdef WIN32
 
 // Convert 100ns since 01/01/1601 to ns since 01/01/1970
-static inline FXTime fxfiletime(FXTime ft){
+static inline FXTime fxunixtime(FXTime ft){
   return (ft-FXLONG(116444736000000000))*FXLONG(100);
+  }
+
+
+// Convert ns since 01/01/1970 to 100ns since 01/01/1601
+static inline FXTime fxwintime(FXTime ut){
+  return ut/FXLONG(100)+FXLONG(116444736000000000);
   }
 
 #endif
@@ -217,9 +223,9 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
-        info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.accessTime=fxunixtime(*((FXTime*)&data.ftLastAccessTime));
+        info.modifyTime=fxunixtime(*((FXTime*)&data.ftLastWriteTime));
+        info.createTime=fxunixtime(*((FXTime*)&data.ftCreationTime));
         info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
@@ -242,9 +248,9 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
-        info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.accessTime=fxunixtime(*((FXTime*)&data.ftLastAccessTime));
+        info.modifyTime=fxunixtime(*((FXTime*)&data.ftLastWriteTime));
+        info.createTime=fxunixtime(*((FXTime*)&data.ftCreationTime));
         info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
@@ -317,9 +323,9 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
-        info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.accessTime=fxunixtime(*((FXTime*)&data.ftLastAccessTime));
+        info.modifyTime=fxunixtime(*((FXTime*)&data.ftLastWriteTime));
+        info.createTime=fxunixtime(*((FXTime*)&data.ftCreationTime));
         info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
@@ -342,9 +348,9 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
         info.userNumber=0;
         info.groupNumber=0;
         info.linkCount=data.nNumberOfLinks;
-        info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
-        info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
-        info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+        info.accessTime=fxunixtime(*((FXTime*)&data.ftLastAccessTime));
+        info.modifyTime=fxunixtime(*((FXTime*)&data.ftLastWriteTime));
+        info.createTime=fxunixtime(*((FXTime*)&data.ftCreationTime));
         info.fileVolume=data.dwVolumeSerialNumber;
         info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
         info.fileSize=(((FXlong)data.nFileSizeHigh)<<32)|((FXlong)data.nFileSizeLow);
@@ -408,9 +414,9 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
     info.userNumber=0;
     info.groupNumber=0;
     info.linkCount=data.nNumberOfLinks;
-    info.accessTime=fxfiletime(*((FXTime*)&data.ftLastAccessTime));
-    info.modifyTime=fxfiletime(*((FXTime*)&data.ftLastWriteTime));
-    info.createTime=fxfiletime(*((FXTime*)&data.ftCreationTime));
+    info.accessTime=fxunixtime(*((FXTime*)&data.ftLastAccessTime));
+    info.modifyTime=fxunixtime(*((FXTime*)&data.ftLastWriteTime));
+    info.createTime=fxunixtime(*((FXTime*)&data.ftCreationTime));
     info.fileVolume=data.dwVolumeSerialNumber;
     info.fileIndex=(((FXulong)data.nFileIndexHigh)<<32)|((FXulong)data.nFileIndexLow);
     info.fileSize=(((FXulong)data.nFileSizeHigh)<<32)|((FXulong)data.nFileSizeLow);
@@ -467,30 +473,6 @@ FXbool FXStat::mode(const FXString& file,FXuint perm){
   return !file.empty() && ::chmod(file.text(),bits)==0;
 #endif
   }
-
-
-/*
-An API to change the file access/modification time would be helpful.
-Handy if you want to archive/copy files and want to keep the same
-timestamp:
-
-On Windows there's:
-SetFileTime
-http://msdn.microsoft.com/en-us/library/windows/desktop/ms724933(v=vs.85).aspx
-
-or with more work SetFileInformationByHandle:
-http://msdn.microsoft.com/en-us/library/windows/desktop/aa365539(v=VS.85).aspx
-
-On Linux there's:
-(seconds)
-utime
-
-POSIX.1-2008 (nanoseconds):
-utimensat
-
-
-Sander
-*/
 
 
 // Return true if file exists
@@ -553,6 +535,53 @@ FXTime FXStat::modified(const FXString& file){
   }
 
 
+// Change tiome when file was last modified
+FXbool FXStat::modified(const FXString& file,FXTime ns){
+  if(!file.empty()){
+#ifdef WIN32
+#ifdef UNICODE
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    FXInputHandle hnd=CreateFileW(unifile,GENERIC_READ|FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,0,NULL);
+#else
+    FXInputHandle hnd=CreateFileA(file.text(),GENERIC_READ|FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,0,NULL);
+#endif
+    if(hnd!=INVALID_HANDLE_VALUE){
+      FILETIME wintime;
+      *((FXTime*)&wintime)=fxwintime(ns);
+      if(SetFileTime(hnd,NULL,NULL,&wintime)!=0){
+        CloseHandle(hnd);
+        return true;
+        }
+      CloseHandle(hnd);
+      }
+#else
+#if defined(_ATFILE_SOURCE) || (_XOPEN_SOURCE > 700 || _POSIX_C_SOURCE >= 200809)
+    const FXTime seconds=1000000000;
+    struct timespec values[2];
+    values[0].tv_sec=UTIME_OMIT;
+    values[0].tv_nsec=UTIME_OMIT;
+    values[1].tv_sec=ns/seconds;
+    values[1].tv_nsec=ns%seconds;
+    return utimensat(AT_FDCWD,file.text(),values,0)==0;
+#else
+    const FXTime seconds=1000000;
+    struct stat data;
+    if(::stat(file.text(),&data)==0){
+      struct timeval values[2];
+      values[0].tv_sec=data.st_atime;
+      values[0].tv_usec=0;
+      values[1].tv_sec=ns/seconds;
+      values[1].tv_usec=ns%seconds;
+      return utimes(file.text(),values)==0;
+      }
+#endif
+#endif
+    }
+  return false;
+  }
+
+
 // Return time file was last accessed
 FXTime FXStat::accessed(const FXString& file){
   FXStat data;
@@ -561,11 +590,86 @@ FXTime FXStat::accessed(const FXString& file){
   }
 
 
+// Change tiome when file was last accessed
+FXbool FXStat::accessed(const FXString& file,FXTime ns){
+  if(!file.empty()){
+#ifdef WIN32
+#ifdef UNICODE
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    FXInputHandle hnd=CreateFileW(unifile,GENERIC_READ|FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,0,NULL);
+#else
+    FXInputHandle hnd=CreateFileA(file.text(),GENERIC_READ|FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,0,NULL);
+#endif
+    if(hnd!=INVALID_HANDLE_VALUE){
+      FILETIME wintime;
+      *((FXTime*)&wintime)=fxwintime(ns);
+      if(SetFileTime(hnd,NULL,&wintime,NULL)!=0){
+        CloseHandle(hnd);
+        return true;
+        }
+      CloseHandle(hnd);
+      }
+#else
+#if defined(_ATFILE_SOURCE) || (_XOPEN_SOURCE > 700 || _POSIX_C_SOURCE >= 200809)
+    const FXTime seconds=1000000000;
+    struct timespec values[2];
+    values[0].tv_sec=ns/seconds;
+    values[0].tv_nsec=ns%seconds;
+    values[1].tv_sec=UTIME_OMIT;
+    values[1].tv_nsec=UTIME_OMIT;
+    return utimensat(AT_FDCWD,file.text(),values,0)==0;
+#else
+    const FXTime seconds=1000000;
+    struct stat data;
+    if(::stat(file.text(),&data)==0){
+      struct timeval values[2];
+      values[0].tv_sec=ns/seconds;
+      values[0].tv_usec=ns%seconds;
+      values[1].tv_sec=data.st_mtime;
+      values[1].tv_usec=0;
+      return utimes(file.text(),values)==0;
+      }
+#endif
+#endif
+    }
+  return false;
+  }
+
+
 // Return time when created
 FXTime FXStat::created(const FXString& file){
   FXStat data;
   statFile(file,data);
   return data.created();
+  }
+
+
+// Change tiome when file was last created
+FXbool FXStat::created(const FXString& file,FXTime ns){
+  if(!file.empty()){
+#ifdef WIN32
+#ifdef UNICODE
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    FXInputHandle hnd=CreateFileW(unifile,GENERIC_READ|FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,0,NULL);
+#else
+    FXInputHandle hnd=CreateFileA(file.text(),GENERIC_READ|FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,0,NULL);
+#endif
+    if(hnd!=INVALID_HANDLE_VALUE){
+      FILETIME wintime;
+      *((FXTime*)&wintime)=fxwintime(ns);
+      if(SetFileTime(hnd,&wintime,NULL,NULL)!=0){
+        CloseHandle(hnd);
+        return true;
+        }
+      CloseHandle(hnd);
+      }
+#else
+    return false;               // Not available on *NIX
+#endif
+    }
+  return false;
   }
 
 

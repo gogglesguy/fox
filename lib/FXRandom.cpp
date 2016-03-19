@@ -41,7 +41,7 @@ using namespace FX;
 
 
 namespace FX {
-  
+
 /*******************************************************************************/
 
 // Construct random generator with default seed
@@ -78,7 +78,7 @@ FXulong FXRandom::randLong(){
 // Get random double
 FXfloat FXRandom::randFloat(){
 #if (_MSC_VER <= 1300)
-  return ((FXuint)randLong())*5.42101086242752217E-20f;
+  return ((FXuint)randLong())*2.3283064370808E-10f;
 #else
   return randLong()*5.42101086242752217E-20f;
 #endif
@@ -88,7 +88,7 @@ FXfloat FXRandom::randFloat(){
 // Get random double
 FXdouble FXRandom::randDouble(){
 #if (_MSC_VER <= 1300)
-  return ((FXuint)randLong())*5.42101086242752217E-20;
+  return ((FXuint)randLong())*2.3283064370808E-10;
 #else
   return randLong()*5.42101086242752217E-20;
 #endif

@@ -522,6 +522,19 @@ FXString FXHeader::decimalNumbering(FXint index){
   }
 
 
+// Simple alpha numbering
+FXString FXHeader::alphaNumbering(FXint index){
+  FXchar buf[8]; FXint i=8;
+  index++;
+  while(index){
+    index-=1;
+    buf[--i]='A'+index%26;
+    index/=26;
+    }
+  return FXString(&buf[i],8-i);
+  }
+
+
 // Renumber captions
 void FXHeader::renumberCaptions(FXNumberingFunc func,FXint fm,FXint to){
   if(func){

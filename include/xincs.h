@@ -95,9 +95,9 @@
 #ifdef HAVE_GL_H
 #include <GL/gl.h>
 #endif
-#ifdef _WIN32
-#include <GL/glext.h>
-#endif
+//#ifdef _WIN32
+//#include <GL/glext.h>
+//#endif
 #ifndef GLAPIENTRY
 #define GLAPIENTRY
 #endif

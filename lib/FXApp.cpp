@@ -4636,7 +4636,7 @@ long FXApp::onCmdHover(FXObject*,FXSelector,void*){
 
 // This window procedure is a static member function of class FXApp.
 // Its sole purpose is to forward the message info on to FXApp::dispatchEvent().
-long CALLBACK FXApp::wndproc(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam){
+FXival CALLBACK FXApp::wndproc(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam){
   return app->dispatchEvent(hwnd,iMsg,wParam,lParam);
   }
 
@@ -4647,7 +4647,7 @@ long CALLBACK FXApp::wndproc(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
 
 
 // Translate to string on KeyPress
-FXString translateKeyEvent(unsigned int,unsigned int wParam,long lParam){
+FXString translateKeyEvent(FXuint,FXuval wParam,FXival lParam){
   FXnchar buffer[20]; BYTE keystate[256]; int n;
   GetKeyboardState(keystate);
   n=ToUnicodeEx(wParam,HIWORD(lParam)&(KF_EXTENDED|KF_UP|0xFF),keystate,buffer,20,0,GetKeyboardLayout(0));
@@ -4658,7 +4658,7 @@ FXString translateKeyEvent(unsigned int,unsigned int wParam,long lParam){
 
 
 // Message dispatching
-long FXApp::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam){
+FXival FXApp::dispatchEvent(FXID hwnd,FXuint iMsg,FXuval wParam,FXival lParam){
   FXWindow *window,*ancestor,*win,*focuswin;
   static HWND lastmovehwnd=0;
   static LPARAM lastmovelParam=0;

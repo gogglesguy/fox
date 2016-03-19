@@ -1058,13 +1058,13 @@ public:
   /// Return table style
   FXuint getTableStyle() const;
 
-  /// Set column renumbering
+  /// Set column renumbering, see FXHeader
   void setColumnRenumbering(FXNumberingFunc func);
 
   /// Get column renumbering
   FXNumberingFunc getColumnRenumbering() const;
 
-  /// Set row renumbering
+  /// Set row renumbering, see FXHeader
   void setRowRenumbering(FXNumberingFunc func);
 
   /// Get row renumbering
