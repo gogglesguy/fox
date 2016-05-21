@@ -21,7 +21,6 @@
 #ifndef FXSPINLOCK_H
 #define FXSPINLOCK_H
 
-
 namespace FX {
 
 

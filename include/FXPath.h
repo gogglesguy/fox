@@ -21,7 +21,6 @@
 #ifndef FXPATH_H
 #define FXPATH_H
 
-
 namespace FX {
 
 namespace FXPath {

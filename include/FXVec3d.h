@@ -21,7 +21,6 @@
 #ifndef FXVEC3D_H
 #define FXVEC3D_H
 
-
 namespace FX {
 
 
@@ -91,10 +90,10 @@ public:
 
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z; }
-  FXdouble length() const { return sqrt(length2()); }
+  FXdouble length() const { return Math::sqrt(length2()); }
 
   /// Clamp values of vector between limits
-  FXVec3d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi),FXCLAMP(lo,z,hi)); }
+  FXVec3d& clamp(FXdouble lo,FXdouble hi){ return set(Math::fclamp(lo,x,hi),Math::fclamp(lo,y,hi),Math::fclamp(lo,z,hi)); }
 
   /// Destructor
  ~FXVec3d(){}
@@ -146,8 +145,8 @@ inline FXbool operator>(const FXVec3d& a,const FXVec3d& b){ return a.x>b.x && a.
 inline FXbool operator>=(const FXVec3d& a,const FXVec3d& b){ return a.x>=b.x && a.y>=b.y && a.z>=b.z; }
 
 /// Lowest or highest components
-inline FXVec3d lo(const FXVec3d& a,const FXVec3d& b){return FXVec3d(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z));}
-inline FXVec3d hi(const FXVec3d& a,const FXVec3d& b){return FXVec3d(FXMAX(a.x,b.x),FXMAX(a.y,b.y),FXMAX(a.z,b.z));}
+inline FXVec3d lo(const FXVec3d& a,const FXVec3d& b){return FXVec3d(Math::fmin(a.x,b.x),Math::fmin(a.y,b.y),Math::fmin(a.z,b.z));}
+inline FXVec3d hi(const FXVec3d& a,const FXVec3d& b){return FXVec3d(Math::fmax(a.x,b.x),Math::fmax(a.y,b.y),Math::fmax(a.z,b.z));}
 
 /// Convert vector to color
 extern FXAPI FXColor colorFromVec3d(const FXVec3d& vec);

@@ -21,7 +21,6 @@
 #ifndef FXELEMENT_H
 #define FXELEMENT_H
 
-
 namespace FX {
 
 /****************************  D e f i n i t i o n  ****************************/
@@ -125,7 +124,7 @@ inline void fillElms(EType* dst,const OType& src,FXuval n){
 /// Zero out array of elements
 template<typename EType>
 inline void clearElms(EType* dst,FXuval n){
-  memset(dst,0,sizeof(EType)*n);
+  memset((void*)dst,0,sizeof(EType)*n);
   }
 
 

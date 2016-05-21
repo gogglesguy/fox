@@ -21,7 +21,6 @@
 #ifndef FXMAT4D_H
 #define FXMAT4D_H
 
-
 namespace FX {
 
 

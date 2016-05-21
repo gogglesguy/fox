@@ -121,7 +121,7 @@ FXbool FXSettings::resize(FXival n){
             }
           elbat.table[x].key.adopt(table[i].key);       // Steal the string buffers
           elbat.table[x].data.adopt(table[i].data);
-          elbat.table[x].hash=h;                        // And copy the hash value
+          elbat.table[x].hash=(FXuint)h;                // And copy the hash value
           }
         }
       elbat.free(n-used());     // All non-empty slots now free
@@ -220,7 +220,7 @@ FXStringDictionary& FXSettings::at(const FXchar* ky){
   free(free()-1);                                       // Put into empty slot
 y:used(used()+1);
   table[x].key=ky;
-  table[x].hash=h;
+  table[x].hash=(FXuint)h;
 x:modified=true;                                        // Assume its to be written
   return table[x].data;
   }

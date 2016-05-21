@@ -64,14 +64,14 @@ class FXFont;
 class FXAPI FXLabel : public FXFrame {
   FXDECLARE(FXLabel)
 protected:
-  FXString  label;      // Text on the label
-  FXIcon   *icon;       // Icon on the label
-  FXFont   *font;       // Label font
-  FXHotKey  hotkey;     // Hotkey
-  FXint     hotoff;     // Offset in string
-  FXColor   textColor;  // Text color
-  FXString  tip;        // Tooltip
-  FXString  help;       // Help message
+  FXString     label;           // Text on the label
+  FXIcon      *icon;            // Icon on the label
+  FXFont      *font;            // Label font
+  FXString     help;            // Help message
+  FXString     tip;             // Tooltip
+  FXColor      textColor;       // Text color
+  FXHotKey     hotkey;          // Hotkey
+  FXint        hotoff;          // Offset in string
 protected:
   FXLabel();
   FXint labelHeight(const FXString& text) const;

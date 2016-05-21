@@ -21,7 +21,6 @@
 #ifndef FXSTREAM_H
 #define FXSTREAM_H
 
-
 namespace FX {
 
 

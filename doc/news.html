@@ -17,6 +17,72 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+May 20 - FOX DEVELOPMENT 1.7.55
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added XML Parser capability.  This is a SAX parser, which generates callbacks for each XML element encountered.
+There are two new classes, FXXML which is the core parser class, and FXXMLFile which parses files or inputs from devices.
+The FXXML class may also be used to parse from memory buffers.</li>
+<li>FXWSQueue implements a work-stealing queue.  A Work-Stealing queue supports a single thread adding or removing jobs from
+the front end, and multiple threads removing jobs from the backend.</li>
+<li>PathFinder now has new ways to select files quickly: by means of wild-card patterns.
+The new selection method is based on the list of file-patterns available from the normal filter drop-down
+box (which may be configured from the Settings Panel). It can be invoked from Edit/Select Files menu.</li>
+<li>New fxmath function fclamp() added; usually, this is implemented in terms of fmax() and fmin() which are 
+branch-free on many machines.</li>
+<li>Using new Math functions in most places inside library itself.</li>
+<li>Added line to box (2D) functions to FXExtent.</li>
+<li>FXText shows block-cursor when in overstrike mode.</li>
+<li>Fix in case clearElms() is used with volatile pointers.</li>
+<li>More work done on FXDispatcher.</li>
+<li>Dont add accelerators for strings on Bookmarks menu in Adie editor.</li>
+<li>Escape &amp; in FXRecentFiles to avoid accidentally installing accelerator.</li>
+<li>Fix index type in FXGLObject.</li>
+<li>Added new classes for generic callback infrastructure, FXCallback. To support older compilers,
+the current implementation does not yet use varyadic templates (maybe at some future time, it will).
+The new FXCallback mechanisms are already in use in FXXML and will soon be used in FXDispacher
+as well.</li>
+<li>Some bug fixes in FXJSON.</li>
+<li>Missing va_end() fixed in fxprintf() and fxcanf().  Not serious on most compilers, however.</li>
+<li>Updated syntax patterns for Adie editor.</li>
+<li>In fxscanf(), a %n does NOT increase return count.</li>
+<li>Thousands grouping in fxprintf().</li>
+<li>FXVariant (and other collection classes) indexed with FXival instead of FXint.  Allowing for
+64-bit very large data structures.</li>
+<li>More convenience APIs added to FXVariant.</li>
+<li>FXVec4d and FXVec4f: lerp in two fma's when compiled with AVX2 and FMA (nice trick!).</li>
+<li>Rare out-of-bounds memory read fixed in FXText.</li>
+<li>Renamed clashing math functions in fxmath.h; isnan(), etc. renamed to fpNan(), etc. Problem
+was these functions were sometimes macros on some operating systems; new ones are good C++ inside
+Math namespace.  No other clashes have been reported so far.</li>
+<li>When going up one directory-level in PathFinder, select recent directory.  Thus, keyboard
+directory navigation is greatly improved.</li>
+<li>File Dialog widgets also improved as above.  This is a major keyboard navigation improvement.</li>
+<li>Added memory fence APIs to FXAtomic.  Needed for lock-free programming paradigms.</li>
+<li>Byte swap stuff in fxendian.h.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 15 - FOX STABLE 1.6.51
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Small fixes for 64-bit casts in dctest.cpp (compiler warning issues).</li>
+<li>JPEG image I/O color spaces handled better.</li>
+<li>FXApp input callback message ID for SEL_IO_EXCEPT was wrong.</li>
+<li>Change in how FXStat determines if a file is an executable (Windows).</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 January 6 - FOX DEVELOPMENT 1.7.54
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

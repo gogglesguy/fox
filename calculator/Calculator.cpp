@@ -786,12 +786,12 @@ FXdouble Calculator::getDisplayValue() const {
 // Redisplay new value
 void Calculator::setDisplayValue(FXdouble val){
   FXString string;
-  if(Math::isnan(val)){
+  if(Math::fpNan(val)){
     setDisplayText("ERROR");
     if(beep) getApp()->beep();
     }
-  else if(Math::isinf(val)){
-    if(Math::signbit(val)){
+  else if(Math::fpInfinite(val)){
+    if(Math::fpSign(val)){
       setDisplayText("-INF");
       }
     else{
@@ -897,11 +897,11 @@ FXdouble Calculator::trigres(FXdouble r) const {
 // result = n!
 //
 static FXdouble factorial(FXdouble n){
-  FXdouble num=floor(n);
+  FXdouble num=Math::floor(n);
   FXdouble result=1.0;
   if(0.0<=num && num==n){
     while(num>0.0){
-      if(!Math::isfinite(result)) break;
+      if(!Math::fpFinite(result)) break;
       result=result*num;
       num=num-1.0;
       }
@@ -918,12 +918,12 @@ static FXdouble factorial(FXdouble n){
 //            (n-r)!
 //
 static FXdouble permutations(FXdouble n,FXdouble r){
-  FXdouble num=floor(n);
-  FXdouble den=floor(r);
+  FXdouble num=Math::floor(n);
+  FXdouble den=Math::floor(r);
   FXdouble result=1.0;
   if(0.0<=num && 0.0<=den && den<=num && num==n && den==r){
     while(den>0.0){
-      if(!Math::isfinite(result)) break;
+      if(!Math::fpFinite(result)) break;
       result=result*num;
       num=num-1.0;
       den=den-1.0;
@@ -947,7 +947,7 @@ static FXdouble combinations(FXdouble n,FXdouble r){
   FXdouble res2=1.0;
   if(0.0<=num && 0.0<=den && den<=num && num==n && den==r){
     while(den>0.0){
-      if(!Math::isfinite(res1)) break;
+      if(!Math::fpFinite(res1)) break;
       res1=res1*num;
       res2=res2*den;
       num=num-1.0;

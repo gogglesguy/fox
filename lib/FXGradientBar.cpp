@@ -958,7 +958,7 @@ FXdouble FXGradientBar::getValue(FXint x,FXint y) const {
     val=slo+(height-padbottom-border-3-y)*(shi-slo)/(bar->getHeight()-1);
   else
     val=slo+(x-padleft-border-2)*(shi-slo)/(bar->getWidth()-1);
-  return FXCLAMP(slo,val,shi);
+  return Math::fclamp(slo,val,shi);
   }
 
 

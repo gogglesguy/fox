@@ -21,7 +21,6 @@
 #ifndef FXPTRQUEUE_H
 #define FXPTRQUEUE_H
 
-
 namespace FX {
 
 

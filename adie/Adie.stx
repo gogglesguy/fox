@@ -145,7 +145,7 @@ end
 language "C++"
 
   # File patterns for this language mode
-  filesmatch "*.C,*.cpp,*.cc,*.cxx,*.c++,*.H,*.hpp,*.hh,*.hxx,*.h++,*.h"
+  filesmatch "*.C,*.cpp,*.cc,*.cxx,*.c++,*.cu,*.H,*.hpp,*.hh,*.hxx,*.h++,*.h,*.cuh"
   contentsmatch "[Cc]\+\+"
 
   contextlines 1
@@ -224,7 +224,7 @@ language "C++"
       style       "carrot"
     end
     rule "Format"
-      pattern "%(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
       style       "fuchsia"
     end
   end
@@ -418,7 +418,7 @@ language "C"
       style       "carrot"
     end
     rule "Format"
-      pattern "%(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
       style       "fuchsia"
     end
   end
@@ -1065,20 +1065,16 @@ language "JavaScript"
     closepattern  "\""
     stoppattern   "$"
     style         "blue"
-    rule "OctalEscape"
-      pattern     "\\\d+"
-      style       "fuchsia"
-    end
     rule "HexEscape"
       pattern     "\\x\h\h"
       style       "fuchsia"
     end
-    rule "ControlEscape"
-      pattern     "\\."
-      style       "fuchsia"
-    end
     rule "UnicodeEscape"
       pattern     "\\u\h\h\h\h"
+      style       "fuchsia"
+    end
+    rule "ControlEscape"
+      pattern     "\\[0'\"\\nrvtbf]"
       style       "fuchsia"
     end
   end
@@ -1089,20 +1085,16 @@ language "JavaScript"
     closepattern  "\'"
     stoppattern   "$"
     style         "blue"
-    rule "OctalEscape"
-      pattern     "\\\d+"
-      style       "fuchsia"
-    end
     rule "HexEscape"
       pattern     "\\x\h\h"
       style       "fuchsia"
     end
-    rule "ControlEscape"
-      pattern     "\\."
-      style       "fuchsia"
-    end
     rule "UnicodeEscape"
       pattern     "\\u\h\h\h\h"
+      style       "fuchsia"
+    end
+    rule "ControlEscape"
+      pattern     "\\[0'\"\\nrvtbf]"
       style       "fuchsia"
     end
   end
@@ -1930,7 +1922,7 @@ end
 
 # Makefiles
 language "Make"
-  filesmatch "*Makefile*"
+  filesmatch "Makefile*,makefile*"
   contextlines 1
   rule "Comment"
     openpattern  "#"
@@ -2081,19 +2073,36 @@ end
 
 
 # HTML and XML
-language "Xml/Html"
-  filesmatch "*.xml,*.htm,*.html,*.ui"
+language "XML/HTML"
+  filesmatch "*.xml,*.htm,*.html,*.svg,*.ui"
   contextlines 1
+
   rule "Comment"
     openpattern   "<!--"
     closepattern  "-->"
     style         "darkgreen"
   end
 
-  rule "Entity"
-    openpattern   "\&"
-    closepattern  ";"
-    style         "red"
+  rule "CDATA"
+    openpattern   "<!\[CDATA\["
+    closepattern  "\]\]>"
+    style         "cyan"
+  end
+
+  rule "Declaration"
+    openpattern   "<!"
+    closepattern  ">"
+    style         "blue"
+  end
+
+  rule "EntityRef"
+    pattern       "\&\l\w*;"
+    style         "yellow"
+  end
+
+  rule "CharRef"
+    pattern       "\&#(\d+|x\h+);"
+    style         "yellow"
   end
 
   rule "Instruction"
@@ -2104,51 +2113,35 @@ language "Xml/Html"
       openpattern   "\""
       closepattern  "\""
       style         "blue"
-      rule "Entity"
-        openpattern   "\&"
-        closepattern  ";"
-        stoppattern   "(?=\")"
-        style         "red"
-      end
     end
     rule "String"
       openpattern   "\'"
       closepattern  "\'"
       style         "blue"
-      rule "Entity"
-        openpattern   "\&"
-        closepattern  ";"
-        stoppattern   "(?=\")"
-        style         "red"
-      end
     end
   end
 
-  rule "Node"
-    openpattern   "<"
-    closepattern  ">"
+  rule "Element"
+    openpattern   "</?"
+    closepattern  "/?>"
     style         "red"
+    rule "Name"
+      pattern     "[:_\l][\w.-]+"
+      style       "yellow"
+    end
+    rule "Equals"
+      pattern     "="
+      style       "red"
+    end
     rule "String"
       openpattern   "\""
       closepattern  "\""
       style         "blue"
-      rule "Entity"
-        openpattern   "\&"
-        closepattern  ";"
-        stoppattern   "(?=\")"
-        style         "red"
-      end
     end
     rule "String"
-      openpattern   "\'"
-      closepattern  "\'"
+      openpattern   "'"
+      closepattern  "'"
       style         "blue"
-      rule "Entity"
-        openpattern   "\&"
-        closepattern  ";"
-        stoppattern   "(?=\")"
-        style         "red"
-      end
     end
   end
 end

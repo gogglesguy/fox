@@ -94,13 +94,13 @@ FXMenuCaption::FXMenuCaption(){
   flags|=FLAG_SHOWN;
   icon=(FXIcon*)-1L;
   font=(FXFont*)-1L;
-  hotoff=0;
-  hotkey=0;
   textColor=0;
   selbackColor=0;
   seltextColor=0;
   hiliteColor=0;
   shadowColor=0;
+  hotoff=0;
+  hotkey=0;
   }
 
 
@@ -109,17 +109,17 @@ FXMenuCaption::FXMenuCaption(FXComposite* p,const FXString& text,FXIcon* ic,FXui
   FXString string=text.section('\t',0);
   flags|=FLAG_SHOWN;
   label=stripHotKey(string);
-  help=text.section('\t',2);
   icon=ic;
   font=getApp()->getNormalFont();
-  hotkey=parseHotKey(string);
-  hotoff=findHotKey(string);
-  addHotKey(hotkey);
+  help=text.section('\t',2);
   textColor=getApp()->getForeColor();
   seltextColor=getApp()->getSelMenuTextColor();
   selbackColor=getApp()->getSelMenuBackColor();
   hiliteColor=getApp()->getHiliteColor();
   shadowColor=getApp()->getShadowColor();
+  hotkey=parseHotKey(string);
+  hotoff=findHotKey(string);
+  addHotKey(hotkey);
   }
 
 

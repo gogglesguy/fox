@@ -21,7 +21,6 @@
 #ifndef FXREADWRITELOCK_H
 #define FXREADWRITELOCK_H
 
-
 namespace FX {
 
 

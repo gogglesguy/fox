@@ -21,7 +21,6 @@
 #ifndef FXSEMAQUEUE_H
 #define FXSEMAQUEUE_H
 
-
 namespace FX {
 
 

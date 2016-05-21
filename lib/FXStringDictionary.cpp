@@ -102,7 +102,7 @@ FXbool FXStringDictionary::resize(FXival n){
             }
           elbat.table[x].key.adopt(table[i].key);       // Steal the string buffers
           elbat.table[x].data.adopt(table[i].data);
-          elbat.table[x].hash=h;                        // And copy the hash value
+          elbat.table[x].hash=(FXuint)h;                // And copy the hash value
           elbat.table[x].mark=table[i].mark;            // Copy mark
           }
         }
@@ -201,7 +201,7 @@ FXString& FXStringDictionary::at(const FXchar* ky,FXbool mrk){
   free(free()-1);                                       // Put into empty slot
 y:used(used()+1);
   table[x].key=ky;
-  table[x].hash=h;
+  table[x].hash=(FXuint)h;
 x:table[x].mark=mrk;
   return table[x].data;
   }

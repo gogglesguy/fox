@@ -908,10 +908,10 @@ public:
   FXbool replaceSelection(const FXString& text,FXbool notify=false);
 
   /// Enter text into editor as if typed
-  void enterText(const FXchar *text,FXint n,FXbool repsel=true,FXbool notify=false);
+  void enterText(const FXchar *text,FXint n,FXbool notify=false);
 
   /// Enter text into editor as if typed
-  void enterText(const FXString& text,FXbool repsel=true,FXbool notify=false);
+  void enterText(const FXString& text,FXbool notify=false);
 
   /// Return true if position pos is selected
   FXbool isPosSelected(FXint pos) const;

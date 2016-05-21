@@ -49,6 +49,17 @@ CopyDialog::CopyDialog(FXWindow *own,const FXString& name):FXDialogBox(own,name,
   }
 
 
+// We have to do this so as to force the initial text to be seleced
+FXuint CopyDialog::execute(FXuint placement){
+  create();
+  newname->setFocus();
+  newname->selectAll();
+  show(placement);
+  return getApp()->runModalFor(this);
+  }
+
+
+
 // Destroy
 CopyDialog::~CopyDialog(){
   oldname=(FXTextField*)-1L;

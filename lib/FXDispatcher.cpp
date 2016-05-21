@@ -45,49 +45,31 @@
   - FXDispatcher does NOT loop; but does maintain set of event sources and raised
     events; thus, recursive event loops don't lose track.
 
-  - Process IO handles in circular fashion so each one gets equal opportunity of being
-    handled; always return to called after each dispatch.
+  - Process IO handles in round-robin fashion so each one gets equal opportunity of being
+    handled; on Windows, the list of handles is simply shuffled.
+
+  - A successful handling of a callback causes return from dispatch; an unsuccessful
+    callback causes FXDispatcher::dispatch() to go around to the next event.
 
   - If we allow another thread to add/remove event sources, then we will need a
     signaling pipe to notify the blocking thread (except when using epoll).
 
-  - Use new pselect() to have (1) nanosecond wait-time and (2) dispatch non-immediate
-    signal handlers properly (see man 2 select_tut).
+  - Use epoll_pwait(() if available; otherwise fall back to pselect().  If neither
+    of these available, we will use select(); on Windows, WaitForMultipleObjects(),
+    or MsgWaitForMultipleObjects.
 
-  - Signal handling:
+  - When using WaitForMultipleObjects(), only one handle is dispatched at a time.
+    The list is reshuffled prior to dispatch, thus providing fairness; also, this
+    is reentrant in case a nested event loop returns to FXDispatcher again.
 
-      o Synchronous signals are dispatched from FXDispatcher.  We can use signalfd()
-        maybe.  Point is, they're part of the regular event loop and are dispatched
-        from FXDispatcher.
+  - FXDispatcher (or subclasses thereof) don't loop.  Just block and dispatch.
+    FXInvocation represents a loop.  They're linked, and per-thread.  It calls
+    FXDispatcher::dispatch() repeatedly until some condition calls for it to stop.
 
-      o All signal masks are left unchanged as per program-startup.  When setting a
-        handler for a signal, that particular signal will be masked (blocked) until
-        we get into pselect(). When a signal handler is removed, the old state will
-        be reinstated.
+  - Each signal is handled by only one single FXDispatcher.  However, there may
+    be multiple FXDispatcher's, each one handling a different, non-overlapping
+    set of signals.
 
-  - Idea: when inside dispatch, substract fd of dispatch from the set, until dispatch
-    returns.  Thus, if dispatcher processed by multiple threads, no two threads manage
-    the same fd.  So the set of fd's being watched is the total set of fd's minus
-    the ones currently being dispatched.
-
-  - Look at: extern int timerfd_create ();
-  - Look at: epoll_create().
-  - Look at: eventfd().
-  - Look at: signalfd().
-  - Must be multi-thread capable.
-  - Threads which are inside run-loop have their TLS dispatcherStorageKey pointed
-    to the thread.  This association is broken when they leave.
-  - Add static function to return calling thread's FXDispatcher.
-  - Threads can enter/leave loop individually or collectively.
-
-  - NEW:
-    FXDispatcher (or subclasses thereof) don't loop.  Just block and dispatch.
-    FXInvocation represents a loop.  They're linked, and per-thread.  It
-    calls FXDispatcher::processEvents() repeatedly until some condition calls
-    for it to stop. Several FXInvocations may share a single FXDispatcher.
-
-  - Event/handler objects to have back-link to FXDispatcher, so we know which
-    FXDispatcher they belong to (in case more than one FXDispatcher).
 */
 
 
@@ -108,44 +90,41 @@ namespace FX {
 // Handles being watched
 struct FXDispatcher::FXHandles {
 #if defined(WIN32)
-  HANDLE     handles[MAXIMUM_WAIT_OBJECTS];     // Handles
-  HANDLE     watched[MAXIMUM_WAIT_OBJECTS];     // Watched handles
+  FXInputHandle      handles[MAXIMUM_WAIT_OBJECTS];     // Handles
+  TUInt              modes[MAXIMUM_WAIT_OBJECTS];       // IO Modes each handle
 #elif defined(HAVE_EPOLL_CREATE1)
-  struct epoll_event events[1024];              // Events
-  int        handle;                            // Poll handle
-  sigset_t   signals;                           // Handled signals
+  struct epoll_event events[128];                       // Events
+  FXInputHandle      handle;                            // Poll handle
 #else
-  fd_set     watched[3];                        // Watched handles
-  fd_set     handles[3];                        // Known handles
-  sigset_t   signals;                           // Handled signals
+  fd_set             watched[3];                        // Watched handles
+  fd_set             handles[3];                        // Known handles
 #endif
   };
 
 
 /*******************************************************************************/
 
-FXIMPLEMENT(FXDispatcher,FXObject,NULL,0)
-
 
 // Construct dispatcher object
-FXDispatcher::FXDispatcher():handles(NULL),numhandles(0),numwatched(0),numraised(0),current(0),initialized(false){
+FXDispatcher::FXDispatcher():handles(NULL),sigreceived(0),numhandles(0),numwatched(0),numraised(0),current(-1),initialized(false){
+  FXTRACE((10,"FXDispatcher::FXDispatcher\n"));
+  clearElms(signotified,ARRAYNUMBER(signotified));
   }
 
 
 // Initialize dispatcher
 FXbool FXDispatcher::init(){
-  if(!isInitialized()){
+  FXTRACE((10,"FXDispatcher::init()\n"));
+  if(!initialized){
     if(allocElms(handles,1)){
 #if defined(WIN32)
       clearElms(handles->handles,ARRAYNUMBER(handles->handles));
-      clearElms(handles->watched,ARRAYNUMBER(handles->watched));
+      clearElms(handles->modes,ARRAYNUMBER(handles->modes));
 #elif defined(HAVE_EPOLL_CREATE1)
-      sigemptyset(&handles->signals);
       clearElms(handles->events,ARRAYNUMBER(handles->events));
       handles->handle=epoll_create1(EPOLL_CLOEXEC);
       if(handles->handle<0){ freeElms(handles); return false; }
 #else
-      sigemptyset(&handles->signals);
       FD_ZERO(&handles->handles[0]);            // No handles
       FD_ZERO(&handles->handles[1]);
       FD_ZERO(&handles->handles[2]);
@@ -153,10 +132,12 @@ FXbool FXDispatcher::init(){
       FD_ZERO(&handles->watched[1]);
       FD_ZERO(&handles->watched[2]);
 #endif
+      clearElms(signotified,ARRAYNUMBER(signotified));
+      sigreceived=0;
       numhandles=0;
       numwatched=0;
       numraised=0;
-      current=0;
+      current=-1;
       initialized=true;
       return true;
       }
@@ -167,56 +148,65 @@ FXbool FXDispatcher::init(){
 
 /*******************************************************************************/
 
-// Return timeout when something needs to happen
-FXTime FXDispatcher::getTimeout(){
-  return forever;
-  }
-
-/*******************************************************************************/
-
-// Signal sig was raised
-volatile FXbool FXDispatcher::signotified[64];
-
-// Most recent signal received
-volatile FXint FXDispatcher::sigreceived=0;
+// Which dispatcher responsible for which signal
+FXDispatcher *volatile FXDispatcher::sigmanager[64];
 
 
-// Signal handler simply sets flag to indicate it has gone off; also
-// record most recently raised signal for efficiency
-void FXDispatcher::signalhandler(int sig){
-  signotified[sig]=true;
-  sigreceived=sig;
+// Handler for a synchronous managed signal simply sets flag that a signal
+// was raised, and remembers most-recently raised signal.
+void FXDispatcher::signalhandler(FXint sig){
+  sigmanager[sig]->signotified[sig]=1;
+  sigmanager[sig]->sigreceived=sig;
   }
 
 
-// Check if dispatcher handles given signal
+// Asynchronous signal handler for managed signal directly dispatches to
+// handling code; this is potentially dangerous, so use at your own risk.
+void FXDispatcher::signalhandlerasync(FXint sig){
+  sigmanager[sig]->dispatchSignal(sig);
+  }
+
+
+// Return true if dispatcher manages given signal
 FXbool FXDispatcher::hasSignal(FXint sig){
-  if(isInitialized()){
-#ifdef WIN32
-#else
-    return sigismember(&handles->signals,sig)==1;
-#endif
-    }
-  return false;
+  return (sigmanager[sig]==this);
   }
 
 
 // Append signal to signal-set observed by the dispatcher
-FXbool FXDispatcher::addSignal(FXint sig){
-  if(isInitialized()){
+FXbool FXDispatcher::addSignal(FXint sig,FXbool async){
+  if(initialized){
+    if(atomicBoolCas(&sigmanager[sig],(FXDispatcher*)NULL,this)){
+      void (CDECL *handler)(int);
+      if(async){
+        handler=FXDispatcher::signalhandlerasync;       // Asynchronous callback
+        }
+      else{
+        handler=FXDispatcher::signalhandler;            // Normal callback
+        }
+      signotified[sig]=0;                               // Set non-raised
 #ifdef WIN32
-#else
-    if(sigismember(&handles->signals,sig)==0){
+      if(signal(sig,handler)==SIG_ERR){                 // Set handler
+        sigmanager[sig]=NULL;
+        return false;
+        }
+#elif (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
       struct sigaction sigact;
-      signotified[sig]=false;                   // Set non-raised
-      sigact.sa_handler=signalhandler;
-      sigfillset(&sigact.sa_mask);              // Block other signals while running handler
+      sigact.sa_handler=handler;
       sigact.sa_flags=0;
-      sigaction(sig,&sigact,NULL);              // Set handler
-      sigaddset(&handles->signals,sig);
+      sigfillset(&sigact.sa_mask);
+      if(sigaction(sig,&sigact,NULL)==-1){              // Set handler
+        sigmanager[sig]=NULL;
+        return false;
+        }
+#else
+      if(signal(sig,handler)==SIG_ERR){                 // Set handler
+        sigmanager[sig]=NULL;
+        return false;
+        }
+#endif
       return true;
       }
-#endif
     }
   return false;
   }
@@ -224,85 +214,82 @@ FXbool FXDispatcher::addSignal(FXint sig){
 
 // Remove signal from signal-set observed by the dispatcher
 FXbool FXDispatcher::remSignal(FXint sig){
-  if(isInitialized()){
+  if(initialized){
+    if(sigmanager[sig]==this){
 #ifdef WIN32
-#else
-    if(sigismember(&handles->signals,sig)==1){
+      if(signal(sig,SIG_DFL)==SIG_ERR){                 // Unset handler
+        signotified[sig]=0;                             // Set non-raised
+        sigmanager[sig]=NULL;                           // Now release it
+        return false;
+        }
+#elif (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
       struct sigaction sigact;
       sigact.sa_handler=SIG_DFL;
-      sigemptyset(&sigact.sa_mask);             // Unblock other signals
       sigact.sa_flags=0;
-      sigaction(sig,&sigact,NULL);              // First, unset handler
-      signotified[sig]=false;                   // Set non-raised
-      sigdelset(&handles->signals,sig);
+      sigemptyset(&sigact.sa_mask);
+      if(sigaction(sig,&sigact,NULL)==-1){              // Unset handler
+        sigmanager[sig]=NULL;                           // Now release it
+        signotified[sig]=0;                             // Set non-raised
+        return false;
+        }
+#else
+      if(signal(sig,SIG_DFL)==SIG_ERR){                 // Unset handler
+        sigmanager[sig]=NULL;                           // Now release it
+        signotified[sig]=0;                             // Set non-raised
+        return false;
+        }
+#endif
+      sigmanager[sig]=NULL;                             // Now release it
+      signotified[sig]=0;                               // Set non-raised
       return true;
       }
-#endif
     }
   return false;
+  }
+
+
+// Remove all signals
+FXbool FXDispatcher::remAllSignals(){
+  for(FXuint sig=1; sig<ARRAYNUMBER(sigmanager); ++sig){
+    if(!remSignal(sig)) return false;
+    }
+  return true;
   }
 
 /*******************************************************************************/
 
-
-// Check if handle was watched
-FXbool FXDispatcher::hasHandle(FXInputHandle hnd,FXuint mode){
-  if(isInitialized()){
-#if defined(WIN32)
-    if(hnd!=BadHandle){
-      for(FXint i=numhandles-1; i>=0; --i){
-        if(handles->handles[i]==hnd) return true;
-        }
-      }
-#elif defined(HAVE_EPOLL_CREATE1)
-    if(0<=hnd){
-      // FIXME //
-      }
-#else
-    if(0<=hnd && hnd<numhandles){
-      if((mode&InputRead) && FD_ISSET(hnd,&handles->handles[0])) return true;
-      if((mode&InputWrite) && FD_ISSET(hnd,&handles->handles[1])) return true;
-      if((mode&InputExcept) && FD_ISSET(hnd,&handles->handles[2])) return true;
-      }
-#endif
-    }
-  return false;
-  }
-
-
-// Add handle hnd to list
+// Append new handle hnd to watch-list
 FXbool FXDispatcher::addHandle(FXInputHandle hnd,FXuint mode){
-  if(isInitialized()){
+  FXTRACE((11,"FXDispatcher::addHandle(%d,%d)\n",hnd,mode));
+  if(initialized){
 #if defined(WIN32)
     if(hnd!=BadHandle && numhandles<MAXIMUM_WAIT_OBJECTS){
       for(FXint i=numhandles-1; i>=0; --i){
-        if(handles->handles[i]==hnd) return true;
+        if(handles->handles[i]==hnd) return false;
         }
-      handles->handles[numhandles++]=hnd;
+      handles->handles[numhandles]=hnd;
+      handles->modes[numhandles]=mode;
+      numhandles++;
       return true;
       }
 #elif defined(HAVE_EPOLL_CREATE1)
     if(0<=hnd){
       struct epoll_event ev;
       ev.events=0;
+      ev.data.fd=hnd;
       if(mode&InputRead) ev.events|=EPOLLIN;
       if(mode&InputWrite) ev.events|=EPOLLOUT;
       if(mode&InputExcept) ev.events|=EPOLLPRI;
-      ev.data.fd=hnd;
-      if(epoll_ctl(handles->handle,EPOLL_CTL_ADD,hnd,&ev)==0){
-        // FIXME //
-// FIXME    EPOLL_CTL_MOD if already added
-        return true;
-        }
+      if(::epoll_ctl(handles->handle,EPOLL_CTL_ADD,hnd,&ev)!=0){ return false; }
+      numhandles++;
+      return true;
       }
 #else
-    if(0<=hnd && hnd<FD_SETSIZE){
+    if(0<=hnd && hnd<FD_SETSIZE && !(FD_ISSET(hnd,&handles->handles[0]) || FD_ISSET(hnd,&handles->handles[1]) || FD_ISSET(hnd,&handles->handles[2]))){
       if(mode&InputRead){ FD_SET(hnd,&handles->handles[0]); }
       if(mode&InputWrite){ FD_SET(hnd,&handles->handles[1]); }
       if(mode&InputExcept){ FD_SET(hnd,&handles->handles[2]); }
-      if(numhandles<=hnd){
-        numhandles=hnd+1;
-        }
+      if(numhandles<=hnd){ numhandles=hnd+1; }
       return true;
       }
 #endif
@@ -312,38 +299,41 @@ FXbool FXDispatcher::addHandle(FXInputHandle hnd,FXuint mode){
 
 
 // Remove handle hnd from list
-FXbool FXDispatcher::remHandle(FXInputHandle hnd,FXuint mode){
-  if(isInitialized()){
+FXbool FXDispatcher::remHandle(FXInputHandle hnd){
+  FXTRACE((11,"FXDispatcher::remHandle(%d)\n",hnd));
+  if(initialized){
 #if defined(WIN32)
     if(hnd!=BadHandle){
       for(FXint i=numhandles-1; i>=0; --i){
         if(handles->handles[i]==hnd){
-          handles->handles[i]=handles->handles[--numhandles];
-          break;
+          if(current==i) current=-1;                    // Removed a raised handle
+          if(current==numhandles-1) current=i;          // Renumbered a raised handle
+          handles->handles[i]=handles->handles[numhandles-1];
+          handles->modes[i]=handles->modes[numhandles-1];
+          numhandles--;
+          return true;
           }
         }
-      return true;
+      return false;
       }
 #elif defined(HAVE_EPOLL_CREATE1)
     if(0<=hnd){
       struct epoll_event ev;
-      ev.events=0;
-      if(mode&InputRead) ev.events|=EPOLLIN;
-      if(mode&InputWrite) ev.events|=EPOLLOUT;
-      if(mode&InputExcept) ev.events|=EPOLLPRI;
-      ev.data.fd=hnd;
-      if(epoll_ctl(handles->handle,EPOLL_CTL_DEL,hnd,&ev)==0){
-        // FIXME //
-// FIXME    EPOLL_CTL_MOD if already added
-        return true;
-        }
+      ev.events=0;              // Doesn't really matter, ignored by kernel
+      ev.data.fd=0;
+      if(::epoll_ctl(handles->handle,EPOLL_CTL_DEL,hnd,&ev)!=0){ return false; }
+      numhandles++;
+      return true;
       }
 #else
-    if(0<=hnd && hnd<numhandles){
-      if(mode&InputRead){ FD_CLR(hnd,&handles->handles[0]); }
-      if(mode&InputWrite){ FD_CLR(hnd,&handles->handles[1]); }
-      if(mode&InputExcept){ FD_CLR(hnd,&handles->handles[2]); }
-      if(numhandles==hnd+1){
+    if(0<=hnd && hnd<numhandles && (FD_ISSET(hnd,&handles->handles[0]) || FD_ISSET(hnd,&handles->handles[1]) || FD_ISSET(hnd,&handles->handles[2]))){
+      if(FD_ISSET(hnd,&handles->watched[0])){ FD_CLR(hnd,&handles->watched[0]); numraised--; }
+      if(FD_ISSET(hnd,&handles->watched[1])){ FD_CLR(hnd,&handles->watched[1]); numraised--; }
+      if(FD_ISSET(hnd,&handles->watched[2])){ FD_CLR(hnd,&handles->watched[2]); numraised--; }
+      FD_CLR(hnd,&handles->handles[0]);
+      FD_CLR(hnd,&handles->handles[1]);
+      FD_CLR(hnd,&handles->handles[2]);
+      if(hnd==numhandles-1){
         while(0<numhandles && !FD_ISSET(numhandles-1,&handles->handles[0]) && !FD_ISSET(numhandles-1,&handles->handles[1]) && !FD_ISSET(numhandles-1,&handles->handles[2])){
           numhandles--;
           }
@@ -369,9 +359,11 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd,FXuint mode){
 
 // Dispatch driver
 FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
-  if(isInitialized()){
+  TLTRACE((10,"FXDispatcher::dispatch(%lld,%x)\n",blocking,flags));
+  if(initialized){
+    FXInputHandle hnd;
     FXTime now,due,delay,interval;
-    FXint signaled,sig,nxt;
+    FXuint sig,nxt,mode;
 
     // Loop till we got something
     while(1){
@@ -380,46 +372,47 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
       delay=forever;
       due=getTimeout();
       if(due<forever){
-        now=FXThread::time();
+        now=Thread::time();
         delay=due-now;
-        if(delay<1000L){
+        if(delay<FXLONG(1000)){
           if(dispatchTimeout(due)) return true;
-          delay=forever;
+          continue;
           }
         }
 
       // Check for signal
-//      sig=sigreceived;
-//      if(signotified[sig] && sigismember(&handles->signals,sig)==1){
-//        signotified[sig]=false;
-//        nxt=64;
-//        while(--nxt && !signotified[nxt]){ }
-//        sigreceived=nxt;
-//        if(dispatchSignal(sig)) return true;
-//        }
+      sig=nxt=sigreceived;
+      if(atomicSet(&signotified[sig],0)){
+        do{ nxt=(nxt+63)&63; }while(nxt!=sig && !signotified[nxt]);
+        sigreceived=nxt;
+        if(dispatchSignal(sig)) return true;
+        continue;
+        }
 
       // Check active handles
-      while(0<numraised){
-        current=current%numhandles;
-        if(WaitForSingleObject(handles->handles[current],0)==WAIT_OBJECT_0){
-          numraised--;
-          if(dispatchHandle(current,InputRead)) return true; // Which of InputRead or InputWrite ??
-          }
-        current=current+1;
+      if(0<=current && current<numhandles){
+        nxt=(current+1)%numhandles;
+        hnd=handles->handles[current];                          // Shuffle raised handle up in the list
+        mode=handles->modes[current];                           // To give all handles equal play time
+        handles->handles[current]=handles->handles[nxt];
+        handles->modes[current]=handles->modes[nxt];
+        handles->handles[nxt]=hnd;
+        handles->modes[nxt]=mode;
+        current=-1;
+        if(dispatchHandle(hnd,mode)) return true;
+        continue;
         }
 
       // Select active handles and check signals; don't block
-//      signaled=WaitForMultipleObjects(numhandles,handles->handles,false,0,QS_ALLINPUT);
-      signaled=WaitForMultipleObjects(numhandles,handles->handles,false,0);
-
-      // Start scanning with current
-      if(WAIT_OBJECT_0<=signaled && signaled<WAIT_OBJECT_0+numhandles){ current=signaled-WAIT_OBJECT_0; numraised=numhandles; }
+      current=WaitForMultipleObjects(numhandles,handles->handles,false,0);
 
       // Bad stuff happened
-      if(signaled==WAIT_FAILED){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+      if(current==WAIT_FAILED || current>=WAIT_ABANDONED_0){
+        throw FXFatalException("FXDispatcher::dispatch: error waiting on handles.");
+        }
 
-      // No handles were active
-      if(signaled==WAIT_TIMEOUT){
+      // No active handles yet; need to wait
+      if(current==WAIT_TIMEOUT){
 
         // Idle callback if we're about to block
         if(dispatchIdle()) return true;
@@ -427,17 +420,23 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
         // We're not blocking
         if(blocking<=0) return false;
 
+        // Block this long
         interval=FXMIN(delay,blocking);
 
         // Select active handles and check signals, waiting for timeout or maximum block time
-//        signaled=WaitForMultipleObjects(numhandles,handles->handles,false,(interval==forever)?INFINITE:(DWORD)(interval/1000000L),QS_ALLINPUT);
-        signaled=WaitForMultipleObjects(numhandles,handles->handles,false,(interval==forever)?INFINITE:(DWORD)(interval/1000000L));
+        current=WaitForMultipleObjects(numhandles,handles->handles,false,(interval<forever) ? (FXuint)((interval+FXLONG(500000))/FXLONG(1000000)) : INFINITE);
 
         // Bad stuff happened
-        if(signaled==WAIT_FAILED){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+        if(current==WAIT_FAILED || current>=WAIT_ABANDONED_0){
+          throw FXFatalException("FXDispatcher::dispatch: error waiting on handles.");
+          }
 
         // Return if there was no timeout within maximum block time
-        if(signaled==WAIT_TIMEOUT && delay>=blocking) return false;
+        if(current==WAIT_TIMEOUT){
+          if(delay>=blocking) return false;             // Nothing happened during blocking period!
+          if(blocking<forever){ blocking-=delay; }      // Next blocking period reduced by time already expired
+          continue;
+          }
         }
       }
     }
@@ -448,9 +447,11 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
 
 // Dispatch driver
 FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
-  if(isInitialized()){
-    FXTime now,due,delay;
-    FXint sig,nxt;
+  FXTRACE((10,"FXDispatcher::dispatch(%lld,%x)\n",blocking,flags));
+  if(initialized){
+    FXInputHandle hnd;
+    FXTime now,due,delay,interval;
+    FXuint sig,nxt,mode;
 
     // Loop till we got something
     while(1){
@@ -461,55 +462,45 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
       if(due<forever){
         now=FXThread::time();
         delay=due-now;
-        if(delay<1000L){
+        if(delay<FXLONG(1000)){
           if(dispatchTimeout(due)) return true;
-          delay=forever;
+          continue;
           }
         }
 
       // Check for signal
-      sig=sigreceived;
-      if(signotified[sig] && sigismember(&handles->signals,sig)==1){
-        signotified[sig]=false;
-        nxt=64;
-        while(--nxt && !signotified[nxt]){ }
+      sig=nxt=sigreceived;
+      if(atomicSet(&signotified[sig],0)){
+        do{ nxt=(nxt+63)&63; }while(nxt!=sig && !signotified[nxt]);
         sigreceived=nxt;
         if(dispatchSignal(sig)) return true;
+        continue;
         }
 
       // Check active handles
-      while(0<numraised){
+      if(0<numraised){
+        mode=0;
+        numraised--;
         current=(current+1)%numwatched;
-        if(handles->events[current].events&EPOLLIN){
-          handles->events[current].events&=~EPOLLIN;
-          numraised--;
-          if(dispatchHandle(handles->events[current].data.fd,InputRead)) return true;
-          }
-        if(handles->events[current].events&EPOLLOUT){
-          handles->events[current].events&=~EPOLLOUT;
-          numraised--;
-          if(dispatchHandle(handles->events[current].data.fd,InputWrite)) return true;
-          }
-        if(handles->events[current].events&EPOLLERR){
-          handles->events[current].events&=~EPOLLERR;
-          numraised--;
-          if(dispatchHandle(handles->events[current].data.fd,InputExcept)) return true;
-          }
+        hnd=handles->events[current].data.fd;
+        if(handles->events[current].events&EPOLLIN){ mode|=InputRead; }
+        if(handles->events[current].events&EPOLLOUT){ mode|=InputWrite; }
+        if(handles->events[current].events&EPOLLERR){ mode|=InputExcept; }
+        if(dispatchHandle(hnd,mode)) return true;
+        continue;
         }
 
-      FXASSERT(numraised==0);
-
-      // Prepare handles to check
-      numwatched=numhandles;
-
       // Select active handles and check signals; don't block
-      numraised=epoll_pwait(handles->handle,handles->events,ARRAYNUMBER(handles->events),0,NULL);
+      numwatched=epoll_pwait(handles->handle,handles->events,ARRAYNUMBER(handles->events),0,NULL);
 
       // Bad stuff happened
-      if(numraised<0 && errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+      if(numwatched<0){
+        if(errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+        continue;
+        }
 
-      // No handles were active
-      if(numraised==0){
+      // No active handles yet; need to wait
+      if(numwatched==0){
 
         // Idle callback if we're about to block
         if(dispatchIdle()) return true;
@@ -517,18 +508,26 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
         // We're not blocking
         if(blocking<=0) return false;
 
-        // Prepare handles to check
-        numwatched=numhandles;
+        // Nanoseconds to wait
+        interval=FXMIN(delay,blocking);
 
         // Select active handles and check signals, waiting for timeout or maximum block time
-        numraised=epoll_pwait(handles->handle,handles->events,ARRAYNUMBER(handles->events),FXMIN(delay,blocking)/1000000L,NULL);
+        numwatched=epoll_pwait(handles->handle,handles->events,ARRAYNUMBER(handles->events),(interval<forever) ? (FXint)((interval+FXLONG(500000))/FXLONG(1000000)) : -1,NULL);
 
         // Bad stuff happened
-        if(numraised<0 && errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+        if(numwatched<0){
+          if(errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+          continue;
+          }
 
         // Return if there was no timeout within maximum block time
-        if(numraised==0 && delay>=blocking) return false;
+        if(numwatched==0){
+          if(delay>=blocking) return false;             // Nothing happened during blocking period!
+          if(blocking<forever){ blocking-=delay; }      // Next blocking period reduced by time already expired
+          continue;
+          }
         }
+      numraised=numwatched;
       }
     }
   return false;
@@ -569,9 +568,10 @@ static FXint sselect(FXint nfds,fd_set* readfds,fd_set* writefds,fd_set* errorfd
 
 // Dispatch driver
 FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
-  if(isInitialized()){
-    FXTime now,due,delay;
-    FXint sig,nxt;
+  FXTRACE((10,"FXDispatcher::dispatch(%lld,%x)\n",blocking,flags));
+  if(initialized){
+    FXTime now,due,delay,interval;
+    FXuint sig,nxt,mode;
 
     // Loop till we got something
     while(1){
@@ -582,55 +582,60 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
       if(due<forever){
         now=FXThread::time();
         delay=due-now;
-        if(delay<1000L){
+        if(delay<FXLONG(1000)){
           if(dispatchTimeout(due)) return true;
-          delay=forever;
+          continue;
           }
         }
 
       // Check for signal
-      sig=sigreceived;
-      if(signotified[sig] && sigismember(&handles->signals,sig)==1){
-        signotified[sig]=false;
-        nxt=64;
-        while(--nxt && !signotified[nxt]){ }
+      sig=nxt=sigreceived;
+      if(atomicSet(&signotified[sig],0)){
+        do{ nxt=(nxt+63)&63; }while(nxt!=sig && !signotified[nxt]);
         sigreceived=nxt;
         if(dispatchSignal(sig)) return true;
+        continue;
         }
 
       // Check active handles
-      while(0<numraised){
-        current=(current+1)%numwatched;
-        if(FD_ISSET(current,&handles->watched[0])){
-          FD_CLR(current,&handles->watched[0]);
-          numraised--;
-          if(dispatchHandle(current,InputRead)) return true;
+      if(0<numraised){
+        mode=0;
+        do{
+          current=(current+1)%numwatched;
+          if(FD_ISSET(current,&handles->watched[0])){
+            FD_CLR(current,&handles->watched[0]);
+            mode|=InputRead;
+            numraised--;
+            }
+          if(FD_ISSET(current,&handles->watched[1])){
+            FD_CLR(current,&handles->watched[1]);
+            mode|=InputWrite;
+            numraised--;
+            }
+          if(FD_ISSET(current,&handles->watched[2])){
+            FD_CLR(current,&handles->watched[2]);
+            mode|=InputExcept;
+            numraised--;
+            }
           }
-        if(FD_ISSET(current,&handles->watched[1])){
-          FD_CLR(current,&handles->watched[1]);
-          numraised--;
-          if(dispatchHandle(current,InputWrite)) return true;
-          }
-        if(FD_ISSET(current,&handles->watched[2])){
-          FD_CLR(current,&handles->watched[2]);
-          numraised--;
-          if(dispatchHandle(current,InputExcept)) return true;
-          }
+        while(mode==0);
+        if(dispatchHandle(current,mode)) return true;
+        continue;
         }
-
-      FXASSERT(numraised==0);
 
       // Prepare handles to check
       handles->watched[0]=handles->handles[0];
       handles->watched[1]=handles->handles[1];
       handles->watched[2]=handles->handles[2];
-      numwatched=numhandles;
 
       // Select active handles and check signals; don't block
-      numraised=sselect(numwatched,&handles->watched[0],&handles->watched[1],&handles->watched[2],0LL,NULL);
+      numraised=sselect(numhandles,&handles->watched[0],&handles->watched[1],&handles->watched[2],0,NULL);
 
       // Bad stuff happened
-      if(numraised<0 && errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+      if(numraised<0){
+        if(errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+        continue;
+        }
 
       // No handles were active
       if(numraised==0){
@@ -645,17 +650,27 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
         handles->watched[0]=handles->handles[0];
         handles->watched[1]=handles->handles[1];
         handles->watched[2]=handles->handles[2];
-        numwatched=numhandles;
+
+        // Nanoseconds to wait
+        interval=FXMIN(delay,blocking);
 
         // Select active handles and check signals, waiting for timeout or maximum block time
-        numraised=sselect(numwatched,&handles->watched[0],&handles->watched[1],&handles->watched[2],FXMIN(delay,blocking),NULL);
+        numraised=sselect(numhandles,&handles->watched[0],&handles->watched[1],&handles->watched[2],interval,NULL);
 
         // Bad stuff happened
-        if(numraised<0 && errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+        if(numraised<0){
+          if(errno!=EAGAIN && errno!=EINTR){ throw FXFatalException("FXDispatcher::dispatch: error waiting on handles."); }
+          continue;
+          }
 
         // Return if there was no timeout within maximum block time
-        if(numraised==0 && delay>=blocking) return false;
+        if(numraised==0){
+          if(delay>=blocking) return false;             // Nothing happened during blocking period!
+          if(blocking<forever){ blocking-=delay; }      // Next blocking period reduced by time already expired
+          continue;
+          }
         }
+      numwatched=numhandles;
       }
     }
   return false;
@@ -665,26 +680,40 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
 
 /*******************************************************************************/
 
-// Dispatch when when handle hnd is signaled with mode
-FXbool FXDispatcher::dispatchHandle(FXint,FXuint){
+// Dispatch when a signal was fired
+FXbool FXDispatcher::dispatchSignal(FXint sig){
+  FXTRACE((10,"FXDispatcher::dispatchSignal(%d)\n",sig));
   return false;
   }
 
+/*******************************************************************************/
 
-// Dispatch when a signal was fired
-FXbool FXDispatcher::dispatchSignal(FXint){
+// Dispatch when when handle hnd is signaled with mode
+FXbool FXDispatcher::dispatchHandle(FXInputHandle hnd,FXuint mode){
+  FXTRACE((10,"FXDispatcher::dispatchHandle(%d,%x)\n",hnd,mode));
   return false;
+  }
+
+/*******************************************************************************/
+
+// Return timeout when something needs to happen
+FXTime FXDispatcher::getTimeout(){
+  return forever;
   }
 
 
 // Dispatch when timeout expires
-FXbool FXDispatcher::dispatchTimeout(FXTime){
+FXbool FXDispatcher::dispatchTimeout(FXTime due){
+  FXTRACE((10,"FXDispatcher::dispatchTimeout(%lld)\n",due));
   return false;
   }
+
+/*******************************************************************************/
 
 
 // Dispatch when idle
 FXbool FXDispatcher::dispatchIdle(){
+  FXTRACE((10,"FXDispatcher::dispatchIdle()\n"));
   return false;
   }
 
@@ -692,7 +721,8 @@ FXbool FXDispatcher::dispatchIdle(){
 
 // Exit dispatcher
 FXbool FXDispatcher::exit(){
-  if(isInitialized()){
+  if(initialized){
+    remAllSignals();
 #if defined(WIN32)
     ///////////////
 #elif defined(HAVE_EPOLL_CREATE1)
@@ -701,6 +731,12 @@ FXbool FXDispatcher::exit(){
     ///////////////
 #endif
     freeElms(handles);
+    clearElms(signotified,ARRAYNUMBER(signotified));
+    sigreceived=0;
+    numhandles=0;
+    numwatched=0;
+    numraised=0;
+    current=-1;
     initialized=false;
     return true;
     }

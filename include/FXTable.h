@@ -27,7 +27,6 @@
 
 namespace FX {
 
-
 class FXIcon;
 class FXFont;
 class FXTable;
@@ -37,7 +36,6 @@ class FXButton;
 
 /// Default cell margin
 enum { DEFAULT_MARGIN = 2 };
-
 
 
 /// Table options

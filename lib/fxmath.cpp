@@ -96,9 +96,9 @@ FXfloat Math::floor(FXfloat x){
 // Single precision round to nearest integer (away from zero)
 #if defined(NO_ROUNDF)
 FXfloat Math::round(FXfloat x){
-  if(__likely(Math::isfinite(x))){
+  if(__likely(Math::fpFinite(x))){
     FXfloat t;
-    if(Math::signbit(x)){
+    if(Math::fpSign(x)){
       t=Math::floor(-x);
       t+=(FXfloat)(t+x<=-0.5f);
       return -t;
@@ -117,9 +117,9 @@ FXfloat Math::round(FXfloat x){
 // Double precision round to nearest integer (away from zero)
 #if defined(NO_ROUND)
 FXdouble Math::round(FXdouble x){
-  if(__likely(Math::isfinite(x))){
+  if(__likely(Math::fpFinite(x))){
     FXdouble t;
-    if(Math::signbit(x)){
+    if(Math::fpSign(x)){
       t=Math::floor(-x);
       t+=(FXdouble)(t+x<=-0.5);
       return -t;
@@ -291,7 +291,8 @@ FXdouble Math::sinh(FXdouble x){
         }
       return h*(t+t/(t+1.0));                           // |x| < 22
       }
-    if(ax<FXULONG(0x40862e42fefa39ef)){
+//  if(ax<FXULONG(0x40862e42fefa39ef)){
+    if(ax<FXULONG(0x40862E4200000000)){
       return h*Math::exp(Math::fabs(x));                // |x| < log(DBL_MAX)
       }
     if(ax<=FXULONG(0x408633ce8fb9f87d)){                // |x| < overflowthreshold

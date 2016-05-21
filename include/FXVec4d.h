@@ -21,7 +21,6 @@
 #ifndef FXVEC4D_H
 #define FXVEC4D_H
 
-
 namespace FX {
 
 
@@ -91,10 +90,10 @@ public:
 
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z+w*w; }
-  FXdouble length() const { return sqrt(length2()); }
+  FXdouble length() const { return Math::sqrt(length2()); }
 
   /// Clamp values of vector between limits
-  FXVec4d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi),FXCLAMP(lo,z,hi),FXCLAMP(lo,w,hi)); }
+  FXVec4d& clamp(FXdouble lo,FXdouble hi){ return set(Math::fclamp(lo,x,hi),Math::fclamp(lo,y,hi),Math::fclamp(lo,z,hi),Math::fclamp(lo,w,hi)); }
 
   /// Signed distance normalized plane and point
   FXdouble distance(const FXVec3d& p) const;
@@ -149,8 +148,8 @@ inline FXbool operator>(const FXVec4d& a,const FXVec4d& b){ return a.x>b.x && a.
 inline FXbool operator>=(const FXVec4d& a,const FXVec4d& b){ return a.x>=b.x && a.y>=b.y && a.z>=b.z && a.w>=b.w; }
 
 /// Lowest or highest components
-inline FXVec4d lo(const FXVec4d& a,const FXVec4d& b){return FXVec4d(FXMIN(a.x,b.x),FXMIN(a.y,b.y),FXMIN(a.z,b.z),FXMIN(a.w,b.w));}
-inline FXVec4d hi(const FXVec4d& a,const FXVec4d& b){return FXVec4d(FXMAX(a.x,b.x),FXMAX(a.y,b.y),FXMAX(a.z,b.z),FXMAX(a.w,b.w));}
+inline FXVec4d lo(const FXVec4d& a,const FXVec4d& b){return FXVec4d(Math::fmin(a.x,b.x),Math::fmin(a.y,b.y),Math::fmin(a.z,b.z),Math::fmin(a.w,b.w));}
+inline FXVec4d hi(const FXVec4d& a,const FXVec4d& b){return FXVec4d(Math::fmax(a.x,b.x),Math::fmax(a.y,b.y),Math::fmax(a.z,b.z),Math::fmax(a.w,b.w));}
 
 /// Compute normalized plane equation ax+by+cz+d=0
 extern FXAPI FXVec4d plane(const FXVec4d& vec);

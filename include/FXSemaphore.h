@@ -21,7 +21,6 @@
 #ifndef FXSEMAPHORE_H
 #define FXSEMAPHORE_H
 
-
 namespace FX {
 
 

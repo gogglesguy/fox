@@ -1294,6 +1294,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXCallback.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXCanvas.cpp"
 			>
 			<FileConfiguration
@@ -9507,6 +9511,22 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXXML.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXXML.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXXMLFile.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXXMLFile.h"
+			>
 		</File>
 		<File
 			RelativePath="..\..\..\lib\FXXPMIcon.cpp"

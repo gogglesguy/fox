@@ -119,10 +119,6 @@ protected:
   FXint getNumSelectedFiles() const;
   FXString* getSelectedFiles() const;
   void visitDirectory(const FXString& dir);
-  void setPatternList(const FXString& patterns);
-  FXString getPatternList() const;
-  void setCurrentPattern(FXint n);
-  FXint getCurrentPattern() const;
   FXbool previewImage(const FXString& filename);
   void closePreview();
 public:
@@ -196,6 +192,7 @@ public:
   long onUpdImageSize(FXObject*,FXSelector,void*);
   long onCmdToggleHidden(FXObject*,FXSelector,void*);
   long onUpdToggleHidden(FXObject*,FXSelector,void*);
+  long onCmdWildcardSelect(FXObject*,FXSelector,void*);
   long onCmdPreferences(FXObject*,FXSelector,void*);
 public:
   enum{
@@ -264,6 +261,7 @@ public:
     ID_TOGGLE_HIDDEN,
     ID_HARVEST,
     ID_PREFERENCES,
+    ID_WILDCARD_SELECT,
     ID_LAST
     };
 public:
@@ -279,6 +277,12 @@ public:
   // Closed window
   virtual FXbool close(FXbool notify=false);
 
+  // Change file name
+  void setFilename(const FXString& path);
+
+  // Return file name, if any
+  FXString getFilename() const;
+
   // Switch current directory
   void setDirectory(const FXString& path);
 
@@ -287,6 +291,18 @@ public:
 
   // Return file associations
   FXFileAssociations *getAssociations() const { return associations; }
+
+  // Set list of patterns
+  void setPatternList(const FXString& patterns);
+
+  // Get list of patterns
+  FXString getPatternList() const;
+
+  // Chance current pattern
+  void setCurrentPattern(FXint n);
+
+  // Get currently selected pattern
+  FXint getCurrentPattern() const;
 
   // Save settings
   void saveSettings();

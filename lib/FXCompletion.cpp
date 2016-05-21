@@ -75,7 +75,7 @@ void FXCompletion::increment(FXuint cnt){
 
 // Decrement counter
 void FXCompletion::decrement(FXuint cnt){
-  if(atomicAdd(&counter,-cnt)==cnt && cnt){semaphore.post();}
+  if(atomicAdd(&counter,0-cnt)==cnt && cnt){semaphore.post();}
   }
 
 

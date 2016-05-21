@@ -21,7 +21,6 @@
 #ifndef FXEXTENTD_H
 #define FXEXTENTD_H
 
-
 namespace FX {
 
 
@@ -125,6 +124,12 @@ public:
 
   /// Include given range into extent
   FXExtentd& include(const FXExtentd& ext);
+
+  /// Intersect box with ray u-v
+  FXbool intersect(const FXVec2d& u,const FXVec2d& v) const;
+
+  /// Intersect box with ray pos+lambda*dir, returning true if hit
+  FXbool intersect(const FXVec2d& pos,const FXVec2d& dir,FXdouble hit[]) const;
 
   /// Get corner number 0..3
   FXVec2d corner(FXint c) const { return FXVec2d((&lower)[c&1].x, (&lower)[(c>>1)&1].y); }

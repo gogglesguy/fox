@@ -68,6 +68,7 @@ FXBitmapView.h \
 FXButton.h \
 FXBZFileStream.h \
 FXCURCursor.h \
+FXCallback.h \
 FXCalendar.h \
 FXCalendarView.h \
 FXCanvas.h \
@@ -334,6 +335,9 @@ FXWEBPImage.h \
 FXWindow.h \
 FXWizard.h \
 FXWorker.h \
+FXWSQueue.h \
+FXXML.h \
+FXXMLFile.h \
 FXXBMIcon.h \
 FXXBMImage.h \
 FXXPMIcon.h \

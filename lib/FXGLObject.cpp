@@ -115,14 +115,13 @@ FXIMPLEMENT(FXGLGroup,FXGLObject,NULL,0)
 
 // Get bounding box
 void FXGLGroup::bounds(FXRangef& box){
-  register FXint i;
   FXRangef b;
   box.lower.x=box.lower.y=box.lower.z=0.0f;
   box.upper.x=box.upper.y=box.upper.z=0.0f;
   if(0<list.no()){
     box.lower.x=box.lower.y=box.lower.z= FLT_MAX;
     box.upper.x=box.upper.y=box.upper.z=-FLT_MAX;
-    for(i=0; i<list.no(); i++){
+    for(FXival i=0; i<list.no(); i++){
       list[i]->bounds(b);
       box.include(b);
       }
@@ -132,7 +131,7 @@ void FXGLGroup::bounds(FXRangef& box){
 
 // Draw
 void FXGLGroup::draw(FXGLViewer* viewer){
-  for(FXint i=0; i<list.no(); i++) list[i]->draw(viewer);
+  for(FXival i=0; i<list.no(); i++) list[i]->draw(viewer);
   }
 
 
@@ -140,8 +139,8 @@ void FXGLGroup::draw(FXGLViewer* viewer){
 void FXGLGroup::hit(FXGLViewer* viewer){
 #ifdef HAVE_GL_H
   glPushName(0xffffffff);
-  for(FXint i=0; i<list.no(); i++){
-    glLoadName(i);
+  for(FXival i=0; i<list.no(); i++){
+    glLoadName((FXuint)i);
     list[i]->hit(viewer);
     }
   glPopName();
@@ -170,7 +169,7 @@ FXbool FXGLGroup::canDrag() const { return true; }
 
 // Drag group object
 FXbool FXGLGroup::drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty){
-  for(FXint i=0; i<list.no(); i++){
+  for(FXival i=0; i<list.no(); i++){
     list[i]->drag(viewer,fx,fy,tx,ty);
     }
   return true;
@@ -193,7 +192,7 @@ void FXGLGroup::load(FXStream& store){
 
 // Delete members of the group
 FXGLGroup::~FXGLGroup(){
-  for(FXint i=0; i<list.no(); i++) delete list[i];
+  for(FXival i=0; i<list.no(); i++) delete list[i];
   }
 
 

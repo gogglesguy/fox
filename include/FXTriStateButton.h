@@ -25,7 +25,6 @@
 #include "FXToggleButton.h"
 #endif
 
-
 namespace FX {
 
 /**

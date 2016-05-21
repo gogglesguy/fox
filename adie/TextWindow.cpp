@@ -37,15 +37,12 @@
 /*
   Note:
   - Block select (and block operations).
-  - Shell commands.
   - C tags support.
   - Each style has optional parent; colors with value FXRGBA(0,0,0,0) are
     inherited from the parent; this way, sub-styles are possible.
   - If there is text selected, ctrl-H goes to the next occurrence.  If there
     is nothing selected, ctrl-H would go to the previous search pattern, similar
     to the way ctrl-G works in nedit.
-  - If there is a number selected, ctrl-L goes to that line number.  If there
-    is nothing selected, ctrl-L pops the goto dialog.
   - Have an option to beep when the search wraps back to the top of the file.
   - When entire lines are highlighted through triple click and then dragged, a
     drop at the start of the destination line would seem more natural.
@@ -59,11 +56,6 @@
     preference...
   - The C++ comment/uncomment of selected lines would be very useful.  I didn't
     realize how much I used it until it wasn't there.
-  - When the auto indent is turned on, and you press return, the start of the
-    next line is the same as the previous line, which is good.  If the next key
-    that's pressed is the backspace, it would be nice if the caret could back up
-    a full indention level.  (e.g. We use two spaces for emulated tabs.  The
-    backspace would back up two spaces...)
   - Would be nice if we could remember not only bookmarks, but also window
     size/position based on file name (see idea about sessions below).
   - Close last window just saves text, then starts new document in last window;
@@ -71,23 +63,16 @@
   - Maybe FXText should have its own accelerator table so that key bindings
     may be changed.
   - Would be nice to save as HTML.
-  - Incremental search bar (disappears when clicking in text, unless up permanently).
   - Sessions. When reloading session, restore all windows (& positions)
     that were open last time when in that session.
     Info of sessions is in registry
   - Command line option --sesssion <name> to open session instead of single
     file.
-  - When creating new file, set syntax based on current file.  Switch
-    syntax when performing save-as.
-  - Manual syntax change should associate filename and syntax name in
-    registry (unless extension suggests same name).
   - Master syntax rule should be explicitly created.  Simplifies parser.
   - Master syntax rule NOT style index 0.  So you can set normal colors
     on a per-language basis...
   - Need option for tabbed interface.
   - Ability to open multiple files at once in open-panel.
-  - Find In Files dialog (free floating).
-  - Need default colors for styles.
   - Need default set of styles built-in to code, we can now parse this
     due to new SyntaxParser being able to parse everything from a big
     string!
@@ -139,7 +124,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_DND_DROP,TextWindow::ID_TEXT,TextWindow::onTextDNDDrop),
   FXMAPFUNC(SEL_DND_MOTION,TextWindow::ID_TEXT,TextWindow::onTextDNDMotion),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,TextWindow::onTextRightMouse),
-  
+
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ABOUT,TextWindow::onCmdAbout),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_HELP,TextWindow::onCmdHelp),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEW,TextWindow::onCmdNew),
@@ -3324,7 +3309,6 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
     FXint selend=editor->getSelEndPos();
     FXint pos=editor->getCursorPos();
     FXint beg[10],end[10];
-    pos=editor->getCursorPos();
     if(FXSELID(sel)==ID_SEARCH_SEL_FORW){
       if(editor->isPosSelected(pos)) pos=selend;                // Start from selection end if position is selected
       searchflags=(searchflags&~SEARCH_BACKWARD)|SEARCH_FORWARD;
@@ -3949,6 +3933,7 @@ long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
       editor->extractText(string,b,e-b);
       }
     string.trim();
+    string.substitute("&","&&",true);   // Don't want to introduce accelerator key
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)c);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);

@@ -52,18 +52,18 @@ class FXFont;
 class FXAPI FXMenuCaption : public FXWindow {
   FXDECLARE(FXMenuCaption)
 protected:
-  FXString     label;
-  FXString     help;
-  FXString     tip;
-  FXIcon      *icon;
-  FXFont      *font;
-  FXint        hotoff;
-  FXHotKey     hotkey;
-  FXColor      textColor;
-  FXColor      selbackColor;
-  FXColor      seltextColor;
-  FXColor      hiliteColor;
-  FXColor      shadowColor;
+  FXString     label;           // Text on the label
+  FXIcon      *icon;            // Icon on the label
+  FXFont      *font;            // Label font
+  FXString     help;            // Help message
+  FXString     tip;             // Tooltip
+  FXColor      textColor;       // Text color
+  FXColor      selbackColor;    // Selection background color
+  FXColor      seltextColor;    // Selected text color
+  FXColor      hiliteColor;     // Highlight color
+  FXColor      shadowColor;     // Shadow color
+  FXHotKey     hotkey;          // Hotkey
+  FXint        hotoff;          // Offset in string
 protected:
   FXMenuCaption();
 private:

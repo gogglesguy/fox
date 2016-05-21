@@ -471,6 +471,9 @@ FXWEBPImage.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
 FXWorker.cpp \
+FXWSQueue.cpp \
+FXXML.cpp \
+FXXMLFile.cpp \
 FXXBMIcon.cpp \
 FXXBMImage.cpp \
 FXXPMIcon.cpp \

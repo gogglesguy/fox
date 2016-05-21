@@ -49,7 +49,7 @@ FXint Runner::run(){
   fxmessage("runner %d start\n",number);
   value=1.0;
   for(FXint i=0; i<count; i++){
-    value=cos(value);
+    value=Math::cos(value);
     }
   fxmessage("runner %d done\n",number);
   delete this;

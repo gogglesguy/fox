@@ -27,6 +27,7 @@
 
 namespace FX {
 
+
 /// ICO (Microsoft icon format) graphics file
 class FXAPI FXICOImage : public FXImage {
   FXDECLARE(FXICOImage)

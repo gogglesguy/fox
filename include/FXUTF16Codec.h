@@ -25,7 +25,6 @@
 #include "FXTextCodec.h"
 #endif
 
-
 namespace FX {
 
 /// Codec for UTF-16BE

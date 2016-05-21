@@ -21,7 +21,6 @@
 #ifndef FXRANDOM_H
 #define FXRANDOM_H
 
-
 namespace FX {
 
 

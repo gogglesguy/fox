@@ -122,7 +122,7 @@ FXbool FXVariantMap::resize(FXival n){
             }
           elbat.table[x].key.adopt(table[i].key);   // Steal string from old table
           elbat.table[x].data.adopt(table[i].data); // Steal data from old table
-          elbat.table[x].hash=h;                    // And copy the hash value
+          elbat.table[x].hash=(FXuint)h;            // And copy the hash value
           }
         }
       elbat.free(n-used());     // All non-empty slots now free
@@ -220,7 +220,7 @@ FXVariant& FXVariantMap::at(const FXchar* ky){
   free(free()-1);                                       // Put into empty slot
 y:used(used()+1);
   table[x].key=ky;
-  table[x].hash=h;
+  table[x].hash=(FXuint)h;
 x:return table[x].data;
   }
 

@@ -21,7 +21,6 @@
 #ifndef FXIO_H
 #define FXIO_H
 
-
 namespace FX {
 
 

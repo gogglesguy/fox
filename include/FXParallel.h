@@ -21,7 +21,6 @@
 #ifndef FXPARALLEL_H
 #define FXPARALLEL_H
 
-
 namespace FX {
 
 

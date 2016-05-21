@@ -102,7 +102,14 @@ FXbool FXVec4d::crosses(const FXVec3d& a,const FXVec3d& b) const {
 
 // Linearly interpolate
 FXVec4d lerp(const FXVec4d& u,const FXVec4d& v,FXdouble f){
-#if defined(FOX_HAS_AVX)
+#if defined(FOX_HAS_AVX2) && defined(FOX_HAS_FMA)
+  register __m256d u0=_mm256_loadu_pd(&u[0]);
+  register __m256d v0=_mm256_loadu_pd(&v[0]);
+  register __m256d ff=_mm256_set1_pd(f);
+  FXVec4d r;
+  _mm256_storeu_pd(&r[0],_mm256_fmadd_pd(ff,v0,_mm256_fnmadd_pd(ff,u0,u0)));       // Lerp in two instructions!
+  return r;
+#elif defined(FOX_HAS_AVX)
   register __m256d u0=_mm256_loadu_pd(&u[0]);
   register __m256d v0=_mm256_loadu_pd(&v[0]);
   register __m256d ff=_mm256_set1_pd(f);

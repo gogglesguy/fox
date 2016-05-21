@@ -35,30 +35,39 @@ namespace FX {
 * A Dispatcher watches a number of devices and signals for activity
 * and dispatches to the proper function when activity is observed.
 */
-class FXAPI FXDispatcher : public FXObject {
-  FXDECLARE(FXDispatcher)
+class FXAPI FXDispatcher {
 protected:
   struct FXHandles;
 protected:
   FXHandles      *handles;              // Handle to watch
+  volatile FXint  signotified[64];      // Signal notify flag
+  FXint           sigreceived;          // Most recent received signal
   FXint           numhandles;           // Number of handles
   FXint           numwatched;           // Number of watched
   FXint           numraised;            // Number of raised handles
   FXint           current;              // Current handle
   FXbool          initialized;          // Is initialized
 protected:
-  static volatile FXbool signotified[64];       // Signal notify flag
-  static volatile FXint  sigreceived;           // Most recent received signal
+  static FXDispatcher* volatile sigmanager[64]; // Signals managed flag
 protected:
   FXDispatcher(const FXDispatcher&);
   FXDispatcher &operator=(const FXDispatcher&);
-  static void signalhandler(int sig);
+private:
+  static CDECL void signalhandler(FXint sig);
+  static CDECL void signalhandlerasync(FXint sig);
 public:
   enum {
     InputNone   = 0,            /// Inactive handle
     InputRead   = 1,            /// Read input handle
     InputWrite  = 2,            /// Write input handle
     InputExcept = 4             /// Except input handle
+    };
+  enum {
+    DispatchAll     = 0xffffffff,       /// Dispatch all events
+    DispatchSignals = 0x00000001,       /// Dispatch signals
+    DispatchTimers  = 0x00000002,       /// Dispatch timers
+    DispatchIdle    = 0x00000004,       /// Dispatch idle processing
+    DispatchInputs  = 0x00000008        /// Dispatch i/o handles
     };
 public:
 
@@ -80,30 +89,31 @@ public:
   virtual FXbool hasSignal(FXint sig);
 
   /// Append signal to signal-set
-  virtual FXbool addSignal(FXint sig);
+  virtual FXbool addSignal(FXint sig,FXbool async=false);
 
   /// Remove signal from signal-set
   virtual FXbool remSignal(FXint sig);
 
-  /// Check if handle hnd is being watched.
-  FXbool hasHandle(FXInputHandle hnd,FXuint mode=InputRead);
+  /// Remvoe all signals
+  virtual FXbool remAllSignals();
+
 
   /// Append handle hnd to watch-list.
   virtual FXbool addHandle(FXInputHandle hnd,FXuint mode=InputRead);
 
   /// Remove handle hnd from watch-list.
-  virtual FXbool remHandle(FXInputHandle hnd,FXuint mode=InputRead);
+  virtual FXbool remHandle(FXInputHandle hnd);
 
 
   /// Dispatch if something happens within given timeout
-  virtual FXbool dispatch(FXTime blocking=forever,FXuint flags=0);
+  virtual FXbool dispatch(FXTime blocking=forever,FXuint flags=DispatchAll);
 
-
-  /// Dispatch when handle with given mode becomes active
-  virtual FXbool dispatchHandle(FXint hnd,FXuint mode);
 
   /// Dispatch when a signal was fired
   virtual FXbool dispatchSignal(FXint sig);
+
+  /// Dispatch when handle with given mode becomes active
+  virtual FXbool dispatchHandle(FXInputHandle hnd,FXuint mode);
 
   /// Dispatch when timeout expires
   virtual FXbool dispatchTimeout(FXTime now);

@@ -248,7 +248,6 @@ void Preferences::setSyntax(Syntax* syn){
     FXCheckButton *check;
     FXColorWell   *well;
     FXLabel       *label;
-    FXint          i;
 
     // Captions
     new FXLabel(stylemat,tr("Rule\tSyntax rule name"),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
@@ -264,7 +263,7 @@ void Preferences::setSyntax(Syntax* syn){
     new FXLabel(stylemat,tr("Bld\tBold face"),NULL,JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);
 
     // Add controls for each rule
-    for(i=0; i<syn->getNumRules()-1; i++){
+    for(FXint i=0; i<syn->getNumRules()-1; i++){
 
       // Rule name
       label=new FXLabel(stylemat,syn->getRule(i+1)->getName(),NULL,JUSTIFY_LEFT|JUSTIFY_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_COLUMN);

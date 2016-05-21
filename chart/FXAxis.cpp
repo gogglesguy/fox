@@ -99,8 +99,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
     // Minor grid lines
     if(style&AXIS_GRID_MINOR){
       dc.setForeground(minorgridcolor);
-      minl=(FXint)ceil((axisrange.minimum+FUDGE_FACTOR*minorspace)/minorspace);
-      minh=(FXint)floor((axisrange.maximum-FUDGE_FACTOR*minorspace)/minorspace);
+      minl=(FXint)Math::ceil((axisrange.minimum+FUDGE_FACTOR*minorspace)/minorspace);
+      minh=(FXint)Math::floor((axisrange.maximum-FUDGE_FACTOR*minorspace)/minorspace);
       for(i=minl; i<=minh; i++){
         x=fx+lrint(mulx*(i*minorspace-axisrange.minimum));
         y=fy+lrint(muly*(i*minorspace-axisrange.minimum));
@@ -111,8 +111,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
     // Major grid lines
     if(style&AXIS_GRID_MAJOR){
       dc.setForeground(majorgridcolor);
-      majl=(FXint)ceil((axisrange.minimum+FUDGE_FACTOR*majorspace)/majorspace);
-      majh=(FXint)floor((axisrange.maximum-FUDGE_FACTOR*majorspace)/majorspace);
+      majl=(FXint)Math::ceil((axisrange.minimum+FUDGE_FACTOR*majorspace)/majorspace);
+      majh=(FXint)Math::floor((axisrange.maximum-FUDGE_FACTOR*majorspace)/majorspace);
       for(i=majl; i<=majh; i++){
         x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
         y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
@@ -133,8 +133,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       if(style&AXIS_TICKS_INSIDE) tin=minorticksize;
       if(style&AXIS_TICKS_OUTSIDE) tout=minorticksize;
       dc.setForeground(minortickcolor);
-      minl=(FXint)ceil(axisrange.minimum/minorspace);
-      minh=(FXint)floor(axisrange.maximum/minorspace);
+      minl=(FXint)Math::ceil(axisrange.minimum/minorspace);
+      minh=(FXint)Math::floor(axisrange.maximum/minorspace);
       for(i=minl; i<=minh; i++){
         x=fx+lrint(mulx*(i*minorspace-axisrange.minimum));
         y=fy+lrint(muly*(i*minorspace-axisrange.minimum));
@@ -147,8 +147,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       if(style&AXIS_TICKS_INSIDE) tin=majorticksize;
       if(style&AXIS_TICKS_OUTSIDE) tout=majorticksize;
       dc.setForeground(majortickcolor);
-      majl=(FXint)ceil(axisrange.minimum/majorspace);
-      majh=(FXint)floor(axisrange.maximum/majorspace);
+      majl=(FXint)Math::ceil(axisrange.minimum/majorspace);
+      majh=(FXint)Math::floor(axisrange.maximum/majorspace);
       for(i=majl; i<=majh; i++){
         x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
         y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
@@ -162,8 +162,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       dc.setForeground(numbercolor);
       if(style&AXIS_NUMBERS_INSIDE){
         tin+=numberoffset;
-        majl=(FXint)ceil((axisrange.minimum+FUDGE_FACTOR*majorspace)/majorspace);
-        majh=(FXint)floor((axisrange.maximum-FUDGE_FACTOR*majorspace)/majorspace);
+        majl=(FXint)Math::ceil((axisrange.minimum+FUDGE_FACTOR*majorspace)/majorspace);
+        majh=(FXint)Math::floor((axisrange.maximum-FUDGE_FACTOR*majorspace)/majorspace);
         for(i=majl; i<=majh; i++){
           x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
           y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
@@ -173,8 +173,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
         }
       else{
         tout+=numberoffset;
-        majl=(FXint)ceil(axisrange.minimum/majorspace);
-        majh=(FXint)floor(axisrange.maximum/majorspace);
+        majl=(FXint)Math::ceil(axisrange.minimum/majorspace);
+        majh=(FXint)Math::floor(axisrange.maximum/majorspace);
         for(i=majl; i<=majh; i++){
           x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
           y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
@@ -313,8 +313,8 @@ void FXAxis::setAxisRange(FXdouble min,FXdouble max){
       getTickSpacing(majorspace,minorspace,min,max);
       }
     if(style&AXIS_ROUND){
-      min=majorspace*floor(min/majorspace);
-      max=majorspace*ceil(max/majorspace);
+      min=majorspace*Math::floor(min/majorspace);
+      max=majorspace*Math::ceil(max/majorspace);
       }
     FXASSERT(min<max);
     axisrange.minimum=min;

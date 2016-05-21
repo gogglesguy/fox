@@ -145,6 +145,15 @@ long FXChoiceBox::onCmdCancel(FXObject*,FXSelector,void*){
   }
 
 
+// We have to do this so as to force the initial text to be seleced
+FXuint FXChoiceBox::execute(FXuint placement){
+  create();
+  list->setFocus();
+  show(placement);
+  return getApp()->runModalFor(this);
+  }
+
+
 // Save object to stream
 void FXChoiceBox::save(FXStream& store) const {
   FXDialogBox::save(store);

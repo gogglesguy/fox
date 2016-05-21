@@ -280,7 +280,7 @@ FXbool FXVariant::toBool() const {
     return !!reinterpret_cast<const FXVariantArray*>(&value.p)->no();   // True for non-empty array
   case VMap:
     return !reinterpret_cast<const FXVariantMap*>(&value.p)->empty();   // True for non-empty map
-  case VNull:
+  default:
     return false;
     }
   return false;
@@ -633,6 +633,7 @@ FXVariant& FXVariant::adopt(FXVariantMap& other){
   }
 
 /*******************************************************************************/
+
 // Return value of object member
 FXVariant& FXVariant::at(const FXchar* key){
   if(type!=VMap){
@@ -696,7 +697,7 @@ const FXVariant& FXVariant::at(FXival idx) const {
     }
   return FXVariant::null;
   }
- 
+
 /*******************************************************************************/
 
 // Clear the data

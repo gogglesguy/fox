@@ -21,7 +21,6 @@
 #ifndef FXSIZE_H
 #define FXSIZE_H
 
-
 namespace FX {
 
 

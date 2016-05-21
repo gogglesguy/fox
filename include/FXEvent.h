@@ -21,7 +21,6 @@
 #ifndef FXEVENT_H
 #define FXEVENT_H
 
-
 namespace FX {
 
 

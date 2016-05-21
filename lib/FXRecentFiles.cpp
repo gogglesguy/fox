@@ -184,15 +184,15 @@ long FXRecentFiles::onCmdFile(FXObject*,FXSelector sel,void*){
 long FXRecentFiles::onUpdFile(FXObject *sender,FXSelector sel,void*){
   const FXchar *filename=settings->readStringEntry(group,key[FXSELID(sel)-ID_FILE_1],NULL);
   if(filename){
+    FXint which=FXSELID(sel)-ID_FILE_1+1;
     FXString string;
-    if(FXSELID(sel)<ID_FILE_10){
-      string.format("&%d %s",FXSELID(sel)-ID_FILE_1+1,filename);
+    string.format("%d %s",which,filename);
+    string.substitute("&","&&",true);   // No accelerator, please!
+    if(which<=9){
+      string.insert(0,"&");
       }
-    else if(FXSELID(sel)==ID_FILE_10){
-      string.format("1&0 %s",filename);
-      }
-    else{
-      string.format("%d %s",FXSELID(sel)-ID_FILE_1+1,filename);
+    else if(which==10){
+      string.insert(1,"&");
       }
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&string);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SHOW),NULL);
