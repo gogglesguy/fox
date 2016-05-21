@@ -295,7 +295,7 @@ void FXColorRing::updatering(){
         if(i2<=r2){
 
           // Compute color
-          fxhsv_to_rgb(r,g,b,atan2f(ry,rx)*RTOD+180.0f,1.0f,1.0f);
+          fxhsv_to_rgb(r,g,b,Math::atan2((FXfloat)ry,(FXfloat)rx)*RTOD+180.0f,1.0f,1.0f);
           dial->setPixel(x,y,FXRGB(255.0f*r,255.0f*g,255.0f*b));
           continue;
           }
@@ -331,7 +331,7 @@ FXbool FXColorRing::inHueRing(FXint x,FXint y) const {
 
 // Compute hue from position on ring x, y
 FXfloat FXColorRing::hueFromXY(FXint x,FXint y) const {
-  return atan2f(y-dialy-ringouter,x-dialx-ringouter)*RTOD+180.0f;
+  return Math::atan2((FXfloat)(y-dialy-ringouter),(FXfloat)(x-dialx-ringouter))*RTOD+180.0f;
   }
 
 
@@ -411,8 +411,8 @@ void FXColorRing::satValFromXY(FXfloat& s,FXfloat& v,FXint x,FXint y) const {
     }
 
   // Clamp to range
-  s=FXCLAMP(0.0f,ss,1.0f);
-  v=FXCLAMP(0.0f,vv,1.0f);
+  s=Math::fclamp(0.0f,ss,1.0f);
+  v=Math::fclamp(0.0f,vv,1.0f);
   }
 
 
@@ -592,7 +592,7 @@ long FXColorRing::onMouseWheel(FXObject*,FXSelector,void* ptr){
 
 // Change hue
 void FXColorRing::setHue(FXfloat h){
-  h=FXCLAMP(0.0f,h,360.0f);
+  h=Math::fclamp(0.0f,h,360.0f);
   if(hsv[0]!=h){
     hsv[0]=h;
     update(huex-4,huey-4,9,9);
@@ -605,7 +605,7 @@ void FXColorRing::setHue(FXfloat h){
 
 // Change saturation
 void FXColorRing::setSat(FXfloat s){
-  s=FXCLAMP(0.0f,s,1.0f);
+  s=Math::fclamp(0.0f,s,1.0f);
   if(hsv[1]!=s){
     hsv[1]=s;
     update(satvalx-4,satvaly-4,9,9);
@@ -617,7 +617,7 @@ void FXColorRing::setSat(FXfloat s){
 
 // Change saturation
 void FXColorRing::setVal(FXfloat v){
-  v=FXCLAMP(0.0f,v,1.0f);
+  v=Math::fclamp(0.0f,v,1.0f);
   if(hsv[2]!=v){
     hsv[2]=v;
     update(satvalx-4,satvaly-4,9,9);
@@ -631,9 +631,9 @@ void FXColorRing::setVal(FXfloat v){
 void FXColorRing::setHueSatVal(FXfloat h,FXfloat s,FXfloat v){
 
   // Clamp
-  h=FXCLAMP(0.0f,h,360.0f);
-  s=FXCLAMP(0.0f,s,1.0f);
-  v=FXCLAMP(0.0f,v,1.0f);
+  h=Math::fclamp(0.0f,h,360.0f);
+  s=Math::fclamp(0.0f,s,1.0f);
+  v=Math::fclamp(0.0f,v,1.0f);
 
   // Changed after clamping?
   if(hsv[0]!=h || hsv[1]!=s || hsv[2]!=v){

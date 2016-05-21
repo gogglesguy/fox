@@ -21,7 +21,6 @@
 #ifndef FXSTRING_H
 #define FXSTRING_H
 
-
 namespace FX {
 
 

@@ -21,7 +21,6 @@
 #ifndef FXREGION_H
 #define FXREGION_H
 
-
 namespace FX {
 
 

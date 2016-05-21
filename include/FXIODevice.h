@@ -25,7 +25,6 @@
 #include "FXIO.h"
 #endif
 
-
 namespace FX {
 
 

@@ -178,16 +178,16 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXVariantArray.lo FXVariantMap.lo FXVec2d.lo FXVec2f.lo \
 	FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
 	FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo FXWindow.lo \
-	FXWizard.lo FXWorker.lo FXXBMIcon.lo FXXBMImage.lo \
-	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxcpuid.lo \
-	fxbmpio.lo fxddsio.lo fxezquantize.lo fxexeio.lo \
-	fxfsquantize.lo fxgetticks.lo fxgifio.lo fxiffio.lo \
-	fxjpegio.lo fxjp2io.lo fxkeyboard.lo fxkeysym.lo fxmath.lo \
-	fxparsegeometry.lo fxpcxio.lo fxpngio.lo fxppmio.lo \
-	fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo fxrgbio.lo \
-	fxscanf.lo fxstrtoll.lo fxstrtoull.lo fxstrtod.lo fxtargaio.lo \
-	fxtifio.lo fxunicode.lo fxutils.lo fxwebpio.lo fxwuquantize.lo \
-	fxxbmio.lo fxxpmio.lo icons.lo
+	FXWizard.lo FXWorker.lo FXWSQueue.lo FXXML.lo FXXMLFile.lo \
+	FXXBMIcon.lo FXXBMImage.lo FXXPMIcon.lo FXXPMImage.lo \
+	fxascii.lo fxbase64.lo fxcpuid.lo fxbmpio.lo fxddsio.lo \
+	fxezquantize.lo fxexeio.lo fxfsquantize.lo fxgetticks.lo \
+	fxgifio.lo fxiffio.lo fxjpegio.lo fxjp2io.lo fxkeyboard.lo \
+	fxkeysym.lo fxmath.lo fxparsegeometry.lo fxpcxio.lo fxpngio.lo \
+	fxppmio.lo fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo \
+	fxrgbio.lo fxscanf.lo fxstrtoll.lo fxstrtoull.lo fxstrtod.lo \
+	fxtargaio.lo fxtifio.lo fxunicode.lo fxutils.lo fxwebpio.lo \
+	fxwuquantize.lo fxxbmio.lo fxxpmio.lo icons.lo
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 libFOX_1_7_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -820,6 +820,9 @@ FXWEBPImage.cpp \
 FXWindow.cpp \
 FXWizard.cpp \
 FXWorker.cpp \
+FXWSQueue.cpp \
+FXXML.cpp \
+FXXMLFile.cpp \
 FXXBMIcon.cpp \
 FXXBMImage.cpp \
 FXXPMIcon.cpp \
@@ -1273,11 +1276,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVisual.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWEBPIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWEBPImage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWSQueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWindow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWizard.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXWorker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXBMIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXBMImage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXML.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXMLFile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXPMIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXXPMImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXhalf.Plo@am__quote@

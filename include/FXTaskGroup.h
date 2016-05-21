@@ -21,7 +21,6 @@
 #ifndef FXTASKGROUP_H
 #define FXTASKGROUP_H
 
-
 namespace FX {
 
 

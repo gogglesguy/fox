@@ -21,7 +21,6 @@
 #ifndef FXEXPRESSION_H
 #define FXEXPRESSION_H
 
-
 namespace FX {
 
 

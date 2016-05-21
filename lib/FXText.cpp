@@ -540,6 +540,7 @@ FXint FXText::getByte(FXint pos) const {
 
 // Get character, assuming that gap never inside utf8 encoding
 FXwchar FXText::getChar(FXint pos) const {
+  FXASSERT(0<=pos && pos<length);
   const FXuchar* ptr=(FXuchar*)&buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
   FXwchar w=ptr[0];
   if(__unlikely(0xC0<=w)){ w=(w<<6)^ptr[1]^0x3080;
@@ -551,12 +552,14 @@ FXwchar FXText::getChar(FXint pos) const {
 
 // Get length of wide character at position pos
 FXint FXText::getCharLen(FXint pos) const {
+  FXASSERT(0<=pos && pos<length);
   return FXString::utfBytes[(FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))]];
   }
 
 
 // Get style
 FXint FXText::getStyle(FXint pos) const {
+  FXASSERT(0<=pos && pos<length);
   return (FXuchar)sbuffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
   }
 
@@ -2449,14 +2452,43 @@ FXint FXText::overstruck(FXint start,FXint end,const FXchar *text,FXint n){
   return end;
   }
 
-
+/*
 // Insert text at cursor
 void FXText::enterText(const FXchar *text,FXint n,FXbool repsel,FXbool notify){
   FXint start=cursorpos;
   FXint end=cursorpos;
 
   // Replace selected characters
-  if(repsel && isPosSelected(cursorpos)){
+  if(isPosSelected(cursorpos) && repsel){
+    start=selstartpos;
+    end=selendpos;
+    }
+
+  // Replace overstruck characters
+  if(isOverstrike()){
+    end=overstruck(start,end,text,n);
+    }
+
+  // Replace text
+  replaceText(start,end-start,text,n,notify);
+//  moveCursor(start+n,notify);
+
+
+  if(repsel){ killSelection(notify); }
+  setCursorPos(start+n,notify);
+  makePositionVisible(cursorpos);
+  setAnchorPos(cursorpos);
+  flashMatching();
+  }
+*/
+
+// Insert text at cursor
+void FXText::enterText(const FXchar *text,FXint n,FXbool notify){
+  FXint start=cursorpos;
+  FXint end=cursorpos;
+
+  // Replace selected characters
+  if(isPosSelected(cursorpos)){
     start=selstartpos;
     end=selendpos;
     }
@@ -2473,8 +2505,8 @@ void FXText::enterText(const FXchar *text,FXint n,FXbool repsel,FXbool notify){
 
 
 // Insert text at cursor
-void FXText::enterText(const FXString& text,FXbool repsel,FXbool notify){
-  enterText(text.text(),text.length(),repsel,notify);
+void FXText::enterText(const FXString& text,FXbool notify){
+  enterText(text.text(),text.length(),notify);
   }
 
 
@@ -2663,23 +2695,46 @@ FXbool FXText::pasteSelection(FXbool notify){
 
   // Avoid paste inside selection
   if(selstartpos==selendpos || cursorpos<=selstartpos || selendpos<=cursorpos){
+    FXint start=cursorpos;
+    FXint end=cursorpos;
     FXString string;
 
     // First, try UTF-8
     if(getDNDData(FROM_SELECTION,utf8Type,string)){
-      enterText(string,false,notify);
+      if(isOverstrike()){
+        end=overstruck(start,end,string.text(),string.length());
+        }
+      replaceText(start,end-start,string,notify);
+      makePositionVisible(cursorpos);
+      setCursorPos(cursorpos,notify);
+      setAnchorPos(cursorpos);
+      flashMatching();
       return true;
       }
 
     // Next, try UTF-16
     if(getDNDData(FROM_SELECTION,utf16Type,string)){
-      enterText(string,false,notify);
+      if(isOverstrike()){
+        end=overstruck(start,end,string.text(),string.length());
+        }
+      replaceText(start,end-start,string,notify);
+      makePositionVisible(cursorpos);
+      setCursorPos(cursorpos,notify);
+      setAnchorPos(cursorpos);
+      flashMatching();
       return true;
       }
 
     // Finally, try good old 8859-1
     if(getDNDData(FROM_SELECTION,stringType,string)){
-      enterText(string,false,notify);
+      if(isOverstrike()){
+        end=overstruck(start,end,string.text(),string.length());
+        }
+      replaceText(start,end-start,string,notify);
+      makePositionVisible(cursorpos);
+      setCursorPos(cursorpos,notify);
+      setAnchorPos(cursorpos);
+      flashMatching();
       return true;
       }
     }
@@ -2696,7 +2751,7 @@ FXbool FXText::pasteClipboard(FXbool notify){
 #ifdef WIN32
     dosToUnix(string);
 #endif
-    enterText(string,true,notify);
+    enterText(string,notify);
     return true;
     }
 
@@ -2705,7 +2760,7 @@ FXbool FXText::pasteClipboard(FXbool notify){
 #ifdef WIN32
     dosToUnix(string);
 #endif
-    enterText(string,true,notify);
+    enterText(string,notify);
     return true;
     }
 
@@ -2714,7 +2769,7 @@ FXbool FXText::pasteClipboard(FXbool notify){
 #ifdef WIN32
     dosToUnix(string);
 #endif
-    enterText(string,true,notify);
+    enterText(string,notify);
     return true;
     }
   return false;
@@ -2922,11 +2977,11 @@ void FXText::drawCursor(FXuint state){
 
 // Paint cursor glyph
 void FXText::paintCursor(FXDCWindow& dc) const {
-  FXint th=font->getFontHeight(),tw,cursorx,cursory;
-  FXwchar c;
+  FXint th,tw,cursorx,cursory; FXwchar c;
+  th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
-    tw=font->getCharWidth((c=getChar(cursorpos))>=' '?c:' ');
+    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
     cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
     if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
@@ -2948,11 +3003,11 @@ void FXText::paintCursor(FXDCWindow& dc) const {
 
 // Erase cursor glyph
 void FXText::eraseCursor(FXDCWindow& dc) const {
-  FXint th=font->getFontHeight(),tw,cursorx,cursory,cx,cy,ch,cw;
-  FXwchar c;
+  FXint th,tw,cursorx,cursory,cx,cy,ch,cw; FXwchar c;
+  th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
-    tw=font->getCharWidth((c=getChar(cursorpos))>=' '?c:' ');
+    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
     cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
     if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
@@ -2975,11 +3030,11 @@ void FXText::eraseCursor(FXDCWindow& dc) const {
 
 // Erase cursor overhang outside of margins
 void FXText::eraseCursorOverhang(){
-  FXint th=font->getFontHeight(),tw,cursorx,cursory;
-  FXwchar c;
+  FXint th,tw,cursorx,cursory; FXwchar c;
+  th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
-    tw=font->getCharWidth((c=getChar(cursorpos))>=' '?c:' ');
+    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
     cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
     if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
       FXDCWindow dc(this);
@@ -4363,7 +4418,7 @@ long FXText::onCmdScrollCenter(FXObject*,FXSelector,void*){
 // Insert a string
 long FXText::onCmdInsertString(FXObject*,FXSelector,void* ptr){
   if(isEditable()){
-    enterText((const FXchar*)ptr,strlen((const FXchar*)ptr),true,true);
+    enterText((const FXchar*)ptr,strlen((const FXchar*)ptr),true);
     return 1;
     }
   getApp()->beep();

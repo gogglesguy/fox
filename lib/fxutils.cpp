@@ -238,7 +238,6 @@ void fxtrace(FXint level,const FXchar* format,...){
     OutputDebugStringA(msg);
     fputs(msg,stderr);    // if a console is available
     fflush(stderr);
-    va_end(arguments);
 #else
     fputs(msg,stderr);
     fflush(stderr);

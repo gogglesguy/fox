@@ -121,14 +121,18 @@ public:
   /// Erase entry at pos in the table
   void erase(FXival pos);
 
-  /// Return true if slot is empty.
+  /// Return true if slot at pos is empty.
   FXbool empty(FXival pos) const { return table[pos].key.empty(); }
 
-  /// Return key value at slot s; may be empty!
-  const FXString& key(FXival s) const { return table[s].key; }
+  /// Return key value at slot pos; may be empty!
+  const FXString& key(FXival pos) const { return table[pos].key; }
 
-  /// Return value at slot s; may be empty!
-  const FXVariant& data(FXival s) const { return table[s].data; }
+  /// Return reference to data at slot s; but careful as assignment
+  /// to empty slot is dangerous!!
+  FXVariant& data(FXival pos){ return table[pos].data; }
+
+  /// Return value at slot pos; may be empty!
+  const FXVariant& data(FXival pos) const { return table[pos].data; }
 
   /// Clear the table
   void clear();

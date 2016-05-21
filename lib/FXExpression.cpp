@@ -933,7 +933,8 @@ FXExpression::Error FXExpression::parse(const FXString& expression,const FXStrin
 FXdouble FXExpression::evaluate(const FXdouble *args) const {
   FXdouble stack[MAXSTACKDEPTH];
   register const FXuchar *pc=code+2;
-  register FXdouble *sp=stack-1;
+  register FXdouble *sp=stack;
+  stack[0]=0.0;
   while(1){
     switch(*pc++){
       case OP_END:   return *sp;

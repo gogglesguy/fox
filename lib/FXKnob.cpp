@@ -689,7 +689,7 @@ void FXKnob::setTickDelta(FXint dist){
 FXint FXKnob::calcValue(FXint x,FXint y){
   register FXint cx=(width+padleft-padright)>>1;
   register FXint cy=(height+padtop-padbottom)>>1;
-  register FXdouble angle=atan2((FXdouble)(cy-y),(FXdouble)(x-cx))/PI;
+  register FXdouble angle=Math::atan2((FXdouble)(cy-y),(FXdouble)(x-cx))/PI;
   if(angle<-0.5) angle+=2.0;
   angle=(1.0-angle-limits[0])/(limits[1]-limits[0]);
   return (FXint)(angle*(range[1]-range[0])+0.5)+range[0];

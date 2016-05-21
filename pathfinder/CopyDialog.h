@@ -44,6 +44,9 @@ public:
   void setNewName(const FXString& nm){ newname->setText(nm); }
   FXString getNewName() const { return newname->getText(); }
 
+  // Run modal invocation of the dialog
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
+  
   // Destroy
   virtual ~CopyDialog();
   };

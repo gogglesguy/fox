@@ -328,7 +328,7 @@ long FXColorBar::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
 
 // Change hue
 void FXColorBar::setHue(FXfloat h){
-  h=FXCLAMP(0.0f,h,360.0f);
+  h=Math::fclamp(0.0f,h,360.0f);
   if(h!=hsv[0]){
     hsv[0]=h;
     updatebar();
@@ -340,7 +340,7 @@ void FXColorBar::setHue(FXfloat h){
 
 // Change saturation
 void FXColorBar::setSat(FXfloat s){
-  s=FXCLAMP(0.0f,s,1.0f);
+  s=Math::fclamp(0.0f,s,1.0f);
   if(s!=hsv[1]){
     hsv[1]=s;
     updatebar();
@@ -352,7 +352,7 @@ void FXColorBar::setSat(FXfloat s){
 
 // Change saturation
 void FXColorBar::setVal(FXfloat v){
-  v=FXCLAMP(0.0f,v,1.0f);
+  v=Math::fclamp(0.0f,v,1.0f);
   if(v!=hsv[2]){
     hsv[2]=v;
     update(padleft+border+2,padtop+border+2,width-padleft-padright-(border<<1)-4,height-padtop-padbottom-(border<<1)-4);

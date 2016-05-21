@@ -542,16 +542,16 @@ FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
             // Bail if at end
             if(store.eof()) break;
 
-            FXTRACE((100,"sec%ld.name: %.8s\n",s,sec.name));
-            FXTRACE((100,"sec%ld.virtualSize: %u\n",s,sec.virtualSize));
-            FXTRACE((100,"sec%ld.virtualAddress: %u\n",s,sec.virtualAddress));
-            FXTRACE((100,"sec%ld.sizeOfRawData: %u\n",s,sec.sizeOfRawData));
-            FXTRACE((100,"sec%ld.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData));
-            FXTRACE((100,"sec%ld.pointerToRelocations: %u\n",s,sec.pointerToRelocations));
-            FXTRACE((100,"sec%ld.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers));
-            FXTRACE((100,"sec%ld.numberOfRelocations: %u\n",s,sec.numberOfRelocations));
-            FXTRACE((100,"sec%ld.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers));
-            FXTRACE((100,"sec%ld.characteristics: %#08x\n\n",s,sec.characteristics));
+            FXTRACE((100,"sec%d.name: %.8s\n",s,sec.name));
+            FXTRACE((100,"sec%d.virtualSize: %u\n",s,sec.virtualSize));
+            FXTRACE((100,"sec%d.virtualAddress: %u\n",s,sec.virtualAddress));
+            FXTRACE((100,"sec%d.sizeOfRawData: %u\n",s,sec.sizeOfRawData));
+            FXTRACE((100,"sec%d.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData));
+            FXTRACE((100,"sec%d.pointerToRelocations: %u\n",s,sec.pointerToRelocations));
+            FXTRACE((100,"sec%d.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers));
+            FXTRACE((100,"sec%d.numberOfRelocations: %u\n",s,sec.numberOfRelocations));
+            FXTRACE((100,"sec%d.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers));
+            FXTRACE((100,"sec%d.characteristics: %#08x\n\n",s,sec.characteristics));
 
             // Found the resource section in the pe file
             if(compare(sec.name,".rsrc")==0){

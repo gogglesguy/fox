@@ -867,7 +867,7 @@ void FXGLViewer::setScene(FXGLObject* sc){
 // Change field of view
 void FXGLViewer::setFieldOfView(FXdouble fv){
   FXdouble tn;
-  fov=FXCLAMP(2.0,fv,90.0);
+  fov=Math::fclamp(2.0,fv,90.0);
   tn=Math::tan(0.5*DTOR*fov);
   FXASSERT(tn>0.0);
   distance=diameter/tn;

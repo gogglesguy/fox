@@ -21,7 +21,6 @@
 #ifndef FXVEC2D_H
 #define FXVEC2D_H
 
-
 namespace FX {
 
 
@@ -84,10 +83,10 @@ public:
 
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y; }
-  FXdouble length() const { return sqrt(length2()); }
+  FXdouble length() const { return Math::sqrt(length2()); }
 
   /// Clamp values of vector between limits
-  FXVec2d& clamp(FXdouble lo,FXdouble hi){ return set(FXCLAMP(lo,x,hi),FXCLAMP(lo,y,hi)); }
+  FXVec2d& clamp(FXdouble lo,FXdouble hi){ return set(Math::fclamp(lo,x,hi),Math::fclamp(lo,y,hi)); }
 
   /// Destructor
  ~FXVec2d(){}
@@ -136,8 +135,8 @@ inline FXbool operator>(const FXVec2d& a,const FXVec2d& b){ return a.x>b.x && a.
 inline FXbool operator>=(const FXVec2d& a,const FXVec2d& b){ return a.x>=b.x && a.y>=b.y; }
 
 /// Lowest or highest components
-inline FXVec2d lo(const FXVec2d& a,const FXVec2d& b){return FXVec2d(FXMIN(a.x,b.x),FXMIN(a.y,b.y));}
-inline FXVec2d hi(const FXVec2d& a,const FXVec2d& b){return FXVec2d(FXMAX(a.x,b.x),FXMAX(a.y,b.y));}
+inline FXVec2d lo(const FXVec2d& a,const FXVec2d& b){return FXVec2d(Math::fmin(a.x,b.x),Math::fmin(a.y,b.y));}
+inline FXVec2d hi(const FXVec2d& a,const FXVec2d& b){return FXVec2d(Math::fmax(a.x,b.x),Math::fmax(a.y,b.y));}
 
 /// Normalize vector
 extern FXAPI FXVec2d normalize(const FXVec2d& v);

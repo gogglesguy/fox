@@ -22,12 +22,6 @@
 #define FXMATH_H
 
 // Remove macros
-#undef signbit
-#undef isfinite
-#undef isinf
-#undef isnan
-#undef isnormal
-
 #undef fabs
 #undef fabsf
 #undef fmod
@@ -107,7 +101,7 @@
 #undef copysignf
 
 // Switch on remedial math on Windows with VC++
-#if defined(WIN32) && defined(_MSC_VER)
+#if defined(WIN32) && (defined(_MSC_VER) || defined(__MINGW32__))
 #define NO_CEILF
 #define NO_FLOORF
 #define NO_ROUNDF
@@ -150,6 +144,12 @@
 #define NO_COPYSIGN
 #endif
 
+// Systems below are missing these functions
+#if defined(__sun__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
+#define NO_EXP10F
+#define NO_EXP10
+#endif
+
 namespace FX {
 
 /*********************************  Constants  *********************************/
@@ -173,79 +173,79 @@ namespace Math {
 
 
 /// Sign of single precision float point number
-static inline FXuint signbit(FXfloat x){
+static inline FXuint fpSign(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x}; return (z.u>>31);
   }
 
 /// Sign of double precision float point number
-static inline FXulong signbit(FXdouble x){
+static inline FXulong fpSign(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x}; return (z.u>>63);
   }
 
 
 /// Mantissa of single precision float point number
-static inline FXuint mantissa(FXfloat x){
+static inline FXuint fpMantissa(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x}; return (z.u&0x007fffff);
   }
 
 /// Mantissa of double precision float point number
-static inline FXulong mantissa(FXdouble x){
+static inline FXulong fpMantissa(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x}; return (z.u&FXULONG(0x000fffffffffffff));
   }
 
 
 /// Exponent of single precision float point number
-static inline FXuint exponent(FXfloat x){
+static inline FXuint fpExponent(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x}; return ((z.u>>23)&0xff);
   }
 
 /// Exponent of double precision float point number
-static inline FXulong exponent(FXdouble x){
+static inline FXulong fpExponent(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x}; return ((z.u>>52)&0x7ff);
   }
 
 
 /// Single precision floating point number is finite
-static inline FXbool isfinite(FXfloat x){
+static inline FXbool fpFinite(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x}; return ((z.u&0x7fffffff)<0x7f800000);
   }
 
 /// Double precision floating point number is finite
-static inline FXbool isfinite(FXdouble x){
+static inline FXbool fpFinite(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x}; return ((z.u&FXULONG(0x7fffffffffffffff))<FXULONG(0x7ff0000000000000));
   }
 
 
 /// Single precision floating point number is infinite
-static inline FXbool isinf(FXfloat x){
+static inline FXbool fpInfinite(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x}; return ((z.u&0x7fffffff)==0x7f800000);
   }
 
 /// Double precision floating point number is infinite
-static inline FXbool isinf(FXdouble x){
+static inline FXbool fpInfinite(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x}; return ((z.u&FXULONG(0x7fffffffffffffff))==FXULONG(0x7ff0000000000000));
   }
 
 
 /// Single precision floating point number is NaN
-static inline FXbool isnan(FXfloat x){
+static inline FXbool fpNan(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x}; return (0x7f800000<(z.u&0x7fffffff));
   }
 
 /// Double precision floating point number is NaN
-static inline FXbool isnan(FXdouble x){
+static inline FXbool fpNan(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x}; return (FXULONG(0x7ff0000000000000)<(z.u&FXULONG(0x7fffffffffffffff)));
   }
 
 
 /// Single precision floating point number is normalized
-static inline FXbool isnormal(FXfloat x){
+static inline FXbool fpNormal(FXfloat x){
   union{ FXfloat f; FXuint u; } z={x};
   return ((z.u&0x7fffffff)==0) || ((0x00800000<=(z.u&0x7fffffff)) && ((z.u&0x7fffffff)<0x7f800000));
   }
 
 /// Double precision floating point number is normalized
-static inline FXbool isnormal(FXdouble x){
+static inline FXbool fpNormal(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x};
   return ((z.u&FXULONG(0x7fffffffffffffff))==0) || ((FXULONG(0x0010000000000000)<=(z.u&FXULONG(0x7fffffffffffffff))) && ((z.u&FXULONG(0x7fffffffffffffff))<FXULONG(0x7ff0000000000000)));
   }
@@ -399,14 +399,14 @@ static inline FXdouble atan2(FXdouble y,FXdouble x){ return ::atan2(y,x); }
 
 /// Single precision hyperbolic sine
 #if defined(NO_SINHF)
-extern FXfloat sinh(FXfloat x);
+extern FXAPI FXfloat sinh(FXfloat x);
 #else
 static inline FXfloat sinh(FXfloat x){ return ::sinhf(x); }
 #endif
 
 /// Double precision hyperbolic sine
 #if defined(NO_SINH)
-extern FXdouble sinh(FXdouble x);
+extern FXAPI FXdouble sinh(FXdouble x);
 #else
 static inline FXdouble sinh(FXdouble x){ return ::sinh(x); }
 #endif
@@ -414,14 +414,14 @@ static inline FXdouble sinh(FXdouble x){ return ::sinh(x); }
 
 /// Single precision hyperbolic cosine
 #if defined(NO_COSHF)
-extern FXfloat cosh(FXfloat x);
+extern FXAPI FXfloat cosh(FXfloat x);
 #else
 static inline FXfloat cosh(FXfloat x){ return ::coshf(x); }
 #endif
 
 /// Double precision hyperbolic cosine
 #if defined(NO_COSH)
-extern FXdouble cosh(FXdouble x);
+extern FXAPI FXdouble cosh(FXdouble x);
 #else
 static inline FXdouble cosh(FXdouble x){ return ::cosh(x); }
 #endif
@@ -429,14 +429,14 @@ static inline FXdouble cosh(FXdouble x){ return ::cosh(x); }
 
 /// Single precision hyperbolic tangent
 #if defined(NO_TANHF)
-extern FXfloat tanh(FXfloat x);
+extern FXAPI FXfloat tanh(FXfloat x);
 #else
 static inline FXfloat tanh(FXfloat x){ return ::tanhf(x); }
 #endif
 
 /// Double precision hyperbolic tangent
 #if defined(NO_TANH)
-extern FXdouble tanh(FXdouble x);
+extern FXAPI FXdouble tanh(FXdouble x);
 #else
 static inline FXdouble tanh(FXdouble x){ return ::tanh(x); }
 #endif
@@ -444,14 +444,14 @@ static inline FXdouble tanh(FXdouble x){ return ::tanh(x); }
 
 /// Single precision hyperbolic arc sine
 #if defined(NO_ASINHF)
-extern FXfloat asinh(FXfloat x);
+extern FXAPI FXfloat asinh(FXfloat x);
 #else
 static inline FXfloat asinh(FXfloat x){ return ::asinhf(x); }
 #endif
 
 /// Double precision hyperbolic arc sine
 #if defined(NO_ASINH)
-extern FXdouble asinh(FXdouble x);
+extern FXAPI FXdouble asinh(FXdouble x);
 #else
 static inline FXdouble asinh(FXdouble x){ return ::asinh(x); }
 #endif
@@ -459,14 +459,14 @@ static inline FXdouble asinh(FXdouble x){ return ::asinh(x); }
 
 /// Single precision hyperbolic arc cosine
 #if defined(NO_ACOSHF)
-extern FXfloat acosh(FXfloat x);
+extern FXAPI FXfloat acosh(FXfloat x);
 #else
 static inline FXfloat acosh(FXfloat x){ return ::acoshf(x); }
 #endif
 
 /// Double precision  hyperbolic arc cosine
 #if defined(NO_ACOSH)
-extern FXdouble acosh(FXdouble x);
+extern FXAPI FXdouble acosh(FXdouble x);
 #else
 static inline FXdouble acosh(FXdouble x){ return ::acosh(x); }
 #endif
@@ -474,14 +474,14 @@ static inline FXdouble acosh(FXdouble x){ return ::acosh(x); }
 
 /// Single precision hyperbolic arc tangent
 #if defined(NO_ATANHF)
-extern FXfloat atanh(FXfloat x);
+extern FXAPI FXfloat atanh(FXfloat x);
 #else
 static inline FXfloat atanh(FXfloat x){ return ::atanhf(x); }
 #endif
 
 /// Double precision hyperbolic arc tangent
 #if defined(NO_ATANH)
-extern FXdouble atanh(FXdouble x);
+extern FXAPI FXdouble atanh(FXdouble x);
 #else
 static inline FXdouble atanh(FXdouble x){ return ::atanh(x); }
 #endif
@@ -654,6 +654,13 @@ static inline FXdouble fmin(FXdouble x,FXdouble y){ return (x<y)?x:y; }
 #else
 static inline FXdouble fmin(FXdouble x,FXdouble y){ return ::fmin(x,y); }
 #endif
+
+
+/// Single precision clamp of number x to lie within range [lo..hi]
+static inline FXfloat fclamp(FXfloat lo,FXfloat x,FXfloat hi){ return fmin(fmax(x,lo),hi); }
+
+/// Double precision clamp of number x to lie within range [lo..hi]
+static inline FXdouble fclamp(FXdouble lo,FXdouble x,FXdouble hi){ return fmin(fmax(x,lo),hi); }
 
 
 /// Single precision copy sign of y and apply to magnitude of x

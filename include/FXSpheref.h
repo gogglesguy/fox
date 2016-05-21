@@ -21,7 +21,6 @@
 #ifndef FXSPHEREF_H
 #define FXSPHEREF_H
 
-
 namespace FX {
 
 

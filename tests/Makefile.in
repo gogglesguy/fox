@@ -64,7 +64,7 @@ noinst_PROGRAMS = bitmapviewer$(EXEEXT) button$(EXEEXT) \
 	scribble$(EXEEXT) shutter$(EXEEXT) splitter$(EXEEXT) \
 	switcher$(EXEEXT) tabbook$(EXEEXT) table$(EXEEXT) \
 	thread$(EXEEXT) unicode$(EXEEXT) variant$(EXEEXT) \
-	wizard$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
+	wizard$(EXEEXT) xml$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -251,6 +251,10 @@ am_wizard_OBJECTS = wizard.$(OBJEXT)
 wizard_OBJECTS = $(am_wizard_OBJECTS)
 wizard_LDADD = $(LDADD)
 wizard_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
+am_xml_OBJECTS = xml.$(OBJEXT)
+xml_OBJECTS = $(am_xml_OBJECTS)
+xml_LDADD = $(LDADD)
+xml_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -287,7 +291,8 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
 	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
 	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
-	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES)
+	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES) \
+	$(xml_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
@@ -302,7 +307,8 @@ DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
 	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
 	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
-	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES)
+	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES) \
+	$(xml_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -493,9 +499,11 @@ unicode_SOURCES = unicode.cpp
 parallel_SOURCES = parallel.cpp
 variant_SOURCES = variant.cpp
 math_SOURCES = math.cpp
+xml_SOURCES = xml.cpp
 EXTRA_DIST = Makefile.bc \
              Makefile.wc \
-             Makefile.dmc
+             Makefile.dmc \
+             xmltests.json
 
 all: all-am
 
@@ -672,6 +680,9 @@ variant$(EXEEXT): $(variant_OBJECTS) $(variant_DEPENDENCIES) $(EXTRA_variant_DEP
 wizard$(EXEEXT): $(wizard_OBJECTS) $(wizard_DEPENDENCIES) $(EXTRA_wizard_DEPENDENCIES) 
 	@rm -f wizard$(EXEEXT)
 	$(CXXLINK) $(wizard_OBJECTS) $(wizard_LDADD) $(LIBS)
+xml$(EXEEXT): $(xml_OBJECTS) $(xml_DEPENDENCIES) $(EXTRA_xml_DEPENDENCIES) 
+	@rm -f xml$(EXEEXT)
+	$(CXXLINK) $(xml_OBJECTS) $(xml_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -723,6 +734,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variant.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wizard.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xml.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

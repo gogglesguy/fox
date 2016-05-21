@@ -97,6 +97,16 @@ static const FXchar mkey[20][3]={
 
 // For deserialization
 FindInFiles::FindInFiles():visitor(this){
+  locations=NULL;
+  findstring=NULL;
+  filefolder=NULL;
+  filefilter=NULL;
+  pausebutton=NULL;
+  clearElms(optionsHistory,ARRAYNUMBER(optionsHistory));
+  searchmode=SearchExact|SearchRecurse;
+  index=-1;
+  proceed=1;
+  firsthit=false;
   }
 
 
@@ -152,6 +162,9 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   locations=new FXIconList(resultbox,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_DETAILED|ICONLIST_SINGLESELECT);
   locations->appendHeader(tr("Location"),NULL,200);
   locations->appendHeader(tr("Context"),NULL,800);
+
+  // Clean array
+  clearElms(optionsHistory,ARRAYNUMBER(optionsHistory));
 
   // Set title
   setTitle(tr("Find In Files"));

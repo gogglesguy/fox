@@ -479,9 +479,12 @@ long FXFileSelector::onCmdAccept(FXObject*,FXSelector,void*){
   }
 
 
-// User clicked up directory button
+// User clicked up directory button; we move to the next higher directory,
+// and select the directory we just came from in that directory; this allows
+// a quick jump back into the original directory in case we went up too far.
 long FXFileSelector::onCmdDirectoryUp(FXObject*,FXSelector,void*){
-  if(allowNavigation()) setDirectory(FXPath::upLevel(filebox->getDirectory()));
+//  if(allowNavigation()) setDirectory(FXPath::upLevel(filebox->getDirectory()));
+  if(allowNavigation()) setFilename(filebox->getDirectory());
   return 1;
   }
 

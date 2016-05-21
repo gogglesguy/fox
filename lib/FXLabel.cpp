@@ -50,6 +50,9 @@
   - When text changes, do we delete the hot key, or parse it from the new label?
   - It makes sense for certain ``passive'' widgets such as labels to have onUpdate;
     for example, to show/hide/whatever based on changing data structures.
+  - Perhaps its better to only set accelerator, tip, and help texts from constructor,
+    not from setText().  In particular when connected to data targets that make no
+    assumptions about what they're connected to.
 */
 
 #define JUSTIFY_MASK    (JUSTIFY_HZ_APART|JUSTIFY_VT_APART)
@@ -90,9 +93,9 @@ FXLabel::FXLabel(){
   flags|=FLAG_ENABLED;
   icon=(FXIcon*)-1L;
   font=(FXFont*)-1L;
+  textColor=0;
   hotkey=0;
   hotoff=0;
-  textColor=0;
   }
 
 
@@ -101,10 +104,10 @@ FXLabel::FXLabel(FXComposite* p,const FXString& text,FXIcon* ic,FXuint opts,FXin
   FXString string=text.section('\t',0);
   flags|=FLAG_ENABLED;
   label=stripHotKey(string);
-  tip=text.section('\t',1);
-  help=text.section('\t',2);
   icon=ic;
   font=getApp()->getNormalFont();
+  help=text.section('\t',2);
+  tip=text.section('\t',1);
   textColor=getApp()->getForeColor();
   hotkey=parseHotKey(string);
   hotoff=findHotKey(string);

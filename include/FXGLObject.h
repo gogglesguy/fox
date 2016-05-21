@@ -119,16 +119,16 @@ public:
   virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
 
   /// Return number of children
-  FXint no() const { return list.no(); }
+  FXival no() const { return list.no(); }
 
   /// Child at position
-  FXGLObject* child(FXint pos) const { return list[pos]; }
+  FXGLObject* child(FXival pos) const { return list[pos]; }
 
   /// Insert child object at given position
-  void insert(FXint pos,FXGLObject* obj){ list.insert(pos,obj); }
+  void insert(FXival pos,FXGLObject* obj){ list.insert(pos,obj); }
 
   /// Insert list of child objects at given position
-  void insert(FXint pos,const FXGLObjectList& objs){ list.insert(pos,objs); }
+  void insert(FXival pos,const FXGLObjectList& objs){ list.insert(pos,objs); }
 
   /// Prepend child object
   void prepend(FXGLObject* obj){ list.prepend(obj); }
@@ -143,13 +143,13 @@ public:
   void append(const FXGLObjectList& objs){ list.append(objs); }
 
   /// Replace child object
-  void replace(FXint pos,FXGLObject* obj){ list.replace(pos,obj); }
+  void replace(FXival pos,FXGLObject* obj){ list.replace(pos,obj); }
 
   /// Remove child object
   void remove(FXGLObject* obj){ list.remove(obj); }
 
   /// Remove child object at given position
-  void erase(FXint pos){ list.erase(pos); }
+  void erase(FXival pos){ list.erase(pos); }
 
   /// Remove all children
   void clear(){ list.clear(); }

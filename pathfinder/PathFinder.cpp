@@ -155,6 +155,7 @@ FXDEFMAP(PathFinderMain) PathFinderMainMap[]={
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_TOGGLE_HIDDEN,PathFinderMain::onCmdToggleHidden),
   FXMAPFUNC(SEL_UPDATE,PathFinderMain::ID_TOGGLE_HIDDEN,PathFinderMain::onUpdToggleHidden),
   FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_PREFERENCES,PathFinderMain::onCmdPreferences),
+  FXMAPFUNC(SEL_COMMAND,PathFinderMain::ID_WILDCARD_SELECT,PathFinderMain::onCmdWildcardSelect),
   FXMAPFUNCS(SEL_COMMAND,PathFinderMain::ID_MINI_SIZE,PathFinderMain::ID_GIANT_SIZE,PathFinderMain::onCmdImageSize),
   FXMAPFUNCS(SEL_UPDATE,PathFinderMain::ID_MINI_SIZE,PathFinderMain::ID_GIANT_SIZE,PathFinderMain::onUpdImageSize),
   FXMAPFUNC(SEL_LEFTBUTTONRELEASE,PathFinderMain::ID_IMAGE_PREVIEW,PathFinderMain::onClickedImagePreview)
@@ -338,6 +339,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy to clipboard."),copyicon,filelist,FXFileList::ID_COPY_SEL);
   new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),pasteicon,filelist,FXFileList::ID_PASTE_SEL);
   new FXMenuSeparator(editmenu);
+  new FXMenuCommand(editmenu,tr("Select files\tCtl-S\tSelect files matching wildcard."),NULL,this,ID_WILDCARD_SELECT);
   new FXMenuCommand(editmenu,tr("&Select All\tCtl-A\tSelect all icons."),NULL,filelist,FXFileList::ID_SELECT_ALL);
   new FXMenuCommand(editmenu,tr("&Deselect All\t\tDeselect all icons."),NULL,filelist,FXFileList::ID_DESELECT_ALL);
   new FXMenuCommand(editmenu,tr("&Invert Selection\t\tInvert selection."),NULL,filelist,FXFileList::ID_SELECT_INVERSE);
@@ -586,6 +588,22 @@ FXbool PathFinderMain::close(FXbool notify){
   }
 
 
+// Change file name
+void PathFinderMain::setFilename(const FXString& path){
+  FXTRACE((10,"PathFinderMain::setFilename(%s)\n",path.text()));
+  filelist->setCurrentFile(path,true);
+  dirlist->setDirectory(filelist->getDirectory());
+  dirbox->setDirectory(filelist->getDirectory());
+  address->setText(filelist->getDirectory());
+  }
+
+
+// Return file name, if any
+FXString PathFinderMain::getFilename() const {
+  return filelist->getCurrentFile();
+  }
+
+
 // Switch to given directory
 void PathFinderMain::setDirectory(const FXString& path){
   FXTRACE((10,"PathFinderMain::setDirectory(%s)\n",path.text()));
@@ -663,7 +681,7 @@ FXbool PathFinderMain::haveSelectedFiles() const {
 
 // Get number of selected filenames, not including "." and ".."
 FXint PathFinderMain::getNumSelectedFiles() const {
-  register FXint result=0;
+  FXint result=0;
   if(filelist->getNumItems()){
     for(FXint i=0; i<filelist->getNumItems(); i++){
       if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)) result++;
@@ -1156,10 +1174,10 @@ long PathFinderMain::onFilePopup(FXObject*,FXSelector,void* ptr){
   if(!event->moved){
     FXMenuPane pane(this);
     new FXMenuCommand(&pane,tr("&Up\t\tChange up one level."),upicon,this,ID_UPDIRECTORY);
-    new FXMenuCommand(&pane,tr("&Back\t\tChange to previous directory."),backicon,this,ID_GO_BACKWARD);
-    new FXMenuCommand(&pane,tr("&Forward\t\tChange to next directory."),forwicon,this,ID_GO_FORWARD);
     new FXMenuCommand(&pane,tr("&Home\t\tChange to home directory."),homeicon,this,ID_GO_HOME);
     new FXMenuCommand(&pane,tr("&Work\t\tChange to current working directory."),workicon,this,ID_GO_WORK);
+    new FXMenuCommand(&pane,tr("&Back\t\tChange to previous directory."),backicon,this,ID_GO_BACKWARD);
+    new FXMenuCommand(&pane,tr("&Forward\t\tChange to next directory."),forwicon,this,ID_GO_FORWARD);
     new FXMenuSeparator(&pane);
     FXMenuPane openmenu(this);
     new FXMenuCascade(&pane,tr("Open with"),execicon,&openmenu);
@@ -1228,11 +1246,13 @@ long PathFinderMain::onCmdDirTree(FXObject*,FXSelector,void*){
   }
 
 
-// Move up one directory
+// User clicked up directory button; we move to the next higher directory,
+// and select the directory we just came from in that directory; this allows
+// a quick jump back into the original directory in case we went up too far.
 long PathFinderMain::onCmdUpDirectory(FXObject*,FXSelector,void*){
-  FXString path=FXPath::upLevel(getDirectory());
-  setDirectory(path);
-  visitDirectory(path);
+  FXString path=getDirectory();
+  setFilename(path);
+  visitDirectory(getDirectory());
   closePreview();
   return 1;
   }
@@ -1718,6 +1738,36 @@ long PathFinderMain::onCmdPreferences(FXObject*,FXSelector,void*){
   return 1;
   }
 
+
+// Select files matching wildcard
+long PathFinderMain::onCmdWildcardSelect(FXObject*,FXSelector,void*){
+  FXChoiceBox choices(this,tr("Select Files Matching"),tr("Select files matching wildcard pattern"),NULL,getPatternList(),DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,400,300);
+  FXint pick=choices.execute(PLACEMENT_CURSOR);
+  if(0<=pick && filelist->getNumItems()){
+    FXString wildcard=FXFileSelector::patternFromText(pattern->getItemText(pick));
+    FXint anch=-1,curr=-1;
+    for(FXint i=0; i<filelist->getNumItems(); i++){
+      if(filelist->isItemNavigational(i)) continue;
+#if defined(WIN32)
+      if(FXPath::match(filelist->getItemFilename(i),wildcard,(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold))){
+        if(anch<0){ anch=i; } curr=i;
+        filelist->selectItem(i,true);
+        }
+#else
+      if(FXPath::match(filelist->getItemFilename(i),wildcard,(FXPath::PathName|FXPath::NoEscape))){
+        if(anch<0){ anch=i; } curr=i;
+        filelist->selectItem(i,true);
+        }
+#endif
+      filelist->setAnchorItem(anch);
+      filelist->setCurrentItem(curr,true);
+      filelist->makeItemVisible(curr);
+      }
+    }
+  return 1;
+  }
+
+
 /*******************************************************************************/
 
 // Pop up properties panel
@@ -1879,6 +1929,7 @@ long PathFinderMain::onCmdRotateImage(FXObject*,FXSelector sel,void*){
   imagepreview->setImage(image);
   return 1;
   }
+
 
 long PathFinderMain::onUpdRotateImage(FXObject* sender,FXSelector,void*){
   sender->handle(this,imagepreview->getImage()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);

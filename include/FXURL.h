@@ -21,7 +21,6 @@
 #ifndef FXURL_H
 #define FXURL_H
 
-
 namespace FX {
 
 namespace FXURL {

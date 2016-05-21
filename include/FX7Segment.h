@@ -43,13 +43,13 @@ enum {
 class FXAPI FX7Segment : public FXFrame {
   FXDECLARE(FX7Segment)
 protected:
-  FXString label;       // Text being shown
-  FXColor  textColor;   // Text color
-  FXint    thickness;   // Segment thickness
-  FXint    cellwidth;   // Width of cell
-  FXint    cellheight;  // height of cell
-  FXString tip;         // Tooltip
-  FXString help;        // Help message
+  FXString   label;             // Text being shown
+  FXString   tip;               // Tooltip
+  FXString   help;              // Help message
+  FXColor    textColor;         // Text color
+  FXint      thickness;         // Segment thickness
+  FXint      cellwidth;         // Width of cell
+  FXint      cellheight;        // height of cell
 protected:
   FX7Segment();
 private:

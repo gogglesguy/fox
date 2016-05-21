@@ -21,7 +21,6 @@
 #ifndef FXDIR_H
 #define FXDIR_H
 
-
 namespace FX {
 
 

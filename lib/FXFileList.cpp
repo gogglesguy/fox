@@ -1246,7 +1246,7 @@ void FXFileList::scan(FXbool force){
 
   // Move to higher directory
   else{
-    setDirectory(FXPath::upLevel(directory));
+    setDirectory(FXPath::upLevel(directory),true);
     }
   }
 
@@ -1484,7 +1484,8 @@ FXString FXFileList::getSelectedFiles() const {
 // Set current directory; return true if success
 FXbool FXFileList::setDirectory(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
-  FXString path(FXPath::validPath(FXPath::absolute(directory,pathname)));
+//  FXString path(FXPath::validPath(FXPath::absolute(directory,pathname)));
+  FXString path(FXPath::absolute(directory,pathname));
   if(FXStat::isDirectory(path)){
     if(directory!=path){
       directory=path;
@@ -1505,8 +1506,7 @@ FXbool FXFileList::setDirectory(const FXString& pathname,FXbool notify){
 
 // Set the pattern to filter
 void FXFileList::setPattern(const FXString& ptrn){
-  if(ptrn.empty()) return;
-  if(pattern!=ptrn){
+  if(!ptrn.empty() && pattern!=ptrn){
     pattern=ptrn;
     scan(true);
     }

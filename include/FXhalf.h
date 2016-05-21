@@ -27,7 +27,6 @@
 #define HALF_MAX        65504.0                 // Largest half number
 #define HALF_EPSILON    0.00097656              // Smallest number where (1+e) != 1
 
-
 namespace FX {
 
 

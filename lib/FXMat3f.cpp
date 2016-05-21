@@ -742,7 +742,6 @@ FXVec2f operator*(const FXVec2f& v,const FXMat3f& m){
   FXVec2f r;
   _mm_storeh_pi((__m64*)&r[0],rr);
   return r;
-  return r;
 #else
   return FXVec2f(v[0]*m[0][0]+v[1]*m[1][0]+m[2][0],v[0]*m[0][1]+v[1]*m[1][1]+m[2][1]);
 #endif

@@ -49,6 +49,7 @@ thread \
 unicode \
 variant \
 wizard \
+xml \
 gltest \
 glviewer
 
@@ -96,9 +97,11 @@ unicode_SOURCES		= unicode.cpp
 parallel_SOURCES	= parallel.cpp
 variant_SOURCES         = variant.cpp
 math_SOURCES            = math.cpp
+xml_SOURCES             = xml.cpp
 
 
 
 EXTRA_DIST = Makefile.bc \
              Makefile.wc \
-             Makefile.dmc
+             Makefile.dmc \
+             xmltests.json

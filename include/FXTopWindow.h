@@ -25,7 +25,6 @@
 #include "FXShell.h"
 #endif
 
-
 namespace FX {
 
 

@@ -21,7 +21,6 @@
 #ifndef FXQUATD_H
 #define FXQUATD_H
 
-
 namespace FX {
 
 
@@ -103,7 +102,7 @@ public:
 
   /// Length and square of length
   FXdouble length2() const { return x*x+y*y+z*z+w*w; }
-  FXdouble length() const { return sqrt(length2()); }
+  FXdouble length() const { return Math::sqrt(length2()); }
 
   /// Adjust quaternion length
   FXQuatd& adjust();

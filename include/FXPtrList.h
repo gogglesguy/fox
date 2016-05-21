@@ -21,7 +21,6 @@
 #ifndef FXPTRLIST_H
 #define FXPTRLIST_H
 
-
 namespace FX {
 
 

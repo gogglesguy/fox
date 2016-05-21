@@ -27,7 +27,6 @@
 
 namespace FX {
 
-
 class FXApp;
 
 

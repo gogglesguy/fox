@@ -48,16 +48,7 @@ FXVec2d normalize(const FXVec2d& v){
 
 // Linearly interpolate
 FXVec2d lerp(const FXVec2d& u,const FXVec2d& v,FXdouble f){
-#if defined(FOX_HAS_SSE2)
-  register __m128d u0=_mm_loadu_pd(&u[0]);
-  register __m128d v0=_mm_loadu_pd(&v[0]);
-  register __m128d ff=_mm_set1_pd(f);
-  FXVec2d r;
-  _mm_storeu_pd(&r[0],_mm_add_pd(u0,_mm_mul_pd(_mm_sub_pd(v0,u0),ff)));
-  return r;
-#else
   return FXVec2d(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f);
-#endif
   }
 
 

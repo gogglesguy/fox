@@ -21,7 +21,6 @@
 #ifndef FXSTAT_H
 #define FXSTAT_H
 
-
 namespace FX {
 
 

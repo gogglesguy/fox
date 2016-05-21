@@ -322,10 +322,10 @@ public:
 
   /// Return value of array member
   FXVariant& operator[](FXint idx){ return at(idx); }
-  FXVariant& operator[](FXival idx){ return at(idx); }
+  const FXVariant& operator[](FXint idx) const { return at(idx); }
 
   /// Return value of array member
-  const FXVariant& operator[](FXint idx) const { return at(idx); }
+  FXVariant& operator[](FXival idx){ return at(idx); }
   const FXVariant& operator[](FXival idx) const { return at(idx); }
 
   /// Check if key is mapped
@@ -334,28 +334,49 @@ public:
   /// Check if key is mapped
   FXbool has(const FXString& key) const { return has(key.text()); }
 
-  /// Return the value of the variant as a pointer
+  /// Return the value of the variant as a pointer; variant type MUST be a VPointer
+  FXptr& asPtr(){ return value.p; }
+
+  /// Return the value of the variant as a pointer; variant type MUST be a VPointer
   const FXptr& asPtr() const { return value.p; }
 
-  /// Return the value of the variant as a char pointer; variant MUST be a string
-  const FXchar* asChars() const { return value.s; }
+  /// Return the value of the variant as a long; variant type MUST be a VLong
+  FXlong& asLong(){ return value.i; }
 
-  /// Return the value of the variant as a long
+  /// Return the value of the variant as a long; variant type MUST be a VLong
   const FXlong& asLong() const { return value.i; }
 
-  /// Return the value of the variant as an unsigned long
+  /// Return the value of the variant as an unsigned long; variant type MUST be a VULong
+  FXulong& asULong(){ return value.u; }
+
+  /// Return the value of the variant as an unsigned long; variant type MUST be a VULong
   const FXulong& asULong() const { return value.u; }
 
-  /// Return the value of the variant as a double
+  /// Return the value of the variant as a double; variant type MUST be a VDouble
+  FXdouble& asDouble(){ return value.d; }
+
+  /// Return the value of the variant as a double; variant type MUST be a VDouble
   const FXdouble& asDouble() const { return value.d; }
 
-  /// Return the value of the variant as a string-reference; variant MUST be a string
+  /// Return the value of the variant as a char pointer; variant type MUST be a VString
+  const FXchar* asChars() const { return value.s; }
+
+  /// Return the value of the variant as a string-reference; variant type MUST be a VString
+  FXString& asString(){ return *reinterpret_cast<FXString*>(&value.p); }
+
+  /// Return the value of the variant as a const string-reference; variant type MUST be a VString
   const FXString& asString() const { return *reinterpret_cast<const FXString*>(&value.p); }
 
-  /// Return the value of the variant as an array-reference; variant MUST be a array
+  /// Return the value of the variant as an array-reference; variant type MUST be a VArray
+  FXVariantArray& asArray(){ return *reinterpret_cast<FXVariantArray*>(&value.p); }
+
+  /// Return the value of the variant as a const array-reference; variant type MUST be a VArray
   const FXVariantArray& asArray() const { return *reinterpret_cast<const FXVariantArray*>(&value.p); }
 
-  /// Return the value of the variant as an map-reference; variant MUST be a map
+  /// Return the value of the variant as an map-reference; variant type MUST be VMap
+  FXVariantMap& asMap(){ return *reinterpret_cast<FXVariantMap*>(&value.p); }
+
+  /// Return the value of the variant as a const map-reference; variant type MUST be VMap
   const FXVariantMap& asMap() const { return *reinterpret_cast<const FXVariantMap*>(&value.p); }
 
   /// Clear the data

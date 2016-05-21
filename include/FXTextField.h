@@ -66,6 +66,9 @@ protected:
   FXString      contents;       // Edited text
   FXFont       *font;           // Text font
   const FXchar *delimiters;     // Set of delimiters
+  FXString      clipped;        // Clipped text
+  FXString      help;           // Help string
+  FXString      tip;            // Tooltip
   FXColor       textColor;      // Text color
   FXColor       selbackColor;   // Selected background color
   FXColor       seltextColor;   // Selected text color
@@ -74,9 +77,6 @@ protected:
   FXint         anchor;         // Anchor position
   FXint         columns;        // Number of columns visible
   FXint         shift;          // Shift amount
-  FXString      clipped;        // Clipped text
-  FXString      help;           // Help string
-  FXString      tip;            // Tooltip
 protected:
   FXTextField();
   FXint index(FXint x) const;

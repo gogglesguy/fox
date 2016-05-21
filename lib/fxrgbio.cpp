@@ -217,9 +217,6 @@ FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // Remember swap state
   store.setBigEndian(true);
 
-  // Where the image format starts
-  base=store.position();
-
   // Load header
   store >> magic;       // MAGIC (2)
   store >> storage;     // STORAGE (1)

@@ -21,7 +21,6 @@
 #ifndef FXDLL_H
 #define FXDLL_H
 
-
 namespace FX {
 
 

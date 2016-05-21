@@ -21,7 +21,6 @@
 #ifndef FXPROCESS_H
 #define FXPROCESS_H
 
-
 namespace FX {
 
 class FXIODevice;

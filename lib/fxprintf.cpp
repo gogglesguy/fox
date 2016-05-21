@@ -41,7 +41,7 @@
      '0'        Zero-padding.
      '-'        Left-adjust.
      '+'        Show sign always.
-     '''        Insert comma's for thousands, like 1,000,000. Fractional part is printed with
+     '''        Insert commas for thousands, like 1,000,000. Fractional part is printed with
                 no thousands-separators. [For exponential notation, make exponent a multiple of
                 3, so for example, print 3.567E-5 as 35.67E-6.  The C library ignores this option
                 unless printing fractions].
@@ -254,7 +254,7 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
   FXbool mode;
 
   // Handle sign
-  if(Math::signbit(number)){
+  if(Math::fpSign(number)){
     number=Math::fabs(number);
     *ptr++='-';
     }
@@ -266,14 +266,14 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
     }
 
   // Infinity
-  if(Math::isinf(number)){
+  if(Math::fpInfinite(number)){
     *ptr++='i';
     *ptr++='n';
     *ptr++='f';
     }
 
   // NaN
-  else if(Math::isnan(number)){
+  else if(Math::fpNan(number)){
     *ptr++='n';
     *ptr++='a';
     *ptr++='n';
@@ -391,7 +391,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
   FXint  decimal;
 
   // Handle sign
-  if(Math::signbit(number)){
+  if(Math::fpSign(number)){
     number=Math::fabs(number);
     *ptr++='-';
     }
@@ -403,14 +403,14 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
     }
 
   // Infinity
-  if(Math::isinf(number)){
+  if(Math::fpInfinite(number)){
     *ptr++='i';
     *ptr++='n';
     *ptr++='f';
     }
 
   // NaN
-  else if(Math::isnan(number)){
+  else if(Math::fpNan(number)){
     *ptr++='n';
     *ptr++='a';
     *ptr++='n';
@@ -1153,7 +1153,8 @@ nml:if(count<length){ *string++=ch; }
   if(count<length){ *string++='\0'; }
 
   // Done
-x:return count;
+x:va_end(ag);
+  return count;
   }
 
 

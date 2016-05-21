@@ -21,7 +21,6 @@
 #ifndef FXMETACLASS_H
 #define FXMETACLASS_H
 
-
 namespace FX {
 
 

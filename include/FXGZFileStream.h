@@ -26,7 +26,6 @@
 #include "FXFileStream.h"
 #endif
 
-
 namespace FX {
 
 

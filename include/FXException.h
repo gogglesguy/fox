@@ -21,7 +21,6 @@
 #ifndef FXEXCEPTION_H
 #define FXEXCEPTION_H
 
-
 namespace FX {
 
 

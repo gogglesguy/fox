@@ -484,13 +484,22 @@ int main(int argc,char *argv[]){
 
   // Hyperbolic sine, cosine, tangent
 /*
-*/
   testDouble(Math::sinh,sinh,"sinh");
   testFloat(Math::sinh,sinhf,"sinhf");
   testDouble(Math::cosh,cosh,"cosh");
   testFloat(Math::cosh,coshf,"coshf");
   testDouble(Math::tanh,tanh,"tanh");
   testFloat(Math::tanh,tanhf,"tanhf");
+*/
+
+  // Exp
+  testDouble(Math::expm1,expm1,"expm1");
+  testFloat(Math::expm1,expm1f,"expm1f");
+/*
+  testDouble(Math::exp2,exp2,"exp2");
+  testFloat(Math::exp2,exp2f,"exp2f");
+  testDouble(Math::exp10,exp10,"exp10");
+  testFloat(Math::exp10,exp10f,"exp10f");
 
   // Inverse hyperbolic sine, cosine, tangent
   testDouble(Math::asinh,asinh,"asinh");
@@ -525,15 +534,6 @@ int main(int argc,char *argv[]){
   testFloat(Math::log2,log2f,"log2f");
   testDouble(Math::log10,log10,"log10");
   testFloat(Math::log10,log10f,"log10f");
-
-  // Exp
-  testDouble(Math::expm1,expm1,"expm1");
-  testFloat(Math::expm1,expm1f,"expm1f");
-  testDouble(Math::exp2,exp2,"exp2");
-  testFloat(Math::exp2,exp2f,"exp2f");
-  testDouble(Math::exp10,exp10,"exp10");
-  testFloat(Math::exp10,exp10f,"exp10f");
-/*
 */
   return 0;
   }

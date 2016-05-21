@@ -1148,8 +1148,7 @@ FXString FXDirList::getDirectory() const {
 
 // Set the pattern to filter
 void FXDirList::setPattern(const FXString& ptrn){
-  if(ptrn.empty()) return;
-  if(pattern!=ptrn){
+  if(!ptrn.empty() && pattern!=ptrn){
     pattern=ptrn;
     scan(true);
     }

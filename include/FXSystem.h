@@ -21,7 +21,6 @@
 #ifndef FXSYSTEM_H
 #define FXSYSTEM_H
 
-
 namespace FX {
 
 namespace FXSystem {

@@ -21,7 +21,6 @@
 #ifndef FXRUNNABLE_H
 #define FXRUNNABLE_H
 
-
 namespace FX {
 
 

@@ -20,6 +20,7 @@
 namespace FX {
 
 extern FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+extern FXint __sscanf(const FXchar* string,const FXchar* format,...);
 
 }
 
@@ -192,6 +193,22 @@ int main(int,char*[]){
 
   __snprintf(buffer,sizeof(buffer),positionalformat3,10,20,30);
   fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat3,buffer);
+
+  int num=0;
+  __sscanf("199,999","%'d",&num);
+  fprintf(stdout,"num=%d\n",num);
+
+  __sscanf("1,999,9","%'d",&num);
+  fprintf(stdout,"num=%d\n",num);
+
+  __sscanf("1,999,99","%'d",&num);
+  fprintf(stdout,"num=%d\n",num);
+
+  __sscanf("1,999,999","%'d",&num);
+  fprintf(stdout,"num=%d\n",num);
+
+  __sscanf("1999,999","%'d",&num);
+  fprintf(stdout,"num=%d\n",num);
 
   return 0;
   }

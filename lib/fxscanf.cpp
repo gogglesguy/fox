@@ -32,8 +32,9 @@
 
         % [*] [digits$] [width] [l|ll|h|hh|L|q|t|z] [n|p|d|u|i|x|X|o|D|c|s|[SET]|e|E|f|G|g|b]
 
-  - Assignment suppression:
+  - Assignment suppression and number-grouping:
      '*'        When '*' is passed assignment of the matching quantity is suppressed.
+     '''        Commas for thousands, like 1,000,000.
 
   - Positional argument:
      'digits$'  A sequence of decimal digits indication the position in the parameter
@@ -108,9 +109,61 @@ enum {
 
 /*******************************************************************************/
 
+static const FXchar* grouping(const FXchar* begin,const FXchar* end){
+  while(end>begin){
+    const FXchar* cp=end-1;
+    const FXchar* new_end;
+    const FXchar* group_end;
+
+    // Scan backwards for thousands separator
+    while(cp>=begin){   
+      if(*cp==',') break;
+      --cp;
+      }
+
+    // No numbers grouping
+    if(cp<begin) return end;
+
+    // Three digits following a ','
+    if(end-cp==3+1){
+
+      // No more in front
+      if(cp<begin) return end;
+
+      // Loop while the grouping is correct
+      new_end=cp-1;
+      while(1){
+
+        // Scan backwards for next thousands separator
+        group_end=--cp;
+        while(cp>=begin){
+          if(*cp==',') break;
+          --cp;
+          }
+
+        // Found correct start
+        if(cp<begin && group_end-cp<=3) return end;
+
+        // Incorrect group; bail
+        if(cp<begin || group_end-cp!=3) break;
+        }
+
+      // Drop incorrect tail
+      end=new_end;
+      }
+    else{
+      if(end-cp>3+1) end=cp+3+1;        // Even the first group was wrong; determine maximum shift
+      else if(cp<begin) return end;     // This number does not fill the first group, but is correct
+      else end=cp;                      // CP points to a thousands separator character
+      }
+    }
+  return FXMAX(begin,end);
+  }
+
+
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  register FXint modifier,width,convert,base,digits,count,exponent,expo,neg,nex,pos,ch,nn,v;
+  register FXint modifier,width,convert,comma,base,digits,count,exponent,expo,neg,nex,pos,ch,nn,v;
   register const FXchar *start=string;
   register const FXchar *ss;
   register FXchar *ptr;
@@ -121,6 +174,8 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
   va_list ag;
 
   count=0;
+
+  FXTRACE((1,"string=%s segment=%.*s\n",string,(int)(grouping(string,string+strlen(string))-string),string));
 
   // Process format string
   va_copy(ag,args);
@@ -139,6 +194,7 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
       modifier=ARG_DEFAULT;
       width=0;
       convert=1;
+      comma=0;
       base=0;
       pos=-1;
 
@@ -146,6 +202,10 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
 flg:  switch(ch){
         case '*':                                       // Suppress conversion
           convert=0;
+          ch=*format++;
+          goto flg;
+        case '\'':                                      // Print thousandths
+          comma=',';                                    // Thousands grouping character
           ch=*format++;
           goto flg;
         case '0':                                       // Width or positional parameter
@@ -202,56 +262,92 @@ flg:  switch(ch){
           goto flg;
         case 'n':                                       // Consumed characters till here
           value=string-start;
-          goto assign;
+          if(convert){
+            if(modifier==ARG_DEFAULT){                  // 32-bit always
+              *va_arg(ag,FXint*)=(FXint)value;
+              }
+            else if(modifier==ARG_LONG){                // Whatever size a long is
+              *va_arg(ag,long*)=(long)value;
+              }
+            else if(modifier==ARG_LONGLONG){            // 64-bit always
+              *va_arg(ag,FXlong*)=value;
+              }
+            else if(modifier==ARG_HALF){                // 16-bit always
+              *va_arg(ag,FXshort*)=(FXshort)value;
+              }
+            else if(modifier==ARG_HALFHALF){            // 8-bit always
+              *va_arg(ag,FXchar*)=(FXchar)value;
+              }
+            else{                                       // Whatever size a pointer is
+              *va_arg(ag,FXival*)=(FXival)value;
+              }
+            }
+          break;
         case 'D':
           modifier=ARG_LONG;
-          goto decimal;
+          base=10;
+          goto integer;
         case 'p':                                       // Hex pointer
           modifier=ARG_VARIABLE;
+          base=16;
+          comma=0;
+          goto integer;
         case 'x':                                       // Hex
         case 'X':
-          base+=6;
+          base=16;
+          comma=0;
+          goto integer;
+        case 'o':                                       // Octal
+          base=8;
+          comma=0;
+          goto integer;
+        case 'b':                                       // Binary
+          base=2;
+          comma=0;
+          goto integer;
         case 'd':                                       // Decimal
         case 'u':
-decimal:  base+=2;
-        case 'o':                                       // Octal
-          base+=6;
-        case 'b':                                       // Binary
-          base+=2;
+          base=10;
         case 'i':                                       // Either
-          value=0;
+integer:  value=0;
           digits=0;
-          if(width<1) width=2147483647;                                 // Width at least 1
-          while(Ascii::isSpace(*string)) string++;                      // Skip white space; not included in field width
-          if((neg=(*string=='-')) || (*string=='+')){                   // Handle sign
+          if(width<1) width=2147483647;                 // Width at least 1
+          while(Ascii::isSpace(*string)) string++;      // Skip white space; not included in field width
+          if((neg=(*string=='-')) || (*string=='+')){   // Handle sign
             string++;
             width--;
             }
-          if(0<width && *string=='0'){                                  // Got a '0'
+          if(0<width && *string=='0'){                          // Got a '0'
             digits++;
             string++;
             width--;
-            if(0<width && (*string=='x' || *string=='X')){              // Got a '0x'
-              if(base==0) base=16;                                      // If not set yet, '0x' means set base to 16
-              if(base==16){                                             // But don't eat the 'x' if base wasn't 16!
+            if(0<width && (*string=='x' || *string=='X')){      // Got a '0x'
+              if(base==0){ comma=0; base=16; }                  // If not set yet, '0x' means set base to 16
+              if(base==16){                                     // But don't eat the 'x' if base wasn't 16!
                 string++;
                 width--;
                 }
               }
-            else if(0<width && (*string=='b' || *string=='B')){         // Got a '0b'
-              if(base==0) base=2;                                       // If not set yet, '0b' means set base to 2
-              if(base==2){                                              // But don't eat the 'b' if base wasn't 2!
+            else if(0<width && (*string=='b' || *string=='B')){ // Got a '0b'
+              if(base==0){ comma=0; base=2; }                   // If not set yet, '0b' means set base to 2
+              if(base==2){                                      // But don't eat the 'b' if base wasn't 2!
                 string++;
                 width--;
                 }
               }
             else{
-              if(base==0) base=8;                                       // If not set yet, '0' means set base to 8
+              if(base==0){ comma=0; base=8; }                   // If not set yet, '0' means set base to 8
               }
             }
           else{
-            if(base==0) base=10;                                        // Not starting with '0' or '0x', so its decimal
+            if(base==0){ base=10; }                             // Not starting with '0' or '0x', so its decimal
             }
+/*
+          if(0<width && *string && *string==comma){             // Thousands grouping
+            width--;
+            string++;
+            }
+*/
           while(0<width && 0<=(v=Ascii::digitValue(*string)) && v<base){        // Convert to integer
             value=value*base+v;
             digits++;
@@ -262,7 +358,7 @@ decimal:  base+=2;
           if(neg){                                              // Apply sign
             value=0-value;
             }
-assign:   if(convert){
+          if(convert){
             if(modifier==ARG_DEFAULT){                          // 32-bit always
               *va_arg(ag,FXint*)=(FXint)value;
               }
@@ -421,10 +517,10 @@ assign:   if(convert){
         case '[':                                       // Character set
           if(width<1) width=2147483647;                 // Width at least 1
           ch=(FXuchar)*format++;
-          v=1;
+          v=1;                                          // Add characters to set
           if(ch=='^'){                                  // Negated character set
             ch=(FXuchar)*format++;
-            v=0;
+            v=0;                                        // Remove characters from set
             }
           memset(set,1-v,sizeof(set));                  // Initialize set
           if(ch=='\0') goto x;                          // Format error
@@ -480,8 +576,8 @@ nml:if(Ascii::isSpace(ch)){
     // Next regular character
     string++;
     }
-
-x:return count;
+x:va_end(ag);
+  return count;
   }
 
 

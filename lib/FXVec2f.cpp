@@ -74,17 +74,7 @@ FXVec2f normalize(const FXVec2f& v){
 
 // Linearly interpolate
 FXVec2f lerp(const FXVec2f& u,const FXVec2f& v,FXfloat f){
-#if defined(FOX_HAS_SSE2)
-  register __m128 u0=_mm_castsi128_ps(_mm_set1_epi64(*((const __m64*)&u[0])));
-  register __m128 v0=_mm_castsi128_ps(_mm_set1_epi64(*((const __m64*)&v[0])));
-  register __m128 ff=_mm_set1_ps(f);
-  register __m128 rr=_mm_add_ps(u0,_mm_mul_ps(_mm_sub_ps(v0,u0),ff));
-  FXVec2f r;
-  _mm_storel_pi((__m64*)&r[0],rr);
-  return r;
-#else
   return FXVec2f(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f);
-#endif
   }
 
 

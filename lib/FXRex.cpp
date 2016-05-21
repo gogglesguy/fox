@@ -1864,7 +1864,7 @@ public:
 
 
 // Construct match engine
-FXExecute::FXExecute(const FXchar *s,FXint n,FXint* b,FXint* e,FXint p,FXint m):str_beg(s),str_end(s+n),sub_beg(b),sub_end(e),npar(p),recs(0),mode(m){
+FXExecute::FXExecute(const FXchar *s,FXint n,FXint* b,FXint* e,FXint p,FXint m):anc(NULL),str(NULL),str_beg(s),str_end(s+n),sub_beg(b),sub_end(e),npar(p),recs(0),mode(m){
   bak_beg[0]=bak_end[0]=NULL;
   bak_beg[1]=bak_end[1]=NULL;
   bak_beg[2]=bak_end[2]=NULL;

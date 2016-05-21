@@ -128,9 +128,12 @@ FXbool FXRanged::contains(const FXSphered& sphere) const {
 
 // Include point into range
 FXRanged& FXRanged::include(FXdouble x,FXdouble y,FXdouble z){
-  if(x<lower.x) lower.x=x; if(x>upper.x) upper.x=x;
-  if(y<lower.y) lower.y=y; if(y>upper.y) upper.y=y;
-  if(z<lower.z) lower.z=z; if(z>upper.z) upper.z=z;
+  lower.x=Math::fmin(x,lower.x);
+  lower.y=Math::fmin(y,lower.y);
+  lower.z=Math::fmin(z,lower.z);
+  upper.x=Math::fmax(x,upper.x);
+  upper.y=Math::fmax(y,upper.y);
+  upper.z=Math::fmax(z,upper.z);
   return *this;
   }
 
@@ -143,9 +146,12 @@ FXRanged& FXRanged::include(const FXVec3d& v){
 
 // Include given box into box's range
 FXRanged& FXRanged::include(const FXRanged& box){
-  if(box.lower.x<lower.x) lower.x=box.lower.x; if(box.upper.x>upper.x) upper.x=box.upper.x;
-  if(box.lower.y<lower.y) lower.y=box.lower.y; if(box.upper.y>upper.y) upper.y=box.upper.y;
-  if(box.lower.z<lower.z) lower.z=box.lower.z; if(box.upper.z>upper.z) upper.z=box.upper.z;
+  lower.x=Math::fmin(box.lower.x,lower.x);
+  lower.y=Math::fmin(box.lower.y,lower.y);
+  lower.z=Math::fmin(box.lower.z,lower.z);
+  upper.x=Math::fmax(box.upper.x,upper.x);
+  upper.y=Math::fmax(box.upper.y,upper.y);
+  upper.z=Math::fmax(box.upper.z,upper.z);
   return *this;
   }
 
@@ -154,9 +160,12 @@ FXRanged& FXRanged::include(const FXRanged& box){
 FXRanged& FXRanged::include(const FXSphered& sphere){
   FXVec3d lo(sphere.center.x-sphere.radius,sphere.center.y-sphere.radius,sphere.center.z-sphere.radius);
   FXVec3d hi(sphere.center.x+sphere.radius,sphere.center.y+sphere.radius,sphere.center.z+sphere.radius);
-  if(lo.x<lower.x) lower.x=lo.x; if(hi.x>upper.x) upper.x=hi.x;
-  if(lo.y<lower.y) lower.y=lo.y; if(hi.y>upper.y) upper.y=hi.y;
-  if(lo.z<lower.z) lower.z=lo.z; if(hi.z>upper.z) upper.z=hi.z;
+  lower.x=Math::fmin(lo.x,lower.x);
+  lower.y=Math::fmin(lo.y,lower.y);
+  lower.z=Math::fmin(lo.z,lower.z);
+  upper.x=Math::fmax(hi.x,upper.x);
+  upper.y=Math::fmax(hi.y,upper.y);
+  upper.z=Math::fmax(hi.z,upper.z);
   return *this;
   }
 

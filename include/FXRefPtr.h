@@ -21,7 +21,6 @@
 #ifndef FXREFPTR_H
 #define FXREFPTR_H
 
-
 namespace FX {
 
 

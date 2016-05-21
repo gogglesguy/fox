@@ -36,7 +36,6 @@ enum {
   };
 
 
-
 /**
 * Popup window is used as a container for transitional controls
 * such as menu panes and other ephemeral windows.  One of its

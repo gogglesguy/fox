@@ -21,7 +21,6 @@
 #ifndef FXRANGED_H
 #define FXRANGED_H
 
-
 namespace FX {
 
 

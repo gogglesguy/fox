@@ -106,8 +106,10 @@ FXbool FXExtentd::contains(const FXExtentd& ext) const {
 
 // Include point into range
 FXExtentd& FXExtentd::include(FXdouble x,FXdouble y){
-  if(x<lower.x) lower.x=x; if(x>upper.x) upper.x=x;
-  if(y<lower.y) lower.y=y; if(y>upper.y) upper.y=y;
+  lower.x=Math::fmin(x,lower.x);
+  lower.y=Math::fmin(y,lower.y);
+  upper.x=Math::fmax(x,upper.x);
+  upper.y=Math::fmax(y,upper.y);
   return *this;
   }
 
@@ -120,9 +122,60 @@ FXExtentd& FXExtentd::include(const FXVec2d& v){
 
 // Include given box into box's range
 FXExtentd& FXExtentd::include(const FXExtentd& ext){
-  if(ext.lower.x<lower.x) lower.x=ext.lower.x; if(ext.upper.x>upper.x) upper.x=ext.upper.x;
-  if(ext.lower.y<lower.y) lower.y=ext.lower.y; if(ext.upper.y>upper.y) upper.y=ext.upper.y;
+  lower.x=Math::fmin(ext.lower.x,lower.x);
+  lower.y=Math::fmin(ext.lower.y,lower.y);
+  upper.x=Math::fmax(ext.upper.x,upper.x);
+  upper.y=Math::fmax(ext.upper.y,upper.y);
   return *this;
+  }
+
+
+// Intersect box with ray u-v
+FXbool FXExtentd::intersect(const FXVec2d& u,const FXVec2d& v) const {
+  FXdouble hits[2];
+  return intersect(u,v-u,hits) && 0.0<=hits[1] && hits[0]<=1.0;
+  }
+
+
+// Intersect box with ray p+lambda*d, returning true if hit
+FXbool FXExtentd::intersect(const FXVec2d& pos,const FXVec2d& dir,FXdouble hit[]) const {
+  register FXdouble f= DBL_MAX;
+  register FXdouble n=-DBL_MAX;
+  register FXdouble ni,fi;
+  if(__likely(dir.x!=0.0)){
+    if(0.0<dir.x){
+      ni=(lower.x-pos.x)/dir.x;
+      fi=(upper.x-pos.x)/dir.x;
+      }
+    else{
+      ni=(upper.x-pos.x)/dir.x;
+      fi=(lower.x-pos.x)/dir.x;
+      }
+    if(ni>n) n=ni;
+    if(fi<f) f=fi;
+    }
+  else{
+    if((pos.x<lower.x) || (pos.x>upper.x)) return false;
+    }
+  if(__likely(dir.y!=0.0)){
+    if(0.0<dir.y){
+      ni=(lower.y-pos.y)/dir.y;
+      fi=(upper.y-pos.y)/dir.y;
+      }
+    else{
+      ni=(upper.y-pos.y)/dir.y;
+      fi=(lower.y-pos.y)/dir.y;
+      }
+    if(ni>n) n=ni;
+    if(fi<f) f=fi;
+    if(n>f) return false;
+    }
+  else{
+    if((pos.y<lower.y) || (pos.y>upper.y)) return false;
+    }
+  hit[0]=n;
+  hit[1]=f;
+  return true;
   }
 
 

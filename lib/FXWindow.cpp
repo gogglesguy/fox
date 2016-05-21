@@ -1291,6 +1291,11 @@ void FXWindow::create(){
       // To keep it on top
       //SetWindowPos((HWND)xid,HWND_TOPMOST,xpos,ypos,FXMAX(width,1),FXMAX(height,1),0);
 
+      // Disable if not enabled (FIXME this does not work)
+      if(!isEnabled()){
+ //       EnableWindow((HWND)xid,false);
+        }
+
       // Show if it was supposed to be.  Apparently, initial state
       // is neither shown nor hidden, so an explicit hide is needed.
       // Patch thanks to "Glenn Shen" <shen@hks.com>

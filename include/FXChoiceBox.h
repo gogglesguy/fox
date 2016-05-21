@@ -69,6 +69,9 @@ public:
   /// Construct free floating choice box with given caption, icon, message text, and with choices from newline separated strings
   FXChoiceBox(FXApp* app,const FXString& caption,const FXString& text,FXIcon* icon,const FXString& choices,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
+  /// Run modal invocation of the dialog
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
+
   /**
   * Show a modal choice dialog.
   * Prompt the user using a dialog with given caption, icon,

@@ -109,7 +109,7 @@ int main(int argc,char *argv[]){
     var["emptymap"].setType(FXVariant::VMap);
     var["emptyarray"].setType(FXVariant::VArray);
     for(FXival i=0; i<100; ++i){
-      var["bigarray"][i]=sin(0.005*i/PI);
+      var["bigarray"][i]=Math::sin(0.005*i/PI);
       }
     }
 

@@ -21,7 +21,6 @@
 #ifndef FXENDIAN_H
 #define FXENDIAN_H
 
-
 namespace FX {
 
 
@@ -78,7 +77,7 @@ static inline FXushort swap16(FXushort x){
 
 // Byte swap unsiged int
 static inline FXuint swap32(FXuint x){
-#if (defined(__GNUC__) && ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))))
+#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)))
   return __builtin_bswap32(x);
 #elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   __asm__ __volatile__("bswapl %0\n\t" : "=r"(x): "0"(x));
@@ -94,7 +93,7 @@ static inline FXuint swap32(FXuint x){
 
 // Byte swap unsigned long
 static inline FXulong swap64(FXulong x){
-#if (defined(__GNUC__) && ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))))
+#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)))
   return __builtin_bswap64(x);
 #elif (defined(__GNUC__) && defined(__i386__))
   union { struct { FXuint l; FXuint h; } s; FXulong x; } n;
@@ -135,7 +134,7 @@ static inline FXuint msb32(FXuint x){
 
 // Count one-bits in non-zero integer
 static inline FXuint pop32(FXuint x){
-#if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
+#if ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)))
   return __builtin_popcount(x);
 #else
   x=x-((x>>1)&0x55555555);
@@ -150,7 +149,7 @@ static inline FXuint pop32(FXuint x){
 
 // Count leading zeros in non-zero integer
 static inline FXuint clz32(FXuint x){
-#if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
+#if ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)))
   return __builtin_clz(x);
 #else
   register unsigned int f,e,d,c,b;
@@ -166,7 +165,7 @@ static inline FXuint clz32(FXuint x){
 
 // Count trailing zeros in non-zero integer
 static inline FXuint ctz32(FXuint x){
-#if (defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4))))
+#if ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)))
   return __builtin_ctz(x);
 #else
   register unsigned int f,e,d,c,b;

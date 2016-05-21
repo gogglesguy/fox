@@ -21,7 +21,6 @@
 #ifndef FXDIRVISITOR_H
 #define FXDIRVISITOR_H
 
-
 namespace FX {
 
 

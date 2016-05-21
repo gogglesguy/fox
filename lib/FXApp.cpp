@@ -2047,7 +2047,7 @@ FXbool FXApp::addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode
   if(maxhandle+1>=MAXIMUM_WAIT_OBJECTS) return false;
   if(maxhandle+1>=ninputs){             // Grow table of callbacks
     resizeElms(inputs,ninputs+1);
-    memset(&inputs[ninputs],0,sizeof(FXInput));
+    clearElms(&inputs[ninputs],1);
     ninputs=ninputs+1;
     }
   in=++maxhandle;                       // One more handle
@@ -2072,7 +2072,7 @@ r:FXASSERT(in<ninputs);
   if(fd<0 || fd>=FD_SETSIZE) return false;
   if(fd>=ninputs){                      // Grow table of callbacks
     resizeElms(inputs,fd+1);
-    memset(&inputs[ninputs],0,sizeof(FXInput)*(fd+1-ninputs));
+    clearElms(&inputs[ninputs],fd+1-ninputs);
     ninputs=fd+1;
     }
   FXASSERT(inputs);
@@ -4254,7 +4254,7 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
   // If set, force FOXDIR for system-wide path
   if((str=getenv("FOXDIR"))!=NULL){
-    registry.setSystemDirectories("$FOXDIR");
+    registry.setSystemDirectories(str);
     }
 
   //fxisconsole(argv[0]);

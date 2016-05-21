@@ -37,7 +37,7 @@ public:
     ErrSave,            /// Unable to save
     ErrLoad,            /// Unable to load
     ErrToken,           /// Illegal token
-    ErrColon,           /// Expected color ':'
+    ErrColon,           /// Expected colon ':'
     ErrComma,           /// Expected comma ','
     ErrBracket,         /// Expected closing bracket
     ErrBrace,           /// Expected closing brace
@@ -58,9 +58,9 @@ public:
 protected:
   FXchar     *begptr;           // Text buffer begin ptr
   FXchar     *endptr;           // Text buffer end ptr
+  FXchar     *sptr;             // Text buffer start ptr
   FXchar     *rptr;             // Text buffer read ptr
   FXchar     *wptr;             // Text buffer write ptr
-  FXchar     *sptr;             // Text buffer scan ptr
   FXint       token;            // Token
   FXint       column;           // Column number
   FXint       indent;           // Indent level
@@ -74,12 +74,13 @@ protected:
   FXbool      owns;             // Owns the buffer
 private:
   FXint next();
+  FXbool need(FXival n);
+  Error emit(const FXchar* str,FXint count);
+  Error emit(FXchar ch,FXint count);
   Error loadString(FXString& str);
   Error loadMap(FXVariant& var);
   Error loadArray(FXVariant& var);
   Error loadVariant(FXVariant& var);
-  Error saveText(const FXchar* ptr,FXint count);
-  Error saveIndent(FXint count);
   Error saveString(const FXString& str);
   Error saveMap(const FXVariant& var);
   Error saveArray(const FXVariant& var);
@@ -112,6 +113,11 @@ public:
   * Return direction in effect.
   */
   Direction direction() const { return dir; }
+
+  /**
+  * Return size of parse buffer
+  */
+  FXuval size() const { return endptr-begptr; }
 
   /**
   * Load a variant from stream.

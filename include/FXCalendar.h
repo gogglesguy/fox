@@ -25,7 +25,6 @@
 #include "FXPacker.h"
 #endif
 
-
 namespace FX {
 
 

@@ -59,7 +59,7 @@ FXLFQueue::FXLFQueue(FXuint sz):whead(0),wtail(0),rhead(0),rtail(0){
 
 // Change size of queue (must be power of two); return true if success
 FXbool FXLFQueue::setSize(FXuint sz){
-  if(sz&(sz-1)){ fxerror("FXLFQueue::setSize: bad argument: %d.\n",sz); }
+  if(sz&(sz-1)){ fxerror("FXLFQueue::setSize: bad argument: %u.\n",sz); }
   if(items.no(sz)){
     whead=wtail=rhead=rtail=0;
     return true;

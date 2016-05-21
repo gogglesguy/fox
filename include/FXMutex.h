@@ -21,7 +21,6 @@
 #ifndef FXMUTEX_H
 #define FXMUTEX_H
 
-
 namespace FX {
 
 

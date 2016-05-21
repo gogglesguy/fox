@@ -328,7 +328,7 @@ void drawRectangle(FXDC& dc,const FillStyle& fs,FXint x,FXint y,FXint w,FXint h)
 // Determine tick spacing
 void getTickSpacing(FXdouble& major,FXdouble& minor,FXdouble min,FXdouble max){
   register FXdouble range=max-min;
-  register FXdouble delta=pow(10.0,floor(log10(range)));
+  register FXdouble delta=Math::pow(10.0,Math::floor(Math::log10(range)));
   register FXdouble frac=range/delta;
   if(frac<1.5){
     major=0.1*delta;
