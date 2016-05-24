@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="gltest"
 	ProjectGUID="{A8340A1E-F673-453F-AA69-CE210BD93362}"
 	TargetFrameworkVersion="0"
@@ -48,6 +48,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;HAVE_GL_H;HAVE_GLU_H"
 				StringPooling="true"
@@ -139,6 +140,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;HAVE_GL_H;HAVE_GLU_H"
 				RuntimeLibrary="1"

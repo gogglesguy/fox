@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;DEBUG;_WINDOWS;UNICODE;_CRT_SECURE_NO_WARNINGS;HAVE_GL_H;HAVE_GLU_H"
 				StringPooling="true"

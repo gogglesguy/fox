@@ -99,8 +99,8 @@ private:
   Error parseprocessing();
   Error parsecomment();
   Error parseattribute(Element& elm);
-  Error parsestart(Element& elm);
-  Error parseend(Element& elm);
+  Error parsestarttag(Element& elm);
+  Error parseendtag(Element& elm);
   Error parsecdata(Element& elm);
   Error parsecontents(Element& elm);
   Error parseelement();
@@ -224,12 +224,12 @@ public:
   /**
   * Decode escaped special characters from XML stream.
   */
-  static FXbool decode(FXString& dst,const FXString& src,FXuint flags);
+  static FXbool decode(FXString& dst,const FXString& src,FXuint flags=CRLF|REFS);
 
   /**
   * Encode special characters for inclusion into XML stream.
   */
-  static FXbool encode(FXString& dst,const FXString& src,FXuint flags);
+  static FXbool encode(FXString& dst,const FXString& src,FXuint flags=CRLF|REFS);
 
   /**
   * Close XML stream and clean up.

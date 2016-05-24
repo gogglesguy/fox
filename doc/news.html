@@ -17,6 +17,25 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+May 23 - FOX DEVELOPMENT 1.7.56
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Removed quoted string length limitation in XML parser.</li>
+<li>Removed comment length limitation in XMP parser.</li>
+<li>Pass all text of processing instruction in one single callback from XML parser.</li>
+<li>XML declaration now only recognized if followed by whitespace.</li>
+<li>Updated Visual Studio 2008 project files to add enable intrinsics flags.  This was causing problems compiling FXAtomic file.</li>
+<li>In FXAtomic, favor inlined x86 or x86-64 assembly over GCC builtins, due to spotty implementation of these primitives.</li>
+<li>Quoted string in XML could have newlines or blanks; adjusted parsing routine to not lose track of line and column numbers while parsing
+over strings.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 May 20 - FOX DEVELOPMENT 1.7.55
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -30,7 +49,7 @@ the front end, and multiple threads removing jobs from the backend.</li>
 <li>PathFinder now has new ways to select files quickly: by means of wild-card patterns.
 The new selection method is based on the list of file-patterns available from the normal filter drop-down
 box (which may be configured from the Settings Panel). It can be invoked from Edit/Select Files menu.</li>
-<li>New fxmath function fclamp() added; usually, this is implemented in terms of fmax() and fmin() which are 
+<li>New fxmath function fclamp() added; usually, this is implemented in terms of fmax() and fmin() which are
 branch-free on many machines.</li>
 <li>Using new Math functions in most places inside library itself.</li>
 <li>Added line to box (2D) functions to FXExtent.</li>

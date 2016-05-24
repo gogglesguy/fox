@@ -140,6 +140,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_USRDLL;FOXDLL;FOXDLL_EXPORTS;HAVE_GL_H;HAVE_GLU_H"
 				BasicRuntimeChecks="3"

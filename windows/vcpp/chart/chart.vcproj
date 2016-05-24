@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="chart"
 	ProjectGUID="{645CE498-CD09-4F5F-83CF-9296CC620FCA}"
 	TargetFrameworkVersion="0"
@@ -114,6 +114,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;UNICODE"
 				BasicRuntimeChecks="3"
