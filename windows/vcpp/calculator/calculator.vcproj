@@ -25,7 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;"
+				CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -48,6 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE"
 				RuntimeLibrary="1"
@@ -117,7 +118,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;"
+				CommandLine="cd ..\..\..\calculator&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -o icons.h bigcalc.gif tinycalc.gif constmem.bmp question.gif colors.gif information.gif&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -143,6 +144,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE"
 				StringPooling="true"

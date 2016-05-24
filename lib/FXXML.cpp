@@ -267,6 +267,11 @@ static inline FXuchar restrictedChar(FXuchar ch){
   return property_data[ch]&ESCAPE;
   }
 
+// Return non-zero if ch is whitespace character
+static inline FXuchar spaceChar(FXuchar ch){
+  return property_data[ch]&SPACE;
+  }
+
 
 // Error messages
 const FXchar *const FXXML::errors[]={
@@ -320,7 +325,7 @@ public:
 FXbool FXXML::decode(FXString& dst,const FXString& src,FXuint flags){
   register FXival p,q;
   register FXwchar wc;
-  
+
   // Measure the resulting string first
   p=q=0;
   while(q<src.length()){
@@ -387,10 +392,10 @@ FXbool FXXML::decode(FXString& dst,const FXString& src,FXuint flags){
       }
     p++;
     }
-  
+
   // Now allocate space
   dst.length(p);
-  
+
   // Now produce the result string
   p=q=0;
   while(q<src.length()){
@@ -505,7 +510,7 @@ FXbool FXXML::encode(FXString& dst,const FXString& src,FXuint flags){
       }
     p++;
     }
-  
+
   // Now allocate space
   dst.length(p);
 
@@ -912,18 +917,46 @@ FXbool FXXML::match(const FXchar* str,FXint len){
 // Parse string
 FXXML::Error FXXML::parsestring(FXString& str){
   FXchar q=rptr[0];
+  str.clear();
   if(q=='"' || q=='\''){
-    sptr=rptr;
-    do{
-      rptr=wcinc(rptr);
-      column++;
-      if(rptr>=wptr) return ErrEof;
-      }
-    while(rptr[0]!=q);
-    column++;
     rptr++;
-    str.assign(sptr+1,rptr-sptr-2);
-    return ErrOK;
+    column++;
+    sptr=rptr;
+    while(need(MAXTOKEN)){
+      switch(rptr[0]){
+      case '\t':
+        column+=(8-column%8);
+        rptr++;
+        continue;
+      case '\n':
+        column=0;
+        line++;
+        rptr++;
+        continue;
+      case ' ':
+        column++;
+      case '\r':
+        rptr++;
+        continue;
+      case '\'':
+      case '"':
+        if(rptr[0]!=q) goto nxt;
+        str.append(sptr,rptr-sptr);
+        rptr++;
+        column++;
+        sptr=rptr;
+        return ErrOK;
+      default:
+nxt:    if((rptr-sptr)>=(size()-MAXTOKEN)){
+          str.append(sptr,rptr-sptr);
+          sptr=rptr;
+          }
+        rptr=wcinc(rptr);
+        column++;
+        continue;
+        }
+      }
+    return ErrEof;
     }
   return ErrString;
   }
@@ -1108,7 +1141,6 @@ FXXML::Error FXXML::parseinternalsubset(){
           column+=2;
           rptr+=2;
           if((err=parseprocessing())!=ErrOK) return err;
-          sptr=rptr;
           continue;
           }
         if(rptr[1]=='!' && rptr[2]=='-' && rptr[3]=='-'){
@@ -1180,6 +1212,7 @@ FXXML::Error FXXML::parsedeclarations(){
 
 // Processing instruction
 FXXML::Error FXXML::parseprocessing(){
+  FXXML::Error err;
   FXString target;
   FXString data;
   if(name()){
@@ -1203,13 +1236,17 @@ FXXML::Error FXXML::parseprocessing(){
         continue;
       case '?':
         if(rptr[1]!='>') goto nxt;      // Just a lone '?'
-        data.assign(sptr,rptr-sptr);
-        processingCB(target,data);      // Report processing instruction
+        data.append(sptr,rptr-sptr);    // Add last chunk of processing instruction
         column+=2;
         rptr+=2;
-        return ErrOK;                   // End of processing instruction
+        sptr=rptr;
+        return processingCB(target,data);
       default:
-nxt:    rptr=wcinc(rptr);               // Next wide character
+nxt:    if((rptr-sptr)>=(size()-MAXTOKEN)){
+          data.append(sptr,rptr-sptr);  // Add another chunk
+          sptr=rptr;
+          }
+        rptr=wcinc(rptr);               // Next wide character
         column++;
         continue;
         }
@@ -1244,14 +1281,17 @@ FXXML::Error FXXML::parsecomment(){
     case '-':
       if(rptr[1]!='-') goto nxt;        // Just a lone '-'
       if(rptr[2]!='>') goto nxt;        // Allow a '--' inside a comment; technically, not spec
-      FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF|REFS);
-      if((err=commentCB(text))!=ErrOK) return err;
+      text.append(sptr,rptr-sptr);      // Pass comment undecoded
       column+=3;
       rptr+=3;
       sptr=rptr;
-      return ErrOK;                     // End of comment
+      return commentCB(text);
     default:
-nxt:  rptr=wcinc(rptr);                 // Next wide character
+nxt:  if((rptr-sptr)>=(size()-MAXTOKEN)){
+        text.append(sptr,rptr-sptr);    // Pass comment undecoded
+        sptr=rptr;
+        }
+      rptr=wcinc(rptr);                 // Next wide character
       column++;
       continue;
       }
@@ -1280,7 +1320,7 @@ FXXML::Error FXXML::parseattribute(Element& elm){
 
 
 // Start tag
-FXXML::Error FXXML::parsestart(Element& elm){
+FXXML::Error FXXML::parsestarttag(Element& elm){
   FXXML::Error err;
   if(!name()) return ErrName;
   elm.name.assign(sptr,rptr-sptr);
@@ -1322,7 +1362,7 @@ FXXML::Error FXXML::parsestart(Element& elm){
 
 
 // End tag
-FXXML::Error FXXML::parseend(Element& elm){
+FXXML::Error FXXML::parseendtag(Element& elm){
   if(!match(elm.name.text(),elm.name.length())) return ErrNoMatch;
   while(need(MAXTOKEN)){
     sptr=rptr;
@@ -1385,7 +1425,7 @@ FXXML::Error FXXML::parsecdata(Element& elm){
       sptr=rptr;
       return ErrOK;
     default:
-nxt:  if((wptr==endptr) && (wptr<=rptr+MAXTOKEN)){
+nxt:  if((rptr-sptr)>=(size()-MAXTOKEN)){
 //        if((err=decode(text,sptr,rptr-sptr,CRLF))!=ErrOK) return err;
         FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF);
         if((err=charactersCB(text))!=ErrOK) return err;
@@ -1460,7 +1500,6 @@ FXXML::Error FXXML::parsecontents(Element& elm){
         column+=2;
         rptr+=2;
         if((err=parseprocessing())!=ErrOK) return err;
-        sptr=rptr;
         continue;
         }
 
@@ -1490,7 +1529,7 @@ FXXML::Error FXXML::parsecontents(Element& elm){
       sptr=rptr;
       continue;
     default:
-      if((wptr==endptr) && (wptr<=rptr+MAXTOKEN) && brk){
+      if(brk && (rptr-sptr)>=(size()-MAXTOKEN)){
 
         // Try decode, translate both CRLF and references
         //if((err=decode(text,sptr,rptr-sptr,CRLF|REFS))!=ErrOK) return err;
@@ -1517,7 +1556,7 @@ FXXML::Error FXXML::parseelement(){
   FXXML::Error err;
 
   // Parse start tag
-  if((err=parsestart(instance))!=ErrOK) return err;
+  if((err=parsestarttag(instance))!=ErrOK) return err;
 
   // Report element start
   if((err=startElementCB(instance.name,instance.attributes))!=ErrOK) return err;
@@ -1529,7 +1568,7 @@ FXXML::Error FXXML::parseelement(){
     if((err=parsecontents(instance))!=ErrOK) return err;
 
     // Parse end tag
-    if((err=parseend(instance))!=ErrOK) return err;
+    if((err=parseendtag(instance))!=ErrOK) return err;
     }
 
   // Report element end
@@ -1574,8 +1613,16 @@ FXXML::Error FXXML::parse(){
           continue;
           }
 
+        // Parse document type declarations
+        if(rptr[1]=='!' && rptr[2]=='D' && rptr[3]=='O' && rptr[4]=='C' && rptr[5]=='T' && rptr[6]=='Y' && rptr[7]=='P' && rptr[8]=='E' && spaceChar(rptr[9])){
+          column+=9;
+          rptr+=9;
+          if((err=parsedeclarations())!=ErrOK) return err;
+          continue;
+          }
+
         // Parse XML declaration
-        if(rptr[1]=='?' && rptr[2]=='x' && rptr[3]=='m' && rptr[4]=='l'){
+        if(rptr[1]=='?' && rptr[2]=='x' && rptr[3]=='m' && rptr[4]=='l' && spaceChar(rptr[5])){
           column+=5;
           rptr+=5;
           if((err=parsexml())!=ErrOK) return err;
@@ -1587,14 +1634,6 @@ FXXML::Error FXXML::parse(){
           column+=2;
           rptr+=2;
           if((err=parseprocessing())!=ErrOK) return err;
-          continue;
-          }
-
-        // Parse document type declarations
-        if(rptr[1]=='!' && rptr[2]=='D' && rptr[3]=='O' && rptr[4]=='C' && rptr[5]=='T' && rptr[6]=='Y' && rptr[7]=='P' && rptr[8]=='E'){
-          column+=9;
-          rptr+=9;
-          if((err=parsedeclarations())!=ErrOK) return err;
           continue;
           }
 
