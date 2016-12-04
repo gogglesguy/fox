@@ -203,16 +203,38 @@ public:
   /// Return icon loader
   FXIconSource* getIconSource() const;
 
-  /// Open existing filename
+  /**
+  * Open existing filename.
+  * The new dialog will have the given caption and select the indicated path.
+  * Files will be filtered by the pattern or patterns.  If there is more than one pattern,
+  * the initial pattern will be selected in the drop-down box of the file dialog.
+  */
   static FXString getOpenFilename(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns="*",FXint initial=0);
 
-  /// Open multiple existing files
+  /**
+  * Open multiple existing files.
+  * The new dialog will have the given caption and select the indicated path.
+  * Files will be filtered by the pattern or patterns.  If there is more than one pattern,
+  * the initial pattern will be selected in the drop-down box of the file dialog.
+  * The return value of this function is an array of strings; the last item in the 
+  * array is an empty string.
+  */
   static FXString* getOpenFilenames(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns="*",FXint initial=0);
 
-  /// Save to filename
+  /**
+  * Save to filename.
+  * The new dialog will have the given caption and select the indicated path.
+  * Files will be filtered by the pattern or patterns.  If there is more than one pattern,
+  * the initial pattern will be selected in the drop-down box of the file dialog.
+  */
   static FXString getSaveFilename(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns="*",FXint initial=0);
 
-  /// Open directory name
+  /**
+  * Open directory name.
+  * The new dialog will have the given caption and select the indicated path.
+  * Files will be filtered by the pattern or patterns.  If there is more than one pattern,
+  * the initial pattern will be selected in the drop-down box of the file dialog.
+  */
   static FXString getOpenDirectory(FXWindow* owner,const FXString& caption,const FXString& path);
 
   /// Save to stream

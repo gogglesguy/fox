@@ -89,7 +89,7 @@ void FXMutex::lock(){
 
 // Try lock the mutex
 FXbool FXMutex::trylock(){
-#if defined(WIN32) && (_WIN32_WINNT >= 0x0400)
+#if defined(WIN32)
   return TryEnterCriticalSection((CRITICAL_SECTION*)data)!=0;
 #elif defined(WIN32)
   return false;

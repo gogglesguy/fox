@@ -159,7 +159,7 @@ FXbool fxcheckWEBP(FXStream&){
 
 
 // Stub routine
-FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+FXbool fxloadWEBP(FXStream&,FXColor*& data,FXint& width,FXint& height){
   static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
   static const FXuchar webp_bits[] = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,

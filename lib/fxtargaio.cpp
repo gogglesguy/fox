@@ -309,10 +309,9 @@ static FXbool loadTarga24(FXStream& store,FXColor* data,FXint width,FXint height
 
 
 static FXbool loadTarga16(FXStream& store,FXColor* data,FXint width,FXint height,FXuchar imgdescriptor,FXuchar ImageType){
-  register FXushort rgb16;
-  register FXuchar *pp;
-  register int i,j,rc;
-  FXuchar R,G,B,c;
+  FXushort rgb16;
+  FXint i,j,rc;
+  FXuchar *pp,R,G,B,c;
 
   // 2 - Uncompressed, RGB images.
   if(ImageType==2){

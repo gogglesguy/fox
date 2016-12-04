@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                             S p i n   B u t t o n                             *
+*                          S p i n n e r   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1998,2016 by Lyle Johnson.   All Rights Reserved.               *
@@ -72,7 +72,6 @@ FXDEFMAP(FXSpinner) FXSpinnerMap[]={
   FXMAPFUNC(SEL_KEYPRESS,0,FXSpinner::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXSpinner::onKeyRelease),
   FXMAPFUNC(SEL_FOCUS_SELF,0,FXSpinner::onFocusSelf),
-  FXMAPFUNC(SEL_UPDATE,FXSpinner::ID_ENTRY,FXSpinner::onUpdEntry),
   FXMAPFUNC(SEL_CHANGED,FXSpinner::ID_ENTRY,FXSpinner::onChgEntry),
   FXMAPFUNC(SEL_COMMAND,FXSpinner::ID_ENTRY,FXSpinner::onCmdEntry),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXSpinner::ID_ENTRY,FXSpinner::onWheelEntry),
@@ -97,7 +96,6 @@ FXIMPLEMENT(FXSpinner,FXPacker,FXSpinnerMap,ARRAYNUMBER(FXSpinnerMap))
 // Construct spinner out of two buttons and a text field
 FXSpinner::FXSpinner(){
   flags|=FLAG_ENABLED;
-  flags&=~FLAG_UPDATE;  // Never GUI update
   textField=(FXTextField*)-1L;
   upButton=(FXArrowButton*)-1L;
   downButton=(FXArrowButton*)-1L;
@@ -111,7 +109,6 @@ FXSpinner::FXSpinner(){
 // Construct spinner out of two buttons and a text field
 FXSpinner::FXSpinner(FXComposite *p,FXint cols,FXObject *tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h,0,0,0,0,0,0){
   flags|=FLAG_ENABLED;
-  flags&=~FLAG_UPDATE;  // Never GUI update
   target=tgt;
   message=sel;
   textField=new FXTextField(this,cols,this,ID_ENTRY,TEXTFIELD_INTEGER|JUSTIFY_RIGHT,0,0,0,0,pl,pr,pt,pb);
@@ -187,6 +184,18 @@ void FXSpinner::layout(){
   }
 
 
+// Notification that focus moved to new child
+void FXSpinner::changeFocus(FXWindow *child){
+  FXPacker::changeFocus(child);
+  if(child){
+    flags&=~FLAG_UPDATE; 
+    }
+  else{
+    flags|=FLAG_UPDATE; 
+    }
+  }
+
+
 // Respond to increment message
 long FXSpinner::onUpdIncrement(FXObject* sender,FXSelector,void*){
   if(isEnabled() && ((options&SPIN_CYCLIC) || (pos<range[1])))
@@ -241,12 +250,6 @@ long FXSpinner::onWheelEntry(FXObject*,FXSelector,void* ptr){
     return 1;
     }
   return 0;
-  }
-
-
-// Forward GUI update of text field to target
-long FXSpinner::onUpdEntry(FXObject*,FXSelector,void*){
-  return target && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
   }
 
 

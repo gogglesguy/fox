@@ -64,7 +64,6 @@ public:
   long onCmdIncrement(FXObject*,FXSelector,void*);
   long onUpdDecrement(FXObject*,FXSelector,void*);
   long onCmdDecrement(FXObject*,FXSelector,void*);
-  long onUpdEntry(FXObject*,FXSelector,void*);
   long onChgEntry(FXObject*,FXSelector,void*);
   long onCmdEntry(FXObject*,FXSelector,void*);
   long onWheelEntry(FXObject*,FXSelector,void*);
@@ -108,6 +107,9 @@ public:
 
   /// Return default height
   virtual FXint getDefaultHeight();
+
+  /// Notification that focus moved to new child
+  virtual void changeFocus(FXWindow *child);
 
   /// Increment spinner
   void increment(FXbool notify=false);

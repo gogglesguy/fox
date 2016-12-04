@@ -529,8 +529,9 @@ public:
   * Note: the smallest interval that one can wait is actually much larger
   * than a nanosecond; on Unix systems, the smallest interval is about 1000 ns,
   * whereas on Windows, it is about 1000000 ns.
+  * Return data pointer from original timeout, if any.
   */
-  void addTimeout(FXObject* tgt,FXSelector sel,FXTime ns=1000000000,void* ptr=NULL);
+  FXptr addTimeout(FXObject* tgt,FXSelector sel,FXTime ns=1000000000,FXptr ptr=NULL);
 
   /**
   * Add deadline timeout message sel to be sent to target object tgt when the due time,
@@ -539,14 +540,16 @@ public:
   * not suffer accumulating errors as with the addTimeout() method.  However, it is important to ensure
   * that the due time is sufficiently far into the future, as otherwise the system may be swamped
   * executing nothing but timeout messages.
+  * Return data pointer from original timeout, if any.
   */
-  void addDeadline(FXObject* tgt,FXSelector sel,FXTime due=forever,void* ptr=NULL);
+  FXptr addDeadline(FXObject* tgt,FXSelector sel,FXTime due=forever,FXptr ptr=NULL);
 
   /**
   * Remove timeout identified by target object tgt and message sel; if sel=0, remove all timeouts which
   * reference object tgt.
+  * Return data pointer from original timeout, if any.
   */
-  void removeTimeout(FXObject* tgt,FXSelector sel=0);
+  FXptr removeTimeout(FXObject* tgt,FXSelector sel=0);
 
   /**
   * Return true if a timeout with target object tgt and message sel has been set;
@@ -569,14 +572,16 @@ public:
   * The void* ptr is user data which will be passed into the void* ptr
   * of the message handler. If a chore with the same target and message
   * already exists, it will be rescheduled.
+  * Returns the data pointer from the original chore, if any.
   */
-  void addChore(FXObject* tgt,FXSelector sel,void *ptr=NULL);
+  FXptr addChore(FXObject* tgt,FXSelector sel,FXptr ptr=NULL);
 
   /**
   * Remove chore identified by target object tgt and message sel; if sel=0,
-  * remove all idle processing messages which refernce object tgt.
+  * remove all idle processing messages which reference object tgt.
+  * Returns the data pointer from the original chore, if any.
   */
-  void removeChore(FXObject* tgt,FXSelector sel=0);
+  FXptr removeChore(FXObject* tgt,FXSelector sel=0);
 
   /**
   * Return true if a chore with target object tgt and message sel has been set;
@@ -606,7 +611,7 @@ public:
   * as the value for ptr so that the message handler knows which file descriptor
   * is involved.
   */
-  FXbool addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode=INPUT_READ,void* ptr=NULL);
+  FXbool addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode=INPUT_READ,FXptr ptr=NULL);
 
   /**
   * Remove input message and target object for the specified file descriptor

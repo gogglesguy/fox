@@ -106,9 +106,10 @@ FXString FXPath::root(const FXString& file){
   }
 
 
+#if defined(WIN32)
+
 // Return share name from Windows UNC filename
 FXString FXPath::share(const FXString& file){
-#if defined(WIN32)
   if(!file.empty()){
     FXint f,n;
     if(ISPATHSEP(file[0])){                                   // UNC
@@ -124,9 +125,17 @@ FXString FXPath::share(const FXString& file){
         }
       }
     }
-#endif
   return FXString::null;
   }
+
+#else
+
+// Return share name from Windows UNC filename
+FXString FXPath::share(const FXString&){
+  return FXString::null;
+  }
+
+#endif
 
 
 // Return directory part of pathname, assuming full pathname.
@@ -544,20 +553,16 @@ FXString FXPath::absolute(const FXString& file){
       return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.right(file.length()-2));  // D:file -> D:\file
       }
     FXString result(FXSystem::getCurrentDirectory());
-    if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
-      result.append(file);
-      }
+    if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+    result.append(file);
     return FXPath::simplify(result);                                    // file -> D:\cwd\file
     }
   return FXPath::simplify(file);                                        // D:\dirs\file  OR  \\share\file
 #else
   if(!ISPATHSEP(file[0])){
     FXString result(FXSystem::getCurrentDirectory());
-    if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
-      result.append(file);
-      }
+    if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+    result.append(file);
     return FXPath::simplify(result);                                    // file -> /cwd/file
     }
   return FXPath::simplify(file);                                        // /dirs/file
@@ -576,20 +581,16 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
       return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.right(file.length()-2));  // D:file -> D:\file
       }
     FXString result(FXPath::absolute(base));
-    if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
-      result.append(file);
-      }
+    if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+    result.append(file);
     return FXPath::simplify(result);                                    // file -> /base/file
     }
   return FXPath::simplify(file);                                        // D:\dirs\file  OR  \\share\file
 #else
   if(!ISPATHSEP(file[0])){
     FXString result(FXPath::absolute(base));
-    if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
-      result.append(file);
-      }
+    if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+    result.append(file);
     return FXPath::simplify(result);                                    // file -> /base/file
     }
   return FXPath::simplify(file);                                        // /dirs/file
@@ -1293,40 +1294,40 @@ FXString FXPath::dequote(const FXString& file){
 // A last and final concern is the escape sequence (if enabled), which
 // prevents interpretation of the escaped character as a special directive.
 static const FXchar* skip(const FXchar* p,FXuint flags,FXbool alt){
-  FXint set=0;          // Characters in set [ ]
+  FXint set=0;          // Characters in set [...]
   FXint brk=0;          // Bracket set
   FXint par=0;          // Group level
   FXint neg=0;          // Negated
 n:switch(*p){
     case '\0':
       goto x;
-    case '[':           // Enter character set [ ]
+    case '[':           // Enter character set [...]
       p++;
       if(!brk){ brk=1; set=0; neg=0; goto n; }
       set++;
       goto n;
-    case ']':           // Leave character set [ ]
+    case ']':           // Leave character set [...] (if not first character in set []...] or [!]...] or [^]...])
       p++;
       if(brk && set){ brk=0; goto n; }
       set++;
       goto n;
     case '!':
-    case '^':
+    case '^':           // Invert character set [^...] or [!...] (if in set [...])
       p++;
-      if(!neg && !set){ neg=1; goto n; }
+      if(brk && !set && !neg){ neg=1; goto n; }
       set++;
       goto n;
-    case '(':           // Enter sub group ( )
+    case '(':           // Enter sub group (...) (if not in character set [...])
       p++;
       if(!brk){ ++par; }
       set++;
       goto n;
-    case ')':           // Leave sub group ( )
+    case ')':           // Leave sub group (...) (if not in character set [...])
       if(!brk){ if(--par<0) goto x; }
       p++;
       set++;
       goto n;
-    case ',':           // Separation of alternatives
+    case ',':           // End of alternatives
     case '|':
       if(!brk && !par && alt){ goto x; }
       p++;
@@ -1337,7 +1338,7 @@ n:switch(*p){
       // FALL //
     default:            // Regular character
       p=wcinc(p);       // Next unicode character
-      set++;            // One more in set
+      set++;
       goto n;
     }
 x:return p;
@@ -1555,10 +1556,10 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
   return result;
   }
 
+#if defined(WIN32)
 
 // Check if file has executable extension
 FXbool FXPath::hasExecExtension(const FXString& file){
-#if defined(WIN32)
   if(!file.empty()){
     FXString pathext(FXSystem::getExecExtensions());
     FXint beg=0,end;
@@ -1570,9 +1571,16 @@ FXbool FXPath::hasExecExtension(const FXString& file){
       }
     while(end<pathext.length());
     }
-#endif
   return false;
   }
 
+#else
+
+// Check if file has executable extension
+FXbool FXPath::hasExecExtension(const FXString&){
+  return false;
+  }
+
+#endif
 
 }

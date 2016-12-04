@@ -146,9 +146,6 @@ image.exe: $(FOXLIB) image.obj
 gltest.exe: $(FOXLIB) gltest.obj
 	$(LD) $(LDFLAGS) gltest.obj,,,$(FOXLIB) $(GLLIBS) $(LIBS)
 
-glviewer.exe: $(FOXLIB) glviewer.obj
-	$(LD) $(LDFLAGS) glviewer.obj,,,$(FOXLIB) $(GLLIBS) $(LIBS)
-
 dialog.exe: $(FOXLIB) dialog.obj
 	$(LD) $(LDFLAGS) dialog.obj,,,$(FOXLIB) $(LIBS)
 

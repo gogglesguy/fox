@@ -59,11 +59,11 @@ public:
   /// Check if queue is empty
   FXbool isEmpty() const;
 
-  /// Peek for item
-  FXbool peek(FXptr& ptr);
-
   /// Add item to queue, return true if success
   FXbool push(FXptr ptr);
+
+  /// Peek for item
+  FXbool peek(FXptr& ptr);
 
   /// Remove item from queue, return true if success
   FXbool pop(FXptr& ptr);
@@ -82,8 +82,8 @@ class FXPtrQueueOf : public FXPtrQueue {
 public:
   FXPtrQueueOf(){}
   FXPtrQueueOf(FXuint sz):FXPtrQueue(sz){}
-  FXbool peek(TYPE*& ptr){ return FXPtrQueue::peek((FXptr&)ptr); }
   FXbool push(TYPE* ptr){ return FXPtrQueue::push((FXptr)ptr); }
+  FXbool peek(TYPE*& ptr){ return FXPtrQueue::peek((FXptr&)ptr); }
   FXbool pop(TYPE*& ptr){ return FXPtrQueue::pop((FXptr&)ptr); }
   };
 

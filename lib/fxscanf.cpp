@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxmath.h"
 #include "fxascii.h"
+#include "FXString.h"
 
 
 /*
@@ -73,8 +74,6 @@
      'f', 'F'   Floating point conversion.
      'g', 'G'   Floating point conversion.
 
-
-  - We can print comma's like 1,000,000.00 but we can't read them...
 */
 
 #ifdef WIN32
@@ -116,7 +115,7 @@ static const FXchar* grouping(const FXchar* begin,const FXchar* end){
     const FXchar* group_end;
 
     // Scan backwards for thousands separator
-    while(cp>=begin){   
+    while(cp>=begin){
       if(*cp==',') break;
       --cp;
       }
@@ -163,7 +162,7 @@ static const FXchar* grouping(const FXchar* begin,const FXchar* end){
 
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  register FXint modifier,width,convert,comma,base,digits,count,exponent,expo,neg,nex,pos,ch,nn,v;
+  register FXint modifier,width,convert,comma,base,digits,sdigits,count,exponent,expo,neg,nex,pos,ch,nn,v;
   register const FXchar *start=string;
   register const FXchar *ss;
   register FXchar *ptr;
@@ -175,7 +174,7 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
 
   count=0;
 
-  FXTRACE((1,"string=%s segment=%.*s\n",string,(int)(grouping(string,string+strlen(string))-string),string));
+  //FXTRACE((1,"string=%s segment=%.*s\n",string,(int)(grouping(string,string+strlen(string))-string),string));
 
   // Process format string
   va_copy(ag,args);
@@ -342,15 +341,13 @@ integer:  value=0;
           else{
             if(base==0){ base=10; }                             // Not starting with '0' or '0x', so its decimal
             }
-/*
-          if(0<width && *string && *string==comma){             // Thousands grouping
-            width--;
-            string++;
-            }
-*/
-          while(0<width && 0<=(v=Ascii::digitValue(*string)) && v<base){        // Convert to integer
-            value=value*base+v;
-            digits++;
+          while(0<width && *string){
+            if(*string!=comma){                                 // FIXME only should consume LEGAL number groupings!
+              v=FXString::digit2Value[(FXuchar)*string];
+              if(v<0 || base<=v) break;
+              value=value*base+v;                               // Convert to integer
+              digits++;
+              }
             string++;
             width--;
             }
@@ -390,24 +387,32 @@ integer:  value=0;
           mult=1.0;
           exponent=-1;
           digits=0;
+          sdigits=0;
           if(width<1) width=2147483647;                         // Width at least 1
           while(Ascii::isSpace(*string)) string++;              // Skip white space; not included in field width
           if((neg=(*string=='-')) || (*string=='+')){           // Handle sign
             string++;
             width--;
             }
-          if(width<=0 || !(*string=='.' || ('0'<=*string && *string<='9'))) goto x;     // Bail if not starting a number now
-          while(0<width && *string=='0'){                       // Leading zeros
+          while(0<width && *string){                            // Leading zeros, with possible groupings
+            if(*string!=comma){
+              if(*string!='0') break;
+              digits++;
+              }
             string++;
             width--;
             }
-          while(0<width && '0'<=*string && *string<='9'){       // Mantissa digits
-            if(digits<MAXDIGS){
-              number+=(*string-'0')*mult;
-              mult*=0.1;
+          while(0<width && *string){                            // Mantissa digits
+            if(*string!=comma){                                 // FIXME only should consume LEGAL number groupings!
+              if(*string<'0' || *string>'9') break;
+              if(sdigits<MAXDIGS){
+                number+=(*string-'0')*mult;
+                mult*=0.1;
+                }
+              exponent++;
+              sdigits++;
+              digits++;
               }
-            exponent++;
-            digits++;
             string++;
             width--;
             }
@@ -415,15 +420,17 @@ integer:  value=0;
             string++;
             width--;
             while(0<width && '0'<=*string && *string<='9'){
-              if(digits<MAXDIGS){
+              if(sdigits<MAXDIGS){
                 number+=(*string-'0')*mult;
                 mult*=0.1;
                 }
+              sdigits++;
               digits++;
               string++;
               width--;
               }
             }
+          if(!digits) goto x;                                   // No digits seen!
           if(1<width && (*string|0x20)=='e'){                   // Handle exponent, tentatively
             ss=string;
             ss++;

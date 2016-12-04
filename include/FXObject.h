@@ -65,7 +65,7 @@ namespace FX {
 
 /// Macro to set up abstract class implementation
 #define FXIMPLEMENT_ABSTRACT(classname,baseclassname,mapping,nmappings) \
-  const FX::FXMetaClass classname::metaClass(#classname,NULL,&baseclassname::metaClass,mapping,nmappings,sizeof(classname::FXMapEntry)); \
+  const FX::FXMetaClass classname::metaClass(#classname,FX::FXMetaClass::nullObject,&baseclassname::metaClass,mapping,nmappings,sizeof(classname::FXMapEntry)); \
   long classname::handle(FX::FXObject* sender,FX::FXSelector sel,void* ptr){ \
     const FXMapEntry* me=(const FXMapEntry*)metaClass.search(sel); \
     return me ? (this->* me->func)(sender,sel,ptr) : baseclassname::handle(sender,sel,ptr); \

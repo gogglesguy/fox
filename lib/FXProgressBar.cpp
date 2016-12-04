@@ -270,17 +270,6 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
       // Light/dark bubble
       dc.fillHorizontalGradient(border+padleft,height-border-padbottom-barfilled,barwidth/2,barfilled,makeHiliteColor(barColor,40),barColor);
       dc.fillHorizontalGradient(border+padleft+barwidth/2,height-border-padbottom-barfilled,barwidth-barwidth/2,barfilled,barColor,makeShadowColor(barColor,20));
-
-      // Bubble
-      //dc.fillHorizontalGradient(border+padleft,height-border-padbottom-barfilled,barwidth/2,barfilled,makeHiliteColor(barColor,60),barColor);
-      //dc.fillHorizontalGradient(border+padleft+barwidth/2,height-border-padbottom-barfilled,barwidth-barwidth/2,barfilled,barColor,makeHiliteColor(barColor,60));
-
-      // Original code
-      //dc.setForeground(barColor);
-      //dc.fillRectangle(border+padleft,height-border-padbottom-barfilled,barwidth,barfilled);
-
-      // Increasing gradient
-      //dc.fillVerticalGradient(border+padleft,height-border-padbottom-barfilled,barwidth,barfilled,makeBlendColor(barBGColor,barColor,20+(80*percent)/100),makeBlendColor(barBGColor,barColor,20));
       }
 
     // Draw uncompleted bar
@@ -333,17 +322,6 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
       // Light/dark bubble
       dc.fillVerticalGradient(border+padleft,border+padtop,barfilled,barwidth/2,makeHiliteColor(barColor,40),barColor);
       dc.fillVerticalGradient(border+padleft,border+padtop+barwidth/2,barfilled,barwidth-barwidth/2,barColor,makeShadowColor(barColor,20));
-
-      // Bubble
-      //dc.fillVerticalGradient(border+padleft,border+padtop,barfilled,barwidth/2,makeHiliteColor(barColor,60),barColor);
-      //dc.fillVerticalGradient(border+padleft,border+padtop+barwidth/2,barfilled,barwidth-barwidth/2,barColor,makeHiliteColor(barColor,60));
-
-      // Original code
-      //dc.setForeground(barColor);
-      //dc.fillRectangle(border+padleft,border+padtop,barfilled,barwidth);
-
-      // Increasing gradient
-      //dc.fillHorizontalGradient(border+padleft,border+padtop,barfilled,barwidth,makeBlendColor(barBGColor,barColor,20),makeBlendColor(barBGColor,barColor,20+(80*percent)/100));
       }
 
     // Draw uncompleted bar

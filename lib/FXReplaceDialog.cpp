@@ -311,7 +311,7 @@ long FXReplaceDialog::onUpdDir(FXObject* sender,FXSelector,void*){
 
 
 // Change wrap mode
-long FXReplaceDialog::onCmdWrap(FXObject*,FXSelector,void* ptr){
+long FXReplaceDialog::onCmdWrap(FXObject*,FXSelector,void*){
   searchmode^=SEARCH_WRAP;
   return 1;
   }
@@ -325,7 +325,7 @@ long FXReplaceDialog::onUpdWrap(FXObject* sender,FXSelector,void*){
 
 
 // Change case sensitive mode
-long FXReplaceDialog::onCmdCase(FXObject*,FXSelector,void* ptr){
+long FXReplaceDialog::onCmdCase(FXObject*,FXSelector,void*){
   searchmode^=SEARCH_IGNORECASE;
   return 1;
   }

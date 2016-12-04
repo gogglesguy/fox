@@ -73,7 +73,7 @@
 /*******************************************************************************/
 
 
-const char version[]="5.3.0";
+const char version[]="6.0.0";
 
 
 typedef struct {
@@ -319,7 +319,7 @@ static int processresourcefile(const char* filename,const char* name,OPTIONS* op
         fprintf(opts->outfile,"=\n  \"");
         while((b=fgetc(file))!=EOF){
           if(!opts->binary && (b=='\r')) continue;
-          if(col>=opts->maxcols){
+          if(col>=opts->maxcols && opts->maxcols){
             fprintf(opts->outfile,"\"\n  \"");
             col=0;
             }
@@ -347,13 +347,14 @@ static int processresourcefile(const char* filename,const char* name,OPTIONS* op
       else{
         col=0;
         first=1;
-        fprintf(opts->outfile,"={\n  ");
+        fprintf(opts->outfile,"={");
+        if(opts->maxcols) fprintf(opts->outfile,"\n  ");
         while((b=fgetc(file))!=EOF){
           if(!opts->binary && (b=='\r')) continue;
           if(!first){
             fprintf(opts->outfile,",");
             }
-          if(col>=opts->maxcols){
+          if(col>=opts->maxcols && opts->maxcols){
             fprintf(opts->outfile,"\n  ");
             col=0;
             }
@@ -366,7 +367,8 @@ static int processresourcefile(const char* filename,const char* name,OPTIONS* op
           first=0;
           col++;
           }
-        fprintf(opts->outfile,"\n  }");
+        if(opts->maxcols) fprintf(opts->outfile,"\n  ");
+        fprintf(opts->outfile,"}");
         }
       }
 
@@ -593,7 +595,7 @@ int main(int argc,char **argv){
           fprintf(stderr,"reswrap: missing argument for -c or --columns option\n");
           exit(1);
           }
-        if(sscanf(argv[arg],"%d",&opts.maxcols)==1 && opts.maxcols<1){
+        if(sscanf(argv[arg],"%d",&opts.maxcols)==1 && opts.maxcols<0){
           fprintf(stderr,"reswrap: illegal argument for number of columns\n");
           exit(1);
           }

@@ -264,51 +264,6 @@ void FXApp::dragdropGetTypes(const FXWindow*,FXDragType*& types,FXuint& numtypes
 
 /*******************************************************************************/
 
-
-// When called, grab the true API from the DLL if we can
-static BOOL WINAPI MyGetMonitorInfo(HANDLE monitor,MYMONITORINFO* minfo){
-  HINSTANCE hUser32;
-  PFNGETMONITORINFO gmi;
-  if((hUser32=GetModuleHandleA("USER32")) && (gmi=(PFNGETMONITORINFO)GetProcAddress(hUser32,"GetMonitorInfoA"))){
-    fxGetMonitorInfo=gmi;
-    return fxGetMonitorInfo(monitor,minfo);
-    }
-  return 0;
-  }
-
-
-// When called, grab the true API from the DLL if we can
-static HANDLE WINAPI MyMonitorFromRect(RECT* rect,DWORD flags){
-  HINSTANCE hUser32;
-  PFNMONITORFROMRECT mfr;
-  if((hUser32=GetModuleHandleA("USER32")) && (mfr=(PFNMONITORFROMRECT)GetProcAddress(hUser32,"MonitorFromRect"))){
-    fxMonitorFromRect=mfr;
-    return fxMonitorFromRect(rect,flags);
-    }
-  return NULL;
-  }
-
-
-// When called, grab the true API from the DLL if we can
-static HANDLE WINAPI MyMonitorFromWindow(HWND hwnd,DWORD flags){
-  HINSTANCE hUser32;
-  PFNMONITORFROMWINDOW mfw;
-  if((hUser32=GetModuleHandleA("USER32")) && (mfw=(PFNMONITORFROMWINDOW)GetProcAddress(hUser32,"MonitorFromWindow"))){
-    fxMonitorFromWindow=mfw;
-    return fxMonitorFromWindow(hwnd,flags);
-    }
-  return NULL;
-  }
-
-
-PFNGETMONITORINFO fxGetMonitorInfo=MyGetMonitorInfo;
-PFNMONITORFROMRECT fxMonitorFromRect=MyMonitorFromRect;
-PFNMONITORFROMWINDOW fxMonitorFromWindow=MyMonitorFromWindow;
-
-
-/*******************************************************************************/
-
-
 #else                   // X11
 
 

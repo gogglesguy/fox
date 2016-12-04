@@ -54,7 +54,7 @@
      - file:///C/TEMP/                     --, --, --
 
     The conclusion seems to be we should probably try to handle all
-    of these possibilities, although keeping the `:' seems favorable.
+    of these possibilities, although keeping the ':' seems favorable.
 
   - Syntax (as per rfc3986):
 
@@ -154,22 +154,47 @@
       sub-delims    =  "!" / "$" / "&" / "'" / "(" / ")"
                     /  "*" / "+" / "," / ";" / "="
 
+  - Also, encode all non-ascii bytes from a string.
 */
 
-#define UNRESERVED   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~" // Unreserved characters
-#define IPV6DIGITS   "abcdefABCDEF0123456789:."                                           // Stuff in IPv6 numbers
-#define PCTENCODED   "%0123456789abcdefABCDEF"                                            // Percent encoded characters
-#define GENDELIMS    ":/?#[]@"                                                            // General delimiters
-#define SUBDELIMS    "!$&'()*+,;="                                                        // Sub-delimiters
-#define RESERVED     ":/?#[]@!$&'()*+,;="                                                 // Reserved characters (GENDELIMS + SUBDELIMS)
-#define UNSAFE       "<>#%{}|^~[]`\" "                                                    // Unsafe characters
-#define ENCODE_THESE "<>#%{}|^~[]`\"?$&'*,;="                                             // Encode these for pathnames
+#define ENCODE_THESE "<>#%{}|^~[]`\"?$&'*,;="           // Encode these for pathnames
 
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
+
+// Character classes
+enum {
+  UNRESERVED =  1,
+  PERCENT    =  2,
+  SUBDELIM   =  4,
+  GENDELIM   =  8,
+  PATHCHAR   = 16,
+  QUERYCHAR  = 32
+  };
+
+
+// Table of character classes
+static const FXuchar properties[256]={
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x10,0x04,0x00,0x08,0x04,0x32,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x01,0x01,0x38,
+  0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x38,0x04,0x00,0x04,0x00,0x28,
+  0x38,0x03,0x03,0x03,0x03,0x03,0x03,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x08,0x10,0x08,0x00,0x01,
+  0x00,0x03,0x03,0x03,0x03,0x03,0x03,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0x00,0x00,0x01,0x00,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  };
 
 
 // URL parts
@@ -191,6 +216,7 @@ public:
 // Parse string to url parts
 URL::URL(const FXString& string){
   register FXint s=0;
+  register FXuchar c;
 
   prot[0]=prot[1]=0;
 
@@ -221,7 +247,7 @@ URL::URL(const FXString& string){
 
     // Parse username
     user[0]=s;
-    while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
+    while((c=string[s])!='\0' && (properties[c]&(UNRESERVED|SUBDELIM|PERCENT))){
       s++;
       }
 
@@ -229,7 +255,7 @@ URL::URL(const FXString& string){
     user[1]=pass[0]=s;
     if(string[s]==':'){
       pass[0]=++s;
-      while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
+      while((c=string[s])!='\0' && (properties[c]&(UNRESERVED|SUBDELIM|PERCENT))){
         s++;
         }
       }
@@ -245,7 +271,7 @@ URL::URL(const FXString& string){
 
     // Parse hostname
     host[0]=s;
-    while(string[s] && strchr(UNRESERVED SUBDELIMS "%",string[s])){
+    while((c=string[s])!='\0' && (properties[c]&(UNRESERVED|SUBDELIM|PERCENT))){
       s++;
       }
 
@@ -258,25 +284,17 @@ URL::URL(const FXString& string){
     port[1]=s;
     }
 
-#ifdef WIN32
   // Parse path, allowing for \ path delimiters (legacy urls)
   path[0]=s;
-  while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/\\ ",string[s])){
+  while((c=string[s])!='\0' && (properties[c]&(UNRESERVED|SUBDELIM|PATHCHAR))){
     s++;
     }
-#else
-  // Parse path
-  path[0]=s;
-  while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/ ",string[s])){
-    s++;
-    }
-#endif
 
   // Parse query
   path[1]=quer[0]=s;
   if(string[s]=='?'){
     quer[0]=++s;
-    while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/?",string[s])){
+    while((c=string[s])!='\0' && (properties[c]&(UNRESERVED|SUBDELIM|QUERYCHAR))){
       s++;
       }
     }
@@ -285,7 +303,7 @@ URL::URL(const FXString& string){
   quer[1]=frag[0]=s;
   if(string[s]=='#'){
     frag[0]=++s;
-    while(string[s] && strchr(UNRESERVED SUBDELIMS "%:@/?",string[s])){
+    while((c=string[s])!='\0' && (properties[c]&(UNRESERVED|SUBDELIM|QUERYCHAR))){
       s++;
       }
     }
@@ -300,7 +318,7 @@ FXString FXURL::encode(const FXString& url,const FXchar* set){
     register FXint p,q,c;
     for(p=q=0; p<url.length(); ++p){
       c=(FXuchar)url[p];
-      if(c<0x20 || c=='%' || (set && strchr(set,c))){
+      if(c<0x20 || 128<=c || c=='%' || (set && strchr(set,c))){
         q+=3;
         continue;
         }
@@ -309,7 +327,7 @@ FXString FXURL::encode(const FXString& url,const FXchar* set){
     result.length(q);
     for(p=q=0; p<url.length(); ++p){
       c=(FXuchar)url[p];
-      if(c<0x20 || c=='%' || (set && strchr(set,c))){
+      if(c<0x20 || 128<=c || c=='%' || (set && strchr(set,c))){
         result[q++]='%';
         result[q++]=FXString::value2Digit[c>>4];
         result[q++]=FXString::value2Digit[c&15];

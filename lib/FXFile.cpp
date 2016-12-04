@@ -36,12 +36,12 @@
 #include "FXDir.h"
 
 
-
 /*
   Notes:
 
-  - Implemented many functions in terms of FXFile and FXDir
-    so we won't have to worry about unicode stuff.
+  - Implemented many functions in terms of FXFile and FXDir so we won't have to worry about
+    unicode stuff.
+
 */
 
 // Bad handle value
@@ -302,79 +302,7 @@ FXbool FXFile::create(const FXString& file,FXuint perm){
   return false;
   }
 
-
-// Remove a file
-FXbool FXFile::remove(const FXString& file){
-  if(!file.empty()){
-#if defined(WIN32)
-#if defined(UNICODE)
-    FXnchar unifile[MAXPATHLEN];
-    utf2ncs(unifile,file.text(),MAXPATHLEN);
-    return ::DeleteFileW(unifile)!=0;
-#else
-    return ::DeleteFileA(file.text())!=0;
-#endif
-#else
-    return ::unlink(file.text())==0;
-#endif
-    }
-  return false;
-  }
-
-
-// Rename file
-FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
-  if(srcfile!=dstfile){
-#if defined(WIN32)
-#if defined(UNICODE)
-    FXnchar srcname[MAXPATHLEN];
-    FXnchar dstname[MAXPATHLEN];
-    utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
-    utf2ncs(dstname,dstfile.text(),MAXPATHLEN);
-    return ::MoveFileExW(srcname,dstname,MOVEFILE_REPLACE_EXISTING)!=0;
-#else
-    return ::MoveFileExA(srcfile.text(),dstfile.text(),MOVEFILE_REPLACE_EXISTING)!=0;
-#endif
-#else
-    return ::rename(srcfile.text(),dstfile.text())==0;
-#endif
-    }
-  return false;
-  }
-
-
-#if defined(WIN32)
-
-typedef BOOL (WINAPI *FunctionCreateHardLink)(const TCHAR*,const TCHAR*,LPSECURITY_ATTRIBUTES);
-
-static BOOL WINAPI HelpCreateHardLink(const TCHAR*,const TCHAR*,LPSECURITY_ATTRIBUTES);
-
-static FunctionCreateHardLink MyCreateHardLink=HelpCreateHardLink;
-
-
-// The first time its called, we're setting the function pointer, so
-// subsequent calls will experience no additional overhead whatsoever!
-static BOOL WINAPI HelpCreateHardLink(const TCHAR* newname,const TCHAR* oldname,LPSECURITY_ATTRIBUTES sa){
-#if defined(UNICODE)
-  HMODULE hkernel=LoadLibraryW(L"Kernel32");
-  if(hkernel){
-    MyCreateHardLink=(FunctionCreateHardLink)::GetProcAddress(hkernel,"CreateHardLinkW");
-    ::FreeLibrary(hkernel);
-    return MyCreateHardLink(newname,oldname,sa);
-    }
-#else
-  HMODULE hkernel=LoadLibraryA("Kernel32");
-  if(hkernel){
-    MyCreateHardLink=(FunctionCreateHardLink)::GetProcAddress(hkernel,"CreateHardLinkA");
-    ::FreeLibrary(hkernel);
-    return MyCreateHardLink(newname,oldname,sa);
-    }
-#endif
-  return 0;
-  }
-
-#endif
-
+/*******************************************************************************/
 
 // Link file
 FXbool FXFile::link(const FXString& srcfile,const FXString& dstfile){
@@ -385,9 +313,9 @@ FXbool FXFile::link(const FXString& srcfile,const FXString& dstfile){
     FXnchar dstname[MAXPATHLEN];
     utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
     utf2ncs(dstname,dstfile.text(),MAXPATHLEN);
-    return MyCreateHardLink(dstname,srcname,NULL)!=0;
+    return CreateHardLinkW(dstname,srcname,NULL)!=0;
 #else
-    return MyCreateHardLink(dstfile.text(),srcfile.text(),NULL)!=0;
+    return CreateHardLinkA(dstfile.text(),srcfile.text(),NULL)!=0;
 #endif
 #else
     return ::link(srcfile.text(),dstfile.text())==0;
@@ -422,8 +350,9 @@ FXbool FXFile::symlink(const FXString& srcfile,const FXString& dstfile){
   return false;
   }
 
+/*******************************************************************************/
 
-// Return true if files are identical
+// Return true if files are identical (identical node on disk)
 FXbool FXFile::identical(const FXString& file1,const FXString& file2){
   if(file1!=file2){
     FXStat info1;
@@ -436,22 +365,26 @@ FXbool FXFile::identical(const FXString& file1,const FXString& file2){
   return true;
   }
 
+/*******************************************************************************/
 
 // Copy srcfile to dstfile, overwriting dstfile if allowed
 FXbool FXFile::copy(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
   if(srcfile!=dstfile){
-    FXuchar buffer[4096]; FXival nwritten,nread; FXStat stat;
     FXFile src(srcfile,FXIO::Reading);
     if(src.isOpen()){
+      FXStat stat;
       if(FXStat::stat(src,stat)){
         FXFile dst(dstfile,overwrite?FXIO::Writing:FXIO::Writing|FXIO::Exclusive,stat.mode());
         if(dst.isOpen()){
+          FXuchar buffer[4096];
+          FXival  nwritten;
+          FXival  nread;
           while(1){
             nread=src.readBlock(buffer,sizeof(buffer));
             if(nread<0) return false;
             if(nread==0) break;
             nwritten=dst.writeBlock(buffer,nread);
-            if(nwritten<0) return false;
+            if(nwritten<nread) return false;
             }
           return true;
           }
@@ -461,6 +394,178 @@ FXbool FXFile::copy(const FXString& srcfile,const FXString& dstfile,FXbool overw
   return false;
   }
 
+
+// Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
+FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
+  if(srcfile!=dstfile){
+    FXStat srcstat;
+    FXStat dststat;
+
+    // Source file information
+    if(FXStat::statLink(srcfile,srcstat)){
+
+      // Destination file information
+      if(FXStat::statLink(dstfile,dststat)){
+
+        // Destination is a directory?
+        if(!dststat.isDirectory()){
+          if(!overwrite) return false;
+          if(!FXFile::remove(dstfile)) return false;
+          }
+        }
+
+      // Source is a directory
+      if(srcstat.isDirectory()){
+        FXString name;
+        FXDir dir;
+
+        // Open source directory
+        if(!dir.open(srcfile)) return false;
+
+        // Make destination directory if needed
+        if(!dststat.isDirectory()){
+
+          // Make directory
+          if(!FXDir::create(dstfile,srcstat.mode()|FXIO::OwnerWrite)) return false;
+          }
+
+        // Copy contents of source directory
+        while(dir.next(name)){
+
+          // Skip '.' and '..'
+          if(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))) continue;
+
+          // Recurse
+          if(!FXFile::copyFiles(srcfile+PATHSEP+name,dstfile+PATHSEP+name,overwrite)) return false;
+          }
+
+        // OK
+        return true;
+        }
+
+      // Source is a file
+      if(srcstat.isFile()){
+
+        // Simply copy
+        if(!FXFile::copy(srcfile,dstfile,overwrite)) return false;
+
+        // OK
+        return true;
+        }
+
+      // Source is symbolic link: make a new one
+      if(srcstat.isLink()){
+        FXString lnkfile=FXFile::symlink(srcfile);
+
+        // New symlink to whatever old one referred to
+        if(!FXFile::symlink(lnkfile,dstfile)) return false;
+
+        // OK
+        return true;
+        }
+
+      // Source is fifo: make a new one
+      if(srcstat.isFifo()){
+
+        // Make named pipe
+        if(!FXPipe::create(dstfile,srcstat.mode())) return false;
+
+        // OK
+        return true;
+        }
+
+      // Source is device/socket; only on UNIX
+#if !defined(WIN32)
+      if(srcstat.isDevice() || srcstat.isSocket()){
+        struct stat data;
+        if(::lstat(srcfile.text(),&data)==0){
+          return ::mknod(dstfile.text(),data.st_mode,data.st_rdev)==0;
+          }
+        }
+#endif
+      }
+    }
+  return false;
+  }
+
+/*******************************************************************************/
+
+// Move or rename srcfile to dstfile, overwriting dstfile if allowed
+FXbool FXFile::move(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
+  if(srcfile!=dstfile){
+#if defined(WIN32)
+#if defined(UNICODE)
+    FXnchar srcname[MAXPATHLEN];
+    FXnchar dstname[MAXPATHLEN];
+    utf2ncs(srcname,srcfile.text(),MAXPATHLEN);
+    utf2ncs(dstname,dstfile.text(),MAXPATHLEN);
+    return ::MoveFileExW(srcname,dstname,overwrite?MOVEFILE_REPLACE_EXISTING:0)!=0;
+#else
+    return ::MoveFileExA(srcfile.text(),dstfile.text(),overwrite?MOVEFILE_REPLACE_EXISTING:0)!=0;
+#endif
+#else
+    if(overwrite || !FXStat::exists(dstfile)){
+      return ::rename(srcfile.text(),dstfile.text())==0;
+      }
+#endif
+    }
+  return false;
+  }
+
+
+// Recursively copy or move files or directories from srcfile to dstfile, overwriting dstfile if allowed
+FXbool FXFile::moveFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
+  if(srcfile!=dstfile){
+    if(FXFile::move(srcfile,dstfile,overwrite)) return true;
+    if(FXFile::copyFiles(srcfile,dstfile,overwrite)){
+      return FXFile::removeFiles(srcfile,true);
+      }
+    }
+  return false;
+  }
+
+/*******************************************************************************/
+
+// Remove a file
+FXbool FXFile::remove(const FXString& file){
+  if(!file.empty()){
+#if defined(WIN32)
+#if defined(UNICODE)
+    FXnchar unifile[MAXPATHLEN];
+    utf2ncs(unifile,file.text(),MAXPATHLEN);
+    return ::DeleteFileW(unifile)!=0;
+#else
+    return ::DeleteFileA(file.text())!=0;
+#endif
+#else
+    return ::unlink(file.text())==0;
+#endif
+    }
+  return false;
+  }
+
+
+// Remove file or directory, recursively if allowed
+FXbool FXFile::removeFiles(const FXString& path,FXbool recursive){
+  FXStat stat;
+  if(FXStat::statLink(path,stat)){
+    if(stat.isDirectory()){
+      if(recursive){
+        FXDir dir(path);
+        FXString name;
+        while(dir.next(name)){
+          if(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))) continue;
+          if(!FXFile::removeFiles(path+PATHSEP+name,true)) return false;
+          }
+        }
+      return FXDir::remove(path);
+      }
+    return FXFile::remove(path);
+    }
+  return false;
+  }
+
+/*******************************************************************************/
 
 // Concatenate srcfile1 and srcfile2 to dstfile, overwriting dstfile if allowed
 FXbool FXFile::concat(const FXString& srcfile1,const FXString& srcfile2,const FXString& dstfile,FXbool overwrite){
@@ -493,145 +598,5 @@ FXbool FXFile::concat(const FXString& srcfile1,const FXString& srcfile2,const FX
     }
   return false;
   }
-
-/*******************************************************************************/
-
-// FIXME use FXFile::identical to keep struct on stack for cycle-test
-
-// Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
-FXbool FXFile::copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
-  if(srcfile!=dstfile){
-    FXString lnkfile;
-    FXString name;
-    FXStat srcstat;
-    FXStat dststat;
-    FXDir  dir;
-    //FXTRACE((100,"FXFile::copyFiles(%s,%s)\n",srcfile.text(),dstfile.text()));
-    if(FXStat::statLink(srcfile,srcstat)){
-
-      // Destination is a directory?
-      if(FXStat::statLink(dstfile,dststat)){
-        if(!dststat.isDirectory()){
-          if(!overwrite) return false;
-          //FXTRACE((100,"FXFile::remove(%s)\n",dstfile.text()));
-          if(!FXFile::remove(dstfile)) return false;
-          }
-        }
-
-      // Source is a directory
-      if(srcstat.isDirectory()){
-
-        // Open source directory
-        if(!dir.open(srcfile)) return false;
-
-        // Make destination directory if needed
-        if(!dststat.isDirectory()){
-          //FXTRACE((100,"FXDir::create(%s)\n",dstfile.text()));
-
-          // Make directory
-          if(!FXDir::create(dstfile,srcstat.mode()|FXIO::OwnerWrite)) return false;
-          }
-
-        // Copy contents of source directory
-        while(dir.next(name)){
-
-          // Skip '.' and '..'
-          if(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))) continue;
-
-          // Recurse
-          if(!FXFile::copyFiles(srcfile+PATHSEP+name,dstfile+PATHSEP+name,overwrite)) return false;
-          }
-
-        // OK
-        return true;
-        }
-
-      // Source is a file
-      if(srcstat.isFile()){
-        //FXTRACE((100,"FXFile::copy(%s,%s)\n",srcfile.text(),dstfile.text()));
-
-        // Simply copy
-        if(!FXFile::copy(srcfile,dstfile,overwrite)) return false;
-
-        // OK
-        return true;
-        }
-
-      // Source is symbolic link: make a new one
-      if(srcstat.isLink()){
-        lnkfile=FXFile::symlink(srcfile);
-        //FXTRACE((100,"symlink(%s,%s)\n",lnkfile.text(),dstfile.text()));
-
-        // New symlink to whatever old one referred to
-        if(!FXFile::symlink(lnkfile,dstfile)) return false;
-
-        // OK
-        return true;
-        }
-
-      // Source is fifo: make a new one
-      if(srcstat.isFifo()){
-        //FXTRACE((100,"FXPipe::create(%s)\n",dstfile.text()));
-
-        // Make named pipe
-        if(!FXPipe::create(dstfile,srcstat.mode())) return false;
-
-        // OK
-        return true;
-        }
-
-/*
-  // Source is device: make a new one
-  if(S_ISBLK(status1.st_mode) || S_ISCHR(status1.st_mode) || S_ISSOCK(status1.st_mode)){
-    FXTRACE((100,"mknod(%s)\n",newfile.text()));
-    return ::mknod(newfile.text(),status1.st_mode,status1.st_rdev)==0;
-    }
-*/
-
-      }
-    }
-  return false;
-  }
-
-
-
-// Recursively copy or move files or directories from srcfile to dstfile, overwriting dstfile if allowed
-FXbool FXFile::moveFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite){
-  if(srcfile!=dstfile){
-    if(FXStat::exists(srcfile)){
-      if(FXStat::exists(dstfile)){
-        if(!overwrite) return false;
-        if(!FXFile::removeFiles(dstfile,true)) return false;
-        }
-      if(FXDir::rename(srcfile,dstfile)) return true;
-      if(FXFile::copyFiles(srcfile,dstfile,overwrite)){
-        return FXFile::removeFiles(srcfile,true);
-        }
-      }
-    }
-  return false;
-  }
-
-
-// Remove file or directory, recursively if allowed
-FXbool FXFile::removeFiles(const FXString& path,FXbool recursive){
-  FXStat stat;
-  if(FXStat::statLink(path,stat)){
-    if(stat.isDirectory()){
-      if(recursive){
-        FXDir dir(path);
-        FXString name;
-        while(dir.next(name)){
-          if(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0'))) continue;
-          if(!FXFile::removeFiles(path+PATHSEP+name,true)) return false;
-          }
-        }
-      return FXDir::remove(path);
-      }
-    return FXFile::remove(path);
-    }
-  return false;
-  }
-
 
 }

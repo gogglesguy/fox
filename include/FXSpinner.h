@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                        S p i n   B u t t o n   W i d g e t                    *
+*                          S p i n n e r   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1998,2016 by Lyle Johnson.   All Rights Reserved.               *
@@ -62,7 +62,6 @@ public:
   long onCmdIncrement(FXObject*,FXSelector,void*);
   long onUpdDecrement(FXObject*,FXSelector,void*);
   long onCmdDecrement(FXObject*,FXSelector,void*);
-  long onUpdEntry(FXObject*,FXSelector,void*);
   long onChgEntry(FXObject*,FXSelector,void*);
   long onCmdEntry(FXObject*,FXSelector,void*);
   long onWheelEntry(FXObject*,FXSelector,void*);
@@ -102,6 +101,9 @@ public:
 
   /// Return default height
   virtual FXint getDefaultHeight();
+
+  /// Notification that focus moved to new child
+  virtual void changeFocus(FXWindow *child);
 
   /// Increment spinner
   void increment(FXbool notify=false);

@@ -196,6 +196,30 @@ const FXchar fallbackPatterns[]=
 // Make some windows
 PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,DECOR_ALL,0,0,800,600,0,0),bookmarkeddirs(a,"Bookmarked Directories"){
 
+  // Totals
+  totalCount=0;
+  totalSpace=0L;
+  selectedCount=0;
+  selectedSpace=0L;
+
+  // Zero out mode bits
+  selectedModeBits[0]=0;
+  selectedModeBits[1]=0;
+  selectedModeBits[2]=0;
+  selectedModeBits[3]=0;
+  selectedModeBits[4]=0;
+  selectedModeBits[5]=0;
+  selectedModeBits[6]=0;
+  selectedModeBits[7]=0;
+  selectedModeBits[8]=0;
+  selectedModeBits[9]=0;
+  selectedModeBits[10]=0;
+  selectedModeBits[11]=0;
+  selectedModeBits[12]=0;
+  selectedModeBits[13]=0;
+  selectedModeBits[14]=0;
+  selectedModeBits[15]=0;
+
   // Make some icons
   foxbigicon=new FXGIFIcon(getApp(),foxbig);
   foxminiicon=new FXGIFIcon(getApp(),foxmini);
@@ -337,6 +361,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuTitle(menubar,tr("&Edit"),NULL,editmenu);
   new FXMenuCommand(editmenu,tr("Cu&t\tCtl-X\tCut to clipboard."),cuticon,filelist,FXFileList::ID_CUT_SEL);
   new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy to clipboard."),copyicon,filelist,FXFileList::ID_COPY_SEL);
+  new FXMenuCommand(editmenu,tr("Delete\t\tDelete Selected files."),deleteicon,this,ID_DELETE);
   new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),pasteicon,filelist,FXFileList::ID_PASTE_SEL);
   new FXMenuSeparator(editmenu);
   new FXMenuCommand(editmenu,tr("Select files\tCtl-S\tSelect files matching wildcard."),NULL,this,ID_WILDCARD_SELECT);
@@ -546,15 +571,6 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // Recent directories
   visiting=0;
-
-  // Totals
-  totalCount=0;
-  totalSpace=0L;
-  selectedCount=0;
-  selectedSpace=0L;
-
-  // Zero out mode bits
-  memset(selectedModeBits,0,sizeof(selectedModeBits));
 
   // Image previewing and blending
   preview=true;

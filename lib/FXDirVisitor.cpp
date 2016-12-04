@@ -57,30 +57,43 @@ namespace FX {
 
 // Keep track of visited directories
 struct FXDirVisitor::Seen {
-  Seen   *next;
-  FXlong  node;
+  FXStat  stat;                 // File status
+  Seen**  current;              // Current one
+  Seen*   last;                 // Link last visited directory
+
+  // Save old value of current, point it here
+  Seen(Seen** cur):current(cur),last(*cur){ *current=this; }
+
+  // Restore old value of current
+ ~Seen(){ *current=last; }
   };
 
 
-// Recurse, keeping track of where we've been already
-FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen,FXint depth){
+
+// Return info on current file
+const FXStat& FXDirVisitor::info() const {
+  return current->stat;
+  }
+
+
+// Recursively traverse starting from path
+FXuint FXDirVisitor::traverse(const FXString& path,FXint depth){
   if(0<depth){
-    FXStat data;
-    if(FXStat::statLink(path,data)){
-      if(data.isDirectory()){                     // Directory
+    Seen node(&current);
+    if(FXStat::statLink(path,node.stat)){
+      if(node.stat.isDirectory()){              // Directory
         FXuint code;
-        for(Seen *s=seen; s; s=s->next){
-          if(data.index()==s->node) return 0;     // Skip if we've been here already
+        for(Seen *s=node.last; s; s=s->last){
+          if(node.stat.index()==s->stat.index() && node.stat.volume()==s->stat.volume()) return 0;         // Skip if we've been here already
           }
-        if((code=enter(path))==1){                // Conditionally enter subdirectories
-          Seen here={seen,data.index()};
+        if((code=enter(path))==1){              // Conditionally enter subdirectories
           FXDir directory(path);
           FXString name;
           while(directory.next(name)){
-            if(!(name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))){
-              if(recurse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,&here,depth-1)==2){
+            if(!(name[0]=='.' && (name[1]=='\0' || (name[1]=='.' && name[2]=='\0')))){
+              if(traverse(path+(ISPATHSEP(path.tail())?"":PATHSEPSTRING)+name,depth-1)==2){
                 leave(path);
-                return 2;                         // Bail
+                return 2;                       // Bail
                 }
               }
             }
@@ -88,16 +101,10 @@ FXuint FXDirVisitor::recurse(const FXString& path,Seen *seen,FXint depth){
           }
         return code;
         }
-      return visit(path);                         // Regular file
+      return visit(path);                       // Regular file
       }
     }
   return 0;
-  }
-
-
-// Recursively traverse starting from path
-FXuint FXDirVisitor::traverse(const FXString& path,FXint depth){
-  return recurse(path,NULL,depth);
   }
 
 
@@ -123,13 +130,15 @@ FXuint FXDirVisitor::leave(const FXString&){
 FXDirVisitor::~FXDirVisitor(){
   }
 
+
 /*******************************************************************************/
+
 
 // Recursively traverse starting from path
 FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& wild,FXuint opts,FXint depth){
   wildcard=wild;
   options=opts;
-  return recurse(path,NULL,depth);
+  return FXDirVisitor::traverse(path,depth);
   }
 
 
@@ -165,16 +174,12 @@ FXuint FXGlobVisitor::leave(const FXString&){
 FXGlobVisitor::~FXGlobVisitor(){
   }
 
-/*******************************************************************************/
 
+/*******************************************************************************/
 
 
 // Create new glob counting visitor
 FXGlobCountVisitor::FXGlobCountVisitor():countFolders(0),countFiles(0),countBytes(0),maxDepth(0),depth(0){
-  }
-
-// Copy glob counting visitor
-FXGlobCountVisitor::FXGlobCountVisitor(const FXGlobCountVisitor& org):countFolders(org.countFolders),countFiles(org.countFiles),countBytes(org.countBytes),maxDepth(org.maxDepth),depth(0){
   }
 
 
@@ -199,7 +204,7 @@ FXuint FXGlobCountVisitor::enter(const FXString& path){
 // He mister tally man, tally me banana...
 FXuint FXGlobCountVisitor::visit(const FXString& path){
   if(FXGlobVisitor::visit(path)){
-    countBytes+=FXStat::size(path);
+    countBytes+=info().size();
     countFiles++;
     return 1;
     }

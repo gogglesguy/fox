@@ -314,6 +314,7 @@ long FXFileSelector::onCmdItemSelected(FXObject*,FXSelector,void* ptr){
     for(i=0; i<filebox->getNumItems(); i++){
       if(filebox->isItemSelected(i) && !filebox->isItemDirectory(i)){
         if(!text.empty()) text+=' ';
+        //text+=FXPath::enquote(filebox->getItemFilename(i));
         text+="\""+filebox->getItemFilename(i)+"\"";
         }
       }
@@ -323,6 +324,7 @@ long FXFileSelector::onCmdItemSelected(FXObject*,FXSelector,void* ptr){
     for(i=0; i<filebox->getNumItems(); i++){
       if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         if(!text.empty()) text+=' ';
+        //text+=FXPath::enquote(filebox->getItemFilename(i));
         text+="\""+filebox->getItemFilename(i)+"\"";
         }
       }
@@ -331,13 +333,13 @@ long FXFileSelector::onCmdItemSelected(FXObject*,FXSelector,void* ptr){
   else if(selectmode==SELECTFILE_DIRECTORY){
     if(filebox->isItemDirectory(index)){
       text=filebox->getItemFilename(index);
-      filename->setText(text);
+      filename->setText(text);          // FIXME Should we enquote here too?
       }
     }
   else{
     if(!filebox->isItemDirectory(index)){
       text=filebox->getItemFilename(index);
-      filename->setText(text);
+      filename->setText(text);          // FIXME Should we enquote here too?
       }
     }
   return 1;
@@ -352,6 +354,7 @@ long FXFileSelector::onCmdItemDeselected(FXObject*,FXSelector,void*){
     for(i=0; i<filebox->getNumItems(); i++){
       if(filebox->isItemSelected(i) && !filebox->isItemDirectory(i)){
         if(!text.empty()) text+=' ';
+        //text+=FXPath::enquote(filebox->getItemFilename(i));
         text+="\""+filebox->getItemFilename(i)+"\"";
         }
       }
@@ -361,6 +364,7 @@ long FXFileSelector::onCmdItemDeselected(FXObject*,FXSelector,void*){
     for(i=0; i<filebox->getNumItems(); i++){
       if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         if(!text.empty()) text+=' ';
+        //text+=FXPath::enquote(filebox->getItemFilename(i));
         text+="\""+filebox->getItemFilename(i)+"\"";
         }
       }
@@ -483,8 +487,8 @@ long FXFileSelector::onCmdAccept(FXObject*,FXSelector,void*){
 // and select the directory we just came from in that directory; this allows
 // a quick jump back into the original directory in case we went up too far.
 long FXFileSelector::onCmdDirectoryUp(FXObject*,FXSelector,void*){
-//  if(allowNavigation()) setDirectory(FXPath::upLevel(filebox->getDirectory()));
-  if(allowNavigation()) setFilename(filebox->getDirectory());
+  if(allowNavigation()) setDirectory(FXPath::upLevel(getDirectory()));
+//  if(allowNavigation()) setFilename(getDirectory()); // FIXME
   return 1;
   }
 
@@ -941,14 +945,14 @@ void FXFileSelector::setFilename(const FXString& path){
 // Get complete path + filename
 FXString FXFileSelector::getFilename() const {
   register FXint i;
-  if(selectmode==SELECTFILE_MULTIPLE_ALL){
+  if(selectmode==SELECTFILE_MULTIPLE_ALL){              // FIXME just return first item from text box
     for(i=0; i<filebox->getNumItems(); i++){
       if(filebox->isItemSelected(i) && !filebox->isItemNavigational(i)){
         return FXPath::absolute(filebox->getDirectory(),filebox->getItemFilename(i));
         }
       }
     }
-  else if(selectmode==SELECTFILE_MULTIPLE){
+  else if(selectmode==SELECTFILE_MULTIPLE){             // FIXME just return first item from text box
     for(i=0; i<filebox->getNumItems(); i++){
       if(filebox->isItemSelected(i) && !filebox->isItemDirectory(i)){
         return FXPath::absolute(filebox->getDirectory(),filebox->getItemFilename(i));
@@ -956,7 +960,7 @@ FXString FXFileSelector::getFilename() const {
       }
     }
   else{
-    if(!filename->getText().empty()){
+    if(!filename->getText().empty()){                   // FIXME dequote if we're enquoting
       return FXPath::absolute(filebox->getDirectory(),FXPath::expand(filename->getText()));
       }
     }
@@ -966,7 +970,7 @@ FXString FXFileSelector::getFilename() const {
 
 
 // Return empty-string terminated list of selected file names, or NULL
-FXString* FXFileSelector::getFilenames() const {
+FXString* FXFileSelector::getFilenames() const {        // FIXME should build list from contents of text box
   register FXString *files;
   if(selectmode==SELECTFILE_MULTIPLE_ALL){
     files=getSelectedFiles();

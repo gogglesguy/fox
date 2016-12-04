@@ -655,7 +655,7 @@ static FXbool glXUseXftFont(XftFont* font,int first,int count,int listBase){
     if(!allocElms(glyph,size)) goto x;
 
     // Copy into OpenGL bitmap format; note OpenGL upside down
-    for(y=0; y<face->glyph->bitmap.rows; y++){
+    for(y=0; y<(FXint)face->glyph->bitmap.rows; y++){
       for(x=0; x<face->glyph->bitmap.pitch; x++){
         glyph[y*face->glyph->bitmap.pitch+x]=face->glyph->bitmap.buffer[(face->glyph->bitmap.rows-y-1)*face->glyph->bitmap.pitch+x];
         }

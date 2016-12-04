@@ -123,14 +123,9 @@
 +FXGIFIcon.obj &
 +FXGIFImage.obj &
 +FXGLCanvas.obj &
-+FXGLCone.obj &
 +FXGLContext.obj &
-+FXGLCube.obj &
-+FXGLCylinder.obj &
 +FXGLObject.obj &
 +FXGLShape.obj &
-+FXGLSphere.obj &
-+FXGLTriangleMesh.obj &
 +FXGLViewer.obj &
 +FXGLVisual.obj &
 +FXGradientBar.obj &

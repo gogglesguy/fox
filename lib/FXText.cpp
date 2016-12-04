@@ -504,8 +504,14 @@ FXbool FXText::isPosSelected(FXint pos) const {
 
 // Check if w is delimiter
 static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
-  return w<128 && strchr(delimiters,w); // FIXME for w>=128
+  FXchar wcs[5]={'\0','\0','\0','\0','\0'};
+  if(128<=w){
+    wc2utf(wcs,w);  
+    return (strstr(delimiters,wcs)!=NULL);
+    }
+  return (strchr(delimiters,w)!=NULL);
   }
+
 
 // Make a valid position, at the start of a wide character
 FXint FXText::validPos(FXint pos) const {
@@ -642,7 +648,8 @@ FXint FXText::charWidth(FXwchar ch,FXint indent) const {
 
 // Start of next wrapped line
 FXint FXText::wrap(FXint start) const {
-  register FXint lw,cw,p,s,c;
+  register FXint lw,cw,p,s;
+  register FXwchar c;
   FXASSERT(0<=start && start<=length);
   lw=0;
   p=s=start;
@@ -678,7 +685,8 @@ FXint FXText::countLines(FXint start,FXint end) const {
 
 // Count number of rows; start should be on a row start
 FXint FXText::countRows(FXint start,FXint end) const {
-  register FXint p,q,s,c,cw,w=0,nr=0;
+  register FXint p,q,s,cw,w=0,nr=0;
+  register FXwchar c;
   FXASSERT(0<=start && end<=length+1);
   if(options&TEXT_WORDWRAP){
     p=q=s=start;
@@ -723,7 +731,8 @@ FXint FXText::countRows(FXint start,FXint end) const {
 
 // Count number of columns; start should be on a row start
 FXint FXText::countCols(FXint start,FXint end) const {
-  register FXint nc=0,in=0,ch;
+  register FXint nc=0,in=0;
+  register FXwchar ch;
   FXASSERT(0<=start && end<=length);
   while(start<end){
     ch=getChar(start);
@@ -746,7 +755,8 @@ FXint FXText::countCols(FXint start,FXint end) const {
 
 // Measure lines; start and end should be on a row start
 FXint FXText::measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const {
-  register FXint nr=0,w=0,c,cw,p,q,s;
+  register FXint nr=0,w=0,cw,p,q,s;
+  register FXwchar c;
   FXASSERT(0<=start && end<=length+1);
   if(options&TEXT_WORDWRAP){
     wmax=wrapwidth;
@@ -808,7 +818,7 @@ FXint FXText::measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const {
 
 // Find end of previous word
 FXint FXText::leftWord(FXint pos) const {
-  register FXint ch;
+  register FXwchar ch;
   FXASSERT(0<=pos && pos<=length);
   if(0<pos){
     pos=dec(pos);
@@ -839,7 +849,7 @@ FXint FXText::leftWord(FXint pos) const {
 
 // Find begin of next word
 FXint FXText::rightWord(FXint pos) const {
-  register FXint ch;
+  register FXwchar ch;
   FXASSERT(0<=pos && pos<=length);
   if(pos<length){
     ch=getChar(pos);
@@ -870,9 +880,10 @@ FXint FXText::rightWord(FXint pos) const {
 
 // Find begin of a word
 FXint FXText::wordStart(FXint pos) const {
+  register FXwchar ch;
   FXASSERT(0<=pos && pos<=length);
   if(0<pos){
-    FXint ch=(pos<length)?getChar(pos):' ';
+    ch=(pos<length)?getChar(pos):' ';
     if(ch=='\n') return pos;
     if(Unicode::isBlank(ch)){
       while(0<pos){
@@ -902,9 +913,10 @@ FXint FXText::wordStart(FXint pos) const {
 
 // Find end of word
 FXint FXText::wordEnd(FXint pos) const {
+  register FXwchar ch;
   FXASSERT(0<=pos && pos<=length);
   if(pos<length){
-    FXint ch=getChar(pos);
+    ch=getChar(pos);
     if(ch=='\n') return pos+1;
     if(Unicode::isBlank(ch)){
       while(pos<length){
@@ -1074,14 +1086,14 @@ FXint FXText::lineWidth(FXint pos,FXint n) const {
 // Determine indent of position pos relative to start
 FXint FXText::indentFromPos(FXint start,FXint pos) const {
   register FXint p=start,in=0;
-  register FXwchar c;
+  register FXwchar ch;
   FXASSERT(0<=start && pos<=length);
   while(p<pos){
-    c=getChar(p);
-    if(c=='\n'){
+    ch=getChar(p);
+    if(ch=='\n'){
       in=0;
       }
-    else if(c=='\t'){
+    else if(ch=='\t'){
       in+=(tabcolumns-in%tabcolumns);
       }
     else{
@@ -1096,14 +1108,14 @@ FXint FXText::indentFromPos(FXint start,FXint pos) const {
 // Determine position of indent relative to start
 FXint FXText::posFromIndent(FXint start,FXint indent) const {
   register FXint pos=start,in=0;
-  register FXwchar c;
+  register FXwchar ch;
   FXASSERT(0<=start && start<=length);
   while(in<indent && pos<length){
-    c=getChar(pos);
-    if(c=='\n'){
+    ch=getChar(pos);
+    if(ch=='\n'){
       break;
       }
-    else if(c=='\t'){
+    else if(ch=='\t'){
       in+=(tabcolumns-in%tabcolumns);
       }
     else{
@@ -1117,16 +1129,16 @@ FXint FXText::posFromIndent(FXint start,FXint indent) const {
 
 // Search forward for match
 FXint FXText::matchForward(FXint pos,FXint end,FXwchar l,FXwchar r,FXint level) const {
-  register FXwchar c;
+  register FXwchar ch;
   FXASSERT(0<=end && end<=length);
   FXASSERT(0<=pos && pos<=length);
   while(pos<end){
-    c=getChar(pos);
-    if(c==r){
+    ch=getChar(pos);
+    if(ch==r){
       level--;
       if(level<=0) return pos;
       }
-    else if(c==l){
+    else if(ch==l){
       level++;
       }
     pos=inc(pos);
@@ -1137,16 +1149,16 @@ FXint FXText::matchForward(FXint pos,FXint end,FXwchar l,FXwchar r,FXint level) 
 
 // Search backward for match
 FXint FXText::matchBackward(FXint pos,FXint beg,FXwchar l,FXwchar r,FXint level) const {
-  register FXwchar c;
+  register FXwchar ch;
   FXASSERT(0<=beg && beg<=length);
   FXASSERT(0<=pos && pos<=length);
   while(beg<=pos){
-    c=getChar(pos);
-    if(c==l){
+    ch=getChar(pos);
+    if(ch==l){
       level--;
       if(level<=0) return pos;
       }
-    else if(c==r){
+    else if(ch==r){
       level++;
       }
     pos=dec(pos);
@@ -1321,7 +1333,8 @@ FXint FXText::posToLine(FXint pos,FXint ln) const {
 
 // Return text position containing x, y coordinate
 FXint FXText::getPosContaining(FXint x,FXint y) const {
-  register FXint row,ls,le,cx,cw,ch;
+  register FXint row,ls,le,cx,cw;
+  register FXwchar ch;
   y=y-pos_y-margintop-getVisibleY();
   row=y/font->getFontHeight();
   if(row<0) return 0;               // Before first row
@@ -1358,7 +1371,8 @@ FXint FXText::getPosContaining(FXint x,FXint y) const {
 
 // Localize position at x,y
 FXint FXText::getPosAt(FXint x,FXint y) const {
-  register FXint row,ls,le,cx,cw,ch;
+  register FXint row,ls,le,cx,cw;
+  register FXwchar ch;
   y=y-pos_y-margintop-getVisibleY();
   row=y/font->getFontHeight();
   if(row<0) return 0;               // Before first row
@@ -2424,7 +2438,8 @@ FXString FXText::getSelectedText() const {
 // End of overstruck character range
 FXint FXText::overstruck(FXint start,FXint end,const FXchar *text,FXint n){
   if(!memchr(text,'\n',n)){
-    FXint sindent,nindent,oindent,p,c;
+    register FXint sindent,nindent,oindent,p;
+    register FXwchar ch;
     const FXchar *ptr;
 
     // Measure indent at pos
@@ -2439,9 +2454,9 @@ FXint FXText::overstruck(FXint start,FXint end,const FXchar *text,FXint n){
 
     // Now figure out how much text to replace
     for(p=start,oindent=sindent; p<length; p+=getCharLen(p)){
-      c=getChar(p);
-      if(c=='\n') break;                // Stuff past the newline just gets inserted
-      oindent+=(c=='\t') ? (tabcolumns-oindent%tabcolumns) : 1;
+      ch=getChar(p);
+      if(ch=='\n') break;                // Stuff past the newline just gets inserted
+      oindent+=(ch=='\t') ? (tabcolumns-oindent%tabcolumns) : 1;
       if(oindent>=nindent){              // Replace string fits inside here
         if(oindent==nindent) p+=getCharLen(p);
         break;
@@ -2977,7 +2992,8 @@ void FXText::drawCursor(FXuint state){
 
 // Paint cursor glyph
 void FXText::paintCursor(FXDCWindow& dc) const {
-  FXint th,tw,cursorx,cursory; FXwchar c;
+  register FXint th,tw,cursorx,cursory; 
+  register FXwchar c;
   th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
@@ -3003,7 +3019,8 @@ void FXText::paintCursor(FXDCWindow& dc) const {
 
 // Erase cursor glyph
 void FXText::eraseCursor(FXDCWindow& dc) const {
-  FXint th,tw,cursorx,cursory,cx,cy,ch,cw; FXwchar c;
+  register FXint th,tw,cursorx,cursory,cx,cy,ch,cw; 
+  register FXwchar c;
   th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
@@ -3030,7 +3047,8 @@ void FXText::eraseCursor(FXDCWindow& dc) const {
 
 // Erase cursor overhang outside of margins
 void FXText::eraseCursorOverhang(){
-  FXint th,tw,cursorx,cursory; FXwchar c;
+  register FXint th,tw,cursorx,cursory; 
+  register FXwchar c;
   th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){

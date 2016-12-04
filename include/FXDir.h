@@ -73,9 +73,6 @@ public:
   /// Remove directory
   static FXbool remove(const FXString& path);
 
-  /// Rename directory
-  static FXbool rename(const FXString& srcpath,const FXString& dstpath);
-
 
   /**
   * List files in a given directory.

@@ -109,7 +109,7 @@ void FXReadWriteLock::readLock(){
 FXbool FXReadWriteLock::tryReadLock(){
 #if defined(WIN32) && (_WIN32_WINNT >= 0x0600)    // Vista or newer
   return TryAcquireSRWLockShared((SRWLOCK*)data)!=0;
-#elif defined(WIN32) && (_WIN32_WINNT >= 0x0400)
+#elif defined(WIN32)
   if(TryEnterCriticalSection(((RWLOCK*)data)->mutex)){
     if(++((RWLOCK*)data)->readers==1 && !TryEnterCriticalSection(((RWLOCK*)data)->access)){
       --((RWLOCK*)data)->readers;
@@ -119,8 +119,6 @@ FXbool FXReadWriteLock::tryReadLock(){
     LeaveCriticalSection(((RWLOCK*)data)->mutex);
     return true;
     }
-  return false;
-#elif defined(WIN32)
   return false;
 #else
   return pthread_rwlock_tryrdlock((pthread_rwlock_t*)data)==0;

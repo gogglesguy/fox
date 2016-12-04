@@ -81,9 +81,6 @@ all: $(PROGRAMS)
 gltest.exe: $(FOXLIB) gltest.obj
 	$(LD) $(LDFLAGS) gltest.obj $(FOXLIB) $(GLLIBS)
 
-glviewer.exe: $(FOXLIB) glviewer.obj
-	$(LD) $(LDFLAGS) glviewer.obj $(FOXLIB) $(GLLIBS)
-
 dctest.exe: $(FOXLIB) dctest.obj
 	$(LD) $(LDFLAGS) dctest.obj $(FOXLIB)
 

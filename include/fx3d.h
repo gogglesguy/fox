@@ -72,12 +72,6 @@
 #include "FXGLCanvas.h"
 #include "FXGLViewer.h"
 #include "FXGLObject.h"
-#include "FXGLShape.h"
-#include "FXGLCone.h"
-#include "FXGLCube.h"
-#include "FXGLCylinder.h"
-#include "FXGLSphere.h"
-#include "FXGLTriangleMesh.h"
 
 #ifndef FX_NO_GLOBAL_NAMESPACE
 using namespace FX;

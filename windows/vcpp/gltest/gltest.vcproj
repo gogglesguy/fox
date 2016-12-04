@@ -145,7 +145,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;HAVE_GL_H;HAVE_GLU_H"
 				RuntimeLibrary="1"
 				RuntimeTypeInfo="true"
-				PrecompiledHeaderFile=".\Debug/gltest.pch"
+				PrecompiledHeaderFile=""
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"

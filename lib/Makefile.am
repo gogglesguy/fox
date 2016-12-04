@@ -270,6 +270,7 @@ FXFile.cpp \
 FXFileAssociations.cpp \
 FXFileDialog.cpp \
 FXFileList.cpp \
+FXFileProgressDialog.cpp \
 FXFileSelector.cpp \
 FXFileStream.cpp \
 FXFoldingList.cpp \
@@ -281,14 +282,8 @@ FXGIFCursor.cpp \
 FXGIFIcon.cpp \
 FXGIFImage.cpp \
 FXGLCanvas.cpp \
-FXGLCone.cpp \
 FXGLContext.cpp \
-FXGLCube.cpp \
-FXGLCylinder.cpp \
 FXGLObject.cpp \
-FXGLShape.cpp \
-FXGLSphere.cpp \
-FXGLTriangleMesh.cpp \
 FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGauge.cpp \

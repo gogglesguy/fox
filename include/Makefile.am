@@ -131,6 +131,7 @@ FXFile.h \
 FXFileAssociations.h \
 FXFileDialog.h \
 FXFileList.h \
+FXFileProgressDialog.h \
 FXFileSelector.h \
 FXFileStream.h \
 FXFoldingList.h \
@@ -142,14 +143,8 @@ FXGIFCursor.h \
 FXGIFIcon.h \
 FXGIFImage.h \
 FXGLCanvas.h \
-FXGLCone.h \
 FXGLContext.h \
-FXGLCube.h \
-FXGLCylinder.h \
 FXGLObject.h \
-FXGLShape.h \
-FXGLSphere.h \
-FXGLTriangleMesh.h \
 FXGLViewer.h \
 FXGLVisual.h \
 FXGauge.h \

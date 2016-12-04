@@ -253,7 +253,6 @@ int main(int,char**){
   FXwchar uc;
   FXchar ch;
 
-
   // Dump character properties
   for(uc=0; uc<0x110000; ++uc){
     if(uc%32==0){

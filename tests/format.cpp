@@ -138,7 +138,7 @@ const FXchar *positionalformat3="%3$d%3$d";
 
 
 // Start
-int main(int,char*[]){
+int main(int argc,char* argv[]){
   FXchar buffer[1024];
   FXuint x,y;
 

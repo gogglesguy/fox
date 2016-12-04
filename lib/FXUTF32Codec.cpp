@@ -398,7 +398,6 @@ FXint FXUTF32Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
 // Count multi-byte characters characters needed to convert utf8 from src
 FXint FXUTF32Codec::utf2mblen(const FXchar* src,FXint nsrc) const {
   register FXint nr,len=0;
-  FXwchar w;
   if(src && 0<nsrc){
     len+=4;
     while(0<nsrc){

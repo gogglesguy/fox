@@ -157,9 +157,12 @@ protected:
   FXbool              draggable;        // Dragable files
 protected:
   FXFileList();
-  void listItems(FXbool force);
+  void listItems(FXbool force,FXbool notify);
   FXString getSelectedFiles() const;
   virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
+  void delete_files(const FXString& files);
+  void copy_files(const FXString& directory,const FXString& files);
+  void move_files(const FXString& directory,const FXString& files);
 private:
   FXFileList(const FXFileList&);
   FXFileList &operator=(const FXFileList&);
@@ -262,10 +265,10 @@ public:
     ID_TOGGLE_HIDDEN,   /// Toggle display of hidden files
     ID_TOGGLE_IMAGES,   /// Toggle display of images
     ID_REFRESH,         /// Refresh immediately
-    ID_CUT_SEL,
-    ID_COPY_SEL,
-    ID_DELETE_SEL,
-    ID_PASTE_SEL,
+    ID_CUT_SEL,         /// Cut selected files to clipboard
+    ID_COPY_SEL,        /// Copy selected files to clipboard
+    ID_DELETE_SEL,      /// Delete selected files
+    ID_PASTE_SEL,       /// Paste selected files from clipboard
     ID_LAST
     };
 public:

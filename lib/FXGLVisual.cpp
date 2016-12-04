@@ -404,13 +404,9 @@ void FXGLVisual::create(){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
 #ifdef HAVE_GL_H
       PIXELFORMATDESCRIPTOR pfd;
-      int
-      glsupport,gldrawwnd,gldrawbmp,glrender,glaccel,
-      glneedpal,glswapcopy,glcomposition;
-      int dred,dgreen,dblue,dalpha,ddepth,dstencil,dsamples,daccred,daccgreen,daccblue,daccalpha,match;
       int bestmatch=1000000000;
       int best=-1;
-      int att;
+      int match;
       int npf;
       HDC hdc;
 

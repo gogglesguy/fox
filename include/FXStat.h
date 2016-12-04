@@ -42,6 +42,9 @@ private:
   FXlong  fileSize;             /// File size
 public:
 
+  /// Initialize 
+  FXStat():modeFlags(0),userNumber(0),groupNumber(0),linkCount(0),createTime(0),accessTime(0),modifyTime(0),fileVolume(0),fileIndex(0),fileSize(0){ }
+
   /// Return the mode flags for this file
   FXuint mode() const { return modeFlags; }
 
@@ -92,6 +95,9 @@ public:
 
   /// Return true if the file has the sticky bit set
   FXbool isSetSticky() const;
+
+  /// Return true if special device (character or block device)
+  FXbool isDevice() const;
 
   /// Return true if character device
   FXbool isCharacter() const;

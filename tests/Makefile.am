@@ -50,8 +50,7 @@ unicode \
 variant \
 wizard \
 xml \
-gltest \
-glviewer
+gltest
 
 gaugetest_SOURCES       = gaugetest.cpp
 format_SOURCES          = format.cpp
@@ -66,7 +65,8 @@ layout_SOURCES	        = layout.cpp
 minheritance_SOURCES	= minheritance.cpp
 memmap_SOURCES	        = memmap.cpp
 gltest_SOURCES	        = gltest.cpp
-glviewer_SOURCES        = glviewer.cpp
+gltest_LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm @GLU_LIBS@
+
 mditest_SOURCES		= mditest.cpp
 table_SOURCES		= table.cpp
 groupbox_SOURCES	= groupbox.cpp

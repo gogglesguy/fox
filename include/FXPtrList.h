@@ -187,6 +187,9 @@ public:
   /// Construct and init with list of objects
   FXPtrListOf(TYPE** objects,FXival n):FXPtrList(reinterpret_cast<FXptr*>(objects),n){ }
 
+  /// Assignment operator
+  FXPtrListOf<TYPE>& operator=(const FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::operator=(src)); }
+
   /// Indexing operator
   TYPE*& operator[](FXival i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
   TYPE *const& operator[](FXival i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
@@ -209,6 +212,78 @@ public:
 
   /// Adopt objects from orig, leaving orig empty
   FXPtrListOf<TYPE>& adopt(FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::adopt(src)); }
+
+  /// Find object in list, searching forward; return position or -1
+  FXival find(TYPE* object,FXival pos=0) const { return FXPtrList::find(object,pos); }
+
+  /// Find object in list, searching backward; return position or -1
+  FXival rfind(TYPE* object,FXival pos=2147483647) const { return FXPtrList::rfind(object,pos); }
+
+  /// Assign object to list
+  FXbool assign(TYPE* object){ return FXPtrList::assign(object); }
+
+  /// Assign n copies of object to list
+  FXbool assign(TYPE* object,FXival n){ return FXPtrList::assign(object,n); }
+
+  /// Assign n objects to list
+  FXbool assign(TYPE** objects,FXival n){ return FXPtrList::assign(objects,n); }
+
+  /// Assign objects to list
+  FXbool assign(const FXPtrListOf<TYPE>& objects){ return FXPtrList::assign(objects); }
+
+  /// Insert object at certain position
+  FXbool insert(FXival pos,TYPE* object){ return FXPtrList::insert(pos,object); }
+
+  /// Insert n copies of object at specified position
+  FXbool insert(FXival pos,TYPE* object,FXival n){ return FXPtrList::insert(pos,object,n); }
+
+  /// Insert n objects at specified position
+  FXbool insert(FXival pos,TYPE** objects,FXival n){ return FXPtrList::insert(pos,objects,n); }
+
+  /// Insert objects at specified position
+  FXbool insert(FXival pos,const FXPtrListOf<TYPE>& objects){ return FXPtrList::insert(pos,objects); }
+
+  /// Prepend object
+  FXbool prepend(TYPE* object){ return FXPtrList::prepend(object); }
+
+  /// Prepend n copies of object
+  FXbool prepend(TYPE* object,FXival n){ return FXPtrList::prepend(object,n); }
+
+  /// Prepend n objects
+  FXbool prepend(TYPE** objects,FXival n){ return FXPtrList::prepend(objects,n); }
+
+  /// Prepend objects
+  FXbool prepend(const FXPtrListOf<TYPE>& objects){ return FXPtrList::prepend(objects); }
+
+  /// Append object
+  FXbool append(TYPE* object){ return FXPtrList::append(object); }
+
+  /// Append n copies of object
+  FXbool append(TYPE* object,FXival n){ return FXPtrList::append(object,n); }
+
+  /// Append n objects
+  FXbool append(TYPE** objects,FXival n){ return FXPtrList::append(objects,n); }
+
+  /// Append objects
+  FXbool append(const FXPtrListOf<TYPE>& objects){ return FXPtrList::append(objects); }
+
+  /// Replace object at position by given object
+  FXbool replace(FXival pos,TYPE* object){ return FXPtrList::replace(pos,object); }
+
+  /// Replaces the m objects at pos with n copies of object
+  FXbool replace(FXival pos,FXival m,TYPE* object,FXival n){ return FXPtrList::replace(pos,m,object,n); }
+
+  /// Replaces the m objects at pos with n objects
+  FXbool replace(FXival pos,FXival m,TYPE** objects,FXival n){ return FXPtrList::replace(pos,m,objects,n); }
+
+  /// Replace the m objects at pos with objects
+  FXbool replace(FXival pos,FXival m,const FXPtrListOf<TYPE>& objects){ return FXPtrList::replace(pos,m,objects); }
+
+  /// Remove object
+  FXbool remove(TYPE* object){ return FXPtrList::remove(object); }
+
+  /// Push object to end
+  FXbool push(TYPE* object){ return FXPtrList::push(object); }
   };
 
 }

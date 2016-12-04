@@ -218,7 +218,7 @@ long FXListBox::onListForward(FXObject*,FXSelector sel,void* ptr){
 
 
 // Forward message from list widget
-long FXListBox::onListChanged(FXObject*,FXSelector sel,void* ptr){
+long FXListBox::onListChanged(FXObject*,FXSelector,void* ptr){
   field->setText(list->getItemText((FXint)(FXival)ptr));        // FIXME but also called in notify callbacks...
   field->setIcon(list->getItemIcon((FXint)(FXival)ptr));
   return target && target->tryHandle(this,FXSEL(SEL_CHANGED,message),ptr);

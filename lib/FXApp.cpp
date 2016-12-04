@@ -246,7 +246,7 @@ namespace FX {
 // Callback Record
 struct FXCBSpec {
   FXObject      *target;            // Receiver object
-  void          *data;              // User data
+  FXptr          data;              // User data
   FXSelector     message;           // Message sent to receiver
   };
 
@@ -255,7 +255,7 @@ struct FXCBSpec {
 struct FXTimer {
   FXTimer       *next;              // Next timeout in list
   FXObject      *target;            // Receiver object
-  void          *data;              // User data
+  FXptr          data;              // User data
   FXSelector     message;           // Message sent to receiver
   FXTime         due;               // When timer is due (ns)
   };
@@ -274,7 +274,7 @@ struct FXSignal {
 struct FXChore {
   FXChore       *next;              // Next chore in list
   FXObject      *target;            // Receiver object
-  void          *data;              // User data
+  FXptr          data;              // User data
   FXSelector     message;           // Message sent to receiver
   };
 
@@ -1838,10 +1838,11 @@ FXbool FXApp::closeDisplay(){
 /*******************************************************************************/
 
 // Add deadline in nanoseconds
-void FXApp::addDeadline(FXObject* tgt,FXSelector sel,FXTime due,void* ptr){
+FXptr FXApp::addDeadline(FXObject* tgt,FXSelector sel,FXTime due,FXptr ptr){
+  register FXptr result=NULL;
   register FXTimer *t,**tt;
   for(tt=&timers; (t=*tt)!=NULL; tt=&t->next){
-    if(t->target==tgt && t->message==sel){ *tt=t->next; goto a; }
+    if(t->target==tgt && t->message==sel){ *tt=t->next; result=t->data; goto a; }
     }
   if(timerrecs){
     t=timerrecs;
@@ -1857,12 +1858,13 @@ a:t->data=ptr;
   for(tt=&timers; *tt && ((*tt)->due < t->due); tt=&(*tt)->next){}
   t->next=*tt;
   *tt=t;
+  return result;
   }
 
 
 // Add timeout in nanoseconds
-void FXApp::addTimeout(FXObject* tgt,FXSelector sel,FXTime ns,void* ptr){
-  addDeadline(tgt,sel,FXThread::time()+ns,ptr);
+FXptr FXApp::addTimeout(FXObject* tgt,FXSelector sel,FXTime ns,FXptr ptr){
+  return addDeadline(tgt,sel,FXThread::time()+ns,ptr);
   }
 
 
@@ -1876,16 +1878,18 @@ FXbool FXApp::hasTimeout(FXObject* tgt,FXSelector sel) const {
 
 
 // Remove timeout(s) identified by tgt and sel from the list
-void FXApp::removeTimeout(FXObject* tgt,FXSelector sel){
+FXptr FXApp::removeTimeout(FXObject* tgt,FXSelector sel){
+  register FXptr result=NULL;
   register FXTimer **tt=&timers;
   register FXTimer *t;
   while((t=*tt)!=NULL){
     if(t->target==tgt && (sel==0 || t->message==sel)){
-      *tt=t->next; t->next=timerrecs; timerrecs=t;
+      *tt=t->next; result=t->data; t->next=timerrecs; timerrecs=t;
       continue;
       }
     tt=&t->next;
     }
+  return result;
   }
 
 
@@ -1989,10 +1993,11 @@ void FXApp::removeSignal(FXint sig){
 
 
 // Add chore to the END of the list
-void FXApp::addChore(FXObject* tgt,FXSelector sel,void *ptr){
+FXptr FXApp::addChore(FXObject* tgt,FXSelector sel,FXptr ptr){
+  register FXptr result=NULL;
   register FXChore *c,**cc;
   for(cc=&chores; (c=*cc)!=NULL; cc=&c->next){
-    if(c->target==tgt && c->message==sel){ *cc=c->next; goto a; }
+    if(c->target==tgt && c->message==sel){ *cc=c->next; result=c->data; goto a; }
     }
   if(chorerecs){
     c=chorerecs;
@@ -2007,20 +2012,23 @@ a:c->data=ptr;
   for(cc=&chores; *cc; cc=&(*cc)->next){}
   c->next=NULL;
   *cc=c;
+  return result;
   }
 
 
 // Remove chore(s) identified by tgt and sel from the list
-void FXApp::removeChore(FXObject* tgt,FXSelector sel){
+FXptr FXApp::removeChore(FXObject* tgt,FXSelector sel){
+  register FXptr result=NULL;
   register FXChore **cc=&chores;
   register FXChore *c;
   while((c=*cc)!=NULL){
     if(c->target==tgt && (sel==0 || c->message==sel)){
-      *cc=c->next; c->next=chorerecs; chorerecs=c;
+      *cc=c->next; result=c->data; c->next=chorerecs; chorerecs=c;
       continue;
       }
     cc=&c->next;
     }
+  return result;
   }
 
 
@@ -2036,7 +2044,7 @@ FXbool FXApp::hasChore(FXObject* tgt,FXSelector sel) const {
 
 
 // Add input
-FXbool FXApp::addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode,void* ptr){
+FXbool FXApp::addInput(FXObject *tgt,FXSelector sel,FXInputHandle fd,FXuint mode,FXptr ptr){
   if(mode==INPUT_NONE) return false;
 #ifdef WIN32
   register FXint in;
@@ -4013,7 +4021,7 @@ FXint FXApp::runUntil(FXuint& condition){
 FXint FXApp::runWhileEvents(FXTime blocking){
   FXInvocation inv(&invocation,MODAL_FOR_NONE,NULL);
   FXTRACE((100,"Start runWhileEvents\n"));
-  while(!inv.done && runOneEvent(blocking)) blocking=0;
+  while(!inv.done && runOneEvent(blocking)) blocking=1000;
   FXTRACE((100,"End runWhileEvents\n"));
   return !inv.done;
   }
@@ -4023,7 +4031,7 @@ FXint FXApp::runWhileEvents(FXTime blocking){
 FXint FXApp::runModalWhileEvents(FXWindow* window,FXTime blocking){
   FXInvocation inv(&invocation,MODAL_FOR_WINDOW,window);
   FXTRACE((100,"Start runModalWhileEvents\n"));
-  while(!inv.done && runOneEvent(blocking)) blocking=0;
+  while(!inv.done && runOneEvent(blocking)) blocking=1000;
   FXTRACE((100,"End runModalWhileEvents\n"));
   return !inv.done;
   }

@@ -3526,6 +3526,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXFileProgressDialog.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXFileProgressDialog.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXFileSelector.cpp"
 			>
 			<FileConfiguration
@@ -3919,33 +3927,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\lib\FXGLCone.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXGLCone.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\lib\FXGLContext.cpp"
 			>
 			<FileConfiguration
@@ -3973,60 +3954,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\lib\FXGLCube.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXGLCube.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\lib\FXGLCylinder.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXGLCylinder.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\lib\FXGLObject.cpp"
 			>
 			<FileConfiguration
@@ -4051,87 +3978,6 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXGLObject.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\lib\FXGLShape.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXGLShape.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\lib\FXGLSphere.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXGLSphere.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\lib\FXGLTriangleMesh.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXGLTriangleMesh.h"
 			>
 		</File>
 		<File

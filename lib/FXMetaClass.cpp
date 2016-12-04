@@ -45,6 +45,8 @@
     when FOX is loaded as a DLL into FXRuby, these symbols need to be resolvable
     in order for the DLL startup code to run properly for the meta class
     initializers; afterward everything's OK.
+  - For abstract classes, FXMetaClass contains nullObject() as manufacture function;
+    this will always return NULL as abstract classes can't be instantiated.
   - Possibly store hash into FXMetaClass during construction.  Benefits are:
       - No need to recompute it during destruction or growth of hash table.
       - Quick equality test inside getMetaClassFromName().
@@ -226,34 +228,11 @@ const FXMetaClass* FXMetaClass::getMetaClassFromName(const FXchar* name){
   }
 
 
-/*
-  /// Dump all metaclasses
-  static void dumpMetaClasses();
-
-  /// Dump metaclass
-  void dumpMetaClass() const;
-*/
-
-/*
-// Dump all metaclasses
-void FXMetaClass::dumpMetaClasses(){
-  for(FXuint p=0; p<metaClassSlots; ++p){
-    if(metaClassTable[p]!=NULL && metaClassTable[p]!=EMPTY) metaClassTable[p]->dumpMetaClass();
-    }
+// Make NULL object; used for abstract classes that may not be instantiated
+FXObject* FXMetaClass::nullObject(){
+  return NULL;
   }
 
-
-// Dump metaclass
-void FXMetaClass::dumpMetaClass() const {
-  const FXObject::FXMapEntry* lst=(const FXObject::FXMapEntry*)assoc;
-  FXuint n=nassocs;
-  fxmessage("%s : %s\n",className,baseClass?baseClass->className:"(root)");
-  while(n--){
-    fxmessage("  %s:%04x - %s:%04x\n",FXSELTYPE(lst->keylo)<SEL_LAST?FXDebugTarget::messageTypeName[FXSELTYPE(lst->keylo)]:"Unknown",FXSELID(lst->keylo),FXSELTYPE(lst->keyhi)<SEL_LAST?FXDebugTarget::messageTypeName[FXSELTYPE(lst->keyhi)]:"Unknown",FXSELID(lst->keyhi));
-    lst=(const FXObject::FXMapEntry*) (((const FXchar*)lst)+assocsz);
-    }
-  }
-*/
 
 // Destructor removes metaclass from the table
 FXMetaClass::~FXMetaClass(){

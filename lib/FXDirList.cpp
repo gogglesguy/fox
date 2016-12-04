@@ -316,15 +316,19 @@ long FXDirList::onCmdDeleteSel(FXObject*,FXSelector,void*){     // FIXME
 
 // Copy files to drop directory
 long FXDirList::onCmdDropCopy(FXObject*,FXSelector,void*){
-  FXString filedst,filesrc;
-  FXint beg,end;
+  FXString filedst,filesrc; FXint beg,end; FXuint answer;
   for(beg=0; beg<dropfiles.length(); beg=end+2){
     if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
     filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
     filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
     if(!FXFile::copyFiles(filesrc,filedst,false)){
-      if(FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text())==MBOX_CLICKED_NO) break;
-      FXFile::copyFiles(filesrc,filedst,true);
+      answer=FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text());
+      if(answer==MBOX_CLICKED_CANCEL) break;
+      if(answer==MBOX_CLICKED_NO) continue;
+      if(!FXFile::moveFiles(filesrc,filedst,true)){
+        answer=FXMessageBox::question(this,MBOX_OK_CANCEL,tr("Failed Moving File"),tr("Failed to move file: %s; continue?"),filedst.text());
+        if(answer==MBOX_CLICKED_CANCEL) break;
+        }
       }
     }
   dropdirectory=FXString::null;
@@ -336,15 +340,19 @@ long FXDirList::onCmdDropCopy(FXObject*,FXSelector,void*){
 
 // Move files to drop directory
 long FXDirList::onCmdDropMove(FXObject*,FXSelector,void*){
-  FXString filedst,filesrc;
-  FXint beg,end;
+  FXString filedst,filesrc; FXint beg,end; FXuint answer;
   for(beg=0; beg<dropfiles.length(); beg=end+2){
     if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
     filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
     filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
     if(!FXFile::moveFiles(filesrc,filedst,false)){
-      if(FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text())==MBOX_CLICKED_NO) break;
-      FXFile::moveFiles(filesrc,filedst,true);
+      answer=FXMessageBox::question(this,MBOX_YES_NO_CANCEL,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text());
+      if(answer==MBOX_CLICKED_CANCEL) break;
+      if(answer==MBOX_CLICKED_NO) continue;
+      if(!FXFile::moveFiles(filesrc,filedst,true)){
+        answer=FXMessageBox::question(this,MBOX_OK_CANCEL,tr("Failed Moving File"),tr("Failed to move file: %s; continue?"),filedst.text());
+        if(answer==MBOX_CLICKED_CANCEL) break;
+        }
       }
     }
   dropdirectory=FXString::null;
@@ -356,14 +364,13 @@ long FXDirList::onCmdDropMove(FXObject*,FXSelector,void*){
 
 // Link to files from drop directory
 long FXDirList::onCmdDropLink(FXObject*,FXSelector,void*){
-  FXString filedst,filesrc;
-  FXint beg,end;
+  FXString filedst,filesrc; FXint beg,end;
   for(beg=0; beg<dropfiles.length(); beg=end+2){
     if((end=dropfiles.find_first_of("\r\n",beg))<0) end=dropfiles.length();
     filesrc=FXURL::fileFromURL(dropfiles.mid(beg,end-beg));
     filedst=FXPath::absolute(dropdirectory,FXPath::name(filesrc));
     if(!FXFile::symlink(filesrc,filedst)){
-      if(FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite File"),tr("Overwrite existing file or directory: %s?"),filedst.text())==MBOX_CLICKED_NO) break;
+      if(FXMessageBox::question(this,MBOX_OK_CANCEL,tr("Failed Linking File"),tr("Failed to make symbolic link from: %s; continue?"),filedst.text())==MBOX_CLICKED_CANCEL) break;
       }
     }
   dropdirectory=FXString::null;
@@ -394,6 +401,7 @@ long FXDirList::onCmdDropAsk(FXObject*,FXSelector,void* ptr){
   return 1;
   }
 
+/*******************************************************************************/
 
 // Handle drag-and-drop enter
 long FXDirList::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr){

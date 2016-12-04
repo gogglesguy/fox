@@ -60,16 +60,22 @@
 // Platform includes
 #if defined(WIN32)  /////////////// Windows /////////////////////////////////////
 
-// Common headers
-#if _WIN32_WINNT < 0x0400
-#define _WIN32_WINNT 0x0400
+// Windows 2000 is minimum now
+#if _WIN32_WINNT < 0x0500
+#define _WIN32_WINNT 0x0500
 #endif
+
+// Enforce handle types
 #ifndef STRICT
-#define STRICT
+#define STRICT 1
 #endif
+
+// Skip some stuff
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+
+// Common headers
 #include <windows.h>            // Core Windows stuff
 #include <winspool.h>           // Printer stuff
 #include <io.h>                 // For _access()
@@ -108,9 +114,9 @@
 #ifndef GL_BGRA
 #define GL_BGRA GL_BGRA_EXT
 #endif
-#ifdef HAVE_GLU_H
-#include <GL/glu.h>
-#endif
+//#ifdef HAVE_GLU_H
+//#include <GL/glu.h>
+//#endif
 
 #else ////////////////////////////// Unix ///////////////////////////////////////
 
@@ -328,9 +334,9 @@ typedef cpuset_t   cpu_set_t;
 #include <GL/glx.h>
 #endif
 #endif
-#ifdef HAVE_GLU_H
-#include <GL/glu.h>
-#endif
+//#ifdef HAVE_GLU_H
+//#include <GL/glu.h>
+//#endif
 
 #endif //////////////////////////////////////////////////////////////////////////
 

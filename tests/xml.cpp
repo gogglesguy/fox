@@ -11,10 +11,11 @@
 // Print options
 void printusage(const char* prog){
   fxmessage("%s options:\n",prog);
-  fxmessage("  --load <file>            Load json file.\n");
+  fxmessage("  --load <file>            Load xml file.\n");
+  fxmessage("  --save <file>            Save xml file.\n");
   fxmessage("  --oasis <dir>            Run OASIS tests from directory <dir>.\n");
   fxmessage("  --tracelevel <level>     Set trace level.\n");
-  fxmessage("  -v, --verbose            Show more (and more -v -v ...) info.\n");
+  fxmessage("  -v, --verbose            Increase verbosity level.\n");
   fxmessage("  -h, --help               Print help.\n");
   }
 
@@ -34,7 +35,7 @@ FXXMLFile xmlinput;
 
 // Just print in the callback
 
-// Start document 
+// Start document
 FXXML::Error startDocument(){
   fxmessage("startDocument()\n");
   return FXXML::ErrOK;
@@ -188,7 +189,7 @@ int main(int argc,char *argv[]){
     }
 
   // Unless output file is specified, we will just print
-  // Notice we can connect plain functions as well as member 
+  // Notice we can connect plain functions as well as member
   // functions of some object
   xmlinput.startDocumentCB.connect<startDocument>();
   xmlinput.startElementCB.connect<startElement>();
@@ -204,7 +205,7 @@ int main(int argc,char *argv[]){
       fxwarning("Error: unable to open: \"%s\" for writing.\n",savefile);
       return 0;
       }
-      
+
     // Connect source XML file parser to write back out to destination file
     // Just for kicks, we disconnect comments and processing instructions
     xmlinput.startDocumentCB.connect<FXXML,&FXXML::startDocument>(&xmloutput);

@@ -451,8 +451,8 @@ void FXTopWindow::place(FXuint placement){
   // Get root window size
 #ifdef WIN32
   RECT rect;
-  MYMONITORINFO minfo;
-  HANDLE monitor;
+  MONITORINFO minfo;
+  HMONITOR monitor;
 
   // Use mouse position to select screen
   if(placement!=PLACEMENT_OWNER){
@@ -476,11 +476,11 @@ void FXTopWindow::place(FXuint placement){
     }
 
   // Get monitor info if we have this API
-  monitor=fxMonitorFromRect(&rect,MONITOR_DEFAULTTOPRIMARY);
+  monitor=MonitorFromRect(&rect,MONITOR_DEFAULTTOPRIMARY);
   if(monitor){
     memset(&minfo,0,sizeof(minfo));
     minfo.cbSize=sizeof(minfo);
-    fxGetMonitorInfo(monitor,&minfo);
+    GetMonitorInfo(monitor,&minfo);
     rx=minfo.rcWork.left;
     ry=minfo.rcWork.top;
     rw=minfo.rcWork.right-minfo.rcWork.left;

@@ -81,6 +81,11 @@ FXbool FXStat::isSetSticky() const {
   return (modeFlags&FXIO::Sticky)!=0;
   }
 
+// Return true if special device (character or block device)
+FXbool FXStat::isDevice() const {
+  return (modeFlags&(FXIO::Character|FXIO::Block))!=0;
+  }
+
 // Return true if character device
 FXbool FXStat::isCharacter() const {
   return (modeFlags&FXIO::Character)!=0;
@@ -275,9 +280,15 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
       info.userNumber=data.st_uid;
       info.groupNumber=data.st_gid;
       info.linkCount=data.st_nlink;
+#if (_POSIX_C_SOURCE >= 200809L) || (_XOPEN_SOURCE >= 700)
+      info.accessTime=data.st_atim.tv_sec*seconds+data.st_atim.tv_nsec;
+      info.modifyTime=data.st_mtim.tv_sec*seconds+data.st_mtim.tv_nsec;
+      info.createTime=data.st_ctim.tv_sec*seconds+data.st_ctim.tv_nsec;
+#else
       info.accessTime=data.st_atime*seconds;
       info.modifyTime=data.st_mtime*seconds;
       info.createTime=data.st_ctime*seconds;
+#endif
       info.fileVolume=(FXlong)data.st_dev;
       info.fileIndex=(FXlong)data.st_ino;
       info.fileSize=(FXlong)data.st_size;
@@ -371,9 +382,15 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
       info.userNumber=data.st_uid;
       info.groupNumber=data.st_gid;
       info.linkCount=data.st_nlink;
+#if (_POSIX_C_SOURCE >= 200809L) || (_XOPEN_SOURCE >= 700)
+      info.accessTime=data.st_atim.tv_sec*seconds+data.st_atim.tv_nsec;
+      info.modifyTime=data.st_mtim.tv_sec*seconds+data.st_mtim.tv_nsec;
+      info.createTime=data.st_ctim.tv_sec*seconds+data.st_ctim.tv_nsec;
+#else
       info.accessTime=data.st_atime*seconds;
       info.modifyTime=data.st_mtime*seconds;
       info.createTime=data.st_ctime*seconds;
+#endif
       info.fileVolume=(FXlong)data.st_dev;
       info.fileIndex=(FXlong)data.st_ino;
       info.fileSize=(FXlong)data.st_size;
@@ -433,9 +450,15 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
     info.userNumber=data.st_uid;
     info.groupNumber=data.st_gid;
     info.linkCount=data.st_nlink;
+#if (_POSIX_C_SOURCE >= 200809L) || (_XOPEN_SOURCE >= 700)
+    info.accessTime=data.st_atim.tv_sec*seconds+data.st_atim.tv_nsec;
+    info.modifyTime=data.st_mtim.tv_sec*seconds+data.st_mtim.tv_nsec;
+    info.createTime=data.st_ctim.tv_sec*seconds+data.st_ctim.tv_nsec;
+#else
     info.accessTime=data.st_atime*seconds;
     info.modifyTime=data.st_mtime*seconds;
     info.createTime=data.st_ctime*seconds;
+#endif
     info.fileVolume=(FXlong)data.st_dev;
     info.fileIndex=(FXlong)data.st_ino;
     info.fileSize=(FXlong)data.st_size;
@@ -678,7 +701,7 @@ FXTime FXStat::created(const FXString& file){
   }
 
 
-// Change tiome when file was last created
+// Change time when file was last created
 FXbool FXStat::created(const FXString& file,FXTime ns){
   if(!file.empty()){
 #ifdef WIN32

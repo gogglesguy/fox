@@ -202,17 +202,17 @@ public:
     ID_DROPCOPY,
     ID_DROPMOVE,
     ID_DROPLINK,
-    ID_SHOW_FILES,
-    ID_HIDE_FILES,
-    ID_TOGGLE_FILES,
-    ID_SHOW_HIDDEN,
-    ID_HIDE_HIDDEN,
-    ID_TOGGLE_HIDDEN,
-    ID_SET_PATTERN,
-    ID_SORT_REVERSE,
-    ID_SORT_CASE,
-    ID_REFRESH,
-    ID_DELETE_SEL,
+    ID_SHOW_FILES,      /// Show files
+    ID_HIDE_FILES,      /// Hide files
+    ID_TOGGLE_FILES,    /// Toggle show files
+    ID_SHOW_HIDDEN,     /// Show hidden files
+    ID_HIDE_HIDDEN,     /// Hide hidden files
+    ID_TOGGLE_HIDDEN,   /// Toggle display of hidden files
+    ID_SET_PATTERN,     /// Set match pattern
+    ID_SORT_REVERSE,    /// Reverse sort order
+    ID_SORT_CASE,       /// Toggle sort case sensitivity
+    ID_REFRESH,         /// Refresh immediately
+    ID_DELETE_SEL,      /// Delete selected files
     ID_LAST
     };
 public:

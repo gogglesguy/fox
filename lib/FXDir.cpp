@@ -208,27 +208,6 @@ FXbool FXDir::remove(const FXString& path){
   }
 
 
-// Rename directory
-FXbool FXDir::rename(const FXString& srcpath,const FXString& dstpath){
-  if(srcpath!=dstpath){
-#ifdef WIN32
-#ifdef UNICODE
-    FXnchar srcname[MAXPATHLEN];
-    FXnchar dstname[MAXPATHLEN];
-    utf2ncs(srcname,srcpath.text(),MAXPATHLEN);
-    utf2ncs(dstname,dstpath.text(),MAXPATHLEN);
-    return ::MoveFileExW(srcname,dstname,MOVEFILE_REPLACE_EXISTING)!=0;
-#else
-    return ::MoveFileExA(srcpath.text(),dstpath.text(),MOVEFILE_REPLACE_EXISTING)!=0;
-#endif
-#else
-    return ::rename(srcpath.text(),dstpath.text())==0;
-#endif
-    }
-  return false;
-  }
-
-
 // List all the files in directory
 FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& pattern,FXuint flags){
   FXDir dir(path);

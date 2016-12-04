@@ -69,6 +69,9 @@
   - Each signal is handled by only one single FXDispatcher.  However, there may
     be multiple FXDispatcher's, each one handling a different, non-overlapping
     set of signals.
+    
+  - FIXME keep track of time we entered event loop; so we can process events for
+    a certain interval only (better than runWhileEvents() currently does).
 
 */
 

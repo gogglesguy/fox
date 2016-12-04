@@ -524,7 +524,7 @@ FXbool FXRegistry::write(){
             if(unparseFile(tempfile)){
 
               // Rename ATOMICALLY to proper name
-              if(FXFile::rename(tempfile,realfile)){
+              if(FXFile::move(tempfile,realfile,true)){
                 setModified(false);
                 ok=true;
                 }

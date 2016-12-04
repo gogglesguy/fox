@@ -2947,11 +2947,11 @@ hex1: q+=4;                             // Escape as \xHH
       q+=2;
       continue;
     default:
-      if(__unlikely(c==lquote)){        // Escape opening quote if found in string
+      if(__unlikely(c==lquote && lquote)){      // Escape opening quote if found in string
         q+=2;
         continue;
         }
-      if(__unlikely(c==rquote)){        // Escape closing quote if found in string
+      if(__unlikely(c==rquote && rquote)){      // Escape closing quote if found in string
         q+=2;
         continue;
         }
@@ -3052,12 +3052,12 @@ hex2: result[q++]='\\';                 // Escape as \xHH
       result[q++]='\\';
       continue;
     default:
-      if(__unlikely(c==lquote)){        // Escape opening quote if found in string
+      if(__unlikely(c==lquote && lquote)){      // Escape opening quote if found in string
         result[q++]='\\';
         result[q++]=lquote;
         continue;
         }
-      if(__unlikely(c==rquote)){        // Escape closing quote if found in string
+      if(__unlikely(c==rquote && rquote)){      // Escape closing quote if found in string
         result[q++]='\\';
         result[q++]=rquote;
         continue;

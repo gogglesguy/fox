@@ -69,7 +69,6 @@ FXDEFMAP(FXRealSpinner) FXRealSpinnerMap[]={
   FXMAPFUNC(SEL_KEYPRESS,0,FXRealSpinner::onKeyPress),
   FXMAPFUNC(SEL_KEYRELEASE,0,FXRealSpinner::onKeyRelease),
   FXMAPFUNC(SEL_FOCUS_SELF,0,FXRealSpinner::onFocusSelf),
-  FXMAPFUNC(SEL_UPDATE,FXRealSpinner::ID_ENTRY,FXRealSpinner::onUpdEntry),
   FXMAPFUNC(SEL_CHANGED,FXRealSpinner::ID_ENTRY,FXRealSpinner::onChgEntry),
   FXMAPFUNC(SEL_COMMAND,FXRealSpinner::ID_ENTRY,FXRealSpinner::onCmdEntry),
   FXMAPFUNC(SEL_MOUSEWHEEL,FXRealSpinner::ID_ENTRY,FXRealSpinner::onWheelEntry),
@@ -98,7 +97,6 @@ FXIMPLEMENT(FXRealSpinner,FXPacker,FXRealSpinnerMap,ARRAYNUMBER(FXRealSpinnerMap
 // Construct spinner out of two buttons and a text field
 FXRealSpinner::FXRealSpinner(){
   flags|=FLAG_ENABLED;
-  flags&=~FLAG_UPDATE;  // Never GUI update
   textField=(FXTextField*)-1L;
   upButton=(FXArrowButton*)-1L;
   downButton=(FXArrowButton*)-1L;
@@ -113,7 +111,6 @@ FXRealSpinner::FXRealSpinner(){
 // Construct spinner out of dial and a text field
 FXRealSpinner::FXRealSpinner(FXComposite *p,FXint cols,FXObject *tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXPacker(p,opts,x,y,w,h,0,0,0,0,0,0){
   flags|=FLAG_ENABLED;
-  flags&=~FLAG_UPDATE;  // Never GUI update
   target=tgt;
   message=sel;
   textField=new FXTextField(this,cols,this,ID_ENTRY,TEXTFIELD_REAL|JUSTIFY_RIGHT,0,0,0,0,pl,pr,pt,pb);
@@ -190,6 +187,18 @@ void FXRealSpinner::layout(){
   }
 
 
+// Notification that focus moved to new child
+void FXRealSpinner::changeFocus(FXWindow *child){
+  FXPacker::changeFocus(child);
+  if(child){
+    flags&=~FLAG_UPDATE; 
+    }
+  else{
+    flags|=FLAG_UPDATE; 
+    }
+  }
+
+
 // Respond to increment message
 long FXRealSpinner::onUpdIncrement(FXObject* sender,FXSelector,void*){
   if(isEnabled() && ((options&REALSPIN_CYCLIC) || (pos<range[1])))
@@ -244,12 +253,6 @@ long FXRealSpinner::onWheelEntry(FXObject*,FXSelector,void* ptr){
     return 1;
     }
   return 0;
-  }
-
-
-// Forward GUI update of text field to target
-long FXRealSpinner::onUpdEntry(FXObject*,FXSelector,void*){
-  return target && target->tryHandle(this,FXSEL(SEL_UPDATE,message),NULL);
   }
 
 

@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [56])
+m4_define([fox_level], [57])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -114,7 +114,7 @@ AC_CHECK_FUNCS(pipe2 statvfs)
 
 # Add copious amounts of debugging with gcc
 if test "${GXX}" = "yes" ; then
-  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow"
+  CXXFLAGS="${CXXFLAGS} -Wall -Wextra -Woverloaded-virtual -Wshadow"
 #  CXXFLAGS="${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual -Wshadow -Wstrict-overflow -Wcast-qual -Wcast-align -Wdouble-promotion -fvisibility=hidden"
 #  LDFLAGS="-rdynamic ${LDFLAGS}"
 fi
@@ -135,7 +135,7 @@ AC_MSG_RESULT([$enable_release])
 if test "x$enable_release" = "xyes" ; then
   CXXFLAGS="${CXXFLAGS} -O2 -DNDEBUG"
   if test "${GXX}" = "yes" ; then
-    CXXFLAGS="${CXXFLAGS} -Wuninitialized -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer"
+    CXXFLAGS="${CXXFLAGS} -ffast-math -fstrict-aliasing -finline-functions -fomit-frame-pointer"
     LDFLAGS="-s ${LDFLAGS}"
   fi
 fi
@@ -325,13 +325,15 @@ AC_ARG_WITH(opengl,[  --with-opengl           choices are yes, no])
 AC_MSG_RESULT([$with_opengl])
 if test "x$with_opengl" != "xno" ; then
 AC_CHECK_HEADER(GL/gl.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GL_H=1"; LIBS="${LIBS} ${LIBGL}")
-AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1"; LIBS="${LIBS} ${LIBGLU}")
+AC_CHECK_HEADER(GL/glu.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLU_H=1";)
 AC_CHECK_HEADER(GL/glx.h,CXXFLAGS="${CXXFLAGS} -DHAVE_GLX_H=1")
-GL_LIBS="${LIBGL} ${LIBGLU}"
+GL_LIBS="${LIBGL}"
+GLU_LIBS="${LIBGLU}"
 fi
 
 # Substitute variables in output files
 AC_SUBST(GL_LIBS)
+AC_SUBST(GLU_LIBS)
 
 # To find all preprocessor defines in GCC, run:
 # echo | gcc -E -dM -
@@ -348,6 +350,7 @@ doc/Makefile
 doc/art/Makefile
 doc/screenshots/Makefile
 tests/Makefile
+glviewer/Makefile
 adie/Makefile
 shutterbug/Makefile
 pathfinder/Makefile

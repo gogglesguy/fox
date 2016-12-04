@@ -65,7 +65,7 @@ FXSpinLock::FXSpinLock(){
 // Lock the spinlock
 void FXSpinLock::lock(){
 #if defined(WIN32)
-  while(InterlockedExchange((LONG*)data,1L)){
+  while(_InterlockedExchange((LONG*)data,1L)){
     while(data[0]){ }
     }
 #elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
@@ -90,7 +90,7 @@ void FXSpinLock::lock(){
 // Try lock the spinlock
 FXbool FXSpinLock::trylock(){
 #if defined(WIN32)
-  return !InterlockedExchange((LONG*)data,1L);
+  return !_InterlockedExchange((LONG*)data,1L);
 #elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
   FXbool ret;
   __asm__ __volatile__ ("movw %1,%%ax\n\t"
@@ -114,7 +114,7 @@ FXbool FXSpinLock::trylock(){
 // Unlock spinlock
 void FXSpinLock::unlock(){
 #if defined(WIN32)
-  InterlockedExchange((LONG*)data,0L);
+  _InterlockedExchange((LONG*)data,0L);
 #elif (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__x86_64__))
   __asm__ __volatile__ ("lock\n\t"
                         "incb %0\n\t" : "+m" (data) : : "memory", "cc");

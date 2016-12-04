@@ -64,7 +64,7 @@ noinst_PROGRAMS = bitmapviewer$(EXEEXT) button$(EXEEXT) \
 	scribble$(EXEEXT) shutter$(EXEEXT) splitter$(EXEEXT) \
 	switcher$(EXEEXT) tabbook$(EXEEXT) table$(EXEEXT) \
 	thread$(EXEEXT) unicode$(EXEEXT) variant$(EXEEXT) \
-	wizard$(EXEEXT) xml$(EXEEXT) gltest$(EXEEXT) glviewer$(EXEEXT)
+	wizard$(EXEEXT) xml$(EXEEXT) gltest$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -129,12 +129,7 @@ gaugetest_LDADD = $(LDADD)
 gaugetest_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_gltest_OBJECTS = gltest.$(OBJEXT)
 gltest_OBJECTS = $(am_gltest_OBJECTS)
-gltest_LDADD = $(LDADD)
 gltest_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
-am_glviewer_OBJECTS = glviewer.$(OBJEXT)
-glviewer_OBJECTS = $(am_glviewer_OBJECTS)
-glviewer_LDADD = $(LDADD)
-glviewer_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_groupbox_OBJECTS = groupbox.$(OBJEXT)
 groupbox_OBJECTS = $(am_groupbox_OBJECTS)
 groupbox_LDADD = $(LDADD)
@@ -282,33 +277,31 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
 	$(dirlist_SOURCES) $(expression_SOURCES) $(format_SOURCES) \
 	$(foursplit_SOURCES) $(gaugetest_SOURCES) $(gltest_SOURCES) \
-	$(glviewer_SOURCES) $(groupbox_SOURCES) $(half_SOURCES) \
-	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
-	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
-	$(layout_SOURCES) $(match_SOURCES) $(math_SOURCES) \
-	$(mditest_SOURCES) $(memmap_SOURCES) $(minheritance_SOURCES) \
-	$(parallel_SOURCES) $(process_SOURCES) $(ratio_SOURCES) \
-	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
-	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
-	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
-	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES) \
-	$(xml_SOURCES)
+	$(groupbox_SOURCES) $(half_SOURCES) $(header_SOURCES) \
+	$(hello_SOURCES) $(hello2_SOURCES) $(iconlist_SOURCES) \
+	$(image_SOURCES) $(imageviewer_SOURCES) $(layout_SOURCES) \
+	$(match_SOURCES) $(math_SOURCES) $(mditest_SOURCES) \
+	$(memmap_SOURCES) $(minheritance_SOURCES) $(parallel_SOURCES) \
+	$(process_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
+	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
+	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
+	$(table_SOURCES) $(thread_SOURCES) $(unicode_SOURCES) \
+	$(variant_SOURCES) $(wizard_SOURCES) $(xml_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
 	$(dirlist_SOURCES) $(expression_SOURCES) $(format_SOURCES) \
 	$(foursplit_SOURCES) $(gaugetest_SOURCES) $(gltest_SOURCES) \
-	$(glviewer_SOURCES) $(groupbox_SOURCES) $(half_SOURCES) \
-	$(header_SOURCES) $(hello_SOURCES) $(hello2_SOURCES) \
-	$(iconlist_SOURCES) $(image_SOURCES) $(imageviewer_SOURCES) \
-	$(layout_SOURCES) $(match_SOURCES) $(math_SOURCES) \
-	$(mditest_SOURCES) $(memmap_SOURCES) $(minheritance_SOURCES) \
-	$(parallel_SOURCES) $(process_SOURCES) $(ratio_SOURCES) \
-	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
-	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
-	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
-	$(unicode_SOURCES) $(variant_SOURCES) $(wizard_SOURCES) \
-	$(xml_SOURCES)
+	$(groupbox_SOURCES) $(half_SOURCES) $(header_SOURCES) \
+	$(hello_SOURCES) $(hello2_SOURCES) $(iconlist_SOURCES) \
+	$(image_SOURCES) $(imageviewer_SOURCES) $(layout_SOURCES) \
+	$(match_SOURCES) $(math_SOURCES) $(mditest_SOURCES) \
+	$(memmap_SOURCES) $(minheritance_SOURCES) $(parallel_SOURCES) \
+	$(process_SOURCES) $(ratio_SOURCES) $(rex_SOURCES) \
+	$(scan_SOURCES) $(scribble_SOURCES) $(shutter_SOURCES) \
+	$(splitter_SOURCES) $(switcher_SOURCES) $(tabbook_SOURCES) \
+	$(table_SOURCES) $(thread_SOURCES) $(unicode_SOURCES) \
+	$(variant_SOURCES) $(wizard_SOURCES) $(xml_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -349,6 +342,7 @@ FOX_BYTEORDER = @FOX_BYTEORDER@
 FOX_MAJOR_VERSION = @FOX_MAJOR_VERSION@
 FOX_MINOR_VERSION = @FOX_MINOR_VERSION@
 FOX_PATCH_LEVEL = @FOX_PATCH_LEVEL@
+GLU_LIBS = @GLU_LIBS@
 GL_LIBS = @GL_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
@@ -468,7 +462,7 @@ layout_SOURCES = layout.cpp
 minheritance_SOURCES = minheritance.cpp
 memmap_SOURCES = memmap.cpp
 gltest_SOURCES = gltest.cpp
-glviewer_SOURCES = glviewer.cpp
+gltest_LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm @GLU_LIBS@
 mditest_SOURCES = mditest.cpp
 table_SOURCES = table.cpp
 groupbox_SOURCES = groupbox.cpp
@@ -590,9 +584,6 @@ gaugetest$(EXEEXT): $(gaugetest_OBJECTS) $(gaugetest_DEPENDENCIES) $(EXTRA_gauge
 gltest$(EXEEXT): $(gltest_OBJECTS) $(gltest_DEPENDENCIES) $(EXTRA_gltest_DEPENDENCIES) 
 	@rm -f gltest$(EXEEXT)
 	$(CXXLINK) $(gltest_OBJECTS) $(gltest_LDADD) $(LIBS)
-glviewer$(EXEEXT): $(glviewer_OBJECTS) $(glviewer_DEPENDENCIES) $(EXTRA_glviewer_DEPENDENCIES) 
-	@rm -f glviewer$(EXEEXT)
-	$(CXXLINK) $(glviewer_OBJECTS) $(glviewer_LDADD) $(LIBS)
 groupbox$(EXEEXT): $(groupbox_OBJECTS) $(groupbox_DEPENDENCIES) $(EXTRA_groupbox_DEPENDENCIES) 
 	@rm -f groupbox$(EXEEXT)
 	$(CXXLINK) $(groupbox_OBJECTS) $(groupbox_LDADD) $(LIBS)
@@ -704,7 +695,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/foursplit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gaugetest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gltest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glviewer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/groupbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/half.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/header.Po@am__quote@

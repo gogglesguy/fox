@@ -160,14 +160,14 @@ FXJSON::FXJSON():begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),toke
 
 // Construct and open for loading
 FXJSON::FXJSON(FXchar* data,FXuval sz,Direction d):begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),token(TK_EOF),column(0),indent(0),line(1),wrap(80),dir(Stop),flow(Compact),prec(16),fmt(2),dent(2),owns(false){
-  FXTRACE((1,"FXJSON::FXJSON\n"));
+  FXTRACE((1,"FXJSON::FXJSON(%p,%lu,%s)\n",data,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   open(data,sz,d);
   }
 
 
 // Open FXJSON stream for given direction and set its buffer
 FXbool FXJSON::open(FXchar* data,FXuval sz,Direction d){
-  FXTRACE((2,"FXJSON::open(%p,%lu,%d)\n",data,sz,d));
+  FXTRACE((2,"FXJSON::open(%p,%lu,%s)\n",data,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   if((dir==Stop) && (d!=Stop)){
     if(data){                   // External buffer
       begptr=data;
@@ -553,7 +553,7 @@ FXJSON::Error FXJSON::loadVariant(FXVariant& var){
 FXJSON::Error FXJSON::emit(const FXchar* str,FXint count){
   FXival num;
   while(0<count){
-    if(wptr>=endptr && !flush()){ FXTRACE((1,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
+    if(wptr>=endptr && !flush()){ FXTRACE((2,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
     FXASSERT(wptr<endptr);
     num=FXMIN(count,endptr-wptr);
     memcpy(wptr,str,num);
@@ -569,7 +569,7 @@ FXJSON::Error FXJSON::emit(const FXchar* str,FXint count){
 FXJSON::Error FXJSON::emit(FXchar ch,FXint count){
   FXival num;
   while(0<count){
-    if(wptr>=endptr && !flush()){ FXTRACE((1,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
+    if(wptr>=endptr && !flush()){ FXTRACE((2,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
     FXASSERT(wptr<endptr);
     num=FXMIN(count,endptr-wptr);
     memset(wptr,ch,num);

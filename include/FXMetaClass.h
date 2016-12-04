@@ -83,6 +83,9 @@ public:
   /// Find metaclass object
   static const FXMetaClass* getMetaClassFromName(const FXchar* name);
 
+  /// Make NULL object
+  static FXObject* nullObject();
+  
   /// Destroy metaclass
  ~FXMetaClass();
   };

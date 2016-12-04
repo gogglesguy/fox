@@ -70,7 +70,7 @@ namespace FXPath {
 
   /// Return file name less the extension
   extern FXAPI FXString stripExtension(const FXString& file);
-
+  
   /// Return the drive letter prefixing this file name (if any).
   extern FXAPI FXString drive(const FXString& file);
 

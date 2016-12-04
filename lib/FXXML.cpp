@@ -323,7 +323,7 @@ public:
 
 // Decode escaped special characters from XML stream
 FXbool FXXML::decode(FXString& dst,const FXString& src,FXuint flags){
-  register FXival p,q;
+  register FXint p,q;
   register FXwchar wc;
 
   // Measure the resulting string first
@@ -472,7 +472,7 @@ FXbool FXXML::decode(FXString& dst,const FXString& src,FXuint flags){
 // Encode special characters for inclusion into XML stream
 FXbool FXXML::encode(FXString& dst,const FXString& src,FXuint flags){
   register FXint p,q;
-  register FXwchar ch;
+  register FXuchar ch;
 
   // Measure the resulting string first
   p=q=0;
@@ -596,7 +596,7 @@ FXXML::FXXML():begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),curren
 
 // Construct XML parser instance and pass it external buffer
 FXXML::FXXML(FXchar* data,FXuval size,Direction d):begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),current(NULL),column(0),line(1),dir(Stop),enc(UTF8),owns(false){
-  FXTRACE((1,"FXXML::FXXML\n"));
+  FXTRACE((1,"FXXML::FXXML(%p,%ld,%s)\n",data,size,d==Load?"Load":d==Save?"Save":"Stop"));
   open(data,size,d);
   }
 
@@ -678,7 +678,7 @@ FXbool FXXML::need(FXival n){
 FXXML::Error FXXML::emit(const FXchar* str,FXint count){
   FXival num;
   while(0<count){
-    if(wptr>=endptr && !flush()){ FXTRACE((1,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
+    if(wptr>=endptr && !flush()){ FXTRACE((2,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
     FXASSERT(wptr<endptr);
     num=FXMIN(count,endptr-wptr);
     memcpy(wptr,str,num);
@@ -694,7 +694,7 @@ FXXML::Error FXXML::emit(const FXchar* str,FXint count){
 FXXML::Error FXXML::emit(FXchar ch,FXint count){
   FXival num;
   while(0<count){
-    if(wptr>=endptr && !flush()){ FXTRACE((1,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
+    if(wptr>=endptr && !flush()){ FXTRACE((2,"%s:%d: flush() failed!\n",__FILE__,__LINE__)); return ErrSave; }
     FXASSERT(wptr<endptr);
     num=FXMIN(count,endptr-wptr);
     memset(wptr,ch,num);
@@ -818,7 +818,6 @@ FXXML::Error FXXML::endDocument(){
     }
   return err;
   }
-
 
 /*******************************************************************************/
 
@@ -947,7 +946,7 @@ FXXML::Error FXXML::parsestring(FXString& str){
         sptr=rptr;
         return ErrOK;
       default:
-nxt:    if((rptr-sptr)>=(size()-MAXTOKEN)){
+nxt:    if((rptr-sptr)>=(endptr-begptr-MAXTOKEN)){
           str.append(sptr,rptr-sptr);
           sptr=rptr;
           }
@@ -1115,7 +1114,7 @@ FXXML::Error FXXML::parseinternalsubset(){
   FXXML::Error err;
   spaces();
   if(match('[')){
-    FXTRACE((1,"internalsubset\n"));
+    FXTRACE((2,"internalsubset\n"));
     while(need(MAXTOKEN)){
       switch(rptr[0]){
       case '\t':
@@ -1212,7 +1211,6 @@ FXXML::Error FXXML::parsedeclarations(){
 
 // Processing instruction
 FXXML::Error FXXML::parseprocessing(){
-  FXXML::Error err;
   FXString target;
   FXString data;
   if(name()){
@@ -1242,7 +1240,7 @@ FXXML::Error FXXML::parseprocessing(){
         sptr=rptr;
         return processingCB(target,data);
       default:
-nxt:    if((rptr-sptr)>=(size()-MAXTOKEN)){
+nxt:    if((rptr-sptr)>=(endptr-begptr-MAXTOKEN)){
           data.append(sptr,rptr-sptr);  // Add another chunk
           sptr=rptr;
           }
@@ -1259,7 +1257,6 @@ nxt:    if((rptr-sptr)>=(size()-MAXTOKEN)){
 
 // Scan comment
 FXXML::Error FXXML::parsecomment(){
-  FXXML::Error err;
   FXString text;
   sptr=rptr;
   while(need(MAXTOKEN)){
@@ -1287,7 +1284,7 @@ FXXML::Error FXXML::parsecomment(){
       sptr=rptr;
       return commentCB(text);
     default:
-nxt:  if((rptr-sptr)>=(size()-MAXTOKEN)){
+nxt:  if((rptr-sptr)>=(endptr-begptr-MAXTOKEN)){
         text.append(sptr,rptr-sptr);    // Pass comment undecoded
         sptr=rptr;
         }
@@ -1312,7 +1309,7 @@ FXXML::Error FXXML::parseattribute(Element& elm){
     spaces();
     if((err=parsestring(value))!=ErrOK) return err;
     spaces();
-    FXXML::decode(elm.attributes[key],value,REFS|CRLF);
+    if(!FXXML::decode(elm.attributes[key],value,REFS|CRLF)) return ErrToken;
     return ErrOK;
     }
   return ErrName;
@@ -1417,17 +1414,15 @@ FXXML::Error FXXML::parsecdata(Element& elm){
     case ']':
       if(rptr[1]!=']') goto nxt;
       if(rptr[2]!='>') goto nxt;
-//      if((err=decode(text,sptr,rptr-sptr,CRLF))!=ErrOK) return err;
-      FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF);
+      if(!FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF)) return ErrToken;
       if((err=charactersCB(text))!=ErrOK) return err;
       column+=3;
       rptr+=3;
       sptr=rptr;
       return ErrOK;
     default:
-nxt:  if((rptr-sptr)>=(size()-MAXTOKEN)){
-//        if((err=decode(text,sptr,rptr-sptr,CRLF))!=ErrOK) return err;
-        FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF);
+nxt:  if((rptr-sptr)>=(endptr-begptr-MAXTOKEN)){
+        if(!FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF)) return ErrToken;
         if((err=charactersCB(text))!=ErrOK) return err;
         sptr=rptr;
         }
@@ -1479,8 +1474,7 @@ FXXML::Error FXXML::parsecontents(Element& elm){
       brk=1;
 
       // Try decode, translate both CRLF and references
-//      if((err=decode(text,sptr,rptr-sptr,CRLF|REFS))!=ErrOK) return err;
-      FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF|REFS);
+      if(!FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF|REFS)) return ErrToken;
 
       // Report final batch of characters
       if((err=charactersCB(text))!=ErrOK) return err;
@@ -1529,11 +1523,10 @@ FXXML::Error FXXML::parsecontents(Element& elm){
       sptr=rptr;
       continue;
     default:
-      if(brk && (rptr-sptr)>=(size()-MAXTOKEN)){
+      if(brk && (rptr-sptr)>=(endptr-begptr-MAXTOKEN)){
 
         // Try decode, translate both CRLF and references
-        //if((err=decode(text,sptr,rptr-sptr,CRLF|REFS))!=ErrOK) return err;
-        FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF|REFS);
+        if(!FXXML::decode(text,FXString(sptr,rptr-sptr),CRLF|REFS)) return ErrToken;
 
         // Report batch of characters
         if((err=charactersCB(text))!=ErrOK) return err;
@@ -1660,6 +1653,7 @@ FXXML::Error FXXML::parse(){
   return ErrEmpty;
   }
 
+/*******************************************************************************/
 
 // Close it
 FXbool FXXML::close(){

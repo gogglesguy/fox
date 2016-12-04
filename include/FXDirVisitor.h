@@ -51,17 +51,28 @@ namespace FX {
 * equal to 1 traverses the given path only; a setting of 2 traverses the path
 * and its immediate children, but stops there. A limit of 0 does nothing at
 * all.
+* The function info() returns information about the current file or directory
+* being visited; valid only while in enter(), leave(), or visit() callbacks.
 */
 class FXAPI FXDirVisitor {
 private:
   struct Seen;
-protected:
-  virtual FXuint recurse(const FXString& path,Seen *seen,FXint depth);
+private:
+  Seen* current;
+private:
+  FXDirVisitor(const FXDirVisitor&);
+  FXDirVisitor& operator=(const FXDirVisitor&);
 public:
+
+  /// Initialize directory visitor
+  FXDirVisitor():current(NULL){}
 
   /// Start traversal at given path
   FXuint traverse(const FXString& path,FXint limit=1000);
 
+  /// Return stats on current file or directory
+  const FXStat& info() const;
+  
   /// Enter directory
   virtual FXuint enter(const FXString& path);
 
@@ -84,13 +95,13 @@ class FXAPI FXGlobVisitor : public FXDirVisitor {
 private:
   FXString wildcard;            // Match files against this wild card
   FXuint   options;             // Matching options
+private:
+  FXGlobVisitor(const FXGlobVisitor&);
+  FXGlobVisitor& operator=(const FXGlobVisitor&);
 public:
 
   /// Construct directory visitor
   FXGlobVisitor():options(0){}
-
-  /// Construct directory visitor from original
-  FXGlobVisitor(const FXGlobVisitor& org):wildcard(org.wildcard),options(org.options){}
 
   /// Start traversal at given path
   FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll,FXint depth=1000);
@@ -122,13 +133,13 @@ private:
   FXlong countBytes;            // Total number of bytes in files
   FXlong maxDepth;              // Maximum depth
   FXlong depth;                 // Current depth during traversal
+private:
+  FXGlobCountVisitor(const FXGlobCountVisitor&);
+  FXGlobCountVisitor& operator=(const FXGlobCountVisitor&);
 public:
 
   /// Create new glob counting visitor
   FXGlobCountVisitor();
-
-  /// Copy glob counting visitor
-  FXGlobCountVisitor(const FXGlobCountVisitor& org);
 
   /// Start traversal of path
   FXuint traverse(const FXString& path,const FXString& wild="*",FXuint opts=FXDir::MatchAll,FXint limit=1000);

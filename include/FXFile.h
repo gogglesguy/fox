@@ -73,15 +73,8 @@ public:
   /// Return file size
   virtual FXlong size();
 
-
   /// Create new (empty) file
   static FXbool create(const FXString& file,FXuint perm=FXIO::AllReadWrite);
-
-  /// Remove file
-  static FXbool remove(const FXString& file);
-
-  /// Rename or move srcfile to dstfile, replacing dstfile if it exists
-  static FXbool rename(const FXString& srcfile,const FXString& dstfile);
 
   /// Link file
   static FXbool link(const FXString& srcfile,const FXString& dstfile);
@@ -92,25 +85,32 @@ public:
   /// Symbolic link file
   static FXbool symlink(const FXString& srcfile,const FXString& dstfile);
 
-  /// Return true if files are identical
+  /// Return true if files are identical (identical node on disk)
   static FXbool identical(const FXString& file1,const FXString& file2);
 
   /// Copy srcfile to dstfile, overwriting dstfile if allowed
   static FXbool copy(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
 
-  /// Concatenate srcfile1 and srcfile2 to dstfile, overwriting dstfile if allowed
-  static FXbool concat(const FXString& srcfile1,const FXString& srcfile2,const FXString& dstfile,FXbool overwrite=false);
-
-
-
   /// Recursively copy files or directories from srcfile to dstfile, overwriting dstfile if allowed
   static FXbool copyFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
+
+
+  /// Move or rename srcfile to dstfile, overwriting dstfile if allowed
+  static FXbool move(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
 
   /// Recursively copy or move files or directories from srcfile to dstfile, overwriting dstfile if allowed
   static FXbool moveFiles(const FXString& srcfile,const FXString& dstfile,FXbool overwrite=false);
 
+
+  /// Remove file
+  static FXbool remove(const FXString& file);
+
   /// Recursively remove file or directory, recurse if allowed
   static FXbool removeFiles(const FXString& path,FXbool recursive=false);
+
+
+  /// Concatenate srcfile1 and srcfile2 to dstfile, overwriting dstfile if allowed
+  static FXbool concat(const FXString& srcfile1,const FXString& srcfile2,const FXString& dstfile,FXbool overwrite=false);
   };
 
 }

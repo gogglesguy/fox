@@ -3,7 +3,7 @@
 # For non-gcc compilers, change the options to "no-dependencies"
 AUTOMAKE_OPTIONS = foreign dist-zip
 
-SUBDIRS    = utils include lib chart doc tests shutterbug adie pathfinder calculator controlpanel windows
+SUBDIRS    = utils include lib chart doc tests shutterbug adie pathfinder calculator controlpanel glviewer windows
 EXTRA_DIST = ADDITIONS AUTHORS INSTALL LICENSE LICENSE_ADDENDUM TRACING README fox.spec fox-config index.html aclocal.m4
 
 bin_SCRIPTS = fox-config

@@ -63,14 +63,14 @@ FXXMLFile::FXXMLFile(){
 
 // Create XML file i/o object and open it
 FXXMLFile::FXXMLFile(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((1,"FXXMLFile::FXXMLFile\n"));
+  FXTRACE((1,"FXXMLFile::FXXMLFile(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   open(filename,d,sz);
   }
 
 
 // Open archive for operation
 FXbool FXXMLFile::open(FXInputHandle h,Direction d,FXuval sz){
-  FXTRACE((2,"FXXMLFile::open(%d,%d,%lu)\n",h,d,sz));
+  FXTRACE((2,"FXXMLFile::open(%lx,%s,%lu)\n",h,(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(FXXML::open(NULL,sz,d)){
     if(file.open(h,(d==Save)?FXIO::Writing:FXIO::Reading)){
       return true;
@@ -83,7 +83,7 @@ FXbool FXXMLFile::open(FXInputHandle h,Direction d,FXuval sz){
 
 // Open archive for operation
 FXbool FXXMLFile::open(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((2,"FXXMLFile::open(\"%s\",%d,%lu)\n",filename.text(),d,sz));
+  FXTRACE((2,"FXXMLFile::open(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(FXXML::open(NULL,sz,d)){
     if(file.open(filename,(d==Save)?FXIO::Writing:FXIO::Reading,FXIO::AllReadWrite)){
       return true;

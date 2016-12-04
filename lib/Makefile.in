@@ -128,11 +128,10 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXDriveBox.lo FXException.lo FXEXEIcon.lo FXEXEImage.lo \
 	FXExpression.lo FXExtentd.lo FXExtentf.lo FXFile.lo \
 	FXFileAssociations.lo FXFileDialog.lo FXFileList.lo \
-	FXFileSelector.lo FXFileStream.lo FXFoldingList.lo FXFont.lo \
-	FXFontDialog.lo FXFontSelector.lo FXFrame.lo FXGIFCursor.lo \
-	FXGIFIcon.lo FXGIFImage.lo FXGLCanvas.lo FXGLCone.lo \
-	FXGLContext.lo FXGLCube.lo FXGLCylinder.lo FXGLObject.lo \
-	FXGLShape.lo FXGLSphere.lo FXGLTriangleMesh.lo FXGLViewer.lo \
+	FXFileProgressDialog.lo FXFileSelector.lo FXFileStream.lo \
+	FXFoldingList.lo FXFont.lo FXFontDialog.lo FXFontSelector.lo \
+	FXFrame.lo FXGIFCursor.lo FXGIFIcon.lo FXGIFImage.lo \
+	FXGLCanvas.lo FXGLContext.lo FXGLObject.lo FXGLViewer.lo \
 	FXGLVisual.lo FXGauge.lo FXGradientBar.lo FXGroupBox.lo \
 	FXGZFileStream.lo FXhalf.lo FXHash.lo FXHeader.lo \
 	FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo FXIFFIcon.lo \
@@ -256,6 +255,7 @@ FOX_BYTEORDER = @FOX_BYTEORDER@
 FOX_MAJOR_VERSION = @FOX_MAJOR_VERSION@
 FOX_MINOR_VERSION = @FOX_MINOR_VERSION@
 FOX_PATCH_LEVEL = @FOX_PATCH_LEVEL@
+GLU_LIBS = @GLU_LIBS@
 GL_LIBS = @GL_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
@@ -619,6 +619,7 @@ FXFile.cpp \
 FXFileAssociations.cpp \
 FXFileDialog.cpp \
 FXFileList.cpp \
+FXFileProgressDialog.cpp \
 FXFileSelector.cpp \
 FXFileStream.cpp \
 FXFoldingList.cpp \
@@ -630,14 +631,8 @@ FXGIFCursor.cpp \
 FXGIFIcon.cpp \
 FXGIFImage.cpp \
 FXGLCanvas.cpp \
-FXGLCone.cpp \
 FXGLContext.cpp \
-FXGLCube.cpp \
-FXGLCylinder.cpp \
 FXGLObject.cpp \
-FXGLShape.cpp \
-FXGLSphere.cpp \
-FXGLTriangleMesh.cpp \
 FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGauge.cpp \
@@ -1075,6 +1070,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFileAssociations.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFileDialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFileList.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFileProgressDialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFileSelector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFileStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXFoldingList.Plo@am__quote@
@@ -1086,14 +1082,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGIFIcon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGIFImage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLCanvas.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLCone.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLContext.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLCube.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLCylinder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLObject.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLShape.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLSphere.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLTriangleMesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLViewer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLVisual.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGZFileStream.Plo@am__quote@

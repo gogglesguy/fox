@@ -1878,6 +1878,18 @@ FXExecute::FXExecute(const FXchar *s,FXint n,FXint* b,FXint* e,FXint p,FXint m):
   }
 
 
+// Check if wide character at wcs is in set 
+static FXbool isinset(const FXchar* set,const FXchar* wcs){
+  while(set[0]!='\0'){
+    if((set[0]==wcs[0]) && ((wcs[0]<=0x7F) || ((set[1]==wcs[1]) && ((wcs[0]<=0xDF) || ((set[2]==wcs[2]) && ((wcs[0]<=0xEF) || (set[3]==wcs[3]))))))){
+      return true;
+      }
+    set++;
+    }
+  return false;
+  }
+  
+  
 // The workhorse
 FXbool FXExecute::match(const FXuchar* prog){
   if(recs<MAXRECURSION){

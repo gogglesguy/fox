@@ -298,13 +298,18 @@ FXbool FXTextField::isPosSelected(FXint pos) const {
 
 // Check if w is delimiter
 static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
-  return w<128 && strchr(delimiters,w); // FIXME for w>=128
+  FXchar wcs[5]={'\0','\0','\0','\0','\0'};
+  if(128<=w){
+    wc2utf(wcs,w);  
+    return (strstr(delimiters,wcs)!=NULL);
+    }
+  return (strchr(delimiters,w)!=NULL);
   }
 
 
 // Find end of previous word
 FXint FXTextField::leftWord(FXint pos) const {
-  register FXint ch;
+  register FXwchar ch;
   FXASSERT(0<=pos && pos<=contents.length());
   if(0<pos){
     pos=contents.dec(pos);
@@ -335,7 +340,7 @@ FXint FXTextField::leftWord(FXint pos) const {
 
 // Find begin of next word
 FXint FXTextField::rightWord(FXint pos) const {
-  register FXint ch;
+  register FXwchar ch;
   FXASSERT(0<=pos && pos<=contents.length());
   if(pos<contents.length()){
     ch=contents.wc(pos);

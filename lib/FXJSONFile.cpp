@@ -57,14 +57,14 @@ FXJSONFile::FXJSONFile(){
 
 // Create JSON file i/o object and open it
 FXJSONFile::FXJSONFile(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((1,"FXJSONFile::FXJSONFile\n"));
+  FXTRACE((1,"FXJSONFile::FXJSONFile(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   open(filename,d,sz);
   }
 
 
 // Open archive for operation
 FXbool FXJSONFile::open(FXInputHandle h,Direction d,FXuval sz){
-  FXTRACE((2,"FXJSONFile::open(%d,%d,%lu)\n",h,d,sz));
+  FXTRACE((1,"FXJSONFile::open(%lx,%s,%ld)\n",h,(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(FXJSON::open(NULL,sz,d)){
     if(file.open(h,(d==Save)?FXIO::Writing:FXIO::Reading)){
       return true;
@@ -77,7 +77,7 @@ FXbool FXJSONFile::open(FXInputHandle h,Direction d,FXuval sz){
 
 // Open archive for operation
 FXbool FXJSONFile::open(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((2,"FXJSONFile::open(\"%s\",%d,%lu)\n",filename.text(),d,sz));
+  FXTRACE((1,"FXJSONFile::open(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(FXJSON::open(NULL,sz,d)){
     if(file.open(filename,(d==Save)?FXIO::Writing:FXIO::Reading,FXIO::AllReadWrite)){
       return true;
