@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -185,6 +185,7 @@ FXTextField::FXTextField(){
   selbackColor=0;
   seltextColor=0;
   cursorColor=0;
+  blink=FLAG_CARET;
   cursor=0;
   anchor=0;
   columns=0;
@@ -208,6 +209,7 @@ FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel
   selbackColor=getApp()->getSelbackColor();
   seltextColor=getApp()->getSelforeColor();
   cursorColor=getApp()->getForeColor();
+  blink=FLAG_CARET;
   cursor=0;
   anchor=0;
   columns=ncols;
@@ -300,7 +302,7 @@ FXbool FXTextField::isPosSelected(FXint pos) const {
 static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
   FXchar wcs[5]={'\0','\0','\0','\0','\0'};
   if(128<=w){
-    wc2utf(wcs,w);  
+    wc2utf(wcs,w);
     return (strstr(delimiters,wcs)!=NULL);
     }
   return (strchr(delimiters,w)!=NULL);
@@ -569,6 +571,7 @@ void FXTextField::setCursorPos(FXint pos){
     cursor=pos;
     if(isEditable() && hasFocus()) drawCursor(FLAG_CARET);
     }
+  blink=FLAG_CARET;
   }
 
 
@@ -1156,7 +1159,8 @@ long FXTextField::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
 
 // Blink the cursor
 long FXTextField::onBlink(FXObject*,FXSelector,void*){
-  drawCursor(flags^FLAG_CARET);
+  drawCursor(blink);
+  blink^=FLAG_CARET;
   getApp()->addTimeout(this,ID_BLINK,getApp()->getBlinkSpeed());
   return 0;
   }

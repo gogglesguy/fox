@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -404,47 +404,54 @@ FXString FXPath::expand(const FXString& file){
   }
 
 
-// Contract path based on environment variables
+// Contract path based on environment variable
 //
-//      /home/jeroen/junk
-//      /home/someoneelse/junk
-//      /usr/local/ACE_wrappers/TAO
+// For example, on UNIX:
 //
-//    to:
+//   /home/jeroen/junk                  -> ~/junk
+//   /home/someoneelse/junk             -> ~someoneelse/junk
+//   /usr/local/ACE_wrappers/TAO        -> $ACE_ROOT/TAO
 //
-//      ~/junk
-//      ~someoneelse/junk
-//      $ACE_ROOT/TAO
+// On Windows:
+//
+//   /usr/local/ACE_wrappers/TAO        -> %ACE_ROOT%/TAO
 //
 FXString FXPath::contract(const FXString& file,const FXString& user,const FXString& var){
-  FXString result(file);
-  if(!result.empty()){
-    FXString val;
-    FXint pos;
-    if(FXPath::isAbsolute(result)){
-      val=FXSystem::getUserDirectory(user);
-      if(!val.empty()){
+  const FXchar legalcharacters[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
+  if(!file.empty()){
 #if defined(WIN32)
-        if(comparecase(result,val,val.length())==0 && ((result.length()==val.length()) || ISPATHSEP(result[val.length()]))){
-          result.replace(0,val.length(),"~"+user);
+    FXString result(file);
+    if(var.find_first_not_of(legalcharacters)<0){
+      FXString val=FXSystem::getEnvironment(var);
+      if(!val.empty()){
+        FXint pos=result.find(val);
+        if(((0==pos) || (0<pos && ISPATHSEP(result[pos-1]))) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+          result.replace(pos,val.length(),"%"+var+"%");
           }
-#else
-        if(compare(result,val,val.length())==0 && ((result.length()==val.length()) || ISPATHSEP(result[val.length()]))){
-          result.replace(0,val.length(),"~"+user);
-          }
-#endif
         }
       }
-    val=FXSystem::getEnvironment(var);
-    if(!val.empty()){
-      if(0<=(pos=result.find(val))){
-        if((pos==0 || ISPATHSEP(result[pos-1])) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+    return result;
+#else
+    FXString result(file);
+    if(FXPath::isAbsolute(result)){
+      FXString val=FXSystem::getUserDirectory(user);
+      if(!val.empty() && compare(result,val,val.length())==0 && ((result.length()==val.length()) || ISPATHSEP(result[val.length()]))){
+        result.replace(0,val.length(),"~"+user);
+        }
+      }
+    if(var.find_first_not_of(legalcharacters)<0){
+      FXString val=FXSystem::getEnvironment(var);
+      if(!val.empty()){
+        FXint pos=result.find(val);
+        if(((0==pos) || (0<pos && ISPATHSEP(result[pos-1]))) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
           result.replace(pos,val.length(),"$"+var);
           }
         }
       }
+    return result;
+#endif
     }
-  return result;
+  return FXString::null;
   }
 
 
@@ -1034,16 +1041,16 @@ FXString FXPath::enquote(const FXString& file,FXbool force){
             }
           n=0;
           continue;
-        case '^':             // Escape character
-        case '<':             // Redirection
+        case '^':               // Escape character
+        case '<':               // Redirection
         case '>':
         case '(':
         case ')':
-        case '|':             // Pipe
-        case '%':             // Environment variables
-        case '!':             // Wildcard
-        case '&':             // Command separators
-        case '*':             // Wildcard
+        case '|':               // Pipe
+        case '%':               // Environment variables
+        case '!':               // Wildcard
+        case '&':               // Command separators
+        case '*':               // Wildcard
         case '?':
           if(!force) q++;
         default:                // Normal characters
@@ -1173,6 +1180,7 @@ FXString FXPath::dequote(const FXString& file){
     }
   return result;
   }
+
 
 #else                         // UNIX
 

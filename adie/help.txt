@@ -111,12 +111,17 @@ or:
 
    #include <filename.h>
 
-then Adie will search for this file in a sequence of include directories, otherwise it will search in the same directory as the currently loaded file.  You can specify the list of include directories to search with the "Include Path" option.
+then Adie will search for this file in a sequence of include search paths, otherwise it will search in the same directory as the currently loaded file.  You can specify the list of search paths to search by entering a list of absolute or relative pathnames into the Preferences dialog (Search Paths) text field.
 When the selected filename is of the form:
 
    filename.cpp:177
 
-then Adie will not only load the filename, but also jump to the given line number.  If this file has already been loaded, Adie will simply jump to the given line number in the current file.  This option is very useful when fixing compiler errors.
+or:
+
+   filename.cpp:177:9   
+
+then Adie will not only load the filename, but also jump to the given line number.  In case of the second form, it will also place the cursor on the 9-column.  If this file has already been loaded, Adie will simply jump to the given line (and column-) number in the open file.  This option is very useful when fixing compiler errors.
+Note, various popular compiler output formats are supported to obtain the necessary information.
 
 
 Mouse Selection.

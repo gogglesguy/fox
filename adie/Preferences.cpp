@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -207,9 +207,9 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXHorizontalSeparator(miscellaneouspane,SEPARATOR_LINE|LAYOUT_FILL_X);
   FXMatrix *matrix3=new FXMatrix(miscellaneouspane,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 4);
 
-  new FXLabel(matrix3,tr("Search path:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  new FXLabel(matrix3,tr("Search paths:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
   searchtext=new FXTextField(matrix3,10,own,TextWindow::ID_SEARCHPATHS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
-  searchtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where files are to be found."));
+  searchtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where include files are to be found.\nPaths are subjected to tilde and environment variable expansion."));
   searchtext->setHelpText(tr("Change file search path."));
 
   new FXLabel(matrix3,tr("Syntax path:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);

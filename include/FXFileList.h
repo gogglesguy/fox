@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -157,7 +157,7 @@ protected:
   FXbool              draggable;        // Dragable files
 protected:
   FXFileList();
-  void listItems(FXbool force,FXbool notify);
+  FXbool listItems(FXbool force,FXbool notify);
   FXString getSelectedFiles() const;
   virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
   void delete_files(const FXString& files);
@@ -285,9 +285,6 @@ public:
   /// Destroy server-side resources
   virtual void destroy();
 
-  /// Scan the current directory and update the items if needed, or if force is true
-  void scan(FXbool force=true);
-
   /// Set current file; return true if success
   FXbool setCurrentFile(const FXString& file,FXbool notify=false);
 
@@ -299,12 +296,6 @@ public:
 
   /// Return current directory
   FXString getDirectory() const { return directory; }
-
-  /// Change wildcard matching pattern
-  void setPattern(const FXString& ptrn);
-
-  /// Return wildcard pattern
-  FXString getPattern() const { return pattern; }
 
   /// Return name of item at index
   FXString getItemFilename(FXint index) const;
@@ -339,62 +330,68 @@ public:
   /// Return the mode bits for this item
   FXuint getItemMode(FXint index) const;
 
+  /// Change wildcard matching pattern
+  void setPattern(const FXString& ptrn,FXbool notify=false);
+
+  /// Return wildcard pattern
+  FXString getPattern() const { return pattern; }
+
   /// Change wildcard matching mode (see FXPath)
-  void setMatchMode(FXuint mode);
+  void setMatchMode(FXuint mode,FXbool notify=false);
 
   /// Return wildcard matching mode
   FXuint getMatchMode() const { return matchmode; }
 
   /// Show or hide hidden files
-  void showHiddenFiles(FXbool flag);
+  void showHiddenFiles(FXbool flag,FXbool notify=false);
 
   /// Return true if showing hidden files
   FXbool showHiddenFiles() const;
 
   /// Show directories only
-  void showOnlyDirectories(FXbool flag);
+  void showOnlyDirectories(FXbool flag,FXbool notify=false);
 
   /// Return true if showing directories only
   FXbool showOnlyDirectories() const;
 
   /// Show files only
-  void showOnlyFiles(FXbool flag);
+  void showOnlyFiles(FXbool flag,FXbool notify=false);
 
   /// Return true if showing files only
   FXbool showOnlyFiles() const;
 
   /// Show parent directories
-  void showParents(FXbool flag);
+  void showParents(FXbool flag,FXbool notify=false);
 
   /// Return true if showing parent directories
   FXbool showParents() const;
 
   /// Show or hide preview images
-  void showImages(FXbool flag);
+  void showImages(FXbool flag,FXbool notify=false);
 
   /// Return true if image preview on
   FXbool showImages() const;
 
   /// Change images preview size
-  void setImageSize(FXint size);
+  void setImageSize(FXint size,FXbool notify=false);
 
   /// Return images preview size
   FXint getImageSize() const { return imagesize; }
 
   /// Set draggable files
-  void setDraggableFiles(FXbool flag);
+  void setDraggableFiles(FXbool flag,FXbool notify=false);
 
   /// Are draggable files
   FXbool getDraggableFiles() const { return draggable; }
 
   /// Set file time format
-  void setTimeFormat(const FXString& fmt);
+  void setTimeFormat(const FXString& fmt,FXbool notify=false);
 
   /// Return file time format
   const FXString& getTimeFormat() const { return timeformat; }
 
   /// Change file associations; delete the old one unless it was shared
-  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false,FXbool notify=false);
 
   /// Return file associations
   FXFileAssociations* getAssociations() const { return associations; }

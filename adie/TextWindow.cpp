@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -138,6 +138,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE,TextWindow::onCmdSave),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVE,TextWindow::onUpdSave),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEAS,TextWindow::onCmdSaveAs),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVETO,TextWindow::onCmdSaveTo),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERT_FILE,TextWindow::onUpdIsEditable),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERT_FILE,TextWindow::onCmdInsertFile),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXTRACT_FILE,TextWindow::onUpdExtractFile),
@@ -240,14 +241,17 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE_SETTINGS,TextWindow::onCmdSaveSettings),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FINDFILES,TextWindow::onCmdFindInFiles),
 
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SET_MARK,TextWindow::onUpdSetMark),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SET_MARK,TextWindow::onCmdSetMark),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_NEXT_MARK,TextWindow::onUpdNextMark),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEXT_MARK,TextWindow::onCmdNextMark),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_PREV_MARK,TextWindow::onUpdPrevMark),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_PREV_MARK,TextWindow::onCmdPrevMark),
-  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SET_MARK,TextWindow::onUpdSetMark),
-  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SET_MARK,TextWindow::onCmdSetMark),
   FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_MARK_0,TextWindow::ID_MARK_9,TextWindow::onUpdGotoMark),
   FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_MARK_0,TextWindow::ID_MARK_9,TextWindow::onCmdGotoMark),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DEL_MARK,TextWindow::onUpdDelMark),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DEL_MARK,TextWindow::onCmdDelMark),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_CLEAR_MARKS,TextWindow::onUpdClearMarks),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_CLEAR_MARKS,TextWindow::onCmdClearMarks),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVEMARKS,TextWindow::onUpdSaveMarks),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEMARKS,TextWindow::onCmdSaveMarks),
@@ -494,7 +498,8 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(filemenu,tr("Switch...\t\tSwitch to other file."),NULL,this,ID_SWITCH);
   new FXMenuCommand(filemenu,tr("&Reopen...\t\tReopen file."),getApp()->reloadicon,this,ID_REOPEN);
   new FXMenuCommand(filemenu,tr("&Save\tCtl-S\tSave changes to file."),getApp()->saveicon,this,ID_SAVE);
-  new FXMenuCommand(filemenu,tr("Save &As...\t\tSave document to another file."),getApp()->saveasicon,this,ID_SAVEAS);
+  new FXMenuCommand(filemenu,tr("Save &As...\tShift-Ctl-S\tSave document under a different file name."),getApp()->saveasicon,this,ID_SAVEAS);
+  new FXMenuCommand(filemenu,tr("Save &To...\tShift-Ctl-T\tSave copy of document to file name."),getApp()->savetoicon,this,ID_SAVETO);
   new FXMenuCommand(filemenu,tr("&Close\tCtl-W\tClose document."),NULL,this,ID_CLOSE);
   new FXMenuSeparator(filemenu);
   new FXMenuCommand(filemenu,tr("Insert from file...\t\tInsert text from file."),NULL,this,ID_INSERT_FILE);
@@ -564,10 +569,11 @@ void TextWindow::createMenubar(){
   new FXMenuSeparator(gotomenu);
   new FXMenuCommand(gotomenu,tr("Goto matching (..)\tCtl-M\tGoto matching brace or parenthesis."),NULL,editor,FXText::ID_GOTO_MATCHING);
   new FXMenuSeparator(gotomenu);
-  new FXMenuCommand(gotomenu,tr("&Set bookmark\tAlt-B"),getApp()->bookseticon,this,ID_SET_MARK);
-  new FXMenuCommand(gotomenu,tr("&Next bookmark\tAlt-N"),getApp()->booknexticon,this,ID_NEXT_MARK);
-  new FXMenuCommand(gotomenu,tr("&Previous bookmark\tAlt-P"),getApp()->bookprevicon,this,ID_PREV_MARK);
-  new FXMenuCommand(gotomenu,tr("&Clear bookmarks\tAlt-C"),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
+  new FXMenuCommand(gotomenu,tr("&Set bookmark\tAlt-B\tSet bookmark at cursor location."),getApp()->bookseticon,this,ID_SET_MARK);
+  new FXMenuCommand(gotomenu,tr("&Next bookmark\tAlt-N\tMove cursor to next bookmark."),getApp()->booknexticon,this,ID_NEXT_MARK);
+  new FXMenuCommand(gotomenu,tr("&Previous bookmark\tAlt-P\tMove cursor to previous bookmark."),getApp()->bookprevicon,this,ID_PREV_MARK);
+  new FXMenuCommand(gotomenu,tr("&Delete bookmark\t\tDelete bookmark at cursor."),getApp()->bookdelicon,this,ID_DEL_MARK);
+  new FXMenuCommand(gotomenu,tr("&Clear all bookmarks\tAlt-C\tClear all bookmarks."),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
 
   // Search Menu
   searchmenu=new FXMenuPane(this);
@@ -581,14 +587,14 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-)\tSelect enclosing parentheses."),NULL,editor,FXText::ID_SELECT_PAREN);
   new FXMenuSeparator(searchmenu);
   new FXMenuCommand(searchmenu,tr("Incremental search\tCtl-I\tSearch for a string."),NULL,this,ID_ISEARCH_START);
-  new FXMenuCommand(searchmenu,tr("Search &Files\t\tSearch files for a string."),NULL,this,ID_FINDFILES);
-  new FXMenuCommand(searchmenu,tr("Find selected >>\tCtl-H\tSearch for selection."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
-  new FXMenuCommand(searchmenu,tr("Find selected <<\tShift-Ctl-H\tSearch for selection."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
-  new FXMenuCommand(searchmenu,tr("Find again >>\tCtl-G\tSearch forward for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
-  new FXMenuCommand(searchmenu,tr("Find again <<\tShift-Ctl-G\tSearch backward for next occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+  new FXMenuCommand(searchmenu,tr("Search &Files\tShift-Ctl-F\tSearch files for a string."),NULL,this,ID_FINDFILES);
+  new FXMenuCommand(searchmenu,tr("Find next selected\tCtl-H\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
+  new FXMenuCommand(searchmenu,tr("Find previous selected\tShift-Ctl-H\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+  new FXMenuCommand(searchmenu,tr("Find next\tCtl-G\tSearch for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+  new FXMenuCommand(searchmenu,tr("Find previous\tShift-Ctl-G\tSearch for previous occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
 
-  new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch for a string."),getApp()->searchicon,this,ID_SEARCH);
-  new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch for a string."),getApp()->replaceicon,this,ID_REPLACE);
+  new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch with a string pattern."),getApp()->searchicon,this,ID_SEARCH);
+  new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch and replace with a string pattern."),getApp()->replaceicon,this,ID_REPLACE);
 
   getAccelTable()->addAccel(MKUINT(KEY_F3,0),this,FXSEL(SEL_COMMAND,ID_SEARCH_NXT_FORW));
   getAccelTable()->addAccel(MKUINT(KEY_F3,SHIFTMASK),this,FXSEL(SEL_COMMAND,ID_SEARCH_NXT_BACK));
@@ -689,7 +695,8 @@ void TextWindow::createToolbar(){
   new FXButton(toolbar,tr("\tNew\tCreate new document."),getApp()->newicon,this,ID_NEW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tOpen\tOpen document file."),getApp()->openicon,this,ID_OPEN,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tSave\tSave document."),getApp()->saveicon,this,ID_SAVE,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tSave As\tSave document to another file."),getApp()->saveasicon,this,ID_SAVEAS,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSave As\tSave document under a different file name."),getApp()->saveasicon,this,ID_SAVEAS,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSave To\tSave copy of document to file name."),getApp()->savetoicon,this,ID_SAVETO,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
@@ -717,18 +724,19 @@ void TextWindow::createToolbar(){
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
 
   // Search
-  new FXButton(toolbar,tr("\tSearch\tSearch text."),getApp()->searchicon,this,ID_SEARCH,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tFind selected <<\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tFind selected >>\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSearch...\tSearch with a string pattern."),getApp()->searchicon,this,ID_SEARCH,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tReplace...\tSearch and replace with a string pattern."),getApp()->replaceicon,this,ID_REPLACE,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tFind previous selected\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tFind next selected\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
 
   // Bookmarks
-  new FXButton(toolbar,tr("\tBookmark\tSet bookmark."),getApp()->bookseticon,this,ID_SET_MARK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tPrevious Bookmark\tGoto previous bookmark."),getApp()->bookprevicon,this,ID_PREV_MARK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tNext Bookmark\tGoto next bookmark."),getApp()->booknexticon,this,ID_NEXT_MARK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tDelete Bookmarks\tDelete all bookmarks."),getApp()->bookdelicon,this,ID_CLEAR_MARKS,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tSet bookmark\tSet bookmark at cursor location."),getApp()->bookseticon,this,ID_SET_MARK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tPrevious Bookmark\tMove cursor to previous bookmark."),getApp()->bookprevicon,this,ID_PREV_MARK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tNext Bookmark\tMove cursor to next bookmark."),getApp()->booknexticon,this,ID_NEXT_MARK,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tClear Bookmarks\tClear all bookmarks."),getApp()->bookdelicon,this,ID_CLEAR_MARKS,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
@@ -1066,7 +1074,6 @@ FXbool TextWindow::insertFile(const FXString& file){
 // Save file
 FXbool TextWindow::saveFile(const FXString& file){
   FXFile textfile(file,FXFile::Writing);
-  FXbool saved=false;
 
   FXTRACE((100,"saveFile(%s)\n",file.text()));
 
@@ -1098,9 +1105,16 @@ FXbool TextWindow::saveFile(const FXString& file){
 
       // Write the file
       n=textfile.writeBlock(text,size);
+
+      // Kill wait cursor
+      getApp()->endWaitCursor();
+
+      // Free buffer
+      freeElms(text);
+
       if(n==size){
 
-        // Set stuff
+        // Switch to this file as current document
         setEditable(true);
         setBrowserCurrentFile(file);
         mrufiles.appendFile(file);
@@ -1110,24 +1124,66 @@ FXbool TextWindow::saveFile(const FXString& file){
         undolist.mark();
 
         // Success
-        saved=true;
+        return true;
         }
+      }
+    }
+  return false;
+  }
+
+
+// Save to file; don't switch to it as current document
+FXbool TextWindow::saveToFile(const FXString& file){
+  FXFile textfile(file,FXFile::Writing);
+
+  FXTRACE((100,"saveToFile(%s)\n",file.text()));
+
+  // Opened file?
+  if(textfile.isOpen()){
+    FXchar *text; FXint size,n;
+
+    // Get size
+    size=editor->getLength();
+
+    // Alloc buffer
+    if(allocElms(text,size+1)){
+
+      // Set wait cursor
+      getApp()->beginWaitCursor();
+
+      // Get text from editor
+      editor->getText(text,size);
+
+      // Append newline?
+      if(appendnl && (0<size) && (text[size-1]!='\n')){
+        text[size++]='\n';
+        }
+
+      // Translate newlines
+      if(appendcr){
+        fxtoDOS(text,size);
+        }
+
+      // Write the file
+      n=textfile.writeBlock(text,size);
 
       // Kill wait cursor
       getApp()->endWaitCursor();
 
       // Free buffer
       freeElms(text);
+
+      // Hopefully, all got saved
+      return (n==size);
       }
     }
-  return saved;
+  return false;
   }
 
 
 // Extract file
 FXbool TextWindow::extractFile(const FXString& file){
   FXFile textfile(file,FXFile::Writing);
-  FXbool saved=false;
 
   FXTRACE((100,"extractFile(%s)\n",file.text()));
 
@@ -1154,20 +1210,18 @@ FXbool TextWindow::extractFile(const FXString& file){
 
       // Write the file
       n=textfile.writeBlock(text,size);
-      if(n==size){
-
-        // Success
-        saved=true;
-        }
 
       // Kill wait cursor
       getApp()->endWaitCursor();
 
       // Ditch buffer
       freeElms(text);
+
+      // All got saved?
+      return (n==size);
       }
     }
-  return saved;
+  return false;
   }
 
 
@@ -1565,7 +1619,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2016 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2017 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1688,6 +1742,29 @@ long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
   }
 
 
+// Search list of (possibly relative to given base) paths for a file
+static FXString searchRelativePaths(const FXString& base,const FXString& paths,const FXString& file){
+  if(!file.empty()){
+    FXString stem,path;
+    FXint beg,end;
+    if(FXPath::isAbsolute(file)){
+      if(FXStat::exists(file)) return file;
+      return FXString::null;
+      }
+    for(beg=0; paths[beg]; beg=end){
+      while(paths[beg]==PATHLISTSEP) beg++;
+      end=beg;
+      while(paths[end] && paths[end]!=PATHLISTSEP) end++;
+      if(beg==end) break;
+      stem=FXPath::absolute(base,FXPath::expand(paths.mid(beg,end-beg)));
+      path=FXPath::absolute(stem,file);
+      if(FXStat::exists(path)) return path;
+      }
+    }
+  return FXString::null;
+  }
+
+
 // Open Selected
 long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
   FXchar name[1024];
@@ -1701,82 +1778,78 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
     // Its too big, most likely not a file name
     if(string.length()<1024){
 
-      // File to load
+      // Use current file's directory as base directory
+      FXString base=FXPath::directory(getFilename());
       FXString file;
 
-      // Use current file's directory as base directory
-      FXString dir=FXPath::directory(getFilename());
-
       // If no directory part, use current directory
-      if(dir.empty()){
-        dir=FXSystem::getCurrentDirectory();
-        }
+      if(base.empty()){ base=FXSystem::getCurrentDirectory(); }
 
       // Strip leading/trailing space
       string.trim();
 
       // Extract name from #include "file.h" syntax
       if(string.scan("#include \"%1023[^\"]\"",name)==1){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Extract name from #include <file.h> syntax
       else if(string.scan("#include <%1023[^>]>",name)==1){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Compiler output in the form <filename>:<number>:<number>: Error message
       else if(string.scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
         column-=1;
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Compiler output in the form <filename>:<number>: Error message
       else if(string.scan("%1023[^:]:%d",name,&lineno)==2){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Compiler output in the form <filename>(<number>) : Error message
       else if(string.scan("%1023[^(](%d)",name,&lineno)==2){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Compiler output in the form "<filename>", line <number>: Error message
       else if(string.scan("\"%1023[^\"]\", line %d",name,&lineno)==2){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Compiler output in the form ... File = <filename>, Line = <number>
       else if(string.scan("%*[^:]: %*s File = %1023[^,], Line = %d",name,&lineno)==2){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
       // Compiler output in the form filename: Other stuff
       else if(string.scan("%1023[^:]:",name)==1){
-        file=FXPath::absolute(dir,name);
+        file=FXPath::absolute(base,name);
         if(!FXStat::exists(file)){
-          file=FXPath::search(searchpaths,name);
+          file=searchRelativePaths(base,searchpaths,name);
           }
         }
 
@@ -1784,7 +1857,7 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
       if(!FXStat::exists(file)){
         file=string;
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(dir,string);
+          file=FXPath::absolute(base,string);
           }
         }
 
@@ -1878,7 +1951,7 @@ long TextWindow::onCmdOpenTree(FXObject*,FXSelector,void* ptr){
 
 
 // Switch files
-long TextWindow::onCmdSwitch(FXObject*,FXSelector,void* ptr){
+long TextWindow::onCmdSwitch(FXObject*,FXSelector,void*){
   if(saveChanges()){
     FXFileDialog opendialog(this,tr("Switch Document"));
     FXString file=getFilename();
@@ -2067,6 +2140,29 @@ long TextWindow::onCmdSaveAs(FXObject*,FXSelector,void*){
       FXMessageBox::error(this,MBOX_OK,tr("Error Saving File"),tr("Unable to save file: %s"),file.text());
       }
     determineSyntax();
+    }
+  return 1;
+  }
+
+
+// Save To
+long TextWindow::onCmdSaveTo(FXObject*,FXSelector,void*){
+  FXFileDialog savedialog(this,tr("Save Copy Of Document"));
+  FXString file=getFilename();
+  savedialog.setSelectMode(SELECTFILE_ANY);
+  savedialog.setAssociations(getApp()->associations,false);
+  savedialog.setPatternList(getPatternList());
+  savedialog.setCurrentPattern(getCurrentPattern());
+  savedialog.setFilename(file);
+  if(savedialog.execute()){
+    file=savedialog.getFilename();
+    if(FXStat::exists(file)){
+      if(MBOX_CLICKED_NO==FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite Document"),tr("Overwrite existing document: %s?"),file.text())) return 1;
+      }
+    if(!saveToFile(file)){
+      getApp()->beep();
+      FXMessageBox::error(this,MBOX_OK,tr("Error Saving To File"),tr("Unable to save to file: %s"),file.text());
+      }
     }
   return 1;
   }
@@ -2778,7 +2874,7 @@ long TextWindow::onCmdFindInFiles(FXObject*,FXSelector,void*){
 /*******************************************************************************/
 
 // Evaluate expression
-long TextWindow::onCmdExpression(FXObject* sender,FXSelector,void*){
+long TextWindow::onCmdExpression(FXObject*,FXSelector,void*){
   FXString string(editor->getSelectedText());
   FXExpression expression;
   if(expression.parse(string)==FXExpression::ErrOK){
@@ -3756,10 +3852,10 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCommand(&popupmenu,tr("Redo"),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
     new FXMenuSeparator(&popupmenu);
 
-    new FXMenuCommand(&popupmenu,tr("Find selected <<"),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
-    new FXMenuCommand(&popupmenu,tr("Find selected >>"),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
-    new FXMenuCommand(&popupmenu,tr("Find again <<"),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
-    new FXMenuCommand(&popupmenu,tr("Find again >>"),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+    new FXMenuCommand(&popupmenu,tr("Find next selected\t\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
+    new FXMenuCommand(&popupmenu,tr("Find previous selected\t\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+    new FXMenuCommand(&popupmenu,tr("Find next\t\tSearch for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+    new FXMenuCommand(&popupmenu,tr("Find previous\t\tSearch for previous occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
 
     new FXMenuSeparator(&popupmenu);
     new FXMenuCommand(&popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
@@ -3767,7 +3863,7 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCommand(&popupmenu,tr("Paste"),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
     new FXMenuCommand(&popupmenu,tr("Select All"),NULL,editor,FXText::ID_SELECT_ALL);
     new FXMenuSeparator(&popupmenu);
-    new FXMenuCommand(&popupmenu,tr("Set bookmark"),getApp()->bookseticon,this,ID_SET_MARK);
+    new FXMenuCommand(&popupmenu,tr("Set bookmark\t\tSet bookmark at cursor location."),getApp()->bookseticon,this,ID_SET_MARK);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_0);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_1);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_2);
@@ -3778,7 +3874,8 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_7);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_8);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_9);
-    new FXMenuCommand(&popupmenu,tr("Clear bookmarks"),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
+    new FXMenuCommand(&popupmenu,tr("Delete bookmark\t\tDelete bookmark at cursor."),getApp()->bookdelicon,this,ID_DEL_MARK);
+    new FXMenuCommand(&popupmenu,tr("Clear all bookmarks\t\tClear all bookmarks."),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
     popupmenu.forceRefresh();
     popupmenu.create();
     popupmenu.popup(NULL,event->root_x,event->root_y);
@@ -3832,7 +3929,7 @@ long TextWindow::onClock(FXObject*,FXSelector,void*){
 long TextWindow::onCmdNextMark(FXObject*,FXSelector,void*){
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(FXint b=0; b<=9; b++){
+    for(FXuint b=0; b<ARRAYNUMBER(bookmark); b++){
       if(bookmark[b]==0) break;
       if(bookmark[b]>pos){ gotoPosition(bookmark[b]); break; }
       }
@@ -3845,9 +3942,9 @@ long TextWindow::onCmdNextMark(FXObject*,FXSelector,void*){
 long TextWindow::onUpdNextMark(FXObject* sender,FXSelector,void*){
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(FXint b=0; b<=9; b++){
+    for(FXuint b=0; b<ARRAYNUMBER(bookmark); b++){
       if(bookmark[b]==0) break;
-      if(bookmark[b]>pos){ sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL); return 1; }
+      if(bookmark[b] && bookmark[b]>pos){ sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL); return 1; }
       }
     }
   sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
@@ -3859,9 +3956,9 @@ long TextWindow::onUpdNextMark(FXObject* sender,FXSelector,void*){
 long TextWindow::onCmdPrevMark(FXObject*,FXSelector,void*){
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(FXint b=9; 0<=b; b--){
-      if(bookmark[b]==0) continue;
-      if(bookmark[b]<pos){ gotoPosition(bookmark[b]); break; }
+    for(FXuint b=ARRAYNUMBER(bookmark); b>0; b--){
+      if(bookmark[b-1]==0) continue;
+      if(bookmark[b-1]<pos){ gotoPosition(bookmark[b-1]); break; }
       }
     }
   return 1;
@@ -3872,9 +3969,9 @@ long TextWindow::onCmdPrevMark(FXObject*,FXSelector,void*){
 long TextWindow::onUpdPrevMark(FXObject* sender,FXSelector,void*){
   if(bookmark[0]){
     FXint pos=editor->getCursorPos();
-    for(FXint b=9; 0<=b; b--){
-      if(bookmark[b]==0) continue;
-      if(bookmark[b]<pos){ sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL); return 1; }
+    for(FXuint b=ARRAYNUMBER(bookmark); b>0; b--){
+      if(bookmark[b-1]==0) continue;
+      if(bookmark[b-1]<pos){ sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL); return 1; }
       }
     }
   sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
@@ -3882,16 +3979,16 @@ long TextWindow::onUpdPrevMark(FXObject* sender,FXSelector,void*){
   }
 
 
-// Set bookmark
+// Set bookmark, but don't set more than one per line
 long TextWindow::onCmdSetMark(FXObject*,FXSelector,void*){
-  setBookmark(editor->getCursorPos());
+  setBookmark(editor->lineStart(editor->getCursorPos()));
   return 1;
   }
 
 
 // Update set bookmark
 long TextWindow::onUpdSetMark(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(bookmark[9]==0)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  sender->handle(this,(bookmark[ARRAYNUMBER(bookmark)-1]==0)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
@@ -3900,12 +3997,7 @@ long TextWindow::onUpdSetMark(FXObject* sender,FXSelector,void*){
 long TextWindow::onCmdGotoMark(FXObject*,FXSelector sel,void*){
   FXint pos=bookmark[FXSELID(sel)-ID_MARK_0];
   if(pos){
-    if(editor->getCursorPos()==pos){
-      clearBookmark(pos);
-      }
-    else{
-      gotoPosition(pos);
-      }
+    gotoPosition(pos);
     }
   return 1;
   }
@@ -3944,6 +4036,35 @@ long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
   }
 
 
+// Highlight if cursor on bookmarked line
+long TextWindow::onUpdDelMark(FXObject* sender,FXSelector,void*){
+  FXint pos=editor->lineStart(editor->getCursorPos());
+  for(FXuint i=0; bookmark[i] && i<ARRAYNUMBER(bookmark); i++){
+    if(pos==bookmark[i]){
+      sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+      return 1;
+      } 
+    }
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Clear bookmark at cursor
+long TextWindow::onCmdDelMark(FXObject*,FXSelector,void*){
+  clearBookmark(editor->lineStart(editor->getCursorPos()));
+  return 1;
+  }
+  
+  
+
+// Highlight if cursor on bookmarked line
+long TextWindow::onUpdClearMarks(FXObject* sender,FXSelector,void*){
+  sender->handle(this,bookmark[0]?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
 // Clear bookmarks
 long TextWindow::onCmdClearMarks(FXObject*,FXSelector,void*){
   clearBookmarks();
@@ -3954,15 +4075,15 @@ long TextWindow::onCmdClearMarks(FXObject*,FXSelector,void*){
 // Add bookmark at current cursor position; we force the cursor
 // position to be somewhere in the currently visible text.
 void TextWindow::setBookmark(FXint pos){
-  if(!bookmark[9] && pos){
-    FXint i;
-    for(i=0; i<=9; i++){
+  if(!bookmark[ARRAYNUMBER(bookmark)-1] && pos){
+    FXuint i;
+    for(i=0; i<ARRAYNUMBER(bookmark); i++){
       if(bookmark[i]==pos) return;
       }
-    for(i=8; i>=0 && (bookmark[i]==0 || pos<bookmark[i]); i--){
-      bookmark[i+1]=bookmark[i];
+    for(i=ARRAYNUMBER(bookmark)-1; i>0 && (bookmark[i-1]==0 || pos<bookmark[i-1]); i--){
+      bookmark[i]=bookmark[i-1];
       }
-    bookmark[i+1]=pos;
+    bookmark[i]=pos;
     }
   }
 
@@ -3970,15 +4091,12 @@ void TextWindow::setBookmark(FXint pos){
 // Remove bookmark at given position pos
 void TextWindow::clearBookmark(FXint pos){
   if(bookmark[0] && pos){
-    FXint i,j,p;
-    for(i=j=0; j<=9; j++){
-      p=bookmark[j];
-      if(p!=pos){
-        bookmark[i]=p;
-        i++;
-        }
+    FXuint i,j;
+    for(i=j=0; j<ARRAYNUMBER(bookmark); j++){
+      if(bookmark[j]==pos) continue;
+      bookmark[i++]=bookmark[j];
       }
-    bookmark[i]=0;
+    if(i<ARRAYNUMBER(bookmark)) bookmark[i]=0;
     }
   }
 
@@ -3987,14 +4105,13 @@ void TextWindow::clearBookmark(FXint pos){
 // if it was inside the deleted text and moving its position otherwise
 void TextWindow::updateBookmarks(FXint pos,FXint nd,FXint ni){
   if(bookmark[0]){
-    FXint i,j,p;
-    for(i=j=0; j<=9; j++){
-      p=bookmark[j];
-      if(p<=pos){
-        bookmark[i++]=p;
+    FXuint i,j;
+    for(i=j=0; j<ARRAYNUMBER(bookmark); j++){
+      if(bookmark[j]<=pos){
+        bookmark[i++]=bookmark[j];
         }
-      else if(pos+nd<=p){
-        bookmark[i++]=p+ni-nd;
+      else if(pos+nd<=bookmark[j]){
+        bookmark[i++]=bookmark[j]+ni-nd;
         }
       else{
         bookmark[j]=0;
@@ -4540,7 +4657,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
 
       // Restyle [beg,end> using rule, return matched range in [head,tail>
       affected=restyleRange(beg,end,head,tail,rule);
-      FXTRACE((1,"affected=%d beg=%d end=%d head=%d tail=%d, ule=%d (%s) \n",affected,beg,end,head,tail,rule,syntax->getRule(rule)->getName().text()));
+      FXTRACE((1,"affected=%d beg=%d end=%d head=%d tail=%d, rule=%d (%s) \n",affected,beg,end,head,tail,rule,syntax->getRule(rule)->getName().text()));
 
       // Not all colored yet, continue coloring with parent rule from
       if(tail<end){

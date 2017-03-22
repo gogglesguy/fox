@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -73,6 +73,7 @@ protected:
   FXColor       selbackColor;   // Selected background color
   FXColor       seltextColor;   // Selected text color
   FXColor       cursorColor;    // Color of the Cursor
+  FXuint        blink;          // Next cursor blink state
   FXint         cursor;         // Cursor position
   FXint         anchor;         // Anchor position
   FXint         columns;        // Number of columns visible

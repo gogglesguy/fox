@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -281,6 +281,20 @@ static const FXchar spaces[MAXTABCOLUMNS+1]="                                ";
 
 /*******************************************************************************/
 
+#if 0
+/**
+* Text selection data.
+* A range-selection is in effect when startpos<endpos, while a block-select
+* is in effect when startcol<endcol additionally.
+*/
+struct FXTextSelection {
+  FXint  startpos;      // Start of selection (begin of first line if block-select)
+  FXint  endpos;        // End of selection (end of last line if block-select)
+  FXint  startcol;      // Start column, if block-select
+  FXint  endcol;        // End column, if block select
+  };
+#endif
+
 
 // Absolute value
 static inline FXint fxabs(FXint a){ return a<0?-a:a; }
@@ -337,6 +351,7 @@ FXText::FXText(){
   vrows=0;
   vcols=0;
   hilitestyles=NULL;
+  blink=FLAG_CARET;
   matchtime=0;
   grabx=0;
   graby=0;
@@ -384,6 +399,7 @@ FXText::FXText(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
   barcolumns=0;
   font=getApp()->getNormalFont();
   hilitestyles=NULL;
+  blink=FLAG_CARET;
   defaultCursor=getApp()->getDefaultCursor(DEF_TEXT_CURSOR);
   dragCursor=getApp()->getDefaultCursor(DEF_TEXT_CURSOR);
   textColor=getApp()->getForeColor();
@@ -405,39 +421,6 @@ FXText::FXText(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
   graby=0;
   mode=MOUSE_NONE;
   modified=false;
-  }
-
-
-// Create window
-void FXText::create(){
-  FXScrollArea::create();
-  font->create();
-  tabwidth=tabcolumns*font->getTextWidth(" ",1);
-  barwidth=barcolumns*font->getTextWidth("8",1);
-  recalc();
-  if(getApp()->hasInputMethod()){
-    createComposeContext();
-    getComposeContext()->setFont(font);
-    }
-  }
-
-
-// Detach window
-void FXText::detach(){
-  FXScrollArea::detach();
-  font->detach();
-  }
-
-
-// Get default width
-FXint FXText::getDefaultWidth(){
-  return 0<vcols ? marginleft+marginright+vcols*font->getTextWidth("8",1)+barwidth : FXScrollArea::getDefaultWidth()+barwidth;
-  }
-
-
-// Get default height
-FXint FXText::getDefaultHeight(){
-  return 0<vrows ? margintop+marginbottom+vrows*font->getFontHeight() : FXScrollArea::getDefaultHeight();
   }
 
 
@@ -488,87 +471,27 @@ void FXText::disable(){
   }
 
 
-// Propagate size change
-void FXText::recalc(){
-  FXScrollArea::recalc();
-  flags|=FLAG_RECALC;
+// Create window
+void FXText::create(){
+  FXScrollArea::create();
+  font->create();
+  tabwidth=tabcolumns*font->getTextWidth(" ",1);
+  barwidth=barcolumns*font->getTextWidth("8",1);
+  recalc();
+  if(getApp()->hasInputMethod()){
+    createComposeContext();
+    getComposeContext()->setFont(font);
+    }
+  }
+
+
+// Detach window
+void FXText::detach(){
+  FXScrollArea::detach();
+  font->detach();
   }
 
 /*******************************************************************************/
-
-// See if position is in the selection, and the selection is non-empty
-FXbool FXText::isPosSelected(FXint pos) const {
-  return selstartpos<selendpos && selstartpos<=pos && pos<=selendpos;
-  }
-
-
-// Check if w is delimiter
-static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
-  FXchar wcs[5]={'\0','\0','\0','\0','\0'};
-  if(128<=w){
-    wc2utf(wcs,w);  
-    return (strstr(delimiters,wcs)!=NULL);
-    }
-  return (strchr(delimiters,w)!=NULL);
-  }
-
-
-// Make a valid position, at the start of a wide character
-FXint FXText::validPos(FXint pos) const {
-  const FXchar* ptr=&buffer[(gapend-gapstart)&((~pos+gapstart)>>31)];
-  if(pos<=0) return 0;
-  if(pos>=length) return length;
-  return (FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
-  }
-
-
-// Decrement; a wide character does not cross the gap, so if pos is at
-// or below below the gap, we read from the segment below the gap
-FXint FXText::dec(FXint pos) const {
-  const FXchar* ptr=&buffer[(gapend-gapstart)&((gapstart-pos)>>31)];
-  return (--pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
-  }
-
-
-// Increment; since a wide character does not cross the gap, if we
-// start under the gap the last character accessed is below the gap
-FXint FXText::inc(FXint pos) const {
-  const FXchar* ptr=&buffer[(gapend-gapstart)&((~pos+gapstart)>>31)];
-  return (++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos), pos;
-  }
-
-
-// Get byte
-FXint FXText::getByte(FXint pos) const {
-  return (FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
-  }
-
-
-// Get character, assuming that gap never inside utf8 encoding
-FXwchar FXText::getChar(FXint pos) const {
-  FXASSERT(0<=pos && pos<length);
-  const FXuchar* ptr=(FXuchar*)&buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
-  FXwchar w=ptr[0];
-  if(__unlikely(0xC0<=w)){ w=(w<<6)^ptr[1]^0x3080;
-  if(__unlikely(0x800<=w)){ w=(w<<6)^ptr[2]^0x20080;
-  if(__unlikely(0x10000<=w)){ w=(w<<6)^ptr[3]^0x400080; }}}
-  return w;
-  }
-
-
-// Get length of wide character at position pos
-FXint FXText::getCharLen(FXint pos) const {
-  FXASSERT(0<=pos && pos<length);
-  return FXString::utfBytes[(FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))]];
-  }
-
-
-// Get style
-FXint FXText::getStyle(FXint pos) const {
-  FXASSERT(0<=pos && pos<length);
-  return (FXuchar)sbuffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
-  }
-
 
 // Move the gap; gap is never moved inside utf character
 void FXText::movegap(FXint pos){
@@ -623,6 +546,65 @@ void FXText::squeezegap(){
 
 /*******************************************************************************/
 
+// Make a valid position, at the start of a wide character
+FXint FXText::validPos(FXint pos) const {
+  const FXchar* ptr=&buffer[(gapend-gapstart)&((~pos+gapstart)>>31)];
+  if(pos<=0) return 0;
+  if(pos>=length) return length;
+  return (FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
+  }
+
+
+// Decrement; a wide character does not cross the gap, so if pos is at
+// or below below the gap, we read from the segment below the gap
+FXint FXText::dec(FXint pos) const {
+  const FXchar* ptr=&buffer[(gapend-gapstart)&((gapstart-pos)>>31)];
+  return (--pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos<=0 || FXISUTF8(ptr[pos]) || --pos), pos;
+  }
+
+
+// Increment; since a wide character does not cross the gap, if we
+// start under the gap the last character accessed is below the gap
+FXint FXText::inc(FXint pos) const {
+  const FXchar* ptr=&buffer[(gapend-gapstart)&((~pos+gapstart)>>31)];
+  return (++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos>=length || FXISUTF8(ptr[pos]) || ++pos), pos;
+  }
+
+/*******************************************************************************/
+
+// Get byte
+FXint FXText::getByte(FXint pos) const {
+  return (FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
+  }
+
+
+// Get character, assuming that gap never inside utf8 encoding
+FXwchar FXText::getChar(FXint pos) const {
+  FXASSERT(0<=pos && pos<length);
+  const FXuchar* ptr=(FXuchar*)&buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
+  FXwchar w=ptr[0];
+  if(__unlikely(0xC0<=w)){ w=(w<<6)^ptr[1]^0x3080;
+  if(__unlikely(0x800<=w)){ w=(w<<6)^ptr[2]^0x20080;
+  if(__unlikely(0x10000<=w)){ w=(w<<6)^ptr[3]^0x400080; }}}
+  return w;
+  }
+
+
+// Get length of wide character at position pos
+FXint FXText::getCharLen(FXint pos) const {
+  FXASSERT(0<=pos && pos<length);
+  return FXString::utfBytes[(FXuchar)buffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))]];
+  }
+
+
+// Get style
+FXint FXText::getStyle(FXint pos) const {
+  FXASSERT(0<=pos && pos<length);
+  return (FXuchar)sbuffer[pos+((gapend-gapstart)&((~pos+gapstart)>>31))];
+  }
+
+/*******************************************************************************/
+
 // FIXME
 // Its a little bit more complex than this:
 // We need to deal with diacritics, i.e. non-spacing stuff.  When wrapping, scan till
@@ -639,6 +621,59 @@ FXint FXText::charWidth(FXwchar ch,FXint indent) const {
   if(__likely(' '<=ch)) return font->getCharWidth(ch);
   if(__likely(ch=='\t')) return (tabwidth-indent%tabwidth);
   return font->getCharWidth('^')+font->getCharWidth(ch|0x40);
+  }
+
+
+// Calculate line width
+FXint FXText::lineWidth(FXint pos,FXint n) const {
+  register FXint end=pos+n,w=0;
+  FXASSERT(0<=pos && end<=length);
+  while(pos<end){ w+=charWidth(getChar(pos),w); pos+=getCharLen(pos); }
+  return w;
+  }
+
+
+// Determine indent of position pos relative to start
+FXint FXText::indentFromPos(FXint start,FXint pos) const {
+  register FXint p=start,in=0;
+  register FXwchar ch;
+  FXASSERT(0<=start && pos<=length);
+  while(p<pos){
+    ch=getChar(p);
+    if(ch=='\n'){
+      in=0;
+      }
+    else if(ch=='\t'){
+      in+=(tabcolumns-in%tabcolumns);
+      }
+    else{
+      in+=1;
+      }
+    p+=getCharLen(p);
+    }
+  return in;
+  }
+
+
+// Determine position of indent relative to start
+FXint FXText::posFromIndent(FXint start,FXint indent) const {
+  register FXint pos=start,in=0;
+  register FXwchar ch;
+  FXASSERT(0<=start && start<=length);
+  while(in<indent && pos<length){
+    ch=getChar(pos);
+    if(ch=='\n'){
+      break;
+      }
+    else if(ch=='\t'){
+      in+=(tabcolumns-in%tabcolumns);
+      }
+    else{
+      in+=1;
+      }
+    pos+=getCharLen(pos);
+    }
+  return pos;
   }
 
 
@@ -670,149 +705,116 @@ FXint FXText::wrap(FXint start) const {
   }
 
 
-// Count number of newlines
-FXint FXText::countLines(FXint start,FXint end) const {
-  register FXint p=start,nl=0;
-  FXASSERT(0<=start && end<=length+1);
-  while(p<end){
-    if(p>=length) return nl+1;
-    if(getByte(p)=='\n') nl++;
-    p++;
-    }
-  return nl;
+// Return position of begin of paragraph
+FXint FXText::lineStart(FXint pos) const {
+  FXASSERT(0<=pos && pos<=length);
+  while(0<pos){ if(getByte(pos-1)=='\n') return pos; pos--; }
+  return 0;
   }
 
 
-// Count number of rows; start should be on a row start
-FXint FXText::countRows(FXint start,FXint end) const {
-  register FXint p,q,s,cw,w=0,nr=0;
-  register FXwchar c;
-  FXASSERT(0<=start && end<=length+1);
-  if(options&TEXT_WORDWRAP){
-    p=q=s=start;
-    while(q<end){
-      if(p>=length) return nr+1;
-      c=getChar(p);
-      if(c=='\n'){                      // Break at newline
-        nr++;
-        w=0;
-        p=q=s=p+1;
-        continue;
-        }
-      cw=charWidth(c,w);
-      if(w+cw>wrapwidth){               // Break due to wrap
-        nr++;
-        w=0;
-        if(s>q){                        // Break past last space seen
-          p=q=s;
-          continue;
-          }
-        if(p==q) p+=getCharLen(p);      // Break anywhere, but at least one character on each line
-        q=s=p;
-        continue;
-        }
-      w+=cw;
-      p+=getCharLen(p);
-      if(Unicode::isSpace(c)) s=p;
-      }
-    }
-  else{
-    p=start;
-    while(p<end){
-      if(p>=length) return nr+1;
-      c=getByte(p);
-      if(c=='\n') nr++;
-      p++;
-      }
-    }
-  return nr;
+// Return position of end of paragraph
+FXint FXText::lineEnd(FXint pos) const {
+  FXASSERT(0<=pos && pos<=length);
+  while(pos<length){ if(getByte(pos)=='\n') return pos; pos++; }
+  return length;
   }
 
 
-// Count number of columns; start should be on a row start
-FXint FXText::countCols(FXint start,FXint end) const {
-  register FXint nc=0,in=0;
-  register FXwchar ch;
-  FXASSERT(0<=start && end<=length);
-  while(start<end){
-    ch=getChar(start);
-    if(ch=='\n'){
-      if(in>nc) nc=in;
-      in=0;
-      }
-    else if(ch=='\t'){
-      in+=(tabcolumns-nc%tabcolumns);
-      }
-    else{
-      in++;
-      }
-    start+=getCharLen(start);
+// Return start of next line
+FXint FXText::nextLine(FXint pos,FXint nl) const {
+  FXASSERT(0<=pos && pos<=length);
+  if(nl<=0) return pos;
+  while(pos<length){
+    if(getByte(pos)=='\n' && --nl==0) return pos+1;
+    pos++;
     }
-  if(in>nc) nc=in;
-  return nc;
+  return length;
   }
 
 
-// Measure lines; start and end should be on a row start
-FXint FXText::measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const {
-  register FXint nr=0,w=0,cw,p,q,s;
-  register FXwchar c;
-  FXASSERT(0<=start && end<=length+1);
-  if(options&TEXT_WORDWRAP){
-    wmax=wrapwidth;
-    p=q=s=start;
-    while(q<end){
-      if(p>=length){
-        nr++;
-        break;
-        }
-      c=getChar(p);
-      if(c=='\n'){                      // Break at newline
-        nr++;
-        w=0;
-        p=q=s=p+1;
-        continue;
-        }
-      cw=charWidth(c,w);
-      if(w+cw>wrapwidth){               // Break due to wrap
-        nr++;
-        w=0;
-        if(s>q){                        // Break past last space seen
-          p=q=s;
-          continue;
-          }
-        if(p==q) p+=getCharLen(p);      // Break anywhere, but at least one character on each line
-        q=s=p;
-        continue;
-        }
-      w+=cw;
-      p+=getCharLen(p);
-      if(Unicode::isSpace(c)) s=p;
-      }
+// Return start of previous line
+FXint FXText::prevLine(FXint pos,FXint nl) const {
+  FXASSERT(0<=pos && pos<=length);
+  if(nl<=0) return pos;
+  while(0<pos){
+    if(getByte(pos-1)=='\n' && nl--==0) return pos;
+    pos--;
     }
-  else{
-    wmax=0;
-    p=start;
-    while(p<end){
-      if(p>=length){
-        if(w>wmax) wmax=w;
-        nr++;
-        break;
-        }
-      c=getChar(p);
-      if(c=='\n'){                      // Break at newline
-        if(w>wmax) wmax=w;
-        nr++;
-        w=0;
-        }
-      else{
-        w+=charWidth(c,w);
-        }
-      p+=getCharLen(p);
+  return 0;
+  }
+
+
+// Return row start
+FXint FXText::rowStart(FXint pos) const {
+  register FXint p,t;
+  FXASSERT(0<=pos && pos<=length);
+  p=lineStart(pos);
+  if(!(options&TEXT_WORDWRAP)) return p;
+  while(p<pos && (t=wrap(p))<=pos && t<length) p=t;
+  FXASSERT(0<=p && p<=pos);
+  return p;
+  }
+
+
+// Return row end
+FXint FXText::rowEnd(FXint pos) const {
+  register FXint p;
+  FXASSERT(0<=pos && pos<=length);
+  if(!(options&TEXT_WORDWRAP)) return lineEnd(pos);
+  p=lineStart(pos);
+  while(p<length && p<=pos) p=wrap(p);
+  FXASSERT(0<=p && p<=length);
+  if(pos<p && Unicode::isSpace(getChar(dec(p)))) p=dec(p);
+  FXASSERT(pos<=p && p<=length);
+  return p;
+  }
+
+
+// Move to next row given start of line
+FXint FXText::nextRow(FXint pos,FXint nr) const {
+  register FXint p;
+  FXASSERT(0<=pos && pos<=length);
+  if(!(options&TEXT_WORDWRAP)) return nextLine(pos,nr);
+  if(nr<=0) return pos;
+  p=rowStart(pos);
+  while(p<length && 0<nr){ p=wrap(p); nr--; }
+  FXASSERT(0<=p && p<=length);
+  return p;
+  }
+
+
+// Move to previous row given start of line
+FXint FXText::prevRow(FXint pos,FXint nr) const {
+  register FXint p,q,t;
+  FXASSERT(0<=pos && pos<=length);
+  if(!(options&TEXT_WORDWRAP)) return prevLine(pos,nr);
+  if(nr<=0) return pos;
+  while(0<pos){
+    p=lineStart(pos);
+    for(q=p; q<pos && (t=wrap(q))<=pos && t<length; q=t) nr--;
+    if(nr==0) return p;
+    if(nr<0){
+      do{p=wrap(p);}while(++nr);
+      FXASSERT(0<=p && p<=length);
+      return p;
       }
+    pos=p-1;
+    nr--;
     }
-  hmax=nr*font->getFontHeight();
-  return nr;
+  return 0;
+  }
+
+/*******************************************************************************/
+
+// Check if w is delimiter
+static FXbool isdelimiter(const FXchar *delimiters,FXwchar w){
+  FXchar wcs[5]={'\0','\0','\0','\0','\0'};
+  if(128<=w){
+    wc2utf(wcs,w);
+    return (strstr(delimiters,wcs)!=NULL);
+    }
+  return (strchr(delimiters,w)!=NULL);
   }
 
 
@@ -943,189 +945,353 @@ FXint FXText::wordEnd(FXint pos) const {
   return pos;
   }
 
+/*******************************************************************************/
 
-// Return position of begin of paragraph
-FXint FXText::lineStart(FXint pos) const {
-  FXASSERT(0<=pos && pos<=length);
-  while(0<pos){ if(getByte(pos-1)=='\n') return pos; pos--; }
-  return 0;
-  }
-
-
-// Return position of end of paragraph
-FXint FXText::lineEnd(FXint pos) const {
-  FXASSERT(0<=pos && pos<=length);
-  while(pos<length){ if(getByte(pos)=='\n') return pos; pos++; }
-  return length;
-  }
-
-
-// Return start of next line
-FXint FXText::nextLine(FXint pos,FXint nl) const {
-  FXASSERT(0<=pos && pos<=length);
-  if(nl<=0) return pos;
-  while(pos<length){
-    if(getByte(pos)=='\n' && --nl==0) return pos+1;
-    pos++;
-    }
-  return length;
-  }
-
-
-// Return start of previous line
-FXint FXText::prevLine(FXint pos,FXint nl) const {
-  FXASSERT(0<=pos && pos<=length);
-  if(nl<=0) return pos;
-  while(0<pos){
-    if(getByte(pos-1)=='\n' && nl--==0) return pos;
-    pos--;
-    }
-  return 0;
-  }
-
-
-// Return row start
-FXint FXText::rowStart(FXint pos) const {
-  register FXint p,t;
-  FXASSERT(0<=pos && pos<=length);
-  p=lineStart(pos);
-  if(!(options&TEXT_WORDWRAP)) return p;
-  while(p<pos && (t=wrap(p))<=pos && t<length) p=t;
-  FXASSERT(0<=p && p<=pos);
-  return p;
-  }
-
-
-// Return row end
-FXint FXText::rowEnd(FXint pos) const {
-  register FXint p;
-  FXASSERT(0<=pos && pos<=length);
-  if(!(options&TEXT_WORDWRAP)) return lineEnd(pos);
-  p=lineStart(pos);
-  while(p<length && p<=pos) p=wrap(p);
-  FXASSERT(0<=p && p<=length);
-  if(pos<p && Unicode::isSpace(getChar(dec(p)))) p=dec(p);
-  FXASSERT(pos<=p && p<=length);
-  return p;
-  }
-
-
-// Move to next row given start of line
-FXint FXText::nextRow(FXint pos,FXint nr) const {
-  register FXint p;
-  FXASSERT(0<=pos && pos<=length);
-  if(!(options&TEXT_WORDWRAP)) return nextLine(pos,nr);
-  if(nr<=0) return pos;
-  p=rowStart(pos);
-  while(p<length && 0<nr){ p=wrap(p); nr--; }
-  FXASSERT(0<=p && p<=length);
-  return p;
-  }
-
-
-// Move to previous row given start of line
-FXint FXText::prevRow(FXint pos,FXint nr) const {
-  register FXint p,q,t;
-  FXASSERT(0<=pos && pos<=length);
-  if(!(options&TEXT_WORDWRAP)) return prevLine(pos,nr);
-  if(nr<=0) return pos;
-  while(0<pos){
-    p=lineStart(pos);
-    for(q=p; q<pos && (t=wrap(q))<=pos && t<length; q=t) nr--;
-    if(nr==0) return p;
-    if(nr<0){
-      do{p=wrap(p);}while(++nr);
-      FXASSERT(0<=p && p<=length);
-      return p;
-      }
-    pos=p-1;
-    nr--;
-    }
-  return 0;
-  }
-
-
-// Backs up to the begin of the line preceding the line containing pos, or the
-// start of the line containing pos if the preceding line terminated in a newline
-FXint FXText::changeBeg(FXint pos) const {
-  register FXint p1,p2,t;
-  FXASSERT(0<=pos && pos<=length);
-  p1=p2=lineStart(pos);
-  if(options&TEXT_WORDWRAP){
-    while(p2<pos && (t=wrap(p2))<=pos){
-      p1=p2;
-      p2=t;
-      }
-    }
-  FXASSERT(0<=p1 && p1<=length);
-  return p1;
-  }
-
-
-// Scan forward to the end of affected area, which is the start of the next
-// paragraph; a change can cause the rest of the paragraph to reflow.
-FXint FXText::changeEnd(FXint pos) const {
-  FXASSERT(0<=pos && pos<=length);
-  while(pos<length){
-    if(getByte(pos)=='\n') return pos+1;
-    pos++;
-    }
-  return length+1;  // YES, one more!
-  }
-
-
-// Calculate line width
-FXint FXText::lineWidth(FXint pos,FXint n) const {
-  register FXint end=pos+n,w=0;
-  FXASSERT(0<=pos && end<=length);
-  while(pos<end){ w+=charWidth(getChar(pos),w); pos+=getCharLen(pos); }
-  return w;
-  }
-
-
-// Determine indent of position pos relative to start
-FXint FXText::indentFromPos(FXint start,FXint pos) const {
-  register FXint p=start,in=0;
+// Count number of columns; start should be on a row start
+FXint FXText::countCols(FXint start,FXint end) const {
+  register FXint nc=0,in=0;
   register FXwchar ch;
-  FXASSERT(0<=start && pos<=length);
-  while(p<pos){
-    ch=getChar(p);
+  FXASSERT(0<=start && end<=length);
+  while(start<end){
+    ch=getChar(start);
     if(ch=='\n'){
+      if(in>nc) nc=in;
       in=0;
       }
     else if(ch=='\t'){
-      in+=(tabcolumns-in%tabcolumns);
+      in+=(tabcolumns-nc%tabcolumns);
       }
     else{
-      in+=1;
+      in++;
       }
-    p+=getCharLen(p);
+    start+=getCharLen(start);
     }
-  return in;
+  if(in>nc) nc=in;
+  return nc;
   }
 
 
-// Determine position of indent relative to start
-FXint FXText::posFromIndent(FXint start,FXint indent) const {
-  register FXint pos=start,in=0;
-  register FXwchar ch;
-  FXASSERT(0<=start && start<=length);
-  while(in<indent && pos<length){
-    ch=getChar(pos);
-    if(ch=='\n'){
-      break;
+// Count number of rows; start should be on a row start
+FXint FXText::countRows(FXint start,FXint end) const {
+  register FXint p,q,s,cw,w=0,nr=0;
+  register FXwchar c;
+  FXASSERT(0<=start && end<=length+1);
+  if(options&TEXT_WORDWRAP){
+    p=q=s=start;
+    while(q<end){
+      if(p>=length) return nr+1;
+      c=getChar(p);
+      if(c=='\n'){                      // Break at newline
+        nr++;
+        w=0;
+        p=q=s=p+1;
+        continue;
+        }
+      cw=charWidth(c,w);
+      if(w+cw>wrapwidth){               // Break due to wrap
+        nr++;
+        w=0;
+        if(s>q){                        // Break past last space seen
+          p=q=s;
+          continue;
+          }
+        if(p==q) p+=getCharLen(p);      // Break anywhere, but at least one character on each line
+        q=s=p;
+        continue;
+        }
+      w+=cw;
+      p+=getCharLen(p);
+      if(Unicode::isSpace(c)) s=p;
       }
-    else if(ch=='\t'){
-      in+=(tabcolumns-in%tabcolumns);
-      }
-    else{
-      in+=1;
-      }
-    pos+=getCharLen(pos);
     }
-  return pos;
+  else{
+    p=start;
+    while(p<end){
+      if(p>=length) return nr+1;
+      c=getByte(p);
+      if(c=='\n') nr++;
+      p++;
+      }
+    }
+  return nr;
   }
 
+
+// Count number of newlines
+FXint FXText::countLines(FXint start,FXint end) const {
+  register FXint p=start,nl=0;
+  FXASSERT(0<=start && end<=length+1);
+  while(p<end){
+    if(p>=length) return nl+1;
+    if(getByte(p)=='\n') nl++;
+    p++;
+    }
+  return nl;
+  }
+
+/*******************************************************************************/
+
+// Measure lines; start and end should be on a row start
+FXint FXText::measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const {
+  register FXint nr=0,w=0,cw,p,q,s;
+  register FXwchar c;
+  FXASSERT(0<=start && end<=length+1);
+  if(options&TEXT_WORDWRAP){
+    wmax=wrapwidth;
+    p=q=s=start;
+    while(q<end){
+      if(p>=length){
+        nr++;
+        break;
+        }
+      c=getChar(p);
+      if(c=='\n'){                      // Break at newline
+        nr++;
+        w=0;
+        p=q=s=p+1;
+        continue;
+        }
+      cw=charWidth(c,w);
+      if(w+cw>wrapwidth){               // Break due to wrap
+        nr++;
+        w=0;
+        if(s>q){                        // Break past last space seen
+          p=q=s;
+          continue;
+          }
+        if(p==q) p+=getCharLen(p);      // Break anywhere, but at least one character on each line
+        q=s=p;
+        continue;
+        }
+      w+=cw;
+      p+=getCharLen(p);
+      if(Unicode::isSpace(c)) s=p;
+      }
+    }
+  else{
+    wmax=0;
+    p=start;
+    while(p<end){
+      if(p>=length){
+        if(w>wmax) wmax=w;
+        nr++;
+        break;
+        }
+      c=getChar(p);
+      if(c=='\n'){                      // Break at newline
+        if(w>wmax) wmax=w;
+        nr++;
+        w=0;
+        }
+      else{
+        w+=charWidth(c,w);
+        }
+      p+=getCharLen(p);
+      }
+    }
+  hmax=nr*font->getFontHeight();
+  return nr;
+  }
+
+
+// Recalculate line starts
+void FXText::calcVisRows(FXint startline,FXint endline){
+  register FXint pos;
+  FXASSERT(nvisrows>0);
+  startline=FXCLAMP(0,startline,nvisrows);
+  endline=FXCLAMP(0,endline,nvisrows);
+  if(startline<=endline){
+    if(startline==0){
+      FXASSERT(0<=toppos && toppos<=length);
+      visrows[0]=toppos;
+      startline=1;
+      }
+    pos=visrows[startline-1];
+    if(options&TEXT_WORDWRAP){
+      while(startline<=endline && pos<length){
+        pos=wrap(pos);
+        FXASSERT(0<=pos && pos<=length);
+        visrows[startline++]=pos;
+        }
+      }
+    else{
+      while(startline<=endline && pos<length){
+        pos=nextLine(pos);
+        FXASSERT(0<=pos && pos<=length);
+        visrows[startline++]=pos;
+        }
+      }
+    while(startline<=endline){
+      visrows[startline++]=length;
+      }
+    }
+  }
+
+
+// Completely reflow the text, because font, wrapwidth, or all of the
+// text may have changed and everything needs to be recomputed
+void FXText::recompute(){
+  FXint ww1,ww2,ww3,hh1,hh2,hh3,hh;
+
+  // Make it point somewhere sensible
+  keeppos=FXCLAMP(0,keeppos,length);
+
+  // Make sure we're pointing to the start of a row again
+  toppos=rowStart(keeppos);
+
+  // Font height
+  hh=font->getFontHeight();
+
+  // Get start
+  cursorstartpos=rowStart(cursorpos);
+  cursorendpos=nextRow(cursorstartpos);
+  cursorcol=indentFromPos(cursorstartpos,cursorpos);
+
+  // Avoid measuring huge chunks of text twice!
+  if(cursorstartpos<toppos){
+    cursorrow=measureText(0,cursorstartpos,ww1,hh1);
+    toprow=cursorrow+measureText(cursorstartpos,toppos,ww2,hh2);
+    nrows=toprow+measureText(toppos,length+1,ww3,hh3);
+    }
+  else{
+    toprow=measureText(0,toppos,ww1,hh1);
+    cursorrow=toprow+measureText(toppos,cursorstartpos,ww2,hh2);
+    nrows=cursorrow+measureText(cursorstartpos,length+1,ww3,hh3);
+    }
+
+  textWidth=FXMAX3(ww1,ww2,ww3);
+  textHeight=hh1+hh2+hh3;
+
+  // Adjust position, keeping same fractional position
+  pos_y=-toprow*hh-(-pos_y%hh);
+
+  // Number of visible lines has changed
+  nvisrows=(height-margintop-marginbottom+hh+hh-1)/hh;
+  if(nvisrows<1) nvisrows=1;
+
+  // Resize line start array
+  resizeElms(visrows,nvisrows+1);
+
+  // Recompute line starts
+  calcVisRows(0,nvisrows);
+
+  FXTRACE((150,"recompute : toprow=%d toppos=%d nrows=%d nvisrows=%d textWidth=%d textHeight=%d length=%d cursorrow=%d cursorcol=%d\n",toprow,toppos,nrows,nvisrows,textWidth,textHeight,length,cursorrow,cursorcol));
+
+  // Done with that
+  flags&=~FLAG_RECALC;
+  }
+
+/*******************************************************************************/
+
+// Determine content width of scroll area
+FXint FXText::getContentWidth(){
+  if(flags&FLAG_RECALC) recompute();
+  return marginleft+marginright+textWidth;
+  }
+
+
+// Determine content height of scroll area
+FXint FXText::getContentHeight(){
+  if(flags&FLAG_RECALC) recompute();
+  return margintop+marginbottom+textHeight;
+  }
+
+
+// Return visible scroll-area x position
+FXint FXText::getVisibleX() const {
+  return barwidth;
+  }
+
+
+// Return visible scroll-area y position
+FXint FXText::getVisibleY() const {
+  return 0;
+  }
+
+
+// Return visible scroll-area width
+FXint FXText::getVisibleWidth() const {
+  return width-vertical->getWidth()-barwidth;
+  }
+
+
+// Return visible scroll-area height
+FXint FXText::getVisibleHeight() const {
+  return height-horizontal->getHeight();
+  }
+
+
+// Get default width
+FXint FXText::getDefaultWidth(){
+  return 0<vcols ? marginleft+marginright+vcols*font->getTextWidth("8",1)+barwidth : FXScrollArea::getDefaultWidth()+barwidth;
+  }
+
+
+// Get default height
+FXint FXText::getDefaultHeight(){
+  return 0<vrows ? margintop+marginbottom+vrows*font->getFontHeight() : FXScrollArea::getDefaultHeight();
+  }
+
+/*******************************************************************************/
+
+// Recalculate layout
+void FXText::layout(){
+  FXint fh=font->getFontHeight();
+  FXint fw=font->getFontWidth();
+  FXint ovv=nvisrows;
+  FXint oww=wrapwidth;
+
+  // Compute new wrap width; needed to reflow text
+  if(options&TEXT_FIXEDWRAP){
+    wrapwidth=wrapcolumns*font->getTextWidth("x",1);
+    }
+  else{
+    wrapwidth=width-barwidth-marginleft-marginright;
+    if(!(options&VSCROLLER_NEVER)) wrapwidth-=vertical->getDefaultWidth();
+    }
+
+  // Wrap width changed, so reflow; when using fixed pitch font,
+  // we only reflow if the number of columns has changed.
+  if((options&TEXT_WORDWRAP) && (wrapwidth!=oww)){
+    if(!font->isFontMono() || (wrapwidth/fw!=oww/fw)) flags|=FLAG_RECALC;
+    }
+
+  // Scrollbars adjusted
+  placeScrollBars(width-barwidth,height);
+
+  // Number of visible lines may have changed
+  nvisrows=(height-margintop-marginbottom+fh+fh-1)/fh;
+  if(nvisrows<1) nvisrows=1;
+
+  // Number of visible lines changed
+  if(nvisrows!=ovv){
+
+    // Resize line start array
+    resizeElms(visrows,nvisrows+1);
+
+    // Recompute line starts
+    calcVisRows(0,nvisrows);
+    }
+
+  // Set line size based on font
+  vertical->setLine(fh);
+  horizontal->setLine(fw);
+
+  // Force repaint
+  update();
+
+  // Done
+  flags&=~FLAG_DIRTY;
+  }
+
+
+// Propagate size change
+void FXText::recalc(){
+  FXScrollArea::recalc();
+  flags|=FLAG_RECALC;
+  }
+
+/*******************************************************************************/
 
 // Search forward for match
 FXint FXText::matchForward(FXint pos,FXint end,FXwchar l,FXwchar r,FXint level) const {
@@ -1197,6 +1363,7 @@ void FXText::flashMatching(){
     }
   }
 
+/*******************************************************************************/
 
 // Shift text by certain amount
 FXint FXText::shiftText(FXint start,FXint end,FXint amount,FXbool notify){
@@ -1270,6 +1437,7 @@ FXint FXText::shiftText(FXint start,FXint end,FXint amount,FXbool notify){
   return 0;
   }
 
+/*******************************************************************************/
 
 // Search for text
 FXbool FXText::findText(const FXString& string,FXint* beg,FXint* end,FXint start,FXuint flgs,FXint npar){
@@ -1448,6 +1616,12 @@ FXint FXText::getXOfPos(FXint pos) const {
 
 /*******************************************************************************/
 
+// See if position is in the selection, and the selection is non-empty
+FXbool FXText::isPosSelected(FXint pos) const {
+  return selstartpos<selendpos && selstartpos<=pos && pos<=selendpos;
+  }
+
+
 // Return true if position is fully visible
 FXbool FXText::isPosVisible(FXint pos) const {
   if(visrows[0]<=pos && pos<=visrows[nvisrows]){
@@ -1597,186 +1771,6 @@ void FXText::moveContents(FXint x,FXint y){
 
 /*******************************************************************************/
 
-// Recalculate line starts
-void FXText::calcVisRows(FXint startline,FXint endline){
-  register FXint pos;
-  FXASSERT(nvisrows>0);
-  startline=FXCLAMP(0,startline,nvisrows);
-  endline=FXCLAMP(0,endline,nvisrows);
-  if(startline<=endline){
-    if(startline==0){
-      FXASSERT(0<=toppos && toppos<=length);
-      visrows[0]=toppos;
-      startline=1;
-      }
-    pos=visrows[startline-1];
-    if(options&TEXT_WORDWRAP){
-      while(startline<=endline && pos<length){
-        pos=wrap(pos);
-        FXASSERT(0<=pos && pos<=length);
-        visrows[startline++]=pos;
-        }
-      }
-    else{
-      while(startline<=endline && pos<length){
-        pos=nextLine(pos);
-        FXASSERT(0<=pos && pos<=length);
-        visrows[startline++]=pos;
-        }
-      }
-    while(startline<=endline){
-      visrows[startline++]=length;
-      }
-    }
-  }
-
-
-// Completely reflow the text, because font, wrapwidth, or all of the
-// text may have changed and everything needs to be recomputed
-void FXText::recompute(){
-  FXint ww1,ww2,ww3,hh1,hh2,hh3,hh;
-
-  // Make it point somewhere sensible
-  keeppos=FXCLAMP(0,keeppos,length);
-
-  // Make sure we're pointing to the start of a row again
-  toppos=rowStart(keeppos);
-
-  // Font height
-  hh=font->getFontHeight();
-
-  // Get start
-  cursorstartpos=rowStart(cursorpos);
-  cursorendpos=nextRow(cursorstartpos);
-  cursorcol=indentFromPos(cursorstartpos,cursorpos);
-
-  // Avoid measuring huge chunks of text twice!
-  if(cursorstartpos<toppos){
-    cursorrow=measureText(0,cursorstartpos,ww1,hh1);
-    toprow=cursorrow+measureText(cursorstartpos,toppos,ww2,hh2);
-    nrows=toprow+measureText(toppos,length+1,ww3,hh3);
-    }
-  else{
-    toprow=measureText(0,toppos,ww1,hh1);
-    cursorrow=toprow+measureText(toppos,cursorstartpos,ww2,hh2);
-    nrows=cursorrow+measureText(cursorstartpos,length+1,ww3,hh3);
-    }
-
-  textWidth=FXMAX3(ww1,ww2,ww3);
-  textHeight=hh1+hh2+hh3;
-
-  // Adjust position, keeping same fractional position
-  pos_y=-toprow*hh-(-pos_y%hh);
-
-  // Number of visible lines has changed
-  nvisrows=(height-margintop-marginbottom+hh+hh-1)/hh;
-  if(nvisrows<1) nvisrows=1;
-
-  // Resize line start array
-  resizeElms(visrows,nvisrows+1);
-
-  // Recompute line starts
-  calcVisRows(0,nvisrows);
-
-  FXTRACE((150,"recompute : toprow=%d toppos=%d nrows=%d nvisrows=%d textWidth=%d textHeight=%d length=%d cursorrow=%d cursorcol=%d\n",toprow,toppos,nrows,nvisrows,textWidth,textHeight,length,cursorrow,cursorcol));
-
-  // Done with that
-  flags&=~FLAG_RECALC;
-  }
-
-/*******************************************************************************/
-
-// Return visible scroll-area x position
-FXint FXText::getVisibleX() const {
-  return barwidth;
-  }
-
-
-// Return visible scroll-area y position
-FXint FXText::getVisibleY() const {
-  return 0;
-  }
-
-
-// Return visible scroll-area width
-FXint FXText::getVisibleWidth() const {
-  return width-vertical->getWidth()-barwidth;
-  }
-
-
-// Return visible scroll-area height
-FXint FXText::getVisibleHeight() const {
-  return height-horizontal->getHeight();
-  }
-
-
-// Determine content width of scroll area
-FXint FXText::getContentWidth(){
-  if(flags&FLAG_RECALC) recompute();
-  return marginleft+marginright+textWidth;
-  }
-
-
-// Determine content height of scroll area
-FXint FXText::getContentHeight(){
-  if(flags&FLAG_RECALC) recompute();
-  return margintop+marginbottom+textHeight;
-  }
-
-
-// Recalculate layout
-void FXText::layout(){
-  FXint fh=font->getFontHeight();
-  FXint fw=font->getFontWidth();
-  FXint ovv=nvisrows;
-  FXint oww=wrapwidth;
-
-  // Compute new wrap width; needed to reflow text
-  if(options&TEXT_FIXEDWRAP){
-    wrapwidth=wrapcolumns*font->getTextWidth("x",1);
-    }
-  else{
-    wrapwidth=width-barwidth-marginleft-marginright;
-    if(!(options&VSCROLLER_NEVER)) wrapwidth-=vertical->getDefaultWidth();
-    }
-
-  // Wrap width changed, so reflow; when using fixed pitch font,
-  // we only reflow if the number of columns has changed.
-  if((options&TEXT_WORDWRAP) && (wrapwidth!=oww)){
-    if(!font->isFontMono() || (wrapwidth/fw!=oww/fw)) flags|=FLAG_RECALC;
-    }
-
-  // Scrollbars adjusted
-  placeScrollBars(width-barwidth,height);
-
-  // Number of visible lines may have changed
-  nvisrows=(height-margintop-marginbottom+fh+fh-1)/fh;
-  if(nvisrows<1) nvisrows=1;
-
-  // Number of visible lines changed
-  if(nvisrows!=ovv){
-
-    // Resize line start array
-    resizeElms(visrows,nvisrows+1);
-
-    // Recompute line starts
-    calcVisRows(0,nvisrows);
-    }
-
-  // Set line size based on font
-  vertical->setLine(fh);
-  horizontal->setLine(fw);
-
-  // Force repaint
-  update();
-
-  // Done
-  flags&=~FLAG_DIRTY;
-  }
-
-
-/*******************************************************************************/
-
 // Move the cursor
 void FXText::setCursorPos(FXint pos,FXbool notify){
   FXint p=validPos(pos);
@@ -1806,6 +1800,7 @@ void FXText::setCursorPos(FXint pos,FXbool notify){
       target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)cursorpos);
       }
     }
+  blink=FLAG_CARET;
   }
 
 
@@ -1863,6 +1858,35 @@ void FXText::setAnchorPos(FXint pos){
   }
 
 /*******************************************************************************/
+
+// Backs up to the begin of the line preceding the line containing pos, or the
+// start of the line containing pos if the preceding line terminated in a newline
+FXint FXText::changeBeg(FXint pos) const {
+  register FXint p1,p2,t;
+  FXASSERT(0<=pos && pos<=length);
+  p1=p2=lineStart(pos);
+  if(options&TEXT_WORDWRAP){
+    while(p2<pos && (t=wrap(p2))<=pos){
+      p1=p2;
+      p2=t;
+      }
+    }
+  FXASSERT(0<=p1 && p1<=length);
+  return p1;
+  }
+
+
+// Scan forward to the end of affected area, which is the start of the next
+// paragraph; a change can cause the rest of the paragraph to reflow.
+FXint FXText::changeEnd(FXint pos) const {
+  FXASSERT(0<=pos && pos<=length);
+  while(pos<length){
+    if(getByte(pos)=='\n') return pos+1;
+    pos++;
+    }
+  return length+1;  // YES, one more!
+  }
+
 
 // There has been a mutation in the buffer
 void FXText::mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel){
@@ -2001,7 +2025,6 @@ void FXText::mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel)
 
   FXTRACE((150,"AFTER : pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows));
   }
-
 
 
 // Replace m characters at pos by n characters
@@ -2467,35 +2490,6 @@ FXint FXText::overstruck(FXint start,FXint end,const FXchar *text,FXint n){
   return end;
   }
 
-/*
-// Insert text at cursor
-void FXText::enterText(const FXchar *text,FXint n,FXbool repsel,FXbool notify){
-  FXint start=cursorpos;
-  FXint end=cursorpos;
-
-  // Replace selected characters
-  if(isPosSelected(cursorpos) && repsel){
-    start=selstartpos;
-    end=selendpos;
-    }
-
-  // Replace overstruck characters
-  if(isOverstrike()){
-    end=overstruck(start,end,text,n);
-    }
-
-  // Replace text
-  replaceText(start,end-start,text,n,notify);
-//  moveCursor(start+n,notify);
-
-
-  if(repsel){ killSelection(notify); }
-  setCursorPos(start+n,notify);
-  makePositionVisible(cursorpos);
-  setAnchorPos(cursorpos);
-  flashMatching();
-  }
-*/
 
 // Insert text at cursor
 void FXText::enterText(const FXchar *text,FXint n,FXbool notify){
@@ -2524,9 +2518,7 @@ void FXText::enterText(const FXString& text,FXbool notify){
   enterText(text.text(),text.length(),notify);
   }
 
-
 /*******************************************************************************/
-
 
 // Select all text
 FXbool FXText::selectAll(FXbool notify){
@@ -2825,6 +2817,109 @@ FXbool FXText::killHighlight(){
 
 /*******************************************************************************/
 
+// Draw the cursor
+void FXText::drawCursor(FXuint state){
+  if((state^flags)&FLAG_CARET){
+    if(xid){
+      FXDCWindow dc(this);
+      if(state&FLAG_CARET)
+        paintCursor(dc);
+      else
+        eraseCursor(dc);
+      }
+    flags^=FLAG_CARET;
+    }
+  }
+
+
+// Paint cursor glyph
+void FXText::paintCursor(FXDCWindow& dc) const {
+  register FXint th,tw,cursorx,cursory;
+  register FXwchar c;
+  th=font->getFontHeight();
+  cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
+  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
+    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
+    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
+    if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
+      dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
+      if(0<dc.getClipWidth() && 0<dc.getClipHeight()){
+        dc.setForeground(cursorColor);
+        if(options&TEXT_OVERSTRIKE){
+          dc.drawRectangle(cursorx,cursory,tw,th-1);
+          }
+        else{
+          dc.fillRectangle(cursorx,cursory,2,th);
+          dc.fillRectangle(cursorx-2,cursory,6,1);
+          dc.fillRectangle(cursorx-2,cursory+th-1,6,1);
+          }
+        }
+      }
+    }
+  }
+
+
+// Erase cursor glyph
+void FXText::eraseCursor(FXDCWindow& dc) const {
+  register FXint th,tw,cursorx,cursory,cx,cy,ch,cw;
+  register FXwchar c;
+  th=font->getFontHeight();
+  cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
+  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
+    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
+    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
+    if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
+      dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
+      if(0<dc.getClipWidth() && 0<dc.getClipHeight()){
+        dc.setFont(font);
+        dc.setForeground(backColor);
+        dc.fillRectangle(cursorx-2,cursory,tw+4,th);
+        cx=FXMAX(cursorx-2,getVisibleX()+marginleft);
+        cy=getVisibleY()+margintop;
+        cw=FXMIN(cursorx+tw+2,getVisibleX()+getVisibleWidth()-marginright)-cx;
+        ch=getVisibleHeight()-margintop-marginbottom;
+        dc.setClipRectangle(cx,cy,cw,ch);
+        FXASSERT(toprow<=cursorrow && cursorrow<toprow+nvisrows);
+        drawTextRow(dc,cursorrow);
+        }
+      }
+    }
+  }
+
+
+// Erase cursor overhang outside of margins
+void FXText::eraseCursorOverhang(){
+  register FXint th,tw,cursorx,cursory;
+  register FXwchar c;
+  th=font->getFontHeight();
+  cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
+  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
+    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
+    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
+    if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
+      FXDCWindow dc(this);
+      if(cursorx-2<=getVisibleX()+marginleft && getVisibleX()<=cursorx+tw+2){
+        dc.setForeground(backColor);
+        dc.fillRectangle(getVisibleX(),cursory,marginleft,th);
+        }
+      if(getVisibleX()+getVisibleWidth()-marginright<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
+        dc.setForeground(backColor);
+        dc.fillRectangle(getVisibleX()+getVisibleWidth()-marginright,cursory,marginright,th);
+        }
+      if(cursory<=getVisibleY()+margintop && getVisibleY()<=cursory+th){
+        dc.setForeground(backColor);
+        dc.fillRectangle(cursorx-2,getVisibleY(),tw+4,margintop);
+        }
+      if(getVisibleY()+getVisibleHeight()-marginbottom<=cursory+th && cursory<getVisibleY()+getVisibleHeight()){
+        dc.setForeground(backColor);
+        dc.fillRectangle(cursorx-2,getVisibleY()+getVisibleHeight()-marginbottom,tw+4,marginbottom);
+        }
+      }
+    }
+  }
+
+/*******************************************************************************/
+
 // Draw fragment of text in given style
 void FXText::drawBufferText(FXDCWindow& dc,FXint x,FXint y,FXint,FXint,FXint pos,FXint n,FXuint style) const {
   register FXuint index=(style&STYLE_MASK);
@@ -2974,107 +3069,6 @@ FXuint FXText::styleOf(FXint beg,FXint end,FXint row,FXint col,FXint pos) const 
   return s;
   }
 
-
-// Draw the cursor
-void FXText::drawCursor(FXuint state){
-  if((state^flags)&FLAG_CARET){
-    if(xid){
-      FXDCWindow dc(this);
-      if(state&FLAG_CARET)
-        paintCursor(dc);
-      else
-        eraseCursor(dc);
-      }
-    flags^=FLAG_CARET;
-    }
-  }
-
-
-// Paint cursor glyph
-void FXText::paintCursor(FXDCWindow& dc) const {
-  register FXint th,tw,cursorx,cursory; 
-  register FXwchar c;
-  th=font->getFontHeight();
-  cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
-    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
-    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
-    if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
-      dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
-      if(0<dc.getClipWidth() && 0<dc.getClipHeight()){
-        dc.setForeground(cursorColor);
-        if(options&TEXT_OVERSTRIKE){
-          dc.drawRectangle(cursorx,cursory,tw,th-1);
-          }
-        else{
-          dc.fillRectangle(cursorx,cursory,2,th);
-          dc.fillRectangle(cursorx-2,cursory,6,1);
-          dc.fillRectangle(cursorx-2,cursory+th-1,6,1);
-          }
-        }
-      }
-    }
-  }
-
-
-// Erase cursor glyph
-void FXText::eraseCursor(FXDCWindow& dc) const {
-  register FXint th,tw,cursorx,cursory,cx,cy,ch,cw; 
-  register FXwchar c;
-  th=font->getFontHeight();
-  cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
-    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
-    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
-    if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
-      dc.setClipRectangle(getVisibleX(),getVisibleY(),getVisibleWidth(),getVisibleHeight());
-      if(0<dc.getClipWidth() && 0<dc.getClipHeight()){
-        dc.setFont(font);
-        dc.setForeground(backColor);
-        dc.fillRectangle(cursorx-2,cursory,tw+4,th);
-        cx=FXMAX(cursorx-2,getVisibleX()+marginleft);
-        cy=getVisibleY()+margintop;
-        cw=FXMIN(cursorx+tw+2,getVisibleX()+getVisibleWidth()-marginright)-cx;
-        ch=getVisibleHeight()-margintop-marginbottom;
-        dc.setClipRectangle(cx,cy,cw,ch);
-        FXASSERT(toprow<=cursorrow && cursorrow<toprow+nvisrows);
-        drawTextRow(dc,cursorrow);
-        }
-      }
-    }
-  }
-
-
-// Erase cursor overhang outside of margins
-void FXText::eraseCursorOverhang(){
-  register FXint th,tw,cursorx,cursory; 
-  register FXwchar c;
-  th=font->getFontHeight();
-  cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
-  if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()+marginbottom){
-    tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
-    cursorx=getVisibleX()+marginleft+pos_x+lineWidth(cursorstartpos,cursorpos-cursorstartpos)-1;
-    if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
-      FXDCWindow dc(this);
-      if(cursorx-2<=getVisibleX()+marginleft && getVisibleX()<=cursorx+tw+2){
-        dc.setForeground(backColor);
-        dc.fillRectangle(getVisibleX(),cursory,marginleft,th);
-        }
-      if(getVisibleX()+getVisibleWidth()-marginright<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
-        dc.setForeground(backColor);
-        dc.fillRectangle(getVisibleX()+getVisibleWidth()-marginright,cursory,marginright,th);
-        }
-      if(cursory<=getVisibleY()+margintop && getVisibleY()<=cursory+th){
-        dc.setForeground(backColor);
-        dc.fillRectangle(cursorx-2,getVisibleY(),tw+4,margintop);
-        }
-      if(getVisibleY()+getVisibleHeight()-marginbottom<=cursory+th && cursory<getVisibleY()+getVisibleHeight()){
-        dc.setForeground(backColor);
-        dc.fillRectangle(cursorx-2,getVisibleY()+getVisibleHeight()-marginbottom,tw+4,marginbottom);
-        }
-      }
-    }
-  }
 
 // FIXME
 // Runs should preferably be whole combining sequence
@@ -3264,7 +3258,8 @@ long FXText::onPaint(FXObject*,FXSelector,void* ptr){
 
 // Blink the cursor
 long FXText::onBlink(FXObject*,FXSelector,void*){
-  drawCursor(flags^FLAG_CARET);
+  drawCursor(blink);
+  blink^=FLAG_CARET;
   getApp()->addTimeout(this,ID_BLINK,getApp()->getBlinkSpeed());
   return 0;
   }
@@ -3275,6 +3270,7 @@ long FXText::onFlash(FXObject*,FXSelector,void*){
   killHighlight();
   return 0;
   }
+
 
 // Gained focus
 long FXText::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
@@ -3292,7 +3288,7 @@ long FXText::onFocusOut(FXObject* sender,FXSelector sel,void* ptr){
   FXScrollArea::onFocusOut(sender,sel,ptr);
   if(isEditable()){
     getApp()->removeTimeout(this,ID_BLINK);
-    drawCursor(0);                                      // FIXME show insertion-caret?
+    drawCursor(0);
     }
   flags|=FLAG_UPDATE;
   return 1;

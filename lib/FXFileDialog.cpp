@@ -3,7 +3,7 @@
 *                    F i l e   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -133,6 +133,18 @@ FXString* FXFileDialog::getFilenames() const {
   }
 
 
+// Set directory
+void FXFileDialog::setDirectory(const FXString& path){
+  filebox->setDirectory(path);
+  }
+
+
+// Get directory
+FXString FXFileDialog::getDirectory() const {
+  return filebox->getDirectory();
+  }
+
+
 // Set pattern
 void FXFileDialog::setPattern(const FXString& ptrn){
   filebox->setPattern(ptrn);
@@ -154,18 +166,6 @@ void FXFileDialog::setPatternList(const FXString& patterns){
 // Return list of patterns
 FXString FXFileDialog::getPatternList() const {
   return filebox->getPatternList();
-  }
-
-
-// Set directory
-void FXFileDialog::setDirectory(const FXString& path){
-  filebox->setDirectory(path);
-  }
-
-
-// Get directory
-FXString FXFileDialog::getDirectory() const {
-  return filebox->getDirectory();
   }
 
 

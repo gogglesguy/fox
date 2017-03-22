@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -491,11 +491,11 @@ public:
   */
   FXTable(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_MARGIN,FXint pr=DEFAULT_MARGIN,FXint pt=DEFAULT_MARGIN,FXint pb=DEFAULT_MARGIN);
 
-  /// Return default width
-  virtual FXint getDefaultWidth();
+  /// Create the server-side resources
+  virtual void create();
 
-  /// Return default height
-  virtual FXint getDefaultHeight();
+  /// Detach the server-side resources
+  virtual void detach();
 
   /// Computes content width
   virtual FXint getContentWidth();
@@ -515,11 +515,11 @@ public:
   /// Return visible area height
   virtual FXint getVisibleHeight() const;
 
-  /// Create the server-side resources
-  virtual void create();
+  /// Return default width
+  virtual FXint getDefaultWidth();
 
-  /// Detach the server-side resources
-  virtual void detach();
+  /// Return default height
+  virtual FXint getDefaultHeight();
 
   /// Perform layout
   virtual void layout();

@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -92,8 +92,9 @@ protected:
   FXbool             navigable;         // May navigate
 protected:
   FXFileSelector(){}
-  FXString *getSelectedFiles() const;
-  FXString *getSelectedFilesOnly() const;
+  static FXint countFilenames(const FXString& string);
+  static FXString decodeFilename(const FXString& string,FXint n=0);
+  static FXString encodeFilename(const FXString& string);
 private:
   FXFileSelector(const FXFileSelector&);
   FXFileSelector &operator=(const FXFileSelector&);
@@ -105,6 +106,7 @@ public:
   long onCmdItemDeselected(FXObject*,FXSelector,void*);
   long onCmdDirectoryUp(FXObject*,FXSelector,void*);
   long onUpdDirectoryUp(FXObject*,FXSelector,void*);
+  long onUpdDirTree(FXObject*,FXSelector,void*);
   long onCmdDirTree(FXObject*,FXSelector,void*);
   long onCmdHome(FXObject*,FXSelector,void*);
   long onCmdWork(FXObject*,FXSelector,void*);
@@ -172,11 +174,29 @@ public:
   */
   FXString* getFilenames() const;
 
+  /// Change directory
+  void setDirectory(const FXString& path);
+
+  /// Return directory
+  FXString getDirectory() const;
+
+  /// Change file selection mode; the default is SELECTFILE_ANY
+  void setSelectMode(FXuint mode);
+
+  /// Return file selection mode
+  FXuint getSelectMode() const { return selectmode; }
+
   /// Change file pattern
   void setPattern(const FXString& ptrn);
 
   /// Return file pattern
   FXString getPattern() const;
+
+  /// Change wildcard matching mode (see FXPath)
+  void setMatchMode(FXuint mode);
+
+  /// Return wildcard matching mode
+  FXuint getMatchMode() const;
 
   /**
   * Change the list of file patterns shown in the file dialog.
@@ -221,27 +241,6 @@ public:
   /// Return true if pattern entry is allowed
   FXbool allowPatternEntry() const;
 
-  /**
-  * Given filename pattern of the form "GIF Format (*.gif)",
-  * returns the pattern only, i.e. "*.gif" in this case.
-  * If the parentheses are not found then returns the entire
-  * input pattern.
-  */
-  static FXString patternFromText(const FXString& pattern);
-
-  /**
-  * Given a pattern of the form "*.gif,*.GIF", return
-  * the first extension of the pattern, i.e. "gif" in this
-  * example. Returns empty string if it doesn't work out.
-  */
-  static FXString extensionFromPattern(const FXString& pattern);
-
-  /// Change directory
-  void setDirectory(const FXString& path);
-
-  /// Return directory
-  FXString getDirectory() const;
-
   /// Set the inter-item spacing (in pixels)
   void setItemSpace(FXint s);
 
@@ -253,18 +252,6 @@ public:
 
   /// Return file list style
   FXuint getFileBoxStyle() const;
-
-  /// Change file selection mode; the default is SELECTFILE_ANY
-  void setSelectMode(FXuint mode);
-
-  /// Return file selection mode
-  FXuint getSelectMode() const { return selectmode; }
-
-  /// Change wildcard matching mode (see FXPath)
-  void setMatchMode(FXuint mode);
-
-  /// Return wildcard matching mode
-  FXuint getMatchMode() const;
 
   /// Return true if showing hidden files
   FXbool showHiddenFiles() const;
@@ -325,6 +312,21 @@ public:
 
   /// Return icon loader
   FXIconSource* getIconSource() const;
+
+  /**
+  * Given filename pattern of the form "GIF Format (*.gif)",
+  * returns the pattern only, i.e. "*.gif" in this case.
+  * If the parentheses are not found then returns the entire
+  * input pattern.
+  */
+  static FXString patternFromText(const FXString& pattern);
+
+  /**
+  * Given a pattern of the form "*.gif,*.GIF", return
+  * the first extension of the pattern, i.e. "gif" in this
+  * example. Returns empty string if it doesn't work out.
+  */
+  static FXString extensionFromPattern(const FXString& pattern);
 
   /// Save object to a stream
   virtual void save(FXStream& store) const;

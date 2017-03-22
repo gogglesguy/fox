@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -181,6 +181,18 @@ void FXDirSelector::setDirectory(const FXString& path){
 // Return directory
 FXString FXDirSelector::getDirectory() const {
   return dirname->getText();
+  }
+
+
+// Change wildcard matching pattern
+void FXDirSelector::setPattern(const FXString& ptrn){
+  dirbox->setPattern(ptrn);
+  }
+
+
+// Return wildcard pattern
+FXString FXDirSelector::getPattern() const {
+  return dirbox->getPattern();
   }
 
 

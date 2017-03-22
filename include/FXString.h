@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -702,13 +702,30 @@ extern FXAPI FXString& unixToDos(FXString& str);
 /// Convert dos string to unix string
 extern FXAPI FXString& dosToUnix(FXString& str);
 
-/// Check if the string contains special characters or leading or trailing whitespace, or contains utf8 if flag!=0
+/**
+* Check if the string contains special characters or leading or trailing whitespace, 
+* or contains UTF8 if flag!=0.
+*/
 extern FXAPI FXbool shouldEscape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXint flag=0);
 
-/// Escape special characters, and optionally enclose with left and right quotes; escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2
+/**
+* Escape special characters.
+* Optionally enclose return value with left and right quotes.
+* Flag: 0 don't encode UTF8 multi-byte characters.
+* Flag: 1 encodes UTF8 multi-byte characters to a sequence of hexadecimals of the form \xXX.
+* Flag: 2 encodes UTF8 multi-byte characters to the form \uXXXX or \uXXXX\uYYYY.
+* Ill-formed UTF8 will be encoded as hexadecimals \xXX regardless even if \uXXXX is requested.
+* Quotes will be escaped if quoting is performed.
+*/
 extern FXAPI FXString escape(const FXString& str,FXchar lquote=0,FXchar rquote=0,FXint flag=0);
 
-/// Unescape special characters, and optionally remove left and right quotes
+/**
+* Unescape special characters,
+* Optionally remove surrounding left and right quotes.
+* In particular, decode \xXX to the hexadecimal character XX, \uXXXX to the multi-byte
+* UTF8 sequence representing unicode character XXXX, and decode \t, \n, etc. 
+* Handle surrogate pairs of the form \uXXXX\uYYYY properly.
+*/
 extern FXAPI FXString unescape(const FXString& str,FXchar lquote=0,FXchar rquote=0);
 
 /// Return normalized string, i.e. reordering of diacritical marks

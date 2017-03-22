@@ -3,7 +3,7 @@
 *                       X M L   R e a d e r  &  W r i t e r                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2016 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2016,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -595,19 +595,19 @@ FXXML::FXXML():begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),curren
 
 
 // Construct XML parser instance and pass it external buffer
-FXXML::FXXML(FXchar* data,FXuval size,Direction d):begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),current(NULL),column(0),line(1),dir(Stop),enc(UTF8),owns(false){
-  FXTRACE((1,"FXXML::FXXML(%p,%ld,%s)\n",data,size,d==Load?"Load":d==Save?"Save":"Stop"));
-  open(data,size,d);
+FXXML::FXXML(FXchar* data,FXuval sz,Direction d):begptr(NULL),endptr(NULL),sptr(NULL),rptr(NULL),wptr(NULL),current(NULL),column(0),line(1),dir(Stop),enc(UTF8),owns(false){
+  FXTRACE((1,"FXXML::FXXML(%p,%ld,%s)\n",data,sz,d==Load?"Load":d==Save?"Save":"Stop"));
+  open(data,sz,d);
   }
 
 
 // Open XML stream for given direction d
-FXbool FXXML::open(FXchar* data,FXuval size,Direction d){
-  FXTRACE((2,"FXXML::open(%p,%ld,%s)\n",data,size,d==Load?"Load":d==Save?"Save":"Stop"));
+FXbool FXXML::open(FXchar* data,FXuval sz,Direction d){
+  FXTRACE((2,"FXXML::open(%p,%ld,%s)\n",data,sz,d==Load?"Load":d==Save?"Save":"Stop"));
   if((dir==Stop) && (d!=Stop)){
     if(data){
       begptr=data;
-      endptr=begptr+size;
+      endptr=begptr+sz;
       if(d==Save){
         sptr=begptr;
         rptr=begptr;
@@ -621,9 +621,9 @@ FXbool FXXML::open(FXchar* data,FXuval size,Direction d){
       owns=false;
       }
     else{
-      if(size<MINBUFFER) size=MINBUFFER;
-      if(!allocElms(begptr,size)) return false;
-      endptr=begptr+size;
+      if(sz<MINBUFFER) sz=MINBUFFER;
+      if(!allocElms(begptr,sz)) return false;
+      endptr=begptr+sz;
       if(d==Save){
         sptr=begptr;
         rptr=begptr;

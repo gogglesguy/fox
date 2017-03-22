@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1878,7 +1878,7 @@ FXExecute::FXExecute(const FXchar *s,FXint n,FXint* b,FXint* e,FXint p,FXint m):
   }
 
 
-// Check if wide character at wcs is in set 
+// Check if wide character at wcs is in set
 static FXbool isinset(const FXchar* set,const FXchar* wcs){
   while(set[0]!='\0'){
     if((set[0]==wcs[0]) && ((wcs[0]<=0x7F) || ((set[1]==wcs[1]) && ((wcs[0]<=0xDF) || ((set[2]==wcs[2]) && ((wcs[0]<=0xEF) || (set[3]==wcs[3]))))))){
@@ -1888,8 +1888,8 @@ static FXbool isinset(const FXchar* set,const FXchar* wcs){
     }
   return false;
   }
-  
-  
+
+
 // The workhorse
 FXbool FXExecute::match(const FXuchar* prog){
   if(recs<MAXRECURSION){

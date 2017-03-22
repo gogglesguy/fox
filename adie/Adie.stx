@@ -3,7 +3,7 @@
 #                       A d i e   S y n t a x   F i l e                         #
 #                                                                               #
 #################################################################################
-# Copyright (C) 2004,2016 by Jeroen van der Zijp.   All Rights Reserved.        #
+# Copyright (C) 2004,2017 by Jeroen van der Zijp.   All Rights Reserved.        #
 #################################################################################
 # This program is free software; you can redistribute it and/or modify          #
 # it under the terms of the GNU General Public License as published by          #
@@ -224,7 +224,7 @@ language "C++"
       style       "carrot"
     end
     rule "Format"
-      pattern "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern     "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
       style       "fuchsia"
     end
   end
@@ -321,7 +321,9 @@ language "C++"
   end
 
   rule "Number"
-    pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|LL|l|ll|UL|ULL|ul|ull|u|U|F|f|Q|q)?\>"
+    #pattern     "\<((0[xX]\h+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(LL|L|ll|l|ULL|UL|ull|ul|u|U|F|f|Q|q)?\>"
+#    pattern     "\<((\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+[Ee][+-]?\d+)[LlFfQq]?|(0[xX][0-9a-fA-F]+|0[0-7]*|[1-9]\d*)[Uu]?[Ll]{0,2})\>"
+    pattern     "\<((\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+[Ee][+-]?\d+|0[Xx]\.\h+[Pp][+-]?\d+|0[Xx]\h+\.\h*[Pp][+-]?\d+|0[Xx]\h+[Pp][+-]?\d+)[LlFfQq]?|(0[xX]\h+|0[0-7]*|[1-9]\d*)[Uu]?[Ll]{0,2})\>"
     style       "blue"
   end
 
@@ -418,7 +420,7 @@ language "C"
       style       "carrot"
     end
     rule "Format"
-      pattern "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern     "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
       style       "fuchsia"
     end
   end
@@ -506,7 +508,7 @@ language "C"
   end
 
   rule "Number"
-    pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|LL|l|ll|UL|ULL|ul|ull|u|U|F|f|Q|q)?\>"
+    pattern     "\<((\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+[Ee][+-]?\d+|0[Xx]\.\h+[Pp][+-]?\d+|0[Xx]\h+\.\h*[Pp][+-]?\d+|0[Xx]\h+[Pp][+-]?\d+)[LlFfQq]?|(0[xX]\h+|0[0-7]*|[1-9]\d*)[Uu]?[Ll]{0,2})\>"
     style       "blue"
   end
 

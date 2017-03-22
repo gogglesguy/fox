@@ -3,7 +3,7 @@
 *                          I c o n L i s t   O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1519,11 +1519,25 @@ FXbool FXIconList::killSelection(FXbool notify){
 
 // Lasso changed, so select/unselect items based on difference between new and old lasso box
 void FXIconList::lassoChanged(FXint ox,FXint oy,FXint ow,FXint oh,FXint nx,FXint ny,FXint nw,FXint nh,FXbool notify){
-  register FXint r,c;
+  FXint x0,y0,x1,y1,rlo,rhi,clo,chi,r,c;
   FXint ohit,nhit,index;
   if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
-    for(r=0; r<nrows; r++){
-      for(c=0; c<ncols; c++){
+    
+    // Union rectangle    
+    x0=FXMIN(ox,nx); x1=FXMAX(ox+ow,nx+nw);
+    y0=FXMIN(oy,ny); y1=FXMAX(oy+oh,ny+nh);
+  
+    // Affected row range
+    rlo=(y0-pos_y)/itemHeight; if(rlo<0) rlo=0;
+    rhi=(y1-pos_y)/itemHeight; if(rhi>=nrows) rhi=nrows-1;
+
+    // Affected column range
+    clo=(x0-pos_x)/itemWidth; if(clo<0) clo=0;
+    chi=(x1-pos_x)/itemWidth; if(chi>=ncols) chi=ncols-1;
+    
+    // Change selection
+    for(r=rlo; r<=rhi; r++){
+      for(c=clo; c<=chi; c++){
         index=(options&ICONLIST_COLUMNS) ? ncols*r+c : nrows*c+r;
         if(index<items.no()){
           ohit=hitItem(index,ox,oy,ow,oh);
@@ -1539,7 +1553,16 @@ void FXIconList::lassoChanged(FXint ox,FXint oy,FXint ow,FXint oh,FXint nx,FXint
       }
     }
   else{
-    for(index=0; index<items.no(); index++){
+
+    // Affected lines
+    y0=FXMIN(oy,ny); y1=FXMAX(oy+oh,ny+nh);
+
+    // Exposed rows
+    rlo=(y0-pos_y-header->getDefaultHeight())/itemHeight; if(rlo<0) rlo=0;
+    rhi=(y1-pos_y-header->getDefaultHeight())/itemHeight; if(rhi>=items.no()) rhi=items.no()-1;
+
+    // Change selection
+    for(index=rlo; index<=rhi; index++){
       ohit=hitItem(index,ox,oy,ow,oh);
       nhit=hitItem(index,nx,ny,nw,nh);
       if(ohit && !nhit){          // Was in old, not in new

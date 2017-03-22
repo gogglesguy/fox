@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -410,7 +410,7 @@ public:
   /**
   * List all fonts matching hints. If listFonts() returns true then
   * fonts points to a newly-allocated array of length numfonts. It
-  * is the caller's responsibility to free this array using FXFREE().
+  * is the caller's responsibility to free this array using freeElms().
   */
   static FXbool listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt=0,FXuint sl=0,FXuint sw=0,FXuint en=0,FXuint h=0);
 

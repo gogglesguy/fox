@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -334,7 +334,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // File List
   filelist=new FXFileList(switcher,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_MINI_ICONS|ICONLIST_AUTOSIZE|FILELIST_NO_OWN_ASSOC);
-  filelist->setAssociations(associations);
+  filelist->setAssociations(associations,false,true);
   filelist->dropEnable();
 
   // Image view
@@ -878,16 +878,16 @@ void PathFinderMain::loadSettings(){
 
   // Showing hidden files...
   hiddenfiles=getApp()->reg().readBoolEntry("SETTINGS","hiddenfiles",false);
-  filelist->showHiddenFiles(hiddenfiles);
+  filelist->showHiddenFiles(hiddenfiles,true);
   dirlist->showHiddenFiles(hiddenfiles);
 
   // Showing thumbnails...
   thumbnails=getApp()->reg().readBoolEntry("SETTINGS","thumbnails",false);
-  filelist->showImages(thumbnails);
+  filelist->showImages(thumbnails,true);
 
   // Showing thumbnails...
   thumbnailsize=getApp()->reg().readIntEntry("SETTINGS","thumbnailsize",32);
-  filelist->setImageSize(thumbnailsize);
+  filelist->setImageSize(thumbnailsize,true);
 
   // Get size
   xx=getApp()->reg().readIntEntry("SETTINGS","x",100);
@@ -1200,11 +1200,8 @@ long PathFinderMain::onFilePopup(FXObject*,FXSelector,void* ptr){
     new FXMenuCommand(&openmenu,tr("Open..."),NULL,this,ID_OPEN);
     new FXMenuCommand(&openmenu,tr("Open with..."),NULL,this,ID_OPEN_WITH);
     new FXMenuCommand(&openmenu,tr("Open with editor"),NULL,this,ID_OPEN_WITH_EDITOR);
-    new FXMenuSeparator(&pane);
     new FXMenuCascade(&pane,tr("Bookmarks"),setbookicon,bookmarkmenu);
-    new FXMenuSeparator(&pane);
     new FXMenuCascade(&pane,tr("Sort by"),sortingicon,sortmenu);
-    new FXMenuSeparator(&pane);
     new FXMenuCascade(&pane,tr("View"),bigiconsicon,arrangemenu);
     new FXMenuSeparator(&pane);
     new FXMenuCommand(&pane,tr("New directory..."),newdiricon,this,ID_NEW);
@@ -1229,7 +1226,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"PathFinder",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s).\nCopyright (C) 2000,2016 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s).\nCopyright (C) 2000,2017 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1600,7 +1597,7 @@ long PathFinderMain::onCmdDelete(FXObject*,FXSelector,void*){
 
 // Change the pattern
 long PathFinderMain::onCmdFilter(FXObject*,FXSelector,void* ptr){
-  filelist->setPattern(FXFileSelector::patternFromText((FXchar*)ptr));
+  filelist->setPattern(FXFileSelector::patternFromText((FXchar*)ptr),true);
   return 1;
   }
 
@@ -1686,7 +1683,7 @@ long PathFinderMain::onSigHarvest(FXObject*,FXSelector,void*){
 // Toggle hidden files display
 long PathFinderMain::onCmdToggleHidden(FXObject*,FXSelector,void*){
   dirlist->showHiddenFiles(!filelist->showHiddenFiles());
-  filelist->showHiddenFiles(!filelist->showHiddenFiles());
+  filelist->showHiddenFiles(!filelist->showHiddenFiles(),true);
   return 1;
   }
 
@@ -1702,10 +1699,10 @@ long PathFinderMain::onUpdToggleHidden(FXObject* sender,FXSelector,void*){
 // Change image size
 long PathFinderMain::onCmdImageSize(FXObject*,FXSelector sel,void*){
   switch(FXSELID(sel)){
-    case ID_MINI_SIZE: filelist->setImageSize(16); break;
-    case ID_NORMAL_SIZE: filelist->setImageSize(32); break;
-    case ID_MEDIUM_SIZE: filelist->setImageSize(64); break;
-    case ID_GIANT_SIZE: filelist->setImageSize(128); break;
+    case ID_MINI_SIZE: filelist->setImageSize(16,true); break;
+    case ID_NORMAL_SIZE: filelist->setImageSize(32,true); break;
+    case ID_MEDIUM_SIZE: filelist->setImageSize(64,true); break;
+    case ID_GIANT_SIZE: filelist->setImageSize(128,true); break;
     }
   return 1;
   }
@@ -1815,7 +1812,6 @@ long PathFinderMain::onCmdChmod(FXObject*,FXSelector sel,void* ptr){
         }
       }
     }
-  filelist->scan(true);
   return 1;
   }
 
@@ -1882,7 +1878,7 @@ long PathFinderMain::onUpdFileLocation(FXObject* sender,FXSelector,void*){
 // Update file type
 long PathFinderMain::onUpdFileSize(FXObject* sender,FXSelector,void*){
   FXString size;
-  size.fromLong(FXStat::size(filelist->getCurrentFile()));
+  size.format("%'lld",FXStat::size(filelist->getCurrentFile()));
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&size);
   return 1;
   }

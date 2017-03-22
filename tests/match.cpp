@@ -3,7 +3,7 @@
 *                             File Pattern Match Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

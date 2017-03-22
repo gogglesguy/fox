@@ -3,7 +3,7 @@
 *                       S c r o l l A r e a   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -97,14 +97,11 @@ public:
     };
 public:
 
-  /// Return default width
-  virtual FXint getDefaultWidth();
+  /// Set the current position
+  void setPosition(FXint x,FXint y);
 
-  /// Return default height
-  virtual FXint getDefaultHeight();
-
-  /// Perform layout
-  virtual void layout();
+  /// Get the current position
+  void getPosition(FXint& x,FXint& y) const { x=pos_x; y=pos_y; }
 
   /// Return content area x position
   FXint getContentX() const { return pos_x; }
@@ -130,6 +127,15 @@ public:
   /// Return visible scroll-area height
   virtual FXint getVisibleHeight() const;
 
+  /// Return default width
+  virtual FXint getDefaultWidth();
+
+  /// Return default height
+  virtual FXint getDefaultHeight();
+
+  /// Perform layout
+  virtual void layout();
+
   /// Return true if horizontally scrollable
   FXbool isHorizontalScrollable() const;
 
@@ -147,12 +153,6 @@ public:
 
   /// Return a pointer to the vertical scrollbar
   FXScrollBar* verticalScrollBar() const { return vertical; }
-
-  /// Set the current position
-  void setPosition(FXint x,FXint y);
-
-  /// Get the current position
-  void getPosition(FXint& x,FXint& y) const { x=pos_x; y=pos_y; }
 
   /// Save to a stream
   virtual void save(FXStream& store) const;

@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -862,7 +862,7 @@ void FXFoldingList::makeItemVisible(FXFoldingItem* item){
     // Expand parents of this node
     if(!(options&FOLDINGLIST_AUTOSELECT)){
       for(FXFoldingItem *par=item->parent; par; par=par->parent){
-        expandTree(par);
+        expandTree(par,true);
         }
       }
 

@@ -3,7 +3,7 @@
 *                D i r e c t o r y   S e l e c t i o n   D i a l o g            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -112,6 +112,18 @@ void FXDirDialog::setDirectory(const FXString& path){
 // Get directory
 FXString FXDirDialog::getDirectory() const {
   return dirbox->getDirectory();
+  }
+
+
+// Change wildcard matching pattern
+void FXDirDialog::setPattern(const FXString& ptrn){
+  dirbox->setPattern(ptrn);
+  }
+
+
+// Return wildcard pattern
+FXString FXDirDialog::getPattern() const {
+  return dirbox->getPattern();
   }
 
 

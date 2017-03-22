@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -315,7 +315,7 @@ FXdouble FXGradientBar::blenddecreasing(FXdouble middle,FXdouble pos){
 
 
 // Fill with gradient ramp
-void FXGradientBar::gradient(FXColor *ramp,FXint nramp){
+void FXGradientBar::gradient(FXColor *ramp,FXint nramp) const {
   register FXint s,lr,lg,lb,la,ur,ug,ub,ua,d,l,h,m,i;
   register FXdouble len=seg[nsegs-1].upper-seg[0].lower;
   register FXdouble del=nramp-1;

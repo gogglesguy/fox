@@ -3,7 +3,7 @@
 *                          S p i n n e r   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Lyle Johnson.   All Rights Reserved.               *
+* Copyright (C) 1998,2017 by Lyle Johnson.   All Rights Reserved.               *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -188,10 +188,10 @@ void FXSpinner::layout(){
 void FXSpinner::changeFocus(FXWindow *child){
   FXPacker::changeFocus(child);
   if(child){
-    flags&=~FLAG_UPDATE; 
+    flags&=~FLAG_UPDATE;
     }
   else{
-    flags|=FLAG_UPDATE; 
+    flags|=FLAG_UPDATE;
     }
   }
 

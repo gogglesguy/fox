@@ -3,7 +3,7 @@
 *                         R u l e r V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -78,11 +78,11 @@ public:
   /// Construct a rulerview window
   FXRulerView(FXComposite* p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
-  /// Return default width
-  virtual FXint getDefaultWidth();
+  /// Return content width
+  virtual FXint getContentWidth();
 
-  /// Return default height
-  virtual FXint getDefaultHeight();
+  /// Return content height
+  virtual FXint getContentHeight();
 
   /// Return visible area x position
   virtual FXint getVisibleX() const;
@@ -96,11 +96,11 @@ public:
   /// Return visible area height
   virtual FXint getVisibleHeight() const;
 
-  /// Return content width
-  virtual FXint getContentWidth();
+  /// Return default width
+  virtual FXint getDefaultWidth();
 
-  /// Return content height
-  virtual FXint getContentHeight();
+  /// Return default height
+  virtual FXint getDefaultHeight();
 
   /// Perform layout
   virtual void layout();

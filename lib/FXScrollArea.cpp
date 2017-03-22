@@ -3,7 +3,7 @@
 *                      S c r o l l A r e a   W i d g e t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -136,21 +136,15 @@ FXScrollArea::FXScrollArea(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FX
   }
 
 
-// Get default width
-FXint FXScrollArea::getDefaultWidth(){
-  register FXint w=0;
-  if((options&HSCROLLER_NEVER)&&(options&HSCROLLER_ALWAYS)) w=getContentWidth();
-  if(!(options&VSCROLLER_NEVER)) w+=vertical->getDefaultWidth();
-  return FXMAX(w,1);
+// Return content area width
+FXint FXScrollArea::getContentWidth(){
+  return 1;
   }
 
 
-// Get default height
-FXint FXScrollArea::getDefaultHeight(){
-  register FXint h=0;
-  if((options&VSCROLLER_NEVER)&&(options&VSCROLLER_ALWAYS)) h=getContentHeight();
-  if(!(options&HSCROLLER_NEVER)) h+=horizontal->getDefaultHeight();
-  return FXMAX(h,1);
+// Return content area height
+FXint FXScrollArea::getContentHeight(){
+  return 1;
   }
 
 
@@ -178,15 +172,21 @@ FXint FXScrollArea::getVisibleHeight() const {
   }
 
 
-// Return content area width
-FXint FXScrollArea::getContentWidth(){
-  return 1;
+// Get default width
+FXint FXScrollArea::getDefaultWidth(){
+  register FXint w=0;
+  if((options&HSCROLLER_NEVER)&&(options&HSCROLLER_ALWAYS)) w=getContentWidth();
+  if(!(options&VSCROLLER_NEVER)) w+=vertical->getDefaultWidth();
+  return FXMAX(w,1);
   }
 
 
-// Return content area height
-FXint FXScrollArea::getContentHeight(){
-  return 1;
+// Get default height
+FXint FXScrollArea::getDefaultHeight(){
+  register FXint h=0;
+  if((options&VSCROLLER_NEVER)&&(options&VSCROLLER_ALWAYS)) h=getContentHeight();
+  if(!(options&HSCROLLER_NEVER)) h+=horizontal->getDefaultHeight();
+  return FXMAX(h,1);
   }
 
 

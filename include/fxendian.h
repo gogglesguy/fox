@@ -3,7 +3,7 @@
 *                      B y t e   S w a p p i n g   S u p p o r t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2010,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2010,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -64,7 +64,9 @@ static inline FXulong reverse64(FXulong x){
 
 // Byte swap unsigned short
 static inline FXushort swap16(FXushort x){
-#if (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)))
+  return __builtin_bswap16(x);
+#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   __asm__ __volatile__("rorw $8,%0\n\t" : "=r"(x) : "0"(x) : "cc");
   return x;
 #elif (_MSC_VER >= 1500)
@@ -77,7 +79,7 @@ static inline FXushort swap16(FXushort x){
 
 // Byte swap unsiged int
 static inline FXuint swap32(FXuint x){
-#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)))
+#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)))
   return __builtin_bswap32(x);
 #elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
   __asm__ __volatile__("bswapl %0\n\t" : "=r"(x): "0"(x));
@@ -93,7 +95,7 @@ static inline FXuint swap32(FXuint x){
 
 // Byte swap unsigned long
 static inline FXulong swap64(FXulong x){
-#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)))
+#if ((__GNUC__ >= 5) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)))
   return __builtin_bswap64(x);
 #elif (defined(__GNUC__) && defined(__i386__))
   union { struct { FXuint l; FXuint h; } s; FXulong x; } n;
@@ -121,6 +123,12 @@ static inline FXuint lsb32(FXuint x){
   }
 
 
+// Isolate least significant bit set
+static inline FXulong lsb64(FXulong x){
+  return FXulong(x&(-FXulong(x)));
+  }
+
+
 // Isolate most significant bit set
 static inline FXuint msb32(FXuint x){
   x|=(x>>1);
@@ -128,6 +136,18 @@ static inline FXuint msb32(FXuint x){
   x|=(x>>4);
   x|=(x>>8);
   x|=(x>>16);
+  return x-(x>>1);
+  }
+
+
+// Isolate most significant bit set
+static inline FXulong msb64(FXulong x){
+  x|=(x>>1);
+  x|=(x>>2);
+  x|=(x>>4);
+  x|=(x>>8);
+  x|=(x>>16);
+  x|=(x>>32);
   return x-(x>>1);
   }
 

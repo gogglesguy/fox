@@ -3,7 +3,7 @@
 *                          T r e e L i s t   O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -727,7 +727,7 @@ void FXTreeList::makeItemVisible(FXTreeItem* item){
     // Expand parents of this node
     if(!(options&TREELIST_AUTOSELECT)){
       for(FXTreeItem *par=item->parent; par; par=par->parent){
-        expandTree(par);
+        expandTree(par,true);
         }
       }
 
@@ -1127,7 +1127,6 @@ long FXTreeList::onLeave(FXObject* sender,FXSelector sel,void* ptr){
 
 // We timed out, i.e. the user didn't move for a while
 long FXTreeList::onTipTimer(FXObject*,FXSelector,void*){
-  FXTRACE((200,"%s::onTipTimer %p\n",getClassName(),this));
   flags|=FLAG_TIP;
   return 1;
   }

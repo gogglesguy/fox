@@ -3,7 +3,7 @@
 *                         I c o n   L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -317,17 +317,17 @@ public:
   /// Perform layout
   virtual void layout();
 
-  /// Return visible area y position
-  virtual FXint getVisibleY() const;
-
-  /// Return visible area height
-  virtual FXint getVisibleHeight() const;
-
   /// Compute and return content width
   virtual FXint getContentWidth();
 
   /// Return content height
   virtual FXint getContentHeight();
+
+  /// Return visible area y position
+  virtual FXint getVisibleY() const;
+
+  /// Return visible area height
+  virtual FXint getVisibleHeight() const;
 
   /// Icon list can receive focus
   virtual FXbool canFocus() const;

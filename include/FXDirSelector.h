@@ -3,7 +3,7 @@
 *              D i r e c t o r y   S e l e c t i o n   W i d g e t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -118,6 +118,18 @@ public:
   /// Return directory
   FXString getDirectory() const;
 
+  /// Change wildcard matching pattern
+  void setPattern(const FXString& ptrn);
+
+  /// Return wildcard pattern
+  FXString getPattern() const;
+
+  /// Return wildcard matching mode
+  FXuint getMatchMode() const;
+
+  /// Change wildcard matching mode (see FXPath)
+  void setMatchMode(FXuint mode);
+
   /// Return true if showing files as well as directories
   FXbool showFiles() const;
 
@@ -129,12 +141,6 @@ public:
 
   /// Show or hide hidden directories
   void showHiddenFiles(FXbool showing);
-
-  /// Return wildcard matching mode
-  FXuint getMatchMode() const;
-
-  /// Change wildcard matching mode (see FXPath)
-  void setMatchMode(FXuint mode);
 
   /// Change Directory List style
   void setDirBoxStyle(FXuint style);

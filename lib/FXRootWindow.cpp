@@ -3,7 +3,7 @@
 *                       R o o t   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -44,8 +44,8 @@
 
   - Size of FXRootWindow is now size of the entire virtual display, which
     is a tiled virtual area of primary and secondary display adapters.
-  - Maybe getDefaultWidth() and getDefaultHeight() should return the size
-    of the currently active screen.
+  - Maybe getDefaultWidth() and getDefaultHeight() now returns virtual
+    screen size.
 */
 
 
@@ -133,11 +133,14 @@ void FXRootWindow::create(){
       xid=GetDesktopWindow();
 
       // Obtain desktop window size
+      width=GetSystemMetrics(SM_CXVIRTUALSCREEN);
+      height=GetSystemMetrics(SM_CYVIRTUALSCREEN);
+#if 0      
       HDC hdc=::GetDC((HWND)xid);
       width=GetDeviceCaps(hdc,HORZRES);
       height=GetDeviceCaps(hdc,VERTRES);
       ::ReleaseDC((HWND)xid,hdc);
-
+#endif
       // Size bigger than all display screens
       //getMaxScreenSize(width,height);
 
@@ -200,6 +203,7 @@ void FXRootWindow::destroy(){
   }
 
 
+#if 0
 // Get default width
 FXint FXRootWindow::getDefaultWidth(){
 #ifdef WIN32
@@ -224,6 +228,25 @@ FXint FXRootWindow::getDefaultHeight(){
   return DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
 #endif
   }
+#endif  
+  
+// Get default width
+FXint FXRootWindow::getDefaultWidth(){
+#ifdef WIN32
+  return GetSystemMetrics(SM_CXVIRTUALSCREEN);
+#else
+  return DisplayWidth(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+#endif
+  }
+
+// Get default height
+FXint FXRootWindow::getDefaultHeight(){
+#ifdef WIN32
+  return GetSystemMetrics(SM_CYVIRTUALSCREEN);
+#else
+  return DisplayHeight(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
+#endif
+  } 
 
 
 // Moving root has no effect

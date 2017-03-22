@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   B o x   O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -176,19 +176,19 @@ long FXDirBox::onCmdGetStringValue(FXObject*,FXSelector,void* ptr){
 
 // Return item path
 FXString FXDirBox::getItemPathname(FXTreeItem *item) const {
-  FXString string;
+  FXString path;
   if(item){
-    while(item->getParent()){
-      string.prepend(getItemText(item));
+    while(1){
+      path.prepend(item->getText());
       item=item->getParent();
-      if(item->getParent()) string.prepend(PATHSEPSTRING);
+      if(!item) break;
+      if(item->getParent()) path.prepend(PATHSEP);
       }
-    string.prepend(getItemText(item));
     }
-  return string;
+  return path;
   }
-
-
+  
+  
 #ifdef WIN32            // Windows flavor
 
 // Return the item from the absolute pathname
@@ -382,7 +382,7 @@ FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
       if(id()) icon->create();
 
       // Skip over path separator
-      if(end<path.length() && ISPATHSEP(path[end])) end++;
+      if(ISPATHSEP(path[end])) end++;
       }
 
     // Return leaf item

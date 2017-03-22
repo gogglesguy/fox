@@ -1,9 +1,9 @@
 /********************************************************************************
 *                                                                               *
-*                       T r e e  L i s t  B o x  O b j e c t                    *
+*                      T r e e  L i s t  B o x   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *

@@ -3,7 +3,7 @@
 *                    M u l t i - L i ne   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -138,62 +138,63 @@ struct FXTextChange {
 class FXAPI FXText : public FXScrollArea {
   FXDECLARE(FXText)
 protected:
-  FXchar        *buffer;              // Text buffer being edited
-  FXchar        *sbuffer;             // Text style buffer
-  FXint         *visrows;             // Starts of rows in buffer
-  FXint          length;              // Length of the actual text in the buffer
-  FXint          nvisrows;            // Number of visible rows
-  FXint          nrows;               // Total number of rows
-  FXint          gapstart;            // Start of the insertion point (the gap)
-  FXint          gapend;              // End of the insertion point+1
-  FXint          toppos;              // Start position of first visible row
-  FXint          toprow;              // Row number of first visible row
-  FXint          keeppos;             // Position to keep on top visible row
-  FXint          selstartpos;         // Start of selection
-  FXint          selendpos;           // End of selection
-  FXint          hilitestartpos;      // Hightlight start position
-  FXint          hiliteendpos;        // Hightlight end position
-  FXint          anchorpos;           // Anchor position
-  FXint          cursorpos;           // Cursor position
-  FXint          cursorstartpos;      // Cursor row start pos
-  FXint          cursorendpos;        // Cursor row end pos
-  FXint          cursorrow;           // Cursor row
-  FXint          cursorcol;           // Cursor column indent (not character offset!)
-  FXint          prefcol;             // Preferred cursor column
-  FXint          margintop;           // Margins top
-  FXint          marginbottom;        // Margin bottom
-  FXint          marginleft;          // Margin left
-  FXint          marginright;         // Margin right
-  FXint          wrapwidth;           // Wrap width in pixels
-  FXint          wrapcolumns;         // Wrap columns
-  FXint          tabwidth;            // Tab width in pixels
-  FXint          tabcolumns;          // Tab columns
-  FXint          barwidth;            // Line number width
-  FXint          barcolumns;          // Line number columns
-  FXFont        *font;                // Text font
-  FXColor        textColor;           // Normal text color
-  FXColor        selbackColor;        // Select background color
-  FXColor        seltextColor;        // Select text color
-  FXColor        hilitebackColor;     // Highlight background color
-  FXColor        hilitetextColor;     // Highlight text color
-  FXColor        activebackColor;     // Background color for active line
-  FXColor        numberColor;         // Line number color
-  FXColor        cursorColor;         // Cursor color
-  FXColor        barColor;            // Bar background color
-  FXint          textWidth;           // Total width of all text
-  FXint          textHeight;          // Total height of all text
-  const FXchar  *delimiters;          // Delimiters
-  FXString       clipped;             // Clipped text
-  FXint          vrows;               // Default visible rows
-  FXint          vcols;               // Default visible columns
-  FXString       help;                // Status line help
-  FXString       tip;                 // Tooltip
-  FXHiliteStyle *hilitestyles;        // Style definitions
-  FXTime         matchtime;           // Match time (ns)
-  FXint          grabx;               // Grab point x
-  FXint          graby;               // Grab point y
-  FXuchar        mode;                // Mode widget is in
-  FXbool         modified;            // User has modified text
+  FXchar         *buffer;               // Text buffer being edited
+  FXchar         *sbuffer;              // Text style buffer
+  FXint          *visrows;              // Starts of rows in buffer
+  FXint           length;               // Length of the actual text in the buffer
+  FXint           nvisrows;             // Number of visible rows
+  FXint           nrows;                // Total number of rows
+  FXint           gapstart;             // Start of the insertion point (the gap)
+  FXint           gapend;               // End of the insertion point+1
+  FXint           toppos;               // Start position of first visible row
+  FXint           toprow;               // Row number of first visible row
+  FXint           keeppos;              // Position to keep on top visible row
+  FXint           selstartpos;          // Start of selection
+  FXint           selendpos;            // End of selection
+  FXint           hilitestartpos;       // Hightlight start position
+  FXint           hiliteendpos;         // Hightlight end position
+  FXint           anchorpos;            // Anchor position
+  FXint           cursorpos;            // Cursor position
+  FXint           cursorstartpos;       // Cursor row start pos
+  FXint           cursorendpos;         // Cursor row end pos
+  FXint           cursorrow;            // Cursor row
+  FXint           cursorcol;            // Cursor column indent (not character offset!)
+  FXint           prefcol;              // Preferred cursor column
+  FXint           margintop;            // Margins top
+  FXint           marginbottom;         // Margin bottom
+  FXint           marginleft;           // Margin left
+  FXint           marginright;          // Margin right
+  FXint           wrapwidth;            // Wrap width in pixels
+  FXint           wrapcolumns;          // Wrap columns
+  FXint           tabwidth;             // Tab width in pixels
+  FXint           tabcolumns;           // Tab columns
+  FXint           barwidth;             // Line number width
+  FXint           barcolumns;           // Line number columns
+  FXFont         *font;                 // Text font
+  FXColor         textColor;            // Normal text color
+  FXColor         selbackColor;         // Select background color
+  FXColor         seltextColor;         // Select text color
+  FXColor         hilitebackColor;      // Highlight background color
+  FXColor         hilitetextColor;      // Highlight text color
+  FXColor         activebackColor;      // Background color for active line
+  FXColor         numberColor;          // Line number color
+  FXColor         cursorColor;          // Cursor color
+  FXColor         barColor;             // Bar background color
+  FXint           textWidth;            // Total width of all text
+  FXint           textHeight;           // Total height of all text
+  const FXchar   *delimiters;           // Delimiters
+  FXString        clipped;              // Clipped text
+  FXint           vrows;                // Default visible rows
+  FXint           vcols;                // Default visible columns
+  FXString        help;                 // Status line help
+  FXString        tip;                  // Tooltip
+  FXHiliteStyle  *hilitestyles;         // Style definitions
+  FXuint          blink;                // Next cursor blink state
+  FXTime          matchtime;            // Match time (ns)
+  FXint           grabx;                // Grab point x
+  FXint           graby;                // Grab point y
+  FXuchar         mode;                 // Mode widget is in
+  FXbool          modified;             // User has modified text
 protected:
   FXText();
   void calcVisRows(FXint s,FXint e);
@@ -506,23 +507,11 @@ public:
   /// Detach server-side resources
   virtual void detach();
 
-  /// Perform layout
-  virtual void layout();
+  /// Get default width
+  virtual FXint getContentWidth();
 
-  /// Return default width
-  virtual FXint getDefaultWidth();
-
-  /// Return default height
-  virtual FXint getDefaultHeight();
-
-  /// Enable the text widget
-  virtual void enable();
-
-  /// Disable the text widget
-  virtual void disable();
-
-  /// Need to recalculate size
-  virtual void recalc();
+  /// Get default height
+  virtual FXint getContentHeight();
 
   /// Return visible scroll-area x position
   virtual FXint getVisibleX() const;
@@ -536,11 +525,23 @@ public:
   /// Return visible scroll-area height
   virtual FXint getVisibleHeight() const;
 
-  /// Get default width
-  virtual FXint getContentWidth();
+  /// Return default width
+  virtual FXint getDefaultWidth();
 
-  /// Get default height
-  virtual FXint getContentHeight();
+  /// Return default height
+  virtual FXint getDefaultHeight();
+
+  /// Perform layout
+  virtual void layout();
+
+  /// Enable the text widget
+  virtual void enable();
+
+  /// Disable the text widget
+  virtual void disable();
+
+  /// Need to recalculate size
+  virtual void recalc();
 
   /// Returns true because a text widget can receive focus
   virtual FXbool canFocus() const;
@@ -805,11 +806,11 @@ public:
   /// Return x coordinate of pos
   FXint getXOfPos(FXint pos) const;
 
-  /// Count number of rows; start should be on a row start
-  FXint countRows(FXint start,FXint end) const;
-
   /// Count number of columns; start should be on a row start
   FXint countCols(FXint start,FXint end) const;
+
+  /// Count number of rows; start should be on a row start
+  FXint countRows(FXint start,FXint end) const;
 
   /// Count number of newlines
   FXint countLines(FXint start,FXint end) const;

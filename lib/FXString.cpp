@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -324,6 +324,7 @@ FXint wcvalid(const FXnchar* ptr){
 
 // Return number of bytes for utf8 representation of wide character w
 FXint wc2utf(FXwchar w){
+//  return (w>=0x80)+(w>=0x800)+(w>=0x10000)+1;
   if(__likely(w<0x80)) return 1;
   if(__likely(w<0x800)) return 2;
   if(__likely(w<0x10000)) return 3;
@@ -333,8 +334,7 @@ FXint wc2utf(FXwchar w){
 
 // Return number of narrow characters for utf16 representation of wide character w
 FXint wc2nc(FXwchar w){
-  if(__likely(w<0x10000)) return 1;
-  return 2;
+  return (w>=0x10000)+1;
   }
 
 
@@ -2890,10 +2890,11 @@ FXString& dosToUnix(FXString& str){
 // Check if the string contains special characters or leading or trailing whitespace, or contains utf8 if flag!=0
 FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
   if(0<str.length()){
-    register FXint p,c;
-    if(Ascii::isSpace(str.head()) || Ascii::isSpace(str.tail())) return true;
-    for(p=0; p<str.length(); p++){
-      if((c=(FXuchar)str[p])<'\x20' || c=='\x7F' || c=='\\' || c==lquote || c==rquote || ('\x80'<=c && flag)) return true;
+    FXuchar c;
+    if(Ascii::isSpace(str.head())) return true;
+    if(Ascii::isSpace(str.tail())) return true;
+    for(FXint p=0; p<str.length(); p++){
+      if((c=str[p])<'\x20' || c=='\x7F' || c=='\\' || c==lquote || c==rquote || ('\x80'<=c && flag)) return true;
       }
     }
   return false;
@@ -2902,12 +2903,14 @@ FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
 
 // Escape special characters, and optionally enclose with left and right quotes; escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2
 FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
-  register FXint p,q,c,w;
+  register FXint p,q,w;
+  register FXuchar c;
   FXString result;
   p=q=0;
   if(lquote) q++;                       // Opening quote
   while(p<str.length()){                // Measure length of converted string
-    switch(c=(FXuchar)str[p++]){
+    c=str[p++];
+    switch(c){
     case '\x00':                        // Control characters
     case '\x01':
     case '\x02':
@@ -2936,13 +2939,13 @@ FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
     case '\x7F':
 hex1: q+=4;                             // Escape as \xHH
       continue;
-    case '\n':                          // Special characters
-    case '\r':
+    case '\a':                          // Special characters
     case '\b':
-    case '\v':
-    case '\a':
-    case '\f':
     case '\t':
+    case '\n':
+    case '\v':
+    case '\f':
+    case '\r':
     case '\\':
       q+=2;
       continue;
@@ -2956,8 +2959,8 @@ hex1: q+=4;                             // Escape as \xHH
         continue;
         }
       if(__unlikely(0x80<=c)){          // Escape specials
-        if(flag){
-          if(flag==1) goto hex1;        // Output \xHH for everything
+        if(flag&1) goto hex1;           // Output \xHH for everything
+        if(flag&2){
           if(!FXISLEADUTF8(c)) goto hex1;               // UTF8 starter?
           if(!FXISFOLLOWUTF8(str[p])) goto hex1;        // UTF8 follower?
           c=(c<<6)^(FXuchar)str[p]^0x3080;
@@ -2965,7 +2968,7 @@ hex1: q+=4;                             // Escape as \xHH
             if(!FXISFOLLOWUTF8(str[p+1])) goto hex1;    // UTF8 follower?
             c=(c<<6)^(FXuchar)str[p+1]^0x20080;
             if(0x10000<=c){                             // Surrogate pair needed
-              if(!FXISFOLLOWUTF8(str[p+2])) goto hex1;// UTF8 follower?
+              if(!FXISFOLLOWUTF8(str[p+2])) goto hex1;  // UTF8 follower?
               c=(c<<6)^(FXuchar)str[p+2]^0x400080;
               if(0x110000<=c) goto hex1;                // Beyond assigned code space?
               p++;
@@ -2987,7 +2990,8 @@ hex1: q+=4;                             // Escape as \xHH
   p=q=0;
   if(lquote) result[q++]=lquote;        // Opening quote
   while(p<str.length()){                // Then convert the string
-    switch(c=(FXuchar)str[p++]){
+    c=str[p++];
+    switch(c){
     case '\x00':                        // Control characters
     case '\x01':
     case '\x02':
@@ -3019,33 +3023,33 @@ hex2: result[q++]='\\';                 // Escape as \xHH
       result[q++]=FXString::value2Digit[(c>>4)&15];
       result[q++]=FXString::value2Digit[c&15];
       continue;
-    case '\n':                          // Special characters
+    case '\a':                          // Special characters
       result[q++]='\\';
-      result[q++]='n';
-      continue;
-    case '\r':
-      result[q++]='\\';
-      result[q++]='r';
+      result[q++]='a';
       continue;
     case '\b':
       result[q++]='\\';
       result[q++]='b';
       continue;
+    case '\t':
+      result[q++]='\\';
+      result[q++]='t';
+      continue;
+    case '\n':
+      result[q++]='\\';
+      result[q++]='n';
+      continue;
     case '\v':
       result[q++]='\\';
       result[q++]='v';
-      continue;
-    case '\a':
-      result[q++]='\\';
-      result[q++]='a';
       continue;
     case '\f':
       result[q++]='\\';
       result[q++]='f';
       continue;
-    case '\t':
+    case '\r':
       result[q++]='\\';
-      result[q++]='t';
+      result[q++]='r';
       continue;
     case '\\':
       result[q++]='\\';
@@ -3063,8 +3067,8 @@ hex2: result[q++]='\\';                 // Escape as \xHH
         continue;
         }
       if(__unlikely(0x80<=c)){          // Escape specials
-        if(flag){
-          if(flag==1) goto hex2;        // Output \xHH for everything
+        if(flag&1) goto hex2;           // Output \xHH for everything
+        if(flag&2){
           if(!FXISLEADUTF8(c)) goto hex2;               // UTF8 starter?
           if(!FXISFOLLOWUTF8(str[p])) goto hex2;        // UTF8 follower?
           c=(c<<6)^(FXuchar)str[p]^0x3080;
@@ -3170,6 +3174,7 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
       case 'f':
       case 't':
       case '\\':
+      default:                          // Unneccessarily escaped character
         q++;
         continue;
         }
@@ -3257,6 +3262,9 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
         continue;
       case '\\':
         result[q++]='\\';
+        continue;
+      default:                          // Unneccessarily escaped character
+        result[q++]=c;
         continue;
         }
       }

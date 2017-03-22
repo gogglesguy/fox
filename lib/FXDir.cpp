@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -661,64 +661,6 @@ void fxenumWNetContainerResource(NETRESOURCE* netResource,FXObjectListOf<FXStrin
     }
   return count;
   }
-
-
-// Hack code below for testing if volume is mounted
-
-// #if defined (HKS_NT)
-//
-// static int check_nfs (const char* name)
-// {
-// char drive[8];
-//
-// char* cp = strchr (name, ':');
-// if (cp)
-// {
-// strncpy (drive, name, cp - name);
-// drive[cp - name] = '\0';
-// }
-// else
-// {
-// drive[0] = 'A' + _getdrive() - 1;
-// drive[1] = '\0';
-// }
-//
-// strcat (drive, ":\\");
-//
-// return GetDriveType(drive) == DRIVE_REMOTE;
-// }
-//
-// #elif defined(LINUX)
-//
-// static int check_nfs (int fd)
-// {
-// struct statfs statbuf;
-// if (fstatfs(fd,&statbuf) < 0)
-// {
-// RFM_RAISE_SYSTEM_ERROR("statfs");
-// return 0;
-// }
-// if (statbuf.f_type == NFS_SUPER_MAGIC)
-// return 1;
-// else
-// return 0;
-// }
-//
-// #else
-//
-// static int check_nfs (int fd)
-// {
-//
-// struct statvfs statbuf;
-//
-// if (fstatvfs (fd, &statbuf) < 0)
-// {
-// RFM_RAISE_SYSTEM_ERROR ("fstatvfs");
-// }
-// return strncmp (statbuf.f_basetype, "nfs", 3) == 0 || strncmp
-// (statbuf.f_basetype, "NFS", 3) == 0;
-// }
-// #endif
 
 
 

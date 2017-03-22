@@ -3,7 +3,7 @@
 *             R e a l - V a l u e d   S p i n n e r  W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2016 by Bill Baxter.   All Rights Reserved.                *
+* Copyright (C) 2003,2017 by Bill Baxter.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -191,10 +191,10 @@ void FXRealSpinner::layout(){
 void FXRealSpinner::changeFocus(FXWindow *child){
   FXPacker::changeFocus(child);
   if(child){
-    flags&=~FLAG_UPDATE; 
+    flags&=~FLAG_UPDATE;
     }
   else{
-    flags|=FLAG_UPDATE; 
+    flags|=FLAG_UPDATE;
     }
   }
 

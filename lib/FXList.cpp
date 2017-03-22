@@ -3,7 +3,7 @@
 *                            L i s t   O b j e c t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -88,6 +88,9 @@
   - FIXME if no text, you're unable to see if an item is selected.
   - Should sortItems() have optional notify parameter to generate callback
     when current item index has changed?
+  - FIXME can we add another flag to FXListItem to support invisible items
+    which are present but not drawn.  These would be skipped during keyboard
+    navigation similar and not give rise to selection callbacks, etc.
 */
 
 

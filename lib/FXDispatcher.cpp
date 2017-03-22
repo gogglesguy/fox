@@ -3,7 +3,7 @@
 *                         E v e n t   D i s p a t c h e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -69,7 +69,7 @@
   - Each signal is handled by only one single FXDispatcher.  However, there may
     be multiple FXDispatcher's, each one handling a different, non-overlapping
     set of signals.
-    
+
   - FIXME keep track of time we entered event loop; so we can process events for
     a certain interval only (better than runWhileEvents() currently does).
 

@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -65,16 +65,32 @@ namespace FXPath {
   /// Return file title, i.e. document name only
   extern FXAPI FXString title(const FXString& file);
 
-  /// Return extension part of the file name
+  /** 
+  * Return extension part of the file name.
+  * This returns the string after the last '.' in the last path-component of the 
+  * file, provided that the '.' was not the first character of the path-component.
+  * For example, extension("/usr/share/icons/folder.png") returns "png", but the call to
+  * extension("../path.name/.bashrc") returns "".
+  */
   extern FXAPI FXString extension(const FXString& file);
 
-  /// Return file name less the extension
+  /**
+  * Return file name less the extension.
+  */
   extern FXAPI FXString stripExtension(const FXString& file);
-  
-  /// Return the drive letter prefixing this file name (if any).
+
+  /**
+  * Return the drive letter prefixing this file name (if any).
+  */
   extern FXAPI FXString drive(const FXString& file);
 
-  /// Perform tilde or environment variable expansion
+  /**
+  * Perform tilde or environment variable expansion.
+  * A prefix of the form ~ or ~user is expanded to the user's home directory.
+  * Environment variables of the form $HOME or ${HOME} are expanded by 
+  * substituting the value of the variable.
+  * On Windows, only environment variables of the form %HOME% are expanded.
+  */
   extern FXAPI FXString expand(const FXString& file);
 
   /// Contract path based on user name and environment variable
@@ -181,6 +197,7 @@ namespace FXPath {
 
   /**
   * Search path list for this file, return full path name for first occurrence.
+  * Each path in the pathlist is expanded first.
   */
   extern FXAPI FXString search(const FXString& pathlist,const FXString& file);
 

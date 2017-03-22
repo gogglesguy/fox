@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,7 +72,7 @@ public:
 
   /// Return stats on current file or directory
   const FXStat& info() const;
-  
+
   /// Enter directory
   virtual FXuint enter(const FXString& path);
 

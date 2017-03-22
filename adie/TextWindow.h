@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -153,6 +153,7 @@ public:
   long onCmdSave(FXObject*,FXSelector,void*);
   long onUpdSave(FXObject*,FXSelector,void*);
   long onCmdSaveAs(FXObject*,FXSelector,void*);
+  long onCmdSaveTo(FXObject*,FXSelector,void*);
   long onCmdFont(FXObject*,FXSelector,void*);
   long onCmdPrint(FXObject*,FXSelector,void*);
   long onCmdSaveSettings(FXObject*,FXSelector,void*);
@@ -241,14 +242,17 @@ public:
   long onUpdExtractFile(FXObject*,FXSelector,void*);
   long onCmdWheelAdjust(FXObject*,FXSelector,void*);
   long onUpdWheelAdjust(FXObject*,FXSelector,void*);
+  long onCmdSetMark(FXObject*,FXSelector,void*);
+  long onUpdSetMark(FXObject*,FXSelector,void*);
   long onCmdNextMark(FXObject*,FXSelector,void*);
   long onUpdNextMark(FXObject*,FXSelector,void*);
   long onCmdPrevMark(FXObject*,FXSelector,void*);
   long onUpdPrevMark(FXObject*,FXSelector,void*);
-  long onCmdSetMark(FXObject*,FXSelector,void*);
-  long onUpdSetMark(FXObject*,FXSelector,void*);
   long onCmdGotoMark(FXObject*,FXSelector,void*);
   long onUpdGotoMark(FXObject*,FXSelector,void*);
+  long onCmdDelMark(FXObject*,FXSelector,void*);
+  long onUpdDelMark(FXObject*,FXSelector,void*);
+  long onUpdClearMarks(FXObject*,FXSelector,void*);
   long onCmdClearMarks(FXObject*,FXSelector,void*);
   long onCmdSaveMarks(FXObject*,FXSelector,void*);
   long onUpdSaveMarks(FXObject*,FXSelector,void*);
@@ -356,6 +360,7 @@ public:
     ID_REOPEN,
     ID_SAVE,
     ID_SAVEAS,
+    ID_SAVETO,
     ID_FONT,
     ID_HELP,
     ID_WINDOW,
@@ -403,7 +408,6 @@ public:
     ID_SET_MARK,
     ID_NEXT_MARK,
     ID_PREV_MARK,
-    ID_CLEAR_MARKS,
     ID_MARK_0,
     ID_MARK_1,
     ID_MARK_2,
@@ -414,6 +418,8 @@ public:
     ID_MARK_7,
     ID_MARK_8,
     ID_MARK_9,
+    ID_DEL_MARK,
+    ID_CLEAR_MARKS,
     ID_SAVEMARKS,
     ID_SAVEVIEWS,
     ID_SHOWACTIVE,
@@ -550,6 +556,9 @@ public:
 
   // Save text to file
   FXbool saveFile(const FXString& file);
+
+  // Save text to file
+  FXbool saveToFile(const FXString& file);
 
   // Insert file at cursor
   FXbool insertFile(const FXString& file);

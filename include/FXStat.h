@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,7 +42,7 @@ private:
   FXlong  fileSize;             /// File size
 public:
 
-  /// Initialize 
+  /// Initialize
   FXStat():modeFlags(0),userNumber(0),groupNumber(0),linkCount(0),createTime(0),accessTime(0),modifyTime(0),fileVolume(0),fileIndex(0),fileSize(0){ }
 
   /// Return the mode flags for this file

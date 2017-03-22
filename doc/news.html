@@ -17,6 +17,35 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 13 - FOX DEVELOPMENT 1.7.58
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Adie improvement: don't clear bookmark selecting it 2nd time; now, remove bookmark by invoking "Delete Bookmark"
+with the cursor on the bookmark to be deleted.</li>
+<li>Bookmarks now at start of line; thus, only one per line.</li>
+<li>Use __buildin_bswapXX() only for GCC 4.8 and newer; older versions buggy, apparently.</li>
+<li>Added SaveTo option in Adie text editor.</li>
+<li>FXText and FXTextField cursor blink fix; don't blink while moving (so user doesn't lose track of where it is!).</li>
+<li>When multi-file mode in FXFileSelector, enquote files only when needed; and escape quotes and backslashes if they appear.</li>
+<li>FXFileSelector now returns filenames as typed into the box in all modes, including multi-file mode.</li>
+<li>Now allow relative search paths in Adie file search paths.  This means you can list places to look for files in your project
+directory subtree, regardless of where the project subtree is referenced from; for example, "../include:../lib" will let you
+open a file from "../include" when you're in "lib", and vice-versa.</li>
+<li>FXFileList properly hops back to original directory when dragging over directories.</li>
+<li>Major speedup in FXIconList lasso-selection mode.  Much, much faster when lassoing items in very large folders.</li>
+<li>FXFileSelector's getFilename() returns first of many, if box contains multiple names.</li>
+<li>FXFileSelector scans for first non-wildcard extension when substituting extensions when filter is changed.</li>
+<li>FXTreeList and FXFoldingList should issue SEL_EXPANDED message as side effect of makeItemVisible expanding a subtree.</li>
+<li>Missing setPattern(), getPattern() API's added for FXDirDialog and FXDirSelector.</li>
+<li>Added syntax pattern for hexadecimal floating point numbers.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 December 3 - FOX DEVELOPMENT 1.7.57
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -57,7 +86,7 @@ delete user-objects that may be referenced by those callbacks.</li>
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-December 3 - FOX SATBE 1.6.53
+December 3 - FOX STABLE 1.6.53
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->

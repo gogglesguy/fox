@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -111,7 +111,7 @@ FindInFiles::FindInFiles():visitor(this){
 
 
 // Construct file in files dialog
-FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,600,400, 10,10,10,10, 10,10),visitor(this){
+FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE,0,0,600,400, 10,10,10,10, 10,10),visitor(this){
 
   // Buttons at bottom
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|PACK_UNIFORM_WIDTH|PACK_UNIFORM_HEIGHT,0,0,0,0,0,0,0,0);
@@ -240,6 +240,7 @@ void FindInFiles::appendHistory(const FXString& patt,FXuint opts){
 void FindInFiles::create(){
   readRegistry();
   FXDialogBox::create();
+  findstring->setFocus();
   }
 
 

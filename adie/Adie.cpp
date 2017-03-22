@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -68,6 +68,7 @@ Adie::Adie(const FXString& name):FXApp(name){
   openicon=new FXGIFIcon(this,open_gif);
   saveicon=new FXGIFIcon(this,save_gif);
   saveasicon=new FXGIFIcon(this,saveas_gif,0,IMAGE_ALPHAGUESS);
+  savetoicon=new FXGIFIcon(this,saveto_gif,0,IMAGE_ALPHAGUESS);
   printicon=new FXGIFIcon(this,print_gif);
   cuticon=new FXGIFIcon(this,cut_gif);
   copyicon=new FXGIFIcon(this,copy_gif);
@@ -121,7 +122,7 @@ Adie::Adie(const FXString& name):FXApp(name){
 
 
 // Close all windows
-long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){      
+long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){
   while(0<windowlist.no() && windowlist[0]->close(true)){}
   return 1;
   }
@@ -172,7 +173,7 @@ static void printusage(){
 // Print verson info
 static void printversion(){
   fxmessage("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  fxmessage("Copyright (C) 2000,2016 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Copyright (C) 2000,2017 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
   fxmessage("\n");
   fxmessage("This program is free software: you can redistribute it and/or modify\n");
@@ -479,6 +480,7 @@ Adie::~Adie(){
   delete openicon;
   delete saveicon;
   delete saveasicon;
+  delete savetoicon;
   delete printicon;
   delete cuticon;
   delete copyicon;

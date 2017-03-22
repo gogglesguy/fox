@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -212,8 +212,8 @@ public:
 
   /**
   * Return a copy of the gradient segments.
-  * The array of segments is allocated using FXMALLOC and should be freed
-  * by the caller using FXFREE.
+  * The array of segments is allocated using allocElms() and should be freed
+  * by the caller using freeElms().
   */
   void getGradients(FXGradient*& segments,FXint& nsegments) const;
 
@@ -276,7 +276,7 @@ public:
    * The ramp argument should be an array of size nramp, which will be
    * filled with the appropriate color values.
    */
-  void gradient(FXColor *ramp,FXint nramp);
+  void gradient(FXColor *ramp,FXint nramp) const;
 
   /**
    * Get blend mode of segment, one of GRADIENT_BLEND_LINEAR,

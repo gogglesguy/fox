@@ -3,7 +3,7 @@
 *                              M a t h   T e s t                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -273,6 +273,8 @@ void report(const SPAccuracy& acc,const char* name){
 
 // FIXME instead, random draws + or- and and-mask.
 // FIXME will allow for testing special patterns easily.
+
+// FIXME this is wrong; UPDATE THIS!
 
 // Make a double number given some constraints
 FXdouble makeDouble(FXuint flags){

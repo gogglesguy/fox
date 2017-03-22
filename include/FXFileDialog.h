@@ -3,7 +3,7 @@
 *                   F i l e   S e l e c t i o n   D i a l o g                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2016 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -64,11 +64,29 @@ public:
   /// Return empty-string terminated list of selected file names, or NULL if none selected
   FXString* getFilenames() const;
 
+  /// Change directory
+  void setDirectory(const FXString& path);
+
+  /// Return directory
+  FXString getDirectory() const;
+
+  /// Change file selection mode; the default is SELECTFILE_ANY
+  void setSelectMode(FXuint mode);
+
+  /// Return file selection mode
+  FXuint getSelectMode() const;
+
   /// Change file pattern
   void setPattern(const FXString& ptrn);
 
   /// Return file pattern
   FXString getPattern() const;
+
+  /// Change wildcard matching mode (see FXPath)
+  void setMatchMode(FXuint mode);
+
+  /// Return wildcard matching mode
+  FXuint getMatchMode() const;
 
   /**
   * Change the list of file patterns shown in the file dialog.
@@ -113,29 +131,11 @@ public:
   /// Return true if pattern entry is allowed
   FXbool allowPatternEntry() const;
 
-  /// Change directory
-  void setDirectory(const FXString& path);
-
-  /// Return directory
-  FXString getDirectory() const;
-
   /// Set the inter-item spacing (in pixels)
   void setItemSpace(FXint s);
 
   /// Return the inter-item spacing (in pixels)
   FXint getItemSpace() const;
-
-  /// Change file selection mode; the default is SELECTFILE_ANY
-  void setSelectMode(FXuint mode);
-
-  /// Return file selection mode
-  FXuint getSelectMode() const;
-
-  /// Change wildcard matching mode (see FXPath)
-  void setMatchMode(FXuint mode);
-
-  /// Return wildcard matching mode
-  FXuint getMatchMode() const;
 
   /// Return true if showing hidden files
   FXbool showHiddenFiles() const;
@@ -216,7 +216,7 @@ public:
   * The new dialog will have the given caption and select the indicated path.
   * Files will be filtered by the pattern or patterns.  If there is more than one pattern,
   * the initial pattern will be selected in the drop-down box of the file dialog.
-  * The return value of this function is an array of strings; the last item in the 
+  * The return value of this function is an array of strings; the last item in the
   * array is an empty string.
   */
   static FXString* getOpenFilenames(FXWindow* owner,const FXString& caption,const FXString& path,const FXString& patterns="*",FXint initial=0);

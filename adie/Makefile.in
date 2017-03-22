@@ -318,6 +318,7 @@ $(top_srcdir)/adie/reload_gif.gif \
 $(top_srcdir)/adie/replace_gif.gif \
 $(top_srcdir)/adie/saveall_gif.gif \
 $(top_srcdir)/adie/saveas_gif.gif \
+$(top_srcdir)/adie/saveto_gif.gif \
 $(top_srcdir)/adie/save_gif.gif \
 $(top_srcdir)/adie/search_gif.gif \
 $(top_srcdir)/adie/searchicon_gif.gif \
