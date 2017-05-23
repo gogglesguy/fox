@@ -67,9 +67,9 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" \
 PROGRAMS = $(bin_PROGRAMS)
 am_adie_OBJECTS = Adie.$(OBJEXT) Commands.$(OBJEXT) \
 	FindInFiles.$(OBJEXT) help.$(OBJEXT) HelpWindow.$(OBJEXT) \
-	icons.$(OBJEXT) main.$(OBJEXT) Preferences.$(OBJEXT) \
-	ShellCommand.$(OBJEXT) Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) \
-	TextWindow.$(OBJEXT)
+	icons.$(OBJEXT) main.$(OBJEXT) Modeline.$(OBJEXT) \
+	Preferences.$(OBJEXT) ShellCommand.$(OBJEXT) Syntax.$(OBJEXT) \
+	SyntaxParser.$(OBJEXT) TextWindow.$(OBJEXT)
 adie_OBJECTS = $(am_adie_OBJECTS)
 adie_LDADD = $(LDADD)
 adie_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
@@ -139,6 +139,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
+AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -346,6 +347,8 @@ HelpWindow.cpp \
 icons.h \
 icons.cpp \
 main.cpp \
+Modeline.h \
+Modeline.cpp \
 Preferences.h \
 Preferences.cpp \
 ShellCommand.h \
@@ -503,6 +506,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FindInFiles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpWindow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Modeline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preferences.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShellCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Syntax.Po@am__quote@

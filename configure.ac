@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [58])
+m4_define([fox_level], [60])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -49,6 +49,15 @@ LT_RELEASE=$FOX_MAJOR_VERSION.$FOX_MINOR_VERSION
 LT_CURRENT=$FOX_INTERFACE_VERSION
 LT_REVISION=`expr $FOX_PATCH_LEVEL - $FOX_INTERFACE_VERSION`
 LT_AGE=`expr $FOX_INTERFACE_VERSION - $FOX_BINARY_VERSION`
+LT_INIT([win32-dll])
+
+# Check win32 compile
+case "$host_os" in
+*mingw32*) OS_WINDOWS=1 ;;
+*cygwin*) OS_WINDOWS=1 ;;
+*) OS_WINDOWS=0 ;;
+esac
+AM_CONDITIONAL(COND_OSWINDOWS, test x$OS_WINDOWS = x1)
 
 # Substitute variables in output files
 AC_SUBST(LT_RELEASE)

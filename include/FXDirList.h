@@ -149,6 +149,7 @@ protected:
   void listChildItems(FXDirItem *par,FXbool force,FXbool notify);
   FXString getSelectedFiles() const;
   virtual FXTreeItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr);
+  FXTreeItem* getPathnameItem__(const FXString& path);
 private:
   FXDirList(const FXDirList&);
   FXDirList &operator=(const FXDirList&);
@@ -249,7 +250,6 @@ public:
 
   /// Return the (closest) item from the absolute pathname
   FXTreeItem* getPathnameItem(const FXString& path);
-  FXTreeItem* getPathnameItem__(const FXString& path);
 
   /// Return true if item is a file
   FXbool isItemFile(const FXTreeItem* item) const;

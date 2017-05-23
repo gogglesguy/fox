@@ -10,8 +10,12 @@ lib_LTLIBRARIES = libFOX-1.7.la
 
 libFOX_1_7_la_LIBADD  = $(X_LIBS) $(X_PRE_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS) $(GL_LIBS)
 
-libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
+libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic -no-undefined
 
+if COND_OSWINDOWS
+AM_CXXFLAGS += -DFOXDLL -DFOXDLL_EXPORTS -DWIN32 -DNDEBUG -D_WINDOWS -DUNICODE -D_USRDLL -D_CRT_SECURE_NO_WARNINGS
+libFOX_1_7_la_LDFLAGS += -lcomctl32 -lwsock32 -limm32 -lmsimg32
+endif
 
 CURSORS = \
 $(top_srcdir)/lib/blank.xbm \

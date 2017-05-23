@@ -280,12 +280,9 @@ FXIMPLEMENT(Syntax,FXObject,NULL,0)
 
 
 // Construct syntax object; needs at least one master rule
-Syntax::Syntax(const FXString& lang,const FXString& grp):language(lang),group(grp){
+Syntax::Syntax(const FXString& lang,const FXString& grp):language(lang),group(grp),delimiters(FXText::textDelimiters),contextLines(1),contextChars(1),autoindent(-1),wrapwidth(-1),tabwidth(-1),wrapmode(-1),tabmode(-1){
   FXTRACE((10,"Syntax::Syntax(\"%s\",\"%s\")\n",lang.text(),grp.text()));
   rules.append(new DefaultRule("Default",FXString::null,-1,0));
-  delimiters=FXText::textDelimiters;
-  contextLines=1;
-  contextChars=1;
   }
 
 

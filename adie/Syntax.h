@@ -184,6 +184,11 @@ protected:
   FXString      delimiters;     // Word delimiters in this language
   FXint         contextLines;   // Context lines needed for restyle
   FXint         contextChars;   // Context characters needed for restyle
+  FXint         autoindent;     // Auto indent for this language
+  FXint         wrapwidth;      // Wrap text at this width
+  FXint         tabwidth;       // Tab is this many columns
+  FXint         wrapmode;       // Wrap lines on or off
+  FXint         tabmode;        // Tab key inserts spaces
 protected:
   Syntax(){}
 private:
@@ -210,32 +215,52 @@ public:
   FXint commonAncestor(FXint a,FXint b) const;
 
   // Language name
-  const FXString& getName() const { return language; }
   void setName(const FXString& lang){ language=lang; }
+  const FXString& getName() const { return language; }
 
   // Style coloring group
-  const FXString& getGroup() const { return group; }
   void setGroup(const FXString& grp){ group=grp; }
+  const FXString& getGroup() const { return group; }
 
   // Extensions
-  const FXString& getExtensions() const { return extensions; }
   void setExtensions(const FXString& exts){ extensions=exts; }
+  const FXString& getExtensions() const { return extensions; }
 
   // Contents
-  const FXString& getContents() const { return contents; }
   void setContents(const FXString& cont){ contents=cont; }
+  const FXString& getContents() const { return contents; }
 
   // Delimiters
-  const FXString& getDelimiters() const { return delimiters; }
   void setDelimiters(const FXString& delims){ delimiters=delims; }
+  const FXString& getDelimiters() const { return delimiters; }
 
   // Context lines
-  FXint getContextLines() const { return contextLines; }
   void setContextLines(FXint num){ contextLines=num; }
+  FXint getContextLines() const { return contextLines; }
 
   // Context characters
-  FXint getContextChars() const { return contextChars; }
   void setContextChars(FXint num){ contextChars=num; }
+  FXint getContextChars() const { return contextChars; }
+
+  // Access auto-indent
+  void setAutoIndent(FXint a){ autoindent=a; }
+  FXint getAutoIndent() const { return autoindent; }
+
+  // Access wrap width
+  void setWrapWidth(FXint w){ wrapwidth=w; }
+  FXint getWrapWidth() const { return wrapwidth; }
+
+  // Access tab width
+  void setTabWidth(FXint w){ tabwidth=w; }
+  FXint getTabWidth() const { return tabwidth; }
+
+  // Access line wrap mode
+  void setWrapMode(FXint m){ wrapmode=m; }
+  FXint getWrapMode() const { return wrapmode; }
+
+  // Access tab expand mode
+  void setTabMode(FXint m){ tabmode=m; }
+  FXint getTabMode() const { return tabmode; }
 
   // Find rule index, given name
   FXint getNamedRule(const FXString& name) const;

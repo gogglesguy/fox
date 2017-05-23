@@ -999,10 +999,10 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
     else if(filelist->isItemExecutable(index)){
       FXString executable=FXPath::enquote(pathname) + " &";
       FXTRACE((10,"system(%s)\n",executable.text()));
-      system(executable.text());
+      ::system(executable.text());
 /*
       FXProcess process;
-      FXString executable=filelist->getItemPathname(index);
+      FXString executable=pathname;
       const FXchar* argvec[]={executable.text(),executable.text(),NULL};
       process.start(argvec[0],argvec,NULL);
 */
@@ -1048,7 +1048,7 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
     else if(filelist->isItemExecutable(index)){
       FXString executable=FXPath::enquote(pathname)+" &";
       FXTRACE((10,"system(%s)\n",executable.text()));
-      system(executable.text());
+      ::system(executable.text());
 /*
       FXProcess process;
       const FXchar* argv[]={pathname.text(),NULL};
@@ -1069,7 +1069,7 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
         if(association->command.text()){
           FXString command=FXString::value(association->command.text(),FXPath::enquote(pathname).text());
           FXTRACE((10,"system(%s)\n",command.text()));
-          system(command.text());
+          ::system(command.text());
           }
         else{
           FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),pathname.text());
@@ -1436,7 +1436,7 @@ long PathFinderMain::onCmdNewPathFinder(FXObject*,FXSelector,void*){
   saveSettings();
   getApp()->reg().write();
   FXString command=FXString::value("%s %s &",pathfindercommand,path.text());
-  system(command.text());
+  ::system(command.text());
   return 1;
   }
 
@@ -1621,7 +1621,7 @@ long PathFinderMain::onCmdOpenWith(FXObject*,FXSelector,void*){
   if(FXInputDialog::getString(cmd,this,tr("Open File With"),tr("Open ") + FXPath::name(filename) + tr(" with:"))){
     getApp()->reg().writeStringEntry("SETTINGS","command",cmd.text());
     FXString command=cmd+" "+FXPath::enquote(filename)+" &";
-    system(command.text());
+    ::system(command.text());
 /*
     // Spawn child
     if(fork()==0){
@@ -1645,7 +1645,7 @@ long PathFinderMain::onCmdOpenWithEditor(FXObject*,FXSelector,void*){
   if(!filename.empty()){
     FXString executable=editor+" "+FXPath::enquote(filename)+" &";
     FXTRACE((10,"system(%s)\n",executable.text()));
-    system(executable.text());
+    ::system(executable.text());
     }
   return 1;
   }
@@ -1657,7 +1657,7 @@ long PathFinderMain::onCmdRun(FXObject*,FXSelector,void*){
   if(FXInputDialog::getString(newprogram,this,tr("Run Program"),tr("Run Program:"))){
     program=newprogram;
     FXString executeable="cd "+FXPath::enquote(getDirectory())+"; "+program+" &";
-    system(executeable.text());
+    ::system(executeable.text());
     }
   return 1;
   }
@@ -1666,7 +1666,7 @@ long PathFinderMain::onCmdRun(FXObject*,FXSelector,void*){
 // Run terminal
 long PathFinderMain::onCmdTerminal(FXObject*,FXSelector,void*){
   FXString executable="cd "+FXPath::enquote(getDirectory())+"; "+terminal+" &";
-  system(executable.text());
+  ::system(executable.text());
   return 1;
   }
 
@@ -1874,6 +1874,7 @@ long PathFinderMain::onUpdFileLocation(FXObject* sender,FXSelector,void*){
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
   return 1;
   }
+
 
 // Update file type
 long PathFinderMain::onUpdFileSize(FXObject* sender,FXSelector,void*){

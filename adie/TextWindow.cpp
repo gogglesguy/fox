@@ -26,6 +26,7 @@
 #include "HelpWindow.h"
 #include "Preferences.h"
 #include "Commands.h"
+#include "Modeline.h"
 #include "Syntax.h"
 #include "TextWindow.h"
 #include "Adie.h"
@@ -218,12 +219,18 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DELIMITERS,TextWindow::onUpdDelimiters),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_WRAPCOLUMNS,TextWindow::onCmdWrapColumns),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_WRAPCOLUMNS,TextWindow::onUpdWrapColumns),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_MODELINE,TextWindow::onCmdModeline),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_MODELINE,TextWindow::onUpdModeline),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_AUTOINDENT,TextWindow::onCmdAutoIndent),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_AUTOINDENT,TextWindow::onUpdAutoIndent),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERTTABS,TextWindow::onCmdInsertTabs),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERTTABS,TextWindow::onUpdInsertTabs),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_BRACEMATCH,TextWindow::onCmdBraceMatch),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_BRACEMATCH,TextWindow::onUpdBraceMatch),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_BRACEMATCHTIME,TextWindow::onCmdBraceMatchTime),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_BRACEMATCHTIME,TextWindow::onUpdBraceMatchTime),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_BRACEMATCHSTAY,TextWindow::onCmdBraceMatchStay),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_BRACEMATCHSTAY,TextWindow::onUpdBraceMatchStay),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_WHEELADJUST,TextWindow::onUpdWheelAdjust),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_WHEELADJUST,TextWindow::onCmdWheelAdjust),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVEVIEWS,TextWindow::onUpdSaveViews),
@@ -310,15 +317,13 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SYNTAX,TextWindow::onCmdSyntax),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_RESTYLE,TextWindow::onUpdRestyle),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_RESTYLE,TextWindow::onCmdRestyle),
-  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_JUMPSCROLL,TextWindow::onUpdJumpScroll),
-  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_JUMPSCROLL,TextWindow::onCmdJumpScroll),
   FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_WINDOW_1,TextWindow::ID_WINDOW_10,TextWindow::onUpdWindow),
   FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_WINDOW_1,TextWindow::ID_WINDOW_10,TextWindow::onCmdWindow),
   FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_SYNTAX_FIRST,TextWindow::ID_SYNTAX_LAST,TextWindow::onUpdSyntaxSwitch),
   FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_SYNTAX_FIRST,TextWindow::ID_SYNTAX_LAST,TextWindow::onCmdSyntaxSwitch),
 
-  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_TABSELECT_1,TextWindow::ID_TABSELECT_8,TextWindow::onUpdTabSelect),
-  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_TABSELECT_1,TextWindow::ID_TABSELECT_8,TextWindow::onCmdTabSelect),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_TABSELECT_0,TextWindow::ID_TABSELECT_8,TextWindow::onUpdTabSelect),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_TABSELECT_0,TextWindow::ID_TABSELECT_8,TextWindow::onCmdTabSelect),
 
   FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_STYLE_NORMAL_FG_FIRST,TextWindow::ID_STYLE_NORMAL_FG_LAST,TextWindow::onCmdStyleNormalFG),
   FXMAPFUNCS(SEL_CHANGED,TextWindow::ID_STYLE_NORMAL_FG_FIRST,TextWindow::ID_STYLE_NORMAL_FG_LAST,TextWindow::onCmdStyleNormalFG),
@@ -414,7 +419,7 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
 
   // Editor frame and text widgets
   editorframe=new FXHorizontalFrame(subsplitter,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
-  editor=new FXText(editorframe,this,ID_TEXT,LAYOUT_FILL_X|LAYOUT_FILL_Y|TEXT_SHOWACTIVE);
+  editor=new FXText(editorframe,this,ID_TEXT,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   editor->setHiliteMatchTime(2000000000);
   editor->setBarColumns(6);
 
@@ -478,8 +483,7 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   saveviews=false;
   savemarks=false;
   warnchanged=false;
-  lastfilesize=false;
-  lastfileposition=false;
+  modeline=false;
   undolist.mark();
   }
 
@@ -572,7 +576,7 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(gotomenu,tr("&Set bookmark\tAlt-B\tSet bookmark at cursor location."),getApp()->bookseticon,this,ID_SET_MARK);
   new FXMenuCommand(gotomenu,tr("&Next bookmark\tAlt-N\tMove cursor to next bookmark."),getApp()->booknexticon,this,ID_NEXT_MARK);
   new FXMenuCommand(gotomenu,tr("&Previous bookmark\tAlt-P\tMove cursor to previous bookmark."),getApp()->bookprevicon,this,ID_PREV_MARK);
-  new FXMenuCommand(gotomenu,tr("&Delete bookmark\t\tDelete bookmark at cursor."),getApp()->bookdelicon,this,ID_DEL_MARK);
+  new FXMenuCommand(gotomenu,tr("&Delete bookmark\tAlt-D\tDelete bookmark at cursor."),getApp()->bookdelicon,this,ID_DEL_MARK);
   new FXMenuCommand(gotomenu,tr("&Clear all bookmarks\tAlt-C\tClear all bookmarks."),getApp()->bookdelicon,this,ID_CLEAR_MARKS);
 
   // Search Menu
@@ -588,10 +592,10 @@ void TextWindow::createMenubar(){
   new FXMenuSeparator(searchmenu);
   new FXMenuCommand(searchmenu,tr("Incremental search\tCtl-I\tSearch for a string."),NULL,this,ID_ISEARCH_START);
   new FXMenuCommand(searchmenu,tr("Search &Files\tShift-Ctl-F\tSearch files for a string."),NULL,this,ID_FINDFILES);
-  new FXMenuCommand(searchmenu,tr("Find next selected\tCtl-H\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
-  new FXMenuCommand(searchmenu,tr("Find previous selected\tShift-Ctl-H\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
-  new FXMenuCommand(searchmenu,tr("Find next\tCtl-G\tSearch for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
-  new FXMenuCommand(searchmenu,tr("Find previous\tShift-Ctl-G\tSearch for previous occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+  new FXMenuCommand(searchmenu,tr("Find Backward\tShift-Ctl-G\tSearch backward for another occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+  new FXMenuCommand(searchmenu,tr("Find Forward\tCtl-G\tSearch forward for another occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+  new FXMenuCommand(searchmenu,tr("Find Backward Selected\tShift-Ctl-H\tSearch backward for selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+  new FXMenuCommand(searchmenu,tr("Find Forward Selected\tCtl-H\tSearch forward for selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
 
   new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch with a string pattern."),getApp()->searchicon,this,ID_SEARCH);
   new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch and replace with a string pattern."),getApp()->replaceicon,this,ID_REPLACE);
@@ -638,7 +642,6 @@ void TextWindow::createMenubar(){
   new FXMenuCheck(optionmenu,tr("&Word wrap\t\tToggle word wrap mode."),this,ID_TOGGLE_WRAP);
   new FXMenuCheck(optionmenu,tr("&Overstrike\t\tToggle overstrike mode."),editor,FXText::ID_TOGGLE_OVERSTRIKE);
   new FXMenuCheck(optionmenu,tr("&Syntax coloring\t\tToggle syntax coloring."),this,ID_SYNTAX);
-  new FXMenuCheck(optionmenu,tr("Jump scrolling\t\tToggle jump scrolling mode."),this,ID_JUMPSCROLL);
   new FXMenuCheck(optionmenu,tr("Use initial size\t\tToggle initial window size mode."),this,ID_USE_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("Set initial size\t\tSet current window size as the initial window size."),NULL,this,ID_SET_INITIAL_SIZE);
   new FXMenuCommand(optionmenu,tr("&Restyle\t\tToggle syntax coloring."),NULL,this,ID_RESTYLE);
@@ -828,7 +831,7 @@ void TextWindow::createStatusbar(){
   new FXLabel(statusbar,tr("  Tab:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
   // Show column number in status bar
-  FXTextField* columnno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_COLUMN,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  FXTextField* columnno=new FXTextField(statusbar,6,editor,FXText::ID_CURSOR_COLUMN,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   columnno->setBackColor(statusbar->getBackColor());
   columnno->setTipText(tr("Current column"));
 
@@ -836,7 +839,7 @@ void TextWindow::createStatusbar(){
   new FXLabel(statusbar,tr("  Col:"),NULL,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
 
   // Show line number in status bar
-  FXTextField* rowno=new FXTextField(statusbar,7,editor,FXText::ID_CURSOR_ROW,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  FXTextField* rowno=new FXTextField(statusbar,6,editor,FXText::ID_CURSOR_ROW,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
   rowno->setBackColor(statusbar->getBackColor());
   rowno->setTipText(tr("Current line"));
 
@@ -1287,10 +1290,11 @@ void TextWindow::setStatusMessage(const FXString& msg){
 
 // Read settings from registry
 void TextWindow::readRegistry(){
-  FXColor textback,textfore,textselback,textselfore,textcursor,texthilitefore,texthiliteback;
-  FXColor dirback,dirfore,dirselback,dirselfore,dirlines,textactiveback,textbar,textnumber;
-  FXint ww,hh,xx,yy,treewidth,wrapping,wrapcols,tabcols,barcols,loggerheight;
-  FXbool hiddenfiles,autoindent,showactive,hardtabs,hidetree,hideclock,hidestatus,hideundo,hidetoolbar,fixedwrap,jumpscroll;
+  FXColor textback,textfore,textselback,textselfore,textcursor,texthilitefore,texthiliteback,textactiveback,textbar,textnumber;
+  FXColor dirback,dirfore,dirselback,dirselfore,dirlines;
+  FXbool hiddenfiles,showactive,showmatch,hidetree;
+  FXbool hideclock,hidestatus,hideundo,hidetoolbar;
+  FXint ww,hh,xx,yy,modebits,treewidth,loggerheight;
   FXString fontspec;
 
   // Text colors
@@ -1299,8 +1303,8 @@ void TextWindow::readRegistry(){
   textselback=getApp()->reg().readColorEntry("SETTINGS","textselbackground",editor->getSelBackColor());
   textselfore=getApp()->reg().readColorEntry("SETTINGS","textselforeground",editor->getSelTextColor());
   textcursor=getApp()->reg().readColorEntry("SETTINGS","textcursor",editor->getCursorColor());
-  texthiliteback=getApp()->reg().readColorEntry("SETTINGS","texthilitebackground",editor->getHiliteBackColor());
   texthilitefore=getApp()->reg().readColorEntry("SETTINGS","texthiliteforeground",editor->getHiliteTextColor());
+  texthiliteback=getApp()->reg().readColorEntry("SETTINGS","texthilitebackground",editor->getHiliteBackColor());
   textactiveback=getApp()->reg().readColorEntry("SETTINGS","textactivebackground",editor->getActiveBackColor());
   textbar=getApp()->reg().readColorEntry("SETTINGS","textnumberbackground",editor->getBarColor());
   textnumber=getApp()->reg().readColorEntry("SETTINGS","textnumberforeground",editor->getNumberColor());
@@ -1372,19 +1376,25 @@ void TextWindow::readRegistry(){
 
   // Highlight match time
   editor->setHiliteMatchTime(getApp()->reg().readLongEntry("SETTINGS","bracematchpause",2000000000));
+  showmatch=getApp()->reg().readBoolEntry("SETTINGS","bracematch",true);
 
   // Active Background
   showactive=getApp()->reg().readBoolEntry("SETTINGS","showactive",false);
 
+  // Modeline support
+  modeline=getApp()->reg().readBoolEntry("SETTINGS","modeline",false);
+
+  // Autoindent
+  autoindent=getApp()->reg().readBoolEntry("SETTINGS","autoindent",false);
+
   // Word wrapping
-  wrapping=getApp()->reg().readBoolEntry("SETTINGS","wordwrap",false);
   wrapcols=getApp()->reg().readIntEntry("SETTINGS","wrapcols",80);
+  wrapping=getApp()->reg().readBoolEntry("SETTINGS","wordwrap",false);
   fixedwrap=getApp()->reg().readBoolEntry("SETTINGS","fixedwrap",true);
 
-  // Tab settings, autoindent
-  autoindent=getApp()->reg().readBoolEntry("SETTINGS","autoindent",false);
-  hardtabs=getApp()->reg().readBoolEntry("SETTINGS","hardtabs",true);
+  // Tab settings
   tabcols=getApp()->reg().readIntEntry("SETTINGS","tabcols",8);
+  hardtabs=getApp()->reg().readBoolEntry("SETTINGS","hardtabs",true);
 
   // Space for line numbers
   barcols=getApp()->reg().readIntEntry("SETTINGS","barcols",0);
@@ -1398,7 +1408,6 @@ void TextWindow::readRegistry(){
   savemarks=getApp()->reg().readBoolEntry("SETTINGS","savebookmarks",false);
   warnchanged=getApp()->reg().readBoolEntry("SETTINGS","warnchanged",true);
   colorize=getApp()->reg().readBoolEntry("SETTINGS","colorize",false);
-  jumpscroll=getApp()->reg().readBoolEntry("SETTINGS","jumpscroll",false);
   searchflags=getApp()->reg().readUIntEntry("SETTINGS","searchflags",SEARCH_FORWARD|SEARCH_EXACT);
 
   // File patterns
@@ -1450,41 +1459,15 @@ void TextWindow::readRegistry(){
   // Hide undo counters
   if(hideundo) undoredoblock->hide();
 
-  // Wrap mode
-  if(wrapping)
-    editor->setTextStyle(editor->getTextStyle()|TEXT_WORDWRAP);
-  else
-    editor->setTextStyle(editor->getTextStyle()&~TEXT_WORDWRAP);
-
-  // Active line color being used
-  if(showactive)
-    editor->setTextStyle(editor->getTextStyle()|TEXT_SHOWACTIVE);
-  else
-    editor->setTextStyle(editor->getTextStyle()&~TEXT_SHOWACTIVE);
-
-  // Wrap fixed mode
-  if(fixedwrap)
-    editor->setTextStyle(editor->getTextStyle()|TEXT_FIXEDWRAP);
-  else
-    editor->setTextStyle(editor->getTextStyle()&~TEXT_FIXEDWRAP);
-
-  // Autoindent
-  if(autoindent)
-    editor->setTextStyle(editor->getTextStyle()|TEXT_AUTOINDENT);
-  else
-    editor->setTextStyle(editor->getTextStyle()&~TEXT_AUTOINDENT);
-
-  // Hard tabs
-  if(hardtabs)
-    editor->setTextStyle(editor->getTextStyle()&~TEXT_NO_TABS);
-  else
-    editor->setTextStyle(editor->getTextStyle()|TEXT_NO_TABS);
-
-  // Jump Scroll
-  if(jumpscroll)
-    editor->setScrollStyle(editor->getScrollStyle()|SCROLLERS_DONT_TRACK);
-  else
-    editor->setScrollStyle(editor->getScrollStyle()&~SCROLLERS_DONT_TRACK);
+  // Set editor modes
+  modebits=0;
+  if(!hardtabs) modebits|=TEXT_NO_TABS;
+  if(wrapping) modebits|=TEXT_WORDWRAP;
+  if(showactive) modebits|=TEXT_SHOWACTIVE;
+  if(fixedwrap) modebits|=TEXT_FIXEDWRAP;
+  if(autoindent) modebits|=TEXT_AUTOINDENT;
+  if(showmatch) modebits|=TEXT_SHOWMATCH;
+  editor->setTextStyle(modebits);
 
   // Wrap and tab columns
   editor->setWrapColumns(wrapcols);
@@ -1565,22 +1548,28 @@ void TextWindow::writeRegistry(){
 
   // Highlight match time
   getApp()->reg().writeLongEntry("SETTINGS","bracematchpause",editor->getHiliteMatchTime());
-
-  // Wrap mode
-  getApp()->reg().writeBoolEntry("SETTINGS","wordwrap",(editor->getTextStyle()&TEXT_WORDWRAP)!=0);
-  getApp()->reg().writeBoolEntry("SETTINGS","fixedwrap",(editor->getTextStyle()&TEXT_FIXEDWRAP)!=0);
-  getApp()->reg().writeIntEntry("SETTINGS","wrapcols",editor->getWrapColumns());
+  getApp()->reg().writeBoolEntry("SETTINGS","bracematch",(editor->getTextStyle()&TEXT_SHOWMATCH)!=0);
 
   // Active background
   getApp()->reg().writeBoolEntry("SETTINGS","showactive",(editor->getTextStyle()&TEXT_SHOWACTIVE)!=0);
 
+  // Modeline support
+  getApp()->reg().writeBoolEntry("SETTINGS","modeline",modeline);
+
+  // Autoindent mode
+  getApp()->reg().writeBoolEntry("SETTINGS","autoindent",autoindent);
+
+  // Wrap mode
+  getApp()->reg().writeIntEntry("SETTINGS","wrapcols",wrapcols);
+  getApp()->reg().writeBoolEntry("SETTINGS","wordwrap",wrapping);
+  getApp()->reg().writeBoolEntry("SETTINGS","fixedwrap",fixedwrap);
+
+  // Tab settings
+  getApp()->reg().writeIntEntry("SETTINGS","tabcols",tabcols);
+  getApp()->reg().writeBoolEntry("SETTINGS","hardtabs",hardtabs);
+
   // Bar columns
   getApp()->reg().writeIntEntry("SETTINGS","barcols",editor->getBarColumns());
-
-  // Tab settings, autoindent
-  getApp()->reg().writeBoolEntry("SETTINGS","autoindent",(editor->getTextStyle()&TEXT_AUTOINDENT)!=0);
-  getApp()->reg().writeBoolEntry("SETTINGS","hardtabs",(editor->getTextStyle()&TEXT_NO_TABS)==0);
-  getApp()->reg().writeIntEntry("SETTINGS","tabcols",editor->getTabColumns());
 
   // Strip returns
   getApp()->reg().writeBoolEntry("SETTINGS","stripreturn",stripcr);
@@ -1591,7 +1580,6 @@ void TextWindow::writeRegistry(){
   getApp()->reg().writeBoolEntry("SETTINGS","savebookmarks",savemarks);
   getApp()->reg().writeBoolEntry("SETTINGS","warnchanged",warnchanged);
   getApp()->reg().writeBoolEntry("SETTINGS","colorize",colorize);
-  getApp()->reg().writeBoolEntry("SETTINGS","jumpscroll",(editor->getScrollStyle()&SCROLLERS_DONT_TRACK)!=0);
   getApp()->reg().writeUIntEntry("SETTINGS","searchflags",searchflags);
 
   // File patterns
@@ -1672,15 +1660,15 @@ long TextWindow::onCmdReopen(FXObject*,FXSelector,void*){
   if(isModified()){
     if(FXMessageBox::question(this,MBOX_YES_NO,tr("Document was changed"),tr("Discard changes to this document?"))==MBOX_CLICKED_NO) return 1;
     }
-  if(!loadFile(getFilename())){
-    getApp()->beep();
-    FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),getFilename().text());
-    }
-  else{
-    clearBookmarks();
+  if(loadFile(getFilename())){
     readBookmarks(getFilename());
     readView(getFilename());
     determineSyntax();
+    parseModeline();
+    }
+  else{
+    getApp()->beep();
+    FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),getFilename().text());
     }
   return 1;
   }
@@ -1726,10 +1714,10 @@ long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
         window->create();
         }
       if(window->loadFile(file)){
-        window->clearBookmarks();
         window->readBookmarks(file);
         window->readView(file);
         window->determineSyntax();
+        window->parseModeline();
         }
       else{
         FXMessageBox::error(window,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
@@ -1872,15 +1860,15 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
             window=new TextWindow(getApp());
             window->create();
             }
-          if(!window->loadFile(file)){
-            getApp()->beep();
-            FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
-            }
-          else{
-            window->clearBookmarks();
+          if(window->loadFile(file)){
             window->readBookmarks(file);
             window->readView(file);
             window->determineSyntax();
+            window->parseModeline();
+            }
+          else{
+            getApp()->beep();
+            FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
             }
           }
 
@@ -1911,16 +1899,16 @@ long TextWindow::onCmdOpenRecent(FXObject*,FXSelector,void* ptr){
       window=new TextWindow(getApp());
       window->create();
       }
-    if(!window->loadFile(file)){
-      mrufiles.removeFile(file);
-      getApp()->beep();
-      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
-      }
-    else{
-      window->clearBookmarks();
+    if(window->loadFile(file)){
       window->readBookmarks(file);
       window->readView(file);
       window->determineSyntax();
+      window->parseModeline();
+      }
+    else{
+      mrufiles.removeFile(file);
+      getApp()->beep();
+      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
       }
     }
   window->raise();
@@ -1932,19 +1920,19 @@ long TextWindow::onCmdOpenRecent(FXObject*,FXSelector,void* ptr){
 // Command from the tree list
 long TextWindow::onCmdOpenTree(FXObject*,FXSelector,void* ptr){
   FXTreeItem *item=(FXTreeItem*)ptr;
-  FXString file;
-  if(!item || !dirlist->isItemFile(item)) return 1;
-  if(!saveChanges()) return 1;
-  file=dirlist->getItemPathname(item);
-  if(!loadFile(file)){
-    getApp()->beep();
-    FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
-    }
-  else{
-    clearBookmarks();
-    readBookmarks(file);
-    readView(file);
-    determineSyntax();
+  if(item && dirlist->isItemFile(item)){
+    if(!saveChanges()) return 1;
+    FXString file=dirlist->getItemPathname(item);
+    if(loadFile(file)){
+      readBookmarks(file);
+      readView(file);
+      determineSyntax();
+      parseModeline();
+      }
+    else{
+      getApp()->beep();
+      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+      }
     }
   return 1;
   }
@@ -1964,12 +1952,13 @@ long TextWindow::onCmdSwitch(FXObject*,FXSelector,void*){
       setCurrentPattern(opendialog.getCurrentPattern());
       file=opendialog.getFilename();
       if(loadFile(file)){
-        clearBookmarks();
         readBookmarks(file);
         readView(file);
         determineSyntax();
+        parseModeline();
         }
       else{
+        getApp()->beep();
         FXMessageBox::error(this,MBOX_OK,tr("Error Switching Files"),tr("Unable to switch to file: %s"),file.text());
         }
       }
@@ -1985,15 +1974,15 @@ long TextWindow::onTextDNDDrop(FXObject*,FXSelector,void*){
     file=FXURL::fileFromURL(string.before('\r'));
     if(file.empty()) return 1;
     if(!saveChanges()) return 1;
-    if(!loadFile(file)){
-      getApp()->beep();
-      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
-      }
-    else{
-      clearBookmarks();
+    if(loadFile(file)){
       readBookmarks(file);
       readView(file);
       determineSyntax();
+      parseModeline();
+      }
+    else{
+      getApp()->beep();
+      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
       }
     return 1;
     }
@@ -2283,38 +2272,135 @@ long TextWindow::onCmdSaveSettings(FXObject*,FXSelector,void*){
   }
 
 
-// Toggle wrap mode
+// Toggle mode line parsing
+long TextWindow::onCmdModeline(FXObject*,FXSelector,void*){
+  modeline=!modeline;
+  return 1;
+  }
+
+
+// Update mode line parsing
+long TextWindow::onUpdModeline(FXObject* sender,FXSelector,void*){
+  sender->handle(this,modeline ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Toggle autoindent; we remember this value as the default
+long TextWindow::onCmdAutoIndent(FXObject*,FXSelector,void*){
+  FXuint modebits=editor->getTextStyle()^TEXT_AUTOINDENT;
+  editor->setTextStyle(modebits);
+  autoindent=((modebits&TEXT_AUTOINDENT)!=0);
+  return 1;
+  }
+
+
+// Update autoindent; show indeterminate if default is different from current
+long TextWindow::onUpdAutoIndent(FXObject* sender,FXSelector,void*){
+  FXbool ai=(editor->getTextStyle()&TEXT_AUTOINDENT)!=0;
+  sender->handle(this,(autoindent!=ai) ? FXSEL(SEL_COMMAND,ID_UNKNOWN) : ai ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change wrap columns; we remember this value as the default
+long TextWindow::onCmdWrapColumns(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&wrapcols);
+  editor->setWrapColumns(wrapcols);
+  return 1;
+  }
+
+
+// Update wrap columns
+long TextWindow::onUpdWrapColumns(FXObject* sender,FXSelector,void*){
+  FXint wrap=editor->getWrapColumns();
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&wrap);
+  return 1;
+  }
+
+
+// Toggle wrap mode; we remember this value as the default
 long TextWindow::onCmdWrap(FXObject*,FXSelector,void*){
-  editor->setTextStyle(editor->getTextStyle()^TEXT_WORDWRAP);
+  FXuint modebits=editor->getTextStyle()^TEXT_WORDWRAP;
+  editor->setTextStyle(modebits);
+  wrapping=((modebits&TEXT_WORDWRAP)!=0);
   return 1;
   }
 
 
 // Update toggle wrap mode
 long TextWindow::onUpdWrap(FXObject* sender,FXSelector,void*){
-  if(editor->getTextStyle()&TEXT_WORDWRAP)
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  FXbool wr=(editor->getTextStyle()&TEXT_WORDWRAP)!=0;
+  sender->handle(this,(wrapping!=wr) ? FXSEL(SEL_COMMAND,ID_UNKNOWN) : wr ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
-// Toggle fixed wrap mode
+// Toggle fixed wrap mode; we remember this value as the default
 long TextWindow::onCmdWrapFixed(FXObject*,FXSelector,void*){
-  editor->setTextStyle(editor->getTextStyle()^TEXT_FIXEDWRAP);
+  FXuint modebits=editor->getTextStyle()^TEXT_FIXEDWRAP;
+  editor->setTextStyle(modebits);
+  fixedwrap=((modebits&TEXT_FIXEDWRAP)!=0);
   return 1;
   }
 
 
-// Update toggle fixed wrap mode
+// Update toggle fixed wrap mode; show indeterminate if default is different from current
 long TextWindow::onUpdWrapFixed(FXObject* sender,FXSelector,void*){
-  if(editor->getTextStyle()&TEXT_FIXEDWRAP)
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  FXbool fw=(editor->getTextStyle()&TEXT_FIXEDWRAP)!=0;
+  sender->handle(this,(fixedwrap!=fw) ? FXSEL(SEL_COMMAND,ID_UNKNOWN) : fw ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
+
+
+// Change tab columns; we remember this value as the default
+long TextWindow::onCmdTabColumns(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&tabcols);
+  editor->setTabColumns(tabcols);
+  return 1;
+  }
+
+
+// Update tab columns
+long TextWindow::onUpdTabColumns(FXObject* sender,FXSelector,void*){
+  FXint tabs=editor->getTabColumns();
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&tabs);
+  return 1;
+  }
+
+
+// Select tab columns; we remember this value as the default
+long TextWindow::onCmdTabSelect(FXObject*,FXSelector sel,void*){
+  tabcols=FXSELID(sel)-ID_TABSELECT_0;
+  editor->setTabColumns(tabcols);
+  return 1;
+  }
+
+
+// Update select tab columns
+long TextWindow::onUpdTabSelect(FXObject* sender,FXSelector sel,void*){
+  FXint tabs=FXSELID(sel)-ID_TABSELECT_0;
+  sender->handle(this,editor->getTabColumns()==tabs?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Toggle insertion of tabs; we remember this value as the default
+long TextWindow::onCmdInsertTabs(FXObject*,FXSelector,void*){
+  FXuint modebits=editor->getTextStyle()^TEXT_NO_TABS;
+  editor->setTextStyle(modebits);
+  hardtabs=((modebits&TEXT_NO_TABS)==0);
+  return 1;
+  }
+
+
+// Update insertion of tabs; show indeterminate if default is different from current
+long TextWindow::onUpdInsertTabs(FXObject* sender,FXSelector,void*){
+  FXbool ht=(editor->getTextStyle()&TEXT_NO_TABS)==0;
+  sender->handle(this,(hardtabs!=ht) ? FXSEL(SEL_COMMAND,ID_UNKNOWN) : ht ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
 
 // Toggle show active background mode
 long TextWindow::onCmdShowActive(FXObject*,FXSelector,void*){
@@ -2325,10 +2411,7 @@ long TextWindow::onCmdShowActive(FXObject*,FXSelector,void*){
 
 // Update show active background mode
 long TextWindow::onUpdShowActive(FXObject* sender,FXSelector,void*){
-  if(editor->getTextStyle()&TEXT_SHOWACTIVE)
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,(editor->getTextStyle()&TEXT_SHOWACTIVE) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2341,10 +2424,7 @@ long TextWindow::onCmdStripReturns(FXObject*,FXSelector,void* ptr){
 
 // Update toggle strip returns mode
 long TextWindow::onUpdStripReturns(FXObject* sender,FXSelector,void*){
-  if(stripcr)
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else
-    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,stripcr ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2358,7 +2438,7 @@ long TextWindow::onCmdWarnChanged(FXObject*,FXSelector,void* ptr){
 
 // Update check button for warning
 long TextWindow::onUpdWarnChanged(FXObject* sender,FXSelector,void*){
-  sender->handle(this,warnchanged?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,warnchanged ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2372,7 +2452,7 @@ long TextWindow::onCmdUseInitialSize(FXObject*,FXSelector,void* ptr){
 
 // Update initial size flag
 long TextWindow::onUpdUseInitialSize(FXObject* sender,FXSelector,void*){
-  sender->handle(this,initialsize?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,initialsize ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2428,56 +2508,6 @@ long TextWindow::onUpdAppendCarriageReturn(FXObject* sender,FXSelector,void*){
   }
 
 
-// Change tab columns
-long TextWindow::onCmdTabColumns(FXObject* sender,FXSelector,void*){
-  FXint tabs;
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&tabs);
-  editor->setTabColumns(tabs);
-  return 1;
-  }
-
-
-// Update tab columns
-long TextWindow::onUpdTabColumns(FXObject* sender,FXSelector,void*){
-  FXint tabs=editor->getTabColumns();
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&tabs);
-  return 1;
-  }
-
-
-// Select tab columns
-long TextWindow::onCmdTabSelect(FXObject*,FXSelector sel,void*){
-  FXint tabs=FXSELID(sel)-ID_TABSELECT_1+1;
-  editor->setTabColumns(tabs);
-  return 1;
-  }
-
-
-// Update select tab columns
-long TextWindow::onUpdTabSelect(FXObject* sender,FXSelector sel,void*){
-  FXint tabs=FXSELID(sel)-ID_TABSELECT_1+1;
-  sender->handle(this,editor->getTabColumns()==tabs?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
-  return 1;
-  }
-
-
-// Change wrap columns
-long TextWindow::onCmdWrapColumns(FXObject* sender,FXSelector,void*){
-  FXint wrap;
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&wrap);
-  editor->setWrapColumns(wrap);
-  return 1;
-  }
-
-
-// Update wrap columns
-long TextWindow::onUpdWrapColumns(FXObject* sender,FXSelector,void*){
-  FXint wrap=editor->getWrapColumns();
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&wrap);
-  return 1;
-  }
-
-
 // Change line number columna
 long TextWindow::onCmdLineNumbers(FXObject* sender,FXSelector,void*){
   FXint cols;
@@ -2495,36 +2525,22 @@ long TextWindow::onUpdLineNumbers(FXObject* sender,FXSelector,void*){
   }
 
 
-// Toggle insertion of tabs
-long TextWindow::onCmdInsertTabs(FXObject*,FXSelector,void*){
-  editor->setTextStyle(editor->getTextStyle()^TEXT_NO_TABS);
+// Set brace matching
+long TextWindow::onCmdBraceMatch(FXObject*,FXSelector,void*){
+  editor->setTextStyle(editor->getTextStyle()^TEXT_SHOWMATCH);
   return 1;
   }
 
 
-// Update insertion of tabs
-long TextWindow::onUpdInsertTabs(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(editor->getTextStyle()&TEXT_NO_TABS)?FXSEL(SEL_COMMAND,ID_UNCHECK):FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  return 1;
-  }
-
-
-// Toggle autoindent
-long TextWindow::onCmdAutoIndent(FXObject*,FXSelector,void*){
-  editor->setTextStyle(editor->getTextStyle()^TEXT_AUTOINDENT);
-  return 1;
-  }
-
-
-// Update autoindent
-long TextWindow::onUpdAutoIndent(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(editor->getTextStyle()&TEXT_AUTOINDENT)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+// Update brace matching
+long TextWindow::onUpdBraceMatch(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(editor->getTextStyle()&TEXT_SHOWMATCH) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
 
 // Set brace match time
-long TextWindow::onCmdBraceMatch(FXObject* sender,FXSelector,void*){
+long TextWindow::onCmdBraceMatchTime(FXObject* sender,FXSelector,void*){
   FXTime value;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETLONGVALUE),(void*)&value);
   editor->setHiliteMatchTime(value*1000000);
@@ -2533,9 +2549,32 @@ long TextWindow::onCmdBraceMatch(FXObject* sender,FXSelector,void*){
 
 
 // Update brace match time
-long TextWindow::onUpdBraceMatch(FXObject* sender,FXSelector,void*){
-  FXTime value=editor->getHiliteMatchTime()/1000000;
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETLONGVALUE),(void*)&value);
+long TextWindow::onUpdBraceMatchTime(FXObject* sender,FXSelector,void*){
+  FXTime value=editor->getHiliteMatchTime();
+  if(value<forever){
+    value/=1000000;
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETLONGVALUE),(void*)&value);
+    }
+  else{
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)"forever");
+    }
+  return 1;
+  }
+
+
+// Set brace match to remain highlighted forever
+long TextWindow::onCmdBraceMatchStay(FXObject*,FXSelector,void*){
+  FXTime value=editor->getHiliteMatchTime();
+  value=(value<forever) ? forever : 2000000000;
+  editor->setHiliteMatchTime(value);
+  return 1;
+  }
+
+
+// Update brace match remain highlighted forever
+long TextWindow::onUpdBraceMatchStay(FXObject* sender,FXSelector,void*){
+  FXTime value=editor->getHiliteMatchTime();
+  sender->handle(this,(value==forever) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
 
@@ -2596,7 +2635,7 @@ long TextWindow::onCmdWheelAdjust(FXObject* sender,FXSelector,void*){
   }
 
 
-// Update brace match time
+// Update scroll wheel lines
 long TextWindow::onUpdWheelAdjust(FXObject* sender,FXSelector,void*){
   FXuint value=getApp()->getWheelLines();
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&value);
@@ -2822,20 +2861,6 @@ long TextWindow::onUpdDirLineColor(FXObject* sender,FXSelector,void*){
   }
 
 
-// Change jump scrolling mode
-long TextWindow::onCmdJumpScroll(FXObject*,FXSelector,void*){
-  editor->setScrollStyle(editor->getScrollStyle()^SCROLLERS_DONT_TRACK);
-  return 1;
-  }
-
-
-// Update change jump scrolling mode
-long TextWindow::onUpdJumpScroll(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(editor->getScrollStyle()&SCROLLERS_DONT_TRACK)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
-  return 1;
-  }
-
-
 // Change the pattern
 long TextWindow::onCmdFilter(FXObject*,FXSelector,void* ptr){
   dirlist->setPattern(FXFileSelector::patternFromText((FXchar*)ptr));
@@ -3051,7 +3076,7 @@ long TextWindow::onUpdShellCancel(FXObject* sender,FXSelector,void*){
 
 // Output from shell
 long TextWindow::onCmdShellOutput(FXObject*,FXSelector,void* ptr){
-  FXTRACE((1,"TextWindow::onCmdShellOutput\n"));
+  FXTRACE((100,"TextWindow::onCmdShellOutput\n"));
   const FXchar* string=(const FXchar*)ptr;
   FXint len=strlen(string);
   if(replaceStart>editor->getLength()) replaceStart=editor->getLength();
@@ -3067,7 +3092,7 @@ long TextWindow::onCmdShellOutput(FXObject*,FXSelector,void* ptr){
 
 // Shell command has error
 long TextWindow::onCmdShellError(FXObject*,FXSelector,void* ptr){
-  FXTRACE((1,"TextWindow::onCmdShellError\n"));
+  FXTRACE((100,"TextWindow::onCmdShellError\n"));
   const FXchar* string=(const FXchar*)ptr;
   FXint len=strlen(string);
   showlogger=loggerframe->shown();
@@ -3084,7 +3109,7 @@ long TextWindow::onCmdShellError(FXObject*,FXSelector,void* ptr){
 
 // Shell command is done
 long TextWindow::onCmdShellDone(FXObject*,FXSelector,void*){
-  FXTRACE((1,"TextWindow::onCmdShellDone\n"));
+  FXTRACE((100,"TextWindow::onCmdShellDone\n"));
   doneCommand();
   return 1;
   }
@@ -3139,7 +3164,7 @@ FXbool TextWindow::matchesSelection(const FXString& string,FXint* beg,FXint* end
 
 // Search text
 long TextWindow::onCmdSearch(FXObject*,FXSelector,void*){
-  FXTRACE((1,"TextWindow::onCmdSearch()\n"));
+  FXTRACE((100,"TextWindow::onCmdSearch()\n"));
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXSearchDialog searchdialog(this,tr("Search"),&dialogicon);
   FXint beg[10],end[10],pos,code;
@@ -3221,7 +3246,7 @@ static FXString substitute(const FXString& original,const FXString& replace,FXin
 
 // Replace text
 long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
-  FXTRACE((1,"TextWindow::onCmdReplace()\n"));
+  FXTRACE((100,"TextWindow::onCmdReplace()\n"));
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXReplaceDialog replacedialog(this,tr("Replace"),&dialogicon);
   FXint beg[10],end[10],pos,finish,fm,to,code;
@@ -3384,7 +3409,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
 
 // Search seleced
 long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
-  FXTRACE((1,"TextWindow::onCmdSearchSel()\n"));
+  FXTRACE((100,"TextWindow::onCmdSearchSel()\n"));
   FXString string;
   if(getDNDData(FROM_SELECTION,utf8Type,string)){               // UTF8 string
     searchstring=string;
@@ -3428,7 +3453,7 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
 
 // Search for next occurence
 long TextWindow::onCmdSearchNext(FXObject*,FXSelector sel,void*){
-  FXTRACE((1,"TextWindow::onCmdSearchNext()\n"));
+  FXTRACE((100,"TextWindow::onCmdSearchNext()\n"));
   if(!searchstring.empty()){
     FXint selstart=editor->getSelStartPos();
     FXint selend=editor->getSelEndPos();
@@ -3851,12 +3876,10 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCommand(&popupmenu,tr("Undo"),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
     new FXMenuCommand(&popupmenu,tr("Redo"),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
     new FXMenuSeparator(&popupmenu);
-
-    new FXMenuCommand(&popupmenu,tr("Find next selected\t\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
-    new FXMenuCommand(&popupmenu,tr("Find previous selected\t\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
-    new FXMenuCommand(&popupmenu,tr("Find next\t\tSearch for next occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
-    new FXMenuCommand(&popupmenu,tr("Find previous\t\tSearch for previous occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
-
+    new FXMenuCommand(&popupmenu,tr("Find Backward\t\tSearch backward for another occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
+    new FXMenuCommand(&popupmenu,tr("Find Forward\t\tSearch forward for another occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
+    new FXMenuCommand(&popupmenu,tr("Find Backward Selected\t\tSearch backward for selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+    new FXMenuCommand(&popupmenu,tr("Find Forward Selected\t\tSearch forward for selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
     new FXMenuSeparator(&popupmenu);
     new FXMenuCommand(&popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
     new FXMenuCommand(&popupmenu,tr("Copy"),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
@@ -3903,6 +3926,7 @@ long TextWindow::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
           editor->setTopLine(top);
           editor->setCursorPos(pos);
           determineSyntax();
+          parseModeline();
           }
         }
       warnchanged=true;
@@ -3981,7 +4005,7 @@ long TextWindow::onUpdPrevMark(FXObject* sender,FXSelector,void*){
 
 // Set bookmark, but don't set more than one per line
 long TextWindow::onCmdSetMark(FXObject*,FXSelector,void*){
-  setBookmark(editor->lineStart(editor->getCursorPos()));
+  setBookmark(editor->getCursorPos());
   return 1;
   }
 
@@ -4038,12 +4062,12 @@ long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
 
 // Highlight if cursor on bookmarked line
 long TextWindow::onUpdDelMark(FXObject* sender,FXSelector,void*){
-  FXint pos=editor->lineStart(editor->getCursorPos());
+  FXint pos=editor->getCursorPos();
   for(FXuint i=0; bookmark[i] && i<ARRAYNUMBER(bookmark); i++){
-    if(pos==bookmark[i]){
+    if(bookmark[i]==pos){
       sender->handle(this,FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
       return 1;
-      } 
+      }
     }
   sender->handle(this,FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
@@ -4052,11 +4076,11 @@ long TextWindow::onUpdDelMark(FXObject* sender,FXSelector,void*){
 
 // Clear bookmark at cursor
 long TextWindow::onCmdDelMark(FXObject*,FXSelector,void*){
-  clearBookmark(editor->lineStart(editor->getCursorPos()));
+  clearBookmark(editor->getCursorPos());
   return 1;
   }
-  
-  
+
+
 
 // Highlight if cursor on bookmarked line
 long TextWindow::onUpdClearMarks(FXObject* sender,FXSelector,void*){
@@ -4069,6 +4093,15 @@ long TextWindow::onUpdClearMarks(FXObject* sender,FXSelector,void*){
 long TextWindow::onCmdClearMarks(FXObject*,FXSelector,void*){
   clearBookmarks();
   return 1;
+  }
+
+
+// Goto position
+void TextWindow::gotoPosition(FXint pos){
+  if(!editor->isPosVisible(pos)){
+    editor->setCenterLine(pos);
+    }
+  editor->setCursorPos(pos);
   }
 
 
@@ -4111,7 +4144,7 @@ void TextWindow::updateBookmarks(FXint pos,FXint nd,FXint ni){
         bookmark[i++]=bookmark[j];
         }
       else if(pos+nd<=bookmark[j]){
-        bookmark[i++]=bookmark[j]+ni-nd;
+        bookmark[i++]=bookmark[j]-nd+ni;
         }
       else{
         bookmark[j]=0;
@@ -4121,24 +4154,16 @@ void TextWindow::updateBookmarks(FXint pos,FXint nd,FXint ni){
   }
 
 
-// Goto position
-void TextWindow::gotoPosition(FXint pos){
-  if(!editor->isPosVisible(pos)){
-    editor->setCenterLine(pos);
-    }
-  editor->setCursorPos(pos);
-  }
-
-
 // Clear bookmarks
 void TextWindow::clearBookmarks(){
-  memset(bookmark,0,sizeof(bookmark));
+  bookmark[0]=bookmark[1]=bookmark[2]=bookmark[3]=bookmark[4]=bookmark[5]=bookmark[6]=bookmark[7]=bookmark[8]=bookmark[9]=0;
   }
 
 
 // Read bookmarks associated with file
 void TextWindow::readBookmarks(const FXString& file){
-  getApp()->reg().readFormatEntry("BOOKMARKS",FXPath::name(file).text(),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&bookmark[0],&bookmark[1],&bookmark[2],&bookmark[3],&bookmark[4],&bookmark[5],&bookmark[6],&bookmark[7],&bookmark[8],&bookmark[9]);
+  clearBookmarks();
+  getApp()->reg().readFormatEntry("BOOKMARKS",FXPath::name(file),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&bookmark[0],&bookmark[1],&bookmark[2],&bookmark[3],&bookmark[4],&bookmark[5],&bookmark[6],&bookmark[7],&bookmark[8],&bookmark[9]);
   }
 
 
@@ -4148,7 +4173,7 @@ void TextWindow::writeBookmarks(const FXString& file){
     getApp()->reg().writeFormatEntry("BOOKMARKS",FXPath::name(file).text(),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",bookmark[0],bookmark[1],bookmark[2],bookmark[3],bookmark[4],bookmark[5],bookmark[6],bookmark[7],bookmark[8],bookmark[9]);
     }
   else{
-    getApp()->reg().deleteEntry("BOOKMARKS",FXPath::name(file).text());
+    getApp()->reg().deleteEntry("BOOKMARKS",FXPath::name(file));
     }
   }
 
@@ -4185,43 +4210,109 @@ long TextWindow::onUpdSaveViews(FXObject* sender,FXSelector,void*){
 
 // Read view of the file
 void TextWindow::readView(const FXString& file){
-  editor->setTopLine(getApp()->reg().readIntEntry("VIEW",FXPath::name(file).text(),0));
+  editor->setTopLine(getApp()->reg().readIntEntry("VIEW",FXPath::name(file),0));
   }
 
 
 // Write current view of the file
 void TextWindow::writeView(const FXString& file){
   if(saveviews && editor->getTopLine()){
-    getApp()->reg().writeIntEntry("VIEW",FXPath::name(file).text(),editor->getTopLine());
+    getApp()->reg().writeIntEntry("VIEW",FXPath::name(file),editor->getTopLine());
     }
   else{
-    getApp()->reg().deleteEntry("VIEW",FXPath::name(file).text());
+    getApp()->reg().deleteEntry("VIEW",FXPath::name(file));
     }
   }
 
 
 /*******************************************************************************/
 
-// Determine language
-void TextWindow::determineSyntax(){
-  FXString file=FXPath::name(getFilename());
+// Parse modeline from the text buffer
+void TextWindow::parseModeline(){
+  if(modeline){
+    Modeline modes;
+    FXString lines;
+    FXString language;
 
-  // See if specific syntax to be used for a file
-  Syntax* stx=getApp()->getSyntaxByName(getApp()->reg().readStringEntry("SYNTAX",file.text()));
+    // Buffer chunk
+    FXint len=editor->getLength();
+    FXint pos=editor->nextLine(0,30);
+
+    // Extract top few lines and check for modeline
+    editor->extractText(lines,0,pos);
+    if(!modes.parseModeline(lines)){
+      if(pos>=len) return;
+      pos=editor->prevLine(len,10);
+
+      // Extract bottom few lines and check for modeline
+      editor->extractText(lines,pos,len-pos);
+      if(!modes.parseModeline(lines)) return;
+      }
+
+    // See if a new langauge is called for
+    language=modes.getLanguage();
+    if(!language.empty()){
+      Syntax* stx=getApp()->getSyntaxByName(language);
+      if(stx){ setSyntax(stx); }
+      }
+
+    // Get original parameters
+    FXuint modebits=editor->getTextStyle();
+    FXint  tabwidth=editor->getTabColumns();
+    FXint  wrapwidth=editor->getWrapColumns();
+
+    // Modes from the mode line
+    if(modes.getAutoIndent()==0) modebits&=~TEXT_AUTOINDENT;
+    if(modes.getAutoIndent()==1) modebits|=TEXT_AUTOINDENT;
+    if(modes.getWrapMode()==0) modebits&=~(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
+    if(modes.getWrapMode()==1) modebits|=(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
+    if(modes.getTabMode()==0) modebits&=~TEXT_NO_TABS;
+    if(modes.getTabMode()==1) modebits|=TEXT_NO_TABS;
+
+    // Tab and wrap widths
+    if(modes.getTabWidth()>0) tabwidth=modes.getTabWidth();
+    if(modes.getWrapWidth()>0) wrapwidth=modes.getWrapWidth();
+
+    // Put back (modified) parameters
+    editor->setTextStyle(modebits);
+    editor->setTabColumns(tabwidth);
+    editor->setWrapColumns(wrapwidth);
+    }
+  }
+
+/*******************************************************************************/
+
+// Determine language
+// If modeline support is turned on, parse chunk of the file to get the modeline-
+// settable parameters.  If modeline is turned on and syntax mapping not forced by
+// user, use the one provided by the modeline.  Override editor settings with those
+// from modeline regardless of how language-mode was resolved.
+void TextWindow::determineSyntax(){
+  FXString file(FXPath::name(getFilename()));
+
+  // This filename was to be directly associated with a particular syntax
+  // Ignore syntax settings in the modeline, user has explicitly set it
+  Syntax* stx=getApp()->getSyntaxByRegistry(file);
   if(!stx){
 
-    // See if file matches a pattern
+    // Use the syntax whose wildcards match the given filename
     stx=getApp()->getSyntaxByPattern(file);
     if(!stx){
-      FXString contents;
+      FXString lines;
 
-      // Grab contents fragment
-      editor->extractText(contents,0,FXMIN(1024,editor->getLength()));
+      // Grab up to here
+      FXint pos=editor->nextLine(0,30);
 
-      // See if contents of file match a pattern
-      stx=getApp()->getSyntaxByContents(contents);
+      // Grab some lines of the top of the file and see if it contains
+      // anything one of the syntaxes would match against
+      editor->extractText(lines,0,pos);
+
+      // Use the syntax matching some regex patterns inside the file
+      stx=getApp()->getSyntaxByContents(lines);
       }
     }
+
+  // Change the syntax coloring scheme
   setSyntax(stx);
   }
 
@@ -4231,11 +4322,11 @@ long TextWindow::onCmdSyntaxSwitch(FXObject*,FXSelector sel,void*){
   FXint syn=FXSELID(sel)-ID_SYNTAX_FIRST;
   FXString file=FXPath::name(getFilename());
   if(0<syn){
-    getApp()->reg().writeStringEntry("SYNTAX",file.text(),getApp()->syntaxes[syn-1]->getName().text());
+    getApp()->reg().writeStringEntry("SYNTAX",file,getApp()->syntaxes[syn-1]->getName().text());
     setSyntax(getApp()->syntaxes[syn-1]);
     }
   else{
-    getApp()->reg().deleteEntry("SYNTAX",file.text());
+    getApp()->reg().deleteEntry("SYNTAX",file);
     setSyntax(NULL);
     }
   return 1;
@@ -4427,20 +4518,64 @@ long TextWindow::onUpdStyleBold(FXObject* sender,FXSelector sel,void*){
 // Set language
 void TextWindow::setSyntax(Syntax* syn){
   syntax=syn;
+
+  // Set editor attributes to syntax mode
   if(syntax){
+
+    // Get original parameters
+    FXuint modebits=editor->getTextStyle();
+    FXint  tabwidth=editor->getTabColumns();
+    FXint  wrapwidth=editor->getWrapColumns();
+
+    // Set number of syntax styles
     styles.no(syntax->getNumRules()-1);
+
+    // Read attributes for each style
     for(FXint rule=1; rule<syntax->getNumRules(); rule++){
       styles[rule-1]=readStyleForRule(syntax->getGroup(),syntax->getRule(rule)->getName(),syntax->getRule(rule)->getStyle());
       }
-    editor->setDelimiters(syntax->getDelimiters().text());
+
+    // Set styles
     editor->setHiliteStyles(styles.data());
     editor->setStyled(colorize);
+
+    // Other syntax-determined stuff
+    editor->setDelimiters(syntax->getDelimiters().text());
+
+    // Modes from the syntax
+    if(syntax->getAutoIndent()==0) modebits&=~TEXT_AUTOINDENT;
+    if(syntax->getAutoIndent()==1) modebits|=TEXT_AUTOINDENT;
+    if(syntax->getWrapMode()==0) modebits&=~(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
+    if(syntax->getWrapMode()==1) modebits|=(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
+    if(syntax->getTabMode()==0) modebits&=~TEXT_NO_TABS;
+    if(syntax->getTabMode()==1) modebits|=TEXT_NO_TABS;
+
+    // Tab and wrap widths
+    if(syntax->getTabWidth()>0) tabwidth=syntax->getTabWidth();
+    if(syntax->getWrapWidth()>0) wrapwidth=syntax->getWrapWidth();
+
+    // Put back (modified) parameters
+    editor->setTextStyle(modebits);
+    editor->setTabColumns(tabwidth);
+    editor->setWrapColumns(wrapwidth);
+
+    // Full recolorization is called for
     restyleText();
     }
+
+  // Reset editor attributes to defaults
   else{
-    editor->setDelimiters(delimiters.text());
+    FXuint modebits=editor->getTextStyle();
     editor->setHiliteStyles(NULL);
     editor->setStyled(false);
+    editor->setDelimiters(delimiters.text());
+    if(autoindent) modebits|=TEXT_AUTOINDENT; else modebits&=~TEXT_AUTOINDENT;
+    if(wrapping) modebits|=TEXT_WORDWRAP; else modebits&=~TEXT_WORDWRAP;
+    if(fixedwrap) modebits|=TEXT_FIXEDWRAP; else modebits&=~TEXT_FIXEDWRAP;
+    if(hardtabs) modebits&=~TEXT_NO_TABS; else modebits|=TEXT_NO_TABS;
+    editor->setTextStyle(modebits);
+    editor->setTabColumns(tabcols);
+    editor->setWrapColumns(wrapcols);
     }
   }
 
@@ -4502,14 +4637,10 @@ FXint TextWindow::backwardByContext(FXint pos) const {
   FXint nchars=syntax->getContextChars();
   FXint r1=pos;
   FXint r2=pos;
-  if(nlines==0){
-    r1=pos-nchars;
+  if(0<nchars){
+    r1=editor->validPos(pos-nchars);
     }
-  else if(nchars==0){
-    r2=editor->prevLine(pos,nlines);
-    }
-  else{
-    r1=pos-nchars;
+  if(0<nlines){
     r2=editor->prevLine(pos,nlines);
     }
   return FXMAX(0,FXMIN(r1,r2));
@@ -4522,14 +4653,10 @@ FXint TextWindow::forwardByContext(FXint pos) const {
   FXint nchars=syntax->getContextChars();
   FXint r1=pos;
   FXint r2=pos;
-  if(nlines==0){
-    r1=pos+nchars;
+  if(0<nchars){
+    r1=editor->validPos(pos+nchars);
     }
-  else if(nchars==0){
-    r2=editor->nextLine(pos,nlines);
-    }
-  else{
-    r1=pos-nchars;
+  if(0<nlines){
     r2=editor->nextLine(pos,nlines);
     }
   return FXMIN(editor->getLength(),FXMAX(r1,r2));
@@ -4631,7 +4758,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& head,FXint& tail,FXint
 // Restyle text after change in buffer
 void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
   FXint head,tail,changed,affected,beg,end,len,rule,restylejump;
-  FXTRACE((1,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));
+  FXTRACE((100,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));
   if(colorize && syntax){
 
     // Length of text
@@ -4647,7 +4774,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
     // Scan forward by one context
     end=forwardByContext(changed);
 
-    FXTRACE((1,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text()));
+    FXTRACE((110,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text()));
 
     FXASSERT(0<=rule && rule<syntax->getNumRules());
 
@@ -4657,7 +4784,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
 
       // Restyle [beg,end> using rule, return matched range in [head,tail>
       affected=restyleRange(beg,end,head,tail,rule);
-      FXTRACE((1,"affected=%d beg=%d end=%d head=%d tail=%d, rule=%d (%s) \n",affected,beg,end,head,tail,rule,syntax->getRule(rule)->getName().text()));
+      FXTRACE((110,"affected=%d beg=%d end=%d head=%d tail=%d, rule=%d (%s) \n",affected,beg,end,head,tail,rule,syntax->getRule(rule)->getName().text()));
 
       // Not all colored yet, continue coloring with parent rule from
       if(tail<end){

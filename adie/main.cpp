@@ -20,6 +20,7 @@
 ********************************************************************************/
 #include "fx.h"
 #include "Syntax.h"
+#include "Modeline.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "icons.h"

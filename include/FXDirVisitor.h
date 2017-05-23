@@ -70,6 +70,9 @@ public:
   /// Start traversal at given path
   FXuint traverse(const FXString& path,FXint limit=1000);
 
+  /// Return true if we're actively visiting directories
+  FXbool visiting() const { return current!=NULL; }
+  
   /// Return stats on current file or directory
   const FXStat& info() const;
 

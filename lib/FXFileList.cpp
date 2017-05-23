@@ -547,7 +547,7 @@ long FXFileList::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
 // Somebody wants our selection
 long FXFileList::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
-  FXTRACE((1,"FXFileList::onClipboardRequest: requested: %d\n",((FXEvent*)ptr)->target));
+  FXTRACE((1,"FXFileList::onClipboardRequest: requested: %lu\n",((FXEvent*)ptr)->target));
 
   // Try base class first
   if(FXIconList::onClipboardRequest(sender,sel,ptr)) return 1;

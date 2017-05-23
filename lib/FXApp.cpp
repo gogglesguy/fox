@@ -292,7 +292,7 @@ struct FXRepaint {
   FXRepaint     *next;              // Next repaint in list
   FXID           window;            // Window ID of the dirty window
   FXRectangle    rect;              // Dirty rectangle
-  FXint          hint;              // Hint for compositing
+  FXint          area;              // Area of this rectangle
   FXbool         synth;             // Synthetic expose event or real one?
   };
 
@@ -2204,9 +2204,9 @@ void FXApp::enterWindow(FXWindow *window,FXWindow *ancestor){
 
 // Smart rectangle compositing algorithm
 void FXApp::addRepaint(FXID win,FXint x,FXint y,FXint w,FXint h,FXbool synth){
-  register FXint px,py,pw,ph,hint,area;
+  register FXint px,py,pw,ph,newarea,area;
   register FXRepaint *r,**pr;
-  hint=w*h;
+  area=w*h;
   w+=x;
   h+=y;
   do{
@@ -2220,10 +2220,10 @@ void FXApp::addRepaint(FXID win,FXint x,FXint y,FXint w,FXint h,FXbool synth){
         py=FXMIN(y,r->rect.y);
         pw=FXMAX(w,r->rect.w);
         ph=FXMAX(h,r->rect.h);
-        area=(pw-px)*(ph-py);
+        newarea=(pw-px)*(ph-py);
 
-        // New area MUCH bigger than sum; forget about it
-        if(area > (hint+r->hint)*2) continue;
+        // New area bigger than sum; forget about it
+        if(newarea > area+r->area) continue;
 
         // Take old paintrect out of the list
         *pr=r->next;
@@ -2232,7 +2232,7 @@ void FXApp::addRepaint(FXID win,FXint x,FXint y,FXint w,FXint h,FXbool synth){
 
         // New rectangle
         synth|=r->synth;        // Synthethic is preserved!
-        hint=area;
+        area=newarea;
         x=px;
         y=py;
         w=pw;
@@ -2258,7 +2258,7 @@ void FXApp::addRepaint(FXID win,FXint x,FXint y,FXint w,FXint h,FXbool synth){
   r->rect.y=y;
   r->rect.w=w;
   r->rect.h=h;
-  r->hint=hint;
+  r->area=area;
   r->synth=synth;
   r->next=NULL;
   *pr=r;

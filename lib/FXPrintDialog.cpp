@@ -412,23 +412,23 @@ void FXPrintDialog::create(){
 
   // Use CUPS to determine list of printers
   cups_dest_t *dests;
-  int          num_dests;
+  FXint        num_dests;
 
   // Obtain list of destinations
   num_dests=cupsGetDests(&dests);
 
   // Fill list of printers
-  for(int d=0; d<num_dests; d++){
+  for(FXint d=0; d<num_dests; d++){
     printername->appendItem(dests[d].name);
     if(printer.name==dests[d].name) printername->setCurrentItem(d);
     }
 
 #else
 
-  char name[1000];
+  FXchar name[1000];
   FILE *pc;
-  char buf[1000];
-  int i;
+  FXchar buf[1000];
+  FXint i;
 
   // Open printcap file, found as per registry setting
   // You may have change this setting for your particular system

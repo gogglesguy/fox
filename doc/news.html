@@ -17,6 +17,68 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+May 17 - FOX DEVELOPMENT 1.7.60
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Context back-up changed in incremental syntax recolorizer (Adie).</li>
+<li>Some typos fixed here and there.</li>
+<li>Configure script and makefile updates.</li>
+<li>Many updates being worked on inside FXText.</li>
+<li>Compiler warnings fixes for GCC 6.3.1, which seems to flag a few new things.</li>
+<li>Some FXText widget speedups.</li>
+<li>Bug fixes in FXString.</li>
+<li>Added visiting() API to FXDirVisitor.</li>
+<li>Disable and enable buttons in FindInFiles dialog in Adie editor when starting/stopping searches.</li>
+<li>Brace-matching change: matching brace can now stay visible as long as cursor on a brace (if enabled).
+Enabling permanent highlighting also makes the match search outside of the visible part of the text buffer,
+in case the matching brace is scrolled into view later.  Thus, people with slow machines may notice brace-match could
+take slightly more time, when working with really large files.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 20 - FOX STABLE 1.6.54
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fix core dump using old GNU C Library or CYGWIN inside FXString::vformat.cpp.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 14 - FOX DEVELOPMENT 1.7.59
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Changed the way bookmarks are done in Adie; you can delete them one by one.</li>
+<li>A fair number of changes and bug-fixes in FXText widget.</li>
+<li>Cursor doesn't blink during movement in FXText and FXTextField.</li>
+<li>Limit accumulation of repaint-areas yields less visible flicker in some case.</li>
+<li>Redraw of line numbers in FXText now with less flicker during resizing.</li>
+<li>Adie text editor now supports adie, emacs, and vim modeline parsing; you can set language (syntax) mode, tab width, wrapping, and a few other things.</li>
+<li>Dropped jump-scroll mode support in Adie: never used by anyone.</li>
+<li>Some extra options added to Adie Preferences Dialog.</li>
+<li>Syntax file for Adie can now force hard-tabs, autoindent, and other attributes.  This means editing 'Makefile' will automatically switch hard-tabs on!!.</li>
+<li>Adie on-line help updated with description of syntax for 'Adie.stx' syntax description file.</li>
+<li>Documentation in FXAccelTable.h expanded to include syntax for accelerator keys.</li>
+<li>Option for brace-matching added to FXText.  Also, added option to keep brace highlighted forever, or until cursor moves or a selection is made.</li>
+<li>Show 'indeterminate' state for checkbuttons in Preferences panel, if default settings for tab-mode, wrap-mode, auto-indent have been superceeded by
+attributes from the syntax-file or a parsed modeline.</li>
+<li>Added 'SaveTo' option in File Menu of Adie text editor.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 March 13 - FOX DEVELOPMENT 1.7.58
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

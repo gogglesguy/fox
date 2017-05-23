@@ -367,7 +367,8 @@ FXchar* fxstrcasestr(const FXchar* s,const FXchar* find){
 FXbool fxtoDOS(FXchar*& string,FXint& len){
   FXint f=0,t=0;
   while(f<len){
-    if(string[f++]=='\n') t++; t++;
+    if(string[f++]=='\n') t++; 
+    t++;
     }
   if(resizeElms(string,t+1)){
     len=t;

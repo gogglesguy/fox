@@ -732,6 +732,14 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\..\adie\Modeline.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\adie\Modeline.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\adie\new2_gif.gif"
 			>
 			<FileConfiguration

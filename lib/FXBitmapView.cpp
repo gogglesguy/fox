@@ -171,8 +171,10 @@ long FXBitmapView::onPaint(FXObject*,FXSelector,void* ptr){
     dc.setForeground(backColor);
     xl=xx; xr=xx+ww;
     yt=yy; yb=yy+hh;
-    if(xl<0) xl=0; if(xr>vw) xr=vw;
-    if(yt<0) yt=0; if(yb>vh) yb=vh;
+    if(xl<0) xl=0; 
+    if(xr>vw) xr=vw;
+    if(yt<0) yt=0; 
+    if(yb>vh) yb=vh;
     dc.fillRectangle(0,0,xr,yt);
     dc.fillRectangle(0,yt,xl,vh-yt);
     dc.fillRectangle(xr,0,vw-xr,yb);

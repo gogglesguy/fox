@@ -83,22 +83,45 @@ public:
 
 
 /**
-* Parse accelerator from string, yielding modifier and
-* key code.  For example, parseAccel("Ctl+Shift+X")
-* yields MKUINT(KEY_X,CONTROLMASK|SHIFTMASK).
+* Parse accelerator from string, yielding modifier and key code.  
+* The syntax of the string is:
+*
+*  <Accelerator> ::= (<Modifier> ('-' | '+'))* <Key>
+*
+* where:
+*
+* <Modifier> ::= 'Ctl' | 'Ctrl' | 'Alt' | 'Meta' | 'Shift'
+*
+* <Key>      ::= 'Home' | 'End' | 'PgUp' | 'PgDn' | 'Left' | 'Right' | 
+*                'Up' | 'Down' | 'Ins' | 'Del' | 'Esc' | 'Tab' | 'Return' | 
+*                'Enter' | 'Back' | 'Spc' | 'Space' | 
+*                'F'<Digit><Digit>? | 
+*                '#'<HexDigit>+ | 
+*                <Letter>
+*
+* <Digit>    ::= '0' ... '1'
+* <Letter>   ::= 'A' ... 'Z'
+* <HexDigit> ::= '0' ... '9', 'A' ... 'F'
+*
+* Case is not significant, but uppercase is preferred.
+* For example, parseAccel("Ctl+Shift+X") yields the same value as:
+* MKUINT(KEY_X,CONTROLMASK|SHIFTMASK).
 */
 extern FXAPI FXHotKey parseAccel(const FXString& string);
 
 /**
 * Unparse hot key comprising modifier and key code back
 * into a string suitable for parsing with fxparseHotKey.
+* For example, an input of MKUINT(KEY_X,CONTROLMASK|SHIFTMASK)
+* will return the string "Ctl+Shift+X".
 */
 extern FXAPI FXString unparseAccel(FXHotKey key);
 
 /**
-* Parse hot key from string, yielding modifier and
-* key code.  For example, parseHotKey(""Salt && &Pepper!"")
-* yields MKUINT(KEY_p,ALTMASK).
+* Parse hot key from string of the form "&Hotkey", yielding modifier and
+* key code. If a '&' is to be just plain text, it should be doubled.
+* For example, parseHotKey(""Salt && &Pepper!"") yields the same value as
+* MKUINT(KEY_p,ALTMASK).
 */
 extern FXAPI FXHotKey parseHotKey(const FXString& string);
 

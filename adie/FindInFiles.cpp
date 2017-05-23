@@ -25,6 +25,7 @@
 #include "Preferences.h"
 #include "Commands.h"
 #include "Syntax.h"
+#include "Modeline.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "FindInFiles.h"
@@ -253,6 +254,7 @@ FXbool FindInFiles::close(FXbool notify){
 
 // Called by visitor to see if we should continue processing
 FXbool FindInFiles::continueProcessing(){
+  getApp()->refresh();
   getApp()->runModalWhileEvents(pausebutton,1000000L);
   getApp()->runUntil(proceed);
   return (proceed!=2);
@@ -470,6 +472,7 @@ long FindInFiles::onCmdStop(FXObject*,FXSelector,void*){
 // Update pause/resume button
 long FindInFiles::onUpdPause(FXObject* sender,FXSelector,void*){
   sender->handle(this,(proceed==0)?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  sender->handle(this,visitor.visiting()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
@@ -496,7 +499,8 @@ long FindInFiles::onCmdDelete(FXObject*,FXSelector,void*){
 
 // Grey out buttons if no search text
 long FindInFiles::onUpdSearch(FXObject* sender,FXSelector,void*){
-  sender->handle(this,findstring->getText().empty()?FXSEL(SEL_COMMAND,ID_DISABLE):FXSEL(SEL_COMMAND,ID_ENABLE),NULL);
+  FXbool enabled=!visitor.visiting() && !findstring->getText().empty();
+  sender->handle(this,enabled?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
@@ -513,6 +517,7 @@ long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
   appendHistory(getSearchText(),getSearchMode());
   proceed=1;
   visitor.traverse(getDirectory(),getSearchText(),getPattern(),rexmode,opts,limit);
+  getApp()->refresh();
   return 1;
   }
 
@@ -600,14 +605,14 @@ long FindInFiles::onCmdFolder(FXObject*,FXSelector,void*){
 
 
 // Update arrows
-long FindInFiles::onUpdHistoryUp(FXObject* sender,FXSelector sel,void*){
+long FindInFiles::onUpdHistoryUp(FXObject* sender,FXSelector,void*){
   sender->handle(this,(index<19 && !patternHistory[index+1].empty())?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 
 
 // Update arrows
-long FindInFiles::onUpdHistoryDn(FXObject* sender,FXSelector sel,void*){
+long FindInFiles::onUpdHistoryDn(FXObject* sender,FXSelector,void*){
   sender->handle(this,(-1<index)?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }

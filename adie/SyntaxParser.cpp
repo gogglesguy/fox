@@ -229,6 +229,11 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
   FXString group;
   FXint contextlines=0;
   FXint contextchars=0;
+  FXint autoindent=-1;
+  FXint wrapwidth=-1;
+  FXint tabwidth=-1;
+  FXint wrapmode=-1;
+  FXint tabmode=-1;
   FXRex::Error error;
   Syntax *syntax;
 
@@ -241,10 +246,12 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
       fxwarning("%s:%d: error: expected 'language' <name>.\n",from,line);
       return false;
       }
+
+    // Snarf language name from parse buffer
     name.assign(head+1,tail-head-2);
     token=gettok();
 
-    // Default same as language
+    // Default group name is same as language name
     group=name;
 
     // Parse various features
@@ -302,6 +309,51 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
           contextchars=strtol(head,NULL,0);
           token=gettok();
           continue;
+        case TK_AUTOINDENT:             // Set autoindent mode (0,1)
+          token=gettok();
+          if(token!=TK_YES && token!=TK_NO){
+            fxwarning("%s:%d: error: expected 'autoindent' to be followed by 'yes' or 'no'.\n",from,line);
+            return false;
+            }
+          autoindent=(token==TK_YES);
+          token=gettok();
+          continue;
+        case TK_WRAPWIDTH:              // Set wrap width
+          token=gettok();
+          if(token!=TK_INTEGER){
+            fxwarning("%s:%d: error: expected 'wrapwidth' <number>.\n",from,line);
+            return false;
+            }
+          wrapwidth=strtol(head,NULL,0);
+          token=gettok();
+          continue;
+        case TK_TABWIDTH:               // Set tab width for language
+          token=gettok();
+          if(token!=TK_INTEGER){
+            fxwarning("%s:%d: error: expected 'tabwidth' <number>.\n",from,line);
+            return false;
+            }
+          tabwidth=strtol(head,NULL,0);
+          token=gettok();
+          continue;
+        case TK_WORDWRAP:               // Word wrap mode
+          token=gettok();
+          if(token!=TK_YES && token!=TK_NO){
+            fxwarning("%s:%d: error: expected 'wordwrap' to be followed by 'yes' or 'no'.\n",from,line);
+            return false;
+            }
+          wrapmode=(token==TK_YES);
+          token=gettok();
+          continue;
+        case TK_EXPANDTABS:             // Tab expands to characters
+          token=gettok();
+          if(token!=TK_YES && token!=TK_NO){
+            fxwarning("%s:%d: error: expected 'expandtabs' to be followed by 'yes' or 'no'.\n",from,line);
+            return false;
+            }
+          tabmode=(token==TK_YES);
+          token=gettok();
+          continue;
         case TK_GROUP:                  // Style group
           token=gettok();
           if(token!=TK_STRING){
@@ -323,6 +375,24 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
     syntax->setDelimiters(delimiters);
     syntax->setContextLines(contextlines);
     syntax->setContextChars(contextchars);
+    syntax->setAutoIndent(autoindent);
+    syntax->setWrapWidth(wrapwidth);
+    syntax->setTabWidth(tabwidth);
+    syntax->setWrapMode(wrapmode);
+    syntax->setTabMode(tabmode);
+
+    FXTRACE((10,"name=%s\n",name.text()));
+    FXTRACE((10,"group=%s\n",group.text()));
+    FXTRACE((10,"filesmatch=%s\n",filesmatch.text()));
+    FXTRACE((10,"contentsmatch=%s\n",contentsmatch.text()));
+    FXTRACE((10,"delimiters=%s\n",delimiters.text()));
+    FXTRACE((10,"contextlines=%d\n",contextlines));
+    FXTRACE((10,"contextchars=%d\n",contextchars));
+    FXTRACE((10,"autoindent=%d\n",autoindent));
+    FXTRACE((10,"wrapwidth=%d\n",wrapwidth));
+    FXTRACE((10,"tabwidth=%d\n",tabwidth));
+    FXTRACE((10,"wrapmode=%d\n",wrapmode));
+    FXTRACE((10,"tabmode=%d\n",tabmode));
 
     // Add new syntax to list
     syntaxes.append(syntax);

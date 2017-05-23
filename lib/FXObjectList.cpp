@@ -34,6 +34,8 @@
   - A list of pointers to objects.
   - The list may be serialized; this means contents of all objects referenced
     from the list may be saved or loaded through the serialization mechanism.
+  - Serialization is limited to 2^31 objects only, due to serialization format
+    using a 32-bit int for compatibility with 32 bit systems.
 */
 
 

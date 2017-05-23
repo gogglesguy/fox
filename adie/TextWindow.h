@@ -85,17 +85,25 @@ protected:
   FXint                replaceEnd;              // End of text to be replaced
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
+  FXbool               initialsize;             // New window is initialwidth x initialheight
   FXString             isearchString[20];       // Incremental search strings
   FXuint               isearchOption[20];       // Incremental search options
   FXbool               isearchReplace;          // Replace new entry
   FXint                isearchIndex;            // Incremental search index
   FXint                isearchpos;              // Incremental search position
-  FXbool               searching;               // Incremental search in effect
   FXString             searchstring;            // String of last search
   FXuint               searchflags;             // Incremental search flags
+  FXbool               searching;               // Incremental search in effect
   FXbool               showsearchbar;           // Showing incremental search bar
+  FXbool               modeline;                // Set modes from modeline
+  FXbool               autoindent;              // Autoindent mode
+  FXint                wrapcols;                // Wrap lines at this column if fixed wrap
+  FXbool               wrapping;                // Wrapping lines
+  FXbool               fixedwrap;               // Wrap lines at fixed column
+  FXint                tabcols;                 // Tab indents this many columns
+  FXbool               hardtabs;                // Insert hard tabs
+  FXint                barcols;                 // Number of columns for line numbers
   FXbool               showlogger;              // Showing error logger
-  FXbool               initialsize;             // New window is initialwidth x initialheight
   FXbool               colorize;                // Syntax coloring on if possible
   FXbool               stripcr;                 // Strip carriage returns
   FXbool               stripsp;                 // Strip trailing spaces
@@ -104,8 +112,6 @@ protected:
   FXbool               saveviews;               // Save views of files
   FXbool               savemarks;               // Save bookmarks of files
   FXbool               warnchanged;             // Warn if changed by other program
-  FXbool               lastfilesize;            // Keep window size for each file
-  FXbool               lastfileposition;        // Keep window position for each file
 protected:
   void createMenubar();
   void createToolbar();
@@ -122,13 +128,15 @@ protected:
   FXHiliteStyle readStyleForRule(const FXString& group,const FXString& name,const FXString& style);
   void writeStyleForRule(const FXString& group,const FXString& name,const FXHiliteStyle& style);
   FXbool matchesSelection(const FXString& string,FXint* beg,FXint* end,FXuint flgs,FXint npar) const;
+  void updateBookmarks(FXint pos,FXint nd,FXint ni);
   void addSearchHistory(const FXString& pat,FXuint opt,FXbool rep);
   void loadSearchHistory();
   void saveSearchHistory();
+  FXbool saveChanges();
 protected:
   enum{
-    MAXUNDOSIZE    = 1000000,               // Don't let the undo buffer get out of hand
-    KEEPUNDOSIZE   = 500000                 // When MAXUNDOSIZE was exceeded, trim down to this size
+    MAXUNDOSIZE  = 1000000,     // Don't let the undo buffer get out of hand
+    KEEPUNDOSIZE = 500000       // When MAXUNDOSIZE was exceeded, trim down to this size
     };
 private:
   TextWindow(){}
@@ -199,6 +207,12 @@ public:
   long onUpdTabSelect(FXObject*,FXSelector,void*);
   long onCmdBraceMatch(FXObject*,FXSelector,void*);
   long onUpdBraceMatch(FXObject*,FXSelector,void*);
+  long onCmdBraceMatchTime(FXObject*,FXSelector,void*);
+  long onUpdBraceMatchTime(FXObject*,FXSelector,void*);
+  long onCmdBraceMatchStay(FXObject*,FXSelector,void*);
+  long onUpdBraceMatchStay(FXObject*,FXSelector,void*);
+  long onCmdModeline(FXObject*,FXSelector,void*);
+  long onUpdModeline(FXObject*,FXSelector,void*);
   long onCmdAutoIndent(FXObject*,FXSelector,void*);
   long onUpdAutoIndent(FXObject*,FXSelector,void*);
   long onCmdInsertTabs(FXObject*,FXSelector,void*);
@@ -264,8 +278,6 @@ public:
   long onUpdSyntax(FXObject*,FXSelector,void*);
   long onCmdRestyle(FXObject*,FXSelector,void*);
   long onUpdRestyle(FXObject*,FXSelector,void*);
-  long onCmdJumpScroll(FXObject*,FXSelector,void*);
-  long onUpdJumpScroll(FXObject*,FXSelector,void*);
   long onCmdWindow(FXObject*,FXSelector,void*);
   long onUpdWindow(FXObject*,FXSelector,void*);
   long onCmdSyntaxSwitch(FXObject*,FXSelector,void*);
@@ -400,7 +412,10 @@ public:
     ID_DELIMITERS,
     ID_INSERTTABS,
     ID_AUTOINDENT,
+    ID_MODELINE,
     ID_BRACEMATCH,
+    ID_BRACEMATCHTIME,
+    ID_BRACEMATCHSTAY,
     ID_NUM_ROWS,
     ID_INSERT_FILE,
     ID_EXTRACT_FILE,
@@ -426,7 +441,6 @@ public:
     ID_WARNCHANGED,
     ID_SYNTAX,
     ID_RESTYLE,
-    ID_JUMPSCROLL,
     ID_WINDOW_1,
     ID_WINDOW_2,
     ID_WINDOW_3,
@@ -483,6 +497,7 @@ public:
     ID_ISEARCH_FINISH,
     ID_ISEARCH_HIST_UP,
     ID_ISEARCH_HIST_DN,
+    ID_TABSELECT_0,
     ID_TABSELECT_1,
     ID_TABSELECT_2,
     ID_TABSELECT_3,
@@ -566,9 +581,6 @@ public:
   // Extract selection to file
   FXbool extractFile(const FXString& file);
 
-  // Return true if changes have been saved
-  FXbool saveChanges();
-
   // Change pattern list
   void setPatternList(const FXString& patterns);
 
@@ -593,18 +605,15 @@ public:
   // Add bookmark at given position pos
   void setBookmark(FXint pos);
 
-  // Remove bookmark at given position pos
-  void clearBookmark(FXint pos);
-
-  // Update bookmarks upon a text mutation
-  void updateBookmarks(FXint pos,FXint nd,FXint ni);
-
   // Clear bookmarks
   void clearBookmarks();
 
   // Read/write bookmarks
   void readBookmarks(const FXString& file);
   void writeBookmarks(const FXString& file);
+
+  // Remove bookmark at given position pos
+  void clearBookmark(FXint pos);
 
   // Visit given line, and column
   void visitLine(FXint line,FXint column=0);
@@ -639,6 +648,9 @@ public:
 
   // Determine syntax
   void determineSyntax();
+
+  // Parse modeline
+  void parseModeline();
 
   // Set status message
   void setStatusMessage(const FXString& msg);

@@ -116,7 +116,7 @@ void FXAccelTable::resize(FXuint m){
 // Add (or replace) accelerator
 void FXAccelTable::addAccel(FXHotKey hotkey,FXObject* target,FXSelector seldn,FXSelector selup){
   if(hotkey){
-    FXTRACE((150,"%p->FXAccelTable::addAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
+    FXTRACE((160,"%p->FXAccelTable::addAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
     register FXuint p=(hotkey*13)&max;
     register FXuint c;
     FXASSERT(hotkey!=UNUSEDSLOT);
@@ -145,7 +145,7 @@ x:  key[p].code=hotkey;                 // Add or replace accelerator info
 // positions, unless it is demonstrably the last item in a chain.
 void FXAccelTable::removeAccel(FXHotKey hotkey){
   if(hotkey){
-    FXTRACE((150,"%p->FXAccelTable::removeAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
+    FXTRACE((160,"%p->FXAccelTable::removeAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
     register FXuint p=(hotkey*13)&max;
     register FXuint c;
     FXASSERT(hotkey!=UNUSEDSLOT);
@@ -458,7 +458,7 @@ FXHotKey parseAccel(const FXString& string){
       code=Ascii::toLower(string[pos])+KEY_space-' ';
     }
 
-  FXTRACE((110,"parseAccel(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
+  FXTRACE((160,"parseAccel(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
   return MKUINT(code,mods);
   }
 
@@ -482,7 +482,7 @@ FXHotKey parseHotKey(const FXString& string){
       }
     pos++;
     }
-  FXTRACE((110,"parseHotKey(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
+  FXTRACE((160,"parseHotKey(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
   return MKUINT(code,mods);
   }
 

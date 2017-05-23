@@ -51,6 +51,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@COND_OSWINDOWS_TRUE@am__append_1 = -DFOXDLL -DFOXDLL_EXPORTS -DWIN32 -DNDEBUG -D_WINDOWS -DUNICODE -D_USRDLL -D_CRT_SECURE_NO_WARNINGS
+@COND_OSWINDOWS_TRUE@am__append_2 = -lcomctl32 -lwsock32 -limm32 -lmsimg32
 subdir = lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/version.rc.in
@@ -226,6 +228,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
+AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -357,13 +360,15 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = @X_CFLAGS@
+AM_CXXFLAGS = @X_CFLAGS@ $(am__append_1)
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 RESWRAP = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 lib_LTLIBRARIES = libFOX-1.7.la
 libFOX_1_7_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) $(X_BASE_LIBS) $(X_EXTRA_LIBS) $(GL_LIBS)
-libFOX_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
+libFOX_1_7_la_LDFLAGS = -version-info \
+	$(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic \
+	-no-undefined $(am__append_2)
 CURSORS = \
 $(top_srcdir)/lib/blank.xbm \
 $(top_srcdir)/lib/blank_mask.xbm \

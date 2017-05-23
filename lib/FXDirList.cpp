@@ -758,7 +758,6 @@ void FXDirList::scan(FXbool force){
   // Do root first time
   if(!firstitem || force){
     listRootItems();
-    sortRootItems();
     }
 
   // Check all items
@@ -782,7 +781,6 @@ void FXDirList::scan(FXbool force){
 
         // And do the refresh
         listChildItems(item,force,true);
-        sortChildItems(item);
 
         // Remember when we did this
         item->date=newdate;
@@ -901,6 +899,9 @@ fnd:*pn=item; pn=&item->link;
 
   // Remember new list
   list=newlist;
+
+  // Update sort order
+  sortRootItems();
   }
 
 #else                   // UNIX flavor
@@ -956,7 +957,7 @@ void FXDirList::listChildItems(FXDirItem *par,FXbool force,FXbool notify){
   FXDir       dir;
   FXuint      mode;
 
-  FXTRACE((1,"FXDirList::listChildItems(%p = \"%s\",%s)\n",par,par->getText().text(),force?"true":"false"));
+//FXTRACE((1,"FXDirList::listChildItems(%p = \"%s\",%s)\n",par,par->getText().text(),force?"true":"false"));
 
   // Path to parent node
   directory=getItemPathname(par);
@@ -1085,6 +1086,9 @@ void FXDirList::listChildItems(FXDirItem *par,FXbool force,FXbool notify){
 
   // Remember new list
   par->list=newlist;
+
+  // Update sort order
+  sortChildItems(par);
 
   // Need to layout
   recalc();
@@ -1218,7 +1222,6 @@ FXTreeItem* FXDirList::getPathnameItem(const FXString& path){
       FXTreeItem *it;
       if((item=findItemChild(firstitem,name))==NULL){
         listRootItems();
-        sortRootItems();
         if((item=findItemChild(firstitem,name))==NULL){
           return NULL;
           }
@@ -1231,7 +1234,6 @@ FXTreeItem* FXDirList::getPathnameItem(const FXString& path){
         FXASSERT(item);
         if((it=findItemChild(item->first,name))==NULL){
           listChildItems((FXDirItem*)item,false,true);
-          sortChildItems(item);
           if((it=findItemChild(item->first,name))==NULL){
             return item;
             }
@@ -1268,7 +1270,7 @@ FXTreeItem* FXDirList::getPathnameItem__(const FXString& path){
 
       // Search for root part of path
       if((item=findItemChild(firstitem,path.mid(beg,end-beg)))!=NULL){
-       FXTreeItem* it;
+        FXTreeItem* it;
 
         // Skip over path separators
         while(ISPATHSEP(path[end])) end++;
@@ -1295,79 +1297,6 @@ FXTreeItem* FXDirList::getPathnameItem__(const FXString& path){
   return item;
   }
 
-
-#if 0
-// Return the item from the absolute pathname
-FXTreeItem* FXDirList::getPathnameItem(const FXString& path){
-  register FXTreeItem *item,*it;
-  register FXint beg=0,end=0;
-  FXString name;
-  if(!path.empty()){
-#ifdef WIN32
-    if(ISPATHSEP(path[0])){
-      end++;
-      if(ISPATHSEP(path[1])) end++;
-      }
-    else if(Ascii::isLetter((FXuchar)path[0]) && path[1]==':'){
-      end+=2;
-      if(ISPATHSEP(path[2])) end++;
-      }
-#else
-    if(ISPATHSEP(path[0])) end++;
-#endif
-    if(beg<end){
-      name=path.mid(beg,end-beg);
-      for(it=firstitem; it; it=it->next){
-#ifdef WIN32
-        if(comparecase(name,it->getText())==0) goto x;
-#else
-        if(compare(name,it->getText())==0) goto x;
-#endif
-        }
-      listRootItems();
-      sortRootItems();
-      for(it=firstitem; it; it=it->next){
-#ifdef WIN32
-        if(comparecase(name,it->getText())==0) goto x;
-#else
-        if(compare(name,it->getText())==0) goto x;
-#endif
-        }
-      return NULL;
-x:    item=it;
-      FXASSERT(item);
-      while(end<path.length()){
-        beg=end;
-        while(end<path.length() && !ISPATHSEP(path[end])) end++;
-        name=path.mid(beg,end-beg);
-        for(it=item->first; it; it=it->next){
-#ifdef WIN32
-          if(comparecase(name,it->getText())==0) goto y;
-#else
-          if(compare(name,it->getText())==0) goto y;
-#endif
-          }
-        listChildItems((FXDirItem*)item,false,true);
-        sortChildItems(item);
-        for(it=item->first; it; it=it->next){
-#ifdef WIN32
-          if(comparecase(name,it->getText())==0) goto y;
-#else
-          if(compare(name,it->getText())==0) goto y;
-#endif
-          }
-        return item;
-y:      item=it;
-        FXASSERT(item);
-        if(ISPATHSEP(path[end])) end++;
-        }
-      FXASSERT(item);
-      return item;
-      }
-    }
-  return NULL;
-  }
-#endif
 
 // Is file
 FXbool FXDirList::isItemFile(const FXTreeItem* item) const {
@@ -1425,7 +1354,6 @@ FXbool FXDirList::expandTree(FXTreeItem* tree,FXbool notify){
   if(FXTreeList::expandTree(item,notify)){
     if(item->isDirectory() && !item->getFirst()){
       listChildItems(item,true,notify);
-      sortChildItems(item);
       }
     return true;
     }

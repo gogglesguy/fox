@@ -94,7 +94,7 @@ namespace FX {
 struct FXDispatcher::FXHandles {
 #if defined(WIN32)
   FXInputHandle      handles[MAXIMUM_WAIT_OBJECTS];     // Handles
-  TUInt              modes[MAXIMUM_WAIT_OBJECTS];       // IO Modes each handle
+  FXuint             modes[MAXIMUM_WAIT_OBJECTS];       // IO Modes each handle
 #elif defined(HAVE_EPOLL_CREATE1)
   struct epoll_event events[128];                       // Events
   FXInputHandle      handle;                            // Poll handle
@@ -362,7 +362,7 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd){
 
 // Dispatch driver
 FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
-  TLTRACE((10,"FXDispatcher::dispatch(%lld,%x)\n",blocking,flags));
+  FXTRACE((10,"FXDispatcher::dispatch(%lld,%x)\n",blocking,flags));
   if(initialized){
     FXInputHandle hnd;
     FXTime now,due,delay,interval;
@@ -375,7 +375,7 @@ FXbool FXDispatcher::dispatch(FXTime blocking,FXuint flags){
       delay=forever;
       due=getTimeout();
       if(due<forever){
-        now=Thread::time();
+        now=FXThread::time();
         delay=due-now;
         if(delay<FXLONG(1000)){
           if(dispatchTimeout(due)) return true;

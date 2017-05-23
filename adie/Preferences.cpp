@@ -23,6 +23,7 @@
 #include "help.h"
 #include "Preferences.h"
 #include "Syntax.h"
+#include "Modeline.h"
 #include "TextWindow.h"
 #include "Adie.h"
 #include "icons.h"
@@ -59,7 +60,7 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   FXVerticalFrame* editorpane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   new FXLabel(editorpane,tr("Editor settings"),NULL,LAYOUT_LEFT);
   new FXHorizontalSeparator(editorpane,SEPARATOR_LINE|LAYOUT_FILL_X);
-  FXMatrix *matrix2=new FXMatrix(editorpane,8,MATRIX_BY_ROWS|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 2);
+  FXMatrix *matrix2=new FXMatrix(editorpane,10,MATRIX_BY_ROWS|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 2);
 
   new FXLabel(matrix2,tr("Word wrapping:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Auto indent:\tAutomatically indent new line same as previous line\tAutomatically indent new line same as previous line."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
@@ -69,6 +70,8 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXLabel(matrix2,tr("Strip trailing spaces:\tStrip useless spaces from ends of lines when saving files\tStrip useless spaces from ends of lines when saving files."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Append newline at end of file:\tAppend a newline at the end of the file if needed\tEnsure file ends with a newline when saved."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Insert tab characters:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
+  new FXLabel(matrix2,tr("Brace matching:\tHighlight matching braces, parentheses, or brackets\tHighlight matching braces, parentheses, or brackets."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
+  new FXLabel(matrix2,tr("Modeline parsing support:\tParse adie, emacs, or vim modelines\tParse adie, emacs, or vim modelines to set language and other attributes."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
 
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_TOGGLE_WRAP,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_AUTOINDENT,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
@@ -78,7 +81,11 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_STRIP_SP,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_APPEND_NL,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_INSERTTABS,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
+  new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_BRACEMATCH,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
+  new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_MODELINE,LAYOUT_LEFT|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
 
+  new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
+  new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
   new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
   new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
   new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
@@ -96,10 +103,12 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXLabel(matrix2,tr("Save view of file:\tSave and restore file view\tPermanently remember view for each file."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Save bookmarks:\tSave and restore bookmarks\tPermanently remember bookmark positions for each file."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Warn if changed externally:\tWarn if another program changed the file\tWarn if another program changed the file being edited."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
+  new FXLabel(matrix2,tr("Brace match stays:\tMatching brace stays highlighted\tMatching brace stays highlighted until cursor moves."),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
+  new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
 
   new FXTextField(matrix2,6,own,TextWindow::ID_WRAPCOLUMNS,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW,0,0,0,0, 2,2,1,1);
   new FXTextField(matrix2,6,own,TextWindow::ID_TABCOLUMNS,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW,0,0,0,0, 2,2,1,1);
-  new FXTextField(matrix2,6,own,TextWindow::ID_BRACEMATCH,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW,0,0,0,0, 2,2,1,1);
+  new FXTextField(matrix2,6,own,TextWindow::ID_BRACEMATCHTIME,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW,0,0,0,0, 2,2,1,1);
   FXSpinner* spinner=new FXSpinner(matrix2,3,own,TextWindow::ID_WHEELADJUST,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW,0,0,0,0, 2,2,1,1);
   spinner->setRange(1,100);
   FXSpinner* spinner1=new FXSpinner(matrix2,3,own,TextWindow::ID_TEXT_LINENUMS,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW,0,0,0,0, 2,2,1,1);
@@ -107,9 +116,8 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_SAVEVIEWS,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_SAVEMARKS,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_WARNCHANGED,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
-  FXHorizontalFrame *worddelims=new FXHorizontalFrame(editorpane,LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0, 4,4,4,4, 4, 4);
-  new FXLabel(worddelims,tr("Word delimiters:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
-  new FXTextField(worddelims,10,own,TextWindow::ID_DELIMITERS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X,0,0,0,0, 2,2,1,1);
+  new FXCheckButton(matrix2,FXString::null,own,TextWindow::ID_BRACEMATCHSTAY,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
+  new FXFrame(matrix2,LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
 
   //// Editor settings button
   new FXButton(buttons,tr("Editor\tEditor settings\tChange editor settings and other things."),ind,switcher,FXSwitcher::ID_OPEN_FIRST,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
@@ -205,7 +213,8 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   FXVerticalFrame* miscellaneouspane=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
   new FXLabel(miscellaneouspane,tr("Miscellaneous settings"),NULL,LAYOUT_LEFT);
   new FXHorizontalSeparator(miscellaneouspane,SEPARATOR_LINE|LAYOUT_FILL_X);
-  FXMatrix *matrix3=new FXMatrix(miscellaneouspane,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 4);
+  FXMatrix *matrix3=new FXMatrix(miscellaneouspane,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X,0,0,0,0, 4,4,4,4, 4, 4);
+//  FXMatrix *matrix4=new FXMatrix(miscellaneouspane,5,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 4);
 
   new FXLabel(matrix3,tr("Search paths:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
   searchtext=new FXTextField(matrix3,10,own,TextWindow::ID_SEARCHPATHS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
@@ -216,6 +225,10 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   syntaxtext=new FXTextField(matrix3,10,getApp(),Adie::ID_SYNTAXPATHS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
   syntaxtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where syntax file is to be found."));
   syntaxtext->setHelpText(tr("Change syntax file search path."));
+
+  new FXLabel(matrix3,tr("Word delimiters:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  new FXTextField(matrix3,10,own,TextWindow::ID_DELIMITERS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
+
 
   //// File pattern settings button
   new FXButton(buttons,tr("Misc\tMiscellaneous\tMiscellaneous settings."),mis,switcher,FXSwitcher::ID_OPEN_FIFTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);

@@ -62,7 +62,7 @@ Editing Features.
 Syntax Coloring Features.
 
   - Syntax coloring is programmable, using PERL-like regular expressions.
-  - Syntax patterns are keyed to language or file extension.
+  - Syntax patterns are keyed to file extension, file contents, modelines, or explicitly set by user.
   - Text styles including foreground, background, selection colors, as well as underlining and strike-throughs.
   - Syntax expressions, text styles, and language modes can be set up from convenient dialogs.
   - Color fallback mechanism to minimize style setup hassles.
@@ -70,24 +70,23 @@ Syntax Coloring Features.
 
 Starting a New Document.
 
-To start a new document, invoke the New menu, or press on the New button on the toolbar.  If the current document has not yet been saved, you will be prompted to either save or abandon the current text.
+To start a new document, invoke the 'New' menu, or press on the New button on the toolbar. A new window, empty, window will be created with a pathname in the same directory as the current file (if any).  The initial name of the file will be 'untitled', 'untitled1', etc.  When trying to save the file, you will be prompted to supply a new filename.
 
 
 Opening and Saving Files the Old Fashioned Way.
 
-To open a file, you can invoke the Open menu, or press on the Open button on the toolbar.  This will bring up the standard File Dialog, which allows you to select a file.
-To save a file, you can either invoke the Save or the Save As menu option. The former saves the file back to the same filename, while the latter prompts for an alternative filename.
+To open a file, you can invoke the 'Open' menu, or press on the 'Open' button on the toolbar.  This will bring up the standard File Dialog, which allows you to select a file.
+To save a file, you can either invoke the 'Save', 'Save As', or 'Save To' menu option.  'Save' will save the text to the same filename as it was loaded from.  'Save As' will prompt you to enter a new filename, then save the file to the new name.  This will leave the document under the new name in the text buffer, and a subsequent 'Save' will save the document to the new filename.  When you invoke 'Save To', you will be prompted for a new filename, same as 'Save As', except that the document will not change to the new filename.  A subsequent 'Save' will still save the document to its prior name.
 
-You can quickly navigate to the desired file by typing the first few letters of the filename and then pressing Enter (Return); use Backspace to move up one directory level.  Control-H moves to your home directory, Control-W moves back to the current working directory.
+When working with the File Dialog, you can quickly navigate to the desired file by typing the first few letters of the filename and then pressing Enter (Return).  You can use Backspace to move up one directory level.  Control-H moves to your home directory, Control-W moves back to the current working directory. Thus, power-users can open and select a new file with no mouse interactions.
 
-A nice convenience of the File Dialog is the ability to set bookmarks, so once bookmarked, you can quickly move back to a previously visited directory.
+A nice convenience of the File Dialog is the ability to set bookmarks to commonly referenced directories.  Once bookmarked, you can quickly move back and forth between several directories.
 
 
-Opening Files Using the File/Directory Browser.
+Opening Files Using the File and Directory Browser.
 
-An alternative method to open files is the File/Directory Browser. You can display the File/Directory Browser by invoking the File Browser option under the View menu.  To open a file using the File/Directory Browser, simply click on the file. If there are many files, you may want to limit the number of files displayed by specifying a file pattern in the Filter typein field.
-The pattern is can be any regular file wildcard expression such as "*.cpp".  By default, the File/Directory Browser shows all files, i.e. the pattern is "*".
-You can switch patterns by means of the combo box under file File Browser; additional patterns for the combo box (and File Dialog) can be specified in the Preferences Dialog.
+An alternative method to open files is the File and Directory Browser. You can display the File and Directory Browser by invoking the 'File Browser' option under the 'View' menu.  To open a file using the File and Directory Browser, simply click on the file. If there are many files, you may want to limit the number of files displayed by specifying a file pattern in the 'Filter' combo box.
+The patterns can be any file wildcard expression such as '*.cpp'.  By default, the File and Directory Browser shows all files, i.e. the pattern is '*'. Additional patterns can be added to the list using the 'Preferences' Dialog.
 
 
 Opening Recently Visited Files.
@@ -98,12 +97,11 @@ The recent file menu shows files which have been recently visited.  You can quic
 Opening Files by Drag and Drop.
 
 Using a file browser such as PathFinder or other Konqueror or other XDND compatible file browsers, you can simply drop a file into the text pane and have Adie read this file.
-Of course, the File/Directory browser supports drag and drop also, so you can also drag a file from the File/Directory browser into the Text Window.
 
 
 Opening a Selected Filename
 
-Selecting any filename, possibly in another application, and invoking the "Open Selected" option causes Adie to open the selected file. When the selected filename is of the form:
+Selecting any filename, possibly in another application, and invoking the 'Open Selected' option causes Adie to open the selected file. When the selected filename is of the form:
 
    #include "filname.h"
 
@@ -111,17 +109,17 @@ or:
 
    #include <filename.h>
 
-then Adie will search for this file in a sequence of include search paths, otherwise it will search in the same directory as the currently loaded file.  You can specify the list of search paths to search by entering a list of absolute or relative pathnames into the Preferences dialog (Search Paths) text field.
+Adie will search for this file in the same directory as the currently loaded file, and if not found there, look into a sequence of (possibly relative) search paths.  You can specify the list of search paths to search by entering a list of absolute or relative pathnames into the 'Preferences' dialog, under the 'Miscellaneous' sub panel.
 When the selected filename is of the form:
 
    filename.cpp:177
 
 or:
 
-   filename.cpp:177:9   
+   filename.cpp:177:9
 
-then Adie will not only load the filename, but also jump to the given line number.  In case of the second form, it will also place the cursor on the 9-column.  If this file has already been loaded, Adie will simply jump to the given line (and column-) number in the open file.  This option is very useful when fixing compiler errors.
-Note, various popular compiler output formats are supported to obtain the necessary information.
+Adie will not only load the filename, but also jump to the given line number, and, in the second case, column number.  In the case above, it will also place the cursor on the 9-column of line 177.  If this file has already been loaded, Adie will simply jump to the given line (and column-) number in the already open file, and bring the file to the front.
+This option is very useful when fixing compiler errors.  Various other popular compiler error or warning formats are supported besides GCC.
 
 
 Mouse Selection.
@@ -405,6 +403,156 @@ Changing Delimiters.
 Different programming language have different notions about identifiers.  Adie accomodates for this by allowing you to specify which characters (besides white space, of course) are used to delimit identifiers or tokens in the programming language. The default set of delimiters is "!"#$%&'()*+,-./:;<=>?@[\]^`{|}~".
 
 
+Syntax Coloring Text.
+
+Syntax highlighting colorizes source code based on recognizing certain patterns in the source files being edited.  For example, in C++ the keywords 'class' and 'while' may be given a different color from normal text. When syntax highlighting is enabled, the Adie editor will evaluate the color of each piece of text as you type it.  Thus, you'll have immediate feedback as misspellings of keywords will be instantly obvious.
+Coloring the syntactical elements is only performed if syntax coloring is turned on, and a particular language syntax has been selected for the file.
+Colors may be assigned by the user using the 'Preferences' dialog, using the 'Styles' subpanel.  Each particular syntactical element may be given a different foreground color and background color.  Separate colors are available for when a syntactial element is highlighted, selected, or is the currently active cursor line.
+Apart from coloring, it is also possible to emphasize a syntactical element with underlines, strikeouts, or bold-face.  These effects may be selected by checking the underline, strikeout, or bold-face checkbuttons in the 'Styles' subpanel next to the style element.
+Colors that are set to fully transparent (alpha = 0), will revert to the default text foreground and background colors.  Most users will probably prefer not to set the background colors but only foreground colors, making it easier to keep background colors consistent among the different syntactical elements.
+
+Language Matching.
+
+The set of patterns to be recognized in a piece of text are determined by the programming language syntax currently in effect for the text window.  The editor has several ways to determine which language is to be used for colorizing the text:
+
+The first method is to look at the file's file-extension.  For example, a file extension '.py' will select the Python programming language. Each language syntax definition has a wildcard pattern which is matched against incoming filename, to determine if that langauge should be used for colorizing the file.
+
+The second method is to look at a file's contents.  For example, when the string '#!/bin/bash' is spotted at the top of a file, the 'Shell' language is automatically selected.  This is a very useful method since shell scripts very often don't have a particular file extension.
+
+The third method is to scan the top or bottom of the file for a so-called 'modeline'.  Adie currently supports vi, emacs, and its own modeline syntax.  The modeline is typically embedded in a comment-section of the source text, and may contain other specifications like tab settings and other hints for editing.
+
+The final method is for the user to simply enforce the programming language syntax, by selecting the proper language syntax from the menu. Adie will write this association to the registry, so when the same file will get loaded in the future, the same language will be automatically selected. If this method is used, file extensions, contents, or embedded modelines will not be used to determine the language syntax.
+
+
+Writing Custom Syntax Files.
+
+The syntax highlighting patterns in Adie are fully extensible, simply by writing you own language specification, or modifying one of the existing language specifications in the 'Adie.stx' file delivered with the software.
+In order to get started on writing custom syntax patterns, it will be necessary to develop a basic understanding of how the syntax highlighting in Adie actually works.
+Consider the following simple language definition (this is actually the language definition of the language specification file itself!):
+
+  # Adie editor syntax-file syntax coloring
+  language "Adie Syntax"
+    filesmatch "*.stx"
+    contextlines 1
+    rule "Comment"
+      openpattern     "#"
+      closepattern    "$"
+      style           "darkgreen"
+    end
+    rule "Keyword"
+      pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|end|pattern|openpattern|closepattern|stoppattern|style|autoindent|wrapwidth|tabwidth|wordwrap|expandtabs)\>"
+      style           "red"
+    end
+    rule "String"
+      openpattern     "\""
+      closepattern    "\""
+      stoppattern     "$"
+      style           "blue"
+      rule "Escape"
+        pattern       "\\\""
+        style         "red"
+      end
+    end
+  end
+
+The first line of this language specification is a comment line.  Comment lines start with '#' and extend to the end of the line.  You can place comments anywhere on a line, but all text after the '#' becomes part of the comment up to the end of the line. The section between 'language' and 'end' is the actual language specification.  Each language specification must have a unique name, to distinguish it from other language specifications.  A language specification contains a number of language-specific parameters, followed by a number of syntax rules.
+
+The first 'filesmatch' statement specifies the wildcard expressions that the filename should be matched against to identify this language as the one to be used for the filename.  In this case, any file ending in '.stx' will use this language syntax.
+
+The statement 'contextlines' specifies how many lines to go backward and forward relative to a change in the text, in order to pick up an incremental recoloring of the text after a modification.  The larger this number is, the more time it takes to recolor. If developing a completely new language specification, its suggested to leave this set as 1 and increase it until there are no more errors recolorizing large documents.
+
+The syntax rules specify what patterns are matched and how to highlight/color them. As can be seen from the language specification above, syntax rules may contain other subrules.  This works as you expect: the nested rules colorize fragments of text found within the outer rules.
+Each rule must have a name.  Rule names are used to assign colors, and so its OK to have different rules be given the same name, if they're to have the same color.
+
+There are four types of rules:
+
+ 1. Simple rule. Simple rules match only a single regular expression 'pattern'.
+ 2. Bracket rule. Bracket rules match an 'openpattern' and 'closepattern'.
+ 3. Safe bracket rule. A bracket rule with an additional 'stoppattern'.
+ 4. Default rule. A rule that matches all text and has no patterns.
+
+Except for the simple rule, the other rules may have subrules to colorize specific areas within the scope of that rule.  For example, inside the rule "String" above, which colors text blue, rule "Escape" matches escape sequences and colors them red. [An important detail is that the subrule patterns are matched before the closing rule of the outer rule, thus an escape like '\"' will prevent the outer rule from seeing the '"' as the end of the string.
+
+Within each rule, the optional 'style' keyword can be used to specify an initial color to be used for the text highlighted by that rule.
+
+The full list of keywords in the language specification is below:
+
+language "name" ... end
+
+The block between 'language' and 'end' describes one particular progamming language syntax.  Names must be unique.
+
+filesmatch "wildcard"
+
+This describes the wildcard pattern (see file patterns) used to matched against filenames or file extensions.  If there's a match, the language syntax will be used to higlight the file.
+
+contentsmatch "regular-expression"
+
+This sets the regular expression (see regular expressions) used to search the contents of the a small fragment of the file.  If the pattern is found, the language syntax fill be used to highlight the file.
+
+delimiters "string"
+
+Sets the delimiters and punctuation characters considered to be not part of a word in the language.  This affects next word, previous word cursor navigation commands.
+
+contextlines <number>
+
+Sets the number of lines to search around after a change in text to pick up incremental highlighting.  Set to 1 for many programming language but could be set based on largest syntactical element likely to be encountered.
+
+contextchars <number>
+
+Set the number of characters to search around after a change in text. Similar to 'contextlines' above.
+
+autoindent yes | no
+
+Set the auto indent feature for the language.  If set, the next new line after the current line will be indented at the same level as the current line by inserting spaces or tabs.  If no autoindent value is specified in the syntax description, the default value will be in effect.
+
+wrapwidth <number>
+
+Set the number of columns to wrap text at, if text is to be wrapped.  The special value 0 wraps the text at the window-edge.  If no value is specified, the default value will be in effect for this language.
+
+tabwidth <number>
+
+Set the number of columns a tab character indents with.  Typical value is 8.  If no value is specified, the default value will be in effect for this language.
+
+wordwrap yes | no
+
+Enables wrapping of long lines.  Lines will be broken at whitespace, if possible, to keep within the number of columns specified by 'wrapwidth' parameter, or the window edge if 'wrapwidth' was set to 0.  If no value is specified, the default value will be in effect for this language.
+
+expandtabs yes | no
+
+Enables tab expansion into spaces.  The number of spaces tabs expand into is set with 'tabwidth' parameter.  If no value is specified, the default value will be in effect for this language.
+
+group "groupname"
+
+Specifies this language is part of language group "groupname".  If specified, the language color scheme is consolidated on a per-group, rather than a per-language basis.  For example, group "C-Like" comprises various programming languages with similar syntactical elements.  Settings of a color scheme for one language will then be applied to all languages in the group.  For this to work, rule names must match; rule "Comment" in the Java language specification will have the same coloring as rule "Comment" in C or C++ language specification.  This can be a real time-saver as it allows you to set colors for many languages
+in a consistent and succinct manner.
+
+rule "name" ... end
+
+Specifies a new language rule.  Within a rule, the following keywords may be used.
+
+style "colorname"
+
+This will give text colored by the rule a color, unless specified from the registry.  It is chiefly to ensure some highlighting is performed prior to customizing the color scheme.
+Colors can be specified by name, for example "Aquamarine", or as a number hexadecimal digits, like #FF0000 (which yields a pure red).
+
+pattern "regular-expression"
+
+This sets the pattern this rule is to match against the text.  All text captured by the match will be colored by the colors associated with rule name. If quotes ('"') are to be matched, make sure to escape them as '\"'. Only quotes ('"') need to be escaped for the syntax parser itself.
+
+openpattern "regular-expression"
+closepattern "regular-expression"
+stoppattern "regular-expression"
+
+This sets regular expression patterns for bracket and safe-bracket rules. A bracket rule matches text against the regular expression specified by 'openpattern' and then colors all text subsequently until the place where the regular expression specified by 'closepattern' is found.  If 'stoppattern' is specified and encountered before the close pattern, the rule breaks out early.  This is handy for rules which may match huge quantities of text while the user hasn't finished typing, for example open-ended strings or multi-line comments.
+Note that subrules, if any, are matched first before attempting close pattern or stop pattern.
+
+
+Finding the Syntax File.
+
+When Adie starts up, it normally looks in the directories listed in the PATH environment variable.  There are installations where this is not convenient.  Therefore, it is possible to set the search directories using the special 'syntaxpaths' registry setting.
+For testing purposes, you can also pass the filename of the syntax file directly on the command line using '-S' or '--syntax' flag.
+
+
 Other Configuration Issues.
 
 Because Adie is an editor written to use the FOX Toolkit, there are various other items, common to all FOX Toolkit programs, which may be configured either by hand or using some other control panel.
@@ -412,16 +560,16 @@ A few items of particular interest are list below:
 
   [SETTINGS]
   typingspeed=800
-  clickspeed=400
-  scrollspeed=80
-  scrolldelay=600
-  blinkspeed=500
-  animspeed=10
-  menupause=400
-  tippause=800
-  tiptime=3000
+  clickspeed=400000000
+  scrollspeed=80000000
+  scrolldelay=600000000
+  blinkspeed=500000000
+  animspeed=20000000
+  menupause=400000000
+  tippause=800000000
+  tiptime=2000000000
   dragdelta=6
-  wheellines=1
+  wheellines=10
   bordercolor=black
   basecolor=AntiqueWhite3
   hilitecolor=AntiqueWhite
@@ -439,13 +587,13 @@ These settings can be either placed in $HOME/.foxrc (and thus affect all FOX pro
 File types may be bound to a command, mime-type, and icons using statements like the one below:
 
   [FILETYPES]
-  cpp = "/usr/local/bin/textedit %s &;C++ Source File;c_src.xpm;mini/c_src.xpm"
+  cpp = "/usr/local/bin/adie %s &;C++ Source File;c_src.xpm;mini/c_src.xpm"
   /home/jeroen = ";Home Directory;home.xpm;mini/home.xpm;application/x-folder"
-  defaultfilebinding = "/usr/local/bin/textedit %s &;Document;document.xpm;mini/document.xpm"
+  defaultfilebinding = "/usr/local/bin/adie %s &;Document;document.xpm;mini/document.xpm"
   defaultexecbinding = ";Application;exec.xpm;mini/exec.xpm;application/x-executable-file"
   defaultdirbinding = ";Folder;folder.xpm;mini/folder.xpm;application/x-folder"
 
-This example shows how the extension ".cpp" is bound to the program "textedit" and is associated with two icons, a big icon "c_src.xpm" and a small icon "mini/c_src.xpm", which are to be found in the directories determined by 'iconpath", in this case, "/usr/share/icons" or "/home/jeroen/icons".
+This example shows how the extension ".cpp" is bound to the program "adie" and is associated with two icons, a big icon "c_src.xpm" and a small icon "mini/c_src.xpm", which are to be found in the directories determined by 'iconpath", in this case, "/usr/share/icons" or "/home/jeroen/icons".
 
 It also binds two icons "home.xpm" and "mini/home.xpm" to the home directory "/home/jeroen".
 

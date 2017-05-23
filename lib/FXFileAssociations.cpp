@@ -318,13 +318,13 @@ void FXFileAssociations::clear(){
 
 // Save object to stream
 void FXFileAssociations::save(FXStream& store) const {
-//  store << settings;
+  cache.save(store);
   }
 
 
 // Load object from stream
 void FXFileAssociations::load(FXStream& store){
-//  store >> settings;
+  cache.load(store);
   }
 
 

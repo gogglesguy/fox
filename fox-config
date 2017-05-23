@@ -1,6 +1,6 @@
 #! /bin/sh
 
-version="1.7.58"
+version="1.7.60"
 prefix="/crypt/jeroen/FOX/DIR"
 exec_prefix="${prefix}"
 libdir="${exec_prefix}/lib"

@@ -74,7 +74,7 @@ language "Adie Syntax"
     style           "darkgreen"
   end
   rule "Keyword"
-    pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|end|pattern|openpattern|closepattern|stoppattern|style)\>"
+    pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|end|pattern|openpattern|closepattern|stoppattern|style|autoindent|wrapwidth|tabwidth|wordwrap|expandtabs)\>"
     style           "red"
   end
   rule "String"
@@ -312,7 +312,7 @@ language "C++"
   end
 
   rule "FOXType"
-    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXptr|FXColor|FXPixel|FXTime)\>"
+    pattern     "\<(FXuchar|FXschar|FXwchar|FXnchar|FXchar|FXbool|FXushort|FXshort|FXuint|FXint|FXhalf|FXfloat|FXdouble|FXulong|FXlong|FXival|FXuval|FXptr|FXColor|FXPixel|FXTime|FXString)\>"
   end
 
   rule "Keyword"
@@ -321,8 +321,6 @@ language "C++"
   end
 
   rule "Number"
-    #pattern     "\<((0[xX]\h+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(LL|L|ll|l|ULL|UL|ull|ul|u|U|F|f|Q|q)?\>"
-#    pattern     "\<((\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+[Ee][+-]?\d+)[LlFfQq]?|(0[xX][0-9a-fA-F]+|0[0-7]*|[1-9]\d*)[Uu]?[Ll]{0,2})\>"
     pattern     "\<((\.\d+([eE][+-]?\d+)?|\d+\.\d*([eE][+-]?\d+)?|\d+[Ee][+-]?\d+|0[Xx]\.\h+[Pp][+-]?\d+|0[Xx]\h+\.\h*[Pp][+-]?\d+|0[Xx]\h+[Pp][+-]?\d+)[LlFfQq]?|(0[xX]\h+|0[0-7]*|[1-9]\d*)[Uu]?[Ll]{0,2})\>"
     style       "blue"
   end
@@ -1925,7 +1923,8 @@ end
 # Makefiles
 language "Make"
   filesmatch "Makefile*,makefile*"
-  contextlines 1
+  contextlines 10
+  expandtabs   no
   rule "Comment"
     openpattern  "#"
     closepattern "$"
@@ -1947,7 +1946,7 @@ language "Make"
     end
   end
   rule "DependencyLine"
-    openpattern "^( *| [ \t]*)(.DEFAULT|.DELETE_ON_ERROR|.EXPORT_ALL_VARIABLES.IGNORE|.INTERMEDIATE|.PHONY|.POSIX|.PRECIOUS|.SECONDARY|.SILENT|.SUFFIXES)*(([A-Za-z0-9./$(){} _@^<*?%+-]*(\\\n)){,8}[A-Za-z0-9./$(){} _@^<*?%+-]*)::?"
+    openpattern "^( *| [ \t]*)(.DEFAULT|.DELETE_ON_ERROR|.EXPORT_ALL_VARIABLES.IGNORE|.INTERMEDIATE|.PHONY|.POSIX|.PRECIOUS|.SECONDARY|.SILENT|.SUFFIXES)*(([A-Za-z0-9./$(){} _@^<*?%+-]+?(\\\n))*?[A-Za-z0-9./$(){} _@^<*?%+-]+)::?"
     closepattern "$|;"
     rule "DependencyContinuation"
       pattern "\\\n"

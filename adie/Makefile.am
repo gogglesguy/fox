@@ -83,6 +83,8 @@ HelpWindow.cpp \
 icons.h \
 icons.cpp \
 main.cpp \
+Modeline.h \
+Modeline.cpp \
 Preferences.h \
 Preferences.cpp \
 ShellCommand.h \

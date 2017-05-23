@@ -104,11 +104,17 @@ public:
   // Run the application
   FXint start(int argc,char** argv);
 
-  // Generate unique name from given path
-  FXString unique(const FXString& path) const;
+  // Set syntax paths
+  void setSyntaxPaths(const FXString& paths){ syntaxpaths=paths; }
+
+  // Get syntax paths
+  const FXString& getSyntaxPaths() const { return syntaxpaths; }
 
   // Find an as yet untitled, unedited window
   TextWindow* findUnused() const;
+
+  // Generate unique name from given path
+  FXString unique(const FXString& path) const;
 
   // Find window, if any, currently editing the given file
   TextWindow* findWindow(const FXString& file) const;
@@ -119,17 +125,14 @@ public:
   // Get syntax for language name
   Syntax* getSyntaxByName(const FXString& lang);
 
+  // Get syntax by consulting registry
+  Syntax* getSyntaxByRegistry(const FXString& file);
+
   // Get syntax by matching pattern
   Syntax* getSyntaxByPattern(const FXString& file);
 
   // Get syntax by contents
   Syntax* getSyntaxByContents(const FXString& contents);
-
-  // Set syntax paths
-  void setSyntaxPaths(const FXString& paths){ syntaxpaths=paths; }
-
-  // Get syntax paths
-  const FXString& getSyntaxPaths() const { return syntaxpaths; }
 
   // Delete application object
   virtual ~Adie();

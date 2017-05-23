@@ -1,6 +1,6 @@
 /********************************************************************************
 *                                                                               *
-*                    M u l t i - L i ne   T e x t   W i d g e t                 *
+*                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
 * Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
@@ -36,7 +36,8 @@ enum {
   TEXT_FIXEDWRAP     = 0x00800000,      /// Fixed wrap columns
   TEXT_NO_TABS       = 0x01000000,      /// Insert spaces for tabs
   TEXT_AUTOINDENT    = 0x02000000,      /// Autoindent
-  TEXT_SHOWACTIVE    = 0x04000000       /// Show active line
+  TEXT_SHOWACTIVE    = 0x04000000,      /// Show active line
+  TEXT_SHOWMATCH     = 0x08000000,      /// Show matching brace
   };
 
 
@@ -131,9 +132,11 @@ struct FXTextChange {
 * The flag TEXT_NO_TABS causes a TAB key to be replaced by the appropriate
 * number of spaces when entered interactively; however, the user can still
 * enter a TAB by entering Ctrl+TAB.
-* Finally, the TEXT_SHOWACTIVE mode will cause the line containing the current
+* The TEXT_SHOWACTIVE mode will cause the line containing the current
 * cursor location to be highlighted.  This makes it easier to find the insertion
 * point when scrolling back and forth a large document.
+* The flag TEXT_SHOWMATCH will briefly flash the matching brace, parenthesis, or
+* bracket when the cursor is positioned at brace, parenthesis, or bracket.
 */
 class FXAPI FXText : public FXScrollArea {
   FXDECLARE(FXText)
@@ -197,39 +200,39 @@ protected:
   FXbool          modified;             // User has modified text
 protected:
   FXText();
-  void calcVisRows(FXint s,FXint e);
-  void drawCursor(FXuint state);
-  virtual void paintCursor(FXDCWindow& dc) const;
-  virtual void eraseCursor(FXDCWindow& dc) const;
-  virtual void eraseCursorOverhang();
-  virtual FXuint styleOf(FXint beg,FXint end,FXint row,FXint col,FXint pos) const;
-  virtual void drawBufferText(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXint pos,FXint n,FXuint style) const;
-  virtual void fillBufferRect(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXuint style) const;
-  virtual void drawTextRow(FXDCWindow& dc,FXint row) const;
-  virtual void drawContents(FXDCWindow& dc) const;
-  virtual void drawNumbers(FXDCWindow& dc) const;
-  FXint posToLine(FXint pos,FXint ln) const;
-  void updateRange(FXint beg,FXint end) const;
   void movegap(FXint pos);
   void sizegap(FXint sz);
   void squeezegap();
   FXint charWidth(FXwchar ch,FXint indent) const;
-  FXint wrap(FXint start) const;
-  FXint measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const;
-  FXint lineWidth(FXint pos,FXint n) const;
-  FXint changeBeg(FXint pos) const;
-  FXint changeEnd(FXint pos) const;
+  FXint xoffset(FXint start,FXint pos) const;
   FXint indentFromPos(FXint start,FXint pos) const;
   FXint posFromIndent(FXint start,FXint indent) const;
-  void mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel);
-  virtual void replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style);
+  FXint wrap(FXint start) const;
+  FXint measureText(FXint start,FXint end,FXint& wmax,FXint& hmax) const;
+  void calcVisRows(FXint s,FXint e);
   void recompute();
   FXint matchForward(FXint pos,FXint end,FXwchar l,FXwchar r,FXint level) const;
   FXint matchBackward(FXint pos,FXint beg,FXwchar l,FXwchar r,FXint level) const;
   FXint findMatching(FXint pos,FXint beg,FXint end,FXwchar ch,FXint level) const;
   void flashMatching();
+  FXint posToLine(FXint pos,FXint ln) const;
   void moveContents(FXint x,FXint y);
+  FXint changeBeg(FXint pos) const;
+  FXint changeEnd(FXint pos) const;
+  void mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel);
   FXint overstruck(FXint start,FXint end,const FXchar *text,FXint n);
+  void drawCursor(FXuint state);
+  virtual void paintCursor(FXDCWindow& dc) const;
+  virtual void eraseCursor(FXDCWindow& dc) const;
+  virtual void eraseCursorOverhang();
+  virtual void drawBufferText(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXint pos,FXint n,FXuint style) const;
+  virtual void fillBufferRect(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h,FXuint style) const;
+  virtual FXuint styleOf(FXint beg,FXint end,FXint row,FXint col,FXint pos) const;
+  virtual void drawTextRow(FXDCWindow& dc,FXint row) const;
+  virtual void drawContents(FXDCWindow& dc) const;
+  virtual void drawNumbers(FXDCWindow& dc) const;
+  virtual void replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style);
+  void updateRange(FXint beg,FXint end) const;
   FXbool deletePendingSelection(FXbool notify);
 protected:
   enum {
@@ -794,11 +797,14 @@ public:
   */
   FXbool findText(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint start=0,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP|SEARCH_EXACT,FXint npar=1);
 
+  /// Return text position at given visible x,y coordinate
+  FXint getPosAt(FXint x,FXint y) const;
+
   /// Return text position containing x, y coordinate
   FXint getPosContaining(FXint x,FXint y) const;
 
-  /// Return text position at given visible x,y coordinate
-  FXint getPosAt(FXint x,FXint y) const;
+  /// Return row and column at given x,y coordinate
+  void getRowAndColumn(FXint x,FXint y,FXint& row,FXint& col) const;
 
   /// Return y coordinate of pos
   FXint getYOfPos(FXint pos) const;
@@ -806,10 +812,16 @@ public:
   /// Return x coordinate of pos
   FXint getXOfPos(FXint pos) const;
 
-  /// Count number of columns; start should be on a row start
+  /**
+  * Count number of columns taken up by some text.
+  * Start should be on a row start.
+  */
   FXint countCols(FXint start,FXint end) const;
 
-  /// Count number of rows; start should be on a row start
+  /**
+  * Count number of rows taken up by some text.
+  * Start should be on a row start.
+  */
   FXint countRows(FXint start,FXint end) const;
 
   /// Count number of newlines
@@ -993,7 +1005,11 @@ public:
 
   /**
   * Change brace and parenthesis match highlighting time, in nanoseconds.
-  * A match highlight time of 0 disables brace matching.
+  * If highlighting for a small interval, only flash if the matching brace
+  * is visible. If the highlighting interval is set to forever, highlighting
+  * stays on till cursor moves, and the brace is highlighted even if not
+  * (yet) visible.  Note that this may be expensive as a large part of the
+  * text buffer could be visited to find the matching brace.
   */
   void setHiliteMatchTime(FXTime t){ matchtime=t; }
 
@@ -1025,7 +1041,6 @@ public:
   /// Destructor
   virtual ~FXText();
   };
-
 
 }
 

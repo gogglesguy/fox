@@ -2865,7 +2865,8 @@ FXString operator+(FXchar c,const FXString& s){
 FXString& unixToDos(FXString& str){
   register FXint f=0,t=0;
   while(f<str.length() && str[f]){
-    if(str[f++]=='\n') t++; t++;
+    if(str[f++]=='\n') t++; 
+    t++;
     }
   str.length(t);
   while(0<f){
@@ -2894,7 +2895,7 @@ FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
     if(Ascii::isSpace(str.head())) return true;
     if(Ascii::isSpace(str.tail())) return true;
     for(FXint p=0; p<str.length(); p++){
-      if((c=str[p])<'\x20' || c=='\x7F' || c=='\\' || c==lquote || c==rquote || ('\x80'<=c && flag)) return true;
+      if((c=str[p])<0x20 || c==0x7F || c=='\\' || c==lquote || c==rquote || (0x80<=c && flag)) return true;
       }
     }
   return false;
@@ -2904,7 +2905,7 @@ FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
 // Escape special characters, and optionally enclose with left and right quotes; escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2
 FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
   register FXint p,q,w;
-  register FXuchar c;
+  register FXwchar c;
   FXString result;
   p=q=0;
   if(lquote) q++;                       // Opening quote

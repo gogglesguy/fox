@@ -27,6 +27,7 @@
 #include "HelpWindow.h"
 #include "Preferences.h"
 #include "Commands.h"
+#include "Modeline.h"
 #include "Syntax.h"
 #include "SyntaxParser.h"
 #include "TextWindow.h"
@@ -215,12 +216,12 @@ FXint Adie::start(int argc,char** argv){
 
   FXTRACE((10,"execpath=%s\n",execpath.text()));
 
-  // Get syntax path
+  // See if override paths are provided in the registry
   syntaxpaths=reg().readStringEntry("SETTINGS","syntaxpaths",execpath.text());
 
   FXTRACE((10,"syntaxpaths=%s\n",syntaxpaths.text()));
 
-  // Hunt for the syntax file
+  // Look for syntax file in the syntax paths
   syntaxfile=FXPath::search(syntaxpaths,"Adie.stx");
 
   FXTRACE((10,"syntaxfile=%s\n",syntaxfile.text()));
@@ -306,6 +307,7 @@ FXint Adie::start(int argc,char** argv){
       window->readView(file);
       window->setEditable(edit);
       window->determineSyntax();
+      window->parseModeline();
       if(line) window->visitLine(line,col);
       }
 
@@ -315,7 +317,6 @@ FXint Adie::start(int argc,char** argv){
       window->setFilenameSet(false);    // Prompt for name when saving
       window->determineSyntax();
       window->setBrowserCurrentFile(file);
-      window->determineSyntax();
       }
 
     // Override language mode?
@@ -403,10 +404,10 @@ TextWindow* Adie::openFileWindow(const FXString& file,FXint lineno,FXint column)
 
     // Load the file
     if(window->loadFile(file)){
-      window->clearBookmarks();
       window->readBookmarks(file);
       window->readView(file);
       window->determineSyntax();
+      window->parseModeline();
       }
     }
 
@@ -432,6 +433,17 @@ Syntax* Adie::getSyntaxByName(const FXString& lang){
         return syntaxes[syn];
         }
       }
+    }
+  return NULL;
+  }
+
+
+// Get syntax by consulting registry
+Syntax* Adie::getSyntaxByRegistry(const FXString& file){
+  FXTRACE((10,"Adie::getSyntaxByRegistry(%s)\n",file.text()));
+  if(!file.empty()){
+    FXString name=FXPath::name(file);
+    return getSyntaxByName(reg().readStringEntry("SYNTAX",name));
     }
   return NULL;
   }
@@ -465,6 +477,7 @@ Syntax* Adie::getSyntaxByContents(const FXString& contents){
     }
   return NULL;
   }
+
 
 /*******************************************************************************/
 
