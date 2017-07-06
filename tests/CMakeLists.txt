@@ -40,7 +40,7 @@ add_executable(gaugetest gaugetest.cpp)
 target_link_libraries(gaugetest FOX)
 
 add_executable(gltest gltest.cpp)
-target_link_libraries(gltest FOX)
+target_link_libraries(gltest FOX ${OPENGL_LIBRARIES})
 
 add_executable(groupbox groupbox.cpp)
 target_link_libraries(groupbox FOX)
