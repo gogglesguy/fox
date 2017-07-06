@@ -1,3 +1,5 @@
+find_package(OpenGL)
+
 set(SOURCES FXGLCone.cpp
 FXGLCone.h
 FXGLCube.cpp
@@ -18,5 +20,5 @@ glviewer.cpp
 )
 
 add_executable(glviewer ${SOURCES})
-target_link_libraries(glviewer FOX)
+target_link_libraries(glviewer FOX ${OPENGL_LIBRARIES})
 
