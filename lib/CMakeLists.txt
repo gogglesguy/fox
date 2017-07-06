@@ -1,3 +1,15 @@
+option(WITH_XIM "Compile with X Input Method Support" ON)
+
+
+
+
+
+
+
+
+
+
+
 set(SOURCES FX4Splitter.cpp
 FX7Segment.cpp
 FX885910Codec.cpp
@@ -136,14 +148,8 @@ FXGIFIcon.cpp
 FXGIFImage.cpp
 fxgifio.cpp
 FXGLCanvas.cpp
-FXGLCone.cpp
 FXGLContext.cpp
-FXGLCube.cpp
-FXGLCylinder.cpp
 FXGLObject.cpp
-FXGLShape.cpp
-FXGLSphere.cpp
-FXGLTriangleMesh.cpp
 FXGLViewer.cpp
 FXGLVisual.cpp
 FXGradientBar.cpp
@@ -366,6 +372,89 @@ fxxpmio.cpp
 icons.cpp)
 
 
+set(ICONS
+arrownext.gif
+arrowprev.gif
+bigapp.gif
+bigcdrom.gif
+bigcomputer.gif
+bigdesktop.gif
+bigdoc.gif
+bigfloppy.gif
+bigfloppy3.gif
+bigfloppy5.gif
+bigfolder.gif
+bigfolderopen.gif
+bigharddisk.gif
+bignetdrive.gif
+bignethood.gif
+bookset.gif
+bookclr.gif
+bookadd.bmp
+bookdel.bmp
+clearentry.gif
+cmymode.gif
+dialmode.gif
+dirupicon.gif
+deleteicon.gif
+docktop.gif
+dockbottom.gif
+dockleft.gif
+dockright.gif
+dockfree.gif
+dockflip.gif
+entericon.gif
+erroricon.gif
+eyedrop.gif
+filecancel.gif
+fileaccept.gif
+filecopy.gif
+filemove.gif
+filehidden.gif
+filelink.gif
+filerename.gif
+filedelete.gif
+fileshown.gif
+foldernew.gif
+gotohome.gif
+gotowork.gif
+hsvmode.gif
+infoicon.gif
+landscape.gif
+listmode.gif
+miniapp.gif
+minicdrom.gif
+minicomputer.gif
+minidesktop.gif
+minidoc.gif
+minifloppy.gif
+minifloppy3.gif
+minifloppy5.gif
+minifolder.gif
+minifolderopen.gif
+miniharddisk.gif
+mininetdrive.gif
+mininethood.gif
+minizipdrive.gif
+newfolder.bmp
+portrait.gif
+questionicon.gif
+rgbmode.gif
+searchicon.gif
+showbigicons.gif
+showdetails.gif
+showsmallicons.gif
+sorting.bmp
+undo_gif.gif
+warningicon.gif
+winclose.gif
+winmaximize.gif
+winminimize.gif
+winrestore.gif)
+
+include(CheckIncludeFileCXX)
+include(CheckCXXSourceCompiles)
+
 find_package(PkgConfig)
 find_package(Threads)
 find_package(X11)
@@ -378,6 +467,11 @@ add_library(FOX-1.7 ${SOURCES})
 add_library(FOX ALIAS FOX-1.7)
 
 
+check_cxx_source_compiles( "#include <immintrin.h>
+int main(int argc,char *argv) { return 0; }" HAVE_IMMINTRIN_H)
+if(HAVE_IMMINTRIN_H)
+  add_definitions(-DHAVE_IMMINTRIN_H)
+endif()
 
 if(FREETYPE_FOUND)
   include_directories(${FREETYPE_INCLUDE_DIRS})
@@ -412,78 +506,202 @@ if(X11_Xrandr_FOUND)
   list(APPEND LIBRARIES ${X11_Xrandr_LIB})
 endif()
 
+if(X11_Xfixes_FOUND)
+  add_definitions(-DHAVE_XFIXES_H)
+  list(APPEND LIBRARIES ${X11_Xfixes_LIB})
+endif()
 
 
 
 find_file(HAVE_DIRENT_H dirent.h)
 if(HAVE_DIRENT_H)
+  message(STATUS "Checking dirent.h: ${HAVE_DIRENT_H}")
   add_definitions(-DHAVE_DIRENT_H)
-endif()
-
-find_file(HAVE_UNISTD_H unistd.h)
-if(HAVE_UNISTD_H)
-  add_definitions(-DHAVE_UNISTD_H)
+else()
+  message(STATUS "Checking dirent.h: not found")
 endif()
 
 find_file(HAVE_DLFCN_H dlfcn.h)
 if(HAVE_DLFCN_H)
+  message(STATUS "Checking dlfcn.h: ${HAVE_DLFCN_H}")
   add_definitions(-DHAVE_DLFCN_H)
+else()
+  message(STATUS "Checking dlfcn.h: not found")
 endif()
 
-find_file(HAVE_SYS_MMAN_H sys/mman.h)
-if(HAVE_SYS_MMAN_H)
-  add_definitions(-DHAVE_SYS_MMAN_H)
-endif()
-
-find_file(HAVE_SYS_WAIT_H sys/wait.h)
-if(HAVE_SYS_WAIT_H)
-  add_definitions(-DHAVE_SYS_WAIT_H)
+find_file(HAVE_NDIR_H ndir.h)
+if(HAVE_NDIR_H)
+  message(STATUS "Checking ndir.h: ${HAVE_NDIR_H}")
+  add_definitions(-DHAVE_NDIR_H)
+else()
+  message(STATUS "Checking ndir.h: not found")
 endif()
 
 find_file(HAVE_SEMAPHORE_H semaphore.h)
 if(HAVE_SEMAPHORE_H)
+  message(STATUS "Checking semaphore.h: ${HAVE_SEMAPHORE_H}")
   add_definitions(-DHAVE_SEMAPHORE_H)
+else()
+  message(STATUS "Checking semaphore.h: not found")
 endif()
 
-find_file(HAVE_IMMINTRIN_H immintrin.h)
-if(HAVE_IMMINTRIN_H)
-  add_definitions(-DHAVE_IMMINTRIN_H)
+find_file(HAVE_UNISTD_H unistd.h)
+if(HAVE_UNISTD_H)
+  message(STATUS "Checking unistd.h: ${HAVE_UNISTD_H}")
+  add_definitions(-DHAVE_UNISTD_H)
+else()
+  message(STATUS "Checking unistd.h: not found")
+endif()
+
+find_file(HAVE_SYS_DIR_H sys/dir.h)
+if(HAVE_SYS_DIR_H)
+  message(STATUS "Checking sys/dir.h: ${HAVE_SYS_DIR_H}")
+  add_definitions(-DHAVE_SYS_DIR_H)
+else()
+  message(STATUS "Checking sys/dir.h: not found")
+endif()
+
+find_file(HAVE_SYS_FILIO_H sys/filio.h)
+if(HAVE_SYS_FILIO_H)
+  message(STATUS "Checking sys/filio.h: ${HAVE_SYS_FILIO_H}")
+  add_definitions(-DHAVE_SYS_FILIO_H)
+else()
+  message(STATUS "Checking sys/filio.h: not found")
+endif()
+
+find_file(HAVE_SYS_MMAN_H sys/mman.h)
+if(HAVE_SYS_MMAN_H)
+  message(STATUS "Checking sys/mman.h: ${HAVE_SYS_MMAN_H}")
+  add_definitions(-DHAVE_SYS_MMAN_H)
+else()
+  message(STATUS "Checking sys/mman.h: not found")
+endif()
+
+find_file(HAVE_SYS_MOUNT_H sys/mount.h)
+if(HAVE_SYS_MOUNT_H)
+  message(STATUS "Checking sys/mount.h: ${HAVE_SYS_MOUNT_H}")
+  add_definitions(-DHAVE_SYS_MOUNT_H)
+else()
+  message(STATUS "Checking sys/mount.h: not found")
+endif()
+
+find_file(HAVE_SYS_NDIR_H sys/ndir.h)
+if(HAVE_SYS_NDIR_H)
+  message(STATUS "Checking sys/ndir.h: ${HAVE_SYS_NDIR_H}")
+  add_definitions(-DHAVE_SYS_NDIR_H)
+else()
+  message(STATUS "Checking sys/ndir.h: not found")
+endif()
+
+find_file(HAVE_SYS_PARAM_H sys/param.h)
+if(HAVE_SYS_PARAM_H)
+  message(STATUS "Checking sys/param.h: ${HAVE_SYS_PARAM_H}")
+  add_definitions(-DHAVE_SYS_PARAM_H)
+else()
+  message(STATUS "Checking sys/param.h: not found")
+endif()
+
+find_file(HAVE_SYS_SELECT_H sys/select.h)
+if(HAVE_SYS_SELECT_H)
+  message(STATUS "Checking sys/select.h: ${HAVE_SYS_SELECT_H}")
+  add_definitions(-DHAVE_SYS_SELECT_H)
+else()
+  message(STATUS "Checking sys/select.h: not found")
+endif()
+
+find_file(HAVE_SYS_EPOLL_H sys/epoll.h)
+if(HAVE_SYS_EPOLL_H)
+  message(STATUS "Checking sys/epoll.h: ${HAVE_SYS_EPOLL_H}")
+  add_definitions(-DHAVE_SYS_EPOLL_H)
+else()
+  message(STATUS "Checking sys/epoll.h: not found")
 endif()
 
 find_file(HAVE_SYS_SHM_H sys/shm.h)
 if(HAVE_SYS_SHM_H)
+  message(STATUS "Checking sys/shm.h: ${HAVE_SYS_SHM_H}")
   add_definitions(-DHAVE_SYS_SHM_H)
+else()
+  message(STATUS "Checking sys/shm.h: not found")
+endif()
+
+find_file(HAVE_SYS_STATVFS_H sys/statvfs.h)
+if(HAVE_SYS_STATVFS_H)
+  message(STATUS "Checking sys/statvfs.h: ${HAVE_SYS_STATVFS_H}")
+  add_definitions(-DHAVE_SYS_STATVFS_H)
+else()
+  message(STATUS "Checking sys/statvfs.h: not found")
+endif()
+
+find_file(HAVE_SYS_WAIT_H sys/wait.h)
+if(HAVE_SYS_WAIT_H)
+  message(STATUS "Checking sys/wait.h: ${HAVE_SYS_WAIT_H}")
+  add_definitions(-DHAVE_SYS_WAIT_H)
+else()
+  message(STATUS "Checking sys/wait.h: not found")
 endif()
 
 
-# Check for JPEG
+
+
+
+
+
+
+
+
 find_package(JPEG)
 if(JPEG_FOUND)
   list(APPEND LIBRARIES ${JPEG_LIBRARIES})
   add_definitions(-DHAVE_JPEG_H)
 endif()
 
-# Check for PNG
 find_package(PNG)
-if(PNG_FOUND)
-  list(APPEND LIBRARIES ${PNG_LIBRARIES})
+if(TARGET PNG::PNG)
+  list(APPEND LIBRARIES PNG::PNG)
   add_definitions(-DHAVE_PNG_H)
+endif()
+
+find_package(ZLIB)
+if(TARGET ZLIB::ZLIB)
+  list(APPEND LIBRARIES ZLIB::ZLIB)
+  add_definitions(-DHAVE_ZLIB_H)
+endif()
+
+find_package(BZip2)
+if(TARGET BZip2::BZip2)
+  list(APPEND LIBRARIES BZip2::BZip2)
+  add_definitions(-DHAVE_BZ2LIB_H)
+endif()
+
+find_package(TIFF)
+if(TARGET TIFF::TIFF)
+  list(APPEND LIBRARIES TIFF::TIFF)
+  add_definitions(-DHAVE_TIFF_H)
 endif()
 
 find_file(HAVE_GLX_H GL/glx.h)
 if(OPENGL_FOUND AND OPENGL_GLU_FOUND AND HAVE_GLX_H)
   list(APPEND LIBRARIES ${OPENGL_LIBRARIES})
-  add_definitions(-DHAVE_GL_H -DHAVE_GLU_H -DHAVE_GLX_H)
+  target_compile_definitions(FOX-1.7 PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
+  add_definitions(-DHAVE_GLX_H)
+endif()
+
+if(NOT WITH_XIM)
+  add_definitions(-DNO_XIM)
 endif()
 
 
-
 target_include_directories(FOX-1.7 PUBLIC ../include)
-target_link_libraries(FOX-1.7 PRIVATE ${X11_LIBRARIES} ${LIBRARIES}  ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(FOX-1.7 PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 
-
-
-
-
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
+  COMMAND reswrap -nc -h -n FX -o icons.h ${ICONS}
+  COMMAND reswrap -nc -i icons.h -n FX -o icons.cpp ${ICONS}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  DEPENDS reswrap
+  VERBATIM
+  )
 
