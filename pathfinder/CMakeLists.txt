@@ -1,3 +1,5 @@
+include(CheckIncludeFileCXX)
+
 set(SOURCES CopyDialog.cpp
 CopyDialog.h
 PathFinder.cpp
@@ -59,12 +61,9 @@ work.gif
 )
 
 
-find_file(HAVE_SYS_WAIT_H sys/wait.h)
+check_include_file_cxx(sys/wait.h HAVE_SYS_WAIT_H)
 if(HAVE_SYS_WAIT_H)
-  message(STATUS "Checking sys/wait.h: ${HAVE_SYS_WAIT_H}")
   add_definitions(-DHAVE_SYS_WAIT_H)
-else()
-  message(STATUS "Checking sys/wait.h: not found")
 endif()
 
 add_executable(PathFinder ${SOURCES})
