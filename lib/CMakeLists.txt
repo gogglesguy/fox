@@ -1223,4 +1223,3 @@ install(TARGETS cfox
 install(FILES ${HEADERS} DESTINATION include/cfox-${cfox_VERSION_MAJOR}.${cfox_VERSION_MINOR})
 
 
-
