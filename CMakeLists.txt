@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3.1)
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-project(FOX VERSION 1.7.83)
+project(cfox VERSION 1.7.83)
 
 option(WITH_NATIVE "Compile for native architecture" OFF)
 
@@ -126,15 +126,3 @@ endif()
 # Libraries
 add_subdirectory(utils)
 add_subdirectory(lib)
-add_subdirectory(chart)
-
-# Tests
-add_subdirectory(tests)
-add_subdirectory(glviewer)
-
-# Programs
-add_subdirectory(adie)
-add_subdirectory(calculator)
-add_subdirectory(controlpanel)
-add_subdirectory(pathfinder)
-add_subdirectory(shutterbug)

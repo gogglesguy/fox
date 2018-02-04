@@ -836,7 +836,7 @@ winmaximize.gif
 winminimize.gif
 winrestore.gif)
 
-add_library(FOX ${SOURCES})
+add_library(cfox ${SOURCES})
 
 find_package(PkgConfig)
 find_package(Threads)
@@ -1205,11 +1205,11 @@ endif()
 if(WITH_OPENGL)
   if(TARGET OpenGL::GL AND TARGET OpenGL::GLU AND OPENGL_GLX_INCLUDE_DIR)
     list(APPEND LIBRARIES OpenGL::GL OpenGL::GLU)
-    target_compile_definitions(FOX PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
+    target_compile_definitions(cfox PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
     add_definitions(-DHAVE_GLX_H)
   elseif(OPENGL_GL_FOUND AND OPENGL_GLU_FOUND AND OPENGL_GLX_INCLUDE_DIR)
     list(APPEND LIBRARIES OPENGL_gl_LIBRARY OPENGL_glu_LIBRARY)
-    target_compile_definitions(FOX PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
+    target_compile_definitions(cfox PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
     add_definitions(-DHAVE_GLX_H)
   endif()
 endif()
@@ -1218,8 +1218,8 @@ if(NOT WITH_XIM)
   add_definitions(-DNO_XIM)
 endif()
 
-target_include_directories(FOX PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(FOX PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(cfox PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(cfox PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
@@ -1230,11 +1230,11 @@ add_custom_command(
   VERBATIM
   )
 
-set_target_properties(FOX PROPERTIES VERSION ${FOX_VERSION} SOVERSION ${FOX_VERSION_PATCH})
-set_target_properties(FOX PROPERTIES OUTPUT_NAME FOX-${FOX_VERSION_MAJOR}.${FOX_VERSION_MINOR})
+set_target_properties(cfox PROPERTIES VERSION ${cfox_VERSION} SOVERSION ${cfox_VERSION_PATCH})
+set_target_properties(cfox PROPERTIES OUTPUT_NAME cfox-${cfox_VERSION_MAJOR}.${cfox_VERSION_MINOR})
 
-install(TARGETS FOX
+install(TARGETS cfox
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
-install(FILES ${HEADERS} DESTINATION include/fox-${FOX_VERSION_MAJOR}.${FOX_VERSION_MINOR})
+install(FILES ${HEADERS} DESTINATION include/cfox-${cfox_VERSION_MAJOR}.${cfox_VERSION_MINOR})
