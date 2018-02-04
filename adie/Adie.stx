@@ -1922,8 +1922,8 @@ end
 
 # Makefiles
 language "Make"
-  filesmatch "Makefile*,makefile*"
-  contextlines 10
+  filesmatch "GNUmakefile,Makefile*,makefile*"
+  contextlines 1000
   expandtabs   no
   rule "Comment"
     openpattern  "#"
@@ -1934,23 +1934,23 @@ language "Make"
       style    "darkgreen"
     end
   end
-  rule "Assignment"
-    openpattern "^( *| [ \t]*)[A-Za-z0-9_+$()][^ \t\n]*[ \t]*(\+=|:=|=)"
-    closepattern "$"
-    rule "AssignmentContinuation"
+  rule "PhonyDependencies"
+    openpattern "\<(\.PHONY|\.SUFFIXES|\.DEFAULT|\.PRECIOUS|\.INTERMEDIATE|\.SECONDARY|\.SECONDEXPANSION|\.DELETE_ON_ERROR|\.IGNORE|\.LOW_RESOLUTION_TIME|\.SILENT|\.EXPORT_ALL_VARIABLES|\.NOTPARALLEL|\.ONESHELL|\.POSIX|\.DEFAULT_GOAL)\>::?"
+    closepattern "$|;"
+    rule "PhonyDependencyContinuation"
       pattern "\\\n"
     end
-    rule "AssignmentComment"
-      openpattern "#"
-      closepattern "$"
-    end
   end
-  rule "DependencyLine"
-    openpattern "^( *| [ \t]*)(.DEFAULT|.DELETE_ON_ERROR|.EXPORT_ALL_VARIABLES.IGNORE|.INTERMEDIATE|.PHONY|.POSIX|.PRECIOUS|.SECONDARY|.SILENT|.SUFFIXES)*(([A-Za-z0-9./$(){} _@^<*?%+-]+?(\\\n))*?[A-Za-z0-9./$(){} _@^<*?%+-]+)::?"
+  rule "Dependencies"
+    openpattern "(([A-Za-z0-9./$(){} _@^<*?%+-]+?(\\\n))*?[A-Za-z0-9./$(){} _@^<*?%+-]+)::?"
     closepattern "$|;"
     rule "DependencyContinuation"
       pattern "\\\n"
     end
+  end
+  rule "Keyword"
+    pattern    "\<(define|ifdef|ifndef|ifeq|ifneq|else|endif|endef|include|-include|sinclude|override|export|unexport|private|vpath)\>"
+    style      "brown"
   end
   rule "String"
     openpattern   "\""
@@ -1986,6 +1986,13 @@ language "Make"
     rule "ControlEscape"
       pattern     "\\."
       style       "fuchsia"
+    end
+  end
+  rule "Assignment"
+    openpattern "^[ \t]*[A-Za-z0-9_+$()]+[ \t]*(\?=|\+=|::=|:=|=)"
+    closepattern "$"
+    rule "AssignmentContinuation"
+      pattern "\\\n"
     end
   end
 end

@@ -84,6 +84,36 @@ extern FXAPI FXuint atomicCas(volatile FXuint* ptr,FXuint expect,FXuint v);
 extern FXAPI FXbool atomicBoolCas(volatile FXuint* ptr,FXuint expect,FXuint v);
 
 
+///// Atomic longs
+
+/// Atomically set variable at ptr to v, and return its old contents
+extern FXAPI FXlong atomicSet(volatile FXlong* ptr,FXlong v);
+
+/// Atomically add v to variable at ptr, and return its old contents
+extern FXAPI FXlong atomicAdd(volatile FXlong* ptr,FXlong v);
+
+/// Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
+extern FXAPI FXlong atomicCas(volatile FXlong* ptr,FXlong expect,FXlong v);
+
+/// Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
+extern FXAPI FXbool atomicBoolCas(volatile FXlong* ptr,FXlong expect,FXlong v);
+
+
+///// Atomic unsigned longs
+
+/// Atomically set variable at ptr to v, and return its old contents
+extern FXAPI FXulong atomicSet(volatile FXulong* ptr,FXulong v);
+
+/// Atomically add v to variable at ptr, and return its old contents
+extern FXAPI FXulong atomicAdd(volatile FXulong* ptr,FXulong v);
+
+/// Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
+extern FXAPI FXulong atomicCas(volatile FXulong* ptr,FXulong expect,FXulong v);
+
+/// Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
+extern FXAPI FXbool atomicBoolCas(volatile FXulong* ptr,FXulong expect,FXulong v);
+
+
 ///// Atomic void pointers
 
 /// Atomic read

@@ -1562,7 +1562,7 @@ void FXImage::resize(FXint w,FXint h){
 //      I = pow(P,2.2)
 //      P = pow(I,1/2.2)
 //
-// Reference: http://www.4p8.com/eric.brasseur/gamma.html
+// Reference: http://www.ericbrasseur.org/gamma.html
 // At some future time this should be based around the gamma used in
 // FXVisual; this means generating the table at run time.
 
@@ -1607,6 +1607,16 @@ static FXuint gammaLookup(FXuint i){
   return gammatable[i];
   }
 
+
+#if 0
+static FXuint gammaInvertLookup(FXuint val){    // New
+  register FXint m,l=0,h=255;
+  while(l<(m=(h+l)>>1)){
+    if(gammatable[m]<=val) l=m; else h=m;
+    }
+  return l;
+  }
+#endif
 
 static FXuint gammaInvertLookup(FXuint val){
   register FXint mid,low=0,high=255;
@@ -1660,6 +1670,7 @@ static void hscalergbagamma(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FX
     }
   while(dst<end);
   }
+
 
 // Vertical box-filtered, gamma-corrected
 static void vscalergbagamma(FXuchar *dst,const FXuchar* src,FXint dw,FXint dh,FXint sw,FXint sh){

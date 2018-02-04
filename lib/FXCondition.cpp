@@ -131,7 +131,7 @@ FXbool FXCondition::wait(FXMutex& mtx,FXTime nsec){
 #elif defined(WIN32)
   if(0<nsec){
     DWORD delay=INFINITE;
-    if(nsec<forever) delay=nsec/1000000;
+    if(nsec<forever) delay=(DWORD)(nsec/1000000);
     EnterCriticalSection((CRITICAL_SECTION*)&data[3]);
     data[2]++;
     LeaveCriticalSection((CRITICAL_SECTION*)&data[3]);

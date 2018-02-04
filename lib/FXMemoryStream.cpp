@@ -127,15 +127,15 @@ FXbool FXMemoryStream::position(FXlong offset,FXWhence whence){
     if(whence==FXFromCurrent) offset=offset+pos;
     else if(whence==FXFromEnd) offset=offset+(endptr-begptr);
     if(dir==FXStreamSave){
-      if(begptr+offset>=endptr){
+      if(begptr+offset>endptr){
         if(!owns){ setError(FXStreamFull); return false; }
         setSpace(offset);
-        if(begptr+offset>=endptr) return false;
+        if(begptr+offset>endptr) return false;
         }
       wrptr=begptr+offset;
       }
     else{
-      if(begptr+offset>=endptr){ setError(FXStreamEnd); return false; }
+      if(begptr+offset>endptr){ setError(FXStreamEnd); return false; }
       rdptr=begptr+offset;
       }
     pos=offset;

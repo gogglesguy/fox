@@ -166,6 +166,12 @@ extern FXAPI FXVec3d normalize(const FXVec3d& v);
 /// Linearly interpolate
 extern FXAPI FXVec3d lerp(const FXVec3d& u,const FXVec3d& v,FXdouble f);
 
+/// Rotate vector vec by unit-length axis about angle specified as (ca,sa)
+extern FXAPI FXVec3d rotate(const FXVec3d& vec,const FXVec3d& axis,FXdouble ca,FXdouble sa);
+
+/// Rotate vector vec by unit-length axis about angle ang
+extern FXAPI FXVec3d rotate(const FXVec3d& vec,const FXVec3d& axis,FXdouble ang);
+
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3d& v);
 

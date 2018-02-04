@@ -87,7 +87,7 @@ const char Calculator::help[]=
 "The operators in the FOX Calculator are the usual suspects:\n"
 "\n"
 "\t+\tAddition\n"
-"\t-\tSubstraction\n"
+"\t-\tSubtraction\n"
 "\t*\tMultiplication\n"
 "\t/\tFloating point division\n"
 "\n"

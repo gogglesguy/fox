@@ -252,7 +252,7 @@ FXMat2f& FXMat2f::operator+=(const FXMat2f& s){
   }
 
 
-// Substract matrices
+// Subtract matrices
 FXMat2f& FXMat2f::operator-=(const FXMat2f& s){
 #if defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_sub_ps(_mm_loadu_ps(&m[0][0]),_mm_loadu_ps(&s[0][0])));

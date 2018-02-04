@@ -65,9 +65,9 @@ namespace FXPath {
   /// Return file title, i.e. document name only
   extern FXAPI FXString title(const FXString& file);
 
-  /** 
+  /**
   * Return extension part of the file name.
-  * This returns the string after the last '.' in the last path-component of the 
+  * This returns the string after the last '.' in the last path-component of the
   * file, provided that the '.' was not the first character of the path-component.
   * For example, extension("/usr/share/icons/folder.png") returns "png", but the call to
   * extension("../path.name/.bashrc") returns "".
@@ -87,7 +87,7 @@ namespace FXPath {
   /**
   * Perform tilde or environment variable expansion.
   * A prefix of the form ~ or ~user is expanded to the user's home directory.
-  * Environment variables of the form $HOME or ${HOME} are expanded by 
+  * Environment variables of the form $HOME or ${HOME} are expanded by
   * substituting the value of the variable.
   * On Windows, only environment variables of the form %HOME% are expanded.
   */
@@ -99,8 +99,9 @@ namespace FXPath {
   /**
   * Simplify a file path; the path will remain relative if it was relative,
   * or absolute if it was absolute.  Also, a trailing "/" will be preserved
-  * as this is important in other functions.
-  * For example, simplify("..//aaa/./bbb//../c/") becomes "../aaa/c/".
+  * as this is important in other functions.  Finally, returned path should
+  * be non-empty unless the input path was empty, and pathological paths
+  * will be fixed.
   */
   extern FXAPI FXString simplify(const FXString& file);
 
@@ -148,6 +149,24 @@ namespace FXPath {
 
   /// Dequote filename to get original again
   extern FXAPI FXString dequote(const FXString& file);
+
+  /**
+  * Parse command string to argc and argv.
+  * The input string may contain single- or double-quoted segments
+  * or escape characters, as per shell rules.
+  * Returns argc, the number of arguments identified in the input,
+  * if successful.  If input is empty (NULL pointer or only whitespace),
+  * or syntax errors are encountered, or system is out of memory, the
+  * function returns 0.
+  * Memory at argv may be released by a single call to freeElms().
+  */
+  extern FXAPI FXint parseArgs(FXchar**& argv,const FXchar* command);
+
+  /**
+  * Parse command string to argc and argv.
+  * This is a convenience version for the parseArgv() above.
+  */
+  extern FXAPI FXint parseArgs(FXchar**& argv,const FXString& command);
 
   /**
   * Perform match of a filename against a wildcard pattern.
@@ -205,13 +224,13 @@ namespace FXPath {
   * Given search path list, return shortest relative path name that still
   * uniquely resolves to the given file name.
   */
-  FXString relativize(const FXString& pathlist,const FXString& file);
+  extern FXAPI FXString relativize(const FXString& pathlist,const FXString& file);
 
   /**
   * Check if the file has an extension from the list of known executable
   * extensions (Windows)
   */
-  FXbool hasExecExtension(const FXString& file);
+  extern FXAPI FXbool hasExecExtension(const FXString& file);
   }
 
 }

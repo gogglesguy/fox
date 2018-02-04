@@ -74,6 +74,8 @@
      'f', 'F'   Floating point conversion.
      'g', 'G'   Floating point conversion.
 
+  - In the case of string (%s or %[...]), do not report a conversion unless at 
+    least one character is returned.
 */
 
 #ifdef WIN32
@@ -162,10 +164,11 @@ static const FXchar* grouping(const FXchar* begin,const FXchar* end){
 
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  register FXint modifier,width,convert,comma,base,digits,sdigits,count,exponent,expo,neg,nex,pos,ch,nn,v;
-  register const FXchar *start=string;
-  register const FXchar *ss;
-  register FXchar *ptr;
+  FXint modifier,width,convert,comma,base,digits,sdigits,count,exponent,expo,done,neg,nex,pos,v;
+  const FXchar *start=string;
+  const FXchar *ss;
+  FXchar *ptr;
+  FXuchar ch,nn;
   FXdouble number;
   FXdouble mult;
   FXulong  value;
@@ -193,6 +196,7 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
       modifier=ARG_DEFAULT;
       width=0;
       convert=1;
+      done=0;
       comma=0;
       base=0;
       pos=-1;
@@ -341,9 +345,9 @@ integer:  value=0;
           else{
             if(base==0){ base=10; }                             // Not starting with '0' or '0x', so its decimal
             }
-          while(0<width && *string){
-            if(*string!=comma){                                 // FIXME only should consume LEGAL number groupings!
-              v=FXString::digit2Value[(FXuchar)*string];
+          while(0<width && (ch=*string)!='\0'){
+            if(ch!=comma){                                      // FIXME only should consume LEGAL number groupings!
+              v=FXString::digit2Value[ch];
               if(v<0 || base<=v) break;
               value=value*base+v;                               // Convert to integer
               digits++;
@@ -402,11 +406,11 @@ integer:  value=0;
             string++;
             width--;
             }
-          while(0<width && *string){                            // Mantissa digits
-            if(*string!=comma){                                 // FIXME only should consume LEGAL number groupings!
-              if(*string<'0' || *string>'9') break;
+          while(0<width && (ch=*string)!='\0'){                 // Mantissa digits
+            if(ch!=comma){                                      // FIXME only should consume LEGAL number groupings!
+              if(ch<'0' || ch>'9') break;
               if(sdigits<MAXDIGS){
-                number+=(*string-'0')*mult;
+                number+=(ch-'0')*mult;
                 mult*=0.1;
                 }
               exponent++;
@@ -419,9 +423,9 @@ integer:  value=0;
           if(0<width && *string=='.'){                          // Mantissa decimals following '.'
             string++;
             width--;
-            while(0<width && '0'<=*string && *string<='9'){
+            while(0<width && (ch=*string)>='0' && ch<='9'){
               if(sdigits<MAXDIGS){
-                number+=(*string-'0')*mult;
+                number+=(ch-'0')*mult;
                 mult*=0.1;
                 }
               sdigits++;
@@ -441,8 +445,8 @@ integer:  value=0;
               width--;
               }
             if(0<width && '0'<=*ss && *ss<='9'){                // Have exponent?
-              while(0<width && '0'<=*ss && *ss<='9'){
-                expo=expo*10+(*ss-'0');
+              while(0<width && (ch=*ss)>='0' && ch<='9'){
+                expo=expo*10+(ch-'0');
                 ss++;
                 width--;
                 }
@@ -489,14 +493,16 @@ integer:  value=0;
           if(width<1) width=1;                          // Width at least 1
           if(convert){
             ptr=va_arg(ag,FXchar*);
-            while(0<width && *string){
-              *ptr++=*string++;
+            while(0<width && (ch=*string)!='\0'){
+              *ptr++=ch;
+              string++;
               width--;
+              done=1;
               }
-            count++;
+            count+=done;
             }
           else{
-            while(0<width && *string){
+            while(0<width && (ch=*string)!='\0'){
               string++;
               width--;
               }
@@ -507,15 +513,17 @@ integer:  value=0;
           while(Ascii::isSpace(*string)) string++;      // Skip white space
           if(convert){
             ptr=va_arg(ag,FXchar*);
-            while(0<width && *string && !Ascii::isSpace(*string)){
-              *ptr++=*string++;
+            while(0<width && (ch=*string)!='\0' && !Ascii::isSpace(ch)){
+              *ptr++=ch;
+              string++;
               width--;
+              done=1;
               }
             *ptr='\0';
-            count++;
+            count+=done; 
             }
           else{
-            while(0<width && *string && !Ascii::isSpace(*string)){
+            while(0<width && (ch=*string)!='\0' && !Ascii::isSpace(ch)){
               string++;
               width--;
               }
@@ -523,21 +531,21 @@ integer:  value=0;
           break;
         case '[':                                       // Character set
           if(width<1) width=2147483647;                 // Width at least 1
-          ch=(FXuchar)*format++;
+          ch=*format++;
           v=1;                                          // Add characters to set
           if(ch=='^'){                                  // Negated character set
-            ch=(FXuchar)*format++;
+            ch=*format++;
             v=0;                                        // Remove characters from set
             }
           memset(set,1-v,sizeof(set));                  // Initialize set
           if(ch=='\0') goto x;                          // Format error
           for(;;){                                      // Parse set
             set[ch]=v;
-            nn=(FXuchar)*format++;
+            nn=*format++;
             if(nn=='\0') goto x;                        // Format error
             if(nn==']') break;
             if(nn=='-'){
-              nn=(FXuchar)*format;
+              nn=*format;
               if(nn!=']' && ch<=nn){                    // Range if not at end
                 while(ch<nn){ set[++ch]=v; }
                 format++;
@@ -550,15 +558,17 @@ integer:  value=0;
             }
           if(convert){
             ptr=va_arg(ag,FXchar*);
-            while(0<width && *string && set[(FXuchar)*string]){
-              *ptr++=*string++;
+            while(0<width && (ch=*string)!='\0' && set[ch]){
+              *ptr++=ch;
+              string++;
               width--;
+              done=1;
               }
             *ptr='\0';
-            count++;
+            count+=done;
             }
           else{
-            while(0<width && *string && set[(FXuchar)*string]){
+            while(0<width && (ch=*string)!='\0' && set[ch]){
               string++;
               width--;
               }

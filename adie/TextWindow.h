@@ -287,6 +287,8 @@ public:
   long onCmdSetInitialSize(FXObject*,FXSelector,void*);
   long onCmdToggleBrowser(FXObject*,FXSelector,void*);
   long onUpdToggleBrowser(FXObject*,FXSelector,void*);
+  long onCmdToggleHidden(FXObject*,FXSelector,void*);
+  long onUpdToggleHidden(FXObject*,FXSelector,void*);
   long onCmdSearchPaths(FXObject*,FXSelector,void*);
   long onUpdSearchPaths(FXObject*,FXSelector,void*);
   long onCmdFindInFiles(FXObject*,FXSelector,void*);
@@ -476,6 +478,7 @@ public:
     ID_USE_INITIAL_SIZE,
     ID_SET_INITIAL_SIZE,
     ID_TOGGLE_BROWSER,
+    ID_TOGGLE_DOTFILES,
     ID_FINDFILES,
     ID_SEARCHPATHS,
     ID_EXPRESSION,

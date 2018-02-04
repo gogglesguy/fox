@@ -165,7 +165,6 @@ extern FXAPI FXVec4f colorToVec4f(FXColor clr);
 
 /// Normalize vector
 extern FXAPI FXVec4f normalize(const FXVec4f& v);
-extern FXAPI FXVec4f fastnormalize(const FXVec4f& v);
 
 /// Linearly interpolate
 extern FXAPI FXVec4f lerp(const FXVec4f& u,const FXVec4f& v,FXdouble f);

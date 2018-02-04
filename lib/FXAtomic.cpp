@@ -225,6 +225,323 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
   }
 
 /*******************************************************************************/
+ 
+// Atomically set variable at ptr to v, and return its old contents
+FXlong atomicSet(volatile FXlong* ptr,FXlong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return _InterlockedExchange64(ptr,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  register FXlong ret;
+  __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
+                        "1:\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "jnz 1b\n\t"
+                        "xchgl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXint)v), "c"((FXint)(v>>32)), "A"(*ptr) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  register FXlong ret;
+  __asm__ __volatile__ ("1:\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "jnz 1b\n\t" : "=A"(ret) : "D"(ptr), "b"((FXint)v), "c"((FXint)(v>>32)), "A"(*ptr) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXlong ret;
+  __asm__ __volatile__("xchgq %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(v) : "memory", "cc");
+  return ret;
+#elif defined(HAVE_BUILTIN_ATOMIC)
+  return __atomic_exchange_n(ptr,v,__ATOMIC_SEQ_CST);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_lock_test_and_set(ptr,v);
+#else
+  FXlong ret=*ptr;
+  *ptr=v;
+  return ret;
+#endif
+  }
+
+
+// Atomically add v to variable at ptr, and return its old contents
+FXlong atomicAdd(volatile FXlong* ptr,FXlong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return _InterlockedAdd64(ptr,v);
+#elif defined(HAVE_BUILTIN_ATOMIC)
+  return __atomic_fetch_add(ptr,v,__ATOMIC_SEQ_CST);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_fetch_and_add(ptr,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  FXuint inclo=v;
+  FXuint inchi=(v>>32);
+  register FXlong ret;
+  __asm __volatile("movl %%ebx, %%esi\n\t"
+                   "1:\n\t"
+                   "movl %2, %%ebx\n\t"
+                   "movl %3, %%ecx\n\t"
+                   "addl %%eax, %%ebx\n\t"
+                   "addc %%edx, %%ecx\n\t"
+                   "lock\n\t"
+                   "cmpxchg8b (%1)\n\t"
+                   "jnz 1b\n\t"
+                   "movl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "m"(inclo), "m"(inchi), "A"(*ptr) : "esi", "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  FXuint inclo=v;
+  FXuint inchi=(v>>32);
+  register FXlong ret;
+  __asm __volatile("1:\n\t"
+                   "movl %2, %%ebx\n\t"
+                   "movl %3, %%ecx\n\t"
+                   "addl %%eax, %%ebx\n\t"
+                   "addc %%edx, %%ecx\n\t"
+                   "lock\n\t"
+                   "cmpxchg8b (%1)\n\t"
+                   "jnz 1b\n\t" : "=A"(ret) : "D"(ptr), "m"(inclo), "m"(inchi), "A"(*ptr) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXlong ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "xaddq %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(v) : "memory", "cc");
+  return ret;
+#else
+  FXlong ret=*ptr;
+  *ptr+=v;
+  return ret;
+#endif
+  }
+
+
+// Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
+FXlong atomicCas(volatile FXlong* ptr,FXlong expect,FXlong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return _InterlockedCompareExchange64(ptr,v,expect);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_val_compare_and_swap(ptr,expect,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  register FXlong ret;
+  __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "movl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  register FXlong ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchg8b (%1)\n\t" : "=A"(ret) : "D"(ptr), "b"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXlong ret;
+  __asm__ __volatile__("lock\n\t"
+                       "cmpxchgq %2,(%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
+  return ret;
+#else
+  FXlong ret=*ptr;
+  if(*ptr==expect){
+    *ptr=v;
+    }
+  return ret;
+#endif
+  }
+
+
+// Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
+FXbool atomicBoolCas(volatile FXlong* ptr,FXlong expect,FXlong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return (_InterlockedCompareExchange64(ptr,v,expect)==expect);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_bool_compare_and_swap(ptr,expect,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  register FXbool ret;
+  __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "setz %%al\n\t"
+                        "andl $1, %%eax\n\t"
+                        "xchgl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  register FXbool ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "setz %%al\n\t"
+                        "andl $1, %%eax\n\t" : "=a"(ret) : "D"(ptr), "b"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXbool ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchgq %2,(%1)\n\t"
+                        "sete %%al\n\t"
+                        "andq $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
+  return ret;
+#else
+  if(*ptr==expect){
+    *ptr=v;
+    return true;
+    }
+  return false;
+#endif
+  }
+
+
+/*******************************************************************************/
+
+// Atomically set variable at ptr to v, and return its old contents
+FXulong atomicSet(volatile FXulong* ptr,FXulong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return _InterlockedExchange64(ptr,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  register FXulong ret;
+  __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
+                        "1:\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "jnz 1b\n\t"
+                        "xchgl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXuint)v), "c"((FXuint)(v>>32)), "A"(*ptr) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  register FXulong ret;
+  __asm__ __volatile__ ("1:\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "jnz 1b\n\t" : "=A"(ret) : "D"(ptr), "b"((FXuint)v), "c"((FXuint)(v>>32)), "A"(*ptr) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXulong ret;
+  __asm__ __volatile__("xchgq %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(v) : "memory", "cc");
+  return ret;
+#elif defined(HAVE_BUILTIN_ATOMIC)
+  return __atomic_exchange_n(ptr,v,__ATOMIC_SEQ_CST);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_lock_test_and_set(ptr,v);
+#else
+  FXulong ret=*ptr;
+  *ptr=v;
+  return ret;
+#endif
+  }
+
+
+// Atomically add v to variable at ptr, and return its old contents
+FXulong atomicAdd(volatile FXulong* ptr,FXulong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return _InterlockedAdd64(ptr,v);
+#elif defined(HAVE_BUILTIN_ATOMIC)
+  return __atomic_fetch_add(ptr,v,__ATOMIC_SEQ_CST);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_fetch_and_add(ptr,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  FXuint inclo=v;
+  FXuint inchi=(v>>32);
+  register FXulong ret;
+  __asm __volatile("movl %%ebx, %%esi\n\t"
+                   "1:\n\t"
+                   "movl %2, %%ebx\n\t"
+                   "movl %3, %%ecx\n\t"
+                   "addl %%eax, %%ebx\n\t"
+                   "addc %%edx, %%ecx\n\t"
+                   "lock\n\t"
+                   "cmpxchg8b (%1)\n\t"
+                   "jnz 1b\n\t"
+                   "movl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "m"(inclo), "m"(inchi), "A"(*ptr) : "esi", "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  FXuint inclo=v;
+  FXuint inchi=(v>>32);
+  register FXulong ret;
+  __asm __volatile("1:\n\t"
+                   "movl %2, %%ebx\n\t"
+                   "movl %3, %%ecx\n\t"
+                   "addl %%eax, %%ebx\n\t"
+                   "addc %%edx, %%ecx\n\t"
+                   "lock\n\t"
+                   "cmpxchg8b (%1)\n\t"
+                   "jnz 1b\n\t" : "=A"(ret) : "D"(ptr), "m"(inclo), "m"(inchi), "A"(*ptr) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXulong ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "xaddq %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(v) : "memory", "cc");
+  return ret;
+#else
+  FXulong ret=*ptr;
+  *ptr+=v;
+  return ret;
+#endif
+  }
+
+
+// Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
+FXulong atomicCas(volatile FXulong* ptr,FXulong expect,FXulong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return _InterlockedCompareExchange64(ptr,v,expect);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_val_compare_and_swap(ptr,expect,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  register FXulong ret;
+  __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "movl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  register FXulong ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchg8b (%1)\n\t" : "=A"(ret) : "D"(ptr), "b"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXulong ret;
+  __asm__ __volatile__("lock\n\t"
+                       "cmpxchgq %2,(%1)\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
+  return ret;
+#else
+  FXulong ret=*ptr;
+  if(*ptr==expect){
+    *ptr=v;
+    }
+  return ret;
+#endif
+  }
+
+
+// Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
+FXbool atomicBoolCas(volatile FXulong* ptr,FXulong expect,FXulong v){
+#if defined(WIN32) && (_MSC_VER >= 1800)
+  return (_InterlockedCompareExchange64(ptr,v,expect)==expect);
+#elif defined(HAVE_BUILTIN_SYNC)
+  return __sync_bool_compare_and_swap(ptr,expect,v);
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
+  register FXbool ret;
+  __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
+                        "lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "setz %%al\n\t"
+                        "andl $1, %%eax\n\t"
+                        "xchgl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__))
+  register FXbool ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchg8b (%1)\n\t"
+                        "setz %%al\n\t"
+                        "andl $1, %%eax\n\t" : "=a"(ret) : "D"(ptr), "b"((FXuint)v), "c"((FXuint)(v>>32)), "A"(expect) : "memory", "cc");
+  return ret;
+#elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__x86_64__))
+  register FXbool ret;
+  __asm__ __volatile__ ("lock\n\t"
+                        "cmpxchgq %2,(%1)\n\t"
+                        "sete %%al\n\t"
+                        "andq $1, %%rax\n\t" : "=a"(ret) : "r"(ptr), "r"(v), "a"(expect) : "memory", "cc");
+  return ret;
+#else
+  if(*ptr==expect){
+    *ptr=v;
+    return true;
+    }
+  return false;
+#endif
+  }
+
+/*******************************************************************************/
 
 // Atomic read; necessary as it serializes reads and writes prior to this one
 FXuint atomicRead(volatile FXuint* ptr){

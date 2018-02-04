@@ -378,6 +378,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuCommand(gomenu,tr("&Home\tCtl-H\tChange to home directory."),homeicon,this,ID_GO_HOME);
   new FXMenuCommand(gomenu,tr("&Work\tCtl-W\tChange to current working directory."),workicon,this,ID_GO_WORK);
   new FXMenuCommand(gomenu,tr("&Goto...\tCtl-G\tGoto directory."),NULL,this,ID_GOTO_DIR);
+  new FXMenuSeparator(gomenu);
   new FXMenuCommand(gomenu,tr("Set bookmark\t\tBookmark the current directory."),addbookicon,this,ID_BOOKMARK);
   new FXMenuCommand(gomenu,tr("Unset bookmark\t\tUnset bookmark to current directory."),delbookicon,this,ID_UNBOOKMARK);
   new FXMenuCommand(gomenu,tr("&Clear\t\tClear bookmarks."),clrbookicon,&bookmarkeddirs,FXRecentFiles::ID_CLEAR);
@@ -415,9 +416,6 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuRadio(arrangemenu,tr("&Rows\t\tView row-wise."),filelist,FXFileList::ID_ARRANGE_BY_ROWS);
   new FXMenuRadio(arrangemenu,tr("&Columns\t\tView column-wise."),filelist,FXFileList::ID_ARRANGE_BY_COLUMNS);
   new FXMenuSeparator(arrangemenu);
-  new FXMenuCheck(arrangemenu,tr("Hidden files"),this,ID_TOGGLE_HIDDEN);
-  new FXMenuCheck(arrangemenu,tr("Preview images"),filelist,FXFileList::ID_TOGGLE_IMAGES);
-  new FXMenuSeparator(arrangemenu);
   new FXMenuRadio(arrangemenu,tr("Mini images"),this,ID_MINI_SIZE);
   new FXMenuRadio(arrangemenu,tr("Normal images"),this,ID_NORMAL_SIZE);
   new FXMenuRadio(arrangemenu,tr("Medium images"),this,ID_MEDIUM_SIZE);
@@ -432,6 +430,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuRadio(sortmenu,tr("T&ime\t\tSort by modification time."),filelist,FXFileList::ID_SORT_BY_TIME);
   new FXMenuRadio(sortmenu,tr("&User\t\tSort by user name."),filelist,FXFileList::ID_SORT_BY_USER);
   new FXMenuRadio(sortmenu,tr("&Group\t\tSort by group name."),filelist,FXFileList::ID_SORT_BY_GROUP);
+  new FXMenuSeparator(sortmenu);
   new FXMenuCheck(sortmenu,tr("&Reverse\t\tReverse sort direction."),filelist,FXFileList::ID_SORT_REVERSE);
   new FXMenuCheck(sortmenu,tr("&Ignore case\t\tIgnore case of names."),filelist,FXFileList::ID_SORT_CASE);
 
@@ -449,6 +448,9 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   new FXMenuCheck(viewmenu,tr("Toolbar\t\tShow or hide tool bar."),toolbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Location bar\t\tShow or hide location bar."),locationbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Status bar\t\tShow or hide status bar."),statusbar,FXWindow::ID_TOGGLESHOWN);
+  new FXMenuSeparator(viewmenu);
+  new FXMenuCheck(viewmenu,tr("Hidden files\t\tShow hidden files."),this,ID_TOGGLE_HIDDEN);
+  new FXMenuCheck(viewmenu,tr("Preview images\t\tPreview images as icons."),filelist,FXFileList::ID_TOGGLE_IMAGES);
 
   // Help menu
   helpmenu=new FXMenuPane(this);
@@ -1053,6 +1055,9 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
       FXProcess process;
       const FXchar* argv[]={pathname.text(),NULL};
       process.start(argv[0],argv);
+
+      FIXME
+      status = posix_spawn(&pid,executable.text(),NULL,NULL,argv,environ);
 */
       }
 
@@ -1684,6 +1689,12 @@ long PathFinderMain::onSigHarvest(FXObject*,FXSelector,void*){
 long PathFinderMain::onCmdToggleHidden(FXObject*,FXSelector,void*){
   dirlist->showHiddenFiles(!filelist->showHiddenFiles());
   filelist->showHiddenFiles(!filelist->showHiddenFiles(),true);
+  if(dirlist->getCurrentItem()){
+    dirlist->makeItemVisible(dirlist->getCurrentItem());
+    }
+  if(filelist->getCurrentItem()>=0){
+    filelist->makeItemVisible(filelist->getCurrentItem());
+    }
   return 1;
   }
 

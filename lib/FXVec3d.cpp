@@ -56,7 +56,7 @@ FXVec3d colorToVec3d(FXColor clr){
 
 // Normalize vector
 FXVec3d normalize(const FXVec3d& v){
-  register FXdouble m=v.length2();
+  FXdouble m=v.length2();
   FXVec3d result(v);
   if(__likely(0.0<m)){ result/=Math::sqrt(m); }
   return result;
@@ -78,6 +78,21 @@ FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,const FXVec3d&
 // Linearly interpolate
 FXVec3d lerp(const FXVec3d& u,const FXVec3d& v,FXdouble f){
   return FXVec3d(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f);
+  }
+
+
+// Rotate vector vec by unit-length axis about angle specified as (ca,sa)
+FXVec3d rotate(const FXVec3d& vec,const FXVec3d& axis,FXdouble ca,FXdouble sa){
+  FXVec3d v1((vec*axis)*axis);
+  FXVec3d v2(axis^vec);
+  FXVec3d v3(vec-v1);
+  return v1+v2*sa+v3*ca;
+  }
+
+
+// Rotate vector vec by unit-length axis about angle ang
+FXVec3d rotate(const FXVec3d& vec,const FXVec3d& axis,FXdouble ang){
+  return rotate(vec,axis,Math::cos(ang),Math::sin(ang));
   }
 
 

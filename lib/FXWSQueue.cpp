@@ -35,6 +35,7 @@
      threads may take() (steal) items of the back of the queue.
    - It is lock-free in that no operating-system calls are used; this solution requires
      atomic operations however.
+   - This is a version of the Chase-Lev work-stealing queue. 
 */
 
 using namespace FX;
@@ -87,8 +88,8 @@ FXbool FXWSQueue::isEmpty() const {
 
 // Push task
 FXbool FXWSQueue::push(FXptr ptr){
-  FXuint mask=getSize()-1;
-  FXuint t=top;
+  FXival mask=getSize()-1;
+  FXival t=top;
   if(__likely((bot-t)<mask)){
     list[bot&mask]=ptr;
     bot++;
@@ -101,11 +102,11 @@ FXbool FXWSQueue::push(FXptr ptr){
 
 // Pop task
 FXbool FXWSQueue::pop(FXptr& ptr){
-  FXuint mask=getSize()-1;
-  FXuint b=bot-1;
+  FXival mask=getSize()-1;
+  FXival b=bot-1;
   bot=b;
   atomicThreadFence();
-  FXuint t=top;
+  FXival t=top;
   if(t<=b){
     ptr=list[b&mask];
     if(t==b){
@@ -129,10 +130,10 @@ FXbool FXWSQueue::pop(FXptr& ptr){
 
 // Take (steal) task
 FXbool FXWSQueue::take(FXptr& ptr){
-  FXuint mask=getSize()-1;
-  FXuint t=top;
+  FXival mask=getSize()-1;
+  FXival t=top;
   atomicThreadFence();
-  FXuint b=bot;
+  FXival b=bot;
   if(__likely(t<b)){
     ptr=list[t&mask];
     if(atomicBoolCas(&top,t,t+1)){

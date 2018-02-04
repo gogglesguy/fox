@@ -152,7 +152,7 @@ void FXStatusBar::layout(){
   // Child spacing
   if(numc>1) remain-=hspacing*(numc-1);
 
-  // Substract corner width
+  // Subtract corner width
   if((options&STATUSBAR_WITH_DRAGCORNER) && (numc>1)){
     right-=corner->getDefaultWidth();
     remain-=corner->getDefaultWidth();

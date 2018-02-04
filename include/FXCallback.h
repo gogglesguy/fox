@@ -87,7 +87,7 @@ public:
   inline void connect(){ method=&function_call<fn>; object=NULL; }
 
   // Return trye if connected
-  bool connected() const { return !!method; }
+  bool connected() const { return (method!=&default_call); }
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
@@ -151,7 +151,7 @@ public:
   inline void connect(){ method=&function_call<fn>; object=NULL; }
 
   // Return trye if connected
-  bool connected() const { return !!method; }
+  bool connected() const { return (method!=&default_call); }
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
@@ -215,7 +215,7 @@ public:
   inline void connect(){ method=&function_call<fn>; object=NULL; }
 
   // Return trye if connected
-  bool connected() const { return !!method; }
+  bool connected() const { return (method!=&default_call); }
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
@@ -279,7 +279,7 @@ public:
   inline void connect(){ method=&function_call<fn>; object=NULL; }
 
   // Return trye if connected
-  bool connected() const { return !!method; }
+  bool connected() const { return (method!=&default_call); }
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
@@ -343,7 +343,7 @@ public:
   inline void connect(){ method=&function_call<fn>; object=NULL; }
 
   // Return trye if connected
-  bool connected() const { return !!method; }
+  bool connected() const { return (method!=&default_call); }
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }

@@ -116,6 +116,7 @@ int main(int,char*[]){
   // Reading strings
   for(x=0; x<ARRAYNUMBER(stringformat); x++){
     for(y=0; y<ARRAYNUMBER(stringinputs); y++){
+      memset(buf,0,sizeof(buf));
       res=__sscanf(stringinputs[y],stringformat[x],buf);
       fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d str=%s\n",stringformat[x],stringinputs[y],res,buf);
       }

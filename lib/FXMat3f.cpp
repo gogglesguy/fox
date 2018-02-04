@@ -373,7 +373,7 @@ FXMat3f& FXMat3f::operator+=(const FXMat3f& w){
   }
 
 
-// Substract matrices
+// Subtract matrices
 FXMat3f& FXMat3f::operator-=(const FXMat3f& w){
 #if defined(FOX_HAS_AVX)
   _mm256_storeu_ps(&m[0][0],_mm256_sub_ps(_mm256_loadu_ps(&m[0][0]),_mm256_loadu_ps(&w[0][0])));

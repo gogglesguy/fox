@@ -81,7 +81,6 @@
     the visual stuff changed setListStyle().
   - Since '\0' is no longer special in FXString, perhaps we can replace the function
     of '\t' with '\0'.  This would be significantly more efficient.
-  - FIXME resizing header partitions shouldn't cause full recalc().
 */
 
 
@@ -1522,11 +1521,11 @@ void FXIconList::lassoChanged(FXint ox,FXint oy,FXint ow,FXint oh,FXint nx,FXint
   FXint x0,y0,x1,y1,rlo,rhi,clo,chi,r,c;
   FXint ohit,nhit,index;
   if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
-    
-    // Union rectangle    
+
+    // Union rectangle
     x0=FXMIN(ox,nx); x1=FXMAX(ox+ow,nx+nw);
     y0=FXMIN(oy,ny); y1=FXMAX(oy+oh,ny+nh);
-  
+
     // Affected row range
     rlo=(y0-pos_y)/itemHeight; if(rlo<0) rlo=0;
     rhi=(y1-pos_y)/itemHeight; if(rhi>=nrows) rhi=nrows-1;
@@ -1534,7 +1533,7 @@ void FXIconList::lassoChanged(FXint ox,FXint oy,FXint ow,FXint oh,FXint nx,FXint
     // Affected column range
     clo=(x0-pos_x)/itemWidth; if(clo<0) clo=0;
     chi=(x1-pos_x)/itemWidth; if(chi>=ncols) chi=ncols-1;
-    
+
     // Change selection
     for(r=rlo; r<=rhi; r++){
       for(c=clo; c<=chi; c++){

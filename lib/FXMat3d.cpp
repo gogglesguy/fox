@@ -400,7 +400,7 @@ FXMat3d& FXMat3d::operator+=(const FXMat3d& w){
   }
 
 
-// Substract matrices
+// Subtract matrices
 FXMat3d& FXMat3d::operator-=(const FXMat3d& w){
 #if defined(FOX_HAS_AVX)
   _mm256_storeu_pd(&m[0][0],_mm256_sub_pd(_mm256_loadu_pd(&m[0][0]),_mm256_loadu_pd(&w[0][0])));

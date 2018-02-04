@@ -140,7 +140,6 @@ inline FXVec2f hi(const FXVec2f& a,const FXVec2f& b){return FXVec2f(Math::fmax(a
 
 /// Normalize vector
 extern FXAPI FXVec2f normalize(const FXVec2f& v);
-extern FXAPI FXVec2f fastnormalize(const FXVec2f& v);
 
 /// Linearly interpolate
 extern FXAPI FXVec2f lerp(const FXVec2f& u,const FXVec2f& v,FXfloat f);

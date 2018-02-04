@@ -517,7 +517,8 @@ namespace {
 enum {
   FLG_WORST  = 0,           // Worst case
   FLG_WIDTH  = 1,           // Matches >=1 character
-  FLG_SIMPLE = 2            // Simple
+  FLG_SIMPLE = 2,           // Simple
+  FLG_ATOMIC = 4            // Atomic
   };
 
 
@@ -540,7 +541,11 @@ enum {
   OP_JUMP,              // Jump to another location
   OP_BRANCH,            // Jump after trying following code, recursive
   OP_BRANCHREV,         // Jump before trying following code, recursive
-  OP_ATOMIC,            // Atomic subgroup
+  OP_ATOMIC,            // Match atomic subgroup
+  OP_IF,                // Optionally match subgroup, with no backtrack
+  OP_WHILE,             // Zero or more times, match wubgroup, with no backtrack
+  OP_UNTIL,             // One or more times, match wubgroup, with no backtrack
+  OP_FOR,               // Repeat minimum and maximum times, no backtrack
 
   // Assertions
   OP_NOT_EMPTY,         // Match not empty
@@ -913,6 +918,7 @@ public:
   FXuchar* insert(FXuchar *ptr,FXuchar op);
   FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg);
   FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg1,FXshort arg2);
+  FXuchar* insert(FXuchar *ptr,FXuchar op,FXshort arg1,FXshort arg2,FXshort arg3);
 
   // Patch branches
   void patch(FXuchar *fm,FXuchar *to);
@@ -1017,34 +1023,35 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
   // Process atom
   if((err=atom(flags,smin,smax))) return err;
 
-  // Followed by repetition
+  // Check if atom is followed by repetition
   if((ch=*pat)=='*' || ch=='+' || ch=='?' || ch=='{'){
-    pat++;
 
     // Repeats may not match empty
     if(!(flags&FLG_WIDTH)) return FXRex::ErrNoAtom;
 
+    pat++;
+
     // Handle repetition type
     switch(ch){
-      case '*':                         // Repeat E [0..INF>
+      case '*':                                         // Repeat E [0..INF>
         rep_min=0;
         rep_max=ONEINDIG;
         smin=0;
         smax=ONEINDIG;
-        flags&=~FLG_WIDTH;              // No width!
+        flags&=~FLG_WIDTH;                              // No width!
         break;
-      case '+':                         // Repeat E [1..INF>
+      case '+':                                         // Repeat E [1..INF>
         rep_min=1;
         rep_max=ONEINDIG;
         smax=ONEINDIG;
         break;
-      case '?':                         // Repeat E [0..1]
+      case '?':                                         // Repeat E [0..1]
         rep_min=0;
         rep_max=1;
         smin=0;
-        flags&=~FLG_WIDTH;              // No width!
+        flags&=~FLG_WIDTH;                              // No width!
         break;
-      case '{':                         // Repeat E [N..M]
+      case '{':                                         // Repeat E [N..M]
         rep_min=0;
         rep_max=ONEINDIG;
         if(*pat!='}'){
@@ -1062,41 +1069,43 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
                 }
               }
             }
-          if(rep_max<=0) return FXRex::ErrCount;          // Bad count
-          if(rep_max>ONEINDIG) return FXRex::ErrCount;    // Bad count
-          if(rep_min>rep_max) return FXRex::ErrRange;     // Illegal range
+          if(rep_max<=0) return FXRex::ErrCount;        // Bad count
+          if(rep_max>ONEINDIG) return FXRex::ErrCount;  // Bad count
+          if(rep_min>rep_max) return FXRex::ErrRange;   // Illegal range
           }
-        if(*pat!='}') return FXRex::ErrBrace;             // Unmatched brace
+        if(*pat!='}') return FXRex::ErrBrace;           // Unmatched brace
         pat++;
         smin=rep_min*smin;
         smax=FXMIN(rep_max*smax,ONEINDIG);
-        if(!rep_min) flags&=~FLG_WIDTH; // No width!
+        if(!rep_min) flags&=~FLG_WIDTH;                 // No width!
         break;
       }
 
     // Handle greedy, lazy, or possessive forms
-    if(*pat=='?'){      // Lazy
-      greediness=LAZY; pat++;
+    if(*pat=='?'){
+      pat++;
+      greediness=LAZY;
       }
-    else if(*pat=='+'){ // Possessive
-      greediness=GRABBY; pat++;
+    else if(*pat=='+'){
+      pat++;
+      greediness=GRABBY;
       }
 
-    // Handle only non-trivial cases
-    if(rep_min!=1 || rep_max!=1){
+    // Non-trivial repetition?
+    if(!(rep_min==1 && rep_max==1)){
 
       // For simple repeats we prefix the last operation
       if(flags&FLG_SIMPLE){
-        if(rep_min==0 && rep_max==ONEINDIG){
+        if(rep_min==0 && rep_max==ONEINDIG){            // *
           insert(ptr,OP_STAR+greediness);
           }
-        else if(rep_min==1 && rep_max==ONEINDIG){
+        else if(rep_min==1 && rep_max==ONEINDIG){       // +
           insert(ptr,OP_PLUS+greediness);
           }
-        else if(rep_min==0 && rep_max==1){
+        else if(rep_min==0 && rep_max==1){              // ?
           insert(ptr,OP_QUEST+greediness);
           }
-        else{
+        else{                                           // {M,N}
           insert(ptr,OP_REP+greediness,rep_min,rep_max);
           }
         }
@@ -1104,38 +1113,73 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
       // For complex repeats we build loop constructs
       else{
         if(greediness==GRABBY){
-          return FXRex::ErrSupport;             // FIXME for now, not supported
+          if(rep_min==0 && rep_max==ONEINDIG){          // (...)*+
+            /*
+            **
+            ** --WHILE--(...)--T--+--
+            **     \______________|
+            */
+            insert(ptr,OP_WHILE,pc-ptr+3);
+            append(OP_PASS);
+            }
+          else if(rep_min==1 && rep_max==ONEINDIG){     // (...)++
+            /*
+            **
+            ** --UNTIL--(...)--T--+--
+            **      \_____________|
+            */
+            insert(ptr,OP_UNTIL,pc-ptr+3);
+            append(OP_PASS);
+            }
+          else if(rep_min==0 && rep_max==1){            // (...)?+
+            /*
+            **
+            ** --IF--(...)--T--+--
+            **    \____________|
+            */
+            insert(ptr,OP_IF,pc-ptr+3);
+            append(OP_PASS);
+            }
+          else{                                         // (...){M,N}+
+            /*
+            **
+            ** --FOR--(...)--T--+--
+            **    \_____________|
+            */
+            insert(ptr,OP_FOR,pc-ptr+7,rep_min,rep_max);
+            append(OP_PASS);
+            }
           }
         else{
-          if(rep_min==0 && rep_max==ONEINDIG){
+          if(rep_min==0 && rep_max==ONEINDIG){        // (...)*
             /*    ________
             **   |        \
-            ** --B--(...)--J--+--                 (...){0,ONEINDIG}
+            ** --B--(...)--J--+--
             **    \___________|
             */
             insert(ptr,greediness?OP_BRANCHREV:OP_BRANCH,pc-ptr+5);
             append(OP_JUMP,ptr-pc-1);
             }
-          else if(rep_min==1 && rep_max==ONEINDIG){
+          else if(rep_min==1 && rep_max==ONEINDIG){   // (...)+
             /*    ________
             **   |        \
-            ** --+--(...)--B--                    (...){1,ONEINDIG}
+            ** --+--(...)--B--
             **
             */
             append(greediness?OP_BRANCH:OP_BRANCHREV,ptr-pc-1);
             }
-          else if(rep_min==0 && rep_max==1){
+          else if(rep_min==0 && rep_max==1){          // (...)?
             /*
             **
-            ** --B--(...)--+--                    (...){0,1}
+            ** --B--(...)--+--
             **    \________|
             */
             insert(ptr,greediness?OP_BRANCHREV:OP_BRANCH,pc-ptr+2);
             }
-          else if(0<rep_min && rep_min==rep_max){
+          else if(0<rep_min && rep_min==rep_max){     // (...){M,N}, where M>0
             /*       ___________
             **      |           \
-            ** --Z--+--(...)--I--L--              (...){n,n}
+            ** --Z--+--(...)--I--L--
             **
             */
             if(nbra>=NSUBEXP) return FXRex::ErrComplex;
@@ -1144,10 +1188,10 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
             append(OP_JUMPLT_0+nbra,rep_min,ptr-pc-2);
             nbra++;
             }
-          else if(rep_min==0 && rep_max<ONEINDIG){
+          else if(rep_min==0 && rep_max<ONEINDIG){    // (...){0,N}, while N finite
             /*       ___________
             **      |           \
-            ** --Z--B--(...)--I--L--+--           (...){0,n}
+            ** --Z--B--(...)--I--L--+--
             **       \______________|
             */
             if(nbra>=NSUBEXP) return FXRex::ErrComplex;
@@ -1157,11 +1201,11 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
             append(OP_JUMPLT_0+nbra,rep_max,ptr-pc-2);
             nbra++;
             }
-          else if(0<rep_min && rep_max==ONEINDIG){
+          else if(0<rep_min && rep_max==ONEINDIG){    // (...){M,}, where M>0
             /*       ________________
             **      |   ___________  \
             **      |  |           \  \
-            ** --Z--+--+--(...)--I--L--B--        (...){n,ONEINDIG}
+            ** --Z--+--+--(...)--I--L--B--
             */
             if(nbra>=NSUBEXP) return FXRex::ErrComplex;
             insert(ptr,OP_ZERO_0+nbra);
@@ -1170,11 +1214,11 @@ FXRex::Error FXCompile::piece(FXshort& flags,FXshort& smin,FXshort& smax){
             append(greediness?OP_BRANCH:OP_BRANCHREV,ptr-pc);
             nbra++;
             }
-          else{
+          else{                                         // (...){M,N}
             /*       ___________________
             **      |   ___________     \
             **      |  |           \     \
-            ** --Z--+--+--(...)--I--L--G--B--+--  (...){n,m}
+            ** --Z--+--+--(...)--I--L--G--B--+--
             **                          \____|
             */
             if(nbra>=NSUBEXP) return FXRex::ErrComplex;
@@ -1205,7 +1249,8 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
   flags=FLG_WORST;                                      // Assume the worst
   switch(*pat){
     case '(':                                           // Subexpression grouping
-      if(*++pat=='?'){
+      pat++;
+      if(*pat=='?'){
         if((ch=*++pat)==':'){                           // Non capturing parentheses
           pat++;
           if((err=expression(flags,smin,smax))) return err;
@@ -1220,25 +1265,33 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
           if((err=expression(flags,smin,smax))) return err;
           mode=save;                                    // Restore flags
           }
-        else if(ch=='>'){                               // Atomic sub group (possessive match)
+        else if(ch=='>'){                               // Possessive subgroup
           pat++;
-          ptr=append(OP_ATOMIC,0);
+          insert(ptr,OP_ATOMIC,pc-ptr+3);
           if((err=expression(flags,smin,smax))) return err;
           append(OP_PASS);
-          patch(ptr+1,pc);                              // If subgroup matches, go here!
           }
-        else if(ch=='<'){                               // Positive or negative look-behind
-          if((ch=*++pat)=='='){
-            pat++;
-            ptr=append(OP_BEHIND_POS,0,0);
-            }
-          else if(ch=='!'){
-            pat++;
-            ptr=append(OP_BEHIND_NEG,0,0);
-            }
-          else{
-            return FXRex::ErrToken;
-            }
+        else if(ch=='='){                               // Positive look ahead
+          pat++;
+          ptr=append(OP_AHEAD_POS,0);
+          if((err=expression(flags,smin,smax))) return err;
+          append(OP_PASS);
+          patch(ptr+1,pc);
+          flags=FLG_WORST;                              // Look ahead has no width!
+          smin=smax=0;
+          }
+        else if(ch=='!'){                               // Negative look ahead
+          pat++;
+          ptr=append(OP_AHEAD_NEG,0);
+          if((err=expression(flags,smin,smax))) return err;
+          append(OP_PASS);
+          patch(ptr+1,pc);
+          flags=FLG_WORST;                              // Look ahead has no width!
+          smin=smax=0;
+          }
+        else if(ch=='<' && *(pat+1)=='='){              // Positive look-behind
+          pat+=2;
+          ptr=append(OP_BEHIND_POS,0,0);
           if((err=expression(flags,smin,smax))) return err;
           if(smin!=smax || smax==ONEINDIG) return FXRex::ErrBehind;
           append(OP_PASS);
@@ -1247,23 +1300,19 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
           flags=FLG_WORST;                              // Look behind has no width!
           smin=smax=0;
           }
-        else{
-          if(ch=='='){                                  // Positive look ahead
-            pat++;
-            ptr=append(OP_AHEAD_POS,0);
-            }
-          else if(ch=='!'){                             // Negative look ahead
-            pat++;
-            ptr=append(OP_AHEAD_NEG,0);
-            }
-          else{
-            return FXRex::ErrToken;
-            }
+        else if(ch=='<' && *(pat+1)=='!'){              // Negative look-behind
+          pat+=2;
+          ptr=append(OP_BEHIND_NEG,0,0);
           if((err=expression(flags,smin,smax))) return err;
+          if(smin!=smax || smax==ONEINDIG) return FXRex::ErrBehind;
           append(OP_PASS);
-          patch(ptr+1,pc);                              // If trailing context matches (fails), go here!
-          flags=FLG_WORST;                              // Look ahead has no width!
+          fix(ptr+1,smax);                              // Fix up lookbehind size
+          patch(ptr+3,pc);                              // If trailing context matches (fails), go here!
+          flags=FLG_WORST;                              // Look behind has no width!
           smin=smax=0;
+          }
+        else{                                           // Bad token
+          return FXRex::ErrToken;
           }
         }
       else{
@@ -1304,6 +1353,8 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
       return FXRex::ErrOK;
     case '\\':                                          // Escape sequences which are NOT part of simple character-run
       switch((ch=*++pat)){
+        case '\0':                                      // Unexpected pattern end
+          return FXRex::ErrNoAtom;
         case 'w':                                       // Word character
           pat++;
           append(OP_WORD);
@@ -1486,8 +1537,6 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
             goto s;
             }
           goto s;
-        case '\0':                                      // Unexpected pattern end
-          return FXRex::ErrNoAtom;
         default:                                        // Single escaped characters should match exactly
           pat++;
 s:        append(OP_CHAR);
@@ -1791,6 +1840,20 @@ FXuchar* FXCompile::insert(FXuchar *ptr,FXuchar op,FXshort arg1,FXshort arg2){
   }
 
 
+// Insert three-argument opcode at ptr
+FXuchar* FXCompile::insert(FXuchar *ptr,FXuchar op,FXshort arg1,FXshort arg2,FXshort arg3){
+  if(code){
+    memmove(ptr+7,ptr,pc-ptr);
+    SETOP(ptr,op);
+    SETARG(ptr+1,arg1);
+    SETARG(ptr+3,arg2);
+    SETARG(ptr+5,arg3);
+    }
+  pc+=7;
+  return ptr;
+  }
+
+
 // Patch linked set of branches or jumps
 // Example:
 //
@@ -1895,7 +1958,7 @@ static FXbool isinset(const FXchar* set,const FXchar* wcs){
 // The workhorse
 FXbool FXExecute::match(const FXuchar* prog){
   if(recs<MAXRECURSION){
-    FXint op,no,max,keep,rep_min,rep_max,greediness;
+    FXint op,no,keep,rep_min,rep_max,greediness;
     const FXchar *save,*beg,*end;
     const FXuchar *ptr;
     FXwchar ch;
@@ -1925,9 +1988,40 @@ nxt:op=*prog++;
         str=save;
         prog+=2;
         goto nxt;
-      case OP_ATOMIC:
+      case OP_ATOMIC:                           // Atomic subgroup
         if(!match(prog+2)) goto f;
-        prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
+        prog=prog+GETARG(prog);
+        goto nxt;
+      case OP_IF:                               // Possessive match of subgroup
+        save=str;
+        if(match(prog+2)){
+          save=str;
+          }
+        str=save;
+        prog=prog+GETARG(prog);
+        goto nxt;
+      case OP_UNTIL:                            // Possessively match subgroup 1 or more times
+        if(!match(prog+2)) goto f;
+        /*FALL*/
+      case OP_WHILE:                            // Possessively match subgroup 0 or more times
+        save=str;
+        while(match(prog+2)){
+          save=str;
+          }
+        str=save;
+        prog=prog+GETARG(prog);
+        goto nxt;
+      case OP_FOR:                              // Possessive match subgroup min...max times
+        rep_min=GETARG(prog+2);
+        rep_max=GETARG(prog+4);
+        save=str;
+        for(no=0; no<rep_max; ++no){
+          if(!match(prog+6)) break;
+          save=str;
+          }
+        str=save;
+        if(no<rep_min) goto f;
+        prog=prog+GETARG(prog);
         goto nxt;
       case OP_NOT_EMPTY:                        // Assert not empty
         if(str==anc) goto f;
@@ -2337,66 +2431,66 @@ nxt:op=*prog++;
         str=wcinc(str);                         // Safe increment
         goto nxt;
       case OP_MIN_PLUS:                         // Lazy one or more repetitions
-        rep_min=max=1;
+        rep_min=1;
         rep_max=INT_MAX;
         greediness=LAZY;
         goto rep;
       case OP_POS_PLUS:                         // Possessive one or more repetitions
         rep_min=1;
-        rep_max=max=INT_MAX;
+        rep_max=INT_MAX;
         greediness=GRABBY;
         goto rep;
       case OP_PLUS:                             // Greedy one or more repetitions
         rep_min=1;
-        rep_max=max=INT_MAX;
+        rep_max=INT_MAX;
         greediness=GREEDY;
         goto rep;
       case OP_MIN_QUEST:                        // Lazy zero or one
-        rep_min=max=0;
+        rep_min=0;
         rep_max=1;
         greediness=LAZY;
         goto rep;
       case OP_POS_QUEST:                        // Possessive zero or one
         rep_min=0;
-        rep_max=max=1;
+        rep_max=1;
         greediness=GRABBY;
         goto rep;
       case OP_QUEST:                            // Greedy zero or one
         rep_min=0;
-        rep_max=max=1;
+        rep_max=1;
         greediness=GREEDY;
         goto rep;
       case OP_MIN_REP:                          // Lazy bounded repeat
-        rep_min=max=GETARG(prog+0);
+        rep_min=GETARG(prog+0);
         rep_max=GETARG(prog+2);
         prog+=4;
         greediness=LAZY;
         goto rep;
       case OP_POS_REP:                          // Possessive bounded repeat
         rep_min=GETARG(prog+0);
-        rep_max=max=GETARG(prog+2);
+        rep_max=GETARG(prog+2);
         prog+=4;
         greediness=GRABBY;
         goto rep;
       case OP_REP:                              // Greedy bounded repeat
         rep_min=GETARG(prog+0);
-        rep_max=max=GETARG(prog+2);
+        rep_max=GETARG(prog+2);
         prog+=4;
         greediness=GREEDY;
         goto rep;
       case OP_MIN_STAR:                         // Lazy zero or more repetitions
-        rep_min=max=0;
+        rep_min=0;
         rep_max=INT_MAX;
         greediness=LAZY;
         goto rep;
       case OP_POS_STAR:                         // Possessive zero or more repetitions
         rep_min=0;
-        rep_max=max=INT_MAX;
+        rep_max=INT_MAX;
         greediness=GRABBY;
         goto rep;
       case OP_STAR:                             // Greedy zero or more repetitions
         rep_min=0;
-        rep_max=max=INT_MAX;
+        rep_max=INT_MAX;
         greediness=GREEDY;
 rep:    if(str+rep_min>str_end) goto f;         // Can't possibly succeed
         beg=str;
@@ -2407,7 +2501,6 @@ rep:    if(str+rep_min>str_end) goto f;         // Can't possibly succeed
             while(str<str_end && *str!='\n' && no<rep_max){ ++str; ++no; }
             goto asc;
           case OP_ANY_NL:
-            //if(str+max-no<=str_end){no=max;str+=max-no;}else{no+=str_end-str;str=str_end;}
             while(str<str_end && no<rep_max){ ++str; ++no; }
             goto asc;
           case OP_ANY_OF:
@@ -2664,7 +2757,7 @@ asc:    if(no<rep_min) goto f;
           keep=match(prog+2);                   // Match the assertion
           str=save;
           }
-        if((op-OP_BEHIND_NEG!=keep)) goto f;        // Didn't get what we expected
+        if((op-OP_BEHIND_NEG!=keep)) goto f;    // Didn't get what we expected
         prog=prog+GETARG(prog);                 // Jump to code after OP_PASS
         goto nxt;
       case OP_SUB_BEG_0:                        // Capturing open parentheses
@@ -3082,6 +3175,8 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
 
   // Free old code
   clear();
+
+  FXASSERT(OP_LAST<=256);
 
   // Check
   if(pattern){

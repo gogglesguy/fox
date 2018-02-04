@@ -70,7 +70,7 @@ class FXFont;
 * center, left-adjust, or right-adjust the document.
 * Finally, a special option exists to stretch the document to the
 * available space, that is to say, the document will always be fitten
-* with given left and right edges substracted from the available space.
+* with given left and right edges subtracted from the available space.
 */
 class FXAPI FXRuler : public FXFrame {
   FXDECLARE(FXRuler)

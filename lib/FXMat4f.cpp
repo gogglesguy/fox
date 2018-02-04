@@ -409,7 +409,7 @@ FXMat4f& FXMat4f::operator+=(const FXMat4f& s){
   }
 
 
-// Substract matrices
+// Subtract matrices
 FXMat4f& FXMat4f::operator-=(const FXMat4f& s){
 #if defined(FOX_HAS_AVX)
   _mm256_storeu_ps(&m[0][0],_mm256_sub_ps(_mm256_loadu_ps(&m[0][0]),_mm256_loadu_ps(&s[0][0])));

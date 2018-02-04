@@ -88,35 +88,9 @@ FXfloat dot(const FXVec3f& u,const FXVec3f& v){
   }
 
 
-#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
-
-static inline FXfloat rsqrtf(FXfloat r){
-  register FXfloat q=r;
-  asm volatile("rsqrtss %0, %0" : "=x" (q) : "0" (q) );
-  return (r*q*q-3.0f)*q*-0.5f;
-  }
-
-#else
-
-static inline FXfloat rsqrtf(FXfloat r){
-  return 1.0f/Math::sqrt(r);
-  }
-
-#endif
-
-
-// Fast normalize vector
-FXVec3f fastnormalize(const FXVec3f& v){
-  register FXfloat m=dot(v,v);
-  FXVec3f result(v);
-  if(__likely(FLT_MIN<m)){ result*=rsqrtf(m); }
-  return result;
-  }
-
-
 // Normalize vector
 FXVec3f normalize(const FXVec3f& v){
-  register FXfloat m=dot(v,v);
+  FXfloat m=v.length2();
   FXVec3f result(v);
   if(__likely(0.0f<m)){ result/=Math::sqrt(m); }
   return result;
@@ -138,6 +112,21 @@ FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f&
 // Linearly interpolate
 FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f){
   return FXVec3f(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f);
+  }
+
+
+// Rotate vector vec by unit-length axis about angle specified as (ca,sa)
+FXVec3f rotate(const FXVec3f& vec,const FXVec3f& axis,FXfloat ca,FXfloat sa){
+  FXVec3f v1((vec*axis)*axis);
+  FXVec3f v2(axis^vec);
+  FXVec3f v3(vec-v1);
+  return v1+v2*sa+v3*ca;
+  }
+
+
+// Rotate vector by unit-length axis about angle ang
+FXVec3f rotate(const FXVec3f& vector,const FXVec3f& axis,FXfloat ang){
+  return rotate(vector,axis,Math::cos(ang),Math::sin(ang));
   }
 
 

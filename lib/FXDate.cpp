@@ -144,7 +144,7 @@ void FXDate::getDate(FXint& yr,FXint& mo,FXint& dy) const {
 
 // Set date from nanoseconds since 1/1/1970
 void FXDate::setTime(FXTime ns){
-  julian=UNIX_EPOCH_JDAY+ns/(86400L*seconds);
+  julian=(FXuint)(UNIX_EPOCH_JDAY+ns/(86400L*seconds));
   }
 
 

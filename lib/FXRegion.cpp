@@ -228,7 +228,7 @@ FXRegion& FXRegion::operator*=(const FXRegion& r){
   }
 
 
-// Substract region r from this one
+// Subtract region r from this one
 FXRegion& FXRegion::operator-=(const FXRegion& r){
 #ifdef WIN32
   CombineRgn((HRGN)region,(HRGN)region,(HRGN)r.region,RGN_DIFF);

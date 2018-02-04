@@ -163,6 +163,12 @@ public:
   /// Copy constructor
   FXDictionaryOf(const FXDictionaryOf<TYPE>& src):FXDictionary(src){ }
 
+  /// Assignment operator
+  FXDictionaryOf<TYPE>& operator=(const FXDictionaryOf<TYPE>& other){ return reinterpret_cast<FXDictionaryOf<TYPE>&>(FXDictionary::operator=(other)); }
+
+  /// Adopt objects from orig, leaving orig empty
+  FXDictionaryOf<TYPE>& adopt(FXDictionaryOf<TYPE>& src){ return reinterpret_cast<FXDictionaryOf<TYPE>&>(FXDictionary::adopt(src)); }
+
   /// Return reference to slot assocated with given key
   TYPE*& at(const FXchar* ky){ return reinterpret_cast<TYPE*&>(FXDictionary::at(ky)); }
 

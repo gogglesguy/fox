@@ -214,7 +214,6 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXLabel(miscellaneouspane,tr("Miscellaneous settings"),NULL,LAYOUT_LEFT);
   new FXHorizontalSeparator(miscellaneouspane,SEPARATOR_LINE|LAYOUT_FILL_X);
   FXMatrix *matrix3=new FXMatrix(miscellaneouspane,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X,0,0,0,0, 4,4,4,4, 4, 4);
-//  FXMatrix *matrix4=new FXMatrix(miscellaneouspane,5,MATRIX_BY_COLUMNS|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 4,4,4,4, 4, 4);
 
   new FXLabel(matrix3,tr("Search paths:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
   searchtext=new FXTextField(matrix3,10,own,TextWindow::ID_SEARCHPATHS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);

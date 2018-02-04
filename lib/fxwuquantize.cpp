@@ -367,8 +367,8 @@ static void mark(box& cube,FXint label,FXuchar map[33][33][33]){
 
 // Wu's quantization method based on recursive partitioning
 FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors){
-  FXint i,k,weight,next,size,r,g,b;
-  FXfloat temp;
+  FXint    i,k,weight,next,size,r,g,b;
+  FXfloat  temp;
   FXuchar  map[33][33][33];
   FXfloat  vv[MAXCOLOR];
   box      cube[MAXCOLOR];
@@ -428,7 +428,7 @@ FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& act
       }
     }
 
-  // Build histogram
+  // Quantize image
   for(i=0; i<size; ++i){
     r=((const FXuchar*)(src+i))[2];
     g=((const FXuchar*)(src+i))[1];

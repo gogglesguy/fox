@@ -17,6 +17,45 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 22 - FOX DEVELOPMENT 1.7.61
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Regular expression now supports non-simple possessive matching.</li>
+<li>Possible signed character issues fixed in fxscanf.</li>
+<li>Some better feedback in Adie while searching patterns in multiple files.</li>
+<li>Find in files in Adie remembers last-used patterns and folders.</li>
+<li>APIs added to FXText to manage virtual columns (columns past end of line).  This will be needed
+for block select operations.</li>
+<li>FXIconList lasso speedup, especially when YUGE numbers of files in a folder.</li>
+<li>Minor PathFinder spruce-ups.</li>
+<li>New APIs in FXPath: parseArgs() builds argv vector from command line, suitable to passing to execve() (etc.) 
+system calls (or FXProcess).</li>
+<li>Improved enquote() and dequote() for UNIX in FXPath.</li>
+<li>In Adie, ShellCommand now kicks off sub-command w/o needing a shell; uses new API parseArgs() to
+assemble command and start sub-process with it.</li>
+<li>Minor fixes in FXCallback template.</li>
+<li>Added rotate() to FXVec3d and FXVec3f.</li>
+<li>Added additional APIs to FXAtomic.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 19 - FOX STABLE 1.6.55
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Fix FXMemoryStream position() API: error code was set moving stream position to end of buffer.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 May 17 - FOX DEVELOPMENT 1.7.60
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

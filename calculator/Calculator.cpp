@@ -1862,7 +1862,7 @@ long Calculator::onCmdMemAdd(FXObject*,FXSelector,void*){
   }
 
 
-// Substract from memory
+// Subtract from memory
 long Calculator::onCmdMemSub(FXObject*,FXSelector,void*){
   recall-=getnum();
   modifiers=0;

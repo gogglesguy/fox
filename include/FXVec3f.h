@@ -162,10 +162,15 @@ extern FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,c
 
 /// Normalize vector
 extern FXAPI FXVec3f normalize(const FXVec3f& v);
-extern FXAPI FXVec3f fastnormalize(const FXVec3f& v);
 
 /// Linearly interpolate
 extern FXAPI FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f);
+
+/// Rotate vector vec by unit-length axis about angle specified as (ca,sa)
+extern FXAPI FXVec3f rotate(const FXVec3f& vec,const FXVec3f& axis,FXfloat ca,FXfloat sa);
+
+/// Rotate vector by unit-length axis about angle ang
+extern FXAPI FXVec3f rotate(const FXVec3f& vector,const FXVec3f& axis,FXfloat ang);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3f& v);

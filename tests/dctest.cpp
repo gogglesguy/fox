@@ -1236,7 +1236,7 @@ long DCTestWindow::onPaintShapes(FXObject *sender,FXSelector,void *ptr){
   poly_letter[4].x=15; poly_letter[4].y=53;
   poly_letter[5].x=15; poly_letter[5].y=22;
 
-  // Substract inner O
+  // Subtract inner O
   letter_O -= FXRegion(poly_letter,6);
 
   // Letter X left slant

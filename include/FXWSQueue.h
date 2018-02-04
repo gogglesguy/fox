@@ -27,9 +27,9 @@ namespace FX {
 /// Work-stealing queue
 class FXAPI FXWSQueue {
 private:
-  FXPtrList      list;
-  volatile FXint top;
-  volatile FXint bot;
+  FXPtrList       list;
+  volatile FXival top;
+  volatile FXival bot;
 private:
   FXWSQueue(const FXWSQueue&);
   FXWSQueue &operator=(const FXWSQueue&);

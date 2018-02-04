@@ -591,7 +591,7 @@ void FXTopWindow::place(FXuint placement){
     case PLACEMENT_MAXIMIZED:
       wx=rx;
       wy=ry;
-      ww=rw;                // Yes, I know:- we should substract the borders;
+      ww=rw;                // Yes, I know:- we should subtract the borders;
       wh=rh;                // trouble is, no way to know how big those are....
       break;
 

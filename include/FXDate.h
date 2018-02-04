@@ -181,7 +181,7 @@ public:
   friend inline FXDate operator+(const FXDate& d,FXint x);
   friend inline FXDate operator+(FXint x,const FXDate& d);
 
-  /// Substract dates yielding days
+  /// Subtract dates yielding days
   friend inline FXint operator-(const FXDate& a,const FXDate& b);
 
   /// save to stream

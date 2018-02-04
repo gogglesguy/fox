@@ -37,35 +37,9 @@ using namespace FX;
 namespace FX {
 
 
-#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
-
-static inline FXfloat rsqrtf(FXfloat r){
-  register FXfloat q=r;
-  asm volatile("rsqrtss %0, %0" : "=x" (q) : "0" (q) );
-  return (r*q*q-3.0f)*q*-0.5f;
-  }
-
-#else
-
-static inline FXfloat rsqrtf(FXfloat r){
-  return 1.0f/Math::sqrt(r);
-  }
-
-#endif
-
-
-// Fast normalize vector
-FXVec2f fastnormalize(const FXVec2f& v){
-  register FXfloat m=v.length2();
-  FXVec2f result(v);
-  if(__likely(FLT_MIN<m)){ result*=rsqrtf(m); }
-  return result;
-  }
-
-
 // Normalize vector
 FXVec2f normalize(const FXVec2f& v){
-  register FXfloat m=v.length2();
+  FXfloat m=v.length2();
   FXVec2f result(v);
   if(__likely(0.0f<m)){ result/=Math::sqrt(m); }
   return result;

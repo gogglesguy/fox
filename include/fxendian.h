@@ -125,7 +125,7 @@ static inline FXuint lsb32(FXuint x){
 
 // Isolate least significant bit set
 static inline FXulong lsb64(FXulong x){
-  return FXulong(x&(-FXulong(x)));
+  return FXulong(x&(-FXlong(x)));
   }
 
 
@@ -172,7 +172,7 @@ static inline FXuint clz32(FXuint x){
 #if ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)))
   return __builtin_clz(x);
 #else
-  register unsigned int f,e,d,c,b;
+  FXuint f,e,d,c,b;
   f=!(x&0xffff0000)<<4; x<<=f;
   e=!(x&0xff000000)<<3; x<<=e;
   d=!(x&0xf0000000)<<2; x<<=d;
@@ -188,7 +188,7 @@ static inline FXuint ctz32(FXuint x){
 #if ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)))
   return __builtin_ctz(x);
 #else
-  register unsigned int f,e,d,c,b;
+  FXuint f,e,d,c,b;
   f=!(x&0x0000ffff)<<4; x>>=f;
   e=!(x&0x000000ff)<<3; x>>=e;
   d=!(x&0x0000000f)<<2; x>>=d;

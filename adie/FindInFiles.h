@@ -30,7 +30,6 @@ class FindInFiles;
 class SearchVisitor : public FXGlobVisitor {
 private:
   FindInFiles* dlg;     // Find dialog
-  FXString     base;    // Scan starting from this
   FXRex        rex;     // Regex parser
   FXlong       limit;   // File size limit
 private:
@@ -43,13 +42,10 @@ private:
 public:
 
   // Construct search file for pattern visitor
-  SearchVisitor(FindInFiles* dg):dlg(dg),base(PATHSEPSTRING),limit(100000000L){ }
+  SearchVisitor(FindInFiles* dg):dlg(dg),limit(100000000L){ }
 
   // Traverse files under path and search for pattern in each
   FXuint traverse(const FXString& path,const FXString& pattern,const FXString& wild="*",FXint mode=FXRex::Normal,FXuint opts=FXDir::MatchAll,FXint depth=1000);
-
-  // Get base of traversal
-  const FXString& getBase() const { return base; }
 
   // Set file size limit
   void setLimit(FXlong size);
@@ -72,10 +68,15 @@ protected:
   FXTextField    *filefolder;           // Folder to search
   FXComboBox     *filefilter;           // File filters
   FXToggleButton *pausebutton;          // Pause button
+  FXLabel        *searching;            // Show file being scanned
   FXString        filePattern;          // Search files matching pattern
-  FXString        patternHistory[20];   // Search string history
+  FXString        searchHistory[20];    // Search string history
+  FXuint          patternHistory[20];   // Search wildcard history
   FXuint          optionsHistory[20];   // Search option history
   FXuint          searchmode;           // Search options
+  FXString        savedsearchtext;      // Saved seach text
+  FXuint          savedsearchmode;      // Saved search mode
+  FXuint          savedcurrentpattern;  // Saved search pattern
   FXint           index;                // History index
   FXuint          proceed;              // Flag
   FXbool          firsthit;             // Record only first hit in file
@@ -87,7 +88,7 @@ private:
 private:
   void readRegistry();
   void writeRegistry();
-  void appendHistory(const FXString& patt,FXuint opts);
+  void appendHistory(const FXString& text,FXuint patt,FXuint opts);
 public:
   long onUpdStop(FXObject*,FXSelector,void*);
   long onCmdStop(FXObject*,FXSelector,void*);
@@ -156,7 +157,7 @@ public:
   FXbool continueProcessing();
 
   /// Called by visitor to deposit new search result
-  void appendSearchResult(const FXString& file,const FXString& text,FXint lineno,FXint column);
+  void appendSearchResult(const FXString& relpath,const FXString& text,FXint lineno,FXint column);
 
   /// Clear search results
   void clearSearchResults();
@@ -217,6 +218,12 @@ public:
 
   /// Return true if pattern entry is allowed
   FXbool allowPatternEntry() const;
+
+  /// Update file being scanned
+  void setSearchingText(const FXString& fn);
+
+  /// Read it back
+  FXString getSearchingText() const;
 
   /// Destroy it
   virtual ~FindInFiles();

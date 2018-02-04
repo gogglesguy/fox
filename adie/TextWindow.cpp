@@ -243,6 +243,8 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_WARNCHANGED,TextWindow::onCmdWarnChanged),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TOGGLE_BROWSER,TextWindow::onCmdToggleBrowser),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_BROWSER,TextWindow::onUpdToggleBrowser),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TOGGLE_DOTFILES,TextWindow::onCmdToggleHidden),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_DOTFILES,TextWindow::onUpdToggleHidden),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCHPATHS,TextWindow::onCmdSearchPaths),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATHS,TextWindow::onUpdSearchPaths),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE_SETTINGS,TextWindow::onCmdSaveSettings),
@@ -662,7 +664,7 @@ void TextWindow::createMenubar(){
   new FXMenuCheck(viewmenu,tr("Status line\t\tDisplay status line."),statusbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Undo Counters\t\tShow undo/redo counters on status line."),undoredoblock,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Clock\t\tShow clock on status line."),clock,FXWindow::ID_TOGGLESHOWN);
-  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),dirlist,FXDirList::ID_TOGGLE_HIDDEN);
+  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),this,ID_TOGGLE_DOTFILES);
 
   // Window menu
   windowmenu=new FXMenuPane(this);
@@ -933,6 +935,7 @@ FXbool TextWindow::isEditable() const {
   return editor->isEditable();
   }
 
+/*******************************************************************************/
 
 // Load file
 FXbool TextWindow::loadFile(const FXString& file){
@@ -995,69 +998,6 @@ FXbool TextWindow::loadFile(const FXString& file){
 
         // Mark undo state as clean (saved)
         undolist.mark();
-
-        // Success
-        loaded=true;
-        }
-
-      // Kill wait cursor
-      getApp()->endWaitCursor();
-
-      // Free buffer
-      freeElms(text);
-      }
-    }
-  return loaded;
-  }
-
-
-// Insert file
-FXbool TextWindow::insertFile(const FXString& file){
-  FXFile textfile(file,FXFile::Reading);
-  FXbool loaded=false;
-
-  FXTRACE((100,"insertFile(%s)\n",file.text()));
-
-  // Opened file?
-  if(textfile.isOpen()){
-    FXchar *text; FXint size,n,i,j,k,c;
-
-    // Get file size
-    size=textfile.size();
-
-    // Make buffer to load file
-    if(allocElms(text,size)){
-
-      // Set wait cursor
-      getApp()->beginWaitCursor();
-
-      // Read the file
-      n=textfile.readBlock(text,size);
-      if(0<=n){
-
-        // Strip carriage returns
-        if(stripcr){
-          fxfromDOS(text,n);
-          }
-
-        // Strip trailing spaces
-        if(stripsp){
-          for(i=j=k=0; j<n; i++,j++){
-            c=text[j];
-            if(c=='\n'){
-              i=k;
-              k++;
-              }
-            else if(!Ascii::isSpace(c)){
-              k=i+1;
-              }
-            text[i]=c;
-            }
-          n=i;
-          }
-
-        // Set text
-        editor->insertText(editor->getCursorPos(),text,n,true);
 
         // Success
         loaded=true;
@@ -1184,6 +1124,69 @@ FXbool TextWindow::saveToFile(const FXString& file){
   }
 
 
+// Insert file
+FXbool TextWindow::insertFile(const FXString& file){
+  FXFile textfile(file,FXFile::Reading);
+  FXbool loaded=false;
+
+  FXTRACE((100,"insertFile(%s)\n",file.text()));
+
+  // Opened file?
+  if(textfile.isOpen()){
+    FXchar *text; FXint size,n,i,j,k,c;
+
+    // Get file size
+    size=textfile.size();
+
+    // Make buffer to load file
+    if(allocElms(text,size)){
+
+      // Set wait cursor
+      getApp()->beginWaitCursor();
+
+      // Read the file
+      n=textfile.readBlock(text,size);
+      if(0<=n){
+
+        // Strip carriage returns
+        if(stripcr){
+          fxfromDOS(text,n);
+          }
+
+        // Strip trailing spaces
+        if(stripsp){
+          for(i=j=k=0; j<n; i++,j++){
+            c=text[j];
+            if(c=='\n'){
+              i=k;
+              k++;
+              }
+            else if(!Ascii::isSpace(c)){
+              k=i+1;
+              }
+            text[i]=c;
+            }
+          n=i;
+          }
+
+        // Set text
+        editor->insertText(editor->getCursorPos(),text,n,true);
+
+        // Success
+        loaded=true;
+        }
+
+      // Kill wait cursor
+      getApp()->endWaitCursor();
+
+      // Free buffer
+      freeElms(text);
+      }
+    }
+  return loaded;
+  }
+
+
 // Extract file
 FXbool TextWindow::extractFile(const FXString& file){
   FXFile textfile(file,FXFile::Writing);
@@ -1227,13 +1230,12 @@ FXbool TextWindow::extractFile(const FXString& file){
   return false;
   }
 
+/*******************************************************************************/
 
 // Visit given line
 void TextWindow::visitLine(FXint line,FXint column){
-  FXint start=editor->nextLine(0,line-1);
-  editor->setCursorPos(start);
-  editor->setCenterLine(start);
-  editor->setCursorColumn(column);
+  editor->setCursorRowColumn(line-1,column);
+  editor->setCenterLine(editor->getCursorPos());
   }
 
 
@@ -2262,6 +2264,22 @@ long TextWindow::onUpdToggleBrowser(FXObject* sender,FXSelector,void*){
   }
 
 
+// Toggle hidden files display
+long TextWindow::onCmdToggleHidden(FXObject*,FXSelector,void*){
+  dirlist->showHiddenFiles(!dirlist->showHiddenFiles());
+  if(dirlist->getCurrentItem()){
+    dirlist->makeItemVisible(dirlist->getCurrentItem());
+    }
+  return 1;
+  }
+
+
+// Update toggle hidden files widget
+long TextWindow::onUpdToggleHidden(FXObject* sender,FXSelector,void*){
+  sender->handle(this,dirlist->showHiddenFiles()?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
 /*******************************************************************************/
 
 // Save settings
@@ -2886,10 +2904,9 @@ long TextWindow::onUpdSearchPaths(FXObject* sender,FXSelector,void*){
 // Find in files
 long TextWindow::onCmdFindInFiles(FXObject*,FXSelector,void*){
   FindInFiles *findwindow=new FindInFiles(getApp());
-  findwindow->setSearchText(searchstring);
   findwindow->setPatternList(getPatternList());
-  findwindow->setCurrentPattern(getCurrentPattern());
   findwindow->setDirectory(FXPath::directory(getFilename()));
+  findwindow->setSearchText(searchstring);
   findwindow->create();
   findwindow->show(PLACEMENT_CURSOR);
   return 1;

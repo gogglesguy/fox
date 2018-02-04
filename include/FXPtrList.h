@@ -190,6 +190,9 @@ public:
   /// Assignment operator
   FXPtrListOf<TYPE>& operator=(const FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::operator=(src)); }
 
+  /// Adopt objects from orig, leaving orig empty
+  FXPtrListOf<TYPE>& adopt(FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::adopt(src)); }
+
   /// Indexing operator
   TYPE*& operator[](FXival i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
   TYPE *const& operator[](FXival i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
@@ -209,9 +212,6 @@ public:
   /// Access to content array
   TYPE** data(){ return reinterpret_cast<TYPE**>(ptr); }
   TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
-
-  /// Adopt objects from orig, leaving orig empty
-  FXPtrListOf<TYPE>& adopt(FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::adopt(src)); }
 
   /// Find object in list, searching forward; return position or -1
   FXival find(TYPE* object,FXival pos=0) const { return FXPtrList::find(object,pos); }

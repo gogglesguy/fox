@@ -49,7 +49,7 @@ using namespace FX;
 namespace FX {
 
 
-extern FXbool fxfsquantize(FXuchar* p8,const FXColor* p32,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
+extern FXbool fxfsquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
 
 
 // Floyd-Steinberg quantization full 32 bpp to less than or equal to maxcolors

@@ -278,7 +278,7 @@ FXMat2d& FXMat2d::operator+=(const FXMat2d& s){
   }
 
 
-// Substract matrices
+// Subtract matrices
 FXMat2d& FXMat2d::operator-=(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
   _mm256_storeu_pd(&m[0][0],_mm256_sub_pd(_mm256_loadu_pd(&m[0][0]),_mm256_loadu_pd(&s[0][0])));

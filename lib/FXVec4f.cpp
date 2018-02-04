@@ -63,35 +63,9 @@ FXfloat dot(const FXVec4f& u,const FXVec4f& v){
   }
 
 
-#if defined(__GNUC__) && defined(__linux__) && defined(__x86_64__)
-
-static inline FXfloat rsqrtf(FXfloat r){
-  register FXfloat q=r;
-  asm volatile("rsqrtss %0, %0" : "=x" (q) : "0" (q) );
-  return (r*q*q-3.0f)*q*-0.5f;
-  }
-
-#else
-
-static inline FXfloat rsqrtf(FXfloat r){
-  return 1.0f/Math::sqrt(r);
-  }
-
-#endif
-
-
-// Fast normalize vector
-FXVec4f fastnormalize(const FXVec4f& v){
-  register FXfloat m=dot(v,v);
-  FXVec4f result(v);
-  if(__likely(FLT_MIN<m)){ result*=rsqrtf(m); }
-  return result;
-  }
-
-
 // Normalize vector
 FXVec4f normalize(const FXVec4f& v){
-  register FXfloat m=dot(v,v);
+  FXfloat m=v.length2();
   FXVec4f result(v);
   if(__likely(0.0f<m)){ result/=Math::sqrt(m); }
   return result;

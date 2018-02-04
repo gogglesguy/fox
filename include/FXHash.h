@@ -173,6 +173,12 @@ public:
   /// Copy constructor
   FXHashOf(const FXHashOf<KEYTYPE,VALUETYPE>& src):FXHash(src){}
 
+  /// Assignment operator
+  FXHashOf<KEYTYPE,VALUETYPE>& operator=(const FXHashOf<KEYTYPE,VALUETYPE>& other){ return reinterpret_cast<FXHashOf<KEYTYPE,VALUETYPE>&>(FXHash::operator=(other)); }
+
+  /// Adopt objects from orig, leaving orig empty
+  FXHashOf<KEYTYPE,VALUETYPE>& adopt(FXHashOf<KEYTYPE,VALUETYPE>& src){ return reinterpret_cast<FXHashOf<KEYTYPE,VALUETYPE>&>(FXHash::adopt(src)); }
+
   /// Return reference to slot assocated with given key
   VALUETYPE*& at(KEYTYPE* name){ return (VALUETYPE*&)FXHash::at((FXptr)name); }
 

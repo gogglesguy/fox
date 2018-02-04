@@ -52,6 +52,9 @@ public:
   /// Assignment operator
   FXObjectList& operator=(const FXObjectList& orig);
 
+  /// Adopt objects from orig, leaving orig empty
+  FXObjectList& adopt(FXObjectList& orig);
+
   /// Return number of objects
   FXival no() const { return *((FXival*)(ptr-1)); }
 
@@ -77,9 +80,6 @@ public:
   /// Access to content array
   FXObject** data(){ return ptr; }
   FXObject *const * data() const { return ptr; }
-
-  /// Adopt objects from orig, leaving orig empty
-  FXObjectList& adopt(FXObjectList& orig);
 
   /// Find object in list, searching forward; return position or -1
   FXival find(const FXObject *object,FXival pos=0) const;
@@ -199,6 +199,9 @@ public:
   /// Assignment operator
   FXObjectListOf<TYPE>& operator=(const FXObjectListOf<TYPE>& orig){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::operator=(orig)); }
 
+  /// Adopt objects from src, leaving src empty
+  FXObjectListOf<TYPE>& adopt(FXObjectListOf<TYPE>& src){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::adopt(src)); }
+
   /// Indexing operator
   TYPE*& operator[](FXival i){ return reinterpret_cast<TYPE*&>(ptr[i]); }
   TYPE *const& operator[](FXival i) const { return reinterpret_cast<TYPE*const&>(ptr[i]); }
@@ -218,9 +221,6 @@ public:
   /// Access to content array
   TYPE** data(){ return reinterpret_cast<TYPE**>(ptr); }
   TYPE *const * data() const { return reinterpret_cast<TYPE*const*>(ptr); }
-
-  /// Adopt objects from src, leaving src empty
-  FXObjectListOf<TYPE>& adopt(FXObjectListOf<TYPE>& src){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::adopt(src)); }
 
   /// Find object in list, searching forward; return position or -1
   FXival find(TYPE* object,FXival pos=0) const { return FXObjectList::find(object,pos); }

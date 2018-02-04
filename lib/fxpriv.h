@@ -96,19 +96,6 @@ extern Atom fxrecvdata(Display *display,Window window,Atom prop,Atom incr,Atom& 
 
 #endif //////////////////////////////////////////////////////////////////////////
 
-
-// Floyd-Steinberg quantization full 24 bpp to less than or equal to 256 colors
-extern FXbool fxfsquantize(FXuchar* p8,const FXColor* p32,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
-
-// EZ quantization may be used if w*h<=maxcolors, or if the actual colors used is
-// less than maxcolors; using fxezquantize assures that no loss of data occurs
-// repeatedly loading and saving the same file!
-extern FXbool fxezquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
-
-
-// Xiaolin Wu's quantization method based on recursive partitioning
-extern FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
-
 }
 
 #endif

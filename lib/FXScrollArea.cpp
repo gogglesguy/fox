@@ -56,7 +56,7 @@
   - Note that the content size does NOT include the sizes of fixed elements like headers or
     rulers; it should return ONLY the size of the scrolled document.
   - The placement of the viewport is returned by getVisibleX(), getVisibleY(), getVisibleWidth(),
-    and getVisibleHeight().  Subclass these when header controls need to be substracted from
+    and getVisibleHeight().  Subclass these when header controls need to be subtracted from
     the visible area.
     If the document is not scrolled, (getVisibleX(), getVisibleY()) corresponds to
     the document coordinate (0,0).  Drawing should be relative to getVisibleX() and

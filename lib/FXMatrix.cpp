@@ -419,7 +419,7 @@ void FXMatrix::layout(){
       }
     }
 
-  // Substract spacing for non-zero rows/columns
+  // Subtract spacing for non-zero rows/columns
   if(nzcol>1) hremain-=(nzcol-1)*hspacing;
   if(nzrow>1) vremain-=(nzrow-1)*vspacing;
 

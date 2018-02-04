@@ -112,6 +112,10 @@
         Use \\\" to insert a literal \"
         Use \    to insert a literal \
 
+  - On Linux, consider using posix_spawn() instead of the old fork()/exec() pair.
+    This means setting up some posix_spawn_file_actions and posix_spawnattr to
+    deal with file descriptors, signal masks, process groups, etc.
+    Need POSIX >= 2008 for this.
 */
 
 using namespace FX;

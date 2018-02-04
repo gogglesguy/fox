@@ -25,7 +25,7 @@ int main(int argc,char** argv){
   FXint end[NCAP]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
   FXint where;
   FXint ncap=1;
-  FXint mode;
+  FXint mode=FXRex::Normal;
   FXRex rex;
   FXRex::Error err;
 
@@ -39,9 +39,9 @@ int main(int argc,char** argv){
 
   // Just compile pattern arg#1
   if(2<=argc){
-    mode=FXRex::Normal;
-    mode|=FXRex::Capture;
-    mode|=FXRex::NotEmpty;
+//    mode|=FXRex::Capture;
+    //mode|=FXRex::IgnoreCase;
+//    mode|=FXRex::NotEmpty;
     mode|=FXRex::Exact;
     err=rex.parse(argv[1],mode);
     fxmessage("parse(\"%s\") = %s\n",argv[1],FXRex::getError(err));
@@ -53,7 +53,7 @@ int main(int argc,char** argv){
       ncap=strtoul(argv[3],NULL,10);
       if(ncap>NCAP) ncap=NCAP;
       }
-    mode=FXRex::Normal;
+    //mode|=FXRex::Capture;
     //mode|=FXRex::NotBol;
     //mode|=FXRex::NotEol;
     where=rex.search(argv[2],strlen(argv[2]),0,strlen(argv[2]),mode,beg,end,ncap);

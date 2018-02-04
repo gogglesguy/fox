@@ -53,64 +53,13 @@ ShellCommand::ShellCommand(FXApp* a,FXObject* tgt,FXSelector so,FXSelector se,FX
   }
 
 
-
 // Set string as command input
 void ShellCommand::setInput(const FXString& str){
   input=str;
   }
 
-#if 0
-// Parse command to argv vector
-FXchar **parsecommand(const FXchar* command){
-  FXuval space=0,count=0,quote=0,s;
-  const FXchar *p=command;
-  FXchar** result=NULL;
-  FXchar* q;
-  while(*p){
-    s=0;
-    while(Ascii::isSpace(*p)){ p++; }
-    while(*p){
-      if(!quote && Ascii::isSpace(*p)){ break; }
-      if(*p=='\''){ quote^=1; p++; continue; }
-      if(*p=='\\'){ if(*++p=='\n'){ p++; continue; } }
-      space++;
-      p++;
-      s=1;
-      }
-    count+=s;
-    space+=s;
-    }
-  FXTRACE((1,"space=%ld count=%ld\n",space,count));
-  if(count){
-    result=(FXchar**)malloc((count+1)*sizeof(FXchar**)+space);
-    if(result){
-      q=(FXchar*)(result+count+1);
-      p=command;
-      quote=count=0;
-      while(*p){
-        s=0;
-        result[count]=q;
-        while(Ascii::isSpace(*p)){ p++; }
-        while(*p){
-          if(!quote && Ascii::isSpace(*p)){ break; }
-          if(*p=='\''){ quote^=1; p++; continue; }
-          if(*p=='\\'){ if(*++p=='\n'){ p++; continue; } }
-          *q++=*p++;
-          s=1;
-          }
-        if(s){
-          count+=1;
-          *q++='\0';
-          }
-        }
-      result[count]=NULL;
-      FXTRACE((1,"space=%ld count=%ld\n",q-(FXchar*)(result+count+1),count));
-      }
-    }
-  return result;
-  }
-#endif
 
+#if 0
 // Execute command
 FXbool ShellCommand::start(const FXString& command){
   FXTRACE((1,"ShellCommand::start(%s)\n",command.text()));
@@ -163,6 +112,73 @@ FXbool ShellCommand::start(const FXString& command){
         app->addInput(this,ID_ERROR,epipe.handle(),INPUT_READ);
         }
       result=true;
+      }
+    }
+  return result;
+  }
+#endif
+
+
+// Execute command
+FXbool ShellCommand::start(const FXString& command){
+  FXTRACE((1,"ShellCommand::start(%s)\n",command.text()));
+  FXbool result=false;
+  if(!command.empty() && !process.id()){
+    FXchar** argv;
+
+    // Assemble command
+    if(FXPath::parseArgs(argv,command)){
+
+      // Try find the command (argv[0]) in the path
+      FXString exec=FXPath::search(FXSystem::getExecPath(),argv[0]);
+      if(!exec.empty()){
+
+        // Pipes at child's end
+        FXPipe ichild;
+        FXPipe ochild;
+        FXPipe echild;
+
+        // Open pipe for child input (the parent writes, child reads)
+        if(!ipipe.open(ichild,FXIO::WriteOnly|FXIO::Inheritable)) return false;
+
+        // Open pipe for child outout (parent reads, child writes)
+        if(!opipe.open(ochild,FXIO::ReadOnly|FXIO::Inheritable)) return false;
+
+        // Open pipe for child errors (parent reads, child writes)
+        if(!epipe.open(echild,FXIO::ReadOnly|FXIO::Inheritable)) return false;
+
+        // Set handles to be used by child
+        process.setInputStream(&ichild);
+        process.setOutputStream(&ochild);
+        process.setErrorStream(&echild);
+
+        // Start it
+        if(process.start(exec.text(),argv)){
+
+          // Close child-side handles
+          ichild.close();
+          ochild.close();
+          echild.close();
+
+          // Set non-blocking on our end
+          ipipe.setMode(ipipe.mode()|FXIO::NonBlocking);
+          opipe.setMode(opipe.mode()|FXIO::NonBlocking);
+          epipe.setMode(epipe.mode()|FXIO::NonBlocking);
+
+          // Set I/O callbacks
+          if(ipipe.isOpen()){
+            app->addInput(this,ID_INPUT,ipipe.handle(),INPUT_WRITE);
+            }
+          if(opipe.isOpen()){
+            app->addInput(this,ID_OUTPUT,opipe.handle(),INPUT_READ);
+            }
+          if(epipe.isOpen()){
+            app->addInput(this,ID_ERROR,epipe.handle(),INPUT_READ);
+            }
+          result=true;
+          }
+        }
+      freeElms(argv);
       }
     }
   return result;
