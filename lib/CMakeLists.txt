@@ -455,7 +455,7 @@ winmaximize.gif
 winminimize.gif
 winrestore.gif)
 
-add_library(FOX-1.7 ${SOURCES})
+add_library(FOX-1.7 STATIC ${SOURCES})
 add_library(FOX ALIAS FOX-1.7)
 
 find_package(PkgConfig)
@@ -808,8 +808,8 @@ if(NOT WITH_XIM)
   add_definitions(-DNO_XIM)
 endif()
 
-target_include_directories(FOX-1.7 PUBLIC ../include)
-target_link_libraries(FOX-1.7 PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(cfox PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(cfox PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
