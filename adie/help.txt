@@ -226,9 +226,9 @@ Expression. In the Expression mode, the the search performs a full regular expre
   \n	Newline
   \r	Return
   \v	Vertical tab
-  \cX	Control character
+  \cX	Control character (X is '@', 'A'...'Z', '[', '\', ']', '^', '_', or '?' for DEL).
   \033	Octal
-  \x1b	Hex
+  \xFF	Hexadecimal number (should be exactly two hex-digits)
   \w	Word character [a-zA-Z_0-9]
   \W	Non-word character
   \l	Letter [a-zA-Z]
@@ -250,6 +250,10 @@ Expression. In the Expression mode, the the search performs a full regular expre
   \A	Match only beginning of string
   \Z	Match only and end of string
   \1...\9	Back reference
+
+
+Greedy match (the default) tries to match as many characters as possible, but backs off one at a time until a match is found.  Lazy match tries to match as few characters as possible, but advances one at a time until a match is found.  The possessive match behaves much like the greedy match, but does not back off; if the rest of the pattern does not succeed, the match fails.  Possessive match can often be a major guard against unnecessary recursion by calling it quits early, because backing off has no possibility of success.
+
 
 
 Keyboard Bindings.

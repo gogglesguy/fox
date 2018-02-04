@@ -82,8 +82,12 @@ public:
   static FXint listFiles(FXString*& filelist,const FXString& path,const FXString& pattern="*",FXuint flags=FXDir::MatchAll);
 
   /**
-  * List drives, i.e. roots of directory trees.
-  * Return the number of drives in the string array.
+  * List drives, i.e. the roots of directory trees.
+  * On Windows, this returns an array of strings like {"C:\", "D:\", ..., ""}, 
+  * while on Unix it will be just a two-element list like {"/", ""}.
+  * The last element will be always be set to the empty string.
+  * The list can be released by means of delete [] list.
+  * Returns the number of non-empty elements in the array.
   */
   static FXint listDrives(FXString*& drivelist);
 

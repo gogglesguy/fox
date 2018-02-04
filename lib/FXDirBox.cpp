@@ -72,6 +72,9 @@
   Notes:
   - When setting path, it adds all directories from the top down to
     the lowest directory.
+  - When switching from one path to the next, keep as much of the old path
+    as possible; remove and create minimum number of items.
+  - Thus, if path is same as old path, there's no change in the items.
   - Share icons with other widgets; upgrade icons to some nicer ones.
   - Should some of these icons move to FXFileAssociations?
   - Need to support ":" directory list separator so we can path not just
@@ -187,9 +190,128 @@ FXString FXDirBox::getItemPathname(FXTreeItem *item) const {
     }
   return path;
   }
-  
-  
+
+
+// Find child of item matching name
+static FXTreeItem* findItemChild(FXTreeItem* item,const FXString& name){
+  while(item){
+#ifdef WIN32
+    if(comparecase(name,item->getText())==0) return item;
+#else
+    if(compare(name,item->getText())==0) return item;
+#endif
+    item=item->getNext();
+    }
+  return NULL;
+  }
+
+
 #ifdef WIN32            // Windows flavor
+
+// Return the item from the absolute pathname
+FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
+  FXTreeItem *item=NULL;
+  if(!path.empty()){
+    FXint beg=0;
+    FXint end=0;
+
+    // Parse root directory 
+    if(ISPATHSEP(path[end])){
+      end++;
+      if(ISPATHSEP(path[end])) end++;
+      }
+    else if(Ascii::isLetter(path[end]) && path[end+1]==':'){
+      end+=2;
+      if(ISPATHSEP(path[end])) end++;
+      }
+
+    // Absolute path?
+    if(beg<end){
+      FXString     name;
+      FXFileAssoc *assoc;
+      FXTreeItem  *child;
+      FXIcon      *icon;
+      FXString    *drives;
+      FXint        ndrives;
+
+      // Path component
+      name=path.mid(beg,end-beg);
+
+      // First try find if existing root item
+      if((item=findItemChild(getFirstItem(),name))==NULL){
+      
+        // List drives
+        ndrives=FXDir::listDrives(drives);
+        
+        // Add the drives
+        for(FXint i=0; i<ndrives; ++i){
+          icon=foldericon;
+          if(associations){
+            assoc=associations->findDirBinding(drives[i]);
+            if(assoc && assoc->miniicon) icon=assoc->miniicon;
+            }
+          child=appendItem(NULL,drives[i],icon,icon);
+          if(id()) child->create();
+          }
+          
+        // Delete drive list
+        delete [] drives;
+
+        // Perhaps something else?
+        if((item=findItemChild(getFirstItem(),name))==NULL){
+          icon=foldericon;
+          if(associations){
+            assoc=associations->findDirBinding(path.left(end));
+            if(assoc && assoc->miniicon) icon=assoc->miniicon;
+            }
+          item=appendItem(NULL,name,icon,icon);
+          if(id()) item->create();
+          }
+        }
+
+      // Now the subdirectories
+      while(end<path.length()){
+
+        beg=end; 
+
+        // Bracket the next component
+        while(end<path.length() && !ISPATHSEP(path[end])) end++;
+
+        // Path component
+        name=path.mid(beg,end-beg);
+
+        // Find child, remove other siblings if not found
+        if((child=findItemChild(item->getFirst(),name))==NULL){
+
+          // Remove the old ones
+          removeItems(item->getFirst(),item->getLast());
+
+          // Update icon
+          icon=foldericon;
+          if(associations){
+            assoc=associations->findDirBinding(path.left(end));
+            if(assoc && assoc->miniicon) icon=assoc->miniicon;
+            }
+          child=appendItem(item,name,icon,icon);
+          if(id()) child->create();
+          }
+
+        // Skip over path separators
+        while(ISPATHSEP(path[end])) end++;
+
+        // Next level down
+        item=child;
+        }
+      }
+    }
+  return item;
+  }
+
+
+
+
+
+#if 0
 
 // Return the item from the absolute pathname
 FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
@@ -326,69 +448,84 @@ FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
     }
   return NULL;
   }
+#endif
 
 #else                   // UNIX flavor
 
+
 // Return the item from the absolute pathname
 FXTreeItem* FXDirBox::getPathnameItem(const FXString& path){
-  register FXFileAssoc *fileassoc;
-  register FXTreeItem *item;
-  register FXIcon *icon;
-  register FXint beg=0;
-  register FXint end=0;
+  FXTreeItem *item=NULL;
+  if(!path.empty()){
+    FXint beg=0;
+    FXint end=0;
+    
+    // Parse root directory 
+    if(ISPATHSEP(path[0])) end++;
+    
+    // Absolute path?
+    if(beg<end){
+      FXString     name;
+      FXFileAssoc *assoc;
+      FXTreeItem  *child;
+      FXIcon      *icon;
 
-  // Remove old items first
-  clearItems();
+      // Path component
+      name=path.mid(beg,end-beg);
 
-  // Parse past root
-  if(ISPATHSEP(path[0])) end++;
+      // Find root item, or create it if needed
+      if((item=findItemChild(getFirstItem(),name))==NULL){
 
-  // Absolute path?
-  if(beg<end){
+        // Update icon
+        icon=foldericon;
+        if(associations){
+          assoc=associations->findDirBinding(path.left(end));
+          if(assoc && assoc->miniicon) icon=assoc->miniicon;
+          }
 
-    // Determine associations, icons and type
-    icon=foldericon;
-    if(associations){
-      fileassoc=associations->findDirBinding("/");
-      if(fileassoc && fileassoc->miniicon) icon=fileassoc->miniicon;
-      }
-
-    // Create item
-    if(id()) icon->create();
-
-    // Add root
-    item=appendItem(NULL,"/",icon,icon);
-
-    // Add the rest
-    while(end<path.length()){
-
-      // Begin of path component
-      beg=end;
-
-      // Find next path separator
-      while(end<path.length() && !ISPATHSEP(path[end])) end++;
-
-      // Determine associations, icons and type
-      icon=foldericon;
-      if(associations){
-        fileassoc=associations->findDirBinding(path.left(end));
-        if(fileassoc && fileassoc->miniicon) icon=fileassoc->miniicon;
+        // Create item
+        item=appendItem(NULL,name,icon,icon);
+        if(id()) item->create();
         }
 
-      // Add next item under last
-      item=appendItem(item,path.mid(beg,end-beg),icon,icon);
+      // Now the subdirectories
+      while(end<path.length()){
 
-      // Create item
-      if(id()) icon->create();
+        beg=end; 
 
-      // Skip over path separator
-      if(ISPATHSEP(path[end])) end++;
+        // Bracket the next component
+        while(end<path.length() && !ISPATHSEP(path[end])) end++;
+
+        // Path component
+        name=path.mid(beg,end-beg);
+
+        // Find child, remove other siblings if not found
+        if((child=findItemChild(item->getFirst(),name))==NULL){
+
+          // Remove the old ones
+          removeItems(item->getFirst(),item->getLast());
+
+          // Update icon
+          icon=foldericon;
+          if(associations){
+            assoc=associations->findDirBinding(path.left(end));
+            if(assoc && assoc->miniicon) icon=assoc->miniicon;
+            }
+            
+          // Add new
+          child=appendItem(item,name,icon,icon);
+          if(id()) child->create();
+          }
+
+        // Skip over path separators
+        while(ISPATHSEP(path[end])) end++;
+
+        // Next level down
+        item=child;
+        }
       }
-
-    // Return leaf item
-    return item;
     }
-  return NULL;
+  return item;
   }
 
 #endif
@@ -413,8 +550,9 @@ long FXDirBox::onTreeChanged(FXObject*,FXSelector,void* ptr){
 
 
 // Set directory
-void FXDirBox::setDirectory(const FXString& pathname){
-  setCurrentItem(getPathnameItem(FXPath::absolute(pathname)));
+void FXDirBox::setDirectory(const FXString& pathname,FXbool notify){
+  FXTRACE((1,"FXDirBox::setDirectory(%s,%d)\n",pathname.text(),notify));
+  setCurrentItem(getPathnameItem(FXPath::absolute(pathname)),notify);
   }
 
 
@@ -425,13 +563,15 @@ FXString FXDirBox::getDirectory() const {
 
 
 // Change file associations; delete the old one unless it was shared
-void FXDirBox::setAssociations(FXFileAssociations* assocs,FXbool owned){
+void FXDirBox::setAssociations(FXFileAssociations* assocs,FXbool owned,FXbool notify){
   FXuint opts=options;
   options^=((owned-1)^options)&DIRBOX_NO_OWN_ASSOC;
   if(associations!=assocs){
+    FXString path=getDirectory();
     if(!(opts&DIRBOX_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
-    setDirectory(getDirectory());
+    clearItems(notify);
+    setDirectory(path,notify);
     }
   }
 

@@ -641,6 +641,6 @@ FXString FXSystem::dllName(const FXString& name){
   return "lib"+name+".so";
 #endif
   }
-
+  
 }
 

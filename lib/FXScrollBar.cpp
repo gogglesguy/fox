@@ -50,11 +50,19 @@
     the position will be stuck at zero; position should ALWAYS be >= 0.
   - When range or page changes, call setPosition() since even though position
     may not have changed, the size of the scroll-thumb may have changed!
+  - Raised WHEELJUMPTIME from 5ms to 16ms, which is around one frame-time
+    on a typical 60Hz display.
+  - The WHEELJUMPINCR was dropped from 16 to 8, which means a single scroll
+    wheel click would complete in 128ms, or 8 frame times.
+  - Minor trickiness when animating scroll: ensure we come out exactly so
+    a up/down scroll followed by an equal down/up scroll lands us at the
+    exact location we came from. 
 */
 
 
 #define SCROLLBAR_MASK  (SCROLLBAR_HORIZONTAL|SCROLLBAR_WHEELJUMP)
-#define WHEELJUMPTIME   5000000
+#define WHEELJUMPTIME   16666666
+#define WHEELJUMPINCR   8
 
 using namespace FX;
 
@@ -592,35 +600,43 @@ long FXScrollBar::onMotion(FXObject*,FXSelector,void* ptr){
 
 // Mouse wheel
 long FXScrollBar::onMouseWheel(FXObject*,FXSelector,void* ptr){
-  register FXEvent* ev=(FXEvent*)ptr;
-  register FXint r=range-page;
-  register FXint jump,dragjump;
   if(isEnabled()){
-    getApp()->removeTimeout(this,ID_TIMEWHEEL);
+    FXEvent* ev=(FXEvent*)ptr;
+    FXint r=range-page;
+    FXint jump,dragjump;
     getApp()->removeTimeout(this,ID_AUTOSCROLL);
     if(!(ev->state&(LEFTBUTTONMASK|MIDDLEBUTTONMASK|RIGHTBUTTONMASK))){
-      if(ev->state&ALTMASK) jump=line;                      // Fine scrolling
-      else if(ev->state&CONTROLMASK) jump=page;             // Coarse scrolling
-      else jump=FXMIN(page,getApp()->getWheelLines()*line); // Normal scrolling
-      if(dragpoint==0) dragpoint=pos;                       // Were not scrolling already?
-      dragpoint-=ev->code*jump/120;                         // Move scroll position
-      if(dragpoint>r) dragpoint=r;
-      if(dragpoint<0) dragpoint=0;
-      FXASSERT(0<=dragpoint);
-      if(dragpoint!=pos){
+    
+      // Scroll by a line-at-a-time, page-at-a-time, or by given wheel-lines
+      if(ev->state&ALTMASK) jump=line;                      
+      else if(ev->state&CONTROLMASK) jump=page;             
+      else jump=FXMIN(page,getApp()->getWheelLines()*line); 
+
+      // Move scroll position
+      dragpoint-=ev->code*jump/120;                
+      
+      // Keep it within bounds of the document         
+      if(pos+dragpoint<0) dragpoint=-pos;
+      if(pos+dragpoint>r) dragpoint=r-pos;
+      
+      // Any amount to scroll at all?
+      if(dragpoint){
+      
+        // Jump scroll is less cpu time
         if(options&SCROLLBAR_WHEELJUMP){
-          setPosition(dragpoint);
+          setPosition(pos+dragpoint);
           dragpoint=0;
           if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
           }
+           
+        // Animated scroll is better looking
         else{
-          dragjump=(dragpoint-pos);
-          if(FXABS(dragjump)>16) dragjump/=16;
+          dragjump=dragpoint;
+          if(FXABS(dragjump)>WHEELJUMPINCR) dragjump/=WHEELJUMPINCR;
+          
+          // Schedule timer to animate scroll
           getApp()->addTimeout(this,ID_TIMEWHEEL,WHEELJUMPTIME,(void*)(FXival)dragjump);
           }
-        }
-      else{
-        dragpoint=0;
         }
       return 1;
       }
@@ -631,33 +647,37 @@ long FXScrollBar::onMouseWheel(FXObject*,FXSelector,void* ptr){
 
 // Smoothly scroll to desired value as determined by wheel
 long FXScrollBar::onTimeWheel(FXObject*,FXSelector,void* ptr){
-  register FXint p=pos+(FXint)(FXival)ptr;
-  if(dragpoint<pos){
-    if(p<=dragpoint){
-      setPosition(dragpoint);
-      dragpoint=0;
-      if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
-      }
-    else{
-      setPosition(p);
+  if(dragpoint){
+  
+    // Scroll step, which is a fraction of the amount to be scrolled
+    FXint delta=(FXint)(FXival)ptr;
+  
+    // Target scroll amount larger than animation step:- schedule another step
+    // Adjust the amount left to go to the target scroll amount
+    if(FXABS(dragpoint)>FXABS(delta)){
+    
+      // Scroll by delta step
+      setPosition(pos+delta);
+      
+      // Adjust remaining amount to scroll
+      dragpoint-=delta;
+      
+      // Schedule next timer
       getApp()->addTimeout(this,ID_TIMEWHEEL,WHEELJUMPTIME,ptr);
+      
+      // Tell target intermediate position
       if(target) target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)pos);
+      return 1;
       }
-    }
-  else if(dragpoint>pos){
-    if(p>=dragpoint){
-      setPosition(dragpoint);
-      dragpoint=0;
-      if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
-      }
-    else{
-      setPosition(p);
-      getApp()->addTimeout(this,ID_TIMEWHEEL,WHEELJUMPTIME,ptr);
-      if(target) target->tryHandle(this,FXSEL(SEL_CHANGED,message),(void*)(FXival)pos);
-      }
-    }
-  else{
+      
+    // Almost there; make one more step to get to exact target
+    setPosition(pos+dragpoint);
+
+    // Since this will reach the target, remaining scroll amount now zero
     dragpoint=0;
+
+    // Tell target where scrollbar is now at
+    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
     }
   return 1;
   }

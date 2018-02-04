@@ -61,7 +61,7 @@ const FXchar FXPCXIcon::fileExt[]="pcx";
 
 
 // Suggested mime type
-const FXchar FXPCXIcon::mimeType[]="image/x-pcx";
+const FXchar FXPCXIcon::mimeType[]="image/vnd.zbrush.pcx";
 
 
 // Object implementation

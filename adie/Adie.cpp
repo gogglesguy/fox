@@ -443,7 +443,8 @@ Syntax* Adie::getSyntaxByRegistry(const FXString& file){
   FXTRACE((10,"Adie::getSyntaxByRegistry(%s)\n",file.text()));
   if(!file.empty()){
     FXString name=FXPath::name(file);
-    return getSyntaxByName(reg().readStringEntry("SYNTAX",name));
+    FXString lang=reg().readStringEntry("SYNTAX",name);
+    return getSyntaxByName(lang);
     }
   return NULL;
   }

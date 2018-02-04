@@ -107,7 +107,14 @@ static const FXchar mkey[20][3]={
 
 // Traverse files under path and search for pattern in each
 FXuint SearchVisitor::traverse(const FXString& path,const FXString& pattern,const FXString& wild,FXint mode,FXuint opts,FXint depth){
+
+  // Compile the pattern
   if(rex.parse(pattern,mode)==FXRex::ErrOK){
+  
+    // Sensitize controls; in case GUI-update can't get in sideways
+    dlg->forceRefresh();
+    
+    // Traverse directory and visit the files
     return FXGlobVisitor::traverse(path,wild,opts,depth);
     }
   return 0;

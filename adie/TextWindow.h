@@ -292,6 +292,7 @@ public:
   long onCmdSearchPaths(FXObject*,FXSelector,void*);
   long onUpdSearchPaths(FXObject*,FXSelector,void*);
   long onCmdFindInFiles(FXObject*,FXSelector,void*);
+  long onQueryTextTip(FXObject*,FXSelector,void*);
 
   // Shell commands
   long onCmdShellDialog(FXObject*,FXSelector,void*);

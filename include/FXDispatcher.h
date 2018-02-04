@@ -116,7 +116,7 @@ public:
   virtual FXbool dispatchHandle(FXInputHandle hnd,FXuint mode);
 
   /// Dispatch when timeout expires
-  virtual FXbool dispatchTimeout(FXTime now);
+  virtual FXbool dispatchTimeout(FXTime due);
 
   /// Dispatch when idle
   virtual FXbool dispatchIdle();

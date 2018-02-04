@@ -27,8 +27,8 @@ namespace FX {
 /**
 * FXRex is a regular expression class implementing a NFA matcher.
 * It supports capturing parentheses, non-capturing parentheses, positive or negative
-* lookahead, backreferences, case-insensitive matching, counted repetitions, lazy or
-* greedy matches, and PERL-like matching operators.
+* lookahead, backreferences, case-insensitive matching, counted repetitions, greedy, lazy and
+* possessive matches, and PERL-like matching operators.
 * The subject string may be searched forwards or backwards, and may contain any of
 * 256 possible byte values.
 *
@@ -37,16 +37,22 @@ namespace FX {
 * capturing parentheses and back references, and allows the matcher engine to return
 * the locations of the string matching these sub-patterns. The flag IgnoreCase enables
 * case-insensitive matching.
+*
 * When the flag Newline is passed, newlines are treated like normal characters, and
 * not line-separators.  If Newline flag is not passed, character classes such as '.',
 * '\D', '\s', [^a-z] etc. will NOT match newlines.  The flag Verbatim disables all
 * special character interpretation, making the entire pattern a literal string to be
-* matched against a string one-to-one.
-* When the Exact flag is passed, a match succeeds only if the entire string is matched.
+* matched against a string.
+*
+* When the Exact flag is passed, a match succeeds only if the entire string is matched,
+* i.e. the entire input presented to FXRex must match against the pattern; otherwise,
+* only a (possibly empty) substring of the input is matched against the pattern.
 * If the NotEmpty flag is passed, the pattern must match at least one character in order
-* to succeed.
+* to succeed, and empty matches are considered non-matching.
+*
 * If the flag Syntax will check the pattern for correct syntax only, and not generate a
-* matching engine; it will just reset the engine to the empty pattern.
+* matching engine; it will just reset the engine to the empty pattern; use this flag to
+* verify the syntax of the pattern without compiling it.
 *
 * When matching a compiled pattern, the mode parameter is the bitwise OR of a set of
 * flags that affects how the match is performed.  Passing the flags NotBol and/or NotEol
@@ -55,6 +61,8 @@ namespace FX {
 *
 * Patterns which cause inordinate amounts of recursion may cause FXRex to fail where
 * otherwise it would succeed to match.
+* FXRex uses no global variables, and thus multiple threads may simultaneously use it;
+* moreover, multiple threads may use the same instance to perform a match.
 */
 class FXAPI FXRex {
 private:
@@ -79,10 +87,11 @@ public:
     Newline    = 32,    /// Match-any operators match newline too
     Exact      = 64,    /// Exact match to entire string (\A..\Z)
     NotEmpty   = 128,   /// A successful match must not be empty
+    Reverse    = 256,   /// Reverse expression mode
 
     /// Regular expression match flags
-    NotBol     = 256,   /// Start of string is NOT begin of line
-    NotEol     = 512    /// End of string is NOT end of line
+    NotBol     = 512,   /// Start of string is NOT begin of line
+    NotEol     = 1024   /// End of string is NOT end of line
     };
 
   /// Regular expression error codes

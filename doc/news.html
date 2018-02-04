@@ -17,6 +17,56 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+December 13 - FOX DEVELOPMENT 1.7.62
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Newly added arbitrary-length look-behind assertions in FXRex are a bit more bullet-proofed.</li>
+<li>Some bugs with partially filled buffers in FXText fixed.</li>
+<li>Large number of updates to syntax patterns in Adie.stx.</li>
+<li>Fixed some minor issues in reversing of regular expressions, needed for arbitrary-lookbehind assertions in regular expression engine.</li>
+<li>Bug fixes in FXDispatcher.</li>
+<li>Added disconnect API to FXCallback, the new fast delegation class.</li>
+<li>Word boundary in back-scanning regex engine fixed.</li>
+<li>FXRex empty branch issue fixed; empty branches no longer allowed.</li>
+<li>Removed limitations on message lenghts in fxerror(), fxwarning(), etc.</li>
+<li>In FXRex, when patterns are reversed, some escape sequences are dangerous; partially, this could be fixed
+by requiring that the hex escape sequence require two hex characters.  For octal character sequences,
+however, this can not be done, so those are flagged as unsupported in look-behind patterns.</li>
+<li>Some bugs fixed for Windows build.</li>
+<li>Added API to FXPath to check if a filename is a reserved filename, such as "COM1", "PRN" etc.</li>
+<li>Fixed FXDirBox flicker, particularly under Windows, due to bad implementation.</li>
+<li>The call to ::system() does not work as desired under Windows.  Calls to ::system() are used to spawn
+child processes, for instance, clicking on an icon in PathFinder.  These calls have now all been replaced by
+newly developed APIs in FXPath, like parseArgs().</li>
+<li>A Windows-specific version of parseArgs() has been added, it follows Windows commandline escaping rules.</li>
+<li>More options in file-associations for launching applications from PathFinder.
+Applications may be launched with the current file (%f), the list of all selected files (%F), the url of the current file (%u),
+the url's of all selected files (%U), or the current directory (%d).
+These options can be used at the same time, for instance, an association "tar cvfz %d.tar.gz %F" would tar up all the selected files 
+into an archive that's named after the current directory.</li>
+<li>Updated Makefile colorizing.</li>
+<li>PathFinder now as its own notion of executable paths; this allows users to add additonal paths to the
+shell-provided PATH environment variable.  Handy as not everyone knows how, or is allowed to change system PATH
+variables.</li>
+<li>Show exact bytes in tooltip on bottom of PathFinder window.</li>
+<li>Fixed FXAtomic problems on Windows.</li>
+<li>FXText widget has tooltip timer, and will be able to pop a tooltip with location-dependent content.</li>
+<li>Duplicate accelerator issue fixed in FXReplaceDialog.</li>
+<li>Try and prevent Adie from loading insanely large files [for example, accidentally clicking on an .iso].</li>
+<li>Strange Dell mice issue issuing dual mouse-wheel reports.  This caused some minor issues with scrolling.
+The FXScrollBar has been fixed for this problem.</li>
+<li>At the same time, changed anomation parameters of FXScrollBar slightly; animation time-step is now raised to 16ms,
+which is about one frame-time on 60Hz screen.  This means scrolling is a bit less CPU-hoggy as the amount of work
+is dropped to 1/3.</li>
+<li>Find In Files has some utility improvements.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 September 22 - FOX DEVELOPMENT 1.7.61
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -30,7 +80,7 @@ September 22 - FOX DEVELOPMENT 1.7.61
 for block select operations.</li>
 <li>FXIconList lasso speedup, especially when YUGE numbers of files in a folder.</li>
 <li>Minor PathFinder spruce-ups.</li>
-<li>New APIs in FXPath: parseArgs() builds argv vector from command line, suitable to passing to execve() (etc.) 
+<li>New APIs in FXPath: parseArgs() builds argv vector from command line, suitable to passing to execve() (etc.)
 system calls (or FXProcess).</li>
 <li>Improved enquote() and dequote() for UNIX in FXPath.</li>
 <li>In Adie, ShellCommand now kicks off sub-command w/o needing a shell; uses new API parseArgs() to

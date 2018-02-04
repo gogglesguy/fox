@@ -49,7 +49,7 @@ FXIMPLEMENT(FXUTF32BECodec,FXTextCodec,NULL,0)
 // Convert from utf32be
 FXint FXUTF32BECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
   ((FXuchar*)&wc)[0]=src[0];
   ((FXuchar*)&wc)[1]=src[1];
   ((FXuchar*)&wc)[2]=src[2];
@@ -67,7 +67,7 @@ FXint FXUTF32BECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
 // Convert to utf32be
 FXint FXUTF32BECodec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   if(ndst<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
   dst[0]=((FXuchar*)&wc)[0];
   dst[1]=((FXuchar*)&wc)[1];
   dst[2]=((FXuchar*)&wc)[2];
@@ -115,7 +115,7 @@ FXIMPLEMENT(FXUTF32LECodec,FXTextCodec,NULL,0)
 // Convert from utf32le
 FXint FXUTF32LECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
   ((FXuchar*)&wc)[0]=src[3];
   ((FXuchar*)&wc)[1]=src[2];
   ((FXuchar*)&wc)[2]=src[1];
@@ -133,7 +133,7 @@ FXint FXUTF32LECodec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
 // Convert to utf32le
 FXint FXUTF32LECodec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   if(ndst<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
   dst[3]=((FXuchar*)&wc)[0];
   dst[2]=((FXuchar*)&wc)[1];
   dst[1]=((FXuchar*)&wc)[2];
@@ -181,7 +181,7 @@ FXIMPLEMENT(FXUTF32Codec,FXTextCodec,NULL,0)
 // Convert utf32
 FXint FXUTF32Codec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
   if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
   ((FXuchar*)&wc)[0]=src[0];
   ((FXuchar*)&wc)[1]=src[1];
   ((FXuchar*)&wc)[2]=src[2];
@@ -194,7 +194,7 @@ FXint FXUTF32Codec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
 #endif
   if(wc==BOM_BE){
     if(nsrc<8) return -8;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
     ((FXuchar*)&wc)[0]=src[4];
     ((FXuchar*)&wc)[1]=src[5];
     ((FXuchar*)&wc)[2]=src[6];
@@ -209,7 +209,7 @@ FXint FXUTF32Codec::mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const {
     }
   if(wc==BOM_LE){
     if(nsrc<8) return -8;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
     ((FXuchar*)&wc)[0]=src[7];
     ((FXuchar*)&wc)[1]=src[6];
     ((FXuchar*)&wc)[2]=src[5];
@@ -243,7 +243,7 @@ FXint FXUTF32Codec::mb2utflen(const FXchar* src,FXint nsrc) const {
   FXwchar w;
   if(src && 0<nsrc){
     if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
     ((FXuchar*)&w)[0]=src[0];
     ((FXuchar*)&w)[1]=src[1];
     ((FXuchar*)&w)[2]=src[2];
@@ -261,7 +261,7 @@ FXint FXUTF32Codec::mb2utflen(const FXchar* src,FXint nsrc) const {
         }
       while(0<nsrc){
         if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
         ((FXuchar*)&w)[0]=src[0];
         ((FXuchar*)&w)[1]=src[1];
         ((FXuchar*)&w)[2]=src[2];
@@ -282,7 +282,7 @@ FXint FXUTF32Codec::mb2utflen(const FXchar* src,FXint nsrc) const {
       nsrc-=4;
       while(0<nsrc){
         if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
         ((FXuchar*)&w)[0]=src[3];
         ((FXuchar*)&w)[1]=src[2];
         ((FXuchar*)&w)[2]=src[1];
@@ -309,7 +309,7 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
   FXwchar w;
   if(dst && src && 0<nsrc){
     if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
     ((FXuchar*)&w)[0]=src[0];
     ((FXuchar*)&w)[1]=src[1];
     ((FXuchar*)&w)[2]=src[2];
@@ -327,7 +327,7 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
         }
       while(0<nsrc){
         if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
         ((FXuchar*)&w)[0]=src[0];
         ((FXuchar*)&w)[1]=src[1];
         ((FXuchar*)&w)[2]=src[2];
@@ -352,7 +352,7 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
       nsrc-=4;
       while(0<nsrc){
         if(nsrc<4) return -4;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
         ((FXuchar*)&w)[0]=src[3];
         ((FXuchar*)&w)[1]=src[2];
         ((FXuchar*)&w)[2]=src[1];
@@ -380,7 +380,7 @@ FXint FXUTF32Codec::mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
 // Convert to utf32
 FXint FXUTF32Codec::wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const {
   if(ndst<4) return 0;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
   dst[0]=((FXuchar*)&wc)[0];
   dst[1]=((FXuchar*)&wc)[1];
   dst[2]=((FXuchar*)&wc)[2];
@@ -429,7 +429,7 @@ FXint FXUTF32Codec::utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) 
       if(nr>nsrc) break;
       w=wc(src);
       if(ndst<4) break;
-#if FOX_BIGENDIAN
+#if (FOX_BIGENDIAN == 1)
       dst[0]=((FXuchar*)&w)[0];
       dst[1]=((FXuchar*)&w)[1];
       dst[2]=((FXuchar*)&w)[2];

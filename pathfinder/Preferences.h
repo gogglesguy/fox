@@ -33,6 +33,7 @@ protected:
   FXText          *pattern;
   FXTextField     *editor;
   FXTextField     *terminal;
+  FXTextField     *execpaths;
   FXCheckButton   *preview;
   FXCheckButton   *blending;
   FXCheckButton   *scaling;
@@ -48,6 +49,7 @@ protected:
   FXString         filemime;
   FXString         filecommand;
   FXString         fileicons[4];
+  FXuint           fileflags;
   FXCheckButton   *autosize;
   FXTextField     *itemspace;
   FXIcon          *brw;
@@ -61,9 +63,10 @@ private:
   Preferences& operator=(const Preferences&);
 public:
   long onCmdAccept(FXObject*,FXSelector,void*);
-  long onCmdBrowsePaths(FXObject*,FXSelector,void*);
+  long onCmdBrowseIcons(FXObject*,FXSelector,void*);
   long onCmdBrowseEditor(FXObject*,FXSelector,void*);
   long onCmdBrowseTerminal(FXObject*,FXSelector,void*);
+  long onCmdBrowsePaths(FXObject*,FXSelector,void*);
   long onCmdBrowseCommand(FXObject*,FXSelector,void*);
   long onCmdBrowseIcon(FXObject*,FXSelector,void*);
   long onCmdCommand(FXObject*,FXSelector,void*);
@@ -78,11 +81,16 @@ public:
   long onCmdSelectExtension(FXObject*,FXSelector,void*);
   long onCmdDeselectExtension(FXObject*,FXSelector,void*);
   long onUpdSelectExtension(FXObject*,FXSelector,void*);
+  long onUpdRunInTerminal(FXObject*,FXSelector,void*);
+  long onCmdRunInTerminal(FXObject*,FXSelector,void*);
+  long onUpdChangeDirectory(FXObject*,FXSelector,void*);
+  long onCmdChangeDirectory(FXObject*,FXSelector,void*);
 public:
   enum{
-    ID_BROWSE_PATHS=FXDialogBox::ID_LAST,
+    ID_BROWSE_ICONS=FXDialogBox::ID_LAST,
     ID_BROWSE_EDITOR,
     ID_BROWSE_TERMINAL,
+    ID_BROWSE_PATHS,
     ID_BROWSE_COMMAND,
     ID_BROWSE_SMALLICON,
     ID_BROWSE_BIGICON,
@@ -94,7 +102,9 @@ public:
     ID_SELECT_EXTENSION,
     ID_APPEND_EXTENSION,
     ID_CHANGE_EXTENSION,
-    ID_REMOVE_EXTENSION
+    ID_REMOVE_EXTENSION,
+    ID_RUN_IN_TERMINAL,
+    ID_CHANGE_DIRECTORY
     };
 public:
 
@@ -127,6 +137,10 @@ public:
   // Get/set terminal
   void setTerminal(const FXString& term){ terminal->setText(term); }
   FXString getTerminal() const { return terminal->getText(); }
+
+  // Get/set exec paths
+  void setExecPaths(const FXString& paths){ execpaths->setText(paths); }
+  FXString getExecPaths() const { return execpaths->getText(); }
 
   // Set image preview
   void setPreview(FXbool flag){ preview->setCheck(flag); }

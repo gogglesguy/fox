@@ -24,14 +24,29 @@
 #include "icons.h"
 
 
+// Place to look for executables
+#if defined(WIN32)
+#define SUGGESTED_FOLDER "C:\\Windows\\System32\\"
+#else
+#define SUGGESTED_FOLDER "/usr/bin/"
+#endif
+
+// Executable file extensions
+#if defined(WIN32)
+#define SUGGESTED_PATTERNS "Executables (*.com,*.exe,*.bat,*.cmd)\nAll Files (*)"
+#else
+#define SUGGESTED_PATTERNS "All Files (*)"
+#endif
+
 /*******************************************************************************/
 
 // Map
 FXDEFMAP(Preferences) PreferencesMap[]={
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_ACCEPT,Preferences::onCmdAccept),
-  FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_PATHS,Preferences::onCmdBrowsePaths),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_ICONS,Preferences::onCmdBrowseIcons),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_EDITOR,Preferences::onCmdBrowseEditor),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_TERMINAL,Preferences::onCmdBrowseTerminal),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_PATHS,Preferences::onCmdBrowsePaths),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_BROWSE_COMMAND,Preferences::onCmdBrowseCommand),
   FXMAPFUNCS(SEL_UPDATE,Preferences::ID_BROWSE_SMALLICON,Preferences::ID_BROWSE_BIGICONOPEN,Preferences::onUpdSelectExtension),
   FXMAPFUNCS(SEL_COMMAND,Preferences::ID_BROWSE_SMALLICON,Preferences::ID_BROWSE_BIGICONOPEN,Preferences::onCmdBrowseIcon),
@@ -48,6 +63,10 @@ FXDEFMAP(Preferences) PreferencesMap[]={
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_CHANGE_EXTENSION,Preferences::onCmdChangeExtension),
   FXMAPFUNC(SEL_UPDATE,Preferences::ID_REMOVE_EXTENSION,Preferences::onUpdSelectExtension),
   FXMAPFUNC(SEL_COMMAND,Preferences::ID_REMOVE_EXTENSION,Preferences::onCmdRemoveExtension),
+  FXMAPFUNC(SEL_UPDATE,Preferences::ID_RUN_IN_TERMINAL,Preferences::onUpdRunInTerminal),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_RUN_IN_TERMINAL,Preferences::onCmdRunInTerminal),
+  FXMAPFUNC(SEL_UPDATE,Preferences::ID_CHANGE_DIRECTORY,Preferences::onUpdChangeDirectory),
+  FXMAPFUNC(SEL_COMMAND,Preferences::ID_CHANGE_DIRECTORY,Preferences::onCmdChangeDirectory),
   };
 
 
@@ -81,7 +100,7 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
 
   new FXLabel(matrix2,tr("Icon search paths:"),NULL,LAYOUT_LEFT);
   icondirs=new FXTextField(matrix2,6,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,2,2);
-  new FXButton(matrix2,tr("\tBrowse..."),dir,this,ID_BROWSE_PATHS,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);
+  new FXButton(matrix2,tr("\tBrowse..."),dir,this,ID_BROWSE_ICONS,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);
 
   new FXLabel(matrix2,tr("Editor command:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
   editor=new FXTextField(matrix2,6,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,2,2);
@@ -90,6 +109,10 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   new FXLabel(matrix2,tr("Terminal command:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
   terminal=new FXTextField(matrix2,6,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,2,2);
   new FXButton(matrix2,tr("\tBrowse..."),dir,this,ID_BROWSE_TERMINAL,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);
+
+  new FXLabel(matrix2,tr("Executable paths:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
+  execpaths=new FXTextField(matrix2,6,NULL,0,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,2,2);
+  new FXButton(matrix2,tr("\tBrowse..."),dir,this,ID_BROWSE_PATHS,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);
 
   new FXLabel(matrix2,tr("Preview images:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
   preview=new FXCheckButton(matrix2,FXString::null,NULL,0,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN,0,0,0,0, 0,0,0,0);
@@ -132,10 +155,8 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   FXHorizontalFrame *commandset=new FXHorizontalFrame(commandgroup,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
   new FXButton(commandset,tr("\tBrowse..."),dir,this,ID_BROWSE_COMMAND,LAYOUT_RIGHT|LAYOUT_CENTER_Y|FRAME_RAISED|FRAME_THICK);
   command=new FXTextField(commandset,40,this,ID_COMMAND,LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
-  runinterminal=new FXCheckButton(commandgroup,tr("Run in terminal"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_LEFT);
-  changedirectory=new FXCheckButton(commandgroup,tr("Change directory"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_SIDE_LEFT);
-  runinterminal->disable();
-  changedirectory->disable();
+  runinterminal=new FXCheckButton(commandgroup,tr("Run in terminal\t\tRun command in terminal."),this,ID_RUN_IN_TERMINAL,ICON_BEFORE_TEXT|LAYOUT_SIDE_LEFT);
+  changedirectory=new FXCheckButton(commandgroup,tr("Change directory\t\tChange directory before running command."),this,ID_CHANGE_DIRECTORY,ICON_BEFORE_TEXT|LAYOUT_SIDE_LEFT);
 
   // Mime type
   FXGroupBox *mimegroup=new FXGroupBox(mimetypepane,tr("Mime Types"),GROUPBOX_TITLE_LEFT|FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_SIDE_TOP);
@@ -195,7 +216,6 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
 
   //// File pattern settings button
   new FXButton(buttons,tr("Other\tOther settings\tChange other settings."),run,switcher,FXSwitcher::ID_OPEN_FOURTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
-
 
 
   // Bottom part
@@ -275,22 +295,24 @@ void Preferences::changeIconButton(const FXString& name,FXint index){
 void Preferences::readFileExtension(const FXString& ext){
   if(!ext.empty()){
     FXString association=getApp()->reg().readStringEntry("FILETYPES",ext.text());
-    FXString iconname;
+    FXString string;
     FXint index;
+
+    FXTRACE((1,"association=%s\n",association.text()));
 
     // Get command and description names
     filecommand=association.section(';',0);
     filedesc=association.section(';',1);
 
     // Big icon closed and open
-    iconname=association.section(';',2);
-    fileicons[1]=iconname.section(':',0);
-    fileicons[3]=iconname.section(':',1);
+    string=association.section(';',2);
+    fileicons[1]=string.section(':',0);
+    fileicons[3]=string.section(':',1);
 
     // Small icon closed and open
-    iconname=association.section(';',3);
-    fileicons[0]=iconname.section(':',0);
-    fileicons[2]=iconname.section(':',1);
+    string=association.section(';',3);
+    fileicons[0]=string.section(':',0);
+    fileicons[2]=string.section(':',1);
 
     // Mime type name
     filemime=association.section(';',4);
@@ -302,6 +324,12 @@ void Preferences::readFileExtension(const FXString& ext){
       index=mimetypes->findItem(" ");           // FIXME
       mimetypes->setCurrentItem(index);
       }
+
+    // Flags
+    string=association.section(';',5);
+    fileflags=0;
+    if(string.contains("c")) fileflags|=1;
+    if(string.contains("t")) fileflags|=2;
 
     // Change icons
     changeIconButton(fileicons[0],0);
@@ -315,18 +343,79 @@ void Preferences::readFileExtension(const FXString& ext){
 // Save file extension to registry
 void Preferences::writeFileExtension(const FXString& ext){
   if(!ext.empty()){
-    FXString association=filecommand+";"+filedesc+";";
-    if(fileicons[3].empty())
-      association+=fileicons[1]+";";
-    else
-      association+=fileicons[1]+":"+fileicons[3]+";";
-    if(fileicons[2].empty())
-      association+=fileicons[0]+";";
-    else
-      association+=fileicons[0]+":"+fileicons[2]+";";
+    FXString association;
+
+    // Command line
+    association=filecommand;
+    association+=";";
+
+    // Description
+    association+=filedesc;
+    association+=";";
+
+    // Big icon(s)
+    association+=fileicons[1];
+    if(!fileicons[3].empty()){
+      association+=":";
+      association+=fileicons[3];
+      }
+    association+=";";
+
+    // Mini icon(s)
+    association+=fileicons[0];
+    if(!fileicons[2].empty()){
+      association+=":";
+      association+=fileicons[2];
+      }
+    association+=";";
+
+    // Mime type
     association+=filemime;
+
+    // Flags, if any
+    if(fileflags){
+      association+=";";
+      if(fileflags&1){
+        association+="c";
+        }
+      if(fileflags&2){
+        association+="t";
+        }
+      }
+
+    FXTRACE((1,"association=%s\n",association.text()));
+
+    // Write to filetypes key
     getApp()->reg().writeStringEntry("FILETYPES",ext.text(),association.text());
     }
+  }
+
+
+// Run in terminal update
+long Preferences::onUpdRunInTerminal(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(fileflags&2) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Run in terminal
+long Preferences::onCmdRunInTerminal(FXObject*,FXSelector,void*){
+  fileflags^=2;
+  return 1;
+  }
+
+
+// Change directory update
+long Preferences::onUpdChangeDirectory(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(fileflags&1) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change directory
+long Preferences::onCmdChangeDirectory(FXObject*,FXSelector,void*){
+  fileflags^=1;
+  return 1;
   }
 
 
@@ -423,9 +512,9 @@ long Preferences::onUpdMimeType(FXObject* sender,FXSelector,void*){
 
 
 // Browse icon path
-long Preferences::onCmdBrowsePaths(FXObject*,FXSelector,void*){
+long Preferences::onCmdBrowseIcons(FXObject*,FXSelector,void*){
   FXString path=getIconPath();
-  path=FXFileDialog::getOpenDirectory(this,tr("Search Path"),path);
+  path=FXFileDialog::getOpenDirectory(this,tr("Icon Paths"),path);
   if(!path.empty()) setIconPath(path);
   return 1;
   }
@@ -433,27 +522,38 @@ long Preferences::onCmdBrowsePaths(FXObject*,FXSelector,void*){
 
 // Set browser editor
 long Preferences::onCmdBrowseEditor(FXObject*,FXSelector,void*){
-  FXString neweditor=editor->getText();
+  FXString neweditor=getEditor();
   neweditor=FXFileDialog::getOpenFilename(this,tr("Editor Program"),neweditor);
-  if(!neweditor.empty()) editor->setText(neweditor);
+  if(!neweditor.empty()) setEditor(neweditor);
   return 1;
   }
 
 
 // Select command
 long Preferences::onCmdBrowseCommand(FXObject*,FXSelector,void*){
-  FXString path="/usr/bin/";
-  if(!filecommand.empty()) path=filecommand;
-  filecommand=FXFileDialog::getOpenFilename(this,"Select Command",path,"*");
+  FXString oldcommand=filecommand.empty() ? SUGGESTED_FOLDER : FXPath::dequote(filecommand);
+  FXString newcommand=FXFileDialog::getOpenFilename(this,tr("Select Command"),oldcommand,SUGGESTED_PATTERNS);
+  if(!newcommand.empty()){
+    filecommand=FXPath::enquote(newcommand)+" %f";
+    }
   return 1;
   }
 
 
 // Set terminal
 long Preferences::onCmdBrowseTerminal(FXObject*,FXSelector,void*){
-  FXString newterminal=terminal->getText();
+  FXString newterminal=getTerminal();
   newterminal=FXFileDialog::getOpenFilename(this,tr("Terminal Program"),newterminal);
-  if(!newterminal.empty()) terminal->setText(newterminal);
+  if(!newterminal.empty()) setTerminal(newterminal);
+  return 1;
+  }
+
+
+// Set paths
+long Preferences::onCmdBrowsePaths(FXObject*,FXSelector,void*){
+  FXString path=getExecPaths();
+  path=FXFileDialog::getOpenDirectory(this,tr("Executable Paths"),path);
+  if(!path.empty()) setExecPaths(path);
   return 1;
   }
 

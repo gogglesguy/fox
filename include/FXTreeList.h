@@ -101,7 +101,7 @@ public:
   /// Get first child item
   FXTreeItem* getFirst() const { return first; }
 
-  /// Get las child item
+  /// Get last child item
   FXTreeItem* getLast() const { return last; }
 
   /// Get item below this one in list

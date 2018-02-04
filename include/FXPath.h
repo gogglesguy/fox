@@ -231,6 +231,12 @@ namespace FXPath {
   * extensions (Windows)
   */
   extern FXAPI FXbool hasExecExtension(const FXString& file);
+  
+  /**
+  * Check if given name is controversial, i.e. reserved for other devices (Windows).
+  */
+  extern FXAPI FXbool isReservedName(const FXString& file);
+  
   }
 
 }

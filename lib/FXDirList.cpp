@@ -1379,7 +1379,7 @@ FXbool FXDirList::collapseTree(FXTreeItem* tree,FXbool notify){
 void FXDirList::setPattern(const FXString& ptrn,FXbool notify){
   if(!ptrn.empty() && pattern!=ptrn){
     pattern=ptrn;
-    scan(true);
+    scan(true); // FIXME
     }
   }
 
@@ -1387,7 +1387,7 @@ void FXDirList::setPattern(const FXString& ptrn,FXbool notify){
 void FXDirList::setMatchMode(FXuint mode,FXbool notify){
   if(matchmode!=mode){
     matchmode=mode;
-    scan(true);
+    scan(true); // FIXME
     }
   }
 
@@ -1403,7 +1403,7 @@ void FXDirList::showFiles(FXbool flag,FXbool notify){
   FXuint opts=(((0-flag)^options)&DIRLIST_SHOWFILES)^options;
   if(options!=opts){
     options=opts;
-    scan(true);
+    scan(true); // FIXME
     }
   }
 
@@ -1419,7 +1419,7 @@ void FXDirList::showHiddenFiles(FXbool flag,FXbool notify){
   FXuint opts=(((0-flag)^options)&DIRLIST_SHOWHIDDEN)^options;
   if(opts!=options){
     options=opts;
-    scan(true);
+    scan(true); // FIXME
     }
   }
 
@@ -1431,7 +1431,7 @@ void FXDirList::setAssociations(FXFileAssociations* assocs,FXbool owned,FXbool n
   if(associations!=assocs){
     if(!(opts&DIRLIST_NO_OWN_ASSOC)) delete associations;
     associations=assocs;
-    scan(true);
+    scan(true); // FIXME
     }
   }
 
@@ -1440,7 +1440,7 @@ void FXDirList::setAssociations(FXFileAssociations* assocs,FXbool owned,FXbool n
 void FXDirList::setDraggableFiles(FXbool flag,FXbool notify){
   if(draggable!=flag){
     draggable=flag;
-    scan(true);
+    scan(true); // FIXME
     }
   }
 

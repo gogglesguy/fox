@@ -53,7 +53,6 @@
   - Copy / Paste /Cut doesn't seem to work
   - If you drag some files to a certain directory in the dir-list, hilight the directory so
     we're sure we are dropping it in the right directory...
-  - Settings dialog like the one in TextEdit....
   - Edit menu layout should change:
 
       Undo
@@ -76,11 +75,18 @@
     file of the selection: (file1.htm ... file99.htm)
   - Change 'Delete Files' dynamically  depending on the amount of files you've selected:
     so 1 file shows only Delete File....  same thing for the dialog that shows up....
-  - Time in statusbar as in TextEdit
-
+  - Specifications for file commands:
+    https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s06.html
+  - Observe t and c option flags in association; for t (terminal) run <terminal> -e command.
 */
 
 
+// Executable name
+#ifdef WIN32
+#define PATHFINDEREXEC "PathFinder.exe"
+#else
+#define PATHFINDEREXEC "PathFinder"
+#endif
 
 /*******************************************************************************/
 
@@ -166,11 +172,6 @@ FXDEFMAP(PathFinderMain) PathFinderMainMap[]={
 FXIMPLEMENT(PathFinderMain,FXMainWindow,PathFinderMainMap,ARRAYNUMBER(PathFinderMainMap))
 
 /*******************************************************************************/
-
-
-// Executable for another PathFinder
-FXchar* PathFinderMain::pathfindercommand;
-
 
 // Fallback patterns
 const FXchar fallbackPatterns[]=
@@ -697,33 +698,28 @@ FXbool PathFinderMain::haveSelectedFiles() const {
   }
 
 
-// Get number of selected filenames, not including "." and ".."
-FXint PathFinderMain::getNumSelectedFiles() const {
-  FXint result=0;
+// Return selected filenames, not including "." and ".."
+FXString* PathFinderMain::getSelectedFiles() const {
+  FXString* result=NULL;
+  FXint total=0;
+  FXint count=0;
   if(filelist->getNumItems()){
     for(FXint i=0; i<filelist->getNumItems(); i++){
-      if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)) result++;
+      if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)){
+        total++;
+        }
+      }
+    if(0<total){
+      result=new FXString [total+1];
+      for(FXint i=0; i<filelist->getNumItems(); i++){
+        if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)){
+          result[count++]=filelist->getItemPathname(i);
+          }
+        }
+      result[count]=FXString::null;
       }
     }
   return result;
-  }
-
-
-// Return selected filenames, not including "." and ".."
-FXString* PathFinderMain::getSelectedFiles() const {
-  FXint num=getNumSelectedFiles();
-  if(0<num){
-    FXString *files=new FXString [num+1];
-    FXint count=0;
-    for(FXint i=0; i<filelist->getNumItems(); i++){
-      if(filelist->isItemSelected(i) && !filelist->isItemNavigational(i)){
-	files[count++]=filelist->getItemPathname(i);
-	}
-      }
-    files[count]=FXString::null;
-    return files;
-    }
-  return NULL;
   }
 
 /*******************************************************************************/
@@ -746,6 +742,7 @@ static const FXIconListSortFunc sortfuncs[]={
   FXFileList::descendingGroup
   };
 
+/*******************************************************************************/
 
 // Save settings
 void PathFinderMain::saveSettings(){
@@ -849,6 +846,7 @@ void PathFinderMain::saveSettings(){
   getApp()->reg().writeStringEntry("SETTINGS","directory",path.text());
   }
 
+/*******************************************************************************/
 
 // Load settings
 void PathFinderMain::loadSettings(){
@@ -983,9 +981,148 @@ long PathFinderMain::onUpdSelectedVisible(FXObject* sender,FXSelector,void*){
   }
 
 
+// Run program from given command line
+FXbool PathFinderMain::executeCommandline(const FXString& commandline){
+  FXbool result=false;
+  FXchar **argvec=NULL;
+
+  FXTRACE((10,"PathFinderMain::executeCommandline(%s)\n",commandline.text()));
+
+  // Parse commandline into argvec
+  if(FXPath::parseArgs(argvec,commandline)){
+
+    // Find the executable path
+    FXString command=FXPath::search(FXSystem::getExecPath(),argvec[0]);
+    if(!command.empty()){
+
+      // Old directory
+      FXString cwd=FXSystem::getCurrentDirectory();
+
+      // Switch to new directory
+      if(FXSystem::setCurrentDirectory(getDirectory())){
+        FXProcess process;
+
+        // Start the program with arguments
+        result=process.start(command.text(),argvec,NULL);
+
+        // Failed to start the program
+        if(!result){
+          FXMessageBox::error(this,MBOX_OK,tr("Unable to Start"),tr("Unable to start program: '%s'.\n"),commandline.text());
+          }
+
+        // Switch back to old directory
+        FXSystem::setCurrentDirectory(cwd);
+        }
+
+      // Couldn't change working directory
+      else{
+        FXMessageBox::error(this,MBOX_OK,tr("Unable to Change Directory"),tr("Unable to change directories.\n"));
+        }
+      }
+
+    // Could not find executable path
+    else{
+      FXMessageBox::error(this,MBOX_OK,tr("Unknown Program"),tr("Unable to find program: '%s'.\n"),argvec[0]);
+      }
+
+    // Done with that
+    freeElms(argvec);
+    }
+
+  // Could not parse commandline
+  else{
+    FXMessageBox::error(this,MBOX_OK,tr("Bad Command or Filename"),tr("Syntax error in commandline: '%s'.\n"),commandline.text());
+    }
+  return result;
+  }
+
+
+// Parse associated command string exec
+// This command string may contain some special codes which are expanded
+// in this routine.
+//
+// The special codes are as follows:
+//
+//      %f or %s     Replaced by (quoted) current filename
+//      %F           Replaced by the (quoted) selected filenames
+//      %u           Replaced by (quoted) URL-encoded of the current filename
+//      %U           Replaced by the (quoted) URL-encoded selected filenames
+//      %d           Replaced by current working directory
+//      %%           Replaced by '%'
+//
+// Quoting is performed along the needs of the shell; this is slightly different
+// between UNIX and Windows.
+FXString PathFinderMain::makeCommandline(const FXString& executable) const {
+  FXString *files=getSelectedFiles();
+  FXString commandline;
+  FXTRACE((10,"PathFinderMain::makeCommandline(%s)\n",executable.text()));
+  if(files){
+    const FXString *f;
+    FXint b,e,t;
+    FXchar c;
+
+    b=0;
+    e=executable.length();
+
+    // Lop off trailing, non-escaped '&' if present
+    if((t=executable.rfind('&'))>0 && executable[t-1]!='\'') e=t;
+
+    while(b<e){
+      if((c=executable[b++])=='%'){
+        switch(executable[b++]){
+        case '\0':
+          continue;
+        case 's':         // Backward compatibility
+        case 'f':         // One file
+          f=files;
+          if(f && !f->empty()){
+            if(!commandline.empty()) commandline+=' ';
+            commandline+=FXPath::enquote(*f);
+            }
+          continue;
+        case 'F':         // Multiple files
+          f=files;
+          while(f && !f->empty()){
+            if(!commandline.empty()) commandline+=' ';
+            commandline+=FXPath::enquote(*f);
+            f++;
+            }
+          continue;
+        case 'u':         // URL-ified filename
+          f=files;
+          if(f && !f->empty()){
+            if(!commandline.empty()) commandline+=' ';
+            commandline+=FXPath::enquote(FXURL::fileToURL(*f));
+            }
+          continue;
+        case 'U':         // URL-ified multiple filenames
+          f=files;
+          while(f && !f->empty()){
+            if(!commandline.empty()) commandline+=' ';
+            commandline+=FXPath::enquote(FXURL::fileToURL(*f));
+            f++;
+            }
+          continue;
+        case 'd':         // Current working directory
+          if(!commandline.empty()) commandline+=' ';
+          commandline+=FXPath::enquote(getDirectory());
+          continue;
+        case '%':         // We wanted a '%'
+          commandline+='%';
+          continue;
+          }
+        }
+      commandline+=c;
+      }
+    delete [] files;
+    }
+  return commandline;
+  }
+
+
 // Open
 long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
-  FXint index=filelist->getCurrentItem();       // FIXME use selected item(s)
+  FXint index=filelist->getCurrentItem();
   if(0<=index){
 
     // Pathname of item
@@ -999,25 +1136,16 @@ long PathFinderMain::onCmdOpen(FXObject*,FXSelector,void*){
 
     // If executable, execute it!
     else if(filelist->isItemExecutable(index)){
-      FXString executable=FXPath::enquote(pathname) + " &";
-      FXTRACE((10,"system(%s)\n",executable.text()));
-      ::system(executable.text());
-/*
-      FXProcess process;
-      FXString executable=pathname;
-      const FXchar* argvec[]={executable.text(),executable.text(),NULL};
-      process.start(argvec[0],argvec,NULL);
-*/
+      executeCommandline(pathname);
       }
 
     // If regular file return as the selected file
     else if(filelist->isItemFile(index)){
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
-        if(association->command.text()){
-          FXString command=FXString::value(association->command.text(),FXPath::enquote(pathname).text());
-          FXTRACE((10,"system(%s)\n",command.text()));
-          ::system(command.text());
+        if(!association->command.empty()){
+          FXString commandline=makeCommandline(association->command);
+          executeCommandline(commandline);
           }
         else{
           FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),pathname.text());
@@ -1048,17 +1176,7 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
 
     // If executable, execute it!
     else if(filelist->isItemExecutable(index)){
-      FXString executable=FXPath::enquote(pathname)+" &";
-      FXTRACE((10,"system(%s)\n",executable.text()));
-      ::system(executable.text());
-/*
-      FXProcess process;
-      const FXchar* argv[]={pathname.text(),NULL};
-      process.start(argv[0],argv);
-
-      FIXME
-      status = posix_spawn(&pid,executable.text(),NULL,NULL,argv,environ);
-*/
+      executeCommandline(pathname);
       }
 
     // If regular file return as the selected file
@@ -1069,12 +1187,12 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
         if(previewImage(pathname)) return 1;
         }
 
+      // Get association
       FXFileAssoc *association=filelist->getItemAssoc(index);
       if(association){
-        if(association->command.text()){
-          FXString command=FXString::value(association->command.text(),FXPath::enquote(pathname).text());
-          FXTRACE((10,"system(%s)\n",command.text()));
-          ::system(command.text());
+        if(!association->command.empty()){
+          FXString commandline=makeCommandline(association->command);
+          executeCommandline(commandline);
           }
         else{
           FXMessageBox::information(this,MBOX_OK,tr("Unknown Command"),tr("No command defined for file: %s."),pathname.text());
@@ -1383,9 +1501,10 @@ long PathFinderMain::onUpdDiskSpace(FXObject* sender,FXSelector,void*){
   if(FXStat::getTotalDiskSpace(getDirectory(),totalspace) && FXStat::getAvailableDiskSpace(getDirectory(),availspace)){
     FXString space;
     space.format("Free: %.4lgGB / %.4lgGB",1.0E-9*availspace,1.0E-9*totalspace);
-//    space.format("Free: %'llu / %'llu",availspace,totalspace);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SHOW),NULL);
     sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETSTRINGVALUE),(void*)&space);
+    space.format("Free: %'llu / Total: %'llu Bytes",availspace,totalspace);
+    sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETTIPSTRING),(void*)&space);
     return 1;
     }
   sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_HIDE),NULL);
@@ -1437,13 +1556,12 @@ long PathFinderMain::onCmdSaveSettings(FXObject*,FXSelector,void*){
 
 // Spawn new PathFinder
 long PathFinderMain::onCmdNewPathFinder(FXObject*,FXSelector,void*){
-  FXString path=getDirectory();
   saveSettings();
   getApp()->reg().write();
-  FXString command=FXString::value("%s %s &",pathfindercommand,path.text());
-  ::system(command.text());
+  executeCommandline(PATHFINDEREXEC);
   return 1;
   }
+
 
 /*******************************************************************************/
 
@@ -1621,24 +1739,13 @@ long PathFinderMain::onCmdGotoDir(FXObject*,FXSelector,void*){
 
 // Open with program
 long PathFinderMain::onCmdOpenWith(FXObject*,FXSelector,void*){
-  FXString cmd=getApp()->reg().readStringEntry("SETTINGS","command","adie");
-  FXString filename=filelist->getCurrentFile();         // FIXME use selected item(s)
-  if(FXInputDialog::getString(cmd,this,tr("Open File With"),tr("Open ") + FXPath::name(filename) + tr(" with:"))){
-    getApp()->reg().writeStringEntry("SETTINGS","command",cmd.text());
-    FXString command=cmd+" "+FXPath::enquote(filename)+" &";
-    ::system(command.text());
-/*
-    // Spawn child
-    if(fork()==0){
-      // Close on exec of file descriptor
-      //fcntl(fd,F_SETFD,true);
-      // Start command and pass it the filename
-      execlp(cmd.text(),cmd.text(),filename.text(),NULL);
-
-      // Just in case we failed to execute the command
-      ::exit(0);
+  FXString progname=getApp()->reg().readStringEntry("SETTINGS","command","adie");
+  FXString filename=filelist->getCurrentFile();
+  if(FXInputDialog::getString(progname,this,tr("Open File With"),tr("Open file(s): '") + FXPath::name(filename) + tr("' with:"))){
+    FXString commandline=makeCommandline(progname+" %F");
+    if(executeCommandline(commandline)){
+      getApp()->reg().writeStringEntry("SETTINGS","command",progname.text());
       }
-*/
     }
   return 1;
   }
@@ -1646,32 +1753,27 @@ long PathFinderMain::onCmdOpenWith(FXObject*,FXSelector,void*){
 
 // Open this file with the editor
 long PathFinderMain::onCmdOpenWithEditor(FXObject*,FXSelector,void*){
-  FXString filename=filelist->getCurrentFile();         // FIXME use selected item(s)
-  if(!filename.empty()){
-    FXString executable=editor+" "+FXPath::enquote(filename)+" &";
-    FXTRACE((10,"system(%s)\n",executable.text()));
-    ::system(executable.text());
-    }
+  FXString commandline=makeCommandline(editor);
+  executeCommandline(commandline);
   return 1;
   }
 
 
-// Run program
+// Run a program, possibly with arguments
 long PathFinderMain::onCmdRun(FXObject*,FXSelector,void*){
   FXString newprogram=program;
-  if(FXInputDialog::getString(newprogram,this,tr("Run Program"),tr("Run Program:"))){
-    program=newprogram;
-    FXString executeable="cd "+FXPath::enquote(getDirectory())+"; "+program+" &";
-    ::system(executeable.text());
+  if(FXInputDialog::getString(newprogram,this,tr("Run Program"),tr("Run a program:"))){
+    if(executeCommandline(newprogram)){
+      program=newprogram;
+      }
     }
   return 1;
   }
 
 
-// Run terminal
+// Run terminal in this directory
 long PathFinderMain::onCmdTerminal(FXObject*,FXSelector,void*){
-  FXString executable="cd "+FXPath::enquote(getDirectory())+"; "+terminal+" &";
-  ::system(executable.text());
+  executeCommandline(terminal);
   return 1;
   }
 
@@ -1679,6 +1781,7 @@ long PathFinderMain::onCmdTerminal(FXObject*,FXSelector,void*){
 // Harvest the zombies :-)
 long PathFinderMain::onSigHarvest(FXObject*,FXSelector,void*){
 #ifndef WIN32
+  FXTRACE((10,"onSigHarvest\n"));
   while(waitpid(-1,NULL,WNOHANG)>0){ }
 #endif
   return 1;
@@ -1704,7 +1807,6 @@ long PathFinderMain::onUpdToggleHidden(FXObject* sender,FXSelector,void*){
   sender->handle(this,filelist->showHiddenFiles()?FXSEL(SEL_COMMAND,ID_CHECK):FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
-
 
 
 // Change image size
@@ -1733,7 +1835,6 @@ long PathFinderMain::onUpdImageSize(FXObject* sender,FXSelector sel,void*){
   }
 
 
-
 // Show preferences dialog
 long PathFinderMain::onCmdPreferences(FXObject*,FXSelector,void*){
   Preferences preferences(this);
@@ -1747,6 +1848,7 @@ long PathFinderMain::onCmdPreferences(FXObject*,FXSelector,void*){
   preferences.setIconPath(associations->getIconPath());
   preferences.setAutoSize((liststyle&ICONLIST_AUTOSIZE)!=0);
   preferences.setItemSpace(filelist->getItemSpace());
+  preferences.setExecPaths(FXSystem::getExecPath());
   if(preferences.execute(PLACEMENT_OWNER)){
     setPatternList(preferences.getPatterns());
     terminal=preferences.getTerminal();
@@ -1790,7 +1892,6 @@ long PathFinderMain::onCmdWildcardSelect(FXObject*,FXSelector,void*){
     }
   return 1;
   }
-
 
 /*******************************************************************************/
 
@@ -1946,7 +2047,7 @@ long PathFinderMain::onUpdFileDesc(FXObject* sender,FXSelector,void*){
 
 /*******************************************************************************/
 
-
+// Rotate image
 long PathFinderMain::onCmdRotateImage(FXObject*,FXSelector sel,void*){
   FXImage * image=imagepreview->getImage();
   image->rotate((FXSELID(sel)==ID_IMAGE_ROTATE_LEFT)?90:-90);
@@ -2170,14 +2271,11 @@ int main(int argc,char *argv[]){
 
   // Make sure  we're linked against the right library version
   if(fxversion[0]!=FOX_MAJOR || fxversion[1]!=FOX_MINOR || fxversion[2]!=FOX_LEVEL){
-    fxerror("FOX Library mismatch; expected version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL);
+    fxerror("FOX Library mismatch; expected version: %d.%d.%d, but found version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL,fxversion[0],fxversion[1],fxversion[2]);
     }
 
   // Create application
   FXApp application("PathFinder");
-
-  // Keep original launch name
-  PathFinderMain::pathfindercommand=argv[0];
 
   // Initialize application
   application.init(argc,argv);

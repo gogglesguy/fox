@@ -93,8 +93,9 @@
     of the untitled file to that of the current text window.
 */
 
-#define CLOCKTIMER      1000000000
-#define RESTYLEJUMP     80
+#define CLOCKTIMER      1000000000      // Blink rate for corner clock
+#define RESTYLEJUMP     80              // Restyling back-off
+#define MAXFILESIZE     100000000       // Limit files to this when loading
 
 /*******************************************************************************/
 
@@ -124,6 +125,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_DELETED,TextWindow::ID_TEXT,TextWindow::onTextDeleted),
   FXMAPFUNC(SEL_DND_DROP,TextWindow::ID_TEXT,TextWindow::onTextDNDDrop),
   FXMAPFUNC(SEL_DND_MOTION,TextWindow::ID_TEXT,TextWindow::onTextDNDMotion),
+  FXMAPFUNC(SEL_QUERY_TIP,TextWindow::ID_TEXT,TextWindow::onQueryTextTip),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,TextWindow::ID_TEXT,TextWindow::onTextRightMouse),
 
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_ABOUT,TextWindow::onCmdAbout),
@@ -948,66 +950,67 @@ FXbool TextWindow::loadFile(const FXString& file){
   if(textfile.isOpen()){
     FXchar *text; FXint size,n,i,j,k,c;
 
-    // Get file size
-    size=textfile.size();
+    // Get the file size; bail if too big
+    if((size=textfile.size())<=MAXFILESIZE){
 
-    // Make buffer to load file
-    if(allocElms(text,size)){
+      // Make buffer to load file
+      if(allocElms(text,size)){
 
-      // Set wait cursor
-      getApp()->beginWaitCursor();
+        // Set wait cursor
+        getApp()->beginWaitCursor();
 
-      // Read the file
-      n=textfile.readBlock(text,size);
-      if(0<=n){
+        // Read the file
+        n=textfile.readBlock(text,size);
+        if(0<=n){
 
-        // Strip carriage returns
-        if(stripcr){
-          fxfromDOS(text,n);
-          }
-
-        // Strip trailing spaces
-        if(stripsp){
-          for(i=j=k=0; j<n; i++,j++){
-            c=text[j];
-            if(c=='\n'){
-              i=k;
-              k++;
-              }
-            else if(!Ascii::isSpace(c)){
-              k=i+1;
-              }
-            text[i]=c;
+          // Strip carriage returns
+          if(stripcr){
+            fxfromDOS(text,n);
             }
-          n=i;
+
+          // Strip trailing spaces
+          if(stripsp){
+            for(i=j=k=0; j<n; i++,j++){
+              c=text[j];
+              if(c=='\n'){
+                i=k;
+                k++;
+                }
+              else if(!Ascii::isSpace(c)){
+                k=i+1;
+                }
+              text[i]=c;
+              }
+            n=i;
+            }
+
+          // Set text
+          editor->setText(text,n);
+
+          // Set stuff
+          setEditable(FXStat::isWritable(file));
+          setBrowserCurrentFile(file);
+          mrufiles.appendFile(file);
+          setFiletime(FXStat::modified(file));
+          setFilename(file);
+          setFilenameSet(true);
+
+          // Clear undo records
+          undolist.clear();
+
+          // Mark undo state as clean (saved)
+          undolist.mark();
+
+          // Success
+          loaded=true;
           }
 
-        // Set text
-        editor->setText(text,n);
+        // Kill wait cursor
+        getApp()->endWaitCursor();
 
-        // Set stuff
-        setEditable(FXStat::isWritable(file));
-        setBrowserCurrentFile(file);
-        mrufiles.appendFile(file);
-        setFiletime(FXStat::modified(file));
-        setFilename(file);
-        setFilenameSet(true);
-
-        // Clear undo records
-        undolist.clear();
-
-        // Mark undo state as clean (saved)
-        undolist.mark();
-
-        // Success
-        loaded=true;
+        // Free buffer
+        freeElms(text);
         }
-
-      // Kill wait cursor
-      getApp()->endWaitCursor();
-
-      // Free buffer
-      freeElms(text);
       }
     }
   return loaded;
@@ -1135,52 +1138,53 @@ FXbool TextWindow::insertFile(const FXString& file){
   if(textfile.isOpen()){
     FXchar *text; FXint size,n,i,j,k,c;
 
-    // Get file size
-    size=textfile.size();
+    // Get the file size; bail if too big
+    if((size=textfile.size())<=MAXFILESIZE){
 
-    // Make buffer to load file
-    if(allocElms(text,size)){
+      // Make buffer to load file
+      if(allocElms(text,size)){
 
-      // Set wait cursor
-      getApp()->beginWaitCursor();
+        // Set wait cursor
+        getApp()->beginWaitCursor();
 
-      // Read the file
-      n=textfile.readBlock(text,size);
-      if(0<=n){
+        // Read the file
+        n=textfile.readBlock(text,size);
+        if(0<=n){
 
-        // Strip carriage returns
-        if(stripcr){
-          fxfromDOS(text,n);
-          }
-
-        // Strip trailing spaces
-        if(stripsp){
-          for(i=j=k=0; j<n; i++,j++){
-            c=text[j];
-            if(c=='\n'){
-              i=k;
-              k++;
-              }
-            else if(!Ascii::isSpace(c)){
-              k=i+1;
-              }
-            text[i]=c;
+          // Strip carriage returns
+          if(stripcr){
+            fxfromDOS(text,n);
             }
-          n=i;
+
+          // Strip trailing spaces
+          if(stripsp){
+            for(i=j=k=0; j<n; i++,j++){
+              c=text[j];
+              if(c=='\n'){
+                i=k;
+                k++;
+                }
+              else if(!Ascii::isSpace(c)){
+                k=i+1;
+                }
+              text[i]=c;
+              }
+            n=i;
+            }
+
+          // Set text
+          editor->insertText(editor->getCursorPos(),text,n,true);
+
+          // Success
+          loaded=true;
           }
 
-        // Set text
-        editor->insertText(editor->getCursorPos(),text,n,true);
+        // Kill wait cursor
+        getApp()->endWaitCursor();
 
-        // Success
-        loaded=true;
+        // Free buffer
+        freeElms(text);
         }
-
-      // Kill wait cursor
-      getApp()->endWaitCursor();
-
-      // Free buffer
-      freeElms(text);
       }
     }
   return loaded;
@@ -1236,6 +1240,7 @@ FXbool TextWindow::extractFile(const FXString& file){
 void TextWindow::visitLine(FXint line,FXint column){
   editor->setCursorRowColumn(line-1,column);
   editor->setCenterLine(editor->getCursorPos());
+  editor->makePositionVisible(editor->getCursorPos());
   }
 
 
@@ -3139,6 +3144,7 @@ long TextWindow::onCmdGotoLine(FXObject*,FXSelector,void*){
   FXint row=editor->getCursorRow()+1;
   if(FXInputDialog::getInteger(row,this,tr("Goto Line"),tr("&Goto line number:"),&dialogicon,1,2147483647)){
     editor->setCursorRow(row-1,true);
+    editor->makePositionVisible(editor->getCursorPos());
     }
   return 1;
   }
@@ -3156,6 +3162,7 @@ long TextWindow::onCmdGotoSelected(FXObject*,FXSelector,void*){
         }
       if(1<=row){
         editor->setCursorRow(row-1,true);
+        editor->makePositionVisible(editor->getCursorPos());
         return 1;
         }
       }
@@ -4119,6 +4126,7 @@ void TextWindow::gotoPosition(FXint pos){
     editor->setCenterLine(pos);
     }
   editor->setCursorPos(pos);
+  editor->makePositionVisible(editor->getCursorPos());
   }
 
 
@@ -4860,4 +4868,31 @@ long TextWindow::onCmdRestyle(FXObject*,FXSelector,void*){
 long TextWindow::onUpdRestyle(FXObject* sender,FXSelector,void*){
   sender->handle(this,editor->isStyled()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
+  }
+
+
+// Show syntax in tooltip
+// FIXME for now, we should the syntax rule; but in the future,
+// we will show more interesting stuff than that.
+long TextWindow::onQueryTextTip(FXObject* sender,FXSelector,void*){
+  if(getSyntax() && editor->isStyled()){
+    FXint vx=editor->getVisibleX();
+    FXint vy=editor->getVisibleY();
+    FXint vw=editor->getVisibleWidth();
+    FXint vh=editor->getVisibleHeight();
+    FXint pos,x,y,s;
+    FXuint btns;
+    if(editor->getCursorPosition(x,y,btns)){
+      if(vx<=x && vy<=y && x<vx+vw && y<vy+vh){
+        pos=editor->getPosAt(x,y);
+        s=editor->getStyle(pos);
+        if(0<s && s<getSyntax()->getNumRules()){
+          FXString tipstring=getSyntax()->getRule(s)->getName();
+          sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tipstring);
+          return 1;
+          }
+        }
+      }
+    }
+  return 0;
   }

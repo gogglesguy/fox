@@ -503,6 +503,11 @@ FXQuatd FXQuatd::conj() const {
 
 // Rotation of a vector by a quaternion; this is defined as q.v.q*
 // where q* is the conjugate of q.
+// Alternatively, using ^ to denote cross product, it can be expressed as:
+//
+//   t = 2 * (q.xyz ^ v)
+//   v' = v + q.w * t + (q.xyz ^ t)
+// 
 FXVec3d FXQuatd::operator*(const FXVec3d& v) const {
   return v*FXMat3d(*this);
   }

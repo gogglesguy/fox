@@ -95,11 +95,12 @@ struct FXDispatcher::FXHandles {
 #if defined(WIN32)
   FXInputHandle      handles[MAXIMUM_WAIT_OBJECTS];     // Handles
   FXuint             modes[MAXIMUM_WAIT_OBJECTS];       // IO Modes each handle
+  FX
 #elif defined(HAVE_EPOLL_CREATE1)
   struct epoll_event events[128];                       // Events
   FXInputHandle      handle;                            // Poll handle
 #else
-  fd_set             watched[3];                        // Watched handles
+  fd_set             watched[3];                        // Watched handles (FD_SETSIZE elements)
   fd_set             handles[3];                        // Known handles
 #endif
   };
@@ -309,10 +310,10 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd){
     if(hnd!=BadHandle){
       for(FXint i=numhandles-1; i>=0; --i){
         if(handles->handles[i]==hnd){
-          if(current==i) current=-1;                    // Removed a raised handle
-          if(current==numhandles-1) current=i;          // Renumbered a raised handle
           handles->handles[i]=handles->handles[numhandles-1];
           handles->modes[i]=handles->modes[numhandles-1];
+          if(current==i) current=-1;                    // Removed a raised handle
+          if(current==numhandles-1) current=i;          // Renumbered a raised handle
           numhandles--;
           return true;
           }
@@ -325,7 +326,7 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd){
       ev.events=0;              // Doesn't really matter, ignored by kernel
       ev.data.fd=0;
       if(::epoll_ctl(handles->handle,EPOLL_CTL_DEL,hnd,&ev)!=0){ return false; }
-      numhandles++;
+      numhandles--;
       return true;
       }
 #else

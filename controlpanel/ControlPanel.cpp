@@ -23,8 +23,24 @@
 #include "ControlPanel.h"
 #include "icons.h"
 
+// Place to look for executables
+#if defined(WIN32)
+#define SUGGESTED_FOLDER "C:\\Windows\\System32\\"
+#else
+#define SUGGESTED_FOLDER "/usr/bin/"
+#endif
+
+// Executable file extensions
+#if defined(WIN32)
+#define SUGGESTED_PATTERNS "Executables (*.com,*.exe,*.bat,*.cmd)\nAll Files (*)"
+#else
+#define SUGGESTED_PATTERNS "All Files (*)"
+#endif
+
+// Padding for the dialog elements
 #define DEFAULT_SPACING 6
 
+/*******************************************************************************/
 
 
 const ColorTheme ColorThemes[]={
@@ -96,6 +112,10 @@ FXDEFMAP(FXDesktopSetup) FXDesktopSetupMap[]={
   FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_CREATE_FILEBINDING,FXDesktopSetup::onCmdCreateFileBinding),
   FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_REMOVE_FILEBINDING,FXDesktopSetup::onCmdRemoveFileBinding),
   FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_RENAME_FILEBINDING,FXDesktopSetup::onCmdRenameFileBinding),
+  FXMAPFUNC(SEL_UPDATE,FXDesktopSetup::ID_RUN_IN_TERMINAL,FXDesktopSetup::onUpdRunInTerminal),
+  FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_RUN_IN_TERMINAL,FXDesktopSetup::onCmdRunInTerminal),
+  FXMAPFUNC(SEL_UPDATE,FXDesktopSetup::ID_CHANGE_DIRECTORY,FXDesktopSetup::onUpdChangeDirectory),
+  FXMAPFUNC(SEL_COMMAND,FXDesktopSetup::ID_CHANGE_DIRECTORY,FXDesktopSetup::onCmdChangeDirectory),
   FXMAPFUNCS(SEL_COMMAND,FXDesktopSetup::ID_SELECT_ICON_BIG,FXDesktopSetup::ID_SELECT_ICON_MINIOPEN,FXDesktopSetup::onCmdSelectIcon),
   };
 
@@ -295,10 +315,8 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   // Command to execute
   packer=new FXPacker(vframe7,LAYOUT_FILL_X,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
   new FXLabel(packer,"Command:");
-  FXCheckButton *checkbutton1=new FXCheckButton(packer,tr("Run in terminal"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_LEFT|LAYOUT_SIDE_BOTTOM);
-  FXCheckButton *checkbutton2=new FXCheckButton(packer,tr("Change directory"),NULL,0,ICON_BEFORE_TEXT|LAYOUT_LEFT|LAYOUT_SIDE_BOTTOM);
-  checkbutton1->disable();
-  checkbutton2->disable();
+  FXCheckButton *checkbutton1=new FXCheckButton(packer,tr("Run in terminal\t\tRun command in terminal."),this,ID_RUN_IN_TERMINAL,ICON_BEFORE_TEXT|LAYOUT_LEFT|LAYOUT_SIDE_BOTTOM);
+  FXCheckButton *checkbutton2=new FXCheckButton(packer,tr("Change directory\t\tChange directory before running command."),this,ID_CHANGE_DIRECTORY,ICON_BEFORE_TEXT|LAYOUT_LEFT|LAYOUT_SIDE_BOTTOM);
   new FXButton(packer,"...",NULL,this,ID_SELECT_COMMAND,LAYOUT_SIDE_RIGHT|LAYOUT_CENTER_Y|FRAME_RAISED|FRAME_THICK);
   new FXTextField(packer,2,&target_filebinding_command,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
 
@@ -465,6 +483,8 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   maxcolors=125;
   gamma=1.0;
 
+  filebinding.flags=0;
+
   // Color data targets associations
   target_base.connect(theme_current.base,this,ID_COLORS);
   target_back.connect(theme_current.back,this,ID_COLORS);
@@ -539,16 +559,47 @@ void FXDesktopSetup::setupIconButton(const FXString& name,FXint index){
 // Save file binding entry
 void FXDesktopSetup::saveFileBinding(){
   if(!filebinding.key.empty()){
-    FXString entry=filebinding.command+";"+filebinding.description+";";
-    if(filebinding.iconfile[BIG_ICON_OPEN].empty())
-      entry+=filebinding.iconfile[BIG_ICON]+";";
-    else
-      entry+=filebinding.iconfile[BIG_ICON]+":"+filebinding.iconfile[BIG_ICON_OPEN]+";";
-    if(filebinding.iconfile[MINI_ICON_OPEN].empty())
-      entry+=filebinding.iconfile[MINI_ICON]+";";
-    else
-      entry+=filebinding.iconfile[MINI_ICON]+":" + filebinding.iconfile[MINI_ICON_OPEN]+";";
+    FXString entry;
+
+    // Command line
+    entry=filebinding.command;
+    entry+=";";
+
+    // Description
+    entry+=filebinding.description;
+    entry+=";";
+
+    // Big icon(s)
+    entry+=filebinding.iconfile[BIG_ICON];
+    if(!filebinding.iconfile[BIG_ICON_OPEN].empty()){
+      entry+=":";
+      entry+=filebinding.iconfile[BIG_ICON_OPEN];
+      }
+    entry+=";";
+
+    // Mini icon(s)
+    entry+=filebinding.iconfile[MINI_ICON];
+    if(!filebinding.iconfile[MINI_ICON_OPEN].empty()){
+      entry+=":";
+      entry+=filebinding.iconfile[MINI_ICON_OPEN];
+      }
+    entry+=";";
+
+    // Mime type
     entry+=filebinding.mime;
+
+    // Flags, if any
+    if(filebinding.flags){
+      entry+=";";
+      if(filebinding.flags&1){
+        entry+="c";
+        }
+      if(filebinding.flags&2){
+        entry+="t";
+        }
+      }
+
+    // Write to filetypes key
     desktopsettings.writeStringEntry("FILETYPES",filebinding.key.text(),entry.text());
     }
   }
@@ -556,10 +607,10 @@ void FXDesktopSetup::saveFileBinding(){
 
 // Set command association
 long FXDesktopSetup::onCmdSelectCommand(FXObject*,FXSelector,void*){
-  FXString path=(filebinding.command.empty()) ? "/usr/bin/" : filebinding.command.text();
-  FXString command=FXFileDialog::getOpenFilename(this,"Select Command",path,"*");
-  if(!command.empty()){
-    filebinding.command=command;
+  FXString oldcommand=filebinding.command.empty() ? SUGGESTED_FOLDER : filebinding.command;
+  FXString newcommand=FXFileDialog::getOpenFilename(this,tr("Select Command"),oldcommand,SUGGESTED_PATTERNS);
+  if(!newcommand.empty()){
+    filebinding.command=newcommand;
     }
   return 1;
   }
@@ -582,6 +633,7 @@ long FXDesktopSetup::onCmdFileBinding(FXObject*,FXSelector,void* ptr){
   FXint index=(FXint)(FXival)ptr,no;
   FXString association;
   FXString iconname;
+  FXString string;
 
   // Save old one
   saveFileBinding();
@@ -615,10 +667,16 @@ long FXDesktopSetup::onCmdFileBinding(FXObject*,FXSelector,void* ptr){
       no=mimetypelist->findItem(filebinding.mime);
       mimetypelist->setCurrentItem(no);
       }
-    else {
+    else{
       no=mimetypelist->findItem(" ");           // FIXME
       mimetypelist->setCurrentItem(no);
       }
+
+    // Flags
+    string=association.section(';',5);
+    filebinding.flags=0;
+    if(string.contains("c")) filebinding.flags|=1;
+    if(string.contains("t")) filebinding.flags|=2;
 
     // Change icons
     setupIconButton(filebinding.iconfile[BIG_ICON],BIG_ICON);
@@ -651,6 +709,7 @@ long FXDesktopSetup::onCmdCreateFileBinding(FXObject*,FXSelector,void*){
     filebinding.iconfile[MINI_ICON]=FXString::null;
     filebinding.iconfile[MINI_ICON_OPEN]=FXString::null;
     filebinding.mime=FXString::null;
+    filebinding.flags=0;
 
     // Save New
     saveFileBinding();
@@ -720,6 +779,34 @@ long FXDesktopSetup::onCmdSelectIcon(FXObject*,FXSelector sel,void*){
     filebinding.iconfile[index]=FXPath::relativize(iconpath,iconfilename);
     setupIconButton(filebinding.iconfile[index],index);
     }
+  return 1;
+  }
+
+
+// Run in terminal update
+long FXDesktopSetup::onUpdRunInTerminal(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(filebinding.flags&2) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Run in terminal
+long FXDesktopSetup::onCmdRunInTerminal(FXObject*,FXSelector,void*){
+  filebinding.flags^=2;
+  return 1;
+  }
+
+
+// Change directory update
+long FXDesktopSetup::onUpdChangeDirectory(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(filebinding.flags&1) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change directory
+long FXDesktopSetup::onCmdChangeDirectory(FXObject*,FXSelector,void*){
+  filebinding.flags^=1;
   return 1;
   }
 
@@ -1200,7 +1287,6 @@ FXDesktopSetup::~FXDesktopSetup(){
   delete icon_filebinding;
   }
 
-
 /*******************************************************************************/
 
 // Start the program
@@ -1209,7 +1295,7 @@ int main(int argc,char **argv){
 
   // Make sure  we're linked against the right library version
   if(fxversion[0]!=FOX_MAJOR || fxversion[1]!=FOX_MINOR || fxversion[2]!=FOX_LEVEL){
-    fxerror("FOX Library mismatch; expected version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL);
+    fxerror("FOX Library mismatch; expected version: %d.%d.%d, but found version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL,fxversion[0],fxversion[1],fxversion[2]);
     }
 
   // Make application

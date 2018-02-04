@@ -38,7 +38,7 @@ class FXCallback;
 // Both free functions and member functions may be called.
 template<typename RT>
 class FXAPI FXCallback<RT ()> {
-private:
+public:
   typedef RT (*METHOD)(const void*);
 private:
   METHOD      method;
@@ -68,6 +68,9 @@ public:
   // Copy constructor
   FXCallback(const FXCallback& org):method(org.method),object(org.object){ }
 
+  // Construct with given method and object
+  FXCallback(METHOD mw,const void* obj=0):method(mw),object(obj){ }
+
   // Assignment operator
   FXCallback& operator=(const FXCallback& org){ method=org.method; object=org.object; return *this; }
 
@@ -91,6 +94,9 @@ public:
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
+
+  // Disconnect conditionally
+  void disconnect(const void* obj){ if(obj==object){ disconnect(); } }
   };
 
 /********************************************************************************/
@@ -102,7 +108,7 @@ public:
 // Both free functions and member functions may be called.
 template<typename RT,typename PT1>
 class FXAPI FXCallback<RT (PT1)> {
-private:
+public:
   typedef RT (*METHOD)(const void*,PT1);
 private:
   METHOD      method;
@@ -132,6 +138,9 @@ public:
   // Copy constructor
   FXCallback(const FXCallback& org):method(org.method),object(org.object){ }
 
+  // Construct with given method and object
+  FXCallback(METHOD mw,const void* obj=0):method(mw),object(obj){ }
+
   // Assignment operator
   FXCallback& operator=(const FXCallback& org){ method=org.method; object=org.object; return *this; }
 
@@ -155,6 +164,9 @@ public:
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
+
+  // Disconnect conditionally
+  void disconnect(const void* obj){ if(obj==object){ disconnect(); } }
   };
 
 /********************************************************************************/
@@ -166,7 +178,7 @@ public:
 // Both free functions and member functions may be called.
 template<typename RT,typename PT1,typename PT2>
 class FXAPI FXCallback<RT (PT1,PT2)> {
-private:
+public:
   typedef RT (*METHOD)(const void*,PT1,PT2);
 private:
   METHOD      method;
@@ -196,6 +208,9 @@ public:
   // Copy constructor
   FXCallback(const FXCallback& org):method(org.method),object(org.object){ }
 
+  // Construct with given method and object
+  FXCallback(METHOD mw,const void* obj=0):method(mw),object(obj){ }
+
   // Assignment operator
   FXCallback& operator=(const FXCallback& org){ method=org.method; object=org.object; return *this; }
 
@@ -219,6 +234,9 @@ public:
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
+
+  // Disconnect conditionally
+  void disconnect(const void* obj){ if(obj==object){ disconnect(); } }
   };
 
 /********************************************************************************/
@@ -230,7 +248,7 @@ public:
 // Both free functions and member functions may be called.
 template<typename RT,typename PT1,typename PT2,typename PT3>
 class FXAPI FXCallback<RT (PT1,PT2,PT3)> {
-private:
+public:
   typedef RT (*METHOD)(const void*,PT1,PT2,PT3);
 private:
   METHOD      method;
@@ -260,6 +278,9 @@ public:
   // Copy constructor
   FXCallback(const FXCallback& org):method(org.method),object(org.object){ }
 
+  // Construct with given method and object
+  FXCallback(METHOD mw,const void* obj=0):method(mw),object(obj){ }
+
   // Assignment operator
   FXCallback& operator=(const FXCallback& org){ method=org.method; object=org.object; return *this; }
 
@@ -283,6 +304,9 @@ public:
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
+
+  // Disconnect conditionally
+  void disconnect(const void* obj){ if(obj==object){ disconnect(); } }
   };
 
 /********************************************************************************/
@@ -294,7 +318,7 @@ public:
 // Both free functions and member functions may be called.
 template<typename RT,typename PT1,typename PT2,typename PT3,typename PT4>
 class FXAPI FXCallback<RT (PT1,PT2,PT3,PT4)> {
-private:
+public:
   typedef RT (*METHOD)(const void*,PT1,PT2,PT3,PT4);
 private:
   METHOD      method;
@@ -324,6 +348,9 @@ public:
   // Copy constructor
   FXCallback(const FXCallback& org):method(org.method),object(org.object){ }
 
+  // Construct with given method and object
+  FXCallback(METHOD mw,const void* obj=0):method(mw),object(obj){ }
+
   // Assignment operator
   FXCallback& operator=(const FXCallback& org){ method=org.method; object=org.object; return *this; }
 
@@ -347,6 +374,9 @@ public:
 
   // Disconnect resets to default
   void disconnect(){ method=&default_call; object=NULL; }
+
+  // Disconnect conditionally
+  void disconnect(const void* obj){ if(obj==object){ disconnect(); } }
   };
 
 }

@@ -91,13 +91,13 @@ public:
   virtual void load(FXStream& store);
 
   /// Set current directory
-  void setDirectory(const FXString& pathname);
+  void setDirectory(const FXString& pathname,FXbool notify=false);
 
   /// Return current directory
   FXString getDirectory() const;
 
   /// Change file associations; delete the old one unless it was shared
-  void setAssociations(FXFileAssociations* assoc,FXbool owned=false);
+  void setAssociations(FXFileAssociations* assoc,FXbool owned=false,FXbool notify=false);
 
   /// Return file associations
   FXFileAssociations* getAssociations() const { return associations; }

@@ -1,4 +1,4 @@
-/*********** Generated on 2017/09/22 20:05:19 by reswrap version 6.0.0 *********/
+/*********** Generated on 2017/12/14 00:20:23 by reswrap version 6.0.0 *********/
 
 #include "help.h"
 
@@ -331,9 +331,10 @@ const char help[]=
   "  \\n\tNewline\n"
   "  \\r\tReturn\n"
   "  \\v\tVertical tab\n"
-  "  \\cX\tControl character\n"
+  "  \\cX\tControl character (X is '@', 'A'...'Z', '[', '\\', ']', '^', '_', or '?'"
+  " for DEL).\n"
   "  \\033\tOctal\n"
-  "  \\x1b\tHex\n"
+  "  \\xFF\tHexadecimal number (should be exactly two hex-digits)\n"
   "  \\w\tWord character [a-zA-Z_0-9]\n"
   "  \\W\tNon-word character\n"
   "  \\l\tLetter [a-zA-Z]\n"
@@ -355,6 +356,16 @@ const char help[]=
   "  \\A\tMatch only beginning of string\n"
   "  \\Z\tMatch only and end of string\n"
   "  \\1...\\9\tBack reference\n"
+  "\n"
+  "\n"
+  "Greedy match (the default) tries to match as many characters as possible, but ba"
+  "cks off one at a time until a match is found.  Lazy match tries to match as few "
+  "characters as possible, but advances one at a time until a match is found.  The "
+  "possessive match behaves much like the greedy match, but does not back off; if t"
+  "he rest of the pattern does not succeed, the match fails.  Possessive match can "
+  "often be a major guard against unnecessary recursion by calling it quits early, "
+  "because backing off has no possibility of success.\n"
+  "\n"
   "\n"
   "\n"
   "Keyboard Bindings.\n"

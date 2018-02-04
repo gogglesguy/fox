@@ -59,66 +59,6 @@ void ShellCommand::setInput(const FXString& str){
   }
 
 
-#if 0
-// Execute command
-FXbool ShellCommand::start(const FXString& command){
-  FXTRACE((1,"ShellCommand::start(%s)\n",command.text()));
-  FXbool result=false;
-  if(!command.empty() && !process.id()){
-
-    // Assemble command
-    const FXchar* argv[]={"/bin/sh","-c",command.text(),NULL};
-
-    // Pipes at child's end
-    FXPipe ichild;
-    FXPipe ochild;
-    FXPipe echild;
-
-    // Open pipe for child input (the parent writes, child reads)
-    if(!ipipe.open(ichild,FXIO::WriteOnly|FXIO::Inheritable)) return false;
-
-    // Open pipe for child outout (parent reads, child writes)
-    if(!opipe.open(ochild,FXIO::ReadOnly|FXIO::Inheritable)) return false;
-
-    // Open pipe for child errors (parent reads, child writes)
-    if(!epipe.open(echild,FXIO::ReadOnly|FXIO::Inheritable)) return false;
-
-    // Set handles to be used by child
-    process.setInputStream(&ichild);
-    process.setOutputStream(&ochild);
-    process.setErrorStream(&echild);
-
-    // Start it
-    if(process.start(argv[0],argv)){
-
-      // Close child-side handles
-      ichild.close();
-      ochild.close();
-      echild.close();
-
-      // Set non-blocking on our end
-      ipipe.setMode(ipipe.mode()|FXIO::NonBlocking);
-      opipe.setMode(opipe.mode()|FXIO::NonBlocking);
-      epipe.setMode(epipe.mode()|FXIO::NonBlocking);
-
-      // Set I/O callbacks
-      if(ipipe.isOpen()){
-        app->addInput(this,ID_INPUT,ipipe.handle(),INPUT_WRITE);
-        }
-      if(opipe.isOpen()){
-        app->addInput(this,ID_OUTPUT,opipe.handle(),INPUT_READ);
-        }
-      if(epipe.isOpen()){
-        app->addInput(this,ID_ERROR,epipe.handle(),INPUT_READ);
-        }
-      result=true;
-      }
-    }
-  return result;
-  }
-#endif
-
-
 // Execute command
 FXbool ShellCommand::start(const FXString& command){
   FXTRACE((1,"ShellCommand::start(%s)\n",command.text()));

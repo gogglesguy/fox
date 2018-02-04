@@ -54,6 +54,7 @@ struct FXFileBinding {
   FXString command;             // Command to invoke
   FXString iconfile[4];         // Icon file names
   FXString mime;                // Mime type
+  FXuint   flags;               // Flags
   };
 
 
@@ -180,7 +181,9 @@ public:
     ID_SELECT_ICON_BIGOPEN,
     ID_SELECT_ICON_MINI,
     ID_SELECT_ICON_MINIOPEN,
-    ID_SELECT_MIMETYPE
+    ID_SELECT_MIMETYPE,
+    ID_RUN_IN_TERMINAL,
+    ID_CHANGE_DIRECTORY
     };
 public:
   long onColorChanged(FXObject*,FXSelector,void*);
@@ -193,6 +196,10 @@ public:
   long onCmdRenameFileBinding(FXObject*,FXSelector,void*);
   long onCmdSelectCommand(FXObject*,FXSelector,void*);
   long onCmdSelectIcon(FXObject*,FXSelector,void*);
+  long onUpdRunInTerminal(FXObject*,FXSelector,void*);
+  long onCmdRunInTerminal(FXObject*,FXSelector,void*);
+  long onUpdChangeDirectory(FXObject*,FXSelector,void*);
+  long onCmdChangeDirectory(FXObject*,FXSelector,void*);
 public:
 
   // Constructor

@@ -1345,7 +1345,7 @@ language "Python"
   end
 
   rule "Operator"
-    pattern    "\+\+|\+=|\+|--|-=|-|==|=|&&|&=|&|=|^=|^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!=|!|~=|~|\*=|\*|/=|/|%=|%|:"
+    pattern    "\+\+|\+=|\+|--|-=|-|==|=|&&|&=|&|=|\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!=|!|~=|~|\*=|\*|/=|/|%=|%|:"
     style      "red"
   end
 
@@ -1402,7 +1402,7 @@ language "Ruby"
     style       "darkgreen"
   end
   rule "Operator"
-    pattern     "\+=|\+|-=|-|===|==|=|&&|&=|&|\|\||\|=|\||^=|^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%|"
+    pattern     "\+=|\+|-=|-|===|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%"
   end
   rule "Keyword"
     pattern     "\<(alias|and|BEGIN|begin|break|case|class|def|defined|do|else|elsif|END|end|ensure|false|for|if|in|module|next|nil|not|or|redo|rescue|retry|return|self|super|then|true|undef|unless|until|when|while|yield)\>"
@@ -1934,23 +1934,30 @@ language "Make"
       style    "darkgreen"
     end
   end
+  rule "Keyword"
+    pattern    "^\s*?\<(define|endef|undefine|ifdef|ifndef|ifeq|ifneq|else|endif|include|-include|sinclude|override|export|unexport|private|vpath)\>"
+    style      "brown"
+  end
+  rule "Assignment"
+    openpattern "^\s*?[A-Za-z0-9_+$()]+\s*?(\?=|\+=|::=|:=|=)"
+    closepattern "$"
+    rule "AssignmentContinuation"
+      pattern "\\\n"
+    end
+  end
   rule "PhonyDependencies"
-    openpattern "\<(\.PHONY|\.SUFFIXES|\.DEFAULT|\.PRECIOUS|\.INTERMEDIATE|\.SECONDARY|\.SECONDEXPANSION|\.DELETE_ON_ERROR|\.IGNORE|\.LOW_RESOLUTION_TIME|\.SILENT|\.EXPORT_ALL_VARIABLES|\.NOTPARALLEL|\.ONESHELL|\.POSIX|\.DEFAULT_GOAL)\>::?"
+    openpattern "^(\.PHONY|\.SUFFIXES|\.DEFAULT|\.PRECIOUS|\.INTERMEDIATE|\.SECONDARY|\.SECONDEXPANSION|\.DELETE_ON_ERROR|\.IGNORE|\.LOW_RESOLUTION_TIME|\.SILENT|\.EXPORT_ALL_VARIABLES|\.NOTPARALLEL|\.ONESHELL|\.POSIX|\.DEFAULT_GOAL)\s*::?"
     closepattern "$|;"
     rule "PhonyDependencyContinuation"
       pattern "\\\n"
     end
   end
   rule "Dependencies"
-    openpattern "(([A-Za-z0-9./$(){} _@^<*?%+-]+?(\\\n))*?[A-Za-z0-9./$(){} _@^<*?%+-]+)::?"
+    openpattern "^([\w%./$(){}@^<*?%+-]+\s*)+::?"
     closepattern "$|;"
     rule "DependencyContinuation"
       pattern "\\\n"
     end
-  end
-  rule "Keyword"
-    pattern    "\<(define|ifdef|ifndef|ifeq|ifneq|else|endif|endef|include|-include|sinclude|override|export|unexport|private|vpath)\>"
-    style      "brown"
   end
   rule "String"
     openpattern   "\""
@@ -1986,13 +1993,6 @@ language "Make"
     rule "ControlEscape"
       pattern     "\\."
       style       "fuchsia"
-    end
-  end
-  rule "Assignment"
-    openpattern "^[ \t]*[A-Za-z0-9_+$()]+[ \t]*(\?=|\+=|::=|:=|=)"
-    closepattern "$"
-    rule "AssignmentContinuation"
-      pattern "\\\n"
     end
   end
 end

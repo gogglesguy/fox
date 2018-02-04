@@ -30,6 +30,49 @@
     for instance "\"quoted\"" means "quoted" but "line\n" means line\n, not
     line<NL>.  This is to keep patterns moderately sane and avoid multiple
     levels of escaping.
+  - Syntax patterns syntax:
+
+      Syntax         =     { Language }*
+
+      Language       =     "language" String
+                           { LangDefinition }* 
+                           "end"
+
+      LangDefinition =     "filesmatch"    String
+                     |     "contentsmatch" String
+                     |     "delimiters"    String 
+                     |     "contextlines"  Number
+                     |     "contextchars"  Number
+                     |     "autoindent"    YesNo
+                     |     "wrapwidth"     Number
+                     |     "tabwidth"      Number
+                     |     "wordwrap"      YesNo
+                     |     "expandtabs"    YesNo
+                     |     "group"         String
+                     |     { Rule }*
+
+      Rule           =     "rule" String 
+                           { RuleDefinition }* 
+                           "end"
+
+      RuleDefinition =     "style"        String
+                     |     "pattern"      String
+                     |     "openpattern"  String
+                     |     "closepattern" String
+                     |     "stoppattern"  String 
+                     |     { Rule }*
+
+      YesNo          =     "yes" | "no"
+
+      String         =     '"' Characters '"'
+
+      Characters     =     ([^"]|\\")*
+
+      Number         =     [0-9]+
+      
+  - Note that only quotes (") need to be escaped; this is because otherwise, patterns 
+    get really complicated as the regular expression engine also needs special characters
+    to be quoted.
 */
 
 /*******************************************************************************/

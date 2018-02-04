@@ -116,11 +116,11 @@ protected:
 protected:
   PathFinderMain(){}
   FXbool haveSelectedFiles() const;
-  FXint getNumSelectedFiles() const;
-  FXString* getSelectedFiles() const;
   void visitDirectory(const FXString& dir);
   FXbool previewImage(const FXString& filename);
   void closePreview();
+  FXbool executeCommandline(const FXString& commandline);
+  FXString makeCommandline(const FXString& executable) const;
 public:
   long onUpdate(FXObject*,FXSelector,void*);
   long onCmdAbout(FXObject*,FXSelector,void*);
@@ -265,8 +265,6 @@ public:
     ID_LAST
     };
 public:
-  static FXchar* pathfindercommand;
-public:
 
   // Construct window
   PathFinderMain(FXApp* a);
@@ -288,6 +286,9 @@ public:
 
   // Return current directory
   FXString getDirectory() const;
+
+  // Return selected filenames
+  FXString* getSelectedFiles() const;
 
   // Return file associations
   FXFileAssociations *getAssociations() const { return associations; }

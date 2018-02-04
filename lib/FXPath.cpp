@@ -1384,7 +1384,166 @@ FXString FXPath::dequote(const FXString& file){
 
 /*******************************************************************************/
 
-// Parse command to argc and argv
+#if defined(WIN32)
+
+// Parse command to argc and argv, according to os-native rules
+//
+// 2N+1 backslashes + '"' : N backslashes + literal '"'
+// 2N backslashes + '"'   : N backslashes and begin/end of quoted text
+// N backslashes          : N backslashes
+//
+FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
+  argv=NULL;
+  if(command){
+    const FXchar *p=command;
+    FXint token=0;
+    FXint count=0;
+    FXint space=0;
+    FXint slash=0;
+    FXint quote=0;
+    FXchar* buffer;
+    FXchar** ptr;
+    FXchar* arg;
+    FXchar* a;
+    FXchar c;
+
+    // First pass: measure output
+    while((c=*p++)!='\0'){
+      switch(c){
+      case '\\':                        // Backslashes get special handling
+        space++;
+        slash++;
+        token=1;
+        break;
+      case '"':                         // Double quoted
+        space-=(slash>>1);              // Halve the number of slashes, if any
+        if(slash&1){                    // Odd number of slashes
+          space++;                      // Literal " added
+          }
+        else{                           // Even number of slashes
+          if(quote && *(p+1)=='"'){
+            space++;                    // Escaped quote inside quotation
+            }
+          else{
+            quote^=1;
+            }
+          }
+        token=1;
+        slash=0;
+        break;
+      case ' ':                         // White space
+      case '\t':
+      case '\v':
+      case '\r':
+      case '\f':
+      case '\n':
+        count+=token;
+        token=0;
+        slash=0;
+        break;
+      default:                          // Normal characters
+        space++;
+        token=1;
+        slash=0;
+        break;
+        }
+      }
+
+    // Wrap up last one
+    count+=token;
+    space+=count;
+    
+    // We got at least one argument
+    if(count){
+
+      // Allocate one buffer for the whole thing
+      if(allocElms(buffer,(count+1)*sizeof(FXchar*)+space)){
+
+        // First part of buffer contains pointers
+        argv=ptr=(FXchar**)buffer;
+
+        // Point to where the characters start
+        arg=a=(FXchar*)&argv[count+1];
+
+        // Reset string input
+        p=command;
+        
+        token=0;
+        slash=0;
+        quote=0;
+
+        // Second pass: generate output
+        while((c=*p++)!='\0'){
+          switch(c){
+          case '\\':                    // Backslashes get special handling
+            *a++='\\';
+            slash++;
+            token=1;
+            break;
+          case '"':                     // Double quoted
+            a-=(slash>>1);              // Halve number of slashes, if any
+            if(slash&1){                // Odd number of slashes
+              *a++='"';                 // Literal " added
+              }
+            else{                       // Even number of slashes
+              if(quote && *(p+1)=='"'){
+                *a++='"';               // Escaped quote inside quotation
+                }
+              else{
+                quote^=1;
+                }
+              }
+            token=1;
+            slash=0;
+            break;
+          case ' ':                     // White space
+          case '\t':
+          case '\v':
+          case '\r':
+          case '\f':
+          case '\n':
+            if(token){                  // Close out argument
+              *ptr++=arg;
+              *a++='\0';
+              arg=a;
+              token=0;
+              }
+            slash=0;
+            break;
+          default:                      // Normal characters
+            *a++=c;
+            token=1;
+            slash=0;
+            break;
+            }
+          }
+
+        // Final token closeout
+        if(token){                      
+          *ptr++=arg;
+          *a='\0';
+          }
+
+        // Argv closeout
+        *ptr=NULL;
+        return count;
+        }
+      }
+    }
+  return 0;
+  }
+  
+  
+#else
+
+// Parse command to argc and argv, according to os-native rules
+//
+// \<nl>        : Line continuation NOT counted as a space
+// \X           : Escaped character (when outside quotes)
+// #...<nl>     : Comments are ignored same as whitespace
+// "......"     : Only $, \, and ' need escaping inside double-quoted text
+// '......'     : No characters can be escaped inside single-quoted text
+//
 FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
   argv=NULL;
   if(command){
@@ -1465,7 +1624,7 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
         // First part of buffer contains pointers
         argv=ptr=(FXchar**)buffer;
 
-        // Second part of buffer contains strings
+        // Point to where the characters start
         arg=a=(FXchar*)&argv[count+1];
 
         // Reset string input
@@ -1514,7 +1673,7 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
           case '\r':
           case '\f':
           case '\n':
-            if(token){
+            if(token){                  // Close out argument
               *ptr++=arg;
               *a++='\0';
               arg=a;
@@ -1527,10 +1686,14 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
             break;
             }
           }
-        if(token){
+
+        // Final token closeout
+        if(token){                      
           *ptr++=arg;
           *a='\0';
           }
+          
+        // Argv closeout
         *ptr=NULL;
         return count;
         }
@@ -1539,6 +1702,7 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
   return 0;
   }
 
+#endif
 
 // Parse command to argc and argv
 FXint FXPath::parseArgs(FXchar**& argv,const FXString& command){
@@ -1847,6 +2011,34 @@ FXbool FXPath::hasExecExtension(const FXString& file){
   return false;
   }
 
+
+// Define our own as Windows is missing this function
+static const char *fxstrcasestr(const FXchar *haystack,const FXchar *needle){
+  const FXchar *a,*b;
+  while(*haystack){
+    a=haystack;
+    b=needle;
+    while((*a++ | 32) == (*b++ | 32)){
+      if(!*b) return haystack;
+      }
+    }
+  return NULL;
+  }
+
+
+// Check if given name is controversial
+FXbool FXPath::isReservedName(const FXString& file){
+  static const FXchar reserved3[]="CON\nPRN\nAUX\nNUL\n";
+  static const FXchar reserved4[]="COM1\nCOM2\nCOM3\nCOM4\nCOM5\nCOM6\nCOM7\nCOM8\nCOM9\nLPT1\nLPT2\nLPT3\nLPT4\nLPT5\nLPT6\nLPT7\nLPT8\nLPT9\n";
+  if(file.length()==3){
+    return (fxstrcasestr(reserved3,file.text())!=NULL);
+    }
+  if(file.length()==4){
+    return (fxstrcasestr(reserved4,file.text())!=NULL);
+    }
+  return false;
+  }
+
 #else
 
 // Check if file has executable extension
@@ -1854,6 +2046,12 @@ FXbool FXPath::hasExecExtension(const FXString&){
   return false;
   }
 
+// Check if given name is controversial
+FXbool FXPath::isReservedName(const FXString&){
+  return false;
+  }
+
 #endif
+
 
 }

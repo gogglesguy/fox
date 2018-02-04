@@ -283,6 +283,8 @@ private:
   FXText& operator=(const FXText&);
 public:
   long onPaint(FXObject*,FXSelector,void*);
+  long onEnter(FXObject*,FXSelector,void*);
+  long onLeave(FXObject*,FXSelector,void*);
   long onBlink(FXObject*,FXSelector,void*);
   long onFlash(FXObject*,FXSelector,void*);
   long onFocusIn(FXObject*,FXSelector,void*);
@@ -322,6 +324,7 @@ public:
   long onUpdHaveSelection(FXObject*,FXSelector,void*);
   long onUpdHaveEditableSelection(FXObject*,FXSelector,void*);
   long onIMEStart(FXObject*,FXSelector,void*);
+  long onTipTimer(FXObject*,FXSelector,void*);
 
   // Value access
   long onCmdSetStringValue(FXObject*,FXSelector,void*);

@@ -238,8 +238,8 @@ FXFileAssoc* FXFileAssociations::parse(const FXString& assoc){
 
       // Parse flags
       string=assoc.section(';',5);
-      if(string.contains("cd")) flags|=1;
-      if(string.contains("term")) flags|=2;
+      if(string.contains("c")) flags|=1;
+      if(string.contains("t")) flags|=2;
       result->flags=flags;
 
       FXTRACE((300,"FXFileAssociations::parse: command=\"%s\" extension=\"%s\" mimetype=\"%s\" big=\"%s\" bigopen=\"%s\" mini=\"%s\" miniopen=\"%s\" flags=%d\n",result->command.text(),result->extension.text(),result->mimetype.text(),bigname.text(),bignameopen.text(),mininame.text(),mininameopen.text(),flags));

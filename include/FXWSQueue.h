@@ -27,28 +27,28 @@ namespace FX {
 /// Work-stealing queue
 class FXAPI FXWSQueue {
 private:
-  FXPtrList       list;
-  volatile FXival top;
-  volatile FXival bot;
+  FXPtrList      list;
+  volatile FXint top;
+  volatile FXint bot;
 private:
   FXWSQueue(const FXWSQueue&);
   FXWSQueue &operator=(const FXWSQueue&);
 public:
 
   /// Create a queue and set its size to sz
-  FXWSQueue(FXival sz=256);
+  FXWSQueue(FXint sz=256);
 
   /// Change size of the queue
-  FXbool setSize(FXival sz);
+  FXbool setSize(FXint sz);
 
   /// Return size
-  FXival getSize() const { return list.no(); }
+  FXint getSize() const { return list.no(); }
 
   /// Return number of used slots
-  FXival getUsed() const;
+  FXint getUsed() const;
 
   /// Return number of free slots
-  FXival getFree() const;
+  FXint getFree() const;
 
   /// Check if queue is full
   FXbool isFull() const;

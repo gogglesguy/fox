@@ -48,7 +48,7 @@
 #if defined(__i386__) || defined(__x86_64__)            // No alignment limits on shorts
 #define SETARG(p,val) (*((FXshort*)(p))=(val))
 #define GETARG(p)     (*((FXshort*)(p)))
-#elif defined(FOX_BIGENDIAN)                            // Big-endian machines
+#elif (FOX_BIGENDIAN == 1)                              // Big-endian machines
 #define SETARG(p,val) (*((p)+0)=(val)>>8,*((p)+1)=(val))
 #define GETARG(p)     ((FXshort)((*((p)+0)<<8)+(*((p)+1))))
 #else                                                   // Little-endian machines
@@ -809,10 +809,10 @@ void FXCompile::fix(FXuchar *ptr,FXshort val){
 
 /*******************************************************************************/
 
-#if FOX_BIGENDIAN == 1
+#if (FOX_BIGENDIAN == 1)
 const FXuchar FXExpression::initial[]={0,14,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
 #endif
-#if FOX_BIGENDIAN == 0
+#if (FOX_BIGENDIAN == 0)
 const FXuchar FXExpression::initial[]={14,0,OP_NUM,0,0,0,0,0,0,0,0,OP_END};
 #endif
 

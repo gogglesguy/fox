@@ -143,7 +143,7 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* i
   FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_SEARCH_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
   ar1->setArrowSize(3);
   ar2->setArrowSize(3);
-  replacelabel=new FXLabel(entry,tr("Replace &With:"),NULL,LAYOUT_LEFT);
+  replacelabel=new FXLabel(entry,tr("Re&place With:"),NULL,LAYOUT_LEFT);
   replacebox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
   replacetext=new FXTextField(replacebox,26,this,ID_REPLACE_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,4,4,2,2);
   FXVerticalFrame* replacearrows=new FXVerticalFrame(replacebox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);

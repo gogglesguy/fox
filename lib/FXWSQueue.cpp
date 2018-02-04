@@ -46,14 +46,14 @@ namespace FX {
 
 
 // Create a queue and set its size to sz
-FXWSQueue::FXWSQueue(FXival sz):top(0),bot(0){
+FXWSQueue::FXWSQueue(FXint sz):top(0),bot(0){
   setSize(sz);
   }
 
 
 // Change size of the queue
-FXbool FXWSQueue::setSize(FXival sz){
-  if(sz&(sz-1)){ fxerror("FXWSQueue::setSize: bad argument: %ld.\n",sz); }
+FXbool FXWSQueue::setSize(FXint sz){
+  if(sz&(sz-1)){ fxerror("FXWSQueue::setSize: bad argument: %d.\n",sz); }
   if(list.no(sz)){
     top=bot=0;
     return true;
@@ -63,13 +63,13 @@ FXbool FXWSQueue::setSize(FXival sz){
 
 
 // Return used slots
-FXival FXWSQueue::getUsed() const {
+FXint FXWSQueue::getUsed() const {
   return bot-top;
   }
 
 
 // Return free slots
-FXival FXWSQueue::getFree() const {
+FXint FXWSQueue::getFree() const {
   return getSize()-bot+top;
   }
 
@@ -88,8 +88,8 @@ FXbool FXWSQueue::isEmpty() const {
 
 // Push task
 FXbool FXWSQueue::push(FXptr ptr){
-  FXival mask=getSize()-1;
-  FXival t=top;
+  FXint mask=getSize()-1;
+  FXint t=top;
   if(__likely((bot-t)<mask)){
     list[bot&mask]=ptr;
     bot++;
@@ -102,8 +102,8 @@ FXbool FXWSQueue::push(FXptr ptr){
 
 // Pop task
 FXbool FXWSQueue::pop(FXptr& ptr){
-  FXival mask=getSize()-1;
-  FXival b=bot-1;
+  FXint mask=getSize()-1;
+  FXint b=bot-1;
   bot=b;
   atomicThreadFence();
   FXival t=top;
@@ -130,10 +130,10 @@ FXbool FXWSQueue::pop(FXptr& ptr){
 
 // Take (steal) task
 FXbool FXWSQueue::take(FXptr& ptr){
-  FXival mask=getSize()-1;
-  FXival t=top;
+  FXint mask=getSize()-1;
+  FXint t=top;
   atomicThreadFence();
-  FXival b=bot;
+  FXint b=bot;
   if(__likely(t<b)){
     ptr=list[t&mask];
     if(atomicBoolCas(&top,t,t+1)){

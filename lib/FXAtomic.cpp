@@ -225,7 +225,7 @@ FXbool atomicBoolCas(volatile FXint* ptr,FXint expect,FXint v){
   }
 
 /*******************************************************************************/
- 
+
 // Atomically set variable at ptr to v, and return its old contents
 FXlong atomicSet(volatile FXlong* ptr,FXlong v){
 #if defined(WIN32) && (_MSC_VER >= 1800)
@@ -388,7 +388,7 @@ FXbool atomicBoolCas(volatile FXlong* ptr,FXlong expect,FXlong v){
 // Atomically set variable at ptr to v, and return its old contents
 FXulong atomicSet(volatile FXulong* ptr,FXulong v){
 #if defined(WIN32) && (_MSC_VER >= 1800)
-  return _InterlockedExchange64(ptr,v);
+  return _InterlockedExchange64(reinterpret_cast<volatile FXlong*>(ptr),v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
   register FXulong ret;
   __asm__ __volatile__ ("xchgl %%esi, %%ebx\n\t"
@@ -424,7 +424,7 @@ FXulong atomicSet(volatile FXulong* ptr,FXulong v){
 // Atomically add v to variable at ptr, and return its old contents
 FXulong atomicAdd(volatile FXulong* ptr,FXulong v){
 #if defined(WIN32) && (_MSC_VER >= 1800)
-  return _InterlockedAdd64(ptr,v);
+  return _InterlockedAdd64(reinterpret_cast<volatile FXlong*>(ptr),v);
 #elif defined(HAVE_BUILTIN_ATOMIC)
   return __atomic_fetch_add(ptr,v,__ATOMIC_SEQ_CST);
 #elif defined(HAVE_BUILTIN_SYNC)
@@ -473,7 +473,7 @@ FXulong atomicAdd(volatile FXulong* ptr,FXulong v){
 // Atomically compare variable at ptr against expect, setting it to v if equal; returns the old value at ptr
 FXulong atomicCas(volatile FXulong* ptr,FXulong expect,FXulong v){
 #if defined(WIN32) && (_MSC_VER >= 1800)
-  return _InterlockedCompareExchange64(ptr,v,expect);
+  return _InterlockedCompareExchange64(reinterpret_cast<volatile FXlong*>(ptr),v,expect);
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_val_compare_and_swap(ptr,expect,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))
@@ -506,7 +506,7 @@ FXulong atomicCas(volatile FXulong* ptr,FXulong expect,FXulong v){
 // Atomically compare variable at ptr against expect, setting it to v if equal and return true, or false otherwise
 FXbool atomicBoolCas(volatile FXulong* ptr,FXulong expect,FXulong v){
 #if defined(WIN32) && (_MSC_VER >= 1800)
-  return (_InterlockedCompareExchange64(ptr,v,expect)==expect);
+  return (_InterlockedCompareExchange64(reinterpret_cast<volatile FXlong*>(ptr),v,expect)==expect);
 #elif defined(HAVE_BUILTIN_SYNC)
   return __sync_bool_compare_and_swap(ptr,expect,v);
 #elif (defined(HAVE_INLINE_ASSEMBLY) && defined(__i386__) && (defined(__PIC__) || defined(__PIE__)))

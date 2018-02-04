@@ -37,9 +37,9 @@
 */
 
 
-// Make it larger if you need
-#ifndef MAXMESSAGESIZE
-#define MAXMESSAGESIZE 1024
+// Initial space allocated for message; it will grow if needed
+#ifndef INITIALMESSAGESIZE
+#define INITIALMESSAGESIZE 512
 #endif
 
 
@@ -52,7 +52,6 @@ namespace FX {
 
 
 // Furnish our own versions
-extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args);
 extern FXAPI FXuint __strtoul(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
 
 // Allows GNU autoconfigure to find FOX
@@ -167,22 +166,22 @@ FXbool fxisconsole(const FXchar*){
 
 // Log message to [typically] stderr
 void fxmessage(const FXchar* format,...){
-  char msg[MAXMESSAGESIZE];
+  FXString message('\0',INITIALMESSAGESIZE);
   va_list arguments;
   va_start(arguments,format);
-  __vsnprintf(msg,sizeof(msg),format,arguments);
+  message.vformat(format,arguments);
   va_end(arguments);
 #ifdef WIN32
 #ifdef _WINDOWS
-  OutputDebugStringA(msg);
-  fputs(msg,stderr);    // if a console is available
+  OutputDebugStringA(message.text());
+  fputs(message.text(),stderr);         // if a console is available
   fflush(stderr);
 #else
-  fputs(msg,stderr);
+  fputs(message.text(),stderr);
   fflush(stderr);
 #endif
 #else
-  fputs(msg,stderr);
+  fputs(message.text(),stderr);
   fflush(stderr);
 #endif
   }
@@ -228,22 +227,22 @@ void fxtrace(FXint level,const FXchar* format,...){
       }
     }
   if(fxTraceLevel>level){
-    char msg[MAXMESSAGESIZE];
+    FXString message('\0',INITIALMESSAGESIZE);
     va_list arguments;
     va_start(arguments,format);
-    __vsnprintf(msg,sizeof(msg),format,arguments);
+    message.vformat(format,arguments);
     va_end(arguments);
 #ifdef WIN32
 #ifdef _WINDOWS
-    OutputDebugStringA(msg);
-    fputs(msg,stderr);    // if a console is available
+    OutputDebugStringA(message.text());
+    fputs(message.text(),stderr);       // if a console is available
     fflush(stderr);
 #else
-    fputs(msg,stderr);
+    fputs(message.text(),stderr);
     fflush(stderr);
 #endif
 #else
-    fputs(msg,stderr);
+    fputs(message.text(),stderr);
     fflush(stderr);
 #endif
     }
@@ -252,25 +251,25 @@ void fxtrace(FXint level,const FXchar* format,...){
 
 // Error routine
 void fxerror(const FXchar* format,...){
-  char msg[MAXMESSAGESIZE];
+  FXString message('\0',INITIALMESSAGESIZE);
   va_list arguments;
   va_start(arguments,format);
-  __vsnprintf(msg,sizeof(msg),format,arguments);
+  message.vformat(format,arguments);
   va_end(arguments);
 #ifdef WIN32
 #ifdef _WINDOWS
-  OutputDebugStringA(msg);
-  fputs(msg,stderr);    // if a console is available
+  OutputDebugStringA(message.text());
+  fputs(message.text(),stderr);         // if a console is available
   fflush(stderr);
-  MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONEXCLAMATION|MB_APPLMODAL);
+  MessageBoxA(NULL,message.text(),NULL,MB_OK|MB_ICONEXCLAMATION|MB_APPLMODAL);
   DebugBreak();
 #else
-  fputs(msg,stderr);
+  fputs(message.text(),stderr);
   fflush(stderr);
   abort();
 #endif
 #else
-  fputs(msg,stderr);
+  fputs(message.text(),stderr);
   fflush(stderr);
   abort();
 #endif
@@ -279,23 +278,23 @@ void fxerror(const FXchar* format,...){
 
 // Warning routine
 void fxwarning(const FXchar* format,...){
-  char msg[MAXMESSAGESIZE];
+  FXString message('\0',INITIALMESSAGESIZE);
   va_list arguments;
   va_start(arguments,format);
-  __vsnprintf(msg,sizeof(msg),format,arguments);
+  message.vformat(format,arguments);
   va_end(arguments);
 #ifdef WIN32
 #ifdef _WINDOWS
-  OutputDebugStringA(msg);
-  fputs(msg,stderr);    // if a console is available
+  OutputDebugStringA(message.text());
+  fputs(message.text(),stderr);         // if a console is available
   fflush(stderr);
-  MessageBoxA(NULL,msg,NULL,MB_OK|MB_ICONINFORMATION|MB_APPLMODAL);
+  MessageBoxA(NULL,message.text(),NULL,MB_OK|MB_ICONINFORMATION|MB_APPLMODAL);
 #else
-  fputs(msg,stderr);
+  fputs(message.text(),stderr);
   fflush(stderr);
 #endif
 #else
-  fputs(msg,stderr);
+  fputs(message.text(),stderr);
   fflush(stderr);
 #endif
   }
@@ -367,7 +366,7 @@ FXchar* fxstrcasestr(const FXchar* s,const FXchar* find){
 FXbool fxtoDOS(FXchar*& string,FXint& len){
   FXint f=0,t=0;
   while(f<len){
-    if(string[f++]=='\n') t++; 
+    if(string[f++]=='\n') t++;
     t++;
     }
   if(resizeElms(string,t+1)){

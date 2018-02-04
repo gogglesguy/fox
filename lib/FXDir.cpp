@@ -278,12 +278,14 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 FXint FXDir::listDrives(FXString*& drivelist){
   register FXint count=0;
 #ifdef WIN32
-  TCHAR drives[256],*drive;
-  GetLogicalDriveStrings(256,drives);
+  FXchar drives[256];
+  clearElms(drives,ARRAYNUMBER(drives)); 
+  GetLogicalDriveStringsA(ARRAYNUMBER(drives),drives);
   drivelist=new FXString [33];
-  for(drive=drives; *drive && count<32; drive++){
-    drivelist[count++].assign(drive);
+  for(const FXchar* drive=drives; *drive && count<32; drive++){
+    drivelist[count].assign(drive);
     while(*drive) drive++;
+    count++;
     }
 #else
   drivelist=new FXString [2];

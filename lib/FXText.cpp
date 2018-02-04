@@ -177,8 +177,11 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_PAINT,0,FXText::onPaint),
   FXMAPFUNC(SEL_MOTION,0,FXText::onMotion),
   FXMAPFUNC(SEL_DRAGGED,0,FXText::onDragged),
+  FXMAPFUNC(SEL_ENTER,0,FXText::onEnter),
+  FXMAPFUNC(SEL_LEAVE,0,FXText::onLeave),
   FXMAPFUNC(SEL_TIMEOUT,FXText::ID_BLINK,FXText::onBlink),
   FXMAPFUNC(SEL_TIMEOUT,FXText::ID_FLASH,FXText::onFlash),
+  FXMAPFUNC(SEL_TIMEOUT,FXText::ID_TIPTIMER,FXText::onTipTimer),
   FXMAPFUNC(SEL_TIMEOUT,FXText::ID_AUTOSCROLL,FXText::onAutoScroll),
   FXMAPFUNC(SEL_FOCUSIN,0,FXText::onFocusIn),
   FXMAPFUNC(SEL_FOCUSOUT,0,FXText::onFocusOut),
@@ -875,6 +878,8 @@ FXint FXText::rowFromPos(FXint pos) const {
     return toprow+nvisrows-1+countRows(visrows[nvisrows-1],pos);
     }
   while(row+1<nvisrows && visrows[row+1]<=pos && visrows[row]<visrows[row+1]) row++;
+  FXASSERT(0<=row && row<nvisrows);
+  FXASSERT(visrows[row]<=pos && pos<=visrows[row+1]);
   return toprow+row;
   }
 
@@ -2113,7 +2118,7 @@ FXint FXText::changeEnd(FXint pos) const {
     if(getByte(pos)=='\n') return pos+1;
     pos++;
     }
-  return length+1;  // YES, one more!
+  return length;
   }
 
 
@@ -2128,52 +2133,70 @@ void FXText::mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel)
   register FXint vh=getVisibleHeight();
   register FXint ncdelta=ncins-ncdel;
   register FXint nrdelta=nrins-nrdel;
-  register FXint line,i,x,y;
+  register FXint line,i,y;
 
   FXTRACE((150,"BEFORE: pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d nvisrows=%d length=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows,nvisrows,length));
 
-  // Changes fully before visible part of buffer
-  if(pos+ncdel<=visrows[0]){
+  // Changes below top of buffer
+  if(visrows[0]<=pos){
 
-    FXTRACE((150,"change: %d...%d BEFORE toppos: %d visible: %d...%d lines: ---\n",pos,pos+ncdel,toppos,visrows[0],visrows[nvisrows]));
+    // Changes in bottom part of visible buffer
+    if(pos<=visrows[nvisrows]){
 
-    toprow+=nrdelta;
-    toppos+=ncdelta;
-    keeppos=toppos;
-    FXASSERT(0<=toprow);
-    FXASSERT(nextRow(0,toprow)==toppos);
-    for(i=0; i<=nvisrows; i++) visrows[i]+=ncdelta;
-    FXASSERT(0<=visrows[0]);
-    FXASSERT(visrows[nvisrows]<=length);
-    pos_y-=nrdelta*th;
-    if(nrdelta) update(0,vy,vx,vh);             // Repaint line numbers
-    }
-
-  // Changes affect top of visible buffer
-  else if(pos<visrows[0]){
-
-    // Changes affect all visible lines of buffer
-    if(visrows[nvisrows]<=pos+ncdel){
-
-      FXTRACE((150,"change: %d...%d COVERS toppos: %d visible: %d...%d lines: %d...%d\n",pos,pos+ncdel,toppos,visrows[0],visrows[nvisrows],0,nvisrows));
-
-      toprow=FXMAX(0,FXMIN(toprow,nrows-nvisrows));   // Scroll minimally while keeping buffer filled as much as possible
-      toppos=nextRow(0,toprow);
-      keeppos=toppos;
-      pos_y=-toprow*th;
-      calcVisRows(0,nvisrows);
-      update();
-      }
-
-    // Bottom lines in visible buffer are unchanged
-    else{
-      FXASSERT(pos+ncdel<visrows[nvisrows]);
-      line=rowFromPos(pos+ncdel)-toprow;        // Line is in visible part of buffer
+      // Line is in visible part of buffer
+      line=rowFromPos(pos)-toprow;
       FXASSERT(0<=line && line<nvisrows);
 
-      FXTRACE((150,"change: %d...%d OVERLAP toppos: %d visible: %d...%d lines: %d...%d\n",pos,pos+ncdel,toppos,visrows[0],visrows[nvisrows],0,line));
+      // More lines
+      if(nrdelta>0){
+        for(i=nvisrows; i>=line+nrins; i--) visrows[i]=visrows[i-nrdelta]+ncdelta;
+        calcVisRows(line,line+nrins);
+        y=vy+pos_y+margintop+(toprow+line)*th;
+        update(vx,y,vw,vh-y);                   // Repaint bottom part
+        FXASSERT(0<=visrows[0]);
+        FXASSERT(visrows[nvisrows]<=length);
+        }
 
-      // We can keep bottom few lines in place
+      // Fewer lines
+      else if(nrdelta<0){
+        for(i=line+nrdel; i<=nvisrows; i++) visrows[i+nrdelta]=visrows[i]+ncdelta;
+        calcVisRows(line,line+nrins);
+        calcVisRows(nvisrows+nrdelta,nvisrows);
+        y=vy+pos_y+margintop+(toprow+line)*th;
+        update(vx,y,vw,vh-y);                   // Repaint bottom part
+        FXASSERT(0<=visrows[0]);
+        FXASSERT(visrows[nvisrows]<=length);
+        }
+
+      // Same lines
+      else{
+        for(i=line+nrdel; i<=nvisrows; i++) visrows[i]=visrows[i]+ncdelta;
+        calcVisRows(line,line+nrins);
+        if(nrins==0){
+          y=vy+pos_y+margintop+(toprow+line)*th;
+          update(vx,y,vw,th);                  // Repaint one line
+          }
+        else{
+          y=vy+pos_y+margintop+(toprow+line)*th;
+          update(vx,y,vw,nrins*th);             // Repaint nrins lines
+          }
+        FXASSERT(0<=visrows[0]);
+        FXASSERT(visrows[nvisrows]<=length);
+        }
+      }
+    }
+
+  // Changes above bottom of buffer
+  else if(pos+ncdel<visrows[nvisrows]){
+
+    // Changes in top visible part of buffer
+    if(visrows[0]<pos+ncdel){
+
+      // Line is in visible part of buffer
+      line=rowFromPos(pos+ncdel)-toprow;
+      FXASSERT(0<=line && line<nvisrows);
+
+      // Enough text to keep bottom part of buffer
       if(line<=toprow+nrdelta){
         toprow+=nrdelta;
         toppos=prevRow(visrows[line]+ncdelta,line);
@@ -2187,65 +2210,41 @@ void FXText::mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel)
         if(nrdelta) update(0,vy,vx,vh);         // Repaint line numbers
         }
 
-      // Not enough text above visible buffer to avoid scrolling
+      // Not enough text in buffer to avoid scrolling
       else{
         toprow=0;
         toppos=0;
-        keeppos=toppos;
+        keeppos=0;
         pos_y=0;
         calcVisRows(0,nvisrows);
-        update();                               // Repaint everything
+        update();                               // Repaint all
         }
       }
-    }
 
-  // Top lines in buffer remain unchanged
-  else if(pos<=visrows[nvisrows]){
-    FXASSERT(visrows[0]<=pos);
-    line=rowFromPos(pos)-toprow;                // Line is in visible part of buffer
-    FXASSERT(0<=line && line<nvisrows);
-
-    FXTRACE((150,"change: %d...%d AFTER toppos: %d visible: %d...%d line: %d...%d\n",pos,pos+ncdel,toppos,visrows[0],visrows[nvisrows],line,nvisrows));
-
-    // More lines
-    if(nrdelta>0){
-      for(i=nvisrows; i>=line+nrins; i--) visrows[i]=visrows[i-nrdelta]+ncdelta;
-      calcVisRows(line,line+nrins);
-      y=vy+pos_y+margintop+(toprow+line)*th;
-      update(vx,y,vw,vh-y);                     // Repaint bottom part
-      FXASSERT(0<=visrows[0]);
-      FXASSERT(visrows[nvisrows]<=length);
-      }
-
-    // Fewer lines
-    else if(nrdelta<0){
-      for(i=line+nrdel; i<=nvisrows; i++) visrows[i+nrdelta]=visrows[i]+ncdelta;
-      calcVisRows(line,line+nrins);
-      calcVisRows(nvisrows+nrdelta,nvisrows);
-      y=vy+pos_y+margintop+(toprow+line)*th;
-      update(vx,y,vw,vh-y);                     // Repaint bottom part
-      FXASSERT(0<=visrows[0]);
-      FXASSERT(visrows[nvisrows]<=length);
-      }
-
-    // Same lines
+    // Changes above visible part of buffer
     else{
-      for(i=line+nrdel; i<=nvisrows; i++) visrows[i]=visrows[i]+ncdelta;
-      calcVisRows(line,line+nrins);
-      if(nrins==0){
-        x=vx+pos_x+marginleft+xoffset(visrows[line],pos);
-        y=vy+pos_y+margintop+(toprow+line)*th;
-        update(x,y,vw-x,th);                    // Repaint one line
-        }
-      else{
-        y=vy+pos_y+margintop+(toprow+line)*th;
-        update(vx,y,vw,nrins*th);               // Repaint nrins lines
-        }
+      toprow+=nrdelta;
+      toppos+=ncdelta;
+      keeppos=toppos;
+      FXASSERT(0<=toprow);
+      FXASSERT(nextRow(0,toprow)==toppos);
+      for(i=0; i<=nvisrows; i++) visrows[i]+=ncdelta;
       FXASSERT(0<=visrows[0]);
       FXASSERT(visrows[nvisrows]<=length);
+      pos_y-=nrdelta*th;
+      if(nrdelta) update(0,vy,vx,vh);           // Repaint only line numbers
       }
     }
 
+  // Changes affect all of visible buffer
+  else{
+    toprow=FXMAX(0,FXMIN(toprow,nrows-nvisrows));
+    toppos=nextRow(0,toprow);
+    keeppos=toppos;
+    pos_y=-toprow*th;
+    calcVisRows(0,nvisrows);
+    update();                                   // Repaint all
+    }
   FXTRACE((150,"AFTER : pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d nvisrows=%d length=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows,nvisrows,length));
   }
 
@@ -2322,23 +2321,39 @@ void FXText::replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style){
   else if(pos<=anchorpos)
     anchorpos=pos+n;
 
-  // Cursor is beyond changed area, so simple update
-  if(wend<=cursorpos){
-    cursorpos+=del;
-    cursorstartpos+=del;
-    cursorendpos+=del;
-    cursorrow+=nrins-nrdel;
+  FXTRACE((150,"BEFORE cursorpos      = %d\n",cursorpos));
+  FXTRACE((150,"BEFORE cursorstartpos = %d\n",cursorstartpos));
+  FXTRACE((150,"BEFORE cursorendpos   = %d\n",cursorendpos));
+  FXTRACE((150,"BEFORE cursorrow      = %d\n",cursorrow));
+  FXTRACE((150,"BEFORE cursorcol      = %d\n",cursorcol));
+
+  // Simple adjustment only if cursor beyond changed area
+  if(wend<cursorstartpos){
+    cursorpos+=del;                                     // Update position
+    cursorstartpos+=del;                                // Update cursor start pos
+    cursorendpos+=del;                                  // Update cursor end pos
+    cursorrow+=nrins-nrdel;                             // Update cursor row
     }
 
-  // Cursor inside changed area, recompute cursor data
-  else if(wbeg<=cursorpos){
+  // Complicated adjustment if cursor overlap with changed area
+  else if(wbeg<=cursorendpos){
     if(pos+m<=cursorpos) cursorpos+=del;                // Beyond changed text
     else if(pos<=cursorpos) cursorpos=pos+n;            // Inside changed text
-    cursorstartpos=rowStart(cursorpos);
-    cursorendpos=nextRow(cursorstartpos);
-    cursorrow=rowFromPos(cursorpos);
-    cursorcol=columnFromPos(cursorstartpos,cursorpos);
+    cursorstartpos=rowStart(cursorpos);                 // Recompute start pos
+    cursorendpos=nextRow(cursorstartpos);               // Recompute end pos
+    cursorcol=columnFromPos(cursorstartpos,cursorpos);  // Recompute cursor column
+    cursorrow=rowFromPos(cursorstartpos);               // Cursor row is row of cursor start pos!
     }
+
+  // Hopefully it all still makes sense
+  FXASSERT(0<=cursorpos && cursorpos<=length);
+  FXASSERT(cursorstartpos<=cursorpos && cursorpos<=cursorendpos);
+
+  FXTRACE((150,"AFTER cursorpos       = %d\n",cursorpos));
+  FXTRACE((150,"AFTER cursorstartpos  = %d\n",cursorstartpos));
+  FXTRACE((150,"AFTER cursorendpos    = %d\n",cursorendpos));
+  FXTRACE((150,"AFTER cursorrow       = %d\n",cursorrow));
+  FXTRACE((150,"AFTER cursorcol       = %d\n",cursorcol));
 
   // Reconcile scrollbars
   placeScrollBars(width-barwidth,height);
@@ -3783,6 +3798,22 @@ long FXText::onFlash(FXObject*,FXSelector,void*){
   }
 
 
+// Start motion timer while in this window
+long FXText::onEnter(FXObject* sender,FXSelector sel,void* ptr){
+  FXScrollArea::onEnter(sender,sel,ptr);
+  getApp()->addTimeout(this,ID_TIPTIMER,getApp()->getMenuPause());
+  return 1;
+  }
+
+
+// Stop motion timer when leaving window
+long FXText::onLeave(FXObject* sender,FXSelector sel,void* ptr){
+  FXScrollArea::onLeave(sender,sel,ptr);
+  getApp()->removeTimeout(this,ID_TIPTIMER);
+  return 1;
+  }
+
+
 // Gained focus
 long FXText::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
   FXScrollArea::onFocusIn(sender,sel,ptr);
@@ -4388,7 +4419,12 @@ long FXText::onRightBtnRelease(FXObject*,FXSelector,void* ptr){
 long FXText::onMotion(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXint pos,row,col;
+  flags&=~FLAG_TIP;
+  getApp()->removeTimeout(this,ID_TIPTIMER);
   switch(mode){
+    case MOUSE_NONE:
+      getApp()->addTimeout(this,ID_TIPTIMER,getApp()->getMenuPause());
+      return 1;
     case MOUSE_CHARS:
       if(startAutoScroll(event,false)) return 1;
       if((fxabs(event->win_x-grabx-pos_x)>getApp()->getDragDelta())||(fxabs(event->win_y-graby-pos_y)>getApp()->getDragDelta())){
@@ -4497,6 +4533,15 @@ long FXText::onUngrabbed(FXObject* sender,FXSelector sel,void* ptr){
   stopAutoScroll();
   return 1;
   }
+
+
+// Mouse hovered a while
+long FXText::onTipTimer(FXObject*,FXSelector,void*){
+  FXTRACE((250,"%s::onTipTimer %p\n",getClassName(),this));
+  flags|=FLAG_TIP;
+  return 1;
+  }
+
 
 /*******************************************************************************/
 
@@ -5811,6 +5856,7 @@ void FXText::load(FXStream& store){
 FXText::~FXText(){
   getApp()->removeTimeout(this,ID_BLINK);
   getApp()->removeTimeout(this,ID_FLASH);
+  getApp()->removeTimeout(this,ID_TIPTIMER);
   freeElms(buffer);
   freeElms(sbuffer);
   freeElms(visrows);

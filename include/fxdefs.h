@@ -73,9 +73,11 @@
 #define FXIMPORT __declspec(dllimport)
 #else
 #if defined(__GNUC__) && (__GNUC__ >= 4)
+#define FXLOCAL  __attribute__((visibility("hidden")))
 #define FXEXPORT __attribute__((visibility("default")))
-#define FXIMPORT
+#define FXIMPORT __attribute__((visibility("default")))
 #else
+#define FXLOCAL
 #define FXEXPORT
 #define FXIMPORT
 #endif

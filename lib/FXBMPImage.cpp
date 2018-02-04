@@ -58,7 +58,7 @@ const FXchar FXBMPImage::fileExt[]="bmp";
 
 
 // Suggested mime type
-const FXchar FXBMPImage::mimeType[]="image/x-bmp";
+const FXchar FXBMPImage::mimeType[]="image/bmp";
 
 
 // Object implementation

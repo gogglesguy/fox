@@ -59,7 +59,7 @@ const FXchar FXPCXImage::fileExt[]="pcx";
 
 
 // Suggested mime type
-const FXchar FXPCXImage::mimeType[]="image/x-pcx";
+const FXchar FXPCXImage::mimeType[]="image/vnd.zbrush.pcx";
 
 
 // Object implementation
