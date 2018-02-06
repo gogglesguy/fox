@@ -808,8 +808,8 @@ if(NOT WITH_XIM)
   add_definitions(-DNO_XIM)
 endif()
 
-target_include_directories(cfox PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(cfox PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(FOX PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(FOX PRIVATE ${X11_LIBRARIES} ${LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
@@ -819,4 +819,10 @@ add_custom_command(
   DEPENDS reswrap
   VERBATIM
   )
+
+set_target_properties(FOX PROPERTIES VERSION ${FOX_VERSION} SOVERSION ${FOX_VERSION_PATCH})
+set_target_properties(FOX PROPERTIES OUTPUT_NAME FOX-${FOX_VERSION_MAJOR}.${FOX_VERSION_MINOR})
+
+
+install(TARGETS FOX LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
