@@ -455,8 +455,7 @@ winmaximize.gif
 winminimize.gif
 winrestore.gif)
 
-add_library(FOX-1.7 STATIC ${SOURCES})
-add_library(FOX ALIAS FOX-1.7)
+add_library(FOX ${SOURCES})
 
 find_package(PkgConfig)
 find_package(Threads)
@@ -799,7 +798,7 @@ if(WITH_OPENGL)
   find_file(HAVE_GLX_H GL/glx.h)
   if(OPENGL_FOUND AND OPENGL_GLU_FOUND AND HAVE_GLX_H)
     list(APPEND LIBRARIES OpenGL::GL OpenGL::GLU)
-    target_compile_definitions(FOX-1.7 PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
+    target_compile_definitions(FOX PUBLIC -DHAVE_GL_H -DHAVE_GLU_H)
     add_definitions(-DHAVE_GLX_H)
   endif()
 endif()
@@ -825,4 +824,5 @@ set_target_properties(FOX PROPERTIES OUTPUT_NAME FOX-${FOX_VERSION_MAJOR}.${FOX_
 
 
 install(TARGETS FOX LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS FOX ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
