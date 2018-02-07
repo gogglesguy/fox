@@ -28,3 +28,5 @@ add_custom_command(
   DEPENDS reswrap
   VERBATIM
   )
+
+install(TARGETS calculator RUNTIME DESTINATION bin)

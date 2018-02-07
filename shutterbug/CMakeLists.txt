@@ -30,3 +30,4 @@ add_custom_command(
   VERBATIM
   )
 
+install(TARGETS shutterbug RUNTIME DESTINATION bin)
