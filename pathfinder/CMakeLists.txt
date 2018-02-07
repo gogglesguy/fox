@@ -77,3 +77,6 @@ add_custom_command(
   DEPENDS reswrap
   VERBATIM
   )
+
+install(TARGETS PathFinder RUNTIME DESTINATION bin)
+
