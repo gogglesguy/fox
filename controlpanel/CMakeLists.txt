@@ -22,3 +22,5 @@ add_custom_command(
   DEPENDS reswrap
   VERBATIM
   )
+
+install(TARGETS ControlPanel RUNTIME DESTINATION bin)

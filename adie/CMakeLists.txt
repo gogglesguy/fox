@@ -97,7 +97,7 @@ add_custom_command(
   VERBATIM
   )
 
-
+install(TARGETS adie RUNTIME DESTINATION bin)
 
 
 
