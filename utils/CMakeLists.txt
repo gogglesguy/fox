@@ -1,3 +1,4 @@
 add_executable(reswrap reswrap.cpp)
 
-install(TARGETS reswrap RUNTIME DESTINATION bin)
+# don't distribute for cfox
+# install(TARGETS reswrap RUNTIME DESTINATION bin)
