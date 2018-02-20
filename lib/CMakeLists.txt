@@ -1085,7 +1085,10 @@ if(HAVE_SYS_STATVFS_H)
   add_definitions(-DHAVE_SYS_STATVFS_H)
 endif()
 
-
+check_include_file_cxx(sys/pstat.h HAVE_SYS_PSTAT_H)
+if(HAVE_SYS_PSTAT_H)
+  add_definitions(-DHAVE_SYS_PSTAT_H)
+endif()
 
 if(WITH_JPEG)
   find_package(JPEG)
