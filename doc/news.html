@@ -17,6 +17,59 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+January 16 - FOX STABLE 1.6.56
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Problem fixed in FXString vformat().</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+February 20 - FOX DEVELOPMENT 1.7.64
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Switched FXDir to use readdir() instead of now-deprecated readdir_r().  Supposedly now
+thread-safe.</li>
+<li>Some internal streamlining in FXRex.</li>
+<li>In FXText, duplicate line leaves cursor in place, but highlights the new line (if you duplicate one too
+many, you can therefore immediately delete it again).</li>
+<li>Add some help messages for PathFinder's Preferences dialog.</li>
+<li>Add columnFromPos() and posFromColumn() functions in FXText.</li>
+<li>Fixed bug in FXText not recalculating width if only single line present (was introduced recently).</li>
+<li>FXRex reverse algorithm was not working for verbatim mode; it does now.</li>
+<li>Some limitations on FXRex regex-reversal algorithm removed.</li>
+<li>Adie open-selected rework had introduced some bugs; is fixed now.</li>
+<li>Added new convenient API's to Math namespace.</li>
+<li>Added new API's to vector classes.</li>
+<li>FXText block select, block copy to clipboard, and block delete now work.</li>
+<li>FXText shiftText() had minor issue shifting text containing tabs; this has been dealt with
+in a very sophisticated way, an internal routine which is also needed for block operations.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+December 18 - FOX DEVELOPMENT 1.7.63
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>PathFinder now stores execpath, which is used to locate executables listed in icon-associations;
+it can be changed via Preferences Dialog.  This is for people who are not able to set system environment
+variables directly.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 December 13 - FOX DEVELOPMENT 1.7.62
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -44,7 +97,7 @@ newly developed APIs in FXPath, like parseArgs().</li>
 <li>More options in file-associations for launching applications from PathFinder.
 Applications may be launched with the current file (%f), the list of all selected files (%F), the url of the current file (%u),
 the url's of all selected files (%U), or the current directory (%d).
-These options can be used at the same time, for instance, an association "tar cvfz %d.tar.gz %F" would tar up all the selected files 
+These options can be used at the same time, for instance, an association "tar cvfz %d.tar.gz %F" would tar up all the selected files
 into an archive that's named after the current directory.</li>
 <li>Updated Makefile colorizing.</li>
 <li>PathFinder now as its own notion of executable paths; this allows users to add additonal paths to the
@@ -2900,7 +2953,7 @@ Older News
 <tr>
 <td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1>
-<font size=-1>Copyright &copy; 1997-2016 Jeroen van der Zijp</font>
+<font size=-1>Copyright &copy; 1997-2018 Jeroen van der Zijp</font>
 </td>
 </tr>
 </table>

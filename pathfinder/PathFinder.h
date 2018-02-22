@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -100,6 +100,7 @@ protected:
   FXIcon             *configicon;
   FXIcon             *warningicon;
   FXString            editor;		        // Editor command
+  FXString            execpaths;                // Search in these paths
   FXString            terminal;		        // Terminal command
   FXString            program;		        // Last program
   FXString            visiteddir[10];	        // Visited directories

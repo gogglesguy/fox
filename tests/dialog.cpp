@@ -3,7 +3,7 @@
 *                                 Test Dialog Box                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

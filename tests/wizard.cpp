@@ -3,7 +3,7 @@
 *                                 Test Wizard                                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

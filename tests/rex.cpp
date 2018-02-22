@@ -3,7 +3,7 @@
 *                             Regular Expression Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -32,6 +32,7 @@ static void printusage(){
   fxmessage("  -nb, --not-bol                      Start of string is not begin of line.\n");
   fxmessage("  -ne, --not-eol                      End of string is not end of line.\n");
   fxmessage("  -u, --unicode                       Unicode mode.\n");
+  fxmessage("  -v, --verbatim                      Verbatim mode.\n");
   fxmessage("  -l <num>, --levels <num>            Capure levels.\n");
   }
 
@@ -74,6 +75,9 @@ int main(int argc,char** argv){
     else if(compare(argv[arg],"-u")==0 || compare(argv[arg],"--unicode")==0){
       mode|=FXRex::Unicode;
       }
+    else if(compare(argv[arg],"-v")==0 || compare(argv[arg],"--verbatim")==0){
+      mode|=FXRex::Verbatim;
+      }
     else if(compare(argv[arg],"-l")==0 || compare(argv[arg],"--levels")==0){
       if(++arg>=argc){ fxwarning("rex: missing capture levels.\n"); return 1; }
       sscanf(argv[arg],"%d",&ncap);
@@ -84,25 +88,25 @@ int main(int argc,char** argv){
       }
     arg++;
     }
-    
+
   // Pattern
   if(arg<argc){
-  
+
     // Parse expression
     err=rex.parse(argv[arg],mode);
-    
+
     // Show result of parse
     fxmessage("parse(\"%s\") = %s\n",argv[arg],FXRex::getError(err));
-    
+
     // Next
     arg++;
-    
+
     // Input
     if(arg<argc){
-     
+
       // Search string with pattern
       where=rex.search(argv[arg],strlen(argv[arg]),0,strlen(argv[arg]),mode,beg,end,ncap);
-      
+
       // If found, show where
       if(0<=where){
         fxmessage("found at %d\n",where);

@@ -3,7 +3,7 @@
 *                     U n d o a b l e   C o m m a n d s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -45,6 +45,12 @@ FXIMPLEMENT_ABSTRACT(FXTextCommand,FXCommand,NULL,0)
 // Return size of record plus any data kept here
 FXuint FXTextCommand::size() const {
   return sizeof(FXTextCommand)+ndel;
+  }
+
+
+// Delete it
+FXTextCommand::~FXTextCommand(){
+  freeElms(buffer);
   }
 
 

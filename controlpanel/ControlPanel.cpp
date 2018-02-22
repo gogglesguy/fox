@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2017 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2018 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -277,7 +277,8 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   // Icon search path
   FXHorizontalFrame* hframe3=new FXHorizontalFrame(vframe5,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
   new FXLabel(hframe3,tr("Icon Search Path:"),NULL,LAYOUT_CENTER_Y);
-  new FXTextField(hframe3,2,&target_iconpath,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
+  FXTextField* icondirs=new FXTextField(hframe3,2,&target_iconpath,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
+  icondirs->setTipText(tr("List of directories to search for icons."));
 
   new FXSeparator(vframe5,SEPARATOR_GROOVE|LAYOUT_FILL_X);
 
@@ -308,7 +309,8 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   // Description
   FXPacker *packer=new FXPacker(vframe7,LAYOUT_FILL_X,0,0,0,0,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING);
   new FXLabel(packer,tr("Description:"));
-  new FXTextField(packer,2,&target_filebinding_description,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
+  FXTextField* description=new FXTextField(packer,2,&target_filebinding_description,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
+  description->setTipText(tr("Short description of file type."));
 
   new FXSeparator(vframe7,SEPARATOR_GROOVE|LAYOUT_FILL_X);
 
@@ -318,8 +320,8 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   FXCheckButton *checkbutton1=new FXCheckButton(packer,tr("Run in terminal\t\tRun command in terminal."),this,ID_RUN_IN_TERMINAL,ICON_BEFORE_TEXT|LAYOUT_LEFT|LAYOUT_SIDE_BOTTOM);
   FXCheckButton *checkbutton2=new FXCheckButton(packer,tr("Change directory\t\tChange directory before running command."),this,ID_CHANGE_DIRECTORY,ICON_BEFORE_TEXT|LAYOUT_LEFT|LAYOUT_SIDE_BOTTOM);
   new FXButton(packer,"...",NULL,this,ID_SELECT_COMMAND,LAYOUT_SIDE_RIGHT|LAYOUT_CENTER_Y|FRAME_RAISED|FRAME_THICK);
-  new FXTextField(packer,2,&target_filebinding_command,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
-
+  FXTextField* command=new FXTextField(packer,2,&target_filebinding_command,FXDataTarget::ID_VALUE,LAYOUT_SIDE_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK);
+  command->setTipText(tr("Path to program associated with the file\nCommand line arguments are assembled from the selected file(s) as follows:\n  %f  Replaced by current filename;\n  %F  Replaced by selected filenames;\n  %u  Replaced by URL encoding of current filename;\n  %U  Replaced by URL encoding of selected files;\n  %d  Replaced by current working directory;\n  %%  Replaced by simply '%'."));
   new FXSeparator(vframe7,SEPARATOR_GROOVE|LAYOUT_FILL_X);
 
   // Mime types
@@ -328,6 +330,7 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   mimetypelist=new FXComboBox(packer,1,this,ID_SELECT_MIMETYPE,LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK|COMBOBOX_NO_REPLACE);
   mimetypelist->setSortFunc(FXList::ascending);
   mimetypelist->setNumVisible(9);
+  mimetypelist->setTipText(tr("Select existing mime-type or type in new one\nMime type is used to identify format of item during drag and drop and clipboard operations."));
 
   new FXSeparator(vframe7,SEPARATOR_GROOVE|LAYOUT_FILL_X);
 

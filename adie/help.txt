@@ -27,6 +27,9 @@ General Features.
   - Persistent scroll position is remembered for each visited file.
   - Wheel mouse scroll support.
   - Online help built in.
+  - Parse vim, emacs, and adie modelines.
+  - Automatically configure hardtabs when loading files recognized as Makefiles.
+  - Searching files matching a wildcard pattern for a regular expression.
 
 File Access Features.
 
@@ -117,9 +120,27 @@ When the selected filename is of the form:
 or:
 
    filename.cpp:177:9
+   
+or:
 
-Adie will not only load the filename, but also jump to the given line number, and, in the second case, column number.  In the case above, it will also place the cursor on the 9-column of line 177.  If this file has already been loaded, Adie will simply jump to the given line (and column-) number in the already open file, and bring the file to the front.
+  filename.cpp(177)
+
+or:
+
+  filename.cpp, line 177
+  
+or:
+
+  File = filename.cpp, Line = 177
+  
+or:
+
+  filename.cpp:         
+
+Adie will not only load the filename, but also jump to the given line number and column number, if available.  In the case column number is available, it will also place the cursor on the 9-column of line 177.  If this file has already been loaded, Adie will simply jump to the given line (and column-) number in the already open file, and bring the file to the front.
 This option is very useful when fixing compiler errors.  Various other popular compiler error or warning formats are supported besides GCC.
+
+Finally, a filename that was escaped according to bash-quotation rules (Linux), or command line escaping rules (Windows), will be unescaped and loaded as well.
 
 
 Mouse Selection.
@@ -163,6 +184,31 @@ Adie support unlimited (well, the limit is large...) undo and redo capability.  
 If you make a mistake, you can undo the last command, and the one before that, and so on. Having invoked undo many times, it is sometimes desirable to invoke the redo command, i.e. to perform the original editing operation again.  Thus, you can move backward or forward in time.
 However if, after undoing several commands, you decide edit the buffer in a different way, then you will no longer be able to redo the undone commands:- you have now taken a different path.
 When you first load a file, or just after you save it, Adie remembers that this version of the text was special; while subsequent editing commands can be undone individually, you can always quickly return to this special version of the text by means of the revert command.
+
+
+Modeline Support.
+
+When modelines are present in the loaded text, certain editor features can be automatically switched.  Adie recognizes three flavors of modelines: vim (Vi-Improved), Emacs modelines, and Adie modelines.
+
+Vim modelines are of the form:
+
+	[text]{white}{vi:|vim:|ex:}[white]{options1}
+
+In Vim modelines, programming language, wrap mode, wrap columns, auto-indent, tab-columns, and soft- or hard-tab modes may be configured.  These take precedence over the defaults and values in the syntax file if present.
+
+Emacs modelines are of the form:
+
+	"-*- key1: value1; key2: value2; -*-"
+
+In Emacs modelines, programming language, tab stops, wrap mode, soft- or hard-tab modes, and auto-indent may be configured.
+
+Finally, in Adie modelines, which are of the form:
+
+	"adie: key1=value1 key2=value2 key3=value3 :"
+
+Language mode, tab stops, wrap columns, wrap mode, soft- or hard-tab mode, and auto-indent may be configured.  The variables are simple two-letter names.  The variable "la" configures the programming language to be used for syntax coloring; the variable "ts" sets the tab-stop value. The variable "ww" controls wrap column, and "wr" enables word-wrapping if set to 1.  The variable "et" controls hard-tabs 0 or soft-tabs 1, and the variable "ai" enables auto-indent if set to 1.
+
+These settings may also be set in the syntax file; however, the modeline, if enabled, will override the value in the syntax file or the default setting from the dialog, if present.
 
 
 Search and Replace.
@@ -303,6 +349,9 @@ Key:	Action:
   Ctl+Return	Insert end of line only.
   Tab	Insert (emulated) tab.
   Ctl-Tab	Insert hard tab.
+  Ctl+Shift+<	Move current line up.
+  Ctl+Shift+>	Move current line down.
+  Ctl-D	Copy current line.
   Ctl+A	Select all text.
   Ctl+K	Delete current line.
   Ctl+X	Cut selected text to clipboard.

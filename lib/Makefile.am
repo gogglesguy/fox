@@ -481,8 +481,10 @@ fxascii.cpp \
 fxbase64.cpp \
 fxcpuid.cpp \
 fxbmpio.cpp \
+fxcompose.cpp \
 fxddsio.cpp \
 fxezquantize.cpp \
+fxescape.cpp \
 fxexeio.cpp \
 fxfsquantize.cpp \
 fxgetticks.cpp \

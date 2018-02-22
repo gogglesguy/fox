@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -127,7 +127,7 @@ Preferences::Preferences(Calculator *own):FXDialogBox(own,"Calculator Preference
   new FXHorizontalSeparator(pane3,SEPARATOR_LINE|LAYOUT_FILL_X);
   FXHorizontalFrame *sub3=new FXHorizontalFrame(pane3,LAYOUT_FILL_Y|LAYOUT_FILL_X);
   new FXLabel(sub3,FXString::null,calculator,LAYOUT_CENTER_Y,0,0,0,0,20,20,20,20);
-  new FXLabel(sub3,FXString::value(tr("The FOX Calculator\n\nA Programmer's Desktop Calculator version 2.2.0.\nFOX library version %d.%d.%d.\nHome Page: http://www.fox-toolkit.org\nFTP Site: ftp://ftp.fox-toolkit.org\n\nCopyright (C) 2001,2017 Jeroen van der Zijp."),FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  new FXLabel(sub3,FXString::value(tr("The FOX Calculator\n\nA Programmer's Desktop Calculator version 2.2.0.\nFOX library version %d.%d.%d.\nHome Page: http://www.fox-toolkit.org\nFTP Site: ftp://ftp.fox-toolkit.org\n\nCopyright (C) 2001,2018 Jeroen van der Zijp."),FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
 
   // Button 3
   new FXButton(buttons,tr("About\tAbout FOX Calculator\tAbout the FOX Calculator."),info,switcher,FXSwitcher::ID_OPEN_THIRD,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);

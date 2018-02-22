@@ -14,14 +14,14 @@ pkgconfig_DATA = fox17.pc
 CLEANFILES = $(distdir).tar.gz $(distdir).zip
 
 snapshot: dist-all
-	cp $(distdir).tar.gz /home/site/ftp/pub/fox-snapshot.tar.gz
-	cp $(distdir).zip /home/site/ftp/pub/fox-snapshot.zip
+	cp $(distdir).tar.gz /site/ftp/pub/fox-snapshot.tar.gz
+	cp $(distdir).zip /site/ftp/pub/fox-snapshot.zip
 
 
 
 web: distdir
 	cd $(distdir)/doc && doxygen doxygen.cfg
-	cp -r $(distdir)/doc/* /home/site/html
+	cp -r $(distdir)/doc/* /site/www
 
 #web: distdir
 #	cp -r $(distdir)/doc/* /net/webby/html

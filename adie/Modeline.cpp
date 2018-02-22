@@ -3,7 +3,7 @@
 *                          M o d e l i n e   P a r s e r                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2017 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2017,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -92,7 +92,7 @@
 
 
 // Initialize modeline
-Modeline::Modeline():autoindent(-1),wrapwidth(-1),tabwidth(-1),wrapmode(-1),tabmode(-1){ 
+Modeline::Modeline():autoindent(-1),wrapwidth(-1),tabwidth(-1),wrapmode(-1),tabmode(-1){
   }
 
 

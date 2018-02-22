@@ -3,7 +3,7 @@
 *                                Thread Pool Test                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

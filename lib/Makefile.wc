@@ -3,7 +3,7 @@
 #                       FOX:  A Free C++ Class Library for X                 #
 #                                                                            #
 ##############################################################################
-# Copyright (C) 1997,2016 by Jeroen van der Zijp.   All Rights Reserved.     #
+# Copyright (C) 1997,2018 by Jeroen van der Zijp.   All Rights Reserved.     #
 ##############################################################################
 # This library is free software; you can redistribute it and/or              #
 # modify it under the terms of the GNU Library General Public                #
@@ -332,7 +332,9 @@ OBJECTS += FXXPMIcon.obj
 OBJECTS += FXXPMImage.obj
 OBJECTS += fxascii.obj
 OBJECTS += fxbmpio.obj
+OBJECTS += fxcompose.obj
 OBJECTS += fxddsio.obj
+OBJECTS += fxentab.obj
 OBJECTS += fxexeio.obj
 OBJECTS += fxezquantize.obj
 OBJECTS += fxfsquantize.obj

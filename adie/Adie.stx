@@ -3,7 +3,7 @@
 #                       A d i e   S y n t a x   F i l e                         #
 #                                                                               #
 #################################################################################
-# Copyright (C) 2004,2017 by Jeroen van der Zijp.   All Rights Reserved.        #
+# Copyright (C) 2004,2018 by Jeroen van der Zijp.   All Rights Reserved.        #
 #################################################################################
 # This program is free software; you can redistribute it and/or modify          #
 # it under the terms of the GNU General Public License as published by          #
@@ -1939,7 +1939,7 @@ language "Make"
     style      "brown"
   end
   rule "Assignment"
-    openpattern "^\s*?[A-Za-z0-9_+$()]+\s*?(\?=|\+=|::=|:=|=)"
+    openpattern "^\s*?[A-Za-z0-9_+$()]++\s*?(\?=|\+=|::=|:=|=)"
     closepattern "$"
     rule "AssignmentContinuation"
       pattern "\\\n"
@@ -1953,7 +1953,7 @@ language "Make"
     end
   end
   rule "Dependencies"
-    openpattern "^([\w%./$(){}@^<*?%+-]+\s*)+::?"
+    openpattern "^([\w%./$(){}@^<*?%+-]++\s*)+?::?"
     closepattern "$|;"
     rule "DependencyContinuation"
       pattern "\\\n"

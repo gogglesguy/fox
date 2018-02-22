@@ -3,7 +3,7 @@
 *                         S y n t a x   P a r s e r                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -35,12 +35,12 @@
       Syntax         =     { Language }*
 
       Language       =     "language" String
-                           { LangDefinition }* 
+                           { LangDefinition }*
                            "end"
 
       LangDefinition =     "filesmatch"    String
                      |     "contentsmatch" String
-                     |     "delimiters"    String 
+                     |     "delimiters"    String
                      |     "contextlines"  Number
                      |     "contextchars"  Number
                      |     "autoindent"    YesNo
@@ -51,15 +51,15 @@
                      |     "group"         String
                      |     { Rule }*
 
-      Rule           =     "rule" String 
-                           { RuleDefinition }* 
+      Rule           =     "rule" String
+                           { RuleDefinition }*
                            "end"
 
       RuleDefinition =     "style"        String
                      |     "pattern"      String
                      |     "openpattern"  String
                      |     "closepattern" String
-                     |     "stoppattern"  String 
+                     |     "stoppattern"  String
                      |     { Rule }*
 
       YesNo          =     "yes" | "no"
@@ -69,8 +69,8 @@
       Characters     =     ([^"]|\\")*
 
       Number         =     [0-9]+
-      
-  - Note that only quotes (") need to be escaped; this is because otherwise, patterns 
+
+  - Note that only quotes (") need to be escaped; this is because otherwise, patterns
     get really complicated as the regular expression engine also needs special characters
     to be quoted.
 */

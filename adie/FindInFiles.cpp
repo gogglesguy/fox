@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -110,10 +110,10 @@ FXuint SearchVisitor::traverse(const FXString& path,const FXString& pattern,cons
 
   // Compile the pattern
   if(rex.parse(pattern,mode)==FXRex::ErrOK){
-  
+
     // Sensitize controls; in case GUI-update can't get in sideways
     dlg->forceRefresh();
-    
+
     // Traverse directory and visit the files
     return FXGlobVisitor::traverse(path,wild,opts,depth);
     }

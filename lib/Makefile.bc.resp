@@ -312,7 +312,9 @@
 +FXXPMImage.obj &
 +fxascii.obj &
 +fxbmpio.obj &
++fxcompose.obj &
 +fxddsio.obj &
++fxescape.obj &
 +fxexeio.obj &
 +fxezquantize.obj &
 +fxfsquantize.obj &

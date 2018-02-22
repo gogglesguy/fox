@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2017 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -550,6 +550,9 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(editmenu,tr("Expression\t\tEvaluate selected expression."),NULL,this,ID_EXPRESSION);
   new FXMenuCommand(editmenu,tr("URL Encode\t\tEncode url special characters."),NULL,this,ID_URL_ENCODE);
   new FXMenuCommand(editmenu,tr("URL Decode\t\tDecode url special characters."),NULL,this,ID_URL_DECODE);
+  new FXMenuCommand(editmenu,tr("Duplicate Line\tCtl-D\tDuplicate current line."),NULL,editor,FXText::ID_COPY_LINE);
+  new FXMenuCommand(editmenu,tr("Move line up\tCtl-Shift-<\tMove current line up."),NULL,editor,FXText::ID_MOVE_LINE_UP);
+  new FXMenuCommand(editmenu,tr("Move line down\tCtl-Shift->\tMove current line down."),NULL,editor,FXText::ID_MOVE_LINE_DOWN);
   new FXMenuCommand(editmenu,tr("Lo&wer-case\tCtl-U\tChange to lower case."),getApp()->lowercaseicon,editor,FXText::ID_LOWER_CASE);
   new FXMenuCommand(editmenu,tr("Upp&er-case\tCtl-Shift-U\tChange to upper case."),getApp()->uppercaseicon,editor,FXText::ID_UPPER_CASE);
   new FXMenuCommand(editmenu,tr("Clean indent\t\tClean indentation to either all tabs or all spaces."),NULL,editor,FXText::ID_CLEAN_INDENT);
@@ -1614,7 +1617,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2017 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2018 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1737,23 +1740,24 @@ long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
   }
 
 
-// Search list of (possibly relative to given base) paths for a file
+// Search for file from a list of possible directory paths;
+// the list of paths may contain expandable items relative to base
 static FXString searchRelativePaths(const FXString& base,const FXString& paths,const FXString& file){
   if(!file.empty()){
-    FXString stem,path;
-    FXint beg,end;
     if(FXPath::isAbsolute(file)){
       if(FXStat::exists(file)) return file;
-      return FXString::null;
       }
-    for(beg=0; paths[beg]; beg=end){
-      while(paths[beg]==PATHLISTSEP) beg++;
-      end=beg;
-      while(paths[end] && paths[end]!=PATHLISTSEP) end++;
-      if(beg==end) break;
-      stem=FXPath::absolute(base,FXPath::expand(paths.mid(beg,end-beg)));
-      path=FXPath::absolute(stem,file);
+    else{
+      FXString path=FXPath::absolute(base,file);
       if(FXStat::exists(path)) return path;
+      for(FXint beg=0,end=0; paths[beg]; beg=end){
+        while(paths[beg]==PATHLISTSEP) beg++;
+        end=beg;
+        while(paths[end] && paths[end]!=PATHLISTSEP) end++;
+        if(beg==end) break;
+        path=FXPath::absolute(FXPath::absolute(base,FXPath::expand(paths.mid(beg,end-beg))),file);
+        if(FXStat::exists(path)) return path;
+        }
       }
     }
   return FXString::null;
@@ -1762,10 +1766,7 @@ static FXString searchRelativePaths(const FXString& base,const FXString& paths,c
 
 // Open Selected
 long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
-  FXchar name[1024];
   FXString string;
-  FXint lineno=0;
-  FXint column=0;
 
   // Get selection
   if(getDNDData(FROM_SELECTION,stringType,string)){
@@ -1773,86 +1774,71 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
     // Its too big, most likely not a file name
     if(string.length()<1024){
 
-      // Use current file's directory as base directory
-      FXString base=FXPath::directory(getFilename());
-      FXString file;
-
-      // If no directory part, use current directory
-      if(base.empty()){ base=FXSystem::getCurrentDirectory(); }
-
       // Strip leading/trailing space
       string.trim();
 
-      // Extract name from #include "file.h" syntax
-      if(string.scan("#include \"%1023[^\"]\"",name)==1){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
+      FXString file=string;
+      FXint lineno=0;
+      FXint column=0;
 
-      // Extract name from #include <file.h> syntax
-      else if(string.scan("#include <%1023[^>]>",name)==1){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Compiler output in the form <filename>:<number>:<number>: Error message
-      else if(string.scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
-        column-=1;
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Compiler output in the form <filename>:<number>: Error message
-      else if(string.scan("%1023[^:]:%d",name,&lineno)==2){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Compiler output in the form <filename>(<number>) : Error message
-      else if(string.scan("%1023[^(](%d)",name,&lineno)==2){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Compiler output in the form "<filename>", line <number>: Error message
-      else if(string.scan("\"%1023[^\"]\", line %d",name,&lineno)==2){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Compiler output in the form ... File = <filename>, Line = <number>
-      else if(string.scan("%*[^:]: %*s File = %1023[^,], Line = %d",name,&lineno)==2){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Compiler output in the form filename: Other stuff
-      else if(string.scan("%1023[^:]:",name)==1){
-        file=FXPath::absolute(base,name);
-        if(!FXStat::exists(file)){
-          file=searchRelativePaths(base,searchpaths,name);
-          }
-        }
-
-      // Still not found; try whole string
+      // Maybe the string is the filename
       if(!FXStat::exists(file)){
-        file=string;
+
+        // If no directory part, use current directory
+        FXString base=FXPath::directory(getFilename());
+        if(base.empty()){
+          base=FXSystem::getCurrentDirectory();
+          }
+
+        // Try if we can find it relative to base
+        file=FXPath::absolute(base,string);
         if(!FXStat::exists(file)){
-          file=FXPath::absolute(base,string);
+          FXchar   name[1024];
+
+          // Extract name from #include "file.h" syntax
+          if(string.scan("#include \"%1023[^\"]\"",name)==1){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Extract name from #include <file.h> syntax
+          else if(string.scan("#include <%1023[^>]>",name)==1){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Compiler output in the form <filename>:<number>:<number>: Error message
+          else if(string.scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Compiler output in the form <filename>:<number>: Error message
+          else if(string.scan("%1023[^:]:%d",name,&lineno)==2){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Compiler output in the form <filename>(<number>) : Error message
+          else if(string.scan("%1023[^(](%d)",name,&lineno)==2){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Compiler output in the form "<filename>", line <number>: Error message
+          else if(string.scan("\"%1023[^\"]\", line %d",name,&lineno)==2){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Compiler output in the form ... File = <filename>, Line = <number>
+          else if(string.scan("%*[^:]: %*s File = %1023[^,], Line = %d",name,&lineno)==2){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Compiler output in the form filename: Other stuff
+          else if(string.scan("%1023[^:]:",name)==1){
+            file=searchRelativePaths(base,searchpaths,name);
+            }
+
+          // Last straw, maybe dequote it?
+          if(file.empty()){
+            file=FXPath::dequote(string);
+            }
           }
         }
 
@@ -2118,7 +2104,7 @@ long TextWindow::onUpdSave(FXObject* sender,FXSelector,void*){
 
 // Save As
 long TextWindow::onCmdSaveAs(FXObject*,FXSelector,void*){
-  FXFileDialog savedialog(this,tr("Save Document"));
+  FXFileDialog savedialog(this,tr("Save As"));
   FXString file=getFilename();
   savedialog.setSelectMode(SELECTFILE_ANY);
   savedialog.setAssociations(getApp()->associations,false);
@@ -2143,7 +2129,7 @@ long TextWindow::onCmdSaveAs(FXObject*,FXSelector,void*){
 
 // Save To
 long TextWindow::onCmdSaveTo(FXObject*,FXSelector,void*){
-  FXFileDialog savedialog(this,tr("Save Copy Of Document"));
+  FXFileDialog savedialog(this,tr("Save To"));
   FXString file=getFilename();
   savedialog.setSelectMode(SELECTFILE_ANY);
   savedialog.setAssociations(getApp()->associations,false);
@@ -2531,7 +2517,7 @@ long TextWindow::onUpdAppendCarriageReturn(FXObject* sender,FXSelector,void*){
   }
 
 
-// Change line number columna
+// Change line number column
 long TextWindow::onCmdLineNumbers(FXObject* sender,FXSelector,void*){
   FXint cols;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&cols);
@@ -2540,7 +2526,7 @@ long TextWindow::onCmdLineNumbers(FXObject* sender,FXSelector,void*){
   }
 
 
-// Update line number columna
+// Update line number column
 long TextWindow::onUpdLineNumbers(FXObject* sender,FXSelector,void*){
   FXint cols=editor->getBarColumns();
   sender->handle(this,FXSEL(SEL_COMMAND,ID_SETINTVALUE),(void*)&cols);
@@ -3462,6 +3448,7 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
       if(editor->isPosSelected(pos)) pos=selstart-1;            // Start from selection start-1 if position is selected
       searchflags=(searchflags&~SEARCH_FORWARD)|SEARCH_BACKWARD;
       }
+    FXTRACE((100,"searchstring=\n\"\"\"\n%s\n\"\"\"\n",searchstring.text()));
     if(editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
       if(beg[0]!=selstart || end[0]!=selend){
         editor->setAnchorPos(beg[0]);
