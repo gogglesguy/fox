@@ -416,6 +416,7 @@ set(SOURCES FX4Splitter.cpp
             FXComplexd.cpp
             FXComplexf.cpp
             FXComposeContext.cpp
+	    fxcompose.cpp
             FXComposite.cpp
             FXCondition.cpp
             FXConsole.cpp
@@ -475,6 +476,7 @@ set(SOURCES FX4Splitter.cpp
             FXDragCorner.cpp
             FXDrawable.cpp
             FXDriveBox.cpp
+	    fxescape.cpp
             FXException.cpp
             FXEXEIcon.cpp
             FXEXEImage.cpp
