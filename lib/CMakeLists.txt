@@ -118,6 +118,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXDirList.h
             ../include/FXDirSelector.h
             ../include/FXDirVisitor.h
+            ../include/FXDirWatch.h
             ../include/FXDispatcher.h
             ../include/FXDLL.h
             ../include/FXDockBar.h
@@ -186,8 +187,9 @@ set(HEADERS ../include/fx3d.h
             ../include/FXJP2Image.h
             ../include/FXJPGIcon.h
             ../include/FXJPGImage.h
-            ../include/FXJSONFile.h
             ../include/FXJSON.h
+            ../include/FXJSONFile.h
+            ../include/FXJSONString.h
             ../include/fxkeys.h
             ../include/FXKnob.h
             ../include/FXKOI8RCodec.h
@@ -264,6 +266,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXRegion.h
             ../include/FXRegistry.h
             ../include/FXReplaceDialog.h
+            ../include/FXReverseDictionary.h
             ../include/FXRex.h
             ../include/FXRGBIcon.h
             ../include/FXRGBImage.h
@@ -384,6 +387,7 @@ set(SOURCES FX4Splitter.cpp
             FXAutoThreadStorageKey.cpp
             FXBarrier.cpp
             fxbase64.cpp
+            fxbase85.cpp
             FXBitmap.cpp
             FXBitmapFrame.cpp
             FXBitmapView.cpp
@@ -410,7 +414,7 @@ set(SOURCES FX4Splitter.cpp
             FXComplexd.cpp
             FXComplexf.cpp
             FXComposeContext.cpp
-	          fxcompose.cpp
+            fxcompose.cpp
             FXComposite.cpp
             FXCondition.cpp
             FXConsole.cpp
@@ -460,6 +464,7 @@ set(SOURCES FX4Splitter.cpp
             FXDirList.cpp
             FXDirSelector.cpp
             FXDirVisitor.cpp
+            FXDirWatch.cpp
             FXDispatcher.cpp
             FXDLL.cpp
             FXDockBar.cpp
@@ -470,7 +475,7 @@ set(SOURCES FX4Splitter.cpp
             FXDragCorner.cpp
             FXDrawable.cpp
             FXDriveBox.cpp
-	          fxescape.cpp
+	        fxescape.cpp
             FXException.cpp
             FXEXEIcon.cpp
             FXEXEImage.cpp
@@ -534,6 +539,7 @@ set(SOURCES FX4Splitter.cpp
             FXJPGImage.cpp
             FXJSON.cpp
             FXJSONFile.cpp
+            FXJSONString.cpp
             fxkeyboard.cpp
             fxkeysym.cpp
             FXKnob.cpp
@@ -617,6 +623,7 @@ set(SOURCES FX4Splitter.cpp
             FXRegion.cpp
             FXRegistry.cpp
             FXReplaceDialog.cpp
+            FXReverseDictionary.cpp
             FXRex.cpp
             FXRGBIcon.cpp
             FXRGBImage.cpp
@@ -917,6 +924,11 @@ if(HAVE_TIMERFD_CREATE)
   add_definitions(-DHAVE_TIMERFD_CREATE)
 endif()
 
+check_cxx_symbol_exists(inotify_init1 "sys/inotify.h" HAVE_INOTIFY_INIT1)
+if(HAVE_INOTIFY_INIT1)
+  add_definitions(-DHAVE_INOTIFY_INIT1)
+endif()
+
 check_cxx_symbol_exists(statvfs "sys/statvfs.h" HAVE_STATVFS)
 if(HAVE_STATVFS)
   add_definitions(-DHAVE_STATVFS)
@@ -1083,6 +1095,11 @@ endif()
 check_include_file_cxx(sys/pstat.h HAVE_SYS_PSTAT_H)
 if(HAVE_SYS_PSTAT_H)
   add_definitions(-DHAVE_SYS_PSTAT_H)
+endif()
+
+check_include_file_cxx(sys/inotify.h HAVE_SYS_INOTIFY_H)
+if(HAVE_SYS_INOTIFY_H)
+  add_definitions(-DHAVE_SYS_INOTIFY_H)
 endif()
 
 if(WITH_JPEG)
