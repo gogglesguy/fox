@@ -150,7 +150,7 @@ typedef FXint (*FXListSortFunc)(const FXListItem*,const FXListItem*);
 
 
 /// Explicit template specialization
-//extern template class FXAPI FXObjectListOf<FXListItem>;
+//extern FXAPI template class FXObjectListOf<FXListItem>;
 
 /// List of FXListItem's
 typedef FXObjectListOf<FXListItem> FXListItemList;

@@ -114,8 +114,11 @@ protected:
   FXbool              preview;		        // Preview mode
   FXbool              blending;		        // Icon blending
   FXbool              scaling;                  // Image scaled
+#if defined(DIRWATCH)
+  FXDirWatch dirwatch; // FIXME
+#endif
 protected:
-  PathFinderMain(){}
+  PathFinderMain();
   FXbool haveSelectedFiles() const;
   void visitDirectory(const FXString& dir);
   FXbool previewImage(const FXString& filename);

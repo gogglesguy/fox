@@ -34,6 +34,7 @@
     Processing Calendar Dates". CACM, Vol. 11, No. 10, October 1968, pp 657.
   - Major clean up and simplification was done!
   - Added week number calculations!
+  - Reminder, MJD = JD - 2400000.5.
 */
 
 
@@ -47,11 +48,14 @@ namespace FX {
 // Many nanoseconds in a second
 const FXTime seconds=1000000000L;
 
-// Julian day number of GPS week zero
+// Julian day number of GPS week zero (Jan 6, 1980)
 const FXuint GPS_EPOCH_JDAY=2444245;
 
-// Julian day number of UNIX epoch
+// Julian day number of UNIX epoch (Jan 1, 1970)
 const FXuint UNIX_EPOCH_JDAY=2440588;
+
+// UNIX time to GPS time offset in nanoseconds
+const FXTime UNIX_TO_GPS=315964800L*seconds;
 
 // Short month names
 const FXchar FXDate::shortMonthName[12][4]={

@@ -92,7 +92,7 @@ end
 
 # FOX Registry syntax coloring
 language "Registry"
-  filesmatch "*.ini,*.INI,*rc"
+  filesmatch "*.ini,*.INI,*.rc"
   contentsmatch  "^\s*?\[[^]]*?\]"
   contextlines 1
   rule "Comment"
@@ -1790,26 +1790,32 @@ language "IDL"
   # All C-like languages use similar color schemes
   group "C-Like"
 
-  # // style comment
+  # C++ style comment
+  rule "CPPDocComment"
+    openpattern   "///(?!/)"
+    closepattern  "$"
+    style         "darkgreen"
+  end
+
+  # C++ style comment
   rule "CPPComment"
     openpattern   "//"
     closepattern  "$"
     style         "darkgreen"
-    rule "FIXME"
-      pattern     "FIXME"
-      style       "fuchsia"
-    end
   end
 
-  # /* */ style comment
+  # C style comment
+  rule "CDocComment"
+    openpattern   "/\*\*(?=\s)"
+    closepattern  "\*/"
+    style         "darkgreen"
+  end
+
+  # C style comment
   rule "CComment"
     openpattern   "/\*"
     closepattern  "\*/"
     style         "darkgreen"
-    rule "FIXME"
-      pattern     "FIXME"
-      style       "fuchsia"
-    end
   end
 
   # String
@@ -1830,12 +1836,7 @@ language "IDL"
       pattern     "\\."
       style       "fuchsia"
     end
-    rule "Format"
-      pattern     "%[\*hlLq#0 +-]?\d*(\.(\*|\d*))?l?[diouxXeEfFgGaAcsp]"
-      style       "fuchsia"
-    end
   end
-
 
   # Char constant
   rule "Char"
@@ -1858,30 +1859,36 @@ language "IDL"
 
   # Preprocessor
   rule "Preprocessor"
-    openpattern  "^\s*#"
+    openpattern  "^\s*(?=#)"
     closepattern "$"
     style        "blue"
+
+    # Continuation
     rule "PreprocessorContinuation"
-      pattern    "\\\n"
-      style      "blue"
+      pattern "\\\n"
+      style   "blue"
+    end
+
+    # Comments
+    rule "CComment"
+      openpattern   "/\*"
+      closepattern  "\*/"
+      style         "darkgreen"
+    end
+    rule "CPPComment"
+      openpattern   "//"
+      closepattern  "$"
+      style         "darkgreen"
     end
   end
 
   rule "Keyword"
-    pattern     "\<(attribute|component|comsumes|context|custom|exception|emits|eventtype|factory|finder|fixed|getraises|home|import|interface|local|module|multiple|native|oneway|primarykey|private|provides|public|publishes|raises|readonly|setraises|supports|truncatable|typedef|typeid|typeprefix|uses|ValueBase|valuetype)\>"
-  end
-
-  rule "Direction"
-    pattern     "\<(in|inout|out)\>"
+    pattern     "\<(abstract|alias|any|attribute|boolean|case|char|component|connector|const|consumes|context|custom|default|double|emits|enum|eventtype|exception|factory|FALSE|finder|fixed|float|getraises|home|import|in|inout|interface|local|long|mirrorport|module|multiple|native|object|octet|oneway|out|port|porttype|primarykey|private|provides|pseudo|public|publishes|raises|readonly|sequence|setraises|short|string|struct|supports|switch|TRUE|truncatable|typedef|typeid|typename|typeprefix|union|unsigned|uses|valuebase|valuetype|void|wchar|wstring)\>"
   end
 
   rule "Number"
     pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|l|UL|ul|u|U|F|f)?\>"
     style       "blue"
-  end
-
-  rule "Type"
-    pattern     "\<(unsigned|signed|int|char|octet|any|wchar|short|long|hyper|float|double|boolean|complex|void|struct|union|enum|switch|case|default|sequence|string|wstring|Object)\>"
   end
 
   rule "Braces"
@@ -1895,7 +1902,7 @@ language "IDL"
   end
 
   rule "Operator"
-    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%)"
+    pattern     "(\+|-|&|\||\^|<<|<|>>|>|~|\*|/|%|\[|\]|=|::|:|;|,|\.\.\.|@|//@)"
     style       "red"
   end
 end
@@ -1903,11 +1910,74 @@ end
 
 # Shell scripts
 language "Shell"
-  contentsmatch "\A#!\s*(/bin/)?(ba)?sh"
+
+  # File patterns for this language mode
+  filesmatch "*.sh,.bashrc"
+
+  # Or contents
+  contentsmatch "\A#(.*?)(ba)?sh"
+
   contextlines 1
   rule "Comment"
     pattern    "#.*?$"
     style      "darkgreen"
+  end
+  rule "Escape"
+    pattern     "\\[\\"$]"
+    style       "red"
+  end
+  rule "Variable"
+    pattern     "\$([-*@#?$!0-9_]|[a-zA-Z_][0-9a-zA-Z_]*)"
+    style       "yellow"
+  end
+  rule "CurlyVariable"
+    openpattern   "\$\{"
+    closepattern  "\}"
+    stoppattern   "$"
+    style         "blue"
+  end
+  rule "Command Substitution"
+    openpattern   "`"
+    closepattern  "`"
+    style         "blue"
+    rule "CSEscape"
+      pattern     "\\[\\"$]"
+      style       "red"
+    end
+    rule "CSVariable"
+      pattern     "\$([-*@#?$!0-9_]|[a-zA-Z_][0-9a-zA-Z_]*)"
+      style       "yellow"
+    end
+    rule "CSCurlyVariable"
+      openpattern   "\$\{"
+      closepattern  "\}"
+      stoppattern   "$"
+      style         "blue"
+    end
+  end
+  rule "SQString"
+    openpattern   "'"
+    closepattern  "'"
+    style         "blue"
+  end
+  rule "DQString"
+    openpattern   "\""
+    closepattern  "\""
+    style         "blue"
+    rule "DQEscape"
+      pattern     "\\[\\"$]"
+      style       "red"
+    end
+    rule "DQVariable"
+      pattern     "\$([-*@#?$!0-9_]|[a-zA-Z_][0-9a-zA-Z_]*)"
+      style       "yellow"
+    end
+    rule "DQCurlyVariable"
+      openpattern   "\$\{"
+      closepattern  "\}"
+      stoppattern   "$"
+      style         "blue"
+    end
   end
   rule "Keyword"
     pattern    "\<(for|in|do|done|if|then|else|elif|fi|switch|case|esac|while|function|select|until|time)\>"
@@ -2083,6 +2153,7 @@ end
 # HTML and XML
 language "XML/HTML"
   filesmatch "*.xml,*.htm,*.html,*.svg,*.ui"
+  contentsmatch "<\?xml"
   contextlines 1
 
   rule "Comment"
@@ -2318,111 +2389,3 @@ language "Markup"
 end
 
 
-# TENA definition language
-language "TDL"
-
-  # File patterns for this language mode
-  filesmatch "*.tdl"
-
-  # Word delimiters
-  delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
-  contextlines 1
-
-  # All C-like languages use similar color schemes
-  group "C-Like"
-
-  # // style comment
-  rule "CPPComment"
-    openpattern   "//"
-    closepattern  "$"
-    style         "darkgreen"
-    rule "FIXME"
-      pattern     "FIXME"
-      style       "fuchsia"
-    end
-  end
-
-  # /* */ style comment
-  rule "CComment"
-    openpattern   "/\*"
-    closepattern  "\*/"
-    style         "darkgreen"
-    rule "FIXME"
-      pattern     "FIXME"
-      style       "fuchsia"
-    end
-  end
-
-  # String
-  rule "String"
-    openpattern   "\""
-    closepattern  "\""
-    stoppattern   "$"
-    rule "OctalEscape"
-      pattern     "\\\d+"
-    end
-    rule "HexEscape"
-      pattern     "\\x\h+"
-    end
-    rule "ControlEscape"
-      pattern     "\\."
-    end
-    rule "Format"
-      pattern "%[\*hlLq#0 +-]?\d*(\.(\*|\d*))?l?[diouxXeEfFgGaAcsp]"
-    end
-  end
-
-
-  # Char constant
-  rule "Char"
-    openpattern  "'"
-    closepattern "'"
-    rule "OctalEscape"
-      pattern "\\\d+"
-    end
-    rule "HexEscape"
-      pattern     "\\x\h+"
-    end
-    rule "ControlEscape"
-      pattern "\\."
-    end
-  end
-
-  # Preprocessor
-  rule "Preprocessor"
-    openpattern  "^\s*#"
-    closepattern "$"
-    rule "PreprocessorContinuation"
-      pattern "\\\n"
-    end
-  end
-
-  rule "Keyword"
-    pattern     "\<(abstract|and_eq|and|any|asm|attribute|auto|bitand|bitor|break|case|catch|compl|component|const_cast|consumes|context|continue|custom|default|delete|do|dynamic_cast|else|emits|eventtype|exception|explicit|export|extends|extern|factory|FALSE|false|finder|fixed|for|friend|getraises|goto|home|if|implements|import|inline|interface|local|message|module|multiple|mutable|namespace|native|new|not_eq|not|oneway|operator|optional|or_eq|or|package|primarykey|private|protected|provides|public|publishes|raises|readonly|reinterpret_cast|return|sequence|setraises|sizeof|static_cast|supports|switch|template|this|throw|TRUE|true|truncatable|try|typedef|typeid|typename|typeprefix|uses|using|ValueBase|valuetype|vector|while|xor_eq|xor)\>"
-    style       "red"
-  end
-
-  rule "Direction"
-    pattern     "\<(inout|in|out)\>"
-  end
-
-  rule "Number"
-    pattern     "\<((0[xX][0-9a-fA-F]+)|((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)(L|l|UL|ul|u|U|F|f)?\>"
-  end
-
-  rule "Type"
-    pattern     "\<(boolean|bool|char|class|const|double|enum|float32|float64|float|long|int16|int32|int64|int8|int|object|octet|register|short|signed|static|string|struct|uint16|uint32|uint64|uint8|union|unsigned|void|virtual|volatile|wchar_t|wchar|wstring)\>"
-  end
-
-  rule "Braces"
-    pattern     "(\{|\})"
-  end
-
-  rule "Parentheses"
-    pattern     "(\(|\))"
-  end
-
-  rule "Operator"
-    pattern     "(\[|\]|\+\+|\+=|\+|--|-=|->\*|->|-|==|=|&&|&=|&|\|\||\|=|\||\^=|\^|<<=|<<|<=|<|>>=|>>|>=|>|!=|!|~=|~|\*=|\*|/=|/|%=|%)"
-  end
-end

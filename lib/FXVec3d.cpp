@@ -75,12 +75,6 @@ FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,const FXVec3d&
   }
 
 
-// Linearly interpolate
-FXVec3d lerp(const FXVec3d& u,const FXVec3d& v,FXdouble f){
-  return FXVec3d(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f);
-  }
-
-
 // Rotate vector vec by unit-length axis about angle specified as (ca,sa)
 FXVec3d rotate(const FXVec3d& vec,const FXVec3d& axis,FXdouble ca,FXdouble sa){
   FXVec3d v1((vec*axis)*axis);

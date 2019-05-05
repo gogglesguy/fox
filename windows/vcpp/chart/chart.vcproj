@@ -53,6 +53,7 @@
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
+				SuppressStartupBanner="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -68,6 +69,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\..\..\lib\CHART-1.7.lib"
+				SuppressStartupBanner="false"
 			/>
 			<Tool
 				Name="VCALinkTool"

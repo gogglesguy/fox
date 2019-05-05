@@ -239,6 +239,7 @@ FXMetaClass::~FXMetaClass(){
   register FXuint p=hashstring(className);
   register FXuint x=(p<<1)|1;
   while(metaClassTable[p=(p+x)&(metaClassSlots-1)]!=this){
+    if(metaClassTable[p]==NULL) return;
     }
   metaClassTable[p]=EMPTY;
   if((--metaClassCount<<1) <= metaClassSlots){

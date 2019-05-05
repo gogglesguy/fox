@@ -57,21 +57,19 @@ public:
   FXbool open(const FXString& filename,Direction d=Load,FXuval sz=4096);
 
   /**
-  * Fill buffer from file.
-  * Return false if not open for reading, or fail to read from disk.
+  * Read at least count bytes into buffer; return bytes available, or -1 for error.
   */
-  virtual FXbool fill();
+  virtual FXival fill(FXival count);
 
   /**
-  * Flush buffer to file.
-  * Return false if not open for writing, or if fail to write to disk.
+  * Write at least count bytes from buffer; return space available, or -1 for error.
   */
-  virtual FXbool flush();
+  virtual FXival flush(FXival count);
 
   /**
   * Close XML file and delete buffers.
   */
-  virtual FXbool close();
+  FXbool close();
 
   /**
   * Close XML file.

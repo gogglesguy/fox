@@ -67,7 +67,11 @@ vorhour2.jpg \
 vorhour2_small.jpg \
 xfe.png \
 xfe_small.png \
-sumo.png
+sumo.png \
+20soft2b.png \
+20soft2b_small.png \
+20soft4b.png \
+20soft4b_small.png
 
 
 

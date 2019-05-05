@@ -36,9 +36,9 @@ namespace FX {
 * and dispatches to the proper function when activity is observed.
 */
 class FXAPI FXDispatcher {
-protected:
+private:
   struct FXHandles;
-protected:
+private:
   FXHandles      *handles;              // Handle to watch
   volatile FXint  signotified[64];      // Signal notify flag
   FXint           sigreceived;          // Most recent received signal
@@ -47,9 +47,9 @@ protected:
   FXint           numraised;            // Number of raised handles
   FXint           current;              // Current handle
   FXbool          initialized;          // Is initialized
-protected:
+private:
   static FXDispatcher* volatile sigmanager[64]; // Signals managed flag
-protected:
+private:
   FXDispatcher(const FXDispatcher&);
   FXDispatcher &operator=(const FXDispatcher&);
 private:

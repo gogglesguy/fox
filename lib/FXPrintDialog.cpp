@@ -428,7 +428,7 @@ void FXPrintDialog::create(){
   FXchar name[1000];
   FILE *pc;
   FXchar buf[1000];
-  FXint i;
+  FXuint i;
 
   // Open printcap file, found as per registry setting
   // You may have change this setting for your particular system

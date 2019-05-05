@@ -67,7 +67,7 @@ namespace FX {
 *
 *       abs, acos, acosh, asin, asinh, atan, atanh,
 *       ceil, cos, cosh, exp, floor, log, log10, sin, sinh,
-*       sqrt, tan, tanh, max, min, atan2
+*       sqr, cub, sqrt, cbrt, round, trunc, tan, tanh, max, min, atan2
 *
 * The expression engine also contains the following constants:
 *

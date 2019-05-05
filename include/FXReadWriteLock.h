@@ -103,7 +103,7 @@ public:
   void unlock(){ rwlock.readUnlock(); }
 
   /// Destroy and unlock associated read-write lock
-  ~FXScopedReadLock(){ unlock(); }
+ ~FXScopedReadLock(){ unlock(); }
   };
 
 
@@ -137,7 +137,7 @@ public:
   void unlock(){ rwlock.writeUnlock(); }
 
   /// Destroy and unlock associated read-write lock
-  ~FXScopedWriteLock(){ unlock(); }
+ ~FXScopedWriteLock(){ unlock(); }
   };
 
 }

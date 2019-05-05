@@ -17,12 +17,39 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-January 16 - FOX STABLE 1.6.56
+May 3 - FOX DEVELOPMENT 1.7.65
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
 <ul>
-<li>Problem fixed in FXString vformat().</li>
+<li>FXJSON now has <a href='https://json5.org'>JSON5</a> JSON5 support; line-comments, multi-line comments,
+unquoted key names, etc.</li>
+<li>Experimental block-selection in FXText widget.</li>
+<li>Fixed fxscanf.cpp to be able to read NaN and Infinity/Inf.</li>
+<li>Fixed strtod() to recognize Infinity.</li>
+<li>The escape() of empty string returns "", not empty string.</li>
+<li>The unescape() supports line-continuations.</li>
+<li>Additions to Math namespace.</li>
+<li>Additions to FXQuatd and FXQuatf.</li>
+<li>Some missing functions added to FXExpression.</li>
+<li>FXPath::convert() transforms foreign operating system-style paths to local conventions (path separator, path list separator,
+environment variable syntax).</li>
+<li>Improved FXPath::expand().</li>
+<li>FXThread::wakeat() now using absolute time on Windows (using undocumented API).</li>
+<li>FXReverseDictionary class added.</li>
+<li>FXDirWatch class added.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 3 - FOX STABLE 1.6.57
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Libtool flags added on behalf of FXRuby builds and missing UNICODE flag added for CYGWIN32 build.</li>
 </ul>
 
 
@@ -50,6 +77,18 @@ many, you can therefore immediately delete it again).</li>
 <li>FXText block select, block copy to clipboard, and block delete now work.</li>
 <li>FXText shiftText() had minor issue shifting text containing tabs; this has been dealt with
 in a very sophisticated way, an internal routine which is also needed for block operations.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+January 16 - FOX STABLE 1.6.56
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Problem fixed in FXString vformat().</li>
 </ul>
 
 

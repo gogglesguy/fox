@@ -255,6 +255,7 @@ FXDirDialog.cpp \
 FXDirList.cpp \
 FXDirSelector.cpp \
 FXDirVisitor.cpp \
+FXDirWatch.cpp \
 FXDispatcher.cpp \
 FXDockBar.cpp \
 FXDockSite.cpp \
@@ -320,6 +321,7 @@ FXJPGIcon.cpp \
 FXJPGImage.cpp \
 FXJSON.cpp \
 FXJSONFile.cpp \
+FXJSONString.cpp \
 FXKnob.cpp \
 FXLabel.cpp \
 FXLFQueue.cpp \
@@ -393,6 +395,7 @@ FXRectangle.cpp \
 FXRegion.cpp \
 FXRegistry.cpp \
 FXReplaceDialog.cpp \
+FXReverseDictionary.cpp \
 FXRex.cpp \
 FXRootWindow.cpp \
 FXRuler.cpp \
@@ -479,6 +482,7 @@ FXXPMIcon.cpp \
 FXXPMImage.cpp \
 fxascii.cpp \
 fxbase64.cpp \
+fxbase85.cpp \
 fxcpuid.cpp \
 fxbmpio.cpp \
 fxcompose.cpp \

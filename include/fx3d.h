@@ -27,6 +27,8 @@
 #define STRICT
 #endif
 #include <windows.h>
+#undef max
+#undef min
 #endif
 #ifdef HAVE_GL_H
 #ifndef GL_GLEXT_PROTOTYPES

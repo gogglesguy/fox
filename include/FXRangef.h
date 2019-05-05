@@ -102,7 +102,7 @@ public:
   /// Longest side
   FXfloat longest() const;
 
-  /// shortest side
+  /// Shortest side
   FXfloat shortest() const;
 
   /// Length of diagonal

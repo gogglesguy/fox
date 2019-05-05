@@ -246,7 +246,7 @@ match:XFree(ximstyles);
 FXbool isIMRunning(Display *display){
   const FXchar *p=XSetLocaleModifiers(NULL);
   if(p){
-    FXTRACE((1,"XSetLocaleModifiers=%s\n",p));
+    FXTRACE((100,"XSetLocaleModifiers=%s\n",p));
     FXString server("@server=");
     server.append(p+4);         // skip "@im="
     FXint pos=server.find('@',1);
@@ -342,7 +342,7 @@ m:      XFree(ximstyles);
 
         // Have status callbacks
         if(style&XIMStatusCallbacks){
-          FXTRACE((1,"On the Spot/Status\n"));
+          FXTRACE((100,"On the Spot/Status\n"));
           statusStartStruct.client_data=(XPointer)this;
           statusStartStruct.callback=(XIMProc)statusStartCallback;
           statusDoneStruct.client_data=(XPointer)this;

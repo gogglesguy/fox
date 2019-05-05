@@ -116,6 +116,14 @@ public:
   /// Load object
   FXFileStream& loadObject(FXObject*& v){ FXStream::loadObject(v); return *this; }
 
+  /// Load object
+  template<class TYPE>
+  FXFileStream& operator>>(TYPE*& obj){ return loadObject(reinterpret_cast<FXObject*&>(obj)); }
+  
+  /// Save object
+  template<class TYPE>
+  FXFileStream& operator<<(const TYPE* obj){ return saveObject(static_cast<const FXObject*>(obj)); }
+
   /// Destructor
   virtual ~FXFileStream();
   };

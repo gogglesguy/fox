@@ -194,8 +194,17 @@ const FXchar fallbackPatterns[]=
 
 /*******************************************************************************/
 
+// Initialize main window
+PathFinderMain::PathFinderMain(){
+  }
+
+
 // Make some windows
-PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,DECOR_ALL,0,0,800,600,0,0),bookmarkeddirs(a,"Bookmarked Directories"){
+PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,DECOR_ALL,0,0,800,600,0,0),bookmarkeddirs(a,"Bookmarked Directories")
+#if defined(DIRWATCH)
+  ,dirwatch(a) // FIXME
+#endif
+{
 
   // Totals
   totalCount=0;
@@ -288,7 +297,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   statusline->setSelector(ID_STATUSLINE);
 
   // Subtle plug for LINUX
-  new FXButton(statusbar,tr("\tAbout PathFinder"),foxminiicon,this,ID_ABOUT,LAYOUT_TOP|LAYOUT_RIGHT);
+  new FXButton(statusbar,tr("\tAbout PathFinder"),foxminiicon,this,ID_ABOUT,LAYOUT_CENTER_Y|LAYOUT_RIGHT);
 
   // Pattern
   pattern=new FXComboBox(statusbar,25,this,ID_FILEFILTER,COMBOBOX_STATIC|LAYOUT_RIGHT|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK, 0,0,200,0, 0,0,1,1);
@@ -1368,7 +1377,17 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
 long PathFinderMain::onCmdDirectory(FXObject*,FXSelector,void* ptr){
   FXTreeItem *item=(FXTreeItem*)ptr;
   FXString path=dirlist->getItemPathname(item);
+
+#if defined(DIRWATCH)
+dirwatch.remWatch(filelist->getDirectory());           // FIXME
+#endif
+
   filelist->setDirectory(path,true);
+
+#if defined(DIRWATCH)
+dirwatch.addWatch(filelist->getDirectory());           // FIXME
+#endif
+
   dirbox->setDirectory(filelist->getDirectory());
   address->setText(filelist->getDirectory());
   visitDirectory(filelist->getDirectory());

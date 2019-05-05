@@ -79,6 +79,7 @@
 #include "FXVariantArray.h"
 #include "FXVariantMap.h"
 #include "FXDictionary.h"
+#include "FXReverseDictionary.h"
 #include "FXDLL.h"
 #include "FXSize.h"
 #include "FXPoint.h"
@@ -289,6 +290,7 @@
 #include "FXCalendar.h"
 #include "FXGradientBar.h"
 #include "FXConsole.h"
+#include "FXDirWatch.h"
 #include "FXSplashWindow.h"
 
 

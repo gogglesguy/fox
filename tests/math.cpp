@@ -224,20 +224,17 @@ void record(SPAccuracy& acc,FXfloat arg,FXfloat act,FXfloat res){
     }
   }
 
+static const char sign[2]={'+','-'};
 
 // Print a double, disassembled
 void printDP(FXdouble x){
-  static const char sign[2]={'+','-'};
-  DP dp={x};
-  fprintf(stderr,"0x%016lx (%c)(% 4ld(%4ld))(0x%013lx) -> %+.17lg\n",dp.u,sign[dp.u>>63],((dp.u>>52)&0x7ff)-1023,((dp.u>>52)&0x7ff),(dp.u&0x000fffffffffffffL),dp.f);
+  fprintf(stderr,"0x%016lx (%c)(% 4ld(%4ld))(0x%013lx) -> %+.17lg\n",Math::fpBits(x),sign[Math::fpSign(x)],Math::fpExponent(x)-1023,Math::fpExponent(x),Math::fpMantissa(x),x);
   }
 
 
 // Print a double, disassembled
 void printSP(FXfloat x){
-  static const char sign[2]={'+','-'};
-  SP sp={x};
-  fprintf(stderr,"0x%08x (%c)(% 3d(%3d))(0x%06x) -> %+.17lg\n",sp.u,sign[sp.u>>31],((sp.u>>23)&0xff)-127,((sp.u>>23)&0xff),(sp.u&0x007fffff),(FXdouble)sp.f);
+  fprintf(stderr,"0x%08x (%c)(% 3d(%3d))(0x%06x) -> %+.17lg\n",Math::fpBits(x),sign[Math::fpSign(x)],Math::fpExponent(x)-127,Math::fpExponent(x),Math::fpMantissa(x),(FXdouble)x);
   }
 
 

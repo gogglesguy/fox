@@ -128,6 +128,7 @@
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -142,6 +143,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib opengl32.lib glu32.lib comctl32.lib wsock32.lib mpr.lib imm32.lib"
+				SuppressStartupBanner="false"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="0"

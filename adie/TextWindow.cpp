@@ -95,7 +95,7 @@
 
 #define CLOCKTIMER      1000000000      // Blink rate for corner clock
 #define RESTYLEJUMP     80              // Restyling back-off
-#define MAXFILESIZE     100000000       // Limit files to this when loading
+#define MAXFILESIZE     500000000       // Limit files to this when loading
 
 /*******************************************************************************/
 
@@ -991,7 +991,7 @@ FXbool TextWindow::loadFile(const FXString& file){
           editor->setText(text,n);
 
           // Set stuff
-          setEditable(FXStat::isWritable(file));
+          setEditable(FXStat::isAccessible(file,FXIO::ReadOnly|FXIO::WriteOnly));
           setBrowserCurrentFile(file);
           mrufiles.appendFile(file);
           setFiletime(FXStat::modified(file));
@@ -3177,14 +3177,17 @@ long TextWindow::onCmdSearch(FXObject*,FXSelector,void*){
   FXTRACE((100,"TextWindow::onCmdSearch()\n"));
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXSearchDialog searchdialog(this,tr("Search"),&dialogicon);
-  FXint beg[10],end[10],pos,code;
-  FXuint placement=PLACEMENT_OWNER;
+  FXint    beg[10],end[10],pos,code;
+  FXuint   placement=PLACEMENT_OWNER;
+  FXString findstring;
+  FXuint   findflags;
 
   // Start the search
   setStatusMessage(tr("Search for a string in the file."));
 
   // Start with same flags as last time
-  searchdialog.setSearchMode(searchflags);
+//  searchdialog.setSearchMode(searchflags);
+//  searchdialog.setSearchText(searchstring);
 
   // First time, throw dialog over window
   while((code=searchdialog.execute(placement))!=FXSearchDialog::DONE){
@@ -3193,26 +3196,28 @@ long TextWindow::onCmdSearch(FXObject*,FXSelector,void*){
     placement=PLACEMENT_DEFAULT;
 
     // Grab the search parameters
-    searchstring=searchdialog.getSearchText();
-    searchflags=searchdialog.getSearchMode();
+//    searchstring=searchdialog.getSearchText();
+//    searchflags=searchdialog.getSearchMode();
+    findstring=searchdialog.getSearchText();
+    findflags=searchdialog.getSearchMode();
 
     // If search string matches the selection, start from the end (or begin
     // when seaching backwards) of the selection.  Otherwise proceed from the
     // cursor position.
     pos=editor->getCursorPos();
-    if(matchesSelection(searchstring,beg,end,searchflags,10)){
-      pos=(searchflags&SEARCH_BACKWARD) ? beg[0]-1 : end[0];
+    if(matchesSelection(findstring,beg,end,findflags,10)){
+      pos=(findflags&SEARCH_BACKWARD) ? beg[0]-1 : end[0];
       }
 
     // Search the text
-    if(editor->findText(searchstring,beg,end,pos,searchflags,10)){
+    if(editor->findText(findstring,beg,end,pos,findflags,10)){
 
       // Feed back success, search box turns green
       setStatusMessage(tr("String found!"));
       searchdialog.setSearchTextColor(FXRGB(128,255,128));
 
       // Flag a wraparound the text
-      if(searchflags&SEARCH_BACKWARD){
+      if(findflags&SEARCH_BACKWARD){
         if(pos<=beg[0]){ setStatusMessage(tr("Search wrapped around.")); }
         }
       else{
@@ -3259,18 +3264,22 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
   FXTRACE((100,"TextWindow::onCmdReplace()\n"));
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXReplaceDialog replacedialog(this,tr("Replace"),&dialogicon);
-  FXint beg[10],end[10],pos,finish,fm,to,code;
-  FXuint placement=PLACEMENT_OWNER;
+  FXint    beg[10],end[10],pos,finish,fm,to,code;
+  FXuint   placement=PLACEMENT_OWNER;
   FXString originalvalue;
-  FXString replacevalue;
+  FXString findstring;
   FXString replacestring;
-  FXbool found;
+  FXString replacevalue;
+  FXuint   findflags;
+  FXbool   found;
 
   // Start the search/replace
   setStatusMessage(tr("Search and replace strings in the file."));
 
   // Start with same flags as last time
-  replacedialog.setSearchMode(searchflags);
+//  replacedialog.setSearchMode(searchflags);
+//  replacedialog.setSearchText(searchstring);
+//  replacedialog.setReplaceText(searchstring);
 
   // First time, throw dialog over window
   while((code=replacedialog.execute(placement))!=FXReplaceDialog::DONE){
@@ -3279,9 +3288,14 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
     placement=PLACEMENT_DEFAULT;
 
     // Grab the search parameters
-    searchstring=replacedialog.getSearchText();
+//    searchstring=replacedialog.getSearchText();
+//    replacestring=replacedialog.getReplaceText();
+//    searchflags=replacedialog.getSearchMode();
+//    replacevalue=FXString::null;
+
+    findstring=replacedialog.getSearchText();
+    findflags=replacedialog.getSearchMode();
     replacestring=replacedialog.getReplaceText();
-    searchflags=replacedialog.getSearchMode();
     replacevalue=FXString::null;
 
     // Search or replace one instance
@@ -3291,14 +3305,14 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
       // when seaching backwards) of the selection.  Otherwise proceed from the
       // cursor position.
       pos=editor->getCursorPos();
-      found=matchesSelection(searchstring,beg,end,searchflags,10);
+      found=matchesSelection(findstring,beg,end,findflags,10);
       if(found){
-        pos=(searchflags&SEARCH_BACKWARD) ? beg[0]-1 : end[0];
+        pos=(findflags&SEARCH_BACKWARD) ? beg[0]-1 : end[0];
         }
 
       // Perform a search if no match yet, or we're just searching
       if(!found || (code==FXReplaceDialog::SEARCH)){
-        found=editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10);
+        found=editor->findText(findstring,beg,end,pos,findflags|SEARCH_WRAP,10);
         }
 
       // Found a match; if just searching, select the match, otherwise, select
@@ -3309,7 +3323,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
         replacedialog.setReplaceTextColor(FXRGB(128,255,128));
 
         // Flag a wraparound the text
-        if(searchflags&SEARCH_BACKWARD){
+        if(findflags&SEARCH_BACKWARD){
           if(pos<=beg[0]){ setStatusMessage(tr("Search wrapped around.")); }
           }
         else{
@@ -3318,7 +3332,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
 
         // Replace the string
         if(code==FXReplaceDialog::REPLACE){
-          if(searchflags&SEARCH_REGEX){
+          if(findflags&SEARCH_REGEX){
             editor->extractText(originalvalue,beg[0],end[0]-beg[0]);
             replacevalue=substitute(originalvalue,replacestring,beg,end,10);
             }
@@ -3364,7 +3378,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
         }
 
       // Scan through text buffer
-      while(editor->findText(searchstring,beg,end,pos,((searchflags&~(SEARCH_WRAP|SEARCH_BACKWARD|SEARCH_FORWARD))|SEARCH_FORWARD),10) && end[0]<=finish){
+      while(editor->findText(findstring,beg,end,pos,((findflags&~(SEARCH_WRAP|SEARCH_BACKWARD|SEARCH_FORWARD))|SEARCH_FORWARD),10) && end[0]<=finish){
 
         // Start buffer mutation at first occurrence
         if(fm<0){ fm=to=beg[0]; }
@@ -3376,7 +3390,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
           }
 
         // For changed piece, use substitution pattern
-        if(searchflags&SEARCH_REGEX){
+        if(findflags&SEARCH_REGEX){
           editor->extractText(originalvalue,beg[0],end[0]-beg[0]);
           replacevalue.append(substitute(originalvalue,replacestring,beg,end,10));
           }
@@ -4859,7 +4873,7 @@ long TextWindow::onUpdRestyle(FXObject* sender,FXSelector,void*){
 
 
 // Show syntax in tooltip
-// FIXME for now, we should the syntax rule; but in the future,
+// FIXME for now, we show the syntax rule; but in the future,
 // we will show more interesting stuff than that.
 long TextWindow::onQueryTextTip(FXObject* sender,FXSelector,void*){
   if(getSyntax() && editor->isStyled()){

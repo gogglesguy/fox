@@ -400,10 +400,9 @@ extern FXAPI FILE *fxopen(const char *filename,const char *mode);
 
 FILE *fxopen(const char *filename,const char *mode){
 #if defined(WIN32) && defined(UNICODE)
-  FXnchar unifile[MAXPATHLEN];
-  FXnchar unimode[8];
-  utf2ncs(unifile,filename,MAXPATHLEN);
-  utf2ncs(unimode,mode,8);
+  FXnchar unifile[MAXPATHLEN],unimode[8];
+  utf2ncs(unifile,filename,ARRAYNUMBER(unifile));
+  utf2ncs(unimode,mode,ARRAYNUMBER(unimode));
   return _wfopen(unifile,unimode);
 #else
   return fopen(filename,mode);
@@ -414,10 +413,9 @@ extern FXAPI FILE *fxreopen(const char *filename,const char *mode,FILE * stream)
 
 FILE *fxreopen(const char *filename,const char *mode,FILE * stream){
 #if defined(WIN32) && defined(UNICODE)
-  FXnchar unifile[MAXPATHLEN];
-  FXnchar unimode[8];
-  utf2ncs(unifile,filename,MAXPATHLEN);
-  utf2ncs(unimode,mode,8);
+  FXnchar unifile[MAXPATHLEN],unimode[8];
+  utf2ncs(unifile,filename,ARRAYNUMBER(unifile));
+  utf2ncs(unimode,mode,ARRAYNUMBER(unimode));
   return _wfreopen(unifile,unimode,stream);
 #else
   return freopen(filename,mode,stream);

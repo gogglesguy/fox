@@ -108,7 +108,7 @@ FXTime fxgetticks(){
 // Return clock ticks from performance counter [GCC PA-RISC version].
 FXTime fxgetticks(){
   FXTime value;
-  asm ("mfctl 16, %0": "=r" (value));           // FIXME not tested!
+  asm ("mfctl 16, %0": "=r" (value));                   // FIXME not tested!
   return value;
   }
 
@@ -166,7 +166,7 @@ FXTime fxgetticks(){
 FXTime fxgetticks(){
   const FXTime seconds=1000000000;
   struct timespec ts;
-  clock_gettime(CLOCK_REALTIME,&ts);
+  clock_gettime(CLOCK_MONOTONIC,&ts);
   return ts.tv_sec*seconds+ts.tv_nsec;                  // NOT accurate!
   }
 

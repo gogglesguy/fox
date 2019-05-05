@@ -367,16 +367,59 @@ FXString FXURL::decode(const FXString& url){
 
 /*******************************************************************************/
 
+// Convert path from using 'sepfm' to use 'septo' path-separators
+static FXString convertPathSep(const FXString& file,FXchar septo,FXchar sepfm){
+  if(!file.empty()){
+    FXString result(file);
+    FXint p=0,q=0;
+#if defined(WIN32)
+    if(result[q]==sepfm || result[q]==septo){                   // UNC
+      result[p++]=septo; q++;
+      if(result[q]==sepfm || result[q]==septo){
+        result[p++]=septo; q++;
+        while(result[q]==sepfm || result[q]==septo) q++;
+        }
+      }
+    else if(Ascii::isLetter(result[q]) && result[q+1]==':'){    // C:
+      result[p++]=result[q++];
+      result[p++]=':'; q++;
+      if(result[q]==sepfm || result[q]==septo){
+        result[p++]=septo; q++;
+        while(result[q]==sepfm || result[q]==septo) q++;
+        }
+      }
+#else
+    if(result[q]==sepfm || result[q]==septo){
+      result[p++]=septo; q++;
+      while(result[q]==sepfm || result[q]==septo) q++;
+      }
+#endif
+    while(result[q]){
+      if(result[q]==sepfm || result[q]==septo){                 // FIXME don't convert escaped path separators!!
+        result[p++]=septo; q++;
+        while(result[q]==sepfm || result[q]==septo) q++;
+        continue;
+        }
+      result[p++]=result[q++];
+      }
+    return result.trunc(p);
+    }
+  return FXString::null;
+  }
+
+
+/*******************************************************************************/
+
 // Return URL of filename
 FXString FXURL::fileToURL(const FXString& file){
 #ifdef WIN32
   if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    return "file:"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);         // file://share/path-with-slashes
+    return "file:"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);         // file://share/path-with-slashes
     }
   if(Ascii::isLetter(file[0]) && file[1]==':'){
-    return "file:///"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);      // file:///c:/path-with-slashes
+    return "file:///"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);      // file:///c:/path-with-slashes
     }
-  return "file://"+encode(FXPath::convert(file,'/','\\'),ENCODE_THESE);         // file://path-with-slashes
+  return "file://"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);         // file://path-with-slashes
 #else
   return "file://"+encode(file,ENCODE_THESE);                                   // file://path
 #endif
@@ -389,9 +432,9 @@ FXString FXURL::fileFromURL(const FXString& string){
 #ifdef WIN32
     URL url(string);
     if(url.host[0]<url.host[1]){
-      return "\\\\"+string.mid(url.host[0],url.host[1]-url.host[0])+decode(FXPath::convert(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
+      return "\\\\"+string.mid(url.host[0],url.host[1]-url.host[0])+decode(convertPathSep(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
       }
-    return decode(FXPath::convert(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
+    return decode(convertPathSep(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
 #else
     URL url(string);
     return decode(string.mid(url.path[0],url.path[1]-url.path[0]));

@@ -145,11 +145,12 @@ protected:
   FXbool              draggable;        // Dragable files
 protected:
   FXDirList();
-  void listRootItems();
-  void listChildItems(FXDirItem *par,FXbool force,FXbool notify);
+  void listItems(FXbool force,FXbool notify);
+  void listRootItems(FXbool force,FXbool notify);
+  FXbool listChildItems(FXDirItem *par,FXbool force,FXbool notify);
   FXString getSelectedFiles() const;
   virtual FXTreeItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr);
-  FXTreeItem* getPathnameItem__(const FXString& path);
+  FXTreeItem* expandPath(const FXString& path,FXbool notify);
 private:
   FXDirList(const FXDirList&);
   FXDirList &operator=(const FXDirList&);
@@ -230,9 +231,6 @@ public:
   /// Destroy server-side resources
   virtual void destroy();
 
-  /// Scan the directories and update the items if needed, or if force is true
-  void scan(FXbool force=true);
-
   /// Set current file; return true if success
   FXbool setCurrentFile(const FXString& file,FXbool notify=false);
 
@@ -249,7 +247,7 @@ public:
   FXString getItemPathname(const FXTreeItem* item) const;
 
   /// Return the (closest) item from the absolute pathname
-  FXTreeItem* getPathnameItem(const FXString& path);
+  FXTreeItem* getPathnameItem(const FXString& path) const;
 
   /// Return true if item is a file
   FXbool isItemFile(const FXTreeItem* item) const;

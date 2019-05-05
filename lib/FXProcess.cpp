@@ -177,7 +177,7 @@ static int CDECL comparison(const void *a1, const void *a2){
 static FXbool needquotes(const FXchar* ptr){
   register FXchar c;
   while((c=*ptr++)!='\0'){
-    if(c==' ' || c=='"' || c=='\t' || c=='\v') return true;
+    if(c==' ' || c=='"' || c=='\t' || c=='\v' || c=='\n') return true;
     }
   return false;
   }

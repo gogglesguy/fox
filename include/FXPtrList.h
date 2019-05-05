@@ -48,6 +48,9 @@ public:
   /// Assignment operator
   FXPtrList& operator=(const FXPtrList& src);
 
+  /// Adopt objects from src, leaving src empty
+  FXPtrList& adopt(FXPtrList& src);
+
   /// Return number of objects
   FXival no() const { return *((FXival*)(ptr-1)); }
 
@@ -73,9 +76,6 @@ public:
   /// Access to content array
   FXptr* data(){ return ptr; }
   const FXptr* data() const { return ptr; }
-
-  /// Adopt objects from src, leaving src empty
-  FXPtrList& adopt(FXPtrList& src);
 
   /// Find object in list, searching forward; return position or -1
   FXival find(FXptr object,FXival pos=0) const;
@@ -179,13 +179,13 @@ public:
   FXPtrListOf(const FXPtrListOf<TYPE>& src):FXPtrList(src){ }
 
   /// Construct and init with single object
-  FXPtrListOf(TYPE* object):FXPtrList(reinterpret_cast<FXptr>(object)){ }
+  FXPtrListOf(TYPE* object):FXPtrList(object){ }
 
   /// Construct and init with n copies of object
-  FXPtrListOf(TYPE* object,FXival n):FXPtrList(reinterpret_cast<FXptr>(object),n){ }
+  FXPtrListOf(TYPE* object,FXival n):FXPtrList(object,n){ }
 
   /// Construct and init with list of objects
-  FXPtrListOf(TYPE** objects,FXival n):FXPtrList(reinterpret_cast<FXptr*>(objects),n){ }
+  FXPtrListOf(TYPE** objects,FXival n):FXPtrList(objects,n){ }
 
   /// Assignment operator
   FXPtrListOf<TYPE>& operator=(const FXPtrListOf<TYPE>& src){ return reinterpret_cast<FXPtrListOf<TYPE>&>(FXPtrList::operator=(src)); }

@@ -1,6 +1,8 @@
 %define name fox
-%define version 1.7.64
+%define version 1.7.65
 %define release 1
+
+%global debug_package %{nil}
 
 Summary: The FOX toolkit.
 Name: %{name}
@@ -8,7 +10,7 @@ Version: %{version}
 Release: %{release}
 License: LGPL+Addendum
 Group: System Environment/Libraries
-Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.64.tar.gz
+Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.65.tar.gz
 URL: http://www.fox-toolkit.org
 Packager: Jeroen van der Zijp <jeroen@fox-toolkit.com>
 BuildRoot: %{_tmppath}/%{name}-buildroot
@@ -93,7 +95,7 @@ various other parameters common between all FOX applications.
 %setup -q
 
 %build
-CPPFLAGS="$RPM_OPT_FLAGS -frtti" CFLAGS="$RPM_OPT_FLAGS -frtti" LDFLAGS="$RPM_OPT_FLAGS -fPIC" 
+CPPFLAGS="$RPM_OPT_FLAGS -frtti" CFLAGS="$RPM_OPT_FLAGS -frtti" LDFLAGS="$RPM_OPT_FLAGS -fPIC"
 %configure --enable-release
 make
 
@@ -116,10 +118,10 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %defattr(-,root,root)
 %{_libdir}/libFOX-1.7.so
 %{_libdir}/libFOX-1.7.so.0
-%{_libdir}/libFOX-1.7.so.0.0.64
+%{_libdir}/libFOX-1.7.so.0.0.65
 %{_libdir}/libCHART-1.7.so
 %{_libdir}/libCHART-1.7.so.0
-%{_libdir}/libCHART-1.7.so.0.0.64
+%{_libdir}/libCHART-1.7.so.0.0.65
 %{_libdir}/pkgconfig/fox17.pc
 
 %doc doc
@@ -166,7 +168,7 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %{_mandir}/man1/ControlPanel.1*
 
 %changelog
-* Sat Feb 9 2011 Jeroen van der Zijp <jeroen@fox-toolkit.com>
+* Sat Wed 9 2011 Jeroen van der Zijp <jeroen@fox-toolkit.com>
 - Added Control Panel application.
 - Added package config to installed.
 - Deleted very old stuff in change log.

@@ -117,8 +117,10 @@ public:
   /// Validate position to point to begin of utf8 character
   FXint validate(FXint p) const;
 
-  /// Get text contents
+  /// Get text contents as pointer
   FXchar* text(){ return str; }
+
+  /// Get text contents as const pointer
   const FXchar* text() const { return str; }
 
   /// See if string is empty

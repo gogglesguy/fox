@@ -122,6 +122,14 @@ public:
   /// Load object
   FXBZFileStream& loadObject(FXObject*& v){ FXStream::loadObject(v); return *this; }
 
+  /// Load object
+  template<class TYPE>
+  FXBZFileStream& operator>>(TYPE*& obj){ loadObject(reinterpret_cast<FXObject*&>(obj)); return *this; }
+  
+  /// Save object
+  template<class TYPE>
+  FXBZFileStream& operator<<(const TYPE* obj){ saveObject(static_cast<const FXObject*>(obj)); return *this; }
+
   /// Clean up
   virtual ~FXBZFileStream();
   };

@@ -204,7 +204,7 @@ FXString normalize(const FXString& s){
   FXwchar* wcs=(FXwchar*)::malloc(s.length()*sizeof(FXwchar));
   FXString result;
   if(wcs){
-    FXint n=utf2wcs(wcs,s.text(),s.length(),s.length());
+    FXint n=utf2wcs(wcs,s.text(),s.length());
     normalize(wcs,n);
     result.assign(wcs,n);
     ::free(wcs);
@@ -222,7 +222,7 @@ FXString decompose(const FXString& s,FXbool canonical){
   FXString result;
   if(wcs){
     FXwchar* ptr=wcs+s.length()*17;
-    FXint m=utf2wcs(ptr,s.text(),s.length(),s.length());
+    FXint m=utf2wcs(ptr,s.text(),s.length());
     FXint p=0;
     FXint n=0;
     while(p<m){
@@ -243,7 +243,7 @@ FXString compose(const FXString& s,FXbool canonical){
   FXString result;
   if(wcs){
     FXwchar* ptr=wcs+s.length()*17;
-    FXint m=utf2wcs(ptr,s.text(),s.length(),s.length());
+    FXint m=utf2wcs(ptr,s.text(),s.length());
     FXint p=0;
     FXint n=0;
     while(p<m){

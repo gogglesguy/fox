@@ -46,7 +46,9 @@ namespace FX {
 
 // Initialize matrix from scalar
 FXMat2d::FXMat2d(FXdouble s){
-#if defined(FOX_HAS_SSE2)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_set1_pd(s));
+#elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_set1_pd(s));
   _mm_storeu_pd(&m[1][0],_mm_set1_pd(s));
 #else
@@ -124,7 +126,9 @@ FXMat2d::FXMat2d(const FXVec2d& a,const FXVec2d& b){
 
 // Assign from scalar
 FXMat2d& FXMat2d::operator=(FXdouble s){
-#if defined(FOX_HAS_SSE2)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_set1_pd(s));
+#elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_set1_pd(s));
   _mm_storeu_pd(&m[1][0],_mm_set1_pd(s));
 #else
@@ -180,7 +184,9 @@ FXMat2d& FXMat2d::operator=(const FXdouble s[]){
 
 // Set value from scalar
 FXMat2d& FXMat2d::set(FXdouble s){
-#if defined(FOX_HAS_SSE2)
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_set1_pd(s));
+#elif defined(FOX_HAS_SSE2)
   _mm_storeu_pd(&m[0][0],_mm_set1_pd(s));
   _mm_storeu_pd(&m[1][0],_mm_set1_pd(s));
 #else

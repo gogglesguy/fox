@@ -37,6 +37,7 @@
     http://www.graphicswiz.com/png/
     http://www.inforamp.net/~poynton
     http://www.libpng.org/pub/png/
+    https://libspng.org/download.html (new!)
 */
 
 using namespace FX;

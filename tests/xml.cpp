@@ -225,6 +225,7 @@ int main(int argc,char *argv[]){
       return 0;
       }
     xmlerr=xmlinput.parse();
+    fxmessage("Loaded %lld bytes\n",xmlinput.getOffset());
     if(xmlerr!=FXXML::ErrOK){
       fxmessage("Error: %s:%d:%d: %s\n",loadfile,xmlinput.getLine(),xmlinput.getColumn(),FXXML::getError(xmlerr));
       }
@@ -236,7 +237,9 @@ int main(int argc,char *argv[]){
 
   // Close if it was open
   if(savefile){
+    fxmessage("Stored %lld bytes\n",xmloutput.getOffset());
     xmloutput.close();
+    fxmessage("OK\n");
     }
 
   return 0;

@@ -188,13 +188,13 @@ public:
   FXObjectListOf(const FXObjectListOf<TYPE>& src):FXObjectList(src){ }
 
   /// Construct and init with single object
-  FXObjectListOf(TYPE* object):FXObjectList(reinterpret_cast<FXObject*>(object)){ }
+  FXObjectListOf(TYPE* object):FXObjectList(object){ }
 
   /// Construct and init with n copies of object
-  FXObjectListOf(TYPE* object,FXival n):FXObjectList(reinterpret_cast<FXObject*>(object),n){ }
+  FXObjectListOf(TYPE* object,FXival n):FXObjectList(object,n){ }
 
   /// Construct and init with list of objects
-  FXObjectListOf(TYPE** objects,FXival n):FXObjectList(reinterpret_cast<FXObject**>(objects),n){ }
+  FXObjectListOf(TYPE** objects,FXival n):FXObjectList(objects,n){ }
 
   /// Assignment operator
   FXObjectListOf<TYPE>& operator=(const FXObjectListOf<TYPE>& orig){ return reinterpret_cast<FXObjectListOf<TYPE>&>(FXObjectList::operator=(orig)); }

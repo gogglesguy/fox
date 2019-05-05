@@ -673,7 +673,7 @@ void FXTopWindow::settitle(){
 #ifdef WIN32
 #ifdef UNICODE
     FXnchar unititle[1024];
-    utf2ncs(unititle,title.text(),1024);
+    utf2ncs(unititle,title.text(),ARRAYNUMBER(unititle));
     SetWindowTextW((HWND)xid,unititle);
 #else
     SetWindowTextA((HWND)xid,title.text());

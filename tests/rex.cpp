@@ -36,6 +36,7 @@ static void printusage(){
   fxmessage("  -l <num>, --levels <num>            Capure levels.\n");
   }
 
+
 // Start the whole thing
 int main(int argc,char** argv){
   FXint beg[NCAP]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};

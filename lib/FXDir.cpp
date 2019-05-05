@@ -94,13 +94,13 @@ FXbool FXDir::open(const FXString& path){
   if(!path.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-    FXnchar buffer[MAXPATHLEN];
-    utf2ncs(buffer,path.text(),MAXPATHLEN-2);
-    wcsncat(buffer,TEXT("\\*"),MAXPATHLEN);
+    FXnchar buffer[MAXPATHLEN+2];
+    utf2ncs(buffer,path.text(),MAXPATHLEN);
+    wcsncat(buffer,TEXT("\\*"),MAXPATHLEN+2);
 #else
-    FXchar buffer[MAXPATHLEN];
+    FXchar buffer[MAXPATHLEN+2];
     fxstrlcpy(buffer,path.text(),MAXPATHLEN);
-    fxstrlcat(buffer,"\\*",MAXPATHLEN);
+    fxstrlcat(buffer,"\\*",MAXPATHLEN+2);
 #endif
     ((SPACE*)space)->handle=FindFirstFile(buffer,&((SPACE*)space)->result);
     if(((SPACE*)space)->handle!=INVALID_HANDLE_VALUE){

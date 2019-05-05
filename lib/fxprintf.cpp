@@ -90,11 +90,23 @@
      'f', 'F'   Simple point conversion.
      'g', 'G'   Shortest representation point conversion.
 
+  - Printing special floating point values:
+  
+     nan,       If floating point conversion specifier is lower case ('f', 'g',
+     inf        or 'e'), if needed, preceded by a sign.
+     
+     NAN,       If floating point conversion specifier is lower case ('F', 'G', 
+     INF        or 'E'), if needed, preceded by a sign.
+     
+    We may have to change inf -> Infinity or INFINITY instead [have to find spec
+    for this change].
+     
   - If the range of positional parameters in a format string is not contiguous,
     i.e. if a positional parameter is skipped (e.g. "%3$d%1$d"), then the missing
     one is assumed to be of type "int".
     Its therefore best if no parameters are skipped; referencing a single parameter
     multiple times however, is no problem!!
+
   - FIXME Subtle difference between glibc: does NOT output '\0' at the end, unless
     buffer is large enough.  This implementation is better for our purposes, however.
 */
@@ -267,16 +279,30 @@ static FXchar *convertGeneral(FXchar *buffer,FXint& len,FXdouble number,FXint pr
 
   // Infinity
   if(Math::fpInfinite(number)){
-    *ptr++='i';
-    *ptr++='n';
-    *ptr++='f';
+    if(flags&FLG_UPPER){
+      *ptr++='I';
+      *ptr++='N';
+      *ptr++='F';
+      }
+    else{
+      *ptr++='i';
+      *ptr++='n';
+      *ptr++='f';
+      }
     }
 
   // NaN
   else if(Math::fpNan(number)){
-    *ptr++='n';
-    *ptr++='a';
-    *ptr++='n';
+    if(flags&FLG_UPPER){
+      *ptr++='N';
+      *ptr++='A';
+      *ptr++='N';
+      }
+    else{
+      *ptr++='n';
+      *ptr++='a';
+      *ptr++='n';
+      }
     }
 
   // Finite
@@ -404,16 +430,30 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
 
   // Infinity
   if(Math::fpInfinite(number)){
-    *ptr++='i';
-    *ptr++='n';
-    *ptr++='f';
+    if(flags&FLG_UPPER){
+      *ptr++='I';
+      *ptr++='N';
+      *ptr++='F';
+      }
+    else{
+      *ptr++='i';
+      *ptr++='n';
+      *ptr++='f';
+      }
     }
 
   // NaN
   else if(Math::fpNan(number)){
-    *ptr++='n';
-    *ptr++='a';
-    *ptr++='n';
+    if(flags&FLG_UPPER){
+      *ptr++='N';
+      *ptr++='A';
+      *ptr++='N';
+      }
+    else{
+      *ptr++='n';
+      *ptr++='a';
+      *ptr++='n';
+      }
     }
 
   // Finite

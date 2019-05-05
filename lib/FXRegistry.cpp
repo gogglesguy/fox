@@ -474,15 +474,15 @@ FXbool FXRegistry::read(){
         }
       }
     }
-  else{
 #if defined(WIN32)
+  else{
     // Try read system-wide registry settings from HKEY_LOCAL_MACHINE
     if(readFromRegistry(HKEY_LOCAL_MACHINE,false)) ok=true;
 
     // Try read per-user registry settings from HKEY_CURRENT_USER
     if(readFromRegistry(HKEY_CURRENT_USER,true)) ok=true;
-#endif
     }
+#endif
   return ok;
   }
 
@@ -533,12 +533,12 @@ FXbool FXRegistry::write(){
           }
         }
       }
-    else{
 #if defined(WIN32)
+    else{
       // Write per-user registry settings to HKEY_CURRENT_USER
       if(writeToRegistry(HKEY_CURRENT_USER)) ok=true;
-#endif
       }
+#endif
     }
   return ok;
   }

@@ -4487,14 +4487,20 @@ FXRex::Error FXReverse::atom(){
       savemode=mode;
       if(*src=='?'){
         *dst++=*src++;
-        if((ch=*src)!='i' && ch!='I' && ch!='n' && ch!='N' && ch!=':' && ch!='=' && ch!='!' && ch!='>' && (ch!='<' || (*(src+1)!='=' && *(src+1)!='!'))) return FXRex::ErrToken;
-        *dst++=*src++;
-        if(ch=='=' || ch=='!'){                         // Non-reversed segment
-          mode&=~FXRex::Reverse;
-          }
-        else if(ch=='<'){                               // Reversed segment
-          mode|=FXRex::Reverse;
+        if((ch=*src)==':' || ch=='i' || ch=='I' || ch=='n' || ch=='N' || ch=='>'){      // Some type of sub-expression 
           *dst++=*src++;
+          }
+        else if(ch=='=' || ch=='!'){                                                    // Positive or negative look-ahead
+          *dst++=*src++;
+          mode&=~FXRex::Reverse;                        // Non-reversed segment
+          }
+        else if(ch=='<' && (*(src+1)=='=' || *(src+1)=='!')){                           // Positive or negative look-behind
+          *dst++=*src++;
+          *dst++=*src++;
+          mode|=FXRex::Reverse;                         // Reversed segment
+          }
+        else{                                           // Bad token
+          return FXRex::ErrToken;
           }
         }
       if((err=expression())!=FXRex::ErrOK) return err;

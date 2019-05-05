@@ -774,7 +774,7 @@ void FXDCWindow::drawText(FXint x,FXint y,const FXchar* string,FXuint length){
   if(!surface){ fxerror("FXDCWindow::drawText: DC not connected to drawable.\n"); }
   if(!font){ fxerror("FXDCWindow::drawText: no font selected.\n"); }
   FXnchar sbuffer[4096];
-  FXint count=utf2ncs(sbuffer,string,4096,length);
+  FXint count=utf2ncs(sbuffer,string,ARRAYNUMBER(sbuffer),length);
   FXint bkmode=::SetBkMode((HDC)ctx,TRANSPARENT);
   ::TextOutW((HDC)ctx,x,y,sbuffer,count);
   ::SetBkMode((HDC)ctx,bkmode);
@@ -786,7 +786,7 @@ void FXDCWindow::drawImageText(FXint x,FXint y,const FXchar* string,FXuint lengt
   if(!surface){ fxerror("FXDCWindow::drawImageText: DC not connected to drawable.\n"); }
   if(!font){ fxerror("FXDCWindow::drawImageText: no font selected.\n"); }
   FXnchar sbuffer[4096];
-  FXint count=utf2ncs(sbuffer,string,4096,length);
+  FXint count=utf2ncs(sbuffer,string,ARRAYNUMBER(sbuffer),length);
   FXint bkmode=::SetBkMode((HDC)ctx,OPAQUE);
   ::TextOutW((HDC)ctx,x,y,sbuffer,count);
 //    RECT r;

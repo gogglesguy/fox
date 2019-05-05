@@ -133,7 +133,7 @@ void FXCursor::create(){
   if(!xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::create %p\n",getClassName(),this));
-#ifdef WIN32            // WIN32
+#if defined(WIN32)      // WIN32
 
       // Mapping to standard WIN32 cursors
       const LPCTSTR stock[]={IDC_ARROW,IDC_ARROW,IDC_ARROW,IDC_IBEAM,IDC_WAIT,IDC_CROSS,IDC_SIZENS,IDC_SIZEWE,IDC_SIZEALL};
@@ -334,7 +334,7 @@ void FXCursor::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
       FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
-#ifdef WIN32
+#if defined(WIN32)
       DestroyCursor((HCURSOR)xid);
 #else
       XFreeCursor(DISPLAY(getApp()),xid);

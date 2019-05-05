@@ -18,7 +18,6 @@ snapshot: dist-all
 	cp $(distdir).zip /site/ftp/pub/fox-snapshot.zip
 
 
-
 web: distdir
 	cd $(distdir)/doc && doxygen doxygen.cfg
 	cp -r $(distdir)/doc/* /site/www
@@ -27,9 +26,9 @@ web: distdir
 #	cp -r $(distdir)/doc/* /net/webby/html
 
 drop: dist-all
-	cp $(distdir).tar.gz /home/site/ftp/pub
-	cp $(distdir).zip /home/site/ftp/pub
-	sha1sum $(distdir).tar.gz >/home/site/ftp/pub/$(distdir).tar.gz.sha1sum
-	sha1sum $(distdir).zip >/home/site/ftp/pub/$(distdir).zip.sha1sum
-	cd /home/site/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
-	cd /home/site/ftp/pub && ln -sf $(distdir).zip fox-latest.zip
+	cp $(distdir).tar.gz /site/ftp/pub
+	cp $(distdir).zip /site/ftp/pub
+	sha1sum $(distdir).tar.gz >/site/ftp/pub/$(distdir).tar.gz.sha1sum
+	sha1sum $(distdir).zip >/site/ftp/pub/$(distdir).zip.sha1sum
+	cd /site/ftp/pub && ln -sf $(distdir).tar.gz fox-latest.tar.gz
+	cd /site/ftp/pub && ln -sf $(distdir).zip fox-latest.zip

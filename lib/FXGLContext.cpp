@@ -702,8 +702,7 @@ FXbool glUseFXFont(FXFont* font,int first,int count,int list){
     HFONT oldfont=(HFONT)SelectObject(hdc,(HFONT)font->id());
     // Replace wglUseFontBitmaps() with wglUseFontBitmapsW()
     // Change glCallLists() parameter:
-    //   len=utf2ncs(sbuffer,text.text(),text.length());
-    //   glCallLists(len,GL_UNSIGNED_SHORT,(GLushort*)sbuffer);
+    //   glCallLists(len,GL_UNSIGNED_SHORT,(GLushort*)unicodebuffer);
     // Figure out better values for "first" and "count".
     result=wglUseFontBitmaps(hdc,first,count,list);
     SelectObject(hdc,oldfont);

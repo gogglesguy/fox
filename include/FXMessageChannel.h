@@ -47,6 +47,7 @@ class FXApp;
 * any message handler in the context of the main user-interface thread.
 * If the size of the optional data is zero, the message handler will be passed a
 * NULL pointer.
+* The maximum payload size passed with message() is 8192 bytes.
 */
 class FXAPI FXMessageChannel : public FXObject {
   FXDECLARE(FXMessageChannel)
@@ -69,16 +70,30 @@ public:
   long onMessage(FXObject*,FXSelector,void*);
 public:
 
-  /// Initialize message channel
+  /**
+  * Initialize message channel.
+  * Adds the message channel to FXApp's input watch set.
+  */
   FXMessageChannel(FXApp* a);
 
-  /// Get application pointer
+  /**
+  * Get application pointer.
+  */
   FXApp* getApp() const { return app; }
 
-  /// Send a message msg comprising of FXSEL(type,id) to a target tgt, and pass optional data of size bytes
+  /**
+  * Send a message msg comprising of FXSEL(type,id) to a target tgt, and pass optional 
+  * data of size bytes.  
+  * This asynchronously calls the indicated handler in the context of the main GUI
+  * thread's event loop. 
+  * Up to 8192 bytes may be passed along.
+  */
   FXbool message(FXObject* tgt,FXSelector msg,const void* data=NULL,FXint size=0);
 
-  /// Clean up message channel
+  /**
+  * Clean up message channel.
+  * Removes the message channel from FXApp's input watch set.
+  */
   virtual ~FXMessageChannel();
   };
 

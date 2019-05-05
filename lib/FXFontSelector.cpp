@@ -211,7 +211,7 @@ FXFontSelector::FXFontSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   scalable=new FXCheckButton(attributes,tr("Scalable:"),this,ID_SCALABLE,JUSTIFY_NORMAL|TEXT_BEFORE_ICON|LAYOUT_CENTER_Y|LAYOUT_FILL_X);
 
   // Check for all (X11) fonts
-#ifdef WIN32
+#if defined(WIN32)
   allfonts=NULL;
 #else
   new FXFrame(attributes,FRAME_NONE|LAYOUT_FILL_X);

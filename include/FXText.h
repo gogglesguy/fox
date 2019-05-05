@@ -247,18 +247,13 @@ protected:
   virtual void drawContents(FXDCWindow& dc) const;
   virtual void drawNumbers(FXDCWindow& dc) const;
   virtual void replace(FXint pos,FXint m,const FXchar *text,FXint n,FXint style);
-  void updateRows(FXint startrow,FXint endrow) const;
+  void updateRow(FXint row) const;
+  void updateLines(FXint startpos,FXint endpos) const;
   void updateRange(FXint startpos,FXint endpos) const;
-  FXbool deletePendingSelection(FXbool notify);
-  FXint countTextLines(const FXchar* text,FXint n) const;
-  FXint countTextColumns(const FXchar* text,FXint n) const;
-  FXString tabbify(const FXchar* str,FXint len,FXint indent=0,FXint outdent=0,FXint shift=0,FXbool tab=false) const;
-  FXString tabbify(const FXString& str,FXint indent=0,FXint outdent=0,FXint shift=0,FXbool tab=false) const;
-  FXString extractTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol) const;
-  FXint removeTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,FXbool notify);
-  void replaceTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXString& text,FXbool notify);
   FXint shiftText(FXint startpos,FXint endpos,FXint shift,FXbool notify);
   FXint caseShift(FXint startpos,FXint endpos,FXint upper,FXbool notify);
+  FXint insertTextBlock(FXint startpos,FXint endpos,FXint startcol,const FXchar *text,FXint n,FXbool notify);
+  FXbool deletePendingSelection(FXbool notify);
 protected:
   enum {
     MOUSE_NONE,                 // No mouse operation
@@ -277,7 +272,8 @@ protected:
     STYLE_SELECTED  = 0x0200,   // Selected
     STYLE_CONTROL   = 0x0400,   // Control character
     STYLE_HILITE    = 0x0800,   // Highlighted
-    STYLE_ACTIVE    = 0x1000    // Active
+    STYLE_ACTIVE    = 0x1000,   // Active
+    STYLE_INSERT    = 0x2000    // Column insert
     };
 public:
   enum {
@@ -748,62 +744,81 @@ public:
   /// Return number of rows in buffer
   FXint getNumRows() const { return nrows; }
 
-  /// Return entire text as string
-  FXString getText() const;
-
   /// Retrieve text into buffer
   void getText(FXchar* text,FXint n) const;
 
   /// Retrieve text into string
   void getText(FXString& text) const;
 
+  /// Return entire text as string
+  FXString getText() const;
+
   /// Get selected text
   FXString getSelectedText() const;
 
   /// Change the text in the buffer to new text
-  virtual void setText(const FXchar* text,FXint n,FXbool notify=false);
-  virtual void setText(const FXString& text,FXbool notify=false);
+  virtual FXint setText(const FXchar* text,FXint n,FXbool notify=false);
+  virtual FXint setText(const FXString& text,FXbool notify=false);
 
   /// Change the text in the buffer to new text
-  virtual void setStyledText(const FXchar* text,FXint n,FXint style=0,FXbool notify=false);
-  virtual void setStyledText(const FXString& text,FXint style=0,FXbool notify=false);
+  virtual FXint setStyledText(const FXchar* text,FXint n,FXint style=0,FXbool notify=false);
+  virtual FXint setStyledText(const FXString& text,FXint style=0,FXbool notify=false);
 
   /// Replace m bytes at pos by n characters
-  virtual void replaceText(FXint pos,FXint m,const FXchar *text,FXint n,FXbool notify=false);
-  virtual void replaceText(FXint pos,FXint m,const FXString& text,FXbool notify=false);
+  virtual FXint replaceText(FXint pos,FXint m,const FXchar *text,FXint n,FXbool notify=false);
+  virtual FXint replaceText(FXint pos,FXint m,const FXString& text,FXbool notify=false);
 
   /// Replace m bytes at pos by n characters
-  virtual void replaceStyledText(FXint pos,FXint m,const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
-  virtual void replaceStyledText(FXint pos,FXint m,const FXString& text,FXint style=0,FXbool notify=false);
+  virtual FXint replaceStyledText(FXint pos,FXint m,const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
+  virtual FXint replaceStyledText(FXint pos,FXint m,const FXString& text,FXint style=0,FXbool notify=false);
+
+  /// Replace text columns startcol to endcol in lines starting at startpos to endpos by new text
+  virtual FXint replaceTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXchar *text,FXint n,FXbool notify=false);
+  virtual FXint replaceTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXString& text,FXbool notify=false);
+
+  /// Replace text columns startcol to endcol in lines starting at startpos to endpos by new text with given style
+  virtual FXint replaceStyledTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
+  virtual FXint replaceStyledTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXString& text,FXint style=0,FXbool notify=false);
+
+  /// Overstrike text block
+  virtual FXint overstrikeTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXchar *text,FXint n,FXbool notify=false);
+  virtual FXint overstrikeTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXString& text,FXbool notify=false);
+
+  /// Overstrike styled text block
+  virtual FXint overstrikeStyledTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
+  virtual FXint overstrikeStyledTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,const FXString& text,FXint style=0,FXbool notify=false);
 
   /// Append n bytes of text at the end of the buffer
-  virtual void appendText(const FXchar *text,FXint n,FXbool notify=false);
-  virtual void appendText(const FXString& text,FXbool notify=false);
+  virtual FXint appendText(const FXchar *text,FXint n,FXbool notify=false);
+  virtual FXint appendText(const FXString& text,FXbool notify=false);
 
   /// Append n bytes of text at the end of the buffer
-  virtual void appendStyledText(const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
-  virtual void appendStyledText(const FXString& text,FXint style=0,FXbool notify=false);
+  virtual FXint appendStyledText(const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
+  virtual FXint appendStyledText(const FXString& text,FXint style=0,FXbool notify=false);
 
   /// Insert n bytes of text at position pos into the buffer
-  virtual void insertText(FXint pos,const FXchar *text,FXint n,FXbool notify=false);
-  virtual void insertText(FXint pos,const FXString& text,FXbool notify=false);
+  virtual FXint insertText(FXint pos,const FXchar *text,FXint n,FXbool notify=false);
+  virtual FXint insertText(FXint pos,const FXString& text,FXbool notify=false);
 
   /// Insert n bytes of text at position pos into the buffer
-  virtual void insertStyledText(FXint pos,const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
-  virtual void insertStyledText(FXint pos,const FXString& text,FXint style=0,FXbool notify=false);
-
-  /// Remove n bytes of text at position pos from the buffer
-  virtual void removeText(FXint pos,FXint n,FXbool notify=false);
-
-  /// Remove all text from the buffer
-  virtual void clearText(FXbool notify=false);
+  virtual FXint insertStyledText(FXint pos,const FXchar *text,FXint n,FXint style=0,FXbool notify=false);
+  virtual FXint insertStyledText(FXint pos,const FXString& text,FXint style=0,FXbool notify=false);
 
   /// Change style of text range
-  virtual void changeStyle(FXint pos,FXint n,FXint style);
+  virtual FXint changeStyle(FXint pos,FXint n,FXint style);
 
   /// Change style of text range from style-array
-  virtual void changeStyle(FXint pos,const FXchar* style,FXint n);
-  virtual void changeStyle(FXint pos,const FXString& style);
+  virtual FXint changeStyle(FXint pos,const FXchar* style,FXint n);
+  virtual FXint changeStyle(FXint pos,const FXString& style);
+
+  /// Remove n bytes of text at position pos from the buffer
+  virtual FXint removeText(FXint pos,FXint n,FXbool notify=false);
+
+  /// Remove columns startcol to endcol from lines starting at startpos to endpos
+  virtual FXint removeTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol,FXbool notify=false);
+
+  /// Remove all text from the buffer
+  virtual FXint clearText(FXbool notify=false);
 
   /// Extract n bytes of text from position pos into already allocated buffer
   void extractText(FXchar *text,FXint pos,FXint n) const;
@@ -822,6 +837,12 @@ public:
 
   /// Return n bytes of style info from buffer from position pos
   FXString extractStyle(FXint pos,FXint n) const;
+
+  /// Extract text columns startcol to endcol from lines starting at startpos to endpos
+  void extractTextBlock(FXString& text,FXint startpos,FXint endpos,FXint startcol,FXint endcol) const;
+
+  /// Return text columns startcol to endcol from lines starting at startpos to endpos
+  FXString extractTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol) const;
 
   /**
   * Search for string in text buffer, returning the extent of the string in beg and end.
@@ -968,7 +989,7 @@ public:
   /// Delete primary selection
   FXbool deleteSelection(FXbool notify=false);
 
-  /// Paste primary selection
+  /// Paste primary ("middle-mouse") selection
   FXbool pasteSelection(FXbool notify=false);
 
   /// Paste clipboard
@@ -976,12 +997,6 @@ public:
 
   /// Replace primary selection by other text
   FXbool replaceSelection(const FXString& text,FXbool notify=false);
-
-  /// Enter text into editor as if typed
-  void enterText(const FXchar *text,FXint n,FXbool notify=false);
-
-  /// Enter text into editor as if typed
-  void enterText(const FXString& text,FXbool notify=false);
 
   /// Return true if position pos is selected
   FXbool isPosSelected(FXint pos) const;

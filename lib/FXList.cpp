@@ -108,6 +108,9 @@ using namespace FX;
 
 namespace FX {
 
+// Explicit template instantiation
+//template class  FXObjectListOf<FXListItem>;
+
 
 // Object implementation
 FXIMPLEMENT(FXListItem,FXObject,NULL,0)

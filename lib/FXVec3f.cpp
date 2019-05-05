@@ -109,12 +109,6 @@ FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f&
   }
 
 
-// Linearly interpolate
-FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f){
-  return FXVec3f(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f,u.z+(v.z-u.z)*f);
-  }
-
-
 // Rotate vector vec by unit-length axis about angle specified as (ca,sa)
 FXVec3f rotate(const FXVec3f& vec,const FXVec3f& axis,FXfloat ca,FXfloat sa){
   FXVec3f v1((vec*axis)*axis);

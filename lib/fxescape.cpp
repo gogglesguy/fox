@@ -34,7 +34,24 @@
   Notes:
 
   - Escape or unescape string, optionally adding or removing quotes.
+
   - This makes the string safe when it contains non-printing characters.
+
+  - Optionally, UTF8 characters may be encoded as hex (in the form of: \xHH),
+    or as unicode escape sequences (of the form \uHHHH).  Code points exceeding
+    16-bits will be encoded as hex-encoded surrogate-pairs (\uHHHH\uHHHH).
+
+  - End-of-line continuation: '\<LF>' or '\<CR>' will be replaced by nothing
+    when unescaped.  Allows strings from being broken up into separate lines.
+
+  - Special case for end-of-line continuation: '\<CR><LF>' or '\<LF><CR>'
+    are also treated as continuation; rationale: string to be unescaped may
+    have been created on MS-Windows.
+
+  - Perhaps a different pair of routines should perform end-of-line
+    continuations encoding/decoding; for now, this probaby suffices.
+
+  - Escaping strings will not generate end-of-line continuations.
 */
 
 
@@ -70,13 +87,12 @@ FXbool shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
 
 // Escape special characters, and optionally enclose with left and right quotes; escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2
 FXString escape(const FXString& str,FXchar lquote,FXchar rquote,FXint flag){
-  register FXint p,q,w;
-  register FXwchar c;
   FXString result;
+  FXint p,q,w,c;
   p=q=0;
   if(lquote) q++;                       // Opening quote
   while(p<str.length()){                // Measure length of converted string
-    c=str[p++];
+    c=(FXuchar)str[p++];
     switch(c){
     case '\x00':                        // Control characters
     case '\x01':
@@ -117,34 +133,34 @@ hex1: q+=4;                             // Escape as \xHH
       q+=2;
       continue;
     default:
-      if(__unlikely(c==lquote && lquote)){      // Escape opening quote if found in string
+      if(c==lquote && lquote){          // Escape opening quote if found in string
         q+=2;
         continue;
         }
-      if(__unlikely(c==rquote && rquote)){      // Escape closing quote if found in string
+      if(c==rquote && rquote){          // Escape closing quote if found in string
         q+=2;
         continue;
         }
       if(__unlikely(0x80<=c)){          // Escape specials
-        if(flag&1) goto hex1;           // Output \xHH for everything
+        if(flag&1) goto hex1;                                   // Output \xHH for everything
         if(flag&2){
-          if(!FXISLEADUTF8(c)) goto hex1;               // UTF8 starter?
-          if(!FXISFOLLOWUTF8(str[p])) goto hex1;        // UTF8 follower?
+          if(!FXISLEADUTF8(c)) goto hex1;                       // UTF8 starter?
+          if(!FXISFOLLOWUTF8(str[p])) goto hex1;                // UTF8 follower?
           c=(c<<6)^(FXuchar)str[p]^0x3080;
           if(0x800<=c){
-            if(!FXISFOLLOWUTF8(str[p+1])) goto hex1;    // UTF8 follower?
+            if(!FXISFOLLOWUTF8(str[p+1])) goto hex1;            // UTF8 follower?
             c=(c<<6)^(FXuchar)str[p+1]^0x20080;
-            if(0x10000<=c){                             // Surrogate pair needed
-              if(!FXISFOLLOWUTF8(str[p+2])) goto hex1;  // UTF8 follower?
+            if(0x10000<=c){                                     // Surrogate pair needed
+              if(!FXISFOLLOWUTF8(str[p+2])) goto hex1;          // UTF8 follower?
               c=(c<<6)^(FXuchar)str[p+2]^0x400080;
-              if(0x110000<=c) goto hex1;                // Beyond assigned code space?
+              if(0x110000<=c) goto hex1;                        // Beyond assigned code space?
               p++;
               q+=6;
               }
             p++;
             }
           p++;
-          q+=6;                                         // Escape as \uHHHH
+          q+=6;                                                 // Escape as \uHHHH
           continue;
           }
         }
@@ -157,7 +173,7 @@ hex1: q+=4;                             // Escape as \xHH
   p=q=0;
   if(lquote) result[q++]=lquote;        // Opening quote
   while(p<str.length()){                // Then convert the string
-    c=str[p++];
+    c=(FXuchar)str[p++];
     switch(c){
     case '\x00':                        // Control characters
     case '\x01':
@@ -233,19 +249,19 @@ hex2: result[q++]='\\';                 // Escape as \xHH
         result[q++]=rquote;
         continue;
         }
-      if(__unlikely(0x80<=c)){          // Escape specials
-        if(flag&1) goto hex2;           // Output \xHH for everything
+      if(__unlikely(0x80<=c)){                  // Escape specials
+        if(flag&1) goto hex2;                                   // Output \xHH for everything
         if(flag&2){
-          if(!FXISLEADUTF8(c)) goto hex2;               // UTF8 starter?
-          if(!FXISFOLLOWUTF8(str[p])) goto hex2;        // UTF8 follower?
+          if(!FXISLEADUTF8(c)) goto hex2;                       // UTF8 starter?
+          if(!FXISFOLLOWUTF8(str[p])) goto hex2;                // UTF8 follower?
           c=(c<<6)^(FXuchar)str[p]^0x3080;
           if(0x800<=c){
-            if(!FXISFOLLOWUTF8(str[p+1])) goto hex2;    // UTF8 follower?
+            if(!FXISFOLLOWUTF8(str[p+1])) goto hex2;            // UTF8 follower?
             c=(c<<6)^(FXuchar)str[p+1]^0x20080;
-            if(0x10000<=c){                             // Surrogate pair needed
-              if(!FXISFOLLOWUTF8(str[p+2])) goto hex2;  // UTF8 follower?
+            if(0x10000<=c){                                     // Surrogate pair needed
+              if(!FXISFOLLOWUTF8(str[p+2])) goto hex2;          // UTF8 follower?
               c=(c<<6)^(FXuchar)str[p+2]^0x400080;
-              if(0x110000<=c) goto hex1;                // Beyond assigned code space?
+              if(0x110000<=c) goto hex1;                        // Beyond assigned code space?
               w=LEAD_OFFSET+(c>>10);
               c=TAIL_OFFSET+(c&0x3FF);
               result[q++]='\\';
@@ -259,7 +275,7 @@ hex2: result[q++]='\\';                 // Escape as \xHH
             p++;
             }
           p++;
-          result[q++]='\\';                             // Escape as \uHHHH
+          result[q++]='\\';                                     // Escape as \uHHHH
           result[q++]='u';
           result[q++]=FXString::value2Digit[(c>>12)&15];
           result[q++]=FXString::value2Digit[(c>>8)&15];
@@ -281,9 +297,9 @@ hex2: result[q++]='\\';                 // Escape as \xHH
 
 // Unescape special characters in a string; optionally strip quote characters
 FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
-  register FXint p,q,c,w;
   FXString result;
-  p=q=c=0;
+  FXint p,q,w,c;
+  p=q=c=w=0;
   if(str[p]==lquote && lquote) p++;     // Opening quote
   while(p<str.length()){                // Measure length of converted string
     w=c;                                // Keep previous decoded character
@@ -318,6 +334,11 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
           if(Ascii::isHexDigit(str[p])) p++;
           }
         q++;
+        continue;
+      case '\r':                        // End-of-line continuation
+        if(str[p]=='\n') p++;           // Eat both <CR> and <LF> of <CR><LF>
+        continue;
+      case '\n':                        // End-of-line continuation
         continue;
       case '0':                         // Octal escape
       case '1':
@@ -386,6 +407,11 @@ FXString unescape(const FXString& str,FXchar lquote,FXchar rquote){
             }
           }
         result[q++]=c;
+        continue;
+      case '\r':                        // End-of-line continuation
+        if(str[p]=='\n') p++;           // Eat both <CR> and <LF> of <CR><LF>
+        continue;
+      case '\n':                        // End-of-line continuation
         continue;
       case '0':                         // Octal escape
       case '1':

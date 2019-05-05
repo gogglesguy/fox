@@ -52,6 +52,7 @@
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -131,6 +132,7 @@
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
+				SuppressStartupBanner="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -146,6 +148,7 @@
 				Name="VCLibrarianTool"
 				AdditionalDependencies="msimg32.lib"
 				OutputFile="..\..\..\lib\FOX-1.7.lib"
+				SuppressStartupBanner="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -994,6 +997,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\fxbase64.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxbase85.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXBitmap.cpp"
 			>
 			<FileConfiguration
@@ -1647,6 +1658,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXComplexf.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxcompose.cpp"
 			>
 		</File>
 		<File
@@ -3000,7 +3015,19 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXDirWatch.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\include\FXDirWatch.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXDispatcher.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXDispatcher.h"
 			>
 		</File>
 		<File
@@ -3251,10 +3278,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\include\FXEmbedderWindow.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\include\fxendian.h"
 			>
 		</File>
@@ -3311,6 +3334,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\lib\fxexeio.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxexprdbg.h"
 			>
 		</File>
 		<File
@@ -4587,6 +4614,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXIOBuffer.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXIOBuffer.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXIODevice.cpp"
 			>
 			<FileConfiguration
@@ -4765,6 +4800,22 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXJPGImage.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXJSON.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXJSON.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXJSONFile.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXJSONFile.h"
 			>
 		</File>
 		<File
@@ -5209,10 +5260,6 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXMatrix.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\include\FXMBCSCodec.h"
 			>
 		</File>
 		<File
@@ -6951,6 +6998,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXReverseDictionary.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXReverseDictionary.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXRex.cpp"
 			>
 			<FileConfiguration
@@ -6975,6 +7030,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXRex.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxrexdbg.h"
 			>
 		</File>
 		<File
@@ -7163,6 +7222,14 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXScopedThread.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXScopedThread.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXScrollArea.cpp"
 			>
 			<FileConfiguration
@@ -7322,6 +7389,14 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXSemaphore.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXSemaQueue.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXSemaQueue.h"
 			>
 		</File>
 		<File
@@ -8879,11 +8954,23 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXVariant.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXVariantArray.cpp"
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXVariantArray.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXVariantMap.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXVariantMap.h"
 			>
 		</File>
 		<File

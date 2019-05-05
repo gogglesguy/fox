@@ -547,41 +547,41 @@ GLViewWindow::GLViewWindow(FXApp* a):FXMainWindow(a,"OpenGL Test Application",NU
   // Angles
   FXMatrix *angles=new FXMatrix(panels,3,FRAME_THICK|FRAME_RAISED|MATRIX_BY_COLUMNS|LAYOUT_FILL_Y|LAYOUT_FILL_X,0,0,0,0,10,10,10,10);
   new FXLabel(angles,"X:");
-  new FXTextField(angles,6,mdiclient,FXGLViewer::ID_ROLL,TEXTFIELD_INTEGER|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  new FXTextField(angles,6,mdiclient,FXGLViewer::ID_ROLL,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   FXDial* x_dial=new FXDial(angles,mdiclient,FXGLViewer::ID_DIAL_X,FRAME_SUNKEN|FRAME_THICK|DIAL_CYCLIC|DIAL_HORIZONTAL|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_Y,0,0,160,14,0,0,0,0);
   x_dial->setTipText("Rotate about X");
   x_dial->setNotchOffset(900);
 
   new FXLabel(angles,"Y:");
-  new FXTextField(angles,6,mdiclient,FXGLViewer::ID_PITCH,TEXTFIELD_INTEGER|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  new FXTextField(angles,6,mdiclient,FXGLViewer::ID_PITCH,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   FXDial* y_dial=new FXDial(angles,mdiclient,FXGLViewer::ID_DIAL_Y,FRAME_SUNKEN|FRAME_THICK|DIAL_CYCLIC|DIAL_HORIZONTAL|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_Y,0,0,160,14,0,0,0,0);
   y_dial->setTipText("Rotate about Y");
   y_dial->setNotchOffset(900);
 
   new FXLabel(angles,"Z:");
-  new FXTextField(angles,6,mdiclient,FXGLViewer::ID_YAW,TEXTFIELD_INTEGER|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  new FXTextField(angles,6,mdiclient,FXGLViewer::ID_YAW,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   FXDial* z_dial=new FXDial(angles,mdiclient,FXGLViewer::ID_DIAL_Z,FRAME_SUNKEN|FRAME_THICK|DIAL_CYCLIC|DIAL_HORIZONTAL|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_CENTER_Y,0,0,160,14,0,0,0,0);
   z_dial->setTipText("Rotate about Z");
   z_dial->setNotchOffset(900);
 
   new FXLabel(angles,"FOV:");
-  FXTextField* fov=new FXTextField(angles,5,mdiclient,FXGLViewer::ID_FOV,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  FXTextField* fov=new FXTextField(angles,5,mdiclient,FXGLViewer::ID_FOV,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   new FXFrame(angles,0);
   fov->setTipText("Field of view");
 
   new FXLabel(angles,"Zoom:");
-  FXTextField* zz=new FXTextField(angles,5,mdiclient,FXGLViewer::ID_ZOOM,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  FXTextField* zz=new FXTextField(angles,5,mdiclient,FXGLViewer::ID_ZOOM,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   new FXFrame(angles,0);
   zz->setTipText("Zooming");
 
   new FXLabel(angles,"Scale X:");
-  new FXTextField(angles,5,mdiclient,FXGLViewer::ID_SCALE_X,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  new FXTextField(angles,5,mdiclient,FXGLViewer::ID_SCALE_X,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   new FXFrame(angles,0);
   new FXLabel(angles,"Scale Y:");
-  new FXTextField(angles,5,mdiclient,FXGLViewer::ID_SCALE_Y,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  new FXTextField(angles,5,mdiclient,FXGLViewer::ID_SCALE_Y,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   new FXFrame(angles,0);
   new FXLabel(angles,"Scale Z:");
-  new FXTextField(angles,5,mdiclient,FXGLViewer::ID_SCALE_Z,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
+  new FXTextField(angles,5,mdiclient,FXGLViewer::ID_SCALE_Z,TEXTFIELD_REAL|JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK);
   new FXFrame(angles,0);
 
   // Colors

@@ -2557,9 +2557,8 @@ a:ev.xany.type=0;
     }
 #endif
 
-  // Event was filtered by input method; return no event
-  FXWindow* focuswin=getFocusWindow();
-  if(xim && focuswin && XFilterEvent(&ev,(Window)focuswin->id())){      // [Patch from Roland Baudin] FIXME but also need to deal with keyboard grabs
+  // Passing in focuswindow to XFilterEvent just didn't work on Gnome3 with either scim or ibus
+  if(xim && getFocusWindow() && XFilterEvent(&ev,None)){      // [Patch from Roland Baudin] FIXME but also need to deal with keyboard grabs
     return false;
     }
 
@@ -3008,6 +3007,7 @@ FXbool FXApp::dispatchEvent(FXRawEvent& ev){
         event.rect.h=ev.xexpose.height;
         event.synthetic=ev.xexpose.send_event;
         window->handle(this,FXSEL(SEL_PAINT,0),&event);
+        return true;
       case NoExpose:
         return true;
 

@@ -242,11 +242,19 @@ public:
 
   /// Add object without saving or loading
   FXStream& addObject(const FXObject* v);
+    
+  /// Load object
+  template<class TYPE>
+  FXStream& operator>>(TYPE*& obj){ return loadObject(reinterpret_cast<FXObject*&>(obj)); }
+  
+  /// Save object
+  template<class TYPE>
+  FXStream& operator<<(const TYPE* obj){ return saveObject(static_cast<const FXObject*>(obj)); }
 
   /// Destructor
   virtual ~FXStream();
   };
-
+  
 }
 
 #endif

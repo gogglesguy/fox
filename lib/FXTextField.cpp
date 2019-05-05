@@ -221,10 +221,6 @@ FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel
 void FXTextField::create(){
   FXFrame::create();
   font->create();
-  if(getApp()->hasInputMethod()){
-    createComposeContext();
-    getComposeContext()->setFont(font);
-    }
   }
 
 
@@ -252,6 +248,11 @@ void FXTextField::setFocus(){
   if(getApp()->hasInputMethod()){
     createComposeContext();
     getComposeContext()->setFont(font);
+
+    // focusIn() is needed for:
+    // scim: without it, input seems to be broken, input window doesn't appear
+    // ibus: without it, initial location of the input window is way off.
+    getComposeContext()->focusIn();
     }
   }
 
@@ -571,6 +572,13 @@ void FXTextField::setCursorPos(FXint pos){
     cursor=pos;
     if(isEditable() && hasFocus()) drawCursor(FLAG_CARET);
     }
+
+  // After mouse click in widget, this assure we update the cursor pos in the InputMethod
+  if(getComposeContext()) {
+    register FXint cursorx=coord(cursor)-1;
+    getComposeContext()->setSpot(cursorx,height-padbottom-border);
+    }
+
   blink=FLAG_CARET;
   }
 
@@ -732,6 +740,17 @@ FXbool FXTextField::extendSelection(FXint pos){
   }
 
 
+// Kill the selection
+FXbool FXTextField::killSelection(){
+  if(hasSelection()){
+    releaseSelection();
+    update(border,border,width-(border<<1),height-(border<<1));
+    return true;
+    }
+  return false;
+  }
+
+
 // Copy selection to clipboard
 FXbool FXTextField::copySelection(){
   FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
@@ -770,6 +789,12 @@ FXbool FXTextField::deleteSelection(FXbool notify){
   }
 
 
+// Delete pending selection
+FXbool FXTextField::deletePendingSelection(FXbool notify){
+  return isPosSelected(cursor) && deleteSelection(notify);
+  }
+
+
 // Replace selection by other text
 FXbool FXTextField::replaceSelection(const FXString& text,FXbool notify){
   if(hasSelection()){
@@ -780,12 +805,6 @@ FXbool FXTextField::replaceSelection(const FXString& text,FXbool notify){
     return true;
     }
   return false;
-  }
-
-
-// Delete pending selection
-FXbool FXTextField::deletePendingSelection(FXbool notify){
-  return isPosSelected(cursor) && deleteSelection(notify);
   }
 
 
@@ -842,17 +861,6 @@ FXbool FXTextField::pasteClipboard(FXbool notify){
     dosToUnix(string);
 #endif
     enterText(string,notify);
-    return true;
-    }
-  return false;
-  }
-
-
-// Kill the selection
-FXbool FXTextField::killSelection(){
-  if(hasSelection()){
-    releaseSelection();
-    update(border,border,width-(border<<1),height-(border<<1));
     return true;
     }
   return false;
@@ -1324,8 +1332,9 @@ long FXTextField::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 long FXTextField::onIMEStart(FXObject*,FXSelector,void*){
   if(isEditable()){
     if(getComposeContext()){
+      // Not sure if this is needed
       register FXint cursorx=coord(cursor)-1;
-      getComposeContext()->setSpot(cursorx,padtop+border);
+      getComposeContext()->setSpot(cursorx,height-padbottom-border);
       }
     return 1;
     }
@@ -1689,9 +1698,9 @@ long FXTextField::onAutoScroll(FXObject*,FXSelector,void* ptr){
 
 // Pressed a key
 long FXTextField::onKeyPress(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
   if(isEnabled()){
+    FXEvent* event=(FXEvent*)ptr;
     FXTRACE((200,"%s::onKeyPress keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state));
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
     flags&=~FLAG_UPDATE;
@@ -1839,8 +1848,8 @@ ins:    if((event->state&(CONTROLMASK|ALTMASK)) || ((FXuchar)event->text[0]<32))
 
 // Key Release
 long FXTextField::onKeyRelease(FXObject*,FXSelector,void* ptr){
-  FXEvent* event=(FXEvent*)ptr;
   if(isEnabled()){
+    FXEvent* event=(FXEvent*)ptr;
     FXTRACE((200,"%s::onKeyRelease keysym=0x%04x state=%04x\n",getClassName(),((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
     switch(event->code){

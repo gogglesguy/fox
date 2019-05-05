@@ -46,12 +46,6 @@ FXVec2d normalize(const FXVec2d& v){
   }
 
 
-// Linearly interpolate
-FXVec2d lerp(const FXVec2d& u,const FXVec2d& v,FXdouble f){
-  return FXVec2d(u.x+(v.x-u.x)*f,u.y+(v.y-u.y)*f);
-  }
-
-
 // Save vector to a stream
 FXStream& operator<<(FXStream& store,const FXVec2d& v){
   store << v.x << v.y;

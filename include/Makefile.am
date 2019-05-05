@@ -110,6 +110,7 @@ FXDirDialog.h \
 FXDirList.h \
 FXDirSelector.h \
 FXDirVisitor.h \
+FXDirWatch.h \
 FXDispatcher.h \
 FXDockBar.h \
 FXDockHandler.h \
@@ -177,6 +178,7 @@ FXJPGIcon.h \
 FXJPGImage.h \
 FXJSON.h \
 FXJSONFile.h \
+FXJSONString.h \
 FXKnob.h \
 FXLabel.h \
 FXLFQueue.h \
@@ -252,6 +254,7 @@ FXRefPtr.h \
 FXRegion.h \
 FXRegistry.h \
 FXReplaceDialog.h \
+FXReverseDictionary.h \
 FXRex.h \
 FXRootWindow.h \
 FXRuler.h \

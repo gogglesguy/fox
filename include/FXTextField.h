@@ -298,6 +298,9 @@ public:
   /// Extend the selection from the anchor to the given position
   FXbool extendSelection(FXint pos);
 
+  /// Unselect the text
+  FXbool killSelection();
+
   /// Copy primary selection to clipboard
   FXbool copySelection();
 
@@ -315,9 +318,6 @@ public:
 
   /// Paste clipboard
   FXbool pasteClipboard(FXbool notify=false);
-
-  /// Unselect the text
-  FXbool killSelection();
 
   /// Return true if position pos is selected
   FXbool isPosSelected(FXint pos) const;

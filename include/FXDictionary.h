@@ -25,8 +25,8 @@ namespace FX {
 
 
 /**
-* The dictionary class is a fast-access hash table, mapping strings to pointers.
-* Subclasses of dictionary can easily specialize the pointers to pointers to
+* The dictionary class is a fast-access hash table, mapping strings to void-pointers.
+* Subclasses of dictionary can easily specialize the void-pointers to pointers to
 * particular types; to this end subclasses must overload certain API's and
 * perform the necessary type-casts for the proper interpretation of the stored
 * pointer values.

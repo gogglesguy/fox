@@ -708,7 +708,7 @@ void FXSlider::drawSliderHead(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h){
       dc.drawLine(x,y,x+w-m-1,y);
       dc.drawLine(x,y+1,x,y+h-1);
       dc.drawLine(x+w-1,y+m,x+w-m-1,y);
-#ifdef WIN32
+#if defined(WIN32)
       dc.setForeground(shadowColor);
       dc.drawLine(x+w-1,y+h-m-2,x+w-m-2,y+h-1);
       dc.drawLine(x+1,y+h-2,x+w-m-1,y+h-2);

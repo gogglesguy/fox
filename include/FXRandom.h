@@ -28,7 +28,7 @@ namespace FX {
 * FXRandom provides a thread-safe random number generator with a period
 * of around 1.84E19.
 */
-class FXRandom {
+class FXAPI FXRandom {
 private:
   FXulong state;
 public:

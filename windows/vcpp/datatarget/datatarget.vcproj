@@ -152,6 +152,7 @@
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
+				SuppressStartupBanner="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -169,6 +170,7 @@
 				AdditionalDependencies="comctl32.lib wsock32.lib mpr.lib imm32.lib"
 				OutputFile=".\Release/datatarget.exe"
 				LinkIncremental="1"
+				SuppressStartupBanner="false"
 				SubSystem="2"
 				EntryPointSymbol="mainCRTStartup"
 				RandomizedBaseAddress="1"

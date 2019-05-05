@@ -193,6 +193,9 @@
 #ifdef HAVE_SYS_PSTAT_H
 #include <sys/pstat.h>
 #endif
+#ifdef HAVE_SYS_INOTIFY_H
+#include <sys/inotify.h>
+#endif
 #if defined(__APPLE__)
 #include <libkern/OSAtomic.h>
 #endif
