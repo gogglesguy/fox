@@ -10,9 +10,10 @@ include(CheckCXXCompilerFlag)
 
 check_cxx_compiler_flag(-Wall                HAS_CXX_WALL)
 check_cxx_compiler_flag(-Wextra              HAS_CXX_WEXTRA)
-check_cxx_compiler_flag(-Wformat=2           HAS_CXX_WFORMAT)
+check_cxx_compiler_flag(-Wno-format          HAS_CXX_WFORMAT)
 check_cxx_compiler_flag(-Woverloaded-virtual HAS_CXX_WOVERLOADED_VIRTUAL)
 check_cxx_compiler_flag(-Wshadow             HAS_CXX_WSHADOW)
+check_cxx_compiler_flag(-Wno-implicit-fallthrough HAX_CXX_IMPLICIT_FALLTHROUGH)
 
 
 check_cxx_compiler_flag(-Wfatal-errors  HAS_CXX_WFATAL)
@@ -49,7 +50,7 @@ if(HAS_CXX_WEXTRA)
 endif()
 
 if(HAS_CXX_WFORMAT)
-    add_compile_options(-Wformat=2)
+    add_compile_options(-Wno-format)
 endif()
 
 if(HAS_CXX_WFATAL)
@@ -62,6 +63,10 @@ endif()
 
 if(HAS_CXX_WOVERLOADED_VIRTUAL)
     add_compile_options(-Woverloaded-virtual)
+endif()
+
+if(HAX_CXX_IMPLICIT_FALLTHROUGH)
+    add_compile_options(-Wno-implicit-fallthrough)
 endif()
 
 if(WITH_NATIVE)
