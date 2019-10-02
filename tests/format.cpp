@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 //#include <locale.h>
@@ -25,7 +25,7 @@ extern FXint __sscanf(const FXchar* string,const FXchar* format,...);
 }
 
 const FXchar *floatformat[]={
-  "%.10e",
+  "%.15e",
   "%'.5e",
   "%10.5f",
   "%-10.5f",
@@ -65,7 +65,7 @@ const double floatnumbers[]={
   134.21,
   91340.2,
   341.1234,
-  0203.9,
+  203.9,
   0.96,
   0.996,
   0.9996,
@@ -76,6 +76,7 @@ const double floatnumbers[]={
   0.123456789,
   2.2250738585072014e-308,
   1.7976931348623157e+308,
+  1.9382023e-03,
   0.0,
   -0.0
   };
@@ -136,6 +137,16 @@ const FXchar *positionalformat3="%3$d%3$d";
 // Uncomment to revert to native version
 //#define __snprintf snprintf
 
+void specialcases(const char* fmt){
+  FXchar buffer[1024];
+  double num=1234567890.123456789;
+  while(0.000001<=num){
+    __snprintf(buffer,sizeof(buffer),fmt,num);
+    fprintf(stdout,"format=\"%s\" output=\"%s\"\n",fmt,buffer);
+    num*=0.1;
+    }
+  }
+
 
 // Start
 int main(int argc,char* argv[]){
@@ -143,6 +154,14 @@ int main(int argc,char* argv[]){
   FXuint x,y;
 
   //setlocale(LC_ALL,"");
+
+  if(argc==2){
+    FXdouble num=strtod(argv[1],NULL);
+    __snprintf(buffer,sizeof(buffer),"%.20e",num);
+    fprintf(stdout,"native: %.20e\n",num);
+    fprintf(stdout,"ours  : %s\n",buffer);
+    return 0;
+    }
 
   // Testing int formats
   for(x=0; x<ARRAYNUMBER(intformat); x++){
@@ -209,6 +228,16 @@ int main(int argc,char* argv[]){
 
   __sscanf("1999,999","%'d",&num);
   fprintf(stdout,"num=%d\n",num);
+
+  fprintf(stdout,"\n");
+
+  // Special cases float formatting
+  specialcases("%'.5e");
+  specialcases("%'.5f");
+  specialcases("%'.5g");
+
+  __snprintf(buffer,sizeof(buffer),"%#.3g",0.0);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%#.3g",buffer);
 
   return 0;
   }

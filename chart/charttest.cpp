@@ -3,7 +3,7 @@
 *                                  Chart  Test                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include "chart.h"

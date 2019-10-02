@@ -3,7 +3,7 @@
 *                                 Layout Example                             *
 *                                                                            *
 ******************************************************************************
-* Copyright (C) 2004,2018 by Bill Baxter.   All Rights Reserved.             *
+* Copyright (C) 2004,2019 by Bill Baxter.   All Rights Reserved.             *
 *****************************************************************************/
 #include "fx.h"
 #include <stdio.h>

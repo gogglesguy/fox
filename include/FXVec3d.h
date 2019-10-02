@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -71,12 +71,12 @@ public:
   /// Assigning operators
   FXVec3d& operator*=(FXdouble n){ return set(x*n,y*n,z*n); }
   FXVec3d& operator/=(FXdouble n){ return set(x/n,y/n,z/n); }
-  
+
   /// Element-wise assigning operators
   FXVec3d& operator+=(const FXVec3d& v){ return set(x+v.x,y+v.y,z+v.z); }
   FXVec3d& operator-=(const FXVec3d& v){ return set(x-v.x,y-v.y,z-v.z); }
   FXVec3d& operator%=(const FXVec3d& v){ return set(x*v.x,y*v.y,z*v.z); }
-  
+
   /// Cross product assigning operator
   FXVec3d& operator^=(const FXVec3d& v){ return set(y*v.z-z*v.y,z*v.x-x*v.z,x*v.y-y*v.x); }
 

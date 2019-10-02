@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -485,33 +485,69 @@ PSID GetUserSID(const FXString& name){
 // Get home directory for a given user
 FXString FXSystem::getUserDirectory(const FXString& user){
 #if defined(WIN32)
+#ifdef UNICODE
   if(user.empty()){
-    const FXchar *str1,*str2;
-    FXchar home[MAXPATHLEN];
-    DWORD size=MAXPATHLEN;
+    FXnchar path[4096];
+    FXnchar drive[256];
+    DWORD pathlen;
+    DWORD drivelen;
     HKEY hKey;
     LONG result;
-    if((str1=getenv("USERPROFILE"))!=NULL){
-      return FXString(str1);
+    if((pathlen=GetEnvironmentVariableW(L"USERPROFILE",path,ARRAYNUMBER(path)))>0){
+      return FXString(path,pathlen);
       }
-    if((str1=getenv("HOME"))!=NULL){
-      return FXString(str1);
+    if((pathlen=GetEnvironmentVariableW(L"HOME",path,ARRAYNUMBER(path)))>0){
+      return FXString(path,pathlen);
       }
-    if((str2=getenv("HOMEPATH"))!=NULL){      // This should be good for WinNT, Win2K according to MSDN
-      if((str1=getenv("HOMEDRIVE"))==NULL) str1="c:";
-      fxstrlcpy(home,str1,MAXPATHLEN);
-      fxstrlcat(home,str2,MAXPATHLEN);
-      return FXString(home);
+    if((pathlen=GetEnvironmentVariableW(L"HOMEPATH",path,ARRAYNUMBER(path)))>0){        // This should be good for WinNT, Win2K according to MSDN
+      FXString result("C:");
+      if((drivelen=GetEnvironmentVariableW(L"HOMEDRIVE",drive,ARRAYNUMBER(drive)))>0){
+        result.assign(drive,drivelen);
+        }
+      result.append(path,pathlen);
+      return result;
       }
-    if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
-      result=RegQueryValueExA(hKey,"Personal",NULL,NULL,(LPBYTE)home,&size);  // Change "Personal" to "Desktop" if you want...
+    if(RegOpenKeyExW(HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
+      result=RegQueryValueExW(hKey,L"Personal",NULL,NULL,(LPBYTE)path,&pathlen);        // Change "Personal" to "Desktop" if you want...
       RegCloseKey(hKey);
       if(result==ERROR_SUCCESS){
-        return FXString(home);
+        return FXString(path,pathlen);
         }
       }
     }
   return FXString::null;
+#else
+  if(user.empty()){
+    FXchar path[4096];
+    FXchar drive[256];
+    DWORD pathlen;
+    DWORD drivelen;
+    HKEY hKey;
+    LONG result;
+    if((pathlen=GetEnvironmentVariableA("USERPROFILE",path,ARRAYNUMBER(buffer)))>0){
+      return FXString(path,pathlen);
+      }
+    if((pathlen=GetEnvironmentVariableA("HOME",path,ARRAYNUMBER(buffer)))>0){
+      return FXString(path,pathlen);
+      }
+    if((pathlen=GetEnvironmentVariableA("HOMEPATH",path,ARRAYNUMBER(path)))>0){         // This should be good for WinNT, Win2K according to MSDN
+      FXString result("C:");
+      if((drivelen=GetEnvironmentVariableA("HOMEDRIVE",drive,ARRAYNUMBER(drive)))>0){
+        result.assign(drive,drivelen);
+        }
+      result.append(path,pathlen);
+      return result;
+      }
+    if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
+      result=RegQueryValueExA(hKey,"Personal",NULL,NULL,(LPBYTE)path,&pathlen);         // Change "Personal" to "Desktop" if you want...
+      RegCloseKey(hKey);
+      if(result==ERROR_SUCCESS){
+        return FXString(path,pathlen);
+        }
+      }
+    }
+  return FXString::null;
+#endif
 #elif defined(HAVE_GETPWNAM_R)
   struct passwd pwdresult,*pwd;
   const FXchar* str;

@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -867,11 +867,11 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
 //
 FXString FXPath::relative(const FXString& base,const FXString& file){
   if(!base.empty() && !file.empty()){
-  
+
     // Base and file either both absolute or both relative
     if(FXPath::isAbsolute(base) == FXPath::isAbsolute(file)){
       FXint p=0,q=0,bp=0,bq=0;
-  
+
       // Find branch point
 #if defined(WIN32)
       while(base[p] && file[q]){
@@ -902,20 +902,20 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
         break;
         }
 #endif
-  
+
       // Common prefix except for trailing path separator
       if((base[p]=='\0' || ISPATHSEP(base[p])) && (file[q]=='\0' || ISPATHSEP(file[q]))){
         bp=p;
         bq=q;
         }
-  
+
       // Strip leading path character off, if any
       while(ISPATHSEP(file[bq])) bq++;
-  
+
       // Non trivial
       if(file[bq]){
         FXString result;
-  
+
         // Up to branch point
         while(base[bp]){
           while(ISPATHSEP(base[bp])) bp++;
@@ -924,7 +924,7 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
             result.append(".." PATHSEPSTRING);
             }
           }
-  
+
         // Append tail end
         result.append(&file[bq]);
         return result;

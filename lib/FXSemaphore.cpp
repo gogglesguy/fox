@@ -3,7 +3,7 @@
 *                          S e m a p h o r e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,13 +36,13 @@
   - Keep in mind we can not do sizeof() in the header file, as we're trying to avoid
     including system-headers from public accessible FOX header files.  This is so
     as to avoid "accidental" incorporation of declarations or unexpected macros,
-    that may clash.  
+    that may clash.
   - Also we want to avoid calls to memory allocators as that would incur a big
     performance penalty; besides, a memory allocator may need to call locking
     primitives since memory is a resource shared by all threads.
   - The upshot is that the space allocated for the semaphore may be a bit more
     than strictly necessary on some machines.  It may actually be a good thing
-    as this increases the odds of these datastructures living in dedicated 
+    as this increases the odds of these datastructures living in dedicated
     cache-lines.
 */
 

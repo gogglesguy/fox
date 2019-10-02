@@ -3,7 +3,7 @@
 *         I n t e r - T h r e a d    M e s s a g i n g    C h a n n e l         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -82,10 +82,10 @@ public:
   FXApp* getApp() const { return app; }
 
   /**
-  * Send a message msg comprising of FXSEL(type,id) to a target tgt, and pass optional 
-  * data of size bytes.  
+  * Send a message msg comprising of FXSEL(type,id) to a target tgt, and pass optional
+  * data of size bytes.
   * This asynchronously calls the indicated handler in the context of the main GUI
-  * thread's event loop. 
+  * thread's event loop.
   * Up to 8192 bytes may be passed along.
   */
   FXbool message(FXObject* tgt,FXSelector msg,const void* data=NULL,FXint size=0);

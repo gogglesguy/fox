@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [65])
+m4_define([fox_level], [67])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -116,7 +116,7 @@ AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(dld, shl_load)
 
 # Check thread functions
-AC_CHECK_FUNCS(localtime_r gmtime_r getpwuid_r getgrgid_r getpwnam_r pthread_setaffinity_np sched_getcpu epoll_create1 timerfd_create inotify_init1)
+AC_CHECK_FUNCS(localtime_r gmtime_r getpwuid_r getgrgid_r getpwnam_r pthread_setaffinity_np sched_getcpu epoll_create1 timerfd_create)
 
 # Check for common functions
 AC_CHECK_FUNCS(pipe2 statvfs)

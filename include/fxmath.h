@@ -3,7 +3,7 @@
 *                           M a t h   F u n c t i o n s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2015,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2015,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -161,6 +161,8 @@
 #define NO_FDIM
 #define NO_SINCOS
 #define NO_SINCOSF
+#define NO_LRINT
+#define NO_LRINTF
 #endif
 
 // Systems below are missing these functions
@@ -168,6 +170,13 @@
 #define NO_EXP10F
 #define NO_EXP10
 #endif
+
+// Apple is missing sincos
+#if defined(__APPLE__)
+#define NO_SINCOS
+#define NO_SINCOSF
+#endif
+
 
 namespace FX {
 
@@ -494,10 +503,22 @@ static inline FXdouble rint(FXdouble x){ return ::rint(x); }
 
 
 /// Single precision round to nearest integer
-static inline FXint lrint(FXfloat x){ return ::lrintf(x); }
+static inline FXint lrint(FXfloat x){ 
+#if defined(NO_LRINTF)
+  return (FXint)(x+Math::copysign(0.5f,x));
+#else
+  return ::lrintf(x); 
+#endif
+ }
 
 /// Double precision round to nearest integer
-static inline FXlong lrint(FXdouble x){ return ::lrint(x); }
+static inline FXlong lrint(FXdouble x){ 
+#if defined(NO_LRINT)
+ return (FXlong)(x+Math::copysign(0.5,x));
+#else
+ return ::lrint(x); 
+#endif
+ }
 
 
 /// Wrap single precision phase argument x to -PI...PI range
@@ -823,7 +844,7 @@ static inline FXdouble smoothstep(FXdouble f){
   return (3.0-2.0*f)*f*f;
   }
 
-  
+
 /// Single precision base E exponential
 static inline FXfloat exp(FXfloat x){
   return ::expf(x);

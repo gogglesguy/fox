@@ -8044,6 +8044,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\fxtabbify.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXTabBook.cpp"
 			>
 			<FileConfiguration

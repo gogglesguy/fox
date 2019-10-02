@@ -3,7 +3,7 @@
 *                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -582,53 +582,11 @@ public:
   /// Remove the focus from this window
   virtual void killFocus();
 
-  /// Change top margin
-  void setMarginTop(FXint pt);
-
-  /// Return top margin
-  FXint getMarginTop() const { return margintop; }
-
-  /// Change bottom margin
-  void setMarginBottom(FXint pb);
-
-  /// Return bottom margin
-  FXint getMarginBottom() const { return marginbottom; }
-
-  /// Change left margin
-  void setMarginLeft(FXint pl);
-
-  /// Return left margin
-  FXint getMarginLeft() const { return marginleft; }
-
-  /// Change right margin
-  void setMarginRight(FXint pr);
-
-  /// Return right margin
-  FXint getMarginRight() const { return marginright; }
-
-  /// Return wrap columns
-  FXint getWrapColumns() const { return wrapcolumns; }
-
-  /// Set wrap columns
-  void setWrapColumns(FXint cols);
-
-  /// Return tab columns
-  FXint getTabColumns() const { return tabcolumns; }
-
-  /// Change tab columns
-  void setTabColumns(FXint cols);
-
-  /// Return number of columns used for line numbers
-  FXint getBarColumns() const { return barcolumns; }
-
-  /// Change number of columns used for line numbers
-  void setBarColumns(FXint cols);
+  /// Set modified flag
+  void setModified(FXbool mod=true){ modified=mod; }
 
   /// Return true if text was modified
   FXbool isModified() const { return modified; }
-
-  /// Set modified flag
-  void setModified(FXbool mod=true){ modified=mod; }
 
   /// Set editable mode
   void setEditable(FXbool edit=true);
@@ -642,91 +600,13 @@ public:
   /// Return true if overstrike mode in effect
   FXbool isOverstrike() const;
 
-  /// Set styled text mode; return true if success
-  FXbool setStyled(FXbool styled=true);
+  /// Return length of buffer
+  FXint getLength() const { return length; }
 
-  /// Return true if style buffer
-  FXbool isStyled() const { return (sbuffer!=NULL); }
+  /// Return number of rows in buffer
+  FXint getNumRows() const { return nrows; }
 
-  /// Change delimiters of words
-  void setDelimiters(const FXchar* delims=textDelimiters){ delimiters=delims; }
-
-  /// Return word delimiters
-  const FXchar* getDelimiters() const { return delimiters; }
-
-  /// Change text font
-  void setFont(FXFont* fnt);
-
-  /// Return text font
-  FXFont* getFont() const { return font; }
-
-  /// Change text color
-  void setTextColor(FXColor clr);
-
-  /// Return text color
-  FXColor getTextColor() const { return textColor; }
-
-  /// Change selected background color
-  void setSelBackColor(FXColor clr);
-
-  /// Return selected background color
-  FXColor getSelBackColor() const { return selbackColor; }
-
-  /// Change selected text color
-  void setSelTextColor(FXColor clr);
-
-  /// Return selected text color
-  FXColor getSelTextColor() const { return seltextColor; }
-
-  /// Change highlighted text color
-  void setHiliteTextColor(FXColor clr);
-
-  /// Return highlighted text color
-  FXColor getHiliteTextColor() const { return hilitetextColor; }
-
-  /// Change highlighted background color
-  void setHiliteBackColor(FXColor clr);
-
-  /// Return highlighted background color
-  FXColor getHiliteBackColor() const { return hilitebackColor; }
-
-  /// Change active background color
-  void setActiveBackColor(FXColor clr);
-
-  /// Return active background color
-  FXColor getActiveBackColor() const { return activebackColor; }
-
-  /// Change cursor color
-  void setCursorColor(FXColor clr);
-
-  /// Return cursor color
-  FXColor getCursorColor() const { return cursorColor; }
-
-  /// Change line number color
-  void setNumberColor(FXColor clr);
-
-  /// Return line number color
-  FXColor getNumberColor() const { return numberColor; }
-
-  /// Change bar color
-  void setBarColor(FXColor clr);
-
-  /// Return bar color
-  FXColor getBarColor() const { return barColor; }
-
-  /// Set help text
-  void setHelpText(const FXString& text){ help=text; }
-
-  /// Return help text
-  FXString getHelpText() const { return help; }
-
-  /// Set the tool tip message for this text widget
-  void setTipText(const FXString& text){ tip=text; }
-
-  /// Get the tool tip message for this text widget
-  FXString getTipText() const { return tip; }
-
-  /// Get character at position in text buffer
+  /// Get byte at position in text buffer
   FXint getByte(FXint pos) const;
 
   /// Get wide character at position pos
@@ -738,23 +618,66 @@ public:
   /// Get style at position pos
   FXint getStyle(FXint pos) const;
 
-  /// Return length of buffer
-  FXint getLength() const { return length; }
+  /// Retreat to the previous valid utf8 character start
+  FXint dec(FXint pos) const;
 
-  /// Return number of rows in buffer
-  FXint getNumRows() const { return nrows; }
+  /// Advance to the next valid utf8 character start
+  FXint inc(FXint pos) const;
 
-  /// Retrieve text into buffer
-  void getText(FXchar* text,FXint n) const;
+  /// Return position of begin of line containing position pos
+  FXint lineStart(FXint pos) const;
 
-  /// Retrieve text into string
-  void getText(FXString& text) const;
+  /// Return position of end of line containing position pos
+  FXint lineEnd(FXint pos) const;
 
-  /// Return entire text as string
-  FXString getText() const;
+  /// Return start of next line
+  FXint nextLine(FXint pos,FXint nl=1) const;
 
-  /// Get selected text
-  FXString getSelectedText() const;
+  /// Return start of previous line
+  FXint prevLine(FXint pos,FXint nl=1) const;
+
+  /// Return row start
+  FXint rowStart(FXint pos) const;
+
+  /// Return row end
+  FXint rowEnd(FXint pos) const;
+
+  /// Return start of next row
+  FXint nextRow(FXint pos,FXint nr=1) const;
+
+  /// Return start of previous row
+  FXint prevRow(FXint pos,FXint nr=1) const;
+
+  /// Return end of previous word
+  FXint leftWord(FXint pos) const;
+
+  /// Return begin of next word
+  FXint rightWord(FXint pos) const;
+
+  /// Return begin of word
+  FXint wordStart(FXint pos) const;
+
+  /// Return end of word
+  FXint wordEnd(FXint pos) const;
+
+  /// Return validated utf8 character start position
+  FXint validPos(FXint pos) const;
+
+  /**
+  * Count number of columns taken up by some text.
+  * Start should be on a row start.
+  */
+  FXint countCols(FXint start,FXint end) const;
+
+  /**
+  * Count number of rows taken up by some text.
+  * Start should be on a row start.
+  */
+  FXint countRows(FXint start,FXint end) const;
+
+  /// Count number of newlines
+  FXint countLines(FXint start,FXint end) const;
+
 
   /// Change the text in the buffer to new text
   virtual FXint setText(const FXchar* text,FXint n,FXbool notify=false);
@@ -820,6 +743,7 @@ public:
   /// Remove all text from the buffer
   virtual FXint clearText(FXbool notify=false);
 
+
   /// Extract n bytes of text from position pos into already allocated buffer
   void extractText(FXchar *text,FXint pos,FXint n) const;
 
@@ -844,19 +768,101 @@ public:
   /// Return text columns startcol to endcol from lines starting at startpos to endpos
   FXString extractTextBlock(FXint startpos,FXint endpos,FXint startcol,FXint endcol) const;
 
-  /**
-  * Search for string in text buffer, returning the extent of the string in beg and end.
-  * The search starts from the given starting position, scans forward (SEARCH_FORWARD) or
-  * backward (SEARCH_BACKWARD), and wraps around if SEARCH_WRAP has been specified.
-  * If neither SEARCH_FORWARD or SEARCH_BACKWARD flags are set, an anchored match is performed
-  * at the given starting position.
-  * The search type is either a plain search (SEARCH_EXACT), case insensitive search
-  * (SEARCH_IGNORECASE), or regular expression search (SEARCH_REGEX).
-  * For regular expression searches, capturing parentheses are used if npar is greater than 1;
-  * in this case, the number of entries in the beg[], end[] arrays must be npar also.
-  * If either beg or end or both are NULL, internal arrays are used.
-  */
-  FXbool findText(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint start=0,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP|SEARCH_EXACT,FXint npar=1);
+  /// Return entire text as string
+  FXString getText() const;
+
+  /// Retrieve text into buffer
+  void getText(FXchar* text,FXint n) const;
+
+  /// Retrieve text into string
+  void getText(FXString& text) const;
+
+
+  /// Select all text
+  virtual FXbool selectAll(FXbool notify=false);
+
+  /// Select len characters starting at given position pos
+  virtual FXbool setSelection(FXint pos,FXint len,FXbool notify=false);
+
+  /// Extend the primary selection from the anchor to the given position
+  virtual FXbool extendSelection(FXint pos,FXuint sel=SelectChars,FXbool notify=false);
+
+  /// Select block of characters within given box
+  virtual FXbool setBlockSelection(FXint trow,FXint lcol,FXint brow,FXint rcol,FXbool notify=false);
+
+  /// Extend primary selection from anchor to given row, column
+  virtual FXbool extendBlockSelection(FXint row,FXint col,FXbool notify=false);
+
+  /// Kill or deselect primary selection
+  virtual FXbool killSelection(FXbool notify=false);
+
+  /// Return selection start position
+  FXint getSelStartPos() const { return select.startpos; }
+
+  /// Return selection end position
+  FXint getSelEndPos() const { return select.endpos; }
+
+  /// Return selection start column
+  FXint getSelStartColumn() const { return select.startcol; }
+
+  /// Return selection end column
+  FXint getSelEndColumn() const { return select.endcol; }
+
+  /// Get selected text
+  FXString getSelectedText() const;
+
+
+  /// Copy primary selection to clipboard
+  FXbool copySelection();
+
+  /// Cut primary selection to clipboard
+  FXbool cutSelection(FXbool notify=false);
+
+  /// Delete primary selection
+  FXbool deleteSelection(FXbool notify=false);
+
+  /// Paste primary ("middle-mouse") selection
+  FXbool pasteSelection(FXbool notify=false);
+
+  /// Paste clipboard
+  FXbool pasteClipboard(FXbool notify=false);
+
+  /// Replace primary selection by other text
+  FXbool replaceSelection(const FXString& text,FXbool notify=false);
+
+  /// Return true if position pos is selected
+  FXbool isPosSelected(FXint pos) const;
+
+  /// Return true if position pos (and column col) is selected
+  FXbool isPosSelected(FXint pos,FXint col) const;
+
+  /// Return true if line containing position is fully visible
+  FXbool isPosVisible(FXint pos) const;
+
+  /// Highlight len characters starting at given position pos
+  FXbool setHighlight(FXint start,FXint len);
+
+  /// Unhighlight the text
+  FXbool killHighlight();
+
+
+  /// Make line containing pos the top line
+  void setTopLine(FXint pos);
+
+  /// Return position of top line
+  FXint getTopLine() const;
+
+  /// Make line containing pos the bottom line
+  void setBottomLine(FXint pos);
+
+  /// Return the position of the bottom line
+  FXint getBottomLine() const;
+
+  /// Make line containing pos the center line
+  void setCenterLine(FXint pos);
+
+  /// Scroll text to make the given position visible
+  void makePositionVisible(FXint pos);
 
 
   /// Return text position at given visible x,y coordinate
@@ -887,134 +893,6 @@ public:
   /// Return screen y-coordinate of unconstrained (row,col).
   FXint getYOfRowColumn(FXint row,FXint col) const;
 
-  /**
-  * Count number of columns taken up by some text.
-  * Start should be on a row start.
-  */
-  FXint countCols(FXint start,FXint end) const;
-
-  /**
-  * Count number of rows taken up by some text.
-  * Start should be on a row start.
-  */
-  FXint countRows(FXint start,FXint end) const;
-
-  /// Count number of newlines
-  FXint countLines(FXint start,FXint end) const;
-
-  /// Return position of begin of line containing position pos
-  FXint lineStart(FXint pos) const;
-
-  /// Return position of end of line containing position pos
-  FXint lineEnd(FXint pos) const;
-
-  /// Return start of next line
-  FXint nextLine(FXint pos,FXint nl=1) const;
-
-  /// Return start of previous line
-  FXint prevLine(FXint pos,FXint nl=1) const;
-
-  /// Return row start
-  FXint rowStart(FXint pos) const;
-
-  /// Return row end
-  FXint rowEnd(FXint pos) const;
-
-  /// Return start of next row
-  FXint nextRow(FXint pos,FXint nr=1) const;
-
-  /// Return start of previous row
-  FXint prevRow(FXint pos,FXint nr=1) const;
-
-  /// Return end of previous word
-  FXint leftWord(FXint pos) const;
-
-  /// Return begin of next word
-  FXint rightWord(FXint pos) const;
-
-  /// Return begin of word
-  FXint wordStart(FXint pos) const;
-
-  /// Return end of word
-  FXint wordEnd(FXint pos) const;
-
-  /// Return validated utf8 character start position
-  FXint validPos(FXint pos) const;
-
-  /// Retreat to the previous valid utf8 character start
-  FXint dec(FXint pos) const;
-
-  /// Advance to the next valid utf8 character start
-  FXint inc(FXint pos) const;
-
-  /// Make line containing pos the top line
-  void setTopLine(FXint pos);
-
-  /// Return position of top line
-  FXint getTopLine() const;
-
-  /// Make line containing pos the bottom line
-  void setBottomLine(FXint pos);
-
-  /// Return the position of the bottom line
-  FXint getBottomLine() const;
-
-  /// Make line containing pos the center line
-  void setCenterLine(FXint pos);
-
-  /// Select all text
-  virtual FXbool selectAll(FXbool notify=false);
-
-  /// Select len characters starting at given position pos
-  virtual FXbool setSelection(FXint pos,FXint len,FXbool notify=false);
-
-  /// Extend the primary selection from the anchor to the given position
-  virtual FXbool extendSelection(FXint pos,FXuint sel=SelectChars,FXbool notify=false);
-
-  /// Select block of characters within given box
-  virtual FXbool setBlockSelection(FXint trow,FXint lcol,FXint brow,FXint rcol,FXbool notify=false);
-
-  /// Extend primary selection from anchor to given row, column
-  virtual FXbool extendBlockSelection(FXint row,FXint col,FXbool notify=false);
-
-  /// Kill or deselect primary selection
-  virtual FXbool killSelection(FXbool notify=false);
-
-  /// Copy primary selection to clipboard
-  FXbool copySelection();
-
-  /// Cut primary selection to clipboard
-  FXbool cutSelection(FXbool notify=false);
-
-  /// Delete primary selection
-  FXbool deleteSelection(FXbool notify=false);
-
-  /// Paste primary ("middle-mouse") selection
-  FXbool pasteSelection(FXbool notify=false);
-
-  /// Paste clipboard
-  FXbool pasteClipboard(FXbool notify=false);
-
-  /// Replace primary selection by other text
-  FXbool replaceSelection(const FXString& text,FXbool notify=false);
-
-  /// Return true if position pos is selected
-  FXbool isPosSelected(FXint pos) const;
-
-  /// Return true if position pos (and column col) is selected
-  FXbool isPosSelected(FXint pos,FXint col) const;
-
-  /// Return true if line containing position is fully visible
-  FXbool isPosVisible(FXint pos) const;
-
-  /// Scroll text to make the given position visible
-  void makePositionVisible(FXint pos);
-
-  /// Highlight len characters starting at given position pos
-  FXbool setHighlight(FXint start,FXint len);
-
-  /// Unhighlight the text
-  FXbool killHighlight();
 
   /// Set the cursor position
   virtual void setCursorPos(FXint pos,FXbool notify=false);
@@ -1064,17 +942,19 @@ public:
   /// Move cursor to row and column, and extend the block selection to this point
   void moveCursorRowColumnAndSelect(FXint row,FXint col,FXbool notify=false);
 
-  /// Return selection start position
-  FXint getSelStartPos() const { return select.startpos; }
-
-  /// Return selection end position
-  FXint getSelEndPos() const { return select.endpos; }
-
-  /// Return selection start column
-  FXint getSelStartColumn() const { return select.startcol; }
-
-  /// Return selection end column
-  FXint getSelEndColumn() const { return select.endcol; }
+  /**
+  * Search for string in text buffer, returning the extent of the string in beg and end.
+  * The search starts from the given starting position, scans forward (SEARCH_FORWARD) or
+  * backward (SEARCH_BACKWARD), and wraps around if SEARCH_WRAP has been specified.
+  * If neither SEARCH_FORWARD or SEARCH_BACKWARD flags are set, an anchored match is performed
+  * at the given starting position.
+  * The search type is either a plain search (SEARCH_EXACT), case insensitive search
+  * (SEARCH_IGNORECASE), or regular expression search (SEARCH_REGEX).
+  * For regular expression searches, capturing parentheses are used if npar is greater than 1;
+  * in this case, the number of entries in the beg[], end[] arrays must be npar also.
+  * If either beg or end or both are NULL, internal arrays are used.
+  */
+  FXbool findText(const FXString& string,FXint* beg=NULL,FXint* end=NULL,FXint start=0,FXuint flags=SEARCH_FORWARD|SEARCH_WRAP|SEARCH_EXACT,FXint npar=1);
 
   /// Change text widget style
   void setTextStyle(FXuint style);
@@ -1082,25 +962,143 @@ public:
   /// Return text widget style
   FXuint getTextStyle() const;
 
-  /**
-  * Change number of visible rows.
-  * The number of visible rows is used to calculate the default height
-  * the text widget reports to its parent layout manager.
-  */
+  /// Change text font
+  void setFont(FXFont* fnt);
+
+  /// Return text font
+  FXFont* getFont() const { return font; }
+
+  /// Change number of visible rows
   void setVisibleRows(FXint rows);
 
   /// Return number of visible rows
   FXint getVisibleRows() const { return vrows; }
 
-  /**
-  * Change number of visible columns.
-  * The number of visible columns is used to calculate the default height
-  * the text widget reports to its parent layout manager.
-  */
+  /// Change number of visible columns
   void setVisibleColumns(FXint cols);
 
   /// Return number of visible columns
   FXint getVisibleColumns() const { return vcols; }
+
+  /// Change top margin
+  void setMarginTop(FXint pt);
+
+  /// Return top margin
+  FXint getMarginTop() const { return margintop; }
+
+  /// Change bottom margin
+  void setMarginBottom(FXint pb);
+
+  /// Return bottom margin
+  FXint getMarginBottom() const { return marginbottom; }
+
+  /// Change left margin
+  void setMarginLeft(FXint pl);
+
+  /// Return left margin
+  FXint getMarginLeft() const { return marginleft; }
+
+  /// Change right margin
+  void setMarginRight(FXint pr);
+
+  /// Return right margin
+  FXint getMarginRight() const { return marginright; }
+
+  /// Return number of columns used for line numbers
+  FXint getBarColumns() const { return barcolumns; }
+
+  /// Change number of columns used for line numbers
+  void setBarColumns(FXint cols);
+
+  /// Set wrap columns
+  void setWrapColumns(FXint cols);
+
+  /// Return wrap columns
+  FXint getWrapColumns() const { return wrapcolumns; }
+
+  /// Change tab columns
+  void setTabColumns(FXint cols);
+
+  /// Return tab columns
+  FXint getTabColumns() const { return tabcolumns; }
+
+  /// Change text color
+  void setTextColor(FXColor clr);
+
+  /// Return text color
+  FXColor getTextColor() const { return textColor; }
+
+  /// Change selected background color
+  void setSelBackColor(FXColor clr);
+
+  /// Return selected background color
+  FXColor getSelBackColor() const { return selbackColor; }
+
+  /// Change selected text color
+  void setSelTextColor(FXColor clr);
+
+  /// Return selected text color
+  FXColor getSelTextColor() const { return seltextColor; }
+
+  /// Change highlighted text color
+  void setHiliteTextColor(FXColor clr);
+
+  /// Return highlighted text color
+  FXColor getHiliteTextColor() const { return hilitetextColor; }
+
+  /// Change highlighted background color
+  void setHiliteBackColor(FXColor clr);
+
+  /// Return highlighted background color
+  FXColor getHiliteBackColor() const { return hilitebackColor; }
+
+  /// Change active background color
+  void setActiveBackColor(FXColor clr);
+
+  /// Return active background color
+  FXColor getActiveBackColor() const { return activebackColor; }
+
+  /// Change cursor color
+  void setCursorColor(FXColor clr);
+
+  /// Return cursor color
+  FXColor getCursorColor() const { return cursorColor; }
+
+  /// Change line number color
+  void setNumberColor(FXColor clr);
+
+  /// Return line number color
+  FXColor getNumberColor() const { return numberColor; }
+
+  /// Change bar color
+  void setBarColor(FXColor clr);
+
+  /// Return bar color
+  FXColor getBarColor() const { return barColor; }
+
+  /// Set styled text mode; return true if success
+  FXbool setStyled(FXbool styled=true);
+
+  /// Return true if style buffer
+  FXbool isStyled() const { return (sbuffer!=NULL); }
+
+  /**
+  * Set highlight styles.
+  * The table of styles is only referenced by the widget; it is not copied.
+  * Thus, multiple widgets may share a common style table.
+  * Some care must be taken to populate the style-buffer only with numbers
+  * inside the style table.
+  */
+  void setHiliteStyles(FXHiliteStyle* styles);
+
+  /// Return current value of the style table.
+  FXHiliteStyle* getHiliteStyles() const { return hilitestyles; }
+
+  /// Change delimiters of words
+  void setDelimiters(const FXchar* delims=textDelimiters){ delimiters=delims; }
+
+  /// Return word delimiters
+  const FXchar* getDelimiters() const { return delimiters; }
 
   /**
   * Change brace and parenthesis match highlighting time, in nanoseconds.
@@ -1112,24 +1110,20 @@ public:
   */
   void setHiliteMatchTime(FXTime t){ matchtime=t; }
 
-  /**
-  * Return brace and parenthesis match highlighting time, in nanoseconds.
-  */
+  /// Return brace and parenthesis match highlighting time, in nanoseconds
   FXTime getHiliteMatchTime() const { return matchtime; }
 
-  /**
-  * Set highlight styles.
-  * The table of styles is only referenced by the widget; it is not copied.
-  * Thus, multiple widgets may share a common style table.
-  * Some care must be taken to populate the style-buffer only with numbers
-  * inside the style table.
-  */
-  void setHiliteStyles(FXHiliteStyle* styles);
+  /// Set help text
+  void setHelpText(const FXString& text){ help=text; }
 
-  /**
-  * Return current value of the style table.
-  */
-  FXHiliteStyle* getHiliteStyles() const { return hilitestyles; }
+  /// Return help text
+  FXString getHelpText() const { return help; }
+
+  /// Set the tool tip message for this text widget
+  void setTipText(const FXString& text){ tip=text; }
+
+  /// Get the tool tip message for this text widget
+  FXString getTipText() const { return tip; }
 
   /// Save to a stream
   virtual void save(FXStream& store) const;

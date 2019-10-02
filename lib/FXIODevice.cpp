@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -104,8 +104,8 @@ static FXbool isvalid(FXInputHandle h){
 #endif
   if(flags&O_CREAT){ mm|=FXIO::Create; }
   if(flags&O_EXCL){ mm|=FXIO::Exclusive; }
-#endif     
-#endif   
+#endif
+#endif
 
 // Open device with access mode m and existing handle h
 FXbool FXIODevice::open(FXInputHandle h,FXuint m){

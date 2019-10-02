@@ -3,7 +3,7 @@
 *                                 Codecs Tests                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

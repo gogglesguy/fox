@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -283,7 +283,7 @@ FXptr FXHash::erase(FXival pos){
   return old;
   }
 
- 
+
 // Clear hash table, marking all slots as free
 void FXHash::clear(){
   no(1);

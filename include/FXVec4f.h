@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,7 +72,7 @@ public:
   /// Assigning operators
   FXVec4f& operator*=(FXfloat n){ return set(x*n,y*n,z*n,w*n); }
   FXVec4f& operator/=(FXfloat n){ return set(x/n,y/n,z/n,w/n); }
-  
+
   /// Element-wise assigning operators
   FXVec4f& operator+=(const FXVec4f& v){ return set(x+v.x,y+v.y,z+v.z,w+v.w); }
   FXVec4f& operator-=(const FXVec4f& v){ return set(x-v.x,y-v.y,z-v.z,w-v.w); }

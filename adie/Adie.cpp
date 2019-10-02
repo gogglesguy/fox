@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -174,7 +174,7 @@ static void printusage(){
 // Print verson info
 static void printversion(){
   fxmessage("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  fxmessage("Copyright (C) 2000,2018 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Copyright (C) 2000,2019 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
   fxmessage("\n");
   fxmessage("This program is free software: you can redistribute it and/or modify\n");

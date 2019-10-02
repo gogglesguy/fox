@@ -3,7 +3,7 @@
 *                      J S O N   R e a d e r  &  W r i t e r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,7 +62,7 @@
                    | pair ',' members
                    ;
 
-         pair      : name ':' value 
+         pair      : name ':' value
                    ;
 
          name      : string
@@ -88,16 +88,16 @@
                    ;
 
          dq-char   : any-character-except-double-quotes
-                   | '\"' | '\\' | '\/' | '\b' | '\f' | '\n' | '\r' | '\t'
-                   | '\x' hxdigit hxdigit
-                   | '\u' hxdigit hxdigit hxdigit hxdigit
+                   | '\\"' | '\\\\' | '\\/' | '\\b' | '\\f' | '\\n' | '\\r' | '\\t'
+                   | '\\x' hxdigit hxdigit
+                   | '\\u' hxdigit hxdigit hxdigit hxdigit
                    | '\\' newline
                    ;
 
          sq-char   : any-character-except-single-quotes
-                   | '\"' | '\\' | '\/' | '\b' | '\f' | '\n' | '\r' | '\t'
-                   | '\x' hxdigit hxdigit
-                   | '\u' hxdigit hxdigit hxdigit hxdigit
+                   | '\\\'' | '\\\\' | '\\/' | '\\b' | '\\f' | '\\n' | '\\r' | '\\t'
+                   | '\\x' hxdigit hxdigit
+                   | '\\u' hxdigit hxdigit hxdigit hxdigit
                    | '\\' newline
                    ;
 
@@ -107,18 +107,23 @@
                    ;
 
          ident     : alpha
-                   | ident alphanum
+                   | alpha alphanums
                    ;
 
          alpha     : 'a'...'z' | 'A'...'Z' | '_' | '$'
-                   | unicode-categories Lu, Ll, Lt, Lm, Lo, Nl
+                   | unicode-categories in { Lu, Ll, Lt, Lm, Lo, Nl }
+                   ;
+
+         alphanums : alphanum
+                   | alphanum alphanums
                    ;
 
          alphanum  : 'a'...'z' | 'A'...'Z' | '0'...'9'  | '_' | '$'
-                   | unicode-categories Lu, Ll, Lt, Lm, Lo, Nl, Mn, Mc, Nd, Pc
+                   | unicode-categories in { Lu, Ll, Lt, Lm, Lo, Nl, Mn, Mc, Nd, Pc }
                    ;
 
-         number    : [ '+' | '-' ] literal ;
+         number    : [ '+' | '-' ] literal
+                   ;
 
          literal   : decimal
                    | hex
@@ -139,7 +144,8 @@
                    | digit digits
                    ;
 
-         digit     : '0'...'9' ;
+         digit     : '0'...'9'
+                   ;
 
          hex       : '0' ('x' | 'X') hexdigits
                    ;
@@ -148,7 +154,8 @@
                    | hexdigit hexdigits
                    ;
 
-         hexdigit  : '0'...'9' | 'a'...'f' | 'A'...'F' ;
+         hexdigit  : '0'...'9' | 'a'...'f' | 'A'...'F'
+                   ;
 
 
   - Flow controls the looks of the output.  The current values supported are:
@@ -184,7 +191,7 @@
     changed in the future.
 
   - Parsing is done in a way that things will likely work if input is NOT UTF8, as long
-    as those character sequences are not actually equal to those fewe UTF8 sequences
+    as those character sequences are not actually equal to those few UTF8 sequences
     we care about!
 */
 
@@ -265,8 +272,8 @@ FXbool FXJSON::open(FXchar* buffer,FXuval sz,Direction d){
     wptr=(d==Load)?endptr:begptr;
     rptr=begptr;
     sptr=begptr;
-    offset=0;
     token=TK_ERROR;
+    offset=0;
     column=0;
     line=1;
     indent=0;
@@ -350,7 +357,7 @@ FXbool FXJSON::emit(const FXchar* str,FXival count){
 FXint FXJSON::next(){
   FXint comment=0;
   FXint tok;
-  FXuint cc;
+  FXuchar c,cc;
 
   FXASSERT(dir==Load);
 
@@ -363,112 +370,116 @@ FXint FXJSON::next(){
     FXASSERT(sptr<wptr);
 
     // Process characters
-    switch(sptr[0]){
-      case '\t':                        // Tab hops to next tabstop
+    c=sptr[0];
+    switch(c){
+      case '\t':                                // Tab hops to next tabstop
         column+=(8-column%8);
         offset++;
         sptr++;
         continue;
-      case ' ':                         // Space
+      case ' ':                                 // Space
         column++;
-      case '\v':                        // Vertical tab
-      case '\f':                        // Form feed
+      case '\v':                                // Vertical tab
+      case '\f':                                // Form feed
         offset++;
         sptr++;
         continue;
-      case '\r':                        // Carriage return
-        if(sptr+1<wptr && sptr[1]=='\n'){ offset++; sptr++; }
-      case '\n':                        // Newline also ends single-line comment
-        if(comment<0) comment=0;
+      case '\r':                                // Carriage return
+        if(sptr+1<wptr && sptr[1]=='\n'){
+          offset++;
+          sptr++;
+          }
+      case '\n':                                // Newline 
+        if(comment<0) comment=0;                // End single-line comment
         column=0;
         offset++;
         sptr++;
         line++;
         continue;
-      case '/':                         // Possible start of comment
+      case '/':                                 // Possible start of comment
         if(sptr+1<wptr && sptr[1]=='*' && comment>=0){
           column+=2;
           offset+=2;
           sptr+=2;
-          comment+=1;                   // Increase comment nesting level
+          comment+=1;                           // Increase comment nesting level
           continue;
           }
         if(sptr+1<wptr && sptr[1]=='/' && comment==0){
           column+=2;
           offset+=2;
           sptr+=2;
-          comment=-1;                   // Comment till end of line
+          comment=-1;                           // Comment till end of line
           continue;
           }
-        if(!comment) return TK_ERROR;   // Illegal character outside of comment or string
+        if(!comment) return TK_ERROR;           // Illegal character outside of comment or string
         column++;
         offset++;
-        sptr++;                         // Comment
+        sptr++;                                 // Comment
         continue;
-      case '*':                         // Possible end of comment
+      case '*':                                 // Possible end of comment
         if(sptr+1<wptr && sptr[1]=='/' && comment>=1){
-          comment-=1;                   // Decrease comment nesting level
+          comment-=1;                           // Decrease comment nesting level
           column+=2;
           offset+=2;
           sptr+=2;
           continue;
           }
-        if(!comment) return TK_ERROR;   // Illegal character outside of comment or string
+        if(!comment) return TK_ERROR;           // Illegal character outside of comment or string
         column++;
         offset++;
-        sptr++;                         // Comment
+        sptr++;                                 // Comment
         continue;
-      case '{':                         // Begin of map
+      case '{':                                 // Begin of map
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_LBRACE;
         continue;
-      case '}':                         // End of map
+      case '}':                                 // End of map
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_RBRACE;
         continue;
-      case '[':                         // Begin of array
+      case '[':                                 // Begin of array
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_LBRACK;
         continue;
-      case ']':                         // End of array
+      case ']':                                 // End of array
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_RBRACK;
         continue;
-      case ',':                         // Element separator
+      case ',':                                 // Element separator
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_COMMA;
         continue;
-      case ':':                         // Key:value separator
+      case ':':                                 // Key:value separator
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_COLON;
         continue;
-      case '"':                         // String double quotes
+      case '"':                                 // String double quotes
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_QUOTES;
         continue;
-      case '\'':                        // String single quote
+      case '\'':                                // String single quote
         column++;
         offset++;
         sptr++;
         if(!comment) return TK_QUOTE;
         continue;
-      case '+':                         // Number value
+      case '+':                                 // Number value
       case '-':
-      case '.':                         // Leading period is allowed
+      case '.':                                 // Leading period is allowed
       case '0':
       case '1':
       case '2':
@@ -653,122 +664,230 @@ FXint FXJSON::next(){
             sptr+=3;
             return TK_NAN;                      // NaN
             }
+          column++;
+          offset++;
+          sptr++;
           return TK_IDENT;                      // Identifier
           }
         column++;
         offset++;
         sptr++;                                 // Comment
         continue;
-      case '\xC0':                              // 2-byte UTF8 sequences
-      case '\xC1':
-      case '\xC2':
-      case '\xC3':
-      case '\xC4':
-      case '\xC5':
-      case '\xC6':
-      case '\xC7':
-      case '\xC8':
-      case '\xC9':
-      case '\xCA':
-      case '\xCB':
-      case '\xCC':
-      case '\xCD':
-      case '\xCE':
-      case '\xCF':
-      case '\xD0':
-      case '\xD1':
-      case '\xD2':
-      case '\xD3':
-      case '\xD4':
-      case '\xD5':
-      case '\xD6':
-      case '\xD7':
-      case '\xD8':
-      case '\xD9':
-      case '\xDA':
-      case '\xDB':
-      case '\xDC':
-      case '\xDD':
-      case '\xDE':
-      case '\xDF':
+      case 0x00:                                // Non-special control characters
+      case 0x01:
+      case 0x02:
+      case 0x03:
+      case 0x04:
+      case 0x05:
+      case 0x06:
+      case 0x07:
+      case 0x08:
+      case 0x0E:
+      case 0x0F:
+      case 0x10:
+      case 0x11:
+      case 0x12:
+      case 0x13:
+      case 0x14:
+      case 0x15:
+      case 0x16:
+      case 0x17:
+      case 0x18:
+      case 0x19:
+      case 0x1A:
+      case 0x1B:
+      case 0x1C:
+      case 0x1D:
+      case 0x1E:
+      case 0x1F:
+      case 0x7F:                                // DEL
+      case 0x80:                                // UTF8 followers
+      case 0x81:
+      case 0x82:
+      case 0x83:
+      case 0x84:
+      case 0x85:
+      case 0x86:
+      case 0x87:
+      case 0x88:
+      case 0x89:
+      case 0x8A:
+      case 0x8B:
+      case 0x8C:
+      case 0x8D:
+      case 0x8E:
+      case 0x8F:
+      case 0x90:
+      case 0x91:
+      case 0x92:
+      case 0x93:
+      case 0x94:
+      case 0x95:
+      case 0x96:
+      case 0x97:
+      case 0x98:
+      case 0x99:
+      case 0x9A:
+      case 0x9B:
+      case 0x9C:
+      case 0x9D:
+      case 0x9E:
+      case 0x9F:
+      case 0xA0:
+      case 0xA1:
+      case 0xA2:
+      case 0xA3:
+      case 0xA4:
+      case 0xA5:
+      case 0xA6:
+      case 0xA7:
+      case 0xA8:
+      case 0xA9:
+      case 0xAA:
+      case 0xAB:
+      case 0xAC:
+      case 0xAD:
+      case 0xAE:
+      case 0xAF:
+      case 0xB0:
+      case 0xB1:
+      case 0xB2:
+      case 0xB3:
+      case 0xB4:
+      case 0xB5:
+      case 0xB6:
+      case 0xB7:
+      case 0xB8:
+      case 0xB9:
+      case 0xBA:
+      case 0xBB:
+      case 0xBC:
+      case 0xBD:
+      case 0xBE:
+      case 0xBF:
+        return ErrToken;                        // Bad token
+      case 0xC0:                                // 2-byte UTF8 sequences
+      case 0xC1:
+      case 0xC2:
+      case 0xC3:
+      case 0xC4:
+      case 0xC5:
+      case 0xC6:
+      case 0xC7:
+      case 0xC8:
+      case 0xC9:
+      case 0xCA:
+      case 0xCB:
+      case 0xCC:
+      case 0xCD:
+      case 0xCE:
+      case 0xCF:
+      case 0xD0:
+      case 0xD1:
+      case 0xD2:
+      case 0xD3:
+      case 0xD4:
+      case 0xD5:
+      case 0xD6:
+      case 0xD7:
+      case 0xD8:
+      case 0xD9:
+      case 0xDA:
+      case 0xDB:
+      case 0xDC:
+      case 0xDD:
+      case 0xDE:
+      case 0xDF:
         if(sptr+1>=wptr) return TK_EOF;         // Premature EOF
+        if(sptr[0]=='\xC2' && sptr[1]=='\xA0'){
+          column++;
+          offset+=2;
+          sptr+=2;                              // Non Breakable Space 
+          continue;
+          }
         if(!comment){
           cc=Unicode::charCategory(wc(sptr));
-          if((CatLetterUpper<=cc && cc<=CatNumberLetter)){
-            return TK_IDENT;                    // Identifier
-            }
-          if(sptr[0]=='\xC2' && sptr[1]=='\xA0'){
-            column++;
-            offset+=2;
-            sptr+=2;                            // Non Breakable Space (\xC2\xA0)
-            continue;
-            }
-          return TK_ERROR;                      // Illegal character outside of comment or string
+          if(!(CatLetterUpper<=cc && cc<=CatNumberLetter)) return TK_ERROR;
+          column++;
+          offset+=2;
+          sptr+=2;
+          return TK_IDENT;                      // Identifier
           }
         column++;
         offset+=2;
         sptr+=2;                                // Comment
         continue;
-      case '\xE0':                              // 3-byte UTF8 sequences
-      case '\xE1':
-      case '\xE2':
-      case '\xE3':
-      case '\xE4':
-      case '\xE5':
-      case '\xE6':
-      case '\xE7':
-      case '\xE8':
-      case '\xE9':
-      case '\xEA':
-      case '\xEB':
-      case '\xEC':
-      case '\xED':
-      case '\xEE':
-      case '\xEF':
+      case 0xE0:                                // 3-byte UTF8 sequences
+      case 0xE1:
+      case 0xE2:
+      case 0xE3:
+      case 0xE4:
+      case 0xE5:
+      case 0xE6:
+      case 0xE7:
+      case 0xE8:
+      case 0xE9:
+      case 0xEA:
+      case 0xEB:
+      case 0xEC:
+      case 0xED:
+      case 0xEE:
+      case 0xEF:
         if(sptr+2>=wptr) return TK_EOF;         // Premature EOF
+        if(sptr[0]=='\xEF' && sptr[1]=='\xBB' && sptr[2]=='\xBF'){
+          offset+=3;
+          sptr+=3;                              // Byte order mark 
+          continue;
+          }
+        if(sptr[0]=='\xE2' && sptr[1]=='\x80' && (sptr[2]=='\xA8' || sptr[2]=='\xA9')){
+          if(comment<0) comment=0;              // End single-line comment
+          column=0;
+          offset+=3;
+          sptr+=3;                              // Line Separator or Paragraph Separator 
+          line++;
+          continue;
+          }
         if(!comment){
           cc=Unicode::charCategory(wc(sptr));
-          if((CatLetterUpper<=cc && cc<=CatNumberLetter)){
-            return TK_IDENT;                    // Identifier
-            }
-          if(sptr[0]=='\xEF' && sptr[1]=='\xBB' && sptr[2]=='\xBF'){
-            offset+=3;
-            sptr+=3;                            // Byte order mark (\xEF\xBB\xBF) should behave as space
-            continue;
-            }
-          if(sptr[0]=='\xE2' && sptr[1]=='\x80' && (sptr[2]=='\xA8' || sptr[2]=='\xA9')){
-            if(comment<0) comment=0;
-            column=0;
-            offset+=3;
-            sptr+=3;                            // Line Separator or Paragraph Separator also end single-line comment
-            line++;
-            continue;
-            }
-          return TK_ERROR;                      // Illegal character outside of comment or string
+          if(!(CatLetterUpper<=cc && cc<=CatNumberLetter)) return TK_ERROR;
+          column++;
+          offset+=3;
+          sptr+=3;
+          return TK_IDENT;                      // Identifier
           }
         column++;
         offset+=3;
         sptr+=3;                                // Comment
         continue;
-      case '\xF0':                              // 4-byte UTF8 sequences
-      case '\xF1':
-      case '\xF3':
-      case '\xF4':
-      case '\xF5':
-      case '\xF6':
-      case '\xF7':
+      case 0xF0:                                // 4-byte UTF8 sequences
+      case 0xF1:
+      case 0xF2:
+      case 0xF3:
+      case 0xF4:
+      case 0xF5:
+      case 0xF6:
+      case 0xF7:
         if(sptr+3>=wptr) return TK_EOF;         // Premature EOF
         if(!comment){
           cc=Unicode::charCategory(wc(sptr));
-          if((CatLetterUpper<=cc && cc<=CatNumberLetter)){
-            return TK_IDENT;                    // Identifier
-            }
-          return TK_ERROR;                      // Illegal character outside of comment or string
+          if(!(CatLetterUpper<=cc && cc<=CatNumberLetter)) return TK_ERROR;
+          column++;
+          offset+=4;
+          sptr+=4;
+          return TK_IDENT;                      // Identifier
           }
         column++;
         offset+=4;
         sptr+=4;
         continue;                               // Comment
+      case 0xF8:                                // Bad UTF8 leaders
+      case 0xF9:
+      case 0xFA:
+      case 0xFB:
+      case 0xFC:
+      case 0xFD:
+      case 0xFF:
+        return ErrToken;                        // Bad token
       default:                                  // Normal characters
         if(!comment) return TK_ERROR;           // Illegal character outside of comment or string
         column++;
@@ -785,10 +904,14 @@ FXint FXJSON::next(){
 // Parse single- or double-quoted string, and after matching the terminating
 // quote, eat the final quote, leaving sptr at the start of the next token.
 // We keep track of columns even inside the string, so error reporting remains
-// useful for sensible following the string in the input.
+// useful for sensible input.
 FXJSON::Error FXJSON::loadString(FXString& str){
-  FXchar quote=rptr[0];
+  FXuchar quote=rptr[0];
   FXString string;
+  FXuchar c;
+
+  // Nothing yet
+  str=FXString::null;
 
   // Process string
   while(need(MAXTOKEN)){
@@ -802,7 +925,8 @@ FXJSON::Error FXJSON::loadString(FXString& str){
     FXASSERT(sptr<wptr);
 
     // Process characters
-    switch(sptr[0]){
+    c=sptr[0];
+    switch(c){
       case '\t':                                // Tab hops to next tabstop
         column+=(8-column%8);
         offset++;
@@ -816,106 +940,217 @@ FXJSON::Error FXJSON::loadString(FXString& str){
         sptr++;
         continue;
       case '\r':                                // Carriage return
-        if(sptr+1<wptr && sptr[1]=='\n'){ offset++; sptr++; }
       case '\n':                                // Newline
-        column=0;
-        offset++;
-        sptr++;
-        line++;
-        continue;
+        return ErrQuotes;                       // Missing quotes
       case '"':                                 // End of string
+      case '\'':
         column++;
         offset++;
         sptr++;
-        if(quote!='"') continue;
+        if(quote!=c) continue;
         string.append(rptr,sptr-rptr);
         rptr=sptr;
-        str=unescape(string,'"','"');
+        str=FXString::unescape(string,quote,quote);       // Of course
         return ErrOK;
-      case '\'':                                // End of string
-        column++;
-        offset++;
-        sptr++;
-        if(quote!='\'') continue;
-        string.append(rptr,sptr-rptr);
-        rptr=sptr;
-        str=unescape(string,'\'','\'');
-        return ErrOK;
-      case '\xC0':                              // 2-byte UTF8 sequences
-      case '\xC1':
-      case '\xC2':
-      case '\xC3':
-      case '\xC4':
-      case '\xC5':
-      case '\xC6':
-      case '\xC7':
-      case '\xC8':
-      case '\xC9':
-      case '\xCA':
-      case '\xCB':
-      case '\xCC':
-      case '\xCD':
-      case '\xCE':
-      case '\xCF':
-      case '\xD0':
-      case '\xD1':
-      case '\xD2':
-      case '\xD3':
-      case '\xD4':
-      case '\xD5':
-      case '\xD6':
-      case '\xD7':
-      case '\xD8':
-      case '\xD9':
-      case '\xDA':
-      case '\xDB':
-      case '\xDC':
-      case '\xDD':
-      case '\xDE':
-      case '\xDF':
+      case 0x00:                                // Non-special control characters
+      case 0x01:
+      case 0x02:
+      case 0x03:
+      case 0x04:
+      case 0x05:
+      case 0x06:
+      case 0x07:
+      case 0x08:
+      case 0x0E:
+      case 0x0F:
+      case 0x10:
+      case 0x11:
+      case 0x12:
+      case 0x13:
+      case 0x14:
+      case 0x15:
+      case 0x16:
+      case 0x17:
+      case 0x18:
+      case 0x19:
+      case 0x1A:
+      case 0x1B:
+      case 0x1C:
+      case 0x1D:
+      case 0x1E:
+      case 0x1F:
+      case 0x7F:                                // DEL
+      case 0x80:                                // UTF8 followers
+      case 0x81:
+      case 0x82:
+      case 0x83:
+      case 0x84:
+      case 0x85:
+      case 0x86:
+      case 0x87:
+      case 0x88:
+      case 0x89:
+      case 0x8A:
+      case 0x8B:
+      case 0x8C:
+      case 0x8D:
+      case 0x8E:
+      case 0x8F:
+      case 0x90:
+      case 0x91:
+      case 0x92:
+      case 0x93:
+      case 0x94:
+      case 0x95:
+      case 0x96:
+      case 0x97:
+      case 0x98:
+      case 0x99:
+      case 0x9A:
+      case 0x9B:
+      case 0x9C:
+      case 0x9D:
+      case 0x9E:
+      case 0x9F:
+      case 0xA0:
+      case 0xA1:
+      case 0xA2:
+      case 0xA3:
+      case 0xA4:
+      case 0xA5:
+      case 0xA6:
+      case 0xA7:
+      case 0xA8:
+      case 0xA9:
+      case 0xAA:
+      case 0xAB:
+      case 0xAC:
+      case 0xAD:
+      case 0xAE:
+      case 0xAF:
+      case 0xB0:
+      case 0xB1:
+      case 0xB2:
+      case 0xB3:
+      case 0xB4:
+      case 0xB5:
+      case 0xB6:
+      case 0xB7:
+      case 0xB8:
+      case 0xB9:
+      case 0xBA:
+      case 0xBB:
+      case 0xBC:
+      case 0xBD:
+      case 0xBE:
+      case 0xBF:
+        return ErrToken;                        // Bad token
+      case 0xC0:                                // 2-byte UTF8 sequences
+      case 0xC1:
+      case 0xC2:
+      case 0xC3:
+      case 0xC4:
+      case 0xC5:
+      case 0xC6:
+      case 0xC7:
+      case 0xC8:
+      case 0xC9:
+      case 0xCA:
+      case 0xCB:
+      case 0xCC:
+      case 0xCD:
+      case 0xCE:
+      case 0xCF:
+      case 0xD0:
+      case 0xD1:
+      case 0xD2:
+      case 0xD3:
+      case 0xD4:
+      case 0xD5:
+      case 0xD6:
+      case 0xD7:
+      case 0xD8:
+      case 0xD9:
+      case 0xDA:
+      case 0xDB:
+      case 0xDC:
+      case 0xDD:
+      case 0xDE:
+      case 0xDF:
         if(sptr+1>=wptr) return ErrEnd;         // Premature EOF
         column++;
         offset+=2;
         sptr+=2;
         continue;
-      case '\xE0':                              // 3-byte UTF8 sequences
-      case '\xE1':
-      case '\xE2':
-      case '\xE3':
-      case '\xE4':
-      case '\xE5':
-      case '\xE6':
-      case '\xE7':
-      case '\xE8':
-      case '\xE9':
-      case '\xEA':
-      case '\xEB':
-      case '\xEC':
-      case '\xED':
-      case '\xEE':
-      case '\xEF':
+      case 0xE0:                                // 3-byte UTF8 sequences
+      case 0xE1:
+      case 0xE2:
+      case 0xE3:
+      case 0xE4:
+      case 0xE5:
+      case 0xE6:
+      case 0xE7:
+      case 0xE8:
+      case 0xE9:
+      case 0xEA:
+      case 0xEB:
+      case 0xEC:
+      case 0xED:
+      case 0xEE:
+      case 0xEF:
         if(sptr+2>=wptr) return ErrEnd;         // Premature EOF
+        if(sptr[0]=='\xE2' && sptr[1]=='\x80' && (sptr[2]=='\xA8' || sptr[2]=='\xA9')){
+          column=0;
+          offset+=3;
+          sptr+=3;                              // Line Separator or Paragraph Separator 
+          line++;
+          continue;
+          }
         column++;
         offset+=3;
         sptr+=3;
         continue;
-      case '\xF0':                              // 4-byte UTF8 sequences
-      case '\xF1':
-      case '\xF3':
-      case '\xF4':
-      case '\xF5':
-      case '\xF6':
-      case '\xF7':
+      case 0xF0:                                // 4-byte UTF8 sequences
+      case 0xF1:
+      case 0xF2:
+      case 0xF3:
+      case 0xF4:
+      case 0xF5:
+      case 0xF6:
+      case 0xF7:
         if(sptr+3>=wptr) return ErrEnd;         // Premature EOF
         column++;
         offset+=4;
         sptr+=4;
         continue;
+      case 0xF8:                                // Bad UTF8 leaders
+      case 0xF9:
+      case 0xFA:
+      case 0xFB:
+      case 0xFC:
+      case 0xFD:
+      case 0xFF:
+        return ErrToken;                        // Bad token
       case '\\':                                // Escape next character
         column++;
         offset++;
         sptr++;
         if(sptr>=wptr) return ErrEnd;           // Premature EOF
+        if(sptr[0]=='\r' || sptr[0]=='\n'){     // Check line-continuation
+          if(sptr[0]=='\r' && sptr+1<wptr && sptr[1]=='\n'){
+            offset++;
+            sptr++;
+            }
+          column=0;                             // Reset to line start
+          line++;                               // Add line
+          offset++;
+          sptr++;
+          continue;
+          }
+        column++;                               // Advance over escaped character
+        offset++;
+        sptr++;
+        continue;
       default:                                  // Normal characters
         column++;
         offset++;
@@ -929,7 +1164,7 @@ FXJSON::Error FXJSON::loadString(FXString& str){
 
 // Load identifier
 FXJSON::Error FXJSON::loadIdent(FXString& str){
-  FXuint cc;
+  FXuchar c,cc;
 
   // Empty
   str=FXString::null;
@@ -946,8 +1181,9 @@ FXJSON::Error FXJSON::loadIdent(FXString& str){
     FXASSERT(sptr<wptr);
 
     // Process characters
-    switch(sptr[0]){
-      case 'a':                                 // Allowed characters
+    c=sptr[0];
+    switch(c){
+      case 'a':                                 // Identifier characters
       case 'b':
       case 'c':
       case 'd':
@@ -1015,96 +1251,85 @@ FXJSON::Error FXJSON::loadIdent(FXString& str){
         offset++;
         sptr++;
         continue;
-      case '\xC0':                              // 2-byte UTF8 sequences
-      case '\xC1':
-      case '\xC2':
-      case '\xC3':
-      case '\xC4':
-      case '\xC5':
-      case '\xC6':
-      case '\xC7':
-      case '\xC8':
-      case '\xC9':
-      case '\xCA':
-      case '\xCB':
-      case '\xCC':
-      case '\xCD':
-      case '\xCE':
-      case '\xCF':
-      case '\xD0':
-      case '\xD1':
-      case '\xD2':
-      case '\xD3':
-      case '\xD4':
-      case '\xD5':
-      case '\xD6':
-      case '\xD7':
-      case '\xD8':
-      case '\xD9':
-      case '\xDA':
-      case '\xDB':
-      case '\xDC':
-      case '\xDD':
-      case '\xDE':
-      case '\xDF':
+      case 0xC0:                                // 2-byte UTF8 sequences
+      case 0xC1:
+      case 0xC2:
+      case 0xC3:
+      case 0xC4:
+      case 0xC5:
+      case 0xC6:
+      case 0xC7:
+      case 0xC8:
+      case 0xC9:
+      case 0xCA:
+      case 0xCB:
+      case 0xCC:
+      case 0xCD:
+      case 0xCE:
+      case 0xCF:
+      case 0xD0:
+      case 0xD1:
+      case 0xD2:
+      case 0xD3:
+      case 0xD4:
+      case 0xD5:
+      case 0xD6:
+      case 0xD7:
+      case 0xD8:
+      case 0xD9:
+      case 0xDA:
+      case 0xDB:
+      case 0xDC:
+      case 0xDD:
+      case 0xDE:
+      case 0xDF:
         if(sptr+1>=wptr) return ErrEnd;         // Premature EOF
         cc=Unicode::charCategory(wc(sptr));
-        if((CatLetterUpper<=cc && cc<=CatPunctConnector) || (CatMarkNonSpacing<=cc && cc<=CatMarkSpacingCombining)){
-          column++;
-          offset+=2;
-          sptr+=2;
-          continue;
-          }
-        str.append(rptr,sptr-rptr);
-        rptr=sptr;
-        return ErrOK;
-      case '\xE0':                              // 3-byte UTF8 sequences
-      case '\xE1':
-      case '\xE2':
-      case '\xE3':
-      case '\xE4':
-      case '\xE5':
-      case '\xE6':
-      case '\xE7':
-      case '\xE8':
-      case '\xE9':
-      case '\xEA':
-      case '\xEB':
-      case '\xEC':
-      case '\xED':
-      case '\xEE':
-      case '\xEF':
+        if(!(CatLetterUpper<=cc && cc<=CatPunctConnector) && !(CatMarkNonSpacing<=cc && cc<=CatMarkSpacingCombining)) goto eot;
+        column++;
+        offset+=2;
+        sptr+=2;
+        continue;
+      case 0xE0:                                // 3-byte UTF8 sequences
+      case 0xE1:
+      case 0xE2:
+      case 0xE3:
+      case 0xE4:
+      case 0xE5:
+      case 0xE6:
+      case 0xE7:
+      case 0xE8:
+      case 0xE9:
+      case 0xEA:
+      case 0xEB:
+      case 0xEC:
+      case 0xED:
+      case 0xEE:
+      case 0xEF:
         if(sptr+2>=wptr) return ErrEnd;         // Premature EOF
         cc=Unicode::charCategory(wc(sptr));
-        if((CatLetterUpper<=cc && cc<=CatPunctConnector) || (CatMarkNonSpacing<=cc && cc<=CatMarkSpacingCombining)){
-          column++;
-          offset+=3;
-          sptr+=3;
-          continue;
-          }
-        str.append(rptr,sptr-rptr);
-        rptr=sptr;
-        return ErrOK;
-      case '\xF0':                              // 4-byte UTF8 sequences
-      case '\xF1':
-      case '\xF3':
-      case '\xF4':
-      case '\xF5':
-      case '\xF6':
-      case '\xF7':
+        if(!(CatLetterUpper<=cc && cc<=CatPunctConnector) && !(CatMarkNonSpacing<=cc && cc<=CatMarkSpacingCombining)) goto eot;
+        column++;
+        offset+=3;
+        sptr+=3;
+        continue;
+      case 0xF0:                                // 4-byte UTF8 sequences
+      case 0xF1:
+      case 0xF2:
+      case 0xF3:
+      case 0xF4:
+      case 0xF5:
+      case 0xF6:
+      case 0xF7:
         if(sptr+3>=wptr) return ErrEnd;         // Premature EOF
         cc=Unicode::charCategory(wc(sptr));
-        if((CatLetterUpper<=cc && cc<=CatPunctConnector) || (CatMarkNonSpacing<=cc && cc<=CatMarkSpacingCombining)){
-          column++;
-          offset+=4;
-          sptr+=4;
-          continue;
-          }
-        str.append(rptr,sptr-rptr);
-        rptr=sptr;
-        return ErrOK;
-      default:                                  // End of token
-        str.append(rptr,sptr-rptr);
+        if(!(CatLetterUpper<=cc && cc<=CatPunctConnector) && !(CatMarkNonSpacing<=cc && cc<=CatMarkSpacingCombining)) goto eot;
+        column++;
+        offset+=4;
+        sptr+=4;
+        continue;
+      default:                                  // Not part of identifier
+eot:    str.append(rptr,sptr-rptr);
         rptr=sptr;
         return ErrOK;
       }
@@ -1270,7 +1495,7 @@ FXJSON::Error FXJSON::load(FXVariant& variant){
 
 // Save string after escaping it
 FXJSON::Error FXJSON::saveString(const FXString& str){
-  FXString string=escape(str,'"','"',esc);
+  FXString string=FXString::escape(str,'"','"',esc);
   if(!emit(string.text(),string.length())) return ErrSave;
   column+=string.count();
   offset+=string.length();
@@ -1532,7 +1757,6 @@ FXJSON::Error FXJSON::saveVariant(const FXVariant& var){
     }
   return ErrOK;
   }
-
 
 
 // Save a variant

@@ -224,9 +224,9 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	fxjpegio.lo fxjp2io.lo fxkeyboard.lo fxkeysym.lo fxmath.lo \
 	fxparsegeometry.lo fxpcxio.lo fxpngio.lo fxppmio.lo \
 	fxprintf.lo fxpriv.lo fxpsio.lo fxrasio.lo fxrgbio.lo \
-	fxscanf.lo fxstrtoll.lo fxstrtoull.lo fxstrtod.lo fxtargaio.lo \
-	fxtifio.lo fxunicode.lo fxutils.lo fxwebpio.lo fxwuquantize.lo \
-	fxxbmio.lo fxxpmio.lo icons.lo
+	fxscanf.lo fxstrtoll.lo fxstrtoull.lo fxstrtod.lo fxtabbify.lo \
+	fxtargaio.lo fxtifio.lo fxunicode.lo fxutils.lo fxwebpio.lo \
+	fxwuquantize.lo fxxbmio.lo fxxpmio.lo icons.lo
 libFOX_1_7_la_OBJECTS = $(am_libFOX_1_7_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -957,6 +957,7 @@ fxscanf.cpp \
 fxstrtoll.cpp \
 fxstrtoull.cpp \
 fxstrtod.cpp \
+fxtabbify.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \
@@ -1420,6 +1421,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxstrtod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxstrtoll.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxstrtoull.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxtabbify.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxtargaio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxtifio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fxunicode.Plo@am__quote@

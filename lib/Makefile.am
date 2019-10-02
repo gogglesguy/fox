@@ -513,6 +513,7 @@ fxscanf.cpp \
 fxstrtoll.cpp \
 fxstrtoull.cpp \
 fxstrtod.cpp \
+fxtabbify.cpp \
 fxtargaio.cpp \
 fxtifio.cpp \
 fxunicode.cpp \

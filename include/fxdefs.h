@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -190,7 +190,7 @@
 
 
 // Word size issues
-#if defined(_MSC_VER)           // Windows
+#if defined(_MSC_VER) || defined(__MINGW32__) // Windows
 #if defined(_WIN64)
 #define LLP64  1                // Long longs and pointers are 64 bit
 #else

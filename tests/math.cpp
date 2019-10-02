@@ -3,7 +3,7 @@
 *                              M a t h   T e s t                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -84,7 +84,7 @@ struct SPAccuracy {
   FXfloat worstrelarg;          // Argument passed to function
   FXfloat worstrelres;          // Desired result
   FXfloat worstrelact;          // Actual value returned
-  FXulong  errcount;            // Total number of errors
+  FXulong errcount;             // Total number of errors
   };
 
 
@@ -434,12 +434,6 @@ void testFloat(FLTFUN1 tf,FLTFUN1 rf,const char* name){
   fprintf(stderr,"\n");
   }
 
-//namespace FX {
-//extern FXAPI FXuint fxgetmxcsr();
-//extern FXAPI void fxsetmxcsr(FXuint mxcsr);
-//fxsetmxcsr(fxgetmxcsr() | 0x8040);    // FTZ and DAZ both on
-//fxsetmxcsr(fxgetmxcsr() & ~0x8040);    // FTZ and DAZ both off
-//}
 
 // Start
 int main(int argc,char *argv[]){

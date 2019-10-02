@@ -3,7 +3,7 @@
 *                          T h r e a d   S u p p o r t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -308,7 +308,7 @@ FXTime FXThread::time(){
 
 #if defined(WIN32)
 static FXTime frequency=0;
-#endif 
+#endif
 
 // Get steady time in nanoseconds since some arbitrary start time
 FXTime FXThread::steadytime(){
@@ -317,7 +317,7 @@ FXTime FXThread::steadytime(){
   FXTime now,s,f;
   FXASSERT(sizeof(FXTime)==sizeof(LARGE_INTEGER));
   if(__unlikely(frequency==0)){
-    ::QueryPerformanceFrequency((LARGE_INTEGER*)&frequency); 
+    ::QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
     }
   FXASSERT(frequency<FXLONG(9223372036));               // Overflow possible if CPU speed exceeds 9.2GHz
   ::QueryPerformanceCounter((LARGE_INTEGER*)&now);

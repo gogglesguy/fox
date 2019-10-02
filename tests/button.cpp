@@ -3,7 +3,7 @@
 *                                 Button Test                                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2018 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
