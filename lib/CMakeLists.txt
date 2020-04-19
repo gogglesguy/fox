@@ -665,6 +665,7 @@ set(SOURCES FX4Splitter.cpp
             fxstrtoull.cpp
             FXSwitcher.cpp
             FXSystem.cpp
+            fxtabbify.cpp
             FXTabBar.cpp
             FXTabBook.cpp
             FXTabItem.cpp
