@@ -403,8 +403,6 @@ set(SOURCES FX4Splitter.cpp
             fxbmpio.cpp
             FXButton.cpp
             FXBZFileStream.cpp
-            FXCalendar.cpp
-            FXCalendarView.cpp
             FXCanvas.cpp
             FXCheckButton.cpp
             FXChoiceBox.cpp
@@ -424,7 +422,6 @@ set(SOURCES FX4Splitter.cpp
             fxcompose.cpp
             FXComposite.cpp
             FXCondition.cpp
-            FXConsole.cpp
             FXCP1250Codec.cpp
             FXCP1251Codec.cpp
             FXCP1252Codec.cpp
@@ -475,10 +472,6 @@ set(SOURCES FX4Splitter.cpp
             FXDispatcher.cpp
             FXDisplay.cpp
             FXDLL.cpp
-            FXDockBar.cpp
-            FXDockHandler.cpp
-            FXDockSite.cpp
-            FXDockTitle.cpp
             FXDocument.cpp
             FXDragCorner.cpp
             FXDrawable.cpp
@@ -506,7 +499,6 @@ set(SOURCES FX4Splitter.cpp
             FXFontSelector.cpp
             FXFrame.cpp
             fxfsquantize.cpp
-            FXGauge.cpp
             fxgetticks.cpp
             FXGIFCursor.cpp
             FXGIFIcon.cpp
@@ -515,7 +507,6 @@ set(SOURCES FX4Splitter.cpp
             FXGLCanvas.cpp
             FXGLContext.cpp
             FXGLObject.cpp
-            FXGLViewer.cpp
             FXGLVisual.cpp
             FXGradientBar.cpp
             FXGroupBox.cpp
@@ -552,7 +543,6 @@ set(SOURCES FX4Splitter.cpp
             FXJSONString.cpp
             fxkeyboard.cpp
             fxkeysym.cpp
-            FXKnob.cpp
             FXKOI8RCodec.cpp
             FXLabel.cpp
             fxleaps.cpp
@@ -561,17 +551,8 @@ set(SOURCES FX4Splitter.cpp
             FXList.cpp
             FXLocale.cpp
             FXMainWindow.cpp
-            FXMat2d.cpp
-            FXMat2f.cpp
-            FXMat3d.cpp
-            FXMat3f.cpp
-            FXMat4d.cpp
-            FXMat4f.cpp
             fxmath.cpp
             FXMatrix.cpp
-            FXMDIButton.cpp
-            FXMDIChild.cpp
-            FXMDIClient.cpp
             FXMemMap.cpp
             FXMemoryStream.cpp
             FXMenuBar.cpp
@@ -617,8 +598,6 @@ set(SOURCES FX4Splitter.cpp
             fxpsio.cpp
             FXPtrList.cpp
             FXPtrQueue.cpp
-            FXQuatd.cpp
-            FXQuatf.cpp
             FXReactor.cpp
             FXRadioButton.cpp
             FXRandom.cpp
@@ -659,7 +638,6 @@ set(SOURCES FX4Splitter.cpp
             FXShutter.cpp
             FXSize.cpp
             FXSlider.cpp
-            FXSocket.cpp
             FXSphered.cpp
             FXSpheref.cpp
             FXSpinLock.cpp
@@ -719,11 +697,7 @@ set(SOURCES FX4Splitter.cpp
             FXVariantArray.cpp
             FXVariant.cpp
             FXVariantMap.cpp
-            FXVec2d.cpp
-            FXVec2f.cpp
-            FXVec3d.cpp
             FXVec3f.cpp
-            FXVec4d.cpp
             FXVec4f.cpp
             FXVerticalFrame.cpp
             FXVisual.cpp
@@ -731,7 +705,6 @@ set(SOURCES FX4Splitter.cpp
             FXWEBPImage.cpp
             fxwebpio.cpp
             FXWindow.cpp
-            FXWizard.cpp
             FXWorker.cpp
             FXWSQueue.cpp
             fxwuquantize.cpp
