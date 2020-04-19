@@ -503,7 +503,7 @@
 */
 
 // Debugging regex code
-#define REXDEBUG 1
+// #define REXDEBUG 1
 
 // As close to infinity as we're going to get; this seems big enough.  We can not make
 // it too large as this may wrap around when added to something else!
