@@ -46,7 +46,7 @@ namespace FXSystem {
   extern FXAPI void systemTimeFromTime(Time& st,FXTime ns);
 
 
-  /// Default formatting string used for time formatting
+  /// Default formatting (mm/dd/yyyy hh:mm:ss) string used for time formatting
   extern FXAPI const FXchar defaultTimeFormat[];
 
   /// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hh:mm) formatting string
@@ -82,12 +82,15 @@ namespace FXSystem {
 
   /// Return offset between standard local time zone to UTC, in nanoseconds
   extern FXAPI FXTime localTimeZoneOffset();
-  
-  /// Return time zone name (or daylight savings time time zone name)
-  extern FXAPI FXString localTimeZoneName(FXbool dst=false);
 
   /// Return offset daylight savings time to standard time, in nanoseconds
   extern FXAPI FXTime daylightSavingsOffset();
+
+  /// Return 1 if daylight savings time is active at Unix Epoch time
+  extern FXAPI FXTime daylightSavingsActive(FXTime ns);
+
+  /// Return time zone name (or daylight savings time time zone name)
+  extern FXAPI FXString localTimeZoneName(FXbool dst=false);
 
 
   /// Convert NTP format (ssss:ffff) to nanoseconds since Unix Epoch
@@ -95,8 +98,8 @@ namespace FXSystem {
 
   /// Convert nanoseconds since Unix Epoch to NTP (ssss:ffff)
   extern FXAPI FXulong ntpTimeFromTime(FXTime ns);
-  
-  
+
+
   /// Format UTC nanoseconds since Unix Epoch to date-time string using given format
   extern FXAPI FXString universalTime(FXTime ns,const FXchar *format=defaultTimeFormat);
 

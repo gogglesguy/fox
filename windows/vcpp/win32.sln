@@ -193,6 +193,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glviewer", "glviewer\glview
 		{F9B16000-8A41-4A18-A602-8E1CA609C6B3} = {F9B16000-8A41-4A18-A602-8E1CA609C6B3}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timefmt", "timefmt\timefmt.vcproj", "{19AFCEA0-004A-4940-AAE0-CF443C0D51BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9B16000-8A41-4A18-A602-8E1CA609C6B3} = {F9B16000-8A41-4A18-A602-8E1CA609C6B3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -351,6 +356,10 @@ Global
 		{EA883171-E1F8-432C-8B45-FE67CC7BCDD2}.Debug|Win32.Build.0 = Debug|Win32
 		{EA883171-E1F8-432C-8B45-FE67CC7BCDD2}.Release|Win32.ActiveCfg = Release|Win32
 		{EA883171-E1F8-432C-8B45-FE67CC7BCDD2}.Release|Win32.Build.0 = Release|Win32
+		{19AFCEA0-004A-4940-AAE0-CF443C0D51BB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{19AFCEA0-004A-4940-AAE0-CF443C0D51BB}.Debug|Win32.Build.0 = Debug|Win32
+		{19AFCEA0-004A-4940-AAE0-CF443C0D51BB}.Release|Win32.ActiveCfg = Release|Win32
+		{19AFCEA0-004A-4940-AAE0-CF443C0D51BB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

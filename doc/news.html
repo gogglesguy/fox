@@ -17,6 +17,25 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 6 - FOX DEVELOPMENT 1.7.71
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXSystem::Time not initialized inside FXSystem::systemTimeParse(); must initialize 
+to zero prior to call. Reason: need to be able to determine what fields were actually
+set during the parse.</li>
+<li>Added FXSystem::daylightSavingsActive() API.  Determines if daylight savings time in effect
+at the given time.</li>
+<li>On Windows, FXSystem::daylightSavingsActive() uses TIME_ZONE_INFORMATION to determine when
+daylight savings is to be switched.  But Linux and Windows versions may need additional work.</li>
+<li>FXSystem::localTimeZoneName() returns time zone name as known by O.S.  Note its returned as
+UTF8 string.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 June 28 - FOX DEVELOPMENT 1.7.70
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

@@ -41,6 +41,13 @@ using namespace FX;
 
 namespace FX {
 
+// Time units in terms of nanoseconds
+static const FXTime seconds=1000000000;
+static const FXTime minutes=60*seconds;
+static const FXTime hours=60*minutes;
+static const FXTime days=24*hours;
+
+
 // Default formatting string used for time formatting
 const FXchar FXSystem::defaultTimeFormat[]="%m/%d/%Y %H:%M:%S";
 
@@ -48,12 +55,6 @@ const FXchar FXSystem::defaultTimeFormat[]="%m/%d/%Y %H:%M:%S";
 // ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hhmm) formatting string
 const FXchar FXSystem::isoTimeFormat[]="%FT%T%z";
 
-
-// Time zone variables, set only once
-static volatile FXuint local_zone_offset_set=0;  // Called already?
-static FXTime          local_zone_offset=0;      // Offset local to UTC (ns)
-static FXTime          local_dst_offset=0;       // Offset daylight savings to UTC (ns)
-static FXchar          local_zone_name[2][32];   // Local zone name (regular and daylight savings)
 
 // Cumulative days of the year, for non-leap-years and leap-years
 static const FXint days_of_year[2][13]={
@@ -116,7 +117,6 @@ void FXSystem::civilFromDays(FXint& y,FXint& m,FXint& d,FXlong z){
 
 // Compute nanoseconds since Unix Epoch from struct tm
 FXTime FXSystem::timeFromSystemTime(const Time& st){
-  const FXTime seconds=1000000000;
   FXint year=st.year;
   FXint month=st.month;
   FXint day=st.mday;
@@ -177,10 +177,6 @@ FXTime FXSystem::timeFromSystemTime(const Time& st){
 
 // Return system time from number of nanoseconds since Epoch
 void FXSystem::systemTimeFromTime(Time& st,FXTime ns){
-  const FXTime seconds=1000000000;
-  const FXTime minutes=60*seconds;
-  const FXTime hours=60*minutes;
-  const FXTime days=24*hours;
 
   // Compute days from nanoseconds, rounding down
   FXlong zz=(0<=ns ? ns : ns-(days-1))/days;
@@ -216,60 +212,227 @@ void FXSystem::systemTimeFromTime(Time& st,FXTime ns){
 
 /*******************************************************************************/
 
-//BOOL SystemTimeToTzSpecificLocalTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpUniversalTime,LPSYSTEMTIME lpLocalTime);
-//BOOL TzSpecificLocalTimeToSystemTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpLocalTime,LPSYSTEMTIME lpUniversalTime);
 
-// Setup timezone information
-static void setuplocaltimezone(){
+// Time zone variables, set only once
+static volatile FXuint local_zone_set=0;
+
 #if defined(_WIN32)
-  const FXTime seconds=1000000000;
-  const FXTime minutes=60*seconds;
-  const FXTime hours=60*minutes;
-  if(atomicSet(&local_zone_offset_set,1)==0){
-    TIME_ZONE_INFORMATION tzi;
-    clearElms(&tzi,1);
-    GetTimeZoneInformation(&tzi);
-    local_zone_offset=minutes*tzi.Bias;
-    local_dst_offset=0;
-    strncpy(local_zone_name[0],tzi.StandardName,ARRAYNUMBER(local_zone_name[0])-1);
-    strncpy(local_zone_name[1],tzi.DaylightName,ARRAYNUMBER(local_zone_name[1])-1);
-    if(tzi.StandardDate.wMonth!=0 && tzi.DaylightDate.wMonth!=0){
-      local_dst_offset=minutes*tzi.DaylightBias;
-      }
-    }
-#else
-  const FXTime seconds=1000000000;
-  const FXTime minutes=60*seconds;
-  const FXTime hours=60*minutes;
-  if(atomicSet(&local_zone_offset_set,1)==0){
-    tzset();
-    local_zone_offset=seconds*timezone;
-    local_dst_offset=-hours*daylight;
-    strncpy(local_zone_name[0],tzname[0],ARRAYNUMBER(local_zone_name[0])-1);
-    strncpy(local_zone_name[1],tzname[1],ARRAYNUMBER(local_zone_name[1])-1);
-    }
+//
+// The Windows TIME_ZONE_INFORMATION struct contains:
+//
+//   struct TIME_ZONE_INFORMATION {
+//     LONG       Bias;                 // UTC = localtime + bias (minutes)
+//     WCHAR      StandardName[32];     // Standard time name
+//     SYSTEMTIME StandardDate;         // Time when daylight saving to standard time occurs
+//     LONG       StandardBias;         // Value added to Bias during standard time (most zones = 0)
+//     WCHAR      DaylightName[32];     // Daylight savings time name
+//     SYSTEMTIME DaylightDate;         // Time when standard time to daylight savings time occurs
+//     LONG       DaylightBias;         // Value added to Bias during daylight savings time (most zones = -60)
+//     };
+//
+// While the Windows SYSTEMTIME struct contains:
+//
+//   struct SYSTEMTIME {
+//     WORD wYear;                      // Year, 1601..
+//     WORD wMonth;                     // Month, january..december (1..12)
+//     WORD wDayOfWeek;                 // Day of week, sunday..monday (0..7)
+//     WORD wDay;                       // Day of month, (1..31) [SEE NOTES BELOW]
+//     WORD wHour;                      // Hour (0..23)
+//     WORD wMinute;                    // Minutes (0..59)
+//     WORD wSecond;                    // Seconds (0..59)
+//     WORD wMilliseconds;              // Milliseconds (0..999)
+//     };
+//
+static TIME_ZONE_INFORMATION tzi;
 #endif
+
+
+// Call tzset() only once
+static void setuplocaltimezone(){
+  if(atomicSet(&local_zone_set,1)==0){
+#if defined(_WIN32)
+    GetTimeZoneInformation(&tzi);
+#else
+    tzset();
+#endif
+    }
   }
 
 
 // Return offset between standard local time zone to UTC, in nanoseconds
 FXTime FXSystem::localTimeZoneOffset(){
   setuplocaltimezone();
-  return local_zone_offset;
-  }
-
-
-// Return time zone name (or daylight savings time time zone name)
-FXString FXSystem::localTimeZoneName(FXbool dst){
-  setuplocaltimezone();
-  return local_zone_name[dst];
+#if defined(_WIN32)
+  return minutes*tzi.Bias; // +minutes*tzi.StandardBias;
+#else
+  return seconds*timezone;
+#endif
   }
 
 
 // Return offset daylight savings time to standard time, in nanoseconds
 FXTime FXSystem::daylightSavingsOffset(){
   setuplocaltimezone();
-  return local_dst_offset;
+#if defined(_WIN32)
+  return minutes*tzi.DaylightBias;      // Or difference between standard and daylight bias.
+#else
+  return -hours*seconds*daylight;
+#endif
+  }
+
+
+// Return time zone name (or daylight savings time time zone name)
+FXString FXSystem::localTimeZoneName(FXbool dst){
+  setuplocaltimezone();
+#if defined(_WIN32)
+  return FXString(dst?tzi.DaylightName:tzi.StandardName);
+#else
+  return FXString(tzname[dst]);
+#endif
+  }
+
+
+#if defined(WIN32)
+
+// Convert ns since 01/01/1970 to 100ns since 01/01/1601
+static inline FXTime fxwintime(FXTime ut){
+  return ut/FXLONG(100)+FXLONG(116444736000000000);
+  }
+
+
+// Compare incoming date cur against changeover date chg; there are
+// two ways to compare the numbers.
+// When chg.wYear!=0, the change over occurs only once on the indicated
+// absolute time.
+// If chg.wYear==0, the switch between standard and daylight savings time
+// occurs yearly, on the nth occurrence of wDayOfWeek, where n is given
+// in the wDay variable of the TIME_ZONE_INFORMATION StandardDate or
+// DaylightDate struct.
+static FXint compare_zone_switch_over(const SYSTEMTIME& cur,const SYSTEMTIME& chg){
+  static const FXint month_lengths[12]={31,28,31,30,31,30,31,31,30,31,30,31};
+  FXint cursecs,chgsecs,chgday,first,last;
+
+  // Absolute date
+  if(chg.wYear){
+    if(cur.wYear==chg.wYear){
+      if(cur.wMonth==chg.wMonth){
+        if(cur.wDay==chg.wDay){
+          cursecs=(cur.wHour*60+cur.wMinute)*60+cur.wSecond;
+          chgsecs=(chg.wHour*60+chg.wMinute)*60+chg.wSecond;
+          return cursecs-chgsecs;
+          }
+        return cur.wDay-chg.wDay;
+        }
+      return cur.wMonth-chg.wMonth;
+      }
+    return cur.wYear-chg.wYear;
+    }
+
+  // Relative date
+  if(cur.wMonth==chg.wMonth){
+
+    // Calculate the day of the first wDayOfWeek in the month
+    first=(6+chg.wDayOfWeek-cur.wDayOfWeek+cur.wDay)%7+1;
+
+    // Check needed for the 5th weekday of the month
+    last=month_lengths[cur.wMonth-1]+(cur.wMonth==2 && is_leap(cur.wYear));
+
+    // Switch at the nth occurrence (value in chg.wDay) of certain day of week
+    chgday=first+7*(chg.wDay-1);
+    if(chgday>last) chgday-=7;
+
+    chgsecs=((chgday*24+chg.wHour)*60+chg.wMinute)*60+chg.wSecond;
+    cursecs=((cur.wDay*24+cur.wHour)*60+cur.wMinute)*60+cur.wSecond;
+    return cursecs-chgsecs;
+    }
+  return (FXint)cur.wMonth-(FXint)chg.wMonth;
+  }
+
+
+// Determine if daylight savings in effect
+// The daylight savings time switch is tied to local time, and local
+// time's year is tied to time zone.  However, time zone is a function
+// of the local year [time zone info can change from year to year].
+// We assume that the time zone is relatively stable, but we may
+// call GetTimeZoneInformationForYear() in a future revision to
+// obtain only DST/STD time switches, which are changed more rapidly.
+static FXint daylightSavingsState(FXTime ns,FXbool local){
+
+  // Expanded date/time
+  SYSTEMTIME loc;
+
+  // Assume local time
+  FXTime ftloc=ns;
+  FXTime ftdst=ns;
+  FXTime ftstd=ns;
+
+  // If UTC, convert to local using
+  if(!local){
+    ftloc=ftloc-tzi.Bias*minutes;
+    ftdst=ftloc-tzi.DaylightBias*minutes;
+    ftstd=ftloc-tzi.StandardBias*minutes;
+    }
+
+  // Convert to windows time
+  ftloc=fxwintime(ftloc);
+
+  // Get expanded date/time
+  FileTimeToSystemTime((const FILETIME*)&ftloc,&loc);
+
+  // If wMonth is zero then no daylight savings in effect
+  if(tzi.DaylightDate.wMonth && tzi.StandardDate.wMonth){
+
+    // Convert UNIX Epoch to windows time
+    ftdst=fxwintime(ftdst);
+    ftstd=fxwintime(ftstd);
+
+    // Expanded date/time
+    SYSTEMTIME dst;
+    SYSTEMTIME std;
+
+    // Get expanded date/time
+    FileTimeToSystemTime((const FILETIME*)&ftdst,&dst);
+    FileTimeToSystemTime((const FILETIME*)&ftstd,&std);
+
+    // Daylight savings time prior to switch to standard time
+    FXbool before_std_date=(compare_zone_switch_over(dst,tzi.StandardDate)<0);
+
+    // Standard time after switch to daylight savings time
+    FXbool after_dst_date=(compare_zone_switch_over(std,tzi.DaylightDate)>=0);
+
+    // Northern hemisphere
+    if(tzi.DaylightDate.wMonth<tzi.StandardDate.wMonth){
+      if(before_std_date && after_dst_date) return 1;
+      }
+
+    // Southern hemisphere
+    else{
+      if(before_std_date || after_dst_date) return 1;
+      }
+    }
+  return 0;
+  }
+
+#endif
+
+
+// Return 1 if daylight savings time is active at Unix Epoch time
+FXTime FXSystem::daylightSavingsActive(FXTime ns){
+  setuplocaltimezone();
+#if defined(_WIN32)
+  return daylightSavingsState(ns,false);
+#elif defined(HAVE_LOCALTIME_R)
+  struct tm tmresult;
+  time_t tmp=(time_t)(ns/seconds);
+  struct tm* ptm=localtime_r(&tmp,&tmresult);
+  FXTRACE((1,"FXSystem::daylightSavingsActive(%lld) = %d\n",ns,ptm && ptm->tm_isdst!=0));
+  return ptm && ptm->tm_isdst!=0;
+#else
+  time_t tmp=(time_t)(ns/seconds);
+  struct tm* ptm=localtime(&tmp);
+  FXTRACE((1,"FXSystem::daylightSavingsActive(%lld) = %d\n",ns,ptm && ptm->tm_isdst!=0));
+  return ptm && ptm->tm_isdst!=0;
+#endif
   }
 
 /*******************************************************************************/
@@ -283,12 +446,12 @@ FXString FXSystem::universalTime(FXTime ns,const FXchar *format){
 
 
 // Parse utc date-time string to UTC nanoseconds since Unix Epoch using given format
-// Assume string is time in UTC, unless a time zone offset was parsed; in that 
+// Assume string is time in UTC, unless a time zone offset was parsed; in that
 // case, adjust the time according to the zone offset.
 FXTime FXSystem::universalTime(const FXchar* string,const FXchar* format){
   FXSystem::Time st={0,0,0,0,0,0,0,0,0,0};
   if(FXSystem::systemTimeParse(st,string,format)){
-    return FXSystem::timeFromSystemTime(st)+st.offset*FXLONG(1000000000);
+    return FXSystem::timeFromSystemTime(st)+st.offset*seconds;
     }
   return forever;
   }
@@ -303,21 +466,21 @@ FXTime FXSystem::universalTime(const FXString& string,const FXchar* format){
 
 // Format UTC nanoseconds since Unix Epoch to local date-time string using given format
 FXString FXSystem::localTime(FXTime ns,const FXchar *format){
-  FXTime zoneoffset=FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset(); 
-  FXSystem::Time st={0,0,0,0,0,0,0,0,0,zoneoffset/FXLONG(1000000000)};
-  FXSystem::systemTimeFromTime(st,ns-zoneoffset); 
+  FXTime zoneoffset=FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset()*FXSystem::daylightSavingsActive(ns);
+  FXSystem::Time st={0,0,0,0,0,0,0,0,0,(FXint)(zoneoffset/seconds)};
+  FXSystem::systemTimeFromTime(st,ns-zoneoffset);
   return FXSystem::systemTimeFormat(st,format);
   }
 
 
 // Parse local date-time string to UTC nanoseconds since Unix Epoch using given format
-// Assume string is time in local time, unless a time zone offset was parsed; in that 
+// Assume string is time in local time, unless a time zone offset was parsed; in that
 // case, adjust the time according to the zone offset.
 FXTime FXSystem::localTime(const FXchar* string,const FXchar* format){
-  FXTime zoneoffset=FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset(); 
-  FXSystem::Time st={0,0,0,0,0,0,0,0,0,zoneoffset/FXLONG(1000000000)};
+  FXSystem::Time st={0,0,0,0,0,0,0,0,0,0};
   if(FXSystem::systemTimeParse(st,string,format)){
-    return FXSystem::timeFromSystemTime(st)+st.offset*FXLONG(1000000000);
+    //FXTime zoneoffset=FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset()*FXSystem::daylightSavingsActive(FXThread::time());
+    return FXSystem::timeFromSystemTime(st)+st.offset*seconds;
     }
   return forever;
   }

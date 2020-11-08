@@ -182,13 +182,12 @@ FXbool FXStat::isOtherExecutable() const {
   }
 
 
-#ifdef WIN32
+#if defined(WIN32)
 
 // Convert 100ns since 01/01/1601 to ns since 01/01/1970
 static inline FXTime fxunixtime(FXTime ft){
   return (ft-FXLONG(116444736000000000))*FXLONG(100);
   }
-
 
 // Convert ns since 01/01/1970 to 100ns since 01/01/1601
 static inline FXTime fxwintime(FXTime ut){
@@ -214,7 +213,6 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
-//    FXnchar* unifile=(FXnchar*)alloca(file.length()*sizeof(FXnchar)+sizeof(FXnchar));
     FXnchar unifile[MAXPATHLEN];
     HANDLE hfile;
     utf2ncs(unifile,file.text(),MAXPATHLEN);

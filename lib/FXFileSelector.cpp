@@ -1075,24 +1075,7 @@ void FXFileSelector::setFilename(const FXString& path){
   dirbox->setDirectory(filebox->getDirectory());
   filename->setText(name);
   }
-/*
-*/
 
-
-/*
-// Set file name
-void FXFileSelector::setFilename(const FXString& path){
-  FXString fullname(FXPath::absolute(path));
-  filebox->setCurrentFile(fullname);
-  dirbox->setDirectory(filebox->getDirectory());
-  if(selectmode==SELECTFILE_ANY){
-    filename->setText(FXPath::name(fullname));
-    }
-  else if(0<=filebox->getCurrentItem()){
-    filename->setText(filebox->getItemFilename(filebox->getCurrentItem()));
-    }
-  }
-*/
 
 // Get complete path + filename
 FXString FXFileSelector::getFilename() const {

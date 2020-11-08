@@ -285,13 +285,28 @@ void FXThread::yield(){
   }
 
 
+#if defined(WIN32)
+
+// Convert 100ns since 01/01/1601 to ns since 01/01/1970
+static inline FXTime fxunixtime(FXTime ft){
+  return (ft-FXLONG(116444736000000000))*FXLONG(100);
+  }
+
+// Convert ns since 01/01/1970 to 100ns since 01/01/1601
+static inline FXTime fxwintime(FXTime ut){
+  return ut/FXLONG(100)+FXLONG(116444736000000000);
+  }
+
+#endif
+
+
 // Get time in nanoseconds since Epoch
 FXTime FXThread::time(){
 #if defined(WIN32)
   FXTime now;
   FXASSERT(sizeof(FXTime)==sizeof(FILETIME));
   GetSystemTimeAsFileTime((FILETIME*)&now);
-  return (now-FXLONG(116444736000000000))*FXLONG(100);
+  return fxunixtime(now);
 #elif (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec ts;
@@ -430,7 +445,7 @@ DWORD WaitForSingleObject(HANDLE hHandle,DWORD  dwMilliseconds);
 // Wake at appointed absolute time
 void FXThread::wakeat(FXTime nsec){
 #if defined(WIN32)
-  FXTime jiffies=nsec/FXLONG(100)+FXLONG(116444736000000000);
+  FXTime jiffies=fxwintime(nsec);
   if(0<=jiffies){
     fxNtDelayExecution((BOOLEAN)false,(LARGE_INTEGER*)&jiffies);
     }
