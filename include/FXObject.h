@@ -27,6 +27,10 @@
 
 namespace FX {
 
+
+class FXStream;
+
+
 /// Macro to set up class declaration
 #define FXDECLARE(classname) \
   public: \

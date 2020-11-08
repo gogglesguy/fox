@@ -68,6 +68,7 @@
 #include "FXListBox.h"
 #include "FXDriveBox.h"
 #include "FXDictionary.h"
+#include "FXDictionaryOf.h"
 #include "FXIconCache.h"
 #include "FXFileAssociations.h"
 #include "icons.h"

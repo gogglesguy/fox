@@ -78,6 +78,12 @@ public:
   FXQuatd(const FXVec3d& ex,const FXVec3d& ey,const FXVec3d& ez);
 
   /**
+  * Construct quaternion from rotation vector rot, representing a rotation 
+  * by |rot| radians about a unit vector rot/|rot|. 
+  */
+  FXQuatd(const FXVec3d& rot);
+
+  /**
   * Return a non-const reference to the ith element.
   */
   FXdouble& operator[](FXint i){return (&x)[i];}

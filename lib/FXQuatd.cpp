@@ -77,6 +77,13 @@ FXQuatd::FXQuatd(const FXVec3d& ex,const FXVec3d& ey,const FXVec3d& ez){
   }
 
 
+// Construct quaternion from rotation vector rot, representing a rotation 
+// by |rot| radians about a unit vector rot/|rot|. 
+FXQuatd::FXQuatd(const FXVec3d& rot){
+  setRotation(rot);
+  }
+
+
 // Adjust quaternion length
 FXQuatd& FXQuatd::adjust(){
   FXdouble mag2(x*x+y*y+z*z+w*w);

@@ -214,6 +214,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
+//    FXnchar* unifile=(FXnchar*)alloca(file.length()*sizeof(FXnchar)+sizeof(FXnchar));
     FXnchar unifile[MAXPATHLEN];
     HANDLE hfile;
     utf2ncs(unifile,file.text(),MAXPATHLEN);

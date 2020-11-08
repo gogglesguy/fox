@@ -57,6 +57,7 @@
 #include "FXMenuCheck.h"
 #include "FXMenuSeparator.h"
 #include "FXDictionary.h"
+#include "FXDictionaryOf.h"
 #include "FXIconCache.h"
 #include "FXFileAssociations.h"
 #include "FXMessageBox.h"

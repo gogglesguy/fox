@@ -248,6 +248,17 @@ extern FXAPI FXuint fpBits(FXfloat x);
 extern FXAPI FXulong fpBits(FXdouble x);
 
 
+/// Evaluate integer (a < b) ? x : y
+static inline FXint iblend(FXint a,FXint b,FXint x,FXint y){
+  return a<b ? x : y;
+  }
+
+/// Evaluate long integer (a < b) ? x : y
+static inline FXlong iblend(FXlong a,FXlong b,FXlong x,FXlong y){
+  return a<b ? x : y;
+  }
+
+
 /// Minimum if two integers
 static inline FXint imin(FXint x,FXint y){
   return (x<y)?x:y;
@@ -277,7 +288,7 @@ static inline FXint iabs(FXint x){
 
 /// Absolute value of long
 static inline FXlong iabs(FXlong x){
-  return 0L<x?x:-x;
+  return 0<x?x:-x;
   }
 
 
@@ -397,6 +408,18 @@ static inline FXdouble fmod(FXdouble x,FXdouble y){
   }
 
 
+/// Evaluate single-precision (a < b) ? x : y
+static inline FXfloat fblend(FXfloat a,FXfloat b,FXfloat x,FXfloat y){
+  return a<b ? x : y;
+  }
+
+
+/// Evaluate double-precision (a < b) ? x : y
+static inline FXdouble fblend(FXdouble a,FXdouble b,FXdouble x,FXdouble y){
+  return a<b ? x : y;
+  }
+
+
 /// Single precision copy sign of y and apply to magnitude of x
 static inline FXfloat copysign(FXfloat x,FXfloat y){
 #if defined(NO_COPYSIGNF)
@@ -503,20 +526,20 @@ static inline FXdouble rint(FXdouble x){ return ::rint(x); }
 
 
 /// Single precision round to nearest integer
-static inline FXint lrint(FXfloat x){ 
+static inline FXint lrint(FXfloat x){
 #if defined(NO_LRINTF)
   return (FXint)(x+Math::copysign(0.5f,x));
 #else
-  return ::lrintf(x); 
+  return ::lrintf(x);
 #endif
  }
 
 /// Double precision round to nearest integer
-static inline FXlong lrint(FXdouble x){ 
+static inline FXlong lrint(FXdouble x){
 #if defined(NO_LRINT)
  return (FXlong)(x+Math::copysign(0.5,x));
 #else
- return ::lrint(x); 
+ return ::lrint(x);
 #endif
  }
 

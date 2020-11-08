@@ -77,6 +77,13 @@ inline void copyElms(EType* dst,const OType* src,FXuval n){
   }
 
 
+/// Bit-wise copy elements from overlapping place to another
+template<typename EType>
+inline void bitcopyElms(EType* dst,const EType* src,FXuval n){
+  memcpy((void*)dst,(const void*)src,n*sizeof(EType));
+  }
+
+
 /// Move some elements from overlapping place to another
 template<typename EType>
 inline void moveElms(EType* dst,const EType* src,FXuval n){
@@ -88,6 +95,13 @@ inline void moveElms(EType* dst,const EType* src,FXuval n){
     src+=n;
     while(n--){ *--dst = *--src; }
     }
+  }
+
+
+/// Bit-wise move elements from overlapping place to another
+template<typename EType>
+inline void bitmoveElms(EType* dst,const EType* src,FXuval n){
+  memmove((void*)dst,(const void*)src,n*sizeof(EType));
   }
 
 

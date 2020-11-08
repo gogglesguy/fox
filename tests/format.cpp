@@ -7,6 +7,7 @@
 ********************************************************************************/
 #include "fx.h"
 //#include <locale.h>
+#include <time.h>
 
 
 /*
@@ -94,6 +95,7 @@ const FXuint doubleinf[2]={0x00000000,0x7ff00000};
 
 const FXchar *intformat[]={
   "%d",
+  "%0d",
   "%'d",
   "%02x",
   "%0.2x",
@@ -147,11 +149,10 @@ void specialcases(const char* fmt){
     }
   }
 
-
 // Start
 int main(int argc,char* argv[]){
   FXchar buffer[1024];
-  FXuint x,y;
+  FXuval x,y;
 
   //setlocale(LC_ALL,"");
 
@@ -238,6 +239,8 @@ int main(int argc,char* argv[]){
 
   __snprintf(buffer,sizeof(buffer),"%#.3g",0.0);
   fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%#.3g",buffer);
+
+  fprintf(stdout,"\n");
 
   return 0;
   }

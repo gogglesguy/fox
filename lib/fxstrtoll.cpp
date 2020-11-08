@@ -28,7 +28,7 @@
 /*
   Notes:
   - Thread-safe conversion of strings to signed long and int, with extra parameter
-    for conversion success.
+    'ok' for conversion success.
 */
 
 

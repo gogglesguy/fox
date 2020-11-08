@@ -34,7 +34,7 @@ public:
   FXPtrList();
 
   /// Copy constructor
-  FXPtrList(const FXPtrList& src);
+  FXPtrList(const FXPtrList& other);
 
   /// Construct and init with single object
   FXPtrList(FXptr object);
@@ -46,10 +46,10 @@ public:
   FXPtrList(FXptr* objects,FXival n);
 
   /// Assignment operator
-  FXPtrList& operator=(const FXPtrList& src);
+  FXPtrList& operator=(const FXPtrList& other);
 
-  /// Adopt objects from src, leaving src empty
-  FXPtrList& adopt(FXPtrList& src);
+  /// Adopt objects from other, leaving other empty
+  FXPtrList& adopt(FXPtrList& other);
 
   /// Return number of objects
   FXival no() const { return *((FXival*)(ptr-1)); }

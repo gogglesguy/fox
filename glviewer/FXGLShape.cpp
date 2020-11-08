@@ -216,13 +216,19 @@ void FXGLShape::draw(FXGLViewer* viewer){
 
   // Save attributes and matrix
 //  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_LIGHTING_BIT|GL_POINT_BIT|GL_LINE_BIT|GL_POLYGON_BIT);
-//  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_LIGHTING_BIT|GL_POINT_BIT|GL_LINE_BIT);
-  glPushAttrib(GL_CURRENT_BIT|GL_LIGHTING_BIT|GL_POINT_BIT|GL_LINE_BIT);
+  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_LIGHTING_BIT|GL_POINT_BIT|GL_LINE_BIT);
+//  glPushAttrib(GL_CURRENT_BIT|GL_LIGHTING_BIT|GL_POINT_BIT|GL_LINE_BIT);
   glPushMatrix();
 
   // Object position
   glTranslatef(position[0],position[1],position[2]);
 
+  // Blending
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+  glEnable(GL_CULL_FACE);
+  
   // Draw full object
   if(!viewer->doesTurbo()){
 
@@ -262,6 +268,7 @@ void FXGLShape::draw(FXGLViewer* viewer){
       glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,material[0].emission);
       glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,material[0].shininess);
       }
+
 
     // Surface
     if(options&STYLE_SURFACE){

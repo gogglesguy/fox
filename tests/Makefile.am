@@ -46,6 +46,7 @@ switcher \
 tabbook \
 table \
 thread \
+timefmt \
 unicode \
 variant \
 wizard \
@@ -54,6 +55,7 @@ gltest
 
 gaugetest_SOURCES       = gaugetest.cpp
 format_SOURCES          = format.cpp
+timefmt_SOURCES         = timefmt.cpp
 scan_SOURCES            = scan.cpp
 console_SOURCES         = console.cpp
 thread_SOURCES          = thread.cpp

@@ -257,6 +257,16 @@ public:
   * Get thread's processor affinity.
   */
   FXulong affinity() const;
+  
+  /**
+  * Change thread description.
+  */
+  FXbool description(const FXString& desc);
+
+  /**
+  * Return thread description, if any.
+  */
+  FXString description() const;
 
   /**
   * Suspend thread; return true if success.

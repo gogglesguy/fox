@@ -1077,14 +1077,14 @@ void FXTable::recalc(){
 
 // Get default width
 FXint FXTable::getDefaultWidth(){
-  register FXint rw=(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) ? rowHeader->getWidth() : rowHeader->getDefaultWidth();
+  FXint rw=(rowHeader->getLayoutHints()&LAYOUT_FIX_WIDTH) ? rowHeader->getWidth() : rowHeader->getDefaultWidth();
   return 0<visiblecols ? visiblecols*defColWidth+vgrid+rw : FXScrollArea::getDefaultWidth()+rw;
   }
 
 
 // Get default height
 FXint FXTable::getDefaultHeight(){
-  register FXint ch=(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) ? colHeader->getHeight() : colHeader->getDefaultHeight();
+  FXint ch=(colHeader->getLayoutHints()&LAYOUT_FIX_HEIGHT) ? colHeader->getHeight() : colHeader->getDefaultHeight();
   return 0<visiblerows ? visiblerows*defRowHeight+hgrid+ch : FXScrollArea::getDefaultHeight()+ch;
   }
 

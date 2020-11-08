@@ -1031,6 +1031,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\fxbase64.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxbase85.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXBitmap.cpp"
 			>
 			<FileConfiguration
@@ -1684,6 +1692,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXComplexf.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxcompose.cpp"
 			>
 		</File>
 		<File
@@ -2875,6 +2887,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXDictionaryOf.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXDir.cpp"
 			>
 			<FileConfiguration
@@ -3042,6 +3058,22 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXDirWatch.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXDispatcher.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXDispatcher.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXDisplay.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXDisplay.h"
 			>
 		</File>
 		<File
@@ -3301,6 +3333,18 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXEvent.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXEventDispatcher.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXEventDispatcher.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXEventLoop.cpp"
 			>
 		</File>
 		<File
@@ -4184,6 +4228,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXHashOf.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXHeader.cpp"
 			>
 			<FileConfiguration
@@ -4616,6 +4664,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXIOBuffer.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXIODevice.cpp"
 			>
 			<FileConfiguration
@@ -4797,6 +4849,18 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXJSON.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXJSONFile.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXJSONString.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\fxkeyboard.cpp"
 			>
 			<FileConfiguration
@@ -4925,6 +4989,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXLabel.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxleaps.cpp"
 			>
 		</File>
 		<File
@@ -5747,6 +5815,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXMutex.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\fxntp.cpp"
 			>
 		</File>
 		<File
@@ -6752,6 +6824,18 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXReactor.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXReactor.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXReactorCore.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXReadWriteLock.cpp"
 			>
 			<FileConfiguration
@@ -6980,6 +7064,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXReverseDictionaryOf.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXRex.cpp"
 			>
 			<FileConfiguration
@@ -7192,6 +7280,10 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXScopedThread.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXScrollArea.cpp"
 			>
 			<FileConfiguration
@@ -7351,6 +7443,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXSemaphore.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXSemaQueue.cpp"
 			>
 		</File>
 		<File
@@ -8014,6 +8110,18 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXSystem.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXSystemTime.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXSystemTimeFormat.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXSystemTimeParse.cpp"
 			>
 		</File>
 		<File
@@ -8908,6 +9016,18 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXVariant.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXVariantArray.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXVariantMap.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXVec2d.cpp"
 			>
 			<FileConfiguration
@@ -9286,6 +9406,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\lib\FXWSQueue.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\fxwuquantize.cpp"
 			>
 			<FileConfiguration
@@ -9553,6 +9677,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\lib\landscape.gif"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\leapseconds.h"
 			>
 		</File>
 		<File

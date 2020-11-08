@@ -100,7 +100,7 @@ TestWindow::TestWindow(FXApp *a):FXMainWindow(a,"Calendar Test Program",NULL,NUL
 
   hframe=new FXHorizontalFrame(box);
   new FXLabel(hframe,"Julian Day Number");
-  new FXTextField(hframe,9,&dt_date,FXDataTarget::ID_VALUE,TEXTFIELD_NORMAL|TEXTFIELD_READONLY);
+  new FXTextField(hframe,9,&dt_date,FXDataTarget::ID_VALUE,TEXTFIELD_NORMAL);
 
   date=FXDate::localDate().getJulian();
   dt_date.connect(date);

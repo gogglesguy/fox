@@ -308,7 +308,7 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__threadlocal|__noreturn|__prefetchw|__prefetch|__restrict|constructElms|destructElms|copyElms|moveElms|swapElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
+    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__threadlocal|__noreturn|__prefetchw|__prefetch|__restrict|constructElms|destructElms|copyElms|moveElms|bitmoveElms|bitcopyElms|swapElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
   end
 
   rule "FOXType"
@@ -536,7 +536,7 @@ end
 language "Fortran"
 
   # File patterns for this language mode
-  filesmatch "*.f,*.F,*.f90,*.F90,*.interface,*.INTERFACE"
+  filesmatch "*.f,*.F,*.f90,*.F90,*.FOR,*.for,*.interface,*.INTERFACE"
 
   contextlines 1
 
@@ -1101,7 +1101,7 @@ language "JavaScript"
 
   # Keywords
   rule "Keyword"
-    pattern     "\<(break|case|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with|class|const|enum|export|extends|import|super|implements|interface|let|package|private|protected|public|static|yield)\>"
+    pattern     "\<(break|case|catch|continue|debugger|default|delete|do|else|false|finally|for|function|if|in|Infinity|instanceof|NaN|new|null|return|switch|this|throw|try|typeof|var|void|while|with|class|const|enum|export|extends|import|super|implements|interface|let|package|private|protected|public|static|true|yield)\>"
     style       "red"
   end
 
@@ -1109,6 +1109,7 @@ language "JavaScript"
     pattern     "\<(((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)[ij]?\>"
     style       "blue"
   end
+
   rule "Braces"
     pattern     "(\{|\})"
     style       "red"
