@@ -17,12 +17,38 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+July 14 - FOX DEVELOPMENT 1.7.72
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added math function Math::pow10i(). Performs integer power of 10. NOTE: function Math::pow10() will go away
+as this has been deprecated; use Math::exp10() instead!</li>
+<li>String to double conversion routines accuracy improvement fix implemented; approximately
+16th digit accuracy now.</li>
+<li>Added %a and %A handling in fxscanf.cpp. Hex float support parsing to be switched in soon;
+not yet 100% working at this time.</li>
+<li>When parsing exponent-part of floating point number fails, properly rewind input to the
+part before it; this will leave the rest of the string for another conversion specifier if
+there is one.</li>
+<li>When parsing number-separator, don't allow consecutive number separators.  Future implementations
+may be more strict still.</li>
+<li>FXThread thread naming update for MacOSX and other operating systems.</li>
+<li>The math.cpp test program now implements testing functions when they are missing from the
+operating system.</li>
+</ul>
+
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 July 6 - FOX DEVELOPMENT 1.7.71
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
 <ul>
-<li>FXSystem::Time not initialized inside FXSystem::systemTimeParse(); must initialize 
+<li>FXSystem::Time not initialized inside FXSystem::systemTimeParse(); must initialize
 to zero prior to call. Reason: need to be able to determine what fields were actually
 set during the parse.</li>
 <li>Added FXSystem::daylightSavingsActive() API.  Determines if daylight savings time in effect

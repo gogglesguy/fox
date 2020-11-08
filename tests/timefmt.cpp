@@ -269,7 +269,7 @@ int main(int argc,char* argv[]){
       }
     }
 
-#if 0
+#if 1
   // Calculate nanoseconds
   ct0=FXSystem::timeFromSystemTime(st);
 
@@ -290,7 +290,7 @@ int main(int argc,char* argv[]){
   fxmessage("\n");
 #endif
 
-#if 0
+#if 1
   // Test new civilFromDays() and daysFromCivil()
   fxmessage("*** TEST civilFromDays() and daysFromCivil() ***\n");
   for(y=0; y<ARRAYNUMBER(timevalues); y++){
@@ -303,7 +303,7 @@ int main(int argc,char* argv[]){
   fxmessage("\n");
 #endif
 
-#if 0
+#if 1
   // Test ISO week number and year
   fxmessage("*** TEST ISO Week Number ***\n");
   for(y=0; y<ARRAYNUMBER(week_number_cases); y++){
@@ -313,7 +313,7 @@ int main(int argc,char* argv[]){
   fxmessage("\n");
 #endif
 
-#if 0
+#if 1
   // Testing time formats
   fxmessage("*** TEST Time Format ***\n");
   for(y=0; y<ARRAYNUMBER(timevalues); y++){
@@ -339,7 +339,7 @@ int main(int argc,char* argv[]){
   fxmessage("\n");
 #endif
 
-#if 0
+#if 1
   // Test time parsing
   fxmessage("*** TEST Time Parsing ***\n");
   for(x=0; x<ARRAYNUMBER(timeparse); x++){

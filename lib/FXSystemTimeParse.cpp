@@ -744,5 +744,4 @@ FXint FXSystem::systemTimeParse(Time& st,const FXString& string,const FXchar* fo
   return FXSystem::systemTimeParse(st,string.text(),format);
   }
 
-
 }

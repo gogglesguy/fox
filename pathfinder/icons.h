@@ -1,4 +1,4 @@
-/*********** Generated on 2020/07/06 08:17:03 by reswrap version 6.0.0 *********/
+/*********** Generated on 2020/07/14 14:44:38 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../pathfinder/addbook.bmp */
 extern const unsigned char addbook[];

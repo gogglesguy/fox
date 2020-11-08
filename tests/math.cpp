@@ -111,49 +111,105 @@ static const char *const names[]={
   };
 
 
+
+// log1p()
+#if defined(NO_LOG1P)
+FXdouble log1p(FXdouble x){ return ::log(1.0+x); }
+#endif
+
+// log1pf()
+#if defined(NO_LOG1PF)
+FXfloat log1pf(FXfloat x){ return ::log(1.0f+x); }
+#endif
+
+
+// exp2()
+#if defined(NO_EXP2)
+FXdouble expm1(FXdouble x){ return ::exp(x)-1.0; }
+#endif
+
+// exp2f()
+#if defined(NO_EXP2F)
+FXfloat expm1f(FXfloat x){ return ::expf(x)-1.0f; }
+#endif
+
+
+// exp2()
+#if defined(NO_EXP2)
+FXdouble exp2(FXdouble x){ return ::pow(2.0,x); }
+#endif
+
+// exp2f()
+#if defined(NO_EXP2F)
+FXfloat exp2f(FXfloat x){ return ::powf(2.0f,x); }
+#endif
+
+
+// exp10()
+#if defined(NO_EXP10)
+FXdouble exp10(FXdouble x){ return ::pow(10.0,x); }
+#endif
+
+// exp10f()
+#if defined(NO_EXP10F)
+FXfloat exp10f(FXfloat x){ return ::powf(10.0f,x); }
+#endif
+
+
+// log2()
+#if defined(NO_EXP10)
+FXdouble log2(FXdouble x){ return ::log(x)*1.442695040888963407359924681001892137; }
+#endif
+
+// log2f()
+#if defined(NO_EXP10F)
+FXfloat log2f(FXfloat x){ return ::log(x)*1.442695040888963407359924681001892137f; }
+#endif
+
+
 // Double function list
 static const DBLFUNS dblfuns[]={
-  {Math::fabs,      ::fabs},
-  {Math::ceil,      ::ceil},
-  {Math::floor,     ::floor},
-  {Math::round,     ::round},
-  {Math::trunc,     ::trunc},
-  {Math::nearbyint, ::nearbyint},
-  {Math::rint,      ::rint},
-  {Math::sinh,      ::sinh},
-  {Math::cosh,      ::cosh},
-  {Math::tanh,      ::tanh},
-  {Math::asinh,     ::asinh},
-  {Math::acosh,     ::acosh},
-  {Math::atanh,     ::atanh},
-  {Math::expm1,     ::expm1},
-  {Math::exp2,      ::exp2},
-  {Math::exp10,     ::exp10},
-  {Math::log1p,     ::log1p},
-  {Math::log2,      ::log2},
+  {Math::fabs,      fabs},
+  {Math::ceil,      ceil},
+  {Math::floor,     floor},
+  {Math::round,     round},
+  {Math::trunc,     trunc},
+  {Math::nearbyint, nearbyint},
+  {Math::rint,      rint},
+  {Math::sinh,      sinh},
+  {Math::cosh,      cosh},
+  {Math::tanh,      tanh},
+  {Math::asinh,     asinh},
+  {Math::acosh,     acosh},
+  {Math::atanh,     atanh},
+  {Math::expm1,     expm1},
+  {Math::exp2,      exp2},
+  {Math::exp10,     exp10},
+  {Math::log1p,     log1p},
+  {Math::log2,      log2},
   };
 
 
 // Float function list
 static const FLTFUNS fltfuns[]={
-  {Math::fabs,      ::fabsf},
-  {Math::ceil,      ::ceilf},
-  {Math::floor,     ::floorf},
-  {Math::round,     ::roundf},
-  {Math::trunc,     ::truncf},
-  {Math::nearbyint, ::nearbyintf},
-  {Math::rint,      ::rintf},
-  {Math::sinh,      ::sinhf},
-  {Math::cosh,      ::coshf},
-  {Math::tanh,      ::tanhf},
-  {Math::asinh,     ::asinhf},
-  {Math::acosh,     ::acoshf},
-  {Math::atanh,     ::atanhf},
-  {Math::expm1,     ::expm1f},
-  {Math::exp2,      ::exp2f},
-  {Math::exp10,     ::exp10f},
-  {Math::log1p,     ::log1pf},
-  {Math::log2,      ::log2f},
+  {Math::fabs,      fabsf},
+  {Math::ceil,      ceilf},
+  {Math::floor,     floorf},
+  {Math::round,     roundf},
+  {Math::trunc,     truncf},
+  {Math::nearbyint, nearbyintf},
+  {Math::rint,      rintf},
+  {Math::sinh,      sinhf},
+  {Math::cosh,      coshf},
+  {Math::tanh,      tanhf},
+  {Math::asinh,     asinhf},
+  {Math::acosh,     acoshf},
+  {Math::atanh,     atanhf},
+  {Math::expm1,     expm1f},
+  {Math::exp2,      exp2f},
+  {Math::exp10,     exp10f},
+  {Math::log1p,     log1pf},
+  {Math::log2,      log2f},
   };
 
 
@@ -474,10 +530,10 @@ int main(int argc,char *argv[]){
       }
     return 0;
     }
-
-  // Hyperbolic sine, cosine, tangent
 /*
 */
+
+  // Hyperbolic sine, cosine, tangent
   testDouble(Math::sinh,sinh,"sinh");
   testFloat(Math::sinh,sinhf,"sinhf");
   testDouble(Math::cosh,cosh,"cosh");

@@ -960,6 +960,10 @@ static inline FXdouble pow10(FXdouble x){
   }
 
 
+/// Double precision integer power of 10
+extern FXAPI FXdouble pow10i(FXint ex);
+
+
 /// Single precision natural logarithm
 static inline FXfloat log(FXfloat x){
   return ::logf(x);

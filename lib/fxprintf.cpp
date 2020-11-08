@@ -127,7 +127,7 @@
     statements as written.
 
   - Subtle difference between glibc: does NOT output '\0' at the end, unless
-    buffer is large enough.  
+    buffer is large enough.
 */
 
 #define CONVERTSIZE     512     // Conversion buffer

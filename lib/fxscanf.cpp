@@ -55,7 +55,7 @@
      'L'        ditto
      'q'        ditto
      't'        convert to FXival (size depends on pointer size)
-     'z'        ditto
+     'z'        convert to FXuval (size depends on pointer size)
 
   - Conversion specifiers:
 
@@ -73,22 +73,24 @@
      'e', 'E',  Floating point conversion.
      'f', 'F'   Floating point conversion.
      'g', 'G'   Floating point conversion.
+     'a', 'A'   Floating point conversion.
 
   - In the case of string (%s or %[...]), do not report a conversion unless at
     least one character is returned.
 */
 
-#ifdef WIN32
+#if defined(WIN32)
 #ifndef va_copy
 #define va_copy(arg,list) ((arg)=(list))
 #endif
 #endif
 
-#define MAXDIGS  20     // Maximum number of significant digits
-
-/*******************************************************************************/
+#define MAXDIGS    20   // Maximum number of significant digits
+#define MAXHEXDIGS 14   // Maximum number of hexadecimal significant digits
 
 using namespace FX;
+
+/*******************************************************************************/
 
 namespace FX {
 
@@ -113,6 +115,7 @@ const union{ FXulong u; FXdouble f; } inf={FXULONG(0x7ff0000000000000)};
 const union{ FXulong u; FXdouble f; } nan={FXULONG(0x7fffffffffffffff)};
 
 /*******************************************************************************/
+
 
 static const FXchar* grouping(const FXchar* begin,const FXchar* end){
   while(end>begin){
@@ -166,17 +169,23 @@ static const FXchar* grouping(const FXchar* begin,const FXchar* end){
   }
 
 
+// Make double from sign, exponent, and mantissa
+static inline FXdouble fpMake(FXlong m,FXlong exp){
+  union{ FXulong u; FXdouble f; } z={(m&FXULONG(0x000fffffffffffff)) | (((exp&0x7ff)+1023)<<52)};
+  return z.f;
+  }
+
+
 // Scan with va_list arguments
 FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
-  FXint modifier,width,convert,comma,base,digits,sdigits,count,exponent,expo,done,neg,nex,nana,pos,v;
+  FXint modifier,width,convert,comma,base,digits,sdigits,count,exponent,expo,done,neg,nex,pos,ww,v;
   const FXchar *start=string;
   const FXchar *ss;
+  FXdouble dvalue,dmult;
+  FXulong  ivalue,imult;
   FXchar   set[256];
   FXchar  *ptr;
   FXuchar  ch,nn;
-  FXdouble number;
-  FXdouble mult;
-  FXulong  value;
   va_list  ag;
 
   count=0;
@@ -266,32 +275,28 @@ flg:  switch(ch){
           ch=*format++;
           goto flg;
         case 'n':                                       // Consumed characters till here
-          value=string-start;
+          ivalue=string-start;
           if(convert){
             if(modifier==ARG_DEFAULT){                  // 32-bit always
-              *va_arg(ag,FXint*)=(FXint)value;
+              *va_arg(ag,FXint*)=(FXint)ivalue;
               }
             else if(modifier==ARG_LONG){                // Whatever size a long is
-              *va_arg(ag,long*)=(long)value;
+              *va_arg(ag,long*)=(long)ivalue;
               }
             else if(modifier==ARG_LONGLONG){            // 64-bit always
-              *va_arg(ag,FXlong*)=value;
+              *va_arg(ag,FXlong*)=ivalue;
               }
             else if(modifier==ARG_HALF){                // 16-bit always
-              *va_arg(ag,FXshort*)=(FXshort)value;
+              *va_arg(ag,FXshort*)=(FXshort)ivalue;
               }
             else if(modifier==ARG_HALFHALF){            // 8-bit always
-              *va_arg(ag,FXchar*)=(FXchar)value;
+              *va_arg(ag,FXchar*)=(FXchar)ivalue;
               }
             else{                                       // Whatever size a pointer is
-              *va_arg(ag,FXival*)=(FXival)value;
+              *va_arg(ag,FXival*)=(FXival)ivalue;
               }
             }
           break;
-        case 'D':
-          modifier=ARG_LONG;
-          base=10;
-          goto integer;
         case 'p':                                       // Hex pointer
           modifier=ARG_VARIABLE;
           base=16;
@@ -313,8 +318,8 @@ flg:  switch(ch){
         case 'd':                                       // Decimal
         case 'u':
           base=10;
-        case 'i':                                       // Either
-integer:  value=0;
+        case 'i':                                       // Any
+integer:  ivalue=0;
           digits=0;
           if(width<1) width=2147483647;                 // Width at least 1
           while(Ascii::isSpace(string[0])) string++;    // Skip white space; not included in field width
@@ -322,75 +327,88 @@ integer:  value=0;
             string++;
             width--;
             }
-          if(0<width && string[0]=='0'){                        // Got a '0'
+          if(0<width && string[0]=='0'){                // Handle '0x', '0b', and '0'
             digits++;
             string++;
             width--;
             if(0<width && (string[0]|0x20)=='x'){       // Got a '0x'
-              if(base==0){ comma=0; base=16; }          // If not set yet, '0x' means set base to 16
+              if(base==0){                              // If not set yet, '0x' means set base to 16
+                comma=0; 
+                base=16; 
+                }          
               if(base==16){                             // But don't eat the 'x' if base wasn't 16!
                 string++;
                 width--;
                 }
               }
             else if(0<width && (string[0]|0x20)=='b'){  // Got a '0b'
-              if(base==0){ comma=0; base=2; }           // If not set yet, '0b' means set base to 2
+              if(base==0){                              // If not set yet, '0b' means set base to 2
+                comma=0; 
+                base=2; 
+                }
               if(base==2){                              // But don't eat the 'b' if base wasn't 2!
                 string++;
                 width--;
                 }
               }
-            else{
-              if(base==0){ comma=0; base=8; }           // If not set yet, '0' means set base to 8
+            else{                                       // If not set yet, '0' means set base to 8
+              if(base==0){                          
+                comma=0; 
+                base=8;            
+                }
               }
             }
-          else{
-            if(base==0){ base=10; }                     // Not starting with '0' or '0x', so its decimal
-            }
-          while(0<width && (ch=string[0])!='\0'){
-            if(ch!=comma){                              // FIXME only should consume LEGAL number groupings!
-              v=FXString::digit2Value[ch];
-              if(v<0 || base<=v) break;
-              value=value*base+v;                       // Convert to integer
-              digits++;
+          else{                                         // Not starting with '0', '0x', or '0b', so its decimal
+            if(base==0){                             
+              base=10;                      
               }
+            }
+          while(0<width && 0<=(v=FXString::digit2Value[(FXuchar)string[0]]) && v<base){
+            ivalue=ivalue*base+v;
+            digits++;
             string++;
             width--;
+            if(0<width && string[0]==comma && comma){   // Skip over grouping
+              string++;                                 // FIXME only should consume LEGAL number groupings!
+              width--;
+              }
             }
           if(!digits) goto x;                           // No digits seen!
           if(neg){                                      // Apply sign
-            value=0-value;
+            ivalue=0-ivalue;
             }
           if(convert){
             if(modifier==ARG_DEFAULT){                  // 32-bit always
-              *va_arg(ag,FXint*)=(FXint)value;
+              *va_arg(ag,FXint*)=(FXint)ivalue;
               }
             else if(modifier==ARG_LONG){                // Whatever size a long is
-              *va_arg(ag,long*)=(long)value;
+              *va_arg(ag,long*)=(long)ivalue;
               }
             else if(modifier==ARG_LONGLONG){            // 64-bit always
-              *va_arg(ag,FXlong*)=value;
+              *va_arg(ag,FXlong*)=ivalue;
               }
             else if(modifier==ARG_HALF){                // 16-bit always
-              *va_arg(ag,FXshort*)=(FXshort)value;
+              *va_arg(ag,FXshort*)=(FXshort)ivalue;
               }
             else if(modifier==ARG_HALFHALF){            // 8-bit always
-              *va_arg(ag,FXchar*)=(FXchar)value;
+              *va_arg(ag,FXchar*)=(FXchar)ivalue;
               }
             else{                                       // Whatever size a pointer is
-              *va_arg(ag,FXival*)=(FXival)value;
+              *va_arg(ag,FXival*)=(FXival)ivalue;
               }
             count++;
             }
           break;
-        case 'e':                                       // Floating point
+        case 'a':                                       // Floating point
+        case 'A':
+        case 'e':
         case 'E':
         case 'f':
         case 'F':
         case 'g':
         case 'G':
-          number=0.0;
-          mult=1.0;
+          dvalue=0.0;
+          dmult=1.0;
           exponent=-1;
           digits=0;
           sdigits=0;
@@ -400,81 +418,95 @@ integer:  value=0;
             string++;
             width--;
             }
-          if(2<width && ((nana=(string[0]|0x20)=='n') || (string[0]|0x20)=='i')){
-            if(nana){
-              if((string[1]|0x20)!='a') goto x;
-              if((string[2]|0x20)!='n') goto x;
-              string+=3;
-              width-=3;
-              number=nan.f;                                     // Recognized a NaN
-              }
-            else{
-              if((string[1]|0x20)!='n') goto x;
-              if((string[2]|0x20)!='f') goto x;
-              string+=3;
-              width-=3;
-              if(4<width && (string[0]|0x20)=='i' && (string[1]|0x20)=='n' && (string[2]|0x20)=='i' && (string[3]|0x20)=='t' && (string[4]|0x20)=='y'){
-                string+=5;
-                width-=5;
-                }
-              number=inf.f;                                     // Recognized Inf[inity]
-              }
-            if(neg){                                            // Apply sign
-              number=-number;
-              }
+          if(2<width && (string[0]|0x20)=='n'){         // NaN
+            if((string[1]|0x20)!='a') goto x;
+            if((string[2]|0x20)!='n') goto x;
+            string+=3;
+            width-=3;
+            dvalue=nan.f;
             }
-          else{
-            while(0<width && string[0]){                        // Leading zeros, with possible groupings
-              if(string[0]!=comma){
-                if(string[0]!='0') break;
-                digits++;
-                }
-              string++;
-              width--;
+          else if(2<width && (string[0]|0x20)=='i'){    // Inf{inity}
+            if((string[1]|0x20)!='n') goto x;
+            if((string[2]|0x20)!='f') goto x;
+            if(7<width && (string[3]|0x20)=='i' && (string[4]|0x20)=='n' && (string[5]|0x20)=='i' && (string[6]|0x20)=='t' && (string[7]|0x20)=='y'){
+              string+=5;
+              width-=5;
               }
-            while(0<width && (ch=string[0])!='\0'){             // Mantissa digits
-              if(ch!=comma){                                    // FIXME only should consume LEGAL number groupings!
-                if(ch<'0' || ch>'9') break;
-                if(sdigits<MAXDIGS){
-                  number+=(ch-'0')*mult;
-                  mult*=0.1;
-                  }
-                exponent++;
-                sdigits++;
-                digits++;
-                }
+            string+=3;
+            width-=3;
+            dvalue=inf.f;
+            }
+#if 0
+          else if(1<width && string[0]=='0' && (string[1]|0x20)=='x'){  // Hex float
+            string+=2;
+            width-=2;
+            ivalue=0;
+            imult=FXLONG(0x0010000000000000);
+            exponent=-4;
+            while(0<width && string[0]=='0'){           // Leading zeros
               string++;
               width--;
+              digits++;
               }
-            if(0<width && string[0]=='.'){                      // Mantissa decimals following '.'
+            while(0<width && (v=FXString::digit2Value[(FXuchar)string[0]])>=0 && v<16){  // Mantissa digits
+              if(sdigits<=MAXHEXDIGS){
+                ivalue+=imult*v;
+                imult>>=4;
+                }
+              exponent+=4;
               string++;
               width--;
-              while(0<width && (ch=string[0])>='0' && ch<='9'){
-                if(sdigits<MAXDIGS){
-                  number+=(ch-'0')*mult;
-                  mult*=0.1;
+              sdigits++;
+              digits++;
+              }
+            if(0<width && string[0]=='.'){              // Mantissa hexadecimals following '.'
+              string++;
+              width--;
+              if(sdigits==0){
+                while(0<width && string[0]=='0'){       // Leading zeros
+                  exponent-=4;
+                  string++;
+                  width--;
+                  digits++;
                   }
-                sdigits++;
-                digits++;
+                }
+              while(0<width && (v=FXString::digit2Value[(FXuchar)string[0]])>=0 && v<16){
+                if(sdigits<=MAXHEXDIGS){
+                  ivalue+=imult*v;
+                  imult>>=4;
+                  }
                 string++;
                 width--;
+                sdigits++;
+                digits++;
                 }
               }
-            if(!digits) goto x;                                 // No digits seen!
-            if(1<width && (string[0]|0x20)=='e'){               // Handle exponent, tentatively
-              ss=string;
+            if(!digits) goto x;                         // No digits seen!
+            while(ivalue>0x001fffffffffffff){           // MSB should be 0..1
+              ivalue>>=1;
+              ++exponent;
+              }
+/*
+            while(ivalue<0x001fffffffffffff){ // FIXME
+              ivalue<<=1;
+              --exponent;
+              }
+*/
+            if(1<width && (string[0]|0x20)=='p'){       // Handle exponent, tentatively
+              ss=string;                                // Rewind point if no match
+              ww=width;
               ss++;
-              width--;
+              ww--;
               expo=0;
-              if((nex=(ss[0]=='-')) || (ss[0]=='+')){           // Handle exponent sign
+              if((nex=(ss[0]=='-')) || (ss[0]=='+')){   // Handle exponent sign
                 ss++;
-                width--;
+                ww--;
                 }
-              if(0<width && '0'<=ss[0] && ss[0]<='9'){          // Have exponent?
-                while(0<width && (ch=ss[0])>='0' && ch<='9'){
+              if(0<ww && '0'<=ss[0] && ss[0]<='9'){     // Have exponent?
+                while(0<ww && (ch=ss[0])>='0' && ch<='9'){
                   expo=expo*10+(ch-'0');
                   ss++;
-                  width--;
+                  ww--;
                   }
                 if(nex){
                   exponent-=expo;
@@ -482,36 +514,121 @@ integer:  value=0;
                 else{
                   exponent+=expo;
                   }
-                string=ss;                                      // Eat exponent characters
+                string=ss;                              // Eat exponent characters
+                width=ww;
                 }
               }
-            if(number!=0.0){
-              if(308<=exponent){                                // Check for overflow
-                if((308<exponent) || (1.79769313486231570815<=number)){
-                  number=1.79769313486231570815E+308;
+            // FIXME
+            FXTRACE((1,"ivalue  = 0x%016llx\n",ivalue));
+            FXTRACE((1,"exponent= %d\n",exponent));
+            FXTRACE((1,"sdigits = %d\n",sdigits));
+            FXTRACE((1,"expo    = %d\n",expo));
+            dvalue=fpMake(ivalue,exponent);   // FIXME
+            FXTRACE((1,"dvalue  = %.20lg\n",dvalue));
+            FXTRACE((1,"dvalue  = 0x%016llx\n",*((FXulong*)&dvalue)));
+            }
+#endif
+          else{                                         // Decimal float
+            while(0<width && string[0]=='0'){           // Leading zeros
+              string++;
+              width--;
+              digits++;
+              if(0<width && string[0]==comma && comma){ // Skip over grouping
+                string++;                               // FIXME only should consume LEGAL number groupings!
+                width--;
+                }
+              }
+            while(0<width && (ch=string[0])>='0' && ch<='9'){   // Significant digits
+              if(sdigits<MAXDIGS){
+                dvalue+=(ch-'0')*dmult;
+                dmult*=0.1;
+                }
+              exponent++;
+              string++;
+              width--;
+              sdigits++;
+              digits++;
+              if(0<width && string[0]==comma && comma){ // Skip over grouping
+                string++;                               // FIXME only should consume LEGAL number groupings!
+                width--;
+                }
+              }
+            if(0<width && string[0]=='.'){              // Decimals following '.'
+              string++;
+              width--;
+              if(sdigits==0){
+                while(0<width && string[0]=='0'){        // Leading zeros; adjust exponent
+                  exponent--;
+                  string++;
+                  width--;
+                  digits++;
+                  }
+                }
+              while(0<width && (ch=string[0])>='0' && ch<='9'){ // Significant digits
+                if(sdigits<MAXDIGS){
+                  dvalue+=(ch-'0')*dmult;
+                  dmult*=0.1;
+                  }
+                string++;
+                width--;
+                sdigits++;
+                digits++;
+                }
+              }
+            if(!digits) goto x;                         // No digits seen!
+            if(1<width && (string[0]|0x20)=='e'){       // Handle exponent, tentatively
+              ss=string;                                // Rewind point if no match
+              ww=width;
+              ss++;
+              ww--;
+              expo=0;
+              if((nex=(ss[0]=='-')) || (ss[0]=='+')){   // Handle exponent sign
+                ss++;
+                ww--;
+                }
+              if(0<ww && '0'<=ss[0] && ss[0]<='9'){     // Have exponent?
+                while(0<ww && (ch=ss[0])>='0' && ch<='9'){
+                  expo=expo*10+(ch-'0');
+                  ss++;
+                  ww--;
+                  }
+                if(nex){
+                  exponent-=expo;
+                  }
+                else{
+                  exponent+=expo;
+                  }
+                string=ss;                              // Eat exponent characters
+                width=ww;
+                }
+              }
+            if(dvalue!=0.0){
+              if(308<=exponent){                        // Check for overflow
+                if((308<exponent) || (1.79769313486231570815<=dvalue)){
+                  dvalue=1.79769313486231570815E+308;
                   exponent=0;
                   }
                 }
-              if(exponent<-308){                                // Check for denormal or underflow
-                if((exponent<-324) || ((exponent==-324) && (number<=4.94065645841246544177))){
-                  number=0.0;
+              if(exponent<-308){                        // Check for denormal or underflow
+                if((exponent<-324) || ((exponent==-324) && (dvalue<=4.94065645841246544177))){
+                  dvalue=0.0;
                   exponent=0;
                   }
-                number*=1.0E-16;
+                dvalue*=1.0E-16;
                 exponent+=16;
                 }
-              number*=Math::ipow(10.0,exponent);                // In range
-              if(neg){                                          // Apply sign
-                number=-number;
-                }
+              dvalue*=Math::pow10i(exponent);           // Exponent in range
               }
+            }
+          if(neg){                                      // Apply sign
+            dvalue=-dvalue;
             }
           if(convert){
             if(modifier==ARG_DEFAULT){
-              *va_arg(ag,FXfloat*)=(FXfloat)number;             // 32-bit float
+              *va_arg(ag,FXfloat*)=(FXfloat)dvalue;     // 32-bit float
               }
             else{
-              *va_arg(ag,FXdouble*)=number;                     // 64-bit double
+              *va_arg(ag,FXdouble*)=dvalue;             // 64-bit double
               }
             count++;
             }

@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxmath.h"
 #include "fxascii.h"
+#include "FXString.h"
 
 
 /*
@@ -37,12 +38,11 @@
 #define ULLONG_MAX FXULONG(18446744073709551615)
 #endif
 
-/*******************************************************************************/
-
 using namespace FX;
 
-namespace FX {
+/*******************************************************************************/
 
+namespace FX {
 
 extern FXAPI FXulong __strtoull(const FXchar* beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
 extern FXAPI FXuint __strtoul(const FXchar* beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
@@ -50,14 +50,14 @@ extern FXAPI FXuint __strtoul(const FXchar* beg,const FXchar** end=NULL,FXint ba
 
 // Convert string to unsigned long
 FXulong __strtoull(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
-  register const FXchar *s=beg;
-  register FXulong cutoff=ULLONG_MAX;
-  register FXulong value=0;
-  register FXint cutlim;
-  register FXint digits=0;
-  register FXint neg=0;
-  register FXint ovf=0;
-  register FXint v;
+  const FXchar *s=beg;
+  FXulong cutoff=ULLONG_MAX;
+  FXulong value=0;
+  FXint cutlim;
+  FXint digits=0;
+  FXint neg=0;
+  FXint ovf=0;
+  FXint v;
 
   // Assume the worst
   if(ok) *ok=false;
@@ -99,7 +99,7 @@ FXulong __strtoull(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
     cutoff=cutoff/base;
 
     // Scan digits and aggregate number
-    while(0<=(v=Ascii::digitValue(*s)) && v<base){
+    while(0<=(v=FXString::digit2Value[(FXuchar)*s]) && v<base){
       if(!ovf){
         if(value>cutoff || (value==cutoff && v>cutlim)) ovf=1;
         value=value*base+v;
@@ -126,7 +126,7 @@ FXulong __strtoull(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
 
 // Convert string to unsigned int
 FXuint __strtoul(const FXchar* beg,const FXchar** end,FXint base,FXbool* ok){
-  register FXulong value=__strtoull(beg,end,base,ok);
+  FXulong value=__strtoull(beg,end,base,ok);
   if(__unlikely(value>UINT_MAX)){
     if(ok) *ok=false;
     return UINT_MAX;

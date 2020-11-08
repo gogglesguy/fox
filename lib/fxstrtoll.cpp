@@ -23,6 +23,7 @@
 #include "fxdefs.h"
 #include "fxmath.h"
 #include "fxascii.h"
+#include "FXString.h"
 
 
 /*
@@ -40,12 +41,12 @@
 #define LLONG_MIN  (-LLONG_MAX-FXLONG(1))
 #endif
 
-/*******************************************************************************/
 
 using namespace FX;
 
-namespace FX {
+/*******************************************************************************/
 
+namespace FX {
 
 extern FXAPI FXlong __strtoll(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
 extern FXAPI FXint __strtol(const FXchar *beg,const FXchar** end=NULL,FXint base=0,FXbool* ok=NULL);
@@ -53,14 +54,14 @@ extern FXAPI FXint __strtol(const FXchar *beg,const FXchar** end=NULL,FXint base
 
 // Convert string to signed long
 FXlong __strtoll(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
-  register const FXchar *s=beg;
-  register FXulong cutoff=LLONG_MAX;
-  register FXulong value=0;
-  register FXint cutlim;
-  register FXint digits=0;
-  register FXint neg=0;
-  register FXint ovf=0;
-  register FXint v;
+  const FXchar *s=beg;
+  FXulong cutoff=LLONG_MAX;
+  FXulong value=0;
+  FXint cutlim;
+  FXint digits=0;
+  FXint neg=0;
+  FXint ovf=0;
+  FXint v;
 
   // Assume the worst
   if(ok) *ok=false;
@@ -103,7 +104,7 @@ FXlong __strtoll(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
     cutoff=cutoff/base;
 
     // Scan digits and aggregate number
-    while(0<=(v=Ascii::digitValue(*s)) && v<base){
+    while(0<=(v=FXString::digit2Value[(FXuchar)*s]) && v<base){
       if(!ovf){
         if(value>cutoff || (value==cutoff && v>cutlim)) ovf=1;
         value=value*base+v;
@@ -130,7 +131,7 @@ FXlong __strtoll(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
 
 // Convert string to signed int
 FXint __strtol(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
-  register FXlong value=__strtoll(beg,end,base,ok);
+  FXlong value=__strtoll(beg,end,base,ok);
   if(__unlikely(value<INT_MIN)){
     if(ok) *ok=false;
     return INT_MIN;

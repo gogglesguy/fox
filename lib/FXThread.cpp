@@ -921,6 +921,13 @@ FXbool FXThread::description(const FXString& desc){
     FXnchar udesc[256];
     utf2ncs(udesc,desc.text(),ARRAYNUMBER(udesc));
     return 0<=fxSetThreadDescription((HANDLE)tid,udesc);
+#elif defined(__APPLE__)
+    return pthread_setname_np(desc.text())==0;
+#elif defined(__NetBSD__)
+    return pthread_setname_np(tid,"%s",desc.text())==0;
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
+    pthread_set_name_np(tid,desc.text());
+    return true;
 #elif defined(HAVE_PTHREAD_SETNAME_NP)
     return pthread_setname_np(tid,desc.text())==0;
 #endif
@@ -940,9 +947,19 @@ FXString FXThread::description() const {
       ::LocalFree(udesc);
       return desc;
       }
+#elif defined(__APPLE__)
+    FXchar desc[256];
+    if(pthread_getname_np(*((pthread_t*)&tid),desc,ARRAYNUMBER(desc))==0){
+      return desc;
+      }
+#elif defined(__NetBSD__)
+    FXchar desc[256];
+    if(pthread_getname_np(tid,desc,ARRAYNUMBER(desc))==0){
+      return desc;
+      }
 #elif defined(HAVE_PTHREAD_GETNAME_NP)
     FXchar desc[256];
-    if(pthread_getname_np(tid,desc,sizeof(desc)==0)){
+    if(pthread_getname_np(tid,desc,ARRAYNUMBER(desc))==0){
       return desc;
       }
 #endif

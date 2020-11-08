@@ -263,7 +263,7 @@ static void setuplocaltimezone(){
 FXTime FXSystem::localTimeZoneOffset(){
   setuplocaltimezone();
 #if defined(_WIN32)
-  return minutes*tzi.Bias; // +minutes*tzi.StandardBias;
+  return minutes*tzi.Bias;              // +minutes*tzi.StandardBias;
 #else
   return seconds*timezone;
 #endif
@@ -276,7 +276,7 @@ FXTime FXSystem::daylightSavingsOffset(){
 #if defined(_WIN32)
   return minutes*tzi.DaylightBias;      // Or difference between standard and daylight bias.
 #else
-  return -hours*seconds*daylight;
+  return -hours*daylight;
 #endif
   }
 

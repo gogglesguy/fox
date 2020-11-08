@@ -18,6 +18,7 @@
 namespace FX {
 
 extern FXint __sscanf(const FXchar* string,const FXchar* format,...);
+extern FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
 }
 
@@ -60,6 +61,7 @@ const FXchar *floatnumbers[]={
   "0000000000000000000000000000 0.1 1.0E-1",
   "-1. -.1 1.",
   "NaN Inf 3.14",
+  "+0.5 -.5 +0x1.ac54p+66",
   };
 
 
@@ -96,6 +98,36 @@ int main(int,char*[]){
   FXdouble da,db,dc;
   FXchar   buf[1000];
 
+
+/*
+//  res=__sscanf("+0x1.ac54p+66","%la",&dc); //1.23456789E+20,
+//  res=__sscanf("0x1.ac53a7df93d691111p+66","%la",&dc);
+//  res=__sscanf("0x003.fffffffffffffp+00","%la",&dc);
+  res=__sscanf("0x0.00ffffffp+00","%la",&dc);
+  __snprintf(buf,sizeof(buf),"%a 0x%16llx",dc,*((FXulong*)&dc));
+  fprintf(stdout,"c=%s\n",buf);
+  fprintf(stdout,"c=%.20lg\n",dc);
+  fprintf(stdout,"\n");
+*/
+/*
+
+  fprintf(stdout,"i=0.0000012345678987654321234\n");
+  res=__sscanf("0.0000012345678987654321234","%lf",&dc);
+  fprintf(stdout,"o=%.15le\n",dc);
+  res=__sscanf("0.00012345678987654321234","%lf",&dc);
+  fprintf(stdout,"o=%.15le\n",dc);
+  res=__sscanf("0.12345678987654321234","%lf",&dc);
+  fprintf(stdout,"o=%.15le\n",dc);
+  res=__sscanf("1.2345678987654321234","%lf",&dc);
+  fprintf(stdout,"o=%.15le\n",dc);
+  res=__sscanf("12345678987654321234.","%lf",&dc);
+  fprintf(stdout,"o=%.15le\n",dc);
+  fprintf(stdout,"\n");
+  return 1;
+*/
+  
+  
+
   // Reading integers
   for(x=0; x<ARRAYNUMBER(intformat); x++){
     for(y=0; y<ARRAYNUMBER(intnumbers); y++){
@@ -104,15 +136,17 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d a=%d b=%d c=%d\n",intformat[x],intnumbers[y],res,ia,ib,ic);
       }
     }
+  fprintf(stdout,"\n");
 
   // Reading floats
   for(x=0; x<ARRAYNUMBER(floatformat); x++){
     for(y=0; y<ARRAYNUMBER(floatnumbers); y++){
       da=db=dc=0;
       res=__sscanf(floatnumbers[y],floatformat[x],&da,&db,&dc);
-      fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d a=%.16g b=%.16g c=%.16g\n",floatformat[x],floatnumbers[y],res,da,db,dc);
+      fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d a=%.20lg b=%.20lg c=%.20lg\n",floatformat[x],floatnumbers[y],res,da,db,dc);
       }
     }
+  fprintf(stdout,"\n");
 
   // Reading strings
   for(x=0; x<ARRAYNUMBER(stringformat); x++){
@@ -122,6 +156,7 @@ int main(int,char*[]){
       fprintf(stdout,"format=\"%s\" input=\"%s\" res=%d str=%s\n",stringformat[x],stringinputs[y],res,buf);
       }
     }
+  fprintf(stdout,"\n");
 
   return 1;
   }

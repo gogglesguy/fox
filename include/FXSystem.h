@@ -52,6 +52,7 @@ namespace FXSystem {
   /// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hh:mm) formatting string
   extern FXAPI const FXchar isoTimeFormat[];
 
+
   /// Format system time to string
   extern FXAPI FXString systemTimeFormat(const Time& st,const FXchar* format=defaultTimeFormat);
 
@@ -60,6 +61,7 @@ namespace FXSystem {
 
   /// Parse system time from string, returning number of characters parsed
   extern FXAPI FXint systemTimeParse(Time& st,const FXString& string,const FXchar* format=defaultTimeFormat);
+
 
   /**
   * Returns number of days since civil 1970-01-01.  Negative values indicate
