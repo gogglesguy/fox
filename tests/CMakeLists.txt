@@ -120,6 +120,9 @@ target_link_libraries(table FOX)
 add_executable(thread thread.cpp)
 target_link_libraries(thread FOX)
 
+add_executable(timefmt timefmt.cpp)
+target_link_libraries(timefmt FOX)
+
 add_executable(unicode unicode.cpp)
 target_link_libraries(unicode FOX)
 
