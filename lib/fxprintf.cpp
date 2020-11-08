@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -130,8 +130,6 @@
     buffer is large enough.
 */
 
-#define CONVERTSIZE     512     // Conversion buffer
-
 #if defined(_WIN32)
 #ifndef va_copy
 #define va_copy(arg,list) ((arg)=(list))
@@ -178,8 +176,12 @@ enum {
   };
 
 
-static const FXchar lower_digits[]="0123456789abcdef";
-static const FXchar upper_digits[]="0123456789ABCDEF";
+// Conversion buffer
+const FXint CONVERTSIZE=512;
+
+// Hexadecimal digits
+const FXchar lower_digits[]="0123456789abcdef";
+const FXchar upper_digits[]="0123456789ABCDEF";
 
 /*******************************************************************************/
 
@@ -215,7 +217,7 @@ static FXchar* cvt(FXchar* buffer,FXuval size,FXdouble value,FXint& decimal,FXin
   FXchar *dst=buffer;
   FXchar *src=end;
   FXchar *p;
-  FXint digits,binex,decex,negex,x;
+  FXint digits,binex,decex,negex,dex,x;
   FXulong num,n;
 
   // Compute decimal point
@@ -232,13 +234,14 @@ static FXchar* cvt(FXchar* buffer,FXuval size,FXdouble value,FXint& decimal,FXin
     //
     //   decex = binex*0.30078125 = (binex*77)>>8
     //
-    decex=((FXint)((binex-1023)*77))>>8;
+    decex=(binex*77)>>8;
 
     // Ought to be in this range
     FXASSERT(-308<=decex && decex<=308);
 
-    // Bring mantissa in range for conversion to unsigned long.
-    // Mantissa is always [0.5...1), thus we scale by:
+    // Bring mantissa in range for conversion to a 64-bit long.
+    // For normalized floating point numbers the mantissa is always
+    // [0.5...1), thus we scale by:
     //
     //   1.0E18 * 10^-decex       decex>=0
     //
@@ -246,8 +249,11 @@ static FXchar* cvt(FXchar* buffer,FXuval size,FXdouble value,FXint& decimal,FXin
     //
     //   1.0E18 * 10^+decex       decex<0
     //
-    // as per above. This leaves a number 0.5E18...1.0E18, which fits in
-    // 64-bit unsigned long.
+    // This leaves a number 0.5E18...1.0E18, which fits in 64-bit long.
+    // If the floating point number was denormalized, apply an additional
+    // scale after the one above.  We scale the number an arbitrary number
+    // of times by 10, until its in the expected range 0.5E18...1.0E18, and
+    // adjust the exponent along the way.
     //
     // The variable 'number' is declared as 'volatile', to force compiler
     // to write back to memory in between the two statements:
@@ -282,6 +288,13 @@ static FXchar* cvt(FXchar* buffer,FXuval size,FXdouble value,FXint& decimal,FXin
         number*=scalepos1[negex&31];
         number*=scalepos2[negex>>5];
         }
+      }
+
+    // Denormalized number hack
+    if(binex==-1023){
+      dex=(Math::fpExponent(number)*77)>>8;
+      number*=Math::pow10i(18-dex);
+      decex+=dex-18;
       }
 
     // Adjust decimal point, keep 18 digits only
@@ -384,42 +397,27 @@ static FXchar* cvthex(FXchar* buffer,FXuval size,FXdouble value,FXint& decimal,F
   const FXchar* hexdigits=(flags&FLG_UPPER)?upper_digits:lower_digits;
   const FXlong HEXRND=FXLONG(0x0080000000000000);
   const FXlong HEXMSK=FXLONG(0xFF00000000000000);
-  FXulong num=Math::fpMantissa(value);
-  FXint expo=Math::fpExponent(value)-1023;
+  FXulong mantissa=Math::fpMantissa(value);
+  FXint exponent=Math::fpExponent(value);
+  FXint digits=Math::imin(precision,size-2);
   FXchar *dst=buffer;
-  FXint digits;
 
-  // One extra 1-bit in mantissa added back
-  if(-1023<expo){
-    num|=FXULONG(0x0010000000000000);
-    }
-
-  // Denormalized non-zero float
-  else if(num){
-    expo=-1022;
-    }
-
-  // Makes exponent zero also
-  else{
-    expo=0;
-    }
+  // Zero mantissa means exponent should be zero also
+  if(mantissa==0) exponent=0;
 
   // Decimal point location after 1st digit
-  decimal=expo+1;
-
-  // Digits to be returned
-  digits=Math::imin(precision,size-2);
+  decimal=exponent+1;
 
   // Round to precision nibbles, and zero the rest
   if(precision<14){
-    num+=HEXRND>>(precision<<2);
-    num&=HEXMSK>>(precision<<2);
+    mantissa+=HEXRND>>(precision<<2);
+    mantissa&=HEXMSK>>(precision<<2);
     }
 
   // Whip out digits
   while(digits>0){
-    *dst++=hexdigits[(num>>52)&15];
-    num<<=4;
+    *dst++=hexdigits[(mantissa>>52)&15];
+    mantissa<<=4;
     digits--;
     }
 
@@ -521,7 +519,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
 
     // Exponent
     *ptr++=(flags&FLG_UPPER)?'P':'p';
-    if(number!=0.0){
+    if(Math::fpBits(number)){
 
       // Negative exponent
       if(decimal<0){
@@ -586,7 +584,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
 
     // Exponent
     *ptr++=(flags&FLG_UPPER)?'E':'e';
-    if(number!=0.0){
+    if(Math::fpBits(number)){
 
       // Negative exponent
       if(decimal<0){
@@ -719,7 +717,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
 
       // Exponent
       *ptr++=(flags&FLG_UPPER)?'E':'e';
-      if(number!=0.0){
+      if(Math::fpBits(number)){
 
         // Negative exponent
         if(decimal<0){

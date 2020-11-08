@@ -3,7 +3,7 @@
 *                           M a t h   F u n c t i o n s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2015,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2015,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -60,39 +60,47 @@ FXulong Math::fpBits(FXdouble x){
   }
 
 
-// Sign of single precision float point number
-FXuint Math::fpSign(FXfloat x){
-  return Math::fpBits(x)>>31;
+// Sign of single precision float point number (0..1)
+FXint Math::fpSign(FXfloat x){
+  FXint sign=Math::fpBits(x)>>31;
+  return sign;
   }
 
 
-// Sign of double precision float point number
-FXulong Math::fpSign(FXdouble x){
-  return Math::fpBits(x)>>63;
+// Sign of double precision float point number (0..1)
+FXlong Math::fpSign(FXdouble x){
+  FXlong sign=Math::fpBits(x)>>63;
+  return sign;
+  }
+
+
+// Signed exponent of single precision float point number (-127..128)
+FXint Math::fpExponent(FXfloat x){
+  FXint result=(Math::fpBits(x)>>23)&0xff;
+  return result-127;
+  }
+
+
+// Signed exponent of double precision float point number (-1023..1023)
+FXlong Math::fpExponent(FXdouble x){
+  FXlong result=(Math::fpBits(x)>>52)&0x7ff;
+  return result-1023;
   }
 
 
 // Mantissa of single precision float point number
-FXuint Math::fpMantissa(FXfloat x){
-  return Math::fpBits(x)&0x007fffff;
+FXint Math::fpMantissa(FXfloat x){
+  FXint mantissa=Math::fpBits(x)&0x007fffff;
+  FXint exponent=Math::fpBits(x)&0x7f800000;
+  return mantissa|((FXint)(0<exponent))<<23;
   }
 
 
 // Mantissa of double precision float point number
-FXulong Math::fpMantissa(FXdouble x){
-  return Math::fpBits(x)&FXULONG(0x000fffffffffffff);
-  }
-
-
-// Exponent of single precision float point number
-FXuint Math::fpExponent(FXfloat x){
-  return (Math::fpBits(x)>>23)&0xff;
-  }
-
-
-// Exponent of double precision float point number
-FXulong Math::fpExponent(FXdouble x){
-  return (Math::fpBits(x)>>52)&0x7ff;
+FXlong Math::fpMantissa(FXdouble x){
+  FXlong mantissa=Math::fpBits(x)&FXLONG(0x000fffffffffffff);
+  FXlong exponent=Math::fpBits(x)&FXLONG(0x7ff0000000000000);
+  return mantissa|((FXlong)(0<exponent))<<52;
   }
 
 
@@ -809,13 +817,14 @@ static FXdouble negPowOfTen[324]={
 // The exponent should be in the range -323 to +308, these being the limits
 // of double precision IEEE754 standard floating point.
 FXdouble Math::pow10i(FXint ex){
-  return 0<ex ? posPowOfTen[ex] : negPowOfTen[-ex];
+  FXASSERT(-323<=ex && ex<=308);
+  return 0<=ex ? posPowOfTen[ex] : negPowOfTen[-ex];
   }
 
 /*******************************************************************************/
 
 // Single precision integer power
-FXfloat Math::ipow(FXfloat base,FXint ex){
+FXfloat Math::powi(FXfloat base,FXint ex){
   FXfloat result=1.0f;
   if(ex){
     if(ex<0){
@@ -834,7 +843,7 @@ FXfloat Math::ipow(FXfloat base,FXint ex){
 
 
 // Double precision integer power
-FXdouble Math::ipow(FXdouble base,FXint ex){
+FXdouble Math::powi(FXdouble base,FXint ex){
   FXdouble result=1.0;
   if(ex){
     if(ex<0){

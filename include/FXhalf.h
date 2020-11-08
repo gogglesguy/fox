@@ -3,7 +3,7 @@
 *                     H a l f - F l o a t   S u p p o r t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -45,17 +45,17 @@ public:
 
   // Initialize half with half
   FXhalf(const FXhalf& h):v(h.v){}
-  
+
   // Initialize half with float
-  FXhalf(FXfloat f){ 
+  FXhalf(FXfloat f){
     union { FXfloat f; FXuint u; } r={f};
-    v=fhb[(r.u>>23)&0x1ff]+((r.u&0x007fffff)>>fhs[(r.u>>23)&0x1ff]); 
+    v=fhb[(r.u>>23)&0x1ff]+((r.u&0x007fffff)>>fhs[(r.u>>23)&0x1ff]);
     }
 
   // Convert half to float
-  operator FXfloat() const { 
-    union { FXuint u; FXfloat f; } r={hfm[hfw[v>>10]+(v&0x3ff)]+hfe[v>>10]}; 
-    return r.f; 
+  operator FXfloat() const {
+    union { FXuint u; FXfloat f; } r={hfm[hfw[v>>10]+(v&0x3ff)]+hfe[v>>10]};
+    return r.f;
     }
 
   // Test for zero

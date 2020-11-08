@@ -3,7 +3,7 @@
 *      S t r i n g   t o   U n s i g n e d   L o n g   C o n v e r s i o n      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -99,7 +99,7 @@ FXulong __strtoull(const FXchar *beg,const FXchar** end,FXint base,FXbool* ok){
     cutoff=cutoff/base;
 
     // Scan digits and aggregate number
-    while(0<=(v=FXString::digit2Value[(FXuchar)*s]) && v<base){
+    while(0<=(v=Ascii::digitValue(*s)) && v<base){
       if(!ovf){
         if(value>cutoff || (value==cutoff && v>cutlim)) ovf=1;
         value=value*base+v;

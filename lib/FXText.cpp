@@ -3,7 +3,7 @@
 *                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -710,7 +710,7 @@ FXint FXText::rowFromPos(FXint pos) const {
     }
   if(visrows[nvisrows]<pos){                                            // Below visible buffer
     if(pos>=length) return nrows-1;
-    return toprow+nvisrows-1+countRows(visrows[nvisrows-1],pos);
+    return toprow+nvisrows-1+countRows(visrows[nvisrows-1],rowStart(pos));
     }
   while(row+1<nvisrows && visrows[row+1]<=pos && visrows[row]<visrows[row+1]) row++;
   FXASSERT(0<=row && row<nvisrows);
@@ -1101,42 +1101,13 @@ FXint FXText::countCols(FXint start,FXint end) const {
   }
 
 
-// Count number of rows; start should be on a row start
+// Count number of rows; start and end should be on a row start
 FXint FXText::countRows(FXint start,FXint end) const {
   FXint result=0;
-  FXint s=start;
-  FXint b=start;
-  FXint w=0;
-  FXint cw;
-  FXwchar c;
-  FXASSERT(0<=start && start<=end && end<=length);
   if(options&TEXT_WORDWRAP){
     while(start<end){
-      c=getChar(start);
-      if(c=='\n'){                      // Break at newline
-        result++;
-        start++;
-        s=b=start;
-        w=0;
-        continue;
-        }
-      cw=charWidth(c,w);
-      if(w+cw>wrapwidth){               // Break due to wrap
-        result++;
-        w=0;
-        if(s<b){                        // Break past last space seen
-          s=start=b;
-          continue;
-          }
-        if(start==s){                   // Always at least one character on each line!
-          start+=getCharLen(start);
-          }
-        s=b=start;
-        continue;
-        }
-      w+=cw;
-      start+=getCharLen(start);
-      if(Unicode::isSpace(c)) b=start;  // Remember potential break point!
+      start=wrap(start);
+      result++;
       }
     }
   else{
@@ -1277,10 +1248,10 @@ void FXText::recompute(){
   // the rest.  This avoids measuring the entire text twice, which is
   // quite expensive.
   toprow=measureText(0,toppos,ww1,hh1);
-  FXTRACE((1,"measureText(%d,%d,%d,%d) = %d\n",0,toppos,ww1,hh1,toprow));
+  FXTRACE((150,"measureText(%d,%d,%d,%d) = %d\n",0,toppos,ww1,hh1,toprow));
 
   botrow=measureText(toppos,length,ww2,hh2);
-  FXTRACE((1,"measureText(%d,%d,%d,%d) = %d\n",toppos,length,ww2,hh2,botrow));
+  FXTRACE((150,"measureText(%d,%d,%d,%d) = %d\n",toppos,length,ww2,hh2,botrow));
 
   // Update text dimensions in terms of pixels and rows; note one extra
   // row always added, as there is always at least one row, even though
@@ -1293,7 +1264,7 @@ void FXText::recompute(){
   // determined toprow, which may have changed due to wrapping changes.
   pos_y=-toprow*hh-(-pos_y%hh);
 
-  FXTRACE((1,"recompute: textWidth=%d textHeight=%d nrows=%d\n",textWidth,textHeight,nrows));
+  FXTRACE((150,"recompute: textWidth=%d textHeight=%d nrows=%d\n",textWidth,textHeight,nrows));
 
   // All is clean
   flags&=~FLAG_RECALC;
@@ -2367,12 +2338,14 @@ FXbool FXText::isPosSelected(FXint pos,FXint col) const {
   return (select.startpos<=pos && pos<=select.endpos) && ((select.startcol>select.endcol) || (select.startcol<=col && col<=select.endcol));
   }
 
+// return (select.startpos<select.endpos) && (select.startpos<=pos) && (pos<=select.endpos) && ((select.startcol>select.endcol) || ((select.startcol<=col) && (col<=select.endcol)));
 
 // See if position is in the range selection, and the selection is non-empty
 FXbool FXText::isPosSelected(FXint pos) const {
   return select.startpos<=pos && pos<=select.endpos;
   }
 
+// return select.startpos<select.endpos && select.startpos<=pos && pos<=select.endpos;
 
 // Return true if line containing position is fully visible
 FXbool FXText::isPosVisible(FXint pos) const {
@@ -3482,7 +3455,7 @@ FXbool FXText::setBlockSelection(FXint trow,FXint lcol,FXint brow,FXint rcol,FXb
       select.startcol=lcol;
       select.endcol=rcol;
       }
-    FXTRACE((140,"select: startpos=%d endpos=%d startcol=%d endcol=%d\n",select.startpos,select.endpos,select.startcol,select.endcol));
+    FXTRACE((150,"select: startpos=%d endpos=%d startcol=%d endcol=%d\n",select.startpos,select.endpos,select.startcol,select.endcol));
     return true;
     }
   return false;
@@ -3727,6 +3700,7 @@ void FXText::paintCursor(FXDCWindow& dc) const {
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()-marginbottom){
     FXASSERT(toprow<=cursorrow && cursorrow<toprow+nvisrows);
+    FXASSERT(0<=visrows[cursorrow-toprow] && visrows[cursorrow-toprow]<=cursorpos && cursorpos<=length);
     tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
     cursorx=getVisibleX()+marginleft+pos_x+xoffset(visrows[cursorrow-toprow],cursorpos)-1;
     if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
@@ -3754,7 +3728,8 @@ void FXText::eraseCursor(FXDCWindow& dc) const {
   th=font->getFontHeight();
   cursory=getVisibleY()+margintop+pos_y+cursorrow*th;
   if(getVisibleY()+margintop<cursory+th && cursory<=getVisibleY()+getVisibleHeight()-marginbottom){
-    FXASSERT(0<=cursorrow-toprow && cursorrow-toprow<nvisrows);
+    FXASSERT(toprow<=cursorrow && cursorrow<toprow+nvisrows);
+    FXASSERT(0<=visrows[cursorrow-toprow] && visrows[cursorrow-toprow]<=cursorpos && cursorpos<=length);
     tw=font->getCharWidth((cursorpos<length) && ((c=getChar(cursorpos))>=' ')?c:' ');
     cursorx=getVisibleX()+marginleft+pos_x+xoffset(visrows[cursorrow-toprow],cursorpos)-1;
     if(getVisibleX()<=cursorx+tw+2 && cursorx-2<=getVisibleX()+getVisibleWidth()){
@@ -4764,7 +4739,7 @@ long FXText::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
     graby=event->win_y-pos_y;
     if(event->click_count==1){
       pos=getRowColumnAt(event->win_x,event->win_y,row,col);
-FXTRACE((1,"getRowColumnAt: pos=%d row=%d col=%d nrows=%d length=%d\n",pos,row,col,nrows,length));
+//FXTRACE((1,"getRowColumnAt: pos=%d row=%d col=%d nrows=%d length=%d\n",pos,row,col,nrows,length));
       if((event->state&CONTROLMASK) && !(options&TEXT_WORDWRAP)){
         if(event->state&SHIFTMASK){                     // Shift-select block
           moveCursorRowColumnAndSelect(row,col,true);

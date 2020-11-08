@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,7 +51,7 @@ namespace FX {
 // Mask bottom 3 elements
 #define MMM _mm256_set_epi64x(0,~0,~0,~0)
 
-// More palatable syntax 
+// More palatable syntax
 #define _mm256_storeu_sd(p,x) _mm_storel_pd(p,_mm256_castpd256_pd128(x))
 #define _mm256_loadu_sd(p)    _mm256_castpd128_pd256(_mm_load_sd(p))
 
@@ -424,7 +424,7 @@ FXMat3d& FXMat3d::operator+=(const FXMat3d& w){
 #endif
   return *this;
   }
- 
+
 
 // Subtract matrices
 FXMat3d& FXMat3d::operator-=(const FXMat3d& w){

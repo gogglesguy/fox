@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -507,7 +507,7 @@ long FXFileList::onCmdPasteSel(FXObject*,FXSelector,void*){
   FXString files,action;
   if(getDNDData(FROM_CLIPBOARD,urilistType,files)){
     if(getDNDData(FROM_CLIPBOARD,actionType,action)){
-      FXTRACE((1,"%s::onCmdPasteSel(): Action: %s Files: %s\n",getClassName(),action.text(),files.text()));
+      FXTRACE((100,"%s::onCmdPasteSel(): Action: %s Files: %s\n",getClassName(),action.text(),files.text()));
       if(action[0]=='1'){
         move_files(directory,files);
         }

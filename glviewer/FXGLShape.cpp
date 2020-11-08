@@ -3,7 +3,7 @@
 *                      O p e n G L   S h a p e   O b j e c t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -228,7 +228,7 @@ void FXGLShape::draw(FXGLViewer* viewer){
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
   glEnable(GL_CULL_FACE);
-  
+
   // Draw full object
   if(!viewer->doesTurbo()){
 

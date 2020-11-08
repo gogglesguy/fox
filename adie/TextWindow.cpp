@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -1617,7 +1617,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",NULL,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2019 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2020 Jeroen van der Zijp (jeroen@fox-toolkit.com).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),NULL,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),NULL,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -4057,24 +4057,22 @@ long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
   FXint pos=bookmark[FXSELID(sel)-ID_MARK_0];
   if(0<pos && pos<=editor->getLength()){
     FXString string;
-    FXint b=editor->lineStart(pos);
+    FXint b=editor->lineStart(pos);     // Extent of bookmarked line
     FXint e=editor->lineEnd(pos);
     FXint p=editor->getCursorPos();
-    FXint c=(b<=p&&p<=e);
+    FXint c=(b<=p&&p<=e);               // Cursor inside bookmarked line
     FXASSERT(0<=b && e<=editor->getLength());
-    if(b+50<=e){
-      e=editor->validPos(b+50);
-      editor->extractText(string,b,e-b);
-      string.append("...");
-      }
-    else if(b==e){
+    if(b==e){                           // Empty line: just show line number
       string.format("<<%d>>",pos);
       }
-    else{
-      editor->extractText(string,b,e-b);
+    else{                               // Show squeezed text of line as label
+      editor->extractText(string,b,e-b);    
+      string.simplify();
+      if(50<=string.length()){          // If too long after squeeze, suffix "..."
+        string.replace(50,string.length()-50,"...");
+        }
+      string.substitute("&","&&",true); // Don't want to introduce accelerator key
       }
-    string.trim();
-    string.substitute("&","&&",true);   // Don't want to introduce accelerator key
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&string);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SETVALUE),(void*)(FXuval)c);
     sender->handle(this,FXSEL(SEL_COMMAND,ID_SHOW),NULL);

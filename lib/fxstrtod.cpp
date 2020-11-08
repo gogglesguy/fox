@@ -3,7 +3,7 @@
 *               S t r i n g   t o   D o u b l e   C o n v e r s i o n           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -38,7 +38,6 @@
     will be less accurate!
 */
 
-#define MAXDIGS  20     // Maximum number of significant digits
 
 using namespace FX;
 
@@ -53,6 +52,10 @@ extern FXAPI FXfloat __strtof(const FXchar *beg,const FXchar** end=NULL,FXbool* 
 // Some magick
 const union{ FXulong u; FXdouble f; } inf={FXULONG(0x7ff0000000000000)};
 const union{ FXulong u; FXdouble f; } nan={FXULONG(0x7fffffffffffffff)};
+
+
+// Maximum number of significant digits
+const FXint MAXDIGS=20;
 
 
 // Convert string to double

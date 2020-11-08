@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 //#include <locale.h>
@@ -60,7 +60,7 @@ const double floatnumbers[]={
   0.000000001,
   -1.5,
   0.8,
-  1.0,
+  1.0,                          // 0x1p+0
   10.0,
   100.0,
   1000.0,
@@ -79,9 +79,12 @@ const double floatnumbers[]={
   6442452944.1234,
   1.23456789E+20,
   0.123456789,
-  2.2250738585072014e-308,
-  1.7976931348623157e+308,
+  2.2250738585072014e-308,      // 0x1p-1022
+  4.94065645841246544177e-324,  // 0x0.0000000000001p-1023
+  1.7976931348623157e+308,      // 0x1.fffffffffffffp+1023
   1.9382023e-03,
+  5e-320,
+  0x0.0000000002788p-1023,
   0.0,
   -0.0
   };
@@ -159,7 +162,6 @@ int main(int argc,char* argv[]){
   FXuval x,y;
 
   //setlocale(LC_ALL,"");
-
   if(argc==2){
     FXdouble num=strtod(argv[1],NULL);
     __snprintf(buffer,sizeof(buffer),"%.20e",num);
@@ -174,6 +176,7 @@ int main(int argc,char* argv[]){
       __snprintf(buffer,sizeof(buffer),intformat[x],intnumbers[y]);
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",intformat[x],buffer);
       }
+    fprintf(stdout,"\n");
     }
 
   fprintf(stdout,"\n");
@@ -184,6 +187,12 @@ int main(int argc,char* argv[]){
       __snprintf(buffer,sizeof(buffer),floatformat[x],floatnumbers[y]);
       fprintf(stdout,"format=\"%s\" output=\"%s\"\n",floatformat[x],buffer);
       }
+    fprintf(stdout,"\n");
+    }
+
+  for(y=0; y<ARRAYNUMBER(floatnumbers); y++){
+    __snprintf(buffer,sizeof(buffer),"0x%016lx",Math::fpBits(floatnumbers[y]));
+    fprintf(stdout,"format=\"%s\" output=\"%s\"\n","0x%016lx",buffer);
     }
 
   fprintf(stdout,"\n");
@@ -218,22 +227,6 @@ int main(int argc,char* argv[]){
   __snprintf(buffer,sizeof(buffer),positionalformat3,10,20,30);
   fprintf(stdout,"format=\"%s\" output=\"%s\"\n",positionalformat3,buffer);
 
-  int num=0;
-  __sscanf("199,999","%'d",&num);
-  fprintf(stdout,"num=%d\n",num);
-
-  __sscanf("1,999,9","%'d",&num);
-  fprintf(stdout,"num=%d\n",num);
-
-  __sscanf("1,999,99","%'d",&num);
-  fprintf(stdout,"num=%d\n",num);
-
-  __sscanf("1,999,999","%'d",&num);
-  fprintf(stdout,"num=%d\n",num);
-
-  __sscanf("1999,999","%'d",&num);
-  fprintf(stdout,"num=%d\n",num);
-
   fprintf(stdout,"\n");
 
   // Special cases float formatting
@@ -245,6 +238,29 @@ int main(int argc,char* argv[]){
   fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%#.3g",buffer);
 
   fprintf(stdout,"\n");
+
+
+  // Small dernormalized float, regular notation
+  __snprintf(buffer,sizeof(buffer),"%.18le",5e-320);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%.18le",buffer);
+  __snprintf(buffer,sizeof(buffer),"%a",5e-320);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%a",buffer);
+  fprintf(stdout,"\n");
+
+  // Small dernormalized float, passed as hex (types may be flagged as wrong)
+  __snprintf(buffer,sizeof(buffer),"%.18le",FXULONG(0x0000000000002788));
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%.18le",buffer);
+  __snprintf(buffer,sizeof(buffer),"%a",FXULONG(0x0000000000002788));
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%a",buffer);
+  fprintf(stdout,"\n");
+
+  // Small dernormalized float, passed as floating point hex syntax
+  __snprintf(buffer,sizeof(buffer),"%.18le",0x0.0000000002788p-1023);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%.18le",buffer);
+  __snprintf(buffer,sizeof(buffer),"%a",0x0.0000000002788p-1023);
+  fprintf(stdout,"format=\"%s\" output=\"%s\"\n","%a",buffer);
+  fprintf(stdout,"\n");
+
 
   return 0;
   }

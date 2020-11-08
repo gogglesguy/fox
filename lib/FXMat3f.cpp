@@ -3,7 +3,7 @@
 *            S i n g l e - P r e c i s i o n   3 x 3   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -55,11 +55,11 @@ namespace FX {
 // Initialize matrix from scalar
 FXMat3f::FXMat3f(FXfloat s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_set1_ps(s)); 
+  _mm256_storeu_ps(&m[0][0],_mm256_set1_ps(s));
   _mm_store_ss    (&m[2][2],_mm_set1_ps   (s));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set1_ps(s)); 
-  _mm_storeu_ps(&m[1][1],_mm_set1_ps(s)); 
+  _mm_storeu_ps(&m[0][0],_mm_set1_ps(s));
+  _mm_storeu_ps(&m[1][1],_mm_set1_ps(s));
   _mm_store_ss (&m[2][2],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
@@ -80,7 +80,7 @@ FXMat3f::FXMat3f(const FXMat2f& s){
 // Initialize matrix from another matrix
 FXMat3f::FXMat3f(const FXMat3f& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0])); 
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0]));
   _mm_store_ss    (&m[2][2],_mm_load_ss    (&s[2][2]));
 #elif defined(FOX_HAS_SSE)
   _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0])); _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1])); _mm_store_ss(&m[2][2],_mm_load_ss(&s[2][2]));
@@ -109,11 +109,11 @@ FXMat3f::FXMat3f(const FXMat4f& s){
 // Initialize matrix from array
 FXMat3f::FXMat3f(const FXfloat s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0)); 
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
   _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0)); 
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4)); 
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
   _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
 #else
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
@@ -162,11 +162,11 @@ FXMat3f::FXMat3f(const FXQuatf& quat){
 // Assign from scalar
 FXMat3f& FXMat3f::operator=(FXfloat s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_set1_ps(s)); 
+  _mm256_storeu_ps(&m[0][0],_mm256_set1_ps(s));
   _mm_store_ss    (&m[2][2],_mm_set1_ps   (s));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set1_ps(s)); 
-  _mm_storeu_ps(&m[1][1],_mm_set1_ps(s)); 
+  _mm_storeu_ps(&m[0][0],_mm_set1_ps(s));
+  _mm_storeu_ps(&m[1][1],_mm_set1_ps(s));
   _mm_store_ss (&m[2][2],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
@@ -189,11 +189,11 @@ FXMat3f& FXMat3f::operator=(const FXMat2f& s){
 // Assignment operator
 FXMat3f& FXMat3f::operator=(const FXMat3f& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0])); 
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0]));
   _mm_store_ss    (&m[2][2],_mm_load_ss    (&s[2][2]));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0])); 
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1])); 
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0]));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1]));
   _mm_store_ss (&m[2][2],_mm_load_ss (&s[2][2]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
@@ -232,8 +232,8 @@ FXMat3f& FXMat3f::operator=(const FXfloat s[]){
   _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
   _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0)); 
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4)); 
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
   _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
 #else
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
@@ -247,11 +247,11 @@ FXMat3f& FXMat3f::operator=(const FXfloat s[]){
 // Set value from scalar
 FXMat3f& FXMat3f::set(FXfloat s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_set1_ps(s)); 
+  _mm256_storeu_ps(&m[0][0],_mm256_set1_ps(s));
   _mm_store_ss    (&m[2][2],_mm_set1_ps   (s));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set1_ps(s)); 
-  _mm_storeu_ps(&m[1][1],_mm_set1_ps(s)); 
+  _mm_storeu_ps(&m[0][0],_mm_set1_ps(s));
+  _mm_storeu_ps(&m[1][1],_mm_set1_ps(s));
   _mm_store_ss (&m[2][2],_mm_set1_ps(s));
 #else
   m[0][0]=s; m[0][1]=s; m[0][2]=s;
@@ -274,11 +274,11 @@ FXMat3f& FXMat3f::set(const FXMat2f& s){
 // Set value from another matrix
 FXMat3f& FXMat3f::set(const FXMat3f& s){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0])); 
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(&s[0][0]));
   _mm_store_ss    (&m[2][2],_mm_load_ss    (&s[2][2]));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0])); 
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1])); 
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(&s[0][0]));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(&s[1][1]));
   _mm_store_ss (&m[2][2],_mm_load_ss (&s[2][2]));
 #else
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=s[0][2];
@@ -307,11 +307,11 @@ FXMat3f& FXMat3f::set(const FXMat4f& s){
 // Set value from array
 FXMat3f& FXMat3f::set(const FXfloat s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0)); 
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
   _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
 #elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0)); 
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4)); 
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
   _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
 #else
   m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];

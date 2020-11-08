@@ -3,7 +3,7 @@
 *                           M a t h   F u n c t i o n s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2015,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2015,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -194,28 +194,31 @@ const FXdouble DTOR=0.0174532925199432957692369077;
 /// Multiplier for radians to degrees
 const FXdouble RTOD=57.295779513082320876798154814;
 
+/// Feigenbaum constant
+const FXdouble FEIGENBAUM=4.6692016091029906718532038215;
+
 /*********************************  Functions  *********************************/
 
 // FOX math functions live here
 namespace Math {
 
-/// Sign of single precision float point number
-extern FXAPI FXuint fpSign(FXfloat x);
+/// Sign of single precision float point number (0..1)
+extern FXAPI FXint fpSign(FXfloat x);
 
-/// Sign of double precision float point number
-extern FXAPI FXulong fpSign(FXdouble x);
+/// Sign of double precision float point number (0..1)
+extern FXAPI FXlong fpSign(FXdouble x);
 
-/// Mantissa of single precision float point number
-extern FXAPI FXuint fpMantissa(FXfloat x);
+/// Signed exponent of single precision float point number (-127..128)
+extern FXAPI FXint fpExponent(FXfloat x);
 
-/// Mantissa of double precision float point number
-extern FXAPI FXulong fpMantissa(FXdouble x);
+/// Signed exponent of double precision float point number (-1023..1023)
+extern FXAPI FXlong fpExponent(FXdouble x);
 
-/// Exponent of single precision float point number
-extern FXAPI FXuint fpExponent(FXfloat x);
+/// Mantissa of single precision float point number (including hidden bit)
+extern FXAPI FXint fpMantissa(FXfloat x);
 
-/// Exponent of double precision float point number
-extern FXAPI FXulong fpExponent(FXdouble x);
+/// Mantissa of double precision float point number (including hidden bit)
+extern FXAPI FXlong fpMantissa(FXdouble x);
 
 /// Single precision floating point number is finite
 extern FXAPI FXbool fpFinite(FXfloat x);
@@ -964,6 +967,14 @@ static inline FXdouble pow10(FXdouble x){
 extern FXAPI FXdouble pow10i(FXint ex);
 
 
+/// Single precision integer power
+extern FXAPI FXfloat powi(FXfloat base,FXint ex);
+
+
+/// Double precision integer power
+extern FXAPI FXdouble powi(FXdouble base,FXint ex);
+
+
 /// Single precision natural logarithm
 static inline FXfloat log(FXfloat x){
   return ::logf(x);
@@ -1024,13 +1035,6 @@ static inline FXfloat log10(FXfloat x){
 static inline FXdouble log10(FXdouble x){
   return ::log10(x);
   }
-
-
-/// Single precision integer power
-extern FXAPI FXfloat ipow(FXfloat base,FXint ex);
-
-/// Double precision integer power
-extern FXAPI FXdouble ipow(FXdouble base,FXint ex);
 
 }
 

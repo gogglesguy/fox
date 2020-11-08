@@ -264,6 +264,8 @@ FXTime FXSystem::localTimeZoneOffset(){
   setuplocaltimezone();
 #if defined(_WIN32)
   return minutes*tzi.Bias;              // +minutes*tzi.StandardBias;
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
+  return 0;     // FIXME
 #else
   return seconds*timezone;
 #endif
@@ -425,12 +427,12 @@ FXTime FXSystem::daylightSavingsActive(FXTime ns){
   struct tm tmresult;
   time_t tmp=(time_t)(ns/seconds);
   struct tm* ptm=localtime_r(&tmp,&tmresult);
-  FXTRACE((1,"FXSystem::daylightSavingsActive(%lld) = %d\n",ns,ptm && ptm->tm_isdst!=0));
+  FXTRACE((100,"FXSystem::daylightSavingsActive(%lld) = %d\n",ns,ptm && ptm->tm_isdst!=0));
   return ptm && ptm->tm_isdst!=0;
 #else
   time_t tmp=(time_t)(ns/seconds);
   struct tm* ptm=localtime(&tmp);
-  FXTRACE((1,"FXSystem::daylightSavingsActive(%lld) = %d\n",ns,ptm && ptm->tm_isdst!=0));
+  FXTRACE((100,"FXSystem::daylightSavingsActive(%lld) = %d\n",ns,ptm && ptm->tm_isdst!=0));
   return ptm && ptm->tm_isdst!=0;
 #endif
   }

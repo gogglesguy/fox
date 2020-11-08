@@ -3,7 +3,7 @@
 *                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -671,7 +671,7 @@ public:
 
   /**
   * Count number of rows taken up by some text.
-  * Start should be on a row start.
+  * Start and end should be on a row start.
   */
   FXint countRows(FXint start,FXint end) const;
 

@@ -3,7 +3,7 @@
 *                             Half Float Support Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -43,7 +43,7 @@ FXhalf  convertedback[65536];
 int main(int argc,char* argv[]){
   FXint i;
   CNV c;
-  
+
   // Fill initial half data
   for(i=0; i<65536; ++i){ *((FXushort*)&initial[i])=i; }
 

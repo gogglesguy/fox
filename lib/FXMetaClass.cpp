@@ -3,7 +3,7 @@
 *                         M e t a C l a s s   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -129,12 +129,12 @@ FXuint              FXMetaClass::metaClassSlots=0;
 FXuint              FXMetaClass::metaClassCount=0;
 
 
-// Hash function for string
+// Compute FNV1a hash value of string
 static inline FXuint hashstring(const FXchar* str){
-  FXuint result=0;
+  FXuint result=0x811C9DC5;
   FXuchar c;
   while((c=*str++)!='\0'){
-    result=((result<<5)+result)^c;
+    result=(result^c)*0x01000193;
     }
   return result;
   }

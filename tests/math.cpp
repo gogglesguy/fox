@@ -3,7 +3,7 @@
 *                              M a t h   T e s t                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -284,13 +284,13 @@ static const char sign[2]={'+','-'};
 
 // Print a double, disassembled
 void printDP(FXdouble x){
-  fprintf(stderr,"0x%016lx (%c)(% 4ld(%4ld))(0x%013lx) -> %+.17lg\n",Math::fpBits(x),sign[Math::fpSign(x)],Math::fpExponent(x)-1023,Math::fpExponent(x),Math::fpMantissa(x),x);
+  fprintf(stderr,"0x%016lx (%c)(% 4ld)(0x%014lx) -> %+.17lg\n",Math::fpBits(x),sign[Math::fpSign(x)],Math::fpExponent(x),Math::fpMantissa(x),x);
   }
 
 
 // Print a double, disassembled
 void printSP(FXfloat x){
-  fprintf(stderr,"0x%08x (%c)(% 3d(%3d))(0x%06x) -> %+.17lg\n",Math::fpBits(x),sign[Math::fpSign(x)],Math::fpExponent(x)-127,Math::fpExponent(x),Math::fpMantissa(x),(FXdouble)x);
+  fprintf(stderr,"0x%08x (%c)(% 3d)(0x%06x) -> %+.17lg\n",Math::fpBits(x),sign[Math::fpSign(x)],Math::fpExponent(x),Math::fpMantissa(x),(FXdouble)x);
   }
 
 

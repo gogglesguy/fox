@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2019 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -2584,14 +2584,14 @@ FXString FXString::vvalue(const FXchar* fmt,va_list args){
 
 /*******************************************************************************/
 
-// Compute hash value of string
+// Compute FNV1a hash value of string
 FXuint FXString::hash(const FXchar* s){
-  FXuint result=0;
+  FXuint result=0x811C9DC5;
   FXuchar c;
-  while((c=*s++)!=0){
-    result = ((result << 5) + result) ^ c;      // This should be a very good hash function:- just 4 collisions
-    }                                           // on the webster web2 dictionary of 234936 words, and no
-  return result;                                // collisions at all on the standard dict!
+  while((c=*s++)!='\0'){
+    result=(result^c)*0x01000193;
+    }
+  return result;
   }
 
 
