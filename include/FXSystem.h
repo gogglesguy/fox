@@ -53,13 +53,13 @@ namespace FXSystem {
   extern FXAPI const FXchar isoTimeFormat[];
 
   /// Format system time to string
-  extern FXAPI FXString systemTimeFormat(const Time& st,const FXchar* format);
+  extern FXAPI FXString systemTimeFormat(const Time& st,const FXchar* format=defaultTimeFormat);
 
   /// Parse system time from string, returning number of characters parsed
-  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* format,const FXchar* string);
+  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* string,const FXchar* format=defaultTimeFormat);
 
   /// Parse system time from string, returning number of characters parsed
-  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* format,const FXString& string);
+  extern FXAPI FXint systemTimeParse(Time& st,const FXString& string,const FXchar* format=defaultTimeFormat);
 
   /**
   * Returns number of days since civil 1970-01-01.  Negative values indicate
@@ -82,6 +82,9 @@ namespace FXSystem {
 
   /// Return offset between standard local time zone to UTC, in nanoseconds
   extern FXAPI FXTime localTimeZoneOffset();
+  
+  /// Return time zone name (or daylight savings time time zone name)
+  extern FXAPI FXString localTimeZoneName(FXbool dst=false);
 
   /// Return offset daylight savings time to standard time, in nanoseconds
   extern FXAPI FXTime daylightSavingsOffset();
@@ -92,43 +95,22 @@ namespace FXSystem {
 
   /// Convert nanoseconds since Unix Epoch to NTP (ssss:ffff)
   extern FXAPI FXulong ntpTimeFromTime(FXTime ns);
+  
+  
+  /// Format UTC nanoseconds since Unix Epoch to date-time string using given format
+  extern FXAPI FXString universalTime(FXTime ns,const FXchar *format=defaultTimeFormat);
+
+  /// Parse date-time string to UTC nanoseconds since Unix Epoch using given format
+  extern FXAPI FXTime universalTime(const FXchar* string,const FXchar* format=defaultTimeFormat);
+  extern FXAPI FXTime universalTime(const FXString& string,const FXchar* format=defaultTimeFormat);
 
 
-  /**
-  * Convert time in nanoseconds since 1/1/1970 to local date string as per strftime(3).
-  * Format characters supported by most systems are:
-  *
-  *  %a %A %b %B %c %d %H %I %j %m %M %p %S %U %w %W %x %X %y %Y %Z %%
-  *
-  * Some systems support additional conversions.
-  */
-  extern FXAPI FXString localTime(const FXchar *format,FXTime ns);
+  /// Format UTC nanoseconds since Unix Epoch to local date-time string using given format
+  extern FXAPI FXString localTime(FXTime ns,const FXchar *format=defaultTimeFormat);
 
-  /// Convert time in nanoseconds since 1/1/1970 to local date string
-  extern FXAPI FXString localTime(FXTime ns);
-
-  /**
-  * Convert date string to time in nanoseconds since 1/1/1970, as per strptime.
-  * Format characters supported by most systems are:
-  *
-  *  %a %A %b %B %c %d %H %I %j %m %M %p %S %U %w %W %x %X %y %Y %Z %%
-  *
-  * Some systems support additional conversions.
-  */
-  extern FXAPI FXTime localTime(const FXchar* string,const FXchar* format);
-  extern FXAPI FXTime localTime(const FXString& string,const FXchar* format);
-
-  /// Convert date string to time in nanoseconds since 1/1/1970.
-  extern FXAPI FXTime localTime(const FXchar* string);
-  extern FXAPI FXTime localTime(const FXString& string);
-
-  /**
-  * Convert time in nanoseconds since 1/1/1970 to universal date string as per strftime(3).
-  */
-  extern FXAPI FXString universalTime(const FXchar *format,FXTime ns);
-
-  /// Convert time in nanoseconds since 1/1/1970 to universal date string
-  extern FXAPI FXString universalTime(FXTime ns);
+  /// Parse local date-time string to UTC nanoseconds since Unix Epoch using given format
+  extern FXAPI FXTime localTime(const FXchar* string,const FXchar* format=defaultTimeFormat);
+  extern FXAPI FXTime localTime(const FXString& string,const FXchar* format=defaultTimeFormat);
 
 
   /// Get effective user id

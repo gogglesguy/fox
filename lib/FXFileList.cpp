@@ -1424,7 +1424,7 @@ FXbool FXFileList::listItems(FXbool force,FXbool notify){
             attrs=FXSystem::modeString(mode);
 
             // Mod time
-            modtm=FXSystem::localTime(timeformat.text(),info.modified());
+            modtm=FXSystem::localTime(info.modified(),timeformat.text());
 
             // Link name, if any
             lnknm=FXString::null;

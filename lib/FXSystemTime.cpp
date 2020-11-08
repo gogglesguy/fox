@@ -53,7 +53,7 @@ const FXchar FXSystem::isoTimeFormat[]="%FT%T%z";
 static volatile FXuint local_zone_offset_set=0;  // Called already?
 static FXTime          local_zone_offset=0;      // Offset local to UTC (ns)
 static FXTime          local_dst_offset=0;       // Offset daylight savings to UTC (ns)
-
+static FXchar          local_zone_name[2][32];   // Local zone name (regular and daylight savings)
 
 // Cumulative days of the year, for non-leap-years and leap-years
 static const FXint days_of_year[2][13]={
@@ -216,6 +216,9 @@ void FXSystem::systemTimeFromTime(Time& st,FXTime ns){
 
 /*******************************************************************************/
 
+//BOOL SystemTimeToTzSpecificLocalTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpUniversalTime,LPSYSTEMTIME lpLocalTime);
+//BOOL TzSpecificLocalTimeToSystemTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpLocalTime,LPSYSTEMTIME lpUniversalTime);
+
 // Setup timezone information
 static void setuplocaltimezone(){
 #if defined(_WIN32)
@@ -228,6 +231,8 @@ static void setuplocaltimezone(){
     GetTimeZoneInformation(&tzi);
     local_zone_offset=minutes*tzi.Bias;
     local_dst_offset=0;
+    strncpy(local_zone_name[0],tzi.StandardName,ARRAYNUMBER(local_zone_name[0])-1);
+    strncpy(local_zone_name[1],tzi.DaylightName,ARRAYNUMBER(local_zone_name[1])-1);
     if(tzi.StandardDate.wMonth!=0 && tzi.DaylightDate.wMonth!=0){
       local_dst_offset=minutes*tzi.DaylightBias;
       }
@@ -240,6 +245,8 @@ static void setuplocaltimezone(){
     tzset();
     local_zone_offset=seconds*timezone;
     local_dst_offset=-hours*daylight;
+    strncpy(local_zone_name[0],tzname[0],ARRAYNUMBER(local_zone_name[0])-1);
+    strncpy(local_zone_name[1],tzname[1],ARRAYNUMBER(local_zone_name[1])-1);
     }
 #endif
   }
@@ -252,6 +259,13 @@ FXTime FXSystem::localTimeZoneOffset(){
   }
 
 
+// Return time zone name (or daylight savings time time zone name)
+FXString FXSystem::localTimeZoneName(FXbool dst){
+  setuplocaltimezone();
+  return local_zone_name[dst];
+  }
+
+
 // Return offset daylight savings time to standard time, in nanoseconds
 FXTime FXSystem::daylightSavingsOffset(){
   setuplocaltimezone();
@@ -260,176 +274,56 @@ FXTime FXSystem::daylightSavingsOffset(){
 
 /*******************************************************************************/
 
-#if NEW_TIME
-
-// Convert file time to string as per systemTimeFormat()
-FXString FXSystem::universalTime(const TChar *format,FXTime ns){
-  FXSystem::Time st;
-  FXString string;
-  st.offset=0;
+// Format UTC nanoseconds since Unix Epoch to date-time string using given format
+FXString FXSystem::universalTime(FXTime ns,const FXchar *format){
+  FXSystem::Time st={0,0,0,0,0,0,0,0,0,0};
   FXSystem::systemTimeFromTime(st,ns);
-  FXSystem::systemTimeFormat(string,format,st);
-  return string;
-  }
-
-#endif
-
-
-// Convert file time to string as per strftime format
-FXString FXSystem::universalTime(const FXchar *format,FXTime ns){
-  const FXTime seconds=1000000000;
-  time_t tmp=(time_t)(ns/seconds);
-#if defined(WIN32)
-#if (_MSC_VER >= 1500)
-  struct tm tmv;
-  if(gmtime_s(&tmv,&tmp)==0){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=gmtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
-#elif defined(HAVE_GMTIME_R)
-  struct tm tmresult;
-  struct tm* ptm=gmtime_r(&tmp,&tmresult);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=gmtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
+  return FXSystem::systemTimeFormat(st,format);
   }
 
 
-// Convert file time to string
-FXString FXSystem::universalTime(FXTime ns){
-  return FXSystem::universalTime(defaultTimeFormat,ns);
+// Parse utc date-time string to UTC nanoseconds since Unix Epoch using given format
+// Assume string is time in UTC, unless a time zone offset was parsed; in that 
+// case, adjust the time according to the zone offset.
+FXTime FXSystem::universalTime(const FXchar* string,const FXchar* format){
+  FXSystem::Time st={0,0,0,0,0,0,0,0,0,0};
+  if(FXSystem::systemTimeParse(st,string,format)){
+    return FXSystem::timeFromSystemTime(st)+st.offset*FXLONG(1000000000);
+    }
+  return forever;
+  }
+
+
+// Parse date-time string to UTC nanoseconds since Unix Epoch using given format
+FXTime FXSystem::universalTime(const FXString& string,const FXchar* format){
+  return FXSystem::universalTime(string.text(),format);
   }
 
 /*******************************************************************************/
 
-// FIXME FXSystem::universalTime(const FXString&) also needed
-
-
-/*******************************************************************************/
-
-#if NEW_TIME
-
-// Convert file time to string as per strftime format
-// Adjust value for local time zone and daylight savings time
-FXString FXSystem::localTime(const TChar *format,FXTime ns){
-  const NSTime seconds=1000000000;
-  FXSystem::Time st;
-  FXString string;
-  st.offset=-(FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset())/seconds;
-  FXSystem::systemTimeFromTime(st,ns);
-  FXSystem::systemTimeFormat(string,format,st);
-  return string;
-  }
-
-#endif
-
-// Convert file time to string as per strftime format
-FXString FXSystem::localTime(const FXchar *format,FXTime ns){
-  const FXTime seconds=1000000000;
-  time_t tmp=(time_t)(ns/seconds);
-#if defined(WIN32)
-#if (_MSC_VER >= 1500)
-  struct tm tmv;
-  if(localtime_s(&tmv,&tmp)==0){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=localtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
-#elif defined(HAVE_LOCALTIME_R)
-  struct tm tmresult;
-  struct tm* ptm=localtime_r(&tmp,&tmresult);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=localtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
+// Format UTC nanoseconds since Unix Epoch to local date-time string using given format
+FXString FXSystem::localTime(FXTime ns,const FXchar *format){
+  FXTime zoneoffset=FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset(); 
+  FXSystem::Time st={0,0,0,0,0,0,0,0,0,zoneoffset/FXLONG(1000000000)};
+  FXSystem::systemTimeFromTime(st,ns-zoneoffset); 
+  return FXSystem::systemTimeFormat(st,format);
   }
 
 
-// Convert file time to string
-FXString FXSystem::localTime(FXTime ns){
-  return FXSystem::localTime(defaultTimeFormat,ns);
-  }
-
-/*******************************************************************************/
-
-//BOOL SystemTimeToTzSpecificLocalTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpUniversalTime,LPSYSTEMTIME lpLocalTime);
-//BOOL TzSpecificLocalTimeToSystemTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpLocalTime,LPSYSTEMTIME lpUniversalTime);
-
-
-// Convert date string to time in nanoseconds since 1/1/1970
+// Parse local date-time string to UTC nanoseconds since Unix Epoch using given format
+// Assume string is time in local time, unless a time zone offset was parsed; in that 
+// case, adjust the time according to the zone offset.
 FXTime FXSystem::localTime(const FXchar* string,const FXchar* format){
-  const FXTime seconds=1000000000;
-  FXTime result=forever;
-#if defined(WIN32)
-#else
-  struct tm date;
-  clearElms(&date,1);
-  if(strptime(string,format,&date)!=NULL){
-    time_t tmp=mktime(&date);
-    result=seconds*tmp;
+  FXTime zoneoffset=FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset(); 
+  FXSystem::Time st={0,0,0,0,0,0,0,0,0,zoneoffset/FXLONG(1000000000)};
+  if(FXSystem::systemTimeParse(st,string,format)){
+    return FXSystem::timeFromSystemTime(st)+st.offset*FXLONG(1000000000);
     }
-#endif
-  return result;
+  return forever;
   }
 
 
-// Convert universal date string to time in nanoseconds since 1/1/1970
-FXTime FXSystem::localTime(const FXchar* string){
-  return FXSystem::localTime(string,defaultTimeFormat);
-  }
-
-
-// Convert universal date string to time in nanoseconds since 1/1/1970
-FXTime FXSystem::localTime(const FXString& string){
-  return FXSystem::localTime(string.text(),defaultTimeFormat);
-  }
-
-
-// Convert universal date string to time in nanoseconds since 1/1/1970
+// Parse local date-time string to UTC nanoseconds since Unix Epoch using given format
 FXTime FXSystem::localTime(const FXString& string,const FXchar* format){
   return FXSystem::localTime(string.text(),format);
   }

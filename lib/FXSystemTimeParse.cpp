@@ -258,6 +258,7 @@ static const FXchar *findstring(FXint& result,const FXchar *string,const FXchar 
   return NULL;
   }
 
+
 // Convert string of digits, but ensure number is [lo..hi]
 static const FXchar *convertstring(FXint& result,const FXchar *string,FXint lo,FXint hi){
   FXint digs=hi;
@@ -278,6 +279,7 @@ static const FXchar *convertstring(FXint& result,const FXchar *string,FXint lo,F
   return NULL;
   }
 
+
 // Is leap year
 static FXint is_leap(FXint year){
   return !(year%4) && ((year%100) || !(year%400));
@@ -289,12 +291,14 @@ static FXint days_in_year(FXint year){
   return 365+is_leap(year);
   }
 
+
 // Calculate the week day of the first day of a year, for Gregorian calendar.
 // Simplified version of Tomohiko Sakamoto's method for Gregorian Calendar.
 static FXint day_of_week_jan1(FXint year){
   year-=1;
   return (year+year/4-year/100+year/400+1)%7;
   }
+
 
 // Calculate the week day of the 4th day of a year, for Gregorian calendar.
 // Simplified version of Tomohiko Sakamoto's method for Gregorian Calendar.
@@ -726,10 +730,8 @@ nxt:  ch=*format++;
 
 
 // Parse system time from string, returning number of characters parsed
-FXint FXSystem::systemTimeParse(Time& st,const FXchar* format,const FXchar* string){
-  const FXchar* ptr;
-  FXuint set=0;
-  st.year=st.month=st.mday=st.yday=st.wday=st.hour=st.min=st.sec=st.nano=st.offset=0;
+FXint FXSystem::systemTimeParse(Time& st,const FXchar* string,const FXchar* format){
+  const FXchar* ptr; FXuint set=0;
   if((ptr=systemTimeParseRecursive(st,set,string,format))!=NULL){
     return ptr-string;
     }
@@ -738,14 +740,8 @@ FXint FXSystem::systemTimeParse(Time& st,const FXchar* format,const FXchar* stri
 
 
 // Parse system time from string, returning number of characters parsed
-FXint FXSystem::systemTimeParse(Time& st,const FXchar* format,const FXString& string){
-  const FXchar* ptr;
-  FXuint set=0;
-  st.year=st.month=st.mday=st.yday=st.wday=st.hour=st.min=st.sec=st.nano=st.offset=0;
-  if((ptr=systemTimeParseRecursive(st,set,string.text(),format))!=NULL){
-    return ptr-string.text();
-    }
-  return 0;
+FXint FXSystem::systemTimeParse(Time& st,const FXString& string,const FXchar* format){
+  return FXSystem::systemTimeParse(st,string.text(),format);
   }
 
 

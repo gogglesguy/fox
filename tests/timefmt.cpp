@@ -267,7 +267,7 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"--from-iso")==0){         // Test ISO week and year
       for(x=0; x<ARRAYNUMBER(isoweek_date_strings); x++){
         clearElms(&st,1);
-        FXSystem::systemTimeParse(st,"%G-W%V-%u",isoweek_date_strings[x]);
+        FXSystem::systemTimeParse(st,isoweek_date_strings[x],"%G-W%V-%u");
         z=FXSystem::timeFromSystemTime(st);
         fxmessage("%-16s -> ",isoweek_date_strings[x]);
         fxmessage("%04d/%02d/%02d %02d:%02d:%02d  (wday=%1d  yday=%03d)\n",st.year,st.month,st.mday,st.hour,st.min,st.sec,st.wday,st.yday);
@@ -336,7 +336,7 @@ int main(int argc,char* argv[]){
 
 #if 1
   for(x=0; x<ARRAYNUMBER(timeparse); x++){
-    FXSystem::systemTimeParse(st,timeparse[x],timestrings[x]);
+    FXSystem::systemTimeParse(st,timestrings[x],timeparse[x]);
     z=FXSystem::timeFromSystemTime(st);
     fxmessage("format=%-16s input=%-16s -> ",timeparse[x],timestrings[x]);
     string=format_time("date: %Y/%m/%d time: %H:%M:%S wday: %w yday: %j week: %U epoch: %s",z);
@@ -348,7 +348,7 @@ int main(int argc,char* argv[]){
 #if 1
   for(x=0; x<ARRAYNUMBER(timeparse); x++){
     clearElms(&st,1);
-    FXSystem::systemTimeParse(st,timeparse[x],timestrings[x]);
+    FXSystem::systemTimeParse(st,timestrings[x],timeparse[x]);
     z=FXSystem::timeFromSystemTime(st);
     fxmessage("format=%-16s input=%-16s -> ",timeparse[x],timestrings[x]);
     fxmessage("%04d/%02d/%02d %02d:%02d:%02d  (wday=%1d  yday=%03d gmt=%6d z=%lld)\n",st.year,st.month,st.mday,st.hour,st.min,st.sec,st.wday,st.yday,st.offset,z);

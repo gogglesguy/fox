@@ -225,7 +225,7 @@ static FXint iso_year(const FXSystem::Time& st){
 
 // Format system time to string, generating up to length characters of the result.
 // Return number of characters that would have been needed to store the full result.
-static FXint systemTimeFormatRecursive(FXchar* string,FXint length,const FXchar* format,const FXSystem::Time& st){
+static FXint systemTimeFormatRecursive(const FXSystem::Time& st,FXchar* string,FXint length,const FXchar* format){
   const FXchar* src;
   FXchar buf[32];
   FXint result,ch,val,n;
@@ -366,42 +366,42 @@ nxt:  ch=*format++;
           }
         goto x;
       case 'D':
-        n=systemTimeFormatRecursive(string,length-result,"%m/%d/%y",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%m/%d/%y");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'F':
-        n=systemTimeFormatRecursive(string,length-result,"%Y-%m-%d",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%Y-%m-%d");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'c':
-        n=systemTimeFormatRecursive(string,length-result,"%b %a %d %k:%M:%S %Z %Y",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%b %a %d %k:%M:%S %Z %Y");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'r':
-        n=systemTimeFormatRecursive(string,length-result,"%I:%M:%S %p",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%I:%M:%S %p");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'R':
-        n=systemTimeFormatRecursive(string,length-result,"%H:%M",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%H:%M");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'x':
-        n=systemTimeFormatRecursive(string,length-result,"%b %a %d",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%b %a %d");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'X':
-        n=systemTimeFormatRecursive(string,length-result,"%k:%M:%S",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%k:%M:%S");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'T':
-        n=systemTimeFormatRecursive(string,length-result,"%H:%M:%S",st);
+        n=systemTimeFormatRecursive(st,string,length-result,"%H:%M:%S");
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
@@ -441,10 +441,10 @@ x:if(result<length){
 FXString FXSystem::systemTimeFormat(const Time& st,const FXchar* format){
   FXString result;
   if(format && *format){
-    FXint len=systemTimeFormatRecursive(result.text(),result.length(),format,st);       // Try to see if existing buffer fits
+    FXint len=systemTimeFormatRecursive(st,result.text(),result.length(),format);       // Try to see if existing buffer fits
     if(result.length()<len){
       result.length(len);
-      len=systemTimeFormatRecursive(result.text(),result.length(),format,st);           // Again with exactly the right size
+      len=systemTimeFormatRecursive(st,result.text(),result.length(),format);           // Again with exactly the right size
       }
     result.length(len);
     }

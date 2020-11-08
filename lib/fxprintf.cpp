@@ -91,8 +91,8 @@
      'f', 'F'   Simple point conversion.
      'g', 'G'   Shortest representation point conversion.
      'a', 'A'   Hexadecimal floating point output. If no precision specified,
-                print the shortest number of digits (at most 13 after the hexadecimal 
-                point), otherwise, round the last printed digit.  Use upper- or lower-case, 
+                print the shortest number of digits (at most 13 after the hexadecimal
+                point), otherwise, round the last printed digit.  Use upper- or lower-case,
                 depending on whether A or a was used.
 
   - Printing special floating point values:
@@ -112,9 +112,6 @@
     Its therefore best if no parameters are skipped; referencing a single parameter
     multiple times however, is no problem!!
 
-  - FIXME Subtle difference between glibc: does NOT output '\0' at the end, unless
-    buffer is large enough.  This implementation is better for our purposes, however.
-
   - A sticky situation developed with compilers optimizing statements like:
 
         number*=xxx;
@@ -128,6 +125,9 @@
     The problem is prevented by declaring 'number' as 'volatile' which causes the
     value to be written to memory after assignment, and thus execute these two
     statements as written.
+
+  - Subtle difference between glibc: does NOT output '\0' at the end, unless
+    buffer is large enough.  
 */
 
 #define CONVERTSIZE     512     // Conversion buffer
@@ -206,7 +206,6 @@ static FXdouble scaleneg2[10] = {
   1.0E-00,  1.0E-32,  1.0E-64,  1.0E-96,  1.0E-128,
   1.0E-160, 1.0E-192, 1.0E-224, 1.0E-256, 1.0E-288
   };
-
 
 
 // Convert number to string in buffer
@@ -385,36 +384,36 @@ static FXchar* cvthex(FXchar* buffer,FXuval size,FXdouble value,FXint& decimal,F
   const FXchar* hexdigits=(flags&FLG_UPPER)?upper_digits:lower_digits;
   const FXlong HEXRND=FXLONG(0x0080000000000000);
   const FXlong HEXMSK=FXLONG(0xFF00000000000000);
-  FXulong num=Math::fpMantissa(value);          
-  FXint expo=Math::fpExponent(value)-1023;       
+  FXulong num=Math::fpMantissa(value);
+  FXint expo=Math::fpExponent(value)-1023;
   FXchar *dst=buffer;
   FXint digits;
 
   // One extra 1-bit in mantissa added back
   if(-1023<expo){
     num|=FXULONG(0x0010000000000000);
-    }                
+    }
 
   // Denormalized non-zero float
-  else if(num){                                         
+  else if(num){
     expo=-1022;
     }
 
   // Makes exponent zero also
   else{
-    expo=0;                            
+    expo=0;
     }
 
   // Decimal point location after 1st digit
   decimal=expo+1;
 
-  // Digits to be returned 
+  // Digits to be returned
   digits=Math::imin(precision,size-2);
 
   // Round to precision nibbles, and zero the rest
   if(precision<14){
-    num+=HEXRND>>(precision<<2);   
-    num&=HEXMSK>>(precision<<2);   
+    num+=HEXRND>>(precision<<2);
+    num&=HEXMSK>>(precision<<2);
     }
 
   // Whip out digits
@@ -484,7 +483,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
   else if(flags&FLG_HEXADEC){
 
     pr=precision;
-    if(precision<0) precision=13;     
+    if(precision<0) precision=13;
     precision++;
 
     // Convert with 1 extra hexdigit before decimal point
@@ -495,7 +494,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
       while(0<precision && p[precision-1]=='0') precision--;
       }
 
-    // Prefix with 0x 
+    // Prefix with 0x
     *ptr++='0';
     if(flags&FLG_UPPER){
       *ptr++='X';
@@ -503,12 +502,12 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
     else{
       *ptr++='x';
       }
-    
+
     // One digit before decimal point
     *ptr++=*p++;
     decimal--;
     precision--;
-    
+
     // Decimal point needed
     if((0<precision) || (flags&FLG_ALTER)){
       *ptr++='.';
@@ -523,7 +522,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
     // Exponent
     *ptr++=(flags&FLG_UPPER)?'P':'p';
     if(number!=0.0){
-    
+
       // Negative exponent
       if(decimal<0){
         decimal=-decimal;
@@ -540,10 +539,10 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
             *ptr++='0'+(decimal/1000);
             decimal%=1000;
             }
-          *ptr++='0'+(decimal/100); 
+          *ptr++='0'+(decimal/100);
           decimal%=100;
           }
-        *ptr++='0'+(decimal/10); 
+        *ptr++='0'+(decimal/10);
         decimal%=10;
         }
       *ptr++='0'+decimal;
@@ -556,7 +555,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
 
   // Force exponential mode
   else if(flags&FLG_EXPONENT){
-  
+
     if(precision<0) precision=6;
 
     // Convert with 1 extra digit before decimal point
@@ -588,7 +587,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
     // Exponent
     *ptr++=(flags&FLG_UPPER)?'E':'e';
     if(number!=0.0){
-    
+
       // Negative exponent
       if(decimal<0){
         decimal=-decimal;
@@ -721,7 +720,7 @@ static FXchar* convertDouble(FXchar* buffer,FXint& len,FXdouble number,FXint pre
       // Exponent
       *ptr++=(flags&FLG_UPPER)?'E':'e';
       if(number!=0.0){
-    
+
         // Negative exponent
         if(decimal<0){
           decimal=-decimal;
@@ -900,13 +899,11 @@ static FXchar* convertLong(FXchar* buffer,FXint& len,FXlong value,FXuint base,FX
     }
 
   // Return length
-  len=end-ptr;
+  len=(FXint)(end-ptr);
   return ptr;
   }
 
-
 /*******************************************************************************/
-
 
 // Advance ag from args to position before pos
 void vadvance(va_list& ag,va_list args,const FXchar* format,FXint pos){
@@ -1075,7 +1072,6 @@ flg:    switch(ch){
 nxt:cur++;
     }
   }
-
 
 /*******************************************************************************/
 

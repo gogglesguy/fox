@@ -3964,8 +3964,8 @@ long TextWindow::onFocusIn(FXObject* sender,FXSelector sel,void* ptr){
 // Update clock
 long TextWindow::onClock(FXObject*,FXSelector,void*){
   FXTime current=FXThread::time();
-  clock->setText(FXSystem::localTime(tr("%H:%M:%S"),current));
-  clock->setTipText(FXSystem::localTime(tr("%A %B %d %Y"),current));
+  clock->setText(FXSystem::localTime(current,tr("%H:%M:%S")));
+  clock->setTipText(FXSystem::localTime(current,tr("%A %B %d %Y")));
   getApp()->addTimeout(this,ID_CLOCKTIME,CLOCKTIMER);
   return 0;
   }

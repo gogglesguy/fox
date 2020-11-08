@@ -1,6 +1,6 @@
 #! /bin/sh
 
-version="1.7.69"
+version="1.7.70"
 prefix="/home/jeroen/FOX/DIR"
 exec_prefix="${prefix}"
 libdir="${exec_prefix}/lib"
