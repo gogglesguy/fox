@@ -1,4 +1,4 @@
-/*********** Generated on 2019/09/12 00:01:50 by reswrap version 6.0.0 *********/
+/*********** Generated on 2020/04/29 14:56:43 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../adie/adie_gif.gif */
 extern const unsigned char adie_gif[];

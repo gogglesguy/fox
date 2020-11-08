@@ -104,6 +104,7 @@ FXDelegator.h \
 FXDial.h \
 FXDialogBox.h \
 FXDictionary.h \
+FXDictionaryOf.h \
 FXDir.h \
 FXDirBox.h \
 FXDirDialog.h \
@@ -112,6 +113,7 @@ FXDirSelector.h \
 FXDirVisitor.h \
 FXDirWatch.h \
 FXDispatcher.h \
+FXDisplay.h \
 FXDockBar.h \
 FXDockHandler.h \
 FXDockSite.h \
@@ -122,6 +124,8 @@ FXDrawable.h \
 FXDriveBox.h \
 FXElement.h \
 FXEvent.h \
+FXEventDispatcher.h \
+FXEventLoop.h \
 FXException.h \
 FXEXEIcon.h \
 FXEXEImage.h \
@@ -154,6 +158,7 @@ FXGroupBox.h \
 FXGZFileStream.h \
 FXhalf.h \
 FXHash.h \
+FXHashOf.h \
 FXHeader.h \
 FXHorizontalFrame.h \
 FXICOIcon.h \
@@ -245,6 +250,7 @@ FXRandom.h \
 FXRangef.h \
 FXRanged.h \
 FXRangeSlider.h \
+FXReactor.h \
 FXReadWriteLock.h \
 FXRealSlider.h \
 FXRealSpinner.h \
@@ -255,6 +261,7 @@ FXRegion.h \
 FXRegistry.h \
 FXReplaceDialog.h \
 FXReverseDictionary.h \
+FXReverseDictionaryOf.h \
 FXRex.h \
 FXRootWindow.h \
 FXRuler.h \

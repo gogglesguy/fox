@@ -97,8 +97,9 @@ struct FXTextSelection {
 * text buffer, in sufficient detail for recording undo and redo info.
 *
 * When selections are made, SEL_SELECTED or SEL_DESELECTED messages
-* are issued, passing along the range of text affected by the change
-* in selection.
+* are issued, passing along the range of affected text affected as
+* an array of four numbers: position, number of bytes, column, number
+* of columns.
 *
 * As the cursor is being moved, matching parentheses, brackets, and
 * braces may be highlighted for a short time if the brace-matching
@@ -215,7 +216,6 @@ protected:
   FXText();
   void movegap(FXint pos);
   void sizegap(FXint sz);
-  void squeezegap();
   FXint charWidth(FXwchar ch,FXint indent) const;
   FXint xoffset(FXint start,FXint pos) const;
   FXint wrap(FXint start) const;
@@ -675,7 +675,10 @@ public:
   */
   FXint countRows(FXint start,FXint end) const;
 
-  /// Count number of newlines
+  /**
+  * Count number of newlines.
+  * Start should be on a line start.
+  */
   FXint countLines(FXint start,FXint end) const;
 
 

@@ -25,9 +25,70 @@ namespace FX {
 
 namespace FXSystem {
 
+  /// System Time in parts
+  struct Time {
+    FXint year;         /// Year (e.g. 1970)
+    FXint month;        /// Month 1..12
+    FXint mday;         /// Day of the month 1..31
+    FXint yday;         /// Day in the year 1..366
+    FXint wday;         /// Day of the week 0..6
+    FXint hour;         /// Hours 0..23
+    FXint min;          /// Minutes 0..59
+    FXint sec;          /// Seconds 0..60
+    FXint nano;         /// Nanoseconds 0..999999999
+    FXint offset;       /// Seconds east of utc
+    };
+
+  /// Compute nanoseconds since Unix Epoch from system time
+  extern FXAPI FXTime timeFromSystemTime(const Time& st);
+
+  /// Return system time from number of nanoseconds since Epoch
+  extern FXAPI void systemTimeFromTime(Time& st,FXTime ns);
+
+  /// Format system time to string, returning the number of characters that would have been written.
+  extern FXAPI FXint systemTimeFormat(FXchar* string,FXint length,const FXchar* format,const Time& st);
+  
+  /// Format system time to string, returning the number of characters.
+  extern FXAPI FXint systemTimeFormat(FXString& string,const FXchar* format,const Time& st);
+
+  /// Parse system time from string, returning number of characters parsed
+  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* string,FXint length,const FXchar* format);
+
+  /// Parse system time from string, returning number of characters parsed
+  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* string,const FXchar* format);
+
+  /// Parse system time from string, returning number of characters parsed
+  extern FXAPI FXint systemTimeParse(Time& st,const FXString& string,const FXchar* format);
+
+  /**
+  * Returns number of days since civil 1970-01-01.  Negative values indicate
+  * days prior to 1970-01-01.
+  * y is year, m is month of year (1..12), d is day of month (1..31).
+  */
+  extern FXAPI FXlong daysFromCivil(FXint y,FXint m,FXint d);
+
+  /**
+  * Returns year/month/day in civil calendar.
+  * z is number of days since 1970-01-01. Negative values indicate
+  * days prior to 1970-01-01.
+  * y is year, m is month of year (1..12), d is day of month (1..31).
+  */
+  extern FXAPI void civilFromDays(FXint& y,FXint& m,FXint& d,FXlong z);
+
+  /// Convert NTP format (ssss:ffff) to nanoseconds since Unix Epoch
+  extern FXAPI FXTime timeFromNTPTime(FXulong ntptime);
+
+  /// Convert nanoseconds since Unix Epoch to NTP (ssss:ffff)
+  extern FXAPI FXulong ntpTimeFromTime(FXTime ns);
+
+  /// Return leap seconds since since Unix Epoch time
+  extern FXAPI FXival leapSeconds(FXTime ns);
 
   /// Default formatting string used for time formatting
   extern FXAPI const FXchar defaultTimeFormat[];
+
+  /// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hh:mm) formatting string
+  extern FXAPI const FXchar isoTimeFormat[];
 
   /// Convert time in nanoseconds since 1/1/1970 to local date string
   extern FXAPI FXString localTime(FXTime value);
@@ -36,7 +97,7 @@ namespace FXSystem {
   extern FXAPI FXString universalTime(FXTime value);
 
   /**
-  * Convert time in nanoseconds since 1/1/1970 to local date string as per strftime.
+  * Convert time in nanoseconds since 1/1/1970 to local date string as per strftime(3).
   * Format characters supported by most systems are:
   *
   *  %a %A %b %B %c %d %H %I %j %m %M %p %S %U %w %W %x %X %y %Y %Z %%
@@ -46,9 +107,24 @@ namespace FXSystem {
   extern FXAPI FXString localTime(const FXchar *format,FXTime value);
 
   /**
-  * Convert time in nanoseconds since 1/1/1970 to universal date string as per strftime.
+  * Convert time in nanoseconds since 1/1/1970 to universal date string as per strftime(3).
   */
   extern FXAPI FXString universalTime(const FXchar *format,FXTime value);
+
+  /// Convert date string to time in nanoseconds since 1/1/1970.
+  extern FXAPI FXTime localTime(const FXchar* string);
+  extern FXAPI FXTime localTime(const FXString& string);
+
+  /**
+  * Convert date string to time in nanoseconds since 1/1/1970, as per strptime.
+  * Format characters supported by most systems are:
+  *
+  *  %a %A %b %B %c %d %H %I %j %m %M %p %S %U %w %W %x %X %y %Y %Z %%
+  *
+  * Some systems support additional conversions.
+  */
+  extern FXAPI FXTime localTime(const FXchar* string,const FXchar* format);
+  extern FXAPI FXTime localTime(const FXString& string,const FXchar* format);
 
 
   /// Get effective user id

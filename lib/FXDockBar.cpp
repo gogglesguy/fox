@@ -331,8 +331,8 @@ FXbool FXDockBar::isAllowable(FXuint hints) const {
 
 // Search siblings of drydock for first dock opportunity
 FXDockSite* FXDockBar::findDockAtSide(FXuint side){
-  register FXDockSite* docksite;
-  register FXWindow *child;
+  FXDockSite* docksite;
+  FXWindow *child;
   if(drydock){
     child=drydock->getParent()->getFirst();
     while(child){
@@ -352,8 +352,8 @@ FXbool FXDockBar::insideDock(FXDockSite* docksite,FXint barx,FXint bary){
   if(docksite){
 
     // Bar size
-    register FXint barw=getWidth();
-    register FXint barh=getHeight();
+    FXint barw=getWidth();
+    FXint barh=getHeight();
 
     // Vertically oriented dock
     if(docksite->getLayoutHints()&LAYOUT_SIDE_LEFT){

@@ -514,7 +514,6 @@ void FXGLViewer::glsetup(){
 
     // Vertex colors change both diffuse and ambient
     glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-    glDisable(GL_COLOR_MATERIAL);
 
     // Simplest and fastest drawing is default
     glShadeModel(GL_FLAT);

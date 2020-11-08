@@ -45,12 +45,18 @@ public:
 
   // Initialize half with half
   FXhalf(const FXhalf& h):v(h.v){}
-
+  
   // Initialize half with float
-  FXhalf(FXfloat f){ union { FXuint u; FXfloat f; } r; r.f=f; v=fhb[(r.u>>23)&0x1ff]+((r.u&0x007fffff)>>fhs[(r.u>>23)&0x1ff]); }
+  FXhalf(FXfloat f){ 
+    union { FXfloat f; FXuint u; } r={f};
+    v=fhb[(r.u>>23)&0x1ff]+((r.u&0x007fffff)>>fhs[(r.u>>23)&0x1ff]); 
+    }
 
   // Convert half to float
-  operator FXfloat() const { union { FXuint u; FXfloat f; } r; r.u=hfm[hfw[v>>10]+(v&0x3ff)]+hfe[v>>10]; return r.f; }
+  operator FXfloat() const { 
+    union { FXuint u; FXfloat f; } r={hfm[hfw[v>>10]+(v&0x3ff)]+hfe[v>>10]}; 
+    return r.f; 
+    }
 
   // Test for zero
   FXbool operator!() const { return v==0; }

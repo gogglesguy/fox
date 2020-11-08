@@ -33,6 +33,7 @@
 #include "FXPoint.h"
 #include "FXRectangle.h"
 #include "FXDictionary.h"
+#include "FXDictionaryOf.h"
 #include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"

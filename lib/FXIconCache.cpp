@@ -32,6 +32,7 @@
 #include "FXRectangle.h"
 #include "FXPath.h"
 #include "FXDictionary.h"
+#include "FXDictionaryOf.h"
 #include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"

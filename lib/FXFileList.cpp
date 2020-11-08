@@ -61,6 +61,7 @@
 #include "FXMenuCheck.h"
 #include "FXMenuSeparator.h"
 #include "FXDictionary.h"
+#include "FXDictionaryOf.h"
 #include "FXIconCache.h"
 #include "FXFileAssociations.h"
 #include "FXHeader.h"
@@ -226,7 +227,7 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   mini_doc=new FXGIFIcon(getApp(),minidoc);
   big_app=new FXGIFIcon(getApp(),bigapp);
   mini_app=new FXGIFIcon(getApp(),miniapp);
-  timeformat=tr(FXSystem::defaultTimeFormat);
+  timeformat=tr(FXSystem::defaultTimeFormat); 
   dropaction=DRAG_COPY;
 #ifdef WIN32
   matchmode=FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold;

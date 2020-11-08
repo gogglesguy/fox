@@ -276,7 +276,7 @@ static FXchar* cvt(FXchar* buffer,FXuval size,FXdouble value,FXint& decpt,FXint 
       if(negex<32){
         number*=scalepos1[negex];
         }
-      else {
+      else{
         number*=scalepos1[negex&31];
         number*=scalepos2[negex>>5];
         }
@@ -1333,7 +1333,7 @@ flg:  switch(ch){
           }
         }
 
-      // Get format character
+      // Next character
       continue;
       }
 
@@ -1343,10 +1343,10 @@ nml:if(count<length){ *string++=ch; }
     }
 
   // Last character
-  if(count<length){ *string++='\0'; }
+x:if(count<length){ *string++='\0'; }
 
   // Done
-x:va_end(ag);
+  va_end(ag);
   return count;
   }
 

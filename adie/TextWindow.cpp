@@ -1796,12 +1796,12 @@ long TextWindow::onCmdOpenSelected(FXObject*,FXSelector,void*){
           FXchar   name[1024];
 
           // Extract name from #include "file.h" syntax
-          if(string.scan("#include \"%1023[^\"]\"",name)==1){
+          if(string.scan("#%*[ \t]include \"%1023[^\"]\"",name)==1){
             file=searchRelativePaths(base,searchpaths,name);
             }
 
           // Extract name from #include <file.h> syntax
-          else if(string.scan("#include <%1023[^>]>",name)==1){
+          else if(string.scan("#%*[ \t]include <%1023[^>]>",name)==1){
             file=searchRelativePaths(base,searchpaths,name);
             }
 
