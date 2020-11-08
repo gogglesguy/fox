@@ -112,6 +112,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXDial.h
             ../include/FXDialogBox.h
             ../include/FXDictionary.h
+            ../include/FXDictionaryOf.h
             ../include/FXDirBox.h
             ../include/FXDirDialog.h
             ../include/FXDir.h
@@ -120,6 +121,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXDirVisitor.h
             ../include/FXDirWatch.h
             ../include/FXDispatcher.h
+            ../include/FXDisplay.h
             ../include/FXDLL.h
             ../include/FXDockBar.h
             ../include/FXDockHandler.h
@@ -132,6 +134,8 @@ set(HEADERS ../include/fx3d.h
             ../include/FXElement.h
             ../include/fxendian.h
             ../include/FXEvent.h
+            ../include/FXEventDispatcher.h
+            ../include/FXEventLoop.h
             ../include/FXException.h
             ../include/FXEXEIcon.h
             ../include/FXEXEImage.h
@@ -165,6 +169,7 @@ set(HEADERS ../include/fx3d.h
             ../include/fx.h
             ../include/FXhalf.h
             ../include/FXHash.h
+            ../include/FXHashOf.h
             ../include/FXHeader.h
             ../include/FXHorizontalFrame.h
             ../include/FXICOIcon.h
@@ -257,6 +262,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXRangeSlider.h
             ../include/FXRASIcon.h
             ../include/FXRASImage.h
+            ../include/FXReactor.h
             ../include/FXReadWriteLock.h
             ../include/FXRealSlider.h
             ../include/FXRealSpinner.h
@@ -267,6 +273,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXRegistry.h
             ../include/FXReplaceDialog.h
             ../include/FXReverseDictionary.h
+            ../include/FXReverseDictionaryOf.h
             ../include/FXRex.h
             ../include/FXRGBIcon.h
             ../include/FXRGBImage.h
@@ -466,6 +473,7 @@ set(SOURCES FX4Splitter.cpp
             FXDirVisitor.cpp
             FXDirWatch.cpp
             FXDispatcher.cpp
+            FXDisplay.cpp
             FXDLL.cpp
             FXDockBar.cpp
             FXDockHandler.cpp
@@ -475,7 +483,9 @@ set(SOURCES FX4Splitter.cpp
             FXDragCorner.cpp
             FXDrawable.cpp
             FXDriveBox.cpp
-	        fxescape.cpp
+            fxescape.cpp
+            FXEventDispatcher.cpp
+            FXEventLoop.cpp
             FXException.cpp
             FXEXEIcon.cpp
             FXEXEImage.cpp
@@ -545,6 +555,7 @@ set(SOURCES FX4Splitter.cpp
             FXKnob.cpp
             FXKOI8RCodec.cpp
             FXLabel.cpp
+            fxleaps.cpp
             FXLFQueue.cpp
             FXListBox.cpp
             FXList.cpp
@@ -577,6 +588,7 @@ set(SOURCES FX4Splitter.cpp
             FXMessageChannel.cpp
             FXMetaClass.cpp
             FXMutex.cpp
+            fxntp.cpp
             FXObject.cpp
             FXObjectList.cpp
             FXOptionMenu.cpp
@@ -607,6 +619,7 @@ set(SOURCES FX4Splitter.cpp
             FXPtrQueue.cpp
             FXQuatd.cpp
             FXQuatf.cpp
+            FXReactor.cpp
             FXRadioButton.cpp
             FXRandom.cpp
             FXRanged.cpp
@@ -665,6 +678,9 @@ set(SOURCES FX4Splitter.cpp
             fxstrtoull.cpp
             FXSwitcher.cpp
             FXSystem.cpp
+            FXSystemTime.cpp
+            FXSystemTimeFormat.cpp
+            FXSystemTimeParse.cpp
             fxtabbify.cpp
             FXTabBar.cpp
             FXTabBook.cpp
