@@ -23,6 +23,8 @@
 #include "fxdefs.h"
 #include "fxmath.h"
 #include "fxascii.h"
+#include "FXAtomic.h"
+#include "FXElement.h"
 #include "FXString.h"
 #include "FXSystem.h"
 
@@ -38,6 +40,20 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
+
+// Default formatting string used for time formatting
+const FXchar FXSystem::defaultTimeFormat[]="%m/%d/%Y %H:%M:%S";
+
+
+// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hhmm) formatting string
+const FXchar FXSystem::isoTimeFormat[]="%FT%T%z";
+
+
+// Time zone variables, set only once
+static volatile FXuint local_zone_offset_set=0;  // Called already?
+static FXTime          local_zone_offset=0;      // Offset local to UTC (ns)
+static FXTime          local_dst_offset=0;       // Offset daylight savings to UTC (ns)
+
 
 // Cumulative days of the year, for non-leap-years and leap-years
 static const FXint days_of_year[2][13]={
@@ -196,6 +212,226 @@ void FXSystem::systemTimeFromTime(Time& st,FXTime ns){
 
   // Offset utc
   st.offset=0;
+  }
+
+/*******************************************************************************/
+
+// Setup timezone information
+static void setuplocaltimezone(){
+#if defined(_WIN32)
+  const FXTime seconds=1000000000;
+  const FXTime minutes=60*seconds;
+  const FXTime hours=60*minutes;
+  if(atomicSet(&local_zone_offset_set,1)==0){
+    TIME_ZONE_INFORMATION tzi;
+    clearElms(&tzi,1);
+    GetTimeZoneInformation(&tzi);
+    local_zone_offset=minutes*tzi.Bias;
+    local_dst_offset=0;
+    if(tzi.StandardDate.wMonth!=0 && tzi.DaylightDate.wMonth!=0){
+      local_dst_offset=minutes*tzi.DaylightBias;
+      }
+    }
+#else
+  const FXTime seconds=1000000000;
+  const FXTime minutes=60*seconds;
+  const FXTime hours=60*minutes;
+  if(atomicSet(&local_zone_offset_set,1)==0){
+    tzset();
+    local_zone_offset=seconds*timezone;
+    local_dst_offset=-hours*daylight;
+    }
+#endif
+  }
+
+
+// Return offset between standard local time zone to UTC, in nanoseconds
+FXTime FXSystem::localTimeZoneOffset(){
+  setuplocaltimezone();
+  return local_zone_offset;
+  }
+
+
+// Return offset daylight savings time to standard time, in nanoseconds
+FXTime FXSystem::daylightSavingsOffset(){
+  setuplocaltimezone();
+  return local_dst_offset;
+  }
+
+/*******************************************************************************/
+
+#if NEW_TIME
+
+// Convert file time to string as per systemTimeFormat()
+FXString FXSystem::universalTime(const TChar *format,FXTime ns){
+  FXSystem::Time st;
+  FXString string;
+  st.offset=0;
+  FXSystem::systemTimeFromTime(st,ns);
+  FXSystem::systemTimeFormat(string,format,st);
+  return string;
+  }
+
+#endif
+
+
+// Convert file time to string as per strftime format
+FXString FXSystem::universalTime(const FXchar *format,FXTime ns){
+  const FXTime seconds=1000000000;
+  time_t tmp=(time_t)(ns/seconds);
+#if defined(WIN32)
+#if (_MSC_VER >= 1500)
+  struct tm tmv;
+  if(gmtime_s(&tmv,&tmp)==0){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#else
+  struct tm* ptm=gmtime(&tmp);
+  if(ptm){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#endif
+#elif defined(HAVE_GMTIME_R)
+  struct tm tmresult;
+  struct tm* ptm=gmtime_r(&tmp,&tmresult);
+  if(ptm){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#else
+  struct tm* ptm=gmtime(&tmp);
+  if(ptm){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#endif
+  }
+
+
+// Convert file time to string
+FXString FXSystem::universalTime(FXTime ns){
+  return FXSystem::universalTime(defaultTimeFormat,ns);
+  }
+
+/*******************************************************************************/
+
+// FIXME FXSystem::universalTime(const FXString&) also needed
+
+
+/*******************************************************************************/
+
+#if NEW_TIME
+
+// Convert file time to string as per strftime format
+// Adjust value for local time zone and daylight savings time
+FXString FXSystem::localTime(const TChar *format,FXTime ns){
+  const NSTime seconds=1000000000;
+  FXSystem::Time st;
+  FXString string;
+  st.offset=-(FXSystem::localTimeZoneOffset()+FXSystem::daylightSavingsOffset())/seconds;
+  FXSystem::systemTimeFromTime(st,ns);
+  FXSystem::systemTimeFormat(string,format,st);
+  return string;
+  }
+
+#endif
+
+// Convert file time to string as per strftime format
+FXString FXSystem::localTime(const FXchar *format,FXTime ns){
+  const FXTime seconds=1000000000;
+  time_t tmp=(time_t)(ns/seconds);
+#if defined(WIN32)
+#if (_MSC_VER >= 1500)
+  struct tm tmv;
+  if(localtime_s(&tmv,&tmp)==0){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#else
+  struct tm* ptm=localtime(&tmp);
+  if(ptm){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#endif
+#elif defined(HAVE_LOCALTIME_R)
+  struct tm tmresult;
+  struct tm* ptm=localtime_r(&tmp,&tmresult);
+  if(ptm){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#else
+  struct tm* ptm=localtime(&tmp);
+  if(ptm){
+    FXchar buffer[1024];
+    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
+    return FXString(buffer,len);
+    }
+  return FXString::null;
+#endif
+  }
+
+
+// Convert file time to string
+FXString FXSystem::localTime(FXTime ns){
+  return FXSystem::localTime(defaultTimeFormat,ns);
+  }
+
+/*******************************************************************************/
+
+//BOOL SystemTimeToTzSpecificLocalTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpUniversalTime,LPSYSTEMTIME lpLocalTime);
+//BOOL TzSpecificLocalTimeToSystemTime(const TIME_ZONE_INFORMATION *lpTimeZoneInformation,const SYSTEMTIME *lpLocalTime,LPSYSTEMTIME lpUniversalTime);
+
+
+// Convert date string to time in nanoseconds since 1/1/1970
+FXTime FXSystem::localTime(const FXchar* string,const FXchar* format){
+  const FXTime seconds=1000000000;
+  FXTime result=forever;
+#if defined(WIN32)
+#else
+  struct tm date;
+  clearElms(&date,1);
+  if(strptime(string,format,&date)!=NULL){
+    time_t tmp=mktime(&date);
+    result=seconds*tmp;
+    }
+#endif
+  return result;
+  }
+
+
+// Convert universal date string to time in nanoseconds since 1/1/1970
+FXTime FXSystem::localTime(const FXchar* string){
+  return FXSystem::localTime(string,defaultTimeFormat);
+  }
+
+
+// Convert universal date string to time in nanoseconds since 1/1/1970
+FXTime FXSystem::localTime(const FXString& string){
+  return FXSystem::localTime(string.text(),defaultTimeFormat);
+  }
+
+
+// Convert universal date string to time in nanoseconds since 1/1/1970
+FXTime FXSystem::localTime(const FXString& string,const FXchar* format){
+  return FXSystem::localTime(string.text(),format);
   }
 
 }

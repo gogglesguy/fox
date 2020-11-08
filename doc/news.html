@@ -17,17 +17,35 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+June 24 - FOX DEVELOPMENT 1.7.69
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>More FXSystem time related API changes.</li>
+<li>FXString 16-bit character conversion fix.</li>
+<li>Military time zone parse.</li>
+<li>FXFileSelector onCmdDirectoryUp() selects directory we were in before, for quick downward
+navigation.</li>
+<li>FXFileList sets both current and anchor item when entering directory.</li>
+<li>The fxprintf.cpp used in string formatting now supports %a and %A for floating point
+printout.</li>
+</ul>
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 April 29 - FOX DEVELOPMENT 1.7.68
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->
 <ul>
-<li>Added FXSystem::Time struct, system-independent time in parts.  This comes with (at the moment) 
+<li>Added FXSystem::Time struct, system-independent time in parts.  This comes with (at the moment)
 two routines, FXSystem::systemTimeFromTime() which converts FXTime to FXSystem::Time, and
 FXSystem::timeFromSystemTime() which converts time in parts to FXTime (in nanoseconds).</li>
-<li>New routine FXSystem::systemTimeFormat() formats FXSystem::Time to a string, similar to strftime(), 
+<li>New routine FXSystem::systemTimeFormat() formats FXSystem::Time to a string, similar to strftime(),
 with a few extensions.</li>
-<li>New routine FXSystem::systemTimeParse() parses FXSystem::Time from a string, similar to strptime(), 
+<li>New routine FXSystem::systemTimeParse() parses FXSystem::Time from a string, similar to strptime(),
 with a few (more) extensions.</li>
 <li>New routine FXSystem::daysFromCivil() converts year, month, day to days since Unix Epoch in days.</li>
 <li>New routine FXSystem::civilFromDays() converts Unix Epoch in days to year, month, day.</li>

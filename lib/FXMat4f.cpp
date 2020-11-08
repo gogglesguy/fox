@@ -47,7 +47,7 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
+ 
 
 // Initialize matrix from scalar
 FXMat4f::FXMat4f(FXfloat s){

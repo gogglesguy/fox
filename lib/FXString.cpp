@@ -360,8 +360,9 @@ FXival ncs2utf(const FXnchar *src,FXival srclen){
   FXival p=0;
   FXnchar w;
   while(src<srcend && (w=*src++)!=0){
-    if((w&0xFC00)==0xD800){
-      if(__unlikely(src>=srcend || (*src&0xFC00)!=0xDC00)) break;
+    if(FXISLEADUTF16(w)){
+      if(__unlikely(src>=srcend)) break;
+      if(__unlikely(!FXISFOLLOWUTF16(*src))) break;
       w=SURROGATE_OFFSET+(w<<10)+*src++;
       }
     p+=wc2utf(w);
@@ -375,8 +376,8 @@ FXival ncs2utf(const FXnchar *src){
   FXival p=0;
   FXnchar w;
   while((w=*src++)!=0){
-    if((w&0xFC00)==0xD800){
-      if(__unlikely((*src&0xFC00)!=0xDC00)) break;
+    if(FXISLEADUTF16(w)){
+      if(__unlikely(!FXISFOLLOWUTF16(*src))) break;
       w=SURROGATE_OFFSET+(w<<10)+*src++;
       }
     p+=wc2utf(w);
@@ -414,23 +415,23 @@ FXival utf2wcs(const FXchar *src,FXival srclen){
 
 
 // Return number of wide characters for utf8 character string
-FXival utf2wcs(const FXchar *ptr){
+FXival utf2wcs(const FXchar *src){
   FXival p=0;
   FXuchar c;
-  while((c=ptr[0])!=0){
+  while((c=src[0])!=0){
     if(0xC0<=c){
-      if(__unlikely(!FXISFOLLOWUTF8(ptr[1]))) break;
+      if(__unlikely(!FXISFOLLOWUTF8(src[1]))) break;
       if(0xE0<=c){
-        if(__unlikely(!FXISFOLLOWUTF8(ptr[2]))) break;
+        if(__unlikely(!FXISFOLLOWUTF8(src[2]))) break;
         if(0xF0<=c){
-          if(__unlikely(!FXISFOLLOWUTF8(ptr[3]))) break;
-          ptr++;
+          if(__unlikely(!FXISFOLLOWUTF8(src[3]))) break;
+          src++;
           }
-        ptr++;
+        src++;
         }
-      ptr++;
+      src++;
       }
-    ptr++;
+    src++;
     p++;
     }
   return p;
@@ -438,52 +439,53 @@ FXival utf2wcs(const FXchar *ptr){
 
 
 // Return number of narrow characters for utf8 character string
-FXival utf2ncs(const FXchar *ptr,FXival len){
-  const FXchar* end=ptr+len;
+FXival utf2ncs(const FXchar *src,FXival len){
+  const FXchar* end=src+len;
   FXival p=0;
   FXuchar c;
-  while(ptr<end && (c=ptr[0])!=0){
+  while(src<end && (c=src[0])!=0){
     if(0xC0<=c){
-      if(__unlikely(ptr+1>=end)) break;
-      if(__unlikely(!FXISFOLLOWUTF8(ptr[1]))) break;
+      if(__unlikely(src+1>=end)) break;
+      if(__unlikely(!FXISFOLLOWUTF8(src[1]))) break;
       if(0xE0<=c){
-        if(__unlikely(ptr+2>=end)) break;
-        if(__unlikely(!FXISFOLLOWUTF8(ptr[2]))) break;
+        if(__unlikely(src+2>=end)) break;
+        if(__unlikely(!FXISFOLLOWUTF8(src[2]))) break;
         if(0xF0<=c){
-        if(__unlikely(ptr+3>=end)) break;
-          if(__unlikely(!FXISFOLLOWUTF8(ptr[3]))) break;
-          ptr++;
+        if(__unlikely(src+3>=end)) break;
+          if(__unlikely(!FXISFOLLOWUTF8(src[3]))) break;
+          src++;
           p++;
           }
-        ptr++;
+        src++;
         }
-        ptr++;
+      src++;
       }
-    ptr++;
+    src++;
     p++;
     }
   return p;
   }
 
+
 // Return number of narrow characters for utf8 character string
-FXival utf2ncs(const FXchar *ptr){
+FXival utf2ncs(const FXchar *src){
   FXival p=0;
   FXuchar c;
-  while((c=ptr[0])!=0){
+  while((c=src[0])!=0){
     if(0xC0<=c){
-      if(__unlikely(!FXISFOLLOWUTF8(ptr[1]))) break;
+      if(__unlikely(!FXISFOLLOWUTF8(src[1]))) break;
       if(0xE0<=c){
-        if(__unlikely(!FXISFOLLOWUTF8(ptr[2]))) break;
+        if(__unlikely(!FXISFOLLOWUTF8(src[2]))) break;
         if(0xF0<=c){
-          if(__unlikely(!FXISFOLLOWUTF8(ptr[3]))) break;
-          ptr++;
+          if(__unlikely(!FXISFOLLOWUTF8(src[3]))) break;
+          src++;
           p++;
           }
-        ptr++;
+        src++;
         }
-      ptr++;
+      src++;
       }
-    ptr++;
+    src++;
     p++;
     }
   return p;
@@ -629,17 +631,15 @@ FXival ncs2utf(FXchar *dst,const FXnchar* src,FXival dstlen,FXival srclen){
       *ptr++=(w&0x3F)|0x80;
       continue;
       }
-    if((w&0xF800)!=0xD800){
+    if(!FXISLEADUTF16(w)){
       if(__unlikely(ptr+2>=ptrend)) break;
       *ptr++=(w>>12)|0xE0;
       *ptr++=((w>>6)&0x3F)|0x80;
       *ptr++=(w&0x3F)|0x80;
       continue;
       }
-    if((w&0xFC00)==0xD800){
+    if(src<srcend && FXISFOLLOWUTF16(*src)){
       if(__unlikely(ptr+3>=ptrend)) break;
-      if(__unlikely(src>=srcend)) break;
-      if(__unlikely((*src&0xFC00)!=0xDC00)) break;
       w=SURROGATE_OFFSET+(w<<10)+*src++;
       *ptr++=(w>>18)|0xF0;
       *ptr++=((w>>12)&0x3F)|0x80;
@@ -673,16 +673,15 @@ FXival ncs2utf(FXchar *dst,const FXnchar* src,FXival dstlen){
       *ptr++=(w&0x3F)|0x80;
       continue;
       }
-    if((w&0xF800)!=0xD800){
+    if(!FXISSEQUTF16(w)){
       if(__unlikely(ptr+2>=ptrend)) break;
       *ptr++=(w>>12)|0xE0;
       *ptr++=((w>>6)&0x3F)|0x80;
       *ptr++=(w&0x3F)|0x80;
       continue;
       }
-    if((w&0xFC00)==0xD800){
+    if(FXISFOLLOWUTF16(*src)){
       if(__unlikely(ptr+3>=ptrend)) break;
-      if(__unlikely((*src&0xFC00)!=0xDC00)) break;
       w=SURROGATE_OFFSET+(w<<10)+*src++;
       *ptr++=(w>>18)|0xF0;
       *ptr++=((w>>12)&0x3F)|0x80;
@@ -706,18 +705,18 @@ FXival utf2wcs(FXwchar *dst,const FXchar* src,FXival dstlen,FXival srclen){
   FXwchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while(ptr<ptrend && src<srcend && (w=c=*src++)!=0){
-    if(0xC0<=c){
+  while(src<srcend && (w=c=*src++)!=0){
+    if(0xC0<=w){
       if(__unlikely(src>=srcend)) break;
       c=*src++;
       if(__unlikely(!FXISFOLLOWUTF8(c))) break;
       w=(w<<6) ^ c ^ 0x3080;
-      if(0xE0<=c){
+      if(0x800<=w){
         if(__unlikely(src>=srcend)) break;
         c=*src++;
         if(__unlikely(!FXISFOLLOWUTF8(c))) break;
         w=(w<<6) ^ c ^ 0x20080;
-        if(0xF0<=c){
+        if(0x10000<=w){
           if(__unlikely(src>=srcend)) break;
           c=*src++;
           if(__unlikely(!FXISFOLLOWUTF8(c))) break;
@@ -725,6 +724,7 @@ FXival utf2wcs(FXwchar *dst,const FXchar* src,FXival dstlen,FXival srclen){
           }
         }
       }
+    if(__unlikely(ptr>=ptrend)) break;
     *ptr++=w;
     }
   if(ptr<ptrend){
@@ -740,22 +740,23 @@ FXival utf2wcs(FXwchar *dst,const FXchar* src,FXival dstlen){
   FXwchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while(ptr<ptrend && (w=c=*src++)!=0){
+  while((w=c=*src++)!=0){
     if(0xC0<=c){
       c=*src++;
       if(__unlikely(!FXISFOLLOWUTF8(c))) break;
       w=(w<<6) ^ c ^ 0x3080;
-      if(0xE0<=c){
+      if(0x800<=w){
         c=*src++;
         if(__unlikely(!FXISFOLLOWUTF8(c))) break;
         w=(w<<6) ^ c ^ 0x20080;
-        if(0xF0<=c){
+        if(0x10000<=w){
           c=*src++;
           if(__unlikely(!FXISFOLLOWUTF8(c))) break;
           w=(w<<6) ^ c ^ 0x400080;
           }
         }
       }
+    if(__unlikely(ptr>=ptrend)) break;
     *ptr++=w;
     }
   if(ptr<ptrend){
@@ -772,18 +773,18 @@ FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dstlen,FXival srclen){
   FXnchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while(ptr<ptrend && src<srcend && (w=c=*src++)!=0){
-    if(0xC0<=c){
+  while(src<srcend && (w=c=*src++)!=0){
+    if(0xC0<=w){
       if(__unlikely(src>=srcend)) break;
       c=*src++;
       if(__unlikely(!FXISFOLLOWUTF8(c))) break;
       w=(w<<6) ^ c ^ 0x3080;
-      if(0xE0<=c){
+      if(0x800<=w){
         if(__unlikely(src>=srcend)) break;
         c=*src++;
         if(__unlikely(!FXISFOLLOWUTF8(c))) break;
         w=(w<<6) ^ c ^ 0x20080;
-        if(0xF0<=c){
+        if(0x10000<=w){
           if(__unlikely(src>=srcend)) break;
           c=*src++;
           if(__unlikely(!FXISFOLLOWUTF8(c))) break;
@@ -795,6 +796,7 @@ FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dstlen,FXival srclen){
           }
         }
       }
+    if(__unlikely(ptr>=ptrend)) break;
     *ptr++=w;
     }
   if(ptr<ptrend){
@@ -810,16 +812,16 @@ FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dstlen){
   FXnchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while(ptr<ptrend && (w=c=*src++)!=0){
-    if(0xC0<=c){
+  while((w=c=*src++)!=0){
+    if(0xC0<=w){
       c=*src++;
       if(__unlikely(!FXISFOLLOWUTF8(c))) break;
       w=(w<<6) ^ c ^ 0x3080;
-      if(0xE0<=c){
+      if(0x800<=w){
         c=*src++;
         if(__unlikely(!FXISFOLLOWUTF8(c))) break;
         w=(w<<6) ^ c ^ 0x20080;
-        if(0xF0<=c){
+        if(0x10000<=w){
           c=*src++;
           if(__unlikely(!FXISFOLLOWUTF8(c))) break;
           w=(w<<6) ^ c ^ 0x400080;
@@ -830,6 +832,7 @@ FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dstlen){
           }
         }
       }
+    if(__unlikely(ptr>=ptrend)) break;
     *ptr++=w;
     }
   if(ptr<ptrend){

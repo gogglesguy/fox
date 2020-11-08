@@ -45,20 +45,21 @@ namespace FXSystem {
   /// Return system time from number of nanoseconds since Epoch
   extern FXAPI void systemTimeFromTime(Time& st,FXTime ns);
 
-  /// Format system time to string, returning the number of characters that would have been written.
-  extern FXAPI FXint systemTimeFormat(FXchar* string,FXint length,const FXchar* format,const Time& st);
-  
-  /// Format system time to string, returning the number of characters.
-  extern FXAPI FXint systemTimeFormat(FXString& string,const FXchar* format,const Time& st);
+
+  /// Default formatting string used for time formatting
+  extern FXAPI const FXchar defaultTimeFormat[];
+
+  /// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hh:mm) formatting string
+  extern FXAPI const FXchar isoTimeFormat[];
+
+  /// Format system time to string
+  extern FXAPI FXString systemTimeFormat(const Time& st,const FXchar* format);
 
   /// Parse system time from string, returning number of characters parsed
-  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* string,FXint length,const FXchar* format);
+  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* format,const FXchar* string);
 
   /// Parse system time from string, returning number of characters parsed
-  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* string,const FXchar* format);
-
-  /// Parse system time from string, returning number of characters parsed
-  extern FXAPI FXint systemTimeParse(Time& st,const FXString& string,const FXchar* format);
+  extern FXAPI FXint systemTimeParse(Time& st,const FXchar* format,const FXString& string);
 
   /**
   * Returns number of days since civil 1970-01-01.  Negative values indicate
@@ -75,26 +76,23 @@ namespace FXSystem {
   */
   extern FXAPI void civilFromDays(FXint& y,FXint& m,FXint& d,FXlong z);
 
+
+  /// Return leap seconds since since Unix Epoch time
+  extern FXAPI FXival leapSeconds(FXTime ns);
+
+  /// Return offset between standard local time zone to UTC, in nanoseconds
+  extern FXAPI FXTime localTimeZoneOffset();
+
+  /// Return offset daylight savings time to standard time, in nanoseconds
+  extern FXAPI FXTime daylightSavingsOffset();
+
+
   /// Convert NTP format (ssss:ffff) to nanoseconds since Unix Epoch
   extern FXAPI FXTime timeFromNTPTime(FXulong ntptime);
 
   /// Convert nanoseconds since Unix Epoch to NTP (ssss:ffff)
   extern FXAPI FXulong ntpTimeFromTime(FXTime ns);
 
-  /// Return leap seconds since since Unix Epoch time
-  extern FXAPI FXival leapSeconds(FXTime ns);
-
-  /// Default formatting string used for time formatting
-  extern FXAPI const FXchar defaultTimeFormat[];
-
-  /// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hh:mm) formatting string
-  extern FXAPI const FXchar isoTimeFormat[];
-
-  /// Convert time in nanoseconds since 1/1/1970 to local date string
-  extern FXAPI FXString localTime(FXTime value);
-
-  /// Convert time in nanoseconds since 1/1/1970 to universal date string
-  extern FXAPI FXString universalTime(FXTime value);
 
   /**
   * Convert time in nanoseconds since 1/1/1970 to local date string as per strftime(3).
@@ -104,16 +102,10 @@ namespace FXSystem {
   *
   * Some systems support additional conversions.
   */
-  extern FXAPI FXString localTime(const FXchar *format,FXTime value);
+  extern FXAPI FXString localTime(const FXchar *format,FXTime ns);
 
-  /**
-  * Convert time in nanoseconds since 1/1/1970 to universal date string as per strftime(3).
-  */
-  extern FXAPI FXString universalTime(const FXchar *format,FXTime value);
-
-  /// Convert date string to time in nanoseconds since 1/1/1970.
-  extern FXAPI FXTime localTime(const FXchar* string);
-  extern FXAPI FXTime localTime(const FXString& string);
+  /// Convert time in nanoseconds since 1/1/1970 to local date string
+  extern FXAPI FXString localTime(FXTime ns);
 
   /**
   * Convert date string to time in nanoseconds since 1/1/1970, as per strptime.
@@ -125,6 +117,18 @@ namespace FXSystem {
   */
   extern FXAPI FXTime localTime(const FXchar* string,const FXchar* format);
   extern FXAPI FXTime localTime(const FXString& string,const FXchar* format);
+
+  /// Convert date string to time in nanoseconds since 1/1/1970.
+  extern FXAPI FXTime localTime(const FXchar* string);
+  extern FXAPI FXTime localTime(const FXString& string);
+
+  /**
+  * Convert time in nanoseconds since 1/1/1970 to universal date string as per strftime(3).
+  */
+  extern FXAPI FXString universalTime(const FXchar *format,FXTime ns);
+
+  /// Convert time in nanoseconds since 1/1/1970 to universal date string
+  extern FXAPI FXString universalTime(FXTime ns);
 
 
   /// Get effective user id
@@ -150,13 +154,11 @@ namespace FXSystem {
   extern FXAPI FXString modeString(FXuint mode);
 
 
-
   /// Return value of environment variable name
   extern FXAPI FXString getEnvironment(const FXString& name);
 
   /// Change value of environment variable name, return true if success
   extern FXAPI FXbool setEnvironment(const FXString& name,const FXString& value);
-
 
 
   /// Get the current working directory
@@ -172,12 +174,14 @@ namespace FXSystem {
   extern FXAPI FXbool setCurrentDrive(const FXString& prefix);
 
 
-
   /// Get executable path
   extern FXAPI FXString getExecPath();
 
   /// Return known executable file extensions (Windows)
   extern FXAPI FXString getExecExtensions();
+
+  /// Get name of calling executable
+  extern FXAPI FXString getExecFilename();
 
   /// Return the home directory for the current user
   extern FXAPI FXString getHomeDirectory();
@@ -195,9 +199,6 @@ namespace FXSystem {
 
   /// Determine if UTF8 locale in effect
   extern FXAPI FXbool localeIsUTF8();
-
-  /// Get name of calling executable
-  extern FXAPI FXString getExecFilename();
 
   /**
   * Get DLL name for given base name; for example "png"

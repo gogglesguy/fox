@@ -5,7 +5,7 @@
 // FOX version
 #define FOX_MAJOR  1
 #define FOX_MINOR  7
-#define FOX_LEVEL  68
+#define FOX_LEVEL  69
 
 
 // FOX byte order

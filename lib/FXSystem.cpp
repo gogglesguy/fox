@@ -37,7 +37,19 @@
 
 /*
   Notes:
+
   - A bric-a-brack of various functions we could not place anywhere else.
+
+  - Some ISO 8601 Formats:
+
+     Date:                        2019-09-28
+     Date and time in UTC:        2019-09-28T15:33:50+00:00
+                                  2019-09-28T15:33:50Z
+                                  20190928T153350Z
+     Week:                        2019-W39
+     Date with week number:       2019-W39-6
+     Date without year:           --09-28[1]
+     Ordinal date:                2019-271
 */
 
 
@@ -47,187 +59,9 @@ using namespace FX;
 
 namespace FX {
 
-
 // Furnish our own version
 extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
 
-
-// Default formatting string used for time formatting
-// Perhaps change to "%x %T".
-const FXchar FXSystem::defaultTimeFormat[]="%m/%d/%Y %H:%M:%S";
-
-
-// ISO 8601 Formats:
-// Date:                        2019-09-28
-// Date and time in UTC:        2019-09-28T15:33:50+00:00
-//                              2019-09-28T15:33:50Z
-//                              20190928T153350Z
-// Week:                        2019-W39
-// Date with week number:       2019-W39-6
-// Date without year:           --09-28[1]
-// Ordinal date:                2019-271
-
-// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hhmm) formatting string
-const FXchar FXSystem::isoTimeFormat[]="%FT%T%z";
-
-
-// Convert file time to string
-FXString FXSystem::localTime(FXTime value){
-  return FXSystem::localTime(defaultTimeFormat,value);
-  }
-
-
-// Convert file time to string
-FXString FXSystem::universalTime(FXTime value){
-  return FXSystem::universalTime(defaultTimeFormat,value);
-  }
-
-
-// Convert file time to string as per strftime format
-FXString FXSystem::localTime(const FXchar *format,FXTime value){
-  const FXTime seconds=1000000000;
-  time_t tmp=(time_t)(value/seconds);
-#if defined(WIN32)
-#if (_MSC_VER >= 1500)
-  struct tm tmv;
-  if(localtime_s(&tmv,&tmp)==0){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=localtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
-#elif defined(HAVE_LOCALTIME_R)
-  struct tm tmresult;
-  struct tm* ptm=localtime_r(&tmp,&tmresult);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=localtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
-  }
-
-
-// Convert file time to string as per strftime format
-FXString FXSystem::universalTime(const FXchar *format,FXTime value){
-  const FXTime seconds=1000000000;
-  time_t tmp=(time_t)(value/seconds);
-#if defined(WIN32)
-#if (_MSC_VER >= 1500)
-  struct tm tmv;
-  if(gmtime_s(&tmv,&tmp)==0){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,&tmv);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=gmtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
-#elif defined(HAVE_GMTIME_R)
-  struct tm tmresult;
-  struct tm* ptm=gmtime_r(&tmp,&tmresult);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#else
-  struct tm* ptm=gmtime(&tmp);
-  if(ptm){
-    FXchar buffer[1024];
-    FXint len=strftime(buffer,sizeof(buffer),format,ptm);
-    return FXString(buffer,len);
-    }
-  return FXString::null;
-#endif
-  }
-
-/*******************************************************************************/
-
-// FIXME custom version to parse sss.sssss to obtain sub-second accuracy
-// not supportable via struct tm implementation.
-
-
-// Convert date string to time in nanoseconds since 1/1/1970
-FXTime FXSystem::localTime(const FXchar* string,const FXchar* format){
-#if defined(WIN32)
-  return forever;
-#else
-  const FXTime seconds=1000000000;
-  FXTime result=forever;
-  struct tm date;
-  clearElms(&date,1);
-  if(strptime(string,format,&date)!=NULL){
-    time_t tmp=mktime(&date);
-    result=seconds*tmp;
-    }
-  return result;
-#endif
-  }
-
-
-// Convert universal date string to time in nanoseconds since 1/1/1970
-FXTime FXSystem::localTime(const FXchar* string){
-  return FXSystem::localTime(string,defaultTimeFormat);
-  }
-
-
-// Convert universal date string to time in nanoseconds since 1/1/1970
-FXTime FXSystem::localTime(const FXString& string){
-  return FXSystem::localTime(string.text(),defaultTimeFormat);
-  }
-
-
-// Convert universal date string to time in nanoseconds since 1/1/1970
-FXTime FXSystem::localTime(const FXString& string,const FXchar* format){
-  return FXSystem::localTime(string.text(),format);
-  }
-
-/*
-  FXTime now,time;
-  FXString str;
-
-  now=FXThread::time();
-
-  str=FXSystem::localTime(now);
-  time=FXSystem::localTime(str);
-  fxmessage("now=%lld\n",now);
-
-  fxmessage("str=%s\n",str.text());
-  fxmessage("time=%lld\n",time);
-
-  str=FXSystem::localTime(time);
-  fxmessage("str=%s\n",str.text());
-  return 0;
-*/
-
-/*******************************************************************************/
 
 // Get effective user id
 FXuint FXSystem::user(){
@@ -507,6 +341,22 @@ FXString FXSystem::getExecExtensions(){
   }
 
 
+// Get name of calling executable
+FXString FXSystem::getExecFilename(){
+#if defined(WIN32)
+  TCHAR buffer[MAXPATHLEN];
+  DWORD len=GetModuleFileName(NULL,buffer,MAXPATHLEN);
+  return FXString(buffer,len);
+#elif defined(__linux__)
+  FXint pid=FXProcess::current();
+  FXString filename=FXString::value("/proc/%d/exe",pid);
+  return FXFile::symlink(filename);
+#else
+  return FXString::null;
+#endif
+  }
+
+
 // Return the home directory for the current user.
 FXString FXSystem::getHomeDirectory(){
   return FXSystem::getUserDirectory(FXString::null);
@@ -552,7 +402,6 @@ PSID GetUserSID(const FXString& name){
     }
   return NULL
   }
-
 */
 
 // Get home directory for a given user
@@ -706,22 +555,6 @@ FXbool FXSystem::localeIsUTF8(){
     return (strstr(str,"utf")!=NULL || strstr(str,"UTF")!=NULL);
     }
   return false;
-#endif
-  }
-
-
-// Get name of calling executable
-FXString FXSystem::getExecFilename(){
-#if defined(WIN32)
-  TCHAR buffer[MAXPATHLEN];
-  DWORD len=GetModuleFileName(NULL,buffer,MAXPATHLEN);
-  return FXString(buffer,len);
-#elif defined(__linux__)
-  FXint pid=FXProcess::current();
-  FXString filename=FXString::value("/proc/%d/exe",pid);
-  return FXFile::symlink(filename);
-#else
-  return FXString::null;
 #endif
   }
 

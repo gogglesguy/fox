@@ -119,27 +119,11 @@
 
   - FOX extensions:
 
-      %fm       Fracional seconds: milli-seconds (000-999).
+      %fm       Fractional seconds: milli-seconds (000-999).
 
-      %fu       Fracional seconds: micro-seconds (000000-999999).
+      %fu       Fractional seconds: micro-seconds (000000-999999).
 
-      %fn       Fracional seconds: nano-seconds (000000000-999999999).
-
-  - The struct tm parameter is laid out as:
-
-      /// System Time in parts
-      struct Time {
-        FXint year;         /// Year
-        FXint month;        /// Month 1..12
-        FXint mday;         /// Day of the month 1..31
-        FXint yday;         /// Day in the year 1..366
-        FXint wday;         /// Day of the week 0..6
-        FXint hour;         /// Hours 0..23
-        FXint min;          /// Minutes 0..59
-        FXint sec;          /// Seconds 0..60
-        FXint nano;         /// Nanoseconds 0..999999999
-        FXint offset;       /// Seconds east of utc
-        };
+      %fn       Fractional seconds: nano-seconds (000000000-999999999).
 
   - We can parse ISO week number (1..53) and ISO day of week (1..7) and get
     year day, day of month, month, and week day back from that.
@@ -147,42 +131,37 @@
     There are a few tweaks, due to 0=sunday:
 
       yday=week*7 + (wday+6)%7 - (day_of_week_jan4(year)+6)%7 - 3;
-      
+
     Short explanation of the algorithm. For the year, the ISO calendar
     starts week 1 as the week containing january 4th, or (alternatively),
-    the first week containing thursday, or first week with >= 4 days in 
+    the first week containing thursday, or first week with >= 4 days in
     the new year.
-    
+
     We use the first definition, and calculate the day of the week (with
     sunday=0) on January 4th (dowjan4). The amount to back up is based
     on a monday-starting week, so we back up by (dowjan4+6)%7, plus
     an extra 3 days for the beginning of the year.
-    
+
     Then we simply add the week number and weekday, (similarly converted
     to monday-starting by performing (wday+6)%7).
-    
-    The resulting yday may have to be adjusted; if < 1, the date falls 
+
+    The resulting yday may have to be adjusted; if < 1, the date falls
     into the previous year, and we correct yday and year accordingly.
     If > days_in_year(year), then the date falls into the next year,
     and we correct yday and year as needed.  Otherwise, we use yday
     and year as computed.
-    
+
 */
 
 #ifndef LLONG_MAX
 #define LLONG_MAX  FXLONG(9223372036854775807)
 #endif
 
-/*******************************************************************************/
-
 using namespace FX;
 
+/*******************************************************************************/
+
 namespace FX {
-
-
-extern FXAPI const FXchar *__strptime(const FXchar *string,const FXchar *format,struct tm *tm);
-
-extern FXAPI void timeFromSeconds(struct tm& tm,FXlong z);
 
 
 // Elements successfully parsed
@@ -279,7 +258,6 @@ static const FXchar *findstring(FXint& result,const FXchar *string,const FXchar 
   return NULL;
   }
 
-
 // Convert string of digits, but ensure number is [lo..hi]
 static const FXchar *convertstring(FXint& result,const FXchar *string,FXint lo,FXint hi){
   FXint digs=hi;
@@ -300,7 +278,6 @@ static const FXchar *convertstring(FXint& result,const FXchar *string,FXint lo,F
   return NULL;
   }
 
-
 // Is leap year
 static FXint is_leap(FXint year){
   return !(year%4) && ((year%100) || !(year%400));
@@ -312,19 +289,10 @@ static FXint days_in_year(FXint year){
   return 365+is_leap(year);
   }
 
-
-#if 0
-// Calculate the week day of the first day of a year, for Gregorian calendar.
-// See: http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week.
-static FXint first_wday_of(FXint yr){
-  return ((2*(3-(yr/100)%4))+(yr%100)+((yr%100)/4)+(is_leap(yr)?6:0)+1)%7;
-  }
-#endif
-
 // Calculate the week day of the first day of a year, for Gregorian calendar.
 // Simplified version of Tomohiko Sakamoto's method for Gregorian Calendar.
 static FXint day_of_week_jan1(FXint year){
-  year-=1; 
+  year-=1;
   return (year+year/4-year/100+year/400+1)%7;
   }
 
@@ -346,7 +314,7 @@ static FXint day_of_week(FXint year,FXint month,FXint day){
 
 
 // Convert string to time according to format.
-static const FXchar* systemTimeParseRecursive(FXSystem::Time& st,FXuint& set,const FXchar* string,const FXchar* end,const FXchar*format){
+static const FXchar* systemTimeParseRecursive(FXSystem::Time& st,FXuint& set,const FXchar* string,const FXchar* format){
   const FXTime seconds=1000000000;
   const FXchar *s;
   FXint startofweek=0;
@@ -359,7 +327,7 @@ static const FXchar* systemTimeParseRecursive(FXSystem::Time& st,FXuint& set,con
 
   // Parse format
   while((ch=*format++)!='\0'){
-    
+
     // Check format characters
     if(ch=='%'){
 
@@ -423,18 +391,18 @@ nxt:  ch=*format++;
         if(!string) return NULL;
         set|=SET_YDAY;
         continue;
-      case 'g':                 // Year corresponding to the ISO week, w/o century  
+      case 'g':                 // Year corresponding to the ISO week, w/o century
         string=convertstring(num,string,0,99);
         if(!string) return NULL;
         if(set&SET_CENT){       // Keep century, set the years
           st.year=(st.year/100)*100+num;
           }
         else{                   // Set year, guess the century
-          st.year=(num<69)?num+1900:num+2000;   
+          st.year=(num<69)?num+1900:num+2000;
           }
         set|=SET_YEAR|SET_ISO;
         continue;
-      case 'G':                 // Year corresponding to the ISO week, with century 
+      case 'G':                 // Year corresponding to the ISO week, with century
         string=convertstring(st.year,string,0,9999);
         if(!string) return NULL;
         set|=SET_CENT|SET_YEAR|SET_ISO;
@@ -446,7 +414,7 @@ nxt:  ch=*format++;
           st.year=(st.year/100)*100+num;
           }
         else{                   // Set year, guess the century
-          st.year=(num<69)?num+1900:num+2000;   
+          st.year=(num<69)?num+1900:num+2000;
           }
         set|=SET_YEAR;
         continue;
@@ -480,52 +448,53 @@ nxt:  ch=*format++;
         set|=SET_WDAY;
         continue;
       case 'U':                 // Week number, starting 1st Sunday (00..53)
-        string=convertstring(week,string,0,53);       
+        string=convertstring(week,string,0,53);
         if(!string) return NULL;
         startofweek=0;          // SUN
         set|=SET_WEEK;
         continue;
       case 'W':                  // Week number, starting 1st Monday (00..53)
-        string=convertstring(week,string,0,53);       
+        string=convertstring(week,string,0,53);
         if(!string) return NULL;
         startofweek=1;          // MON
         set|=SET_WEEK;
         continue;
       case 'V':                 // Week number, ISO 8601:1988 (01..53)
-        string=convertstring(week,string,1,53);   
+        string=convertstring(week,string,1,53);
         if(!string) return NULL;
         startofweek=1;          // MON
         set|=SET_WEEK|SET_ISO;
         continue;
       case 'Z':                 // Time zone
-        //tzset();                                      // FIXME
         while(*string==' ' || *string=='\t') string++;
         if('a'<=(*string|0x20) && (*string|0x20)<='z' && *(string+1)<=' '){     // Military time zone offset
-          st.offset=militaryzoneoffsets[(*string|0x20)-'a'];        // Offset in seconds
-          //if((*string|0x20)=='j') st.offset=timezone; // FIXME
+          st.offset=militaryzoneoffsets[(*string|0x20)-'a'];                    // Offset in seconds
+          if((*string|0x20)=='j'){                                              // Local timezone offset
+            st.offset=-FXSystem::localTimeZoneOffset()/seconds;
+            }
           string++;
           set|=SET_OFF;
           continue;
           }
-        if((s=findstring(num,string,USSTD,ARRAYNUMBER(USSTD)))!=NULL){  // Standard time
+        if((s=findstring(num,string,USSTD,ARRAYNUMBER(USSTD)))!=NULL){          // Standard time
           string=s;
           st.offset=-3600*(num+5);
           set|=SET_OFF;
           continue;
           }
-        if((s=findstring(num,string,USDST,ARRAYNUMBER(USDST)))!=NULL){  // Daylight savings time
+        if((s=findstring(num,string,USDST,ARRAYNUMBER(USDST)))!=NULL){          // Daylight savings time
           string=s;
           st.offset=-3600*(num+4);
           set|=SET_OFF;
           continue;
           }
-        if((s=findstring(num,string,GMT,ARRAYNUMBER(GMT)))!=NULL){      // GMT
+        if((s=findstring(num,string,GMT,ARRAYNUMBER(GMT)))!=NULL){              // GMT
           string=s;
           st.offset=0;
           set|=SET_OFF;
           continue;
           }
-        while(*string && *string!=' ' && *string!='\t'){                // Parse over it, for now..
+        while(*string && *string!=' ' && *string!='\t'){                        // Parse over it, for now..
           string++;
           }
         continue;
@@ -618,7 +587,7 @@ nxt:  ch=*format++;
           sse=sse*10+num;
           }
         while('0'<=*string && *string<='9');
-        FXSystem::systemTimeFromTime(st,sse*seconds);
+        systemTimeFromTime(st,sse*seconds);
         set|=SET_CENT|SET_YEAR|SET_MON|SET_YDAY|SET_MDAY|SET_WDAY|SET_24HR|SET_MIN|SET_SEC|SET_OFF;
         continue;
       case 'f':                 // Fraction
@@ -642,35 +611,35 @@ nxt:  ch=*format++;
           }
         return NULL;
       case 'D':                 // The date as "%m/%d/%y"
-        string=systemTimeParseRecursive(st,set,string,end,"%m/%d/%y");
+        string=systemTimeParseRecursive(st,set,string,"%m/%d/%y");
         if(!string) return NULL;
         continue;
       case 'F':                 // The date as "%Y-%m-%d"
-        string=systemTimeParseRecursive(st,set,string,end,"%Y-%m-%d");
+        string=systemTimeParseRecursive(st,set,string,"%Y-%m-%d");
         if(!string) return NULL;
         continue;
       case 'c':                 // Date and time, using the locale's format
-        string=systemTimeParseRecursive(st,set,string,end,"%b %a %d %k:%M:%S %Z %Y");
+        string=systemTimeParseRecursive(st,set,string,"%b %a %d %k:%M:%S %Z %Y");
         if(!string) return NULL;
         continue;
       case 'r':                 // The time in 12-hour clock representation
-        string=systemTimeParseRecursive(st,set,string,end,"%I:%M:%S %p");
+        string=systemTimeParseRecursive(st,set,string,"%I:%M:%S %p");
         if(!string) return NULL;
         continue;
       case 'R':                 // The time as "%H:%M"
-        string=systemTimeParseRecursive(st,set,string,end,"%H:%M");
+        string=systemTimeParseRecursive(st,set,string,"%H:%M");
         if(!string) return NULL;
         continue;
       case 'x':                 // The date, using the locale's format
-        string=systemTimeParseRecursive(st,set,string,end,"%b %a %d");
+        string=systemTimeParseRecursive(st,set,string,"%b %a %d");
         if(!string) return NULL;
         continue;
       case 'X':                 // The time, using the locale's format
-        string=systemTimeParseRecursive(st,set,string,end,"%k:%M:%S");
+        string=systemTimeParseRecursive(st,set,string,"%k:%M:%S");
         if(!string) return NULL;
         continue;
       case 'T':                 // The time as "%H:%M:%S"
-        string=systemTimeParseRecursive(st,set,string,end,"%H:%M:%S");
+        string=systemTimeParseRecursive(st,set,string,"%H:%M:%S");
         if(!string) return NULL;
         continue;
       default:                  // Error: not supported
@@ -678,13 +647,13 @@ nxt:  ch=*format++;
         }
       return NULL;
       }
-      
-    // Match whitespace 
+
+    // Match whitespace
     if(ch==' ' || ch=='\t'){
       while(Ascii::isSpace(*string)) string++;
       continue;
       }
-      
+
     // Match other characters
     if(ch!=*string) return NULL;
     string++;
@@ -697,7 +666,7 @@ nxt:  ch=*format++;
 
   // Some things may be calculated
   if(set&SET_YEAR){
-  
+
     // If we have month and day-of-month, we can calculate day-of-year
     if((set&SET_MON) && (set&SET_MDAY)){
       if(!(set&SET_YDAY)){
@@ -706,11 +675,11 @@ nxt:  ch=*format++;
         set|=SET_YDAY;
         }
       }
-  
+
     // If we have week and day-of-week, we can calculate day-of-year
     if((set&SET_WEEK) && (set&SET_WDAY)){
       if(!(set&SET_YDAY)){
-        if(set&SET_ISO){        // ISO week number 
+        if(set&SET_ISO){        // ISO week number
           st.yday=week*7+(st.wday+6)%7-(day_of_week_jan4(st.year)+6)%7-3;
           if(st.yday<1){
             st.yday=st.yday+days_in_year(st.year-1);
@@ -721,13 +690,13 @@ nxt:  ch=*format++;
             st.year+=1;
             }
           }
-        else{                   // Simple week number               
+        else{                   // Simple week number
           st.yday=(week-1)*7+(7-day_of_week_jan1(st.year)+startofweek)%7+(st.wday-startofweek+7)%7+1;
           }
         set|=SET_YDAY;
         }
       }
-  
+
     // If we have day-of-year, we can calculate month, day-of-month, and day-of-week
     if(set&SET_YDAY){
       if(!(set&SET_MON)){
@@ -756,27 +725,28 @@ nxt:  ch=*format++;
   }
 
 
-// Parse string to system time, returning number of characters parsed
-FXint FXSystem::systemTimeParse(Time& st,const FXchar* string,FXint length,const FXchar* format){
-  const FXchar* result;
+// Parse system time from string, returning number of characters parsed
+FXint FXSystem::systemTimeParse(Time& st,const FXchar* format,const FXchar* string){
+  const FXchar* ptr;
   FXuint set=0;
   st.year=st.month=st.mday=st.yday=st.wday=st.hour=st.min=st.sec=st.nano=st.offset=0;
-  if((result=systemTimeParseRecursive(st,set,string,string+length,format))!=NULL){
-    return result-string;
+  if((ptr=systemTimeParseRecursive(st,set,string,format))!=NULL){
+    return ptr-string;
     }
   return 0;
   }
-  
+
 
 // Parse system time from string, returning number of characters parsed
-FXint FXSystem::systemTimeParse(Time& st,const FXchar* string,const FXchar* format){
-  return systemTimeParse(st,string,strlen(string),format);
+FXint FXSystem::systemTimeParse(Time& st,const FXchar* format,const FXString& string){
+  const FXchar* ptr;
+  FXuint set=0;
+  st.year=st.month=st.mday=st.yday=st.wday=st.hour=st.min=st.sec=st.nano=st.offset=0;
+  if((ptr=systemTimeParseRecursive(st,set,string.text(),format))!=NULL){
+    return ptr-string.text();
+    }
+  return 0;
   }
-  
 
-// Parse system time from string, returning number of characters parsed
-FXint FXSystem::systemTimeParse(Time& st,const FXString& string,const FXchar* format){
-  return systemTimeParse(st,string.text(),string.length(),format);
-  }
 
 }

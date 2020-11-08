@@ -625,8 +625,9 @@ long FXFileSelector::onCmdAccept(FXObject*,FXSelector,void*){
 // a quick jump back into the original directory in case we went up too far.
 long FXFileSelector::onCmdDirectoryUp(FXObject*,FXSelector,void*){
   if(allowNavigation()){
-    setDirectory(FXPath::upLevel(getDirectory()));
-//  if(allowNavigation()) setFilename(getDirectory()); // FIXME
+    FXString dir(getDirectory());
+    setDirectory(FXPath::upLevel(dir));
+    filebox->setCurrentFile(dir);
     return 1;
     }
   getApp()->beep();
@@ -1074,7 +1075,24 @@ void FXFileSelector::setFilename(const FXString& path){
   dirbox->setDirectory(filebox->getDirectory());
   filename->setText(name);
   }
+/*
+*/
 
+
+/*
+// Set file name
+void FXFileSelector::setFilename(const FXString& path){
+  FXString fullname(FXPath::absolute(path));
+  filebox->setCurrentFile(fullname);
+  dirbox->setDirectory(filebox->getDirectory());
+  if(selectmode==SELECTFILE_ANY){
+    filename->setText(FXPath::name(fullname));
+    }
+  else if(0<=filebox->getCurrentItem()){
+    filename->setText(filebox->getItemFilename(filebox->getCurrentItem()));
+    }
+  }
+*/
 
 // Get complete path + filename
 FXString FXFileSelector::getFilename() const {

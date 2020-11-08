@@ -87,8 +87,8 @@
 
       %s        The number of seconds since the Epoch, 1970-01-01 00:00:00 +0000 (UTC).
                 DISCREPANCY between FOX and standard library version: FOX does NOT add offset
-                to local time when interpreting broken-down time "struct tm"; thus passing
-                1/1/1970 00:00:00 in "struct tm", FOX version will always print "0".
+                to local time when interpreting broken-down time "FXSystem::Time"; thus passing
+                1/1/1970 00:00:00 in "FXSystem::Time", FOX version will always print "0".
                 Its more consistent with the actual printout of the other flags.
 
       %c        Preferred date and time representation (in locale)
@@ -111,33 +111,18 @@
 
   - FOX extensions:
 
-      %fm       Fracional seconds: milli-seconds (000-999).
+      %fm       Fractional seconds: milli-seconds (000-999).
 
-      %fu       Fracional seconds: micro-seconds (000000-999999).
+      %fu       Fractional seconds: micro-seconds (000000-999999).
 
-      %fn       Fracional seconds: nano-seconds (000000000-999999999).
-
-  - The struct tm parameter is laid out as:
-
-      /// System Time in parts
-      struct Time {
-        FXint year;         /// Year
-        FXint month;        /// Month 1..12
-        FXint mday;         /// Day of the month 1..31
-        FXint yday;         /// Day in the year 1..366
-        FXint wday;         /// Day of the week 0..6
-        FXint hour;         /// Hours 0..23
-        FXint min;          /// Minutes 0..59
-        FXint sec;          /// Seconds 0..60
-        FXint nano;         /// Nanoseconds 0..999999999
-        FXint offset;       /// Seconds east of utc
-        };
+      %fn       Fractional seconds: nano-seconds (000000000-999999999).
 
 */
 
-/*******************************************************************************/
 
 using namespace FX;
+
+/*******************************************************************************/
 
 namespace FX {
 
@@ -207,9 +192,9 @@ static FXint iso_week(const FXSystem::Time& st){
 
   // Week number starting 1st monday (hint: break at thursday!)
   week=(st.yday+6-(st.wday+6)%7+3)/7;
-  
+
   // Week belongs to previous year; figure out if that was a 52-week
-  // year or a 53-week year: if 31 December of previous year is a Thursday, 
+  // year or a 53-week year: if 31 December of previous year is a Thursday,
   // or Friday of a leap year, then the previous year has 53 weeks.
   if(week==0){
     week=52;
@@ -240,7 +225,7 @@ static FXint iso_year(const FXSystem::Time& st){
 
 // Format system time to string, generating up to length characters of the result.
 // Return number of characters that would have been needed to store the full result.
-FXint FXSystem::systemTimeFormat(FXchar* string,FXint length,const FXchar* format,const Time& st){
+static FXint systemTimeFormatRecursive(FXchar* string,FXint length,const FXchar* format,const FXSystem::Time& st){
   const FXchar* src;
   FXchar buf[32];
   FXint result,ch,val,n;
@@ -381,42 +366,42 @@ nxt:  ch=*format++;
           }
         goto x;
       case 'D':
-        n=systemTimeFormat(string,length-result,"%m/%d/%y",st);
+        n=systemTimeFormatRecursive(string,length-result,"%m/%d/%y",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'F':
-        n=systemTimeFormat(string,length-result,"%Y-%m-%d",st);
+        n=systemTimeFormatRecursive(string,length-result,"%Y-%m-%d",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'c':
-        n=systemTimeFormat(string,length-result,"%b %a %d %k:%M:%S %Z %Y",st);
+        n=systemTimeFormatRecursive(string,length-result,"%b %a %d %k:%M:%S %Z %Y",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'r':
-        n=systemTimeFormat(string,length-result,"%I:%M:%S %p",st);
+        n=systemTimeFormatRecursive(string,length-result,"%I:%M:%S %p",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'R':
-        n=systemTimeFormat(string,length-result,"%H:%M",st);
+        n=systemTimeFormatRecursive(string,length-result,"%H:%M",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'x':
-        n=systemTimeFormat(string,length-result,"%b %a %d",st);
+        n=systemTimeFormatRecursive(string,length-result,"%b %a %d",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'X':
-        n=systemTimeFormat(string,length-result,"%k:%M:%S",st);
+        n=systemTimeFormatRecursive(string,length-result,"%k:%M:%S",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
       case 'T':
-        n=systemTimeFormat(string,length-result,"%H:%M:%S",st);
+        n=systemTimeFormatRecursive(string,length-result,"%H:%M:%S",st);
         if(result+n<length){ string+=n; }
         result+=n;
         continue;
@@ -450,21 +435,20 @@ x:if(result<length){
   // Done
   return result;
   }
-  
 
-// Format system time to string, returning number of characters
-FXint FXSystem::systemTimeFormat(FXString& string,const FXchar* format,const Time& st){
-  FXint result=0;
+
+// Format system time to string
+FXString FXSystem::systemTimeFormat(const Time& st,const FXchar* format){
+  FXString result;
   if(format && *format){
-    result=systemTimeFormat(string.text(),string.length(),format,st);     // Try to see if existing buffer fits
-    if(string.length()<result){
-      string.length(result);
-      result=systemTimeFormat(string.text(),string.length(),format,st);   // Again with exactly the right size
-      return result;
+    FXint len=systemTimeFormatRecursive(result.text(),result.length(),format,st);       // Try to see if existing buffer fits
+    if(result.length()<len){
+      result.length(len);
+      len=systemTimeFormatRecursive(result.text(),result.length(),format,st);           // Again with exactly the right size
       }
+    result.length(len);
     }
-  string.length(result);
   return result;
   }
-  
+
 }

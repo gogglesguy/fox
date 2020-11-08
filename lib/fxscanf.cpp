@@ -171,17 +171,15 @@ FXint __vsscanf(const FXchar* string,const FXchar* format,va_list args){
   FXint modifier,width,convert,comma,base,digits,sdigits,count,exponent,expo,done,neg,nex,nana,pos,v;
   const FXchar *start=string;
   const FXchar *ss;
-  FXchar *ptr;
-  FXuchar ch,nn;
+  FXchar   set[256];
+  FXchar  *ptr;
+  FXuchar  ch,nn;
   FXdouble number;
   FXdouble mult;
   FXulong  value;
-  FXchar   set[256];
-  va_list ag;
+  va_list  ag;
 
   count=0;
-
-  //FXTRACE((1,"string=%s segment=%.*s\n",string,(int)(grouping(string,string+strlen(string))-string),string));
 
   // Process format string
   va_copy(ag,args);

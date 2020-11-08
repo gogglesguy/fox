@@ -104,7 +104,7 @@ const FXint week_number_cases[][3]={
   {2009,12,31},     // Thu 31 Dec 2009      2009-12-31      2009-W53-4
   {2010, 1, 1},     // Fri  1 Jan 2010      2010-01-01      2009-W53-5
   {2010, 1, 2},     // Sat  2 Jan 2010      2010-01-02      2009-W53-6
-  {2010, 1, 3},     // Sun  3 Jan 2010      2010-01-03      2009-W53-7 
+  {2010, 1, 3},     // Sun  3 Jan 2010      2010-01-03      2009-W53-7
   {2020, 4,27}      // Mon 27 Apr 2020      2020-04-27      2020-W18-1
   };
 
@@ -129,29 +129,32 @@ const FXchar* isoweek_date_strings[]={
   "2009-W53-4",     // Thu 31 Dec 2009      2009-12-31      2009-W53-4
   "2009-W53-5",     // Fri  1 Jan 2010      2010-01-01      2009-W53-5
   "2009-W53-6",     // Sat  2 Jan 2010      2010-01-02      2009-W53-6
-  "2009-W53-7",     // Sun  3 Jan 2010      2010-01-03      2009-W53-7 
+  "2009-W53-7",     // Sun  3 Jan 2010      2010-01-03      2009-W53-7
   "2020-W18-1"      // Mon 27 Apr 2020      2020-04-27      2020-W18-1
   };
-  
+
 
 // Populate time struct, then print with time format
-void format_time(FXchar* buffer,FXint length,const FXchar* format,FXlong time){
+FXString format_time(const FXchar* format,FXTime time){
+  const FXTime seconds=1000000000;
   FXSystem::Time st;
+  FXTime tzoff=FXSystem::localTimeZoneOffset();
+  FXTime dsoff=FXSystem::daylightSavingsOffset();
   FXSystem::systemTimeFromTime(st,time);
-  st.offset=-3600*5;
-  FXSystem::systemTimeFormat(buffer,length,format,st);  
+  st.offset=-(tzoff+dsoff)/seconds;
+  return FXSystem::systemTimeFormat(st,format);
   }
 
 
 // Test week number stuff
-void weeknumber(FXchar* buffer,FXint length,FXint year,FXint month,FXint day){
+FXString weeknumber(FXint year,FXint month,FXint day){
   const FXTime seconds=1000000000;
   const FXTime DAY=86400*seconds;
   FXSystem::Time st;
   FXSystem::systemTimeFromTime(st,FXSystem::daysFromCivil(year,month,day)*DAY);
-  systemTimeFormat(buffer,length,"%a %e %b %Y    %Y-%m-%d    %G-W%V-%u (doy=%j)",st);  
+  return systemTimeFormat(st,"%a %e %b %Y    %Y-%m-%d    %G-W%V-%u (doy=%j)");
   }
-  
+
 
 // Print options
 void printusage(const char* prog){
@@ -178,18 +181,26 @@ int main(int argc,char* argv[]){
   FXint  year,month,day,hour,min,sec,days;
   FXString string;
   FXchar buffer[1024];
-  FXTime z,ct0,ct1;
+  FXTime z,ct0,ct1,tzoff,dsoff;
   FXuval x,y;
-  
+
   // System Time in parts
   FXSystem::Time st;
 
   // Current time
   ct0=ct1=FXThread::time();
-  
+
+  // Time zone offset
+  tzoff=FXSystem::localTimeZoneOffset();
+
+  // Daylight savings offset
+  dsoff=FXSystem::daylightSavingsOffset();
+
+  ct0=ct0-tzoff-dsoff;
+
   // Init structure
   FXSystem::systemTimeFromTime(st,ct0);
-  
+
   // Grab a few arguments
   for(FXint arg=1; arg<argc; ++arg){
     if(strcmp(argv[arg],"-h")==0 || strcmp(argv[arg],"--help")==0){
@@ -242,13 +253,13 @@ int main(int argc,char* argv[]){
       }
     else if(strcmp(argv[arg],"--format")==0){
       if(++arg>=argc){ fxmessage("Missing --format argument.\n"); exit(1); }
-      FXSystem::systemTimeFormat(string,argv[arg],st);
+      string=FXSystem::systemTimeFormat(st,argv[arg]);
       fxmessage("format=%-16s output=%s\n",argv[arg],string.text());
       }
     else if(strcmp(argv[arg],"--to-iso")==0){           // Test ISO week and year
       for(y=0; y<ARRAYNUMBER(week_number_cases); y++){
-        weeknumber(buffer,sizeof(buffer),week_number_cases[y][0],week_number_cases[y][1],week_number_cases[y][2]);
-        fxmessage("%s\n",buffer);
+        string=weeknumber(week_number_cases[y][0],week_number_cases[y][1],week_number_cases[y][2]);
+        fxmessage("%s\n",string.text());
         }
       fxmessage("\n");
       return 0;
@@ -256,7 +267,7 @@ int main(int argc,char* argv[]){
     else if(strcmp(argv[arg],"--from-iso")==0){         // Test ISO week and year
       for(x=0; x<ARRAYNUMBER(isoweek_date_strings); x++){
         clearElms(&st,1);
-        FXSystem::systemTimeParse(st,isoweek_date_strings[x],"%G-W%V-%u");
+        FXSystem::systemTimeParse(st,"%G-W%V-%u",isoweek_date_strings[x]);
         z=FXSystem::timeFromSystemTime(st);
         fxmessage("%-16s -> ",isoweek_date_strings[x]);
         fxmessage("%04d/%02d/%02d %02d:%02d:%02d  (wday=%1d  yday=%03d)\n",st.year,st.month,st.mday,st.hour,st.min,st.sec,st.wday,st.yday);
@@ -276,11 +287,16 @@ int main(int argc,char* argv[]){
   // Dump original and updated
   fxmessage("ct0=%'-16lld\n",ct0);
   fxmessage("ct1=%'-16lld\n",ct1);
+  fxmessage("\n");
+
+  fxmessage("tzoff=%'lld\n",tzoff);
+  fxmessage("dsoff=%'lld\n",dsoff);
+  fxmessage("\n");
 
   // Format every which way
   for(x=0; x<ARRAYNUMBER(timeformat); x++){
-    format_time(buffer,sizeof(buffer),timeformat[x],ct1);
-    fxmessage("format=%-16s output=%s\n",timeformat[x],buffer);
+    string=format_time(timeformat[x],ct1);
+    fxmessage("format=%-16s output=%s\n",timeformat[x],string.text());
     }
   fxmessage("\n");
 #endif
@@ -300,8 +316,8 @@ int main(int argc,char* argv[]){
 #if 1
   // Test ISO week and year
   for(y=0; y<ARRAYNUMBER(week_number_cases); y++){
-    weeknumber(buffer,sizeof(buffer),week_number_cases[y][0],week_number_cases[y][1],week_number_cases[y][2]);
-    fxmessage("%s\n",buffer);
+    string=weeknumber(week_number_cases[y][0],week_number_cases[y][1],week_number_cases[y][2]);
+    fxmessage("%s\n",string.text());
     }
   fxmessage("\n");
 #endif
@@ -311,8 +327,8 @@ int main(int argc,char* argv[]){
   for(y=0; y<ARRAYNUMBER(timevalues); y++){
     fxmessage("time=%'-16lld\n",timevalues[y]);
     for(x=0; x<ARRAYNUMBER(timeformat); x++){
-      format_time(buffer,sizeof(buffer),timeformat[x],timevalues[y]);
-      fxmessage("format=%-16s output=%s\n",timeformat[x],buffer);
+      string=format_time(timeformat[x],timevalues[y]);
+      fxmessage("format=%-16s output=%s\n",timeformat[x],string.text());
       }
     fxmessage("\n");
     }
@@ -320,11 +336,11 @@ int main(int argc,char* argv[]){
 
 #if 1
   for(x=0; x<ARRAYNUMBER(timeparse); x++){
-    FXSystem::systemTimeParse(st,timestrings[x],timeparse[x]);
+    FXSystem::systemTimeParse(st,timeparse[x],timestrings[x]);
     z=FXSystem::timeFromSystemTime(st);
     fxmessage("format=%-16s input=%-16s -> ",timeparse[x],timestrings[x]);
-    format_time(buffer,sizeof(buffer),"date: %Y/%m/%d time: %H:%M:%S wday: %w yday: %j week: %U epoch: %s",z);
-    fxmessage("%s \n",buffer);
+    string=format_time("date: %Y/%m/%d time: %H:%M:%S wday: %w yday: %j week: %U epoch: %s",z);
+    fxmessage("%s \n",string.text());
     }
   fxmessage("\n");
 #endif
@@ -332,7 +348,7 @@ int main(int argc,char* argv[]){
 #if 1
   for(x=0; x<ARRAYNUMBER(timeparse); x++){
     clearElms(&st,1);
-    FXSystem::systemTimeParse(st,timestrings[x],timeparse[x]);
+    FXSystem::systemTimeParse(st,timeparse[x],timestrings[x]);
     z=FXSystem::timeFromSystemTime(st);
     fxmessage("format=%-16s input=%-16s -> ",timeparse[x],timestrings[x]);
     fxmessage("%04d/%02d/%02d %02d:%02d:%02d  (wday=%1d  yday=%03d gmt=%6d z=%lld)\n",st.year,st.month,st.mday,st.hour,st.min,st.sec,st.wday,st.yday,st.offset,z);

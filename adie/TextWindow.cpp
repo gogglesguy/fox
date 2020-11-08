@@ -95,7 +95,7 @@
 
 #define CLOCKTIMER      1000000000      // Blink rate for corner clock
 #define RESTYLEJUMP     80              // Restyling back-off
-#define MAXFILESIZE     500000000       // Limit files to this when loading
+#define MAXFILESIZE     1000000000      // Limit files to this when loading
 
 /*******************************************************************************/
 

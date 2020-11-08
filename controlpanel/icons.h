@@ -1,4 +1,4 @@
-/*********** Generated on 2020/04/29 14:57:15 by reswrap version 6.0.0 *********/
+/*********** Generated on 2020/06/24 14:33:11 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../controlpanel/controlpanel_gif.gif */
 extern const unsigned char controlpanel_gif[];

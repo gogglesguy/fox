@@ -227,7 +227,7 @@ FXFileList::FXFileList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
   mini_doc=new FXGIFIcon(getApp(),minidoc);
   big_app=new FXGIFIcon(getApp(),bigapp);
   mini_app=new FXGIFIcon(getApp(),miniapp);
-  timeformat=tr(FXSystem::defaultTimeFormat); 
+  timeformat=tr(FXSystem::defaultTimeFormat);
   dropaction=DRAG_COPY;
 #ifdef WIN32
   matchmode=FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold;
@@ -1529,10 +1529,10 @@ FXbool FXFileList::setCurrentFile(const FXString& file,FXbool notify){
   if(setDirectory(FXPath::directory(file),notify)){
     FXint index=findItem(FXPath::name(file));
     if(0<=index){
+      makeItemVisible(index);
       setAnchorItem(index);
       setCurrentItem(index,notify);
       selectItem(index,notify);
-      makeItemVisible(index);
       return true;
       }
     }
@@ -1553,14 +1553,15 @@ FXString FXFileList::getCurrentFile() const {
 FXbool FXFileList::setDirectory(const FXString& pathname,FXbool notify){
   FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   FXString path(FXPath::absolute(directory,pathname));
-  if(directory==path) return true;
   if(FXStat::isDirectory(path)){
+    if(directory==path) return true;
     clearItems(notify);
     directory=path;
     list=NULL;
     if(listItems(true,notify)){
       if(getNumItems()){
         makeItemVisible(0);
+        setAnchorItem(0);
         setCurrentItem(0,notify);
         }
       return true;
@@ -1568,7 +1569,6 @@ FXbool FXFileList::setDirectory(const FXString& pathname,FXbool notify){
     }
   return false;
   }
-
 
 /*******************************************************************************/
 
