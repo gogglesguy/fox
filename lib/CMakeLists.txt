@@ -509,7 +509,6 @@ set(SOURCES FX4Splitter.cpp
             fxgifio.cpp
             FXGLCanvas.cpp
             FXGLContext.cpp
-            FXGLObject.cpp
             FXGLVisual.cpp
             FXGradientBar.cpp
             FXGroupBox.cpp
@@ -604,8 +603,6 @@ set(SOURCES FX4Splitter.cpp
             FXReactor.cpp
             FXRadioButton.cpp
             FXRandom.cpp
-            FXRanged.cpp
-            FXRangef.cpp
             FXRangeSlider.cpp
             FXRASIcon.cpp
             FXRASImage.cpp
@@ -641,8 +638,6 @@ set(SOURCES FX4Splitter.cpp
             FXShutter.cpp
             FXSize.cpp
             FXSlider.cpp
-            FXSphered.cpp
-            FXSpheref.cpp
             FXSpinLock.cpp
             FXSpinner.cpp
             FXSplashWindow.cpp
