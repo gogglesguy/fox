@@ -478,6 +478,9 @@ set(SOURCES FX4Splitter.cpp
             FXDispatcher.cpp
             FXDisplay.cpp
             FXDLL.cpp
+            FXDockBar.cpp
+            FXDockHandler.cpp
+            FXDockSite.cpp
             FXDocument.cpp
             FXDragCorner.cpp
             FXDrawable.cpp
