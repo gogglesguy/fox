@@ -362,8 +362,9 @@ set(HEADERS ../include/fx3d.h
             ../include/FXWSQueue.h
             ../include/FXXBMIcon.h
             ../include/FXXBMImage.h
-            ../include/FXXMLFile.h
             ../include/FXXML.h
+            ../include/FXXMLFile.h
+            ../include/FXXMLString.h
             ../include/FXXPMIcon.h
             ../include/FXXPMImage.h
             ../include/xincs.h)
@@ -740,6 +741,7 @@ set(SOURCES FX4Splitter.cpp
             fxxbmio.cpp
             FXXML.cpp
             FXXMLFile.cpp
+            FXXMLString.cpp
             FXXPMIcon.cpp
             FXXPMImage.cpp
             fxxpmio.cpp
