@@ -64,6 +64,7 @@ const FXchar *timeparse[]={
   "%z",                 // Zone offset
   "%z",                 // Zone offset
   "%F",                 // ISO date format
+  "%H:%M:%S.%fm"
   };
 
 
@@ -81,6 +82,7 @@ const FXchar* timestrings[]={
   "+0300",
   "-03",
   "2020-2-7",
+  "18:50:19.734"
   };
 
 

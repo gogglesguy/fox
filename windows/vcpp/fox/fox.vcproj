@@ -3290,10 +3290,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\include\FXEmbedderWindow.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\include\fxendian.h"
 			>
 		</File>
@@ -3366,10 +3362,6 @@
 		</File>
 		<File
 			RelativePath="..\..\..\lib\fxexeio.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\lib\fxexprdbg.h"
 			>
 		</File>
 		<File
@@ -7101,10 +7093,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\lib\fxrexdbg.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\lib\FXRGBIcon.cpp"
 			>
 			<FileConfiguration
@@ -9557,6 +9545,14 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXXMLFile.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXXMLString.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXXMLString.h"
 			>
 		</File>
 		<File

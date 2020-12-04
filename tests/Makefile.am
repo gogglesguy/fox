@@ -103,7 +103,4 @@ xml_SOURCES             = xml.cpp
 
 
 
-EXTRA_DIST = Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc \
-             xmltests.json
+EXTRA_DIST = xmltests.json

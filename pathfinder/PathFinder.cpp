@@ -572,10 +572,9 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   address=new FXTextField(locationbar,10,this,ID_GOTO_LOCATION,TEXTFIELD_NORMAL|JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 1,1,1,1);
   new FXButton(locationbar,tr("\tGo\tGo to location."),entericon,this,ID_GOTO_LOCATION,BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_CENTER_Y);
 
-
   // Install some accelerators
-  getAccelTable()->addAccel(MKUINT(KEY_BackSpace,0),this,FXSEL(SEL_COMMAND,ID_UPDIRECTORY));
-  getAccelTable()->addAccel(MKUINT(KEY_Delete,0),this,FXSEL(SEL_COMMAND,ID_DELETE));
+  getAccelTable()->addAccel("Back",this,FXSEL(SEL_COMMAND,ID_UPDIRECTORY));
+  getAccelTable()->addAccel("Del",this,FXSEL(SEL_COMMAND,ID_DELETE));
 
 
   // Make a tool tip
@@ -2236,8 +2235,8 @@ void PathFinderMain::closePreview(){
 
 // Clean up
 PathFinderMain::~PathFinderMain(){
-  getAccelTable()->removeAccel(MKUINT(KEY_BackSpace,0));
-  getAccelTable()->removeAccel(MKUINT(KEY_Delete,0));
+  getAccelTable()->removeAccel("Back");
+  getAccelTable()->removeAccel("Del");
   delete dragshell1;
   delete dragshell2;
   delete dragshell3;

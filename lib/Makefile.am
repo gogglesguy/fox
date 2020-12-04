@@ -484,6 +484,7 @@ FXWorker.cpp \
 FXWSQueue.cpp \
 FXXML.cpp \
 FXXMLFile.cpp \
+FXXMLString.cpp \
 FXXBMIcon.cpp \
 FXXBMImage.cpp \
 FXXPMIcon.cpp \
@@ -546,11 +547,6 @@ icons.cpp: $(ICONS)
 	$(RESWRAP) -nc -i icons.h -n FX -o $@ $^
 
 EXTRA_DIST = \
-Makefile.bc \
-Makefile.bc.resp \
-Makefile.dmc \
-Makefile.wc \
-Makefile.dmc.resp \
 version.rc \
 version.rc.in \
 $(CURSORS) \

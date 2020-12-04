@@ -399,7 +399,7 @@ ICONS = $(top_srcdir)/chart/marble.bmp
 charttest_SOURCES = charttest.cpp icons.h icons.cpp
 BUILT_SOURCES = icons.h icons.cpp
 CLEANFILES = icons.h icons.cpp
-EXTRA_DIST = Makefile.bc $(ICONS)
+EXTRA_DIST = $(ICONS)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

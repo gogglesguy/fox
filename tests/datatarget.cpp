@@ -244,7 +244,7 @@ DataTargetWindow::DataTargetWindow(FXApp* a):FXMainWindow(a,"Data Target Test",N
   new FXSpinner(matrix,5,&progress_target,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_ROW);
 
   // Install an accelerator
-  getAccelTable()->addAccel(parseAccel("Ctl-Q"),getApp(),FXSEL(SEL_COMMAND,FXApp::ID_QUIT));
+  getAccelTable()->addAccel("Ctl-Q",getApp(),FXSEL(SEL_COMMAND,FXApp::ID_QUIT));
 
   }
 

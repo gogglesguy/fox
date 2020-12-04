@@ -22,7 +22,7 @@ icons.h \
 icons.cpp \
 ControlPanel.h \
 ControlPanel.cpp
- 
+
 BUILT_SOURCES = icons.h icons.cpp
 
 icons.h: $(ICONS)
@@ -35,8 +35,5 @@ CLEANFILES = icons.h icons.cpp
 
 EXTRA_DIST = \
 $(man_MANS) \
-Makefile.bc \
-Makefile.wc \
-Makefile.dmc \
 LICENSE \
 $(ICONS)

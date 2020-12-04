@@ -562,8 +562,8 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(editmenu,tr("Shift tab right\tAlt-]\tShift text right one tab position."),getApp()->shiftrighticon,editor,FXText::ID_SHIFT_TABRIGHT);
 
   // These were the old bindings; keeping them for now...
-  getAccelTable()->addAccel(MKUINT(KEY_9,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_LEFT));
-  getAccelTable()->addAccel(MKUINT(KEY_0,CONTROLMASK),editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_RIGHT));
+  getAccelTable()->addAccel("Ctl-9",editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_LEFT));
+  getAccelTable()->addAccel("Ctl-0",editor,FXSEL(SEL_COMMAND,FXText::ID_SHIFT_RIGHT));
 
   // Goto Menu
   gotomenu=new FXMenuPane(this);
@@ -607,8 +607,9 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(searchmenu,tr("&Search...\tCtl-F\tSearch with a string pattern."),getApp()->searchicon,this,ID_SEARCH);
   new FXMenuCommand(searchmenu,tr("R&eplace...\tCtl-R\tSearch and replace with a string pattern."),getApp()->replaceicon,this,ID_REPLACE);
 
-  getAccelTable()->addAccel(MKUINT(KEY_F3,0),this,FXSEL(SEL_COMMAND,ID_SEARCH_NXT_FORW));
-  getAccelTable()->addAccel(MKUINT(KEY_F3,SHIFTMASK),this,FXSEL(SEL_COMMAND,ID_SEARCH_NXT_BACK));
+  // Accelerators for search
+  getAccelTable()->addAccel("F3",this,FXSEL(SEL_COMMAND,ID_SEARCH_NXT_FORW));
+  getAccelTable()->addAccel("Shift-F3",this,FXSEL(SEL_COMMAND,ID_SEARCH_NXT_BACK));
 
   // Syntax menu; it scrolls if we get too many
   syntaxmenu=new FXScrollPane(this,25);
@@ -4066,7 +4067,7 @@ long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
       string.format("<<%d>>",pos);
       }
     else{                               // Show squeezed text of line as label
-      editor->extractText(string,b,e-b);    
+      editor->extractText(string,b,e-b);
       string.simplify();
       if(50<=string.length()){          // If too long after squeeze, suffix "..."
         string.replace(50,string.length()-50,"...");

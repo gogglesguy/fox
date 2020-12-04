@@ -343,6 +343,7 @@ FXWorker.h \
 FXWSQueue.h \
 FXXML.h \
 FXXMLFile.h \
+FXXMLString.h \
 FXXBMIcon.h \
 FXXBMImage.h \
 FXXPMIcon.h \

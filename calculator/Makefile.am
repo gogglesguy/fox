@@ -6,7 +6,7 @@ RESWRAP  = $(top_builddir)/utils/reswrap$(EXEEXT)
 SUFFIXES = .gif .bmp
 LDADD = $(top_builddir)/lib/libFOX-1.7.la -lm
 
- 
+
 bin_PROGRAMS = calculator
 
 man_MANS = calculator.1
@@ -48,8 +48,5 @@ CLEANFILES = icons.h icons.cpp
 
 EXTRA_DIST = \
 $(man_MANS) \
-Makefile.bc \
-Makefile.wc \
-Makefile.dmc \
 LICENSE \
 $(ICONS)
