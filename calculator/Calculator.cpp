@@ -81,6 +81,8 @@ FXDEFMAP(Calculator) CalculatorMap[]={
   FXMAPFUNC(SEL_COMMAND,Calculator::ID_EXPONENT_NEVER,Calculator::onCmdExponent),
   FXMAPFUNC(SEL_UPDATE,Calculator::ID_EXPONENT_ALWAYS,Calculator::onUpdExponent),
   FXMAPFUNC(SEL_UPDATE,Calculator::ID_EXPONENT_NEVER,Calculator::onUpdExponent),
+  FXMAPFUNC(SEL_COMMAND,Calculator::ID_ENGINEERING_MODE,Calculator::onCmdEngineeringMode),
+  FXMAPFUNC(SEL_UPDATE,Calculator::ID_ENGINEERING_MODE,Calculator::onUpdEngineeringMode),
   FXMAPFUNC(SEL_COMMAND,Calculator::ID_PRECISION,Calculator::onCmdPrecision),
   FXMAPFUNC(SEL_UPDATE,Calculator::ID_PRECISION,Calculator::onUpdPrecision),
   FXMAPFUNC(SEL_COMMAND,Calculator::ID_QUESTION,Calculator::onCmdQuestion),
@@ -663,7 +665,10 @@ void Calculator::readRegistry(){
   FXint amode=getApp()->reg().readIntEntry("SETTINGS","angles",ANG_RAD);
 
   // Exponent mode
-  FXint expmode=(FXExponent)getApp()->reg().readIntEntry("SETTINGS","exponent",EXPONENT_IFNEEDED);
+  FXint expmode=getApp()->reg().readIntEntry("SETTINGS","exponent",EXPONENT_IFNEEDED);
+
+  // Engineering mode
+  FXint engmode=getApp()->reg().readBoolEntry("SETTINGS","engineering",false);
 
   // Precision
   FXint prec=getApp()->reg().readIntEntry("SETTINGS","precision",10);
@@ -700,6 +705,7 @@ void Calculator::readRegistry(){
   setAngles(amode);
   setPrecision(prec);
   setExponentMode(expmode);
+  setEngineeringMode(engmode);
   setBeep(noise);
 
   setX(xx);
@@ -742,6 +748,9 @@ void Calculator::writeRegistry(){
 
   // Exponent mode
   getApp()->reg().writeIntEntry("SETTINGS","exponent",getExponentMode());
+
+  // Engineering mode
+  getApp()->reg().writeIntEntry("SETTINGS","engineering",getEngineeringMode());
 
   // Precision
   getApp()->reg().writeIntEntry("SETTINGS","precision",getPrecision());
@@ -856,7 +865,15 @@ void Calculator::setBase(FXint b){
 
 // Set exponent mode
 void Calculator::setExponentMode(FXuchar expmode){
-  exponent=expmode;
+  exponent=(expmode&3)|(exponent&4);
+  setDisplayValue(getnum());
+  modifiers=0;
+  }
+
+
+// Set exponent mode
+void Calculator::setEngineeringMode(FXbool engmode){
+  exponent^=((0-engmode)^exponent)&4;
   setDisplayValue(getnum());
   modifiers=0;
   }
@@ -1147,7 +1164,7 @@ void Calculator::dyadic(FXuchar op){
 
 // Enter evaluate
 void Calculator::evaluate(){
-  register FXuchar op;
+  FXuchar op;
   while(0<=opsp){
     op=opstack[opsp--];
     if(op!=DY_LPAR)
@@ -1172,7 +1189,7 @@ void Calculator::lparen(){
 
 // Right parentheses
 void Calculator::rparen(){
-  register FXuchar op;
+  FXuchar op;
   while(0<=opsp){
     op=opstack[opsp--];
     if(op==DY_LPAR){ parens--; break; }
@@ -1275,9 +1292,26 @@ long Calculator::onCmdExponent(FXObject*,FXSelector sel,void* ptr){
 
 // Update exponential notation
 long Calculator::onUpdExponent(FXObject* sender,FXSelector sel,void*){
-  if(FXSELID(sel)==ID_EXPONENT_ALWAYS && exponent==EXPONENT_ALWAYS)
+  if(FXSELID(sel)==ID_EXPONENT_ALWAYS && getExponentMode()==EXPONENT_ALWAYS)
     sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
-  else if(FXSELID(sel)==ID_EXPONENT_NEVER && exponent==EXPONENT_NEVER)
+  else if(FXSELID(sel)==ID_EXPONENT_NEVER && getExponentMode()==EXPONENT_NEVER)
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
+  else
+    sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
+  return 1;
+  }
+
+
+// Change engineering notation
+long Calculator::onCmdEngineeringMode(FXObject*,FXSelector,void*){
+  setEngineeringMode(!getEngineeringMode());
+  return 1;
+  }
+
+
+// Update exponential notation
+long Calculator::onUpdEngineeringMode(FXObject* sender,FXSelector,void*){
+  if(getEngineeringMode())
     sender->handle(this,FXSEL(SEL_COMMAND,ID_CHECK),NULL);
   else
     sender->handle(this,FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);

@@ -2,10 +2,6 @@
 
 htmldir = $(prefix)/@PACKAGE@/html
 
-# Windows files
-BCPP_FILES = \
-borland/Makefile
-
 # Microsoft Visual C++
 VCPP_FILES = \
 vcpp/adie/adie.vcproj \
@@ -49,16 +45,7 @@ vcpp/wizard/wizard.vcproj \
 vcpp/win32.sln
 
 
-# Digital Mars C++
-DMC_FILES = \
-dmc/Makefile
-
-# Open Watcom C++
-WATCOM_FILES = \
-watcom/Makefile
-
-
-EXTRA_DIST = $(BCPP_FILES) $(VCPP_FILES) $(DMC_FILES) $(WATCOM_FILES)
+EXTRA_DIST = $(VCPP_FILES)
 
 
 

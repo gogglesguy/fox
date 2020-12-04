@@ -38,8 +38,8 @@ namespace FXCHART {
 
 // Measure text width
 FXint textWidth(FXFont *font,const FXString& string){
-  register FXint angle=font->getAngle()/(90*64);
-  register FXint beg=0,tw=0,end,w;
+  FXint angle=font->getAngle()/(90*64);
+  FXint beg=0,tw=0,end,w;
   do{
     end=beg;
     while(end<string.length() && string[end]!='\n') end++;
@@ -58,8 +58,8 @@ FXint textWidth(FXFont *font,const FXString& string){
 
 // Measure text height
 FXint textHeight(FXFont *font,const FXString& string){
-  register FXint angle=font->getAngle()/(90*64);
-  register FXint beg=0,th=0,end,h;
+  FXint angle=font->getAngle()/(90*64);
+  FXint beg=0,th=0,end,h;
   do{
     end=beg;
     while(end<string.length() && string[end]!='\n') end++;
@@ -78,10 +78,10 @@ FXint textHeight(FXFont *font,const FXString& string){
 
 // Draw text
 void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
-  register FXint angle=dc.getFont()->getAngle()/(90*64);
-  register FXint tw=textWidth(dc.getFont(),string);
-  register FXint th=textHeight(dc.getFont(),string);
-  register FXint beg,end,xx,yy,tx,ty;
+  FXint angle=dc.getFont()->getAngle()/(90*64);
+  FXint tw=textWidth(dc.getFont(),string);
+  FXint th=textHeight(dc.getFont(),string);
+  FXint beg,end,xx,yy,tx,ty;
 
 
   // Text box vertical attachment
@@ -173,8 +173,8 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
 
 // Marker size is in pixels; x,y are canvas coordinates of the center
 void drawMarker(FXDC& dc,const Marker& ms,FXint x,FXint y){
-  register FXint s=ms.size;
-  register FXint h=s>>1;
+  FXint s=ms.size;
+  FXint h=s>>1;
   FXPoint p[5];
   dc.setForeground(ms.color);
   switch(ms.style){
@@ -327,9 +327,9 @@ void drawRectangle(FXDC& dc,const FillStyle& fs,FXint x,FXint y,FXint w,FXint h)
 
 // Determine tick spacing
 void getTickSpacing(FXdouble& major,FXdouble& minor,FXdouble min,FXdouble max){
-  register FXdouble range=max-min;
-  register FXdouble delta=Math::pow(10.0,Math::floor(Math::log10(range)));
-  register FXdouble frac=range/delta;
+  FXdouble range=max-min;
+  FXdouble delta=Math::pow(10.0,Math::floor(Math::log10(range)));
+  FXdouble frac=range/delta;
   if(frac<1.5){
     major=0.1*delta;
     minor=0.02*delta;

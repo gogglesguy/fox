@@ -3348,6 +3348,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXEventLoop.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXException.cpp"
 			>
 			<FileConfiguration
@@ -3527,6 +3531,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\lib\FXFileAssociations.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXFileAssociations.h"
 			>
 		</File>
 		<File
@@ -4371,6 +4379,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXIconCache.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXIconList.cpp"
 			>
 			<FileConfiguration
@@ -4668,6 +4680,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXIOBuffer.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXIODevice.cpp"
 			>
 			<FileConfiguration
@@ -4853,11 +4869,23 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXJSON.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXJSONFile.cpp"
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXJSONFile.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXJSONString.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXJSONString.h"
 			>
 		</File>
 		<File
@@ -4997,6 +5025,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\lib\FXLFQueue.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXLFQueue.h"
 			>
 		</File>
 		<File
@@ -7284,6 +7316,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXScopedThread.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXScrollArea.cpp"
 			>
 			<FileConfiguration
@@ -7447,6 +7483,10 @@
 		</File>
 		<File
 			RelativePath="..\..\..\lib\FXSemaQueue.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXSemaQueue.h"
 			>
 		</File>
 		<File
@@ -9020,11 +9060,23 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXVariant.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXVariantArray.cpp"
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXVariantArray.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\FXVariantMap.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXVariantMap.h"
 			>
 		</File>
 		<File
@@ -9410,6 +9462,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\include\FXWSQueue.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\lib\fxwuquantize.cpp"
 			>
 			<FileConfiguration
@@ -9523,6 +9579,14 @@
 		</File>
 		<File
 			RelativePath="..\..\..\include\FXXMLFile.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\lib\FXXMLString.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\include\FXXMLString.h"
 			>
 		</File>
 		<File

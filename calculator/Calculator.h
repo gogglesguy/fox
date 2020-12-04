@@ -162,6 +162,8 @@ public:
   long onCmdFont(FXObject*,FXSelector,void*);
   long onCmdExponent(FXObject*,FXSelector,void*);
   long onUpdExponent(FXObject*,FXSelector,void*);
+  long onCmdEngineeringMode(FXObject*,FXSelector,void*);
+  long onUpdEngineeringMode(FXObject*,FXSelector,void*);
   long onCmdPrecision(FXObject*,FXSelector,void*);
   long onUpdPrecision(FXObject*,FXSelector,void*);
   long onCmdBeep(FXObject*,FXSelector,void*);
@@ -249,6 +251,7 @@ public:
     ID_COLOR_CLEAR,
     ID_EXPONENT_ALWAYS,
     ID_EXPONENT_NEVER,
+    ID_ENGINEERING_MODE,
     ID_PRECISION,
     ID_QUESTION,
     ID_BEEP,
@@ -392,7 +395,11 @@ public:
 
   /// Set exponent mode
   void setExponentMode(FXuchar expmode);
-  FXuchar getExponentMode() const { return exponent; }
+  FXuchar getExponentMode() const { return (exponent&3); }
+
+  /// Set exponent mode
+  void setEngineeringMode(FXbool engmode);
+  FXbool getEngineeringMode() const { return !!(exponent&4); }
 
   /// Set precision
   void setPrecision(FXint prec);

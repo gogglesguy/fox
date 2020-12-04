@@ -55,17 +55,19 @@ Preferences::Preferences(Calculator *own):FXDialogBox(own,"Calculator Preference
   FXVerticalFrame* pane2=new FXVerticalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y);
   new FXLabel(pane2,tr("Calculator settings"),NULL,LAYOUT_LEFT);
   new FXHorizontalSeparator(pane2,SEPARATOR_LINE|LAYOUT_FILL_X);
-  FXMatrix *matrix2=new FXMatrix(pane2,5,MATRIX_BY_ROWS|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  FXMatrix *matrix2=new FXMatrix(pane2,6,MATRIX_BY_ROWS|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 
   new FXLabel(matrix2,tr("Display Font:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Always show exponent:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Never show exponent:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
+  new FXLabel(matrix2,tr("Engineering mode:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Precision:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_ROW);
   new FXLabel(matrix2,tr("Beep on error:"),NULL,JUSTIFY_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
 
   new FXButton(matrix2,tr("Set..."),NULL,own,Calculator::ID_FONT,FRAME_RAISED|FRAME_THICK|LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
   new FXCheckButton(matrix2,FXString::null,own,Calculator::ID_EXPONENT_ALWAYS,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   new FXCheckButton(matrix2,FXString::null,own,Calculator::ID_EXPONENT_NEVER,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
+  new FXCheckButton(matrix2,FXString::null,own,Calculator::ID_ENGINEERING_MODE,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);
   FXSpinner* spinner=new FXSpinner(matrix2,2,own,Calculator::ID_PRECISION,JUSTIFY_RIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_LEFT|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW);
   spinner->setRange(1,30);
   new FXCheckButton(matrix2,FXString::null,own,Calculator::ID_BEEP,LAYOUT_LEFT|LAYOUT_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,0,0, 0,0,0,0);

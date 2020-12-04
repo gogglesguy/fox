@@ -14,7 +14,7 @@ libCHART_1_7_la_LIBADD  = $(top_builddir)/lib/libFOX-1.7.la
 libCHART_1_7_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -export-dynamic
 
 chartincludedir=$(includedir)/fox-1.7/chart
- 
+
 chartinclude_HEADERS = \
 FX2DChart.h \
 FX2DPlot.h \
@@ -51,4 +51,4 @@ icons.cpp: $(ICONS)
 CLEANFILES = icons.h icons.cpp
 
 
-EXTRA_DIST = Makefile.bc $(ICONS)
+EXTRA_DIST = $(ICONS)

@@ -347,7 +347,7 @@ void ShutterBug::changeCursor(FXint which,FXuchar drag){
 
 // Handle repaint
 long ShutterBug::onPaint(FXObject*,FXSelector,void* ptr){
-  register FXEvent *event=(FXEvent*)ptr;
+  FXEvent *event=(FXEvent*)ptr;
   FXDCWindow dc(this,event);
   dc.setForeground(backColor);
   dc.fillRectangle(0,0,width,height);
@@ -851,8 +851,8 @@ long ShutterBug::onCmdResetCount(FXObject*,FXSelector,void*){
 
 // Pressed on snapper
 long ShutterBug::onPressSnapper(FXObject*,FXSelector sel,void* ptr){
-  register FXint which=FXSELID(sel)-ID_SNAPPER_0;
-  register FXEvent *event=(FXEvent*)ptr;
+  FXint which=FXSELID(sel)-ID_SNAPPER_0;
+  FXEvent *event=(FXEvent*)ptr;
   if((event->state&CONTROLMASK) || (event->type!=SEL_LEFTBUTTONPRESS) || size){
     mode=MODE_WHOLERECT;
     spotx=event->root_x-rectangle.x;
@@ -877,7 +877,7 @@ long ShutterBug::onPressSnapper(FXObject*,FXSelector sel,void* ptr){
 
 // Release on snapper
 long ShutterBug::onReleaseSnapper(FXObject*,FXSelector sel,void*){
-  register FXint which=FXSELID(sel)-ID_SNAPPER_0;
+  FXint which=FXSELID(sel)-ID_SNAPPER_0;
   mode=MODE_NONE;
   changeCursor(which,mode);
   return 1;
@@ -886,9 +886,9 @@ long ShutterBug::onReleaseSnapper(FXObject*,FXSelector sel,void*){
 
 // Moved snapper
 long ShutterBug::onMovedSnapper(FXObject*,FXSelector sel,void* ptr){
-  register FXint which=FXSELID(sel)-ID_SNAPPER_0;
-  register FXEvent *event=(FXEvent*)ptr;
-  register FXuchar m;
+  FXint which=FXSELID(sel)-ID_SNAPPER_0;
+  FXEvent *event=(FXEvent*)ptr;
+  FXuchar m;
   FXint t;
   FXTRACE((1,"%s::onMovedSnapper %d,%d\n",getClassName(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y));
   if(mode!=MODE_NONE){
@@ -940,7 +940,7 @@ long ShutterBug::onMovedSnapper(FXObject*,FXSelector sel,void* ptr){
 
 // Entered snapper window
 long ShutterBug::onEnterSnapper(FXObject*,FXSelector sel,void* ptr){
-  register FXuchar m=MODE_WHOLERECT;
+  FXuchar m=MODE_WHOLERECT;
   if(!(((FXEvent*)ptr)->state&CONTROLMASK) && (0==size)){
     m=where(((FXEvent*)ptr)->root_x,((FXEvent*)ptr)->root_y);
     }

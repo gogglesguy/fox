@@ -593,11 +593,7 @@ parallel_SOURCES = parallel.cpp
 variant_SOURCES = variant.cpp
 math_SOURCES = math.cpp
 xml_SOURCES = xml.cpp
-EXTRA_DIST = Makefile.bc \
-             Makefile.wc \
-             Makefile.dmc \
-             xmltests.json
-
+EXTRA_DIST = xmltests.json
 all: all-am
 
 .SUFFIXES:

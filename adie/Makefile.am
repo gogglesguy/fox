@@ -120,9 +120,6 @@ CLEANFILES = icons.h icons.cpp help.h help.cpp
 
 EXTRA_DIST = $(man_MANS) \
 Adie.stx \
-Makefile.bc \
-Makefile.wc \
-Makefile.dmc \
 LICENSE \
 help.txt \
 $(ICONS)
