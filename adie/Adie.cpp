@@ -99,6 +99,8 @@ Adie::Adie(const FXString& name):FXApp(name){
   lowercaseicon=new FXGIFIcon(this,lowercase);
   backwardicon=new FXGIFIcon(this,backward_gif);
   forwardicon=new FXGIFIcon(this,forward_gif);
+  shownicon=new FXGIFIcon(this,fileshown);
+  hiddenicon=new FXGIFIcon(this,filehidden);
 
 #ifndef DEBUG
   // If interrupt happens, quit gracefully; we may want to
@@ -524,5 +526,7 @@ Adie::~Adie(){
   delete lowercaseicon;
   delete backwardicon;
   delete forwardicon;
+  delete shownicon;
+  delete hiddenicon;
   }
 

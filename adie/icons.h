@@ -1,4 +1,4 @@
-/*********** Generated on 2021/03/02 08:08:09 by reswrap version 6.0.0 *********/
+/*********** Generated on 2021/04/01 19:49:55 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../adie/adie_gif.gif */
 extern const unsigned char adie_gif[];
@@ -47,6 +47,12 @@ extern const unsigned char delete_gif[];
 
 /* Created by reswrap from file ../adie/delimit_gif.gif */
 extern const unsigned char delimit_gif[];
+
+/* Created by reswrap from file ../adie/filehidden.gif */
+extern const unsigned char filehidden[];
+
+/* Created by reswrap from file ../adie/fileshown.gif */
+extern const unsigned char fileshown[];
 
 /* Created by reswrap from file ../adie/fonts_gif.gif */
 extern const unsigned char fonts_gif[];

@@ -142,9 +142,9 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVE,TextWindow::onUpdSave),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEAS,TextWindow::onCmdSaveAs),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVETO,TextWindow::onCmdSaveTo),
-  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERT_FILE,TextWindow::onUpdIsEditable),
-  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERT_FILE,TextWindow::onCmdInsertFile),
-  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXTRACT_FILE,TextWindow::onUpdExtractFile),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_REPLACE_FILE,TextWindow::onUpdIsEditable),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_REPLACE_FILE,TextWindow::onCmdReplaceFile),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXTRACT_FILE,TextWindow::onUpdHasSelection),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXTRACT_FILE,TextWindow::onCmdExtractFile),
 
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FONT,TextWindow::onCmdFont),
@@ -418,6 +418,7 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",NULL,NULL,DECOR_ALL,0,0,85
   new FXLabel(filterframe,tr("Filter:"),NULL,LAYOUT_CENTER_Y);
   filter=new FXComboBox(filterframe,25,this,ID_FILEFILTER,COMBOBOX_STATIC|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
   filter->setNumVisible(4);
+  new FXToggleButton(filterframe,tr("\tShow hidden files\tShow hidden files and directories."),tr("\tHide Hidden Files\tHide hidden files and directories."),getApp()->hiddenicon,getApp()->shownicon,this,ID_TOGGLE_DOTFILES,TOGGLEBUTTON_TOOLBAR|FRAME_RAISED,0,0,0,0, 3,3,3,3);
 
   FXSplitter* subsplitter=new FXSplitter(splitter,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|LAYOUT_FILL_Y|SPLITTER_VERTICAL|SPLITTER_REVERSED|SPLITTER_TRACKING);
 
@@ -510,7 +511,7 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(filemenu,tr("Save &To...\tShift-Ctl-T\tSave copy of document to file name."),getApp()->savetoicon,this,ID_SAVETO);
   new FXMenuCommand(filemenu,tr("&Close\tCtl-W\tClose document."),NULL,this,ID_CLOSE);
   new FXMenuSeparator(filemenu);
-  new FXMenuCommand(filemenu,tr("Insert from file...\t\tInsert text from file."),NULL,this,ID_INSERT_FILE);
+  new FXMenuCommand(filemenu,tr("Replace by file...\t\tReplace by text from file."),NULL,this,ID_REPLACE_FILE);
   new FXMenuCommand(filemenu,tr("Extract to file...\t\tExtract text to file."),NULL,this,ID_EXTRACT_FILE);
   new FXMenuCommand(filemenu,tr("&Print...\tCtl-P\tPrint document."),getApp()->printicon,this,ID_PRINT);
   new FXMenuCheck(filemenu,tr("&Editable\t\tDocument editable."),editor,FXText::ID_TOGGLE_EDITABLE);
@@ -670,7 +671,6 @@ void TextWindow::createMenubar(){
   new FXMenuCheck(viewmenu,tr("Status line\t\tDisplay status line."),statusbar,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Undo Counters\t\tShow undo/redo counters on status line."),undoredoblock,FXWindow::ID_TOGGLESHOWN);
   new FXMenuCheck(viewmenu,tr("Clock\t\tShow clock on status line."),clock,FXWindow::ID_TOGGLESHOWN);
-  new FXMenuCheck(viewmenu,tr("Hidden Files\t\tShow hidden files and directories."),this,ID_TOGGLE_DOTFILES);
 
   // Window menu
   windowmenu=new FXMenuPane(this);
@@ -943,299 +943,280 @@ FXbool TextWindow::isEditable() const {
 
 /*******************************************************************************/
 
-// Load file
-FXbool TextWindow::loadFile(const FXString& file){
+enum {
+  CRLF = 1,     // CRLF versus LF
+  LINE = 2,     // Append end of line
+  TRIM = 4      // trim trailing space
+  };
+
+// Load file into buffer
+FXbool TextWindow::loadBuffer(const FXString& file,FXString& buffer,FXuint bits){
   FXFile textfile(file,FXFile::Reading);
-  FXbool loaded=false;
-
-  FXTRACE((100,"loadFile(%s)\n",file.text()));
-
-  // Opened file?
   if(textfile.isOpen()){
-    FXchar *text; FXint size,n,i,j,k,c;
-
-    // Get the file size; bail if too big
-    if((size=textfile.size())<=MAXFILESIZE){
-
-      // Make buffer to load file
-      if(allocElms(text,size)){
-
-        // Set wait cursor
-        getApp()->beginWaitCursor();
-
-        // Read the file
-        n=textfile.readBlock(text,size);
-        if(0<=n){
-
-          // Strip carriage returns
-          if(stripcr){
-            fxfromDOS(text,n);
-            }
-
-          // Strip trailing spaces
-          if(stripsp){
-            for(i=j=k=0; j<n; i++,j++){
-              c=text[j];
+    FXlong size=textfile.size();
+    if(size<=MAXFILESIZE){
+      if(buffer.length(size)){
+        if(textfile.readBlock(buffer.text(),buffer.length())==buffer.length()){
+          if(bits&TRIM){
+            FXint i=0,j=0,k=0,c;
+            while(j<buffer.length()){
+              buffer[i]=c=buffer[j];
               if(c=='\n'){
-                i=k;
-                k++;
-                }
-              else if(!Ascii::isSpace(c)){
+                while(k<i && Ascii::isSpace(buffer[i-1])){
+                  i--;
+                  }
+                buffer[i]='\n';
                 k=i+1;
                 }
-              text[i]=c;
+              i++;
+              j++;
               }
-            n=i;
+            buffer.trunc(i);
             }
-
-          // Set text
-          editor->setText(text,n);
-
-          // Set stuff
-          setEditable(FXStat::isAccessible(file,FXIO::ReadOnly|FXIO::WriteOnly));
-          setBrowserCurrentFile(file);
-          mrufiles.appendFile(file);
-          setFiletime(FXStat::modified(file));
-          setFilename(file);
-          setFilenameSet(true);
-
-          // Clear undo records
-          undolist.clear();
-
-          // Mark undo state as clean (saved)
-          undolist.mark();
-
-          // Success
-          loaded=true;
+          if(bits&LINE){
+            if(buffer.tail()!='\n'){
+              buffer.append('\n');
+              }
+            }
+          if(bits&CRLF){
+            dosToUnix(buffer);
+            }
+          return true;
           }
-
-        // Kill wait cursor
-        getApp()->endWaitCursor();
-
-        // Free buffer
-        freeElms(text);
         }
       }
     }
+  return false;
+  }
+
+
+// Save file from buffer
+FXbool TextWindow::saveBuffer(const FXString& file,FXString& buffer,FXuint bits){
+  FXFile textfile(file,FXFile::Writing);
+  if(textfile.isOpen()){
+    if(bits&TRIM){
+      FXint i=0,j=0,k=0,c;
+      while(j<buffer.length()){
+        buffer[i]=c=buffer[j];
+        if(c=='\n'){
+          while(k<i && Ascii::isSpace(buffer[i-1])){
+            i--;
+            }
+          buffer[i]='\n';
+          k=i+1;
+          }
+        i++;
+        j++;
+        }
+      buffer.trunc(i);
+      }
+    if(bits&LINE){
+      if(buffer.tail()!='\n'){
+        buffer.append('\n');
+        }
+      }
+    if(bits&CRLF){
+      unixToDos(buffer);
+      }
+    if(textfile.writeBlock(buffer.text(),buffer.length())==buffer.length()){
+      return true;
+      }
+    }
+  return false;
+  }
+
+/*******************************************************************************/
+
+// Load file
+FXbool TextWindow::loadFile(const FXString& file){
+  FXString buffer;
+  FXbool loaded=false;
+  FXuint bits=0;
+
+  // Load flags
+  if(stripsp) bits|=TRIM;
+  if(stripcr) bits|=CRLF;
+
+  // Set wait cursor
+  getApp()->beginWaitCursor();
+
+  // Try load buffer
+  if(TextWindow::loadBuffer(file,buffer,bits)){
+
+    // Set text
+    editor->setText(buffer);
+
+    // Set stuff
+    setEditable(FXStat::isAccessible(file,FXIO::ReadOnly|FXIO::WriteOnly));
+    setBrowserCurrentFile(file);
+    mrufiles.appendFile(file);
+    setFiletime(FXStat::modified(file));
+    setFilename(file);
+    setFilenameSet(true);
+
+    // Clear undo records
+    undolist.clear();
+
+    // Mark undo state as clean (saved)
+    undolist.mark();
+
+    // Success
+    loaded=true;
+    }
+
+  // Kill wait cursor
+  getApp()->endWaitCursor();
   return loaded;
   }
 
 
 // Save file
 FXbool TextWindow::saveFile(const FXString& file){
-  FXFile textfile(file,FXFile::Writing);
+  FXString buffer;
+  FXbool saved=false;
+  FXuint bits=0;
 
-  FXTRACE((100,"saveFile(%s)\n",file.text()));
+  // Load flags
+  if(stripsp) bits|=TRIM;
+  if(appendcr) bits|=CRLF;
+  if(appendnl) bits|=LINE;
 
-  // Opened file?
-  if(textfile.isOpen()){
-    FXchar *text; FXint size,n;
+  // Set wait cursor
+  getApp()->beginWaitCursor();
 
-    // Get size
-    size=editor->getLength();
+  // Get text from editor
+  editor->getText(buffer);
 
-    // Alloc buffer
-    if(allocElms(text,size+1)){
+  // Try save buffer
+  if(TextWindow::saveBuffer(file,buffer,bits)){
 
-      // Set wait cursor
-      getApp()->beginWaitCursor();
+    // Set stuff
+    setEditable(true);
+    setBrowserCurrentFile(file);
+    mrufiles.appendFile(file);
+    setFiletime(FXStat::modified(file));
+    setFilename(file);
+    setFilenameSet(true);
 
-      // Get text from editor
-      editor->getText(text,size);
+    // Mark undo state as clean (saved)
+    undolist.mark();
 
-      // Append newline?
-      if(appendnl && (0<size) && (text[size-1]!='\n')){
-        text[size++]='\n';
-        }
-
-      // Translate newlines
-      if(appendcr){
-        fxtoDOS(text,size);
-        }
-
-      // Write the file
-      n=textfile.writeBlock(text,size);
-
-      // Kill wait cursor
-      getApp()->endWaitCursor();
-
-      // Free buffer
-      freeElms(text);
-
-      if(n==size){
-
-        // Switch to this file as current document
-        setEditable(true);
-        setBrowserCurrentFile(file);
-        mrufiles.appendFile(file);
-        setFiletime(FXStat::modified(file));
-        setFilename(file);
-        setFilenameSet(true);
-        undolist.mark();
-
-        // Success
-        return true;
-        }
-      }
+    // Success
+    saved=true;
     }
-  return false;
+
+  // Kill wait cursor
+  getApp()->endWaitCursor();
+  return saved;
   }
 
 
 // Save to file; don't switch to it as current document
 FXbool TextWindow::saveToFile(const FXString& file){
-  FXFile textfile(file,FXFile::Writing);
+  FXString buffer;
+  FXbool saved=false;
+  FXuint bits=0;
 
-  FXTRACE((100,"saveToFile(%s)\n",file.text()));
+  // Load flags
+  if(stripsp) bits|=TRIM;
+  if(appendcr) bits|=CRLF;
+  if(appendnl) bits|=LINE;
 
-  // Opened file?
-  if(textfile.isOpen()){
-    FXchar *text; FXint size,n;
+  // Set wait cursor
+  getApp()->beginWaitCursor();
 
-    // Get size
-    size=editor->getLength();
+  // Get text from editor
+  editor->getText(buffer);
 
-    // Alloc buffer
-    if(allocElms(text,size+1)){
-
-      // Set wait cursor
-      getApp()->beginWaitCursor();
-
-      // Get text from editor
-      editor->getText(text,size);
-
-      // Append newline?
-      if(appendnl && (0<size) && (text[size-1]!='\n')){
-        text[size++]='\n';
-        }
-
-      // Translate newlines
-      if(appendcr){
-        fxtoDOS(text,size);
-        }
-
-      // Write the file
-      n=textfile.writeBlock(text,size);
-
-      // Kill wait cursor
-      getApp()->endWaitCursor();
-
-      // Free buffer
-      freeElms(text);
-
-      // Hopefully, all got saved
-      return (n==size);
-      }
+  // Try save buffer
+  if(TextWindow::saveBuffer(file,buffer,bits)){
+    saved=true;
     }
-  return false;
+
+  // Kill wait cursor
+  getApp()->endWaitCursor();
+  return saved;
   }
 
+/*******************************************************************************/
 
-// Insert file
-FXbool TextWindow::insertFile(const FXString& file){
-  FXFile textfile(file,FXFile::Reading);
+// Replace by file
+FXbool TextWindow::replaceByFile(const FXString& file,FXint startpos,FXint endpos,FXint startcol,FXint endcol){
+  FXString buffer;
   FXbool loaded=false;
+  FXuint bits=0;
 
-  FXTRACE((100,"insertFile(%s)\n",file.text()));
+  // Load flags
+  if(stripsp) bits|=TRIM;
+  if(stripcr) bits|=CRLF;
 
-  // Opened file?
-  if(textfile.isOpen()){
-    FXchar *text; FXint size,n,i,j,k,c;
+  // Set wait cursor
+  getApp()->beginWaitCursor();
 
-    // Get the file size; bail if too big
-    if((size=textfile.size())<=MAXFILESIZE){
+  // Try load buffer
+  if(TextWindow::loadBuffer(file,buffer,bits)){
 
-      // Make buffer to load file
-      if(allocElms(text,size)){
-
-        // Set wait cursor
-        getApp()->beginWaitCursor();
-
-        // Read the file
-        n=textfile.readBlock(text,size);
-        if(0<=n){
-
-          // Strip carriage returns
-          if(stripcr){
-            fxfromDOS(text,n);
-            }
-
-          // Strip trailing spaces
-          if(stripsp){
-            for(i=j=k=0; j<n; i++,j++){
-              c=text[j];
-              if(c=='\n'){
-                i=k;
-                k++;
-                }
-              else if(!Ascii::isSpace(c)){
-                k=i+1;
-                }
-              text[i]=c;
-              }
-            n=i;
-            }
-
-          // Set text
-          editor->insertText(editor->getCursorPos(),text,n,true);
-
-          // Success
-          loaded=true;
-          }
-
-        // Kill wait cursor
-        getApp()->endWaitCursor();
-
-        // Free buffer
-        freeElms(text);
+    // Replace selection
+    if(startpos<=endpos){
+      if(startcol<endcol){  
+        editor->replaceTextBlock(startpos,endpos,startcol,endcol,buffer,true);
+        }
+      else if(startpos<endpos){
+        editor->replaceText(startpos,endpos-startpos,buffer,true);
         }
       }
+      
+    // Or insert at cursor
+    else{
+      editor->insertText(editor->getCursorPos(),buffer,true);
+      }
+  
+    // Success
+    loaded=true;
     }
+
+  // Kill wait cursor
+  getApp()->endWaitCursor();
   return loaded;
   }
 
 
 // Extract file
-FXbool TextWindow::extractFile(const FXString& file){
-  FXFile textfile(file,FXFile::Writing);
+FXbool TextWindow::extractToFile(const FXString& file,FXint startpos,FXint endpos,FXint startcol,FXint endcol){
+  FXString buffer;
+  FXbool saved=false;
+  FXuint bits=0;
 
-  FXTRACE((100,"extractFile(%s)\n",file.text()));
+  // Load flags
+  if(stripsp) bits|=TRIM;
+  if(appendcr) bits|=CRLF;
+  if(appendnl) bits|=LINE;
 
-  // Opened file?
-  if(textfile.isOpen()){
-    FXchar *text; FXint size,n;
+  // Set wait cursor
+  getApp()->beginWaitCursor();
 
-    // Get size
-    size=editor->getSelEndPos()-editor->getSelStartPos();
-
-    // Alloc buffer
-    if(allocElms(text,size+1)){
-
-      // Set wait cursor
-      getApp()->beginWaitCursor();
-
-      // Get text from editor
-      editor->extractText(text,editor->getSelStartPos(),size);
-
-      // Translate newlines
-      if(appendcr){
-        fxtoDOS(text,size);
-        }
-
-      // Write the file
-      n=textfile.writeBlock(text,size);
-
-      // Kill wait cursor
-      getApp()->endWaitCursor();
-
-      // Ditch buffer
-      freeElms(text);
-
-      // All got saved?
-      return (n==size);
+  // Replace selection
+  if(startpos<=endpos){
+    if(startcol<endcol){  
+      editor->extractTextBlock(buffer,startpos,endpos,startcol,endcol);
+      }
+    else if(startpos<endpos){
+      editor->extractText(buffer,startpos,endpos-startpos);
       }
     }
-  return false;
+    
+  // Don't bother if no text
+  if(buffer.length()){
+      
+    // Try save buffer
+    if(TextWindow::saveBuffer(file,buffer,bits)){
+      saved=true;
+      }
+    }
+
+  // Kill wait cursor
+  getApp()->endWaitCursor();
+  return saved;
   }
 
 /*******************************************************************************/
@@ -1666,6 +1647,20 @@ long TextWindow::onCmdFont(FXObject*,FXSelector,void*){
 
 /*******************************************************************************/
 
+// Sensitize if editable
+long TextWindow::onUpdIsEditable(FXObject* sender,FXSelector,void*){
+  sender->handle(this,editor->isEditable()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
+// Sensitize if selection
+long TextWindow::onUpdHasSelection(FXObject* sender,FXSelector,void*){
+  sender->handle(this,editor->hasSelection()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
+  return 1;
+  }
+
+
 // Reopen file
 long TextWindow::onCmdReopen(FXObject*,FXSelector,void*){
   if(isModified()){
@@ -1994,9 +1989,13 @@ long TextWindow::onTextDNDMotion(FXObject*,FXSelector,void*){
   }
 
 
-// Insert file into buffer
-long TextWindow::onCmdInsertFile(FXObject*,FXSelector,void*){
-  FXFileDialog opendialog(this,tr("Open Document"));
+// Replace by text from file
+long TextWindow::onCmdReplaceFile(FXObject*,FXSelector,void*){
+  FXFileDialog opendialog(this,tr("Load Text"));  
+  FXint sp=editor->getSelStartPos();
+  FXint ep=editor->getSelEndPos();
+  FXint sc=editor->getSelStartColumn();
+  FXint ec=editor->getSelEndColumn();
   FXString file;
   opendialog.setSelectMode(SELECTFILE_EXISTING);
   opendialog.setAssociations(getApp()->associations,false);
@@ -2006,24 +2005,21 @@ long TextWindow::onCmdInsertFile(FXObject*,FXSelector,void*){
   if(opendialog.execute()){
     setCurrentPattern(opendialog.getCurrentPattern());
     file=opendialog.getFilename();
-    if(!insertFile(file)){
-      FXMessageBox::error(this,MBOX_OK,tr("Error Inserting File"),tr("Unable to insert file: %s."),file.text());
+    if(!replaceByFile(file,sp,ep,sc,ec)){
+      FXMessageBox::error(this,MBOX_OK,tr("Error Replacing From File"),tr("Unable to replace text from file: %s."),file.text());
       }
     }
   return 1;
   }
 
 
-// Sensitize if editable
-long TextWindow::onUpdIsEditable(FXObject* sender,FXSelector,void*){
-  sender->handle(this,editor->isEditable()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
-  return 1;
-  }
-
-
 // Extract selection to file
 long TextWindow::onCmdExtractFile(FXObject*,FXSelector,void*){
-  FXFileDialog savedialog(this,tr("Save Document"));
+  FXFileDialog savedialog(this,tr("Save Text"));
+  FXint sp=editor->getSelStartPos();
+  FXint ep=editor->getSelEndPos();
+  FXint sc=editor->getSelStartColumn();
+  FXint ec=editor->getSelEndColumn();
   FXString file=FXPath::stripExtension(getFilename())+".extract";
   savedialog.setSelectMode(SELECTFILE_ANY);
   savedialog.setAssociations(getApp()->associations,false);
@@ -2037,17 +2033,10 @@ long TextWindow::onCmdExtractFile(FXObject*,FXSelector,void*){
     if(FXStat::exists(file)){
       if(MBOX_CLICKED_NO==FXMessageBox::question(this,MBOX_YES_NO,tr("Overwrite Document"),tr("Overwrite existing document: %s?"),file.text())) return 1;
       }
-    if(!extractFile(file)){
-      FXMessageBox::error(this,MBOX_OK,tr("Error Extracting File"),tr("Unable to extract file: %s."),file.text());
+    if(!extractToFile(file,sp,ep,sc,ec)){
+      FXMessageBox::error(this,MBOX_OK,tr("Error Extracting To File"),tr("Unable to extract to file: %s."),file.text());
       }
     }
-  return 1;
-  }
-
-
-// Update extract file
-long TextWindow::onUpdExtractFile(FXObject* sender,FXSelector,void*){
-  sender->handle(this,editor->hasSelection()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),NULL);
   return 1;
   }
 

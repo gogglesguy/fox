@@ -266,6 +266,8 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
   quiticon=new FXGIFIcon(getApp(),quit_gif);
   configicon=new FXGIFIcon(getApp(),config_gif);
   warningicon=new FXGIFIcon(getApp(),warningicon_gif);
+  shownicon=new FXGIFIcon(getApp(),fileshown);
+  hiddenicon=new FXGIFIcon(getApp(),filehidden);
 
   // Set application icons for Window Manager
   setIcon(foxbigicon);
@@ -298,6 +300,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",NULL,NULL,D
 
   // Subtle plug for LINUX
   new FXButton(statusbar,tr("\tAbout PathFinder"),foxminiicon,this,ID_ABOUT,LAYOUT_CENTER_Y|LAYOUT_RIGHT);
+  new FXToggleButton(statusbar,tr("\tShow hidden files\tShow hidden files and directories."),tr("\tHide Hidden Files\tHide hidden files and directories."),hiddenicon,shownicon,this,ID_TOGGLE_HIDDEN,TOGGLEBUTTON_TOOLBAR|LAYOUT_CENTER_Y|LAYOUT_RIGHT,0,0,0,0, 3,3,3,3);
 
   // Pattern
   pattern=new FXComboBox(statusbar,25,this,ID_FILEFILTER,COMBOBOX_STATIC|LAYOUT_RIGHT|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK, 0,0,200,0, 0,0,1,1);
@@ -2287,6 +2290,8 @@ PathFinderMain::~PathFinderMain(){
   delete quiticon;
   delete configicon;
   delete warningicon;
+  delete shownicon;
+  delete hiddenicon;
   }
 
 

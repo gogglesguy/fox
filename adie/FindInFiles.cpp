@@ -176,13 +176,9 @@ FXlong SearchVisitor::loadFile(const FXString& path,FXString& text) const {
   if(file.isOpen()){
     FXlong size=file.size();
     if(0<size && size<=limit){
-      try{
-        text.length(size);
+      if(text.length(size)){
+        return file.readBlock(text.text(),text.length());
         }
-      catch(...){
-        return 0L;
-        }
-      return file.readBlock(text.text(),text.length());
       }
     }
   return 0L;

@@ -3294,10 +3294,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\lib\fxescape.cpp"
-			>
-		</File>
-		<File
 			RelativePath="..\..\..\include\FXEvent.h"
 			>
 		</File>

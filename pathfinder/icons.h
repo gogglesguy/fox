@@ -1,4 +1,4 @@
-/*********** Generated on 2021/03/02 08:08:25 by reswrap version 6.0.0 *********/
+/*********** Generated on 2021/04/01 19:50:12 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../pathfinder/addbook.bmp */
 extern const unsigned char addbook[];
@@ -47,6 +47,12 @@ extern const unsigned char execute[];
 
 /* Created by reswrap from file ../pathfinder/file_gif.gif */
 extern const unsigned char file_gif[];
+
+/* Created by reswrap from file ../pathfinder/fileshown.gif */
+extern const unsigned char fileshown[];
+
+/* Created by reswrap from file ../pathfinder/filehidden.gif */
+extern const unsigned char filehidden[];
 
 /* Created by reswrap from file ../pathfinder/foldernew.gif */
 extern const unsigned char foldernew[];

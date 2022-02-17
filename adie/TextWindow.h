@@ -134,6 +134,9 @@ protected:
   void saveSearchHistory();
   FXbool saveChanges();
 protected:
+  static FXbool loadBuffer(const FXString& file,FXString& buffer,FXuint bits=0);
+  static FXbool saveBuffer(const FXString& file,FXString& buffer,FXuint bits=0);
+protected:
   enum{
     MAXUNDOSIZE  = 1000000,     // Don't let the undo buffer get out of hand
     KEEPUNDOSIZE = 500000       // When MAXUNDOSIZE was exceeded, trim down to this size
@@ -148,6 +151,7 @@ public:
   long onCmdAbout(FXObject*,FXSelector,void*);
   long onCmdHelp(FXObject*,FXSelector,void*);
   long onUpdIsEditable(FXObject*,FXSelector,void*);
+  long onUpdHasSelection(FXObject*,FXSelector,void*);
 
   // File management
   long onCmdNew(FXObject*,FXSelector,void*);
@@ -165,6 +169,8 @@ public:
   long onCmdFont(FXObject*,FXSelector,void*);
   long onCmdPrint(FXObject*,FXSelector,void*);
   long onCmdSaveSettings(FXObject*,FXSelector,void*);
+  long onCmdReplaceFile(FXObject*,FXSelector,void*);
+  long onCmdExtractFile(FXObject*,FXSelector,void*);
 
   // Text display
   long onCmdTextBackColor(FXObject*,FXSelector,void*);
@@ -251,9 +257,6 @@ public:
   long onCmdPreferences(FXObject*,FXSelector,void*);
   long onCmdDelimiters(FXObject*,FXSelector,void*);
   long onUpdDelimiters(FXObject*,FXSelector,void*);
-  long onCmdInsertFile(FXObject*,FXSelector,void*);
-  long onCmdExtractFile(FXObject*,FXSelector,void*);
-  long onUpdExtractFile(FXObject*,FXSelector,void*);
   long onCmdWheelAdjust(FXObject*,FXSelector,void*);
   long onUpdWheelAdjust(FXObject*,FXSelector,void*);
   long onCmdSetMark(FXObject*,FXSelector,void*);
@@ -420,7 +423,7 @@ public:
     ID_BRACEMATCHTIME,
     ID_BRACEMATCHSTAY,
     ID_NUM_ROWS,
-    ID_INSERT_FILE,
+    ID_REPLACE_FILE,
     ID_EXTRACT_FILE,
     ID_WHEELADJUST,
     ID_SET_MARK,
@@ -580,10 +583,10 @@ public:
   FXbool saveToFile(const FXString& file);
 
   // Insert file at cursor
-  FXbool insertFile(const FXString& file);
+  FXbool replaceByFile(const FXString& file,FXint startpos,FXint endpos,FXint startcol=-1,FXint endcol=-1);
 
   // Extract selection to file
-  FXbool extractFile(const FXString& file);
+  FXbool extractToFile(const FXString& file,FXint startpos,FXint endpos,FXint startcol=-1,FXint endcol=-1);
 
   // Change pattern list
   void setPatternList(const FXString& patterns);

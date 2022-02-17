@@ -497,7 +497,6 @@ fxbmpio.cpp \
 fxcompose.cpp \
 fxddsio.cpp \
 fxezquantize.cpp \
-fxescape.cpp \
 fxexeio.cpp \
 fxfsquantize.cpp \
 fxgetticks.cpp \

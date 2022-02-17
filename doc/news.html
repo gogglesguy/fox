@@ -14,6 +14,32 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE WITH LOGO --->
 
 
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+April 1 - FOX DEVELOPMENT 1.7.76
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Add handy icon button to Adie file list widget to hide/show hidden files.</li>
+<li>FXText widget parameter verification improved for content-modification APIs.</li>
+<li>FXText widget block mode replace, block insert, and other block operation regressions fixed.</li>
+<li>FXText widget block selection issues fixed.</li>
+<li>FXRex grammar depiction fix.</li>
+<li>In FXJSON parser, a single bad-utf8 prefix case label was missing.</li>
+<li>Not all systems have pthread_rwlock_setkind_np(), causing compile to fail on those systems.</li>
+<li>New FXASSERT_STATIC macro added; it is defined for C++ language > 2011.</li>
+<li>Scoped FXReverseSpinLock class added, similar to FXReverseMutex scoped lock.</li>
+<li>The unixToDos() API would potentially add a second CR if input was already DOS format; now fixed.</li>
+<li>Adie text buffer loading and saving updated.</li>
+<li>Adie extract range selection to file, and extract block selection to file option added.</li>
+<li>Adie replace text range from file, or replace text block from file option added.</li>
+<li>FXString::length() now returns boolean instead of throwing exception when out of space; internals
+of FXString somewhat fortified against low-memory situations (you're unlikely to run into memory
+issues on FXString on modern machines, unless you're dealing with truly gigantic strings).</li>
+<li>A number of places are now defining specific trace topics using the new topic-tracing implementation.</li>
+</ul>
 
 <!--- TOPIC TITLE -->
 <p>

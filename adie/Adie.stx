@@ -308,7 +308,7 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__threadlocal|__noreturn|__prefetchw|__prefetch|__restrict|constructElms|destructElms|copyElms|moveElms|bitmoveElms|bitcopyElms|swapElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
+    pattern     "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXASSERT_STATIC|FXASSERT|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|__likely|__unlikely|__threadlocal|__noreturn|__prefetchw|__prefetch|__restrict|constructElms|destructElms|copyElms|moveElms|bitmoveElms|bitcopyElms|swapElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
   end
 
   rule "FOXType"

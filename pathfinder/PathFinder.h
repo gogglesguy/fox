@@ -99,6 +99,8 @@ protected:
   FXIcon             *quiticon;
   FXIcon             *configicon;
   FXIcon             *warningicon;
+  FXIcon             *shownicon;
+  FXIcon             *hiddenicon;
   FXString            editor;		        // Editor command
   FXString            execpaths;                // Search in these paths
   FXString            terminal;		        // Terminal command

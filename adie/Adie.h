@@ -80,6 +80,8 @@ protected:
   FXIcon             *lowercaseicon;
   FXIcon             *backwardicon;
   FXIcon             *forwardicon;
+  FXIcon             *shownicon;   
+  FXIcon             *hiddenicon;  
 private:
   Adie(){}
   Adie(const Adie&);

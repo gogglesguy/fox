@@ -26,6 +26,8 @@ $(top_srcdir)/pathfinder/dirup.bmp \
 $(top_srcdir)/pathfinder/enter.gif \
 $(top_srcdir)/pathfinder/execute.bmp \
 $(top_srcdir)/pathfinder/file_gif.gif \
+$(top_srcdir)/pathfinder/fileshown.gif \
+$(top_srcdir)/pathfinder/filehidden.gif \
 $(top_srcdir)/pathfinder/foldernew.gif \
 $(top_srcdir)/pathfinder/foxbig.gif \
 $(top_srcdir)/pathfinder/foxmini.gif \

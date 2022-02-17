@@ -1,4 +1,4 @@
-/*********** Generated on 2021/03/02 08:08:04 by reswrap version 6.0.0 *********/
+/*********** Generated on 2021/04/01 19:49:51 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../shutterbug/line_0.gif */
 extern const unsigned char line_0[];

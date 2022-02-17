@@ -385,6 +385,8 @@ $(top_srcdir)/adie/copy_gif.gif \
 $(top_srcdir)/adie/cut_gif.gif \
 $(top_srcdir)/adie/delete_gif.gif \
 $(top_srcdir)/adie/delimit_gif.gif \
+$(top_srcdir)/adie/filehidden.gif \
+$(top_srcdir)/adie/fileshown.gif \
 $(top_srcdir)/adie/fonts_gif.gif \
 $(top_srcdir)/adie/forward_gif.gif \
 $(top_srcdir)/adie/goto_gif.gif \

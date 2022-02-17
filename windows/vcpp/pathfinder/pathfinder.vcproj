@@ -290,6 +290,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\pathfinder\filehidden.gif"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\pathfinder\fileshown.gif"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\pathfinder\foxbig.gif"
 			>
 		</File>
@@ -305,7 +313,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="cd ..\..\..\pathfinder&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -i icons.h -o icons.cpp addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -h -o icons.h addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;"
+					CommandLine="cd ..\..\..\pathfinder&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -i icons.h -o icons.cpp addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif filehidden.gif fileshown.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;$(SolutionDir)reswrap\Debug\reswrap -h -o icons.h addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif filehidden.gif fileshown.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;"
 					Outputs="icons.h;icons.cpp"
 				/>
 			</FileConfiguration>
@@ -314,7 +322,7 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
-					CommandLine="cd ..\..\..\pathfinder&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -i icons.h -o icons.cpp addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -h -o icons.h addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;"
+					CommandLine="cd ..\..\..\pathfinder&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -i icons.h -o icons.cpp addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif filehidden.gif fileshown.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;&#x0A;$(SolutionDir)reswrap\Release\reswrap -h -o icons.h addbook.bmp bigicons.bmp closepanel.gif clrbook.gif copy.bmp config_gif.gif copyit.gif cut.bmp delbook.bmp deleteit.bmp desktop.bmp details.bmp dirup.bmp enter.gif execute.bmp file_gif.gif filehidden.gif fileshown.gif foldernew.gif foxbig.gif foxmini.gif goback.bmp goforw.bmp gotodir.bmp home.gif hosts.bmp linkit.bmp location.gif maphost.bmp miscellaneous_gif.gif moveit.gif paste.bmp pattern_gif.gif properties.bmp quit_gif.gif newfolder.bmp renameit.gif rotateleft.gif rotateright.gif run_bmp.bmp setbook.gif setdir.gif sorting.bmp smallicons.bmp unmaphost.bmp warningicon_gif.gif work.gif&#x0D;"
 					Outputs="icons.h;icons.cpp"
 				/>
 			</FileConfiguration>
