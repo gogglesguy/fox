@@ -36,6 +36,8 @@ copy_gif.gif
 cut_gif.gif
 delete_gif.gif
 delimit_gif.gif
+filehidden.gif
+fileshown.gif
 fonts_gif.gif
 forward_gif.gif
 goto_gif.gif
