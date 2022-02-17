@@ -484,7 +484,6 @@ set(SOURCES FX4Splitter.cpp
             FXDragCorner.cpp
             FXDrawable.cpp
             FXDriveBox.cpp
-            fxescape.cpp
             FXEventDispatcher.cpp
             FXEventLoop.cpp
             FXException.cpp

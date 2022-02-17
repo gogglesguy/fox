@@ -28,6 +28,8 @@ dirup.bmp
 enter.gif
 execute.bmp
 file_gif.gif
+filehidden.gif
+fileshown.gif
 foldernew.gif
 foxbig.gif
 foxmini.gif
