@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2021 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -1158,19 +1158,19 @@ FXbool TextWindow::replaceByFile(const FXString& file,FXint startpos,FXint endpo
 
     // Replace selection
     if(startpos<=endpos){
-      if(startcol<endcol){  
+      if(startcol<endcol){
         editor->replaceTextBlock(startpos,endpos,startcol,endcol,buffer,true);
         }
       else if(startpos<endpos){
         editor->replaceText(startpos,endpos-startpos,buffer,true);
         }
       }
-      
+
     // Or insert at cursor
     else{
       editor->insertText(editor->getCursorPos(),buffer,true);
       }
-  
+
     // Success
     loaded=true;
     }
@@ -1197,17 +1197,17 @@ FXbool TextWindow::extractToFile(const FXString& file,FXint startpos,FXint endpo
 
   // Replace selection
   if(startpos<=endpos){
-    if(startcol<endcol){  
+    if(startcol<endcol){
       editor->extractTextBlock(buffer,startpos,endpos,startcol,endcol);
       }
     else if(startpos<endpos){
       editor->extractText(buffer,startpos,endpos-startpos);
       }
     }
-    
+
   // Don't bother if no text
   if(buffer.length()){
-      
+
     // Try save buffer
     if(TextWindow::saveBuffer(file,buffer,bits)){
       saved=true;
@@ -1991,7 +1991,7 @@ long TextWindow::onTextDNDMotion(FXObject*,FXSelector,void*){
 
 // Replace by text from file
 long TextWindow::onCmdReplaceFile(FXObject*,FXSelector,void*){
-  FXFileDialog opendialog(this,tr("Load Text"));  
+  FXFileDialog opendialog(this,tr("Load Text"));
   FXint sp=editor->getSelStartPos();
   FXint ep=editor->getSelEndPos();
   FXint sc=editor->getSelStartColumn();
@@ -2413,6 +2413,7 @@ long TextWindow::onUpdShowActive(FXObject* sender,FXSelector,void*){
   sender->handle(this,(editor->getTextStyle()&TEXT_SHOWACTIVE) ? FXSEL(SEL_COMMAND,ID_CHECK) : FXSEL(SEL_COMMAND,ID_UNCHECK),NULL);
   return 1;
   }
+
 
 // Toggle strip returns mode
 long TextWindow::onCmdStripReturns(FXObject*,FXSelector,void* ptr){
@@ -4046,17 +4047,17 @@ long TextWindow::onCmdGotoMark(FXObject*,FXSelector sel,void*){
 long TextWindow::onUpdGotoMark(FXObject* sender,FXSelector sel,void*){
   FXint pos=bookmark[FXSELID(sel)-ID_MARK_0];
   if(0<pos && pos<=editor->getLength()){
-    FXString string;
     FXint b=editor->lineStart(pos);     // Extent of bookmarked line
     FXint e=editor->lineEnd(pos);
     FXint p=editor->getCursorPos();
     FXint c=(b<=p&&p<=e);               // Cursor inside bookmarked line
+    FXString string;
     FXASSERT(0<=b && e<=editor->getLength());
     if(b==e){                           // Empty line: just show line number
       string.format("<<%d>>",pos);
       }
     else{                               // Show squeezed text of line as label
-      editor->extractText(string,b,e-b);
+      string=editor->extractText(b,e-b);
       string.simplify();
       if(50<=string.length()){          // If too long after squeeze, suffix "..."
         string.replace(50,string.length()-50,"...");
@@ -4130,6 +4131,7 @@ void TextWindow::setBookmark(FXint pos){
     for(i=ARRAYNUMBER(bookmark)-1; i>0 && (bookmark[i-1]==0 || pos<bookmark[i-1]); i--){
       bookmark[i]=bookmark[i-1];
       }
+    FXASSERT(i<ARRAYNUMBER(bookmark));
     bookmark[i]=pos;
     }
   }

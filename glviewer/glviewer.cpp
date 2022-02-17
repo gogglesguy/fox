@@ -3,7 +3,7 @@
 *                         OpenGL Application coding sample                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2021 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include "fx3d.h"

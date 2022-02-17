@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2020 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2021 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -194,8 +194,8 @@ FindInFiles::FindInFiles():visitor(this){
   filefilter=NULL;
   pausebutton=NULL;
   searching=NULL;
-  clearElms(optionsHistory,ARRAYNUMBER(optionsHistory));
-  clearElms(patternHistory,ARRAYNUMBER(patternHistory));
+  clearElms(optionsHistory,20);
+  clearElms(patternHistory,20);
   searchmode=SearchExact|SearchRecurse;
   savedsearchmode=0;
   savedcurrentpattern=0;
@@ -262,8 +262,8 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   locations->appendHeader(tr("Context"),NULL,800);
 
   // Clean array
-  clearElms(optionsHistory,ARRAYNUMBER(optionsHistory));
-  clearElms(patternHistory,ARRAYNUMBER(patternHistory));
+  clearElms(optionsHistory,20);
+  clearElms(patternHistory,20);
 
   // Set title
   setTitle(tr("Find In Files"));
