@@ -24,7 +24,7 @@ int main(int argc,char* argv[]){
   FXint code;
 
   // Trace
-  fxTraceLevel=151;
+  setTraceLevel(151);
 
   // Make thread pool
   FXProcess process;

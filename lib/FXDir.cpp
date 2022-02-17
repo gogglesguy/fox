@@ -304,7 +304,7 @@ FXint FXDir::listShares(FXString*& sharelist){
 
 // Create a directories recursively
 FXbool FXDir::createDirectories(const FXString& path,FXuint perm){
-  if(!path.empty()){
+  if(FXPath::isAbsolute(path)){
     if(FXStat::isDirectory(path)) return true;
     if(createDirectories(FXPath::upLevel(path),perm)){
       if(FXDir::create(path,perm)) return true;

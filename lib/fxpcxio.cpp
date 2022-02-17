@@ -372,7 +372,6 @@ FXbool fxsavePCX(FXStream& store,const FXColor *data,FXint width,FXint height){
             else{
               rc=0xC0|RLECount;
               store << rc << Last;
-              RLECount = 1;
               }
             }
           Last=Current;

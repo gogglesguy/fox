@@ -160,6 +160,8 @@
   - Need to move to BGRA components; 4x faster with OpenGL!
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
 
 #define DISPLAY(app) ((Display*)((app)->display))
 
@@ -202,7 +204,7 @@ FXImage::FXImage():data(NULL),options(0){
 
 // Initialize
 FXImage::FXImage(FXApp* a,const FXColor *pix,FXuint opts,FXint w,FXint h):FXDrawable(a,w,h){
-  FXTRACE((100,"FXImage::FXImage %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXImage::FXImage %p\n",this));
   FXASSERT((opts&~(IMAGE_OWNED|IMAGE_MASK))==0);
   visual=getApp()->getDefaultVisual();
   data=(FXColor*)pix;
@@ -307,7 +309,7 @@ int FXImage::ReleaseDC(FXID hdc) const {
 void FXImage::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 
       // Initialize visual
       visual->create();
@@ -343,7 +345,7 @@ void FXImage::create(){
 void FXImage::detach(){
   visual->detach();
   if(xid){
-    FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
     xid=0;
     }
   }
@@ -353,7 +355,7 @@ void FXImage::detach(){
 void FXImage::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 #ifdef WIN32
       DeleteObject(xid);
 #else
@@ -377,7 +379,7 @@ void FXImage::restore(){
     BITMAPINFO bmi;
     HDC hdcmem;
 
-    FXTRACE((100,"%s::restore image %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this));
 
     // Check for legal size
     if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
@@ -476,7 +478,7 @@ void FXImage::restore(){
     XShmSegmentInfo shminfo;
 #endif
 
-    FXTRACE((100,"%s::restore image %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this));
 
     // Check for legal size
     if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
@@ -662,7 +664,7 @@ void FXImage::render(){
     FXuchar *pixels;
     HDC hdcmem;
 
-    FXTRACE((100,"%s::render %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::render %p\n",getClassName(),this));
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
@@ -1336,7 +1338,7 @@ void FXImage::render(){
     XShmSegmentInfo shminfo;
 #endif
 
-    FXTRACE((100,"%s::render image %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::render image %p\n",getClassName(),this));
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
@@ -1518,7 +1520,7 @@ void FXImage::release(){
 void FXImage::resize(FXint w,FXint h){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((100,"%s::resize(%d,%d)\n",getClassName(),w,h));
+  FXTRACE((TOPIC_CREATION,"%s::resize(%d,%d)\n",getClassName(),w,h));
   if(width!=w || height!=h){
 
     // Resize device dependent pixmap
@@ -1827,7 +1829,7 @@ static void scalenearest(FXColor *dst,const FXColor* src,FXint dw,FXint dh,FXint
 void FXImage::scale(FXint w,FXint h,FXint quality){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((100,"%s::scale(%d,%d)\n",getClassName(),w,h));
+  FXTRACE((TOPIC_CREATION,"%s::scale(%d,%d)\n",getClassName(),w,h));
   if(w!=width || h!=height){
     if(data){
       FXint ow=width;
@@ -1916,7 +1918,7 @@ void FXImage::scale(FXint w,FXint h,FXint quality){
 
 // Mirror image horizontally and/or vertically
 void FXImage::mirror(FXbool horizontal,FXbool vertical){
-  FXTRACE((100,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
+  FXTRACE((TOPIC_CREATION,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
   if(horizontal || vertical){
     if(data){
       FXColor *paa,*pa,*pbb,*pb,t;
@@ -1954,7 +1956,7 @@ void FXImage::mirror(FXbool horizontal,FXbool vertical){
 
 // Rotate image by degrees ccw
 void FXImage::rotate(FXint degrees){
-  FXTRACE((100,"%s::rotate(%d)\n",getClassName(),degrees));
+  FXTRACE((TOPIC_CREATION,"%s::rotate(%d)\n",getClassName(),degrees));
   degrees=(degrees+360)%360;
   if(degrees!=0 && width>1 && height>1){
     if(data){
@@ -2045,7 +2047,7 @@ void FXImage::crop(FXint x,FXint y,FXint w,FXint h,FXColor color){
   if(w<1) w=1;
   if(h<1) h=1;
   if(x>=width || y>=height || x+w<=0 || y+h<=0){ fxerror("%s::crop: bad arguments.\n",getClassName()); }
-  FXTRACE((100,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
+  FXTRACE((TOPIC_CREATION,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
   if(data){
     FXColor *pnn,*poo,*yyy,*pn,*po,*xx;
     FXint ow=width;
@@ -2339,7 +2341,7 @@ static void sheary(FXuchar *out,FXuchar* in,FXint width,FXint nheight,FXint ohei
 void FXImage::xshear(FXint shear,FXColor clr){
   FXint neww=width+((FXABS(shear)+255)>>8);
   FXint oldw=width;
-  FXTRACE((100,"%s::xshear(%d)\n",getClassName(),shear));
+  FXTRACE((TOPIC_CREATION,"%s::xshear(%d)\n",getClassName(),shear));
   if(data){
     FXColor *olddata;
     if(!dupElms(olddata,data,width*height)){ throw FXMemoryException("unable to xshear image"); }
@@ -2358,7 +2360,7 @@ void FXImage::xshear(FXint shear,FXColor clr){
 void FXImage::yshear(FXint shear,FXColor clr){
   FXint newh=height+((FXABS(shear)+255)>>8);
   FXint oldh=height;
-  FXTRACE((100,"%s::yshear(%d)\n",getClassName(),shear));
+  FXTRACE((TOPIC_CREATION,"%s::yshear(%d)\n",getClassName(),shear));
   if(data){
     FXColor *olddata;
     if(!dupElms(olddata,data,width*height)){ throw FXMemoryException("unable to yshear image"); }
@@ -2698,7 +2700,7 @@ void FXImage::load(FXStream& store){
 
 // Clean up
 FXImage::~FXImage(){
-  FXTRACE((100,"FXImage::~FXImage %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXImage::~FXImage %p\n",this));
   destroy();
   if(options&IMAGE_OWNED){freeElms(data);}
   data=(FXColor*)-1L;

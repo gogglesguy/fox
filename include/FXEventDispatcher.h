@@ -17,16 +17,28 @@ namespace FX {
 */
 class FXAPI FXEventDispatcher : public FXDispatcher {
 private:
-  FXptr   display;              // Display
+  FXptr         display;                // Display
 private:
   FXEventDispatcher(const FXEventDispatcher&);
   FXEventDispatcher &operator=(const FXEventDispatcher&);
 public:
+
+  /// Event callback when GUI has activity
   typedef FXCallback<FXbool(FXEventDispatcher*,FXRawEvent& event)> EventCallback;
+
 public:
 
   /// Construct event dispatcher object.
   FXEventDispatcher();
+
+  /// Initialize dispatcher with display.
+  virtual FXbool init(FXptr dpy);
+
+  /// Initialize dispatcher without display.
+  virtual FXbool init();
+
+  /// Return display pointer
+  FXptr getDisplay() const { return display; }
 
   /// Dispatch if something happens within given blocking time.
   /// Flags control subsets of events to be dispatched (signals, timers,
@@ -35,6 +47,9 @@ public:
 
   /// Dispatch platform-dependent event
   virtual FXbool dispatchEvent(FXRawEvent& event);
+
+  /// Exit dispatcher.
+  virtual FXbool exit();
 
   /// Destroy event dispatcher object.
   virtual ~FXEventDispatcher();

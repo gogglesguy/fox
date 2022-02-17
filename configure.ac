@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [74])
+m4_define([fox_level], [75])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -103,10 +103,6 @@ LIBGLU="-lglu32"
 LIBGL="-lopengl32"
 fi
 
-# Byte order
-AC_C_BIGENDIAN([FOX_BYTEORDER=1], [FOX_BYTEORDER=0])
-AC_SUBST(FOX_BYTEORDER)
-
 # Threads
 AC_CHECK_LIB(rt,clock_gettime)
 AC_CHECK_LIB(pthread, pthread_exit)
@@ -196,76 +192,62 @@ AC_CHECK_HEADERS([immintrin.h])
 
 # Check for JPEG Image support
 AC_ARG_ENABLE(jpeg,[  --disable-jpeg          compile without JPEG image support])
-AC_MSG_RESULT([$enable_jpeg])
 if test "x$enable_jpeg" != "xno"; then
-AC_CHECK_HEADER(jpeglib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JPEG_H=1"; LIBS="${LIBS} ${LIBJPEG:=-ljpeg}")
+AC_CHECK_HEADER(jpeglib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JPEG_H=1")
+AC_CHECK_LIB(jpeg,jpeg_CreateCompress,LIBS="${LIBS} ${LIBJPEG:=-ljpeg}")
 fi
 
 
 # Check for J2K Image support
 AC_ARG_ENABLE(jp2,[  --disable-jp2          compile without JPEG 2000 image support])
-AC_MSG_RESULT([$enable_jp2])
 if test "x$enable_jp2" = "xyes"; then
-AC_CHECK_HEADER(openjpeg.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JP2_H=1"; LIBS="${LIBS} ${LIBJP2:=-lopenjpeg}")
+AC_CHECK_HEADER(openjpeg.h,CXXFLAGS="${CXXFLAGS} -DHAVE_JP2_H=1")
+AC_CHECK_LIB(openjpeg,opj_create_decompress,LIBS="${LIBS} ${LIBJP2:=-lopenjpeg}")
 fi
 
 
 # Check for PNG Image support; note zlib is needed for PNG
 AC_ARG_ENABLE(png,[  --disable-png           compile without PNG image support])
-AC_MSG_RESULT([$enable_png])
 if test "x$enable_png" != "xno"; then
-AC_CHECK_HEADERS(png.h,CXXFLAGS="${CXXFLAGS} -DHAVE_PNG_H=1"; LIBS="${LIBS} ${LIBPNG:=-lpng}")
+AC_CHECK_HEADERS(png.h,CXXFLAGS="${CXXFLAGS} -DHAVE_PNG_H=1")
+AC_CHECK_LIB(png,png_create_read_struct,LIBS="${LIBS} ${LIBPNG:=-lpng}")
 fi
 
 
 # Check for WEBP Image support
 AC_ARG_ENABLE(webp,[  --disable-webp           compile without WEBP image support])
-AC_MSG_RESULT([$enable_webp])
 if test "x$enable_webp" = "xyes"; then
-AC_CHECK_HEADERS(webp/decode.h,CXXFLAGS="${CXXFLAGS} -DHAVE_WEBP_H=1"; LIBS="${LIBS} ${LIBWEBP:=-lwebp}")
+AC_CHECK_HEADERS(webp/decode.h,CXXFLAGS="${CXXFLAGS} -DHAVE_WEBP_H=1")
+AC_CHECK_LIB(webp,WebPDecodeBGRAInto,LIBS="${LIBS} ${LIBWEBP:=-lwebp}")
 fi
 
 
 # Check for TIFF Image support; note zlib is needed for TIFF
 AC_ARG_ENABLE(tiff,[  --disable-tiff          compile without TIFF image support])
-AC_MSG_RESULT([$enable_tiff])
 if test "x$enable_tiff" != "xno"; then
-AC_CHECK_HEADERS(tiff.h,CXXFLAGS="${CXXFLAGS} -DHAVE_TIFF_H=1"; LIBS="${LIBS} ${LIBTIFF:=-ltiff}")
+AC_CHECK_HEADERS(tiff.h,CXXFLAGS="${CXXFLAGS} -DHAVE_TIFF_H=1")
+AC_CHECK_LIB(tiff,TIFFClientOpen,LIBS="${LIBS} ${LIBTIFF:=-ltiff}")
 fi
 
 
 # Check for libz compression library
 AC_ARG_ENABLE(zlib,[  --disable-zlib          compile without zlib support])
-AC_MSG_RESULT([$enable_zlib])
 if test "x$enable_zlib" != "xno"; then
-AC_CHECK_HEADERS(zlib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_ZLIB_H=1"; LIBS="${LIBS} ${LIBZ:=-lz}")
+AC_CHECK_HEADERS(zlib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_ZLIB_H=1")
+AC_CHECK_LIB(z,inflateEnd,LIBS="${LIBS} ${LIBZ:=-lz}")
 fi
 
 
 # Check for bzip2 compression library
 AC_ARG_ENABLE(bz2lib,[  --disable-bz2lib        compile without bz2lib support])
-AC_MSG_RESULT([$enable_bz2lib])
 if test "x$enable_bz2lib" != "xno"; then
-AC_CHECK_HEADERS(bzlib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_BZ2LIB_H=1"; LIBS="${LIBS} ${LIBBZ2:=-lbz2}")
-fi
-
-
-dnl Check for Xft2 support
-AC_MSG_CHECKING(for Xft support)
-AC_ARG_WITH(xft,[  --with-xft              enable Xft support])
-AC_MSG_RESULT([$with_xft])
-if test "x$with_xft" != "xno"; then
-XFTCFLAGS="-I/usr/include/freetype2"
-XFTLIBS="-lXft -lfontconfig -lfreetype"
-saved_cppflags="${CXXFLAGS}"
-CXXFLAGS="${CXXFLAGS} -DHAVE_XFT_H=1 $XFTCFLAGS"
-X_BASE_LIBS="${X_BASE_LIBS} $XFTLIBS"
+AC_CHECK_HEADERS(bzlib.h,CXXFLAGS="${CXXFLAGS} -DHAVE_BZ2LIB_H=1")
+AC_CHECK_LIB(bz2,BZ2_bzCompress,LIBS="${LIBS} ${LIBBZ2:=-lbz2}")
 fi
 
 
 dnl Check for XShm support
 AC_ARG_WITH(xshm,[  --with-xshm             compile with XShm support])
-AC_MSG_RESULT([$with_xshm])
 if test "x$with_xshm" != "xno"; then
 AC_CHECK_HEADERS(X11/extensions/XShm.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XSHM_H=1",, [#include <X11/Xlib.h>])
 fi
@@ -273,7 +255,6 @@ fi
 
 dnl Check for XShape support
 AC_ARG_WITH(shape,[  --with-shape            enable XShape support])
-AC_MSG_RESULT([$with_shape])
 if test "x$with_shape" != "xno"; then
 AC_CHECK_HEADERS(X11/extensions/shape.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XSHAPE_H=1",, [#include <X11/Xlib.h>])
 fi
@@ -281,7 +262,6 @@ fi
 
 # Check for Xcursor support
 AC_ARG_WITH(xcursor,[  --with-xcursor          compile with Xcursor support])
-AC_MSG_RESULT([$with_xcursor])
 if test "x$with_xcursor" != "xno"; then
 AC_CHECK_HEADERS(X11/Xcursor/Xcursor.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XCURSOR_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXcursor",, [#include <X11/Xlib.h>])
 fi
@@ -289,7 +269,6 @@ fi
 
 # Check for XRender support
 AC_ARG_WITH(xrender,[  --with-xrender           compile with XRender support])
-AC_MSG_RESULT([$with_xrender])
 if test "x$with_xrender" != "xno"; then
 AC_CHECK_HEADERS(X11/extensions/Xrender.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XRENDER_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXrender",, [#include <X11/Xlib.h>])
 fi
@@ -297,7 +276,6 @@ fi
 
 # Check for XRandR support
 AC_ARG_WITH(xrandr,[  --with-xrandr           compile with XRandR support])
-AC_MSG_RESULT([$with_xrandr])
 if test "x$with_xrandr" != "xno"; then
 AC_CHECK_HEADERS(X11/extensions/Xrandr.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XRANDR_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXrandr",, [#include <X11/Xlib.h>])
 fi
@@ -305,7 +283,6 @@ fi
 
 # Check for XFixes support
 AC_ARG_WITH(xfixes,[  --with-xfixes           compile with XFixes support])
-AC_MSG_RESULT([$with_xfixes])
 if test "x$with_xfixes" != "xno"; then
 AC_CHECK_HEADERS(X11/extensions/Xfixes.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XFIXES_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXfixes",, [#include <X11/Xlib.h>])
 fi
@@ -313,18 +290,40 @@ fi
 
 # Check for XInput2 support
 AC_ARG_WITH(xinput,[  --with-xinput           compile with XInput2 support])
-AC_MSG_RESULT([$with_xinput])
 if test "x$with_xinput" != "xno"; then
 AC_CHECK_HEADERS(X11/extensions/XInput2.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XINPUT2_H=1"; X_BASE_LIBS="${X_BASE_LIBS} -lXi",, [#include <X11/Xlib.h>])
 fi
 
-
 # Check for Input Method support
 AC_ARG_WITH(xim,[  --with-xim              compile with XIM support])
-AC_MSG_RESULT([$with_xim])
-##if test "x$with_xim" = "xno"; then
 if test "x$with_xim" != "xyes"; then
 CXXFLAGS="${CXXFLAGS} -DNO_XIM"
+fi
+
+dnl Check for Xft2 support
+AC_ARG_WITH(xft,[  --with-xft              enable Xft support])
+if test "x$with_xft" != "xno"; then
+
+dnl freetype location
+AC_ARG_WITH(freetype_include,AS_HELP_STRING([--with-freetype-include],[freetype include directory]),
+            [CPPFLAGS="${CPPFLAGS} -I${with_freetype_include}"],
+            [CPPFLAGS="${CPPFLAGS} -I/usr/include/freetype2"])
+AC_CHECK_HEADER(ft2build.h)
+AC_ARG_WITH(freetype_library,AS_HELP_STRING([--with-freetype-library],[freetype library directory]),
+            [LDFLAGS="${LDFLAGS} -L${with_freetype_library}"])
+AC_CHECK_LIB(freetype,FT_New_Face,X_BASE_LIBS="${X_BASE_LIBS} -lfreetype")
+
+dnl fontconfig location
+AC_ARG_WITH(fontconfig_include,AS_HELP_STRING([--with-fontconfig-include],[fontconfig include directory]),
+            [CPPFLAGS="${CPPFLAGS} -I${with_fontconfig_include}"])
+AC_CHECK_HEADER(fontconfig/fontconfig.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XFT_H=1")
+AC_ARG_WITH(fontconfig_library,AS_HELP_STRING([--with-fontconfig-library],[fontconfig library directory]),
+            [LDFLAGS="${LDFLAGS} -L${with_fontconfig_library}"])
+AC_CHECK_LIB(fontconfig,FcPatternCreate,X_BASE_LIBS="${X_BASE_LIBS} -lfontconfig ")
+
+dnl check Xft
+AC_CHECK_HEADER(X11/Xft/Xft.h,CXXFLAGS="${CXXFLAGS} -DHAVE_XFT_H=1",, [#include <X11/Xlib.h>])
+AC_CHECK_LIB(Xft,XftDrawRect,X_BASE_LIBS="${X_BASE_LIBS} -lXft")
 fi
 
 # Substitute variables in output files

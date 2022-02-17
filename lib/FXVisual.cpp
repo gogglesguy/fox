@@ -91,6 +91,8 @@
     is not included.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
 
 // Maximum size of the colormap; for high-end graphics systems
 // you may want to define HIGHENDGRAPHICS to allow large colormaps
@@ -112,7 +114,7 @@ FXIMPLEMENT(FXVisual,FXId,NULL,0)
 
 // Deserialization
 FXVisual::FXVisual():visual(NULL),colormap(0),maxcolors(1000000),numcolors(0),numred(0),numgreen(0),numblue(0),depth(0),flags(VISUAL_DEFAULT),hint(32),type(Unknown),freemap(false){
-  FXTRACE((100,"FXVisual::FXVisual %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXVisual::FXVisual %p\n",this));
 #ifndef WIN32
   scrollgc=0;
   gc=0;
@@ -122,7 +124,7 @@ FXVisual::FXVisual():visual(NULL),colormap(0),maxcolors(1000000),numcolors(0),nu
 
 // Construct
 FXVisual::FXVisual(FXApp* a,FXuint flgs,FXuint hnt):FXId(a),visual(NULL),colormap(0),maxcolors(1000000),numcolors(0),numred(0),numgreen(0),numblue(0),depth(0),flags(flgs),hint(hnt),type(Unknown),freemap(false){
-  FXTRACE((100,"FXVisual::FXVisual %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXVisual::FXVisual %p\n",this));
 #ifndef WIN32
   scrollgc=0;
   gc=0;
@@ -198,7 +200,7 @@ static HPALETTE createGenericPalette(){
 void FXVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
       FXuint redbits,greenbits,bluebits,redmask,greenmask,bluemask;
       BITMAPINFO256 bmi;
       HBITMAP hbm;
@@ -1001,7 +1003,7 @@ void* FXVisual::setupgc(FXbool gex){
 void FXVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
       XVisualInfo vitemplate;
       XVisualInfo *vi;
       FXint nvi,i,d,dbest;
@@ -1148,7 +1150,7 @@ void FXVisual::create(){
 // Detach visual
 void FXVisual::detach(){
   if(xid){
-    FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
     colormap=0;
     freemap=false;
     xid=0;
@@ -1160,7 +1162,7 @@ void FXVisual::detach(){
 void FXVisual::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 #ifdef WIN32
       if(freemap){ DeleteObject((HPALETTE)colormap); }
 #else
@@ -1233,7 +1235,7 @@ void FXVisual::load(FXStream& store){
 
 // Destroy
 FXVisual::~FXVisual(){
-  FXTRACE((100,"FXVisual::~FXVisual %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXVisual::~FXVisual %p\n",this));
   destroy();
   }
 

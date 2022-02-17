@@ -518,6 +518,8 @@ Adie::~Adie(){
   delete configicon;
   delete browsericon;
   delete nobrowsericon;
+  delete loggericon;
+  delete nologgericon;
   delete uppercaseicon;
   delete lowercaseicon;
   delete backwardicon;

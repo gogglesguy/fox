@@ -237,6 +237,9 @@ extern FXAPI FXbool operator!=(const FXMat4f& a,FXfloat n);
 extern FXAPI FXbool operator==(FXfloat n,const FXMat4f& a);
 extern FXAPI FXbool operator!=(FXfloat n,const FXMat4f& a);
 
+/// Orthogonalize matrix
+extern FXAPI FXMat4f orthogonalize(const FXMat4f& m);
+
 /// Save matrix to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXMat4f& m);
 

@@ -1104,7 +1104,6 @@ FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args)
       precision=-1;
       width=-1;
       pos=-1;
-      val=0;
 
       // Parse format specifier
 flg:  switch(ch){
@@ -1135,7 +1134,6 @@ flg:  switch(ch){
           goto flg;
         case '*':                                       // Width or precision parameter
           ch=*fmt++;
-          val=0;                                        // Assume non-positional parameter
           if(Ascii::isDigit(ch)){
             val=ch-'0';
             ch=*fmt++;

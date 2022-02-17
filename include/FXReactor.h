@@ -94,7 +94,6 @@ public:
     DispatchOther   = 0x00000010        /// Dispatch other i/o
     };
 
-
   /// Sleep no longer than this
   static const FXTime maxwait;
 

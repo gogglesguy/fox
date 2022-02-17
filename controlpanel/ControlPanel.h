@@ -73,6 +73,7 @@ private:
   FXList            *filebindinglist;
   FXComboBox        *mimetypelist;
   FXButton          *iconbutton[4];
+  FXIcon            *iconimage[4];
   FXLabel           *vendorandapplication;
 private:
   FXToolTip         *tooltip;

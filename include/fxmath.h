@@ -326,6 +326,7 @@ static inline FXfloat fmin(FXfloat x,FXfloat y){
 #endif
   }
 
+
 /// Double precision minimum of two
 static inline FXdouble fmin(FXdouble x,FXdouble y){
 #if defined(NO_FMIN)

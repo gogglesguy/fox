@@ -38,6 +38,8 @@
   - Manage nested event loops.
 
   - Exceptions will unroll through event loops.
+  
+  - FIXME Active FXEventLoop is referenced by member variable FXEventDispatcher.
 
 */
 
@@ -46,7 +48,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 
 // Enter modal loop

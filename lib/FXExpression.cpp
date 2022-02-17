@@ -39,8 +39,8 @@
   - Maintain stack-depth during compile phase for possible limit check.
 */
 
-// Debugging expression code
-//#define EXPRDEBUG 1
+#define TOPIC_CONSTRUCT 1000
+//#define TOPIC_EXPDUMP   1015          // Debugging expression code
 
 #define MAXSTACKDEPTH 128
 
@@ -910,11 +910,13 @@ const FXchar *const FXExpression::errors[]={
 
 // Construct empty expression object
 FXExpression::FXExpression():code((FXuchar*)(void*)initial){
+  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression()\n"));
   }
 
 
 // Copy regex object
 FXExpression::FXExpression(const FXExpression& orig):code((FXuchar*)(void*)initial){
+  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(FXExpression)\n"));
   if(orig.code!=initial){
     dupElms(code,orig.code,GETARG(orig.code));
     }
@@ -923,6 +925,7 @@ FXExpression::FXExpression(const FXExpression& orig):code((FXuchar*)(void*)initi
 
 // Compile expression from pattern; fail if error
 FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpression::Error* error):code((FXuchar*)(void*)initial){
+  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression,variables,error));
   FXExpression::Error err=parse(expression,variables);
   if(error){ *error=err; }
   }
@@ -930,6 +933,7 @@ FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXEx
 
 // Compile expression from pattern; fail if error
 FXExpression::FXExpression(const FXString& expression,const FXString& variables,FXExpression::Error* error):code((FXuchar*)(void*)initial){
+  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression.text(),variables.text(),error));
   FXExpression::Error err=parse(expression.text(),variables.text());
   if(error){ *error=err; }
   }
@@ -949,7 +953,7 @@ FXExpression& FXExpression::operator=(const FXExpression& orig){
 
 /*******************************************************************************/
 
-#ifdef EXPRDEBUG
+#ifdef TOPIC_EXPDUMP
 #include "fxexprdbg.h"
 #endif
 
@@ -986,8 +990,8 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
           // Install new program
           code=prog;
 
-#ifdef EXPRDEBUG
-          if(fxTraceLevel>100) dump(code);
+#ifdef TOPIC_EXPDUMP
+          if(getTraceTopic(TOPIC_EXPDUMP)){ dump(code); }
 #endif
 
           // Report success
@@ -1108,6 +1112,7 @@ void FXExpression::clear(){
 
 // Clean up
 FXExpression::~FXExpression(){
+  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::~FXExpression()\n"));
   clear();
   }
 

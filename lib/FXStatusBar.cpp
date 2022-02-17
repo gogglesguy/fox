@@ -164,7 +164,6 @@ void FXStatusBar::layout(){
       hints=child->getLayoutHints();
 
       // Layout child in Y
-      y=child->getY();
       if(hints&LAYOUT_FIX_HEIGHT) h=child->getHeight();
       else h=child->getDefaultHeight();
       extra_space=0;
@@ -181,7 +180,6 @@ void FXStatusBar::layout(){
         y=top+extra_space;
 
       // Layout child in X
-      x=child->getX();
       if(hints&LAYOUT_FIX_WIDTH) w=child->getWidth();
       else w=child->getDefaultWidth();
       extra_space=0;

@@ -149,8 +149,8 @@ FXival FXXMLFile::flush(FXival){
 
 // Close stream and delete buffers
 FXbool FXXMLFile::close(){
-  FXchar *buffer=begptr;
   FXTRACE((101,"FXXMLFile::close()\n"));
+  FXchar *buffer=begptr;
   if(FXXML::close()){
     freeElms(buffer);
     return file.close();

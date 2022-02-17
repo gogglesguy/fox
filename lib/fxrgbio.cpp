@@ -293,7 +293,6 @@ FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
               // Free RLE chunks
               freeElms(chunk);
-              result=true;
               }
 
             // Free line tables

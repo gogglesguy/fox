@@ -51,6 +51,9 @@
   -
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_TRANSLATE 1010
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -64,7 +67,7 @@ FXIMPLEMENT(FXTranslator,FXObject,NULL,0)
 
 // Construct translator
 FXTranslator::FXTranslator(){
-  FXTRACE((100,"%p->FXTranslator::FXTranslator\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXTranslator::FXTranslator()\n"));
   }
 
 /*
@@ -109,7 +112,7 @@ FXTranslator::FXTranslator(){
 
 // Translate a string
 const FXchar* FXTranslator::tr(const FXchar* context,const FXchar* message,const FXchar* hint,FXint count) const {
-  FXTRACE((200,"tr context: '%s' message: '%s' hint: '%s' count: %d.\n",context,message,hint?hint:"",count));
+  FXTRACE((TOPIC_TRANSLATE,"tr context: '%s' message: '%s' hint: '%s' count: %d.\n",context,message,hint?hint:"",count));
   return message;
   }
 
@@ -128,7 +131,7 @@ void FXTranslator::load(FXStream& store){
 
 // Destroy translator
 FXTranslator::~FXTranslator(){
-  FXTRACE((100,"%p->FXTranslator::~FXTranslator\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXTranslator::~FXTranslator()\n"));
   }
 
 }

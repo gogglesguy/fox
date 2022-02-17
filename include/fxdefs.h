@@ -53,15 +53,22 @@
 #endif
 
 
-// For Windows
-#ifdef _DEBUG
-#ifndef DEBUG
-#define DEBUG
+// Byte order
+#if !defined(FOX_BIGENDIAN)
+#if defined(__GNUC__)
+#if defined(__BYTE_ORDER__)
+#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define FOX_BIGENDIAN 0
+#else
+#define FOX_BIGENDIAN 1
 #endif
+#else
+#error "FOX_BIGENDIAN macro not set"
 #endif
-#ifdef _NDEBUG
-#ifndef NDEBUG
-#define NDEBUG
+#elif defined(_MSC_VER)
+#define FOX_BIGENDIAN 0
+#else
+#error "FOX_BIGENDIAN macro not set"
 #endif
 #endif
 
@@ -69,11 +76,11 @@
 // Shared library support
 #ifdef WIN32
 #if defined(__GNUC__)
-#define FXLOCAL  
+#define FXLOCAL
 #define FXEXPORT __attribute__ ((dllexport))
 #define FXIMPORT __attribute__ ((dllimport))
 #else
-#define FXLOCAL  
+#define FXLOCAL
 #define FXEXPORT __declspec(dllexport)
 #define FXIMPORT __declspec(dllimport)
 #endif
@@ -572,15 +579,18 @@ const FXTime forever=FXLONG(9223372036854775807);
 
 /**
 * FXTRACE() allows you to trace the execution of your application
-* with increasing levels of detail the higher the trace level.
-* The trace level is determined by variable fxTraceLevel, which
-* may be set from the command line with "-tracelevel <level>".
+* with any amount of detail desired.
+* The trace topic number determines whether a trace command is
+* printed to the output.
 * When compiling your application for release, all trace statements
 * are compiled out, just like FXASSERT.
 * A statement like: FXTRACE((10,"The value of x=%d\n",x)) will
-* generate output only if fxTraceLevel is set to 11 or greater.
-* The default value fxTraceLevel=0 will block all trace outputs.
+* generate output only if the trace topic 10 is enabled.
 * Note the double parentheses!
+* Trace topics may be set by command line parameter "-tracetopics"
+* followed by a comma-separeted list of topic ranges.  For example,
+* parameter "-tracetopics 1000:1023,0:3" selects topics 1000 through
+* 1023, and topics 0 through 3.
 */
 #ifndef NDEBUG
 #define FXTRACE(arguments) FX::fxtrace arguments
@@ -643,16 +653,16 @@ extern FXAPI FXbool fxcalloc(void** ptr,FXuval size);
 /// Resize memory
 extern FXAPI FXbool fxresize(void** ptr,FXuval size);
 
-/// Duplicate memory
-extern FXAPI FXbool fxmemdup(void** ptr,const void* src,FXuval size);
-
 /// Free memory, resets ptr to NULL afterward
 extern FXAPI void fxfree(void** ptr);
 
-/// Error routine
+/// Duplicate memory
+extern FXAPI FXbool fxmemdup(void** ptr,const void* src,FXuval size);
+
+/// Error output routine; will terminate program after writing message
 extern FXAPI __noreturn void fxerror(const FXchar* format,...) FX_PRINTF(1,2) ;
 
-/// Warning routine
+/// Warning routine; will continue program after writing message
 extern FXAPI void fxwarning(const FXchar* format,...) FX_PRINTF(1,2) ;
 
 /// Log message to [typically] stderr
@@ -665,7 +675,7 @@ extern FXAPI void fxassert(const FXchar* expression,const FXchar* filename,unsig
 extern FXAPI void fxverify(const FXchar* expression,const FXchar* filename,unsigned int lineno);
 
 /// Trace printout routine:- usually not called directly but called through FXTRACE
-extern FXAPI void fxtrace(FXint level,const FXchar* format,...) FX_PRINTF(2,3) ;
+extern FXAPI void fxtrace(FXuint level,const FXchar* format,...) FX_PRINTF(2,3) ;
 
 /// Convert string of length len to MSDOS; return new string and new length
 extern FXAPI FXbool fxtoDOS(FXchar*& string,FXint& len);
@@ -727,9 +737,26 @@ extern FXAPI FXTime fxgetticks();
 /// Version number that the library has been compiled with
 extern FXAPI const FXuchar fxversion[3];
 
-/// Controls tracing level
-extern FXAPI FXint fxTraceLevel;
+/// Get trace topic setting
+extern FXAPI FXbool getTraceTopic(FXuint topic);
 
+/// Set trace topic on or off
+extern FXAPI void setTraceTopic(FXuint topic,FXbool flag=true);
+
+/// Set tracing for all topics up to and including level
+extern FXAPI void setTraceLevel(FXuint level,FXbool flag=true);
+
+/// Set trace topics from a string of the form:
+///
+/// <topic-list>  : <topic-range> [ ',' <topic-range> ]*
+///
+/// <topic-range> : <topic> [':' [ <topic> ]? ]?
+///
+///               : ':' [<topic> ]?
+///
+/// <topic>       : <digit> [ <digits> ]*
+///
+extern FXAPI FXbool setTraceTopics(const FXchar* topics,FXbool flag=true);
 
 /// Return wide character from utf8 string at ptr
 extern FXAPI FXwchar wc(const FXchar *ptr);
@@ -831,9 +858,6 @@ extern FXAPI FXival utf2wcs(FXwchar *dst,const FXchar* src,FXival dsrlen);
 /// Convert utf8 string to narrow character string; return number of items written to dst
 extern FXAPI FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dsrlen,FXival srclen);
 extern FXAPI FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dsrlen);
-
-/// Swap non-overlapping arrays
-extern FXAPI void memswap(void* dst,void* src,FXuval n);
 
 }
 

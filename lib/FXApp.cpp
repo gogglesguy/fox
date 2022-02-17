@@ -1278,7 +1278,7 @@ void FXApp::openInputDevices(){
       XIDeviceInfo *devices=XIQueryDevice((Display*)display,XIAllDevices,&ndevices);
       if(devices){
         for(FXint i=0; i<ndevices; i++){
-          FXTRACE((100,"Device %s id: %d attached to: %d is a ",devices[i].name,devices[i].deviceid,devices[i].attachment));
+          FXTRACE((100,"Device %s id: %d enabled: %d attached to: %d is a ",devices[i].name,devices[i].deviceid,devices[i].enabled,devices[i].attachment));
           switch(devices[i].use){
             case XIMasterPointer: FXTRACE((100,"master pointer\n")); break;
             case XIMasterKeyboard: FXTRACE((100,"master keyboard\n")); break;
@@ -1345,6 +1345,22 @@ const FXchar *const windowTypeAtoms[14]={
 
 /*******************************************************************************/
 
+#if defined(WIN32) && defined(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)
+
+typedef DWORD (WINAPI *SETPROCESSDPIAWARENESSCONTEXTFUNC)(DPI_AWARENESS_CONTEXT value);
+
+void setDPIAwareness(){
+  HMODULE user32dll;
+  if((user32dll=GetModuleHandleA("user32.dll"))!=NULL){
+    SETPROCESSDPIAWARENESSCONTEXTFUNC SetProcessDpiAwarenessContextFunc;
+    if((SetProcessDpiAwarenessContextFunc=(SETPROCESSDPIAWARENESSCONTEXTFUNC)GetProcAddress(user32dll,"SetProcessDpiAwarenessContext"))!=NULL){
+      SetProcessDpiAwarenessContextFunc(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+      }
+    }
+  }
+
+#endif
+
 // Open the display
 FXbool FXApp::openDisplay(const FXchar* dpy){
   if(!initialized){
@@ -1356,6 +1372,11 @@ FXbool FXApp::openDisplay(const FXchar* dpy){
 
     // Set to HINSTANCE on Windows
     display=GetOwnModuleHandle();
+
+    // Don't let GDI scale our stuff
+#if defined(WIN32) && defined(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)
+    setDPIAwareness();
+#endif
 
     // TARGETS
     ddeTargets=GlobalAddAtomA("TARGETS");
@@ -4334,7 +4355,17 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
         fxwarning("%s:init: missing argument for -tracelevel.\n",getClassName());
         ::exit(1);
         }
-      fxTraceLevel=__strtoul(argv[j++]);
+      setTraceLevel(__strtoul(argv[j++]));
+      continue;
+      }
+
+    // Set trace level
+    if(compare(argv[j],"-tracetopics")==0){
+      if(++j>=argc){
+        fxwarning("%s:init: missing argument for -tracetopics.\n",getClassName());
+        ::exit(1);
+        }
+      setTraceTopics(argv[j++]);
       continue;
       }
 

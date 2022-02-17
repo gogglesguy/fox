@@ -354,12 +354,12 @@ x:return result;
 // Return the empty string if n exceeds the number of filenames present, or if
 // unmatching quotes are encountered.
 FXString FXFileSelector::decodeFilename(const FXString& string,FXint n){
-  FXint pp,p,q;
   FXString result;
-  pp=p=q=0;
+  FXint p=0;
   while(p<string.length()){
-    if(string[p]>' '){
-      pp=p; q=0;
+    if(' '<string[p]){
+      FXint pp=p; 
+      FXint q=0;
 
       // Parse over enquoted file
       if(string[p]=='\''){
@@ -369,7 +369,7 @@ FXString FXFileSelector::decodeFilename(const FXString& string,FXint n){
           p++;
           q++;
           }
-        if(p>=string.length()) goto x;  // Bail if missing quote!
+        if(p>=string.length()) goto x;                  // Bail if missing quote!
         p++;                                            // Skip trailing quote
         }
 
@@ -384,7 +384,8 @@ FXString FXFileSelector::decodeFilename(const FXString& string,FXint n){
       // Found n-th filename encoding; decode it
       if(--n<0){
         result.length(q);
-        p=pp; q=0;
+        p=pp; 
+        q=0;
 
         // Parse and decode file
         if(string[p]=='\''){

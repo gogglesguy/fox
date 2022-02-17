@@ -77,7 +77,6 @@
 */
 
 #define EMPTY     ((Entry*)(__hash__empty__+3))
-#define NOMEMORY  ((Entry*)(((FXival*)NULL)+3))
 #define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
 #define VOID      ((FXptr)-1L)
 #define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
@@ -115,7 +114,8 @@ FXHash::FXHash(const FXHash& other):table(EMPTY){
 FXbool FXHash::no(FXival n){
   FXival m=no();
   if(__likely(m!=n)){
-    Entry *elbat;
+    Entry* elbat;
+    void*  p;
 
     // Release old table
     if(1<m){
@@ -126,7 +126,8 @@ FXbool FXHash::no(FXival n){
 
     // Allocate new table
     if(1<n){
-      if((elbat=(Entry*)(((FXival*)::calloc(sizeof(FXival)*3+sizeof(Entry)*n,1))+3))==NOMEMORY) return false;
+      if(__unlikely((p=::calloc(sizeof(FXival)*3+sizeof(Entry)*n,1))==NULL)) return false;
+      elbat=(Entry*)(((FXival*)p)+3);
       ((FXival*)elbat)[-3]=n;
       ((FXival*)elbat)[-2]=0;
       ((FXival*)elbat)[-1]=n;

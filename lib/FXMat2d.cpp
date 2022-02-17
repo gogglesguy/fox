@@ -458,6 +458,17 @@ FXMat2d FXMat2d::invert() const {
   }
 
 
+// Orthogonalize matrix
+// Uses Gram-Schmidt orthogonalization on a row-by-row basis
+FXMat2d orthogonalize(const FXMat2d& m){
+  FXMat2d result(m);
+  result[0]/=result[0].length();
+  result[1]-=result[0]*(result[1]*result[0]);
+  result[1]/=result[1].length();
+  return result;
+  }
+
+
 // Matrix times vector
 FXVec2d operator*(const FXMat2d& m,const FXVec2d& v){
 #if defined(FOX_HAS_SSE3)

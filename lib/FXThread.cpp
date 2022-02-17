@@ -392,6 +392,14 @@ void FXThread::sleep(FXTime nsec){
     FXTime jiffies=-nsec/FXLONG(100);
     fxNtDelayExecution((BOOLEAN)false,(LARGE_INTEGER*)&jiffies);
     }
+#elif (_XOPEN_SOURCE >= 600) || (_POSIX_C_SOURCE >= 200112L)
+  const FXTime seconds=1000000000;
+  struct timespec value;
+  if(1<=nsec){
+    value.tv_sec=nsec/seconds;
+    value.tv_nsec=nsec%seconds;
+    while(clock_nanosleep(CLOCK_MONOTONIC,0,&value,&value)!=0){ }
+    }
 #elif (_POSIX_C_SOURCE >= 199309L)
   const FXTime seconds=1000000000;
   struct timespec value;
@@ -414,31 +422,11 @@ void FXThread::sleep(FXTime nsec){
   }
 
 /*
-
-HANDLE CreateWaitableTimerEx(LPSECURITY_ATTRIBUTES lpTimerAttributes,
-                             LPCWSTR               lpTimerName,
-                             DWORD                 dwFlags,
-                             DWORD                 dwDesiredAccess);
-
-BOOL SetWaitableTimer(HANDLE               hTimer,
-                      const LARGE_INTEGER *lpDueTime,   // UTC if >0
-                      LONG                 lPeriod,
-                      PTIMERAPCROUTINE     pfnCompletionRoutine,
-                      LPVOID               lpArgToCompletionRoutine,
-                      BOOL                 fResume);
-
-BOOL SetWaitableTimerEx(HANDLE               hTimer,
-                        const LARGE_INTEGER *lpDueTime, // UTC if >0
-                        LONG                 lPeriod,
-                        PTIMERAPCROUTINE     pfnCompletionRoutine,
-                        LPVOID               lpArgToCompletionRoutine,
-                        PREASON_CONTEXT      WakeContext,
-                        ULONG                TolerableDelay);
-
+HANDLE CreateWaitableTimerEx(LPSECURITY_ATTRIBUTES lpTimerAttributes,LPCWSTR lpTimerName,DWORD dwFlags,DWORD dwDesiredAccess);
+BOOL SetWaitableTimer(HANDLE hTimer,const LARGE_INTEGER *lpDueTime,LONG lPeriod,PTIMERAPCROUTINE pfnCompletionRoutine,LPVOID lpArgToCompletionRoutine,BOOL fResume);
+BOOL SetWaitableTimerEx(HANDLE hTimer,const LARGE_INTEGER *lpDueTime,LONG lPeriod,PTIMERAPCROUTINE pfnCompletionRoutine,LPVOID lpArgToCompletionRoutine,PREASON_CONTEXT WakeContext,ULONG TolerableDelay);
 BOOL CancelWaitableTimer(HANDLE hTimer);
-
 DWORD WaitForSingleObject(HANDLE hHandle,DWORD  dwMilliseconds);
-
 */
 
 
@@ -923,13 +911,11 @@ FXbool FXThread::description(const FXString& desc){
     return 0<=fxSetThreadDescription((HANDLE)tid,udesc);
 #elif defined(__APPLE__)
     return pthread_setname_np(desc.text())==0;
-#elif defined(__NetBSD__)
-    return pthread_setname_np(tid,"%s",desc.text())==0;
-#elif defined(__FreeBSD__) || defined(__OpenBSD__)
-    pthread_set_name_np(tid,desc.text());
+#elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+    pthread_setname_np((pthread_t)tid,desc.text());
     return true;
 #elif defined(HAVE_PTHREAD_SETNAME_NP)
-    return pthread_setname_np(tid,desc.text())==0;
+    return pthread_setname_np((pthread_t)tid,desc.text())==0;
 #endif
     }
   return false;
@@ -952,14 +938,14 @@ FXString FXThread::description() const {
     if(pthread_getname_np(*((pthread_t*)&tid),desc,ARRAYNUMBER(desc))==0){
       return desc;
       }
-#elif defined(__NetBSD__)
+#elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
     FXchar desc[256];
-    if(pthread_getname_np(tid,desc,ARRAYNUMBER(desc))==0){
+    if(pthread_getname_np((pthread_t)tid,desc,ARRAYNUMBER(desc))==0){
       return desc;
       }
 #elif defined(HAVE_PTHREAD_GETNAME_NP)
     FXchar desc[256];
-    if(pthread_getname_np(tid,desc,ARRAYNUMBER(desc))==0){
+    if(pthread_getname_np((pthread_t)tid,desc,ARRAYNUMBER(desc))==0){
       return desc;
       }
 #endif

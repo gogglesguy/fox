@@ -446,10 +446,10 @@ FXString FXSystem::getUserDirectory(const FXString& user){
     DWORD drivelen;
     HKEY hKey;
     LONG result;
-    if((pathlen=GetEnvironmentVariableA("USERPROFILE",path,ARRAYNUMBER(buffer)))>0){
+    if((pathlen=GetEnvironmentVariableA("USERPROFILE",path,ARRAYNUMBER(path)))>0){
       return FXString(path,pathlen);
       }
-    if((pathlen=GetEnvironmentVariableA("HOME",path,ARRAYNUMBER(buffer)))>0){
+    if((pathlen=GetEnvironmentVariableA("HOME",path,ARRAYNUMBER(path)))>0){
       return FXString(path,pathlen);
       }
     if((pathlen=GetEnvironmentVariableA("HOMEPATH",path,ARRAYNUMBER(path)))>0){         // This should be good for WinNT, Win2K according to MSDN

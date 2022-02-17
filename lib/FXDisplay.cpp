@@ -34,9 +34,12 @@ namespace FX {
 
 /*******************************************************************************/
 
+// Construct display
 FXDisplay::FXDisplay(){
   }
 
+
+// Destroy display
 FXDisplay::~FXDisplay(){
   }
 

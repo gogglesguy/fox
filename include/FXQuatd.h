@@ -174,6 +174,18 @@ public:
   */
   FXVec3d getRotation() const;
 
+  /**
+  * Set unit quaternion to modified rodrigues parameters.
+  * Modified Rodriques parameters are defined as MRP = tan(theta/4)*E,
+  * where theta is rotation angle (radians), and E is unit axis of rotation.
+  */
+  void setMRP(const FXVec3d& m);
+
+  /**
+  * Return modified rodrigues parameters from unit quaternion.
+  */
+  FXVec3d getMRP() const;
+
   /// Set quaternion from roll (x), pitch (y), yaw (z), in that order
   void setRollPitchYaw(FXdouble roll,FXdouble pitch,FXdouble yaw);
 

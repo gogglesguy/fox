@@ -24,12 +24,19 @@
 namespace FX {
 
 
+/**
+* Display class.
+*/
 class FXAPI FXDisplay {
 private:
   FXDisplay(const FXDisplay&);
   FXDisplay &operator=(const FXDisplay&);
 public:
+
+  /// Construct display
   FXDisplay();
+
+  /// Destroy display
  ~FXDisplay();
   };
 

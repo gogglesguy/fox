@@ -41,6 +41,7 @@ protected:
   FXList          *extensions;
   FXComboBox      *mimetypes;
   FXButton        *iconbutton[4];
+  FXIcon          *iconimage[4];
   FXCheckButton   *runinterminal;
   FXCheckButton   *changedirectory;
   FXTextField     *description;

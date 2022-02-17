@@ -58,7 +58,7 @@ int main(int argc,char *argv[]){
       }
     else if(strcmp(argv[arg],"--tracelevel")==0){
       if(++arg>=argc){ fxmessage("Missing tracelevel number argument.\n"); exit(1); }
-      fxTraceLevel=strtoul(argv[arg],NULL,0);
+      setTraceLevel(strtoul(argv[arg],NULL,0));
       }
     else if(strcmp(argv[arg],"--precision")==0){
       if(++arg>=argc){ fxmessage("Missing precision number argument.\n"); exit(1); }

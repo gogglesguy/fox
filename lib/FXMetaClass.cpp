@@ -44,6 +44,7 @@
       - Very minor space penalty.
 */
 
+#define TOPIC_CONSTRUCT 1000
 
 using namespace FX;
 
@@ -163,7 +164,7 @@ void FXMetaClass::resize(FXuint slots){
 
 // Constructor adds metaclass to the table
 FXMetaClass::FXMetaClass(const FXchar* name,FXObject *(fac)(),const FXMetaClass* base,const void* ass,FXuint nass,FXuint assz):className(name),manufacture(fac),baseClass(base),assoc(ass),nassocs(nass),assocsz(assz){
-  FXTRACE((100,"FXMetaClass::FXMetaClass(%s)\n",className));
+  FXTRACE((TOPIC_CONSTRUCT,"FXMetaClass::FXMetaClass(%s)\n",className));
   FXuint p=hashstring(className);
   FXuint x=(p<<1)|1;
   if((++metaClassCount<<1) > metaClassSlots){
@@ -228,7 +229,7 @@ FXObject* FXMetaClass::nullObject(){
 
 // Destructor removes metaclass from the table
 FXMetaClass::~FXMetaClass(){
-  FXTRACE((100,"FXMetaClass::~FXMetaClass(%s)\n",className));
+  FXTRACE((TOPIC_CONSTRUCT,"FXMetaClass::~FXMetaClass(%s)\n",className));
   FXuint p=hashstring(className);
   FXuint x=(p<<1)|1;
   while(metaClassTable[p=(p+x)&(metaClassSlots-1)]!=this){

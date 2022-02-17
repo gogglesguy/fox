@@ -34,7 +34,10 @@
     display connection is special in some sense [having to do with message queue
     management].
 
+  - FIXME link to chain of FXEventLoop items from this class, and add the modal
+    loops here.
 */
+
 
 using namespace FX;
 
@@ -42,9 +45,37 @@ using namespace FX;
 
 namespace FX {
 
+// Units of time in nanoseconds
+const FXTime seconds=1000000000;
+
 
 // Construct event dispatcher object
 FXEventDispatcher::FXEventDispatcher():display(NULL){
+  }
+
+
+// Initialize dispatcher
+FXbool FXEventDispatcher::init(FXptr dpy){
+  if(FXDispatcher::init()){
+    if(dpy){
+#if !defined(WIN32)
+      addHandle(ConnectionNumber((Display*)dpy),InputRead);
+#endif
+      display=dpy;
+      return true;
+      }
+    }
+  return false;
+  }
+
+
+// Initialize dispatcher
+FXbool FXEventDispatcher::init(){
+  if(FXDispatcher::init()){
+    display=NULL;
+    return true;
+    }
+  return false;
   }
 
 
@@ -222,6 +253,7 @@ FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
       if(flags&DispatchEvents){
         if(XEventsQueued((Display*)display,QueuedAfterFlush)){
           XNextEvent((Display*)display,&event);
+// FIXME compress events
           if(dispatchEvent(event)) return true;         // Event activity
           continue;
           }
@@ -297,20 +329,17 @@ FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
 
 #else ///////////////////////////////////////////////////////////////////////////
 
-// Wait for file descriptors
-extern FXint sselect(FXint nfds,fd_set* readfds,fd_set* writefds,fd_set* errorfds,FXTime interval);
-
-// FIXME Somewhere else...
-//      FXReactor::addHandle(ConnectionNumber((Display*)display),InputRead);
-//      FXReactor::remHandle(ConnectionNumber((Display*)display);
-// FIXME
-
 // Dispatch driver
 FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
   if(internals){
     FXTime now,due,delay,interval;
     FXuint sig,nxt,mode;
     FXRawEvent event;
+#if (_POSIX_C_SOURCE >= 200112L)
+    struct timespec delta;
+#else
+    struct timeval delta;
+#endif
 
     // Loop till we got something
     while(1){
@@ -344,6 +373,7 @@ FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
       if(flags&DispatchEvents){
         if(XEventsQueued((Display*)display,QueuedAfterFlush)){
           XNextEvent((Display*)display,&event);
+// FIXME compress events
           if(dispatchEvent(event)) return true;         // Event activity
           continue;
           }
@@ -386,7 +416,11 @@ FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
       internals->watched[2]=internals->handles[2];
 
       // Select active handles and check signals; don't block
-      numraised=sselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],0);
+#if (_POSIX_C_SOURCE >= 200112L)
+      numraised=pselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],NULL,NULL);
+#else
+      numraised=select(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],NULL);
+#endif
 
       // No handles were active
       if(numraised==0){
@@ -411,7 +445,15 @@ FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
           }
 
         // Select active handles and check signals, waiting for timeout or maximum block time
-        numraised=sselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],interval);
+#if (_POSIX_C_SOURCE >= 200112L)
+        delta.tv_sec=interval/seconds;
+        delta.tv_nsec=(interval-seconds*delta.tv_sec);
+        numraised=pselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],&delta,NULL);
+#else
+        delta.tv_sec=interval/seconds;
+        delta.tv_usec=(interval-seconds*delta.tv_sec)/1000;
+        numraised=select(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],&delta);
+#endif
 
         // Return if there was no timeout within maximum block time
         if(numraised==0){
@@ -445,6 +487,16 @@ FXbool FXEventDispatcher::dispatchEvent(FXRawEvent& event){
   }
 
 /*******************************************************************************/
+
+// Exit dispatcher
+FXbool FXEventDispatcher::exit(){
+  if(FXDispatcher::exit()){
+    display=NULL;
+    return true;
+    }
+  return false;
+  }
+
 
 // Destroy event dispatcher object
 FXEventDispatcher::~FXEventDispatcher(){

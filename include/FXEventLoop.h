@@ -50,6 +50,12 @@ public:
   /// Initialize event loop
   FXEventLoop(FXEventLoop** inv,FXWindow* win=NULL,FXuint mode=0);
 
+  /// Set dispatcher
+  void setDispatcher(FXEventDispatcher* disp){ dispatcher=disp; }
+  
+  /// Get dispatcher
+  FXEventDispatcher* getDispatcher() const { return dispatcher; }
+
   /// Test if the window is involved in a modal invocation
   FXbool isModal(FXWindow *window) const;
 

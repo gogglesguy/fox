@@ -309,7 +309,7 @@ long TestWindow::onCmdStaticMode(FXObject*,FXSelector,void*){
   if(bstatic)
     view->setCalendarStyle(style|CALENDAR_STATIC);
   else
-    view->setCalendarStyle(style&=~CALENDAR_STATIC);
+    view->setCalendarStyle(style&~CALENDAR_STATIC);
   return 1;
   }
 
@@ -319,7 +319,7 @@ long TestWindow::onCmdSiblingMode(FXObject*,FXSelector,void*){
   if(bsibling)
     view->setCalendarStyle(style|CALENDAR_HIDEOTHER);
   else
-    view->setCalendarStyle(style&=~CALENDAR_HIDEOTHER);
+    view->setCalendarStyle(style&~CALENDAR_HIDEOTHER);
   return 1;
   }
 
@@ -329,7 +329,7 @@ long TestWindow::onCmdWeekMode(FXObject*,FXSelector,void*){
   if(bweek)
     view->setCalendarStyle(style|CALENDAR_WEEKNUMBERS);
   else
-    view->setCalendarStyle(style&=~CALENDAR_WEEKNUMBERS);
+    view->setCalendarStyle(style&~CALENDAR_WEEKNUMBERS);
   return 1;
   }
 

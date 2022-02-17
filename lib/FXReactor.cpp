@@ -91,7 +91,7 @@
   - When DispatchSignals is not in control-set, no signals are processed.
 
   - When DispatchTimers is not in control-set, no timers are processed (this has the
-    effect of possibly oversleeping over due timers!).
+    effect of possibly oversleeping of due timers!).
 
   - When DispatchIdle is not in control-set, no idle processing is performed; the
     calling thread will block in the system-call immediately after determining no
@@ -145,9 +145,6 @@ FXbool FXReactor::init(){
       internals->handle=epoll_create1(EPOLL_CLOEXEC);
       if(internals->handle<0){ freeElms(internals); return false; }
 #endif
-#if !defined(_WIN32)
-      sigfillset(&internals->sigmaskset);
-#endif
       sigreceived=0;
       numhandles=0;
       numwatched=0;
@@ -159,9 +156,7 @@ FXbool FXReactor::init(){
   return false;
   }
 
-
 /*******************************************************************************/
-
 
 // Which reactor is responsible for which signal
 FXReactor *volatile FXReactor::sigmanager[64];
@@ -187,26 +182,6 @@ FXbool FXReactor::hasSignal(FXint sig) const {
   return (0<sig && sig<64 && sigmanager[sig]==this);
   }
 
-// Idea: if we handle signal, it will be masked, except when in
-// pselect() or epoll_pwait(), where it will be unmasked.
-// This prevents race [a signal being raised just after we tested
-// it not being raced, but prior to entering the system call.
-// If that happens we would miss the signal while in the system call,
-// i.e. not wake up when we should have.
-//
-// Now, outside of the event loop, we do NOT want it masked as we're
-// not checking it then, so want it to go off if it does.
-// So, before entering loop we mask, then test, then atomically unmask
-// during system call, then leave it masked while in loop, and unmask
-// again upon exit of the loop.
-//
-// Does this make sense???
-
-//        sigemptyset(&sigact.sa_mask);
-//        sigaddset(&sigmaskset,sig);
-//        sigdelset(&sigmaskset,sig);
-//        sigfillset(&sigact.sa_mask);
-//    FXint res=sigismember(&sigmaskset,sig);
 
 // Append signal to signal-set observed by the reactor
 FXbool FXReactor::addSignal(FXint sig,FXbool async){
@@ -229,16 +204,14 @@ FXbool FXReactor::addSignal(FXint sig,FXbool async){
         }
 #elif defined(_POSIX_SOURCE) || defined(_INCLUDE_POSIX_SOURCE) || defined(_XOPEN_SOURCE)
       struct sigaction sigact;
-      sigdelset(&internals->sigmaskset,sig);
       sigact.sa_handler=handler;
       sigact.sa_flags=0;
-      sigfillset(&sigact.sa_mask);              // Block other signals while running handler
+      sigfillset(&sigact.sa_mask);              // Block signals while running handler
       if(sigaction(sig,&sigact,NULL)==-1){      // Set handler
         sigmanager[sig]=NULL;
         return false;
         }
 #else
-      sigdelset(&internals->sigmaskset,sig);
       if(signal(sig,handler)==SIG_ERR){         // Set handler
         sigmanager[sig]=NULL;
         return false;
@@ -263,15 +236,13 @@ FXbool FXReactor::remSignal(FXint sig){
         }
 #elif defined(_POSIX_SOURCE) || defined(_INCLUDE_POSIX_SOURCE) || defined(_XOPEN_SOURCE)
       struct sigaction sigact;
-      sigaddset(&internals->sigmaskset,sig);
       sigact.sa_handler=SIG_DFL;
       sigact.sa_flags=0;
-      sigemptyset(&sigact.sa_mask);             // Pass all signals while running handler
+      sigemptyset(&sigact.sa_mask);             // Pass signals while running handler
       if(sigaction(sig,&sigact,NULL)==-1){      // Unset handler
         return false;
         }
 #else
-      sigaddset(&internals->sigmaskset,sig);
       if(signal(sig,SIG_DFL)==SIG_ERR){         // Unset handler
         return false;
         }
@@ -290,9 +261,7 @@ FXbool FXReactor::dispatchSignal(FXint){
   return false;
   }
 
-
 /*******************************************************************************/
-
 
 // Return timeout when something needs to happen
 FXTime FXReactor::nextTimeout(){
@@ -305,15 +274,12 @@ FXbool FXReactor::dispatchTimeout(FXTime){
   return false;
   }
 
-
 /*******************************************************************************/
-
 
 // Dispatch when idle
 FXbool FXReactor::dispatchIdle(){
   return false;
   }
-
 
 /*******************************************************************************/
 
@@ -411,7 +377,6 @@ FXbool FXReactor::remHandle(FXInputHandle hnd){
 FXbool FXReactor::dispatchHandle(FXInputHandle,FXuint,FXuint){
   return false;
   }
-
 
 #if defined(_WIN32) /////////////////////////////////////////////////////////////
 
@@ -614,81 +579,16 @@ FXbool FXReactor::dispatch(FXTime blocking,FXuint flags){
 
 #else ///////////////////////////////////////////////////////////////////////////
 
-// Wait for file descriptors
-extern FXint sselect(FXint nfds,fd_set* readfds,fd_set* writefds,fd_set* errorfds,FXTime interval);
-
-// Wait for file descriptors
-FXint sselect(FXint nfds,fd_set* readfds,fd_set* writefds,fd_set* errorfds,FXTime interval){
-#if (_POSIX_C_SOURCE >= 200112L)
-  if(interval<forever){
-    struct timespec delta;
-    delta.tv_sec=interval/seconds;
-    delta.tv_nsec=interval-seconds*delta.tv_sec;
-    return pselect(nfds,readfds,writefds,errorfds,&delta,NULL);
-    }
-  return pselect(nfds,readfds,writefds,errorfds,NULL,NULL);
-#else
-  if(interval<forever){
-    struct timeval delta;
-    interval=interval/1000;
-    delta.tv_sec=interval/1000000;
-    delta.tv_usec=interval-1000000*delta.tv_sec;
-    return select(nfds,readfds,writefds,errorfds,&delta);
-    }
-  return select(nfds,readfds,writefds,errorfds,NULL);
-#endif
-  }
-
-
-#if 0
-
-#if !defined(_WIN32) && defined(_GNU_SOURCE) && (_POSIX_C_SOURCE >= 199506L || _XOPEN_SOURCE >= 500)
-
-// Block set of signals until leaving scope
-class ScopedSigBlock {
-private:
-  sigset_t savedset;
-public:
-  ScopedSigBlock(sigset_t& blockset){
-    pthread_sigmask(SIG_BLOCK,&blockset,&savedset);
-    }
- ~ScopedSigBlock(){
-    pthread_sigmask(SIG_SETMASK,&savedset,NULL);
-    }
-  };
-
-#endif
-
-
-//           s = pthread_sigmask(SIG_BLOCK, &set, NULL);
-//           pthread_sigmask(SIG_SETMASK, &sigmask, &origmask);
-//           pthread_sigmask(SIG_SETMASK, &origmask, NULL);
-#if (_POSIX_C_SOURCE >= 200112L)
-    sigset_t watchset;        // Watched signals
-    sigset_t savedset;        // Current masked signals
-#endif
-
-    // Get signal mask from thread
-#if (_POSIX_C_SOURCE >= 200112L)
-    pthread_sigmask(SIG_SETMASK,NULL,&savedset);
-    sigandset(&watchset,&internals->sigmaskset,&savedset);
-#endif
-
-
-      // Get signal mask from thread
-      pthread_sigmask(SIG_SETMASK,NULL,&savedset);
-      sigandset(&watchset,&internals->sigmaskset,&savedset);
-
-      // Check for activity before falling asleep
-      numraised=sselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],0,&watchset);
-#endif
-
-
 // Dispatch driver
 FXbool FXReactor::dispatch(FXTime blocking,FXuint flags){
   if(internals){
     FXTime now,due,delay,interval;
     FXuint sig,nxt,mode;
+#if (_POSIX_C_SOURCE >= 200112L)
+    struct timespec delta;
+#else
+    struct timeval delta;
+#endif
 
     // Loop till we got something
     while(1){
@@ -750,7 +650,11 @@ FXbool FXReactor::dispatch(FXTime blocking,FXuint flags){
       internals->watched[2]=internals->handles[2];
 
       // Select active handles and check signals; don't block
-      numraised=sselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],0);
+#if (_POSIX_C_SOURCE >= 200112L)
+      numraised=pselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],NULL,NULL);
+#else
+      numraised=select(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],NULL);
+#endif
 
       // No handles were active
       if(numraised==0){
@@ -775,7 +679,15 @@ FXbool FXReactor::dispatch(FXTime blocking,FXuint flags){
           }
 
         // Select active handles and check signals, waiting for timeout or maximum block time
-        numraised=sselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],interval);
+#if (_POSIX_C_SOURCE >= 200112L)
+        delta.tv_sec=interval/seconds;
+        delta.tv_nsec=(interval-seconds*delta.tv_sec);
+        numraised=pselect(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],&delta,NULL);
+#else
+        delta.tv_sec=interval/seconds;
+        delta.tv_usec=(interval-seconds*delta.tv_sec)/1000;
+        numraised=select(numhandles,&internals->watched[0],&internals->watched[1],&internals->watched[2],&delta);
+#endif
 
         // Return if there was no timeout within maximum block time
         if(numraised==0){
@@ -801,7 +713,6 @@ FXbool FXReactor::dispatch(FXTime blocking,FXuint flags){
   }
 
 #endif //////////////////////////////////////////////////////////////////////////
-
 
 // Exit reactor
 FXbool FXReactor::exit(){

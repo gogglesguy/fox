@@ -344,6 +344,10 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,NULL,NU
   iconbutton[BIG_ICON]=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_SELECT_ICON_BIG,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,68,68, 1,1,1,1);
   iconbutton[MINI_ICON_OPEN]=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_SELECT_ICON_MINIOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,68,68, 1,1,1,1);
   iconbutton[BIG_ICON_OPEN]=new FXButton(iconsmatrix,tr("\tChange icon"),NULL,this,ID_SELECT_ICON_BIGOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,68,68, 1,1,1,1);
+  iconimage[MINI_ICON]=NULL;
+  iconimage[BIG_ICON]=NULL;
+  iconimage[MINI_ICON_OPEN]=NULL;
+  iconimage[BIG_ICON_OPEN]=NULL;
 
   /// Miscellaneous Parameters Panel ///
   FXHorizontalFrame* hframe5=new FXHorizontalFrame(switcher,LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,0,0,0,0,0,0);
@@ -547,14 +551,15 @@ FXIcon *FXDesktopSetup::createIconFromName(const FXString& name) const {
 
 // Reflect icon on button
 void FXDesktopSetup::setupIconButton(const FXString& name,FXint index){
-  FXIcon *ico=iconbutton[index]->getIcon();
-  if(ico){
+  FXASSERT(0<=index && index<=4);
+  if(iconimage[index]){
+    delete iconimage[index];
     iconbutton[index]->setIcon(NULL);
-    delete ico;
+    iconimage[index]=NULL;
     }
-  ico=createIconFromName(name);
-  if(ico){
-    iconbutton[index]->setIcon(ico);
+  iconimage[index]=createIconFromName(name);
+  if(iconimage[index]){
+    iconbutton[index]->setIcon(iconimage[index]);
     }
   }
 
@@ -894,9 +899,9 @@ void FXDesktopSetup::setupFileBindings(){
     if(!mime.empty() && (mimetypelist->findItem(mime)==-1)){
       mimetypelist->appendItem(mime);
       }
-    filebindinglist->sortItems();
-    mimetypelist->sortItems();
     }
+  filebindinglist->sortItems();
+  mimetypelist->sortItems();
   }
 
 
@@ -1288,6 +1293,10 @@ FXDesktopSetup::~FXDesktopSetup(){
   delete icon_colors;
   delete icon_settings;
   delete icon_filebinding;
+  delete iconimage[MINI_ICON];
+  delete iconimage[BIG_ICON];
+  delete iconimage[MINI_ICON_OPEN];
+  delete iconimage[BIG_ICON_OPEN];
   }
 
 /*******************************************************************************/

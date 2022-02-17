@@ -56,6 +56,10 @@
     This simplifies the shape/etch mask procedure.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+
+
 #define DARKCOLOR(r,g,b) (((r)+(g)+(b))<thresh)
 
 using namespace FX;
@@ -75,7 +79,7 @@ FXIcon::FXIcon():shape(0),etch(0),transp(0),thresh(382){
 
 // Initialize nicely
 FXIcon::FXIcon(FXApp* a,const FXColor *pix,FXColor clr,FXuint opts,FXint w,FXint h):FXImage(a,pix,opts,w,h),shape(0),etch(0),transp(clr),thresh(382){
-  FXTRACE((100,"FXIcon::FXIcon %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXIcon::FXIcon %p\n",this));
   }
 
 
@@ -126,7 +130,7 @@ FXshort FXIcon::guessthresh() const {
 void FXIcon::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 
       // Initialize visual
       visual->create();
@@ -174,7 +178,7 @@ void FXIcon::create(){
 void FXIcon::detach(){
   visual->detach();
   if(xid){
-    FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
     shape=0;
     etch=0;
     xid=0;
@@ -186,7 +190,7 @@ void FXIcon::detach(){
 void FXIcon::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 #ifdef WIN32
       ::DeleteObject(shape);
       ::DeleteObject(etch);
@@ -224,7 +228,7 @@ void FXIcon::render(){
     BITMAPINFO2 bmi;
     HDC hdcmsk;
 
-    FXTRACE((100,"%s::render %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::render %p\n",getClassName(),this));
 
     // Render the image (color) pixels as usual
     FXImage::render();
@@ -349,7 +353,7 @@ void FXIcon::render(){
     XShmSegmentInfo shminfo;
 #endif
 
-    FXTRACE((100,"%s::render shape %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::render shape %p\n",getClassName(),this));
 
     // Render the image pixels
     FXImage::render();
@@ -515,7 +519,7 @@ void FXIcon::render(){
 void FXIcon::resize(FXint w,FXint h){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((100,"%s::resize(%d,%d) %p\n",getClassName(),w,h,this));
+  FXTRACE((TOPIC_CREATION,"%s::resize(%d,%d) %p\n",getClassName(),w,h,this));
   if(width!=w || height!=h){
 
     // Resize device dependent pixmap
@@ -583,7 +587,7 @@ void FXIcon::resize(FXint w,FXint h){
 
 // Clean up
 FXIcon::~FXIcon(){
-  FXTRACE((100,"FXIcon::~FXIcon %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXIcon::~FXIcon %p\n",this));
   destroy();
   }
 

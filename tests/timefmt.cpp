@@ -200,7 +200,7 @@ int main(int argc,char* argv[]){
       }
     else if(strcmp(argv[arg],"--tracelevel")==0){
       if(++arg>=argc){ fxmessage("Missing --tracelevel argument.\n"); exit(1); }
-      fxTraceLevel=strtoul(argv[arg],NULL,0);
+      setTraceLevel(strtoul(argv[arg],NULL,0));
       }
     else if(strcmp(argv[arg],"--year")==0){
       if(++arg>=argc){ fxmessage("Missing --year argument.\n"); exit(1); }

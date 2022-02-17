@@ -200,7 +200,7 @@ FXbool fxcheckRAS(FXStream& store){
 // Load SUN raster image file format
 FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   FXuchar red[256],green[256],blue[256],*line,*p,*q,count,c,bit;
-  FXint   npixels,linesize,x,y,i;
+  FXint   npixels,linesize,x,y,i,b;
   HEADER  header;
   FXbool  swap;
   FXbool  ok=false;
@@ -317,8 +317,9 @@ FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
                       }
                     }
                   if(header.depth==1){                          // 1 bits/pixel
-                    for(x=0,q=line; x<width; x++,p+=4){
-                      bit=(line[x>>3]>>(7-(x&7)))&1;
+                    for(x=0,q=line,b=-1; x<width; x++,p+=4){
+                      if(b<0){ c=~*q++; b=7; }
+                      bit=(c>>(b--))&1;
                       p[0]=blue[bit];
                       p[1]=green[bit];
                       p[2]=red[bit];

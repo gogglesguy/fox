@@ -59,6 +59,10 @@
   - We need to deal with X11 unicode keysyms (with 0x01000000 flag) in some way.
 */
 
+#define TOPIC_CONSTRUCT  1000
+#define TOPIC_KEYBOARD   1009
+#define TOPIC_ACCEL      1011
+
 #define EMPTYSLOT       0xfffffffe   // Previously used, now empty slot
 #define UNUSEDSLOT      0xffffffff   // Unsused slot marker
 
@@ -83,7 +87,7 @@ FXIMPLEMENT(FXAccelTable,FXObject,FXAccelTableMap,ARRAYNUMBER(FXAccelTableMap))
 
 // Make empty accelerator table
 FXAccelTable::FXAccelTable(){
-  FXTRACE((100,"%p->FXAccelTable::FXAccelTable\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"%p->FXAccelTable::FXAccelTable\n",this));
   allocElms(key,1);
   key[0].code=UNUSEDSLOT;
   key[0].target=NULL;
@@ -121,7 +125,7 @@ void FXAccelTable::resize(FXuint m){
 // Add accelerator key combination into the accelerator table
 void FXAccelTable::addAccel(FXHotKey hotkey,FXObject* target,FXSelector seldn,FXSelector selup){
   if(hotkey){
-    FXTRACE((160,"%p->FXAccelTable::addAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
+    FXTRACE((TOPIC_ACCEL,"%p->FXAccelTable::addAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
     FXuint p=(hotkey*13)&max;
     FXuint c;
     FXASSERT(hotkey!=UNUSEDSLOT);
@@ -134,7 +138,7 @@ void FXAccelTable::addAccel(FXHotKey hotkey,FXObject* target,FXSelector seldn,FX
     if(max<(num<<1)) resize((max<<1)+1);
     FXASSERT(num<=max);
     p=(hotkey*13)&max;                  // Locate first unused or empty slot
-    while((c=key[p].code)<EMPTYSLOT){
+    while(key[p].code<EMPTYSLOT){
       p=(p+1)&max;
       }
 x:  key[p].code=hotkey;                 // Add or replace accelerator info
@@ -161,7 +165,7 @@ void FXAccelTable::addAccel(const FXchar* string,FXObject* target,FXSelector sel
 // Remove accelerator key combination from the accelerator table
 void FXAccelTable::removeAccel(FXHotKey hotkey){
   if(hotkey){
-    FXTRACE((160,"%p->FXAccelTable::removeAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
+    FXTRACE((TOPIC_ACCEL,"%p->FXAccelTable::removeAccel: code=%04x state=%04x\n",this,(FXushort)hotkey,(FXushort)(hotkey>>16)));
     FXuint p=(hotkey*13)&max;
     FXuint c;
     FXASSERT(hotkey!=UNUSEDSLOT);
@@ -261,7 +265,7 @@ FXObject* FXAccelTable::targetOfAccel(const FXchar* string) const {
 
 // Keyboard press; forward to accelerator target
 long FXAccelTable::onKeyPress(FXObject* sender,FXSelector,void* ptr){
-  FXTRACE((200,"%p->FXAccelTable::onKeyPress keysym=0x%04x state=%04x\n",this,((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
+  FXTRACE((TOPIC_KEYBOARD,"%p->FXAccelTable::onKeyPress keysym=0x%04x state=%04x\n",this,((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
   FXEvent* event=(FXEvent*)ptr;
   FXuint code=MKUINT(event->code,event->state&(SHIFTMASK|CONTROLMASK|ALTMASK));
   FXuint p=(code*13)&max;
@@ -281,7 +285,7 @@ long FXAccelTable::onKeyPress(FXObject* sender,FXSelector,void* ptr){
 
 // Keyboard release; forward to accelerator target
 long FXAccelTable::onKeyRelease(FXObject* sender,FXSelector,void* ptr){
-  FXTRACE((200,"%p->FXAccelTable::onKeyRelease keysym=0x%04x state=%04x\n",this,((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
+  FXTRACE((TOPIC_KEYBOARD,"%p->FXAccelTable::onKeyRelease keysym=0x%04x state=%04x\n",this,((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
   FXEvent* event=(FXEvent*)ptr;
   FXuint code=MKUINT(event->code,event->state&(SHIFTMASK|CONTROLMASK|ALTMASK));
   FXuint p=(code*13)&max;
@@ -417,7 +421,7 @@ FXHotKey FXAccelTable::parseAccel(const FXchar* string){
       code=Ascii::toLower(*ptr)+KEY_space-' ';
     }
 
-  FXTRACE((160,"parseAccel(%s) = code=%04x mods=%04x\n",string,code,mods));
+  FXTRACE((TOPIC_ACCEL,"parseAccel(%s) = code=%04x mods=%04x\n",string,code,mods));
   return MKUINT(code,mods);
   }
 
@@ -555,7 +559,7 @@ FXHotKey parseHotKey(const FXString& string){
       }
     ptr++;
     }
-  FXTRACE((160,"parseHotKey(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
+  FXTRACE((TOPIC_ACCEL,"parseHotKey(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
   return MKUINT(code,mods);
   }
 
@@ -627,7 +631,7 @@ void FXAccelTable::load(FXStream& store){
 
 // Destroy table
 FXAccelTable::~FXAccelTable(){
-  FXTRACE((100,"%p->FXAccelTable::~FXAccelTable\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"%p->FXAccelTable::~FXAccelTable\n",this));
   freeElms(key);
   key=(FXAccelKey*)-1L;
   }

@@ -142,7 +142,7 @@ static inline FXdouble fpMake(FXlong m,FXlong exp){
   union{ FXulong u; FXdouble f; } z={(m&FXULONG(0x000fffffffffffff)) | (((exp+1023)&0x7ff)<<52)};
   return z.f;
   }
- 
+
 #if 0
 // Fast hex digit '0'..'9', 'A'..'F', 'a'..'f' to int
 // Otherwise bad values
@@ -395,7 +395,6 @@ integer:  ivalue=0;
             if((string[1]|0x20)!='a') goto x;
             if((string[2]|0x20)!='n') goto x;
             string+=3;
-            width-=3;
             dvalue=nan.f;
             }
           else if(2<width && (string[0]|0x20)=='i'){            // Inf{inity}
@@ -403,10 +402,8 @@ integer:  ivalue=0;
             if((string[2]|0x20)!='f') goto x;
             if(7<width && (string[3]|0x20)=='i' && (string[4]|0x20)=='n' && (string[5]|0x20)=='i' && (string[6]|0x20)=='t' && (string[7]|0x20)=='y'){
               string+=5;
-              width-=5;
               }
             string+=3;
-            width-=3;
             dvalue=inf.f;
             }
           else if(1<width && string[0]=='0' && (string[1]|0x20)=='x'){  // Hexadecimal float
@@ -470,7 +467,6 @@ integer:  ivalue=0;
                   exponent+=expo;
                   }
                 string=ss;                                      // Eat exponent characters
-                width=ww;
                 }
               }
             if(ivalue!=0){
@@ -572,7 +568,6 @@ integer:  ivalue=0;
                   exponent+=expo;
                   }
                 string=ss;                                      // Eat exponent characters
-                width=ww;
                 }
               }
             dvalue=1.0E-16*(FXlong)ivalue;                      // Convert to 64-bit integer to 64-bit real

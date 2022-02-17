@@ -120,6 +120,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   pixels=0;
   view=0;
   colors=0;
+  planes=0;
   bytesperline=0;
   pixelcolor=0;
   fmt=ILBM_NORMAL;

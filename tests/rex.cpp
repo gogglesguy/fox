@@ -48,7 +48,7 @@ int main(int argc,char** argv){
   FXRex rex;
   FXRex::Error err;
 
-  fxTraceLevel=101;
+  setTraceLevel(100);
 
   // Parse options
   while(arg<argc && argv[arg][0]=='-'){

@@ -52,6 +52,9 @@
     alpha-blended cursors.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+
 #define DISPLAY(app)     ((Display*)((app)->display))
 #define DARKCOLOR(r,g,b) (((r)+(g)+(b))<382)
 #define CURSOR_STOCK     255
@@ -83,7 +86,7 @@ FXCursor::FXCursor(){
 
 // Make stock cursor
 FXCursor::FXCursor(FXApp* a,FXStockCursor curid):FXId(a){
-  FXTRACE((100,"FXCursor::FXCursor %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this));
   data=NULL;
   width=0;
   height=0;
@@ -95,7 +98,7 @@ FXCursor::FXCursor(FXApp* a,FXStockCursor curid):FXId(a){
 
 // Make cursor from source and mask
 FXCursor::FXCursor(FXApp* a,const FXuchar* src,const FXuchar* msk,FXint w,FXint h,FXint hx,FXint hy):FXId(a){
-  FXTRACE((100,"FXCursor::FXCursor %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this));
   fxloadXBM(data,src,msk,w,h);
   width=w;
   height=h;
@@ -107,7 +110,7 @@ FXCursor::FXCursor(FXApp* a,const FXuchar* src,const FXuchar* msk,FXint w,FXint 
 
 // Make cursor from FXColor pixels
 FXCursor::FXCursor(FXApp* a,const FXColor *pix,FXint w,FXint h,FXint hx,FXint hy):FXId(a){
-  FXTRACE((100,"FXCursor::FXCursor %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this));
   data=(FXColor*)pix;
   width=w;
   height=h;
@@ -132,7 +135,7 @@ FXbool FXCursor::isColor() const {
 void FXCursor::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 #if defined(WIN32)      // WIN32
 
       // Mapping to standard WIN32 cursors
@@ -140,7 +143,7 @@ void FXCursor::create(){
 
       // Building stock cursor
       if(options&CURSOR_STOCK){
-        FXTRACE((100,"%s::create: stock cursor\n",getClassName()));
+        FXTRACE((TOPIC_CREATION,"%s::create: stock cursor\n",getClassName()));
         xid=LoadCursor(NULL,stock[options&CURSOR_STOCK]);
         }
 
@@ -153,14 +156,11 @@ void FXCursor::create(){
         // Let's hope it's the correct size!
         if(width>32 || height>32){ fxerror("%s::create: cursor exceeds maximum size of 32x32 pixels\n",getClassName()); }
 
-        FXASSERT(GetSystemMetrics(SM_CXCURSOR)==32);
-        FXASSERT(GetSystemMetrics(SM_CYCURSOR)==32);
-
         // We have support for color cursors (WindowXP and up) and its a color cursor
         OSVERSIONINFO osvi={sizeof(OSVERSIONINFO)};
         if(isColor() && GetVersionEx((OSVERSIONINFO*)&osvi) && (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT) && (osvi.dwMajorVersion==5) && (osvi.dwMinorVersion>=0 || osvi.dwMajorVersion>5)){
           const BITMAPV4HEADER bi={sizeof(BITMAPV4HEADER),32,-32,1,32,BI_BITFIELDS,0,0,0,0,0,0x00FF0000,0x0000FF00,0x000000FF,0xFF000000,0,{{0,0,0},{0,0,0},{0,0,0}},0,0,0};
-          FXTRACE((100,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE((TOPIC_CREATION,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
 
           // Make a DIB
           void *imgdata=0;
@@ -204,7 +204,7 @@ void FXCursor::create(){
           FXuchar tmpand[128];
           FXint   srcoffset=0;
           FXint   dstoffset=0;
-          FXTRACE((100,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE((TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
           memset(tmpand,0xff,sizeof(tmpand));
           memset(tmpxor,0x00,sizeof(tmpxor));
           for(FXint j=0; j<height; j++){
@@ -230,7 +230,7 @@ void FXCursor::create(){
 
       // Building stock cursor
       if(options&CURSOR_STOCK){
-        FXTRACE((100,"%s::create: stock cursor\n",getClassName()));
+        FXTRACE((TOPIC_CREATION,"%s::create: stock cursor\n",getClassName()));
         xid=XCreateFontCursor(DISPLAY(getApp()),stock[options&CURSOR_STOCK]);
         }
 
@@ -246,7 +246,7 @@ void FXCursor::create(){
         // We have support for color cursors and its a color cursor
 #ifdef HAVE_XCURSOR_H
         if(isColor() && XcursorSupportsARGB(DISPLAY(getApp()))){
-          FXTRACE((100,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE((TOPIC_CREATION,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
           XcursorImage *image=XcursorImageCreate(width,height);
           image->xhot=hotx;
           image->yhot=hoty;
@@ -274,7 +274,7 @@ void FXCursor::create(){
           FXint   dstbytes=(width+7)/8;
           FXint   srcoffset=0;
           FXint   dstoffset=0;
-          FXTRACE((100,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE((TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
           color[0].pixel=BlackPixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
           color[1].pixel=WhitePixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
           color[0].flags=DoRed|DoGreen|DoBlue;
@@ -318,7 +318,7 @@ void FXCursor::create(){
 // Detach cursor
 void FXCursor::detach(){
   if(xid){
-    FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
     xid=0;
     }
   }
@@ -338,7 +338,7 @@ void FXCursor::release(){
 void FXCursor::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 #if defined(WIN32)
       DestroyCursor((HCURSOR)xid);
 #else
@@ -411,7 +411,7 @@ void FXCursor::load(FXStream& store){
 
 // Clean up
 FXCursor::~FXCursor(){
-  FXTRACE((100,"FXCursor::~FXCursor %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::~FXCursor %p\n",this));
   destroy();
   if(options&CURSOR_OWNED){freeElms(data);}
   data=(FXColor *)-1L;

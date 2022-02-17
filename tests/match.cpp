@@ -27,7 +27,7 @@ static FXbool matchtest(const FXchar* pattern,const FXchar* string,FXuint flags,
 
 // Start
 int main(int,char*[]){
-  fxTraceLevel=2;
+  setTraceLevel(1);
   matchtest("ABCD", "ABCD", 0, true);
   matchtest("ABCD", "abcd", 0, false);
   matchtest("ABCD", "abcd", FXPath::CaseFold, true);

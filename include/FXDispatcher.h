@@ -30,9 +30,6 @@ private:
 private:
   FXDispatcher(const FXDispatcher&);
   FXDispatcher &operator=(const FXDispatcher&);
-
-  /// Add new handle hnd to watch-list (no callback)
-  virtual FXbool addHandle(FXInputHandle hnd,FXuint mode=InputRead);
 public:
 
   /// I/O Handle callback when a handle is raised
@@ -57,6 +54,9 @@ public:
 
   /// Add callback cb with new handle hnd to watch-list
   virtual FXbool addHandle(HandleCallback cb,FXInputHandle hnd,FXuint mode=InputRead,void* ptr=NULL);
+
+  /// Add new handle hnd to watch-list (no callback)
+  virtual FXbool addHandle(FXInputHandle hnd,FXuint mode=InputRead);
 
   /// Remove handle hnd from watch-list
   virtual FXbool remHandle(FXInputHandle hnd);

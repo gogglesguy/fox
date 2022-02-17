@@ -1742,7 +1742,7 @@ FXint FXText::getXOfRowColumn(FXint row,FXint col) const {
       continue;
       }
     if(c!='\t'){                        // Control character
-      cw+=caretw+font->getCharWidth(c|0x40);
+      cx+=caretw+font->getCharWidth(c|0x40);
       cc+=1;
       linebeg+=1;
       continue;

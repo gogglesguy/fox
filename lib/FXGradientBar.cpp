@@ -319,7 +319,7 @@ void FXGradientBar::gradient(FXColor *ramp,FXint nramp) const {
   FXint s,lr,lg,lb,la,ur,ug,ub,ua,d,l,h,m,i;
   FXdouble len=seg[nsegs-1].upper-seg[0].lower;
   FXdouble del=nramp-1;
-  BLENDFUNC blend=NULL;
+  BLENDFUNC blend=blendlinear;
   FXdouble f,t;
 
   FXASSERT(len>0.0);
@@ -352,6 +352,7 @@ void FXGradientBar::gradient(FXColor *ramp,FXint nramp) const {
       case GRADIENT_BLEND_SINE:       blend=blendsine;       break;
       case GRADIENT_BLEND_INCREASING: blend=blendincreasing; break;
       case GRADIENT_BLEND_DECREASING: blend=blenddecreasing; break;
+      default:                        blend=blendlinear;     break;
       }
 
     d=h-l;

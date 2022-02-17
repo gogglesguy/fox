@@ -85,7 +85,7 @@ int main(int,char**){
   int started;
 
   // Trace
-  fxTraceLevel=151;
+  setTraceLevel(150);
 
   // Make thread pool
   FXThreadPool pool(256);

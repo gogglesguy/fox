@@ -572,7 +572,7 @@ nml2:   result[q++]=c;                          // Normal characters
 FXString FXString::unescape(const FXString& str,FXchar lquote,FXchar rquote){
   FXString result;
   FXint p,q,w,c;
-  p=q=c=w=0;
+  p=q=c=0;
   if(str[p]==lquote && lquote) p++;     // Opening quote
   while(p<str.length()){                // Measure length of converted string
     w=c;                                // Keep previous decoded character

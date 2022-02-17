@@ -528,7 +528,7 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
     }
 
   // Output Graphics Control Extension, if alpha is present
-  for(i=0,alpha=0; i<ncolors; i++){
+  for(i=0; i<ncolors; i++){
     if(((FXuchar*)(colormap+i))[0]==0){
       alpha=i;
       store << TAG_EXTENSION;   // Extension Introducer

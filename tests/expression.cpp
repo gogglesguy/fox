@@ -10,7 +10,7 @@ int main(int argc,char **argv){
   FXdouble result;
   FXint i;
 #ifndef NDEBUG
-  fxTraceLevel=101;
+  setTraceLevel(101);
 #endif
   if(1<argc){
     fxmessage("evaluate(%s) :",argv[1]);

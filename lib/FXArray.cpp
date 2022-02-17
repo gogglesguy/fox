@@ -53,12 +53,15 @@ extern const FXival __array__empty__[];
 const FXival __array__empty__[2]={0,0};
 
 
-// Default constructor
+// Copying empty array uses same empty-array pointer regardless of 
+// subclass; if array is non-empty, subclass does the actual copying.
 FXArrayBase::FXArrayBase():ptr(EMPTY){
   }
 
 
-// Change number of items in list
+// Resize the array to num elements of size sz; if size becomes zero,
+// substitute special empty-array pointer again which contains zero 
+// elements of any type.
 FXbool FXArrayBase::resize(FXival num,FXival sz){
   FXival old=*(((FXival*)ptr)-1);
   if(__likely(old!=num)){
@@ -87,6 +90,7 @@ FXbool FXArrayBase::resize(FXival num,FXival sz){
 // Destructor
 FXArrayBase::~FXArrayBase(){
   resize(0,0);
+  ptr=(void*)-1L;
   }
 
 }

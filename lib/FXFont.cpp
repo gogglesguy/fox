@@ -127,12 +127,12 @@
   - ix|xi
 */
 
-
-
-/*******************************************************************************/
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
 
 using namespace FX;
 
+/*******************************************************************************/
 
 namespace FX {
 
@@ -829,26 +829,26 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
 
       // Weight
       if(wantweight){
-        dweight=Math::iabs(weight-wantweight);
+        dweight=Math::iabs(FXint(weight-wantweight));
         }
       else{
-        dweight=Math::iabs(weight-FXFont::Normal);
+        dweight=Math::iabs(FXint(weight-FXFont::Normal));
         }
 
       // Slant
       if(wantslant){
-        dslant=Math::iabs(slant-wantslant);
+        dslant=Math::iabs(FXint(slant-wantslant));
         }
       else{
-        dslant=Math::iabs(slant-FXFont::Straight);
+        dslant=Math::iabs(FXint(slant-FXFont::Straight));
         }
 
       // Set width
       if(wantsetwidth){
-        dsetwidth=Math::iabs(setwidth-wantsetwidth);
+        dsetwidth=Math::iabs(FXint(setwidth-wantsetwidth));
         }
       else{
-        dsetwidth=Math::iabs(setwidth-FXFont::NonExpanded);
+        dsetwidth=Math::iabs(FXint(setwidth-FXFont::NonExpanded));
         }
 
       // Pitch
@@ -900,7 +900,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       // should be multiplied by (100/90).
       else{
         size=(yres*points)/res;
-        dsize=Math::iabs(size-wantsize);
+        dsize=Math::iabs(FXint(size-wantsize));
         }
 
       FXTRACE((160,"%4d: dweight=%-3d dsize=%3d dslant=%d dsetwidth=%d dscalable=%d dpolymorph=%d xres=%-3d yres=%-3d xlfd=\"%s\"\n",f,dweight,dsize,dslant,dsetwidth,dscalable,dpolymorph,xres,yres,fontnames[f]));
@@ -1075,7 +1075,7 @@ FXFont::FXFont(){
 
 // Construct font from given font description
 FXFont::FXFont(FXApp* a,const FXString& string):FXId(a){
-  FXTRACE((100,"FXFont::FXFont %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
   wantedSize=0;
   actualSize=0;
   wantedWeight=0;
@@ -1099,7 +1099,7 @@ FXFont::FXFont(FXApp* a,const FXString& string):FXId(a){
 
 // Construct a font with given family name, size in points, weight, slant, character set encoding, setwidth, and hints
 FXFont::FXFont(FXApp* a,const FXString& face,FXuint size,FXuint weight,FXuint slant,FXuint encoding,FXuint setwidth,FXuint h):FXId(a),wantedName(face){
-  FXTRACE((100,"FXFont::FXFont %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
   wantedSize=10*size;
   wantedWeight=weight;
   wantedSlant=slant;
@@ -1122,7 +1122,7 @@ FXFont::FXFont(FXApp* a,const FXString& face,FXuint size,FXuint weight,FXuint sl
 
 // Construct font from font description
 FXFont::FXFont(FXApp* a,const FXFontDesc& fontdesc):FXId(a),wantedName(fontdesc.face){
-  FXTRACE((100,"FXFont::FXFont %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
   wantedSize=fontdesc.size;
   wantedWeight=fontdesc.weight;
   wantedSlant=fontdesc.slant;
@@ -1162,7 +1162,7 @@ FXString FXFont::getFoundry() const {
 void FXFont::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 
 #if defined(WIN32)              ///// WIN32 /////
 
@@ -1316,7 +1316,7 @@ void FXFont::create(){
 // Detach font
 void FXFont::detach(){
   if(xid){
-    FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
 
 #if defined(WIN32)              ///// WIN32 /////
 
@@ -1350,7 +1350,7 @@ void FXFont::detach(){
 void FXFont::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 
 #if defined(WIN32)              ///// WIN32 /////
 
@@ -2791,9 +2791,9 @@ FXFontDesc::FXFontDesc(const FXString& fc,FXuint sz,FXuint wt,FXuint sl,FXuint e
 // Set font description from a string
 void FXFontDesc::setFont(const FXString& string){
   FXint len=string.find(',');
-  memset(face,0,sizeof(face));
+  clearElms(face,sizeof(face));
   if(0<=len){
-    memcpy(face,string.text(),FXMIN(len,sizeof(face)-1));
+    memcpy(face,string.text(),Math::imin(len,sizeof(face)-1));
     size=string.section(',',1).toUInt();
     weight=FXFont::weightFromString(string.section(',',2));
     slant=FXFont::slantFromString(string.section(',',3));
@@ -2978,7 +2978,7 @@ void FXFont::load(FXStream& store){
 
 // Clean up
 FXFont::~FXFont(){
-  FXTRACE((100,"FXFont::~FXFont %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFont::~FXFont %p\n",this));
   destroy();
   }
 

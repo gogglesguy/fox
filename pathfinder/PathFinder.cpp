@@ -1131,6 +1131,7 @@ FXString PathFinderMain::makeCommandline(const FXString& executable) const {
       }
     delete [] files;
     }
+  FXTRACE((10,"%s\n",commandline.text()));
   return commandline;
   }
 

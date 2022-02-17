@@ -182,6 +182,32 @@ FXVec3d FXQuatd::getRotation() const {
   }
 
 
+// Set unit quaternion to modified rodrigues parameters.
+// Modified Rodriques parameters are defined as MRP = tan(theta/4)*E,
+// where theta is rotation angle (radians), and E is unit axis of rotation.
+// Reference: "A survey of Attitude Representations", Malcolm D. Shuster,
+// Journal of Astronautical sciences, Vol. 41, No. 4, Oct-Dec. 1993, pp. 476,
+// Equations (253).
+void FXQuatd::setMRP(const FXVec3d& m){
+  FXdouble mm=m[0]*m[0]+m[1]*m[1]+m[2]*m[2];
+  FXdouble D=1.0/(1.0+mm);
+  x=m[0]*2.0*D;
+  y=m[1]*2.0*D;
+  z=m[2]*2.0*D;
+  w=(1.0-mm)*D;
+  }
+
+
+// Return modified rodrigues parameters from unit quaternion.
+// Reference: "A survey of Attitude Representations", Malcolm D. Shuster,
+// Journal of Astronautical sciences, Vol. 41, No. 4, Oct-Dec. 1993, pp. 475,
+// Equations (249). (250).
+FXVec3d FXQuatd::getMRP() const {
+  FXdouble m=(0.0<w)?1.0/(1.0+w):-1.0/(1.0-w);
+  return FXVec3d(x*m,y*m,z*m);
+  }
+
+
 // Set quaternion from roll (x), pitch (y), yaw (z)
 void FXQuatd::setRollPitchYaw(FXdouble roll,FXdouble pitch,FXdouble yaw){
   FXdouble sr,cr,sp,cp,sy,cy;
@@ -565,10 +591,10 @@ FXQuatd arc(const FXVec3d& f,const FXVec3d& t){
 // This is equivalent to: u * (u.unitinvert()*v).pow(f)
 FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
   FXdouble dot=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
+  FXdouble to=Math::fblend(dot,0.0,-f,f);
+  FXdouble fr=1.0-f;
   FXdouble cost=Math::fabs(dot);
   FXdouble sint;
-  FXdouble fr=1.0-f;
-  FXdouble to=f;
   FXdouble theta;
   FXQuatd result;
   if(__likely(cost<0.999999999999999)){
@@ -577,7 +603,6 @@ FXQuatd lerp(const FXQuatd& u,const FXQuatd& v,FXdouble f){
     fr=Math::sin(fr*theta)/sint;
     to=Math::sin(to*theta)/sint;
     }
-  if(dot<0.0) to=-to;
   result.x=fr*u.x+to*v.x;
   result.y=fr*u.y+to*v.y;
   result.z=fr*u.z+to*v.z;

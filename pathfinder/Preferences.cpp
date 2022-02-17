@@ -187,7 +187,10 @@ Preferences::Preferences(PathFinderMain *own):FXDialogBox(own,"PathFinder Prefer
   iconbutton[1]=new FXButton(iconsmatrix,tr("\tChange big icon."),NULL,this,ID_BROWSE_BIGICON,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
   iconbutton[2]=new FXButton(iconsmatrix,tr("\tChange small open icon."),NULL,this,ID_BROWSE_SMALLICONOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
   iconbutton[3]=new FXButton(iconsmatrix,tr("\tChange big open icon."),NULL,this,ID_BROWSE_BIGICONOPEN,FRAME_RAISED|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|JUSTIFY_CENTER_X|JUSTIFY_CENTER_Y|LAYOUT_FILL_COLUMN|LAYOUT_FILL_ROW,0,0,56,56, 1,1,1,1);
-
+  iconimage[0]=NULL;
+  iconimage[1]=NULL;
+  iconimage[2]=NULL;
+  iconimage[3]=NULL;
 
   //// Mime type settings button
   new FXButton(buttons,tr("Extensions\tFile extensions setup\tChange associations for file extensions."),mim,switcher,FXSwitcher::ID_OPEN_SECOND,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
@@ -286,14 +289,15 @@ FXIcon *Preferences::createIconFromName(const FXString& name) const {
 
 // Change icon on button
 void Preferences::changeIconButton(const FXString& name,FXint index){
-  FXIcon *ico=iconbutton[index]->getIcon();
-  if(ico){
+  FXASSERT(0<=index && index<=4);
+  if(iconimage[index]){
+    delete iconimage[index];
     iconbutton[index]->setIcon(NULL);
-    delete ico;
+    iconimage[index]=NULL;
     }
-  ico=createIconFromName(name);
-  if(ico){
-    iconbutton[index]->setIcon(ico);
+  iconimage[index]=createIconFromName(name);
+  if(iconimage[index]){
+    iconbutton[index]->setIcon(iconimage[index]);
     }
   }
 
@@ -625,6 +629,10 @@ long Preferences::onCmdAccept(FXObject* sender,FXSelector sel,void* ptr){
 
 // Clean up
 Preferences::~Preferences(){
+  delete iconimage[0];
+  delete iconimage[1];
+  delete iconimage[2];
+  delete iconimage[3];
   delete pat;
   delete brw;
   delete mim;

@@ -340,9 +340,9 @@ void FXTabBar::layout(){
           if(x+w>px+pw-2) x=px+pw-w-2;
           if(x<px+2) x=px+2;
           if(options&TABBOOK_BOTTOMTABS)
-            tab->position(xx+2,-4,w,h);
+            tab->position(x+2,-4,w,h);
           else
-            tab->position(xx+2,height-h+4,w,h);
+            tab->position(x+2,height-h+4,w,h);
           tab->lower();
           xx+=w;
           }
@@ -351,9 +351,9 @@ void FXTabBar::layout(){
           if(x+w>px+pw-2) x=px+pw-w-2;
           if(x<px) x=px;
           if(options&TABBOOK_BOTTOMTABS)
-            tab->position(xx,-2,w,h);
+            tab->position(x,-2,w,h);
           else
-            tab->position(xx,height-h+2,w,h);
+            tab->position(x,height-h+2,w,h);
           raisetab=tab;
           xx+=w-3;
           }

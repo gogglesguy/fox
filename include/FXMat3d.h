@@ -203,6 +203,9 @@ extern FXAPI FXbool operator!=(const FXMat3d& a,FXdouble n);
 extern FXAPI FXbool operator==(FXdouble n,const FXMat3d& a);
 extern FXAPI FXbool operator!=(FXdouble n,const FXMat3d& a);
 
+/// Orthogonalize matrix
+extern FXAPI FXMat3d orthogonalize(const FXMat3d& m);
+
 /// Save matrix to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXMat3d& m);
 

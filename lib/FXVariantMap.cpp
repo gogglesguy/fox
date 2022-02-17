@@ -61,7 +61,6 @@
 */
 
 #define EMPTY     ((Entry*)(__variantmap__empty__+3))
-#define NOMEMORY  ((Entry*)(((FXival*)NULL)+3))
 #define BSHIFT    5
 
 using namespace FX;
@@ -81,7 +80,8 @@ const FXival __variantmap__empty__[8]={1,0,1,(FXival)(__string__empty__+1),0,0,0
 FXbool FXVariantMap::no(FXival n){
   FXival m=no();
   if(__likely(m!=n)){
-    Entry *elbat;
+    Entry* elbat;
+    void*  p;
 
     // Release old table
     if(1<m){
@@ -92,7 +92,8 @@ FXbool FXVariantMap::no(FXival n){
 
     // Allocate new table
     if(1<n){
-      if((elbat=(Entry*)(((FXival*)::calloc(sizeof(FXival)*3+sizeof(Entry)*n,1))+3))==NOMEMORY) return false;
+      if(__unlikely((p=::calloc(sizeof(FXival)*3+sizeof(Entry)*n,1))==NULL)) return false;
+      elbat=(Entry*)(((FXival*)p)+3);
       ((FXival*)elbat)[-3]=n;
       ((FXival*)elbat)[-2]=0;
       ((FXival*)elbat)[-1]=n;
@@ -119,9 +120,9 @@ FXbool FXVariantMap::resize(FXival n){
             p=(p<<2)+p+b+1;
             b>>=BSHIFT;
             }
-          elbat.table[x].key.adopt(table[i].key);   // Steal string from old table
-          elbat.table[x].data.adopt(table[i].data); // Steal data from old table
-          elbat.table[x].hash=(FXuint)h;            // And copy the hash value
+          elbat.table[x].key.adopt(table[i].key);       // Steal string from old table
+          elbat.table[x].data.adopt(table[i].data);     // Steal data from old table
+          elbat.table[x].hash=(FXuint)h;                // And copy the hash value
           }
         }
       elbat.free(n-used());     // All non-empty slots now free

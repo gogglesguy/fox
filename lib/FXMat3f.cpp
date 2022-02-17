@@ -674,6 +674,20 @@ FXMat3f FXMat3f::invert() const {
   }
 
 
+// Orthogonalize matrix
+// Uses Gram-Schmidt orthogonalization on a row-by-row basis
+FXMat3f orthogonalize(const FXMat3f& m){
+  FXMat3f result(m);
+  result[0]/=result[0].length();
+  result[1]-=result[0]*(result[1]*result[0]);
+  result[1]/=result[1].length();
+  result[2]-=result[0]*(result[2]*result[0]);
+  result[2]-=result[1]*(result[2]*result[1]);
+  result[2]/=result[2].length();
+  return result;
+  }
+
+
 // Matrix times vector
 FXVec2f operator*(const FXMat3f& m,const FXVec2f& v){
 #if defined(FOX_HAS_AVX)

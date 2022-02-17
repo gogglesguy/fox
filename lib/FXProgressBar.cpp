@@ -247,7 +247,6 @@ void FXProgressBar::drawInterior(FXDCWindow& dc){
       if(th>ds/2) return;                        // Text too tall
       n=__snprintf(numtext,sizeof(numtext),"%d%%",percent);
       tw=font->getTextWidth(numtext,n);
-      th=font->getFontHeight();
       tx=dx+ds/2-tw/2;
       ty=dy+ds/2+font->getFontAscent()+5;
       dc.setFont(font);

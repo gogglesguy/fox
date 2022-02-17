@@ -147,11 +147,11 @@ void* FXDispatcher::addTimeout(TimeoutCallback cb,FXTime due,void* ptr){
   if(isInitialized()){
     Timer **tt=&timers,*t,*x;
     while((x=*tt)!=NULL){
-      if(x->cb==cb){ 
-        *tt=x->next; 
-        res=x->ptr; 
-        t=x; 
-        goto a; 
+      if(x->cb==cb){
+        *tt=x->next;
+        res=x->ptr;
+        t=x;
+        goto a;
         }
       tt=&x->next;
       }
@@ -248,8 +248,8 @@ void* FXDispatcher::addIdle(IdleCallback cb,void* ptr){
     Idle **cc=&idles,*c,*x;
     while((x=*cc)!=NULL){         // Search list for cb
       if(x->cb==cb){
-        *cc=x->next; 
-        res=x->ptr; 
+        *cc=x->next;
+        res=x->ptr;
         c=x;
         goto a;
         }
@@ -323,7 +323,7 @@ FXbool FXDispatcher::addHandle(HandleCallback cb,FXInputHandle hnd,FXuint mode,v
     Handle *handle=new Handle();
     handle->cb=cb;
     handle->ptr=ptr;
-    handles.insert((FXptr)(FXuval)hnd,handle);
+    handles.insert(reinterpret_cast<FXptr>(hnd),handle);
     return true;
     }
   return false;
@@ -339,7 +339,7 @@ FXbool FXDispatcher::addHandle(FXInputHandle hnd,FXuint mode){
 // Remove handle hnd from list
 FXbool FXDispatcher::remHandle(FXInputHandle hnd){
   if(FXReactor::remHandle(hnd)){
-    Handle *handle=static_cast<Handle*>(handles.remove((FXptr)(FXuval)hnd));
+    Handle *handle=static_cast<Handle*>(handles.remove(reinterpret_cast<FXptr>(hnd)));
     delete handle;
     return true;
     }
@@ -350,7 +350,7 @@ FXbool FXDispatcher::remHandle(FXInputHandle hnd){
 // Return true if handle has been set.
 FXbool FXDispatcher::hasHandle(FXInputHandle hnd) const {
   if(isInitialized()){
-    return 0<=handles.find((FXptr)(FXuval)hnd);
+    return 0<=handles.find(reinterpret_cast<FXptr>(hnd));
     }
   return false;
   }
@@ -358,7 +358,7 @@ FXbool FXDispatcher::hasHandle(FXInputHandle hnd) const {
 
 // Dispatch when when handle hnd is signaled with mode
 FXbool FXDispatcher::dispatchHandle(FXInputHandle hnd,FXuint mode,FXuint){
-  Handle *handle=static_cast<Handle*>(handles[(FXptr)(FXuval)hnd]);
+  Handle *handle=static_cast<Handle*>(handles[reinterpret_cast<FXptr>(hnd)]);
   return handle && handle->cb(this,hnd,mode,handle->ptr);
   }
 

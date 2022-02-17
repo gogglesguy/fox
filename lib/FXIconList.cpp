@@ -191,7 +191,6 @@ void FXIconItem::drawMiniIcon(const FXIconList* list,FXDC& dc,FXint x,FXint y,FX
     for(len=0; len<label.length() && label[len]!='\t'; len++){}
     tw=4+font->getTextWidth(label.text(),len);
     th=4+font->getFontHeight();
-    dw=font->getTextWidth("...",3);
     y+=(h-th)/2;
     dw=0;
     if(tw>space){                  // FIXME as below in drawDetails
@@ -1127,7 +1126,6 @@ FXint FXIconList::getItemAt(FXint x,FXint y) const {
     }
   else{
     y-=header->getDefaultHeight();
-    c=0;
     index=y/itemHeight;
     if(index<0 || index>=items.no()) return -1;
     }

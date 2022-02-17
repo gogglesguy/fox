@@ -29,11 +29,11 @@
 
 /*
   Notes:
+  - Reverse dictionary maps pointers to strings.
 */
 
 
 #define EMPTY     (const_cast<Entry*>((const Entry*)(__reversedictionary__empty__+3)))
-#define NOMEMORY  ((const Entry*)(((FXival*)NULL)+3))
 #define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
 #define VOID      ((FXptr)-1L)
 #define LEGAL(p)  ((p)!=NULL && (p)!=VOID)
@@ -45,6 +45,7 @@ using namespace FX;
 
 namespace FX {
 
+// Empty dictionary table value
 extern const FXint __string__empty__[];
 extern const FXival __reversedictionary__empty__[];
 const FXival __reversedictionary__empty__[5]={1,0,1,0,(FXival)(__string__empty__+1)};
@@ -54,14 +55,20 @@ const FXival __reversedictionary__empty__[5]={1,0,1,0,(FXival)(__string__empty__
 FXbool FXReverseDictionary::no(FXival n){
   FXival m=no();
   if(__likely(m!=n)){
-    Entry *elbat;
+    Entry* elbat;
+    void*  p;
+
+    // Release old table
     if(1<m){
       destructElms(table,m);
       ::free(((FXival*)table)-3);
       table=EMPTY;
       }
+
+    // Allocate new table
     if(1<n){
-      if((elbat=(Entry*)(((FXival*)::calloc(sizeof(FXival)*3+sizeof(Entry)*n,1))+3))==NOMEMORY) return false;
+      if(__unlikely((p=::calloc(sizeof(FXival)*3+sizeof(Entry)*n,1))==NULL)) return false;
+      elbat=(Entry*)(((FXival*)p)+3);
       ((FXival*)elbat)[-3]=n;
       ((FXival*)elbat)[-2]=0;
       ((FXival*)elbat)[-1]=n;

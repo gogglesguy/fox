@@ -146,6 +146,7 @@
         ExtractIconEx("absolutepathofprogram",index,NULL,&smallicon,1);
 */
 
+#define TOPIC_CONSTRUCT  1000
 
 #define COMMANDLEN   256
 #define EXTENSIONLEN 128
@@ -178,14 +179,14 @@ FXFileAssociations::FXFileAssociations():cache(NULL),settings(NULL){
 
 // Construct an file-extension association table
 FXFileAssociations::FXFileAssociations(FXApp* app):cache(app),settings(&app->reg()){
-  FXTRACE((100,"FXFileAssociations::FXFileAssociations\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFileAssociations::FXFileAssociations\n"));
   cache.setIconPath(settings->readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath));
   }
 
 
 // Construct an file-extension association table, and alternative settings database
 FXFileAssociations::FXFileAssociations(FXApp* app,FXSettings* sdb):cache(app),settings(sdb){
-  FXTRACE((100,"FXFileAssociations::FXFileAssociations\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFileAssociations::FXFileAssociations\n"));
   cache.setIconPath(settings->readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath));
   }
 
@@ -331,7 +332,7 @@ void FXFileAssociations::load(FXStream& store){
 
 // Destructor
 FXFileAssociations::~FXFileAssociations(){
-  FXTRACE((100,"FXFileAssociations::~FXFileAssociations\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXFileAssociations::~FXFileAssociations\n"));
   clear();
   settings=(FXSettings*)-1L;
   }

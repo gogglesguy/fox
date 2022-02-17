@@ -277,6 +277,8 @@ FXTime FXSystem::daylightSavingsOffset(){
   setuplocaltimezone();
 #if defined(_WIN32)
   return minutes*tzi.DaylightBias;      // Or difference between standard and daylight bias.
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
+  return 0;     // FIXME
 #else
   return -hours*daylight;
 #endif

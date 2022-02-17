@@ -1282,6 +1282,24 @@ FXMat3d FXMat4d::normalMatrix() const {
   }
 
 
+// Orthogonalize matrix
+// Uses Gram-Schmidt orthogonalization on a row-by-row basis
+FXMat4d orthogonalize(const FXMat4d& m){
+  FXMat4d result(m);
+  result[0]/=result[0].length();
+  result[1]-=result[0]*(result[1]*result[0]);
+  result[1]/=result[1].length();
+  result[2]-=result[0]*(result[2]*result[0]);
+  result[2]-=result[1]*(result[2]*result[1]);
+  result[2]/=result[2].length();
+  result[3]-=result[0]*(result[3]*result[0]);
+  result[3]-=result[1]*(result[3]*result[1]);
+  result[3]-=result[2]*(result[3]*result[2]);
+  result[3]/=result[3].length();
+  return result;
+  }
+
+
 // Matrix times vector
 FXVec3d operator*(const FXMat4d& m,const FXVec3d& v){
 #if defined(FOX_HAS_AVX)

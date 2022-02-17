@@ -706,7 +706,7 @@ FXival utf2wcs(FXwchar *dst,const FXchar* src,FXival dstlen,FXival srclen){
   FXwchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while(src<srcend && (w=c=*src++)!=0){
+  while(src<srcend && (w=*src++)!=0){
     if(0xC0<=w){
       if(__unlikely(src>=srcend)) break;
       c=*src++;
@@ -774,7 +774,7 @@ FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dstlen,FXival srclen){
   FXnchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while(src<srcend && (w=c=*src++)!=0){
+  while(src<srcend && (w=*src++)!=0){
     if(0xC0<=w){
       if(__unlikely(src>=srcend)) break;
       c=*src++;
@@ -813,7 +813,7 @@ FXival utf2ncs(FXnchar *dst,const FXchar* src,FXival dstlen){
   FXnchar* ptr=dst;
   FXwchar w;
   FXuchar c;
-  while((w=c=*src++)!=0){
+  while((w=*src++)!=0){
     if(0xC0<=w){
       c=*src++;
       if(__unlikely(!FXISFOLLOWUTF8(c))) break;

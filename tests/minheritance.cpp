@@ -287,7 +287,7 @@ ThreeBase::~ThreeBase(){
 
 // Start the whole thing
 int main(int,char**){
-  fxTraceLevel=101;
+  setTraceLevel(100);
 
   {
   TwoBaseOne twobase1;

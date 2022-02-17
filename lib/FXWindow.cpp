@@ -92,6 +92,10 @@
   - Close v.s. delete messages are not consistent.
 */
 
+
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+
 #ifndef WIN32
 
 // Basic events
@@ -250,7 +254,7 @@ FXDragType FXWindow::utf16Type=0;
 // For deserialization; note that the deserialized window only
 // becomes part of the widget tree after its loaded with load().
 FXWindow::FXWindow(){
-  FXTRACE((100,"FXWindow::FXWindow %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWindow::FXWindow %p\n",this));
   parent=NULL;
   owner=NULL;
   first=NULL;
@@ -275,7 +279,7 @@ FXWindow::FXWindow(){
 
 // Only used for the root window
 FXWindow::FXWindow(FXApp* a,FXVisual *vis):FXDrawable(a,1,1){
-  FXTRACE((100,"FXWindow::FXWindow %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWindow::FXWindow %p\n",this));
   getApp()->windowCount++;
   visual=vis;
   parent=NULL;
@@ -300,7 +304,7 @@ FXWindow::FXWindow(FXApp* a,FXVisual *vis):FXDrawable(a,1,1){
 
 // This constructor is used for shell windows
 FXWindow::FXWindow(FXApp* a,FXWindow* own,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDrawable(a,w,h){
-  FXTRACE((100,"FXWindow::FXWindow %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWindow::FXWindow %p\n",this));
   getApp()->windowCount++;
   parent=a->root;
   owner=own;
@@ -334,7 +338,7 @@ FXWindow::FXWindow(FXApp* a,FXWindow* own,FXuint opts,FXint x,FXint y,FXint w,FX
 
 // This constructor is used for all child windows
 FXWindow::FXWindow(FXComposite* p,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXDrawable(p->getApp(),w,h){
-  FXTRACE((100,"FXWindow::FXWindow %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWindow::FXWindow %p\n",this));
   getApp()->windowCount++;
   parent=p;
   owner=parent;
@@ -1228,7 +1232,7 @@ void FXWindow::remColormapWindows(){
 void FXWindow::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 
       // Gotta have a parent already created!
       if(!parent->id()){ fxerror("%s::create: trying to create window before creating parent window.\n",getClassName()); }
@@ -1307,10 +1311,7 @@ void FXWindow::create(){
 #else                   // X11
 
       XSetWindowAttributes wattr;
-      unsigned long mask;
-
-      // Fill in the attributes
-      mask=CWBackPixmap|CWWinGravity|CWBitGravity|CWBorderPixel|CWEventMask|CWDontPropagate|CWCursor|CWOverrideRedirect|CWSaveUnder|CWColormap;
+      unsigned long mask=(CWBackPixmap|CWWinGravity|CWBitGravity|CWBorderPixel|CWEventMask|CWDontPropagate|CWOverrideRedirect|CWSaveUnder|CWColormap);
 
       // Events for normal windows
       wattr.event_mask=BASIC_EVENT_MASK;
@@ -1368,7 +1369,10 @@ void FXWindow::create(){
       wattr.save_under=doesSaveUnder();
 
       // Set cursor
-      wattr.cursor=defaultCursor->id();
+      if(defaultCursor){
+        wattr.cursor=defaultCursor->id();
+        mask|=CWCursor;
+        }
 
       // Finally, create the window
       xid=XCreateWindow((Display*)getApp()->getDisplay(),parent->id(),xpos,ypos,FXMAX(width,1),FXMAX(height,1),0,visual->depth,InputOutput,(Visual*)visual->visual,mask,&wattr);
@@ -1410,7 +1414,7 @@ void FXWindow::create(){
 void FXWindow::attach(FXID w){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::attach %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::attach %p\n",getClassName(),this));
 
       // Gotta have a parent already created!
       if(!parent->id()){ fxerror("%s::attach: trying to attach window before creating parent window.\n",getClassName()); }
@@ -1447,12 +1451,22 @@ void FXWindow::attach(FXID w){
 #else
 
       XSetWindowAttributes wattr;
-      unsigned long mask;
-      mask=CWEventMask|CWDontPropagate|CWCursor;
+      unsigned long mask=(CWEventMask|CWDontPropagate);
+      
+      // Set event mask
       wattr.event_mask=BASIC_EVENT_MASK;
       if(isEnabled()) wattr.event_mask|=ENABLED_EVENT_MASK;
+      
+      // Events that should not propagate
       wattr.do_not_propagate_mask=NOT_PROPAGATE_MASK;
-      wattr.cursor=defaultCursor->id();
+      
+      // Set cursor
+      if(defaultCursor){
+        wattr.cursor=defaultCursor->id();
+        mask|=CWCursor;
+        }
+        
+      // Change window attributes
       XChangeWindowAttributes((Display*)getApp()->getDisplay(),xid,mask,&wattr);
 
       // Reparent window
@@ -1468,7 +1482,7 @@ void FXWindow::attach(FXID w){
 void FXWindow::detach(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
 
       // Remove from xid to C++ object mapping
       getApp()->hash.remove((FXptr)xid);
@@ -1499,7 +1513,7 @@ void FXWindow::detach(){
 void FXWindow::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 
       // Remove from xid to C++ object mapping
       getApp()->hash.remove((FXptr)xid);
@@ -3482,7 +3496,7 @@ FXDragAction FXWindow::endDrag(FXbool drop){
 
 // Delete window
 FXWindow::~FXWindow(){
-  FXTRACE((100,"FXWindow::~FXWindow %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWindow::~FXWindow %p\n",this));
   getApp()->windowCount--;
   destroy();
   delete accelTable;

@@ -161,6 +161,9 @@ extern FXAPI FXbool operator!=(const FXMat2f& a,FXfloat n);
 extern FXAPI FXbool operator==(FXfloat n,const FXMat2f& a);
 extern FXAPI FXbool operator!=(FXfloat n,const FXMat2f& a);
 
+/// Orthogonalize matrix
+extern FXAPI FXMat2f orthogonalize(const FXMat2f& m);
+
 /// Save matrix to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXMat2f& m);
 

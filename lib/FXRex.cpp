@@ -502,8 +502,9 @@
     parsing code.
 */
 
-// Debugging regex code
-//#define REXDEBUG 1
+#define TOPIC_CONSTRUCT 1000
+//#define TOPIC_REXDUMP   1014          // Debugging regex code
+
 
 // As close to infinity as we're going to get; this seems big enough.  We can not make
 // it too large as this may wrap around when added to something else!
@@ -1008,6 +1009,12 @@ static inline void EXCL(FXuchar set[],FXuchar ch){
 // Include character in set
 static inline void INCL(FXuchar set[],FXuchar ch){
   set[ch>>3]|=1<<(ch&7);
+  }
+
+
+// Set bit c to value v
+static inline void SET(FXuchar set[],FXuchar ch,FXbool v){
+  set[ch>>3]^=(set[ch>>3]^(0-v))&(1<<(ch&7));
   }
 
 
@@ -4482,7 +4489,7 @@ FXRex::Error FXReverse::atom(){
   FXRex::Error err;
   FXint savemode;
   FXuchar ch;
-  switch((ch=*src)){
+  switch(*src){
     case '(':                                           // Subexpression grouping
       *dst++=*src++;
       savemode=mode;
@@ -4517,7 +4524,7 @@ FXRex::Error FXReverse::atom(){
       break;
     case '\\':                                          // Escape sequences which are NOT part of simple character-run
       *dst++=*src++;
-      switch((ch=*src)){
+      switch(*src){
         case '\0':                                      // Unexpected pattern end
           return FXRex::ErrNoAtom;
         case '1':                                       // Back reference not supported in reverse
@@ -4631,11 +4638,13 @@ const FXuchar FXRex::fallback[]={
 
 // Construct empty regular expression object
 FXRex::FXRex():code((FXuchar*)(void*)fallback){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex()\n"));
   }
 
 
 // Copy regex object
 FXRex::FXRex(const FXRex& orig):code((FXuchar*)(void*)fallback){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex(FXRex)\n"));
   if(orig.code!=fallback){
     dupElms(code,orig.code,GETARG(orig.code));
     }
@@ -4644,6 +4653,7 @@ FXRex::FXRex(const FXRex& orig):code((FXuchar*)(void*)fallback){
 
 // Compile expression from pattern; fail if error
 FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error):code((FXuchar*)(void*)fallback){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex(%s,%u,%p)\n",pattern,mode,error));
   FXRex::Error err=parse(pattern,mode);
   if(error){ *error=err; }
   }
@@ -4651,13 +4661,14 @@ FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error):code((FXuchar
 
 // Compile expression from pattern; fail if error
 FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error):code((FXuchar*)(void*)fallback){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex(%s,%u,%p)\n",pattern.text(),mode,error));
   FXRex::Error err=parse(pattern.text(),mode);
   if(error){ *error=err; }
   }
 
 /*******************************************************************************/
 
-#ifdef REXDEBUG
+#ifdef TOPIC_REXDUMP
 #include "fxrexdbg.h"
 #endif
 
@@ -4699,8 +4710,8 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
 
                 // Install new program
                 code=prog;
-#ifdef REXDEBUG
-                if(fxTraceLevel>50){ dump(adjustedpattern,code); }
+#ifdef TOPIC_REXDUMP
+                if(getTraceTopic(TOPIC_REXDUMP)){ dump(adjustedpattern,code); }
 #endif
                 freeElms(adjustedpattern);
                 return ErrOK;
@@ -4908,6 +4919,7 @@ void FXRex::clear(){
 
 // Clean up
 FXRex::~FXRex(){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRex::~FXRex()\n"));
   clear();
   }
 

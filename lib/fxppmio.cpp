@@ -134,7 +134,7 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
           switch(format){
             case '1':   // Ascii bitmap
               for(i=0; i<height; i++){
-                for(j=0; j<width; j++,byte<<=1,pp+=4){
+                for(j=0; j<width; j++,pp+=4){
                   byte=getint(store);
                   pp[2] = byte?255:0;
                   pp[1] = pp[2];

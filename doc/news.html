@@ -18,6 +18,44 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+March 2 - FOX DEVELOPMENT 1.7.75
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>FXSystem::getUserDirectory() had bug on Windows with non-unicode build.</li>
+<li>Configure scripts allows specification of freetype2 install locations.</li>
+<li>Adie rules for C# language updated with current set of keywords.</li>
+<li>Added TypeScript coloring rules to Adie syntax file.</li>
+<li>FXDir::createDirectories() now insists on absolute path as input.</li>
+<li>FXPath::upLevel() now works for relative paths as well.</li>
+<li>FXPath::enquote() bug fix: enquoting string containing '#' was flawed.</li>
+<li>Building using VC++ now keys on DEBUG not _DEBUG.</li>
+<li>Adie syntax rule fix for CMake.</li>
+<li>Some small fixes to FXPath::simplify() for path separators.</li>
+<li>Set DPI Awareness upon launch on Windows.</li>
+<li>Dropped unnecessary asserts in FXCursor (Windows).</li>
+<li>Updated FXTRACE() implementation.  Trace topics in addition to levels.
+You can change the set of topics to trace using new <em>-tracetopics</em> command line
+parameter.  The old <em>-tracelevel</em> is still there, it sets a range of topics.
+New APIs are added to set topics programmatically: setTraceTopic(), setTraceLevel(),
+setTraceTopics().  The trace topics allow dumping reduced amounts of information
+when debugging a particular aspect of your program.</li>
+<li>Removed fxstrhash() in favor of FXString::hash().</li>
+<li>Support convert to/from Modified Rodrigues Parameter in quaternion classes.</li>
+<li>Orthogonalize 2x2, 3x3, 4x4 matrices using Gram-Schmidt orthogonalization added.</li>
+<li>Some further work in FXReactor, FXDispatcher.</li>
+<li>Fix address sanitizer issues in FXDictionary, FXHash, FXReverseDictionary, FXSettings, FXStringDictionary, FXVariantMap.</li>
+<li>Leaked icon resource fix in Adie, ControlPanel, PathFinder Preference panel.</li>
+<li>Fix to SUNRAS image loader loading 1-bit per pixel images.</li>
+<li>Potential NULL cursor pointer issue during create() fixed.</li>
+<li>Miscellaneous compiler warnings fixed here and there.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 December 3 - FOX DEVELOPMENT 1.7.74: Sinterklaas Release!
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -37,6 +75,37 @@ December 3 - FOX DEVELOPMENT 1.7.74: Sinterklaas Release!
 <li>Relaxed parsing of fractional seconds in systemTimeParse().</li>
 <li>Obtain leap seconds given TAI, in addition to leapseconds from UTC.</li>
 <li>Highlight text block via keyboard arrow keys in FXText.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 24 - FOX DEVELOPMENT 1.7.73
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Added math function Math::pow10i(). Performs integer power of 10. NOTE: function Math::pow10() will go away
+as this has been deprecated; use Math::exp10() instead!</li>
+<li>FXString::hash() now switched over to FNV1a algorithm; is slightly better than old one on dictionary tests; the classname hashing in FXMetaClass was switched too.  Note this means libraries using FOX
+that need hashing would need to be recompiled!</li>
+<li>Serious bug in FXText fixed: caused assertions from book-keeping discrepancies in cursor movement.</li>
+<li>More stringent checking floating point input containing thousands-grouping.</li>
+<li>Hexadecimal floating point input (fxscanf) now supported.</li>
+<li>Hexadecimal floating point output (fxprintf) now supported.</li>
+<li>Possible speedup in FXDictionary, FXSettings, FXStringDictionary, and FXVariantMap.</li>
+<li>Non-compile issue discovered in *BSD.</li>
+<li>Finite wait-API added in FXSemaQueue.</li>
+<li>Adie text editor bookmark menu labels slightly more intelligent caption.</li>
+<li>Bug printing out denormalized numbers, in optimized mode [FTZ/DAZ floating point flags in effect].</li>
+<li>When printing out floating point numbers, correct exponent in case it was denormalized.  Important
+note: we have reason to believe (a) glibc version of fprintf() has a bug with small denormalized numbers
+printed with "%a", and (b) we believe both GCC and clang++ compilers have bugs parsing hexadecimal
+denormalized floating point numbers.</li>
+<li>Some math functions renamed for consistency: ipow() to powi().</li>
+<li>Change in behaviour: Math::fpExponent() now returns exponent without bias.</li>
+<li>Change in behaviour: Math::fpMantissa() now returns mantissa including the hidden bit [unless number is denormalized].</li>
 </ul>
 
 

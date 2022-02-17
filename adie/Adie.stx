@@ -3,7 +3,7 @@
 #                       A d i e   S y n t a x   F i l e                         #
 #                                                                               #
 #################################################################################
-# Copyright (C) 2004,2020 by Jeroen van der Zijp.   All Rights Reserved.        #
+# Copyright (C) 2004,2021 by Jeroen van der Zijp.   All Rights Reserved.        #
 #################################################################################
 # This program is free software; you can redistribute it and/or modify          #
 # it under the terms of the GNU General Public License as published by          #
@@ -74,8 +74,8 @@ language "Adie Syntax"
     style           "darkgreen"
   end
   rule "Keyword"
-    pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|end|pattern|openpattern|closepattern|stoppattern|style|autoindent|wrapwidth|tabwidth|wordwrap|expandtabs)\>"
-    style           "red"
+    pattern         "\<(language|filesmatch|contentsmatch|delimiters|contextlines|contextchars|rule|group|pattern|openpattern|closepattern|stoppattern|end|style|autoindent|wrapwidth|tabwidth|wordwrap|expandtabs)\>"
+    style           "yellow"
   end
   rule "String"
     openpattern     "\""
@@ -895,7 +895,7 @@ language "C#"
   end
 
   rule "Keyword"
-    pattern     "\<(abstract|base|break|case|catch|checked|class|const|continue|default|delegate|do|else|enum|event|explicit|extern|false|finally|fixed|for|foreach|goto|if|implicit|in|interface|internal|lock|namespace|new|null|object|operator|out|override|params|private|protected|public|readonly|ref|return|sealed|sizeof|stackalloc|static|struct|switch|this|throw|true|try|typeof|unchecked|unsafe|using|virtual|while|is|as)\>"
+    pattern     "\<(abstract|as|add|alias|ascending|async|await|base|by|break|case|catch|checked|class|const|continue|default|delegate|descending|do|dynamic|else|enum|event|equals|explicit|extern|false|finally|fixed|for|foreach|from|goto|get|global|group|if|implicit|in|interface|internal|into|is|join|let|lock|namespace|nameof|new|notnull|null|object|on|operator|orderby|out|override|params|partial|private|protected|public|readonly|ref|remove|return|sealed|select|set|sizeof|stackalloc|static|struct|switch|this|throw|true|try|typeof|unchecked|unsafe|unmanaged|using|value|var|virtual|volatile|when|while|with|yield)\>"
     style       "red"
   end
 
@@ -905,7 +905,7 @@ language "C#"
   end
 
   rule "Type"
-    pattern     "\<(bool|byte|double|float|int|sbyte|short|void|ushort|long|uint|ulong|char|string|decimal)\>"
+    pattern     "\<(bool|char|byte|sbyte|float|double|short|int|long|ushort|uint|ulong|decimal|string|void)\>"
   end
 
   rule "Braces"
@@ -1101,7 +1101,115 @@ language "JavaScript"
 
   # Keywords
   rule "Keyword"
-    pattern     "\<(break|case|catch|continue|debugger|default|delete|do|else|false|finally|for|function|if|in|Infinity|instanceof|NaN|new|null|return|switch|this|throw|try|typeof|var|void|while|with|class|const|enum|export|extends|import|super|implements|interface|let|package|private|protected|public|static|true|yield)\>"
+    pattern     "\<(await|break|case|catch|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|function|if|import|in|instanceof|new|return|super|switch|this|throw|try|typeof|var|void|while|with|yield|null|true|false)\>"
+    style       "red"
+  end
+
+  rule "Number"
+    pattern     "\<(((\d+\.?\d*)|(\.\d+))([eE](\+|-)?\d+)?)[ij]?\>"
+    style       "blue"
+  end
+
+  rule "Braces"
+    pattern     "(\{|\})"
+    style       "red"
+  end
+
+  rule "Parentheses"
+    pattern     "(\(|\))"
+    style       "red"
+  end
+
+  rule "Operator"
+    pattern     "(\[|\]|\.|;|,|<<=|<<|<=|<|>>>=|>>>|>>=|>>|>=|>|===|==|=|!==|!=|!|\+\+|\+=|\+|--|-=|-|%=|%|\*=|\*|\^=|\^|~=|~|&&|&=|&|\|\||\|=|\||:|/=|/|\?)"
+    style       "red"
+  end
+end
+
+
+# TypeScript
+language "TypeScript"
+
+  # File patterns for this language mode
+  filesmatch "*.ts"
+
+  # Word delimiters
+  delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+  contextlines 1
+
+  # All C-like languages use similar color schemes
+  group "C-Like"
+
+  # Merge
+  rule "MergeMine"
+    openpattern   "^<<<<<<<.*?\n"
+    closepattern  "(?=^=======\n)"
+  end
+  rule "MergeDivision"
+    pattern     "^=======\n"
+  end
+  rule "MergeYours"
+    openpattern   "(?<=^=======\n)"
+    closepattern  "^>>>>>>>.*?\n"
+  end
+
+  # C style comment
+  rule "CComment"
+    openpattern   "/\*"
+    closepattern  "\*/"
+    style         "darkgreen"
+  end
+
+  # C++ style comment
+  rule "CPPComment"
+    openpattern   "//"
+    closepattern  "$"
+    style         "darkgreen"
+  end
+
+  # String
+  rule "String"
+    openpattern   "\""
+    closepattern  "\""
+    stoppattern   "$"
+    style         "blue"
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+      style       "fuchsia"
+    end
+    rule "UnicodeEscape"
+      pattern     "\\u\h\h\h\h"
+      style       "fuchsia"
+    end
+    rule "ControlEscape"
+      pattern     "\\[0'\"\\nrvtbf]"
+      style       "fuchsia"
+    end
+  end
+
+  # String
+  rule "String"
+    openpattern   "\'"
+    closepattern  "\'"
+    stoppattern   "$"
+    style         "blue"
+    rule "HexEscape"
+      pattern     "\\x\h\h"
+      style       "fuchsia"
+    end
+    rule "UnicodeEscape"
+      pattern     "\\u\h\h\h\h"
+      style       "fuchsia"
+    end
+    rule "ControlEscape"
+      pattern     "\\[0'\"\\nrvtbf]"
+      style       "fuchsia"
+    end
+  end
+
+  # Keywords
+  rule "Keyword"
+    pattern "\<(any|as|boolean|break|case|catch|class|const|constructor|continue|debugger|declare|default|delete|do|else|enum|export|extends|false|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|module|new|null|number|of|package|private|protected|public|require|return|set|static|string|super|switch|symbol|this|throw|true|try|type|typeof|var|void|while|with|yield)\>"
     style       "red"
   end
 
@@ -2087,6 +2195,11 @@ language "CMake"
     openpattern  "\s*?[A-Za-z_][A-Za-z0-9_]*?\s*?\("
     closepattern "\)"
     style        "blue"
+    rule "Comment"
+      openpattern  "#"
+      closepattern "$"
+      style         "darkgreen"
+    end
     rule "QuotedArgument"
       openpattern   "\""
       closepattern  "\""
