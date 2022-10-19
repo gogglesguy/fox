@@ -96,6 +96,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXCP866Codec.h
             ../include/FXCP869Codec.h
             ../include/FXCP874Codec.h
+            ../include/fxchar.h
             ../include/fxcpuid.h
             ../include/FXCURCursor.h
             ../include/FXCursor.h
@@ -236,6 +237,7 @@ set(HEADERS ../include/fx3d.h
             ../include/FXOptionMenu.h
             ../include/FXPacker.h
             ../include/FXParallel.h
+            ../include/FXParseBuffer.h
             ../include/FXPath.h
             ../include/FXPCXIcon.h
             ../include/FXPCXImage.h
@@ -407,6 +409,7 @@ set(SOURCES FX4Splitter.cpp
             FXCalendar.cpp
             FXCalendarView.cpp
             FXCanvas.cpp
+            fxchar.cpp
             FXCheckButton.cpp
             FXChoiceBox.cpp
             FXColorBar.cpp
@@ -592,7 +595,9 @@ set(SOURCES FX4Splitter.cpp
             FXObject.cpp
             FXObjectList.cpp
             FXOptionMenu.cpp
+            fxosver.cpp
             FXPacker.cpp
+            FXParseBuffer.cpp
             fxparsegeometry.cpp
             FXPath.cpp
             FXPCXIcon.cpp
@@ -909,6 +914,12 @@ if(HAVE_GETGRGID_R)
   add_definitions(-DHAVE_GETGRGID_R)
 endif()
 
+check_cxx_symbol_exists(uname "sys/utsname.h" HAVE_SYS_UTSNAME_H)
+if(HAVE_SYS_UTSNAME_H)
+  add_definitions(-DHAVE_SYS_UTSNAME_H)
+endif()
+
+
 cmake_push_check_state()
   set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
   set(CMAKE_REQUIRED_LIBRARIES -pthread)
@@ -1120,6 +1131,7 @@ if(HAVE_SYS_INOTIFY_H)
   add_definitions(-DHAVE_SYS_INOTIFY_H)
 endif()
 
+
 if(WITH_JPEG)
   find_package(JPEG)
   if(JPEG_FOUND)
@@ -1222,5 +1234,3 @@ install(TARGETS FOX
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 install(FILES ${HEADERS} DESTINATION include/fox-${FOX_VERSION_MAJOR}.${FOX_VERSION_MINOR})
-
-
