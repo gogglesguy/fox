@@ -11,6 +11,7 @@ include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-Wall                HAS_CXX_WALL)
 check_cxx_compiler_flag(-Wextra              HAS_CXX_WEXTRA)
 check_cxx_compiler_flag(-Wno-format          HAS_CXX_WFORMAT)
+check_cxx_compiler_flag(-Wno-format-security HAS_CXX_WFORMAT_SECURITY)
 check_cxx_compiler_flag(-Woverloaded-virtual HAS_CXX_WOVERLOADED_VIRTUAL)
 check_cxx_compiler_flag(-Wshadow             HAS_CXX_WSHADOW)
 check_cxx_compiler_flag(-Wstrict-aliasing    HAS_CXX_WSTRICT_ALIASING)
@@ -74,8 +75,14 @@ if(HAS_CXX_WEXTRA)
     add_compile_options(-Wextra)
 endif()
 
+# Disable any -Wformat as FXString::format is incompatible
 if(HAS_CXX_WFORMAT)
     add_compile_options(-Wno-format)
+endif()
+
+# Disable -Wformat-security as this flag won't work with passing -Wno-format
+if(HAS_CXX_WFORMAT)
+    add_compile_options(-Wno-format-security)
 endif()
 
 if(HAS_CXX_WFATAL)
@@ -114,14 +121,12 @@ if(HAS_CXX_WDOUBLE_PROMOTION)
     add_compile_options(-Wdouble-promotion)
 endif()
 
-
 if(WITH_NATIVE)
   check_cxx_compiler_flag(-march=native HAS_CXX_OPTIMIZE_NATIVE)
   if(HAS_CXX_OPTIMIZE_NATIVE)
     add_compile_options(-march=native)
   endif()
 endif()
-
 
 # Libraries
 add_subdirectory(utils)
