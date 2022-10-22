@@ -458,7 +458,6 @@ set(SOURCES FX4Splitter.cpp
             FXDataTarget.cpp
             FXDate.cpp
             FXDC.cpp
-            FXDCPrint.cpp
             FXDCWindow.cpp
             FXDDSIcon.cpp
             FXDDSImage.cpp
@@ -605,7 +604,6 @@ set(SOURCES FX4Splitter.cpp
             FXProcess.cpp
             FXProgressBar.cpp
             FXProgressDialog.cpp
-            fxpsio.cpp
             FXPtrList.cpp
             FXPtrQueue.cpp
             FXReactor.cpp
