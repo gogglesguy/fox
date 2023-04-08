@@ -13,6 +13,8 @@ Preferences.cpp
 Preferences.h
 ShellCommand.cpp
 ShellCommand.h
+ShellDialog.cpp
+ShellDialog.h
 Syntax.cpp
 Syntax.h
 SyntaxParser.cpp
@@ -31,6 +33,7 @@ browser.gif
 capitalize.gif
 close_gif.gif
 colors_gif.gif
+command_bmp.bmp
 config_gif.gif
 copy_gif.gif
 cut_gif.gif
@@ -100,7 +103,3 @@ add_custom_command(
   )
 
 install(TARGETS adie RUNTIME DESTINATION bin)
-
-
-
-
