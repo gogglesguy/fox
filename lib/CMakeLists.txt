@@ -771,15 +771,14 @@ bigfolderopen.gif
 bigharddisk.gif
 bignetdrive.gif
 bignethood.gif
-bookset.gif
-bookclr.gif
-bookadd.bmp
-bookdel.bmp
+bookclr_gif.gif
+bookdel_gif.gif
+bookmrk_gif.gif
+bookset_gif.gif
 clearentry.gif
 cmymode.gif
 dialmode.gif
-dirupicon.gif
-deleteicon.gif
+dirup_gif.gif
 docktop.gif
 dockbottom.gif
 dockleft.gif
@@ -799,6 +798,7 @@ filerename.gif
 filedelete.gif
 fileshown.gif
 foldernew.gif
+hammer_gif.gif
 gotohome.gif
 gotowork.gif
 hsvmode.gif
@@ -822,6 +822,7 @@ minizipdrive.gif
 newfolder.bmp
 portrait.gif
 questionicon.gif
+redo_gif.gif
 rgbmode.gif
 searchicon.gif
 showbigicons.gif
